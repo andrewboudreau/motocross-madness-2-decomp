@@ -3,8 +3,8 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 # motion (Spheres.cpp, SteeringControl.cpp)
 
-Validation: all 101 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
-(Spheres 14, SteeringControl 21, Motnctrl 40, D3DIMSoultreeMotnctrl 26). In `samples/physics/motion/`,
+Validation: all 112 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
+(Spheres 14, SteeringControl 21, Motnctrl 40, D3DIMSoultreeMotnctrl 26, CollisionCharacter 11). In `samples/physics/motion/`,
 SurfaceMap.cpp is strict exact for 6 of 6 targets; the rest are partial.
 
 Wave 4. Both files are linked back to back in `0x504940..0x5051ec`; SurfaceMap and the keyboard hooks
@@ -140,3 +140,16 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
   - The functions after `0x4a9aa0`.
   - `0x4a8bf0`, `0x4a8c50` and `0x4a9050` (2138 bytes), which round with direct `fistp` instructions (no
     `_ftol` call): `__asm` in the original, which the readable-C++ rule excludes.
+
+## CollisionCharacter.cpp
+Extent: `0x004318d0..0x00431da0`. All 11 functions are strict exact in
+`src/krusty2/motion/CollisionCharacter.cpp` (`CollisionCharacter.h`, `CollisionCharacter.bindings.json`).
+- `__FILE__` string `D:\aardvark\VC\krusty2\CollisionCharacter.cpp` at `0x00568554`, one xref (`0x00431a12`,
+  the debug `new(0xb8, __FILE__, 27)` of the CollisionObject in Load `0x004319c0`).
+- Start: the constructor `0x004318d0`, which follows CDAudio.cpp/ClipRectangle.cpp. End: `0x00431da0` is
+  CollisionObject.cpp's first function (it frees with that unit's `__FILE__` `0x00568614`).
+- `CollisionCharacter : D3DIMSoultreeCharacter`, GameObject as a virtual base at `0x268` with a vtordisp; primary
+  vtable `0x0055110c`, vbase vtable `0x0055109c`, vbptr table `0x0055113c`.
+- Functions: constructor `0x004318d0`, destructor core `0x00431980`, Load `0x004319c0`, slot 10 `0x00431b30`,
+  slot 14 `0x00431cf0`, the vbase deleting destructor `0x00431d20`, and the five vtordisp thunks `0x00431d10`,
+  `0x00431d60`, `0x00431d70`, `0x00431d80`, `0x00431d90`.

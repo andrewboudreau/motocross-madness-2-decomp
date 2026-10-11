@@ -1,21 +1,9 @@
 // Small vector helpers reached by direct call from the collision code (tier 3 names).
 // Their translation unit is unknown: they sit between the CollisionPoint.cpp and cube.cpp
-// __FILE__ references, outside CollisionObject.cpp (src/krusty2/collision).
+// __FILE__ references, outside CollisionObject.cpp (src/krusty2/collision).  The reject
+// helper 0x0043b190, inside CollisionPoint.cpp's extent, is in src/krusty2/collision/CollisionPoint.cpp.
 #include "collision/CollisionTypes.h"
 #include "math/Math3D.h"   // FastSqrt (0x00460b50)
-
-// 0x0043b190 (cdecl): out = a - b * (a . b), the part of a perpendicular to the (unit) vector b.
-// Returns 0 when the result is exactly the zero vector, else out.
-CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b)
-{
-    float d = CollisionDot(*b, *a);
-    CollisionVec3 t = *b * d;
-    *out = *a - t;
-    if (out->x == 0.0f && out->y == 0.0f && out->z == 0.0f)
-        return 0;
-    return out;
-}
-
 
 // 0x0043c890 (cdecl): *out = *v * (1 / len); returns out.
 CollisionVec3* CollisionDivide(CollisionVec3* out, const CollisionVec3* v, float len)

@@ -1,5 +1,11 @@
+// With ConstraintMethodCollisionModel.bindings.json all 19 targets of this file
+// (src/krusty2/constraint/targets.json) pass `tools/run_physics_samples.py --strict`.
 // ConstraintMethodCollisionModel.cpp -- reconstruction of the retail translation unit
-// "ConstraintMethodCollisionModel.cpp" (__FILE__ xref at 0x0043c7f9). Region 0x0043b320..0x0043c8e0.
+// "ConstraintMethodCollisionModel.cpp" (__FILE__ xref at 0x0043c7f9). Unit extent
+// 0x0043b800..0x0043ca20 plus the out-of-line vector helpers 0x0043c890 / 0x0043ca20 it calls.
+// ApplyContactImpulse (0x0043bdb0) is a near miss kept in
+// samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp, which includes
+// this file.
 //
 // SOLVER OVERVIEW (semantic names are tier 3; instruction behaviour is tier 1)
 //   Method: single-contact IMPULSE (velocity-level rigid body response) plus a small
@@ -26,8 +32,9 @@
 //   velocity (P' = m*v + j*n, damped by 1 - dt*damping) and angular momentum (L' = I*w + rA x J),
 //   and clamps the speed to maxSpeed (+0xfc). Body B (the other party, may be null) only
 //   contributes to the denominator and to the relative velocity (null -> zero vector 0x579830).
-//   Other content of this TU: static pixel blend helpers (0x43b320..0x43b660, PixelBlend.cpp),
-//   the contact callback 0x43b800, and the TU initializer 0x43c8e0 (zeroes the Vec3 at 0x579830).
+//   Other content of this TU: the contact callback 0x43b800 and the four kVec3 initializer pairs
+//   0x43c8e0..0x43ca1b.  The pixel blend helpers just before it (0x43b320..0x43b7f9,
+//   samples/physics/constraint/PixelBlend.cpp) have no literal tying them to this unit.
 //
 #include "ConstraintMethodCollisionModel.h"
 
@@ -95,23 +102,13 @@ void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const
     UpdatePlacement();
 }
 
-void ConstraintMethodCollisionModel::AddProbePoint(ConVec3 point, ConNode* node)
-{
-    probes = (ConstraintProbe*)DebugRealloc(probes, (probeCount + 1) * sizeof(ConstraintProbe), __FILE__, 331);
-    probes[probeCount].node = node;
-    probes[probeCount].localPoint = point;
-    probes[probeCount].hit = 0;
-    probeCount++;
-}
-
-// ---- Slot 11 / contact solver --------------------------------------------------
-
-
-static inline float Dot3(const ConVec3& a, const ConVec3& b)
-{
-    return a.x * b.x + a.y * b.y + a.z * b.z;
-}
-
+// Slot 11 (0x0043ba70, ret 4; this == the subobject at +0xc): one solver step, see the overview
+// above.  Source shapes that retail's bytes require: the refresh and the overlap push-out are two
+// separate if statements (one block keeps the CollisionObject base pointer in ebx across both);
+// the loop's p, probeY and n are declared in the ground-query block, not in the loop body
+// (in the loop body they share frame slots with the push-out's locals, giving a different
+// frame); the offset products carry redundant parentheses (docs/VC6_OPERAND_ORDER.md section 3),
+// without which VC6 schedules the argument copies of the ApplyContactImpulse call differently.
 int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
 {
     dt = t;
@@ -122,30 +119,32 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
         } else {
             UpdatePlacement();
         }
-        if (shapeCollisionEnabled && QueryCollisions()) {
-            const ConVec3* n = (const ConVec3*)contactRecord;
-            ConVec3 pos;
-            body->node->GetPositionIn(0, &pos);
-            ConVec3 d;
-            d.x = n->x * 1.005f;
-            d.y = n->y * 1.005f;
-            d.z = n->z * 1.005f;
-            pos.x -= d.x;
-            pos.y -= d.y;
-            pos.z -= d.z;
-            body->node->SetPositionIn(0, &pos);
-            UpdatePlacement();
-        }
+    }
+    if (shapeCollisionEnabled && QueryCollisions()) {
+        const ConVec3* n = (const ConVec3*)contactRecord;
+        ConVec3 pos;
+        body->node->GetPositionIn(0, &pos);
+        ConVec3 d;
+        d.x = n->x * 1.005f;
+        d.y = n->y * 1.005f;
+        d.z = n->z * 1.005f;
+        pos.x -= d.x;
+        pos.y -= d.y;
+        pos.z -= d.z;
+        body->node->SetPositionIn(0, &pos);
+        UpdatePlacement();
     }
     if (groundQuery) {
         float maxPen = 0.0f;
         int anyHit = 0;
         ConVec3 bestNormal;
         ConVec3 bestPoint;
+        ConVec3 p;
+        float probeY;
+        ConVec3 n;
         for (int i = 0; i < probeCount; i++) {
-            ConVec3 p = probes[i].node->LocalToWorldPoint(probes[i].localPoint);
-            float probeY = p.y;
-            ConVec3 n;
+            p = probes[i].node->LocalToWorldPoint(probes[i].localPoint);
+            probeY = p.y;
             groundQuery->QueryPoint(&p, &n, 0, 0);
             if (probeY < p.y) {
                 anyHit = 1;
@@ -164,9 +163,9 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
         if (anyHit && applyImpulses) {
             float d = -maxPen;
             ConVec3 offset;
-            offset.x = bestNormal.x * d;
-            offset.y = bestNormal.y * d;
-            offset.z = bestNormal.z * d;
+            offset.x = (bestNormal.x * d);
+            offset.y = (bestNormal.y * d);
+            offset.z = (bestNormal.z * d);
             ApplyContactImpulse(0, 1.0f, offset, bestPoint, bestNormal);
             ConVec3 pos;
             body->node->GetPositionIn(0, &pos);
@@ -185,72 +184,29 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
     return 1;
 }
 
+void ConstraintMethodCollisionModel::AddProbePoint(ConVec3 point, ConNode* node)
+{
+    probes = (ConstraintProbe*)DebugRealloc(probes, (probeCount + 1) * sizeof(ConstraintProbe), __FILE__, 331);
+    probes[probeCount].node = node;
+    probes[probeCount].localPoint = point;
+    probes[probeCount].hit = 0;
+    probeCount++;
+}
+
 // TU-private vector constants, .CRT$XCU entries 66-69: zero 0x00579830 (thunk 0x0043c8e0,
 // body 0x0043c8f0), x axis 0x00579840 (0x0043c930/0x0043c940), y axis 0x00579850
 // (0x0043c980/0x0043c990) and z axis 0x00579820 (0x0043c9d0/0x0043c9e0).  Each 60-byte body
 // builds the value in a stack temporary and copies it out, which is the shape VC6 gives
 // copy-initialization from a constructor call (direct initialization stores the floats
-// straight into the global).  Only the zero vector has a reader here.
-struct ConStaticVec3 {
-    float x, y, z;
-    ConStaticVec3(float a, float b, float c) : x(a), y(b), z(c) {}
+// straight into the global).  Only the zero vector has a reader: ApplyContactImpulse copies it
+// as a whole ConVec3 (three dword moves), which is why the type derives from ConVec3.
+struct ConStaticVec3 : ConVec3 {
+    ConStaticVec3(float a, float b, float c) { x = a; y = b; z = c; }
 };
 static const ConStaticVec3 g_ConZero = ConStaticVec3(0.0f, 0.0f, 0.0f);
 static const ConStaticVec3 g_ConXAxis = ConStaticVec3(1.0f, 0.0f, 0.0f);
 static const ConStaticVec3 g_ConYAxis = ConStaticVec3(0.0f, 1.0f, 0.0f);
 static const ConStaticVec3 g_ConZAxis = ConStaticVec3(0.0f, 0.0f, 1.0f);
-
-void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,
-                                                         ConVec3 a, ConVec3 b, ConVec3 c)
-{
-    ConVec3 wA = body->GetWorldAngularVelocity();
-    ConVec3 vLin(body->prevVelocity.x + (body->velocity.x - body->prevVelocity.x) * t,
-                 body->prevVelocity.y + (body->velocity.y - body->prevVelocity.y) * t,
-                 body->prevVelocity.z + (body->velocity.z - body->prevVelocity.z) * t);
-    ConVec3 cA = body->node->LocalToWorldPoint(body->centerOfMass);
-    b = a + b;
-    contactPoint = b;
-    ConVec3 rA(b.x - cA.x, b.y - cA.y, b.z - cA.z);
-    ConVec3 vA = vLin + CrossProduct(wA, rA);
-    ConVec3 vB(g_ConZero.x, g_ConZero.y, g_ConZero.z);
-    ConVec3 rB;
-    if (other) {
-        ConVec3 posB;
-        other->node->GetPositionIn(0, &posB);
-        rB = ConVec3(b.x - posB.x, b.y - posB.y, b.z - posB.z);
-        ConVec3 wB = other->GetWorldAngularVelocity();
-        vB = other->velocity + CrossProduct(wB, rB);
-    }
-    ConVec3 vRel(vA.x - vB.x, vA.y - vB.y, vA.z - vB.z);
-    float vn = Dot3(vRel, c);
-    float num = -(1.0f + restitution) * vn;
-
-    ConVec3 nl = body->node->WorldToLocalDirection(c);
-    ConVec3 rl = body->node->WorldToLocalDirection(rA);
-    ConVec3 axisA = RotateVector(CrossProduct(rl, nl), body->invInertia);
-    float denom = body->invMass + Dot3(nl, CrossProduct(axisA, rl));
-    if (other) {
-        ConVec3 nlB = other->node->WorldToLocalDirection(c);
-        ConVec3 rlB = other->node->WorldToLocalDirection(rB);
-        ConVec3 axisB = RotateVector(CrossProduct(rlB, nlB), other->invInertia);
-        denom += other->invMass + Dot3(nlB, CrossProduct(axisB, rlB));
-    }
-    float j = num / denom;
-    j *= 1.0f - impulseLoss;
-    if (maxImpulse != 0 && j > maxImpulse)
-        j = maxImpulse;
-
-    ConVec3 J = c * j;
-    ConVec3 P = vLin * body->mass + J;
-    body->velocity = (P / body->mass) * (1.0f - dt * damping);
-
-    ConVec3 Lang = RotateVector(body->angularVelocity, body->inertia)
-                 + CrossProduct(rl, body->node->WorldToLocalDirection(J));
-    body->angularVelocity = RotateVector(Lang, body->invInertia) * (1.0f - dt * damping);
-
-    if (maxSpeed != 0 && Magnitude(body->velocity) > maxSpeed)
-        body->velocity = maxSpeed * Normalize(body->velocity);
-}
 
 // ---- Contact callback (0x0043b800) ----------------------------------------------
 // Stored into field_0x88 by slot 8 (with 0x464e90 in field_0x8c). cdecl; self is the

@@ -1,44 +1,5 @@
 [
   {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "CollisionPointVirtualSlot1@CollisionPoint",
-    "target_va": "0x0043b240",
-    "target_size": 186,
-    "expect": "partial",
-    "notes": "155/162: same size; residual is one store pair scheduled differently (retail `fstp [esp+8]` before `mov [edx+4], eax`). Unchanged: `((-normalForce) * surfaceGrip) * frictionCoefficient`, a named magnitude local stored then reused through the member, a frictionForce temp, parenthesised and chained-assignment forms. Worse: dropping the parentheses around -normalForce, `-(a * b) * c` / `-(a * b * c)`, `(-n) * (g * c)`, using the local magnitude in the product, componentwise frictionForce stores. 0..33 dead initialised locals at the top change nothing.",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "??_GCollisionPoint",
-    "target_va": "0x0043b300",
-    "target_size": 32,
-    "expect": "exact",
-    "notes": "12.5%: same size; retail loads flag byte into al then test al,1 (mine tests [esp+4] directly); core dtor inlined as in retail; exact under vc6_o2_ml (retail profile, no /G6)",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "AddCollisionPoint",
-    "target_va": "0x0043a330",
-    "target_size": 565,
-    "expect": "exact",
-    "notes": "AddCollisionPoint with the inlined CollisionPoint ctor. Exact with the capacity test as `if (*count < capacity) {...} return 0;` (retail puts the return 0 at the end) and field_0x04 = 0 after field_0x08 in the ctor.",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "ConstraintMethodCollisionModel",
-    "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot2@ConstraintMethodCollisionModel",
-    "target_va": "0x0044d710",
-    "target_size": 1,
-    "expect": "exact",
-    "notes": "bare ret"
-  },
-  {
     "class": "SoultreePhysicsCharacter",
     "source": "SoultreePhysicsCharacter.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot1@SoultreePhysicsCharacter",
@@ -111,16 +72,6 @@
   {
     "class": "CollisionVectorHelpers",
     "source": "CollisionVectorHelpers.cpp",
-    "candidate_symbol_contains": "CollisionRejectFrom",
-    "target_va": "0x0043b190",
-    "target_size": 168,
-    "expect": "partial",
-    "notes": "96% (150/156) under vc6_o2_ml; vector rejection (a - proj_b(a)). Residual: retail loads b's pointer before a's and computes the y term as b.y * a.y (VC6: a first, a.y * b.y). Unchanged: every operand order / permutation of the dot terms and CollisionDot(*a, *b), one-statement and t-inline forms, Vec3/DotProduct casts, non-const or reference parameters, renamed parameters, prepended dummies/typedefs. `const CollisionVec3& u = *b, & v = *a` locals fix the pointer load order but sum the dot as (z + y) + x (143/156). Lever sweep (masked 162/168 of 168 is the best): a reference alias of a and/or b used in any subset of the dot terms, in all six term orders (384 + 384 forms); u/v references with every term order, operand order and bracketing, CollisionDot(u, v)/(v, u), and t/out through the references (196 forms).",
-    "bindings": "CollisionVectorHelpers.bindings.json"
-  },
-  {
-    "class": "CollisionVectorHelpers",
-    "source": "CollisionVectorHelpers.cpp",
     "candidate_symbol_contains": "CollisionDivide",
     "target_va": "0x0043c890",
     "target_size": 71,
@@ -130,51 +81,23 @@
   },
   {
     "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "UpdateRelativeMotion",
-    "target_va": "0x0043a640",
-    "target_size": 1003,
-    "expect": "partial",
-    "notes": "5.0% under vc6_o2_ml; semantics match retail (see CollisionPoint.cpp) but retail pushes an extra ebx, keeps sums z,y,x and spills different temporaries (942 vs 1003 bytes)",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionContactUpdate.cpp",
+    "source": "CollisionPointNearMisses.cpp",
     "candidate_symbol_contains": "SoultreeMergeContacts",
     "target_va": "0x0043aa30",
     "target_size": 845,
     "expect": "partial",
-    "notes": "3.6%: reduces contact manifold (mean position, summed+normalised normal, deepest penetration, angular/linear terms); retail reuses argument slots for scalars (deepest in a2 slot, len2 in a9 slot) and orders sums differently (772 vs 845)"
+    "notes": "Near miss (CollisionPoint.cpp extent). Frame, blocks, clamp, loop, by-value product copy and trailing return 0 match; left: the sum * (1/merged) y component is component-first in retail, the normal's squared length squares y, x, z (y consumed) where VC6 gives Vec3Normalize's order, and one fstp of the push is scheduled later.",
+    "bindings": "../../../src/krusty2/collision/CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionPoint",
-    "source": "CollisionContactUpdate.cpp",
+    "source": "CollisionPointNearMisses.cpp",
     "candidate_symbol_contains": "SoultreeRefreshContacts",
     "target_va": "0x0043ad80",
     "target_size": 615,
     "expect": "partial",
-    "notes": "8.3%: refreshes contact points (single-point and N-point paths via 0x4fd660 and 0x507c10), tallies penetrating contacts; retail duplicates the tail for both paths (331 vs 615)"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "AddExistingCollisionPoint",
-    "target_va": "0x0043a570",
-    "target_size": 109,
-    "expect": "exact",
-    "notes": "AddCollisionPoint without the allocation: optional caller-supplied point stored into the slot, position reset from the zero vector",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "RemoveCollisionPoint",
-    "target_va": "0x0043a5e0",
-    "target_size": 85,
-    "expect": "exact",
-    "notes": "search loop with the shift nested inside the match; returning from inside the loop keeps the separate not-found return",
-    "bindings": "CollisionPoint.bindings.json"
+    "notes": "Near miss (CollisionPoint.cpp extent). Body, both paths and the owner reload match; left: retail returns for a null a1 before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead points argument slot (VC6 uses a1's).",
+    "bindings": "../../../src/krusty2/collision/CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionVectorHelpers",
@@ -187,16 +110,6 @@
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "UpdateCollisionPointWorldPositions",
-    "target_va": "0x0043aff0",
-    "target_size": 88,
-    "expect": "exact",
-    "notes": "the owner is read again through (*points) for the call, so the +0xa4 test gets ecx and the thiscall setup reloads it",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
     "class": "CollisionObject",
     "source": "CollisionVectorHelpers.cpp",
     "candidate_symbol_contains": "NextCollisionCounter",
@@ -205,86 +118,6 @@
     "expect": "exact",
     "notes": "return ++g gives mov/inc/mov; owner: bracket only",
     "bindings": "CollisionVectorHelpers.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E2",
-    "target_va": "0x0043b050",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "Dynamic-initializer thunk for the (0,0,0) constant 0x005797f0 (5-byte jmp to 0x0043b060).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E1",
-    "target_va": "0x0043b060",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary and copies it to 0x005797f0 (copy-initialization from the inline constructor).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E5",
-    "target_va": "0x0043b0a0",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "Dynamic-initializer thunk for the (1,0,0) constant 0x00579800 (5-byte jmp to 0x0043b0b0).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E4",
-    "target_va": "0x0043b0b0",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "Dynamic-initializer body: builds (1,0,0) in a stack temporary and copies it to 0x00579800 (copy-initialization from the inline constructor).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E8",
-    "target_va": "0x0043b0f0",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "Dynamic-initializer thunk for the (0,1,0) constant 0x00579810 (5-byte jmp to 0x0043b100).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E7",
-    "target_va": "0x0043b100",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "Dynamic-initializer body: builds (0,1,0) in a stack temporary and copies it to 0x00579810 (copy-initialization from the inline constructor).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E11",
-    "target_va": "0x0043b140",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "Dynamic-initializer thunk for the (0,0,1) constant 0x005797e0 (5-byte jmp to 0x0043b150).",
-    "bindings": "CollisionPoint.bindings.json"
-  },
-  {
-    "class": "CollisionPoint",
-    "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "_$E10",
-    "target_va": "0x0043b150",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "Dynamic-initializer body: builds (0,0,1) in a stack temporary and copies it to 0x005797e0 (copy-initialization from the inline constructor).",
-    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionObject",

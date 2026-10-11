@@ -198,5 +198,215 @@
     "expect": "exact",
     "notes": "g_d3dimShadowVertices initializer body: the empty inline vertex constructor leaves a bare ret",
     "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "??0ProjectedShadow",
+    "target_va": "0x004da570",
+    "target_size": 331,
+    "expect": "exact",
+    "notes": "constructor; the previous-bounds stores are written per axis (min x, max x, min y, max y) after receiverCapacity, which gives retail's early 0x7fffffff load and late stores",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "??1ProjectedShadow",
+    "target_va": "0x004da6e0",
+    "target_size": 194,
+    "expect": "exact",
+    "notes": "destructor core",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "??_GProjectedShadow",
+    "target_va": "0x004da6c0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor wrapper",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?AddCaster@",
+    "target_va": "0x004dab00",
+    "target_size": 135,
+    "expect": "exact",
+    "notes": "grow x2 array, new/DebugAlloc line 0xfe/0x102",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?ClearCasters@",
+    "target_va": "0x004dab90",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "casterCount=0",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?AddReceiver@",
+    "target_va": "0x004daba0",
+    "target_size": 167,
+    "expect": "exact",
+    "notes": "grow receivers, lines 0x115/0x119",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?ResizeVertexBuffer@",
+    "target_va": "0x004dac50",
+    "target_size": 138,
+    "expect": "exact",
+    "notes": "vertex buffer line 0x131/0x134",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?SetShadowStrength@",
+    "target_va": "0x004dace0",
+    "target_size": 336,
+    "expect": "exact",
+    "notes": "colour key from strength",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?SetShadowGrey@",
+    "target_va": "0x004dae30",
+    "target_size": 31,
+    "expect": "exact",
+    "notes": "grey level to shadowColor",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot10",
+    "target_va": "0x004dafc0",
+    "target_size": 62,
+    "expect": "exact",
+    "notes": "slot 10 (float dt)",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot12",
+    "target_va": "0x004db000",
+    "target_size": 193,
+    "expect": "exact",
+    "notes": "slot 12 per-frame update",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot13",
+    "target_va": "0x004dc410",
+    "target_size": 165,
+    "expect": "exact",
+    "notes": "slot 13",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004dc4d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004dc4e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004dc520",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004dc530",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004dc570",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004dc580",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004dc5c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004dc5d0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "?SetLight@",
+    "target_va": "0x004dae50",
+    "target_size": 365,
+    "expect": "exact",
+    "notes": "Exact. The mode is the third argument (callers 0x4998c0/0x4e00e2 push it first); the direction goes through an inline Vec3Normalize-shaped helper; one `mode = newMode` store after the if/else chain keeps newMode in ebx as retail does.",
+    "bindings": "ProjectedShadow.bindings.json"
   }
 ]

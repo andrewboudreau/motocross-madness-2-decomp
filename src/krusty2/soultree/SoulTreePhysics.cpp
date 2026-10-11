@@ -1009,7 +1009,7 @@ void SoultreePhysicsBaseObject::UpdateRestState()
 }
 
 // ---- GameObject slot 10 override (0x005036f0, via vtordisp thunk 0x005042d0) ---------------
-// 0x0043ad80 (cdecl, collision/CollisionContactUpdate.cpp): refreshes every contact point
+// 0x0043ad80 (cdecl, CollisionPoint.cpp; near miss in samples/physics/collision/CollisionPointNearMisses.cpp): refreshes every contact point
 // from its owner node, counts the penetrating ones into *activeCount and returns nonzero
 // when it ran (first argument zero: nothing done).  Parameter names tier 3.
 int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeContact** contacts,

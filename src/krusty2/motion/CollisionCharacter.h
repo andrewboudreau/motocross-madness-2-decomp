@@ -17,8 +17,8 @@
 //    virtual-base function; the C++ below is an ordinary member function.
 //  * Field semantics are tier 3.  CollisionCharacter attaches a CollisionObject (0x210) to a
 //    scene node (0x214) and, every update, turns the node's movement into a velocity.
-#ifndef TIRE_COLLISION_CHARACTER_H
-#define TIRE_COLLISION_CHARACTER_H
+#ifndef COLLISION_CHARACTER_H
+#define COLLISION_CHARACTER_H
 
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "collision/CollisionObject.h"

@@ -1,3 +1,6 @@
+// With CollisionCharacter.bindings.json all 11 targets of this file (src/krusty2/motion/targets.json)
+// pass `tools/run_physics_samples.py --strict`.  They are every function of the unit's extent
+// 0x004318d0..0x00431da0 (the next function, 0x00431da0, belongs to CollisionObject.cpp).
 // CollisionCharacter.cpp -- see CollisionCharacter.h.
 #include <stddef.h>
 #include "CollisionCharacter.h"

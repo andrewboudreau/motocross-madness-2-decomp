@@ -5,10 +5,10 @@
 // constructor (thiscall, ret 0xc, 0x00404e60) and calls out-of-line copies of the
 // vector operators (0x00421cb0 a+b, 0x005015b0 v*s, 0x00428090 s*v, 0x0043c890 v/s,
 // 0x00515600 cross, 0x00435ec0 length, 0x005087b0 normalize, 0x0043ca20 v*M).
-// ../common/Math3D.h defines the same operations inline, which VC6 would expand;
+// math/Math3D.h defines the same operations inline, which VC6 would expand;
 // so the operators here are declared, not defined, to force the same calls.
 // The physics body / node classes are minimal views of PhysicsBody
-// (../rigidbody/PhysicsBody.h) and SoultreeObject (../common/SoultreeObject.h).
+// (samples/physics/rigidbody/PhysicsBody.h) and SoultreeObject (core/SoultreeObject.h).
 #ifndef CONSTRAINT_TYPES_H
 #define CONSTRAINT_TYPES_H
 

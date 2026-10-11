@@ -121,6 +121,64 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
+## CollisionCharacter and ConstraintMethodCollisionModel
+
+Both units moved from `samples/physics/` to `src/krusty2/`:
+
+- `src/krusty2/motion/CollisionCharacter.cpp` (from `samples/physics/tire/`) passes
+  all 11 targets of its extent `0x4318d0..0x431da0`.
+- `src/krusty2/constraint/ConstraintMethodCollisionModel.cpp` (with
+  `ConstraintTypes.h`, from `samples/physics/constraint/`) passes 19 targets: the
+  unit's methods, callback and `$E` set, plus the shared bare `ret` `0x44d710`
+  that the removed duplicate `samples/physics/collision/ConstraintMethodCollisionModel.cpp`
+  registered. Slot 11 `0x43ba70` is exact with the refresh and the push-out as
+  two `if` statements, the probe-loop locals declared in the ground-query block
+  and parenthesised offset products.
+- ApplyContactImpulse `0x43bdb0` stays a near miss (1570/2619) in
+  `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp`. It is
+  fully decoded; the frame and slot order match.
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/motion/CollisionCharacter.cpp \
+  --source src/krusty2/constraint/ConstraintMethodCollisionModel.cpp \
+  --source samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `30/31 strict exact` with no required failures.
+
+## CollisionPoint and ProjectedShadow
+
+Both units moved from `samples/physics/` to `src/krusty2/`; every function of their
+extents is exact, a near miss or excluded:
+
+- `src/krusty2/collision/CollisionPoint.cpp` (with `CollisionPointCtor.h`, extent
+  `0x43a1e0..0x43b320`) passes 16 targets. New: UpdateRelativeMotion `0x43a640`
+  (header-shaped inline helpers whose constructor calls go out of line under the
+  inline budget), CollisionRejectFrom `0x43b190` (moved from
+  `samples/physics/collision/CollisionVectorHelpers.cpp`) and slot 1 `0x43b240`. The
+  sphere tests `0x43a1e0`/`0x43a270` stay exact in `samples/physics/collision/CollisionQueries.cpp`
+  (unit open). The contact merge `0x43aa30` and refresh `0x43ad80` (formerly
+  `CollisionContactUpdate.cpp`) are near misses in `samples/physics/collision/CollisionPointNearMisses.cpp`.
+- `src/krusty2/shadow/ProjectedShadow.cpp` (extent `0x4da570..0x4dc610`) passes 21
+  targets. New: SetLight `0x4dae50`, whose mode is the third argument (the callers push
+  it first). Init, ComputeBounds and Present are near misses in
+  `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; RenderShadow `0x4db8c0` and
+  TintCasterVertices `0x4dc2b0` round with bare `fistp` (inline asm) and stay
+  partial. Slot 23 is the folded stub `0x4dc4c0`, registered with Terrain.cpp.
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/collision/CollisionPoint.cpp \
+  --source samples/physics/collision/CollisionPointNearMisses.cpp \
+  --source src/krusty2/shadow/ProjectedShadow.cpp \
+  --source samples/physics/shadow/ProjectedShadowNearMisses.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `37/44 strict exact` with no required failures.
+
 ## Wave-8 promoted slice
 
 `src/krusty2/soultree/SoultreeQuadTreeRenderer.cpp` (8 cases, moved from
@@ -369,7 +427,8 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
 
 - The GameObject slot 10 override `0x005036f0` was `masked` only because the contact
   refresh it calls had no binding; `SoultreeRefreshContacts` is `0x0043ad80`
-  (collision/CollisionContactUpdate.cpp) and the target is strict exact.
+  (CollisionPoint.cpp's extent; near miss in
+  `samples/physics/collision/CollisionPointNearMisses.cpp`) and the target is strict exact.
 - SoultreePhysicsObject (`soultree/SoultreePhysicsObject.h`, formerly a collision sample
   header): ctor `0x005037c0` (`GameObject(1)`, `SoultreePhysicsBaseObject(flags)`,
   `D3DIMSoultreeObject(flags)`, then `sceneNode = this` converted to the D3DIM subobject),
@@ -480,7 +539,7 @@ InterpolatePose from 10.7% to 19.4%, with no other motion target changing.
 ## Preserved candidates
 
 The near misses of the tree builder, Motnctrl (the .VUE loader and pose
-helpers), steering (SetAxisFromPoints), projected shadow and the visibility traversal remain under
+helpers), steering (SetAxisFromPoints) and the visibility traversal remain under
 `samples/physics/` until their remaining byte/relocation evidence is
 complete. Shared layout headers remain under `src/krusty2/` for both verified
 source and samples; a header alone does not claim a reconstructed
@@ -491,8 +550,8 @@ where supported, without promoting that evidence into exact-code status.
 count as strict validation. `expect: "partial"` retains known code-generation
 mismatches. Full-root status of the `--strict` audit:
 
-- `--root src/krusty2`: 726/776 strict exact, 0 required failures.
-- `--root samples/physics`: 298/373 strict exact, 0 required failures.
+- `--root src/krusty2`: 793/843 strict exact, 0 required failures.
+- `--root samples/physics`: 236/306 strict exact, 0 required failures.
 
 Every other required target's relocations are bound in a `*.bindings.json` next to its
 source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the

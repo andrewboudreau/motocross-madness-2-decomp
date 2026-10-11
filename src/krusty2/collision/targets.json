@@ -788,5 +788,165 @@
     "expect": "partial",
     "notes": "149/1476: the pre-test calls the out-of-line operators as by-value views (SegmentSubtract/Add/Dot/Length; Add takes the scaled vector first, as retail pushes it). Retail gives each operator result its own frame slot (frame 0xa8; here the temporaries share) and keeps the segment pointer in ebx.",
     "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "??_GCollisionPoint",
+    "target_va": "0x0043b300",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "12.5%: same size; retail loads flag byte into al then test al,1 (mine tests [esp+4] directly); core dtor inlined as in retail; exact under vc6_o2_ml (retail profile, no /G6)",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "AddCollisionPoint",
+    "target_va": "0x0043a330",
+    "target_size": 565,
+    "expect": "exact",
+    "notes": "AddCollisionPoint with the inlined CollisionPoint ctor. Exact with the capacity test as `if (*count < capacity) {...} return 0;` (retail puts the return 0 at the end) and field_0x04 = 0 after field_0x08 in the ctor.",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "AddExistingCollisionPoint",
+    "target_va": "0x0043a570",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "AddCollisionPoint without the allocation: optional caller-supplied point stored into the slot, position reset from the zero vector",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "RemoveCollisionPoint",
+    "target_va": "0x0043a5e0",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": "search loop with the shift nested inside the match; returning from inside the loop keeps the separate not-found return",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "UpdateCollisionPointWorldPositions",
+    "target_va": "0x0043aff0",
+    "target_size": 88,
+    "expect": "exact",
+    "notes": "the owner is read again through (*points) for the call, so the +0xa4 test gets ecx and the thiscall setup reloads it",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x0043b050",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,0,0) constant 0x005797f0 (5-byte jmp to 0x0043b060).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x0043b060",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary and copies it to 0x005797f0 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x0043b0a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (1,0,0) constant 0x00579800 (5-byte jmp to 0x0043b0b0).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x0043b0b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (1,0,0) in a stack temporary and copies it to 0x00579800 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x0043b0f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,1,0) constant 0x00579810 (5-byte jmp to 0x0043b100).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x0043b100",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,1,0) in a stack temporary and copies it to 0x00579810 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x0043b140",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,0,1) constant 0x005797e0 (5-byte jmp to 0x0043b150).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x0043b150",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,1) in a stack temporary and copies it to 0x005797e0 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "CollisionPointVirtualSlot1@CollisionPoint",
+    "target_va": "0x0043b240",
+    "target_size": 186,
+    "expect": "exact",
+    "notes": "Exact with the product returned through an inline three-float constructor (CollisionPointVec3, Math3D's operator* shape): VC6 then issues the z temporary's fstp before the y copy store as retail does. CollisionTypes.h's operator* (member stores into a named result) gave 155/162.",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "CollisionRejectFrom",
+    "target_va": "0x0043b190",
+    "target_size": 168,
+    "expect": "exact",
+    "notes": "Reject helper between the unit's vector set and slot 1. Exact with the dot product's middle term parenthesised (a.x*b.x + (a.y*b.y) + a.z*b.z): retail emits y, x, z with b.y loaded first; the flat chain loads a.y first (150/156), grouped pairs emit x before y.",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "UpdateRelativeMotion",
+    "target_va": "0x0043a640",
+    "target_size": 1003,
+    "expect": "exact",
+    "notes": "Exact with header-shaped inline helpers: a dot grouped z + (x + (y)) at both expanded sites, the cross product with parenthesised products, operators returning through the out-of-line constructor 0x00404e60 (inline budget), c + t*f with c first, the branch-2 normalisation as v * (1/len) inside a division helper, and tangentSpeed = 0 stored before the w = c copies (otherwise VC6 caches 0 in edi).",
+    "bindings": "CollisionPoint.bindings.json"
   }
 ]

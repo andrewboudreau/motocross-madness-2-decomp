@@ -1,0 +1,192 @@
+[
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "ConstraintContactCallback",
+    "target_va": "0x43b800",
+    "target_size": 202,
+    "expect": "exact",
+    "notes": "cdecl callback stored in field_0x88. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "??0ConstraintMethodCollisionModel",
+    "target_va": "0x43b8d0",
+    "target_size": 121,
+    "expect": "exact",
+    "notes": "constructor. Exact with the body statement order bc, ec, b8, 108, then the zeroed fields (found by a placement search; VC6 schedules the vptr stores after the member stores).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "??_GConstraintMethodCollisionModel",
+    "target_va": "0x43b950",
+    "target_size": 34,
+    "expect": "exact",
+    "notes": "scalar deleting destructor. Extent is the CodeView function size; the alignment padding after it is not compared; retail next function is 0x43b980, so the 48-byte extent (34 code + 14 padding) is compared and matches byte-for-byte.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "??1ConstraintMethodCollisionModel",
+    "target_va": "0x43b980",
+    "target_size": 18,
+    "expect": "exact",
+    "notes": "destructor core. exact (dtor core: writes both vptrs then jmp base dtor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot8@ConstraintMethodCollisionModel",
+    "target_va": "0x43b9a0",
+    "target_size": 59,
+    "expect": "exact",
+    "notes": "slot 8 (secondary vtable). exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "SetBody",
+    "target_va": "0x43b9e0",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": "SetBody. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot10@ConstraintMethodCollisionModel",
+    "target_va": "0x43ba40",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "slot 10. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot11@ConstraintMethodCollisionModel",
+    "target_va": "0x43ba70",
+    "target_size": 829,
+    "expect": "exact",
+    "notes": "slot 11: probe / ground query step. Exact with the refresh and the overlap push-out as two if statements, the loop locals p/probeY/n declared in the ground-query block and the offset products parenthesised (redundant-parenthesis node, docs/VC6_OPERAND_ORDER.md section 3).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "AddProbePoint",
+    "target_va": "0x43c7f0",
+    "target_size": 139,
+    "expect": "exact",
+    "notes": "AddProbePoint. exact (signature is Vec3 by value + node: same stack layout as three floats).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@ConstraintMethodCollisionModel",
+    "target_va": "0x43c880",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 14 tail jump. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x0043c8e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the TU zero vector 0x579830 (a 5-byte jmp to the body; target_size is the CodeView extent, without the alignment padding).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x0043c8f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x0043c930",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (1,0,0) constant 0x00579840 (5-byte jmp to 0x0043c940).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x0043c940",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (1,0,0) in a stack temporary and copies it to 0x00579840 (copy-initialization from the inline constructor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x0043c980",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,1,0) constant 0x00579850 (5-byte jmp to 0x0043c990).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x0043c990",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,1,0) in a stack temporary and copies it to 0x00579850 (copy-initialization from the inline constructor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x0043c9d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,0,1) constant 0x00579820 (5-byte jmp to 0x0043c9e0).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x0043c9e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,1) in a stack temporary and copies it to 0x00579820 (copy-initialization from the inline constructor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot2@ConstraintMethodCollisionModel",
+    "target_va": "0x0044d710",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "bare ret; 0x0044d710 is the empty-body stub shared (folded) by six vtables (ConnectionInfoType, InfoType, DrawableGridNode, RenderTarget, ShadowReceiver and this class), so it lies outside this unit; the empty UnknownVirtualSlot2 body compiles to it",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  }
+]

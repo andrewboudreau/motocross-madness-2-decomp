@@ -25,7 +25,7 @@ struct UnknownSceneLodObject {
 };
 
 // The object a key-framed scene entry holds: CollisionCharacter (0x294
-// bytes, constructor 0x004318d0, samples/physics/tire), a
+// bytes, constructor 0x004318d0, src/krusty2/motion), a
 // D3DIMSoultreeCharacter with its own vtable at +0, a vbptr at +4 and the
 // GameObject virtual base at +0x268. Tier 2: 0x004eb040 calls 0x004a8b40
 // (D3DIMSoultreeCharacter::SetMotion in src/krusty2/motion) on it, whose

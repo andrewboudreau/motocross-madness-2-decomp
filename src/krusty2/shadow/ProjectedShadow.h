@@ -284,7 +284,9 @@ public:
     void ResizeVertexBuffer();                      // 0x004dac50
     void SetShadowStrength(int strength);           // 0x004dace0
     void SetShadowGrey(int level);                  // 0x004dae30
-    int SetLight(int newMode, const ShadowVec3* dir, const ShadowVec3* pos);  // 0x004dae50
+    // 0x004dae50.  The mode is the last argument: KrustyUI 0x004998c0 and QuarryStuntEvent
+    // 0x004e00e2 push it first (push 3), then the direction, then the position.
+    int SetLight(const ShadowVec3* pos, const ShadowVec3* dir, int newMode);
     void ComputeBounds();                           // 0x004db0d0
     void RenderShadow();                            // 0x004db8c0
     void Present();                                 // 0x004dbd30
@@ -294,7 +296,7 @@ public:
     int casterCount;              // +0x30 number of entries in casters
     int casterCapacity;           // +0x34 allocated entries of casters
     ShadowVec3 lightDir;          // +0x38 ctor zero vector; 0x004dae50 stores the normalised direction
-    ShadowVec3 lightVec2;         // +0x44 ctor zero vector; 0x004dae50 copies its 3rd argument
+    ShadowVec3 lightVec2;         // +0x44 ctor zero vector; 0x004dae50 (mode 1) copies its 1st argument
     int field_0x50;               // +0x50 ctor 0
     ShadowTexture* texture;       // +0x54 created in Init, released by dtor
     ShadowCameraProxy* camera;    // +0x58 created in Init, released by dtor

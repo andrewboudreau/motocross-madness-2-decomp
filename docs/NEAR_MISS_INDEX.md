@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 176, c 124, total 300. The three class (a) functions of the
+Counts: a 0, b 173, c 122, total 295. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -138,14 +138,10 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/bvh/BoundingBoxTreeQuery | `0x00429570` | 246/831 | b | 17 code diffs: `jne @82 ; xor eax, eax ; pop edi` vs `je @272`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
-| physics/collision/CollisionContactUpdate | `0x0043aa30` | 25/698 (masked) | b | 51 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x1c ; mov ecx, [edx]`; frame 0x10 vs 0x0 |
-| physics/collision/CollisionContactUpdate | `0x0043ad80` | 26/315 (masked) | c | 19 code diffs: `sub esp, 0xc` vs `sub esp, 0x24`; retail adds `jne @7 ; xor eax, eax ; add esp, 0x24` |
-| physics/collision/CollisionPoint | `0x0043a640` | 41/814 (masked) | b | 44 code diffs: retail adds `push ebx`; retail adds `fld [esi + 0x30] ; fmul [eax + 4] ; fld~`; slots differ |
-| physics/collision/CollisionPoint | `0x0043b240` | 155/162 (masked) | c | 2 code diffs: retail adds `fstp [esp + N]`; retail lacks `fstp [esp + N]` |
-| physics/collision/CollisionVectorHelpers | `0x0043b190` | 150/156 (masked) | b | 2 code diffs: retail adds `mov ecx, [esp + N]`; `mov ecx, [esp + N] ; fld [eax + 4] ; fm~` vs `fld [ecx + 4] ; fmul [eax + 4]`; slots differ |
+| physics/collision/CollisionPoint | `0x0043aa30` | 377/791 (masked) | b | frame and blocks match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, the squared normal length squares y, x, z (y consumed), one push fstp scheduled later |
+| physics/collision/CollisionPoint | `0x0043ad80` | 47/599 (masked) | b | body matches; retail returns for a null first argument before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead `points` slot, VC6 in a1's |
 | physics/collision/CollisionVectorHelpers | `0x0043ca20` | 61/115 | b | 5 code diffs: retail adds `mov edx, [esp + N]`; retail lacks `mov edx, [esp + N]`; slots differ |
-| physics/constraint/ConstraintMethodCollisionModel | `0x0043ba70` | 100/756 (masked) | c | 11 code diffs: `lea ebx, [esi - 0xc]` vs `lea ecx, [esi - 0xc]`; `mov ecx, ebx ; je @20` vs `je @19` |
-| physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 91/1686 (masked) | b | 65 code diffs: retail adds `push ebx ; push ebp`; retail adds `fld [eax + 0x154] ; fsub [eax + 0x160] ~`; frame 0xd4 vs 0xb8, slot order differs |
+| physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 1570/2619 | c | ApplyContactImpulse, frame 0xb8 and slot order match; termB (other-body branch) builds its cross/dot in a different x87 register order (fstp st(2), +2 bytes), plus scheduling of three struct copies and the `test edi` of `if (other)` |
 | physics/contact/ContactImpulse | `0x005004a0` | 104/927 (masked) | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 451/3321 (masked) | b | 123 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x1c4 vs 0x1ac, slot order differs |
 | physics/effects/DirtChunkParticleEmitter | `0x004b8df0` | 17/235 (masked) | c | 15 code diffs: retail lacks `sub esp, 8`; `lea edi, [esi + 0x80]` vs `lea ecx, [esi + 0x50] ; mov edx, eax ; ~` |
@@ -181,12 +177,11 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/motion/SteeringControl | `0x00504d30` | 125/206 (masked) | b | 6 code diffs: `fxch st(2) ; fmul st(2)` vs `fld st(0) ; fmul st(3)`; `fmul st(2)` vs `fmul st(1)`; slots differ |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 730/771 | c | x87 term order of the inlined 4x4 product: one term pair in each of _11, _21, _31, _41 (retail's sum orders differ from slot 27's with the same helper) (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp); 748/771 with 1, 2, 9, 10, 18, 25, 26, 33 or 34 locals at the top; exact only with 5-6 locals inside the shared helper, which break the exact slot 27 |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446f40` | 180/1485 | b | retail's inline __asm fld/fistp rounding helper forces an ebp frame (0xe4 locals); the (int) casts call __ftol |
-| physics/shadow/ProjectedShadow | `0x004da7b0` | 152/777 (masked) | b | 22 code diffs: `lea ecx, [esp + N] ; mov eax, [eax + 4]~` vs `lea edx, [esp + N] ; mov ecx, [eax + 4]~`; `push ecx` vs `push edx`; slots differ |
-| physics/shadow/ProjectedShadow | `0x004dae50` | 21/345 (masked) | b | 27 code diffs: `mov eax, [esp + N] ; sub esp, 0xc ; cmp~` vs `sub esp, N ; push ebx ; mov ebx, [esp +~`; `mov esi, ecx ; jne @72 ; mov edi, [esp ~` vs `cmp ebx, 1 ; mov edi, ecx ; jne @74`; frame 0x0 vs 0xc |
-| physics/shadow/ProjectedShadow | `0x004db0d0` | 88/1597 (masked) | b | 108 code diffs: retail adds `push ebp`; retail adds `mov ecx, [ebx + 0x2c]`; frame 0x9c vs 0xc0, slot order differs |
-| physics/shadow/ProjectedShadow | `0x004db8c0` | 19/840 (masked) | b | 51 code diffs: retail adds `push ebp ; mov ebp, esp`; `mov [esp + N], ebx` vs `mov [ebp - N], ebx`; slot order differs |
-| physics/shadow/ProjectedShadow | `0x004dbd30` | 81/647 (masked) | b | 20 code diffs: `mov ecx, [esi + 0x74] ; mov ebx, [esi +~` vs `mov edi, [esi + 0x74] ; mov ecx, [esi +~`; `mov edi, ebx` vs `sar edi, 1 ; mov [esp + N], edx ; mov [~`; frame 0x40 vs 0x3c, slot order differs |
-| physics/shadow/ProjectedShadow | `0x004dc2b0` | 29/324 (masked) | b | 29 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x24 vs 0x34, slot order differs |
+| physics/shadow/ProjectedShadow | `0x004da7b0` | 130/778 (masked) | b | tail and clip rectangle match (844/842 B, 18 aligned diffs); register choice in the sprintf/QueryFlag set-up and the saved render-target fields, and retail keeps a second release-and-return block for the surface-format failures |
+| physics/shadow/ProjectedShadow | `0x004db0d0` | 111/1687 (masked) | b | magnitude/normalise/transform helpers as retail (1851/2020 B); frame and slot assignment differ (retail locals 0x14..0x3c higher), mode-1 fov block |
+| physics/shadow/ProjectedShadow | `0x004db8c0` | 19/840 (masked) | b | 51 code diffs: retail adds `push ebp ; mov ebp, esp`; `mov [esp + N], ebx` vs `mov [ebp - N], ebx`; slot order differs; inline-asm `fistp` exclusion |
+| physics/shadow/ProjectedShadow | `0x004dbd30` | 156/1244 (masked) | b | per-format row loops and the three Duff's-device fills as retail; register assignment of the clip fields and the format-9 constants (retail uses byte ops on field_0x94's low byte) |
+| physics/shadow/ProjectedShadow | `0x004dc2b0` | 29/324 (masked) | b | 29 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x24 vs 0x34, slot order differs; inline-asm `fistp` exclusion |
 | physics/shadow/TerrainShadow | `0x005097d0` | 105/442 (masked) | b | 16 code diffs: `jmp @29` vs `jmp @31 ; mov edx, [esp + N]`; `mov edx, [ecx + 0x54] ; fild [edx + 0x1~` vs `mov [esp + N], edx ; mov eax, [ecx + 0x~`; slots differ |
 | physics/shadow/TerrainShadow | `0x00508bc0` | 353/3031 | b | slot 27 footprint: frame 0xdc vs 0xd0, slot order, the cross product's operand order and the corner loops' form; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |

@@ -18,7 +18,7 @@
 //     cross products; normalizes (0x5087b0), computes penetration/length, and
 //     registers points with AddCollisionPoint (0x43a330).
 //   0x43aa30 merges the penetrating contacts (mean position, summed+normalised normal,
-//     deepest penetration, response terms); 0x43ad80 refreshes contacts (CollisionContactUpdate.cpp).
+//     deepest penetration, response terms); 0x43ad80 refreshes contacts (both CollisionPoint.cpp).
 //   Broadphase helpers: SphereContainsPointXZ (0x43a1e0, point-in-circle in XZ),
 //     BoundingSpheresOverlap (0x43a270). Vector helpers: CollisionRejectFrom
 //     (0x43b190, a - proj_b a), CollisionLength (0x435ec0), CollisionDivide (0x43c890).

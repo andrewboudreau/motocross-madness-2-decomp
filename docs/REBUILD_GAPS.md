@@ -131,7 +131,7 @@ the retail objects were linked alphabetically by original file name.
 
 The extent column is the doc extent (`Extent: \`a..b\`` in `docs/*.md` or a
 `src/krusty2` README, accepted only when it holds this unit's xrefs and no other
-unit's: 16 units) or else the first..last xref span, which is only a lower
+unit's: 20 units) or else the first..last xref span, which is only a lower
 bound. Status: `src` when a `src/` file has the retail name or registers a
 function that contains one of the unit's xrefs; `samples only` likewise under
 `samples/`. Repository file: the file whose registered functions hold the
@@ -151,10 +151,10 @@ xrefs, else the name match.
 | 10 | `bmpfile.cpp` | `0x0042416e..0x004245dd` (xref) | 6 | src | `reconstructed/bmpfile.cpp` |
 | 11 | `BoundingBoxTreeBuild.cpp` | `0x0042b75e..0x0042e258` (xref) | 62 | src | `reconstructed/BoundingBoxTreeBuild.cpp` |
 | 12 | `CarProcedural.cpp` | `0x0042f657..0x0042fb53` (xref) | 6 | src | `reconstructed/CarProcedural.cpp` |
-| 13 | `CollisionCharacter.cpp` | `0x00431a12..0x00431a13` (xref) | 1 | samples only | `samples/physics/tire/CollisionCharacter.cpp` |
+| 13 | `CollisionCharacter.cpp` | `0x004318d0..0x00431da0` (doc) | 1 | src | `krusty2/motion/CollisionCharacter.cpp` |
 | 14 | `CollisionObject.cpp` | `0x00431dd8..0x0043a125` (xref) | 31 | src | `krusty2/collision/CollisionObject.cpp` |
-| 15 | `CollisionPoint.cpp` | `0x0043a347..0x0043a348` (xref) | 1 | samples only | `samples/physics/collision/CollisionPoint.cpp` |
-| 16 | `ConstraintMethodCollisionModel.cpp` | `0x0043c7f9..0x0043c7fa` (xref) | 1 | samples only | `samples/physics/constraint/ConstraintMethodCollisionModel.cpp` |
+| 15 | `CollisionPoint.cpp` | `0x0043a1e0..0x0043b320` (doc) | 1 | src | `krusty2/collision/CollisionPoint.cpp` |
+| 16 | `ConstraintMethodCollisionModel.cpp` | `0x0043b800..0x0043caa0` (doc) | 1 | src | `krusty2/constraint/ConstraintMethodCollisionModel.cpp` |
 | 17 | `cube.cpp` | `0x0043d4ff..0x0043d55d` (xref) | 2 | src | `reconstructed/Cube.cpp` |
 | 18 | `cubedraw.cpp` | `0x0043da8f..0x0043e2cb` (xref) | 3 | src | `reconstructed/CubeDraw.cpp` |
 | 19 | `cursor.cpp` | `0x0043ea00..0x0043f160` (doc) | 1 | src | `reconstructed/GameCursor.cpp` |
@@ -210,7 +210,7 @@ xrefs, else the name match.
 | 69 | `Pixtrans.cpp` | `0x004cde20..0x004d28b0` (doc) | 21 | src | `reconstructed/Pixtrans.cpp` |
 | 70 | `ProCircuit.cpp` | `0x004d34a1..0x004d45c3` (xref) | 15 | src | `reconstructed/ProCircuit.cpp` |
 | 71 | `ProCircuitProcs.cpp` | `0x004d4bce..0x004da35d` (xref) | 33 | src | `reconstructed/ProCircuitProcs.cpp` |
-| 72 | `ProjectedShadow.cpp` | `0x004da745..0x004dacbd` (xref) | 11 | samples only | `samples/physics/shadow/ProjectedShadow.cpp` |
+| 72 | `ProjectedShadow.cpp` | `0x004da570..0x004dc610` (doc) | 11 | src | `krusty2/shadow/ProjectedShadow.cpp` |
 | 73 | `Quadtree.cpp` | `0x004dc729..0x004ddce7` (xref) | 5 | src | `krusty2/broadphase/Quadtree.cpp` |
 | 74 | `Quantize.cpp` | `0x004dde47..0x004de12f` (xref) | 3 | src | `reconstructed/Quantize.cpp` |
 | 75 | `QuarryStuntEvent.cpp` | `0x004de2a0..0x004e1fa8` (doc) | 27 | src | `reconstructed/QuarryStuntEvent.cpp` |
@@ -247,8 +247,7 @@ xrefs, else the name match.
 | 106 | `VisibilityQuadTree.cpp` | `0x0052d4c9..0x0052d4ca` (xref) | 1 | src | `krusty2/visibility/VisibilityQuadTree.cpp` |
 | 107 | `wrecker.cpp` | `0x005300f8..0x0053297d` (xref) | 14 | src | `reconstructed/Wrecker.cpp` |
 
-Totals: **103 units `src`, 4 `samples only`** (CollisionCharacter,
-CollisionPoint, ConstraintMethodCollisionModel, ProjectedShadow), **none without any reconstruction**. That only
+Totals: **107 units `src`, 0 `samples only`**, **none without any reconstruction**. That only
 says some function is reconstructed; per-unit byte coverage is in the report
 (`registered_bytes_in_extent`).
 
@@ -283,14 +282,13 @@ of the 252 RTTI type descriptors, `GR_PixelString`, `GroundFogableObject` and
 
 | C++ definition | Classes |
 |---|---:|
-| `class`/`struct` body under `src/` | 229 |
+| `class`/`struct` body under `src/` | 231 |
 | under `src/` with a stand-in name (`PCVideoCard`, RTTI noted in `Display.h`) | 1 |
-| only under `samples/` | 14 |
+| only under `samples/` | 12 |
 | CRT (`type_info`, `exception`, `bad_cast`, `bad_typeid`, `__non_rtti_object`; all slots in LIBCMT) | 5 |
 | nowhere | 0 |
 
-Samples-only: CollisionCharacter, ConstraintMethodCollisionModel,
-DirtChunk/DirtSpray/Dust/Spark/SteamParticleEmitter, InlineShock,
+Samples-only: DirtChunk/DirtSpray/Dust/Spark/SteamParticleEmitter, InlineShock,
 PhysicsBody, PhysicsRigidBody, RotatingShock, Shock, TerrainShadow, Tire.
 
 A slot counts as reconstructed when its function start is strict exact (CRT

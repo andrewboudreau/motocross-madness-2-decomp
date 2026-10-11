@@ -4,7 +4,7 @@
 // and the constructor 0x0043b8d0; secondary vtable 0x005511f0 at +12; RTTI base
 // CollisionObject; sizeof == 0x10c (operator new(0x10c, "wrecker.cpp", 0x68) at 0x005302e8,
 // which then calls the constructor 0x0043b8d0 with argument 1).
-// Field semantics are tier 3 (justified in ConstraintMethodCollisionModel.cpp).
+// Field semantics are tier 3 (justified in ConstraintMethodCollisionModel.cpp and its near misses).
 #ifndef CONSTRAINT_METHOD_COLLISION_MODEL_H
 #define CONSTRAINT_METHOD_COLLISION_MODEL_H
 
