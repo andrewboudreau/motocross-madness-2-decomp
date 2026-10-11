@@ -42,7 +42,7 @@ long ReceiveMessages(unsigned int time)
     char text[256];
     EnterCriticalSection(NET_LOCK(g_TrackGame->network->lock));
     if (!g_TrackGame->network) {
-        sprintf(text, "LpGame->LpNetworkInterface invalid = 0x%x\n",
+        sprintf(text, "LpGame->LpNetworkInterface invalid = 0x%x \n",
                 g_TrackGame->network);
         LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
         return NET_E_INVALIDARG;

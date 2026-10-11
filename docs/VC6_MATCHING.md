@@ -79,12 +79,15 @@ translation-unit ownership remain provisional.
 RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 [application allocation accounting](ALLOCATION.md). Wrong bindings fail comparison.
 
-The exception is a binding that sends a `__real@` constant to the wrong address. An
-instruction's bytes do not include the value it loads, so if the binding points
-at retail's own constant, the comparison passes even when the source literal is
-wrong. `python tools/check_real_bindings.py --exe "$MCM2_EXE"` decodes every
-`__real@` key in the tracked `*.bindings.json` files. It then checks that the
-retail bytes at the bound address hold that value.
+The exception is a binding that sends a `__real@` constant or a `??_C@` string
+literal to the wrong address. An instruction's bytes do not include the value it
+loads, so if the binding points at retail's own literal, the comparison passes
+even when the source literal is wrong.
+`python tools/check_literal_bindings.py --exe "$MCM2_EXE"` decodes every such key
+in the tracked `*.bindings.json` files. It checks that the retail bytes at the
+bound address hold the named float or double, or a NUL-terminated string with the
+key's length and leading bytes. `__FILE__` keys are skipped, because they name the
+build machine's path and are bound to retail's own `D:\aardvark\...` string.
 
 ## Validated slices
 

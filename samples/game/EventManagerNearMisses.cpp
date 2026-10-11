@@ -324,7 +324,7 @@ int EventManager::CreatePodiumScene() {
             sprintf(name, "%s\\Winner.mcf", "Res");
         }
         if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", (int)path)) {
-            sprintf(message, "No winner animation file found in resources.  Aborting podium scene.");
+            sprintf(message, "No winner animation file found in resources.  Aborting.\n");
             delete stream;
             return 0;
         }

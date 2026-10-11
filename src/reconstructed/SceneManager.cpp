@@ -947,7 +947,7 @@ int Scene::OpenResourceFiles()
         }
         return 1;
     }
-    sprintf(message, "\nCannot find data for [%s] in %s", "ResourceFiles", scenePath);
+    sprintf(message, "\nCannot find data for [%s] in %s.\n\n", "ResourceFiles", scenePath);
     UnknownFunction464e80(message);
     return 0;
 }
