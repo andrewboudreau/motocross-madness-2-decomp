@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 187, c 138, total 325. The three class (a) functions of the
+Counts: a 0, b 186, c 133, total 319. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -60,7 +60,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
-| io/FileStream | `0x00460d10` | 17/77 | c | 3 code diffs: retail loads the argument into edx on entry; VC6 here loads it into ecx just before the +0x12c store, which it hoists above the header byte stores (samples/io/FileStream.cpp) |
 | io/FileStream | `0x00460db0` | 27/176 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp) |
 | io/FileStream | `0x00460f50` | 284/933 | c | 18 code diffs: VC6 here stores access[0] as well; candidate 933 of 957 bytes |
 | io/FileStream | `0x00461340` | 201/700 | c | 29 code diffs: retail loads the decoded position (+0x0c) once and keeps the next pointer in another register |
@@ -120,8 +119,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Vehicle | `0x0052a6a0` | 19/331 (masked) | b | 22 code diffs: `push ecx ; push ebx` vs `sub esp, 8`; retail lacks `fld [edi + 0xe0]`; frame 0x0 vs 0x8 |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 304/3018 (masked) | b | 120 code diffs: `test eax, eax ; mov [esp + N], eax ; jn~` vs `mov ebp, eax ; xor ebx, ebx ; cmp ebp, ~`; `push 0` vs `push ebx`; frame 0xdc vs 0x104, slot order differs |
 | krusty2/vehicle/Vehicle | `0x0052b6d0` | 28/63 | c | 4 code diffs: retail lacks `fld [A]`; retail adds `mov edx, [A]` |
-| net/MSZoneInterface | `0x004aa360` | 233/300 (masked) | c | 7 code diffs |
-| net/MSZoneInterface | `0x004aa4e0` | 237/309 (masked) | c | 7 code diffs |
 | net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |
 | net/Net | `0x004abf10` | 874/948 | b | 13 code diffs: retail adds `mov ecx, [A]`; `mov ecx, [A]` vs `mov ebx, [esp + N]`; slots differ |
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
@@ -338,7 +335,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x0047a400` | 320/962 | c | 21 code diffs: retail adds `mov [esi + 0x20c], ecx`; `mov [esi + 0x20c], ecx` vs `add ecx, ebp ; mov [esi + 0x210], edx ;~` |
 | ui/GameUi | `0x0047b490` | 116/220 | c | 14 code diffs: retail adds `mov esi, ecx`; `mov esi, ecx ; sar edx, 8 ; sar esi, 5` vs `sar esi, 8 ; sar edx, 5 ; and esi, 0xf8~` |
 | ui/KrustyUI | `0x004988a0` | 872/1104 | b | 8 code diffs: `mov edx, [esi + 0x2c] ; mov eax, [esp +~` vs `mov eax, [esi + 0x2c] ; mov ecx, [esp +~`; `mov edx, [eax + 0xc0] ; mov [edx + 0x5c~` vs `mov eax, [eax + 0xc0] ; mov [eax + 0x5c~`; slots differ |
-| ui/KrustyUI | `0x0049b0d0` | 880/916 | c | 5 code diffs: `jne @202 ; cmp ecx, 1 ; jne @204` vs `je @212`; `jne @205` vs `jne @202 ; jmp @218 ; cmp ecx, 1` |
 | ui/ProCircuitProcs | `0x004d72c0` | 1125/1291 | b | 11 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
 | ui/ProCircuitProcs | `0x004d8fc0` | 750/882 | c | 45 code diffs: retail adds `mov fs:[X], esp`; retail lacks `mov fs:[X], esp` |
@@ -346,7 +342,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/ProCircuitProcs | `0x004d9cd0` | 48/755 | c | 37 code diffs: retail adds `mov eax, [A]`; retail adds `mov ebp, [eax + 0x3444]` |
 | ui/SelectGamePicProcs | `0x004f2340` | 933/2148 | b | 62 code diffs: `mov [esp + N], ecx` vs `push esi`; `push esi` vs `mov [esp + N], ecx`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f3720` | 92/380 | b | 10 code diffs: retail lacks `jmp @44 ; lea ecx, [esp + N] ; push 0x80`; slots differ |
-| ui/SelectGamePicProcs | `0x004f3a70` | 2714/2729 | b | 2 code diffs: retail adds `mov [esp + N], edx ; fild qword ptr [es~`; retail lacks `fild qword ptr [esp + N] ; mov [esp + N~`; slots differ |
 | ui/SelectGamePicProcs | `0x004f8220` | 110/840 | b | 57 code diffs: `xor ebp, ebp` vs `xor edi, edi`; `mov [esp + N], ebp ; mov [esp + N], ebp` vs `mov [esp + N], edi ; mov [esp + N], edi`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f8820` | 1214/1268 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 
