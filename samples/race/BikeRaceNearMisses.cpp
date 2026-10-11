@@ -12,6 +12,9 @@
 // the 0x004dab90 call, the entry indexed directly at every use, char-pointer
 // arithmetic, an explicit `!= 0` bit test, the two branches swapped
 // (`if (!caster)`), or 0..63 prepended typedefs (no arena window).
+// Redundant parentheses on the head's `field_0x150` copy, the table
+// pointer test and the entry's index, table and whole address (162
+// combinations) give identical bytes.
 //
 // 0x0041f1d0 (881 bytes; next/previous camera target): control flow, the
 // three branches and the shared tail call 0x0041eb20(caster) (the caster

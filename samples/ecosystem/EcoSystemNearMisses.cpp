@@ -14,7 +14,9 @@
 //               static accessors for the eye and the scaled coordinate,
 //               pointer/reference/by-value helpers, a struct copy, the
 //               difference as a Vector3: identical bytes or worse), and
-//               /G6 scores lower (267)
+//               /G6 scores lower (267); redundant parentheses on the
+//               differences, the products and the detail-band casts (225
+//               combinations) do not move it either (356/369)
 //   0x004570a0  retail loads the definition-table entry once into edi before
 //               the position conversions and picks other registers for the
 //               shape store blocks (103/386)
@@ -29,10 +31,26 @@
 //               unsigned/long types, `true`, a nested else chain or a
 //               separate loop variable
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
-//               (1105/1153)
+//               (1105/1153): retail reads it right after the fild, before
+//               the `j` spill store; parentheses on the angle, the cos/sin
+//               casts and products and the height (216 combinations), a
+//               `(float)j`, every order of the five loop statements and
+//               split cos/sin locals give 1105 or (mostly much) worse
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
-//   0x004598d0  only where `mov ecx, [g_collisionQuadTree]` sits among the
-//               last ComputeCode argument's fsub/fstp (445/455)
+//               (457/461). The `name[length] = 0` byte store decides it:
+//               without it (or without the whole name head) the loop gets
+//               retail's `[veg + i]` order, and each further byte store at
+//               a variable index toggles it back (parity-like; int/short/
+//               float stores, constant-index stores and loads do not).
+//               No code-neutral form moved it (~60 tried): loop shapes
+//               (for/while, pre-increment, unsigned i: 455), `this->`,
+//               dead/top/loop-scope locals, parentheses on the coordinate
+//               products (27 combinations) and on the zero store's index,
+//               array and value, `'\0'`/`(char)0`/`*(name + length)`/
+//               `length[name]`/end-pointer spellings, clamp spellings
+//               (if/ternary, <, <=, >=), `sizeof`, pointer arithmetic, a
+//               reference, split file/strrchr forms, and 0..40 prepended
+//               typedefs (no arena window)
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300)
 //   0x0045b060  frame 0xe0 for 0xf0 and the slot order; retail leans the
@@ -393,41 +411,6 @@ void EcoSystem::WriteListing(const char* path) {
                               definition->HeightForParameter(vegetation[i].heightParam));
     }
     fclose(file);
-}
-
-// 0x004598d0: places the objects the .esb lists. The definition byte is
-// widened to `int` right after its read (that hoists the zero-extension
-// into a register and spills the loop counter as retail does).
-int EcoSystem::PlaceStoredObjects() {
-    UnknownTextureStream* stream = esbStream;
-    int i;
-    for (i = 0; i < placedCount; i++) {
-        unsigned char definitionByte;
-        UnknownEcoCoordinates coordinates;
-        unsigned char heightParameter;
-        unsigned char radiusParameter;
-        stream->UnknownFunction461640(&definitionByte, 1, 1);
-        int definition = definitionByte;
-        stream->UnknownFunction461640(&coordinates, 6, 1);
-        stream->UnknownFunction461640(&heightParameter, 1, 1);
-        stream->UnknownFunction461640(&radiusParameter, 1, 1);
-        vegetation[i].PlaceQuantized(textureManager, definition, &coordinates, heightParameter, radiusParameter);
-        float radius = definitionTable[definition]->RadiusForParameter(radiusParameter);
-        float height = definitionTable[definition]->HeightForParameter(heightParameter);
-        float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        unsigned int code = g_collisionQuadTree->ComputeCode(x - radius, z - radius, x + radius, z + radius);
-        g_MemTagStack->Push("QuadTree");
-        g_collisionQuadTree->Insert(&vegetation[i], code, y, y + height);
-        g_MemTagStack->Push("EcoSystem");
-    }
-    if (!esbStreamInArchive) {
-        if (esbStream)
-            delete esbStream;
-        esbStream = 0;
-    }
-    return 1;
 }
 
 // A random number in 0..1 (inline shape only: the helper boundary is what

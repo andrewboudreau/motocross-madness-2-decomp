@@ -861,6 +861,41 @@ EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textu
     return this;
 }
 
+// 0x004598d0: places the objects the .esb lists. The definition byte is
+// widened to `int` right after its read (that hoists the zero-extension
+// into a register and spills the loop counter as retail does).
+int EcoSystem::PlaceStoredObjects() {
+    UnknownTextureStream* stream = esbStream;
+    int i;
+    for (i = 0; i < placedCount; i++) {
+        unsigned char definitionByte;
+        UnknownEcoCoordinates coordinates;
+        unsigned char heightParameter;
+        unsigned char radiusParameter;
+        stream->UnknownFunction461640(&definitionByte, 1, 1);
+        int definition = definitionByte;
+        stream->UnknownFunction461640(&coordinates, 6, 1);
+        stream->UnknownFunction461640(&heightParameter, 1, 1);
+        stream->UnknownFunction461640(&radiusParameter, 1, 1);
+        vegetation[i].PlaceQuantized(textureManager, definition, &coordinates, heightParameter, radiusParameter);
+        float radius = definitionTable[definition]->RadiusForParameter(radiusParameter);
+        float height = definitionTable[definition]->HeightForParameter(heightParameter);
+        float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        unsigned int code = g_collisionQuadTree->ComputeCode((x - radius), (z - radius), (x + radius), (z + radius));
+        g_MemTagStack->Push("QuadTree");
+        g_collisionQuadTree->Insert(&vegetation[i], code, y, y + height);
+        g_MemTagStack->Push("EcoSystem");
+    }
+    if (!esbStreamInArchive) {
+        if (esbStream)
+            delete esbStream;
+        esbStream = 0;
+    }
+    return 1;
+}
+
 // 0x00459b40: places the objects the PlacementBmp paints (one pixel per
 // terrain cell, the palette index selecting the definition). The cell
 // sizes are `extent; /= width` (that gives retail's `fld; fidiv` over the

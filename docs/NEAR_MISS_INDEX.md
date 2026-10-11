@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 157, total 353. The three class (a) functions of the
+Counts: a 0, b 196, c 156, total 352. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -45,12 +45,11 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | camera/VehicleCamera | `0x0052c510` | 817/1261 | c | slot 35: frame and slots match; `(x*x) + y*y + z*z` gives retail's x*x-first squared length; retail duplicates the x scaling into both range branches (`fld x; fmul st(1)` / `fld st(0); fmul x`) where VC6 shares one block |
 | control/ControlInterface | `0x004bf4f0` | 43/124 | c | 5 code diffs: `test ecx, ecx ; je @38 ; mov edx, [esp ~` vs `jmp @5` |
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
-| ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]` |
+| ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]`; redundant parentheses on the differences, products and detail-band casts (225 combinations) do not move it |
 | ecosystem/EcoSystem | `0x004570a0` | 103/386 | b | retail keeps the definition-table entry in `edi` across the position conversions (`mov edi, [eax + ecx*4 + 0x58]`); register choice in the shape store blocks |
 | ecosystem/EcoSystem | `0x00457480` | 561/2629 (in the unit) | c | 3 code diffs: `mov edi, 1 ; mov [esi + 0x30], edi` vs `mov dword ptr [esi + 0x30], 1`; `mov [esp + N], edi` vs `mov dword ptr [esp + N], 1` (the constant 1 of `method = 1` / `i = 1` kept in `edi`) |
-| ecosystem/EcoSystem | `0x00457ed0` | 1105/1153 | b | 4 code diffs: retail adds `mov edx, [edi + 0x20]`; retail adds `fmul [A]`; slots differ |
-| ecosystem/EcoSystem | `0x00458da0` | 457/461 | c | 4 code diffs: `mov cl, byte ptr [esi + eax + 0x14]` vs `mov cl, byte ptr [eax + esi + 0x14]`; `lea eax, [esi + edx]` vs `lea eax, [edx + esi]` |
-| ecosystem/EcoSystem | `0x004598d0` | 445/455 | c | 1 code diff: `mov ecx, [0x68aba4]` sits between the last ComputeCode argument's `fsub` and `fstp` in retail |
+| ecosystem/EcoSystem | `0x00457ed0` | 1105/1153 | b | retail reads the cylinder height right after the fild, before the `j` spill store; paren sweeps (216), statement orders and split cos/sin locals do not move it |
+| ecosystem/EcoSystem | `0x00458da0` | 457/461 | c | four SIB operands `[esi + eax]` for `[eax + esi]`; the `name[length] = 0` byte store flips the later array-base/induction order (without it the loop has retail's order; each further variable-index byte store toggles it); no code-neutral form found (~60 forms incl. paren sweeps, zero-store spellings, loop shapes, 0..40 typedef shift) |
 | ecosystem/EcoSystem | `0x00459ce0` | 323/3300 | b | 112 code diffs: retail adds `xor edi, edi`; retail adds `mov [esp + N], edi`; slot order differs |
 | ecosystem/EcoSystem | `0x0045b060` | 461/3967 (in the unit) | c | frame 0xe0 vs 0xf0 and the slot sharing; retail leans the side normals through memory temporaries and pops `edi` / `ebp` / `ebx` before the overlay rows |
 | game/DeviceSetup | `0x00448560` | 148/1006 | b | 35 code diffs: retail adds `push edi`; `push edi ; xor ebp, ebp` vs `xor edi, edi`; frame 0x11c vs 0x118 |
@@ -134,7 +133,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/Net | `0x004aced0` | 355/370 | c | 15 code diffs: `mov eax, [edi + eax + 4]` vs `mov eax, [eax + edi + 4]`; `mov eax, [edi + edx + 4]` vs `mov eax, [edx + edi + 4]` |
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
 | net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
-| net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index) |
+| net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index); parentheses, `index = index - 27`, `index += -27` and `field_0x29c = ++index` give identical bytes |
 | parameterblocks/Parameterblocks | `0x004b7220` | 144/157 | c | `this` and `path` in ebp/ebx where retail uses ebx/ebp (samples/parameterblocks/ParameterblocksNearMisses.cpp) |
 | parser/Parser | `0x004b87f0` | 33/406 | b | prologue: retail pushes ebx/ebp/esi/edi before the null test, VC6 here pushes ebx/ebp after the early return (samples/parser/ParserNearMisses.cpp) |
 | physics/bikeai/BikeAI | `0x0040d200` | 4430/4464 | c | 2 scheduling diffs: the initial `seg.y = 0` store and the ground-branch `p.y = ground.y` store each sit one instruction pair earlier than retail's |
@@ -233,7 +232,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2046/2814 (masked) | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 1386/13322 | b | frame 0xac4 vs 0xab0, slot order differs (register choice follows); retail keeps one more stream destructor tail |
-| race/BikeRace | `0x0041eb20` | 1699/1710 | c | retail loads the scene-table index (+0x150) before the table pointer in the scene-object branch (edx/ecx swapped at the branch head) |
+| race/BikeRace | `0x0041eb20` | 1697/1710 | c | retail loads the scene-table index (+0x150) before the table pointer in the scene-object branch (edx/ecx swapped at the branch head) and again after the 0x4dab90 call; 162 parenthesisations of the index copy, table test and entry address give identical bytes |
 | race/BikeRace | `0x0041f1d0` | 230/881 | c | 44 code diffs: retail adds `xor edx, edx`; `mov eax, [edi + 0x3430] ; test eax, eax~` vs `cmp [edi + 0x3430], edx ; jne @271` |
 | race/BikeRace | `0x004210f0` | 975/2940 | b | inline budget: retail calls the Vector3 constructor in the mode 2/3 tail and expands Scale in mode 4; registers follow |
 | race/CarProcedural | `0x0042fd80` | 221/2844 | b | slot 10: frame 0xd0 vs 0xdc (retail shares the wheel loop's axisA with the orientation's `flat`, axisB with nothing), the steering clamp's memory local, component/scalar load order in the `back` normalisation and blend; masked, 781 instructions like retail's |

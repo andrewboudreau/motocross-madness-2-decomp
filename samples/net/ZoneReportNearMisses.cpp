@@ -17,6 +17,9 @@
 // last), `++index`/`1 + index` joins, stores in both branches (worse) and
 // moving `first = 0` into the else branch (worse) were tried; a
 // `(short)(index - first) + 1` cast also avoids the spill but adds a movsx.
+// Redundant parentheses on the join sum, the -27 and the else's difference,
+// `index = index - 27`, `index += -27` and `field_0x29c = ++index` give
+// identical bytes; -26 in the branch with the +1 in the else branch spills.
 // Check: compile this file and compare ?UnknownFunction49ca60@... with
 // samples/net/ZoneReportNearMisses.bindings.json.
 

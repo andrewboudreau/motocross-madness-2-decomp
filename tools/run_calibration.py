@@ -21343,6 +21343,15 @@ CASES = [
         'reason': '859 B: band table, QuadTree extents, Load, Vegetation[] line 0x5eb, FindTypeId Vegetation',
     },
     {
+        'name': 'EcoSystem.cpp EcoSystem place stored objects',
+        'bindings': 'src/reconstructed/EcoSystem.bindings.json',
+        'source': 'src/reconstructed/EcoSystem.cpp',
+        'symbol': '?PlaceStoredObjects@EcoSystem@@QAEHXZ',
+        'target_va': '0x004598d0',
+        'target_size': 455,
+        'reason': '.esb records: PlaceQuantized, ComputeCode (parenthesised arguments), QuadTree Insert, MemTag QuadTree/EcoSystem',
+    },
+    {
         'name': 'EcoSystem.cpp EcoSystem lighting update',
         'bindings': 'src/reconstructed/EcoSystem.bindings.json',
         'source': 'src/reconstructed/EcoSystem.cpp',
