@@ -21,7 +21,11 @@
 //   after the zeroed members, right before the frame-list memset; VC6 here
 //   hoists it next to the texture store whatever the statement, initializer
 //   list or loop form (retail loads both arguments into ecx/edx with zero in
-//   eax; VC6 here loads them into eax/ecx and zeroes eax after).
+//   eax; VC6 here loads them into eax/ecx and zeroes eax after). Also
+//   tried: the palette, the textures or both after the memset, the memset
+//   first, the palette before the textures, a palette local, `this->`, a
+//   `memset(&frameList[0], 0, 50 * 4)` and a clearing loop (35/82, same
+//   register choice).
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places

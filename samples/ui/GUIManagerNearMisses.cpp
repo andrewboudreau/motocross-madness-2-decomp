@@ -24,7 +24,8 @@
 //   or `*p++` stores, `&position[0]`, x/y/bottom/text locals, casts or
 //   parentheses on the text, a centre helper, a ShowText call in each
 //   branch, and the centre written as `width / 2 + left`, a `width` or
-//   `left` local, or `left` then `+=`.
+//   `left` local, or `left` then `+=`; parentheses around either whole
+//   ternary, around its arms or around the centre leave it unchanged.
 // 0x00486b80 (553 bytes, ratio 0.97): retail computes the width limit as
 //   `sub eax, 2` (VC6 here: `add eax, -2`) and spills width/height into the
 //   SIZE slots later. VC6 emits `sub` only for a named `limit` local (the
