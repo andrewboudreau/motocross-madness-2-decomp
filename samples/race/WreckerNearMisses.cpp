@@ -4,29 +4,41 @@
 // and compare the symbol against retail with
 // samples/race/WreckerNearMisses.bindings.json.
 //
-// UnknownFunction5329e0 (0x005329e0, 1312 bytes): pushes probes back out of
-// the box field_0xe8/field_0xf4 and turns the mean push into the impulse
-// field_0x10c. Every block matches in shape, including the per-axis clip
-// (an inline helper with by-value parameters, which explains the local
+// UnknownFunction5329e0 (0x005329e0, 1312 bytes; 763/1312): pushes probes
+// back out of the box field_0xe8/field_0xf4 and turns the mean push into the
+// impulse field_0x10c. Every block matches in shape, including the per-axis
+// clip (an inline helper with by-value parameters, which explains the local
 // copies of the extent and the previous position) and the retail use of the
 // previous position's y for the x axis. Retail runs out of inline budget at
 // the end (docs/VC6_INLINE_BUDGET.md): it expands `sum * field_0x118` but
 // calls the Vector3 constructor inside it (0x00404e60), then calls the
-// out-of-line `operator*` (0x005015b0) for `* frameTime`. Written naturally
-// (`field_0x10c = sum * field_0x118 * frameTime;`) VC6 expands every site
-// and gets retail's 0x94-byte frame; one more trivial inline expansion
-// anywhere in the body makes it call the constructor as retail does, so
-// the original had about one small inline helper more (an accessor, for
-// example). The version below passes the scaled temporary straight to the
-// out-of-line scale, which gives retail's 0x94 frame; only the slot order
-// differs (241/1312; retail keeps `push` nearest esp). A probe-count
-// accessor does not change the budget.
+// out-of-line `operator*` (0x005015b0) for `* frameTime`; the scaled
+// temporary is passed straight through, which gives retail's 0x94 frame.
+// The clip sums written `out = out + (extent - p)` and the mean through the
+// inline `operator/` give retail's instructions except one block placement:
+// retail does not merge the two `outPrevious` updates of the z clip (the
+// x and y clips are merged in both). Left: that block and the slot order
+// (retail, nearest esp first: push, the y and x extent copies, p, the z
+// extent copy, previousPush, sum, a zero temporary, hits, the three previous
+// copies, previousSum; here p, previousPush, sum, push, a zero temporary,
+// then the six copies and hits as one group). Tried without a change:
+// every order of the clip's five parameters (120), `else if`, an early
+// return, the clip returning `out` by value, pointer outputs, a macro with
+// block locals, the clip written out with named locals, push/previousPush
+// declared at function or loop scope, `sum = sum + push`.
 //
-// UnknownFunction531740 (0x00531740, 1624 bytes; 772/1617): the contact
-// particle spray. Frame 0xc4 and every call, operator and constant in
-// retail's order; three scratch vectors are reused across the body as
-// retail's slot sharing shows. Left: the slot order and `0.0f - scaled.z`
-// of the cross product with the Y axis (retail loads scaled.z first).
+// UnknownFunction531740 (0x00531740, 1624 bytes; 1606/1624): the contact
+// particle spray. Frame, slot order and every instruction but two match
+// with the normalisations written as nested expressions (their temporaries
+// share slots as retail's do) and the per-particle gravity drift built
+// from the nested out-of-line scale. Left: the argument push of two
+// out-of-line constructor calls in the loop comes one load earlier here
+// (`push ecx` before the particle-pointer load, and before the copy of
+// `along`'s y), which also changes two registers. Tried without a change:
+// a float copy of the index, a particle pointer local, `along` declared
+// at loop or function scope or assigned, reusing `delta`/`step` for
+// `along`, by-value or derived-type returning helpers, `from + along`;
+// prepending 0..63 typedefs (tools/decl_shift_scan.py) never changes it.
 
 #include <math.h>
 #include <stdlib.h>
@@ -51,7 +63,7 @@ inline float WreckerSquareMagnitude(const Vector3& v) {
 
 // The parenthesised first product puts each fsubp between the load and the store of the
 // previous component's copy, as retail does (docs/VC6_OPERAND_ORDER.md section 3); both
-// x products parenthesised gain 4 bytes in 0x00531740 (best of the 64 forms; slot 10
+// x products parenthesised gain 5 bytes in 0x00531740 (best of the 64 forms; slot 10
 // scores the same with every form). 0x00532580 is exact in src/reconstructed/Wrecker.cpp.
 inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     Vector3 r;
@@ -61,23 +73,25 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     return r;
 }
 
-// Per-axis clip of a probe against the box (inlined three times).
+// Per-axis clip of a probe against the box (inlined three times). The sums are
+// written `out = out + (extent - p)`: with `+=` VC6 computes the probe-array
+// address base first (`mov ecx, [esi+0x104]; add ecx, edi`) where retail adds
+// the base to the index register, and scores 240 instead of 763.
 static inline void WreckerClipAxis(float p, float extent, float previous, float& out, float& outPrevious) {
     if (p >= 0.0f) {
         if (p < extent) {
             if (p < previous)
-                outPrevious += previous - p;
-            out += extent - p;
+                outPrevious = outPrevious + (previous - p);
+            out = out + (extent - p);
         }
     } else {
         if (-extent > p) {
             if (p > previous)
-                outPrevious += previous - p;
-            out += extent - p;
+                outPrevious = outPrevious + (previous - p);
+            out = out + (extent - p);
         }
     }
 }
-
 
 // ---------------------------------------------------------------------------
 // Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the sites where retail
@@ -124,6 +138,14 @@ static inline Vector3 WreckerAddCtorCall(const Vector3& a, const Vector3& b) {
     return WreckerVec3Call(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
+// The mean push divides through the inline `operator/` that Wrecker.cpp uses in
+// 0x00531da0 (`v * (1.0f / s)`): retail keeps the reciprocal on the stack for
+// the first component (`fld st(0); fmul [sum.x]`), and the later scale by
+// field_0x118 then loads sum.x as a new leaf, as retail does.
+inline Vector3 operator/(const Vector3& v, float s) {
+    return v * (1.0f / s);
+}
+
 void Wrecker::UnknownFunction5329e0(float frameTime) {
     Vector3 previousSum = Vector3(0.0f, 0.0f, 0.0f);
     Vector3 sum = Vector3(0.0f, 0.0f, 0.0f);
@@ -147,7 +169,7 @@ void Wrecker::UnknownFunction5329e0(float frameTime) {
         }
     }
     if (hits)
-        sum = sum * (1.0f / hits);
+        sum = sum / hits;
     field_0x10c = UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime);
 }
 
@@ -171,21 +193,20 @@ void Wrecker::UnknownFunction531740(Vector3 from, Vector3 to, Vector3 normal, fl
     float speed = WreckerLength(velocity);
     if (speed < 1.0f)
         return;
-    Vector3 dir = WreckerNormalizeFirst(velocity);
-    Vector3 scaled = dir * (speed + 2.0f);
-    dir = WreckerCross(scaled, Vector3(0.0f, 1.0f, 0.0f));
-    Vector3 side = WreckerNormalizeTail(dir);
+    Vector3 scaled = WreckerNormalizeFirst(velocity) * (speed + 2.0f);
+    Vector3 side = WreckerNormalizeTail(WreckerCross(scaled, Vector3(0.0f, 1.0f, 0.0f)));
     Vector3 spread = side * 0.5f * speed;
     float count = frameTime * 200.0f;
     float inv = 1.0f / count;
-    side = delta * inv;                                   // the step per particle
-    delta = WreckerScaleCtorCall(field_0x11c->field_0x1f98, frameTime);
-    dir = WreckerScaleCtorCall(delta, inv);               // the gravity drift per particle
+    Vector3 step = delta * inv;                           // the step per particle
+    // The gravity drift per particle; nested, the inner temporary shares the
+    // particle drift's slot as retail's does.
+    Vector3 dirStep = WreckerScaleCtorCall(WreckerScaleCtorCall(field_0x11c->field_0x1f98, frameTime), inv);
     for (int i = 0; i < count; i++) {
         if (field_0x11c->field_0x2c != 1000) {
             WRECKER_NEXT_PARTICLE()->field_0x14 = 0.0f;
-            delta = WreckerScaleCtorCall(side, (float)i);
-            WRECKER_NEXT_PARTICLE()->field_0x00 = WreckerAddCtorCall(delta, from);
+            Vector3 along = WreckerScaleCtorCall(step, (float)i);
+            WRECKER_NEXT_PARTICLE()->field_0x00 = WreckerAddCtorCall(along, from);
             WRECKER_NEXT_PARTICLE()->field_0x10 = field_0x124;
             WRECKER_NEXT_PARTICLE()->field_0x1c = WRECKER_RANDOM_TABLE() * 0.15f;
             WRECKER_NEXT_PARTICLE()->field_0x20 = WRECKER_RANDOM_TABLE() * 0.3f;
@@ -193,7 +214,7 @@ void Wrecker::UnknownFunction531740(Vector3 from, Vector3 to, Vector3 normal, fl
             WRECKER_NEXT_PARTICLE()->field_0x18 = 375.0f;
             float jitter = WRECKER_RANDOM_TABLE() * 2.0f - 1.0f;
             WRECKER_ADVANCE_RANDOM();
-            Vector3 drift = WreckerScaleCtorCall(dir, count - (float)i);
+            Vector3 drift = WreckerScaleCtorCall(dirStep, count - (float)i);
             Vector3 sideways = WreckerScaleCtorCall(spread, jitter);
             Vector3 sum = WreckerAddCtorCall(sideways, scaled);
             Vector3 result;

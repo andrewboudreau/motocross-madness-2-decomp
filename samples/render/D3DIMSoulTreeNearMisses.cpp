@@ -3,34 +3,21 @@
 // evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
 // and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
 //
-// UnknownFunction4435b0 (0x004435b0, 400 bytes): the axis gizmo. Retail
-// stores the index words and the four points with plain immediates in
-// declaration order and keeps the vertex array at esp+0x5c. Member stores
-// (135/404) and aggregate initialisers both group the zero stores first;
-// Vector3 temporaries are worse. Retail also copies each transformed point
-// back out of `points` instead of from the call result.
-//
-// UnknownFunction443740 (0x00443740, 640 bytes): the box outline. The corner
-// table is built from negated extents kept on the FPU stack (fst chains)
-// and integer copies; the Vector3 form here evaluates each corner apart.
-//
 // SoultreeVirtualSlot5 (0x00444140, 768 bytes): 610/764. The bounds use
 // by-value Raise/Lower inlines and no face-group pointer; the loops match.
 // VC6 adds the y and z of `high + low` as low + high, and keeps the
 // +0x164 address in ebp where retail uses edx. Unchanged by `high + low`,
 // `0.5f * (...)`, named center/extent locals, operator+ with by-value
 // operands or swapped component sums; explicit component constructors are
-// worse. Retail sums every component low-first and forms +0x164 in edx
-// after the +0x158 stores; VC6 here sums y and z high-first. Worse: the
+// worse. Retail loads high first in every component (`fld high; fadd
+// low`) and forms +0x164 in edx after the +0x158 stores; VC6 here loads
+// high first only for x. Worse: the
 // zero reset as `high` then `low` (604) or chained (515-518), `high`
 // declared first (596), the Lower calls first (588) or interleaved (556).
-//
-// SelectLod (0x00443de0, 592 bytes): the level-of-detail and
-// mip chooser. Writing the camera expression without a local reproduces
-// retail's `add esi, 0x170`. Retail keeps `center`/`extents` in ebx/ebp
-// from the prologue and multiplies scale * +0x280[i] * +0x284 and
-// scale * +0xcc * width in that order; VC6 reorders both products.
-// `*(float*)&field_0xcc`: SoultreeMaterial.h types +0xcc as int.
+// Also unchanged (610): a named `sum` local, center/extent pointer or
+// reference locals for +0x158/+0x164, a reference alias of `low` or `high`
+// in the sum, Raise/Lower taking a pointer. `center = low; center += high`
+// gives 552; comparisons written out in the loop load 64000 from .rdata.
 //
 // SoultreeVirtualSlot7 (0x00444560, 1233 bytes): the node search reuses
 // the CollectDescendants counter `index` (retail keeps it in that slot,
@@ -42,13 +29,21 @@
 // `from` in edi and `to` in ebp (ours ebp, ebx, edi), whose disp8 on [ebp]
 // makes VC6 here 2 bytes shorter (355/1231 by position). Swapping or
 // dropping locals, the loop declarations and a typedef-prefix scan do not
-// rotate it.
+// rotate it; neither does reading the source through the cast parameter at
+// any one of its 15 uses or at all of them, or `from` declared before `to`.
 //
 // UnknownFunction440810 (0x00440810, 1328 bytes): texture density per
 // material. Same 388 instructions; the uv delta is a copy of a zeroed
 // Vector3 (`Vector3 delta = zero`) taken once, which reproduces retail's
 // single z*z. Retail spills `this` and keeps the face offset in ebx; VC6
-// keeps a separate face counter, so the frame is 4 bytes larger.
+// keeps a separate face counter, so the frame is 4 bytes larger. Retail's
+// ebx is also the zero of the material loop, so the offset restarts at 0
+// without a store. Unchanged or worse: `surface->indices + f * 3`, the face
+// pointer before the zero vector, `int f` outside the loop, vertex pointer
+// locals v0..v2 (much worse), a `vertices` base local, the squared length
+// as `z*z + (x*x + y*y)` or `(x*x + y*y) + z*z`. Indexing through
+// `int first = f * 3` (with or without an `indices` local) gives retail's
+// 0x80 frame but another register plan (148/1344).
 //
 // UnknownVirtualSlot12 (0x00443aa0, 832 bytes): 799/832. The inline view
 // matrix product only gets retail's `add eax, 0xec` base when the camera
@@ -76,16 +71,6 @@
 // give the same scores by count (799 at 0 and 29..33, otherwise 706..776), so the count
 // moves all rows together and no count gives retail's row 1. SoultreeVirtualSlot5 stays
 // at 610 for 0..33 top locals.
-//
-// DrawNormals (normals, 528 bytes): scales by the function-local static
-// 0x00568944 = 0.5, which is what puts the variable before the vertex
-// operand in retail's fmul/fadd. Remaining: retail materializes the
-// face-group address with `lea` and keeps different induction registers.
-// Its sibling DrawVertexCrosses (0x004431f0) is exact in
-// src/reconstructed/D3DIMSoulTree.cpp once the `group` pointer local is
-// dropped and the call result is copied per component; the same two changes
-// here (group local position, per-component from/to/line copies, 96 combos)
-// reach 99..114/504 at best, so DrawNormals needs something else.
 //
 // DrawCurrentLod (0x00440f30..0x00442dd8, 7848 bytes): the drawing
 // function. A nine-way switch on the material mapping type (+0xc8; source
@@ -143,86 +128,6 @@ static inline Vector3 operator+(const Vector3& a, const Vector3& b)
 static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
-}
-
-// 0x004435b0
-void D3DIMSoultreeObject::UnknownFunction4435b0()
-{
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
-    unsigned short indices[6] = { 0, 1, 0, 2, 0, 3 };
-    Vector3 points[4];
-    points[0].x = 0.0f;
-    points[0].y = 0.0f;
-    points[0].z = 0.0f;
-    points[1].x = 0.25f;
-    points[1].y = 0.0f;
-    points[1].z = 0.0f;
-    points[2].x = 0.0f;
-    points[2].y = 0.25f;
-    points[2].z = 0.0f;
-    points[3].x = 0.0f;
-    points[3].y = 0.0f;
-    points[3].z = 0.25f;
-    UnknownSoultreeVertex vertices[4];
-    for (int i = 0; i < 4; i++) {
-        points[i] = UnknownFunction4fd660(points[i]);
-        vertices[i].position = points[i];
-        vertices[i].tu = 0;
-        vertices[i].tv = 0;
-        vertices[i].specular = 0;
-    }
-    vertices[0].diffuse = 0xffffff;
-    vertices[1].diffuse = 0xff0000;
-    vertices[2].diffuse = 0xff;
-    vertices[3].diffuse = 0xff00;
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 4, (int)indices, 6, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
-    if (nextSibling)
-        ((D3DIMSoultreeObject*)nextSibling)->UnknownFunction4435b0();
-    if (firstChild)
-        ((D3DIMSoultreeObject*)firstChild)->UnknownFunction4435b0();
-}
-
-// 0x00443740
-void D3DIMSoultreeObject::UnknownFunction443740(Vector3 center, Vector3 extents, int flag)
-{
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
-    unsigned short indices[24] = {
-        0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7,
-    };
-    Vector3 corners[8];
-    corners[0] = Vector3(-extents.x, extents.y, extents.z);
-    corners[1] = Vector3(extents.x, extents.y, extents.z);
-    corners[2] = Vector3(extents.x, extents.y, -extents.z);
-    corners[3] = Vector3(-extents.x, extents.y, -extents.z);
-    corners[4] = Vector3(-extents.x, -extents.y, extents.z);
-    corners[5] = Vector3(extents.x, -extents.y, extents.z);
-    corners[6] = Vector3(extents.x, -extents.y, -extents.z);
-    corners[7] = Vector3(-extents.x, -extents.y, -extents.z);
-    UnknownSoultreeVertex vertices[8];
-    for (int i = 0; i < 8; i++) {
-        corners[i].x = center.x + corners[i].x;
-        corners[i].y = center.y + corners[i].y;
-        corners[i].z = center.z + corners[i].z;
-        corners[i] = UnknownFunction4fd660(corners[i]);
-        vertices[i].position = corners[i];
-        vertices[i].tu = 0;
-        vertices[i].tv = 0;
-        if (flag)
-            vertices[i].specular = 0;
-        else
-            vertices[i].specular = 0xff0000;
-        vertices[i].diffuse = 0;
-    }
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 8, (int)indices, 24, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
 }
 
 static inline void Raise(float& bound, float value)
@@ -357,67 +262,6 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
     UnknownFunction444440();
 }
 
-// 0x00460b50 (cdecl): table-driven square root (FollowCamera.h and
-// Wrecker.h declare it too).
-float UnknownFunction460b50(float value);
-
-static inline float Magnitude(const Vector3& v)
-{
-    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
-    if (squared == 1.0f)
-        return 1.0f;
-    return UnknownFunction460b50(squared);
-}
-
-// 0x00443de0
-void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
-{
-    Vector3 boundsCenter;
-    Vector3 boundsExtents;
-    if (!center || !extents) {
-        UnknownFunction4fe850(&boundsCenter, &boundsExtents);
-        center = &boundsCenter;
-        extents = &boundsExtents;
-    }
-    float distance = Magnitude(UnknownFunction4fd660(*center) -
-                               ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
-    float range = distance - Magnitude(*extents);
-    if (0.1f > range)
-        range = 0.1f;
-    float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->imagePlaneDistance / range;
-    if (field_0x288) {
-        int lod = 0;
-        for (int i = 0; i < lodCount - 1; i++) {
-            if (scale * autoLodDistances[i] * field_0x284 < 1.0f)
-                lod = i + 1;
-        }
-        if (field_0x27c != lod)
-            UnknownFunction444d00(lod);
-    }
-    for (int i = 0; i < materialCount; i++) {
-        SoultreeMaterial* material = materialTable[i];
-        if (material->field_0x70) {
-            ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
-            if (texture->field_0x68 & 1) {
-                float width = (float)texture->field_0x14;
-                float size = scale * *(float*)&material->field_0xcc * width;
-                if (size > width + width)
-                    size = width + width;
-                int power = 1;
-                int level = 0;
-                for (int n = (int)size >> 1; n; n >>= 1) {
-                    power <<= 1;
-                    level++;
-                }
-                float fraction = (size - power) / power;
-                if (fraction < 0.0f)
-                    fraction = 0.0f;
-                texture->UnknownFunction510820(level + 1 + fraction);
-            }
-        }
-    }
-}
-
 float FastInvSqrt(float x);                         // 0x00460c00
 
 // |v| through the table-driven reciprocal square root, exact for 0 and 1.
@@ -488,40 +332,6 @@ void D3DIMSoultreeObject::UnknownFunction440810()
             }
         }
     }
-}
-
-// 0x00442fe0
-void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
-{
-    static float length = 0.5f;                    // 0x00568944
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
-    for (int i = 0; i < surface->groupCount; i++) {
-        for (int j = 0; j < surface->groups[i].vertexCount; j++) {
-            UnknownSoultreeFaceGroup* group = &surface->groups[i];
-            Vector3 from;
-            from.x = group->transformedVertices[j].position.x;
-            from.y = group->transformedVertices[j].position.y;
-            from.z = group->transformedVertices[j].position.z;
-            Vector3 to = from + length * group->normals[j];
-            from = group->node->UnknownFunction4fd660(from);
-            to = surface->groups[i].node->UnknownFunction4fd660(to);
-            UnknownSoultreeVertex line[2];
-            line[0].position = from;
-            line[0].tu = 0;
-            line[0].tv = 0;
-            line[0].specular = 0xff;
-            line[0].diffuse = 0;
-            line[1].position = to;
-            line[1].tu = 0;
-            line[1].tv = 0;
-            line[1].diffuse = 0;
-            line[1].specular = 0xffffff;
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
-        }
-    }
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
 }
 
 // The box test at 0x00575a98 (VisibilityClipper, 0x0052f570, ret 0x1c):

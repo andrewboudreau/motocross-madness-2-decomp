@@ -8,7 +8,7 @@ D3DIMSoultreeShadow.cpp, are validated by the physics runner; see
 | Unit | Extent | Where |
 |---|---|---|
 | D3DIMSoultreeModifier.cpp | `0x00445240..0x0044545f` | `src/reconstructed/D3DIMSoultreeModifier.*` |
-| D3DIMSoultreeMotnctrl.cpp | `0x00445460..0x00446830` | `samples/physics/motion/` |
+| D3DIMSoultreeMotnctrl.cpp | `0x00445460..0x00446830` | `src/krusty2/motion/` |
 | D3DIMSoultreeShadow.cpp | `0x00446840..0x00447908` | `src/krusty2/shadow/` |
 | DebugOverlay.cpp | `0x00447920..0x00448559` | `src/reconstructed/DebugOverlay.*` |
 

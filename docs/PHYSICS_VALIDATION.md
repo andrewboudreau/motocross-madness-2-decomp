@@ -102,15 +102,14 @@ Two more sources pass strict comparison:
 
 - `src/krusty2/shadow/D3DIMSoultreeShadow.cpp` now passes 17 cases. Slot 14,
   `0x447540`, was added.
-- `samples/physics/motion/D3DIMSoultreeMotnctrl.cpp` passes 24 of 26
-  targets. These are the D3DIMSoultreeCharacter methods and the four vector
-  `$E` pairs, with `D3DIMSoultreeMotnctrl.bindings.json`.
-  - Slot 2 `0x445fc0` is one byte off.
+- `src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp` passes all 26 targets:
+  the D3DIMSoultreeCharacter methods and the four vector `$E` pairs, with
+  `D3DIMSoultreeMotnctrl.bindings.json`.
+  - Slot 2 `0x445fc0` reads the node table through a reference to the member.
   - Slot 4 `0x446210` is exact once the field_0x3c enable is read inside
     each branch rather than into a local before the branch.
-  - Slot 11 `0x445680` is at 39.6%.
+  - Slot 11 `0x445680` uses the `sltFile` member, not a local, for the .slt reader.
 
-D3DIMSoultreeMotnctrl.cpp stays in `samples/` because those two targets are still partial.
 Of its bindings, the seven that `tools/propose_bindings.py` could not prove
 were checked by hand. One of them is `_strupr` at `0x535d3d`; that CRT
 identity is provisional.
@@ -118,11 +117,9 @@ identity is provisional.
 ```bash
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/shadow/D3DIMSoultreeShadow.cpp \
-  --source samples/physics/motion/D3DIMSoultreeMotnctrl.cpp \
+  --source src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
-
-This run reports `43/45 strict exact` with no required failures.
 
 ## Wave-8 promoted slice
 
@@ -482,7 +479,7 @@ InterpolatePose from 10.7% to 19.4%, with no other motion target changing.
 
 ## Preserved candidates
 
-The near misses of the tree builder, D3DIMSoultree motion control, Motnctrl (the .VUE loader and pose
+The near misses of the tree builder, Motnctrl (the .VUE loader and pose
 helpers), steering (SetAxisFromPoints), projected shadow and the visibility traversal remain under
 `samples/physics/` until their remaining byte/relocation evidence is
 complete. Shared layout headers remain under `src/krusty2/` for both verified
@@ -494,8 +491,8 @@ where supported, without promoting that evidence into exact-code status.
 count as strict validation. `expect: "partial"` retains known code-generation
 mismatches. Full-root status of the `--strict` audit:
 
-- `--root src/krusty2`: 690/744 strict exact, 0 required failures.
-- `--root samples/physics`: 315/403 strict exact, 0 required failures.
+- `--root src/krusty2`: 726/776 strict exact, 0 required failures.
+- `--root samples/physics`: 298/373 strict exact, 0 required failures.
 
 Every other required target's relocations are bound in a `*.bindings.json` next to its
 source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the

@@ -3,9 +3,9 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 # motion (Spheres.cpp, SteeringControl.cpp)
 
-Validation: all 75 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
-(Spheres 14, SteeringControl 21, Motnctrl 40). In `samples/physics/motion/`, SurfaceMap.cpp
-is strict exact for 6 of 6 targets and D3DIMSoultreeMotnctrl.cpp for 23 of 26; the rest are partial.
+Validation: all 101 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
+(Spheres 14, SteeringControl 21, Motnctrl 40, D3DIMSoultreeMotnctrl 26). In `samples/physics/motion/`,
+SurfaceMap.cpp is strict exact for 6 of 6 targets; the rest are partial.
 
 Wave 4. Both files are linked back to back in `0x504940..0x5051ec`; SurfaceMap and the keyboard hooks
 that follow live in `samples/physics/motion/`.
@@ -39,10 +39,13 @@ are not reconstructed.
   `D3DIMSoultreeCharacter` run `0x445460..0x4466d8`.
 - `D3DIMSoultreeCharacter : Character`, Character : virtual GameObject. Primary vtable `0x551530` (12 slots), vbase vtable
   `0x5514c0` at object offset 532 (0x214), vtordisp at 0x210. The dtor core receives the GameObject vbase pointer.
-- 15 exact (FillNodeNames, ctor `0x4455b0`, slots 0, 3, 5, 6, 8, 9, 10, dtor core, GameObject slots 4/5 and three
-  vtordisp thunks), 3 partial: slot 4 98.63% (retail holds the 0x3c flag in ecx, ours in eax), slot 2 99.68% (one SIB
-  base/index order byte; many spellings tried), slot 11 `0x445680` 39.6% (789 vs 788 bytes: retail keeps the registry
-  entry in esi, reloads a2 from the stack, frame 0x308; ours caches a2 in esi, spills the entry, frame 0x30c).
+- `src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp`: all 26 targets strict exact (FillNodeNames, ctor `0x4455b0`,
+  slots 0, 2..6, 8..11, dtor core, GameObject slots 4/5, three vtordisp thunks and the four `$E` pairs). The deleting
+  destructor `0x446680` is registered from `samples/physics/hierarchy/LayoutProbe.cpp`.
+  - Slot 2 `0x445fc0` reads the node through `NodeNameEntry*& names = nodeNames;`; `nodeNames[i + 1]` forms the row
+    address as offset + table, retail table + offset.
+  - Slot 11 `0x445680` uses the `sltFile` member directly for the .slt reader; through a local, VC6 keeps a2 in esi,
+    spills the registry entry and grows the frame from 0x308 to 0x30c.
 - Local stand-in `ModelObject` is D3DIMSoultreeObject (vtable `0x5513ec`, size 0x2d8, ctor `0x43f160(int)`, slot 7
   `0x444560` takes a source object); helper classes ArchiveFile (0x134), SltFile (0x5c4), registry entry (owner +0x10)
   are local, tier 3.

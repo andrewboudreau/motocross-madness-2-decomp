@@ -1,6 +1,5 @@
-// Candidate kept in samples/: with D3DIMSoultreeMotnctrl.bindings.json, 23 of its 26 targets
-// (targets.json) pass `tools/run_physics_samples.py --strict`; slots 2, 4 and 11 remain partial.
-// See docs/PHYSICS_VALIDATION.md.
+// With D3DIMSoultreeMotnctrl.bindings.json all 26 targets of this file (src/krusty2/motion/targets.json)
+// pass `tools/run_physics_samples.py --strict`.
 // D3DIMSoultreeMotnctrl.cpp -- D3DIMSoultreeCharacter methods (motion-control loading and playback).
 //
 // The retail __FILE__ string 'D:\aardvark\VC\krusty2\D3DIMSoultreeMotnctrl.cpp' is at 0x00568b70; it is
@@ -188,8 +187,11 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot10()
 
 // slot 2 (0x00445fc0): captures the current pose of every node but the root into
 // poseList (+0x190; poses allocated on first use, line 0x12d), in each node's parent space.
+// The node is read through a named reference to the table member (`names`); with
+// `nodeNames[i + 1]` VC6 forms the row address as `offset + table`, retail `table + offset`.
 void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
 {
+    NodeNameEntry*& names = nodeNames;
     int count = nodeCount;
     poseList.count = count - 1;
     if (poseList.poses == 0)
@@ -197,7 +199,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
     for (int i = 0; i < nodeCount - 1; i++) {
         poseList.poses[i].nodeIndex = i + 1;
         poseList.poses[i].hasPose = 1;
-        SoultreeObject* node = nodeNames[i + 1].node;
+        SoultreeObject* node = names[i + 1].node;
         SoultreeObject* parent = node->parent;
         Vec3 position;
         Vec3 axisZ;
@@ -459,11 +461,10 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     int n = len > 0x4f ? 0x4f : len;
     strncpy(sltPath, a2, n);
     sltPath[n] = 0;
-    SltFile* slt = new(__FILE__, 0xa5) SltFile();
-    sltFile = slt;
-    slt->Attach(file, 0, 1);
-    slt->SelectSection("General info");
-    slt->ReadString("SLTFile", d3d_field_0x1a4, -1);
+    sltFile = new(__FILE__, 0xa5) SltFile();
+    sltFile->Attach(file, 0, 1);
+    sltFile->SelectSection("General info");
+    sltFile->ReadString("SLTFile", d3d_field_0x1a4, -1);
     CharacterVirtualSlot1();
     delete sltFile;
     g_pOwnerRegistry->SetOwner(entry, this);

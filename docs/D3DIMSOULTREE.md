@@ -22,15 +22,24 @@ In this tree, SoultreeObject is a view with real bases
 untouched. The secondary-base slots are named `QuadTreeVirtualSlot0/1` and
 `SoultreeVirtualSlot2..8`, so they cannot collide with GameObject's.
 
-Exact: 44 calibration cases:
+Exact: 50 calibration cases:
 - The constructor, the destructor and its deleting wrapper.
 - The `.slb`/`.slt` loader (slot 9), the binary load (slot 2) and the
   materials (slot 3).
 - The clone (slot 4), slots 5, 6 and 8 and GameObject slots 4, 5, 10 and 14.
-- The wireframe and box outlines, the vertex crosses `0x004431f0`
-  (static scale `0x00568948`), the surface buffers, the LOD setters and
-  preset, the two modifier lists, the material copy and texture, and the
-  counts.
+- The wireframe and box outlines, the normals `0x00442fe0` (static scale
+  `0x00568944`), the vertex crosses `0x004431f0` (static scale
+  `0x00568948`), the axis gizmo `0x004435b0`, the box outline
+  `0x00443740`, the LOD chooser `0x00443de0`, the surface buffers, the LOD
+  setters and preset, the two modifier lists, the material copy and
+  texture, and the counts.
+- What made the last four exact: the transformed points are copied into
+  the vertices per component (normals, gizmo, box), the box corners are
+  stored per component (VC6 then shares each negated extent, retail's
+  fchs/fst chains), the normals' `from` and `line` are function-scope
+  locals, and the LOD chooser groups its squared lengths
+  `z*z + (x*x + y*y)` and its products `(scale * a) * b` and sets the
+  bounds pointers before the bounds call.
 - The eight `$E`.
 
 Near misses (`samples/render/D3DIMSoulTreeNearMisses.cpp`, details in its
@@ -44,10 +53,9 @@ header):
   the kind of its leaves and destination, not by the source order.
 - Slot 5 bounds `0x00444140` (610 of 764): the y/z sums of the centre.
 - The texture-density pass `0x00440810` (same instruction count; one
-  extra frame slot), the normals `0x00442fe0` (its scale is the
-  function-local static `0x00568944` in .data), the LOD chooser `0x00443de0`, slot 7
-  `0x00444560`, the axis gizmo `0x004435b0` and the box outline
-  `0x00443740`.
+  extra frame slot: retail keeps the face offset in the register that
+  holds zero) and slot 7 `0x00444560` (a register rotation of the source,
+  `from` and `to` pointers).
 - The drawing function `0x00440f30..0x00442dd8`: a nine-way switch on the
   material mapping type, then modifiers, draw and debug overlays. Its
   function-local statics are the .data ints `0x00568930..0x0056893c`, the

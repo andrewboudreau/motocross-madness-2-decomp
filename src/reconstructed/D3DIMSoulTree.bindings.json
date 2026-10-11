@@ -47,6 +47,8 @@
   "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40",
   "?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ": "0x00440f30",
   "?DrawWireframe@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z": "0x00442f70",
+  "?DrawNormals@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z": "0x00442fe0",
+  "_?length@?1??DrawNormals@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z@4MA": "0x00568944",
   "?DrawVertexCrosses@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z": "0x004431f0",
   "_?size@?1??DrawVertexCrosses@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z@4MA": "0x00568948",
   "?UnknownFunction4433f0@D3DIMSoultreeObject@@QAEXHPAPAUUnknownSoultreeVertex@@PAHPAPAG1HH@Z": "0x004433f0",

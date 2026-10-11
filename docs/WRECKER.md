@@ -42,6 +42,13 @@ relocation resolved by the bindings. Two near misses are parked in
   Their globals directly follow the previous TU's `.bss`, so their owner is
   open. They are not claimed here; both are strict exact in their own
   provisional unit, `src/reconstructed/ImeUiState.cpp`.
+- Every function start in `0x0052ff90..0x0053303b` is registered except the
+  two near misses below; `0x00530000`, `0x005304c0` and `0x00530880` are
+  branch targets inside the constructor, `0x005301c0` and slot 10. The
+  inline-assembly rounding function `0x0052f570` (ebp frame, `fld; mov eax,
+  [ebp+N]; fistp [eax]` x6), listed under wrecker.cpp in
+  docs/REBUILD_GAPS.md as the nearest following `__FILE__`, lies before the
+  previous unit's initializers and so belongs to that unit, not here.
 - Collaborators, all confirmed from constructor vptr writes: `+0x38` is a
   ConstraintMethodCollisionModel (`0x0043b8d0`, `0x10c` bytes, GameObject
   table at `+0xc`). `+0x3c` is a SelectiveGravityModel (`0x004f9760`, `0x3c`
@@ -135,8 +142,8 @@ relocation resolved by the bindings. Two near misses are parked in
 
 | VA | Size | Score | Remaining difference |
 |---|---:|---|---|
-| `0x005329e0` | 1312 | 241/1312 | frame 0x94 (retail's) once the final scale is `UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime)`, the scaled temporary passed straight through; only the slot order differs (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`; a probe-count accessor does not change the budget) |
-| `0x00531740` | 1624 | 768/1617 | contact particle spray; frame 0xc4 (retail's) and every call and operator in retail's order. Written with `WreckerLength` by value, the dot product and the gravity/step scales through the out-of-line views, and three scratch vectors reused across the body (delta/wind/step-along, dir/drift-per-particle, cross result/side/step), which gives retail's slot sharing. Left: the slot order (`velocity` 0x14 here, 0x28 in retail) and `0.0f - scaled.z` of the folded cross product with the Y axis, which retail loads as `fld scaled.z; fsubr` (the constant's leaf is older there); a by-value cross product does not change it |
+| `0x005329e0` | 1312 | 763/1312 | frame 0x94 (retail's) with the scaled temporary passed straight to the out-of-line scale `0x005015b0`; the clip sums written `out = out + (extent - p)` (with `+=` the probe-array address is formed base first, 240/1312) and the mean through the unit's inline `operator/` give retail's instructions except one block: retail keeps the z clip's two `outPrevious` updates separate. The slot order differs (retail: `push`, the y and x extent copies, `p`, the z extent copy, `previousPush`, `sum`) |
+| `0x00531740` | 1624 | 1606/1624 | contact particle spray; frame 0xc4 and slot order match with the two normalisations written as nested expressions (`WreckerNormalizeFirst(velocity) * (speed + 2.0f)`, `WreckerNormalizeTail(WreckerCross(...))`) and the per-particle gravity drift as the nested out-of-line scale. Left: the argument push of two constructor calls in the loop comes one load earlier (before the particle-pointer load and before `along.y` is copied), which changes two registers; not sensitive to the declaration count |
 
 ## Remaining uncertainty
 

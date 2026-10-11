@@ -160,7 +160,7 @@ xrefs, else the name match.
 | 19 | `cursor.cpp` | `0x0043ea00..0x0043f160` (doc) | 1 | src | `reconstructed/GameCursor.cpp` |
 | 20 | `D3DIMSoulTree.CPP` | `0x0043f160..0x00445240` (doc) | 67 | src | `reconstructed/D3DIMSoulTree.cpp` |
 | 21 | `D3DIMSoultreeModifier.cpp` | `0x004452fa..0x0044544b` (xref) | 6 | src | `reconstructed/D3DIMSoultreeModifier.cpp` |
-| 22 | `D3DIMSoultreeMotnctrl.cpp` | `0x004456e7..0x00445fec` (xref) | 12 | samples only | `samples/physics/motion/D3DIMSoultreeMotnctrl.cpp` |
+| 22 | `D3DIMSoultreeMotnctrl.cpp` | `0x004456e7..0x00445fec` (xref) | 12 | src | `krusty2/motion/D3DIMSoultreeMotnctrl.cpp` |
 | 23 | `D3DIMSoultreeShadow.cpp` | `0x00447024..0x00447045` (xref) | 2 | src | `krusty2/shadow/D3DIMSoultreeShadow.cpp` |
 | 24 | `DebugOverlay.cpp` | `0x00447a67..0x00447a68` (xref) | 1 | src | `reconstructed/DebugOverlay.cpp` |
 | 25 | `dirlist.cpp` | `0x00449ea6..0x0044af57` (xref) | 9 | src | `reconstructed/DirectoryList.cpp` |
@@ -247,9 +247,8 @@ xrefs, else the name match.
 | 106 | `VisibilityQuadTree.cpp` | `0x0052d4c9..0x0052d4ca` (xref) | 1 | src | `krusty2/visibility/VisibilityQuadTree.cpp` |
 | 107 | `wrecker.cpp` | `0x005300f8..0x0053297d` (xref) | 14 | src | `reconstructed/Wrecker.cpp` |
 
-Totals: **102 units `src`, 5 `samples only`** (CollisionCharacter,
-CollisionPoint, ConstraintMethodCollisionModel, D3DIMSoultreeMotnctrl,
-ProjectedShadow), **none without any reconstruction**. That only
+Totals: **103 units `src`, 4 `samples only`** (CollisionCharacter,
+CollisionPoint, ConstraintMethodCollisionModel, ProjectedShadow), **none without any reconstruction**. That only
 says some function is reconstructed; per-unit byte coverage is in the report
 (`registered_bytes_in_extent`).
 
