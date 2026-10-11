@@ -480,3 +480,13 @@ python tools/vc6_profile_matrix.py --exe $env:MCM2_EXE --vc6-root $env:VC6_ROOT
 `make vc6-gate` enforces executed SP3 identity and manual/generated matches;
 calibration failures remain diagnostic. `make vc6-profile-matrix` compares all
 profiles. Detailed reports belong in ignored `analysis/` and `work/`.
+
+For store-order, alias and zeroing-form near misses, copy the source to an
+ignored template under `work/sweep/`, mark the choice points (`//@perm`,
+`//@alt`, `//@opt` blocks or inline `{@a@|b@}`; see the docstring of
+`tools/sweep_variants.py`) and let `tools/sweep_variants.py` compile every
+combination with VC6 and rank them by strict bytes and aligned instructions:
+
+```powershell
+python tools/sweep_variants.py work/sweep/t.cpp --target 0x00472e30:82 --bindings src/reconstructed/GameUi.bindings.json --exe $env:MCM2_EXE --vc6-root $env:VC6_ROOT --jobs 12
+```
