@@ -17,21 +17,30 @@
 // The stage ladder's fourth compare (retail keeps `fcomp g*4` with no
 // branch after a speculative `stage = 3`) is folded away here.
 //
-// 0x0047d470 (783 bytes; 309 of 786): identical control flow and calls;
+// 0x0047d470 (783 bytes; 313 of 786): identical control flow and calls;
 // retail keeps the row (y & 15) in eax, the head length in edx and the run
 // line pointer in ebx (frame 0x834), VC6 here uses edx/ebx and spills the
 // line pointer (frame 0x838). Writing the tile-span test as a subtraction
 // (`last - first == 0`) is required for retail's `sub ecx,edx`; the
-// equality form becomes xor/test. Inline row terms, unsigned x/y, a
-// `tile += row * tileStride` reuse, and the order of the line/rest
-// statements were tried without closing the gap.
+// equality form becomes xor/test. Computing `rest` before `line` gives
+// retail's tail-loop shape (313 of 786; 149 -> 113 differing
+// instructions, 124 -> 90 with stack offsets masked); `line` is still
+// spilled and `first`/`row` sit in ebx/edx where retail has edx/eax.
+// Inline row terms, unsigned x/y, a
+// `tile += row * tileStride` reuse, `16 * bpp` in the tail loop, a
+// ternary `first`, `rest -= first` in the head, a `column` local, a
+// `last`/`span` local and `line` declared at the block start were tried
+// without closing the gap.
 //
 // 0x0047d780 (977 bytes; 216 of 1008): the per-block variant (4 x 4 pixel
 // cells, width / 4 tiles, four rows per run, a dead `done` accumulator that
 // retail keeps). Retail computes the head source pointer before the
 // `x & mask` test and reuses row * tileStride for the line pointer; texture
 // in edi and tileSize in esi (swapped here); its inner row copies keep the
-// destination in ebp/[esp+0x14].
+// destination in ebp/[esp+0x14]. Retail has 339 instructions to 325 here.
+// The head source pointer (with or without a `column` local) computed
+// before the test is worse (144-154); `rest` before `line` gains only two
+// bytes (retail computes `line` first here).
 
 #include "../../src/reconstructed/Grid1.h"
 
@@ -301,8 +310,8 @@ int DrawableGridNodeSharedTextures::UnknownFunction47d470(ManagedTexture* textur
                 memcpy(out, tile + (x & 15) * bpp + row * tileStride, first * bpp);
                 out += first * bpp;
             }
-            unsigned char* line = tile + row * tileStride;
             int rest = length - first;
+            unsigned char* line = tile + row * tileStride;
             while (rest > 16) {
                 memcpy(out, line, tileStride);
                 out += tileStride;

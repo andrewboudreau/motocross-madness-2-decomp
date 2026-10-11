@@ -19,7 +19,12 @@
 // +0x30, found +0x40, probe +0x44; the two inverse temporaries 0x48/0x54 in
 // the other order). Declaration scopes of targetCount, probe, found and i,
 // constant channel axes, the isNew/controller test order and the
-// targetValue initialisation do not move them.
+// targetValue initialisation do not move them; tools/frame_layout.py finds
+// no use-count adjustment for the swapped pairs (j/controller, k/isNew,
+// i/k). In the channel inverse retail loads the rotation element first in
+// 8 of 9 products (m[3][0] * m[0][2] is the exception); the translation
+// read into locals before or after the swaps, a Vector3* translation
+// pointer and a Vector3 position copy are worse (1068-1343).
 //
 // MorphBastardModifier::UnknownVirtualSlot27 (0x004a4c60, 1568 bytes): blends
 // the target deltas of every channel into the copied mesh. The control flow,

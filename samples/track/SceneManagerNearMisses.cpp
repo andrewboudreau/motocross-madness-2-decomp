@@ -15,8 +15,10 @@
 // collision block or the sound section removed) emit retail's
 // `add edx, ebx`, and a small probe with the same statements does too.
 // Declaration order, `count`/`length`/`i` types (int, long, unsigned,
-// register), `'\0'`, `*(p + count)`, extra uses of `count` and the
-// /G3-/G6, /GB, /Gy, /Gf, /Zp, /Op, /Ox, /vm* flags leave it.
+// register), `'\0'`, `*(p + count)`, extra uses of `count`, `(p + i)->`,
+// extra parentheses, a count-plus-pointer form, char* arithmetic,
+// `&...[0]` in the strncpy and the /G3-/G6, /GB, /Gy, /Gf, /Zp, /Op, /Ox,
+// /vm* flags leave it.
 
 //
 // Scene::ReadAnimations (0x004edfe0, 5343 bytes): the "Animations"

@@ -11,8 +11,13 @@
 // (CameraZoom below; written plainly VC6 loads this+0x1e4 first, 1295/1308,
 // whichever operand order). Left: retail loads field_0x38 before storing the
 // length to field_0x1ec, VC6 here after. A separate length local, a
-// chained assignment, the length stored in its own statement and a
-// reference parameter for the camera leave that order.
+// chained assignment, the length stored in its own statement, a
+// reference parameter for the camera, a camera local or by-value camera
+// struct, BonusZoom/denominator/size helpers, ten parenthesisations of the
+// size expression, `field_0x1f0 = 0` moved, field_0x38 re-read, `this->`
+// spellings and Length helper forms (result local, ?:, != tests) leave
+// that order (at best 1299; parentheses around field_0x1e4 or a plain
+// field_0x38->field_0x198 give 1295).
 //
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode

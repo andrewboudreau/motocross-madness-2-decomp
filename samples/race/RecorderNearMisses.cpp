@@ -4,14 +4,20 @@
 //
 // 0x004e6f80 (2148 bytes with its jump table, the worker thread): the stack
 // frame, the prologue, the eleven-way switch, every case body and the error
-// exits match. Remaining difference: VC6 cross-jumping of the case tails.
-// Retail merges case 1's whole success tail into case 2's (case 1 ends in
-// `jmp` to case 2's strcpy(message, name)) and leaves case 4's tail intact;
-// here VC6 hoists the first `lea edx, message` of case 1's strcpy above the
-// header-write test (both successors start with it) and then merges the
-// "push esi; field_0xc8 = 1; LeaveCriticalSection" suffixes of cases 1 and 2
-// into case 4, so the candidate is 15 instructions longer. break/continue
-// mixes, braces, a shared goto label and store orders did not reproduce it.
+// exits match. Retail case 1 ends in a `jmp` to case 2's strcpy(message,
+// name); `goto opened` there reproduces it (516 -> 652 of 2180; the real
+// extent is 2148 bytes, the rest is padding and the next function). With
+// its own copy of the tail VC6 hoists the first `lea edx, message` of the
+// strcpy above the header-write test (both successors start with it) and
+// merges the tail suffixes of cases 1 and 2 into case 4; a shared
+// `headerWriteError` label for cases 1 and 9 removes the hoist but not the
+// merge, and `strcpy; goto` (label after case 2's strcpy) keeps the hoist.
+// Left: case 2's "field_0xc8 = 1; LeaveCriticalSection" suffix still
+// cross-jumps into case 4 (retail keeps it, after scheduling `push esi`
+// above the stores), and with one `name` use fewer `name` and `headerSize`
+// trade stack slots (0x08/0x10; declaration order does not move them).
+// break/continue mixes, braces, a comma store and store orders did not
+// change the case 2 merge.
 //
 // 0x004e7d60 (2412 bytes with its jump table, VCRInterface slot 10; KrustyVCR
 // shares it): control flow, call arguments and the callback switch order
@@ -94,12 +100,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
                 strcpy(message, "VCRtape file header write error\n");
                 goto done;
             }
-            strcpy(message, name);
-            EnterCriticalSection(&vcr->lock);
-            vcr->isStopped = 0;
-            vcr->workerAcknowledged = 1;
-            LeaveCriticalSection(&vcr->lock);
-            break;
+            goto opened;
         case 2: // reopen the file for appending
             EnterCriticalSection(&vcr->lock);
             vcr->field_0xbc = 1;
@@ -114,6 +115,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
                 goto done;
             }
             file->Seek(handle, headerSize, SEEK_SET);
+        opened:
             strcpy(message, name);
             EnterCriticalSection(&vcr->lock);
             vcr->isStopped = 0;

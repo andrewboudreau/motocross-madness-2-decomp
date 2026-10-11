@@ -29,9 +29,21 @@
 // the EnterCriticalSection. Here (outside PCAudio.cpp) VC6 also adds the EH
 // frame.
 //
-// UnknownPCAudioObject 0x004bdc00 (the loader thread): retail's queue loop is
-// not rotated and spills one local (frame 0xc); here VC6 rotates the loop
-// and keeps everything in registers.
+// UnknownPCAudioObject 0x004bdc00 (the loader thread; retail extent is 483
+// bytes, 0x4bdc00..0x4bdde3): spelling the inner queue loop `while (1)`
+// instead of `for (;;)` keeps it top-tested like retail (instruction count
+// 155 = retail, candidate 478 bytes; `for (;;)` is rotated, 162
+// instructions and 491 bytes, though it scores 95 strict bytes against 91
+// here). Left: register allocation. Retail keeps ebp = audio,
+// ebx = &audio->field_0x0c then `loaded`, edi = &sound->field_0x48, and
+// spills `ready`/`bytes` to one frame slot (frame 0xc); VC6 here caches the
+// EnterCriticalSection pointer in ebx, spills `loaded` (frame 8). Tried
+// without gain: context macro instead of the `audio` local, `loaded = 0`
+// before the lock, function-scope ready/bytes/loaded, one shared variable
+// for ready and bytes, a CRITICAL_SECTION* local, inline Lock/Unlock
+// helpers, `loaded = 1` after Play (same strict score), swapped bitfield
+// stores, `if (!loaded) continue;`, if-wrapping instead of `continue`, the
+// ready test inline in the if.
 
 #include <process.h>
 #include <string.h>
@@ -140,7 +152,7 @@ unsigned __stdcall UnknownPCAudioObject::UnknownThreadProc(void* context) {
     while ((result = WaitForMultipleObjects(2, events, FALSE, INFINITE)) != WAIT_FAILED) {
         switch (result) {
         case 0:
-            for (;;) {
+            while (1) {
                 EnterCriticalSection(&audio->field_0x0c);
                 if (audio->field_0x2c.m_count <= 0) {
                     LeaveCriticalSection(&audio->field_0x0c);

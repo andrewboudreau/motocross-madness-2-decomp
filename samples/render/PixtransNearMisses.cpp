@@ -5,8 +5,10 @@
 // 8888 halver. Control flow, the count switch and the retail alpha quirk
 // line up, but retail keeps the upper row pointer in ecx and the lower one
 // on the stack, VC6 here the other way round, so most registers differ.
-// Accumulator declaration order (all 120) and an indexed lower row do not
-// change it.
+// Accumulator declaration order (all 120), an indexed lower row, `bottom`
+// derived from `top` inside the loop, other for-increment orders and a
+// count-down x loop do not change it (declaring `bottom` before `top`
+// gives 64 of 636 strict but more masked differences).
 //
 // Halve1555 (0x004ce420, 456 bytes; candidate 448): the 1555
 // halver behind 0x004d0170. The arithmetic, the >= 2 test and the packing
@@ -14,7 +16,11 @@
 // keeps them in frame slots (a 0x10-byte frame); VC6 here loads each where
 // it is first tested (0x8 frame). Locals in every declaration order, a
 // lower-row pointer, function-scope pixels, a 1555 bitfield struct and
-// direct indexing do not keep them.
+// direct indexing do not keep them. Reading the upper pair in place as
+// top[0]/top[1] loads pixel1 at its test as retail does but still not the
+// lower pair early (fewer differing instructions, fewer strict bytes);
+// pixel1 alone in place, interleaved declarations and the lower pair
+// declared first are worse.
 //
 // Halve8 (0x004cee30, 1133 bytes; candidate 1093): the palette-index
 // halver. The search for the magenta entry, both block loops, the key test
