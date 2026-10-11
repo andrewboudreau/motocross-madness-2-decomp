@@ -590,14 +590,31 @@ try on similar code. None is a rule.
   changes the `offset + base` order of an element address. This fixed
   D3DIMSoulTree ReadLods (`0x00440060`) and TransformVertexGroups (`0x00440d40`).
   A reference to a local struct folds away and has no effect.
-- **Local-symbol count orders equal-cost terms (provisional).** In flattened
-  4-term product sums, the order of equal-cost terms followed how many
-  initialised locals were referenced before the expression, modulo 8. Locals in
-  an inline helper and in its caller count together; unused uninitialised locals
-  and file-scope declarations do not count. A named cast pointer in an inline
-  helper that is expanded twice adds two, which fixed Wrecker slot 10
-  (`0x005306e0`). A per-row search over all 24 term orders moved SoultreeBounds
-  Scale `0x004fd340` from 596 to 618 bytes.
+- **Local-symbol count orders equal-cost terms (provisional).** In larger
+  functions, the order of the equal-cost terms of a 2-, 3- or 4-term sum follows
+  how many local symbols were declared before the expression. The period is 32:
+  n and n+32 locals give identical code on SoultreeBounds Scale `0x004fd340`.
+  Only narrow windows of counts change a given row, and rows that share leaves
+  flip together.
+  - Each initialised local counts once, whatever its type. A reference counts
+    once, for its declaration.
+  - Locals in an inline helper add to the caller's count.
+  - Uninitialised unused locals, file-scope declarations, extra statements and
+    reassignments count zero. A partly stored Vec3 counts several units.
+  - Placement does not matter except through the count. The exception is a
+    helper shared by two functions: Shadow slot 29 `0x00446c30` becomes exact
+    only with locals inside the helper it shares with the exact slot 27, and
+    those locals break slot 27, so the change was not adopted.
+  - The count does not move differences, cross products, the `fld X; fmul Y`
+    operand order inside a product, or store scheduling. A trivial standalone
+    function does not respond at all.
+  - A named cast pointer in an inline helper that is expanded twice adds two;
+    this fixed Wrecker slot 10 (`0x005306e0`).
+  - A per-row search over all 24 term orders moved Scale from 596 to 618 bytes.
+  - Of 17 term-order near misses swept with 0 to 33 dead locals, only four
+    respond: Shadow slot 29, D3DIMSoulTree `0x00443aa0`, SoultreeTransform
+    `0x004fd710` and Track `0x00516ef0`. Run that sweep before relying on this
+    lever.
 - **`||` versus separate `goto` tests.** Writing `if (a) goto failed; if (b) goto
   failed;` with the shared failure block under the last test places that block
   right after the test, so control falls through into it. One `||` condition
