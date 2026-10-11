@@ -17,12 +17,13 @@ Evidence
 - RotatingShock::SolveContact (0x4fac60) uses a 4-entry jump table at 0x4fafc0; the extent
   is 880 bytes including the table.
 
-Diagnostic counts: 24 relocation-masked matches, 3 partial of 27 targets (the four `$E`
+Diagnostic counts: 25 relocation-masked matches, 2 partial of 27 targets (the four `$E`
 wrappers match once their bodies are bound).
 These are not strict acceptance; reviewed bindings are still required.
-- partial: UpdateAxis 0x4f9f90 (98.7%, `1.0f/len` gives `fld [1.0]; fdiv st(1)` instead of
-  `fld st(0); fdivr [1.0]`, tried named locals, reordering, and component-wise forms);
-  InlineShock::SolveContact 0x4fa400 (758/764 bytes, 68%: the projection temporary is
+- UpdateAxis 0x4f9f90 is strict exact only with the `axisLength` store embedded in the divisor
+  (`axis * (1.0f / (axisLength = len))`); as a separate statement VC6 emits
+  `fld [1.0]; fdiv st(1)` instead of retail's `fld st(0); fdivr [1.0]`.
+- partial: InlineShock::SolveContact 0x4fa400 (758/764 bytes, 68%: the projection temporary is
   allocated in its own slot rather than reusing the dead `d` slot); RotatingShock::SolveContact
   0x4fac60 (880/880 bytes, 94.1%: only the placement of the `mov [r.x], ecx` struct-copy
   relative to `fsubp` differs in the four cross-product cases).

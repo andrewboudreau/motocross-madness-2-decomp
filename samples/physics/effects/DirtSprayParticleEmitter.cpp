@@ -67,7 +67,10 @@ int DirtSprayParticleEmitter::GameObjectVirtualSlot10(float dt)
         float inv = 1.0f / n;
         ParticleVec3 step = d * inv;
         ParticleVec3 velStep = (dt * launchVelocity) * inv;
-        ParticleVec3 gravStep = (dt * manager->gravity) * inv;
+        // Near miss: the scalar-first form below fixes velStep's first component; gravStep.x in the
+        // velocity product still loads as `fld st(0); fmul [esp+N]` (retail `fld [esp+N]; fmul st(1)`).
+        // Forms tried are listed in targets.json.
+        ParticleVec3 gravStep = inv * (dt * manager->gravity);
         int i;
         for (i = 0; (float)i < n; i++) {
             if (manager->activeCount == 1000) return 1;

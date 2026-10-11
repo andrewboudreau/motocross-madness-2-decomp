@@ -36,7 +36,7 @@
     "target_va": "0x00513490",
     "target_size": 201,
     "expect": "partial",
-    "notes": "98.87% at exact size 201: zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap Also tried: permuted zero.x/y/z store order (worse, 196-197) and member-wise copies into pts[i].origin (frame changes)."
+    "notes": "98.87% at exact size 201 (175/177 masked): zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap in the origin stores (retail x<-edi, y<-edx, z<-ebx). Also tried without gain: permuted zero.x/y/z store order (worse), chained `zero.x = zero.y = zero.z` and comma forms, zero declared before/after i/zeroValue (`i` last much worse), member-wise copies into pts[i].origin (worse), rim stores first, while loop, pointer/reference to pts[i], scoped zero block, a second zero local, `float zeroValue = 0`, prepended typedefs 0..63 (no change)."
   },
   {
     "class": "Tire",
@@ -360,7 +360,7 @@
     "target_va": "0x00513f90",
     "target_size": 479,
     "expect": "partial",
-    "notes": "470/479: only the stack slots differ; retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local, VC6 the other way round (see Tire.cpp).",
+    "notes": "470/479 (406/415 bytes): only the stack slots differ; retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local, VC6 the other way round (frame-layout fact 9: minimum has 4 references, boost 3). Tried without gain: embedded assignment in the boost condition (much worse), boost = 1 default with a nested if (worse), `?:` forms of minimum and of the clamp, `share <= minimum`, minimum = 1 default (worse), a temp b for the boost product (worse).",
     "bindings": "Tire.bindings.json"
   },
   {

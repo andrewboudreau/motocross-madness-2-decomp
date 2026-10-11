@@ -105,8 +105,8 @@
     "candidate_symbol_contains": "UpdateAxis@InlineShock",
     "target_va": "0x004f9f90",
     "target_size": 250,
-    "expect": "partial",
-    "notes": "partial 98.7%: 1.0f/len gives fld;fdiv instead of fld st0;fdivr",
+    "expect": "exact",
+    "notes": "strict exact with the axisLength store embedded in the divisor (axis * (1.0f / (axisLength = len))); a separate store statement gives fld [1.0]; fdiv st(1) instead of retail's fld st(0); fdivr",
     "bindings": "Shock.bindings.json"
   },
   {

@@ -6,7 +6,7 @@
     "target_va": "0x0043b240",
     "target_size": 186,
     "expect": "partial",
-    "notes": "95.7%: same size, scheduling differs (sub esp placement / fld order)",
+    "notes": "155/162: same size; residual is one store pair scheduled differently (retail `fstp [esp+8]` before `mov [edx+4], eax`). Unchanged: `((-normalForce) * surfaceGrip) * frictionCoefficient`, a named magnitude local stored then reused through the member, a frictionForce temp, parenthesised and chained-assignment forms. Worse: dropping the parentheses around -normalForce, `-(a * b) * c` / `-(a * b * c)`, `(-n) * (g * c)`, using the local magnitude in the product, componentwise frictionForce stores.",
     "bindings": "CollisionPoint.bindings.json"
   },
   {
@@ -115,7 +115,7 @@
     "target_va": "0x0043b190",
     "target_size": 168,
     "expect": "partial",
-    "notes": "96% under vc6_o2_ml; vector rejection (a - proj_b(a))",
+    "notes": "96% (150/156) under vc6_o2_ml; vector rejection (a - proj_b(a)). Residual: retail loads b's pointer before a's and computes the y term as b.y * a.y (VC6: a first, a.y * b.y). Unchanged: every operand order / permutation of the dot terms and CollisionDot(*a, *b), one-statement and t-inline forms, Vec3/DotProduct casts, non-const or reference parameters, renamed parameters, prepended dummies/typedefs. `const CollisionVec3& u = *b, & v = *a` locals fix the pointer load order but sum the dot as (z + y) + x (143/156).",
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {

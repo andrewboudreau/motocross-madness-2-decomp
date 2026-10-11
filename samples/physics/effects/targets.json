@@ -86,7 +86,7 @@
     "target_va": "0x004b8f40",
     "target_size": 970,
     "expect": "partial",
-    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). Only the first component of each r-scaled vector differs (retail fld mem; fmul st(1), VC6 emits fld st(0); fmul mem) Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h. Also unchanged or worse: a named `n - (float)i` local, velStep/gravStep defined before step, velStep written inline in the loop (not hoisted).",
+    "notes": "947/958 masked (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). gravStep written `inv * (dt * manager->gravity)` (free operator*(float, v)) fixes the velStep first component; the remaining diff is gravStep.x in the velocity product (retail `fld [esp+N]; fmul st(1)`, VC6 `fld st(0); fmul [esp+N]`). The gravStep site never moved across ~400 variants: velStep/step member vs free forms, member/free and parenthesised position/velocity loop forms, named k/(n - i) locals (worse: retail uses a CSE temp), inline non-hoisted vectors (worse), definition-order permutations, d via ctor/operator-/componentwise, `ParticleVec3&` or temp gravity, `for (int i` vs `int i;`, v + k*g / k*g + v / member velocity forms, component multiply forms, dead statements (no arena effect). With gravStep as member operator*, velStep's first component regresses again.",
     "bindings": "DirtChunkParticleEmitter.bindings.json"
   },
   {
@@ -126,7 +126,7 @@
     "target_va": "0x004b9460",
     "target_size": 970,
     "expect": "partial",
-    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: same shape as DirtChunk (initial age 375, frame wraps at 13); same residual first-component fld st(0) difference Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h.",
+    "notes": "947/958 masked (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: same shape as DirtChunk (initial age 375, frame wraps at 13). gravStep written `inv * (dt * manager->gravity)` fixes the velStep first component; the residual gravStep.x `fld st(0); fmul [esp+N]` vs retail `fld [esp+N]; fmul st(1)` is the same as DirtChunk (see its note for the forms tried).",
     "bindings": "DirtSprayParticleEmitter.bindings.json"
   },
   {
@@ -186,7 +186,7 @@
     "target_va": "0x004b99a0",
     "target_size": 1055,
     "expect": "partial",
-    "notes": "98.4% (1055 vs 1055 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: DirtChunk-like direct particle fill that switches itself off once the manager table is full or the burst ends; residual is the same first-component fld st(0) difference as DirtChunk/DirtSpray Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h.",
+    "notes": "1027/1039 masked (1055 vs 1055 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: DirtChunk-like direct particle fill that switches itself off once the manager table is full or the burst ends. gravStep written `inv * (dt * manager->gravity)` fixes the velStep first component; the residual gravStep.x `fld st(0); fmul [esp+N]` vs retail `fld [esp+N]; fmul st(1)` is the same as DirtChunk (see its note for the forms tried).",
     "bindings": "SparkParticleEmitter.bindings.json"
   },
   {

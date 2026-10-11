@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 154, total 350. The three class (a) functions of the
+Counts: a 0, b 195, c 154, total 349. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -165,12 +165,12 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/contact/ContactImpulse | `0x005004a0` | 104/927 (masked) | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 451/3321 (masked) | b | 123 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x1c4 vs 0x1ac, slot order differs |
 | physics/effects/DirtChunkParticleEmitter | `0x004b8df0` | 17/235 (masked) | c | 15 code diffs: retail lacks `sub esp, 8`; `lea edi, [esi + 0x80]` vs `lea ecx, [esi + 0x50] ; mov edx, eax ; ~` |
-| physics/effects/DirtChunkParticleEmitter | `0x004b8f40` | 942/958 (masked) | c | 3 code diffs: `fld st(0) ; fmul [esp + N]` vs `fld [esp + N] ; fmul st(1)`; `fld st(0)` vs `fld [esp + N]` |
+| physics/effects/DirtChunkParticleEmitter | `0x004b8f40` | 947/958 (masked) | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
 | physics/effects/DirtSprayParticleEmitter | `0x004b9310` | 30/235 (masked) | c | 10 code diffs: retail adds `lea ecx, [esi + 0x50] ; mov edx, eax`; retail adds `mov [ecx], edx ; mov [esi], A ; mov [es~` |
-| physics/effects/DirtSprayParticleEmitter | `0x004b9460` | 942/958 (masked) | c | 3 code diffs: `fld st(0) ; fmul [esp + N]` vs `fld [esp + N] ; fmul st(1)`; `fld st(0)` vs `fld [esp + N]` |
+| physics/effects/DirtSprayParticleEmitter | `0x004b9460` | 947/958 (masked) | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
 | physics/effects/DustParticleEmitter | `0x004b8a00` | 21/110 (masked) | c | 7 code diffs: retail adds `lea ecx, [esi + 0x50] ; mov edx, eax`; retail adds `mov [ecx], edx` |
 | physics/effects/SparkParticleEmitter | `0x004b9830` | 27/227 (masked) | c | 11 code diffs: `lea edi, [esi + 0x84]` vs `lea ecx, [esi + 0x50] ; mov edx, eax ; ~`; retail lacks `mov [esi + 0x50], eax ; mov [esi + 0x54~` |
-| physics/effects/SparkParticleEmitter | `0x004b99a0` | 1022/1039 (masked) | c | 3 code diffs: `fld st(0) ; fmul [esp + N]` vs `fld [esp + N] ; fmul st(1)`; `fld st(0)` vs `fld [esp + N]` |
+| physics/effects/SparkParticleEmitter | `0x004b99a0` | 1027/1039 (masked) | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
 | physics/effects/SteamParticleEmitter | `0x004b9f40` | 21/164 (masked) | c | 6 code diffs: `lea edi, [esi + 0x74]` vs `lea ecx, [esi + 0x54] ; mov edx, ebx ; ~`; `mov [esi + 0x54], ebx ; mov [esi + 0x58~` vs `mov [ecx + 8], edx` |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 814/917 | b | frame 0xb84 vs 0xb78 (one more Vec3 temporary); one load of the first inline cross product, a vertex-fill store and `points[i] += *center` operand order |
 | physics/helpers/GraphicsTest | `0x0047c270` | 622/626 | b | 1 code diffs: `fld [eax] ; fadd [esi + 8]` vs `fld [esi + 8] ; fadd [eax]`; slots differ |
@@ -216,12 +216,11 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/shadow/TerrainShadow | `0x00508bc0` | 353/3031 | b | slot 27 footprint: frame 0xdc vs 0xd0, slot order, the cross product's operand order and the corner loops' form; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 275/404 (masked) | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
-| physics/suspension/Shock | `0x004f9f90` | 227/230 (masked) | b | 1 code diffs: `fld [A] ; fdiv st(1)` vs `fld st(0) ; fdivr [A]`; slots differ |
 | physics/suspension/Shock | `0x004fa400` | 458/674 (masked) | b | 20 code diffs: `je @160 ; mov eax, [A]` vs `je @162`; `jmp @180` vs `mov eax, [A] ; mov [esp + N], ecx ; mov~`; slots differ |
-| physics/tire/Tire | `0x00513490` | 175/177 (masked) | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` |
+| physics/tire/Tire | `0x00513490` | 175/177 (masked) | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` | in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts give no gain |
 | physics/tire/Tire | `0x005135f0` | 559/1666 | b | UpdateContactPatch: frame 0x18 matches; retail homes the projected axis in the dead `axis` argument slot, normal through ecx, tail-path copies |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
-| physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local |
+| physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local | (reference counts 3 vs 4, VC6_FRAME_LAYOUT fact 9); rewrites of the boost/minimum conditions and the clamp give no gain |
 | physics/tire/Tire | `0x00514170` | 276/589 | b | `fld st(0); fcomp` where retail uses `fcom`; x87 operand order of the `dir` scaling |
 | physics/tire/Tire | `0x00514550` | 169/3838 (masked) | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
 | physics/tire/Tire | `0x00515880` | 48/653 (masked) | b | 35 code diffs: retail adds `mov eax, [esp + N] ; push esi ; mov ecx~`; retail lacks `mov ecx, [esp + N]`; slots differ |
