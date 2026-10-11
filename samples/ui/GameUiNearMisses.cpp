@@ -2,13 +2,6 @@
 // included below for its types and matched functions). Check: compile this
 // file and compare each function with GameUiNearMisses.bindings.json.
 //
-// 0x0046e8c0 dialog slot 28 (55/64): retail stores the value before loading
-//   the vtable (and so keeps the vtable in eax); every store order gives the
-//   hoisted load, and so do an inline send helper, an inline initialiser, an
-//   event pointer local and a `this` copy.
-// 0x0046ea80 (160/164): the two arguments are loaded into the opposite
-//   registers (id in esi in retail); a local copy of either, `id == groupId`,
-//   for, guarded do-while and `continue` loop forms do not change it.
 // 0x004705d0 UIControl slot 49 (91/101) and 0x004733a0 UIButton slot 49
 //   (85/99): the value loaded for each call lands in another register
 //   (retail: ecx/edx, VC6 here: edx/eax); an int SetFontColor, a local for the
@@ -17,7 +10,13 @@
 //   inline wrappers for both calls, inline accessors for every operand (32
 //   combinations) and an int-returning slot 29/SetFontColor. An extra member
 //   copy in the first branch moves the second branch's registers, so the
-//   choice is function-wide.
+//   choice is function-wide. Swept with no gain (576 + 128 forms for
+//   UIControl, 64+ for UIButton): early return or one block, inverted
+//   branches, `!enable`, locals for the old state/savedState/currentState/
+//   currentTextColor/textColor/stateImages[4] (also as `UIAnim*`), `!= 0`
+//   image tests, parentheses on each operand and per-branch `enabled`
+//   stores. Retail UIControl and UIButton pick opposite registers for the
+//   same fragments, so the choice is an allocation tie-break.
 // 0x00472e30 UIAnim constructor (34/82): retail stores the palette (+0xf4)
 //   after the zeroed members, right before the frame-list memset; VC6 here
 //   hoists it next to the texture store whatever the statement, initializer
@@ -55,7 +54,11 @@
 //   before or after, the local at function scope or reused for the second
 //   call, a nested flags test, `(POINT*)b` casts, an owner local, `point !=
 //   0`, `found != 0`, guarded do-while rows and `rect.bottom = h; bottom +=
-//   top` were tried.
+//   top` were tried (456 swept combinations, best 322). The form without the
+//   local (`rect.bottom = rect.top + GetRowHeight(row);`, as in the exact
+//   UIListBox slot 10 at 0x00476020) matches retail apart from the
+//   ebx/ebp swap (ebp makes `[ebp]` take a disp8, so 344 bytes); no
+//   declaration shift (k = 0..63) changes either form.
 // 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi,
 //   the width in edx and spills the row counter into the key's argument
 //   slot; VC6 here spills the pixel instead. Hoisting the width or
@@ -132,30 +135,6 @@
 #include "../../src/reconstructed/Palette8.h"
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/Tgafile.h"
-
-// 0x0046e8c0
-void UIDialog::UnknownVirtualSlot28(int value) {
-    UnknownDialogEvent event;
-    event.handled = 0;
-    event.gui = guiManager;
-    event.code = 0;
-    event.controlName = 0;
-    event.control = 0;
-    event.field_0x18 = value;
-    event.kind = kDialogInit;
-    event.dialog = this;
-    UnknownVirtualSlot29(&event);
-}
-
-// 0x0046ea80
-void UIDialog::EnableGroup(int id, int value) {
-    GameObjectIterator iterator(controlContainer, 1, "UIControl");
-    UIControl* control;
-    while ((control = (UIControl*)iterator.Next()) != 0) {
-        if (control->groupId == id)
-            control->UnknownVirtualSlot49(value);
-    }
-}
 
 // 0x004705d0
 void UIControl::UnknownVirtualSlot49(int enable) {

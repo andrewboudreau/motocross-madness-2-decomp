@@ -1898,6 +1898,20 @@ GameObject* UIDialog::AddControl(GameObject* control, int a, int b) {
     return 0;
 }
 
+// 0x0046e8c0
+void UIDialog::UnknownVirtualSlot28(int value) {
+    UnknownDialogEvent event;
+    event.handled = 0;
+    event.kind = kDialogInit;
+    event.code = 0;
+    event.controlName = 0;
+    event.control = 0;
+    event.field_0x18 = value;
+    event.gui = guiManager;
+    event.dialog = this;
+    UnknownVirtualSlot29(&event);
+}
+
 // 0x0046e9a0
 Sound* UIDialog::FindSectionObject(const char* name) {
     if (!name)
@@ -1918,6 +1932,17 @@ void UIDialog::UnknownFunction46ea60(int value) {
         GameObject::UnknownVirtualSlot5();
     else
         GameObject::UnknownVirtualSlot4();
+}
+
+// 0x0046ea80
+void UIDialog::EnableGroup(int id, int value) {
+    GameObjectIterator iterator(controlContainer, 1, "UIControl");
+    UIControl* control;
+    while ((control = (UIControl*)iterator.Next()) != 0) {
+        int group = control->groupId;
+        if (group == id)
+            control->UnknownVirtualSlot49(value);
+    }
 }
 
 // 0x0046eb30

@@ -14323,6 +14323,15 @@ CASES = [
         'reason': 'gameui.cpp $E static initializer',
     },
     {
+        'name': 'gameui.cpp UIDialog::slot28',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '?UnknownVirtualSlot28@UIDialog@@UAEXH@Z',
+        'target_va': '0x0046e8c0',
+        'target_size': 64,
+        'reason': 'UIDialog primary vtable slot 28 in gameui.cpp extent 0x469db0-0x47b66f',
+    },
+    {
         'name': 'gameui.cpp UIDialog::fn46e9a0',
         'bindings': 'src/reconstructed/GameUi.bindings.json',
         'source': 'src/reconstructed/GameUi.cpp',
@@ -14356,6 +14365,15 @@ CASES = [
         'symbol': '?UnknownFunction46ea60@UIDialog@@QAEXH@Z',
         'target_va': '0x0046ea60',
         'target_size': 30,
+        'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',
+    },
+    {
+        'name': 'gameui.cpp UIDialog::EnableGroup',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '?EnableGroup@UIDialog@@QAEXHH@Z',
+        'target_va': '0x0046ea80',
+        'target_size': 164,
         'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',
     },
     {

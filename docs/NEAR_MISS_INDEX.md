@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 156, total 352. The three class (a) functions of the
+Counts: a 0, b 196, c 154, total 350. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -340,12 +340,10 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/DlgProcs | `0x00452930` | 276/1875 | c | 86 code diffs: retail adds `jmp @67 ; mov ebx, [esp + N] ; push 1` |
 | ui/GUIManager | `0x00485a70` | 62/345 | c | 29 code diffs: retail lacks `mov edx, ebx`; retail lacks `mov ebp, [esp + N]` |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
-| ui/GUIManager | `0x00486b10` | 86/106 | c | 5 code diffs: retail lacks `mov edx, [esi + 0x48]`; `mov [esp + N], edx` vs `pop edi` |
+| ui/GUIManager | `0x00486b10` | 89/106 | c | two per-component ternaries give retail's `pop edi` placement; retail loads bottom into eax after storing x and passes the text in eax and &position in edx (VC6 here hoists the bottom load into edx beside the cdq and swaps the call registers) |
 | ui/GUIManager | `0x00486b80` | 227/555 | c | 13 code diffs: `add eax, -2` vs `sub eax, 2`; retail adds `mov edi, [esp + N]` (a named `limit` local gives retail's `sub eax, 2`, but retail also writes width/height back into `size`'s slots) |
 | ui/GUIManager | `0x00488120` | 46/52 | c | retail tests the owner for zero before comparing it with `this`; VC6 threads the ternary's xor arm into a leading zero test, so the sample compares with `this` first (samples/ui/GUIManagerNearMisses.cpp) |
 | ui/GameUi | `0x0046a920` | 684/2323 (masked) | b | 17 code diffs: `mov eax, 0x64` vs `mov ecx, 0x64 ; mov eax, 1 ; mov [esp +~`; `mov eax, 1` vs `mov [esp + N], eax`; frame 0x9bf4 vs 0x9c74, slot order differs |
-| ui/GameUi | `0x0046e8c0` | 55/64 | c | 4 code diffs: retail lacks `mov edx, [ecx]`; `lea eax, [esp + N]` vs `mov eax, [ecx] ; lea edx, [esp + N]` |
-| ui/GameUi | `0x0046ea80` | 160/164 | c | 2 code diffs: `cmp [eax + 0x78], edi` vs `cmp [eax + 0x78], esi`; `push esi` vs `push edi` |
 | ui/GameUi | `0x0046ef00` | 352/555 | c | 13 code diffs: retail adds `mov [edi + 0xc], ebx`; retail lacks `mov [edi + 0xc], ebx` |
 | ui/GameUi | `0x004705d0` | 91/101 | c | 5 code diffs: `mov edx, [esi + 0xcc]` vs `mov ecx, [esi + 0xcc] ; push ecx`; retail lacks `push edx` |
 | ui/GameUi | `0x00472960` | 352/566 | c | 18 code diffs: retail lacks `push A`; retail adds `push A` |
@@ -357,7 +355,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x00477110` | 356/646 | c | 12 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `mov [esp + N], eax ; mov ecx, [esi + 0x~` |
 | ui/GameUi | `0x004773a0` | 169/232 | c | 5 code diffs: `mov ecx, [esp + N] ; mov [esp + N], ecx~` vs `mov eax, [esp + N]`; retail adds `mov ecx, [esi + 0xc] ; mov edx, [esi + ~` |
 | ui/GameUi | `0x00477800` | 78/242 | c | 2 register choices: `mov edx, [ecx + 0x218]` vs `mov eax, [ecx + 0x218]`; `mov eax, [A]` vs `mov edx, [A]` (flow and layout are retail's) |
-| ui/GameUi | `0x00477e90` | 322/342 | c | register choice after the row-height call: `mov edx, [esp + N] ; mov ecx, [ebx]` vs `mov ecx, [esp + N] ; mov edx, [ebx + 4]` (rect.top/point register choice) |
+| ui/GameUi | `0x00477e90` | 322/342 | c | register choice after the row-height call: `mov edx, [esp + N] ; mov ecx, [ebx]` vs `mov ecx, [esp + N] ; mov edx, [ebx + 4]` (rect.top/point register choice) |; without the height local (as in the exact slot 10 at 0x476020) only ebx/ebp are swapped (155/344) |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
 | ui/GameUi | `0x00478e10` | 231/303 | c | frame and head are retail's (the area is tested in place, no RECT copy); the opaque-result tail differs as in UIButton slot 28 `0x004734c0` (retail returns through edi, 8-bit hit sets edi directly) |
 | ui/GameUi | `0x0047a400` | 320/962 | c | 21 code diffs: retail adds `mov [esi + 0x20c], ecx`; `mov [esi + 0x20c], ecx` vs `add ecx, ebp ; mov [esi + 0x210], edx ;~` |

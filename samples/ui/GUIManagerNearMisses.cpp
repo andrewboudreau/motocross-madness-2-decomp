@@ -14,11 +14,17 @@
 // 0x00486170 (896 bytes): same logic; retail keeps three more stack locals
 //   (frame 0xb0 against 0xa4) and allocates registers differently around
 //   the row copy and the 8-bit dim loop.
-// 0x00486b10 (106 bytes): retail stores the centred x before loading the
-//   control's bottom and passes the text in eax; VC6 here hoists the load
-//   (also with a POINT, a centre helper, a `left` local, a pointer to the
-//   array or a ShowText call in each branch, and with the centre written
-//   as `width / 2 + left`, a `width` or `left` local, or `left` then `+=`).
+// 0x00486b10 (106 bytes, 89/106): one ternary per component (below; two
+//   separate if/else statements compile the same) gives retail's block
+//   order and `pop edi` placement (one if/else block: 86/106). Retail still
+//   stores the centred x before loading the control's bottom into eax and
+//   passes the text in eax and &position in edx; VC6 here hoists the bottom
+//   load into edx beside the cdq and swaps the call registers. Tried: y
+//   before x (81), `!device` ternaries/ifs, a POINT, a pointer to the array
+//   or `*p++` stores, `&position[0]`, x/y/bottom/text locals, casts or
+//   parentheses on the text, a centre helper, a ShowText call in each
+//   branch, and the centre written as `width / 2 + left`, a `width` or
+//   `left` local, or `left` then `+=`.
 // 0x00486b80 (553 bytes, ratio 0.97): retail computes the width limit as
 //   `sub eax, 2` (VC6 here: `add eax, -2`) and spills width/height into the
 //   SIZE slots later. VC6 emits `sub` only for a named `limit` local (the
@@ -31,8 +37,9 @@
 //   the zero test (inline helper, if/else assignment, early-return layouts,
 //   `owner == 0` first, a result variable, a switch, an assignment in the
 //   condition, an int-cast ternary, `owner && owner != this`, an `owned`
-//   flag); comparing with `this` first (below) keeps the branch, so only the
-//   order of the two tests differs.
+//   flag, nested if/else, goto, a `const` or `void*` owner, a `self` local,
+//   `!device ? 0 : owner`, `this == owner`); comparing with `this` first
+//   (below) keeps the branch, so only the order of the two tests differs.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 
@@ -175,13 +182,9 @@ void ToolTip::UnknownFunction486b10(UnknownGuiControl* control) {
     int position[2];
     GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
 
-    if (device) {
-        position[0] = device->pointerPosition.x;
-        position[1] = device->pointerPosition.y + 16;
-    } else {
-        position[0] = control->area.left + (control->area.right - control->area.left) / 2;
-        position[1] = control->area.bottom;
-    }
+    position[0] = device ? device->pointerPosition.x
+                         : control->area.left + (control->area.right - control->area.left) / 2;
+    position[1] = device ? device->pointerPosition.y + 16 : control->area.bottom;
     ShowText(control->toolTipText, position, 1.0f);
 }
 
