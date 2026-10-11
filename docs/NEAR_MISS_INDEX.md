@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 184, c 126, total 310. The three class (a) functions of the
+Counts: a 0, b 184, c 124, total 308. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -55,7 +55,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | game/QuarryStuntEvent | `0x004e0560` | 22/331 | b | 30 code diffs: `sub esp, N` vs `push ecx`; retail lacks `xor ebx, ebx`; frame 0xc vs 0x0 |
 | game/QuarryStuntEvent | `0x004e14a0` | 166/1760 | b | 9 code diffs: `mov edx, [A] ; test edx, edx` vs `mov ecx, [A] ; test ecx, ecx`; `mov eax, [ecx + 0x26c0] ; lea edx, [eax~` vs `mov eax, [eax + 0x38] ; mov ecx, [eax +~`; slots differ |
 | game/QuarryStuntEventLoader | `0x004de590` | 397/7912 | b | camera argument fixed to 1.048f (retail 0x3f8624dd); 2074/2208 normalised insns align (was 2063); scalar stack slots and decision-tree registers left |
-| game/UiInfo | `0x00522440` | 362/427 | c | 6 code diffs: `mov eax, 1` vs `mov ecx, 1 ; lea eax, [ebp + N]`; `mov [ebp + N], eax ; mov [ebp + N], eax~` vs `mov [ebp + N], ecx ; mov [ebp + N], ecx~` |
+| game/UiInfo | `0x00522440` | 383/427 | c | 2 diffs: retail schedules the +0x2828 store after `mov edx, 2` and places the second 0x1ec-byte rep movsd after the +0x196c store; ~21,000 store-order/copy-form/zeroing variants swept |
 | game/UiInfo | `0x005238f0` | 190/357 | c | block layout and the single `return 0` tail are retail's; retail keeps fopen's result in eax until the found block (`mov edx, eax` there), VC6 here gives `file` edx after each fopen |
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ |
@@ -71,7 +71,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/broadphase/Terrain | `0x00506e90` | 850/1502 (masked) | b | 44 code diffs: `je @308` vs `je @282 ; fld [esp + N] ; push ecx`; retail adds `mov ecx, [esp + N]`; slots differ |
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
 | krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |
-| krusty2/collision/CollisionObject | `0x00431df0` | 19/85 | c | 2 code diffs: `mov eax, [esi + 0x14] ; add eax, ebx` vs `mov edx, [esi + 0x14] ; mov eax, ebx ; ~` |
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
 | krusty2/collision/CollisionObject | `0x004334c0` | 1046/1066 (masked) | b | 11 code diffs: `call A` vs `call @0`; `fmul [edi + 4]` vs `fmul [edi + 0x24]`; slots differ |
 | krusty2/collision/CollisionObject | `0x00434540` | 1054/1068 | b | 8 code diffs: retail adds `fld [eax + 0x38] ; fmul [eax + 4]`; retail lacks `fld [eax + 0x38] ; fmul [eax + 4]`; slots differ |
@@ -106,7 +105,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Bike | `0x0040b600` | 1061/1066 | b | slot 46: frame offsets of the one-wheel path's constructor temporaries (sub/half constructor at retail 0x38/0x20, the 0x421cb0 mid at 0x40, the WorldToLocal temporary at 0x48/0x30); the register pair is fixed by `const Vec3&` rear/front locals |
 | krusty2/vehicle/Bike | `0x0040ba30` | 55/973 (masked) | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 135/802 (masked) | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
-| krusty2/vehicle/Vehicle | `0x005257a0` | 579/637 (masked) | b | 5 code diffs: retail lacks `mov [esi + 0x4fc], ebx ; mov [esi + 0x5~`; retail adds `mov [edx + 8], ecx`; slots differ |
+| krusty2/vehicle/Vehicle | `0x005257a0` | 585/637 (masked) | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 51/471 (masked) | b | 35 code diffs: retail lacks `fld [eax + 8]`; retail adds `mov ebx, [esp + N] ; mov ecx, [esp + N]`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 248/1446 (masked) | b | 87 code diffs: retail adds `xor ebx, ebx`; retail lacks `xor ebp, ebp`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x00526fa0` | 96/1161 | b | 21 code diffs: retail lacks `xor ecx, ecx`; `mov [esp + N], ebp` vs `mov [esp + N], ebx`; slot order differs |
@@ -313,7 +312,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x0046ef00` | 352/555 | c | 13 code diffs: retail adds `mov [edi + 0xc], ebx`; retail lacks `mov [edi + 0xc], ebx` |
 | ui/GameUi | `0x004705d0` | 91/101 | c | 5 code diffs: `mov edx, [esi + 0xcc]` vs `mov ecx, [esi + 0xcc] ; push ecx`; retail lacks `push edx` |
 | ui/GameUi | `0x00472960` | 352/566 | c | 18 code diffs: retail lacks `push A`; retail adds `push A` |
-| ui/GameUi | `0x00472e30` | 34/82 | c | 5 code diffs: retail lacks `mov eax, [esp + N]`; `mov [esi + 0xf0], eax` vs `mov edx, [esp + N]` |
 | ui/GameUi | `0x004733a0` | 85/99 | c | 4 code diffs: `mov ecx, [esi + 0xcc] ; push ecx` vs `mov eax, [esi + 0xcc]`; retail adds `push eax` |
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
 | ui/GameUi | `0x004738a0` | 206/975 | b | 53 code diffs: `mov edi, [esi + 0x1bc] ; mov ebx, eax` vs `mov ecx, [esi + 0x1bc] ; lea ebx, [esi ~`; retail lacks `lea ebp, [esi + 0x1bc]`; frame 0x38 vs 0x40 |
