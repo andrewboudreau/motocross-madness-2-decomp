@@ -26310,6 +26310,15 @@ CASES = [
         'target_size': 243,
         'reason': 'qsort comparison passed by 0x00477900; first comparator call through a control local (eax/edx as retail)',
     },
+    {
+        'name': 'QuarryStuntEvent.cpp BaseQuarryEvent race memory estimate',
+        'bindings': 'src/reconstructed/QuarryStuntEvent.bindings.json',
+        'source': 'src/reconstructed/QuarryStuntEvent.cpp',
+        'symbol': '?UnknownFunction4e0560@BaseQuarryEvent@@QAEHXZ',
+        'target_va': '0x004e0560',
+        'target_size': 311,
+        'reason': 'between 0x004e04f0 and slot 27 0x004e06a0 in QuarryStuntEvent.cpp; sum in a local, field_0x560 constant by if/else (counts in edi/esi, push ecx frame)',
+    },
 ]
 
 def main():

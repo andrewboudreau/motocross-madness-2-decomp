@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 173, c 121, total 294. The three class (a) functions of the
+Counts: a 0, b 172, c 121, total 293. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -52,7 +52,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | game/EventManager | `0x0045e710` | 454/533 | c | 10 code diffs: `mov edx, [ecx + 0xc4c] ; mov [eax + 0x5~` vs `mov ecx, [ecx + 0xc4c] ; mov [eax + 0x5~`; `mov eax, [eax + 0x56c]` vs `mov edx, [eax + 0x56c]` |
 | game/Game | `0x00467b70` | 406/813 | b | 11 code diffs: `jne @128 ; pop edi ; pop esi` vs `je @227`; slot order differs |
 | game/PCGame | `0x004c0d10` | 1776/1790 | c | retail stores the surface description's size right after the memset, VC6 after pushing the 0x005119c0 arguments ; helpers, a derived-struct constructor, pointer/format locals and sizeof spellings do not move it (retail stores it after the pushes in the matched 0x004c5950) |
-| game/QuarryStuntEvent | `0x004e0560` | 22/331 | b | 30 code diffs: `sub esp, N` vs `push ecx`; retail lacks `xor ebx, ebx`; frame 0xc vs 0x0 |
 | game/QuarryStuntEvent | `0x004e14a0` | 166/1760 | b | 9 code diffs: `mov edx, [A] ; test edx, edx` vs `mov ecx, [A] ; test ecx, ecx`; `mov eax, [ecx + 0x26c0] ; lea edx, [eax~` vs `mov eax, [eax + 0x38] ; mov ecx, [eax +~`; slots differ |
 | game/QuarryStuntEventLoader | `0x004de590` | 397/7912 | b | camera argument fixed to 1.048f (retail 0x3f8624dd); 2074/2208 normalised insns align (was 2063); scalar stack slots and decision-tree registers left |
 | game/UiInfo | `0x00522440` | 383/427 | c | 2 diffs: retail schedules the +0x2828 store after `mov edx, 2` and places the second 0x1ec-byte rep movsd after the +0x196c store; ~21,000 store-order/copy-form/zeroing variants swept |

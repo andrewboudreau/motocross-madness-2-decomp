@@ -21,8 +21,8 @@
 // __FILE__ at 0x00572154): BaseQuarryEvent, 0x004de2a0..0x004e1fa7, between
 // Quantize.cpp (ends 0x004de29f) and racesnd.cpp (RaceSound's constructor
 // 0x004e1fb0). Names are provisional. Not here: the loader 0x004de590
-// (about 7.9 KB, not reconstructed) and the near misses 0x004e0560 and slot
-// 12 (0x004e14a0), kept in samples/game/QuarryStuntEventNearMisses.cpp.
+// (about 7.9 KB, not reconstructed) and the near miss slot 12 (0x004e14a0),
+// kept in samples/game/QuarryStuntEventNearMisses.cpp.
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -136,6 +136,61 @@ int BaseQuarryEvent::UnknownFunction4e04e0() {
 // 0x004e04f0
 int BaseQuarryEvent::UnknownFunction4e04f0(int* counts) {
     return counts[0] * 0x80000 / 3 + counts[1] * 0x20000 / 3 + counts[2] * 0x8000 / 3 + counts[3] * 0x2000 / 3;
+}
+
+// The bike model table at KrustyUI+0x48 (0xc8-byte records) and the choices
+// at +0x50 (0x94 bytes, a model index first); +0x58 holds more 0xc8-byte
+// model records.
+struct UnknownQuarryBikeModel {
+    unsigned char field_0x00[0xc4];
+    int field_0xc4;                           // model kind
+};
+
+struct UnknownQuarryBikeChoice {
+    int field_0x00;                           // model index
+    unsigned char field_0x04[0x94 - 0x04];
+};
+
+// 0x004e0560: the race memory estimate (counts of eligible bikes and
+// opponents, capped by the circuit's +0x460). The sum is a local and the
+// field_0x560 constant an if/else assignment: VC6 still emits the branchless
+// neg/sbb/and/add last, and with the ternary inside the return it keeps
+// g_TrackGame in a register across the first loop and spills a count (22/331).
+int BaseQuarryEvent::UnknownFunction4e0560() {
+    int players = 0;
+    int opponents = 0;
+    if (g_TrackGame->UnknownFunction521cd0()) {
+        int i;
+        for (i = 0; i < g_TrackGame->ui->field_0x54; i++) {
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->field_0x48)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->field_0x50)[i].field_0x00].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
+                players++;
+        }
+        for (i = 0; i < g_TrackGame->ui->field_0x5c; i++) {
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->field_0x58)[i].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
+                opponents++;
+        }
+        if (players >= g_TrackGame->field_0x3444->field_0x460)
+            players = g_TrackGame->field_0x3444->field_0x460;
+        if (opponents >= g_TrackGame->field_0x3444->field_0x460)
+            opponents = g_TrackGame->field_0x3444->field_0x460;
+    } else {
+        if (g_TrackGame->field_0x18 == 1) {
+            if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
+                opponents = 1;
+            else
+                opponents = g_TrackGame->mode.field_0x27f8.field_0x24 + 1;
+        } else {
+            opponents = g_TrackGame->mode.field_0x27f8.field_0x28 + g_TrackGame->field_0x18;
+        }
+        players = opponents;
+    }
+    int total = opponents * 0x80000 / 3 + opponents * 0x8000 / 3 + players * 0x80000 / 3 + 0x80000 / 3;
+    int extra;
+    if (g_TrackGame->field_0x560)
+        extra = 2 * (0x80000 / 3);
+    else
+        extra = 3 * (0x80000 / 3);
+    return total + extra;
 }
 
 // 0x004e06a0
