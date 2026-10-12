@@ -16,12 +16,12 @@ Extent: `0x00469db0..0x0047b66f`. Evidence:
 - **Vtables:** UIDialog `0x00552a9c` through UIProgressBar `0x00553c68`.
 - **`$E`:** its four kVec3 initializers sit at `0x0046e870..0x0046ea5b`.
 
-Exact: 324 functions compile strict-exact from GameUi.cpp. 317 are
+Exact: 325 functions compile strict-exact from GameUi.cpp. 318 are
 registered as calibration cases, including the 13 drawing, input and layout
-functions in the file's last section ("Drawing and input slots"), the ten
+functions in the file's last section ("Drawing and input slots"), the eleven
 promoted from the near-miss sample (UIControl slots 22, 23 and 41, UIScrollBar
 `0x004753c0`, UIListBox slots 21 and 56 and `ScrollBy`, UIMultiState slot 48,
-UIDDLListBox slot 66 and UIFrame `0x00472bc0`), the UIDialog constructor,
+UIDDLListBox slot 66 and UIFrame `0x00472bc0` and `0x00472960`), the UIDialog constructor,
 destructor and deleting destructor (`0x00469db0`, `0x0046a070`, `0x00469ff0`)
 and `NotifyParent` (`0x0046ff70`). Seven sit
 at the addresses of the deliberately non-strict compiler-shape probes in
@@ -93,6 +93,14 @@ Source forms the promoted functions needed (each one byte-exact only this way):
 - UIFrame `0x00472bc0`: the palette's two members are passed as inline
   conditionals (`pal ? pal->field_0x708 : 0`, as GUIManager.cpp does); named
   locals swap ecx/ebx.
+- UIFrame's file constructor `0x00472960`: `image` is declared `= 0` at the
+  top and freed by one `if (image) FreeFile(image);` after the whole
+  `.wav` if/else, so VC6 neither threads that test from the loaded path nor
+  from the missing-image block; the missing-image and `.wav` blocks then sit
+  after the epilogue and jump back to the test or the epilogue, as in
+  retail. The extension test is `_stricmp(".wav", file + strlen(file) - 4)`
+  (retail pushes the name end first). With the free inside the image
+  branch VC6 threads the test and puts the epilogue last.
 
 - UIDialog's constructor `0x00469db0`: the resource name is copied by
   `if (resource) strcpy(resourceName, resource); else strcpy(resourceName,
@@ -234,13 +242,13 @@ Other header facts:
   `ShowDialog` passes its int `b` and `d` as the area and the name).
 - GameObject.h befriends UICtlContainer, UIControl and UIDialog.
 
-Near misses (`samples/ui/GameUiNearMisses.cpp`): 21 functions, listed with
+Near misses (`samples/ui/GameUiNearMisses.cpp`): 20 functions, listed with
 their differences at the top of the sample, among them UIListBox `0x00477110`
 (adds an image row and returns 0/1; retail places the epilogue after the
 stream-failure block), several list-box and scroll slots and the resource
 parser. Most of the remaining ones differ only in register choice (slots 49
 of UIControl and UIButton, UIAnim's constructor and advance, the colour-key
-test) or in block placement (UIFrame's file constructor, UIDialog slot 10);
+test) or in block placement (UIDialog slot 10);
 the forms tried are noted in the sample. UIControl's deleting
 destructor (`0x00470430`) is byte-exact; VC6 emits it only alongside the
 near-miss UIControl constructor, so its calibration case compiles the sample.

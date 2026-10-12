@@ -26355,6 +26355,14 @@ CASES = [
         'target_va': '0x004bd0c0',
         'target_size': 412,
         'reason': 'EH frame for new UnknownTextureStream; if/else branches share one trailing return 1 placed after the file branch delete, archive Fill failure keeps its own epilogue',
+    },    {
+        'name': 'GameUi UIFrame constructor from a file 0x472960',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '??0UIFrame@@QAE@PBDPAXHH1@Z',
+        'target_va': '0x00472960',
+        'target_size': 566,
+        'reason': 'image declared = 0 and freed by one test after the whole .wav if/else (unthreaded, else blocks after the epilogue); _stricmp(".wav", end) argument order',
     },
 ]
 

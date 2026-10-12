@@ -70,12 +70,6 @@
 //   `return found` after Unlock; `if (!Unlock) return 0; return found;`
 //   becomes neg/sbb/and, early returns for a failed Lock duplicate the
 //   epilogue, and goto, result variable and while row loops do not give it.
-// 0x00472960 UIFrame constructor from a file (352/562): retail places the
-//   sprintf (image missing) block after the epilogue, jumping back to the
-//   `if (image)` free test; VC6 here lays it inline and threads its jump past
-//   the test (the same unthreaded test as GUIUser::SetPointerDevice). An
-//   `if (!image)` first, goto, inline/macro free helpers and a `return` after
-//   the free were tried.
 // 0x0046ef00 UIDialog slot 10 (352/555): the timer's +0x0c is cleared before
 //   +0x14 is loaded, and the joystick branches after the first sit after the
 //   epilogue. `while (1)`/`for (;;)` device loops, `continue` per branch and
@@ -315,43 +309,6 @@ unlock:
     return 0;
 }
 
-// 0x00472960
-UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
-    if (_stricmp(file + strlen(file) - 4, ".wav")) {
-        int format = g_TrackGame->renderTarget->surfacePixelFormat;
-        ownsSound = 0;
-        isSound = 0;
-        frameSound = 0;
-        frameTextures = (int)textures;
-        UnknownTgaFile* image = LoadFile(file, 0, (int)g_UnknownResourceManager572b44);
-        if (image) {
-            frameWidth = image->width;
-            frameHeight = image->height;
-            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)frameTextures, 1);
-            Palette8* pal = (Palette8*)palette;
-            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
-                                            image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
-                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (TextureHasColor(frameTexture, 0xff00ff))
-                frameTexture->UnknownVirtualSlot18(0xff00ff);
-        } else {
-            char message[100];
-            frameTexture = 0;
-            sprintf(message, "UIFrame(): Warning! Error loading frame: %s\n", file);
-        }
-        if (image)
-            FreeFile(image);
-    } else {
-        frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
-        frameSound->Load(file, 0, 1, 3, b, -1);
-        ownsSound = 1;
-        isSound = 1;
-        frameWidth = 0;
-        frameHeight = 0;
-        frameTexture = 0;
-    }
-}
 
 // 0x0046ef00: runs the timers and the joystick focus moves.
 int UIDialog::UnknownVirtualSlot10(float frameTime) {

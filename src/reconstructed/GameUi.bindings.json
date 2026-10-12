@@ -26,6 +26,7 @@
   "??0UIFrame@@QAE@PAXH0HHH0@Z": "0x00472d00",
   "??0UIFrame@@QAE@PAXH0HHH0@Z$ehhandler": "0x0054b1c8",
   "??0UIFrame@@QAE@PBDPAXHH1@Z": "0x00472960",
+  "??0UIFrame@@QAE@PBDPAXHH1@Z$ehhandler": "0x0054b186",
   "??0UIListBox@@QAE@HHPAUCameraRect@@PAVUIDialog@@@Z": "0x00475c70",
   "??0UIListBox@@QAE@HHPAUCameraRect@@PAVUIDialog@@@Z$ehhandler": "0x0054b308",
   "??0UIMultiState@@QAE@HPAUCameraRect@@PAVUIDialog@@@Z": "0x004781f0",
@@ -568,5 +569,10 @@
   "_strchr": "0x00535f10",
   "_strncpy": "0x00534b10",
   "_strrchr": "0x00534a60",
-  "_strstr": "0x005362c0"
+  "_strstr": "0x005362c0",
+  "??_C@_04MPDF@?4wav?$AA@": "0x0056bd48",
+  "??_C@_0CN@FCNK@UIFrame?$CI?$CJ?3?5Warning?$CB?5Error?5loadin@": "0x0056bd18",
+  "??0Sound@@QAE@PAVSoundGroup@@H@Z": "0x004bba10",
+  "?UnknownFunction4bc320@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
+  "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0"
 }

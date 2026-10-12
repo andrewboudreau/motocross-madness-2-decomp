@@ -973,6 +973,49 @@ void UIListBox::SyncBoundValue(int value) {
 // ---------------------------------------------------------------------------
 // UIFrame and UIAnim
 
+// 0x00472960: a frame from `file`: a .wav file becomes a sound of group `a`
+// (played with `b`), anything else an image texture keyed on magenta. The
+// image is freed after both the loaded and the missing path, which retail
+// tests once after the whole if/else; the missing-image warning is formatted
+// but never shown.
+UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
+    UnknownTgaFile* image = 0;
+    if (_stricmp(".wav", file + strlen(file) - 4)) {
+        int format = g_TrackGame->renderTarget->surfacePixelFormat;
+        ownsSound = 0;
+        isSound = 0;
+        frameSound = 0;
+        frameTextures = (int)textures;
+        image = LoadFile(file, 0, (int)g_UnknownResourceManager572b44);
+        if (image) {
+            frameWidth = image->width;
+            frameHeight = image->height;
+            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)frameTextures, 1);
+            Palette8* pal = (Palette8*)palette;
+            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+                                            image->width, 0x22b, format,
+                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
+                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            if (TextureHasColor(frameTexture, 0xff00ff))
+                frameTexture->UnknownVirtualSlot18(0xff00ff);
+        } else {
+            char message[100];
+            frameTexture = 0;
+            sprintf(message, "UIFrame(): Warning! Error loading frame: %s\n", file);
+        }
+    } else {
+        frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
+        frameSound->Load(file, 0, 1, 3, b, -1);
+        ownsSound = 1;
+        isSound = 1;
+        frameWidth = 0;
+        frameHeight = 0;
+        frameTexture = 0;
+    }
+    if (image)
+        FreeFile(image);
+}
+
 // 0x00472d00: `module` is the image's name and `id` the resource manager
 // holding it; `a` is the sound group a missing image is loaded from as a sound.
 UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void* palette) {
