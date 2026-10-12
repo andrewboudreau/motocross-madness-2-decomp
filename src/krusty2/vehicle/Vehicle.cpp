@@ -531,7 +531,7 @@ void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
 
 static inline Vec3 VehNormalized(const Vec3& v)
 {
-    float len2 = v.y * v.y + v.x * v.x + v.z * v.z;
+    float len2 = VehLen2(v);
     if (len2 == 1.0f)
         return v;
     float inv = FastInvSqrt(len2);
@@ -607,6 +607,11 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
     return 0.0f;
 }
 
+// Smaller of two values; slot 72's load clamp and the scrape clamps go through it (the
+// by-value copy is what keeps each component on the x87 stack across its compare, as
+// retail does).
+static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
+
 // Tier 3 reading: accumulates per-wheel ground normals and suspension loads into one
 // support normal and a lean/steer response (via slot 74).  Wheels are averaged, so more than
 // one contact normalises the sum.
@@ -614,30 +619,36 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 // wheels and pushes the vehicle along the resulting cross direction (tier 3). *out receives the
 // summed normal (normalised when more than one contact); field_0x4b8/0x43c receive the result
 // of slot 74 (deflection angle and angle*dt) using the last flagged wheel's point (+0x23c).
+// Retail keeps the argument wheel (tested from its stack slot, also in the reset test) apart
+// from the last flagged wheel (edi, initialised from the argument): flagged wheels are read
+// through that pointer, plain wheels through the loop's element, so the two branches do not
+// share a tail.  Load is declared first (frame slot 0) and the average divides by a float
+// count (fild/fdivp, not fidiv).
 void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 {
     if (crashState != 0)
         return;
+    float load = 0.0f;
     Vec3 sum = kVec3Zero;
     *out = kVec3Zero;
-    float load = 0.0f;
     int mixed = 0;
     int flagged = 0;
     int plain = 0;
+    VehicleWheel* last = wheel;
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
         if (w->inContact || wheel) {
             if (w->field_0x1c0) {
-                wheel = w;
+                last = wheelList[i];
                 flagged++;
-                sum.x += w->rollDirection.x;
-                sum.y += w->rollDirection.y;
-                sum.z += w->rollDirection.z;
-                out->x += w->groundNormal.x;
-                out->y += w->groundNormal.y;
-                out->z += w->groundNormal.z;
-                load += w->contactLoad;
-                if (plain > 0)
+                sum.x += last->rollDirection.x;
+                sum.y += last->rollDirection.y;
+                sum.z += last->rollDirection.z;
+                out->x += last->groundNormal.x;
+                out->y += last->groundNormal.y;
+                out->z += last->groundNormal.z;
+                load += last->contactLoad;
+                if (plain != 0)
                     mixed = 1;
             } else {
                 plain++;
@@ -651,7 +662,7 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
         }
     }
     if (wheelsInContact > 1) {
-        float len2 = out->y * out->y + out->x * out->x + out->z * out->z;
+        float len2 = VehLen2(*out);
         if (len2 == 0.0f) {
             *out = kVec3Zero;
         } else {
@@ -660,7 +671,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
             out->y = inv * out->y;
             out->z = inv * out->z;
         }
-        load = load / wheelsInContact;
+        float n = (float)wheelsInContact;
+        load = load / n;
     }
     if (mixed == 0 && wheel == 0) {
         turnAngle = 0.0f;
@@ -671,18 +683,11 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     }
     Vec3 c = ((VehV3&)sum).Cross(*out);
     Vec3 axis = VehNormalized(c);
-    float mag = load;
-    if (!(mag < 1.0f))
-        mag = 1.0f;
-    turnAngle = UnknownVirtualSlot74(&wheel->sideAxis, &axis, mag, 1.0f);
+    turnAngle = UnknownVirtualSlot74(&last->sideAxis, &axis, VehMinF(load, 1.0f), 1.0f);
     turnRate = turnAngle * invStepTime;
 }
 
 // ---- impact handlers (slots 18..20) ----
-// Smaller of two values; the scrape clamps go through it (the by-value copy is what keeps
-// each component on the x87 stack across its compare, as retail does).
-static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
-
 // Commit an impact to a sink: latch the current vector into the previous one, mark it dirty.
 static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** sink)
 {

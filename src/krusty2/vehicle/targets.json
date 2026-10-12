@@ -776,7 +776,7 @@
     "target_va": "0x00527e30",
     "target_size": 831,
     "expect": "partial",
-    "notes": "4.1% (814/831). Normal accumulation + slot-74 call. First divergence +0x0: frame sub esp,0x2c vs our 0x28 (one extra local); retail keeps this in ebx and out in esi and pushes ebp late, so all later bytes shift.",
+    "notes": "770/831 strict. Normal accumulation + slot-74 call. Fixed by a separate last-flagged-wheel pointer (the argument stays the loop/reset test), flagged reads through it, plain != 0, VehLen2 for both lengths, float count divide, VehMinF clamp, load declared first. Left: the prologue kVec3Zero copies use edx and load out early instead of retail's esi temp then esi=out/edi=copy. Tried: last declared at top/before load/after *out/before mixed/for-init, sum/out copy swapped (64), load after plain, int divide (407).",
     "bindings": "Vehicle.bindings.json"
   },
   {
