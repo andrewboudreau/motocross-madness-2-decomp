@@ -26319,6 +26319,15 @@ CASES = [
         'target_size': 311,
         'reason': 'between 0x004e04f0 and slot 27 0x004e06a0 in QuarryStuntEvent.cpp; sum in a local, field_0x560 constant by if/else (counts in edi/esi, push ecx frame)',
     },
+    {
+        'name': 'ZoneReport.cpp 0x49ca60 lobby/game numbering',
+        'bindings': 'src/reconstructed/ZoneReport.bindings.json',
+        'source': 'src/reconstructed/ZoneReport.cpp',
+        'symbol': '?UnknownFunction49ca60@UnknownTrackGameObject3410@@QAEXH@Z',
+        'target_va': '0x0049ca60',
+        'target_size': 4810,
+        'reason': "track-name tables 'Quarry01'.., bike-type counts 0x0056db00; six arrays initialised quarry..stunt, direction 2's 1-based type computed per branch into a local",
+    },
 ]
 
 def main():

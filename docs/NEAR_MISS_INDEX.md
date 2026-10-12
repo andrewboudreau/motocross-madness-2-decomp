@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 171, c 122, total 293. The three class (a) functions of the
+Counts: a 0, b 171, c 121, total 292. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -120,7 +120,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
 | net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
-| net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index); parentheses, `index = index - 27`, `index += -27` and `field_0x29c = ++index` give identical bytes |
 | parser/Parser | `0x004b87f0` | 33/406 | b | prologue: retail pushes ebx/ebp/esi/edi before the null test, VC6 here pushes ebx/ebp after the early return (samples/parser/ParserNearMisses.cpp) |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
 | physics/bikeai/BikeAI | `0x00415640` | 6059/6112 | b | schedule and frame size match (squared distance and k dot grouped `z + ((x) + y)`); the one-use temporaries above +0x100 sit in other slots and the start-up zero vectors are stored x-first (retail z-first); the retail extent includes one nop of padding (candidate 6111 bytes) |
