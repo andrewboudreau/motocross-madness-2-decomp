@@ -198,9 +198,9 @@ void UnknownTrackGameObject33fc::UnknownFunction448e90(const char* path, int dev
         g_TrackGame->controlMapping->Clear();
     if (device != -1)
         field_0x00 = device;
-    g_TrackGame->field_0x3344.UnknownFunction43cde0();
-    g_TrackGame->field_0x3380.UnknownFunction43cde0();
-    g_TrackGame->field_0x33bc.UnknownFunction43cde0();
+    g_TrackGame->field_0x3344.Unbind();
+    g_TrackGame->field_0x3380.Unbind();
+    g_TrackGame->field_0x33bc.Unbind();
 
     g_TrackGame->field_0x3344 =
         UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),

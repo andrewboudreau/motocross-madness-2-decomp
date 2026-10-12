@@ -713,8 +713,8 @@ GUIInputDevice::GUIInputDevice() : GameObject(1) {
 // 0x00486f20
 GUIInputDevice::~GUIInputDevice() {
     if (inputDevice->deviceKind) {
-        bindingX.UnknownFunction43cde0();
-        bindingY.UnknownFunction43cde0();
+        bindingX.Unbind();
+        bindingY.Unbind();
     }
 }
 

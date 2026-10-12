@@ -33,12 +33,12 @@ struct UnknownControlBinding {
 
     ~UnknownControlBinding();                                 // 0x0043cd00: unbinds
 
-    void UnknownFunction43cca0();                             // 0x0043cca0: reset
-    void UnknownFunction43cce0(int a, int b);                 // 0x0043cce0
-    void UnknownFunction43cd10();                             // 0x0043cd10: recentre
-    void UnknownFunction43cd20(float value, float range);     // 0x0043cd20
-    void UnknownFunction43cd90(float delta);                  // 0x0043cd90
-    void UnknownFunction43cde0();                             // 0x0043cde0: unbind
+    void Reset();                                             // 0x0043cca0: clears everything, ids -1
+    void SetKeys(int a, int b);                               // 0x0043cce0: +0x0c and +0x10 (the keyboard's keys)
+    void Recenter();                                          // 0x0043cd10: value = centre
+    void SetFromAxis(float value, float range);               // 0x0043cd20: maps value/range, dead zone
+    void Adjust(float delta);                                 // 0x0043cd90: adds delta, clamped
+    void Unbind();                                            // 0x0043cde0: the device drops this id
 
     InputDevice* field_0x00;  // owning device
     int field_0x04;           // id the device's slot 0 unbinds by

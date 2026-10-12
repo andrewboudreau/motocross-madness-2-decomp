@@ -83,13 +83,13 @@ void UnknownControlMapping::GetMouseButton(int control, int* result) {
 
 // 0x0043cc40
 UnknownControlBinding::UnknownControlBinding() {
-    UnknownFunction43cca0();
+    Reset();
 }
 
 // 0x0043cc50
 UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float center,
                                              int id, int axis, float deadZone) {
-    UnknownFunction43cca0();
+    Reset();
     field_0x2c = minimum;
     field_0x30 = maximum;
     field_0x24 = center;
@@ -101,7 +101,7 @@ UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float
 }
 
 // 0x0043cca0
-void UnknownControlBinding::UnknownFunction43cca0() {
+void UnknownControlBinding::Reset() {
     field_0x24 = 0;
     field_0x28 = 0;
     field_0x2c = 0;
@@ -120,24 +120,24 @@ void UnknownControlBinding::UnknownFunction43cca0() {
 }
 
 // 0x0043cce0
-void UnknownControlBinding::UnknownFunction43cce0(int a, int b) {
+void UnknownControlBinding::SetKeys(int a, int b) {
     field_0x0c = a;
     field_0x10 = b;
 }
 
 // 0x0043cd00
 UnknownControlBinding::~UnknownControlBinding() {
-    UnknownFunction43cde0();
+    Unbind();
 }
 
 // 0x0043cd10
-void UnknownControlBinding::UnknownFunction43cd10() {
+void UnknownControlBinding::Recenter() {
     field_0x24 = field_0x28;
 }
 
 // 0x0043cd20: maps value/range onto [min, max]; inside the dead zone the
 // value snaps to the centre.
-void UnknownControlBinding::UnknownFunction43cd20(float value, float range) {
+void UnknownControlBinding::SetFromAxis(float value, float range) {
     float mapped = (field_0x30 - field_0x2c) * (value / range) + field_0x2c;
     if (mapped < field_0x34 && mapped > field_0x38)
         mapped = field_0x28;
@@ -145,13 +145,13 @@ void UnknownControlBinding::UnknownFunction43cd20(float value, float range) {
 }
 
 // 0x0043cd90
-void UnknownControlBinding::UnknownFunction43cd90(float delta) {
+void UnknownControlBinding::Adjust(float delta) {
     field_0x24 += delta;
     field_0x24 = BindingMin(BindingMax(field_0x24, field_0x2c), field_0x30);
 }
 
 // 0x0043cde0: asks the owning device to drop bindings with this id.
-void UnknownControlBinding::UnknownFunction43cde0() {
+void UnknownControlBinding::Unbind() {
     if (g_TrackGame->controlInterface && field_0x00)
         field_0x00->UnknownVirtualSlot0(field_0x04);
 }

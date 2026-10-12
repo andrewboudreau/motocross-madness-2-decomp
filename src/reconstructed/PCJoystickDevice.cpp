@@ -161,24 +161,24 @@ void PCJoystickDevice::UpdateAxisRepeat(int axis, int value) {
         binding->field_0x14 += g_TrackGame->frameTime;
         if (axisValues[axis] < 16384.0f) {
             if (binding->field_0x14 - g_TrackGame->frameTime > binding->field_0x20) {
-                binding->UnknownFunction43cd10();
+                binding->Recenter();
                 binding->field_0x14 = 0;
             }
             while (binding->field_0x14 > binding->field_0x20) {
-                binding->UnknownFunction43cd90(-binding->field_0x1c);
+                binding->Adjust(-binding->field_0x1c);
                 binding->field_0x14 -= binding->field_0x20;
             }
         } else if (axisValues[axis] > 49152.0f) {
             if (binding->field_0x18 - g_TrackGame->frameTime > binding->field_0x20) {
-                binding->UnknownFunction43cd10();
+                binding->Recenter();
                 binding->field_0x18 = 0;
             }
             while (binding->field_0x18 > binding->field_0x20) {
-                binding->UnknownFunction43cd90(binding->field_0x1c);
+                binding->Adjust(binding->field_0x1c);
                 binding->field_0x18 -= binding->field_0x20;
             }
         } else {
-            binding->UnknownFunction43cd10();
+            binding->Recenter();
         }
     }
 }

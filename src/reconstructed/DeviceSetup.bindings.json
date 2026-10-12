@@ -19,7 +19,7 @@
   "?SetKey@UnknownControlMapping@@QAEXHH@Z": "0x0043cb30",
   "?SetJoystickButton@UnknownControlMapping@@QAEXHHH@Z": "0x0043cb50",
   "?SetMouseButton@UnknownControlMapping@@QAEXHH@Z": "0x0043cb80",
-  "?UnknownFunction43cde0@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
+  "?Unbind@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
   "?UnknownFunction43ce90@ControlInterface@@QAEHXZ": "0x0043ce90",
   "?UnknownFunction448990@UnknownTrackGameObject33fc@@QAEXPBD@Z": "0x00448990",
   "?UnknownFunction4489e0@UnknownTrackGameObject33fc@@QAEXPBD@Z": "0x004489e0",

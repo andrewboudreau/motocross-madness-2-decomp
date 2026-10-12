@@ -124,7 +124,7 @@
   "?UnknownFunction404c80@BackgroundImage@@QAEHXZ": "0x00404c80",
   "?UnknownFunction404cb0@BackgroundImage@@QAEXH@Z": "0x00404cb0",
   "?UnknownFunction404da0@BackgroundImage@@QAEXXZ": "0x00404da0",
-  "?UnknownFunction43cde0@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
+  "?Unbind@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
   "?UnknownFunction43ce90@ControlInterface@@QAEHXZ": "0x0043ce90",
   "?UnknownFunction43ea70@GameCursor@@QAEPAVGameObject@@PAXPAUUnknownControlBinding@@1PBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043ea70",
   "?UnknownFunction43eaf0@GameCursor@@QAEPAVGameObject@@PAXPBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043eaf0",
