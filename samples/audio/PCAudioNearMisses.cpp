@@ -13,6 +13,10 @@
 // sizeof - 4, a derived struct clearing in its constructor, unsigned/short
 // parameter types (bool or unsigned char `stereo`: 38) and blockAlign
 // first; avgBytesPerSec from `rate` or as a product scores lower.
+// Session 10, no gain: `1 + (stereo != 0)`, `!!stereo + 1` and
+// `(stereo ? 1 : 0) + 1` give the same 108; `channels = 1; if (stereo)
+// channels = 2;` (34), an inline SetPcmFormat(format*, channels, rate, bits)
+// helper (51) and rate first with (unsigned short) casts (68) are worse.
 //
 // Sound 0x004bc6b0 (starts a sound): compiled inside PCAudio.cpp (where the
 // UnknownSoundNotifier constructor is defined, so VC6 drops the EH frame
