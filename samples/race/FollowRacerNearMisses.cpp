@@ -129,7 +129,7 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
     if (racer == raceView->localRacer && previous && previous != racer) {
         racer->score += 2500.0f;
         if (raceView->scoreBoard)
-            raceView->scoreBoard->UnknownFunction48d1e0(2500.0f, 1.0f);
+            raceView->scoreBoard->ShowValue(2500.0f, 1.0f);
     }
     followedRacer = racer;
 }

@@ -142,7 +142,7 @@
   "?HandlePlayerLeft@BikeRace@@QAEXH@Z": "0x00420590",
   "?RestartRace@BikeRace@@QAEXHPAD0@Z": "0x00420650",
   "?RestartRace@BikeRace@@QAEXHPAD0@Z$ehhandler": "0x00549d14",
-  "?UnknownFunction420b00@BikeRace@@QAEXPAD0@Z": "0x00420b00",
+  "?SaveReplay@BikeRace@@QAEXPAD0@Z": "0x00420b00",
   "?RestartReplay@BikeRace@@QAEXXZ": "0x00420bd0",
   "?RestartReplay@BikeRace@@QAEXXZ$ehhandler": "0x00549d54",
   "?ResetStartCountdown@BikeRace@@QAEXXZ": "0x00421050",

@@ -69,9 +69,9 @@ void UnknownOverlayText::SelectFont(const char* font) {
 // 0x0050b080
 int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color) {
     if (texture->mapFormat == 1555)
-        return DrawText1555(texture, x, y, text, UnknownFunction43b660(color, texture->mapFormat));
+        return DrawText1555(texture, x, y, text, ConvertColorToFormat(color, texture->mapFormat));
     if (texture->mapFormat == 4444)
-        return DrawText4444(texture, x, y, text, UnknownFunction43b660(color, texture->mapFormat));
+        return DrawText4444(texture, x, y, text, ConvertColorToFormat(color, texture->mapFormat));
 
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->textureWidth;
@@ -107,7 +107,7 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
             for (unsigned int row = 0; row < h; row++) {
                 end = px;
                 for (unsigned int column = u; column < u + w; column++) {
-                    bits[dest + end] = UnknownFunction43b560(fontBits[source + column], bits[dest + end], color);
+                    bits[dest + end] = BlendFontTexel32(fontBits[source + column], bits[dest + end], color);
                     end++;
                 }
                 source += fontStride;
@@ -158,7 +158,7 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
             for (unsigned int row = 0; row < h; row++) {
                 end = px;
                 for (unsigned int column = u; column < u + w; column++) {
-                    bits[dest + end] = UnknownFunction43b320(fontBits[source + column], bits[dest + end], color);
+                    bits[dest + end] = BlendFontTexel4444(fontBits[source + column], bits[dest + end], color);
                     end++;
                 }
                 source += fontStride;
@@ -209,7 +209,7 @@ int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const ch
             for (unsigned int row = 0; row < h; row++) {
                 end = px;
                 for (unsigned int column = u; column < u + w; column++) {
-                    bits[dest + end] = UnknownFunction43b440(fontBits[source + column], bits[dest + end], color);
+                    bits[dest + end] = BlendFontTexel1555(fontBits[source + column], bits[dest + end], color);
                     end++;
                 }
                 source += fontStride;

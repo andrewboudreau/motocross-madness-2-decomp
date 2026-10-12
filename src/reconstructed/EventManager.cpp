@@ -923,7 +923,7 @@ void EventManager::CloseRace(int mode) {
             GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
             sprintf(description, "%s %s", date, time);
-            view->UnknownFunction420b00(name, description);
+            view->SaveReplay(name, description);
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.saveGhost) {
             char time[32];

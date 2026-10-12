@@ -14218,7 +14218,7 @@ CASES = [
         'name': 'bikerace.cpp BikeRace save replay 0x420b00',
         'bindings': 'src/reconstructed/BikeRace.bindings.json',
         'source': 'src/reconstructed/BikeRace.cpp',
-        'symbol': '?UnknownFunction420b00@BikeRace@@QAEXPAD0@Z',
+        'symbol': '?SaveReplay@BikeRace@@QAEXPAD0@Z',
         'target_va': '0x00420b00',
         'target_size': 207,
         'reason': 'string 0x1437, CopyFileA VCRtape.dat',

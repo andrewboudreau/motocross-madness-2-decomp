@@ -28,7 +28,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
             if (!g_TrackGame->uiInteractionBlocked) {
                 UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
                 if (view && !view->localRacer->hasFinished) {
-                    view->UnknownFunction420650(1, 0, 0);
+                    view->RestartRace(1, 0, 0);
                     g_TrackGame->SetMenuOpen(0, kMenuExit, 1);
                 }
             }
@@ -239,9 +239,9 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             UnknownKrustyBikeView* racers =
                 g_TrackGame->eventManager->FindRaceMode()->raceView;
             if (!_stricmp("ButPrevRider", event->controlName))
-                racers->UnknownFunction41f1d0(1, 1, 0);
+                racers->NextCameraTarget(1, 1, 0);
             else
-                racers->UnknownFunction41f1d0(0, 1, 0);
+                racers->NextCameraTarget(0, 1, 0);
         } else if (!_stricmp("ButExit", event->controlName)) {
             event->dialog->EndDialog(0);
             event->handled = 1;

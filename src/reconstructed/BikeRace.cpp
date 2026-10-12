@@ -1291,7 +1291,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         }
     }
     if (g_TrackGame->useReplayTape) {
-        UnknownFunction420b00(path, description);
+        SaveReplay(path, description);
         replayTime = 0;
         field_0x1d4 = 0;
         replayLength = 0;
@@ -1366,7 +1366,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
 }
 
 // 0x00420b00
-void BikeRace::UnknownFunction420b00(char* path, char* description) {
+void BikeRace::SaveReplay(char* path, char* description) {
     g_TrackGame->ui->replayAvailable = 0;
     if (replayVcr != 0) {
         char text[0x80];

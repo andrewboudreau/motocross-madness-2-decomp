@@ -908,7 +908,7 @@ public:
     void ToggleReplayPause(int pauseOnly); // 0x0041f550: pauses, or with 0 toggles, +0x3f8
     UnknownBikeRaceRacer* NextBike(int* iterator); // 0x004204e0
     void HandlePlayerLeft(int player);   // 0x00420590
-    void UnknownFunction420b00(char* path, char* description); // 0x00420b00
+    void SaveReplay(char* path, char* description); // 0x00420b00: saves the recording, copies VCRtape.dat to `path`
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0
     // plays the replay just recorded, otherwise records a new one.
     void RestartRace(int mode, char* path, char* description);
