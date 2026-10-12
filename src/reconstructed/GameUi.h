@@ -193,7 +193,7 @@ public:
     virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
     virtual int HitTest(tagPOINT point); // slot 51, 0x004709f0: the area, or ContainsPoint with ShapeBounds
     virtual void SetAttachId(int id); // slot 52, 0x00470400: stores attachId
-    virtual int UnknownVirtualSlot53();       // 0x004726b0
+    virtual int CreateControlIterator();      // slot 53, 0x004726b0: a GameObjectIterator over the owner's "UIControl"s
     virtual void BindValue(int* value); // slot 54, 0x00470a70: stores boundValue (NetProcs.cpp)
     // Slots 55-57: slot 23 calls 55 with the pressed button (and the pointer
     // position), slot 22 calls 56 on release, and slot 10 calls 57 each frame
@@ -237,7 +237,6 @@ public:
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
     void StartTransition(int type, int a, int b, int delay, int c);
     int RunTransition();              // 0x00471500
-    GameObjectIterator* CreateControlIterator(); // slot 53's body: an iterator over the owner's controls
     void DeleteControlIterator(GameObjectIterator* iterator); // 0x00472730: deletes it
     // 0x00472750: the next control with this control's attach id.
     UIControl* NextAttachedControl(GameObjectIterator* iterator);
@@ -615,7 +614,7 @@ class UIRadioButton : public UIMultiState {
 public:
     UIRadioButton(int id, CameraRect* area, UIDialog* owner); // 0x00479240
     virtual ~UIRadioButton();                 // 0x004792d0 (deleting wrapper 0x004792b0)
-    virtual int UnknownVirtualSlot53();       // 0x004795c0
+    virtual int CreateControlIterator();      // slot 53, 0x004795c0: iterates the "UIRadioButton"s
     virtual int ButtonDown(int a, int b); // slot 55, 0x004794c0
     virtual void SyncBoundValue(int value); // slot 59, 0x004792e0
 

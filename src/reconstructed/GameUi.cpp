@@ -532,7 +532,7 @@ void UIControl::PlayControlSound(int index, int a) {
 }
 
 // 0x004726b0
-int UIControl::UnknownVirtualSlot53() {
+int UIControl::CreateControlIterator() {
     return (int)new(__FILE__, 0x1267) GameObjectIterator(ownerDialog->controlContainer, 1, "UIControl");
 }
 
@@ -758,7 +758,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
         GameObjectIterator* iterator;
         UIControl* control;
         if (controlType == 9) {
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3) {
                     ((UIListBox*)control)->lastClickTime = 0;
@@ -779,7 +779,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
             ownerDialog->UnknownVirtualSlot29(&event);
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         } else {
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3) {
                     ((UIListBox*)control)->lastClickTime = 0;
@@ -821,7 +821,7 @@ void UIScrollCtl::HandleTimer(int value) {
     case 0x102:
         switch (controlType) {
         case 9:
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3)
                     ((UIListBox*)control)->ScrollBy(-1);
@@ -836,7 +836,7 @@ void UIScrollCtl::HandleTimer(int value) {
             ownerDialog->UnknownVirtualSlot29(&event);
             break;
         case 10:
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3)
                     ((UIListBox*)control)->ScrollBy(1);
@@ -1497,7 +1497,7 @@ void UIRadioButton::SyncBoundValue(int value) {
 }
 
 // 0x004795c0
-int UIRadioButton::UnknownVirtualSlot53() {
+int UIRadioButton::CreateControlIterator() {
     return (int)new(__FILE__, 0x23b9) GameObjectIterator(ownerDialog->controlContainer, 1, "UIRadioButton");
 }
 
@@ -2658,7 +2658,7 @@ int UIListBox::SelectRow(int row) {
     int result = SetSelectedRow(row);
     UpdateScrollBars();
     if (ownerDialog) {
-        GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+        GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
         UIListBox* control;
         while ((control = static_cast<UIListBox*>(NextAttachedControlOfType(iterator))) != 0)
             control->SetSelectedRow(row);
@@ -2992,7 +2992,7 @@ int UIRadioButton::ButtonDown(int a, int b) {
         event.handled = a;
         if (!GetSelectedState()) {
             SetCurrentState(1);
-            GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
             UIRadioButton* control;
             while ((control = static_cast<UIRadioButton*>(NextAttachedControlOfType(iterator))) != 0) {
                 if (control != this && control->GetSelectedState() == 1) {
@@ -3083,7 +3083,7 @@ int CompareSortedRows(const void* a, const void* b) {
             int left = ((const UnknownGameUiListRow*)a)->sortIndex;
             int right = ((const UnknownGameUiListRow*)b)->sortIndex;
             GameObjectIterator* iterator =
-                (GameObjectIterator*)g_SortingDialog->sortingList->field_0x218_control->UnknownVirtualSlot53();
+                (GameObjectIterator*)g_SortingDialog->sortingList->field_0x218_control->CreateControlIterator();
             while (1) {
                 UIListBox* other = static_cast<UIListBox*>(
                     g_SortingDialog->sortingList->field_0x218_control->NextAttachedControlOfType(iterator));
@@ -4279,7 +4279,7 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
     }
     int result = UIControl::UnknownVirtualSlot10(frameTime);
     if (result) {
-        GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+        GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
         int full = 0;
         for (UIControl* control = NextAttachedControl(iterator); control;
              control = NextAttachedControl(iterator)) {
@@ -4363,7 +4363,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                 float x = (float)((int*)b)[0];
                 float left = (float)screenArea[0];
                 if (x > thumbOffset + (left + thumbWidth)) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
@@ -4373,7 +4373,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                     }
                     DeleteControlIterator(iterator);
                 } else if (x < left + thumbOffset) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
@@ -4392,7 +4392,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                 float y = (float)((int*)b)[1];
                 float top = (float)screenArea[1];
                 if (y > thumbOffset + (top + thumbHeight)) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
@@ -4402,7 +4402,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                     }
                     DeleteControlIterator(iterator);
                 } else if (y < top + thumbOffset) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
@@ -4482,7 +4482,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
             }
             if (!event.handled) {
             scroll:
-                GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
                 for (UIControl* list = NextAttachedControl(iterator); list;
                      list = NextAttachedControl(iterator)) {
                     if (list->controlType == 3) {
