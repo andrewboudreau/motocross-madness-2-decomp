@@ -173,20 +173,20 @@ int UnknownFunction511970(int format);
 
 // Views of the +0x48 (model), +0x50 (bike) and +0x58 (rider) lists.
 struct UnknownKrustyUIModelEntry {
-    char field_0x00[0x40];                    // name
-    char field_0x40[0x40];                    // model file (a rider's file runs to +0xc0)
-    char field_0x80[0x40];                    // UI model file
-    UnknownKrustyUICharacter* field_0xc0;     // the loaded UI model (0x00498cf0)
-    int field_0xc4;                           // availability (3 for the random choices)
+    char name[0x40];                          // +0x00: "Name"
+    char modelFile[0x40];                     // +0x40: "ModelFile" (a rider's "File" runs to +0xc0)
+    char uiModelFile[0x40];                   // +0x80: "UIModelFile"
+    UnknownKrustyUICharacter* uiModel;        // +0xc0: the loaded UI model (0x00498cf0)
+    int availability;                         // +0xc4: "Availability" (3 for the random choices)
 };
 
 struct UnknownKrustyUIBikeEntry {
-    int field_0x00;                           // index into +0x48
-    char field_0x04[0x44];                    // name
-    char field_0x48[0x40];                    // texture
+    int manufacturer;                         // +0x00: index into +0x48
+    char name[0x44];                          // +0x04: "BikeName_%02d"
+    char texture[0x40];                       // +0x48: "BikeTexture_%02d"
     int field_0x88;
-    int field_0x8c;                           // engine size (cc)
-    int field_0x90;                           // four-stroke
+    int engineSize;                           // +0x8c: "BikeEngineSize_%02d" (cc)
+    int fourStroke;                           // +0x90: "BikeFourStroke_%02d"
 };
 
 // Copies at most size - 1 characters of `source` and terminates them.
@@ -351,13 +351,13 @@ void KrustyUI::UnknownFunction498cf0(int value) {
     if (pending && !done && (value == 2 || value == -1)) {
         UnknownKrustyUIPlatePainter painter(g_TrackGame->field_0x1c);
         for (int i = 0; i < field_0x4c; i++) {
-            sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].field_0x80);
-            KRUSTYUI_MODELS[i].field_0xc0 = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
+            sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
+            KRUSTYUI_MODELS[i].uiModel = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
             garageScene->AppendChild(
-                KRUSTYUI_MODELS[i].field_0xc0->CharacterVirtualSlot11(field_0x18, text, lights,
+                KRUSTYUI_MODELS[i].uiModel->CharacterVirtualSlot11(field_0x18, text, lights,
                                                                       &g_TrackGame->field_0x1c,
                                                                       1, 1), -1);
-            UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].field_0xc0;
+            UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             bike->field_0x1a0->UnknownFunction4444c0(1);
             bike->field_0x1a0->UnknownFunction4fc660(&field_0x474);
             bike->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
@@ -366,7 +366,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             painter.UnknownFunction417670(bike->field_0x1a0, g_TrackGame->mode.field_0x1bcc);
         }
         if (shadow) {
-            shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].field_0xc0->field_0x1a0);
+            shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);
             shadow->UnknownFunction4dab00(KRUSTYUI_RIDER->field_0x1a0);
             s468 = field_0x474;
             s468.y += 40.0f;
@@ -710,17 +710,17 @@ void KrustyUI::LoadBikesAndRiders() {
             field_0x48 = UnknownFunction47b570(field_0x48, (field_0x4c + 1) * sizeof(UnknownKrustyUIModelEntry));
             int length = strlen(name);
             int n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0x00, name, n);
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0x00[n] = 0;
+            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].name, name, n);
+            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].name[n] = 0;
             length = strlen(model);
             n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0x40, model, n);
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0x40[n] = 0;
+            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].modelFile, model, n);
+            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].modelFile[n] = 0;
             length = strlen(uiModel);
             n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0x80, uiModel, n);
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0x80[n] = 0;
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].field_0xc4 = availability;
+            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].uiModelFile, uiModel, n);
+            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].uiModelFile[n] = 0;
+            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].availability = availability;
             for (int j = 1; j <= bikeCount; j++) {
                 if (j != 2)
                     continue;
@@ -731,20 +731,20 @@ void KrustyUI::LoadBikesAndRiders() {
                 sprintf(key, "BikeTexture_%02d", j);
                 block.UnknownFunction4b7ec0(key, "", texture, -1);
                 field_0x50 = UnknownFunction47b570(field_0x50, (field_0x54 + 1) * sizeof(UnknownKrustyUIBikeEntry));
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x00 = field_0x4c;
+                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].manufacturer = field_0x4c;
                 ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x88 = 0;
                 length = strlen(bikeName);
                 n = length > 63 ? 63 : length;
-                strncpy(((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x04, bikeName, n);
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x04[n] = 0;
+                strncpy(((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].name, bikeName, n);
+                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].name[n] = 0;
                 length = strlen(texture);
                 n = length > 63 ? 63 : length;
-                strncpy(((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x48, texture, n);
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x48[n] = 0;
+                strncpy(((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].texture, texture, n);
+                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].texture[n] = 0;
                 sprintf(key, "BikeEngineSize_%02d", j);
-                block.UnknownFunction4b7f10(key, 250, &((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x8c);
+                block.UnknownFunction4b7f10(key, 250, &((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].engineSize);
                 sprintf(key, "BikeFourStroke_%02d", j);
-                block.UnknownFunction4b7f10(key, 0, &((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x90);
+                block.UnknownFunction4b7f10(key, 0, &((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].fourStroke);
                 field_0x54++;
             }
             field_0x4c++;
@@ -767,16 +767,16 @@ void KrustyUI::LoadBikesAndRiders() {
             block.UnknownFunction4b7ec0("File", "", file, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
             field_0x58 = UnknownFunction47b570(field_0x58, (field_0x5c + 1) * sizeof(UnknownKrustyUIModelEntry));
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].field_0xc0 = 0;
+            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].uiModel = 0;
             int length = strlen(riderName);
             int n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].field_0x00, riderName, n);
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].field_0x00[n] = 0;
+            strncpy(((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].name, riderName, n);
+            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].name[n] = 0;
             length = strlen(file);
             n = length > 127 ? 127 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].field_0x40, file, n);
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].field_0x40[n] = 0;
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].field_0xc4 = availability;
+            strncpy(((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].modelFile, file, n);
+            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].modelFile[n] = 0;
+            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].availability = availability;
             field_0x5c++;
         }
     }
@@ -808,8 +808,8 @@ int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
     do {
         index = (int)(RandomUnit() * (field_0x54 - 1));
     } while (((UnknownKrustyUIBikeEntry*)field_0x50)[index].field_0x88
-             || ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[index].field_0x00].field_0xc4 != 3);
-    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIBikeEntry*)field_0x50)[index].field_0x48, size);
+             || ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[index].manufacturer].availability != 3);
+    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIBikeEntry*)field_0x50)[index].texture, size);
     return 0;
 }
 
@@ -837,9 +837,9 @@ int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
     int index;
     do {
         index = (int)(RandomUnit() * (field_0x5c - 1));
-    } while (((UnknownKrustyUIModelEntry*)field_0x58)[index].field_0xc0
-             || ((UnknownKrustyUIModelEntry*)field_0x58)[index].field_0xc4 != 3);
-    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIModelEntry*)field_0x58)[index].field_0x40, size);
+    } while (((UnknownKrustyUIModelEntry*)field_0x58)[index].uiModel
+             || ((UnknownKrustyUIModelEntry*)field_0x58)[index].availability != 3);
+    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIModelEntry*)field_0x58)[index].modelFile, size);
     return 0;
 }
 
@@ -956,17 +956,17 @@ void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
     srand(UnknownFunction4bfa80());
     int i;
     for (i = 0; i < field_0x5c; i++) {
-        int type = ((UnknownKrustyUIModelEntry*)field_0x58)[i].field_0xc4;
+        int type = ((UnknownKrustyUIModelEntry*)field_0x58)[i].availability;
         if (type < 2 || type > 3)
             usedRiders[i] = -1;
     }
     for (i = 0; i < field_0x54; i++) {
-        int type = ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[i].field_0x00].field_0xc4;
+        int type = ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[i].manufacturer].availability;
         if (type < 2 || type > 3) {
             usedBikes[i] = -1;
             continue;
         }
-        int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[i].field_0x8c);
+        int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[i].engineSize);
         if (playerClass == bikeClass || (playerClass == 1 && bikeClass == 2)
             || (playerClass == 2 && bikeClass == 1) || (playerClass == 3 && bikeClass == 4)
             || (playerClass == 4 && bikeClass == 3))
@@ -983,7 +983,7 @@ void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
         int start = index;
         if (!usedBikes[index]) {
             chance = RandomUnit();
-            bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[index].field_0x8c);
+            bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[index].engineSize);
             switch (bikeClass) {
             case 1:
             case 2:
