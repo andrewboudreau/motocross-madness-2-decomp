@@ -19,7 +19,12 @@
 //               combinations) do not move it either (356/369)
 //   0x004570a0  retail loads the definition-table entry once into edi before
 //               the position conversions and picks other registers for the
-//               shape store blocks (103/386)
+//               shape store blocks (103/386); retail reloads the index
+//               byte at +0x12 for the definition while keeping the global
+//               in eax, VC6 here reuses the first table entry. A `table`
+//               local, direct reads, `(int)` casts, a `first` definition
+//               local and an inline definition accessor for either read
+//               (12 forms) all compile to one load
 //   0x00457480  three instructions: VC6 keeps the constant 1 of `method = 1`
 //               and `i = 1` in edi where retail stores immediates (561/2629
 //               compiled inside the unit; the sample TU adds an EH state for
