@@ -73,7 +73,7 @@ public:
     virtual ~InstrumentOverlay();             // 0x00518c00 (deleting wrapper 0x00518750)
     virtual int UnknownVirtualSlot14();       // 0x00518940
 
-    InstrumentOverlay* UnknownFunction518770(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* a3); // 0x00518770
+    InstrumentOverlay* Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* a3); // 0x00518770
     void PlaceNeedle(UnknownGauge* gauge, UnknownOverlayVertex* vertices);           // 0x00518c60
     void PlaceNeedleTip(UnknownGauge* gauge, UnknownOverlayVertex* vertex);          // 0x00518cc0
 
@@ -204,7 +204,7 @@ public:
 
 // 0x005199f0 (cdecl): qsort comparator for UnknownEventScore records
 // (EventManager.h), larger value first.
-int UnknownFunction5199f0(const void* a, const void* b);
+int CompareScoresDescending(const void* a, const void* b);
 
 // RTTI: DropTextOverlay : GameObject (vtable 0x005586f0), 0xc8 bytes: one
 // line of text drawn with GDI and a one-pixel black drop shadow.
@@ -415,7 +415,7 @@ public:
 
     // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for
     // the screen and the cue rectangle; returns this, or 0.
-    ChatOverlay* UnknownFunction51cf80(RenderTarget* target, TextureMapManager* manager, void* camera,
+    ChatOverlay* Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
                                        UnknownOverlayRect screen, UnknownOverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.

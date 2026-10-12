@@ -79,7 +79,7 @@ int BackgroundImage::UnknownVirtualSlot13() {
         ClearRegionDepth();
     if (regionCount) {
         for (int i = 0; i < regionCapacity; i++)
-            UnknownFunction404d30(i);
+            ClearRegionRect(i);
     }
     if (--fullRestoreFrames < 0)
         fullRestoreFrames = 0;
@@ -109,7 +109,7 @@ int BackgroundImage::UnknownVirtualSlot15() {
         g_UnknownGlobal5777b8.top = 0;
         g_UnknownGlobal5777b8.right = field_0x2c->field_0x14;
         g_UnknownGlobal5777b8.bottom = field_0x2c->field_0x18;
-        UnknownFunction404480(field_0x2c, &g_UnknownGlobal5777b8, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
+        DrawImage(field_0x2c, &g_UnknownGlobal5777b8, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
                               0);
         field_0x5c = 1;
     }
@@ -200,7 +200,7 @@ void BackgroundImage::ReleaseRegion(int index) {
 }
 
 // 0x00404240: records `rect` (clipped to the target) for the current frame.
-void BackgroundImage::UnknownFunction404240(int index, CameraRect* rect) {
+void BackgroundImage::SetRegionRect(int index, CameraRect* rect) {
     if (rect->bottom + rect->top && rect->right + rect->left) {
         if (regionTable[index].framesLeft) {
             regionTable[index].frameRects[Target()->field_0x18] = *rect;
@@ -259,7 +259,7 @@ int BackgroundImage::ClearRegionDepth() {
 // only the parts under this frame's dirty regions are redrawn (into both
 // surfaces); `frames` counts full redraws still owed. The region rectangle is
 // re-read for each use: the global stores could alias it.
-int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags,
+int BackgroundImage::DrawImage(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags,
                                            int index, int dirty, int* frames, int skip) {
     if (dirty) {
         if (copyValid) {
@@ -300,20 +300,20 @@ int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect
             *frames = Target()->field_0x14;
         }
         if (index >= 0)
-            UnknownFunction404cb0(index);
+            MarkRegionPending(index);
         return 1;
     }
     ReleaseDc();
     image->BlitTo(rect, Target()->renderSurface, sourceRect, flags, skip);
     if (index >= 0)
-        UnknownFunction404240(index, rect);
+        SetRegionRect(index, rect);
     *frames = Target()->field_0x14;
     return 1;
 }
 
 // 0x00404700: as 0x00404480, but copies `rect` of the image to (x, y)
 // through PCTextureMap 0x004c7b40.
-int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, CameraRect* rect, int flags, int index,
+int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect* rect, int flags, int index,
                                            int dirty, int* frames, unsigned char* table) {
     if (dirty) {
         if (copyValid) {
@@ -352,7 +352,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
             *frames = Target()->field_0x14;
         }
         if (index >= 0)
-            UnknownFunction404cb0(index);
+            MarkRegionPending(index);
         return 1;
     }
     ReleaseDc();
@@ -362,7 +362,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
         g_UnknownGlobal5777e8.right = rect->right - rect->left + x;
         g_UnknownGlobal5777e8.top = y;
         g_UnknownGlobal5777e8.bottom = rect->bottom - rect->top + y;
-        UnknownFunction404240(index, &g_UnknownGlobal5777e8);
+        SetRegionRect(index, &g_UnknownGlobal5777e8);
     }
     *frames = Target()->field_0x14;
     return 1;
@@ -378,7 +378,7 @@ int BackgroundImage::ReleaseDc() {
 }
 
 // 0x00404cb0
-void BackgroundImage::UnknownFunction404cb0(int index) {
+void BackgroundImage::MarkRegionPending(int index) {
     regionTable[index].pendingFrame = Target()->field_0x18;
 }
 
@@ -397,7 +397,7 @@ void BackgroundImage::ResetPendingRects() {
 }
 
 // 0x00404d30
-void BackgroundImage::UnknownFunction404d30(int index) {
+void BackgroundImage::ClearRegionRect(int index) {
     regionTable[index].pendingFrame = -1;
     regionTable[index].frameRects[Target()->field_0x18].top = 0;
     regionTable[index].frameRects[Target()->field_0x18].bottom = 0;

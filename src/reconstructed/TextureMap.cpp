@@ -109,9 +109,9 @@ failed:
     if (choice) {
         if (alpha) {
             if (choice->field_0x08)
-                choice->field_0x08->UnknownFunction50c6c0((ManagedTexture*)map);
+                choice->field_0x08->AddTexture((ManagedTexture*)map);
         } else if (choice->field_0x04) {
-            choice->field_0x04->UnknownFunction50c6c0((ManagedTexture*)map);
+            choice->field_0x04->AddTexture((ManagedTexture*)map);
         }
     }
     if (palette) {

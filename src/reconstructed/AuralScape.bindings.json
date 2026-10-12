@@ -114,7 +114,7 @@
   "?Set3DDistanceRange@Sound@@QAEHMMH@Z": "0x004bd960",
   "?QueryListener@PCSoundInterface@@QAEPAUUnknownSoundListener@@XZ": "0x004be800",
   "?SetEAXEnvironment@PCSoundInterface@@QAEHK@Z": "0x004bed00",
-  "?UnknownFunction4e9cd0@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
   "?GetPositionIn@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?FindByName@UnknownVehiclePart@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",

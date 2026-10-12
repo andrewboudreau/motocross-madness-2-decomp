@@ -220,7 +220,7 @@ public:
     virtual int UnknownVirtualSlot12();            // 0x00443aa0
     virtual int UnknownVirtualSlot14();            // 0x00444030
 
-    void UnknownFunction4fc630(Vector3 position);  // 0x004fc630: sets the local translation
+    void SetPositionVec3(Vector3 position);  // 0x004fc630: sets the local translation
     void UnknownFunction4fd340(float x, float y, float z); // 0x004fd340
     // Seen from ArcadeObject.cpp: 0x004fc660 (ret 4) sets the position from
     // a pointer, 0x004fe850 (ret 8) returns two vectors (the second is the

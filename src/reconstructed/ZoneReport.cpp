@@ -66,7 +66,7 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         if (eventTypeLocation != -1)
             strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, trackName);
         if (g_TrackGame->network->isHost)
-            g_TrackGame->sceneObject->UnknownFunction4ea010(name, g_TrackGame->mode.field_0x27f8.field_0x36, 0, "scn",
+            g_TrackGame->sceneObject->ReadSceneName(name, g_TrackGame->mode.field_0x27f8.field_0x36, 0, "scn",
                                                              &g_TrackGame->mode.field_0x27f8.field_0x138,
                                                              &g_TrackGame->mode.field_0x27f8.field_0x13c);
         g_TrackGame->mode.field_0x27f8.field_0x10 = 1;

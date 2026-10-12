@@ -169,7 +169,7 @@ inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 }
 
 // cdecl 0x00511970 (Tgafile.h): bytes per pixel of a pixel format.
-int UnknownFunction511970(int format);
+int PixelFormatBytesPerPixel(int format);
 
 // Views of the +0x48 (model), +0x50 (bike) and +0x58 (rider) lists.
 struct UnknownKrustyUIModelEntry {
@@ -311,7 +311,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
             // (2 MB below 800x600) off the total outside NT without the 0x400 cap.
             int memory = KRUSTYUI_TARGET->field_0x04->totalVideoMemory;
-            int free = memory - UnknownFunction511970(KRUSTYUI_TARGET->field_0x28) *
+            int free = memory - PixelFormatBytesPerPixel(KRUSTYUI_TARGET->field_0x28) *
                                     (KRUSTYUI_TARGET->field_0x14 + 1) * KRUSTYUI_TARGET->field_0x10 *
                                     KRUSTYUI_TARGET->field_0x0c;
             if (g_TrackGame->osVersion.platformId != 2 &&

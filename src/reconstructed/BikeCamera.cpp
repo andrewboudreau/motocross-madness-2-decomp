@@ -29,10 +29,10 @@ BikeCamera::BikeCamera(int flags) : VehicleCamera(flags) {
 BikeCamera::~BikeCamera() {}
 
 // 0x00416e80
-BikeCamera* BikeCamera::UnknownFunction416e80(void* value, float rate294, float rate298, float value228,
+BikeCamera* BikeCamera::SetupBikeCamera(void* value, float rate294, float rate298, float value228,
                                               float value2d0, float value2e8, int capacity, int count,
                                               const int* list) {
-    if (!UnknownFunction52b9e0(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+    if (!SetupVehicleCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
         return 0;
     return this;
 }

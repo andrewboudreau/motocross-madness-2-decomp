@@ -319,7 +319,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         g_TrackGame->LoadResourceString(0x14de, text, 0x80);
                         UnknownMessage* message = new (__FILE__, 0x8bf) UnknownMessage(text, 3.25f);
                         if (message != 0) {
-                            overlay->UnknownFunction51b540(message);
+                            overlay->ReplaceHeadMessage(message);
                             delete message;
                         }
                     } else {
@@ -400,7 +400,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         g_TrackGame->LoadResourceString(0x14dd, text, 0x80);
                         UnknownMessage* message = new (__FILE__, 0x912) UnknownMessage(text, 3.25f);
                         if (message != 0) {
-                            overlay->UnknownFunction51b540(message);
+                            overlay->ReplaceHeadMessage(message);
                             delete message;
                         }
                     } else {
@@ -895,26 +895,26 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 case 2:
                     overlay = g_TrackGame->field_0x564->field_0x6c;
                     if (overlay != 0 && message != 0) {
-                        overlay->UnknownFunction51b540(message);
+                        overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 case 0:
                     overlay = g_TrackGame->field_0x55c->field_0x6c;
                     if (overlay != 0 && message != 0) {
-                        overlay->UnknownFunction51b540(message);
+                        overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 case 1:
                 case 5:
                     overlay = g_TrackGame->field_0x560->field_0x6c;
                     if (overlay != 0 && message != 0) {
-                        overlay->UnknownFunction51b540(message);
+                        overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 case 4:
                     overlay = g_TrackGame->field_0x568->field_0x6c;
                     if (overlay != 0 && message != 0) {
-                        overlay->UnknownFunction51b540(message);
+                        overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 }
@@ -975,7 +975,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 }
                 sprintf(text, "%s %s", title, value);
                 UnknownMessage message(text, 1.5f);
-                overlay->UnknownFunction51b540(&message);
+                overlay->ReplaceHeadMessage(&message);
                 return 1;
             }
             break;
@@ -998,7 +998,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 }
                 sprintf(text, "%s %s", title, value);
                 UnknownMessage message(text, 1.5f);
-                overlay->UnknownFunction51b540(&message);
+                overlay->ReplaceHeadMessage(&message);
                 return 1;
             }
             break;
@@ -1248,7 +1248,7 @@ void BikeRace::UnknownFunction420590(int player) {
                 if (g_TrackGame->mode.field_0x27f8.field_0x144) {
                     owner->field_0xa8 = 0;
                 } else if (g_TrackGame->network->isHost) {
-                    owner->UnknownFunction4a9d20();
+                    owner->PickFollowedRacer();
                 }
             }
         }

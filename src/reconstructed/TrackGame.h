@@ -63,12 +63,12 @@ struct TrackGameViewOwner : public GameObject {
     void UnknownFunction4e1f00();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
     // 0x004a9d20 (dlgprocs.cpp 0x004526b0): the host picks the racer to
     // follow (+0xa8) and tells the players and the recorder (FollowRacer.cpp).
-    void UnknownFunction4a9d20();
+    void PickFollowedRacer();
     // 0x004a9e80: follows `racer` after `previous` (KrustyBike.cpp 0x00497986
     // passes itself, 0, 1); `tell` lets the view's own racer know.
-    void UnknownFunction4a9e80(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell);
+    void SetFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell);
     // 0x004a9f90: lets every other racer know about the switch.
-    void UnknownFunction4a9f90(UnknownEventRacer* racer, UnknownEventRacer* previous);
+    void AnnounceFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous);
     // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer
     // (0x00420650 passes 0, 1): picks entries `a` and `b` at +0x420 after
     // flagging the two it leaves; `racer` is unused.
@@ -473,18 +473,18 @@ public:
     int UnknownFunction4e9a10(int* flag);
     int UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c);
     // 0x004e9ba0: opens the scene archive `name` (default field_0x24c).
-    UnknownTextureStream* UnknownFunction4e9ba0(const char* name);
+    UnknownTextureStream* OpenSceneArchive(const char* name);
     // 0x004e9cd0: opens `name` from the archive in `stream` (racesnd.cpp
     // reads Audio.res samples through it); 0 when not found.
-    int UnknownFunction4e9cd0(UnknownTextureStream* stream, const char* name, const char* mode, int a);
-    void UnknownFunction4e9f70(const char* name); // 0x004e9f70: derived file names
-    void UnknownFunction4e9b80(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
-    void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
+    int OpenArchiveFile(UnknownTextureStream* stream, const char* name, const char* mode, int a);
+    void SetSceneFileNames(const char* name); // 0x004e9f70: derived file names
+    void SetSceneDirectory(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
+    void SelectScene(char* name, const char* kind, int value); // 0x004e9e30
     // 0x004ea390: writes the scene name for `field_0x24c` into `name`.
-    void UnknownFunction4ea390(char* name, char* scene, int value);
+    void ReadCurrentSceneName(char* name, char* scene, int value);
     // 0x004ea010 (TrackRecord.cpp 0x0051ffe0): a track's display name.
     // Clears *a and *b when given; the archive's 0x00461cb0 fills them.
-    void UnknownFunction4ea010(char* out, char* name, int index, const char* kind, int* a, int* b);
+    void ReadSceneName(char* out, char* name, int index, const char* kind, int* a, int* b);
 
     // Layout from the constructor's stores; array lengths are inferred
     // from the gaps between them (and the 0x103-byte copy into +0x44).

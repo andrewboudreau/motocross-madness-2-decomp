@@ -325,7 +325,7 @@ int EventManager::CreatePodiumScene() {
         } else {
             sprintf(name, "%s\\Winner.mcf", "Res");
         }
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", (int)path)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", (int)path)) {
             sprintf(message, "No winner animation file found in resources.  Aborting.\n");
             delete stream;
             return 0;
@@ -363,7 +363,7 @@ int EventManager::CreatePodiumScene() {
     if (g_TrackGame->mode.field_0xa28 && g_TrackGame->mode.field_0x23a4) {
         UnknownPodiumSound* sound = new(__FILE__, 0x34e) UnknownPodiumSound(PODIUM_OWNER(owner)->field_0x2c->field_0xc4, 1);
         UnknownTextureStream* audio = new(__FILE__, 0x34f) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(audio, "CrowdLoop.wav", "rb", 0)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(audio, "CrowdLoop.wav", "rb", 0)) {
             char text[0x80];
             sprintf(text, "CrowdLoop.wav not found in Audio.res.\n");
             delete audio;

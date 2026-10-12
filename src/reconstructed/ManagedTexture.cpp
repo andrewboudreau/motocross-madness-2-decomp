@@ -58,7 +58,7 @@ void ManagedTexture::Reregister() {
     field_0xa8 = -1;
     field_0x98 = 0;
     field_0x9c = 0;
-    group->UnknownFunction50c6c0(this);
+    group->AddTexture(this);
 }
 
 // 0x00510700

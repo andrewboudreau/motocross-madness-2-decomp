@@ -451,7 +451,7 @@ int UIButton::ContainsPoint(POINT point, int state) {
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
-            int offset = desc.pitch * y / UnknownFunction511970(format) + x;
+            int offset = desc.pitch * y / PixelFormatBytesPerPixel(format) + x;
             if (format == 8) {
                 if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
                     opaque = 1;
@@ -481,7 +481,7 @@ int UIMultiState::ContainsPoint(POINT point, int state) {
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
-            int offset = desc.pitch * y / UnknownFunction511970(format) + x;
+            int offset = desc.pitch * y / PixelFormatBytesPerPixel(format) + x;
             if (format == 8) {
                 if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
                     opaque = 1;
@@ -507,7 +507,7 @@ int UIEditBox::Draw() {
         SetEditText("");
     if (drawnTexture) {
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
+            ownerDialog->dialogBackground->DrawImage((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
                                                            visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
@@ -721,7 +721,7 @@ int UIMultiState::Draw() {
             rect.bottom = (int)(texture->field_0x18 * ownerDialog->scaleY) + rect.top;
         }
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)texture, &rect, 0,
+            ownerDialog->dialogBackground->DrawImage((PCTextureMap*)texture, &rect, 0,
                                                            texture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;

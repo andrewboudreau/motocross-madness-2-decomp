@@ -107,7 +107,7 @@ void LightEmitter::SetRange(float range) {
 void LightEmitter::SetPosition(const Vector3* position) {
     if (position->x != lightPosition.x || position->y != lightPosition.y || position->z != lightPosition.z) {
         if (debugSphere)
-            debugSphere->UnknownFunction4fc630(*position);
+            debugSphere->SetPositionVec3(*position);
         lightPosition = *position;
         if (field_0x9c)
             field_0x9c->UnknownFunction49de90(position);

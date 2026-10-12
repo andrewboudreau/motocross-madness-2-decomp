@@ -85,7 +85,7 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     gui->GetUser(0)->ForgetDevices();
     gui->GetUser(0)->AcceptDevice(gui->field_0x30c);
     gui->ShowCursors(0);
-    g_UnknownResourceManager572b44->UnknownFunction4e9030("ui\\uires.res", 0);
+    g_UnknownResourceManager572b44->AddArchive("ui\\uires.res", 0);
     g_TrackGame->mode.LoadBonusTrackNames();
     g_TrackGame->GetRegistryString("MRUProfile", g_UnknownString577738,
                                                  g_TrackGame->mode.field_0x00, &size);

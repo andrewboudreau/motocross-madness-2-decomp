@@ -114,7 +114,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         manager = field_0x10;
         copy = new(__FILE__, 976) ManagedTexture(manager);
         copy->field_0x68 |= 1;
-        ((ManagedTexture*)this)->group->UnknownFunction50c6c0((ManagedTexture*)copy);
+        ((ManagedTexture*)this)->group->AddTexture((ManagedTexture*)copy);
     } else {
         manager = g_TrackGame->field_0x3c;
         copy = new(__FILE__, 986) PCTextureMap(manager, 1);
@@ -131,7 +131,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
             if (!(desc.caps[0] & 0x1000))
                 noAlpha = 4;
             int created = copy->UnknownVirtualSlot4(desc.surface, field_0x14, field_0x18,
-                                                    desc.pitch / UnknownFunction511970(field_0x20), field_0x1c,
+                                                    desc.pitch / PixelFormatBytesPerPixel(field_0x20), field_0x1c,
                                                     field_0x20, field_0x20, field_0x2c, noAlpha | systemMemory,
                                                     texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (!systemSurface->Unlock(0) && created) {
@@ -276,8 +276,8 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             field_0x24++;
         }
         if (bits && sourceFormat != field_0x20 &&
-            (!checkMemory || UnknownFunction511970(565) > UnknownFunction511970(sourceFormat)) &&
-            !field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(565) * width * height))
+            (!checkMemory || PixelFormatBytesPerPixel(565) > PixelFormatBytesPerPixel(sourceFormat)) &&
+            !field_0x10->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(565) * width * height))
             return 0;
         if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));
@@ -359,7 +359,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
         if (systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
             goto failed;
         void* destination = desc.surface;
-        int bytesPerPixel = UnknownFunction511970(field_0x20);
+        int bytesPerPixel = PixelFormatBytesPerPixel(field_0x20);
         ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
                               sourceFormat, 0, palette, alphaThreshold, key);
         if (!(flags & 4))

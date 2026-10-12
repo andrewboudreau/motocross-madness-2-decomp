@@ -850,7 +850,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             {
                 UnknownMessage message(text, 1.5f);
                 if (owner)
-                    owner->field_0x6c->UnknownFunction51b540(&message);
+                    owner->field_0x6c->ReplaceHeadMessage(&message);
             }
             if (g_TrackGame->mode.field_0x23a4)
                 crowdSounds->UnknownFunction401dd0(musicVolume);
@@ -1015,7 +1015,7 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
     int bytes;
     void* buffer;
 
-    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", 0)) {
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
     } else {
         stream->UnknownFunction461340(stream->field_0x130, 0, 1);
@@ -1046,7 +1046,7 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
     if (!sound)
         return 0;
     stream = new (__FILE__, 1678) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", 0)) {
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
         if (stream)
             delete stream;

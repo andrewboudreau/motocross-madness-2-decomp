@@ -54,7 +54,7 @@ void UnknownTrackGameViewOwnerDc::UnknownFunction4a9d10(KrustyVCR* vcr)
 
 // 0x004a9f90: every other racer hears about the new and the previous racer,
 // and the new racer hears about each of them.
-void TrackGameViewOwner::UnknownFunction4a9f90(UnknownEventRacer* racer, UnknownEventRacer* previous)
+void TrackGameViewOwner::AnnounceFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous)
 {
     int iterator = 0;
     for (UnknownEventRacer* other = field_0x34->UnknownFunction4204e0(&iterator); other;

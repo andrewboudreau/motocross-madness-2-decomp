@@ -58,7 +58,7 @@ struct UnknownFollowedRacerSlots {
 // 0x004a9d20: the host picks the racer to follow: the only one still racing
 // (+0x4a0 clear), or a random still-racing one, or its own racer when none
 // is; then tells the players (message 0x87) and the replay recorder.
-void TrackGameViewOwner::UnknownFunction4a9d20()
+void TrackGameViewOwner::PickFollowedRacer()
 {
     if (!g_TrackGame->network || !g_TrackGame->network->isHost)
         return;
@@ -101,7 +101,7 @@ void TrackGameViewOwner::UnknownFunction4a9d20()
 // previous racer banks its run (+0x75c into +0x764, the best into +0x760),
 // both racers get their tier-3 role for five seconds and every other racer
 // hears of it; the view's own racer taking over scores 2500.
-void TrackGameViewOwner::UnknownFunction4a9e80(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell)
+void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell)
 {
     if (previous) {
         previous->field_0x764 += previous->field_0x75c;
@@ -121,7 +121,7 @@ void TrackGameViewOwner::UnknownFunction4a9e80(UnknownEventRacer* racer, Unknown
         ((RaceSound*)field_0x34->field_0x44)->PlayItSound();
         FOLLOWED_RACER_SLOTS(racer)->UnknownVirtualSlot50(1, 5.0f, 0);
     }
-    UnknownFunction4a9f90(racer, previous);
+    AnnounceFollowedRacer(racer, previous);
     if (racer == field_0x34->field_0x38 && previous && previous != racer) {
         racer->field_0x768 += 2500.0f;
         if (field_0x34->field_0x0bc)

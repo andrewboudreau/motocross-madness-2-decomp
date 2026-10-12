@@ -226,7 +226,7 @@ int TrackGame::UnknownVirtualSlot1() {
     sprintf(name, "%s\\%s", "Res", file);                          \
     if (!UnknownVirtualSlot18(name, path))                           \
         return 0;                                                    \
-    g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 0);
+    g_UnknownResourceManager572b44->AddArchive(path, 0);
 
 // 0x00520d10
 int TrackGame::UnknownVirtualSlot3() {

@@ -262,7 +262,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
         sprintf(sltPath, "%s\\%s", "Res", slt);
         strcpy(strrchr(slt, '.'), ".col");
         sprintf(path, "%s\\%s", "Res", slt);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)colPath)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)colPath)) {
             strcpy(strrchr(slt, '.'), "");
             colPath[0] = 0;
         }
@@ -374,7 +374,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             int count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
             staticModels->casters[i].fileName[count] = 0;
-            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->UnknownFunction4fc630(position);
+            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetPositionVec3(position);
             ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetAxesPtr(&look, &up, 1, 0);
             parameters.UnknownFunction4b7f10("Collision", 1, &collision);
             staticModels->casters[i].collisionObject = 0;
@@ -516,7 +516,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             sprintf(text, "%s\\%s", "Res", vue);
             UnknownTextureStream* stream =
                 new(__FILE__, 2216) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-            if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)vuePath)) {
+            if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, text, "rb", (int)vuePath)) {
                 sprintf(sound, "No procedural vue file found in resources.  Aborting.\n");
                 delete stream;
                 return 0;
@@ -573,7 +573,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         UnknownTextureStream* stream =
             new(__FILE__, 2281) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         sprintf(text, "%s\\%s", "Res", colPath);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)colPath))
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, text, "rb", (int)colPath))
             colPath[0] = 0;
         delete stream;
         if (!ReadVector(&animationTable->entries[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))

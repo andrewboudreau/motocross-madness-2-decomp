@@ -53,7 +53,7 @@
   "?UnknownFunction4a8b40@D3DIMSoultreeCharacter@@QAEXPAUMotion@@@Z": "0x004a8b40",
   "?UnknownFunction4bc320@UnknownPodiumSound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
   "?UnknownFunction4e8cf0@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
-  "?UnknownFunction4e9cd0@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
   "?SetAxesPtr@UnknownPodiumSoultree@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
   "?UnknownFunction4fc4f0@UnknownPodiumNode@@QAEXPAUVector3@@0@Z": "0x004fc4f0",
   "?SetPosition@UnknownPodiumSoultree@@QAEXPBUVector3@@@Z": "0x004fc660",

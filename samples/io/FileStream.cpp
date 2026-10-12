@@ -165,7 +165,7 @@ int UnknownTextureStream::UnknownFunction460f50(const char* path, const char* mo
     if (*mode == 'r' || *mode == 'a') {
         if (!encoded && UnknownFunction460e70(path)) {
             field_0x08 = 1;
-            if (field_0x12c && (field_0x1c = field_0x12c->UnknownFunction4e9030(path, 0)) != 0) {
+            if (field_0x12c && (field_0x1c = field_0x12c->AddArchive(path, 0)) != 0) {
                 return 1;
             }
         }

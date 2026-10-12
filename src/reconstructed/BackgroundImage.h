@@ -48,26 +48,26 @@ public:
     void SetImage(PCTextureMap* image);                // 0x004040b0: sets the image
     int AllocRegion(int owner);               // 0x004040f0: allocates a region
     void ReleaseRegion(int index);              // 0x00404200: releases a region
-    void UnknownFunction404240(int index, CameraRect* rect); // 0x00404240
+    void SetRegionRect(int index, CameraRect* rect); // 0x00404240
     int RestoreRegions();                               // 0x004042e0: restores the regions
     int ClearRegionDepth();                             // 0x004043c0: clears their depth
-    int UnknownFunction404480(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags, int index,
+    int DrawImage(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags, int index,
                               int dirty, int* frames, int skip); // 0x00404480: draws an image
     // 0x00404700: copies `rect` of `image` to (x, y) (GameCursor slot 15).
-    int UnknownFunction404700(PCTextureMap* image, int x, int y, CameraRect* rect, int flags, int index,
+    int DrawImageRect(PCTextureMap* image, int x, int y, CameraRect* rect, int flags, int index,
                               int dirty, int* frames, unsigned char* table);
     // 0x004049d0: a DC clipped to `rect` (gameui.cpp 0x0046ed70; near miss in
     // samples/render/BackgroundImageNearMisses.cpp).
-    int UnknownFunction4049d0(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
+    int GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
                               CameraRect* clip);
     // Region `index`'s rectangle for the target's current frame.
     CameraRect& CurrentRegionRect(int index) {
         return regionTable[index].frameRects[((PCRenderTarget*)field_0x18)->field_0x18];
     }
     int ReleaseDc();                        // 0x00404c80: releases the DC
-    void UnknownFunction404cb0(int index);              // 0x00404cb0
+    void MarkRegionPending(int index);              // 0x00404cb0
     void ResetPendingRects();                           // 0x00404cd0: resets pending rectangles
-    void UnknownFunction404d30(int index);              // 0x00404d30
+    void ClearRegionRect(int index);              // 0x00404d30
     void MarkAllDirty();                       // 0x00404da0: marks everything dirty
 
     PCTextureMap* field_0x2c;              // image

@@ -473,7 +473,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 if (g_TrackGame->network->GetPlayerName(message->player, name)) {
                     sprintf(line, "%s %s", name, text);
                     UnknownMessage notice(line, 3.25f);
-                    target->UnknownFunction51b540(&notice);
+                    target->ReplaceHeadMessage(&notice);
                 }
             }
             if (message->player == g_TrackGame->network->localPlayer) {
@@ -497,7 +497,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     if (target) {
                         g_TrackGame->LoadResourceString(0x13d1, line, 128); // capped like `text`
                         UnknownMessage notice(line, 3.25f);
-                        target->UnknownFunction51b540(&notice);
+                        target->ReplaceHeadMessage(&notice);
                     }
                 } else {
                     ResetEntries();
@@ -623,17 +623,17 @@ int EventManager::UnknownFunction45cb70() {
     g_TrackGame->ui->UnknownFunction49b530();
     g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                       g_TrackGame->mode.field_0x27f8.field_0x36, "env", path);
-    g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
+    g_TrackGame->sceneObject->SetSceneDirectory(path);
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 0:
-        g_TrackGame->sceneObject->UnknownFunction4e9e30(g_TrackGame->mode.field_0x27f8.field_0x36, "scn", 0);
+        g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.field_0x27f8.field_0x36, "scn", 0);
         g_TrackGame->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
         if (!g_TrackGame->field_0x34->AppendChild(g_TrackGame->field_0x55c, -1))
             return 0;
         break;
     case 2:
-        g_TrackGame->sceneObject->UnknownFunction4e9e30(g_TrackGame->mode.field_0x27f8.field_0x36, "scn", 0);
+        g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.field_0x27f8.field_0x36, "scn", 0);
         g_TrackGame->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
         if (!g_TrackGame->field_0x34->AppendChild(g_TrackGame->field_0x564, -1))
@@ -776,7 +776,7 @@ void EventManager::RankRacers() {
                 scored++;
             }
         }
-        qsort(scores, scored, sizeof(scores[0]), UnknownFunction5199f0);
+        qsort(scores, scored, sizeof(scores[0]), CompareScoresDescending);
         for (int i = 0; i < scored; i++)
             scores[i].racer->field_0x784 = i + 1;
         next = 0;
@@ -800,7 +800,7 @@ void EventManager::RankRacers() {
                     scored++;
                 }
             }
-            qsort(scores, scored, sizeof(scores[0]), UnknownFunction5199f0);
+            qsort(scores, scored, sizeof(scores[0]), CompareScoresDescending);
             for (int i = 0; i < scored; i++)
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
@@ -821,7 +821,7 @@ void EventManager::RankRacers() {
                     scored++;
                 }
             }
-            qsort(scores, scored, sizeof(scores[0]), UnknownFunction5199f0);
+            qsort(scores, scored, sizeof(scores[0]), CompareScoresDescending);
             for (int i = 0; i < scored; i++)
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
@@ -906,7 +906,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
             g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
             char description[32];
             char time[32];
-            g_TrackGame->sceneObject->UnknownFunction4ea390(
+            g_TrackGame->sceneObject->ReadCurrentSceneName(
                 scene, g_TrackGame->sceneObject->field_0x24c, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
@@ -927,7 +927,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
         }
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4 && g_TrackGame->mode.field_0x26f0) {
             char time[32];
-            g_TrackGame->sceneObject->UnknownFunction4ea390(
+            g_TrackGame->sceneObject->ReadCurrentSceneName(
                 scene, g_TrackGame->sceneObject->field_0x24c, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));

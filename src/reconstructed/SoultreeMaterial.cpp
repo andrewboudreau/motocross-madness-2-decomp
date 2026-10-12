@@ -212,9 +212,9 @@ void SoultreeMaterial::LoadTexture()
                                          0x80, 0xff00ff);
             if (alpha) {
                 if (field_0x74.alphaTextures)
-                    field_0x74.alphaTextures->UnknownFunction50c6c0((ManagedTexture*)texture);
+                    field_0x74.alphaTextures->AddTexture((ManagedTexture*)texture);
             } else if (field_0x74.opaqueTextures) {
-                field_0x74.opaqueTextures->UnknownFunction50c6c0((ManagedTexture*)texture);
+                field_0x74.opaqueTextures->AddTexture((ManagedTexture*)texture);
             }
         } else {
             texture = new(__FILE__, 0x17a) PCTextureMap(field_0x74.textureManager, 1);

@@ -27,7 +27,7 @@ CameraRect g_UnknownGlobal5777a8;
 // 0x004049d0: a DC for drawing `rect`: the back buffer, or with the copy
 // current the surfaces in turn (`a` set when the copy is returned), clipped
 // to the next dirty region in `clip`.
-int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
+int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
                                            CameraRect* clip) {
     UnknownSurfaceInterface* surface;
     *dc = 0;
@@ -81,10 +81,10 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
             *frames = Target()->field_0x14;
         }
         if (index >= 0)
-            UnknownFunction404cb0(index);
+            MarkRegionPending(index);
     } else {
         if (index >= 0)
-            UnknownFunction404240(index, rect);
+            SetRegionRect(index, rect);
         surface = Target()->renderSurface;
         *frames = Target()->field_0x14;
     }

@@ -108,7 +108,7 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
     strcpy(path, name);
     strcpy(strrchr(path, '.'), ".col");
     UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)found))
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)found))
         found[0] = 0;
     if (stream)
         delete stream;

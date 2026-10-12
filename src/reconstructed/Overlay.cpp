@@ -87,7 +87,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
                                                            Target()->field_0x28, Target()->field_0x28,
                                                            0, 8, 0, 1, 0, 5, 6, 0, 0x80, 0xff00ff);
         void* bits = g_UnknownOverlayTexture689110->UnknownVirtualSlot13(0, 0, 0);
-        memset(bits, 0, UnknownFunction511970(g_UnknownOverlayTexture689110->field_0x20) << 16);
+        memset(bits, 0, PixelFormatBytesPerPixel(g_UnknownOverlayTexture689110->field_0x20) << 16);
         g_UnknownOverlayTexture689110->UnknownVirtualSlot14(0);
         sharedTexture = g_UnknownOverlayTexture689110;
     } else {

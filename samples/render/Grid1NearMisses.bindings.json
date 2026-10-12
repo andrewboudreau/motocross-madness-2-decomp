@@ -12,7 +12,7 @@
   "?ReleaseBlockCentres@DrawableGridNode@@QAEHXZ": "0x00483100",
   "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?Reregister@ManagedTexture@@QAEXXZ": "0x00510670",
-  "?UnknownFunction511970@@YAHH@Z": "0x00511970",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?g_grid1DetailDistance@@3MA": "0x0056c034",
   "?g_grid1OwnTextureCount@@3HA": "0x0066529c",
   "__FILE__": "0x0056c0a0",

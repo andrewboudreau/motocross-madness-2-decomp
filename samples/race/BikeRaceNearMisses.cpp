@@ -565,7 +565,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         strcpy(strrchr(path, '.'), ".tdf");
         UnknownTextureStream* stream =
             new(__FILE__, 0x193) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)modelName)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
             sprintf(message, "No Track file found in env file.  Abort.\n");
             delete stream;
             Release();
@@ -593,7 +593,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                     g_TrackGame->mode.field_0x27f8.field_0x34);
             UnknownTextureStream* stream =
                 new(__FILE__, 0x1be) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-            if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)modelName)) {
+            if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
                 delete stream;
             } else if (stream) {
                 {
@@ -642,7 +642,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 }
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 &&
                     g_TrackGame->mode.field_0x27f8.field_0x00 != 4 && field_0x06c) {
-                    field_0x06c->model->UnknownFunction4fc630(point);
+                    field_0x06c->model->SetPositionVec3(point);
                     field_0x06c->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 }
                 if (field_0x06c)
@@ -669,7 +669,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                     if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 &&
                         g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
                         if (field_0x064) {
-                            field_0x064->model->UnknownFunction4fc630(point);
+                            field_0x064->model->SetPositionVec3(point);
                             field_0x064->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                         }
                     } else if (field_0x064) {
@@ -728,7 +728,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
                 flagGirl->field_0x1a0->UnknownFunction4444c0(1);
-                flagGirl->field_0x1a0->UnknownFunction4fc630(girlPosition);
+                flagGirl->field_0x1a0->SetPositionVec3(girlPosition);
                 flagGirl->field_0x1a0->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 flagGirl->SetMotionByName("Stand");
                 flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
@@ -813,7 +813,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             point.z += localRacer->heading.z * 15.0f;
         }
         terrain->QueryGround(&point, 0, 0, 0);
-        field_0x06c->model->UnknownFunction4fc630(point);
+        field_0x06c->model->SetPositionVec3(point);
     }
     if (g_TrackGame->field_0x3428 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
         g_TrackGame->field_0x342c) {
@@ -936,7 +936,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
 
     UnknownTextureStream* stream = new(__FILE__, 0x3b6) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     sprintf(path, "%s\\rider.mcf", "Res");
-    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)riderFile)) {
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)riderFile)) {
         sprintf(message, "No Rider MCF found in resources.  Aborting.\n");
         delete stream;
         Release();
@@ -993,7 +993,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         setup.weight = g_TrackGame->ui->weight[bikeClass];
         WriteRelativePositions(&position, &direction, event, order[0]);
         sprintf(path, "%s\\%s", "Res", circuit->field_0x465[0].field_0x38);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)bikeFile)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
             sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
             delete stream;
             Release();
@@ -1006,7 +1006,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         } else {
             COPY_TEXT(riderPath, riderFile, 0x104);
         }
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, riderPath, "rb",
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, riderPath, "rb",
                                                                        (int)circuitRiderFile)) {
             sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
             delete stream;
@@ -1041,7 +1041,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 UnknownProCircuitRacer* racer = &g_TrackGame->field_0x3444->field_0x465[n];
                 WriteRelativePositions(&position, &direction, event, order[n]);
                 sprintf(path, "%s\\%s", "Res", racer->field_0x38);
-                if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)bikeFile)) {
+                if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
                     sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
                     delete stream;
                     Release();
@@ -1099,7 +1099,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         g_TrackGame->ui->UnknownFunction49b7f0(recordedRider, riderTexture, 0x3f);
     } else {
         sprintf(path, "%s\\%s", "Res", g_TrackGame->mode.field_0x1974.field_0x00);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)bikeFile)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
             sprintf(message, "No Rider MCF found in resources.  Aborting.\n");
             delete stream;
             Release();
@@ -1376,7 +1376,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                         sprintf(bikeFile, "%s\\%s", "Res", models[choices[bikes[n]].field_0x00].field_0x40);
                     }
                     ai = 1;
-                    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, bikeFile, "rb",
+                    if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, bikeFile, "rb",
                                                                                    (int)bikeFile)) {
                         sprintf(message, "No Net Bike MCF found in resources.  Aborting.\n");
                         delete stream;

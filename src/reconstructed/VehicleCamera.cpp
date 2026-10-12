@@ -26,7 +26,7 @@ VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
 VehicleCamera::~VehicleCamera() {}
 
 // 0x0052b9e0
-VehicleCamera* VehicleCamera::UnknownFunction52b9e0(void* value, float rate294, float rate298, float value228,
+VehicleCamera* VehicleCamera::SetupVehicleCamera(void* value, float rate294, float rate298, float value228,
                                                     float value2d0, float value2e8, int capacity, int count,
                                                     const int* list) {
     if (!SetupFollowCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))

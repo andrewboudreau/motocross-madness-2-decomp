@@ -330,7 +330,7 @@ int DitherConvert(void* source, int format, int width, int height, int sourceStr
                   int destinationStride, void* output24, void* output565, void* output555,
                   void* output8, UnknownTexturePalette* palette)
 {
-    int bytesPerPixel = UnknownFunction511970(format);
+    int bytesPerPixel = PixelFormatBytesPerPixel(format);
     unsigned char* indices;
     unsigned char* colors;
     if (palette) {

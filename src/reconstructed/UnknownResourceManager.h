@@ -20,7 +20,7 @@ class UnknownResourceManager {
 public:
     UnknownResourceEntry* FindItem(const char* name, int a); // 0x004e9360: finds `name`
     // 0x004e9030: adds an archive and returns it; 0x004e9830 removes one.
-    UnknownTextureStream* UnknownFunction4e9030(const char* path, int flags);
+    UnknownTextureStream* AddArchive(const char* path, int flags);
     void RemoveArchiveItems(UnknownTextureStream* archive);
     // 0x004e9430 loads `name` from `path`; 0x004e96b0 takes `name` over from
     // the global manager (SceneManager 0x004f0310).

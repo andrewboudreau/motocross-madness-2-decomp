@@ -72,7 +72,7 @@ static inline int LevelArea(int level) {
 }
 
 static inline float TexelMegabytes(ManagedTextureGroup* group, const int& texels) {
-    return (float)UnknownFunction511970(group->field_0x0c) * texels * 1.2715658e-06f;
+    return (float)PixelFormatBytesPerPixel(group->field_0x0c) * texels * 1.2715658e-06f;
 }
 
 static inline CacheTexture* LeastWantedPage(UnknownTextureMapList* pages, int* lowest) {
@@ -89,7 +89,7 @@ static inline CacheTexture* LeastWantedPage(UnknownTextureMapList* pages, int* l
 }
 
 static inline float PageMegabytes(ManagedTextureGroup* group, const int& pages) {
-    return (UnknownFunction511970(group->field_0x0c) * pages << 18) * 3.1789145e-07f;
+    return (PixelFormatBytesPerPixel(group->field_0x0c) * pages << 18) * 3.1789145e-07f;
 }
 
 // 0x0050c960: repacks the pages. Each texture used since the last repack
@@ -258,8 +258,8 @@ void ManagedTextureGroup::RepackWholePages() {
         float peak = (float)field_0x1d4.LargestRecentSample();
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMem Blted: %.2fM, Peak: %.2fM",
-            (float)UnknownFunction511970(field_0x0c) * field_0x1d0 * 9.536743e-07f,
-            UnknownFunction511970(field_0x0c) * peak * 9.536743e-07f);
+            (float)PixelFormatBytesPerPixel(field_0x0c) * field_0x1d0 * 9.536743e-07f,
+            PixelFormatBytesPerPixel(field_0x0c) * peak * 9.536743e-07f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
                                                                 field_0x1e0.LargestRecentSample());
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Size Requested Granted");
@@ -594,7 +594,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "PixelFormat:%s", format);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "CacheTextures:%d %.2fM", field_0x54.m_count,
-            (UnknownFunction511970(field_0x0c) * field_0x54.m_count << 18) * 3.1789145e-07f);
+            (PixelFormatBytesPerPixel(field_0x0c) * field_0x54.m_count << 18) * 3.1789145e-07f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "ManagedTextures:%d", field_0x44.m_count);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Managed %0.2fM",
                                                                 (managedF = (float)managedTexels) * 9.536743e-07f);
@@ -604,8 +604,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         float peak = (float)field_0x1d4.LargestRecentSample();
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMem Blted: %.2fM, (%.2fM)",
-            (float)UnknownFunction511970(field_0x0c) * field_0x1d0 * 9.536743e-07f,
-            UnknownFunction511970(field_0x0c) * peak * 9.536743e-07f);
+            (float)PixelFormatBytesPerPixel(field_0x0c) * field_0x1d0 * 9.536743e-07f,
+            PixelFormatBytesPerPixel(field_0x0c) * peak * 9.536743e-07f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
                                                                 field_0x1e0.LargestRecentSample());
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
@@ -617,11 +617,11 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, " 32:    %02d        %02d",
                                                                 field_0x1fc[5], field_0x220[5]);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
-            field_0x254, "TexMemRequested:%.2fM", (float)UnknownFunction511970(field_0x0c) * field_0x244 * 1.2715658e-06f);
+            field_0x254, "TexMemRequested:%.2fM", (float)PixelFormatBytesPerPixel(field_0x0c) * field_0x244 * 1.2715658e-06f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
-            field_0x254, "TexMemGranted:%.2fM", (float)UnknownFunction511970(field_0x0c) * field_0x248 * 1.2715658e-06f);
+            field_0x254, "TexMemGranted:%.2fM", (float)PixelFormatBytesPerPixel(field_0x0c) * field_0x248 * 1.2715658e-06f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
-            field_0x254, "TexMemManaged:%.2fM", (float)UnknownFunction511970(field_0x0c) * field_0x24c * 1.2715658e-06f);
+            field_0x254, "TexMemManaged:%.2fM", (float)PixelFormatBytesPerPixel(field_0x0c) * field_0x24c * 1.2715658e-06f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Textures Blted %d", field_0x144.m_count);
     }
 }
@@ -684,8 +684,8 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                 long sourcePitch;
                 void* source = selected->UnknownVirtualSlot13(0, &sourcePitch, 0x811);
                 if (source) {
-                    int sourceSize = UnknownFunction511970(selected->field_0x20);
-                    int size = UnknownFunction511970(target->field_0x28);
+                    int sourceSize = PixelFormatBytesPerPixel(selected->field_0x20);
+                    int size = PixelFormatBytesPerPixel(target->field_0x28);
                     ConvertPixels(bits + x * size + 20 * pitch, source, selected->field_0x14,
                                           selected->field_0x18, pitch / size, sourcePitch / sourceSize,
                                           target->field_0x28, selected->field_0x20, 0, selected->field_0x2c, 0, 0);
@@ -755,8 +755,8 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                     memset(&locked, 0, sizeof(locked));
                     locked.size = sizeof(locked);
                     if (!level->Lock(0, &locked, 0x811, 0)) {
-                        int sourceSize = UnknownFunction511970(managed->field_0x20);
-                        int size = UnknownFunction511970(target->field_0x28);
+                        int sourceSize = PixelFormatBytesPerPixel(managed->field_0x20);
+                        int size = PixelFormatBytesPerPixel(target->field_0x28);
                         ConvertPixels(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
                                               pitch / size, locked.pitch / sourceSize, target->field_0x28,
                                               managed->field_0x20, 0, managed->field_0x2c, 0, 0);

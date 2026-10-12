@@ -364,8 +364,8 @@ int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* blo
             sprintf(schedule->field_0x00[i].field_0x00, "%s", value);
             g_TrackGame->mode.FindFileDirectory((int)directory, schedule->field_0x00[i].field_0x00,
                                                              "env", path);
-            g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
-            g_TrackGame->sceneObject->UnknownFunction4ea010(key, schedule->field_0x00[i].field_0x00, 0,
+            g_TrackGame->sceneObject->SetSceneDirectory(path);
+            g_TrackGame->sceneObject->ReadSceneName(key, schedule->field_0x00[i].field_0x00, 0,
                                                                       "scn", 0, 0);
             schedule->field_0x00[i].field_0x04 = (char*)DebugMalloc(strlen(key) + 1, __FILE__, 453);
             strcpy(schedule->field_0x00[i].field_0x04, key);

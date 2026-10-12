@@ -9,7 +9,7 @@
   "?GetLobbyPreset@UnknownTrackGameObject3410@@QAEHPADI@Z": "0x004aa360",
   "?GetLobbyRank@UnknownTrackGameObject3410@@QAEHPADI@Z": "0x004aa4e0",
   "?SubmitScores@UnknownTrackGameObject3410@@QAEHIPAX0@Z": "0x004aa670",
-  "?UnknownFunction4ea010@UnknownTrackGameObject574@@QAEXPAD0HPBDPAH2@Z": "0x004ea010",
+  "?ReadSceneName@UnknownTrackGameObject574@@QAEXPAD0HPBDPAH2@Z": "0x004ea010",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
   "?SendDebugMessage@@YAXPBDZZ": "0x00520820",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",

@@ -2009,14 +2009,14 @@ int UIDialog::UnknownVirtualSlot13() {
             UIControl* control;
             while ((control = (UIControl*)iterator.Next()) != 0) {
                 if (control->backgroundRegion >= 0 && (!control->needsRedraw || control->redrawFrames))
-                    dialogBackground->UnknownFunction404240(control->backgroundRegion,
+                    dialogBackground->SetRegionRect(control->backgroundRegion,
                                                                (CameraRect*)&control->screenArea);
             }
         }
         GameObject::UnknownVirtualSlot13();
     } else if (screenGrab && !controlsPost3D) {
         if (dialogBackground)
-            dialogBackground->UnknownFunction404480(screenGrab, &screenArea, 0, 0x1000000,
+            dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &field_0x7f4c, 0);
         else
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
@@ -2038,7 +2038,7 @@ int UIDialog::UnknownVirtualSlot15() {
         GameObject::UnknownVirtualSlot15();
     } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
-            dialogBackground->UnknownFunction404480(screenGrab, &screenArea, 0, 0x1000000,
+            dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &field_0x7f4c, 0);
         else
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
@@ -2464,7 +2464,7 @@ int UIControl::UnknownVirtualSlot15() {
     BackgroundImage* background = ownerDialog->dialogBackground;
     if (background && backgroundRegion > -1 &&
         (!shown || (last && (!last->shown || last->transitionState))))
-        background->UnknownFunction404cb0(backgroundRegion);
+        background->MarkRegionPending(backgroundRegion);
     return result;
 }
 
@@ -3520,13 +3520,13 @@ int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* c
         g_UnknownGlobal65b588 = &g_UnknownGlobal65b5f0;
         g_UnknownGlobal65b5f0 = *rect;
         if (control) {
-            g_UnknownGlobal65b5ec = dialogBackground->UnknownFunction4049d0(
+            g_UnknownGlobal65b5ec = dialogBackground->GetDc(
                 dc, rect, control->backgroundRegion, control->needsRedraw, &control->redrawFrames, a,
                 &g_UnknownGlobal65b5f0);
         } else {
             int frames = 1;
             g_UnknownGlobal65b5ec =
-                dialogBackground->UnknownFunction4049d0(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
+                dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
         }
     } else {
         ((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(dc);
@@ -3973,7 +3973,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         } else {
             sprintf(path, "%s%s", directory ? directory : "", name);
         }
-        resourceArchive = g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 0);
+        resourceArchive = g_UnknownResourceManager572b44->AddArchive(path, 0);
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
         UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         if (stream->UnknownFunction460f50(path, "r", 0)) {
@@ -4126,7 +4126,7 @@ int UIControl::Draw() {
     if (drawnTexture) {
         GetImageRect((CameraRect*)screenArea, &rect);
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, &rect, visibleArea,
+            ownerDialog->dialogBackground->DrawImage((PCTextureMap*)drawnTexture, &rect, visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
@@ -4310,7 +4310,7 @@ int UIScrollBar::Draw() {
             rect.right = track->field_0x14 + rect.left;
         }
         if (ownerDialog->dialogBackground)
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)track, &rect, 0,
+            ownerDialog->dialogBackground->DrawImage((PCTextureMap*)track, &rect, 0,
                                                            track->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
         else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, track, 0,
@@ -4332,7 +4332,7 @@ int UIScrollBar::Draw() {
             rect.right = thumbWidth + rect.left;
         }
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)thumb, &rect, 0,
+            ownerDialog->dialogBackground->DrawImage((PCTextureMap*)thumb, &rect, 0,
                                                            thumb->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             if (stateImages[currentState]->frameCount == 1)
@@ -4548,7 +4548,7 @@ int UIListBox::Draw() {
     int done = 1;
     if (drawnTexture) {
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
+            ownerDialog->dialogBackground->DrawImage((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
                                                            visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
@@ -4625,7 +4625,7 @@ int UIListBox::Draw() {
                         }
                         TextureMap* texture = rowTable[row].image->GetCurrentFrame()->frameTexture;
                         if (ownerDialog->dialogBackground) {
-                            ownerDialog->dialogBackground->UnknownFunction404480(
+                            ownerDialog->dialogBackground->DrawImage(
                                 (PCTextureMap*)texture, &rect, 0, texture->field_0x30 ? 0x1008000 : 0x1000000,
                                 backgroundRegion, needsRedraw, &redrawFrames, 0);
                             if (rowTable[row].image->frameCount > 1) {
@@ -4926,7 +4926,7 @@ int UIProgressBar::Draw() {
         rect.right = (int)(source.right * owner->scaleX + rect.left);
         rect.bottom = (int)(source.bottom * owner->scaleY + rect.top);
         if (owner->dialogBackground) {
-            owner->dialogBackground->UnknownFunction404480((PCTextureMap*)barTexture, &rect, &source,
+            owner->dialogBackground->DrawImage((PCTextureMap*)barTexture, &rect, &source,
                                                       barTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                       backgroundRegion, needsRedraw, &redraw, 0);
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(

@@ -196,7 +196,7 @@ int GameCursor::UnknownVirtualSlot15() {
 
     if (field_0x44) {
         PCTextureMap* frame = field_0x38 ? (PCTextureMap*)field_0x38 : field_0x34;
-        field_0x44->UnknownFunction404700(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
+        field_0x44->DrawImageRect(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
                                           (frame->field_0x30 != 0) + 0x10, field_0x48, 0, &field_0x4c, 0);
     } else if (field_0x38) {
         if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, ((PCTextureMap*)field_0x38)->systemSurface, &s_source,

@@ -13,7 +13,7 @@
   "?GetTexture@FontTexture@@QAEPAVTextureMap@@XZ": "0x004673c0",
   "?UnknownFunction4673d0@FontTexture@@SAPAV1@PBD00HPAVTextureMapManager@@H@Z": "0x004673d0",
   "?UnknownFunction467760@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x00467760",
-  "?UnknownFunction4e9030@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
+  "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
   "?SelectFont@UnknownOverlayText@@QAEXPBD@Z": "0x0050ade0",
   "?SetFont@UnknownOverlayText@@QAEXIPAVFontTexture@@@Z": "0x0050ae60",
   "?Create@UnknownOverlayText@@SAPAV1@PBDPAPBDHHPAVTextureMapManager@@MMMMH@Z": "0x0050ae80",

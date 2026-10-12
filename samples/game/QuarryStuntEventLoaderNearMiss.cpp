@@ -287,7 +287,7 @@ struct UnknownQuarryOverlayHooks {
 
 // The bytes the render target's colour buffers take.
 static inline int FrameBufferBytes(RenderTarget* target) {
-    return UnknownFunction511970(target->field_0x28) * (target->field_0x14 + 1) * target->field_0x10 *
+    return PixelFormatBytesPerPixel(target->field_0x28) * (target->field_0x14 + 1) * target->field_0x10 *
            target->field_0x0c;
 }
 
@@ -328,7 +328,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (ecosystem[0]) {
         if (strstr(ecosystem, ".est"))
             strcpy(strstr(ecosystem, ".est"), ".esb");
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, ecosystem, "rb", 0))
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, ecosystem, "rb", 0))
             sprintf(text, "No Ecosystem found in env file.  Ecosystem not preloaed.\n");
         else
             UnknownFunction45c040(g_TrackGame->field_0x3c, ecosystem, stream, 0x115c);
@@ -530,7 +530,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(text, "Scene not created.\n");
         return 0;
     }
-    if (!eventScene->UnknownFunction4efb20(field_0x18, lightManager, (int)particleManager, (int)g_TrackGame->field_0x3c,
+    if (!eventScene->Load(field_0x18, lightManager, (int)particleManager, (int)g_TrackGame->field_0x3c,
                                            (int)&modelTextures, "Teraform\\Skies", (void (*)(int))progress,
                                            (int)ceil(sceneSteps * 0.1f)))
         return 0;
@@ -581,7 +581,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (eventFog)
             eventFog->UnknownFunction462db0(g_TrackGame->mode.videoSettings[4]);
         AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(field_0x18), -1);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->environment->cubeFile, "rb", 0)) {
+        if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
             if (stream)
                 delete stream;
@@ -598,7 +598,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Terrain");
-    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(field_0x44, eventScene->environment->terrainFile, "rb",
+    if (!g_TrackGame->sceneObject->OpenArchiveFile(field_0x44, eventScene->environment->terrainFile, "rb",
                                                                    (int)terrainPath)) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
@@ -627,7 +627,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         stream = new(__FILE__, 848) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (strstr(eventScene->environment->ecosystemFile, ".est"))
         strcpy(strstr(eventScene->environment->ecosystemFile, ".est"), ".esb");
-    if (stream && !g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->environment->ecosystemFile,
+    if (stream && !g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->ecosystemFile,
                                                                            "rb", 0)) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
@@ -753,7 +753,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     AppendChild(eventScene, -1);
 
     g_MemTagStack->Push("Shadow");
-    eventScene->UnknownFunction4edf20((ProjectedShadow*)projectedShadow, g_TrackGame->mode.field_0xa50);
+    eventScene->AttachCasterShadows((ProjectedShadow*)projectedShadow, g_TrackGame->mode.field_0xa50);
     g_MemTagStack->Pop(0);
     if (ecoSystem)
         AppendChild((GameObject*)ecoSystem, -1);
@@ -860,7 +860,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         g_TrackGame->field_0x3c->ShareCacheLimit();
     }
     g_MemTagStack->Pop(0);
-    eventScene->UnknownFunction4eff30(g_TrackGame->mode.videoSettings[2]);
+    eventScene->SetDetailLevel(g_TrackGame->mode.videoSettings[2]);
     raceView->UnknownFunction423790(g_TrackGame->mode.videoSettings[2]);
     if (progress)
         progress(0);

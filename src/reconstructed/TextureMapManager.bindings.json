@@ -45,7 +45,7 @@
   "?GrowSecondScratchBuffer@TextureMapManager@@QAEPAXI@Z": "0x00511370",
   "?ShareCacheLimit@TextureMapManager@@QAEHXZ": "0x005113d0",
   "?CountTextureMemory@TextureMapManager@@QAEXXZ": "0x00511580",
-  "?UnknownFunction511970@@YAHH@Z": "0x00511970",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot10@TextureMapManager@@UAEHM@Z": "0x00510dd0",
   "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",

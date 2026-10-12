@@ -20,7 +20,7 @@ int HasMipLevels(int fileFormat);
 int DecodedFormat(int fileFormat);
 
 // 0x00511970: bytes per pixel of a pixel format.
-int UnknownFunction511970(int format);
+int PixelFormatBytesPerPixel(int format);
 
 // 0x005119c0: fills a DirectDraw pixel format for a pixel format.
 void FillPixelFormat(int format, void* pixelFormat);

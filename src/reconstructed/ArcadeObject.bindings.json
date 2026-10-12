@@ -32,7 +32,7 @@
   "?UnknownFunction444d80@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction4a2da0@MemTagStack@@QAEXPAD@Z": "0x004a2da0",
-  "?UnknownFunction4e9cd0@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
+  "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
   "?SetAxesPtr@D3DIMSoultreeObject@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
   "?SetPosition@D3DIMSoultreeObject@@QAEXPBUVector3@@@Z": "0x004fc660",
   "?UnknownFunction4fceb0@D3DIMSoultreeObject@@QAEXUVector3@@M@Z": "0x004fceb0",

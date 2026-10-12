@@ -73,13 +73,13 @@ int UnknownTrackGameObject574::UnknownFunction4e9ac0(unsigned long* info, char* 
 }
 
 // 0x004e9b80
-void UnknownTrackGameObject574::UnknownFunction4e9b80(char* path)
+void UnknownTrackGameObject574::SetSceneDirectory(char* path)
 {
     strncpy(field_0x44, path, 0x103);
 }
 
 // 0x004e9ba0: keeps the open archive when it already is `name`.
-UnknownTextureStream* UnknownTrackGameObject574::UnknownFunction4e9ba0(const char* name)
+UnknownTextureStream* UnknownTrackGameObject574::OpenSceneArchive(const char* name)
 {
     char scene[0x40];
     char path[0x104];
@@ -96,7 +96,7 @@ UnknownTextureStream* UnknownTrackGameObject574::UnknownFunction4e9ba0(const cha
         g_UnknownResourceManager572b44->RemoveArchiveItems(field_0x00);
         delete field_0x00;
     }
-    field_0x00 = g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 1);
+    field_0x00 = g_UnknownResourceManager572b44->AddArchive(path, 1);
     if (!field_0x00) {
         field_0x04[0] = 0;
         return 0;
@@ -112,7 +112,7 @@ UnknownTextureStream* UnknownTrackGameObject574::UnknownFunction4e9ba0(const cha
 // succeeds only inside an archive (an inner stream at +0x1c), then copies the
 // opened name to `a` (a char buffer) when given. Otherwise it frees `stream`
 // and allocates a replacement that nothing keeps.
-int UnknownTrackGameObject574::UnknownFunction4e9cd0(UnknownTextureStream* stream, const char* name,
+int UnknownTrackGameObject574::OpenArchiveFile(UnknownTextureStream* stream, const char* name,
                                                      const char* mode, int a)
 {
     char drive[_MAX_DRIVE];
@@ -141,19 +141,19 @@ int UnknownTrackGameObject574::UnknownFunction4e9cd0(UnknownTextureStream* strea
 }
 
 // 0x004e9e30: selects scene `name`.`kind` and reads whether it is named.
-void UnknownTrackGameObject574::UnknownFunction4e9e30(char* name, const char* kind, int value)
+void UnknownTrackGameObject574::SelectScene(char* name, const char* kind, int value)
 {
     char sceneName[0x40];
     char buffer[0x104];
 
     sprintf(buffer, "%s.%s", name, kind);
     strncpy(field_0x24c, buffer, 0x3f);
-    UnknownFunction4e9f70(name);
-    UnknownFunction4e9ba0(0);
+    SetSceneFileNames(name);
+    OpenSceneArchive(0);
     UnknownTextureStream* stream =
         new(__FILE__, 297) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (stream->UnknownFunction460f50(field_0x24c, "r", 0)) {
-        UnknownFunction4ea390(sceneName, field_0x24c, value);
+        ReadCurrentSceneName(sceneName, field_0x24c, value);
         if (value && !_stricmp(sceneName, "NO NAME"))
             field_0x38c = 0;
         else
@@ -165,7 +165,7 @@ void UnknownTrackGameObject574::UnknownFunction4e9e30(char* name, const char* ki
 }
 
 // 0x004e9f70
-void UnknownTrackGameObject574::UnknownFunction4e9f70(const char* name)
+void UnknownTrackGameObject574::SetSceneFileNames(const char* name)
 {
     char buffer[0x104];
 
@@ -180,7 +180,7 @@ void UnknownTrackGameObject574::UnknownFunction4e9f70(const char* name)
 
 // 0x004ea010: as 0x004ea390 for scene `name` (with extension `kind` when
 // it has none), opened through 0x004e9ba0.
-void UnknownTrackGameObject574::UnknownFunction4ea010(char* out, char* name, int index,
+void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
                                                       const char* kind, int* a, int* b)
 {
     char path[0x104];
@@ -198,7 +198,7 @@ void UnknownTrackGameObject574::UnknownFunction4ea010(char* out, char* name, int
             strncpy(scene, name, 0x3f);
         sprintf(path, "%s\\%s", field_0x44, scene);
         UnknownParameterBlock block;
-        UnknownTextureStream* archive = UnknownFunction4e9ba0(scene);
+        UnknownTextureStream* archive = OpenSceneArchive(scene);
         if (archive) {
             archive->UnknownFunction461cb0(a, b);
             block.UnknownFunction4b7220((UnknownParameterStream*)archive, scene, path, 0);
@@ -241,7 +241,7 @@ void UnknownTrackGameObject574::UnknownFunction4ea010(char* out, char* name, int
 // 0x004ea390: reads the scene name (value 0) or waypoint race `value`'s
 // name from the scene's SceneInfo section; "NO NAME" when missing. The
 // archive is passed through Parameterblocks.h's view of the stream class.
-void UnknownTrackGameObject574::UnknownFunction4ea390(char* name, char* scene, int value)
+void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, int value)
 {
     char path[0x104];
     char base[0x104];
@@ -249,7 +249,7 @@ void UnknownTrackGameObject574::UnknownFunction4ea390(char* name, char* scene, i
     if (field_0x44[0]) {
         sprintf(path, "%s\\%s", field_0x44, scene);
         UnknownParameterBlock block;
-        block.UnknownFunction4b7220((UnknownParameterStream*)UnknownFunction4e9ba0(0), scene, path, 1);
+        block.UnknownFunction4b7220((UnknownParameterStream*)OpenSceneArchive(0), scene, path, 1);
         block.UnknownFunction4b78f0("SceneInfo");
         block.UnknownFunction4b7f10("NumberOfWaypointRaces", 0, &field_0x390);
         if (value) {
@@ -942,7 +942,7 @@ int Scene::OpenResourceFiles()
             sprintf(name, "%s\\%s", "Res", file);
             if (!g_TrackGame->UnknownVirtualSlot18(name, path))
                 return 0;
-            g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 0);
+            g_UnknownResourceManager572b44->AddArchive(path, 0);
             sprintf(key, "ResourceFile%d", ++i);
         }
         return 1;
@@ -975,7 +975,7 @@ void Scene::ReadStadium()
 
 // 0x004edf20: attaches a new shadow receiver for `shadow` to each caster and
 // adds it as a child.
-void Scene::UnknownFunction4edf20(ProjectedShadow* shadow, int flags)
+void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
 {
     if (shadow && staticModels) {
         for (int i = 0; i < staticModels->casterCount; i++)
@@ -1116,13 +1116,13 @@ int Scene::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* e
 // an emitter in `lights` for each light that emits; then the fog, resource
 // files, stadium and the 0x004ecd60/0x004edfe0/0x004ef4c0 parts. Returns 0
 // when a part fails.
-int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int a4, int a5,
+int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
                                  const char* cubeDirectory, void (*progress)(int), int interval)
 {
     int logProgress;
     char path[0x104];
 
-    UnknownTextureStream* archive = sceneManager->UnknownFunction4e9ba0(0);
+    UnknownTextureStream* archive = sceneManager->OpenSceneArchive(0);
     if (!archive)
         return 0;
     sprintf(scenePath, "%s\\%s", sceneManager->field_0x44, sceneManager->field_0x24c);
@@ -1139,7 +1139,7 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
     } else {
         logFile = 0;
     }
-    sceneManager->UnknownFunction4ea390(sceneName, sceneManager->field_0x24c, 0);
+    sceneManager->ReadCurrentSceneName(sceneName, sceneManager->field_0x24c, 0);
     UnknownFunction4de580("SceneInfo", "SceneName", sceneName);
     ReadVector(&defaultStartPosition, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
     ReadVector(&defaultStartDirection, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
@@ -1188,7 +1188,7 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
 
 // 0x004eff30: selects the detail table and applies `level` to every entry's
 // object and to the shadow casters, re-enabling those without flag 2.
-void Scene::UnknownFunction4eff30(int level)
+void Scene::SetDetailLevel(int level)
 {
     g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8
                                                               : g_UnknownGlobal574428;
@@ -1423,7 +1423,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
 // static model plus animation count (at least 1).
 int Scene::CountObjects(int* count)
 {
-    UnknownTextureStream* archive = sceneManager->UnknownFunction4e9ba0(0);
+    UnknownTextureStream* archive = sceneManager->OpenSceneArchive(0);
     if (!archive)
         return 0;
     int animations;
@@ -1509,7 +1509,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
     char modelPath[0x108];
     char modelMessage[0x204];
 
-    UnknownTextureStream* archive = sceneManager->UnknownFunction4e9ba0(0);
+    UnknownTextureStream* archive = sceneManager->OpenSceneArchive(0);
     if (!archive)
         return 0;
     UnknownSceneResourceManager resources;

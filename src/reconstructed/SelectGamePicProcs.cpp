@@ -229,13 +229,13 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                 }
             }
             g_TrackGame->mode.FindFileDirectory((int)directory, entry, kind, found);
-            g_TrackGame->sceneObject->UnknownFunction4e9b80(found);
+            g_TrackGame->sceneObject->SetSceneDirectory(found);
             series = g_TrackGame->mode.UnknownFunction524100();
             if (_strnicmp(entry, "Quarry01.env", strlen(entry)) && _strnicmp(entry, "Nat04.env", strlen(entry)))
                 series = -1;
             if (g_TrackGame->mode.field_0x27f8.field_0x04 != 1 &&
                 g_TrackGame->mode.field_0x27f8.field_0x04 != 5) {
-                g_TrackGame->sceneObject->UnknownFunction4ea010(text, entry, 0, "scn", &x, &y);
+                g_TrackGame->sceneObject->ReadSceneName(text, entry, 0, "scn", &x, &y);
                 int row;
                 if (g_TrackGame->network && g_TrackGame->network->isHost)
                     row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, x, y);
@@ -254,7 +254,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                         sprintf(file, "%ss.tga", entry);
                 }
                 sprintf(path, "%s\\%s", directory, file);
-                if (g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file))
+                if (g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)file))
                     pictures->AddImageFileRow(file, row, 1, 0);
                 else if (g_TrackGame->UnknownVirtualSlot18(path, found))
                     pictures->AddImageFileRow(found, row, 0, 0);
@@ -264,10 +264,10 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     g_TrackGame->LoadResourceString(0x143b, text, 128);
                 list->AddRow(text, row, 0);
             } else {
-                g_TrackGame->sceneObject->UnknownFunction4ea010(text, entry, 1, "scn", 0, 0);
+                g_TrackGame->sceneObject->ReadSceneName(text, entry, 1, "scn", 0, 0);
                 int count = g_TrackGame->sceneObject->field_0x390;
                 for (int scene = 1; scene <= count; scene++) {
-                    g_TrackGame->sceneObject->UnknownFunction4ea010(text, entry, scene, "scn", &x, &y);
+                    g_TrackGame->sceneObject->ReadSceneName(text, entry, scene, "scn", &x, &y);
                     int row;
                     if (g_TrackGame->network && g_TrackGame->network->isHost)
                         row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, x, y);
@@ -278,7 +278,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     else
                         sprintf(file, "%s%02ds.tga", entry, scene);
                     sprintf(path, "%s\\%s", directory, file);
-                    if (g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file))
+                    if (g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)file))
                         pictures->AddImageFileRow(file, row, 1, 0);
                     else if (g_TrackGame->UnknownVirtualSlot18(path, found))
                         pictures->AddImageFileRow(found, row, 0, 0);
@@ -300,9 +300,9 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             *value = 0;
     }
     if (strcmp(selected, "")) {
-        g_TrackGame->sceneObject->UnknownFunction4e9e30(selected, "scn", 0);
+        g_TrackGame->sceneObject->SelectScene(selected, "scn", 0);
         if (g_TrackGame->sceneObject->field_0x38c) {
-            g_TrackGame->sceneObject->UnknownFunction4ea390(text, g_TrackGame->sceneObject->field_0x24c, b);
+            g_TrackGame->sceneObject->ReadCurrentSceneName(text, g_TrackGame->sceneObject->field_0x24c, b);
             list->SelectRowByText(text);
             int row = list->GetSelectedRow();
             if (value)
@@ -1329,13 +1329,13 @@ void MultiPlayerDlg::FollowTrackChange() {
     g_TrackGame->mode.FindFileDirectory((int)scene, g_TrackGame->mode.field_0x27f8.field_0x36, "env", path);
     index = 0;
     value = 0;
-    g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
+    g_TrackGame->sceneObject->SetSceneDirectory(path);
     if (g_TrackGame->mode.UnknownFunction524100() == 1 || g_TrackGame->mode.UnknownFunction524100() == 5)
-        g_TrackGame->sceneObject->UnknownFunction4ea010(sceneName, g_TrackGame->mode.field_0x27f8.field_0x36,
+        g_TrackGame->sceneObject->ReadSceneName(sceneName, g_TrackGame->mode.field_0x27f8.field_0x36,
                                                                   g_TrackGame->mode.field_0x27f8.field_0x34, "scn", &index,
                                                                   &value);
     else
-        g_TrackGame->sceneObject->UnknownFunction4ea010(sceneName, g_TrackGame->mode.field_0x27f8.field_0x36, 0,
+        g_TrackGame->sceneObject->ReadSceneName(sceneName, g_TrackGame->mode.field_0x27f8.field_0x36, 0,
                                                                   "scn", &index, &value);
     if (!_stricmp("no name", sceneName)) {
         g_UnknownGlobal689dfc = 2;
@@ -1801,7 +1801,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
     else
         sprintf(file, "%ss.tga", name);
     sprintf(path, "%s\\%s", directory, file);
-    if (g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file)) {
+    if (g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)file)) {
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
     } else if (g_TrackGame->UnknownVirtualSlot18(path, found)) {
         static_cast<UIListBox*>(picture)->AddImageFileRow(found, 0, 1, 0);

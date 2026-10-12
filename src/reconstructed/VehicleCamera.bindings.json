@@ -13,7 +13,7 @@
   "?GetPosition@UnknownVehiclePart@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?GetPositionIn@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
-  "?UnknownFunction52b9e0@VehicleCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x0052b9e0",
+  "?SetupVehicleCamera@VehicleCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x0052b9e0",
   "?UnknownFunction52bac0@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bac0",
   "?TargetPoint@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bb60",
   "?UnknownFunction52bc50@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bc50",

@@ -203,7 +203,7 @@ SoundEmitter* SoundEmitter::UnknownFunction402260(void* target, const char* name
         strncpy(field_0x48, name, sizeof(field_0x48) - 1);
         field_0x48[sizeof(field_0x48) - 1] = 0;
         sprintf(path, "%s\\%s", "Res", field_0x48);
-        found = g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)field_0x48);
+        found = g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)field_0x48);
     }
     if (!found) {
         if (stream)

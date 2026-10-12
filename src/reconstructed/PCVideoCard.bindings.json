@@ -43,7 +43,7 @@
   "?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z": "0x004cb330",
   "?SetGDISurfaceVisible@UnknownDisplay@@QAEHH@Z": "0x004cb5b0",
   "?UnknownFunction4e8cc0@RenderTarget@@QAEXXZ": "0x004e8cc0",
-  "?UnknownFunction511970@@YAHH@Z": "0x00511970",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?FillPixelFormat@@YAXHPAX@Z": "0x005119c0",
   "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
   "?FreeFile@@YAXPAUUnknownTgaFile@@@Z": "0x00512dd0",

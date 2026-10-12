@@ -65,7 +65,7 @@
   "?UnknownFunction4b7ec0@UnknownParameterBlock@@QAEHPBD0PADH@Z": "0x004b7ec0",
   "?UnknownFunction4b7f10@UnknownParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
-  "?UnknownFunction4e9030@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
+  "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?LoadProfile@TrackGameMode@@QAEHXZ": "0x005231f0",
   "?LoadBonusTrackNames@TrackGameMode@@QAEXXZ": "0x00523e50",

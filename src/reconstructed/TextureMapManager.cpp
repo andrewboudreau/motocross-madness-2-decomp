@@ -334,12 +334,12 @@ void TextureMapManager::CountTextureMemory() {
             if (texture->field_0x14 == 256)
                 count256++;
             kind |= texture->field_0x14 > texture->field_0x1c;
-            kind |= UnknownFunction511970(texture->field_0x20) == 1 ? 8 : 0;
+            kind |= PixelFormatBytesPerPixel(texture->field_0x20) == 1 ? 8 : 0;
             int pixels = 0;
             for (int width = texture->field_0x14, height = texture->field_0x18; width >= texture->field_0x1c;
                  width /= 2, height /= 2)
                 pixels += height * width;
-            bytes += UnknownFunction511970(texture->field_0x20) * pixels;
+            bytes += PixelFormatBytesPerPixel(texture->field_0x20) * pixels;
             cost += g_TrackGame->display->field_0x14[kind];
         }
     }

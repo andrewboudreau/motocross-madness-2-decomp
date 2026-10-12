@@ -195,7 +195,7 @@ int DecodedFormat(int fileFormat) {
 
 // 0x00511970: bytes per pixel of a pixel format. The 16-bit formats return
 // separately; VC6 merges them into the block retail places first.
-int UnknownFunction511970(int format) {
+int PixelFormatBytesPerPixel(int format) {
     switch (format) {
     case 8:
         return 1;

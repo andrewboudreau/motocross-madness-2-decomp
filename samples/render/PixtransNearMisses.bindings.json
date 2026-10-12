@@ -57,7 +57,7 @@
   "?UnknownFunction4de270@UnknownTexturePalette@@QAEPAEXZ": "0x004de270",
   "?UnknownFunction4de280@UnknownTexturePalette@@QAEPAEXZ": "0x004de280",
   "?UnknownFunction4de290@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",
-  "?UnknownFunction511970@@YAHH@Z": "0x00511970",
+  "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?g_ditherCapacity@@3HA": "0x00689a6c",
   "?g_ditherRows@@3PAPAHA": "0x00689a70",
   "__FILE__:pixtrans.cpp": "0x00571688",

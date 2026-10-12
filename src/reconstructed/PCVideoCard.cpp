@@ -515,7 +515,7 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
         return 0;
     }
     int rows = texture->field_0x18;
-    int rowSize = UnknownFunction511970(texture->field_0x20) * texture->field_0x14;
+    int rowSize = PixelFormatBytesPerPixel(texture->field_0x20) * texture->field_0x14;
     char* source = (char*)desc.surface;
     while (rows--) {
         memcpy(bits, source, rowSize);

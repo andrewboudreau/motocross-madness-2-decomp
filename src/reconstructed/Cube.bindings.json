@@ -24,7 +24,7 @@
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461600@UnknownTextureStream@@QAEHXZ": "0x00461600",
   "?UnknownFunction461640@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
-  "?UnknownFunction50c6c0@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
+  "?AddTexture@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?BytesPerPixel@@YAHH@Z": "0x00511740",
   "?IsCompressedFormat@@YAHH@Z": "0x00511800",
   "_$E1": "0x0043d760",

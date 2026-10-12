@@ -612,8 +612,8 @@ void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
     }
     g_TrackGame->mode.FindFileDirectory(
         (int)directory, circuit->field_0x1285[series].field_0x00[circuit->field_0x44 - 1].field_0x00, "env", path);
-    g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
-    g_TrackGame->sceneObject->UnknownFunction4e9e30(
+    g_TrackGame->sceneObject->SetSceneDirectory(path);
+    g_TrackGame->sceneObject->SelectScene(
         circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00, "scn", 0);
     picture->SetImageFile(0, image);
 }

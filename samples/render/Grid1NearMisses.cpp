@@ -146,7 +146,7 @@ retry:
                                     g_grid1OwnTextureCount++;
                                     Terrain()->textureAgeManager->Register(
                                         &Extra()->blocks[block].ageEntry, (int (*)(void*))EvictBlockTexture,
-                                        this, block, UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
+                                        this, block, PixelFormatBytesPerPixel(Terrain()->nodeTextureFormat) * 0x40000 / 3);
                                 }
                             } else {
                                 stage = wanted;
@@ -228,7 +228,7 @@ createTexture:
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
     Terrain()->textureAgeManager->Register(&Extra()->ageEntry, EvictNodeTexture, this, 0,
-                                                  UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
+                                                  PixelFormatBytesPerPixel(Terrain()->nodeTextureFormat) * 0x40000 / 3);
 ownTexture:
     Extra()->texture = (ManagedTexture*)Extra()->field_0x10;
     ReleaseBlockCentres();
@@ -280,7 +280,7 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
 
     unsigned char* bits = (unsigned char*)texture->UnknownVirtualSlot13(0, 0, 0);
     unsigned char* out = texture->field_0x14 == 0x100 ? bits : g_grid1TextureBuffer;
-    int bpp = UnknownFunction511970(texture->field_0x20);
+    int bpp = PixelFormatBytesPerPixel(texture->field_0x20);
     int tileStride = bpp << 4;
     unsigned char* runs = (unsigned char*)Extra()->field_0x04 + index * 2;
     do {
@@ -361,7 +361,7 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
     unsigned char* out = (unsigned char*)texture->UnknownVirtualSlot13(0, 0, 0);
     int width = texture->field_0x14;
     int tileSize = width / 4;
-    int bpp = UnknownFunction511970(texture->field_0x20);
+    int bpp = PixelFormatBytesPerPixel(texture->field_0x20);
     int pitch = bpp * width;
     int tileStride = bpp * tileSize;
     unsigned char* runs = (unsigned char*)Extra()->field_0x04 + index * 2;

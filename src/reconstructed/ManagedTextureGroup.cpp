@@ -47,7 +47,7 @@ ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format,
     field_0x1cc = 0;
     field_0x1d0 = 0;
     field_0x74 = 0x10000;
-    field_0x78 = 6 / UnknownFunction511970(field_0x0c);
+    field_0x78 = 6 / PixelFormatBytesPerPixel(field_0x0c);
     field_0x1f8 = 0;
     field_0x1bc = 0;
     field_0x08 = 0;
@@ -120,7 +120,7 @@ int ManagedTextureGroup::SetPageCount(int count) {
 
 // 0x0050c6c0: the first texture of an 8-bit group supplies the pages'
 // palette.
-void ManagedTextureGroup::UnknownFunction50c6c0(ManagedTexture* texture) {
+void ManagedTextureGroup::AddTexture(ManagedTexture* texture) {
     if (field_0x0c == 8 && !field_0x1bc) {
         field_0x1bc = texture->texturePalette;
         for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {

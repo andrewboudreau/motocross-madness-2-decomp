@@ -3,7 +3,7 @@
   "?UnknownFunction4925a0@UnknownEventRacer@@QAEXPAU1@_N@Z": "0x004925a0",
   "?UnknownFunction496f90@UnknownEventRacer@@QAEXPAU1@@Z": "0x00496f90",
   "?UnknownFunction48d1e0@UnknownScoreBoard@@QAEXMM@Z": "0x0048d1e0",
-  "?UnknownFunction4a9f90@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0@Z": "0x004a9f90",
+  "?AnnounceFollowedRacer@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0@Z": "0x004a9f90",
   "?PlayItSound@RaceSound@@QAEXXZ": "0x004e5860",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",

@@ -14,7 +14,7 @@
 #include "../../src/reconstructed/ResourceManager.cpp"
 
 // 0x004e9030
-UnknownTextureStream* UnknownResourceManager::UnknownFunction4e9030(const char* path, int flags)
+UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int flags)
 {
     int count;
     char magic[4];

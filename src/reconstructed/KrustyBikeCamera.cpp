@@ -39,7 +39,7 @@ KrustyBikeCamera::~KrustyBikeCamera() {}
 KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float rate298,
                                                           float value228, float value2d0, float value2e8,
                                                           int capacity, int count, const int* list) {
-    if (!UnknownFunction416e80(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+    if (!SetupBikeCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
         return 0;
     LoadCameraFile("FlybyCam.vue");
     return this;
@@ -145,7 +145,7 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
         char text[260];
         g_TrackGame->LoadResourceString(cameraState + 0x13B9, text, 0x80);
         UnknownMessage message(text, 1.5f);
-        target->UnknownFunction51b540(&message);
+        target->ReplaceHeadMessage(&message);
     }
 }
 

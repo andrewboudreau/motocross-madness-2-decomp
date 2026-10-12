@@ -147,7 +147,7 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
 
     if (context->field_0x04) {
         ManagedTexture* texture = new (__FILE__, 0x2c3) ManagedTexture(context->field_0x00);
-        context->field_0x04->UnknownFunction50c6c0(texture);
+        context->field_0x04->AddTexture(texture);
         field_0x38[face].textures[index] = texture;
     } else {
         field_0x38[face].textures[index] = new (__FILE__, 0x2c8) PCTextureMap(context->field_0x00, 1);

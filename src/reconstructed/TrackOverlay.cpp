@@ -80,7 +80,7 @@ InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 
 // 0x00518770: loads the dial texture and places the needle for the
 // render target's size (the layout is for 640x480).
-InstrumentOverlay* InstrumentOverlay::UnknownFunction518770(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* a3)
+InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapManager* manager, UnknownInstrumentSource* a3)
 {
     UnknownOverlayRect rect;
     char name[260];
@@ -722,7 +722,7 @@ int StatsOverlay::DrawTagStandings()
             scores[count].racer = racer;
             count++;
         }
-        qsort(scores, count, sizeof(UnknownEventScore), UnknownFunction5199f0);
+        qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
         for (i = 0; i < count; i++) {
             if (scores[i].racer == view->field_0x38) {
                 own = i;
@@ -786,7 +786,7 @@ fail:
 }
 
 // 0x005199f0
-int UnknownFunction5199f0(const void* a, const void* b)
+int CompareScoresDescending(const void* a, const void* b)
 {
     const float* left = (const float*)a;
     const float* right = (const float*)b;
@@ -886,7 +886,7 @@ TextQueueOverlay::~TextQueueOverlay()
 }
 
 // 0x0051b320
-TextQueueOverlay* TextQueueOverlay::UnknownFunction51b320(void* target, UnknownOverlayRect rect)
+TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
 {
     GameObject::UnknownVirtualSlot8(target);
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
@@ -914,7 +914,7 @@ int TextQueueOverlay::UnknownVirtualSlot10(float frameTime)
     GameObject::UnknownVirtualSlot10(g_TrackGame->frameTime);
     if (field_0x50) {
         if (field_0x50->field_0x84 > field_0x50->field_0x80)
-            UnknownFunction51b670();
+            DropHeadMessage();
         if (field_0x50)
             field_0x50->field_0x84 += g_TrackGame->frameTime;
     }
@@ -947,7 +947,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
 }
 
 // 0x0051b540: replaces the head line with a copy of `message`.
-void TextQueueOverlay::UnknownFunction51b540(UnknownMessage* message)
+void TextQueueOverlay::ReplaceHeadMessage(UnknownMessage* message)
 {
     if (!field_0x50) {
         field_0x50 = new(__FILE__, 1451) UnknownMessage(*message);
@@ -960,7 +960,7 @@ void TextQueueOverlay::UnknownFunction51b540(UnknownMessage* message)
 }
 
 // 0x0051b5e0: appends a copy of `message`.
-void TextQueueOverlay::UnknownFunction51b5e0(UnknownMessage* message)
+void TextQueueOverlay::AppendMessage(UnknownMessage* message)
 {
     if (!field_0x50) {
         field_0x50 = new(__FILE__, 1469) UnknownMessage(*message);
@@ -976,7 +976,7 @@ void TextQueueOverlay::UnknownFunction51b5e0(UnknownMessage* message)
 }
 
 // 0x0051b670
-void TextQueueOverlay::UnknownFunction51b670()
+void TextQueueOverlay::DropHeadMessage()
 {
     UnknownMessage* head = field_0x50;
     if (head) {

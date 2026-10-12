@@ -60,7 +60,7 @@
 // entering clip's hit point, and the child loop, where retail reloads the
 // node from edi in the body instead of reusing the loop test's eax.
 
-// ChatOverlay::UnknownFunction51cf80 (0x0051cf80, 1953 bytes; candidate
+// ChatOverlay::Setup (0x0051cf80, 1953 bytes; candidate
 // 1947): the loader. Frame layout, calls, the font set-up and the
 // rectangles match once the side-panel rectangle is declared inside the
 // wide-screen block. Left: scheduling in that block (retail keeps the chat
@@ -247,7 +247,7 @@ int StatsOverlay::DrawStandings()
             count++;
         }
     }
-    qsort(scores, count, sizeof(UnknownEventScore), UnknownFunction5199f0);
+    qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
     for (i = 0; i < count; i++) {
         if (scores[i].racer == view->field_0x38) {
             own = i;
@@ -575,7 +575,7 @@ extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width,
 // 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
 // texture, the side panels on wide screens, the pen, two fonts and the
 // thirteen name-tag rectangles.
-ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMapManager* manager, void* camera,
+ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager, void* camera,
                                                 UnknownOverlayRect screen, UnknownOverlayRect cue)
 {
     const char* font;

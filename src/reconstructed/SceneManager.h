@@ -268,7 +268,7 @@ public:
     // 0x004eaec0: the entry object named like `path`'s file name.
     UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
     void UnknownFunction4eafd0(int index);
-    void UnknownFunction4eff30(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
+    void SetDetailLevel(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void UnknownFunction4eb000(float time);
     int RestartEntry(int index, float time, int force, int motion);
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1
@@ -281,7 +281,7 @@ public:
                               const char* def, int unused, UnknownParameterBlock* block);
     int ReadFog();                        // 0x004ebdb0: the "Fog" section
     int OpenResourceFiles();              // 0x004eca20: opens the "ResourceFiles" archives
-    void UnknownFunction4edf20(ProjectedShadow* shadow, int flags); // shadows for the casters
+    void AttachCasterShadows(ProjectedShadow* shadow, int flags); // shadows for the casters
     void ReadStadium();                   // 0x004ecc10: the "Stadium" section
     // 0x004ef9c0: one sound emitter's settings from `section`.
     void ReadSoundSettings(const char* section, char* file, int is3D,
@@ -301,7 +301,7 @@ public:
     void UnknownFolded4de580(const char* section, const char* key, const char* value);
     // 0x004efb20: loads the scene: its file, the start and podium positions,
     // the environment, lights, fog, resources, stadium and the rest.
-    int UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int a4, int a5,
+    int Load(void* owner, LightManager* lights, int a3, int a4, int a5,
                               const char* cubeDirectory, void (*progress)(int), int interval);
     // 0x004ecd60: reads "StaticModels": a model per "Model<n>", with its
     // physics object, collision points and particle emitters or its

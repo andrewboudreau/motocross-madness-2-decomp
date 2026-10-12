@@ -303,7 +303,7 @@ int GUIManager::UnknownVirtualSlot13() {
         rect.right = screenGrab->field_0x14;
         rect.bottom = screenGrab->field_0x18;
         if (guiBackground) {
-            guiBackground->UnknownFunction404480(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
+            guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
             GameObject::UnknownVirtualSlot13();
             return 0;
@@ -324,7 +324,7 @@ int GUIManager::UnknownVirtualSlot15() {
             rect.right = screenGrab->field_0x14;
             rect.bottom = screenGrab->field_0x18;
             if (guiBackground) {
-                guiBackground->UnknownFunction404480(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
+                guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
             } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
                 GameObject::UnknownVirtualSlot15();
                 return 0;
@@ -680,7 +680,7 @@ int ToolTip::UnknownVirtualSlot15() {
 
     if (shown) {
         if (tipGui && tipGui->guiBackground) {
-            tipGui->guiBackground->UnknownFunction404480(textTexture, &screenArea, &textArea, 0x1008000, backgroundRegion,
+            tipGui->guiBackground->DrawImage(textTexture, &screenArea, &textArea, 0x1008000, backgroundRegion,
                                                          0, &restoreFrames, 0);
             return 1;
         }
@@ -692,11 +692,11 @@ int ToolTip::UnknownVirtualSlot15() {
             return 0;
     } else if (tipGui && tipGui->guiBackground && backgroundRegion > -1) {
         if (restoreFrames > 0) {
-            tipGui->guiBackground->UnknownFunction404240(backgroundRegion, &screenArea);
+            tipGui->guiBackground->SetRegionRect(backgroundRegion, &screenArea);
             restoreFrames--;
             return 1;
         }
-        tipGui->guiBackground->UnknownFunction404cb0(backgroundRegion);
+        tipGui->guiBackground->MarkRegionPending(backgroundRegion);
     }
     return 1;
 }

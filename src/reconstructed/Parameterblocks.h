@@ -24,7 +24,7 @@ struct UnknownParameterArchiveEntry {
 class UnknownParameterArchive {
 public:
     UnknownParameterArchiveEntry* FindItem(const char* name, int a); // 0x004e9360: finds `name`
-    int UnknownFunction4e9030(const char* path, int flags);   // 0x004e9030: adds an archive
+    int AddArchive(const char* path, int flags);   // 0x004e9030: adds an archive
     void AddLooseFile(const char* name, const char* path); // 0x004e9430: loads `name` from `path`
 };
 

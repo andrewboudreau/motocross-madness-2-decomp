@@ -217,7 +217,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     int height;
 
     instrumentOverlay = new(__FILE__, 1412) InstrumentOverlay(g_TrackGame->mode.instrumentOverlayOn);
-    instrumentOverlay = instrumentOverlay->UnknownFunction518770((RenderTarget*)field_0x18, g_TrackGame->field_0x3c,
+    instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->field_0x3c,
                                                    (UnknownInstrumentSource*)raceCamera);
     if (!instrumentOverlay)
         sprintf(message, "Instrument Overlay not created.\n");
@@ -241,7 +241,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     cue.right = cue.left - (int)(width * -0.046875f);
 
     chatOverlay = new(__FILE__, 1433) ChatOverlay(1);
-    chatOverlay = chatOverlay->UnknownFunction51cf80((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen, cue);
+    chatOverlay = chatOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen, cue);
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
     if (chatOverlay && g_TrackGame->mode.field_0x6b4 == 1)
@@ -264,19 +264,19 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     text.right = 256;
     textQueue = new(__FILE__, 1463) TextQueueOverlay(0);
     text.top = text.bottom - 20;
-    textQueue = textQueue->UnknownFunction51b320(field_0x18, text);
+    textQueue = textQueue->Setup(field_0x18, text);
     if (!textQueue)
         sprintf(message, "TextQueueOverlay not created.\n");
 
     if (textQueue) {
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 1 || g_TrackGame->mode.field_0x27f8.field_0x04 == 5)
-            g_TrackGame->sceneObject->UnknownFunction4ea390(
+            g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->field_0x24c, g_TrackGame->mode.field_0x27f8.field_0x34);
         else
-            g_TrackGame->sceneObject->UnknownFunction4ea390(
+            g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->field_0x24c, 0);
         UnknownMessage line(name, 3.25f);
-        textQueue->UnknownFunction51b540(&line);
+        textQueue->ReplaceHeadMessage(&line);
     }
 }
 
@@ -302,7 +302,7 @@ void BaseQuarryEvent::ShowOnOffMessage(int id, int on) {
         g_TrackGame->LoadResourceString(0x1408, state, 0x80);
     sprintf(buffer, "%s %s", name, state);
     UnknownMessage message(buffer, 1.5f);
-    textQueue->UnknownFunction51b540(&message);
+    textQueue->ReplaceHeadMessage(&message);
 }
 
 // 0x004e0ce0
@@ -423,7 +423,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             ecoSystem->UnknownFunction4594c0(level);
         if (eventFog)
             eventFog->UnknownFunction462db0(level);
-        eventScene->UnknownFunction4eff30(level);
+        eventScene->SetDetailLevel(level);
         raceView->UnknownFunction423790(level);
         if (textQueue) {
             char text[0x80];
@@ -431,7 +431,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             g_TrackGame->LoadResourceString(0x14c4, text, 0x80);
             sprintf(buffer, "%s = %d", text, level + 1);
             UnknownMessage message(buffer, 1.5f);
-            textQueue->UnknownFunction51b540(&message);
+            textQueue->ReplaceHeadMessage(&message);
         }
         return 1;
     }
@@ -449,7 +449,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             ecoSystem->UnknownFunction4594c0(level);
         if (eventFog)
             eventFog->UnknownFunction462db0(level);
-        eventScene->UnknownFunction4eff30(level);
+        eventScene->SetDetailLevel(level);
         raceView->UnknownFunction423790(level);
         if (textQueue) {
             char text[0x80];
@@ -457,7 +457,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             g_TrackGame->LoadResourceString(0x14c4, text, 0x80);
             sprintf(buffer, "%s = %d", text, level + 1);
             UnknownMessage message(buffer, 1.5f);
-            textQueue->UnknownFunction51b540(&message);
+            textQueue->ReplaceHeadMessage(&message);
         }
         return 1;
     }
@@ -515,7 +515,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         g_TrackGame->LoadResourceString(0xbd6, text, 0x80);
         sprintf(buffer, "%s %s", name, text);
         UnknownMessage message(buffer, 3.25f);
-        textQueue->UnknownFunction51b5e0(&message);
+        textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(leave->field_0x08);
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
             g_TrackGame->eventManager->UnknownFunction45fbd0(leave->field_0x08);
@@ -525,7 +525,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         g_TrackGame->LoadResourceString(0xbd5, text, 0x80);
         sprintf(buffer, "%s %s", (char*)data + 4, text);
         UnknownMessage message(buffer, 3.25f);
-        textQueue->UnknownFunction51b5e0(&message);
+        textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(from);
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
             g_TrackGame->eventManager->UnknownFunction45fbd0(from);

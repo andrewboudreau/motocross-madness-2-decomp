@@ -160,7 +160,7 @@ void UnknownParameterBlock::UnknownFunction4b7220(UnknownParameterStream* stream
         UnknownParameterArchiveEntry* entry =
             stream->field_0x12c->FindItem(name, 0);
         if (!entry) {
-            if (!stream->field_0x12c->UnknownFunction4e9030(path, 0))
+            if (!stream->field_0x12c->AddArchive(path, 0))
                 stream->field_0x12c->AddLooseFile(name, path);
             entry = stream->field_0x12c->FindItem(name, 0);
             if (!entry) {

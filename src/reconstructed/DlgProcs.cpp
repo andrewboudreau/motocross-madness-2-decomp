@@ -1655,7 +1655,7 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
             UnknownEventRacer* racer = owner->field_0x34->field_0x38;
             if (racer)
                 racer->field_0x4a0 = 1;
-            g_TrackGame->field_0x568->UnknownFunction4a9d20();
+            g_TrackGame->field_0x568->PickFollowedRacer();
         }
         g_TrackGame->eventManager->UnknownFunction45cdc0(2);
         if (g_TrackGame->network) {
@@ -2278,9 +2278,9 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
             g_TrackGame->mode.UnknownFunction5240e0(header.series);
             g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                               header.trackName, "env", env);
-            g_TrackGame->sceneObject->UnknownFunction4e9b80(env);
+            g_TrackGame->sceneObject->SetSceneDirectory(env);
             rider->AddRow(header.riderName, 0, 0);
-            g_TrackGame->sceneObject->UnknownFunction4ea010(text, header.trackName, 0, "scn", 0, 0);
+            g_TrackGame->sceneObject->ReadSceneName(text, header.trackName, 0, "scn", 0, 0);
             COPY_TEXT(name, text, 128);
             if (!_stricmp(name, "no name"))
                 g_TrackGame->LoadResourceString(0x143b, name, 128);
@@ -2433,7 +2433,7 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
             g_TrackGame->mode.UnknownFunction5240e0(header.series);
             g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                               header.trackName, "env", env);
-            g_TrackGame->sceneObject->UnknownFunction4e9b80(env);
+            g_TrackGame->sceneObject->SetSceneDirectory(env);
             strcpy(name, "--");
             switch (header.raceKind) {
             case 3:
@@ -2451,12 +2451,12 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
             }
             laps->AddRow(name, 0, 0);
             rider->AddRow(header.riderName, 0, 0);
-            g_TrackGame->sceneObject->UnknownFunction4ea010(text, header.trackName, header.trackIndex,
+            g_TrackGame->sceneObject->ReadSceneName(text, header.trackName, header.trackIndex,
                                                                       "scn", 0, 0);
             if (!_stricmp(text, "no name")) {
                 g_TrackGame->LoadResourceString(0x143b, name, 128);
             } else if ((header.raceKind == 1 || header.raceKind == 5) && header.randomGates) {
-                g_TrackGame->sceneObject->UnknownFunction4ea010(text, header.trackName, 0, "scn", 0, 0);
+                g_TrackGame->sceneObject->ReadSceneName(text, header.trackName, 0, "scn", 0, 0);
                 sprintf(name, "%s, #%d", text, header.eventNumber);
             } else {
                 strcpy(name, text);

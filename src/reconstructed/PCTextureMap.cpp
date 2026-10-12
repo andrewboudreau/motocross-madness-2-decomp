@@ -29,7 +29,7 @@ PCTextureMap::~PCTextureMap() {
         if (field_0x24 != 1)
             scale = 4.0f / 3.0f;
         g_MemTagStack->UnknownFunction4a2e00(
-            (int)(UnknownFunction511970(field_0x20) * field_0x18 * field_0x14 * scale));
+            (int)(PixelFormatBytesPerPixel(field_0x20) * field_0x18 * field_0x14 * scale));
         systemSurface->Release();
         systemSurface = 0;
     }
@@ -43,8 +43,8 @@ PCTextureMap::~PCTextureMap() {
 
 // The larger of two formats' pixel sizes (re-evaluated, max-macro style).
 static inline int LargerPixelSize(int first, int second) {
-    return UnknownFunction511970(first) > UnknownFunction511970(second) ? UnknownFunction511970(first)
-                                                                         : UnknownFunction511970(second);
+    return PixelFormatBytesPerPixel(first) > PixelFormatBytesPerPixel(second) ? PixelFormatBytesPerPixel(first)
+                                                                         : PixelFormatBytesPerPixel(second);
 }
 
 // Reads `rows` rows of `rowSize` bytes; whether they were all read.
@@ -129,7 +129,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                     UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * levelHeight * levelSide);
                     break;
                 case 0x14:
-                    bits = field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(sourceFormat) * levelHeight *
+                    bits = field_0x10->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(sourceFormat) * levelHeight *
                                                                levelSide + 4);
                     if (!bits)
                         return 0;
@@ -155,7 +155,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                     desc.size = sizeof(desc);
                     if (surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
                         return 0;
-                    int stride = desc.pitch / UnknownFunction511970(format);
+                    int stride = desc.pitch / PixelFormatBytesPerPixel(format);
                     ConvertPixels(desc.surface, bits, levelSide, levelHeight, stride, levelSide, field_0x20,
                                           sourceFormat, 0, palette, alphaThreshold, key);
                     if (surface->Unlock(0))
@@ -203,7 +203,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
             UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * width * height);
             break;
         case 5:
-            bits = field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(sourceFormat) * width * height + 4);
+            bits = field_0x10->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(sourceFormat) * width * height + 4);
             if (!bits)
                 return 0;
             break;
@@ -220,7 +220,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                                       palette, 2)) {
                 width /= 2;
                 height /= 2;
-                memcpy(bits, buffer, UnknownFunction511970(sourceFormat) * width * height);
+                memcpy(bits, buffer, PixelFormatBytesPerPixel(sourceFormat) * width * height);
             }
         }
     }
@@ -243,7 +243,7 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
             if (field_0x24 != 1)
                 scale = 4.0f / 3.0f;
             g_MemTagStack->UnknownFunction4a2de0(
-                (int)(UnknownFunction511970(field_0x20) * field_0x18 * field_0x14 * scale));
+                (int)(PixelFormatBytesPerPixel(field_0x20) * field_0x18 * field_0x14 * scale));
             return 1;
         }
     }
@@ -439,7 +439,7 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
     } else {
         void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
         ConvertPixels(pixels, desc->surface, desc->width, desc->height, desc->width,
-                              desc->pitch / UnknownFunction511970(field_0x20), 8888, field_0x20, 0, 0, 0x80,
+                              desc->pitch / PixelFormatBytesPerPixel(field_0x20), 8888, field_0x20, 0, 0, 0x80,
                               0xff00ff);
         WriteTga32(pixels, desc->width, desc->height, 0, path, 32);
         DebugFree(pixels, __FILE__, 2154);
@@ -555,7 +555,7 @@ int PCTextureMap::UnknownVirtualSlot15(int filter) {
     UnknownSurfaceDesc desc;
     memset(&caps, 0, sizeof(caps));
     caps.caps = 0x401000;
-    bytesPerPixel = UnknownFunction511970(field_0x20);
+    bytesPerPixel = PixelFormatBytesPerPixel(field_0x20);
     UnknownSurfaceInterface* parent = systemSurface;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
@@ -649,7 +649,7 @@ int PCTextureMap::ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int c
         to.blue = (unsigned char)color;
         to.alpha = 0;
         ReplaceColor32(desc.surface, from, to, desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(8888));
+                              desc.pitch / PixelFormatBytesPerPixel(8888));
     }
     if (field_0x20 == 888) {
         UnknownPixel24 from;
@@ -662,16 +662,16 @@ int PCTextureMap::ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int c
         to.green = (unsigned char)(color >> 8);
         to.blue = (unsigned char)color;
         ReplaceColor24(desc.surface, from, to, desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(888));
+                              desc.pitch / PixelFormatBytesPerPixel(888));
     }
     if (field_0x20 == 555 || field_0x20 == 1555) {
         field_0x34 = field_0x38 = Pack555(color);
         ReplaceColor16(desc.surface, 0x7c1f, Pack555(color), desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(field_0x20));
+                              desc.pitch / PixelFormatBytesPerPixel(field_0x20));
     } else if (field_0x20 == 565) {
         field_0x34 = field_0x38 = Pack565(color);
         ReplaceColor16(desc.surface, 0xf81f, Pack565(color), desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(565));
+                              desc.pitch / PixelFormatBytesPerPixel(565));
     } else if (field_0x20 == 8) {
         field_0x34 = field_0x38 = field_0x2c->field_0x710[Pack555(color)];
         ReplaceColor8(desc.surface, field_0x2c->field_0x710[0x7c1f],

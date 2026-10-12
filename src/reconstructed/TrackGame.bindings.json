@@ -88,7 +88,7 @@
   "?Connect@DebugSocket@@QAEHPBDH@Z": "0x004ad3e0",
   "?InitializeSound@PCSoundInterface@@QAEJHHHHH@Z": "0x004be5a0",
   "?SetPrimaryVolume@PCSoundInterface@@QAEHJ@Z": "0x004be9b0",
-  "?UnknownFunction4e9030@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
+  "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
   "?SendDebugMessage@@YAXPBD@Z": "0x00520820",
   "?SendDebugMessage@@YAXPBDZZ": "0x00520820",
   "?SetMenuOpen@TrackGame@@QAEXHHH@Z": "0x00521860",

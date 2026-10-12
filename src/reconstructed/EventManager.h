@@ -23,7 +23,7 @@ struct UnknownEventScore {
     float value;
     UnknownEventRacer* racer;
 };
-int UnknownFunction5199f0(const void* a, const void* b); // cdecl 0x005199f0
+int CompareScoresDescending(const void* a, const void* b); // cdecl 0x005199f0
 
 // 16-byte record sorted with 0x0045d3d0.
 struct UnknownEventStanding {

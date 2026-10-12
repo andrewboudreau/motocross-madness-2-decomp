@@ -184,7 +184,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         idleMotionPlaying = 1;
     }
     if (dialogBackground)
-        dialogBackground->UnknownFunction404240(previewRegion, (CameraRect*)&previewArea);
+        dialogBackground->SetRegionRect(previewRegion, (CameraRect*)&previewArea);
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }
 

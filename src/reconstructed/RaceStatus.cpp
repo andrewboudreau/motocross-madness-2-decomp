@@ -279,7 +279,7 @@ int RankByScore(int keepRacing) {
                 count++;
             }
         }
-        qsort(scores, count, sizeof(UnknownEventScore), UnknownFunction5199f0);
+        qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
         for (i = 0; i < count; i++)
             scores[i].racer->field_0x784 = i + 1;
         if (!keepRacing) {

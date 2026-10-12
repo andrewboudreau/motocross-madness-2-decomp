@@ -117,7 +117,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     unsigned int x;
 
     format = g_TrackGame->renderTarget->field_0x28;
-    bytesPerPixel = UnknownFunction511970(format);
+    bytesPerPixel = PixelFormatBytesPerPixel(format);
     if (guiBackground)
         guiBackground->ReleaseDc();
     g_TrackGame->field_0x34->UnknownFunction468dd0("GUICursor");

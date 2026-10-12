@@ -216,8 +216,8 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
             }
             g_TrackGame->mode.FindFileDirectory((int)g_TrackGame->mode.seriesDirectories[directoryIndex],
                                                               track, "env", pattern);
-            g_TrackGame->sceneObject->UnknownFunction4e9b80(pattern);
-            g_TrackGame->sceneObject->UnknownFunction4ea010(display, track, digit, "scn", 0, 0);
+            g_TrackGame->sceneObject->SetSceneDirectory(pattern);
+            g_TrackGame->sceneObject->ReadSceneName(display, track, digit, "scn", 0, 0);
             static_cast<UIListBox*>(list)->AddRow(display, field_0x7f64, 0);
             count++;
             field_0x7f60 = (UnknownTrackRecordRow**)DebugRealloc(field_0x7f60, (field_0x7f64 + 1) * 4, __FILE__, 534);
