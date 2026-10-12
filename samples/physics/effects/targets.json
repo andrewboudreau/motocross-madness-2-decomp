@@ -115,8 +115,8 @@
     "candidate_symbol_contains": "??0DirtSprayParticleEmitter",
     "target_va": "0x004b9310",
     "target_size": 281,
-    "expect": "partial",
-    "notes": "12.8% (271 vs 281 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops",
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact with plain ParticleVec3 position/previousPosition, retail store order, previousPosition struct-copied from the zeroed position, and each random vector built in a temporary with a chained `v.x = v.y = v.z = ...` (retail stores z, y, x, then copies).",
     "bindings": "DirtSprayParticleEmitter.bindings.json"
   },
   {

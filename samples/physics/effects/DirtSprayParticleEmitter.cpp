@@ -8,27 +8,32 @@ DirtSprayParticleEmitter::DirtSprayParticleEmitter(int flags) : GameObject(flags
 {
     int i;
     firstUpdate = 1;
-    manager = 0;
     field_0x34 = 750.0f;
-    field_0x38 = 6.0f;
     field_0x3c = 1.0f;
+    field_0x38 = 6.0f;
     field_0x40 = 200.0f;
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
     launchVelocity.x = 0;
     launchVelocity.y = 2.0f;
     launchVelocity.z = 0;
+    previousPosition = position;
     field_0x64 = 0;
     field_0x68 = 0;
     field_0x5c = 0;
     field_0x60 = 0;
     field_0x6c = 0;
+    manager = 0;
     field_0x70 = 0x1e;
     field_0x480 = 0;
     field_0x604 = 0;
     for (i = 0; i < 256; i++)
         randomTable[i] = ((float)rand() / 32768.0f + 1.0f) * 0.25f;
     for (i = 0; i < 32; i++) {
-        float v = (float)rand() / 32768.0f * 0.5f + 0.75f;
-        randomVectors[i] = ParticleVec3(v, v, v);
+        ParticleVec3 v;
+        v.x = v.y = v.z = ((float)rand() / 32768.0f) * 0.5f + 0.75f;
+        randomVectors[i] = v;
     }
 }
 
