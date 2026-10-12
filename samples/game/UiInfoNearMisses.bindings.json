@@ -3,7 +3,7 @@
   "??_C@_01LHO@r?$AA@": "0x00566a38",
   "??_C@_05KEJO@?$CFs?2?$CFs?$AA@": "0x005667dc",
   "?UnknownFunction522440@TrackGameMode@@QAEXXZ": "0x00522440",
-  "?UnknownFunction522720@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z": "0x00522720",
+  "?ResetInterfaceOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z": "0x00522720",
   "?ResetSoundOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA20@@@Z": "0x00522780",
   "?ResetGraphicsOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA4c@@@Z": "0x005227d0",
   "?UnknownFunction522800@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA68@@@Z": "0x00522800",

@@ -127,15 +127,15 @@ struct UnknownTrackGameModeOptions6ac360 {
 };
 
 struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 bytes
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
+    int instrumentOverlayOn;                  // +0x00 (TrackGameMode +0x6ac)
+    int showRaceStatistics;                   // +0x04 (+0x6b0: TrackOverlay 0x00519980)
+    int chatInputLine;                        // +0x08 (+0x6b4: 1 shows the chat input line)
+    int showNameTags;                         // +0x0c (+0x6b8: TrackOverlay 0x005190e0)
     int field_0x10;
     int field_0x14;
     int field_0x18;
     int field_0x1c;
-    int field_0x20;
+    int introMovieOn;                         // +0x20 (+0x6cc: Intro1Dlg)
     int field_0x24;
     int field_0x28;
     int field_0x2c;
@@ -311,7 +311,7 @@ public:
     // clears the selected session, the racers and the entries.
     int ResetNetworkRace();
     // Reset helpers called by 0x00522440.
-    void UnknownFunction522720(UnknownTrackGameModeOptions6ac* options);
+    void ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options);
     void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);

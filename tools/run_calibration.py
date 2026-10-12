@@ -19258,7 +19258,7 @@ CASES = [
         'name': 'uiinfo.cpp TrackGameMode 0x522720 option defaults',
         'bindings': 'src/reconstructed/UiInfo.bindings.json',
         'source': 'src/reconstructed/UiInfo.cpp',
-        'symbol': '?UnknownFunction522720@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z',
+        'symbol': '?ResetInterfaceOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z',
         'target_va': '0x00522720',
         'target_size': 92,
         'reason': 'between 0x00522440 and 0x00522780; inline memset of +0x360',

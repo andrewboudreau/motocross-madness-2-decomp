@@ -38,7 +38,7 @@
 
 // 0x00522440: restores the default settings.
 void TrackGameMode::UnknownFunction522440() {
-    UnknownFunction522720((UnknownTrackGameModeOptions6ac*)&instrumentOverlayOn);
+    ResetInterfaceOptions((UnknownTrackGameModeOptions6ac*)&instrumentOverlayOn);
     ResetSoundOptions((UnknownTrackGameModeOptionsA20*)&field_0xa20);
     ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
     g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);

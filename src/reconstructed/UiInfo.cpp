@@ -160,14 +160,15 @@ int TrackGameMode::ResetNetworkRace() {
     return 1;
 }
 
-// 0x00522720: the defaults of the TrackGameMode+0x6ac options; the last
+// 0x00522720: the defaults of the TrackGameMode+0x6ac options (overlay,
+// name tags, intro movie; the name is inference); the last
 // 0x14 bytes are cleared with an inline memset.
-void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* options) {
-    options->field_0x00 = 1;
-    options->field_0x04 = 1;
+void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options) {
+    options->instrumentOverlayOn = 1;
+    options->showRaceStatistics = 1;
     options->field_0x1c = 1;
-    options->field_0x08 = 0;
-    options->field_0x0c = 1;
+    options->chatInputLine = 0;
+    options->showNameTags = 1;
     options->field_0x10 = 1;
     options->field_0x14 = 1;
     options->field_0x18 = 1;
@@ -177,7 +178,7 @@ void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* option
     options->field_0x3c = 0;
     options->field_0x40 = 0;
     options->field_0x44 = 0;
-    options->field_0x20 = 1;
+    options->introMovieOn = 1;
     options->field_0x24 = 1;
     options->field_0x28 = 1;
     options->field_0x2c = 1;
