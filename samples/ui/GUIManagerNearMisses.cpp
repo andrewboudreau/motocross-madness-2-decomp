@@ -21,7 +21,12 @@
 //   instruction diffs) but folds the failure return to `xor eax, eax`;
 //   the texture's zero assigned at its declaration, after the format
 //   read or just before the Lock test does not change that; an early
-//   `return texture` or `return 0` on a Lock failure gives 294.
+//   `return texture` or `return 0` on a Lock failure gives 294. The row
+//   copy written without the row pointer (`memcpy(bits + y * width *
+//   bytesPerPixel, ...)`) reproduces retail's copy loop instruction for
+//   instruction (38 instruction diffs against 70) but scores 249/901;
+//   the 8-bit dim loop as `for (x = line & 1; x < width; x += 2)
+//   bits[line * width + x] = 0;` gives 68.
 // 0x00486b10 (106 bytes, 89/106): one ternary per component (below; two
 //   separate if/else statements compile the same) gives retail's block
 //   order and `pop edi` placement (one if/else block: 86/106). Retail still
