@@ -936,7 +936,12 @@ static inline CollisionVec3 TireNegate(const CollisionVec3& v)
 // `fld mem; fmul st(1)` where retail has `fld st(0); fmul mem` (tried
 // `dir * k`, a local k, k * dir.x per component, a pre-copied push and
 // `1 / grip * needed`), plus one stack store and two cross-product
-// fsubp/mov pairs scheduled differently.
+// fsubp/mov pairs scheduled differently. Retail's y and z products load the
+// component first, so only dir.x has the older leaf there; no change (560)
+// from `v.x * s` operand order in TireTimes, a dedicated helper that copies
+// v.x into a local or into r first (by reference or by value), a `dx` copy
+// before the grip test, or the negation written per component or as a
+// `forward ?:` / if-else initialisation (114..149).
 void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                       CollisionVec3* torque, CollisionVec3* force)
 {

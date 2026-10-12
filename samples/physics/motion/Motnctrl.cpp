@@ -193,7 +193,10 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // first) loads b's component first in each product where retail loads a's (the axisY one matches).
 // No gain from a local cross helper with or without parentheses or with swapped operands, a named
 // cross local, swapped comparison operands, or swapped DotProduct arguments (registers swap, 1099
-// strict but esi/edi exchanged, not kept).
+// strict but esi/edi exchanged, not kept).  Also no gain: a const Vec3& alias of a->axisZ or
+// b->axisZ (in the cross or in the test, 1069..1097), a Vec3 copy (188..198), a pointer alias
+// (1097), an inline PoseAxisDiffers test by reference or by value (23..130), or reordered or
+// swapped component comparisons in the axisZ test (1004..1006).
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {
