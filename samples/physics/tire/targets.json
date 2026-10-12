@@ -265,7 +265,7 @@
     "target_va": "0x00514170",
     "target_size": 607,
     "expect": "partial",
-    "notes": "560/607 strict: the clamp and moment match; the first `dir` component's x87 operand order and three scheduling pairs differ (see Tire.cpp).",
+    "notes": "565/607 strict: the clamp, the scaled push and the moment match; the push.y copy and two cross-product fsubp/mov pairs are scheduled differently (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {

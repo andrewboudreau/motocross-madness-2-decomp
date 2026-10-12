@@ -100,6 +100,12 @@ of a call (in `st(0)`):
   (`0x005135f0`) scales its slip vector through a helper that copies `v.x`
   and `v.y` into locals (`fld mem; fmul st(1)` for both, `fmul v.z` last);
   copying all three components or none gives the scalar-first form.
+  A freshly computed scalar is the newest leaf and is duplicated for the first
+  product (`fld st(0); fmul v.x`): Tire's ApplyDrive (`0x00514170`, 560 to
+  565) writes `r.x = a / b * v.x;` and then multiplies copies of `v.y` and
+  `v.z` by a named `a / b` (`fld mem; fmul st(1)`), as retail does; the
+  quotient as an expression in all three products gives the duplicate form
+  for all of them.
 - Storing the result vector: when an inline helper writes `r.x = v.x * s;`
   .. and returns `r` into a member, VC6 stores x and y before spilling the z
   product (`mov [edx+4]; fstp tmp`). Computing the three products into

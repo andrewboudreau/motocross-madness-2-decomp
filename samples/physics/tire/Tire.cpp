@@ -976,18 +976,34 @@ static inline CollisionVec3 TireNegate(const CollisionVec3& v)
     return r;
 }
 
-// 0x00514170 (near miss, 560 of 607 bytes): clamping as `*speed < amount` gives
+// Scales v by numerator / denominator for ApplyDrive.  The x product uses the
+// quotient expression and y and z multiply copies of their components by a named
+// quotient: VC6 then keeps the fresh quotient for x (`fld st(0); fmul mem`) and
+// loads y and z first (`fld mem; fmul st(1)`), as retail does.
+static inline CollisionVec3 TireRatioTimes(float numerator, float denominator,
+                                           const CollisionVec3& v)
+{
+    CollisionVec3 r;
+    r.x = numerator / denominator * v.x;
+    float ratio = numerator / denominator;
+    float y = v.y;
+    float z = v.z;
+    r.y = y * ratio;
+    r.z = z * ratio;
+    return r;
+}
+
+// 0x00514170 (near miss, 565 of 607 bytes): clamping as `*speed < amount` gives
 // retail's `fcom`, and scaling the cross product component-wise through a local
-// copy of +0x1d8 gives its moment. Left: the first `dir` component is scaled as
-// `fld mem; fmul st(1)` where retail has `fld st(0); fmul mem` (tried
-// `dir * k`, a local k, k * dir.x per component, a pre-copied push and
-// `1 / grip * needed`), plus one stack store and two cross-product
-// fsubp/mov pairs scheduled differently. Retail's y and z products load the
-// component first, so only dir.x has the older leaf there; no change (560)
-// from `v.x * s` operand order in TireTimes, a dedicated helper that copies
-// v.x into a local or into r first (by reference or by value), a `dx` copy
-// before the grip test, or the negation written per component or as a
-// `forward ?:` / if-else initialisation (114..149).
+// copy of +0x1d8 gives its moment. TireRatioTimes gives the scaled push's x87
+// operand order (560 -> 565). Left: the copy of push.y out of the return temp and
+// two cross-product fsubp/mov pairs are scheduled differently.
+// Before TireRatioTimes (560): `dir * k`, a local k, k * dir.x per component, a
+// pre-copied push, `1 / grip * needed`, `v.x * s` operand order (all 8 orders) in
+// TireTimes, a helper copying v.x into a local or into r first, a `dx` copy before
+// the grip test, the negation per component or as `forward ?:` / if-else (114..149),
+// direct push.x stores (336), the quotient as a CSE expression in all three
+// products (361) or named first (553..560).
 void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                       CollisionVec3* torque, CollisionVec3* force)
 {
@@ -1004,7 +1020,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     float rate = mass / stepTime;
     float needed = rate * amount;
     if (grip > needed) {
-        push = TireTimes(needed / grip, dir);
+        push = TireRatioTimes(needed, grip, dir);
         *speed -= amount;
     } else {
         *speed -= grip / rate;
