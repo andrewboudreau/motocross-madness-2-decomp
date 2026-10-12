@@ -871,9 +871,9 @@ void KrustyUI::RecordRaceResults() {
         if (g_TrackGame->mode.raceSettings.lapCount == 10)
             RecordHighScoreTable(2);
     } else {
-        if (g_TrackGame->mode.raceSettings.field_0x140 == 5.0f)
+        if (g_TrackGame->mode.raceSettings.timeLimitMinutes == 5.0f)
             RecordHighScoreTable(1);
-        if (g_TrackGame->mode.raceSettings.field_0x140 == 10.0f)
+        if (g_TrackGame->mode.raceSettings.timeLimitMinutes == 10.0f)
             RecordHighScoreTable(2);
     }
 }

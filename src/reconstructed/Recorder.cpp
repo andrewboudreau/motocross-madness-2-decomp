@@ -42,8 +42,8 @@ VCRInterface::VCRInterface() : GameObject(1) {
     field_0xbc = 0;
     field_0xc0 = 0;
     field_0xc4 = 0;
-    field_0xcc = 0;
-    field_0xd0 = 0;
+    sceneTimePending = 0;
+    pendingSceneTime = 0;
     isStopped = 1;
     workerAcknowledged = 1;
 }
@@ -269,8 +269,8 @@ void VCRInterface::RestartReverseRead() {
 void VCRInterface::Seek(unsigned int milliseconds) {
     if (frameRing) {
         SetEvent(seekEvent);
-        field_0xcc = 1;
-        field_0xd0 = milliseconds * 0.001f;
+        sceneTimePending = 1;
+        pendingSceneTime = milliseconds * 0.001f;
     }
 }
 
@@ -278,8 +278,8 @@ void VCRInterface::Seek(unsigned int milliseconds) {
 void VCRInterface::Rewind() {
     if (frameRing) {
         EnterCriticalSection(&lock);
-        field_0xcc = 1;
-        field_0xd0 = 0;
+        sceneTimePending = 1;
+        pendingSceneTime = 0;
         field_0xbc = 0;
         frameRing->ClearPositions();
         SetEvent(rewindEvent);

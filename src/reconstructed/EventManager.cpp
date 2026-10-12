@@ -700,11 +700,11 @@ void EventManager::CheckRaceOver(float frameTime) {
         }
         break;
     case 0:
-        if (g_TrackGame->quarryEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->quarryEvent->elapsedMinutes < g_TrackGame->mode.raceSettings.timeLimitMinutes)
             return;
         break;
     case 4:
-        if (g_TrackGame->tagEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->tagEvent->elapsedMinutes < g_TrackGame->mode.raceSettings.timeLimitMinutes)
             return;
         if (owner->followedRacer == owner->raceView->localRacer) {
             owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;

@@ -431,9 +431,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                     }
                 }
-                if (replayVcr != 0 && replayVcr->field_0xcc) {
-                    SetSceneTime(replayVcr->field_0xd0);
-                    replayVcr->field_0xcc = 0;
+                if (replayVcr != 0 && replayVcr->sceneTimePending) {
+                    SetSceneTime(replayVcr->pendingSceneTime);
+                    replayVcr->sceneTimePending = 0;
                 }
             }
             if (field_0x18e) {

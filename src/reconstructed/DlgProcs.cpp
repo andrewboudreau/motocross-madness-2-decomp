@@ -798,7 +798,7 @@ void SPEventDlg::ApplyEventType() {
             sprintf(text, "%dm", i);
             laps->AddRow(text, i, 0);
         }
-        laps->SelectRowByData((int)g_TrackGame->mode.raceSettings.field_0x140);
+        laps->SelectRowByData((int)g_TrackGame->mode.raceSettings.timeLimitMinutes);
     }
     if (settings.eventType == 0) {
         g_TrackGame->mode.SelectSeries(0);

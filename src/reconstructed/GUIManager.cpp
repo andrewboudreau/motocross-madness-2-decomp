@@ -796,8 +796,8 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
             return 1;
         }
         if (kind == 1 && ownerUser && ownerUser->userCursor) {
-            pointerPosition.x = ownerUser->userCursor->field_0x54;
-            pointerPosition.y = ownerUser->userCursor->field_0x58;
+            pointerPosition.x = ownerUser->userCursor->cursorX;
+            pointerPosition.y = ownerUser->userCursor->cursorY;
         }
     }
     return 1;

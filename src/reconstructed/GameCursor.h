@@ -56,6 +56,6 @@ public:
     int backgroundRegion;                     // +0x48 background region, -1 when none
     int field_0x4c;
     float field_0x50;                         // scale of the destination's far corner
-    int field_0x54;                           // position
-    int field_0x58;
+    int cursorX;                              // +0x54 position, clamped to the target
+    int cursorY;                              // +0x58
 };

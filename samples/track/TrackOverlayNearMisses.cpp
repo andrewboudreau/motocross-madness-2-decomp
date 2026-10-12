@@ -234,8 +234,8 @@ int StatsOverlay::DrawStandings()
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
-        float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
-        FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         sprintf(rowText[0], "%s", label);
     }
     iterator = 0;

@@ -56,7 +56,7 @@ void TrackGameMode::ResetDefaults() {
     raceSettings.raceMode = 0;
     raceSettings.riderCollision = 1;
     raceSettings.lapCount = 5;
-    raceSettings.field_0x140 = 15.0f;
+    raceSettings.timeLimitMinutes = 15.0f;
     raceSettings.field_0x2c = 0;
     raceSettings.field_0x2d = 30;
     raceSettings.aiRacerCount = 0;

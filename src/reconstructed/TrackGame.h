@@ -85,8 +85,8 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x64;
     GameObject* field_0x68;
     TextQueueOverlay* textQueue;              // +0x6c
-    float field_0x70;                         // compared with TrackGame+0x2eb0, settings +0x140 (EventManager 0x0045eef0)
-    float field_0x74;                         // RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
+    float elapsedMinutes;                     // +0x70 compared with the settings' time limit (EventManager 0x0045eef0)
+    float elapsedSeconds;                     // +0x74 RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
     unsigned char field_0x78[0x9c - 0x78];
     GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
     unsigned char field_0xa0[0xa8 - 0xa0];
@@ -230,7 +230,7 @@ struct UnknownTrackGameModeSettings {
     unsigned char field_0x56[0x138 - 0x56];
     int field_0x138;                          // SelectGamePicProcs.cpp
     int field_0x13c;                          // SelectGamePicProcs.cpp
-    float field_0x140;
+    float timeLimitMinutes;                   // +0x140 "%dm" rows 2..5 (DlgProcs 0x0044e3e0), SelectGamePicProcs.cpp's minutes
     int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
     int field_0x148;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
     UnknownTrackGameModeEntry field_0x14c[8]; // reset by TrackGameMode 0x00522cd0

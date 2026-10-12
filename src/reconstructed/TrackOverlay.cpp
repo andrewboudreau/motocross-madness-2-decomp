@@ -483,8 +483,8 @@ void StatsOverlay::DrawTimeLeft()
     TrackGame* game = g_TrackGame;
     if (game->mode.raceSettings.raceMode != 0 && game->mode.raceSettings.raceMode != 4) {
         TrackGameViewOwner* owner = game->quarryEvent;
-        float limit = game->mode.raceSettings.field_0x140 * 60.0f;
-        FormatMinutesSeconds(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        float limit = game->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(text, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         rect = rowRects[0];
         rect.left += rowExtent.cx + 4;
         sprintf(rowText[0], "%s", text);
@@ -707,8 +707,8 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->mode.raceSettings.raceMode != 0) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->tagEvent;
-        float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
-        FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         sprintf(rowText[0], "%s %s", label, time);
     }
     if (g_TrackGame->mode.raceSettings.field_0x148) {

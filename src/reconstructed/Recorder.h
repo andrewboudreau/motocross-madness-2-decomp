@@ -103,7 +103,7 @@ public:
     int field_0xc0;
     int field_0xc4;
     int workerAcknowledged;                       // acknowledged by the worker
-    int field_0xcc;
-    float field_0xd0;                     // seconds
+    int sceneTimePending;                 // +0xcc set by Seek/Rewind; BikeRace slot 10 applies and clears it
+    float pendingSceneTime;               // +0xd0 seconds
     int recordTimeMs;                       // record time in ms (worker event 5, slot 10)
 };
