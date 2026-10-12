@@ -542,6 +542,21 @@ static inline Vec3 VehNormalized(const Vec3& v)
     return r;
 }
 
+// (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
+static inline float VehDotG(const Vec3& a, const Vec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
+
+static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
 // Tier 3 reading: an impulse-style velocity deflection.  k is an effective-mass term along dir,
 // r = -m^2/k * dt is the impulse magnitude, and the deflected velocity is v' = v + min(1.5c,1) * r * dir,
 // rescaled to keep the old speed (a pure turn); the returned value is the signed angle between
@@ -554,49 +569,42 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
     float k = UnknownVirtualSlot73(point, dir) * d;
     field_0x4e8 = k;
-    if (VehAbs(k) <= 0.0f)
-        return 0.0f;
-    float m = field_0x434;
-    float r = (m * m) / -k * stepTime;
-    Vec3 t;
-    t.x = r * dir->x;
-    t.y = r * dir->y;
-    t.z = r * dir->z;
-    float s = c * 1.5f;
-    if (!(s < 1.0f))
-        s = 1.0f;
-    Vec3 u;
-    u.x = s * t.x;
-    u.y = t.y * s;
-    u.z = t.z * s;
-    Vec3 sumv;
-    sumv.x = u.x + velocity.x;
-    sumv.y = u.y + velocity.y;
-    sumv.z = u.z + velocity.z;
-    scratchVector = sumv;
-    Vec3* nv = &scratchVector;
-    float len2 = nv->y * nv->y + nv->x * nv->x + nv->z * nv->z;
-    float len;
-    if (len2 == 1.0f)
-        len = 1.0f;
-    else
-        len = (float)sqrt(len2);
-    if (VehAbs(len) < 0.01f)
-        return 0.0f;
-    float sign = -1.0f;
-    if (!(k < 0.0f))
-        sign = 1.0f;
-    float dot = nv->y * velocity.y + nv->x * velocity.x + nv->z * velocity.z;
-    sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
-    if (!_finite(sign))
-        return 0.0f;
-    float scale = linearSpeed / len;
-    velocity.x = scale * nv->x;
-    velocity.y = scale * nv->y;
-    velocity.z = scale * nv->z;
-    if (movingForward)
-        return sign;
-    return -sign;
+    if (!(VehAbsT(k) <= 0.0f)) {
+        float m = field_0x434;
+        float nk = -k;
+        float r = m * m / nk * stepTime;
+        Vec3 t = VehScale(*dir, r);
+        float s = c * 1.5f;
+        if (!(s < 1.0f))
+            s = 1.0f;
+        Vec3 u;
+        u.x = s * t.x;
+        u.y = t.y * s;
+        u.z = t.z * s;
+        scratchVector = VehSum(u, velocity);
+        Vec3* nv = &scratchVector;
+        float len2 = VehLen2(*nv);
+        float len;
+        if (len2 == 1.0f)
+            len = 1.0f;
+        else
+            len = (float)sqrt(len2);
+        if (!(VehAbsT(len) < 0.01f)) {
+            float sign = -1.0f;
+            if (!(k < 0.0f))
+                sign = 1.0f;
+            float dot = VehDotG(scratchVector, velocity);
+            sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
+            if (_finite(sign)) {
+                velocity = VehScale(*nv, linearSpeed / len);
+                if (movingForward)
+                    return sign;
+                sign = -sign;
+                return sign;
+            }
+        }
+    }
+    return 0.0f;
 }
 
 // Tier 3 reading: accumulates per-wheel ground normals and suspension loads into one
@@ -857,15 +865,6 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
     r.x = a.x - b.x;
     r.y = a.y - b.y;
     r.z = a.z - b.z;
-    return r;
-}
-
-static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = a.x + b.x;
-    r.y = a.y + b.y;
-    r.z = a.z + b.z;
     return r;
 }
 
@@ -2252,12 +2251,6 @@ void Vehicle::PlaceWheels()
     }
     if (unflagged)
         wheelList[0]->reportContactOutputs = 1;
-}
-
-// (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
-static inline float VehDotG(const Vec3& a, const Vec3& b)
-{
-    return (a.x * b.x + a.y * b.y) + a.z * b.z;
 }
 
 // 0x00527a20 (PARTIAL, 349/866 bytes aligned): the first 0x120 bytes (count loop, drive

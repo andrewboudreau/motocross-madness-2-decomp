@@ -115,7 +115,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Vehicle | `0x005276d0` | 468/495 (masked) | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 349/870 | b | 25 code diffs: `jne @99` vs `jne @98 ; mov [esp + N], 0 ; mov edx, [~`; `lea edx, [esi + 0x120]` vs `mov [esi + 0x12c], 0`; slots differ |
 | krusty2/vehicle/Vehicle | `0x00527e30` | 31/831 | b | 42 code diffs: `push ebp` vs `push ebx ; mov ebx, ecx ; xor ecx, ecx`; retail adds `mov eax, [ebx + 0x444]`; frame 0x28 vs 0x2c |
-| krusty2/vehicle/Vehicle | `0x005281b0` | 40/479 (masked) | b | 37 code diffs: retail adds `mov esi, [esp + N]`; `mov edi, [esp + N] ; mov esi, ecx` vs `mov edi, ecx`; slots differ |
+| krusty2/vehicle/Vehicle | `0x005281b0` | 502/539 | b | 4 code diffs: retail stores field_0x4e8 before the abs `fcom`; `fld st(0) ; fmul [t.x]` vs `fld [t.x] ; fmul st(1)`; scratchVector .y store scheduled later; len/sign dead-parameter slots swapped |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 263/782 | b | slot 56: frame 0x3c matches; retail shares the ground-normal output with the projection and n with the side vector; register roles |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 304/3018 (masked) | b | 120 code diffs: `test eax, eax ; mov [esp + N], eax ; jn~` vs `mov ebp, eax ; xor ebx, ebx ; cmp ebp, ~`; `push 0` vs `push ebx`; frame 0xdc vs 0x104, slot order differs |
 | net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |

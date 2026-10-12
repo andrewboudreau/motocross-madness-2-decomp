@@ -796,7 +796,7 @@
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "partial",
-    "notes": "8.4% (547/539). Velocity deflection, returns signed acos angle. First divergence +0x4: retail esi=dir(arg) / edi=this, we swap (esi=this); retail keeps k live in x87.",
+    "notes": "Strict 502/539 (448/483 masked). Velocity deflection, returns signed acos angle. Nested-if layout with one trailing return 0 gives retail esi=dir/edi=this and keeps k live in x87; VehDotG (x+y)+z dot loads retail y,x,z order; sign = -sign before the second return keeps fchs ahead of the pops. Left: retail stores field_0x4e8 before the abs compare (fcom placement), s*t.x via fld st(0), scratchVector .y store scheduling, and len/sign dead-parameter slots swapped (0x28/0x24). Tried: abs via local if, k assignment forms, sign/len declared at top, len init-then-if/reuse len2 (much worse), ternary return (worse), u via VehScale/scaled helper, sum via named temp, z-first or x-y dot groupings, VehDotI/pointer dot.",
     "bindings": "Vehicle.bindings.json"
   },
   {
