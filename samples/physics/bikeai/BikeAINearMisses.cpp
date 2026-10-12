@@ -852,7 +852,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
 // +0x5cd and +0x3951; an earlier 0.1f was a semantic slip).
 int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, float* outSpeed,
                           Vec3* center, Vec3* forward, Vec3* side, float maxTime, float dt,
-                          Terrain* terrain, char* outAirborne, float* outImpact, CollisionObject* probe,
+                          Terrain* terrain, unsigned char* outAirborne, float* outImpact, CollisionObject* probe,
                           float* frontSusp, float* rearSusp, int* outFrontContact, int* outRearContact,
                           UnknownBikeAIPath* path, float* speedTable, float sideOffset, int nearOnly)
 {
@@ -1381,7 +1381,7 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
     *frontVel = vF;
     *rearVel = vR;
     if (outAirborne)
-        *outAirborne = (char)airborne;
+        *outAirborne = (unsigned char)airborne;
     if (!frontContact && !rearContact) {
         frontVel->x = outVel->x;
         frontVel->z = outVel->z;
@@ -1496,6 +1496,19 @@ inline void BikeAIClampUnit(float& v)
 // bike is then advanced by the look-ahead model 0x0040eca0 as two wheel points, and the
 // angular velocity, speed, suspension, wheel roll, crash test and orientation are derived
 // from the result.  Names tier 3.
+// Retail shapes reproduced (654 -> 722 strict, candidate size 4112): the crash flag
+// +0x464 as a `?:` (retail `mov eax, 1` / `xor eax, eax` and one store), airborneOut as an
+// unsigned char (retail zero-extends it with `and ecx, 0xff` for slot 71), the travel
+// argument written as `-field_0x7f8` twice (retail keeps the negated value with `fst` and
+// scales with `fld st(0); fmul mem`), and `if (!airborne)` first for +0x5a4 (retail's
+// branch layout).
+// Measured but not applied, because they raise the instruction alignment (to 1098 of 1120
+// together) while the strict count falls with the frame slots still differing:
+// `float height = position.y;` before BIKEAI_ABS (retail loads it once and fchs's it) and a
+// value-returning smoother that copies s->timeConstant into a local,
+// `smoothedForwardAccel = BikeAISmoothValue(...)` (retail compares against the copy and keeps
+// the result for the store).  tools/frame_layout.py finds no use-count change that
+// reproduces retail's slot order (steps nearest esp, lean at 0x18).
 int KrustyBike::Fn_00413200(float dt)
 {
     Vec3 a, c;
@@ -1603,7 +1616,7 @@ int KrustyBike::Fn_00413200(float dt)
     Vec3* w = &worldAngularVelocity;
     field_0x7e0 = CrossProduct(*w, *fwd) * 3.5f + velocity;
     field_0x7ec = velocity - CrossProduct(*w, *fwd) * 3.5f;
-    char airborneOut = airborne;
+    unsigned char airborneOut = airborne;
     UnknownFunction40eca0(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
                           &bodyForward, &bodyUp, dt, dt, field_0x740->field_0x4c, &airborneOut,
                           &impact, field_0x15e0, &field_0x7f8, &field_0x7fc,
@@ -1614,14 +1627,13 @@ int KrustyBike::Fn_00413200(float dt)
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
 
-    float travel = -field_0x7f8;
-    frontWheel->w_0x2b0->ClampAndStepAlong(travel, 0, frontWheel->w_0x2b0->q_0xc0 * travel);
+    frontWheel->w_0x2b0->ClampAndStepAlong(-field_0x7f8, 0, frontWheel->w_0x2b0->q_0xc0 * -field_0x7f8);
     rearWheel->w_0x2ac->q_0x98 = field_0x7fc;
     rearWheel->w_0x2ac->ClampAndStep(field_0x7fc, 0);
-    if (airborne)
-        anyWheelInContact = 0;
-    else
+    if (!airborne)
         anyWheelInContact = 1;
+    else
+        anyWheelInContact = 0;
 
     float steerTarget = worldAngularVelocity.y * -1.2732f;
     float steerDiff = steerTarget - controlInput.x;
@@ -1703,10 +1715,7 @@ int KrustyBike::Fn_00413200(float dt)
         field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
         field_0x431 = 0;
         field_0x433 = 0;
-        if (savedUp.y < 0.0f)
-            field_0x464 = 1;
-        else
-            field_0x464 = 0;
+        field_0x464 = savedUp.y < 0.0f ? 1 : 0;
         field_0x45c = savedYaw;
         field_0x604->Method_0x00532220(crashDirection);
         UnknownVirtualSlot69();

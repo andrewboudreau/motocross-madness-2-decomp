@@ -119,7 +119,7 @@
   "?PlaceWheels@Vehicle@@QAEXXZ": "0x00528eb0",
   "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
   "?SetRollDistance@KbWheel@@QAEXM@Z": "0x00513560",
-  "?UnknownFunction40eca0@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAD1PAVCollisionObject@@11PAH5PAUUnknownBikeAIPath@@1MH@Z": "0x0040eca0",
+  "?UnknownFunction40eca0@@YAHPAUVec3@@000PAM000MMPAVTerrain@@PAE1PAVCollisionObject@@11PAH5PAUUnknownBikeAIPath@@1MH@Z": "0x0040eca0",
   "?UpdateWheelRampLevels@Vehicle@@QAEHXZ": "0x00529280",
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
   "?g_BikeAISpeedTable_00566f74@@3PAY0MI@MA": "0x00566f74",
