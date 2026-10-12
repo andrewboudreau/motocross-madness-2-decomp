@@ -218,7 +218,7 @@ inline UnknownBikeRaceRacer* BikeRace::UnknownFunctionRacerAt(int index) {
 }
 
 // 0x0041f1d0
-void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
+void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
     int caster;
     if (g_TrackGame->uiInteractionBlocked) {
         return;

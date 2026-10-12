@@ -6,7 +6,7 @@
 #include "DebugAlloc.h"
 
 // 0x00424140
-UnknownBitmapFile* UnknownFunction424140(const char* name, UnknownBitmapFile* bitmap) {
+UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap) {
     FILE* file;
     int stride;
     unsigned char* bits;
@@ -125,7 +125,7 @@ int WriteBitmap(UnknownBitmapFile* bitmap) {
 }
 
 // 0x004245b0
-void UnknownFunction4245b0(UnknownBitmapFile* bitmap) {
+void FreeBitmap(UnknownBitmapFile* bitmap) {
     if (bitmap) {
         if (bitmap->bits)
             DebugFree(bitmap->bits, __FILE__, 200);

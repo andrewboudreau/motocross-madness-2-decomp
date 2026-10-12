@@ -44,12 +44,12 @@ struct UnknownBitmapFile {
 
 // 0x00424140: reads the 8-bit bitmap `name` into `bitmap` (a new record when
 // 0); 0 on failure, when the record is freed.
-UnknownBitmapFile* UnknownFunction424140(const char* name, UnknownBitmapFile* bitmap);
+UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap);
 // 0x00424380: writes `bitmap` (8-bit, or 24-bit from 16.16 components) to
 // its `name`; 1 on success.
 int WriteBitmap(UnknownBitmapFile* bitmap);
 // 0x004245b0: frees a record and its pixels.
-void UnknownFunction4245b0(UnknownBitmapFile* bitmap);
+void FreeBitmap(UnknownBitmapFile* bitmap);
 // 0x004245f0: describes an 8-bit width x height bitmap of `bits` with a
 // 256-entry RGB palette.
 void DescribeBitmap8(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,

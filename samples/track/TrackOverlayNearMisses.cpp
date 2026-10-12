@@ -13,7 +13,7 @@
 // Declaration order, operand order of the distance sums and the store order
 // of the result do not change it.
 
-// ChatOverlay::UnknownFunction51d730 (0x0051d730, 586 bytes, 44%): the
+// ChatOverlay::CollectRacers (0x0051d730, 586 bytes, 44%): the
 // candidate is 587 bytes with the same instructions. Retail keeps the zero
 // in ebx and the incremented count in ebp; VC6 here swaps them, which
 // shifts later register choices. The racer loop written as in RadarOverlay
@@ -183,7 +183,7 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
 }
 
 // 0x0051d730
-int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
+int ChatOverlay::CollectRacers(UnknownChatView* view)
 {
     int iterator;
     UnknownChatRacer* racer;

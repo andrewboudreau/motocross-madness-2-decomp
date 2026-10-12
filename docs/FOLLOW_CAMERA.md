@@ -376,7 +376,9 @@ The unit's own kVec3 set (`.CRT$XCU` 113-116, `0x00466f10..0x004670fb`) is
 interleaved with slots 72 and 70. Its vectors `0x0065b438..0x0065b468` are
 read only by FollowCam code, so they are now file statics.
 
-This wave adds 13 calibration cases: the point-table append `0x00463520` (`AppendTableEntry`),
+This wave adds 13 calibration cases: the point-table append `0x00463520` (`AppendTableEntry`; the subject
+setter `0x00463600` is `SetSubject` and KrustyBikeCamera's flyby setup
+`0x00497d90` `SetupFlyby`),
 set subject `0x00463600`, slot 38 (point-table steering, with its jump
 table), slot 49 (camera position), slot 23 (controls) and the eight `$E`.
 

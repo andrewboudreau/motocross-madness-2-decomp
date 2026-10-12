@@ -120,7 +120,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0048a760
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
-    RunwayLights* UnknownFunction48a600(void* value, int a, int b, UnknownRunwayTerrain* terrain);
+    RunwayLights* SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain);
     void UnknownFunction48ad50(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
 
     float blinkTimer;                          // blink timer
@@ -162,7 +162,7 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0048afa0
 
     // 0x0048adf0 (ret 0x34): loads "viscue.slt"; returns this, or 0.
-    VisualCue* UnknownFunction48adf0(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
+    VisualCue* LoadVisualCue(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
                                      UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
                                      float size, float c, float d);
     // 0x0048af20 (ret 4): collects the view's racers.

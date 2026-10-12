@@ -1092,7 +1092,7 @@ RadarOverlay* RadarOverlay::UnknownFunction51b840(RenderTarget* target, TextureM
 }
 
 // 0x0051baf0: takes the racers from `view`.
-int RadarOverlay::UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2)
+int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
 {
     int iterator;
     UnknownEventRacer* racer;

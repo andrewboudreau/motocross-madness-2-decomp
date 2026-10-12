@@ -58,7 +58,7 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 }
 
 // 0x0048a600
-RunwayLights* RunwayLights::UnknownFunction48a600(void* value, int a, int b, UnknownRunwayTerrain* terrain) {
+RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain) {
     char name[0x104];
 
     GameObject::UnknownVirtualSlot8(value);
@@ -172,7 +172,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::UnknownFunction48adf0(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
+VisualCue* VisualCue::LoadVisualCue(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
                                             UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
                                             float size, float c, float d) {
     char name[0x104];

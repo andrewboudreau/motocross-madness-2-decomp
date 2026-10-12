@@ -314,7 +314,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 status->field_0x44.t = start->field_0x2c.t + 0.1f;
             }
             if (!racer->field_0x735)
-                racer->field_0x78c = track->UnknownFunction517340(status->field_0x1c, status->field_0x44,
+                racer->field_0x78c = track->PlaceNear(status->field_0x1c, status->field_0x44,
                                                                   g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
                                                                   &status->field_0x38);
             else

@@ -904,7 +904,7 @@ public:
     UnknownBikeRaceRacer* UnknownFunctionRacerAt(int index);
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
-    void UnknownFunction41f1d0(int forward, int racers, int objects);
+    void NextCameraTarget(int forward, int racers, int objects);
     void UnknownFunction41f550(int value);    // 0x0041f550: toggles +0x3f8
     UnknownBikeRaceRacer* UnknownFunction4204e0(int* iterator); // 0x004204e0
     void UnknownFunction420590(int player);   // 0x00420590

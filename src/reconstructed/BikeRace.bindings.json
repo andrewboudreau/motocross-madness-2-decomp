@@ -75,7 +75,7 @@
   "?UnknownFunction41d2a0@BikeRace@@QAEXM@Z": "0x0041d2a0",
   "?UnknownFunction41ea10@BikeRace@@QAEHXZ": "0x0041ea10",
   "?ReplaceMeshId@BikeRace@@QAEXPAVUnknownBikeRaceCharacter@@HH@Z": "0x0041ea60",
-  "?UnknownFunction41f1d0@BikeRace@@QAEXHHH@Z": "0x0041f1d0",
+  "?NextCameraTarget@BikeRace@@QAEXHHH@Z": "0x0041f1d0",
   "?UnknownFunction41f550@BikeRace@@QAEXH@Z": "0x0041f550",
   "?UnknownFunction4204e0@BikeRace@@QAEPAVUnknownBikeRaceRacer@@PAH@Z": "0x004204e0",
   "?UnknownFunction420590@BikeRace@@QAEXH@Z": "0x00420590",

@@ -1,7 +1,7 @@
 // Near-miss Track.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/TRACK.md.
 //
-// Track::UnknownFunction516ca0 (0x00516ca0, 586 bytes): the candidate is 576
+// Track::ClosestPointOnNode (0x00516ca0, 586 bytes): the candidate is 576
 // bytes and the frame, stack slots and x87 shape agree. VC6 here reuses the
 // projection's `p - segment` differences (CSE temps at esp+8/+0xc) in the
 // t < 0 and t == 0 branches; retail recomputes them there with
@@ -39,7 +39,7 @@
 // 1002, 992, 1012, 1032 with period 4 wherever they go (top or before edge 2..6);
 // locals inside UnknownEdgeCrosses stop it being inlined from 4 on.
 //
-// Track::UnknownFunction517340 (0x00517340, 1509 bytes; the candidate is
+// Track::PlaceNear (0x00517340, 1509 bytes; the candidate is
 // 1533): the walk, the strip test, the candidate list and the acceptance
 // tests follow retail instruction for instruction, but VC6 here gives the
 // candidate list a frame slot (0x24 bytes of locals against retail's 0x20)
@@ -73,7 +73,7 @@
 
 // 0x00516ca0: the closest position on `node` to p, in the horizontal
 // plane, and optionally its distance.
-int Track::UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance)
+int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance)
 {
     float best = -1.0f;
     if (!node || !out)
@@ -249,7 +249,7 @@ void TrackRecordDlg::UnknownFunction51ffe0(UIControl* list, DirectoryList* direc
 }
 
 // 0x00517340
-int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out)
+int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out)
 {
     float best;
     float t;

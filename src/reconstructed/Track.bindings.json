@@ -29,9 +29,9 @@
   "_strchr": "0x00535f10",
   "_strpbrk": "0x00537ff0",
   "?UnknownFunction517ea0@Track@@QAEHUTrackPos@@PAU2@PAPAUTrackListItem@@ME@Z": "0x00517ea0",
-  "?UnknownFunction516ca0@Track@@QAEHUTrackVec3@@PAUTrackNode@@PAUTrackPos@@PAM@Z": "0x00516ca0",
+  "?ClosestPointOnNode@Track@@QAEHUTrackVec3@@PAUTrackNode@@PAUTrackPos@@PAM@Z": "0x00516ca0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?IsInsideStrip@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z": "0x00516ef0",
-  "?UnknownFunction517340@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
+  "?PlaceNear@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
   "?UnknownFunction47b800@@YAHMMMMMMMMPAM0@Z": "0x0047b800"
 }

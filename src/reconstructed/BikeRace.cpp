@@ -286,7 +286,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
     if (!g_TrackGame->uiInteractionBlocked) {
         if (UnknownFunctionCameraView()->field_0x390 &&
             UnknownFunctionCameraView()->field_0x3b0->outOfRace != 0) {
-            UnknownFunction41f1d0(0, 1, 0);
+            NextCameraTarget(0, 1, 0);
         }
         if (!g_TrackGame->field_0x1c4) {
             if (g_TrackGame->mode.field_0xa88) {
@@ -494,7 +494,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             raceScene->RestartEntry(field_0x068, 0.0f, 0, 0);
                             field_0x064->UnknownVirtualSlot4();
                             if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x068) {
-                                UnknownFunction41f1d0(1, 1, 0);
+                                NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x064->field_0x210 != 0) {
                                 field_0x064->field_0x210->Release();
@@ -530,7 +530,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
                             field_0x06c->UnknownVirtualSlot4();
                             if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x070) {
-                                UnknownFunction41f1d0(1, 1, 0);
+                                NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x06c->field_0x210 != 0) {
                                 field_0x06c->field_0x210->Release();
@@ -926,33 +926,33 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         case 0x1b:
             if ((g_TrackGame->field_0x2d4_bit2) &&
                 UnknownFunction43caa0(0x1b, 0, event, 3)) {
-                UnknownFunction41f1d0(1, 0, 0);
+                NextCameraTarget(1, 0, 0);
                 return 1;
             }
             if (!UnknownFunction43caa0(0x1b, 0, event, 0x80)) {
-                UnknownFunction41f1d0(1, 0, 1);
+                NextCameraTarget(1, 0, 1);
             }
             return 1;
         case 0x1a:
             if ((g_TrackGame->field_0x2d4_bit2) &&
                 UnknownFunction43caa0(0x1a, 0, event, 3)) {
-                UnknownFunction41f1d0(0, 0, 0);
+                NextCameraTarget(0, 0, 0);
                 return 1;
             }
             if (!UnknownFunction43caa0(0x1a, 0, event, 0x80)) {
-                UnknownFunction41f1d0(0, 0, 1);
+                NextCameraTarget(0, 0, 1);
             }
             return 1;
 
         case 0xc9:
             if (UnknownFunction43caa0(0xc9, 0, event, 0x80000000)) {
-                UnknownFunction41f1d0(1, 1, 0);
+                NextCameraTarget(1, 1, 0);
                 return 1;
             }
             break;
         case 0xd1:
             if (UnknownFunction43caa0(0xd1, 0, event, 0x80000000)) {
-                UnknownFunction41f1d0(0, 1, 0);
+                NextCameraTarget(0, 1, 0);
                 return 1;
             }
             break;
@@ -1060,13 +1060,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                                 if (picked == caster->field_0x08->field_0x128) {
                                     UnknownFunctionCameraView()->field_0x390 = 1;
                                     field_0x154 = i;
-                                    UnknownFunction41f1d0(1, 0, 0);
+                                    NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
                             } else if (picked == caster->field_0x0c) {
                                 UnknownFunctionCameraView()->field_0x390 = 1;
                                 field_0x154 = i;
-                                UnknownFunction41f1d0(1, 0, 0);
+                                NextCameraTarget(1, 0, 0);
                                 return 1;
                             }
                         }
@@ -1078,13 +1078,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                                 if (picked == ((UnknownBikeRacePickCharacter*)entry->field_0x04)->field_0x210) {
                                     UnknownFunctionCameraView()->field_0x390 = 1;
                                     field_0x150 = i;
-                                    UnknownFunction41f1d0(1, 0, 1);
+                                    NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
                             } else if (picked == ((UnknownBikeRacePickObject*)entry->field_0x08)->field_0x3c) {
                                 UnknownFunctionCameraView()->field_0x390 = 1;
                                 field_0x150 = i;
-                                UnknownFunction41f1d0(1, 0, 1);
+                                NextCameraTarget(1, 0, 1);
                                 return 1;
                             }
                         }

@@ -94,9 +94,9 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 All member and method names are provisional. Methods named from their
 recorded behaviour: NumberObjectManager `0x0048bd00` `SetupDigits`;
 BonusObjectManager `0x0048c330` `LoadDigitModels`, `0x0048c8a0`
-`CreateFrameNode` and `0x0048ca60` `SetupCounter`. The light setup
-`0x0048a600` and visual-cue loader `0x0048adf0` keep placeholders because
-NationalRace.cpp and QuarryStuntEvent.cpp call them.
+`CreateFrameNode` and `0x0048ca60` `SetupCounter`; RunwayLights `0x0048a600`
+`SetupLights` and VisualCue `0x0048adf0` `LoadVisualCue` (NationalRace.cpp and
+QuarryStuntEvent.cpp keep their own address-named declarations).
 The view structs' fields with a recorded use are named (each keeps its
 `// +0xNN`): the camera views' `eyePosition`/`viewDirection` (Camera's
 names for +0x170/+0x17c), the racer views' `position`, `countdown`,

@@ -36,7 +36,7 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
 KrustyBikeCamera::~KrustyBikeCamera() {}
 
 // 0x00497d90
-KrustyBikeCamera* KrustyBikeCamera::UnknownFunction497d90(void* value, float rate294, float rate298,
+KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float rate298,
                                                           float value228, float value2d0, float value2e8,
                                                           int capacity, int count, const int* list) {
     if (!UnknownFunction416e80(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))

@@ -254,7 +254,7 @@ public:
     // top and right edges are read).
     RadarOverlay* UnknownFunction51b840(RenderTarget* target, TextureMapManager* manager, int a3,
                                         UnknownOverlayRect screen);
-    int UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
+    int TakeRacers(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
     void DrawFrameRate();                     // 0x0051bdc0: frame-rate readout
     // 0x0051bed0: places every racer's name tag and draws its map dot, then
@@ -419,7 +419,7 @@ public:
                                        UnknownOverlayRect screen, UnknownOverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.
-    int UnknownFunction51d730(UnknownChatView* view);
+    int CollectRacers(UnknownChatView* view);
     void UnknownFunction51d980(int show);     // 0x0051d980
     // 0x0051da30 (bikerace.cpp 0x0041f5b1): a typed key; Enter sends the
     // line as network message 0x85, Escape sets *result.

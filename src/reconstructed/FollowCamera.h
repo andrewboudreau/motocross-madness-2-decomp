@@ -217,7 +217,7 @@ public:
     bool AppendTableEntry(const Vector3& position, float a, float b, float c,
                           float d, float e);
     // 0x00463600: stores the subject and copies its +0x40.
-    void UnknownFunction463600(UnknownFollowCameraSubject* subject);
+    void SetSubject(UnknownFollowCameraSubject* subject);
 
 protected:
     friend class VCRDlg;        // InGameProcs.cpp: ButCamera restores the saved state

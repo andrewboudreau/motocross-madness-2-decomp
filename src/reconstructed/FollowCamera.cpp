@@ -144,7 +144,7 @@ FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, fl
 }
 
 // 0x00463600
-void FollowCamera::UnknownFunction463600(UnknownFollowCameraSubject* subject) {
+void FollowCamera::SetSubject(UnknownFollowCameraSubject* subject) {
     field_0x240 = subject;
     field_0x2ec = subject->field_0x40;
 }

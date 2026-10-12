@@ -92,7 +92,7 @@ public:
     // 0x00516980 (RaceStatus.cpp): places `p` on the track (the closest
     // position over every reachable node) and optionally returns its distance.
     int ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance);
-    int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
+    int ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
     int IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
     int NodeHasSegment(TrackSegment* segment, TrackNode* node);
     // 0x00517340 (RaceStatus.cpp): places `p` on the track near `from`. Every
@@ -100,7 +100,7 @@ public:
     // ahead of `from` or `range` behind it is accepted (the farthest ahead
     // lands in `out`), and otherwise one on the nodes of the work list
     // `path` (passed as an int). Returns whether one was accepted.
-    int UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out);
+    int PlaceNear(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out);
     int UnknownFunction517930(TrackListItem** list, int all);
     int IsAtOrAfter(TrackPos a, TrackPos b);
     int UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
