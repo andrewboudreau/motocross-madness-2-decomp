@@ -252,7 +252,7 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
         if (a == 0) {
             if (selectable) {
                 int found = 0;
-                RECT rect = *(RECT*)field_0x2c;
+                RECT rect = *(RECT*)screenArea;
                 for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
                     int height = GetRowHeight(row);
                     rect.bottom = rect.top + height;
@@ -441,7 +441,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
 int UIButton::UnknownVirtualSlot28(POINT point, int state) {
     int opaque = 0;
     int format = g_TrackGame->renderTarget->field_0x28;
-    RECT rect = *(RECT*)field_0x2c;
+    RECT rect = *(RECT*)screenArea;
     if (PtInRect(&rect, point)) {
         point.x -= rect.left;
         point.y -= rect.top;
@@ -468,13 +468,13 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
 }
 
 // 0x00478e10: the same test as UIButton slot 28 (0x004734c0), but on the
-// control's own area (no RECT copy: retail passes &field_0x2c to PtInRect).
+// control's own area (no RECT copy: retail passes &screenArea to PtInRect).
 int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
     int opaque = 0;
     int format = g_TrackGame->renderTarget->field_0x28;
-    if (PtInRect((RECT*)field_0x2c, point)) {
-        point.x -= ((RECT*)field_0x2c)->left;
-        point.y -= ((RECT*)field_0x2c)->top;
+    if (PtInRect((RECT*)screenArea, point)) {
+        point.x -= ((RECT*)screenArea)->left;
+        point.y -= ((RECT*)screenArea)->top;
         int x = (int)(point.x / ownerDialog->scaleX);
         int y = (int)(point.y / ownerDialog->scaleY);
         UnknownSurfaceDesc desc;
@@ -507,14 +507,14 @@ int UIEditBox::UnknownVirtualSlot40() {
         SetEditText("");
     if (drawnTexture) {
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)field_0x2c,
-                                                           field_0x4c,
+            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
+                                                           visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
             redrawFrames = redraw;
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(field_0x2c, drawnTexture, field_0x4c,
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
                                                             drawnTexture->field_0x30 ? 0x1008000 : 0x1000000);
             redrawFrames = redraw;
         }
@@ -539,27 +539,27 @@ int UIEditBox::UnknownVirtualSlot40() {
             int offset = width - textWidth;
             field_0x200 = offset > 0 ? 0 : offset;
         }
-        int x = field_0x2c[0] + field_0x200;
+        int x = screenArea[0] + field_0x200;
         int y;
         if (textAlign & 8)
-            y = field_0x2c[1];
+            y = screenArea[1];
         else if (textAlign & 0x10)
-            y = (field_0x2c[3] - field_0x2c[1]) / 2 - fontHeight / 2 + field_0x2c[1];
+            y = (screenArea[3] - screenArea[1]) / 2 - fontHeight / 2 + screenArea[1];
         else if (textAlign & 0x20)
-            y = field_0x2c[3] - fontHeight;
+            y = screenArea[3] - fontHeight;
         else
-            y = field_0x2c[1];
+            y = screenArea[1];
         rect.left = x + textLeftMargin;
         rect.top = y + textTopMargin;
-        rect.right = field_0x2c[2] - textLeftMargin;
-        rect.bottom = field_0x2c[3] - textTopMargin;
-        if (ownerDialog->BeginControlDraw(&dc, (CameraRect*)field_0x2c, &more, this)) {
-            if (field_0xd0)
-                ownerDialog->DrawAlignedText(dc, &rect, controlText, field_0xd0, textColor, fontHeight, 0,
+        rect.right = screenArea[2] - textLeftMargin;
+        rect.bottom = screenArea[3] - textTopMargin;
+        if (ownerDialog->BeginControlDraw(&dc, (CameraRect*)screenArea, &more, this)) {
+            if (controlTextLength)
+                ownerDialog->DrawAlignedText(dc, &rect, controlText, controlTextLength, textColor, fontHeight, 0,
                                                   textDrop, dropColor, 9, 1, 0);
             if (!more && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 int caret = rect.left + textWidth;
-                int limit = ownerDialog->screenArea.left + field_0x2c[0] + width - 1;
+                int limit = ownerDialog->screenArea.left + screenArea[0] + width - 1;
                 if (limit < caret)
                     caret = limit;
                 rect.left = caret;
@@ -619,19 +619,19 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
         }
         switch (c) {
         case 8:
-            if (field_0xd0 && textLength > 0) {
+            if (controlTextLength && textLength > 0) {
                 char* previous = CharPrevA(controlText, controlText + textLength);
                 if (previous) {
                     int lead = IsDBCSLeadByte(*previous);
-                    int length = field_0xd0;
+                    int length = controlTextLength;
                     int cursor = textLength;
                     if (lead) {
                         memmove(previous, controlText + cursor, length - cursor + 1);
-                        field_0xd0 -= 2;
+                        controlTextLength -= 2;
                         textLength -= 2;
                     } else {
                         memmove(previous, controlText + cursor, length - cursor + 1);
-                        field_0xd0--;
+                        controlTextLength--;
                         textLength--;
                     }
                 }
@@ -662,19 +662,19 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             int room;
             if (lead) {
                 field_0x228 = 1;
-                room = field_0xd0 < textCapacity - 2;
+                room = controlTextLength < textCapacity - 2;
                 field_0x22c = !room;
             } else if (field_0x22c) {
                 field_0x22c = 0;
                 room = 0;
             } else {
-                room = field_0xd0 < textCapacity - 1;
+                room = controlTextLength < textCapacity - 1;
             }
             if (room) {
-                memmove(controlText + textLength + 1, controlText + textLength, field_0xd0 - textLength + 1);
+                memmove(controlText + textLength + 1, controlText + textLength, controlTextLength - textLength + 1);
                 controlText[textLength] = c;
                 textLength++;
-                field_0xd0++;
+                controlTextLength++;
             } else if (field_0x208_sound) {
                 field_0x208_sound->SetVolume(ownerGui->field_0x34c, 0);
                 field_0x208_sound->PlayWithOptions(1, 0, 0);
@@ -682,12 +682,12 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             break;
         }
         }
-        controlText[field_0xd0] = 0;
+        controlText[controlTextLength] = 0;
         void* dc;
         if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
-            GetTextExtentPoint32A((HDC)dc, controlText, field_0xd0, &size);
+            GetTextExtentPoint32A((HDC)dc, controlText, controlTextLength, &size);
             textExtent[1] = size.cx;
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
@@ -715,7 +715,7 @@ int UIMultiState::UnknownVirtualSlot40() {
     CameraRect rect;
     if (stateTable && drawnTexture) {
         TextureMap* texture = drawnTexture;
-        rect = *(CameraRect*)field_0x2c;
+        rect = *(CameraRect*)screenArea;
         if (sourceBlit) {
             rect.right = (int)(texture->field_0x14 * ownerDialog->scaleX) + rect.left;
             rect.bottom = (int)(texture->field_0x18 * ownerDialog->scaleY) + rect.top;
@@ -731,20 +731,20 @@ int UIMultiState::UnknownVirtualSlot40() {
         }
     }
     if ((stateTable && stateTable[selectedState].text && stateTable[selectedState].field_0x0c) ||
-        (sourceBlit && controlText && field_0xd0)) {
+        (sourceBlit && controlText && controlTextLength)) {
         void* dc;
         int more;
         redrawFrames = redraw;
         do {
-            if (ownerDialog->BeginControlDraw(&dc, (CameraRect*)field_0x2c, &more, this)) {
+            if (ownerDialog->BeginControlDraw(&dc, (CameraRect*)screenArea, &more, this)) {
                 if (sourceBlit) {
-                    rect = *(CameraRect*)field_0x2c;
+                    rect = *(CameraRect*)screenArea;
                     rect.left += stateTable[selectedState].image->GetCurrentFrame()->frameWidth +
                                  textLeftMargin;
                     rect.right -= textLeftMargin;
                     rect.top += textTopMargin;
                     rect.bottom -= textTopMargin;
-                    ownerDialog->DrawAlignedText(dc, &rect, controlText, field_0xd0, textColor, fontHeight,
+                    ownerDialog->DrawAlignedText(dc, &rect, controlText, controlTextLength, textColor, fontHeight,
                                                       (UnknownGameUiTextRun*)textLines, textDrop, dropColor,
                                                       0x11, 1, 0);
                 } else {
@@ -762,13 +762,13 @@ int UIMultiState::UnknownVirtualSlot40() {
 // 0x0047a400: names the parts after the list ("<name>_BUT", "_LB", "_SB",
 // "_LBK", "_SBK", "_TBK") and lays them out below and beside the text.
 void UIDropDownList::LayoutParts() {
-    int left = field_0x2c[0];
+    int left = screenArea[0];
     CameraRect full;
     full.left = 0;
     full.top = 0;
-    full.right = field_0x2c[2] - left;
-    int top = field_0x2c[1];
-    full.bottom = field_0x2c[3] - top;
+    full.right = screenArea[2] - left;
+    int top = screenArea[1];
+    full.bottom = screenArea[3] - top;
     CameraRect button;
     UIAnim* image = buttonPart->stateImages[0];
     if (image) {
@@ -797,30 +797,30 @@ void UIDropDownList::LayoutParts() {
     area->bottom = top + scroll.bottom;
     sprintf(name, "%s_BUT", GetName());
     buttonPart->SetName(name);
-    *(CameraRect*)buttonPart->field_0x2c = button;
-    *(CameraRect*)buttonPart->field_0x3c = *(CameraRect*)buttonPart->field_0x2c;
+    *(CameraRect*)buttonPart->screenArea = button;
+    *(CameraRect*)buttonPart->bounds = *(CameraRect*)buttonPart->screenArea;
     if (!button.left)
         buttonPart->UnknownVirtualSlot4();
     sprintf(name, "%s_LB", GetName());
     listPart->SetName(name);
-    *(CameraRect*)listPart->field_0x2c = list;
-    *(CameraRect*)listPart->field_0x3c = *(CameraRect*)listPart->field_0x2c;
+    *(CameraRect*)listPart->screenArea = list;
+    *(CameraRect*)listPart->bounds = *(CameraRect*)listPart->screenArea;
     sprintf(name, "%s_SB", GetName());
     scrollBarPart->SetName(name);
-    *(CameraRect*)scrollBarPart->field_0x2c = scroll;
-    *(CameraRect*)scrollBarPart->field_0x3c = *(CameraRect*)scrollBarPart->field_0x2c;
+    *(CameraRect*)scrollBarPart->screenArea = scroll;
+    *(CameraRect*)scrollBarPart->bounds = *(CameraRect*)scrollBarPart->screenArea;
     sprintf(name, "%s_LBK", GetName());
     staticPart0->SetName(name);
-    *(CameraRect*)staticPart0->field_0x2c = list;
-    *(CameraRect*)staticPart0->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
+    *(CameraRect*)staticPart0->screenArea = list;
+    *(CameraRect*)staticPart0->bounds = *(CameraRect*)staticPart0->screenArea;
     sprintf(name, "%s_SBK", GetName());
     staticPart1->SetName(name);
-    *(CameraRect*)staticPart1->field_0x2c = scroll;
-    *(CameraRect*)staticPart1->field_0x3c = *(CameraRect*)staticPart1->field_0x2c;
+    *(CameraRect*)staticPart1->screenArea = scroll;
+    *(CameraRect*)staticPart1->bounds = *(CameraRect*)staticPart1->screenArea;
     sprintf(name, "%s_TBK", GetName());
     staticPart2->SetName(name);
-    *(CameraRect*)staticPart2->field_0x2c = full;
-    *(CameraRect*)staticPart2->field_0x3c = *(CameraRect*)staticPart2->field_0x2c;
+    *(CameraRect*)staticPart2->screenArea = full;
+    *(CameraRect*)staticPart2->bounds = *(CameraRect*)staticPart2->screenArea;
     listPart->textLeftMargin = textLeftMargin;
     listPart->textTopMargin = textTopMargin;
     static_cast<UIListBox*>(listPart)->SetRowTextColor(textColor, -1);
@@ -1409,13 +1409,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         scrollBar->SetImage(1, FindSectionObject(buffer));
                         scrollBar->SetImage(2, FindSectionObject(buffer));
                         scrollBar->SetImage(3, FindSectionObject(buffer));
-                        if (control->field_0x3c[2] == control->field_0x3c[0]) {
+                        if (control->bounds[2] == control->bounds[0]) {
                             UIAnim* image = control->stateImages[0];
-                            control->field_0x3c[2] = image->frameList[0]->frameWidth + control->field_0x3c[0];
-                            control->field_0x3c[3] = control->field_0x3c[1] + image->frameList[0]->frameHeight;
+                            control->bounds[2] = image->frameList[0]->frameWidth + control->bounds[0];
+                            control->bounds[3] = control->bounds[1] + image->frameList[0]->frameHeight;
                         }
                         static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4753c0(position, ticks ? ticks
-                                                                         : control->field_0x3c[2] - control->field_0x3c[0] + 1);
+                                                                         : control->bounds[2] - control->bounds[0] + 1);
                         scrollBar->SetThumbSizeFromState(0);
                     }
                 }
@@ -1641,14 +1641,14 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 control->SetAnchor((UIControl*)FindSectionObject(anchor), relAnchor);
                 control->SetName(sectionTable[i].sectionName);
                 control->moveable = moveable;
-                if (control->field_0x3c[2] == control->field_0x3c[0]) {
+                if (control->bounds[2] == control->bounds[0]) {
                     UIAnim* image;
                     if (!_stricmp(type, "MULTISTATE") || !_stricmp(type, "RADIOBUTTON"))
                         image = ((UIMultiState*)control)->stateTable[((UIMultiState*)control)->selectedState].image;
                     else
                         image = control->stateImages[0];
-                    control->field_0x3c[2] = image->frameList[0]->frameWidth + control->field_0x3c[0];
-                    control->field_0x3c[3] = control->field_0x3c[1] + image->frameList[0]->frameHeight;
+                    control->bounds[2] = image->frameList[0]->frameWidth + control->bounds[0];
+                    control->bounds[3] = control->bounds[1] + image->frameList[0]->frameHeight;
                 }
                 if (fontName[0] || (fontHeight && guiManager && guiManager->dialogFontName)) {
                     control->ownsFont = 1;
@@ -1784,9 +1784,9 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             int width = image->GetCurrentTexture()->field_0x14;
             int imageHeight = image->GetCurrentTexture()->field_0x18;
             frame->SetImage(0, image);
-            frame->field_0x2c[2] = width;
-            frame->field_0x2c[3] = imageHeight;
-            *(CameraRect*)frame->field_0x3c = *(CameraRect*)frame->field_0x2c;
+            frame->screenArea[2] = width;
+            frame->screenArea[3] = imageHeight;
+            *(CameraRect*)frame->bounds = *(CameraRect*)frame->screenArea;
             frame->drawnTexture = frame->UnknownVirtualSlot48(0);
             screenArea.right = screenArea.left + width;
             screenArea.bottom = screenArea.top + imageHeight;

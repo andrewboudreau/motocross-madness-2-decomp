@@ -953,7 +953,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     field_0x7f84 = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (!engine->field_0x70) {
+        if (!engine->shown) {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
@@ -961,7 +961,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
         }
     } else {
         UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (engine->field_0x70) {
+        if (engine->shown) {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
             if (dialogBackground)

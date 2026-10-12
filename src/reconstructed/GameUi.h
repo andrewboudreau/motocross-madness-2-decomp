@@ -231,49 +231,50 @@ public:
     UIControl* NextFocusableControl(); // 0x00472810: the next focusable control
     int UnknownFunction472480(int* position); // 0x00472480
 
-    int field_0x2c[4];                        // screen area (scaled +0x3c)
+    int screenArea[4];                        // +0x2c: screen area (scaled +0x3c)
     union {
-        int field_0x3c[4];                    // the control's area, a CameraRect (dlgprocs.cpp LoadingDlg)
+        int bounds[4];                        // +0x3c: the control's area, a CameraRect (dlgprocs.cpp LoadingDlg)
         struct {
             int left;
             int top;
             int right;
             int bottom;
-        } field_0x3c_rect;
+        } boundsRect;
     };
-    int field_0x4c[4];                        // the visible part: left and top clipped, width, height
+    int visibleArea[4];                       // +0x4c: the visible part: left and top clipped, width, height
     // Member names follow the .dtm keys the dialog loader (UIDialog slot 27)
     // stores in them ("GroupId", "AttachId", "TextColor", ...).
     int controlType;                          // +0x5c: 5 static, 7/8 scroll bar, 11 edit box, 12 static text (FindControl's filter)
     int currentState;                         // +0x60: state (image index)
     int savedState;                           // +0x64: state before disabling
-    int field_0x68;                           // a movie control's playing flag (dlgprocs.cpp MainDlg slot 10)
+    int transitionState;                      // +0x68: 0 idle, 1 showing, 2 hiding (Show, RunTransition;
+                                              // MainDlg slot 10 waits for its menu animation to clear it)
     int enabled;                              // +0x6c: "Enable" (slot 49)
-    int field_0x70;
+    int shown;                                // +0x70: Show's flag; drawing and hit tests skip hidden controls
     int eventCode;                            // +0x74
     int groupId;                              // +0x78: "GroupId" (UIDialog::EnableGroup, ShowGroup)
     int attachId;                             // +0x7c: "AttachId" (slot 52; lists and their scroll bars share it)
-    float field_0x80;                         // sliding position (x)
-    float field_0x84;                         // sliding position (y)
-    float field_0x88;                         // zooming width
-    float field_0x8c;                         // zooming height
-    float field_0x90;                         // x step per frame
-    float field_0x94;                         // y step per frame
-    float field_0x98;                         // width step per frame
-    float field_0x9c;                         // height step per frame
+    float slideX;                             // +0x80: sliding position (x)
+    float slideY;                             // +0x84: sliding position (y)
+    float zoomWidth;                          // +0x88: zooming width
+    float zoomHeight;                         // +0x8c: zooming height
+    float slideStepX;                         // +0x90: x step per frame
+    float slideStepY;                         // +0x94: y step per frame
+    float zoomStepWidth;                      // +0x98: width step per frame
+    float zoomStepHeight;                     // +0x9c: height step per frame
     int shapeBounds;                          // +0xa0: "ShapeBounds"
     int sourceBlit;                           // +0xa4: "SourceBlit"
     unsigned int transitionTime;              // +0xa8
     unsigned int transitionDelay;             // +0xac: "FXDelay"
     int field_0xb0;
-    int field_0xb4;
+    int transitionType;                       // +0xb4: StartTransition's type (0x6a picks slots 46/47)
     UIDialog* ownerDialog;         // +0xb8
     GUIManager* ownerGui;                     // +0xbc
     char* controlText;                        // +0xc0: "Text" (SetText)
     unsigned int textColor;                   // +0xc4: "TextColor"
     int dropColor;                            // +0xc8: "DropColor"
     unsigned int currentTextColor;            // +0xcc
-    int field_0xd0;
+    int controlTextLength;                    // +0xd0: strlen(controlText)
     int textDrop;                             // +0xd4: "TextDrop"
     int textAlign;                            // +0xd8: "TextAlign"/"TextAlignV" bits
     int textExtent[2];                        // +0xdc: the text's length and width
@@ -308,7 +309,7 @@ public:
     void* field_0x1c4;
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
-    int (UIControl::*field_0x1d0)(); // the running transition (slots 41-47)
+    int (UIControl::*transitionStep)(); // +0x1d0: the running transition (slots 41-47)
     int field_0x1d4;
     int keyBind;                              // +0x1d8: "KeyBind"
     int post3D;                               // +0x1dc: "Pre3D" == 0

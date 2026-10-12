@@ -150,7 +150,7 @@ void CloseDialogCallback(UIDialog* dialog) {
 int MainDlg::UnknownVirtualSlot10(float frameTime) {
     if (field_0x7f6c) {
         FindControl("ScreenOverCtl", 0)->UnknownVirtualSlot50();
-        if (field_0x7f6c && !menuSingleAnimation->field_0x68 && field_0x7f78) {
+        if (field_0x7f6c && !menuSingleAnimation->transitionState && field_0x7f78) {
             if (field_0x7f7c < 4.0f) {
                 field_0x7f7c = g_TrackGame->frameTime + field_0x7f7c;
             } else {
@@ -1192,7 +1192,7 @@ void SPBikeRiderDlg::UnknownFunction4500e0() {
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (!engine->field_0x70) {
+        if (!engine->shown) {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
@@ -1200,7 +1200,7 @@ void SPBikeRiderDlg::UnknownFunction4500e0() {
         }
     } else {
         UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (engine->field_0x70) {
+        if (engine->shown) {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
             if (dialogBackground)
@@ -1338,7 +1338,7 @@ void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case kDialogInit: {
         UIControl* area = FindControl("StaBarRect", 5);
-        UIProgressBar* bar = new(__FILE__, 2878) UIProgressBar(0, (CameraRect*)area->field_0x3c, this);
+        UIProgressBar* bar = new(__FILE__, 2878) UIProgressBar(0, (CameraRect*)area->bounds, this);
         AddControl(bar, 0, 0);
         bar->SetName("ProgressBar");
         UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");

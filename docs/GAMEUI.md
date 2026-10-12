@@ -74,7 +74,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
   `return 1` inside the branches, with or without a goto, duplicates the
   epilogue; retail jumps back to one.
 - UIControl slot 41 (`0x004715d0`): the zoom's right edge is
-  `(int)(width + field_0x80)` with `float width = field_0x88` loaded into a
+  `(int)(width + slideX)` with `float width = zoomWidth` loaded into a
   local first (both member orders give `fld +0x80`), and the switch has
   cases 1, 4, 5, 9 and 10 (the retail index table maps type 2 to default).
 - UIScrollBar `0x004753c0`: `float limit = travel` before the division, so
