@@ -72,12 +72,12 @@ struct UnknownEventRacerPart {
     float gateDistance;                       // +0x0c distance to the next gate (sort key)
     float field_0x10;
     float field_0x14;
-    int lapOffset;                            // +0x18 added to the lap count when ordering (0x004e5f40): -1 when the +0x38..+0x44 distance passes the probe gate
+    int lapOffset;                            // +0x18 added to the lap count when ordering (0x004e5f40): -1 when the placedPos..progressPos distance passes the probe gate
     Vector3 previousPosition;                 // +0x1c previous position
     Vector3 currentPosition;                  // +0x28 current position
     UnknownBikeRaceNode* nextGate;            // +0x34 next gate
-    TrackPos field_0x38;
-    TrackPos field_0x44;
+    TrackPos placedPos;                       // +0x38 Track::PlaceNear's (or ClosestPointOnTrack's) placement of previousPosition
+    TrackPos progressPos;                     // +0x44 PlaceNear's search start; advances only forward to placedPos (0x004e6a50)
     UnknownEventRacerPart* next;              // +0x50 next
 };
 

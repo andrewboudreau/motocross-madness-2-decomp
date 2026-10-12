@@ -599,16 +599,16 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         chatOpen = false;
                     }
                 }
-                if (flagGirl != 0 && localRacer->statusNode->field_0x44.node != 0) {
+                if (flagGirl != 0 && localRacer->statusNode->progressPos.node != 0) {
                     int laps = g_TrackGame->mode.raceSettings.lapCount;
                     int lap = localRacer->lapCount;
                     int last = lap == laps - 1;
                     int previous = lap == laps - 2;
                     if (previous || last) {
-                        float toFinish = raceTrack->DistanceAlong(localRacer->statusNode->field_0x44,
+                        float toFinish = raceTrack->DistanceAlong(localRacer->statusNode->progressPos,
                                                                             finishProbe.field_0x2c);
                         float fromFinish = raceTrack->DistanceAlong(finishProbe.field_0x2c,
-                                                                              localRacer->statusNode->field_0x44);
+                                                                              localRacer->statusNode->progressPos);
                         if (field_0x078 && localRacer->finished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
                             flagGirl->SetMotionByName("Stand");

@@ -90,8 +90,8 @@ struct UnknownRunwayView {
 // The racer's race status node (RaceView.h's UnknownEventRacerPart).
 struct UnknownRunwayRacerPart {
     unsigned char field_0x00[0x38];
-    UnknownRunwayTrackPos field_0x38;
-    UnknownRunwayTrackPos field_0x44;
+    UnknownRunwayTrackPos placedPos;          // +0x38 (RaceView.h)
+    UnknownRunwayTrackPos progressPos;        // +0x44 (RaceView.h)
 };
 
 // The racer the lights point for (NationalRace.cpp passes its view's
