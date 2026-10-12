@@ -106,11 +106,11 @@ struct UnknownGroundFog {
     unsigned char field_0x00[0x18];
     UnknownGroundFogOwner* field_0x18;        // GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];
-    float field_0x30;                         // fog plane height
-    float field_0x34;                         // depth limit
-    int field_0x38;                           // alpha limit
+    float planeHeight;                        // +0x30: fog plane height (compared with each vertex's y)
+    float depthLimit;                         // +0x34
+    int alphaLimit;                           // +0x38
     unsigned char field_0x3c[0x40 - 0x3c];
-    float field_0x40;                         // density
+    float density;                            // +0x40
 };
 
 // A 0x20-byte lit vertex (D3DLVERTEX layout): position, colour, specular.
@@ -131,7 +131,7 @@ struct UnknownGroundFogShader {
     // 0x00484f10: fogs `count` vertices by their depth below the fog plane.
     void UnknownFunction484f10(UnknownFogVertex* vertices, int count);
 
-    UnknownGroundFog* field_0x00;
+    UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
 // Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8).

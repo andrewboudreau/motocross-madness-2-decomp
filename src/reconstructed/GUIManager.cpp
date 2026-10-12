@@ -55,32 +55,32 @@ void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, i
     int alpha;
     int i;
 
-    if (field_0x00 == (UnknownGroundFog*)1)
+    if (groundFog == (UnknownGroundFog*)1)
         return;
-    if (!field_0x00) {
-        field_0x00 = (UnknownGroundFog*)g_TrackGame->field_0x34->FindByClassName(1, "GroundFog");
-        if (!field_0x00) {
-            field_0x00 = (UnknownGroundFog*)1;
+    if (!groundFog) {
+        groundFog = (UnknownGroundFog*)g_TrackGame->field_0x34->FindByClassName(1, "GroundFog");
+        if (!groundFog) {
+            groundFog = (UnknownGroundFog*)1;
             return;
         }
     }
-    fog = field_0x00;
+    fog = groundFog;
     camera = fog->field_0x18->field_0x08;
-    alphaLimit = fog->field_0x38;
+    alphaLimit = fog->alphaLimit;
     eyeX = camera->field_0x170;
     eyeY = camera->field_0x174;
     eyeZ = camera->field_0x178;
-    depthLimit = (int)fog->field_0x34;
-    density = fog->field_0x40;
+    depthLimit = (int)fog->depthLimit;
+    density = fog->density;
     for (i = 0; i < count; i++) {
-        if (vertices[i].y >= field_0x00->field_0x30 && field_0x00->field_0x30 <= eyeY) {
+        if (vertices[i].y >= groundFog->planeHeight && groundFog->planeHeight <= eyeY) {
             vertices[i].specular = 0xff000000;
             continue;
         }
-        if (field_0x00->field_0x30 > eyeY && vertices[i].y > eyeY)
-            depth = field_0x00->field_0x30 - eyeY;
+        if (groundFog->planeHeight > eyeY && vertices[i].y > eyeY)
+            depth = groundFog->planeHeight - eyeY;
         else
-            depth = field_0x00->field_0x30 - vertices[i].y;
+            depth = groundFog->planeHeight - vertices[i].y;
         dx = eyeX - vertices[i].x;
         dy = eyeY - vertices[i].y;
         dz = eyeZ - vertices[i].z;
