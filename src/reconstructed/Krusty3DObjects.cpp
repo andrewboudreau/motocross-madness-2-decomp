@@ -320,8 +320,8 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
         if (digitModels[i])
             digitModels[i]->isVisible = 0;
     if (((UnknownNumberOwner*)renderContext)->currentCamera == digitCamera) {
-        int counting = countdownRacer->countdown > 0.0f && countdownRacer->field_0x6c == 0;
-        if (!(countdownRacer->field_0x38->field_0x76c > 1.0f) && !counting)
+        int counting = countdownRacer->countdown > 0.0f && countdownRacer->thirtySecondMan == 0;
+        if (!(countdownRacer->localRacer->offTrackTime > 1.0f) && !counting)
             return 1;
         drawEnabled = 1;
         Vector3 up;
@@ -340,7 +340,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
             position += forward * 6.0f;
             digitModels[index]->SetPosition(&position);
         } else {
-            index = 5 - (int)countdownRacer->field_0x38->field_0x76c;
+            index = 5 - (int)countdownRacer->localRacer->offTrackTime;
             if (index >= 5 || index < 0 || !digitModels[index])
                 return 1;
             digitModels[index]->isVisible = 1;

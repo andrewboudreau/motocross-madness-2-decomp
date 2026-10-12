@@ -52,15 +52,16 @@ struct UnknownNumberCamera {
 
 struct UnknownNumberRacerState {
     unsigned char field_0x000[0x76c];
-    float field_0x76c;
+    float offTrackTime;                       // +0x76c RaceView.h's racer offTrackTime
 };
 
-// NumberObjectManager's +0x2c.
+// NumberObjectManager's +0x2c. Its offsets line up with BikeRace.h's race
+// view: +0x38 localRacer, +0x6c the 30SecMan entry, +0x15c startCountdown.
 struct UnknownNumberRacer {
     unsigned char field_0x000[0x38];
-    UnknownNumberRacerState* field_0x38;
+    UnknownNumberRacerState* localRacer;      // +0x38
     unsigned char field_0x03c[0x6c - 0x3c];
-    int field_0x6c;
+    int thirtySecondMan;                      // +0x6c no digits count down while it is present
     unsigned char field_0x070[0x15c - 0x70];
     float countdown;                          // +0x15c count-down value
 };
