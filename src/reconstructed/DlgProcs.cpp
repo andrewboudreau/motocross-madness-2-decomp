@@ -994,7 +994,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
         ApplyChosenRider();
         ApplyChosenBike();
-        PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
+        PaintPlateNumber(g_TrackGame->mode.plateNumber);
         srand(ReadClock());
         if (dialogBackground)
             previewRegion = dialogBackground->AllocRegion(1);
@@ -1048,7 +1048,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
             } else {
                 number = 101;
             }
-            g_TrackGame->mode.field_0x1bcc = number;
+            g_TrackGame->mode.plateNumber = number;
             _itoa(number, plate, 10);
             static_cast<UIEditBox*>(event->control)->SetEditText(plate);
             PaintPlateNumber(number);
@@ -1060,7 +1060,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
             int number = atoi(typed);
             if (number >= 100 && number <= 999) {
                 PaintPlateNumber(number);
-                g_TrackGame->mode.field_0x1bcc = number;
+                g_TrackGame->mode.plateNumber = number;
             }
         }
         break;
@@ -1091,7 +1091,7 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
         UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model];
         sprintf(text, "%s %s", model->displayName, entry->displayName);
         list->AddRow(text, i, 0);
-        if (g_TrackGame->mode.racerChoice.field_0xc4 == i)
+        if (g_TrackGame->mode.racerChoice.bikeIndex == i)
             bike = i;
     }
     if (bike)
@@ -1208,7 +1208,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
                 dialogBackground->MarkAllDirty();
         }
     }
-    g_TrackGame->mode.racerChoice.field_0xc4 = bikes->GetRowData(-1);
+    g_TrackGame->mode.racerChoice.bikeIndex = bikes->GetRowData(-1);
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
@@ -1230,7 +1230,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
     }
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
-    _itoa(g_TrackGame->mode.field_0x1bcc, text, 10);
+    _itoa(g_TrackGame->mode.plateNumber, text, 10);
     plate->SetEditText(text);
 }
 
@@ -1418,8 +1418,8 @@ void CreateProfile(UnknownDialogEvent* event) {
     g_TrackGame->mode.showNewbieDialog = 1;
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
         if (((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize == 250) {
-            g_TrackGame->mode.racerChoice.field_0xc4 = i;
-            g_TrackGame->mode.racerChoice.field_0xc0 =
+            g_TrackGame->mode.racerChoice.bikeIndex = i;
+            g_TrackGame->mode.racerChoice.modelIndex =
                 ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model;
             strcpy(g_TrackGame->mode.racerChoice.bikeModel,
                    ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)

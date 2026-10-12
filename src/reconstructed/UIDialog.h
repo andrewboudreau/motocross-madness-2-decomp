@@ -109,7 +109,7 @@ public:
     void RemoveTimer(void* timer);            // 0x0046fec0: removes `timer`
     void UnknownFunction46ff60();             // 0x0046ff60
     void UnknownFunction46ffc0(int value);    // 0x0046ffc0
-    void UnknownFunction46ffd0(void* background); // 0x0046ffd0: the background, also for its parents
+    void SetBackground(void* background); // 0x0046ffd0: the background, also for its parents
     void UnknownFunction470070(int a, int b, CameraRect* rect); // 0x00470070
     void GrabBackground(int dim, CameraRect* rect); // 0x004700b0: grabs the screen behind it
     void ReleaseBackgroundGrab();             // 0x00470110: releases the grab

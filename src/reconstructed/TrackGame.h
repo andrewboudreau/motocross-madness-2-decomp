@@ -256,8 +256,8 @@ struct UnknownTrackGameRacerChoice {
     char bikeModel[0x40];                     // +0x00 bike model name (dlgprocs.cpp SPBikeRiderDlg)
     char bikeName[0x40];                      // +0x40 bike name
     char riderName[0x40];                     // +0x80 rider name
-    int field_0xc0;                           // -1 (constructor)
-    int field_0xc4;                           // SelectGamePicProcs.cpp
+    int modelIndex;                           // +0xc0 -1 (constructor)
+    int bikeIndex;                            // +0xc4 SelectGamePicProcs.cpp
 };
 
 // Per-racer record (0xf8 bytes); TrackGameMode holds eight at +0x1be4, after
@@ -266,22 +266,22 @@ struct UnknownTrackGameRacerChoice {
 struct UnknownTrackGameRacerSlot {
     UnknownTrackGameRacerSlot();              // 0x00521f30
     // 0x00521fb0 (SelectGamePicProcs.cpp passes TrackGameMode+0x1974, +0x19b4 and +0x19f4).
-    void SetBikeAndRiderNames(void* bikeModelName, void* bikeName, void* riderName);
+    void SetBikeAndRiderNames(void* modelText, void* bikeText, void* riderText);
     void ClearLeft();                         // 0x00522050 (dlgprocs.cpp LoadingDlg): clears +0xc8
 
-    char field_0x00[0x40];                    // 0x00521fb0 copies three names (at most 63 chars)
-    char field_0x40[0x40];
-    char field_0x80[0x40];
-    int field_0xc0;                           // SelectGamePicProcs.cpp
-    int field_0xc4;                           // SelectGamePicProcs.cpp
-    int field_0xc8;                           // set when the player leaves (EventManager slot 24)
+    char bikeModelName[0x40];                 // +0x00 0x00521fb0 copies three names (at most 63 chars)
+    char bikeName[0x40];                      // +0x40
+    char riderName[0x40];                     // +0x80
+    int plateNumber;                          // +0xc0 SelectGamePicProcs.cpp
+    int bikeIndex;                            // +0xc4 SelectGamePicProcs.cpp
+    int hasLeft;                              // +0xc8 set when the player leaves (EventManager slot 24)
     int isReady;                              // +0xcc ready
     float lowestMessageDelay;                 // +0xd0 lowest message delay (bikerace.cpp slot 24); FLT_MAX initially
     int networkPlayerId;                      // +0xd4 network player id
     int racerIndex;                           // +0xd8 player's racer index (EventManager slot 24)
     char playerName[0x10];                    // +0xdc player name (SelectGamePicProcs.cpp)
-    int field_0xec;                           // bike record +0x8c (SelectGamePicProcs.cpp 0x004f2340)
-    int field_0xf0;                           // bike record +0x90
+    int engineSize;                           // +0xec bike record +0x8c (SelectGamePicProcs.cpp 0x004f2340)
+    int fourStroke;                           // +0xf0 bike record +0x90
     unsigned char field_0xf4;                 // 1 (constructor)
     unsigned char field_0xf5[0xf8 - 0xf5];
 };
@@ -315,7 +315,7 @@ public:
     void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
-    void UnknownFunction522840(char (*names)[0x80]);   // reloads resourceStrings
+    void ReloadResourceStrings(char (*names)[0x80]);   // reloads resourceStrings
     void UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
@@ -399,7 +399,7 @@ public:
     UnknownTrackGameRacerChoice racerChoice;  // +0x1974 the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
     UnknownTrackGameRacerChoice racerChoiceBackup; // +0x1a3c
     unsigned char field_0x1b04[0x1bcc - 0x1b04];
-    int field_0x1bcc;                         // SelectGamePicProcs.cpp
+    int plateNumber;                          // +0x1bcc SelectGamePicProcs.cpp
     int lobbyRank;                            // +0x1bd0: 0x0049c600 WaitForLobbyRank; 1..100 is copied to +0x1bcc
     int lobbyPresetFlags;                     // +0x1bd4: 0x0049c2f0 ReadLobbyPreset (-1 until read)
     int maxOpponents;                         // +0x1bd8: largest opponent count (SelectGamePicProcs.cpp)

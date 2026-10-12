@@ -47,34 +47,34 @@ UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
     count = length > 0xf ? 0xf : length;
     strncpy(playerName, "", count);
     playerName[count] = 0;
-    field_0xc8 = 0;
+    hasLeft = 0;
     isReady = 0;
-    field_0x80[0] = 0;
-    field_0x40[0] = 0;
-    field_0x00[0] = 0;
+    riderName[0] = 0;
+    bikeName[0] = 0;
+    bikeModelName[0] = 0;
     lowestMessageDelay = FLT_MAX;
     field_0xf4 = 1;
 }
 
 // 0x00521fb0
-void UnknownTrackGameRacerSlot::SetBikeAndRiderNames(void* bikeModelName, void* bikeName, void* riderName) {
-    int length = strlen((char*)bikeModelName);
+void UnknownTrackGameRacerSlot::SetBikeAndRiderNames(void* modelText, void* bikeText, void* riderText) {
+    int length = strlen((char*)modelText);
     int count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x00, (char*)bikeModelName, count);
-    field_0x00[count] = 0;
-    length = strlen((char*)bikeName);
+    strncpy(bikeModelName, (char*)modelText, count);
+    bikeModelName[count] = 0;
+    length = strlen((char*)bikeText);
     count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x40, (char*)bikeName, count);
-    field_0x40[count] = 0;
-    length = strlen((char*)riderName);
+    strncpy(bikeName, (char*)bikeText, count);
+    bikeName[count] = 0;
+    length = strlen((char*)riderText);
     count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x80, (char*)riderName, count);
-    field_0x80[count] = 0;
+    strncpy(riderName, (char*)riderText, count);
+    riderName[count] = 0;
 }
 
 // 0x00522050
 void UnknownTrackGameRacerSlot::ClearLeft() {
-    field_0xc8 = 0;
+    hasLeft = 0;
 }
 
 // 0x00522060
@@ -110,10 +110,10 @@ TrackGameMode::TrackGameMode() {
     ghostFile[0] = 0;
     saveGhost = 0;
     replayFile[0] = 0;
-    racerChoice.field_0xc0 = -1;
-    field_0x1bcc = (int)((rand() * (1.0f / 32768.0f)) * 999.0f);
-    if (field_0x1bcc <= 99)
-        field_0x1bcc += 100;
+    racerChoice.modelIndex = -1;
+    plateNumber = (int)((rand() * (1.0f / 32768.0f)) * 999.0f);
+    if (plateNumber <= 99)
+        plateNumber += 100;
     for (i = 0; i < 6; i++) {
         bonusTrackUnlocked[i] = 0;
         bonusTrackNames[i][0] = 0;
@@ -237,7 +237,7 @@ void TrackGameMode::UnknownFunction522800(UnknownTrackGameModeOptionsA68* option
     strncpy(g_TrackGame->mode.resourceStrings[index], text, count);             \
     g_TrackGame->mode.resourceStrings[index][count] = 0;
 
-void TrackGameMode::UnknownFunction522840(char (*names)[0x80]) {
+void TrackGameMode::ReloadResourceStrings(char (*names)[0x80]) {
     char text[0x100];
     int length;
     int count;
@@ -451,7 +451,7 @@ int TrackGameMode::LoadProfile() {
     fread(&field_0x90, 4, 1, file);
     fread(&field_0x98, 4, 1, file);
     fread(customGarageCurves, 0x294, 1, file);
-    fread(&field_0x1bcc, 4, 1, file);
+    fread(&plateNumber, 4, 1, file);
     fclose(file);
     raceSettings.field_0x35 = 0;
     ChooseDisplayMode(&displayAdapterGuid, &displayModeIndex);
@@ -505,7 +505,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(&field_0x90, 4, 1, file);
     fwrite(&field_0x98, 4, 1, file);
     fwrite(customGarageCurves, 0x294, 1, file);
-    fwrite(&field_0x1bcc, 4, 1, file);
+    fwrite(&plateNumber, 4, 1, file);
     fclose(file);
     g_TrackGame->SetRegistryString("MRUProfile", field_0x00);
     if (g_TrackGame->ui)

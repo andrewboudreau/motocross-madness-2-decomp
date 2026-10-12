@@ -2104,9 +2104,9 @@ void UIDialog::UnknownFunction46ffc0(int value) {
 }
 
 // 0x0046ffd0
-void UIDialog::UnknownFunction46ffd0(void* background) {
+void UIDialog::SetBackground(void* background) {
     if (parentDialog) {
-        parentDialog->UnknownFunction46ffd0(background);
+        parentDialog->SetBackground(background);
         dialogBackground = (BackgroundImage*)background;
     } else {
         dialogBackground = (BackgroundImage*)background;

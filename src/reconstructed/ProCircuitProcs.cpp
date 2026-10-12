@@ -987,7 +987,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->proCircuit->racers[0].engineSize;
     UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->proCircuit->racers[0].field_0x13c;
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
-    _itoa(g_TrackGame->mode.field_0x1bcc, text, 10);
+    _itoa(g_TrackGame->mode.plateNumber, text, 10);
     plate->SetEditText(text);
 }
 
@@ -1062,7 +1062,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
         ApplyChosenRider();
         ApplyChosenBike();
-        PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
+        PaintPlateNumber(g_TrackGame->mode.plateNumber);
         srand(ReadClock());
         if (dialogBackground)
             previewRegion = dialogBackground->AllocRegion(0);
@@ -1116,7 +1116,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
             } else {
                 number = 101;
             }
-            g_TrackGame->mode.field_0x1bcc = number;
+            g_TrackGame->mode.plateNumber = number;
             _itoa(number, plate, 10);
             static_cast<UIEditBox*>(event->control)->SetEditText(plate);
             PaintPlateNumber(number);
@@ -1128,7 +1128,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
             int number = atoi(typed);
             if (number >= 100 && number <= 999) {
                 PaintPlateNumber(number);
-                g_TrackGame->mode.field_0x1bcc = number;
+                g_TrackGame->mode.plateNumber = number;
             }
         }
         break;

@@ -454,7 +454,7 @@ void GUIManager::ReleaseBackground() {
     RecreateCursors(0, 0);
     GameObjectIterator iterator(this, 1, "UIDialog");
     while ((dialog = (UIDialog*)iterator.Next()) != 0)
-        dialog->UnknownFunction46ffd0(0);
+        dialog->SetBackground(0);
     for (i = 0; i < userCount; i++)
         GetUser(i)->CreateToolTip(field_0x18, this);
 }

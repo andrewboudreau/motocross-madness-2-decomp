@@ -60,7 +60,7 @@ public:
     void SetDirectory(const char* directory);     // 0x0044a1d0
     void SetPattern(const char* pattern, int includeFiles); // 0x0044a220
     int GetEntryName(int index, char* path);      // 0x0044a270: entry `index`'s name
-    int UnknownFunction44a2f0(int index, char* name);      // 0x0044a2f0: ... without its extension
+    int GetEntryStem(int index, char* name);      // 0x0044a2f0: ... without its extension
     int NextEntry(char* path);                 // 0x0044a3b0: advances to the next entry
     int CurrentEntry(char* path);                 // 0x0044a440: the current entry
     int NextName(char* name);                 // 0x0044a4c0: next listed name

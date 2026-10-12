@@ -136,7 +136,7 @@ int DirectoryList::GetEntryName(int index, char* path) {
 }
 
 // 0x0044a2f0
-int DirectoryList::UnknownFunction44a2f0(int index, char* name) {
+int DirectoryList::GetEntryStem(int index, char* name) {
     char drive[_MAX_DRIVE];
     char fileName[_MAX_FNAME];
     char path[MAX_PATH];

@@ -32,18 +32,18 @@ public:
     ~AuralScapeListener(); // 0x00402b20: releases the listener
     // 0x00402b40: queries a listener and sets its doppler and rolloff
     // factors and a distance factor of 0.3048 (feet).
-    int UnknownFunction402b40(AuralScape* owner, float doppler, float rolloff);
-    int UnknownFunction402bc0();                        // CommitDeferredSettings
-    int UnknownFunction402be0(float factor);            // SetDistanceFactor
-    int UnknownFunction402c10(float factor);            // SetDopplerFactor
-    int UnknownFunction402c40(float factor);            // SetRolloffFactor
-    int UnknownFunction402c70(Vector3 front, Vector3 top); // SetOrientation
-    int UnknownFunction402cb0(Vector3* position);       // GetPosition
-    int UnknownFunction402ce0(Vector3 position);        // SetPosition
-    int UnknownFunction402d10(Vector3 velocity);        // SetVelocity
+    int Initialize(AuralScape* owner, float doppler, float rolloff);
+    int CommitDeferredSettings();
+    int SetDistanceFactor(float factor);
+    int SetDopplerFactor(float factor);
+    int SetRolloffFactor(float factor);
+    int SetOrientation(Vector3 front, Vector3 top);
+    int GetPosition(Vector3* position);
+    int SetPosition(Vector3 position);
+    int SetVelocity(Vector3 velocity);
 
-    AuralScape* field_0x00;
-    UnknownSoundListener* field_0x04;
+    AuralScape* ownerScape;                   // +0x00
+    UnknownSoundListener* soundListener;      // +0x04
 };
 
 // RTTI: SoundEmitter : GameObject (0x1a4 bytes). A named sound placed in

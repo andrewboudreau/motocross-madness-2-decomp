@@ -246,7 +246,7 @@ void SoundEmitter::UpdateListenerDistance(int count, AuralScapeListener** listen
         Vector3 position;
         float dx;
         float dz;
-        listeners[i]->UnknownFunction402cb0(&position);
+        listeners[i]->GetPosition(&position);
         float x = soundParameters.position.x;
         if (emitterFlags & 2) {
             dx = x - position.x;
@@ -414,89 +414,89 @@ int SoultreeSoundEmitter::UnknownVirtualSlot10(float frameTime) {
 }
 
 AuralScapeListener::AuralScapeListener() {
-    field_0x00 = 0;
-    field_0x04 = 0;
+    ownerScape = 0;
+    soundListener = 0;
 }
 
 // 0x00402b20
 AuralScapeListener::~AuralScapeListener() {
-    if (field_0x04) {
-        field_0x04->Release();
-        field_0x04 = 0;
+    if (soundListener) {
+        soundListener->Release();
+        soundListener = 0;
     }
 }
 
 // 0x00402b40
-int AuralScapeListener::UnknownFunction402b40(AuralScape* owner, float doppler, float rolloff) {
+int AuralScapeListener::Initialize(AuralScape* owner, float doppler, float rolloff) {
     if (!owner)
         return 0;
-    field_0x00 = owner;
-    field_0x04 = SoundSystem()->QueryListener();
-    if (!field_0x04)
+    ownerScape = owner;
+    soundListener = SoundSystem()->QueryListener();
+    if (!soundListener)
         return 0;
-    if (!UnknownFunction402c10(doppler))
+    if (!SetDopplerFactor(doppler))
         return 0;
-    if (!UnknownFunction402c40(rolloff))
+    if (!SetRolloffFactor(rolloff))
         return 0;
-    if (!UnknownFunction402be0(0.3048f))
+    if (!SetDistanceFactor(0.3048f))
         return 0;
-    return UnknownFunction402bc0() != 0;
+    return CommitDeferredSettings() != 0;
 }
 
 // 0x00402bc0
-int AuralScapeListener::UnknownFunction402bc0() {
-    if (!field_0x04)
+int AuralScapeListener::CommitDeferredSettings() {
+    if (!soundListener)
         return 0;
-    return field_0x04->CommitDeferredSettings() >= 0;
+    return soundListener->CommitDeferredSettings() >= 0;
 }
 
 // 0x00402be0
-int AuralScapeListener::UnknownFunction402be0(float factor) {
-    if (!field_0x04)
+int AuralScapeListener::SetDistanceFactor(float factor) {
+    if (!soundListener)
         return 0;
-    return field_0x04->SetDistanceFactor(factor, 1) >= 0;
+    return soundListener->SetDistanceFactor(factor, 1) >= 0;
 }
 
 // 0x00402c10
-int AuralScapeListener::UnknownFunction402c10(float factor) {
-    if (!field_0x04)
+int AuralScapeListener::SetDopplerFactor(float factor) {
+    if (!soundListener)
         return 0;
-    return field_0x04->SetDopplerFactor(factor, 1) >= 0;
+    return soundListener->SetDopplerFactor(factor, 1) >= 0;
 }
 
 // 0x00402c40
-int AuralScapeListener::UnknownFunction402c40(float factor) {
-    if (!field_0x04)
+int AuralScapeListener::SetRolloffFactor(float factor) {
+    if (!soundListener)
         return 0;
-    return field_0x04->SetRolloffFactor(factor, 1) >= 0;
+    return soundListener->SetRolloffFactor(factor, 1) >= 0;
 }
 
 // 0x00402c70
-int AuralScapeListener::UnknownFunction402c70(Vector3 front, Vector3 top) {
-    if (!field_0x04)
+int AuralScapeListener::SetOrientation(Vector3 front, Vector3 top) {
+    if (!soundListener)
         return 0;
-    return field_0x04->SetOrientation(front.x, front.y, front.z, top.x, top.y, top.z, 1) >= 0;
+    return soundListener->SetOrientation(front.x, front.y, front.z, top.x, top.y, top.z, 1) >= 0;
 }
 
 // 0x00402cb0
-int AuralScapeListener::UnknownFunction402cb0(Vector3* position) {
-    if (!field_0x04)
+int AuralScapeListener::GetPosition(Vector3* position) {
+    if (!soundListener)
         return 0;
-    return field_0x04->GetPosition(position) >= 0;
+    return soundListener->GetPosition(position) >= 0;
 }
 
 // 0x00402ce0
-int AuralScapeListener::UnknownFunction402ce0(Vector3 position) {
-    if (!field_0x04)
+int AuralScapeListener::SetPosition(Vector3 position) {
+    if (!soundListener)
         return 0;
-    return field_0x04->SetPosition(position.x, position.y, position.z, 1) >= 0;
+    return soundListener->SetPosition(position.x, position.y, position.z, 1) >= 0;
 }
 
 // 0x00402d10
-int AuralScapeListener::UnknownFunction402d10(Vector3 velocity) {
-    if (!field_0x04)
+int AuralScapeListener::SetVelocity(Vector3 velocity) {
+    if (!soundListener)
         return 0;
-    return field_0x04->SetVelocity(velocity.x, velocity.y, velocity.z, 1) >= 0;
+    return soundListener->SetVelocity(velocity.x, velocity.y, velocity.z, 1) >= 0;
 }
 
 // 0x00402d40: qsort order with bit 2 set first.
@@ -552,7 +552,7 @@ int AuralScape::NextListenerNumber() {
 // 0x00403010
 int AuralScape::AddListener(int index, float doppler, float rolloff) {
     listeners[index] = new (__FILE__, 717) AuralScapeListener();
-    if (listeners[index] && listeners[index]->UnknownFunction402b40(this, doppler, rolloff)) {
+    if (listeners[index] && listeners[index]->Initialize(this, doppler, rolloff)) {
         listenerCount++;
         return 1;
     }
@@ -566,11 +566,11 @@ void AuralScape::UnknownFunction4030a0(int index, Vector3* position, Vector3* fr
                                        Vector3* velocity) {
     if (listeners[index]) {
         if (position)
-            listeners[index]->UnknownFunction402ce0(*position);
+            listeners[index]->SetPosition(*position);
         if (front && top)
-            listeners[index]->UnknownFunction402c70(*front, *top);
+            listeners[index]->SetOrientation(*front, *top);
         if (velocity)
-            listeners[index]->UnknownFunction402d10(*velocity);
+            listeners[index]->SetVelocity(*velocity);
     }
 }
 
@@ -578,7 +578,7 @@ void AuralScape::UnknownFunction4030a0(int index, Vector3* position, Vector3* fr
 static inline void UnknownPlaceEmitter(const int& count, AuralScapeListener** listeners, SoundEmitter* emitter) {
     int j;
     for (j = 0; j < count; j++) {
-        listeners[j]->UnknownFunction402cb0(&s_UnknownListenerPositions5776f8[j]);
+        listeners[j]->GetPosition(&s_UnknownListenerPositions5776f8[j]);
         float dx = s_UnknownListenerPositions5776f8[j].x - emitter->soundParameters.position.x;
         if (dx < 0.0f)
             dx = -dx;
@@ -716,7 +716,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
     }
 
     for (int i = 0; i < listenerCount; i++)
-        listeners[i]->UnknownFunction402bc0();
+        listeners[i]->CommitDeferredSettings();
 
     DebugOverlay* overlay = g_TrackGame->debugOverlay;
     if (overlay) {

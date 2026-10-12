@@ -82,7 +82,7 @@
   "?ResetSoundOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA20@@@Z": "0x00522780",
   "?ResetGraphicsOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA4c@@@Z": "0x005227d0",
   "?UnknownFunction522800@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA68@@@Z": "0x00522800",
-  "?UnknownFunction522840@TrackGameMode@@QAEXPAY0IA@D@Z": "0x00522840",
+  "?ReloadResourceStrings@TrackGameMode@@QAEXPAY0IA@D@Z": "0x00522840",
   "?UnknownFunction522bf0@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsFd8@@@Z": "0x00522bf0",
   "?UnknownFunction522c70@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsFd8@@@Z": "0x00522c70",
   "?UnknownFunction522c90@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsFd8@@@Z": "0x00522c90",

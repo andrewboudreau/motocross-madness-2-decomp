@@ -136,7 +136,7 @@
   "?AppendSibling@GameObject@@QAEHPAV1@H@Z": "0x00469130",
   "?InsertBefore@GameObject@@QAEHPAV1@H@Z": "0x00469260",
   "?SetShown@UIDialog@@QAEXH@Z": "0x0046ea60",
-  "?UnknownFunction46ffd0@UIDialog@@QAEXPAX@Z": "0x0046ffd0",
+  "?SetBackground@UIDialog@@QAEXPAX@Z": "0x0046ffd0",
   "?UnknownFunction470070@UIDialog@@QAEXHHPAUCameraRect@@@Z": "0x00470070",
   "?UnknownFunction484f10@UnknownGroundFogShader@@QAEXPAUUnknownFogVertex@@H@Z": "0x00484f10",
   "?SetAnimation@GUICursor@@QAEXPAUUnknownCursorAnimation@@@Z": "0x00485150",

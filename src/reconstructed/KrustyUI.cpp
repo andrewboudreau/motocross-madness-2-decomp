@@ -363,7 +363,7 @@ void KrustyUI::BuildGarageScene(int value) {
             bike->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->SetMotionByName("WaitB");
             bike->UnknownFunction4a6bb0(0.03f, 0, 0);
-            painter.PaintNumber(bike->field_0x1a0, g_TrackGame->mode.field_0x1bcc);
+            painter.PaintNumber(bike->field_0x1a0, g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
             shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);

@@ -43,7 +43,7 @@ void TrackGameMode::UnknownFunction522440() {
     ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
     g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
     UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
-    UnknownFunction522840(resourceStrings);
+    ReloadResourceStrings(resourceStrings);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)garageOptions);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)optionsBackup);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1090);
@@ -76,7 +76,7 @@ void TrackGameMode::UnknownFunction522440() {
     field_0x1bdc = 0;
     field_0x90 = 0;
     saveReplay = 0;
-    field_0x1bcc = 101;
+    plateNumber = 101;
     for (int i = 0; i < 6; i++)
         bonusTrackUnlocked[i] = 0;
     field_0x98 = 2;

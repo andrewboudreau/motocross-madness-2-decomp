@@ -25,7 +25,7 @@
   "?SetDirectory@DirectoryList@@QAEXPBD@Z": "0x0044a1d0",
   "?SetPattern@DirectoryList@@QAEXPBDH@Z": "0x0044a220",
   "?GetEntryName@DirectoryList@@QAEHHPAD@Z": "0x0044a270",
-  "?UnknownFunction44a2f0@DirectoryList@@QAEHHPAD@Z": "0x0044a2f0",
+  "?GetEntryStem@DirectoryList@@QAEHHPAD@Z": "0x0044a2f0",
   "?NextEntry@DirectoryList@@QAEHPAD@Z": "0x0044a3b0",
   "?CurrentEntry@DirectoryList@@QAEHPAD@Z": "0x0044a440",
   "?NextName@DirectoryList@@QAEHPAD@Z": "0x0044a4c0",

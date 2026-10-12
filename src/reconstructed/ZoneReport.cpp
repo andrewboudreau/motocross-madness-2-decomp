@@ -55,8 +55,8 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         if (bikeIndex == -1) {
             *flags &= ~0xc;
         } else {
-            g_TrackGame->mode.racerChoice.field_0xc0 = bikeManufacturer;
-            g_TrackGame->mode.racerChoice.field_0xc4 = bikeIndex;
+            g_TrackGame->mode.racerChoice.modelIndex = bikeManufacturer;
+            g_TrackGame->mode.racerChoice.bikeIndex = bikeIndex;
         }
         if (eventTypeIndex == -1)
             *flags &= ~3;
@@ -156,7 +156,7 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
             }
             for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
                 if (g_TrackGame->eventManager->results[i].playerId == g_TrackGame->mode.racers[j].networkPlayerId) {
-                    bikeIndex = g_TrackGame->mode.racers[j].field_0xc4;
+                    bikeIndex = g_TrackGame->mode.racers[j].bikeIndex;
                     break;
                 }
             }

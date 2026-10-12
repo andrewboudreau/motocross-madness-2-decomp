@@ -452,7 +452,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     int id = g_TrackGame->mode.racers[i].networkPlayerId;
                     if (id != self) {
                         NetPlayer* player = g_TrackGame->network->FindPlayer(id);
-                        if (!g_TrackGame->mode.racers[i].field_0xc8 && player != 0) {
+                        if (!g_TrackGame->mode.racers[i].hasLeft && player != 0) {
                             ready = 0;
                         } else {
                             racerSlots[i]->UnknownVirtualSlot5();
@@ -655,7 +655,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 strncpy(name,
                         ((UnknownBikeRaceUiModel*)g_TrackGame->ui->manufacturers)
                             [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes)
-                                 [g_TrackGame->mode.racerChoice.field_0xc4].field_0x00].field_0x40,
+                                 [g_TrackGame->mode.racerChoice.bikeIndex].field_0x00].field_0x40,
                         0x14);
                 name[0x14] = 0;
                 raceScene->ResolveSltPath(name);
@@ -1193,7 +1193,7 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
                 if (delay < g_TrackGame->mode.racers[i].lowestMessageDelay) {
                     g_TrackGame->mode.racers[i].lowestMessageDelay = delay;
                 }
-                g_TrackGame->mode.racers[i].field_0xc8 = 1;
+                g_TrackGame->mode.racers[i].hasLeft = 1;
             }
         }
     }
@@ -1439,7 +1439,7 @@ void BikeRace::RestartReplay() {
     replayVcr->SetRacer(0, 0, 0, g_TrackGame->mode.field_0x00, model, rider,
                                        riderName, bikeName, aiRacers[0]->engineSize,
                                        (unsigned char)aiRacers[0]->engineKind,
-                                       g_TrackGame->mode.field_0x1bcc);
+                                       g_TrackGame->mode.plateNumber);
     AppendChild(replayVcr, -1);
     localRacer->UnknownFunction496e20(replayVcr);
     if (field_0x189 && localRacer->field_0x7a0 == 1 && ghostFilePlayed[0] == 0) {

@@ -482,7 +482,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             } else {
                 for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
                     if (message->player == g_TrackGame->mode.racers[i].networkPlayerId) {
-                        g_TrackGame->mode.racers[i].field_0xc8 = 1;
+                        g_TrackGame->mode.racers[i].hasLeft = 1;
                         g_TrackGame->mode.racers[i].isReady = 1;
                     }
                 }

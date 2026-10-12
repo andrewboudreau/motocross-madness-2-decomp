@@ -155,7 +155,7 @@
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?SetViewport@Camera@@QAEHHHHH@Z": "0x0042f190",
   "?SetPattern@DirectoryList@@QAEXPBDH@Z": "0x0044a220",
-  "?UnknownFunction44a2f0@DirectoryList@@QAEHHPAD@Z": "0x0044a2f0",
+  "?GetEntryStem@DirectoryList@@QAEHHPAD@Z": "0x0044a2f0",
   "?NextName@DirectoryList@@QAEHPAD@Z": "0x0044a4c0",
   "?CurrentName@DirectoryList@@QAEHPAD@Z": "0x0044a550",
   "?UnknownFunction44abb0@CombinedDirectoryList@@QAEXPBD0@Z": "0x0044abb0",

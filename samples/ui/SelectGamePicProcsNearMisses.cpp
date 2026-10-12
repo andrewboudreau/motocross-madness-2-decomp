@@ -95,7 +95,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
                 if ((model == entry->model || (!model && entry->model == 7)) &&
                     UnknownBikeClassOf(entry->engineSize) <= 2) {
                     allowed = 1;
-                    if ((flags & 8) && i != g_TrackGame->mode.racerChoice.field_0xc4)
+                    if ((flags & 8) && i != g_TrackGame->mode.racerChoice.bikeIndex)
                         allowed = 0;
                 }
             }
@@ -107,7 +107,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
                     entry->displayName);
             list->AddRow(text, i, 0);
         }
-        if (g_TrackGame->mode.racerChoice.field_0xc4 == i)
+        if (g_TrackGame->mode.racerChoice.bikeIndex == i)
             bike = i;
     }
     if (bike)
@@ -224,19 +224,19 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 g_TrackGame->mode.racers[racer].networkPlayerId = lobbySlots.slots[j].playerId;
                 g_TrackGame->mode.racers[racer].racerIndex = racer;
                 COPY_TEXT(g_TrackGame->mode.racers[racer].playerName, names[racer], 0x10);
-                g_TrackGame->mode.racers[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
-                COPY_TEXT(g_TrackGame->mode.racers[racer].field_0x00,
+                g_TrackGame->mode.racers[racer].plateNumber = 100 - (int)(RandomUnit() * -899.0f);
+                COPY_TEXT(g_TrackGame->mode.racers[racer].bikeModelName,
                           ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
                               [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].model]
                                   .modelName,
                           0x40);
-                COPY_TEXT(g_TrackGame->mode.racers[racer].field_0x40,
+                COPY_TEXT(g_TrackGame->mode.racers[racer].bikeName,
                           ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x48, 0x40);
-                COPY_TEXT(g_TrackGame->mode.racers[racer].field_0x80,
+                COPY_TEXT(g_TrackGame->mode.racers[racer].riderName,
                           ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[riders[racer]].modelName, 0x40);
-                g_TrackGame->mode.racers[racer].field_0xec =
+                g_TrackGame->mode.racers[racer].engineSize =
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].engineSize;
-                g_TrackGame->mode.racers[racer].field_0xf0 =
+                g_TrackGame->mode.racers[racer].fourStroke =
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x90;
                 racer++;
             }
@@ -281,22 +281,22 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     memcpy(message.raceSettings.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
         char name[0x80];
-        message.field_0x1f8[0] = g_TrackGame->mode.field_0x1bcc;
+        message.field_0x1f8[0] = g_TrackGame->mode.plateNumber;
         g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer, name);
         strcpy(message.playerNames[0], name);
         int humans = g_UnknownGlobal689df8 + 1;
         for (i = 1; i < humans; i++) {
-            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].field_0xc0;
+            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].plateNumber;
             strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
         }
         for (i = humans; i < total; i++) {
-            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].field_0xc0;
+            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].plateNumber;
             strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
-            strcpy(message.bikeModelNames[i], g_TrackGame->mode.racers[i].field_0x00);
-            strcpy(message.bikeNames[i], g_TrackGame->mode.racers[i].field_0x40);
-            strcpy(message.riderNames[i], g_TrackGame->mode.racers[i].field_0x80);
-            message.engineSizes[i] = g_TrackGame->mode.racers[i].field_0xec;
-            message.fourStrokes[i] = g_TrackGame->mode.racers[i].field_0xf0;
+            strcpy(message.bikeModelNames[i], g_TrackGame->mode.racers[i].bikeModelName);
+            strcpy(message.bikeNames[i], g_TrackGame->mode.racers[i].bikeName);
+            strcpy(message.riderNames[i], g_TrackGame->mode.racers[i].riderName);
+            message.engineSizes[i] = g_TrackGame->mode.racers[i].engineSize;
+            message.fourStrokes[i] = g_TrackGame->mode.racers[i].fourStroke;
         }
     }
     g_TrackGame->network->Send(0x83, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
