@@ -23,7 +23,10 @@
 // [0x80] buffer at +0x168. Left: the squared lengths (retail squares each
 // component as it loads it, `fld; fld st(0); fmulp`, and spills z*z; plain,
 // local-copy, Square-helper, dot-product and accumulated forms all load the
-// three components first), the scalar spill homes below +0x68, the register
+// three components first; so do (2026-10-12) the canonical
+// `v.z * v.z + (v.x * v.x + v.y * v.y)` by reference or by value, helpers
+// taking three floats, and square or component locals, a `zz` local
+// being 6 bytes longer), the scalar spill homes below +0x68, the register
 // rotation of the Winner branch (one step behind retail), the place counter
 // store (retail stores 1 after the count test) and the z component order of
 // `podiumPosition + offsets[place - 1]`.
