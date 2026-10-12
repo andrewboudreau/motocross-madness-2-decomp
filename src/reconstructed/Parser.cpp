@@ -9,77 +9,77 @@
 
 UnknownParserNode::UnknownParserNode(const char* key, const char* value)
 {
-    UnknownFunction4b84f0();
+    Clear();
     if (key && value) {
-        lstrcpy(field_0x000, key);
-        lstrcpy(field_0x200, value);
-        field_0x400 = 0;
+        lstrcpy(tagText, key);
+        lstrcpy(valueText, value);
+        next = 0;
     }
 }
 
 UnknownParserNode::~UnknownParserNode()
 {
-    UnknownFunction4b84f0();
+    Clear();
 }
 
-BOOL UnknownParserNode::UnknownFunction4b84d0(const char* key)
+BOOL UnknownParserNode::MatchesKey(const char* key)
 {
     if (!key)
         return FALSE;
-    return lstrcmpi(field_0x000, key) == 0;
+    return lstrcmpi(tagText, key) == 0;
 }
 
-void UnknownParserNode::UnknownFunction4b84f0()
+void UnknownParserNode::Clear()
 {
-    field_0x000[0] = 0;
-    field_0x200[0] = 0;
-    field_0x400 = 0;
+    tagText[0] = 0;
+    valueText[0] = 0;
+    next = 0;
 }
 
-HRESULT UnknownParserList::UnknownFunction4b8510(const char* key, const char* value)
+HRESULT UnknownParserList::Append(const char* key, const char* value)
 {
     UnknownParserNode* node;
 
-    if (!field_0x00) {
-        node = field_0x00 = new (__FILE__, 73) UnknownParserNode(key, value);
+    if (!head) {
+        node = head = new (__FILE__, 73) UnknownParserNode(key, value);
     } else {
-        UnknownParserNode* last = field_0x00;
-        while (last->field_0x400)
-            last = last->field_0x400;
-        node = last->field_0x400 = new (__FILE__, 86) UnknownParserNode(key, value);
+        UnknownParserNode* last = head;
+        while (last->next)
+            last = last->next;
+        node = last->next = new (__FILE__, 86) UnknownParserNode(key, value);
     }
     return node ? S_OK : E_OUTOFMEMORY;
 }
 
-UnknownParserNode* UnknownParserList::UnknownFunction4b85f0(const char* key)
+UnknownParserNode* UnknownParserList::Find(const char* key)
 {
-    for (UnknownParserNode* node = field_0x00; node; node = node->field_0x400) {
-        if (node->UnknownFunction4b84d0(key))
+    for (UnknownParserNode* node = head; node; node = node->next) {
+        if (node->MatchesKey(key))
             return node;
     }
     return 0;
 }
 
-HRESULT UnknownParserList::UnknownFunction4b8620(const char* key, unsigned long* out)
+HRESULT UnknownParserList::GetNumber(const char* key, unsigned long* out)
 {
     if (!key || !out)
         return E_FAIL;
-    UnknownParserNode* node = UnknownFunction4b85f0(key);
+    UnknownParserNode* node = Find(key);
     if (!node)
         return E_ACCESSDENIED;
-    *out = strtoul(node->field_0x200, 0, 10);
+    *out = strtoul(node->valueText, 0, 10);
     return S_OK;
 }
 
-HRESULT UnknownParserList::UnknownFunction4b8670(const char* key, char* out, unsigned int size)
+HRESULT UnknownParserList::GetText(const char* key, char* out, unsigned int size)
 {
     if (!key || !out || !size)
         return E_FAIL;
-    UnknownParserNode* node = UnknownFunction4b85f0(key);
+    UnknownParserNode* node = Find(key);
     if (!node)
         return E_ACCESSDENIED;
-    if ((unsigned int)lstrlen(node->field_0x200) < size) {
-        lstrcpy(out, node->field_0x200);
+    if ((unsigned int)lstrlen(node->valueText) < size) {
+        lstrcpy(out, node->valueText);
         return S_OK;
     }
     return E_OUTOFMEMORY;
@@ -87,15 +87,15 @@ HRESULT UnknownParserList::UnknownFunction4b8670(const char* key, char* out, uns
 
 UnknownParserList::~UnknownParserList()
 {
-    while (field_0x00) {
-        UnknownParserNode* node = field_0x00;
-        field_0x00 = node->field_0x400;
+    while (head) {
+        UnknownParserNode* node = head;
+        head = node->next;
         delete node;
     }
-    field_0x00 = 0;
+    head = 0;
 }
 
-char* UnknownParser::UnknownFunction4b8720(char* text, char* end)
+char* UnknownParser::SkipBlanks(char* text, char* end)
 {
     char* start = text;
 
@@ -110,12 +110,12 @@ char* UnknownParser::UnknownFunction4b8720(char* text, char* end)
             text++;
         if (text == end)
             return 0;
-        text = UnknownFunction4b8720(text, end);
+        text = SkipBlanks(text, end);
     }
     return text;
 }
 
-char* UnknownParser::UnknownFunction4b87b0(char* text, char c, char* end)
+char* UnknownParser::FindChar(char* text, char c, char* end)
 {
     if (!end)
         end = text + lstrlen(text);
@@ -129,16 +129,16 @@ char* UnknownParser::UnknownFunction4b87b0(char* text, char c, char* end)
 // 0x004b87f0 (parses the buffer) is a near miss; see
 // samples/parser/ParserNearMisses.cpp.
 
-HRESULT UnknownParser::UnknownFunction4b8990(const char* key, char* out, unsigned int size)
+HRESULT UnknownParser::GetText(const char* key, char* out, unsigned int size)
 {
     if (!key || !out || !size)
         return E_FAIL;
-    return field_0x04.UnknownFunction4b8670(key, out, size);
+    return pairs.GetText(key, out, size);
 }
 
-HRESULT UnknownParser::UnknownFunction4b89d0(const char* key, unsigned long* out)
+HRESULT UnknownParser::GetNumber(const char* key, unsigned long* out)
 {
     if (!key || !out)
         return E_FAIL;
-    return field_0x04.UnknownFunction4b8620(key, out);
+    return pairs.GetNumber(key, out);
 }

@@ -12,12 +12,12 @@ class UnknownParserNode {
 public:
     UnknownParserNode(const char* key, const char* value); // 0x004b8470
     ~UnknownParserNode();                                  // 0x004b84c0
-    BOOL UnknownFunction4b84d0(const char* key);           // 0x004b84d0: case-insensitive key match
-    void UnknownFunction4b84f0();                          // 0x004b84f0: clears the node
+    BOOL MatchesKey(const char* key);                      // 0x004b84d0: case-insensitive tag match
+    void Clear();                                          // 0x004b84f0: clears the node
 
-    char field_0x000[0x200];          // tag
-    char field_0x200[0x200];          // value
-    UnknownParserNode* field_0x400;   // next
+    char tagText[0x200];              // +0x000
+    char valueText[0x200];            // +0x200
+    UnknownParserNode* next;          // +0x400
 };
 
 // The list head; a parser holds it at +4.
@@ -25,22 +25,22 @@ class UnknownParserList {
 public:
     UnknownParserList();                                                  // 0x004aae20 (a shared body that stores one zero dword)
     ~UnknownParserList();                                                 // 0x004b86e0
-    HRESULT UnknownFunction4b8510(const char* key, const char* value);    // appends a pair
-    UnknownParserNode* UnknownFunction4b85f0(const char* key);            // finds a tag
-    HRESULT UnknownFunction4b8620(const char* key, unsigned long* out);   // decimal value
-    HRESULT UnknownFunction4b8670(const char* key, char* out, unsigned int size); // text value
+    HRESULT Append(const char* key, const char* value);                   // 0x004b8510: appends a pair
+    UnknownParserNode* Find(const char* key);                             // 0x004b85f0: finds a tag
+    HRESULT GetNumber(const char* key, unsigned long* out);               // 0x004b8620: decimal value
+    HRESULT GetText(const char* key, char* out, unsigned int size);       // 0x004b8670: text value
 
-    UnknownParserNode* field_0x00;    // first node
+    UnknownParserNode* head;          // +0x00: first node
 };
 
 class UnknownParser {
 public:
-    char* UnknownFunction4b8720(char* text, char* end);       // skips blanks and ';' comment lines
-    char* UnknownFunction4b87b0(char* text, char c, char* end); // finds `c`
-    HRESULT UnknownFunction4b87f0(char* text, int length);    // parses the buffer
-    HRESULT UnknownFunction4b8990(const char* key, char* out, unsigned int size);
-    HRESULT UnknownFunction4b89d0(const char* key, unsigned long* out);
+    char* SkipBlanks(char* text, char* end);                  // 0x004b8720: skips blanks and ';' comment lines
+    char* FindChar(char* text, char c, char* end);            // 0x004b87b0: finds `c`
+    HRESULT Parse(char* text, int length);                    // 0x004b87f0: parses the buffer
+    HRESULT GetText(const char* key, char* out, unsigned int size); // 0x004b8990
+    HRESULT GetNumber(const char* key, unsigned long* out);   // 0x004b89d0
 
-    int field_0x00;                   // pairs parsed
-    UnknownParserList field_0x04;
+    int pairCount;                    // +0x00: pairs parsed
+    UnknownParserList pairs;          // +0x04
 };

@@ -10,6 +10,12 @@ The TU reads `<Tag>value</Tag>` pairs from a text buffer into a singly linked
 list. Lookups by tag are case-insensitive. Blank runs and lines starting
 with `;` are skipped.
 
+Class names stay provisional (`UnknownParserNode`, `UnknownParserList`,
+`UnknownParser`; no RTTI). The members are named after their bodies (tier 3):
+`MatchesKey`, `Clear`, `Append`, `Find`, `GetNumber`, `GetText`,
+`SkipBlanks`, `FindChar`, `Parse`; fields `tagText`/`valueText`/`next`, `head`,
+`pairCount`/`pairs`.
+
 | VA | Size | Role |
 |---|---:|---|
 | `0x004b8470` | 71 | node constructor: clears, then copies tag and value |
@@ -73,7 +79,7 @@ python tools/compile.py src/reconstructed/Parser.cpp -o work/parser.obj \
   --vc6-root "$VC6_ROOT" --profile vc6_o2_mt
 python tools/match.py --exe work/game/mcm2.exe --target-va 0x004b8510 \
   --target-size 209 --obj work/parser.obj \
-  --symbol '?UnknownFunction4b8510@UnknownParserList@@QAEJPBD0@Z' \
+  --symbol '?Append@UnknownParserList@@QAEJPBD0@Z' \
   --bindings src/reconstructed/Parser.bindings.json --json
 python tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt \
   --vc6-root "$VC6_ROOT" --exe work/game/mcm2.exe --jobs 8
