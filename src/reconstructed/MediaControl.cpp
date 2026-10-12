@@ -12,7 +12,7 @@ extern "C" const UnknownGuid IID_IGraphBuilder;           // 0x00558ef0
 // 0x004a2560 (open) is a near miss: samples/gameui/MediaControlNearMisses.cpp.
 
 // 0x004a23d0
-int MediaControl::UnknownFunction4a23d0()
+int MediaControl::IsDirectShowInstalled()
 {
     UnknownSurfaceInterface* graph;
     if (CoCreateInstance(*(const GUID*)&CLSID_FilterGraph, 0, CLSCTX_INPROC_SERVER,
@@ -27,22 +27,22 @@ int MediaControl::UnknownFunction4a23d0()
 MediaControl::MediaControl(int a)
     : GameObject(a)
 {
-    field_0x68_low = 0;
-    field_0x78_bit0 = 0;
+    pausedTimeLow = 0;
+    resumeAfterPause = 0;
     field_0x4c = 0;
-    field_0x50 = 0;
-    field_0x5c = 0;
-    field_0x60 = 0;
-    field_0x64 = 0;
+    multiMediaStream = 0;
+    videoStream = 0;
+    videoDrawStream = 0;
+    videoSample = 0;
     field_0x2c = 0;
-    field_0x38 = 0;
+    sampleSurface = 0;
     field_0x30 = 0;
     field_0x34 = 0;
-    field_0x54 = 0;
-    field_0x58 = 0;
-    field_0x70 = 0;
-    field_0x74 = 0;
-    field_0x68_high = 0;
+    directDraw = 0;
+    displayDirectDraw = 0;
+    doneCallback = 0;
+    doneOwner = 0;
+    pausedTimeHigh = 0;
 }
 
 // 0x004a2490
@@ -53,33 +53,33 @@ MediaControl::~MediaControl()
         field_0x2c->Release();
         field_0x2c = 0;
     }
-    if (field_0x38) {
-        field_0x38->Release();
-        field_0x38 = 0;
+    if (sampleSurface) {
+        sampleSurface->Release();
+        sampleSurface = 0;
     }
-    if (field_0x64) {
-        field_0x64->Release();
-        field_0x64 = 0;
+    if (videoSample) {
+        videoSample->Release();
+        videoSample = 0;
     }
-    if (field_0x60) {
-        field_0x60->Release();
-        field_0x60 = 0;
+    if (videoDrawStream) {
+        videoDrawStream->Release();
+        videoDrawStream = 0;
     }
-    if (field_0x5c) {
-        field_0x5c->Release();
-        field_0x5c = 0;
+    if (videoStream) {
+        videoStream->Release();
+        videoStream = 0;
     }
-    if (field_0x50) {
-        field_0x50->Release();
-        field_0x50 = 0;
+    if (multiMediaStream) {
+        multiMediaStream->Release();
+        multiMediaStream = 0;
     }
     if (field_0x4c) {
         field_0x4c->Release();
         field_0x4c = 0;
     }
-    if (field_0x54) {
-        field_0x54->Release();
-        field_0x54 = 0;
+    if (directDraw) {
+        directDraw->Release();
+        directDraw = 0;
     }
 }
 
@@ -90,7 +90,7 @@ int MediaControl::UnknownVirtualSlot10(float frameTime)
     __int64 duration;
 
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (!field_0x64) {
+    if (!videoSample) {
         return 0;
     }
     if (IsRunning()) {
@@ -98,12 +98,12 @@ int MediaControl::UnknownVirtualSlot10(float frameTime)
         GetDuration(&duration);
         if (time >= duration) {
             Stop();
-            if (field_0x70) {
-                field_0x70(field_0x74);
+            if (doneCallback) {
+                doneCallback(doneOwner);
             }
-        } else if (field_0x64->UnknownMethod7(2, 25) == 0) {
-            UnknownFunction4a2a90(field_0x2c, field_0x3c, 0, 0x1000000);
-            if (field_0x64->UnknownMethod6(1, 0, 0, 0) < 0) {
+        } else if (videoSample->CompletionStatus(2, 25) == 0) {
+            BlitFrame(field_0x2c, frameRect, 0, 0x1000000);
+            if (videoSample->Update(1, 0, 0, 0) < 0) {
                 return 0;
             }
         }
@@ -131,10 +131,10 @@ int MediaControl::UnknownVirtualSlot18()
 int MediaControl::Restart()
 {
     do {
-        if (field_0x50->UnknownMethod7(1) < 0) {
+        if (multiMediaStream->SetState(1) < 0) {
             break;
         }
-        if (field_0x64->UnknownMethod6(0, 0, 0, 0) < 0) {
+        if (videoSample->Update(0, 0, 0, 0) < 0) {
             break;
         }
         return 1;
@@ -145,7 +145,7 @@ int MediaControl::Restart()
 // 0x004a2940
 void MediaControl::Stop()
 {
-    if (IsRunning() && field_0x50->UnknownMethod7(0) >= 0) {
+    if (IsRunning() && multiMediaStream->SetState(0) >= 0) {
         SeekToStart();
     }
 }
@@ -155,13 +155,13 @@ int MediaControl::UnknownVirtualSlot16(int value)
 {
     if (value) {
         if (!field_0x25_bit2) {
-            field_0x78_bit0 = IsRunning();
-            GetPosition(&field_0x68);
-            field_0x50->UnknownMethod7(0);
+            resumeAfterPause = IsRunning();
+            GetPosition(&pausedTime);
+            multiMediaStream->SetState(0);
         }
-    } else if (field_0x78_bit0) {
-        Seek(field_0x68);
-        field_0x50->UnknownMethod7(1);
+    } else if (resumeAfterPause) {
+        Seek(pausedTime);
+        multiMediaStream->SetState(1);
     }
     return GameObject::UnknownVirtualSlot16(value);
 }
@@ -169,7 +169,7 @@ int MediaControl::UnknownVirtualSlot16(int value)
 // 0x004a29f0
 int MediaControl::Seek(__int64 time)
 {
-    return field_0x50->UnknownMethod10(time) >= 0;
+    return multiMediaStream->Seek(time) >= 0;
 }
 
 // 0x004a2a10
@@ -182,7 +182,7 @@ int MediaControl::SeekToStart()
 int MediaControl::IsRunning()
 {
     int state;
-    if (field_0x50->UnknownMethod6(&state) >= 0 && state == 1) {
+    if (multiMediaStream->GetState(&state) >= 0 && state == 1) {
         return 1;
     }
     return 0;
@@ -191,21 +191,21 @@ int MediaControl::IsRunning()
 // 0x004a2a50
 int MediaControl::GetPosition(__int64* time)
 {
-    return field_0x50->UnknownMethod8(time) >= 0;
+    return multiMediaStream->GetTime(time) >= 0;
 }
 
 // 0x004a2a70
 int MediaControl::GetDuration(__int64* duration)
 {
-    return field_0x50->UnknownMethod9(duration) >= 0;
+    return multiMediaStream->GetDuration(duration) >= 0;
 }
 
 // 0x004a2a90
-long MediaControl::UnknownFunction4a2a90(UnknownSurfaceInterface* destination, void* destinationRect,
+long MediaControl::BlitFrame(UnknownSurfaceInterface* destination, void* destinationRect,
                                          void* sourceRect, int flags)
 {
-    if (!field_0x38) {
+    if (!sampleSurface) {
         return 0x80004005;
     }
-    return destination->Blt(destinationRect, field_0x38, sourceRect, flags, 0);
+    return destination->Blt(destinationRect, sampleSurface, sourceRect, flags, 0);
 }
