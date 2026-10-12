@@ -106,11 +106,11 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             if (singleMenuOpen) {
                 movieRestartTime = 0.0f;
                 if (movieControl) {
-                    movieControl->field_0x1ec->UnknownVirtualSlot16(1);
+                    movieControl->moviePlayer->UnknownVirtualSlot16(1);
                     movieControl->Show(0, 1);
                 }
             } else if (movieControl) {
-                movieControl->field_0x1ec->UnknownVirtualSlot16(1);
+                movieControl->moviePlayer->UnknownVirtualSlot16(1);
                 movieControl->Show(0, 1);
             }
             if (multiMenuOpen) {
@@ -181,7 +181,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButStuntQuarry", event->controlName)) {
             if (movieControl)
-                movieControl->field_0x1ec->Stop();
+                movieControl->moviePlayer->Stop();
             g_TrackGame->mode.field_0x29e4.field_0x04 = 0;
             g_TrackGame->mode.field_0x29e4.field_0x08 = 0;
             g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\Quarries";
@@ -191,7 +191,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->handled = 1;
         } else if (!_stricmp("ButBaja", event->controlName)) {
             if (movieControl)
-                movieControl->field_0x1ec->Stop();
+                movieControl->moviePlayer->Stop();
             g_TrackGame->mode.field_0x29e4.field_0x04 = 1;
             g_TrackGame->mode.field_0x29e4.field_0x08 = 1;
             g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\Baja";
@@ -201,7 +201,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->handled = 1;
         } else if (!_stricmp("ButSupercross", event->controlName)) {
             if (movieControl)
-                movieControl->field_0x1ec->Stop();
+                movieControl->moviePlayer->Stop();
             g_TrackGame->mode.field_0x29e4.field_0x04 = 3;
             g_TrackGame->mode.field_0x29e4.field_0x08 = 3;
             g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\SX";
@@ -211,7 +211,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->handled = 1;
         } else if (!_stricmp("ButEnduro", event->controlName)) {
             if (movieControl)
-                movieControl->field_0x1ec->Stop();
+                movieControl->moviePlayer->Stop();
             g_TrackGame->mode.field_0x29e4.field_0x04 = 5;
             g_TrackGame->mode.field_0x29e4.field_0x08 = 5;
             g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\Enduro";
@@ -221,7 +221,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->handled = 1;
         } else if (!_stricmp("ButNationals", event->controlName)) {
             if (movieControl)
-                movieControl->field_0x1ec->Stop();
+                movieControl->moviePlayer->Stop();
             g_TrackGame->mode.field_0x29e4.field_0x04 = 2;
             g_TrackGame->mode.field_0x29e4.field_0x08 = 2;
             g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\National";
@@ -231,7 +231,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->handled = 1;
         } else if (!_stricmp("ButProCircuit", event->controlName)) {
             if (movieControl)
-                movieControl->field_0x1ec->Stop();
+                movieControl->moviePlayer->Stop();
             PCStartupDlg* dialog = new(__FILE__, 389) PCStartupDlg;
             g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);

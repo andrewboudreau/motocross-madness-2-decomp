@@ -40,12 +40,15 @@ void LeaveMenusForRace();
 // 0x00451380: formats `value` into `text` (near dlgprocs.cpp's code).
 void FormatDecimal(int value, char* text);
 // 0x004f17a0: fills the list `listName` of `dialog` with the `pattern`
-// files under `directory` and shows the first one's picture.
+// files under `directory` and shows the first one's picture. `largePictures`
+// picks "unart.tga"/"%s.tga" over the "s"-suffixed pictures (dlgprocs.cpp
+// passes 1, MPEventDlg 0).
 int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
-                 int a, const char* picture, const char* listName, char* name, int* value,
+                 int largePictures, const char* picture, const char* listName, char* name, int* value,
                  UIDialog* dialog, int b, int append);
 // 0x004f3080: the same for the track directories of the current game type.
-void FillTrackList(int a, const char* picture, const char* listName, int* value, UIDialog* dialog, int append);
+void FillTrackList(int largePictures, const char* picture, const char* listName, int* value, UIDialog* dialog,
+                   int append);
 
 // KrustyUI+0x50's 0x94-byte bike records and the 0xc8-byte model records
 // at KrustyUI+0x48 and +0x58 (bikes and riders) they index.
