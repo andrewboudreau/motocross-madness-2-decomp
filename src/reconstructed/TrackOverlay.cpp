@@ -533,7 +533,7 @@ int StatsOverlay::DrawViewModePanel()
     else
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
-        FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
+        FormatLapTime(time, g_TrackGame->eventManager->endTimer);
         sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
@@ -646,7 +646,7 @@ int StatsOverlay::DrawRacePanel()
     else
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
-        FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
+        FormatLapTime(time, g_TrackGame->eventManager->endTimer);
         sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);

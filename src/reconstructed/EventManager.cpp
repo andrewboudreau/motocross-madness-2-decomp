@@ -70,8 +70,8 @@ void UnknownEventEntry::Reset() {
     aiIndex = 0;
     largestStuntPoints = 0;
     field_0x10 = 0;
-    field_0x18 = 0;
-    field_0x1c = 0;
+    bestTagRun = 0;
+    totalTagRun = 0;
     finished = 0;
     strcpy(name, "");
     outOfRace = 0;
@@ -97,8 +97,8 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         totalRunningTime = racer->totalRunningTime;
         largestStuntPoints = racer->largestStuntPoints;
         field_0x10 = racer->field_0x758;
-        field_0x18 = racer->bestTagRun;
-        field_0x1c = racer->totalTagRun;
+        bestTagRun = racer->bestTagRun;
+        totalTagRun = racer->totalTagRun;
         aiIndex = racer->aiIndex;
         field_0x34[0] = racer->field_0x7ac[0];
         field_0x34[1] = racer->field_0x7ac[1];
@@ -114,8 +114,8 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         totalRunningTime = 0;
         largestStuntPoints = 0;
         field_0x10 = 0;
-        field_0x18 = 0;
-        field_0x1c = 0;
+        bestTagRun = 0;
+        totalTagRun = 0;
         aiIndex = 0;
         field_0x34[0] = 0;
         field_0x34[1] = 0;
@@ -133,7 +133,7 @@ EventManager::EventManager(int flags) : GameObject(flags) {
     allRacersFinished = 0;
     racesRun = 0;
     resultCount = 0;
-    field_0x3c0 = 0;
+    endTimer = 0;
     keepAliveTimeout = 20.0f;
     keepAliveInterval = 1.0f;
     resumeArmed = 0;
@@ -610,7 +610,7 @@ float g_UnknownGlobal59af54;
 int EventManager::LoadEvent() {
     char path[260];
     g_UnknownGlobal59af54 = 0;
-    field_0x3c0 = 0;
+    endTimer = 0;
     keepAliveStarted = 0;
     waitingForRacers = 0;
     for (int i = 0; i < 8; i++)
@@ -677,10 +677,10 @@ void EventManager::CheckRaceOver(float frameTime) {
                     allRacersFinished = 0;
             }
             if (anyRacerFinished)
-                field_0x3c0 += g_TrackGame->frameTime;
+                endTimer += g_TrackGame->frameTime;
             // VC6 merges this call pair with the one after the switch.
             float limit = g_TrackGame->mode.raceSettings.shortTimeLimit ? 30.0f : 120.0f;
-            if (allRacersFinished || limit < field_0x3c0) {
+            if (allRacersFinished || limit < endTimer) {
                 SendRacerResults();
                 EndRace();
             }

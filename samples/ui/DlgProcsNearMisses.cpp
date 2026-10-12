@@ -683,8 +683,8 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 if (!g_TrackGame->eventManager->results[i].outOfRace) {
                     sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                    FormatLapTime(score, g_TrackGame->eventManager->results[i].field_0x1c);
-                    FormatLapTime(points, g_TrackGame->eventManager->results[i].field_0x18);
+                    FormatLapTime(score, g_TrackGame->eventManager->results[i].totalTagRun);
+                    FormatLapTime(points, g_TrackGame->eventManager->results[i].bestTagRun);
                     if (g_TrackGame->mode.raceSettings.raceMode == 2) {
                         sprintf(points, "%d", g_TrackGame->eventManager->results[i].points);
                         AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score,

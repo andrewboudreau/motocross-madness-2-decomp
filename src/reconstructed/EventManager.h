@@ -125,8 +125,8 @@ struct UnknownEventEntry {
     int largestStuntPoints;                        // +0x0c: racer +0x788 (ZoneReport "LargestSingleStuntPoints")
     int field_0x10;                                // racer +0x758
     float totalRunningTime;                        // +0x14: racer +0x754 (ZoneReport "TotalrunningTime")
-    float field_0x18;                              // racer +0x760 bestTagRun
-    float field_0x1c;                              // racer +0x764 totalTagRun
+    float bestTagRun;                              // +0x18: racer +0x760 bestTagRun
+    float totalTagRun;                             // +0x1c: racer +0x764 totalTagRun
     int finished;                                  // +0x20: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
     int outOfRace;                            // +0x24 racer +0x4a0
     int points;                                    // +0x28: championship points (AddChampionshipPoints)
@@ -201,7 +201,7 @@ public:
     unsigned char racesRun;                        // +0x48: RankRacers counts mode-2 races; dialogs show it as "%d/%d"
     int resultCount;                               // +0x4c: entries filled by 0x0045e9d0
     UnknownEventEntry results[11];                 // +0x50: one per racer, copied by RankRacers
-    float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
+    float endTimer;                                // +0x3c0: seconds since a racer finished (0x0045eef0); the "End Timer" debug row (TrackOverlay.cpp)
     Vector3 podiumPosition;                        // +0x3c4: where 0x0045d480 places the podium; characters stand at offsets from it
     ArcadeObject* podiumObject;                     // the podium (0x0045d480)
     Camera* podiumCamera;                           // a PCCamera (0x0045d480; constructor 0x004bed80)
