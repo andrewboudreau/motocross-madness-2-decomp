@@ -30,7 +30,7 @@
 // (5, 3, 11, 12, 2, 1, 7) are reconstructed, but many blocks differ: retail
 // keeps the constant 0 in eax from the field_0x88 test on (cmp ecx, eax;
 // push eax for the flag; field_0x84 = eax) and 1 in ebp in the loops, assigns
-// the stack slots value 0x18, queued 0x1c, size 0x20 and the field_0xc0
+// the stack slots value 0x18, queued 0x1c, size 0x20 and the readsReset
 // flag/loop count 0x24, keeps loop counts in ebp/edx, and cross-jumps fewer
 // `Rewind(); return 1;` exits.
 
@@ -54,9 +54,9 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
     int handle = -1;
 
     strcpy(message, "VCR WaitForMultipleObjects Failure!\n");
-    header = (void*)params->field_0x00;
-    headerSize = params->field_0x04;
-    name = (char*)params->field_0x08;
+    header = (void*)params->header;
+    headerSize = params->headerSize;
+    name = (char*)params->fileName;
     vcr = params->owner;
     file = (UnknownVcrFile*)vcr->vcrFile;
     events[0] = vcr->writeEvent;
@@ -95,7 +95,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
             break;
         case 1: // create the file and write the header
             EnterCriticalSection(&vcr->lock);
-            vcr->field_0xbc = 1;
+            vcr->fileReady = 1;
             LeaveCriticalSection(&vcr->lock);
             handle = file->Open(name, "wb");
             if (handle == -1) {
@@ -109,7 +109,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
             goto opened;
         case 2: // reopen the file for appending
             EnterCriticalSection(&vcr->lock);
-            vcr->field_0xbc = 1;
+            vcr->fileReady = 1;
             LeaveCriticalSection(&vcr->lock);
             handle = file->Open(name, "rb+");
             if (handle == -1) {
@@ -176,7 +176,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
             break;
         case 4: // open the file for playback
             EnterCriticalSection(&vcr->lock);
-            vcr->field_0xbc = 1;
+            vcr->fileReady = 1;
             LeaveCriticalSection(&vcr->lock);
             handle = file->Open(name, "rb");
             if (handle == -1) {
@@ -286,7 +286,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
             vcr->frameRing->ResetSlots();
             LeaveCriticalSection(&vcr->lock);
             file->Seek(handle, position, SEEK_SET);
-            vcr->field_0xbc = 1;
+            vcr->fileReady = 1;
             SetEvent(vcr->readForwardEvent);
             break;
         }
@@ -294,8 +294,8 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
             ResetEvent(vcr->readForwardEvent);
             ResetEvent(vcr->readReverseEvent);
             EnterCriticalSection(&vcr->lock);
-            vcr->field_0xc0 = 1;
-            vcr->field_0xbc = 1;
+            vcr->readsReset = 1;
+            vcr->fileReady = 1;
             LeaveCriticalSection(&vcr->lock);
             break;
         case 9: // rewrite the header and close the file
@@ -339,7 +339,7 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
     int result;
 
     EnterCriticalSection(&lock);
-    if (!field_0xbc) {
+    if (!fileReady) {
         LeaveCriticalSection(&lock);
         return 1;
     }
@@ -350,18 +350,18 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
         int flag;
 
         EnterCriticalSection(&lock);
-        flag = field_0xc0;
+        flag = readsReset;
         LeaveCriticalSection(&lock);
         if (flag) {
             EnterCriticalSection(&lock);
-            field_0xc0 = 0;
-            field_0xc4 = 1;
+            readsReset = 0;
+            reverseReadRestarted = 1;
             LeaveCriticalSection(&lock);
             RestartReverseRead();
             return 1;
         }
         EnterCriticalSection(&lock);
-        flag = field_0xc4;
+        flag = reverseReadRestarted;
         LeaveCriticalSection(&lock);
         if (!flag)
             return 1;
@@ -373,14 +373,14 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
                     StopReading();
                     frameRing->SeekPosition(value);
                     Seek(milliseconds);
-                    field_0xc4 = 0;
+                    reverseReadRestarted = 0;
                     return 1;
                 }
             } else if (result == 2) {
                 recordCallback(-3, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
                 field_0x88 = 0;
                 EnterCriticalSection(&lock);
-                field_0xc4 = 0;
+                reverseReadRestarted = 0;
                 LeaveCriticalSection(&lock);
                 field_0x84 = 0;
                 Rewind();

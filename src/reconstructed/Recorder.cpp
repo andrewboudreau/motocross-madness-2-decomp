@@ -39,9 +39,9 @@ VCRInterface::VCRInterface() : GameObject(1) {
     field_0xa4 = 0;
     field_0xa8 = 0;
     isBusy = 0;
-    field_0xbc = 0;
-    field_0xc0 = 0;
-    field_0xc4 = 0;
+    fileReady = 0;
+    readsReset = 0;
+    reverseReadRestarted = 0;
     sceneTimePending = 0;
     pendingSceneTime = 0;
     isStopped = 1;
@@ -118,15 +118,15 @@ int VCRInterface::Start(int a1, int a2, int a3, int mode, int a5, unsigned int s
         !readReverseEvent || !seekEvent || !rewindEvent || !stopReadingEvent || !closeFileEvent)
         return 0;
     recordMode = mode;
-    threadParameters.field_0x00 = a2;
-    threadParameters.field_0x04 = a3;
-    threadParameters.field_0x08 = a5;
+    threadParameters.header = a2;
+    threadParameters.headerSize = a3;
+    threadParameters.fileName = a5;
     threadParameters.owner = this;
     InitializeCriticalSection(&lock);
     workerThread = (HANDLE)_beginthreadex(0, 0, UnknownRecorderThread, &threadParameters, 0, &workerThreadId);
     if (!workerThread)
         return 0;
-    interval = vcrFile->field_0x23c ? 10 : 200;
+    interval = vcrFile->memory ? 10 : 200;
     if (mode == 0) {
         SignalAndWait(createFileEvent, interval);
         return 1;
@@ -148,10 +148,10 @@ int VCRInterface::Start(int a1, int a2, int a3, int mode, int a5, unsigned int s
 
 // 0x004e86d0
 void VCRInterface::UnknownFunction4e86d0(int a, int b, int wait) {
-    int fast = vcrFile->field_0x23c;
+    int fast = vcrFile->memory;
 
-    threadParameters.field_0x00 = a;
-    threadParameters.field_0x04 = b;
+    threadParameters.header = a;
+    threadParameters.headerSize = b;
     if (wait)
         SignalAndWait(closeFileEvent, fast ? 10 : 200);
     else
@@ -245,8 +245,8 @@ int VCRInterface::TakeRecord(int* a, int* b, int* value, void* data, unsigned in
 // 0x004e8990
 void VCRInterface::StopReading() {
     EnterCriticalSection(&lock);
-    field_0xc0 = 0;
-    field_0xbc = 0;
+    readsReset = 0;
+    fileReady = 0;
     LeaveCriticalSection(&lock);
     SetEvent(stopReadingEvent);
 }
@@ -280,7 +280,7 @@ void VCRInterface::Rewind() {
         EnterCriticalSection(&lock);
         sceneTimePending = 1;
         pendingSceneTime = 0;
-        field_0xbc = 0;
+        fileReady = 0;
         frameRing->ClearPositions();
         SetEvent(rewindEvent);
         LeaveCriticalSection(&lock);

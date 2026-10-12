@@ -32,9 +32,9 @@ typedef int (*UnknownRecorderCallback)(int a, void* data, int flag, int b, int* 
 
 // What 0x004e7a90 passes to the worker thread (VCRInterface+0x90).
 struct UnknownRecorderThreadParameters {
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
+    int header;                           // +0x00 header to write (mode 1), a pointer
+    int headerSize;                       // +0x04
+    int fileName;                         // +0x08 VCR tape file name, a pointer
     class VCRInterface* owner;
 };
 
@@ -44,7 +44,7 @@ struct UnknownRecorderThreadParameters {
 // type is kept for the 0x004e7a90 symbol.
 struct UnknownRecorderOwner {
     unsigned char field_0x000[0x23c];
-    int field_0x23c;
+    int memory;                           // +0x23c UnknownVcrFile's memory flag (VCRfile.h)
 };
 
 class VCRInterface : public GameObject {
@@ -99,9 +99,9 @@ public:
     UnknownVcr* frameRing;
     int isStopped;                       // stopped
     int isBusy;                       // busy
-    int field_0xbc;
-    int field_0xc0;
-    int field_0xc4;
+    int fileReady;                        // +0xbc set by the worker once the file is open (events 1, 2, 6..8); slot 10 waits for it
+    int readsReset;                       // +0xc0 set by worker event 8; slot 10 then restarts the reverse read
+    int reverseReadRestarted;             // +0xc4 set when slot 10 restarted the reverse read
     int workerAcknowledged;                       // acknowledged by the worker
     int sceneTimePending;                 // +0xcc set by Seek/Rewind; BikeRace slot 10 applies and clears it
     float pendingSceneTime;               // +0xd0 seconds
