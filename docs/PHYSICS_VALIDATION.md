@@ -274,11 +274,14 @@ rotated into itself through a by-value inline helper, so VC6 copies it as retail
   (VC6_OPERAND_ORDER.md section 3).
 
 **`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
-`0x00424690..0x0042ad2f`) passes 40 cases:
+`0x00424690..0x0042ad2f`) passes 42 cases:
 - its 18 `$E` (the kVec3 set and five empty statics);
 - the segment and sphere box tests;
 - GrowBoxByTransformedBox `0x004290d0`, whose loop writes its own local (VC6 homes it in
   the dead `center` argument slot, so the transformed x is never stored);
+- SphereTreeQuery `0x00429570` and CapsuleTreeQuery `0x004298c0`, whose misses share one
+  `return 0` tail and whose second recursive call stays out of tail position (VC6
+  otherwise turns it into a loop);
 - the tree-tree and tree-box queries and the three entry points;
 - the matrix and point helpers.
 
@@ -293,7 +296,7 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The second run reports `40/40 strict exact`. The soultree root reports one
+The second run reports `42/42 strict exact`. The soultree root reports one
 required failure, SoulTreePhysics'
 `0x5036f0`, which predates this slice.
 
@@ -327,6 +330,14 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   each scan posts and returns from inside its loop; slots 18/19 scan with guarded do-while
   loops (unrotated back edge), slot 20 with `for` loops. Slot 19/20's sign factor is
   `turnAngle >= 0 ? -1 : 1` and the scrape clamps go through a by-value min helper.
+- Vehicle.cpp slot 95 `0x0052a6a0`: the rotation angle is |angularVelocity| * stepTime (the
+  1e-4 threshold and RotateAboutPoint take the angle, not the squared length); both squared
+  lengths load y, x, z into locals and sum `z*z + (x*x + y*y)`, and the in-place scale
+  writes the members (`scratchVector.y *= s` addresses `this`, not the copy pointer).
+- Bike.cpp slot 92 `0x0040ba30`: the lean error is computed into a float local and then
+  stored (retail stores `leanError` before reserving `_finite`'s double argument);
+  RotateAboutPoint takes the pivot first; the lean-axis scales go through a by-value helper;
+  the cancel deltas are read by reference and the negative-side clamp is `0.0f > n`.
 
 x87 operand order facts measured on these targets (they add to the list below):
 

@@ -48,6 +48,7 @@
   "?CollisionMatrixMultiply@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
   "?CollisionMeshShape_Free@@YAXPAX@Z": "0x00431e50",
   "?CollisionModelShape_Free@@YAXPAX@Z": "0x00431df0",
+  "?CollisionRelativeFrame@@YAXPAUMatrix4@@PBU1@11@Z": "0x00432260",
   "?CollisionRelativeTransform@@YAXPAUMatrix4@@PBU1@1@Z": "0x00432180",
   "?CollisionVec3Max@@YA?AUCollisionInlineVec3@@ABUCollisionVec3@@0@Z": "0x00435680",
   "?CollisionVec3Min@@YA?AUCollisionInlineVec3@@ABUCollisionVec3@@0@Z": "0x00435610",

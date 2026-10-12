@@ -11,31 +11,11 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
-    "target_va": "0x00429570",
-    "target_size": 789,
-    "expect": "partial",
-    "notes": "near miss: retail merges the return-0/return-1 tails; control flow and calls otherwise match",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
     "candidate_symbol_contains": "?MoveBox@@YAXPAUVec3@@0PBUMatrix4@@@Z",
     "target_va": "0x00428db0",
     "target_size": 789,
     "expect": "partial",
     "notes": "near miss (773/789): operand order of the first two products of the transform's x and z rows",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?CapsuleTreeQuery@@",
-    "target_va": "0x004298c0",
-    "target_size": 1436,
-    "expect": "partial",
-    "notes": "532/1418: matches through the |dist| test; operator-result temporaries and the shared return 1 differ afterwards (see the file header).",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {

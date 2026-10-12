@@ -66,7 +66,7 @@
     "target_va": "0x005097d0",
     "target_size": 486,
     "expect": "partial",
-    "notes": "slot 28 light matrix setup, 23.8% (499/486). Retail keeps extent=max(x,z) in memory ([esp+0xc], redundant reload), reloads [ecx+0x54] for the 2nd texture->size read and uses frame 0x48; none of the source shapes tried reproduce these",
+    "notes": "slot 28 light matrix setup, 477/486 bytes long, 6 instruction diffs. Retail copies extent onto its own [esp+0xc] slot through edx on the extentX <= extent path and so reloads shadow->texture into eax/edx; the candidate elides that self-copy. Tried: ternary, if/else with three variables (FPU-cached extent, frame 0x44), inline max by value/const-ref (ref-return gives a pointer select), extent = extent else-branch, explicit copy through a scoped local",
     "bindings": "TerrainShadow.bindings.json"
   },
   {

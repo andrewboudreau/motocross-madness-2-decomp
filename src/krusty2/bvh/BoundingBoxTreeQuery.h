@@ -144,6 +144,7 @@ Vec3 Vec3Scale(const Vec3& v, float s);         // 0x005015b0 operator*(const Ve
 float Vec3Dot(const Vec3& a, const Vec3& b);    // 0x0040ae30 DotProduct
 Vec3 Vec3ScaleLeft(float s, const Vec3& v);     // 0x00428090 operator*(float, const Vec3&)
 float Vec3LengthCall(const Vec3* v);            // 0x00435ec0 length (CollisionLength)
+float Vec3Length(const Vec3& v);                // 0x00435ec0 length, by reference
 
 // The operators expanded inline while their constructor is called out of line (the nested
 // expansion is the first one VC6 gives up when the budget runs low).

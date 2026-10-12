@@ -1,0 +1,11 @@
+{
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
+  "?InvalidateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb850",
+  "?MatrixMultiply@@YAXPAUMatrix4@@U1@1@Z": "0x0042a1a0",
+  "?MatrixProductRows@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
+  "?SetLocalMatrix@SoultreeObject@@QAEXPBUMatrix4@@@Z": "0x004fca30",
+  "?TransposeRotation3x3@@YAXPAUMatrix4@@@Z": "0x004fefb0",
+  "?UpdateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb4f0",
+  "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
+  "?Vec3TransformNormalTranspose@@YAXPAUVec3@@U1@PBUMatrix4@@@Z": "0x0042a4b0"
+}

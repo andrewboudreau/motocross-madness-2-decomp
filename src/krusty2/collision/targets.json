@@ -535,8 +535,8 @@
     "candidate_symbol_contains": "TestMeshAgainst",
     "target_va": "0x00438c90",
     "target_size": 475,
-    "expect": "partial",
-    "notes": "13.2%: type 0 -> 0x428950 mesh vs hull (result vec rotated by hull+0x48); type 1 -> thiscall 0x4392c0 then loop enabled elements; scheduling differs (453 vs 475)",
+    "expect": "exact",
+    "notes": "type 0 -> 0x428950 mesh vs hull (result vec rotated by hull+0x48 through a by-value copy); type 1 -> thiscall 0x4392c0 then loop enabled elements, element address formed before the enabled test",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -755,8 +755,8 @@
     "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionObject",
     "target_va": "0x00434540",
     "target_size": 1068,
-    "expect": "partial",
-    "notes": "1054/1068: size and frame exact; only the capsule end-point transforms differ in x87 operand order.",
+    "expect": "exact",
+    "notes": "Exact. The capsule's end points go through two transforms (p0 by reference with reference locals, p1 by pointer with the y and z rows bracketed x + (y + z)); one shared transform reaches 1054-1058/1068.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

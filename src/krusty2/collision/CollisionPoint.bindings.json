@@ -9,6 +9,7 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?LocalToWorldPoint@CollisionContactOwner@@QAEPAUCollisionVec3@@PAU2@PBU2@@Z": "0x004fd660",
+  "?QueryGround@CollisionFrameHelper@@QAEXPAUCollisionVec3@@PBU2@HPAD@Z": "0x00507c10",
   "?Vec3DotCall@@YAMPBUCollisionVec3@@0@Z": "0x0040ae30",
   "?Vec3Normalize@@YAPAUCollisionVec3@@PAU1@PBU1@@Z": "0x005087b0",
   "?g_CollisionVec3_579810@@3UCollisionVec3@@A": "0x00579810",

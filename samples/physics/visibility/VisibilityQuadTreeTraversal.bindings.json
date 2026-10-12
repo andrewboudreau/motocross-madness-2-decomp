@@ -1,0 +1,8 @@
+{
+  "?Alloc@BlockAllocator@@QAEPAXXZ": "0x00423fc0",
+  "?TestBox@VisibilityClipper@@QAEHPAUVisibilityCamera@@PBM11PAH2H@Z": "0x0052f570",
+  "?Traverse@VisibilityQuadTreeNode@@QAEPAUQuadTreeResultLink@@HHPAU2@HHHPAUVisibilityCamera@@@Z": "0x0052d610",
+  "?g_pQuadTree@@3PAVQuadTree@@A": "0x00689b78",
+  "?g_quadTreeInvScale@@3MA": "0x00689b74",
+  "?g_visibilityClipper@@3PAVVisibilityClipper@@A": "0x00575a98"
+}

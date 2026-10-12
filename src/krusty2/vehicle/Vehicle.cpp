@@ -270,6 +270,9 @@ void Vehicle::UnknownVirtualSlot43()
 // weight = 1 - dist_i / sum(dist), so the nearest contact takes the biggest share.
 // Wheel mode: field_0x430 gives every wheel its stored weight (+0x294); otherwise the same
 // blending as for contacts using the wheels' contact points, or a single lead wheel.
+// Retail leaves `last` uninitialised (its slot is the squared-distance temporary), declares
+// the running total before the share temporary, and the single-wheel branch zeroes the share
+// temporary in the loop (z, y, x) instead of copying kVec3Zero like the no-contact branch.
 static inline Vec3 VehScale(const Vec3& v, float k)
 {
     Vec3 r;
@@ -284,7 +287,7 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
     float dx = a.x - b.x;
     float dy = a.y - b.y;
     float dz = a.z - b.z;
-    float d2 = dx * dx + dy * dy + dz * dz;
+    float d2 = (dy * dy + dx * dx) + dz * dz;
     if (d2 == 1.0f)
         return 1.0f;
     return FastSqrt(d2);
@@ -292,17 +295,17 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
 
 void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
 {
-    Vec3 share;
     float total;
+    Vec3 share;
     float dist[128];
     int i;
     int active;
 
     contactTotal = touchingPointCount + wheelsInContact;
     if (pointsTouching) {
-        active = 0;
         total = 0.0f;
-        int last = 0;
+        active = 0;
+        int last;
         for (i = 0; i < collisionPointCount; i++) {
             VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
             if (c->contactActive) {
@@ -371,7 +374,10 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     } else if (wheelsInContact == 1) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            wheelList[i]->appliedShare = kVec3Zero;
+            share.z = 0.0f;
+            share.y = 0.0f;
+            share.x = 0.0f;
+            wheelList[i]->appliedShare = share;
         }
         primaryWheel->loadWeight = 1.0f;
         primaryWheel->appliedShare = *arg;
@@ -423,9 +429,9 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
         n = *GetAverageGroundNormal(&t);
     } else
         n = *c;
+    Vec3* perp = &scratchVector2;
     Vec3 s;
     Vec3 proj = *Vec3ScaleCall(&s, a, Vec3DotCall(&n, a));
-    Vec3* perp = &scratchVector2;
     Vec3 d;
     *perp = *Vec3SubtractCall(&d, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
@@ -531,7 +537,7 @@ void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
 
 static inline Vec3 VehNormalized(const Vec3& v)
 {
-    float len2 = v.y * v.y + v.x * v.x + v.z * v.z;
+    float len2 = VehLen2(v);
     if (len2 == 1.0f)
         return v;
     float inv = FastInvSqrt(len2);
@@ -539,6 +545,21 @@ static inline Vec3 VehNormalized(const Vec3& v)
     r.x = inv * v.x;
     r.y = inv * v.y;
     r.z = inv * v.z;
+    return r;
+}
+
+// (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
+static inline float VehDotG(const Vec3& a, const Vec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
+
+static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
     return r;
 }
 
@@ -554,50 +575,48 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 {
     float k = UnknownVirtualSlot73(point, dir) * d;
     field_0x4e8 = k;
-    if (VehAbs(k) <= 0.0f)
-        return 0.0f;
-    float m = field_0x434;
-    float r = (m * m) / -k * stepTime;
-    Vec3 t;
-    t.x = r * dir->x;
-    t.y = r * dir->y;
-    t.z = r * dir->z;
-    float s = c * 1.5f;
-    if (!(s < 1.0f))
-        s = 1.0f;
-    Vec3 u;
-    u.x = s * t.x;
-    u.y = t.y * s;
-    u.z = t.z * s;
-    Vec3 sumv;
-    sumv.x = u.x + velocity.x;
-    sumv.y = u.y + velocity.y;
-    sumv.z = u.z + velocity.z;
-    scratchVector = sumv;
-    Vec3* nv = &scratchVector;
-    float len2 = nv->y * nv->y + nv->x * nv->x + nv->z * nv->z;
-    float len;
-    if (len2 == 1.0f)
-        len = 1.0f;
-    else
-        len = (float)sqrt(len2);
-    if (VehAbs(len) < 0.01f)
-        return 0.0f;
-    float sign = -1.0f;
-    if (!(k < 0.0f))
-        sign = 1.0f;
-    float dot = nv->y * velocity.y + nv->x * velocity.x + nv->z * velocity.z;
-    sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
-    if (!_finite(sign))
-        return 0.0f;
-    float scale = linearSpeed / len;
-    velocity.x = scale * nv->x;
-    velocity.y = scale * nv->y;
-    velocity.z = scale * nv->z;
-    if (movingForward)
-        return sign;
-    return -sign;
+    if (!(VehAbsT(k) <= 0.0f)) {
+        float m = field_0x434;
+        float nk = -k;
+        float r = m * m / nk * stepTime;
+        Vec3 t = VehScale(*dir, r);
+        float s = c * 1.5f;
+        if (!(s < 1.0f))
+            s = 1.0f;
+        Vec3 u;
+        u.x = s * t.x;
+        u.y = t.y * s;
+        u.z = t.z * s;
+        scratchVector = VehSum(u, velocity);
+        Vec3* nv = &scratchVector;
+        float len2 = VehLen2(*nv);
+        float len;
+        if (len2 == 1.0f)
+            len = 1.0f;
+        else
+            len = (float)sqrt(len2);
+        if (!(VehAbsT(len) < 0.01f)) {
+            float sign = -1.0f;
+            if (!(k < 0.0f))
+                sign = 1.0f;
+            float dot = VehDotG(scratchVector, velocity);
+            sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
+            if (_finite(sign)) {
+                velocity = VehScale(*nv, linearSpeed / len);
+                if (movingForward)
+                    return sign;
+                sign = -sign;
+                return sign;
+            }
+        }
+    }
+    return 0.0f;
 }
+
+// Smaller of two values; slot 72's load clamp and the scrape clamps go through it (the
+// by-value copy is what keeps each component on the x87 stack across its compare, as
+// retail does).
+static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
 
 // Tier 3 reading: accumulates per-wheel ground normals and suspension loads into one
 // support normal and a lean/steer response (via slot 74).  Wheels are averaged, so more than
@@ -606,30 +625,36 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 // wheels and pushes the vehicle along the resulting cross direction (tier 3). *out receives the
 // summed normal (normalised when more than one contact); field_0x4b8/0x43c receive the result
 // of slot 74 (deflection angle and angle*dt) using the last flagged wheel's point (+0x23c).
+// Retail keeps the argument wheel (tested from its stack slot, also in the reset test) apart
+// from the last flagged wheel (edi, initialised from the argument): flagged wheels are read
+// through that pointer, plain wheels through the loop's element, so the two branches do not
+// share a tail.  Load is declared first (frame slot 0) and the average divides by a float
+// count (fild/fdivp, not fidiv).
 void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 {
     if (crashState != 0)
         return;
+    float load = 0.0f;
     Vec3 sum = kVec3Zero;
     *out = kVec3Zero;
-    float load = 0.0f;
     int mixed = 0;
     int flagged = 0;
     int plain = 0;
+    VehicleWheel* last = wheel;
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
         if (w->inContact || wheel) {
             if (w->field_0x1c0) {
-                wheel = w;
+                last = wheelList[i];
                 flagged++;
-                sum.x += w->rollDirection.x;
-                sum.y += w->rollDirection.y;
-                sum.z += w->rollDirection.z;
-                out->x += w->groundNormal.x;
-                out->y += w->groundNormal.y;
-                out->z += w->groundNormal.z;
-                load += w->contactLoad;
-                if (plain > 0)
+                sum.x += last->rollDirection.x;
+                sum.y += last->rollDirection.y;
+                sum.z += last->rollDirection.z;
+                out->x += last->groundNormal.x;
+                out->y += last->groundNormal.y;
+                out->z += last->groundNormal.z;
+                load += last->contactLoad;
+                if (plain != 0)
                     mixed = 1;
             } else {
                 plain++;
@@ -643,7 +668,7 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
         }
     }
     if (wheelsInContact > 1) {
-        float len2 = out->y * out->y + out->x * out->x + out->z * out->z;
+        float len2 = VehLen2(*out);
         if (len2 == 0.0f) {
             *out = kVec3Zero;
         } else {
@@ -652,7 +677,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
             out->y = inv * out->y;
             out->z = inv * out->z;
         }
-        load = load / wheelsInContact;
+        float n = (float)wheelsInContact;
+        load = load / n;
     }
     if (mixed == 0 && wheel == 0) {
         turnAngle = 0.0f;
@@ -663,18 +689,11 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     }
     Vec3 c = ((VehV3&)sum).Cross(*out);
     Vec3 axis = VehNormalized(c);
-    float mag = load;
-    if (!(mag < 1.0f))
-        mag = 1.0f;
-    turnAngle = UnknownVirtualSlot74(&wheel->sideAxis, &axis, mag, 1.0f);
+    turnAngle = UnknownVirtualSlot74(&last->sideAxis, &axis, VehMinF(load, 1.0f), 1.0f);
     turnRate = turnAngle * invStepTime;
 }
 
 // ---- impact handlers (slots 18..20) ----
-// Smaller of two values; the scrape clamps go through it (the by-value copy is what keeps
-// each component on the x87 stack across its compare, as retail does).
-static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
-
 // Commit an impact to a sink: latch the current vector into the previous one, mark it dirty.
 static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** sink)
 {
@@ -863,46 +882,46 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
 // Slot 46: the point the follow/aim logic looks at, relative to the vehicle position: toward the
 // lead wheel (or the midpoint of two wheels when only the aux one is not yet fully settled),
 // rotated by the frame transform; falls back to field_0x194 when disabled or > 2 wheels.
+// Each branch converts through its own WorldToLocalDirection call (retail has three) and VC6
+// merges the `*out = ` copies; the midpoint goes through three temporaries (difference, half,
+// sum) as retail's 0x24 frame shows.  Left: two FPU/store scheduling spots in the midpoint and
+// lead-wheel branches (3 instructions).  Tried: by-pointer/reference/named-temp lead wheel,
+// a named offset temp, nested helper expressions, early-return and if/else layouts.
 Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 {
-    Vec3* src = &rotationPivot;
-    Vec3 t;
     if (!airborne && !pointsTouching && wheelsInContact <= 2) {
         if (wheelsInContact == 2) {
-            VehicleWheel* a = secondaryWheel;
-            VehicleWheel* b = primaryWheel;
-            if (!a->aux) {
+            // a has the aux object, b is the other wheel
+            VehicleWheel* a;
+            VehicleWheel* b = secondaryWheel;
+            if (b->aux) {
+                a = b;
+                b = primaryWheel;
+            } else {
                 a = primaryWheel;
                 if (!a->aux) {
-                    *out = *src;
+                    *out = rotationPivot;
                     return out;
                 }
-                b = secondaryWheel;
-            } else {
-                b = primaryWheel;
             }
-            // a has the aux object, b is the other wheel
             if (a->field_0x2b8 < 0.9f) {
                 scratchVector = VehOffset(b->wheelPosition, position);
+                *out = modelNode->WorldToLocalDirection(scratchVector);
             } else {
                 Vec3 d = VehOffset(a->wheelPosition, b->wheelPosition);
-                Vec3 mid;
-                mid.x = d.x * 0.5f;
-                mid.y = d.y * 0.5f;
-                mid.z = d.z * 0.5f;
-                mid.x += b->wheelPosition.x;
-                mid.y += b->wheelPosition.y;
-                mid.z += b->wheelPosition.z;
+                Vec3 half = VehScale(d, 0.5f);
+                Vec3 mid = VehSum(half, b->wheelPosition);
                 scratchVector = VehOffset(mid, position);
+                *out = modelNode->WorldToLocalDirection(scratchVector);
             }
         } else {
             Vec3* p = &primaryWheel->wheelPosition;
             scratchVector = VehOffset(*p, position);
+            *out = modelNode->WorldToLocalDirection(scratchVector);
         }
-        t = modelNode->WorldToLocalDirection(scratchVector);
-        src = &t;
+    } else {
+        *out = rotationPivot;
     }
-    *out = *src;
     return out;
 }
 
@@ -1627,36 +1646,41 @@ int Vehicle::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c, c
     return 0;
 }
 
-static inline float VehLenSq(const Vec3& v)
+// Both helpers load y, x, z first and sum z*z + (x*x + y*y), as retail's x87 sequence shows.
+static inline float VehSqLength(const Vec3& v)
 {
-    return v.x * v.x + v.y * v.y + v.z * v.z;
+    float y = v.y, x = v.x, z = v.z;
+    return z * z + (x * x + y * y);
 }
 
-// Tier 3 reading: when field_0xd8 (a velocity-like vector) is long enough, remembers its
-// direction in field_0x1ac and rotates the scene node about field_0x194 by |v| * dt.
+static inline float VehMagnitude(const Vec3& v)
+{
+    float sq = VehSqLength(v);
+    if (sq == 0.0f)
+        return 0.0f;
+    if (sq == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(sq);
+}
+
+// Tier 3 reading: turns the scene node about rotationPivot by |angularVelocity| * stepTime,
+// around the angular velocity's direction (kept in scratchVector), when that angle is finite
+// and at least 1e-4.
 void Vehicle::UnknownVirtualSlot95()
 {
-    float lenSq = SquareMagnitude(angularVelocity);
-    float len;
-    if (lenSq == 0.0f)
-        len = 0.0f;
-    else if (lenSq == 1.0f)
-        len = 1.0f;
-    else
-        len = 1.0f / FastInvSqrt(lenSq);
-    float mag = len * stepTime;
-    if (_finite(mag) && lenSq >= 0.0001f) {
+    float angle = VehMagnitude(angularVelocity) * stepTime;
+    if (_finite(angle) && angle >= 0.0001f) {
         scratchVector = angularVelocity;
-        float sq = VehLenSq(scratchVector);
+        float sq = VehSqLength(scratchVector);
         if (sq == 0.0f) {
             scratchVector = kVec3Zero;
         } else {
             float s = FastInvSqrt(sq);
-            scratchVector.x = s * scratchVector.x;
-            scratchVector.y = s * scratchVector.y;
-            scratchVector.z = s * scratchVector.z;
+            scratchVector.x *= s;
+            scratchVector.y *= s;
+            scratchVector.z *= s;
         }
-        modelNode->RotateAboutPoint(rotationPivot, scratchVector, lenSq);
+        modelNode->RotateAboutPoint(rotationPivot, scratchVector, angle);
     }
 }
 
@@ -2238,12 +2262,6 @@ void Vehicle::PlaceWheels()
     }
     if (unflagged)
         wheelList[0]->reportContactOutputs = 1;
-}
-
-// (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
-static inline float VehDotG(const Vec3& a, const Vec3& b)
-{
-    return (a.x * b.x + a.y * b.y) + a.z * b.z;
 }
 
 // 0x00527a20 (PARTIAL, 349/866 bytes aligned): the first 0x120 bytes (count loop, drive

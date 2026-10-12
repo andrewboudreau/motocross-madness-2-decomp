@@ -2,11 +2,6 @@
 // (src/krusty2/bvh/BoundingBoxTreeQuery.cpp, 0x00424690..0x0042ad2f).  Names are tier 3.
 //
 // Status (VC6 SP3, vc6_o2_ml; tools/run_physics_samples.py scores):
-// - SphereTreeQuery 0x00429570 (831 vs 789 bytes): retail shares one `return 0` / `return 1`
-//   tail between the triangle and point branches and keeps the second recursive call
-//   un-merged (it returns the first child's nonzero result as is); this source gives
-//   separate epilogues.  An if / else-if form with `int hit = child0; if (!hit) hit = child1;`
-//   gives retail's block order and tails but moves the triangle branch's stack slots.
 // - MoveBox 0x00428db0 (789 bytes, 773 strict): the GrowBoxByTransformedBox body on pointer
 //   arguments (that one is exact in the src file).  With the loop output in its own local
 //   (`mid`), `grown` assigned after the last rotation and the z, y, x sums of the transform,
@@ -17,6 +12,8 @@
 //
 // LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
 // exact in the src file.
+//
+// SphereTreeQuery 0x00429570 and CapsuleTreeQuery 0x004298c0 are exact in the src file too.
 //
 // SweptBoxOverlap 0x00424730, BoxOverlap 0x00424ab0 and PointInTriangle 0x004278d0 are exact
 // in the src file as well (the last two with Math3D.h's parenthesised CrossProduct and
@@ -53,14 +50,6 @@
 //   inline cross products load a's components first in the x term.  The natural operator
 //   form expands more helpers than retail (see the notes at the function).
 //
-// - CapsuleTreeQuery 0x004298c0 (1418 vs 1436 bytes, 532 match): the frame (0x54), the
-//   inline transforms and the out-of-line Vec3 operator calls match through the |dist| test
-//   (the point branch needs its own block so its locals share the triangle branch's slots);
-//   from there VC6 here assigns the operator result temporaries other slots and shares the
-//   `return 1` of the PointInTriangle test, where retail returns inline.  Calls
-//   SegmentSegmentDistance 0x0042a640 (near miss below) for the three edges.  Retail calls
-//   every Vec3 operator out of line here; the natural operator form expands most of them.
-//
 // - SegmentTriangleQuery 0x00427c10 (1101 bytes, 1110 here): the natural operator form gives
 //   retail's exact sequence of inline and out-of-line helpers (five constructor calls,
 //   operator*(float, Vec3), three Vec3::operator+= calls).  The segment is moved into the
@@ -88,49 +77,6 @@ static Matrix4 s_relativeBA;        // 0x00578eb0
 static Matrix4 s_motion;            // 0x00579018
 static int s_mode;                  // 0x0057905c
 extern QueryHit* g_CollisionBoxResult;   // 0x00579058
-
-// 0x00429570.  Sphere (world centre, radius) against a tree: a triangle tree when
-// triangles != 0 (the vertices are in s_vertices), else a point tree.
-int SphereTreeQuery(const Vec3* center, float radius, float radiusSq, QueryTreeNode* node,
-                    const Matrix4* xf, int triangles)
-{
-    if (node->volume < 0.0f) {
-        if (triangles) {
-            QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
-            Vec3 p = *center;
-            InverseTransformPoint(&p, p, xf);
-            const Vec3& v0 = s_vertices[tri->vertex[0]];
-            Vec3 d = Vec3Call(p.x - v0.x, p.y - v0.y, p.z - v0.z);
-            float dist = QueryDot(d, tri->normal);
-            if (dist > radius)
-                return 0;
-            Vec3 t, q;
-            q = *Vec3SubtractCall(&q, &p, Vec3ScaleCall(&t, &tri->normal, dist));
-            if (PointInTriangle(&q, tri))
-                return 1;
-            if (PointSegmentDistance(&p, &s_vertices[tri->vertex[0]], &s_vertices[tri->vertex[1]]) < radiusSq)
-                return 1;
-            if (PointSegmentDistance(&p, &s_vertices[tri->vertex[1]], &s_vertices[tri->vertex[2]]) < radiusSq)
-                return 1;
-            if (PointSegmentDistance(&p, &s_vertices[tri->vertex[2]], &s_vertices[tri->vertex[0]]) < radiusSq)
-                return 1;
-            return 0;
-        }
-        Vec3 p = ((QueryPointLeaf*)node)->point;
-        Vec3 w;
-        w.x = p.x * xf->_11 + p.y * xf->_21 + p.z * xf->_31 + xf->_41;
-        w.y = p.x * xf->_12 + p.y * xf->_22 + p.z * xf->_32 + xf->_42;
-        w.z = p.x * xf->_13 + p.y * xf->_23 + p.z * xf->_33 + xf->_43;
-        Vec3 d = w - *center;
-        if (QueryDot(d, d) < radiusSq)
-            return 1;
-        return 0;
-    }
-    if (!BoxSphereOverlap(&node->center, &node->halfExtents, *center, radius, radiusSq, xf))
-        return 0;
-    return SphereTreeQuery(center, radius, radiusSq, node->child[0], xf, triangles) ||
-           SphereTreeQuery(center, radius, radiusSq, node->child[1], xf, triangles);
-}
 
 // MoveBox's transform: the x and z rows sum z, y, x (no grouping), which also gives retail's
 // slot order for d and half.
@@ -489,62 +435,6 @@ float SegmentSegmentDistance(const Vec3* p0, const Vec3* d0, const Vec3* p1, con
     float l1 = SegPointDistance(c0, *p1, *d1);
     float l2 = SegPointDistance(c1, *p0, *d0);
     return QueryMax(l1, l2);
-}
-
-// 0x004298c0.  Capsule (segment ends[0]..ends[1], radius) against the tree; the triangle
-// branch clips the segment against the face plane, the point branch measures the distance
-// from the transformed point to the segment.  See the header for what differs.
-int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNode* node,
-                     const Matrix4* xf, int triangles)
-{
-    if (node->volume < 0.0f) {
-        if (triangles) {
-            QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
-            Vec3 p;
-            InverseTransformPointInline(&p, *ends, xf);
-            Vec3 d;
-            Vec3TransformNormalTranspose(&d, Vec3Sub(ends[1], ends[0]), xf);
-            float t = -(Vec3Dot(tri->normal, p) + tri->planeOffset) / Vec3Dot(tri->normal, d);
-            if (!(t < 1.0f))
-                t = 1.0f;
-            else if (t <= 0.0f)
-                t = 0.0f;
-            Vec3 c = Vec3Add(Vec3Scale(d, t), p);
-            float dist = Vec3Dot(Vec3Sub(c, s_vertices[tri->vertex[0]]), tri->normal);
-            if (QueryAbs(dist) <= radius) {
-                Vec3 q = Vec3Sub(c, Vec3ScaleLeft(dist, tri->normal));
-                if (PointInTriangle(&q, tri))
-                    return 1;
-                Vec3 e = Vec3Sub(s_vertices[tri->vertex[1]], s_vertices[tri->vertex[0]]);
-                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[0]], &e) > radius)
-                    return 1;
-                e = Vec3Sub(s_vertices[tri->vertex[2]], s_vertices[tri->vertex[1]]);
-                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[1]], &e) > radius)
-                    return 1;
-                e = Vec3Sub(s_vertices[tri->vertex[0]], s_vertices[tri->vertex[2]]);
-                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[2]], &e) > radius)
-                    return 1;
-            }
-            return 0;
-        } else {
-            Vec3 p;
-            TransformPointInline(&p, ((QueryPointLeaf*)node)->point, xf);
-            Vec3 dir = Vec3Call(ends[1].x - ends[0].x, ends[1].y - ends[0].y, ends[1].z - ends[0].z);
-            float t = Vec3Dot(dir, Vec3Sub(p, *ends)) / Vec3Dot(dir, dir);
-            if (!(t < 1.0f))
-                t = 1.0f;
-            else if (t <= 0.0f)
-                t = 0.0f;
-            Vec3 r = Vec3Sub(p, Vec3Add(Vec3ScaleLeft(t, dir), *ends));
-            if (Vec3LengthCall(&r) < radius)
-                return 1;
-            return 0;
-        }
-    }
-    if (!BoxCapsuleOverlap(&node->center, &node->halfExtents, ends, radius, radiusSq, xf))
-        return 0;
-    return CapsuleTreeQuery(ends, radius, radiusSq, node->child[0], xf, triangles) ||
-           CapsuleTreeQuery(ends, radius, radiusSq, node->child[1], xf, triangles);
 }
 
 // 0x00427c10.  Segment (moved by m) against a triangle, accumulating into the sweep record.

@@ -265,8 +265,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot92@Bike",
     "target_va": "0x0040ba30",
     "target_size": 1157,
-    "expect": "partial",
-    "notes": "slot 92: frame 0x18 vs ours 0x1c, ours pushes edi; first divergence at prologue register use [5.7% match under vc6_o2_ml]",
+    "expect": "exact",
+    "notes": "slot 92: byte-exact (strict) under vc6_o2_mt.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -636,7 +636,7 @@
     "target_va": "0x00526fa0",
     "target_size": 1161,
     "expect": "partial",
-    "notes": "8.8% (1155/1161). Inverse-distance blend of *arg over active contacts/wheels. First divergence +0x2a: branch distance (frame 0x214 matches); retail keeps the share temp at esp+0x10 and running total at 0x1c (we swap them) and the x87 term order of the squared-distance sum differs.",
+    "notes": "1134/1161 strict. Inverse-distance blend of *arg over active contacts/wheels. Fixed by uninitialised last, total declared before share, (dy*dy + dx*dx) + dz*dz, total zeroed before active, and the single-wheel branch zeroing the share temporary. Left: total = 0 stored from ebp (active) not ebx, `dec ebp` one instruction early, share.y copied before the share.z fstp in the three blend loops, and the single-wheel zero registers (edx/edi) swapped. Tried: active-- before/after the weight, VehScale into share or directly, x/y/z and chained zero orders.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -676,7 +676,7 @@
     "target_va": "0x5276d0",
     "target_size": 523,
     "expect": "partial",
-    "notes": "8.3% (479/523). Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710, else field_0x194. First divergence +0x0: retail tests flag in al and has frame 0x24 (ours 0x18, dl): retail keeps d.x on the x87 stack across the midpoint temp and routes vecs through int stack temps.",
+    "notes": "Same length (523), 3 instruction diffs. Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710 in each branch, else field_0x194; frame 0x24 from the difference/half/sum temporaries. Left: store/fstp and return-pointer push scheduling in the midpoint and lead-wheel branches.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -776,7 +776,7 @@
     "target_va": "0x00527e30",
     "target_size": 831,
     "expect": "partial",
-    "notes": "4.1% (814/831). Normal accumulation + slot-74 call. First divergence +0x0: frame sub esp,0x2c vs our 0x28 (one extra local); retail keeps this in ebx and out in esi and pushes ebp late, so all later bytes shift.",
+    "notes": "770/831 strict. Normal accumulation + slot-74 call. Fixed by a separate last-flagged-wheel pointer (the argument stays the loop/reset test), flagged reads through it, plain != 0, VehLen2 for both lengths, float count divide, VehMinF clamp, load declared first. Left: the prologue kVec3Zero copies use edx and load out early instead of retail's esi temp then esi=out/edi=copy. Tried: last declared at top/before load/after *out/before mixed/for-init, sum/out copy swapped (64), load after plain, int divide (407).",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -796,7 +796,7 @@
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "partial",
-    "notes": "8.4% (547/539). Velocity deflection, returns signed acos angle. First divergence +0x4: retail esi=dir(arg) / edi=this, we swap (esi=this); retail keeps k live in x87.",
+    "notes": "Strict 502/539 (448/483 masked). Velocity deflection, returns signed acos angle. Nested-if layout with one trailing return 0 gives retail esi=dir/edi=this and keeps k live in x87; VehDotG (x+y)+z dot loads retail y,x,z order; sign = -sign before the second return keeps fchs ahead of the pops. Left: retail stores field_0x4e8 before the abs compare (fcom placement), s*t.x via fld st(0), scratchVector .y store scheduling, and len/sign dead-parameter slots swapped (0x28/0x24). Tried: abs via local if, k assignment forms, sign/len declared at top, len init-then-if/reuse len2 (much worse), ternary return (worse), u via VehScale/scaled helper, sum via named temp, z-first or x-y dot groupings, VehDotI/pointer dot.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -836,7 +836,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "263/782: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
+    "notes": "291/784: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail); perp declared just before s (263 -> 291). Tried: perp at the top (a gets ebx but perp ebp, 190), s/d before n, a member-first cross helper and CrossB (no gain). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1135,8 +1135,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot95@Vehicle",
     "target_va": "0x0052a6a0",
     "target_size": 399,
-    "expect": "partial",
-    "notes": "5.7% (387/399). Rotate scene node about field_0x194 by |v|*dt. Retail loads y,x,z then does the three squares with the lenSq kept in memory and no ebx; all source permutations of the sum (fields, locals, helpers) compile to the same z,y,x load order.",
+    "expect": "exact",
+    "notes": "Strict exact. Rotates the scene node about rotationPivot by |angularVelocity| * stepTime around its direction; both squared lengths go through a helper that loads y, x, z first and sums z*z + (x*x + y*y), the in-place scale is written on the member.",
     "bindings": "Vehicle.bindings.json"
   },
   {

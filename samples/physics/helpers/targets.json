@@ -99,7 +99,8 @@
     "target_va": "0x4fc050",
     "target_size": 1171,
     "expect": "partial",
-    "notes": "partial (~69% sim): this/frame register assignment swapped (retail this=ebp, frame=ebx) and z/y/r temp slot placement differs."
+    "notes": "partial (~69% sim): this/frame register assignment swapped (retail this=ebp, frame=ebx) and z/y/r temp slot placement differs.",
+    "bindings": "SoultreeMatrix.bindings.json"
   },
   {
     "class": "SoultreeObject",
@@ -108,7 +109,8 @@
     "target_va": "0x4fb8c0",
     "target_size": 1096,
     "expect": "partial",
-    "notes": "same instructions and frame as retail, but the two copied matrices of each block get swapped stack slots (0x50/0x10)"
+    "notes": "same instructions and frame as retail, but the two copied matrices of each block get swapped stack slots (0x50/0x10)",
+    "bindings": "SoultreeMatrix.bindings.json"
   },
   {
     "class": "Math",
@@ -126,7 +128,8 @@
     "target_va": "0x4fd1f0",
     "target_size": 334,
     "expect": "partial",
-    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary."
+    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary.",
+    "bindings": "SoultreeRotate.bindings.json"
   },
   {
     "class": "(free)",

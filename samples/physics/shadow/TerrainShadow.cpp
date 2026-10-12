@@ -82,6 +82,8 @@ int TerrainShadow::UnknownVirtualSlot29()
 // two-mode matrix build as ProjectedShadow::ComputeBounds: mode 1 is a perspective camera whose
 // field of view comes from the texture area over the larger rectangle edge, otherwise an
 // orthographic scale by lensScale.  Returns 0 when the rectangle does not fit the texture.
+// Each branch owns its matrix: with one shared `m` VC6 cross-jumps the whole Multiply argument
+// copy, retail only merges from the final push.  The chained stores give retail's fst order.
 // Explicit-destination forms of 0x004a1410 / 0x004a1860 (cdecl, the destination is the first
 // argument and is returned), as Math3D.h's MatrixMultiply(Matrix4* out, a, b) declares them.
 ShadowMatrix* TerrainMatrixIdentityInto(ShadowMatrix* out);                       // 0x004a1410
@@ -101,22 +103,22 @@ int TerrainShadow::UnknownVirtualSlot28()
         extent = extentX;
     if (shadow->texture->size > extent) {
         float fov;
-        ShadowMatrix m;
         if (shadow->mode == 1) {
+            ShadowMatrix m;
             fov = (float)atan2((float)(shadow->texture->size * shadow->texture->size) / extent * 0.5,
                                shadow->camera->field_0x198) * 114.59156f;
             shadow->camera->SetLookAt(&shadow->camera->eyePosition, 0, 0, 0, &fov);
             shadow->camera->UnknownVirtualSlot28();
             m = *TerrainMatrixIdentityInto(&m);
-            m.m[0][0] = (float)shadow->texture->size;
-            m.m[1][1] = (float)shadow->texture->size;
+            m.m[0][0] = m.m[1][1] = (float)shadow->texture->size;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&m, m, shadow->camera->matrix_0xec);
         } else {
+            ShadowMatrix m;
             m = *TerrainMatrixIdentityInto(&m);
+            float half = (float)shadow->texture->size * 0.5f;
             m.m[0][0] = 0.5f / shadow->lensScale * fov;
             m.m[1][1] = -m.m[0][0];
-            m.m[3][0] = (float)shadow->texture->size * 0.5f;
-            m.m[3][1] = (float)shadow->texture->size * 0.5f;
+            m.m[3][1] = m.m[3][0] = half;
             shadow->lightMatrix = *TerrainMatrixMultiplyInto(&m, m, shadow->camera->matrix_0xac);
         }
         return 1;

@@ -35,20 +35,20 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 |---|---|
 | `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h`; `GraphicsTest.cpp`: 17 strict cases |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
-| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionTypes.h`): 63 strict cases of 79; `CollisionPoint.cpp` (+ `CollisionPoint.h`, `CollisionPointCtor.h`): 16 strict cases, its two near misses in `samples/physics/collision/CollisionPointNearMisses.cpp` |
+| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionTypes.h`): 65 strict cases of 79; `CollisionPoint.cpp` (+ `CollisionPoint.h`, `CollisionPointCtor.h`): 16 strict cases, its two near misses in `samples/physics/collision/CollisionPointNearMisses.cpp` |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 46 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 60 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
-| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
+| `vehicle/` | `Vehicle.cpp` (73 strict cases of 83 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |
-| `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 40 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
+| `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 42 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; `Motnctrl.cpp`: 40; `SteeringControl.cpp`: 21; `D3DIMSoultreeMotnctrl.cpp`: 26; `CollisionCharacter.cpp`: 11; shared motion layouts |
 | `constraint/` | `ConstraintMethodCollisionModel.cpp` (+ `ConstraintTypes.h`): 19 strict cases; its near miss ApplyContactImpulse is in `samples/physics/constraint/ConstraintMethodCollisionModelNearMisses.cpp` |
 | `shadow/` | D3DIMSoultreeShadow: 18 strict cases; `ProjectedShadow.cpp`: 21 strict cases, its near misses and the two inline-asm functions in `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; TerrainShadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
-Every `exact` target under `src/krusty2` is strict exact (682 of 738 targets; the rest are
+Every `exact` target under `src/krusty2` is strict exact (807 of 849 targets; the rest are
 `partial`). The reviewed slices and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
 SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
 family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors

@@ -927,6 +927,31 @@ inline void DebugTransformPointQ(Vec3* out, const Vec3& v, const Matrix4* m)
     out->z = x * m->_13 + (y * m->_23 + z * m->_33) + m->_43;
 }
 
+// The capsule's two end points (0x00434540).  Retail orders the x87 operands of the two
+// transforms differently: the start point's rows load x, y, z products as written (read
+// through reference locals), the far end's y and z rows are bracketed x + (y + z) and its
+// source comes in by pointer (with it by reference the x row's m->_11 loads after p1.x).
+inline void DebugTransformCapsuleStart(Vec3* out, const Vec3& v, const Matrix4* m)
+{
+    const float& x = v.x;
+    const float& y = v.y;
+    const float& z = v.z;
+    out->x = x * m->_11 + y * m->_21 + z * m->_31 + m->_41;
+    out->y = x * m->_12 + y * m->_22 + z * m->_32 + m->_42;
+    out->z = x * m->_13 + y * m->_23 + z * m->_33 + m->_43;
+}
+
+inline void DebugTransformCapsuleEnd(Vec3* out, const Vec3* p, const Matrix4* m)
+{
+    const Vec3& v = *p;
+    const float& x = v.x;
+    const float& y = v.y;
+    const float& z = v.z;
+    out->x = x * m->_11 + y * m->_21 + z * m->_31 + m->_41;
+    out->y = x * m->_12 + (y * m->_22 + z * m->_32) + m->_42;
+    out->z = x * m->_13 + (y * m->_23 + z * m->_33) + m->_43;
+}
+
 // v * M3x3 (no translation), like 0x0042a450.
 inline void DebugRotateVector(Vec3* out, Vec3 v, const Matrix4* m)
 {
@@ -1192,10 +1217,8 @@ struct CollisionCapsuleView {
 // collision debug overlay.  debugDrawMode 0 draws nothing, 5 adds the translucent bounding
 // sphere; hulls and models draw their trees, a polyline its segment tree, a sphere a wire
 // sphere and a capsule its two end spheres joined by ten rings along the axis.
-// Near miss (1054/1068, size and frame exact): only the capsule end-point transforms differ in
-// x87 operand order (retail sums p0's terms y, z, x and loads m->_11 before p1.x).
-// Swapping capsule/shape bases and by-value, pointer, temporary or per-row helpers gave
-// nothing; per-row hand-ordered products reach 1060/1068 only in unreadable forms.
+// The capsule's end points go through DebugTransformCapsuleStart/End (see there); with one
+// shared transform for both ends retail's operand orders are out of reach (1054-1058).
 // The ring step is d / 10.0f: VC6 turns it into a multiply by the reciprocal constant
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
 int CollisionObject::GameObjectVirtualSlot14()
@@ -1235,8 +1258,8 @@ int CollisionObject::GameObjectVirtualSlot14()
             SetDrawColor(0xff, 0xff, 0xff);
             CollisionCapsuleView* capsule = (CollisionCapsuleView*)shape;
             Vec3 ends[2];
-            DebugTransformPointRef(&ends[0], capsule->p0, &capsule->transform);
-            DebugTransformPointRef(&ends[1], capsule->p1, &capsule->transform);
+            DebugTransformCapsuleStart(&ends[0], capsule->p0, &capsule->transform);
+            DebugTransformCapsuleEnd(&ends[1], &capsule->p1, &capsule->transform);
             DrawSphere(&ends[0], capsule->radius, 0x10);
             DrawSphere(&ends[1], ((CollisionCapsuleView*)shape)->radius, 0x10);
             Vec3 d = ends[1] - ends[0];
@@ -1732,10 +1755,13 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
-            if (a->elementEnabled[i] && HullVsHull(&a->elements[i], b, q)) {
-                sum += QueryContact(q);
-                hit = 1;
-                count++;
+            if (a->elementEnabled[i]) {
+                CollisionHullBody* e = &a->elements[i];
+                if (HullVsHull(e, b, q)) {
+                    sum += QueryContact(q);
+                    hit = 1;
+                    count++;
+                }
             }
         }
         if (hit) {
@@ -1777,10 +1803,13 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
-            if (a->elementEnabled[i] && HullVsHullSwept(&a->elements[i], b, q)) {
-                sum += QueryContact(q);
-                hit = 1;
-                count++;
+            if (a->elementEnabled[i]) {
+                CollisionHullBody* e = &a->elements[i];
+                if (HullVsHullSwept(e, b, q)) {
+                    sum += QueryContact(q);
+                    hit = 1;
+                    count++;
+                }
             }
         }
         if (hit) {
@@ -1813,7 +1842,8 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < b->elementCount; i++) {
-            if (ModelVsHull(a, &b->elements[i], q)) {
+            CollisionHullBody* e = &b->elements[i];
+            if (ModelVsHull(a, e, q)) {
                 sum += QueryContact(q);
                 hit = 1;
                 count++;
@@ -1867,7 +1897,8 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
         Vec3 last;
         last = Vec3(0.0f, 0.0f, 0.0f);
         for (int i = 0; i < b->elementCount; i++) {
-            if (ModelVsHullSwept(a, &b->elements[i], q)) {
+            CollisionHullBody* e = &b->elements[i];
+            if (ModelVsHullSwept(a, e, q)) {
                 hit = 1;
                 last = QueryContact(q);
             }
@@ -1889,6 +1920,14 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
 // is set.  The query vectors and the scratch points are first rotated into B's frame, the
 // box test runs with mode 2, and on a hit the contact point is averaged over contactCount
 // and transformed back; the vectors/points are always rotated back afterwards.
+// Near miss.  Retail rotates each query vector in place from a by-value copy in one 12-byte
+// slot (frame 0xc), as TestMeshAgainst (0x00438c90) does; with in-place helpers of the form
+// `out->x = (v.y * m->m[0][1] + v.z * m->m[0][2]) + v.x * m->m[0][0]`, a `&q->contact` pointer
+// local and the scratch rows written (x + z) + y, the candidate reaches 779/962 (18 insn
+// diffs).  Left: the x row of the column/point helpers loads v.y before v.z, the loop's z row
+// x/z order and two copy schedules.  These pair orders follow unrelated declaration counts
+// (dead locals reach 801/962), and the column helper's form that suits HullVsHull breaks
+// TestMeshAgainst, so the in-place forms are not applied here.
 int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)
@@ -1973,10 +2012,13 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
         // Retail makes this call (0x004fc9a0); nodePos is never read.
         ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
-            if (b->elementEnabled[i] && HullVsHullSwept(a, &b->elements[i], q)) {
-                sum += QueryContact(q);
-                hit = 1;
-                count++;
+            if (b->elementEnabled[i]) {
+                CollisionHullBody* e = &b->elements[i];
+                if (HullVsHullSwept(a, e, q)) {
+                    sum += QueryContact(q);
+                    hit = 1;
+                    count++;
+                }
             }
         }
         if (hit) {
@@ -2119,10 +2161,20 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
     outMax->z = center.z + ez;
 }
 
+// v * M3x3 written back through `out` from a by-value copy of v (retail copies the vector to
+// the stack before the three rows; the x row's terms are emitted x, y, z).
+inline void CollisionRotateColsInPlace(CollisionVec3* out, CollisionVec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->m[0][0] + v.y * m->m[1][0] + v.z * m->m[2][0];
+    out->y = v.z * m->m[2][1] + v.y * m->m[1][1] + v.x * m->m[0][1];
+    out->z = v.z * m->m[2][2] + v.y * m->m[1][2] + v.x * m->m[0][2];
+}
+
 // 0x00438c90: this is a static mesh (type 2); test it against a hull (0) or a model (1).
 // The mesh's convex geometry (+4) and matrix (+8) go through the box test 0x00428950 with
 // mode 1; on a hit the result vec3 at globalResult+8 is rotated by the hull matrix (v * M).
-// For a model, 0x004392c0 rejects first and every enabled element is tested.
+// For a model, 0x004392c0 rejects first and every enabled element is tested.  Retail forms
+// the element address before reading its enabled flag.
 int CollisionObject::TestMeshAgainst(CollisionObject* other)
 {
     CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
@@ -2131,7 +2183,7 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         CollisionHullBody* hull = (CollisionHullBody*)other->shape;
         if (TreeTreeQuery(mesh->field_0x04, hull->triangleTree, &mesh->field_0x08, &hull->worldTransform, 1,
                         hull->vertices, 0)) {
-            g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &hull->worldTransform);
+            CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &hull->worldTransform);
             return 1;
         }
         break;
@@ -2141,12 +2193,12 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         int hit = 0;
         if (TestMeshBounds(other)) {
             for (int i = 0; i < model->elementCount; i++) {
+                CollisionHullBody* e = &model->elements[i];
                 if (model->elementEnabled[i]) {
-                    CollisionHullBody* e = &model->elements[i];
                     if (TreeTreeQuery(mesh->field_0x04, e->triangleTree, &mesh->field_0x08, &e->worldTransform, 1,
                                     e->vertices, 0)) {
                         hit = 1;
-                        g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &e->worldTransform);
+                        CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &e->worldTransform);
                     }
                 }
             }
