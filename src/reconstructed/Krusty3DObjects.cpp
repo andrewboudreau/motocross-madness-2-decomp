@@ -246,7 +246,7 @@ int VisualCue::UnknownVirtualSlot14() {
 }
 
 // 0x0048bc30
-int VisualCue::UnknownFunction48bc30() {
+int VisualCue::NextCueIndex() {
     if (reportedRacer != currentRacer) {
         reportedRacer = currentRacer;
         return currentRacer;

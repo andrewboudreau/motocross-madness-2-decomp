@@ -50,11 +50,11 @@ public:
     // 0x004e9030: opens the "RS2" archive `path` and adds its items.
     UnknownTextureStream* UnknownFunction4e9030(const char* path, int flags);
     ResourceItem* UnknownFunction4e9360(const char* name, int a); // finds `name`
-    void* UnknownFunction4e93f0(void* object);       // the item recording `object`
+    void* FindItemByObject(void* object);       // the item recording `object`
     int UnknownFunction4e9430(const char* name, const char* path); // adds a loose file
     int UnknownFunction4e96b0(const char* name, void* object);     // adds an object
     int UnknownFunction4e9830(UnknownTextureStream* archive);     // removes an archive's items
-    void UnknownFunction4e9900(ResourceItem* item);               // releases `item`
+    void ReleaseItem(ResourceItem* item);               // releases `item`
 
     // Inline (no out-of-line copy): whether an item still comes from
     // `archive`. Written inline, 0x004e8f40 saves ebp only on the path that

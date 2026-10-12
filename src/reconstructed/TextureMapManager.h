@@ -43,8 +43,8 @@ int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget);
 class UnknownTimer {
 public:
     explicit UnknownTimer(int interval);
-    int UnknownFunction4cb690();              // 0x004cb690: the largest recent sample
-    void UnknownFunction4cb6b0(int sample);   // 0x004cb6b0: records a sample
+    int LargestRecentSample();              // 0x004cb690: the largest recent sample
+    void RecordSample(int sample);   // 0x004cb6b0: records a sample
 
     int field_0x00;                           // start time
     int field_0x04;

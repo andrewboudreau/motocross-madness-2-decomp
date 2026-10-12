@@ -104,7 +104,7 @@
   "?UnknownFunction4b81c0@UnknownParameterBlock@@QAEHHPAM@Z": "0x004b81c0",
   "?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z": "0x004e9010",
   "?UnknownFunction4e9360@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
-  "?UnknownFunction4e93f0@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
+  "?FindItemByObject@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
   "?UnknownFunction4e9430@UnknownResourceManager@@QAEHPBD0@Z": "0x004e9430",
   "?UpdateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb4f0",
   "?UnknownFunction4fc9a0@UnknownSoultreeNodeView@@QAEXPAVSoultreeObject@@PAUVector3@@@Z": "0x004fc9a0",

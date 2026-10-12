@@ -84,7 +84,7 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
     }
     UnknownFunction444e80();
     UnknownFunction444fb0();
-    void* item = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
+    void* item = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (item)
         g_UnknownResourceManager572b44->SetItemObject(item, 0);
 }

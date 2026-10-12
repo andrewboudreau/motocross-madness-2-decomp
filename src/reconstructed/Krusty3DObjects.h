@@ -167,7 +167,7 @@ public:
                                      float size, float c, float d);
     // 0x0048af20 (ret 4): collects the view's racers.
     void CollectRacers(UnknownVisualCueView* view);
-    int UnknownFunction48bc30();               // 0x0048bc30: the next cue index when it changed, else -1
+    int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
     int UnknownFunction48bc80();               // 0x0048bc80
 
     // ArcadeObject.h types +0x48/+0x4c as int (0x00401310's `c` and `d`);

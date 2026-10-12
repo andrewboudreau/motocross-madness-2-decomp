@@ -44,3 +44,8 @@ of the same name; tier 3). `0x004e9010` is `SetItemObject` in the lane's files
 (PCAudio.cpp and Palette8.cpp keep their own address-named declarations);
 `0x004e9030` keeps its address name because SceneManager.cpp and the
 FileStream sample reach it through headers other lanes share.
+`0x004e93f0` is `FindItemByObject` (returns the item that records an object)
+and `0x004e9900` is `ReleaseItem` (both tier 3). `0x004e9360`, `0x004e9430`,
+`0x004e96b0` and `0x004e9830` keep their address names: SceneManager.cpp also
+sees the address-named declarations in UnknownResourceManager.h and
+Parameterblocks.h, so the lane-only rename does not compile there.

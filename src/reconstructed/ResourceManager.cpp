@@ -113,7 +113,7 @@ void UnknownResourceManager::SetItemObject(void* entry, void* object)
 
     item->object = object;
     if (!object && !item->field_0x14)
-        UnknownFunction4e9900(item);
+        ReleaseItem(item);
 }
 
 // 0x004e9030 (opens an "RS2" archive and adds its items) is a near miss:
@@ -134,7 +134,7 @@ ResourceItem* UnknownResourceManager::UnknownFunction4e9360(const char* name, in
 }
 
 // 0x004e93f0
-void* UnknownResourceManager::UnknownFunction4e93f0(void* object)
+void* UnknownResourceManager::FindItemByObject(void* object)
 {
     for (int i = 0; i < itemCount; i++) {
         if (items[i]->object == object)
@@ -257,7 +257,7 @@ int UnknownResourceManager::UnknownFunction4e9830(UnknownTextureStream* archive)
 }
 
 // 0x004e9900
-void UnknownResourceManager::UnknownFunction4e9900(ResourceItem* item)
+void UnknownResourceManager::ReleaseItem(ResourceItem* item)
 {
     for (int i = 0; i < itemCount; i++) {
         if (items[i] == item && !items[i]->Release()) {

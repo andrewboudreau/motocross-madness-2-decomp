@@ -231,8 +231,8 @@ void ManagedTextureGroup::RepackWholePages() {
 
     if (g_TrackGame->debugOverlay) {
         int now = UnknownFunction4bfa80();
-        field_0x1d4.UnknownFunction4cb6b0(field_0x1d0);
-        field_0x1e0.UnknownFunction4cb6b0(now - field_0x250);
+        field_0x1d4.RecordSample(field_0x1d0);
+        field_0x1e0.RecordSample(now - field_0x250);
         char format[12];
         strcpy(format, "Unknown");
         texture = field_0x44.First();
@@ -248,20 +248,20 @@ void ManagedTextureGroup::RepackWholePages() {
         }
         if (field_0x254 < 0)
             field_0x254 = g_TrackGame->debugOverlay->NewPage();
-        field_0x1ec.UnknownFunction4cb6b0(filled);
+        field_0x1ec.RecordSample(filled);
         g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x254, "TextureManager no partial");
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "PixelFormat:%s", format);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "CacheTextures:%d %.2fM", field_0x54.m_count,
             PageMegabytes(this, field_0x54.m_count));
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "ManagedTextures:%d", field_0x44.m_count);
-        float peak = (float)field_0x1d4.UnknownFunction4cb690();
+        float peak = (float)field_0x1d4.LargestRecentSample();
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMem Blted: %.2fM, Peak: %.2fM",
             (float)UnknownFunction511970(field_0x0c) * field_0x1d0 * 9.536743e-07f,
             UnknownFunction511970(field_0x0c) * peak * 9.536743e-07f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
-                                                                field_0x1e0.UnknownFunction4cb690());
+                                                                field_0x1e0.LargestRecentSample());
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Size Requested Granted");
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
                                                                 field_0x1fc[8], field_0x220[8]);
@@ -278,7 +278,7 @@ void ManagedTextureGroup::RepackWholePages() {
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemManaged:%.2fM", TexelMegabytes(this, field_0x24c));
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Textures Blted %d (%d)", filled,
-                                                                field_0x1ec.UnknownFunction4cb690());
+                                                                field_0x1ec.LargestRecentSample());
     }
     field_0x158.Clear();
     field_0x16c.Clear();
@@ -567,8 +567,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
 
     if (g_TrackGame->debugOverlay) {
         int now = UnknownFunction4bfa80();
-        field_0x1d4.UnknownFunction4cb6b0(field_0x1d0);
-        field_0x1e0.UnknownFunction4cb6b0(now - field_0x250);
+        field_0x1d4.RecordSample(field_0x1d0);
+        field_0x1e0.RecordSample(now - field_0x250);
         int managedTexels = field_0x44.m_count << 16;
         char format[8];
         int wantedTexels = 0;
@@ -601,13 +601,13 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Ideal   %0.2fM",
                                                                 (wantedF = (float)wantedTexels) * 9.536743e-07f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "  ratio %0.2fM", wantedF / managedF);
-        float peak = (float)field_0x1d4.UnknownFunction4cb690();
+        float peak = (float)field_0x1d4.LargestRecentSample();
         g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMem Blted: %.2fM, (%.2fM)",
             (float)UnknownFunction511970(field_0x0c) * field_0x1d0 * 9.536743e-07f,
             UnknownFunction511970(field_0x0c) * peak * 9.536743e-07f);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
-                                                                field_0x1e0.UnknownFunction4cb690());
+                                                                field_0x1e0.LargestRecentSample());
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
                                                                 field_0x1fc[8], field_0x220[8]);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "128:    %02d        %02d",
