@@ -95,7 +95,7 @@ void OptGameSettingsDlg::SyncValues(int save)
             g_UnknownGlobal688898.chatMode = 0;
             break;
         }
-        if (!g_TrackGame->field_0x2d5_bit1) {
+        if (!g_TrackGame->shuttingDown) {
             if (static_cast<UIMultiState*>(FindControl("ChkToolTips", 2))->GetSelectedState())
                 guiManager->GetUser(0)->userToolTip->enabled = 1;
             else

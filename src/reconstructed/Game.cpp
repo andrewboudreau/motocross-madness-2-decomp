@@ -105,7 +105,7 @@ Game::Game() {
     paused = 0;
     stepOneFrame = 0;
     inputSuspended = 0;
-    field_0x2d5_bit1 = 0;
+    shuttingDown = 0;
     field_0x2d5_bit2 = 1;
     field_0x2e4 = 1.0f;
     field_0x2e8 = 0;
@@ -395,7 +395,7 @@ Game::~Game() {
 // 0x00468a30: tears down the interface, the network object, the owners and
 // the ControlInterface.
 int Game::UnknownVirtualSlot15() {
-    field_0x2d5_bit1 = 1;
+    shuttingDown = 1;
     if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
         g_UnknownGlobal56c470->Unlink();
     g_UnknownStatic65b478.DeleteFonts();

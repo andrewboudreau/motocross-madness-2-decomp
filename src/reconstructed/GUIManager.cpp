@@ -1193,7 +1193,7 @@ void GUIUser::RecreateCursor(const char* image, int redraw) {
     int visible;
     int defaultImage;
 
-    if (g_TrackGame->field_0x2d5_bit1 || !pointerDevice)
+    if (g_TrackGame->shuttingDown || !pointerDevice)
         return;
     visible = userCursor ? userCursor->isEnabled : 1;
     ReleaseCursor();
@@ -1209,7 +1209,7 @@ void GUIUser::RecreateCursor(const char* image, int redraw) {
 
 // 0x004880c0
 void GUIUser::ReleaseCursor() {
-    if (!g_TrackGame->field_0x2d5_bit1 && userCursor)
+    if (!g_TrackGame->shuttingDown && userCursor)
         userCursor->Release();
     userCursor = 0;
 }

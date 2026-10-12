@@ -267,7 +267,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         }
         break;
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1 && !field_0x7f58)
+        if (!g_TrackGame->shuttingDown && !field_0x7f58)
             guiManager->ShowCursors(0);
         break;
     }

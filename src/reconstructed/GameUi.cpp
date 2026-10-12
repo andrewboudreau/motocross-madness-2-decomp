@@ -1855,7 +1855,7 @@ UIDialog::~UIDialog() {
         if ((field_0x144 & 4) && (field_0x144 & 0x10))
             guiManager->ReleaseBackgroundGrab();
     }
-    if (dialogBackground && !g_TrackGame->field_0x2d5_bit1)
+    if (dialogBackground && !g_TrackGame->shuttingDown)
         dialogBackground->MarkAllDirty();
     if (parentDialog) {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
@@ -1872,16 +1872,16 @@ UIDialog::~UIDialog() {
                 imageTable[i]->Release();
         }
     }
-    if (!g_TrackGame->field_0x2d5_bit1 && g_UnknownResourceManager572b44 && resourceArchive)
+    if (!g_TrackGame->shuttingDown && g_UnknownResourceManager572b44 && resourceArchive)
         g_UnknownResourceManager572b44->RemoveArchiveItems(resourceArchive);
     if ((ownsPalette && dialogPalette && !parentDialog) ||
         (dialogPalette && parentDialog && parentDialog->dialogPalette != dialogPalette))
         ((Palette8*)dialogPalette)->Release();
-    if (!g_TrackGame->field_0x2d5_bit1 && ownsBackground && parentBackground) {
+    if (!g_TrackGame->shuttingDown && ownsBackground && parentBackground) {
         dialogBackground->field_0x2c->Release();
         dialogBackground->SetImage(parentBackground);
     }
-    if (!g_TrackGame->field_0x2d5_bit1 && parentDialog && parentDialog->dialogBackground)
+    if (!g_TrackGame->shuttingDown && parentDialog && parentDialog->dialogBackground)
         parentDialog->dialogBackground->MarkAllDirty();
     int i = 0;
     UITimer* timer;
@@ -2301,7 +2301,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
 // 0x00470450: two independent guiUser tests (VC6 threads the second one);
 // nesting them inside one test keeps the focus control in a register.
 UIControl::~UIControl() {
-    if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
+    if (ownerDialog && !g_TrackGame->shuttingDown) {
         pendingRelease = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {

@@ -1876,7 +1876,7 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
 void CreditsVidDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1)
+        if (!g_TrackGame->shuttingDown)
             g_TrackGame->ui->OpenMenu(kMenuMain);
         break;
     case kDialogInit: {
@@ -1904,7 +1904,7 @@ void CreditsVidDlg::HandleEvent(UnknownDialogEvent* event) {
 void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1) {
+        if (!g_TrackGame->shuttingDown) {
             Intro2Dlg* dialog = new(__FILE__, 4217) Intro2Dlg;
             g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
         }
@@ -1935,7 +1935,7 @@ int Intro1Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1) {
+        if (!g_TrackGame->shuttingDown) {
             if (!g_UnknownGlobal59ae00) {
                 Intro3Dlg* dialog = new(__FILE__, 4256) Intro3Dlg;
                 g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
@@ -1976,7 +1976,7 @@ int Intro2Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1) {
+        if (!g_TrackGame->shuttingDown) {
             g_TrackGame->ui->OpenMenu(kMenuMain);
             g_TrackGame->ui->gui->ShowCursors(1);
         }
@@ -2593,7 +2593,7 @@ void EditBoxDlg::EditWithResources(const char* title, int titleId, const char* p
 void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1) {
+        if (!g_TrackGame->shuttingDown) {
             g_TrackGame->eventManager->CloseRace(2);
             memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
@@ -2635,7 +2635,7 @@ int DemoDlg::UnknownVirtualSlot10(float frameTime) {
 void TransDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1) {
+        if (!g_TrackGame->shuttingDown) {
             g_TrackGame->ui->OpenMenu(nextMenu);
             g_TrackGame->ui->gui->ShowCursors(1);
         }
@@ -2669,7 +2669,7 @@ void TransDlg::SetNextMenu(int menu) {
 void Exit1Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
-        if (!g_TrackGame->field_0x2d5_bit1)
+        if (!g_TrackGame->shuttingDown)
             PostMessageA((HWND)g_TrackGame->display->windowHandle, WM_CLOSE, 0, 0);
         break;
     case kDialogInit:

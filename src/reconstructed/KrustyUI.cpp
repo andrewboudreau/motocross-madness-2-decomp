@@ -398,7 +398,7 @@ KrustyUI::~KrustyUI() {
 // 0x004999b0
 void KrustyUI::Shutdown() {
     UnknownFunction5053b0(0);
-    if (!g_TrackGame->field_0x2d5_bit1)
+    if (!g_TrackGame->shuttingDown)
         gui->CloseDialogResource();
     if (garageScene) {
         garageScene->Release();
