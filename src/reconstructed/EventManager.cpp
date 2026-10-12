@@ -875,7 +875,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
     char scene[64];
     char name[260];
     char filtered[260];
-    g_TrackGame->ui->field_0x44 = 0;
+    g_TrackGame->ui->demoEnded = 0;
     UnknownKrustyBikeView* view = FindRaceView();
     TrackGameViewOwner* owner = FindRaceMode();
     g_TrackGame->mode.UnknownFunction523580();

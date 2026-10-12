@@ -31,7 +31,11 @@ ends with the shared dialog deleting destructor and its vector set:
 | Offset | Name | Evidence |
 |---|---|---|
 | +0x2c | `gui` | the GUIManager built by constructor `0x00485190`; every dialog is shown through it |
-| +0x3c | `currentMenu` | `OpenMenu` stores its argument here (+0x34 keeps the old value for menu 0xd0) |
+| +0x30 | `returnMenu` | DlgProcs.cpp saves `currentMenu` here for events 0x104/0x105 and later reopens it |
+| +0x34 | `previousMenu` | `OpenMenu` copies `currentMenu` here before opening menu 0xd0 |
+| +0x3c | `currentMenu` | `OpenMenu` stores its argument here |
+| +0x40 | `replayAvailable` | BikeRace `0x00420b00` sets it after closing a replay VCR; the results dialog then shows "ButViewReplay" |
+| +0x44 | `demoEnded` | BikeRace sets it at race end while +0x4a8 is set; `DemoDlg` slot 10 consumes it and ends the dialog |
 | +0x48/+0x4c | `manufacturers`/`manufacturerCount` | `LoadBikesAndRiders` appends one entry per `Manufacturer_%02d` section of bikes.pb |
 | +0x50/+0x54 | `bikes`/`bikeCount` | one entry per bike of those manufacturers |
 | +0x58/+0x5c | `riders`/`riderCount` | one entry per `Rider_%02d` section of riders.pb |

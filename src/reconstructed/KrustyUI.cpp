@@ -209,15 +209,15 @@ void UnknownFunction49bda0() {
 // 0x004987f0
 KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     gui = 0;
-    field_0x30 = 0;
-    field_0x34 = 0;
+    returnMenu = 0;
+    previousMenu = 0;
     field_0x38 = 0;
     currentMenu = 0;
     field_0x48c = 0;
     progressDialog = 0;
     garageScene = 0;
-    field_0x40 = 0;
-    field_0x44 = 0;
+    replayAvailable = 0;
+    demoEnded = 0;
     savedInputContext = 0;
     allowIme = 0;
     field_0x4a8 = 0;
@@ -500,7 +500,7 @@ void KrustyUI::UnknownFunction499b10() {
 void KrustyUI::OpenMenu(int menu) {
     UIDialog* dialog;
     if (menu == 0xd0)
-        field_0x34 = currentMenu;
+        previousMenu = currentMenu;
     currentMenu = menu;
     switch (menu) {
     case kMenuMain:

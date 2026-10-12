@@ -1617,7 +1617,7 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
         event->handled = 1;
         break;
     case 0xcd:
-        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->field_0x30);
+        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->returnMenu);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1777,7 +1777,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
     }
     case 0x104:
     case 0x105:
-        g_TrackGame->ui->field_0x30 = g_TrackGame->ui->currentMenu;
+        g_TrackGame->ui->returnMenu = g_TrackGame->ui->currentMenu;
         switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
         case 0:
         case 2:
@@ -1837,7 +1837,7 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
         event->handled = 1;
         break;
     case kMenuOptions:
-        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->field_0x30);
+        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->returnMenu);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -2623,8 +2623,8 @@ int DemoDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry*
 // 0x00455b20
 int DemoDlg::UnknownVirtualSlot10(float frameTime) {
     KrustyUI* ui = g_TrackGame->ui;
-    if (ui->field_0x44) {
-        ui->field_0x44 = 0;
+    if (ui->demoEnded) {
+        ui->demoEnded = 0;
         EndDialog(0);
         return 0;
     }

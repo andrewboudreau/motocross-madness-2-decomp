@@ -1368,7 +1368,7 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
 
 // 0x00420b00
 void BikeRace::UnknownFunction420b00(char* path, char* description) {
-    g_TrackGame->ui->field_0x40 = 0;
+    g_TrackGame->ui->replayAvailable = 0;
     if (replayVcr != 0) {
         char text[0x80];
         g_TrackGame->LoadResourceString(0x1437, text, sizeof(text));
@@ -1382,7 +1382,7 @@ void BikeRace::UnknownFunction420b00(char* path, char* description) {
         replayVcr->UnknownFunction4691f0();
         replayVcr->Release();
         replayVcr = 0;
-        g_TrackGame->ui->field_0x40 = 1;
+        g_TrackGame->ui->replayAvailable = 1;
     }
 }
 
@@ -1505,7 +1505,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
         UnknownFunction422ec0();
         g_TrackGame->field_0x2e0 = 1.0f;
         if (g_TrackGame->ui->field_0x4a8) {
-            g_TrackGame->ui->field_0x44 = 1;
+            g_TrackGame->ui->demoEnded = 1;
             return 1;
         }
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {

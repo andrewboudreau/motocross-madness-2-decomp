@@ -444,7 +444,7 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     char time[128];
     switch (event->kind) {
     case kDialogInit: {
-        if (g_TrackGame->ui->field_0x40)
+        if (g_TrackGame->ui->replayAvailable)
             FindControl("ButViewReplay", 1)->Show(1, 1);
         else
             FindControl("ButViewReplay", 1)->Show(0, 1);

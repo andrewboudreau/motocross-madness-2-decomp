@@ -138,12 +138,12 @@ public:
     void RecordHighScoreTable(int table);                          // 0x0049bc50
 
     UnknownKrustyUIGui* gui;                  // +0x2c: the GUIManager (constructor 0x00485190)
-    int field_0x30;
-    int field_0x34;
-    int field_0x38;
+    int returnMenu;                           // +0x30: DlgProcs.cpp saves currentMenu here (events 0x104/0x105) and reopens it
+    int previousMenu;                         // +0x34: OpenMenu saves currentMenu here before opening menu 0xd0
+    int field_0x38;                           // reopened by the 0x911 track-record dialog
     int currentMenu;                          // +0x3c: set by OpenMenu
-    int field_0x40;
-    int field_0x44;                           // cleared by EventManager 0x0045cdc0
+    int replayAvailable;                      // +0x40: BikeRace 0x00420b00 sets it after closing a replay VCR; shows "ButViewReplay"
+    int demoEnded;                            // +0x44: BikeRace sets it at race end while +0x4a8 is set; DemoDlg slot 10 closes on it; cleared by EventManager 0x0045cdc0
     // Lists that LoadBikesAndRiders reads from bikes.pb and riders.pb.
     void* manufacturers;                      // +0x48: "Manufacturer_%02d" entries; freed by the destructor
     int manufacturerCount;                    // +0x4c
