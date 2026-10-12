@@ -656,7 +656,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
     UnknownSurfaceInterface* surface = target->renderSurface;
     if (groupManager->debugGroup != this)
         return 0;
-    if (!g_TrackGame->field_0x2d4_bit2)
+    if (!g_TrackGame->testKey)
         return 1;
     char text[0x50];
     ManagedTexture* selected = 0;

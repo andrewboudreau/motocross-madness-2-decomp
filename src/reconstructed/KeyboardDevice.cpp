@@ -79,11 +79,11 @@ void KeyboardDevice::RepeatKeys(int list, int value) {
 // states with bit 7 never do. 0x80 also holds while key 0x29 is down,
 // 0x80000000 means no modifier, and bit 6 asks for an exact match.
 int KeyboardDevice::ModifierHolds(int modifier) {
-    if (!g_TrackGame->field_0x2d4_bit2 && (modifier & 0x80))
+    if (!g_TrackGame->testKey && (modifier & 0x80))
         return 0;
     if (modifier == 0x3f)
         return 1;
-    if (g_TrackGame->field_0x2d4_bit2 && modifier == 0x80 && keyStates[0x29].state == 1)
+    if (g_TrackGame->testKey && modifier == 0x80 && keyStates[0x29].state == 1)
         return 1;
     if (modifier == (int)0x80000000)
         return modifierState == 0;

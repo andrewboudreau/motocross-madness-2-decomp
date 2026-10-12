@@ -62,7 +62,7 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
             *flags &= ~3;
         else
             g_TrackGame->mode.raceSettings.eventType = eventTypeIndex;
-        g_TrackGame->mode.raceSettings.field_0x34 = trackVariant;
+        g_TrackGame->mode.raceSettings.trackNumber = trackVariant;
         if (eventTypeLocation != -1)
             strcpy(g_TrackGame->mode.raceSettings.trackName, trackName);
         if (g_TrackGame->network->isHost)
@@ -73,12 +73,12 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         g_TrackGame->mode.raceSettings.riderCollision = 1;
         g_TrackGame->mode.raceSettings.aiRacerCount = 0;
         g_TrackGame->mode.raceSettings.raceMode = 1;
-        g_TrackGame->mode.raceSettings.field_0x0c = 0;
+        g_TrackGame->mode.raceSettings.races = 0;
         g_TrackGame->mode.raceSettings.shortTimeLimit = 0;
         g_TrackGame->mode.raceSettings.lapCount = 5;
         g_TrackGame->mode.raceSettings.timeLimitMinutes = 5.0f;
-        g_TrackGame->mode.raceSettings.field_0x148 = 0;
-        g_TrackGame->mode.raceSettings.field_0x2d = 0;
+        g_TrackGame->mode.raceSettings.stuntMode = 0;
+        g_TrackGame->mode.raceSettings.gateCount = 0;
         g_TrackGame->mode.raceSettings.tagBall = 0;
         g_TrackGame->mode.savedDifficulty = 3;
         g_TrackGame->mode.difficulty = 3;
@@ -105,7 +105,7 @@ int UnknownTrackGameObject3410::WaitForLobbyRank()
         if (GetLobbyRank(response, 0x800)) {
             UnknownParser parser;
             parser.Parse(response, lstrlen(response));
-            parser.GetText(g_TrackGame->mode.field_0x00, text, 0x800);
+            parser.GetText(g_TrackGame->mode.profileName, text, 0x800);
             sscanf(text, "%d,%d,%d,%d", &value, &b, &c, &d);
             if (value == -1) {
                 Sleep(1000);
@@ -137,7 +137,7 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
         i = 0;
         eventTypeIndex = g_TrackGame->mode.raceSettings.eventType;
         strcpy(trackName, g_TrackGame->mode.raceSettings.trackName);
-        trackVariant = g_TrackGame->mode.raceSettings.field_0x34;
+        trackVariant = g_TrackGame->mode.raceSettings.trackNumber;
         raceStatus.laps = g_TrackGame->mode.raceSettings.lapCount;
         for (; i < g_TrackGame->playerCount; i++) {
             raceStatus.records[i].position = g_TrackGame->eventManager->results[i].position;

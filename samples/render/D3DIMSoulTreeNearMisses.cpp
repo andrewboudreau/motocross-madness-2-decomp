@@ -22,7 +22,7 @@
 // SoultreeVirtualSlot7 (0x00444560, 1233 bytes): the node search reuses
 // the CollectDescendants counter `index` (retail keeps it in that slot,
 // frame 0x2c now matches), the surface array size is read back from
-// `to->surfaceCount`, the final UnknownFunction444440 call is shared after
+// `to->surfaceCount`, the final ComputeAllBounds call is shared after
 // the if/else (retail pops edi/ebp before it), and `to` declared before
 // `from` gives retail's loop-head schedule. The instruction stream then
 // equals retail's up to a register rotation: retail keeps the source in ebx,
@@ -188,12 +188,12 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
     textureManager = source->textureManager;
     lightManager = source->lightManager;
     SoultreeObject::SoultreeVirtualSlot7(source);
-    UnknownFunction444a40(source);
+    CopyMaterials(source);
     lodCount = source->lodCount;
     currentLod = source->currentLod;
     lowestLod = source->lowestLod;
-    field_0x288 = source->field_0x288;
-    if (field_0x288) {
+    useAutoLod = source->useAutoLod;
+    if (useAutoLod) {
         autoLodDistances = (float*)DebugMalloc(lodCount * 4, __FILE__, 0x88e);
         for (int i = 0; i < lodCount; i++)
             autoLodDistances[i] = source->autoLodDistances[i];
@@ -259,7 +259,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
     } else {
         lodTable = 0;
     }
-    UnknownFunction444440();
+    ComputeAllBounds();
 }
 
 float FastInvSqrt(float x);                         // 0x00460c00
@@ -325,10 +325,10 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
         }
         for (int k = 0; k < surface->materialCount; k++) {
             SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
-            if (material->field_0x70) {
-                float scale = best / material->field_0x70->texture->textureHeight;
-                float current = *(float*)&material->field_0xcc;
-                *(float*)&material->field_0xcc = current > scale ? current : scale;
+            if (material->surfaceMap) {
+                float scale = best / material->surfaceMap->texture->textureHeight;
+                float current = *(float*)&material->texelRatio;
+                *(float*)&material->texelRatio = current > scale ? current : scale;
             }
         }
     }
@@ -340,7 +340,7 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
 class UnknownSoultreeClipper {
 public:
     int TestBox(UnknownSoultreeCameraView* camera, Matrix4* matrix, Vector3* center,
-                              Vector3* extents, UnknownSoultreeCounters* rect, int* corners, int* a7);
+                              Vector3* extents, UnknownSoultreeScreenRect* rect, int* corners, int* a7);
 };
 extern UnknownSoultreeClipper* g_UnknownSoultreeClipper575a98;
 
@@ -371,7 +371,7 @@ struct UnknownSoultreeMatrix {
 // 0x00443aa0
 int D3DIMSoultreeObject::UnknownVirtualSlot12()
 {
-    field_0x2d4 = 0;
+    visible = 0;
     if (!field_0x14c && field_0x190) {
         if (subtreeDirty)
             UpdateSubtreeBounds();
@@ -398,9 +398,9 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         view._42 = world.m[3][0] * projection.m[0][1] + world.m[3][1] * projection.m[1][1] + world.m[3][2] * projection.m[2][1] + world.m[3][3] * projection.m[3][1];
         view._43 = world.m[3][0] * projection.m[0][2] + world.m[3][1] * projection.m[1][2] + world.m[3][2] * projection.m[2][2] + world.m[3][3] * projection.m[3][2];
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
-        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
+        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera, (Matrix4*)&view, &center, &extents, &screenRect, 0,
                                                                   &field_0x260)) {
-            field_0x2d4 = 1;
+            visible = 1;
             SelectLod(&center, &extents);
         }
     }
@@ -487,8 +487,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
     int savedShade;
     ((RenderTarget*)renderContext)->UnknownVirtualSlot9(4, &savedCull);
     ((RenderTarget*)renderContext)->UnknownVirtualSlot9(9, &savedShade);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, field_0x1b4, 0);
-    if (field_0x1b8)
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, texturePerspective, 0);
+    if (gouraudShading)
         ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
     else
         ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
@@ -500,7 +500,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
         int restore = 0;
         for (int m = 0; m < surface->materialCount; m++) {
             SoultreeMaterial* material = materialTable[surface->materialIndices[m]];
-            if (field_0x1a4)
+            if (useLighting)
                 ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
             material->ApplyRenderStates();
             switch (material->mappingType) {
@@ -627,8 +627,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             }
             case 2: {
                 Vector3 position = *(Vector3*)&worldMatrix.m[3][0];
-                textureScroll += Length(field_0x2bc - position) * 0.0075f;
-                field_0x2bc = position;
+                textureScroll += Length(lastScrollPosition - position) * 0.0075f;
+                lastScrollPosition = position;
                 if (textureScroll > 100.0f)
                     textureScroll -= 100.0f;
                 float scroll = textureScroll;
@@ -805,8 +805,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 drawn = surface;
             }
             if (drawn->vertexCount) {
-                if (material->field_0x70) {
-                    ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
+                if (material->surfaceMap) {
+                    ManagedTexture* texture = (ManagedTexture*)material->surfaceMap->texture;
                     if (texture->mapFlags & 1)
                         texture->RemapTexCoordsIfMoved(&drawn->field_0x2c, (float*)&drawn->field_0x30,
                                                        (float*)&drawn->field_0x34, &drawn->vertices->tu,
@@ -814,11 +814,11 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 }
                 ((RenderTarget*)renderContext)->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)drawn->vertices, drawn->vertexCount,
                                                                   (int)drawn->indices, drawn->faceCount * 3, 0);
-                if (field_0x1b0)
+                if (showWireframe)
                     DrawWireframe(drawn);
-                if (field_0x1a8)
+                if (showNormals)
                     DrawNormals(drawn);
-                if (field_0x1ac)
+                if (showVertexCrosses)
                     DrawVertexCrosses(drawn);
             }
             if (modified && restore) {

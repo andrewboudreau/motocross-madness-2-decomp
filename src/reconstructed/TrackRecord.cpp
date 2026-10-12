@@ -159,9 +159,9 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
         break;
     case 4:
         if (extensionIndex > 0 && extensionIndex <= 2)
-            value = g_TrackGame->eventManager->results[racer].field_0x1c;
+            value = g_TrackGame->eventManager->results[racer].totalTagRun;
         else
-            value = g_TrackGame->eventManager->results[racer].field_0x18;
+            value = g_TrackGame->eventManager->results[racer].bestTagRun;
         if (recordCount != 0 && value < records[recordCount - 1].score)
             return 0;
         break;

@@ -81,8 +81,8 @@ static long __stdcall EnumDisplayModeCallback(UnknownSurfaceDesc* desc, void* co
         display->displayModes[display->displayModeCount].refreshRate = desc->refreshRate;
         display->displayModes[display->displayModeCount].field_0x14 = 1;
         display->displayModes[display->displayModeCount].field_0x18 = 1;
-        display->displayModes[display->displayModeCount].field_0x1c = 0;
-        display->displayModes[display->displayModeCount].field_0x20 = 0;
+        display->displayModes[display->displayModeCount].textureMemory = 0;
+        display->displayModes[display->displayModeCount].nonLocalTextureMemory = 0;
         display->displayModes[display->displayModeCount].field_0x10 = 2;
         display->displayModeCount++;
     }

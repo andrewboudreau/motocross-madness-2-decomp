@@ -60,9 +60,9 @@ void D3DIMSoultreeModifier::DetachFromAll()
         int count = objectCount;
         for (int j = 0; j < count; j++) {
             if (field_0x3c)
-                objects[j]->UnknownFunction444de0(this);
+                objects[j]->RemoveModifier(this);
             else
-                objects[j]->UnknownFunction444f10(this);
+                objects[j]->RemoveSecondModifier(this);
         }
         DebugFree(objects, __FILE__, 80);
     }

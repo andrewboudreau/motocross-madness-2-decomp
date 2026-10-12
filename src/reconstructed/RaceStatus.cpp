@@ -162,28 +162,28 @@ int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRa
     if (!list || !track)
         return 0;
     for (status = *list; status; status = status->next) {
-        status->gateDistance = track->DistanceAlong(status->field_0x38, probe->field_0x2c);
+        status->gateDistance = track->DistanceAlong(status->placedPos, probe->trackPos);
         if (status->gateDistance < 0.0f)
             return 0;
-        float distance = track->DistanceAlong(status->field_0x38, status->field_0x44);
-        if (distance > 0.0f && (distance < status->field_0x10 || status->field_0x10 < 0.0f) &&
+        float distance = track->DistanceAlong(status->placedPos, status->progressPos);
+        if (distance > 0.0f && (distance < status->progressStep || status->progressStep < 0.0f) &&
             distance > status->gateDistance)
-            status->field_0x18 = -1;
+            status->lapOffset = -1;
         else
-            status->field_0x18 = 0;
+            status->lapOffset = 0;
     }
     for (at = list; *at; ) {
         if (!(*at)->next)
             break;
         if (!(*at)->racer->hasFinished) {
-            key = (*at)->racer->lapCount + (*at)->field_0x18;
+            key = (*at)->racer->lapCount + (*at)->lapOffset;
             for (next = &(*at)->next; (status = *next) != 0; ) {
-                int other = status->racer->lapCount + status->field_0x18;
+                int other = status->racer->lapCount + status->lapOffset;
                 if (other > key || (other == key && status->gateDistance < (*at)->gateDistance)) {
                     *next = status->next;
                     status->next = *at;
                     *at = status;
-                    key = status->racer->lapCount + status->field_0x18;
+                    key = status->racer->lapCount + status->lapOffset;
                 }
                 if (*next)
                     next = &(*next)->next;
@@ -308,41 +308,41 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
         racer = status->racer;
         if (!racer->hasFinished) {
             status->previousPosition = racer->field_0x088 * 3.5f + racer->position;
-            if (!status->field_0x38.node) {
-                status->field_0x44.node = start->field_0x2c.node;
-                status->field_0x44.segment = start->field_0x2c.segment;
-                status->field_0x44.t = start->field_0x2c.t + 0.1f;
+            if (!status->placedPos.node) {
+                status->progressPos.node = start->trackPos.node;
+                status->progressPos.segment = start->trackPos.segment;
+                status->progressPos.t = start->trackPos.t + 0.1f;
             }
             if (!racer->field_0x735)
-                racer->field_0x78c = track->PlaceNear(status->previousPosition, status->field_0x44,
+                racer->onTrack = track->PlaceNear(status->previousPosition, status->progressPos,
                                                                   g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
-                                                                  &status->field_0x38);
+                                                                  &status->placedPos);
             else
-                track->ClosestPointOnTrack(status->previousPosition, &status->field_0x38, 0);
-            if (racer->field_0x78c) {
+                track->ClosestPointOnTrack(status->previousPosition, &status->placedPos, 0);
+            if (racer->onTrack) {
                 racer->offTrackTime = 0;
-                status->field_0x08 = track->DistanceAlong(status->field_0x44, finish->field_0x2c);
-                status->gateDistance = track->DistanceAlong(status->field_0x38, finish->field_0x2c);
-                if (status->field_0x08 < g_UnknownGlobal572988 && status->field_0x08 < status->gateDistance)
-                    COPY_TRACK_POS(status->field_0x38, status->field_0x44);
+                status->goalDistance = track->DistanceAlong(status->progressPos, finish->trackPos);
+                status->gateDistance = track->DistanceAlong(status->placedPos, finish->trackPos);
+                if (status->goalDistance < g_UnknownGlobal572988 && status->goalDistance < status->gateDistance)
+                    COPY_TRACK_POS(status->placedPos, status->progressPos);
                 if ((racer->field_0x735 && racer->field_0x7c0) || g_UnknownGlobal572988 < 0.0f ||
-                    (!racer->field_0x735 && status->field_0x08 >= 0.0f && status->field_0x08 < g_UnknownGlobal572988)) {
+                    (!racer->field_0x735 && status->goalDistance >= 0.0f && status->goalDistance < g_UnknownGlobal572988)) {
                     if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
                                               &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
                                               racer->totalRunningTime, &racer->lapStartTime, &racer->fastestLap, 1,
                                               unlimited, racer->field_0x735, racer->field_0x7c0)) {
-                        status->field_0x44.node = finish->field_0x2c.node;
-                        status->field_0x44.segment = finish->field_0x2c.segment;
-                        status->field_0x44.t = finish->field_0x2c.t + 1e-5f;
+                        status->progressPos.node = finish->trackPos.node;
+                        status->progressPos.segment = finish->trackPos.segment;
+                        status->progressPos.t = finish->trackPos.t + 1e-5f;
                     }
                 }
                 if (racer->hasFinished && racer == racer->bikeView->localRacer)
                     g_ViewRacerFinished = 1;
-                status->field_0x10 = track->DistanceAlong(status->field_0x44, status->field_0x38);
-                if (status->field_0x10 > 0.0f && status->field_0x10 < g_UnknownGlobal572988 &&
-                    status->field_0x10 < status->field_0x08) {
-                    status->field_0x14 += status->field_0x10;
-                    COPY_TRACK_POS(status->field_0x44, status->field_0x38);
+                status->progressStep = track->DistanceAlong(status->progressPos, status->placedPos);
+                if (status->progressStep > 0.0f && status->progressStep < g_UnknownGlobal572988 &&
+                    status->progressStep < status->goalDistance) {
+                    status->progressTotal += status->progressStep;
+                    COPY_TRACK_POS(status->progressPos, status->placedPos);
                 }
             } else {
                 racer->offTrackTime += frameTime;
@@ -379,10 +379,10 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 racer->totalRunningTime += frameTime;
         }
     next:
-        if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->next) {
-            if (!track->PointAt(status->field_0x44, (TrackVec3*)&status->racer->trackPoint))
+        if (status->progressPos.node && status->progressPos.segment && status->progressPos.segment->next) {
+            if (!track->PointAt(status->progressPos, (TrackVec3*)&status->racer->trackPoint))
                 racer->trackPoint = racer->position;
-            if (!track->SegmentDirection(status->field_0x44.segment,
+            if (!track->SegmentDirection(status->progressPos.segment,
                                               (TrackVec3*)&status->racer->trackDirection))
                 racer->trackDirection = racer->field_0x088;
             status->racer->trackPoint -= status->racer->trackDirection * 3.5f;
@@ -397,7 +397,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
 // RaceSound.h's UnknownRaceSoundCamera; KrustyBikeCamera keeps it protected).
 struct UnknownRaceStatusCamera {
     unsigned char field_0x000[0x3b4];
-    UnknownEventRacer* field_0x3b4;
+    UnknownEventRacer* followedRacer;         // +0x3b4 (RaceSound.h)
 };
 
 // |v|, exact for unit vectors (as CarProcedural.cpp).
@@ -427,20 +427,20 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
         if (racer->hasFinished)
             continue;
         {
-            int gate = racer->field_0x7b8;
+            int gate = racer->lapGate;
             status->previousPosition.x = racer->frontWheel->field_0x200.x;
             status->previousPosition.y = racer->frontWheel->field_0x200.y;
             status->previousPosition.z = racer->frontWheel->field_0x200.z;
             if (!AdvanceGate(&status->previousPosition, &status->currentPosition, &status->nextGate, firstGate,
-                                       &racer->gatesPassed, &racer->field_0x7b8, racer->gateTimes, racer->totalRunningTime,
+                                       &racer->gatesPassed, &racer->lapGate, racer->gateTimes, racer->totalRunningTime,
                                        0, &racer->lapCount, &racer->lastLapTime, &racer->fastestLap,
                                        &racer->lapStartTime, &racer->hasFinished, lapLimit, unlimited,
                                        racer->field_0x735, racer->field_0x7c0))
                 return 0;
-            if (g_TrackGame->bajaEnduroEvent && gate != racer->field_0x7b8) {
-                racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
-                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->field_0x50)->field_0x3b4)
-                    g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
+            if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
+                racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
+                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->raceCamera)->followedRacer)
+                    g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->lapGate, racer->nextLapGate,
                                                                               racer);
             }
         }
@@ -451,8 +451,8 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
         status->currentPosition.x = status->previousPosition.x;
         status->currentPosition.y = status->previousPosition.y;
         status->currentPosition.z = status->previousPosition.z;
-        status->field_0x14 += before - after;
-        status->field_0x08 = after;
+        status->progressTotal += before - after;
+        status->goalDistance = after;
         if (g_TrackGame->playerCount == 1 && g_ViewRacerFinished) {
             if (racer->hasFinished)
                 goto next;

@@ -111,8 +111,8 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float 
     fieldOfViewEase = new(__FILE__, 0x78) UnknownFollowCameraValue(fieldOfView, rate294);
     distanceEase = new(__FILE__, 0x79) UnknownFollowCameraValue(followDistance, rate298);
     field_0x228 = value228;
-    field_0x2d0 = value2d0;
-    field_0x2d4 = value2d0;
+    defaultFollowHeight = value2d0;
+    followHeight = value2d0;
     pointCapacity = capacity;
     if (capacity > 0) {
         points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
@@ -193,13 +193,13 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
                     FollowCameraTurn(followYaw, dt * points[i].field_0x1c);
                     break;
                 case 4:
-                    field_0x2d4 += dt * points[i].field_0x10;
+                    followHeight += dt * points[i].field_0x10;
                     if (pitch) {
                         FollowCameraTilt(followPitch, -(dt * points[i].field_0x18));
                     }
                     break;
                 case 8:
-                    field_0x2d4 -= dt * points[i].field_0x14;
+                    followHeight -= dt * points[i].field_0x14;
                     break;
             }
             return;
@@ -287,7 +287,7 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
         }
     } else {
         if (field_0x23c < -8.0f) {
-            field_0x2d4 = field_0x2d0;
+            followHeight = defaultFollowHeight;
             field_0x23c = field_0x23c + 16.0f;
             if (field_0x23c < 0.0f) {
                 followPitch = 0.0f;
@@ -313,7 +313,7 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
         direction *= -followDistance;
         Vector3 position = direction + base;
         result = position;
-        result.y = position.y + field_0x2d4;
+        result.y = position.y + followHeight;
     }
     return result;
 }
@@ -663,7 +663,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
 int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Camera::UnknownVirtualSlot23(event, entry) || event->kind)
         return 0;
-    if (g_TrackGame->field_0x2d4_bit0) {
+    if (g_TrackGame->allowFreezeCamera) {
         if (TestInputEvent(0x21, 0, event, 0xc) && cameraState != 6) {
             UnknownVirtualSlot70(g_TrackGame->paused);
             return 1;

@@ -7,19 +7,22 @@ struct UnknownCameraBikeRider {
     UnknownVehiclePart* modelNode;            // +0x1a0 the rider model; has a "Head" part
 };
 
-// Object at UnknownCameraBikeState+0x40; KrustyBikeCamera slot 34 leads the
-// camera by its +0x154 vector.
+// Object at UnknownCameraBikeState+0x40, Wrecker.h's UnknownWreckerRigidBody;
+// KrustyBikeCamera slot 34 leads the camera by its velocity.
 struct UnknownCameraBikeBody {
     unsigned char field_0x000[0x154];
-    Vector3 field_0x154;
+    Vector3 velocity;                    // +0x154 UnknownWreckerRigidBody::velocity
 };
 
+// The racer's +0x604 object: the Wrecker (Wrecker.h) lines up at +0x40
+// rigidBody (velocity +0x154), +0x44 wreckState (0 idle, 1..3) and +0xb0
+// contactThisFrame.
 struct UnknownCameraBikeState {
     unsigned char field_0x00[0x40];
-    UnknownCameraBikeBody* field_0x40;   // KrustyBikeCamera slot 34
-    int field_0x44;                      // BikeCamera slot 75 tests 3
+    UnknownCameraBikeBody* rigidBody;    // +0x40 KrustyBikeCamera slot 34
+    int wreckState;                      // +0x44 BikeCamera slot 75 tests 3
     unsigned char field_0x48[0xb0 - 0x48];
-    int field_0xb0;                      // racesnd.cpp 0x004e39b0
+    int contactThisFrame;                // +0xb0 racesnd.cpp 0x004e39b0 plays a fall sound
 };
 
 // Object at BikeCamera+0x3b0. It shares UnknownCameraVehicle's offsets
@@ -39,7 +42,7 @@ struct UnknownCameraBike {
     unsigned char field_0x464[0x5c4 - 0x464];
     UnknownCameraBikeRider* riderCharacter;   // +0x5c4
     unsigned char field_0x5c8[0x604 - 0x5c8];
-    UnknownCameraBikeState* field_0x604;
+    UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker
 };
 
 // RTTI: BikeCamera : VehicleCamera. Its code sits near BikeAI.cpp references;

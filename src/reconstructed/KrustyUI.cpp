@@ -213,16 +213,16 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     previousMenu = 0;
     field_0x38 = 0;
     currentMenu = 0;
-    field_0x48c = 0;
+    profileLoaded = 0;
     progressDialog = 0;
     garageScene = 0;
     replayAvailable = 0;
     demoEnded = 0;
     savedInputContext = 0;
     allowIme = 0;
-    field_0x4a8 = 0;
+    playingDemo = 0;
     field_0x4ac = 0;
-    field_0x4b0 = 0;
+    userNameDialogOpen = 0;
     field_0x4a4 = 0;
     field_0x4a0 = 0;
     field_0x49c = 0;
@@ -259,7 +259,7 @@ void KrustyUI::BuildGarageScene(int value) {
     char text[260];
 
     field_0x4ac = 0;
-    field_0x4a8 = 0;
+    playingDemo = 0;
     ((RenderTarget*)renderContext)->clearTarget = 0;
     g_TrackGame->field_0x2d5_bit2 = 1;
     if (!garageScene && (value == 1 || value == -1)) {
@@ -305,7 +305,7 @@ void KrustyUI::BuildGarageScene(int value) {
         light = emitter->Create(renderContext, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
-        UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->field_0x1c;
+        UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->textureContext;
         context.field_0x14 = 0;
         if (!g_TrackGame->field_0x2d0) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
@@ -338,7 +338,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_RIDER = new(__FILE__, 0x194) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
             KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
-                                                   &g_TrackGame->field_0x1c, 1, 1), -1);
+                                                   &g_TrackGame->textureContext, 1, 1), -1);
         KRUSTYUI_RIDER->modelNode->UnknownFunction4444c0(1);
         KRUSTYUI_RIDER->modelNode->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
@@ -349,13 +349,13 @@ void KrustyUI::BuildGarageScene(int value) {
         done = 0;
     }
     if (pending && !done && (value == 2 || value == -1)) {
-        UnknownKrustyUIPlatePainter painter(g_TrackGame->field_0x1c);
+        UnknownKrustyUIPlatePainter painter(g_TrackGame->textureContext);
         for (int i = 0; i < manufacturerCount; i++) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
             KRUSTYUI_MODELS[i].uiModel = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
             garageScene->AppendChild(
                 KRUSTYUI_MODELS[i].uiModel->CharacterVirtualSlot11(renderContext, text, lights,
-                                                                      &g_TrackGame->field_0x1c,
+                                                                      &g_TrackGame->textureContext,
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             bike->modelNode->UnknownFunction4444c0(1);
@@ -398,7 +398,7 @@ KrustyUI::~KrustyUI() {
 // 0x004999b0
 void KrustyUI::Shutdown() {
     UnknownFunction5053b0(0);
-    if (!g_TrackGame->field_0x2d5_bit1)
+    if (!g_TrackGame->shuttingDown)
         gui->CloseDialogResource();
     if (garageScene) {
         garageScene->Release();
@@ -861,7 +861,7 @@ int KrustyUI::AddEntry(int a, int scene, int series, const char* name, int d, in
 // 0x0049bbb0
 void KrustyUI::RecordRaceResults() {
     UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.raceSettings;
-    if (settings->eventType == 1 && settings->field_0x2c)
+    if (settings->eventType == 1 && settings->randomGates)
         return;
     RecordHighScoreTable(0);
     int mode = g_TrackGame->mode.raceSettings.eventType;
@@ -889,7 +889,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
     case 1:
     case 5:
         sprintf(name, "%s%d", g_TrackGame->mode.raceSettings.trackName,
-                g_TrackGame->mode.raceSettings.field_0x34);
+                g_TrackGame->mode.raceSettings.trackNumber);
         break;
     default: {
         int length = strlen(g_TrackGame->mode.raceSettings.trackName);

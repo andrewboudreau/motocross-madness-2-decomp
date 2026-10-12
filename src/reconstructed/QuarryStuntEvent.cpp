@@ -99,7 +99,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
         radarOverlay->field_0x174 = visualCue->CanCycleCues();
         chatOverlay->ShowCueTag(visualCue->CanCycleCues());
     }
-    if (!g_TrackGame->eventManager->waitingForRacers && !raceView->viewAvailable && raceView->isRacing) {
+    if (!g_TrackGame->eventManager->waitingForRacers && !raceView->networkStartPending && raceView->isRacing) {
         clockSeconds += g_TrackGame->frameTime;
         while (clockSeconds >= 60.0f) {
             clockMinutes += 1.0f;
@@ -107,7 +107,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
             if (clockSeconds < 0.0f)
                 clockSeconds = 0.0f;
         }
-    } else if (raceView->viewAvailable) {
+    } else if (raceView->networkStartPending) {
         ResetClock();
     }
     SoundSystem()->CommitListenerSettings();
@@ -180,7 +180,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
             else
                 opponents = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
         } else {
-            opponents = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+            opponents = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
         }
         players = opponents;
     }
@@ -271,7 +271,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     if (textQueue) {
         if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5)
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.raceSettings.field_0x34);
+                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.raceSettings.trackNumber);
         else
             g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->sceneFile, 0);
@@ -310,19 +310,19 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
     if (TestInputEvent(0x31, 0, event, 0xc)) {
-        if (g_TrackGame->mode.field_0x6bc && g_TrackGame->mode.field_0x6c0) {
-            g_TrackGame->mode.field_0x6c0 = 0;
+        if (g_TrackGame->mode.showRiderNames && g_TrackGame->mode.showRiderPositions) {
+            g_TrackGame->mode.showRiderPositions = 0;
             ShowOnOffMessage(0x1412, 1);
-        } else if (g_TrackGame->mode.field_0x6bc) {
-            g_TrackGame->mode.field_0x6bc = 0;
-            g_TrackGame->mode.field_0x6c0 = 1;
+        } else if (g_TrackGame->mode.showRiderNames) {
+            g_TrackGame->mode.showRiderNames = 0;
+            g_TrackGame->mode.showRiderPositions = 1;
             ShowOnOffMessage(0x1413, 1);
-        } else if (g_TrackGame->mode.field_0x6c0) {
-            g_TrackGame->mode.field_0x6c0 = 0;
+        } else if (g_TrackGame->mode.showRiderPositions) {
+            g_TrackGame->mode.showRiderPositions = 0;
             ShowOnOffMessage(0x1414, 0);
         } else {
-            g_TrackGame->mode.field_0x6bc = 1;
-            g_TrackGame->mode.field_0x6c0 = 1;
+            g_TrackGame->mode.showRiderNames = 1;
+            g_TrackGame->mode.showRiderPositions = 1;
             ShowOnOffMessage(0x1414, 1);
         }
         chatOverlay->RedrawNameTags(-1);
@@ -461,7 +461,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         }
         return 1;
     }
-    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay) {
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
         if (TestInputEvent(0x1c, 0, event, 0x80)) {
@@ -488,7 +488,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 struct UnknownQuarryLeaveMessage {
     int field_0x00;
     int field_0x04;
-    int field_0x08;
+    int playerId;                             // +0x08 matched against racers' networkPlayerId
 };
 
 // 0x004e1cc0
@@ -504,7 +504,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         char buffer[0x80];
         strcpy(name, "");
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
-            if (g_TrackGame->mode.racers[i].networkPlayerId == leave->field_0x08) {
+            if (g_TrackGame->mode.racers[i].networkPlayerId == leave->playerId) {
                 int n = strlen(g_TrackGame->mode.racers[i].playerName);
                 int length = n > 0x7f ? 0x7f : n;
                 strncpy(name, g_TrackGame->mode.racers[i].playerName, length);
@@ -516,9 +516,9 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         sprintf(buffer, "%s %s", name, text);
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        raceView->HandlePlayerLeft(leave->field_0x08);
+        raceView->HandlePlayerLeft(leave->playerId);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
-            g_TrackGame->eventManager->RemovePlayer(leave->field_0x08);
+            g_TrackGame->eventManager->RemovePlayer(leave->playerId);
     } else if (from && type == 0x89) {
         char text[0x80];
         char buffer[0x80];

@@ -28,21 +28,21 @@ struct UnknownInstrumentState {
     unsigned char field_0x000[0xbc];
     float gaugeValue;                         // the gauge value before scaling
     unsigned char field_0x0c0[0x108 - 0xc0];
-    bool field_0x108;
+    bool airborne;                            // +0x108 RaceView.h's racer airborne flag; the gauge winds down while set
     unsigned char field_0x109[0x736 - 0x109];
     unsigned char field_0x736;
     unsigned char field_0x737[0x74c - 0x737];
     float lastLapTime;                        // last lap time (StatsOverlay 0x0051a560)
-    float field_0x750;
-    float field_0x754;                        // a time (StatsOverlay 0x0051a480)
+    float fastestLap;                         // +0x750 string 0x838 "Best Lap:" row (StatsOverlay 0x00519ef0, 0x0051a560)
+    float trtTime;                            // +0x754 string 0x13b8 "TRT" row (StatsOverlay 0x00519ef0); drawn by 0x0051a480
     unsigned char field_0x758[0x770 - 0x758];
-    float field_0x770;
+    float tblTime;                            // +0x770 string 0x839 "TBL:" row (StatsOverlay 0x00519ef0, 0x0051a560)
     unsigned char field_0x774[0x784 - 0x774];
     int position;                             // position
     unsigned char field_0x788[0x7a0 - 0x788];
     unsigned short lapsDone;                  // laps done
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
-    char field_0x7a4;
+    char finished;                            // +0x7a4 RaceView.h's racer hasFinished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
     int lapGate;                              // gate of the lap
 };
@@ -153,15 +153,14 @@ struct UnknownTextExtent {
 };
 
 // StatsOverlay+0x124 (set by 0x00519880): a view whose racers 0x0051a560
-// counts (0x004204e0, as UnknownKrustyBikeView in RaceView.h); +0x1b8 is a
-// time (0x0051a480).
+// counts (0x004204e0, as UnknownKrustyBikeView in RaceView.h).
 struct UnknownStatsSource {
     UnknownEventRacer* NextBike(int* iterator); // 0x004204e0
 
     unsigned char field_0x000[0x38];
     UnknownEventRacer* ownRacer;              // its own racer
     unsigned char field_0x03c[0x1b8 - 0x3c];
-    float field_0x1b8;
+    float replayTime;                         // +0x1b8 the "TRT" row while a replay plays (RaceView.h's replayTime)
 };
 
 // RTTI: StatsOverlay : Overlay (vtable 0x00558680), 0x9b8 bytes: the race
@@ -350,7 +349,7 @@ struct UnknownChatRacer {
     unsigned char field_0x4a8[0x5e0 - 0x4a8];
     char name[0x10];                          // name
     unsigned char field_0x5f0[0x784 - 0x5f0];
-    int field_0x784;                          // ChatOverlay+0x19c keeps the last value
+    int position;                             // +0x784 the racer's position (RaceView.h finishPosition); ChatOverlay+0x19c keeps the last value
 };
 
 // ChatOverlay+0x128 and +0x12c: only these fields are read.

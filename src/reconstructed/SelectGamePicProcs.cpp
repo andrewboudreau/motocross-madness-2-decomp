@@ -340,9 +340,9 @@ int CompareGridDraws(const void* a, const void* b) {
 // 0x004f20d0
 void MultiPlayerDlg::FillRacerSlots() {
     int player = g_TrackGame->network->localPlayer;
-    g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.field_0x35;
-    g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
-    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+    g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
+    g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
+    g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
     for (int i = 0; i < g_TrackGame->playerCount - 1; i++) {
         g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
         g_TrackGame->mode.racers[i + 1].racerIndex = 0;
@@ -353,9 +353,9 @@ void MultiPlayerDlg::FillRacerSlots() {
     }
     g_TrackGame->mode.racers[0].networkPlayerId = player;
     {
-        int length = strlen(g_TrackGame->mode.field_0x00);
+        int length = strlen(g_TrackGame->mode.profileName);
         int count = length > 0xf ? 0xf : length;
-        strncpy(g_TrackGame->mode.racers[0].playerName, g_TrackGame->mode.field_0x00, count);
+        strncpy(g_TrackGame->mode.racers[0].playerName, g_TrackGame->mode.profileName, count);
         g_TrackGame->mode.racers[0].playerName[count] = 0;
     }
     g_TrackGame->mode.racers[0].racerIndex = 0;
@@ -398,9 +398,9 @@ static int s_UnknownStatic573c0c = 2;
 // 0x004f2b90
 void MultiPlayerDlg::SendSettings() {
     UnknownLobbySlotTable* slots = &lobbySlots;
-    g_TrackGame->mode.maxOpponents = slots->GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.field_0x28);
-    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.field_0x28)
-        g_TrackGame->mode.raceSettings.field_0x28 = g_TrackGame->mode.maxOpponents;
+    g_TrackGame->mode.maxOpponents = slots->GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
+    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.multiplayerAiRacerCount)
+        g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = g_TrackGame->mode.maxOpponents;
     if (eventPage) {
         UIListBox* list = static_cast<UIListBox*>(eventPage->FindControl("OpponentsListBox", 0));
         if (list && list->rowCount - 1 != g_TrackGame->mode.maxOpponents) {
@@ -418,10 +418,10 @@ void MultiPlayerDlg::SendSettings() {
         }
     }
     if (++s_UnknownStatic573c0c >= 2) {
-        g_TrackGame->mode.raceSettings.field_0x35 = g_UnknownGlobal689df8 + 1;
-        g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.field_0x35;
-        g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
-        g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+        g_TrackGame->mode.raceSettings.networkPlayerCount = g_UnknownGlobal689df8 + 1;
+        g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
+        g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
+        g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
         if (eventPage)
             eventPage->UpdateBoundValues(1);
         if (optionsPage)
@@ -433,11 +433,11 @@ void MultiPlayerDlg::SendSettings() {
         message.raceMode = game->mode.raceSettings.raceMode;
         message.field_0x2d78 = game->mode.raceSettings.series;
         message.laps = game->mode.raceSettings.lapCount;
-        message.opponents = game->mode.raceSettings.field_0x28;
-        message.players = game->mode.raceSettings.field_0x35;
-        message.races = game->mode.raceSettings.field_0x0c;
+        message.opponents = game->mode.raceSettings.multiplayerAiRacerCount;
+        message.players = game->mode.raceSettings.networkPlayerCount;
+        message.races = game->mode.raceSettings.races;
         message.tagBall = game->mode.raceSettings.tagBall;
-        message.stuntMode = game->mode.raceSettings.field_0x148;
+        message.stuntMode = game->mode.raceSettings.stuntMode;
         message.treeCollision = game->mode.raceSettings.treeCollision;
         message.riderCollision = game->mode.raceSettings.riderCollision;
         message.fastFinishes = game->mode.raceSettings.shortTimeLimit;
@@ -445,7 +445,7 @@ void MultiPlayerDlg::SendSettings() {
         message.field_0x0c = game->mode.raceSettings.field_0x138;
         message.field_0x10 = game->mode.raceSettings.field_0x13c;
         message.difficulty = game->mode.difficulty;
-        message.trackNumber = game->mode.raceSettings.field_0x34;
+        message.trackNumber = game->mode.raceSettings.trackNumber;
         memcpy(message.slots, slots->slots, sizeof(message.slots));
         message.trackName[0] = 0;
         strncat(message.trackName, game->mode.raceSettings.trackName, 0x3f);
@@ -459,7 +459,7 @@ void MultiPlayerDlg::SendSettings() {
 int MultiPlayerDlg::CreateLobbyPlayer() {
     UIControl* button = FindControl("ButRdyUser", 1);
     button->SetFontColor(0x808080);
-    return g_TrackGame->network->CreateLocalPlayer(g_TrackGame->mode.field_0x00) != 0;
+    return g_TrackGame->network->CreateLocalPlayer(g_TrackGame->mode.profileName) != 0;
 }
 
 // 0x004f2f00
@@ -764,9 +764,9 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
         g_TrackGame->mode.raceSettings = start->raceSettings;
         g_TrackGame->mode.difficulty = start->field_0x1f4;
-        int total = g_TrackGame->mode.raceSettings.field_0x35 + g_TrackGame->mode.raceSettings.field_0x28;
+        int total = g_TrackGame->mode.raceSettings.networkPlayerCount + g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
         if (start->start) {
-            for (i = g_TrackGame->mode.raceSettings.field_0x35; i < total; i++) {
+            for (i = g_TrackGame->mode.raceSettings.networkPlayerCount; i < total; i++) {
                 g_TrackGame->mode.racers[i].plateNumber = start->field_0x1f8[i];
                 COPY_TEXT(g_TrackGame->mode.racers[i].playerName, start->playerNames[i], 0x10);
                 g_TrackGame->mode.racers[i].racerIndex = i;
@@ -788,16 +788,16 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         g_TrackGame->mode.raceSettings.raceMode = settings->raceMode;
         g_TrackGame->mode.raceSettings.series = settings->field_0x2d78;
         g_TrackGame->mode.raceSettings.lapCount = settings->laps;
-        g_TrackGame->mode.raceSettings.field_0x28 = settings->opponents;
-        g_TrackGame->mode.raceSettings.field_0x35 = settings->players;
-        g_TrackGame->mode.raceSettings.field_0x0c = settings->races;
+        g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = settings->opponents;
+        g_TrackGame->mode.raceSettings.networkPlayerCount = settings->players;
+        g_TrackGame->mode.raceSettings.races = settings->races;
         g_TrackGame->mode.raceSettings.tagBall = settings->tagBall;
-        g_TrackGame->mode.raceSettings.field_0x148 = settings->stuntMode;
+        g_TrackGame->mode.raceSettings.stuntMode = settings->stuntMode;
         g_TrackGame->mode.raceSettings.treeCollision = settings->treeCollision;
         g_TrackGame->mode.raceSettings.riderCollision = settings->riderCollision;
         g_TrackGame->mode.raceSettings.shortTimeLimit = settings->fastFinishes;
         g_TrackGame->mode.raceSettings.maxBikeClass = settings->bikeClass;
-        g_TrackGame->mode.raceSettings.field_0x34 = settings->trackNumber;
+        g_TrackGame->mode.raceSettings.trackNumber = settings->trackNumber;
         g_TrackGame->mode.raceSettings.field_0x138 = settings->field_0x0c;
         g_TrackGame->mode.raceSettings.field_0x13c = settings->field_0x10;
         g_TrackGame->mode.difficulty = settings->difficulty;
@@ -900,11 +900,11 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1468);
         tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1468);
         tab->SetTextAlign(0x22);
-        memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.field_0x2bd0,
+        memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.multiplayerSettings,
                sizeof(g_TrackGame->mode.raceSettings));
-        memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.field_0x1090,
+        memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.multiplayerGarageOptions,
                sizeof(g_TrackGame->mode.garageOptions));
-        memcpy(&g_TrackGame->mode.racerChoice, g_TrackGame->mode.field_0x1b04,
+        memcpy(&g_TrackGame->mode.racerChoice, g_TrackGame->mode.multiplayerRacerChoice,
                sizeof(g_TrackGame->mode.racerChoice));
         strcpy(builtForTrack, "");
         builtForVariant = 0;
@@ -935,7 +935,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->mode.ResetNetworkRace();
         if (openingMenu != 0x868)
             g_TrackGame->eventManager->ResetEntries();
-        g_TrackGame->mode.raceSettings.field_0x2c = 0;
+        g_TrackGame->mode.raceSettings.randomGates = 0;
         g_UnknownGlobal689dfc = g_TrackGame->network->isHost == 0;
         g_UnknownGlobal689e04 = 2;
         if (g_TrackGame->mode.raceSettings.eventType == 4) {
@@ -1030,12 +1030,12 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             if (bikeRiderPage)
                 bikeRiderPage->UpdateBoundValues(1);
             UpdateBoundValues(1);
-            memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
-                   sizeof(g_TrackGame->mode.field_0x2bd0));
-            memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
-                   sizeof(g_TrackGame->mode.field_0x1090));
-            memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
-                   sizeof(g_TrackGame->mode.field_0x1b04));
+            memcpy(&g_TrackGame->mode.multiplayerSettings, &g_TrackGame->mode.raceSettings,
+                   sizeof(g_TrackGame->mode.multiplayerSettings));
+            memcpy(g_TrackGame->mode.multiplayerGarageOptions, g_TrackGame->mode.garageOptions,
+                   sizeof(g_TrackGame->mode.multiplayerGarageOptions));
+            memcpy(g_TrackGame->mode.multiplayerRacerChoice, &g_TrackGame->mode.racerChoice,
+                   sizeof(g_TrackGame->mode.multiplayerRacerChoice));
             if (g_TrackGame->network->lobbyConnected) {
                 EndDialog(0);
                 g_TrackGame->ui->OpenExitDialog();
@@ -1065,7 +1065,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 EnableReadyControls();
                 button->SetFontColor(0xffffff);
                 g_TrackGame->LoadResourceString(0x14d3, format, 0x80);
-                sprintf(line, format, g_TrackGame->mode.field_0x00);
+                sprintf(line, format, g_TrackGame->mode.profileName);
                 SendSystemChatLine(line);
             } else {
                 button->SetFontColor(0x808080);
@@ -1091,12 +1091,12 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                     dialog->FindControl("TxtPrompt", 0)->wordWrap = 1;
                     return;
                 }
-                memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
-                       sizeof(g_TrackGame->mode.field_0x2bd0));
-                memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
-                       sizeof(g_TrackGame->mode.field_0x1090));
-                memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
-                       sizeof(g_TrackGame->mode.field_0x1b04));
+                memcpy(&g_TrackGame->mode.multiplayerSettings, &g_TrackGame->mode.raceSettings,
+                       sizeof(g_TrackGame->mode.multiplayerSettings));
+                memcpy(g_TrackGame->mode.multiplayerGarageOptions, g_TrackGame->mode.garageOptions,
+                       sizeof(g_TrackGame->mode.multiplayerGarageOptions));
+                memcpy(g_TrackGame->mode.multiplayerRacerChoice, &g_TrackGame->mode.racerChoice,
+                       sizeof(g_TrackGame->mode.multiplayerRacerChoice));
                 SendStartMessage(1);
             }
         } else if (!_stricmp("ButChatSend", event->controlName)) {
@@ -1255,11 +1255,11 @@ void MultiPlayerDlg::ReportReadyCleared(int reason) {
     g_UnknownGlobal689df4 = 0;
     if (reason == 2) {
         g_TrackGame->LoadResourceString(0x14d4, text, 0x80);
-        sprintf(value, text, g_TrackGame->mode.field_0x00);
+        sprintf(value, text, g_TrackGame->mode.profileName);
         SendSystemChatLine(value);
     } else if (reason == 3) {
         g_TrackGame->LoadResourceString(0x14db, text, 0x80);
-        sprintf(value, text, g_TrackGame->mode.field_0x00);
+        sprintf(value, text, g_TrackGame->mode.profileName);
         SendSystemChatLine(value);
     }
     FindControl("ButRdyUser", 1)->SetFontColor(0x808080);
@@ -1323,7 +1323,7 @@ void MultiPlayerDlg::FollowTrackChange() {
     char scene[0x104];
     char path[0x104];
     EnableReadyControls();
-    if (!strcmp(builtForTrack, g_TrackGame->mode.raceSettings.trackName) && builtForVariant == g_TrackGame->mode.raceSettings.field_0x34)
+    if (!strcmp(builtForTrack, g_TrackGame->mode.raceSettings.trackName) && builtForVariant == g_TrackGame->mode.raceSettings.trackNumber)
         return;
     g_TrackGame->mode.CopyCurrentSeriesDirectory(scene);
     g_TrackGame->mode.FindFileDirectory((int)scene, g_TrackGame->mode.raceSettings.trackName, "env", path);
@@ -1332,7 +1332,7 @@ void MultiPlayerDlg::FollowTrackChange() {
     g_TrackGame->sceneObject->SetSceneDirectory(path);
     if (g_TrackGame->mode.GetSelectedSeries() == 1 || g_TrackGame->mode.GetSelectedSeries() == 5)
         g_TrackGame->sceneObject->ReadSceneName(sceneName, g_TrackGame->mode.raceSettings.trackName,
-                                                                  g_TrackGame->mode.raceSettings.field_0x34, "scn", &index,
+                                                                  g_TrackGame->mode.raceSettings.trackNumber, "scn", &index,
                                                                   &value);
     else
         g_TrackGame->sceneObject->ReadSceneName(sceneName, g_TrackGame->mode.raceSettings.trackName, 0,
@@ -1357,7 +1357,7 @@ void MultiPlayerDlg::FollowTrackChange() {
         strncpy(builtForTrack, g_TrackGame->mode.raceSettings.trackName, count);
         builtForTrack[count] = 0;
     }
-    builtForVariant = g_TrackGame->mode.raceSettings.field_0x34;
+    builtForVariant = g_TrackGame->mode.raceSettings.trackNumber;
     {
         int length = strlen(sceneName);
         int count = length > 0x7f ? 0x7f : length;
@@ -1370,7 +1370,7 @@ void MultiPlayerDlg::FollowTrackChange() {
 int MPEventDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
     char text[0x80];
     if (type == 0x101) {
-        int count = g_TrackGame->mode.raceSettings.field_0x28;
+        int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
         selectTrackByName = 0;
         UpdateBoundValues(0);
         ApplyEventType();
@@ -1414,14 +1414,14 @@ void MPEventDlg::ShowHostSettings() {
         check->SetCurrentState(g_TrackGame->mode.raceSettings.tagBall);
         check = static_cast<UIMultiState*>(FindControl("ChkStuntMode", 2));
         check->Show(1, 1);
-        check->SetCurrentState(g_TrackGame->mode.raceSettings.field_0x148);
+        check->SetCurrentState(g_TrackGame->mode.raceSettings.stuntMode);
     } else {
         FindControl("OpponentsControlBox", 5)->Show(1, 1);
         UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         if (opponents) {
             opponents->RemoveAllRows();
-            FormatDecimal(g_TrackGame->mode.raceSettings.field_0x28, text);
-            opponents->AddRow(text, g_TrackGame->mode.raceSettings.field_0x28, 0);
+            FormatDecimal(g_TrackGame->mode.raceSettings.multiplayerAiRacerCount, text);
+            opponents->AddRow(text, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount, 0);
         }
         FindControl("ChkTagBall", 2)->Show(0, 1);
         FindControl("ChkStuntMode", 2)->Show(0, 1);
@@ -1478,7 +1478,7 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
         list->SelectRow(settings->raceMode);
         FindControl("ChkTagBall", 0)->BindValue(&settings->tagBall);
         FindControl("ChkStuntMode", 0)->BindValue(&settings->stuntMode);
-        int count = g_TrackGame->mode.raceSettings.field_0x28;
+        int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
         UpdateBoundValues(0);
         ApplyEventType();
         EnableChangeableControls();
@@ -1511,7 +1511,7 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
             list->ReportClick(0);
         } else if (!_stricmp("RacesLeftArrow", event->controlName) || !_stricmp("RacesRightArrow", event->controlName)) {
-            g_TrackGame->mode.raceSettings.field_0x0c = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
+            g_TrackGame->mode.raceSettings.races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         }
         break;
     case kDialogListSelect:
@@ -1548,9 +1548,9 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         if (g_TrackGame->mode.raceSettings.eventType != 4) {
             UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
-            g_TrackGame->mode.raceSettings.field_0x28 = opponents->GetRowData(-1);
+            g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = opponents->GetRowData(-1);
         } else
-            g_TrackGame->mode.raceSettings.field_0x28 = 0;
+            g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
         break;
     }
 }
@@ -1607,7 +1607,7 @@ void MPEventDlg::EnableChangeableControls() {
     if (g_TrackGame->network->isHost && races->rowCount)
         selection = races->GetRowData(-1);
     else
-        selection = g_TrackGame->mode.raceSettings.field_0x0c;
+        selection = g_TrackGame->mode.raceSettings.races;
     races->RemoveAllRows();
     for (int i = 3; i <= 7; i += 2) {
         sprintf(text, "%d", i);
@@ -1623,7 +1623,7 @@ void MPEventDlg::EnableChangeableControls() {
             racesRight->Show(0, 1);
         }
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
-        sprintf(text, "%d/%d", g_TrackGame->eventManager->racesRun + 1, g_TrackGame->mode.raceSettings.field_0x0c + 1);
+        sprintf(text, "%d/%d", g_TrackGame->eventManager->racesRun + 1, g_TrackGame->mode.raceSettings.races + 1);
         races->RemoveAllRows();
         races->AddRow(text, 0, 0);
     } else {
@@ -1735,16 +1735,16 @@ void MPEventDlg::SyncValues(int apply) {
         settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
         settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
         strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType], list->GetRowText(-1));
-        g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.eventType] = g_TrackGame->mode.raceSettings.field_0x34;
+        g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.eventType] = g_TrackGame->mode.raceSettings.trackNumber;
         list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         settings->eventType = list->GetRowData(-1);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
         settings->raceMode = list->GetRowData(-1);
         UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         if (settings->eventType != 4)
-            g_TrackGame->mode.raceSettings.field_0x28 = opponents->GetRowData(-1);
+            g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = opponents->GetRowData(-1);
         else
-            g_TrackGame->mode.raceSettings.field_0x28 = 0;
+            g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
     } else {
         static_cast<UIListBox*>(FindControl("RacesListBox", 3))->SelectRowByData(settings->races);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
@@ -1795,7 +1795,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
     }
     UnknownTextureStream* stream = new(__FILE__, 0xa72) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5)
-        sprintf(file, "%s%02ds.tga", name, g_TrackGame->mode.raceSettings.field_0x34);
+        sprintf(file, "%s%02ds.tga", name, g_TrackGame->mode.raceSettings.trackNumber);
     else if (g_TrackGame->mode.GetSelectedSeries() == 1 || g_TrackGame->mode.GetSelectedSeries() == 5)
         sprintf(file, "%s01s.tga", name);
     else
@@ -1966,7 +1966,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
 
 // 0x004f8570
 void MPBikeRiderDlg::PaintPlateNumber(int number) {
-    UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
+    UnknownBikeNumberPainter painter(g_TrackGame->textureContext);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture, number);

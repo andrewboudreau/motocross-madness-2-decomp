@@ -83,11 +83,11 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         multiMenuOpen = 0;
         userMenuOpen = 0;
         movieRestartTime = 0.0f;
-        g_TrackGame->ui->field_0x4b0 = 0;
+        g_TrackGame->ui->userNameDialogOpen = 0;
         g_TrackGame->mode.championshipInProgress = 0;
         FillProfileList();
         ShowCurrentProfile();
-        if (g_TrackGame->profileDirectory->count >= 1 && g_TrackGame->ui->field_0x48c) {
+        if (g_TrackGame->profileDirectory->count >= 1 && g_TrackGame->ui->profileLoaded) {
             if (event->field_0x18 == 0x63) {
                 PlayerRemovedDlg* dialog = new(__FILE__, 168) PlayerRemovedDlg;
                 g_TrackGame->ui->gui->ShowDialog(dialog, 0x1fa, 0xc, 0, (int)this, 0, 0, 1);
@@ -124,7 +124,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 menuMultiAnimation->Show(0, 1);
                 multiMenuOpen = 0;
                 EndNetworkGame();
-                g_TrackGame->ui->field_0x4b0 = 0;
+                g_TrackGame->ui->userNameDialogOpen = 0;
             }
             if (userMenuOpen) {
                 menuUserAnimation->Show(0, 1);
@@ -148,7 +148,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 FindControl("ButZone", 1)->SetEnabled(1);
                 FindControl("ButCable", 1)->SetEnabled(0);
                 FindControl("ButModem", 1)->SetEnabled(0);
-                g_TrackGame->mode.field_0x2bd0.field_0x28 = 0;
+                g_TrackGame->mode.multiplayerSettings.multiplayerAiRacerCount = 0;
                 if (EnsureNetworkInterface()) {
                     ConnectionInfoType connections[5];
                     g_TrackGame->network->EnumConnections(connections, &count);
@@ -166,7 +166,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 guiManager->RecreateCursors(guiManager->cursorImage, 0);
             } else {
                 EndNetworkGame();
-                g_TrackGame->ui->field_0x4b0 = 0;
+                g_TrackGame->ui->userNameDialogOpen = 0;
             }
         } else if (!_stricmp("MenuUserProfile", event->controlName) || !_stricmp("ButCancelProfile", event->controlName)) {
             userMenuOpen = userMenuOpen == 0;
@@ -175,7 +175,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 menuMultiAnimation->Show(0, 1);
                 multiMenuOpen = 0;
                 EndNetworkGame();
-                g_TrackGame->ui->field_0x4b0 = 0;
+                g_TrackGame->ui->userNameDialogOpen = 0;
             }
             if (userMenuOpen)
                 RequestHover(FindControl("LstProfiles", 3), 0, 0);
@@ -262,7 +262,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButRemoveProfile", event->controlName)) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
             short row = list->GetSelectedRow();
-            if (!_stricmp(list->GetRowText(-1), g_TrackGame->mode.field_0x00)) {
+            if (!_stricmp(list->GetRowText(-1), g_TrackGame->mode.profileName)) {
                 NoDelCurProfileDlg* dialog = new(__FILE__, 423) NoDelCurProfileDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             } else if (row != -1) {
@@ -274,14 +274,14 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             RequestHover(list, 0, 0);
             FillProfileList();
         } else if (!_stricmp("ButIPX", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             if (g_TrackGame->network->CreateAddress(DPSPGUID_IPX, "", "", 0, &address, &size) &&
                 g_TrackGame->network->InitializeConnection(address, size, 1)) {
                 DebugFree(address, __FILE__, 443);
                 g_TrackGame->ui->OpenMenu(0x85c);
             }
         } else if (!_stricmp("ButTCP", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             ChooseTCPMethodDlg* dialog = new(__FILE__, 453) ChooseTCPMethodDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButZone", event->controlName)) {
@@ -290,10 +290,10 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             event->handled = 1;
             g_TrackGame->ui->OpenExitDialog();
         } else if (!_stricmp("ButCable", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             g_TrackGame->ui->OpenMenu(0xd8);
         } else if (!_stricmp("ButModem", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             ConnectionInfoType connections[5];
             g_TrackGame->network->EnumConnections(connections, &count);
             for (int i = 0; i < count; i++) {
@@ -326,9 +326,9 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         if (event->code == 0x1e || event->code == 0x32) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
             if (event->code == 0x1e) {
-                list->AddRow(g_TrackGame->mode.field_0x00, 0, 0);
+                list->AddRow(g_TrackGame->mode.profileName, 0, 0);
                 list->Sort(1);
-                list->SelectRowByText(g_TrackGame->mode.field_0x00);
+                list->SelectRowByText(g_TrackGame->mode.profileName);
             } else if (event->code == 0x32) {
                 COPY_TEXT(name, list->GetRowText(g_UnknownGlobal59adbc), 16);
                 sprintf(path, "%s\\%s", "ui\\profile", name);
@@ -459,9 +459,9 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             UIControl* text = FindControl("TitleText", 0xc);
             g_TrackGame->LoadResourceString(0x93b, position, 0x80);
             sprintf(title, "%s (%d/%d)", position, g_TrackGame->eventManager->racesRun,
-                    g_TrackGame->mode.raceSettings.field_0x0c + 1);
+                    g_TrackGame->mode.raceSettings.races + 1);
             text->SetText(title);
-            if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.field_0x0c) {
+            if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.races) {
                 text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
                 g_TrackGame->mode.championshipInProgress = 0;
                 g_TrackGame->ui->currentMenu = 0x10e;
@@ -577,9 +577,9 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         UIControl* text = FindControl("TitleText", 0xc);
         g_TrackGame->LoadResourceString(0x93b, position, 0x80);
         sprintf(title, "%s (%d/%d)", position, g_TrackGame->eventManager->racesRun,
-                g_TrackGame->mode.raceSettings.field_0x0c + 1);
+                g_TrackGame->mode.raceSettings.races + 1);
         text->SetText(title);
-        if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.field_0x0c) {
+        if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.races) {
             text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
             g_TrackGame->mode.championshipInProgress = 0;
             g_TrackGame->ui->currentMenu = 0x10e;
@@ -655,7 +655,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         break;
     }
     case 4:
-        if (g_TrackGame->mode.raceSettings.field_0x148) {
+        if (g_TrackGame->mode.raceSettings.stuntMode) {
             if (g_TrackGame->mode.raceSettings.raceMode == 2)
             SetStatsButtonResources(event, 0x934, 0, 0x937, 0x938);
         else
@@ -690,8 +690,8 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 if (!g_TrackGame->eventManager->results[i].outOfRace) {
                     sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                    FormatLapTime(score, g_TrackGame->eventManager->results[i].field_0x1c);
-                    FormatLapTime(points, g_TrackGame->eventManager->results[i].field_0x18);
+                    FormatLapTime(score, g_TrackGame->eventManager->results[i].totalTagRun);
+                    FormatLapTime(points, g_TrackGame->eventManager->results[i].bestTagRun);
                     if (g_TrackGame->mode.raceSettings.raceMode == 2) {
                         sprintf(points, "%d", g_TrackGame->eventManager->results[i].points);
                         AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score,

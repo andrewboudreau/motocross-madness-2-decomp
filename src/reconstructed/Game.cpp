@@ -79,7 +79,7 @@ static inline void DecodeString(char* text) {
 Game::Game() {
     InitFastMath();
     useZBuffer = 1;
-    field_0x2d4_bit2 = 0;
+    testKey = 0;
     fullScreen = 1;
     soundInterface = 0;
     network = 0;
@@ -96,7 +96,7 @@ Game::Game() {
     strcpy(field_0x40, "");
     field_0x2dc = 0;
     field_0x2d8 = 0;
-    field_0x2e0 = 1.0f;
+    replaySpeed = 1.0f;
     allowDither = 1;
     allowMipMapping = 1;
     allowBilinear = 1;
@@ -105,7 +105,7 @@ Game::Game() {
     paused = 0;
     stepOneFrame = 0;
     inputSuspended = 0;
-    field_0x2d5_bit1 = 0;
+    shuttingDown = 0;
     field_0x2d5_bit2 = 1;
     field_0x2e4 = 1.0f;
     field_0x2e8 = 0;
@@ -149,7 +149,7 @@ int Game::CreateObjects(char*) {
     do
         rand();
     while (count--);
-    field_0x2d4_bit2 = 0;
+    testKey = 0;
     void* key;
     unsigned long type;
     unsigned long value;
@@ -157,19 +157,19 @@ int Game::CreateObjects(char*) {
     if (RegOpenKeyExA((void*)0x80000002, s_UnknownEncoded56b334, 0, 0x20019, &key) == 0 &&
         RegQueryValueExA(key, s_UnknownEncoded56b350, 0, &type, (unsigned char*)&value, &size) == 0 &&
         type == 4)                            // REG_DWORD
-        field_0x2d4_bit2 = value;
+        testKey = value;
     RegCloseKey(key);
     if (!UnknownVirtualSlot32())
         return 0;
     textureManager = new(__FILE__, 282) TextureMapManager;
     childRoot->AppendChild(textureManager->UnknownVirtualSlot8(renderTarget), -1);
-    field_0x1c = textureManager;
+    textureContext = textureManager;
     field_0x20 = 0;
     field_0x24 = 0;
     field_0x28 = renderTarget->surfacePixelFormat;
     field_0x2c = 0x115c;
     field_0x30 = 0;
-    if (field_0x2d4_bit2) {
+    if (testKey) {
         int category = g_MemTagStack->Push("DebugOverlay");
         debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, textureManager, 8, 3, 3);
         if (debugOverlay) {
@@ -181,7 +181,7 @@ int Game::CreateObjects(char*) {
         }
         g_MemTagStack->Pop(category);
     }
-    field_0x2d4_bit0 = GetRegistryFlag("AllowFreezeCamera", 0);
+    allowFreezeCamera = GetRegistryFlag("AllowFreezeCamera", 0);
     if (!UnknownVirtualSlot3())
         return 0;
     return UnknownVirtualSlot4() != 0;
@@ -234,7 +234,7 @@ int Game::UnknownVirtualSlot8() {
     now = ReadClock();
     int renderPost3D = now - last;
     int elapsed = now - s_LastFrameTime;
-    if (field_0x2d4_bit2) {
+    if (testKey) {
         if (debugOverlay) {
             static int profilePage = -1;
             if (profilePage < 0)
@@ -367,7 +367,7 @@ int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* en
 int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (inputSuspended)
         return 1;
-    if (field_0x2d4_bit2 && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
+    if (testKey && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
         if (debugOverlay->isEnabled) {
             if (debugOverlay->ShowNextPage())
                 debugOverlay->UnknownVirtualSlot4();
@@ -375,7 +375,7 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
             debugOverlay->UnknownVirtualSlot5();
         }
     }
-    if (field_0x2d4_bit0) {
+    if (allowFreezeCamera) {
         if (controlInterface->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
             paused = 1 - paused;
         } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && paused) {
@@ -395,7 +395,7 @@ Game::~Game() {
 // 0x00468a30: tears down the interface, the network object, the owners and
 // the ControlInterface.
 int Game::UnknownVirtualSlot15() {
-    field_0x2d5_bit1 = 1;
+    shuttingDown = 1;
     if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
         g_UnknownGlobal56c470->Unlink();
     g_UnknownStatic65b478.DeleteFonts();
@@ -440,9 +440,9 @@ int Game::UnknownVirtualSlot17(int type, void* data, int from, int to, int flags
     return rootObject->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
 }
 
-// 0x00468bd0: `path` = the +0x1cc directory, "\\" and `name`.
+// 0x00468bd0: `path` = workingDirectory (+0x1cc), "\\" and `name`.
 int Game::UnknownVirtualSlot18(const char* name, char* path) {
-    strcpy(path, field_0x1cc);
+    strcpy(path, workingDirectory);
     strcat(path, "\\");
     strcat(path, name);
     return 1;

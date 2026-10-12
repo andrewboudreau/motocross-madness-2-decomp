@@ -12,6 +12,6 @@ struct UnknownDisplayMode {
     int field_0x10;
     int field_0x14;           // usable; PCGame slot 34 and 0x004c0760 clear it
     int field_0x18;           // usable; PCGame slot 34 clears it
-    int field_0x1c;           // PCGame slot 31 copies it to Display+0x58
-    int field_0x20;           // and this to Display+0x5c
+    int textureMemory;        // +0x1c PCGame slot 31 copies it to Display textureMemory (+0x58)
+    int nonLocalTextureMemory; // +0x20 and this to nonLocalTextureMemory (+0x5c)
 };

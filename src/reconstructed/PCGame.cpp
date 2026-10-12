@@ -122,7 +122,7 @@ PCGame::PCGame() {
     strcpy(companyName, "Rainbow Studios");
     strcpy(applicationName, "Rainbow Demo");
     strcpy(registryKey, "SOFTWARE\\Rainbow Studios\\Demo");
-    GetCurrentDirectoryA(0x104, field_0x1cc);
+    GetCurrentDirectoryA(0x104, workingDirectory);
     resourceInstance = 0;
     imeLibrary = LoadLibraryA("IMM32.DLL");
     inputContext = ImmCreateContext();
@@ -298,7 +298,7 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
 int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Game::UnknownVirtualSlot14(event, entry))
         return 1;
-    if (field_0x2d4_bit2 && TestInputEvent(0x41, 0, event, 3)) {
+    if (testKey && TestInputEvent(0x41, 0, event, 3)) {
         PCTarget()->fillMode = PCTarget()->fillMode == D3DFILL_SOLID ? D3DFILL_WIREFRAME : D3DFILL_SOLID;
         return 1;
     }
@@ -469,18 +469,18 @@ RenderTarget* PCGame::UnknownVirtualSlot31() {
     if (!target)
         return 0;
     if (fullScreen) {
-        display->field_0x58 = display->displayModes[display->currentDisplayMode].field_0x1c;
-        display->field_0x5c = display->displayModes[display->currentDisplayMode].field_0x20;
+        display->textureMemory = display->displayModes[display->currentDisplayMode].textureMemory;
+        display->nonLocalTextureMemory = display->displayModes[display->currentDisplayMode].nonLocalTextureMemory;
     } else {
         int value;
         if (display->ProbeNonLocalTextureMemory(&value, renderTarget)) {
-            display->field_0x5c = value;
+            display->nonLocalTextureMemory = value;
             PCTarget()->MeasureTextureMemory(&value);
-            display->field_0x58 = value;
+            display->textureMemory = value;
         } else {
-            display->field_0x5c = 0;
+            display->nonLocalTextureMemory = 0;
             PCTarget()->MeasureTextureMemory(&value);
-            display->field_0x58 = value;
+            display->textureMemory = value;
         }
     }
     return target;
@@ -622,8 +622,8 @@ int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
         int index = count - remaining;
         display->displayModes[index].field_0x14 = saved[index].field_0x14;
         display->displayModes[index].field_0x18 = saved[index].field_0x18;
-        display->displayModes[index].field_0x1c = saved[index].field_0x1c;
-        display->displayModes[index].field_0x20 = saved[index].field_0x20;
+        display->displayModes[index].textureMemory = saved[index].textureMemory;
+        display->displayModes[index].nonLocalTextureMemory = saved[index].nonLocalTextureMemory;
     }
     sprintf(name, "DriverInfo\\%s\\PartialTextureBlt", display->driverGuidText);
     display->partialTextureUploadResult = GetRegistryInt(name, 0);

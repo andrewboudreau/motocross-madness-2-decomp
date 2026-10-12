@@ -134,15 +134,17 @@ struct UnknownGroundFogShader {
     UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
-// Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8).
+// Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8). Its
+// AdvancePastSounds is UIAnim's (0x004730b0) and dialogs cast a control's
+// "MouseAnim" UIAnim to it, so the members follow GameUi.h's UIAnim.
 struct UnknownCursorAnimation {
     int AdvancePastSounds();              // 0x004730b0: current frame
     unsigned char field_0x00[0x08];
-    int field_0x08;
-    int field_0x0c;
-    int field_0x10;
+    int currentFrame;                         // +0x08 UIAnim::currentFrame
+    int playForwards;                         // +0x0c UIAnim::playForwards
+    int frameCount;                           // +0x10 UIAnim::frameCount
     unsigned char field_0x14[0x20 - 0x14];
-    int field_0x20;
+    int lastStepTime;                         // +0x20 UIAnim::lastStepTime
 };
 
 // RTTI: GUICursor : GameCursor (vtable 0x00553ed0; 0x60 bytes, the size
@@ -317,7 +319,7 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004857f0
 
     // 0x004853b0: sets the GUI up (KrustyUI 0x004988a0 passes its target,
-    // Display+0x64, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"
+    // Display+0x64 palette, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"
     // and a callback).
     GUIManager* SetUp(void* target, Palette8* palette, TextureMapManager* textures,
                       BackgroundImage* background, int startSound, SoundGroup* sound,
@@ -373,8 +375,8 @@ public:
     PCTextureMap* screenGrab;                 // +0xdc: screen grab
     int drawGrabFirst;                        // +0xe0: draw the grab before the children
     int grabRegion;                           // +0xe4
-    int field_0xe8;
-    int field_0xec;                           // from TrackGame+0xc40 (KrustyUI 0x004988a0)
+    int grabCopyFrames;                       // +0xe8: the screen grab's full-copy frames left (BackgroundImage::DrawImage `frames`)
+    int uiAnimations;                         // +0xec ChkUIAnims (OptionProcs.cpp); from TrackGame+0xc40 (KrustyUI 0x004988a0); handed to each dialog's animatesControls
     char dialogDirectory[0x100];              // +0xf0: dialog directory
     int paletteChanged;                       // +0x1f0: set by 0x00486150; slot 10 clears it
     int waitFrames;                           // +0x1f4: frames to wait
@@ -391,9 +393,9 @@ public:
     int userCount;                            // +0x340: users
     GameObject* dialogContainer;              // +0x344: the UIDlgContainer
     void* languageModule;                     // +0x348: "uilang.dll" module
-    int field_0x34c;
+    int soundVolume;                          // +0x34c the UI sounds' volume: (uiVolume - 100) * 25 - 200, or -10200 with UI sounds off (OptionProcs.cpp)
     char toolTipFontFace[0x80];               // +0x350: tool tip font face
-    int field_0x3d0;
+    int fontSizeOffset;                       // +0x3d0 a float added to the dialog and control font heights (0x0046a920); string 0xfed (KrustyUI)
     int toolTipBold;                          // +0x3d4: bold
     int toolTipItalic;                        // +0x3d8: italic
     UnknownGuiClipper* windowClipper;         // +0x3dc

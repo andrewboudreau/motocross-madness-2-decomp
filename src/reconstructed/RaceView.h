@@ -68,16 +68,16 @@ class UnknownVehiclePart;
 struct UnknownEventRacerPart {
     int creationOrder;                        // +0x00 1-based order of creation
     UnknownEventRacer* racer;                 // +0x04 racer
-    float field_0x08;
+    float goalDistance;                       // +0x08 progressPos to the finish probe (track races) or to the next gate's centre (gate races), 0x004e6a50
     float gateDistance;                       // +0x0c distance to the next gate (sort key)
-    float field_0x10;
-    float field_0x14;
-    int field_0x18;                         // -1 when behind the leader's lap (0x004e5f40)
+    float progressStep;                       // +0x10 progressPos..placedPos distance this frame (0x004e6a50)
+    float progressTotal;                      // +0x14 sum of accepted progress steps (gate races: of gate approach)
+    int lapOffset;                            // +0x18 added to the lap count when ordering (0x004e5f40): -1 when the placedPos..progressPos distance passes the probe gate
     Vector3 previousPosition;                 // +0x1c previous position
     Vector3 currentPosition;                  // +0x28 current position
     UnknownBikeRaceNode* nextGate;            // +0x34 next gate
-    TrackPos field_0x38;
-    TrackPos field_0x44;
+    TrackPos placedPos;                       // +0x38 Track::PlaceNear's (or ClosestPointOnTrack's) placement of previousPosition
+    TrackPos progressPos;                     // +0x44 PlaceNear's search start; advances only forward to placedPos (0x004e6a50)
     UnknownEventRacerPart* next;              // +0x50 next
 };
 
@@ -131,7 +131,7 @@ struct UnknownEventRacer : virtual public GameObject {
     char racerName[0x10];                     // +0x5e0 name
     UnknownEventRacerModel* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
-    UnknownCameraBikeState* field_0x604;           // racesnd.cpp 0x004e39b0 reads its +0xb0
+    UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
     unsigned char field_0x608[0x734 - 0x608];
     char field_0x734;                              // RaceStatus.cpp 0x004e6a50 finishes the race on its lap count
     unsigned char field_0x735;                     // RaceStatus.cpp: gates are passed without the crossing test
@@ -145,10 +145,11 @@ struct UnknownEventRacer : virtual public GameObject {
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)
     float totalRunningTime;                   // +0x754 FLT_MAX until finished; ZoneReport "TotalrunningTime" (0x0045c8b0)
-    int field_0x758;
-    float field_0x75c;
-    float field_0x760;                             // best of +0x75c
-    float field_0x764;                             // sum of +0x75c
+    int field_0x758;                          // +0x758
+    float tagRun;                             // +0x75c the current run as the followed racer in tag (mode 4); banked by
+                                              // TrackGameViewOwner 0x004a9e80 and EventManager 0x0045eef0
+    float bestTagRun;                         // +0x760 best banked run
+    float totalTagRun;                        // +0x764 sum of the banked runs; EventManager 0x0045e9d0 ranks by it
     float score;                              // +0x768 a score (sorted with TrackOverlay's 0x005199f0)
     float offTrackTime;                       // +0x76c time off the track (RaceStatus.cpp 0x004e63e0)
     float timeBehindLeader;                   // +0x770 time behind the leader (RaceStatus.cpp 0x004e6210)
@@ -158,7 +159,7 @@ struct UnknownEventRacer : virtual public GameObject {
     float* gateTimes;                         // +0x780 gate times, by gate count % 600
     int finishPosition;                       // +0x784 finishing position (1-based)
     int largestStuntPoints;                   // +0x788 ZoneReport "LargestSingleStuntPoints" (0x0045c8b0)
-    int field_0x78c;                               // RaceStatus.cpp 0x004e63e0: Track 0x00517340's result
+    int onTrack;                              // +0x78c Track::PlaceNear placed the racer (RaceStatus.cpp 0x004e63e0); clears offTrackTime
     int gatesPassed;                          // +0x790 gates passed
     unsigned char field_0x794[0x7a0 - 0x794];
     unsigned short lapCount;                  // +0x7a0 laps
@@ -166,8 +167,8 @@ struct UnknownEventRacer : virtual public GameObject {
     char hasFinished;                         // +0x7a4 finished
     unsigned char field_0x7a5[0x7ac - 0x7a5];
     int field_0x7ac[3];                            // copied by EventManager 0x0045c8b0
-    int field_0x7b8;                               // racesnd.cpp keeps a copy at +0x1294; gate of the lap
-    int field_0x7bc;
+    int lapGate;                              // +0x7b8 gate of the lap (AdvanceGate's gateIndex); racesnd.cpp keeps a copy at +0x1294
+    int nextLapGate;                          // +0x7bc lapGate + 1 wrapped by the owner's gate count (RaceStatus.cpp 0x004e6a50)
     int field_0x7c0;                               // RaceStatus.cpp: passes the current gate without the test
     unsigned char field_0x7c4[0x11bc - 0x7c4];
     int networkPlayerId;                      // +0x11bc network player id
@@ -210,11 +211,11 @@ struct UnknownKrustyBikeView : public GameObject {
     UnknownEventRacer* localRacer;            // +0x38 its own racer
     UnknownEventRacer** racerSlots;           // +0x3c all racers, by racer slot
     UnknownEventRacer** aiRacers;             // +0x40 AI racers (TrackGame+0x2d94 of them)
-    GameObject* field_0x44;
+    GameObject* raceSound;                    // +0x44 BikeRace: the RaceSound (FollowRacer plays the "it" sound through it)
     unsigned char field_0x048[0x50 - 0x48];
-    GameObject* field_0x50;
+    GameObject* raceCamera;                   // +0x50 BikeRace: the race camera
     unsigned char field_0x054[0x60 - 0x54];
-    GameObject* field_0x60;
+    GameObject* youIndicator;                 // +0x60 BikeRace: the "youind.slt" marker
     unsigned char field_0x064[0xbc - 0x64];
     UnknownScoreBoard* scoreBoard;            // +0x0bc score board (FollowRacer.cpp 0x004a9e80)
     unsigned char field_0x0c0[0xc8 - 0xc0];
@@ -224,12 +225,12 @@ struct UnknownKrustyBikeView : public GameObject {
     unsigned char field_0x15c[0x18a - 0x15c];
     bool isRacing;                            // +0x18a racing (EventManager 0x0045eef0)
     unsigned char field_0x18b[0x18e - 0x18b];
-    bool viewAvailable;                       // +0x18e slot 10: view available
+    bool networkStartPending;                 // +0x18e BikeRace: the multiplayer start check is pending (the race clock waits, the camera shows the grid)
     unsigned char field_0x18f[0x19c - 0x18f];
     ChatOverlay* chatOverlay;                 // +0x19c the name tags (TrackOverlay 0x0051bed0 updates them)
     UnknownKrustyBikeViewReplay* replayVcr;   // +0x1a0 replay being played (InGameProcs.cpp VCRDlg)
     unsigned char field_0x1a4[0x1a8 - 0x1a4];
-    UnknownVcrFile* field_0x1a8;         // ghost recording (EventManager 0x0045cdc0)
+    UnknownVcrFile* vcrFile;             // +0x1a8 VCR file the recordings open; EventManager 0x0045cdc0 saves it as Record\*.gho
     unsigned char field_0x1ac[0x1b8 - 0x1ac];
     float replayTime;                         // +0x1b8 replay time (InGameProcs.cpp VCRDlg)
     unsigned char field_0x1bc[0x1c4 - 0x1bc];
@@ -238,7 +239,7 @@ struct UnknownKrustyBikeView : public GameObject {
     int replayMode;                           // +0x1dc replay mode (4 play ... 14)
     unsigned char field_0x1e0[0x1e4 - 0x1e0];
     int field_0x1e4;                     // -2: no replay
-    int field_0x1e8;
+    int ghostLap;                             // +0x1e8 lap count when the ghost lap restarted
     unsigned char field_0x1ec[0x3f8 - 0x1ec];
     bool replayPaused;                       // +0x3f8
     bool replayStepFrame;                    // +0x3f9

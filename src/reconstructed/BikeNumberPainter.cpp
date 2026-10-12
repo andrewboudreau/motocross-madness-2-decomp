@@ -75,7 +75,7 @@ void UnknownBikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int numbe
         if (_stricmp(model->materialTable[i]->textureName, "PROCEDURAL"))
             continue;
         plate = i;
-        PCTextureMap* texture = (PCTextureMap*)model->materialTable[i]->field_0x70->texture;
+        PCTextureMap* texture = (PCTextureMap*)model->materialTable[i]->surfaceMap->texture;
         UnknownBltFx fx;
         memset(&fx, 0, sizeof(fx));
         fx.size = sizeof(fx);

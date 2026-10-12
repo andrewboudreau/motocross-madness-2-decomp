@@ -201,15 +201,15 @@ static inline float RandomUnit() {
 // the AI racers and the starting grid.
 void MultiPlayerDlg::SendStartMessage(short start) {
     int i;
-    g_TrackGame->mode.raceSettings.field_0x35 = g_UnknownGlobal689df8 + 1;
-    g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.field_0x35;
-    g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
-    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+    g_TrackGame->mode.raceSettings.networkPlayerCount = g_UnknownGlobal689df8 + 1;
+    g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
+    g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
+    g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
     int total = g_TrackGame->mode.racerCount;
     g_TrackGame->mode.maxOpponents =
-        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.field_0x28);
-    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.field_0x28)
-        g_TrackGame->mode.raceSettings.field_0x28 = g_TrackGame->mode.maxOpponents;
+        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
+    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.multiplayerAiRacerCount)
+        g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = g_TrackGame->mode.maxOpponents;
     if (start) {
         int* bikes = (int*)DebugCalloc(total, 4, __FILE__, 0x1f4);
         int* riders = (int*)DebugCalloc(total, 4, __FILE__, 0x1f5);

@@ -48,8 +48,8 @@ struct UnknownRaceSoundChannel {
     int wasThrottleOn;                     // +0x24, racer throttle last frame (written by slot 10)
     int field_0x28;
     int wasAirborne;                       // +0x2c, racer +0x108 last frame (the LandHard cue)
-    int field_0x30;
-    int field_0x34;
+    int airRevArmed;                       // +0x30, throttle released after 0.2 s airborne: the next throttle plays a rev
+    int groundRevArmed;                    // +0x34, throttle released on the ground: the next throttle plays a rev (when +0x48 is clear)
     void* streamSample;                     // sample being streamed
     float airborneTime;                     // seconds airborne
     int field_0x40;

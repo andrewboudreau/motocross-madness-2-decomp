@@ -204,7 +204,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x274 = 0;
     pointCapacity = 0;
     pointCount = 0;
-    field_0x2d4 = 7.0f;
+    followHeight = 7.0f;
     field_0x2ec = 3.0f;
     cameraState = 0;
     UnknownVirtualSlot71(0);

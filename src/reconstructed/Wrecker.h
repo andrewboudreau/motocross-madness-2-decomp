@@ -179,11 +179,19 @@ struct UnknownWreckerSkeleton {
     int subtreeDirty;          // +0x18c
 };
 
-struct UnknownWreckerRaceState {
+// The character's current motion (src/krusty2 Motion, Motnctrl.h).
+struct UnknownWreckerMotion {
     unsigned char field_0x00[0xa8];
-    int field_0xa8;
+    int frameCount;                    // +0xa8 "FrameCount"
     unsigned char field_0xac[0xb4 - 0xac];
-    int field_0xb4;
+    int fps;                           // +0xb4 "FPS"
+};
+
+// The 12-byte pose list at +0x190 (src/krusty2 MotionPoseList).
+struct UnknownWreckerPoseList {
+    int frame;                         // +0x00
+    void* poses;                       // +0x04 0x2c-byte records
+    int count;                         // +0x08
 };
 
 // Object at Wrecker+0x34 (Bike passes its rider character). Its +0x1a0 is
@@ -199,18 +207,20 @@ public:
     virtual void UnknownVirtualSlot6();
     virtual void UnknownVirtualSlot7(float frameTime, int a, int b);
 
-    void UnknownFunction4a8ac0(Vector3* position, int value);      // 0x004a8ac0 (ret 8)
+    // 0x004a8ac0 (ret 8): passes each pose of `list` to slot 6 (src/krusty2
+    // Character::ApplyPoseListSlot6).
+    void ApplyPoseListSlot6(UnknownWreckerPoseList* list, int mask);
     void SetMotionByName(const char* animation);             // 0x004a8b10 (ret 4)
     void SetMotion(int value);                         // 0x004a8b40 (ret 4)
     void BlendToMotion(int value, float blend);            // 0x004a8b80 (ret 8)
 
     unsigned char field_0x004[0x18 - 0x4];
-    UnknownWreckerRaceState* field_0x18;
-    int* field_0x1c;
+    UnknownWreckerMotion* currentMotion;      // +0x18 (src/krusty2 Character::currentMotion)
+    UnknownWreckerPoseList* currentFrame;     // +0x1c the motion's frame being played
     unsigned char field_0x020[0x34 - 0x20];
-    int field_0x34;
+    int blendActive;                          // +0x34 set by BlendToMotion, cleared by SetMotion
     unsigned char field_0x038[0x190 - 0x38];
-    Vector3 field_0x190;
+    UnknownWreckerPoseList restPoseList; // +0x190 rest pose list (src/krusty2 Character::poseList)
     unsigned char field_0x19c[0x1a0 - 0x19c];
     UnknownWreckerSkeleton* skeleton; // +0x1a0
 };
@@ -382,9 +392,9 @@ public:
     float randomTable[256];    // +0x128 random values in [0, 1)
     int randomIndex;           // +0x528
     int skipProbeEffects;      // +0x52c set by EndWreck: slot 10 skips one EmitProbeEffects
-    int field_0x530;
-    int field_0x534;
-    int field_0x538;
+    int blendStarted;          // +0x530 a wreck blend is under way; slot 10 sets carryRiderPose once the character's blend ends
+    int poseStepsPending;      // +0x534 slot 10 rebuilds the pose steps once carryRiderPose is set
+    int tumbleStarted;         // +0x538 set by StartTumble; cleared when a second blend starts
 };
 
 typedef char wrecker_assert_sizeof[(sizeof(Wrecker) == 0x53c) ? 1 : -1];

@@ -38,16 +38,16 @@ public:
     // back, whole words first, then 0x004239c0 / 0x00423b70 for the rest.
     void ShiftTowardFront(int count);
     void ShiftTowardBack(int count);
-    void UnknownFunction4239c0(int count);
-    void UnknownFunction423b70(int count);
+    void ShiftBitsTowardFront(int count);           // 0x004239c0: count < 32
+    void ShiftBitsTowardBack(int count);            // 0x00423b70: count < 32
     // 0x00423ef0: reads the next `count` bits, most significant first.
     unsigned int ReadBits(int count);
 
-    int field_0x04;
-    void* field_0x08;
-    void* field_0x0c;
-    unsigned char field_0x10;
-    int field_0x14;
-    int field_0x18;
-    int field_0x1c;
+    int bitCount;                                   // +0x04
+    void* data;                                     // +0x08 the words
+    void* field_0x0c;                               // +0x0c buffer (constructor)
+    unsigned char field_0x10;                       // +0x10 0x80 (constructor)
+    int field_0x14;                                 // +0x14 0 (constructor)
+    int fillWord;                                   // +0x18 0 or -1: shifted in by the shifts
+    int borrowedBuffer;                             // +0x1c the destructor frees data when 0
 };

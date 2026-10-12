@@ -103,7 +103,10 @@ public:
     RenderTarget* renderTarget;               // a PCRenderTarget (PCGame slot 31)
     ControlInterface* controlInterface;       // a PCControlInterface (slot 2)
     int playerCount;                          // +0x18 1 initially; KrustyBikeCamera slot 42 tests > 1
-    TextureMapManager* field_0x1c;
+    // +0x1c..+0x30: a texture context block (the manager, the render
+    // target's pixel format at +0x28); the UI painters and
+    // ReplaceMaterialTexture take its address (KrustyUI.cpp copies all six).
+    TextureMapManager* textureContext;        // +0x1c
     int field_0x20;
     int field_0x24;
     int field_0x28;
@@ -115,25 +118,25 @@ public:
     char field_0x40[0x1c4 - 0x40];            // empty string initially
     int paused;                               // +0x1c4: Ctrl+F toggles it (debug keys); BikeRace mirrors its replay pause here
     int stepOneFrame;                         // +0x1c8: set by E while paused and by the replay ButFrame
-    char field_0x1cc[0x2d0 - 0x1cc];          // directory for slot 18
+    char workingDirectory[0x2d0 - 0x1cc];     // +0x1cc the current directory at startup (PCGame slot 30, WinMain); slot 18 builds paths under it
     int field_0x2d0;                          // the "Renderer" setting is "Blade" (PCGame 0x004bfc50); software paths test it
-    unsigned char field_0x2d4_bit0 : 1;       // "AllowFreezeCamera"; slot 14 key handling
+    unsigned char allowFreezeCamera : 1;      // +0x2d4 bit 0: registry "AllowFreezeCamera"; FollowCamera slot 23 key handling
     unsigned char fullScreen : 1;             // +0x2d4 bit 1: registry "FullScreen" (1 initially)
-    unsigned char field_0x2d4_bit2 : 1;       // registry "TestKey" (debug input, overlay)
+    unsigned char testKey : 1;                // +0x2d4 bit 2: registry "TestKey" (debug input, overlay)
     unsigned char allowDither : 1;            // +0x2d4 bit 3: "DriverInfo\<guid>\AllowDither" (D3DRENDERSTATE_DITHERENABLE)
     unsigned char allowMipMapping : 1;        // +0x2d4 bit 4: "AllowMipMapping" (mip filter)
     unsigned char allowBilinear : 1;          // +0x2d4 bit 5: "AllowBiLinear" (linear mag/min filters)
     unsigned char allowSortIndependentAntialiasing : 1; // +0x2d4 bit 6: "AllowSortIndependantAntiAliasing"
     unsigned char allowTrilinear : 1;         // +0x2d4 bit 7: "AllowTriLinear" (linear mip filter)
     unsigned char inputSuspended : 1;         // +0x2d5 bit 0: set by slot 11; slots 13/14 and PCGame 35/36 then ignore input
-    unsigned char field_0x2d5_bit1 : 1;       // set on shutdown
-    unsigned char field_0x2d5_bit2 : 1;       // set by the constructor
+    unsigned char shuttingDown : 1;           // +0x2d5 bit 1: set by the teardown (slot 15, 0x00468a30); dialogs then skip releasing their resources
+    unsigned char field_0x2d5_bit2 : 1;       // set by the constructor; the debug overlay prints it as "TexturesCached"
     unsigned char useZBuffer : 1;             // +0x2d5 bit 3: set by the constructor; Z enable/write and the render target's z-buffer
     unsigned char field_0x2d5_bits : 4;
     unsigned char field_0x02d6[2];
     unsigned int field_0x2d8;                 // time stamps (0x00468880)
     unsigned int field_0x2dc;
-    float field_0x2e0;
+    float replaySpeed;                        // +0x2e0: 1.0 normal; the replay dialog sets 2/8 for TogFF/TogFFF, 0 reversing, 30 for ButEnd; scales replay time
     float field_0x2e4;
     float field_0x2e8;
     float field_0x2ec;

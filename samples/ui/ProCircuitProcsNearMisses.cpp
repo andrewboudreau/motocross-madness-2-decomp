@@ -65,46 +65,46 @@ void PCLastRaceDlg::PayOutRace()
         total += circuit->placePct[i];
     for (i = 0; i < circuit->racerCount; i++)
         shares[i] = circuit->placePct[i] / total;
-    circuit->field_0x454 += fee;
+    circuit->feesPaid += fee;
 
     int paid = 0;
     for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
         UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_TrackGame->eventManager->results)[j];
         UnknownProCircuitRacer* racer = &circuit->racers[result->racer];
-        racer->field_0x00.field_0x0c = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
-        racer->field_0x00.field_0x08 = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);
-        racer->field_0x00.field_0x14 = (int)__min(purse * circuit->stuntCapPct, result->stunts * 400.0f);
-        racer->field_0x00.field_0x04 = (int)ceil(purse * shares[result->position - 1]);
-        racer->field_0x00.field_0x00 = result->points;
-        paid += racer->field_0x00.field_0x04;
-        racer->money += racer->field_0x00.field_0x14 - racer->field_0x00.field_0x0c - racer->field_0x00.field_0x08 - fee +
-                             racer->field_0x00.field_0x04;
-        racer->field_0x18.field_0x0c += racer->field_0x00.field_0x0c;
-        racer->field_0x18.field_0x08 += racer->field_0x00.field_0x08;
-        racer->field_0x18.field_0x14 += racer->field_0x00.field_0x14;
-        racer->field_0x18.field_0x04 += racer->field_0x00.field_0x04;
-        racer->field_0x18.field_0x00 += racer->field_0x00.field_0x00;
+        racer->raceStats.medicalCost = (int)__min(purse * circuit->medicalCapPct, result->medical * 250.0f);
+        racer->raceStats.repairCost = (int)__min(purse * circuit->repairCapPct, result->repairs * 500.0f);
+        racer->raceStats.stuntWinnings = (int)__min(purse * circuit->stuntCapPct, result->stunts * 400.0f);
+        racer->raceStats.purseWinnings = (int)ceil(purse * shares[result->position - 1]);
+        racer->raceStats.points = result->points;
+        paid += racer->raceStats.purseWinnings;
+        racer->money += racer->raceStats.stuntWinnings - racer->raceStats.medicalCost - racer->raceStats.repairCost - fee +
+                             racer->raceStats.purseWinnings;
+        racer->totalStats.medicalCost += racer->raceStats.medicalCost;
+        racer->totalStats.repairCost += racer->raceStats.repairCost;
+        racer->totalStats.stuntWinnings += racer->raceStats.stuntWinnings;
+        racer->totalStats.purseWinnings += racer->raceStats.purseWinnings;
+        racer->totalStats.points += racer->raceStats.points;
     }
 
     UnknownProCircuitRank order[11];
     for (i = 0; i < circuit->racerCount; i++) {
-        order[i].points = circuit->racers[i].field_0x00.field_0x00;
+        order[i].points = circuit->racers[i].raceStats.points;
         order[i].racer = i;
     }
     qsort(order, circuit->racerCount, sizeof(UnknownProCircuitRank), CompareRankPoints);
     for (i = 0; i < circuit->racerCount; i++)
-        circuit->racers[order[i].racer].field_0x00.field_0x10 = i + 1;
+        circuit->racers[order[i].racer].raceStats.rank = i + 1;
     int rest = purse - paid;
-    circuit->racers[order[0].racer].field_0x00.field_0x04 += rest;
-    circuit->racers[order[0].racer].field_0x18.field_0x04 += rest;
+    circuit->racers[order[0].racer].raceStats.purseWinnings += rest;
+    circuit->racers[order[0].racer].totalStats.purseWinnings += rest;
     circuit->racers[order[0].racer].money += rest;
     for (i = 0; i < circuit->racerCount; i++) {
-        order[i].points = circuit->racers[i].field_0x18.field_0x00;
+        order[i].points = circuit->racers[i].totalStats.points;
         order[i].racer = i;
     }
     qsort(order, circuit->racerCount, sizeof(UnknownProCircuitRank), CompareRankPoints);
     for (i = 0; i < circuit->racerCount; i++)
-        circuit->racers[order[i].racer].field_0x18.field_0x10 = i + 1;
+        circuit->racers[order[i].racer].totalStats.rank = i + 1;
 }
 
 // 0x004d8fc0
@@ -146,7 +146,7 @@ void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("ButAccept", event->controlName) == 0) {
             circuit->racers[0].money += cashShortfall;
-            circuit->racers[0].field_0x34 += cashShortfall;
+            circuit->racers[0].debts += cashShortfall;
             g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             PCCentralDlg* dialog = new(__FILE__, 1551) PCCentralDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
@@ -168,7 +168,7 @@ void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        int debt = circuit->racers[0].field_0x34;
+        int debt = circuit->racers[0].debts;
         int fee = circuit->entryFees[circuit->series];
         int cash = circuit->racers[0].money;
         playerCash = cash;
@@ -209,8 +209,8 @@ void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("ButAccept", event->controlName) == 0) {
-            circuit->racers[0].money += loanAmount - circuit->racers[0].field_0x34;
-            circuit->racers[0].field_0x34 = 0;
+            circuit->racers[0].money += loanAmount - circuit->racers[0].debts;
+            circuit->racers[0].debts = 0;
             g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
@@ -275,9 +275,9 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
                 *extension = 0;
             strcpy(g_TrackGame->mode.raceSettings.trackName, text);
             if (circuit->series == 1 || circuit->series == 5)
-                g_TrackGame->mode.raceSettings.field_0x34 = 1;
+                g_TrackGame->mode.raceSettings.trackNumber = 1;
             else
-                g_TrackGame->mode.raceSettings.field_0x34 = 0;
+                g_TrackGame->mode.raceSettings.trackNumber = 0;
             g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
             UnknownVirtualSlot26();

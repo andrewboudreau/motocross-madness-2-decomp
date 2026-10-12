@@ -165,7 +165,7 @@ int TextureMapManager::UnknownVirtualSlot13() {
 
 // 0x00510e90
 int TextureMapManager::UnknownVirtualSlot15() {
-    if (g_TrackGame->field_0x2d4_bit2) {
+    if (g_TrackGame->testKey) {
         for (int i = 0; i < field_0x44.m_count; i++) {
             ManagedTextureGroup* cache = field_0x44.Get(i);
             if (cache)
@@ -183,7 +183,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
     int handled = 0;
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
-    if (g_TrackGame->field_0x2d4_bit2 && debugGroup) {
+    if (g_TrackGame->testKey && debugGroup) {
         handled = 1;
         if (TestInputEvent(0x14, 0, event, 0x80)) {
             if (++debugKeyMode > 2)

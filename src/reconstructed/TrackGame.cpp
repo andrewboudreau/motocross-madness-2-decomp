@@ -106,7 +106,7 @@ TrackGame::TrackGame() {
     uiInteractionBlocked = 0;
     cdAudio = 0;
     controlMapping = 0;
-    field_0x33fc = 0;
+    controlSetup = 0;
     highScores = 0;
     languageModule = LoadLibraryA("lang.dll");
     if (languageModule)
@@ -127,8 +127,8 @@ TrackGame::TrackGame() {
         GetRegistryInt("IntervalBetweenFullNetPacketsMS", 2000) * 0.001f;
     shortNetPacketIntervalSeconds =
         GetRegistryInt("IntervalBetweenShortNetPacketsMS", 67) * 0.001f;
-    field_0x3424 = 0;
-    field_0x2e0 = 1.0f;
+    networkAiRacerCount = 0;
+    replaySpeed = 1.0f;
     playingReplay = 0;
     useReplayTape = 0;
     proCircuit = 0;
@@ -153,7 +153,7 @@ TrackGame::~TrackGame() {
     delete cdAudio;
     delete profileDirectory;
     delete controlMapping;
-    delete field_0x33fc;
+    delete controlSetup;
     delete highScores;
     if (languageModule) {
         FreeLibrary(languageModule);
@@ -280,8 +280,8 @@ int TrackGame::UnknownVirtualSlot4() {
     if (!controlMapping)
         return 0;
     controlInterface->SetMapping(controlMapping);
-    field_0x33fc = new(__FILE__, 360) UnknownTrackGameObject33fc;
-    if (!field_0x33fc)
+    controlSetup = new(__FILE__, 360) UnknownTrackGameObject33fc;
+    if (!controlSetup)
         return 0;
     g_MemTagStack->Push("UI");
     ui = new(__FILE__, 379) KrustyUI(1);
@@ -310,11 +310,11 @@ int TrackGame::UnknownVirtualSlot4() {
             ui->BuildGarageScene(-1);
             char name[16];
             network->GetPlayerName(network->localPlayer, name);
-            if (strcmp(mode.field_0x00, name)) {
+            if (strcmp(mode.profileName, name)) {
                 int count = strlen(name);
                 int length = count > 15 ? 15 : count;
-                strncpy(mode.field_0x00, name, length);
-                mode.field_0x00[length] = 0;
+                strncpy(mode.profileName, name, length);
+                mode.profileName[length] = 0;
                 if (!mode.LoadProfile())
                     ui->OpenMenu(kMenuUserNameBbb);
             }
@@ -372,7 +372,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         int previous = paused;
         if (PCGame::UnknownVirtualSlot14(event, entry))
             return 0;
-        if (field_0x2d4_bit0 && paused != previous) {
+        if (allowFreezeCamera && paused != previous) {
             if (paused)
                 childRoot->DisableByClassName("RaceSound");
             else
@@ -494,6 +494,6 @@ int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
 // 0x00521cd0
 int TrackGame::InProCircuitCareer() {
     if (proCircuit)
-        return ui->field_0x4a8 == 0;
+        return ui->playingDemo == 0;
     return 0;
 }

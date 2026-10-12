@@ -71,7 +71,7 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
         exit(0);
 
     setlocale(LC_ALL, "");
-    GetCurrentDirectory(MAX_PATH, g_TrackGame->field_0x1cc);
+    GetCurrentDirectory(MAX_PATH, g_TrackGame->workingDirectory);
     if (!g_TrackGame->UnknownVirtualSlot1())
         exit(0);
 

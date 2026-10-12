@@ -67,7 +67,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     font[count] = 0;
     gui = new(__FILE__, 121) UnknownKrustyUIGui(1);
     if (!AppendSibling(gui->SetUp(
-            renderContext, g_TrackGame->display->field_0x64, g_TrackGame->textureManager, 0,
+            renderContext, g_TrackGame->display->palette, g_TrackGame->textureManager, 0,
             0, 0, "Arial", 15, "ui\\cursor.tga", GuiProgressCallback, -1))) {
         Release();
         return 0;
@@ -78,21 +78,21 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
             gui->toolTipBold = atoi(text);
     }
     if (scale != 0.0f)
-        gui->field_0x3d0 = scale;
+        gui->fontSizeOffset = scale;
     gui->CreateBackground();
     gui->SetDialogDirectory("ui");
     gui->SetWaitCursorImage("ui\\wait.tga");
     gui->GetUser(0)->ForgetDevices();
-    gui->GetUser(0)->AcceptDevice(gui->field_0x30c);
+    gui->GetUser(0)->AcceptDevice(gui->keyboardDevice);
     gui->ShowCursors(0);
     g_UnknownResourceManager572b44->AddArchive("ui\\uires.res", 0);
     g_TrackGame->mode.LoadBonusTrackNames();
     g_TrackGame->GetRegistryString("MRUProfile", g_UnknownString577738,
-                                                 g_TrackGame->mode.field_0x00, &size);
+                                                 g_TrackGame->mode.profileName, &size);
     g_TrackGame->mode.LoadProfile();
-    gui->field_0x0ec = g_TrackGame->mode.field_0x6c8;
-    if (!g_TrackGame->mode.field_0x6d4)
-        gui->GetUser(0)->userToolTip->field_0x5c = 0;
+    gui->uiAnimations = g_TrackGame->mode.uiAnimations;
+    if (!g_TrackGame->mode.toolTips)
+        gui->GetUser(0)->userToolTip->enabled = 0;
     if (g_TrackGame->controlInterface->activeJoystick)
         ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)
             ->UnknownMethod4c3ae0(g_TrackGame->GetRegistryFlag("JoystickFilter", 0));
@@ -101,8 +101,8 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     manufacturers = 0;
     LoadBikesAndRiders();
     LoadGarageTables();
-    gui->field_0x34c =
-        (g_TrackGame->mode.field_0xa24 ? (g_TrackGame->mode.field_0xa3c - 100) * 25 : -10000) -
+    gui->soundVolume =
+        (g_TrackGame->mode.uiSounds ? (g_TrackGame->mode.uiVolume - 100) * 25 : -10000) -
         200;
     if ((!g_TrackGame->network || !g_TrackGame->network->lobbyConnected) && showIntro)
         gui->ShowDialog(new(__FILE__, 201) Intro1Dlg, 0, 2, 0, 0, 0, 0, 1);

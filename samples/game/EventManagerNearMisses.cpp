@@ -64,7 +64,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     if (g_TrackGame->ui->allowIme)
         g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
-    g_TrackGame->field_0x3438 = 0;
+    g_TrackGame->podiumFinished = 0;
     g_TrackGame->uiBlockedSeconds = 0;
     if (!g_TrackGame->mode.field_0xa20)
         g_TrackGame->StopCDAudio();
@@ -74,8 +74,8 @@ void EventManager::LeaveRaceForMenu(int menu) {
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
     g_TrackGame->ui->gui->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
-    layer->userToolTip->field_0x5c = g_TrackGame->mode.field_0x6d4;
-    if (!g_TrackGame->playingReplay && !g_TrackGame->ui->field_0x4a8 &&
+    layer->userToolTip->enabled = g_TrackGame->mode.toolTips;
+    if (!g_TrackGame->playingReplay && !g_TrackGame->ui->playingDemo &&
         g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();
     g_TrackGame->ui->gui->ShowCursors(1);
@@ -217,7 +217,7 @@ int EventManager::CreatePodiumScene() {
     int iterator = 0;
     int ok;
     if (g_TrackGame->mode.raceSettings.raceMode == 2)
-        ok = racesRun > g_TrackGame->mode.raceSettings.field_0x0c;
+        ok = racesRun > g_TrackGame->mode.raceSettings.races;
     else
         ok = 1;
     if (circuit) {
@@ -237,7 +237,7 @@ int EventManager::CreatePodiumScene() {
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
     ((RenderTarget*)renderContext)->SetCamera(podiumCamera);
-    podiumCamera->InsertBefore(view->field_0x50, -1);
+    podiumCamera->InsertBefore(view->raceCamera, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
     if (!((int)rows & 1))

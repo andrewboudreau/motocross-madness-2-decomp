@@ -46,27 +46,27 @@ static inline TrackVec3& operator+=(TrackVec3& a, const TrackVec3& b)
 UnknownTokenizer::UnknownTokenizer(char* text)
 {
     if (strlen(text) != 0)
-        field_0x04 = text;
+        rest = text;
     else
-        field_0x04 = 0;
+        rest = 0;
 }
 
 // 0x00515df0: returns the next token and skips the delimiters after it.
 char* UnknownTokenizer::NextToken(const char* delimiters)
 {
-    if (!field_0x04)
+    if (!rest)
         return 0;
-    field_0x00 = field_0x04;
-    field_0x04 = strpbrk(field_0x04, delimiters);
-    if (field_0x04) {
-        *field_0x04++ = 0;
-        if (*field_0x04 == 0)
-            field_0x04 = 0;
+    token = rest;
+    rest = strpbrk(rest, delimiters);
+    if (rest) {
+        *rest++ = 0;
+        if (*rest == 0)
+            rest = 0;
         else
-            while (strchr(delimiters, *field_0x04))
-                field_0x04++;
+            while (strchr(delimiters, *rest))
+                rest++;
     }
-    return field_0x00;
+    return token;
 }
 
 // 0x00515e70: frees a node array (the loader's failure path).

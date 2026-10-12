@@ -47,15 +47,15 @@ VideoCard::VideoCard() {
     field_0x68 = 0;
     lastFrameTime = 0x7fffffff;
     shortestFrameTime = 0x7fffffff;
-    field_0x64 = 0;
+    palette = 0;
     currentDisplayMode = -1;
     field_0x88 = 0;
     frameBufferCount = 0;
     displayModeCapacity = 0;
     displayModes = 0;
     lastPresentTime = 0;
-    field_0x58 = 0;
-    field_0x5c = 0;
+    textureMemory = 0;
+    nonLocalTextureMemory = 0;
     memset(field_0x90, 0, sizeof(field_0x90));
     field_0x8c = 0;
     use8BitTextures = 0;

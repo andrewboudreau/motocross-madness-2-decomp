@@ -29,7 +29,7 @@
   "?LoadShape@CollisionObject@@QAEXPAVD3DIMSoultreeObject@@PBD@Z": "0x00432800",
   "?UnknownFunction435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?SetOwner@CollisionObject@@QAEXPAVD3DIMSoultreeObject@@H@Z": "0x004394d0",
-  "?UnknownFunction444d80@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
+  "?AddModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?CopyCurrentName@MemTagStack@@QAEXPAD@Z": "0x004a2da0",
   "?OpenArchiveFile@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",

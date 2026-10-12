@@ -269,7 +269,7 @@ public:
     UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
     void UnknownFunction4eafd0(int index);
     void SetDetailLevel(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
-    void UnknownFunction4eb000(float time);
+    void RestartAllEntries(float time);       // 0x004eb000: RestartEntry(i, time, 1, 0) for every entry
     int RestartEntry(int index, float time, int force, int motion);
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1
     // flag list from `block` (default: the scene file, parameters). Parameter names provisional.

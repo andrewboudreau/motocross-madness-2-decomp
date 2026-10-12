@@ -111,11 +111,12 @@ public:
     // +0xdc..+0xf8c (0xeb0 bytes) is the block 0x0049bf10 and 0x0049c010 hand
     // to the recorder.
     char magic[8];                            // +0x0dc "MCMVCR" (0x0049bf10, mode 0)
-    char field_0x0e4[8];                      // the string at 0x0056da64
+    char version[8];                          // +0x0e4 version "2.0" plus 0x1a (the string at 0x0056da64)
     char description[0x20];                   // +0x0ec description (0x0049c010)
     float timePlayed;                         // +0x10c the time played (0x00421d50)
-    // TrackGame+0x2d70's 0x1ec bytes (copied by 0x0049bf10, mode 0).
-    unsigned char field_0x110[0x25c - 0x110];
+    // +0x110 TrackGame+0x2d70's 0x1ec bytes, the race settings from
+    // raceMode on (copied by 0x0049bf10, mode 0).
+    unsigned char raceSettings[0x25c - 0x110];
     UnknownKrustyVcrRecord field_0x25c[8];
     unsigned char field_0x29c[0x2fc - 0x29c];
     int racerCount;                           // +0x2fc racers recorded (the loader)
@@ -277,11 +278,11 @@ struct UnknownBikeRaceNetPlayer {
     unsigned char field_0x06[2];
 };
 
-// The object at a racer's +0x740: +0x18c set keeps the racer's model shown
-// when the camera follows it.
+// The object at a racer's +0x740 (its view, BikeRace): +0x18c set keeps the
+// racer's model at full detail when the camera follows another one.
 struct UnknownBikeRaceRacerInfo {
     unsigned char field_0x000[0x18c];
-    char field_0x18c;
+    char forceHighLod;                        // +0x18c BikeRace's "ForceHighLOD"
 };
 
 // A racer as BikeRace's own code reaches it (its primary vtable at +0 and,
@@ -425,8 +426,8 @@ public:
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
     int outOfRace;                            // +0x4a0 out of the race (0x0041f1d0 skips it)
     unsigned char field_0x4a4[0x5bc - 0x4a4];
-    int field_0x5bc;                          // TrackGame+0x1004 copy (slot 23 key 0x22)
-    int field_0x5c0;                          // TrackGame+0x1008 copy (slot 23 key 0x30)
+    int gasGyro;                              // +0x5bc TrackGameMode gasGyro copy (slot 23 key 0x22)
+    int brakeGyro;                            // +0x5c0 TrackGameMode brakeGyro copy (slot 23 key 0x30)
     UnknownBikeRaceRider* riderCharacter;     // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
     CarProceduralCollision* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
@@ -440,7 +441,7 @@ public:
     char engineKind;                          // +0x737 engine kind
     int engineSize;                           // +0x738 engine size
     int plateNumber;                          // +0x73c plate number (the setup paints it)
-    UnknownBikeRaceRacerInfo* field_0x740;
+    UnknownBikeRaceRacerInfo* bikeView;       // +0x740 the racer's view (RaceView.h)
     UnknownEventRacerPart* statusNode;        // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x74c - 0x748];
     float lastLapTime;                        // +0x74c (UnknownEventRacer's last lap time)
@@ -454,8 +455,8 @@ public:
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char finished;                            // +0x7a4 finished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
-    int field_0x7b8;
-    int field_0x7bc;
+    int lapGate;                              // +0x7b8 RaceView.h's racer lapGate
+    int nextLapGate;                          // +0x7bc
     unsigned char field_0x7c0[0x11b8 - 0x7c0];
     unsigned char field_0x11b8;
     unsigned char field_0x11b9[0x11bc - 0x11b9];
@@ -545,7 +546,7 @@ struct UnknownBikeRaceNode {
     Vector3 halfExtents;                      // +0x18 half extents (across the direction for gates)
     float field_0x24;
     int field_0x28;
-    TrackPos field_0x2c;
+    TrackPos trackPos;                        // +0x2c position along the track (DistanceAlong/PlaceNear operand, 0x004e6a50)
     UnknownBikeRaceNode* nextGate;            // +0x38 next gate
 };
 
@@ -572,7 +573,7 @@ struct UnknownBikeRaceNodeOwner {
     UnknownBikeRaceNodeEntry* field_0x420[1];
 };
 
-// The object at +0x210 of BikeRace+0x6c's object: a second base at +0xc
+// The object at +0x210 of BikeRace+0x6c's object (the 30SecMan): a second base at +0xc
 // holds the GameObject part that 0x00421050 releases (slot 2).
 class UnknownBikeRaceColliderBase {
 public:
@@ -584,7 +585,7 @@ public:
 class UnknownBikeRaceCollider : public UnknownBikeRaceColliderBase, public GameObject {
 };
 
-// The object at BikeRace+0x6c: like a racer, it reaches GameObject through
+// The object at BikeRace+0x64/+0x6c (StartGate.slb, 30SecMan.slt): like a racer, it reaches GameObject through
 // a vbptr at +4 (0x00421050 calls slot 5 there).
 struct UnknownBikeRaceView6c : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
@@ -638,37 +639,37 @@ struct UnknownBikeRaceCameraView {
     unsigned char followingRacer;             // +0x390 following a racer
     unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
     unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
-    UnknownBikeRaceRacer* field_0x394;
+    UnknownBikeRaceRacer* vehicle;            // +0x394 VehicleCamera's followed vehicle
     unsigned char field_0x398[0x3b0 - 0x398];
-    UnknownBikeRaceRacer* field_0x3b0;
-    UnknownBikeRaceRacer* field_0x3b4;
+    UnknownBikeRaceRacer* followedBike;       // +0x3b0 BikeCamera's bike (RaceSound.h)
+    UnknownBikeRaceRacer* followedRacer;      // +0x3b4 KrustyBikeCamera's racer (RaceSound.h)
 
     // Inline (three times in 0x0041eb20): follows `racer`, showing the
     // previous racer's model again and hiding the new one's.
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
-        if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
-            field_0x3b0->modelNode->SetLowestLod(1);
-            field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
-            if (field_0x3b0->modelNode->currentDetailLevel == 0) {
-                field_0x3b0->modelNode->SetLod(1);
+        if (followedBike != 0 && !racer->bikeView->forceHighLod) {
+            followedBike->modelNode->SetLowestLod(1);
+            followedBike->riderCharacter->modelNode->SetLowestLod(1);
+            if (followedBike->modelNode->currentDetailLevel == 0) {
+                followedBike->modelNode->SetLod(1);
             }
-            if (field_0x3b0->riderCharacter->modelNode->currentDetailLevel == 0) {
-                field_0x3b0->riderCharacter->modelNode->SetLod(1);
+            if (followedBike->riderCharacter->modelNode->currentDetailLevel == 0) {
+                followedBike->riderCharacter->modelNode->SetLod(1);
             }
         }
-        field_0x394 = racer;
+        vehicle = racer;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = true;
         shadowCaster = 0;
         field_0x384 = 0;
         field_0x388 = 0;
-        field_0x3b0 = racer;
+        followedBike = racer;
         field_0x274 = 0;
-        field_0x3b4 = racer;
-        if (!racer->field_0x740->field_0x18c) {
+        followedRacer = racer;
+        if (!racer->bikeView->forceHighLod) {
             racer->modelNode->SetLowestLod(0);
-            field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
+            followedBike->riderCharacter->modelNode->SetLowestLod(0);
         }
         field_0x274 = 0;
     }
@@ -739,8 +740,8 @@ struct UnknownBikeRacePickObject {
 // The replay recorder's record kinds -1 (a tick) carry the time played and
 // the tick count.
 struct UnknownBikeRaceVcrTick {
-    float field_0x00;
-    int field_0x04;
+    float time;                               // +0x00 recorded length at the tick
+    int tickCount;                            // +0x04 ticks recorded so far
 };
 
 // Record kind 0x11: the ghost's state (0x3c bytes). Kind 0x10's deltas
@@ -852,7 +853,7 @@ public:
     // 0x0041f5e0: keys: chat, camera targets, debug toggles and the debug
     // object picker.
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
-    // 0x00423880: control 0x80 (any modifier) toggles +0x3fd.
+    // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     UnknownBikeRaceCameraView* UnknownFunctionCameraView() {
@@ -860,15 +861,15 @@ public:
     }
 
     // Inline (bikerace.h line 0xd3; the destructor 0x0041cf30): frees the
-    // +0xc8 nodes.
+    // +0xc8 gate list.
     void UnknownFunctionFreeNodes() {
-        if (field_0x0c8 != 0) {
-            while (field_0x0c8 != 0) {
-                UnknownBikeRaceNode* node = field_0x0c8;
-                field_0x0c8 = node->nextGate;
+        if (gateList != 0) {
+            while (gateList != 0) {
+                UnknownBikeRaceNode* node = gateList;
+                gateList = node->nextGate;
                 DebugFree(node, __FILE__, 0xd3);
             }
-            field_0x0c8 = 0;
+            gateList = 0;
         }
     }
 
@@ -923,90 +924,90 @@ public:
     void ClearAiRacerParts(int index);    // 0x00423040: zeroes an AI racer's parts
     void SetDetailLevel(int level);    // 0x00423790: detail level
 
-    unsigned char field_0x034;
+    unsigned char debugDraw;                  // +0x34 toggled by control 0x1f (modifier 0x80): slot 14 draws the track, probes and debug lines
     unsigned char field_0x035[0x38 - 0x35];
     UnknownBikeRaceRacer* localRacer;        // its own racer
     UnknownBikeRaceRacer** racerSlots;       // all racers, by racer slot
     UnknownBikeRaceRacer** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
-    UnknownBikeRaceViews* field_0x044;
+    UnknownBikeRaceViews* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
     UnknownBikeRaceProjector* field_0x04c;
     KrustyBikeCamera* raceCamera;            // the race camera
     int field_0x054;
     Scene* raceScene;
     UnknownBikeRaceShadow* field_0x05c;
-    GameObject* field_0x060;
-    UnknownBikeRaceView6c* field_0x064;       // reset by a restart (slot 5)
-    int field_0x068;
-    UnknownBikeRaceView6c* field_0x06c;
-    int field_0x070;
+    GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
+    UnknownBikeRaceView6c* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
+    int startGateEntry;                       // +0x68 its scene animation entry index
+    UnknownBikeRaceView6c* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
+    int thirtySecondManEntry;                 // +0x70 its scene animation entry index
     UnknownBikeRaceCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
     int field_0x078;
     float field_0x07c[11];
     int lodDebugPage;                         // +0x0a8
-    int field_0x0ac;
-    unsigned char field_0x0b0;
+    int targetIndex;                          // +0xac caster or scene entry index the camera targets
+    unsigned char targetKind;                 // +0xb0 camera target: 0xff a racer, 0 a static caster, 1 a scene entry
     unsigned char field_0x0b1[0xb4 - 0xb1];
     ObjectPicker* objectPicker;                // debug object picker
     int field_0x0b8;
-    int field_0x0bc;
-    int field_0x0c0;
+    int scoreBoard;                           // +0xbc score board: BonusObjectManager::SetupCounter's object
+    int digitCounter;                         // +0xc0 NumberObjectManager::SetupDigits's object
     UnknownEventRacerPart* field_0x0c4;
-    UnknownBikeRaceNode* field_0x0c8;
+    UnknownBikeRaceNode* gateList;            // +0xc8 gate nodes linked through nextGate
     UnknownBikeRaceNode startProbe;          // start probe
     UnknownBikeRaceNode finishProbe;          // finish probe
-    int field_0x144;
-    int field_0x148;
-    int field_0x14c;
-    int field_0x150;
-    int field_0x154;
+    int hasStartProbe;                        // +0x144 LoadTrack found the start probe (debug draw)
+    int hasFinishProbe;                       // +0x148 LoadTrack found the finish probe (debug draw)
+    int targetRacer;                          // +0x14c racer the camera cycles to (0 local, then the AI racers)
+    int targetEntry;                          // +0x150 scene animation entry the camera cycles to
+    int targetCaster;                         // +0x154 static model caster the camera cycles to
     int racerCount;                          // racer count
-    float startCountdown;                     // +0x15c: seconds until the start (8.2 with the +0x6c gate, else 5.2)
-    float field_0x160;                        // seconds until +0x64 is shown (slot 10)
+    float startCountdown;                     // +0x15c: seconds until the start (8.2 with the 30SecMan, else 5.2)
+    float startGateTimer;                     // +0x160 set to 5 at the start; at 0 the start gate entry restarts (slot 10)
     Vector3 gridFirstSlot;                      // start grid: first slot (0x004210f0)
     Vector3 gridSlotStep;                      // start grid: step between slots
     Vector3 gridDirection;                      // start grid: direction
-    bool field_0x188;
+    bool gridReady;                           // +0x188 WriteRelativePositions computed the start grid (cleared by a restart)
     unsigned char field_0x189;
     bool isRacing;                         // racing
-    bool field_0x18b;
+    bool restartPending;                      // +0x18b set by RestartRace; stops the race update and clears isRacing next frame
     unsigned char forceHighLod;                // "ForceHighLOD"
     unsigned char trackLoaded;                // the track file loaded (the setup)
-    bool field_0x18e;
-    bool field_0x18f;
-    bool field_0x190;
+    bool networkStartPending;                   // +0x18e set when playerCount > 1; cleared when the per-racer network check passes and the countdown resets
+    bool startStampSent;                      // +0x18f the 0x84 start time stamp was sent
+    bool chatOpen;                            // +0x190 the chat input line is open and takes keys
     unsigned char field_0x191[0x194 - 0x191];
-    float field_0x194;
+    float chatHideTimer;                      // +0x194 seconds until the chat input line hides (10 after a message)
     int field_0x198;
     UnknownBikeRaceOverlay19c* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
-    UnknownVcrFile* field_0x1a8;
-    float field_0x1ac;                        // the record slot 10 queues (+0x1ac..+0x1b7)
-    int field_0x1b0;
+    UnknownVcrFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open
+    float recordTickTime;                     // +0x1ac the tick record slot 10 queues (+0x1ac..+0x1b7): replay length
+    int recordTickCount;                      // +0x1b0 ticks queued since the replay restarted
     int field_0x1b4;
     float replayTime;                        // replay time
     float replayLength;                        // replay length
     float recorderTickElapsed;                        // seconds since the last recorder tick (slot 10)
     float replaySeekTarget;                        // replay seek target, -1 when none
-    float field_0x1c8;
+    float bestGhostLength;                    // +0x1c8 best ghost lap length (FLT_MAX until one is recorded); seeds the racer's fastestLap
     float ghostTimeLimit;                        // "VCRGhostTimeLimit"
     float recordTimeLimit;                        // "VCRRecordTimeLimit"
-    int field_0x1d4;
-    int field_0x1d8;
+    int replayFrames;                        // +0x1d4 frames played into replayTime (advanced by the replay speed)
+    int replayLengthFrames;                  // +0x1d8 frames recorded into replayLength
     int replayMode;                          // replay mode
-    int field_0x1e0;
+    int appliedReplayMode;                   // +0x1e0 replay mode whose sound state was last applied
     int field_0x1e4;
-    int field_0x1e8;
-    int field_0x1ec;
+    int ghostLap;                            // +0x1e8 lap count when the ghost lap restarted (raceMode 4); ButLeft asks to save the ghost lap when > 0
+    int savedCameraState;                    // +0x1ec camera state saved while a replay plays
     char ghostFilePlayed[0x104];                  // ghost file played
     char ghostFileRecorded[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
     bool replayPaused;                         // +0x3f8: ToggleReplayPause
     bool replayStepFrame;                      // +0x3f9: ButFrame: advance one frame
-    bool field_0x3fa;
+    bool recorderTickDue;                     // +0x3fa a short record packet is due this frame
     bool field_0x3fb;
     unsigned char isRecording;                // recording (0x00420650)
-    unsigned char field_0x3fd;                // toggled by slot 22
+    unsigned char drawChildren;               // +0x3fd 1 by the constructor, toggled by control 6 (slot 22): slot 14 runs GameObject's draw only when set
 };
 
 // The global at 0x00689f18 (D3DIMSoultreeModifier.cpp's code reads it):

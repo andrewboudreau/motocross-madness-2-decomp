@@ -417,7 +417,7 @@ void Scene::UnknownFunction4eafd0(int index)
 }
 
 // 0x004eb000
-void Scene::UnknownFunction4eb000(float time)
+void Scene::RestartAllEntries(float time)
 {
     if (animationTable) {
         for (int i = 0; i < animationTable->entryCount; i++)
@@ -1365,7 +1365,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                 entry->archive->Read(&material->materialAlpha, 4, 1);
                 entry->archive->Read(&material->textureSpeed, 4, 1);
                 entry->archive->Read(&material->mappingType, 2, 1);
-                entry->archive->Read(&material->field_0xcc, 4, 1);
+                entry->archive->Read(&material->texelRatio, 4, 1);
                 position = entry->archive->Tell();
                 mode = entry->archive->GetTextMode();
                 if (material->hasTextureName) {

@@ -13,28 +13,32 @@ class UnknownParameterBlock;
 #pragma pack(push, 1)
 
 // Six counters a racer record keeps twice (both cleared by 0x004d3b00).
+// ProCircuitProcs.cpp shows them in the standings (LstRank, LstPoints,
+// LstWinnings = purse + stunts, LstExpenses = repairs + medical + fees) and
+// the status page (TxtRepairs, TxtMedical); the race payout (0x004d8c40)
+// fills the race block and adds it into the totals.
 struct UnknownProCircuitStats {
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
-    int field_0x10;
-    int field_0x14;
+    int points;                               // +0x00 points (LstPoints, "Points")
+    int purseWinnings;                        // +0x04 share of the purse by finishing position
+    int repairCost;                           // +0x08 TxtRepairs
+    int medicalCost;                          // +0x0c TxtMedical
+    int rank;                                 // +0x10 standing by points (LstRank, "%d / %d" of racerCount)
+    int stuntWinnings;                        // +0x14 stunts * 400, capped by stuntCapPct of the purse
 };
 
 // One racer of the career (0x140 bytes; record 0 is the player).
 struct UnknownProCircuitRacer {
-    UnknownProCircuitStats field_0x00;
-    UnknownProCircuitStats field_0x18;        // +0x28 is compared with 1 and 3 when a series ends
+    UnknownProCircuitStats raceStats;         // +0x00 the last race
+    UnknownProCircuitStats totalStats;        // +0x18 career totals; rank compared with 1 and 3 when a series ends
     int money;                                // +0x30 money (starts at StartingCapital)
-    int field_0x34;
+    int debts;                                // +0x34 the "Debts" row (string 0x1453) of the advertising offer (0x004d9860); repaid with 10% at the series end
     char bikeModel[0x40];                     // +0x38 bike model name
     char bikeName[0x40];                      // +0x78 bike name
     char riderModel[0x40];                    // +0xb8 rider model name
     char racerName[0x20];                     // +0xf8 racer name
     char bikeDisplayName[0x20];               // +0x118 bike display name
     int engineSize;                           // +0x138 engine size
-    int field_0x13c;
+    int fourStroke;                           // +0x13c the bike's fourStroke ("BikeFourStroke_%02d")
 };
 
 // One PCSched.pb track (12 bytes; strings are DebugMalloc'd).
@@ -75,7 +79,7 @@ public:
     int bikeClassRule;                        // +0x4c bike class rule (1..3)
     int difficulty;                           // +0x50 StartCareer argument 2 (PCNewDlg "RadLODEasy"); copied to TrackGameMode+0x94
     char messageText[0x400];                  // +0x54 message text
-    int field_0x454;
+    int feesPaid;                             // +0x454 entry fees paid (TxtFees; the race payout adds each fee)
     int riderRow;                             // +0x458 chosen rider row (ProCircuitProcs.cpp)
     int bikeRow;                              // +0x45c chosen bike row
     int racerCount;                           // +0x460 racer count

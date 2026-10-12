@@ -26,7 +26,7 @@ static bool s_UnknownActive67c3f4;
 static Vector3 s_UnknownVector67c3e8;
 
 // 0x00497e20: picks the view by the global mode on first use. While the view
-// is available it drives FollowCamera slots 46 (once) and 47 from it;
+// has its network start pending it drives FollowCamera slots 46 (once) and 47 from it;
 // otherwise it leaves that mode, restoring the state, and runs FollowCamera
 // slot 10.
 int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
@@ -50,7 +50,7 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
                 break;
         }
     }
-    if (raceView->viewAvailable) {
+    if (raceView->networkStartPending) {
         Vector3 first;
         Vector3 second;
         if (!s_UnknownActive67c3f4) {

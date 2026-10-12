@@ -526,7 +526,7 @@ void UIControl::LeaveHover(int value) {
 // 0x00472670
 void UIControl::PlayControlSound(int index, int a) {
     if (sounds[index]) {
-        sounds[index]->SetVolume(ownerGui->field_0x34c, 0);
+        sounds[index]->SetVolume(ownerGui->soundVolume, 0);
         sounds[index]->PlayWithOptions(1, 0, 0);
     }
 }
@@ -1789,8 +1789,8 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     guiManager = 0;
     dialogResult = 0;
     dialogFont = 0;
-    field_0x108 = 0;
-    field_0x10c = 0;
+    dialogFontBold = 0;
+    dialogFontItalic = 0;
     dialogFontFace[0] = 0;
     screenWidth = 640;
     screenHeight = 480;
@@ -1855,7 +1855,7 @@ UIDialog::~UIDialog() {
         if ((field_0x144 & 4) && (field_0x144 & 0x10))
             guiManager->ReleaseBackgroundGrab();
     }
-    if (dialogBackground && !g_TrackGame->field_0x2d5_bit1)
+    if (dialogBackground && !g_TrackGame->shuttingDown)
         dialogBackground->MarkAllDirty();
     if (parentDialog) {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
@@ -1872,16 +1872,16 @@ UIDialog::~UIDialog() {
                 imageTable[i]->Release();
         }
     }
-    if (!g_TrackGame->field_0x2d5_bit1 && g_UnknownResourceManager572b44 && resourceArchive)
+    if (!g_TrackGame->shuttingDown && g_UnknownResourceManager572b44 && resourceArchive)
         g_UnknownResourceManager572b44->RemoveArchiveItems(resourceArchive);
     if ((ownsPalette && dialogPalette && !parentDialog) ||
         (dialogPalette && parentDialog && parentDialog->dialogPalette != dialogPalette))
         ((Palette8*)dialogPalette)->Release();
-    if (!g_TrackGame->field_0x2d5_bit1 && ownsBackground && parentBackground) {
+    if (!g_TrackGame->shuttingDown && ownsBackground && parentBackground) {
         dialogBackground->field_0x2c->Release();
         dialogBackground->SetImage(parentBackground);
     }
-    if (!g_TrackGame->field_0x2d5_bit1 && parentDialog && parentDialog->dialogBackground)
+    if (!g_TrackGame->shuttingDown && parentDialog && parentDialog->dialogBackground)
         parentDialog->dialogBackground->MarkAllDirty();
     int i = 0;
     UITimer* timer;
@@ -2060,7 +2060,7 @@ int UIDialog::UnknownVirtualSlot13() {
     } else if (screenGrab && !controlsPost3D) {
         if (dialogBackground)
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
-                                                       grabRegion, 1, &field_0x7f4c, 0);
+                                                       grabRegion, 1, &grabCopyFrames, 0);
         else
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
@@ -2082,7 +2082,7 @@ int UIDialog::UnknownVirtualSlot15() {
     } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
-                                                       grabRegion, 1, &field_0x7f4c, 0);
+                                                       grabRegion, 1, &grabCopyFrames, 0);
         else
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
@@ -2212,7 +2212,7 @@ void UIDialog::ReleaseBackgroundGrab() {
     }
     screenGrab = 0;
     grabRegion = -1;
-    field_0x7f4c = 0;
+    grabCopyFrames = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -2301,7 +2301,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
 // 0x00470450: two independent guiUser tests (VC6 threads the second one);
 // nesting them inside one test keeps the focus control in a register.
 UIControl::~UIControl() {
-    if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
+    if (ownerDialog && !g_TrackGame->shuttingDown) {
         pendingRelease = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
@@ -3661,7 +3661,7 @@ int UIControl::AnimInStep() {
         fxAnimIn->Rewind();
         transitionFrame = 1;
         if (fxSoundIn) {
-            fxSoundIn->SetVolume(ownerGui->field_0x34c, 0);
+            fxSoundIn->SetVolume(ownerGui->soundVolume, 0);
             fxSoundIn->PlayWithOptions(1, 0, 0);
         }
     }
@@ -3687,7 +3687,7 @@ int UIControl::AnimOutStep() {
         }
         fxAnimOut->Rewind();
         if (fxSoundOut) {
-            fxSoundOut->SetVolume(ownerGui->field_0x34c, 0);
+            fxSoundOut->SetVolume(ownerGui->soundVolume, 0);
             fxSoundOut->PlayWithOptions(1, 0, 0);
         }
     }
@@ -3714,7 +3714,7 @@ int UIControl::SlideLeftStep() {
         slideX = (float)(left - bounds[2] - 1);
         slideStepX = ((float)left - slideX) / g_UnknownGlobal65b610;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -3755,7 +3755,7 @@ int UIControl::SlideTopStep() {
         slideY = (float)(top - bounds[3]);
         slideStepY = ((float)top - slideY) / g_UnknownGlobal65b614;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -3795,7 +3795,7 @@ int UIControl::SlideRightStep() {
         slideX = (float)ownerDialog->screenWidth;
         slideStepX = ((float)bounds[0] - slideX) / g_UnknownGlobal65b618;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -3835,7 +3835,7 @@ int UIControl::SlideBottomStep() {
         slideY = (float)ownerDialog->screenHeight;
         slideStepY = ((float)bounds[1] - slideY) / g_UnknownGlobal65b61c;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -4045,8 +4045,8 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     strcpy(dialogFontFace, font);
     dialogFont = CreateFontA(dialogFontHeight, 0, 0, 0, FW_MEDIUM, 0, 0, 0, DEFAULT_CHARSET, 0, 0, PROOF_QUALITY,
                              VARIABLE_PITCH, dialogFontFace);
-    field_0x108 = 0;
-    field_0x10c = 0;
+    dialogFontBold = 0;
+    dialogFontItalic = 0;
     controlContainer = (GameObject*)AppendChild(new(__FILE__, 0x16e) UICtlContainer, -1);
     UnknownDialogEvent event;
     event.handled = 0;
@@ -4283,7 +4283,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
     if (!UIControl::UnknownVirtualSlot21(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (clickSound) {
-            clickSound->SetVolume(ownerGui->field_0x34c, 0);
+            clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);
         }
         switch (value) {
@@ -5077,7 +5077,7 @@ int UIControl::GrowStep() {
         zoomStepWidth = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
         zoomStepHeight = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {

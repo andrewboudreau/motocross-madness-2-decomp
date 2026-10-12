@@ -9,24 +9,24 @@
 // denominator multiplies `fld [camera+0x198]; fmul [this+0x1e4]` as in
 // retail once the camera's value is read through a by-value accessor
 // (CameraZoom below; written plainly VC6 loads this+0x1e4 first, 1295/1308,
-// whichever operand order). Left: retail loads field_0x38 before storing the
+// whichever operand order). Left: retail loads camera before storing the
 // length to field_0x1ec, VC6 here after. A separate length local, a
 // chained assignment, the length stored in its own statement, a
 // reference parameter for the camera, a camera local or by-value camera
 // struct, BonusZoom/denominator/size helpers, ten parenthesisations of the
-// size expression, `field_0x1f0 = 0` moved, field_0x38 re-read, `this->`
+// size expression, `field_0x1f0 = 0` moved, camera re-read, `this->`
 // spellings and Length helper forms (result local, ?:, != tests) leave
 // that order (at best 1299; parentheses around field_0x1e4 or a plain
-// field_0x38->field_0x198 give 1295). Storing the length after the size
+// camera->field_0x198 give 1295). Storing the length after the size
 // statement gives retail's `mov edx` first but keeps the length on the x87
 // stack (`fld st(0)`, store at the end; 544). Size helpers taking the length
 // by value, or the camera, `this` and the chained store in any argument
 // order, give 600 or the same 1299.
-// Cycle 3 sweep (156 forms): a `UnknownBonusCamera& camera = *field_0x38`
-// alias (1164), a `UnknownBonusCamera* const&` alias of field_0x38 (1299),
+// Cycle 3 sweep (156 forms): a `UnknownBonusCamera& view = *camera`
+// alias (1164), a `UnknownBonusCamera* const&` alias of camera (1299),
 // a `const float&` alias of the camera's +0x198 (1152), a `float&` alias of
 // field_0x1ec for the chained store, and all 24 orders of the alias, the
-// field_0x1dc store, the delta and `field_0x1f0 = 0`: at best the same 1299.
+// placedFieldOfView store, the delta and `field_0x1f0 = 0`: at best the same 1299.
 //
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
@@ -104,9 +104,9 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
     int digit;
     int place;
 
-    if (currentKey == -1 || g_UnknownKrustyGame56e26c->field_0x3430)
+    if (currentKey == -1 || g_UnknownKrustyGame56e26c->uiInteractionBlocked)
         return 1;
-    if (field_0x2c->field_0x38->crashState && elapsed > 2.0f) {
+    if (raceView->localRacer->crashState && elapsed > 2.0f) {
         HideDigits();
         return 1;
     }
@@ -116,20 +116,20 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             NextKey();
         float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
         Vector3 position;
-        field_0x2c->field_0x38->modelNode->GetPosition(&position);
+        raceView->localRacer->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (field_0x38 != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || field_0x38->fieldOfView != field_0x1dc ||
+        if (camera != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
             field_0x1f0) {
-            field_0x38 = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
-            field_0x1dc = field_0x38->fieldOfView;
-            Vector3 delta = position - field_0x38->eyePosition;
+            camera = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
+            placedFieldOfView = camera->fieldOfView;
+            Vector3 delta = position - camera->eyePosition;
             field_0x1f0 = 0;
-            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(field_0x38) * field_0x1e4);
+            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(camera) * field_0x1e4);
         }
-        position += field_0x2c->field_0x38->rearWheel->field_0x230 * 5.0f;
+        position += raceView->localRacer->rearWheel->field_0x230 * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
-            field_0x188 = position - field_0x38->eyePosition;
+            field_0x188 = position - camera->eyePosition;
             Vector3 forward = field_0x188;
             forward.y = 0.0f;
             baseFrame->SetAxesPtr(&forward, &kVec3YAxis, 1, 1);
@@ -194,9 +194,9 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
 
     if (!ArcadeObject::UnknownVirtualSlot10(frameTime))
         return 1;
-    if (!field_0xbc) {
+    if (!cycleCues) {
         if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||
-            cueView->field_0x50->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
+            cueView->raceCamera->followedBike != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;
             return 1;
@@ -205,17 +205,17 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     switch (g_UnknownKrustyGame56e26c->cameraMode) {
     case 2:
     case 3: {
-        if (!cueView->field_0x48)
+        if (!cueView->raceTrack)
             goto hide;
-        if (cueView->ownRacer->field_0x78c) {
+        if (cueView->ownRacer->onTrack) {
             isVisible = 0;
             return 1;
         }
         isVisible = 1;
         UNKNOWN_PLACE_CUE();
         Vector3 target;
-        if (cueView->field_0x48)
-            cueView->field_0x48->PointAt(cueView->ownRacer->field_0x744->field_0x44, &target);
+        if (cueView->raceTrack)
+            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, &target);
         else
             target = cueView->ownRacer->trackPoint;
         field_0xac->QueryGround(&target, 0, 0, 0);
@@ -228,7 +228,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->field_0x50->field_0x3b4;
+        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->raceCamera->followedRacer;
         if (!ref)
             return 1;
         Vector3 direction =
@@ -238,7 +238,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         break;
     }
     case 0: {
-        if (!field_0xbc || cueRacerCount <= 1)
+        if (!cycleCues || cueRacerCount <= 1)
             goto hide;
         isVisible = 1;
         UNKNOWN_PLACE_CUE();
@@ -257,16 +257,16 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     }
     case 4: {
         UNKNOWN_PLACE_CUE();
-        if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
+        if (g_UnknownKrustyGame56e26c->tagBall) {
             Vector3 target;
-            g_UnknownKrustyGame56e26c->tagEvent->field_0xdc->field_0x21c.GetPosition(&target);
+            g_UnknownKrustyGame56e26c->tagEvent->ball->field_0x21c.GetPosition(&target);
             Vector3 direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
             UnknownVisualCueRacer* followed = 0;
             if (g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x25 & 1)
-                followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x3b4;
+                followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->followedRacer;
             if (!g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 return 1;
             if (followed == g_UnknownKrustyGame56e26c->tagEvent->followedRacer)

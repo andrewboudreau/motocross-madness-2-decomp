@@ -139,8 +139,8 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     ownsBackground = 0;
     screenGrab = 0;
     grabRegion = -1;
-    field_0xe8 = 0;
-    field_0xec = 1;
+    grabCopyFrames = 0;
+    uiAnimations = 1;
     dialogDirectory[0] = 0;
     waitFrames = 0;
     setupPalette = 0;
@@ -167,9 +167,9 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
         users[i] = 0;
     dialogContainer = 0;
     modalDialog = 0;
-    field_0x34c = 0;
+    soundVolume = 0;
     strcpy(toolTipFontFace, "");
-    field_0x3d0 = 0;
+    fontSizeOffset = 0;
     toolTipBold = 0;
     toolTipItalic = 0;
     drawGrabFirst = 0;
@@ -303,7 +303,7 @@ int GUIManager::UnknownVirtualSlot13() {
         rect.right = screenGrab->textureWidth;
         rect.bottom = screenGrab->textureHeight;
         if (guiBackground) {
-            guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
+            guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
         } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
             GameObject::UnknownVirtualSlot13();
             return 0;
@@ -324,7 +324,7 @@ int GUIManager::UnknownVirtualSlot15() {
             rect.right = screenGrab->textureWidth;
             rect.bottom = screenGrab->textureHeight;
             if (guiBackground) {
-                guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
+                guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
             } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
                 GameObject::UnknownVirtualSlot15();
                 return 0;
@@ -354,7 +354,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     else
         dialogContainer->AppendChild(dialog, -1);
     dialog->UnknownVirtualSlot28(a);
-    dialog->animatesControls = field_0xec;
+    dialog->animatesControls = uiAnimations;
     if (guiBackground)
         guiBackground->MarkAllDirty();
     if (wait)
@@ -480,7 +480,7 @@ void GUIManager::ReleaseBackgroundGrab() {
     }
     screenGrab = 0;
     grabRegion = -1;
-    field_0xe8 = 0;
+    grabCopyFrames = 0;
 }
 
 // 0x00486150
@@ -1068,7 +1068,7 @@ void GUIUser::EnableImeInput(int enable) {
         } else if (control->ownerDialog->dialogFontFace[0]) {
             face = control->ownerDialog->dialogFontFace;
             font.lfHeight = control->ownerDialog->dialogFontHeight;
-            font.lfWeight = control->ownerDialog->field_0x108 ? 700 : 500;
+            font.lfWeight = control->ownerDialog->dialogFontBold ? 700 : 500;
         } else {
             face = control->ownerGui->dialogFontName;
             font.lfHeight = control->ownerGui->dialogFontSize;
@@ -1180,10 +1180,10 @@ void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
     if (!animation && cursorAnimation)
         animation = cursorAnimation;
     current = userCursor->cursorAnimation;
-    if (current && field_0xc4 && animation != current && animation->field_0x10 > current->field_0x08) {
-        animation->field_0x08 = current->field_0x08;
-        animation->field_0x0c = current->field_0x0c;
-        animation->field_0x20 = current->field_0x20;
+    if (current && field_0xc4 && animation != current && animation->frameCount > current->currentFrame) {
+        animation->currentFrame = current->currentFrame;
+        animation->playForwards = current->playForwards;
+        animation->lastStepTime = current->lastStepTime;
     }
     userCursor->SetAnimation(animation);
 }
@@ -1193,7 +1193,7 @@ void GUIUser::RecreateCursor(const char* image, int redraw) {
     int visible;
     int defaultImage;
 
-    if (g_TrackGame->field_0x2d5_bit1 || !pointerDevice)
+    if (g_TrackGame->shuttingDown || !pointerDevice)
         return;
     visible = userCursor ? userCursor->isEnabled : 1;
     ReleaseCursor();
@@ -1209,7 +1209,7 @@ void GUIUser::RecreateCursor(const char* image, int redraw) {
 
 // 0x004880c0
 void GUIUser::ReleaseCursor() {
-    if (!g_TrackGame->field_0x2d5_bit1 && userCursor)
+    if (!g_TrackGame->shuttingDown && userCursor)
         userCursor->Release();
     userCursor = 0;
 }

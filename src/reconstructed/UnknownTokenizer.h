@@ -9,6 +9,6 @@ public:
     UnknownTokenizer(char* text);                          // 0x00515dc0
     char* NextToken(const char* delimiters);   // 0x00515df0: next token
 
-    char* field_0x00;   // current token
-    char* field_0x04;   // rest of the text, 0 at the end
+    char* token;        // +0x00 current token
+    char* rest;         // +0x04 rest of the text, 0 at the end
 };

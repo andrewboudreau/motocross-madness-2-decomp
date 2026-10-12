@@ -11,9 +11,9 @@
 // 0x0052d050: closes the compressor, then sends ICM_DECOMPRESSEX_END to the
 // (already closed) handle, in that retail order, then frees three buffers.
 UnknownVideoDecoder::~UnknownVideoDecoder() {
-    if (field_0x18) {
-        ICClose(field_0x18);
-        ICDecompressExEnd(field_0x18);
+    if (compressor) {
+        ICClose(compressor);
+        ICDecompressExEnd(compressor);
     }
     if (field_0x00)
         DebugFree(field_0x00, __FILE__, 178);

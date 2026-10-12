@@ -151,12 +151,15 @@ struct UnknownSoultreeSurface {
 };
 
 // Two 16-byte blocks at +0x298 and +0x2a8, copied whole by slot 8 and
-// cleared by 0x004444e0.
-struct UnknownSoultreeCounters {
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
+// cleared by 0x004444e0. The one at +0x298 is a screen rectangle: SelectLod
+// (0x00443de0) passes it to the clipper's TestBox (0x0052f570) and
+// DrawScreenRect (0x004439c0) outlines x in [+0x00, +0x08) and y in
+// [+0x04, +0x0c) on the locked render surface.
+struct UnknownSoultreeScreenRect {
+    int left;                                  // +0x00
+    int top;                                   // +0x04
+    int right;                                 // +0x08
+    int bottom;                                // +0x0c
 };
 
 // One 8-byte level of detail at +0x28c.
@@ -231,12 +234,12 @@ public:
     void GetSubtreeBounds(Vector3* a, Vector3* b);
     void SetAxesPtr(const Vector3* a, const Vector3* b, int c, int d); // two axes by pointer
     void Rotate(Vector3 axis, float angle);
-    void UnknownFunction444d80(GameObject* modifier);
+    void AddModifier(GameObject* modifier);        // 0x00444d80: appends to the first list (+0x264)
     // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both
     // ret 4) remove a modifier from the first (+0x264) or second (+0x26c)
     // modifier list.
-    void UnknownFunction444de0(GameObject* modifier);
-    void UnknownFunction444f10(GameObject* modifier);
+    void RemoveModifier(GameObject* modifier);
+    void RemoveSecondModifier(GameObject* modifier);
 
     // Not reconstructed: 0x00440810, the drawing function 0x00440f30, slot
     // 12 and 0x00443de0 (see samples/render/D3DIMSoulTreeNearMisses.cpp).
@@ -244,7 +247,7 @@ public:
     void TransformVertexGroups(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
     void DrawCurrentLod();                         // 0x00440f30: draws the current level of detail
     void SelectLod(Vector3* center, Vector3* extents);             // 0x00443de0 (ret 8): picks the level of detail
-    void UnknownFunction4439c0(UnknownSoultreeCounters* counters); // 0x004439c0 (ret 4)
+    void DrawScreenRect(UnknownSoultreeScreenRect* rect); // 0x004439c0 (ret 4): outlines a screen rectangle
     void ComputeSubtreeBounds();                   // 0x004434b0: bounding boxes of the subtree
     void DrawAxisGizmo();                  // 0x004435b0: axes of the subtree
     void DrawBoxOutline(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
@@ -254,53 +257,53 @@ public:
     void UnknownFunction4433f0(int surface, UnknownSoultreeVertex** vertices, int* vertexCount,
                                unsigned short** indices, int* indexCount, int a6, int lod); // 0x004433f0
     int ReadLods();                                // 0x00440060: reads the levels of detail
-    void UnknownFunction444440();                  // 0x00444440
-    void UnknownFunction4444c0(int value);         // 0x004444c0
+    void ComputeAllBounds();                       // 0x00444440: slot 5 (local bounds) on every node, then subtree bounds
+    void UnknownFunction4444c0(int value);         // 0x004444c0: sets useLighting and the dirty flag
     void UnknownFunction4444e0();                  // 0x004444e0
-    void UnknownFunction444a40(D3DIMSoultreeObject* source); // 0x00444a40
+    void CopyMaterials(D3DIMSoultreeObject* source); // 0x00444a40: new materials copied from source
     int ReplaceMaterialTexture(int index, const char* name, int a); // 0x00444c70
     void SetLod(int lod);           // 0x00444d00
     void SetLowestLod(int lod);           // 0x00444d40
-    void UnknownFunction444d60(float value);       // 0x00444d60
-    void UnknownFunction444e80();                  // 0x00444e80
+    void SetLodThreshold(float value);             // 0x00444d60
+    void RemoveAllModifiers();                     // 0x00444e80
     void UnknownFunction444eb0(GameObject* modifier); // 0x00444eb0
-    void UnknownFunction444fb0();                  // 0x00444fb0
+    void RemoveAllSecondModifiers();               // 0x00444fb0
     int GetVertexCount();                   // 0x00444fe0
     int GetSurfaceCount(int lod);         // 0x00445030: surface count
     int NodeMovesVertices(SoultreeObject* node, int lod);     // 0x00445060: node moves vertices
     void ApplyLodSettings(int index);         // 0x004451e0
 
-    int field_0x1a4;
-    int field_0x1a8;
-    int field_0x1ac;
-    int field_0x1b0;
-    int field_0x1b4;
-    int field_0x1b8;
-    LightManager* lightManager;                // slot 9's `a`; lights the vertices
-    char modelName[0x80];                      // name (0x7f characters)
-    TextureMapManager* textureManager;         // texture manager (first option dword)
-    int textureFormat;                         // texture format, 555
-    int textureOptions[6];                     // texture options
-    int field_0x260;
-    int modifierCount;                         // first modifier list
-    GameObject** modifierList;
-    int secondModifierCount;                   // second modifier list
-    GameObject** secondModifierList;
-    int lodCount;                              // level-of-detail count
-    int lowestLod;                             // lowest level of detail
-    int currentLod;                           // +0x27c current level of detail
-    float* autoLodDistances;                   // "AutoLOD#%i" distances
-    float field_0x284;
-    int field_0x288;
-    UnknownSoultreeLod* lodTable;
-    SoultreeMaterial** materialTable;          // materials
-    int materialCount;                         // material count
-    UnknownSoultreeCounters field_0x298;       // slot 14 counts frames in +0x08 / +0x0c
-    UnknownSoultreeCounters field_0x2a8;
-    float lastFrameTime;                       // frame time (slot 10)
-    Vector3 field_0x2bc;
-    float textureScroll;                       // texture scroll (drawing modes 1 and 2)
-    int loadFlag;                              // load flag (slot 9)
-    int field_0x2d0;
-    int field_0x2d4;                           // 1 after construction
+    int useLighting;                           // +0x1a4 set by 0x004444c0; gates the light manager's vertex lighting
+    int showNormals;                           // +0x1a8 DrawNormals per surface (debug)
+    int showVertexCrosses;                     // +0x1ac DrawVertexCrosses per surface (debug)
+    int showWireframe;                         // +0x1b0 DrawWireframe per surface (debug)
+    int texturePerspective;                    // +0x1b4 D3DRENDERSTATE_TEXTUREPERSPECTIVE while drawing
+    int gouraudShading;                        // +0x1b8 D3DRENDERSTATE_SHADEMODE: gouraud when set, else flat
+    LightManager* lightManager;                // +0x1bc slot 9's `a`; lights the vertices
+    char modelName[0x80];                      // +0x1c0 name (0x7f characters)
+    TextureMapManager* textureManager;         // +0x240 texture manager (first option dword)
+    int textureFormat;                         // +0x244 texture format, 555
+    int textureOptions[6];                     // +0x248 texture options
+    int field_0x260;                           // +0x260
+    int modifierCount;                         // +0x264 first modifier list
+    GameObject** modifierList;                 // +0x268
+    int secondModifierCount;                   // +0x26c second modifier list
+    GameObject** secondModifierList;           // +0x270
+    int lodCount;                              // +0x274 level-of-detail count
+    int lowestLod;                             // +0x278 lowest level of detail
+    int currentLod;                            // +0x27c current level of detail
+    float* autoLodDistances;                   // +0x280 "AutoLOD#%i" distances
+    float inverseLodThreshold;                 // +0x284 1 / SetLodThreshold's value; SelectLod takes level i + 1 while scale * autoLodDistances[i] < threshold
+    int useAutoLod;                            // +0x288 "UseAutoLOD"
+    UnknownSoultreeLod* lodTable;              // +0x28c
+    SoultreeMaterial** materialTable;          // +0x290 materials
+    int materialCount;                         // +0x294 material count
+    UnknownSoultreeScreenRect screenRect;      // +0x298 projected bounds (SelectLod); slot 14 bumps right and bottom
+    UnknownSoultreeScreenRect field_0x2a8;     // +0x2a8
+    float lastFrameTime;                       // +0x2b8 frame time (slot 10)
+    Vector3 lastScrollPosition;                // +0x2bc world position at the last mode 2 texture scroll
+    float textureScroll;                       // +0x2c8 texture scroll (drawing modes 1 and 2)
+    int loadFlag;                              // +0x2cc load flag (slot 9)
+    int showBounds;                            // +0x2d0 slot 14 outlines screenRect and draws bounds and axes (debug)
+    int visible;                               // +0x2d4 1 after construction; SelectLod sets it from the clipper test, slot 14 skips drawing when 0
 };

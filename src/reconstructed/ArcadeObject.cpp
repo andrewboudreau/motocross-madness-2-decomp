@@ -77,7 +77,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
         transparency = new (__FILE__, 104) TransparencyMod(1);
         AppendChild(transparency, -1);
         transparency->field_0x48 = alpha;
-        arcadeModel->UnknownFunction444d80(transparency);
+        arcadeModel->AddModifier(transparency);
     }
     return this;
 }

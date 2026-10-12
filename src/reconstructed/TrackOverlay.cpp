@@ -145,7 +145,7 @@ int InstrumentOverlay::UnknownVirtualSlot14()
             PlaceNeedle(&dial, dialNeedle);
         }
         UnknownInstrumentState* state = instrumentSource->state;
-        if (state->field_0x108) {
+        if (state->airborne) {
             s_UnknownGlobal68a448 = (!s_UnknownGlobal575140 ? state->gaugeValue * 0.68182f : s_UnknownGlobal68a448) - 0.5f;
             if (s_UnknownGlobal68a448 < 0.0f)
                 s_UnknownGlobal68a448 = 0.0f;
@@ -153,7 +153,7 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         } else {
             dial.value = state->gaugeValue * 0.68182f;
         }
-        s_UnknownGlobal575140 = instrumentSource->state->field_0x108;
+        s_UnknownGlobal575140 = instrumentSource->state->airborne;
         PlaceNeedleTip(&dial, dialNeedle);
         if (!Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)dialNeedle, 2, 0))
             return 0;
@@ -613,7 +613,7 @@ int StatsOverlay::DrawViewModePanel()
         else
             total = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     } else {
-        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+        total = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
     }
     sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
@@ -627,8 +627,8 @@ int StatsOverlay::DrawViewModePanel()
     else
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
-        FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
-        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->field_0x7a4);
+        FormatLapTime(time, g_TrackGame->eventManager->endTimer);
+        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->field_0x736)
@@ -641,16 +641,16 @@ int StatsOverlay::DrawViewModePanel()
     if (g_TrackGame->mode.raceSettings.raceMode == 4)
         FormatLapTime(time, statsSource->ownRacer->fastestLap);
     else
-        FormatLapTime(time, instrumentSource->state->field_0x750);
+        FormatLapTime(time, instrumentSource->state->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->field_0x770);
+    FormatLapTime(time, instrumentSource->state->tblTime);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13b8, label, 0x80);
     if (g_TrackGame->playingReplay)
-        FormatLapTime(time, statsSource->field_0x1b8);
+        FormatLapTime(time, statsSource->replayTime);
     else
-        FormatLapTime(time, instrumentSource->state->field_0x754);
+        FormatLapTime(time, instrumentSource->state->trtTime);
     sprintf(rowText[5], "%s:", label);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], drawnRowText[i]) != 0)
@@ -691,9 +691,9 @@ void StatsOverlay::DrawLapTime()
     UnknownOverlayRect rect;
     int count;
     if (g_TrackGame->playingReplay)
-        FormatLapTime(text, statsSource->field_0x1b8);
+        FormatLapTime(text, statsSource->replayTime);
     else
-        FormatLapTime(text, instrumentSource->state->field_0x754);
+        FormatLapTime(text, instrumentSource->state->trtTime);
     rect = rowRects[5];
     rect.left += rowExtent.cx + 4;
     sprintf(rowText[5], "%s", text);
@@ -726,7 +726,7 @@ int StatsOverlay::DrawRacePanel()
         else
             total = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     } else {
-        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+        total = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
     }
     sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
@@ -740,18 +740,18 @@ int StatsOverlay::DrawRacePanel()
     else
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
-        FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
-        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->field_0x7a4);
+        FormatLapTime(time, g_TrackGame->eventManager->endTimer);
+        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         FormatLapTime(time, instrumentSource->state->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->field_0x750);
+    FormatLapTime(time, instrumentSource->state->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->field_0x770);
+    FormatLapTime(time, instrumentSource->state->tblTime);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
@@ -805,7 +805,7 @@ int StatsOverlay::DrawTagStandings()
         FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         sprintf(rowText[0], "%s %s", label, time);
     }
-    if (g_TrackGame->mode.raceSettings.field_0x148) {
+    if (g_TrackGame->mode.raceSettings.stuntMode) {
         int iterator;
         int own;
         UnknownKrustyBikeView* view = g_TrackGame->tagEvent->raceView;
@@ -847,7 +847,7 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->tagEvent->followedRacer) {
         g_TrackGame->LoadResourceString(0x14b8, tag, 0x40);
         sprintf(rowText[5], "  %s %s", g_TrackGame->tagEvent->followedRacer->racerName, tag);
-    } else if (g_TrackGame->tagEvent->field_0xdc) {
+    } else if (g_TrackGame->tagEvent->ball) {
         g_TrackGame->LoadResourceString(0x14b7, tag, 0x40);
         sprintf(rowText[5], "  %s", tag);
     }
@@ -1475,7 +1475,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
             if (strlen(message.text)) {
                 g_TrackGame->network->Send(
                     0x85, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
-                AddMessage(g_TrackGame->mode.field_0x00, (int)message.text, 0);
+                AddMessage(g_TrackGame->mode.profileName, (int)message.text, 0);
             }
             chatInput->ClearLine();
             typingEnabled = 0;
@@ -1565,9 +1565,9 @@ int ChatOverlay::UnknownVirtualSlot13()
         RedrawNameTags(-1);
     } else {
         for (int i = 0; i < racerCount; i++) {
-            if (g_TrackGame->mode.field_0x6c0 && lastRacerValues[i] != racers[i]->field_0x784) {
+            if (g_TrackGame->mode.showRiderPositions && lastRacerValues[i] != racers[i]->position) {
                 RedrawNameTags(i);
-                lastRacerValues[i] = racers[i]->field_0x784;
+                lastRacerValues[i] = racers[i]->position;
             }
             if (racers[i]->racerState->hideNameTag)
                 nameTags[i]->UnknownVirtualSlot4();
@@ -1590,7 +1590,7 @@ int ChatOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
     }
-    if (g_TrackGame->mode.field_0x6bc || g_TrackGame->mode.field_0x6c0)
+    if (g_TrackGame->mode.showRiderNames || g_TrackGame->mode.showRiderPositions)
         GameObject::UnknownVirtualSlot14();
     return 1;
 }

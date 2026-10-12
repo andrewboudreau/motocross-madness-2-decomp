@@ -521,7 +521,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
     if (!UIControl::UnknownVirtualSlot20(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (clickSound) {
-            clickSound->SetVolume(ownerGui->field_0x34c, 0);
+            clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);
         }
         switch (c) {
@@ -583,7 +583,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
                 textLength++;
                 controlTextLength++;
             } else if (fullSound) {
-                fullSound->SetVolume(ownerGui->field_0x34c, 0);
+                fullSound->SetVolume(ownerGui->soundVolume, 0);
                 fullSound->PlayWithOptions(1, 0, 0);
             }
             break;
@@ -1007,12 +1007,12 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                             bold = guiManager->toolTipBold;
                             italic = guiManager->toolTipItalic;
                         }
-                        dialogFontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
+                        dialogFontHeight = (int)((guiManager ? *(float*)&guiManager->fontSizeOffset : 0.0f) +
                                                    dialogFontHeight);
                         dialogFont = CreateFontA(dialogFontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
                                                          0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);
-                        field_0x10c = italic;
-                        field_0x108 = bold;
+                        dialogFontItalic = italic;
+                        dialogFontBold = bold;
                     }
                     if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
                         int load = 1;
@@ -1574,10 +1574,10 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                         bold = guiManager->toolTipBold;
                         italic = guiManager->toolTipItalic;
                     }
-                    control->fontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
+                    control->fontHeight = (int)((guiManager ? *(float*)&guiManager->fontSizeOffset : 0.0f) +
                                                  control->fontHeight);
-                    if (control->fontHeight != dialogFontHeight || bold != field_0x108 ||
-                        italic != field_0x10c) {
+                    if (control->fontHeight != dialogFontHeight || bold != dialogFontBold ||
+                        italic != dialogFontItalic) {
                         control->fontHeight = (int)(control->fontHeight * scaleY);
                         control->fontHandle = (int)CreateFontA(control->fontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM,
                                                                 italic, 0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);

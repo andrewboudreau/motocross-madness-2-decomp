@@ -12,7 +12,7 @@ class UnknownTrackGameObject56cItem;
 // Object at a GUI layer's +0xc0.
 struct UnknownKrustyUIGuiLayerItem {
     unsigned char field_0x00[0x5c];
-    int field_0x5c;                           // set from TrackGame+0xc4c (EventManager 0x0045e710)
+    int enabled;                              // +0x5c ToolTip::enabled; set from TrackGame+0xc4c, the tool tips option (EventManager 0x0045e710)
 };
 
 // One of the GUI's four layers (+0x330).
@@ -55,13 +55,13 @@ public:
     unsigned char field_0x000[0x3c];
     BackgroundImage* guiBackground;           // +0x03c the background (dlgprocs.cpp 0x004536e0)
     unsigned char field_0x040[0xec - 0x40];
-    int field_0x0ec;                          // from TrackGame+0xc40 (KrustyUI 0x004988a0)
+    int uiAnimations;                         // +0x0ec GUIManager::uiAnimations; from TrackGame+0xc40 (KrustyUI 0x004988a0)
     unsigned char field_0x0f0[0x30c - 0xf0];
-    int field_0x30c;
+    int keyboardDevice;                       // +0x30c GUIManager::keyboardDevice
     unsigned char field_0x310[0x34c - 0x310];
-    int field_0x34c;
+    int soundVolume;                          // +0x34c GUIManager::soundVolume
     char toolTipFontFace[0x3d0 - 0x350];      // +0x350 font face (TrackOverlay 0x0051b320)
-    float field_0x3d0;                        // string 0xfed's value when nonzero
+    float fontSizeOffset;                     // +0x3d0 string 0xfed's value when nonzero; added to the dialog font heights (0x0046a920)
     int toolTipBold;                          // +0x3d4 string 0x1469's value; bold font
     int toolTipItalic;                        // +0x3d8 italic font (TrackOverlay 0x0051b320)
     unsigned char field_0x3dc[0x3e0 - 0x3dc];
@@ -145,7 +145,7 @@ public:
     int field_0x38;                           // reopened by the 0x911 track-record dialog
     int currentMenu;                          // +0x3c: set by OpenMenu
     int replayAvailable;                      // +0x40: BikeRace 0x00420b00 sets it after closing a replay VCR; shows "ButViewReplay"
-    int demoEnded;                            // +0x44: BikeRace sets it at race end while +0x4a8 is set; DemoDlg slot 10 closes on it; cleared by EventManager 0x0045cdc0
+    int demoEnded;                            // +0x44: BikeRace sets it at race end while playingDemo is set; DemoDlg slot 10 closes on it; cleared by EventManager 0x0045cdc0
     // Lists that LoadBikesAndRiders reads from bikes.pb and riders.pb.
     void* manufacturers;                      // +0x48: "Manufacturer_%02d" entries; freed by the destructor
     int manufacturerCount;                    // +0x4c
@@ -172,16 +172,16 @@ public:
     UnknownKrustyUIModelObject* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
     Vector3 garageFocus;                      // +0x474: the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char field_0x480[0x48c - 0x480];
-    int field_0x48c;
+    int profileLoaded;                        // +0x48c: set once a profile is loaded or saved (UiInfo.cpp LoadProfile/SaveProfile)
     UnknownGameUiPage* progressDialog;        // +0x490: the dialog holding "ProgressBar" (DlgProcs.cpp sets and clears it)
     void* savedInputContext;                  // +0x494: ImmAssociateContext's result (DlgProcs.cpp), restored to the window (EventManager 0x0045e710)
     int allowIme;                             // +0x498: "AllowIME" registry flag (0x00498cf0)
     int field_0x49c;
     int field_0x4a0;
     int field_0x4a4;
-    int field_0x4a8;
+    int playingDemo;                          // +0x4a8: the attract demo plays "ui\demo.rpl" with the credits.dtm dialog (bikerace.cpp 0x00417ed0); LeaveMenusForRace clears it
     int field_0x4ac;
-    int field_0x4b0;
+    int userNameDialogOpen;                   // +0x4b0: set while UserNameDlg is open (DlgProcs.cpp)
     unsigned char field_0x4b4[0x634 - 0x4b4];
     UnknownKrustyUISlot field_0x634[8];
     unsigned char field_0x674[0x1364 - 0x674];

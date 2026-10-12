@@ -52,15 +52,16 @@ struct UnknownNumberCamera {
 
 struct UnknownNumberRacerState {
     unsigned char field_0x000[0x76c];
-    float field_0x76c;
+    float offTrackTime;                       // +0x76c RaceView.h's racer offTrackTime
 };
 
-// NumberObjectManager's +0x2c.
+// NumberObjectManager's +0x2c. Its offsets line up with BikeRace.h's race
+// view: +0x38 localRacer, +0x6c the 30SecMan entry, +0x15c startCountdown.
 struct UnknownNumberRacer {
     unsigned char field_0x000[0x38];
-    UnknownNumberRacerState* field_0x38;
+    UnknownNumberRacerState* localRacer;      // +0x38
     unsigned char field_0x03c[0x6c - 0x3c];
-    int field_0x6c;
+    int thirtySecondMan;                      // +0x6c no digits count down while it is present
     unsigned char field_0x070[0x15c - 0x70];
     float countdown;                          // +0x15c count-down value
 };
@@ -83,14 +84,14 @@ struct UnknownRunwayTrack {
 
 struct UnknownRunwayView {
     unsigned char field_0x00[0x48];
-    UnknownRunwayTrack* field_0x48;
+    UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
 };
 
 // The racer's race status node (RaceView.h's UnknownEventRacerPart).
 struct UnknownRunwayRacerPart {
     unsigned char field_0x00[0x38];
-    UnknownRunwayTrackPos field_0x38;
-    UnknownRunwayTrackPos field_0x44;
+    UnknownRunwayTrackPos placedPos;          // +0x38 (RaceView.h)
+    UnknownRunwayTrackPos progressPos;        // +0x44 (RaceView.h)
 };
 
 // The racer the lights point for (NationalRace.cpp passes its view's
@@ -100,10 +101,10 @@ struct UnknownRunwayRacer {
     Vector3 trackPoint;                       // +0x10c
     Vector3 trackDirection;                   // +0x118 track direction there
     unsigned char field_0x124[0x740 - 0x124];
-    UnknownRunwayView* field_0x740;
-    UnknownRunwayRacerPart* field_0x744;
+    UnknownRunwayView* bikeView;              // +0x740 (RaceView.h)
+    UnknownRunwayRacerPart* statusNode;       // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x78c - 0x748];
-    int field_0x78c;
+    int onTrack;                              // +0x78c RaceView.h's racer onTrack
     unsigned char field_0x790[0x7a4 - 0x790];
     char finished;                            // +0x7a4
 };
@@ -133,7 +134,7 @@ public:
 // follows).
 struct UnknownVisualCueCamera {
     unsigned char field_0x000[0x3b0];
-    UnknownRunwayRacer* field_0x3b0;
+    UnknownRunwayRacer* followedBike;         // +0x3b0 (RaceSound.h)
 };
 
 // The view VisualCue follows (its +0xa8; RaceView.h's UnknownKrustyBikeView).
@@ -144,13 +145,13 @@ struct UnknownVisualCueView {
     unsigned char field_0x000[0x38];
     UnknownRunwayRacer* ownRacer;             // +0x38 its own racer
     unsigned char field_0x03c[0x48 - 0x3c];
-    UnknownRunwayTrack* field_0x48;
+    UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
     unsigned char field_0x04c[0x50 - 0x4c];
-    UnknownVisualCueCamera* field_0x50;
+    UnknownVisualCueCamera* raceCamera;       // +0x50 BikeRace's raceCamera
     unsigned char field_0x054[0x18a - 0x54];
     bool racing;                              // +0x18a
     unsigned char field_0x18b[0x190 - 0x18b];
-    bool field_0x190;
+    bool chatOpen;                            // +0x190 the chat input line is open (BikeRace)
 };
 
 // 0xfc bytes (the allocation at 0x004e06cd).
@@ -182,7 +183,7 @@ public:
     float builtFieldOfView;                          // field of view the offsets were built for
     float screenOffsetX;                          // screen offset along the camera's x axis
     float screenOffsetY;                          // screen offset along the camera's y axis
-    int field_0xbc;                            // toggled by control 0x14
+    int cycleCues;                             // +0xbc toggled by control 0x14 (racing, chat closed, two or more cue racers); keeps the cue shown off the own racer's camera and lets event type 0 cycle racers (CanCycleCues)
     int currentRacer;                            // current racer
     int reportedRacer;                            // last reported racer
     int skippedRacer;                            // racer to skip
@@ -201,10 +202,10 @@ public:
     NumberObjectManager* SetupDigits(void* value, int b, UnknownNumberRacer* racer, int pixels,
                                      UnknownNumberCamera* camera, float size);
 
-    UnknownNumberRacer* field_0x2c;
-    int field_0x30;
-    UnknownNumberCamera* field_0x34;
-    ArcadeObject* field_0x38[5];
+    UnknownNumberRacer* countdownRacer;       // +0x2c whose count-down the digits show
+    int drawEnabled;                          // +0x30 slot 14 draws only when set (1 from the constructor and slot 10)
+    UnknownNumberCamera* digitCamera;         // +0x34 the digits show only through this camera
+    ArcadeObject* digitModels[5];             // +0x38 "one.slt" .. "five.slt"
 };
 
 // The racer a BonusObjectManager follows (its +0x2c).
@@ -229,7 +230,7 @@ struct UnknownBonusRacerState {
 
 struct UnknownBonusRacer {
     unsigned char field_0x000[0x38];
-    UnknownBonusRacerState* field_0x38;
+    UnknownBonusRacerState* localRacer;       // +0x38 BikeRace.h's localRacer
 };
 
 // The camera a BonusObjectManager faces (its +0x38).
@@ -256,12 +257,12 @@ struct UnknownKrustyRacerRef {
 
 struct UnknownKrustyCamera {
     unsigned char field_0x000[0x3b4];
-    UnknownKrustyRacerRef* field_0x3b4;
+    UnknownKrustyRacerRef* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
 struct UnknownKrustyCameraHolder {
     unsigned char field_0x00[0x50];
-    UnknownKrustyCamera* field_0x50;
+    UnknownKrustyCamera* raceCamera;          // +0x50 BikeRace's raceCamera
 };
 
 // One 24-byte gate record of the course at the global's +0x560.
@@ -281,7 +282,7 @@ struct UnknownKrustyFollowed {
     unsigned char field_0x000[0x25];
     unsigned char field_0x25;
     unsigned char field_0x026[0x3b4 - 0x26];
-    UnknownVisualCueRacer* field_0x3b4;
+    UnknownVisualCueRacer* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
 struct UnknownKrustyNode {
@@ -295,7 +296,7 @@ struct UnknownKrustyPlayer {
     unsigned char field_0x40[0xa8 - 0x40];
     UnknownVisualCueRacer* followedRacer;     // +0xa8
     unsigned char field_0xac[0xdc - 0xac];
-    UnknownKrustyNode* field_0xdc;
+    UnknownKrustyNode* ball;                  // +0xdc TrackGameViewOwner::ball (the tag ball)
 };
 
 struct UnknownKrustyGame {
@@ -308,9 +309,9 @@ struct UnknownKrustyGame {
     unsigned char field_0x056c[0x2d74 - 0x56c];
     int cameraMode;                           // +0x2d74 camera mode 0..5
     unsigned char field_0x2d78[0x2eb4 - 0x2d78];
-    int field_0x2eb4;
+    int tagBall;                              // +0x2eb4 race settings' tagBall (TrackGame.h)
     unsigned char field_0x2eb8[0x3430 - 0x2eb8];
-    int field_0x3430;
+    int uiInteractionBlocked;                 // +0x3430 (TrackGame.h)
 };
 extern UnknownKrustyGame* g_UnknownKrustyGame56e26c;
 
@@ -344,10 +345,10 @@ public:
     void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
     void HideDigits();              // 0x0048d540: hides the shown digits
 
-    UnknownBonusRacer* field_0x2c;
+    UnknownBonusRacer* raceView;              // +0x2c the race (BikeRace passes this)
     int currentKey;                            // current key, -1 when idle
     float elapsed;                          // time since the start
-    UnknownBonusCamera* field_0x38;
+    UnknownBonusCamera* camera;               // +0x38 the race camera, then the current camera
     D3DIMSoultreeObject* baseFrame;           // "Base Bonus Frame"
     D3DIMSoultreeObject* digitModels[10][5];    // digit models by digit and place
     int shownDigits[5];                        // shown digit per place, -1 when none
@@ -365,7 +366,7 @@ public:
     Vector3 keyScaleChange;                       // scale change
     Vector3 keyAxis;                       // axis
     Vector3 keyAxisChange;                       // axis change
-    float field_0x1dc;                         // camera +0x16c when last placed
+    float placedFieldOfView;                   // +0x1dc the camera's fieldOfView (+0x16c) when last placed
     float field_0x1e0;
     float field_0x1e4;                         // twice the frame's half height
     float sizeFactor;                         // size factor
