@@ -698,7 +698,7 @@ public:
     int useReplayTape;                        // +0x342c
     int uiInteractionBlocked;
     float uiBlockedSeconds;                   // +0x3434 seconds UI interaction has been blocked (EventManager slot 10)
-    int field_0x3438;
+    int podiumFinished;                       // +0x3438 set when the podium ends, is skipped or fails to load; the next EndRace closes the race and clears it
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;
     UnknownTrackGameObject3444* proCircuit;   // +0x3444 the pro circuit career (ProCircuit.h)

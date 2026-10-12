@@ -60,7 +60,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     if (g_TrackGame->ui->allowIme)
         g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
-    g_TrackGame->field_0x3438 = 0;
+    g_TrackGame->podiumFinished = 0;
     g_TrackGame->uiBlockedSeconds = 0;
     if (!g_TrackGame->mode.field_0xa20)
         g_TrackGame->StopCDAudio();

@@ -228,7 +228,7 @@ int EventManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputE
         resumeArmed) {
         resumeArmed = 0;
         g_TrackGame->uiInteractionBlocked = 0;
-        g_TrackGame->field_0x3438 = 1;
+        g_TrackGame->podiumFinished = 1;
         EndRace();
         return 1;
     }
@@ -265,9 +265,9 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
         podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
         podiumCamera->UnknownVirtualSlot29(podiumFocus);
-        if (!g_TrackGame->field_0x3438 && g_TrackGame->uiBlockedSeconds > 7.0f) {
+        if (!g_TrackGame->podiumFinished && g_TrackGame->uiBlockedSeconds > 7.0f) {
             g_TrackGame->uiInteractionBlocked = 0;
-            g_TrackGame->field_0x3438 = 1;
+            g_TrackGame->podiumFinished = 1;
             EndRace();
         }
     }
@@ -368,7 +368,7 @@ int CompareStandings(const void* a, const void* b) {
 void EventManager::EndRace() {
     if (g_TrackGame->network && waitingForRacers)
         return;
-    if (!g_TrackGame->uiInteractionBlocked && !g_TrackGame->field_0x3438) {
+    if (!g_TrackGame->uiInteractionBlocked && !g_TrackGame->podiumFinished) {
         RankRacers();
         UnknownKrustyBikeView* view = FindRaceView();
         if (view)
@@ -378,14 +378,14 @@ void EventManager::EndRace() {
             g_TrackGame->uiBlockedSeconds = 0;
             return;
         }
-        g_TrackGame->field_0x3438 = 1;
+        g_TrackGame->podiumFinished = 1;
         g_TrackGame->uiInteractionBlocked = 0;
         return;
     }
-    if (g_TrackGame->uiInteractionBlocked && !g_TrackGame->field_0x3438)
+    if (g_TrackGame->uiInteractionBlocked && !g_TrackGame->podiumFinished)
         return;
-    if (!g_TrackGame->uiInteractionBlocked && g_TrackGame->field_0x3438) {
-        g_TrackGame->field_0x3438 = 0;
+    if (!g_TrackGame->uiInteractionBlocked && g_TrackGame->podiumFinished) {
+        g_TrackGame->podiumFinished = 0;
         if (g_TrackGame->network &&
             (g_TrackGame->mode.raceSettings.raceMode != 2 || racesRun > g_TrackGame->mode.raceSettings.races))
             g_TrackGame->network->SetSessionJoinable(1);
