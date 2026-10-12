@@ -1,7 +1,10 @@
 // Near miss for src/krusty2/motion/SteeringControl.cpp (TU SteeringControl.cpp).
-// SteeringControl::SetAxisFromPoints (0x00504d30): retail spills y to a stack slot
-// (60.7% relocation-masked); the flow and calls match. The promoted file supplies the
-// rest of the unit.
+// SteeringControl::SetAxisFromPoints (0x00504d30, 145/234 strict): retail spills y to
+// a stack slot and keeps d.x on the x87 stack (`fld st(0); fmul st(3)`), popping it
+// at the end; the flow and calls match. Tried without gain: d * inv, d * (1 / len),
+// inv * d.x per component (all 64 operand-order combinations), d *= inv, d / len, a
+// component-wise d, other lenSq term orders, SquareMagnitude/DotProduct helpers and
+// separate dir stores. The promoted file supplies the rest of the unit.
 #include "motion/SteeringControl.cpp"
 
 int SteeringControl::SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame)
