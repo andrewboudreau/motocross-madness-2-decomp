@@ -71,6 +71,6 @@
   "?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
   "?UnknownFunction507c10@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "__real@4@4000e000000000000000": "0x00550b94",
-  "?UnknownFunction42e930@Camera@@QAEXM@Z": "0x0042e930",
+  "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
   "?UnknownVirtualSlot10@Camera@@UAEHM@Z": "0x0042e690"
 }

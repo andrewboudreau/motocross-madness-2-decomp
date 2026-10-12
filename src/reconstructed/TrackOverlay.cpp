@@ -1594,8 +1594,8 @@ void ChatOverlay::RedrawNameLine()
     RestoreRect(&rect);
     sprintf(text, "%d : ", (int)sqrt(field_0x1d0));
     field_0x38->SelectFont("arialsm");
-    int right = field_0x38->UnknownFunction50b080(overlayTexture, nameTagRects[racerCount].left,
-                                                   nameTagRects[racerCount].top, text, 0);
+    int right = field_0x38->DrawTextInto(overlayTexture, nameTagRects[racerCount].left,
+                                          nameTagRects[racerCount].top, text, 0);
     if (right != field_0x160 || nameChanged) {
         field_0x160 = right;
         nameChanged = 0;

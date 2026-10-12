@@ -569,8 +569,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         }
         if (stream) {
             raceTrack = new(__FILE__, 0x1a5) Track;
-            trackLoaded = raceTrack->UnknownFunction515ed0(stream, &startProbe, &finishProbe, &field_0x144,
-                                                             &field_0x148);
+            trackLoaded = raceTrack->LoadTrack(stream, &startProbe, &finishProbe, &field_0x144,
+                                                 &field_0x148);
             delete stream;
         }
         if (field_0x148)
@@ -594,8 +594,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             } else if (stream) {
                 {
                     raceTrack = new(__FILE__, 0x1d0) Track;
-                    trackLoaded = raceTrack->UnknownFunction515ed0(stream, &startProbe, &finishProbe,
-                                                                     &field_0x144, &field_0x148);
+                    trackLoaded = raceTrack->LoadTrack(stream, &startProbe, &finishProbe,
+                                                         &field_0x144, &field_0x148);
                     if (!trackLoaded) {
                         Track* track = raceTrack;
                         if (track != 0) {

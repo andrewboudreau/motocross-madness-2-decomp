@@ -25,9 +25,9 @@
 // bound tests, four strcmp operand orders and `== 0`, i++/++i/i += 1) also
 // stays at 117.
 //
-// UnknownFunction50b400 (0x0050b400, 758 bytes; 4444 texels),
-// UnknownFunction50b700 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit
-// body of UnknownFunction50b080 (0x0050b080, 890 bytes; its format dispatch
+// DrawText4444 (0x0050b400, 758 bytes; 4444 texels),
+// DrawText1555 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit
+// body of DrawTextInto (0x0050b080, 890 bytes; its format dispatch
 // matches): same instructions, different register/stack assignment. Retail
 // keeps fontStride in ebp (stride at [esp+0x34]), w in esi and v in the slot
 // later reused for the row count; VC6 here gives ebp to stride and esi to v,
@@ -67,11 +67,11 @@ void UnknownOverlayText::SelectFont(const char* font) {
 }
 
 // 0x0050b080
-int UnknownOverlayText::UnknownFunction50b080(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color) {
     if (texture->field_0x20 == 1555)
-        return UnknownFunction50b700(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
+        return DrawText1555(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
     if (texture->field_0x20 == 4444)
-        return UnknownFunction50b400(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
+        return DrawText4444(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
 
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->field_0x14;
@@ -123,7 +123,7 @@ int UnknownOverlayText::UnknownFunction50b080(TextureMap* texture, int x, int y,
 }
 
 // 0x0050b400
-int UnknownOverlayText::UnknownFunction50b400(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const char* text, int color) {
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->field_0x14;
     long pitch = 0;
@@ -174,7 +174,7 @@ int UnknownOverlayText::UnknownFunction50b400(TextureMap* texture, int x, int y,
 }
 
 // 0x0050b700
-int UnknownOverlayText::UnknownFunction50b700(TextureMap* texture, int x, int y, const char* text, int color) {
+int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const char* text, int color) {
     TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->field_0x14;
     long pitch = 0;

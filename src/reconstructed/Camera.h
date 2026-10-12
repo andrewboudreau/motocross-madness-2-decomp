@@ -50,7 +50,7 @@ public:
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
     // 0x0042e930: stores a nonzero value in +0x16c and refreshes +0x1d0
     // (FollowCamera slot 47 passes 66.0f).
-    void UnknownFunction42e930(float value);
+    void SetFieldOfView(float value);
     // 0x0042e9b0 (EventManager slot 10): sets each non-null part of the
     // camera frame; the two directions are stored normalized.
     void UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,

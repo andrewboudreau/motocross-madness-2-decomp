@@ -36,3 +36,9 @@ miss), and ResourceItem's
 `name`, `nameSize` and `object` (+0x08, +0x0c, +0x10). ResourceItem's
 archive and offset (+0x14, +0x18) keep their placeholders because
 FileStream.cpp (UI lane) reads them.
+
+## Function names
+
+`0x004e8f40` is `MergeWithExisting` (it moves an item onto an existing item
+of the same name; tier 3). `0x004e9010` and `0x004e9030` keep address names
+because PCAudio.cpp, Palette8.cpp, FileStream and UI samples call them.

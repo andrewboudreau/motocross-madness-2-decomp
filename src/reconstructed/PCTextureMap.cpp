@@ -73,10 +73,10 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     } else {
         field_0x6c = 0;
     }
-    void* buffer = field_0x10->UnknownFunction511310(LargerPixelSize(sourceFormat, format) * width * height);
+    void* buffer = field_0x10->GrowScratchBuffer(LargerPixelSize(sourceFormat, format) * width * height);
     if (!buffer)
         return 0;
-    void* bits = field_0x10->UnknownFunction511370(LargerPixelSize(sourceFormat, format) * width * height + 4);
+    void* bits = field_0x10->GrowSecondScratchBuffer(LargerPixelSize(sourceFormat, format) * width * height + 4);
     if (!bits)
         return 0;
     if (HasMipLevels(fileFormat)) {
@@ -129,8 +129,8 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                     UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * levelHeight * levelSide);
                     break;
                 case 0x14:
-                    bits = field_0x10->UnknownFunction511370(UnknownFunction511970(sourceFormat) * levelHeight *
-                                                             levelSide + 4);
+                    bits = field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(sourceFormat) * levelHeight *
+                                                               levelSide + 4);
                     if (!bits)
                         return 0;
                     break;
@@ -203,7 +203,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
             UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * width * height);
             break;
         case 5:
-            bits = field_0x10->UnknownFunction511370(UnknownFunction511970(sourceFormat) * width * height + 4);
+            bits = field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(sourceFormat) * width * height + 4);
             if (!bits)
                 return 0;
             break;

@@ -328,10 +328,10 @@ public:
     // 0x00530190: slot 8 on the owner, then 0x005301c0; returns this.
     Wrecker* UnknownFunction530190(void* owner, UnknownWreckerCharacter* rider, const char* name);
     void UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name);
-    void UnknownFunction5305b0(int value);             // appends to contactAnimations
-    void UnknownFunction5305f0(int value);             // appends to randomAnimations
-    int UnknownFunction530630(int value);              // appends to indexedAnimations, returns its index
-    void UnknownFunction530680(UnknownWreckerCollisionObject* object); // appends to ignoreObjects
+    void AddContactAnimation(int value);             // appends to contactAnimations
+    void AddRandomAnimation(int value);             // appends to randomAnimations
+    int AddIndexedAnimation(int value);              // appends to indexedAnimations, returns its index
+    void AddIgnoredObject(UnknownWreckerCollisionObject* object); // appends to ignoreObjects
     void UnknownFunction5327c0();
     void UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents);
     void UnknownFunction5329e0(float frameTime);

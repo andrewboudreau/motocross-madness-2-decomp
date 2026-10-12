@@ -146,13 +146,13 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
                 field_0x16c -= 1.0f;
                 if (field_0x16c < field_0x1e0)
                     field_0x16c = field_0x1e0;
-                UnknownFunction42e930(field_0x16c);
+                SetFieldOfView(field_0x16c);
             }
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x3f, 0)) {
                 field_0x16c += 1.0f;
                 if (field_0x16c > field_0x1dc)
                     field_0x16c = field_0x1dc;
-                UnknownFunction42e930(field_0x16c);
+                SetFieldOfView(field_0x16c);
             }
         }
         if (field_0x1d8) {
@@ -169,7 +169,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x0042e930: a zero value keeps the current +0x16c.
-void Camera::UnknownFunction42e930(float value) {
+void Camera::SetFieldOfView(float value) {
     if (value != 0.0)
         field_0x16c = value;
     field_0x1d0 = Owner()->field_0x14 + 1;
@@ -197,7 +197,7 @@ void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forwa
     if (roll)
         this->roll = *roll;
     if (fov)
-        UnknownFunction42e930(*fov);
+        SetFieldOfView(*fov);
 }
 
 // 0x0042e8e0

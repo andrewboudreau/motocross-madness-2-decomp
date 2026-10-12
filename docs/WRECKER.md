@@ -166,7 +166,9 @@ Renaming changed no calibration bytes.
 Function names (tier 3, from behaviour): `0x00531da0` `EmitProbeTrail`
 (particles along a probe's movement) and `0x00532580` `RebuildPoseSteps`
 (the pose's linear and angular steps from the node's frame), and the
-near miss `0x00531740` `SprayContactParticles`.
+near miss `0x00531740` `SprayContactParticles`. The list appenders
+`0x005305b0`..`0x00530680` are `AddContactAnimation`, `AddRandomAnimation`,
+`AddIndexedAnimation` and `AddIgnoredObject`.
 
 Calls into code another unit owns now use that unit's canonical name where
 krusty2 already names the address and no other lane's header shares the

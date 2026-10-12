@@ -159,7 +159,9 @@ Provisional names from the behaviour their comments record: `SetPageCount`
 `0x0050c790` and `WriteDebugReport` `0x0050c7e0` (the `C:	emp\TM_debug.txt`
 report) follow the same header comments. The near-miss repacks are
 `RepackWholePages` `0x0050c960` and `RepackWithPartialBlits` `0x0050dad0`;
-the manager's memory count `0x00511580` is `CountTextureMemory`. `0x0050c6c0` (adds a texture) keeps its
+the manager's memory count `0x00511580` is `CountTextureMemory`, and its
+grow-only scratch buffers `0x00511310`/`0x00511370` are `GrowScratchBuffer`
+and `GrowSecondScratchBuffer`. `0x0050c6c0` (adds a texture) keeps its
 address name because Cube.cpp, SoultreeMaterial.cpp and TextureMap.cpp call it.
 
 ## CacheTexture

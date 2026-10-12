@@ -159,7 +159,7 @@ lister `0x0051ffe0` keep placeholders: BikeAI and TrackRecord.cpp call them.
 The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
 `0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address
 names because physics declarations (`src/krusty2/vehicle/KrustyBikeTypes.h`)
-call them.
+call them. The file loader `0x00515ed0` is `LoadTrack`.
 
 ## Reproduce
 

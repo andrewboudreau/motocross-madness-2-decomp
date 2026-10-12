@@ -51,7 +51,7 @@ UnknownTextureStream* UnknownResourceManager::UnknownFunction4e9030(const char* 
                     archive->UnknownFunction461640(&items[itemCount + i]->field_0x18, 4, 1);
                     archive->UnknownFunction461640(&items[itemCount + i]->field_0x1c, 4, 1);
                     items[itemCount + i]->field_0x14 = archive;
-                    if (UnknownFunction4e8f40(items[itemCount + i])) {
+                    if (MergeWithExisting(items[itemCount + i])) {
                         items[itemCount + i]->Release();
                         i--;
                         count--;

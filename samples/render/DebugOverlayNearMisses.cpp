@@ -1,7 +1,7 @@
 // Near-miss DebugOverlay.cpp candidates, kept out of src/reconstructed until
 // they match (the exact members are in src/reconstructed/DebugOverlay.cpp).
 //
-// DebugOverlay::UnknownFunction447a00 (0x00447a00, 980 bytes; ours 989):
+// DebugOverlay::LoadFont (0x00447a00, 980 bytes; ours 989):
 // the GDI font builder. The glyph loop is a top-tested `while (c < 256)`
 // (a do-while lets VC6 peel the first u0 = 0 and reuse u1 as the next u0),
 // and the GetDC/ReleaseDC/Slot8 failures share one `failed: return 0`.
@@ -35,7 +35,7 @@
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/TrackOverlay.h"
 
-int DebugOverlay::UnknownFunction447a00()
+int DebugOverlay::LoadFont()
 {
     int c = 0;
     fontTexture = (PCTextureMap*)UnknownFunction50a590(g_TrackGame->field_0x3c,
@@ -137,7 +137,7 @@ DebugOverlay* DebugOverlay::UnknownFunction447de0(RenderTarget* a, TextureMapMan
     rowsTop = e;
     rowsLeft = d;
     field_0x36d4 = b;
-    if (UnknownFunction447a00()) {
+    if (LoadFont()) {
         int y = e;
         int i = 0;
         do {

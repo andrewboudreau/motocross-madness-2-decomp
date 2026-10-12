@@ -58,7 +58,7 @@ public:
                                         int c, int d, int e);
     // 0x00447a00: loads "DebugOverlayText.tga", or renders the font
     // ("Courier", height field_0x36d0) into a new 256x256 texture through GDI.
-    int UnknownFunction447a00();
+    int LoadFont();
     // 0x00447e90 (ret 0xc): sets the text of row `row` when it changed.
     void SetRowText(int row, const char* text, int flag);
     int UnknownFunction4484f0();                                        // 0x004484f0: next page

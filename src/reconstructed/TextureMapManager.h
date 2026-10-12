@@ -142,8 +142,8 @@ public:
     void CountTextureMemory();             // 0x00511580 (PCTextureMap slot 12 and destructor)
     // 0x00511310 / 0x00511370: grow-only scratch buffers of at least
     // `bytes`; 0 when the allocation fails.
-    void* UnknownFunction511310(unsigned int bytes);
-    void* UnknownFunction511370(unsigned int bytes);
+    void* GrowScratchBuffer(unsigned int bytes);
+    void* GrowSecondScratchBuffer(unsigned int bytes);
 
     UnknownTextureMapList field_0x2c;         // every registered texture
     ManagedTextureGroup* field_0x3c;          // cache selected by the debug keys

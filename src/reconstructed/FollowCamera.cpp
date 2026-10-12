@@ -647,7 +647,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         float height = ground.y + 3.5f;
         if (height > eyePosition.y)
             eyePosition.y = height;
-        UnknownFunction42e930(66.0f);
+        SetFieldOfView(66.0f);
         Camera::UnknownVirtualSlot10(dt);
         return true;
     }

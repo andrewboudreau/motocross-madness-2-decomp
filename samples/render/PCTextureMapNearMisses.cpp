@@ -277,7 +277,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
         }
         if (bits && sourceFormat != field_0x20 &&
             (!checkMemory || UnknownFunction511970(565) > UnknownFunction511970(sourceFormat)) &&
-            !field_0x10->UnknownFunction511370(UnknownFunction511970(565) * width * height))
+            !field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(565) * width * height))
             return 0;
         if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));

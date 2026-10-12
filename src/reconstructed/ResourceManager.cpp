@@ -83,7 +83,7 @@ UnknownResourceManager::~UnknownResourceManager()
 }
 
 // 0x004e8f40
-int UnknownResourceManager::UnknownFunction4e8f40(ResourceItem* item)
+int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(item->name, items[i]->name)) {
@@ -179,7 +179,7 @@ int UnknownResourceManager::UnknownFunction4e9430(const char* name, const char* 
             items[itemCount]->field_0x18 = 0;
             items[itemCount]->field_0x1c = 0;
             items[itemCount]->field_0x14 = archive;
-            if (UnknownFunction4e8f40(items[itemCount])) {
+            if (MergeWithExisting(items[itemCount])) {
                 items[itemCount]->Release();
                 return 1;
             }
@@ -213,7 +213,7 @@ int UnknownResourceManager::UnknownFunction4e96b0(const char* name, void* object
         items[itemCount]->field_0x1c = 0;
         items[itemCount]->field_0x14 = 0;
         items[itemCount]->object = object;
-        if (UnknownFunction4e8f40(items[itemCount]))
+        if (MergeWithExisting(items[itemCount]))
             items[itemCount]->Release();
         else
             itemCount++;

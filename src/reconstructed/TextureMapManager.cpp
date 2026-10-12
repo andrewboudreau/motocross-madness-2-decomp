@@ -359,7 +359,7 @@ void TextureMapManager::UnknownFunction511300(TextureMap* texture) {
 }
 
 // 0x00511310
-void* TextureMapManager::UnknownFunction511310(unsigned int bytes) {
+void* TextureMapManager::GrowScratchBuffer(unsigned int bytes) {
     if (field_0x64 < bytes) {
         if (field_0x5c) {
             DebugFree(field_0x5c, __FILE__, 497);
@@ -374,7 +374,7 @@ void* TextureMapManager::UnknownFunction511310(unsigned int bytes) {
 }
 
 // 0x00511370
-void* TextureMapManager::UnknownFunction511370(unsigned int bytes) {
+void* TextureMapManager::GrowSecondScratchBuffer(unsigned int bytes) {
     if (field_0x68 < bytes) {
         if (field_0x60) {
             DebugFree(field_0x60, __FILE__, 512);

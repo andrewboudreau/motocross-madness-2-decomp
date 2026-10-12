@@ -14,7 +14,7 @@
   "??_C@_06MMHP@CAMERA?$AA@": "0x0056b26c",
   "??_C@_0CE@EPFO@?$CF?$CKs?$CF?$CKs?$CF?$CKf?$CF?$CKf?$CF?$CKf?$CFf?$CFf?$CFf?$CFf?$CFf?$CFf?$CFf?$CFf?$CF@": "0x0056b248",
   "?UnknownFunction40ae30@@YAMPBUVector3@@0@Z": "0x0040ae30",
-  "?UnknownFunction42e930@Camera@@QAEXM@Z": "0x0042e930",
+  "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
   "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",

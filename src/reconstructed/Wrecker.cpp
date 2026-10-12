@@ -112,26 +112,26 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     boxFrame = 0;
 }
 
-void Wrecker::UnknownFunction5305b0(int value) {
+void Wrecker::AddContactAnimation(int value) {
     contactAnimations = (int*)DebugRealloc(contactAnimations, contactAnimationCount * 4 + 4, __FILE__, 0x9d);
     contactAnimations[contactAnimationCount] = value;
     contactAnimationCount++;
 }
 
-void Wrecker::UnknownFunction5305f0(int value) {
+void Wrecker::AddRandomAnimation(int value) {
     randomAnimations = (int*)DebugRealloc(randomAnimations, randomAnimationCount * 4 + 4, __FILE__, 0xa4);
     randomAnimations[randomAnimationCount] = value;
     randomAnimationCount++;
 }
 
-int Wrecker::UnknownFunction530630(int value) {
+int Wrecker::AddIndexedAnimation(int value) {
     indexedAnimations = (int*)DebugRealloc(indexedAnimations, indexedAnimationCount * 4 + 4, __FILE__, 0xac);
     indexedAnimations[indexedAnimationCount] = value;
     indexedAnimationCount++;
     return indexedAnimationCount - 1;
 }
 
-void Wrecker::UnknownFunction530680(UnknownWreckerCollisionObject* object) {
+void Wrecker::AddIgnoredObject(UnknownWreckerCollisionObject* object) {
     ignoreObjects = (UnknownWreckerCollisionObject**)DebugRealloc(ignoreObjects, ignoreObjectCount * 4 + 4, __FILE__, 0xb4);
     ignoreObjects[ignoreObjectCount] = object;
     ignoreObjectCount++;

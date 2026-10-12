@@ -659,7 +659,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
                     field_0x258 = field_0x1dc;
             }
         }
-        UnknownFunction42e930(field_0x294->Update(field_0x258, dt));
+        SetFieldOfView(field_0x294->Update(field_0x258, dt));
         Camera::UnknownVirtualSlot10(dt);
         field_0x278 = wide;
         return 1;

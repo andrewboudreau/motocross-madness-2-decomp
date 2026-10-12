@@ -527,8 +527,8 @@ static inline void ReadProbe(UnknownTextureStream* stream, TrackProbe* probe, fl
     probe->centre.z = probe->centre.z * scale + offsetZ;
 }
 
-int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
-                                 int* hasFinish)
+int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
+                     int* hasFinish)
 {
     int count = 0;
     float offsetX = 0.0f;
