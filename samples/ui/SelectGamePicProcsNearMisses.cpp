@@ -276,25 +276,25 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     }
     UnknownLobbyStartMessage message;
     message.start = start;
-    message.field_0x08 = g_TrackGame->mode.field_0x27f8;
+    message.raceSettings = g_TrackGame->mode.field_0x27f8;
     message.field_0x1f4 = g_TrackGame->mode.field_0x94;
-    memcpy(message.field_0x08.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
+    memcpy(message.raceSettings.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
         char name[0x80];
         message.field_0x1f8[0] = g_TrackGame->mode.field_0x1bcc;
         g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer, name);
-        strcpy(message.field_0x218[0], name);
+        strcpy(message.playerNames[0], name);
         int humans = g_UnknownGlobal689df8 + 1;
         for (i = 1; i < humans; i++) {
             message.field_0x1f8[i] = g_TrackGame->mode.field_0x1be4[i].field_0xc0;
-            strcpy(message.field_0x218[i], g_TrackGame->mode.field_0x1be4[i].field_0xdc);
+            strcpy(message.playerNames[i], g_TrackGame->mode.field_0x1be4[i].field_0xdc);
         }
         for (i = humans; i < total; i++) {
             message.field_0x1f8[i] = g_TrackGame->mode.field_0x1be4[i].field_0xc0;
-            strcpy(message.field_0x218[i], g_TrackGame->mode.field_0x1be4[i].field_0xdc);
-            strcpy(message.field_0x298[i], g_TrackGame->mode.field_0x1be4[i].field_0x00);
-            strcpy(message.field_0x498[i], g_TrackGame->mode.field_0x1be4[i].field_0x40);
-            strcpy(message.field_0x698[i], g_TrackGame->mode.field_0x1be4[i].field_0x80);
+            strcpy(message.playerNames[i], g_TrackGame->mode.field_0x1be4[i].field_0xdc);
+            strcpy(message.bikeModelNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x00);
+            strcpy(message.bikeNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x40);
+            strcpy(message.riderNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x80);
             message.field_0x898[i] = g_TrackGame->mode.field_0x1be4[i].field_0xec;
             message.field_0x8b8[i] = g_TrackGame->mode.field_0x1be4[i].field_0xf0;
         }

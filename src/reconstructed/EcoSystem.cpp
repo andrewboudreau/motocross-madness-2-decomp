@@ -465,7 +465,7 @@ void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
     definition->modelTexture->UnknownVirtualSlot19();
     int vertexCount = definition->modelVertexCount[isBillboard];
     int indexCount = definition->modelIndexCount[isBillboard];
-    target->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
+    target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
                                  indexCount, 0);
     g_UnknownGlobal59aebc->ageManager->MarkUsed(
         (AgeEntry*)((int*)geometryBlock + vertexCount * 8 + (indexCount + 1) / 2));
@@ -1056,65 +1056,65 @@ void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
     if (format == 1555) {
         alphaReference = (float)(g_TrackGame->field_0x2d0 ? 0 : 0xc0);
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else if (format == 4444 || format == 8888) {
         alphaReference = 0.0f;
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else {
         alphaReference = 0.0f;
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 1, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 1, 0);
     }
-    ECO_VIEW->UnknownVirtualSlot18((int)alphaReference);
+    ECO_VIEW->SetAlphaReference((int)alphaReference);
     if (g_UnknownGlobal59af14[detailLevel].stageLighting) {
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         if (g_UnknownGlobal59af14[detailLevel].specular)
-            ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
+            ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
         else
-            ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
+            ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
         if (format == 4444 || format == 8888) {
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         } else {
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     } else {
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
         // Both arms are the same in retail (the second is reached by jump
         // threading from the format test below).
         if (format == 4444) {
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         } else {
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     }
     if (format == 1555) {
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
         if (g_TrackGame->field_0x2d0) {
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
-            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+            ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
         }
     } else if (format == 4444) {
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
     } else {
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
-        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+        ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
     }
 }
 

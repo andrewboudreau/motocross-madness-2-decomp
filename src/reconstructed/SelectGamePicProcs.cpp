@@ -143,13 +143,13 @@ struct UnknownPlayerLeftMessage {
 struct UnknownLobbyStartMessage {
     int field_0x00;
     short start;                              // +0x04: start
-    UnknownTrackGameModeSettings field_0x08;  // TrackGame+0x2d70
+    UnknownTrackGameModeSettings raceSettings; // +0x08: TrackGame+0x2d70
     int field_0x1f4;                          // TrackGame+0x60c
     int field_0x1f8[8];                       // racer slot +0xc0
-    char field_0x218[8][0x10];                // racer slot +0xdc (name)
-    char field_0x298[8][0x40];                // racer slot +0x00
-    char field_0x498[8][0x40];                // racer slot +0x40
-    char field_0x698[8][0x40];                // racer slot +0x80
+    char playerNames[8][0x10];                // +0x218: racer slot +0xdc (name)
+    char bikeModelNames[8][0x40];             // +0x298: racer slot +0x00 (bike model name)
+    char bikeNames[8][0x40];                  // +0x498: racer slot +0x40 (bike name)
+    char riderNames[8][0x40];                 // +0x698: racer slot +0x80 (rider name)
     int field_0x898[8];                       // racer slot +0xec
     int field_0x8b8[8];                       // racer slot +0xf0
 };
@@ -762,21 +762,21 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         }
     } else if (from && type == 0x83) {
         UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
-        g_TrackGame->mode.field_0x27f8 = start->field_0x08;
+        g_TrackGame->mode.field_0x27f8 = start->raceSettings;
         g_TrackGame->mode.field_0x94 = start->field_0x1f4;
         int total = g_TrackGame->mode.field_0x27f8.field_0x35 + g_TrackGame->mode.field_0x27f8.field_0x28;
         if (start->start) {
             for (i = g_TrackGame->mode.field_0x27f8.field_0x35; i < total; i++) {
                 g_TrackGame->mode.field_0x1be4[i].field_0xc0 = start->field_0x1f8[i];
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0xdc, start->field_0x218[i], 0x10);
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0xdc, start->playerNames[i], 0x10);
                 g_TrackGame->mode.field_0x1be4[i].field_0xd8 = i;
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x00, start->field_0x298[i], 0x40);
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x40, start->field_0x498[i], 0x40);
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x80, start->field_0x698[i], 0x40);
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x00, start->bikeModelNames[i], 0x40);
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x40, start->bikeNames[i], 0x40);
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x80, start->riderNames[i], 0x40);
                 g_TrackGame->mode.field_0x1be4[i].field_0xec = start->field_0x898[i];
                 g_TrackGame->mode.field_0x1be4[i].field_0xf0 = start->field_0x8b8[i];
             }
-            memcpy(lobbySlots.slots, start->field_0x08.field_0x18c, sizeof(lobbySlots.slots));
+            memcpy(lobbySlots.slots, start->raceSettings.field_0x18c, sizeof(lobbySlots.slots));
             FillRacerSlots();
         } else {
             FollowTrackChange();

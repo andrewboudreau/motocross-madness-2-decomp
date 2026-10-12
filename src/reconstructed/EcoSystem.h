@@ -182,6 +182,9 @@ public:
     unsigned char field_0x19c[0x1c0 - 0x19c];
     float farDistance;                        // +0x1c0
 };
+// Slots 6-9, 15 and 18 are named from the D3D arguments their callers pass
+// (D3DTSS_*/D3DRENDERSTATE_* states, D3DPT_/D3DFVF_ index draws, the alpha
+// reference); the names follow the IDirect3DDevice7 calls they forward to.
 class UnknownEcoRenderTarget {
 public:
     virtual void UnknownVirtualSlot0();
@@ -190,20 +193,20 @@ public:
     virtual int UnknownVirtualSlot3(void* a, void* b, void* c, int d);
     virtual void* UnknownVirtualSlot4(void* rect, long* pitch, int flags);
     virtual int UnknownVirtualSlot5(void* rect);
-    virtual long UnknownVirtualSlot6(int stage, int type, int* value);
-    virtual long UnknownVirtualSlot7(int stage, int type, int value);
-    virtual void UnknownVirtualSlot8(int state, int value, int force);
-    virtual long UnknownVirtualSlot9(int state, int* value);
+    virtual long GetTextureStageState(int stage, int type, int* value);
+    virtual long SetTextureStageState(int stage, int type, int value);
+    virtual void SetRenderState(int state, int value, int force);
+    virtual long GetRenderState(int state, int* value);
     virtual void UnknownVirtualSlot10(int mode, int flag);
     virtual long UnknownVirtualSlot11(int stage);
     virtual int UnknownVirtualSlot12(const void* rect, int flags);
     virtual int UnknownVirtualSlot13(int a);
     virtual int UnknownVirtualSlot14(void* viewport);
-    virtual int UnknownVirtualSlot15(int primitive, int format, void* vertices, int vertexCount,
+    virtual int DrawIndexedPrimitive(int primitive, int format, void* vertices, int vertexCount,
                                      void* indices, int indexCount, int flags);
     virtual int UnknownVirtualSlot16(int a, int b, int c, int d, int e);
     virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e, int f, int g);
-    virtual void UnknownVirtualSlot18(int value);
+    virtual void SetAlphaReference(int value);
     virtual void UnknownVirtualSlot19();
 
     unsigned char field_0x04[4];
