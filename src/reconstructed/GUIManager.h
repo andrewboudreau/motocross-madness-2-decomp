@@ -402,14 +402,16 @@ public:
 struct UnknownHiResMeterEntry {
     float field_0x00;
     float field_0x04;
-    float field_0x08;                         // calls
-    float field_0x0c;                         // total time
-    float field_0x10;                         // calls this tick
-    float field_0x14;                         // time this tick
-    float field_0x18;                         // time over all ticks
-    float field_0x1c;                         // ticks
-    float field_0x20;                         // peak
-    char field_0x24[0x24];                    // name
+    // Named after slot 10's "MS Timers [CallsThisTick-->TotMSThisTick
+    // (AvgMSPerTick)] : (Per-call Peak/Avg)" columns.
+    float calls;                              // +0x08
+    float totalMs;                            // +0x0c: total time (per-call average = totalMs / calls)
+    float callsThisTick;                      // +0x10
+    float msThisTick;                         // +0x14
+    float msAllTicks;                         // +0x18: msThisTick summed each tick
+    float ticks;                              // +0x1c
+    float peakMs;                             // +0x20: per-call peak
+    char name[0x24];                          // +0x24
 };
 
 class HiResMeter : public GameObject {
@@ -425,10 +427,10 @@ public:
     void UnknownFunction488540();             // 0x00488540
     void UnknownFunction488580();             // 0x00488580
 
-    unsigned char field_0x2c;                 // the counter is usable
-    float field_0x30;                         // counts per millisecond
-    int field_0x34;                           // entries in use
+    unsigned char counterUsable;              // +0x2c: slot 8 calibrated the time stamp counter
+    float countsPerMs;                        // +0x30: counts per millisecond
+    int timerCount;                           // +0x34: entries in use
     int field_0x38;
-    int field_0x3c;                           // overlay page, -1 until assigned
-    UnknownHiResMeterEntry field_0x40[50];
+    int overlayPage;                          // +0x3c: debug overlay page, -1 until assigned
+    UnknownHiResMeterEntry timers[50];        // +0x40
 };

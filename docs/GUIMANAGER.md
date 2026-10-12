@@ -28,7 +28,8 @@ tool-tip font, the cursors and up to four GUIUsers; each GUIUser routes
 input devices (a `ContainerList<GUIInputDevice*>` at +0x1e0), focus,
 hover/capture, IME state, a ToolTip and a GUICursor. HiResMeter is the
 "MS Timers" overlay at `0x0067b468` (Game.h's `g_UnknownGlobal56c470`
-points to it). KrustyUI.h still declares GUIManager and GUIUser as
+points to it); its timer fields are named after the overlay's column header
+(`callsThisTick`, `msThisTick`, `peakMs`, ...). KrustyUI.h still declares GUIManager and GUIUser as
 `UnknownKrustyUIGui` / `UnknownKrustyUIGuiLayer` views; unifying them
 would change KrustyUI's mangled names.
 

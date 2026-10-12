@@ -1211,13 +1211,13 @@ HiResMeter g_UnknownHiResMeter67b468(0);
 
 // 0x00488380
 HiResMeter::HiResMeter(int flags) : GameObject(flags) {
-    field_0x3c = -1;
-    field_0x30 = 0;
+    overlayPage = -1;
+    countsPerMs = 0;
     UnknownFunction488580();
     if (UnknownVirtualSlot8(0))
-        field_0x2c = 1;
+        counterUsable = 1;
     else
-        field_0x2c = 0;
+        counterUsable = 0;
 }
 
 // 0x00488430
@@ -1228,9 +1228,9 @@ HiResMeter::~HiResMeter() {
 void HiResMeter::UnknownFunction488510() {
     int i;
 
-    for (i = 0; i < field_0x34; i++) {
-        field_0x40[i].field_0x10 = 0;
-        field_0x40[i].field_0x14 = 0;
+    for (i = 0; i < timerCount; i++) {
+        timers[i].callsThisTick = 0;
+        timers[i].msThisTick = 0;
     }
 }
 
@@ -1238,16 +1238,16 @@ void HiResMeter::UnknownFunction488510() {
 void HiResMeter::UnknownFunction488540() {
     int i;
 
-    for (i = 0; i < field_0x34; i++) {
-        field_0x40[i].field_0x08 = 0;
-        field_0x40[i].field_0x0c = 0;
-        field_0x40[i].field_0x00 = 0;
-        field_0x40[i].field_0x04 = 0;
-        field_0x40[i].field_0x10 = 0;
-        field_0x40[i].field_0x14 = 0;
-        field_0x40[i].field_0x18 = 0;
-        field_0x40[i].field_0x1c = 0;
-        field_0x40[i].field_0x20 = 0;
+    for (i = 0; i < timerCount; i++) {
+        timers[i].calls = 0;
+        timers[i].totalMs = 0;
+        timers[i].field_0x00 = 0;
+        timers[i].field_0x04 = 0;
+        timers[i].callsThisTick = 0;
+        timers[i].msThisTick = 0;
+        timers[i].msAllTicks = 0;
+        timers[i].ticks = 0;
+        timers[i].peakMs = 0;
     }
     field_0x38 = 0;
 }
@@ -1257,18 +1257,18 @@ void HiResMeter::UnknownFunction488580() {
     int i;
 
     for (i = 0; i < 50; i++) {
-        field_0x40[i].field_0x08 = 0;
-        field_0x40[i].field_0x0c = 0;
-        field_0x40[i].field_0x00 = 0;
-        field_0x40[i].field_0x04 = 0;
-        field_0x40[i].field_0x10 = 0;
-        field_0x40[i].field_0x14 = 0;
-        field_0x40[i].field_0x18 = 0;
-        field_0x40[i].field_0x1c = 0;
-        field_0x40[i].field_0x20 = 0;
-        field_0x40[i].field_0x24[0] = 0;
+        timers[i].calls = 0;
+        timers[i].totalMs = 0;
+        timers[i].field_0x00 = 0;
+        timers[i].field_0x04 = 0;
+        timers[i].callsThisTick = 0;
+        timers[i].msThisTick = 0;
+        timers[i].msAllTicks = 0;
+        timers[i].ticks = 0;
+        timers[i].peakMs = 0;
+        timers[i].name[0] = 0;
     }
-    field_0x34 = 0;
+    timerCount = 0;
     field_0x38 = 0;
 }
 
@@ -1278,25 +1278,25 @@ int HiResMeter::UnknownVirtualSlot10(float frameTime) {
     int i;
 
     if (g_TrackGame->debugOverlay) {
-        if (field_0x3c < 0)
-            field_0x3c = g_TrackGame->debugOverlay->NewPage();
-        if (g_TrackGame->debugOverlay->field_0x26c4 != field_0x3c) {
+        if (overlayPage < 0)
+            overlayPage = g_TrackGame->debugOverlay->NewPage();
+        if (g_TrackGame->debugOverlay->field_0x26c4 != overlayPage) {
             UnknownFunction488540();
             return 1;
         }
         g_TrackGame->debugOverlay->UnknownFunction447fa0(
-            field_0x3c, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x3c, "Previous Game Tick: % 3d  MS",
+            overlayPage, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(overlayPage, "Previous Game Tick: % 3d  MS",
                                                                 g_UnknownGlobal65b534);
-        for (i = 0; i < field_0x34; i++) {
-            entry = &field_0x40[i];
-            if (entry->field_0x08 != 0.0f) {
-                entry->field_0x1c += 1.0f;
-                entry->field_0x18 = entry->field_0x18 + entry->field_0x14;
+        for (i = 0; i < timerCount; i++) {
+            entry = &timers[i];
+            if (entry->calls != 0.0f) {
+                entry->ticks += 1.0f;
+                entry->msAllTicks = entry->msAllTicks + entry->msThisTick;
                 g_TrackGame->debugOverlay->UnknownFunction447f40(
-                    field_0x3c, "%24.24s [%4.0f --> %6.3f (%6.3f)] : (%6.3f / %5.3f) MS", entry->field_0x24,
-                    entry->field_0x10, entry->field_0x14, entry->field_0x18 / entry->field_0x1c,
-                    entry->field_0x20, entry->field_0x0c / entry->field_0x08);
+                    overlayPage, "%24.24s [%4.0f --> %6.3f (%6.3f)] : (%6.3f / %5.3f) MS", entry->name,
+                    entry->callsThisTick, entry->msThisTick, entry->msAllTicks / entry->ticks,
+                    entry->peakMs, entry->totalMs / entry->calls);
             }
         }
     }
