@@ -28,7 +28,7 @@ struct UnknownInstrumentState {
     unsigned char field_0x000[0xbc];
     float gaugeValue;                         // the gauge value before scaling
     unsigned char field_0x0c0[0x108 - 0xc0];
-    bool field_0x108;
+    bool airborne;                            // +0x108 RaceView.h's racer airborne flag; the gauge winds down while set
     unsigned char field_0x109[0x736 - 0x109];
     unsigned char field_0x736;
     unsigned char field_0x737[0x74c - 0x737];
@@ -42,7 +42,7 @@ struct UnknownInstrumentState {
     unsigned char field_0x788[0x7a0 - 0x788];
     unsigned short lapsDone;                  // laps done
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
-    char field_0x7a4;
+    char finished;                            // +0x7a4 RaceView.h's racer hasFinished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
     int lapGate;                              // gate of the lap
 };
@@ -349,7 +349,7 @@ struct UnknownChatRacer {
     unsigned char field_0x4a8[0x5e0 - 0x4a8];
     char name[0x10];                          // name
     unsigned char field_0x5f0[0x784 - 0x5f0];
-    int field_0x784;                          // ChatOverlay+0x19c keeps the last value
+    int position;                             // +0x784 the racer's position (RaceView.h finishPosition); ChatOverlay+0x19c keeps the last value
 };
 
 // ChatOverlay+0x128 and +0x12c: only these fields are read.

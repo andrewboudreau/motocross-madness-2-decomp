@@ -424,8 +424,8 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
         } else {
             if (g_TrackGame->mode.showRiderPositions) {
                 UnknownChatRacer* racer = racers[index];
-                if (racer->field_0x784 > 0)
-                    sprintf(text, "%d", racer->field_0x784);
+                if (racer->position > 0)
+                    sprintf(text, "%d", racer->position);
                 else
                     strcpy(text, "--");
             } else {

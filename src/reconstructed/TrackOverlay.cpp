@@ -145,7 +145,7 @@ int InstrumentOverlay::UnknownVirtualSlot14()
             PlaceNeedle(&dial, dialNeedle);
         }
         UnknownInstrumentState* state = instrumentSource->state;
-        if (state->field_0x108) {
+        if (state->airborne) {
             s_UnknownGlobal68a448 = (!s_UnknownGlobal575140 ? state->gaugeValue * 0.68182f : s_UnknownGlobal68a448) - 0.5f;
             if (s_UnknownGlobal68a448 < 0.0f)
                 s_UnknownGlobal68a448 = 0.0f;
@@ -153,7 +153,7 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         } else {
             dial.value = state->gaugeValue * 0.68182f;
         }
-        s_UnknownGlobal575140 = instrumentSource->state->field_0x108;
+        s_UnknownGlobal575140 = instrumentSource->state->airborne;
         PlaceNeedleTip(&dial, dialNeedle);
         if (!Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)dialNeedle, 2, 0))
             return 0;
@@ -534,7 +534,7 @@ int StatsOverlay::DrawViewModePanel()
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
         FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
-        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->field_0x7a4);
+        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->field_0x736)
@@ -647,7 +647,7 @@ int StatsOverlay::DrawRacePanel()
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
         FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
-        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->field_0x7a4);
+        sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         FormatLapTime(time, instrumentSource->state->lastLapTime);
@@ -1471,9 +1471,9 @@ int ChatOverlay::UnknownVirtualSlot13()
         RedrawNameTags(-1);
     } else {
         for (int i = 0; i < racerCount; i++) {
-            if (g_TrackGame->mode.showRiderPositions && lastRacerValues[i] != racers[i]->field_0x784) {
+            if (g_TrackGame->mode.showRiderPositions && lastRacerValues[i] != racers[i]->position) {
                 RedrawNameTags(i);
-                lastRacerValues[i] = racers[i]->field_0x784;
+                lastRacerValues[i] = racers[i]->position;
             }
             if (racers[i]->racerState->hideNameTag)
                 nameTags[i]->UnknownVirtualSlot4();
