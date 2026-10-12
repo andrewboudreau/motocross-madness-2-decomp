@@ -14,24 +14,6 @@
 // parameter types (bool or unsigned char `stereo`: 38) and blockAlign
 // first; avgBytesPerSec from `rate` or as a product scores lower.
 //
-// Sound 0x004bd0c0 (refills from the archive or file): retail keeps one
-// `return 1` block shared by both branches; VC6 here folds the archive
-// branch's result into `neg/sbb`. An if/else with one trailing `return 1`,
-// gotos to shared labels, a result variable and an ok flag were tried.
-// Retail's extent is 412 bytes (0x4bd0c0..0x4bd25c), not 314: it ends with
-// the file branch's failure tail (delete, `xor eax, eax`) and then its
-// success tail (delete, `mov eax, 1`), which the archive branch's success
-// also jumps to; the archive branch's Fill failure has its own epilogue
-// without `xor eax, eax`. Swept against 412 bytes (24 forms): `goto done`
-// for the archive success, `if (filled) return 1; return filled;` (setne),
-// `return filled` after `goto done` (VC6 cross-jumps it to the xor tail),
-// nested ifs, an ok flag and `goto closeFailed` in the file branch. VC6
-// always places the success tail first (`je fail`); best 114/412 masked.
-// The sound factory 0x004bb890 next to it is exact in PCAudio.cpp: its load
-// failures `goto` one delete tail placed inside the last branch, which
-// keeps the early returns' own epilogues (its old 272-byte extent was
-// short; the function is 384 bytes).
-//
 // Sound 0x004bc6b0 (starts a sound): compiled inside PCAudio.cpp (where the
 // UnknownSoundNotifier constructor is defined, so VC6 drops the EH frame
 // like retail) with the guarded do-while duplicate search and playFlags
@@ -86,38 +68,6 @@ int PCSoundInterface::SetPrimaryFormat(int rate, int stereo, int bits) {
     return primaryBuffer->SetFormat(&format) >= 0;
 }
 
-
-// 0x004bd0c0: refills `buffer` from the sound's archive entry or file,
-// skipping the 44-byte header.
-int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
-    if (!buffer)
-        return 0;
-    if (isPacked) {
-        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(soundName, 0);
-        if (!entry)
-            return 0;
-        entry->archive->Seek(entry->offset, 0, 0);
-        UnknownWaveHeader header;
-        if (entry->archive->Read(&header, 0x2c, 1) != 1)
-            return 0;
-        if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
-            return 0;
-        return 1;
-    }
-    UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (file->Open(soundName, "rb", 0)) {
-        if (file->field_0x1c)
-            file->Seek(file->field_0x130, 0, 0);
-        UnknownWaveHeader header;
-        if (file->Read(&header, 0x2c, 1) == 1 &&
-            FillBufferFromStream(buffer, file, 0, bufferBytes)) {
-            delete file;
-            return 1;
-        }
-    }
-    delete file;
-    return 0;
-}
 
 // 0x004bdc00: loads queued streamed sounds until the stop event: makes room
 // within the budget, creates and fills the buffer, and plays the sound

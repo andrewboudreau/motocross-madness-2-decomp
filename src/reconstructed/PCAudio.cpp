@@ -740,6 +740,45 @@ int Sound::UnlockBuffer(void* first, unsigned long firstBytes, void* second, uns
     return 0;
 }
 
+// 0x004bd0c0: refills `buffer` from the sound's archive entry or its file,
+// skipping the 44-byte header. Both branches end at one `return 1`, which
+// retail places after the file branch's delete, so the archive branch's
+// success jumps there; each file failure deletes the stream on its own path.
+int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
+    if (!buffer)
+        return 0;
+    if (isPacked) {
+        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(soundName, 0);
+        if (!entry)
+            return 0;
+        entry->archive->Seek(entry->offset, 0, 0);
+        UnknownWaveHeader header;
+        if (entry->archive->Read(&header, 0x2c, 1) != 1)
+            return 0;
+        if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
+            return 0;
+    } else {
+        UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        if (!file->Open(soundName, "rb", 0)) {
+            delete file;
+            return 0;
+        }
+        if (file->field_0x1c)
+            file->Seek(file->field_0x130, 0, 0);
+        UnknownWaveHeader header;
+        if (file->Read(&header, 0x2c, 1) != 1) {
+            delete file;
+            return 0;
+        }
+        if (!FillBufferFromStream(buffer, file, 0, bufferBytes)) {
+            delete file;
+            return 0;
+        }
+        delete file;
+    }
+    return 1;
+}
+
 // 0x004bd260: copies `bytes` of the stream into `buffer` at `offset`. At the
 // end of the data a looping sound rewinds to the data start; any other is
 // silenced and stopped.

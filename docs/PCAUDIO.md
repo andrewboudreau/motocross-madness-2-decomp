@@ -138,8 +138,17 @@ Their source shapes:
   shared tail after the if/else, or a delete in every branch, changes the
   layout.
 
+Exact (1 more): the refill `0x004bd0c0` (412 bytes, with the EH frame of
+`new UnknownTextureStream`). The archive and file branches are an if/else
+with one `return 1` after it; the file branch deletes the stream in each
+failure's own block and once more before falling out. Retail places that
+`return 1` after the file branch's delete, and the archive branch's success
+jumps to it, while the archive Fill failure keeps its own epilogue (eax is
+already zero). Returning from inside each branch lets VC6 fold the archive
+result into `neg/sbb` and put the file success tail first.
+
 Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
-`0x004be910`, `0x004bd0c0`, the manager's thread
+`0x004be910`, the manager's thread
 `0x004bdc00` and the start-up `0x004bc6b0` (in the samples file it also
 gains an EH frame because the notifier's constructor is not defined there;
 inside PCAudio.cpp the frame matches retail).

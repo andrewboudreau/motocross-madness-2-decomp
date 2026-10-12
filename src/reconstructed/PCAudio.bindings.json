@@ -72,6 +72,7 @@
   "?LockBuffer@Sound@@QAEHKKPAPAXPAK01K@Z": "0x004bd020",
   "?UnlockBuffer@Sound@@QAEHPAXK0K@Z": "0x004bd080",
   "?FillBufferFromFile@Sound@@QAEHPAPAUUnknownSoundBuffer@@@Z": "0x004bd0c0",
+  "?FillBufferFromFile@Sound@@QAEHPAPAUUnknownSoundBuffer@@@Z$ehhandler": "0x0054ca77",
   "?FillBufferFromStream@Sound@@QAEHPAPAUUnknownSoundBuffer@@PAVUnknownTextureStream@@KK@Z": "0x004bd260",
   "?CreatePendingBuffer@Sound@@QAEHXZ": "0x004bd4b0",
   "?CreateBuffer@Sound@@QAEHPAPAUUnknownSoundBuffer@@KKHHHHHKH@Z": "0x004bd540",

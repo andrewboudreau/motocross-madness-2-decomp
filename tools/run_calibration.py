@@ -26346,6 +26346,15 @@ CASES = [
         'target_va': '0x00483910',
         'target_size': 1067,
         'reason': 'cell sampler; level read through a const unsigned char& reuses the leaf-test byte (and eax,0xff; shl eax,2), mask/one computed before the cell coordinates',
+    },    # s10/match
+    {
+        'name': 'PCAudio Sound refill from archive or file 0x4bd0c0',
+        'bindings': 'src/reconstructed/PCAudio.bindings.json',
+        'source': 'src/reconstructed/PCAudio.cpp',
+        'symbol': '?FillBufferFromFile@Sound@@QAEHPAPAUUnknownSoundBuffer@@@Z',
+        'target_va': '0x004bd0c0',
+        'target_size': 412,
+        'reason': 'EH frame for new UnknownTextureStream; if/else branches share one trailing return 1 placed after the file branch delete, archive Fill failure keeps its own epilogue',
     },
 ]
 
