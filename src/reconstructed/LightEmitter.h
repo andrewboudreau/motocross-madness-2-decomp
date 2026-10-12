@@ -13,7 +13,7 @@
 // file) are known.
 class UnknownLightEmitterTarget {
 public:
-    void UnknownFunction49de70(unsigned int color);           // 0x0049de70
+    void SetRgbColor(unsigned int color);           // 0x0049de70
     void UnknownFunction49de90(const Vector3* position);      // 0x0049de90
 
     unsigned char field_0x00[0xb8];

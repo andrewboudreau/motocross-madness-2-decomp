@@ -1860,7 +1860,7 @@ UIDialog::~UIDialog() {
     if (parentDialog) {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
             parentDialog->guiManager && !parentDialog->guiManager->UnknownFunction4864f0())
-            parentDialog->guiManager->UnknownFunction486150((Palette8*)parentDialog->dialogPalette);
+            parentDialog->guiManager->SetGuiPalette((Palette8*)parentDialog->dialogPalette);
         if (field_0x154)
             NotifyParent(dialogResult, 9);
     }
@@ -4346,7 +4346,7 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
     int range = GetWidth();
     GUIInputDevice* device;
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
-        if (device->inputDevice->deviceKind == 2 && device->inputDevice->UnknownFunction4897e0(4)) {
+        if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
             POINT position = device->pointerPosition;
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (position.y <= -1) {
@@ -4602,7 +4602,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
 int UIListBox::UnknownVirtualSlot10(float frameTime) {
     GUIInputDevice* device;
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
-        if (device->inputDevice->deviceKind == 2 && device->inputDevice->UnknownFunction4897e0(4)) {
+        if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
             POINT position = device->pointerPosition;
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (position.y <= -1) {

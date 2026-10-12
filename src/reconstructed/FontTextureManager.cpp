@@ -51,7 +51,7 @@ void UnknownStatic65b478::DeleteFont(FontTexture* font) {
                 previous->next = node->next;
                 delete node;
             }
-            FontTexture::UnknownFunction467280(font);
+            FontTexture::Destroy(font);
             nodeCount--;
             return;
         }
@@ -65,7 +65,7 @@ void UnknownStatic65b478::DeleteFonts() {
 
     while ((node = firstNode) != 0) {
         firstNode = node->next;
-        FontTexture::UnknownFunction467280(node->font);
+        FontTexture::Destroy(node->font);
         delete node;
         nodeCount--;
     }

@@ -1023,7 +1023,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                             }
                         }
                         if (guiManager && load)
-                            guiManager->UnknownFunction486150((Palette8*)dialogPalette);
+                            guiManager->SetGuiPalette((Palette8*)dialogPalette);
                     }
                     parameters.GetString("BackgroundImage", "", backgroundImage, -1);
                     if (backgroundImage[0]) {

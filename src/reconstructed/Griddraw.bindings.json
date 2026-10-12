@@ -27,7 +27,7 @@
   "?UnknownFunction47e4d0@@YAXXZ": "0x0047e4d0",
   "?EvictNodeBuffers@@YAHPAX@Z": "0x0047ecc0",
   "?ReleaseVertexBuffers@DrawableGridNode@@QAEXH@Z": "0x0047edb0",
-  "?UnknownFunction47ef70@DrawableGridNode@@QAEHXZ": "0x0047ef70",
+  "?WalkVisibleFromRoot@DrawableGridNode@@QAEHXZ": "0x0047ef70",
   "?WalkVisibleQuadrants@DrawableGridNode@@QAEHHHHH@Z": "0x0047ef80",
   "?UnknownFunction47f210@DrawableGridNode@@QAEHXZ": "0x0047f210",
   "?RebuildWholeNodeBuffers@DrawableGridNode@@QAEHXZ": "0x0047f840",

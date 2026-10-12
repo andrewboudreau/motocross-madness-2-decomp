@@ -337,7 +337,7 @@ public:
     void ReleaseBackground();             // 0x00485fc0: releases it
     void GrabBackground(int dim);      // 0x004860a0: grabs the screen as the background
     void ReleaseBackgroundGrab();             // 0x004860f0: releases the grab
-    void UnknownFunction486150(Palette8* palette); // 0x00486150
+    void SetGuiPalette(Palette8* palette); // 0x00486150
     // 0x00486170: copies the screen (or `rect`) into a new texture, halving
     // its brightness when `dim`.
     PCTextureMap* CopyScreenToTexture(int dim, CameraRect* rect);

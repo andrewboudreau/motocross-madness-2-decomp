@@ -322,7 +322,7 @@
   "?UnknownFunction4881d0@GUIUser@@QAEHPAUUnknownControlEvent@@@Z": "0x004881d0",
   "?UnknownFunction4882a0@GUIUser@@QAEPAVGUIInputDevice@@PAUUnknownControlEvent@@@Z": "0x004882a0",
   "?GetAcceptedDevice@GUIUser@@QAEPAVGUIInputDevice@@H@Z": "0x00488310",
-  "?UnknownFunction4897e0@InputDevice@@QAEHH@Z": "0x004897e0",
+  "?IsDeviceSubtype@InputDevice@@QAEHH@Z": "0x004897e0",
   "?LoadEntrySound@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
   "?Load@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
   "?ReadClock@@YAIXZ": "0x004bfa80",

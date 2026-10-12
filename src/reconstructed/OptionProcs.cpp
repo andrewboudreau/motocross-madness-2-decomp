@@ -372,7 +372,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         UIControl* analog = FindControl("ChkAnalogAxes", 0);
         analog->BindValue(&g_UnknownGlobal688868.analogAxes);
         if (g_TrackGame->controlInterface->activeJoystick)
-            g_TrackGame->controlInterface->activeJoystick->UnknownFunction4897e0(4);
+            g_TrackGame->controlInterface->activeJoystick->IsDeviceSubtype(4);
         analog->Show(0, 1);
         joystickIsKind3 = 0;
         if (g_TrackGame->controlInterface->activeJoystick)

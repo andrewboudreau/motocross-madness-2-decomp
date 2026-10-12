@@ -266,7 +266,7 @@ void DrawableGridNode::ReleaseVertexBuffers(int recurse)
 }
 
 // 0x0047ef70
-int DrawableGridNode::UnknownFunction47ef70()
+int DrawableGridNode::WalkVisibleFromRoot()
 {
     return WalkVisibleQuadrants(0, 0, 16, 0);
 }

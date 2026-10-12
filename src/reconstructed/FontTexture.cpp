@@ -23,7 +23,7 @@ FontTexture::FontTexture(unsigned int count, const char* name)
 }
 
 // 0x00467280
-void FontTexture::UnknownFunction467280(FontTexture* font) {
+void FontTexture::Destroy(FontTexture* font) {
     if (font)
         delete font;
 }

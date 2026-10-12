@@ -491,7 +491,7 @@ void KrustyUI::ShowCursors() {
 }
 
 // 0x00499b10
-void KrustyUI::UnknownFunction499b10() {
+void KrustyUI::HideCursors() {
     if (gui)
         gui->ShowCursors(0);
 }

@@ -14,7 +14,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x0049de70
-void UnknownLightEmitterTarget::UnknownFunction49de70(unsigned int color) {
+void UnknownLightEmitterTarget::SetRgbColor(unsigned int color) {
     rgbColor = color & 0xffffff;
 }
 
@@ -87,7 +87,7 @@ void LightEmitter::SetColor(unsigned int color) {
     field_0x54[2] = colorRGBA[2];
     field_0x54[3] = 0.0f;
     if (field_0x9c)
-        field_0x9c->UnknownFunction49de70(color);
+        field_0x9c->SetRgbColor(color);
     if (manager)
         manager->MarkChanged();
 }

@@ -361,7 +361,7 @@
   "?ShowScene@KrustyUI@@QAEXPAVGameObject@@@Z": "0x004999f0",
   "?HideScene@KrustyUI@@QAEXXZ": "0x00499a20",
   "?ShowCursors@KrustyUI@@QAEXXZ": "0x00499b00",
-  "?UnknownFunction499b10@KrustyUI@@QAEXXZ": "0x00499b10",
+  "?HideCursors@KrustyUI@@QAEXXZ": "0x00499b10",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
   "?OpenExitDialog@KrustyUI@@QAEXXZ": "0x0049a4a0",
   "?Restart@MediaControl@@QAEHXZ": "0x004a2900",

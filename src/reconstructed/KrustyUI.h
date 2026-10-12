@@ -116,7 +116,7 @@ public:
     int ResolveBikeFile(const char* name, char* text, int size);
     int ResolveRiderFile(const char* name, char* text, int size);
     void ShowCursors();             // 0x00499b00
-    void UnknownFunction499b10();             // 0x00499b10
+    void HideCursors();             // 0x00499b10
     void OpenExitDialog();             // 0x0049a4a0: opens the exit dialog
     // 0x0049b020: fills `names` with `count` distinct random short strings.
     void MakeRandomNames(const char** names, int count);

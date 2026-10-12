@@ -321,7 +321,7 @@ public:
     virtual int UnknownVirtualSlot8(int a) { return 0; }        // 0x004da550 (shared)
 
     void ReleaseVertexBuffers(int recurse);                    // 0x0047edb0 (ret 4)
-    int UnknownFunction47ef70();                                // 0x0047ef70
+    int WalkVisibleFromRoot();                                // 0x0047ef70
     int WalkVisibleQuadrants(int x, int z, int size, int quad); // 0x0047ef80 (ret 0x10)
     int UnknownFunction47f210();                                // 0x0047f210
     int RebuildWholeNodeBuffers();                                // 0x0047f840

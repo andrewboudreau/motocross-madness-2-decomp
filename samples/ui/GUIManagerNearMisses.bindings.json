@@ -144,7 +144,7 @@
   "?AttachDialog@GUIManager@@QAEXPAVUIDialog@@HH@Z": "0x00485bd0",
   "?UnknownFunction485d70@GUIManager@@QAEXPBD@Z": "0x00485d70",
   "?UnknownFunction485ee0@GUIManager@@QAEHH@Z": "0x00485ee0",
-  "?UnknownFunction486150@GUIManager@@QAEXPAVPalette8@@@Z": "0x00486150",
+  "?SetGuiPalette@GUIManager@@QAEXPAVPalette8@@@Z": "0x00486150",
   "?UnknownFunction4864f0@GUIManager@@QAEHXZ": "0x004864f0",
   "?SetWaitCursorImage@GUIManager@@QAEXPBD@Z": "0x00486560",
   "?CreateCursors@GUIManager@@QAEXPBDH@Z": "0x00486590",

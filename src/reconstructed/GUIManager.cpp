@@ -484,7 +484,7 @@ void GUIManager::ReleaseBackgroundGrab() {
 }
 
 // 0x00486150
-void GUIManager::UnknownFunction486150(Palette8* palette) {
+void GUIManager::SetGuiPalette(Palette8* palette) {
     paletteChanged = 1;
     guiPalette = palette;
 }

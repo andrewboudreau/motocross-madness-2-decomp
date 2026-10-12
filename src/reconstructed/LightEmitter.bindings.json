@@ -21,7 +21,7 @@
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction49de70@UnknownLightEmitterTarget@@QAEXI@Z": "0x0049de70",
+  "?SetRgbColor@UnknownLightEmitterTarget@@QAEXI@Z": "0x0049de70",
   "?UnknownFunction49de90@UnknownLightEmitterTarget@@QAEXPBUVector3@@@Z": "0x0049de90",
   "?PackedColor@LightEmitter@@QAEIXZ": "0x0049dfd0",
   "?SetColor@LightEmitter@@QAEXI@Z": "0x0049e020",

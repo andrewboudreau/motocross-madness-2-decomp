@@ -18,6 +18,6 @@ InputDevice::InputDevice(int id) {
 InputDevice::~InputDevice() {}
 
 // 0x004897e0
-int InputDevice::UnknownFunction4897e0(int value) {
+int InputDevice::IsDeviceSubtype(int value) {
     return deviceSubtype == value;
 }
