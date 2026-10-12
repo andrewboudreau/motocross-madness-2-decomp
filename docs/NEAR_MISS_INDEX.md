@@ -324,6 +324,22 @@ their differences (x87 load order, `[base+index]` order, register choice)
 follow the deterministic leaf-age rule of that document and are source-form
 differences.
 
+## Measuring inside the canonical unit
+
+A sample compiled with only the headers can differ from the same body
+compiled inside its unit (`#include "../../src/reconstructed/X.cpp"` at the
+top of the sample); the cause is not isolated, the differences show in tail
+merging, block placement and epilogue copies. Game `0x00467b70` (406 -> 761),
+Wrecker `0x005329e0` (763 -> 1200, with the unit's own vector operators
+instead of copies) and ControlInterface slot 3 `0x004bf4f0` (43 -> 76) are
+measured that way. Every other sample that did not include its unit was
+also compiled inside it (2026-10-12 scan, duplicate statics and helpers
+removed): no other function's bytes changed except PCAudio `0x004bc6b0` and
+EcoSystem `0x00457480` (their rows are already measured in the unit), CarProcedural slot 10
+`0x0042fd80` (221 -> 211, worse) and Net `0x004ab960` (149 either way, the
+candidate's extent becomes retail's 1072); those samples keep their header
+includes.
+
 ## Reproduction
 
 For one function: compile its file with `tools/compile.py --compiler vc6`
