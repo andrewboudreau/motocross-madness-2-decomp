@@ -751,7 +751,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     }
     g_TrackGame->ui->UnknownFunction49b530();
 
-    UnknownFunction41d2a0(0.0f);
+    SetSceneTime(0.0f);
     raceScene->field_0x7c0 = 1;
     if (g_TrackGame->mode.field_0x27f8.field_0x00) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);

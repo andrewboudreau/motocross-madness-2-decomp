@@ -894,8 +894,8 @@ public:
     int BuildNodeList(UnknownBikeRaceNodeOwner* owner);
     // 0x0041d1e0: sets +0x189 from the track distance between +0xf8 and +0x134.
     int UnknownFunction41d1e0();
-    void UnknownFunction41d2a0(float time);   // 0x0041d2a0: the scene's time
-    int UnknownFunction41ea10();              // 0x0041ea10: whether a racer is remote
+    void SetSceneTime(float time);   // 0x0041d2a0: the scene's time
+    int AnyRacerRemote();              // 0x0041ea10: whether a racer is remote
     // 0x0041ea60: replaces id `from` with `to` in `character`'s mesh groups.
     void ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int to);
     // 0x0041eb20: points the camera at racer +0x14c (when it follows a
@@ -911,17 +911,17 @@ public:
     void UnknownFunction420b00(char* path, char* description); // 0x00420b00
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0
     // plays the replay just recorded, otherwise records a new one.
-    void UnknownFunction420650(int mode, char* path, char* description);
-    void UnknownFunction420bd0();             // 0x00420bd0: restarts the replay and ghost
+    void RestartRace(int mode, char* path, char* description);
+    void RestartReplay();             // 0x00420bd0: restarts the replay and ghost
     // 0x004210f0: writes two positions relative to `reference`.
     void UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int flags);
     void UnknownFunction421050();             // 0x00421050
     // 0x00421d50: the recorder callback's work (0x004230e0 forwards to it).
     int RecordFrame(int a, void* data, int flag, int b, int* keep, int time);
-    void UnknownFunction422ec0();             // 0x00422ec0: zeroes every racer's parts
-    void UnknownFunction423140(Track* track); // 0x00423140: draws the track
-    void UnknownFunction423040(int index);    // 0x00423040: zeroes an AI racer's parts
-    void UnknownFunction423790(int level);    // 0x00423790: detail level
+    void ClearRacerParts();             // 0x00422ec0: zeroes every racer's parts
+    void DrawTrack(Track* track); // 0x00423140: draws the track
+    void ClearAiRacerParts(int index);    // 0x00423040: zeroes an AI racer's parts
+    void SetDetailLevel(int level);    // 0x00423790: detail level
 
     unsigned char field_0x034;
     unsigned char field_0x035[0x38 - 0x35];

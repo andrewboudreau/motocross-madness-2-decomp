@@ -150,5 +150,8 @@ calibration cases and bindings were rekeyed, bytes unchanged):
 `0x00421d50` `RecordFrame` and `0x004230e0` `RecorderCallback` (free; the
 UnknownRecorderCallback passed to the VCR) and `0x0041f1d0`
 `NextCameraTarget` (InGameProcs.cpp keeps its own address-named
-declaration). `0x004210f0` keeps its placeholder because RaceView.h (UI
+declaration), `0x0041d2a0` `SetSceneTime`, `0x0041ea10` `AnyRacerRemote`,
+`0x00420650` `RestartRace`, `0x00420bd0` `RestartReplay`, `0x00422ec0`
+`ClearRacerParts`, `0x00423040` `ClearAiRacerParts`, `0x00423140`
+`DrawTrack` and `0x00423790` `SetDetailLevel`. `0x004210f0` keeps its placeholder because RaceView.h (UI
 lane) declares it for a camera sample.
