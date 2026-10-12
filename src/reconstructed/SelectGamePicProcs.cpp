@@ -1822,10 +1822,10 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     char format[0x80];
     switch (event->kind) {
     case kDialogInit: {
-        field_0x7f78 = 0;
+        previewDragged = 0;
         g_TrackGame->mode.field_0x9c = 0;
-        field_0x7f88 = 1;
-        field_0x7f84 = 1;
+        riderChanged = 1;
+        bikeChanged = 1;
         FillBikeRiderLists();
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
@@ -2015,8 +2015,8 @@ int MPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
         area.right -= 0x32;
         area.bottom -= 0x1e;
         if (PtInRect(&area, guiUser->pointerDevice->pointerPosition)) {
-            field_0x7f78 = 1;
-            field_0x7f7c = 1;
+            previewDragged = 1;
+            previewDragging = 1;
         }
     }
     return UIDialog::UnknownVirtualSlot23(event, entry);
@@ -2037,7 +2037,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         ui = g_TrackGame->ui;
     }
     model->field_0xc0->UnknownVirtualSlot5();
-    field_0x7f84 = 1;
+    bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->field_0x70) {

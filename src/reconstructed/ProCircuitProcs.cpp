@@ -1021,7 +1021,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     char typed[12];
     switch (event->kind) {
     case kDialogInit: {
-        autoRotate = 0;
+        previewDragged = 0;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(1);
         riderChanged = 1;
         bikeChanged = 1;
@@ -1098,7 +1098,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
-            autoRotate = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
+            previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 719) OptionsDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);

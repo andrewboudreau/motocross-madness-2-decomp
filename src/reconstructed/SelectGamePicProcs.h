@@ -187,7 +187,7 @@ public:
     void ShowTrackPicture();             // 0x004f75d0: shows the track picture
     void UnknownFunction4f7640(UIControl* picture, const char* directory, const char* name); // 0x004f7640
 
-    int field_0x7f58;
+    int field_0x7f58;                         // +0x7f58: 0 at init, 1 after slot 24 handles message 0x101; slot 31 then selects the track by name
 };
 
 // RTTI: MPBikeRiderDlg : UIDialog (vtable 0x00557a04; 0x7f9c bytes).
@@ -210,11 +210,11 @@ public:
     Vector3 viewTarget;                       // +0x7f64: and target
     float viewDistance;                       // +0x7f70: their distance
     int previewRegion;                        // +0x7f74: background region
-    int field_0x7f78;
-    int field_0x7f7c;
-    int field_0x7f80;
-    int field_0x7f84;
-    int field_0x7f88;
+    int previewDragged;                       // +0x7f78: the bike preview was dragged
+    int previewDragging;                      // +0x7f7c: the bike preview is being dragged
+    int idleMotionPlaying;                    // +0x7f80: the rider's idle motion is playing
+    int bikeChanged;                          // +0x7f84: the bike changed
+    int riderChanged;                         // +0x7f88: the rider changed
     RECT previewArea;                         // +0x7f8c: the bike view
 };
 

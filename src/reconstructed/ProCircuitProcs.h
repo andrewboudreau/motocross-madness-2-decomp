@@ -162,9 +162,9 @@ public:
     Vector3 viewTarget;                       // +0x7f64: and target
     float viewDistance;                       // +0x7f70: their distance
     int previewRegion;                        // +0x7f74: background region
-    int autoRotate;                           // +0x7f78: auto-rotate
-    int field_0x7f7c;
-    int field_0x7f80;
+    int previewDragged;                       // +0x7f78: the bike preview was dragged (or ChkAutoRotate is off)
+    int previewDragging;                      // +0x7f7c: the bike preview is being dragged
+    int idleMotionPlaying;                    // +0x7f80: the rider's idle motion is playing
     int bikeChanged;                          // +0x7f84: the bike changed
     int riderChanged;                         // +0x7f88: the rider changed
     RECT previewArea;                         // +0x7f8c: the bike view

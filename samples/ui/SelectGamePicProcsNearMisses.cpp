@@ -131,7 +131,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     Vector3 offset;
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
-    if (pointer && field_0x7f78 && field_0x7f7c) {
+    if (pointer && previewDragged && previewDragging) {
         float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
         viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
@@ -142,8 +142,8 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
         g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
-        field_0x7f78 = 1;
-    } else if (!field_0x7f78) {
+        previewDragged = 1;
+    } else if (!previewDragged) {
         offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
@@ -153,7 +153,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     }
     g_TrackGame->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_TrackGame->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
-    if (field_0x7f80 && rand() % 200 == 1) {
+    if (idleMotionPlaying && rand() % 200 == 1) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);
         switch (rand() % 3) {
@@ -167,16 +167,16 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
             g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
             break;
         }
-        field_0x7f80 = 0;
+        idleMotionPlaying = 0;
     }
-    if (!field_0x7f80 && g_TrackGame->ui->field_0x46c->motionFinished) {
+    if (!idleMotionPlaying && g_TrackGame->ui->field_0x46c->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)].model];
         model->field_0xc0->UnknownFunction4a8b10("WaitB");
         g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
-        field_0x7f80 = 1;
+        idleMotionPlaying = 1;
     }
     if (dialogBackground)
         dialogBackground->UnknownFunction404240(previewRegion, (CameraRect*)&previewArea);
