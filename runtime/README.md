@@ -74,7 +74,8 @@ on the 32-bit desktop:
   `DDERR_INVALIDPIXELFORMAT`; adding `DDSCAPS_OFFSCREENPLAIN` makes them
   valid, and blade's `CreateDevice` then succeeds.
 - The primary is an `EmulatedPrimary`, a small `IDirectDrawSurface7` over two
-  RGB 565 system-memory surfaces. Flip waits for the next frame slot
+  RGB 565 surfaces: a system-memory front buffer and a back buffer in video
+  memory for hardware Direct3D (see below), system memory for Blade. Flip waits for the next frame slot
   (`MCM2_FPS`), then draws the back buffer into the window with
   `StretchDIBits`, aspect-correct with black bars.
 
