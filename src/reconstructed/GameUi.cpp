@@ -1784,7 +1784,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     sectionCount = 0;
     field_0x154 = 1;
     lastFrameTime = 0.0f;
-    field_0x7f18 = 1;
+    controlsPost3D = 1;
     timerList.Init(2, 1);
     joystickCentred = 1;
     guiUser = 0;
@@ -1894,7 +1894,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
 UIControl* UIDialog::UnknownFunction46a840(UIControl* control, int group, int region) {
     if (control) {
         control->UnknownInlineSetField18(field_0x18);
-        control->post3D = field_0x7f18;
+        control->post3D = controlsPost3D;
         control->ownerGui = guiManager;
         control->groupId = group;
         control->fontHeight = dialogFontHeight;
@@ -2014,7 +2014,7 @@ int UIDialog::UnknownVirtualSlot13() {
             }
         }
         GameObject::UnknownVirtualSlot13();
-    } else if (screenGrab && !field_0x7f18) {
+    } else if (screenGrab && !controlsPost3D) {
         if (dialogBackground)
             dialogBackground->UnknownFunction404480(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &field_0x7f4c, 0);
@@ -2036,7 +2036,7 @@ int UIDialog::UnknownVirtualSlot14() {
 int UIDialog::UnknownVirtualSlot15() {
     if (!field_0x25_bit2) {
         GameObject::UnknownVirtualSlot15();
-    } else if (screenGrab && field_0x7f18) {
+    } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
             dialogBackground->UnknownFunction404480(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &field_0x7f4c, 0);
@@ -2246,7 +2246,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     transitionType = 0;
     heldButton = -1;
     if (owner)
-        post3D = owner->field_0x7f18;
+        post3D = owner->controlsPost3D;
     else
         post3D = 1;
     if (owner)
@@ -3330,12 +3330,12 @@ int UIDialog::LoadDialogResource(const char* name) {
 
 // 0x0046eeb0
 void UIDialog::EndControlDraw(void* dc) {
-    if (field_0x7f04)
-        SelectObject((HDC)dc, (HGDIOBJ)field_0x7f04);
+    if (previousFont)
+        SelectObject((HDC)dc, (HGDIOBJ)previousFont);
     if (!dialogBackground && dc)
         ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
-    if (field_0x7f00)
-        DeleteObject((HGDIOBJ)field_0x7f00);
+    if (drawClipRegion)
+        DeleteObject((HGDIOBJ)drawClipRegion);
 }
 
 // 0x0046f3c0
@@ -3515,7 +3515,7 @@ int g_UnknownGlobal65b5ec;
 int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control) {
     g_UnknownGlobal65b588 = rect;
     *a = 0;
-    field_0x7f04 = 0;
+    previousFont = 0;
     if (dialogBackground) {
         g_UnknownGlobal65b588 = &g_UnknownGlobal65b5f0;
         g_UnknownGlobal65b5f0 = *rect;
@@ -3533,13 +3533,13 @@ int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* c
         g_UnknownGlobal65b5ec = 1;
     }
     if (*dc && control) {
-        field_0x7f04 =
+        previousFont =
             SelectObject((HDC)*dc, (HGDIOBJ)(control->fontHandle ? control->fontHandle : (int)dialogFont));
-        field_0x7f00 = CreateRectRgn(g_UnknownGlobal65b588->left, g_UnknownGlobal65b588->top,
+        drawClipRegion = CreateRectRgn(g_UnknownGlobal65b588->left, g_UnknownGlobal65b588->top,
                                              g_UnknownGlobal65b588->right, g_UnknownGlobal65b588->bottom);
-        SelectClipRgn((HDC)*dc, (HRGN)field_0x7f00);
+        SelectClipRgn((HDC)*dc, (HRGN)drawClipRegion);
     } else {
-        field_0x7f00 = 0;
+        drawClipRegion = 0;
     }
     return g_UnknownGlobal65b5ec;
 }

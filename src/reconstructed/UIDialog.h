@@ -167,13 +167,13 @@ public:
     float scaleY;                             // +0x9c8: vertical scale
     UnknownGameUiSection sectionTable[500];   // +0x9cc
     int sectionCount;                         // +0x7efc
-    void* field_0x7f00;                       // the clip region of a control draw
-    void* field_0x7f04;                       // the font it replaced
+    void* drawClipRegion;                     // +0x7f00: the clip region of a control draw
+    void* previousFont;                       // +0x7f04: the font a control draw replaced
     int field_0x7f08;
     int ownsPalette;                          // +0x7f0c: owns the palette +0x140
     int ownsBackground;                       // +0x7f10: has its own background image
     int field_0x7f14;
-    int field_0x7f18;                         // 1 by default; the controls' post3D
+    int controlsPost3D;                       // +0x7f18: 1 by default; copied to the controls' post3D
     int joystickCentred;                      // +0x7f1c: the joystick is centred
     void* dialogTextures;                     // +0x7f20
     ContainerList<UITimer*> timerList;        // +0x7f24 (0x14 bytes)

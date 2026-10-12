@@ -58,7 +58,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
   `count - page`; a single `rows` difference local or the inline expression
   puts the page count into ebp or ebx.
 - UIControl constructor (`0x00470170`): the owner is tested twice,
-  `if (owner) post3D = owner->field_0x7f18; else post3D = 1;` and then
+  `if (owner) post3D = owner->controlsPost3D; else post3D = 1;` and then
   `if (owner) field_0x18 = ...`; VC6 threads the second test and places the
   ownerless store after the epilogue, as retail does.
 - UIControl destructor (`0x00470450`): two independent
@@ -133,7 +133,7 @@ procedure bodies read them:
   +0x9c0 `lastFrameTime`, +0x9c4/+0x9c8 the scales (1.0f), +0x9cc
   `sectionTable[500]` (0x3c-byte `UnknownGameUiSection`, memset to 0),
   +0x7efc `sectionCount`.
-- +0x7f00/+0x7f04 the control-draw clip region and replaced font, +0x7f18
+- +0x7f00 `drawClipRegion`/+0x7f04 `previousFont` (the control-draw clip region and replaced font), +0x7f18 `controlsPost3D`
   (1), +0x7f1c `joystickCentred` (1), +0x7f20 `dialogTextures`, +0x7f24
   `ContainerList<UITimer*> timerList` (Init(2, 1)), +0x7f3c
   `controlContainer`, +0x7f40 `sendFrameEvent`, +0x7f44 `screenGrab`,
