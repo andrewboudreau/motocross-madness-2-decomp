@@ -132,6 +132,9 @@ record and ghost fields FollowRacer.cpp (race lane) shares (`timeStep`,
 `receivedStates` (+0x11c8, each a received `state`) and the ghost's
 `receivedStates` (+0x4fc, each holding a `record`) were renamed with it;
 the inline accessor for TrackGame+0x568's ghost is `GhostBike()`.
+BikeRace's `lodDebugPage` (+0x0a8) is the debug overlay page the
+"Soultree LOD" readout gets from `NewPage`, and `chatOverlay` (+0x19c) the
+mode's chat overlay (its methods are ChatOverlay's `0x0051dce0`..`0x0051dd70`).
 Fields that `GameUiHelpers.cpp` or `KrustyVCR.cpp` also read (the gate
 node's centre, direction, half extents and next gate, the model's current
 detail level, the camera view's shadow caster and following flag, the VCR

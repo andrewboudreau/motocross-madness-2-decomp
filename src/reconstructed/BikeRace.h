@@ -943,7 +943,7 @@ public:
     UnknownBikeRaceCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
     int field_0x078;
     float field_0x07c[11];
-    int field_0x0a8;
+    int lodDebugPage;                         // +0x0a8
     int field_0x0ac;
     unsigned char field_0x0b0;
     unsigned char field_0x0b1[0xb4 - 0xb1];
@@ -978,7 +978,7 @@ public:
     unsigned char field_0x191[0x194 - 0x191];
     float field_0x194;
     int field_0x198;
-    UnknownBikeRaceOverlay19c* field_0x19c;
+    UnknownBikeRaceOverlay19c* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
     UnknownVcrFile* field_0x1a8;
