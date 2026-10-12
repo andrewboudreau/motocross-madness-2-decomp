@@ -246,7 +246,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
 }
 
 // 0x00477e90
-int UIListBox::UnknownVirtualSlot55(int a, int b) {
+int UIListBox::ButtonDown(int a, int b) {
     POINT* point = (POINT*)b;
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && point) {
         if (a == 0) {
@@ -269,10 +269,10 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
             }
         } else if (a == 1 && allowWScroll) {
             field_0x22c = point->x;
-            return UIControl::UnknownVirtualSlot55(a, b);
+            return UIControl::ButtonDown(a, b);
         }
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // ---------------------------------------------------------------------------

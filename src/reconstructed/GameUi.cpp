@@ -477,17 +477,17 @@ int UIControl::UnknownVirtualSlot13() {
 }
 
 // 0x00472250
-int UIControl::UnknownVirtualSlot56(int a, int* position) {
+int UIControl::ButtonUp(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
         SetState(3);
         PlayControlSound(3, ownerDialog->field_0x180);
     }
-    field_0x1d4 = -1;
+    heldButton = -1;
     return 0;
 }
 
 // 0x004722b0
-void UIControl::UnknownVirtualSlot57(int a, int* position) {
+void UIControl::ButtonHeld(int a, int* position) {
     if (moveable && a == 1) {
         RequestRedraw();
         int width = GetWidth();
@@ -600,7 +600,7 @@ UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
 }
 
 // 0x00473410
-int UIButton::UnknownVirtualSlot56(int a, int* position) {
+int UIButton::ButtonUp(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
         UnknownDialogEvent event;
         event.handled = a;
@@ -616,7 +616,7 @@ int UIButton::UnknownVirtualSlot56(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::UnknownVirtualSlot56(a, position);
+    return UIControl::ButtonUp(a, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -731,9 +731,9 @@ void UIEditBox::KillFocus(int value) {
 }
 
 // 0x00474120
-int UIEditBox::UnknownVirtualSlot55(int a, int b) {
+int UIEditBox::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->focusControl != (UnknownGuiControl*)this)
-        return UIControl::UnknownVirtualSlot55(a, b);
+        return UIControl::ButtonDown(a, b);
     return 0;
 }
 
@@ -751,7 +751,7 @@ UIScrollCtl::~UIScrollCtl() {
 }
 
 // 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
-int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
+int UIScrollCtl::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = 0;
@@ -801,7 +801,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         }
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // 0x004749f0: the scroll timer (0x101 starts the repeat timer 0x102, which
@@ -856,7 +856,7 @@ void UIScrollCtl::HandleTimer(int value) {
 }
 
 // 0x00474b10
-int UIScrollCtl::UnknownVirtualSlot56(int a, int* position) {
+int UIScrollCtl::ButtonUp(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
         UnknownDialogEvent event;
         event.handled = a;
@@ -870,7 +870,7 @@ int UIScrollCtl::UnknownVirtualSlot56(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::UnknownVirtualSlot56(a, position);
+    return UIControl::ButtonUp(a, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -1260,7 +1260,7 @@ void UIListBox::UnknownFunction477e60(int a) {
 }
 
 // 0x00478190
-void UIListBox::UnknownVirtualSlot57(int a, int* position) {
+void UIListBox::ButtonHeld(int a, int* position) {
     if (a == 1 && position) {
         int delta = position[0] - field_0x22c;
         field_0x234 = delta;
@@ -1269,7 +1269,7 @@ void UIListBox::UnknownVirtualSlot57(int a, int* position) {
         field_0x234 = delta;
         RequestRedraw();
     }
-    UIControl::UnknownVirtualSlot57(a, position);
+    UIControl::ButtonHeld(a, position);
 }
 
 // 0x00479220
@@ -1457,7 +1457,7 @@ int UIStaticText::Draw() {
 }
 
 // 0x00479190
-int UIStaticText::UnknownVirtualSlot55(int a, int b) {
+int UIStaticText::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
@@ -1471,7 +1471,7 @@ int UIStaticText::UnknownVirtualSlot55(int a, int b) {
         if (event.handled)
             return 1;
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // ---------------------------------------------------------------------------
@@ -1539,8 +1539,8 @@ UIDDLButton::UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 }
 
 // 0x00479c90
-int UIDDLButton::UnknownVirtualSlot55(int a, int b) {
-    UIControl::UnknownVirtualSlot55(a, b);
+int UIDDLButton::ButtonDown(int a, int b) {
+    UIControl::ButtonDown(a, b);
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this)
         ownerList->SetOpen(1 - ownerList->isOpen);
     return 0;
@@ -1677,13 +1677,13 @@ void UIDropDownList::SyncBoundValue(int value) {
 }
 
 // 0x0047add0
-int UIDropDownList::UnknownVirtualSlot55(int a, int b) {
+int UIDropDownList::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
         SetOpen(isOpen == 0);
         ownerDialog->guiUser->UnknownFunction487790((UnknownGuiControl*)this, 0, 0);
         return 1;
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // ---------------------------------------------------------------------------
@@ -2244,7 +2244,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     drawnTexture = 0;
     transitionStep = 0;
     transitionType = 0;
-    field_0x1d4 = -1;
+    heldButton = -1;
     if (owner)
         post3D = owner->field_0x7f18;
     else
@@ -2437,9 +2437,9 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
         drawnTexture = GetStateTexture(-1);
         UpdateNeedsRedraw();
         ScaleArea();
-        if (ownerDialog->guiUser->pointerDevice && field_0x1d4 != -1) {
+        if (ownerDialog->guiUser->pointerDevice && heldButton != -1) {
             POINT position = ownerDialog->guiUser->pointerDevice->pointerPosition;
-            UnknownVirtualSlot57(field_0x1d4, (int*)&position);
+            ButtonHeld(heldButton, (int*)&position);
         }
     }
     screenArea[0] = screenArea[0] < 0 ? 0 : screenArea[0];
@@ -2497,13 +2497,13 @@ end:
 // UIControl: input
 
 // 0x004721b0
-int UIControl::UnknownVirtualSlot55(int a, int b) {
+int UIControl::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
         if (!a) {
             SetState(2);
             PlayControlSound(2, ownerDialog->field_0x180);
         }
-        field_0x1d4 = a;
+        heldButton = a;
         if (a == 1 && ownerDialog->dialogBackground)
             ownerDialog->dialogBackground->UnknownFunction404da0();
         ownerDialog->guiUser->UnknownFunction487790((UnknownGuiControl*)this, 0, 0);
@@ -2928,7 +2928,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
 }
 
 // 0x00478d70
-int UIMultiState::UnknownVirtualSlot55(int a, int b) {
+int UIMultiState::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
@@ -2943,7 +2943,7 @@ int UIMultiState::UnknownVirtualSlot55(int a, int b) {
         if (event.handled)
             return 1;
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // 0x00479310
@@ -2986,7 +2986,7 @@ int UIRadioButton::GetGroupSelection() {
 }
 
 // 0x004794c0
-int UIRadioButton::UnknownVirtualSlot55(int a, int b) {
+int UIRadioButton::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
@@ -3012,7 +3012,7 @@ int UIRadioButton::UnknownVirtualSlot55(int a, int b) {
         if (event.handled)
             return 1;
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // 0x00477490
@@ -3770,7 +3770,7 @@ int UIControl::SlideBottomStep() {
 // UIScrollBar
 
 // 0x00475880
-int UIScrollBar::UnknownVirtualSlot56(int a, int* position) {
+int UIScrollBar::ButtonUp(int a, int* position) {
     UnknownDialogEvent event;
     event.handled = 0;
     if (field_0x208) {
@@ -3794,7 +3794,7 @@ int UIScrollBar::UnknownVirtualSlot56(int a, int* position) {
         if (event.handled)
             return 1;
     }
-    return UIControl::UnknownVirtualSlot56(a, position);
+    return UIControl::ButtonUp(a, position);
 }
 
 // ---------------------------------------------------------------------------
@@ -4351,7 +4351,7 @@ failed:
 }
 
 // 0x004755d0: a click on the bar moves the thumb (slider) or pages the lists.
-int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
+int UIScrollBar::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
         GameObjectIterator* iterator;
         UIControl* list;
@@ -4417,12 +4417,12 @@ int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
         if (field_0x1f0)
             UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
     }
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // 0x00475970: dragging the thumb; holding it still repeats kind 0x11.
-void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
-    UIControl::UnknownVirtualSlot57(a, position);
+void UIScrollBar::ButtonHeld(int a, int* position) {
+    UIControl::ButtonHeld(a, position);
     UnknownDialogEvent event;
     event.handled = 0;
     if (!a && position) {
@@ -4699,8 +4699,8 @@ failed:
 }
 
 // 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
-void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
-    UIControl::UnknownVirtualSlot57(a, position);
+void UIDDLScrollBar::ButtonHeld(int a, int* position) {
+    UIControl::ButtonHeld(a, position);
     UnknownDialogEvent event;
     event.handled = 0;
     if (!a && position) {
@@ -4772,7 +4772,7 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
 }
 
 // 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.
-int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
+int UIDDLScrollBar::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
         UIListBox* list = ownerList->listPart;
         if (field_0x1f0) {
@@ -4793,7 +4793,7 @@ int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
     }
     if (field_0x1f0)
         UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
-    return UIControl::UnknownVirtualSlot55(a, b);
+    return UIControl::ButtonDown(a, b);
 }
 
 // 0x0047ab20
@@ -5019,7 +5019,7 @@ int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntr
     if (device) {
         POINT position = device->pointerPosition;
         if (event->kind)
-            handled = UnknownVirtualSlot56(event->control, (int*)&position);
+            handled = ButtonUp(event->control, (int*)&position);
     }
     if (!handled)
         return GameObject::UnknownVirtualSlot22(event, entry);
@@ -5077,12 +5077,12 @@ void UIListBox::ScrollBy(int delta) {
 }
 
 // 0x00477ff0
-int UIListBox::UnknownVirtualSlot56(int a, int* position) {
+int UIListBox::ButtonUp(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && a == 1) {
         field_0x230 += field_0x234;
         field_0x234 = 0;
     }
-    return UIControl::UnknownVirtualSlot56(a, position);
+    return UIControl::ButtonUp(a, position);
 }
 
 // 0x00478040
@@ -5201,8 +5201,8 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0) &&
                 IsEnabled() && shown) {
                 ownerDialog->guiUser->UnknownFunction487730((UnknownGuiControl*)this, 0, 1);
-                UnknownVirtualSlot55(0, 0);
-                UnknownVirtualSlot56(0, 0);
+                ButtonDown(0, 0);
+                ButtonUp(0, 0);
                 return 1;
             }
             if (UnknownFunction43caa0(0x32, event->kind, event, 0x80) &&
@@ -5214,7 +5214,7 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             GUIInputDevice* device = ownerDialog->guiUser->pointerDevice;
             if (device)
                 position = device->pointerPosition;
-            handled = UnknownVirtualSlot55(event->control, ownerDialog->guiUser->pointerDevice ? (int)&position : 0);
+            handled = ButtonDown(event->control, ownerDialog->guiUser->pointerDevice ? (int)&position : 0);
         }
     }
     if (!handled)

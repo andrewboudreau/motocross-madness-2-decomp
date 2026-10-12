@@ -195,9 +195,12 @@ public:
     virtual void SetAttachId(int id); // slot 52, 0x00470400: stores attachId
     virtual int UnknownVirtualSlot53();       // 0x004726b0
     virtual void BindValue(int* value); // slot 54, 0x00470a70: stores boundValue (NetProcs.cpp)
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x004721b0
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00472250
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x004722b0
+    // Slots 55-57: slot 23 calls 55 with the pressed button (and the pointer
+    // position), slot 22 calls 56 on release, and slot 10 calls 57 each frame
+    // while heldButton is set (a KeyBind press calls 55 then 56).
+    virtual int ButtonDown(int a, int b); // slot 55, 0x004721b0: state 2, sound 2
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00472250: state 3, sound 3
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x004722b0: drags a Moveable control
     virtual void PlayControlSound(int index, int a); // slot 58, 0x00472670: plays sound `index`
     // Slot 59: `value` != 0 stores the control's value through boundValue
     // (BindValue), 0 loads it (SelectGamePicProcs.cpp "ChkRecordRace").
@@ -323,7 +326,7 @@ public:
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
     int (UIControl::*transitionStep)(); // +0x1d0: the running transition (slots 41-47)
-    int field_0x1d4;
+    int heldButton;                           // +0x1d4: the button ButtonDown stored (-1: none)
     int keyBind;                              // +0x1d8: "KeyBind"
     int post3D;                               // +0x1dc: "Pre3D" == 0
     int permanent;                            // +0x1e0: "Permanent"
@@ -339,7 +342,7 @@ public:
     virtual ~UIButton();                      // 0x004732c0 (deleting wrapper 0x004732a0)
     virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x004734c0
     virtual void SetEnabled(int enable); // slot 49, 0x004733a0
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00473410
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00473410
 
     // 0x004732d0: the images for the up, over, down, disabled and focus states.
     void SetStateImages(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled);
@@ -374,8 +377,8 @@ public:
     virtual void KillFocus(int value); // slot 33, 0x004740b0
     virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100 (shared with UIStaticText)
     virtual int Draw();                   // slot 40, 0x004738a0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00474120
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10 (shared with UIScrollCtl)
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00474120
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00474b10 (shared with UIScrollCtl)
     virtual void SyncBoundValue(int value); // slot 59, 0x00473840: writes the text back
 
     void SetClickSound(int value);    // 0x00473d80
@@ -420,8 +423,8 @@ class UIScrollCtl : public UIButton {
 public:
     UIScrollCtl(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474820
     virtual ~UIScrollCtl();                   // 0x00474870 (deleting wrapper 0x00474850)
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00474880
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00474880
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00474b10
     virtual void HandleTimer(int value); // slot 60, 0x004749f0
 };
 
@@ -433,9 +436,9 @@ public:
     virtual ~UIScrollBar();                   // 0x00474c50 (deleting wrapper 0x00474c30)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00474cf0
     virtual int Draw();                   // slot 40, 0x00474ed0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x004755d0
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00475880
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x00475970
+    virtual int ButtonDown(int a, int b); // slot 55, 0x004755d0
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00475880
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x00475970
     virtual void SyncBoundValue(int value); // slot 59, 0x00474cb0
 
     void SetThumbSizeFromState(int state);    // 0x00475160: the thumb size from a state image
@@ -488,9 +491,9 @@ public:
     virtual void SetState(int state); // slot 29, 0x00479220
     virtual void RequestRedraw();         // slot 50, 0x00477ce0
     virtual int UnknownVirtualSlot21(int key); // 0x00478040
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00477e90
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00477ff0
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x00478190
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00477e90
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00477ff0
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x00478190
     virtual void SyncBoundValue(int value); // slot 59, 0x00475fe0
     // Slots 65 and 66 are UIListBox's own (UIControl's vtable has 65 slots,
     // UIListBox's and UIDDLListBox's 67).
@@ -586,7 +589,7 @@ public:
     void SetStateText(int index, const char* text);    // 0x00478ad0: a state's text
     void SetCurrentState(int value);    // 0x00478cf0: sets the current state
     void SelectNextState();             // 0x00478d10: the next selectable state
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00478d70
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00478d70
 
     int stateCount;                           // +0x1ec
     int selectedState;                        // +0x1f0
@@ -604,7 +607,7 @@ public:
     virtual int IsInteractive(); // slot 30, 0x00478fe0 (shared with UIStatic)
     virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100
     virtual int Draw();                   // slot 40, 0x00479170
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00479190 (shared with UIStatic)
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00479190 (shared with UIStatic)
 };
 
 // RTTI: UIRadioButton : UIMultiState (vtable 0x00553528; 0x1f8 bytes, `new`
@@ -614,7 +617,7 @@ public:
     UIRadioButton(int id, CameraRect* area, UIDialog* owner); // 0x00479240
     virtual ~UIRadioButton();                 // 0x004792d0 (deleting wrapper 0x004792b0)
     virtual int UnknownVirtualSlot53();       // 0x004795c0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x004794c0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x004794c0
     virtual void SyncBoundValue(int value); // slot 59, 0x004792e0
 
     int SelectInGroup(int index);     // 0x00479310: selects radio button `index` (1-based) of the group
@@ -629,8 +632,8 @@ public:
     UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* owner,
                    UIDropDownList* list);     // 0x00479640
     virtual void KillFocus(int value); // slot 33, 0x004796e0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00479a00
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x00479710
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00479a00
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x00479710
 
     UIDropDownList* ownerList;                // +0x220
 };
@@ -652,7 +655,7 @@ class UIDDLButton : public UIButton {
 public:
     UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479bf0
     virtual void KillFocus(int value); // slot 33, 0x00479ce0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00479c90
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00479c90
 
     UIDropDownList* ownerList;                // +0x1f0
 };
@@ -680,7 +683,7 @@ public:
     virtual int IsInteractive(); // slot 30, 0x00467ae0 (shared body: returns 1)
     virtual void KillFocus(int value); // slot 33, 0x0047a7d0
     virtual void SetAttachId(int id); // slot 52, 0x0047a290
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x0047add0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x0047add0
     virtual void SyncBoundValue(int value); // slot 59, 0x0047ad80
     virtual int GetWidth();               // slot 61, 0x0047a850
     virtual int GetHeight();              // slot 62, 0x0047a870
