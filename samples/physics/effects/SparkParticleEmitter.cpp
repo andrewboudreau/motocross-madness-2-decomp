@@ -69,7 +69,7 @@ int SparkParticleEmitter::GameObjectVirtualSlot10(float dt)
             field_0x6c = 0;
             return 1;
         }
-        if (field_0x64 > 0.0)
+        if (field_0x64 > 0.25)
             previousPosition = position;
         ParticleVec3 d(position.x - previousPosition.x, position.y - previousPosition.y, position.z - previousPosition.z);
         dt += field_0x68;
