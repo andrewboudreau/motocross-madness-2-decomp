@@ -7,6 +7,7 @@
 #include "DebugAlloc.h"
 #include "KeyboardDevice.h"
 #include "SoundInterface.h"
+#include "MenuId.h"
 
 // KERNEL32, SHELL32 and USER32 imports.
 extern "C" __declspec(dllimport) int __stdcall SetLocaleInfoA(unsigned long locale,
@@ -315,12 +316,12 @@ int TrackGame::UnknownVirtualSlot4() {
                 strncpy(mode.field_0x00, name, length);
                 mode.field_0x00[length] = 0;
                 if (!mode.LoadProfile())
-                    ui->OpenMenu(0xbbb);
+                    ui->OpenMenu(kMenuUserNameBbb);
             }
             networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
             if (networkGameObject)
                 networkGameObject->SetDirectPlay(network->directPlay, network->lobby);
-            ui->OpenMenu(0x866);
+            ui->OpenMenu(kMenuMultiPlayer866);
         }
     }
     g_MemTagStack->Push("Audio");
@@ -384,7 +385,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         g_MemTagStack->UnknownFunction4a2bc0("In Game");
         if (!menuIsOpen) {
             int category = g_MemTagStack->Push("UI");
-            SetMenuOpen(1, 0x191, 1);
+            SetMenuOpen(1, kMenuExit, 1);
             g_MemTagStack->Pop(category);
         }
         return 1;
@@ -393,9 +394,9 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
                         UnknownFunction43caa0(0xc5, 0, event, 0x80000000))) {
 toggle:
         if (menuIsOpen)
-            SetMenuOpen(0, 0x190, 1);
+            SetMenuOpen(0, kMenuContinue, 1);
         else
-            SetMenuOpen(1, 0x190, 1);
+            SetMenuOpen(1, kMenuContinue, 1);
 handled:
         return 1;
     }
