@@ -61,6 +61,10 @@
 // branches swapped, `continue`, an `ok` variable and track[n] = 0 in both
 // first-file branches do not move it; a goto into the first copy rearranges
 // the prologue (edi pushed late) and is further off.
+// Session 10: compiled inside TrackRecord.cpp it is unchanged (195 of 800
+// masked, 18 instruction diffs); also unchanged: `while (1)`, an unsigned
+// n, a length local, a DirectoryList local for NextName, n declared first,
+// `*(found + n)` and track[n] = 0 before the digit in the later copy.
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
