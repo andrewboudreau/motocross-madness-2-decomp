@@ -74,8 +74,9 @@ struct BikeVec3ScaleAssign : Vec3 {
     BikeVec3ScaleAssign& operator*=(float s);
 };
 // By-value views of the out-of-line operators (hidden result pointer first, same ABI as
-// the pointer forms in math/Math3D.h): operator- 0x00421d00, operator*(Vec3, float)
-// 0x005015b0 and DotProduct 0x0040ae30.
+// the pointer forms in math/Math3D.h): operator+ 0x00421cb0, operator- 0x00421d00,
+// operator*(Vec3, float) 0x005015b0 and DotProduct 0x0040ae30.
+Vec3 BikeVec3Add(const Vec3& a, const Vec3& b);
 Vec3 BikeVec3Sub(const Vec3& a, const Vec3& b);
 Vec3 BikeVec3Scale(const Vec3& v, float s);
 float BikeVec3Dot(const Vec3& a, const Vec3& b);
@@ -1639,20 +1640,22 @@ Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float t)
             *out = modelNode->WorldToLocalDirection(scratchVector = p - position);
             return out;
         } else {
-            // the midpoint chain goes through the out-of-line Vec3 constructor
-            *out = modelNode->WorldToLocalDirection(scratchVector = BikeOolSub(BikeOolAdd(BikeOolHalf(
-                BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition)), frontWheel->wheelPosition), position));
+            // the midpoint chain goes through the out-of-line Vec3 constructor;
+            // a separate statement lets the transform's result reuse a dead
+            // temporary slot
+            scratchVector = BikeOolSub(BikeOolAdd(BikeOolHalf(
+                BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition)), frontWheel->wheelPosition), position);
+            *out = modelNode->WorldToLocalDirection(scratchVector);
             return out;
         }
     } else {
         // named rear/front references give retail's register pair for the
-        // wheel positions (1048 -> 1061/1066); the remaining difference is
-        // the frame slots of the constructor temporaries
+        // wheel positions; the half vector is built with the out-of-line
+        // constructor and the sum/difference go through the out-of-line
+        // operators, all as temporaries of one statement
         const Vec3& rear = rearWheel->wheelPosition;
         const Vec3& front = frontWheel->wheelPosition;
-        Vec3 half = BikeOolHalf(BikeOolSub(rear, front));
-        Vec3 mid, rel;
-        scratchVector = *Vec3SubtractCall(&rel, Vec3AddCall(&mid, &frontWheel->wheelPosition, &half), &position);
+        scratchVector = BikeVec3Sub(BikeVec3Add(frontWheel->wheelPosition, BikeOolHalf(BikeOolSub(rear, front))), position);
         *out = modelNode->WorldToLocalDirection(scratchVector);
         return out;
     }

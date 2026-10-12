@@ -16,7 +16,7 @@
   "target_va": "0x0040b410",
   "target_size": 432,
   "expect": "partial",
-  "notes": "68.07% under vc6_o2_ml (wave 3: was 65.10%; same size). The else branch charges *b before copying field_0x1ac into v (+3%). Remaining: retail reads lenSq components y,x,z through an esi pointer (a helper with y/x/z locals reproduces that but drops to 35.7%, size 426), stores lenSq with fstp and reloads it after popping, keeps a dead fst of the FastSqrt result, loads 0x158 before 0x13c and uses fcom [b] for the t clamp. /Op makes it much worse (13.8%).",
+  "notes": "68.07% under vc6_o2_ml (wave 3: was 65.10%; same size). The else branch charges *b before copying field_0x1ac into v (+3%). Remaining: retail reads lenSq components y,x,z through an esi pointer (a helper with y/x/z locals reproduces that but drops to 35.7%, size 426), stores lenSq with fstp and reloads it after popping, keeps a dead fst of the FastSqrt result, and uses fcom [b] for the t clamp (den declared before num gives retail's 0x158-then-0x13c loads). Helpers returning lenSq or writing it through a reference or pointer out-parameter all give the 426-byte esi shape without the fstp/reload; FastSqrt result kept in a function-scope local or tested inline, and the clamp written as *b < t or t > *b, change nothing. /Op makes it much worse (13.8%).",
   "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {

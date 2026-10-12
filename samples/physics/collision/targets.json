@@ -86,7 +86,7 @@
     "target_va": "0x0043aa30",
     "target_size": 845,
     "expect": "partial",
-    "notes": "Near miss (CollisionPoint.cpp extent). Frame, blocks, clamp, loop, by-value product copy and trailing return 0 match; left: the sum * (1/merged) y component is component-first in retail, the normal's squared length squares y, x, z (y consumed) where VC6 gives Vec3Normalize's order, and one fstp of the push is scheduled later.",
+    "notes": "Near miss (CollisionPoint.cpp extent). Frame, blocks, clamp, loop, by-value product copy and trailing return 0 match; the normal's squared length accumulated y, x, z (len2 = y*y; len2 += x*x; len2 += z*z) gives retail's in-place squaring (409 -> 820/845). Left: the sum * (1/merged) y component is component-first in retail, and one fstp of the push is scheduled later.",
     "bindings": "../../../src/krusty2/collision/CollisionPoint.bindings.json"
   },
   {
@@ -105,8 +105,8 @@
     "candidate_symbol_contains": "CollisionRotateVector",
     "target_va": "0x0043ca20",
     "target_size": 115,
-    "expect": "partial",
-    "notes": "113 vs 115 bytes: retail copies the result through an extra register (mov ecx,eax) and loads the first component early; struct temp vs Vec3 temporary both give the same 113-byte form",
+    "expect": "exact",
+    "notes": "returns out (both callers read eax after the call: 0x43c524 mov ecx,[eax], 0x43c75b push eax); the void form lacked the result-pointer copy mov ecx,eax (113 bytes, 61/115)",
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {

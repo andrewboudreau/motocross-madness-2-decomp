@@ -34,11 +34,13 @@ static inline CollisionVec3 ComponentProduct(CollisionVec3 a, const CollisionVec
 // copies through by-value/inline-constructor helpers and the trailing `return 0` block.
 // Still differs: (1) in sum * (1/merged) retail multiplies x and z scalar-first and y
 // component-first (`fld sum.y; fmul st(1)`), the candidate all scalar-first; explicit,
-// operator, helper and accumulation forms (+= per component, a += helper, sum = sum + p)
-// do not move it; (2) retail squares the loaded normal components as y (consumed by
-// fmulp), x, z and pops through fxch, the candidate in Vec3Normalize's x, y, z order
-// (18 declaration-order/grouping forms); (3) the push's fstp of z and the linA load are
-// scheduled one copy later.
+// operator, helper and accumulation forms (+= per component, a += helper, sum = sum + p),
+// a separately named scale, by-value or scale-first helpers, y written `sum.y * s` and a
+// named temporary do not move it; (2) the push's fstp of z and the linA load are scheduled
+// one copy later.  The normal's squared length is accumulated y, then x, then z (retail
+// squares y in place, consumed by fmulp, and pops through fxch); the one-expression
+// z * z + (x * x + y * y) and (y * y + x * x) + z * z forms give Vec3Normalize's order
+// and the frame offsets after it shift (409 bytes).
 int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec3* scaleA, const CollisionVec3* scaleB,
                           const CollisionVec3* bias, CollisionVec3* origin, CollisionVec3* linA,
                           CollisionVec3* delta, CollisionVec3* normal, CollisionVec3* angular)
@@ -76,8 +78,9 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
     if (merged > 0) {
         if (merged > 1) {
             sum = ScaleVec3(sum, 1.0f / merged);
-            float y = normal->y, x = normal->x, z = normal->z;
-            float len2 = z * z + (x * x + y * y);
+            float len2 = normal->y * normal->y;
+            len2 += normal->x * normal->x;
+            len2 += normal->z * normal->z;
             if (len2 == 0.0f) {
                 *normal = g_CollisionZeroVec3;
             } else {

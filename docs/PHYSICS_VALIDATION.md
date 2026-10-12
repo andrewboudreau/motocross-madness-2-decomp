@@ -259,22 +259,26 @@ COMDAT; the six near misses are registered as partial).
 Two units are promoted and pass strict comparison.
 
 **`src/krusty2/soultree/soultree.cpp`** (SoultreeObject,
-`0x004fb2b0..0x004fefd8`) passes 56 cases, including the former 78.7%
-partial `UpdateWorldMatrix`.
+`0x004fb2b0..0x004fefd8`) passes 60 cases, including the former 78.7%
+partial `UpdateWorldMatrix`, LocalToWorldPoint `0x004fd660` (moved from the helpers
+samples), WorldToLocalPoint `0x004fd7f0` (its rigid inverse reads the translation
+into scalars z, y, x first) and GetMatrixIn `0x004fca80` (the translation delta is
+rotated into itself through a by-value inline helper, so VC6 copies it as retail does).
 - `core/SoultreeObject.h` gives the real QuadTreeObject + GameObject bases
   only when `SOULTREE_OBJECT_WITH_BASES` is defined. Other physics code
   keeps the flat view.
 - `SetAxes`'s seventh argument is an int.
-- The helpers samples keep the near misses: LocalToWorldPoint,
-  WorldToLocalDirection, WorldToLocalPoint, SetMatrixIn, GetMatrixIn,
-  SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
+- The helpers samples keep the near misses: WorldToLocalDirection,
+  SetMatrixIn, SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
   soultree.cpp once its cross products parenthesise the first product
   (VC6_OPERAND_ORDER.md section 3).
 
 **`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
-`0x00424690..0x0042ad2f`) passes 33 cases:
+`0x00424690..0x0042ad2f`) passes 40 cases:
 - its 18 `$E` (the kVec3 set and five empty statics);
 - the segment and sphere box tests;
+- GrowBoxByTransformedBox `0x004290d0`, whose loop writes its own local (VC6 homes it in
+  the dead `center` argument slot, so the transformed x is never stored);
 - the tree-tree and tree-box queries and the three entry points;
 - the matrix and point helpers.
 
@@ -289,7 +293,7 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The second run reports `33/33 strict exact`. The soultree root reports one
+The second run reports `40/40 strict exact`. The soultree root reports one
 required failure, SoulTreePhysics'
 `0x5036f0`, which predates this slice.
 
@@ -315,6 +319,10 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
 - Bike.cpp slots 54 `0x0040c8b0` and 55 `0x0040ce60`: `BikeNormalized` receives an operator
   temporary (`(front + rear) * 0.5f`, `front - rear`); a local Vec3 built component by
   component left `x` scalar-first.
+- Bike.cpp slot 46 `0x0040b600`: the both-wheels path assigns `scratchVector` in its own
+  statement before `WorldToLocalDirection`, and the one-wheel path nests the by-value
+  out-of-line operators `0x00421cb0`/`0x00421d00` around the constructor chain, so the
+  transform result reuses retail's temporary slots.
 - Vehicle.cpp impact handlers, slots 18 `0x00529dc0`, 19 `0x00529fe0` and 20 `0x0052a290`:
   each scan posts and returns from inside its loop; slots 18/19 scan with guarded do-while
   loops (unrotated back edge), slot 20 with `for` loops. Slot 19/20's sign factor is
@@ -452,7 +460,8 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
 Still partial in SoulTreePhysics.cpp:
 
 - The sub-step loop `RunSteps` `0x00502f60` (1921 bytes) is now written out:
-  1366/1942 bytes, every call, branch and x87 sequence in retail order.  What was learned:
+  1804/1930 bytes, every instruction in retail order (speed clamp and angular damping as
+  `Vec3 *= float`).  What was learned:
   `prevSpeed = linearSpeed;` followed by a test of `prevSpeed` (not `linearSpeed`) gives
   retail's single `fld`/`fst`/`fcom`; the loop is `if (steps <= 0) return; do { ... } while
   (steps > 0);` (the rematerialised `xor ebx,ebx` sits on the back edge); the leftover

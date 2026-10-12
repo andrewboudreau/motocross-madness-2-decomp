@@ -89,6 +89,7 @@
   "?BikeRemoveCollisionPoint@@YAXPAPAVSoultreeContact@@PAXPAH@Z": "0x0043a5e0",
   "?BikeStaticCollisionCallback@@YAXPAVCollisionObject@@0@Z": "0x00405d70",
   "?BikeVec3Dot@@YAMABUVec3@@0@Z": "0x0040ae30",
+  "?BikeVec3Add@@YA?AUVec3@@ABU1@0@Z": "0x00421cb0",
   "?BikeVec3Scale@@YA?AUVec3@@ABU1@M@Z": "0x005015b0",
   "?BikeVec3Sub@@YA?AUVec3@@ABU1@0@Z": "0x00421d00",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",

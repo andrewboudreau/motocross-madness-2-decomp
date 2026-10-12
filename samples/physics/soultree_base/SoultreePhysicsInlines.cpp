@@ -32,8 +32,10 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* a, float* b)
     }
     if (linearSpeed == 0.0f)
         return;
-    float num = bodyMass;
+    // Declared den first: retail loads bodyMass (0x158) before stepTime (0x13c), which this
+    // order reproduces (num first loads 0x13c first).
     float den = stepTime;
+    float num = bodyMass;
     float t = linearSpeed;
     if (!(t <= *b))
         t = *b;

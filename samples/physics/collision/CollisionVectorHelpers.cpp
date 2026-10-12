@@ -12,14 +12,16 @@ CollisionVec3* CollisionDivide(CollisionVec3* out, const CollisionVec3* v, float
     return out;
 }
 
-// 0x0043ca20 (cdecl): out = v * M3x3 (rotate by the matrix rows, no translation), same result as 0x0042a450.
+// 0x0043ca20 (cdecl): out = v * M3x3 (rotate by the matrix rows, no translation), same result as 0x0042a450;
+// returns out (its two callers, 0x43c524 and 0x43c75b, use eax after the call).
 // It sits in the 0x0043c8xx..0x0043cax run (not CollisionObject/CollisionPoint code); tier 3 name.
-// Partial (targets.json); 0..33 dead initialised int locals at the top of the function change nothing.
-void CollisionRotateVector(CollisionVec3* out, const CollisionVec3* v, const Matrix4* m)
+// Exact; the void form lacked retail's result-pointer copy (mov ecx, eax) and scored 61/115.
+CollisionVec3* CollisionRotateVector(CollisionVec3* out, const CollisionVec3* v, const Matrix4* m)
 {
     *(Vec3*)out = Vec3(v->z * m->_31 + v->y * m->_21 + v->x * m->_11,
                        v->z * m->_32 + v->y * m->_22 + v->x * m->_12,
                        v->z * m->_33 + v->y * m->_23 + v->x * m->_13);
+    return out;
 }
 
 // 0x0043ce90 (cdecl): pre-increments a global counter at 0x0057985c and returns the new value

@@ -70,5 +70,6 @@
   "_s_motion": "0x00579018",
   "_s_relativeAB": "0x00578ef0",
   "_s_relativeBA": "0x00578eb0",
-  "_s_vertices": "0x00578f4c"
+  "_s_vertices": "0x00578f4c",
+  "?GrowBoxByTransformedBox@@YAXPAUVec3@@0U1@1PBUMatrix4@@@Z": "0x004290d0"
 }

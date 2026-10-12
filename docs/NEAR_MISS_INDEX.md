@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 163, c 106, total 270. The three class (a) functions of the
+Counts: a 1, b 154, c 107, total 262. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -81,10 +81,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
 | krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
-| krusty2/collision/CollisionObject | `0x004334c0` | 1046/1066 (masked) | b | 11 code diffs: `call A` vs `call @0`; `fmul [edi + 4]` vs `fmul [edi + 0x24]`; slots differ |
 | krusty2/collision/CollisionObject | `0x00434540` | 1054/1068 | b | 8 code diffs: retail adds `fld [eax + 0x38] ; fmul [eax + 4]`; retail lacks `fld [eax + 0x38] ; fmul [eax + 4]`; slots differ |
-| krusty2/collision/CollisionObject | `0x00434bb0` | 163/305 | b | 10 code diffs: `fld [eax - 4]` vs `fld [eax - 8]`; `fld [eax - 0xc]` vs `fld [eax - 0x10]`; slots differ |
-| krusty2/collision/CollisionObject | `0x00434cf0` | 147/448 | c | 16 code diffs: `fld [eax - 4]` vs `fld [eax - 8]`; `fld [eax - 0xc]` vs `fld [eax - 0x10]` |
 | krusty2/collision/CollisionObject | `0x00436100` | 31/804 | c | 35 code diffs: `sub esp, 0x4c` vs `sub esp, 0xac`; `mov eax, [ecx + 0x54]` vs `mov ecx, [ecx + 0x54] ; lea edi, [esp +~` |
 | krusty2/collision/CollisionObject | `0x00436720` | 66/790 (masked) | c | 52 code diffs: `sub esp, 0x18` vs `sub esp, 0xc`; `add esp, 0x18` vs `add esp, 0xc` |
 | krusty2/collision/CollisionObject | `0x00436af0` | 33/812 (masked) | c | 16 code diffs: retail lacks `mov eax, [esp + N]`; `lea esi, [eax + 0x48] ; jle @48` vs `mov edi, [esp + N] ; jle @47` |
@@ -102,7 +99,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 270/619 (masked) | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501e90` | 160/471 (masked) | b | 20 code diffs: `jne @56` vs `jne @55 ; mov [esp + N], 0 ; mov edx, [~`; slots differ |
-| krusty2/soultree/SoulTreePhysics | `0x00502f60` | 1366/1942 | c | 6 code diffs: retail adds `mov [esi + 0xbc], ebx`; retail lacks `mov [esi + 0xbc], ebx` |
+| krusty2/soultree/SoulTreePhysics | `0x00502f60` | 1804/1930 | c | 0 code diffs: stack-slot packing of the integration temporary and merge outputs; 9 bytes longer |
 | krusty2/vehicle/Bike | `0x00405190` | 139/2381 (masked) | b | 99 code diffs: retail adds `mov edx, [esp + N]`; retail adds `push edi ; xor ebx, ebx ; xor edi, edi`; frame 0x94 vs 0xac, slot order differs |
 | krusty2/vehicle/Bike | `0x004060c0` | 121/1436 (masked) | b | 63 code diffs: `mov edx, [esi + 0x4a8] ; mov eax, [esi ~` vs `mov eax, [esi + 0x4a8] ; mov ecx, [esi ~`; retail lacks `xor ecx, ecx`; frame 0x204 vs 0x214 |
 | krusty2/vehicle/Bike | `0x00406ae0` | 78/1576 (masked) | b | 118 code diffs: `push ecx` vs `push ebp ; mov ebp, esp ; sub esp, 8`; `jne @16 ; mov [esp + N], 0 ; jmp @20` vs `jne @18 ; mov [ebp - N], 0 ; jmp @22`; frame 0x0 vs 0x8 |
@@ -111,7 +108,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Bike | `0x00409b30` | 826/1260 (masked) | c | 18 code diffs: `jmp @217` vs `jmp @222 ; mov ecx, [esp + N]`; `mov edx, [esi]` vs `mov [esp + N], ecx ; jmp @222 ; mov edx~` |
 | krusty2/vehicle/Bike | `0x0040a520` | 439/2272 | b | 96 code diffs: retail lacks `test al, al`; retail adds `test al, al`; slots differ |
 | krusty2/vehicle/Bike | `0x0040aec0` | 527/1186 (masked) | b | 35 code diffs; slots differ |
-| krusty2/vehicle/Bike | `0x0040b600` | 1061/1066 | b | slot 46: frame offsets of the one-wheel path's constructor temporaries (sub/half constructor at retail 0x38/0x20, the 0x421cb0 mid at 0x40, the WorldToLocal temporary at 0x48/0x30); the register pair is fixed by `const Vec3&` rear/front locals |
 | krusty2/vehicle/Bike | `0x0040ba30` | 55/973 (masked) | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 135/802 (masked) | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 585/637 (masked) | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
@@ -140,14 +136,12 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/bvh/BoundingBoxTreeQuery | `0x00426be0` | 1673/2572 | b | cross products match; min/max of the projections (retail keeps p2 on the x87 stack and stores p1 twice), one operand pair of a vertex transform and the frame (0x160 vs 0x164) |
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 349/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
-| physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 429/797 | b | 10 code diffs: retail lacks `mov [esp + N], eax`; retail adds `mov [esp + N], eax`; slot order differs |
-| physics/bvh/BoundingBoxTreeQuery | `0x004290d0` | 564/813 | b | 6 code diffs: retail lacks `fstp [esp + N]`; retail lacks `fld [esp + N]`; slots differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 773/789 | c | frame and slots match (loop output in its own local, `grown` after the last rotation, z, y, x transform sums); the first two products of the transform's x and z rows load the matrix element first |
 | physics/bvh/BoundingBoxTreeQuery | `0x00429570` | 246/831 | b | 17 code diffs: `jne @82 ; xor eax, eax ; pop edi` vs `je @272`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
-| physics/collision/CollisionPoint | `0x0043aa30` | 377/791 (masked) | b | frame and blocks match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, the squared normal length squares y, x, z (y consumed), one push fstp scheduled later |
+| physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
 | physics/collision/CollisionPoint | `0x0043ad80` | 47/599 (masked) | b | body matches; retail returns for a null first argument before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead `points` slot, VC6 in a1's |
-| physics/collision/CollisionVectorHelpers | `0x0043ca20` | 61/115 | b | 5 code diffs: retail adds `mov edx, [esp + N]`; retail lacks `mov edx, [esp + N]`; slots differ |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 1570/2619 | c | ApplyContactImpulse, frame 0xb8 and slot order match; termB (other-body branch) builds its cross/dot in a different x87 register order (fstp st(2), +2 bytes), plus scheduling of three struct copies and the `test edi` of `if (other)` |
 | physics/contact/ContactImpulse | `0x005004a0` | 104/927 (masked) | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 451/3321 (masked) | b | 123 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x1c4 vs 0x1ac, slot order differs |
@@ -159,11 +153,9 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/helpers/SoultreeBounds | `0x004fe2e0` | 82/1325 | b | frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx); *have clamps are unconditional selects; retail spends one more inline Vec3 site before h |
 | physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 249/1072 (masked) | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
-| physics/helpers/SoultreeMatrix | `0x004fc050` | 392/1104 (masked) | b | 35 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slot order differs |
-| physics/helpers/SoultreeMatrix | `0x004fca80` | 308/458 (masked) | b | 10 code diffs: `mov [ebx + 4], edx` vs `mov [ebx + 8], eax`; `mov [ebx + 8], eax ; add esp, 0xc` vs `mov eax, [esp + N] ; mov [ebx + 0x18], ~`; slots differ |
-| physics/helpers/SoultreeRotate | `0x004fd1f0` | 285/322 (masked) | c | 6 code diffs: `fld st(2) ; fmul [esi + 0xb8] ; fld st(~` vs `fld st(0)`; retail lacks `faddp st(1)` |
+| physics/helpers/SoultreeMatrix | `0x004fc050` | 1073/1171 (masked) | b | same instructions and length; three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos |
+| physics/helpers/SoultreeRotate | `0x004fd1f0` | 290/322 (masked) | c | x87 order matches; retail pushes `&p` for the second SetPosition after the z row's products, VC6 here before the y row's store |
 | physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) ; x-row, transpose-order, y/z-order and ~10k structural forms (constructor return, reference plus copy, pointer/by-value matrix, out pointer, Swap helper, inline transpose) do not move `v.x * m._11` |
-| physics/helpers/SoultreeTransform | `0x004fd7f0` | 269/281 (masked) | b | InvertRigid + TransformPoint form; the y translation sums _32*_43 before _12*_41 and the second swap's integer moves come early; a parenthesised t.y fixes both but sinks r.z's last fadd/fstp (255) |
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
 | physics/krustybike/KrustyBike | `0x0048fa60` | 472/532 | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 151/230 | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |

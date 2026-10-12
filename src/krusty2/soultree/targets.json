@@ -702,6 +702,16 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z",
+    "target_va": "0x004fca80",
+    "target_size": 494,
+    "expect": "exact",
+    "notes": "the translation delta rotated into itself through a by-value inline helper (RotateByRowsTo(&d, d, parentWorld)) gives retail's copy of the delta (308 -> 494; moved from samples/physics/helpers/SoultreeMatrix.cpp)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
     "candidate_symbol_contains": "?ResetMatrices@SoultreeObject@@QAEXXZ",
     "target_va": "0x004fcc70",
     "target_size": 109,
@@ -747,6 +757,26 @@
     "target_size": 150,
     "expect": "exact",
     "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "target_va": "0x004fd660",
+    "target_size": 168,
+    "expect": "exact",
+    "notes": "x and y rows accumulated statement by statement, z one expression with its first two products parenthesised (moved from samples/physics/helpers/SoultreeTransform.cpp)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "target_va": "0x004fd7f0",
+    "target_size": 285,
+    "expect": "exact",
+    "notes": "InvertRigid reads the translation into scalars z, y, x before the three -(t * R^T) rows (273 -> 285; moved from samples/physics/helpers/SoultreeTransform.cpp)",
     "bindings": "soultree.bindings.json"
   },
   {

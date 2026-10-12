@@ -314,6 +314,9 @@ exact:
 - An inlined helper taking a struct by value copies the argument only when it can
   change under the call (it aliases the output); an unmodified local is read in place.
   This reproduces retail's two `rep movsd` copies in Wrecker slot 10.
+  The same holds for a 12-byte vector: `RotateByRowsTo(&d, d, m)` (a by-value `Vec3 v` and an
+  out pointer to `d`) copies `d` first, its first row still reading the original, as retail's
+  SoultreeObject::GetMatrixIn `0x004fca80` does; a helper that returns the vector does not.
 - A struct assigned from an inline-constructed value (`sum = Vec3(0, 0, 0)`, `dst = sum * s`
   with an operator that returns `Vec3(...)`) goes through a 12-byte temporary that copies
   field by field; `Vec3 sum(0, 0, 0)` or per-component stores build in place and leave that
@@ -325,3 +328,10 @@ exact:
   the helper's return slot; returning the derived type binds the constructor result directly.
   Retail's chain of such helpers in Bike slot 46 (`0x40b600`) shows the copies all landing in
   one slot at frame 0.
+- Temporaries of one full expression stay live to its end; a call result in the next
+  statement can take a dead temporary's slot. Bike slot 46 (`0x40b600`) matched once the
+  transform `*out = node->WorldToLocalDirection(scratchVector)` was its own statement after
+  `scratchVector = <helper chain>` (its result reuses the chain's sum slot), and the
+  one-wheel path's sum/difference were by-value out-of-line operator temporaries
+  (`BikeVec3Sub(BikeVec3Add(front, half), position)`) instead of named pointer-call
+  results, whose own slots kept the transform result off retail's 0x3c.

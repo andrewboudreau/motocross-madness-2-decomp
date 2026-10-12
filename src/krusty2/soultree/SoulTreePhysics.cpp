@@ -1247,10 +1247,21 @@ static inline float VecLengthRsq(const Vec3& v)
 // remainder after the last step is run as one extra short step.  `refreshed` is unused.
 // While a respawn is pending (`held`), the placement search (slot 11) and reset (slot 33)
 // replace the step.
-// Near miss (1366/1942 bytes): every call, branch and x87 sequence is in retail order;
-// the residue is stack-slot packing (retail packs the integration temporary into the
-// respawn path's first vector and the merge outputs o3/o1 into its other two, with
-// `impulse` below `o2`).  Declaration order and scoping of the locals do not move it.
+// Near miss (1804/1930 bytes): every instruction is in retail order once the speed clamp
+// and the angular damping are written as `Vec3 *= float` (the per-component forms add a
+// spilled ratio and reload `this`); the residue is stack-slot packing, which also makes
+// ours 9 bytes longer.  Retail frame, nearest esp first (offsets from the aligned frame
+// top, read by pairing our /FAs listing with retail's displacements): mag -180, an
+// unreferenced 4-byte slot -176, dummy/sq -172, stepTime copy -168, up -164, Vec3(1,1,1)
+// temporary -152, speed -140, a shared with the integration result temporary -136, zeroB
+// -124, scale -112, -100 temporary, zero -88, b/o3 -76, -64 temporary, c/o1 -52, -40
+// temporary, impulse -28, o2 -24, LocalToWorldDirection result -12.  Ours shares a/o3,
+// b/o1, c/o2, gives no temporary a shared slot and has no unreferenced slot.  Not moved
+// by: declaration order or scope of any local (up/speed, the touching and respawn blocks,
+// zeroB, mag, sq, impulse), if/else or bare blocks around the step body or the
+// integration, named or helper-built integration results (the copy is elided into the
+// same temporary), one Vec3 reused as both the first slot output and the integration
+// result (190 bytes, 12 instruction diffs), or by-value/by-reference stepTime helpers.
 void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
 {
     Vec3 up;
@@ -1304,10 +1315,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
                                   &velocity, &centerOfMass, &position, &o3, &o2, &o1);
             UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &impulse);
             if (prevSpeed * 5.0f < linearSpeed && linearSpeed > 5.0f) {
-                float r = prevSpeed / linearSpeed;
-                velocity.x *= r;
-                velocity.y *= r;
-                velocity.z *= r;
+                velocity *= prevSpeed / linearSpeed;
                 linearSpeed = prevSpeed;
             }
             if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
@@ -1336,9 +1344,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
             }
             if (mag > 2.0f) {
                 mag *= 0.95f;
-                angularVelocity.x *= 0.95f;
-                angularVelocity.y *= 0.95f;
-                angularVelocity.z *= 0.95f;
+                angularVelocity *= 0.95f;
             }
             sceneNode->RotateAboutPoint(rotationPivot, scratchVector, mag);
         }
