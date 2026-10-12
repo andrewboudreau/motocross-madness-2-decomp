@@ -207,7 +207,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     case 3: {
         if (!cueView->raceTrack)
             goto hide;
-        if (cueView->ownRacer->field_0x78c) {
+        if (cueView->ownRacer->onTrack) {
             isVisible = 0;
             return 1;
         }

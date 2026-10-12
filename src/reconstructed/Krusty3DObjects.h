@@ -104,7 +104,7 @@ struct UnknownRunwayRacer {
     UnknownRunwayView* bikeView;              // +0x740 (RaceView.h)
     UnknownRunwayRacerPart* statusNode;       // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x78c - 0x748];
-    int field_0x78c;
+    int onTrack;                              // +0x78c RaceView.h's racer onTrack
     unsigned char field_0x790[0x7a4 - 0x790];
     char finished;                            // +0x7a4
 };

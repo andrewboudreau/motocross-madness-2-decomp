@@ -159,7 +159,7 @@ struct UnknownEventRacer : virtual public GameObject {
     float* gateTimes;                         // +0x780 gate times, by gate count % 600
     int finishPosition;                       // +0x784 finishing position (1-based)
     int largestStuntPoints;                   // +0x788 ZoneReport "LargestSingleStuntPoints" (0x0045c8b0)
-    int field_0x78c;                               // RaceStatus.cpp 0x004e63e0: Track 0x00517340's result
+    int onTrack;                              // +0x78c Track::PlaceNear placed the racer (RaceStatus.cpp 0x004e63e0); clears offTrackTime
     int gatesPassed;                          // +0x790 gates passed
     unsigned char field_0x794[0x7a0 - 0x794];
     unsigned short lapCount;                  // +0x7a0 laps

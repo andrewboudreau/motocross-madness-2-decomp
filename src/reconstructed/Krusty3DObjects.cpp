@@ -90,7 +90,7 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     blinkTimer += frameTime;
     if (blinkTimer > 1.375f)
         blinkTimer = 0;
-    if (trackedRacer->field_0x78c)
+    if (trackedRacer->onTrack)
         return 1;
     Vector3 direction;
     Vector3 position;
