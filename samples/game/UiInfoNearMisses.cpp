@@ -15,6 +15,8 @@
 // both copies at every position (moving the second copy later costs
 // 100+ bytes). Earlier passes also tried a reference or pointer alias of
 // field_0x27f8 for the stores and the memcpy sources (32 combinations).
+// An inline settings-reset helper over the 13 stores (720 variants) turns
+// them into [eax + N] stores (174, 394 bytes).
 //
 // TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 190 of 357.
 // The found block written once after the CD retry (`if (file) { ...; return

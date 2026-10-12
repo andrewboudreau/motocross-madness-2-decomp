@@ -17,7 +17,9 @@
 // returns and if-break forms keep the tails apart (43). Sweeps without goto
 // (600 combinations: case order, five return/break forms per case, a
 // `default:`, a KeyboardDevice cast on the mouse; 108 result-variable forms)
-// never merge the tails (best 43).
+// never merge the tails (best 43), and neither do a mouse cast to
+// KeyboardDevice* in both cases or one inline query helper called from
+// both. /Os, /O1, /Og, /Ob0, /Ob1, /Oy-, /GF and /Gy leave 43.
 //
 // UnknownReportError (0x004bf6a0, 978 bytes with jump tables): the switch
 // cases (values traced from retail's decision tree, in retail body order)

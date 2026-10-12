@@ -8,7 +8,11 @@
 // bytes); only the scheduling of the zeroing stores against the argument
 // loads differs. Retail clears all 16 bytes first and keeps `rate` in esi;
 // every order of the four field assignments, a channel temporary, `?:` and
-// an if/else body leave VC6 loading `stereo` into esi first.
+// an if/else body leave VC6 loading `stereo` into esi first; so do all 24
+// assignment orders x five channel-count spellings, memset sizes 16 and
+// sizeof - 4, a derived struct clearing in its constructor, unsigned/short
+// parameter types (bool or unsigned char `stereo`: 38) and blockAlign
+// first; avgBytesPerSec from `rate` or as a product scores lower.
 //
 // Sound 0x004bd0c0 (refills from the archive or file) and 0x004bb890 (the
 // sound factory): retail keeps one `return 1` block shared by both branches

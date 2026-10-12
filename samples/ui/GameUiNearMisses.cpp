@@ -49,17 +49,27 @@
 //   local (`rect.bottom = rect.top + GetRowHeight(row);`, as in the exact
 //   UIListBox slot 10 at 0x00476020) matches retail apart from the
 //   ebx/ebp swap (ebp makes `[ebp]` take a disp8, so 344 bytes); no
-//   declaration shift (k = 0..63) changes either form.
-// 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi,
-//   the width in edx and spills the row counter into the key's argument
-//   slot; VC6 here spills the pixel instead. Hoisting the width or
-//   reordering the red/green/blue terms moves the register pressure
-//   elsewhere; retail ORs red|green then blue, and no term order,
-//   parenthesisation or `pixel |=` split changes VC6 here's blue-first
-//   chain. Retail places `return 0` before `return found` after Unlock;
-//   `if (!Unlock) return 0; return found;` becomes neg/sbb/and, early
-//   returns for a failed Lock duplicate the epilogue, and goto, result
-//   variable, while/for row loops and a row pointer do not give it.
+//   declaration shift (k = 0..63) changes either form. An inline helper
+//   `HitRow(rect, GetRowHeight(row), point)` storing `r.bottom = r.top + h`
+//   gives retail's `add eax, <top>` (319/342, 11 instruction diffs); VC6
+//   then still loads point->x before y.
+// 0x0047b490 colour-key test (120/220): keeping the key pixel in the red
+//   term's variable (`pixel |= green | blue`) keeps it in a register and
+//   spills the row counter into the key's argument slot as retail does;
+//   VC6 still ORs green|blue first where retail ORs red|green then blue
+//   (no term order, parenthesisation or split changes the chain). The
+//   strict 120 form tests `x < width` after the inner loop; the
+//   structurally closest form (14 instruction diffs, 54 strict: the extent
+//   shifts) keeps `found = 1; break;` in the inner loop and walks a row
+//   pointer initialised in the for (`for (rows = .., row = bits; ..)`).
+//   It still differs in the OR chain, in retail's edi save inside the row
+//   loop (VC6 here copies the row pointer before the rows test, so edi is
+//   saved in the prologue) and in the row step (retail `lea eax, [edx +
+//   edx]; add edi, eax`, VC6 here `lea edi, [edi + edx*2]`; a char* step
+//   and `&row[width]` give the same). Retail places `return 0` before
+//   `return found` after Unlock; `if (!Unlock) return 0; return found;`
+//   becomes neg/sbb/and, early returns for a failed Lock duplicate the
+//   epilogue, and goto, result variable and while row loops do not give it.
 // 0x00472960 UIFrame constructor from a file (352/562): retail places the
 //   sprintf (image missing) block after the epilogue, jumping back to the
 //   `if (image)` free test; VC6 here lays it inline and threads its jump past
@@ -273,34 +283,34 @@ int UnknownFunction47b490(TextureMap* texture, int key) {
     int found = 0;
     unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, 0, 0x11);
     if (bits) {
-        int red;
+        int pixel;
         int green;
         if (texture->field_0x20 == 0x235) {
-            red = (key >> 8) & 0xf800;
+            pixel = (key >> 8) & 0xf800;
             green = (key >> 5) & 0x7e0;
         } else if (texture->field_0x20 == 0x22b) {
-            red = (key >> 9) & 0x7c00;
+            pixel = (key >> 9) & 0x7c00;
             green = (key >> 6) & 0x3e0;
         } else {
             goto unlock;
         }
-        {
-            int pixel = red | green | ((key >> 3) & 0x1f);
-            if (pixel) {
-                for (int rows = texture->field_0x18; rows > 0; rows--) {
-                    for (int x = 0; x < texture->field_0x14; x++) {
-                        if (bits[x] == pixel) {
-                            found = 1;
-                            break;
-                        }
-                    }
-                    bits += texture->field_0x14;
+        pixel |= green | ((key >> 3) & 0x1f);
+        if (pixel) {
+            for (int rows = texture->field_0x18; rows > 0; rows--) {
+                int x;
+                for (x = 0; x < texture->field_0x14; x++) {
+                    if (bits[x] == pixel)
+                        break;
                 }
+                if (x < texture->field_0x14)
+                    found = 1;
+                bits += texture->field_0x14;
             }
         }
 unlock:
-        if (texture->UnknownVirtualSlot14(0))
-            return found;
+        if (!texture->UnknownVirtualSlot14(0))
+            return 0;
+        return found;
     }
     return 0;
 }
