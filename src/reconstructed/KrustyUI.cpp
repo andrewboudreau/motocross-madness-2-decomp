@@ -215,11 +215,11 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     field_0x3c = 0;
     field_0x48c = 0;
     field_0x490 = 0;
-    field_0x464 = 0;
+    garageScene = 0;
     field_0x40 = 0;
     field_0x44 = 0;
     field_0x494 = 0;
-    field_0x498 = 0;
+    allowIme = 0;
     field_0x4a8 = 0;
     field_0x4ac = 0;
     field_0x4b0 = 0;
@@ -227,7 +227,7 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     field_0x4a0 = 0;
     field_0x49c = 0;
     field_0x60 = 0;
-    field_0x64 = 0;
+    entryCount = 0;
 }
 
 
@@ -262,37 +262,37 @@ void KrustyUI::UnknownFunction498cf0(int value) {
     field_0x4a8 = 0;
     ((RenderTarget*)field_0x18)->field_0x34 = 0;
     g_TrackGame->field_0x2d5_bit2 = 1;
-    if (!field_0x464 && (value == 1 || value == -1)) {
+    if (!garageScene && (value == 1 || value == -1)) {
         UnknownFunction5053b0(1);
-        field_0x498 = 0;
+        allowIme = 0;
         if (g_TrackGame->LoadResourceString(0x1438, text, 0x80))
-            field_0x498 = atoi(text) != 0;
-        field_0x498 = g_TrackGame->GetRegistryFlag("AllowIME", field_0x498);
-        if (field_0x498)
+            allowIme = atoi(text) != 0;
+        allowIme = g_TrackGame->GetRegistryFlag("AllowIME", allowIme);
+        if (allowIme)
             field_0x2c->EnableWindowClipper(1);
         ((UnknownKrustyUIGuiView*)field_0x2c)->OpenDialogResource("global.dtm");
         field_0x474 = kVec3Zero;
         KRUSTYUI_RIDER_POSITION = kVec3Zero;
         KRUSTYUI_RIDER_POSITION.y += 0.1f;
-        field_0x464 = new(__FILE__, 0x105) GameObject(1);
+        garageScene = new(__FILE__, 0x105) GameObject(1);
         PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
         field_0x468 = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
-        field_0x464->AppendChild(field_0x468, -1);
+        garageScene->AppendChild(field_0x468, -1);
         field_0x468->field_0x1d8 = 0;
         field_0x468->field_0x1d4 = 0;
         UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
         lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(field_0x18);
-        field_0x464->AppendChild(lights, -1);
+        garageScene->AppendChild(lights, -1);
         UnknownKrustyUILight* emitter = new(__FILE__, 0x116) UnknownKrustyUILight(1);
         light = emitter->UnknownFunction49e230(field_0x18, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
-        field_0x464->AppendChild(light, -1);
+        garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         Vector3 position(-1800.0f, 200.0f, 0.0f);
         Vector3 direction = field_0x474 - position;
         emitter = new(__FILE__, 0x121) UnknownKrustyUILight(1);
         light = emitter->UnknownFunction49e230(field_0x18, 4, 0xffffff, &position, &direction, 0, 0, 0,
                                                0, 0, 0);
-        field_0x464->AppendChild(light, -1);
+        garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         s488 = field_0x474;
         s488.y += 8.0f;
@@ -303,7 +303,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         s438 = field_0x474 - s448;
         emitter = new(__FILE__, 0x130) UnknownKrustyUILight(1);
         light = emitter->UnknownFunction49e230(field_0x18, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
-        field_0x464->AppendChild(light, -1);
+        garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->field_0x1c;
         context.field_0x14 = 0;
@@ -321,7 +321,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
                 context.field_0x14 = 1;
         }
         KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
-        field_0x464->AppendChild(
+        garageScene->AppendChild(
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(field_0x18, "UIgarage.mcf", lights, &context, 1, 1), -1);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fc660(&field_0x474);
@@ -332,11 +332,11 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         shadow = projected->UnknownFunction4da7b0(field_0x18, g_TrackGame->field_0x3c);
         UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
         shadowLink = link->UnknownFunction4468b0(field_0x18, KRUSTYUI_GARAGE->field_0x1a0, shadow);
-        field_0x464->AppendChild(shadowLink, -1);
+        garageScene->AppendChild(shadowLink, -1);
         if (shadow)
-            field_0x464->AppendChild(shadow, -1);
+            garageScene->AppendChild(shadow, -1);
         KRUSTYUI_RIDER = new(__FILE__, 0x194) UnknownKrustyUICharacter(1);
-        field_0x464->AppendChild(
+        garageScene->AppendChild(
             KRUSTYUI_RIDER->CharacterVirtualSlot11(field_0x18, "UIRider.mcf", lights,
                                                    &g_TrackGame->field_0x1c, 1, 1), -1);
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
@@ -353,7 +353,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         for (int i = 0; i < field_0x4c; i++) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].field_0x80);
             KRUSTYUI_MODELS[i].field_0xc0 = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
-            field_0x464->AppendChild(
+            garageScene->AppendChild(
                 KRUSTYUI_MODELS[i].field_0xc0->CharacterVirtualSlot11(field_0x18, text, lights,
                                                                       &g_TrackGame->field_0x1c,
                                                                       1, 1), -1);
@@ -400,9 +400,9 @@ void KrustyUI::Shutdown() {
     UnknownFunction5053b0(0);
     if (!g_TrackGame->field_0x2d5_bit1)
         field_0x2c->CloseDialogResource();
-    if (field_0x464) {
-        field_0x464->Release();
-        field_0x464 = 0;
+    if (garageScene) {
+        garageScene->Release();
+        garageScene = 0;
     }
 }
 
@@ -420,7 +420,7 @@ void KrustyUI::UnknownFunction49bb80() {
     if (field_0x60)
         DebugFree(field_0x60, __FILE__, 1453);
     field_0x60 = 0;
-    field_0x64 = 0;
+    entryCount = 0;
 }
 
 // 0x00499ad0
@@ -463,23 +463,23 @@ int KrustyUI::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
 // 0x00499980: also hands the value to the +0x464 scene.
 int KrustyUI::UnknownVirtualSlot25(void* value) {
     GameObject::UnknownVirtualSlot25(value);
-    if (field_0x464)
-        field_0x464->UnknownVirtualSlot25(value);
+    if (garageScene)
+        garageScene->UnknownVirtualSlot25(value);
     return 1;
 }
 
 // 0x004999f0
 void KrustyUI::ShowScene(GameObject* parent) {
-    if (field_0x464) {
-        parent->AppendChild(field_0x464, -1);
+    if (garageScene) {
+        parent->AppendChild(garageScene, -1);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(field_0x468);
     }
 }
 
 // 0x00499a20
 void KrustyUI::HideScene() {
-    if (field_0x464) {
-        field_0x464->UnknownFunction4691f0();
+    if (garageScene) {
+        garageScene->UnknownFunction4691f0();
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
     }
 }
@@ -845,17 +845,17 @@ int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
 
 // 0x0049ba70
 int KrustyUI::UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e) {
-    field_0x60 = (UnknownKrustyUIEntry*)UnknownFunction47b570(field_0x60, (field_0x64 + 1) * sizeof(UnknownKrustyUIEntry));
-    field_0x60[field_0x64].field_0x00 = a;
-    field_0x60[field_0x64].field_0x04 = b;
-    field_0x60[field_0x64].field_0x08 = c;
+    field_0x60 = (UnknownKrustyUIEntry*)UnknownFunction47b570(field_0x60, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
+    field_0x60[entryCount].field_0x00 = a;
+    field_0x60[entryCount].field_0x04 = b;
+    field_0x60[entryCount].field_0x08 = c;
     int length = strlen(name);
     int count = length > 63 ? 63 : length;
-    strncpy(field_0x60[field_0x64].field_0x14, name, count);
-    field_0x60[field_0x64].field_0x14[count] = 0;
-    field_0x60[field_0x64].field_0x0c = d;
-    field_0x60[field_0x64].field_0x10 = e;
-    return ++field_0x64 - 1;
+    strncpy(field_0x60[entryCount].field_0x14, name, count);
+    field_0x60[entryCount].field_0x14[count] = 0;
+    field_0x60[entryCount].field_0x0c = d;
+    field_0x60[entryCount].field_0x10 = e;
+    return ++entryCount - 1;
 }
 
 // 0x0049bbb0

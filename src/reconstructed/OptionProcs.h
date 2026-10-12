@@ -72,7 +72,7 @@ struct UnknownOptControlSettings {            // 0x30 bytes (TrackGame+0xfe0)
 
 struct UnknownOptGarageSettings {             // 0x5c bytes (TrackGame+0x1550)
     int engineSize;                           // +0x00: engine size in cc ("%dcc")
-    int field_0x04;
+    int fourStroke;                           // +0x04: 4-stroke engine (the 400cc and 600cc DDLEngineSize rows)
     int field_0x08;
     float suspension[6];                      // +0x0c: suspension sliders (SldFrontComp ...)
     int eqBands[11];                          // +0x24: SldEQ1..11
@@ -170,8 +170,8 @@ public:
 
     float axisValuesAtWait[6];                // +0x7f58: joystick axis values when the wait began
     int waitingForInput;                      // +0x7f70: waiting for input to map
-    int field_0x7f74;
-    int field_0x7f78;                         // the active joystick has device kind 3
+    int inputWaitPending;                     // +0x7f74: the 250 ms timer before the input wait runs
+    int joystickIsKind3;                      // +0x7f78: the active joystick has device kind 3
 };
 
 // RTTI: OptGarageDlg : UIDialog (vtable 0x00555688; 0x7f5c bytes).
@@ -200,7 +200,7 @@ public:
 // reads them.
 struct UnknownOptKrustyUIRecord {
     unsigned char field_0x00[0x8c];
-    int field_0x8c;
+    int engineSize;                           // +0x8c: engine size (cc), as KrustyUI's bike table
     unsigned char field_0x90[0x94 - 0x90];
 };
 
@@ -213,12 +213,12 @@ public:
     virtual void UnknownVirtualSlot31(int save);
     void OpenPage(int page);     // 0x004b4ab0: opens page `page` (0..5)
 
-    OptGameSettingsDlg* field_0x7f58;
-    OptGraphicsDlg* field_0x7f5c;
-    OptSoundDlg* field_0x7f60;
-    OptControlsDlg* field_0x7f64;
-    OptMessagesDlg* field_0x7f68;
-    OptGarageDlg* field_0x7f6c;
+    OptGameSettingsDlg* gameSettingsPage;     // +0x7f58
+    OptGraphicsDlg* graphicsPage;             // +0x7f5c
+    OptSoundDlg* soundPage;                   // +0x7f60
+    OptControlsDlg* controlsPage;             // +0x7f64
+    OptMessagesDlg* messagesPage;             // +0x7f68
+    OptGarageDlg* garagePage;                 // +0x7f6c
 };
 
 // RTTI: GlobalSettingsDlg : UIDialog (vtable 0x00555604; 0x7f58 bytes):

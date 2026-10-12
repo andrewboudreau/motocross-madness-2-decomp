@@ -79,7 +79,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
             GrabBackground(flags & 8);
     }
     if (wait)
-        UnknownFunction4865e0(waitCursorImage, field_0x1f0 == 0);
+        UnknownFunction4865e0(waitCursorImage, paletteChanged == 0);
     if (dialog->UnknownVirtualSlot27(field_0x18, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)d)) {
@@ -88,7 +88,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
         return dialog;
     }
     if (wait)
-        UnknownFunction4865e0(cursorImage, field_0x1f0 == 0);
+        UnknownFunction4865e0(cursorImage, paletteChanged == 0);
     return 0;
 }
 

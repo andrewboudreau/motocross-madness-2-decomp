@@ -16,6 +16,15 @@ scene reads the last two; the next TU starts at `0x0045ff80`). The eight
 
 TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
+Member names follow their only writers and readers: `waitingForRacers`
+(+0x34, set after `StartKeepAlive`, drives `WaitForRemoteRacers`),
+`keepAliveStarted` (+0x38), `endNetworkGamePending` (+0x3c, slot 10 calls
+`EndNetworkGame` once), `anyRacerFinished`/`allRacersFinished` (+0x40/+0x44,
+0x0045eef0's racer scan) and `resumeArmed` (+0x440, slot 23 arms it, slot 22
+consumes it). +0x48, +0x4c, +0x50 and +0x3c0 keep placeholder names because
+DlgProcs.cpp, SelectGamePicProcs.cpp, TrackRecord.cpp and TrackOverlay.cpp read
+them.
+
 ## Status
 
 Exact (31 calibration cases):

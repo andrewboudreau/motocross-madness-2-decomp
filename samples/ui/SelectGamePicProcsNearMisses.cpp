@@ -8,7 +8,12 @@
 //   colour loop out after the "~1" branch and merges the "%s: %s" sprintf
 //   into the first branch's call, VC6 here keeps source order. Inverting
 //   the tests, swapping the if/else arms and moving the IME test do not
-//   reproduce the layout.
+//   reproduce the layout. With the system branch first (`player == -1`,
+//   `< 0` or `-1 == player`, 62) VC6 merges the system sprintf calls into
+//   the player branch's as retail does, but keeps the system block inline
+//   instead of moving it after the "~1" branch. The IME sprintfs as a
+//   ternary format (104, 48 diffs), `if (imeLibrary)` first (101), a
+//   TrackGame local and an else-if GetPlayerName test do not move it.
 // MPBikeRiderDlg::FillBikeRiderLists (0x004f8220, 833 bytes): the same
 //   flow and calls; retail keeps the bike index in edi and KrustyUI in ebp
 //   and lays the locals out differently (VC6 here swaps the registers).
@@ -131,7 +136,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     Vector3 offset;
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
-    if (pointer && field_0x7f78 && field_0x7f7c) {
+    if (pointer && previewDragged && previewDragging) {
         float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
         viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
@@ -142,8 +147,8 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
         g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
-        field_0x7f78 = 1;
-    } else if (!field_0x7f78) {
+        previewDragged = 1;
+    } else if (!previewDragged) {
         offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
@@ -153,7 +158,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     }
     g_TrackGame->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_TrackGame->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
-    if (field_0x7f80 && rand() % 200 == 1) {
+    if (idleMotionPlaying && rand() % 200 == 1) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);
         switch (rand() % 3) {
@@ -167,16 +172,16 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
             g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
             break;
         }
-        field_0x7f80 = 0;
+        idleMotionPlaying = 0;
     }
-    if (!field_0x7f80 && g_TrackGame->ui->field_0x46c->motionFinished) {
+    if (!idleMotionPlaying && g_TrackGame->ui->field_0x46c->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)].model];
         model->field_0xc0->UnknownFunction4a8b10("WaitB");
         g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
-        field_0x7f80 = 1;
+        idleMotionPlaying = 1;
     }
     if (dialogBackground)
         dialogBackground->UnknownFunction404240(previewRegion, (CameraRect*)&previewArea);
@@ -198,7 +203,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
     int total = g_TrackGame->mode.field_0x1be0;
     g_TrackGame->mode.field_0x1bd8 =
-        field_0x7f68.UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
+        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
     if (g_TrackGame->mode.field_0x1bd8 < g_TrackGame->mode.field_0x27f8.field_0x28)
         g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.field_0x1bd8;
     if (start) {
@@ -215,8 +220,8 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         g_TrackGame->mode.field_0x1be4[0].field_0xd8 = 0;
         int racer = g_UnknownGlobal689df8 + 1;
         for (int j = 0; j < 8; j++) {
-            for (int k = 0; k < field_0x7f68.field_0x00[j].grantedRacers; k++) {
-                g_TrackGame->mode.field_0x1be4[racer].field_0xd4 = field_0x7f68.field_0x00[j].playerId;
+            for (int k = 0; k < lobbySlots.slots[j].grantedRacers; k++) {
+                g_TrackGame->mode.field_0x1be4[racer].field_0xd4 = lobbySlots.slots[j].playerId;
                 g_TrackGame->mode.field_0x1be4[racer].field_0xd8 = racer;
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0xdc, names[racer], 0x10);
                 g_TrackGame->mode.field_0x1be4[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
@@ -241,28 +246,28 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
-                entry.field_0x00 = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
-                entry.field_0x04 = g_TrackGame->eventManager->field_0x50[i].field_0x28;
-                entry.field_0x05 = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
+                entry.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
+                entry.points = g_TrackGame->eventManager->field_0x50[i].field_0x28;
+                entry.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }
             qsort(g_TrackGame->mode.field_0x27f8.field_0x14c, racer, sizeof(UnknownGridEntry),
-                  UnknownFunction4f2080);
+                  CompareGridEntries);
         } else {
             // At random.
             UnknownGridDraw draws[8];
             for (i = 0; i < racer; i++) {
                 UnknownGridDraw draw;
-                draw.field_0x00 = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
-                draw.field_0x04 = RandomUnit() * 10.0f;
-                draw.field_0x08 = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
+                draw.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
+                draw.key = RandomUnit() * 10.0f;
+                draw.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 draws[i] = draw;
             }
-            qsort(draws, racer, sizeof(UnknownGridDraw), UnknownFunction4f20a0);
+            qsort(draws, racer, sizeof(UnknownGridDraw), CompareGridDraws);
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
-                entry.field_0x00 = draws[i].field_0x00;
-                entry.field_0x05 = draws[i].field_0x08;
+                entry.playerId = draws[i].playerId;
+                entry.racerIndex = draws[i].racerIndex;
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }
         }
@@ -270,10 +275,10 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             DebugFree(names, __FILE__, 0x23e);
     }
     UnknownLobbyStartMessage message;
-    message.field_0x04 = start;
+    message.start = start;
     message.field_0x08 = g_TrackGame->mode.field_0x27f8;
     message.field_0x1f4 = g_TrackGame->mode.field_0x94;
-    memcpy(message.field_0x08.field_0x18c, field_0x7f68.field_0x00, sizeof(field_0x7f68.field_0x00));
+    memcpy(message.field_0x08.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
         char name[0x80];
         message.field_0x1f8[0] = g_TrackGame->mode.field_0x1bcc;

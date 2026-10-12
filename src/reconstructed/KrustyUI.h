@@ -151,7 +151,7 @@ public:
     void* field_0x58;
     int field_0x5c;
     UnknownKrustyUIEntry* field_0x60;         // also freed by 0x0049bb80
-    int field_0x64;                           // entry count
+    int entryCount;                           // +0x64: entries in +0x60
     // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg), read
     // from presets.pb by 0x0049a540 (keys in the comments).
     int field_0x68[5][3][11];                 // standard curves ("Category_%dPreset_%d" RPM%05d)
@@ -163,7 +163,7 @@ public:
     int field_0x428[5];                       // "Weight"
     int field_0x43c[5];                       // slider minimum ("MinRange")
     int field_0x450[5];                       // slider maximum (the largest band maximum)
-    GameObject* field_0x464;                  // released by 0x004999b0
+    GameObject* garageScene;                  // +0x464: the garage scene (built by 0x00498cf0); released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown
     UnknownKrustyUIModelObject* field_0x46c;  // the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
     UnknownKrustyUIModelObject* field_0x470;  // the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
@@ -172,7 +172,7 @@ public:
     int field_0x48c;
     UnknownGameUiPage* field_0x490;
     void* field_0x494;                        // input context, restored to the window (EventManager 0x0045e710)
-    int field_0x498;
+    int allowIme;                             // +0x498: "AllowIME" registry flag (0x00498cf0)
     int field_0x49c;
     int field_0x4a0;
     int field_0x4a4;

@@ -357,7 +357,7 @@ public:
     int field_0x2c;
     UIDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
     Palette8* guiPalette;                     // +0x34
-    Palette8* field_0x38;
+    Palette8* setupPalette;                   // +0x38: SetUp's palette
     BackgroundImage* guiBackground;           // +0x3c
     BackgroundImage* redrawBackground;        // +0x40: redrawn when +0x1f4 runs out
     SoundGroup* guiSoundGroup;                // +0x44
@@ -365,7 +365,7 @@ public:
     int ownsSoundGroup;                       // +0x4c: owns +0x44
     char dialogFontName[0x80];                // +0x50: dialog font
     short dialogFontSize;                     // +0xd0: dialog font size
-    int field_0xd4;
+    int setupCallback;                        // +0xd4: SetUp's last argument
     TextureMapManager* guiTextures;           // +0xd8
     PCTextureMap* screenGrab;                 // +0xdc: screen grab
     int drawGrabFirst;                        // +0xe0: draw the grab before the children
@@ -373,7 +373,7 @@ public:
     int field_0xe8;
     int field_0xec;                           // from TrackGame+0xc40 (KrustyUI 0x004988a0)
     char dialogDirectory[0x100];              // +0xf0: dialog directory
-    int field_0x1f0;
+    int paletteChanged;                       // +0x1f0: set by 0x00486150; slot 10 clears it
     int waitFrames;                           // +0x1f4: frames to wait
     int field_0x1f8;
     void* toolTipFont;                        // +0x1fc: tool tip font (HFONT)

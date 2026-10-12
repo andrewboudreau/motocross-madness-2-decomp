@@ -2,19 +2,19 @@
 // MediaControl.h), kept out of src/reconstructed until they match.
 //
 // 0x004a2560 (open, 646 bytes; 9% masked): every call, argument, GUID and
-// branch target matches. Retail keeps a zero in ebx and &field_0x60 in ebp
+// branch target matches. Retail keeps a zero in ebx and &videoDrawStream in ebp
 // after the QueryInterface for the DirectDraw stream and pushes ebx for the
 // later zero arguments; VC6 here pushes immediates and uses one register
 // fewer, so the frame offsets differ by one dword. Neither local order nor
 // moving the `surface = 0` store before the memset changes it. Retail's ebx
-// holds &field_0x5c and then field_0x5c itself (the QueryInterface `this`)
+// holds &videoStream and then videoStream itself (the QueryInterface `this`)
 // before the zero; VC6 here reloads it into eax.
 //
 // The zero register itself is reachable: `UnknownSurfaceInterface* surface
 // = 0;` as a declaration initialiser (with the later `surface = 0` kept)
 // makes VC6 keep the zero in a register and reproduces retail's frame (637
 // bytes). But retail births the `xor ebx, ebx` inside the inlined memset
-// after that QueryInterface and keeps &field_0x60 in ebp and field_0x5c in
+// after that QueryInterface and keeps &videoDrawStream in ebp and videoStream in
 // ebx; VC6 hoists the xor to entry and swaps ebx/ebp, so the score stays.
 // Zeroing `surface` both before the memset and after field_0x34 gives 11%
 // with two stores.
@@ -50,55 +50,55 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     long result;
 
     GameObject::UnknownVirtualSlot8(target);
-    if (!UnknownFunction4a23d0()) {
+    if (!IsDirectShowInstalled()) {
         goto failed;
     }
-    field_0x58 = ((PCRenderTarget*)target)->field_0x04->directDraw;
-    field_0x70 = done;
-    field_0x74 = owner;
+    displayDirectDraw = ((PCRenderTarget*)target)->field_0x04->directDraw;
+    doneCallback = done;
+    doneOwner = owner;
     if (CoCreateInstance(*(const GUID*)&CLSID_AMMultiMediaStream, 0, CLSCTX_INPROC_SERVER,
-                         *(const GUID*)&IID_IAMMultiMediaStream, (void**)&field_0x50)) {
+                         *(const GUID*)&IID_IAMMultiMediaStream, (void**)&multiMediaStream)) {
         goto failed;
     }
-    if (field_0x50->UnknownMethod12(0, 0, 0) < 0) {
+    if (multiMediaStream->Initialize(0, 0, 0) < 0) {
         goto failed;
     }
-    if (field_0x50->UnknownMethod15(field_0x58, &MSPID_PrimaryVideo, 0, 0) < 0) {
+    if (multiMediaStream->AddMediaStream(displayDirectDraw, &MSPID_PrimaryVideo, 0, 0) < 0) {
         goto failed;
     }
-    result = field_0x50->UnknownMethod15(0, &MSPID_PrimaryAudio, 1, 0);
+    result = multiMediaStream->AddMediaStream(0, &MSPID_PrimaryAudio, 1, 0);
     if (result != 0x80040256 && result < 0) {
         goto failed;
     }
-    field_0x50->UnknownMethod1();
+    multiMediaStream->AddRef();
     MultiByteToWideChar(CP_ACP, 0, file, -1, path, MAX_PATH);
-    if (field_0x50->UnknownMethod16(path, 0) < 0) {
+    if (multiMediaStream->OpenFile(path, 0) < 0) {
         goto failed;
     }
-    if (field_0x50->UnknownMethod4(&MSPID_PrimaryVideo, &field_0x5c) < 0) {
+    if (multiMediaStream->GetMediaStream(&MSPID_PrimaryVideo, &videoStream) < 0) {
         goto failed;
     }
-    if (field_0x5c->UnknownMethod0(&IID_IDirectDrawMediaStream, (void**)&field_0x60) < 0) {
+    if (videoStream->QueryInterface(&IID_IDirectDrawMediaStream, (void**)&videoDrawStream) < 0) {
         goto failed;
     }
     memset(&format, 0, sizeof(format));
     format.size = sizeof(format);
-    if (field_0x60->UnknownMethod9(&format, 0, 0, 0) < 0) {
+    if (videoDrawStream->GetFormat(&format, 0, 0, 0) < 0) {
         goto failed;
     }
     field_0x30 = format.width;
     field_0x34 = format.height;
     surface = 0;
-    if (TARGET()->field_0x04->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&field_0x54)) {
+    if (TARGET()->field_0x04->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&directDraw)) {
         goto failed;
     }
-    if (field_0x54->CreateSurface((UnknownSurfaceDesc*)&format, &surface, 0)) {
+    if (directDraw->CreateSurface((UnknownSurfaceDesc*)&format, &surface, 0)) {
         goto failed;
     }
-    if (field_0x60->UnknownMethod13(surface, 0, 1, &field_0x64) < 0) {
+    if (videoDrawStream->CreateSample(surface, 0, 1, &videoSample) < 0) {
         goto failed;
     }
-    if (surface->QueryInterface(&IID_IDirectDrawSurface4, (void**)&field_0x38)) {
+    if (surface->QueryInterface(&IID_IDirectDrawSurface4, (void**)&sampleSurface)) {
         goto failed;
     }
     memset(&frameDesc, 0, sizeof(frameDesc));
@@ -110,13 +110,13 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     frameDesc.width = field_0x30;
     frameDesc.flags = 0x1007;
     frameDesc.caps[0] = 0x2800;
-    if (field_0x58->CreateSurface(&frameDesc, &field_0x2c, 0)) {
+    if (displayDirectDraw->CreateSurface(&frameDesc, &field_0x2c, 0)) {
         goto failed;
     }
-    field_0x3c[2] = field_0x30;
-    field_0x3c[1] = 0;
-    field_0x3c[0] = 0;
-    field_0x3c[3] = field_0x34;
+    frameRect[2] = field_0x30;
+    frameRect[1] = 0;
+    frameRect[0] = 0;
+    frameRect[3] = field_0x34;
     return this;
 
 failed:

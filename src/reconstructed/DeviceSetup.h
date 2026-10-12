@@ -21,15 +21,15 @@ void UnknownFunction47ba80(const char* section, const char* key, const char* val
 
 // 0x00449270: "<resource 0x1406> <GetKeyNameText>" for DirectInput scan code
 // `code`; "Unknown" and 0 when Windows has no name for it.
-int UnknownFunction449270(int code, char* text);
+int FormatKeyName(int code, char* text);
 // 0x00449d40: `code` translated through the NEC PC-98 table when that
 // keyboard is in use on Windows 9x.
-int UnknownFunction449d40(int code);
+int TranslatePc98ScanCode(int code);
 // 0x00449d90: detects the keyboard layout and the platform once.
-void UnknownFunction449d90();
+void DetectKeyboardLayout();
 // 0x00449db0: whether Windows is NT.
-int UnknownFunction449db0();
+int IsWindowsNTPlatform();
 // 0x00449de0: Japanese keyboard subtype (0x62, 0x65, 0x6a; 0 otherwise).
-int UnknownFunction449de0();
+int GetJapaneseKeyboardSubtype();
 // 0x00449e30: `value`, or 0 with the NEC PC-98 keyboard on Windows 9x.
-int UnknownFunction449e30(int code, int value);
+int ValueUnlessPc98(int code, int value);

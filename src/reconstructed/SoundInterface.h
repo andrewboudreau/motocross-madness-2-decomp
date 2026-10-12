@@ -20,7 +20,7 @@ public:
     // entries growing by 8. Element types are unknown.
     ContainerList<void*> field_0x04;
     ContainerList<void*> field_0x18;
-    unsigned char field_0x2c_bit0 : 1; // set once the audio has started
+    unsigned char audioStarted : 1; // +0x2c bit 0: set once the audio has started
 };
 
 // COM-style DirectSound objects (`this` on the stack). The listener is

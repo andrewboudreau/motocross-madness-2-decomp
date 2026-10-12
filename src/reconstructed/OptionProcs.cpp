@@ -338,8 +338,8 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     switch (event->kind) {
     case kDialogInit: {
         waitingForInput = 0;
-        field_0x7f74 = 0;
-        field_0x7f78 = 0;
+        inputWaitPending = 0;
+        joystickIsKind3 = 0;
         FindControl("ForceFeedCheck", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.forceFeedback);
         FindControl("SteeringSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.steering);
         FindControl("CrossupSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.crossup);
@@ -374,12 +374,12 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (g_TrackGame->controlInterface->activeJoystick)
             g_TrackGame->controlInterface->activeJoystick->UnknownFunction4897e0(4);
         analog->Show(0, 1);
-        field_0x7f78 = 0;
+        joystickIsKind3 = 0;
         if (g_TrackGame->controlInterface->activeJoystick)
-            field_0x7f78 = g_TrackGame->controlInterface->activeJoystick->deviceKind == 3;
-        ShowGroup(0x12f, field_0x7f78);
+            joystickIsKind3 = g_TrackGame->controlInterface->activeJoystick->deviceKind == 3;
+        ShowGroup(0x12f, joystickIsKind3);
         UpdateBoundValues(0);
-        field_0x7f74 = 0;
+        inputWaitPending = 0;
         UpdateBoundValues(0);
         break;
     }
@@ -404,7 +404,7 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         }
         break;
     case kDialogListSelect:
-        if (waitingForInput || field_0x7f74)
+        if (waitingForInput || inputWaitPending)
             break;
         if (_stricmp("InputDeviceDDL", event->controlName) == 0) {
             g_TrackGame->field_0x33fc->field_0x00 =
@@ -422,12 +422,12 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 for (i = 0; i < 6; i++)
                     axisValuesAtWait[i] = g_TrackGame->controlInterface->activeJoystick->UnknownFunction489e20(i);
             }
-            field_0x7f74 = 1;
+            inputWaitPending = 1;
             AddTimer(0, 0xfa, 0);
         }
         break;
     case kDialogTimer:
-        field_0x7f74 = 0;
+        inputWaitPending = 0;
         if (!waitingForInput)
             waitingForInput = 1;
         MapMovedInput();
@@ -684,12 +684,12 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         g_UnknownGlobal6887d8 = *UnknownGraphicsSettingsOf(game);
         g_UnknownGlobal688868 = *UnknownControlSettingsOf(game);
         memcpy(g_UnknownGlobal688c10, UnknownMessagesOf(game), sizeof(g_UnknownGlobal688c10));
-        field_0x7f58 = 0;
-        field_0x7f5c = 0;
-        field_0x7f60 = 0;
-        field_0x7f64 = 0;
-        field_0x7f68 = 0;
-        field_0x7f6c = 0;
+        gameSettingsPage = 0;
+        graphicsPage = 0;
+        soundPage = 0;
+        controlsPage = 0;
+        messagesPage = 0;
+        garagePage = 0;
         UIMultiState* tab = static_cast<UIMultiState*>(FindControl("GameSettings", 4));
         tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13dd);
         tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13dd);
@@ -730,29 +730,29 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
-            if (field_0x7f58) {
-                field_0x7f58->Release();
-                field_0x7f58 = 0;
+            if (gameSettingsPage) {
+                gameSettingsPage->Release();
+                gameSettingsPage = 0;
             }
-            if (field_0x7f5c) {
-                field_0x7f5c->Release();
-                field_0x7f5c = 0;
+            if (graphicsPage) {
+                graphicsPage->Release();
+                graphicsPage = 0;
             }
-            if (field_0x7f60) {
-                field_0x7f60->Release();
-                field_0x7f60 = 0;
+            if (soundPage) {
+                soundPage->Release();
+                soundPage = 0;
             }
-            if (field_0x7f64) {
-                field_0x7f64->Release();
-                field_0x7f64 = 0;
+            if (controlsPage) {
+                controlsPage->Release();
+                controlsPage = 0;
             }
-            if (field_0x7f68) {
-                field_0x7f68->Release();
-                field_0x7f68 = 0;
+            if (messagesPage) {
+                messagesPage->Release();
+                messagesPage = 0;
             }
-            if (field_0x7f6c) {
-                field_0x7f6c->Release();
-                field_0x7f6c = 0;
+            if (garagePage) {
+                garagePage->Release();
+                garagePage = 0;
             }
             event->dialog->EndDialog(0);
             event->handled = 1;
@@ -775,8 +775,8 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         } else if (_stricmp("Help", event->controlName) == 0) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         } else if (_stricmp("Advanced", event->controlName) == 0) {
-            if (field_0x7f5c)
-                field_0x7f5c->UpdateBoundValues(1);
+            if (graphicsPage)
+                graphicsPage->UpdateBoundValues(1);
             OptAdvancedGraphicsDlg* dialog = new(__FILE__, 987) OptAdvancedGraphicsDlg;
             event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0,
                                                      (UIDialog*)this, 0, 0, 1);
@@ -791,35 +791,35 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             g_UnknownGlobal6887d8 = *UnknownGraphicsSettingsOf(game);
             g_UnknownGlobal688868 = *UnknownControlSettingsOf(game);
             memcpy(g_UnknownGlobal688c10, UnknownMessagesOf(game), sizeof(g_UnknownGlobal688c10));
-            if (field_0x7f58)
-                field_0x7f58->UpdateBoundValues(0);
-            if (field_0x7f5c)
-                field_0x7f5c->UpdateBoundValues(0);
-            if (field_0x7f60) {
-                field_0x7f60->UpdateBoundValues(0);
-                field_0x7f60->ApplySoundSettings();
+            if (gameSettingsPage)
+                gameSettingsPage->UpdateBoundValues(0);
+            if (graphicsPage)
+                graphicsPage->UpdateBoundValues(0);
+            if (soundPage) {
+                soundPage->UpdateBoundValues(0);
+                soundPage->ApplySoundSettings();
             }
-            if (field_0x7f64)
-                field_0x7f64->UpdateBoundValues(0);
-            if (field_0x7f68)
-                field_0x7f68->UpdateBoundValues(0);
-            if (field_0x7f6c) {
-                field_0x7f6c->UpdateBoundValues(0);
-                field_0x7f6c->FillCurveList();
-                field_0x7f6c->ShowCurve();
+            if (controlsPage)
+                controlsPage->UpdateBoundValues(0);
+            if (messagesPage)
+                messagesPage->UpdateBoundValues(0);
+            if (garagePage) {
+                garagePage->UpdateBoundValues(0);
+                garagePage->FillCurveList();
+                garagePage->ShowCurve();
             }
             KrustyUI* ui = g_TrackGame->ui;
             int count = ui->field_0x54;
             for (int i = 0; i < count; i++) {
-                if (((UnknownOptKrustyUIRecord*)ui->field_0x50)[i].field_0x8c == 0xfa) {
+                if (((UnknownOptKrustyUIRecord*)ui->field_0x50)[i].engineSize == 0xfa) {
                     g_TrackGame->mode.field_0x1974.field_0xc4 = i; // TrackGame+0x1fb0
                     break;
                 }
             }
             NotifyParent(0x51, 9);
         } else if (event->code == 0x52) {
-            if (field_0x7f5c)
-                field_0x7f5c->UpdateBoundValues(0);
+            if (graphicsPage)
+                graphicsPage->UpdateBoundValues(0);
         }
         break;
     case kDialogClose:
@@ -844,65 +844,65 @@ void OptionsDlg::OpenPage(int page)
     area.top = 35;
     area.right = 620;
     area.bottom = 395;
-    if (field_0x7f58 && page != 0) {
-        field_0x7f58->Release();
-        field_0x7f58 = 0;
+    if (gameSettingsPage && page != 0) {
+        gameSettingsPage->Release();
+        gameSettingsPage = 0;
     }
-    if (field_0x7f5c && page != 1) {
-        field_0x7f5c->Release();
-        field_0x7f5c = 0;
+    if (graphicsPage && page != 1) {
+        graphicsPage->Release();
+        graphicsPage = 0;
     }
-    if (field_0x7f60 && page != 2) {
-        field_0x7f60->Release();
-        field_0x7f60 = 0;
+    if (soundPage && page != 2) {
+        soundPage->Release();
+        soundPage = 0;
     }
-    if (field_0x7f64 && page != 3) {
-        field_0x7f64->Release();
-        field_0x7f64 = 0;
+    if (controlsPage && page != 3) {
+        controlsPage->Release();
+        controlsPage = 0;
     }
-    if (field_0x7f68 && page != 4) {
-        field_0x7f68->Release();
-        field_0x7f68 = 0;
+    if (messagesPage && page != 4) {
+        messagesPage->Release();
+        messagesPage = 0;
     }
-    if (field_0x7f6c && page != 5) {
-        field_0x7f6c->Release();
-        field_0x7f6c = 0;
+    if (garagePage && page != 5) {
+        garagePage->Release();
+        garagePage = 0;
     }
     switch (page) {
     case 0:
-        if (!field_0x7f58) {
-            field_0x7f58 = new(__FILE__, 1066) OptGameSettingsDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f58, 0, 1, (int)&area, (int)this, 0, 0, 1);
+        if (!gameSettingsPage) {
+            gameSettingsPage = new(__FILE__, 1066) OptGameSettingsDlg;
+            g_TrackGame->ui->field_0x2c->ShowDialog(gameSettingsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 1:
-        if (!field_0x7f5c) {
-            field_0x7f5c = new(__FILE__, 1072) OptGraphicsDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f5c, 0, 1, (int)&area, (int)this, 0, 0, 1);
+        if (!graphicsPage) {
+            graphicsPage = new(__FILE__, 1072) OptGraphicsDlg;
+            g_TrackGame->ui->field_0x2c->ShowDialog(graphicsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 2:
-        if (!field_0x7f60) {
-            field_0x7f60 = new(__FILE__, 1078) OptSoundDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f60, 0, 1, (int)&area, (int)this, 0, 0, 1);
+        if (!soundPage) {
+            soundPage = new(__FILE__, 1078) OptSoundDlg;
+            g_TrackGame->ui->field_0x2c->ShowDialog(soundPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 3:
-        if (!field_0x7f64) {
-            field_0x7f64 = new(__FILE__, 1084) OptControlsDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f64, 0, 1, (int)&area, (int)this, 0, 0, 1);
+        if (!controlsPage) {
+            controlsPage = new(__FILE__, 1084) OptControlsDlg;
+            g_TrackGame->ui->field_0x2c->ShowDialog(controlsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 4:
-        if (!field_0x7f68) {
-            field_0x7f68 = new(__FILE__, 1090) OptMessagesDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f68, 0, 1, (int)&area, (int)this, 0, 0, 1);
+        if (!messagesPage) {
+            messagesPage = new(__FILE__, 1090) OptMessagesDlg;
+            g_TrackGame->ui->field_0x2c->ShowDialog(messagesPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 5:
-        if (!field_0x7f6c) {
-            field_0x7f6c = new(__FILE__, 1096) OptGarageDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f6c, 0, 1, (int)&area, (int)this, 0, 0, 1);
+        if (!garagePage) {
+            garagePage = new(__FILE__, 1096) OptGarageDlg;
+            g_TrackGame->ui->field_0x2c->ShowDialog(garagePage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     }

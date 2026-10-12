@@ -38,59 +38,56 @@ struct UnknownMediaSurfaceDesc {
 
 // IStreamSample / IDirectDrawStreamSample.
 struct UnknownStreamSampleInterface {
-    virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
-    virtual long __stdcall UnknownMethod1();                              // AddRef
-    virtual long __stdcall Release();                              // Release
+    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);
+    virtual long __stdcall AddRef();
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6(unsigned long flags, void* event, void* apc,
-                                          unsigned long context);         // Update
-    virtual long __stdcall UnknownMethod7(unsigned long flags, unsigned long milliseconds); // CompletionStatus
+    virtual long __stdcall Update(unsigned long flags, void* event, void* apc, unsigned long context);
+    virtual long __stdcall CompletionStatus(unsigned long flags, unsigned long milliseconds);
 };
 
 // IMediaStream / IDirectDrawMediaStream.
 struct UnknownMediaStreamInterface {
-    virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
-    virtual long __stdcall UnknownMethod1();                              // AddRef
-    virtual long __stdcall Release();                              // Release
+    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);
+    virtual long __stdcall AddRef();
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
-    virtual long __stdcall UnknownMethod9(UnknownMediaSurfaceDesc* current, void* palette,
-                                          UnknownMediaSurfaceDesc* desired, unsigned long* flags); // GetFormat
+    virtual long __stdcall GetFormat(UnknownMediaSurfaceDesc* current, void* palette,
+                                     UnknownMediaSurfaceDesc* desired, unsigned long* flags);
     virtual long __stdcall UnknownMethod10();
     virtual long __stdcall UnknownMethod11();
     virtual long __stdcall UnknownMethod12();
-    virtual long __stdcall UnknownMethod13(UnknownSurfaceInterface* surface, const void* rect,
-                                           unsigned long flags,
-                                           UnknownStreamSampleInterface** sample); // CreateSample
+    virtual long __stdcall CreateSample(UnknownSurfaceInterface* surface, const void* rect,
+                                        unsigned long flags, UnknownStreamSampleInterface** sample);
 };
 
 // IMultiMediaStream / IAMMultiMediaStream.
 struct UnknownMultiMediaStreamInterface {
-    virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
-    virtual long __stdcall UnknownMethod1();                              // AddRef
-    virtual long __stdcall Release();                              // Release
+    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);
+    virtual long __stdcall AddRef();
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4(const UnknownGuid* purpose,
-                                          UnknownMediaStreamInterface** stream); // GetMediaStream
+    virtual long __stdcall GetMediaStream(const UnknownGuid* purpose, UnknownMediaStreamInterface** stream);
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6(int* state);                   // GetState
-    virtual long __stdcall UnknownMethod7(int state);                    // SetState
-    virtual long __stdcall UnknownMethod8(__int64* time);                // GetTime
-    virtual long __stdcall UnknownMethod9(__int64* duration);            // GetDuration
-    virtual long __stdcall UnknownMethod10(__int64 time);                // Seek
+    virtual long __stdcall GetState(int* state);
+    virtual long __stdcall SetState(int state);
+    virtual long __stdcall GetTime(__int64* time);
+    virtual long __stdcall GetDuration(__int64* duration);
+    virtual long __stdcall Seek(__int64 time);
     virtual long __stdcall UnknownMethod11();
-    virtual long __stdcall UnknownMethod12(int type, unsigned long flags, void* graph); // Initialize
+    virtual long __stdcall Initialize(int type, unsigned long flags, void* graph);
     virtual long __stdcall UnknownMethod13();
     virtual long __stdcall UnknownMethod14();
-    virtual long __stdcall UnknownMethod15(void* object, const UnknownGuid* purpose, unsigned long flags,
-                                           UnknownMediaStreamInterface** stream); // AddMediaStream
-    virtual long __stdcall UnknownMethod16(const unsigned short* file, unsigned long flags); // OpenFile
+    virtual long __stdcall AddMediaStream(void* object, const UnknownGuid* purpose, unsigned long flags,
+                                          UnknownMediaStreamInterface** stream);
+    virtual long __stdcall OpenFile(const unsigned short* file, unsigned long flags);
 };
 
 class MediaControl : public GameObject {
@@ -103,7 +100,7 @@ public:
     virtual int UnknownVirtualSlot18();       // 0x004a28e0
 
     // 0x004a23d0: 1 when DirectShow's filter graph can be created.
-    static int UnknownFunction4a23d0();
+    static int IsDirectShowInstalled();
     // 0x004a2560: opens `file` for `target`; `done` is called with `owner`
     // at its end. Releases itself and returns 0 when it fails.
     MediaControl* UnknownFunction4a2560(void* target, const char* file, void (*done)(UIDialog* dialog),
@@ -116,29 +113,28 @@ public:
     int GetPosition(__int64* time); // 0x004a2a50
     int GetDuration(__int64* duration); // 0x004a2a70
     // 0x004a2a90: blits the frame into `destination`.
-    long UnknownFunction4a2a90(UnknownSurfaceInterface* destination, void* destinationRect,
-                               void* sourceRect, int flags);
+    long BlitFrame(UnknownSurfaceInterface* destination, void* destinationRect, void* sourceRect, int flags);
 
     UnknownSurfaceInterface* field_0x2c;      // the frame's surface
     int field_0x30;                           // width
     int field_0x34;                           // height
-    UnknownSurfaceInterface* field_0x38;      // the sample's surface
-    int field_0x3c[4];                        // the frame rectangle
+    UnknownSurfaceInterface* sampleSurface;   // +0x38: the sample's surface (IDirectDrawSurface4)
+    int frameRect[4];                         // +0x3c: the frame rectangle
     UnknownSurfaceInterface* field_0x4c;      // released by the destructor only
-    UnknownMultiMediaStreamInterface* field_0x50;
-    UnknownDirectDrawInterface* field_0x54;
-    UnknownDirectDrawInterface* field_0x58;   // the display's (not referenced)
-    UnknownMediaStreamInterface* field_0x5c;  // the video stream
-    UnknownMediaStreamInterface* field_0x60;  // its DirectDraw stream
-    UnknownStreamSampleInterface* field_0x64;
+    UnknownMultiMediaStreamInterface* multiMediaStream; // +0x50: IAMMultiMediaStream
+    UnknownDirectDrawInterface* directDraw;   // +0x54: IDirectDraw of the display's DirectDraw
+    UnknownDirectDrawInterface* displayDirectDraw; // +0x58: the display's DirectDraw (not released)
+    UnknownMediaStreamInterface* videoStream; // +0x5c: the primary video stream
+    UnknownMediaStreamInterface* videoDrawStream; // +0x60: its IDirectDrawMediaStream
+    UnknownStreamSampleInterface* videoSample; // +0x64: the stream sample
     union {
-        __int64 field_0x68;                   // time saved by slot 16
+        __int64 pausedTime;                   // +0x68: time saved by slot 16
         struct {
-            unsigned long field_0x68_low;
-            long field_0x68_high;
+            unsigned long pausedTimeLow;
+            long pausedTimeHigh;
         };
     };
-    void (*field_0x70)(UIDialog* dialog);
-    UIDialog* field_0x74;
-    unsigned char field_0x78_bit0 : 1;        // was running when slot 16 paused it
+    void (*doneCallback)(UIDialog* dialog);   // +0x70: called with doneOwner at the movie's end
+    UIDialog* doneOwner;                      // +0x74
+    unsigned char resumeAfterPause : 1;       // +0x78 bit 0: was running when slot 16 paused it
 };

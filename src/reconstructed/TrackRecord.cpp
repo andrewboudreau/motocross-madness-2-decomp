@@ -7,6 +7,7 @@
 #include "TrackGame.h"
 #include "TrackRecordDlg.h"
 #include "DebugAlloc.h"
+#include "MenuId.h"
 
 // 0x0051ee90: an empty name and no value.
 UnknownTrackRecord::UnknownTrackRecord()
@@ -237,7 +238,7 @@ void TrackRecordDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         break;
     case 1:
         if (!_stricmp("Back", event->controlName)) {
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (!_stricmp("TabQuarry", event->controlName)) {
