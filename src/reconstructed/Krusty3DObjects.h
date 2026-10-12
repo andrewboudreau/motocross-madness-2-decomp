@@ -295,7 +295,7 @@ struct UnknownKrustyPlayer {
     unsigned char field_0x40[0xa8 - 0x40];
     UnknownVisualCueRacer* followedRacer;     // +0xa8
     unsigned char field_0xac[0xdc - 0xac];
-    UnknownKrustyNode* field_0xdc;
+    UnknownKrustyNode* ball;                  // +0xdc TrackGameViewOwner::ball (the tag ball)
 };
 
 struct UnknownKrustyGame {
@@ -308,9 +308,9 @@ struct UnknownKrustyGame {
     unsigned char field_0x056c[0x2d74 - 0x56c];
     int cameraMode;                           // +0x2d74 camera mode 0..5
     unsigned char field_0x2d78[0x2eb4 - 0x2d78];
-    int field_0x2eb4;
+    int tagBall;                              // +0x2eb4 race settings' tagBall (TrackGame.h)
     unsigned char field_0x2eb8[0x3430 - 0x2eb8];
-    int field_0x3430;
+    int uiInteractionBlocked;                 // +0x3430 (TrackGame.h)
 };
 extern UnknownKrustyGame* g_UnknownKrustyGame56e26c;
 

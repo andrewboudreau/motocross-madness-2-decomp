@@ -104,7 +104,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
     int digit;
     int place;
 
-    if (currentKey == -1 || g_UnknownKrustyGame56e26c->field_0x3430)
+    if (currentKey == -1 || g_UnknownKrustyGame56e26c->uiInteractionBlocked)
         return 1;
     if (field_0x2c->field_0x38->crashState && elapsed > 2.0f) {
         HideDigits();
@@ -257,9 +257,9 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     }
     case 4: {
         UNKNOWN_PLACE_CUE();
-        if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
+        if (g_UnknownKrustyGame56e26c->tagBall) {
             Vector3 target;
-            g_UnknownKrustyGame56e26c->tagEvent->field_0xdc->field_0x21c.GetPosition(&target);
+            g_UnknownKrustyGame56e26c->tagEvent->ball->field_0x21c.GetPosition(&target);
             Vector3 direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
