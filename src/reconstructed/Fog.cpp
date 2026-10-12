@@ -77,7 +77,7 @@ int Fog::UnknownVirtualSlot10(float frameTime)
 // 0x00462800
 int Fog::UnknownVirtualSlot12()
 {
-    if (field_0x25_bit0) {
+    if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
         TARGET()->currentCamera->UnknownVirtualSlot28();
         TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
@@ -104,7 +104,7 @@ struct UnknownFogBackdropVertex {
 // corner stores rhw after its colours, as retail schedules it.
 int Fog::UnknownVirtualSlot14()
 {
-    if (field_0x25_bit0) {
+    if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
         TARGET()->currentCamera->UnknownVirtualSlot28();
         if (!TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix)) {

@@ -62,7 +62,7 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
         return 0;
     }
     UnknownVirtualSlot28();
-    if (field_0x25_bit0)
+    if (isEnabled)
         Owner()->SetCamera(this);
     return this;
 }
@@ -136,7 +136,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
     if (lastTurnAngle < 0.0f)
         lastTurnAngle = -lastTurnAngle;
     field_0x214 = viewDirection;
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         if (field_0x1d0)
             field_0x1d0--;
         if (field_0x1cc)

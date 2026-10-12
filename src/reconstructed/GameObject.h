@@ -113,9 +113,9 @@ protected:
     // four low bits is VC6's bitfield code shape. Bit 0 enables the gated child
     // walks, bit 3 excludes a child from every walk; bit 2 is set by slot 16
     // and also excludes a child from slots 9 and 10.
-    unsigned char field_0x25_bit0 : 1;
-    unsigned char field_0x25_bit1 : 1;
-    unsigned char field_0x25_bit2 : 1;
-    unsigned char field_0x25_bit3 : 1;
+    unsigned char isEnabled : 1;              // +0x25 bit 0: cleared by slot 4 (DisableByClassName), set by slot 5
+    unsigned char field_0x25_bit1 : 1;        // +0x25 bit 1: set and cleared with bit 0; gates slot 24 (network messages)
+    unsigned char isPaused : 1;               // +0x25 bit 2: stored by slot 16, which SoundGroup forwards to SetPaused
+    unsigned char pendingRelease : 1;         // +0x25 bit 3: set by slot 26; ReleaseDetached releases the marked children
     char* classNames;                         // +0x28 DebugMalloc'd string, starts empty; see 0x00469ce0
 };

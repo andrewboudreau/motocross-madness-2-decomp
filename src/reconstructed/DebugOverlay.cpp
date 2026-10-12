@@ -72,7 +72,7 @@ void DebugOverlay::SetRowText(int row, const char* text, int flag)
 
 void DebugOverlay::Print(int page, const char* format, ...)
 {
-    if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
+    if (isEnabled && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
         vsprintf(rowText, format, args);
@@ -82,7 +82,7 @@ void DebugOverlay::Print(int page, const char* format, ...)
 
 void DebugOverlay::Title(int page, const char* format, ...)
 {
-    if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
+    if (isEnabled && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
         vsprintf(rowText, format, args);
@@ -92,7 +92,7 @@ void DebugOverlay::Title(int page, const char* format, ...)
 
 void DebugOverlay::SetRowHighlight(int page, int row, int flag)
 {
-    if (field_0x25_bit0 && page == field_0x26c4)
+    if (isEnabled && page == field_0x26c4)
         field_0xb4[row].highlighted = flag;
 }
 

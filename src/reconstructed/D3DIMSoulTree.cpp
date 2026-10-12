@@ -850,7 +850,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot14()
 // 0x004440a0
 void D3DIMSoultreeObject::SoultreeVirtualSlot4(SoultreeObject** out)
 {
-    D3DIMSoultreeObject* copy = new (__FILE__, 0x7d5) D3DIMSoultreeObject(field_0x25_bit0);
+    D3DIMSoultreeObject* copy = new (__FILE__, 0x7d5) D3DIMSoultreeObject(isEnabled);
     *out = copy;
     copy->UnknownVirtualSlot9(renderContext, "", (int)lightManager, (int)textureOptions, 1);
 }

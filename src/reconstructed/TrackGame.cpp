@@ -410,12 +410,12 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
         return;
     if (open) {
         GameObject* other = eventManager->FindRaceView();
-        if (other && !other->field_0x25_bit0)
+        if (other && !other->isEnabled)
             return;
         if (menuIsOpen)
             return;
         ui->OpenMenu(id);
-        if (!menu->field_0x25_bit0)
+        if (!menu->isEnabled)
             return;
         menu->UnknownVirtualSlot4();
         menuIsOpen = 1;

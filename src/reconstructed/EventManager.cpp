@@ -655,7 +655,7 @@ void EventManager::CheckRaceOver(float frameTime) {
     }
     TrackGameViewOwner* owner = FindRaceMode();
     if (g_TrackGame->mode.raceSettings.raceMode == 0 || g_TrackGame->mode.raceSettings.raceMode == 4 || !owner ||
-        !owner->field_0x25_bit0)
+        !owner->isEnabled)
         return;
     UnknownKrustyBikeView* view = FindRaceView();
     if (!view || !view->isRacing)

@@ -241,7 +241,7 @@ int StatsOverlay::DrawStandings()
     iterator = 0;
     UnknownEventRacer* racer;
     while ((racer = view->NextBike(&iterator)) != 0) {
-        if (racer->field_0x25_bit0) {
+        if (racer->isEnabled) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
@@ -698,7 +698,7 @@ void RadarOverlay::DrawRacers(int mode)
     mapAngleCos = cos(mapAngle);
     mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
-        if (i != followedIndex && racers[i]->field_0x25_bit0) {
+        if (i != followedIndex && racers[i]->isEnabled) {
             outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
             if (field_0x174 && field_0x16c == i) {
                 if (radarView->chatOverlay) {

@@ -305,7 +305,7 @@ int EventManager::CreatePodiumScene() {
     PODIUM_ARCADE->UnknownVirtualSlot5();
     PODIUM_ARCADE->SetPosition(&podiumPosition);
     PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
-    if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
+    if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
         PODIUM_ARCADE->field_0x2c->UnknownFunction4444c0(1);
     UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
@@ -331,11 +331,11 @@ int EventManager::CreatePodiumScene() {
             return 0;
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
-        character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(field_0x25_bit0);
+        character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
         character->CharacterVirtualSlot11(renderContext, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {
-            if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
+            if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
                 character->field_0x1a0->UnknownFunction4444c0(1);
             int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {

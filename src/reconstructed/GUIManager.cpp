@@ -346,7 +346,7 @@ int GUIManager::UnknownVirtualSlot15() {
 
 // 0x00485bd0
 void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
-    int visible = dialog->field_0x25_bit0;
+    int visible = dialog->isEnabled;
 
     dialog->SetShown(0);
     if (dialog->parentDialog && (dialog->field_0x144 & 1))
@@ -923,7 +923,7 @@ int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** pre
     if (control && control != hoverControl)
         result = control->UnknownVirtualSlot31();
     if (result) {
-        if (hoverControl && !hoverControl->field_0x25_bit3 && hoverControl != control)
+        if (hoverControl && !hoverControl->pendingRelease && hoverControl != control)
             hoverControl->UnknownVirtualSlot32(control);
         if (previous)
             *previous = hoverControl;
@@ -940,9 +940,9 @@ int GUIUser::MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous)
     if (control && control != hoverControl)
         result = control->UnknownVirtualSlot31();
     if (result) {
-        if (hoverControl && !hoverControl->field_0x25_bit3 && hoverControl != control)
+        if (hoverControl && !hoverControl->pendingRelease && hoverControl != control)
             hoverControl->UnknownVirtualSlot32(control);
-        if (focusControl && !focusControl->field_0x25_bit3 && focusControl != control)
+        if (focusControl && !focusControl->pendingRelease && focusControl != control)
             focusControl->UnknownVirtualSlot33(control);
         if (previous)
             *previous = focusControl;
@@ -1025,7 +1025,7 @@ void GUIUser::EnableImeInput(int enable) {
 
 // 0x00487bf0
 int GUIUser::UnknownFunction487bf0(UnknownGuiControl** previous) {
-    if (focusControl && !focusControl->field_0x25_bit3)
+    if (focusControl && !focusControl->pendingRelease)
         focusControl->UnknownVirtualSlot33(0);
     if (previous)
         *previous = focusControl;
@@ -1125,7 +1125,7 @@ void GUIUser::RecreateCursor(const char* image, int redraw) {
 
     if (g_TrackGame->field_0x2d5_bit1 || !pointerDevice)
         return;
-    visible = userCursor ? userCursor->field_0x25_bit0 : 1;
+    visible = userCursor ? userCursor->isEnabled : 1;
     ReleaseCursor();
     if (g_TrackGame->renderTarget->surfacePixelFormat == 8 && !userGui->guiPalette)
         return;

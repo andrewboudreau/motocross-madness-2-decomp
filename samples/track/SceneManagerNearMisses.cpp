@@ -409,7 +409,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                                       &oneShot, &force2D);
                 SoultreeSoundEmitter* emitter =
                     (new(__FILE__, 2015)
-                         SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
+                         SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
                         ->CreateFollowing(renderContext, sound, "",
                                                 (UnknownVehiclePart*)staticModels->casters[i].model,
                                                 params, flags, oneShotDistance, randomTriggerPercent, 0,
@@ -691,7 +691,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                         node = animationTable->entries[i].proceduralObject->field_0x34;
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
-                             SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
+                             SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
                             ->CreateFollowing(renderContext, sound, attach, (UnknownVehiclePart*)node, params,
                                                     flags, oneShotDistance, randomTriggerPercent, 0, force2D);
                     if (!emitter) {

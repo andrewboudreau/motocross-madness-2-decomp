@@ -154,7 +154,7 @@ void MediaControl::Stop()
 int MediaControl::UnknownVirtualSlot16(int value)
 {
     if (value) {
-        if (!field_0x25_bit2) {
+        if (!isPaused) {
             resumeAfterPause = IsRunning();
             GetPosition(&pausedTime);
             multiMediaStream->SetState(0);

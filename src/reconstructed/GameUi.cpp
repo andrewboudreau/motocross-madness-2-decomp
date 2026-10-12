@@ -1866,7 +1866,7 @@ int UIDialog::Release() {
 int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 1;
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         if (event->kind == 1)
             UnknownFunction46f120();
         return GameObject::UnknownVirtualSlot23(event, entry);
@@ -1878,7 +1878,7 @@ int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
 int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 0;
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         if (event->kind == 1)
             UnknownFunction46f120();
         if (event->kind) {
@@ -2003,7 +2003,7 @@ void UIDialog::UpdateBoundValues(int value) {
 
 // 0x0046f1c0
 int UIDialog::UnknownVirtualSlot13() {
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         GameObjectIterator iterator(controlContainer, 1, "UIControl");
         if (dialogBackground) {
             UIControl* control;
@@ -2027,14 +2027,14 @@ int UIDialog::UnknownVirtualSlot13() {
 
 // 0x0046f300
 int UIDialog::UnknownVirtualSlot14() {
-    if (!field_0x25_bit2)
+    if (!isPaused)
         return GameObject::UnknownVirtualSlot14();
     return 1;
 }
 
 // 0x0046f320
 int UIDialog::UnknownVirtualSlot15() {
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         GameObject::UnknownVirtualSlot15();
     } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
@@ -2259,7 +2259,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
 // nesting them inside one test keeps the focus control in a register.
 UIControl::~UIControl() {
     if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
-        field_0x25_bit3 = 1;
+        pendingRelease = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
             ownerDialog->guiUser->UnknownFunction487bf0(0);
@@ -4962,7 +4962,7 @@ void UIProgressBar::SetBarTexture(int texture, int owned) {
 
 // 0x004715d0
 int UIControl::GrowStep() {
-    if (transitionFrame == 0 && transitionFrameCount && !field_0x25_bit2) {
+    if (transitionFrame == 0 && transitionFrameCount && !isPaused) {
         g_UnknownGlobal65b60c = transitionFrameCount < 0 ? 7 : transitionFrameCount;
         zoomWidth = 21.0f;
         zoomHeight = 11.0f;
@@ -4989,7 +4989,7 @@ int UIControl::GrowStep() {
     if (transitionFrame == g_UnknownGlobal65b60c)
         return 1;
     RequestRedraw();
-    if (!field_0x25_bit2 || transitionFrame) {
+    if (!isPaused || transitionFrame) {
         float width = zoomWidth;
         screenArea[0] = (int)slideX;
         screenArea[1] = (int)slideY;

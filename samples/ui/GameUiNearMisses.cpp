@@ -370,7 +370,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
         HandleEvent(&event);
         sendFrameEvent = 0;
     }
-    if (!field_0x25_bit2 && !isClosing) {
+    if (!isPaused && !isClosing) {
         UITimer* timer;
         for (int i = 0; (timer = timerList.Get(i)) != 0; i++) {
             timer->elapsedTime += (int)(frameTime * 1000.0f);

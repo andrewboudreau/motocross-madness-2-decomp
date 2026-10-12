@@ -320,7 +320,7 @@ int NameOverlay::UnknownVirtualSlot14()
     }
     if (trackedRacer->outOfRace)
         return 1;
-    if (!trackedRacer->field_0x25_bit0)
+    if (!trackedRacer->isEnabled)
         return 1;
     if ((field_0x15c.x != -1.0f || field_0x15c.y != -1.0f) && g_TrackGame->mode.showNameTags) {
         int left;

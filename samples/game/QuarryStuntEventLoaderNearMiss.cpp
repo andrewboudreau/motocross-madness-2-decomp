@@ -524,7 +524,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Particles");
     particleManager = new(__FILE__, 613) UnknownQuarryParticles(g_TrackGame->mode.particlesOn);
     g_MemTagStack->Push("Scene");
-    eventScene = (new(__FILE__, 624) Scene(field_0x25_bit0))
+    eventScene = (new(__FILE__, 624) Scene(isEnabled))
                      ->UnknownFunction4ea7e0(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
     if (!eventScene) {
         sprintf(text, "Scene not created.\n");

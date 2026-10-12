@@ -403,13 +403,13 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
 
     position = Vector3(0.74f, 0.0f, 0.0f);
     sprintf(name, "%s\\%1d.slt", "Res", 0);
-    digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(field_0x25_bit0);
+    digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(isEnabled);
     digitModels[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][0]->SetPosition(&position);
     baseFrame->AppendChild(digitModels[0][0], -1);
     digitModels[0][0]->UnknownFunction4444e0();
     position.x = 0.37f;
-    digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(field_0x25_bit0);
+    digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(isEnabled);
     digitModels[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][1]->SetPosition(&position);
     baseFrame->AppendChild(digitModels[0][1], -1);
@@ -422,7 +422,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
         position.x = 0.0f;
         for (place = 2; place < 5; place++) {
-            digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(field_0x25_bit0);
+            digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(isEnabled);
             digitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             digitModels[digit][place]->SetPosition(&position);
             baseFrame->AppendChild(digitModels[digit][place], -1);
@@ -434,14 +434,14 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
         shownDigits[place] = -1;
     position.x = 1.18f;
     sprintf(name, "%s\\x.slt", "Res", 0);
-    timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(field_0x25_bit0);
+    timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(isEnabled);
     timesModel->UnknownVirtualSlot9(value, name, a, b, 1);
     timesModel->SetPosition(&position);
     baseFrame->AppendChild(timesModel, -1);
     timesModel->UnknownFunction4444e0();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
-    decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(field_0x25_bit0);
+    decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(isEnabled);
     decimalPointModel->UnknownVirtualSlot9(value, name, a, b, 1);
     decimalPointModel->SetPosition(&position);
     baseFrame->AppendChild(decimalPointModel, -1);
@@ -450,7 +450,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
         position.x = 1.87f;
         for (place = 0; place < 2; place++) {
-            fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(field_0x25_bit0);
+            fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(isEnabled);
             fractionDigitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             fractionDigitModels[digit][place]->SetPosition(&position);
             baseFrame->AppendChild(fractionDigitModels[digit][place], -1);

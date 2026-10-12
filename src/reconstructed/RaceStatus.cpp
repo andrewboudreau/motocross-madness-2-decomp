@@ -129,7 +129,7 @@ int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
 // 0x004e5ca0
 int PruneStatusList(UnknownEventRacerPart** list) {
     while (list && *list) {
-        if (!(*list)->racer->field_0x25_bit0) {
+        if (!(*list)->racer->isEnabled) {
             (*list)->racer->statusNode = 0;
             UnknownEventRacerPart* status = *list;
             *list = status->next;
@@ -273,7 +273,7 @@ int RankByScore(int keepRacing) {
         UnknownEventRacer* racer;
         iterator = 0;
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
-            if (racer->field_0x25_bit0) {
+            if (racer->isEnabled) {
                 scores[count].value = racer->score;
                 scores[count].racer = racer;
                 count++;

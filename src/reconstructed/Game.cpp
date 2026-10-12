@@ -185,7 +185,7 @@ int Game::UnknownVirtualSlot8() {
             s_Render3DPeak.Record(render3D);
             s_RenderPost3DPeak.Record(renderPost3D);
             s_ElapsedPeak.Record(elapsed);
-            if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == profilePage) {
+            if (debugOverlay->isEnabled && debugOverlay->field_0x26c4 == profilePage) {
                 UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
                 debugOverlay->Title(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
@@ -224,7 +224,7 @@ int Game::UnknownVirtualSlot8() {
             static int memoryPage = -1;
             if (memoryPage < 0)
                 memoryPage = debugOverlay->NewPage();
-            if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == memoryPage) {
+            if (debugOverlay->isEnabled && debugOverlay->field_0x26c4 == memoryPage) {
                 UnknownMemoryStatus status;
                 GlobalMemoryStatus(&status);
                 debugOverlay->Title(memoryPage, "Memory");
@@ -304,7 +304,7 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
     if (inputSuspended)
         return 1;
     if (field_0x2d4_bit2 && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
-        if (debugOverlay->field_0x25_bit0) {
+        if (debugOverlay->isEnabled) {
             if (debugOverlay->ShowNextPage())
                 debugOverlay->UnknownVirtualSlot4();
         } else {

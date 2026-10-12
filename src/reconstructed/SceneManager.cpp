@@ -314,7 +314,7 @@ Scene* Scene::UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int valu
     sceneManager = manager;
     auralScape = value;
     field_0x88 = flag;
-    soundGroup = new(__FILE__, 622) SoundGroup(field_0x25_bit0);
+    soundGroup = new(__FILE__, 622) SoundGroup(isEnabled);
     AppendChild(soundGroup, -1);
     return this;
 }
@@ -1029,7 +1029,7 @@ int Scene::ReadSounds()
                         }
                         SoundEmitter* emitter =
                             (new(__FILE__, 2588)
-                                 SoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
+                                 SoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
                                 ->Create(renderContext, file, params, flags, oneShotDistance,
                                                         randomTriggerPercent, 0, force2D);
                         AppendChild(emitter, -1);
