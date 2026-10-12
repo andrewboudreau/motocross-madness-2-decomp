@@ -588,7 +588,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     case 1:
     case 5:
         if (mode != 1 || !g_TrackGame->mode.field_0x27f8.field_0x2c) {
-            sprintf(path, "%s\\%s%02d.tdf", g_TrackGame->sceneObject->field_0x44,
+            sprintf(path, "%s\\%s%02d.tdf", g_TrackGame->sceneObject->sceneDirectory,
                     g_TrackGame->mode.field_0x27f8.field_0x36,
                     g_TrackGame->mode.field_0x27f8.field_0x34);
             UnknownTextureStream* stream =

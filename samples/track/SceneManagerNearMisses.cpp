@@ -230,7 +230,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
     models = 0;
     staticModels = 0;
     int found = parameters.SelectSection("StaticModels");
-    if (sceneManager->field_0x38c && found) {
+    if (sceneManager->sceneNamed && found) {
         if (!parameters.GetInt("NumberOfStaticModels", -1, &models)) {
             sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
                     scenePath);
@@ -483,7 +483,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
 
     animations = 0;
     int found = parameters.SelectSection("Animations");
-    if (sceneManager->field_0x38c && found) {
+    if (sceneManager->sceneNamed && found) {
         if (!parameters.GetInt("NumberOfAnimations", -1, &animations)) {
             sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
                     scenePath);

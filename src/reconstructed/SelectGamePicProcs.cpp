@@ -265,7 +265,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                 list->AddRow(text, row, 0);
             } else {
                 g_TrackGame->sceneObject->ReadSceneName(text, entry, 1, "scn", 0, 0);
-                int count = g_TrackGame->sceneObject->field_0x390;
+                int count = g_TrackGame->sceneObject->waypointRaceCount;
                 for (int scene = 1; scene <= count; scene++) {
                     g_TrackGame->sceneObject->ReadSceneName(text, entry, scene, "scn", &x, &y);
                     int row;
@@ -301,8 +301,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     }
     if (strcmp(selected, "")) {
         g_TrackGame->sceneObject->SelectScene(selected, "scn", 0);
-        if (g_TrackGame->sceneObject->field_0x38c) {
-            g_TrackGame->sceneObject->ReadCurrentSceneName(text, g_TrackGame->sceneObject->field_0x24c, b);
+        if (g_TrackGame->sceneObject->sceneNamed) {
+            g_TrackGame->sceneObject->ReadCurrentSceneName(text, g_TrackGame->sceneObject->sceneFile, b);
             list->SelectRowByText(text);
             int row = list->GetSelectedRow();
             if (value)

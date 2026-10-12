@@ -14,10 +14,10 @@ public:
     UnknownMessage(const char* text, float duration); // 0x0051b200
     UnknownMessage(const UnknownMessage& other);       // 0x0051b250
 
-    char field_0x00[0x80];                    // text
-    float field_0x80;                         // seconds to show it
-    float field_0x84;                         // seconds shown so far
-    UnknownMessage* field_0x88;               // next queued line
+    char line[0x80];                          // +0x00 text
+    float showSeconds;                        // +0x80 seconds to show it
+    float shownSeconds;                       // +0x84 seconds shown so far
+    UnknownMessage* next;                     // +0x88 next queued line
 };
 
 // RTTI: TextQueueOverlay : GameObject (vtable 0x00558760), 0x58 bytes
@@ -38,11 +38,11 @@ public:
     void AppendMessage(UnknownMessage* message); // 0x0051b5e0: appends
     void DropHeadMessage();             // 0x0051b670: drops the head
 
-    void* field_0x2c;                         // font (DeleteObject)
-    UnknownOverlayRect field_0x30;            // text rectangle (+0x40 less one)
-    UnknownOverlayRect field_0x40;            // shadow rectangle
-    UnknownMessage* field_0x50;               // queue head
-    unsigned int field_0x54;                  // text colour, 0xff00
+    void* textFont;                           // +0x2c font (DeleteObject)
+    UnknownOverlayRect textRect;              // +0x30 text rectangle (+0x40 less one)
+    UnknownOverlayRect shadowRect;            // +0x40 shadow rectangle
+    UnknownMessage* queueHead;                // +0x50 queue head
+    unsigned int textColor;                   // +0x54 text colour, 0xff00
 };
 
 struct UnknownEventRacer;

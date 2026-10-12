@@ -472,7 +472,7 @@ public:
     // 0x004e9a10 / 0x004e9ac0 (SceneManager.cpp): run a temporary Scene.
     int UnknownFunction4e9a10(int* flag);
     int UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c);
-    // 0x004e9ba0: opens the scene archive `name` (default field_0x24c).
+    // 0x004e9ba0: opens the scene archive `name` (default sceneFile).
     UnknownTextureStream* OpenSceneArchive(const char* name);
     // 0x004e9cd0: opens `name` from the archive in `stream` (racesnd.cpp
     // reads Audio.res samples through it); 0 when not found.
@@ -480,7 +480,7 @@ public:
     void SetSceneFileNames(const char* name); // 0x004e9f70: derived file names
     void SetSceneDirectory(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
     void SelectScene(char* name, const char* kind, int value); // 0x004e9e30
-    // 0x004ea390: writes the scene name for `field_0x24c` into `name`.
+    // 0x004ea390: writes the scene name for `sceneFile` into `name`.
     void ReadCurrentSceneName(char* name, char* scene, int value);
     // 0x004ea010 (TrackRecord.cpp 0x0051ffe0): a track's display name.
     // Clears *a and *b when given; the archive's 0x00461cb0 fills them.
@@ -488,17 +488,17 @@ public:
 
     // Layout from the constructor's stores; array lengths are inferred
     // from the gaps between them (and the 0x103-byte copy into +0x44).
-    UnknownTextureStream* field_0x00;         // open scene archive
-    char field_0x04[0x40];                    // its name
-    char field_0x44[0x104];                   // path
-    char field_0x148[0x104];
-    char field_0x24c[0x40];                   // scene file name
-    char field_0x28c[0x40];                   // "%s.est"
-    char field_0x2cc[0x40];                   // "%s.trn"
-    char field_0x30c[0x40];
-    char field_0x34c[0x40];                   // "%s01.wpt"
-    int field_0x38c;
-    int field_0x390;
+    UnknownTextureStream* sceneArchive;       // +0x00 open scene archive
+    char sceneArchiveName[0x40];              // +0x04 its name
+    char sceneDirectory[0x104];               // +0x44 scene directory (SetSceneDirectory)
+    char waypointPath[0x104];                 // +0x148 directory\waypoint file
+    char sceneFile[0x40];                     // +0x24c scene file name
+    char estFile[0x40];                       // +0x28c "%s.est"
+    char trnFile[0x40];                       // +0x2cc "%s.trn"
+    char field_0x30c[0x40];                   // +0x30c emptied by SetSceneFileNames
+    char waypointFile[0x40];                  // +0x34c "%s01.wpt"
+    int sceneNamed;                           // +0x38c 0 when SelectScene read "NO NAME"
+    int waypointRaceCount;                    // +0x390 SceneInfo "NumberOfWaypointRaces"
 };
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.

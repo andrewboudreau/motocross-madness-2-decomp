@@ -271,10 +271,10 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     if (textQueue) {
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 1 || g_TrackGame->mode.field_0x27f8.field_0x04 == 5)
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                name, g_TrackGame->sceneObject->field_0x24c, g_TrackGame->mode.field_0x27f8.field_0x34);
+                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.field_0x27f8.field_0x34);
         else
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                name, g_TrackGame->sceneObject->field_0x24c, 0);
+                name, g_TrackGame->sceneObject->sceneFile, 0);
         UnknownMessage line(name, 3.25f);
         textQueue->ReplaceHeadMessage(&line);
     }

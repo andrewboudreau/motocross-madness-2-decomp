@@ -907,7 +907,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
             char description[32];
             char time[32];
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                scene, g_TrackGame->sceneObject->field_0x24c, 0);
+                scene, g_TrackGame->sceneObject->sceneFile, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
             sprintf(name, "%s_%s_%s_%s", scene, view->field_0x38->field_0x5e0, date, time);
@@ -928,7 +928,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4 && g_TrackGame->mode.field_0x26f0) {
             char time[32];
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                scene, g_TrackGame->sceneObject->field_0x24c, 0);
+                scene, g_TrackGame->sceneObject->sceneFile, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
             sprintf(name, "%s_%s_%s_%s", scene, view->field_0x38->field_0x5e0, date, time);

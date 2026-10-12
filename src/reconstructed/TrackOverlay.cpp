@@ -851,38 +851,38 @@ void DropTextOverlay::ReshowText()
 // 0x0051b200
 UnknownMessage::UnknownMessage(const char* text, float duration)
 {
-    strcpy(field_0x00, text);
-    field_0x84 = 0.0f;
-    field_0x88 = 0;
-    field_0x80 = duration;
+    strcpy(line, text);
+    shownSeconds = 0.0f;
+    next = 0;
+    showSeconds = duration;
 }
 
 // 0x0051b250
 UnknownMessage::UnknownMessage(const UnknownMessage& other)
 {
-    strcpy(field_0x00, other.field_0x00);
-    field_0x80 = other.field_0x80;
-    field_0x84 = 0.0f;
-    field_0x88 = 0;
+    strcpy(line, other.line);
+    showSeconds = other.showSeconds;
+    shownSeconds = 0.0f;
+    next = 0;
 }
 
 // 0x0051b2a0
 TextQueueOverlay::TextQueueOverlay(int flags) : GameObject(flags)
 {
-    field_0x2c = 0;
-    field_0x30.left = 0;
-    field_0x30.top = 0;
-    field_0x30.right = 0;
-    field_0x30.bottom = 0;
-    field_0x50 = 0;
-    field_0x54 = 0xff00;
+    textFont = 0;
+    textRect.left = 0;
+    textRect.top = 0;
+    textRect.right = 0;
+    textRect.bottom = 0;
+    queueHead = 0;
+    textColor = 0xff00;
 }
 
 // 0x0051b300
 TextQueueOverlay::~TextQueueOverlay()
 {
-    if (field_0x2c)
-        DeleteObject(field_0x2c);
+    if (textFont)
+        DeleteObject(textFont);
 }
 
 // 0x0051b320
@@ -899,12 +899,12 @@ TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
         weight = gui->field_0x3d4 ? 700 : 500;
         italic = gui->field_0x3d8;
     }
-    field_0x2c = CreateFontA(17, 0, 0, 0, weight, italic, 0, 0, 1, 0, 0, 2, 2, face);
-    field_0x40 = rect;
-    field_0x30.left = field_0x40.left - 1;
-    field_0x30.right = field_0x40.right - 1;
-    field_0x30.top = field_0x40.top - 1;
-    field_0x30.bottom = field_0x40.bottom - 1;
+    textFont = CreateFontA(17, 0, 0, 0, weight, italic, 0, 0, 1, 0, 0, 2, 2, face);
+    shadowRect = rect;
+    textRect.left = shadowRect.left - 1;
+    textRect.right = shadowRect.right - 1;
+    textRect.top = shadowRect.top - 1;
+    textRect.bottom = shadowRect.bottom - 1;
     return this;
 }
 
@@ -912,11 +912,11 @@ TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
 int TextQueueOverlay::UnknownVirtualSlot10(float frameTime)
 {
     GameObject::UnknownVirtualSlot10(g_TrackGame->frameTime);
-    if (field_0x50) {
-        if (field_0x50->field_0x84 > field_0x50->field_0x80)
+    if (queueHead) {
+        if (queueHead->shownSeconds > queueHead->showSeconds)
             DropHeadMessage();
-        if (field_0x50)
-            field_0x50->field_0x84 += g_TrackGame->frameTime;
+        if (queueHead)
+            queueHead->shownSeconds += g_TrackGame->frameTime;
     }
     return 1;
 }
@@ -926,16 +926,16 @@ int TextQueueOverlay::UnknownVirtualSlot10(float frameTime)
 int TextQueueOverlay::UnknownVirtualSlot15()
 {
     GameObject::UnknownVirtualSlot15();
-    if (field_0x50) {
+    if (queueHead) {
         void* dc;
         if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
-            void* font = SelectObject(dc, field_0x2c);
+            void* font = SelectObject(dc, textFont);
             SetTextColor(dc, 0);
-            DrawTextA(dc, field_0x50->field_0x00, strlen(field_0x50->field_0x00), &field_0x40, 0x124);
-            SetTextColor(dc, field_0x54);
-            DrawTextA(dc, field_0x50->field_0x00, strlen(field_0x50->field_0x00), &field_0x30, 0x124);
+            DrawTextA(dc, queueHead->line, strlen(queueHead->line), &shadowRect, 0x124);
+            SetTextColor(dc, textColor);
+            DrawTextA(dc, queueHead->line, strlen(queueHead->line), &textRect, 0x124);
             SelectObject(dc, font);
             if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
@@ -949,38 +949,38 @@ int TextQueueOverlay::UnknownVirtualSlot15()
 // 0x0051b540: replaces the head line with a copy of `message`.
 void TextQueueOverlay::ReplaceHeadMessage(UnknownMessage* message)
 {
-    if (!field_0x50) {
-        field_0x50 = new(__FILE__, 1451) UnknownMessage(*message);
+    if (!queueHead) {
+        queueHead = new(__FILE__, 1451) UnknownMessage(*message);
         return;
     }
     UnknownMessage* copy = new(__FILE__, 1453) UnknownMessage(*message);
-    copy->field_0x88 = field_0x50->field_0x88;
-    delete field_0x50;
-    field_0x50 = copy;
+    copy->next = queueHead->next;
+    delete queueHead;
+    queueHead = copy;
 }
 
 // 0x0051b5e0: appends a copy of `message`.
 void TextQueueOverlay::AppendMessage(UnknownMessage* message)
 {
-    if (!field_0x50) {
-        field_0x50 = new(__FILE__, 1469) UnknownMessage(*message);
+    if (!queueHead) {
+        queueHead = new(__FILE__, 1469) UnknownMessage(*message);
         return;
     }
     UnknownMessage* last;
-    UnknownMessage* entry = field_0x50;
+    UnknownMessage* entry = queueHead;
     while (entry) {
         last = entry;
-        entry = entry->field_0x88;
+        entry = entry->next;
     }
-    last->field_0x88 = new(__FILE__, 1476) UnknownMessage(*message);
+    last->next = new(__FILE__, 1476) UnknownMessage(*message);
 }
 
 // 0x0051b670
 void TextQueueOverlay::DropHeadMessage()
 {
-    UnknownMessage* head = field_0x50;
+    UnknownMessage* head = queueHead;
     if (head) {
-        field_0x50 = head->field_0x88;
+        queueHead = head->next;
         delete head;
     }
 }
