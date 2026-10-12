@@ -45,32 +45,32 @@ GridBaseBlock::GridBaseBlock(UnknownTextureStream* stream)
     if (g_gridBaseLoadBuffer == 0)
         g_gridBaseLoadBuffer = (unsigned char*)DebugMalloc(0x908, __FILE__, 136);
 
-    stream->UnknownFunction461640(&packed, 4, 1);
-    stream->UnknownFunction461640(&size, 4, 1);
+    stream->Read(&packed, 4, 1);
+    stream->Read(&size, 4, 1);
     if (packed < size) {
-        stream->UnknownFunction461640(g_gridBaseLoadBuffer, 1, packed);
+        stream->Read(g_gridBaseLoadBuffer, 1, packed);
         UnknownFunction4a03d0((unsigned char*)field_0x908, g_gridBaseLoadBuffer, 0x200);
     } else {
-        stream->UnknownFunction461640(field_0x908, 1, size);
+        stream->Read(field_0x908, 1, size);
     }
 
-    stream->UnknownFunction461640(&packed, 4, 1);
-    stream->UnknownFunction461640(&size, 4, 1);
+    stream->Read(&packed, 4, 1);
+    stream->Read(&size, 4, 1);
     if (packed < size) {
-        stream->UnknownFunction461640(g_gridBaseLoadBuffer, 1, packed);
+        stream->Read(g_gridBaseLoadBuffer, 1, packed);
         UnknownFunction4a03d0((unsigned char*)field_0xb08, g_gridBaseLoadBuffer, 0x244);
     } else {
-        stream->UnknownFunction461640(field_0xb08, 1, size);
+        stream->Read(field_0xb08, 1, size);
     }
 
-    stream->UnknownFunction461640(&packed, 4, 1);
-    stream->UnknownFunction461640(&size, 4, 1);
+    stream->Read(&packed, 4, 1);
+    stream->Read(&size, 4, 1);
     if (packed < size) {
-        stream->UnknownFunction461640(g_gridBaseLoadBuffer, 1, packed);
+        stream->Read(g_gridBaseLoadBuffer, 1, packed);
         UnknownFunction4a03d0((unsigned char*)cells, g_gridBaseLoadBuffer, 0x908);
     } else {
-        stream->UnknownFunction461640(cells, 1, size);
+        stream->Read(cells, 1, size);
     }
 
-    stream->UnknownFunction461640(&field_0xd4c, 4, 1);
+    stream->Read(&field_0xd4c, 4, 1);
 }

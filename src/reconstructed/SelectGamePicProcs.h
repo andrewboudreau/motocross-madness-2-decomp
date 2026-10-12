@@ -33,7 +33,7 @@ extern int g_UnknownGlobal689df8;
 extern int g_UnknownGlobal689dfc;
 
 // 0x004bfa80: the millisecond clock.
-int ReadClock();
+unsigned int ReadClock();
 
 // dlgprocs.cpp's code (0x004536e0).
 void LeaveMenusForRace();
@@ -67,7 +67,7 @@ struct UnknownKrustyUIModelObject : virtual public GameObject {
     // Advances the model's animation (dlgprocs.cpp SPBikeRiderDlg slot 10
     // passes the frame time and two zeros).
     virtual void ModelVirtualSlot7(float frameTime, int a, int b);
-    void UnknownFunction4a8b10(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
+    void SetMotionByName(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
 
     unsigned char field_0x008[0x0c - 0x08];
     int motionFinished;                       // +0x0c: the motion has finished

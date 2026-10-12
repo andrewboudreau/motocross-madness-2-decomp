@@ -96,8 +96,8 @@ int UnknownTrackGameObject3410::GetLobbyPreset(char* buffer, unsigned int size) 
     request.player = g_UnknownGuid556db0;
     request.property = g_UnknownGuid556dd0;
     result = lobby->SendLobbyMessage(2, 0, &request, sizeof(request));
-    start = UnknownFunction4bfa80();
-    while (UnknownFunction4bfa80() - start < 15000) {
+    start = ReadClock();
+    while (ReadClock() - start < 15000) {
         result = lobby->ReceiveLobbyMessage(0, 0, &flags, response, &responseSize);
         if (result >= 0)
             break;
@@ -140,8 +140,8 @@ int UnknownTrackGameObject3410::GetLobbyRank(char* buffer, unsigned int size) {
     request.player = g_UnknownGuid556db0;
     request.property = g_UnknownGuid556de0;
     result = lobby->SendLobbyMessage(2, 0, &request, sizeof(request));
-    start = UnknownFunction4bfa80();
-    while (UnknownFunction4bfa80() - start < 15000) {
+    start = ReadClock();
+    while (ReadClock() - start < 15000) {
         result = lobby->ReceiveLobbyMessage(0, 0, &flags, response, &responseSize);
         if (result >= 0)
             break;

@@ -16,7 +16,7 @@
   "?SetKeys@UnknownControlBinding@@QAEXHH@Z": "0x0043cce0",
   "?SetFromAxis@UnknownControlBinding@@QAEXMM@Z": "0x0043cd20",
   "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__:containerlist.h": "0x005666e4",
   "__real@4@400d8000000000000000": "0x00551428",

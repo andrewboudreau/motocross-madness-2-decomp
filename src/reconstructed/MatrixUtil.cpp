@@ -121,18 +121,18 @@ Matrix4 ProjectionMatrix(float nearPlane, float farPlane, float fov, float aspec
 }
 
 // 0x0040ae30 (cdecl): out-of-line dot product.
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b);
+float Vec3Dot(const Vector3* a, const Vector3* b);
 // 0x005015b0 (cdecl): out-of-line v * scale.
-Vector3 UnknownFunction5015b0(const Vector3& v, float scale);
+Vector3 Vec3Scale(const Vector3& v, float scale);
 
 // v scaled to unit length (unchanged when it already is) through the
 // out-of-line dot product and scale.
 static inline Vector3 NormalizeCall(const Vector3& v) {
-    float squared = UnknownFunction40ae30(&v, &v);
+    float squared = Vec3Dot(&v, &v);
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);
-    return UnknownFunction5015b0(v, scale);
+    return Vec3Scale(v, scale);
 }
 
 // Dot product through the members, summed as z + (x + (y)): ViewMatrix's

@@ -163,13 +163,13 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         bikes->GetRowData(-1);
         switch (rand() % 3) {
         case 0:
-            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookLeftR");
+            g_TrackGame->ui->riderPreview->SetMotionByName("LookLeftR");
             break;
         case 1:
-            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookRightR");
+            g_TrackGame->ui->riderPreview->SetMotionByName("LookRightR");
             break;
         case 2:
-            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("StretchR");
+            g_TrackGame->ui->riderPreview->SetMotionByName("StretchR");
             break;
         }
         idleMotionPlaying = 0;
@@ -179,8 +179,8 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)].model];
-        model->field_0xc0->UnknownFunction4a8b10("WaitB");
-        g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("WaitR");
+        model->field_0xc0->SetMotionByName("WaitB");
+        g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
         idleMotionPlaying = 1;
     }
     if (dialogBackground)

@@ -51,7 +51,7 @@
   "?UnknownFunction4030a0@AuralScape@@QAEXHPAUVector3@@000@Z": "0x004030a0",
   "?UnknownFunction420590@UnknownKrustyBikeView@@QAEXH@Z": "0x00420590",
   "?UnknownFunction423790@UnknownKrustyBikeView@@QAEXH@Z": "0x00423790",
-  "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?UnknownFunction448000@DebugOverlay@@QAEXHHH@Z": "0x00448000",
   "?UnknownFunction4594c0@EcoSystem@@QAEXH@Z": "0x004594c0",
   "?UnknownFunction45fbd0@EventManager@@QAEXH@Z": "0x0045fbd0",

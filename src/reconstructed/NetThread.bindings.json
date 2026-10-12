@@ -9,7 +9,7 @@
   "?ReceiveThreadProc@@YGIPAX@Z": "0x004af6a0",
   "?ReceiveMessages@@YAJI@Z": "0x004af8e0",
   "?IsSameMessage@@YAHPAXIHH0IHH@Z": "0x004afa40",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "__FILE__:netthread.cpp": "0x0056ec6c",
   "__endthreadex": "0x00537c9f",
   "__ftol": "0x00534a88",

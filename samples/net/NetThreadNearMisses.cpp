@@ -147,7 +147,7 @@ void HandleReceivedMessage(unsigned char* data, unsigned int size, int from, int
             EnterCriticalSection(NET_LOCK(g_TrackGame->network->keepAliveLock));
             NetPlayer* player = g_TrackGame->network->FindPlayer(*(int*)(data + 4));
             if (player)
-                player->lastKeepAliveTime = UnknownFunction4bfa80();
+                player->lastKeepAliveTime = ReadClock();
             LeaveCriticalSection(NET_LOCK(g_TrackGame->network->keepAliveLock));
             return;
         } else if (type == 0xcc) {

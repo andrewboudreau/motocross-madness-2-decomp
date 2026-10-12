@@ -935,11 +935,11 @@ void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a
     if (children == 0) {
         children = new (__FILE__, 3383) GridNode*[256];
         childOffsets = new (__FILE__, 3384) int[256];
-        stream->UnknownFunction461340(terrain->childTableOffset + field_0x2c, 0, 1);
-        stream->UnknownFunction461640(childOffsets, 0x400, 1);
+        stream->Seek(terrain->childTableOffset + field_0x2c, 0, 1);
+        stream->Read(childOffsets, 0x400, 1);
         for (int i = 0; i < 256; i++) {
             if (childOffsets[i]) {
-                stream->UnknownFunction461340(terrain->childTableOffset + childOffsets[i], 0, 1);
+                stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
                 children[i] = UnknownVirtualSlot2(stream, 0, this, level - 1, shift - 4,
                                                   (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i, 0, 0);
             } else {

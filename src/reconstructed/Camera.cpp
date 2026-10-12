@@ -224,7 +224,7 @@ int Camera::UnknownVirtualSlot14() {
 }
 
 // 0x0040ae30 (cdecl): out-of-line dot product.
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b);
+float Vec3Dot(const Vector3* a, const Vector3* b);
 
 // Vector3 seen through the out-of-line (x, y, z) constructor copy 0x00404e60.
 struct CameraVec3Call : Vector3 {
@@ -233,7 +233,7 @@ struct CameraVec3Call : Vector3 {
 
 // v scaled to unit length through the out-of-line dot product.
 static inline Vector3 NormalizeCall(const Vector3& v) {
-    float squared = UnknownFunction40ae30(&v, &v);
+    float squared = Vec3Dot(&v, &v);
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);
@@ -323,7 +323,7 @@ int Camera::UnknownVirtualSlot18() {
 // consult 0x0043caa0; a nonzero answer runs slot 27.
 int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (!GameObject::UnknownVirtualSlot23(event, entry)) {
-        if (UnknownFunction43caa0(0xB7, 0, event, 0x80000000)) {
+        if (TestInputEvent(0xB7, 0, event, 0x80000000)) {
             UnknownVirtualSlot27();
             return 1;
         }

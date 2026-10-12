@@ -442,7 +442,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                             view->field_0x3c[i]->field_0x754 = update->totalRunningTime;
                             // Always false here; retail still tests it.
                             if (!view->field_0x3c[i]->field_0x7a4)
-                                view->field_0x3c[i]->field_0x748 = UnknownFunction4bfa80();
+                                view->field_0x3c[i]->field_0x748 = ReadClock();
                         } else {
                             view->field_0x3c[i]->field_0x754 = FLT_MAX;
                             view->field_0x3c[i]->field_0x748 = 0x7ffffffe;
@@ -670,7 +670,7 @@ void EventManager::CheckRaceOver(float frameTime) {
             allRacersFinished = 1;
             int iterator = 0;
             UnknownEventRacer* racer;
-            while ((racer = view->UnknownFunction4204e0(&iterator)) != 0) {
+            while ((racer = view->NextBike(&iterator)) != 0) {
                 if (racer->field_0x7a4)
                     anyRacerFinished = 1;
                 else if (!racer->field_0x4a0)
@@ -694,7 +694,7 @@ void EventManager::CheckRaceOver(float frameTime) {
                     EndRace();
                 return;
             }
-            if (racer->field_0x7a4 >= 3 && UnknownFunction4bfa80() - racer->field_0x748 >= 3000)
+            if (racer->field_0x7a4 >= 3 && ReadClock() - racer->field_0x748 >= 3000)
                 EndRace();
             return;
         }
@@ -744,7 +744,7 @@ void EventManager::RankRacers() {
             UnknownEventRanking rankings[11];
             int ranked = 0;
             int next = 0;
-            while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+            while ((racer = view->NextBike(&next)) != 0) {
                 if (!racer->field_0x4a0) {
                     rankings[ranked].value = racer->field_0x754;
                     rankings[ranked].racer = racer;
@@ -756,7 +756,7 @@ void EventManager::RankRacers() {
                 rankings[i].racer->field_0x784 = i + 1;
         }
         iterator = 0;
-        for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
+        for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
             results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.field_0x27f8.field_0x00 == 2 || g_TrackGame->field_0x3444) &&
                 !racer->field_0x4a0)
@@ -769,7 +769,7 @@ void EventManager::RankRacers() {
         UnknownEventScore scores[11];
         int scored = 0;
         int next = 0;
-        while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+        while ((racer = view->NextBike(&next)) != 0) {
             if (!racer->field_0x4a0) {
                 scores[scored].value = racer->field_0x768;
                 scores[scored].racer = racer;
@@ -780,7 +780,7 @@ void EventManager::RankRacers() {
         for (int i = 0; i < scored; i++)
             scores[i].racer->field_0x784 = i + 1;
         next = 0;
-        for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
+        for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
             results[count].CopyFromRacer(racer);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
                 AddChampionshipPoints(racer, &results[count].points);
@@ -793,7 +793,7 @@ void EventManager::RankRacers() {
             UnknownEventScore scores[11];
             int scored = 0;
             int next = 0;
-            while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+            while ((racer = view->NextBike(&next)) != 0) {
                 if (!racer->field_0x4a0) {
                     scores[scored].value = racer->field_0x768;
                     scores[scored].racer = racer;
@@ -804,7 +804,7 @@ void EventManager::RankRacers() {
             for (int i = 0; i < scored; i++)
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
-            for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
+            for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
                     AddChampionshipPoints(racer, &results[count].points);
@@ -814,7 +814,7 @@ void EventManager::RankRacers() {
             UnknownEventScore scores[11];
             int scored = 0;
             int next = 0;
-            while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+            while ((racer = view->NextBike(&next)) != 0) {
                 if (!racer->field_0x4a0) {
                     scores[scored].value = racer->field_0x764;
                     scores[scored].racer = racer;
@@ -825,7 +825,7 @@ void EventManager::RankRacers() {
             for (int i = 0; i < scored; i++)
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
-            for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
+            for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
                     AddChampionshipPoints(racer, &results[count].points);
@@ -839,7 +839,7 @@ void EventManager::RankRacers() {
         UnknownEventStanding standings[11];
         int next = 0;
         int standing = 0;
-        while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+        while ((racer = view->NextBike(&next)) != 0) {
             if (!racer->field_0x4a0) {
                 standings[standing].field_0x00 = results[standing].points;
                 standings[standing].racer = racer;
@@ -848,7 +848,7 @@ void EventManager::RankRacers() {
         }
         qsort(standings, standing, sizeof(standings[0]), CompareStandings);
         next = 0;
-        while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+        while ((racer = view->NextBike(&next)) != 0) {
             int i;
             for (i = 0; i < standing; i++) {
                 if (standings[i].racer == racer) {
@@ -897,7 +897,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
             view->field_0x60->UnknownVirtualSlot4();
         int iterator = 0;
         UnknownEventRacer* racer;
-        while ((racer = view->UnknownFunction4204e0(&iterator)) != 0)
+        while ((racer = view->NextBike(&iterator)) != 0)
             racer->UnknownVirtualSlot4();
         return;
     }

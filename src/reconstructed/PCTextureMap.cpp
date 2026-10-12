@@ -49,7 +49,7 @@ static inline int LargerPixelSize(int first, int second) {
 
 // Reads `rows` rows of `rowSize` bytes; whether they were all read.
 static inline int ReadRows(UnknownTextureStream* stream, void* bits, int rowSize, int rows) {
-    return stream->UnknownFunction461640(bits, rowSize, rows) == rows;
+    return stream->Read(bits, rowSize, rows) == rows;
 }
 
 // 0x004c6080: reads the texture from `stream`. Files with mip levels hold a
@@ -95,15 +95,15 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         int level = 0;
         int position;
         do {
-            position = stream->UnknownFunction461600();
-            if (stream->UnknownFunction461640(&offsets[level], 4, 1) != 1)
+            position = stream->Tell();
+            if (stream->Read(&offsets[level], 4, 1) != 1)
                 return 0;
             offsets[level] += position;
             side <<= 1;
             level++;
         } while (side <= width);
-        position = stream->UnknownFunction461600();
-        if (stream->UnknownFunction461640(&offsets[level], 4, 1) != 1)
+        position = stream->Tell();
+        if (stream->Read(&offsets[level], 4, 1) != 1)
             return 0;
         offsets[level] += position;
 
@@ -114,9 +114,9 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
             dataSize = offsets[level + 1] - offsets[level];
             if (IsCompressedFormat(fileFormat) &&
                 dataSize != BytesPerPixel(fileFormat) * levelHeight * levelSide) {
-                if (!dataSize && stream->UnknownFunction461640(&dataSize, 4, 1) != 1)
+                if (!dataSize && stream->Read(&dataSize, 4, 1) != 1)
                     return 0;
-                if (stream->UnknownFunction461640(buffer, 1, dataSize) != dataSize)
+                if (stream->Read(buffer, 1, dataSize) != dataSize)
                     return 0;
                 switch (fileFormat) {
                 case 0x15:
@@ -172,9 +172,9 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                 dataSize = offsets[level + 1] - offsets[level];
                 if (IsCompressedFormat(fileFormat) &&
                     dataSize != BytesPerPixel(fileFormat) * levelHeight * levelSide) {
-                    if (!dataSize && stream->UnknownFunction461640(&dataSize, 4, 1) != 1)
+                    if (!dataSize && stream->Read(&dataSize, 4, 1) != 1)
                         return 0;
-                    if (stream->UnknownFunction461640(buffer, 1, dataSize) != dataSize)
+                    if (stream->Read(buffer, 1, dataSize) != dataSize)
                         return 0;
                 } else if (!ReadRows(stream, bits, BytesPerPixel(fileFormat) * levelSide, levelHeight)) {
                     return 0;
@@ -188,9 +188,9 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     }
 
     if (IsCompressedFormat(fileFormat) && dataSize != BytesPerPixel(fileFormat) * width * height) {
-        if (!dataSize && stream->UnknownFunction461640(&dataSize, 4, 1) != 1)
+        if (!dataSize && stream->Read(&dataSize, 4, 1) != 1)
             return 0;
-        if (stream->UnknownFunction461640(buffer, 1, dataSize) != dataSize)
+        if (stream->Read(buffer, 1, dataSize) != dataSize)
             return 0;
         switch (fileFormat) {
         case 6:
@@ -210,7 +210,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         }
     } else {
         dataSize = BytesPerPixel(fileFormat) * width * height;
-        if (stream->UnknownFunction461640(bits, 1, dataSize) != dataSize)
+        if (stream->Read(bits, 1, dataSize) != dataSize)
             return 0;
     }
     if (choice) {

@@ -147,31 +147,31 @@ void SoultreeMaterial::RestoreRenderStates()
 // 0x004ff450
 void SoultreeMaterial::ReadSaved(UnknownParameterStream* stream)
 {
-    stream->UnknownFunction461640(textureName, 0x40, 1);
-    stream->UnknownFunction461640(&textureFormat, 4, 1);
-    stream->UnknownFunction461640(&colorKey, 4, 1);
-    stream->UnknownFunction461640(&sourceBlend, 4, 1);
-    stream->UnknownFunction461640(&destBlend, 4, 1);
-    stream->UnknownFunction461640(&hasTextureName, 4, 1);
-    stream->UnknownFunction461640(&useVertexColor, 4, 1);
-    stream->UnknownFunction461640(&mipMapped, 4, 1);
-    stream->UnknownFunction461640(&hasColorKey, 4, 1);
-    stream->UnknownFunction461640(&hasSourceBlend, 4, 1);
-    stream->UnknownFunction461640(&hasDestBlend, 4, 1);
-    stream->UnknownFunction461640(&field_0xb8, 4, 1);
-    stream->UnknownFunction461640(&clampTexture, 4, 1);
-    stream->UnknownFunction461640(&hasAlpha, 4, 1);
-    stream->UnknownFunction461640(&materialAlpha, 4, 1);
-    stream->UnknownFunction461640(&textureSpeed, 4, 1);
-    stream->UnknownFunction461640(&mappingType, 2, 1);
-    stream->UnknownFunction461640(&field_0xcc, 4, 1);
-    int position = stream->UnknownFunction461600();
+    stream->Read(textureName, 0x40, 1);
+    stream->Read(&textureFormat, 4, 1);
+    stream->Read(&colorKey, 4, 1);
+    stream->Read(&sourceBlend, 4, 1);
+    stream->Read(&destBlend, 4, 1);
+    stream->Read(&hasTextureName, 4, 1);
+    stream->Read(&useVertexColor, 4, 1);
+    stream->Read(&mipMapped, 4, 1);
+    stream->Read(&hasColorKey, 4, 1);
+    stream->Read(&hasSourceBlend, 4, 1);
+    stream->Read(&hasDestBlend, 4, 1);
+    stream->Read(&field_0xb8, 4, 1);
+    stream->Read(&clampTexture, 4, 1);
+    stream->Read(&hasAlpha, 4, 1);
+    stream->Read(&materialAlpha, 4, 1);
+    stream->Read(&textureSpeed, 4, 1);
+    stream->Read(&mappingType, 2, 1);
+    stream->Read(&field_0xcc, 4, 1);
+    int position = stream->Tell();
     char mode = stream->UnknownFunction43e9e0();
     if (!_stricmp(textureName, "PROCEDURAL"))
         field_0x74.opaqueTextures = field_0x74.alphaTextures = 0;
     if (hasTextureName)
         LoadTexture();
-    stream->UnknownFunction461340(position, 0, 0);
+    stream->Seek(position, 0, 0);
     stream->UnknownFunction43e9b0(mode);
 }
 
@@ -259,15 +259,15 @@ void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
     textureSpeed = 0.0f;
     useVertexColor = 0;
     materialAlpha = 1.0f;
-    if (block->UnknownFunction4b7b30("TextureMap", textureName, -1))
+    if (block->ReadString("TextureMap", textureName, -1))
         hasTextureName = 1;
     int managed = field_0x74.opaqueTextures || (field_0x74.alphaTextures && hasTextureName);
     block->UnknownFunction4b7cf0("TextureFormat", &textureFormat);
     block->UnknownFunction4b7cf0("UseVertexColor", &useVertexColor);
     block->UnknownFunction4b7cf0("MipMapped", &mipMapped);
     block->UnknownFunction4b7cf0("ManagedTexture", &managed);
-    block->UnknownFunction4b7f10("ClampTexture", 0, &clampTexture);
-    if (block->UnknownFunction4b7b30("MappingType", value, -1)) {
+    block->GetInt("ClampTexture", 0, &clampTexture);
+    if (block->ReadString("MappingType", value, -1)) {
         if (!_stricmp(value, "STANDARD"))
             mappingType = 0;
         if (!_stricmp(value, "FIRE"))
@@ -293,7 +293,7 @@ void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
         field_0x74.opaqueTextures = 0;
         field_0x74.alphaTextures = 0;
     }
-    if (block->UnknownFunction4b7b30("ColorKey", value, -1)) {
+    if (block->ReadString("ColorKey", value, -1)) {
         hasColorKey = 1;
         UnknownTokenizer tokens(value);
         int red = atoi(tokens.UnknownFunction515df0(","));
@@ -304,7 +304,7 @@ void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
     if (block->UnknownFunction4b7e70("Alpha", &materialAlpha))
         hasAlpha = 1;
     block->UnknownFunction4b7e70("TextureSpeed", &textureSpeed);
-    if (block->UnknownFunction4b7b30("SourceBlend", value, -1)) {
+    if (block->ReadString("SourceBlend", value, -1)) {
         hasSourceBlend = 1;
         if (!_stricmp(value, "ZERO"))
             sourceBlend = 1;
@@ -333,7 +333,7 @@ void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
         if (!_stricmp(value, "BOTHINVSRCALPHA"))
             sourceBlend = 13;
     }
-    if (block->UnknownFunction4b7b30("DestBlend", value, -1)) {
+    if (block->ReadString("DestBlend", value, -1)) {
         hasDestBlend = 1;
         if (!_stricmp(value, "ZERO"))
             destBlend = 1;

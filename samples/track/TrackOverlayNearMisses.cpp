@@ -190,7 +190,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
     racerCount = 0;
     iterator = 0;
     chatView = view;
-    while ((racer = chatView->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = chatView->NextBike(&iterator)) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
@@ -240,7 +240,7 @@ int StatsOverlay::DrawStandings()
     }
     iterator = 0;
     UnknownEventRacer* racer;
-    while ((racer = view->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = view->NextBike(&iterator)) != 0) {
         if (racer->field_0x25_bit0) {
             scores[count].value = racer->field_0x768;
             scores[count].racer = racer;

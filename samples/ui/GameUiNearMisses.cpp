@@ -200,7 +200,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     if (a) {
         UnknownTextureStream* stream =
             new(__FILE__, 0x1e20) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (stream->UnknownFunction460f50(file, "r", 0)) {
+        if (stream->Open(file, "r", 0)) {
             row.kind = 2;
             row.text = 0;
             row.imageFile = 0;
@@ -847,7 +847,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     memset(sectionTable, 0, sizeof(sectionTable));
     int setType = 1;
     UnknownParameterBlock parameters;
-    parameters.UnknownFunction4b77a0((UnknownParameterStream*)stream, offset, 1);
+    parameters.Attach((UnknownParameterStream*)stream, offset, 1);
     char buffer[0x2800];
     parameters.UnknownFunction4b8240(buffer, sizeof(buffer));
     UnknownTokenizer* sections = new(__FILE__, 0x273) UnknownTokenizer(buffer);
@@ -1008,17 +1008,17 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
         for (int i = 0; i < sectionCount; i++) {
             control = 0;
             isDefault = 0;
-            parameters.UnknownFunction4b78f0(sectionTable[i].sectionName);
+            parameters.SelectSection(sectionTable[i].sectionName);
             switch (sectionTable[i].field_0x38) {
             case 0:
                 if (pass == 0) {
-                    parameters.UnknownFunction4b7f10("ScreenWidth", g_TrackGame->renderTarget->field_0x0c,
+                    parameters.GetInt("ScreenWidth", g_TrackGame->renderTarget->field_0x0c,
                                                      &screenWidth);
-                    parameters.UnknownFunction4b7f10("ScreenHeight", g_TrackGame->renderTarget->field_0x10,
+                    parameters.GetInt("ScreenHeight", g_TrackGame->renderTarget->field_0x10,
                                                      &screenHeight);
-                    parameters.UnknownFunction4b7f10("NoScale", 0, &scaleToScreen);
+                    parameters.GetInt("NoScale", 0, &scaleToScreen);
                     scaleToScreen = !scaleToScreen;
-                    parameters.UnknownFunction4b7f10("Popup", 1, &isPopup);
+                    parameters.GetInt("Popup", 1, &isPopup);
                     RenderTarget* target = (RenderTarget*)field_0x18;
                     if (scaleToScreen) {
                         scaleX = (float)target->field_0x0c / screenWidth;
@@ -1028,13 +1028,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         scaleX = scaleY = 1.0f;
                     }
                     if (isPopup) {
-                        parameters.UnknownFunction4b7ec0("DlgAlignV", "MIDDLE", buffer, -1);
+                        parameters.GetString("DlgAlignV", "MIDDLE", buffer, -1);
                         short align;
                         if (!_stricmp(buffer, "TOP"))
                             align = 8;
                         else
                             align = _stricmp(buffer, "BOTTOM") ? 0x10 : 0x20;
-                        parameters.UnknownFunction4b7ec0("DlgAlignH", "CENTER", buffer, -1);
+                        parameters.GetString("DlgAlignH", "CENTER", buffer, -1);
                         if (!_stricmp(buffer, "RIGHT"))
                             UnknownFunction46ffc0(align | 4);
                         else if (!_stricmp(buffer, "LEFT"))
@@ -1046,13 +1046,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     for (int color = 0; color < 10; color++) {
                         sprintf(buffer, "%s%d", "TextColor", color);
-                        parameters.UnknownFunction4b7f10(buffer, defaultColors[color], &value);
+                        parameters.GetInt(buffer, defaultColors[color], &value);
                         textColors[color] = value;
                     }
-                    parameters.UnknownFunction4b7ec0("MouseCursorAnim", "", buffer, -1);
+                    parameters.GetString("MouseCursorAnim", "", buffer, -1);
                     if (buffer[0])
                         cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
-                    parameters.UnknownFunction4b7ec0("BackgroundFile", "", buffer, -1);
+                    parameters.GetString("BackgroundFile", "", buffer, -1);
                     if (buffer[0] && dialogBackground) {
                         UnknownTgaFile* file = LoadFile(buffer, 0, (int)g_UnknownResourceManager572b44);
                         if (file) {
@@ -1073,13 +1073,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         dialogBackground = parentDialog->dialogBackground;
                     }
                     char fontName[0x80];
-                    parameters.UnknownFunction4b7ec0("FontName", "", fontName, -1);
+                    parameters.GetString("FontName", "", fontName, -1);
                     float points;
-                    parameters.UnknownFunction4b7f40("PointSize", 0, &points);
+                    parameters.GetFloat("PointSize", 0, &points);
                     int size = (int)points;
                     if (size < points)
                         size++;
-                    parameters.UnknownFunction4b7f40("FontHeight", 0, &points);
+                    parameters.GetFloat("FontHeight", 0, &points);
                     if (points > 0) {
                         size = (int)points;
                         if (size < points)
@@ -1092,8 +1092,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         strcpy(dialogFontFace, fontName);
                         int bold;
                         int italic;
-                        parameters.UnknownFunction4b7f10("Bold", 0, &bold);
-                        parameters.UnknownFunction4b7f10("Italic", 0, &italic);
+                        parameters.GetInt("Bold", 0, &bold);
+                        parameters.GetInt("Italic", 0, &italic);
                         const char* face = guiManager ? guiManager->toolTipFontFace : "";
                         if (*face) {
                             strcpy(dialogFontFace, face);
@@ -1114,7 +1114,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                                 load = 0;
                             dialogPalette = guiManager->guiPalette;
                         }
-                        parameters.UnknownFunction4b7ec0("PaletteFile", "", buffer, -1);
+                        parameters.GetString("PaletteFile", "", buffer, -1);
                         if (buffer[0] && load) {
                             UnknownResourceEntry* resource = g_UnknownResourceManager572b44->FindItem(buffer, 1);
                             if (resource) {
@@ -1125,7 +1125,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         if (guiManager && load)
                             guiManager->UnknownFunction486150((Palette8*)dialogPalette);
                     }
-                    parameters.UnknownFunction4b7ec0("BackgroundImage", "", backgroundImage, -1);
+                    parameters.GetString("BackgroundImage", "", backgroundImage, -1);
                     if (backgroundImage[0]) {
                         CameraRect frameArea;
                         frameArea.left = 0;
@@ -1145,11 +1145,11 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     imageTable[imageCount] = new(__FILE__, 0x3df) UIAnim(dialogTextures, (void*)1);
                     int delay;
                     int loops;
-                    parameters.UnknownFunction4b7f10("MSecDelay", 0, &delay);
-                    parameters.UnknownFunction4b7f10("LoopCount", 0, &loops);
+                    parameters.GetInt("MSecDelay", 0, &delay);
+                    parameters.GetInt("LoopCount", 0, &loops);
                     imageTable[imageCount]->SetFrameDelay(delay);
                     imageTable[imageCount]->SetFrameCount(loops);
-                    parameters.UnknownFunction4b7ec0("Files1", "", buffer, -1);
+                    parameters.GetString("Files1", "", buffer, -1);
                     UnknownTokenizer files(buffer);
                     for (char* file = files.UnknownFunction515df0(","); file; file = files.UnknownFunction515df0(",")) {
                         if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1))
@@ -1170,9 +1170,9 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 if (pass == 2 && soundCount < 20) {
                     int isStatic;
                     int copies;
-                    parameters.UnknownFunction4b7f10("Static", 1, &isStatic);
-                    parameters.UnknownFunction4b7f10("Copies", 0, &copies);
-                    parameters.UnknownFunction4b7ec0("File", "", buffer, -1);
+                    parameters.GetInt("Static", 1, &isStatic);
+                    parameters.GetInt("Copies", 0, &copies);
+                    parameters.GetString("File", "", buffer, -1);
                     int flags = isStatic ? 1 : 2;
                     if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1)) {
                         soundTable[soundCount] =
@@ -1200,23 +1200,23 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 area.bottom = 0;
                 area.right = 0;
                 if (!isDefault) {
-                    if (parameters.UnknownFunction4b7ec0("Xy", "", buffer, -1)) {
+                    if (parameters.GetString("Xy", "", buffer, -1)) {
                         sscanf(buffer, "%d%*[,.] %d", &area.left, &area.top);
                         area.right = area.left;
                         area.bottom = area.top;
                     }
-                    if (parameters.UnknownFunction4b7ec0("Xywh", "", buffer, -1)) {
+                    if (parameters.GetString("Xywh", "", buffer, -1)) {
                         sscanf(buffer, "%d%*[,.] %d%*[,.] %d%*[,.] %d", &area.left, &area.top, &area.right,
                                &area.bottom);
                         area.right += area.left;
                         area.bottom += area.top;
                     }
-                    if (parameters.UnknownFunction4b7ec0("Xyxy", "", buffer, -1))
+                    if (parameters.GetString("Xyxy", "", buffer, -1))
                         sscanf(buffer, "%d%*[,.] %d%*[,.] %d%*[,.] %d", &area.left, &area.top, &area.right,
                                &area.bottom);
                 }
-                parameters.UnknownFunction4b7f10("GroupId", defaultGroupId, isDefault ? &defaultGroupId : &groupId);
-                parameters.UnknownFunction4b7ec0("Type", defaultType, isDefault ? defaultType : type, -1);
+                parameters.GetInt("GroupId", defaultGroupId, isDefault ? &defaultGroupId : &groupId);
+                parameters.GetString("Type", defaultType, isDefault ? defaultType : type, -1);
 
                 if (!_stricmp(type, "BUTTON") || !_stricmp(type, "SCROLLUP") || !_stricmp(type, "SCROLLDOWN") ||
                     isDefault) {
@@ -1232,21 +1232,21 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             button = (UIButton*)AddControl(control, groupId, 0);
                         }
                     }
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
                         button->SetNormalImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimFocus", defaultAnimFocus, isDefault ? defaultAnimFocus : buffer,
+                    parameters.GetString("AnimFocus", defaultAnimFocus, isDefault ? defaultAnimFocus : buffer,
                                                      -1);
                     if (!isDefault)
                         button->SetFocusImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimPush", defaultAnimPush, isDefault ? defaultAnimPush : buffer, -1);
+                    parameters.GetString("AnimPush", defaultAnimPush, isDefault ? defaultAnimPush : buffer, -1);
                     if (!isDefault)
                         button->SetPushImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimDisable", defaultAnimDisable,
+                    parameters.GetString("AnimDisable", defaultAnimDisable,
                                                      isDefault ? defaultAnimDisable : buffer, -1);
                     if (!isDefault)
                         button->SetDisabledImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("SortLBName", defaultSortLBName,
+                    parameters.GetString("SortLBName", defaultSortLBName,
                                                      isDefault ? defaultSortLBName : buffer, -1);
                     if (!isDefault)
                         button->SetSortList((UIListBox*)FindSectionObject(buffer));
@@ -1258,12 +1258,12 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         multiState = (UIMultiState*)AddControl(control, groupId, 0);
                     }
                     int states;
-                    parameters.UnknownFunction4b7f10("NumStates", defaultNumStates,
+                    parameters.GetInt("NumStates", defaultNumStates,
                                                      isDefault ? &defaultNumStates : &states);
                     if (!isDefault)
                         static_cast<UIMultiState*>(multiState)->SetStateCount(states);
                     int selected;
-                    parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &selected);
+                    parameters.GetInt("Default", defaultDefault, isDefault ? &defaultDefault : &selected);
                     if (!isDefault)
                         static_cast<UIMultiState*>(multiState)->SetCurrentState(selected);
                     state = 0;
@@ -1273,9 +1273,9 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     char textBuffer[0x80];
                     sprintf(stateKey, "%s%d", "State", state);
                     sprintf(textKey, "%s%d", "StateText", state);
-                    int gotState = parameters.UnknownFunction4b7ec0(stateKey, defaultStates[0],
+                    int gotState = parameters.GetString(stateKey, defaultStates[0],
                                                                     isDefault ? defaultStates[0] : stateBuffer, -1);
-                    int gotText = parameters.UnknownFunction4b7ec0(textKey, defaultStateTexts[0],
+                    int gotText = parameters.GetString(textKey, defaultStateTexts[0],
                                                                    isDefault ? defaultStateTexts[0] : textBuffer, -1);
                     while (gotState | gotText) {
                         if (!isDefault) {
@@ -1289,49 +1289,49 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             break;
                         sprintf(stateKey, "%s%d", "State", state);
                         sprintf(textKey, "%s%d", "StateText", state);
-                        gotState = parameters.UnknownFunction4b7ec0(stateKey, state < 50 ? defaultStates[state] : "",
+                        gotState = parameters.GetString(stateKey, state < 50 ? defaultStates[state] : "",
                                                                     isDefault ? defaultStates[state] : stateBuffer, -1);
-                        gotText = parameters.UnknownFunction4b7ec0(textKey, state < 50 ? defaultStateTexts[state] : "",
+                        gotText = parameters.GetString(textKey, state < 50 ? defaultStateTexts[state] : "",
                                                                    isDefault ? defaultStateTexts[state] : textBuffer, -1);
                     }
                 }
 
                 if (!_stricmp(type, "LISTBOX") || isDefault) {
-                    parameters.UnknownFunction4b7f10("MaxItems", 100, isDefault ? &defaultMaxItems : &value);
+                    parameters.GetInt("MaxItems", 100, isDefault ? &defaultMaxItems : &value);
                     if (!isDefault) {
                         control = new(__FILE__, 0x4a3) UIListBox(0, value, &area, this);
                         listBox = (UIListBox*)AddControl(control, groupId, 0);
                     }
-                    parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
+                    parameters.GetInt("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault)
                         static_cast<UIListBox*>(listBox)->SelectRow(value);
-                    parameters.UnknownFunction4b7f10("AutoSort", defaultDefault, isDefault ? &defaultAutoSort : &value);
+                    parameters.GetInt("AutoSort", defaultDefault, isDefault ? &defaultAutoSort : &value);
                     if (!isDefault)
                         listBox->SetAutoSort(value);
-                    parameters.UnknownFunction4b7f10("SelectColor", defaultSelectColor,
+                    parameters.GetInt("SelectColor", defaultSelectColor,
                                                      isDefault ? &defaultSelectColor : &value);
                     if (!isDefault)
                         static_cast<UIListBox*>(listBox)->SetSelectColor(value);
-                    parameters.UnknownFunction4b7f10("Selectable", defaultSelectable,
+                    parameters.GetInt("Selectable", defaultSelectable,
                                                      isDefault ? &defaultSelectable : &value);
                     if (!isDefault)
                         static_cast<UIListBox*>(listBox)->SetSelectable(value);
-                    parameters.UnknownFunction4b7f10("AllowWScroll", defaultAllowWScroll,
+                    parameters.GetInt("AllowWScroll", defaultAllowWScroll,
                                                      isDefault ? &defaultAllowWScroll : &value);
                     if (!isDefault)
                         listBox->SetAllowWScroll(value);
-                    parameters.UnknownFunction4b7f10("SelectBoxColor", defaultSelectBoxColor,
+                    parameters.GetInt("SelectBoxColor", defaultSelectBoxColor,
                                                      isDefault ? &defaultSelectBoxColor : &value);
                     if (!isDefault)
                         static_cast<UIListBox*>(listBox)->SetSelectBoxColor(value);
-                    parameters.UnknownFunction4b7f10("ItemBoxColor", defaultItemBoxColor,
+                    parameters.GetInt("ItemBoxColor", defaultItemBoxColor,
                                                      isDefault ? &defaultItemBoxColor : &value);
                     if (!isDefault)
                         static_cast<UIListBox*>(listBox)->SetItemBoxColor(value, -1);
                     char itemKey[0x80];
                     item = 1;
                     sprintf(itemKey, "%s%d", "Item", 1);
-                    if (parameters.UnknownFunction4b7ec0(itemKey, defaultItems[1], isDefault ? defaultItems[1] : buffer,
+                    if (parameters.GetString(itemKey, defaultItems[1], isDefault ? defaultItems[1] : buffer,
                                                          -1)) {
                         do {
                             if (!isDefault) {
@@ -1344,10 +1344,10 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             if (isDefault && item >= 50)
                                 break;
                             sprintf(itemKey, "%s%d", "Item", item);
-                        } while (parameters.UnknownFunction4b7ec0(itemKey, item < 50 ? defaultItems[item] : "",
+                        } while (parameters.GetString(itemKey, item < 50 ? defaultItems[item] : "",
                                                                   isDefault ? defaultItems[item] : buffer, -1));
                     }
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault) {
                         listBox->SetImage(0, FindSectionObject(buffer));
                         listBox->SetImage(1, FindSectionObject(buffer));
@@ -1361,13 +1361,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         control = new(__FILE__, 0x4e3) UIRadioButton(0, &area, this);
                         radioButton = (UIRadioButton*)AddControl(control, groupId, 0);
                     }
-                    parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
+                    parameters.GetInt("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault)
                         static_cast<UIMultiState*>(radioButton)->SetCurrentState(value);
-                    parameters.UnknownFunction4b7ec0("AnimOff", defaultAnimOff, isDefault ? defaultAnimOff : buffer, -1);
+                    parameters.GetString("AnimOff", defaultAnimOff, isDefault ? defaultAnimOff : buffer, -1);
                     if (!isDefault)
                         radioButton->SetStateEntry(0, (UIAnim*)FindSectionObject(buffer), 0);
-                    parameters.UnknownFunction4b7ec0("AnimOn", defaultAnimOn, isDefault ? defaultAnimOn : buffer, -1);
+                    parameters.GetString("AnimOn", defaultAnimOn, isDefault ? defaultAnimOn : buffer, -1);
                     if (!isDefault)
                         radioButton->SetStateEntry(1, (UIAnim*)FindSectionObject(buffer), 0);
                 }
@@ -1377,7 +1377,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         control = new(__FILE__, 0x4f3) UIStatic(0, &area, this);
                         staticControl = (UIStatic*)AddControl(control, groupId, 0);
                     }
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
                         staticControl->SetImage(0, FindSectionObject(buffer));
                 }
@@ -1392,17 +1392,17 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     int ticks;
                     int position;
                     int scale;
-                    parameters.UnknownFunction4b7f10("TickNum", defaultTickNum, isDefault ? &defaultTickNum : &ticks);
-                    parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &position);
-                    parameters.UnknownFunction4b7f10("Scale", defaultScale, isDefault ? &defaultScale : &scale);
+                    parameters.GetInt("TickNum", defaultTickNum, isDefault ? &defaultTickNum : &ticks);
+                    parameters.GetInt("Default", defaultDefault, isDefault ? &defaultDefault : &position);
+                    parameters.GetInt("Scale", defaultScale, isDefault ? &defaultScale : &scale);
                     if (!isDefault) {
                         static_cast<UIScrollBar*>(scrollBar)->SetSnapStepCount(ticks);
                         static_cast<UIScrollBar*>(scrollBar)->SetScrollRange(scale);
                     }
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
                         scrollBar->trackImage = (UIAnim*)FindSectionObject(buffer);
-                    parameters.UnknownFunction4b7ec0("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
+                    parameters.GetString("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
                                                      -1);
                     if (!isDefault) {
                         scrollBar->SetImage(0, FindSectionObject(buffer));
@@ -1425,17 +1425,17 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         control = new(__FILE__, 0x52c) UIEditBox(0, &area, this, 100, 0, 0);
                         editBox = (UIEditBox*)AddControl(control, groupId, 0);
                     }
-                    parameters.UnknownFunction4b7f10("MaxLen", defaultMaxLen, isDefault ? &defaultMaxLen : &value);
+                    parameters.GetInt("MaxLen", defaultMaxLen, isDefault ? &defaultMaxLen : &value);
                     if (!isDefault)
                         static_cast<UIEditBox*>(editBox)->SetCapacity(value);
-                    parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick,
+                    parameters.GetString("SoundClick", defaultSoundClick,
                                                      isDefault ? defaultSoundClick : buffer, -1);
                     if (!isDefault)
                         editBox->SetClickSound((int)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("SoundEnd", defaultSoundEnd, isDefault ? defaultSoundEnd : buffer, -1);
+                    parameters.GetString("SoundEnd", defaultSoundEnd, isDefault ? defaultSoundEnd : buffer, -1);
                     if (!isDefault)
                         editBox->SetFullSound((int)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault) {
                         editBox->SetImage(0, FindSectionObject(buffer));
                         editBox->SetImage(1, FindSectionObject(buffer));
@@ -1449,7 +1449,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         control = new(__FILE__, 0x545) UIStaticText(0, &area, this, 0, 0xffff);
                         staticText = (UIStaticText*)AddControl(control, groupId, 0);
                     }
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
                         staticText->SetImage(0, FindSectionObject(buffer));
                 }
@@ -1459,17 +1459,17 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         control = new(__FILE__, 0x54f) UIDropDownList(0, &area, this, 0, 0xffff);
                         dropDownList = (UIDropDownList*)AddControl(control, groupId, 0);
                     }
-                    parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
+                    parameters.GetString("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
                         dropDownList->buttonPart->SetNormalImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimFocus", defaultAnimFocus, isDefault ? defaultAnimFocus : buffer,
+                    parameters.GetString("AnimFocus", defaultAnimFocus, isDefault ? defaultAnimFocus : buffer,
                                                      -1);
                     if (!isDefault)
                         dropDownList->buttonPart->SetFocusImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimPush", defaultAnimPush, isDefault ? defaultAnimPush : buffer, -1);
+                    parameters.GetString("AnimPush", defaultAnimPush, isDefault ? defaultAnimPush : buffer, -1);
                     if (!isDefault)
                         dropDownList->buttonPart->SetPushImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
+                    parameters.GetString("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
                                                      -1);
                     if (!isDefault) {
                         UIScrollBar* thumb = dropDownList->scrollBarPart;
@@ -1479,7 +1479,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         thumb->SetImage(3, FindSectionObject(buffer));
                         thumb->SetThumbSizeFromState(0);
                     }
-                    parameters.UnknownFunction4b7f10("ListHeight", defaultListHeight,
+                    parameters.GetInt("ListHeight", defaultListHeight,
                                                      isDefault ? &defaultListHeight : &value);
                     if (!isDefault) {
                         dropDownList->LayoutForRowHeight(value);
@@ -1488,7 +1488,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     char listKey[0x80];
                     item = 1;
                     sprintf(listKey, "%s%d", "Item", 1);
-                    if (parameters.UnknownFunction4b7ec0(listKey, defaultItems[1], isDefault ? defaultItems[1] : buffer,
+                    if (parameters.GetString(listKey, defaultItems[1], isDefault ? defaultItems[1] : buffer,
                                                          -1)) {
                         do {
                             if (!isDefault)
@@ -1497,7 +1497,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             if (isDefault && item >= 50)
                                 break;
                             sprintf(listKey, "%s%d", "Item", item);
-                        } while (parameters.UnknownFunction4b7ec0(listKey, item < 50 ? defaultItems[item] : "",
+                        } while (parameters.GetString(listKey, item < 50 ? defaultItems[item] : "",
                                                                   isDefault ? defaultItems[item] : buffer, -1));
                     }
                     control->SetName(sectionTable[i].sectionName);
@@ -1505,18 +1505,18 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     int topMargin;
                     int textColor;
                     int dropColor;
-                    parameters.UnknownFunction4b7f10("TextLMargin", 0, &leftMargin);
-                    parameters.UnknownFunction4b7f10("TextTMargin", 0, &topMargin);
-                    parameters.UnknownFunction4b7f10("TextColor", defaultTextColor, &textColor);
-                    parameters.UnknownFunction4b7f10("DropColor", defaultDropColor, &dropColor);
+                    parameters.GetInt("TextLMargin", 0, &leftMargin);
+                    parameters.GetInt("TextTMargin", 0, &topMargin);
+                    parameters.GetInt("TextColor", defaultTextColor, &textColor);
+                    parameters.GetInt("DropColor", defaultDropColor, &dropColor);
                     char soundNorm[0x80];
                     char soundFocus[0x80];
                     char soundPush[0x80];
                     char soundClick[0x80];
-                    parameters.UnknownFunction4b7ec0("SoundNorm", defaultSoundNorm, soundNorm, -1);
-                    parameters.UnknownFunction4b7ec0("SoundFocus", defaultSoundFocus, soundFocus, -1);
-                    parameters.UnknownFunction4b7ec0("SoundPush", defaultSoundPush, soundPush, -1);
-                    parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick, soundClick, -1);
+                    parameters.GetString("SoundNorm", defaultSoundNorm, soundNorm, -1);
+                    parameters.GetString("SoundFocus", defaultSoundFocus, soundFocus, -1);
+                    parameters.GetString("SoundPush", defaultSoundPush, soundPush, -1);
+                    parameters.GetString("SoundClick", defaultSoundClick, soundClick, -1);
                     if (!isDefault) {
                         dropDownList->buttonPart->SetSound(0, FindSectionObject(soundNorm));
                         dropDownList->buttonPart->SetSound(1, FindSectionObject(soundFocus));
@@ -1528,21 +1528,21 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         dropDownList->SetDropColor(dropColor);
                         dropDownList->LayoutParts();
                     }
-                    parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
+                    parameters.GetInt("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault) {
                         int row = value - 1 < 0 ? 0 : value - 1;
                         static_cast<UIListBox*>(dropDownListBox)->SelectRow(row);
                         dropDownList->SetText(static_cast<UIListBox*>(dropDownListBox)->GetRowText(row));
                     }
-                    parameters.UnknownFunction4b7ec0("AnimTextBack", defaultAnimTextBack,
+                    parameters.GetString("AnimTextBack", defaultAnimTextBack,
                                                      isDefault ? defaultAnimTextBack : buffer, -1);
                     if (!isDefault && buffer[0])
                         dropDownList->SetCornerImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimListBack", defaultAnimListBack,
+                    parameters.GetString("AnimListBack", defaultAnimListBack,
                                                      isDefault ? defaultAnimListBack : buffer, -1);
                     if (!isDefault && buffer[0])
                         dropDownList->SetStaticImage((UIAnim*)FindSectionObject(buffer));
-                    parameters.UnknownFunction4b7ec0("AnimScrollBack", defaultAnimScrollBack,
+                    parameters.GetString("AnimScrollBack", defaultAnimScrollBack,
                                                      isDefault ? defaultAnimScrollBack : buffer, -1);
                     if (!isDefault && buffer[0])
                         dropDownList->SetButtonImage((UIAnim*)FindSectionObject(buffer));
@@ -1550,9 +1550,9 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 // Every control's settings.
                 char fontName[0x80];
-                parameters.UnknownFunction4b7ec0("FontName", defaultFontName, fontName, -1);
+                parameters.GetString("FontName", defaultFontName, fontName, -1);
                 float height;
-                parameters.UnknownFunction4b7f40("FontHeight", (float)defaultFontHeight, &height);
+                parameters.GetFloat("FontHeight", (float)defaultFontHeight, &height);
                 int size = (int)height;
                 if (size < height)
                     size++;
@@ -1594,45 +1594,45 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 int permanent;
                 int shapeBounds;
                 char toolTip[0x80];
-                parameters.UnknownFunction4b7ec0("Anchor", defaultAnchor, isDefault ? defaultAnchor : anchor, -1);
-                parameters.UnknownFunction4b7f10("RelAnchor", defaultRelAnchor, isDefault ? &defaultRelAnchor : &relAnchor);
-                parameters.UnknownFunction4b7f10("Moveable", defaultMoveable, isDefault ? &defaultMoveable : &moveable);
-                parameters.UnknownFunction4b7ec0("TextAlign", defaultTextAlign, isDefault ? defaultTextAlign : textAlign, -1);
-                parameters.UnknownFunction4b7ec0("TextAlignV", defaultTextAlignV, isDefault ? defaultTextAlignV : textAlignV,
+                parameters.GetString("Anchor", defaultAnchor, isDefault ? defaultAnchor : anchor, -1);
+                parameters.GetInt("RelAnchor", defaultRelAnchor, isDefault ? &defaultRelAnchor : &relAnchor);
+                parameters.GetInt("Moveable", defaultMoveable, isDefault ? &defaultMoveable : &moveable);
+                parameters.GetString("TextAlign", defaultTextAlign, isDefault ? defaultTextAlign : textAlign, -1);
+                parameters.GetString("TextAlignV", defaultTextAlignV, isDefault ? defaultTextAlignV : textAlignV,
                                                  -1);
-                parameters.UnknownFunction4b7f10("TextLMargin", 0, &textLMargin);
-                parameters.UnknownFunction4b7f10("TextTMargin", 0, &textTMargin);
-                parameters.UnknownFunction4b7f10("FXDelay", defaultFXDelay, isDefault ? &defaultFXDelay : &fxDelay);
-                parameters.UnknownFunction4b7ec0("FX", defaultFX, isDefault ? defaultFX : fx, -1);
-                parameters.UnknownFunction4b7ec0("FXSound", defaultFXSound, isDefault ? defaultFXSound : fxSound, -1);
-                parameters.UnknownFunction4b7ec0("FXAnimIn", defaultFXAnimIn, isDefault ? defaultFXAnimIn : fxAnimIn, -1);
-                parameters.UnknownFunction4b7ec0("FXSoundIn", defaultFXSoundIn, isDefault ? defaultFXSoundIn : fxSoundIn, -1);
-                parameters.UnknownFunction4b7ec0("FXAnimOut", defaultFXAnimOut, isDefault ? defaultFXAnimOut : fxAnimOut, -1);
-                parameters.UnknownFunction4b7ec0("FXSoundOut", defaultFXSoundOut, isDefault ? defaultFXSoundOut : fxSoundOut,
+                parameters.GetInt("TextLMargin", 0, &textLMargin);
+                parameters.GetInt("TextTMargin", 0, &textTMargin);
+                parameters.GetInt("FXDelay", defaultFXDelay, isDefault ? &defaultFXDelay : &fxDelay);
+                parameters.GetString("FX", defaultFX, isDefault ? defaultFX : fx, -1);
+                parameters.GetString("FXSound", defaultFXSound, isDefault ? defaultFXSound : fxSound, -1);
+                parameters.GetString("FXAnimIn", defaultFXAnimIn, isDefault ? defaultFXAnimIn : fxAnimIn, -1);
+                parameters.GetString("FXSoundIn", defaultFXSoundIn, isDefault ? defaultFXSoundIn : fxSoundIn, -1);
+                parameters.GetString("FXAnimOut", defaultFXAnimOut, isDefault ? defaultFXAnimOut : fxAnimOut, -1);
+                parameters.GetString("FXSoundOut", defaultFXSoundOut, isDefault ? defaultFXSoundOut : fxSoundOut,
                                                  -1);
-                parameters.UnknownFunction4b7ec0("MouseAnim", defaultMouseAnim, isDefault ? defaultMouseAnim : mouseAnim, -1);
-                parameters.UnknownFunction4b7ec0("SoundNorm", defaultSoundNorm, isDefault ? defaultSoundNorm : soundNorm, -1);
-                parameters.UnknownFunction4b7ec0("SoundFocus", defaultSoundFocus, isDefault ? defaultSoundFocus : soundFocus,
+                parameters.GetString("MouseAnim", defaultMouseAnim, isDefault ? defaultMouseAnim : mouseAnim, -1);
+                parameters.GetString("SoundNorm", defaultSoundNorm, isDefault ? defaultSoundNorm : soundNorm, -1);
+                parameters.GetString("SoundFocus", defaultSoundFocus, isDefault ? defaultSoundFocus : soundFocus,
                                                  -1);
-                parameters.UnknownFunction4b7ec0("SoundPush", defaultSoundPush, isDefault ? defaultSoundPush : soundPush, -1);
-                parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick, isDefault ? defaultSoundClick : soundClick,
+                parameters.GetString("SoundPush", defaultSoundPush, isDefault ? defaultSoundPush : soundPush, -1);
+                parameters.GetString("SoundClick", defaultSoundClick, isDefault ? defaultSoundClick : soundClick,
                                                  -1);
-                parameters.UnknownFunction4b7ec0("Text", defaultText, isDefault ? defaultText : text, -1);
-                parameters.UnknownFunction4b7f10("AttachId", defaultAttachId, isDefault ? &defaultAttachId : &attachId);
-                parameters.UnknownFunction4b7f10("TextColor", defaultTextColor, isDefault ? &defaultTextColor : &textColor);
-                parameters.UnknownFunction4b7f10("DropColor", defaultDropColor, isDefault ? &defaultDropColor : &dropColor);
-                parameters.UnknownFunction4b7f10("KeyBind", defaultKeyBind, isDefault ? &defaultKeyBind : &keyBind);
-                parameters.UnknownFunction4b7f10("Italic", defaultItalic, isDefault ? &defaultItalic : &italic);
-                parameters.UnknownFunction4b7f10("Bold", defaultBold, isDefault ? &defaultBold : &bold);
-                parameters.UnknownFunction4b7f10("TextDrop", defaultTextDrop, isDefault ? &defaultTextDrop : &textDrop);
-                parameters.UnknownFunction4b7f10("SourceBlit", defaultSourceBlit, isDefault ? &defaultSourceBlit : &sourceBlit);
-                parameters.UnknownFunction4b7f10("Enable", defaultEnable, isDefault ? &defaultEnable : &enable);
-                parameters.UnknownFunction4b7f10("Show", defaultShow, isDefault ? &defaultShow : &show);
-                parameters.UnknownFunction4b7f10("Pre3D", defaultPre3D, isDefault ? &defaultPre3D : &pre3D);
-                parameters.UnknownFunction4b7f10("Permanent", defaultPermanent, isDefault ? &defaultPermanent : &permanent);
-                parameters.UnknownFunction4b7f10("ShapeBounds", defaultShapeBounds,
+                parameters.GetString("Text", defaultText, isDefault ? defaultText : text, -1);
+                parameters.GetInt("AttachId", defaultAttachId, isDefault ? &defaultAttachId : &attachId);
+                parameters.GetInt("TextColor", defaultTextColor, isDefault ? &defaultTextColor : &textColor);
+                parameters.GetInt("DropColor", defaultDropColor, isDefault ? &defaultDropColor : &dropColor);
+                parameters.GetInt("KeyBind", defaultKeyBind, isDefault ? &defaultKeyBind : &keyBind);
+                parameters.GetInt("Italic", defaultItalic, isDefault ? &defaultItalic : &italic);
+                parameters.GetInt("Bold", defaultBold, isDefault ? &defaultBold : &bold);
+                parameters.GetInt("TextDrop", defaultTextDrop, isDefault ? &defaultTextDrop : &textDrop);
+                parameters.GetInt("SourceBlit", defaultSourceBlit, isDefault ? &defaultSourceBlit : &sourceBlit);
+                parameters.GetInt("Enable", defaultEnable, isDefault ? &defaultEnable : &enable);
+                parameters.GetInt("Show", defaultShow, isDefault ? &defaultShow : &show);
+                parameters.GetInt("Pre3D", defaultPre3D, isDefault ? &defaultPre3D : &pre3D);
+                parameters.GetInt("Permanent", defaultPermanent, isDefault ? &defaultPermanent : &permanent);
+                parameters.GetInt("ShapeBounds", defaultShapeBounds,
                                                  isDefault ? &defaultShapeBounds : &shapeBounds);
-                parameters.UnknownFunction4b7ec0("ToolTipText", "", toolTip, -1);
+                parameters.GetString("ToolTipText", "", toolTip, -1);
                 if (isDefault)
                     break;
 
@@ -1685,8 +1685,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 if (guiManager->languageModule) {
                     int textId;
                     int toolTipId;
-                    parameters.UnknownFunction4b7f10("LocalTextId", 0, &textId);
-                    parameters.UnknownFunction4b7f10("LocalToolTipId", 0, &toolTipId);
+                    parameters.GetInt("LocalTextId", 0, &textId);
+                    parameters.GetInt("LocalToolTipId", 0, &toolTipId);
                     if (textId)
                         control->SetTextFromResource(guiManager->languageModule, textId);
                     if (toolTipId) {

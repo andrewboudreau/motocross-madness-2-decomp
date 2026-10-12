@@ -167,7 +167,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     enginePresent[1] = 0;
     enginePresent[2] = 0;
     iterator = 0;
-    while ((racer = raceView->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = raceView->NextBike(&iterator)) != 0) {
         if (racer->field_0x738 < 250) {
             enginePresent[0] = 1;
             if (racer == raceView->field_0x38)
@@ -275,9 +275,9 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             strcpy(section, "400");
             break;
         }
-        stream->UnknownFunction460f50(file, "r", 0);
-        parameters.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-        parameters.UnknownFunction4b78f0(section);
+        stream->Open(file, "r", 0);
+        parameters.Attach((UnknownParameterStream*)stream, 0, 1);
+        parameters.SelectSection(section);
 
         parameters.UnknownFunction4b7cf0("TotalIdle", &idleCount[k]);
         parameters.UnknownFunction4b7cf0("TotalIdle", &count);
@@ -290,7 +290,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < idleCount[k]; i++) {
                 sprintf(key, "idle_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &idleSamples[k][i], &idleSampleBytes[k][i]);
             }
         }
@@ -305,7 +305,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < lowTorqueCount[k]; i++) {
                 sprintf(key, "LowTorque_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &lowTorqueSamples[k][i], &lowTorqueSampleBytes[k][i]);
             }
         }
@@ -320,7 +320,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < midTorqueCount[k]; i++) {
                 sprintf(key, "MidTorque_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &midTorqueSamples[k][i], &midTorqueSampleBytes[k][i]);
             }
         }
@@ -335,7 +335,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < highTorqueCount[k]; i++) {
                 sprintf(key, "HighTorque_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &highTorqueSamples[k][i], &highTorqueSampleBytes[k][i]);
             }
         }
@@ -350,7 +350,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < powerBandCount[k]; i++) {
                 sprintf(key, "PowerBand_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &powerBandSamples[k][i], &powerBandSampleBytes[k][i]);
             }
         }
@@ -365,7 +365,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < decelCount[k]; i++) {
                 sprintf(key, "Decel_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &decelSamples[k][i], &decelSampleBytes[k][i]);
             }
         }
@@ -380,7 +380,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < sputterCount[k]; i++) {
                 sprintf(key, "Sputter_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &sputterSamples[k][i], &sputterSampleBytes[k][i]);
             }
         }
@@ -395,14 +395,14 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         if (count >= 1 && count <= 10) {
             for (i = 0; i < revCount[k]; i++) {
                 sprintf(key, "Rev_%d", i + 1);
-                parameters.UnknownFunction4b7b30(key, sample, -1);
+                parameters.ReadString(key, sample, -1);
                 ReadSample(sample, &revSamples[k][i], &revSampleBytes[k][i]);
             }
         }
 
-        parameters.UnknownFunction4b7f10("LowTorqueMaxSpeed", 20, &lowTorqueMaxSpeed[k]);
-        parameters.UnknownFunction4b7f10("MidTorqueMaxSpeed", 55, &midTorqueMaxSpeed[k]);
-        parameters.UnknownFunction4b7f10("HighTorqueMaxSpeed", 100, &highTorqueMaxSpeed[k]);
+        parameters.GetInt("LowTorqueMaxSpeed", 20, &lowTorqueMaxSpeed[k]);
+        parameters.GetInt("MidTorqueMaxSpeed", 55, &midTorqueMaxSpeed[k]);
+        parameters.GetInt("HighTorqueMaxSpeed", 100, &highTorqueMaxSpeed[k]);
     }
     if (stream)
         delete stream;
@@ -476,7 +476,7 @@ void RaceSound::AssignChannels() {
 
     iterator = 0;
     count = 0;
-    while ((racer = raceView->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = raceView->NextBike(&iterator)) != 0) {
         engineChannels[count].channelRacer = racer;
         if (racer->field_0x738 < 250)
             engineChannels[count].engine = 0;
@@ -1018,15 +1018,15 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
     } else {
-        stream->UnknownFunction461340(stream->field_0x130, 0, 1);
-        stream->UnknownFunction461640(&waveHeader, 1, sizeof(waveHeader));
+        stream->Seek(stream->field_0x130, 0, 1);
+        stream->Read(&waveHeader, 1, sizeof(waveHeader));
         bytes = waveHeader.dataSize;
         buffer = DebugMalloc(bytes, __FILE__, 1652);
         if (!buffer) {
             *data = 0;
             *size = 0;
         } else {
-            stream->UnknownFunction461640(buffer, 1, bytes);
+            stream->Read(buffer, 1, bytes);
             if (stream)
                 delete stream;
             *data = buffer;

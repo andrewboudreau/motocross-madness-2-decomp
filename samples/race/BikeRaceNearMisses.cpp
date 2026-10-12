@@ -372,7 +372,7 @@ static inline Vector3 Scale(const Vector3& v, float s) {
     return Vector3(s * v.x, s * v.y, s * v.z);
 }
 
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b); // 0x0040ae30: a.b
+float Vec3Dot(const Vector3* a, const Vector3* b); // 0x0040ae30: a.b
 
 static inline Vector3 Normalize(const Vector3& v) {
     float length = SquareMagnitude(v);

@@ -30,7 +30,7 @@ extern UnknownStatic65b478 g_UnknownStatic65b478;
 void UnknownFunction460ad0();
 
 // cdecl 0x004bfa80: the current time stamp.
-unsigned int UnknownFunction4bfa80();
+unsigned int ReadClock();
 
 // cdecl 0x0052d0d0, called last on shutdown.
 void UnknownFunction52d0d0();

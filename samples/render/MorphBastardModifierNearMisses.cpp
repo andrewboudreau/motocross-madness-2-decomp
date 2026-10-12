@@ -103,30 +103,30 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
     D3DIMSoultreeModifier::UnknownVirtualSlot8(value);
     UnknownTextureStream* stream =
         new (__FILE__, 73) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    stream->UnknownFunction460f50(path, "r", 0);
+    stream->Open(path, "r", 0);
     UnknownParameterBlock* block = new (__FILE__, 77) UnknownParameterBlock;
-    block->UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
+    block->Attach((UnknownParameterStream*)stream, 0, 1);
     sprintf(section, "MorphBastard Information");
-    block->UnknownFunction4b78f0(section);
-    block->UnknownFunction4b7f10("NumberOfMorphBastards", 0, &objectCount);
+    block->SelectSection(section);
+    block->GetInt("NumberOfMorphBastards", 0, &objectCount);
     morphObjects = new (__FILE__, 87) MorphBastardObject[objectCount];
 
     for (int i = 0; i < objectCount; i++) {
         sprintf(section, "MorphBastard %i", i);
-        block->UnknownFunction4b78f0(section);
-        block->UnknownFunction4b7b30("ObjectName", objectName, -1);
+        block->SelectSection(section);
+        block->ReadString("ObjectName", objectName, -1);
         MorphBastardNode* node = model->FindByName(objectName);
         morphObjects[i].node = node;
         node->GetMatrixIn(0, &morphObjects[i].inverseRestMatrix);
         MorphBastardInvertRigid(morphObjects[i].inverseRestMatrix);
-        block->UnknownFunction4b7f10("NumberOfTargets", 0, &targetCount);
+        block->GetInt("NumberOfTargets", 0, &targetCount);
         morphObjects[i].channelCount = 0;
         morphObjects[i].channels = 0;
 
         for (int j = 0; j < targetCount; j++) {
             sprintf(section, "MorphBastard %i Target %i", i, j);
-            block->UnknownFunction4b78f0(section);
-            block->UnknownFunction4b7b30("ControllerName", controllerName, -1);
+            block->SelectSection(section);
+            block->ReadString("ControllerName", controllerName, -1);
             MorphBastardNode* controller = model->FindByName(controllerName);
             int isNew = 1;
             for (int axis = 0; axis < 3; axis++) {
@@ -188,7 +188,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
             float targetValue = 0;
             for (int t = 1; t < channel->targetCount; t++) {
                 sprintf(section, "MorphBastard %i Target %i", i, channel->targetNumbers[t]);
-                block->UnknownFunction4b78f0(section);
+                block->SelectSection(section);
                 if (channel->axis == 0)
                     block->UnknownFunction4b7e70("XAxis", &targetValue);
                 else if (channel->axis == 1)
@@ -355,15 +355,15 @@ void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, Unk
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 
 float FastInvSqrt(float x);                                          // 0x00460c00
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b);     // 0x0040ae30: a.b
-Vector3 UnknownFunction515600(const Vector3* a, const Vector3* b);   // 0x00515600: a x b
+float Vec3Dot(const Vector3* a, const Vector3* b);     // 0x0040ae30: a.b
+Vector3 CrossProduct(const Vector3* a, const Vector3* b);   // 0x00515600: a x b
 Vector3 UnknownFunction4a2350(const Matrix4* m, int row);            // 0x004a2350: row of m
 void UnknownFunction42de90(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90: axis-angle
 void UnknownFunction436500(Matrix4* out, const Matrix4* a, const Matrix4* b);    // 0x00436500: a * b
 
 static inline void NormalizeOrZero(Vector3& v)
 {
-    float squared = UnknownFunction40ae30(&v, &v);
+    float squared = Vec3Dot(&v, &v);
     if (squared == 0.0f) {
         v = kVec3Zero;
     } else {
@@ -469,7 +469,7 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     // The y axes.
     from = *(Vector3*)&identity.m[1][0];
     to = *(Vector3*)&controller.m[1][0];
-    axis = UnknownFunction515600(&from, &to);
+    axis = CrossProduct(&from, &to);
     angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
         axis = Vector3(0.0f, 1.0f, 0.0f);
@@ -477,16 +477,16 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         NormalizeOrZero(axis);
     UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
-    cross = UnknownFunction515600(&UnknownFunction4a2350(&aligned, 2), &UnknownFunction4a2350(&controller, 2));
+    cross = CrossProduct(&UnknownFunction4a2350(&aligned, 2), &UnknownFunction4a2350(&controller, 2));
     float angleY = AngleBetween(UnknownFunction4a2350(&aligned, 2), UnknownFunction4a2350(&controller, 2)) *
                    57.2957764f;
-    if (UnknownFunction40ae30(&to, &cross) < 0.0f)
+    if (Vec3Dot(&to, &cross) < 0.0f)
         angleY = -angleY;
 
     // The z axes.
     from = UnknownFunction4a2350(&identity, 2);
     to = UnknownFunction4a2350(&controller, 2);
-    axis = UnknownFunction515600(&from, &to);
+    axis = CrossProduct(&from, &to);
     angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
         axis = Vector3(0.0f, 0.0f, 1.0f);
@@ -494,11 +494,11 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         NormalizeOrZero(axis);
     UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
-    cross = UnknownFunction515600(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
-    UnknownFunction40ae30(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
+    cross = CrossProduct(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
+    Vec3Dot(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
     float angleZ = AngleBetween(UnknownFunction4a2350(&aligned, 0), UnknownFunction4a2350(&controller, 0)) *
                    57.2957764f;
-    if (UnknownFunction40ae30(&to, &cross) < 0.0f)
+    if (Vec3Dot(&to, &cross) < 0.0f)
         angleZ = -angleZ;
 
     channel->currentValue = -angleX;

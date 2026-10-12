@@ -838,16 +838,16 @@ void ReadTriangleNode(BoxTreeNode** out, UnknownTextureStream* file)
 {
     float flag;
 
-    file->UnknownFunction461640(&flag, 4, 1);
+    file->Read(&flag, 4, 1);
     if (flag >= 0.0f) {
         BoxTreeNode* node = (BoxTreeNode*)DebugMalloc(sizeof(BoxTreeNode), __FILE__, 0x52c);
         node->volume = flag;
-        file->UnknownFunction461640(&node->center.x, 4, 1);
-        file->UnknownFunction461640(&node->center.y, 4, 1);
-        file->UnknownFunction461640(&node->center.z, 4, 1);
-        file->UnknownFunction461640(&node->halfExtents.x, 4, 1);
-        file->UnknownFunction461640(&node->halfExtents.y, 4, 1);
-        file->UnknownFunction461640(&node->halfExtents.z, 4, 1);
+        file->Read(&node->center.x, 4, 1);
+        file->Read(&node->center.y, 4, 1);
+        file->Read(&node->center.z, 4, 1);
+        file->Read(&node->halfExtents.x, 4, 1);
+        file->Read(&node->halfExtents.y, 4, 1);
+        file->Read(&node->halfExtents.z, 4, 1);
         ReadTriangleNode(&node->child[0], file);
         ReadTriangleNode(&node->child[1], file);
         *out = node;
@@ -855,13 +855,13 @@ void ReadTriangleNode(BoxTreeNode** out, UnknownTextureStream* file)
         BoxTreeTriangleLeaf* leaf =
             (BoxTreeTriangleLeaf*)DebugMalloc(sizeof(BoxTreeTriangleLeaf), __FILE__, 0x548);
         leaf->marker = flag;
-        file->UnknownFunction461640(&leaf->planeOffset, 4, 1);
-        file->UnknownFunction461640(&leaf->normal.x, 4, 1);
-        file->UnknownFunction461640(&leaf->normal.y, 4, 1);
-        file->UnknownFunction461640(&leaf->normal.z, 4, 1);
-        file->UnknownFunction461640(&leaf->vertex[0], 2, 1);
-        file->UnknownFunction461640(&leaf->vertex[1], 2, 1);
-        file->UnknownFunction461640(&leaf->vertex[2], 2, 1);
+        file->Read(&leaf->planeOffset, 4, 1);
+        file->Read(&leaf->normal.x, 4, 1);
+        file->Read(&leaf->normal.y, 4, 1);
+        file->Read(&leaf->normal.z, 4, 1);
+        file->Read(&leaf->vertex[0], 2, 1);
+        file->Read(&leaf->vertex[1], 2, 1);
+        file->Read(&leaf->vertex[2], 2, 1);
         *out = (BoxTreeNode*)leaf;
     }
 }
@@ -873,12 +873,12 @@ void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** verts, UnknownTextureStream
     TreeVec3* v;
     int i;
 
-    file->UnknownFunction461640(&count, 4, 1);
+    file->Read(&count, 4, 1);
     v = (TreeVec3*)DebugMalloc(count * sizeof(TreeVec3), __FILE__, 0x567);
     for (i = 0; i < count; i++) {
-        file->UnknownFunction461640(&v[i].x, 4, 1);
-        file->UnknownFunction461640(&v[i].y, 4, 1);
-        file->UnknownFunction461640(&v[i].z, 4, 1);
+        file->Read(&v[i].x, 4, 1);
+        file->Read(&v[i].y, 4, 1);
+        file->Read(&v[i].z, 4, 1);
     }
     *verts = v;
     ReadTriangleNode(tree, file);
@@ -889,16 +889,16 @@ void ReadPointNode(BoxTreeNode** out, UnknownTextureStream* file)
 {
     float flag;
 
-    file->UnknownFunction461640(&flag, 4, 1);
+    file->Read(&flag, 4, 1);
     if (flag >= 0.0f) {
         BoxTreeNode* node = (BoxTreeNode*)DebugMalloc(sizeof(BoxTreeNode), __FILE__, 0x582);
         node->volume = flag;
-        file->UnknownFunction461640(&node->center.x, 4, 1);
-        file->UnknownFunction461640(&node->center.y, 4, 1);
-        file->UnknownFunction461640(&node->center.z, 4, 1);
-        file->UnknownFunction461640(&node->halfExtents.x, 4, 1);
-        file->UnknownFunction461640(&node->halfExtents.y, 4, 1);
-        file->UnknownFunction461640(&node->halfExtents.z, 4, 1);
+        file->Read(&node->center.x, 4, 1);
+        file->Read(&node->center.y, 4, 1);
+        file->Read(&node->center.z, 4, 1);
+        file->Read(&node->halfExtents.x, 4, 1);
+        file->Read(&node->halfExtents.y, 4, 1);
+        file->Read(&node->halfExtents.z, 4, 1);
         ReadPointNode(&node->child[0], file);
         ReadPointNode(&node->child[1], file);
         *out = node;
@@ -906,9 +906,9 @@ void ReadPointNode(BoxTreeNode** out, UnknownTextureStream* file)
         BoxTreePointLeaf* leaf =
             (BoxTreePointLeaf*)DebugMalloc(sizeof(BoxTreePointLeaf), __FILE__, 0x59e);
         leaf->marker = flag;
-        file->UnknownFunction461640(&leaf->point.x, 4, 1);
-        file->UnknownFunction461640(&leaf->point.y, 4, 1);
-        file->UnknownFunction461640(&leaf->point.z, 4, 1);
+        file->Read(&leaf->point.x, 4, 1);
+        file->Read(&leaf->point.y, 4, 1);
+        file->Read(&leaf->point.z, 4, 1);
         *out = (BoxTreeNode*)leaf;
     }
 }

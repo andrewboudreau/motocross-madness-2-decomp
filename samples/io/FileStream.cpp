@@ -139,7 +139,7 @@ int UnknownTextureStream::UnknownFunction460db0()
 // (retail zeroes only bytes 1..7), shares the fclose/sprintf tails of error
 // blocks that retail keeps apart, and swaps dl/cl in the key loop as in
 // 0x00461b90; the rest matches up to branch targets.
-int UnknownTextureStream::UnknownFunction460f50(const char* path, const char* mode, int encoded)
+int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
 {
     char drive[4];
     char buffer[0x184];
@@ -158,8 +158,8 @@ int UnknownTextureStream::UnknownFunction460f50(const char* path, const char* mo
     field_0x1c = UnknownFunction460d70(path);
     if (field_0x1c) {
         field_0x1c->field_0x01 = field_0x1c->field_0x03;
-        UnknownFunction461310(0x8000);
-        UnknownFunction461340(field_0x130, SEEK_SET, 0);
+        SetBufferSize(0x8000);
+        Seek(field_0x130, SEEK_SET, 0);
         return 1;
     }
     if (*mode == 'r' || *mode == 'a') {
@@ -237,8 +237,8 @@ int UnknownTextureStream::UnknownFunction460f50(const char* path, const char* mo
             return 0;
         }
     }
-    UnknownFunction461310(0x8000);
-    UnknownFunction461340(0, SEEK_SET, field_0x08);
+    SetBufferSize(0x8000);
+    Seek(0, SEEK_SET, field_0x08);
     return 1;
 }
 
@@ -260,7 +260,7 @@ static inline void RestartKey(UnknownTextureStream* stream)
 // register. The 0x418-byte buffer reproduces retail's 0x41c-byte frame;
 // `result = 0` inside the loop reproduces retail's store (the source was likely
 // tail recursion).
-int UnknownTextureStream::UnknownFunction461340(int offset, int origin, int flag)
+int UnknownTextureStream::Seek(int offset, int origin, int flag)
 {
     unsigned char buffer[0x418];
     int result = 0;
@@ -270,7 +270,7 @@ int UnknownTextureStream::UnknownFunction461340(int offset, int origin, int flag
         flag = flag && offset != stream->field_0x130;
         stream = stream->field_0x1c;
     }
-    if (origin == SEEK_SET && offset == stream->UnknownFunction461600()) {
+    if (origin == SEEK_SET && offset == stream->Tell()) {
         if (stream->field_0x08 && !flag) {
             RestartKey(stream);
             stream->field_0x0c = offset;
@@ -341,7 +341,7 @@ static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 // returns how many it read. Near miss (about 32%): retail keeps the advanced
 // buffer pointer in ecx and tail-merges the two encoded 45c7b0 calls; VC6 here
 // does neither.
-int UnknownTextureStream::UnknownFunction461640(void* buffer, int size, int count)
+int UnknownTextureStream::Read(void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
     char* p = stream->field_0x124;

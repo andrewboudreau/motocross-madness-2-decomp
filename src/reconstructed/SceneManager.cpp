@@ -123,7 +123,7 @@ int UnknownTrackGameObject574::OpenArchiveFile(UnknownTextureStream* stream, con
 
     _splitpath(name, drive, dir, file, ext);
     strcat(file, ext);
-    if (stream->UnknownFunction460f50(file, mode, 0)) {
+    if (stream->Open(file, mode, 0)) {
         if (stream->field_0x1c) {
             if (out)
                 strcpy(out, file);
@@ -152,7 +152,7 @@ void UnknownTrackGameObject574::SelectScene(char* name, const char* kind, int va
     OpenSceneArchive(0);
     UnknownTextureStream* stream =
         new(__FILE__, 297) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (stream->UnknownFunction460f50(field_0x24c, "r", 0)) {
+    if (stream->Open(field_0x24c, "r", 0)) {
         ReadCurrentSceneName(sceneName, field_0x24c, value);
         if (value && !_stricmp(sceneName, "NO NAME"))
             field_0x38c = 0;
@@ -202,8 +202,8 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
         if (archive) {
             archive->UnknownFunction461cb0(a, b);
             block.UnknownFunction4b7220((UnknownParameterStream*)archive, scene, path, 0);
-            block.UnknownFunction4b78f0("SceneInfo");
-            block.UnknownFunction4b7f10("NumberOfWaypointRaces", 0, &field_0x390);
+            block.SelectSection("SceneInfo");
+            block.GetInt("NumberOfWaypointRaces", 0, &field_0x390);
             if (index) {
                 if (field_0x390) {
                     UnknownTextureStream* stream = new(__FILE__, 401)
@@ -212,10 +212,10 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
                     strcpy(strrchr(base, '.'), "");
                     sprintf(path, "%s%02d.wpt", base, index);
                     strncpy(field_0x34c, path, 0x3f);
-                    if (stream->UnknownFunction460f50(field_0x34c, "r", 0)) {
+                    if (stream->Open(field_0x34c, "r", 0)) {
                         sprintf(field_0x148, "%s\\%s", field_0x44, field_0x34c);
                         sprintf(path, "WaypointRaceName%d", index);
-                        if (!block.UnknownFunction4b7ec0(path, "", out, 0x3f))
+                        if (!block.GetString(path, "", out, 0x3f))
                             strncpy(out, "NO NAME", 0x3f);
                     } else {
                         field_0x148[0] = 0;
@@ -227,7 +227,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
                     strncpy(out, "NO NAME", 0x3f);
                 }
             } else {
-                if (!block.UnknownFunction4b7ec0("SceneName", "", out, 0x3f))
+                if (!block.GetString("SceneName", "", out, 0x3f))
                     strncpy(out, "NO NAME", 0x3f);
             }
         } else {
@@ -250,8 +250,8 @@ void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, in
         sprintf(path, "%s\\%s", field_0x44, scene);
         UnknownParameterBlock block;
         block.UnknownFunction4b7220((UnknownParameterStream*)OpenSceneArchive(0), scene, path, 1);
-        block.UnknownFunction4b78f0("SceneInfo");
-        block.UnknownFunction4b7f10("NumberOfWaypointRaces", 0, &field_0x390);
+        block.SelectSection("SceneInfo");
+        block.GetInt("NumberOfWaypointRaces", 0, &field_0x390);
         if (value) {
             if (field_0x390) {
                 UnknownTextureStream* stream =
@@ -260,10 +260,10 @@ void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, in
                 strcpy(strrchr(base, '.'), "");
                 sprintf(path, "%s%02d.wpt", base, value);
                 strncpy(field_0x34c, path, 0x3f);
-                if (stream->UnknownFunction460f50(field_0x34c, "r", 0)) {
+                if (stream->Open(field_0x34c, "r", 0)) {
                     sprintf(field_0x148, "%s\\%s", field_0x44, field_0x34c);
                     sprintf(path, "WaypointRaceName%d", value);
-                    if (!block.UnknownFunction4b7ec0(path, "", name, 0x3f))
+                    if (!block.GetString(path, "", name, 0x3f))
                         strncpy(name, "NO NAME", 0x3f);
                 } else {
                     field_0x148[0] = 0;
@@ -275,7 +275,7 @@ void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, in
                 strncpy(name, "NO NAME", 0x3f);
             }
         } else {
-            if (!block.UnknownFunction4b7ec0("SceneName", "", name, 0x3f))
+            if (!block.GetString("SceneName", "", name, 0x3f))
                 strncpy(name, "NO NAME", 0x3f);
         }
     } else {
@@ -473,16 +473,16 @@ int Scene::ReadVector(Vector3* out, const char* section, const char* key,
 
     if (!block)
         block = &parameters;
-    block->UnknownFunction4b78f0(section);
+    block->SelectSection(section);
     if (!sceneManager->field_0x38c) {
-        block->UnknownFunction4b7ec0(key, def, value, 0x80);
+        block->GetString(key, def, value, 0x80);
         UnknownFunction4de580(section, key, value);
         out->x = (float)atof(strtok(value, ","));
         out->y = (float)atof(strtok(0, ","));
         out->z = (float)atof(strtok(0, "\n"));
         return 1;
     }
-    if (block->UnknownFunction4b7ec0(key, "", value, 0x80)) {
+    if (block->GetString(key, "", value, 0x80)) {
         UnknownFunction4de580(section, key, value);
         out->x = (float)atof(strtok(value, ","));
         out->y = (float)atof(strtok(0, ","));
@@ -507,9 +507,9 @@ int Scene::ReadColor(unsigned long* out, const char* section, const char* key,
 
     if (!block)
         block = &parameters;
-    block->UnknownFunction4b78f0(section);
+    block->SelectSection(section);
     if (!sceneManager->field_0x38c) {
-        block->UnknownFunction4b7ec0(key, def, value, 0x80);
+        block->GetString(key, def, value, 0x80);
         UnknownFunction4de580(section, key, value);
         int r = atoi(strtok(value, ","));
         int g = atoi(strtok(0, ","));
@@ -517,7 +517,7 @@ int Scene::ReadColor(unsigned long* out, const char* section, const char* key,
         *out = ((r << 8 | g) << 8) | b;
         return 1;
     }
-    if (block->UnknownFunction4b7ec0(key, def, value, 0x80)) {
+    if (block->GetString(key, def, value, 0x80)) {
         UnknownFunction4de580(section, key, value);
         int r = atoi(strtok(value, ","));
         int g = atoi(strtok(0, ","));
@@ -537,8 +537,8 @@ int Scene::ReadFlags(char* out, int count, const char* section, const char* key,
 
     if (!block)
         block = &parameters;
-    block->UnknownFunction4b78f0(section);
-    if (block->UnknownFunction4b7ec0(key, def, value, 0x80)) {
+    block->SelectSection(section);
+    if (block->GetString(key, def, value, 0x80)) {
         char* token = strtok(value, ",");
         for (int i = 0; i < count; i++) {
             out[i] = 0;
@@ -610,10 +610,10 @@ int Scene::ReadLight(int index)
     int hasLensFlare;
 
     sprintf(section, "Light%d", index + 1);
-    int found = parameters.UnknownFunction4b78f0(section);
+    int found = parameters.SelectSection(section);
     if (sceneManager->field_0x38c && found) {
         UnknownSceneLight* light = &sceneLights[index];
-        parameters.UnknownFunction4b7ec0("Type", "BLANK", text, 0x100);
+        parameters.GetString("Type", "BLANK", text, 0x100);
         if (FindKeyword(&light->type, text, s_lightTypes)) {
             UnknownFunction4de580(section, "Type", text);
             if (!ReadColor(&light->color, section, "ColorRGB", "", 1, 0))
@@ -626,7 +626,7 @@ int Scene::ReadLight(int index)
                 else
                     light->field_0x18 = 0;
             }
-            parameters.UnknownFunction4b7f10("PlaceLightAtInfinity", 0, &atInfinity);
+            parameters.GetInt("PlaceLightAtInfinity", 0, &atInfinity);
             light->atInfinity = atInfinity;
             UnknownFunction4de580(section, "PlaceLightAtInfinity", (int)light->atInfinity);
             if (light->atInfinity) {
@@ -642,7 +642,7 @@ int Scene::ReadLight(int index)
                 light->look = Vector3(0.0f, 0.0f, 0.0f);
                 light->field_0x34 = 0;
             }
-            parameters.UnknownFunction4b7f40("Range", -1.0f, &light->range);
+            parameters.GetFloat("Range", -1.0f, &light->range);
             float range = light->range;
             if (range == -1.0) {
                 light->range = 0.0f;
@@ -651,21 +651,21 @@ int Scene::ReadLight(int index)
             } else {
                 UnknownFunction4de580(section, "Range", range);
             }
-            parameters.UnknownFunction4b7f10("ShowDebugSphere", 0, &showDebugSphere);
+            parameters.GetInt("ShowDebugSphere", 0, &showDebugSphere);
             light->showDebugSphere = showDebugSphere;
             UnknownFunction4de580(section, "ShowDebugSphere", (int)light->showDebugSphere);
-            parameters.UnknownFunction4b7f10("CastsShadows", 0, &castsShadows);
+            parameters.GetInt("CastsShadows", 0, &castsShadows);
             light->castsShadows = castsShadows;
             UnknownFunction4de580(section, "CastsShadows", (int)light->castsShadows);
-            parameters.UnknownFunction4b7f10("EmitsLight", 1, &emitsLight);
+            parameters.GetInt("EmitsLight", 1, &emitsLight);
             light->emitsLight = emitsLight;
             UnknownFunction4de580(section, "EmitsLight", (int)light->emitsLight);
-            parameters.UnknownFunction4b7f10("HasLensFlare", 0, &hasLensFlare);
+            parameters.GetInt("HasLensFlare", 0, &hasLensFlare);
             light->hasLensFlare = hasLensFlare;
             UnknownFunction4de580(section, "HasLensFlare", (int)light->hasLensFlare);
             if (light->hasLensFlare) {
                 ReadColor(&light->lensFlareColor, section, "LensFlareColorRGB", "", 0, 0);
-                parameters.UnknownFunction4b7f40("LensFlareBrightness", -1.0f, &light->lensFlareBrightness);
+                parameters.GetFloat("LensFlareBrightness", -1.0f, &light->lensFlareBrightness);
                 float brightness = light->lensFlareBrightness;
                 if (brightness == -1.0) {
                     light->lensFlareBrightness = 1.0f;
@@ -681,7 +681,7 @@ int Scene::ReadLight(int index)
                             TF(light->layersVisible[4]));
                     UnknownFunction464e80(text);
                 }
-                if (parameters.UnknownFunction4b7ec0("LensFlareTextureMapName", "", light->lensFlareTexture,
+                if (parameters.GetString("LensFlareTextureMapName", "", light->lensFlareTexture,
                                                       0x3f))
                     UnknownFunction4de580(section, "LensFlareTextureMapName", light->lensFlareTexture);
                 else
@@ -737,13 +737,13 @@ int Scene::ReadFog()
     fog->color = 0x8080c0;
     fog->visibility = 1.0f;
     fog->haziness = 0.5f;
-    int found = parameters.UnknownFunction4b78f0("Fog");
+    int found = parameters.SelectSection("Fog");
     if (!sceneManager->field_0x38c || !found) {
         UnknownFunction464e80("No Scene File or no fog data:  Using DEFAULT Fog\n");
         return 1;
     }
     visibility = 1.0f;
-    if (!parameters.UnknownFunction4b7f40("Visibility", 1.0f, &visibility)) {
+    if (!parameters.GetFloat("Visibility", 1.0f, &visibility)) {
         UnknownFunction4de580("Fog", "Visibility", "NOT FOUND using default 1.0");
     } else if (visibility < 0.0f || visibility > 1.0f) {
         UnknownFunction4de580("Fog", "Visibility",
@@ -752,7 +752,7 @@ int Scene::ReadFog()
     }
     fog->visibility = visibility;
     UnknownFunction4de580("Fog", "Visibility", fog->visibility);
-    if (!parameters.UnknownFunction4b7f40("Haziness", 0.5f, &haziness)) {
+    if (!parameters.GetFloat("Haziness", 0.5f, &haziness)) {
         UnknownFunction4de580("Fog", "Haziness", "NOT FOUND using default 0.5");
     } else if (visibility < 0.0f || visibility > 1.0f) {
         UnknownFunction4de580("Fog", "Haziness",
@@ -777,7 +777,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
     char zone[0x40];
     char text[0x204];
 
-    int found = parameters.UnknownFunction4b78f0("Environment");
+    int found = parameters.SelectSection("Environment");
     if (sceneManager->field_0x38c && !found) {
         sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Environment", scenePath);
         UnknownFunction464e80(text);
@@ -793,7 +793,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
     strncpy(environment->particleTexture, "dirtpart.tga", 0x3f);
     strncpy(environment->detailTexture, "graynoise.tga", 0x3f);
     environment->startGateScale = 1.0f;
-    if (parameters.UnknownFunction4b7ec0("TerrainFile", "", text, 0x100)) {
+    if (parameters.GetString("TerrainFile", "", text, 0x100)) {
         sprintf(environment->terrainFile, "%s\\%s", directory, text);
         strncpy(sceneManager->field_0x2cc, text, 0x3f);
         strcpy(strrchr(text, '.'), ".est");
@@ -807,49 +807,49 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         if (sceneManager->field_0x38c)
             return 0;
     }
-    if (parameters.UnknownFunction4b7ec0("EcosystemFile", "", text, 0x100)) {
+    if (parameters.GetString("EcosystemFile", "", text, 0x100)) {
         sprintf(environment->ecosystemFile, "%s\\%s", directory, text);
         strncpy(sceneManager->field_0x28c, text, 0x3f);
         UnknownFunction4de580("Environment", "EcosystemFile", environment->terrainFile);
     }
-    if (parameters.UnknownFunction4b7ec0("CubeFile", "", text, 0x104)) {
+    if (parameters.GetString("CubeFile", "", text, 0x104)) {
         sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, text);
         strncpy(sceneManager->field_0x30c, text, 0x3f);
         UnknownFunction4de580("Environment", "CubeFile", environment->cubeFile);
     }
-    if (parameters.UnknownFunction4b7ec0("ParticleTextureMapName", "", text, 0x100)) {
+    if (parameters.GetString("ParticleTextureMapName", "", text, 0x100)) {
         strncpy(environment->particleTexture, text, 0x3f);
         UnknownFunction4de580("Environment", "ParticleTextureMapName", environment->particleTexture);
     } else if (sceneManager->field_0x38c) {
         UnknownFolded4de580("Environment", "ParticleTextureMapName", "dirtpart.tga");
     }
-    if (parameters.UnknownFunction4b7ec0("DetailTextureMapName", "", text, 0x100)) {
+    if (parameters.GetString("DetailTextureMapName", "", text, 0x100)) {
         strncpy(environment->detailTexture, text, 0x3f);
         UnknownFunction4de580("Environment", "DetailTextureMapName", environment->particleTexture);
     } else if (sceneManager->field_0x38c) {
         UnknownFolded4de580("Environment", "DetailTextureMapName", "graynoise.tga");
     }
-    if (!parameters.UnknownFunction4b7f40("TerrainWidthScale", 3.0f, &environment->terrainWidthScale))
+    if (!parameters.GetFloat("TerrainWidthScale", 3.0f, &environment->terrainWidthScale))
         UnknownFunction4de580("Environment", "TerrainWidthScale(Default)", environment->terrainWidthScale);
     else
         UnknownFunction4de580("Environment", "TerrainWidthScale", environment->terrainWidthScale);
-    if (!parameters.UnknownFunction4b7f40("TerrainBreadthScale", 3.0f, &environment->terrainBreadthScale))
+    if (!parameters.GetFloat("TerrainBreadthScale", 3.0f, &environment->terrainBreadthScale))
         UnknownFunction4de580("Environment", "TerrainBreadthScale(Default)", environment->terrainBreadthScale);
     else
         UnknownFunction4de580("Environment", "TerrainBreadthScale", environment->terrainBreadthScale);
-    if (!parameters.UnknownFunction4b7f40("TerrainWidth", 5.0f, &environment->terrainWidth))
+    if (!parameters.GetFloat("TerrainWidth", 5.0f, &environment->terrainWidth))
         UnknownFunction4de580("Environment", "TerrainWidth(Default)", environment->terrainWidth);
     else
         UnknownFunction4de580("Environment", "TerrainWidth", environment->terrainWidth);
-    if (!parameters.UnknownFunction4b7f40("TerrainBreadth", 5.0f, &environment->terrainBreadth))
+    if (!parameters.GetFloat("TerrainBreadth", 5.0f, &environment->terrainBreadth))
         UnknownFunction4de580("Environment", "TerrainBreadth(Default)", environment->terrainBreadth);
     else
         UnknownFunction4de580("Environment", "TerrainBreadth", environment->terrainBreadth);
-    if (!parameters.UnknownFunction4b7f40("StartGateScale", 1.0f, &environment->startGateScale))
+    if (!parameters.GetFloat("StartGateScale", 1.0f, &environment->startGateScale))
         UnknownFunction4de580("Environment", "StartGateScale(Default)", environment->startGateScale);
     else
         UnknownFunction4de580("Environment", "StartGateScale", environment->startGateScale);
-    found = parameters.UnknownFunction4b78f0("TerrainZone1");
+    found = parameters.SelectSection("TerrainZone1");
     environment->surfaceFriction[0] = 1.0f;
     environment->surfaceDrag[0] = 1.0f;
     environment->surfaceTraction[0] = 1.0f;
@@ -859,9 +859,9 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
     } else {
         int dust;
         int dirt;
-        parameters.UnknownFunction4b7f10("GenerateDust", 1, &dust);
+        parameters.GetInt("GenerateDust", 1, &dust);
         environment->generateDust[0] = dust;
-        parameters.UnknownFunction4b7f10("GenerateDirt", 1, &dirt);
+        parameters.GetInt("GenerateDirt", 1, &dirt);
         environment->generateDirt[0] = dirt;
     }
     int i;
@@ -869,7 +869,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         int dust;
         int dirt;
         sprintf(zone, "TerrainZone%d", i);
-        if (!parameters.UnknownFunction4b78f0(zone)) {
+        if (!parameters.SelectSection(zone)) {
             sprintf(text, "\nCannot find data for [%s] in %s.\n\n", zone, scenePath);
             UnknownFunction464e80(text);
             environment->surfaceFriction[i - 1] = 1.0f;
@@ -879,7 +879,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
             environment->generateDirt[i - 1] = i != 8;
             continue;
         }
-        if (!parameters.UnknownFunction4b7f40("SurfaceFriction", 1.0f, &environment->surfaceFriction[i - 1])) {
+        if (!parameters.GetFloat("SurfaceFriction", 1.0f, &environment->surfaceFriction[i - 1])) {
             UnknownFunction4de580(zone, "SurfaceFriction", "NOT FOUND");
         } else if (environment->surfaceFriction[i - 1] > 2.0f) {
             environment->surfaceFriction[i - 1] = 2.0f;
@@ -887,7 +887,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
             environment->surfaceFriction[i - 1] = 0.05f;
         }
         UnknownFunction4de580(zone, "SurfaceFriction", environment->surfaceFriction[i - 1]);
-        if (!parameters.UnknownFunction4b7f40("SurfaceDrag", 1.0f, &environment->surfaceDrag[i - 1])) {
+        if (!parameters.GetFloat("SurfaceDrag", 1.0f, &environment->surfaceDrag[i - 1])) {
             UnknownFunction4de580(zone, "SurfaceDrag", "NOT FOUND");
         } else if (environment->surfaceDrag[i - 1] > 2.0f) {
             environment->surfaceDrag[i - 1] = 2.0f;
@@ -895,7 +895,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
             environment->surfaceDrag[i - 1] = 0.05f;
         }
         UnknownFunction4de580(zone, "SurfaceDrag", environment->surfaceDrag[i - 1]);
-        if (!parameters.UnknownFunction4b7f40("SurfaceTraction", 1.0f, &environment->surfaceTraction[i - 1])) {
+        if (!parameters.GetFloat("SurfaceTraction", 1.0f, &environment->surfaceTraction[i - 1])) {
             UnknownFunction4de580(zone, "SurfaceTraction", "NOT FOUND");
         } else if (environment->surfaceTraction[i - 1] > 2.0f) {
             environment->surfaceTraction[i - 1] = 2.0f;
@@ -903,10 +903,10 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
             environment->surfaceTraction[i - 1] = 0.05f;
         }
         UnknownFunction4de580(zone, "SurfaceTraction", environment->surfaceTraction[i - 1]);
-        parameters.UnknownFunction4b7f10("GenerateDust", 1, &dust);
+        parameters.GetInt("GenerateDust", 1, &dust);
         environment->generateDust[i - 1] = dust;
         UnknownFunction4de580(zone, "GenerateDust", (int)environment->generateDust[i - 1]);
-        parameters.UnknownFunction4b7f10("GenerateDirt", 1, &dirt);
+        parameters.GetInt("GenerateDirt", 1, &dirt);
         environment->generateDirt[i - 1] = dirt;
         UnknownFunction4de580(zone, "GenerateDirt", (int)environment->generateDirt[i - 1]);
     }
@@ -915,11 +915,11 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         environment->enviroID[i] = 0;
     for (i = 0; i < 4; i++) {
         sprintf(zone, "ReverbZone%d", i + 1);
-        if (!parameters.UnknownFunction4b78f0(zone)) {
+        if (!parameters.SelectSection(zone)) {
             sprintf(text, "\nCannot find ReverbZone data for [%s] in %s.\n\n", zone, scenePath);
             UnknownFunction464e80(text);
         } else {
-            parameters.UnknownFunction4b7b30("EnviroID", 0, environment->enviroID[i]);
+            parameters.ReadString("EnviroID", 0, environment->enviroID[i]);
         }
     }
     return 1;
@@ -934,11 +934,11 @@ int Scene::OpenResourceFiles()
     char path[0x104];
     char message[0x204];
 
-    int found = parameters.UnknownFunction4b78f0("ResourceFiles");
+    int found = parameters.SelectSection("ResourceFiles");
     if (sceneManager->field_0x38c && found) {
         int i = 1;
         sprintf(key, "ResourceFile%d", i);
-        while (parameters.UnknownFunction4b7ec0(key, "", file, 0x7f)) {
+        while (parameters.GetString(key, "", file, 0x7f)) {
             sprintf(name, "%s\\%s", "Res", file);
             if (!g_TrackGame->UnknownVirtualSlot18(name, path))
                 return 0;
@@ -963,12 +963,12 @@ static const Vector3 s_UnknownVector689c98 = Vector3(0.0f, 0.0f, 1.0f);
 // 0x004ecc10
 void Scene::ReadStadium()
 {
-    hasStadium = parameters.UnknownFunction4b78f0("Stadium");
+    hasStadium = parameters.SelectSection("Stadium");
     if (hasStadium) {
-        parameters.UnknownFunction4b7ec0("FileName", "", stadiumFile, -1);
-        parameters.UnknownFunction4b7f40("Top", 0, &stadiumTop);
-        parameters.UnknownFunction4b7f40("Bottom", 0, &stadiumBottom);
-        parameters.UnknownFunction4b7f40("Scale", 0, &stadiumScale);
+        parameters.GetString("FileName", "", stadiumFile, -1);
+        parameters.GetFloat("Top", 0, &stadiumTop);
+        parameters.GetFloat("Bottom", 0, &stadiumBottom);
+        parameters.GetFloat("Scale", 0, &stadiumScale);
         ReadVector(&stadiumPosition, "Stadium", "Position", "0.0,0.0,0.0", 0, 0);
     }
 }
@@ -1006,20 +1006,20 @@ int Scene::ReadSounds()
 
     if (!sceneManager->field_0x38c)
         return 0;
-    parameters.UnknownFunction4b78f0("Sounds");
-    parameters.UnknownFunction4b7f10("CrowdPresent", 0, &crowdPresent);
+    parameters.SelectSection("Sounds");
+    parameters.GetInt("CrowdPresent", 0, &crowdPresent);
     UnknownFunction4de580("Sounds", "CrowdPresent", crowdPresent);
     UnknownFunction464e80("");
-    parameters.UnknownFunction4b7f10("NumStaticSounds", 0, &count);
+    parameters.GetInt("NumStaticSounds", 0, &count);
     if (count > 0) {
         sprintf(position, "%f %f %f", FLT_MAX, FLT_MAX, FLT_MAX);
         for (int i = 1; i <= count; i++) {
             sprintf(section, "StaticSound%d", i);
-            parameters.UnknownFunction4b78f0(section);
+            parameters.SelectSection(section);
             if (auralScape) {
-                if (parameters.UnknownFunction4b7ec0("SoundResourceFile", "", file, 0x103) && strcmp(file, "")
+                if (parameters.GetString("SoundResourceFile", "", file, 0x103) && strcmp(file, "")
                     && _stricmp(file, "NONE")) {
-                    parameters.UnknownFunction4b7ec0("SoundType", "Emitter", type, 0x103);
+                    parameters.GetString("SoundType", "Emitter", type, 0x103);
                     if (!_stricmp(type, "Emitter")) {
                         ReadSoundSettings(section, file, 1, &params, &flags, &oneShotDistance,
                                               &randomTriggerPercent, &oneShot, &force2D);
@@ -1042,7 +1042,7 @@ int Scene::ReadSounds()
                         if (!strstr(file, ".wav"))
                             strcat(file, ".wav");
                         Sound* sound = UnknownFunction4bb890(soundGroup, file, 1, 1, 0, -1);
-                        parameters.UnknownFunction4b7f10("SoundVolume", 0, &volume);
+                        parameters.GetInt("SoundVolume", 0, &volume);
                         sound->SetVolume(volume, 0);
                         sounds.Add(sound);
                     }
@@ -1070,20 +1070,20 @@ void Scene::ReadSoundSettings(const char* section, char* file, int is3D,
     memset(params, 0, sizeof(UnknownSound3DParameters));
     if (!strstr(file, ".wav"))
         strcat(file, ".wav");
-    parameters.UnknownFunction4b78f0(section);
+    parameters.SelectSection(section);
     *flags = is3D ? 2 : 0;
     int looping;
-    parameters.UnknownFunction4b7f10("SoundLooping", 0, &looping);
+    parameters.GetInt("SoundLooping", 0, &looping);
     if (looping)
         *flags |= 8;
-    parameters.UnknownFunction4b7f10("SoundOneShot", 0, oneShot);
+    parameters.GetInt("SoundOneShot", 0, oneShot);
     if (*oneShot)
         *flags |= 1;
-    parameters.UnknownFunction4b7f10("SoundForce2D", 0, force2D);
-    parameters.UnknownFunction4b7f40("SoundOneShotDistance", 20.0f, oneShotDistance);
-    parameters.UnknownFunction4b7f40("SoundRandomTriggerPercent", 100.0f, randomTriggerPercent);
-    parameters.UnknownFunction4b7f40("SoundMaxDistance", 0, &params->maxDistance);
-    parameters.UnknownFunction4b7f40("SoundMinDistance", 0, &params->minDistance);
+    parameters.GetInt("SoundForce2D", 0, force2D);
+    parameters.GetFloat("SoundOneShotDistance", 20.0f, oneShotDistance);
+    parameters.GetFloat("SoundRandomTriggerPercent", 100.0f, randomTriggerPercent);
+    parameters.GetFloat("SoundMaxDistance", 0, &params->maxDistance);
+    parameters.GetFloat("SoundMinDistance", 0, &params->minDistance);
     params->position = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
 }
 
@@ -1098,7 +1098,7 @@ int Scene::UnknownVirtualSlot14()
 // 0x004f0060: control 5 toggles field_0x7bc; other events go to GameObject.
 int Scene::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
-    if (UnknownFunction43caa0(5, 0, event, 0x80)) {
+    if (TestInputEvent(5, 0, event, 0x80)) {
         visible = 1 - visible;
         return 1;
     }
@@ -1128,11 +1128,11 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     sprintf(scenePath, "%s\\%s", sceneManager->field_0x44, sceneManager->field_0x24c);
     parameters.UnknownFunction4b7220((UnknownParameterStream*)archive, sceneManager->field_0x24c,
                                      scenePath, 1);
-    parameters.UnknownFunction4b78f0("SceneInfo");
+    parameters.SelectSection("SceneInfo");
     if (logFile)
         fclose(logFile);
     logProgress = 0;
-    parameters.UnknownFunction4b7f10("LogProgress", 0, &logProgress);
+    parameters.GetInt("LogProgress", 0, &logProgress);
     if (logProgress) {
         sprintf(path, "%s\\%s", sceneManager->field_0x44, "scnmgr.log");
         logFile = fopen(path, "w");
@@ -1149,8 +1149,8 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     ReadVector(&podiumDirection, "SceneInfo", "PodiumDirection", "0.0,0.0,0.0", 1, 0);
     if (!ReadEnvironment(sceneManager->field_0x44, cubeDirectory))
         return 0;
-    parameters.UnknownFunction4b78f0("Lights");
-    parameters.UnknownFunction4b7f10("NumberOfLights", -1, &lightCount);
+    parameters.SelectSection("Lights");
+    parameters.GetInt("NumberOfLights", -1, &lightCount);
     UnknownFunction4de580("Lights", "NumberOfLights", lightCount);
     UnknownFunction464e80("");
     if (!sceneManager->field_0x38c || lightCount == -1)
@@ -1233,10 +1233,10 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
     UnknownResourceEntry* entry =
         g_UnknownResourceManager572b44->FindItem(texture->textureName, 0);
     if (entry) {
-        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
-        if (entry->field_0x14->UnknownFunction461640(&header0, 4, 1) != 1
-            || entry->field_0x14->UnknownFunction461640(&header1, 4, 1) != 1
-            || entry->field_0x14->UnknownFunction461640(&width, 4, 1) != 1)
+        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
+        if (entry->field_0x14->Read(&header0, 4, 1) != 1
+            || entry->field_0x14->Read(&header1, 4, 1) != 1
+            || entry->field_0x14->Read(&width, 4, 1) != 1)
             return 0;
     } else {
         UnknownTgaFile* file = OpenAndReadHeader(texture->textureName, 0,
@@ -1326,47 +1326,47 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     }
     if (entry) {
-        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
-        entry->field_0x14->UnknownFunction461640(&count, 4, 1);
+        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
+        entry->field_0x14->Read(&count, 4, 1);
         SoultreeObject* node = new(__FILE__, 3447) SoultreeObject(0);
         for (int i = 0; i < count; i++) {
-            entry->field_0x14->UnknownFunction461640(node->nodeName, 0x80, 1);
-            entry->field_0x14->UnknownFunction461640(&node->localMatrix, 0x40, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x14c, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->localBoundsValid, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->localBoundsCenter, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->localBoundsHalfExtent, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x170, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->subtreeBoundsCenter, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->subtreeBoundsHalfExtent, 0xc, 1);
+            entry->field_0x14->Read(node->nodeName, 0x80, 1);
+            entry->field_0x14->Read(&node->localMatrix, 0x40, 1);
+            entry->field_0x14->Read(&node->field_0x14c, 4, 1);
+            entry->field_0x14->Read(&node->localBoundsValid, 4, 1);
+            entry->field_0x14->Read(&node->localBoundsCenter, 0xc, 1);
+            entry->field_0x14->Read(&node->localBoundsHalfExtent, 0xc, 1);
+            entry->field_0x14->Read(&node->field_0x170, 4, 1);
+            entry->field_0x14->Read(&node->subtreeBoundsCenter, 0xc, 1);
+            entry->field_0x14->Read(&node->subtreeBoundsHalfExtent, 0xc, 1);
         }
         node->Release();
         int* parents = (int*)operator new(count * 4, __FILE__, 3466);
-        entry->field_0x14->UnknownFunction461640(parents, 4, count);
+        entry->field_0x14->Read(parents, 4, count);
         operator delete(parents);
-        entry->field_0x14->UnknownFunction461640(&materials, 4, 1);
+        entry->field_0x14->Read(&materials, 4, 1);
         if (materials > 0) {
             SoultreeMaterial* material = new(__FILE__, 3472) SoultreeMaterial(0);
             for (int j = 0; j < materials; j++) {
-                entry->field_0x14->UnknownFunction461640(material->textureName, 0x40, 1);
-                entry->field_0x14->UnknownFunction461640(&material->textureFormat, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->colorKey, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->sourceBlend, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->destBlend, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->hasTextureName, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->useVertexColor, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->mipMapped, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->hasColorKey, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->hasSourceBlend, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->hasDestBlend, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->field_0xb8, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->clampTexture, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->hasAlpha, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->materialAlpha, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->textureSpeed, 4, 1);
-                entry->field_0x14->UnknownFunction461640(&material->mappingType, 2, 1);
-                entry->field_0x14->UnknownFunction461640(&material->field_0xcc, 4, 1);
-                position = entry->field_0x14->UnknownFunction461600();
+                entry->field_0x14->Read(material->textureName, 0x40, 1);
+                entry->field_0x14->Read(&material->textureFormat, 4, 1);
+                entry->field_0x14->Read(&material->colorKey, 4, 1);
+                entry->field_0x14->Read(&material->sourceBlend, 4, 1);
+                entry->field_0x14->Read(&material->destBlend, 4, 1);
+                entry->field_0x14->Read(&material->hasTextureName, 4, 1);
+                entry->field_0x14->Read(&material->useVertexColor, 4, 1);
+                entry->field_0x14->Read(&material->mipMapped, 4, 1);
+                entry->field_0x14->Read(&material->hasColorKey, 4, 1);
+                entry->field_0x14->Read(&material->hasSourceBlend, 4, 1);
+                entry->field_0x14->Read(&material->hasDestBlend, 4, 1);
+                entry->field_0x14->Read(&material->field_0xb8, 4, 1);
+                entry->field_0x14->Read(&material->clampTexture, 4, 1);
+                entry->field_0x14->Read(&material->hasAlpha, 4, 1);
+                entry->field_0x14->Read(&material->materialAlpha, 4, 1);
+                entry->field_0x14->Read(&material->textureSpeed, 4, 1);
+                entry->field_0x14->Read(&material->mappingType, 2, 1);
+                entry->field_0x14->Read(&material->field_0xcc, 4, 1);
+                position = entry->field_0x14->Tell();
                 mode = entry->field_0x14->UnknownFunction43e9e0();
                 if (material->hasTextureName) {
                     if (!AddResource((UnknownResourceManager*)resources, material->textureName, 0))
@@ -1374,7 +1374,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                     if (!CountTexture((UnknownSceneTextureInfo*)material, (int*)counts))
                         return 0;
                 }
-                entry->field_0x14->UnknownFunction461340(position, 0, 0);
+                entry->field_0x14->Seek(position, 0, 0);
                 entry->field_0x14->UnknownFunction43e9b0(mode);
             }
             material->Release();
@@ -1395,16 +1395,16 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
             return 1;
     }
     UnknownTextureStream* stream = new(__FILE__, 3622) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    stream->UnknownFunction460f50(name, "rb", 0);
+    stream->Open(name, "rb", 0);
     UnknownParameterBlock block;
-    block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-    block.UnknownFunction4b78f0("Materials");
-    block.UnknownFunction4b7f10("NumberOfMaterials", 0, &materials);
+    block.Attach((UnknownParameterStream*)stream, 0, 1);
+    block.SelectSection("Materials");
+    block.GetInt("NumberOfMaterials", 0, &materials);
     SoultreeMaterial material(0);
     for (int k = 0; k < materials; k++) {
         sprintf(section, "Material - %d", k);
-        block.UnknownFunction4b78f0(section);
-        if (block.UnknownFunction4b7b30("TextureMap", material.textureName, -1)) {
+        block.SelectSection(section);
+        if (block.ReadString("TextureMap", material.textureName, -1)) {
             if (!AddResource((UnknownResourceManager*)resources, material.textureName, 0)) {
                 delete stream;
                 return 1;
@@ -1433,19 +1433,19 @@ int Scene::CountObjects(int* count)
     parameters.UnknownFunction4b7220((UnknownParameterStream*)archive, sceneManager->field_0x24c,
                                      scenePath, 1);
     *count = 1;
-    int found = parameters.UnknownFunction4b78f0("StaticModels");
+    int found = parameters.SelectSection("StaticModels");
     if (!sceneManager->field_0x38c || !found) {
         sprintf(message, "\nNo scene file OR cannot find data for [%s] in %s.\n\n",
                 "StaticModels", scenePath);
         UnknownFunction464e80(message);
     }
-    if (!parameters.UnknownFunction4b7f10("NumberOfStaticModels", 1, count)) {
+    if (!parameters.GetInt("NumberOfStaticModels", 1, count)) {
         sprintf(message, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n",
                 "StaticModels", scenePath);
         UnknownFunction464e80(message);
     }
     animations = 0;
-    if (!parameters.UnknownFunction4b7f10("NumberOfAnimations", 0, &animations)) {
+    if (!parameters.GetInt("NumberOfAnimations", 0, &animations)) {
         sprintf(message, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n",
                 "Animations", scenePath);
         UnknownFunction464e80(message);
@@ -1477,15 +1477,15 @@ int Scene::ResolveSltPath(char* path)
             return 0;
         }
     }
-    stream->UnknownFunction460f50(name, "rb", 0);
+    stream->Open(name, "rb", 0);
     UnknownParameterBlock block;
-    block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-    block.UnknownFunction4b78f0("General info");
-    if (!block.UnknownFunction4b7b30("SLTFile", sltFile, -1)) {
+    block.Attach((UnknownParameterStream*)stream, 0, 1);
+    block.SelectSection("General info");
+    if (!block.ReadString("SLTFile", sltFile, -1)) {
         delete stream;
         return 0;
     }
-    block.UnknownFunction4b7ec0("ContentDirectory", "", content, -1);
+    block.GetString("ContentDirectory", "", content, -1);
     strcpy(path, content);
     strcat(path, sltFile);
     delete stream;
@@ -1519,17 +1519,17 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
     OpenResourceFiles();
     int i = 0;
     models = 0;
-    int found = parameters.UnknownFunction4b78f0("StaticModels");
+    int found = parameters.SelectSection("StaticModels");
     if (sceneManager->field_0x38c && found) {
-        if (!parameters.UnknownFunction4b7f10("NumberOfStaticModels", -1, &models)) {
+        if (!parameters.GetInt("NumberOfStaticModels", -1, &models)) {
             sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
                     scenePath);
             UnknownFunction464e80(text);
         } else if (models > i) {
             for (i = 0; i < models;) {
                 sprintf(model, "Model%d", ++i);
-                parameters.UnknownFunction4b78f0(model);
-                if (!parameters.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
+                parameters.SelectSection(model);
+                if (!parameters.GetString("SLT", "", file, 0x104)) {
                     sprintf(modelMessage, "\nCannot find %s for [%s] in %s.\n\n", file, model, scenePath);
                     UnknownFunction464e80(modelMessage);
                     return 0;
@@ -1545,9 +1545,9 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
     }
     i = 0;
     animations = 0;
-    found = parameters.UnknownFunction4b78f0("Animations");
+    found = parameters.SelectSection("Animations");
     if (sceneManager->field_0x38c && found) {
-        if (!parameters.UnknownFunction4b7f10("NumberOfAnimations", -1, &animations)) {
+        if (!parameters.GetInt("NumberOfAnimations", -1, &animations)) {
             sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
                     scenePath);
             UnknownFunction464e80(text);
@@ -1556,8 +1556,8 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
                 int keyFramed;
                 next = i + 1;
                 sprintf(animation, "Animation%d", next);
-                parameters.UnknownFunction4b78f0(animation);
-                if (!parameters.UnknownFunction4b7ec0("AnimationType", "", text, 0x40)) {
+                parameters.SelectSection(animation);
+                if (!parameters.GetString("AnimationType", "", text, 0x40)) {
                     sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
                     UnknownFunction464e80(message);
                     keyFramed = 1;
@@ -1567,12 +1567,12 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
                     keyFramed = 1;
                 }
                 if (keyFramed) {
-                    if (!parameters.UnknownFunction4b7ec0("MCF", "", file, 0x104)) {
+                    if (!parameters.GetString("MCF", "", file, 0x104)) {
                         sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", animation, scenePath);
                         UnknownFunction464e80(message);
                         return 0;
                     }
-                } else if (!parameters.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
+                } else if (!parameters.GetString("SLT", "", file, 0x104)) {
                     sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", animation, scenePath);
                     UnknownFunction464e80(message);
                     return 0;
@@ -1591,17 +1591,17 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
         sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Animations", scenePath);
         UnknownFunction464e80(text);
     }
-    found = parameters.UnknownFunction4b78f0("Environment");
+    found = parameters.SelectSection("Environment");
     if (sceneManager->field_0x38c && found) {
         sprintf(ecosystem, "%s\\%s", sceneManager->field_0x44, sceneManager->field_0x28c);
-        if (parameters.UnknownFunction4b7ec0("TerrainFile", "", text, 0x100)) {
+        if (parameters.GetString("TerrainFile", "", text, 0x100)) {
             strcpy(strrchr(text, '.'), ".est");
             sprintf(ecosystem, "%s\\%s", sceneManager->field_0x44, text);
         }
-        if (parameters.UnknownFunction4b7ec0("EcosystemFile", "", text, 0x100))
+        if (parameters.GetString("EcosystemFile", "", text, 0x100))
             sprintf(ecosystem, "%s\\%s", sceneManager->field_0x44, text);
-        parameters.UnknownFunction4b7f40("TerrainWidth", 5.0f, width);
-        *hasCube = parameters.UnknownFunction4b7ec0("CubeFile", "", text, 0x104);
+        parameters.GetFloat("TerrainWidth", 5.0f, width);
+        *hasCube = parameters.GetString("CubeFile", "", text, 0x104);
         return 1;
     }
     *width = 0;

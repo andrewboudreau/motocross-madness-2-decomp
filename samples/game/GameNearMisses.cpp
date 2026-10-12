@@ -46,8 +46,8 @@ int Game::UnknownFunction467b70(char*) {
     field_0x34 = new(__FILE__, 227) GameObject(1);
     rootObject->AppendChild(field_0x34, -1);
     soundInterface = new(__FILE__, 235) PCSoundInterface;
-    srand(UnknownFunction4bfa80());
-    int count = UnknownFunction4bfa80() & 0xff;
+    srand(ReadClock());
+    int count = ReadClock() & 0xff;
     do
         rand();
     while (count--);

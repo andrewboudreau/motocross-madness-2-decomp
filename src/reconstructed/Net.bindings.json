@@ -158,7 +158,7 @@
   "?StartKeepAlive@NetworkInterface@@QAEHMM@Z": "0x004ac8d0",
   "?StopKeepAlive@NetworkInterface@@QAEHXZ": "0x004ac950",
   "?StripMessageTrailer@NetworkInterface@@QAEXPAPAEPAKPAH22@Z": "0x004abd40",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?UnknownVirtualSlot0@NetworkInterface@@UAEXH@Z": "0x004ad050",
   "?UnknownVirtualSlot1@PlayerInfoType@@UAEXXZ": "0x004add00",
   "?UnknownVirtualSlot1@SessionInfoType@@UAEXXZ": "0x004adc90",

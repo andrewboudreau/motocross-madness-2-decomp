@@ -57,8 +57,8 @@ void UnknownTrackGameViewOwnerDc::UnknownFunction4a9d10(KrustyVCR* vcr)
 void TrackGameViewOwner::AnnounceFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous)
 {
     int iterator = 0;
-    for (UnknownEventRacer* other = field_0x34->UnknownFunction4204e0(&iterator); other;
-         other = field_0x34->UnknownFunction4204e0(&iterator)) {
+    for (UnknownEventRacer* other = field_0x34->NextBike(&iterator); other;
+         other = field_0x34->NextBike(&iterator)) {
         if (other == racer)
             continue;
         if (racer)

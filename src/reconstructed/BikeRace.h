@@ -906,7 +906,7 @@ public:
     // (`racers`), a scene object or a shadow caster.
     void NextCameraTarget(int forward, int racers, int objects);
     void UnknownFunction41f550(int value);    // 0x0041f550: toggles +0x3f8
-    UnknownBikeRaceRacer* UnknownFunction4204e0(int* iterator); // 0x004204e0
+    UnknownBikeRaceRacer* NextBike(int* iterator); // 0x004204e0
     void UnknownFunction420590(int player);   // 0x00420590
     void UnknownFunction420b00(char* path, char* description); // 0x00420b00
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0

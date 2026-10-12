@@ -29,9 +29,9 @@ class UnknownTextureStream {
 public:
     explicit UnknownTextureStream(class UnknownResourceManager* manager); // 0x00460d10
     ~UnknownTextureStream();                  // 0x00460d60
-    int UnknownFunction460f50(const char* path, const char* mode, int a); // 0x00460f50: opens
-    int UnknownFunction461340(int offset, int a, int origin);            // 0x00461340: seeks
-    int UnknownFunction461640(void* buffer, int size, int count);        // 0x00461640: reads
+    int Open(const char* path, const char* mode, int a); // 0x00460f50: opens
+    int Seek(int offset, int a, int origin);            // 0x00461340: seeks
+    int Read(void* buffer, int size, int count);        // 0x00461640: reads
 
     unsigned char field_0x000[0x134];         // 0x134 bytes (operator new at 0x00458fcb)
 };
@@ -411,8 +411,8 @@ class UnknownEcoDebugOverlay {
 public:
     // 0x00447f40 / 0x00447fa0: format a row onto page `page` (cdecl, `this`
     // on the stack).
-    void UnknownFunction447f40(int page, const char* format, ...);
-    void UnknownFunction447fa0(int page, const char* format, ...);
+    void Print(int page, const char* format, ...);
+    void Title(int page, const char* format, ...);
     unsigned char field_0x0000[0x26c0];
     int field_0x26c0;                         // next free page
 };
@@ -455,7 +455,7 @@ public:
 };
 extern UnknownEcoTrackGame* g_TrackGame;   // 0x0056e26c (local view of TrackGame)
 unsigned int ReadClock();                     // 0x004bfa80
-int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier); // 0x0043caa0
+int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier); // 0x0043caa0
 
 // A detail band (0x20 bytes) of the two tables 0x0056a600 / 0x0056a740.
 struct UnknownEcoDetailBand {

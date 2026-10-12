@@ -24,7 +24,7 @@
   "?QueueEvent@ControlInterface@@QAEXHHHH@Z": "0x0043cea0",
   "?UnknownFunction489c00@JoystickDevice@@QAEXHMM@Z": "0x00489c00",
   "?GetForceFeedbackEffectName@@YAHUUnknownGuid@@PAD@Z": "0x004beef0",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z": "0x004c2ef0",
   "?ApplyAxisDeadZone@PCJoystickDevice@@QAEHHH@Z": "0x004c3090",
   "?SetDwordProperty@PCInputDevice@@QAEHHKKK@Z": "0x004c2710",

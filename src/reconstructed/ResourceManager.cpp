@@ -126,7 +126,7 @@ ResourceItem* UnknownResourceManager::FindItem(const char* name, int a)
         if (!_stricmp(items[i]->name, name)) {
             UnknownTextureStream* archive = items[i]->archive;
             if (archive && (a || archive->UnknownFunction4e9960()))
-                items[i]->archive->UnknownFunction461340(items[i]->offset, 0, 0);
+                items[i]->archive->Seek(items[i]->offset, 0, 0);
             return items[i];
         }
     }
@@ -154,7 +154,7 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
         strncpy(buffer, name, sizeof(buffer));
 
     UnknownTextureStream* archive = new(__FILE__, 387) UnknownTextureStream((int)this);
-    if (archive->UnknownFunction460f50(buffer, "rb", archive->UnknownFunction460e70(buffer))) {
+    if (archive->Open(buffer, "rb", archive->UnknownFunction460e70(buffer))) {
         if (itemCount + 1 > itemCapacity) {
             items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 393);
             if (items) {

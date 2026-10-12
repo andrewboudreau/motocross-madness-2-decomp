@@ -158,20 +158,20 @@ Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int
     Sound* loaded = (Sound*)entry->field_0x10;
     if (loaded) {
         if (loaded->soundFlags & 4) {
-            entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+            entry->field_0x14->Seek(entry->field_0x18, 0, 0);
             if (!sound->LoadWave(entry->field_0x14, flags, a, b, c))
                 goto failed;
         } else if (!sound->DuplicateFrom(loaded)) {
             goto failed;
         }
     } else {
-        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
         if (!sound->LoadWave(entry->field_0x14, flags, a, b, c)) {
 failed:
             delete sound;
             return 0;
         }
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, sound);
+        g_UnknownResourceManager572b44->SetItemObject(entry, sound);
     }
     strncpy(sound->soundName, name, 0x103);
     sound->isPacked = 1;
@@ -240,9 +240,9 @@ Sound::~Sound() {
         duplicateSource->Release();
         duplicateSource = 0;
     }
-    void* entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
+    void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, 0);
+        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
     if (dsBuffer3D)
         SoundSystem()->field_0x18.Remove(this);
     SoundSystem()->field_0x04.Remove(this);
@@ -252,7 +252,7 @@ Sound::~Sound() {
 // hardware voice, retried in software).
 int Sound::Play() {
     if (SoundSystem()->audioStarted && dsBuffer) {
-        lastPlayTime = UnknownFunction4bfa80();
+        lastPlayTime = ReadClock();
         ApplyCachedSettings();
         isLooping = lastPlayFlags & 1;
         if ((soundFlags & 0x20) && dsBuffer->Play(0, 0, lastPlayFlags) < 0)
@@ -311,8 +311,8 @@ int Sound::LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned 
     ReleaseBuffers();
     strcpy(soundName, "");
     if (stream->field_0x1c)
-        stream->UnknownFunction461340(stream->field_0x130, 0, 1);
-    if (stream->UnknownFunction461640(&waveHeader, 0x2c, 1) != 1)
+        stream->Seek(stream->field_0x130, 0, 1);
+    if (stream->Read(&waveHeader, 0x2c, 1) != 1)
         return 0;
     int stereo = waveHeader.channels > 1;
     bufferBytes = waveHeader.dataSize;
@@ -389,7 +389,7 @@ int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream,
         return 0;
     if (!stream) {
         file = new (__FILE__, 544) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (!file->UnknownFunction460f50(name, "rb", 0)) {
+        if (!file->Open(name, "rb", 0)) {
             delete file;
             return 0;
         }
@@ -491,7 +491,7 @@ int Sound::Stop(int rewind) {
             if (dsBuffer->Stop() < 0)
                 goto failed;
             if (sourceStream && rewind) {
-                sourceStream->UnknownFunction461340(sourceStream->field_0x130 + 0x2c, 0, 1);
+                sourceStream->Seek(sourceStream->field_0x130 + 0x2c, 0, 1);
                 EnterCriticalSection(&bufferLock);
                 FillBufferFromStream(&dsBuffer, sourceStream, 0, bufferBytes);
                 LeaveCriticalSection(&bufferLock);
@@ -757,15 +757,15 @@ int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStrea
         return 0;
     if (firstBytes > 0) {
         if (stream->UnknownFunction430ff0()) {
-            stream->UnknownFunction461340(stream->field_0x130 + 0x2c, 0, 1);
+            stream->Seek(stream->field_0x130 + 0x2c, 0, 1);
             if (!isLooping)
                 goto ended;
         }
-        stream->UnknownFunction461640(first, firstBytes, 1);
+        stream->Read(first, firstBytes, 1);
     }
     if (secondBytes > 0) {
         if (stream->UnknownFunction430ff0()) {
-            stream->UnknownFunction461340(stream->field_0x130 + 0x2c, 0, 1);
+            stream->Seek(stream->field_0x130 + 0x2c, 0, 1);
             if (!isLooping) {
             ended:
                 memset(first, 0, firstBytes);
@@ -778,7 +778,7 @@ int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStrea
             isFilling = 0;
             return 1;
         }
-        stream->UnknownFunction461640(second, secondBytes, 1);
+        stream->Read(second, secondBytes, 1);
     }
     long result = (*buffer)->Unlock(first, firstBytes, second, secondBytes);
     isFilling = 0;

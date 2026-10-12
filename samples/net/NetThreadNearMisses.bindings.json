@@ -21,7 +21,7 @@
   "?IsSameMessage@@YAHPAXIHH0IHH@Z": "0x004afa40",
   "?HandleReceivedMessage@@YAXPAEIHHI@Z": "0x004afa90",
   "?HandleReceivedMessage@@YAXPAEIHHI@Z$ehhandler": "0x0054c64e",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__": "0x0056ec6c",
   "__FILE__:containerlist.h": "0x005666e4",

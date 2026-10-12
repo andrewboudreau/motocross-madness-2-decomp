@@ -59,21 +59,21 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
                 ((TextureMap*)entry->field_0x10)->AddRef();
             return (TextureMap*)entry->field_0x10;
         }
-        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
     }
     if (entry && fromArchive) {
         fromFile = 0;
         int nameSize;
-        if (entry->field_0x14->UnknownFunction461640(&fileFormat, 4, 1) != 1
-            || entry->field_0x14->UnknownFunction461640(&dataSize, 4, 1) != 1
-            || entry->field_0x14->UnknownFunction461640(&width, 4, 1) != 1
-            || entry->field_0x14->UnknownFunction461640(&height, 4, 1) != 1
-            || entry->field_0x14->UnknownFunction461640(&nameSize, 4, 1) != 1
+        if (entry->field_0x14->Read(&fileFormat, 4, 1) != 1
+            || entry->field_0x14->Read(&dataSize, 4, 1) != 1
+            || entry->field_0x14->Read(&width, 4, 1) != 1
+            || entry->field_0x14->Read(&height, 4, 1) != 1
+            || entry->field_0x14->Read(&nameSize, 4, 1) != 1
             || (paletteName = (char*)DebugRealloc(0, nameSize, __FILE__, 123)) == 0)
             goto failed;    // retail shares one `return 0` with the failed name read
-        if (entry->field_0x14->UnknownFunction461640(paletteName, nameSize, 1) == 1) {
+        if (entry->field_0x14->Read(paletteName, nameSize, 1) == 1) {
             if (format == 8 && !palette && *paletteName) {
-                int position = entry->field_0x14->UnknownFunction461600();
+                int position = entry->field_0x14->Tell();
                 char mode = entry->field_0x14->UnknownFunction43e9e0();
                 palette = Palette8::UnknownFunction4b6b30(paletteName);
                 if (!palette) {
@@ -83,7 +83,7 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
                     texturePalette = (UnknownTexturePalette*)palette->field_0x708;
                     surfacePalette = palette->field_0x70c;
                 }
-                entry->field_0x14->UnknownFunction461340(position, 0, 0);
+                entry->field_0x14->Seek(position, 0, 0);
                 entry->field_0x14->UnknownFunction43e9b0(mode);
             }
         } else {
@@ -143,7 +143,7 @@ failed:
     } else if (map->UnknownVirtualSlot5(entry->field_0x14, width, height, minimumSize, fileFormat, dataSize,
                                         format, texturePalette, flags, surfacePalette, addressU, addressV,
                                         choice, alphaThreshold, key)) {
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, map);
+        g_UnknownResourceManager572b44->SetItemObject(entry, map);
     }
     if (paletteName)
         DebugFree(paletteName, __FILE__, 320);
@@ -157,9 +157,9 @@ TextureMap::~TextureMap() {
         field_0x28->Release();
     if (field_0x10)
         field_0x10->UnregisterTexture(this);
-    void* entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
+    void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, 0);
+        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
 }
 
 // 0x0050abd0

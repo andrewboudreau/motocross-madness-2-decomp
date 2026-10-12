@@ -24,7 +24,7 @@
   "?EnumDisplayExCallback@@YGHPAUUnknownGuid@@PAD1PAX2@Z": "0x004c9550",
   "?EnumDisplayExCallback@@YGHPAUUnknownGuid@@PAD1PAX2@Z$ehhandler": "0x0054cd87",
   "?EnumDisplayModeCallback@@YGJPAUUnknownSurfaceDesc@@PAX@Z": "0x004c9660",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAUUnknownDisplay@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z": "0x004c4f80",
   "?EnumerateDisplays@@YAHPAX@Z": "0x004c9600",
   "?InitializeDisplay@UnknownDisplay@@QAEPAU1@PAUUnknownGuid@@PAD1PAX@Z": "0x004c9830",

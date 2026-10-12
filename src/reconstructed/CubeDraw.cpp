@@ -65,39 +65,39 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
     if (!stream)
         goto fail;
     if (stream->field_0x1c)
-        stream->UnknownFunction461340(stream->field_0x130, 0, 0);
-    start = stream->UnknownFunction461600();
-    if (stream->UnknownFunction461640(&paletteCount, 4, 1) != 1)
+        stream->Seek(stream->field_0x130, 0, 0);
+    start = stream->Tell();
+    if (stream->Read(&paletteCount, 4, 1) != 1)
         goto fail;
-    if (stream->UnknownFunction461640(&cubeCount, 4, 1) != 1)
+    if (stream->Read(&cubeCount, 4, 1) != 1)
         goto fail;
     for (i = 0; i < paletteCount; i++) {
-        if (stream->UnknownFunction461640(&offset, 4, 1) != 1)
+        if (stream->Read(&offset, 4, 1) != 1)
             goto fail;
-        int position = stream->UnknownFunction461600();
+        int position = stream->Tell();
         mode = ((UnknownParameterStream*)stream)->UnknownFunction43e9e0();
-        if (stream->UnknownFunction461340(offset + start, 0, 1))
+        if (stream->Seek(offset + start, 0, 1))
             goto fail;
         if (loadPalette)
             loadPalette->Release();
         loadPalette = new (__FILE__, 0x5f) ColorMapper(stream);
-        if (stream->UnknownFunction461340(position, 0, 1))
+        if (stream->Seek(position, 0, 1))
             goto fail;
         ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
     }
     for (i = 0; i < cubeCount; i++) {
-        if (stream->UnknownFunction461640(&offset, 4, 1) != 1)
+        if (stream->Read(&offset, 4, 1) != 1)
             goto fail;
-        int position = stream->UnknownFunction461600();
+        int position = stream->Tell();
         mode = ((UnknownParameterStream*)stream)->UnknownFunction43e9e0();
-        if (stream->UnknownFunction461340(offset + start, 0, 1))
+        if (stream->Seek(offset + start, 0, 1))
             goto fail;
         if (field_0x2c)
             field_0x2c->Release();
         field_0x2c = (new (__FILE__, 0x6d) Cube)->UnknownFunction43d230(stream, 0, textureGroup, start);
         if (!field_0x2c)
             goto fail;
-        if (stream->UnknownFunction461340(position, 0, 1))
+        if (stream->Seek(position, 0, 1))
             goto fail;
         ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
     }

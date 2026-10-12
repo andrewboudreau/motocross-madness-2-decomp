@@ -138,18 +138,18 @@ int Game::UnknownVirtualSlot33() {
 int Game::UnknownVirtualSlot8() {
     if (display->lastFlipFailed)
         display->UnknownVirtualSlot4(0);
-    unsigned int last = UnknownFunction4bfa80();
+    unsigned int last = ReadClock();
     rootObject->UnknownVirtualSlot12();
-    unsigned int now = UnknownFunction4bfa80();
+    unsigned int now = ReadClock();
     int prepareGeometry = now - last;
     last = now;
     if (display->lastFlipFailed)
         display->UnknownVirtualSlot4(1);
-    now = UnknownFunction4bfa80();
+    now = ReadClock();
     int waitForFlip = now - last;
     last = now;
     rootObject->UnknownVirtualSlot13();
-    now = UnknownFunction4bfa80();
+    now = ReadClock();
     int renderPre3D = now - last;
     int render3D = 0;
     if (useZBuffer) {
@@ -157,17 +157,17 @@ int Game::UnknownVirtualSlot8() {
             goto failed;
         renderTarget->UnknownVirtualSlot12(0, 0);
         UnknownVirtualSlot7();
-        last = UnknownFunction4bfa80();
+        last = ReadClock();
         rootObject->UnknownVirtualSlot14();
-        render3D = UnknownFunction4bfa80() - last;
+        render3D = ReadClock() - last;
         if (!renderTarget->UnknownVirtualSlot2()) {
         failed:
             return 0;
         }
     }
-    last = UnknownFunction4bfa80();
+    last = ReadClock();
     rootObject->UnknownVirtualSlot15();
-    now = UnknownFunction4bfa80();
+    now = ReadClock();
     int renderPost3D = now - last;
     int elapsed = now - s_LastFrameTime;
     if (field_0x2d4_bit2) {
@@ -187,39 +187,39 @@ int Game::UnknownVirtualSlot8() {
             s_ElapsedPeak.Record(elapsed);
             if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == profilePage) {
                 UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
-                debugOverlay->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
+                debugOverlay->Title(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
                                                   display->frameBufferCount);
-                debugOverlay->UnknownFunction447f40(profilePage, "%s", display->deviceIdentifier.description);
-                debugOverlay->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
+                debugOverlay->Print(profilePage, "%s", display->deviceIdentifier.description);
+                debugOverlay->Print(profilePage, "ElapsedTime:   % 3d (%d)",
                                                   elapsed, s_ElapsedPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
+                debugOverlay->Print(profilePage, "PrepFrameTime: % 3d (%d)",
                                                   g_UnknownPrepFrameTime,
                                                   s_PrepFramePeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "UpdateScrnTime:% 3d (%d)",
+                debugOverlay->Print(profilePage, "UpdateScrnTime:% 3d (%d)",
                                                   g_UnknownUpdateScreenTime,
                                                   s_UpdateScreenPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "Net            % 3d (%d)",
+                debugOverlay->Print(profilePage, "Net            % 3d (%d)",
                                                   g_UnknownNetTime, s_NetPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "Tick           % 3d (%d)",
+                debugOverlay->Print(profilePage, "Tick           % 3d (%d)",
                                                   g_UnknownTickTime, s_TickPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "PrepareGeometry% 3d (%d)",
+                debugOverlay->Print(profilePage, "PrepareGeometry% 3d (%d)",
                                                   prepareGeometry,
                                                   s_PrepareGeometryPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "WaitForFlip    % 3d (%d)",
+                debugOverlay->Print(profilePage, "WaitForFlip    % 3d (%d)",
                                                   waitForFlip, s_WaitForFlipPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "RenderPre3D    % 3d (%d)",
+                debugOverlay->Print(profilePage, "RenderPre3D    % 3d (%d)",
                                                   renderPre3D, s_RenderPre3DPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "Render3D       % 3d (%d)",
+                debugOverlay->Print(profilePage, "Render3D       % 3d (%d)",
                                                   render3D, s_Render3DPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "   [this overlay %d]",
+                debugOverlay->Print(profilePage, "   [this overlay %d]",
                                                   debugOverlay->field_0x36dc);
-                debugOverlay->UnknownFunction447f40(profilePage, "RenderPost3D   % 3d (%d)",
+                debugOverlay->Print(profilePage, "RenderPost3D   % 3d (%d)",
                                                   renderPost3D, s_RenderPost3DPeak.Peak());
-                debugOverlay->UnknownFunction447f40(profilePage, "TotalTransforms% 5d", renderTarget->field_0x38);
-                debugOverlay->UnknownFunction447f40(profilePage, "TotalPoints    % 5d", renderTarget->field_0x3c);
-                debugOverlay->UnknownFunction447f40(profilePage, "TotalLines     % 5d", renderTarget->field_0x40);
-                debugOverlay->UnknownFunction447f40(profilePage, "TotalTriangles % 5d", renderTarget->field_0x44);
+                debugOverlay->Print(profilePage, "TotalTransforms% 5d", renderTarget->field_0x38);
+                debugOverlay->Print(profilePage, "TotalPoints    % 5d", renderTarget->field_0x3c);
+                debugOverlay->Print(profilePage, "TotalLines     % 5d", renderTarget->field_0x40);
+                debugOverlay->Print(profilePage, "TotalTriangles % 5d", renderTarget->field_0x44);
             }
             static int memoryPage = -1;
             if (memoryPage < 0)
@@ -227,35 +227,35 @@ int Game::UnknownVirtualSlot8() {
             if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == memoryPage) {
                 UnknownMemoryStatus status;
                 GlobalMemoryStatus(&status);
-                debugOverlay->UnknownFunction447fa0(memoryPage, "Memory");
-                debugOverlay->UnknownFunction447f40(memoryPage, "  Ours   in DirectX       Area");
+                debugOverlay->Title(memoryPage, "Memory");
+                debugOverlay->Print(memoryPage, "  Ours   in DirectX       Area");
                 int count = g_MemTagStack->count;
                 int ours = 0;
                 int directx = 0;
                 for (int i = 0; i < count; i++) {
-                    debugOverlay->UnknownFunction447f40(memoryPage, "%8d %8d %12s",
+                    debugOverlay->Print(memoryPage, "%8d %8d %12s",
                                                       g_MemTagStack->ours[i],
                                                       g_MemTagStack->directx[i],
                                                       g_MemTagStack->names[i]);
                     ours += g_MemTagStack->ours[i];
                     directx += g_MemTagStack->directx[i];
                 }
-                debugOverlay->UnknownFunction447f40(memoryPage, "%8d %8d %12s", ours, directx, "Totals");
-                debugOverlay->UnknownFunction447f40(memoryPage, "Grand Total    %10d", ours + directx);
-                debugOverlay->UnknownFunction447f40(memoryPage, "TotalPhys       %10d", status.totalPhys);
-                debugOverlay->UnknownFunction447f40(memoryPage, "AvailPhys       %10d", status.availPhys);
-                debugOverlay->UnknownFunction447f40(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
-                debugOverlay->UnknownFunction447f40(memoryPage, "AvailVirtual    %10d", status.availVirtual);
-                debugOverlay->UnknownFunction447f40(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
-                debugOverlay->UnknownFunction447f40(memoryPage, "%s", display->deviceIdentifier.description);
-                debugOverlay->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", display->totalVideoMemory);
-                debugOverlay->UnknownFunction447f40(memoryPage, "IsAGP           %s",
+                debugOverlay->Print(memoryPage, "%8d %8d %12s", ours, directx, "Totals");
+                debugOverlay->Print(memoryPage, "Grand Total    %10d", ours + directx);
+                debugOverlay->Print(memoryPage, "TotalPhys       %10d", status.totalPhys);
+                debugOverlay->Print(memoryPage, "AvailPhys       %10d", status.availPhys);
+                debugOverlay->Print(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
+                debugOverlay->Print(memoryPage, "AvailVirtual    %10d", status.availVirtual);
+                debugOverlay->Print(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
+                debugOverlay->Print(memoryPage, "%s", display->deviceIdentifier.description);
+                debugOverlay->Print(memoryPage, "Total VidMem    %10d", display->totalVideoMemory);
+                debugOverlay->Print(memoryPage, "IsAGP           %s",
                                                   display->isAGP ? "TRUE" : "FALSE");
-                debugOverlay->UnknownFunction447f40(memoryPage, "VideoMemoryMB   %d",
+                debugOverlay->Print(memoryPage, "VideoMemoryMB   %d",
                                                   GetRegistryInt("VideoMemoryMB", -1));
-                debugOverlay->UnknownFunction447f40(memoryPage, "PartialTexBlt   %s",
+                debugOverlay->Print(memoryPage, "PartialTexBlt   %s",
                                                   g_TrackGame->display->partialTextureUploadResult ? "Yes" : "No");
-                debugOverlay->UnknownFunction447f40(memoryPage, "TexturesCached  %s",
+                debugOverlay->Print(memoryPage, "TexturesCached  %s",
                                                   g_TrackGame->field_0x2d5_bit2 ? "Yes" : "No");
             }
         }
@@ -272,7 +272,7 @@ int Game::UnknownVirtualSlot9() {
 
 // 0x00468880
 void Game::UnknownFunction468880() {
-    field_0x2d8 = field_0x2dc = UnknownFunction4bfa80();
+    field_0x2d8 = field_0x2dc = ReadClock();
 }
 
 // 0x004688a0
@@ -303,7 +303,7 @@ int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* en
 int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (inputSuspended)
         return 1;
-    if (field_0x2d4_bit2 && debugOverlay && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
+    if (field_0x2d4_bit2 && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
         if (debugOverlay->field_0x25_bit0) {
             if (debugOverlay->ShowNextPage())
                 debugOverlay->UnknownVirtualSlot4();

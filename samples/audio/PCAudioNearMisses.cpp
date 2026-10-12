@@ -96,20 +96,20 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
         UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(soundName, 0);
         if (!entry)
             return 0;
-        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
         UnknownWaveHeader header;
-        if (entry->field_0x14->UnknownFunction461640(&header, 0x2c, 1) != 1)
+        if (entry->field_0x14->Read(&header, 0x2c, 1) != 1)
             return 0;
         if (!FillBufferFromStream(buffer, entry->field_0x14, 0, bufferBytes))
             return 0;
         return 1;
     }
     UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (file->UnknownFunction460f50(soundName, "rb", 0)) {
+    if (file->Open(soundName, "rb", 0)) {
         if (file->field_0x1c)
-            file->UnknownFunction461340(file->field_0x130, 0, 0);
+            file->Seek(file->field_0x130, 0, 0);
         UnknownWaveHeader header;
-        if (file->UnknownFunction461640(&header, 0x2c, 1) == 1 &&
+        if (file->Read(&header, 0x2c, 1) == 1 &&
             FillBufferFromStream(buffer, file, 0, bufferBytes)) {
             delete file;
             return 1;

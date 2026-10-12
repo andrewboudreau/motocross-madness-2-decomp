@@ -19,7 +19,7 @@
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?ReapplyDefaultLimits@Camera@@QAEHXZ": "0x0042e8e0",
   "?ClampLimits@Camera@@QAEXMM@Z": "0x0042e960",
-  "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?UnknownFunction462680@Fog@@QAEPAV1@PAXIMMMMM@Z": "0x00462680",
   "?UnknownFunction4627a0@Fog@@QAEXIMM@Z": "0x004627a0",
   "?UnknownFunction462db0@Fog@@QAEXH@Z": "0x00462db0",

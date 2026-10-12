@@ -66,13 +66,13 @@ void TrackGameViewOwner::PickFollowedRacer()
     int iterator = 0;
     int tries = 0;
     UnknownEventRacer* last = 0;
-    UnknownEventRacer* racer = field_0x34->UnknownFunction4204e0(&iterator);
+    UnknownEventRacer* racer = field_0x34->NextBike(&iterator);
     while (racer) {
         if (racer->field_0x4a0 == 0) {
             last = racer;
             racing++;
         }
-        racer = field_0x34->UnknownFunction4204e0(&iterator);
+        racer = field_0x34->NextBike(&iterator);
     }
     if (racing == 0) {
         field_0xa8 = field_0x34->field_0x38;

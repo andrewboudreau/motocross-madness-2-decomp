@@ -3,7 +3,7 @@
 #include "DisplayMode.h"
 
 // cdecl 0x004bfa80: the current time stamp (also declared in Game.h).
-unsigned int UnknownFunction4bfa80();
+unsigned int ReadClock();
 
 // RTTI: VideoCard (COL 0x0055fa28, vtable 0x00558d74), the base of
 // PCVideoCard (UnknownDisplay in Display.h). TU VideoCard.cpp (literal
@@ -29,7 +29,7 @@ public:
     // Inline (PCVideoCard.cpp): time since the last present and the
     // shortest such time.
     void RecordFrameTime() {
-        unsigned int now = UnknownFunction4bfa80();
+        unsigned int now = ReadClock();
         lastFrameTime = now - lastPresentTime;
         lastPresentTime = now;
         if (lastFrameTime < shortestFrameTime)

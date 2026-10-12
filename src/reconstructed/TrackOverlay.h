@@ -156,7 +156,7 @@ struct UnknownTextExtent {
 // counts (0x004204e0, as UnknownKrustyBikeView in RaceView.h); +0x1b8 is a
 // time (0x0051a480).
 struct UnknownStatsSource {
-    UnknownEventRacer* UnknownFunction4204e0(int* iterator); // 0x004204e0
+    UnknownEventRacer* NextBike(int* iterator); // 0x004204e0
 
     unsigned char field_0x000[0x38];
     UnknownEventRacer* ownRacer;              // its own racer
@@ -361,8 +361,8 @@ struct UnknownChatCamera {
 
 struct UnknownChatView {
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0
-    // (UnknownKrustyBikeView::UnknownFunction4204e0 in RaceView.h).
-    UnknownChatRacer* UnknownFunction4204e0(int* iterator);
+    // (UnknownKrustyBikeView::NextBike in RaceView.h).
+    UnknownChatRacer* NextBike(int* iterator);
 
     unsigned char field_0x00[0x38];
     UnknownChatRacer* ownRacer;

@@ -164,12 +164,12 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
         path[length] = 0;
         strcat(path, ".slt");
         UnknownTextureStream* stream = new(__FILE__, 0xc0) UnknownTextureStream(g_UnknownResourceManager572b44);
-        if (stream->UnknownFunction460f50(path, "r", 0)) {
+        if (stream->Open(path, "r", 0)) {
             int lod;
             UnknownParameterBlock* block = new(__FILE__, 0xc2) UnknownParameterBlock;
-            block->UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-            block->UnknownFunction4b78f0("Material - 0");
-            block->UnknownFunction4b7b30("TextureMap", path, -1);
+            block->Attach((UnknownParameterStream*)stream, 0, 1);
+            block->SelectSection("Material - 0");
+            block->ReadString("TextureMap", path, -1);
             int format = 1555;
             if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->capabilityBits & 8)
                 && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
@@ -181,8 +181,8 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                     modelTexture->UnknownVirtualSlot18(keyColor);
                 modelTexture->UnknownVirtualSlot8(1, 0, 0);
             }
-            block->UnknownFunction4b78f0("LOD Information");
-            block->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
+            block->SelectSection("LOD Information");
+            block->GetInt("NumberOfLOD", 0, &lodCount);
             if (lodCount > kMaxLods)
                 lodCount = kMaxLods;
             float maxX = -FLT_MAX;
@@ -196,9 +196,9 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                 int b;
                 int c;
                 sprintf(section, "LOD %d - Surface 0", lod);
-                block->UnknownFunction4b78f0(section);
-                block->UnknownFunction4b7f10("NumberOfVertices", 0, &modelVertexCount[lod]);
-                block->UnknownFunction4b7f10("NumberOfFaces", 0, &faces);
+                block->SelectSection(section);
+                block->GetInt("NumberOfVertices", 0, &modelVertexCount[lod]);
+                block->GetInt("NumberOfFaces", 0, &faces);
                 modelIndexCount[lod] = faces * 3;
                 modelVertices[lod] = (UnknownEcoModelVertex*)DebugMalloc(
                     modelVertexCount[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
@@ -701,7 +701,7 @@ int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
         UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(path, 1);
         if (!entry) {
             stream = new(__FILE__, 0x520) UnknownTextureStream(g_UnknownResourceManager572b44);
-            if (!stream->UnknownFunction460f50(path, "rb", 0)) {
+            if (!stream->Open(path, "rb", 0)) {
                 if (stream)
                     delete stream;
                 return 0;
@@ -714,72 +714,72 @@ int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
         esbStreamInArchive = 1;
     }
     esbStream = stream;
-    stream->UnknownFunction461640(&method, 4, 1);
+    stream->Read(&method, 4, 1);
     for (i = 0; i < 256; i++) {
-        stream->UnknownFunction461640(&present, 1, 1);
+        stream->Read(&present, 1, 1);
         if (present) {
             int j;
-            stream->UnknownFunction461640(&length, 1, 1);
+            stream->Read(&length, 1, 1);
             definitionTable[i] = new(__FILE__, 0x543) UnknownEcoDefinition;
-            stream->UnknownFunction461640(definitionTable[i]->name, length, 1);
-            stream->UnknownFunction461640(&length, 1, 1);
-            stream->UnknownFunction461640(definitionTable[i]->billboardName, length, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->meanHeight, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->minHeight, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->maxHeight, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->meanRadius, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->minRadius, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->maxRadius, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->uLeft, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->uRight, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->vBottom, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->uCenter, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->vTop, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->usePlanarLighting, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->blendLods, 4, 1);
-            stream->UnknownFunction461640(&definitionTable[i]->keyColor, 4, 1);
+            stream->Read(definitionTable[i]->name, length, 1);
+            stream->Read(&length, 1, 1);
+            stream->Read(definitionTable[i]->billboardName, length, 1);
+            stream->Read(&definitionTable[i]->meanHeight, 4, 1);
+            stream->Read(&definitionTable[i]->minHeight, 4, 1);
+            stream->Read(&definitionTable[i]->maxHeight, 4, 1);
+            stream->Read(&definitionTable[i]->meanRadius, 4, 1);
+            stream->Read(&definitionTable[i]->minRadius, 4, 1);
+            stream->Read(&definitionTable[i]->maxRadius, 4, 1);
+            stream->Read(&definitionTable[i]->uLeft, 4, 1);
+            stream->Read(&definitionTable[i]->uRight, 4, 1);
+            stream->Read(&definitionTable[i]->vBottom, 4, 1);
+            stream->Read(&definitionTable[i]->uCenter, 4, 1);
+            stream->Read(&definitionTable[i]->vTop, 4, 1);
+            stream->Read(&definitionTable[i]->usePlanarLighting, 4, 1);
+            stream->Read(&definitionTable[i]->blendLods, 4, 1);
+            stream->Read(&definitionTable[i]->keyColor, 4, 1);
             if (method == 2) {
-                stream->UnknownFunction461640(&definitionTable[i]->percentBias, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->meanSlope, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationSlope, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->meanAspect, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationAspect, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->meanDrainage, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationDrainage, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->meanAltitude, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationAltitude, 4, 1);
-                stream->UnknownFunction461640(&present, 1, 1);
+                stream->Read(&definitionTable[i]->percentBias, 4, 1);
+                stream->Read(&definitionTable[i]->meanSlope, 4, 1);
+                stream->Read(&definitionTable[i]->standardDeviationSlope, 4, 1);
+                stream->Read(&definitionTable[i]->meanAspect, 4, 1);
+                stream->Read(&definitionTable[i]->standardDeviationAspect, 4, 1);
+                stream->Read(&definitionTable[i]->meanDrainage, 4, 1);
+                stream->Read(&definitionTable[i]->standardDeviationDrainage, 4, 1);
+                stream->Read(&definitionTable[i]->meanAltitude, 4, 1);
+                stream->Read(&definitionTable[i]->standardDeviationAltitude, 4, 1);
+                stream->Read(&present, 1, 1);
                 if (present) {
-                    stream->UnknownFunction461640(&length, 1, 1);
-                    stream->UnknownFunction461640(definitionTable[i]->probabilityTga, length, 1);
+                    stream->Read(&length, 1, 1);
+                    stream->Read(definitionTable[i]->probabilityTga, length, 1);
                 }
             }
-            stream->UnknownFunction461640(&definitionTable[i]->collisionCount, 4, 1);
+            stream->Read(&definitionTable[i]->collisionCount, 4, 1);
             definitionTable[i]->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(
                 definitionTable[i]->collisionCount * sizeof(UnknownEcoCollisionDefinition), __FILE__, 0x56d);
             for (j = 0; j < definitionTable[i]->collisionCount; j++) {
-                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].type, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].start, 0xc, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].end, 0xc, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].radius, 4, 1);
-                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].height, 4, 1);
+                stream->Read(&definitionTable[i]->collisionDefinitions[j].type, 4, 1);
+                stream->Read(&definitionTable[i]->collisionDefinitions[j].start, 0xc, 1);
+                stream->Read(&definitionTable[i]->collisionDefinitions[j].end, 0xc, 1);
+                stream->Read(&definitionTable[i]->collisionDefinitions[j].radius, 4, 1);
+                stream->Read(&definitionTable[i]->collisionDefinitions[j].height, 4, 1);
             }
         }
     }
-    stream->UnknownFunction461640(&present, 1, 1);
+    stream->Read(&present, 1, 1);
     if (present) {
-        stream->UnknownFunction461640(&length, 1, 1);
-        stream->UnknownFunction461640(placementBmp, length, 1);
+        stream->Read(&length, 1, 1);
+        stream->Read(placementBmp, length, 1);
     }
     if (method == 2) {
-        stream->UnknownFunction461640(&northAngle, 4, 1);
-        stream->UnknownFunction461640(&present, 1, 1);
+        stream->Read(&northAngle, 4, 1);
+        stream->Read(&present, 1, 1);
         if (present) {
-            stream->UnknownFunction461640(&length, 1, 1);
-            stream->UnknownFunction461640(probabilityTga, length, 1);
+            stream->Read(&length, 1, 1);
+            stream->Read(probabilityTga, length, 1);
         }
     }
-    stream->UnknownFunction461640(&placedCount, 4, 1);
+    stream->Read(&placedCount, 4, 1);
     totalObjects = placedCount;
     return 1;
 }
@@ -872,11 +872,11 @@ int EcoSystem::PlaceStoredObjects() {
         UnknownEcoCoordinates coordinates;
         unsigned char heightParameter;
         unsigned char radiusParameter;
-        stream->UnknownFunction461640(&definitionByte, 1, 1);
+        stream->Read(&definitionByte, 1, 1);
         int definition = definitionByte;
-        stream->UnknownFunction461640(&coordinates, 6, 1);
-        stream->UnknownFunction461640(&heightParameter, 1, 1);
-        stream->UnknownFunction461640(&radiusParameter, 1, 1);
+        stream->Read(&coordinates, 6, 1);
+        stream->Read(&heightParameter, 1, 1);
+        stream->Read(&radiusParameter, 1, 1);
         vegetation[i].PlaceQuantized(textureManager, definition, &coordinates, heightParameter, radiusParameter);
         float radius = definitionTable[definition]->RadiusForParameter(radiusParameter);
         float height = definitionTable[definition]->HeightForParameter(heightParameter);
@@ -1122,7 +1122,7 @@ void EcoSystem::SetRenderStates(int format) {
 int EcoSystem::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
-    if (UnknownFunction43caa0(4, 0, event, 0x80)) {
+    if (TestInputEvent(4, 0, event, 0x80)) {
         g_UnknownGlobal56a12c = 1 - g_UnknownGlobal56a12c;
         return 1;
     }
@@ -1157,7 +1157,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
         esbName[count] = 0;
         strcpy(strstr(esbName, ".est"), ".esb");
         UnknownTextureStream* probe = new(__FILE__, 0xad7) UnknownTextureStream(g_UnknownResourceManager572b44);
-        if (probe->UnknownFunction460f50(esbName, "rb", 0))
+        if (probe->Open(esbName, "rb", 0))
             strcpy(strstr(path, ".est"), ".esb");
         if (probe)
             delete probe;
@@ -1171,7 +1171,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
             UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(path, 1);
             if (!entry) {
                 esb = new(__FILE__, 0xaf8) UnknownTextureStream(g_UnknownResourceManager572b44);
-                if (!esb->UnknownFunction460f50(path, "rb", 0)) {
+                if (!esb->Open(path, "rb", 0)) {
                     if (esb)
                         delete esb;
                     return 0;
@@ -1181,26 +1181,26 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
                 esb = entry->field_0x14;
             }
         }
-        esb->UnknownFunction461640(&method, 4, 1);
+        esb->Read(&method, 4, 1);
         for (i = 0; i < 256; i++) {
-            esb->UnknownFunction461640(&present, 1, 1);
+            esb->Read(&present, 1, 1);
             if (present) {
-                esb->UnknownFunction461640(&length, 1, 1);
-                esb->UnknownFunction461640(names[i], length, 1);
-                esb->UnknownFunction461640(&length, 1, 1);
-                esb->UnknownFunction461640(billboardNames[i], length, 1);
-                esb->UnknownFunction461340(0x34, 1, 1);
-                esb->UnknownFunction461640(&keyColors[i], 4, 1);
+                esb->Read(&length, 1, 1);
+                esb->Read(names[i], length, 1);
+                esb->Read(&length, 1, 1);
+                esb->Read(billboardNames[i], length, 1);
+                esb->Seek(0x34, 1, 1);
+                esb->Read(&keyColors[i], 4, 1);
                 if (method == 2) {
-                    esb->UnknownFunction461340(0x24, 1, 1);
-                    esb->UnknownFunction461640(&present, 1, 1);
+                    esb->Seek(0x24, 1, 1);
+                    esb->Read(&present, 1, 1);
                     if (present) {
-                        esb->UnknownFunction461640(&length, 1, 1);
-                        esb->UnknownFunction461340(length, 1, 1);
+                        esb->Read(&length, 1, 1);
+                        esb->Seek(length, 1, 1);
                     }
                 }
-                esb->UnknownFunction461640(&collisionCount, 4, 1);
-                esb->UnknownFunction461340(collisionCount * sizeof(UnknownEcoCollisionDefinition), 1, 1);
+                esb->Read(&collisionCount, 4, 1);
+                esb->Seek(collisionCount * sizeof(UnknownEcoCollisionDefinition), 1, 1);
             }
         }
         if (ownsStream) {
@@ -1220,11 +1220,11 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
                 strcpy(sltName, names[i]);
                 strcat(sltName, ".slt");
                 UnknownTextureStream* sltStream = new(__FILE__, 0xb50) UnknownTextureStream(g_UnknownResourceManager572b44);
-                if (sltStream->UnknownFunction460f50(sltName, "r", 0)) {
+                if (sltStream->Open(sltName, "r", 0)) {
                     UnknownParameterBlock* block = new(__FILE__, 0xb52) UnknownParameterBlock;
-                    block->UnknownFunction4b77a0((UnknownParameterStream*)sltStream, 0, 1);
-                    block->UnknownFunction4b78f0("Material - 0");
-                    block->UnknownFunction4b7b30("TextureMap", sltName, -1);
+                    block->Attach((UnknownParameterStream*)sltStream, 0, 1);
+                    block->SelectSection("Material - 0");
+                    block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;
                     if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->capabilityBits & 8)
                         && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))

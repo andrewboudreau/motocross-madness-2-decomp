@@ -29,7 +29,7 @@
   "?Previous@UnknownTextureMapList@@QAEPAVTextureMap@@XZ": "0x00510ad0",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?Remove@UnknownTextureMapList@@QAEXPAVTextureMap@@@Z": "0x00510b30",
-  "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
+  "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?SetPageCount@ManagedTextureGroup@@QAEHH@Z": "0x0050c4a0",
   "?ClearUseRecords@ManagedTextureGroup@@QAEXXZ": "0x0050c760",
   "?RestoreLostPages@ManagedTextureGroup@@QAEXXZ": "0x0050c790",

@@ -251,11 +251,11 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
     int words[16];
     int i;
 
-    stream->UnknownFunction461640(&field_0x10, 4, 1);
-    stream->UnknownFunction461640(&field_0x14, 4, 1);
-    stream->UnknownFunction461640(&field_0x18, 4, 1);
-    stream->UnknownFunction461640(&field_0x1c, 4, 1);
-    stream->UnknownFunction461640(&field_0x20, 2, 1);
+    stream->Read(&field_0x10, 4, 1);
+    stream->Read(&field_0x14, 4, 1);
+    stream->Read(&field_0x18, 4, 1);
+    stream->Read(&field_0x1c, 4, 1);
+    stream->Read(&field_0x20, 2, 1);
     this->level = level;
     this->shift = shift;
     gridX = x;
@@ -277,10 +277,10 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
         if (field_0x1c > boundsMax[1])
             boundsMax[1] = field_0x1c;
     }
-    stream->UnknownFunction461640(&blockIndex, 2, 1);
+    stream->Read(&blockIndex, 2, 1);
     block = terrain->blocks[blockIndex];
-    stream->UnknownFunction461640(&header, 4, 1);
-    stream->UnknownFunction461640(words, 4, 16);
+    stream->Read(&header, 4, 1);
+    stream->Read(words, 4, 16);
     for (i = 0; i < 16; i++) {
         if ((words[i] & 0xfffe) != 0xfffe) {
             data = (GridNodeDrawData*)DebugCalloc(1, 0x540, __FILE__, 687);
@@ -319,14 +319,14 @@ allocated:
     data->field_0x174 = 1.0f;
     data->b3 = 0;
     data->b2 = terrain->field_0xc34 & 1;
-    stream->UnknownFunction461640(extra, 4, 1);
+    stream->Read(extra, 4, 1);
     if (extra->byteCount) {
         extra->data = DebugMalloc(extra->byteCount, __FILE__, 732);
         g_gridExtraBytes += extra->byteCount;
-        stream->UnknownFunction461640(extra->data, extra->byteCount, 1);
+        stream->Read(extra->data, extra->byteCount, 1);
     }
-    stream->UnknownFunction461640(&field_0x2b, 1, 1);
-    stream->UnknownFunction461640(&field_0x2c, 4, 1);
+    stream->Read(&field_0x2b, 1, 1);
+    stream->Read(&field_0x2c, 4, 1);
     data->field_0x174 = 1.0f / (field_0x14 * field_0x10);
     if (data->field_0x174 < 0.0f)
         data->field_0x174 = -data->field_0x174;
@@ -350,11 +350,11 @@ allocated:
     if (a1 && field_0x2c) {
         childOffsets = new (__FILE__, 776) int[256];
         children = new (__FILE__, 777) GridNode*[256];
-        stream->UnknownFunction461340(terrain->childTableOffset + field_0x2c, 0, 1);
-        stream->UnknownFunction461640(childOffsets, 0x400, 1);
+        stream->Seek(terrain->childTableOffset + field_0x2c, 0, 1);
+        stream->Read(childOffsets, 0x400, 1);
         for (i = 0; i < 256; i++) {
             if (childOffsets[i]) {
-                stream->UnknownFunction461340(terrain->childTableOffset + childOffsets[i], 0, 1);
+                stream->Seek(terrain->childTableOffset + childOffsets[i], 0, 1);
                 children[i] = UnknownVirtualSlot2(stream, a1, this, this->level - 1, this->shift - 4,
                                                   (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
                                                   boundsMin, boundsMax);

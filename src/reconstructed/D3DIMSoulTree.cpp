@@ -131,7 +131,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                 RegisterNode();
                 return this;
             }
-            ((UnknownTextureStream*)item->archive)->UnknownFunction461340(item->offset, 0, 0);
+            ((UnknownTextureStream*)item->archive)->Seek(item->offset, 0, 0);
             SoultreeVirtualSlot2((UnknownTextureStream*)item->archive);
         } else {
             fnameLength = strlen(fname);
@@ -162,7 +162,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                 return this;
             }
             UnknownTextureStream* stream = new (__FILE__, 0xe1) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-            stream->UnknownFunction460f50(name, "rb", 0);
+            stream->Open(name, "rb", 0);
             LoadFromParameters(stream, 0);
             delete stream;
         }
@@ -182,7 +182,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
     int index = 1;
     nodes[0] = this;
     CollectDescendants(&index, nodes);
-    stream->UnknownFunction461640(&materialCount, 4, 1);
+    stream->Read(&materialCount, 4, 1);
     if (materialCount > 0) {
         materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x156);
         for (int i = 0; i < materialCount; i++) {
@@ -195,47 +195,47 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
     } else {
         materialTable = 0;
     }
-    stream->UnknownFunction461640(&lodCount, 4, 1);
-    stream->UnknownFunction461640(&field_0x288, 4, 1);
+    stream->Read(&lodCount, 4, 1);
+    stream->Read(&field_0x288, 4, 1);
     if (field_0x288) {
         autoLodDistances = (float*)DebugMalloc(lodCount * 4, __FILE__, 0x166);
         for (int i = 0; i < lodCount - 1; i++)
-            stream->UnknownFunction461640(&autoLodDistances[i], 4, 1);
+            stream->Read(&autoLodDistances[i], 4, 1);
     }
     if (lodCount > 0) {
         lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x16f);
         for (int lod = 0; lod < lodCount; lod++) {
-            stream->UnknownFunction461640(&lodTable[lod].surfaceCount, 4, 1);
+            stream->Read(&lodTable[lod].surfaceCount, 4, 1);
             lodTable[lod].surfaces =
                 (UnknownSoultreeSurface*)DebugMalloc(lodTable[lod].surfaceCount * 0x38, __FILE__, 0x173);
             for (int i = 0; i < lodTable[lod].surfaceCount; i++) {
                 UnknownSoultreeSurface* surface = &lodTable[lod].surfaces[i];
-                stream->UnknownFunction461640(&surface->groupCount, 4, 1);
-                stream->UnknownFunction461640(&surface->vertexCount, 4, 1);
-                stream->UnknownFunction461640(&surface->faceCount, 4, 1);
-                stream->UnknownFunction461640(&surface->materialCount, 4, 1);
+                stream->Read(&surface->groupCount, 4, 1);
+                stream->Read(&surface->vertexCount, 4, 1);
+                stream->Read(&surface->faceCount, 4, 1);
+                stream->Read(&surface->materialCount, 4, 1);
                 surface->field_0x30 = 0;
                 surface->field_0x34 = 0;
                 surface->field_0x2c = 1.0f;
                 surface->vertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x181);
-                stream->UnknownFunction461640(surface->vertices, 0x20, surface->vertexCount);
+                stream->Read(surface->vertices, 0x20, surface->vertexCount);
                 surface->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x184);
-                stream->UnknownFunction461640(surface->drawnVertices, 0x20, surface->vertexCount);
+                stream->Read(surface->drawnVertices, 0x20, surface->vertexCount);
                 surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x187);
-                stream->UnknownFunction461640(surface->normals, 0xc, surface->vertexCount);
+                stream->Read(surface->normals, 0xc, surface->vertexCount);
                 surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x18a);
-                stream->UnknownFunction461640(surface->indices, 6, surface->faceCount);
+                stream->Read(surface->indices, 6, surface->faceCount);
                 surface->uvs = (UnknownSoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x18d);
-                stream->UnknownFunction461640(surface->uvs, 4, surface->vertexCount * 2);
+                stream->Read(surface->uvs, 4, surface->vertexCount * 2);
                 surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x191);
-                stream->UnknownFunction461640(surface->materialIndices, 4, surface->materialCount);
+                stream->Read(surface->materialIndices, 4, surface->materialCount);
                 surface->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(surface->groupCount * 0x14, __FILE__, 0x194);
-                stream->UnknownFunction461640(surface->groups, 0x14, surface->groupCount);
+                stream->Read(surface->groups, 0x14, surface->groupCount);
                 for (int j = 0; j < surface->groupCount; j++) {
                     int node;
                     int first;
-                    stream->UnknownFunction461640(&node, 4, 1);
-                    stream->UnknownFunction461640(&first, 4, 1);
+                    stream->Read(&node, 4, 1);
+                    stream->Read(&first, 4, 1);
                     surface->groups[j].node = nodes[node];
                     surface->groups[j].sourceVertices = &surface->vertices[first];
                     surface->groups[j].transformedVertices = &surface->drawnVertices[first];
@@ -253,8 +253,8 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
 // 0x0043fe40
 void D3DIMSoultreeObject::SoultreeVirtualSlot3()
 {
-    parameterBlock->UnknownFunction4b78f0("Materials");
-    parameterBlock->UnknownFunction4b7f10("NumberOfMaterials", 0, &materialCount);
+    parameterBlock->SelectSection("Materials");
+    parameterBlock->GetInt("NumberOfMaterials", 0, &materialCount);
     SoultreeObject::SoultreeVirtualSlot3();
     int untextured = ReadLods();
     int count = materialCount;
@@ -268,7 +268,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
         AppendChild(materialTable[i], -1);
         char section[0x80];
         sprintf(section, "Material - %d", i);
-        parameterBlock->UnknownFunction4b78f0(section);
+        parameterBlock->SelectSection(section);
         materialTable[i]->ReadKeys(parameterBlock, loadFlag);
     }
     if (untextured) {
@@ -296,15 +296,15 @@ int D3DIMSoultreeObject::ReadLods()
     CollectDescendants(&index, nodes);
     char section[0x80];
     sprintf(section, "LOD Information");
-    parameterBlock->UnknownFunction4b78f0(section);
-    parameterBlock->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
-    parameterBlock->UnknownFunction4b7f10("UseAutoLOD", 0, &field_0x288);
+    parameterBlock->SelectSection(section);
+    parameterBlock->GetInt("NumberOfLOD", 0, &lodCount);
+    parameterBlock->GetInt("UseAutoLOD", 0, &field_0x288);
     int i;
     if (field_0x288) {
         autoLodDistances = (float*)DebugMalloc(lodCount * 4 - 1, __FILE__, 0x1ec);
         for (i = 0; i < lodCount - 1; i++) {
             sprintf(section, "AutoLOD#%i", i);
-            parameterBlock->UnknownFunction4b7f40(section, -1.0f, &autoLodDistances[i]);
+            parameterBlock->GetFloat(section, -1.0f, &autoLodDistances[i]);
         }
     }
     lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x1f5);
@@ -315,8 +315,8 @@ int D3DIMSoultreeObject::ReadLods()
         UnknownSoultreeLod* level = &lodTable[lod];
         UnknownSoultreeLod& levelRef = *level;
         sprintf(section, "LOD %i", lod);
-        parameterBlock->UnknownFunction4b78f0(section);
-        parameterBlock->UnknownFunction4b7f10("NumberOfSurfaces", 0, &level->surfaceCount);
+        parameterBlock->SelectSection(section);
+        parameterBlock->GetInt("NumberOfSurfaces", 0, &level->surfaceCount);
         levelRef.surfaces = (UnknownSoultreeSurface*)DebugMalloc(levelRef.surfaceCount * 0x38, __FILE__, 0x206);
         for (int s = 0; s < level->surfaceCount; s++) {
             UnknownSoultreeSurface* surface = &level->surfaces[s];
@@ -324,16 +324,16 @@ int D3DIMSoultreeObject::ReadLods()
             surface->field_0x30 = 0;
             surface->field_0x34 = 0;
             sprintf(section, "LOD %i - Surface %i", lod, s);
-            parameterBlock->UnknownFunction4b78f0(section);
-            parameterBlock->UnknownFunction4b7f10("NumberOfVertices", 0, &surface->vertexCount);
-            parameterBlock->UnknownFunction4b7f10("NumberOfFaces", 0, &surface->faceCount);
-            parameterBlock->UnknownFunction4b7f10("NumberOfMaterials", 0, &surface->materialCount);
+            parameterBlock->SelectSection(section);
+            parameterBlock->GetInt("NumberOfVertices", 0, &surface->vertexCount);
+            parameterBlock->GetInt("NumberOfFaces", 0, &surface->faceCount);
+            parameterBlock->GetInt("NumberOfMaterials", 0, &surface->materialCount);
             if (surface->materialCount > 0) {
                 surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x216);
                 for (int m = 0; m < surface->materialCount; m++) {
                     char key[0x80];
                     sprintf(key, "Material#%i", m);
-                    parameterBlock->UnknownFunction4b7f10(key, 0, &surface->materialIndices[m]);
+                    parameterBlock->GetInt(key, 0, &surface->materialIndices[m]);
                 }
             } else {
                 untextured = 1;

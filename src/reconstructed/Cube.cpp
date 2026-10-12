@@ -19,9 +19,9 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // 0x0043d0d0: skips `stream` forward to the next 0x800 boundary past `base`.
 static void UnknownFunction43d0d0(UnknownTextureStream* stream, int base)
 {
-    int padding = 0x800 - (stream->UnknownFunction461600() - base) % 0x800;
+    int padding = 0x800 - (stream->Tell() - base) % 0x800;
     if (padding != 0x800)
-        stream->UnknownFunction461340(padding, 1, 1);
+        stream->Seek(padding, 1, 1);
 }
 
 // 0x0043d110
@@ -77,43 +77,43 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
     field_0x610 = group;
     field_0x08 = stream;
     alignmentBase = baseOffset;
-    if (stream->UnknownFunction461640(&fileFormat, 4, 1) != 1)
+    if (stream->Read(&fileFormat, 4, 1) != 1)
         goto fail;
-    if (stream->UnknownFunction461640(&flags, 2, 1) != 1)
+    if (stream->Read(&flags, 2, 1) != 1)
         goto fail;
-    if (stream->UnknownFunction461640(&field_0x12, 2, 1) != 1)
+    if (stream->Read(&field_0x12, 2, 1) != 1)
         goto fail;
     for (face = 0; face < 6; face++) {
-        if (stream->UnknownFunction461640(&field_0x38[face].presentTextures, 2, 1) != 1)
+        if (stream->Read(&field_0x38[face].presentTextures, 2, 1) != 1)
             goto fail;
     }
     for (face = 0; face < 6; face++) {
-        if (stream->UnknownFunction461640(&field_0x38[face].sizeCodes, 4, 1) != 1)
+        if (stream->Read(&field_0x38[face].sizeCodes, 4, 1) != 1)
             goto fail;
     }
-    if (stream->UnknownFunction461640(&field_0x14, 12, 1) != 1)
+    if (stream->Read(&field_0x14, 12, 1) != 1)
         goto fail;
-    if (stream->UnknownFunction461640(&field_0x20, 12, 1) != 1)
+    if (stream->Read(&field_0x20, 12, 1) != 1)
         goto fail;
-    if (stream->UnknownFunction461640(&field_0x2c, 12, 1) != 1)
+    if (stream->Read(&field_0x2c, 12, 1) != 1)
         goto fail;
     if (flags & 4) {
         for (face = 0; face < 6; face++) {
-            if (stream->UnknownFunction461640(field_0x38[face].field_0x88, 0x20, 1) != 1)
+            if (stream->Read(field_0x38[face].field_0x88, 0x20, 1) != 1)
                 goto fail;
         }
     }
     if (flags & 1) {
         for (face = 0; face < 6; face++) {
             for (i = 0; i < 16; i++) {
-                if (stream->UnknownFunction461640(&field_0x38[face].field_0x48[i], 4, 1) != 1)
+                if (stream->Read(&field_0x38[face].field_0x48[i], 4, 1) != 1)
                     goto fail;
             }
         }
     }
     if (flags & 2)
         UnknownFunction43d0d0(stream, alignmentBase);
-    textureDataOffset = stream->UnknownFunction461600();
+    textureDataOffset = stream->Tell();
     if (a) {
     fail:
         Release();
@@ -141,7 +141,7 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
     int size = UnknownFunction43d080(field_0x38[face].sizeCodes, index % 4, index / 4);
     int dataSize;
     if (IsCompressedFormat(fileFormat))
-        field_0x08->UnknownFunction461640(&dataSize, 4, 1);
+        field_0x08->Read(&dataSize, 4, 1);
     else
         dataSize = BytesPerPixel(fileFormat) * size * size;
 
@@ -167,7 +167,7 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
 // 0x0043d630
 int Cube::LoadMissingTextures(UnknownTexturePalette* palette, UnknownCubeTextureContext* context)
 {
-    field_0x08->UnknownFunction461340(textureDataOffset, 0, 1);
+    field_0x08->Seek(textureDataOffset, 0, 1);
     for (int face = 0; face < 6; face++) {
         for (int i = 0; i < 16; i++) {
             if ((field_0x38[face].presentTextures & (1 << i)) && !field_0x38[face].textures[i])

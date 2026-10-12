@@ -35,10 +35,10 @@ public:
 // Every accessor follows +0x1c to the innermost stream first.
 class UnknownParameterStream {
 public:
-    int UnknownFunction461340(int offset, int a, int origin); // 0x00461340: seeks
-    int UnknownFunction461600();                              // 0x00461600: read position
-    int UnknownFunction461aa0(char* buffer, int size);        // 0x00461aa0: reads a line, 0 at the end
-    int UnknownFunction461640(void* buffer, int size, int count); // 0x00461640: reads `count` items (SoultreeMaterial.cpp)
+    int Seek(int offset, int a, int origin); // 0x00461340: seeks
+    int Tell();                              // 0x00461600: read position
+    int ReadLine(char* buffer, int size);        // 0x00461aa0: reads a line, 0 at the end
+    int Read(void* buffer, int size, int count); // 0x00461640: reads `count` items (SoultreeMaterial.cpp)
 
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
     char UnknownFunction43e9e0()
@@ -113,16 +113,16 @@ public:
                                const char* path, int index);
     int UnknownFunction4b72c0(const char* name);     // loads a section by scanning
     void UnknownFunction4b7560(UnknownParameterStream* stream); // indexes the sections
-    void UnknownFunction4b77a0(UnknownParameterStream* stream, int offset, int index); // opens
+    void Attach(UnknownParameterStream* stream, int offset, int index); // opens
     int UnknownFunction4b7830(const char* name);     // section index or -1
     void UnknownFunction4b7890();                    // frees the loaded lines
-    int UnknownFunction4b78f0(const char* name);     // selects a section
-    int UnknownFunction4b7b30(const char* key, char* out, int size); // raw value of `key`
+    int SelectSection(const char* name);     // selects a section
+    int ReadString(const char* key, char* out, int size); // raw value of `key`
     int UnknownFunction4b7cf0(const char* key, int* out);
     int UnknownFunction4b7e70(const char* key, float* out);
-    int UnknownFunction4b7ec0(const char* key, const char* def, char* out, int size);
-    int UnknownFunction4b7f10(const char* key, int def, int* out);
-    int UnknownFunction4b7f40(const char* key, float def, float* out);
+    int GetString(const char* key, const char* def, char* out, int size);
+    int GetInt(const char* key, int def, int* out);
+    int GetFloat(const char* key, float def, float* out);
     int UnknownFunction4b7f70(const char* name);     // starts reading a section's rows
     int UnknownFunction4b8010(char* raw);            // reads the next row
     int UnknownFunction4b8180(int index, int* out);

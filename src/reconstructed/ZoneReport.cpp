@@ -9,7 +9,7 @@
 #include "TrackGame.h"
 #include "Parser.h"
 
-unsigned int UnknownFunction4bfa80();   // 0x004bfa80: milliseconds
+unsigned int ReadClock();   // 0x004bfa80: milliseconds
 
 // 0x0049c2f0: reads the lobby preset (0x004aa360) and applies it to the
 // race settings. `*flags` gets a bit per tag found (1 event type, 2
@@ -100,8 +100,8 @@ int UnknownTrackGameObject3410::WaitForLobbyRank()
     int d;
     char response[0x800];
     char text[0x800];
-    unsigned int start = UnknownFunction4bfa80();
-    while (UnknownFunction4bfa80() - start < 20000) {
+    unsigned int start = ReadClock();
+    while (ReadClock() - start < 20000) {
         if (GetLobbyRank(response, 0x800)) {
             UnknownParser parser;
             parser.Parse(response, lstrlen(response));

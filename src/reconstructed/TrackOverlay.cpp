@@ -508,7 +508,7 @@ int StatsOverlay::DrawViewModePanel()
     int finished = 0;
     iterator = 0;
     UnknownEventRacer* racer;
-    while ((racer = statsSource->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = statsSource->NextBike(&iterator)) != 0) {
         if (racer->field_0x4a0)
             finished++;
     }
@@ -620,7 +620,7 @@ int StatsOverlay::DrawRacePanel()
     int finished = 0;
     iterator = 0;
     UnknownEventRacer* racer;
-    while ((racer = statsSource->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = statsSource->NextBike(&iterator)) != 0) {
         if (racer->field_0x4a0)
             finished++;
     }
@@ -717,7 +717,7 @@ int StatsOverlay::DrawTagStandings()
         UnknownKrustyBikeView* view = g_TrackGame->field_0x568->field_0x34;
         iterator = 0;
         UnknownEventRacer* racer;
-        while ((racer = view->UnknownFunction4204e0(&iterator)) != 0) {
+        while ((racer = view->NextBike(&iterator)) != 0) {
             scores[count].value = racer->field_0x768;
             scores[count].racer = racer;
             count++;
@@ -1099,7 +1099,7 @@ int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
     racerCount = 0;
     iterator = 0;
     radarView = view;
-    while ((racer = radarView->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = radarView->NextBike(&iterator)) != 0) {
         racers[racerCount] = racer;
         racerCount++;
     }
@@ -1113,11 +1113,11 @@ int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
 // does (docs/VC6_OPERAND_ORDER.md section 3).
 int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
-    if (UnknownFunction43caa0(0x21, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x21, 0, event, 0x80000000)) {
         showFrameRate = 1 - showFrameRate;
         return 1;
     }
-    if (UnknownFunction43caa0(0x34, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x34, 0, event, 0x80000000)) {
         if (++s_UnknownGlobal57513c > 5)
             s_UnknownGlobal57513c = 5;
         if (largeMap)
@@ -1126,7 +1126,7 @@ int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
             mapScale = (mapRadius / 180.0f) / s_UnknownGlobal57513c;
         return 1;
     }
-    if (UnknownFunction43caa0(0x33, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x33, 0, event, 0x80000000)) {
         if (--s_UnknownGlobal57513c < 1)
             s_UnknownGlobal57513c = 1;
         if (largeMap)

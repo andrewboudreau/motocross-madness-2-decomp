@@ -381,7 +381,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
     }
     if (!ui)
         return 0;
-    if (UnknownFunction43caa0(1, 0, event, 0x3f)) {
+    if (TestInputEvent(1, 0, event, 0x3f)) {
         g_MemTagStack->UnknownFunction4a2bc0("In Game");
         if (!menuIsOpen) {
             int category = g_MemTagStack->Push("UI");
@@ -390,8 +390,8 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         }
         return 1;
     }
-    if (!network && (UnknownFunction43caa0(0x3d, 0, event, 0x80000000) ||
-                        UnknownFunction43caa0(0xc5, 0, event, 0x80000000))) {
+    if (!network && (TestInputEvent(0x3d, 0, event, 0x80000000) ||
+                        TestInputEvent(0xc5, 0, event, 0x80000000))) {
 toggle:
         if (menuIsOpen)
             SetMenuOpen(0, kMenuContinue, 1);

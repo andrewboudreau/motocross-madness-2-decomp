@@ -71,7 +71,7 @@ public:
     virtual void CharacterVirtualSlot10();
     virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
                                                void* context, int a, int b);
-    void UnknownFunction4a8b10(const char* motion);        // 0x004a8b10: plays a motion
+    void SetMotionByName(const char* motion);        // 0x004a8b10: plays a motion
     int UnknownFunction4a6bb0(float time, int a, int b);   // 0x004a6bb0: advances it
 
     unsigned char field_0x008[0x1a0 - 0x8];
@@ -326,7 +326,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
         KRUSTYUI_GARAGE->field_0x1a0->SetPosition(&garageFocus);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
-        KRUSTYUI_GARAGE->UnknownFunction4a8b10("Spin");
+        KRUSTYUI_GARAGE->SetMotionByName("Spin");
         KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
         shadow = projected->UnknownFunction4da7b0(field_0x18, g_TrackGame->field_0x3c);
@@ -342,7 +342,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
         KRUSTYUI_RIDER->field_0x1a0->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
-        KRUSTYUI_RIDER->UnknownFunction4a8b10("WaitR");
+        KRUSTYUI_RIDER->SetMotionByName("WaitR");
         KRUSTYUI_RIDER->UnknownFunction4a6bb0(0.03f, 0, 0);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
         pending = 1;
@@ -361,7 +361,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             bike->field_0x1a0->UnknownFunction4444c0(1);
             bike->field_0x1a0->SetPosition(&garageFocus);
             bike->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
-            bike->UnknownFunction4a8b10("WaitB");
+            bike->SetMotionByName("WaitB");
             bike->UnknownFunction4a6bb0(0.03f, 0, 0);
             painter.UnknownFunction417670(bike->field_0x1a0, g_TrackGame->mode.field_0x1bcc);
         }
@@ -621,32 +621,32 @@ void KrustyUI::LoadGarageTables() {
     char key[128];
     UnknownParameterBlock block;
     UnknownTextureStream* stream = new(__FILE__, 851) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (stream->UnknownFunction460f50("presets.pb", "r", 0)) {
-        block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
+    if (stream->Open("presets.pb", "r", 0)) {
+        block.Attach((UnknownParameterStream*)stream, 0, 1);
         for (int i = 0; i < 5; i++) {
             sprintf(key, "Category_%d", i + 1);
-            block.UnknownFunction4b78f0(key);
-            block.UnknownFunction4b7f10("RPMLowerLimit", 5000, &rpmLowerLimit[i]);
-            block.UnknownFunction4b7f10("RPMUpperLimit", 10000, &rpmUpperLimit[i]);
+            block.SelectSection(key);
+            block.GetInt("RPMLowerLimit", 5000, &rpmLowerLimit[i]);
+            block.GetInt("RPMUpperLimit", 10000, &rpmUpperLimit[i]);
             rpmStep[i] = (rpmUpperLimit[i] - rpmLowerLimit[i]) / 10;
-            block.UnknownFunction4b7f10("HPSum", 400, &hpSum[i]);
-            block.UnknownFunction4b7f10("MinRange", 10, &minRange[i]);
-            block.UnknownFunction4b7f10("Weight", 200, &weight[i]);
+            block.GetInt("HPSum", 400, &hpSum[i]);
+            block.GetInt("MinRange", 10, &minRange[i]);
+            block.GetInt("Weight", 200, &weight[i]);
             int maximum = 0;
             int j;
             for (j = 0; j < 11; j++) {
                 sprintf(key, "RPM%05d", rpmLowerLimit[i] + rpmStep[i] * j);
-                block.UnknownFunction4b7f10(key, 10, &bandMaxima[i][j]);
+                block.GetInt(key, 10, &bandMaxima[i][j]);
                 if (maximum <= bandMaxima[i][j])
                     maximum = bandMaxima[i][j];
             }
             maxRange[i] = maximum;
             for (int preset = 0; preset < 3; preset++) {
                 sprintf(key, "Category_%dPreset_%d", i + 1, preset + 1);
-                block.UnknownFunction4b78f0(key);
+                block.SelectSection(key);
                 for (j = 0; j < 11; j++) {
                     sprintf(key, "RPM%05d", rpmLowerLimit[i] + rpmStep[i] * j);
-                    block.UnknownFunction4b7f10(key, 10, &standardCurves[i][preset][j]);
+                    block.GetInt(key, 10, &standardCurves[i][preset][j]);
                 }
             }
         }
@@ -687,11 +687,11 @@ void KrustyUI::LoadBikesAndRiders() {
     riderCount = 0;
     bikeCount = 0;
     manufacturerCount = 0;
-    if (stream->UnknownFunction460f50("bikes.pb", "r", 0)) {
-        block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-        block.UnknownFunction4b78f0("Information");
+    if (stream->Open("bikes.pb", "r", 0)) {
+        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.SelectSection("Information");
         int count;
-        block.UnknownFunction4b7f10("NumberOfManufacturers", 0, &count);
+        block.GetInt("NumberOfManufacturers", 0, &count);
         for (int i = 1; i <= count; i++) {
             if (i != 7 && i != 3)
                 continue;
@@ -701,12 +701,12 @@ void KrustyUI::LoadBikesAndRiders() {
             char uiModel[260];
             char model[260];
             sprintf(key, "Manufacturer_%02d", i);
-            block.UnknownFunction4b78f0(key);
-            block.UnknownFunction4b7f10("NumberOfBikes", 0, &manufacturerBikeCount);
-            block.UnknownFunction4b7ec0("Name", "(no name)", name, -1);
-            block.UnknownFunction4b7ec0("UIModelFile", "", uiModel, -1);
-            block.UnknownFunction4b7ec0("ModelFile", "", model, -1);
-            block.UnknownFunction4b7f10("Availability", 1, &availability);
+            block.SelectSection(key);
+            block.GetInt("NumberOfBikes", 0, &manufacturerBikeCount);
+            block.GetString("Name", "(no name)", name, -1);
+            block.GetString("UIModelFile", "", uiModel, -1);
+            block.GetString("ModelFile", "", model, -1);
+            block.GetInt("Availability", 1, &availability);
             manufacturers = ResizeDebugBlock(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             int length = strlen(name);
             int n = length > 63 ? 63 : length;
@@ -727,9 +727,9 @@ void KrustyUI::LoadBikesAndRiders() {
                 char bikeName[260];
                 char texture[260];
                 sprintf(key, "BikeName_%02d", j);
-                block.UnknownFunction4b7ec0(key, "(no name)", bikeName, -1);
+                block.GetString(key, "(no name)", bikeName, -1);
                 sprintf(key, "BikeTexture_%02d", j);
-                block.UnknownFunction4b7ec0(key, "", texture, -1);
+                block.GetString(key, "", texture, -1);
                 bikes = ResizeDebugBlock(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].manufacturer = manufacturerCount;
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].field_0x88 = 0;
@@ -742,19 +742,19 @@ void KrustyUI::LoadBikesAndRiders() {
                 strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture, texture, n);
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture[n] = 0;
                 sprintf(key, "BikeEngineSize_%02d", j);
-                block.UnknownFunction4b7f10(key, 250, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].engineSize);
+                block.GetInt(key, 250, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].engineSize);
                 sprintf(key, "BikeFourStroke_%02d", j);
-                block.UnknownFunction4b7f10(key, 0, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].fourStroke);
+                block.GetInt(key, 0, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].fourStroke);
                 bikeCount++;
             }
             manufacturerCount++;
         }
     }
-    if (stream->UnknownFunction460f50("riders.pb", "r", 0)) {
-        block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-        block.UnknownFunction4b78f0("Information");
+    if (stream->Open("riders.pb", "r", 0)) {
+        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.SelectSection("Information");
         int count;
-        block.UnknownFunction4b7f10("NumberOfRiders", 0, &count);
+        block.GetInt("NumberOfRiders", 0, &count);
         for (int i = 1; i <= count; i++) {
             if (i != 42 && i != 44)
                 continue;
@@ -762,10 +762,10 @@ void KrustyUI::LoadBikesAndRiders() {
             char riderName[260];
             char file[260];
             sprintf(key, "Rider_%02d", i);
-            block.UnknownFunction4b78f0(key);
-            block.UnknownFunction4b7ec0("Name", "(no name)", riderName, -1);
-            block.UnknownFunction4b7ec0("File", "", file, -1);
-            block.UnknownFunction4b7f10("Availability", 1, &availability);
+            block.SelectSection(key);
+            block.GetString("Name", "(no name)", riderName, -1);
+            block.GetString("File", "", file, -1);
+            block.GetInt("Availability", 1, &availability);
             riders = ResizeDebugBlock(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             ((UnknownKrustyUIModelEntry*)riders)[riderCount].uiModel = 0;
             int length = strlen(riderName);
@@ -798,7 +798,7 @@ int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
         path[count] = 0;
     }
     UnknownTextureStream* stream = new(__FILE__, 1369) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (stream->UnknownFunction460f50(path, "r", 0)) {
+    if (stream->Open(path, "r", 0)) {
         delete stream;
         UNKNOWN_COPY_SIZED(text, path, size);
         return 1;
@@ -828,7 +828,7 @@ int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
         path[count] = 0;
     }
     UnknownTextureStream* stream = new(__FILE__, 1411) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (stream->UnknownFunction460f50(path, "r", 0)) {
+    if (stream->Open(path, "r", 0)) {
         delete stream;
         UNKNOWN_COPY_SIZED(text, path, size);
         return 1;
@@ -923,7 +923,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
 // 0x0049b020
 void KrustyUI::UnknownFunction49b020(const char** names, int count) {
     int* used = (int*)DebugCalloc(36, sizeof(int), __FILE__, 1120);
-    srand(UnknownFunction4bfa80());
+    srand(ReadClock());
     for (int i = count; i > 0; i--) {
         int index = (int)(RandomUnit() * 36);
         if (index >= 35)
@@ -953,7 +953,7 @@ void KrustyUI::UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoi
     int* usedRiders = (int*)DebugCalloc(riderCount, sizeof(int), __FILE__, 1165);
     int playerClass = UnknownBikeClassOf(
         ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.field_0xfd8)->field_0x00);
-    srand(UnknownFunction4bfa80());
+    srand(ReadClock());
     int i;
     for (i = 0; i < riderCount; i++) {
         int type = ((UnknownKrustyUIModelEntry*)riders)[i].availability;

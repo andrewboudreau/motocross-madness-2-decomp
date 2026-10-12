@@ -212,7 +212,7 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
         name[length] = 0;
         strcpy(strstr(name, ".est"), ".esb");
         UnknownTextureStream* probe = new(__FILE__, 0x2eb) UnknownTextureStream(g_UnknownResourceManager572b44);
-        if (probe->UnknownFunction460f50(name, "rb", 0))
+        if (probe->Open(name, "rb", 0))
             strcpy(strstr(path, ".est"), ".esb");
         delete probe;
     }
@@ -916,21 +916,21 @@ int EcoSystem::UnknownVirtualSlot14() {
             g_UnknownGlobal56a128 = overlay->field_0x26c0++;
         g_UnknownGlobal59aef0.Record(g_UnknownGlobal59aee8);
         g_UnknownGlobal59aec8.Record(g_UnknownGlobal59aee4);
-        g_TrackGame->field_0x38->UnknownFunction447fa0(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
+        g_TrackGame->field_0x38->Title(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
                                                        g_UnknownGlobal59af08, g_UnknownGlobal59af04);
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Memory %d",
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Memory %d",
                                                        g_MemTagStack->UnknownFunction4a2d20("EcoSystem"));
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
                                                        g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.Peak());
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
                                                        g_UnknownGlobal59aee4, g_UnknownGlobal59aec0,
                                                        g_UnknownGlobal59aec8.Peak());
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Transforms %d",
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
-        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Triangles  %d",
+        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Total Triangles  %d",
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);

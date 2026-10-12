@@ -4,7 +4,7 @@
 MouseDevice::MouseDevice() : PCInputDevice(1) {
     for (int j = 0; j < 2; j++)
         axisBindings[j].Init(1, 1);
-    unsigned int stamp = UnknownFunction4bfa80();
+    unsigned int stamp = ReadClock();
     for (int i = 0; i < 4; i++) {
         buttonStates[i].state = 0;
         buttonStates[i].releaseTime = stamp;

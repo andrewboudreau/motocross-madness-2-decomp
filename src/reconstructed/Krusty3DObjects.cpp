@@ -198,7 +198,7 @@ void VisualCue::CollectRacers(UnknownVisualCueView* view) {
     cueRacerCount = 0;
     iterator = 0;
     cueView = view;
-    while ((racer = cueView->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = cueView->NextBike(&iterator)) != 0) {
         cueRacers[cueRacerCount] = racer;
         cueRacerCount++;
     }
@@ -212,12 +212,12 @@ int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     for (int i = 0; i < cueRacerCount; i++)
         if (cueRacers[i]->UnknownIsEnabled())
             active++;
-    if (UnknownFunction43caa0(0x14, 0, event, 0x80000000) && !cueView->field_0x190 &&
+    if (TestInputEvent(0x14, 0, event, 0x80000000) && !cueView->field_0x190 &&
         cueView->racing && active > 1) {
         field_0xbc = 1 - field_0xbc;
         return 1;
     }
-    if (UnknownFunction43caa0(0xd2, 0, event, 0x80000000)) {
+    if (TestInputEvent(0xd2, 0, event, 0x80000000)) {
         if (++currentRacer >= active)
             currentRacer = 0;
         if (currentRacer == skippedRacer) {
@@ -226,7 +226,7 @@ int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         }
         return 1;
     }
-    if (UnknownFunction43caa0(0xd3, 0, event, 0x80000000)) {
+    if (TestInputEvent(0xd3, 0, event, 0x80000000)) {
         if (--currentRacer < 0)
             currentRacer = active - 1;
         if (currentRacer == skippedRacer) {

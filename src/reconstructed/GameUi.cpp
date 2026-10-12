@@ -314,7 +314,7 @@ int UIAnim::AddFrame(UIFrame* frame) {
 // 0x00472fe0: steps to the next frame once the frame delay has passed (or at
 // once past a sound frame), bouncing or looping as the pass count says.
 UIFrame* UIAnim::Advance() {
-    int now = UnknownFunction4bfa80();
+    int now = ReadClock();
     g_UnknownGlobal65b5c8 = now;
     if (abs(now - lastStepTime) > frameDelay || frameList[currentFrame]->isSound == 1) {
         lastStepTime = now;
@@ -3817,7 +3817,7 @@ void UIListBox::ReportClick(int* handled) {
         *handled = 0;
     if (!event.handled) {
         static unsigned int s_doubleClickTime = GetDoubleClickTime();
-        g_UnknownGlobal65b59c = UnknownFunction4bfa80();
+        g_UnknownGlobal65b59c = ReadClock();
         if (selectedRow == lastClickRow && g_UnknownGlobal65b59c - lastClickTime <= s_doubleClickTime) {
             event.kind = kDialogListDoubleClick;
             event.code = eventCode;
@@ -3976,7 +3976,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         resourceArchive = g_UnknownResourceManager572b44->AddArchive(path, 0);
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
         UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (stream->UnknownFunction460f50(path, "r", 0)) {
+        if (stream->Open(path, "r", 0)) {
             if (!UnknownFunction46a920(stream, 0)) {
                 delete stream;
                 UnknownFunction46ff60();
@@ -5205,7 +5205,7 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 ButtonUp(0, 0);
                 return 1;
             }
-            if (UnknownFunction43caa0(0x32, event->kind, event, 0x80) &&
+            if (TestInputEvent(0x32, event->kind, event, 0x80) &&
                 ownerDialog->guiUser->field_0x1dc == (int)this)
                 moveable = 1;
         }

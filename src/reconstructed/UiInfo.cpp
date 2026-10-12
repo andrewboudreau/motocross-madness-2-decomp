@@ -630,26 +630,26 @@ void TrackGameMode::LoadBonusTrackNames() {
         bonusTrackUnlocked[i] = 0;
         bonusTrackNames[i][0] = 0;
     }
-    if (stream->UnknownFunction460f50("PCSched.pb", "r", 0)) {
+    if (stream->Open("PCSched.pb", "r", 0)) {
         int track;
 
-        block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-        block.UnknownFunction4b78f0("Enduro");
-        block.UnknownFunction4b7f10("BonusTrack", 0, &track);
+        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.SelectSection("Enduro");
+        block.GetInt("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[5], -1);
-        block.UnknownFunction4b78f0("Baja");
-        block.UnknownFunction4b7f10("BonusTrack", 0, &track);
+        block.GetString(key, "", bonusTrackNames[5], -1);
+        block.SelectSection("Baja");
+        block.GetInt("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[1], -1);
-        block.UnknownFunction4b78f0("Nationals");
-        block.UnknownFunction4b7f10("BonusTrack", 0, &track);
+        block.GetString(key, "", bonusTrackNames[1], -1);
+        block.SelectSection("Nationals");
+        block.GetInt("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[2], -1);
-        block.UnknownFunction4b78f0("Supercross");
-        block.UnknownFunction4b7f10("BonusTrack", 0, &track);
+        block.GetString(key, "", bonusTrackNames[2], -1);
+        block.SelectSection("Supercross");
+        block.GetInt("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[3], -1);
+        block.GetString(key, "", bonusTrackNames[3], -1);
     }
     if (stream)
         delete stream;

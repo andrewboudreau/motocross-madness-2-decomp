@@ -191,13 +191,13 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
 {
     char name[256];
 
-    if (UnknownFunction43caa0(0x57, 0, event, 3) && !g_TrackGame->field_0x2d0) {
+    if (TestInputEvent(0x57, 0, event, 3) && !g_TrackGame->field_0x2d0) {
         renderFog = 1 - renderFog;
         sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->driverGuidText);
         g_TrackGame->SetRegistryFlag(name, renderFog);
         return 1;
     }
-    if (UnknownFunction43caa0(0x21, 0, event, 0x80)) {
+    if (TestInputEvent(0x21, 0, event, 0x80)) {
         visibilityOffset += 0.1f;
         if (visibilityOffset > 1.0f) {
             visibilityOffset = 1.0f;
@@ -209,7 +209,7 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
         UnknownFunction4627a0(field_0x2c, visibility, field_0x40);
         return 1;
     }
-    if (UnknownFunction43caa0(0x22, 0, event, 0x80)) {
+    if (TestInputEvent(0x22, 0, event, 0x80)) {
         visibilityOffset -= 0.1f;
         if (visibilityOffset < 0.0f) {
             visibilityOffset = 0;

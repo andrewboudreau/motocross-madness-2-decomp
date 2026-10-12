@@ -45,7 +45,7 @@ unsigned int __stdcall ReceiveThreadProc(void* arg)
     while ((signalled = WaitForMultipleObjects(3, events, FALSE, INFINITE)) != 2) {
         switch (signalled) {
         case 0: {
-            long result = ReceiveMessages(UnknownFunction4bfa80());
+            long result = ReceiveMessages(ReadClock());
             if (result != 0) {
                 ReportDirectPlayError(result, __FILE__, 81);
                 goto done;
@@ -54,12 +54,12 @@ unsigned int __stdcall ReceiveThreadProc(void* arg)
         }
         case 1:
             index = 0;
-            s_LastKeepAliveTime = s_KeepAliveTime = UnknownFunction4bfa80();
+            s_LastKeepAliveTime = s_KeepAliveTime = ReadClock();
             while (IsKeepAliveRunning(net)) {
-                ReceiveMessages(UnknownFunction4bfa80());
+                ReceiveMessages(ReadClock());
                 if (net->isHost) {
                     EnterCriticalSection(NET_LOCK(net->keepAliveLock));
-                    s_KeepAliveTime = UnknownFunction4bfa80();
+                    s_KeepAliveTime = ReadClock();
                     index = 0;
                     NetPlayer* player;
                     while ((player = net->NextPlayer(&index)) != 0) {

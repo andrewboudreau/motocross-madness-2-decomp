@@ -303,21 +303,21 @@ UnknownTgaFile* ReadTgaHeader(UnknownTextureStream* stream, UnknownTgaFile* file
     file->name[0] = 0;
     if (offset == 0) {
         if (stream->field_0x1c)
-            stream->UnknownFunction461340(stream->field_0x130, 0, 0);
+            stream->Seek(stream->field_0x130, 0, 0);
     } else if (offset > 0) {
-        stream->UnknownFunction461340(offset, 0, 1);
+        stream->Seek(offset, 0, 1);
     }
-    if (stream->UnknownFunction461640(&file->idLength, 1, 1) != 1 ||
-        stream->UnknownFunction461640(&file->colorMapType, 1, 1) != 1 ||
-        stream->UnknownFunction461640(&file->imageType, 1, 1) != 1 ||
-        stream->UnknownFunction461640(&file->colorMapStart, 2, 1) != 1 ||
-        stream->UnknownFunction461640(&file->colorMapLength, 2, 1) != 1 ||
-        stream->UnknownFunction461640(&file->colorMapDepth, 1, 1) != 1 ||
-        stream->UnknownFunction461640(&file->x, 2, 1) != 1 || stream->UnknownFunction461640(&file->y, 2, 1) != 1 ||
-        stream->UnknownFunction461640(&file->width, 2, 1) != 1 ||
-        stream->UnknownFunction461640(&file->height, 2, 1) != 1 ||
-        stream->UnknownFunction461640(&file->bitsPerPixel, 1, 1) != 1 ||
-        stream->UnknownFunction461640(&file->descriptor, 1, 1) != 1)
+    if (stream->Read(&file->idLength, 1, 1) != 1 ||
+        stream->Read(&file->colorMapType, 1, 1) != 1 ||
+        stream->Read(&file->imageType, 1, 1) != 1 ||
+        stream->Read(&file->colorMapStart, 2, 1) != 1 ||
+        stream->Read(&file->colorMapLength, 2, 1) != 1 ||
+        stream->Read(&file->colorMapDepth, 1, 1) != 1 ||
+        stream->Read(&file->x, 2, 1) != 1 || stream->Read(&file->y, 2, 1) != 1 ||
+        stream->Read(&file->width, 2, 1) != 1 ||
+        stream->Read(&file->height, 2, 1) != 1 ||
+        stream->Read(&file->bitsPerPixel, 1, 1) != 1 ||
+        stream->Read(&file->descriptor, 1, 1) != 1)
         goto failed;
     if ((file->bitsPerPixel == 16 || file->bitsPerPixel == 24 || file->bitsPerPixel == 32) &&
         (file->imageType == 2 || file->imageType == 10))
@@ -335,7 +335,7 @@ failed:
 // reads its header; 0 when it cannot be opened.
 UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int a) {
     UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream(a);
-    if (!stream->UnknownFunction460f50(path, "rb", 0)) {
+    if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;
     }
@@ -397,7 +397,7 @@ int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
     UnknownPixel24* pixel = (UnknownPixel24*)file->bits;
     UnknownPixel24* end = (UnknownPixel24*)((unsigned char*)pixel + size);
     if (file->imageType == 2) {
-        if (stream->UnknownFunction461640(pixel, 3, count) != count)
+        if (stream->Read(pixel, 3, count) != count)
             return 0;
         for (int i = 0; i < count; i++, pixel++)
             SwapBytes(pixel->red, pixel->blue);
@@ -407,7 +407,7 @@ int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
             int packet = stream->UnknownFunction461980();
             if (packet & 0x80) {
                 packet &= 0x7f;
-                if (stream->UnknownFunction461640(&color, 3, 1) != 1)
+                if (stream->Read(&color, 3, 1) != 1)
                     return 0;
                 SwapBytes(color.red, color.blue);
                 do
@@ -415,7 +415,7 @@ int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
                 while (packet--);
             } else {
                 packet++;
-                if (stream->UnknownFunction461640(pixel, 3, packet) != packet)
+                if (stream->Read(pixel, 3, packet) != packet)
                     return 0;
                 for (int i = 0; i < packet; i++)
                     SwapBytes(pixel[i].red, pixel[i].blue);
@@ -470,7 +470,7 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
     UnknownPixel32* pixel = (UnknownPixel32*)file->bits;
     UnknownPixel32* end = (UnknownPixel32*)((unsigned char*)pixel + size);
     if (file->imageType == 2) {
-        if (stream->UnknownFunction461640(pixel, 4, count) != count)
+        if (stream->Read(pixel, 4, count) != count)
             return 0;
         for (int i = 0; i < count; i++, pixel++)
             SwapBytes(pixel->red, pixel->blue);
@@ -480,7 +480,7 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
             int packet = stream->UnknownFunction461980();
             if (packet & 0x80) {
                 packet &= 0x7f;
-                if (stream->UnknownFunction461640(&color, 4, 1) != 1)
+                if (stream->Read(&color, 4, 1) != 1)
                     return 0;
                 SwapBytes(color.red, color.blue);
                 do
@@ -489,7 +489,7 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
             } else {
                 packet++;
                 do {
-                    if (stream->UnknownFunction461640(pixel, 4, 1) != 1)
+                    if (stream->Read(pixel, 4, 1) != 1)
                         return 0;
                     unsigned char red = pixel->red;
                     pixel->red = pixel->blue;
@@ -547,7 +547,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
     unsigned short* end = pixel + count;
     if (file->imageType == 2) {
         for (int row = 0; row < file->height; row++) {
-            if (stream->UnknownFunction461640(pixel, 2, file->width) != file->width)
+            if (stream->Read(pixel, 2, file->width) != file->width)
                 return 0;
             pixel += file->width;
         }
@@ -557,14 +557,14 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
             int packet = stream->UnknownFunction461980();
             if (packet & 0x80) {
                 packet &= 0x7f;
-                if (stream->UnknownFunction461640(&color, 2, 1) != 1)
+                if (stream->Read(&color, 2, 1) != 1)
                     return 0;
                 do
                     *pixel++ = color;
                 while (packet--);
             } else {
                 packet++;
-                if (stream->UnknownFunction461640(pixel, 2, packet) != packet)
+                if (stream->Read(pixel, 2, packet) != packet)
                     return 0;
                 pixel += packet;
             }
@@ -603,7 +603,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
 // its own path.
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int a) {
     UnknownTextureStream* stream = new(__FILE__, 567) UnknownTextureStream(a);
-    if (!stream->UnknownFunction460f50(path, "rb", 0)) {
+    if (!stream->Open(path, "rb", 0)) {
         delete stream;
         return 0;
     }

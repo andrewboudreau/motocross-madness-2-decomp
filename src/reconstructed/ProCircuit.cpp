@@ -43,22 +43,22 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
     char line[64];
     float defaults[9];
 
-    if (stream->UnknownFunction460f50("PCTables.pb", "r", 0)) {
-        block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-        block.UnknownFunction4b78f0("ProCircuit");
-        block.UnknownFunction4b7f10("StartingCapital", 5000, &field_0x1225);
-        block.UnknownFunction4b7f10("EnduroFee", 300, &field_0x1229[5]);
-        block.UnknownFunction4b7f10("BajaFee", 500, &field_0x1229[1]);
-        block.UnknownFunction4b7f10("NationalsFee", 1500, &field_0x1229[2]);
-        block.UnknownFunction4b7f10("SupercrossFee", 2500, &field_0x1229[3]);
-        block.UnknownFunction4b7f40("PurseMultiplier", 17.5f, &field_0x1241);
-        block.UnknownFunction4b7f40("RepairCapPct", 0.1f, &field_0x1245);
-        block.UnknownFunction4b7f40("MedicalCapPct", 0.05f, &field_0x1249);
-        block.UnknownFunction4b7f40("StuntCapPct", 0.075f, &field_0x124d);
+    if (stream->Open("PCTables.pb", "r", 0)) {
+        block.Attach((UnknownParameterStream*)stream, 0, 1);
+        block.SelectSection("ProCircuit");
+        block.GetInt("StartingCapital", 5000, &field_0x1225);
+        block.GetInt("EnduroFee", 300, &field_0x1229[5]);
+        block.GetInt("BajaFee", 500, &field_0x1229[1]);
+        block.GetInt("NationalsFee", 1500, &field_0x1229[2]);
+        block.GetInt("SupercrossFee", 2500, &field_0x1229[3]);
+        block.GetFloat("PurseMultiplier", 17.5f, &field_0x1241);
+        block.GetFloat("RepairCapPct", 0.1f, &field_0x1245);
+        block.GetFloat("MedicalCapPct", 0.05f, &field_0x1249);
+        block.GetFloat("StuntCapPct", 0.075f, &field_0x124d);
         float total = 0.0f;
         for (int i = 0; i < 11; i++) {
             sprintf(key, "%d_PlacePct", i + 1);
-            block.UnknownFunction4b7f40(key, 0.0f, &field_0x1251[i]);
+            block.GetFloat(key, 0.0f, &field_0x1251[i]);
             total += field_0x1251[i];
         }
         if (total <= 1.0f)
@@ -106,17 +106,17 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
         fclose(file);
     }
 
-    if (stream->UnknownFunction460f50("PCSched.pb", "r", 0)) {
-        block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
+    if (stream->Open("PCSched.pb", "r", 0)) {
+        block.Attach((UnknownParameterStream*)stream, 0, 1);
         field_0x1285[0].field_0x00 = 0;
         field_0x1285[4].field_0x00 = 0;
-        block.UnknownFunction4b78f0("Enduro");
+        block.SelectSection("Enduro");
         UnknownFunction4d4420(&block, &field_0x1285[5], "Teraform\\Enduro");
-        block.UnknownFunction4b78f0("Baja");
+        block.SelectSection("Baja");
         UnknownFunction4d4420(&block, &field_0x1285[1], "Teraform\\Baja");
-        block.UnknownFunction4b78f0("Nationals");
+        block.SelectSection("Nationals");
         UnknownFunction4d4420(&block, &field_0x1285[2], "Teraform\\National");
-        block.UnknownFunction4b78f0("Supercross");
+        block.SelectSection("Supercross");
         UnknownFunction4d4420(&block, &field_0x1285[3], "Teraform\\SX");
     } else {
         for (int i = 0; i < 6; i++) {
@@ -190,7 +190,7 @@ void UnknownTrackGameObject3444::UnknownFunction4d3b00(const char* name, int a, 
     zero.field_0x00 = 0;
     zero.field_0x14 = 0;
     int* used = (int*)DebugCalloc(field_0x1281, 4, __FILE__, 203);
-    srand(UnknownFunction4bfa80());
+    srand(ReadClock());
     PickComputerRacers();
 
     for (int i = 0; i < field_0x460; i++) {
@@ -349,8 +349,8 @@ int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* blo
                                                       UnknownProCircuitSchedule* schedule,
                                                       const char* directory)
 {
-    block->UnknownFunction4b7f10("NumberOfTracks", 0, &schedule->field_0x04);
-    block->UnknownFunction4b7f10("Laps", 3, &schedule->field_0x0c);
+    block->GetInt("NumberOfTracks", 0, &schedule->field_0x04);
+    block->GetInt("Laps", 3, &schedule->field_0x0c);
     if (schedule->field_0x04) {
         schedule->field_0x00 =
             (UnknownProCircuitTrack*)DebugMalloc(schedule->field_0x04 * sizeof(UnknownProCircuitTrack), __FILE__, 433);
@@ -359,7 +359,7 @@ int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* blo
             char value[64];
             char path[128];
             sprintf(key, "Track_%d", i + 1);
-            block->UnknownFunction4b7ec0(key, "", value, -1);
+            block->GetString(key, "", value, -1);
             schedule->field_0x00[i].field_0x00 = (char*)DebugMalloc(strlen(value) + 1, __FILE__, 438);
             sprintf(schedule->field_0x00[i].field_0x00, "%s", value);
             g_TrackGame->mode.FindFileDirectory((int)directory, schedule->field_0x00[i].field_0x00,
@@ -376,7 +376,7 @@ int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* blo
     } else {
         schedule->field_0x00 = 0;
     }
-    block->UnknownFunction4b7f10("BonusTrack", 0, &schedule->field_0x08);
+    block->GetInt("BonusTrack", 0, &schedule->field_0x08);
     return 1;
 }
 

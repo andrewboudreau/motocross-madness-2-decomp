@@ -164,16 +164,16 @@ void UnknownParameterBlock::UnknownFunction4b7220(UnknownParameterStream* stream
                 stream->field_0x12c->AddLooseFile(name, path);
             entry = stream->field_0x12c->FindItem(name, 0);
             if (!entry) {
-                UnknownFunction4b77a0(stream, 0, index);
+                Attach(stream, 0, index);
                 return;
             }
-            UnknownFunction4b77a0(entry->field_0x14, entry->field_0x18, index);
+            Attach(entry->field_0x14, entry->field_0x18, index);
             return;
         }
-        UnknownFunction4b77a0(entry->field_0x14, entry->field_0x18, index);
+        Attach(entry->field_0x14, entry->field_0x18, index);
         return;
     }
-    UnknownFunction4b77a0(stream, 0, index);
+    Attach(stream, 0, index);
 }
 
 // Scans forward for `[name]` and loads the section's non-empty,
@@ -190,7 +190,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
     if (!field_0x008)
         return 0;
     for (;;) {
-        if (!field_0x000->UnknownFunction461aa0(line, PB_LINE_SIZE))
+        if (!field_0x000->ReadLine(line, PB_LINE_SIZE))
             return 0;
         UnknownFunction4b8360(line, stripped);
         if (stripped[0] == '[') {
@@ -211,7 +211,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
     int length = PB_MIN(PB_LINE_SIZE - 1, nameLength);
     strncpy(field_0x130, name, length);
     field_0x130[length] = 0;
-    while (field_0x000->UnknownFunction461aa0(line, PB_LINE_SIZE)) {
+    while (field_0x000->ReadLine(line, PB_LINE_SIZE)) {
         UnknownFunction4b8360(line, stripped);
         if (stripped[0] == '[')
             break;
@@ -244,7 +244,7 @@ void UnknownParameterBlock::UnknownFunction4b7560(UnknownParameterStream* stream
     char line[PB_LINE_SIZE];
     int lineIndex = 0;
 
-    while (stream->UnknownFunction461aa0(line, PB_LINE_SIZE)) {
+    while (stream->ReadLine(line, PB_LINE_SIZE)) {
         UnknownFunction4b8360(line, stripped);
         if (stripped[0] == '[') {
             int length = strcspn(stripped + 1, "]\n\r");
@@ -264,7 +264,7 @@ void UnknownParameterBlock::UnknownFunction4b7560(UnknownParameterStream* stream
                     field_0x11c = 10;
                 }
                 strcpy(field_0x120[field_0x118].name, header);
-                field_0x120[field_0x118].offset = stream->UnknownFunction461600();
+                field_0x120[field_0x118].offset = stream->Tell();
                 field_0x120[field_0x118].lineCount = lineIndex;
                 field_0x120[field_0x118].mode = stream->UnknownFunction43e9e0();
                 if (field_0x118 > 0)
@@ -280,7 +280,7 @@ void UnknownParameterBlock::UnknownFunction4b7560(UnknownParameterStream* stream
             lineIndex - field_0x120[field_0x118 - 1].lineCount - 1;
 }
 
-void UnknownParameterBlock::UnknownFunction4b77a0(UnknownParameterStream* stream, int offset,
+void UnknownParameterBlock::Attach(UnknownParameterStream* stream, int offset,
                                                   int index)
 {
     field_0x124 = offset;
@@ -293,7 +293,7 @@ void UnknownParameterBlock::UnknownFunction4b77a0(UnknownParameterStream* stream
         field_0x120 = 0;
         field_0x118 = 0;
     }
-    stream->UnknownFunction461340(stream->field_0x130 + field_0x124, 0, 0);
+    stream->Seek(stream->field_0x130 + field_0x124, 0, 0);
     if (index)
         UnknownFunction4b7560(stream);
     field_0x530 = 0;
@@ -319,7 +319,7 @@ void UnknownParameterBlock::UnknownFunction4b7890()
 
 // Without an index it rewinds and scans; with one it seeks to the section
 // and reads its recorded line count.
-int UnknownParameterBlock::UnknownFunction4b78f0(const char* name)
+int UnknownParameterBlock::SelectSection(const char* name)
 {
     char stripped[PB_LINE_SIZE];
     char line[PB_LINE_SIZE];
@@ -327,14 +327,14 @@ int UnknownParameterBlock::UnknownFunction4b78f0(const char* name)
     if (!field_0x008)
         return 0;
     if (!field_0x120) {
-        field_0x000->UnknownFunction461340(field_0x000->field_0x130 + field_0x124, 0, 0);
+        field_0x000->Seek(field_0x000->field_0x130 + field_0x124, 0, 0);
         field_0x000->UnknownFunction461d20();
         return UnknownFunction4b72c0(name);
     }
     int index = UnknownFunction4b7830(name);
     if (index == -1)
         return 0;
-    field_0x000->UnknownFunction461340(field_0x120[index].offset, 0, 0);
+    field_0x000->Seek(field_0x120[index].offset, 0, 0);
     field_0x000->UnknownFunction43e9b0(field_0x120[index].mode);
     if (field_0x12c)
         UnknownFunction4b7890();
@@ -346,7 +346,7 @@ int UnknownParameterBlock::UnknownFunction4b78f0(const char* name)
     strncpy(field_0x130, name, length);
     field_0x130[length] = 0;
     for (int i = 0; i < count; i++) {
-        field_0x000->UnknownFunction461aa0(line, PB_LINE_SIZE);
+        field_0x000->ReadLine(line, PB_LINE_SIZE);
         UnknownFunction4b8360(line, stripped);
         if (stripped[0] != 0 && stripped[0] != ';') {
             field_0x12c[field_0x128] = new (__FILE__, 471) char[PB_LINE_SIZE];
@@ -361,7 +361,7 @@ int UnknownParameterBlock::UnknownFunction4b78f0(const char* name)
 // Looks `key` up among the loaded `key=value` lines, strips one pair of
 // quotes and copies at most `size` characters (-1: unbounded). The clamps
 // need the length in its own local and the limit first in the min.
-int UnknownParameterBlock::UnknownFunction4b7b30(const char* key, char* out, int size)
+int UnknownParameterBlock::ReadString(const char* key, char* out, int size)
 {
     char text[PB_LINE_SIZE];
     char name[PB_LINE_SIZE];
@@ -403,7 +403,7 @@ int UnknownParameterBlock::UnknownFunction4b7cf0(const char* key, int* out)
     char* end;
     char text[PB_LINE_SIZE];
 
-    if (UnknownFunction4b7b30(key, text, -1)) {
+    if (ReadString(key, text, -1)) {
         if (_strnicmp(text, "T", 1) == 0) {
             *out = 1;
             return 1;
@@ -438,23 +438,23 @@ int UnknownParameterBlock::UnknownFunction4b7e70(const char* key, float* out)
 {
     char text[PB_LINE_SIZE];
 
-    if (UnknownFunction4b7b30(key, text, -1)) {
+    if (ReadString(key, text, -1)) {
         *out = (float)atof(text);
         return 1;
     }
     return 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b7ec0(const char* key, const char* def, char* out,
+int UnknownParameterBlock::GetString(const char* key, const char* def, char* out,
                                                  int size)
 {
-    if (UnknownFunction4b7b30(key, out, size))
+    if (ReadString(key, out, size))
         return 1;
     strcpy(out, def);
     return 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b7f10(const char* key, int def, int* out)
+int UnknownParameterBlock::GetInt(const char* key, int def, int* out)
 {
     if (UnknownFunction4b7cf0(key, out))
         return 1;
@@ -462,7 +462,7 @@ int UnknownParameterBlock::UnknownFunction4b7f10(const char* key, int def, int* 
     return 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b7f40(const char* key, float def, float* out)
+int UnknownParameterBlock::GetFloat(const char* key, float def, float* out)
 {
     if (UnknownFunction4b7e70(key, out))
         return 1;
@@ -475,7 +475,7 @@ int UnknownParameterBlock::UnknownFunction4b7f70(const char* name)
 {
     int index = UnknownFunction4b7830(name);
     if (UnknownFunction4b7830(name) != -1) {
-        field_0x000->UnknownFunction461340(field_0x120[index].offset, 0, 0);
+        field_0x000->Seek(field_0x120[index].offset, 0, 0);
         field_0x000->UnknownFunction43e9b0(field_0x120[index].mode);
         field_0x530 = 1;
         field_0x53c = 0;
@@ -500,7 +500,7 @@ int UnknownParameterBlock::UnknownFunction4b8010(char* raw)
             DebugFree(field_0x544[i].s, __FILE__, 802);
         field_0x544[i].s = 0;
     }
-    field_0x000->UnknownFunction461aa0(line, PB_LINE_SIZE);
+    field_0x000->ReadLine(line, PB_LINE_SIZE);
     if (raw)
         strcpy(raw, line);
     UnknownFunction4b8360(line, stripped);

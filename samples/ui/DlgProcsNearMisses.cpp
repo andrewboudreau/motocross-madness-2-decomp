@@ -398,13 +398,13 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         bikes->GetRowData(-1);
         switch (rand() % 3) {
         case 0:
-            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookLeftR");
+            g_TrackGame->ui->riderPreview->SetMotionByName("LookLeftR");
             break;
         case 1:
-            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookRightR");
+            g_TrackGame->ui->riderPreview->SetMotionByName("LookRightR");
             break;
         case 2:
-            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("StretchR");
+            g_TrackGame->ui->riderPreview->SetMotionByName("StretchR");
             break;
         }
         idleMotionPlaying = 0;
@@ -412,7 +412,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);
-        g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("WaitR");
+        g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
         idleMotionPlaying = 1;
     }
     if (dialogBackground)

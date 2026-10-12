@@ -753,7 +753,7 @@ int NetworkInterface::StartKeepAlive(float a, float b)
     keepAliveTimeout = a;
     keepAliveInterval = b;
     int index = 0;
-    unsigned int time = UnknownFunction4bfa80();
+    unsigned int time = ReadClock();
     NetPlayer* player;
     while ((player = NextPlayer(&index)) != 0)
         player->lastKeepAliveTime = time;
@@ -1101,12 +1101,12 @@ int DebugSocket::Connect(const char* address, int port)
     }
     field_0x0c = 0;
     field_0x04 = -1;
-    int now = UnknownFunction4bfa80();
+    int now = ReadClock();
     int start = now;
     while (field_0x04 == -1) {
         field_0x04 = connect(field_0x00, (sockaddr*)&socketAddress, sizeof(socketAddress));
         if (field_0x04 == -1)
-            now = UnknownFunction4bfa80();
+            now = ReadClock();
         if (now - start > 2000)
             return 1;
     }

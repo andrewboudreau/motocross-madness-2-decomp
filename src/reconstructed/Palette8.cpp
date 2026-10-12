@@ -20,9 +20,9 @@ Palette8* Palette8::UnknownFunction4b6b30(const char* name) {
         ((Palette8*)entry->field_0x10)->AddRef();
         return (Palette8*)entry->field_0x10;
     }
-    entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+    entry->field_0x14->Seek(entry->field_0x18, 0, 0);
     palette = new(__FILE__, 46) Palette8(entry->field_0x14);
-    g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, palette);
+    g_UnknownResourceManager572b44->SetItemObject(entry, palette);
     return palette;
 }
 
@@ -37,17 +37,17 @@ Palette8::Palette8(UnknownTextureStream* stream) {
 
     field_0x708 = 0;
     field_0x70c = 0;
-    if (stream->UnknownFunction461640(&field_0x710, 4, 1) != 1)
+    if (stream->Read(&field_0x710, 4, 1) != 1)
         return;
-    if (stream->UnknownFunction461640(&field_0x714, 4, 1) != 1)
+    if (stream->Read(&field_0x714, 4, 1) != 1)
         return;
-    if (stream->UnknownFunction461640(&length, 4, 1) != 1)
+    if (stream->Read(&length, 4, 1) != 1)
         return;
     name = (char*)DebugRealloc(0, length, __FILE__, 67);
     if (!name)
         return;
-    if (stream->UnknownFunction461640(name, length, 1) != 1
-        || stream->UnknownFunction461640(field_0x008, sizeof(field_0x008), 1) != 1) {
+    if (stream->Read(name, length, 1) != 1
+        || stream->Read(field_0x008, sizeof(field_0x008), 1) != 1) {
         DebugFree(name, __FILE__, 73);
         return;
     }
@@ -94,7 +94,7 @@ Palette8::~Palette8() {
         field_0x70c->Release();
     if (field_0x708)
         field_0x708->Release();
-    entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
+    entry = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, 0);
+        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
 }

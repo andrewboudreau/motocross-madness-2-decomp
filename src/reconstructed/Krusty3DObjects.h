@@ -139,7 +139,7 @@ struct UnknownVisualCueCamera {
 // The view VisualCue follows (its +0xa8; RaceView.h's UnknownKrustyBikeView).
 struct UnknownVisualCueView {
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
-    UnknownVisualCueRacer* UnknownFunction4204e0(int* iterator);
+    UnknownVisualCueRacer* NextBike(int* iterator);
 
     unsigned char field_0x000[0x38];
     UnknownRunwayRacer* ownRacer;             // +0x38 its own racer

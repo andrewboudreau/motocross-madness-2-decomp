@@ -90,7 +90,7 @@ the game's file stream, and archives can redirect that stream.
 
 `0x004b7220`: retail keeps `this` in `ebx` and `path` in `ebp`, and saves
 `ebp` only around the not-found block. With the found call
-`UnknownFunction4b77a0(entry->field_0x14, entry->field_0x18, index)` written
+`Attach(entry->field_0x14, entry->field_0x18, index)` written
 once after the not-found block, VC6 swaps the two registers (144 of 157
 bytes); early returns, if/else, a top-declared entry, a local copy of the
 path, `== 0` comparisons, inline helpers for the lookups and a `self` copy of
@@ -114,6 +114,6 @@ python tools/compile.py src/reconstructed/Parameterblocks.cpp -o work/pb.obj \
   --vc6-root "$VC6_ROOT" --profile vc6_o2_mt
 python tools/match.py --exe work/game/mcm2.exe --target-va 0x004b7b30 \
   --target-size 437 --obj work/pb.obj \
-  --symbol '?UnknownFunction4b7b30@UnknownParameterBlock@@QAEHPBDPADH@Z' \
+  --symbol '?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z' \
   --bindings src/reconstructed/Parameterblocks.bindings.json --json
 ```

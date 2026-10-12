@@ -413,7 +413,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
 // at the top of this file.
 
 // 0x0040ae30 (cdecl): the out-of-line dot product.
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b);
+float Vec3Dot(const Vector3* a, const Vector3* b);
 // 0x004a10e0 (cdecl): *out = v - 2 (v.n) n.
 void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out);
 
@@ -426,7 +426,7 @@ struct UnknownSoultreeStaticVector : Vector3 {
 
 static inline Vector3 NormalizedByCall(const Vector3& v)
 {
-    float squared = UnknownFunction40ae30(&v, &v);
+    float squared = Vec3Dot(&v, &v);
     if (squared == 1.0f)
         return v;
     float scale = FastInvSqrt(squared);

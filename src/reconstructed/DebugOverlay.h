@@ -64,8 +64,8 @@ public:
     int ShowNextPage();                                        // 0x004484f0: next page
     // 0x00447f40 and 0x00447fa0: format a row onto page `page` when that page
     // is shown (+0x25 bit 0 and +0x26c4); cdecl, `this` on the stack.
-    void UnknownFunction447f40(int page, const char* format, ...);
-    void UnknownFunction447fa0(int page, const char* format, ...);
+    void Print(int page, const char* format, ...);
+    void Title(int page, const char* format, ...);
     // 0x00448000 (ret 0xc): sets field_0x90 of row `row` on a shown page.
     void UnknownFunction448000(int page, int row, int flag);
     // 0x00448200 (ret 0x14): draws `length` characters of `text` at (x, y).

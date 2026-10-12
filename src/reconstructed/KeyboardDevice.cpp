@@ -4,7 +4,7 @@
 
 // 0x00489e30
 KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {
-    unsigned int stamp = UnknownFunction4bfa80();
+    unsigned int stamp = ReadClock();
     buttonCount = 256;
     for (int i = 0; i < 256; i++) {
         keyStates[i].state = 0;

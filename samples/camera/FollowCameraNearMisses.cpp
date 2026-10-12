@@ -152,10 +152,10 @@ inline void FollowCameraTiltBack(float& angle, float step) {
 // did not expand them there). See src/krusty2/math/Math3D.h, whose call views
 // describe the same addresses; names here are provisional.
 float FastInvSqrt(float value);                          // 0x00460c00: 1/sqrt approximation
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
+float Vec3Dot(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
 Vector3 Vec3ScaleCall(const Vector3& v, float scale);      // 0x005015b0: v * scale
-Vector3 UnknownFunction515600(const Vector3& a, const Vector3& b); // 0x00515600: cross product
-Vector3 UnknownFunction5087b0(const Vector3& v);                    // 0x005087b0: normalised copy
+Vector3 CrossProduct(const Vector3& a, const Vector3& b); // 0x00515600: cross product
+Vector3 Vec3Normalize(const Vector3& v);                    // 0x005087b0: normalised copy
 
 // Inline cross product (expanded by slot 46 and 0x004650e0). The parenthesised first
 // products put each fsubp between the load and the store of the previous component's copy,
@@ -166,7 +166,7 @@ inline Vector3 FollowCameraCross(const Vector3& a, const Vector3& b) {
 
 // Inline normalisation: unit-length vectors are returned unchanged.
 inline Vector3 FollowCameraNormalize(const Vector3& v) {
-    float lengthSquared = UnknownFunction40ae30(&v, &v);
+    float lengthSquared = Vec3Dot(&v, &v);
     if (lengthSquared == 1.0f)
         return v;
     float scale = FastInvSqrt(lengthSquared);
@@ -238,21 +238,21 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
 void FollowCamera::LoadCameraFile(const char* path) {
     UnknownTextureStream* stream =
         new(__FILE__, 0x3c7) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (!stream->UnknownFunction460f50(path, "rt", 0)) {
+    if (!stream->Open(path, "rt", 0)) {
         delete stream;
         return;
     }
     char line[256];
     frameCount = 0;
-    while (stream->UnknownFunction461aa0(line, 0xff)) {
+    while (stream->ReadLine(line, 0xff)) {
         if (!_strnicmp(line, "CAMERA", 6))
             frameCount++;
     }
     frames = new(__FILE__, 0x3e1) Matrix4[frameCount];
     field_0x33c = new(__FILE__, 0x3e2) float[frameCount];
-    stream->UnknownFunction461340(stream->field_0x130, 0, 1);
+    stream->Seek(stream->field_0x130, 0, 1);
     int k = 0;
-    while (stream->UnknownFunction461aa0(line, 0xff)) {
+    while (stream->ReadLine(line, 0xff)) {
         if (!_strnicmp(line, "CAMERA", 6)) {
             Vector3 direction;
             Vector3 upHint;
@@ -264,9 +264,9 @@ void FollowCamera::LoadCameraFile(const char* path) {
             Vector3 forward = direction;
             Vector3 side = FollowCameraCross(upHint, direction);
             Vector3 up = FollowCameraCross(direction, side);
-            up = UnknownFunction5087b0(up);
-            forward = UnknownFunction5087b0(forward);
-            side = UnknownFunction515600(up, forward);
+            up = Vec3Normalize(up);
+            forward = Vec3Normalize(forward);
+            side = CrossProduct(up, forward);
             frame->m[0][0] = side.x;
             frame->m[0][1] = side.y;
             frame->m[0][2] = side.z;

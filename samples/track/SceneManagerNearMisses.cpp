@@ -229,9 +229,9 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
 
     models = 0;
     staticModels = 0;
-    int found = parameters.UnknownFunction4b78f0("StaticModels");
+    int found = parameters.SelectSection("StaticModels");
     if (sceneManager->field_0x38c && found) {
-        if (!parameters.UnknownFunction4b7f10("NumberOfStaticModels", -1, &models)) {
+        if (!parameters.GetInt("NumberOfStaticModels", -1, &models)) {
             sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
                     scenePath);
             UnknownFunction464e80(text);
@@ -248,8 +248,8 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             progress(0);
         next = i + 1;
         sprintf(model, "Model%d", next);
-        parameters.UnknownFunction4b78f0(model);
-        if (!parameters.UnknownFunction4b7ec0("SLT", "", slt, 0x104)) {
+        parameters.SelectSection(model);
+        if (!parameters.GetString("SLT", "", slt, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", slt, model, scenePath);
             UnknownFunction464e80(message);
             return 0;
@@ -267,21 +267,21 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             colPath[0] = 0;
         }
         ReadVector(&position, model, "Position", "0.0,0.0,0.0", 0, 0);
-        if (parameters.UnknownFunction4b7f40("Heading", -999.0f, &heading)) {
-            parameters.UnknownFunction4b7f40("Pitch", 0, &pitch);
+        if (parameters.GetFloat("Heading", -999.0f, &heading)) {
+            parameters.GetFloat("Pitch", 0, &pitch);
             UnknownFunction4b5d00(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
         } else {
             ReadVector(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
             ReadVector(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
         }
         staticModels->casters[i].collisionObject = 0;
-        parameters.UnknownFunction4b7f10("PhysicsObject", 0, &physics);
+        parameters.GetInt("PhysicsObject", 0, &physics);
         if (physics) {
-            parameters.UnknownFunction4b7f10("NumberOfCollisionPoints", 0, &points);
-            parameters.UnknownFunction4b7f10("NumberOfEmitters", 0, &emitters);
-            parameters.UnknownFunction4b7f10("MinCollisionPointsToRestOn", 1, &minPoints);
-            parameters.UnknownFunction4b7f40("Radius", 1.0f, &radius);
-            parameters.UnknownFunction4b7ec0("ObjectShape", "", text, 0x80);
+            parameters.GetInt("NumberOfCollisionPoints", 0, &points);
+            parameters.GetInt("NumberOfEmitters", 0, &emitters);
+            parameters.GetInt("MinCollisionPointsToRestOn", 1, &minPoints);
+            parameters.GetFloat("Radius", 1.0f, &radius);
+            parameters.GetString("ObjectShape", "", text, 0x80);
             UnknownSceneShapeKeyword shapes[2] = {{"Box", 0}, {"Sphere", 1}};
             int shape = FindShape(text, shapes);
             if (minPoints >= points - 1)
@@ -300,7 +300,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                     sprintf(key, "CollisionPoint%d", p + 1);
                     ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
                     sprintf(key, "FrictionCoefficient%d", p + 1);
-                    parameters.UnknownFunction4b7f40(key, 0.6f, &friction);
+                    parameters.GetFloat(key, 0.6f, &friction);
                     AddCollisionPoint(points, object->field_0x12c, &position,
                                       object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
                                       friction, (int)this);
@@ -313,7 +313,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                 for (int e = 0; e < emitters; e = nextEmitter) {
                     nextEmitter = e + 1;
                     sprintf(key, "EmitterType%d", nextEmitter);
-                    parameters.UnknownFunction4b7ec0(key, "", text, 0x17);
+                    parameters.GetString(key, "", text, 0x17);
                     UnknownSceneEmitterKeyword types[4] = {
                         {"DustEmitter", 1}, {"DirtChunkEmitter", 2}, {"DirtSprayEmitter", 3},
                         {"ExhaustEmitter", 4},
@@ -376,7 +376,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             staticModels->casters[i].fileName[count] = 0;
             ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetPositionVec3(position);
             ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetAxesPtr(&look, &up, 1, 0);
-            parameters.UnknownFunction4b7f10("Collision", 1, &collision);
+            parameters.GetInt("Collision", 1, &collision);
             staticModels->casters[i].collisionObject = 0;
             if (collision && !stadium
                 && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
@@ -398,12 +398,12 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             }
             staticModels->casters[i].physics = 0;
         }
-        parameters.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
+        parameters.GetInt("UseLighting", 1, &useLighting);
         staticModels->casters[i].useLighting = useLighting;
         ((D3DIMSoultreeObject*)staticModels->casters[i].model)
             ->UnknownFunction4444c0(staticModels->casters[i].useLighting);
         if (auralScape) {
-            parameters.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
+            parameters.GetString("SoundResourceFile", "", sound, 0x103);
             if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
                 ReadSoundSettings(model, sound, 1, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                       &oneShot, &force2D);
@@ -482,9 +482,9 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
     char vuePath[0x104];
 
     animations = 0;
-    int found = parameters.UnknownFunction4b78f0("Animations");
+    int found = parameters.SelectSection("Animations");
     if (sceneManager->field_0x38c && found) {
-        if (!parameters.UnknownFunction4b7f10("NumberOfAnimations", -1, &animations)) {
+        if (!parameters.GetInt("NumberOfAnimations", -1, &animations)) {
             sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
                     scenePath);
             UnknownFunction464e80(text);
@@ -501,14 +501,14 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         animationTable->entries[i].field_0x00_bit0 = 0;
         next = i + 1;
         sprintf(name, "Animation%d", next);
-        parameters.UnknownFunction4b78f0(name);
-        if (!parameters.UnknownFunction4b7ec0("AnimationType", "", text, 0x40)) {
+        parameters.SelectSection(name);
+        if (!parameters.GetString("AnimationType", "", text, 0x40)) {
             sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
             UnknownFunction464e80(message);
             animationTable->entries[i].keyFramed = 1;
         } else if (!_strnicmp(text, "Procedural", 3)) {
             animationTable->entries[i].keyFramed = 0;
-            if (!parameters.UnknownFunction4b7ec0("VUE", "", vue, 0x40)) {
+            if (!parameters.GetString("VUE", "", vue, 0x40)) {
                 sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "VUE", name, scenePath);
                 UnknownFunction464e80(message);
                 return 0;
@@ -523,15 +523,15 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             }
             delete stream;
             UnknownFunction4de580(name, "VUE", vuePath);
-            if (!parameters.UnknownFunction4b7f40("FPS", 30.0f, &fps))
+            if (!parameters.GetFloat("FPS", 30.0f, &fps))
                 UnknownFunction4de580(name, "FPS(Default)", fps);
             else
                 UnknownFunction4de580(name, "FPS", fps);
-            if (!parameters.UnknownFunction4b7f40("LagDistance", 0, &lagDistance))
+            if (!parameters.GetFloat("LagDistance", 0, &lagDistance))
                 UnknownFunction4de580(name, "LagDistance(Default)", lagDistance);
             else
                 UnknownFunction4de580(name, "LagDistance", lagDistance);
-            if (!parameters.UnknownFunction4b7f10("FrontWheelsTurn", 1, &frontWheelsTurn)) {
+            if (!parameters.GetInt("FrontWheelsTurn", 1, &frontWheelsTurn)) {
                 UnknownFunction4de580(name, "FrontWheelsTurn(Default)", frontWheelsTurn);
                 if (lagDistance == 0)
                     frontWheelsTurn = 1;
@@ -540,7 +540,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             } else {
                 UnknownFunction4de580(name, "FrontWheelsTurn", frontWheelsTurn);
             }
-            if (!parameters.UnknownFunction4b7f10("NumberOfTires", 4, &tires))
+            if (!parameters.GetInt("NumberOfTires", 4, &tires))
                 UnknownFunction4de580(name, "NumberOfTires(Default)", tires);
             else
                 UnknownFunction4de580(name, "NumberOfTires", tires);
@@ -548,12 +548,12 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             animationTable->entries[i].keyFramed = 1;
         }
         animationTable->entries[i].field_0x00_bit5 = 0;
-        if (animationTable->entries[i].keyFramed && !parameters.UnknownFunction4b7ec0("MCF", "", file, 0x104)) {
+        if (animationTable->entries[i].keyFramed && !parameters.GetString("MCF", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, scenePath);
             UnknownFunction464e80(message);
             return 0;
         }
-        if (!animationTable->entries[i].keyFramed && !parameters.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
+        if (!animationTable->entries[i].keyFramed && !parameters.GetString("SLT", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", name, scenePath);
             UnknownFunction464e80(message);
             return 0;
@@ -601,17 +601,17 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             }
         }
         g_MemTagStack->Push("Scene");
-        parameters.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
+        parameters.GetInt("UseLighting", 1, &useLighting);
         int axes = 0;
-        if (parameters.UnknownFunction4b7f40("Heading", -999.0f, &heading)) {
-            parameters.UnknownFunction4b7f40("Pitch", 0, &pitch);
+        if (parameters.GetFloat("Heading", -999.0f, &heading)) {
+            parameters.GetFloat("Pitch", 0, &pitch);
             UnknownFunction4b5d00(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
             axes = 1;
         } else if (ReadVector(&look, name, "LookVector", "0.0,0.0,1.0", 0, 0)) {
             ReadVector(&up, name, "UpVector", "0.0,1.0,0.0", 0, 0);
             axes = 1;
         }
-        parameters.UnknownFunction4b7f10("ExcludeFromCameraIteration", 0, &exclude);
+        parameters.GetInt("ExcludeFromCameraIteration", 0, &exclude);
         animationTable->entries[i].field_0x00_bit4 = exclude;
         if (animationTable->entries[i].keyFramed) {
             UnknownFunction4de580(name, "MCF", file);
@@ -619,16 +619,16 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             if (axes)
                 animationTable->entries[i].character->field_0x1a0->SetAxesPtr(&look, &up, 1, 0);
             animationTable->entries[i].character->field_0x1a0->UnknownFunction4444c0(useLighting);
-            parameters.UnknownFunction4b7f10("UseBlendedKeys", 1, &automatic);
+            parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].field_0x00_bit1 = automatic;
-            parameters.UnknownFunction4b7f10("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
+            parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
             animationTable->entries[i].motions = 0;
             animationTable->entries[i].motionSequence = 0;
             if (animationTable->entries[i].motionCount > 0) {
                 animationTable->entries[i].motions = new(__FILE__, 2357) void*[animationTable->entries[i].motionCount];
                 for (int m = 0; m < animationTable->entries[i].motionCount; m++) {
                     sprintf(key, "MotionToPlay%d", m + 1);
-                    if (!parameters.UnknownFunction4b7ec0(key, "", motion, 0x10)) {
+                    if (!parameters.GetString(key, "", motion, 0x10)) {
                         sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", key, name, scenePath);
                         UnknownFunction464e80(message);
                         return 0;
@@ -637,10 +637,10 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     animationTable->entries[i].motions[m] =
                         animationTable->entries[i].character->FindMotion(motion, 1);
                 }
-                if (parameters.UnknownFunction4b7ec0("MotionSequence", "", sequence, 0x40)) {
+                if (parameters.GetString("MotionSequence", "", sequence, 0x40)) {
                     char* token = strtok(sequence, ",");
                     int j = 0;
-                    parameters.UnknownFunction4b7ec0("NumberInSequence", "", number, 0x10);
+                    parameters.GetString("NumberInSequence", "", number, 0x10);
                     animationTable->entries[i].sequenceLength = atoi(number);
                     if (animationTable->entries[i].sequenceLength) {
                         animationTable->entries[i].motionSequence =
@@ -649,7 +649,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                             animationTable->entries[i].motionSequence[j] = atoi(token);
                             token = strtok(0, ",");
                         }
-                        parameters.UnknownFunction4b7f10("AutomaticSequence", 1, &automatic);
+                        parameters.GetInt("AutomaticSequence", 1, &automatic);
                         animationTable->entries[i].field_0x00_bit2 = automatic;
                         animationTable->entries[i].sequenceIndex = animationTable->entries[i].motionSequence[0];
                         if (animationTable->entries[i].sequenceIndex >= animationTable->entries[i].sequenceLength)
@@ -679,11 +679,11 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         }
         if (animationTable->entries[i].motionCount > 0) {
             if (auralScape) {
-                parameters.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
+                parameters.GetString("SoundResourceFile", "", sound, 0x103);
                 if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
                     ReadSoundSettings(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                           &oneShot, &force2D);
-                    parameters.UnknownFunction4b7ec0("SoundAttachToObject", "", attach, 0x40);
+                    parameters.GetString("SoundAttachToObject", "", attach, 0x40);
                     UnknownSceneLodObject* node;
                     if (animationTable->entries[i].keyFramed)
                         node = animationTable->entries[i].character->field_0x1a0;
@@ -707,8 +707,8 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             }
         }
     }
-    parameters.UnknownFunction4b78f0("Animations");
-    parameters.UnknownFunction4b7f10("NumberOfRandomSets", 0, &animationTable->randomSetCount);
+    parameters.SelectSection("Animations");
+    parameters.GetInt("NumberOfRandomSets", 0, &animationTable->randomSetCount);
     if (animationTable->randomSetCount > 0) {
         animationTable->randomSets = new(__FILE__, 2466) UnknownSceneEntry2[animationTable->randomSetCount];
         for (i = 0; i < animationTable->randomSetCount; i = next) {
@@ -716,12 +716,12 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             animationTable->randomSets[i].motionIndices = 0;
             next = i + 1;
             sprintf(setName, "RandomSet%d", next);
-            if (!parameters.UnknownFunction4b78f0(setName)) {
+            if (!parameters.SelectSection(setName)) {
                 sprintf(message, "\nCannot find [%s] in %s.\n\n", setName, scenePath);
                 UnknownFunction464e80(message);
                 return 0;
             }
-            if (!parameters.UnknownFunction4b7ec0("RandomSet", "", list, 0x80)) {
+            if (!parameters.GetString("RandomSet", "", list, 0x80)) {
                 sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "RandomSet", setName, scenePath);
                 UnknownFunction464e80(message);
                 return 0;
@@ -729,7 +729,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             char* token = strtok(list, ",");
             int j = 0;
             animationTable->randomSets[i].entry = 0;
-            parameters.UnknownFunction4b7ec0("NumberInSequence", 0, (char*)&animationTable->randomSets[i].count, -1);
+            parameters.GetString("NumberInSequence", 0, (char*)&animationTable->randomSets[i].count, -1);
             if (animationTable->randomSets[i].count) {
                 animationTable->randomSets[i].animationIndices = new(__FILE__, 2491) signed char[animationTable->randomSets[i].count];
                 animationTable->randomSets[i].motionIndices = new(__FILE__, 2492) signed char[animationTable->randomSets[i].count];

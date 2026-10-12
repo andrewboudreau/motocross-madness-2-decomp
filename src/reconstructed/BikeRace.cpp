@@ -439,7 +439,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             if (field_0x18e) {
                 if (!field_0x18f) {
                     UnknownBikeRaceNetStamp stamp;
-                    stamp.timeStamp = UnknownFunction4bfa80();
+                    stamp.timeStamp = ReadClock();
                     g_TrackGame->network->Send(
                         0x84, &stamp, 8, g_TrackGame->network->localPlayer, 0);
                     field_0x18f = true;
@@ -680,10 +680,10 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 for (int i = 0; i < group->itemCount; i++) {
                     faces += group->field_0x04[i].faceCount;
                 }
-                g_TrackGame->debugOverlay->UnknownFunction447fa0(lodDebugPage, "Soultree LOD (%s)", name);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(lodDebugPage, "Current LOD %d out of %d",
+                g_TrackGame->debugOverlay->Title(lodDebugPage, "Soultree LOD (%s)", name);
+                g_TrackGame->debugOverlay->Print(lodDebugPage, "Current LOD %d out of %d",
                                                                         model->currentDetailLevel + 1, model->detailLevelCount);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(lodDebugPage, "Number of Faces = %d", faces);
+                g_TrackGame->debugOverlay->Print(lodDebugPage, "Number of Faces = %d", faces);
                 if ((signed char)field_0x0b0 < 0) {
                     if (g_UnknownGlobal567a88 > 5) {
                         if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
@@ -757,13 +757,13 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             break;
                         }
                     }
-                    g_TrackGame->debugOverlay->UnknownFunction447f40(
+                    g_TrackGame->debugOverlay->Print(
                         lodDebugPage, "AutoLOD#0 %.2f", model->detailLevelCount > 1 ? model->detailDistances[0] : 0.0f);
-                    g_TrackGame->debugOverlay->UnknownFunction447f40(
+                    g_TrackGame->debugOverlay->Print(
                         lodDebugPage, "AutoLOD#1 %.2f", model->detailLevelCount > 2 ? model->detailDistances[1] : 0.0f);
-                    g_TrackGame->debugOverlay->UnknownFunction447f40(
+                    g_TrackGame->debugOverlay->Print(
                         lodDebugPage, "AutoLOD#2 %.2f", model->detailLevelCount > 3 ? model->detailDistances[2] : 0.0f);
-                    g_TrackGame->debugOverlay->UnknownFunction447f40(
+                    g_TrackGame->debugOverlay->Print(
                         lodDebugPage, "AutoLOD#3 %.2f", model->detailLevelCount > 4 ? model->detailDistances[3] : 0.0f);
                     g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 1);
                 }
@@ -925,39 +925,39 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         case 0x1b:
             if ((g_TrackGame->field_0x2d4_bit2) &&
-                UnknownFunction43caa0(0x1b, 0, event, 3)) {
+                TestInputEvent(0x1b, 0, event, 3)) {
                 NextCameraTarget(1, 0, 0);
                 return 1;
             }
-            if (!UnknownFunction43caa0(0x1b, 0, event, 0x80)) {
+            if (!TestInputEvent(0x1b, 0, event, 0x80)) {
                 NextCameraTarget(1, 0, 1);
             }
             return 1;
         case 0x1a:
             if ((g_TrackGame->field_0x2d4_bit2) &&
-                UnknownFunction43caa0(0x1a, 0, event, 3)) {
+                TestInputEvent(0x1a, 0, event, 3)) {
                 NextCameraTarget(0, 0, 0);
                 return 1;
             }
-            if (!UnknownFunction43caa0(0x1a, 0, event, 0x80)) {
+            if (!TestInputEvent(0x1a, 0, event, 0x80)) {
                 NextCameraTarget(0, 0, 1);
             }
             return 1;
 
         case 0xc9:
-            if (UnknownFunction43caa0(0xc9, 0, event, 0x80000000)) {
+            if (TestInputEvent(0xc9, 0, event, 0x80000000)) {
                 NextCameraTarget(1, 1, 0);
                 return 1;
             }
             break;
         case 0xd1:
-            if (UnknownFunction43caa0(0xd1, 0, event, 0x80000000)) {
+            if (TestInputEvent(0xd1, 0, event, 0x80000000)) {
                 NextCameraTarget(0, 1, 0);
                 return 1;
             }
             break;
         case 0x22:
-            if (UnknownFunction43caa0(0x22, 0, event, 0xc)) {
+            if (TestInputEvent(0x22, 0, event, 0xc)) {
                 g_TrackGame->mode.field_0xa8c = 1 - g_TrackGame->mode.field_0xa8c;
                 localRacer->field_0x5bc = g_TrackGame->mode.field_0xa8c;
                 TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
@@ -980,7 +980,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             }
             break;
         case 0x30:
-            if (UnknownFunction43caa0(0x30, 0, event, 0xc)) {
+            if (TestInputEvent(0x30, 0, event, 0xc)) {
                 g_TrackGame->mode.field_0xa90 = 1 - g_TrackGame->mode.field_0xa90;
                 localRacer->field_0x5c0 = g_TrackGame->mode.field_0xa90;
                 TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
@@ -1003,7 +1003,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             }
             break;
         case 0x1f:
-            if (UnknownFunction43caa0(0x1f, 0, event, 0x80)) {
+            if (TestInputEvent(0x1f, 0, event, 0x80)) {
                 field_0x034 = 1 - field_0x034;
             }
             break;
@@ -1016,7 +1016,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         int shown = g_TrackGame->debugOverlay->field_0x26c4;
         if (shown == lodDebugPage) {
 
-            if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
+            if (TestInputEvent(0x1c, 0, event, 0x80)) {
                 if (g_TrackGame->ui->gui->GetUser(0)->field_0x30 == 0) {
                     g_TrackGame->ui->gui->UnknownFunction486590("ui\\cursor.tga", 0);
                 }
@@ -1049,7 +1049,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     }
                 }
             }
-            if (UnknownFunction43caa0(0, 1, event, 0x80000000)) {
+            if (TestInputEvent(0, 1, event, 0x80000000)) {
                 int picked = objectPicker->UnknownFunction4b04c0();
                 if (picked != 0) {
                     if (raceScene->staticModels != 0) {
@@ -1201,7 +1201,7 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
 }
 
 // 0x004204e0
-UnknownBikeRaceRacer* BikeRace::UnknownFunction4204e0(int* iterator) {
+UnknownBikeRaceRacer* BikeRace::NextBike(int* iterator) {
     UnknownBikeRaceRacer* racer = 0;
     if (g_TrackGame->uiInteractionBlocked) {
         return 0;
@@ -1339,8 +1339,8 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     SetSceneTime(0.0001f);
     raceScene->field_0x7c0 = 1;
-    for (UnknownBikeRaceRacer* racer = UnknownFunction4204e0(&iterator); racer != 0;
-         racer = UnknownFunction4204e0(&iterator)) {
+    for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
+         racer = NextBike(&iterator)) {
         racer->UnknownRacerVirtualSlot43();
         racer->restarted = true;
         WriteRelativePositions(&position, &direction, g_TrackGame->field_0x560,
@@ -1835,8 +1835,8 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             g_TrackGame->field_0x568->field_0xa8 = 0;
             if (follow->field_0x08 != 0) {
                 int iterator = 0;
-                for (UnknownBikeRaceRacer* racer = UnknownFunction4204e0(&iterator); racer != 0;
-                     racer = UnknownFunction4204e0(&iterator)) {
+                for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
+                     racer = NextBike(&iterator)) {
                     if (racer->recorderId == follow->field_0x08) {
                         g_TrackGame->field_0x568->field_0xa8 = (UnknownEventRacer*)racer;
                         break;
@@ -2040,7 +2040,7 @@ void BikeRace::SetDetailLevel(int level) {
 
 // 0x00423880
 int BikeRace::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (UnknownFunction43caa0(6, 0, event, 0x80)) {
+    if (TestInputEvent(6, 0, event, 0x80)) {
         field_0x3fd = 1 - field_0x3fd;
         return 1;
     }

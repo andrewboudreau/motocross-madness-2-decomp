@@ -272,7 +272,7 @@ int RankByScore(int keepRacing) {
         UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
         UnknownEventRacer* racer;
         iterator = 0;
-        for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
+        for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
             if (racer->field_0x25_bit0) {
                 scores[count].value = racer->field_0x768;
                 scores[count].racer = racer;

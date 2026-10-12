@@ -13,7 +13,7 @@
   "?GetLobbyPreset@UnknownTrackGameObject3410@@QAEHPADI@Z": "0x004aa360",
   "?GetLobbyRank@UnknownTrackGameObject3410@@QAEHPADI@Z": "0x004aa4e0",
   "?SubmitScores@UnknownTrackGameObject3410@@QAEHIPAX0@Z": "0x004aa670",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?g_NetApplicationGuid@@3U_GUID@@B": "0x00556dc0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGuid556d80@@3U_GUID@@B": "0x00556d80",

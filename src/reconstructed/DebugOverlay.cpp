@@ -70,7 +70,7 @@ void DebugOverlay::SetRowText(int row, const char* text, int flag)
     }
 }
 
-void DebugOverlay::UnknownFunction447f40(int page, const char* format, ...)
+void DebugOverlay::Print(int page, const char* format, ...)
 {
     if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
@@ -80,7 +80,7 @@ void DebugOverlay::UnknownFunction447f40(int page, const char* format, ...)
     }
 }
 
-void DebugOverlay::UnknownFunction447fa0(int page, const char* format, ...)
+void DebugOverlay::Title(int page, const char* format, ...)
 {
     if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
@@ -113,7 +113,7 @@ int DebugOverlay::UnknownVirtualSlot14()
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
-    unsigned int start = UnknownFunction4bfa80();
+    unsigned int start = ReadClock();
     int i;
     for (i = 0; i <= pageRowCount; i++) {
         if (!field_0xb4[i].highlighted)
@@ -126,7 +126,7 @@ int DebugOverlay::UnknownVirtualSlot14()
                                   field_0xb4[i].text, strlen(field_0xb4[i].text), 0xc0ff0000);
     }
     pageRowCount = -1;
-    field_0x36dc = UnknownFunction4bfa80() - start;
+    field_0x36dc = ReadClock() - start;
     return 1;
 }
 

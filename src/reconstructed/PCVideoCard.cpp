@@ -320,7 +320,7 @@ int UnknownDisplay::CreateFlipChain(int backBuffers) {
     }
     lastFrameTime = 0x7fffffff;
     shortestFrameTime = 0x7fffffff;
-    lastPresentTime = UnknownFunction4bfa80();
+    lastPresentTime = ReadClock();
     if (primarySurface->Flip(0, DDFLIP_WAIT))
         goto failed;
     for (i = 0; i < 10; i++) {
@@ -381,9 +381,9 @@ int UnknownDisplay::UnknownVirtualSlot3() {
     unsigned int now;
 
     if (useFlipChain && !freezeFrameIndex) {
-        UnknownFunction4bfa80();
+        ReadClock();
         lastFlipFailed = primarySurface->Flip(0, waitForFlip ? DDFLIP_WAIT : DDFLIP_DONOTWAIT) != 0;
-        UnknownFunction4bfa80();
+        ReadClock();
         if (lastFlipFailed)
             return 1;
         RecordFrameTime();
@@ -414,7 +414,7 @@ int UnknownDisplay::UnknownVirtualSlot3() {
     source = renderSurface ? renderSurface : backBuffer;
     if (primarySurface->Blt(&g_TrackGame->windowRect, source, 0, DDBLT_WAIT, 0))
         goto failed;
-    now = UnknownFunction4bfa80();
+    now = ReadClock();
     lastFrameTime = now - lastPresentTime;
     lastPresentTime = now;
     return 1;

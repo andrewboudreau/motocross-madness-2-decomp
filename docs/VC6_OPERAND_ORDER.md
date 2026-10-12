@@ -555,7 +555,7 @@ without effect, as noted.
   `0x005511cc`; `* 0.1f` uses `0x005507d0`. A relocation mismatch between the two
   says which the source used (VehicleCamera `0x0052c030`).
 - **Register priority follows reference counts.** Writing the found call out in both
-  branches (`UnknownFunction4b77a0(entry->...); return;` twice), which VC6 cross-jumps
+  branches (`Attach(entry->...); return;` twice), which VC6 cross-jumps
   back into one block, adds a source reference to `this` and moves it from ebp to
   ebx (Parameterblocks `0x004b7220`). Copying a member read into a named local before
   a compare inside a loop swaps the esi/edi assignment of loop-invariant parameters

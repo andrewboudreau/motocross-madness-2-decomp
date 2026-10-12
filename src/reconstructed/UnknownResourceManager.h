@@ -28,10 +28,10 @@ public:
     void AddObject(const char* name, int a);
     // 0x004e93f0 / 0x004e9010: the entry recorded for `object` (0 if none),
     // and its removal (TextureMap's destructor).
-    void* UnknownFunction4e93f0(void* object);
-    void UnknownFunction4e9010(void* entry, int flags);
+    void* FindItemByObject(void* object);
+    void SetItemObject(void* entry, int flags);
     // PCAudio.cpp passes the object to record as the second argument (one
     // retail function; declared twice to keep TextureMap's call unchanged).
-    void UnknownFunction4e9010(void* entry, void* object);
+    void SetItemObject(void* entry, void* object);
 };
 extern UnknownResourceManager* g_UnknownResourceManager572b44;

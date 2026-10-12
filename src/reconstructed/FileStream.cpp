@@ -106,14 +106,14 @@ int UnknownTextureStream::UnknownFunction460e70(const char* path)
 }
 
 // 0x00461310
-int UnknownTextureStream::UnknownFunction461310(int unused)
+int UnknownTextureStream::SetBufferSize(int unused)
 {
     FILE* file = InnermostStream(this)->field_0x14;
     return _setmode(file->_file, _O_BINARY);
 }
 
 // 0x00461600
-int UnknownTextureStream::UnknownFunction461600()
+int UnknownTextureStream::Tell()
 {
     UnknownTextureStream* stream = InnermostStream(this);
     int position = ftell(stream->field_0x14) + (stream->field_0x124 - stream->field_0x128);
@@ -132,7 +132,7 @@ int UnknownTextureStream::UnknownFunction461600()
 int UnknownTextureStream::UnknownFunction461980()
 {
     if (field_0x1c) {
-        if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04) {
+        if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04) {
             return -1;
         }
         if (field_0x1c->UnknownFunction430ff0()) {
@@ -176,22 +176,22 @@ int UnknownTextureStream::UnknownFunction461a60(int c)
 
 // 0x00461aa0: reads a line of at most size - 1 characters; "\r\n" ends it as "\n".
 #pragma inline_depth(0)
-int UnknownTextureStream::UnknownFunction461aa0(char* buffer, int size)
+int UnknownTextureStream::ReadLine(char* buffer, int size)
 {
     if (field_0x1c) {
-        if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04) {
+        if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04) {
             return 0;
         }
         if (field_0x1c->UnknownFunction430ff0()) {
             return 0;
         }
         if (field_0x04 > 0) {
-            int left = field_0x130 - UnknownFunction461600() + field_0x04 + 1;
+            int left = field_0x130 - Tell() + field_0x04 + 1;
             if (left < size) {
                 size = left;
             }
         }
-        return field_0x1c->UnknownFunction461aa0(buffer, size);
+        return field_0x1c->ReadLine(buffer, size);
     }
     char* p = buffer;
     *p = (char)UnknownFunction461980();

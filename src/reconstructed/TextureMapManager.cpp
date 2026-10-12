@@ -185,16 +185,16 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
         return 1;
     if (g_TrackGame->field_0x2d4_bit2 && field_0x3c) {
         handled = 1;
-        if (UnknownFunction43caa0(0x14, 0, event, 0x80)) {
+        if (TestInputEvent(0x14, 0, event, 0x80)) {
             if (++field_0x58 > 2)
                 field_0x58 = 0;
             if (!field_0x3c->field_0x44.m_count && field_0x58 == 1)
                 field_0x58 = 2;
             if (!field_0x3c->field_0x54.m_count && field_0x58 == 2)
                 field_0x58 = 0;
-        } else if (UnknownFunction43caa0(0x21, 0, event, 0x80)) {
+        } else if (TestInputEvent(0x21, 0, event, 0x80)) {
             field_0x3c->field_0x08 ^= 1;
-        } else if (UnknownFunction43caa0(0x1b, 0, event, 0x80)) {
+        } else if (TestInputEvent(0x1b, 0, event, 0x80)) {
             if (field_0x58 == 1) {
                 if (++field_0x3c->field_0x1c8 >= field_0x3c->field_0x44.m_count)
                     field_0x3c->field_0x1c8 = 0;
@@ -206,7 +206,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
                     field_0x40 = 0;
                 field_0x3c = field_0x44.Get(field_0x40);
             }
-        } else if (UnknownFunction43caa0(0x1a, 0, event, 0x80)) {
+        } else if (TestInputEvent(0x1a, 0, event, 0x80)) {
             if (field_0x58 == 1) {
                 if (--field_0x3c->field_0x1c8 < 0)
                     field_0x3c->field_0x1c8 = field_0x3c->field_0x44.m_count - 1;
@@ -218,7 +218,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
                     field_0x40 = field_0x44.m_count;
                 field_0x3c = field_0x44.Get(field_0x40);
             }
-        } else if (UnknownFunction43caa0(0x15, 0, event, 0x80)) {
+        } else if (TestInputEvent(0x15, 0, event, 0x80)) {
             if (field_0x3c)
                 field_0x3c->WriteDebugReport();
         } else {

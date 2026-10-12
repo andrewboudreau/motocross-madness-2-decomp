@@ -191,20 +191,20 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
             } else {
                 strcpy(atmosphere, "(No Fog)");
             }
-            g_TrackGame->debugOverlay->UnknownFunction447fa0(s_DebugPage, "Atmosphere %s", atmosphere);
+            g_TrackGame->debugOverlay->Title(s_DebugPage, "Atmosphere %s", atmosphere);
             if (eventFog) {
-                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Visibility %f", eventFog->field_0x38);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Haziness %f", eventFog->field_0x40);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Fog R      %d", (eventFog->field_0x2c >> 16) & 0xff);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Visibility %f", eventFog->field_0x38);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Haziness %f", eventFog->field_0x40);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog R      %d", (eventFog->field_0x2c >> 16) & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
             }
-            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "SunLight R %d", (sunLight->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "SunLight G %d", (sunLight->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "SunLight B %d", sunLight->UnknownFunction49dfd0() & 0xff);
-            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Ambient  R %d", (ambientLight->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Ambient  G %d", (ambientLight->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Ambient  B %d", ambientLight->UnknownFunction49dfd0() & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight R %d", (sunLight->UnknownFunction49dfd0() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight G %d", (sunLight->UnknownFunction49dfd0() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight B %d", sunLight->UnknownFunction49dfd0() & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  R %d", (ambientLight->UnknownFunction49dfd0() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  G %d", (ambientLight->UnknownFunction49dfd0() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  B %d", ambientLight->UnknownFunction49dfd0() & 0xff);
             g_TrackGame->debugOverlay->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 1);
         }
     }

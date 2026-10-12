@@ -313,9 +313,9 @@ int EventManager::CreatePodiumScene() {
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
         UnknownEventRacer* racer = 0;
         iterator = 0;
-        racer = PODIUM_OWNER(owner)->field_0x34->UnknownFunction4204e0(&iterator);
+        racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
         while (racer && ((UnknownPodiumRacer*)racer)->field_0x784 != place)
-            racer = PODIUM_OWNER(owner)->field_0x34->UnknownFunction4204e0(&iterator);
+            racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
         if (g_TrackGame->UnknownFunction521cd0()) {
             if ((g_TrackGame->field_0x3444->field_0x464 & 2) &&
                 racer == PODIUM_OWNER(owner)->field_0x34->field_0x38)

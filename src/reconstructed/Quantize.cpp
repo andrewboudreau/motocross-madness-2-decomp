@@ -16,9 +16,9 @@ ColorMapper* ColorMapper::UnknownFunction4dddd0(const char* name) {
         ((ColorMapper*)entry->field_0x10)->AddRef();
         return (ColorMapper*)entry->field_0x10;
     }
-    entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+    entry->field_0x14->Seek(entry->field_0x18, 0, 0);
     mapper = new(__FILE__, 148) ColorMapper(entry->field_0x14);
-    g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, mapper);
+    g_UnknownResourceManager572b44->SetItemObject(entry, mapper);
     return mapper;
 }
 
@@ -38,11 +38,11 @@ void ColorMapper::Build16BitTables() {
 ColorMapper::ColorMapper(UnknownTextureStream* stream) {
     int compressed;
 
-    if (stream->UnknownFunction461640(&firstIndex, 4, 1) != 1)
+    if (stream->Read(&firstIndex, 4, 1) != 1)
         return;
-    if (stream->UnknownFunction461640(&entryCount, 4, 1) != 1)
+    if (stream->Read(&entryCount, 4, 1) != 1)
         return;
-    if (stream->UnknownFunction461640(&compressed, 4, 1) != 1)
+    if (stream->Read(&compressed, 4, 1) != 1)
         return;
     if (compressed) {
         unsigned char* buffer;
@@ -51,43 +51,43 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
         buffer = (unsigned char*)DebugMalloc(0x10000, __FILE__, 200);
         if (!buffer)
             return;
-        if (stream->UnknownFunction461640(&size, 4, 1) != 1)
+        if (stream->Read(&size, 4, 1) != 1)
             return;
         if (size == 0x300) {
-            if (stream->UnknownFunction461640(entries, 0x300, 1) != 1)
+            if (stream->Read(entries, 0x300, 1) != 1)
                 return;
         } else {
-            if (stream->UnknownFunction461640(buffer, size, 1) != 1)
+            if (stream->Read(buffer, size, 1) != 1)
                 return;
             UnknownFunction4a03d0(entries[0], buffer, 0x300);
         }
-        if (stream->UnknownFunction461640(&size, 4, 1) != 1)
+        if (stream->Read(&size, 4, 1) != 1)
             return;
         if (size == 0x8000) {
-            if (stream->UnknownFunction461640(indexFrom555, 0x8000, 1) != 1)
+            if (stream->Read(indexFrom555, 0x8000, 1) != 1)
                 return;
         } else {
-            if (stream->UnknownFunction461640(buffer, size, 1) != 1)
+            if (stream->Read(buffer, size, 1) != 1)
                 return;
             UnknownFunction4a03d0(indexFrom555, buffer, 0x8000);
         }
-        if (stream->UnknownFunction461640(&size, 4, 1) != 1)
+        if (stream->Read(&size, 4, 1) != 1)
             return;
         if (size == 0x10000) {
-            if (stream->UnknownFunction461640(indexFrom565, 0x10000, 1) != 1)
+            if (stream->Read(indexFrom565, 0x10000, 1) != 1)
                 return;
         } else {
-            if (stream->UnknownFunction461640(buffer, size, 1) != 1)
+            if (stream->Read(buffer, size, 1) != 1)
                 return;
             UnknownFunction4a03d0(indexFrom565, buffer, 0x10000);
         }
         DebugFree(buffer, __FILE__, 261);
     } else {
-        if (stream->UnknownFunction461640(entries, 0x300, 1) != 1)
+        if (stream->Read(entries, 0x300, 1) != 1)
             return;
-        if (stream->UnknownFunction461640(indexFrom555, 0x8000, 1) != 1)
+        if (stream->Read(indexFrom555, 0x8000, 1) != 1)
             return;
-        if (stream->UnknownFunction461640(indexFrom565, 0x10000, 1) != 1)
+        if (stream->Read(indexFrom565, 0x10000, 1) != 1)
             return;
     }
     if (entryCount != 256) {
@@ -102,9 +102,9 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
 
 // 0x004de200
 ColorMapper::~ColorMapper() {
-    void* entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
+    void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, 0);
+        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
 }
 
 // 0x004de270

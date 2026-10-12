@@ -532,9 +532,9 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
 // did not expand them there). See src/krusty2/math/Math3D.h, whose call views
 // describe the same addresses; names here are provisional.
 float FastInvSqrt(float value);                          // 0x00460c00: 1/sqrt approximation
-float UnknownFunction40ae30(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
+float Vec3Dot(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
 Vector3 Vec3ScaleCall(const Vector3& v, float scale);      // 0x005015b0: v * scale
-Vector3 UnknownFunction515600(const Vector3& a, const Vector3& b); // 0x00515600: cross product
+Vector3 CrossProduct(const Vector3& a, const Vector3& b); // 0x00515600: cross product
 
 // Inline cross product (expanded by slot 46). The parenthesised first
 // products put each fsubp between the load and the store of the previous component's copy,
@@ -545,7 +545,7 @@ inline Vector3 FollowCameraCross(const Vector3& a, const Vector3& b) {
 
 // Inline normalisation: unit-length vectors are returned unchanged.
 inline Vector3 FollowCameraNormalize(const Vector3& v) {
-    float lengthSquared = UnknownFunction40ae30(&v, &v);
+    float lengthSquared = Vec3Dot(&v, &v);
     if (lengthSquared == 1.0f)
         return v;
     float scale = FastInvSqrt(lengthSquared);
@@ -561,7 +561,7 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
     y = FollowCameraCross(z, FollowCameraCross(y, z));
     y = FollowCameraNormalize(y);
     z = FollowCameraNormalize(z);
-    Vector3 x = UnknownFunction515600(y, z);
+    Vector3 x = CrossProduct(y, z);
     orientation.m[0][0] = x.x;
     orientation.m[0][1] = x.y;
     orientation.m[0][2] = x.z;
@@ -664,12 +664,12 @@ int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
     if (Camera::UnknownVirtualSlot23(event, entry) || event->kind)
         return 0;
     if (g_TrackGame->field_0x2d4_bit0) {
-        if (UnknownFunction43caa0(0x21, 0, event, 0xc) && cameraState != 6) {
+        if (TestInputEvent(0x21, 0, event, 0xc) && cameraState != 6) {
             UnknownVirtualSlot70(g_TrackGame->field_0x1c4);
             return 1;
         }
         if (overrideActive) {
-            if (!UnknownFunction43caa0(0x10, 0, event, 0xc))
+            if (!TestInputEvent(0x10, 0, event, 0xc))
                 return 0;
             field_0x26c = 1 - field_0x26c;
             if (!field_0x26c)

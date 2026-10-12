@@ -136,7 +136,7 @@ public:
                                              UnknownTextureFormatChoice* textures, UnknownTerrain* terrain,
                                              UnknownQuarryCamera* camera, Scene* scene, BaseQuarryEvent* event,
                                              void* shadow);
-    UnknownQuarryRacer* UnknownFunction4204e0(int* iterator);  // 0x004204e0: the next racer, or 0
+    UnknownQuarryRacer* NextBike(int* iterator);  // 0x004204e0: the next racer, or 0
     void UnknownFunction423790(int level);                     // 0x00423790: detail level
 
     unsigned char field_0x2c[0x38 - 0x2c];
@@ -704,8 +704,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                     ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439400(0);
                     if (i != ((UnknownQuarryRace*)raceView)->field_0x70 && i != ((UnknownQuarryRace*)raceView)->field_0x68) {
                         int iterator = 0;
-                        for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator);
-                             racer; racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator)) {
+                        for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator);
+                             racer; racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                             if (!racer->field_0x735) {
                                 ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439410(racer->field_0x1418);
                                 ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439410(racer->field_0x1414);
@@ -735,8 +735,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction4394d0(car, 0x69);
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439400(0);
                 int iterator = 0;
-                for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator); racer;
-                     racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator)) {
+                for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
+                     racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->field_0x735) {
                         ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x1418);
                         ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x1414);

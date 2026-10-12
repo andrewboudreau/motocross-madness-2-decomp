@@ -21,9 +21,9 @@ UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int f
     int i;
 
     UnknownTextureStream* archive = new(__FILE__, 212) UnknownTextureStream((int)this);
-    if (archive->UnknownFunction460f50(path, "rb", flags || archive->UnknownFunction460e70(path))) {
-        if (archive->UnknownFunction461640(magic, 4, 1) == 1 && !_stricmp(magic, "RS2")
-            && archive->UnknownFunction461640(&count, 4, 1) == 1) {
+    if (archive->Open(path, "rb", flags || archive->UnknownFunction460e70(path))) {
+        if (archive->Read(magic, 4, 1) == 1 && !_stricmp(magic, "RS2")
+            && archive->Read(&count, 4, 1) == 1) {
             if (itemCount + count > itemCapacity) {
                 items = (ResourceItem**)DebugRealloc(items, (itemCount + count) * 4, __FILE__, 231);
                 if (items) {
@@ -42,14 +42,14 @@ UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int f
             if (archives && items) {
                 for (i = 0; i < count; i++) {
                     items[itemCount + i] = new(__FILE__, 261) ResourceItem;
-                    archive->UnknownFunction461640(&items[itemCount + i]->nameSize, 4, 1);
+                    archive->Read(&items[itemCount + i]->nameSize, 4, 1);
                     items[itemCount + i]->name =
                         (char*)DebugRealloc(items[itemCount + i]->name,
                                             items[itemCount + i]->nameSize, __FILE__, 268);
-                    archive->UnknownFunction461640(items[itemCount + i]->name,
+                    archive->Read(items[itemCount + i]->name,
                                                    items[itemCount + i]->nameSize, 1);
-                    archive->UnknownFunction461640(&items[itemCount + i]->offset, 4, 1);
-                    archive->UnknownFunction461640(&items[itemCount + i]->size, 4, 1);
+                    archive->Read(&items[itemCount + i]->offset, 4, 1);
+                    archive->Read(&items[itemCount + i]->size, 4, 1);
                     items[itemCount + i]->archive = archive;
                     if (MergeWithExisting(items[itemCount + i])) {
                         items[itemCount + i]->Release();

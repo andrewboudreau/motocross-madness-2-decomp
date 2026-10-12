@@ -1284,16 +1284,16 @@ int HiResMeter::UnknownVirtualSlot10(float frameTime) {
             UnknownFunction488540();
             return 1;
         }
-        g_TrackGame->debugOverlay->UnknownFunction447fa0(
+        g_TrackGame->debugOverlay->Title(
             overlayPage, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(overlayPage, "Previous Game Tick: % 3d  MS",
+        g_TrackGame->debugOverlay->Print(overlayPage, "Previous Game Tick: % 3d  MS",
                                                                 g_UnknownGlobal65b534);
         for (i = 0; i < timerCount; i++) {
             entry = &timers[i];
             if (entry->calls != 0.0f) {
                 entry->ticks += 1.0f;
                 entry->msAllTicks = entry->msAllTicks + entry->msThisTick;
-                g_TrackGame->debugOverlay->UnknownFunction447f40(
+                g_TrackGame->debugOverlay->Print(
                     overlayPage, "%24.24s [%4.0f --> %6.3f (%6.3f)] : (%6.3f / %5.3f) MS", entry->name,
                     entry->callsThisTick, entry->msThisTick, entry->msAllTicks / entry->ticks,
                     entry->peakMs, entry->totalMs / entry->calls);

@@ -722,18 +722,18 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
     if (overlay) {
         if (field_0x9c < 0)
             field_0x9c = overlay->NewPage();
-        g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x9c, "Audio");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Hardware");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->Title(field_0x9c, "Audio");
+        g_TrackGame->debugOverlay->Print(field_0x9c, "Hardware");
+        g_TrackGame->debugOverlay->Print(
             field_0x9c, "3D HW Buffers %d Free %d", SoundSystem()->soundCaps.maxHw3DAllBuffers,
             SoundSystem()->soundCaps.freeHw3DAllBuffers);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->Print(
             field_0x9c, "2D HW Buffers %d Free %d", SoundSystem()->soundCaps.maxHwMixingAllBuffers,
             SoundSystem()->soundCaps.freeHwMixingAllBuffers);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->Print(
             field_0x9c, "Bytes %d Free %d", SoundSystem()->soundCaps.totalHwMemBytes,
             SoundSystem()->soundCaps.freeHwMemBytes);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
+        g_TrackGame->debugOverlay->Print(field_0x9c, "");
 
         int sounds = 0;
         int j = 0;
@@ -748,26 +748,26 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
                 bytes += sound->bufferBytes;
             }
         }
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Sounds %d Playing %d", sounds,
+        g_TrackGame->debugOverlay->Print(field_0x9c, "Sounds %d Playing %d", sounds,
                                                                  playing);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "AuralScape");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "NumEmitters %d", field_0x44.m_count);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Audible %d", field_0x58.m_count);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "");
+        g_TrackGame->debugOverlay->Print(field_0x9c, "AuralScape");
+        g_TrackGame->debugOverlay->Print(field_0x9c, "NumEmitters %d", field_0x44.m_count);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "Audible %d", field_0x58.m_count);
         int loaded = 0;
         for (int k = 0; k < field_0x44.m_count; k++) {
             if (field_0x44.Get(k)->field_0x34)
                 loaded++;
         }
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Loaded %d", loaded);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Playing %d", field_0x6c.m_count);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "ReverbZone %d", zone);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "ReverbEnviro %d", environment);
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Total Wave Memory %d", bytes);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "Loaded %d", loaded);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "Playing %d", field_0x6c.m_count);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "");
+        g_TrackGame->debugOverlay->Print(field_0x9c, "ReverbZone %d", zone);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "ReverbEnviro %d", environment);
+        g_TrackGame->debugOverlay->Print(field_0x9c, "");
+        g_TrackGame->debugOverlay->Print(field_0x9c, "Total Wave Memory %d", bytes);
         if (SoundSystem()->soundMemoryManager)
-            g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "SoundCacheBytes %d",
+            g_TrackGame->debugOverlay->Print(field_0x9c, "SoundCacheBytes %d",
                                                                      SoundSystem()->soundMemoryManager->loadedBytes);
     }
     return GameObject::UnknownVirtualSlot10(frameTime);

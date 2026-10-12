@@ -187,18 +187,18 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
 
     sprintf(quoted, "\"%s\"", name);
     UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (stream->UnknownFunction460f50(pathFile, "r", 0)) {
+    if (stream->Open(pathFile, "r", 0)) {
         field_0x6c = 0;
         while (!stream->UnknownFunction430ff0()) {
-            stream->UnknownFunction461aa0(line, 0x400);
+            stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0)
                 field_0x6c++;
         }
-        stream->UnknownFunction461340(stream->field_0x130, 0, 1);
+        stream->Seek(stream->field_0x130, 0, 1);
         field_0x1b4 = new (__FILE__, 241) CarProceduralKey[field_0x6c];
         int i = -1;
         while (!stream->UnknownFunction430ff0()) {
-            stream->UnknownFunction461aa0(line, 0x400);
+            stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0) {
                 i++;
                 char tag[0x400];

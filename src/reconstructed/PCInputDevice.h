@@ -64,7 +64,7 @@ struct UnknownInputInterface {
 
 // cdecl 0x004bfa80: the value the keyboard and mouse stamp into their input
 // entries when they are constructed.
-unsigned int UnknownFunction4bfa80();
+unsigned int ReadClock();
 
 // 20-byte input entry (keys at KeyboardDevice+0x260, buttons at
 // MouseDevice+0x260): a state and four stamped values.

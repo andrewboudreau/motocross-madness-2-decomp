@@ -107,14 +107,14 @@ FontTexture* FontTexture::UnknownFunction4673d0(const char* name, const char* pa
     } else {
         count = 0;
         stream = new(__FILE__, 138) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        stream->UnknownFunction460f50(path, "rb", 0);
-        stream->UnknownFunction461640(&count, 4, 1);
+        stream->Open(path, "rb", 0);
+        stream->Read(&count, 4, 1);
         font = new(__FILE__, 152) FontTexture(count, name);
         int code = 0;
         float rect[4] = {0, 0, 0, 0};
         for (i = 0; i < count; i++) {
-            stream->UnknownFunction461640(&code, 4, 1);
-            stream->UnknownFunction461640(rect, 4, 4);
+            stream->Read(&code, 4, 1);
+            stream->Read(rect, 4, 4);
             font->SetCell(i, new(__FILE__, 166) CharacterCell(code,
                 Rectangle2D(rect[g_UnknownGlobal57972c], rect[g_UnknownGlobal568468], rect[g_UnknownGlobal56846c],
                             rect[g_UnknownGlobal568470])));

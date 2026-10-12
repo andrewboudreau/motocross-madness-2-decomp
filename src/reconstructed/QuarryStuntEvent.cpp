@@ -309,7 +309,7 @@ void BaseQuarryEvent::ShowOnOffMessage(int id, int on) {
 int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
-    if (UnknownFunction43caa0(0x31, 0, event, 0xc)) {
+    if (TestInputEvent(0x31, 0, event, 0xc)) {
         if (g_TrackGame->mode.field_0x6bc && g_TrackGame->mode.field_0x6c0) {
             g_TrackGame->mode.field_0x6c0 = 0;
             ShowOnOffMessage(0x1412, 1);
@@ -328,11 +328,11 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         chatOverlay->RedrawNameTags(-1);
         return 1;
     }
-    if (UnknownFunction43caa0(0x31, 0, event, 0x80000000) && statsOverlay) {
+    if (TestInputEvent(0x31, 0, event, 0x80000000) && statsOverlay) {
         chatOverlay->UnknownFunction51e7c0();
         return 1;
     }
-    if (UnknownFunction43caa0(0x3e, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x3e, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0x6a8) {
             UnknownFunction468dd0("RunwayLights");
             UnknownFunction468dd0("VisualCue");
@@ -344,12 +344,12 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         ShowOnOffMessage(0x13b6, g_TrackGame->mode.field_0x6a8);
         return 1;
     }
-    if (UnknownFunction43caa0(0x3f, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x3f, 0, event, 0x80000000)) {
         g_TrackGame->mode.field_0x6b0 = 1 - g_TrackGame->mode.field_0x6b0;
         ShowOnOffMessage(0x1415, g_TrackGame->mode.field_0x6b0);
         return 1;
     }
-    if (UnknownFunction43caa0(0x40, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x40, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0x6b8)
             UnknownFunction468dd0("RadarOverlay");
         else
@@ -358,7 +358,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         ShowOnOffMessage(0x1441, g_TrackGame->mode.field_0x6b8);
         return 1;
     }
-    if (UnknownFunction43caa0(0x41, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x41, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.instrumentOverlayOn)
             UnknownFunction468dd0("InstrumentOverlay");
         else
@@ -367,7 +367,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         ShowOnOffMessage(0x1416, g_TrackGame->mode.instrumentOverlayOn);
         return 1;
     }
-    if (UnknownFunction43caa0(0x42, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x42, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.skyCubeOn)
             UnknownFunction468dd0("SkyCube");
         else
@@ -377,7 +377,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_TrackGame->mode.skyCubeOn);
         return 1;
     }
-    if (UnknownFunction43caa0(0x43, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x43, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0xa54) {
             UnknownFunction468dd0("ParticleManager");
             UnknownFunction468dd0("DirtParticleEmitter");
@@ -395,7 +395,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         ShowOnOffMessage(0x140f, g_TrackGame->mode.field_0xa54);
         return 1;
     }
-    if (UnknownFunction43caa0(0x44, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x44, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0xa50) {
             UnknownFunction468dd0("ProjectedShadow");
             UnknownFunction468dd0("TerrainShadow");
@@ -409,7 +409,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         ShowOnOffMessage(0x1410, g_TrackGame->mode.field_0xa50);
         return 1;
     }
-    if (UnknownFunction43caa0(0x57, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x57, 0, event, 0x80000000)) {
         int level = g_TrackGame->mode.detailLevel - 1;
         if (level < 0)
             level = 0;
@@ -435,7 +435,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         }
         return 1;
     }
-    if (UnknownFunction43caa0(0x58, 0, event, 0x80000000)) {
+    if (TestInputEvent(0x58, 0, event, 0x80000000)) {
         int level = g_TrackGame->mode.detailLevel + 1;
         if (level >= 9)
             level = 9;
@@ -464,7 +464,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
-        if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
+        if (TestInputEvent(0x1c, 0, event, 0x80)) {
             g_TrackGame->debugOverlay->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 0);
             s_DebugRow++;
             if (s_DebugRow > 10)

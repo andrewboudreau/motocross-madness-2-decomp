@@ -1,7 +1,7 @@
 {
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
   "?UnknownFunction404df0@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
-  "?UnknownFunction4204e0@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
+  "?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?CrossesGate@@YAHPAUVector3@@0PAUUnknownBikeRaceNode@@H@Z": "0x0047b670",
   "?CountLap@@YAHPAUVector3@@0PAGPAUUnknownBikeRaceNode@@PADHPAM4M44HHHH@Z": "0x004e58c0",

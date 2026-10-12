@@ -44,12 +44,12 @@ class UnknownTextureStream {
 public:
     UnknownTextureStream(int a);              // 0x00460d10
     ~UnknownTextureStream();                  // 0x00460d60
-    int UnknownFunction460f50(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
-    int UnknownFunction461340(int offset, int origin, int flag); // 0x00461340: seeks
-    int UnknownFunction461600();
-    int UnknownFunction461640(void* buffer, int size, int count);
+    int Open(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
+    int Seek(int offset, int origin, int flag); // 0x00461340: seeks
+    int Tell();
+    int Read(void* buffer, int size, int count);
     int UnknownFunction461980();              // 0x00461980: reads a byte
-    int UnknownFunction461aa0(char* buffer, int size); // 0x00461aa0: reads a line (CarProcedural.cpp)
+    int ReadLine(char* buffer, int size); // 0x00461aa0: reads a line (CarProcedural.cpp)
     int UnknownFunction461cb0(int* time, int* size); // 0x00461cb0: _fstat times (SceneManager 0x004ea0fd)
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
     // file is closed again (ResourceManager.cpp passes it to 0x00460f50).
@@ -58,7 +58,7 @@ public:
     // +0x130 and +0x04), or 0 (FileStream.cpp).
     UnknownTextureStream* UnknownFunction460d70(const char* name);
     int UnknownFunction460db0();              // 0x00460db0: checks the "FAOE" header
-    int UnknownFunction461310(int unused);    // 0x00461310: binary mode
+    int SetBufferSize(int unused);    // 0x00461310: binary mode
     int UnknownFunction4618e0(const void* buffer, int size, int count); // 0x004618e0: writes
     int UnknownFunction461a60(int c);         // 0x00461a60: writes a byte
     int UnknownFunction461b90(const char* path); // 0x00461b90: writes the header, keyed by the name
@@ -92,7 +92,7 @@ public:
     int UnknownFunction430ff0()
     {
         if (field_0x1c) {
-            if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04)
+            if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04)
                 return 1;
             return field_0x1c->UnknownFunction430ff0();
         }

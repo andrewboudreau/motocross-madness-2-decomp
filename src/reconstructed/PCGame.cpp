@@ -102,7 +102,7 @@ UnknownFilterKeys g_UnknownFilterKeys689940;
 // 0x004bfa80: the current time in milliseconds, read at 1 ms timer
 // resolution. It sits just before PCGame's constructor; its TU is inferred
 // from that position only.
-unsigned int UnknownFunction4bfa80() {
+unsigned int ReadClock() {
     timeBeginPeriod(1);
     unsigned int time = timeGetTime();
     timeEndPeriod(1);
@@ -298,7 +298,7 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
 int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Game::UnknownVirtualSlot14(event, entry))
         return 1;
-    if (field_0x2d4_bit2 && UnknownFunction43caa0(0x41, 0, event, 3)) {
+    if (field_0x2d4_bit2 && TestInputEvent(0x41, 0, event, 3)) {
         PCTarget()->fillMode = PCTarget()->fillMode == D3DFILL_SOLID ? D3DFILL_WIREFRAME : D3DFILL_SOLID;
         return 1;
     }

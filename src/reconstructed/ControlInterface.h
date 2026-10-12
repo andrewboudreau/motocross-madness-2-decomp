@@ -87,7 +87,7 @@ public:
 
 // cdecl 0x0043caa0: whether `event` is control `control` of device kind
 // `kind` with `modifier` held (when there is a keyboard).
-int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier);
+int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier);
 
 // cdecl 0x0043d080: maps the 2-bit field `index` of byte `byteIndex` of
 // `bits` to 0x200, 0x40, 0x80 or 0x100.

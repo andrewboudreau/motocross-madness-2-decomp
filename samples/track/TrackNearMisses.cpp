@@ -508,16 +508,16 @@ struct TrackProbe {
 static inline void ReadProbe(UnknownTextureStream* stream, TrackProbe* probe, float scale,
                              float offsetX, float offsetZ)
 {
-    stream->UnknownFunction461640(&probe->centre.x, 4, 1);
-    stream->UnknownFunction461640(&probe->centre.y, 4, 1);
-    stream->UnknownFunction461640(&probe->centre.z, 4, 1);
-    stream->UnknownFunction461640(&probe->direction.x, 4, 1);
-    stream->UnknownFunction461640(&probe->direction.y, 4, 1);
-    stream->UnknownFunction461640(&probe->direction.z, 4, 1);
-    stream->UnknownFunction461640(&probe->halfExtents.x, 4, 1);
-    stream->UnknownFunction461640(&probe->halfExtents.y, 4, 1);
-    stream->UnknownFunction461640(&probe->halfExtents.z, 4, 1);
-    stream->UnknownFunction461640(&probe->field_0x24, 4, 1);
+    stream->Read(&probe->centre.x, 4, 1);
+    stream->Read(&probe->centre.y, 4, 1);
+    stream->Read(&probe->centre.z, 4, 1);
+    stream->Read(&probe->direction.x, 4, 1);
+    stream->Read(&probe->direction.y, 4, 1);
+    stream->Read(&probe->direction.z, 4, 1);
+    stream->Read(&probe->halfExtents.x, 4, 1);
+    stream->Read(&probe->halfExtents.y, 4, 1);
+    stream->Read(&probe->halfExtents.z, 4, 1);
+    stream->Read(&probe->field_0x24, 4, 1);
     probe->halfExtents.x *= scale;
     probe->halfExtents.y *= scale;
     probe->halfExtents.z *= scale;
@@ -541,24 +541,24 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
     if (!stream)
         return 0;
     char chunk;
-    stream->UnknownFunction461640(&chunk, 1, 1);
+    stream->Read(&chunk, 1, 1);
     index = 0;
     while (!stream->UnknownFunction430ff0()) {
         if (chunk == 1) {
-            stream->UnknownFunction461640(&count, 4, 1);
+            stream->Read(&count, 4, 1);
             if (count <= 0)
                 return 0;
             nodes = (TrackNode**)DebugCalloc(count, 4, __FILE__, 81);
             if (!nodes)
                 return 0;
         } else if (chunk == 2) {
-            stream->UnknownFunction461640(&offsetX, 4, 1);
+            stream->Read(&offsetX, 4, 1);
         } else if (chunk == 3) {
-            stream->UnknownFunction461640(&offsetZ, 4, 1);
+            stream->Read(&offsetZ, 4, 1);
         } else if (chunk == 4) {
-            stream->UnknownFunction461640(&scale, 4, 1);
+            stream->Read(&scale, 4, 1);
         } else if (chunk == 5) {
-            stream->UnknownFunction461640(&index, 4, 1);
+            stream->Read(&index, 4, 1);
             if (index < 0 || index >= count)
                 goto fail;
             nodes[index] = (TrackNode*)DebugCalloc(1, sizeof(TrackNode), __FILE__, 108);
@@ -569,12 +569,12 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
             if (!nodes[index])
                 goto fail;
             int flags;
-            stream->UnknownFunction461640(&flags, 4, 1);
+            stream->Read(&flags, 4, 1);
             nodes[index]->flags = (unsigned char)(flags | 1);
         } else if (chunk == 7) {
             if (!nodes[index])
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->pathLength, 4, 1);
+            stream->Read(&nodes[index]->pathLength, 4, 1);
             nodes[index]->pathLength *= scale;
         } else if (chunk == 8) {
             if (!nodes[index] || !link)
@@ -589,9 +589,9 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
         } else if (chunk == 9) {
             if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x00, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x04, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x08, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x00, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x04, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x08, 4, 1);
             nodes[index]->lastSegment->field_0x00 = scale * nodes[index]->lastSegment->field_0x00 + offsetX;
             nodes[index]->lastSegment->field_0x04 = scale * nodes[index]->lastSegment->field_0x04;
             nodes[index]->lastSegment->field_0x08 = scale * nodes[index]->lastSegment->field_0x08 + offsetZ;
@@ -605,28 +605,28 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
         } else if (chunk == 10) {
             if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x0c, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x10, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x14, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x0c, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x10, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x14, 4, 1);
             nodes[index]->lastSegment->field_0x0c = scale * nodes[index]->lastSegment->field_0x0c + offsetX;
             nodes[index]->lastSegment->field_0x10 = scale * nodes[index]->lastSegment->field_0x10;
             nodes[index]->lastSegment->field_0x14 = scale * nodes[index]->lastSegment->field_0x14 + offsetZ;
         } else if (chunk == 11) {
             if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x18, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x1c, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x20, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x18, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x1c, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->field_0x20, 4, 1);
             nodes[index]->lastSegment->field_0x18 = scale * nodes[index]->lastSegment->field_0x18 + offsetX;
             nodes[index]->lastSegment->field_0x1c = scale * nodes[index]->lastSegment->field_0x1c;
             nodes[index]->lastSegment->field_0x20 = scale * nodes[index]->lastSegment->field_0x20 + offsetZ;
         } else if (chunk == 12) {
             int unused;
-            stream->UnknownFunction461640(&unused, 4, 1);
+            stream->Read(&unused, 4, 1);
         } else if (chunk == 13) {
             if (!nodes[index])
                 goto fail;
-            stream->UnknownFunction461640(&linkCount, 4, 1);
+            stream->Read(&linkCount, 4, 1);
             if (linkCount < 0)
                 goto fail;
             nodes[index]->linkCount = linkCount;
@@ -638,8 +638,8 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
                 goto fail;
             int slot;
             int target;
-            stream->UnknownFunction461640(&slot, 4, 1);
-            stream->UnknownFunction461640(&target, 4, 1);
+            stream->Read(&slot, 4, 1);
+            stream->Read(&target, 4, 1);
             if (slot < 0 || slot > linkCount || target < 0 || target > count)
                 goto fail;
             nodes[index]->links[slot] = (TrackNode*)target;
@@ -650,7 +650,7 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
             *hasFinish = 1;
             ReadProbe(stream, (TrackProbe*)finish, scale, offsetX, offsetZ);
         }
-        stream->UnknownFunction461640(&chunk, 1, 1);
+        stream->Read(&chunk, 1, 1);
     }
     {
         for (int i = 0; i < count; i++) {
