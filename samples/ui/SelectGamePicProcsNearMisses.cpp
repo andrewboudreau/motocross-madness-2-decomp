@@ -3,7 +3,7 @@
 // its matched functions). Check: compile this file and compare each function
 // with SelectGamePicProcsNearMisses.bindings.json.
 //
-// MultiPlayerDlg::AddChatLine (0x004f3720, 361 bytes): the same
+// MultiPlayerDlg::AddChatLine (0x004f3720, 380 bytes, 92 match): the same
 //   calls and strings; retail lays the system-message branch and the player
 //   colour loop out after the "~1" branch and merges the "%s: %s" sprintf
 //   into the first branch's call, VC6 here keeps source order. Inverting
@@ -14,6 +14,10 @@
 //   instead of moving it after the "~1" branch. The IME sprintfs as a
 //   ternary format (104, 48 diffs), `if (imeLibrary)` first (101), a
 //   TrackGame local and an else-if GetPlayerName test do not move it.
+//   Session 10: a `goto` from the system block into the shared sprintf
+//   (62) and an early return after the system branch (57) do not move it
+//   either; VC6 places a cross-jumped tail in the later block, retail
+//   keeps it in the player branch and jumps back from the system block.
 // MPBikeRiderDlg::FillBikeRiderLists (0x004f8220, 833 bytes): the same
 //   flow and calls; retail keeps the bike index in edi and KrustyUI in ebp
 //   and lays the locals out differently (VC6 here swaps the registers).
