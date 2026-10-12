@@ -16,7 +16,7 @@
 // bytes). But retail births the `xor ebx, ebx` inside the inlined memset
 // after that QueryInterface and keeps &videoDrawStream in ebp and videoStream in
 // ebx; VC6 hoists the xor to entry and swaps ebx/ebp, so the score stays.
-// Zeroing `surface` both before the memset and after field_0x34 gives 11%
+// Zeroing `surface` both before the memset and after frameHeight gives 11%
 // with two stores.
 //
 // 0x004a2900 (restart) is exact in src/reconstructed/MediaControl.cpp.
@@ -40,7 +40,7 @@ extern "C" const UnknownGuid IID_IDirectDrawSurface4;     // 0x005560f0
 #define TARGET() ((PCRenderTarget*)field_0x18)
 
 // 0x004a2560
-MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file,
+MediaControl* MediaControl::Open(void* target, const char* file,
                                                   void (*done)(UIDialog* dialog), UIDialog* owner)
 {
     UnknownSurfaceInterface* surface;
@@ -86,8 +86,8 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     if (videoDrawStream->GetFormat(&format, 0, 0, 0) < 0) {
         goto failed;
     }
-    field_0x30 = format.width;
-    field_0x34 = format.height;
+    frameWidth = format.width;
+    frameHeight = format.height;
     surface = 0;
     if (TARGET()->field_0x04->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&directDraw)) {
         goto failed;
@@ -106,17 +106,17 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     if (TARGET()->renderSurface->GetSurfaceDesc(&frameDesc)) {
         goto failed;
     }
-    frameDesc.height = field_0x34;
-    frameDesc.width = field_0x30;
+    frameDesc.height = frameHeight;
+    frameDesc.width = frameWidth;
     frameDesc.flags = 0x1007;
     frameDesc.caps[0] = 0x2800;
-    if (displayDirectDraw->CreateSurface(&frameDesc, &field_0x2c, 0)) {
+    if (displayDirectDraw->CreateSurface(&frameDesc, &frameSurface, 0)) {
         goto failed;
     }
-    frameRect[2] = field_0x30;
+    frameRect[2] = frameWidth;
     frameRect[1] = 0;
     frameRect[0] = 0;
-    frameRect[3] = field_0x34;
+    frameRect[3] = frameHeight;
     return this;
 
 failed:
