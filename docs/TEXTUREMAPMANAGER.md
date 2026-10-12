@@ -142,6 +142,11 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   the page at the bottom of the texture loop and multiplies the outline's
   `left`/`top` as `fld [field]; fmul st(1)`; about 31 of 575 instructions.
 
+Provisional names from the behaviour their comments record: `SetPageCount`
+`0x0050c4a0`, `RepackPages` `0x0050c8c0` and the free function
+`FitTexturesToBudget` `0x0050d800`. `0x0050c6c0` (adds a texture) keeps its
+address name because Cube.cpp, SoultreeMaterial.cpp and TextureMap.cpp call it.
+
 ## CacheTexture
 
 RTTI `CacheTexture : PCTextureMap` (vtable `0x005583d8`, 0x190 bytes) is

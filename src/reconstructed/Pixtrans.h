@@ -175,7 +175,7 @@ void Convert24To8888(void* destination, void* source, int width, int height, int
                            int sourceStride, unsigned int key);
 // 0x004cfe70: 24-bit to 8888 through 0x004cfda0, then `levels` halvings
 // (0x004cdf10) like 0x004cfc40.
-int UnknownFunction4cfe70(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample24To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, unsigned int key);
 
 // 0x004d1b90: downsamples `source` into the width x height `destination`
@@ -185,8 +185,8 @@ int UnknownFunction4d1b90(void* destination, void* source, int width, int height
 
 // 0x004d1d20: copies `source` into `destination`, converting the format;
 // 0x004d24d0 inspects the converted bits.
-int UnknownFunction4d1d20(void* destination, void* source, int width, int height, int destinationStride,
+int ConvertPixels(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int format, int sourceFormat, int dither,
                           UnknownTexturePalette* palette, int alphaThreshold, unsigned int key);
-int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int format,
+int AverageColor(void* bits, int width, int height, int stride, int format,
                           UnknownTexturePalette* palette);

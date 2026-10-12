@@ -21,7 +21,7 @@
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461640@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
   "?UnknownFunction464e90@DrawableGridNode@@QAEXXZ": "0x00464e90",
-  "?UnknownFunction47db60@@YAXXZ": "0x0047db60",
+  "?BuildCurveTables@@YAXXZ": "0x0047db60",
   "?FindEdgeNeighbours@@YAXHHHHHHPAUGridEdge@@@Z": "0x0047e340",
   "?BuildEdgeLevel@@YAXHHHH@Z": "0x0047e430",
   "?UnknownFunction47e4d0@@YAXXZ": "0x0047e4d0",

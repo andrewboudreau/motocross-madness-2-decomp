@@ -360,10 +360,10 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             goto failed;
         void* destination = desc.surface;
         int bytesPerPixel = UnknownFunction511970(field_0x20);
-        UnknownFunction4d1d20(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
+        ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
                               sourceFormat, 0, palette, alphaThreshold, key);
         if (!(flags & 4))
-            field_0x3c = UnknownFunction4d24d0(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
+            field_0x3c = AverageColor(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
                                                field_0x20, palette);
         if (systemSurface->Unlock(0))
             goto failed;

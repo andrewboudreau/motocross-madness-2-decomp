@@ -18,7 +18,7 @@ unsigned char* g_gridBaseLoadBuffer;                  // 0x006754a8
 
 // 0x0047db60: g_gridBaseCurve[i] = (i + 1) ^ (1 + i*i / 255^2) - 1, and the
 // inverse byte table maps every value up to that entry back to i.
-void UnknownFunction47db60()
+void BuildCurveTables()
 {
     if (g_gridBaseCurveBuilt == 0) {
         int next = 0;

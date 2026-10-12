@@ -32,7 +32,7 @@ public:
 };
 
 // 0x0047db60: builds the two lookup tables once (tier 3 name).
-void UnknownFunction47db60();
+void BuildCurveTables();
 
 extern unsigned short g_gridBaseCurve[256];           // 0x006752a4
 extern unsigned char g_gridBaseCurveInverse[0x10000]; // 0x006652a4

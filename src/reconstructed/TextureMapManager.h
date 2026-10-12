@@ -36,7 +36,7 @@ int UnknownCompare50eeb0(const void* first, const void* second);
 int UnknownCompare50ef00(const void* first, const void* second);
 
 // 0x0050d800 (cdecl): fits a size list's planned levels into `budget` texels.
-int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget);
+int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget);
 
 // Interval timer (PCVideoCard.cpp; constructor 0x004cb670 records the
 // current time and the interval), 12 bytes.
@@ -65,12 +65,12 @@ public:
     // 0x0050bed0
     ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV);
     virtual ~ManagedTextureGroup();           // 0x0050c2e0 (deleting wrapper 0x0050c2c0)
-    int UnknownFunction50c4a0(int count);     // 0x0050c4a0: sets the page count; 0 on failure
+    int SetPageCount(int count);     // 0x0050c4a0: sets the page count; 0 on failure
     void UnknownFunction50c6c0(ManagedTexture* texture); // 0x0050c6c0: adds a texture
     void UnknownFunction50c760();             // 0x0050c760: clears the textures' use records
     void UnknownFunction50c790();             // 0x0050c790: restores lost pages
     void UnknownFunction50c7e0();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
-    void UnknownFunction50c8c0();             // 0x0050c8c0: repacks the pages
+    void RepackPages();             // 0x0050c8c0: repacks the pages
     void UnknownFunction50c960();             // 0x0050c960 (near miss in samples/render)
     void UnknownFunction50dad0();             // 0x0050dad0 (near miss in samples/render)
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body): out of page space

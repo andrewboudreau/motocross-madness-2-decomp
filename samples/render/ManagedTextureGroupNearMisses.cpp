@@ -143,7 +143,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
         texels += LevelArea(level);
     }
 
-    UnknownFunction50d800(&field_0x7c, field_0x3c);
+    FitTexturesToBudget(&field_0x7c, field_0x3c);
     int i;
     for (i = field_0x7c.m_count - 1; i >= 0; i--) {
         ManagedTexture* managed = field_0x7c.Get(i);
@@ -200,7 +200,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
         best->UnknownFunction50fc40();
     }
 
-    freed -= UnknownFunction50d800(&field_0x158, freed); // now the spare texels
+    freed -= FitTexturesToBudget(&field_0x158, freed); // now the spare texels
     while (freed > 0 && field_0x16c.m_count > 0) {
         ManagedTexture* managed = field_0x16c.Get(0);
         if (LevelArea(managed->field_0xac) > freed)
@@ -686,7 +686,7 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
                 if (source) {
                     int sourceSize = UnknownFunction511970(selected->field_0x20);
                     int size = UnknownFunction511970(target->field_0x28);
-                    UnknownFunction4d1d20(bits + x * size + 20 * pitch, source, selected->field_0x14,
+                    ConvertPixels(bits + x * size + 20 * pitch, source, selected->field_0x14,
                                           selected->field_0x18, pitch / size, sourcePitch / sourceSize,
                                           target->field_0x28, selected->field_0x20, 0, selected->field_0x2c, 0, 0);
                     selected->systemSurface->Unlock(0);
@@ -757,7 +757,7 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
                     if (!level->Lock(0, &locked, 0x811, 0)) {
                         int sourceSize = UnknownFunction511970(managed->field_0x20);
                         int size = UnknownFunction511970(target->field_0x28);
-                        UnknownFunction4d1d20(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
+                        ConvertPixels(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
                                               pitch / size, locked.pitch / sourceSize, target->field_0x28,
                                               managed->field_0x20, 0, managed->field_0x2c, 0, 0);
                         level->Unlock(0);

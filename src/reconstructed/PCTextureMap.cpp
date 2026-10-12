@@ -156,7 +156,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                     if (surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
                         return 0;
                     int stride = desc.pitch / UnknownFunction511970(format);
-                    UnknownFunction4d1d20(desc.surface, bits, levelSide, levelHeight, stride, levelSide, field_0x20,
+                    ConvertPixels(desc.surface, bits, levelSide, levelHeight, stride, levelSide, field_0x20,
                                           sourceFormat, 0, palette, alphaThreshold, key);
                     if (surface->Unlock(0))
                         return 0;
@@ -438,7 +438,7 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
         UnknownFunction424380(&bitmap);
     } else {
         void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
-        UnknownFunction4d1d20(pixels, desc->surface, desc->width, desc->height, desc->width,
+        ConvertPixels(pixels, desc->surface, desc->width, desc->height, desc->width,
                               desc->pitch / UnknownFunction511970(field_0x20), 8888, field_0x20, 0, 0, 0x80,
                               0xff00ff);
         WriteTga32(pixels, desc->width, desc->height, 0, path, 32);

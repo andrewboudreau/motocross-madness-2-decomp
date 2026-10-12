@@ -168,7 +168,7 @@ DrawableGridNode::DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain
 {
     this->terrain = terrain;
     if (g_gridEdgesBuilt == 0) {
-        UnknownFunction47db60();
+        BuildCurveTables();
         UnknownFunction47e4d0();
         for (int i = 0; i < 17 * 17; i++)
             this->terrain->field_0xb8[i] = 0;

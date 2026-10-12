@@ -281,3 +281,4 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00483040` `ForceBlockCentres`
 - `0x00483100` `ReleaseBlockCentres`
 - `0x004835c0` `PropagateBorderChange`
+- `0x0047db60` `BuildCurveTables` (Gridbase.cpp)

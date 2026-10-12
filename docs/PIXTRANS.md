@@ -198,6 +198,9 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004d1970` `ReplaceColor32`
 - `0x004d1a20` `ReplaceColor24`
 - `0x004d1ac0` `ReplaceColor16`
+- `0x004cfe70` `Downsample24To8888`
+- `0x004d1d20` `ConvertPixels`
+- `0x004d24d0` `AverageColor`
 - `0x004d1b40` `ReplaceColor8`
 - `0x004ddec0` `Build16BitTables`
 

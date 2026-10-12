@@ -77,7 +77,7 @@ ManagedTextureGroup::~ManagedTextureGroup() {
 
 // 0x0050c4a0: creates the shared 256x256 texture on first use, then adds
 // pages sharing its system surface or drops pages from the end.
-int ManagedTextureGroup::UnknownFunction50c4a0(int count) {
+int ManagedTextureGroup::SetPageCount(int count) {
     int pages = field_0x54.m_count;
     int change = count - pages;
     if (count > 0 && !field_0x1c0) {
@@ -179,7 +179,7 @@ void ManagedTextureGroup::UnknownFunction50c7e0() {
 
 // 0x0050c8c0: unless frozen by the debug key, empties the size lists and
 // repacks the pages (through 0x0050dad0 when partial texture blits are on).
-void ManagedTextureGroup::UnknownFunction50c8c0() {
+void ManagedTextureGroup::RepackPages() {
     if (g_TrackGame->field_0x2d4_bit2 && field_0x08)
         return;
     field_0x7c.Clear();
@@ -240,7 +240,7 @@ static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedText
 // 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
 // of the least needy texture until the planned texels fit `budget`; a
 // texture already at level 5 is dropped (level -1). Returns the texels.
-int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget) {
+int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
     qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
     int area = 0;
     for (int i = 0; i < list->m_count; i++)

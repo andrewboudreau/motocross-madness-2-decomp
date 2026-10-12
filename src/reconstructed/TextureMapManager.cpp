@@ -158,7 +158,7 @@ int TextureMapManager::UnknownVirtualSlot13() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
-            cache->UnknownFunction50c8c0();
+            cache->RepackPages();
     }
     return GameObject::UnknownVirtualSlot13();
 }
@@ -231,7 +231,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
 // 0x00511180
 ManagedTextureGroup* TextureMapManager::UnknownFunction511180(int format, int pages, int addressU, int addressV) {
     ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
-    cache->UnknownFunction50c4a0(pages);
+    cache->SetPageCount(pages);
     field_0x44.Add(cache);
     if (!field_0x3c)
         field_0x3c = cache;
@@ -288,7 +288,7 @@ int TextureMapManager::UnknownFunction5113d0() {
             total += 0x2aaaa;
             if (total > g_TrackGame->display->textureCacheLimit)
                 break;
-            if (!field_0x44.Get(best)->UnknownFunction50c4a0(steps[best] + 1))
+            if (!field_0x44.Get(best)->SetPageCount(steps[best] + 1))
                 break;
             steps[best]++;
         }
