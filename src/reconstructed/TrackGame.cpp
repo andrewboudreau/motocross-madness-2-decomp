@@ -107,7 +107,7 @@ TrackGame::TrackGame() {
     cdAudio = 0;
     controlMapping = 0;
     field_0x33fc = 0;
-    field_0x3400 = 0;
+    highScores = 0;
     languageModule = LoadLibraryA("lang.dll");
     if (languageModule)
         resourceInstance = languageModule;
@@ -154,7 +154,7 @@ TrackGame::~TrackGame() {
     delete profileDirectory;
     delete controlMapping;
     delete field_0x33fc;
-    delete field_0x3400;
+    delete highScores;
     if (languageModule) {
         FreeLibrary(languageModule);
         languageModule = 0;
@@ -258,7 +258,7 @@ int TrackGame::UnknownVirtualSlot4() {
     profileDirectory->SetDirectory("ui\\profile");
     profileDirectory->SetPattern("*.*", 1);
     profileDirectory->UnknownVirtualSlot1();
-    field_0x3400 = new(__FILE__, 313) UnknownTrackGameObject3400;
+    highScores = new(__FILE__, 313) UnknownTrackGameObject3400;
     mode.CreateDirectoryLists();
     mode.ResetNetworkRace();
     g_MemTagStack->Push("Audio");

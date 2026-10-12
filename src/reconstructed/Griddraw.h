@@ -183,7 +183,7 @@ struct GridTerrain {
 // Per-node draw data (DebugCalloc'd 0x1c0 or 0x540 bytes by 0x0047e600;
 // freed with plain delete by the destructor). Offsets tier 2.
 struct GridNodeDrawData {
-    unsigned char field_0x000[17 * 17];        // +0x000 per-vertex bytes (bit 7 tested)
+    unsigned char vertexFlags[17 * 17];        // +0x000 per-vertex bytes, row g_gridRow17[z] + x (bit 7 tested)
     unsigned char b0 : 1;                      // +0x121 bit 0
     unsigned char b1 : 1;                      // +0x121 bit 1
     unsigned char b2 : 1;                      // +0x121 bit 2
@@ -192,16 +192,16 @@ struct GridNodeDrawData {
     unsigned short field_0x124;
     unsigned short field_0x126;
     unsigned short field_0x128;
-    short field_0x12a;
-    short field_0x12c;
+    short triangleCount;                       // +0x12a triangles in this node's index list
+    short childTriangleCount;                  // +0x12c children's +0x12a/+0x12c summed into the parent
     short field_0x12e;
     int field_0x130;
-    void* field_0x134;                         // +0x134 buffer (DebugFree'd, line 0x330/0x35a)
-    void* field_0x138;                         // +0x138 buffer (line 0x337/0x361)
-    short field_0x13c;
-    short field_0x13e;
-    short field_0x140;                         // +0x140 size charged to g_gridDrawMemory for +0x134
-    short field_0x142;                         // +0x142 size charged for +0x138
+    void* vertexBuffer;                        // +0x134 32-byte vertices (DebugFree'd, line 0x330/0x35a)
+    void* indexBuffer;                         // +0x138 16-bit indices (line 0x337/0x361)
+    short vertexCount;                         // +0x13c
+    short indexCount;                          // +0x13e three per triangle
+    short vertexBufferBytes;                   // +0x140 size charged to g_gridDrawMemory for +0x134
+    short indexBufferBytes;                    // +0x142 size charged for +0x138
     GridAgeEntry ageEntry;                     // +0x144
     float field_0x158;
     float field_0x15c;
@@ -258,7 +258,7 @@ public:
     unsigned short gridZ;                      // +0x26
     unsigned char level;                       // +0x28
     unsigned char shift;                       // +0x29
-    unsigned char field_0x2a;
+    unsigned char childIndex;                  // +0x2a slot in the parent's children: x low nibble, z high nibble
     unsigned char field_0x2b;
     int field_0x2c;
     int* childOffsets;                        // +0x30 child stream offsets (0x400 bytes)

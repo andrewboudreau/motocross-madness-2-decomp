@@ -685,7 +685,7 @@ public:
     UnknownControlBinding field_0x33bc;
     UnknownControlMapping* controlMapping;
     UnknownTrackGameObject33fc* field_0x33fc;
-    UnknownTrackGameObject3400* field_0x3400;
+    UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];
     void* languageModule;
     UnknownTrackGameObject3410* networkGameObject;

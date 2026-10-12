@@ -14,10 +14,10 @@ public:
     void Stop();                                         // 0x00469a20: stops early
 
 private:
-    GameObject* field_0x00;    // root
-    GameObject* field_0x04;    // current object, 0 when done
-    int field_0x08;            // mode (see GameObject::FindByClassName)
-    char field_0x0c[0x80];     // "<filter>,"
-    int field_0x8c;            // compared length (the filter without the comma)
-    int field_0x90;            // set when the walk ran out (the global was released)
+    GameObject* rootObject;    // +0x00 root
+    GameObject* currentObject; // +0x04 current object, 0 when done
+    int walkMode;              // +0x08 mode (see GameObject::FindByClassName)
+    char filterText[0x80];     // +0x0c "<filter>,"
+    int filterLength;          // +0x8c compared length (the filter without the comma)
+    int exhausted;             // +0x90 set when the walk ran out (the global was released)
 };

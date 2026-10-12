@@ -195,7 +195,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
         prefixed = 0;
     UnknownFunction51ff40();
     directory->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
-    sprintf(pattern, "*%s", g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
+    sprintf(pattern, "*%s", g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
     directory->SetPattern(pattern, 1);
     directory->UnknownVirtualSlot1();
     if (directory->CurrentName(found)) {
@@ -212,7 +212,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
         for (;;) {
             int directoryIndex = g_TrackGame->mode.GetSelectedSeries();
             sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, found,
-                    g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
+                    g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
             FILE* file = fopen(path, "r");
             if (file) {
                 fread(&directoryIndex, 4, 1, file);

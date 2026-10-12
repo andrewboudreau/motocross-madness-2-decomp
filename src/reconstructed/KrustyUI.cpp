@@ -884,7 +884,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
     char name[128];
     if (!g_TrackGame->mode.raceSettings.treeCollision)
         return;
-    g_TrackGame->field_0x3400->field_0x00 = table;
+    g_TrackGame->highScores->extensionIndex = table;
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 1:
     case 5:
@@ -899,23 +899,23 @@ void KrustyUI::RecordHighScoreTable(int table) {
         break;
     }
     }
-    g_TrackGame->field_0x3400->ReadRecord(
+    g_TrackGame->highScores->ReadRecord(
         (short)g_TrackGame->mode.raceSettings.eventType, name);
     int added = 0;
     if (g_TrackGame->playerCount == 1) {
-        if (!g_TrackGame->field_0x3400->AddRacer(
+        if (!g_TrackGame->highScores->AddRacer(
                 (short)g_TrackGame->mode.raceSettings.eventType, 0))
             return;
     } else {
         for (int i = 0; i < g_TrackGame->playerCount; i++) {
-            if (g_TrackGame->field_0x3400->AddRacer(
+            if (g_TrackGame->highScores->AddRacer(
                     (short)g_TrackGame->mode.raceSettings.eventType, i))
                 added = 1;
         }
         if (!added)
             return;
     }
-    g_TrackGame->field_0x3400->WriteRecord(
+    g_TrackGame->highScores->WriteRecord(
         (short)g_TrackGame->mode.raceSettings.eventType, name,
         g_TrackGame->mode.GetSelectedSeries());
 }

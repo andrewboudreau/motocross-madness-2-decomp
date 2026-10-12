@@ -196,24 +196,24 @@ DrawableGridNode::~DrawableGridNode()
 int EvictNodeBuffers(void* owner)
 {
     GridNodeDrawData* d = ((DrawableGridNode*)owner)->data;
-    if (d->field_0x134) {
-        g_gridDrawMemory -= d->field_0x140;
-        DebugFree(d->field_0x134, __FILE__, 816);
-        d->field_0x134 = 0;
-        d->field_0x13c = 0;
-        d->field_0x140 = 0;
+    if (d->vertexBuffer) {
+        g_gridDrawMemory -= d->vertexBufferBytes;
+        DebugFree(d->vertexBuffer, __FILE__, 816);
+        d->vertexBuffer = 0;
+        d->vertexCount = 0;
+        d->vertexBufferBytes = 0;
     }
-    if (d->field_0x138) {
-        g_gridDrawMemory -= d->field_0x142;
-        DebugFree(d->field_0x138, __FILE__, 823);
-        d->field_0x138 = 0;
-        d->field_0x13e = 0;
-        d->field_0x142 = 0;
+    if (d->indexBuffer) {
+        g_gridDrawMemory -= d->indexBufferBytes;
+        DebugFree(d->indexBuffer, __FILE__, 823);
+        d->indexBuffer = 0;
+        d->indexCount = 0;
+        d->indexBufferBytes = 0;
     }
     d->ageEntry.size = 0;
     d->field_0x126 = 0;
     d->field_0x122 = 0;
-    d->field_0x12a = 0;
+    d->triangleCount = 0;
     d->field_0x128 = 0xffff;
     d->field_0x124 = 0xffff;
     d->b0 = 0;
@@ -226,11 +226,11 @@ int EvictNodeBuffers(void* owner)
 void DrawableGridNode::ReleaseVertexBuffers(int recurse)
 {
     if (parent) {
-        ((DrawableGridNode*)parent)->data->field_0x12c -= data->field_0x12c + data->field_0x12a;
-        if (((DrawableGridNode*)parent)->data->field_0x12c < 0)
-            ((DrawableGridNode*)parent)->data->field_0x12c = 0;
+        ((DrawableGridNode*)parent)->data->childTriangleCount -= data->childTriangleCount + data->triangleCount;
+        if (((DrawableGridNode*)parent)->data->childTriangleCount < 0)
+            ((DrawableGridNode*)parent)->data->childTriangleCount = 0;
     }
-    data->field_0x12a = 0;
+    data->triangleCount = 0;
     data->b1 = 1;
     data->b0 = 0;
     if (recurse && children) {
@@ -239,22 +239,22 @@ void DrawableGridNode::ReleaseVertexBuffers(int recurse)
                 ((DrawableGridNode*)children[i])->ReleaseVertexBuffers(recurse);
         }
     }
-    if (data->field_0x134) {
-        g_gridDrawMemory -= data->field_0x140;
-        DebugFree(data->field_0x134, __FILE__, 858);
-        data->field_0x134 = 0;
-        data->field_0x13c = 0;
-        data->field_0x140 = 0;
+    if (data->vertexBuffer) {
+        g_gridDrawMemory -= data->vertexBufferBytes;
+        DebugFree(data->vertexBuffer, __FILE__, 858);
+        data->vertexBuffer = 0;
+        data->vertexCount = 0;
+        data->vertexBufferBytes = 0;
     }
-    if (data->field_0x138) {
-        g_gridDrawMemory -= data->field_0x142;
-        DebugFree(data->field_0x138, __FILE__, 865);
-        data->field_0x138 = 0;
-        data->field_0x13e = 0;
-        data->field_0x142 = 0;
+    if (data->indexBuffer) {
+        g_gridDrawMemory -= data->indexBufferBytes;
+        DebugFree(data->indexBuffer, __FILE__, 865);
+        data->indexBuffer = 0;
+        data->indexCount = 0;
+        data->indexBufferBytes = 0;
     }
-    if (data->field_0x12c != 0)
-        data->field_0x12c = 0;
+    if (data->childTriangleCount != 0)
+        data->childTriangleCount = 0;
     data->field_0x126 = 0;
     data->field_0x122 = 0;
     data->field_0x128 = 0xffff;
@@ -285,7 +285,7 @@ int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
     if (children != 0 && !data->b0) {
         size >>= 1;
         if (size == 8) {
-            data->field_0x12c = 0;
+            data->childTriangleCount = 0;
             if (childMask & 2)
                 WalkVisibleQuadrants(x, z, 8, 0);
             if (childMask & 4)
@@ -315,23 +315,23 @@ int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
         }
     }
     if (size == 16 && data->b1) {
-        int before = data->field_0x12c + data->field_0x12a;
+        int before = data->childTriangleCount + data->triangleCount;
         if (data->b3)
             UnknownFunction47f210();
         else
             RebuildWholeNodeBuffers();
-        int after = data->field_0x12c + data->field_0x12a;
+        int after = data->childTriangleCount + data->triangleCount;
         if ((before >= 2 && after < 2) || (before < 2 && after >= 2)) {
             if (parent)
                 ((DrawableGridNode*)parent)->data->b1 = 1;
         }
         data->b1 = 0;
         if (data->b2)
-            terrain->vertexSink->UnknownFunction49e4a0(terrain->transform, data->field_0x13c,
-                (char*)data->field_0x134 + 0xc, data->field_0x134, 0x20, 0);
+            terrain->vertexSink->UnknownFunction49e4a0(terrain->transform, data->vertexCount,
+                (char*)data->vertexBuffer + 0xc, data->vertexBuffer, 0x20, 0);
     }
     if (parent)
-        ((DrawableGridNode*)parent)->data->field_0x12c += data->field_0x12c + data->field_0x12a;
+        ((DrawableGridNode*)parent)->data->childTriangleCount += data->childTriangleCount + data->triangleCount;
     return 1;
 }
 
@@ -343,89 +343,89 @@ int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
 int DrawableGridNode::RebuildWholeNodeBuffers()
 {
     int closed;
-    int before = data->field_0x12a;
+    int before = data->triangleCount;
     int n;
     int m;
     terrain->bufferRebuilds++;
     g_gridOriginX = 0;
     g_gridOriginZ = 0;
     g_gridVertexCache.Reset(this);
-    if ((field_0x2a & 0x11) != 0x11 && (field_0x2a & 0x11) != 0) {
+    if ((childIndex & 0x11) != 0x11 && (childIndex & 0x11) != 0) {
         n = 0;
         m = n;
         n = EmitDiagonalTriangles(8, n, 0, 0, 8, 8, &closed);
-        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 0, 0, 16, 16);
         m = n;
         n = EmitDiagonalTriangles(8, n, 16, 16, -8, -8, &closed);
-        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 16, 16, -16, -16);
     } else {
         n = 0;
         m = n;
         n = EmitDiagonalTriangles(8, n, 0, 16, 8, -8, &closed);
-        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 0, 16, 16, -16);
         m = n;
         n = EmitDiagonalTriangles(8, n, 16, 0, -8, 8, &closed);
-        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+        if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
             n = AppendCornerTriangle(n, 16, 0, -16, 16);
     }
-    data->field_0x12a = n;
-    if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
+    data->triangleCount = n;
+    if ((data->triangleCount == 0 || before == 0) && data->triangleCount != before && parent)
         ((DrawableGridNode*)parent)->data->b1 = 1;
-    if (data->field_0x12a == 0) {
-        data->field_0x13c = 0;
-        data->field_0x13e = 0;
+    if (data->triangleCount == 0) {
+        data->vertexCount = 0;
+        data->indexCount = 0;
     } else {
-        data->field_0x13c = g_gridVertexCache.count;
-        data->field_0x13e = data->field_0x12a * 3;
-        int vertexBytes = data->field_0x13c * 32;
-        int indexBytes = (data->field_0x13e + data->field_0x13c) * 2;
-        if (data->field_0x134 == 0 || vertexBytes > data->field_0x140) {
-            g_gridDrawMemory -= data->field_0x140;
-            if (data->field_0x134)
-                DebugFree(data->field_0x134, __FILE__, 1306);
-            data->field_0x140 = vertexBytes + 0x80;
-            data->field_0x134 = DebugMalloc(data->field_0x140, __FILE__, 1309);
-            if (data->field_0x134 == 0) {
-                data->field_0x140 = 0;
-                data->field_0x13c = 0;
-                data->field_0x13e = 0;
+        data->vertexCount = g_gridVertexCache.count;
+        data->indexCount = data->triangleCount * 3;
+        int vertexBytes = data->vertexCount * 32;
+        int indexBytes = (data->indexCount + data->vertexCount) * 2;
+        if (data->vertexBuffer == 0 || vertexBytes > data->vertexBufferBytes) {
+            g_gridDrawMemory -= data->vertexBufferBytes;
+            if (data->vertexBuffer)
+                DebugFree(data->vertexBuffer, __FILE__, 1306);
+            data->vertexBufferBytes = vertexBytes + 0x80;
+            data->vertexBuffer = DebugMalloc(data->vertexBufferBytes, __FILE__, 1309);
+            if (data->vertexBuffer == 0) {
+                data->vertexBufferBytes = 0;
+                data->vertexCount = 0;
+                data->indexCount = 0;
                 return 0;
             }
-            g_gridDrawMemory += data->field_0x140;
+            g_gridDrawMemory += data->vertexBufferBytes;
             if (g_gridDrawMemory > g_gridDrawMemoryPeak)
                 g_gridDrawMemoryPeak = g_gridDrawMemory;
         }
-        if (data->field_0x138 == 0 || indexBytes > data->field_0x142) {
-            g_gridDrawMemory -= data->field_0x142;
-            if (data->field_0x138)
-                DebugFree(data->field_0x138, __FILE__, 1324);
-            data->field_0x142 = indexBytes + 0x20;
-            data->field_0x138 = DebugMalloc(data->field_0x142, __FILE__, 1327);
-            if (data->field_0x138 == 0) {
-                data->field_0x138 = 0;
-                data->field_0x142 = 0;
-                data->field_0x13c = 0;
-                data->field_0x13e = 0;
+        if (data->indexBuffer == 0 || indexBytes > data->indexBufferBytes) {
+            g_gridDrawMemory -= data->indexBufferBytes;
+            if (data->indexBuffer)
+                DebugFree(data->indexBuffer, __FILE__, 1324);
+            data->indexBufferBytes = indexBytes + 0x20;
+            data->indexBuffer = DebugMalloc(data->indexBufferBytes, __FILE__, 1327);
+            if (data->indexBuffer == 0) {
+                data->indexBuffer = 0;
+                data->indexBufferBytes = 0;
+                data->vertexCount = 0;
+                data->indexCount = 0;
                 return 0;
             }
-            g_gridDrawMemory += data->field_0x142;
+            g_gridDrawMemory += data->indexBufferBytes;
             if (g_gridDrawMemory > g_gridDrawMemoryPeak)
                 g_gridDrawMemoryPeak = g_gridDrawMemory;
         }
-        memcpy(data->field_0x134, g_gridVertexCache.vertices, data->field_0x13c * 32);
-        memcpy(data->field_0x138, g_gridIndices, data->field_0x13e * 2);
+        memcpy(data->vertexBuffer, g_gridVertexCache.vertices, data->vertexCount * 32);
+        memcpy(data->indexBuffer, g_gridIndices, data->indexCount * 2);
         if (data->ageEntry.size == 0)
             terrain->ageManager->Register(&data->ageEntry, EvictNodeBuffers, this, 0,
-                                                       data->field_0x142 + data->field_0x140);
-        else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
-            data->ageEntry.size = data->field_0x142 + data->field_0x140;
+                                                       data->indexBufferBytes + data->vertexBufferBytes);
+        else if (data->ageEntry.size != data->indexBufferBytes + data->vertexBufferBytes)
+            data->ageEntry.size = data->indexBufferBytes + data->vertexBufferBytes;
     }
     extra->field_0x28 = 1.0f;
     extra->field_0x2c = 0.0f;
@@ -442,7 +442,7 @@ int DrawableGridNode::EmitDiagonalTriangles(int level, int n, int x, int z, int 
     level--;
     x += dx;
     z += dz;
-    if (!(data->field_0x000[g_gridRow17[z] + x] & 0x80)) {
+    if (!(data->vertexFlags[g_gridRow17[z] + x] & 0x80)) {
         *closed = 0;
         return n;
     }
@@ -483,40 +483,40 @@ void DrawableGridNode::EmitLeafEdgeFan(int x, int z, int dx, int dz, int n)
     int f;
     if (dx == 0) {
         if (dz == 1) {
-            f = block->cells[i - 18].field_0x7_b0 && (data->field_0x000[i - 18] & 0x80);
+            f = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - 1);
             g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - f);
-            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->field_0x000[i - 16] & 0x80);
+            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - f);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z - 1);
         } else {
-            f = block->cells[i].field_0x7_b0 && (data->field_0x000[i + 18] & 0x80);
+            f = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z + 1);
             g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + f);
-            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->field_0x000[i + 16] & 0x80);
+            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + f);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z + 1);
         }
     } else {
         if (dx == 1) {
-            f = block->cells[i - 18].field_0x7_b0 && (data->field_0x000[i - 18] & 0x80);
+            f = block->cells[i - 18].field_0x7_b0 && (data->vertexFlags[i - 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - 1);
             g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - f);
-            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->field_0x000[i + 16] & 0x80);
+            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->vertexFlags[i + 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + f);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z + 1);
         } else {
-            f = block->cells[i].field_0x7_b0 && (data->field_0x000[i + 18] & 0x80);
+            f = block->cells[i].field_0x7_b0 && (data->vertexFlags[i + 18] & 0x80);
             g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z + 1);
             g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + f);
-            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->field_0x000[i - 16] & 0x80);
+            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->vertexFlags[i - 16] & 0x80);
             g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
             g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - f);
             g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z - 1);
@@ -528,7 +528,7 @@ void DrawableGridNode::EmitLeafEdgeFan(int x, int z, int dx, int dz, int n)
 // unless it exists, draws no triangles of its own and is not empty.
 static inline int Blocked(DrawableGridNode* c)
 {
-    return !(c && c->data->field_0x12a + (c->data->b0 ? 0 : c->data->field_0x12c) == 0 && c->childMask);
+    return !(c && c->data->triangleCount + (c->data->b0 ? 0 : c->data->childTriangleCount) == 0 && c->childMask);
 }
 
 // 0x00480200: the triangles on one edge of a cell, split at the edge midpoint
@@ -543,7 +543,7 @@ int DrawableGridNode::EmitEdgeTriangles(int level, int n, int x, int z, int dx, 
         z += dz;
     else
         x += dx;
-    if (!(data->field_0x000[g_gridRow17[z] + x] & 0x80)) {
+    if (!(data->vertexFlags[g_gridRow17[z] + x] & 0x80)) {
         *closed = 0;
         return n;
     }
@@ -817,7 +817,7 @@ int DrawableGridNode::UnknownFunction481170()
 // 0x00481180
 int DrawableGridNode::UnknownFunction481180(int x, int z, int size, int quad)
 {
-    if (data->field_0x13c != 0 && childMask != 0 && size == 16 && extra->texture != 0 && !data->b3)
+    if (data->vertexCount != 0 && childMask != 0 && size == 16 && extra->texture != 0 && !data->b3)
         UnknownVirtualSlot4(-1);
     if (!data->b0 || data->b3) {
         size >>= 1;
@@ -864,7 +864,7 @@ void DrawableGridNode::CountEdgeDifferences()
                             int cell = g_gridRow17[k];
                             if (node->block->cells[cell + 16].height != right->block->cells[cell].height ||
                                 node->block->cells[cell + 16].field_0x1 != right->block->cells[cell].field_0x1 ||
-                                (node->data->field_0x000[cell + 16] ^ right->data->field_0x000[cell]) & 0x80)
+                                (node->data->vertexFlags[cell + 16] ^ right->data->vertexFlags[cell]) & 0x80)
                                 mismatches++;
                         }
                     }
@@ -872,7 +872,7 @@ void DrawableGridNode::CountEdgeDifferences()
                         for (int k = 0; k < 15; k++) {
                             if (node->block->cells[g_gridRow17[16] + k].height != below->block->cells[k].height ||
                                 node->block->cells[g_gridRow17[16] + k].field_0x1 != below->block->cells[k].field_0x1 ||
-                                (node->data->field_0x000[g_gridRow17[16] + k] ^ below->data->field_0x000[k]) & 0x80)
+                                (node->data->vertexFlags[g_gridRow17[16] + k] ^ below->data->vertexFlags[k]) & 0x80)
                                 mismatches++;
                         }
                     }
@@ -1005,11 +1005,11 @@ void DrawableGridNode::RetestChangedVertices()
     int k;
     for (k = block->field_0x908[cur]; k < 17 * 17 && k < block->field_0x908[lo]; k++) {
         int i = block->field_0xb08[k];
-        data->field_0x000[i] &= ~0x40;
-        if (!(data->field_0x000[i] & 0xf)) {
+        data->vertexFlags[i] &= ~0x40;
+        if (!(data->vertexFlags[i] & 0xf)) {
             terrain->verticesReleased++;
-            if (!(data->field_0x000[i] & 0x10) && (data->field_0x000[i] & 0x80)) {
-                data->field_0x000[i] &= ~0x80;
+            if (!(data->vertexFlags[i] & 0x10) && (data->vertexFlags[i] & 0x80)) {
+                data->vertexFlags[i] &= ~0x80;
                 data->b1 = 1;
                 PropagateVertexChange(g_gridEdges[i].x, g_gridEdges[i].z, 0);
             }
@@ -1018,11 +1018,11 @@ void DrawableGridNode::RetestChangedVertices()
     if (hiOld > hi) {
         for (k = block->field_0x908[hi]; k < 17 * 17 && k <= block->field_0x908[hiOld]; k++) {
             int i = block->field_0xb08[k];
-            data->field_0x000[i] |= 0x40;
-            if (!(data->field_0x000[i] & 0xf)) {
+            data->vertexFlags[i] |= 0x40;
+            if (!(data->vertexFlags[i] & 0xf)) {
                 terrain->verticesPinned++;
-                if (!(data->field_0x000[i] & 0x80)) {
-                    data->field_0x000[i] |= 0x80;
+                if (!(data->vertexFlags[i] & 0x80)) {
+                    data->vertexFlags[i] |= 0x80;
                     data->b1 = 1;
                     PropagateVertexChange(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
                 }
@@ -1031,7 +1031,7 @@ void DrawableGridNode::RetestChangedVertices()
     }
     for (k = block->field_0x908[lo]; k < 17 * 17 && k < block->field_0x908[hi]; k++) {
         int i = block->field_0xb08[k];
-        if (data->field_0x000[i] & 0xf)
+        if (data->vertexFlags[i] & 0xf)
             terrain->field_0xb8[i] = terrain->field_0x53c;
         else
             TestVertex(g_gridEdges[i].x, g_gridEdges[i].z);
@@ -1046,20 +1046,20 @@ void DrawableGridNode::TestVertex(int x, int z)
     terrain->vertexTests++;
     int i = g_gridRow17[z] + x;
     if (!CanDropVertex(x, z)) {
-        data->field_0x000[i] |= 0x40;
-        if (data->field_0x000[i] & 0x80)
+        data->vertexFlags[i] |= 0x40;
+        if (data->vertexFlags[i] & 0x80)
             return;
-        data->field_0x000[i] |= 0x80;
+        data->vertexFlags[i] |= 0x80;
     } else {
-        data->field_0x000[i] &= ~0x40;
-        if (data->field_0x000[i] & 0x10)
+        data->vertexFlags[i] &= ~0x40;
+        if (data->vertexFlags[i] & 0x10)
             return;
-        if (!(data->field_0x000[i] & 0x80))
+        if (!(data->vertexFlags[i] & 0x80))
             return;
-        data->field_0x000[i] &= ~0x80;
+        data->vertexFlags[i] &= ~0x80;
     }
     data->b1 = 1;
-    PropagateVertexChange(x, z, data->field_0x000[i] & 0x80);
+    PropagateVertexChange(x, z, data->vertexFlags[i] & 0x80);
 }
 
 // 0x00482ae0: the same subdivision sequence as 0x0047e4d0 over the whole
@@ -1098,23 +1098,23 @@ void DrawableGridNode::TestRectangleLevel(int x0, int z0, int w, int h, int half
         int* r = &g_gridRow17[z];
         for (int n = x0 + x; n <= x0 + w; n += step) {
             int i = *r + n;
-            if (data->field_0x000[i] & 0xf)
+            if (data->vertexFlags[i] & 0xf)
                 continue;
             if (!CanDropVertex(n, z)) {
-                data->field_0x000[i] |= 0x40;
-                if (data->field_0x000[i] & 0x80)
+                data->vertexFlags[i] |= 0x40;
+                if (data->vertexFlags[i] & 0x80)
                     continue;
-                data->field_0x000[i] |= 0x80;
+                data->vertexFlags[i] |= 0x80;
             } else {
-                data->field_0x000[i] &= ~0x40;
-                if (!(data->field_0x000[i] & 0x80))
+                data->vertexFlags[i] &= ~0x40;
+                if (!(data->vertexFlags[i] & 0x80))
                     continue;
-                if (data->field_0x000[i] & 0x10)
+                if (data->vertexFlags[i] & 0x10)
                     continue;
-                data->field_0x000[i] &= ~0x80;
+                data->vertexFlags[i] &= ~0x80;
             }
             data->b1 = 1;
-            PropagateVertexChange(n, z, data->field_0x000[i] & 0x80);
+            PropagateVertexChange(n, z, data->vertexFlags[i] & 0x80);
         }
     }
 }
@@ -1129,12 +1129,12 @@ void DrawableGridNode::PropagateVertexChange(int x, int z, int flag)
     int i = g_gridRow17[z] + x;
     if (x == 8 && z == x) {
         if (parent) {
-            if ((field_0x2a & 0x11) != 0x11 && (field_0x2a & 0x11) != 0) {
-                ((DrawableGridNode*)parent)->SetVertexDirection(field_0x2a & 0xf, field_0x2a >> 4, flag, 8, 0);
-                ((DrawableGridNode*)parent)->SetVertexDirection((field_0x2a & 0xf) + 1, (field_0x2a >> 4) + 1, flag, 1, 0);
+            if ((childIndex & 0x11) != 0x11 && (childIndex & 0x11) != 0) {
+                ((DrawableGridNode*)parent)->SetVertexDirection(childIndex & 0xf, childIndex >> 4, flag, 8, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection((childIndex & 0xf) + 1, (childIndex >> 4) + 1, flag, 1, 0);
             } else {
-                ((DrawableGridNode*)parent)->SetVertexDirection(field_0x2a & 0xf, (field_0x2a >> 4) + 1, flag, 2, 0);
-                ((DrawableGridNode*)parent)->SetVertexDirection((field_0x2a & 0xf) + 1, field_0x2a >> 4, flag, 4, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection(childIndex & 0xf, (childIndex >> 4) + 1, flag, 2, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection((childIndex & 0xf) + 1, childIndex >> 4, flag, 4, 0);
             }
         }
     } else {
@@ -1160,22 +1160,22 @@ void DrawableGridNode::SetVertexDirection(int x, int z, int flag, int dir, GridB
     GridBaseCell* cell = &block->cells[i];
     int notify = 0;
     if (flag) {
-        if (!(data->field_0x000[i] & (unsigned char)dir)) {
-            data->field_0x000[i] |= (unsigned char)dir;
+        if (!(data->vertexFlags[i] & (unsigned char)dir)) {
+            data->vertexFlags[i] |= (unsigned char)dir;
             changed = 1;
         }
-        if (!(data->field_0x000[i] & 0x80)) {
-            data->field_0x000[i] |= 0x80;
+        if (!(data->vertexFlags[i] & 0x80)) {
+            data->vertexFlags[i] |= 0x80;
             notify = 1;
         }
     } else {
-        data->field_0x000[i] &= ~(unsigned char)dir;
-        if (!(data->field_0x000[i] & 0xf) && RetestUnpinnedVertex(x, z))
+        data->vertexFlags[i] &= ~(unsigned char)dir;
+        if (!(data->vertexFlags[i] & 0xf) && RetestUnpinnedVertex(x, z))
             notify = 1;
     }
     if (notify) {
         data->b1 = 1;
-        PropagateVertexChange(x, z, data->field_0x000[i] & 0x80);
+        PropagateVertexChange(x, z, data->vertexFlags[i] & 0x80);
     } else if (flag && !changed)
         return;
     if (parent && !origin && (x == 0 || x == 16 || z == 0 || z == 16))
@@ -1192,26 +1192,26 @@ int DrawableGridNode::RetestUnpinnedVertex(int x, int z)
     if (childMask && (data->field_0x130 == terrain->field_0xb4 ||
                       terrain->field_0xb8[i] == terrain->field_0x53c)) {
         if (CanDropVertex(x, z)) {
-            data->field_0x000[i] &= ~0x40;
-            if ((data->field_0x000[i] & 0x80) && !(data->field_0x000[i] & 0x10)) {
-                data->field_0x000[i] &= ~0x80;
+            data->vertexFlags[i] &= ~0x40;
+            if ((data->vertexFlags[i] & 0x80) && !(data->vertexFlags[i] & 0x10)) {
+                data->vertexFlags[i] &= ~0x80;
                 result = 1;
             }
         } else {
-            data->field_0x000[i] |= 0xc0;
+            data->vertexFlags[i] |= 0xc0;
         }
-    } else if (!(data->field_0x000[i] & 0x40)) {
+    } else if (!(data->vertexFlags[i] & 0x40)) {
         if (cell->field_0x1 > g_gridBaseCurveInverse[data->field_0x124]) {
-            data->field_0x000[i] |= 0xc0;
+            data->vertexFlags[i] |= 0xc0;
             result = 1;
-        } else if (!(data->field_0x000[i] & 0x10)) {
-            data->field_0x000[i] &= ~0x80;
+        } else if (!(data->vertexFlags[i] & 0x10)) {
+            data->vertexFlags[i] &= ~0x80;
             result = 1;
         }
     } else if (cell->field_0x1 < g_gridBaseCurveInverse[data->field_0x122]) {
-        data->field_0x000[i] &= ~0x40;
-        if (!(data->field_0x000[i] & 0x10)) {
-            data->field_0x000[i] &= ~0x80;
+        data->vertexFlags[i] &= ~0x40;
+        if (!(data->vertexFlags[i] & 0x10)) {
+            data->vertexFlags[i] &= ~0x80;
             result = 1;
         }
     }
@@ -1227,9 +1227,9 @@ int DrawableGridNode::ForceBlockCentres()
     int i = 2 * 17 + 2;
     for (int bz = 0; bz < 4; bz++, i += 4 * 17 - 16) {
         for (int bx = 0; bx < 4; bx++, i += 4) {
-            data->field_0x000[i] |= 0x10;
-            if (!(data->field_0x000[i] & 0x80)) {
-                data->field_0x000[i] |= 0x80;
+            data->vertexFlags[i] |= 0x10;
+            if (!(data->vertexFlags[i] & 0x80)) {
+                data->vertexFlags[i] |= 0x80;
                 PropagateVertexChange(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
             }
         }
@@ -1247,9 +1247,9 @@ int DrawableGridNode::ReleaseBlockCentres()
         int i = 2 * 17 + 2;
         for (int bz = 0; bz < 4; bz++, i += 4 * 17 - 16) {
             for (int bx = 0; bx < 4; bx++, i += 4) {
-                if (data->field_0x000[i] & 0x10) {
-                    data->field_0x000[i] &= ~0x10;
-                    if (!(data->field_0x000[i] & 0x4f)) {
+                if (data->vertexFlags[i] & 0x10) {
+                    data->vertexFlags[i] &= ~0x10;
+                    if (!(data->vertexFlags[i] & 0x4f)) {
                         int x = g_gridEdges[i].x;
                         int z = g_gridEdges[i].z;
                         if (RetestUnpinnedVertex(x, z))
@@ -1275,52 +1275,52 @@ void DrawableGridNode::PropagateBorderChange(DrawableGridNode* child, int x, int
                                             GridBaseCell* cell)
 {
     DrawableGridNode* n;
-    if ((child->field_0x2a & 0xf) != 0 && (child->field_0x2a & 0xf) != 0xf &&
-        (child->field_0x2a & 0xf0) != 0 && (child->field_0x2a & 0xf0) != 0xf0) {
+    if ((child->childIndex & 0xf) != 0 && (child->childIndex & 0xf) != 0xf &&
+        (child->childIndex & 0xf0) != 0 && (child->childIndex & 0xf0) != 0xf0) {
         if (x == 0) {
-            n = (DrawableGridNode*)children[child->field_0x2a - 1];
+            n = (DrawableGridNode*)children[child->childIndex - 1];
             if (n)
                 n->SetVertexDirection(16, z, flag, dir, cell);
             if (z == 0) {
-                n = (DrawableGridNode*)children[child->field_0x2a - 17];
+                n = (DrawableGridNode*)children[child->childIndex - 17];
                 if (n)
                     n->SetVertexDirection(16, 16, flag, dir, cell);
-                n = (DrawableGridNode*)children[child->field_0x2a - 16];
+                n = (DrawableGridNode*)children[child->childIndex - 16];
                 if (n)
                     n->SetVertexDirection(0, 16, flag, dir, cell);
             } else if (z == 16) {
-                n = (DrawableGridNode*)children[child->field_0x2a + 15];
+                n = (DrawableGridNode*)children[child->childIndex + 15];
                 if (n)
                     n->SetVertexDirection(16, 0, flag, dir, cell);
-                n = (DrawableGridNode*)children[child->field_0x2a + 16];
+                n = (DrawableGridNode*)children[child->childIndex + 16];
                 if (n)
                     n->SetVertexDirection(0, 0, flag, dir, cell);
             }
         } else if (x == 16) {
-            n = (DrawableGridNode*)children[child->field_0x2a + 1];
+            n = (DrawableGridNode*)children[child->childIndex + 1];
             if (n)
                 n->SetVertexDirection(0, z, flag, dir, cell);
             if (z == 0) {
-                n = (DrawableGridNode*)children[child->field_0x2a - 15];
+                n = (DrawableGridNode*)children[child->childIndex - 15];
                 if (n)
                     n->SetVertexDirection(0, 16, flag, dir, cell);
-                n = (DrawableGridNode*)children[child->field_0x2a - 16];
+                n = (DrawableGridNode*)children[child->childIndex - 16];
                 if (n)
                     n->SetVertexDirection(16, 16, flag, dir, cell);
             } else if (z == 16) {
-                n = (DrawableGridNode*)children[child->field_0x2a + 17];
+                n = (DrawableGridNode*)children[child->childIndex + 17];
                 if (n)
                     n->SetVertexDirection(0, 0, flag, dir, cell);
-                n = (DrawableGridNode*)children[child->field_0x2a + 16];
+                n = (DrawableGridNode*)children[child->childIndex + 16];
                 if (n)
                     n->SetVertexDirection(16, 0, flag, dir, cell);
             }
         } else if (z == 0) {
-            n = (DrawableGridNode*)children[child->field_0x2a - 16];
+            n = (DrawableGridNode*)children[child->childIndex - 16];
             if (n)
                 n->SetVertexDirection(x, 16, flag, dir, cell);
         } else if (z == 16) {
-            n = (DrawableGridNode*)children[child->field_0x2a + 16];
+            n = (DrawableGridNode*)children[child->childIndex + 16];
             if (n)
                 n->SetVertexDirection(x, 0, flag, dir, cell);
         }
