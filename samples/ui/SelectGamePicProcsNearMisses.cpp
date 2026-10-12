@@ -198,7 +198,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
     int total = g_TrackGame->mode.field_0x1be0;
     g_TrackGame->mode.field_0x1bd8 =
-        field_0x7f68.UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
+        lobbySlots.UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
     if (g_TrackGame->mode.field_0x1bd8 < g_TrackGame->mode.field_0x27f8.field_0x28)
         g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.field_0x1bd8;
     if (start) {
@@ -215,8 +215,8 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         g_TrackGame->mode.field_0x1be4[0].field_0xd8 = 0;
         int racer = g_UnknownGlobal689df8 + 1;
         for (int j = 0; j < 8; j++) {
-            for (int k = 0; k < field_0x7f68.field_0x00[j].grantedRacers; k++) {
-                g_TrackGame->mode.field_0x1be4[racer].field_0xd4 = field_0x7f68.field_0x00[j].playerId;
+            for (int k = 0; k < lobbySlots.slots[j].grantedRacers; k++) {
+                g_TrackGame->mode.field_0x1be4[racer].field_0xd4 = lobbySlots.slots[j].playerId;
                 g_TrackGame->mode.field_0x1be4[racer].field_0xd8 = racer;
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0xdc, names[racer], 0x10);
                 g_TrackGame->mode.field_0x1be4[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
@@ -273,7 +273,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     message.field_0x04 = start;
     message.field_0x08 = g_TrackGame->mode.field_0x27f8;
     message.field_0x1f4 = g_TrackGame->mode.field_0x94;
-    memcpy(message.field_0x08.field_0x18c, field_0x7f68.field_0x00, sizeof(field_0x7f68.field_0x00));
+    memcpy(message.field_0x08.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
         char name[0x80];
         message.field_0x1f8[0] = g_TrackGame->mode.field_0x1bcc;

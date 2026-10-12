@@ -146,7 +146,7 @@ public:
     void FreeSlot(int id);       // 0x004f2f80: frees `id`'s slot
     int UnknownFunction4f2fe0(int count, int limit); // 0x004f2fe0
 
-    UnknownLobbySlot field_0x00[8];
+    UnknownLobbySlot slots[8];
 };
 
 // The lobby settings message (type 0xf, 0xb4 bytes) the host sends.
@@ -257,12 +257,12 @@ public:
     void ShowPage(int page);     // 0x004f5a00: shows page `page`
     void FollowTrackChange();             // 0x004f5ca0: follows a track change
 
-    MPEventDlg* field_0x7f58;
-    MPBikeRiderDlg* field_0x7f5c;
-    MPRaceInfoDlg* field_0x7f60;
-    MPOptionsDlg* field_0x7f64;
-    UnknownLobbySlotTable field_0x7f68;
+    MPEventDlg* eventPage;
+    MPBikeRiderDlg* bikeRiderPage;
+    MPRaceInfoDlg* raceInfoPage;
+    MPOptionsDlg* optionsPage;
+    UnknownLobbySlotTable lobbySlots;
     char builtForTrack[0x104];                // +0x7fc8: track name the page was built for
-    int field_0x80cc;
-    char field_0x80d0[0x40];
+    int builtForVariant;
+    char sceneName[0x40];
 };
