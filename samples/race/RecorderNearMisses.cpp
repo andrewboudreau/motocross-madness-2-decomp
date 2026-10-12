@@ -18,6 +18,12 @@
 // trade stack slots (0x08/0x10; declaration order does not move them).
 // break/continue mixes, braces, a comma store and store orders did not
 // change the case 2 merge.
+// Session 10: retail keeps `name` in edi from case 2's Open to the shared
+// strcpy and reloads headerSize into eax for the Seek; VC6 here gives edi
+// to headerSize and reloads `name` at the join. Unchanged (652): the
+// opened critical section as an inline helper, a lock pointer local, the
+// two stores as a comma or chained assignment, `register` on name, an
+// unsigned headerSize, name declared first or at its assignment.
 //
 // 0x004e7d60 (2412 bytes with its jump table, VCRInterface slot 10; KrustyVCR
 // shares it): control flow, call arguments and the callback switch order
