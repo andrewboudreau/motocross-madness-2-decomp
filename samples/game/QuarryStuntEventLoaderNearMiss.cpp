@@ -203,10 +203,10 @@ public:
 class UnknownQuarryShadow : public GameObject {
 public:
     explicit UnknownQuarryShadow(int flags);                   // 0x004da570
-    UnknownQuarryShadow* UnknownFunction4da7b0(void* target, TextureMapManager* manager);
-    void UnknownFunction4dab00(D3DIMSoultreeObject* model);    // 0x004dab00: casts a shadow
-    void UnknownFunction4dace0(int value);                     // 0x004dace0
-    void UnknownFunction4dae30(int value);                     // 0x004dae30
+    UnknownQuarryShadow* Init(void* target, TextureMapManager* manager);
+    void AddCaster(D3DIMSoultreeObject* model);    // 0x004dab00: casts a shadow
+    void SetShadowStrength(int value);                     // 0x004dace0
+    void SetShadowGrey(int value);                     // 0x004dae30
     void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
 
     unsigned char field_0x2c[0x134 - 0x2c];
@@ -565,7 +565,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     if (shadowLight) {
         projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_TrackGame->mode.shadowsOn);
-        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4da7b0(field_0x18, g_TrackGame->textureManager);
+        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(field_0x18, g_TrackGame->textureManager);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -783,17 +783,17 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dab00(((UnknownQuarryRace*)raceView)->field_0x38->field_0x3bc);
+        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->field_0x3bc);
         ((UnknownQuarryShadow*)projectedShadow)
-            ->UnknownFunction4dab00(((UnknownQuarryRace*)raceView)->field_0x38->field_0x5c4->field_0x1a0);
+            ->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->field_0x5c4->field_0x1a0);
         ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae50(&shadowLight->position, &shadowLight->look, 3);
-        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dace0(0x80);
+        ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
         int ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
         if (!ambientLight)
             ambientLight = lightManager->FindLightOfType(6);
         if (ambientLight)
             ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
-        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae30(ambient);
+        ((UnknownQuarryShadow*)projectedShadow)->SetShadowGrey(ambient);
     }
     if (progress)
         progress(0);

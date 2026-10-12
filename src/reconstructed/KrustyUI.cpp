@@ -72,7 +72,7 @@ public:
     virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
                                                void* context, int a, int b);
     void SetMotionByName(const char* motion);        // 0x004a8b10: plays a motion
-    int UnknownFunction4a6bb0(float time, int a, int b);   // 0x004a6bb0: advances it
+    int AdvanceMotion(float time, int a, int b);   // 0x004a6bb0: advances it
 
     unsigned char field_0x008[0x1a0 - 0x8];
     UnknownKrustyUISoultree* field_0x1a0;
@@ -111,11 +111,11 @@ static inline void KrustyUIAddLight(UnknownKrustyUILightManager* lights, Unknown
 class UnknownKrustyUIShadow : public GameObject {
 public:
     explicit UnknownKrustyUIShadow(int flags);
-    UnknownKrustyUIShadow* UnknownFunction4da7b0(void* owner, TextureMapManager* textures); // 0x004da7b0
-    void UnknownFunction4dab00(UnknownKrustyUISoultree* caster);     // 0x004dab00: adds a caster
+    UnknownKrustyUIShadow* Init(void* owner, TextureMapManager* textures); // 0x004da7b0
+    void AddCaster(UnknownKrustyUISoultree* caster);     // 0x004dab00: adds a caster
     void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
-    void UnknownFunction4dace0(int value);                           // 0x004dace0
-    void UnknownFunction4dae30(int value);                           // 0x004dae30
+    void SetShadowStrength(int value);                           // 0x004dace0
+    void SetShadowGrey(int value);                           // 0x004dae30
     unsigned char field_0x2c[0x134 - 0x2c];
 };
 
@@ -123,7 +123,7 @@ public:
 class UnknownKrustyUIShadowLink : public GameObject {
 public:
     explicit UnknownKrustyUIShadowLink(int flags);
-    GameObject* UnknownFunction4468b0(void* owner, UnknownKrustyUISoultree* caster,
+    GameObject* Attach(void* owner, UnknownKrustyUISoultree* caster,
                                       UnknownKrustyUIShadow* shadow); // 0x004468b0
     unsigned char field_0x2c[0x48 - 0x2c];
 };
@@ -327,11 +327,11 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_GARAGE->field_0x1a0->SetPosition(&garageFocus);
         KRUSTYUI_GARAGE->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->SetMotionByName("Spin");
-        KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
+        KRUSTYUI_GARAGE->AdvanceMotion(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
-        shadow = projected->UnknownFunction4da7b0(field_0x18, g_TrackGame->textureManager);
+        shadow = projected->Init(field_0x18, g_TrackGame->textureManager);
         UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
-        shadowLink = link->UnknownFunction4468b0(field_0x18, KRUSTYUI_GARAGE->field_0x1a0, shadow);
+        shadowLink = link->Attach(field_0x18, KRUSTYUI_GARAGE->field_0x1a0, shadow);
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
@@ -343,7 +343,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_RIDER->field_0x1a0->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->SetMotionByName("WaitR");
-        KRUSTYUI_RIDER->UnknownFunction4a6bb0(0.03f, 0, 0);
+        KRUSTYUI_RIDER->AdvanceMotion(0.03f, 0, 0);
         ((RenderTarget*)field_0x18)->SetCamera(0);
         pending = 1;
         done = 0;
@@ -362,20 +362,20 @@ void KrustyUI::BuildGarageScene(int value) {
             bike->field_0x1a0->SetPosition(&garageFocus);
             bike->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->SetMotionByName("WaitB");
-            bike->UnknownFunction4a6bb0(0.03f, 0, 0);
+            bike->AdvanceMotion(0.03f, 0, 0);
             painter.PaintNumber(bike->field_0x1a0, g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
-            shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);
-            shadow->UnknownFunction4dab00(KRUSTYUI_RIDER->field_0x1a0);
+            shadow->AddCaster(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);
+            shadow->AddCaster(KRUSTYUI_RIDER->field_0x1a0);
             s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;
             s478 = garageFocus - s468;
             // Retail passes the key light's vectors here, not the two just set.
             shadow->UnknownFunction4dae50(&s488, &s408, 3);
-            shadow->UnknownFunction4dace0(0x20);
-            shadow->UnknownFunction4dae30(0x20);
+            shadow->SetShadowStrength(0x20);
+            shadow->SetShadowGrey(0x20);
             pending = 0;
             done = 1;
         }
