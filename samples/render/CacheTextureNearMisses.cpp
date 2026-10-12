@@ -6,6 +6,13 @@
 // retail places the shared `return 0` block between the second loop and the
 // overlay check (its loop ends `jle; jmp top`); VC6 here puts it after the
 // final returns. 18 instructions differ, in jump targets and the loop end.
+// Tried (s10, all unchanged at 450/558 or worse): the Blt failure as an
+// else arm or a goto into the else, `for (;;)`-style and for-increment
+// loops, the inner break as an if/else, the first loop returning 0
+// directly, an early `if (result) return 0;` (397), a do/while (293),
+// the Blt result stored and tested after the loop (338) and `goto failed`
+// to a label at the end or in an `if (result)` block (450-454). This is the
+// known `jle exit; jmp top` loop-bottom shape that VC6 has not reproduced.
 
 #include <string.h>
 
