@@ -30,7 +30,7 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     materialCount = 0;
     modelName[0] = 0;
     lodCount = 0;
-    field_0x27c = 0;
+    currentLod = 0;
     lowestLod = 0;
     lodTable = 0;
     autoLodDistances = 0;
@@ -424,11 +424,11 @@ int D3DIMSoultreeObject::ReadLods()
 // `groups + offset`, retail `offset + groups`.
 void D3DIMSoultreeObject::TransformVertexGroups(int lod)
 {
-    int saved = field_0x27c;
+    int saved = currentLod;
     if (lod != -1)
-        field_0x27c = lod;
-    for (int i = 0; i < lodTable[field_0x27c].surfaceCount; i++) {
-        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[i];
+        currentLod = lod;
+    for (int i = 0; i < lodTable[currentLod].surfaceCount; i++) {
+        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
         UnknownSoultreeSurface& surfaceRef = *surface;
         int colored = 0;
         int k;
@@ -466,7 +466,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
         }
     }
     subtreeDirty = 0;
-    field_0x27c = saved;
+    currentLod = saved;
 }
 
 // The four vector constants that open about 73 retail files (see
@@ -600,8 +600,8 @@ void D3DIMSoultreeObject::UnknownFunction4433f0(int surface, UnknownSoultreeVert
                                                 int a6, int lod)
 {
     if (lod == -1)
-        lod = field_0x27c;
-    if (subtreeDirty || lod != field_0x27c)
+        lod = currentLod;
+    if (subtreeDirty || lod != currentLod)
         TransformVertexGroups(lod);
     *vertices = lodTable[lod].surfaces[surface].vertices;
     *vertexCount = lodTable[lod].surfaces[surface].vertexCount;
@@ -802,7 +802,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
             if ((scale * autoLodDistances[i]) * field_0x284 < 1.0f)
                 lod = i + 1;
         }
-        if (field_0x27c != lod)
+        if (currentLod != lod)
             UnknownFunction444d00(lod);
     }
     for (int i = 0; i < materialCount; i++) {
@@ -963,9 +963,9 @@ void D3DIMSoultreeObject::UnknownFunction444d00(int lod)
         lod = lowestLod;
     if (lod >= lodCount)
         lod = lodCount - 1;
-    if (field_0x27c != lod) {
+    if (currentLod != lod) {
         subtreeDirty = 1;
-        field_0x27c = lod;
+        currentLod = lod;
     }
 }
 
@@ -1069,7 +1069,7 @@ int D3DIMSoultreeObject::UnknownFunction444fe0()
 int D3DIMSoultreeObject::GetSurfaceCount(int lod)
 {
     if (lod == -1)
-        lod = field_0x27c;
+        lod = currentLod;
     if (lodTable)
         return lodTable[lod].surfaceCount;
     return 0;
@@ -1091,9 +1091,9 @@ int D3DIMSoultreeObject::NodeMovesVertices(SoultreeObject* node, int lod)
 // 0x004450c0
 void D3DIMSoultreeObject::SoultreeVirtualSlot6()
 {
-    int saved = field_0x27c;
+    int saved = currentLod;
     for (int lod = 0; lod < lodCount; lod++) {
-        field_0x27c = lod;
+        currentLod = lod;
         TransformVertexGroups(-1);
         for (int i = 0; i < lodTable[lod].surfaceCount; i++) {
             for (int j = 0; j < lodTable[lod].surfaces[i].vertexCount; j++) {
@@ -1106,7 +1106,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
             }
         }
     }
-    field_0x27c = saved;
+    currentLod = saved;
     SoultreeObject::SoultreeVirtualSlot6();
     if (!parent)
         UnknownFunction444440();

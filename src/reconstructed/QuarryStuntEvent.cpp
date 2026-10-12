@@ -90,7 +90,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
     if (radarOverlay && visualCue && statsOverlay) {
-        visualCue->field_0xc8 = radarOverlay->field_0x170;
+        visualCue->field_0xc8 = radarOverlay->followedIndex;
         int index = visualCue->UnknownFunction48bc30();
         if (index != -1) {
             radarOverlay->field_0x16c = index;

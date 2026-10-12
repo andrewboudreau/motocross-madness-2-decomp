@@ -691,18 +691,18 @@ void RadarOverlay::DrawRacers(int mode)
                 mapAngle = heldMapAngle;
             else
                 heldMapAngle = mapAngle;
-            field_0x170 = i;
+            followedIndex = i;
             break;
         }
     }
     mapAngleCos = cos(mapAngle);
     mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
-        if (i != field_0x170 && racers[i]->field_0x25_bit0) {
+        if (i != followedIndex && racers[i]->field_0x25_bit0) {
             outside = WorldToMap(racers[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
             if (field_0x174 && field_0x16c == i) {
                 if (radarView->field_0x19c) {
-                    Vector3& own = racers[field_0x170]->field_0x00c;
+                    Vector3& own = racers[followedIndex]->field_0x00c;
                     float dx = racers[i]->field_0x00c.x - own.x;
                     float dz = racers[i]->field_0x00c.z - own.z;
                     float distance = dz * dz + dx * dx;

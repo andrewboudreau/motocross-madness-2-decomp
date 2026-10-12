@@ -190,7 +190,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
     SoultreeObject::SoultreeVirtualSlot7(source);
     UnknownFunction444a40(source);
     lodCount = source->lodCount;
-    field_0x27c = source->field_0x27c;
+    currentLod = source->currentLod;
     lowestLod = source->lowestLod;
     field_0x288 = source->field_0x288;
     if (field_0x288) {
@@ -282,8 +282,8 @@ static inline float Length(const Vector3& v)
 void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
 {
     TransformVertexGroups(-1);
-    for (int i = 0; i < lodTable[field_0x27c].surfaceCount; i++) {
-        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[i];
+    for (int i = 0; i < lodTable[currentLod].surfaceCount; i++) {
+        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[i];
         float best = 0.0f;
         for (int f = 0; f < surface->faceCount; f++) {
             Vector3 zero(0.0f, 0.0f, 0.0f);
@@ -493,8 +493,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
     else
         ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
     int k;
-    for (int s = 0; s < lodTable[field_0x27c].surfaceCount; s++) {
-        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[s];
+    for (int s = 0; s < lodTable[currentLod].surfaceCount; s++) {
+        UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[s];
         int count = surface->vertexCount;
         int modified = 0;
         int restore = 0;

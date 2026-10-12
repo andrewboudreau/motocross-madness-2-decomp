@@ -996,7 +996,7 @@ RadarOverlay::RadarOverlay(int flags) : Overlay(flags, 1)
     racerCount = 0;
     for (int i = 0; i < 11; i++)
         racers[i] = 0;
-    field_0x170 = 0;
+    followedIndex = 0;
     showFrameRate = 0;
     readoutCount = 1;
     field_0x16c = 0;

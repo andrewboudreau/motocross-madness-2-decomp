@@ -810,9 +810,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {
         camera->field_0x3b0->field_0x3bc->UnknownFunction444d40(1);
         camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(1);
-        if (!camera->field_0x3b0->field_0x3bc->field_0x27c)
+        if (!camera->field_0x3b0->field_0x3bc->currentLod)
             camera->field_0x3b0->field_0x3bc->UnknownFunction444d00(1);
-        if (!camera->field_0x3b0->field_0x5c4->field_0x1a0->field_0x27c)
+        if (!camera->field_0x3b0->field_0x5c4->field_0x1a0->currentLod)
             camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d00(1);
     }
     camera->field_0x394 = bike;

@@ -291,7 +291,7 @@ public:
     int showFrameRate;                        // shows the frame rate
     int readoutCount;                         // readouts so far
     int field_0x16c;
-    int field_0x170;
+    int followedIndex;                        // +0x170: index of the followed racer (DrawRacers)
     int field_0x174;
     int largeMap;                             // uses the 256-pixel map
     Vector3 mapOrigin;                        // +0x17c

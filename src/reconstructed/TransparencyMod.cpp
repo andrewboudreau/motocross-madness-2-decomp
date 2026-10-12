@@ -24,7 +24,7 @@ void TransparencyMod::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownS
         return;
     }
     surfacesDrawn++;
-    if (surfacesDrawn == object->lodTable[object->field_0x27c].surfaceCount) {
+    if (surfacesDrawn == object->lodTable[object->currentLod].surfaceCount) {
         appliedState = isTransparent;
         surfacesDrawn = 0;
     }

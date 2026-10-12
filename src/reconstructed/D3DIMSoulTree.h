@@ -288,7 +288,7 @@ public:
     GameObject** secondModifierList;
     int lodCount;                              // level-of-detail count
     int lowestLod;                             // lowest level of detail
-    int field_0x27c;                           // current level of detail
+    int currentLod;                           // +0x27c current level of detail
     float* autoLodDistances;                   // "AutoLOD#%i" distances
     float field_0x284;
     int field_0x288;
