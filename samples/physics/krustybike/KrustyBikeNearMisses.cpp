@@ -77,6 +77,9 @@ void KrustyBike::UnknownVirtualSlot101()
 }
 
 // Slot 70: threshold test against a per-mode table; a[] and b[][] are static-init'd locals.
+// Same bytes (151/230): level/row int locals, a flat
+// (&b[0][0])[row * 3 + level - 1] index, swapped products, an else arm. A KbGame*
+// local for both arms drops to 22.
 int KrustyBike::UnknownVirtualSlot70(float arg)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
