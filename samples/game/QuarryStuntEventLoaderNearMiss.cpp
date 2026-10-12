@@ -587,7 +587,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 delete stream;
             return 0;
         }
-        skyCube = (new(__FILE__, 744) UnknownQuarrySkyCube(g_TrackGame->mode.field_0xa5c))
+        skyCube = (new(__FILE__, 744) UnknownQuarrySkyCube(g_TrackGame->mode.skyCubeOn))
                          ->UnknownFunction4fb230(field_0x18, stream, &skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
@@ -840,9 +840,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         ((UnknownQuarryOverlayHooks*)visualCue)->CollectRacers((UnknownQuarryRace*)raceView);
     g_MemTagStack->Pop(0);
 
-    if (!g_TrackGame->mode.field_0x6ac)
+    if (!g_TrackGame->mode.instrumentOverlayOn)
         UnknownFunction468dd0("InstrumentOverlay");
-    if (!g_TrackGame->mode.field_0xa5c)
+    if (!g_TrackGame->mode.skyCubeOn)
         UnknownFunction468dd0("SkyCube");
     if (!g_TrackGame->mode.field_0xa54) {
         UnknownFunction468dd0("ParticleManager");
@@ -853,7 +853,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         UnknownFunction468dd0("TerrainShadow");
         UnknownFunction468dd0("D3DIMSoultreeShadow");
     }
-    ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_TrackGame->mode.field_0xa5c);
+    ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_TrackGame->mode.skyCubeOn);
     field_0x50 = (void*)1;
     if (g_TrackGame->field_0x2d5_bit2) {
         g_MemTagStack->Push("TextureCache");

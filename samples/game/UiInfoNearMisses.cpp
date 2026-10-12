@@ -38,10 +38,10 @@
 
 // 0x00522440: restores the default settings.
 void TrackGameMode::UnknownFunction522440() {
-    UnknownFunction522720((UnknownTrackGameModeOptions6ac*)&field_0x6ac);
+    UnknownFunction522720((UnknownTrackGameModeOptions6ac*)&instrumentOverlayOn);
     ResetSoundOptions((UnknownTrackGameModeOptionsA20*)&field_0xa20);
-    ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&field_0xa4c);
-    g_TrackGame->mode.ChooseDisplayMode(0, &field_0xa4c);
+    ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
+    g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
     UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
     UnknownFunction522840(field_0x145c);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0xfd8);
@@ -69,10 +69,10 @@ void TrackGameMode::UnknownFunction522440() {
     field_0x23c0 = 0.47123885f;
     field_0x23c4 = 1.0646508f;
     field_0x23c8 = 85.0f;
-    videoSettings[4] = field_0xa64;
-    videoSettings[3] = field_0xa64;
-    videoSettings[2] = field_0xa64;
-    videoSettings[1] = field_0xa64;
+    videoSettings[4] = detailLevel;
+    videoSettings[3] = detailLevel;
+    videoSettings[2] = detailLevel;
+    videoSettings[1] = detailLevel;
     field_0x1bdc = 0;
     field_0x90 = 0;
     field_0x2dbc = 0;

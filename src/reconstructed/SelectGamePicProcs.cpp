@@ -1182,7 +1182,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 start->SetEnabled(1);
             else
                 start->SetEnabled(0);
-            lobbySlots.SetSlot(me, g_TrackGame->mode.field_0x6dc);
+            lobbySlots.SetSlot(me, g_TrackGame->mode.maxAIBikes);
             SendSettings();
         }
         state.ready = g_UnknownGlobal689df4;
@@ -1190,7 +1190,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         COPY_TEXT(state.bikeName, g_TrackGame->mode.field_0x1974.field_0x40, 0x40);
         COPY_TEXT(state.riderName, g_TrackGame->mode.field_0x1974.field_0x80, 0x40);
         state.field_0xc2 = g_TrackGame->mode.field_0x1974.field_0xc4;
-        state.requestedRacers = g_TrackGame->mode.field_0x6dc;
+        state.requestedRacers = g_TrackGame->mode.maxAIBikes;
         state.field_0xc8 = UNKNOWN_GARAGE_SETTINGS->engineSize;
         state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->fourStroke;
         if (g_TrackGame->mode.lobbyRank > 0 && g_TrackGame->mode.lobbyRank < 0x65)
@@ -2145,7 +2145,7 @@ void MPOptionsDlg::HandleEvent(UnknownDialogEvent* event) {
         FindControl("ChkRecordRace", 0)->Show(0, 1);
         static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb))->SetAcceptedCharacters("0123456789");
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb));
-        edit->SetEditText(_itoa(g_TrackGame->mode.field_0x6dc, text, 10));
+        edit->SetEditText(_itoa(g_TrackGame->mode.maxAIBikes, text, 10));
         UpdateBoundValues(0);
         EnableHostOptions();
         break;
@@ -2153,7 +2153,7 @@ void MPOptionsDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
     {
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb));
-        g_TrackGame->mode.field_0x6dc = atoi(edit->GetEditText(text, 0x80));
+        g_TrackGame->mode.maxAIBikes = atoi(edit->GetEditText(text, 0x80));
     }
         break;
     }

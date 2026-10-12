@@ -311,7 +311,7 @@ void TrackGameMode::UnknownFunction522cd0() {
 // 0x00522d00
 int TrackGameMode::CreateDirectoryLists() {
 
-    ChooseDisplayMode(0, &field_0xa4c);
+    ChooseDisplayMode(0, &displayModeIndex);
     field_0x25e0 = new(__FILE__, 383) DirectoryList;
     trackDirectoryList = new(__FILE__, 384) CombinedDirectoryList;
     field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
@@ -426,9 +426,9 @@ int TrackGameMode::LoadProfile() {
     }
     fread(field_0x00, 0x10, 1, file);
     fread(&showNewbieDialog, 4, 1, file);
-    fread(&field_0x6ac, 0x374, 1, file);
+    fread(&instrumentOverlayOn, 0x374, 1, file);
     fread(&field_0xa20, 0x2c, 1, file);
-    fread(&field_0xa4c, 0x1c, 1, file);
+    fread(&displayModeIndex, 0x1c, 1, file);
     fread(field_0xa68, 0x30, 1, file);
     fread(field_0x145c, 0x500, 1, file);
     fread(videoSettings, 0x18, 1, file);
@@ -453,7 +453,7 @@ int TrackGameMode::LoadProfile() {
     fread(&field_0x1bcc, 4, 1, file);
     fclose(file);
     field_0x27f8.field_0x35 = 0;
-    ChooseDisplayMode(&displayAdapterGuid, &field_0xa4c);
+    ChooseDisplayMode(&displayAdapterGuid, &displayModeIndex);
     g_TrackGame->ui->field_0x48c = 1;
     LoadControllerChoice();
     if (g_TrackGame->soundInterface) {
@@ -480,9 +480,9 @@ void TrackGameMode::SaveProfile() {
         return;
     fwrite(field_0x00, 0x10, 1, file);
     fwrite(&showNewbieDialog, 4, 1, file);
-    fwrite(&field_0x6ac, 0x374, 1, file);
+    fwrite(&instrumentOverlayOn, 0x374, 1, file);
     fwrite(&field_0xa20, 0x2c, 1, file);
-    fwrite(&field_0xa4c, 0x1c, 1, file);
+    fwrite(&displayModeIndex, 0x1c, 1, file);
     fwrite(field_0xa68, 0x30, 1, file);
     fwrite(field_0x145c, 0x500, 1, file);
     fwrite(videoSettings, 0x18, 1, file);

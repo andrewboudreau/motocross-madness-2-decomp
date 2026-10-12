@@ -64,7 +64,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     g_TrackGame->field_0x3434 = 0;
     if (!g_TrackGame->mode.field_0xa20)
         g_TrackGame->UnknownFunction521a40();
-    UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.field_0xa4c];
+    UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_TrackGame->UnknownVirtualSlot19(
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));

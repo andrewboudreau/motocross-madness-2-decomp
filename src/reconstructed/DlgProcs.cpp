@@ -85,7 +85,7 @@ static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game) {
 }
 
 static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game) {
-    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
+    return (UnknownOptGraphicsSettings*)&game->mode.displayModeIndex;
 }
 
 // 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
@@ -1912,7 +1912,7 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         g_TrackGame->ui->gui->ShowCursors(0);
         framesShown = 0;
-        g_UnknownGlobal59ae00 = !g_TrackGame->mode.field_0x6cc;
+        g_UnknownGlobal59ae00 = !g_TrackGame->mode.introMovieOn;
         break;
     }
 }
@@ -2043,8 +2043,8 @@ void LeaveMenusForRace() {
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
     if (g_TrackGame->ui->gui->field_0x03c)
         g_TrackGame->ui->gui->field_0x03c->UnknownFunction404c80();
-    if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
-        g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
+    if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
+        g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
         g_TrackGame->mode.field_0x26f0 = 0;
         g_TrackGame->mode.field_0x2dbc = 0;

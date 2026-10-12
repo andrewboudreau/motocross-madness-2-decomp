@@ -345,7 +345,7 @@ public:
     int currentSeriesDirectory;           // +0x6a0: a directory name pointer for TrackRecord.cpp 0x0051f2c0; EventManager 0x0045cb70 passes it to 0x00523a60
     int field_0x6a4;                          // cleared when a network race fails to load (dlgprocs.cpp LoadingDlg)
     int field_0x6a8;                          // visual cue and runway lights on (QuarryStuntEvent.cpp)
-    int field_0x6ac;                          // instrument overlay on (QuarryStuntEvent.cpp)
+    int instrumentOverlayOn;                  // +0x6ac: instrument overlay on (QuarryStuntEvent.cpp)
     int field_0x6b0;                          // shows the race statistics (TrackOverlay 0x00519980)
     int field_0x6b4;                          // 1 shows the chat input line (QuarryStuntEvent.cpp)
     int field_0x6b8;                          // shows the racers' name tags (TrackOverlay 0x005190e0)
@@ -353,11 +353,11 @@ public:
     int field_0x6c0;                          // TrackOverlay 0x0051e390
     unsigned char field_0x6c4[0x6c8 - 0x6c4];
     int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
-    int field_0x6cc;                          // intro movie on (dlgprocs.cpp Intro1Dlg)
+    int introMovieOn;                         // +0x6cc: intro movie on (dlgprocs.cpp Intro1Dlg)
     unsigned char field_0x6d0[0x6d4 - 0x6d0];
     int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
     unsigned char field_0x6d8[0x6dc - 0x6d8];
-    int field_0x6dc;                          // most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
+    int maxAIBikes;                           // +0x6dc: most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
     unsigned char field_0x6e0[0x6f4 - 0x6e0];
     char trackNames[6][0x80];             // +0x6f4: a track name per game type (SelectGamePicProcs.cpp)
     int trackIndices[6];                  // +0x9f4: a track index per game type (SelectGamePicProcs.cpp)
@@ -372,13 +372,13 @@ public:
     int field_0xa40;                          // sound volume (racesnd.cpp 0x004e3430)
     unsigned char field_0xa44[0xa48 - 0xa44];
     int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
-    int field_0xa4c;                          // display mode index (EventManager 0x0045e710)
+    int displayModeIndex;                     // +0xa4c: display mode index (EventManager 0x0045e710)
     int field_0xa50;                          // shadows on (QuarryStuntEvent.cpp)
     int field_0xa54;                          // particles on (QuarryStuntEvent.cpp)
     unsigned char field_0xa58[0xa5c - 0xa58];
-    int field_0xa5c;                          // sky cube on (QuarryStuntEvent.cpp)
+    int skyCubeOn;                            // +0xa5c: sky cube on (QuarryStuntEvent.cpp)
     unsigned char field_0xa60[0xa64 - 0xa60];
-    int field_0xa64;                          // detail level 0..9 (QuarryStuntEvent.cpp)
+    int detailLevel;                          // +0xa64: detail level 0..9 (QuarryStuntEvent.cpp)
     unsigned char field_0xa68[0xa88 - 0xa68];
     int field_0xa88;                          // joystick input on (bikerace.cpp slot 16)
     int field_0xa8c;                          // toggled by bikerace.cpp slot 23 (key 0x22)

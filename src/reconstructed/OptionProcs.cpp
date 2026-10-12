@@ -654,7 +654,7 @@ static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game)
 
 static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game)
 {
-    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
+    return (UnknownOptGraphicsSettings*)&game->mode.displayModeIndex;
 }
 
 static inline UnknownOptControlSettings* UnknownControlSettingsOf(TrackGame* game)
