@@ -37,9 +37,9 @@ public:
     GameObject* SetUp(void* owner, int a, TextureMapManager* textures, int b, int c,
                       int d, const char* font, int fontSize, const char* cursor,
                       void (*progress)(), int e);
-    void UnknownFunction485d70(const char* directory);       // 0x00485d70 ("ui")
+    void SetDialogDirectory(const char* directory);       // 0x00485d70 ("ui")
     void SetWaitCursorImage(const char* image);           // 0x00486560 ("ui\\wait.tga")
-    void UnknownFunction4866c0(char* font);                  // 0x004866c0
+    void SetToolTipFont(char* font);                  // 0x004866c0
     void ShowCursors(int value);                             // 0x00486630
     void CloseDialogResource();                            // 0x00485d50 (KrustyUI 0x004999b0)
     UnknownTrackGameObject56cItem* FindInputDialog();        // 0x00485df0

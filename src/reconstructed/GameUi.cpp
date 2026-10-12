@@ -1809,7 +1809,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     soundGroup = 0;
     field_0x7f14 = 0;
     field_0xc0 = 0;
-    field_0x148 = 0;
+    isModal = 0;
     for (int i = 0; i < 10; i++)
         textColors[i] = 0xffffff;
     scaleY = 1.0f;
@@ -1833,7 +1833,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     guiUser = 0;
     resourceArchive = 0;
     controlContainer = 0;
-    field_0x14c = 0;
+    previousModalDialog = 0;
     screenGrab = 0;
     field_0x144 = 0;
     isClosing = 0;
@@ -1844,13 +1844,13 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
 // images, the palette and background it owns, and the timers.
 UIDialog::~UIDialog() {
     if (guiManager) {
-        if (field_0x148)
-            guiManager->UnknownFunction485ee0(field_0x14c);
+        if (isModal)
+            guiManager->SwapModalDialog(previousModalDialog);
         if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
             if (!guiManager || !guiManager->UnknownFunction4864f0())
                 guiManager->UnknownFunction464e90();
         }
-        if (field_0x148 && parentDialog)
+        if (isModal && parentDialog)
             parentDialog->SetModalPause(0, 0, 0);
         if ((field_0x144 & 4) && (field_0x144 & 0x10))
             guiManager->ReleaseBackgroundGrab();
@@ -4028,12 +4028,12 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     }
     parentDialog = parent;
     if (!(flags & 6))
-        field_0x148 = 0;
+        isModal = 0;
     else
-        field_0x148 = 1;
+        isModal = 1;
     guiManager = gui;
-    if (gui && field_0x148)
-        field_0x14c = gui->UnknownFunction485ee0((int)this);
+    if (gui && isModal)
+        previousModalDialog = gui->SwapModalDialog((int)this);
     if (parent)
         dialogPalette = parent->dialogPalette;
     openingMenu = a;

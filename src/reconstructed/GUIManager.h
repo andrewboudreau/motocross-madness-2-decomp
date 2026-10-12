@@ -329,10 +329,10 @@ public:
     void AttachDialog(UIDialog* dialog, int a, int wait); // 0x00485bd0: adds a shown dialog to its container
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
-    void UnknownFunction485d70(const char* directory); // 0x00485d70
+    void SetDialogDirectory(const char* directory); // 0x00485d70
     UIDialog* FindInputDialog();      // 0x00485df0: the dialog taking input
     Sound* FindSectionObject(const char* name); // 0x00485ec0: the opened dialog's section object
-    int UnknownFunction485ee0(int value);     // 0x00485ee0: sets +0x2c, returns the old value
+    int SwapModalDialog(int value);     // 0x00485ee0: sets +0x2c, returns the old value
     void CreateBackground();                  // 0x00485ef0: creates the background
     void ReleaseBackground();             // 0x00485fc0: releases it
     void GrabBackground(int dim);      // 0x004860a0: grabs the screen as the background
@@ -349,7 +349,7 @@ public:
     void RecreateCursors(const char* image, int redraw); // 0x004865e0
     void ShowCursors(int show);               // 0x00486630: each user's cursor slot 5 (show) or 4
     void ReleaseCursors();             // 0x00486680: releases the cursors
-    void UnknownFunction4866c0(const char* font); // 0x004866c0
+    void SetToolTipFont(const char* font); // 0x004866c0
     // 0x00486740: a `width` x `height` texture filled with `color`.
     PCTextureMap* CreateFilledTexture(int width, int height, unsigned long color);
     // 0x004868b0: creates (CreateClipper) and attaches (SetClipper, SetHWnd
@@ -357,7 +357,7 @@ public:
     int EnableWindowClipper(int enable);
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body)
 
-    int field_0x2c;
+    int modalDialog;                          // +0x2c the newest modal UIDialog (SwapModalDialog)
     UIDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
     Palette8* guiPalette;                     // +0x34
     Palette8* setupPalette;                   // +0x38: SetUp's palette

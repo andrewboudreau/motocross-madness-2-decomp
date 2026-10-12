@@ -324,7 +324,7 @@
   "?SetBarTexture@UIProgressBar@@QAEXHH@Z": "0x0047b3d0",
   "?TextureHasColor@@YAHPAVTextureMap@@H@Z": "0x0047b490",
   "?ResizeDebugBlock@@YAPAXPAXI@Z": "0x0047b570",
-  "?UnknownFunction485ee0@GUIManager@@QAEHH@Z": "0x00485ee0",
+  "?SwapModalDialog@GUIManager@@QAEHH@Z": "0x00485ee0",
   "?SetGuiPalette@GUIManager@@QAEXPAVPalette8@@@Z": "0x00486150",
   "?UnknownFunction4864f0@GUIManager@@QAEHXZ": "0x004864f0",
   "?UnknownFunction486b10@ToolTip@@QAEXPAVUnknownGuiControl@@@Z": "0x00486b10",

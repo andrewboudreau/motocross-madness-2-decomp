@@ -63,7 +63,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
     CameraRect* rect;
 
     if (!(flags & 4) && !(flags & 2)) {
-        if (!FindInputDialog() || !FindInputDialog()->field_0x148)
+        if (!FindInputDialog() || !FindInputDialog()->isModal)
             ReleaseBackgroundGrab();
     } else {
         rect = 0;

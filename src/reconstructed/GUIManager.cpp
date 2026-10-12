@@ -166,7 +166,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     for (i = 0; i < 4; i++)
         users[i] = 0;
     dialogContainer = 0;
-    field_0x2c = 0;
+    modalDialog = 0;
     field_0x34c = 0;
     strcpy(toolTipFontFace, "");
     field_0x3d0 = 0;
@@ -386,7 +386,7 @@ void GUIManager::CloseDialogResource() {
 }
 
 // 0x00485d70
-void GUIManager::UnknownFunction485d70(const char* directory) {
+void GUIManager::SetDialogDirectory(const char* directory) {
     int last = strlen(directory) - 1;
 
     strcpy(dialogDirectory, directory);
@@ -405,7 +405,7 @@ UIDialog* GUIManager::FindInputDialog() {
             found = dialog;
         if (mouseDevice && PtInRect((RECT*)&dialog->screenArea, mouseDevice->pointerPosition))
             found = dialog;
-        if (dialog->field_0x148)
+        if (dialog->isModal)
             found = dialog;
     }
     return found;
@@ -419,9 +419,9 @@ Sound* GUIManager::FindSectionObject(const char* name) {
 }
 
 // 0x00485ee0
-int GUIManager::UnknownFunction485ee0(int value) {
-    int previous = field_0x2c;
-    field_0x2c = value;
+int GUIManager::SwapModalDialog(int value) {
+    int previous = modalDialog;
+    modalDialog = value;
     return previous;
 }
 
@@ -565,7 +565,7 @@ void GUIManager::ReleaseCursors() {
 }
 
 // 0x004866c0
-void GUIManager::UnknownFunction4866c0(const char* font) {
+void GUIManager::SetToolTipFont(const char* font) {
     strcpy(toolTipFontFace, font);
     if (toolTipFont)
         DeleteObject((HGDIOBJ)toolTipFont);

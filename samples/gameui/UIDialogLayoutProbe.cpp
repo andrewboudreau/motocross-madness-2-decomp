@@ -40,7 +40,7 @@ DIALOG_OFFSET(soundGroup, 0x114);
 DIALOG_OFFSET(textColors, 0x118);
 DIALOG_OFFSET(dialogPalette, 0x140);
 DIALOG_OFFSET(field_0x144, 0x144);
-DIALOG_OFFSET(field_0x148, 0x148);
+DIALOG_OFFSET(isModal, 0x148);
 DIALOG_OFFSET(notifyParentOnClose, 0x154);
 DIALOG_OFFSET(scaleToScreen, 0x158);
 DIALOG_OFFSET(screenArea, 0x160);
