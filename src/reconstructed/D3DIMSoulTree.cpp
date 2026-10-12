@@ -19,7 +19,7 @@
 D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     : SoultreeObject(flags)
 {
-    field_0x1a4 = 0;
+    useLighting = 0;
     field_0x1a8 = 0;
     field_0x1ac = 0;
     field_0x1b4 = 1;
@@ -41,10 +41,10 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     modifierCount = 0;
     secondModifierList = 0;
     secondModifierCount = 0;
-    field_0x298.field_0x00 = 0;
-    field_0x298.field_0x04 = 0;
-    field_0x298.field_0x08 = 0;
-    field_0x298.field_0x0c = 0;
+    screenRect.left = 0;
+    screenRect.top = 0;
+    screenRect.right = 0;
+    screenRect.bottom = 0;
     textureScroll = 0;
     // Retail fills the temporary z first (a plain Vector3(0, 0, 0) stores
     // it x first).
@@ -82,8 +82,8 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
         }
         DebugFree(lodTable, __FILE__, 0x72);
     }
-    UnknownFunction444e80();
-    UnknownFunction444fb0();
+    RemoveAllModifiers();
+    RemoveAllSecondModifiers();
     void* item = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (item)
         g_UnknownResourceManager572b44->SetItemObject(item, 0);
@@ -247,7 +247,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
         lodTable = 0;
     }
     DebugFree(nodes, __FILE__, 0x1a7);
-    UnknownFunction444440();
+    ComputeAllBounds();
 }
 
 // 0x0043fe40
@@ -413,7 +413,7 @@ int D3DIMSoultreeObject::ReadLods()
             }
         }
     }
-    UnknownFunction444440();
+    ComputeAllBounds();
     DebugFree(groups, __FILE__, 0x291);
     DebugFree(nodes, __FILE__, 0x292);
     return untextured;
@@ -453,7 +453,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
                 group->node->UpdateWorldMatrix();
                 void* target = group->transformedVertices;
                 void* vertices = source->sourceVertices;
-                if (field_0x1a4) {
+                if (useLighting) {
                     if (colored)
                         lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
                                                            group->normals, vertices, 0xc, target);
@@ -743,7 +743,7 @@ void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int fl
 }
 
 // 0x004439c0
-void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
+void D3DIMSoultreeObject::DrawScreenRect(UnknownSoultreeScreenRect* rect)
 {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
@@ -752,13 +752,13 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
     UnknownSoultreeCameraView* camera = (UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera;
     char* bits = (char*)desc.surface + camera->viewportY * desc.pitch + camera->viewportX;
     int i;
-    for (i = rect->field_0x00; i < rect->field_0x08; i++) {
-        bits[rect->field_0x04 * desc.pitch + i * 2] = 0;
-        bits[rect->field_0x0c * desc.pitch + i * 2] = 0;
+    for (i = rect->left; i < rect->right; i++) {
+        bits[rect->top * desc.pitch + i * 2] = 0;
+        bits[rect->bottom * desc.pitch + i * 2] = 0;
     }
-    for (i = rect->field_0x04; i < rect->field_0x0c; i++) {
-        bits[i * desc.pitch + rect->field_0x08 * 2] = 0;
-        bits[i * desc.pitch + rect->field_0x00 * 2] = 0;
+    for (i = rect->top; i < rect->bottom; i++) {
+        bits[i * desc.pitch + rect->right * 2] = 0;
+        bits[i * desc.pitch + rect->left * 2] = 0;
     }
     ((PCRenderTarget*)renderContext)->renderSurface->Unlock(0);
 }
@@ -837,13 +837,13 @@ int D3DIMSoultreeObject::UnknownVirtualSlot14()
         return 1;
     DrawCurrentLod();
     if (field_0x2d0) {
-        UnknownFunction4439c0(&field_0x298);
+        DrawScreenRect(&screenRect);
         ComputeSubtreeBounds();
         DrawAxisGizmo();
     }
     GameObject::UnknownVirtualSlot14();
-    field_0x298.field_0x08++;
-    field_0x298.field_0x0c++;
+    screenRect.right++;
+    screenRect.bottom++;
     return 1;
 }
 
@@ -856,7 +856,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot4(SoultreeObject** out)
 }
 
 // 0x00444440
-void D3DIMSoultreeObject::UnknownFunction444440()
+void D3DIMSoultreeObject::ComputeAllBounds()
 {
     int count = CountNodes();
     SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x80b);
@@ -873,20 +873,20 @@ void D3DIMSoultreeObject::UnknownFunction444440()
 void D3DIMSoultreeObject::UnknownFunction4444c0(int value)
 {
     subtreeDirty = 1;
-    field_0x1a4 = value;
+    useLighting = value;
 }
 
 // 0x004444e0
 void D3DIMSoultreeObject::UnknownFunction4444e0()
 {
-    field_0x298.field_0x00 = 0;
-    field_0x298.field_0x08 = 0;
-    field_0x298.field_0x04 = 0;
-    field_0x298.field_0x0c = 0;
-    field_0x2a8.field_0x00 = 0;
-    field_0x2a8.field_0x08 = 0;
-    field_0x2a8.field_0x04 = 0;
-    field_0x2a8.field_0x0c = 0;
+    screenRect.left = 0;
+    screenRect.right = 0;
+    screenRect.top = 0;
+    screenRect.bottom = 0;
+    field_0x2a8.left = 0;
+    field_0x2a8.right = 0;
+    field_0x2a8.top = 0;
+    field_0x2a8.bottom = 0;
     SetFlag14c();
 }
 
@@ -905,7 +905,7 @@ void D3DIMSoultreeObject::UnknownVirtualSlot4()
 }
 
 // 0x00444a40
-void D3DIMSoultreeObject::UnknownFunction444a40(D3DIMSoultreeObject* source)
+void D3DIMSoultreeObject::CopyMaterials(D3DIMSoultreeObject* source)
 {
     materialCount = source->materialCount;
     materialTable = (SoultreeMaterial**)DebugMalloc(materialCount * 4, __FILE__, 0x8ed);
@@ -925,7 +925,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, Soult
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
     D3DIMSoultreeObject* target = (D3DIMSoultreeObject*)targetNode;
     target->subtreeDirty = 1;
-    target->field_0x1a4 = source->field_0x1a4;
+    target->useLighting = source->useLighting;
     target->field_0x1a8 = source->field_0x1a8;
     target->field_0x1ac = source->field_0x1ac;
     target->lightManager = source->lightManager;
@@ -937,7 +937,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, Soult
     target->textureManager = source->textureManager;
     target->textureFormat = source->textureFormat;
     memcpy(target->textureOptions, source->textureOptions, sizeof(target->textureOptions));
-    target->field_0x298 = source->field_0x298;
+    target->screenRect = source->screenRect;
     target->field_0x2a8 = source->field_0x2a8;
 }
 
@@ -986,7 +986,7 @@ void D3DIMSoultreeObject::UnknownFunction444d60(float value)
 }
 
 // 0x00444d80
-void D3DIMSoultreeObject::UnknownFunction444d80(GameObject* modifier)
+void D3DIMSoultreeObject::AddModifier(GameObject* modifier)
 {
     modifierList = (GameObject**)DebugRealloc(modifierList, modifierCount * 4 + 4, __FILE__, 0x958);
     modifierList[modifierCount] = modifier;
@@ -995,7 +995,7 @@ void D3DIMSoultreeObject::UnknownFunction444d80(GameObject* modifier)
 }
 
 // 0x00444de0
-void D3DIMSoultreeObject::UnknownFunction444de0(GameObject* modifier)
+void D3DIMSoultreeObject::RemoveModifier(GameObject* modifier)
 {
     int found = 0;
     int i;
@@ -1011,10 +1011,10 @@ void D3DIMSoultreeObject::UnknownFunction444de0(GameObject* modifier)
 }
 
 // 0x00444e80
-void D3DIMSoultreeObject::UnknownFunction444e80()
+void D3DIMSoultreeObject::RemoveAllModifiers()
 {
     while (modifierCount)
-        UnknownFunction444de0(modifierList[0]);
+        RemoveModifier(modifierList[0]);
 }
 
 // 0x00444eb0
@@ -1027,7 +1027,7 @@ void D3DIMSoultreeObject::UnknownFunction444eb0(GameObject* modifier)
 }
 
 // 0x00444f10
-void D3DIMSoultreeObject::UnknownFunction444f10(GameObject* modifier)
+void D3DIMSoultreeObject::RemoveSecondModifier(GameObject* modifier)
 {
     int found = 0;
     int i;
@@ -1043,10 +1043,10 @@ void D3DIMSoultreeObject::UnknownFunction444f10(GameObject* modifier)
 }
 
 // 0x00444fb0
-void D3DIMSoultreeObject::UnknownFunction444fb0()
+void D3DIMSoultreeObject::RemoveAllSecondModifiers()
 {
     while (secondModifierCount)
-        UnknownFunction444f10(secondModifierList[0]);
+        RemoveSecondModifier(secondModifierList[0]);
 }
 
 // 0x00444fe0
@@ -1109,7 +1109,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
     currentLod = saved;
     SoultreeObject::SoultreeVirtualSlot6();
     if (!parent)
-        UnknownFunction444440();
+        ComputeAllBounds();
 }
 
 // 0x004451e0

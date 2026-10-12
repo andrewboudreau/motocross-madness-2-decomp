@@ -22,7 +22,7 @@
 // SoultreeVirtualSlot7 (0x00444560, 1233 bytes): the node search reuses
 // the CollectDescendants counter `index` (retail keeps it in that slot,
 // frame 0x2c now matches), the surface array size is read back from
-// `to->surfaceCount`, the final UnknownFunction444440 call is shared after
+// `to->surfaceCount`, the final ComputeAllBounds call is shared after
 // the if/else (retail pops edi/ebp before it), and `to` declared before
 // `from` gives retail's loop-head schedule. The instruction stream then
 // equals retail's up to a register rotation: retail keeps the source in ebx,
@@ -188,7 +188,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
     textureManager = source->textureManager;
     lightManager = source->lightManager;
     SoultreeObject::SoultreeVirtualSlot7(source);
-    UnknownFunction444a40(source);
+    CopyMaterials(source);
     lodCount = source->lodCount;
     currentLod = source->currentLod;
     lowestLod = source->lowestLod;
@@ -259,7 +259,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
     } else {
         lodTable = 0;
     }
-    UnknownFunction444440();
+    ComputeAllBounds();
 }
 
 float FastInvSqrt(float x);                         // 0x00460c00
@@ -340,7 +340,7 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
 class UnknownSoultreeClipper {
 public:
     int TestBox(UnknownSoultreeCameraView* camera, Matrix4* matrix, Vector3* center,
-                              Vector3* extents, UnknownSoultreeCounters* rect, int* corners, int* a7);
+                              Vector3* extents, UnknownSoultreeScreenRect* rect, int* corners, int* a7);
 };
 extern UnknownSoultreeClipper* g_UnknownSoultreeClipper575a98;
 
@@ -398,7 +398,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         view._42 = world.m[3][0] * projection.m[0][1] + world.m[3][1] * projection.m[1][1] + world.m[3][2] * projection.m[2][1] + world.m[3][3] * projection.m[3][1];
         view._43 = world.m[3][0] * projection.m[0][2] + world.m[3][1] * projection.m[1][2] + world.m[3][2] * projection.m[2][2] + world.m[3][3] * projection.m[3][2];
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
-        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
+        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera, (Matrix4*)&view, &center, &extents, &screenRect, 0,
                                                                   &field_0x260)) {
             field_0x2d4 = 1;
             SelectLod(&center, &extents);
@@ -500,7 +500,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
         int restore = 0;
         for (int m = 0; m < surface->materialCount; m++) {
             SoultreeMaterial* material = materialTable[surface->materialIndices[m]];
-            if (field_0x1a4)
+            if (useLighting)
                 ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
             material->ApplyRenderStates();
             switch (material->mappingType) {
