@@ -546,7 +546,7 @@ struct UnknownBikeRaceNode {
     Vector3 halfExtents;                      // +0x18 half extents (across the direction for gates)
     float field_0x24;
     int field_0x28;
-    TrackPos field_0x2c;
+    TrackPos trackPos;                        // +0x2c position along the track (DistanceAlong/PlaceNear operand, 0x004e6a50)
     UnknownBikeRaceNode* nextGate;            // +0x38 next gate
 };
 

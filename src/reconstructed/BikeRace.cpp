@@ -252,7 +252,7 @@ int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
 
 // 0x0041d1e0
 int BikeRace::UpdateTrackSeparation() {
-    if (raceTrack != 0 && raceTrack->DistanceAlong(finishProbe.field_0x2c, startProbe.field_0x2c) > 0.0f) {
+    if (raceTrack != 0 && raceTrack->DistanceAlong(finishProbe.trackPos, startProbe.trackPos) > 0.0f) {
         field_0x189 = 0;
     } else {
         field_0x189 = 1;
@@ -606,8 +606,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     int previous = lap == laps - 2;
                     if (previous || last) {
                         float toFinish = raceTrack->DistanceAlong(localRacer->statusNode->progressPos,
-                                                                            finishProbe.field_0x2c);
-                        float fromFinish = raceTrack->DistanceAlong(finishProbe.field_0x2c,
+                                                                            finishProbe.trackPos);
+                        float fromFinish = raceTrack->DistanceAlong(finishProbe.trackPos,
                                                                               localRacer->statusNode->progressPos);
                         if (field_0x078 && localRacer->finished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
