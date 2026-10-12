@@ -209,6 +209,21 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
     return this;
 }
 
+// v * s with all three products computed before the result is stored: retail
+// stores the x component before the z product is spilled (0x00515b50, 0x005135f0),
+// where the CollisionTypes.h operator* stores x and y after it.
+static inline CollisionVec3 TireScaled(const CollisionVec3& v, float s)
+{
+    float x = v.x * s;
+    float y = v.y * s;
+    float z = v.z * s;
+    CollisionVec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+
 // CollisionPoint slot 1 override (0x00515b50, compiled with this = the CollisionPoint
 // subobject at +0xb8, hence the +0xb8 Tire offsets 0x230.. behind CollisionPoint-relative
 // disassembly displacements).  The base implementation (0x0043b240) computes the contact
@@ -238,7 +253,7 @@ void Tire::CollisionPointVirtualSlot1()
         CollisionPoint::frictionMagnitude = (rollTerm + (-sideFriction) * sideFrictionScale * tangentSin
                                                         * CollisionPoint::frictionCoefficient)
                                      * CollisionPoint::surfaceGrip;
-        CollisionPoint::frictionForce = CollisionPoint::frictionDirection * CollisionPoint::frictionMagnitude;
+        CollisionPoint::frictionForce = TireScaled(CollisionPoint::frictionDirection, CollisionPoint::frictionMagnitude);
         if (CollisionPoint::frictionMagnitude < 0.0f)
             CollisionPoint::frictionMagnitude = -CollisionPoint::frictionMagnitude;
     }
@@ -271,6 +286,32 @@ static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const Collis
     return p;
 }
 
+// a + b, again with the sums computed before the stores.
+static inline CollisionVec3 TireSum(const CollisionVec3& a, const CollisionVec3& b)
+{
+    float x = a.x + b.x;
+    float y = a.y + b.y;
+    float z = a.z + b.z;
+    CollisionVec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+
+// v * s through local copies of v.x and v.y: the copies are newer leaves, so VC6
+// loads each component first and multiplies by the held s (`fld mem; fmul st(1)`).
+static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
+{
+    CollisionVec3 r;
+    float x = v.x;
+    r.x = x * s;
+    float y = v.y;
+    r.y = y * s;
+    r.z = v.z * s;
+    return r;
+}
+
 // 0x005135f0.  Semantics are tier 3.  `this` is the complete Tire; the CollisionPoint
 // members are addressed through the subobject (+0xb8).
 //   field_0x38 = contact position - *pos, field_0x5c = axis x field_0x38;
@@ -281,13 +322,17 @@ static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const Collis
 // also zeroes field_0x90) field_0x1e8 = field_0x218.
 // field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
 // |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
-// Near miss, 1555 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
+// Near miss, 1582 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
 // projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps retail's
-// fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. Left: the
-// lever's `lea edi` and store are scheduled later, the slip vector is scaled as
-// `fld st(0); fmul mem` (retail `fld mem; fmul st(1)`) with its TireDot pushes
-// together, two struct-copy stores trade places, and one x term of the d-path dot
-// swaps its operands.
+// fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
+// vector is scaled through TireScaleCopy (retail's `fld mem; fmul st(1)`) and summed
+// and normalised through TireSum/TireScaled (retail's copy-store schedule). Left:
+// the lever's `lea edi` and store are scheduled later, the second TireDot push comes
+// before the y product instead of after it, and one x term of the d-path dot swaps
+// its operands. No gain from a products-first cross or projection for the lever
+// (1571), a TireScaleCopy that copies all three components or none (1548..1555),
+// or the d-path dot written out in any order (1133..1137) or through a helper with
+// copied or swapped x operands (1575..1582).
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
@@ -313,7 +358,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
         if (d > 0.001f) {
             if (reportContactOutputs)
                 *outValue = d;
-            slipVector = tangent * this->CollisionPoint::tangentSpeed + normalLeverCross;
+            slipVector = TireSum(TireScaleCopy(tangent, this->CollisionPoint::tangentSpeed), normalLeverCross);
             float lenSq = TireDot(&slipVector, &slipVector);
             float len;
             if (lenSq == 0.0f)
@@ -323,7 +368,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             else
                 len = 1.0f / FastInvSqrt(lenSq);
             float inv = 1.0f / len;
-            this->CollisionPoint::frictionDirection = slipVector * inv;
+            this->CollisionPoint::frictionDirection = TireScaled(slipVector, inv);
             lenSq = TireDot(&normalLeverCross, &normalLeverCross);
             this->CollisionPoint::spinSpeed = TireLengthFromSq(lenSq);
             float c = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);

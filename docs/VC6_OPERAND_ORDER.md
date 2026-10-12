@@ -96,6 +96,16 @@ of a call (in `st(0)`):
   scalar's leaf (`ParticleVec3 g(step.x, step.y, step.z);` before
   `v + (n - i) * g`): the DirtChunk, DirtSpray and Spark emitters' slot 10
   (`0x004b8f40`, `0x004b9460`, `0x004b99a0`) became exact with it.
+  The copies work inside an inline helper too: Tire's UpdateContactPatch
+  (`0x005135f0`) scales its slip vector through a helper that copies `v.x`
+  and `v.y` into locals (`fld mem; fmul st(1)` for both, `fmul v.z` last);
+  copying all three components or none gives the scalar-first form.
+- Storing the result vector: when an inline helper writes `r.x = v.x * s;`
+  .. and returns `r` into a member, VC6 stores x and y before spilling the z
+  product (`mov [edx+4]; fstp tmp`). Computing the three products into
+  locals first and then filling `r` gives retail's order (`fstp tmp; mov
+  [edx+4]`): Tire slot 1 (`0x00515b50`, 305 to 312) and UpdateContactPatch
+  (with the same form for `a + b`).
 
 So "a scalar is loaded first when it is a local of the inlined helper"
 (docs/PHYSICS_VALIDATION.md) is the same rule: the helper's `k` is the newest

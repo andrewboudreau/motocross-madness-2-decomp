@@ -46,7 +46,7 @@
     "target_va": "0x00515b50",
     "target_size": 316,
     "expect": "partial",
-    "notes": "305/316 strict. The tangent dot is TireDotInline (z + (x + y), which VC6 emits y, x, z like retail); the roll term is a named local so VC6 neither factors frictionCoefficient out of the sum nor hoists the side term above it. Remaining: in the side term VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2); fmul [ecx+0x74]`), and one frictionForce copy store is scheduled earlier. No gain from: all 24 operand orders of the side product with either negation, parenthesised groupings (these hoist the side term, 193-210), a local s or chained `s = tangentSin = sqrt(...)`, a coefficient local, a named sum, a named side term, the 12 dot orders.",
+    "notes": "312/316 strict. The tangent dot is TireDotInline (z + (x + y), which VC6 emits y, x, z like retail); the roll term is a named local so VC6 neither factors frictionCoefficient out of the sum nor hoists the side term above it. The force is scaled through TireScaled (products before stores), which schedules the frictionForce copy stores like retail. Remaining: in the side term VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2); fmul [ecx+0x74]`). No gain from: all 24 operand orders of the side product with either negation, parenthesised groupings (these hoist the side term, 193-210), a local s or chained `s = tangentSin = sqrt(...)`, a coefficient local, a named sum, a named side term, the 12 dot orders, a coefficient local before the dot or after the sqrt, an inline friction-term helper for one or both terms.",
     "bindings": "Tire.bindings.json"
   },
   {
@@ -85,7 +85,7 @@
     "target_va": "0x005135f0",
     "target_size": 1664,
     "expect": "partial",
-    "notes": "1555/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch. Left: scheduling of the lever store, the slip-vector scale operand order, two struct-copy store pairs and one dot-term operand order (see Tire.cpp).",
+    "notes": "1582/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch; the slip vector is built through TireScaleCopy/TireSum and normalised through TireScaled, which give retail's scale operand order and copy-store schedule. Left: scheduling of the lever store, one TireDot argument push and one dot-term operand order (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {
