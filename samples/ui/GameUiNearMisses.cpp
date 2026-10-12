@@ -1396,8 +1396,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &position);
                     parameters.UnknownFunction4b7f10("Scale", defaultScale, isDefault ? &defaultScale : &scale);
                     if (!isDefault) {
-                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4754d0(ticks);
-                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4751c0(scale);
+                        static_cast<UIScrollBar*>(scrollBar)->SetSnapStepCount(ticks);
+                        static_cast<UIScrollBar*>(scrollBar)->SetScrollRange(scale);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
@@ -1414,7 +1414,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             control->bounds[2] = image->frameList[0]->frameWidth + control->bounds[0];
                             control->bounds[3] = control->bounds[1] + image->frameList[0]->frameHeight;
                         }
-                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4753c0(position, ticks ? ticks
+                        static_cast<UIScrollBar*>(scrollBar)->SetThumbPosition(position, ticks ? ticks
                                                                          : control->bounds[2] - control->bounds[0] + 1);
                         scrollBar->SetThumbSizeFromState(0);
                     }

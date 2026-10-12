@@ -880,11 +880,11 @@ int UIScrollCtl::ButtonUp(int a, int* position) {
 UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner)
     : UIControl(type, id, area, owner) {
     field_0x1ec = 0;
-    field_0x1f0 = 0;
+    snapSteps = 0;
     thumbWidth = 0;
     thumbHeight = 0;
-    field_0x1fc = 0;
-    field_0x208 = 0;
+    followedRow = 0;
+    dragging = 0;
     field_0x204 = 0;
     dragY = 0;
     dragX = 0;
@@ -903,9 +903,9 @@ UIScrollBar::~UIScrollBar() {
 // 0x00474cb0
 void UIScrollBar::SyncBoundValue(int value) {
     if (value)
-        *boundValue = UnknownFunction475500();
+        *boundValue = GetScrollValue();
     else
-        UnknownFunction4753c0(*boundValue, scrollRange);
+        SetThumbPosition(*boundValue, scrollRange);
 }
 
 // 0x00475160
@@ -916,23 +916,23 @@ void UIScrollBar::SetThumbSizeFromState(int state) {
 }
 
 // 0x004751c0
-void UIScrollBar::UnknownFunction4751c0(int range) {
+void UIScrollBar::SetScrollRange(int range) {
     scrollRange = range;
     RequestRedraw();
 }
 
 // 0x004754d0
-void UIScrollBar::UnknownFunction4754d0(int range) {
-    if (range > 0)
-        field_0x1f0 = range - 1;
+void UIScrollBar::SetSnapStepCount(int count) {
+    if (count > 0)
+        snapSteps = count - 1;
     else
-        field_0x1f0 = 0;
+        snapSteps = 0;
     RequestRedraw();
 }
 
 // 0x004755c0
 int UIScrollBar::UnknownFunction4755c0() {
-    return field_0x1f0;
+    return snapSteps;
 }
 
 // UIListBox's first shown row and UIMultiState's current state are read
@@ -3156,11 +3156,11 @@ int UIScrollBar::FollowList(UIListBox* list) {
     RequestRedraw();
     if (reversed) {
         int count = list->rowCount;
-        field_0x1fc = count - list->UnknownFunction4755c0();
+        followedRow = count - list->UnknownFunction4755c0();
     } else {
-        field_0x1fc = list->UnknownFunction4755c0();
+        followedRow = list->UnknownFunction4755c0();
     }
-    if (GetListScrollRange(list) == field_0x1fc)
+    if (GetListScrollRange(list) == followedRow)
         return 1;
     unsigned int travel;
     if (controlType == 8)
@@ -3169,7 +3169,7 @@ int UIScrollBar::FollowList(UIListBox* list) {
         travel = GetHeight() - thumbHeight;
     unsigned int range = list->rowCount - list->lastPageRowCount;
     if (range) {
-        float position = field_0x1fc * (float)travel / range;
+        float position = followedRow * (float)travel / range;
         thumbOffset = position < travel ? position : travel;
         return 1;
     }
@@ -3177,7 +3177,7 @@ int UIScrollBar::FollowList(UIListBox* list) {
 }
 
 // 0x00475300
-int UIScrollBar::UnknownFunction475300(int value) {
+int UIScrollBar::ScaleThumbPosition(int range) {
     int width = GetWidth();
     int height = GetHeight();
     unsigned int position;
@@ -3188,11 +3188,11 @@ int UIScrollBar::UnknownFunction475300(int value) {
         position = (int)(reversed ? height - thumbOffset : thumbOffset);
     }
     travel = controlType == 8 ? width - thumbWidth : height - thumbHeight;
-    return (int)(travel ? (double)(position * value) / travel : 0.0);
+    return (int)(travel ? (double)(position * range) / travel : 0.0);
 }
 
 // 0x00475500
-int UIScrollBar::UnknownFunction475500() {
+int UIScrollBar::GetScrollValue() {
     int width = GetWidth();
     int height = GetHeight();
     int position;
@@ -3773,7 +3773,7 @@ int UIControl::SlideBottomStep() {
 int UIScrollBar::ButtonUp(int a, int* position) {
     UnknownDialogEvent event;
     event.handled = 0;
-    if (field_0x208) {
+    if (dragging) {
         event.kind = 0x10;
         event.code = eventCode;
         event.controlName = GetName();
@@ -3782,7 +3782,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         event.control = this;
         ownerDialog->UnknownVirtualSlot29(&event);
     }
-    field_0x208 = 0;
+    dragging = 0;
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -4252,22 +4252,22 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
                 if (position.y <= -1) {
                     if (ownerDialog->joystickCentred) {
                         if (UnknownFunction4755c0()) {
-                            if (UnknownFunction475500())
-                                UnknownFunction4753c0(UnknownFunction475500() - 1, UnknownFunction4755c0());
+                            if (GetScrollValue())
+                                SetThumbPosition(GetScrollValue() - 1, UnknownFunction4755c0());
                         } else {
-                            if (UnknownFunction475500())
-                                UnknownFunction4753c0(UnknownFunction475500() - 1, range);
+                            if (GetScrollValue())
+                                SetThumbPosition(GetScrollValue() - 1, range);
                         }
                         ownerDialog->joystickCentred = 0;
                     }
                 } else if (position.y >= 1) {
                     if (ownerDialog->joystickCentred) {
                         if (UnknownFunction4755c0()) {
-                            if ((unsigned int)UnknownFunction475500() < (unsigned int)UnknownFunction4755c0())
-                                UnknownFunction4753c0(UnknownFunction475500() + 1, UnknownFunction4755c0());
+                            if ((unsigned int)GetScrollValue() < (unsigned int)UnknownFunction4755c0())
+                                SetThumbPosition(GetScrollValue() + 1, UnknownFunction4755c0());
                         } else {
-                            if ((unsigned int)UnknownFunction475500() < (unsigned int)range)
-                                UnknownFunction4753c0(UnknownFunction475500() + 1, range);
+                            if ((unsigned int)GetScrollValue() < (unsigned int)range)
+                                SetThumbPosition(GetScrollValue() + 1, range);
                         }
                         ownerDialog->joystickCentred = 0;
                     }
@@ -4356,7 +4356,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
         GameObjectIterator* iterator;
         UIControl* list;
         if (controlType == 8) {
-            if (field_0x1f0) {
+            if (snapSteps) {
                 thumbOffset = (float)UnknownMinInt(GetWidth() - thumbWidth,
                                                          UnknownMaxInt(((int*)b)[0] - screenArea[0], 0));
             } else {
@@ -4385,7 +4385,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                 }
             }
         } else {
-            if (field_0x1f0) {
+            if (snapSteps) {
                 thumbOffset = (float)UnknownMinInt(GetHeight() - thumbHeight,
                                                          UnknownMaxInt(((int*)b)[1] - screenArea[1], 0));
             } else {
@@ -4414,8 +4414,8 @@ int UIScrollBar::ButtonDown(int a, int b) {
                 }
             }
         }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+        if (snapSteps)
+            SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
     }
     return UIControl::ButtonDown(a, b);
 }
@@ -4430,23 +4430,23 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
         int height = GetHeight();
         RequestRedraw();
         if (controlType == 8) {
-            if (field_0x1f0)
+            if (snapSteps)
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0], 0));
             else
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
-            if (field_0x1f0 != 0.0f)
+            if (snapSteps != 0.0f)
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1], 0));
             else
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
-        if (!field_0x208) {
+        if (snapSteps)
+            SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
+        if (!dragging) {
             event.kind = 0xf;
             event.code = eventCode;
             event.controlName = GetName();
@@ -4454,7 +4454,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
             event.gui = ownerGui;
             event.control = this;
             ownerDialog->UnknownVirtualSlot29(&event);
-            field_0x208 = 1;
+            dragging = 1;
         }
         if (!event.handled) {
             if (position[0] == dragX && position[1] == dragY) {
@@ -4488,7 +4488,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
                     if (list->controlType == 3) {
                         UIListBox* listBox = static_cast<UIListBox*>(list);
                         listBox->ScrollToRow(
-                            UnknownFunction475300(listBox->rowCount - listBox->lastPageRowCount), 0);
+                            ScaleThumbPosition(listBox->rowCount - listBox->lastPageRowCount), 0);
                     }
                 }
                 DeleteControlIterator(iterator);
@@ -4708,23 +4708,23 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
         int height = GetHeight();
         RequestRedraw();
         if (controlType == 8) {
-            if (field_0x1f0)
+            if (snapSteps)
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0], 0));
             else
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
-            if (field_0x1f0 != 0.0f)
+            if (snapSteps != 0.0f)
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1], 0));
             else
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
-        if (!field_0x208) {
+        if (snapSteps)
+            SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
+        if (!dragging) {
             event.kind = 0xf;
             event.code = eventCode;
             event.controlName = ownerList->GetName();
@@ -4732,7 +4732,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
             event.gui = ownerGui;
             event.control = this;
             ownerDialog->UnknownVirtualSlot29(&event);
-            field_0x208 = 1;
+            dragging = 1;
         }
         if (!event.handled) {
             if (position[0] == dragX && position[1] == dragY) {
@@ -4764,7 +4764,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
                 if (list != 0) {
                     int count = list->rowCount;
                     int page = list->lastPageRowCount;
-                    list->ScrollToRow(UnknownFunction475300(count - page), 0);
+                    list->ScrollToRow(ScaleThumbPosition(count - page), 0);
                 }
             }
         }
@@ -4775,7 +4775,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
 int UIDDLScrollBar::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
         UIListBox* list = ownerList->listPart;
-        if (field_0x1f0) {
+        if (snapSteps) {
             thumbOffset = (float)UNKNOWN_MIN(GetHeight() - thumbHeight,
                                                    UNKNOWN_MAX(((int*)b)[1] - screenArea[1], 0));
         } else {
@@ -4791,8 +4791,8 @@ int UIDDLScrollBar::ButtonDown(int a, int b) {
             }
         }
     }
-    if (field_0x1f0)
-        UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+    if (snapSteps)
+        SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
     return UIControl::ButtonDown(a, b);
 }
 
@@ -5027,10 +5027,10 @@ int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntr
 }
 
 // 0x004753c0
-int UIScrollBar::UnknownFunction4753c0(int value, int range) {
+int UIScrollBar::SetThumbPosition(int value, int range) {
     unsigned int position = reversed ? range - value : value;
     RequestRedraw();
-    if (!field_0x1f0 && UnknownFunction475300(range) == position)
+    if (!snapSteps && ScaleThumbPosition(range) == position)
         return 1;
     if (!range) {
         thumbOffset = position;

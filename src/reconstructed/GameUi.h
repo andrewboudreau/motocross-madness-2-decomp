@@ -442,30 +442,30 @@ public:
     virtual void SyncBoundValue(int value); // slot 59, 0x00474cb0
 
     void SetThumbSizeFromState(int state);    // 0x00475160: the thumb size from a state image
-    void UnknownFunction4751c0(int range);    // 0x004751c0
+    void SetScrollRange(int range);           // 0x004751c0: stores scrollRange and redraws
     int GetListScrollRange(UIListBox* list); // 0x004751e0: `list`'s scroll range
     int FollowList(UIListBox* list); // 0x00475200: follows `list`
-    int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
-    int UnknownFunction4753c0(int value, int range); // 0x004753c0: sets the position to `value` of `range`
-    void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
-    int UnknownFunction475500();              // 0x00475500
-    int UnknownFunction4755c0();              // 0x004755c0: +0x1f0
+    int ScaleThumbPosition(int range);        // 0x00475300: the thumb offset scaled to 0..`range` (OptionProcs.cpp)
+    int SetThumbPosition(int value, int range); // 0x004753c0: sets the position to `value` of `range`
+    void SetSnapStepCount(int count);         // 0x004754d0: snapSteps = count - 1 (OptionProcs.cpp)
+    int GetScrollValue();                     // 0x00475500: the thumb offset scaled to scrollRange (SyncBoundValue)
+    int UnknownFunction4755c0();              // 0x004755c0: snapSteps
 
     union {
         int field_0x1ec;
         float thumbOffset;                    // +0x1ec: the thumb's offset along the track (pixels; clamped to
                                               // the track length less the thumb, added to screenArea)
     };
-    int field_0x1f0;
+    int snapSteps;                            // +0x1f0: the last step when the thumb snaps to steps (0 = free)
     int thumbWidth;                           // +0x1f4
     int thumbHeight;                          // +0x1f8
-    int field_0x1fc;
+    int followedRow;                          // +0x1fc: the followed list's first shown row (FollowList)
     int scrollRange;                          // +0x200
     union {
         int field_0x204;
         UIAnim* trackImage;                   // +0x204: the track image
     };
-    int field_0x208;
+    int dragging;                             // +0x208: drag event 0xf sent; ButtonUp sends 0x10 and clears it
     int dragX;                                // +0x20c: the last drag position (x)
     int dragY;                                // +0x210: (y)
     float holdDelay;                          // +0x214: 0.2 s; held that long in place, it sends event 0x11
