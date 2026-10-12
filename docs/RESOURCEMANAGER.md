@@ -40,5 +40,7 @@ FileStream.cpp (UI lane) reads them.
 ## Function names
 
 `0x004e8f40` is `MergeWithExisting` (it moves an item onto an existing item
-of the same name; tier 3). `0x004e9010` and `0x004e9030` keep address names
-because PCAudio.cpp, Palette8.cpp, FileStream and UI samples call them.
+of the same name; tier 3). `0x004e9010` is `SetItemObject` in the lane's files
+(PCAudio.cpp and Palette8.cpp keep their own address-named declarations);
+`0x004e9030` keeps its address name because SceneManager.cpp and the
+FileStream sample reach it through headers other lanes share.

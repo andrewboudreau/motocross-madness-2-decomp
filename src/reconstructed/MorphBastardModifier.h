@@ -159,7 +159,7 @@ public:
 
     // 0x004a33b0 (ret 0xc): slot 8 of the base, then loads `path` with the
     // nodes of `model`.
-    MorphBastardModifier* UnknownFunction4a33b0(void* value, const char* path, MorphBastardNode* model);
+    MorphBastardModifier* LoadParameterFile(void* value, const char* path, MorphBastardNode* model);
     // 0x004a3c80 (ret 0x44)
     void ControllerAngles(MorphBastardChannel* channel, Matrix4 inverse);
     // 0x004a4bb0 (ret 4): updates every channel of `object`.

@@ -2,7 +2,7 @@
 // until they match. See src/reconstructed/MorphBastardModifier.h for the
 // class evidence.
 //
-// MorphBastardModifier::UnknownFunction4a33b0 (0x004a33b0, 2046 bytes): the
+// MorphBastardModifier::LoadParameterFile (0x004a33b0, 2046 bytes): the
 // parameter-file loader, 1938 of 2046 positions. Calls, strings, lines,
 // field offsets and the frame size (0x350) match retail; the object's rigid
 // inverse is MorphBastardInvertRigid (an inline building a Vector3; the
@@ -91,7 +91,7 @@ inline void MorphBastardInvertRigidInPlace(Matrix4* m)
 }
 
 // 0x004a33b0
-MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, const char* path,
+MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const char* path,
                                                                  MorphBastardNode* model)
 {
     char section[0x100];

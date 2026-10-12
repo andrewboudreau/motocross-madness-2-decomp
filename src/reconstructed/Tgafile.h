@@ -23,7 +23,7 @@ int DecodedFormat(int fileFormat);
 int UnknownFunction511970(int format);
 
 // 0x005119c0: fills a DirectDraw pixel format for a pixel format.
-void UnknownFunction5119c0(int format, void* pixelFormat);
+void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x00511ad0: whether a pixel format is 4444 or 8888.
 int UnknownFunction511ad0(int format);

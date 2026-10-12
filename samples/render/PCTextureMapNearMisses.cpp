@@ -188,7 +188,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     if (choice)
         format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
     field_0x20 = format;
-    UnknownFunction5119c0(format, pixelFormat);
+    FillPixelFormat(format, pixelFormat);
     mipmapped = flags & 2;
     field_0x24 = 1;
     if (!mipmapped) {

@@ -236,7 +236,7 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
     for (; *formats; formats++) {
         field_0x20 = *formats;
         if (desc->flags & 0x1000)
-            UnknownFunction5119c0(field_0x20, &desc->pixelFormat);
+            FillPixelFormat(field_0x20, &desc->pixelFormat);
         if ((flags & 4 || g_TrackGame->renderTarget->UnknownVirtualSlot13(field_0x20)) &&
             !g_TrackGame->display->directDraw->CreateSurface(desc, &systemSurface, 0)) {
             float scale = 1.0f;

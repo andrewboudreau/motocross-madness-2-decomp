@@ -218,7 +218,7 @@ int UnknownFunction511970(int format) {
 // 0x005119c0: fills a DirectDraw pixel format (flags 0x40 RGB, 0x41 with
 // alpha, 0x60 palettised). 8888 falls into the 24-bit case, so it reports
 // 24 bits, and 1555 into 555, as in retail.
-void UnknownFunction5119c0(int format, void* pixelFormat) {
+void FillPixelFormat(int format, void* pixelFormat) {
     UnknownPixelFormat* description = (UnknownPixelFormat*)pixelFormat;
     memset(description, 0, sizeof(*description));
     description->size = sizeof(*description);

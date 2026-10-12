@@ -107,7 +107,7 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
 }
 
 // 0x004e9010
-void UnknownResourceManager::UnknownFunction4e9010(void* entry, void* object)
+void UnknownResourceManager::SetItemObject(void* entry, void* object)
 {
     ResourceItem* item = (ResourceItem*)entry;
 

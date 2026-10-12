@@ -46,7 +46,7 @@ public:
     int MergeWithExisting(ResourceItem* item);
     // 0x004e9010: records `object` on `entry`; drops the entry when both
     // the object and its archive are gone.
-    void UnknownFunction4e9010(void* entry, void* object);
+    void SetItemObject(void* entry, void* object);
     // 0x004e9030: opens the "RS2" archive `path` and adds its items.
     UnknownTextureStream* UnknownFunction4e9030(const char* path, int flags);
     ResourceItem* UnknownFunction4e9360(const char* name, int a); // finds `name`

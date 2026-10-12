@@ -86,7 +86,7 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
     UnknownFunction444fb0();
     void* item = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
     if (item)
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(item, 0);
+        g_UnknownResourceManager572b44->SetItemObject(item, 0);
 }
 
 // 0x0043f4b0
@@ -167,7 +167,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             delete stream;
         }
         if (item)
-            g_UnknownResourceManager572b44->UnknownFunction4e9010(item, this);
+            g_UnknownResourceManager572b44->SetItemObject(item, this);
         RegisterNode();
     }
     return this;

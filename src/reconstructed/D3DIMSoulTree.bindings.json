@@ -85,7 +85,7 @@
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction4b78f0@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?UnknownFunction4b7f10@UnknownParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",
-  "?UnknownFunction4e9010@UnknownResourceManager@@QAEXPAX0@Z": "0x004e9010",
+  "?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z": "0x004e9010",
   "?UnknownFunction4e9360@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "?UnknownFunction4e93f0@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
   "?UnknownFunction4e9430@UnknownResourceManager@@QAEHPBD0@Z": "0x004e9430",
