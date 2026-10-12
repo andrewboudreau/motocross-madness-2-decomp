@@ -190,7 +190,7 @@ public:
     void ShowTrackPicture();             // 0x004f75d0: shows the track picture
     void LoadTrackPicture(UIControl* picture, const char* directory, const char* name); // 0x004f7640: loads the track picture
 
-    int field_0x7f58;                         // +0x7f58: 0 at init, 1 after slot 24 handles message 0x101; slot 31 then selects the track by name
+    int selectTrackByName;                    // +0x7f58: 0 at init, 1 after slot 24 handles message 0x101; slot 31 then selects the track by name
 };
 
 // RTTI: MPBikeRiderDlg : UIDialog (vtable 0x00557a04; 0x7f9c bytes).

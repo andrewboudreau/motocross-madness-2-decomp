@@ -1371,10 +1371,10 @@ int MPEventDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int
     char text[0x80];
     if (type == 0x101) {
         int count = g_TrackGame->mode.field_0x27f8.field_0x28;
-        field_0x7f58 = 0;
+        selectTrackByName = 0;
         UpdateBoundValues(0);
         ApplyEventType();
-        field_0x7f58 = 1;
+        selectTrackByName = 1;
         UpdateBoundValues(0);
         UIListBox* list = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         if (g_TrackGame->mode.field_0x27f8.field_0x04 != 4 && list->rowCount - 1 != g_TrackGame->mode.maxOpponents) {
@@ -1453,7 +1453,7 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
     char number[0x80];
     switch (event->kind) {
     case kDialogInit: {
-        field_0x7f58 = 0;
+        selectTrackByName = 0;
         UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         g_TrackGame->LoadResourceString(0x13ed, text, 0x80);
@@ -1756,7 +1756,7 @@ void MPEventDlg::SyncValues(int apply) {
         list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x04);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x00);
-        if (g_TrackGame->network->lobbyConnected && field_0x7f58) {
+        if (g_TrackGame->network->lobbyConnected && selectTrackByName) {
             list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             for (int i = 0; i < list->rowCount; i++) {
                 int row = list->GetRowData(i);
