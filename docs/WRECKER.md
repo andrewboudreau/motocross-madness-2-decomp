@@ -158,6 +158,9 @@ by the index `0x00530630` returns, `randomAnimations` by `RANDOM_UNIT()`,
 `contactAnimations` when the collision model reports contact), the
 `ignoreObjects` list feeds `0x00439410` both ways, and `hitCenter` is the
 mean of the hit probes' positions (`anyProbeHit` set when one hits).
+`contactThisFrame` (+0xb0) is cleared before the frame's physics steps and
+set when the collision model reports contact; `hadContact` (+0xac) is set
+with it and cleared only when the wreck starts or is reset.
 Renaming changed no calibration bytes.
 
 Function names (tier 3, from behaviour): `0x00531da0` `EmitProbeTrail`

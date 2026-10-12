@@ -360,8 +360,8 @@ public:
     int ignoreObjectCount;     // +0x64
     float inertiaFactor;       // +0x68
     UnknownWreckerFrame lastPose; // +0x6c last pose of poseNode
-    int field_0xac;
-    int field_0xb0;
+    int hadContact;                           // +0xac
+    int contactThisFrame;                     // +0xb0
     int field_0xb4;
     UnknownWreckerSkeleton* poseNode; // +0xb8
     Vector3 linearStep;        // +0xbc

@@ -32,7 +32,7 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
     ignoreObjects = 0;
     ignoreObjectCount = 0;
     wreckState = 0;
-    field_0xac = 0;
+    hadContact = 0;
     field_0xb4 = 0;
     pendingAnimation = 0;
     anyProbeHit = 0;
@@ -303,7 +303,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             }
         }
         float remaining = frameTime;
-        field_0xb0 = 0;
+        contactThisFrame = 0;
         float step = 0.02f;
         if (frameTime > 0.06f)
             step = frameTime * (1.0f / 3);
@@ -331,8 +331,8 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             remaining -= step;
         }
         if (collisionModel->hasContact) {
-            field_0xb0 = 1;
-            field_0xac = 1;
+            contactThisFrame = 1;
+            hadContact = 1;
             if (wreckState == 2) {
                 wreckState = 3;
                 pendingAnimation = contactAnimations[(int)(RANDOM_UNIT() * contactAnimationCount)];
@@ -472,7 +472,7 @@ void Wrecker::UnknownFunction532220(int index) {
     rigidBody->UnknownVirtualSlot44();
     rigidBody->angularVelocity = Vector3(0.0f, 0.0f, 0.0f);
     rigidBody->velocity = Vector3(0.0f, 0.0f, 0.0f);
-    field_0xac = 0;
+    hadContact = 0;
 }
 
 void Wrecker::UnknownFunction532310() {
@@ -493,7 +493,7 @@ void Wrecker::UnknownFunction532310() {
     rigidBody->angularVelocity = rigidBody->node->UnknownFunction4fd710(angularStep);
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
-    field_0xac = 0;
+    hadContact = 0;
     field_0x538 = 1;
 }
 
