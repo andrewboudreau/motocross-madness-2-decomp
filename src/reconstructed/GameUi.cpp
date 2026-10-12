@@ -478,7 +478,7 @@ int UIControl::UnknownVirtualSlot13() {
 
 // 0x00472250
 int UIControl::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
         SetState(3);
         PlayControlSound(3, ownerDialog->field_0x180);
     }
@@ -502,7 +502,7 @@ void UIControl::ButtonHeld(int a, int* position) {
 
 // 0x004725b0
 int UIControl::EnterHover() {
-    if (IsInteractive() && ownerDialog->guiUser->field_0x1d8 != (UnknownGuiControl*)this) {
+    if (IsInteractive() && ownerDialog->guiUser->hoverControl != (UnknownGuiControl*)this) {
         SetState(1);
         if (stateImages[currentState])
             stateImages[currentState]->Rewind();
@@ -601,7 +601,7 @@ UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
 
 // 0x00473410
 int UIButton::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
         UnknownDialogEvent event;
         event.handled = a;
         if (sortList)
@@ -752,7 +752,7 @@ UIScrollCtl::~UIScrollCtl() {
 
 // 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
 int UIScrollCtl::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = 0;
         GameObjectIterator* iterator;
@@ -857,7 +857,7 @@ void UIScrollCtl::HandleTimer(int value) {
 
 // 0x00474b10
 int UIScrollCtl::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
         UnknownDialogEvent event;
         event.handled = a;
         event.kind = kDialogCommand;
@@ -1458,7 +1458,7 @@ int UIStaticText::Draw() {
 
 // 0x00479190
 int UIStaticText::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
         event.kind = kDialogCommand;
@@ -1541,7 +1541,7 @@ UIDDLButton::UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 // 0x00479c90
 int UIDDLButton::ButtonDown(int a, int b) {
     UIControl::ButtonDown(a, b);
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this)
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this)
         ownerList->SetOpen(1 - ownerList->isOpen);
     return 0;
 }
@@ -1678,7 +1678,7 @@ void UIDropDownList::SyncBoundValue(int value) {
 
 // 0x0047add0
 int UIDropDownList::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
         SetOpen(isOpen == 0);
         ownerDialog->guiUser->UnknownFunction487790((UnknownGuiControl*)this, 0, 0);
         return 1;
@@ -1865,7 +1865,7 @@ int UIDialog::Release() {
 // 0x0046a780
 int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
-        guiUser->field_0x3c[event->control] = 1;
+        guiUser->controlDown[event->control] = 1;
     if (!field_0x25_bit2) {
         if (event->kind == 1)
             UnknownFunction46f120();
@@ -1877,7 +1877,7 @@ int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
 // 0x0046a7d0
 int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
-        guiUser->field_0x3c[event->control] = 0;
+        guiUser->controlDown[event->control] = 0;
     if (!field_0x25_bit2) {
         if (event->kind == 1)
             UnknownFunction46f120();
@@ -2265,7 +2265,7 @@ UIControl::~UIControl() {
             ownerDialog->guiUser->UnknownFunction487bf0(0);
             tip = ownerDialog->guiUser->userToolTip;
         }
-        if (ownerDialog->guiUser && ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
+        if (ownerDialog->guiUser && ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
             ownerDialog->UnknownFunction470000(0, 0, 1);
             tip = ownerDialog->guiUser->userToolTip;
         }
@@ -2498,7 +2498,7 @@ end:
 
 // 0x004721b0
 int UIControl::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
         if (!a) {
             SetState(2);
             PlayControlSound(2, ownerDialog->field_0x180);
@@ -2583,11 +2583,11 @@ int UIControl::UpdateHoverAt(int* position) {
         UIControl* last = FindLastAnchor(0);
         if (enabled && shown && (!last || (last->shown && !last->transitionState))) {
             GUIUser* user = ownerDialog->guiUser;
-            UnknownGuiControl* hover = user->field_0x1d8;
-            if (!user->field_0x3c[0] && !user->field_0x3c[1] && hover != (UnknownGuiControl*)this) {
+            UnknownGuiControl* hover = user->hoverControl;
+            if (!user->controlDown[0] && !user->controlDown[1] && hover != (UnknownGuiControl*)this) {
                 result = ownerDialog->UnknownFunction470000(this, 0, 0);
             } else if (hover == (UnknownGuiControl*)this) {
-                if (user->field_0x1cc && user->field_0x1cc != (UnknownGuiControl*)this)
+                if (user->pendingHoverControl && user->pendingHoverControl != (UnknownGuiControl*)this)
                     user->UnknownFunction487730((UnknownGuiControl*)this, 0, 0);
                 result = 1;
             }
@@ -2929,7 +2929,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
 
 // 0x00478d70
 int UIMultiState::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
         SelectNextState();
@@ -2987,7 +2987,7 @@ int UIRadioButton::GetGroupSelection() {
 
 // 0x004794c0
 int UIRadioButton::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
         if (!GetSelectedState()) {
@@ -3367,14 +3367,14 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 void UIDialog::UnknownFunction46f120() {
     if (guiUser->pointerDevice && controlContainer->field_0x10) {
         GUIUser* user = guiUser;
-        UnknownGuiControl* focus = user->field_0x1d8;
+        UnknownGuiControl* focus = user->hoverControl;
         if (focus && ((UIControl*)focus)->ownerDialog != (UIDialog*)this)
             focus = 0;
         POINT position = user->pointerDevice->pointerPosition;
         if (controlContainer->field_0x10) {
             user->field_0x1dc = 0;
             int result = ((UIControl*)controlContainer->field_0x10)->UpdateHoverAt((int*)&position);
-            if (focus && !guiUser->field_0x1cc && !result)
+            if (focus && !guiUser->pendingHoverControl && !result)
                 guiUser->UnknownFunction487730(0, 0, 1);
         }
     }
@@ -3783,7 +3783,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         ownerDialog->UnknownVirtualSlot29(&event);
     }
     dragging = 0;
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && currentState == 2) {
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -4352,7 +4352,7 @@ failed:
 
 // 0x004755d0: a click on the bar moves the thumb (slider) or pages the lists.
 int UIScrollBar::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && b) {
         GameObjectIterator* iterator;
         UIControl* list;
         if (controlType == 8) {
@@ -4519,7 +4519,7 @@ int UIListBox::UnknownVirtualSlot10(float frameTime) {
     GUIUser* user = ownerDialog->guiUser;
     if (user->pointerDevice) {
         POINT cursor = user->pointerDevice->pointerPosition;
-        if (user->field_0x1d8 == (UnknownGuiControl*)this && selectable) {
+        if (user->hoverControl == (UnknownGuiControl*)this && selectable) {
             RECT rect = *(RECT*)screenArea;
             for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
                 rect.bottom = rect.top + GetRowHeight(row);
@@ -4773,7 +4773,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
 
 // 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.
 int UIDDLScrollBar::ButtonDown(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && !a && b) {
         UIListBox* list = ownerList->listPart;
         if (snapSteps) {
             thumbOffset = (float)UNKNOWN_MIN(GetHeight() - thumbHeight,
@@ -5078,7 +5078,7 @@ void UIListBox::ScrollBy(int delta) {
 
 // 0x00477ff0
 int UIListBox::ButtonUp(int a, int* position) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && a == 1) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && a == 1) {
         scrollOffsetX += dragOffsetX;
         dragOffsetX = 0;
     }

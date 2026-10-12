@@ -26,7 +26,7 @@
 // three components first), the scalar spill homes below +0x68, the register
 // rotation of the Winner branch (one step behind retail), the place counter
 // store (retail stores 1 after the count test) and the z component order of
-// `field_0x3c4 + offsets[place - 1]`.
+// `podiumPosition + offsets[place - 1]`.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,13 +52,13 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 void EventManager::UnknownFunction45e710(int menu) {
     if (!g_TrackGame->ui)
         return;
-    UnknownTrackGameObject56cItem* item = g_TrackGame->ui->field_0x2c->FindInputDialog();
+    UnknownTrackGameObject56cItem* item = g_TrackGame->ui->gui->FindInputDialog();
     if (item)
         item->UnknownFunction46ff30(0);
-    if (g_TrackGame->ui->field_0x494)
-        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->field_0x494);
+    if (g_TrackGame->ui->savedInputContext)
+        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->savedInputContext);
     if (g_TrackGame->ui->allowIme)
-        g_TrackGame->ui->field_0x2c->EnableWindowClipper(1);
+        g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
     g_TrackGame->field_0x3438 = 0;
     g_TrackGame->field_0x3434 = 0;
@@ -68,15 +68,15 @@ void EventManager::UnknownFunction45e710(int menu) {
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_TrackGame->UnknownVirtualSlot19(
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
-    g_TrackGame->ui->field_0x2c->CreateBackground();
-    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->field_0x2c->GetUser(0);
+    g_TrackGame->ui->gui->CreateBackground();
+    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
     layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
     if (!g_TrackGame->field_0x3428 && !g_TrackGame->ui->field_0x4a8 &&
         g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
         g_TrackGame->ui->RecordRaceResults();
-    g_TrackGame->ui->field_0x2c->ShowCursors(1);
+    g_TrackGame->ui->gui->ShowCursors(1);
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;
-    g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+    g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     dialog->SetNextMenu(menu);
     ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryVolume(0);
 }
@@ -213,7 +213,7 @@ int EventManager::CreatePodiumScene() {
     int iterator = 0;
     int ok;
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
-        ok = field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c;
+        ok = racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c;
     else
         ok = 1;
     if (circuit) {
@@ -224,7 +224,7 @@ int EventManager::CreatePodiumScene() {
         if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
             return 0;
         if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 && !g_TrackGame->network &&
-            field_0x50[0].field_0x04 > 3)
+            results[0].position > 3)
             return 0;
     }
     UnknownFunction45cdc0(1);
@@ -243,20 +243,20 @@ int EventManager::CreatePodiumScene() {
     Vector3 direction;
     Vector3 up;
     if (!PodiumIsZero(grid->field_0x98)) {
-        field_0x3c4 = grid->field_0x8c;
+        podiumPosition = grid->field_0x8c;
         direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
     } else {
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
-            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc970(&field_0x3c4);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc970(&podiumPosition);
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc4f0(&direction, &up);
         } else {
             float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->field_0x40;
-            field_0x3c4 = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
+            podiumPosition = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
             direction = kVec3ZAxis;
         }
     }
     up = kVec3YAxis;
-    PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->UnknownFunction507c10(&field_0x3c4, 0, 0, 0);
+    PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->UnknownFunction507c10(&podiumPosition, 0, 0, 0);
     float angle = (float)atan2(direction.x, direction.z);
     Vector3 offsets[3];
     Vector3 facings[3];
@@ -270,11 +270,11 @@ int EventManager::CreatePodiumScene() {
         facings[0] = Vector3(0.0f, 0.0f, -1.0f);
         facings[1] = Vector3(0.0f, 0.0f, -1.0f);
         facings[2] = Vector3(0.0f, 0.0f, -1.0f);
-        field_0x3c4.y += 1.5f;
+        podiumPosition.y += 1.5f;
         cameraOffset = Vector3(-10.0f, 15.0f, -20.0f);
         lookOffset = Vector3(5.0f, 9.0f, -10.0f);
-        field_0x3d8 = field_0x3c4;
-        field_0x3d8.y += 6.0f;
+        podiumFocus = podiumPosition;
+        podiumFocus.y += 6.0f;
     } else {
         offsets[0] = Vector3(0.0f, 3.4f, -6.0f);
         offsets[1] = Vector3(-11.0f, 3.4f, -7.0f);
@@ -284,9 +284,9 @@ int EventManager::CreatePodiumScene() {
         facings[2] = Vector3((float)sin(-2.617993578314781), 0.0f, (float)cos(-2.617993578314781));
         cameraOffset = Vector3(-25.0f, 7.0f, -15.0f);
         lookOffset = Vector3(20.0f, 13.0f, -28.0f);
-        field_0x3d8 = field_0x3c4;
-        field_0x3d8.y += 6.0f;
-        field_0x3d8.z -= 6.0f;
+        podiumFocus = podiumPosition;
+        podiumFocus.y += 6.0f;
+        podiumFocus.z -= 6.0f;
     }
     Vector3 rotated;
     for (int i = 0; i < 3; i++) {
@@ -303,12 +303,12 @@ int EventManager::CreatePodiumScene() {
     context.field_0x10 = 0x115c;
     context.field_0x14 = 0;
     PODIUM_ARCADE->UnknownVirtualSlot5();
-    PODIUM_ARCADE->UnknownFunction4014f0(&field_0x3c4);
+    PODIUM_ARCADE->UnknownFunction4014f0(&podiumPosition);
     PODIUM_ARCADE->UnknownFunction401520(&direction, &up, 0, 1);
     if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
         PODIUM_ARCADE->field_0x2c->UnknownFunction4444c0(1);
     UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    podiumCharacterCount = field_0x4c < 3 ? field_0x4c : 3;
+    podiumCharacterCount = resultCount < 3 ? resultCount : 3;
     float chance = rand() * (1.0f / 32768);
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
         UnknownEventRacer* racer = 0;
@@ -347,7 +347,7 @@ int EventManager::CreatePodiumScene() {
                 sprintf(name, "Podium4_%02d", place);
             }
             podiumMotions[place - 1] = character->UnknownFunction4a6b30(name, 1);
-            Vector3 position = field_0x3c4 + offsets[place - 1];
+            Vector3 position = podiumPosition + offsets[place - 1];
             character->field_0x1a0->UnknownFunction4fc660(&position);
             character->field_0x1a0->UnknownFunction4fbd70(&facings[place - 1], &kVec3YAxis, 1, 1);
             character->UnknownFunction4a8b40(podiumMotions[place - 1]);
@@ -374,15 +374,15 @@ int EventManager::CreatePodiumScene() {
         sound->PlayWithOptions(0, 1, 0);
     }
     D3DRMVectorRotate(&rotated, &cameraOffset, &kVec3YAxis, angle);
-    podiumCameraPosition = rotated * PodiumLength(cameraOffset) + field_0x3c4;
+    podiumCameraPosition = rotated * PodiumLength(cameraOffset) + podiumPosition;
     D3DRMVectorRotate(&rotated, &lookOffset, &kVec3YAxis, angle);
-    podiumCameraTarget = rotated * PodiumLength(lookOffset) + field_0x3c4;
+    podiumCameraTarget = rotated * PodiumLength(lookOffset) + podiumPosition;
     podiumPanSpeed = podiumCameraTarget - podiumCameraPosition;
     podiumCamera->UnknownFunction42e9b0(&podiumCameraPosition, 0, 0, 0, 0);
-    podiumCamera->UnknownVirtualSlot29(field_0x3d8);
-    float x0 = field_0x3c4.x - 16.0f;
+    podiumCamera->UnknownVirtualSlot29(podiumFocus);
+    float x0 = podiumPosition.x - 16.0f;
     float x1 = x0 + 32.0f;
-    float z0 = field_0x3c4.z - 16.0f;
+    float z0 = podiumPosition.z - 16.0f;
     float z1 = z0 + 32.0f;
     RemoveVegetationInRect(x0, z0, x1, z1);
     UnknownFunction45fdc0(x0, z0, x1, z1);

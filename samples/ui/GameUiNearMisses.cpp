@@ -248,7 +248,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
 // 0x00477e90
 int UIListBox::ButtonDown(int a, int b) {
     POINT* point = (POINT*)b;
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && point) {
+    if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this && point) {
         if (a == 0) {
             if (selectable) {
                 int found = 0;
@@ -395,7 +395,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
             }
         }
         GUIUser* user = guiUser;
-        UIControl* focus = (UIControl*)user->field_0x1d8;
+        UIControl* focus = (UIControl*)user->hoverControl;
         user->UnknownFunction487fb0(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
                                                                  : cursorAnimation);
         GUIInputDevice* device;
