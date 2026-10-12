@@ -420,7 +420,7 @@ int UIControl::ContainsPoint(POINT point, int state) {
 }
 
 // 0x004709f0
-int UIControl::UnknownVirtualSlot51(POINT point) {
+int UIControl::HitTest(POINT point) {
     RECT rect = *(RECT*)screenArea;
     if (!shapeBounds) {
         if (PtInRect(&rect, point))
@@ -2224,7 +2224,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
         stateImages[i] = 0;
         sounds[i] = 0;
     }
-    field_0x164 = 0;
+    transitionFrame = 0;
     transitionDelay = 0;
     transitionTime = 0;
     slideSound = 0;
@@ -2292,7 +2292,7 @@ void UIControl::Show(int a, int b) {
         if (a) {
             transitionState = 1;
             if (transitionType == 0x6a)
-                transitionStep = &UIControl::UnknownVirtualSlot46;
+                transitionStep = &UIControl::AnimInStep;
             drawnTexture = 0;
             shown = a;
             return;
@@ -2300,7 +2300,7 @@ void UIControl::Show(int a, int b) {
         if (transitionType == 0x6a && b && ownerDialog->animatesControls) {
             drawnTexture = 0;
             transitionState = 2;
-            transitionStep = &UIControl::UnknownVirtualSlot47;
+            transitionStep = &UIControl::AnimOutStep;
             return;
         }
         transitionState = 2;
@@ -2333,29 +2333,29 @@ void UIControl::StartTransition(int type, int a, int b, int delay, int c) {
     transitionType = type;
     switch (type) {
     case 100:
-        transitionStep = &UIControl::UnknownVirtualSlot41;
+        transitionStep = &UIControl::GrowStep;
         break;
     case 101:
-        transitionStep = &UIControl::UnknownVirtualSlot42;
+        transitionStep = &UIControl::SlideLeftStep;
         break;
     case 102:
-        transitionStep = &UIControl::UnknownVirtualSlot43;
+        transitionStep = &UIControl::SlideRightStep;
         break;
     case 103:
-        transitionStep = &UIControl::UnknownVirtualSlot44;
+        transitionStep = &UIControl::SlideTopStep;
         break;
     case 104:
-        transitionStep = &UIControl::UnknownVirtualSlot45;
+        transitionStep = &UIControl::SlideBottomStep;
         break;
     case 106:
-        transitionStep = &UIControl::UnknownVirtualSlot46;
+        transitionStep = &UIControl::AnimInStep;
         break;
     default:
         transitionStep = 0;
         break;
     }
     transitionTime = 0;
-    field_0xb0 = c;
+    transitionFrameCount = c;
     if (delay == 0xffff)
         transitionDelay = rand() % 2000;
     else
@@ -2481,7 +2481,7 @@ int UIControl::RunTransition() {
         done = (this->*step)();
         if (!done)
             goto end;
-        field_0x164 = 0;
+        transitionFrame = 0;
         transitionState = 0;
     } else if (transitionState) {
         transitionState = 0;
@@ -2579,7 +2579,7 @@ int UIControl::UnknownFunction472480(int* position) {
         if (result)
             return result;
     }
-    if (UnknownVirtualSlot51(*(POINT*)position) && IsInteractive()) {
+    if (HitTest(*(POINT*)position) && IsInteractive()) {
         UIControl* last = FindLastAnchor(0);
         if (enabled && shown && (!last || (last->shown && !last->transitionState))) {
             GUIUser* user = ownerDialog->guiUser;
@@ -3555,35 +3555,35 @@ void UIDialog::AddTimer(int a, int time, int b) {
 // UIControl: transitions
 
 // 0x00471df0
-int UIControl::UnknownVirtualSlot46() {
-    if (field_0x164 == 0) {
+int UIControl::AnimInStep() {
+    if (transitionFrame == 0) {
         fxAnimIn->playBackwards = 0;
         fxAnimIn->Rewind();
-        field_0x164 = 1;
+        transitionFrame = 1;
         if (fxSoundIn) {
             fxSoundIn->SetVolume(ownerGui->field_0x34c, 0);
             fxSoundIn->PlayWithOptions(1, 0, 0);
         }
     }
-    if (field_0x164 == 1 && fxAnimIn->currentFrame <= fxAnimIn->frameCount - 1) {
+    if (transitionFrame == 1 && fxAnimIn->currentFrame <= fxAnimIn->frameCount - 1) {
         drawnTexture = fxAnimIn->GetCurrentTexture();
         RequestRedraw();
         if (fxAnimIn->currentFrame == fxAnimIn->frameCount - 1)
-            field_0x164 = 2;
+            transitionFrame = 2;
         return 0;
     }
-    field_0x164 = 0;
+    transitionFrame = 0;
     return 1;
 }
 
 // 0x00471eb0
-int UIControl::UnknownVirtualSlot47() {
-    if (field_0x164 == 0) {
+int UIControl::AnimOutStep() {
+    if (transitionFrame == 0) {
         if (fxAnimOut == fxAnimIn) {
             fxAnimOut->playBackwards = 1;
-            field_0x164 = 2;
+            transitionFrame = 2;
         } else {
-            field_0x164 = 1;
+            transitionFrame = 1;
         }
         fxAnimOut->Rewind();
         if (fxSoundOut) {
@@ -3591,15 +3591,15 @@ int UIControl::UnknownVirtualSlot47() {
             fxSoundOut->PlayWithOptions(1, 0, 0);
         }
     }
-    if ((field_0x164 == 1 && fxAnimOut->currentFrame < fxAnimOut->frameCount - 1) ||
-        (field_0x164 == 2 && fxAnimOut->currentFrame >= 0)) {
+    if ((transitionFrame == 1 && fxAnimOut->currentFrame < fxAnimOut->frameCount - 1) ||
+        (transitionFrame == 2 && fxAnimOut->currentFrame >= 0)) {
         drawnTexture = fxAnimOut->GetCurrentTexture();
         RequestRedraw();
         if (fxAnimOut->currentFrame == 0)
-            field_0x164 = 3;
+            transitionFrame = 3;
         return 0;
     }
-    field_0x164 = 0;
+    transitionFrame = 0;
     shown = 0;
     return 1;
 }
@@ -3607,9 +3607,9 @@ int UIControl::UnknownVirtualSlot47() {
 int g_UnknownGlobal65b610;                       // frames of the slide
 
 // 0x00471850
-int UIControl::UnknownVirtualSlot42() {
-    if (field_0x164 == 0 && field_0xb0) {
-        g_UnknownGlobal65b610 = field_0xb0 < 0 ? 25 : field_0xb0;
+int UIControl::SlideLeftStep() {
+    if (transitionFrame == 0 && transitionFrameCount) {
+        g_UnknownGlobal65b610 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         int left = bounds[0];
         slideX = (float)(left - bounds[2] - 1);
         slideStepX = ((float)left - slideX) / g_UnknownGlobal65b610;
@@ -3620,7 +3620,7 @@ int UIControl::UnknownVirtualSlot42() {
     } else {
         slideX += slideStepX;
     }
-    if (field_0x164 == g_UnknownGlobal65b610)
+    if (transitionFrame == g_UnknownGlobal65b610)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3641,16 +3641,16 @@ int UIControl::UnknownVirtualSlot42() {
             return 1;
         }
     }
-    field_0x164++;
+    transitionFrame++;
     return 0;
 }
 
 int g_UnknownGlobal65b614;                       // frames of the slide
 
 // 0x004719c0
-int UIControl::UnknownVirtualSlot44() {
-    if (field_0x164 == 0 && field_0xb0) {
-        g_UnknownGlobal65b614 = field_0xb0 < 0 ? 25 : field_0xb0;
+int UIControl::SlideTopStep() {
+    if (transitionFrame == 0 && transitionFrameCount) {
+        g_UnknownGlobal65b614 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         int top = bounds[1];
         slideY = (float)(top - bounds[3]);
         slideStepY = ((float)top - slideY) / g_UnknownGlobal65b614;
@@ -3661,7 +3661,7 @@ int UIControl::UnknownVirtualSlot44() {
     } else {
         slideY += slideStepY;
     }
-    if (field_0x164 == g_UnknownGlobal65b614)
+    if (transitionFrame == g_UnknownGlobal65b614)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3682,16 +3682,16 @@ int UIControl::UnknownVirtualSlot44() {
             return 1;
         }
     }
-    field_0x164++;
+    transitionFrame++;
     return 0;
 }
 
 int g_UnknownGlobal65b618;                       // frames of the slide
 
 // 0x00471b30
-int UIControl::UnknownVirtualSlot43() {
-    if (field_0x164 == 0 && field_0xb0) {
-        g_UnknownGlobal65b618 = field_0xb0 < 0 ? 25 : field_0xb0;
+int UIControl::SlideRightStep() {
+    if (transitionFrame == 0 && transitionFrameCount) {
+        g_UnknownGlobal65b618 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         slideX = (float)ownerDialog->screenWidth;
         slideStepX = ((float)bounds[0] - slideX) / g_UnknownGlobal65b618;
         if (slideSound) {
@@ -3701,7 +3701,7 @@ int UIControl::UnknownVirtualSlot43() {
     } else {
         slideX += slideStepX;
     }
-    if (field_0x164 == g_UnknownGlobal65b618)
+    if (transitionFrame == g_UnknownGlobal65b618)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3722,16 +3722,16 @@ int UIControl::UnknownVirtualSlot43() {
             return 1;
         }
     }
-    field_0x164++;
+    transitionFrame++;
     return 0;
 }
 
 int g_UnknownGlobal65b61c;                       // frames of the slide
 
 // 0x00471c90
-int UIControl::UnknownVirtualSlot45() {
-    if (field_0x164 == 0 && field_0xb0) {
-        g_UnknownGlobal65b61c = field_0xb0 < 0 ? 25 : field_0xb0;
+int UIControl::SlideBottomStep() {
+    if (transitionFrame == 0 && transitionFrameCount) {
+        g_UnknownGlobal65b61c = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         slideY = (float)ownerDialog->screenHeight;
         slideStepY = ((float)bounds[1] - slideY) / g_UnknownGlobal65b61c;
         if (slideSound) {
@@ -3741,7 +3741,7 @@ int UIControl::UnknownVirtualSlot45() {
     } else {
         slideY += slideStepY;
     }
-    if (field_0x164 == g_UnknownGlobal65b61c)
+    if (transitionFrame == g_UnknownGlobal65b61c)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3762,7 +3762,7 @@ int UIControl::UnknownVirtualSlot45() {
             return 1;
         }
     }
-    field_0x164++;
+    transitionFrame++;
     return 0;
 }
 
@@ -4961,9 +4961,9 @@ void UIProgressBar::UnknownFunction47b3d0(int texture, int owned) {
 // Input, image and list slots promoted from the near-miss sample
 
 // 0x004715d0
-int UIControl::UnknownVirtualSlot41() {
-    if (field_0x164 == 0 && field_0xb0 && !field_0x25_bit2) {
-        g_UnknownGlobal65b60c = field_0xb0 < 0 ? 7 : field_0xb0;
+int UIControl::GrowStep() {
+    if (transitionFrame == 0 && transitionFrameCount && !field_0x25_bit2) {
+        g_UnknownGlobal65b60c = transitionFrameCount < 0 ? 7 : transitionFrameCount;
         zoomWidth = 21.0f;
         zoomHeight = 11.0f;
         int left = bounds[0];
@@ -4986,10 +4986,10 @@ int UIControl::UnknownVirtualSlot41() {
         zoomWidth += zoomStepWidth;
         zoomHeight += zoomStepHeight;
     }
-    if (field_0x164 == g_UnknownGlobal65b60c)
+    if (transitionFrame == g_UnknownGlobal65b60c)
         return 1;
     RequestRedraw();
-    if (!field_0x25_bit2 || field_0x164) {
+    if (!field_0x25_bit2 || transitionFrame) {
         float width = zoomWidth;
         screenArea[0] = (int)slideX;
         screenArea[1] = (int)slideY;
@@ -5002,7 +5002,7 @@ int UIControl::UnknownVirtualSlot41() {
         case 9:
         case 10:
             drawnTexture = stateImages[currentState]->GetCurrentTexture();
-            field_0x164++;
+            transitionFrame++;
             break;
         default:
             drawnTexture = 0;

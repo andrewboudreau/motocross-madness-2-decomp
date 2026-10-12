@@ -181,17 +181,17 @@ public:
     // the dialog; visibleArea is the part on the render target.
     virtual void ScaleArea();
     virtual int Draw();                   // slot 40, 0x00471240: draws
-    virtual int UnknownVirtualSlot41();       // 0x004715d0
-    virtual int UnknownVirtualSlot42();       // 0x00471850
-    virtual int UnknownVirtualSlot43();       // 0x00471b30
-    virtual int UnknownVirtualSlot44();       // 0x004719c0
-    virtual int UnknownVirtualSlot45();       // 0x00471c90
-    virtual int UnknownVirtualSlot46();       // 0x00471df0
-    virtual int UnknownVirtualSlot47();       // 0x00471eb0
+    virtual int GrowStep(); // slot 41, 0x004715d0: "GROW", type 100
+    virtual int SlideLeftStep(); // slot 42, 0x00471850: "LSLIDE", 101
+    virtual int SlideRightStep(); // slot 43, 0x00471b30: "RSLIDE", 102
+    virtual int SlideTopStep(); // slot 44, 0x004719c0: "TSLIDE", 103
+    virtual int SlideBottomStep(); // slot 45, 0x00471c90: "BSLIDE", 104
+    virtual int AnimInStep(); // slot 46, 0x00471df0: "ANIM", 106, showing
+    virtual int AnimOutStep(); // slot 47, 0x00471eb0: "ANIM", hiding
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00471fa0: the state's texture
     virtual void SetEnabled(int enable); // slot 49, 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
     virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
-    virtual int UnknownVirtualSlot51(tagPOINT point); // 0x004709f0
+    virtual int HitTest(tagPOINT point); // slot 51, 0x004709f0: the area, or ContainsPoint with ShapeBounds
     virtual void SetAttachId(int id); // slot 52, 0x00470400: stores attachId
     virtual int UnknownVirtualSlot53();       // 0x004726b0
     virtual void BindValue(int* value); // slot 54, 0x00470a70: stores boundValue (NetProcs.cpp)
@@ -279,7 +279,7 @@ public:
     int sourceBlit;                           // +0xa4: "SourceBlit"
     unsigned int transitionTime;              // +0xa8
     unsigned int transitionDelay;             // +0xac: "FXDelay"
-    int field_0xb0;
+    int transitionFrameCount;                 // +0xb0: StartTransition's frames (< 0: the step's default)
     int transitionType;                       // +0xb4: StartTransition's type (0x6a picks slots 46/47)
     UIDialog* ownerDialog;         // +0xb8
     GUIManager* ownerGui;                     // +0xbc
@@ -303,7 +303,7 @@ public:
     int bold;                                 // +0x158
     int italic;                               // +0x15c
     int fontHeight;                           // +0x160
-    int field_0x164;
+    int transitionFrame;                      // +0x164: the transition step's frame (or ANIM phase)
     int moveable;                             // +0x168: "Moveable"
     UIAnim* stateImages[5];                   // +0x16c: "AnimNorm", "AnimFocus", "AnimPush", ...
     int mouseAnim;                            // +0x180: "MouseAnim" (a UnknownCursorAnimation*)
