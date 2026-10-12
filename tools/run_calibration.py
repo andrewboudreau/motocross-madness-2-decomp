@@ -25581,15 +25581,6 @@ CASES = [
         'reason': 'attaches a binding to the axis list (ContainerList::Add inlined with the containerlist.h __FILE__)',
     },
     {
-        'name': 'GridNodeNearMisses.cpp 0x483910 GridNode::GetCellCorners',
-        'bindings': 'samples/render/GridNodeNearMisses.bindings.json',
-        'source': 'samples/render/GridNodeNearMisses.cpp',
-        'symbol': '?GetCellCorners@GridNode@@QAEHHHPAMPAUGridVec3@@PAE@Z',
-        'target_va': '0x00483910',
-        'target_size': 1067,
-        'reason': 'near miss (1040/1067, 97%): corner fetch; only the shift setup differs, retail reuses the level byte from the leaf test (and eax,0xff; shl eax,2) where VC6 re-reads it through this',
-    },
-    {
         'name': 'GridNodeNearMisses.cpp 0x484d70 GridNode::FindLeaf',
         'bindings': 'samples/render/GridNodeNearMisses.bindings.json',
         'source': 'samples/render/GridNodeNearMisses.cpp',
@@ -26346,6 +26337,15 @@ CASES = [
         'target_va': '0x0042e550',
         'target_size': 211,
         'reason': 'height read through owner->field_0x04 re-reads the display-mode index (not the table) as retail does; edi becomes the zero register after the table',
+    },
+    {
+        'name': 'GridNode 0x483910 GetCellCorners',
+        'bindings': 'src/reconstructed/GridNode.bindings.json',
+        'source': 'src/reconstructed/GridNode.cpp',
+        'symbol': '?GetCellCorners@GridNode@@QAEHHHPAMPAUGridVec3@@PAE@Z',
+        'target_va': '0x00483910',
+        'target_size': 1067,
+        'reason': 'cell sampler; level read through a const unsigned char& reuses the leaf-test byte (and eax,0xff; shl eax,2), mask/one computed before the cell coordinates',
     },
 ]
 

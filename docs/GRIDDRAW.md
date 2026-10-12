@@ -213,12 +213,15 @@ when the mask changed.
 Griddraw.cpp and before GUIManager.cpp's initializers; its `.data` is the
 third copy of the row tables (`0x0056c2ac`/`0x0056c2f0`) and the constant
 1/127 at `0x00553ec8` right after the GridNode vtable. Exact: the GridNode
-destructor `0x004838a0` and its deleting wrapper `0x004838f0`. Near misses
+destructor `0x004838a0`, its deleting wrapper `0x004838f0` and the cell
+sampler `0x00483910` `GetCellCorners` (1067 bytes, in GridNode.cpp: reading
+`level` through a `const unsigned char&` makes VC6 reuse the leaf-test byte,
+`and eax, 0xff ; shl eax, 2`, and `mask`/`one` must be computed before the
+cell coordinates `cx`/`cz`). Near misses
 (`samples/render/GridNodeNearMisses.cpp`):
 
 | Function | Bytes | What differs |
 |---|---:|---|
-| `0x00483910` (cell sampler, Terrain `0x00507cf8`) | 1040/1067 | only the shift setup: retail reuses the level byte loaded for the leaf test (`and eax, 0xff ; shl eax, 2`, so `this` dies and the children go to ecx) where VC6 re-reads `level` through `this`. The rest (leaf-first layout, the descent loop as VC6's tail-recursion elimination with clamped copies `xx`/`zz` of x and z, the two leaf paths, the GridVec3-temporary fill) is byte-exact |
 | `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame and four bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687) from an `__asm fld/fistp` rounding helper while `__ftol` is still called for the other casts, which the no-inline-asm rule rules out; `/Oy-` only fakes the frame and leaves the x87 crossing loops different |
 | `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index (eax vs ecx) and the gridX/gridZ compare order; invariant under ~30 spellings, /G6, /O1 and /Oy- |
 
