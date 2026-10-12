@@ -21,7 +21,13 @@
 // flag lives in the dead third-argument slot) are reconstructed. Retail
 // keeps the constant 0 in edx from the first instruction (cmp [mem], edx,
 // stores of edx) and so orders registers differently; the candidate tests
-// with `test reg, reg` until the first call.
+// with `test reg, reg` until the first call. Retail has three copies of the
+// 0x0041eb20 call, each reloading the caster slot; the found path of the
+// objects scan calling it and returning (instead of `break`) gives the
+// second copy (230 -> 266 of 881). A third explicit call after the racers
+// loop makes VC6 push a constant 0 (worse); explicit `!= 0` tests, an
+// `int caster = 0` at the top, a function-scope `old` and the `objects`
+// parameter for the caster flag leave the zero register unchanged.
 //
 // 0x004210f0 (2981 bytes with its jump table; the start grid): every case
 // is decoded and the arithmetic matches where VC6 makes the same inlining
@@ -304,7 +310,8 @@ void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
                     view->field_0x390 = 1;
                     return;
                 }
-                break;
+                UnknownFunction41eb20(caster);
+                return;
             }
         } while (hidden);
     } else {
