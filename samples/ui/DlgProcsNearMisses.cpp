@@ -70,7 +70,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         field_0x7f6c = 0;
         field_0x7f70 = 0;
         field_0x7f74 = 0;
-        field_0x7f7c = 0.0f;
+        movieRestartTime = 0.0f;
         g_TrackGame->ui->field_0x4b0 = 0;
         g_TrackGame->mode.field_0x10ec = 0;
         FillProfileList();
@@ -97,9 +97,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         if (!_stricmp("MenuSingle", event->controlName)) {
             field_0x7f6c = field_0x7f6c == 0;
             menuSingleAnimation->Show(field_0x7f6c, 1);
-            field_0x7f78 = 1;
+            movieRestartPending = 1;
             if (field_0x7f6c) {
-                field_0x7f7c = 0.0f;
+                movieRestartTime = 0.0f;
                 if (movieControl) {
                     movieControl->field_0x1ec->UnknownVirtualSlot16(1);
                     movieControl->Show(0, 1);

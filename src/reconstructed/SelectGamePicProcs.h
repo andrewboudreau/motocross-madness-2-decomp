@@ -257,12 +257,12 @@ public:
     void ShowPage(int page);     // 0x004f5a00: shows page `page`
     void FollowTrackChange();             // 0x004f5ca0: follows a track change
 
-    MPEventDlg* eventPage;
-    MPBikeRiderDlg* bikeRiderPage;
-    MPRaceInfoDlg* raceInfoPage;
-    MPOptionsDlg* optionsPage;
-    UnknownLobbySlotTable lobbySlots;
+    MPEventDlg* eventPage;                    // +0x7f58: MPEventDlg page
+    MPBikeRiderDlg* bikeRiderPage;            // +0x7f5c: MPBikeRiderDlg page
+    MPRaceInfoDlg* raceInfoPage;              // +0x7f60: MPRaceInfoDlg page
+    MPOptionsDlg* optionsPage;                // +0x7f64: MPOptionsDlg page
+    UnknownLobbySlotTable lobbySlots;         // +0x7f68
     char builtForTrack[0x104];                // +0x7fc8: track name the page was built for
-    int builtForVariant;
-    char sceneName[0x40];
+    int builtForVariant;                      // +0x80cc: track variant the page was built for
+    char sceneName[0x40];                     // +0x80d0: scene name ("no name": resource 0x143b)
 };
