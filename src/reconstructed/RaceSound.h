@@ -184,15 +184,15 @@ public:
     int field_0x1200;
     Sound* waypointSound;                  // +0x1204, "Waypoint.wav"
     int field_0x1208;                     // reset (0x004e3430) on the next frame
-    int field_0x120c[11];
+    int crashHandled[11];                     // +0x120c, set once a racer's crash (+0x444) sounds started
     int racerWreckSound[11];                  // +0x1238
     int racerFallSound[11];                   // +0x1264
     int field_0x1290;
     int field_0x1294;
     int bytesPerSample;                    // +0x1298, 2 with audio_16.ini, 1 with audio_08.ini
-    int field_0x129c;                     // listener's last position (99 initially)
-    UnknownEventRacer* field_0x12a0;      // listener's racer last frame
-    float field_0x12a4;                   // seconds since the matching sound
-    float field_0x12a8;
-    float field_0x12ac;
+    int lastListenerPosition;                 // +0x129c, listener's last position (99 initially)
+    UnknownEventRacer* lastListenerRacer;     // +0x12a0, listener's racer last frame
+    float ohClock;                            // +0x12a4, seconds since oh_01.wav
+    float applauseClock;                      // +0x12a8, seconds since applause01/02
+    float stuntApplauseClock;                 // +0x12ac, seconds since 0x004e57d0's applause
 };

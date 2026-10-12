@@ -19,11 +19,11 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     int i;
     int k;
 
-    field_0x12a0 = 0;
-    field_0x129c = 99;
-    field_0x12a4 = 0;
-    field_0x12a8 = 0;
-    field_0x12ac = 0;
+    lastListenerRacer = 0;
+    lastListenerPosition = 99;
+    ohClock = 0;
+    applauseClock = 0;
+    stuntApplauseClock = 0;
     streamChannel = 0;
     channelsInUse = 0;
     currentRacer = 0;
@@ -51,7 +51,7 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     applause2 = 0;
     applause3 = 0;
     for (i = 0; i < 11; i++) {
-        field_0x120c[i] = 0;
+        crashHandled[i] = 0;
         racerFallSound[i] = 0;
         racerWreckSound[i] = 0;
         engineChannels[i].sampleBuffer = 0;
@@ -551,15 +551,15 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         field_0x1208 = 0;
     }
     if (SoundSystem()->field_0x2c_bit0 && g_TrackGame->mode.field_0xa28 && !raceView->field_0x3f8) {
-        field_0x12a4 += frameTime;
-        field_0x12a8 += frameTime;
-        field_0x12ac += frameTime;
+        ohClock += frameTime;
+        applauseClock += frameTime;
+        stuntApplauseClock += frameTime;
         listenerRacer = listenerCamera->followedRacer;
-        if (listenerRacer != field_0x12a0) {
-            field_0x12a0 = listenerRacer;
+        if (listenerRacer != lastListenerRacer) {
+            lastListenerRacer = listenerRacer;
             field_0x1290 = listenerRacer->field_0x7a0;
             field_0x1294 = listenerRacer->field_0x7b8;
-            field_0x129c = listenerRacer->field_0x784;
+            lastListenerPosition = listenerRacer->field_0x784;
         }
         UpdateRacerSounds(frameTime);
         SoundSystem()->SetListenerPosition(listenerCamera->listenerPosition);
@@ -744,11 +744,11 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     for (i = 0; i < channelsInUse; i++) {
         currentRacer = engineChannels[i].channelRacer;
         if (!currentRacer->field_0x444) {
-            field_0x120c[i] = 0;
+            crashHandled[i] = 0;
             racerWreckSound[i] = 0;
             racerFallSound[i] = 0;
         } else {
-            if (!field_0x120c[i]) {
+            if (!crashHandled[i]) {
                 if (currentRacer == listenerRacer && listenerRacer->field_0x460 == 12) {
                     launchSound->Stop(1);
                     PlayIfEnabled(launchSound, 0, 0, 0, 0);
@@ -756,9 +756,9 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
                     if (currentRacer == listenerRacer && currentRacer->field_0x784 == 1)
                         PlayIfEnabled(booSound, 0, 0, 0, 0);
-                    if (currentRacer == listenerRacer && currentRacer->field_0x784 > 1 && field_0x12a4 > 30.0f) {
+                    if (currentRacer == listenerRacer && currentRacer->field_0x784 > 1 && ohClock > 30.0f) {
                         PlayIfEnabled(ohSound, 0, 0, 0, 0);
-                        field_0x12a4 = 0;
+                        ohClock = 0;
                     }
                 }
             }
@@ -774,25 +774,25 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                 else if (!fallSounds[racerFallSound[i]]->IsPlaying())
                     racerFallSound[i] = PlayFallSound(currentRacer);
             }
-            field_0x120c[i] = 1;
+            crashHandled[i] = 1;
         }
-        if (currentRacer == listenerRacer && currentRacer->field_0x784 < field_0x129c) {
+        if (currentRacer == listenerRacer && currentRacer->field_0x784 < lastListenerPosition) {
             if (currentRacer->field_0x784 == 1) {
                 if (applause3)
                     PlayIfEnabled(applause3, 0, 0, 0, 0);
-            } else if (field_0x12a8 > 15.0f) {
+            } else if (applauseClock > 15.0f) {
                 if (rand() > 0.5f) {
                     if (applause1)
                         PlayIfEnabled(applause1, 0, 0, 0, 0);
                 } else if (applause2)
                     PlayIfEnabled(applause2, 0, 0, 0, 0);
-                field_0x12a8 = 0;
+                applauseClock = 0;
             }
         }
     }
     field_0x1290 = listenerRacer->field_0x7a0;
     field_0x1294 = listenerRacer->field_0x7b8;
-    field_0x129c = listenerRacer->field_0x784;
+    lastListenerPosition = listenerRacer->field_0x784;
     return 1;
 }
 
@@ -1076,9 +1076,9 @@ void RaceSound::UnknownFunction4e57d0(UnknownEventRacer* racer, float value) {
     if (listenerRacer == racer && value >= 10000.0f &&
         (!g_TrackGame->mode.field_0x27f8.field_0x04 || g_TrackGame->mode.field_0x27f8.field_0x04 == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);
-    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && field_0x12ac > 15.0f) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && stuntApplauseClock > 15.0f) {
         PlayIfEnabled(applause1, 0, 0, 0, 0);
-        field_0x12ac = 0;
+        stuntApplauseClock = 0;
     }
 }
 
