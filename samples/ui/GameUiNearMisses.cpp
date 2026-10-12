@@ -111,11 +111,18 @@
 //   x 3 decrement forms.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
-// 0x0047a400 drop-down layout (320/960): store scheduling of the part rects
-//   (retail stores area left, top, right, bottom in order and adds the
-//   scroll bottom into the top register); `scroll.bottom + top`, `+=` on the
-//   area members, `area->left + scroll.right` and the scroll rect's sides set
-//   before its top/bottom (worse) were tried.
+// 0x0047a400 drop-down layout (702/962): the open area's bottom written from
+//   the list (`top + (list.bottom - 2)`) gives retail's left, top, right
+//   store order and the late scroll-bottom stores; with `top +
+//   scroll.bottom` (any spelling, store order or read-back of area->top)
+//   VC6 stores area->top last and adds into the scroll register (320).
+//   Left: VC6 forms the bottom as `lea edx, [list.bottom + top - 2]` where
+//   retail adds the scroll bottom's `sub eax, 2` value into top, and swaps
+//   ebx/edi (zero and list top), which shifts the scratch registers of the
+//   later sprintf/SetName blocks. The scroll.bottom adjustment's position,
+//   the list rect's spellings, scroll declaration forms and a 0..47
+//   typedef prefix leave 702; `+=` on the area members and the scroll
+//   rect's sides set before its top/bottom were worse.
 // 0x0046a920 UIDialog's resource parser (16 KB; 92% of instructions equal
 //   with stack offsets and relocations ignored, 74% raw): the control flow,
 //   calls and constants follow retail. Retail keeps the current control in
@@ -694,7 +701,7 @@ void UIDropDownList::LayoutParts() {
     area->left = left;
     area->top = top;
     area->right = left + scroll.right;
-    area->bottom = top + scroll.bottom;
+    area->bottom = top + (list.bottom - 2);
     sprintf(name, "%s_BUT", GetName());
     buttonPart->SetName(name);
     *(CameraRect*)buttonPart->screenArea = button;
