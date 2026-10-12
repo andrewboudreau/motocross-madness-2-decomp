@@ -2252,7 +2252,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     if (owner)
         field_0x18 = owner->UnknownInlineField18();
     permanent = 0;
-    field_0x1e8 = 0;
+    wordWrap = 0;
 }
 
 // 0x00470450: two independent guiUser tests (VC6 threads the second one);
@@ -4142,7 +4142,7 @@ int UIControl::Draw() {
         int more;
         if (ownerDialog->BeginControlDraw(&dc, &rect, &more, this)) {
             do {
-                if (field_0x1e8) {
+                if (wordWrap) {
                     unsigned int format = DT_WORDBREAK | DT_NOPREFIX;
                     if (textAlign & 2)
                         format = DT_WORDBREAK | DT_NOPREFIX | DT_CENTER;

@@ -1088,7 +1088,7 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                                    "Stunt Event: Donner Pass, or\n"
                                    "Nationals Race: A Voodoo Basin\n");
                     dialog->SetTextsOrResources("Trial Version", 0, prompt, 0, 0, 0, 0, 0x13e9, 0, 0);
-                    dialog->FindControl("TxtPrompt", 0)->field_0x1e8 = 1;
+                    dialog->FindControl("TxtPrompt", 0)->wordWrap = 1;
                     return;
                 }
                 memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.field_0x27f8,

@@ -285,7 +285,7 @@ void ChooseTCPMethodDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control = FindControl("TitleText", 12);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e8);
         UIControl* prompt = FindControl("TxtPrompt", 12);
-        prompt->field_0x1e8 = 1;
+        prompt->wordWrap = 1;
         prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x13fe);
         break;
     }
@@ -318,7 +318,7 @@ void NewbieDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control = FindControl("TitleText", 12);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13ea);
         UIControl* prompt = FindControl("TxtPrompt", 12);
-        prompt->field_0x1e8 = 1;
+        prompt->wordWrap = 1;
         prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x1400);
         break;
     }
@@ -345,7 +345,7 @@ void NoDelCurProfileDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control = FindControl("TitleText", 12);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x146d);
         UIControl* prompt = FindControl("TxtPrompt", 12);
-        prompt->field_0x1e8 = 1;
+        prompt->wordWrap = 1;
         prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x146e);
         break;
     }
@@ -422,7 +422,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                              "Stunt Event: Donner Pass, or\n"
                              "Nationals Race: A Voodoo Basin\n");
                 dialog->SetTextsOrResources("Trial Version", 0, text, 0, 0, 0, 0, 0x13e9, 0, 0);
-                dialog->FindControl("TxtPrompt", 0)->field_0x1e8 = 1;
+                dialog->FindControl("TxtPrompt", 0)->wordWrap = 1;
             } else if (g_TrackGame->mode.field_0x9c) {
                 NewbieDlg* dialog = new(__FILE__, 1292) NewbieDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
@@ -1473,7 +1473,7 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         if (menu == 0xbba || menu == 0xbbb)
             ShowGroup(0x65, 0);
         UIControl* prompt = FindControl("TxtPrompt", 12);
-        prompt->field_0x1e8 = 1;
+        prompt->wordWrap = 1;
         prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x13ae);
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
         edit->SetCapacity(15);
@@ -1545,7 +1545,7 @@ void ProfileExistsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         sprintf(text, "'%s' %s", (const char*)event->field_0x18, label);
         title->SetText(text);
         UIControl* prompt = FindControl("TxtPrompt", 12);
-        prompt->field_0x1e8 = 1;
+        prompt->wordWrap = 1;
         prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x1403);
         break;
     }

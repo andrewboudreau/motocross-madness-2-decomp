@@ -261,7 +261,7 @@ void TCPAddressDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control = FindControl("CancelButton", 0);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
         control = FindControl("TxtPrompt", 12);
-        control->field_0x1e8 = 1;
+        control->wordWrap = 1;
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x899);
         control = FindControl("EditBox", 0);
         guiUser->UnknownFunction487790((UnknownGuiControl*)control, 0, 0);
@@ -400,7 +400,7 @@ void ConnectErrorDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control->keyBind = 0x1c;
         control = FindControl("TxtPrompt", 12);
-        control->field_0x1e8 = 1;
+        control->wordWrap = 1;
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13c9);
         break;
     }

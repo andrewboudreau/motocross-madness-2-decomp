@@ -1009,7 +1009,7 @@ void ConfirmRestoreDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         control = FindControl("TitleText", 12);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x14c9);
         UIControl* prompt = FindControl("TxtPrompt", 12);
-        prompt->field_0x1e8 = 1;
+        prompt->wordWrap = 1;
         prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x14ca);
         break;
     }
@@ -1030,7 +1030,7 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
-        FindControl("TxtUnused", 0)->field_0x1e8 = 1;
+        FindControl("TxtUnused", 0)->wordWrap = 1;
         FillCurveList();
         ShowCurve();
         UpdateBoundValues(0);

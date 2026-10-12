@@ -318,7 +318,7 @@ public:
     Sound* slideSound;                        // +0x1a8
     Sound* fxSoundIn;                         // +0x1ac: "FXSoundIn"
     Sound* fxSoundOut;                        // +0x1b0: "FXSoundOut"
-    int* boundValue;                          // +0x1b4: slot 54; written back by slot 59
+    int* boundValue;                          // +0x1b4: BindValue; written back by SyncBoundValue
     int backgroundRegion;                     // +0x1b8
     int redrawFrames;                         // +0x1bc: frames to redraw
     int needsRedraw;                          // +0x1c0
@@ -331,7 +331,7 @@ public:
     int post3D;                               // +0x1dc: "Pre3D" == 0
     int permanent;                            // +0x1e0: "Permanent"
     unsigned char field_0x1e4[0x1e8 - 0x1e4];
-    int field_0x1e8;
+    int wordWrap;                             // +0x1e8: Draw uses DrawTextA DT_WORDBREAK when set
 };
 
 // RTTI: UIButton : UIControl (vtable 0x00552ce0; 0x1f0 bytes: gameui.cpp's

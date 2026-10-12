@@ -583,7 +583,7 @@ void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     sprintf(text, "$%d", circuit->field_0x465[0].field_0x18.field_0x0c);
     FindControl("TxtMedical", 12)->SetText(text);
     UIControl* announcement = FindControl("TxtAnnouncement", 12);
-    announcement->field_0x1e8 = 1;
+    announcement->wordWrap = 1;
     announcement->SetText(circuit->field_0x54);
 
     picture = FindControl("NextTrackPic", 5);
@@ -756,7 +756,7 @@ void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogInit: {
         g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
         UIControl* description = FindControl("TxtDescription", 12);
-        description->field_0x1e8 = 1;
+        description->wordWrap = 1;
         description->SetTextFromResource(g_TrackGame->resourceInstance, 0x1464);
         label = FindControl("TitleText", 12);
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x1467);
@@ -857,7 +857,7 @@ void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             break;
         }
         UIControl* control = FindControl("TxtDescription", 12);
-        control->field_0x1e8 = 1;
+        control->wordWrap = 1;
         UnknownSetText(control, description);
         UnknownSetText(FindControl("TitleText", 12), 0x1467);
         control = FindControl("ButDecline", 1);
@@ -893,7 +893,7 @@ void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (circuit->field_0x465[0].field_0x18.field_0x10 == 1)
             g_TrackGame->LoadResourceString(0x145f, rank, 1023);
         sprintf(message, "%s\n%s", text, rank);
-        description->field_0x1e8 = 1;
+        description->wordWrap = 1;
         description->SetText(message);
         UIControl* control = FindControl("ButDecline", 1);
         control->Show(0, 1);
