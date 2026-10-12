@@ -26386,7 +26386,7 @@ CASES = [
         'name': 'JoystickDevice 0x489e20 axis value',
         'bindings': 'src/reconstructed/JoystickDevice.bindings.json',
         'source': 'src/reconstructed/JoystickDevice.cpp',
-        'symbol': '?UnknownFunction489e20@JoystickDevice@@QAEMH@Z',
+        'symbol': '?GetAxisValue@JoystickDevice@@QAEMH@Z',
         'target_va': '0x00489e20',
         'target_size': 14,
         'reason': 'out-of-line axisValues[axis] accessor called from OptionProcs 0x4b331d/0x4b57b9; was bound but undefined',
