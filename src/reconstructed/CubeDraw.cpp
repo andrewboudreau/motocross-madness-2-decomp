@@ -101,7 +101,7 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
             goto fail;
         ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
     }
-    UnknownFunction43dc60();
+    BuildFaceGeometry();
     UnknownFunction43e0b0(field_0x2c, context);
     loadPalette->Release();
     loadPalette = 0;
@@ -142,7 +142,7 @@ DrawableCube::~DrawableCube()
 // 0x0043e850
 int DrawableCube::UnknownVirtualSlot12()
 {
-    UnknownFunction43e330();
+    MarkVisibleCells();
     RecordTextureUse();
     return 1;
 }

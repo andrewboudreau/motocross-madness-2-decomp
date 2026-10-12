@@ -45,7 +45,7 @@ static UnknownCubeVertex s_cellVertices[6][16][6];
 static UnknownCubeTextureMapping s_cellMappings[6][16];
 
 // 0x0043dc60
-int DrawableCube::UnknownFunction43dc60()
+int DrawableCube::BuildFaceGeometry()
 {
     UnknownCubeVertex grid[5][5];
     for (int face = 0; face < 6; face++) {
@@ -196,7 +196,7 @@ int DrawableCube::UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* c
 }
 
 // 0x0043e330
-void DrawableCube::UnknownFunction43e330()
+void DrawableCube::MarkVisibleCells()
 {
     Vector3 forward;
     forward.x = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[0][2];

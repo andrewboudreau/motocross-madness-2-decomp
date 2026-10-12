@@ -67,9 +67,9 @@ public:
     virtual ~ManagedTextureGroup();           // 0x0050c2e0 (deleting wrapper 0x0050c2c0)
     int SetPageCount(int count);     // 0x0050c4a0: sets the page count; 0 on failure
     void UnknownFunction50c6c0(ManagedTexture* texture); // 0x0050c6c0: adds a texture
-    void UnknownFunction50c760();             // 0x0050c760: clears the textures' use records
-    void UnknownFunction50c790();             // 0x0050c790: restores lost pages
-    void UnknownFunction50c7e0();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
+    void ClearUseRecords();             // 0x0050c760: clears the textures' use records
+    void RestoreLostPages();             // 0x0050c790: restores lost pages
+    void WriteDebugReport();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
     void RepackPages();             // 0x0050c8c0: repacks the pages
     void UnknownFunction50c960();             // 0x0050c960 (near miss in samples/render)
     void UnknownFunction50dad0();             // 0x0050dad0 (near miss in samples/render)

@@ -137,7 +137,7 @@ void ManagedTextureGroup::UnknownFunction50c6c0(ManagedTexture* texture) {
 }
 
 // 0x0050c760
-void ManagedTextureGroup::UnknownFunction50c760() {
+void ManagedTextureGroup::ClearUseRecords() {
     for (TextureMap* texture = field_0x44.First(); texture; texture = field_0x44.Next()) {
         static_cast<ManagedTexture*>(texture)->useCount = 0;
         static_cast<ManagedTexture*>(texture)->largestUse = 0;
@@ -145,7 +145,7 @@ void ManagedTextureGroup::UnknownFunction50c760() {
 }
 
 // 0x0050c790
-void ManagedTextureGroup::UnknownFunction50c790() {
+void ManagedTextureGroup::RestoreLostPages() {
     for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {
         CacheTexture* cache = static_cast<CacheTexture*>(page);
         if (cache->textureSurface && cache->textureSurface->IsLost()) {
@@ -157,7 +157,7 @@ void ManagedTextureGroup::UnknownFunction50c790() {
 }
 
 // 0x0050c7e0
-void ManagedTextureGroup::UnknownFunction50c7e0() {
+void ManagedTextureGroup::WriteDebugReport() {
     FILE* file = fopen("C:\\temp\\TM_debug.txt", "a");
     if (file) {
         UnknownFunction461d40(file, "----------------------------------------------------------------------\n");

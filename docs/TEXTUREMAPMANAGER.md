@@ -155,7 +155,9 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
 
 Provisional names from the behaviour their comments record: `SetPageCount`
 `0x0050c4a0`, `RepackPages` `0x0050c8c0` and the free function
-`FitTexturesToBudget` `0x0050d800`. `0x0050c6c0` (adds a texture) keeps its
+`FitTexturesToBudget` `0x0050d800`. `ClearUseRecords` `0x0050c760`, `RestoreLostPages`
+`0x0050c790` and `WriteDebugReport` `0x0050c7e0` (the C:	emp\TM_debug.txt
+report) follow the same header comments. `0x0050c6c0` (adds a texture) keeps its
 address name because Cube.cpp, SoultreeMaterial.cpp and TextureMap.cpp call it.
 
 ## CacheTexture

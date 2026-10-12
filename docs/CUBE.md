@@ -56,4 +56,6 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0043d460` `LoadTexture`
 - `0x0043d630` `LoadMissingTextures`
 - `0x0043d980` `Load`
+- `0x0043dc60` `BuildFaceGeometry`
 - `0x0043e210` `RecordTextureUse`
+- `0x0043e330` `MarkVisibleCells`

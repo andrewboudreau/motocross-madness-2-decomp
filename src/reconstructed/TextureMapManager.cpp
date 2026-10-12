@@ -146,7 +146,7 @@ int TextureMapManager::UnknownVirtualSlot12() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
-            cache->UnknownFunction50c760();
+            cache->ClearUseRecords();
     }
     return GameObject::UnknownVirtualSlot12();
 }
@@ -220,7 +220,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
             }
         } else if (UnknownFunction43caa0(0x15, 0, event, 0x80)) {
             if (field_0x3c)
-                field_0x3c->UnknownFunction50c7e0();
+                field_0x3c->WriteDebugReport();
         } else {
             handled = 0;
         }
@@ -245,7 +245,7 @@ int TextureMapManager::UnknownVirtualSlot18() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
-            cache->UnknownFunction50c790();
+            cache->RestoreLostPages();
     }
     return GameObject::UnknownVirtualSlot18();
 }

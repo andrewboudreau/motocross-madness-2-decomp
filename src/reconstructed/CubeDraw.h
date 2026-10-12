@@ -87,11 +87,11 @@ public:
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
     DrawableCube* Load(void* value, UnknownTextureStream* stream,
                                         UnknownCubeTextureContext* context);
-    int UnknownFunction43dc60();              // 0x0043dc60: builds the face geometry
+    int BuildFaceGeometry();              // 0x0043dc60: builds the face geometry
     // 0x0043e0b0: loads the cube's textures and sets the cells' texture coordinates.
     int UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* context);
     int RecordTextureUse();                   // 0x0043e210: records texture use
-    void UnknownFunction43e330();             // 0x0043e330: marks the visible cells
+    void MarkVisibleCells();             // 0x0043e330: marks the visible cells
 
     RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
 
