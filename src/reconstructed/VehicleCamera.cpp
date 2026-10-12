@@ -62,7 +62,7 @@ Vector3 VehicleCamera::UnknownFunction52bac0() {
 // 0x0052bb60: part 0 of the vehicle's +0x3bc in vehicle mode; else the first
 // target's model (its +0x140 child when set), the second target's +0x34
 // translation, the +0x38c translation, or the global default.
-Vector3 VehicleCamera::UnknownFunction52bb60() {
+Vector3 VehicleCamera::TargetPoint() {
     Vector3 position;
     if (vehicleMode) {
         vehicle->field_0x3bc->UnknownFunction4fc9a0(0, &position);
@@ -94,7 +94,7 @@ Vector3 VehicleCamera::UnknownFunction52bc50() {
         return vehicle->field_0x488;
     }
     if (!field_0x391) {
-        field_0x3a4 = UnknownFunction52bb60();
+        field_0x3a4 = TargetPoint();
         field_0x391 = 1;
     }
     return field_0x3a4;
@@ -145,7 +145,7 @@ void VehicleCamera::UnknownVirtualSlot68() {
 // 0x0052ca10: 0x0052bb60's position, led by the tracked point (slot 33)
 // scaled by dt (at most 0.2) while the camera is free to follow.
 Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
-    Vector3 result = UnknownFunction52bb60();
+    Vector3 result = TargetPoint();
     if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
         if (vehicleMode) {
             if (!vehicle->field_0x444) {

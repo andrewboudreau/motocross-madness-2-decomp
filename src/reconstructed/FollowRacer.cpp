@@ -18,7 +18,7 @@
 
 // 0x004a9aa0: applies a kind-0x10 replay delta to the ghost's state and
 // copies the state into `part` (the same shape as KrustyBike.cpp 0x004933e0).
-void UnknownBikeRaceGhost::UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta* delta,
+void UnknownBikeRaceGhost::ApplyReplayDelta(const UnknownBikeRaceGhostDelta* delta,
                                                  UnknownBikeRaceGhostPart* part)
 {
     Vector3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);

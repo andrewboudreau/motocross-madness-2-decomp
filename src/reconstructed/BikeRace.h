@@ -791,7 +791,7 @@ class UnknownBikeRaceGhost {
 public:
     // 0x004a9aa0 (FollowRacer.cpp): applies record kind 0x10 to a state (as
     // 0x004933e0).
-    void UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta* delta, UnknownBikeRaceGhostPart* part);
+    void ApplyReplayDelta(const UnknownBikeRaceGhostDelta* delta, UnknownBikeRaceGhostPart* part);
 
     unsigned char field_0x000[0x4f8];
     int hasState;                             // +0x4f8 has a state

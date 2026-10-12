@@ -28,7 +28,7 @@ provisional (proximity only).
 
 ## Behaviour (decoded)
 
-- `0x004a9aa0` takes a kind-0x10 replay delta (`UnknownBikeRaceGhostDelta`:
+- `0x004a9aa0` (`ApplyReplayDelta`, provisional name) takes a kind-0x10 replay delta (`UnknownBikeRaceGhostDelta`:
   a kind byte, four signed byte triples and a step byte) and a ghost part.
   Two triples scale by 0.234375 (`0x00554714`) into the position-like
   vectors at +0x5d4/+0x5e0, two by 3.14159f / 64 = 0.0490873456 (`0x0055534c`,

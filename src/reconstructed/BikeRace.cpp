@@ -1824,7 +1824,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
             GhostBike()->receivedStates[0] = oldest;
             GhostBike()->receivedStates[0]->recordTime = time;
-            GhostBike()->UnknownFunction4a9aa0((UnknownBikeRaceGhostDelta*)data,
+            GhostBike()->ApplyReplayDelta((UnknownBikeRaceGhostDelta*)data,
                                                           GhostBike()->receivedStates[0]);
             GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
             GhostBike()->receivedStates[0]->fresh = 0;

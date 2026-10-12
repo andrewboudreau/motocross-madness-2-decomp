@@ -15,7 +15,7 @@
   "?UnknownFunction507c10@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?UnknownFunction52b9e0@VehicleCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x0052b9e0",
   "?UnknownFunction52bac0@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bac0",
-  "?UnknownFunction52bb60@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bb60",
+  "?TargetPoint@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bb60",
   "?UnknownFunction52bc50@VehicleCamera@@QAE?AUVector3@@XZ": "0x0052bc50",
   "?UnknownVirtualSlot33@VehicleCamera@@UAE?AUVector3@@XZ": "0x0052ba30",
   "?UnknownVirtualSlot36@VehicleCamera@@UAE_NABUVector3@@_N1@Z": "0x0052cc80",

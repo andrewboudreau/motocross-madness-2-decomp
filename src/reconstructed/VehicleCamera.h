@@ -116,7 +116,7 @@ public:
     Vector3 UnknownFunction52bac0();
     Vector3 UnknownFunction52bc50();
     // 0x0052bb60: the position of the followed part or target.
-    Vector3 UnknownFunction52bb60();
+    Vector3 TargetPoint();
 
     virtual Vector3 UnknownVirtualSlot33();
     virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt);
