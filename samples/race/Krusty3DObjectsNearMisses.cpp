@@ -127,7 +127,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             field_0x1f0 = 0;
             sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(field_0x38) * field_0x1e4);
         }
-        position += field_0x2c->field_0x38->field_0x5f4->field_0x230 * 5.0f;
+        position += field_0x2c->field_0x38->rearWheel->field_0x230 * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
             field_0x188 = position - field_0x38->eyePosition;
             Vector3 forward = field_0x188;
