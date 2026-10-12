@@ -295,8 +295,8 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             strcpy(message.bikeModelNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x00);
             strcpy(message.bikeNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x40);
             strcpy(message.riderNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x80);
-            message.field_0x898[i] = g_TrackGame->mode.field_0x1be4[i].field_0xec;
-            message.field_0x8b8[i] = g_TrackGame->mode.field_0x1be4[i].field_0xf0;
+            message.engineSizes[i] = g_TrackGame->mode.field_0x1be4[i].field_0xec;
+            message.fourStrokes[i] = g_TrackGame->mode.field_0x1be4[i].field_0xf0;
         }
     }
     g_TrackGame->network->Send(0x83, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);

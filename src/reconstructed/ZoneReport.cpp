@@ -152,7 +152,7 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4)
                     players[i].score = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
                 else
-                    players[i].score = (int)g_TrackGame->eventManager->results[i].field_0x2c;
+                    players[i].score = (int)g_TrackGame->eventManager->results[i].score;
             }
             for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
                 if (g_TrackGame->eventManager->results[i].playerId == g_TrackGame->mode.field_0x1be4[j].field_0xd4) {

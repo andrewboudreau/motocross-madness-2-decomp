@@ -130,7 +130,7 @@ struct UnknownEventEntry {
     int finished;                                  // +0x20: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
     int field_0x24;                                // racer +0x4a0
     int points;                                    // +0x28: championship points (AddChampionshipPoints)
-    float field_0x2c;                              // racer +0x768
+    float score;                                   // +0x2c: racer +0x768 (score)
     unsigned char field_0x30;                      // racer +0x11c0; counted in TrackGame+0x3424 (else Game+0x18)
     unsigned char field_0x31[0x34 - 0x31];
     int field_0x34[3];                             // racer +0x7ac..+0x7b4

@@ -511,7 +511,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             else
                 SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
-                sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].field_0x2c);
+                sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].score);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                     sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
                     AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, score);
@@ -630,7 +630,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
         for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
             if (!g_TrackGame->eventManager->results[i].field_0x24) {
-                sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].field_0x2c);
+                sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].score);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                     sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
                     AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, score);
@@ -655,7 +655,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 if (!g_TrackGame->eventManager->results[i].field_0x24) {
-                    sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].field_0x2c);
+                    sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].score);
                     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                         sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
                         AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, score);
