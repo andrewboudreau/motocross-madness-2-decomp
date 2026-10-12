@@ -9,6 +9,7 @@
 #include "DialogEventKind.h"
 #include "SelectGamePicProcs.h"
 #include "KrustyUI.h"
+#include "MenuId.h"
 #include "TrackGame.h"
 #include "MatrixUtil.h"
 #include "DebugAlloc.h"
@@ -164,7 +165,7 @@ void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             guiManager->ShowDialog((UIDialog*)field_0x8070, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             field_0x8070->SetTextsOrResources(0, 0x143c, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
         } else if (_stricmp("Back", event->controlName) == 0) {
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
             EndDialog(0);
         }
         break;

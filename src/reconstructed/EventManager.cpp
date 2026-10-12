@@ -10,6 +10,7 @@
 #include "DirectPlayMessages.h"
 #include "ControlInterface.h"
 #include "GameUi.h"
+#include "MenuId.h"
 #include "QuarryEvent.h"
 #include "TrackGame.h"
 
@@ -390,7 +391,7 @@ void EventManager::UnknownFunction45e600() {
             g_TrackGame->network->SetSessionJoinable(1);
         field_0x34 = 0;
         UnknownFunction45cdc0(2);
-        UnknownFunction45e710(g_TrackGame->field_0x18 == 1 ? 0x88e : 0x868);
+        UnknownFunction45e710(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
     }
 }
 

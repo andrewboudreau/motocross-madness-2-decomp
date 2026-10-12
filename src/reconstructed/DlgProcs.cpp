@@ -12,6 +12,7 @@
 #include "../krusty2/math/FastMath.h"
 #include "InGameProcs.h"
 #include "MatrixUtil.h"
+#include "MenuId.h"
 #include "Net.h"
 #include "NetProcs.h"
 #include "OptionProcs.h"
@@ -405,7 +406,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
             g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (!_stricmp("Start", event->controlName)) {
@@ -1374,7 +1375,7 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
                 EndNetworkGame();
             }
             g_TrackGame->ui->UnknownFunction499b00();
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
             return 1;
         }
         if (g_TrackGame->network) {
@@ -1600,17 +1601,17 @@ void RemoveProfileDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
     switch (menu) {
     case 0xc9:
-        g_TrackGame->ui->OpenMenu(0x66);
+        g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
     case 0xca:
-        g_TrackGame->ui->OpenMenu(0x66);
+        g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
     case 0xcb:
-        g_TrackGame->ui->OpenMenu(0x66);
+        g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1623,17 +1624,17 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0xd8:
+    case kMenuSerialPopup:
         event->dialog->EndDialog(0xe);
         event->handled = 1;
         break;
-    case 0xd9:
+    case kMenuTCPAddress:
         event->dialog->EndDialog(0xe);
         event->handled = 1;
         break;
     case 0x104:
     case 0x105:
-        g_TrackGame->ui->OpenMenu(0x65);
+        g_TrackGame->ui->OpenMenu(kMenuSinglePlayer);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1641,12 +1642,12 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
         event->dialog->EndDialog(0x15);
         event->handled = 1;
         break;
-    case 0x12f:
+    case kMenuRemoveProfile:
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0x191: {
-        g_TrackGame->SetMenuOpen(0, 0x191, 0);
+    case kMenuExit: {
+        g_TrackGame->SetMenuOpen(0, kMenuExit, 0);
         TrackGameViewOwner* owner = g_TrackGame->field_0x568;
         if (owner && g_TrackGame->network && g_TrackGame->network->isHost &&
             owner->field_0xa8 && owner->field_0x34 && owner->field_0xa8 == owner->field_0x34->field_0x38) {
@@ -1660,24 +1661,24 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
             g_TrackGame->network->SetSessionJoinable(1);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                 EndNetworkGame();
-                g_TrackGame->eventManager->UnknownFunction45e710(100);
+                g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
             } else {
-                g_TrackGame->eventManager->UnknownFunction45e710(0x867);
+                g_TrackGame->eventManager->UnknownFunction45e710(kMenuMultiPlayer867);
             }
         } else if (!g_TrackGame->field_0x3444) {
-            g_TrackGame->eventManager->UnknownFunction45e710(0x65);
+            g_TrackGame->eventManager->UnknownFunction45e710(kMenuSinglePlayer);
         } else {
-            g_TrackGame->eventManager->UnknownFunction45e710(0x88f);
+            g_TrackGame->eventManager->UnknownFunction45e710(kMenuPCCentral);
         }
         break;
     }
-    case 0x1f9:
+    case kMenuConnectError:
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0xbb9:
-    case 0xbba:
-    case 0xbbb:
+    case kMenuUserNameBb9:
+    case kMenuUserNameBba:
+    case kMenuUserNameBbb:
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1694,7 +1695,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         event->dialog->UpdateBoundValues(1);
         *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
         g_TrackGame->ui->field_0x2c->field_0x0ec = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
-        g_TrackGame->ui->OpenMenu(0x66);
+        g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1702,7 +1703,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         event->dialog->UpdateBoundValues(1);
         *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
         g_TrackGame->UnknownFunction521a30();
-        g_TrackGame->ui->OpenMenu(0x66);
+        g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1711,7 +1712,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
         g_UnknownGlobal6887d8.resolutionRow = modes->GetRowData(-1);
         *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
-        g_TrackGame->ui->OpenMenu(0x66);
+        g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1724,11 +1725,11 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         }
         break;
     case 0xd0:
-        g_TrackGame->ui->OpenMenu(0x68);
+        g_TrackGame->ui->OpenMenu(kMenuLoading);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0xd8: {
+    case kMenuSerialPopup: {
         UnknownComPortAddress serial;
         memset(&serial, 0, sizeof(serial));
         UnknownFunction4ae410(&g_SerialSettings, &serial);
@@ -1736,7 +1737,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
                                                                     &size)) {
             if (g_TrackGame->network->InitializeConnection(address, size, 8)) {
                 DebugFree(address, __FILE__, 3843);
-                g_TrackGame->ui->OpenMenu(0x85c);
+                g_TrackGame->ui->OpenMenu(kMenuHostJoin85c);
                 return;
             }
             event->dialog->EndDialog(0xd);
@@ -1748,7 +1749,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         }
         break;
     }
-    case 0xd9: {
+    case kMenuTCPAddress: {
         address = 0;
         UIEditBox* edit = static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0));
         edit->GetEditText(text, 128);
@@ -1804,24 +1805,24 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         event->handled = 1;
         break;
     }
-    case 0x12f:
+    case kMenuRemoveProfile:
         event->dialog->EndDialog(0x32);
         event->handled = 1;
         break;
-    case 0x191:
-        g_TrackGame->SetMenuOpen(0, 0x191, 1);
+    case kMenuExit:
+        g_TrackGame->SetMenuOpen(0, kMenuExit, 1);
         break;
-    case 0x1f9:
+    case kMenuConnectError:
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0x1fa:
+    case kMenuPlayerRemoved:
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0xbb9:
-    case 0xbba:
-    case 0xbbb:
+    case kMenuUserNameBb9:
+    case kMenuUserNameBba:
+    case kMenuUserNameBbb:
         CreateProfile(event);
         break;
     }
@@ -1830,26 +1831,26 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
 // 0x00453090
 void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
     switch (menu) {
-    case 0xfc:
+    case kMenuWaitOrCall:
         event->dialog->EndDialog(0xe);
         event->handled = 1;
         break;
-    case 0x66:
+    case kMenuOptions:
         g_TrackGame->ui->OpenMenu(g_TrackGame->ui->field_0x30);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0x65:
-        g_TrackGame->ui->OpenMenu(100);
+    case kMenuSinglePlayer:
+        g_TrackGame->ui->OpenMenu(kMenuMain);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0x910:
-    case 0x911: {
+    case kMenuTrackRecord910:
+    case kMenuTrackRecord911: {
         KrustyUI* ui = g_TrackGame->ui;
-        if (ui->field_0x3c == 0x910)
-            ui->OpenMenu(0x65);
-        else if (ui->field_0x3c == 0x911)
+        if (ui->field_0x3c == kMenuTrackRecord910)
+            ui->OpenMenu(kMenuSinglePlayer);
+        else if (ui->field_0x3c == kMenuTrackRecord911)
             ui->OpenMenu(ui->field_0x38);
         event->dialog->EndDialog(0);
         event->handled = 1;
@@ -1858,14 +1859,14 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
     case 0x10e:
         g_TrackGame->eventManager->ResetEntries();
         if (g_TrackGame->network)
-            g_TrackGame->ui->OpenMenu(0x867);
+            g_TrackGame->ui->OpenMenu(kMenuMultiPlayer867);
         else
-            g_TrackGame->ui->OpenMenu(0x65);
+            g_TrackGame->ui->OpenMenu(kMenuSinglePlayer);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
-    case 0x190:
-        g_TrackGame->SetMenuOpen(0, 0x190, 1);
+    case kMenuContinue:
+        g_TrackGame->SetMenuOpen(0, kMenuContinue, 1);
         break;
     }
 }
@@ -1875,7 +1876,7 @@ void CreditsVidDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1)
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
         break;
     case kDialogInit: {
         CameraRect area;
@@ -1938,7 +1939,7 @@ void Intro2Dlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 Intro3Dlg* dialog = new(__FILE__, 4256) Intro3Dlg;
                 g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
             } else {
-                g_TrackGame->ui->OpenMenu(100);
+                g_TrackGame->ui->OpenMenu(kMenuMain);
                 g_TrackGame->ui->field_0x2c->ShowCursors(1);
             }
         }
@@ -1975,7 +1976,7 @@ void Intro3Dlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
             g_TrackGame->ui->field_0x2c->ShowCursors(1);
         }
         break;
@@ -2100,7 +2101,7 @@ void GhostReplayDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             event->dialog->EndDialog(0);
             event->handled = 1;
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
         } else if (!_stricmp("TabLeft", event->controlName)) {
             OpenPage(0);
         } else if (!_stricmp("TabRight", event->controlName)) {
@@ -2599,7 +2600,7 @@ void DemoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                    sizeof(g_TrackGame->mode.field_0x1034));
             memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
-            g_TrackGame->eventManager->UnknownFunction45e710(100);
+            g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
             guiManager->ShowCursors(1);
         }
         break;
