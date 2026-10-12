@@ -74,7 +74,7 @@
   "?ReplaceMaterialTexture@D3DIMSoultreeObject@@QAEHHPBDH@Z": "0x00444c70",
   "?SetLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@D3DIMSoultreeObject@@QAEXH@Z": "0x00444d40",
-  "?UnknownFunction444d60@D3DIMSoultreeObject@@QAEXM@Z": "0x00444d60",
+  "?SetLodThreshold@D3DIMSoultreeObject@@QAEXM@Z": "0x00444d60",
   "?AddModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
   "?RemoveModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444de0",
   "?RemoveAllModifiers@D3DIMSoultreeObject@@QAEXXZ": "0x00444e80",

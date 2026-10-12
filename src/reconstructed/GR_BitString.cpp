@@ -94,29 +94,29 @@ void GR_BitString::ShiftTowardFront(int count) {
     unsigned int* src;
 
     if (count >= 32) {
-        words = (field_0x04 + 31) / 32;
+        words = (bitCount + 31) / 32;
         shiftWords = count / 32;
         count -= shiftWords * 32;
         remaining = words - shiftWords;
         if (remaining > 0) {
-            dst = (unsigned int*)field_0x08;
+            dst = (unsigned int*)data;
             src = dst + shiftWords;
             do {
                 *dst++ = *src++;
             } while (--remaining);
             do {
-                *dst++ = field_0x18;
+                *dst++ = fillWord;
             } while (--shiftWords);
         } else {
-            dst = (unsigned int*)field_0x08;
+            dst = (unsigned int*)data;
             remaining = words;
             do {
-                *dst++ = field_0x18;
+                *dst++ = fillWord;
             } while (--remaining);
         }
     }
     if (count > 0)
-        UnknownFunction4239c0(count);
+        ShiftBitsTowardFront(count);
 }
 
 // 0x00423940
@@ -128,36 +128,36 @@ void GR_BitString::ShiftTowardBack(int count) {
     unsigned int* src;
 
     if (count >= 32) {
-        words = (field_0x04 + 31) / 32;
+        words = (bitCount + 31) / 32;
         shiftWords = count / 32;
         count -= shiftWords * 32;
         remaining = words - shiftWords;
         if (remaining > 0) {
-            src = (unsigned int*)field_0x08 + remaining;
-            dst = (unsigned int*)field_0x08 + words;
+            src = (unsigned int*)data + remaining;
+            dst = (unsigned int*)data + words;
             do {
                 *--dst = *--src;
             } while (--remaining);
             do {
-                *--dst = field_0x18;
+                *--dst = fillWord;
             } while (--shiftWords);
         } else {
-            dst = (unsigned int*)field_0x08;
+            dst = (unsigned int*)data;
             do {
-                *dst++ = field_0x18;
+                *dst++ = fillWord;
             } while (--words);
         }
     }
     if (count > 0)
-        UnknownFunction423b70(count);
+        ShiftBitsTowardBack(count);
 }
 
 // 0x00423d50
 GR_BitString::GR_BitString(const void* buffer, int bits, int flag) {
-    field_0x04 = bits;
-    field_0x18 = flag ? -1 : 0;
-    field_0x08 = (void*)buffer;
-    field_0x1c = 1;
+    bitCount = bits;
+    fillWord = flag ? -1 : 0;
+    data = (void*)buffer;
+    borrowedBuffer = 1;
     field_0x0c = (void*)buffer;
     field_0x10 = 0x80;
     field_0x14 = 0;
@@ -168,8 +168,8 @@ GR_BitString::GR_BitString(const void* buffer, int bits, int flag) {
 
 // 0x00423dd0
 GR_BitString::~GR_BitString() {
-    if (!field_0x1c && field_0x08)
-        delete field_0x08;
+    if (!borrowedBuffer && data)
+        delete data;
 }
 
 // 0x00423df0
@@ -180,17 +180,17 @@ void GR_BitString::UnknownVirtualSlot1(int* value) {
     int bytes;
     int pairs;
 
-    front = (unsigned char*)field_0x08;
-    if (front && field_0x04) {
-        bytes = (field_0x04 + 7) / 8;
+    front = (unsigned char*)data;
+    if (front && bitCount) {
+        bytes = (bitCount + 7) / 8;
         pairs = bytes / 2;
-        back = (unsigned char*)field_0x08 + bytes;
+        back = (unsigned char*)data + bytes;
         do {
             c = g_UnknownBitReverse567f98[*front];
             *front++ = g_UnknownBitReverse567f98[*--back];
             *back = c;
         } while (--pairs);
-        *value = -((8 - field_0x04 % 8) % 8);
+        *value = -((8 - bitCount % 8) % 8);
     }
 }
 
@@ -204,7 +204,7 @@ void GR_BitString::UnknownVirtualSlot0() {
 
 // 0x00423e90
 void GR_BitString::UnknownVirtualSlot2(int value) {
-    if (field_0x08 && field_0x04) {
+    if (data && bitCount) {
         if (value < 0)
             ShiftTowardFront(-value);
         else if (value > 0)
@@ -217,9 +217,9 @@ void GR_BitString::UnknownVirtualSlot3() {
     unsigned int* p;
     int words;
 
-    if (field_0x08 && field_0x04) {
-        words = (field_0x04 + 31) / 32;
-        p = (unsigned int*)field_0x08;
+    if (data && bitCount) {
+        words = (bitCount + 31) / 32;
+        p = (unsigned int*)data;
         do {
             *p = ~*p;
             p++;

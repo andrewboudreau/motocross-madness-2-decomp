@@ -264,7 +264,7 @@ public:
     int ReplaceMaterialTexture(int index, const char* name, int a); // 0x00444c70
     void SetLod(int lod);           // 0x00444d00
     void SetLowestLod(int lod);           // 0x00444d40
-    void UnknownFunction444d60(float value);       // 0x00444d60
+    void SetLodThreshold(float value);             // 0x00444d60
     void RemoveAllModifiers();                     // 0x00444e80
     void UnknownFunction444eb0(GameObject* modifier); // 0x00444eb0
     void RemoveAllSecondModifiers();               // 0x00444fb0
@@ -293,7 +293,7 @@ public:
     int lowestLod;                             // lowest level of detail
     int currentLod;                           // +0x27c current level of detail
     float* autoLodDistances;                   // "AutoLOD#%i" distances
-    float field_0x284;
+    float inverseLodThreshold;                 // +0x284 1 / SetLodThreshold's value; SelectLod takes level i + 1 while scale * autoLodDistances[i] < threshold
     int field_0x288;
     UnknownSoultreeLod* lodTable;
     SoultreeMaterial** materialTable;          // materials

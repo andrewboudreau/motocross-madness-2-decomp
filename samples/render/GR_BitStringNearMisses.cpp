@@ -18,10 +18,10 @@
 #include "../../src/reconstructed/GR_BitString.cpp"
 
 // 0x004239c0
-void GR_BitString::UnknownFunction4239c0(int count) {
-    unsigned int* dst = (unsigned int*)field_0x08;
+void GR_BitString::ShiftBitsTowardFront(int count) {
+    unsigned int* dst = (unsigned int*)data;
     unsigned int* src;
-    int words = (field_0x04 + 31) / 32;
+    int words = (bitCount + 31) / 32;
     int carryShift = 32 - count;
     unsigned int value;
     int i;
@@ -48,16 +48,16 @@ void GR_BitString::UnknownFunction4239c0(int count) {
         }
         src++;
     }
-    if (!field_0x18)
+    if (!fillWord)
         *dst &= g_UnknownHighMasks568098[carryShift];
     else
         *dst |= ~g_UnknownHighMasks568098[carryShift];
 }
 
 // 0x00423b70
-void GR_BitString::UnknownFunction423b70(int count) {
-    int words = (field_0x04 + 31) / 32;
-    unsigned int* dst = (unsigned int*)field_0x08 + words - 1;
+void GR_BitString::ShiftBitsTowardBack(int count) {
+    int words = (bitCount + 31) / 32;
+    unsigned int* dst = (unsigned int*)data + words - 1;
     unsigned int* src = dst - 1;
     int carryShift = 32 - count;
     unsigned int value;
@@ -85,7 +85,7 @@ void GR_BitString::UnknownFunction423b70(int count) {
         }
         src--;
     }
-    if (!field_0x18)
+    if (!fillWord)
         *--dst &= ~g_UnknownHighMasks568098[count];
     else
         *--dst |= g_UnknownHighMasks568098[count];

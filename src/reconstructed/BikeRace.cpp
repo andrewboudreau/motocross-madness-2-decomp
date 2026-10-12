@@ -262,7 +262,7 @@ int BikeRace::UpdateTrackSeparation() {
 
 // 0x0041d2a0
 void BikeRace::SetSceneTime(float time) {
-    raceScene->UnknownFunction4eb000(time);
+    raceScene->RestartAllEntries(time);
 }
 
 // Inline: the racers in the race, own and AI (a single player race) or

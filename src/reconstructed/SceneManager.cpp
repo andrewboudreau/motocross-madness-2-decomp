@@ -417,7 +417,7 @@ void Scene::UnknownFunction4eafd0(int index)
 }
 
 // 0x004eb000
-void Scene::UnknownFunction4eb000(float time)
+void Scene::RestartAllEntries(float time)
 {
     if (animationTable) {
         for (int i = 0; i < animationTable->entryCount; i++)

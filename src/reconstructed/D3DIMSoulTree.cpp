@@ -34,7 +34,7 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     lowestLod = 0;
     lodTable = 0;
     autoLodDistances = 0;
-    field_0x284 = 1.0f;
+    inverseLodThreshold = 1.0f;
     field_0x288 = 0;
     lightManager = 0;
     modifierList = 0;
@@ -799,7 +799,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
     if (field_0x288) {
         int lod = 0;
         for (int i = 0; i < lodCount - 1; i++) {
-            if ((scale * autoLodDistances[i]) * field_0x284 < 1.0f)
+            if ((scale * autoLodDistances[i]) * inverseLodThreshold < 1.0f)
                 lod = i + 1;
         }
         if (currentLod != lod)
@@ -980,9 +980,9 @@ void D3DIMSoultreeObject::SetLowestLod(int lod)
 }
 
 // 0x00444d60
-void D3DIMSoultreeObject::UnknownFunction444d60(float value)
+void D3DIMSoultreeObject::SetLodThreshold(float value)
 {
-    field_0x284 = 1.0f / value;
+    inverseLodThreshold = 1.0f / value;
 }
 
 // 0x00444d80
@@ -1115,7 +1115,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
 // 0x004451e0
 void D3DIMSoultreeObject::ApplyLodSettings(int index)
 {
-    UnknownFunction444d60(g_UnknownSoultreeLodSettings689f18[index].field_0x00);
+    SetLodThreshold(g_UnknownSoultreeLodSettings689f18[index].field_0x00);
     field_0x1b4 = g_UnknownSoultreeLodSettings689f18[index].field_0x04;
     field_0x1b8 = g_UnknownSoultreeLodSettings689f18[index].field_0x08;
     UnknownFunction4444c0(g_UnknownSoultreeLodSettings689f18[index].field_0x0c);
