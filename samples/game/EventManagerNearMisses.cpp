@@ -73,7 +73,7 @@ void EventManager::UnknownFunction45e710(int menu) {
     layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
     if (!g_TrackGame->field_0x3428 && !g_TrackGame->ui->field_0x4a8 &&
         g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
-        g_TrackGame->ui->UnknownFunction49bbb0();
+        g_TrackGame->ui->RecordRaceResults();
     g_TrackGame->ui->field_0x2c->ShowCursors(1);
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;
     g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);

@@ -126,7 +126,7 @@ public:
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
-    void UnknownFunction49a8b0();             // 0x0049a8b0
+    void LoadBikesAndRiders();                // 0x0049a8b0: bikes.pb and riders.pb
     GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
     void UnknownFunction498cf0(int value);                         // 0x00498cf0
     void OpenMenu(int menu);                                       // 0x00499b20: opens a menu
@@ -134,8 +134,8 @@ public:
     // 0x0049bbb0: records the finished race in the high-score tables
     // (TrackGame+0x3400): table 0, then 1 and 2 by laps (5, 10) or, in
     // modes 0 and 4, by the +0x140 setting (5.0, 10.0).
-    void UnknownFunction49bbb0();
-    void UnknownFunction49bc50(int table);                         // 0x0049bc50
+    void RecordRaceResults();
+    void RecordHighScoreTable(int table);                          // 0x0049bc50
 
     UnknownKrustyUIGui* field_0x2c;
     int field_0x30;

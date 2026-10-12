@@ -48,7 +48,7 @@
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",
   "?UnknownFunction469260@GameObject@@QAEHPAV1@H@Z": "0x00469260",
   "?UnknownFunction46ff30@UnknownTrackGameObject56cItem@@QAEXH@Z": "0x0046ff30",
-  "?UnknownFunction49bbb0@KrustyUI@@QAEXXZ": "0x0049bbb0",
+  "?RecordRaceResults@KrustyUI@@QAEXXZ": "0x0049bbb0",
   "?UnknownFunction4a6b30@D3DIMSoultreeCharacter@@QAEPAUMotion@@PBDH@Z": "0x004a6b30",
   "?UnknownFunction4a8b40@D3DIMSoultreeCharacter@@QAEXPAUMotion@@@Z": "0x004a8b40",
   "?UnknownFunction4bc320@UnknownPodiumSound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",

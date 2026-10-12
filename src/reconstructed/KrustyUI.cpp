@@ -672,7 +672,7 @@ void KrustyUI::LoadGarageTables() {
 // and 7, their second bike, and riders 42 and 44 are loaded. Each file's
 // entry count is a local of its own block: the two share one frame slot and
 // that puts the manufacturer index below the bike count, as retail has it.
-void KrustyUI::UnknownFunction49a8b0() {
+void KrustyUI::LoadBikesAndRiders() {
     char key[256];
     UnknownParameterBlock block;
     UnknownTextureStream* stream = new(__FILE__, 913) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -859,28 +859,28 @@ int KrustyUI::UnknownFunction49ba70(int a, int b, int c, const char* name, int d
 }
 
 // 0x0049bbb0
-void KrustyUI::UnknownFunction49bbb0() {
+void KrustyUI::RecordRaceResults() {
     UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.field_0x27f8;
     if (settings->field_0x04 == 1 && settings->field_0x2c)
         return;
-    UnknownFunction49bc50(0);
+    RecordHighScoreTable(0);
     int mode = g_TrackGame->mode.field_0x27f8.field_0x04;
     if (mode != 0 && mode != 4) {
         if (g_TrackGame->mode.field_0x27f8.field_0x20 == 5)
-            UnknownFunction49bc50(1);
+            RecordHighScoreTable(1);
         if (g_TrackGame->mode.field_0x27f8.field_0x20 == 10)
-            UnknownFunction49bc50(2);
+            RecordHighScoreTable(2);
     } else {
         if (g_TrackGame->mode.field_0x27f8.field_0x140 == 5.0f)
-            UnknownFunction49bc50(1);
+            RecordHighScoreTable(1);
         if (g_TrackGame->mode.field_0x27f8.field_0x140 == 10.0f)
-            UnknownFunction49bc50(2);
+            RecordHighScoreTable(2);
     }
 }
 
 // 0x0049bc50: selects high-score table `table`, names it after the track
 // and adds the racers' results; saves it when one of them made the table.
-void KrustyUI::UnknownFunction49bc50(int table) {
+void KrustyUI::RecordHighScoreTable(int table) {
     char name[128];
     if (!g_TrackGame->mode.field_0x27f8.field_0x10)
         return;
