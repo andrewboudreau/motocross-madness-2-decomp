@@ -105,8 +105,8 @@
     "candidate_symbol_contains": "CollisionRotateVector",
     "target_va": "0x0043ca20",
     "target_size": 115,
-    "expect": "partial",
-    "notes": "113 vs 115 bytes: retail copies the result through an extra register (mov ecx,eax) and loads the first component early; struct temp vs Vec3 temporary both give the same 113-byte form",
+    "expect": "exact",
+    "notes": "returns out (both callers read eax after the call: 0x43c524 mov ecx,[eax], 0x43c75b push eax); the void form lacked the result-pointer copy mov ecx,eax (113 bytes, 61/115)",
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {

@@ -29,6 +29,11 @@
 //   reproduces) and computes hi = w + ext with w as the destination, keeping ext on the x87
 //   stack until three final pops.
 //   0..33 dead initialised int locals at the top of the function change nothing.
+//   Session 12: the diagonal as three Vec3 locals (`Vec3 ex(b.x, 0, 0)`, ey, ez; zero
+//   stores dead) gives retail's frame exactly (c, e, w, a: all 12-byte keys under the
+//   small-frame size rule), but VC6 then adds an fxch pair to the ext.x sum (394-396).
+//   Tail forms that change nothing: w + ext operand order, `+=` from a copy, Vec3
+//   operators, inline Set helpers by reference/pointer/value, six ext sum orders.
 // AccumulateBounds (0x004fe2e0, 1390 bytes; 80/1297): first draft. Same flow, calls and
 //   arithmetic; retail's frame is 0x48 (here 0x3c): it copies each direction into a by-value
 //   temporary at esp+0x40 and keeps the world centre in ebx/ebp/edx, and loads the three
