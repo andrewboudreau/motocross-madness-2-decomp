@@ -196,6 +196,12 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
     return this;
 }
 
+// Inline form of the dot product (the out-of-line dot is TireDot).
+static inline float TireDotInline(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+
 // CollisionPoint slot 1 override (0x00515b50, compiled with this = the CollisionPoint
 // subobject at +0xb8, hence the +0xb8 Tire offsets 0x230.. behind CollisionPoint-relative
 // disassembly displacements).  The base implementation (0x0043b240) computes the contact
@@ -214,16 +220,16 @@ void Tire::CollisionPointVirtualSlot1()
         CollisionPoint::frictionMagnitude = 0.0f;
         CollisionPoint::frictionForce = kVec3Zero;
     } else {
-        float c = CollisionPoint::frictionDirection.y * rollDirection.y + CollisionPoint::frictionDirection.x * rollDirection.x
-                + CollisionPoint::frictionDirection.z * rollDirection.z;
+        float c = TireDotInline(CollisionPoint::frictionDirection, rollDirection);
         if (c < 0.0f)
             c = -c;
         if (c >= 1.0f)
             c = 1.0f;
         tangentCos = c;
         tangentSin = sqrt(1.0f - c * c);
-        CollisionPoint::frictionMagnitude = ((-sideFriction) * sideFrictionScale * tangentSin * CollisionPoint::frictionCoefficient
-                                      + (-rollFriction) * rollFrictionScale * tangentCos * CollisionPoint::frictionCoefficient)
+        float rollTerm = (-rollFriction) * rollFrictionScale * tangentCos * CollisionPoint::frictionCoefficient;
+        CollisionPoint::frictionMagnitude = (rollTerm + (-sideFriction) * sideFrictionScale * tangentSin
+                                                        * CollisionPoint::frictionCoefficient)
                                      * CollisionPoint::surfaceGrip;
         CollisionPoint::frictionForce = CollisionPoint::frictionDirection * CollisionPoint::frictionMagnitude;
         if (CollisionPoint::frictionMagnitude < 0.0f)
@@ -735,12 +741,7 @@ void Tire::UpdateAttachment()
     }
 }
 
-// Inline forms of the dot and cross products (the out-of-line dot is TireDot).
-static inline float TireDotInline(const CollisionVec3& a, const CollisionVec3& b)
-{
-    return a.z * b.z + (a.x * b.x + a.y * b.y);
-}
-
+// Inline form of the cross product (the inline dot is TireDotInline above).
 static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec3& b)
 {
     CollisionVec3 r;

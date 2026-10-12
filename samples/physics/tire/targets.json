@@ -46,7 +46,7 @@
     "target_va": "0x00515b50",
     "target_size": 316,
     "expect": "partial",
-    "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f` Wave 2: swapping term order, naming s as a local, re-reading s from field_0x288 all compile to identical bytes (VC6 factors the shared field_0x74 multiply and evaluates the field_0x1cc term first); retail multiplies field_0x74 into each term.",
+    "notes": "305/316 strict. The tangent dot is TireDotInline (z + (x + y), which VC6 emits y, x, z like retail); the roll term is a named local so VC6 neither factors frictionCoefficient out of the sum nor hoists the side term above it. Remaining: in the side term VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2); fmul [ecx+0x74]`), and one frictionForce copy store is scheduled earlier. No gain from: all 24 operand orders of the side product with either negation, parenthesised groupings (these hoist the side term, 193-210), a local s or chained `s = tangentSin = sqrt(...)`, a coefficient local, a named sum, a named side term, the 12 dot orders.",
     "bindings": "Tire.bindings.json"
   },
   {
