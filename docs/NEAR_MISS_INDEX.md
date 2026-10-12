@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 170, c 113, total 284. The three class (a) functions of the
+Counts: a 2, b 169, c 113, total 284. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -35,7 +35,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
 | camera/VehicleCamera | `0x0052c510` | 817/1261 | c | slot 35: frame and slots match; `(x*x) + y*y + z*z` gives retail's x*x-first squared length; retail duplicates the x scaling into both range branches (`fld x; fmul st(1)` / `fld st(0); fmul x`) where VC6 shares one block ; writing the scaling out in the body (slot 41's lever) gives 798..824 |
-| control/ControlInterface | `0x004bf4f0` | 43/124 | c | 5 code diffs: `test ecx, ecx ; je @38 ; mov edx, [esp ~` vs `jmp @5` |
+| control/ControlInterface | `0x004bf4f0` | 76/104 (inside ControlInterface.cpp) | c | tails merged as in retail; retail places the mouse pointer load after the shared block's `ret` and jumps back, VC6 places it after the keyboard load |
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]`; redundant parentheses on the differences, products and detail-band casts (225 combinations) do not move it |
 | ecosystem/EcoSystem | `0x004570a0` | 103/386 | b | retail keeps the definition-table entry in `edi` across the position conversions (`mov edi, [eax + ecx*4 + 0x58]`); register choice in the shape store blocks |
@@ -207,7 +207,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/Recorder | `0x004e6f80` | 652/2180 | c | case 1 `goto opened` reproduces retail's jmp into case 2's tail; left: case 2's `[0xc8]=1; Leave` suffix still cross-jumps into case 4 (retail keeps it), and `name`/`headerSize` slots swap (0x08/0x10); real extent 2148 |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
 | race/Wrecker | `0x00531740` | 1606/1624 | c | slots match; the argument push of two loop constructor calls comes one load earlier (`push ecx` before the particle-pointer load and before `along.y`), two registers differ |
-| race/Wrecker | `0x005329e0` | 763/1312 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then the y/x extent copies, `p`); retail does not merge the z clip's two `outPrevious` updates |
+| race/Wrecker | `0x005329e0` | 1200/1312 (inside Wrecker.cpp) | a | every instruction equal; slot order only (retail keeps `push` nearest esp, then the y/x extent copies, `p`) |
 | render/BackgroundImage | `0x004049d0` | 108/606 (masked) | c | block layout as retail; VC6 caches 0 in edi (`xor edi, edi`, `mov [esp + N], edi`) where retail stores immediates, which moves the region loop's registers |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |

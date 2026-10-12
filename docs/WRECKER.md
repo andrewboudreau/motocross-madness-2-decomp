@@ -146,7 +146,7 @@ relocation resolved by the bindings. Two near misses are parked in
 
 | VA | Size | Score | Remaining difference |
 |---|---:|---|---|
-| `0x005329e0` | 1312 | 763/1312 | frame 0x94 (retail's) with the scaled temporary passed straight to the out-of-line scale `0x005015b0`; the clip sums written `out = out + (extent - p)` (with `+=` the probe-array address is formed base first, 240/1312) and the mean through the unit's inline `operator/` give retail's instructions except one block: retail keeps the z clip's two `outPrevious` updates separate. The slot order differs (retail: `push`, the y and x extent copies, `p`, the z extent copy, `previousPush`, `sum`) |
+| `0x005329e0` | 1312 | 1200/1312 | compiled inside Wrecker.cpp; frame 0x94 (retail's) with the scaled temporary passed straight to the out-of-line scale `0x005015b0`; the clip sums written `out = out + (extent - p)` (with `+=` the probe-array address is formed base first) and the mean through the unit's inline `operator/` give every retail instruction. Only the slot order differs (retail: `push`, the y and x extent copies, `p`, the z extent copy, `previousPush`, `sum`) |
 | `0x00531740` | 1624 | 1606/1624 | contact particle spray; frame 0xc4 and slot order match with the two normalisations written as nested expressions (`WreckerNormalizeFirst(velocity) * (speed + 2.0f)`, `WreckerNormalizeTail(WreckerCross(...))`) and the per-particle gravity drift as the nested out-of-line scale. Left: the argument push of two constructor calls in the loop comes one load earlier (before the particle-pointer load and before `along.y` is copied), which changes two registers; not sensitive to the declaration count |
 
 ## Naming

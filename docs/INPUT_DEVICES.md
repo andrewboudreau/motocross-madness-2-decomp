@@ -244,7 +244,8 @@ acquired flag at +0xcc4.
 | `0x004beef0` | Names one of the twelve effect GUIDs (GUID_ConstantForce … GUID_CustomForce); placed in PCControl.cpp by address only |
 
 All are strict exact except two near misses in `samples/control`:
-- **Slot 3** (`0x004bf4f0`, per-device state).
+- **Slot 3** (`0x004bf4f0`, per-device state; 76/104 compiled inside
+  ControlInterface.cpp, where only the mouse case's block placement differs).
 - **The DirectInput error reporter** (`0x004bf6a0`). Its 33 case values,
   traced from retail's decision tree, are the DIERR/DI codes named by its
   own strings. Only VC6's case-tail merging differs.
