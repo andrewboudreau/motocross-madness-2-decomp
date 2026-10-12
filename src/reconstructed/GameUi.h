@@ -322,7 +322,7 @@ public:
     int backgroundRegion;                     // +0x1b8
     int redrawFrames;                         // +0x1bc: frames to redraw
     int needsRedraw;                          // +0x1c0
-    void* field_0x1c4;
+    void* tabStops;                           // +0x1c4: int table for the "|x" text codes (SplitTextLines)
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
     int (UIControl::*transitionStep)(); // +0x1d0: the running transition (slots 41-47)

@@ -2218,7 +2218,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     moveable = 0;
     keyBind = 0;
     field_0x1c8 = 0;
-    field_0x1c4 = 0;
+    tabStops = 0;
     mouseAnim = 0;
     for (int i = 0; i < 5; i++) {
         stateImages[i] = 0;
@@ -2282,8 +2282,8 @@ UIControl::~UIControl() {
         DeleteObject((HGDIOBJ)fontHandle);
     if (textLines)
         DebugFree(textLines, __FILE__, 0xba8);
-    if (field_0x1c4)
-        DebugFree(field_0x1c4, __FILE__, 0xba9);
+    if (tabStops)
+        DebugFree(tabStops, __FILE__, 0xba9);
 }
 
 // 0x00470660
@@ -2395,7 +2395,7 @@ void UIControl::SetText(const char* text) {
             controlText = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0xcc4);
             strcpy(controlText, text);
             textLines = ownerDialog->SplitTextLines(controlText, textColor, (void*)fontHandle,
-                                                    field_0x1c4, textExtent);
+                                                    tabStops, textExtent);
             if (!textLines) {
                 controlTextLength = textExtent[0] = strlen(controlText);
                 HDC dc;
@@ -2774,7 +2774,7 @@ void UIListBox::SetRowText(int row, const char* text) {
         rowTable[row].text = (char*)DebugMalloc(rowTable[row].width + 1, __FILE__, 0x1e0e);
         strcpy(rowTable[row].text, text);
         rowTable[row].textLines = ownerDialog->SplitTextLines(
-            rowTable[row].text, textColor, (void*)fontHandle, field_0x1c4, 0);
+            rowTable[row].text, textColor, (void*)fontHandle, tabStops, 0);
     }
     RequestRedraw();
 }
@@ -2797,7 +2797,7 @@ int UIListBox::AddRow(const char* text, int data, int a) {
         row->text = (char*)DebugMalloc(row->width + 1, __FILE__, 0x1dc7);
         strcpy(row->text, text);
         row->textLines = ownerDialog->SplitTextLines(row->text, textColor, (void*)fontHandle,
-                                                     field_0x1c4, 0);
+                                                     tabStops, 0);
         SetRowData(rowCount, data);
         row->field_0x30 = 0;
         rowCount++;
@@ -2898,7 +2898,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
             stateTable[index].text = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0x2213);
             strcpy(stateTable[index].text, text);
             stateTable[index].textLines = ownerDialog->SplitTextLines(
-                stateTable[index].text, textColor, (void*)fontHandle, field_0x1c4,
+                stateTable[index].text, textColor, (void*)fontHandle, tabStops,
                 stateTable[index].textExtent);
             if (!stateTable[index].textLines) {
                 stateTable[index].textExtent[0] = strlen(stateTable[index].text);
@@ -3382,12 +3382,12 @@ void UIDialog::UnknownFunction46f120() {
 
 // A colored run of dialog text (0x18 bytes).
 struct UnknownGameUiTextRun {
-    const char* field_0x00;                   // text
-    int field_0x04;                           // 1: sets the color, 2: sets the position
-    int field_0x08;                           // length
-    unsigned int field_0x0c;                  // color
-    int field_0x10;                           // width
-    int field_0x14;                           // position
+    const char* text;                         // +0x00
+    int kind;                                 // +0x04: 1 sets the color, 2 the position
+    int length;                               // +0x08
+    unsigned int color;                       // +0x0c: "~N" picks textColors[N]
+    int width;                                // +0x10: GetTextExtentPoint32A cx
+    int position;                             // +0x14: "|x" picks the tab-stop table entry x
 };
 
 int g_UnknownGlobal65b604;                    // the run being drawn
@@ -3405,22 +3405,22 @@ void UIDialog::DrawTextRuns(void* dc, int x, int y, const char* text, int length
     g_UnknownGlobal65b564 = x;
     SetTextColor((HDC)dc, color);
     g_UnknownGlobal65b574 = color;
-    while (runs[g_UnknownGlobal65b604].field_0x00) {
-        if (runs[g_UnknownGlobal65b604].field_0x04 == 2)
-            g_UnknownGlobal65b564 = runs[g_UnknownGlobal65b604].field_0x14 + x;
+    while (runs[g_UnknownGlobal65b604].text) {
+        if (runs[g_UnknownGlobal65b604].kind == 2)
+            g_UnknownGlobal65b564 = runs[g_UnknownGlobal65b604].position + x;
         if (shadow) {
             SetTextColor((HDC)dc, shadowColor);
-            TextOutA((HDC)dc, g_UnknownGlobal65b564 + 1, y + 1, runs[g_UnknownGlobal65b604].field_0x00,
-                     runs[g_UnknownGlobal65b604].field_0x08);
+            TextOutA((HDC)dc, g_UnknownGlobal65b564 + 1, y + 1, runs[g_UnknownGlobal65b604].text,
+                     runs[g_UnknownGlobal65b604].length);
             SetTextColor((HDC)dc, g_UnknownGlobal65b574);
         }
-        if (runs[g_UnknownGlobal65b604].field_0x04 == 1) {
-            g_UnknownGlobal65b574 = runs[g_UnknownGlobal65b604].field_0x0c;
+        if (runs[g_UnknownGlobal65b604].kind == 1) {
+            g_UnknownGlobal65b574 = runs[g_UnknownGlobal65b604].color;
             SetTextColor((HDC)dc, g_UnknownGlobal65b574);
         }
-        TextOutA((HDC)dc, g_UnknownGlobal65b564, y, runs[g_UnknownGlobal65b604].field_0x00,
-                 runs[g_UnknownGlobal65b604].field_0x08);
-        g_UnknownGlobal65b564 += runs[g_UnknownGlobal65b604].field_0x10;
+        TextOutA((HDC)dc, g_UnknownGlobal65b564, y, runs[g_UnknownGlobal65b604].text,
+                 runs[g_UnknownGlobal65b604].length);
+        g_UnknownGlobal65b564 += runs[g_UnknownGlobal65b604].width;
         g_UnknownGlobal65b604++;
     }
 }
@@ -4019,9 +4019,9 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
     int i = 0;
     int count = 0;
     if (text[0] != '~' && text[0] != '|') {
-        runs[0].field_0x00 = text;
-        runs[0].field_0x0c = color;
-        runs[0].field_0x04 = 1;
+        runs[0].text = text;
+        runs[0].color = color;
+        runs[0].kind = 1;
         count = 1;
     }
     char* start = text;
@@ -4041,17 +4041,17 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
             continue;
         }
         UnknownGameUiTextRun* run = &runs[count];
-        run->field_0x00 = &text[i + 2];
+        run->text = &text[i + 2];
         if (c == '~') {
             int index = text[i + 1] - '0';
-            run->field_0x04 = 1;
+            run->kind = 1;
             if (index > 9)
                 index = 9;
             else if (index < 0)
                 index = 0;
-            run->field_0x0c = textColors[index];
+            run->color = textColors[index];
         } else {
-            run->field_0x04 = 2;
+            run->kind = 2;
             if (table) {
                 char key = text[i + 1];
                 char digit;
@@ -4063,54 +4063,54 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
                     digit = key - 'A' + 10;
                 else
                     digit = 0;
-                run->field_0x14 = ((int*)table)[digit];
+                run->position = ((int*)table)[digit];
             } else {
-                run->field_0x14 = 0;
+                run->position = 0;
             }
         }
         i += 2;
         if (count) {
             UnknownGameUiTextRun* last = run - 1;
             if (mark)
-                last->field_0x08 = mark - start;
+                last->length = mark - start;
             else
-                last->field_0x08 = run->field_0x00 - start - 2;
+                last->length = run->text - start - 2;
             if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
                 HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
-                GetTextExtentPoint32A((HDC)dc, last->field_0x00, last->field_0x08, &extent);
+                GetTextExtentPoint32A((HDC)dc, last->text, last->length, &extent);
                 SelectObject((HDC)dc, old);
                 ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
             }
-            last->field_0x10 = extent.cx;
+            last->width = extent.cx;
         }
-        start = (char*)run->field_0x00;
+        start = (char*)run->text;
         mark = 0;
         count++;
     }
     if (count) {
         if (mark)
-            runs[count - 1].field_0x08 = mark - runs[count - 1].field_0x00;
+            runs[count - 1].length = mark - runs[count - 1].text;
         else
-            runs[count - 1].field_0x08 = length - (runs[count - 1].field_0x00 - text);
+            runs[count - 1].length = length - (runs[count - 1].text - text);
         if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
-            GetTextExtentPoint32A((HDC)dc, runs[count - 1].field_0x00, runs[count - 1].field_0x08, &extent);
+            GetTextExtentPoint32A((HDC)dc, runs[count - 1].text, runs[count - 1].length, &extent);
             SelectObject((HDC)dc, old);
             ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
-            runs[count - 1].field_0x10 = extent.cx;
+            runs[count - 1].width = extent.cx;
         } else {
-            runs[count - 1].field_0x10 = 0;
+            runs[count - 1].width = 0;
         }
     }
     if (size) {
         size[1] = 0;
         size[0] = length - count * 2;
         for (int j = 0; j < count; j++)
-            size[1] += runs[j].field_0x10;
+            size[1] += runs[j].width;
     }
-    runs[count].field_0x00 = 0;
-    runs[count].field_0x08 = 0;
-    runs[count].field_0x04 = 0;
+    runs[count].text = 0;
+    runs[count].length = 0;
+    runs[count].kind = 0;
     UnknownGameUiTextRun* result =
         (UnknownGameUiTextRun*)DebugMalloc((count + 1) * sizeof(UnknownGameUiTextRun), __FILE__, 0xa5b);
     if (result)
