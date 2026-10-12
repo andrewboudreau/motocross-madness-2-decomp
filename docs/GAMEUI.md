@@ -84,7 +84,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
 - UIListBox slot 21 (`0x00478040`): VK_END compares and selects
   `rowCount - 1` twice (VC6 keeps it in a `lea`); a local gives `dec`.
 - UIListBox slot 56 (`0x00477ff0`): `guiUser->field_0x1d8 == this` in that
-  operand order and `field_0x230 += field_0x234; field_0x234 = 0;`.
+  operand order and `scrollOffsetX += dragOffsetX; dragOffsetX = 0;`.
 - UIMultiState slot 48 (`0x00478810`): `if (currentState == 4 &&
   stateTable[..].focusImage) image = focusImage; else image = image;` then
   one `if (image)`.
