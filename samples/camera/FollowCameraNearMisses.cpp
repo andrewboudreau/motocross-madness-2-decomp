@@ -12,7 +12,7 @@
 // variable for the second rotation, or extern/non-static axis vectors.
 // Source shapes it needs: one function-scope `position`/`target` pair shared
 // with the first-frame block, `if/else` (not ?:) for +0x2b4, the state 5
-// deltas as member arithmetic, Set(field_0x258, FLT_MAX) for every +0x294
+// deltas as member arithmetic, Set(targetFieldOfView, FLT_MAX) for every +0x294
 // write, and the store orders below (found by permutation).
 // The state 5 `push ecx` is placed in the first x87 stall slot of its block
 // (after the third `fsub`, before `fld st(0)`); retail's slot (after the
@@ -187,17 +187,17 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x276 = 0;
     lift = 0;
     field_0x228 = 27.0f;
-    field_0x258 = fieldOfView;
-    field_0x2f0 = fieldOfView;
-    field_0x294 = 0;
+    targetFieldOfView = fieldOfView;
+    state4FieldOfView = fieldOfView;
+    fieldOfViewEase = 0;
     subject = 0;
-    field_0x27c = 0;
-    field_0x280 = 0;
-    field_0x284 = 0;
-    field_0x288 = 0;
-    field_0x28c = 0;
-    field_0x290 = 0;
-    field_0x298 = 0;
+    targetEaseX = 0;
+    targetEaseY = 0;
+    targetEaseZ = 0;
+    positionEaseX = 0;
+    positionEaseY = 0;
+    positionEaseZ = 0;
+    distanceEase = 0;
     fovKeysEnabled = 0;
     overrideActive = 0;
     field_0x26c = 0;
@@ -208,14 +208,14 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x2ec = 3.0f;
     cameraState = 0;
     UnknownVirtualSlot71(0);
-    field_0x25c = eyePosition;
+    resumeEyePosition = eyePosition;
     savedCameraState = cameraState;
-    field_0x250 = cameraState;
-    savedParameter = fieldOfView;
+    resumeState = cameraState;
+    savedFieldOfView = fieldOfView;
     initialDistance = followDistance;
     initialPitch = followPitch;
     initialYaw = followYaw;
-    field_0x254 = fieldOfView;
+    resumeFieldOfView = fieldOfView;
     field_0x277 = 0;
     field_0x278 = 0;
     stateCount = 0;
@@ -225,10 +225,10 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x279 = 0;
     field_0x270 = 15.0f;
     frameTime = 0;
-    field_0x2f4 = 10.0f;
-    field_0x2f8 = 280.0f;
-    field_0x2fc = 70.0f;
-    field_0x300 = 20.0f;
+    heightFovMinimum = 10.0f;
+    heightForMinimumFov = 280.0f;
+    heightFovMaximum = 70.0f;
+    heightForMaximumFov = 20.0f;
 }
 
 // 0x004650e0: each "CAMERA" line holds two skipped words, three skipped
@@ -514,36 +514,36 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     bool following = UnknownVirtualSlot75();
     target = UnknownVirtualSlot48(wide || field_0x274, following, dt);
     position = UnknownVirtualSlot49(following, target, dt);
-    if (!field_0x288) {
-        field_0x284 = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
-        field_0x27c = new(__FILE__, 0x4b1) UnknownFollowCameraValue(target.x, 0.3f);
-        field_0x280 = new(__FILE__, 0x4b2) UnknownFollowCameraValue(target.y, 0.3f);
+    if (!positionEaseX) {
+        targetEaseZ = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
+        targetEaseX = new(__FILE__, 0x4b1) UnknownFollowCameraValue(target.x, 0.3f);
+        targetEaseY = new(__FILE__, 0x4b2) UnknownFollowCameraValue(target.y, 0.3f);
         UnknownVirtualSlot43(target);
-        field_0x288 = new(__FILE__, 0x4b4) UnknownFollowCameraValue(position.x, 0.3f);
-        field_0x28c = new(__FILE__, 0x4b5) UnknownFollowCameraValue(position.y, 0.3f);
-        field_0x290 = new(__FILE__, 0x4b6) UnknownFollowCameraValue(position.z, 0.3f);
+        positionEaseX = new(__FILE__, 0x4b4) UnknownFollowCameraValue(position.x, 0.3f);
+        positionEaseY = new(__FILE__, 0x4b5) UnknownFollowCameraValue(position.y, 0.3f);
+        positionEaseZ = new(__FILE__, 0x4b6) UnknownFollowCameraValue(position.z, 0.3f);
         UnknownVirtualSlot44(position);
     }
     if (cameraState == 5) {
         if (!overrideActive) {
-            field_0x258 = (field_0x2f8 - field_0x2c0) / (field_0x2f8 - field_0x300) *
-                              (field_0x2fc - field_0x2f4) + field_0x2f4;
-            if (field_0x258 < field_0x2f4)
-                field_0x258 = field_0x2f4;
-            if (field_0x258 > field_0x2fc)
-                field_0x258 = field_0x2fc;
+            targetFieldOfView = (heightForMinimumFov - field_0x2c0) / (heightForMinimumFov - heightForMaximumFov) *
+                              (heightFovMaximum - heightFovMinimum) + heightFovMinimum;
+            if (targetFieldOfView < heightFovMinimum)
+                targetFieldOfView = heightFovMinimum;
+            if (targetFieldOfView > heightFovMaximum)
+                targetFieldOfView = heightFovMaximum;
             if (moved)
-                field_0x258 = (field_0x258 - fieldOfView) * 0.75f + fieldOfView;
+                targetFieldOfView = (targetFieldOfView - fieldOfView) * 0.75f + fieldOfView;
         }
     } else if (cameraState == 7) {
         float dx = eyePosition.x - target.x;
         if (dx < 0.0f) dx = -dx;
         float dz = eyePosition.z - target.z;
         if (dz < 0.0f) dz = -dz;
-        field_0x258 = ((200.0f - FastSqrt(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
-        if (field_0x258 < 10.0f) field_0x258 = 10.0f;
-        if (field_0x258 > 70.0f) field_0x258 = 70.0f;
-        field_0x294->Set(field_0x258, FLT_MAX);
+        targetFieldOfView = ((200.0f - FastSqrt(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
+        if (targetFieldOfView < 10.0f) targetFieldOfView = 10.0f;
+        if (targetFieldOfView > 70.0f) targetFieldOfView = 70.0f;
+        fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
     } else if (following) {
         if (cameraState != 3) {
             if (cameraState == 4)
@@ -553,12 +553,12 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     } else if (UnknownVirtualSlot74()) {
         field_0x276 = 1;
     }
-    cachedTarget.x = field_0x27c->Update(target.x, dt);
-    cachedTarget.y = field_0x280->Update(target.y, dt);
-    cachedTarget.z = field_0x284->Update(target.z, dt);
-    smoothed.x = field_0x288->Update(position.x, dt);
-    smoothed.y = field_0x28c->Update(position.y, dt);
-    smoothed.z = field_0x290->Update(position.z, dt);
+    cachedTarget.x = targetEaseX->Update(target.x, dt);
+    cachedTarget.y = targetEaseY->Update(target.y, dt);
+    cachedTarget.z = targetEaseZ->Update(target.z, dt);
+    smoothed.x = positionEaseX->Update(position.x, dt);
+    smoothed.y = positionEaseY->Update(position.y, dt);
+    smoothed.z = positionEaseZ->Update(position.z, dt);
     if (field_0x279) {
         UnknownVirtualSlot33();
         blendClock += dt;
@@ -575,10 +575,10 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             field_0x279 = moved;
         }
     }
-    if (savedCameraState == 6 || field_0x250 == 7) {
+    if (savedCameraState == 6 || resumeState == 7) {
         field_0x274 = 1;
-        if (field_0x250 == 7)
-            field_0x250 = cameraState;
+        if (resumeState == 7)
+            resumeState = cameraState;
         else
             savedCameraState = cameraState;
         UnknownVirtualSlot44(position);
@@ -604,25 +604,25 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         UnknownVirtualSlot29(cachedTarget);
         if (UnknownVirtualSlot56()) {
             if (cameraState != 7 && !field_0x276) {
-                field_0x250 = cameraState;
-                field_0x254 = field_0x258;
+                resumeState = cameraState;
+                resumeFieldOfView = targetFieldOfView;
                 initialPitch = followPitch;
                 initialYaw = followYaw;
                 initialDistance = followDistance;
                 cameraState = 7;
-                field_0x25c = eyePosition;
+                resumeEyePosition = eyePosition;
                 UnknownVirtualSlot68();
-                field_0x294->Set(field_0x258, FLT_MAX);
+                fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
             }
         } else if (cameraState == 7) {
-            cameraState = field_0x250;
+            cameraState = resumeState;
             followPitch = initialPitch;
             followYaw = initialYaw;
             followDistance = initialDistance;
-            field_0x258 = field_0x254;
-            eyePosition = field_0x25c;
-            field_0x250 = 7;
-            field_0x294->Set(field_0x258, FLT_MAX);
+            targetFieldOfView = resumeFieldOfView;
+            eyePosition = resumeEyePosition;
+            resumeState = 7;
+            fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
         }
         if (cameraState != 5 && cameraState != 7) {
             if (UnknownVirtualSlot55()) {
@@ -632,34 +632,34 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
                     initialYaw = followYaw;
                     initialDistance = followDistance;
                     cameraState = 6;
-                    savedParameter = field_0x258;
+                    savedFieldOfView = targetFieldOfView;
                     UnknownVirtualSlot67();
-                    field_0x294->Set(field_0x258, FLT_MAX);
+                    fieldOfViewEase->Set(targetFieldOfView, FLT_MAX);
                 }
             } else if (cameraState == 6) {
                 cameraState = savedCameraState;
-                field_0x258 = savedParameter;
+                targetFieldOfView = savedFieldOfView;
                 savedCameraState = 6;
                 followPitch = initialPitch;
                 followYaw = initialYaw;
                 followDistance = initialDistance;
-                field_0x294->Set(field_0x258 = savedParameter, FLT_MAX);
+                fieldOfViewEase->Set(targetFieldOfView = savedFieldOfView, FLT_MAX);
 
             }
         }
         if (g_TrackGame->paused || (cameraState != 5 && cameraState != 7)) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
-                field_0x258 -= 3.0f;
-                if (field_0x258 < minFieldOfView)
-                    field_0x258 = minFieldOfView;
+                targetFieldOfView -= 3.0f;
+                if (targetFieldOfView < minFieldOfView)
+                    targetFieldOfView = minFieldOfView;
             }
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x80000000, 0)) {
-                field_0x258 += 3.0f;
-                if (field_0x258 > maxFieldOfView)
-                    field_0x258 = maxFieldOfView;
+                targetFieldOfView += 3.0f;
+                if (targetFieldOfView > maxFieldOfView)
+                    targetFieldOfView = maxFieldOfView;
             }
         }
-        SetFieldOfView(field_0x294->Update(field_0x258, dt));
+        SetFieldOfView(fieldOfViewEase->Update(targetFieldOfView, dt));
         Camera::UnknownVirtualSlot10(dt);
         field_0x278 = wide;
         return 1;

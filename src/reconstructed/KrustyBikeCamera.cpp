@@ -26,10 +26,10 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
     krustyBike = 0;
     raceView = 0;
     widthKeysEnabled = 0;
-    field_0x25c = eyePosition;
+    resumeEyePosition = eyePosition;
     savedCameraState = cameraState;
-    field_0x250 = cameraState;
-    savedParameter = fieldOfView;
+    resumeState = cameraState;
+    savedFieldOfView = fieldOfView;
 }
 
 // 0x00497d80: an explicit empty destructor.
@@ -115,7 +115,7 @@ void KrustyBikeCamera::UnknownVirtualSlot59() {
         g_TrackGame->mode.field_0x23c0 = followPitch;
         g_TrackGame->mode.field_0x23c4 = followYaw;
         g_TrackGame->mode.field_0x23bc = followDistance;
-        g_TrackGame->mode.field_0x23c8 = field_0x258;
+        g_TrackGame->mode.field_0x23c8 = targetFieldOfView;
     }
 }
 
@@ -124,7 +124,7 @@ void KrustyBikeCamera::UnknownVirtualSlot60() {
     followPitch = g_TrackGame->mode.field_0x23c0;
     followYaw = g_TrackGame->mode.field_0x23c4;
     followDistance = g_TrackGame->mode.field_0x23bc;
-    field_0x258 = g_TrackGame->mode.field_0x23c8;
+    targetFieldOfView = g_TrackGame->mode.field_0x23c8;
 }
 
 // 0x00498280: restores the saved state.

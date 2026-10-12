@@ -134,11 +134,11 @@ void VehicleCamera::UnknownVirtualSlot68() {
     float dx = FollowCameraAbs(eyePosition.x - target.x);
     float dz = FollowCameraAbs(eyePosition.z - target.z);
     float closeness = (200.0f - FastSqrt(dx * dx + dz * dz)) * 0.0055555557f;
-    field_0x258 = closeness * 60.0f + 10.0f;
-    if (field_0x258 < 10.0f)
-        field_0x258 = 10.0f;
-    if (field_0x258 > 70.0f)
-        field_0x258 = 70.0f;
+    targetFieldOfView = closeness * 60.0f + 10.0f;
+    if (targetFieldOfView < 10.0f)
+        targetFieldOfView = 10.0f;
+    if (targetFieldOfView > 70.0f)
+        targetFieldOfView = 70.0f;
     UnknownVirtualSlot29(target);
 }
 
@@ -165,7 +165,7 @@ void VehicleCamera::UnknownVirtualSlot67() {
     followPitch = 0.75f;
     followYaw = 3.1415927f;
     followDistance = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
-    field_0x258 = 85.0f;
+    targetFieldOfView = 85.0f;
 }
 
 // 0x0052bff0: holds while the vehicle reports +0x444; otherwise cycles the
@@ -320,9 +320,9 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
         if (vehicleMode) {
             if (vehicle->field_0x434 > 0.1f) {
                 if (!force && field_0x274 &&
-                    FollowCameraAbs(field_0x288->value - point.x) < 10.0f &&
-                    FollowCameraAbs(field_0x290->value - point.z) < 10.0f &&
-                    FollowCameraAbs(field_0x28c->value - point.y) < 10.0f) {
+                    FollowCameraAbs(positionEaseX->value - point.x) < 10.0f &&
+                    FollowCameraAbs(positionEaseZ->value - point.z) < 10.0f &&
+                    FollowCameraAbs(positionEaseY->value - point.y) < 10.0f) {
                     UnknownVirtualSlot44(point);
                     UnknownVirtualSlot43(cachedTarget);
                 }
@@ -332,9 +332,9 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
                     result = false;
                 else {
                     if (!field_0x274 &&
-                        FollowCameraAbs(field_0x288->value - point.x) < 0.01f &&
-                        FollowCameraAbs(field_0x290->value - point.z) < 0.01f &&
-                        FollowCameraAbs(field_0x28c->value - point.y) < 0.01f) {
+                        FollowCameraAbs(positionEaseX->value - point.x) < 0.01f &&
+                        FollowCameraAbs(positionEaseZ->value - point.z) < 0.01f &&
+                        FollowCameraAbs(positionEaseY->value - point.y) < 0.01f) {
                         UnknownVirtualSlot44(point);
                         UnknownVirtualSlot43(cachedTarget);
                         field_0x277 = true;

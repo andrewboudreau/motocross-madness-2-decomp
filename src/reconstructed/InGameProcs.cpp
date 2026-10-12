@@ -229,7 +229,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             TrackGameViewOwner* owner = g_TrackGame->eventManager->FindRaceMode();
             if (owner->raceCamera->cameraState == 5) {
                 owner->raceCamera->cameraState = owner->raceCamera->savedCameraState;
-                owner->raceCamera->field_0x258 = owner->raceCamera->savedParameter;
+                owner->raceCamera->targetFieldOfView = owner->raceCamera->savedFieldOfView;
                 owner->raceCamera->UnknownVirtualSlot58();
             } else {
                 owner->raceCamera->UnknownVirtualSlot72();
