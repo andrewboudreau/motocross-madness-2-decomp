@@ -572,7 +572,7 @@ struct UnknownBikeRaceNodeOwner {
     UnknownBikeRaceNodeEntry* field_0x420[1];
 };
 
-// The object at +0x210 of BikeRace+0x6c's object: a second base at +0xc
+// The object at +0x210 of BikeRace+0x6c's object (the 30SecMan): a second base at +0xc
 // holds the GameObject part that 0x00421050 releases (slot 2).
 class UnknownBikeRaceColliderBase {
 public:
@@ -584,7 +584,7 @@ public:
 class UnknownBikeRaceCollider : public UnknownBikeRaceColliderBase, public GameObject {
 };
 
-// The object at BikeRace+0x6c: like a racer, it reaches GameObject through
+// The object at BikeRace+0x64/+0x6c (StartGate.slb, 30SecMan.slt): like a racer, it reaches GameObject through
 // a vbptr at +4 (0x00421050 calls slot 5 there).
 struct UnknownBikeRaceView6c : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
@@ -936,10 +936,10 @@ public:
     Scene* raceScene;
     UnknownBikeRaceShadow* field_0x05c;
     GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
-    UnknownBikeRaceView6c* field_0x064;       // reset by a restart (slot 5)
-    int field_0x068;
-    UnknownBikeRaceView6c* field_0x06c;
-    int field_0x070;
+    UnknownBikeRaceView6c* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
+    int startGateEntry;                       // +0x68 its scene animation entry index
+    UnknownBikeRaceView6c* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
+    int thirtySecondManEntry;                 // +0x70 its scene animation entry index
     UnknownBikeRaceCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
     int field_0x078;
     float field_0x07c[11];
@@ -961,8 +961,8 @@ public:
     int targetEntry;                          // +0x150 scene animation entry the camera cycles to
     int targetCaster;                         // +0x154 static model caster the camera cycles to
     int racerCount;                          // racer count
-    float startCountdown;                     // +0x15c: seconds until the start (8.2 with the +0x6c gate, else 5.2)
-    float field_0x160;                        // seconds until +0x64 is shown (slot 10)
+    float startCountdown;                     // +0x15c: seconds until the start (8.2 with the 30SecMan, else 5.2)
+    float startGateTimer;                     // +0x160 set to 5 at the start; at 0 the start gate entry restarts (slot 10)
     Vector3 gridFirstSlot;                      // start grid: first slot (0x004210f0)
     Vector3 gridSlotStep;                      // start grid: step between slots
     Vector3 gridDirection;                      // start grid: direction

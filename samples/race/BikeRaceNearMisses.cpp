@@ -631,22 +631,22 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     point = position;
                 }
                 terrain->QueryGround(&point, &normal, 0, 0);
-                field_0x06c = (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("30SecMan.slt", &field_0x070);
-                if (field_0x06c) {
-                    raceScene->RestartEntry(field_0x070, 0, 0, 0);
-                    raceScene->animationTable->entries[field_0x070].field_0x00_bit5 = 1;
-                    if (field_0x06c->collisionObject) {
-                        field_0x06c->collisionObject->Release();
-                        field_0x06c->collisionObject = 0;
+                thirtySecondMan = (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("30SecMan.slt", &thirtySecondManEntry);
+                if (thirtySecondMan) {
+                    raceScene->RestartEntry(thirtySecondManEntry, 0, 0, 0);
+                    raceScene->animationTable->entries[thirtySecondManEntry].field_0x00_bit5 = 1;
+                    if (thirtySecondMan->collisionObject) {
+                        thirtySecondMan->collisionObject->Release();
+                        thirtySecondMan->collisionObject = 0;
                     }
                 }
                 if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
-                    g_TrackGame->mode.raceSettings.raceMode != 4 && field_0x06c) {
-                    field_0x06c->model->SetPositionVec3(point);
-                    field_0x06c->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
+                    g_TrackGame->mode.raceSettings.raceMode != 4 && thirtySecondMan) {
+                    thirtySecondMan->model->SetPositionVec3(point);
+                    thirtySecondMan->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 }
-                if (field_0x06c)
-                    field_0x06c->UnknownVirtualSlot4();
+                if (thirtySecondMan)
+                    thirtySecondMan->UnknownVirtualSlot4();
                 if (hasStartProbe) {
                     point.x = startProbe.center.x;
                     point.z = startProbe.center.z;
@@ -657,23 +657,23 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 }
                 terrain->QueryGround(&point, &normal, 0, 0);
                 if (g_TrackGame->mode.raceSettings.eventType == 3) {
-                    field_0x064 =
-                        (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("StartGate.slb", &field_0x068);
-                    if (field_0x064) {
-                        raceScene->RestartEntry(field_0x068, 0, 0, 0);
-                        if (field_0x064->collisionObject) {
-                            field_0x064->collisionObject->Release();
-                            field_0x064->collisionObject = 0;
+                    startGate =
+                        (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("StartGate.slb", &startGateEntry);
+                    if (startGate) {
+                        raceScene->RestartEntry(startGateEntry, 0, 0, 0);
+                        if (startGate->collisionObject) {
+                            startGate->collisionObject->Release();
+                            startGate->collisionObject = 0;
                         }
                     }
                     if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
                         g_TrackGame->mode.raceSettings.raceMode != 4) {
-                        if (field_0x064) {
-                            field_0x064->model->SetPositionVec3(point);
-                            field_0x064->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
+                        if (startGate) {
+                            startGate->model->SetPositionVec3(point);
+                            startGate->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                         }
-                    } else if (field_0x064) {
-                        field_0x064->UnknownVirtualSlot4();
+                    } else if (startGate) {
+                        startGate->UnknownVirtualSlot4();
                     }
                 }
             }
@@ -806,14 +806,14 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         return 0;
     g_TrackGame->ui->StepProgressBar();
 
-    if (field_0x06c) {
+    if (thirtySecondMan) {
         if (hasStartProbe) {
             localRacer->modelNode->GetPosition(&point);
             point.x += localRacer->heading.x * 15.0f;
             point.z += localRacer->heading.z * 15.0f;
         }
         terrain->QueryGround(&point, 0, 0, 0);
-        field_0x06c->model->SetPositionVec3(point);
+        thirtySecondMan->model->SetPositionVec3(point);
     }
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         g_TrackGame->useReplayTape) {

@@ -111,13 +111,13 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     chatOpen = false;
     chatHideTimer = 0;
     field_0x198 = g_TrackGame->mode.chatInputLine;
-    field_0x064 = 0;
-    field_0x06c = 0;
+    startGate = 0;
+    thirtySecondMan = 0;
     flagGirl = 0;
-    field_0x068 = -1;
-    field_0x070 = -1;
+    startGateEntry = -1;
+    thirtySecondManEntry = -1;
     field_0x189 = 0;
-    field_0x160 = 0;
+    startGateTimer = 0;
     recordTickTime = 0;
     recordTickCount = 0;
     field_0x1b4 = 0;
@@ -486,19 +486,19 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             } else {
                 Vector3 position;
                 if (isRacing) {
-                    if (field_0x064 != 0 && ((UnknownBikeRaceSceneCharacter*)field_0x064)->isEnabled &&
-                        field_0x160 > 0.0f) {
-                        field_0x160 -= g_TrackGame->frameTime;
-                        if (field_0x160 <= 0.0f) {
-                            field_0x160 = 0;
-                            raceScene->RestartEntry(field_0x068, 0.0f, 0, 0);
-                            field_0x064->UnknownVirtualSlot4();
-                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == field_0x068) {
+                    if (startGate != 0 && ((UnknownBikeRaceSceneCharacter*)startGate)->isEnabled &&
+                        startGateTimer > 0.0f) {
+                        startGateTimer -= g_TrackGame->frameTime;
+                        if (startGateTimer <= 0.0f) {
+                            startGateTimer = 0;
+                            raceScene->RestartEntry(startGateEntry, 0.0f, 0, 0);
+                            startGate->UnknownVirtualSlot4();
+                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == startGateEntry) {
                                 NextCameraTarget(1, 1, 0);
                             }
-                            if (field_0x064->collisionObject != 0) {
-                                field_0x064->collisionObject->Release();
-                                field_0x064->collisionObject = 0;
+                            if (startGate->collisionObject != 0) {
+                                startGate->collisionObject->Release();
+                                startGate->collisionObject = 0;
                             }
                         }
                     }
@@ -508,9 +508,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         startCountdown = 0;
                         isRacing = true;
                         raceScene->field_0x7c0 = 0;
-                        if (field_0x064 != 0) {
-                            raceScene->UnknownFunction4eafd0(field_0x068);
-                            field_0x160 = 5.0f;
+                        if (startGate != 0) {
+                            raceScene->UnknownFunction4eafd0(startGateEntry);
+                            startGateTimer = 5.0f;
                         }
                         if (g_TrackGame->playerCount > 1) {
                             int self = g_TrackGame->network->localPlayer;
@@ -526,15 +526,15 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         replayFrames = 0;
                         replayLength = 0;
                         replayLengthFrames = 0;
-                        if (field_0x06c != 0) {
-                            raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
-                            field_0x06c->UnknownVirtualSlot4();
-                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == field_0x070) {
+                        if (thirtySecondMan != 0) {
+                            raceScene->RestartEntry(thirtySecondManEntry, 0.0f, 0, 0);
+                            thirtySecondMan->UnknownVirtualSlot4();
+                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == thirtySecondManEntry) {
                                 NextCameraTarget(1, 1, 0);
                             }
-                            if (field_0x06c->collisionObject != 0) {
-                                field_0x06c->collisionObject->Release();
-                                field_0x06c->collisionObject = 0;
+                            if (thirtySecondMan->collisionObject != 0) {
+                                thirtySecondMan->collisionObject->Release();
+                                thirtySecondMan->collisionObject = 0;
                             }
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
@@ -1269,9 +1269,9 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     int iterator = 0;
     Vector3 position;
     Vector3 direction;
-    if (field_0x064 != 0 && g_TrackGame->mode.raceSettings.raceMode != 0 &&
+    if (startGate != 0 && g_TrackGame->mode.raceSettings.raceMode != 0 &&
         g_TrackGame->mode.raceSettings.raceMode != 4) {
-        field_0x064->UnknownVirtualSlot5();
+        startGate->UnknownVirtualSlot5();
     }
     int positions[11];
     int order[11];
@@ -1468,15 +1468,15 @@ void BikeRace::ResetStartCountdown() {
     }
     int mode = g_TrackGame->mode.raceSettings.raceMode;
     if (mode != 0 && mode != 4) {
-        if (field_0x06c != 0) {
+        if (thirtySecondMan != 0) {
             startCountdown = 8.2f;
-            field_0x06c->UnknownVirtualSlot5();
-            raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
-            if (field_0x06c->collisionObject != 0) {
-                field_0x06c->collisionObject->Release();
-                field_0x06c->collisionObject = 0;
+            thirtySecondMan->UnknownVirtualSlot5();
+            raceScene->RestartEntry(thirtySecondManEntry, 0.0f, 0, 0);
+            if (thirtySecondMan->collisionObject != 0) {
+                thirtySecondMan->collisionObject->Release();
+                thirtySecondMan->collisionObject = 0;
             }
-            raceScene->UnknownFunction4eafd0(field_0x070);
+            raceScene->UnknownFunction4eafd0(thirtySecondManEntry);
         } else {
             startCountdown = 5.2f;
         }
