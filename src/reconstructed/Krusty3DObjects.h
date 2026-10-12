@@ -133,7 +133,7 @@ public:
 // follows).
 struct UnknownVisualCueCamera {
     unsigned char field_0x000[0x3b0];
-    UnknownRunwayRacer* field_0x3b0;
+    UnknownRunwayRacer* followedBike;         // +0x3b0 (RaceSound.h)
 };
 
 // The view VisualCue follows (its +0xa8; RaceView.h's UnknownKrustyBikeView).
@@ -256,7 +256,7 @@ struct UnknownKrustyRacerRef {
 
 struct UnknownKrustyCamera {
     unsigned char field_0x000[0x3b4];
-    UnknownKrustyRacerRef* field_0x3b4;
+    UnknownKrustyRacerRef* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
 struct UnknownKrustyCameraHolder {
@@ -281,7 +281,7 @@ struct UnknownKrustyFollowed {
     unsigned char field_0x000[0x25];
     unsigned char field_0x25;
     unsigned char field_0x026[0x3b4 - 0x26];
-    UnknownVisualCueRacer* field_0x3b4;
+    UnknownVisualCueRacer* followedRacer;     // +0x3b4 (RaceSound.h)
 };
 
 struct UnknownKrustyNode {

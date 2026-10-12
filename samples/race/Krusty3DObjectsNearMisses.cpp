@@ -196,7 +196,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         return 1;
     if (!cycleCues) {
         if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||
-            cueView->raceCamera->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
+            cueView->raceCamera->followedBike != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;
             return 1;
@@ -228,7 +228,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->raceCamera->field_0x3b4;
+        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->raceCamera->followedRacer;
         if (!ref)
             return 1;
         Vector3 direction =
@@ -266,7 +266,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         } else {
             UnknownVisualCueRacer* followed = 0;
             if (g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x25 & 1)
-                followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x3b4;
+                followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->followedRacer;
             if (!g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 return 1;
             if (followed == g_UnknownKrustyGame56e26c->tagEvent->followedRacer)

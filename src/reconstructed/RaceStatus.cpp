@@ -397,7 +397,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
 // RaceSound.h's UnknownRaceSoundCamera; KrustyBikeCamera keeps it protected).
 struct UnknownRaceStatusCamera {
     unsigned char field_0x000[0x3b4];
-    UnknownEventRacer* field_0x3b4;
+    UnknownEventRacer* followedRacer;         // +0x3b4 (RaceSound.h)
 };
 
 // |v|, exact for unit vectors (as CarProcedural.cpp).
@@ -439,7 +439,7 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->field_0x7b8) {
                 racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
-                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->raceCamera)->field_0x3b4)
+                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->raceCamera)->followedRacer)
                     g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
                                                                               racer);
             }

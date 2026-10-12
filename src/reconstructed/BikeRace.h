@@ -639,37 +639,37 @@ struct UnknownBikeRaceCameraView {
     unsigned char followingRacer;             // +0x390 following a racer
     unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
     unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
-    UnknownBikeRaceRacer* field_0x394;
+    UnknownBikeRaceRacer* vehicle;            // +0x394 VehicleCamera's followed vehicle
     unsigned char field_0x398[0x3b0 - 0x398];
-    UnknownBikeRaceRacer* field_0x3b0;
-    UnknownBikeRaceRacer* field_0x3b4;
+    UnknownBikeRaceRacer* followedBike;       // +0x3b0 BikeCamera's bike (RaceSound.h)
+    UnknownBikeRaceRacer* followedRacer;      // +0x3b4 KrustyBikeCamera's racer (RaceSound.h)
 
     // Inline (three times in 0x0041eb20): follows `racer`, showing the
     // previous racer's model again and hiding the new one's.
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
-        if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
-            field_0x3b0->modelNode->SetLowestLod(1);
-            field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
-            if (field_0x3b0->modelNode->currentDetailLevel == 0) {
-                field_0x3b0->modelNode->SetLod(1);
+        if (followedBike != 0 && !racer->field_0x740->field_0x18c) {
+            followedBike->modelNode->SetLowestLod(1);
+            followedBike->riderCharacter->modelNode->SetLowestLod(1);
+            if (followedBike->modelNode->currentDetailLevel == 0) {
+                followedBike->modelNode->SetLod(1);
             }
-            if (field_0x3b0->riderCharacter->modelNode->currentDetailLevel == 0) {
-                field_0x3b0->riderCharacter->modelNode->SetLod(1);
+            if (followedBike->riderCharacter->modelNode->currentDetailLevel == 0) {
+                followedBike->riderCharacter->modelNode->SetLod(1);
             }
         }
-        field_0x394 = racer;
+        vehicle = racer;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = true;
         shadowCaster = 0;
         field_0x384 = 0;
         field_0x388 = 0;
-        field_0x3b0 = racer;
+        followedBike = racer;
         field_0x274 = 0;
-        field_0x3b4 = racer;
+        followedRacer = racer;
         if (!racer->field_0x740->field_0x18c) {
             racer->modelNode->SetLowestLod(0);
-            field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
+            followedBike->riderCharacter->modelNode->SetLowestLod(0);
         }
         field_0x274 = 0;
     }

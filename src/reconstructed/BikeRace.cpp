@@ -285,7 +285,7 @@ static inline float UnknownFunctionMax(float a, float b) {
 int BikeRace::UnknownVirtualSlot10(float frameTime) {
     if (!g_TrackGame->uiInteractionBlocked) {
         if (UnknownFunctionCameraView()->followingRacer &&
-            UnknownFunctionCameraView()->field_0x3b0->outOfRace != 0) {
+            UnknownFunctionCameraView()->followedBike->outOfRace != 0) {
             NextCameraTarget(0, 1, 0);
         }
         if (!g_TrackGame->paused) {
@@ -1361,7 +1361,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         g_TrackGame->tagEvent->ResetClock();
     }
     if (g_TrackGame->bajaEnduroEvent != 0) {
-        g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(0, 1, UnknownFunctionCameraView()->field_0x3b4);
+        g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(0, 1, UnknownFunctionCameraView()->followedRacer);
     }
 }
 

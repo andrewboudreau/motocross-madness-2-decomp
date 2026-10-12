@@ -116,8 +116,8 @@ int BikeRace::AimCamera(int caster) {
         targetKind = 0xff;
         targetIndex = 0;
         if (g_TrackGame->playerCount > 1) {
-            UnknownFunctionCameraView()->field_0x3b0->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->field_0x3b0->riderCharacter->modelNode->ClearFlag14c();
+            UnknownFunctionCameraView()->followedBike->modelNode->ClearFlag14c();
+            UnknownFunctionCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
             UnknownFunctionCameraView()->UnknownFunctionFollow(racerSlots[targetRacer]);
             if (field_0x05c != 0) {
                 field_0x05c->ClearCasters();
@@ -130,8 +130,8 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->field_0x7bc, racer);
             }
         } else if (targetRacer == 0) {
-            UnknownFunctionCameraView()->field_0x3b0->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->field_0x3b0->riderCharacter->modelNode->ClearFlag14c();
+            UnknownFunctionCameraView()->followedBike->modelNode->ClearFlag14c();
+            UnknownFunctionCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
             UnknownFunctionCameraView()->UnknownFunctionFollow(localRacer);
             if (field_0x05c != 0) {
                 field_0x05c->ClearCasters();
@@ -144,8 +144,8 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->field_0x7bc, racer);
             }
         } else {
-            UnknownFunctionCameraView()->field_0x3b0->modelNode->ClearFlag14c();
-            UnknownFunctionCameraView()->field_0x3b0->riderCharacter->modelNode->ClearFlag14c();
+            UnknownFunctionCameraView()->followedBike->modelNode->ClearFlag14c();
+            UnknownFunctionCameraView()->followedBike->riderCharacter->modelNode->ClearFlag14c();
             int index = targetRacer - 1;
             UnknownFunctionCameraView()->UnknownFunctionFollow(aiRacers[index]);
             if (field_0x05c != 0) {
