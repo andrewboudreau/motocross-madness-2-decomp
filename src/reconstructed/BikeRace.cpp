@@ -486,7 +486,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             } else {
                 Vector3 position;
                 if (isRacing) {
-                    if (field_0x064 != 0 && ((UnknownBikeRaceSceneCharacter*)field_0x064)->field_0x25_bit0 &&
+                    if (field_0x064 != 0 && ((UnknownBikeRaceSceneCharacter*)field_0x064)->isEnabled &&
                         field_0x160 > 0.0f) {
                         field_0x160 -= g_TrackGame->frameTime;
                         if (field_0x160 <= 0.0f) {
@@ -583,7 +583,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     field_0x18b = false;
                     isRacing = false;
                 }
-                if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->field_0x25_bit0) {
+                if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->isEnabled) {
                     position = localRacer->carriedFlagPosition;
                     position.y += 4.25f;
                     ((ArcadeObject*)field_0x060)->SetPosition(&position);
@@ -1021,7 +1021,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     g_TrackGame->ui->gui->CreateCursors("ui\\cursor.tga", 0);
                 }
                 if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
-                          ->GetUser(0)->userCursor)->field_0x25_bit0) {
+                          ->GetUser(0)->userCursor)->isEnabled) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;

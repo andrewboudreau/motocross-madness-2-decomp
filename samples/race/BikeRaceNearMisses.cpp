@@ -183,14 +183,14 @@ int BikeRace::AimCamera(int caster) {
             if (entry->keyFramed) {
                 UnknownBikeRaceSceneCharacter* character =
                     (UnknownBikeRaceSceneCharacter*)entry->character;
-                if (character->field_0x25_bit0) {
+                if (character->isEnabled) {
                     UnknownFunctionCameraView()->UnknownFunctionTargetCharacter(character);
                 } else {
                     return 0;
                 }
             } else {
                 GameObject* object = (GameObject*)entry->proceduralObject;
-                if (((UnknownBikeRaceObjectFlags*)object)->field_0x25_bit0) {
+                if (((UnknownBikeRaceObjectFlags*)object)->isEnabled) {
                     UnknownFunctionCameraView()->UnknownFunctionTargetObject(object);
                 } else {
                     return 0;
@@ -292,12 +292,12 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
             }
             UnknownSceneEntry* entry = &scene->animationTable->entries[field_0x150];
             if (entry->keyFramed) {
-                if (((UnknownBikeRaceSceneCharacter*)entry->character)->field_0x25_bit0) {
+                if (((UnknownBikeRaceSceneCharacter*)entry->character)->isEnabled) {
                     hidden = entry->field_0x00_bit4;
                 } else {
                     hidden = 1;
                 }
-            } else if (((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->field_0x25_bit0) {
+            } else if (((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->isEnabled) {
                 hidden = entry->field_0x00_bit4;
             } else {
                 hidden = 1;
@@ -309,11 +309,11 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 }
                 entry = &scene->animationTable->entries[field_0x150];
                 if (entry->keyFramed) {
-                    if (!((UnknownBikeRaceSceneCharacter*)entry->character)->field_0x25_bit0) {
+                    if (!((UnknownBikeRaceSceneCharacter*)entry->character)->isEnabled) {
                         view->followingRacer = 1;
                         return;
                     }
-                } else if (!((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->field_0x25_bit0) {
+                } else if (!((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->isEnabled) {
                     view->followingRacer = 1;
                     return;
                 }

@@ -23,7 +23,7 @@ struct UnknownBackgroundRegion {
 // them protected): GameObject's +0x25 bit 0 and the slot 13 viewport.
 struct UnknownBackgroundCamera {
     unsigned char field_0x000[0x25];
-    unsigned char field_0x25_bit0 : 1;
+    unsigned char isEnabled : 1;              // +0x25
     unsigned char field_0x026[0x1a8 - 0x26];
     int viewportWidth;           // viewport width
     int viewportHeight;          // viewport height

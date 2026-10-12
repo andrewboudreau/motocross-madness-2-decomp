@@ -610,7 +610,7 @@ public:
 // (0x0041eb20 tests bit 0 of scene objects).
 struct UnknownBikeRaceObjectFlags {
     unsigned char field_0x00[0x25];
-    unsigned char field_0x25_bit0 : 1;
+    unsigned char isEnabled : 1;              // +0x25
 };
 
 // A scene character (Scene+0xb4 entries with bit 3 set): it reaches its
