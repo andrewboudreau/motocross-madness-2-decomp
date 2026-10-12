@@ -10,9 +10,9 @@
 // are evidenced by retail reusing the registers that hold the first vectors'
 // components; constructing fresh vectors there emits extra stack temporaries.
 Camera::Camera(int flags) : GameObject(flags) {
-    field_0x1dc = 109.0f;
-    field_0x1e0 = 10.0f;
-    field_0x16c = 77.0f;
+    maxFieldOfView = 109.0f;
+    minFieldOfView = 10.0f;
+    fieldOfView = 77.0f;
     file = 0;
     field_0x1e8 = 0;
     field_0x1ec = 0;
@@ -32,10 +32,10 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1f8 = 0;
     lastMoveDistance = 0.0f;
     lastTurnAngle = 0.0f;
-    field_0x1d4 = 1;
-    field_0x1d8 = 1;
-    field_0x214 = viewDirection;
-    field_0x208 = eyePosition;
+    fovKeysEnabled = 1;
+    widthKeysEnabled = 1;
+    previousViewDirection = viewDirection;
+    previousEyePosition = eyePosition;
 }
 
 // Destructor core 0x0042f020: Camera vptr, close the +0x1e4 file if any, then
@@ -94,16 +94,16 @@ int Camera::UnknownVirtualSlot13() {
 // (both reads through `display` share one index load).
 int Camera::UpdateViewport() {
     RenderTarget* owner = Owner();
-    field_0x1c4 = owner->targetWidth;
-    field_0x1c8 = owner->targetHeight;
+    targetWidth = owner->targetWidth;
+    targetHeight = owner->targetHeight;
     UnknownDisplay* display = owner->targetDisplay;
     float width = (float)display->displayModes[display->currentDisplayMode].width;
     float height = (float)owner->targetDisplay->displayModes[owner->targetDisplay->currentDisplayMode].height;
     displayAspect = width / height;
     field_0x1a0[0] = 0;
     field_0x1a0[1] = 0;
-    field_0x1a0[2] = field_0x1c4;
-    field_0x1a0[3] = field_0x1c8;
+    field_0x1a0[2] = targetWidth;
+    field_0x1a0[3] = targetHeight;
     ((float*)field_0x1a0)[4] = 0.0f;
     ((float*)field_0x1a0)[5] = 1.0f;
     if (!owner->UnknownVirtualSlot14(field_0x1a0))
@@ -129,35 +129,35 @@ static inline float Dot(const Vector3& a, const Vector3& b) {
 // set) and the viewport width keys (0xd2/0xd3, when +0x1d8 is set) and
 // rebuilds the projection through slot 28.
 int Camera::UnknownVirtualSlot10(float frameTime) {
-    Vector3 delta(eyePosition.x - field_0x208.x, eyePosition.y - field_0x208.y, eyePosition.z - field_0x208.z);
+    Vector3 delta(eyePosition.x - previousEyePosition.x, eyePosition.y - previousEyePosition.y, eyePosition.z - previousEyePosition.z);
     lastMoveDistance = FastSqrt(Dot(delta, delta));
-    field_0x208 = eyePosition;
-    lastTurnAngle = (float)acos(Dot(viewDirection, field_0x214));
+    previousEyePosition = eyePosition;
+    lastTurnAngle = (float)acos(Dot(viewDirection, previousViewDirection));
     if (lastTurnAngle < 0.0f)
         lastTurnAngle = -lastTurnAngle;
-    field_0x214 = viewDirection;
+    previousViewDirection = viewDirection;
     if (!isPaused) {
         if (field_0x1d0)
             field_0x1d0--;
         if (field_0x1cc)
             field_0x1cc--;
-        if (field_0x1d4) {
+        if (fovKeysEnabled) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x3f, 0)) {
-                field_0x16c -= 1.0f;
-                if (field_0x16c < field_0x1e0)
-                    field_0x16c = field_0x1e0;
-                SetFieldOfView(field_0x16c);
+                fieldOfView -= 1.0f;
+                if (fieldOfView < minFieldOfView)
+                    fieldOfView = minFieldOfView;
+                SetFieldOfView(fieldOfView);
             }
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x3f, 0)) {
-                field_0x16c += 1.0f;
-                if (field_0x16c > field_0x1dc)
-                    field_0x16c = field_0x1dc;
-                SetFieldOfView(field_0x16c);
+                fieldOfView += 1.0f;
+                if (fieldOfView > maxFieldOfView)
+                    fieldOfView = maxFieldOfView;
+                SetFieldOfView(fieldOfView);
             }
         }
-        if (field_0x1d8) {
+        if (widthKeysEnabled) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
-                (unsigned int)field_0x1a0[2] < (unsigned int)field_0x1c4)
+                (unsigned int)field_0x1a0[2] < (unsigned int)targetWidth)
                 SetViewportWidth(-1, 2, 0);
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
                 (unsigned int)field_0x1a0[2] > 0x20)
@@ -171,7 +171,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
 // 0x0042e930: a zero value keeps the current +0x16c.
 void Camera::SetFieldOfView(float value) {
     if (value != 0.0)
-        field_0x16c = value;
+        fieldOfView = value;
     field_0x1d0 = Owner()->frameModulus + 1;
 }
 
@@ -342,9 +342,9 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
         field_0x1a0[2] += width;
     }
     field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * heightWidthRatio);
-    if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
-        field_0x1a0[3] = field_0x1c8;
-    field_0x1a0[1] = (unsigned int)(field_0x1c8 - field_0x1a0[3]) >> 1;
+    if ((unsigned int)field_0x1a0[3] > (unsigned int)targetHeight)
+        field_0x1a0[3] = targetHeight;
+    field_0x1a0[1] = (unsigned int)(targetHeight - field_0x1a0[3]) >> 1;
     field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
     return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
 }
@@ -355,10 +355,10 @@ int Camera::SetViewport(int x, int y, int width, int height) {
     field_0x1a0[2] = width;
     field_0x1a0[1] = y;
     field_0x1a0[3] = height;
-    if ((unsigned int)field_0x1a0[2] > (unsigned int)field_0x1c4)
-        field_0x1a0[2] = field_0x1c4;
-    if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
-        field_0x1a0[3] = field_0x1c8;
+    if ((unsigned int)field_0x1a0[2] > (unsigned int)targetWidth)
+        field_0x1a0[2] = targetWidth;
+    if ((unsigned int)field_0x1a0[3] > (unsigned int)targetHeight)
+        field_0x1a0[3] = targetHeight;
     field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
     return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
 }

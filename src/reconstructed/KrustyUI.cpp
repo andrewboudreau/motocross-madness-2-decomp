@@ -278,8 +278,8 @@ void KrustyUI::BuildGarageScene(int value) {
         PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
         garageCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
         garageScene->AppendChild(garageCamera, -1);
-        garageCamera->field_0x1d8 = 0;
-        garageCamera->field_0x1d4 = 0;
+        garageCamera->widthKeysEnabled = 0;
+        garageCamera->fovKeysEnabled = 0;
         UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
         lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(renderContext);
         garageScene->AppendChild(lights, -1);

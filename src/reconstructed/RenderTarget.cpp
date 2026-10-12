@@ -40,7 +40,7 @@ void RenderTarget::AdvanceFrame() {
 // refreshed through Camera 0x0042e550.
 void RenderTarget::SetCamera(Camera* camera) {
     currentCamera = camera;
-    if (camera && (targetWidth != camera->field_0x1c4 || targetHeight != camera->field_0x1c8))
+    if (camera && (targetWidth != camera->targetWidth || targetHeight != camera->targetHeight))
         camera->UpdateViewport();
 }
 

@@ -117,7 +117,7 @@ void VehicleCamera::UnknownVirtualSlot68() {
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
     Vector3 side(heading.z, 0.0f, -heading.x);
     eyePosition = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
-    field_0x240->QueryGround(&eyePosition, 0, 0, 0);
+    subject->QueryGround(&eyePosition, 0, 0, 0);
     if (heading.y > 10.0f)
         base.y += (heading * lead).y * 0.19f;
     if (vehicleMode) {
@@ -296,7 +296,7 @@ float VehicleCamera::UnknownVirtualSlot39() {
 
 // 0x0052cc00: +0x308 from the fov/zoom ratio and the vehicle's +0x43c.
 void VehicleCamera::UnknownVirtualSlot42(bool flag) {
-    float ratio = field_0x16c / field_0x1dc;
+    float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (!flag && vehicleMode)
             field_0x308 = ratio * vehicle->turnRate * 0.3f;

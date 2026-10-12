@@ -80,8 +80,8 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
                     texturePalette = 0;
                     surfacePalette = 0;
                 } else {
-                    texturePalette = (UnknownTexturePalette*)palette->field_0x708;
-                    surfacePalette = palette->field_0x70c;
+                    texturePalette = (UnknownTexturePalette*)palette->colorMapper;
+                    surfacePalette = palette->ddPalette;
                 }
                 entry->archive->Seek(position, 0, 0);
                 entry->archive->SetTextMode(mode);
@@ -115,8 +115,8 @@ failed:
         }
     }
     if (palette) {
-        texturePalette = (UnknownTexturePalette*)palette->field_0x708;
-        surfacePalette = palette->field_0x70c;
+        texturePalette = (UnknownTexturePalette*)palette->colorMapper;
+        surfacePalette = palette->ddPalette;
         map->sourcePalette = palette;
         if (addRef)
             palette->AddRef();

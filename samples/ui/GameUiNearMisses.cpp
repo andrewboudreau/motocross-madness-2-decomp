@@ -963,8 +963,8 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                                 new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialogTextures, 1);
                             dialogBackground->field_0x2c->UnknownVirtualSlot4(
                                 file->bits, file->width, file->height, file->width, file->width, 0x22b, depth,
-                                dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialogPalette)->field_0x708 : 0,
-                                4, dialogPalette ? ((Palette8*)dialogPalette)->field_0x70c : 0, 0, 0, 2, 1, 0,
+                                dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialogPalette)->colorMapper : 0,
+                                4, dialogPalette ? ((Palette8*)dialogPalette)->ddPalette : 0, 0, 0, 2, 1, 0,
                                 0x80, 0xff00ff);
                             dialogBackground->MarkAllDirty();
                             FreeFile(file);

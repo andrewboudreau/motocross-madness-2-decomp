@@ -595,8 +595,8 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
             *pixel = fill;
         if (texture->UnknownVirtualSlot4(bits, width, height, width, width, 0x378,
                                          g_TrackGame->renderTarget->surfacePixelFormat,
-                                         (UnknownTexturePalette*)(guiPalette ? guiPalette->field_0x708 : 0), 4,
-                                         guiPalette ? guiPalette->field_0x70c : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
+                                         (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
+                                         guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
             texture->UnknownVirtualSlot18(0xff00ff);
         delete bits;
     }
@@ -1076,7 +1076,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
     if (g_TrackGame->fullScreen) {
         if (g_TrackGame->renderTarget->surfacePixelFormat > 8 ||
             (g_TrackGame->renderTarget->surfacePixelFormat == 8 && userGui->guiPalette)) {
-            palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
+            palette = userGui->guiPalette ? userGui->guiPalette->colorMapper : 0;
             if (!image)
                 image = cursorImage;
             userCursor = (GUICursor*)AppendChild(
@@ -1089,7 +1089,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
     } else {
         if (g_TrackGame->renderTarget->surfacePixelFormat > 8 ||
             (g_TrackGame->renderTarget->surfacePixelFormat == 8 && userGui->guiPalette)) {
-            palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
+            palette = userGui->guiPalette ? userGui->guiPalette->colorMapper : 0;
             if (!image)
                 image = cursorImage;
             userCursor = (GUICursor*)AppendSibling(

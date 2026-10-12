@@ -29,10 +29,10 @@ public:
     // through the resource manager (AddRef on reuse); 0 if there is none.
     static Palette8* UnknownFunction4b6b30(const char* name);
 
-    unsigned char field_0x008[256][3];        // RGB entries from the stream
-    UnknownPaletteEntry field_0x308[256];     // the DirectDraw palette's entries
-    ColorMapper* field_0x708;                 // the mapper named in the stream
-    UnknownPaletteInterface* field_0x70c;
-    int field_0x710;                          // first entry; 10 keeps the system colours
-    int field_0x714;                          // number of entries
+    unsigned char rgbEntries[256][3];         // +0x008 RGB entries from the stream
+    UnknownPaletteEntry paletteEntries[256];  // +0x308 the DirectDraw palette's entries
+    ColorMapper* colorMapper;                 // +0x708 the mapper named in the stream
+    UnknownPaletteInterface* ddPalette;       // +0x70c from DirectDraw CreatePalette
+    int firstEntry;                           // +0x710 first entry; 10 keeps the system colours
+    int entryCount;                           // +0x714 number of entries
 };

@@ -11,7 +11,7 @@ UnknownFontTextureManager FontTexture::s_UnknownManager65b478;
 
 // 0x00467180
 FontTexture::FontTexture(unsigned int count, const char* name)
-    : fontName(0), cells(new(__FILE__, 22) EArray<CharacterCell*>(count)), field_0x0c(0) {
+    : fontName(0), cells(new(__FILE__, 22) EArray<CharacterCell*>(count)), texture(0) {
     int length;
     unsigned int i;
 
@@ -46,9 +46,9 @@ FontTexture::~FontTexture() {
     fontName = 0;
     delete cells;
     cells = 0;
-    if (field_0x0c) {
-        field_0x0c->Release();
-        field_0x0c = 0;
+    if (texture) {
+        texture->Release();
+        texture = 0;
     }
 }
 
@@ -74,8 +74,8 @@ void FontTexture::SetCell(unsigned int index, CharacterCell* cell) {
 }
 
 // 0x004673a0
-void FontTexture::SetTexture(TextureMap* texture) {
-    field_0x0c = texture;
+void FontTexture::SetTexture(TextureMap* newTexture) {
+    texture = newTexture;
 }
 
 // 0x004673b0
@@ -85,7 +85,7 @@ const char* FontTexture::GetFontName() {
 
 // 0x004673c0
 TextureMap* FontTexture::GetTexture() {
-    return field_0x0c;
+    return texture;
 }
 
 // 0x004673d0: the loader. The cell file holds the count, then per cell its

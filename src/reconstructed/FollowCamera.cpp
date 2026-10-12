@@ -53,7 +53,7 @@ FollowCamera::~FollowCamera() {
 // +0x1c4/+0x1c8 in x and y, eases +0x220 toward a target that shrinks with
 // the source height (capped at 335), keeping it at 20 or more.
 void FollowCamera::UnknownVirtualSlot73(const Vector3& from, const Vector3& to, float dt) {
-    if (to.x - from.x < field_0x1c4 * 0.1f && to.y - from.y < field_0x1c8 * 0.1f) {
+    if (to.x - from.x < targetWidth * 0.1f && to.y - from.y < targetHeight * 0.1f) {
         float height = FollowCameraMin(from.z, 335.0f);
         float target = followDistance - (height - 15.0f) * dt * 0.028f;
         followDistance = field_0x298->Update(target, dt);
@@ -108,7 +108,7 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float 
                                                   int capacity, int count, const int* list) {
     if (!Camera::UnknownVirtualSlot8(value))
         return 0;
-    field_0x294 = new(__FILE__, 0x78) UnknownFollowCameraValue(field_0x16c, rate294);
+    field_0x294 = new(__FILE__, 0x78) UnknownFollowCameraValue(fieldOfView, rate294);
     field_0x298 = new(__FILE__, 0x79) UnknownFollowCameraValue(followDistance, rate298);
     field_0x228 = value228;
     field_0x2d0 = value2d0;
@@ -144,9 +144,9 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float 
 }
 
 // 0x00463600
-void FollowCamera::SetSubject(UnknownFollowCameraSubject* subject) {
-    field_0x240 = subject;
-    field_0x2ec = subject->field_0x40;
+void FollowCamera::SetSubject(UnknownFollowCameraSubject* newSubject) {
+    subject = newSubject;
+    field_0x2ec = newSubject->field_0x40;
 }
 
 // Inlined by slot 38: the yaw turns and wraps to [-pi, pi]; the pitch tilts
@@ -321,14 +321,14 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
 // 0x00464ee0 and 0x00464f70: feed a vector into the +0x27c..+0x284 and
 // +0x288..+0x290 values with a rate chosen by the subject's +0xbe8.
 void FollowCamera::UnknownVirtualSlot43(const Vector3& value) {
-    float rate = (field_0x240->field_0xbe8 == 1) ? 0.25f : 0.3f;
+    float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
     field_0x27c->Set(value.x, rate);
     field_0x280->Set(value.y, rate);
     field_0x284->Set(value.z, rate);
 }
 
 void FollowCamera::UnknownVirtualSlot44(const Vector3& value) {
-    float rate = (field_0x240->field_0xbe8 == 1) ? 0.25f : 0.3f;
+    float rate = (subject->field_0xbe8 == 1) ? 0.25f : 0.3f;
     field_0x288->Set(value.x, rate);
     field_0x28c->Set(value.y, rate);
     field_0x290->Set(value.z, rate);
@@ -643,7 +643,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         eyePosition.z = viewMatrix.m[3][2];
         eyePosition += *offset;
         Vector3 ground = eyePosition;
-        field_0x240->QueryGround(&ground, 0, 0, 0);
+        subject->QueryGround(&ground, 0, 0, 0);
         float height = ground.y + 3.5f;
         if (height > eyePosition.y)
             eyePosition.y = height;

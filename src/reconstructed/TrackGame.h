@@ -40,7 +40,7 @@ public:
     unsigned char field_0x000[0x10a];
     unsigned char field_0x10a;                // cleared when the followed racer changes (0x004a9e80)
     unsigned char field_0x10b[0x708 - 0x10b];
-    KrustyVCR* field_0x708;
+    KrustyVCR* recorder;                      // +0x708
 };
 
 // The entries at TrackGameViewOwner+0x420 (BikeRace.h walks them as

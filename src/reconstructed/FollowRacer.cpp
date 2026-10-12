@@ -49,7 +49,7 @@ void UnknownBikeRaceGhost::ApplyReplayDelta(const UnknownBikeRaceGhostDelta* del
 // 0x004a9d10
 void UnknownTrackGameViewOwnerDc::SetRecorder(KrustyVCR* vcr)
 {
-    field_0x708 = vcr;
+    recorder = vcr;
 }
 
 // 0x004a9f90: every other racer hears about the new and the previous racer,

@@ -230,7 +230,7 @@ protected:
     float followYaw;                          // +0x234 yaw slot 49 adds to +0x308 / +0x23c; presets in slots 63-67
     float initialYaw;                         // +0x238 copy of followYaw
     float field_0x23c;          // advanced by pi in VehicleCamera slot 39
-    UnknownFollowCameraSubject* field_0x240;
+    UnknownFollowCameraSubject* subject;      // +0x240 (0x00463600 SetSubject)
     int cameraState;                 // +0x244, current state (slots 70-72, 75)
     int savedCameraState;            // +0x248, saved state (slot 70)
     float savedParameter;            // +0x24c, saved field_0x258 (slot 70)

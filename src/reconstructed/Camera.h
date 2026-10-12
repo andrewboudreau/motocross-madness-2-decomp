@@ -84,7 +84,7 @@ protected:
     // Rebuilt by slot 28: [1] (+0x12c) is the projection times the viewport
     // scale (0.5, -0.5, offset 0.5), [0] (+0xec) that times the view matrix.
     Matrix4 field_0xec[2];
-    float field_0x16c;              // 77.0f
+    float fieldOfView;                        // +0x16c degrees, 77.0f (keys 0xc7/0xcf step it)
     Vector3 eyePosition;                      // +0x170 (0, 0, 0); copied to field_0x208
     Vector3 viewDirection;                    // +0x17c (0, 0, 1); copied to field_0x214
     Vector3 upDirection;                      // +0x188 (0, 1, 0)
@@ -95,14 +95,14 @@ protected:
     float heightWidthRatio;                   // +0x1b8 height/width ratio (0x0042f0e0)
     float field_0x1bc;              // g_UnknownFloat550f6c (1.0f)
     float field_0x1c0;              // g_UnknownFloat550f70 (100000.0f)
-    int field_0x1c4;
-    int field_0x1c8;
+    int targetWidth;                          // +0x1c4 owner width (0x0042e550)
+    int targetHeight;                         // +0x1c8 owner height (0x0042e550)
     int field_0x1cc;                // enables the slot 13 rectangle
     int field_0x1d0;                // owner+0x14 plus one (slots 5 and 18)
-    int field_0x1d4;
-    int field_0x1d8;
-    float field_0x1dc;              // 109.0f
-    float field_0x1e0;              // 10.0f
+    int fovKeysEnabled;                       // +0x1d4 field-of-view keys 0xc7/0xcf (slot 10)
+    int widthKeysEnabled;                     // +0x1d8 viewport width keys 0xd2/0xd3 (slot 10)
+    float maxFieldOfView;                     // +0x1dc 109.0f
+    float minFieldOfView;                     // +0x1e0 10.0f
     _iobuf* file;                             // +0x1e4 FILE*, closed by the destructor
     int field_0x1e8;
     int field_0x1ec;
@@ -112,6 +112,6 @@ protected:
     int field_0x1fc;
     float lastMoveDistance;                   // +0x200 distance moved last frame (slot 10)
     float lastTurnAngle;                      // +0x204 angle turned last frame (slot 10)
-    Vector3 field_0x208;
-    Vector3 field_0x214;
+    Vector3 previousEyePosition;              // +0x208 eyePosition last frame (slot 10)
+    Vector3 previousViewDirection;            // +0x214 viewDirection last frame (slot 10)
 };

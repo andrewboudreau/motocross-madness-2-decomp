@@ -195,7 +195,7 @@ GameObject* LightManager::UnknownVirtualSlot8(void* value) {
 
 // 0x0049e470
 void LightManager::AddLight(LightEmitter* light) {
-    field_0x30[lightCount] = light;
+    lights[lightCount] = light;
     light->manager = this;
     lightCount++;
 }
@@ -215,8 +215,8 @@ LightEmitter* LightManager::FindLightOfType(int type) {
     int i;
 
     for (i = 0; i < lightCount; i++) {
-        if (field_0x30[i]->lightType == type)
-            return field_0x30[i];
+        if (lights[i]->lightType == type)
+            return lights[i];
     }
     return 0;
 }

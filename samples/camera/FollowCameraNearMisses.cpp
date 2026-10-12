@@ -187,10 +187,10 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x276 = 0;
     lift = 0;
     field_0x228 = 27.0f;
-    field_0x258 = field_0x16c;
-    field_0x2f0 = field_0x16c;
+    field_0x258 = fieldOfView;
+    field_0x2f0 = fieldOfView;
     field_0x294 = 0;
-    field_0x240 = 0;
+    subject = 0;
     field_0x27c = 0;
     field_0x280 = 0;
     field_0x284 = 0;
@@ -198,7 +198,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x28c = 0;
     field_0x290 = 0;
     field_0x298 = 0;
-    field_0x1d4 = 0;
+    fovKeysEnabled = 0;
     overrideActive = 0;
     field_0x26c = 0;
     field_0x274 = 0;
@@ -211,11 +211,11 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x25c = eyePosition;
     savedCameraState = cameraState;
     field_0x250 = cameraState;
-    savedParameter = field_0x16c;
+    savedParameter = fieldOfView;
     initialDistance = followDistance;
     initialPitch = followPitch;
     initialYaw = followYaw;
-    field_0x254 = field_0x16c;
+    field_0x254 = fieldOfView;
     field_0x277 = 0;
     field_0x278 = 0;
     stateCount = 0;
@@ -477,7 +477,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         targetPoint = UnknownVirtualSlot57(0);
         position = field_0x29c * -followDistance;
         position += targetPoint;
-        field_0x240->QueryGround(&position, 0, 0, 0);
+        subject->QueryGround(&position, 0, 0, 0);
         Vector3 direction = position - targetPoint;
         D3DRMVectorRotate(&position, &direction, &kVec3XAxis, followPitch);
         D3DRMVectorRotate(&direction, &position, &kVec3YAxis, followYaw);
@@ -486,7 +486,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         SetFrame(&position, 0, 0, 0, 0);
         target = field_0x29c * field_0x228;
         target += targetPoint;
-        field_0x240->QueryGround(&target, 0, 0, 0);
+        subject->QueryGround(&target, 0, 0, 0);
         UnknownVirtualSlot29(target);
         field_0x278 = FollowCameraAbs(followYaw) > 2.0f;
     }
@@ -533,7 +533,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             if (field_0x258 > field_0x2fc)
                 field_0x258 = field_0x2fc;
             if (moved)
-                field_0x258 = (field_0x258 - field_0x16c) * 0.75f + field_0x16c;
+                field_0x258 = (field_0x258 - fieldOfView) * 0.75f + fieldOfView;
         }
     } else if (cameraState == 7) {
         float dx = eyePosition.x - target.x;
@@ -650,13 +650,13 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         if (g_TrackGame->paused || (cameraState != 5 && cameraState != 7)) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
                 field_0x258 -= 3.0f;
-                if (field_0x258 < field_0x1e0)
-                    field_0x258 = field_0x1e0;
+                if (field_0x258 < minFieldOfView)
+                    field_0x258 = minFieldOfView;
             }
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x80000000, 0)) {
                 field_0x258 += 3.0f;
-                if (field_0x258 > field_0x1dc)
-                    field_0x258 = field_0x1dc;
+                if (field_0x258 > maxFieldOfView)
+                    field_0x258 = maxFieldOfView;
             }
         }
         SetFieldOfView(field_0x294->Update(field_0x258, dt));

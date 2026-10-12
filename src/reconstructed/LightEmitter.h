@@ -84,7 +84,7 @@ public:
                                int stride, void* colors);
 
     int lightCount;                         // light count
-    LightEmitter* field_0x30[50];
+    LightEmitter* lights[50];               // +0x30
     int* vertexRed;                         // per-vertex red (one allocation of 3 * capacity)
     int* vertexGreen;                       // green
     int* vertexBlue;                        // blue

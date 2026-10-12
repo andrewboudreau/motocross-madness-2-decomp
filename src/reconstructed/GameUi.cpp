@@ -994,8 +994,8 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
-                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                            (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
+                                            pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
         } else {
@@ -5278,8 +5278,8 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
-                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                            (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
+                                            pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
             FreeFile(image);

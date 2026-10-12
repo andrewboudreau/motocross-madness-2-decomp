@@ -54,5 +54,5 @@ public:
 
     char* fontName;                           // name
     EArray<CharacterCell*>* cells;            // cells
-    TextureMap* field_0x0c;
+    TextureMap* texture;                      // +0x0c
 };
