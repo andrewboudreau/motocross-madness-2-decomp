@@ -12,6 +12,16 @@ The [progress page](docs/DECOMPILATION_PROGRESS.md) records reviewed strict
 calibration results alongside source, RTTI and executable-size indicators.
 Selected-target matching is not a whole-game completion percentage.
 
+## Play the demo on Windows 11
+
+1. Put your copy of the Motocross Madness 2 trial (the folder with
+   `mcm2.exe`) in `work/game/MCM2demov2`.
+2. Install VC6 ([TOOLCHAIN.md](docs/TOOLCHAIN.md)).
+3. Run `python runtime/build.py --stage work/run/demo`
+4. Run `work/run/demo/mcm2.exe`. Accept the license, then click OK.
+
+Details: [runtime/README.md](runtime/README.md).
+
 ## Project layout
 
 | Directory | Purpose |
