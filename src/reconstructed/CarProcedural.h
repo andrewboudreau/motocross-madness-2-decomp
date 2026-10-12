@@ -139,8 +139,8 @@ public:
                                                 int a11, unsigned int wheelCount, float a13, float a14,
                                                 float a15);
 
-    void UnknownFunction42fa00(const char* pathFile, const char* name); // 0x0042fa00 (ret 8)
-    float UnknownFunction4308e0(float time, float distance);         // 0x004308e0 (ret 8)
+    void ReadPath(const char* pathFile, const char* name); // 0x0042fa00 (ret 8)
+    float FindOffsetAtDistance(float time, float distance);         // 0x004308e0 (ret 8)
     Vector3 UnknownFunction430b10(float time);                       // 0x00430b10 (ret 8)
     // 0x00430e60 (ret 0x14): the four cubic Hermite basis weights of t.
     void UnknownFunction430e60(float t, float* h0, float* h1, float* h2, float* h3);

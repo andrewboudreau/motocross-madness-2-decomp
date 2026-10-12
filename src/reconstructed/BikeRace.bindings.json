@@ -136,7 +136,7 @@
   "?RestartEntry@Scene@@QAEHHMHH@Z": "0x004eb040",
   "?ResolveSltPath@Scene@@QAEHPAD@Z": "0x004f0ec0",
   "?UnknownFunction507c10@UnknownBikeRaceProjector@@QAEXPAUVector3@@0HPAE@Z": "0x00507c10",
-  "?UnknownFunction516870@Track@@QAEHPAPAUTrackNode@@@Z": "0x00516870",
+  "?FreeReachableNodes@Track@@QAEHPAPAUTrackNode@@@Z": "0x00516870",
   "?UnknownFunction517930@Track@@QAEHPAPAUTrackListItem@@H@Z": "0x00517930",
   "?UnknownFunction517da0@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",
   "?UnknownFunction51b540@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",

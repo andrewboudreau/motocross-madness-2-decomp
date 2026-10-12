@@ -86,15 +86,15 @@ public:
     // the file has them; 1 on success.
     int UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
                               int* hasFinish);
-    int UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int count);
-    int UnknownFunction516800(TrackNode* node);
-    int UnknownFunction516870(TrackNode** start);
+    int FreeNodeArray(UnknownStream* stream, TrackNode** nodes, int count);
+    int FreeNode(TrackNode* node);
+    int FreeReachableNodes(TrackNode** start);
     // 0x00516980 (RaceStatus.cpp): places `p` on the track (the closest
     // position over every reachable node) and optionally returns its distance.
     int UnknownFunction516980(Vector3 p, TrackPos* out, float* outDistance);
     int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
     int UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
-    int UnknownFunction517310(TrackSegment* segment, TrackNode* node);
+    int NodeHasSegment(TrackSegment* segment, TrackNode* node);
     // 0x00517340 (RaceStatus.cpp): places `p` on the track near `from`. Every
     // segment whose strip contains p is a candidate; one within `distance`
     // ahead of `from` or `range` behind it is accepted (the farthest ahead
@@ -102,7 +102,7 @@ public:
     // `path` (passed as an int). Returns whether one was accepted.
     int UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out);
     int UnknownFunction517930(TrackListItem** list, int all);
-    int UnknownFunction5179a0(TrackPos a, TrackPos b);
+    int IsAtOrAfter(TrackPos a, TrackPos b);
     int UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
     float UnknownFunction517da0(TrackPos a, TrackPos b);
     int UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);

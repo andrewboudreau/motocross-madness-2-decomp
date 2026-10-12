@@ -231,7 +231,7 @@
   "?UnknownFunction5015b0@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
   "?UnknownFunction507c10@UnknownBikeRaceProjector@@QAEXPAUVector3@@0HPAE@Z": "0x00507c10",
   "?UnknownFunction515ed0@Track@@QAEHPAVUnknownTextureStream@@PAX1PAH2@Z": "0x00515ed0",
-  "?UnknownFunction516870@Track@@QAEHPAPAUTrackNode@@@Z": "0x00516870",
+  "?FreeReachableNodes@Track@@QAEHPAPAUTrackNode@@@Z": "0x00516870",
   "?UnknownFunction517930@Track@@QAEHPAPAUTrackListItem@@H@Z": "0x00517930",
   "?UnknownFunction517da0@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",
   "?UnknownFunction518130@Track@@QAEHPAUTrackSegment@@PAUTrackVec3@@@Z": "0x00518130",

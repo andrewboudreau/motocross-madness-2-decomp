@@ -600,7 +600,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                         Track* track = raceTrack;
                         if (track != 0) {
                             if (track->field_0x00 != 0)
-                                track->UnknownFunction516870(&track->field_0x00);
+                                track->FreeReachableNodes(&track->field_0x00);
                             delete track;
                         }
                     }

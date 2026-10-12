@@ -167,7 +167,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     field_0x38->UnknownFunction439410(field_0x3c);
     g_MemTagStack->Pop(tag);
 
-    UnknownFunction42fa00(pathFile, field_0x34->field_0x38);
+    ReadPath(pathFile, field_0x34->field_0x38);
     field_0x170 = speed;
     if (speed > 0.0)
         field_0x174 = 1.0f / speed;
@@ -180,7 +180,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
 // 0x0042fa00: reads the path from `pathFile`: one key per "FRAME <n>" line,
 // whose position is the translation of the "transform" line naming the
 // model (in quotes). The file's y and z are swapped.
-void CarProcedural::UnknownFunction42fa00(const char* pathFile, const char* name)
+void CarProcedural::ReadPath(const char* pathFile, const char* name)
 {
     char quoted[0x100];
     char line[0x400];
@@ -222,7 +222,7 @@ void CarProcedural::UnknownFunction42fa00(const char* pathFile, const char* name
 
 // 0x004308e0: searches, by bisection on the path parameter, for the offset
 // before `time` at which the path is `distance` long (at most 200 steps).
-float CarProcedural::UnknownFunction4308e0(float time, float distance)
+float CarProcedural::FindOffsetAtDistance(float time, float distance)
 {
     unsigned int count = 0;
     float result = 0.0f;

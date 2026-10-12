@@ -137,6 +137,16 @@ frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
 - Boolean values computed with `fcompp` come out in the inverted sense in
   retail: `(lhs <= rhs) == (p.z >= a->z)`, not `(lhs > rhs) != ...`.
 
+## Function names
+
+Provisional names taken from the behaviour each function's comment records:
+`FreeNodeArray` `0x00515e70`, `FreeNode` `0x00516800`, `FreeReachableNodes`
+`0x00516870`, `NodeHasSegment` `0x00517310` and `IsAtOrAfter` `0x005179a0`.
+The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
+`0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address
+names because physics declarations (`src/krusty2/vehicle/KrustyBikeTypes.h`)
+call them.
+
 ## Reproduce
 
 ```bash

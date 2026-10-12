@@ -70,20 +70,20 @@ char* UnknownTokenizer::UnknownFunction515df0(const char* delimiters)
 }
 
 // 0x00515e70: frees a node array (the loader's failure path).
-int Track::UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int count)
+int Track::FreeNodeArray(UnknownStream* stream, TrackNode** nodes, int count)
 {
     if (!stream || !nodes)
         return 0;
     for (int i = 0; i < count; i++) {
         if (nodes[i])
-            UnknownFunction516800(nodes[i]);
+            FreeNode(nodes[i]);
     }
     DebugFree(nodes, __FILE__, 30);
     return 1;
 }
 
 // 0x00516800: frees a node, its segments and its link array.
-int Track::UnknownFunction516800(TrackNode* node)
+int Track::FreeNode(TrackNode* node)
 {
     if (!node)
         return 0;
@@ -100,7 +100,7 @@ int Track::UnknownFunction516800(TrackNode* node)
 
 // 0x00516870: frees every node reachable from *start. A node is marked on
 // its first visit and freed when its list entry comes back to the top.
-int Track::UnknownFunction516870(TrackNode** start)
+int Track::FreeReachableNodes(TrackNode** start)
 {
     TrackListItem* list = 0;
     if (!start || !*start)
@@ -114,7 +114,7 @@ int Track::UnknownFunction516870(TrackNode** start)
     while (list) {
         TrackNode* node = list->field_0x04;
         if (node->field_0x00 & 4) {
-            UnknownFunction516800(node);
+            FreeNode(node);
             item = list;
             list = list->field_0x0c;
             DebugFree(item, __FILE__, 400);
@@ -140,7 +140,7 @@ int Track::UnknownFunction516870(TrackNode** start)
 }
 
 // 0x00517310: whether `segment` belongs to `node`.
-int Track::UnknownFunction517310(TrackSegment* segment, TrackNode* node)
+int Track::NodeHasSegment(TrackSegment* segment, TrackNode* node)
 {
     for (TrackSegment* s = node->field_0x08; s; s = s->field_0x2c) {
         if (s == segment)
@@ -158,7 +158,7 @@ int Track::UnknownFunction517930(TrackListItem** list, int all)
     TrackListItem* item;
     while ((item = *list) != 0) {
         if (item->field_0x04 && (!(item->field_0x04->field_0x00 & 1) || all))
-            UnknownFunction516800(item->field_0x04);
+            FreeNode(item->field_0x04);
         *list = (*list)->field_0x0c;
         DebugFree(item, __FILE__, 1021);
     }
@@ -166,7 +166,7 @@ int Track::UnknownFunction517930(TrackListItem** list, int all)
 }
 
 // 0x005179a0: whether b is at or after a on the same node.
-int Track::UnknownFunction5179a0(TrackPos a, TrackPos b)
+int Track::IsAtOrAfter(TrackPos a, TrackPos b)
 {
     if (a.node == b.node) {
         if (a.segment == b.segment) {
@@ -195,7 +195,7 @@ int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, f
     if (!distance)
         return 0;
     *distance = -1.0f;
-    if (a.node == b.node && UnknownFunction5179a0(a, b)) {
+    if (a.node == b.node && IsAtOrAfter(a, b)) {
         if (path) {
             *path = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1175);
             if (!*path)

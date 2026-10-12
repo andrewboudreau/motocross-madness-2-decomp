@@ -341,8 +341,8 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
                 start.t = 0.0f;
                 ahead = UnknownFunction517da0(start, candidates->pos);
                 behind = UnknownFunction517da0(candidates->pos, start);
-                if (UnknownFunction517310(candidates->pos.segment, step->field_0x04)
-                    && (!UnknownFunction517310(from.segment, step->field_0x04)
+                if (NodeHasSegment(candidates->pos.segment, step->field_0x04)
+                    && (!NodeHasSegment(from.segment, step->field_0x04)
                         || ahead >= 0.0f && behind >= 0.0f && ahead < behind)) {
                     found = 1;
                     if (out && (ahead > best || -behind > best)) {
@@ -688,6 +688,6 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
     }
     return 1;
 fail:
-    UnknownFunction515e70((UnknownStream*)stream, nodes, count);
+    FreeNodeArray((UnknownStream*)stream, nodes, count);
     return 0;
 }

@@ -253,7 +253,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     field_0x194 = (float)fmod(frameTime + field_0x194, field_0x1b4[field_0x6c - 1].time * field_0x174);
     float t;
     if (field_0x19c > 0.0) {
-        field_0x1a0 = UnknownFunction4308e0(field_0x194, field_0x19c);
+        field_0x1a0 = FindOffsetAtDistance(field_0x194, field_0x19c);
         t = field_0x194 - field_0x1a0;
         field_0x1c4 = UnknownFunction430b10(t);
     } else {
@@ -269,7 +269,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     Vector3 local = field_0x34->UnknownFunction4fd710(forward);
     if (field_0x60 > 0)
         field_0x18c = (float)fmod(field_0x184 * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
-    float behind = UnknownFunction4308e0(t, -1.0f);
+    float behind = FindOffsetAtDistance(t, -1.0f);
     Vector3 back = UnknownFunction430b10(t - behind) - field_0x1c4;
     CarNormalizeInPlace(back);
     if (field_0x5c)
@@ -277,7 +277,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     else
         field_0x1f4 = field_0x1f4 * field_0x1ac + back * (1.0f - field_0x1ac);
     if (field_0x50 && field_0x60 > 0) {
-        float wheelbase = UnknownFunction4308e0(t, -field_0x198);
+        float wheelbase = FindOffsetAtDistance(t, -field_0x198);
         Vector3 side = UnknownFunction430b10(t - wheelbase) - field_0x1c4;
         Vector3 steer = field_0x34->UnknownFunction4fd710(side);
         field_0x190 = (float)atan2(steer.x, steer.z);
