@@ -33,9 +33,11 @@ ends with the shared dialog deleting destructor and its vector set:
 (`kMenuMain` 100 = `MainDlg`, `kMenuExit` 0x191 = `ExitDlg`, ...). Ids that
 share a dialog (0x85c/0x85d, 0x866-0x868, 0x910/0x911, 0xbb9-0xbbb) keep
 their number as a suffix, as does 0x88e, which opens one of four dialogs.
-KrustyUI.cpp, DlgProcs.cpp, EventManager.cpp and ProCircuitProcs.cpp use the
-names; including the header in SelectGamePicProcs.cpp changes VC6's code for
-`FillFileList` `0x004f17a0`, so that file keeps the numbers.
+KrustyUI.cpp, DlgProcs.cpp, EventManager.cpp, ProCircuitProcs.cpp,
+NetProcs.cpp, InGameProcs.cpp and TrackRecord.cpp use the names. Including
+the header changes VC6's code for `FillFileList` `0x004f17a0` in
+SelectGamePicProcs.cpp and for TrackGame slot 1 `0x00520ab0` in
+TrackGame.cpp, so those two files keep the numbers.
 
 ## Status
 

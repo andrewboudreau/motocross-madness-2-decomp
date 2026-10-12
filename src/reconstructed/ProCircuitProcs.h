@@ -96,9 +96,9 @@ public:
     PCBunnyDlg() : UIDialog(1, "PCDeal.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9860
 
-    int field_0x7f58;                         // the entry fee
-    int field_0x7f5c;                         // the player's cash
-    int field_0x7f60;                         // what accepting adds
+    int entryFee;                             // +0x7f58: the entry fee
+    int playerCash;                           // +0x7f5c: the player's cash
+    int loanAmount;                           // +0x7f60: fee - cash + debt, the loan offered
 };
 
 // RTTI: PCFailedDlg : UIDialog (vtable 0x005572a8; 0x7f58 bytes).
@@ -158,16 +158,16 @@ public:
     void ApplyChosenRider();             // 0x004d78c0: takes the chosen rider
     void ApplyChosenBike();             // 0x004d7900: applies the chosen bike
 
-    Vector3 field_0x7f58;                     // the bike view's eye
-    Vector3 field_0x7f64;                     // and target
-    float field_0x7f70;                       // their distance
-    int field_0x7f74;                         // background region
-    int field_0x7f78;                         // auto-rotate
-    int field_0x7f7c;
-    int field_0x7f80;
-    int field_0x7f84;                         // the bike changed
-    int field_0x7f88;                         // the rider changed
-    RECT field_0x7f8c;                        // the bike view
+    Vector3 viewEye;                          // +0x7f58: the bike view's eye
+    Vector3 viewTarget;                       // +0x7f64: and target
+    float viewDistance;                       // +0x7f70: their distance
+    int previewRegion;                        // +0x7f74: background region
+    int previewDragged;                       // +0x7f78: the bike preview was dragged (or ChkAutoRotate is off)
+    int previewDragging;                      // +0x7f7c: the bike preview is being dragged
+    int idleMotionPlaying;                    // +0x7f80: the rider's idle motion is playing
+    int bikeChanged;                          // +0x7f84: the bike changed
+    int riderChanged;                         // +0x7f88: the rider changed
+    RECT previewArea;                         // +0x7f8c: the bike view
 };
 
 // RTTI: PCCentralStandingsDlg : UIDialog (vtable 0x00557224; 0x7f58 bytes):
@@ -186,9 +186,9 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d5f70
     void OpenPage(int page);     // 0x004d6570: opens page `page` (0..2)
 
-    PCCentralNextDlg* field_0x7f58;
-    PCCentralBikeRiderDlg* field_0x7f5c;
-    PCCentralStandingsDlg* field_0x7f60;
+    PCCentralNextDlg* nextPage;               // +0x7f58
+    PCCentralBikeRiderDlg* bikeRiderPage;     // +0x7f5c
+    PCCentralStandingsDlg* standingsPage;     // +0x7f60
 };
 
 // RTTI: PCNewDlg : UIDialog (vtable 0x00557098; 0x7f68 bytes): asks for a
@@ -200,10 +200,10 @@ public:
     // 0x004d5f40: where the answers go.
     void SetAnswerTargets(char* name, int* difficulty, int* bikeClass, int* opponents);
 
-    char* field_0x7f58;                       // name (64 bytes)
-    int* field_0x7f5c;                        // "RadLODEasy" group
-    int* field_0x7f60;                        // "RadClass125" group
-    int* field_0x7f64;                        // "OpponentsListBox" row
+    char* careerName;                         // +0x7f58: name (64 bytes)
+    int* difficultyChoice;                    // +0x7f5c: "RadLODEasy" group
+    int* bikeClassChoice;                     // +0x7f60: "RadClass125" group
+    int* opponentsChoice;                     // +0x7f64: "OpponentsListBox" row
 };
 
 // RTTI: PCStartupDlg : UIDialog (vtable 0x00551a10): lists the saved
@@ -218,12 +218,12 @@ public:
     void AddCircuitRow(UnknownTrackGameObject3444* circuit, int row);
     void FreeFileNames();             // 0x004d5ca0: frees the file names
 
-    char** field_0x7f58;                      // career file names
-    int field_0x7f5c;                         // their count
-    char field_0x7f60[0x100];                 // new career's name
-    int field_0x8060;                         // difficulty
-    int field_0x8064;                         // bike class
-    int field_0x8068;                         // opponents row
-    ChoiceDlg* field_0x806c;                  // delete confirmation (running careers)
-    ChoiceDlg* field_0x8070;                  // delete confirmation (finished careers)
+    char** careerFiles;                       // +0x7f58: career file names
+    int careerFileCount;                      // +0x7f5c: their count
+    char newCareerName[0x100];                // +0x7f60: new career's name
+    int chosenDifficulty;                     // +0x8060: PCNewDlg answer: difficulty
+    int chosenBikeClass;                      // +0x8064: PCNewDlg answer: bike class
+    int chosenOpponentsRow;                   // +0x8068: PCNewDlg answer: opponents row
+    ChoiceDlg* deleteRunningChoice;           // +0x806c: delete confirmation (running careers)
+    ChoiceDlg* deleteFinishedChoice;          // +0x8070: delete confirmation (finished careers)
 };

@@ -45,11 +45,11 @@ public:
     UIControl* menuSingleAnimation; // +0x7f60: "MenuSingleAnimation"
     UIControl* menuMultiAnimation; // +0x7f64: "MenuMultiAnimation"
     UIControl* menuUserAnimation;  // +0x7f68: "MenuUserAnimation"
-    int field_0x7f6c;
-    int field_0x7f70;
-    int field_0x7f74;
-    int field_0x7f78;
-    float field_0x7f7c;
+    int singleMenuOpen;                       // +0x7f6c: "MenuSingle" toggles it and MenuSingleAnimation
+    int multiMenuOpen;                        // +0x7f70: "MenuMulti" toggles it and MenuMultiAnimation
+    int userMenuOpen;                         // +0x7f74: "MenuUserProfile" toggles it and MenuUserAnimation
+    int movieRestartPending;                  // +0x7f78: restart the movie once the delay passes
+    float movieRestartTime;                   // +0x7f7c: seconds counted towards the 4 s restart delay
 };
 
 // RTTI: ChooseTCPMethodDlg : UIDialog (vtable 0x00551884).
@@ -93,9 +93,9 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044cf20
     void OpenPage(int page);     // 0x0044d740: opens page `page` (0..2)
 
-    SPEventDlg* field_0x7f58;
-    SPBikeRiderDlg* field_0x7f5c;
-    SPRaceInfoDlg* field_0x7f60;
+    SPEventDlg* eventPage;                    // +0x7f58: SPEventDlg page
+    SPBikeRiderDlg* bikeRiderPage;            // +0x7f5c: SPBikeRiderDlg page
+    SPRaceInfoDlg* raceInfoPage;              // +0x7f60: SPRaceInfoDlg page
 };
 
 struct UnknownRecordFileHeader;
@@ -135,7 +135,7 @@ public:
     void PaintPlateNumber(int number);   // 0x0044f950: paints the plate number on every bike
     // 0x004500d0: MPBikeRiderDlg's identical method is folded into it.
     void ApplyChosenRider();
-    void UnknownFunction4500e0();             // 0x004500e0
+    void ApplyChosenBike();                   // 0x004500e0: shows the chosen bike and loads its class's garage defaults
 
     Vector3 viewEye;                          // +0x7f58: the bike view's eye
     Vector3 viewTarget;                       // +0x7f64: and target
@@ -162,7 +162,7 @@ public:
     CreditsVidDlg() : UIDialog(1, "credits.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453170
 
-    UIVideoStatic* field_0x7f58;
+    UIVideoStatic* movieControl;              // +0x7f58: the credits movie
 };
 
 // 0x0059ae00: set when the player skips the intro (or the intro movie is
@@ -337,8 +337,8 @@ struct UnknownRecordFileHeader {
     UnknownKrustyUISlot field_0x180[8];       // TrackGame+0x2ebc
     unsigned char field_0x1c0[0x229 - 0x1c0];
     char riderName[0x33c - 0x229];            // +0x229: the rider
-    int field_0x33c;                          // copied to TrackGame+0x1550 (ReplayFilesDlg)
-    int field_0x340;
+    int engineSize;                           // +0x33c: garage engine size, copied to TrackGame+0x1550
+    int fourStroke;                           // +0x340: garage 4-stroke flag (TrackGame+0x1554)
     unsigned char field_0x344[0xeb0 - 0x344];
 };
 
@@ -353,8 +353,8 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453b20
     void OpenPage(int page);     // 0x00453e90: opens page `page` (0 ghosts, 1 replays)
 
-    GhostFilesDlg* field_0x7f58;
-    ReplayFilesDlg* field_0x7f5c;
+    GhostFilesDlg* ghostPage;                 // +0x7f58: GhostFilesDlg page
+    ReplayFilesDlg* replayPage;               // +0x7f5c: ReplayFilesDlg page
 };
 
 // RTTI: GhostFilesDlg : UIDialog (vtable 0x00552368; 0x7f88 bytes).
@@ -382,9 +382,9 @@ public:
     int AddReplayFile(const char* path); // 0x00455040: adds a replay file; 0 when unusable
     void PlaySelectedReplay();             // 0x00455490: plays the selected replay
 
-    UnknownRecordFileHeader* field_0x7f58;
-    int field_0x7f5c;
-    char** field_0x7f60;
-    int field_0x7f64;
-    char field_0x7f68[0x20];
+    UnknownRecordFileHeader* fileHeaders;     // +0x7f58: the files' headers
+    int fileHeaderCount;                      // +0x7f5c: their count
+    char** filePaths;                         // +0x7f60: the files' paths
+    int filePathCount;                        // +0x7f64: their count
+    char editedDescription[0x20];             // +0x7f68: the description being edited
 };
