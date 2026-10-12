@@ -7,7 +7,9 @@
 // slot of the `new` temporary ([esp+0x14], stored right after the EH state
 // reset) and returns it from there; VC6 here keeps it in ebx only. Tried
 // without effect: declaration order, separate declaration and assignment,
-// a second `result` variable, a single shared return.
+// a second `result` variable (declared at the top or at the `new`, assigned
+// from `archive` or receiving the `new` and copied to `archive`; all 95 of
+// 798 by match.py), a single shared return.
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 

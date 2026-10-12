@@ -17,6 +17,11 @@
 // a named colour local, an unsigned literal and an inline packer were
 // tried, and the colour spelled as RGB(255, 255, 255), shifted-byte ORs,
 // a DWORD cast, ~0xff000000 or 0xffffffff >> 8 (all fold to the immediate).
+// Also tried (tools/match.py scores; the form here scores 58), none
+// moving the colour into ebx: an inline row setter taking the colour as a
+// parameter (62), the colour in a local set before the 447a00 call (58),
+// returning 0 early on failure with the loop after it (61), and `e` itself
+// advanced as the row y (49).
 // Retail's late `push edi` should follow from that allocation: VC6 saves a
 // register only on the path that uses it (the PCVideoCard 0x004ca520
 // candidate pushes ebp inside its full-screen block).
