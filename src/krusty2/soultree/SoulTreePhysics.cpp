@@ -1247,10 +1247,12 @@ static inline float VecLengthRsq(const Vec3& v)
 // remainder after the last step is run as one extra short step.  `refreshed` is unused.
 // While a respawn is pending (`held`), the placement search (slot 11) and reset (slot 33)
 // replace the step.
-// Near miss (1366/1942 bytes): every call, branch and x87 sequence is in retail order;
-// the residue is stack-slot packing (retail packs the integration temporary into the
-// respawn path's first vector and the merge outputs o3/o1 into its other two, with
-// `impulse` below `o2`).  Declaration order and scoping of the locals do not move it.
+// Near miss (1804/1930 bytes): every instruction is in retail order once the speed clamp
+// and the angular damping are written as `Vec3 *= float` (the per-component forms add a
+// spilled ratio and reload `this`); the residue is stack-slot packing (retail packs the
+// integration temporary into the respawn path's first vector and the merge outputs o3/o1
+// into its other two, with `impulse` below `o2`), which also makes ours 9 bytes longer.
+// Declaration order and scoping of the locals do not move it.
 void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
 {
     Vec3 up;
@@ -1304,10 +1306,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
                                   &velocity, &centerOfMass, &position, &o3, &o2, &o1);
             UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &impulse);
             if (prevSpeed * 5.0f < linearSpeed && linearSpeed > 5.0f) {
-                float r = prevSpeed / linearSpeed;
-                velocity.x *= r;
-                velocity.y *= r;
-                velocity.z *= r;
+                velocity *= prevSpeed / linearSpeed;
                 linearSpeed = prevSpeed;
             }
             if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
@@ -1336,9 +1335,7 @@ void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
             }
             if (mag > 2.0f) {
                 mag *= 0.95f;
-                angularVelocity.x *= 0.95f;
-                angularVelocity.y *= 0.95f;
-                angularVelocity.z *= 0.95f;
+                angularVelocity *= 0.95f;
             }
             sceneNode->RotateAboutPoint(rotationPivot, scratchVector, mag);
         }

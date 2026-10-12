@@ -460,7 +460,8 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
 Still partial in SoulTreePhysics.cpp:
 
 - The sub-step loop `RunSteps` `0x00502f60` (1921 bytes) is now written out:
-  1366/1942 bytes, every call, branch and x87 sequence in retail order.  What was learned:
+  1804/1930 bytes, every instruction in retail order (speed clamp and angular damping as
+  `Vec3 *= float`).  What was learned:
   `prevSpeed = linearSpeed;` followed by a test of `prevSpeed` (not `linearSpeed`) gives
   retail's single `fld`/`fst`/`fcom`; the loop is `if (steps <= 0) return; do { ... } while
   (steps > 0);` (the rematerialised `xor ebx,ebx` sits on the back edge); the leftover
