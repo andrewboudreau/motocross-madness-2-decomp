@@ -199,8 +199,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     strcpy(name, "");
     if (value)
         *value = 0;
-    sprintf(first, "%s\\%s", g_TrackGame->mode.field_0x23d0, directory);
-    sprintf(second, "%s\\%s", g_TrackGame->mode.field_0x24d4, directory);
+    sprintf(first, "%s\\%s", g_TrackGame->mode.installDirectory, directory);
+    sprintf(second, "%s\\%s", g_TrackGame->mode.cdDataDirectory, directory);
     ((CombinedDirectoryList*)directories)->UnknownFunction44abb0(first, second);
     directories->UnknownFunction44a220(pattern, 1);
     directories->UnknownVirtualSlot1();
@@ -222,8 +222,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             int y;
             int series;
             for (i = 0; i < 6; i++) {
-                if (!_stricmp(entry, g_TrackGame->mode.field_0x139c[i])) {
-                    if (!g_TrackGame->mode.field_0x1384[i])
+                if (!_stricmp(entry, g_TrackGame->mode.bonusTrackNames[i])) {
+                    if (!g_TrackGame->mode.bonusTrackUnlocked[i])
                         goto next;
                     break;
                 }
@@ -552,24 +552,24 @@ void FillTrackList(int largePictures, const char* picture, const char* listName,
     name[0] = 0;
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 3:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\SX", "*.env", "env", largePictures, picture,
+        FillFileList(g_TrackGame->mode.trackDirectoryList, "Teraform\\SX", "*.env", "env", largePictures, picture,
                      listName, name, value, dialog, 0, 0);
         break;
     case 1:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Baja", "*.env", "env", largePictures, picture,
-                     listName, name, value, dialog, g_TrackGame->mode.field_0x9f4[1], 0);
+        FillFileList(g_TrackGame->mode.trackDirectoryList, "Teraform\\Baja", "*.env", "env", largePictures, picture,
+                     listName, name, value, dialog, g_TrackGame->mode.trackIndices[1], 0);
         break;
     case 5:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Enduro", "*.env", "env", largePictures, picture,
-                     listName, name, value, dialog, g_TrackGame->mode.field_0x9f4[5], 0);
+        FillFileList(g_TrackGame->mode.trackDirectoryList, "Teraform\\Enduro", "*.env", "env", largePictures, picture,
+                     listName, name, value, dialog, g_TrackGame->mode.trackIndices[5], 0);
         break;
     case 0:
     case 4:
-        FillFileList(g_TrackGame->mode.field_0x25e4, (const char*)g_TrackGame->mode.field_0x6a0,
+        FillFileList(g_TrackGame->mode.trackDirectoryList, (const char*)g_TrackGame->mode.currentSeriesDirectory,
                      "*.env", "env", largePictures, picture, listName, name, value, dialog, 0, append);
         break;
     case 2:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\National", "*.env", "env", largePictures, picture,
+        FillFileList(g_TrackGame->mode.trackDirectoryList, "Teraform\\National", "*.env", "env", largePictures, picture,
                      listName, name, value, dialog, 0, 0);
         break;
     }
@@ -1361,8 +1361,8 @@ void MultiPlayerDlg::FollowTrackChange() {
     {
         int length = strlen(sceneName);
         int count = length > 0x7f ? 0x7f : length;
-        strncpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04], sceneName, count);
-        g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04][count] = 0;
+        strncpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04], sceneName, count);
+        g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04][count] = 0;
     }
 }
 
@@ -1541,7 +1541,7 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             settings->trackNumber = g_TrackGame->ui->field_0x60[index].field_0x04;
             settings->field_0x138 = g_TrackGame->ui->field_0x60[index].field_0x0c;
             settings->field_0x13c = g_TrackGame->ui->field_0x60[index].field_0x10;
-            strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04],
+            strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04],
                    static_cast<UIListBox*>(event->control)->GetRowText(-1));
         }
         break;
@@ -1697,7 +1697,7 @@ void MPEventDlg::ApplyEventType() {
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
         }
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
-        list->SelectRowByText(g_TrackGame->mode.field_0x6f4[type]);
+        list->SelectRowByText(g_TrackGame->mode.trackNames[type]);
     } else {
         MultiPlayerDlg* parent = static_cast<MultiPlayerDlg*>(parentDialog);
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
@@ -1734,8 +1734,8 @@ void MPEventDlg::UnknownVirtualSlot31(int apply) {
         settings->trackNumber = g_TrackGame->ui->field_0x60[index].field_0x04;
         settings->field_0x138 = g_TrackGame->ui->field_0x60[index].field_0x0c;
         settings->field_0x13c = g_TrackGame->ui->field_0x60[index].field_0x10;
-        strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
-        g_TrackGame->mode.field_0x9f4[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
+        strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
+        g_TrackGame->mode.trackIndices[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
         list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         settings->eventType = list->GetRowData(-1);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
@@ -1774,7 +1774,7 @@ void MPEventDlg::ShowTrackPicture() {
     char path[0x104];
     UIListBox* picture = static_cast<UIListBox*>(FindControl("PictureBox", 3));
     picture->RemoveAllRows();
-    g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.field_0x6a0, g_TrackGame->mode.field_0x27f8.field_0x36,
+    g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory, g_TrackGame->mode.field_0x27f8.field_0x36,
                                                       "env", path);
     LoadTrackPicture(picture, path, g_TrackGame->mode.field_0x27f8.field_0x36);
 }
@@ -1823,7 +1823,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         previewDragged = 0;
-        g_TrackGame->mode.field_0x9c = 0;
+        g_TrackGame->mode.showNewbieDialog = 0;
         riderChanged = 1;
         bikeChanged = 1;
         FillBikeRiderLists();

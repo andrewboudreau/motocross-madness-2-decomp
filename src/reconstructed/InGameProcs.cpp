@@ -245,8 +245,8 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButExit", event->controlName)) {
             event->dialog->EndDialog(0);
             event->handled = 1;
-            memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.field_0x29e4,
-                   sizeof(g_TrackGame->mode.field_0x29e4));
+            memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
+                   sizeof(g_TrackGame->mode.savedSettings));
             memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1034,
                    sizeof(g_TrackGame->mode.field_0x1034));
             memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,

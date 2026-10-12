@@ -414,10 +414,10 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         if (level < 0)
             level = 0;
         g_TrackGame->mode.field_0xa64 = level;
-        g_TrackGame->mode.field_0x195c[3] = level;
-        g_TrackGame->mode.field_0x195c[1] = level;
-        g_TrackGame->mode.field_0x195c[2] = level;
-        g_TrackGame->mode.field_0x195c[4] = level;
+        g_TrackGame->mode.videoSettings[3] = level;
+        g_TrackGame->mode.videoSettings[1] = level;
+        g_TrackGame->mode.videoSettings[2] = level;
+        g_TrackGame->mode.videoSettings[4] = level;
         eventTerrain->UnknownFunction507960(level);
         if (ecoSystem)
             ecoSystem->UnknownFunction4594c0(level);
@@ -440,10 +440,10 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         if (level >= 9)
             level = 9;
         g_TrackGame->mode.field_0xa64 = level;
-        g_TrackGame->mode.field_0x195c[3] = level;
-        g_TrackGame->mode.field_0x195c[1] = level;
-        g_TrackGame->mode.field_0x195c[2] = level;
-        g_TrackGame->mode.field_0x195c[4] = level;
+        g_TrackGame->mode.videoSettings[3] = level;
+        g_TrackGame->mode.videoSettings[1] = level;
+        g_TrackGame->mode.videoSettings[2] = level;
+        g_TrackGame->mode.videoSettings[4] = level;
         eventTerrain->UnknownFunction507960(level);
         if (ecoSystem)
             ecoSystem->UnknownFunction4594c0(level);

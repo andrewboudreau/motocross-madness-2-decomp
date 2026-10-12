@@ -231,7 +231,7 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogInit: {
         UnknownTrackGameObject3444* current = g_TrackGame->field_0x3444;
         // TrackGame+0x18fc: an int per series (the bonus track was offered).
-        ((int*)g_TrackGame->mode.field_0x1384)[current->field_0x40] = 1;
+        ((int*)g_TrackGame->mode.bonusTrackUnlocked)[current->field_0x40] = 1;
         int title;
         int description;
         switch (current->field_0x40) {

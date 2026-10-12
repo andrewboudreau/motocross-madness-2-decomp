@@ -5,7 +5,7 @@
 // default settings. Calls, constants and stores all match; 383 of 427 bytes.
 // The leading +0x27f8 store order 0x30, 0x0c, 0x10, 0x00, 0x14 gives
 // retail's ecx = 1 / edx = 2 constants and &field_0x27f8 setup, and an
-// explicit zeroing loop for field_0x1384 (not memset) gives retail's rep
+// explicit zeroing loop for bonusTrackUnlocked (not memset) gives retail's rep
 // stosd placement. Left: retail schedules the +0x2828 store after `mov
 // edx, 2` and places the second 0x1ec-byte rep movsd after the +0x196c
 // store. Exhaustive sweeps (tools/sweep_variants.py) found nothing better:
@@ -63,22 +63,22 @@ void TrackGameMode::UnknownFunction522440() {
     field_0x27f8.field_0x1c = 4;
     field_0x23b8 = 0;
     memcpy(&field_0x2bd0, &field_0x27f8, sizeof(field_0x2bd0));
-    memcpy(&field_0x29e4, &field_0x27f8, sizeof(field_0x29e4));
+    memcpy(&savedSettings, &field_0x27f8, sizeof(savedSettings));
     *(unsigned char*)&field_0x1970 &= ~1;
     field_0x23bc = 10.3f;
     field_0x23c0 = 0.47123885f;
     field_0x23c4 = 1.0646508f;
     field_0x23c8 = 85.0f;
-    field_0x195c[4] = field_0xa64;
-    field_0x195c[3] = field_0xa64;
-    field_0x195c[2] = field_0xa64;
-    field_0x195c[1] = field_0xa64;
+    videoSettings[4] = field_0xa64;
+    videoSettings[3] = field_0xa64;
+    videoSettings[2] = field_0xa64;
+    videoSettings[1] = field_0xa64;
     field_0x1bdc = 0;
     field_0x90 = 0;
     field_0x2dbc = 0;
     field_0x1bcc = 101;
     for (int i = 0; i < 6; i++)
-        field_0x1384[i] = 0;
+        bonusTrackUnlocked[i] = 0;
     field_0x98 = 2;
     field_0x94 = 2;
 }
@@ -91,24 +91,24 @@ int TrackGameMode::UnknownFunction5238f0(const char* name, char* path) {
     FILE* file;
 
     strcpy(path, "");
-    skip = strlen(field_0x23d0);
-    if (!_strnicmp(name, field_0x23d0, skip)) {
+    skip = strlen(installDirectory);
+    if (!_strnicmp(name, installDirectory, skip)) {
         skip++;
     } else {
-        skip = strlen(field_0x24d4);
-        if (skip && !_strnicmp(name, field_0x24d4, skip))
+        skip = strlen(cdDataDirectory);
+        if (skip && !_strnicmp(name, cdDataDirectory, skip))
             skip++;
         else
             skip = 0;
     }
-    sprintf(buffer, "%s\\%s", field_0x23d0, name + skip);
+    sprintf(buffer, "%s\\%s", installDirectory, name + skip);
     file = fopen(buffer, "r");
     if (!file) {
-        if (field_0x23cc == 2)
+        if (installType == 2)
             return 0;
         if (!FindCdDirectory() && !WaitForCd())
             return 0;
-        sprintf(buffer, "%s\\%s", field_0x24d4, name + skip);
+        sprintf(buffer, "%s\\%s", cdDataDirectory, name + skip);
         file = fopen(buffer, "r");
     }
     if (file) {

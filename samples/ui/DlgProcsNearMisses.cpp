@@ -182,9 +182,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButStuntQuarry", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.field_0x29e4.field_0x04 = 0;
-            g_TrackGame->mode.field_0x29e4.field_0x08 = 0;
-            g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\Quarries";
+            g_TrackGame->mode.savedSettings.field_0x04 = 0;
+            g_TrackGame->mode.savedSettings.field_0x08 = 0;
+            g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\Quarries";
             SinglePlayerDlg* dialog = new(__FILE__, 352) SinglePlayerDlg;
             g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
@@ -192,9 +192,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButBaja", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.field_0x29e4.field_0x04 = 1;
-            g_TrackGame->mode.field_0x29e4.field_0x08 = 1;
-            g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\Baja";
+            g_TrackGame->mode.savedSettings.field_0x04 = 1;
+            g_TrackGame->mode.savedSettings.field_0x08 = 1;
+            g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\Baja";
             SinglePlayerDlg* dialog = new(__FILE__, 360) SinglePlayerDlg;
             g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
@@ -202,9 +202,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButSupercross", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.field_0x29e4.field_0x04 = 3;
-            g_TrackGame->mode.field_0x29e4.field_0x08 = 3;
-            g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\SX";
+            g_TrackGame->mode.savedSettings.field_0x04 = 3;
+            g_TrackGame->mode.savedSettings.field_0x08 = 3;
+            g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\SX";
             SinglePlayerDlg* dialog = new(__FILE__, 368) SinglePlayerDlg;
             g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
@@ -212,9 +212,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButEnduro", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.field_0x29e4.field_0x04 = 5;
-            g_TrackGame->mode.field_0x29e4.field_0x08 = 5;
-            g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\Enduro";
+            g_TrackGame->mode.savedSettings.field_0x04 = 5;
+            g_TrackGame->mode.savedSettings.field_0x08 = 5;
+            g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\Enduro";
             SinglePlayerDlg* dialog = new(__FILE__, 376) SinglePlayerDlg;
             g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
@@ -222,9 +222,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButNationals", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.field_0x29e4.field_0x04 = 2;
-            g_TrackGame->mode.field_0x29e4.field_0x08 = 2;
-            g_TrackGame->mode.field_0x6a0 = (int)"Teraform\\National";
+            g_TrackGame->mode.savedSettings.field_0x04 = 2;
+            g_TrackGame->mode.savedSettings.field_0x08 = 2;
+            g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\National";
             SinglePlayerDlg* dialog = new(__FILE__, 384) SinglePlayerDlg;
             g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
@@ -543,7 +543,7 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->field_0x342c = 1;
                 UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;
                 UNKNOWN_GARAGE_SETTINGS->fourStroke = header.fourStroke;
-                COPY_TEXT(g_TrackGame->mode.field_0x26f4, "VCRtape.dat", 0x104);
+                COPY_TEXT(g_TrackGame->mode.replayFile, "VCRtape.dat", 0x104);
                 LeaveMenusForRace();
                 parentDialog->UnknownVirtualSlot26();
             } else {

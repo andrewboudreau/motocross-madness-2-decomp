@@ -166,10 +166,10 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("TerrainQualitySliderBar", event->controlName) == 0) {
             int value = static_cast<UIScrollBar*>(event->control)->UnknownFunction475500();
             g_UnknownGlobal6887d8.terrainQuality = value;
-            g_TrackGame->mode.field_0x195c[1] = value;
-            g_TrackGame->mode.field_0x195c[3] = value;
-            g_TrackGame->mode.field_0x195c[2] = value;
-            g_TrackGame->mode.field_0x195c[4] = value;
+            g_TrackGame->mode.videoSettings[1] = value;
+            g_TrackGame->mode.videoSettings[3] = value;
+            g_TrackGame->mode.videoSettings[2] = value;
+            g_TrackGame->mode.videoSettings[4] = value;
         }
         break;
     case 16:
@@ -195,7 +195,7 @@ void OptGraphicsDlg::UnknownVirtualSlot31(int save)
 // 0x004b26c0
 void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    int* settings = g_TrackGame->mode.field_0x195c;
+    int* settings = g_TrackGame->mode.videoSettings;
     char key[1024];
     switch (event->kind) {
     case kDialogClose: {
@@ -1064,7 +1064,7 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                         game->ui->field_0x68[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve][band];
                 else
                     g_UnknownGlobal688808.eqBands[band] =
-                        game->mode.field_0x10f0[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve - 3][band];
+                        game->mode.customGarageCurves[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve - 3][band];
             }
             ShowCurve();
         }
@@ -1127,7 +1127,7 @@ void OptGarageDlg::EqSliderMoved(UIControl* slider)
                       __min(value, g_TrackGame->ui->field_0x324[bikeClass][band]));
     g_UnknownGlobal688808.eqBands[band] = level;
     int custom = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1) - 3;
-    g_TrackGame->mode.field_0x10f0[bikeClass][custom][band] = level;
+    g_TrackGame->mode.customGarageCurves[bikeClass][custom][band] = level;
     ShowCurve();
 }
 

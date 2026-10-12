@@ -336,13 +336,13 @@ public:
     int FindFileDirectory(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
-    char field_0x10[0x80];                    // player name (NetProcs.cpp opens sessions with it)
+    char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)
     int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
     int field_0x94;                           // "RadLODEasy" (SelectGamePicProcs.cpp)
     int field_0x98;                           // saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
-    int field_0x9c;                           // cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)
-    char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
-    int field_0x6a0;                          // a directory name pointer for TrackRecord.cpp 0x0051f2c0                          // EventManager 0x0045cb70 passes it to 0x00523a60
+    int showNewbieDialog;                 // +0x9c: cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)
+    char seriesDirectories[6][0x100];     // +0xa0: directories (TrackRecord.cpp 0x0051f0b0)
+    int currentSeriesDirectory;           // +0x6a0: a directory name pointer for TrackRecord.cpp 0x0051f2c0; EventManager 0x0045cb70 passes it to 0x00523a60
     int field_0x6a4;                          // cleared when a network race fails to load (dlgprocs.cpp LoadingDlg)
     int field_0x6a8;                          // visual cue and runway lights on (QuarryStuntEvent.cpp)
     int field_0x6ac;                          // instrument overlay on (QuarryStuntEvent.cpp)
@@ -359,9 +359,9 @@ public:
     unsigned char field_0x6d8[0x6dc - 0x6d8];
     int field_0x6dc;                          // most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
     unsigned char field_0x6e0[0x6f4 - 0x6e0];
-    char field_0x6f4[6][0x80];                // a track name per game type (SelectGamePicProcs.cpp)
-    int field_0x9f4[6];                       // a track index per game type (SelectGamePicProcs.cpp)
-    int field_0xa0c[5];                       // the garage curve chosen per bike class (OptionProcs.cpp's +0x360)
+    char trackNames[6][0x80];             // +0x6f4: a track name per game type (SelectGamePicProcs.cpp)
+    int trackIndices[6];                  // +0x9f4: a track index per game type (SelectGamePicProcs.cpp)
+    int garageCurveChoice[5];             // +0xa0c: the garage curve chosen per bike class (OptionProcs.cpp's +0x360)
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
     int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
     int field_0xa28;                          // sound on (racesnd.cpp)
@@ -384,17 +384,17 @@ public:
     int field_0xa8c;                          // toggled by bikerace.cpp slot 23 (key 0x22)
     int field_0xa90;                          // toggled by bikerace.cpp slot 23 (key 0x30)
     unsigned char field_0xa94[0xa98 - 0xa94];
-    UnknownTrackGameSessionList field_0xa98;  // enumerated sessions (NetProcs.cpp)
-    int field_0xfd4;                          // selected session (NetProcs.cpp)
+    UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
+    int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
     unsigned char field_0xfd8[0x5c];          // restored from +0x1034 when a replay is left (InGameProcs.cpp)
     unsigned char field_0x1034[0x5c];
     unsigned char field_0x1090[0x10ec - 0x1090];
     int field_0x10ec;                         // SelectGamePicProcs.cpp
-    int field_0x10f0[5][3][11];               // custom garage curves per bike class (OptionProcs.cpp)
-    int field_0x1384[6];                      // cleared with the names below (uiinfo.cpp 0x00523e50)
-    char field_0x139c[6][0x20];               // names read from a profile (uiinfo.cpp 0x00523e50)
+    int customGarageCurves[5][3][11];     // +0x10f0: custom garage curves per bike class (OptionProcs.cpp)
+    int bonusTrackUnlocked[6];            // +0x1384: a bonus track is listed only when set (SelectGamePicProcs.cpp)
+    char bonusTrackNames[6][0x20];        // +0x139c: each series' BonusTrack from PCSched.pb (LoadBonusTrackNames)
     char field_0x145c[10][0x80];              // string resources 0x1420, 0x1417..0x141f (uiinfo.cpp 0x00522840)
-    int field_0x195c[5];                      // video settings: forced video memory, then four detail levels (OptionProcs.cpp)
+    int videoSettings[5];                 // +0x195c: video settings: forced video memory, then four detail levels (OptionProcs.cpp)
     int field_0x1970;                         // bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
     UnknownTrackGameRacerChoice field_0x1974; // the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
     UnknownTrackGameRacerChoice field_0x1a3c;
@@ -407,25 +407,25 @@ public:
     int field_0x1be0;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x1be4[8];
     int field_0x23a4;                         // network game (racesnd.cpp 0x004e5780)
-    UnknownGuid field_0x23a8;                 // display adapter GUID (TrackGameMode 0x00522e20)
+    UnknownGuid displayAdapterGuid;       // +0x23a8: display adapter GUID (TrackGameMode 0x00522e20)
     int field_0x23b8;                         // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x23bc;                       // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x23c0;
     float field_0x23c4;
     float field_0x23c8;
-    int field_0x23cc;                         // 2 when the game runs without the CD (uiinfo.cpp 0x00523c90)
-    char field_0x23d0[0x104];                 // installed data directory (uiinfo.cpp 0x00523c90)
-    char field_0x24d4[0x104];                 // CD data directory (uiinfo.cpp 0x00523bf0)
-    char field_0x25d8[4];                     // CD drive root (uiinfo.cpp 0x00523bf0)
-    UnknownDriveList* field_0x25dc;           // created by the constructor (0x005221e7)
+    int installType;                      // +0x23cc: 2 when the game runs without the CD (uiinfo.cpp 0x00523c90)
+    char installDirectory[0x104];         // +0x23d0: installed data directory (uiinfo.cpp 0x00523c90)
+    char cdDataDirectory[0x104];          // +0x24d4: CD data directory (uiinfo.cpp 0x00523bf0)
+    char cdDriveRoot[4];                  // +0x25d8: CD drive root (uiinfo.cpp 0x00523bf0)
+    UnknownDriveList* driveList;          // +0x25dc: created by the constructor (0x005221e7)
     DirectoryList* field_0x25e0;              // scanned by TrackRecord.cpp 0x00520390
-    DirectoryList* field_0x25e4;              // track directories (SelectGamePicProcs.cpp)
+    DirectoryList* trackDirectoryList;    // +0x25e4: track directories (SelectGamePicProcs.cpp)
     CombinedDirectoryList* field_0x25e8;      // created by 0x00522d00
-    char field_0x25ec[0x104];                 // the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
+    char ghostFile[0x104];                // +0x25ec: the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
     int field_0x26f0;                         // mode 4 saves a ghost (EventManager 0x0045cdc0)
-    char field_0x26f4[0x104];                 // the replay file played (dlgprocs.cpp ReplayFilesDlg)
+    char replayFile[0x104];               // +0x26f4: the replay file played (dlgprocs.cpp ReplayFilesDlg)
     UnknownTrackGameModeSettings field_0x27f8; // current race settings
-    UnknownTrackGameModeSettings field_0x29e4; // saved copy, restored when a replay is left (InGameProcs.cpp)
+    UnknownTrackGameModeSettings savedSettings; // +0x29e4: saved copy, restored when a replay is left (InGameProcs.cpp)
     UnknownTrackGameModeSettings field_0x2bd0;
     int field_0x2dbc;                         // saves a replay (EventManager 0x0045cdc0)
 };

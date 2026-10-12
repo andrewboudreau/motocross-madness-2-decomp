@@ -37,14 +37,14 @@ struct UnknownDialogEvent {
         UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_TrackGame->ui->field_0x310[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->bandStep = g_TrackGame->ui->field_0x414[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_TrackGame->ui->field_0x428[bikeClass];      \
-        int curve = g_TrackGame->mode.field_0xa0c[bikeClass];                              \
+        int curve = g_TrackGame->mode.garageCurveChoice[bikeClass];                              \
         for (band = 0; band < 11; band++) {                                                           \
             if (curve < 3)                                                                            \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
                     g_TrackGame->ui->field_0x68[bikeClass][curve][band];                    \
             else                                                                                      \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
-                    g_TrackGame->mode.field_0x10f0[bikeClass][curve - 3][band];             \
+                    g_TrackGame->mode.customGarageCurves[bikeClass][curve - 3][band];             \
         }                                                                                             \
     }
 

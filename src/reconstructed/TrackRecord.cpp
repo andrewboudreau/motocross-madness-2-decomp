@@ -72,7 +72,7 @@ void UnknownTrackGameObject3400::Clear()
 int UnknownTrackGameObject3400::UnknownFunction51f0b0(short directory, const char* name)
 {
     char path[260];
-    sprintf(path, "%s\\%s", g_TrackGame->mode.field_0xa0[directory], name);
+    sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
     return Read(path);
 }
 
@@ -112,7 +112,7 @@ int UnknownTrackGameObject3400::Write(const char* path, int value)
 int UnknownTrackGameObject3400::UnknownFunction51f260(short directory, const char* name, int value)
 {
     char path[260];
-    sprintf(path, "%s\\%s", g_TrackGame->mode.field_0xa0[directory], name);
+    sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
     return Write(path, value);
 }
 
@@ -124,11 +124,11 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
     char file[260];
     for (int i = 0; i < 10; i++)
         field_0x14[i] = UnknownTrackRecord();
-    field_0xdc->UnknownFunction44a1d0((const char*)g_TrackGame->mode.field_0x6a0);
+    field_0xdc->UnknownFunction44a1d0((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(path, "*%s", field_0x04[field_0x00]);
     field_0xdc->UnknownFunction44a220(path, 1);
     field_0xdc->UnknownVirtualSlot1();
-    sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.field_0x6a0, name);
+    sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, name);
     sprintf(file, "%s%s", name, field_0x04[field_0x00]);
     if (field_0xdc->UnknownFunction44a910(file))
         Read(path);

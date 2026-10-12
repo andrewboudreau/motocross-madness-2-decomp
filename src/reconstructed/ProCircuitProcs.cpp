@@ -442,7 +442,7 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         } else if (_stricmp("Start", event->controlName) == 0 || _stricmp("Practice", event->controlName) == 0) {
             UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
             g_TrackGame->ui->HideScene();
-            g_TrackGame->mode.field_0x25ec[0] = 0;
+            g_TrackGame->mode.ghostFile[0] = 0;
             g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
             if (nextPage)
                 nextPage->UpdateBoundValues(1);

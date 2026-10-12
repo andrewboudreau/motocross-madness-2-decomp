@@ -774,8 +774,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
         field_0x1a8 = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
-        if (g_TrackGame->mode.field_0x25ec[0]) {
-            field_0x1a8->Load(g_TrackGame->mode.field_0x25ec, "VCRgtemp.dat");
+        if (g_TrackGame->mode.ghostFile[0]) {
+            field_0x1a8->Load(g_TrackGame->mode.ghostFile, "VCRgtemp.dat");
             ghostVcr = new(__FILE__, 0x2b9) KrustyVCR;
         }
         replayVcr = new(__FILE__, 0x2bd) KrustyVCR;
@@ -788,7 +788,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, "ui\\demo.rpl", field_0x1a8);
                 AppendChild(replayVcr, -1);
             } else {
-                replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, g_TrackGame->mode.field_0x26f4,
+                replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, g_TrackGame->mode.replayFile,
                                                    field_0x1a8);
                 AppendChild(replayVcr, -1);
             }

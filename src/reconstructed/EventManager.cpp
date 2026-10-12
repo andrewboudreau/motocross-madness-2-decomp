@@ -621,7 +621,7 @@ int EventManager::UnknownFunction45cb70() {
     podiumCamera = 0;
     podiumObject = 0;
     g_TrackGame->ui->UnknownFunction49b530();
-    g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.field_0x6a0,
+    g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                       g_TrackGame->mode.field_0x27f8.field_0x36, "env", path);
     g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {

@@ -358,7 +358,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         int videoMemory = ((PCRenderTarget*)field_0x18)->field_0x04->totalVideoMemory;
         sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)field_0x18)->field_0x04->driverGuidText);
         int megabytes = g_TrackGame->GetRegistryInt(key, -1);
-        forced = g_TrackGame->mode.field_0x195c[0];
+        forced = g_TrackGame->mode.videoSettings[0];
         if (megabytes != -1)
             videoMemory = megabytes << 20;
         PCRenderTarget* target = (PCRenderTarget*)field_0x18;
@@ -579,7 +579,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (!AppendChild((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
         if (eventFog)
-            eventFog->UnknownFunction462db0(g_TrackGame->mode.field_0x195c[4]);
+            eventFog->UnknownFunction462db0(g_TrackGame->mode.videoSettings[4]);
         AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(field_0x18), -1);
         if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->field_0xa4->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
@@ -605,7 +605,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
                      ->UnknownFunction5059d0(field_0x18, field_0x44, 1, &terrainTextures,
-                                             g_TrackGame->mode.field_0x195c[3], 0,
+                                             g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->field_0xa4->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
         sprintf(text, "Terrain not created.\n");
@@ -635,7 +635,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                          ->UnknownFunction4594d0(field_0x18, g_TrackGame->field_0x3c, eventTerrain, lightManager,
                                                  eventScene->field_0xa4, stream, 0x115c,
                                                  g_TrackGame->mode.field_0x27f8.field_0x10,
-                                                 g_TrackGame->mode.field_0x195c[1]);
+                                                 g_TrackGame->mode.videoSettings[1]);
         if (!ecoSystem)
             sprintf(text, "EcoSystem not created.\n");
     }
@@ -860,8 +860,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         g_TrackGame->field_0x3c->UnknownFunction5113d0();
     }
     g_MemTagStack->Pop(0);
-    eventScene->UnknownFunction4eff30(g_TrackGame->mode.field_0x195c[2]);
-    raceView->UnknownFunction423790(g_TrackGame->mode.field_0x195c[2]);
+    eventScene->UnknownFunction4eff30(g_TrackGame->mode.videoSettings[2]);
+    raceView->UnknownFunction423790(g_TrackGame->mode.videoSettings[2]);
     if (progress)
         progress(0);
     UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);
