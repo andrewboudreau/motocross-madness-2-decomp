@@ -421,7 +421,7 @@ public:
     unsigned char field_0x124[0x128 - 0x124];
     CarProceduralCollision* field_0x128;      // its +0x68 is set without tree collision (the loader)
     unsigned char field_0x12c[0x3bc - 0x12c];
-    UnknownBikeRaceModel* field_0x3bc;
+    UnknownBikeRaceModel* modelNode;          // +0x3bc
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
     int outOfRace;                            // +0x4a0 out of the race (0x0041f1d0 skips it)
     unsigned char field_0x4a4[0x5bc - 0x4a4];
@@ -647,10 +647,10 @@ struct UnknownBikeRaceCameraView {
     // previous racer's model again and hiding the new one's.
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
         if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
-            field_0x3b0->field_0x3bc->SetLowestLod(1);
+            field_0x3b0->modelNode->SetLowestLod(1);
             field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
-            if (field_0x3b0->field_0x3bc->currentDetailLevel == 0) {
-                field_0x3b0->field_0x3bc->SetLod(1);
+            if (field_0x3b0->modelNode->currentDetailLevel == 0) {
+                field_0x3b0->modelNode->SetLod(1);
             }
             if (field_0x3b0->riderCharacter->modelNode->currentDetailLevel == 0) {
                 field_0x3b0->riderCharacter->modelNode->SetLod(1);
@@ -667,7 +667,7 @@ struct UnknownBikeRaceCameraView {
         field_0x274 = 0;
         field_0x3b4 = racer;
         if (!racer->field_0x740->field_0x18c) {
-            racer->field_0x3bc->SetLowestLod(0);
+            racer->modelNode->SetLowestLod(0);
             field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
         }
         field_0x274 = 0;

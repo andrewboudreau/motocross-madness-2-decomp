@@ -659,7 +659,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         0x14);
                 name[0x14] = 0;
                 raceScene->ResolveSltPath(name);
-                model = localRacer->field_0x3bc;
+                model = localRacer->modelNode;
             } else if (field_0x0b0 == 0) {
                 strncpy(name, raceScene->staticModels->casters[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
@@ -2024,16 +2024,16 @@ int BikeRace::UnknownVirtualSlot14() {
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
     g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
-    localRacer->field_0x3bc->ApplyLodSettings(level);
+    localRacer->modelNode->ApplyLodSettings(level);
     localRacer->riderCharacter->modelNode->ApplyLodSettings(level);
     if (g_TrackGame->mode.raceSettings.raceMode != 4) {
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            aiRacers[i]->field_0x3bc->ApplyLodSettings(level);
+            aiRacers[i]->modelNode->ApplyLodSettings(level);
             aiRacers[i]->riderCharacter->modelNode->ApplyLodSettings(level);
         }
     }
     for (int j = 0; j < g_TrackGame->mode.raceSettings.field_0x35; j++) {
-        racerSlots[j]->field_0x3bc->ApplyLodSettings(level);
+        racerSlots[j]->modelNode->ApplyLodSettings(level);
         racerSlots[j]->riderCharacter->modelNode->ApplyLodSettings(level);
     }
 }

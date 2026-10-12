@@ -65,7 +65,7 @@ Vector3 VehicleCamera::UnknownFunction52bac0() {
 Vector3 VehicleCamera::TargetPoint() {
     Vector3 position;
     if (vehicleMode) {
-        vehicle->field_0x3bc->GetPositionIn(0, &position);
+        vehicle->modelNode->GetPositionIn(0, &position);
         return position;
     }
     if (field_0x384) {
@@ -280,7 +280,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
 // 0x0052cb80: the vehicle's position 0, raised by 5.
 Vector3 VehicleCamera::UnknownVirtualSlot50() {
     Vector3 position;
-    vehicle->field_0x3bc->GetPositionIn(0, &position);
+    vehicle->modelNode->GetPositionIn(0, &position);
     position.y += 5.0f;
     return position;
 }

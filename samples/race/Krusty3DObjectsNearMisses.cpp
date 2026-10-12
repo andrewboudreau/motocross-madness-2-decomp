@@ -106,7 +106,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
 
     if (currentKey == -1 || g_UnknownKrustyGame56e26c->field_0x3430)
         return 1;
-    if (field_0x2c->field_0x38->field_0x444 && elapsed > 2.0f) {
+    if (field_0x2c->field_0x38->crashState && elapsed > 2.0f) {
         HideDigits();
         return 1;
     }
@@ -116,7 +116,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             NextKey();
         float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
         Vector3 position;
-        field_0x2c->field_0x38->field_0x3bc->GetPosition(&position);
+        field_0x2c->field_0x38->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
         if (field_0x38 != g_UnknownKrustyGame56e26c->field_0x10->field_0x08 || field_0x38->field_0x16c != field_0x1dc ||

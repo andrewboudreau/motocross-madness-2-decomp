@@ -220,9 +220,9 @@ struct UnknownBonusRacerModel {
 
 struct UnknownBonusRacerState {
     unsigned char field_0x000[0x3bc];
-    UnknownBonusRacerPart* field_0x3bc;
+    UnknownBonusRacerPart* modelNode;         // +0x3bc
     unsigned char field_0x3c0[0x444 - 0x3c0];
-    int field_0x444;
+    int crashState;                           // +0x444
     unsigned char field_0x448[0x5f4 - 0x448];
     UnknownBonusRacerModel* field_0x5f4;
 };

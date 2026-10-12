@@ -41,7 +41,7 @@ struct UnknownCameraVehicle {
     unsigned char field_0x094[0xbc - 0x94];
     float field_0xbc;                    // VehicleCamera slot 41 (at least 0.01)
     unsigned char field_0x0c0[0x3bc - 0xc0];
-    UnknownVehiclePart* field_0x3bc;     // VehicleCamera slot 50
+    UnknownVehiclePart* modelNode;            // +0x3bc VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float field_0x434;                   // VehicleCamera slot 36 tests > 0.1
     float field_0x438;                   // KrustyBikeCamera slot 34 divisor
