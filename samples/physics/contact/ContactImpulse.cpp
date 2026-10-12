@@ -14,6 +14,15 @@
 //   outJ         receives the impulse magnitude j.
 // j = -(1 + e) * (dispA - dispB).n / (n.S + invMassA + invMassB) with
 // S = ((I^-1 (rA x n)) x rA) + ((I^-1 (rB x n)) x rB).  Names are tier 3.
+// Retail tail (decoded): J = *outJ * *n through Vec3(x,y,z) 0x404e60 into a named
+// copy, *velA += J * invMassA inline, then out-of-line operator*(Vec3,float)
+// 0x5015b0 and Vec3::operator+= 0x428060 for angVelA (and the B branch with
+// J = *n * -*outJ), so retail had spent its inline budget by then.  Tried
+// (strict 102 kept): the natural Math3D tail with named copies (aligned 277/328
+// insns but strict 74, frame 0x48 vs retail 0x60, VC6 inlines the operators
+// retail called); a declared-only ContactScale bound to 0x5015b0 (strict 93,
+// frame 0x54: the freed budget inlines J/velA/uA+uB); ContactScaleEach for angA
+// (39); ContactVec3-returning ContactSum/ContactTimes/ContactScaled helpers (96).
 void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeObject* nodeA,
                          const Vec3* dispA, const Vec3* rA, const Vec3* invInertiaA,
                          Vec3* angVelA, Vec3* velA, float invMassB, SoultreeObject* nodeB,
