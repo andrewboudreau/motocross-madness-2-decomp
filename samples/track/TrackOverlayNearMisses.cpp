@@ -491,10 +491,10 @@ void RadarOverlay::DrawTrackOutline(int mode)
         int startY;
         float rim[2];
         int outside = WorldToMap(point, &startX, &startY, &rim[0], &rim[1]);
-        field_0x1b8.sx = (float)startX;
-        field_0x1b8.sy = (float)startY;
-        field_0x1b8.color = 0xedea5e;
-        field_0x1d8.color = 0xedea5e;
+        lineStart.sx = (float)startX;
+        lineStart.sy = (float)startY;
+        lineStart.color = 0xedea5e;
+        lineEnd.color = 0xedea5e;
         int x = startX;
         int y = startY;
         TrackSegment* segment = first->field_0x2c;
@@ -510,8 +510,8 @@ void RadarOverlay::DrawTrackOutline(int mode)
             outside = WorldToMap(point, &x, &y, &rim[0], &rim[1]);
             if (outside) {
                 if (wasOutside) {
-                    field_0x1b8.sx = (float)x;
-                    field_0x1b8.sy = (float)y;
+                    lineStart.sx = (float)x;
+                    lineStart.sy = (float)y;
                 } else {
                     float to[2];
                     float circle[3];
@@ -522,10 +522,10 @@ void RadarOverlay::DrawTrackOutline(int mode)
                     circle[0] = (float)mapCenterX;
                     circle[1] = (float)mapCenterY;
                     if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
-                        field_0x1d8.sx = hit[0];
-                        field_0x1d8.sy = hit[1];
-                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-                        field_0x1b8 = field_0x1d8;
+                        lineEnd.sx = hit[0];
+                        lineEnd.sy = hit[1];
+                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                        lineStart = lineEnd;
                     }
                 }
             } else if (wasOutside) {
@@ -538,23 +538,23 @@ void RadarOverlay::DrawTrackOutline(int mode)
                 circle[0] = (float)mapCenterX;
                 circle[1] = (float)mapCenterY;
                 if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
-                    field_0x1b8.sy = hit[1];
-                    field_0x1d8.sy = (float)y;
-                    field_0x1d8.sx = (float)x;
-                    field_0x1b8.sx = hit[0];
-                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-                    field_0x1b8 = field_0x1d8;
+                    lineStart.sy = hit[1];
+                    lineEnd.sy = (float)y;
+                    lineEnd.sx = (float)x;
+                    lineStart.sx = hit[0];
+                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                    lineStart = lineEnd;
                 }
             } else {
-                field_0x1d8.sx = (float)x;
-                field_0x1d8.sy = (float)y;
-                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-                field_0x1b8 = field_0x1d8;
+                lineEnd.sx = (float)x;
+                lineEnd.sy = (float)y;
+                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                lineStart = lineEnd;
             }
             segment = segment->field_0x2c;
             if (segment == node->field_0x08) {
-                field_0x1d8.sx = (float)startX;
-                field_0x1d8.sy = (float)startY;
+                lineEnd.sx = (float)startX;
+                lineEnd.sy = (float)startY;
                 break;
             }
         } while (segment);
@@ -685,18 +685,18 @@ void RadarOverlay::DrawRacers(int mode)
     Vector3 point;
     for (i = 0; i < racerCount; i++) {
         if (racers[i] == radarCamera->followedRacer) {
-            field_0x17c = racers[i]->field_0x00c;
-            field_0x188 = -racers[i]->field_0x050;
+            mapOrigin = racers[i]->field_0x00c;
+            mapAngle = -racers[i]->field_0x050;
             if (racers[i]->field_0x444)
-                field_0x188 = field_0x18c;
+                mapAngle = heldMapAngle;
             else
-                field_0x18c = field_0x188;
+                heldMapAngle = mapAngle;
             field_0x170 = i;
             break;
         }
     }
-    field_0x190 = cos(field_0x188);
-    field_0x194 = sin(field_0x188);
+    mapAngleCos = cos(mapAngle);
+    mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
         if (i != field_0x170 && racers[i]->field_0x25_bit0) {
             outside = WorldToMap(racers[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
@@ -731,25 +731,25 @@ void RadarOverlay::DrawRacers(int mode)
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
                     g_TrackGame->mode.field_0x27f8.field_0x04 == 2)
                     continue;
-                field_0x1b8.color = 0x28aa28;
-                field_0x1d8.color = 0x28aa28;
-                field_0x1b8.sx = rim.x;
-                field_0x1b8.sy = rim.y;
+                lineStart.color = 0x28aa28;
+                lineEnd.color = 0x28aa28;
+                lineStart.sx = rim.x;
+                lineStart.sy = rim.y;
             } else {
-                field_0x1b8.color = 0x50e650;
-                field_0x1d8.color = 0x50e650;
-                field_0x1b8.sx = (float)x;
-                field_0x1b8.sy = (float)y;
+                lineStart.color = 0x50e650;
+                lineEnd.color = 0x50e650;
+                lineStart.sx = (float)x;
+                lineStart.sy = (float)y;
             }
-            field_0x1d8 = field_0x1b8;
-            field_0x1d8.sx += 3.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-            field_0x1b8.sy += 1.0f;
-            field_0x1d8.sy += 1.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-            field_0x1b8.sy -= 2.0f;
-            field_0x1d8.sy -= 2.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
+            lineEnd = lineStart;
+            lineEnd.sx += 3.0f;
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            lineStart.sy += 1.0f;
+            lineEnd.sy += 1.0f;
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            lineStart.sy -= 2.0f;
+            lineEnd.sy -= 2.0f;
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
         } else {
             point.x = -1.0f;
             point.y = -1.0f;

@@ -294,18 +294,18 @@ public:
     int field_0x170;
     int field_0x174;
     int largeMap;                             // uses the 256-pixel map
-    Vector3 field_0x17c;
-    float field_0x188;
-    float field_0x18c;
-    float field_0x190;
-    float field_0x194;
+    Vector3 mapOrigin;                        // +0x17c
+    float mapAngle;                           // +0x188
+    float heldMapAngle;                       // +0x18c
+    float mapAngleCos;                        // +0x190
+    float mapAngleSin;                        // +0x194
     float mapScale;                           // map scale
     float mapRadius;                          // map radius, pixels
     int mapCenterX;                           // map centre
     int mapCenterY;
     UnknownOverlayRect frameRateRect;         // frame-rate text rectangle
-    UnknownOverlayVertex field_0x1b8;
-    UnknownOverlayVertex field_0x1d8;
+    UnknownOverlayVertex lineStart;           // +0x1b8
+    UnknownOverlayVertex lineEnd;             // +0x1d8
     UnknownOverlayRect mapRect;               // map rectangle
 };
 

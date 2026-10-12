@@ -1002,18 +1002,18 @@ RadarOverlay::RadarOverlay(int flags) : Overlay(flags, 1)
     field_0x16c = 0;
     field_0x174 = 0;
     largeMap = 0;
-    field_0x17c = s_UnknownVector68a410;
-    field_0x1b8.sz = 0.00001f;
-    field_0x1b8.rhw = 1.0f;
-    field_0x1b8.color = 0xedea5e;
-    field_0x1b8.specular = 0;
-    field_0x1b8.tu = 0.0f;
-    field_0x1b8.tv = 0.0f;
-    field_0x1d8 = field_0x1b8;
-    field_0x188 = 0.0f;
-    field_0x18c = 0.0f;
-    field_0x190 = 0.0f;
-    field_0x194 = 0.0f;
+    mapOrigin = s_UnknownVector68a410;
+    lineStart.sz = 0.00001f;
+    lineStart.rhw = 1.0f;
+    lineStart.color = 0xedea5e;
+    lineStart.specular = 0;
+    lineStart.tu = 0.0f;
+    lineStart.tv = 0.0f;
+    lineEnd = lineStart;
+    mapAngle = 0.0f;
+    heldMapAngle = 0.0f;
+    mapAngleCos = 0.0f;
+    mapAngleSin = 0.0f;
     mapScale = 0.0f;
     mapRadius = 0.0f;
     mapCenterX = 0;
@@ -1210,10 +1210,10 @@ void RadarOverlay::DrawFrameRate()
 // 0x0051c360
 int RadarOverlay::WorldToMap(Vector3 point, int* x, int* y, float* rimX, float* rimY)
 {
-    float dx = point.x - field_0x17c.x;
-    float dz = point.z - field_0x17c.z;
-    *x = (int)((dz * field_0x194 + dx * field_0x190) * mapScale);
-    *y = -(int)((dz * field_0x190 - dx * field_0x194) * mapScale);
+    float dx = point.x - mapOrigin.x;
+    float dz = point.z - mapOrigin.z;
+    *x = (int)((dz * mapAngleSin + dx * mapAngleCos) * mapScale);
+    *y = -(int)((dz * mapAngleCos - dx * mapAngleSin) * mapScale);
     float angle = (float)atan2((float)*y, (float)*x);
     float distance = UnknownFunction460b50((float)(*x * *x + *y * *y));
     int outside = 0;
@@ -1282,19 +1282,19 @@ void RadarOverlay::DrawGates()
         right.z *= width;
         right += RadarRace()->gates[i].position;
         if (i == RadarRace()->currentGate) {
-            field_0x1b8.color = 0xffff5e;
-            field_0x1d8.color = 0xffff5e;
+            lineStart.color = 0xffff5e;
+            lineEnd.color = 0xffff5e;
         } else {
-            field_0x1b8.color = 0xffffff;
-            field_0x1d8.color = 0xffffff;
+            lineStart.color = 0xffffff;
+            lineEnd.color = 0xffffff;
         }
         WorldToMap(left, &x, &y, &rim.x, &rim.y);
-        field_0x1b8.sx = (float)x;
-        field_0x1b8.sy = (float)y;
+        lineStart.sx = (float)x;
+        lineStart.sy = (float)y;
         WorldToMap(right, &x, &y, &rim.x, &rim.y);
-        field_0x1d8.sx = (float)x;
-        field_0x1d8.sy = (float)y;
-        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
+        lineEnd.sx = (float)x;
+        lineEnd.sy = (float)y;
+        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
     }
 }
 

@@ -211,3 +211,10 @@ DrawNameTag), `racerCount` (+0x198, the `racers` fill count) and
 `leftPanel`/`rightPanel` (+0x1c8/+0x1cc, the overlays attached left and
 right of `chatRect` when the screen is wider than 512); NameOverlay
 `drawWidth` (+0x124, the width of its screen rectangle).
+RadarOverlay (from DrawRacers, `0x0051bed0`, and WorldToMap): `mapOrigin`
+(+0x17c, the followed racer's position), `mapAngle` (+0x188, its negated
+heading), `heldMapAngle` (+0x18c, the angle kept while the racer's +0x444 is
+set), `mapAngleCos`/`mapAngleSin` (+0x190/+0x194) and `lineStart`/`lineEnd`
+(+0x1b8/+0x1d8, the two-vertex line strip DrawGates and DrawTrackOutline
+submit). +0x170 (the followed racer's index) keeps its offset name because
+QuarryStuntEvent.cpp reads it.
