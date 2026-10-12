@@ -101,11 +101,21 @@
   {
     "class": "CharacterPose",
     "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??0CharacterPose@@QAE@XZ",
+    "target_va": "0x004a8930",
+    "target_size": 3,
+    "expect": "exact",
+    "notes": "CharacterPose's compiler-generated default constructor (`mov eax, ecx; ret`, Vec3 members with an empty user constructor), emitted for slot 7's pose temporaries, which retail calls directly; stays with slot 7 in the sample because the canonical unit has no pose locals",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "CharacterPose",
+    "source": "Motnctrl.cpp",
     "candidate_symbol_contains": "?PoseRotation@@",
     "target_va": "0x004a7fd0",
     "target_size": 1121,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. ~56% (was ~27% before UnitVector named its inverse length): same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts",
+    "notes": "cdecl; slot 7 helper. 1097/1121 strict (was 660): UnitVector takes the squared length through the nested PoseLengthSquared inline and scales in an else block, which spends VC6's inline budget like retail (axisY path: DotProduct called, operator* expanded with the constructor called; axisZ path: everything called; identity axis constructor called). Only the axisZ cross product's operand loads differ (b first here, a first in retail); see Motnctrl.cpp for the forms tried",
     "bindings": "Motnctrl.bindings.json"
   },
   {
@@ -125,6 +135,7 @@
     "target_va": "0x004a70c0",
     "target_size": 3327,
     "expect": "partial",
-    "notes": "ret 0xc; slot 7, playback of a non-looping motion with interpolation/extrapolation and blending. 3330 vs 3327 bytes with the same call sequence (AdvanceClamped x2, the operator COMDATs, PoseRotation/RotatePose x2, InterpolatePose x3, BlendToMotion) and the retail smoothstep/clamp shape, but VC6 calls CharacterPose::CharacterPose (0x4a8930) three times then twice where retail calls it twice then four times, inlines the extrapolation operators retail calls (retail only inlines operator- there and calls Vec3::Vec3), and allocates the frame differently (0x284 vs 0x2dc); every byte after the first expansion shifts; 4.79% relocation-masked"
+    "notes": "ret 0xc; slot 7, playback of a non-looping motion with interpolation/extrapolation and blending. 3330 vs 3327 bytes with the same call sequence (AdvanceClamped x2, the operator COMDATs, PoseRotation/RotatePose x2, InterpolatePose x3, BlendToMotion) and the retail smoothstep/clamp shape, but VC6 calls CharacterPose::CharacterPose (0x4a8930) three times then twice where retail calls it twice then four times, inlines the extrapolation operators retail calls (retail only inlines operator- there and calls Vec3::Vec3), and allocates the frame differently (0x284 vs 0x2dc); every byte after the first expansion shifts; 152/3330 strict once bound to retail (AdvanceClamped, the pose helpers and BlendToMotion at their own addresses, CharacterPose::CharacterPose at 0x4a8930)",
+    "bindings": "Motnctrl.bindings.json"
   }
 ]

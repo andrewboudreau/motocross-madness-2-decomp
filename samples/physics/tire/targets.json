@@ -46,7 +46,7 @@
     "target_va": "0x00515b50",
     "target_size": 316,
     "expect": "partial",
-    "notes": "305/316 strict. The tangent dot is TireDotInline (z + (x + y), which VC6 emits y, x, z like retail); the roll term is a named local so VC6 neither factors frictionCoefficient out of the sum nor hoists the side term above it. Remaining: in the side term VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2); fmul [ecx+0x74]`), and one frictionForce copy store is scheduled earlier. No gain from: all 24 operand orders of the side product with either negation, parenthesised groupings (these hoist the side term, 193-210), a local s or chained `s = tangentSin = sqrt(...)`, a coefficient local, a named sum, a named side term, the 12 dot orders.",
+    "notes": "312/316 strict. The tangent dot is TireDotInline (z + (x + y), which VC6 emits y, x, z like retail); the roll term is a named local so VC6 neither factors frictionCoefficient out of the sum nor hoists the side term above it. The force is scaled through TireScaled (products before stores), which schedules the frictionForce copy stores like retail. Remaining: in the side term VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2); fmul [ecx+0x74]`). No gain from: all 24 operand orders of the side product with either negation, parenthesised groupings (these hoist the side term, 193-210), a local s or chained `s = tangentSin = sqrt(...)`, a coefficient local, a named sum, a named side term, the 12 dot orders, a coefficient local before the dot or after the sqrt, an inline friction-term helper for one or both terms.",
     "bindings": "Tire.bindings.json"
   },
   {
@@ -75,7 +75,7 @@
     "target_va": "0x00515880",
     "target_size": 703,
     "expect": "partial",
-    "notes": "522/703 strict (tier 3 name): rotation-frame builder. y is normalised through TireNormalizeY (inline TireDotInline dot, `return v` when |v|^2 is exactly 1, out-of-line CollisionVec3 ctor), which gives retail's cached y.x/y.y/y.z in ecx/edx/esi (push esi) and the redundant `y = y` stores; z uses TireNormalizeZ. Remaining: retail spills row 0's z through a stack temp and stores x/y last (VC6 here stores all three directly; 6 row-0 store orders x 2 placements and inline row-0 expressions give 505-529, natural order kept), the keepZ test is scheduled later, and c.y loads z.z first (operand order of the c, r crosses written either way compiles the same).",
+    "notes": "622/703 strict (tier 3 name): rotation-frame builder. y is normalised through TireNormalizeY (inline TireDotInline dot, `return v` when |v|^2 is exactly 1, out-of-line CollisionVec3 ctor), which gives retail's cached y.x/y.y/y.z in ecx/edx/esi (push esi) and the redundant `y = y` stores; z uses TireNormalizeZ. Row 0 is built in a CollisionVec3 local `t` and then stored (622; separate float locals or inline expressions stored directly give 505-529): VC6 then spills t.z through the stack and stores x/y last like retail; a helper returning the row gives the same. Remaining: the keepZ test is scheduled earlier, c.y loads y.x before z.z (retail z.z first; operand order of the c, r crosses written either way, a z.z local, `a`/`b` reference aliases or an inline cross helper give 166-622), and one y-row store pair is scheduled earlier. No gain from products-first locals in the c or r crosses, y declared before z (132), or other row orders (527-623; 623 only with m[3] stored after row 2, not kept). Also tried: all 64 operand orders of the c products (only c.x's matter, 618-622), a local copy of one component of y or z in c (620-624; 624 with a z.y copy for c.z leaves c.y unchanged, not kept), and c = CollisionCross(y, z) (616).",
     "bindings": "Tire.bindings.json"
   },
   {
@@ -85,7 +85,7 @@
     "target_va": "0x005135f0",
     "target_size": 1664,
     "expect": "partial",
-    "notes": "1555/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch. Left: scheduling of the lever store, the slip-vector scale operand order, two struct-copy store pairs and one dot-term operand order (see Tire.cpp).",
+    "notes": "1582/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch; the slip vector is built through TireScaleCopy/TireSum and normalised through TireScaled, which give retail's scale operand order and copy-store schedule. Left: scheduling of the lever store, one TireDot argument push and one dot-term operand order (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {
@@ -95,7 +95,8 @@
     "target_va": "0x00514550",
     "target_size": 4258,
     "expect": "partial",
-    "notes": "5.2% (tier 3 name): wheel ground probe; all 3 world probes (0x00507c10), owner/non-owner/angle==pi/2 branches, surface-record lookup, bounds record path, TireBuildFrame + 0x435830/0x438e70 calls and final stores present; candidate 3977 B vs 4258. First divergence is in the prologue: retail frame 0xc0 (ours 0xbc) and different local-vector placement/temps; retail re-derives owner-node loads and the normalise fall-back in separate inlined copies (TireNormalizeOr is a single shared helper here)"
+    "notes": "175/4438 strict (tier 3 name): wheel ground probe; all 3 world probes (0x00507c10), owner/non-owner/angle==pi/2 branches, surface-record lookup, bounds record path, TireBuildFrame + 0x435830/0x438e70 calls and final stores present; candidate 4438 B vs 4258. First divergence is in the prologue: retail frame 0xc0 (ours 0xbc) and different local-vector placement/temps; retail re-derives owner-node loads and the normalise fall-back in separate inlined copies (TireNormalizeOr is a single shared helper here). Scores strictly with the documented retail call targets bound (0x4fd5c0 direction transform, 0x53304c blend, 0x42a510/0x42a580 matrix transforms)",
+    "bindings": "Tire.bindings.json"
   },
   {
     "class": "Tire",
@@ -264,7 +265,7 @@
     "target_va": "0x00514170",
     "target_size": 607,
     "expect": "partial",
-    "notes": "560/607 strict: the clamp and moment match; the first `dir` component's x87 operand order and three scheduling pairs differ (see Tire.cpp).",
+    "notes": "565/607 strict: the clamp, the scaled push and the moment match; the push.y copy and two cross-product fsubp/mov pairs are scheduled differently (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {
@@ -273,8 +274,8 @@
     "candidate_symbol_contains": "Fn_00515c90@Tire",
     "target_va": "0x00515c90",
     "target_size": 292,
-    "expect": "partial",
-    "notes": "287/292 strict: normalised cross product with fallback; only the x scale loads the scalar first (see Tire.cpp).",
+    "expect": "exact",
+    "notes": "Normalised cross product with fallback; strict exact once the x scale reads its component through a local stored after the FastInvSqrt call (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   }
 ]

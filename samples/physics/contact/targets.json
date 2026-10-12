@@ -16,7 +16,8 @@
     "target_va": "0x005004a0",
     "target_size": 1062,
     "expect": "partial",
-    "notes": "Impulse solver, semantics fully decoded (tier 3). 983 vs 1062 bytes, ~11% match. Causes: x87 stack-slot allocation/colouring order, cross-product y/z load order, retail copies out-of-line ctor results through extra locals (naming them changed frame 0x60 to 0x48)."
+    "notes": "Impulse solver, semantics fully decoded (tier 3). 983 vs 1062 bytes, ~11% match. Causes: x87 stack-slot allocation/colouring order, cross-product y/z load order, retail copies out-of-line ctor results through extra locals (naming them changed frame 0x60 to 0x48). 102/1062 strict once the direction transforms, the Vec3 constructor and operator+= bind to the retail calls (0x4fd710, 0x4fd5c0, 0x404e60, 0x428060).",
+    "bindings": "ContactImpulse.bindings.json"
   },
   {
     "class": "ObjectPlacement",

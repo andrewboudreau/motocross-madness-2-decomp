@@ -52,7 +52,6 @@ int DirtChunkParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 
 // 0x004b8f40.  Writes the particles straight into the manager's table: dt (plus the carried
 // remainder) times the rate is the number of particles, spread along the segment moved this tick.
-// 0..33 dead initialised int locals at the top change nothing (947/958 masked).
 int DirtChunkParticleEmitter::GameObjectVirtualSlot10(float dt)
 {
     if (g_gameContext->frozen == 0) {
@@ -73,9 +72,7 @@ int DirtChunkParticleEmitter::GameObjectVirtualSlot10(float dt)
         float inv = 1.0f / n;
         ParticleVec3 step = d * inv;
         ParticleVec3 velStep = (dt * launchVelocity) * inv;
-        // Near miss: the scalar-first form below fixes velStep's first component; gravStep.x in the
-        // velocity product still loads as `fld st(0); fmul [esp+N]` (retail `fld [esp+N]; fmul st(1)`).
-        // Forms tried are listed in targets.json.
+        // The scalar-first form below gives velStep's first component retail's operand order.
         ParticleVec3 gravStep = inv * (dt * manager->gravity);
         int i;
         for (i = 0; (float)i < n; i++) {
@@ -85,7 +82,11 @@ int DirtChunkParticleEmitter::GameObjectVirtualSlot10(float dt)
             manager->particles[manager->activeCount]->frame = field_0x6c;
             manager->particles[manager->activeCount]->size = randomTable[field_0x480];
             manager->particles[manager->activeCount]->lifetime = field_0x34;
-            manager->particles[manager->activeCount]->velocity = launchVelocity + (n - (float)i) * gravStep;
+            // Copying the step inside the loop makes its components newer leaves than the
+            // (n - i) scale, so the x product loads the component first like retail
+            // (`fld [esp+N]; fmul st(1)`); using gravStep directly gives `fld st(0); fmul`.
+            ParticleVec3 g(gravStep.x, gravStep.y, gravStep.z);
+            manager->particles[manager->activeCount]->velocity = launchVelocity + (n - (float)i) * g;
             manager->particles[manager->activeCount]->velocity.x = randomVectors[field_0x604].x * manager->particles[manager->activeCount]->velocity.x;
             manager->particles[manager->activeCount]->velocity.y = randomVectors[field_0x604].y * manager->particles[manager->activeCount]->velocity.y;
             manager->particles[manager->activeCount]->velocity.z = randomVectors[field_0x604].z * manager->particles[manager->activeCount]->velocity.z;

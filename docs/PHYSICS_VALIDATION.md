@@ -679,9 +679,9 @@ Tire sample's exact targets:
   (`0x00515740..0x0051587b`; the former `g_TireZeroVec3`/`g_TireVec3_68a3c0`/
   `g_TireVec3_68a3f0` are its zero, z and y vectors), CollisionPoint's inline
   destructor `0x00515b40`, the roll helpers `0x00513560`/`0x005135b0`, the
-  attachment pose `0x00515660` and the roll update `0x005143d0`. Near misses in
-  the same file: `0x00513f90` (470/479, stack slots), `0x00514170` and
-  `0x00515c90` (x87 operand order).
+  attachment pose `0x00515660`, the roll update `0x005143d0` and the normalised
+  cross product `0x00515c90`. Near misses in the same file: `0x00513f90`
+  (470/479, stack slots) and `0x00514170` (x87 operand order).
 
 Check:
 

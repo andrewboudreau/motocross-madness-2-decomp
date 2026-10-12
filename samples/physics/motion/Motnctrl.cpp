@@ -107,13 +107,24 @@ inline void ClampFloat(float low, float high, float* value)
 // times; VC6 calls the out-of-line copies of DotProduct (0x0040ae30), operator* (0x005015b0) and
 // Vec3::Vec3 (0x00404e60) at some of the sites.
 // Retail stores the inverse length to a stack temp before scaling; the named local reproduces it.
+// The squared length through its own inline (DotProduct nested one level deeper) and the scaling in
+// an else block set VC6's inline budget like retail in 0x004a7fd0: in the axisY path DotProduct is
+// called and operator* expanded (calling the constructor) for the first two unit vectors, the outer
+// DotProduct and ClampFloat are expanded; in the axisZ path all of them are called.
+inline float PoseLengthSquared(const Vec3& v)
+{
+    return DotProduct(v, v);
+}
+
 inline Vec3 UnitVector(const Vec3& v)
 {
-    float lengthSquared = DotProduct(v, v);
+    float lengthSquared = PoseLengthSquared(v);
     if (lengthSquared == 1.0f)
         return v;
-    float inverseLength = FastInvSqrt(lengthSquared);
-    return v * inverseLength;
+    else {
+        float inverseLength = FastInvSqrt(lengthSquared);
+        return v * inverseLength;
+    }
 }
 
 // 0x0042de90 (BoundingBoxTreeBuild.cpp): rotation of 'angle' radians about (x, y, z), row-vector
@@ -128,7 +139,8 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // Swept (tools/sweep_variants.py): every declaration order of pose/rotation/position/axisX/axisZ
 // (hoisted or not) leaves 456 masked; normalising axisZ first gives 448; initialising from
 // Vec3Normalize(src->...), via copies, named or scoped temporaries, and `Vec3 position =
-// src->position` are all worse (55..193).
+// src->position` are all worse (55..193). The position block written as chained
+// assignments or interleaved per component gives 205; storing pose._44 before the position copies leaves 476.
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;
@@ -178,6 +190,14 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // 0x004a7fd0 (cdecl, called twice by slot 7): the rotation taking pose a's axes to pose b's, as
 // an axis and an angle.  It rotates axisY onto axisY when they differ, otherwise axisZ onto axisZ;
 // identical axes give the axis (0, 0, 1) and the angle 0.
+// Near miss (1097/1121): the call sequence and frame match; only the axisZ cross product (laid out
+// first) loads b's component first in each product where retail loads a's (the axisY one matches).
+// No gain from a local cross helper with or without parentheses or with swapped operands, a named
+// cross local, swapped comparison operands, or swapped DotProduct arguments (registers swap, 1099
+// strict but esi/edi exchanged, not kept).  Also no gain: a const Vec3& alias of a->axisZ or
+// b->axisZ (in the cross or in the test, 1069..1097), a Vec3 copy (188..198), a pointer alias
+// (1097), an inline PoseAxisDiffers test by reference or by value (23..130), or reordered or
+// swapped component comparisons in the axisZ test (1004..1006).
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {
@@ -203,6 +223,12 @@ void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 // clamped to [0, 1]: the axes and the position are interpolated linearly (the axes renormalised),
 // then axisY is made orthogonal to axisZ again.  The three weighted sums at the end are
 // computed into a temporary and never used (retail calls operator* and operator+ for them).
+// Near miss (245/1205): VC6 inlines the first CrossProduct where retail calls 0x00515600 twice.
+// CrossProductCall for both gives retail's structure up to the unused sums (aligned 336/394
+// instructions, strict 114, frame 0x54 vs 0x58): VC6 then inlines the whole first unused sum,
+// where retail inlines only `b->axisZ * t` and calls operator* and operator+, and retail keeps
+// &a->axisZ in ebp (spilled) with a in esi and b in ebx.  A PoseLerp inline for the three
+// interpolations (84..115) and a PoseBlend inline for the unused sums (left out of line) are worse.
 void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     ClampFloat(0.0f, 1.0f, &t);

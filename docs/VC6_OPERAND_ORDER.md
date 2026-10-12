@@ -87,6 +87,35 @@ of a call (in `st(0)`):
   last product of the group consumes the scalar (`fmul v.z`).
 - A scalar stored to memory first (`fillf(&s)`) is the newest leaf and loads
   first (`fld s; fmul v.x`) for all three components.
+- The converse for one component: copying it into a local after the call
+  (`float nx = n.x; n.x = nx * inv;`) makes that local the newer leaf, so it
+  loads first (`fld nx; fmul st(1)`) while the other components keep the
+  scalar-first form. This made Tire `0x00515c90` exact; the spellings
+  `n.x * inv`, `inv * n.x`, `c.x * inv` and inline float helpers did not.
+  In a loop the same works with a vector copy made in the body after the
+  scalar's leaf (`ParticleVec3 g(step.x, step.y, step.z);` before
+  `v + (n - i) * g`): the DirtChunk, DirtSpray and Spark emitters' slot 10
+  (`0x004b8f40`, `0x004b9460`, `0x004b99a0`) became exact with it.
+  The copies work inside an inline helper too: Tire's UpdateContactPatch
+  (`0x005135f0`) scales its slip vector through a helper that copies `v.x`
+  and `v.y` into locals (`fld mem; fmul st(1)` for both, `fmul v.z` last);
+  copying all three components or none gives the scalar-first form.
+  A freshly computed scalar is the newest leaf and is duplicated for the first
+  product (`fld st(0); fmul v.x`): Tire's ApplyDrive (`0x00514170`, 560 to
+  565) writes `r.x = a / b * v.x;` and then multiplies copies of `v.y` and
+  `v.z` by a named `a / b` (`fld mem; fmul st(1)`), as retail does; the
+  quotient as an expression in all three products gives the duplicate form
+  for all of them.
+- Storing the result vector: when an inline helper writes `r.x = v.x * s;`
+  .. and returns `r` into a member, VC6 stores x and y before spilling the z
+  product (`mov [edx+4]; fstp tmp`). Computing the three products into
+  locals first and then filling `r` gives retail's order (`fstp tmp; mov
+  [edx+4]`): Tire slot 1 (`0x00515b50`, 305 to 312) and UpdateContactPatch
+  (with the same form for `a + b`). The converse holds for products stored
+  straight into memory: TireBuildFrame (`0x00515880`, 522 to 622) wrote row
+  0 as three float locals stored into the matrix; computing them into a
+  CollisionVec3 local first makes VC6 spill the z product through the stack
+  and store x and y last, as retail does.
 
 So "a scalar is loaded first when it is a local of the inlined helper"
 (docs/PHYSICS_VALIDATION.md) is the same rule: the helper's `k` is the newest

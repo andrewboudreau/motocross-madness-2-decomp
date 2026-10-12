@@ -852,7 +852,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
 // +0x5cd and +0x3951; an earlier 0.1f was a semantic slip).
 int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, float* outSpeed,
                           Vec3* center, Vec3* forward, Vec3* side, float maxTime, float dt,
-                          Terrain* terrain, char* outAirborne, float* outImpact, CollisionObject* probe,
+                          Terrain* terrain, unsigned char* outAirborne, float* outImpact, CollisionObject* probe,
                           float* frontSusp, float* rearSusp, int* outFrontContact, int* outRearContact,
                           UnknownBikeAIPath* path, float* speedTable, float sideOffset, int nearOnly)
 {
@@ -1381,7 +1381,7 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
     *frontVel = vF;
     *rearVel = vR;
     if (outAirborne)
-        *outAirborne = (char)airborne;
+        *outAirborne = (unsigned char)airborne;
     if (!frontContact && !rearContact) {
         frontVel->x = outVel->x;
         frontVel->z = outVel->z;
@@ -1435,7 +1435,9 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
 // distance test right after the track loop and jumps back to it from the single-point and
 // no-track paths (the candidate places it after them); the random free-roam target scales
 // through a stored temporary.  The trick search needs the `for` form (a do/while is
-// rotated with the first division folded to * 0.2).
+// rotated with the first division folded to * 0.2).  Declaring difficulty with the
+// other locals, or kind as well, or splitting kind's declaration leaves edi and 394
+// strict; reading difficulty after kind gives 237.
 // 0x00572988: look-ahead distance of the race-kind 2/3 path samples (100.0f).
 extern float g_BikeAILookAhead_00572988;
 
@@ -1453,14 +1455,18 @@ inline float BikeAIFilterStep(UnknownBikeAIFilter* f, float dt, float target)
     return f->value;
 }
 
-// The same step on a Vehicle smoother (Vehicle.cpp's VehSmooth).
-inline void BikeAISmooth(VehicleSmoother* s, float dt, float target)
+// The same step on a Vehicle smoother (Vehicle.cpp's VehSmooth), returning the new
+// value. Retail reads the time constant before the step is clamped and stores the
+// result straight from the smoother.
+inline float BikeAISmoothValue(VehicleSmoother* s, float dt, float target)
 {
+    float timeConstant = s->timeConstant;
     float step = dt;
-    if (!(step < s->timeConstant))
-        step = s->timeConstant;
+    if (!(step < timeConstant))
+        step = timeConstant;
     s->blendFactor = step / s->timeConstant;
     s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
+    return s->smoothedValue;
 }
 
 // Dot product with the x/y pair grouped (retail sums y*y' + x*x' first, then z*z').
@@ -1496,6 +1502,33 @@ inline void BikeAIClampUnit(float& v)
 // bike is then advanced by the look-ahead model 0x0040eca0 as two wheel points, and the
 // angular velocity, speed, suspension, wheel roll, crash test and orientation are derived
 // from the result.  Names tier 3.
+// Retail shapes reproduced (654 -> 2026 strict, candidate size 4114): the crash flag
+// +0x464 as a `?:` (retail `mov eax, 1` / `xor eax, eax` and one store), airborneOut as an
+// unsigned char (retail zero-extends it with `and ecx, 0xff` for slot 71), the travel
+// argument written as `-field_0x7f8` twice (retail keeps the negated value with `fst` and
+// scales with `fld st(0); fmul mem`), `if (!airborne)` first for +0x5a4 (retail's branch
+// layout), the ground-branch lean clamp written on the assignment `(lean = pitch) > 1.0f`,
+// `float height = position.y;` before BIKEAI_ABS (retail loads it once and fchs's it) and
+// the value-returning smoother BikeAISmoothValue.  Each of the last three alone scores
+// 549..695; the clamp and the height copy together move most stack slots onto retail's
+// (1997), the smoother adds 24.  `up` is assigned before `fwd` and the two lever cross
+// products name one operand as the member and one through the pointer: VC6 loads the
+// newer leaf first (docs/VC6_OPERAND_ORDER.md 1.2), which puts the first two cross
+// products in retail's operand order (2026; all-pointer or all-member forms 2023..2026
+// with fewer aligned instructions).
+// Remaining: slot order (retail steps, impact, steerDiff, airborneOut, lean, steer, start,
+// b from esp; ours puts lean first and `a` at the top, where its slot 11 address needs a
+// disp32, 6 bytes early; tools/frame_layout.py finds no use-count change for it), the
+// ground-branch clamp still keeping lean on the FPU stack (`fld st(0)` ... `fstp st(0)`;
+// retail reloads it), the operand order of the second lever's cross product x and y
+// rows, and the smoother tail (retail spills the target and reloads it; ours keeps it
+// with fxch).  The other lean clamp forms (`lean = pitch;` then an if-chain on lean or
+// on pitch, BikeAIClampUnit(lean = pitch)) score 573..626 with the height copy.
+// Also tried at 2026: `(lean = pitch)` in both tests, the second test without `else`
+// or on pitch, an inner BikeAIClampUnit, a `||` test (2022..2026, or 597..655 with the
+// size changed); the smoother with step read before the time constant, a named target
+// local, `+=`, a copied target or blend * difference (2024..2026); `Vec3 a, b, c` at the
+// top, all three in the hit block, or `dummy` at the top (227..462).
 int KrustyBike::Fn_00413200(float dt)
 {
     Vec3 a, c;
@@ -1574,8 +1607,10 @@ int KrustyBike::Fn_00413200(float dt)
                 else
                     lean = -0.1f;
             } else {
-                lean = pitch;
-                BikeAIClampUnit(lean);
+                if ((lean = pitch) > 1.0f)
+                    lean = 1.0f;
+                else if (lean < -1.0f)
+                    lean = -1.0f;
             }
         }
         float speedGap = aiPath.field_0x96c - linearSpeed;
@@ -1592,18 +1627,19 @@ int KrustyBike::Fn_00413200(float dt)
             field_0x478 = 0;
         }
     }
-    if (BIKEAI_ABS(position.y) > 10000.0f)
+    float height = position.y;
+    if (BIKEAI_ABS(height) > 10000.0f)
         position.y = 0.0f;
 
     Vec3 start = position;
-    Vec3* fwd = &bodyForward;
     Vec3* up = &bodyUp;
+    Vec3* fwd = &bodyForward;
     worldAngularVelocity = *fwd * angularVelocity.z + *up * angularVelocity.y
                            - CrossProduct(*fwd, *up) * angularVelocity.x;
     Vec3* w = &worldAngularVelocity;
-    field_0x7e0 = CrossProduct(*w, *fwd) * 3.5f + velocity;
-    field_0x7ec = velocity - CrossProduct(*w, *fwd) * 3.5f;
-    char airborneOut = airborne;
+    field_0x7e0 = CrossProduct(*w, bodyForward) * 3.5f + velocity;
+    field_0x7ec = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
+    unsigned char airborneOut = airborne;
     UnknownFunction40eca0(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
                           &bodyForward, &bodyUp, dt, dt, field_0x740->field_0x4c, &airborneOut,
                           &impact, field_0x15e0, &field_0x7f8, &field_0x7fc,
@@ -1614,14 +1650,13 @@ int KrustyBike::Fn_00413200(float dt)
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
 
-    float travel = -field_0x7f8;
-    frontWheel->w_0x2b0->ClampAndStepAlong(travel, 0, frontWheel->w_0x2b0->q_0xc0 * travel);
+    frontWheel->w_0x2b0->ClampAndStepAlong(-field_0x7f8, 0, frontWheel->w_0x2b0->q_0xc0 * -field_0x7f8);
     rearWheel->w_0x2ac->q_0x98 = field_0x7fc;
     rearWheel->w_0x2ac->ClampAndStep(field_0x7fc, 0);
-    if (airborne)
-        anyWheelInContact = 0;
-    else
+    if (!airborne)
         anyWheelInContact = 1;
+    else
+        anyWheelInContact = 0;
 
     float steerTarget = worldAngularVelocity.y * -1.2732f;
     float steerDiff = steerTarget - controlInput.x;
@@ -1703,10 +1738,7 @@ int KrustyBike::Fn_00413200(float dt)
         field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
         field_0x431 = 0;
         field_0x433 = 0;
-        if (savedUp.y < 0.0f)
-            field_0x464 = 1;
-        else
-            field_0x464 = 0;
+        field_0x464 = savedUp.y < 0.0f ? 1 : 0;
         field_0x45c = savedYaw;
         field_0x604->Method_0x00532220(crashDirection);
         UnknownVirtualSlot69();
@@ -1724,9 +1756,8 @@ int KrustyBike::Fn_00413200(float dt)
     rearWheel->w_0x0d8 += moved;
     UnknownVirtualSlot21();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
-    BikeAISmooth(forwardAccelSmoother, frameTime,
-                 (scratchVector.z - prevLocalForwardVelocity) / frameTime);
-    smoothedForwardAccel = forwardAccelSmoother->smoothedValue;
+    smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother, frameTime,
+                                             (scratchVector.z - prevLocalForwardVelocity) / frameTime);
     prevLocalForwardVelocity = scratchVector.z;
     UnknownVirtualSlot102(dt);
     return 1;

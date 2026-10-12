@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 154, c 107, total 262. The three class (a) functions of the
+Counts: a 1, b 153, c 104, total 258. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -129,7 +129,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
 | physics/bikeai/BikeAI | `0x00415640` | 6063/6112 | b | schedule and frame size match (squared distance and k dot grouped `z + ((x) + y)`, start-up zero vectors cleared with a chained assignment so they store z-first like retail); the one-use temporaries above +0x100 sit in other slots; the retail extent includes one nop of padding (candidate 6111 bytes) |
 | physics/bikeai/BikeAI | `0x0040eca0` | 1288/17345 | b | both 0x40d200 calls now pass 0.05f as the sixth argument (retail 0x3d4ccccd); 3751/3966 normalised insns align; register/stack layout left |
-| physics/bikeai/BikeAI | `0x00413200` | 659/4122 | b | KrustyBike member: frame 0x74 exact but slot 11's out-vectors at other offsets; operand order of the angular-velocity cross products; ground-branch lean clamp keeps the value on the FPU stack |
+| physics/bikeai/BikeAI | `0x00413200` | 2026/4112 | b | KrustyBike member: frame 0x74 and most slots exact; first three locals at other offsets (`a` needs disp32); operand order of the second lever cross product; ground-branch lean clamp keeps the value on the FPU stack; smoother target kept in a register |
 | physics/bikeai/BikeAI | `0x00414370` | 394/4678 | b | KrustyBike member: frame 0x74 vs 0x78 (retail spills the difficulty, candidate keeps it in edi); kind 1/5 gate-distance test placed after the single-point and no-track paths |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 447/1627 | b | 1 code diffs: retail lacks `mov edx, [eax + 0x27c] ; mov eax, [eax ~`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x00425900` | 718/4237 | b | first draft: inline budget differs from the fifth normalisation on; radius sums accumulated in another x87 order |
@@ -143,11 +143,8 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
 | physics/collision/CollisionPoint | `0x0043ad80` | 47/599 (masked) | b | body matches; retail returns for a null first argument before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead `points` slot, VC6 in a1's |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 1570/2619 | c | ApplyContactImpulse, frame 0xb8 and slot order match; termB (other-body branch) builds its cross/dot in a different x87 register order (fstp st(2), +2 bytes), plus scheduling of three struct copies and the `test edi` of `if (other)` |
-| physics/contact/ContactImpulse | `0x005004a0` | 104/927 (masked) | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
+| physics/contact/ContactImpulse | `0x005004a0` | 102/1062 | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 451/3321 (masked) | b | 123 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x1c4 vs 0x1ac, slot order differs |
-| physics/effects/DirtChunkParticleEmitter | `0x004b8f40` | 959/970 | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
-| physics/effects/DirtSprayParticleEmitter | `0x004b9460` | 959/970 | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
-| physics/effects/SparkParticleEmitter | `0x004b99a0` | 1043/1055 | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeBounds | `0x004fe2e0` | 82/1325 | b | frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx); *have clamps are unconditional selects; retail spends one more inline Vec3 site before h |
@@ -164,9 +161,9 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/krustybike/KrustyBike | `0x00493660` | 2005/8545 | c | 528 code diffs (frame 0x58 and slots exact): retail keeps 1 in ebp and 0 in edi from the second SetAxesPtr call on; retail stores `(len+50)*(len+50)` before the AllowWarping test; velocity y/z `fld s ; fmul` order; pose lerp `c - b` recompute; pose bytes in 0x492670/0x492ad0 scale by 255.0f (0x551420), and 100.0f is 0x5505ec |
 | physics/krustybike/KrustyBike | `0x00496d10` | 5/135 | c | 1 code diffs: `jmp A` vs `jmp @12 ; nop ; nop ` |
 | physics/motion/Motnctrl | `0x004a5e40` | 505/1090 | b | register permutation: retail file in ebx, poses and the zero constant in ebp, path in esi; the candidate swaps ebx/ebp and esi/edi |
-| physics/motion/Motnctrl | `0x004a70c0` | 159/3327 (masked) | b | 733 code diffs: retail calls `CharacterPose::CharacterPose` 2 then 4 times where the candidate calls it 3 then 2; retail calls `operator*`/`operator+` in the first extrapolation loop; frame 0x2dc vs 0x284; slots differ |
+| physics/motion/Motnctrl | `0x004a70c0` | 152/3330 | b | 733 code diffs: retail calls `CharacterPose::CharacterPose` 2 then 4 times where the candidate calls it 3 then 2; retail calls `operator*`/`operator+` in the first extrapolation loop; frame 0x2dc vs 0x284; slots differ |
 | physics/motion/Motnctrl | `0x004a7dc0` | 476/523 | b | 4 code diffs: `fld [esi + 0x20]` vs `mov [esp + N], ecx`; retail lacks `mov [esp + N], ecx`; slots differ |
-| physics/motion/Motnctrl | `0x004a7fd0` | 660/1139 | c | 37 code diffs: `fld [esi + 8] ; fmul [edi + 4] ; fld [e~` vs `fld [edi + 4] ; fmul [esi + 8] ; fld [e~`; retail adds `fsubp st(1)` |
+| physics/motion/Motnctrl | `0x004a7fd0` | 1097/1121 | c | axisZ cross product loads b's component first in each product (retail a's) |
 | physics/motion/Motnctrl | `0x004a8470` | 245/1241 | c | 43 code diffs: retail adds `push ebp`; retail lacks `push ebp` |
 | physics/motion/SteeringControl | `0x00504d30` | 145/234 | b | 6 code diffs: `fxch st(2) ; fmul st(2)` vs `fld st(0) ; fmul st(3)`; `fmul st(2)` vs `fmul st(1)`; slots differ |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 730/771 | c | x87 term order of the inlined 4x4 product: one term pair in each of _11, _21, _31, _41 (retail's sum orders differ from slot 27's with the same helper) (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp); 748/771 with 1, 2, 9, 10, 18, 25, 26, 33 or 34 locals at the top; exact only with 5-6 locals inside the shared helper, which break the exact slot 27 |
@@ -181,14 +178,13 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 275/404 (masked) | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts give no gain |
-| physics/tire/Tire | `0x005135f0` | 1555/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; slip-vector scale `fld st(0); fmul mem` vs `fld mem; fmul st(1)`; two struct-copy store pairs; one dot-term operand order |
+| physics/tire/Tire | `0x005135f0` | 1582/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; second TireDot push earlier; one dot-term operand order |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
 | physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local (reference counts 3 vs 4, VC6_FRAME_LAYOUT fact 9); rewrites of the boost/minimum conditions and the clamp give no gain |
-| physics/tire/Tire | `0x00514170` | 560/607 | b | x87 operand order of the first `dir` component; one stack store and two cross-product pairs scheduled differently |
-| physics/tire/Tire | `0x00514550` | 169/3838 (masked) | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
-| physics/tire/Tire | `0x00515880` | 522/703 | c | row 0 of the frame: retail spills its z through a stack temp and stores x/y last; the keepZ test is scheduled later; c.y loads z.z first |
-| physics/tire/Tire | `0x00515b50` | 305/316 | c | side friction term: VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2) ; fmul [ecx + 0x74]`), and one frictionForce copy store is scheduled earlier |
-| physics/tire/Tire | `0x00515c90` | 287/292 | b | true extent 292; the x component of the normalisation scale loads the scalar first (`fld st(0); fmul c.x`), retail the component; cross product, registers and y/z scales match (samples/physics/tire/Tire.cpp) |
+| physics/tire/Tire | `0x00514170` | 565/607 | b | the push.y copy and two cross-product fsubp/mov pairs scheduled differently |
+| physics/tire/Tire | `0x00514550` | 175/4438 | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
+| physics/tire/Tire | `0x00515880` | 622/703 | c | retail tests keepZ later, loads z.z first in c.y and stores one y-row pair later |
+| physics/tire/Tire | `0x00515b50` | 312/316 | c | side friction term: VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2) ; fmul [ecx + 0x74]`) |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2046/2814 (masked) | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 1386/13322 | b | frame 0xac4 vs 0xab0, slot order differs (register choice follows); retail keeps one more stream destructor tail |

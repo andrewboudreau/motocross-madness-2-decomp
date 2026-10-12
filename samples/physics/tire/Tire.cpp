@@ -102,12 +102,13 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 
     CollisionVec3 n = TireNormalizeZ(z);
 
-    float tx = y.y * n.z - y.z * n.y;
-    float ty = n.x * y.z - y.x * n.z;
-    float tz = y.x * n.y - n.x * y.y;
-    out->m[0] = tx;
-    out->m[1] = ty;
-    out->m[2] = tz;
+    CollisionVec3 t;
+    t.x = y.y * n.z - y.z * n.y;
+    t.y = n.x * y.z - y.x * n.z;
+    t.z = y.x * n.y - n.x * y.y;
+    out->m[0] = t.x;
+    out->m[1] = t.y;
+    out->m[2] = t.z;
     out->m[3] = 0.0f;
     out->m[4] = y.x;
     out->m[5] = y.y;
@@ -209,6 +210,21 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
     return this;
 }
 
+// v * s with all three products computed before the result is stored: retail
+// stores the x component before the z product is spilled (0x00515b50, 0x005135f0),
+// where the CollisionTypes.h operator* stores x and y after it.
+static inline CollisionVec3 TireScaled(const CollisionVec3& v, float s)
+{
+    float x = v.x * s;
+    float y = v.y * s;
+    float z = v.z * s;
+    CollisionVec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+
 // CollisionPoint slot 1 override (0x00515b50, compiled with this = the CollisionPoint
 // subobject at +0xb8, hence the +0xb8 Tire offsets 0x230.. behind CollisionPoint-relative
 // disassembly displacements).  The base implementation (0x0043b240) computes the contact
@@ -238,7 +254,7 @@ void Tire::CollisionPointVirtualSlot1()
         CollisionPoint::frictionMagnitude = (rollTerm + (-sideFriction) * sideFrictionScale * tangentSin
                                                         * CollisionPoint::frictionCoefficient)
                                      * CollisionPoint::surfaceGrip;
-        CollisionPoint::frictionForce = CollisionPoint::frictionDirection * CollisionPoint::frictionMagnitude;
+        CollisionPoint::frictionForce = TireScaled(CollisionPoint::frictionDirection, CollisionPoint::frictionMagnitude);
         if (CollisionPoint::frictionMagnitude < 0.0f)
             CollisionPoint::frictionMagnitude = -CollisionPoint::frictionMagnitude;
     }
@@ -271,6 +287,32 @@ static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const Collis
     return p;
 }
 
+// a + b, again with the sums computed before the stores.
+static inline CollisionVec3 TireSum(const CollisionVec3& a, const CollisionVec3& b)
+{
+    float x = a.x + b.x;
+    float y = a.y + b.y;
+    float z = a.z + b.z;
+    CollisionVec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+
+// v * s through local copies of v.x and v.y: the copies are newer leaves, so VC6
+// loads each component first and multiplies by the held s (`fld mem; fmul st(1)`).
+static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
+{
+    CollisionVec3 r;
+    float x = v.x;
+    r.x = x * s;
+    float y = v.y;
+    r.y = y * s;
+    r.z = v.z * s;
+    return r;
+}
+
 // 0x005135f0.  Semantics are tier 3.  `this` is the complete Tire; the CollisionPoint
 // members are addressed through the subobject (+0xb8).
 //   field_0x38 = contact position - *pos, field_0x5c = axis x field_0x38;
@@ -281,13 +323,18 @@ static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const Collis
 // also zeroes field_0x90) field_0x1e8 = field_0x218.
 // field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
 // |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
-// Near miss, 1555 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
+// Near miss, 1582 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
 // projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps retail's
-// fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. Left: the
-// lever's `lea edi` and store are scheduled later, the slip vector is scaled as
-// `fld st(0); fmul mem` (retail `fld mem; fmul st(1)`) with its TireDot pushes
-// together, two struct-copy stores trade places, and one x term of the d-path dot
-// swaps its operands.
+// fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
+// vector is scaled through TireScaleCopy (retail's `fld mem; fmul st(1)`) and summed
+// and normalised through TireSum/TireScaled (retail's copy-store schedule). Left:
+// the lever's `lea edi` and store are scheduled later, the second TireDot push comes
+// before the y product instead of after it, and one x term of the d-path dot swaps
+// its operands. No gain from a products-first cross or projection for the lever
+// (1571), a named lever or projection local (1575), a pointer or reference alias of
+// the lever member (767), a TireScaleCopy that copies all three components or none (1548..1555),
+// or the d-path dot written out in any order (1133..1137) or through a helper with
+// copied or swapped x operands (1575..1582).
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
@@ -313,7 +360,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
         if (d > 0.001f) {
             if (reportContactOutputs)
                 *outValue = d;
-            slipVector = tangent * this->CollisionPoint::tangentSpeed + normalLeverCross;
+            slipVector = TireSum(TireScaleCopy(tangent, this->CollisionPoint::tangentSpeed), normalLeverCross);
             float lenSq = TireDot(&slipVector, &slipVector);
             float len;
             if (lenSq == 0.0f)
@@ -323,7 +370,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             else
                 len = 1.0f / FastInvSqrt(lenSq);
             float inv = 1.0f / len;
-            this->CollisionPoint::frictionDirection = slipVector * inv;
+            this->CollisionPoint::frictionDirection = TireScaled(slipVector, inv);
             lenSq = TireDot(&normalLeverCross, &normalLeverCross);
             this->CollisionPoint::spinSpeed = TireLengthFromSq(lenSq);
             float c = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
@@ -769,25 +816,18 @@ static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec
     return r;
 }
 
-// 0x00515c90 (near miss, 287/292): the normalised cross product a x b; the
-// fallback when it is exactly zero (this is unused). Three source shapes give
+// 0x00515c90 (exact, 292 bytes): the normalised cross product a x b; the
+// fallback when it is exactly zero (this is unused). Source shapes that give
 // retail's leaf ages (docs/VC6_OPERAND_ORDER.md section 1.2): the reference
 // `av` for a.y in the first product puts the y and z products' b components
-// first (231 -> 238); assigning n after its declaration instead of
-// initialising it gives retail's esi/ecx/edx result registers (242); testing
-// n.y and n.z (not c) for zero makes those components older than the
-// FastInvSqrt result, so their scales load the scalar first and the last one
-// consumes it (287). The parenthesised first products give retail's copy
-// schedule. Left: the x scale loads the scalar first (`fld st(0); fmul c.x`),
-// retail the component. Unchanged (287): x written as n.x * inv, inv * n.x,
-// c.x * inv, through a reference, pointer or float pointer; the x test on c
-// or n; the squared length through the helper or in the body on c or n;
-// `n = c` through a reference; a member-wise copy is far worse (91). With
-// the scales reading c for y and z the schedule matches but the addresses do
-// not; the 64 a/b alias placements (reference or pointer) peak at 238.
-// 0..40 dead initialised int locals at the top, before the scales or in the
-// cross-product helper give 287 at every count: this operand order is not the
-// declaration-count tie-break (docs/VC6_OPERAND_ORDER.md, second 2026-10-11 pass).
+// first; assigning n after its declaration instead of initialising it gives
+// retail's esi/ecx/edx result registers; testing n's components for zero
+// makes y and z older than the FastInvSqrt result, so their scales load the
+// scalar first and the last one consumes it. The x scale reads its component
+// through a local stored after the call (`nx`), a leaf newer than the scalar,
+// so it loads the component first (`fld c.x; fmul st(1)`) like retail; every
+// spelling of `n.x * inv`, inline float helpers by value or reference and
+// helper-based zero tests kept `fld st(0); fmul c.x` (287).
 CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                  const CollisionVec3* fallback)
 {
@@ -806,7 +846,8 @@ CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, con
             n = kVec3Zero;
         } else {
             float inv = FastInvSqrt(lenSq);
-            n.x *= inv;
+            float nx = n.x;
+            n.x = nx * inv;
             n.y *= inv;
             n.z *= inv;
         }
@@ -936,13 +977,34 @@ static inline CollisionVec3 TireNegate(const CollisionVec3& v)
     return r;
 }
 
-// 0x00514170 (near miss, 560 of 607 bytes): clamping as `*speed < amount` gives
+// Scales v by numerator / denominator for ApplyDrive.  The x product uses the
+// quotient expression and y and z multiply copies of their components by a named
+// quotient: VC6 then keeps the fresh quotient for x (`fld st(0); fmul mem`) and
+// loads y and z first (`fld mem; fmul st(1)`), as retail does.
+static inline CollisionVec3 TireRatioTimes(float numerator, float denominator,
+                                           const CollisionVec3& v)
+{
+    CollisionVec3 r;
+    r.x = numerator / denominator * v.x;
+    float ratio = numerator / denominator;
+    float y = v.y;
+    float z = v.z;
+    r.y = y * ratio;
+    r.z = z * ratio;
+    return r;
+}
+
+// 0x00514170 (near miss, 565 of 607 bytes): clamping as `*speed < amount` gives
 // retail's `fcom`, and scaling the cross product component-wise through a local
-// copy of +0x1d8 gives its moment. Left: the first `dir` component is scaled as
-// `fld mem; fmul st(1)` where retail has `fld st(0); fmul mem` (tried
-// `dir * k`, a local k, k * dir.x per component, a pre-copied push and
-// `1 / grip * needed`), plus one stack store and two cross-product
-// fsubp/mov pairs scheduled differently.
+// copy of +0x1d8 gives its moment. TireRatioTimes gives the scaled push's x87
+// operand order (560 -> 565). Left: the copy of push.y out of the return temp and
+// two cross-product fsubp/mov pairs are scheduled differently.
+// Before TireRatioTimes (560): `dir * k`, a local k, k * dir.x per component, a
+// pre-copied push, `1 / grip * needed`, `v.x * s` operand order (all 8 orders) in
+// TireTimes, a helper copying v.x into a local or into r first, a `dx` copy before
+// the grip test, the negation per component or as `forward ?:` / if-else (114..149),
+// direct push.x stores (336), the quotient as a CSE expression in all three
+// products (361) or named first (553..560).
 void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                       CollisionVec3* torque, CollisionVec3* force)
 {
@@ -959,7 +1021,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     float rate = mass / stepTime;
     float needed = rate * amount;
     if (grip > needed) {
-        push = TireTimes(needed / grip, dir);
+        push = TireRatioTimes(needed, grip, dir);
         *speed -= amount;
     } else {
         *speed -= grip / rate;

@@ -4,7 +4,9 @@
 // at the end; the flow and calls match. Tried without gain: d * inv, d * (1 / len),
 // inv * d.x per component (all 64 operand-order combinations), d *= inv, d / len, a
 // component-wise d, other lenSq term orders, SquareMagnitude/DotProduct helpers and
-// separate dir stores. The promoted file supplies the rest of the unit.
+// separate dir stores, a scale helper (with or without component copies, products
+// first, 1 / len argument), copies of d or of d.x/d.z for the length or the scale
+// (all 145; component stores 109). The promoted file supplies the rest of the unit.
 #include "motion/SteeringControl.cpp"
 
 int SteeringControl::SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame)
