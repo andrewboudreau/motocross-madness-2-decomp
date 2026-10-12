@@ -183,7 +183,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local (reference counts 3 vs 4, VC6_FRAME_LAYOUT fact 9); rewrites of the boost/minimum conditions and the clamp give no gain |
 | physics/tire/Tire | `0x00514170` | 560/607 | b | x87 operand order of the first `dir` component; one stack store and two cross-product pairs scheduled differently |
 | physics/tire/Tire | `0x00514550` | 175/4438 | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
-| physics/tire/Tire | `0x00515880` | 522/703 | c | row 0 of the frame: retail spills its z through a stack temp and stores x/y last; the keepZ test is scheduled later; c.y loads z.z first |
+| physics/tire/Tire | `0x00515880` | 622/703 | c | retail tests keepZ later, loads z.z first in c.y and stores one y-row pair later |
 | physics/tire/Tire | `0x00515b50` | 312/316 | c | side friction term: VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2) ; fmul [ecx + 0x74]`) |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2046/2814 (masked) | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |

@@ -105,7 +105,11 @@ of a call (in `st(0)`):
   product (`mov [edx+4]; fstp tmp`). Computing the three products into
   locals first and then filling `r` gives retail's order (`fstp tmp; mov
   [edx+4]`): Tire slot 1 (`0x00515b50`, 305 to 312) and UpdateContactPatch
-  (with the same form for `a + b`).
+  (with the same form for `a + b`). The converse holds for products stored
+  straight into memory: TireBuildFrame (`0x00515880`, 522 to 622) wrote row
+  0 as three float locals stored into the matrix; computing them into a
+  CollisionVec3 local first makes VC6 spill the z product through the stack
+  and store x and y last, as retail does.
 
 So "a scalar is loaded first when it is a local of the inlined helper"
 (docs/PHYSICS_VALIDATION.md) is the same rule: the helper's `k` is the newest

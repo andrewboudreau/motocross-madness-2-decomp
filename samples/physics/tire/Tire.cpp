@@ -102,12 +102,13 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
 
     CollisionVec3 n = TireNormalizeZ(z);
 
-    float tx = y.y * n.z - y.z * n.y;
-    float ty = n.x * y.z - y.x * n.z;
-    float tz = y.x * n.y - n.x * y.y;
-    out->m[0] = tx;
-    out->m[1] = ty;
-    out->m[2] = tz;
+    CollisionVec3 t;
+    t.x = y.y * n.z - y.z * n.y;
+    t.y = n.x * y.z - y.x * n.z;
+    t.z = y.x * n.y - n.x * y.y;
+    out->m[0] = t.x;
+    out->m[1] = t.y;
+    out->m[2] = t.z;
     out->m[3] = 0.0f;
     out->m[4] = y.x;
     out->m[5] = y.y;
