@@ -78,9 +78,9 @@ struct UnknownCameraVehicle {
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
 struct UnknownCameraTargetA {
     unsigned char field_0x000[0x1a0];
-    UnknownVehiclePart* field_0x1a0;     // 0x0052bb60
+    UnknownVehiclePart* modelNode;       // +0x1a0 0x0052bb60; the characters' model node (krusty2 Character)
     unsigned char field_0x1a4[0x224 - 0x1a4];
-    Vector3 field_0x224;
+    Vector3 nodeVelocity;                // +0x224 krusty2 CollisionCharacter::nodeVelocity
 };
 
 struct UnknownCameraTargetB {
