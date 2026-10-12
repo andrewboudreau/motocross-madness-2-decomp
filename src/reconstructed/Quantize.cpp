@@ -6,7 +6,7 @@
 #include "UnknownResourceManager.h"
 
 // 0x004dddd0
-ColorMapper* ColorMapper::UnknownFunction4dddd0(const char* name) {
+ColorMapper* ColorMapper::LoadShared(const char* name) {
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     ColorMapper* mapper;
 
@@ -118,6 +118,6 @@ unsigned char* ColorMapper::GetIndexFrom555() {
 }
 
 // 0x004de290
-unsigned char* ColorMapper::UnknownFunction4de290() {
+unsigned char* ColorMapper::GetIndexFrom565() {
     return indexFrom565;
 }

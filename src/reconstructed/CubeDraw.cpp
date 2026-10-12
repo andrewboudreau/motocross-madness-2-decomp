@@ -49,7 +49,7 @@ static int s_UnknownGlobal57ee98;
 // 0x0043d910
 DrawableCube::DrawableCube(int flags) : GameObject(flags)
 {
-    field_0x2c = 0;
+    cubeObject = 0;
     loadPalette = 0;
     field_0x40 = 0;
     memset(s_cellMappings, 0, sizeof(s_cellMappings));
@@ -69,11 +69,11 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
     int i;
 
     GameObject::UnknownVirtualSlot8(value);
-    textureGroup = context->field_0x04;
+    textureGroup = context->textureGroup;
     if (!stream)
         goto fail;
-    if (stream->field_0x1c)
-        stream->Seek(stream->field_0x130, 0, 0);
+    if (stream->innerStream)
+        stream->Seek(stream->sliceOffset, 0, 0);
     start = stream->Tell();
     if (stream->Read(&paletteCount, 4, 1) != 1)
         goto fail;
@@ -100,17 +100,17 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
         mode = ((UnknownParameterStream*)stream)->GetTextMode();
         if (stream->Seek(offset + start, 0, 1))
             goto fail;
-        if (field_0x2c)
-            field_0x2c->Release();
-        field_0x2c = (new (__FILE__, 0x6d) Cube)->UnknownFunction43d230(stream, 0, textureGroup, start);
-        if (!field_0x2c)
+        if (cubeObject)
+            cubeObject->Release();
+        cubeObject = (new (__FILE__, 0x6d) Cube)->Load(stream, 0, textureGroup, start);
+        if (!cubeObject)
             goto fail;
         if (stream->Seek(position, 0, 1))
             goto fail;
         ((UnknownParameterStream*)stream)->SetTextMode(mode);
     }
     BuildFaceGeometry();
-    LoadTexturesAndCoords(field_0x2c, context);
+    LoadTexturesAndCoords(cubeObject, context);
     loadPalette->Release();
     loadPalette = 0;
     return this;
@@ -124,8 +124,8 @@ int DrawableCube::RecordTextureUse()
 {
     for (int face = 0; face < 6; face++) {
         for (int i = 0; i < 16; i++) {
-            if (textureGroup && (field_0x2c->field_0x38[face].visibleCells & (1 << i))) {
-                TextureMap* texture = field_0x2c->field_0x38[face].textures[i];
+            if (textureGroup && (cubeObject->faces[face].visibleCells & (1 << i))) {
+                TextureMap* texture = cubeObject->faces[face].textures[i];
                 if (texture && (texture->mapFlags & 1))
                     ((ManagedTexture*)texture)->RecordUse(7.0f);
             }
@@ -143,8 +143,8 @@ DrawableCube::~DrawableCube()
     s_UnknownGlobal57ee98 = 0;
     if (loadPalette)
         loadPalette->Release();
-    if (field_0x2c)
-        field_0x2c->Release();
+    if (cubeObject)
+        cubeObject->Release();
 }
 
 // 0x0043e4c0: draws the cube around the camera (scaled by 2, centred on the
@@ -160,9 +160,9 @@ int DrawableCube::UnknownVirtualSlot14()
     s_world.m[0][0] = 2.0f;
     s_world.m[1][1] = 2.0f;
     s_world.m[2][2] = 2.0f;
-    s_world.m[3][0] = field_0x2c->field_0x14.x;
-    s_world.m[3][1] = field_0x2c->field_0x14.y;
-    s_world.m[3][2] = field_0x2c->field_0x14.z;
+    s_world.m[3][0] = cubeObject->center.x;
+    s_world.m[3][1] = cubeObject->center.y;
+    s_world.m[3][2] = cubeObject->center.z;
     Target()->currentCamera->UnknownVirtualSlot30(&s_world);
     Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
@@ -176,21 +176,21 @@ int DrawableCube::UnknownVirtualSlot14()
     int i;
     for (face = 0; face < 6; face++) {
         for (i = 0; i < 16; i++) {
-            if (!(field_0x2c->field_0x38[face].visibleCells & (1 << i)))
+            if (!(cubeObject->faces[face].visibleCells & (1 << i)))
                 continue;
-            if (!(field_0x2c->field_0x38[face].presentTextures & (1 << i)))
+            if (!(cubeObject->faces[face].presentTextures & (1 << i)))
                 continue;
             int cell = face * 16 + i;
             int first = cell * 6;
-            if (!field_0x2c->field_0x38[face].textures[i]->UnknownVirtualSlot7())
+            if (!cubeObject->faces[face].textures[i]->UnknownVirtualSlot7())
                 continue;
-            if (textureGroup && (field_0x2c->field_0x38[face].textures[i]->mapFlags & 1)) {
-                ((ManagedTexture*)field_0x2c->field_0x38[face].textures[i])
+            if (textureGroup && (cubeObject->faces[face].textures[i]->mapFlags & 1)) {
+                ((ManagedTexture*)cubeObject->faces[face].textures[i])
                     ->RemapTexCoordsIfMoved(&CELL_MAPPING(cell).scale, &CELL_MAPPING(cell).offsetU,
                                             &CELL_MAPPING(cell).offsetV, &CELL_VERTEX(first).tu,
                                             &CELL_VERTEX(first).tv, 6, 0x20);
             }
-            field_0x2c->field_0x38[face].textures[i]->UnknownVirtualSlot19();
+            cubeObject->faces[face].textures[i]->UnknownVirtualSlot19();
             if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)&CELL_VERTEX(first), 6, 0))
                 return 0;
         }
@@ -201,9 +201,9 @@ int DrawableCube::UnknownVirtualSlot14()
     Target()->UnknownVirtualSlot11(0);
     for (face = 0; face < 6; face++) {
         for (i = 0; i < 16; i++) {
-            if (!(field_0x2c->field_0x38[face].visibleCells & (1 << i)))
+            if (!(cubeObject->faces[face].visibleCells & (1 << i)))
                 continue;
-            if (field_0x2c->field_0x38[face].presentTextures & (1 << i))
+            if (cubeObject->faces[face].presentTextures & (1 << i))
                 continue;
             if (face >= 4 || i <= 7)
                 continue;

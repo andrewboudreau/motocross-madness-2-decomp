@@ -13,7 +13,7 @@ RTTI `Palette8 : BaseObject` (vtable `0x00555aa4`), `FontTexture`
   `DescribeBitmap8`; EcoSystem.cpp's own declarations keep the address names). The file/info headers are pack(2) layouts inferred from
   offsets and stored constants. PCTextureMap.h now includes `bmpfile.h`.
 - `Palette8.cpp`: the loader `0x004b6b30`, constructor, destructor and
-  deleting wrapper. It uses Quantize's `ColorMapper::UnknownFunction4dddd0`.
+  deleting wrapper. It uses Quantize's `ColorMapper::LoadShared`.
 - `FontTexture.cpp`: the static manager object at `0x0065b478` and its
   `$E` constructor/atexit chain (`0x00467100..0x0046714f`; the guard byte is
   `0x0065b480`), the FontTexture constructor, destructors, accessors and the

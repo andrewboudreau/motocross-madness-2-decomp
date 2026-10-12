@@ -95,7 +95,7 @@ public:
 
     RenderTarget* Target() const { return (RenderTarget*)renderContext; }
 
-    Cube* field_0x2c;
+    Cube* cubeObject;                         // +0x2c the loaded cube (cubedraw.cpp line 0x6d)
     ColorMapper* loadPalette;                 // palette while loading
     ManagedTextureGroup* textureGroup;        // the context's group
     int field_0x38;

@@ -26,14 +26,14 @@
 // scale +0x198.
 void Camera::UnknownVirtualSlot28() {
     viewMatrix = ViewMatrix(eyePosition, viewDirection, upDirection, roll);
-    projectionMatrix = ProjectionMatrix(field_0x1bc, field_0x1c0, field_0x16c * 0.017453290f,
-                                        (float)(unsigned int)field_0x1a0[2] / (unsigned int)field_0x1a0[3]);
-    Matrix4 viewport = IdentityMatrix();
-    viewport(0, 0) = 0.5f;
-    viewport(1, 1) = -0.5f;
-    viewport(3, 0) = 0.5f;
-    viewport(3, 1) = 0.5f;
-    field_0xec[1] = MatrixMult(viewport, projectionMatrix);
-    field_0xec[0] = MatrixMult(field_0xec[1], viewMatrix);
-    focalLength = (float)(unsigned int)field_0x1a0[2] * 0.5f / (float)tan((float)(field_0x16c * 0.5f) * 0.017453290f);
+    projectionMatrix = ProjectionMatrix(nearPlane, farPlane, fieldOfView * 0.017453290f,
+                                        (float)(unsigned int)viewport[2] / (unsigned int)viewport[3]);
+    Matrix4 viewportScale = IdentityMatrix();
+    viewportScale(0, 0) = 0.5f;
+    viewportScale(1, 1) = -0.5f;
+    viewportScale(3, 0) = 0.5f;
+    viewportScale(3, 1) = 0.5f;
+    screenMatrix[1] = MatrixMult(viewportScale, projectionMatrix);
+    screenMatrix[0] = MatrixMult(screenMatrix[1], viewMatrix);
+    focalLength = (float)(unsigned int)viewport[2] * 0.5f / (float)tan((float)(fieldOfView * 0.5f) * 0.017453290f);
 }

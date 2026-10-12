@@ -45,7 +45,7 @@ struct UnknownRaceSoundChannel {
     int sampleOffset;                      // +0x18, bytes of streamSample consumed
     int fillHalf;                          // +0x1c, half being filled (1 or 2)
     int nextSampleKind;                    // +0x20, kind to stream after this one (0: loop it)
-    int field_0x24;
+    int wasThrottleOn;                     // +0x24, racer throttle last frame (written by slot 10)
     int field_0x28;
     int wasAirborne;                       // +0x2c, racer +0x108 last frame (the LandHard cue)
     int field_0x30;
@@ -183,12 +183,12 @@ public:
     Sound* ohSound;                        // +0x11fc, "oh_01.wav"
     int field_0x1200;
     Sound* waypointSound;                  // +0x1204, "Waypoint.wav"
-    int field_0x1208;                     // reset (0x004e3430) on the next frame
+    int assignChannelsPending;            // +0x1208 set by the constructor; slot 10 assigns the channels and clears it
     int crashHandled[11];                     // +0x120c, set once a racer's crash (+0x444) sounds started
     int racerWreckSound[11];                  // +0x1238
     int racerFallSound[11];                   // +0x1264
-    int field_0x1290;
-    int field_0x1294;
+    int lastListenerLap;                  // +0x1290 listener's lap count last frame (the waypoint cue)
+    int lastListenerGate;                 // +0x1294 listener's gate (racer +0x7b8) last frame
     int bytesPerSample;                    // +0x1298, 2 with audio_16.ini, 1 with audio_08.ini
     int lastListenerPosition;                 // +0x129c, listener's last position (99 initially)
     UnknownEventRacer* lastListenerRacer;     // +0x12a0, listener's racer last frame

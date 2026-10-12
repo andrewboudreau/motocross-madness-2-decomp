@@ -76,7 +76,7 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         g_TrackGame->mode.raceSettings.field_0x0c = 0;
         g_TrackGame->mode.raceSettings.shortTimeLimit = 0;
         g_TrackGame->mode.raceSettings.lapCount = 5;
-        g_TrackGame->mode.raceSettings.field_0x140 = 5.0f;
+        g_TrackGame->mode.raceSettings.timeLimitMinutes = 5.0f;
         g_TrackGame->mode.raceSettings.field_0x148 = 0;
         g_TrackGame->mode.raceSettings.field_0x2d = 0;
         g_TrackGame->mode.raceSettings.tagBall = 0;

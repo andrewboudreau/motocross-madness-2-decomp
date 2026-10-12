@@ -4,7 +4,7 @@
   "??_C@_02JKAF@rb?$AA@": "0x0056666c",
   "??_C@_0BD@BMLN@Error?5opening?5?$CFs?4?6?$AA@": "0x0056b018",
   "??_C@_0BD@DLPJ@filename?5is?5NULL?$CB?6?$AA@": "0x0056b004",
-  "?UnknownFunction430ff0@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
+  "?AtEnd@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
   "?FindArchive@UnknownTextureStream@@QAEPAV1@PBD@Z": "0x00460d70",
   "?CheckHeader@UnknownTextureStream@@QAEHXZ": "0x00460db0",
   "?IsValidFile@UnknownTextureStream@@QAEHPBD@Z": "0x00460e70",

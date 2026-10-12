@@ -260,7 +260,7 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
     this->shift = shift;
     gridX = x;
     gridZ = z;
-    field_0x2a = index;
+    childIndex = index;
     if (boundsMin && boundsMax) {
         float fx = (float)x;
         if (fx < boundsMin[0])
@@ -301,12 +301,12 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
 allocated:
     extra->field_0x0c = header;
     extra->field_0x10 = 0;
-    data->field_0x134 = 0;
-    data->field_0x140 = 0;
-    data->field_0x142 = 0;
-    data->field_0x13c = 0;
-    data->field_0x13e = 0;
-    data->field_0x138 = 0;
+    data->vertexBuffer = 0;
+    data->vertexBufferBytes = 0;
+    data->indexBufferBytes = 0;
+    data->vertexCount = 0;
+    data->indexCount = 0;
+    data->indexBuffer = 0;
     data->b1 = 1;
     data->field_0x130 = 0;
     data->field_0x122 = 0xffff;
@@ -314,8 +314,8 @@ allocated:
     data->field_0x124 = 0;
     data->field_0x128 = 0;
     data->b0 = 0;
-    data->field_0x12a = 0;
-    data->field_0x12c = 0;
+    data->triangleCount = 0;
+    data->childTriangleCount = 0;
     data->field_0x174 = 1.0f;
     data->b3 = 0;
     data->b2 = terrain->field_0xc34 & 1;
@@ -330,7 +330,7 @@ allocated:
     data->field_0x174 = 1.0f / (field_0x14 * field_0x10);
     if (data->field_0x174 < 0.0f)
         data->field_0x174 = -data->field_0x174;
-    memset(data, 0, sizeof(data->field_0x000));
+    memset(data, 0, sizeof(data->vertexFlags));
     data->field_0x178 = 0;
     data->field_0x164 = (float)(gridX << this->shift);
     data->field_0x168 = (float)(gridZ << this->shift);
@@ -369,7 +369,7 @@ allocated:
 
 // 0x00480ad0: draws one 4-cell block from this node's buffers when it has
 // geometry and passed the frustum test, then walks the child nodes.
-int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size, int quad, int a5)
+int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5)
 {
     int vertexStart = 0;
     GridBlockRange* ranges = (GridBlockRange*)data->field_0x17c;
@@ -390,12 +390,12 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
         }
         if (vertexCount != 0 && (data->field_0x178 & (1 << block))) {
             if (terrain->lowestQualityOverride)
-                SubmitLitRange(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
-                                      (unsigned short*)data->field_0x138 + indexStart, indexCount,
+                SubmitLitRange(a5, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
+                                      (unsigned short*)data->indexBuffer + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
             else
-                SubmitUnlitRange(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
-                                      (unsigned short*)data->field_0x138 + indexStart, indexCount,
+                SubmitUnlitRange(a5, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
+                                      (unsigned short*)data->indexBuffer + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
         }
     }
@@ -404,17 +404,17 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
             for (int i = 0; i < 4; i++) {
                 DrawableGridNode* child = (DrawableGridNode*)children[g_gridQuadCell[quad] + i + j];
                 if (child && child->childMask) {
-                    if (child->data->field_0x13c != 0 && !child->data->b3) {
+                    if (child->data->vertexCount != 0 && !child->data->b3) {
                         if (terrain->lowestQualityOverride)
-                            child->SubmitLitRange(a5, (GridVertex*)child->data->field_0x134,
-                                                         child->data->field_0x13c,
-                                                         (unsigned short*)child->data->field_0x138,
-                                                         child->data->field_0x13e, -1);
+                            child->SubmitLitRange(a5, (GridVertex*)child->data->vertexBuffer,
+                                                         child->data->vertexCount,
+                                                         (unsigned short*)child->data->indexBuffer,
+                                                         child->data->indexCount, -1);
                         else
-                            child->SubmitUnlitRange(a5, (GridVertex*)child->data->field_0x134,
-                                                         child->data->field_0x13c,
-                                                         (unsigned short*)child->data->field_0x138,
-                                                         child->data->field_0x13e, -1);
+                            child->SubmitUnlitRange(a5, (GridVertex*)child->data->vertexBuffer,
+                                                         child->data->vertexCount,
+                                                         (unsigned short*)child->data->indexBuffer,
+                                                         child->data->indexCount, -1);
                     }
                     child->DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
                 }
@@ -428,7 +428,7 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
 // 0x00481300: one 4-cell block; draws it when it has geometry and
 // 0x00481a20 accepts it, then walks the child nodes unless this node's
 // buffers stand in for them.
-int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
+int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
 {
     GridBlockRange* ranges = (GridBlockRange*)data->field_0x17c;
     if (ranges) {
@@ -446,9 +446,9 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
             for (int i = 0; i < 4; i++) {
                 DrawableGridNode* child = (DrawableGridNode*)children[i + j + g_gridQuadCell[quad]];
                 if (child && child->childMask) {
-                    if (child->data->field_0x13c != 0 && !child->data->b3)
+                    if (child->data->vertexCount != 0 && !child->data->b3)
                         child->UnknownVirtualSlot4(-1);
-                    child->UnknownFunction481180(0, 0, 16, 0);
+                    child->WalkSlot4Quadrants(0, 0, 16, 0);
                 }
             }
         }
@@ -458,12 +458,12 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
 
 
 // 0x0047f210: per-block buffer rebuild (see the note at the top).
-int DrawableGridNode::UnknownFunction47f210()
+int DrawableGridNode::RebuildBlockBuffers()
 {
     int x;
     int z = 0;
     int indexTotal = 0;
-    int before = data->field_0x12a;
+    int before = data->triangleCount;
     terrain->bufferRebuilds++;
     int b = 0;
     int vertexTotal = 0;
@@ -487,13 +487,13 @@ int DrawableGridNode::UnknownFunction47f210()
             n = 0;
             m = n;
             n = EmitDiagonalTriangles(4, n, x, z + 4, 2, -2, &closed);
-            if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+            if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
                 ((DrawableGridNode*)parent)->extra->texture == 0)
                 n = AppendCornerTriangle(n, x, z + 4, 4, -4);
             m = n;
             x += 4;
             n = EmitDiagonalTriangles(4, n, x, z, -2, 2, &closed);
-            if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+            if (n == m && (data->b0 ? 0 : data->childTriangleCount) == 0 && parent &&
                 ((DrawableGridNode*)parent)->extra->texture == 0)
                 n = AppendCornerTriangle(n, x, z, -4, 4);
             vertexTotal += g_gridVertexCache.count;
@@ -509,50 +509,50 @@ int DrawableGridNode::UnknownFunction47f210()
             if (n != 0) {
                 int vertexBytes = vertexTotal * 32;
                 int indexBytes = (indexTotal + vertexTotal) * 2;
-                if (data->field_0x134 == 0 || vertexBytes > data->field_0x140) {
-                    g_gridDrawMemory -= data->field_0x140;
-                    void* old = data->field_0x134;
-                    int oldSize = data->field_0x140;
-                    data->field_0x140 = vertexBytes + 0x80;
-                    data->field_0x134 = DebugMalloc(data->field_0x140, __FILE__, 1077);
-                    if (data->field_0x134 == 0) {
-                        data->field_0x140 = 0;
-                        data->field_0x13c = 0;
-                        data->field_0x13e = 0;
+                if (data->vertexBuffer == 0 || vertexBytes > data->vertexBufferBytes) {
+                    g_gridDrawMemory -= data->vertexBufferBytes;
+                    void* old = data->vertexBuffer;
+                    int oldSize = data->vertexBufferBytes;
+                    data->vertexBufferBytes = vertexBytes + 0x80;
+                    data->vertexBuffer = DebugMalloc(data->vertexBufferBytes, __FILE__, 1077);
+                    if (data->vertexBuffer == 0) {
+                        data->vertexBufferBytes = 0;
+                        data->vertexCount = 0;
+                        data->indexCount = 0;
                         return 0;
                     }
                     if (old) {
-                        memcpy(data->field_0x134, old, oldSize);
+                        memcpy(data->vertexBuffer, old, oldSize);
                         DebugFree(old, __FILE__, 1085);
                     }
-                    g_gridDrawMemory += data->field_0x140;
+                    g_gridDrawMemory += data->vertexBufferBytes;
                     if (g_gridDrawMemory > g_gridDrawMemoryPeak)
                         g_gridDrawMemoryPeak = g_gridDrawMemory;
                 }
-                if (data->field_0x138 == 0 || indexBytes > data->field_0x142) {
-                    g_gridDrawMemory -= data->field_0x142;
-                    void* old = data->field_0x138;
-                    int oldSize = data->field_0x142;
-                    data->field_0x142 = indexBytes + 0x20;
-                    data->field_0x138 = DebugMalloc(data->field_0x142, __FILE__, 1098);
-                    if (data->field_0x138 == 0) {
-                        data->field_0x138 = 0;
-                        data->field_0x142 = 0;
-                        data->field_0x13c = 0;
-                        data->field_0x13e = 0;
+                if (data->indexBuffer == 0 || indexBytes > data->indexBufferBytes) {
+                    g_gridDrawMemory -= data->indexBufferBytes;
+                    void* old = data->indexBuffer;
+                    int oldSize = data->indexBufferBytes;
+                    data->indexBufferBytes = indexBytes + 0x20;
+                    data->indexBuffer = DebugMalloc(data->indexBufferBytes, __FILE__, 1098);
+                    if (data->indexBuffer == 0) {
+                        data->indexBuffer = 0;
+                        data->indexBufferBytes = 0;
+                        data->vertexCount = 0;
+                        data->indexCount = 0;
                         return 0;
                     }
                     if (old) {
-                        memcpy(data->field_0x138, old, oldSize);
+                        memcpy(data->indexBuffer, old, oldSize);
                         DebugFree(old, __FILE__, 1107);
                     }
-                    g_gridDrawMemory += data->field_0x142;
+                    g_gridDrawMemory += data->indexBufferBytes;
                     if (g_gridDrawMemory > g_gridDrawMemoryPeak)
                         g_gridDrawMemoryPeak = g_gridDrawMemory;
                 }
-                memcpy((GridVertex*)data->field_0x134 + vertexStart, g_gridVertexCache.vertices,
+                memcpy((GridVertex*)data->vertexBuffer + vertexStart, g_gridVertexCache.vertices,
                        (vertexTotal - vertexStart) * 32);
-                memcpy((unsigned short*)data->field_0x138 + indexStart, g_gridIndices,
+                memcpy((unsigned short*)data->indexBuffer + indexStart, g_gridIndices,
                        (indexTotal - indexStart) * 2);
             }
             b++;
@@ -561,19 +561,19 @@ int DrawableGridNode::UnknownFunction47f210()
     }
     if (data->ageEntry.size == 0)
         terrain->ageManager->Register(&data->ageEntry, EvictNodeBuffers, this, 0,
-                                                   data->field_0x142 + data->field_0x140);
-    else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
-        data->ageEntry.size = data->field_0x142 + data->field_0x140;
-    data->field_0x13c = vertexTotal;
-    data->field_0x13e = indexTotal;
-    data->field_0x12a = indexTotal / 3;
-    if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
+                                                   data->indexBufferBytes + data->vertexBufferBytes);
+    else if (data->ageEntry.size != data->indexBufferBytes + data->vertexBufferBytes)
+        data->ageEntry.size = data->indexBufferBytes + data->vertexBufferBytes;
+    data->vertexCount = vertexTotal;
+    data->indexCount = indexTotal;
+    data->triangleCount = indexTotal / 3;
+    if ((data->triangleCount == 0 || before == 0) && data->triangleCount != before && parent)
         ((DrawableGridNode*)parent)->data->b1 = 1;
-    if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
+    if ((data->triangleCount == 0 || before == 0) && data->triangleCount != before && parent)
         ((DrawableGridNode*)parent)->data->b1 = 1;
-    if (data->field_0x12a == 0) {
-        data->field_0x13c = 0;
-        data->field_0x13e = 0;
+    if (data->triangleCount == 0) {
+        data->vertexCount = 0;
+        data->indexCount = 0;
     }
     data->field_0x160 = saved;
     return 1;
@@ -680,7 +680,7 @@ void DrawableGridNode::WalkBorderVertex(int x, int z, int flag, int dir, GridBas
 }
 
 // 0x004815e0: the detail update (see the note at the top).
-float DrawableGridNode::UnknownFunction4815e0(int coarse)
+float DrawableGridNode::ComputeViewerDetail(int coarse)
 {
     float nearX;
     float farX;

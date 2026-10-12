@@ -13,7 +13,7 @@
 #include "TrackGame.h"
 
 #define TARGET() ((PCRenderTarget*)renderContext)
-#define VIEWPORT(i) ((unsigned int)TARGET()->currentCamera->field_0x1a0[i])
+#define VIEWPORT(i) ((unsigned int)TARGET()->currentCamera->viewport[i])
 
 // 0x00462620
 Fog::Fog(int flags)

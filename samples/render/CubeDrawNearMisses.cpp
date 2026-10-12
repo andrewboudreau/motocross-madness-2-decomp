@@ -157,9 +157,9 @@ int DrawableCube::BuildFaceGeometry()
 // 0x0043e0b0
 int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context)
 {
-    field_0x2c = cube;
+    cubeObject = cube;
     cube->LoadMissingTextures((UnknownTexturePalette*)loadPalette, context);
-    if (HasMipLevels(field_0x2c->fileFormat)) {
+    if (HasMipLevels(cubeObject->fileFormat)) {
         for (int face = 0; face < 6; face++) {
             for (int row = 0; row < 4; row++) {
                 UnknownCubeVertex* v = s_cellVertices[face][row * 4];
@@ -185,7 +185,7 @@ int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* c
         for (int row = 0; row < 4; row++) {
             UnknownCubeVertex* v = s_cellVertices[face][row * 4];
             for (int column = 0; column < 4; column++, v += 6) {
-                int size = UnknownFunction43d080(field_0x2c->field_0x38[face].sizeCodes, column, row);
+                int size = UnknownFunction43d080(cubeObject->faces[face].sizeCodes, column, row);
                 float low = 1.0f / (float)size;
                 v[0].tu = low;
                 v[0].tv = low;
@@ -213,11 +213,11 @@ void DrawableCube::MarkVisibleCells()
     forward.x = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[0][2];
     forward.y = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[1][2];
     forward.z = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[2][2];
-    const Vector3& center = field_0x2c->field_0x14;
+    const Vector3& center = cubeObject->center;
     const Vector3& eye = ((UnknownCubeCameraView*)Target()->currentCamera)->position;
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
-        field_0x2c->field_0x38[face].visibleCells = 0;
+        cubeObject->faces[face].visibleCells = 0;
         if (!g_UnknownCubeClipper575a98->CanFaceCamera(Target()->currentCamera, &forward,
                                                                 &s_faceNormals[face]))
             continue;
@@ -232,7 +232,7 @@ void DrawableCube::MarkVisibleCells()
             int corner = i + i / 4;
             if (g_UnknownCubeClipper575a98->IsQuadOnScreen(Target()->currentCamera, s_viewPoints, corner,
                                                                   corner + 1, corner + 6, corner + 5))
-                field_0x2c->field_0x38[face].visibleCells |= 1 << i;
+                cubeObject->faces[face].visibleCells |= 1 << i;
         }
     }
 }

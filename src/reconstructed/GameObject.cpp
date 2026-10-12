@@ -579,43 +579,43 @@ GameObject* GameObject::FindByClassName(int mode, const char* name) {
 
 // 0x00469950
 GameObjectIterator::GameObjectIterator(GameObject* root, int mode, const char* filter) {
-    field_0x00 = root;
-    field_0x08 = mode;
+    rootObject = root;
+    walkMode = mode;
     if (filter) {
-        sprintf(field_0x0c, "%s,", filter);
-        field_0x8c = strlen(field_0x0c) - 1;
+        sprintf(filterText, "%s,", filter);
+        filterLength = strlen(filterText) - 1;
     } else {
-        field_0x0c[0] = 0;
-        field_0x8c = 0;
+        filterText[0] = 0;
+        filterLength = 0;
     }
-    switch (field_0x08) {
+    switch (walkMode) {
     case 0:
     case 1:
-        field_0x04 = field_0x00->firstChild;
+        currentObject = rootObject->firstChild;
         break;
     case 2:
-        if (field_0x00->prevSibling) {
-            field_0x04 = field_0x00->prevSibling;
-            while (field_0x04->prevSibling)
-                field_0x04 = field_0x04->prevSibling;
+        if (rootObject->prevSibling) {
+            currentObject = rootObject->prevSibling;
+            while (currentObject->prevSibling)
+                currentObject = currentObject->prevSibling;
         } else {
-            field_0x04 = field_0x00->nextSibling;
+            currentObject = rootObject->nextSibling;
         }
         break;
     case 3:
     case 4:
-        field_0x04 = field_0x00->parent;
+        currentObject = rootObject->parent;
         break;
     }
     g_UnknownGlobal65b548++;
-    field_0x90 = 0;
+    exhausted = 0;
 }
 
 // 0x00469a20
 void GameObjectIterator::Stop() {
-    if (!field_0x90)
+    if (!exhausted)
         g_UnknownGlobal65b548--;
-    field_0x04 = 0;
+    currentObject = 0;
 }
 
 // 0x00469a40
@@ -627,66 +627,66 @@ GameObjectIterator::~GameObjectIterator() {
 // runs out.
 GameObject* GameObjectIterator::Next() {
     char className[128];
-    if (!field_0x04)
+    if (!currentObject)
         return 0;
     GameObject* found;
     do {
-        if (field_0x0c[0]) {
-            if (strstr(field_0x04->classNames, field_0x0c)) {
-                found = field_0x04;
+        if (filterText[0]) {
+            if (strstr(currentObject->classNames, filterText)) {
+                found = currentObject;
             } else {
-                strcpy(className, typeid(*field_0x04).name());
-                if (strlen(className) > 6 && !strncmp(className + 6, field_0x0c, field_0x8c) &&
+                strcpy(className, typeid(*currentObject).name());
+                if (strlen(className) > 6 && !strncmp(className + 6, filterText, filterLength) &&
                     strstr(className, "class ") == className)
-                    found = field_0x04;
-                if (!strncmp(className, field_0x0c, field_0x8c))
-                    found = field_0x04;
+                    found = currentObject;
+                if (!strncmp(className, filterText, filterLength))
+                    found = currentObject;
                 else
                     found = 0;
             }
         } else {
-            found = field_0x04;
+            found = currentObject;
         }
-        switch (field_0x08) {
+        switch (walkMode) {
         case 0:
-            field_0x04 = field_0x04->nextSibling;
+            currentObject = currentObject->nextSibling;
             break;
         case 1:
-            if (field_0x04->firstChild) {
-                field_0x04 = field_0x04->firstChild;
-            } else if (field_0x04->nextSibling) {
-                field_0x04 = field_0x04->nextSibling;
-            } else if (field_0x04 == field_0x00 || field_0x04->parent == field_0x00) {
-                field_0x04 = 0;
+            if (currentObject->firstChild) {
+                currentObject = currentObject->firstChild;
+            } else if (currentObject->nextSibling) {
+                currentObject = currentObject->nextSibling;
+            } else if (currentObject == rootObject || currentObject->parent == rootObject) {
+                currentObject = 0;
             } else {
-                for (field_0x04 = field_0x04->parent; field_0x04; field_0x04 = field_0x04->parent) {
-                    if (field_0x04 == field_0x00) {
-                        field_0x04 = 0;
+                for (currentObject = currentObject->parent; currentObject; currentObject = currentObject->parent) {
+                    if (currentObject == rootObject) {
+                        currentObject = 0;
                         break;
                     }
-                    if (field_0x04->nextSibling) {
-                        field_0x04 = field_0x04->nextSibling;
+                    if (currentObject->nextSibling) {
+                        currentObject = currentObject->nextSibling;
                         break;
                     }
                 }
             }
             break;
         case 2:
-            field_0x04 = field_0x04->nextSibling;
-            if (field_0x04 == field_0x00)
-                field_0x04 = field_0x04->nextSibling;
+            currentObject = currentObject->nextSibling;
+            if (currentObject == rootObject)
+                currentObject = currentObject->nextSibling;
             break;
         case 3:
-            field_0x04 = 0;
+            currentObject = 0;
             break;
         case 4:
-            field_0x04 = field_0x04->parent;
+            currentObject = currentObject->parent;
             break;
         }
-    } while (!found && field_0x04);
-    if (!field_0x04) {
+    } while (!found && currentObject);
+    if (!currentObject) {
         g_UnknownGlobal65b548--;
-        field_0x90 = 1;
+        exhausted = 1;
     }
     return found;
 }

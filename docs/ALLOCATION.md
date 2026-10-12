@@ -144,8 +144,8 @@ behaviors retained by the reconstruction, not recommended allocator semantics.
 
 ### Accounting unit (VC6 strict exact)
 
-`samples/allocation/MemTag.cpp` (bindings `MemTag.bindings.json`) reconstructs
-the whole unit `0x004a2ac0..0x004a3142` against `src/reconstructed/MemTag.h`
+`src/reconstructed/MemTag.cpp` (bindings `MemTag.bindings.json`) reconstructs
+the whole unit `0x004a2ac0..0x004a3142` against `MemTag.h`
 and `DebugAlloc.h`; all 22 functions are strict exact under VC6 with every
 relocation resolved: the `.CRT$XCU` 183 initializer set for the static tracker
 at `0x006850c0` (constructor `0x004a2b00`, destructor `0x004a2b80`), the
@@ -159,8 +159,8 @@ takes the explicit `(pointer, file, line)` calls. Source writes those as
 `DebugFree(p, __FILE__, line)` (declared in both `DebugAlloc.h` headers) and
 binds `?DebugFree@@YAXPAXPBDH@Z` to `0x004a2e60`; bindings keep
 `??3@YAXPAXPBDH@Z` only for the compiler-emitted funclet references, bound to
-`0x004a3060` (all 501 funclet calls in `0x005495f8..0x0054f168` go there). The file name is ours and the
-unit has no `__FILE__` literal, so it stays in samples.
+`0x004a3060` (all 501 funclet calls in `0x005495f8..0x0054f168` go there). The file name is ours (the
+unit has no `__FILE__` literal); the extent is tier 2.
 
 ### Application accounting probes
 

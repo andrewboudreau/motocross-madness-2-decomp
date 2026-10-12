@@ -10,8 +10,8 @@ class DirectoryList;
 struct UnknownTrackRecord {
     UnknownTrackRecord();                     // 0x0051ee90
 
-    char field_0x00[16];                      // racer name
-    float field_0x10;                         // time or score
+    char racerName[16];                       // +0x00 racer name
+    float score;                              // +0x10 time or score
 };
 
 // qsort orders for the records: 0x0051eed0 puts the lower value first,
@@ -33,10 +33,10 @@ public:
     void ReadListedRecord(int unused, const char* name);    // 0x0051f2c0
     int AddRacer(short kind, int racer);             // 0x0051f3c0: adds a racer
 
-    int field_0x00;                           // selects the file extension
-    char field_0x04[3][5];                    // ".hs1", ".hs2", ".hs3"
-    UnknownTrackRecord field_0x14[10];
-    DirectoryList* field_0xdc;
-    int field_0xe0;                           // record count
+    int extensionIndex;                       // +0x00 selects the file extension
+    char extensions[3][5];                    // +0x04 ".hs1", ".hs2", ".hs3"
+    UnknownTrackRecord records[10];           // +0x14
+    DirectoryList* directoryList;             // +0xdc
+    int recordCount;                          // +0xe0 record count
     int field_0xe4;                           // stored with the records
 };

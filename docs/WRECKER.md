@@ -204,6 +204,6 @@ python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" --profile vc6_o2_m
   src/reconstructed/Wrecker.cpp -o work/wrecker.obj
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x005301c0 --target-size 995 \
   --obj work/wrecker.obj \
-  --symbol '?UnknownFunction5301c0@Wrecker@@QAEXPAVUnknownWreckerCharacter@@PBD@Z' \
+  --symbol '?CreateBodies@Wrecker@@QAEXPAVUnknownWreckerCharacter@@PBD@Z' \
   --bindings src/reconstructed/Wrecker.bindings.json --json
 ```

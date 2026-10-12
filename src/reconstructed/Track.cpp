@@ -167,8 +167,8 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
             TrackSegment* segment = list->node->firstSegment;
             if (segment) {
                 if (!segment->next) {
-                    float dx = p.x - segment->field_0x00;
-                    float dz = p.z - segment->field_0x08;
+                    float dx = p.x - segment->pointX;
+                    float dz = p.z - segment->pointZ;
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
                         best = distanceSquared;
@@ -181,29 +181,29 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
                     TrackSegment* next = segment->next;
                     if (!next)
                         break;
-                    float ex = next->field_0x00 - segment->field_0x00;
-                    float ez = next->field_0x08 - segment->field_0x08;
+                    float ex = next->pointX - segment->pointX;
+                    float ez = next->pointZ - segment->pointZ;
                     float t;
                     float dx;
                     float dz;
                     if (ex == 0.0f && ez == 0.0f)
                         t = 0.0f;
                     else {
-                        t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                        t = ((p.z - segment->pointZ) * ez + (p.x - segment->pointX) * ex) / (ez * ez + ex * ex);
                         if (t > 1.0f)
                             t = 1.0f;
                         else if (t < 0.0f)
                             t = 0.0f;
                     }
                     if (t == 1.0f) {
-                        dx = p.x - next->field_0x00;
-                        dz = p.z - next->field_0x08;
+                        dx = p.x - next->pointX;
+                        dz = p.z - next->pointZ;
                     } else if (t == 0.0f) {
-                        dx = p.x - segment->field_0x00;
-                        dz = p.z - segment->field_0x08;
+                        dx = p.x - segment->pointX;
+                        dz = p.z - segment->pointZ;
                     } else {
-                        dx = (p.x - segment->field_0x00) - t * ex;
-                        dz = (p.z - segment->field_0x08) - t * ez;
+                        dx = (p.x - segment->pointX) - t * ex;
+                        dz = (p.z - segment->pointZ) - t * ez;
                     }
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
@@ -255,8 +255,8 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
             out->segment = segment;
             out->t = 0.0f;
             if (outDistance) {
-                float dx = p.x - segment->field_0x00;
-                float dz = p.z - segment->field_0x08;
+                float dx = p.x - segment->pointX;
+                float dz = p.z - segment->pointZ;
                 *outDistance = FastSqrt(dz * dz + dx * dx);
             }
             return 1;
@@ -265,29 +265,29 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
             TrackSegment* next = segment->next;
             if (!next)
                 break;
-            float ex = next->field_0x00 - segment->field_0x00;
-            float ez = next->field_0x08 - segment->field_0x08;
+            float ex = next->pointX - segment->pointX;
+            float ez = next->pointZ - segment->pointZ;
             float t;
             float dx;
             float dz;
             if (ex == 0.0f && ez == 0.0f)
                 t = 0.0f;
             else {
-                t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                t = ((p.z - segment->pointZ) * ez + (p.x - segment->pointX) * ex) / (ez * ez + ex * ex);
                 if (t > 1.0f)
                     t = 1.0f;
                 else if (t < 0.0f)
                     t = 0.0f;
             }
             if (t == 1.0f) {
-                dx = p.x - next->field_0x00;
-                dz = p.z - next->field_0x08;
+                dx = p.x - next->pointX;
+                dz = p.z - next->pointZ;
             } else if (t == 0.0f) {
-                dx = p.x - segment->field_0x00;
-                dz = p.z - segment->field_0x08;
+                dx = p.x - segment->pointX;
+                dz = p.z - segment->pointZ;
             } else {
-                dx = (p.x - segment->field_0x00) - t * ex;
-                dz = (p.z - segment->field_0x08) - t * ez;
+                dx = (p.x - segment->pointX) - t * ex;
+                dz = (p.z - segment->pointZ) - t * ez;
             }
             float distanceSquared = dz * dz + dx * dx;
             if (distanceSquared < best || best < 0.0f) {
@@ -555,9 +555,9 @@ int Track::PointAt(TrackPos pos, TrackVec3* out)
     TrackSegment* next = segment->next;
     if (!next) {
         if (pos.t == 0.0f) {
-            out->x = segment->field_0x00;
-            out->y = segment->field_0x04;
-            out->z = segment->field_0x08;
+            out->x = segment->pointX;
+            out->y = segment->pointY;
+            out->z = segment->pointZ;
         }
         return 0;
     }
@@ -566,12 +566,12 @@ int Track::PointAt(TrackPos pos, TrackVec3* out)
     else if (pos.t > 1.0f)
         pos.t = 1.0f;
     TrackVec3 d;
-    d.x = next->field_0x00 - segment->field_0x00;
-    d.y = next->field_0x04 - segment->field_0x04;
-    d.z = next->field_0x08 - segment->field_0x08;
-    out->x = d.x * pos.t + segment->field_0x00;
-    out->y = d.y * pos.t + segment->field_0x04;
-    out->z = d.z * pos.t + segment->field_0x08;
+    d.x = next->pointX - segment->pointX;
+    d.y = next->pointY - segment->pointY;
+    d.z = next->pointZ - segment->pointZ;
+    out->x = d.x * pos.t + segment->pointX;
+    out->y = d.y * pos.t + segment->pointY;
+    out->z = d.z * pos.t + segment->pointZ;
     return 1;
 }
 
@@ -609,8 +609,8 @@ int Track::SegmentDirection(TrackSegment* segment, TrackVec3* out)
 {
     if (out && segment && segment->next && segment->horizontalLength > 0.0f) {
         TrackSegment* next = segment->next;
-        TrackVec3 d = TrackVector(next->field_0x00 - segment->field_0x00, next->field_0x04 - segment->field_0x04,
-                                  next->field_0x08 - segment->field_0x08);
+        TrackVec3 d = TrackVector(next->pointX - segment->pointX, next->pointY - segment->pointY,
+                                  next->pointZ - segment->pointZ);
         *out = TrackNormalized(d);
         return 1;
     }
@@ -638,18 +638,18 @@ int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out,
     TrackSegment* next = segment->next;
     switch (mode) {
     case 17:
-        a = *(TrackVec3*)&segment->field_0x0c;
-        d = *(TrackVec3*)&next->field_0x0c - *(TrackVec3*)&segment->field_0x0c;
-        a2 = *(TrackVec3*)&segment->field_0x18;
-        d2 = *(TrackVec3*)&next->field_0x18 - *(TrackVec3*)&segment->field_0x18;
+        a = *(TrackVec3*)&segment->edgeAX;
+        d = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
+        a2 = *(TrackVec3*)&segment->edgeBX;
+        d2 = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
         break;
     case 11:
-        a = *(TrackVec3*)&segment->field_0x18;
-        d = *(TrackVec3*)&next->field_0x18 - *(TrackVec3*)&segment->field_0x18;
+        a = *(TrackVec3*)&segment->edgeBX;
+        d = *(TrackVec3*)&next->edgeBX - *(TrackVec3*)&segment->edgeBX;
         break;
     case 10:
-        a = *(TrackVec3*)&segment->field_0x0c;
-        d = *(TrackVec3*)&next->field_0x0c - *(TrackVec3*)&segment->field_0x0c;
+        a = *(TrackVec3*)&segment->edgeAX;
+        d = *(TrackVec3*)&next->edgeAX - *(TrackVec3*)&segment->edgeAX;
         break;
     }
     if (d.x == 0.0f && d.z == 0.0f) {

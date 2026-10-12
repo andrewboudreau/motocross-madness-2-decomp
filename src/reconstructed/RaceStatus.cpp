@@ -284,8 +284,8 @@ int RankByScore(int keepRacing) {
             scores[i].racer->finishPosition = i + 1;
         if (!keepRacing) {
             TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
-            if (owner->field_0x70 * 60.0f + owner->field_0x74 >=
-                g_TrackGame->mode.raceSettings.field_0x140 * 60.0f - 1.0f) {
+            if (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds >=
+                g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f - 1.0f) {
                 for (i = 0; i < count; i++)
                     scores[i].racer->hasFinished = 1;
             }

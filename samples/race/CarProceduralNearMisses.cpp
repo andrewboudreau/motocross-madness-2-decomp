@@ -27,7 +27,7 @@
 // offsets masked the instruction stream is 781 instructions like retail's
 // and 88% aligned. Retail facts the source follows: the sensor contact's
 // normal is at +0x08 (`add ecx, 8`); the back and steering points subtract
-// field_0x1c4 straight from the call result (no named copy) and keep the
+// pathPosition straight from the call result (no named copy) and keep the
 // time offset on the x87 stack (`fld t; fsub st(1)` ... `fstp st(0)`, a
 // float local); the collider frame is built by an inline helper taking
 // the axes by value (its locals share slots with the blocks' vectors); the
@@ -238,100 +238,100 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         // wheels' height from the first wheel above the origin.
         Vector3 box[2];
         box[0] = kVec3Zero;
-        box[0].y += field_0x188;
+        box[0].y += sensorHalfHeight;
         box[1] = kVec3Zero;
-        box[1].y -= field_0x188;
-        field_0x38->SetMeshShape(1, box);
+        box[1].y -= sensorHalfHeight;
+        sensorCollider->SetMeshShape(1, box);
         for (unsigned int i = 0; i < numWheels; i++) {
             Vector3 position;
             wheelNodes[i]->GetPosition(&position);
             if (position.z > 0.0)
-                field_0x198 = position.z;
+                frontWheelZ = position.z;
         }
         started = 1;
     }
-    field_0x194 = (float)fmod(frameTime + field_0x194, pathKeys[pathKeyCount - 1].time * inversePathSpeed);
+    pathTime = (float)fmod(frameTime + pathTime, pathKeys[pathKeyCount - 1].time * inversePathSpeed);
     float t;
-    if (field_0x19c > 0.0) {
-        field_0x1a0 = FindOffsetAtDistance(field_0x194, field_0x19c);
-        t = field_0x194 - field_0x1a0;
-        field_0x1c4 = PositionAtTime(t);
+    if (trailDistance > 0.0) {
+        trailTimeOffset = FindOffsetAtDistance(pathTime, trailDistance);
+        t = pathTime - trailTimeOffset;
+        pathPosition = PositionAtTime(t);
     } else {
-        field_0x1a0 = 0.0f;
-        t = field_0x194;
-        field_0x1c4 = PositionAtTime(t);
+        trailTimeOffset = 0.0f;
+        t = pathTime;
+        pathPosition = PositionAtTime(t);
     }
-    Vector3 ahead = PositionAtTime(t + field_0x1a4);
-    Vector3 forward = ahead - field_0x1c4;
+    Vector3 ahead = PositionAtTime(t + lookAheadTime);
+    Vector3 forward = ahead - pathPosition;
     forward.y = 0.0f;
-    field_0x40 = forward * field_0x1a8;
-    field_0x4c = CarLength(field_0x40);
-    Vector3 local = field_0x34->WorldToLocalDirection(forward);
+    pathVelocity = forward * velocityScale;
+    groundSpeed = CarLength(pathVelocity);
+    Vector3 local = carModel->WorldToLocalDirection(forward);
     if (numWheels > 0)
-        field_0x18c = (float)fmod(inverseWheelRadius * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
+        wheelSpinAngle = (float)fmod(inverseWheelRadius * velocityScale * local.z * frameTime + wheelSpinAngle, 6.2831855f);
     float behind = FindOffsetAtDistance(t, -1.0f);
-    Vector3 back = PositionAtTime(t - behind) - field_0x1c4;
+    Vector3 back = PositionAtTime(t - behind) - pathPosition;
     CarNormalizeInPlace(back);
     if (field_0x5c)
-        field_0x1f4 = back;
+        smoothedBack = back;
     else
-        field_0x1f4 = field_0x1f4 * field_0x1ac + back * (1.0f - field_0x1ac);
-    if (field_0x50 && numWheels > 0) {
-        float wheelbase = FindOffsetAtDistance(t, -field_0x198);
-        Vector3 side = PositionAtTime(t - wheelbase) - field_0x1c4;
-        Vector3 steer = field_0x34->WorldToLocalDirection(side);
-        field_0x190 = (float)atan2(steer.x, steer.z);
-        field_0x190 = CarClamp(field_0x190, -0.52359873f, 0.52359873f);
+        smoothedBack = smoothedBack * backBlend + back * (1.0f - backBlend);
+    if (steersFrontWheels && numWheels > 0) {
+        float wheelbase = FindOffsetAtDistance(t, -frontWheelZ);
+        Vector3 side = PositionAtTime(t - wheelbase) - pathPosition;
+        Vector3 steer = carModel->WorldToLocalDirection(side);
+        steeringAngle = (float)atan2(steer.x, steer.z);
+        steeringAngle = CarClamp(steeringAngle, -0.52359873f, 0.52359873f);
     }
     Vector3 position;
-    field_0x34->GetPositionIn(0, &position);
+    carModel->GetPositionIn(0, &position);
     Vector3 ground = position;
     Vector3 normal;
     ((CarProceduralTerrain*)groundProvider)->QueryGround(&ground, &normal, 0, 0);
     // The sensor collider's frame: the world axes orthonormalised.
     Matrix4 transform;
     CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
-    field_0x38->SetTransform(&transform);
-    field_0x38->QueryCollisions();
-    if (field_0x38->hasContact) {
-        CarProceduralContact* contact = field_0x38->field_0x5c;
-        Vector3 lifted = kVec3YAxis * ((1.0f - contact->field_0x00.x) * field_0x188 * 2.0f - field_0x188) + position;
+    sensorCollider->SetTransform(&transform);
+    sensorCollider->QueryCollisions();
+    if (sensorCollider->hasContact) {
+        CarProceduralContact* contact = sensorCollider->field_0x5c;
+        Vector3 lifted = kVec3YAxis * ((1.0f - contact->field_0x00.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
         if (lifted.y > ground.y) {
             ground = lifted;
             normal = ((CarProceduralSensorContact*)contact)->field_0x08;
         }
     }
     if (field_0x5c)
-        field_0x200 = normal;
+        smoothedNormal = normal;
     else
-        field_0x200 = field_0x200 * field_0x1b0 + normal * (1.0f - field_0x1b0);
-    Vector3 flat = field_0x1f4 - field_0x200 * CarDot(field_0x1f4, field_0x200);
-    field_0x34->SetAxesPtr(&flat, &field_0x200, 0, 1);
-    Vector3 target(field_0x1d0.x + field_0x1c4.x, ground.y, field_0x1d0.z + field_0x1c4.z);
-    Vector3 offset = field_0x34->LocalToWorldDirection(field_0x1dc);
+        smoothedNormal = smoothedNormal * normalBlend + normal * (1.0f - normalBlend);
+    Vector3 flat = smoothedBack - smoothedNormal * CarDot(smoothedBack, smoothedNormal);
+    carModel->SetAxesPtr(&flat, &smoothedNormal, 0, 1);
+    Vector3 target(pathOffset.x + pathPosition.x, ground.y, pathOffset.z + pathPosition.z);
+    Vector3 offset = carModel->LocalToWorldDirection(bodyOffset);
     Vector3 placement = target - offset;
-    field_0x34->SetPositionInFrame(0, &placement);
+    carModel->SetPositionInFrame(0, &placement);
     for (unsigned int i = 0; i < numWheels; i++) {
         Vector3 axisA;
         Vector3 axisB;
-        if (field_0x50 && i < 2) {
-            UnknownFunction4b5d00(&axisA, &axisB, field_0x190, -field_0x18c, 0);
+        if (steersFrontWheels && i < 2) {
+            UnknownFunction4b5d00(&axisA, &axisB, steeringAngle, -wheelSpinAngle, 0);
         } else {
             axisA.x = 0.0f;
-            axisA.y = (float)sin(-field_0x18c);
-            axisA.z = (float)cos(-field_0x18c);
+            axisA.y = (float)sin(-wheelSpinAngle);
+            axisA.z = (float)cos(-wheelSpinAngle);
             axisB.x = 0.0f;
             axisB.y = axisA.z;
             axisB.z = -axisA.y;
         }
         wheelNodes[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
     }
-    field_0x3c->UpdatePlacement();
-    if (field_0x3c->QueryCollisions()) {
-        CarProceduralContact* contact = field_0x3c->field_0x5c;
+    bodyCollider->UpdatePlacement();
+    if (bodyCollider->QueryCollisions()) {
+        CarProceduralContact* contact = bodyCollider->field_0x5c;
         field_0x214 = contact->field_0x18;
         field_0x220 = contact->field_0x0c;
-        Vector3& velocity = field_0x3c->field_0x54->field_0xf8;
+        Vector3& velocity = bodyCollider->field_0x54->field_0xf8;
         velocity.x -= contact->field_0x00.x * 1.005f;
         velocity.y -= contact->field_0x00.y * 1.005f;
         velocity.z -= contact->field_0x00.z * 1.005f;

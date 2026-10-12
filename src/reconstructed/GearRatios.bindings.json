@@ -3,7 +3,7 @@
   "??_C@_0BL@LHGH@Gear?5Ratios?5invalid?5in?5?$CFs?6?$AA@": "0x0057171c",
   "??_C@_0CC@IAAD@Rpm?5Limits?5?$CI?$CFd?0?$CFd?$CJ?5invalid?5in?5?$CFs@": "0x005716f8",
   "??_C@_0DA@BHHP@Unable?5to?5find?5optimum?5shift?5ran@": "0x005716c8",
-  "?UnknownFunction4d2f50@UnknownEngineGearbox@@QAEXMHE@Z": "0x004d2f50",
+  "?UpdateThrottle@UnknownEngineGearbox@@QAEXMHE@Z": "0x004d2f50",
   "?AutoShift@UnknownEngineGearbox@@QAEXHM@Z": "0x004d3030",
   "?DriveForce@UnknownEngineGearbox@@QAEXMPBUVector3@@M_NMPAU2@PAM@Z": "0x004d31b0",
   "_$E1": "0x004d3350",

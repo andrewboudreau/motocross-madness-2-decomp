@@ -89,7 +89,7 @@ Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
     } else {
         float dot = BikeCameraDot(UnknownVirtualSlot33(), field_0x29c);
         float height = field_0x2c0 * 0.009f + 1.0f;
-        float ratio = field_0x16c / field_0x1dc;
+        float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
         float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
         float distance = lag * (height * height * dot / speed) * 35.0f;

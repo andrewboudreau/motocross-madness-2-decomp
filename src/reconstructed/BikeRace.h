@@ -94,7 +94,7 @@ public:
     int OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
                               UnknownVcrFile* file);
     float RecordedLength();            // 0x0049c000: the recorded length
-    void UnknownFunction49bff0(float time, int flag); // 0x0049bff0
+    void SetReplayLength(float time, int flag); // 0x0049bff0
     // 0x0049c010: saves the recording with its length and description.
     void SaveRecording(float length, char* description, int flag);
     // 0x0049c070: describes a racer of the recording: its network id, AI
@@ -107,7 +107,7 @@ public:
                                char* bikeName, char* riderName, int* engineSize, int* engineKind,
                                int* value);
 
-    float field_0x0d8;                        // 0x0049bff0 stores its first argument
+    float replayLength;                       // +0x0d8 SetReplayLength (BikeRace slot 10 each frame)
     // +0xdc..+0xf8c (0xeb0 bytes) is the block 0x0049bf10 and 0x0049c010 hand
     // to the recorder.
     char magic[8];                            // +0x0dc "MCMVCR" (0x0049bf10, mode 0)
@@ -636,8 +636,8 @@ struct UnknownBikeRaceCameraView {
     GameObject* field_0x388;
     void* shadowCaster;                       // +0x38c a scene shadow caster
     unsigned char followingRacer;             // +0x390 following a racer
-    unsigned char field_0x391;
-    unsigned char field_0x392;
+    unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
+    unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
     UnknownBikeRaceRacer* field_0x394;
     unsigned char field_0x398[0x3b0 - 0x398];
     UnknownBikeRaceRacer* field_0x3b0;
@@ -657,8 +657,8 @@ struct UnknownBikeRaceCameraView {
             }
         }
         field_0x394 = racer;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = true;
         shadowCaster = 0;
         field_0x384 = 0;
@@ -677,8 +677,8 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionTargetCaster(void* caster) {
         field_0x274 = 0;
         shadowCaster = caster;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = false;
         field_0x384 = 0;
         field_0x388 = 0;
@@ -686,8 +686,8 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionTargetCharacter(UnknownBikeRaceSceneCharacter* character) {
         field_0x384 = character;
         field_0x274 = 0;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = false;
         field_0x388 = 0;
         shadowCaster = 0;
@@ -695,8 +695,8 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionTargetObject(GameObject* object) {
         field_0x388 = object;
         field_0x274 = 0;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = false;
         field_0x384 = 0;
         shadowCaster = 0;
@@ -905,17 +905,17 @@ public:
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
     void NextCameraTarget(int forward, int racers, int objects);
-    void UnknownFunction41f550(int value);    // 0x0041f550: toggles +0x3f8
+    void ToggleReplayPause(int pauseOnly); // 0x0041f550: pauses, or with 0 toggles, +0x3f8
     UnknownBikeRaceRacer* NextBike(int* iterator); // 0x004204e0
-    void UnknownFunction420590(int player);   // 0x00420590
-    void UnknownFunction420b00(char* path, char* description); // 0x00420b00
+    void HandlePlayerLeft(int player);   // 0x00420590
+    void SaveReplay(char* path, char* description); // 0x00420b00: saves the recording, copies VCRtape.dat to `path`
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0
     // plays the replay just recorded, otherwise records a new one.
     void RestartRace(int mode, char* path, char* description);
     void RestartReplay();             // 0x00420bd0: restarts the replay and ghost
     // 0x004210f0: writes two positions relative to `reference`.
     void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
-    void UnknownFunction421050();             // 0x00421050
+    void ResetStartCountdown();             // 0x00421050
     // 0x00421d50: the recorder callback's work (0x004230e0 forwards to it).
     int RecordFrame(int a, void* data, int flag, int b, int* keep, int time);
     void ClearRacerParts();             // 0x00422ec0: zeroes every racer's parts
@@ -961,7 +961,7 @@ public:
     int field_0x150;
     int field_0x154;
     int racerCount;                          // racer count
-    float field_0x15c;
+    float startCountdown;                     // +0x15c: seconds until the start (8.2 with the +0x6c gate, else 5.2)
     float field_0x160;                        // seconds until +0x64 is shown (slot 10)
     Vector3 gridFirstSlot;                      // start grid: first slot (0x004210f0)
     Vector3 gridSlotStep;                      // start grid: step between slots
@@ -1001,8 +1001,8 @@ public:
     int field_0x1ec;
     char ghostFilePlayed[0x104];                  // ghost file played
     char ghostFileRecorded[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
-    bool field_0x3f8;
-    bool field_0x3f9;
+    bool replayPaused;                         // +0x3f8: ToggleReplayPause
+    bool replayStepFrame;                      // +0x3f9: ButFrame: advance one frame
     bool field_0x3fa;
     bool field_0x3fb;
     unsigned char isRecording;                // recording (0x00420650)

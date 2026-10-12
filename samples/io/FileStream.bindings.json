@@ -7,7 +7,7 @@
   "??_C@_0BG@LACB@Fseek?5failed?5for?5?$CFs?4?6?$AA@": "0x0056b08c",
   "??_C@_0CP@CNEL@Write?5of?5encrypted?5file?5header?5f@": "0x0056b05c",
   "??_C@_0CP@OGFA@?$CFs?5NOT?5an?5encrypted?5file?0?5but?5ex@": "0x0056b02c",
-  "?UnknownFunction430ff0@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
+  "?AtEnd@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
   "?WriteXorEncoded@@YAHPBXHHPAU_iobuf@@PAD@Z": "0x0045c6a0",
   "?ReadXorDecoded@@YAHPAEHHPAU_iobuf@@0@Z": "0x0045c7b0",
   "?FindArchive@UnknownTextureStream@@QAEPAV1@PBD@Z": "0x00460d70",

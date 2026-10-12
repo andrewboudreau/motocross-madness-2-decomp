@@ -51,8 +51,8 @@ public:
     TextureMap* overlayTexture;               // released by derived destructors
     TextureMap* backingTexture;               // copied back by 0x004b6710; RadarOverlay: the map
     TextureMap* sharedTexture;                // shared 256x256 texture (0x00689110)
-    UnknownOverlayText* field_0x38;
-    OverlayIconService* field_0x3c;
+    UnknownOverlayText* textService;          // +0x38 fonts for the overlay (0x0050ae80), or 0
+    OverlayIconService* iconService;          // +0x3c
     int field_0x40;
     UnknownOverlayVertex quadVertices[5];     // cleared by the constructor
     int field_0xe4;                           // 1

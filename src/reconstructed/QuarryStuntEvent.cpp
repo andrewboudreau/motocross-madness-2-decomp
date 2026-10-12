@@ -85,19 +85,19 @@ int BaseQuarryEvent::UnknownVirtualSlot14() {
 int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     if (auralScape)
-        auralScape->UnknownFunction4030a0(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
+        auralScape->SetListener(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
                                           &raceCamera->upDirection, &raceCamera->followedBike->velocity);
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
     if (radarOverlay && visualCue && statsOverlay) {
         visualCue->field_0xc8 = radarOverlay->followedIndex;
-        int index = visualCue->UnknownFunction48bc30();
+        int index = visualCue->NextCueIndex();
         if (index != -1) {
             radarOverlay->field_0x16c = index;
             statsOverlay->UnknownFunction464e80(index);
         }
-        radarOverlay->field_0x174 = visualCue->UnknownFunction48bc80();
-        chatOverlay->UnknownFunction51d980(visualCue->UnknownFunction48bc80());
+        radarOverlay->field_0x174 = visualCue->CanCycleCues();
+        chatOverlay->ShowCueTag(visualCue->CanCycleCues());
     }
     if (!g_TrackGame->eventManager->waitingForRacers && !raceView->viewAvailable && raceView->isRacing) {
         clockSeconds += g_TrackGame->frameTime;
@@ -159,7 +159,7 @@ struct UnknownQuarryBikeChoice {
 int BaseQuarryEvent::UnknownFunction4e0560() {
     int players = 0;
     int opponents = 0;
-    if (g_TrackGame->UnknownFunction521cd0()) {
+    if (g_TrackGame->InProCircuitCareer()) {
         int i;
         for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
             if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].field_0x00].field_0xc4 <= g_TrackGame->proCircuit->maxModelKind)
@@ -197,7 +197,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
 int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
-                     ->UnknownFunction48adf0(renderContext, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
+                     ->LoadVisualCue(renderContext, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
                                              raceView, 45, raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
         sprintf(message, "Visual Cue not loaded.\n");
@@ -329,7 +329,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         return 1;
     }
     if (TestInputEvent(0x31, 0, event, 0x80000000) && statsOverlay) {
-        chatOverlay->UnknownFunction51e7c0();
+        chatOverlay->CycleNameTagShade();
         return 1;
     }
     if (TestInputEvent(0x3e, 0, event, 0x80000000)) {
@@ -516,7 +516,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         sprintf(buffer, "%s %s", name, text);
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        raceView->UnknownFunction420590(leave->field_0x08);
+        raceView->HandlePlayerLeft(leave->field_0x08);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->RemovePlayer(leave->field_0x08);
     } else if (from && type == 0x89) {
@@ -526,7 +526,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         sprintf(buffer, "%s %s", (char*)data + 4, text);
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        raceView->UnknownFunction420590(from);
+        raceView->HandlePlayerLeft(from);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->RemovePlayer(from);
     }

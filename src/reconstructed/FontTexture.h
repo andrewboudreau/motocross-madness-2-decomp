@@ -35,7 +35,7 @@ public:
     virtual ~FontTexture();                   // 0x00467290 (deleting wrapper 0x00467160)
 
     // 0x00467280 (cdecl): deletes `font` if there is one.
-    static void UnknownFunction467280(FontTexture* font);
+    static void Destroy(FontTexture* font);
     CharacterCell* FindCell(int code);              // 0x00467340: the cell for `code`, or 0
     void SetCell(unsigned int index, CharacterCell* cell);               // 0x00467380
     void SetTexture(TextureMap* texture);            // 0x004673a0
@@ -54,5 +54,5 @@ public:
 
     char* fontName;                           // name
     EArray<CharacterCell*>* cells;            // cells
-    TextureMap* field_0x0c;
+    TextureMap* texture;                      // +0x0c
 };

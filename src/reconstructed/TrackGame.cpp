@@ -104,10 +104,10 @@ TrackGame::TrackGame() {
     profileDirectory = 0;
     menuIsOpen = 0;
     uiInteractionBlocked = 0;
-    field_0x3340 = 0;
+    cdAudio = 0;
     controlMapping = 0;
     field_0x33fc = 0;
-    field_0x3400 = 0;
+    highScores = 0;
     languageModule = LoadLibraryA("lang.dll");
     if (languageModule)
         resourceInstance = languageModule;
@@ -150,11 +150,11 @@ TrackGame::~TrackGame() {
         LoadResourceString(0x14df, url, 0x7f);
         ShellExecuteA(0, 0, url, 0, 0, 3);
     }
-    delete field_0x3340;
+    delete cdAudio;
     delete profileDirectory;
     delete controlMapping;
     delete field_0x33fc;
-    delete field_0x3400;
+    delete highScores;
     if (languageModule) {
         FreeLibrary(languageModule);
         languageModule = 0;
@@ -258,7 +258,7 @@ int TrackGame::UnknownVirtualSlot4() {
     profileDirectory->SetDirectory("ui\\profile");
     profileDirectory->SetPattern("*.*", 1);
     profileDirectory->UnknownVirtualSlot1();
-    field_0x3400 = new(__FILE__, 313) UnknownTrackGameObject3400;
+    highScores = new(__FILE__, 313) UnknownTrackGameObject3400;
     mode.CreateDirectoryLists();
     mode.ResetNetworkRace();
     g_MemTagStack->Push("Audio");
@@ -273,8 +273,8 @@ int TrackGame::UnknownVirtualSlot4() {
         PostMessageA(windowHandle, kCloseWindow, 0, 0);
         return 1;
     }
-    field_0x3340 = new(__FILE__, 343) CDAudio;
-    field_0x3340->Initialize();
+    cdAudio = new(__FILE__, 343) CDAudio;
+    cdAudio->Initialize();
     g_MemTagStack->Push("Startup");
     controlMapping = new(__FILE__, 350) UnknownControlMapping;
     if (!controlMapping)
@@ -369,11 +369,11 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         }
     }
     {
-        int previous = field_0x1c4;
+        int previous = paused;
         if (PCGame::UnknownVirtualSlot14(event, entry))
             return 0;
-        if (field_0x2d4_bit0 && field_0x1c4 != previous) {
-            if (field_0x1c4)
+        if (field_0x2d4_bit0 && paused != previous) {
+            if (paused)
                 childRoot->DisableByClassName("RaceSound");
             else
                 childRoot->EnableByClassName("RaceSound");
@@ -458,9 +458,9 @@ void TrackGame::MuteSound() {
 }
 
 // 0x00521a40
-void TrackGame::UnknownFunction521a40() {
-    if (field_0x3340)
-        field_0x3340->Stop();
+void TrackGame::StopCDAudio() {
+    if (cdAudio)
+        cdAudio->Stop();
 }
 
 // 0x00521a50
@@ -492,7 +492,7 @@ int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
 }
 
 // 0x00521cd0
-int TrackGame::UnknownFunction521cd0() {
+int TrackGame::InProCircuitCareer() {
     if (proCircuit)
         return ui->field_0x4a8 == 0;
     return 0;

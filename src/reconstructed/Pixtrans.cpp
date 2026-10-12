@@ -675,7 +675,7 @@ int Convert565To8(void* destination, void* source, int width, int height, int de
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = palette->UnknownFunction4de290();
+        unsigned char* indices = palette->GetIndexFrom565();
         for (int y = 0; y < height; y++) {
             unsigned short* from = sourceRow;
             unsigned char* to = row;

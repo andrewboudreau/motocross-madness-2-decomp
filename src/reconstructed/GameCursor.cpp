@@ -126,8 +126,8 @@ int GameCursor::UnknownVirtualSlot15() {
 
     int outside = 0;
     if (bindingX && bindingY) {
-        field_0x54 = (int)bindingX->currentValue;
-        field_0x58 = (int)bindingY->currentValue;
+        cursorX = (int)bindingX->currentValue;
+        cursorY = (int)bindingY->currentValue;
     } else {
         RECT window;
         RECT client;
@@ -149,50 +149,50 @@ int GameCursor::UnknownVirtualSlot15() {
         client.right += UNKNOWN_ABS(frame.left);
         client.top = UNKNOWN_ABS(frame.top) + window.top;
         client.bottom += UNKNOWN_ABS(frame.top);
-        field_0x54 = s_mouse.x - client.left;
-        field_0x58 = s_mouse.y - client.top;
+        cursorX = s_mouse.x - client.left;
+        cursorY = s_mouse.y - client.top;
 
         if (g_TrackGame->fullScreen) {
-            field_0x54 = max(0, min(field_0x54, client.right));
-            field_0x58 = max(0, min(field_0x58, client.bottom));
-        } else if (field_0x54 < 0 || field_0x58 < 0 || field_0x54 > area.right || field_0x58 > area.bottom) {
-            field_0x58 = 0;
-            field_0x54 = 0;
+            cursorX = max(0, min(cursorX, client.right));
+            cursorY = max(0, min(cursorY, client.bottom));
+        } else if (cursorX < 0 || cursorY < 0 || cursorX > area.right || cursorY > area.bottom) {
+            cursorY = 0;
+            cursorX = 0;
             outside = 1;
         }
 
         RenderTarget* target = (RenderTarget*)renderContext;
-        field_0x54 = (int)((float)target->targetWidth / area.right * field_0x54);
-        field_0x58 = (int)((float)target->targetHeight / area.bottom * field_0x58);
+        cursorX = (int)((float)target->targetWidth / area.right * cursorX);
+        cursorY = (int)((float)target->targetHeight / area.bottom * cursorY);
         if (outside)
             return 1;
     }
 
-    if (field_0x54 < 0)
-        field_0x54 = 0;
-    if (field_0x58 < 0)
-        field_0x58 = 0;
+    if (cursorX < 0)
+        cursorX = 0;
+    if (cursorY < 0)
+        cursorY = 0;
     RenderTarget* target = (RenderTarget*)renderContext;
-    if (field_0x54 >= target->targetWidth)
-        field_0x54 = target->targetWidth - 1;
-    if (field_0x58 >= target->targetHeight)
-        field_0x58 = target->targetHeight - 1;
+    if (cursorX >= target->targetWidth)
+        cursorX = target->targetWidth - 1;
+    if (cursorY >= target->targetHeight)
+        cursorY = target->targetHeight - 1;
 
-    s_right = (currentFrame ? ((PCTextureMap*)currentFrame)->textureWidth : cursorTexture->textureWidth) + field_0x54;
-    s_bottom = (currentFrame ? ((PCTextureMap*)currentFrame)->textureHeight : cursorTexture->textureHeight) + field_0x58;
+    s_right = (currentFrame ? ((PCTextureMap*)currentFrame)->textureWidth : cursorTexture->textureWidth) + cursorX;
+    s_bottom = (currentFrame ? ((PCTextureMap*)currentFrame)->textureHeight : cursorTexture->textureHeight) + cursorY;
     if (s_right >= ((RenderTarget*)renderContext)->targetWidth)
         s_right = ((RenderTarget*)renderContext)->targetWidth;
     if (s_bottom >= ((RenderTarget*)renderContext)->targetHeight)
         s_bottom = ((RenderTarget*)renderContext)->targetHeight;
 
-    s_destination.left = field_0x54;
-    s_destination.top = field_0x58;
+    s_destination.left = cursorX;
+    s_destination.top = cursorY;
     s_destination.right = (int)(s_right * field_0x50);
     s_destination.bottom = (int)(s_bottom * field_0x50);
     s_source.top = 0;
     s_source.left = 0;
-    s_source.right = s_right - field_0x54;
-    s_source.bottom = s_bottom - field_0x58;
+    s_source.right = s_right - cursorX;
+    s_source.bottom = s_bottom - cursorY;
 
     if (backgroundImage) {
         PCTextureMap* frame = currentFrame ? (PCTextureMap*)currentFrame : cursorTexture;

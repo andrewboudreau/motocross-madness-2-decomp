@@ -194,14 +194,14 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             list->RemoveAllRows();
     }
     if (!append)
-        g_TrackGame->ui->UnknownFunction49bb80();
+        g_TrackGame->ui->ClearEntries();
     COPY_TEXT(selected, name, 260);
     strcpy(name, "");
     if (value)
         *value = 0;
     sprintf(first, "%s\\%s", g_TrackGame->mode.installDirectory, directory);
     sprintf(second, "%s\\%s", g_TrackGame->mode.cdDataDirectory, directory);
-    ((CombinedDirectoryList*)directories)->UnknownFunction44abb0(first, second);
+    ((CombinedDirectoryList*)directories)->SetDirectories(first, second);
     directories->SetPattern(pattern, 1);
     directories->UnknownVirtualSlot1();
     if (!directories->GetFontName())
@@ -428,7 +428,7 @@ void MultiPlayerDlg::SendSettings() {
             optionsPage->UpdateBoundValues(1);
         TrackGame* game = g_TrackGame;
         UnknownLobbySettingsMessage message;
-        message.minutes = (int)game->mode.raceSettings.field_0x140;
+        message.minutes = (int)game->mode.raceSettings.timeLimitMinutes;
         message.eventType = game->mode.raceSettings.eventType;
         message.raceMode = game->mode.raceSettings.raceMode;
         message.field_0x2d78 = game->mode.raceSettings.series;
@@ -783,7 +783,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         }
     } else if (from && type == 0xf) {
         UnknownLobbySettingsMessage* settings = (UnknownLobbySettingsMessage*)data;
-        g_TrackGame->mode.raceSettings.field_0x140 = settings->minutes;
+        g_TrackGame->mode.raceSettings.timeLimitMinutes = settings->minutes;
         g_TrackGame->mode.raceSettings.eventType = settings->eventType;
         g_TrackGame->mode.raceSettings.raceMode = settings->raceMode;
         g_TrackGame->mode.raceSettings.series = settings->field_0x2d78;
@@ -1440,8 +1440,8 @@ void MPEventDlg::ShowHostSettings() {
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x92f);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
-        FormatMinutesSeconds(text, g_TrackGame->mode.raceSettings.field_0x140 * 60.0f);
-        laps->AddRow(text, (int)g_TrackGame->mode.raceSettings.field_0x140, 0);
+        FormatMinutesSeconds(text, g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f);
+        laps->AddRow(text, (int)g_TrackGame->mode.raceSettings.timeLimitMinutes, 0);
     }
     if (g_TrackGame->mode.lobbyRank > 0 && g_TrackGame->mode.lobbyRank < 0x65)
         g_TrackGame->mode.plateNumber = g_TrackGame->mode.lobbyRank;
@@ -1675,7 +1675,7 @@ void MPEventDlg::ApplyEventType() {
             FormatMinutesSeconds(text, i * 60.0f);
             laps->AddRow(text, i, 0);
         }
-        laps->SelectRowByData((int)g_TrackGame->mode.raceSettings.field_0x140);
+        laps->SelectRowByData((int)g_TrackGame->mode.raceSettings.timeLimitMinutes);
     }
     if (g_TrackGame->network->isHost) {
         if (eventType == 0) {

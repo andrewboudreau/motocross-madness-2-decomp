@@ -32,13 +32,13 @@
 // - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
 //   VC6 here pushes them from the stack. Register locals, a helper for the fseek
 //   block and an unsigned count do not change it.
-//   A `FILE* file = stream->field_0x14;` local in the fwrite tail does schedule all
+//   A `FILE* file = stream->fileHandle;` local in the fwrite tail does schedule all
 //   loads before the pushes, but in ecx/edx/eax where retail uses edx/eax/ecx
 //   (a register tie-break); not kept. 136/152: the scratch registers are
 //   rotated one step against retail throughout (fclose argument eax vs edx,
 //   encoded call's file and key edx/ecx vs ecx/eax, fwrite's file esi vs
 //   ecx). Also unchanged:
-//   the tail-call form `if (field_0x1c) return field_0x1c->...`, every
+//   the tail-call form `if (innerStream) return innerStream->...`, every
 //   int/unsigned/long/size_t count and const void*/void*/const char* buffer
 //   type, a 0..63 typedef and 0..19 prototype prefix, a standalone TU,
 //   while/for/next InnermostStream loops, `!= 0`/NULL tests, int position,
@@ -47,7 +47,7 @@
 //   locals or empty statements at six positions and an else-return copy.
 //   FILE* locals in the seek block and a nested fseek(f, ftell(f)) are worse.
 //   A later 88-variant sweep (fseek `!= 0`, a result local, FILE* locals or
-//   references for some or all reads of field_0x14, comma zeroing, ternary,
+//   references for some or all reads of fileHandle, comma zeroing, ternary,
 //   else and positive encoded returns, the top-level branch inverted) stays
 //   at 136 or below. Locals for buffer, size, count and the file in all 24
 //   read orders keep the fwrite tail at 136; the same for the encoded call
@@ -77,8 +77,8 @@ int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsig
 // The stream that holds the file: the innermost one.
 static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream)
 {
-    while (stream->field_0x1c) {
-        stream = stream->field_0x1c;
+    while (stream->innerStream) {
+        stream = stream->innerStream;
     }
     return stream;
 }
@@ -87,10 +87,10 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
 // failure path of the four tests falls through, as in retail.
 static inline int HeaderMatches(UnknownTextureStream* stream)
 {
-    if (stream->ReadByte() != stream->field_0x02
-        || stream->ReadByte() != stream->field_0x00
-        || stream->ReadByte() != stream->field_0x20
-        || stream->ReadByte() != stream->field_0x18) {
+    if (stream->ReadByte() != stream->headerByte0
+        || stream->ReadByte() != stream->headerByte1
+        || stream->ReadByte() != stream->headerByte2
+        || stream->ReadByte() != stream->headerByte3) {
         return 0;
     }
     return 1;
@@ -99,47 +99,47 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // 0x00460db0: 1 when the file starts with the header; the file is closed when a
 // seek fails. Near miss (16%): retail keeps the first fseek-failure block inline and
 // cross-jumps only from its fclose call into the second one (the two load +0x14
-// into different registers), and stores field_0x08 = 0 as an immediate; VC6 here
+// into different registers), and stores fileEncoded = 0 as an immediate; VC6 here
 // merges the whole first block into the second and stores fseek's zero result.
 // The plain ||, &&, goto, nested, result-variable and seek-helper shapes compile
 // to the same or worse code; so do inline SeekOrClose/SeekOnly helpers for either
 // or both blocks and `!= 0` tests (27/186 over the whole 186-byte extent).
 // Also swept (20 forms, best 28): a result local, `!= 0`, `0L`, an extra
-// `&& field_0x14` and an unsigned `> 0` test for the first seek, each with the
-// `encoded`/+0x124/`field_0x08 = 0` statements in three orders and a cast zero.
+// `&& fileHandle` and an unsigned `> 0` test for the first seek, each with the
+// `encoded`/+0x124/`fileEncoded = 0` statements in three orders and a cast zero.
 // Nested `if (!fseek(...)) { ... } else { fclose ...}` forms, with the header
 // test negated or not, and an if/else-if chain give 25-28.
 int UnknownTextureStream::CheckHeader()
 {
-    if (fseek(field_0x14, 0, SEEK_SET)) {
-        fclose(field_0x14);
-        field_0x14 = 0;
+    if (fseek(fileHandle, 0, SEEK_SET)) {
+        fclose(fileHandle);
+        fileHandle = 0;
         return 0;
     }
-    int encoded = field_0x08;
-    field_0x124 = field_0x128;
-    field_0x08 = 0;
+    int encoded = fileEncoded;
+    bufferPos = bufferEnd;
+    fileEncoded = 0;
     if (!HeaderMatches(this)) {
-        field_0x08 = encoded;
+        fileEncoded = encoded;
         return 0;
     }
-    if (fseek(field_0x14, 4, SEEK_SET)) {
-        fclose(field_0x14);
-        field_0x14 = 0;
+    if (fseek(fileHandle, 4, SEEK_SET)) {
+        fclose(fileHandle);
+        fileHandle = 0;
         return 0;
     }
-    field_0x08 = encoded;
-    field_0x124 = field_0x128;
+    fileEncoded = encoded;
+    bufferPos = bufferEnd;
     return 1;
 }
 
 // Restarts the key of `stream`: 0x00461d20 inlined one level.
 static inline void RestartKey(UnknownTextureStream* stream)
 {
-    if (stream->field_0x1c)
-        stream->field_0x1c->ResetTextMode();
+    if (stream->innerStream)
+        stream->innerStream->ResetTextMode();
     else
-        stream->field_0x01 = stream->field_0x03;
+        stream->textMode = stream->nameKey;
 }
 
 // 0x00461340: seeks to `offset` (origin as fseek). An encoded file cannot
@@ -161,36 +161,36 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
     unsigned char buffer[0x418];
     int result = 0;
     UnknownTextureStream* stream = this;
-    while (stream->field_0x1c) {
+    while (stream->innerStream) {
         result = 0;
-        flag = flag && offset != stream->field_0x130;
-        stream = stream->field_0x1c;
+        flag = flag && offset != stream->sliceOffset;
+        stream = stream->innerStream;
     }
     if (origin == SEEK_SET && offset == stream->Tell()) {
-        if (stream->field_0x08 && !flag) {
+        if (stream->fileEncoded && !flag) {
             RestartKey(stream);
-            stream->field_0x0c = offset;
+            stream->keyStartOffset = offset;
         }
-        stream->field_0x124 = stream->field_0x128;
+        stream->bufferPos = stream->bufferEnd;
         return 0;
     }
-    if (stream->field_0x08 && flag) {
+    if (stream->fileEncoded && flag) {
         if ((origin == SEEK_END && offset != 0) || (origin == SEEK_CUR && offset < 0))
             return 1;
         int position = 0;
         if (origin != SEEK_CUR) {
-            position = stream->field_0x0c;
+            position = stream->keyStartOffset;
             if (position >= offset)
                 position = 0;
         }
         if (origin == SEEK_SET || origin == SEEK_END) {
-            result = fseek(stream->field_0x14, stream->field_0x10 + position, SEEK_SET);
+            result = fseek(stream->fileHandle, stream->headerSize + position, SEEK_SET);
             if (result) {
-                fclose(stream->field_0x14);
-                stream->field_0x14 = 0;
+                fclose(stream->fileHandle);
+                stream->fileHandle = 0;
                 return result;
             }
-            stream->field_0x01 = stream->field_0x03;
+            stream->textMode = stream->nameKey;
         }
         if (origin == SEEK_SET || origin == SEEK_CUR) {
             int skip = offset - position;
@@ -198,32 +198,32 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
                 int blocks = skip / 0x400;
                 int tail = skip % 0x400;
                 for (; blocks; blocks--) {
-                    if (!ReadXorDecoded(buffer, 0x400, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
+                    if (!ReadXorDecoded(buffer, 0x400, 1, stream->fileHandle, (unsigned char*)&stream->textMode))
                         return -1;
                 }
-                if (tail && !ReadXorDecoded(buffer, tail, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
+                if (tail && !ReadXorDecoded(buffer, tail, 1, stream->fileHandle, (unsigned char*)&stream->textMode))
                     return -1;
             }
         } else if (origin == SEEK_END) {
-            while (ReadXorDecoded(buffer, 0x400, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
+            while (ReadXorDecoded(buffer, 0x400, 1, stream->fileHandle, (unsigned char*)&stream->textMode))
                 ;
-            if (ferror(stream->field_0x14))
+            if (ferror(stream->fileHandle))
                 return -1;
-            return !feof(stream->field_0x14);
+            return !feof(stream->fileHandle);
         }
     } else {
-        if (stream->field_0x08 && !flag) {
+        if (stream->fileEncoded && !flag) {
             RestartKey(stream);
             if (origin == SEEK_SET)
-                stream->field_0x0c = offset;
+                stream->keyStartOffset = offset;
         }
-        result = fseek(stream->field_0x14, stream->field_0x10 + offset, origin);
+        result = fseek(stream->fileHandle, stream->headerSize + offset, origin);
         if (result) {
-            fclose(stream->field_0x14);
-            stream->field_0x14 = 0;
+            fclose(stream->fileHandle);
+            stream->fileHandle = 0;
         }
     }
-    stream->field_0x124 = stream->field_0x128;
+    stream->bufferPos = stream->bufferEnd;
     return result;
 }
 
@@ -232,8 +232,8 @@ static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 {
     for (int i = 0; i < count; i++) {
         char c = *p;
-        char decoded = stream->field_0x01 ^ c;
-        stream->field_0x01 += c;
+        char decoded = stream->textMode ^ c;
+        stream->textMode += c;
         *p++ = decoded;
     }
 }
@@ -250,31 +250,31 @@ static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 int UnknownTextureStream::Read(void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
-    char* p = stream->field_0x124;
-    if (p != stream->field_0x128) {
-        int available = stream->field_0x128 - p;
+    char* p = stream->bufferPos;
+    if (p != stream->bufferEnd) {
+        int available = stream->bufferEnd - p;
         int total = size * count;
         if (total <= available) {
-            if (stream->field_0x08) {
+            if (stream->fileEncoded) {
                 DecodeBytes(stream, p, total);
             }
-            memcpy(buffer, stream->field_0x124, total);
-            stream->field_0x124 += total;
+            memcpy(buffer, stream->bufferPos, total);
+            stream->bufferPos += total;
             return count;
         }
-        if (stream->field_0x08) {
+        if (stream->fileEncoded) {
             DecodeBytes(stream, p, available);
         }
-        memcpy(buffer, stream->field_0x124, available);
-        stream->field_0x124 = stream->field_0x128;
+        memcpy(buffer, stream->bufferPos, available);
+        stream->bufferPos = stream->bufferEnd;
         char* out = (char*)buffer + available;
         int part = (unsigned)available % (unsigned)size;
         if (part) {
-            if (stream->field_0x08) {
-                if (!ReadXorDecoded((unsigned char*)out, part, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+            if (stream->fileEncoded) {
+                if (!ReadXorDecoded((unsigned char*)out, part, 1, stream->fileHandle, (unsigned char*)&stream->textMode)) {
                     return 0;
                 }
-            } else if (!fread(out, part, 1, stream->field_0x14)) {
+            } else if (!fread(out, part, 1, stream->fileHandle)) {
                 return (unsigned)available / (unsigned)size;
             }
             if (part == total - available) {
@@ -282,21 +282,21 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
             }
             out += part;
         }
-        if (stream->field_0x08) {
-            if (!ReadXorDecoded((unsigned char*)out, size, count - (unsigned)(part + available) / (unsigned)size, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+        if (stream->fileEncoded) {
+            if (!ReadXorDecoded((unsigned char*)out, size, count - (unsigned)(part + available) / (unsigned)size, stream->fileHandle, (unsigned char*)&stream->textMode)) {
                 return count - 1;
             }
             return count;
         }
         int left = count - (unsigned)(part + available) / (unsigned)size;
-        int read = fread(out, size, left, stream->field_0x14);
+        int read = fread(out, size, left, stream->fileHandle);
         if (read == left) {
             return count;
         }
         return count - read;
     }
-    if (stream->field_0x08) {
-        if (!ReadXorDecoded((unsigned char*)buffer, size, count, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+    if (stream->fileEncoded) {
+        if (!ReadXorDecoded((unsigned char*)buffer, size, count, stream->fileHandle, (unsigned char*)&stream->textMode)) {
             return count - 1;
         }
         return count;
@@ -307,7 +307,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
     int tail = total % 0x400;
     char* out = (char*)buffer;
     while (blocks) {
-        int read = fread(out, 1, 0x400, stream->field_0x14);
+        int read = fread(out, 1, 0x400, stream->fileHandle);
         if (read != 0x400) {
             return (unsigned)(done + read) / (unsigned)size;
         }
@@ -316,7 +316,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
         done += read;
     }
     if (tail) {
-        int read = fread(out, 1, tail, stream->field_0x14);
+        int read = fread(out, 1, tail, stream->fileHandle);
         if (read != tail) {
             return (unsigned)(done + read) / (unsigned)size;
         }
@@ -329,28 +329,28 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
 int UnknownTextureStream::Write(const void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
-    if (stream->field_0x08) {
-        long position = ftell(stream->field_0x14);
-        if (fseek(stream->field_0x14, position, SEEK_SET)) {
-            fclose(stream->field_0x14);
-            stream->field_0x14 = 0;
+    if (stream->fileEncoded) {
+        long position = ftell(stream->fileHandle);
+        if (fseek(stream->fileHandle, position, SEEK_SET)) {
+            fclose(stream->fileHandle);
+            stream->fileHandle = 0;
         }
-        if (!WriteXorEncoded(buffer, size, count, stream->field_0x14, &stream->field_0x01)) {
+        if (!WriteXorEncoded(buffer, size, count, stream->fileHandle, &stream->textMode)) {
             return count - 1;
         }
         return count;
     }
-    return fwrite(buffer, size, count, stream->field_0x14);
+    return fwrite(buffer, size, count, stream->fileHandle);
 }
 
 // Writes the "FAOE" header; 0 when a write fails. As an inline helper the failure
 // path falls through, as in retail.
 static inline int PutHeader(UnknownTextureStream* stream)
 {
-    if (stream->WriteByte(stream->field_0x02) == -1
-        || stream->WriteByte(stream->field_0x00) == -1
-        || stream->WriteByte(stream->field_0x20) == -1
-        || stream->WriteByte(stream->field_0x18) == -1) {
+    if (stream->WriteByte(stream->headerByte0) == -1
+        || stream->WriteByte(stream->headerByte1) == -1
+        || stream->WriteByte(stream->headerByte2) == -1
+        || stream->WriteByte(stream->headerByte3) == -1) {
         return 0;
     }
     return 1;
@@ -371,17 +371,17 @@ int UnknownTextureStream::WriteHeader(const char* path)
     if (!PutHeader(stream)) {
         return 0;
     }
-    stream->field_0x08 = 1;
-    stream->field_0x10 = 4;
+    stream->fileEncoded = 1;
+    stream->headerSize = 4;
     _splitpath(path, drive, directory, name, extension);
     strcat(name, extension);
-    stream->field_0x01 = (char)0xfa;
+    stream->textMode = (char)0xfa;
     int length = strlen(name);
     char* p = name;
     for (int i = 0; i < length; i++) {
         char c = *p++;
-        stream->field_0x01 = ((stream->field_0x01 + 3) ^ c) + stream->field_0x01;
+        stream->textMode = ((stream->textMode + 3) ^ c) + stream->textMode;
     }
-    stream->field_0x03 = stream->field_0x01;
+    stream->nameKey = stream->textMode;
     return 1;
 }

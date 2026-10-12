@@ -337,7 +337,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
     for (i = 0; i < definition->collisionCount; i++) {
         UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
-        definition->collisionObjects[i]->Configure(g_TrackGame->field_0x10, 0, 0, 1);
+        definition->collisionObjects[i]->Configure(g_TrackGame->display, 0, 0, 1);
         AppendChild(definition->collisionObjects[i], -1);
         definition->collisionObjects[i]->ownerType = 0x3e8;
         if (shape->type == 0) {
@@ -769,7 +769,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     float cosine = inverse * camera->direction.z;
     g_UnknownGlobal59af08 = 0;
     g_UnknownGlobal59af04 = 0;
-    if (g_TrackGame->field_0x2d0)
+    if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->pixelFormat);
@@ -780,7 +780,7 @@ int EcoSystem::UnknownVirtualSlot14() {
         }
     }
     g_UnknownGlobal59aec0 = ReadClock() - start;
-    if (g_TrackGame->field_0x2d0)
+    if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
         definitionTable[vegetation[0].definitionIndex]->billboardTexture->UnknownVirtualSlot19();
@@ -910,27 +910,27 @@ int EcoSystem::UnknownVirtualSlot14() {
         }
     }
     g_UnknownGlobal59aee4 = ReadClock() - start;
-    UnknownEcoDebugOverlay* overlay = g_TrackGame->field_0x38;
+    UnknownEcoDebugOverlay* overlay = g_TrackGame->debugOverlay;
     if (overlay) {
         if (g_UnknownGlobal56a128 < 0)
-            g_UnknownGlobal56a128 = overlay->field_0x26c0++;
+            g_UnknownGlobal56a128 = overlay->nextPage++;
         g_UnknownGlobal59aef0.Record(g_UnknownGlobal59aee8);
         g_UnknownGlobal59aec8.Record(g_UnknownGlobal59aee4);
-        g_TrackGame->field_0x38->Title(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
+        g_TrackGame->debugOverlay->Title(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
                                                        g_UnknownGlobal59af08, g_UnknownGlobal59af04);
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Memory %d",
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Memory %d",
                                                        g_MemTagStack->GetBytes("EcoSystem"));
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
                                                        g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.Peak());
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
                                                        g_UnknownGlobal59aee4, g_UnknownGlobal59aec0,
                                                        g_UnknownGlobal59aec8.Peak());
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Total Transforms %d",
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
-        g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Total Triangles  %d",
+        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Total Triangles  %d",
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);

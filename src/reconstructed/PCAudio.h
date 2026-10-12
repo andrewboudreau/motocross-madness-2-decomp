@@ -130,11 +130,11 @@ public:
     int AddMember(Sound* sound);  // 0x00401b50: adds a member
     int RemoveMember(Sound* sound);  // 0x00401be0: removes a member
     void ReleaseMembers();             // 0x00401c30: releases every member
-    void UnknownFunction401dd0(long volume);  // 0x00401dd0 (racesnd.cpp music volume)
+    void SetMemberVolume(long volume);  // 0x00401dd0 (racesnd.cpp music volume)
 
     unsigned char field_0x2c_bit0 : 1; // members may play
-    long field_0x30; // volume applied to members
-    ContainerList<Sound*> field_0x34; // members
+    long memberVolume; // +0x30: volume applied to members
+    ContainerList<Sound*> members; // +0x34
 };
 
 // 0x1c-byte notification helper a streaming Sound owns at +0x3c: a thread

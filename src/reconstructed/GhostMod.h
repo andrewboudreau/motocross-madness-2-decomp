@@ -11,7 +11,7 @@
 // code (0x0047bc70). No __FILE__ literal: the file name 'GhostMod.cpp' and
 // the member names are ours (tier 3).
 //
-// What it does (tier 3): UnknownFunction47bbf0 starts a fade of `duration`
+// What it does (tier 3): StartFade starts a fade of `duration`
 // seconds (0: none, both fields FLT_MAX); slot 10 counts field_0x40 down by
 // the frame time and slot 27 sets the alpha byte of every vertex colour to
 // 200 - 100 * remaining / duration while time remains.
@@ -26,7 +26,7 @@ public:
     virtual void UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
                                       UnknownSoultreeMesh** out); // 0x0047bb70
     // 0x0047bbf0 (ret 4)
-    void UnknownFunction47bbf0(float duration);
+    void StartFade(float duration);
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0047bc20
 
     float timeRemaining;                       // time remaining

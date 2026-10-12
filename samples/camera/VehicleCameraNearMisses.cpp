@@ -73,7 +73,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
         Vector3 velocity = UnknownVirtualSlot33();
         float along = velocity.z * field_0x29c.z + (velocity.x * field_0x29c.x + velocity.y * field_0x29c.y);
         distance = AngleWeight(followYaw) * AngleWeight(followPitch);
-        float zoom = field_0x16c / field_0x1dc;
+        float zoom = fieldOfView / maxFieldOfView;
         float scale = (float)(followDistance * 0.0111f) * zoom + 1.0f;
         if (a) {
             offset = 0.0f;
@@ -117,7 +117,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
             float reach = (float)(FollowCameraAbs(followPitch) * 0.63661975f) * 1.2f + 0.3f;
             Vector3 ahead = Add(direction * reach, targetPoint);
             Vector3 ground = ahead;
-            field_0x240->QueryGround(&ground, 0, 0, 0);
+            subject->QueryGround(&ground, 0, 0, 0);
             if (ground.y > ahead.y)
                 lift = (ground.y - ahead.y) * 0.6f;
             else

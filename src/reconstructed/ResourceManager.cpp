@@ -22,11 +22,11 @@ UnknownResourceManager* g_UnknownResourceManager572b44 = &g_UnknownResourceManag
 // 0x004e8d70
 ResourceItem::ResourceItem()
 {
-    UnknownFunction4e8de0();
+    Reset();
 }
 
 // 0x004e8de0
-void ResourceItem::UnknownFunction4e8de0()
+void ResourceItem::Reset()
 {
     nameSize = 1;
     name = (char*)DebugMalloc(1, __FILE__, 24);
@@ -88,7 +88,7 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(item->name, items[i]->name)) {
             UnknownTextureStream* archive = items[i]->archive;
-            if (archive && archive->UnknownFunction4e9960())
+            if (archive && archive->IsEncoded())
                 return 0;
 
             items[i]->offset = item->offset;
@@ -125,7 +125,7 @@ ResourceItem* UnknownResourceManager::FindItem(const char* name, int a)
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
             UnknownTextureStream* archive = items[i]->archive;
-            if (archive && (a || archive->UnknownFunction4e9960()))
+            if (archive && (a || archive->IsEncoded()))
                 items[i]->archive->Seek(items[i]->offset, 0, 0);
             return items[i];
         }

@@ -549,8 +549,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     }
     field_0x04c = terrain;
     raceCamera = camera;
-    field_0x3f8 = false;
-    field_0x3f9 = false;
+    replayPaused = false;
+    replayStepFrame = false;
     replayTime = 0;
     replayLength = 0;
     field_0x1d4 = 0;
@@ -979,7 +979,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         }
     }
 
-    if (g_TrackGame->UnknownFunction521cd0()) {
+    if (g_TrackGame->InProCircuitCareer()) {
         // The pro circuit: the player's racer, then the computer racers of
         // the career.
         UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;

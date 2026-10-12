@@ -41,7 +41,7 @@ static inline float Length(Vector3 v)
 CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
 {
     started = 0;
-    field_0x50 = 1;
+    steersFrontWheels = 1;
     field_0x58 = 0;
     numWheels = 0;
     currentPathKey = 0;
@@ -51,31 +51,31 @@ CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
     field_0x178 = 0.0f;
     field_0x17c = 0.0f;
     field_0x180 = 0.0f;
-    field_0x1a4 = 0.1f;
-    field_0x1a8 = 10.0f;
-    field_0x1ac = 0.8f;
-    field_0x1b0 = 0.5f;
-    field_0x18c = 0.0f;
-    field_0x190 = 0.0f;
-    field_0x198 = 0.0f;
-    field_0x19c = 0.0f;
-    field_0x1a0 = 0.0f;
-    field_0x4c = 0.0f;
-    field_0x194 = 1e30f;
+    lookAheadTime = 0.1f;
+    velocityScale = 10.0f;
+    backBlend = 0.8f;
+    normalBlend = 0.5f;
+    wheelSpinAngle = 0.0f;
+    steeringAngle = 0.0f;
+    frontWheelZ = 0.0f;
+    trailDistance = 0.0f;
+    trailTimeOffset = 0.0f;
+    groundSpeed = 0.0f;
+    pathTime = 1e30f;
     pathKeys = 0;
     field_0x1b8 = kVec3Zero;
-    field_0x1c4 = kVec3Zero;
-    field_0x1d0 = kVec3Zero;
-    field_0x1dc = kVec3Zero;
-    field_0x1f4 = kVec3Zero;
+    pathPosition = kVec3Zero;
+    pathOffset = kVec3Zero;
+    bodyOffset = kVec3Zero;
+    smoothedBack = kVec3Zero;
     field_0x1e8 = kVec3Zero;
-    field_0x200 = kVec3YAxis;
-    field_0x40 = kVec3Zero;
+    smoothedNormal = kVec3YAxis;
+    pathVelocity = kVec3Zero;
     groundProvider = 0;
-    field_0x34 = 0;
+    carModel = 0;
     wheelNodes = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
+    sensorCollider = 0;
+    bodyCollider = 0;
     field_0x5c = 1;
 }
 
@@ -113,33 +113,33 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     strncpy(carName, name, length);
     carName[length] = 0;
 
-    field_0x34 = new (__FILE__, 99) CarProceduralModel(1);
-    field_0x34->UnknownNodeVirtualSlot9(a0, name, a3, a4, 1);
-    AppendChild(field_0x34, -1);
-    field_0x1d0 = *a7;
-    field_0x19c = a10;
-    field_0x194 = 0.0f;
-    field_0x1f4 = kVec3Zero;
-    field_0x50 = a9;
-    field_0x18c = 0.0f;
-    CarProceduralNode* body = field_0x34->FindByName("Body");
-    body->GetPosition(&field_0x1dc);
+    carModel = new (__FILE__, 99) CarProceduralModel(1);
+    carModel->UnknownNodeVirtualSlot9(a0, name, a3, a4, 1);
+    AppendChild(carModel, -1);
+    pathOffset = *a7;
+    trailDistance = a10;
+    pathTime = 0.0f;
+    smoothedBack = kVec3Zero;
+    steersFrontWheels = a9;
+    wheelSpinAngle = 0.0f;
+    CarProceduralNode* body = carModel->FindByName("Body");
+    body->GetPosition(&bodyOffset);
 
     numWheels = wheelCount;
     if (numWheels > 0) {
         wheelNodes = new (__FILE__, 126) CarProceduralNode*[numWheels];
         if (numWheels > 0)
-            wheelNodes[0] = field_0x34->FindByName("TireFrontL");
+            wheelNodes[0] = carModel->FindByName("TireFrontL");
         if (numWheels > 1)
-            wheelNodes[1] = field_0x34->FindByName("TireFrontR");
+            wheelNodes[1] = carModel->FindByName("TireFrontR");
         if (numWheels > 2)
-            wheelNodes[2] = field_0x34->FindByName("TireBackL");
+            wheelNodes[2] = carModel->FindByName("TireBackL");
         if (numWheels > 3)
-            wheelNodes[3] = field_0x34->FindByName("TireBackR");
+            wheelNodes[3] = carModel->FindByName("TireBackR");
         if (numWheels > 4)
-            wheelNodes[4] = field_0x34->FindByName("TireMidL");
+            wheelNodes[4] = carModel->FindByName("TireMidL");
         if (numWheels > 5)
-            wheelNodes[5] = field_0x34->FindByName("TireMidR");
+            wheelNodes[5] = carModel->FindByName("TireMidR");
         Vector3 minimum;
         Vector3 maximum;
         wheelNodes[0]->GetLocalBounds(&minimum, &maximum);
@@ -147,27 +147,27 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     }
     groundProvider = a5;
 
-    field_0x38 = new (__FILE__, 149) CarProceduralCollision(1);
-    field_0x38->Configure(a0, 1, 1, 0);
-    field_0x38->field_0x68 = 1;
-    AppendChild(field_0x38, -1);
-    field_0x188 = 5.0f;
+    sensorCollider = new (__FILE__, 149) CarProceduralCollision(1);
+    sensorCollider->Configure(a0, 1, 1, 0);
+    sensorCollider->field_0x68 = 1;
+    AppendChild(sensorCollider, -1);
+    sensorHalfHeight = 5.0f;
 
     int tag = g_MemTagStack->Push("Collision");
-    field_0x3c = new (__FILE__, 162) CarProceduralCollision(1);
-    field_0x3c->Configure(a0, 1, 1, 1);
-    field_0x3c->field_0x68 = 1;
-    AppendChild(field_0x3c, -1);
+    bodyCollider = new (__FILE__, 162) CarProceduralCollision(1);
+    bodyCollider->Configure(a0, 1, 1, 1);
+    bodyCollider->field_0x68 = 1;
+    AppendChild(bodyCollider, -1);
     if (collisionFile && *collisionFile)
-        field_0x3c->LoadShape(field_0x34, collisionFile);
+        bodyCollider->LoadShape(carModel, collisionFile);
     else
-        field_0x3c->SetHullShape(field_0x34, 0, 1, 0, 0);
-    field_0x3c->field_0x54->field_0x00 = 1;
-    field_0x3c->UnknownFunction435fe0();
-    field_0x38->AddIgnoredOwner(field_0x3c);
+        bodyCollider->SetHullShape(carModel, 0, 1, 0, 0);
+    bodyCollider->field_0x54->field_0x00 = 1;
+    bodyCollider->UnknownFunction435fe0();
+    sensorCollider->AddIgnoredOwner(bodyCollider);
     g_MemTagStack->Pop(tag);
 
-    ReadPath(pathFile, field_0x34->field_0x38);
+    ReadPath(pathFile, carModel->field_0x38);
     pathSpeed = speed;
     if (speed > 0.0)
         inversePathSpeed = 1.0f / speed;
@@ -189,15 +189,15 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
     UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (stream->Open(pathFile, "r", 0)) {
         pathKeyCount = 0;
-        while (!stream->UnknownFunction430ff0()) {
+        while (!stream->AtEnd()) {
             stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0)
                 pathKeyCount++;
         }
-        stream->Seek(stream->field_0x130, 0, 1);
+        stream->Seek(stream->sliceOffset, 0, 1);
         pathKeys = new (__FILE__, 241) CarProceduralKey[pathKeyCount];
         int i = -1;
-        while (!stream->UnknownFunction430ff0()) {
+        while (!stream->AtEnd()) {
             stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0) {
                 i++;

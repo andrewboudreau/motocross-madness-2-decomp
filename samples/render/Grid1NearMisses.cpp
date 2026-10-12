@@ -104,7 +104,7 @@ retry:
         if (parent) {
             Grid1BlockTexture* blocks = ((DrawableGridNodeSharedTextures*)parent)->Extra()->blocks;
             if (blocks) {
-                Grid1BlockTexture* record = &blocks[(((field_0x2a >> 2) & 0x30) | (field_0x2a & 0xc)) >> 2];
+                Grid1BlockTexture* record = &blocks[(((childIndex >> 2) & 0x30) | (childIndex & 0xc)) >> 2];
                 index = record->index;
                 if (index != -1 && !record->own)
                     goto parentBlockTexture;
@@ -185,8 +185,8 @@ parentTexture:
     Extra()->texture = Terrain()->textures[((DrawableGridNodeSharedTextures*)parent)->Extra()->index];
     ReleaseBlockCentres();
     {
-        int z = field_0x2a >> 4;
-        int x = field_0x2a % 16;
+        int z = childIndex >> 4;
+        int x = childIndex % 16;
         data->field_0x158 = x * 0.0625f;
         data->field_0x15c = z * 0.0625f;
     }
@@ -198,8 +198,8 @@ parentBlockTexture:
     Extra()->texture = Terrain()->textures[index];
     ReleaseBlockCentres();
     {
-        int z = field_0x2a >> 4;
-        int x = field_0x2a % 16;
+        int z = childIndex >> 4;
+        int x = childIndex % 16;
         data->field_0x158 = x % 4 * 0.25f;
         data->field_0x15c = z % 4 * 0.25f;
     }

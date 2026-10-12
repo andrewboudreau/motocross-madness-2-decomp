@@ -29,8 +29,8 @@ Overlay::Overlay(int flags, int value) : GameObject(flags) {
     overlayAlpha = 0xff;
     alphaBlended = 0;
     sharedTexture = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
+    textService = 0;
+    iconService = 0;
     field_0x118 = value;
 }
 
@@ -42,13 +42,13 @@ Overlay::~Overlay() {
         if (count == 0)
             g_UnknownOverlayTexture689110 = 0;
     }
-    if (field_0x38) {
-        delete field_0x38;
-        field_0x38 = 0;
+    if (textService) {
+        delete textService;
+        textService = 0;
     }
-    if (field_0x3c) {
-        delete field_0x3c;
-        field_0x3c = 0;
+    if (iconService) {
+        delete iconService;
+        iconService = 0;
     }
 }
 
@@ -72,13 +72,13 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     LayOutQuad();
 
     if (a7)
-        field_0x38 = UnknownOverlayText::Create(
+        textService = UnknownOverlayText::Create(
             a8, a9, a10, a11, g_TrackGame->textureManager, quadVertices[0].sx, quadVertices[0].sy,
             quadVertices[2].sx - quadVertices[0].sx, quadVertices[2].sy - quadVertices[0].sy, a12);
     else
-        field_0x38 = 0;
+        textService = 0;
 
-    field_0x3c = UnknownCreateOverlayIconService();
+    iconService = UnknownCreateOverlayIconService();
 
     if (!g_UnknownOverlayTexture689110) {
         g_UnknownOverlayTexture689110 =

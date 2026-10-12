@@ -124,7 +124,7 @@ int UnknownTrackGameObject574::OpenArchiveFile(UnknownTextureStream* stream, con
     _splitpath(name, drive, dir, file, ext);
     strcat(file, ext);
     if (stream->Open(file, mode, 0)) {
-        if (stream->field_0x1c) {
+        if (stream->innerStream) {
             if (out)
                 strcpy(out, file);
             return 1;

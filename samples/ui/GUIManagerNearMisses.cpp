@@ -57,7 +57,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
     CameraRect* rect;
 
     if (!(flags & 4) && !(flags & 2)) {
-        if (!FindInputDialog() || !FindInputDialog()->field_0x148)
+        if (!FindInputDialog() || !FindInputDialog()->isModal)
             ReleaseBackgroundGrab();
     } else {
         rect = 0;
@@ -68,7 +68,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
             rect = &screen;
         }
         if (parent)
-            parent->UnknownFunction470070(1, flags & 8, rect);
+            parent->SetModalPause(1, flags & 8, rect);
         else if ((flags & 4) && (flags & 0x10))
             GrabBackground(flags & 8);
     }
@@ -185,7 +185,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
 }
 
 // 0x00486b10
-void ToolTip::UnknownFunction486b10(UnknownGuiControl* control) {
+void ToolTip::ShowControlToolTip(UnknownGuiControl* control) {
     int position[2];
     GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
 

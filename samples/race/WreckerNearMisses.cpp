@@ -4,7 +4,7 @@
 // and compare the symbol against retail with
 // samples/race/WreckerNearMisses.bindings.json.
 //
-// UnknownFunction5329e0 (0x005329e0, 1312 bytes; 1200/1312 inside
+// PushProbesOutOfBox (0x005329e0, 1312 bytes; 1200/1312 inside
 // Wrecker.cpp): pushes probes back out of the box boxCenter/boxHalfExtents
 // and turns the mean push into the impulse pushImpulse. Every block matches
 // in shape, including the per-axis clip (an inline helper with by-value
@@ -120,7 +120,7 @@ static inline Vector3 WreckerAddCtorCall(const Vector3& a, const Vector3& b) {
     return WreckerVec3Call(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-void Wrecker::UnknownFunction5329e0(float frameTime) {
+void Wrecker::PushProbesOutOfBox(float frameTime) {
     Vector3 previousSum = Vector3(0.0f, 0.0f, 0.0f);
     Vector3 sum = Vector3(0.0f, 0.0f, 0.0f);
     int hits = 0;

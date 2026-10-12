@@ -73,14 +73,14 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
         return 0;
     }
     if (font[0] && _strnicmp(font, "NONE", 4)) {
-        gui->UnknownFunction4866c0(font);
+        gui->SetToolTipFont(font);
         if (g_TrackGame->LoadResourceString(0x1469, text, 128))
             gui->toolTipBold = atoi(text);
     }
     if (scale != 0.0f)
         gui->field_0x3d0 = scale;
     gui->CreateBackground();
-    gui->UnknownFunction485d70("ui");
+    gui->SetDialogDirectory("ui");
     gui->SetWaitCursorImage("ui\\wait.tga");
     gui->GetUser(0)->ForgetDevices();
     gui->GetUser(0)->AcceptDevice(gui->field_0x30c);

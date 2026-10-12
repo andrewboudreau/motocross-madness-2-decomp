@@ -509,7 +509,7 @@ int UIControl::EnterHover() {
         PlayControlSound(1, ownerDialog->field_0x180);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip)
-            tip->UnknownFunction486b10((UnknownGuiControl*)this);
+            tip->ShowControlToolTip((UnknownGuiControl*)this);
     }
     return 1;
 }
@@ -994,8 +994,8 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
-                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                            (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
+                                            pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
         } else {
@@ -1809,7 +1809,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     soundGroup = 0;
     field_0x7f14 = 0;
     field_0xc0 = 0;
-    field_0x148 = 0;
+    isModal = 0;
     for (int i = 0; i < 10; i++)
         textColors[i] = 0xffffff;
     scaleY = 1.0f;
@@ -1825,7 +1825,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     animatesControls = 1;
     memset(sectionTable, 0, sizeof(sectionTable));
     sectionCount = 0;
-    field_0x154 = 1;
+    notifyParentOnClose = 1;
     lastFrameTime = 0.0f;
     controlsPost3D = 1;
     timerList.Init(2, 1);
@@ -1833,7 +1833,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     guiUser = 0;
     resourceArchive = 0;
     controlContainer = 0;
-    field_0x14c = 0;
+    previousModalDialog = 0;
     screenGrab = 0;
     field_0x144 = 0;
     isClosing = 0;
@@ -1844,14 +1844,14 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
 // images, the palette and background it owns, and the timers.
 UIDialog::~UIDialog() {
     if (guiManager) {
-        if (field_0x148)
-            guiManager->UnknownFunction485ee0(field_0x14c);
+        if (isModal)
+            guiManager->SwapModalDialog(previousModalDialog);
         if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
             if (!guiManager || !guiManager->UnknownFunction4864f0())
                 guiManager->UnknownFunction464e90();
         }
-        if (field_0x148 && parentDialog)
-            parentDialog->UnknownFunction470070(0, 0, 0);
+        if (isModal && parentDialog)
+            parentDialog->SetModalPause(0, 0, 0);
         if ((field_0x144 & 4) && (field_0x144 & 0x10))
             guiManager->ReleaseBackgroundGrab();
     }
@@ -1860,8 +1860,8 @@ UIDialog::~UIDialog() {
     if (parentDialog) {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
             parentDialog->guiManager && !parentDialog->guiManager->UnknownFunction4864f0())
-            parentDialog->guiManager->UnknownFunction486150((Palette8*)parentDialog->dialogPalette);
-        if (field_0x154)
+            parentDialog->guiManager->SetGuiPalette((Palette8*)parentDialog->dialogPalette);
+        if (notifyParentOnClose)
             NotifyParent(dialogResult, 9);
     }
     if (dialogFont)
@@ -1911,7 +1911,7 @@ int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         guiUser->controlDown[event->control] = 1;
     if (!isPaused) {
         if (event->kind == 1)
-            UnknownFunction46f120();
+            UpdatePointerHover();
         return GameObject::UnknownVirtualSlot23(event, entry);
     }
     return 0;
@@ -1923,7 +1923,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
         guiUser->controlDown[event->control] = 0;
     if (!isPaused) {
         if (event->kind == 1)
-            UnknownFunction46f120();
+            UpdatePointerHover();
         if (event->kind) {
             RemoveTimers(0x101);
             RemoveTimers(0x102);
@@ -2136,8 +2136,8 @@ void UIDialog::EndDialog(int result) {
 }
 
 // 0x0046ff60
-void UIDialog::UnknownFunction46ff60() {
-    field_0x154 = 0;
+void UIDialog::AbortWithoutNotify() {
+    notifyParentOnClose = 0;
     UnknownVirtualSlot26();
 }
 
@@ -2181,7 +2181,7 @@ void UIDialog::SyncValues(int value) {
 }
 
 // 0x00470070
-void UIDialog::UnknownFunction470070(int a, int b, CameraRect* rect) {
+void UIDialog::SetModalPause(int a, int b, CameraRect* rect) {
     if (a)
         GrabBackground(b, rect);
     else
@@ -2198,7 +2198,7 @@ void UIDialog::GrabBackground(int dim, CameraRect* rect) {
     if (dialogBackground) {
         grabRegion = dialogBackground->AllocRegion(1);
         dialogBackground->MarkAllDirty();
-        dialogBackground->field_0x30 = 0;
+        dialogBackground->imageVisible = 0;
     }
 }
 
@@ -2208,7 +2208,7 @@ void UIDialog::ReleaseBackgroundGrab() {
         screenGrab->Release();
     if (dialogBackground && grabRegion >= 0) {
         dialogBackground->ReleaseRegion(grabRegion);
-        dialogBackground->field_0x30 = 1;
+        dialogBackground->imageVisible = 1;
     }
     screenGrab = 0;
     grabRegion = -1;
@@ -2305,7 +2305,7 @@ UIControl::~UIControl() {
         pendingRelease = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
-            ownerDialog->guiUser->UnknownFunction487bf0(0);
+            ownerDialog->guiUser->ClearFocus(0);
             tip = ownerDialog->guiUser->userToolTip;
         }
         if (ownerDialog->guiUser && ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
@@ -3464,7 +3464,7 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 }
 
 // 0x0046f120
-void UIDialog::UnknownFunction46f120() {
+void UIDialog::UpdatePointerHover() {
     if (guiUser->pointerDevice && controlContainer->firstChild) {
         GUIUser* user = guiUser;
         UnknownGuiControl* focus = user->hoverControl;
@@ -4028,12 +4028,12 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     }
     parentDialog = parent;
     if (!(flags & 6))
-        field_0x148 = 0;
+        isModal = 0;
     else
-        field_0x148 = 1;
+        isModal = 1;
     guiManager = gui;
-    if (gui && field_0x148)
-        field_0x14c = gui->UnknownFunction485ee0((int)this);
+    if (gui && isModal)
+        previousModalDialog = gui->SwapModalDialog((int)this);
     if (parent)
         dialogPalette = parent->dialogPalette;
     openingMenu = a;
@@ -4079,14 +4079,14 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         if (stream->Open(path, "r", 0)) {
             if (!ReadDialogResource(stream, 0)) {
                 delete stream;
-                UnknownFunction46ff60();
+                AbortWithoutNotify();
                 return 0;
             }
             delete stream;
         } else {
             delete stream;
             if (!LoadDialogResource(resourceName)) {
-                UnknownFunction46ff60();
+                AbortWithoutNotify();
                 return 0;
             }
         }
@@ -4346,7 +4346,7 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
     int range = GetWidth();
     GUIInputDevice* device;
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
-        if (device->inputDevice->deviceKind == 2 && device->inputDevice->UnknownFunction4897e0(4)) {
+        if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
             POINT position = device->pointerPosition;
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (position.y <= -1) {
@@ -4602,7 +4602,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
 int UIListBox::UnknownVirtualSlot10(float frameTime) {
     GUIInputDevice* device;
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
-        if (device->inputDevice->deviceKind == 2 && device->inputDevice->UnknownFunction4897e0(4)) {
+        if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
             POINT position = device->pointerPosition;
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (position.y <= -1) {
@@ -5115,7 +5115,7 @@ int UIControl::GrowStep() {
 // 0x00472130
 int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
-    GUIInputDevice* device = ownerDialog->guiUser->UnknownFunction4882a0(event);
+    GUIInputDevice* device = ownerDialog->guiUser->FindEventDevice(event);
     if (device) {
         POINT position = device->pointerPosition;
         if (event->kind)
@@ -5278,8 +5278,8 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
-                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
-                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                            (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
+                                            pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
             FreeFile(image);
@@ -5294,7 +5294,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
 // other presses go to slot 55 with the pointer position.
 int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
-    if (ownerDialog->guiUser->UnknownFunction4881d0(event)) {
+    if (ownerDialog->guiUser->UsesEventDevice(event)) {
         if (event->kind == 0) {
             if (keyBind && keyBind == event->control &&
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&

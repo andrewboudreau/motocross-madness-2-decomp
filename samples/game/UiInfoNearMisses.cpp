@@ -44,19 +44,19 @@ void TrackGameMode::ResetDefaults() {
     ResetSoundOptions((UnknownTrackGameModeOptionsA20*)&field_0xa20);
     ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
     g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
-    UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
+    ResetControlOptions((UnknownTrackGameModeOptionsA68*)field_0xa68);
     ReloadResourceStrings(resourceStrings);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)garageOptions);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)optionsBackup);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1090);
-    UnknownFunction522cd0();
+    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)garageOptions);
+    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)optionsBackup);
+    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)field_0x1090);
+    ResetSettingsEntries();
     raceSettings.field_0x30 = 1;
     raceSettings.field_0x0c = 2;
     raceSettings.treeCollision = 1;
     raceSettings.raceMode = 0;
     raceSettings.riderCollision = 1;
     raceSettings.lapCount = 5;
-    raceSettings.field_0x140 = 15.0f;
+    raceSettings.timeLimitMinutes = 15.0f;
     raceSettings.field_0x2c = 0;
     raceSettings.field_0x2d = 30;
     raceSettings.aiRacerCount = 0;
@@ -76,7 +76,7 @@ void TrackGameMode::ResetDefaults() {
     videoSettings[2] = detailLevel;
     videoSettings[1] = detailLevel;
     field_0x1bdc = 0;
-    field_0x90 = 0;
+    nameTagShade = 0;
     saveReplay = 0;
     plateNumber = 101;
     for (int i = 0; i < 6; i++)

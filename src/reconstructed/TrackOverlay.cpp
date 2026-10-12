@@ -129,14 +129,14 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
-        if (owner->currentCamera->field_0x1cc) {
-            dial.field_0x00 = (int)((unsigned int)owner->currentCamera->field_0x1a0[2] * screenRect.left / 640.0f
-                                           + (unsigned int)owner->currentCamera->field_0x1a0[0]);
-            dial.field_0x04 = (int)((unsigned int)owner->currentCamera->field_0x1a0[3] * screenRect.top / 480.0f
-                                           + (unsigned int)owner->currentCamera->field_0x1a0[1]);
-            dial.centerX = (int)(((unsigned int)owner->currentCamera->field_0x1a0[2] / 640.0f) * 64.0f + dial.field_0x00);
-            dial.centerY = (int)(((unsigned int)owner->currentCamera->field_0x1a0[3] / 480.0f) * 85.0f + dial.field_0x04);
-            dial.length = ((unsigned int)owner->currentCamera->field_0x1a0[2] / 640.0f) * 45.0f;
+        if (owner->currentCamera->viewportClearFrames) {
+            dial.field_0x00 = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
+                                           + (unsigned int)owner->currentCamera->viewport[0]);
+            dial.field_0x04 = (int)((unsigned int)owner->currentCamera->viewport[3] * screenRect.top / 480.0f
+                                           + (unsigned int)owner->currentCamera->viewport[1]);
+            dial.centerX = (int)(((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 64.0f + dial.field_0x00);
+            dial.centerY = (int)(((unsigned int)owner->currentCamera->viewport[3] / 480.0f) * 85.0f + dial.field_0x04);
+            dial.length = ((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 45.0f;
             dial.value = 0.0f;
             dial.maximum = 100.0f;
             dial.firstSweepValue = 50.0f;
@@ -236,10 +236,10 @@ NameOverlay::NameOverlay(int flags) : Overlay(flags, 1)
 {
     trackedRacer = 0;
     world = 0;
-    field_0x13c = 0;
-    field_0x140 = 0;
+    becameHidden = 0;
+    becameVisible = 0;
     field_0x148 = 0;
-    field_0x14c = 0;
+    wasHidden = 0;
     drawWidth = 0;
     field_0x170 = 0;
     lastVisible = 1;
@@ -254,7 +254,7 @@ NameOverlay::~NameOverlay()
 }
 
 // 0x00518e30
-NameOverlay* NameOverlay::UnknownFunction518e30(RenderTarget* target, TextureMap* texture,
+NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
                                                 const UnknownOverlayRect* rect, int a4,
                                                 const UnknownOverlayRect* source, UnknownEventRacer* a6,
                                                 UnknownNameOverlayWorld* a7, int a8)
@@ -269,10 +269,10 @@ NameOverlay* NameOverlay::UnknownFunction518e30(RenderTarget* target, TextureMap
     sourceHeight = source->bottom - source->top + 1;
     testPhase = a8 % 4;
     frameCounter = 0;
-    field_0x168 = 0;
-    field_0x16c = 1;
-    field_0x150 = s_UnknownVector68a410;
-    field_0x15c = s_UnknownVector68a410;
+    drawLeftOfAnchor = 0;
+    anchorOutsideMap = 1;
+    fixedPosition = s_UnknownVector68a410;
+    radarAnchor = s_UnknownVector68a410;
     return this;
 }
 
@@ -292,17 +292,17 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 }
 
 // 0x00519080
-void NameOverlay::UnknownFunction519080(Vector3 point)
+void NameOverlay::SetFixedPosition(Vector3 point)
 {
-    field_0x150 = point;
+    fixedPosition = point;
 }
 
 // 0x005190a0
-void NameOverlay::UnknownFunction5190a0(Vector3 point, int a4, int a5)
+void NameOverlay::SetRadarAnchor(Vector3 point, int leftOfAnchor, int outsideMap)
 {
-    field_0x15c = point;
-    field_0x168 = a4;
-    field_0x16c = a5;
+    radarAnchor = point;
+    drawLeftOfAnchor = leftOfAnchor;
+    anchorOutsideMap = outsideMap;
 }
 
 // 0x005190e0: draws the tag at a fixed point (no racer), at the racer's
@@ -310,8 +310,8 @@ void NameOverlay::UnknownFunction5190a0(Vector3 point, int a4, int a5)
 int NameOverlay::UnknownVirtualSlot14()
 {
     if (!trackedRacer) {
-        int x = (int)field_0x150.x;
-        int y = (int)field_0x150.y;
+        int x = (int)fixedPosition.x;
+        int y = (int)fixedPosition.y;
         screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x - 1, sourceHeight + y);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
@@ -322,22 +322,22 @@ int NameOverlay::UnknownVirtualSlot14()
         return 1;
     if (!trackedRacer->isEnabled)
         return 1;
-    if ((field_0x15c.x != -1.0f || field_0x15c.y != -1.0f) && g_TrackGame->mode.showNameTags) {
+    if ((radarAnchor.x != -1.0f || radarAnchor.y != -1.0f) && g_TrackGame->mode.showNameTags) {
         int left;
         int right;
-        if (field_0x168) {
-            right = (int)field_0x15c.x;
+        if (drawLeftOfAnchor) {
+            right = (int)radarAnchor.x;
             left = right - drawWidth;
         } else {
-            left = (int)field_0x15c.x;
+            left = (int)radarAnchor.x;
             right = drawWidth + left;
         }
-        int top = (int)field_0x15c.y;
+        int top = (int)radarAnchor.y;
         screenRect = UnknownMakeOverlayRect(left, top, right, sourceHeight + top);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         int alpha = overlayAlpha;
-        overlayAlpha = field_0x16c ? 0xb4 : 0xff;
+        overlayAlpha = anchorOutsideMap ? 0xb4 : 0xff;
         Overlay::UnknownVirtualSlot14();
         overlayAlpha = alpha;
     }
@@ -346,20 +346,20 @@ int NameOverlay::UnknownVirtualSlot14()
     head.y += 1.62f;
     int hidden = !IsPointVisible(&head);
     if (hidden) {
-        if (!field_0x14c) {
-            field_0x13c = 1;
-            field_0x140 = 0;
+        if (!wasHidden) {
+            becameHidden = 1;
+            becameVisible = 0;
         }
-    } else if (field_0x14c) {
-        field_0x140 = 1;
-        field_0x13c = 0;
+    } else if (wasHidden) {
+        becameVisible = 1;
+        becameHidden = 0;
     }
-    field_0x14c = hidden;
+    wasHidden = hidden;
     if (overlayAlpha) {
         Camera* camera = Target()->currentCamera;
         Vector3 screen;
         float depth;
-        if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->field_0xec, &head, &screen, &depth)) {
+        if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->screenMatrix, &head, &screen, &depth)) {
             int x = (int)screen.x;
             int y = (int)screen.y;
             screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);
@@ -382,7 +382,7 @@ StatsOverlay::StatsOverlay(int flags) : Overlay(flags, 1)
     overlayTexture = 0;
     backingTexture = 0;
     memset(rowText, 0, sizeof(rowText));
-    memset(field_0x1b0, 0, sizeof(field_0x1b0));
+    memset(drawnRowText, 0, sizeof(drawnRowText));
     rowExtent.cy = 0;
     rowExtent.cx = 0;
 }
@@ -483,14 +483,14 @@ void StatsOverlay::DrawTimeLeft()
     TrackGame* game = g_TrackGame;
     if (game->mode.raceSettings.raceMode != 0 && game->mode.raceSettings.raceMode != 4) {
         TrackGameViewOwner* owner = game->quarryEvent;
-        float limit = game->mode.raceSettings.field_0x140 * 60.0f;
-        FormatMinutesSeconds(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        float limit = game->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(text, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         rect = rowRects[0];
         rect.left += rowExtent.cx + 4;
         sprintf(rowText[0], "%s", text);
-        field_0x38->SelectFont("arialsm");
-        void* laidOut = field_0x38->LayoutText(&rect, rowText[0], 0xffffff, &count);
-        field_0x38->DrawVertices(Target(), laidOut, count);
+        textService->SelectFont("arialsm");
+        void* laidOut = textService->LayoutText(&rect, rowText[0], 0xffffff, &count);
+        textService->DrawVertices(Target(), laidOut, count);
     }
 }
 
@@ -559,7 +559,7 @@ int StatsOverlay::DrawViewModePanel()
         FormatLapTime(time, instrumentSource->state->field_0x754);
     sprintf(rowText[5], "%s:", label);
     for (i = 0; i <= 5; i++) {
-        if (strcmp(rowText[i], field_0x1b0[i]) != 0)
+        if (strcmp(rowText[i], drawnRowText[i]) != 0)
             goto draw;
     }
     return 1;
@@ -578,7 +578,7 @@ draw:
         if (i >= 2)
             SelectObject(dc, smallFont);
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
-        strcpy(field_0x1b0[i], rowText[i]);
+        strcpy(drawnRowText[i], rowText[i]);
     }
     SelectObject(dc, font);
     if (texture->systemSurface->ReleaseDC(dc) != 0) {
@@ -603,9 +603,9 @@ void StatsOverlay::DrawLapTime()
     rect = rowRects[5];
     rect.left += rowExtent.cx + 4;
     sprintf(rowText[5], "%s", text);
-    field_0x38->SelectFont("arialsm");
-    void* laidOut = field_0x38->LayoutText(&rect, rowText[5], 0xffffff, &count);
-    field_0x38->DrawVertices(Target(), laidOut, count);
+    textService->SelectFont("arialsm");
+    void* laidOut = textService->LayoutText(&rect, rowText[5], 0xffffff, &count);
+    textService->DrawVertices(Target(), laidOut, count);
 }
 
 // 0x0051a560: the race panel: position, lap, lap times and gate.
@@ -663,7 +663,7 @@ int StatsOverlay::DrawRacePanel()
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
             g_TrackGame->bajaEnduroEvent->field_0xac);
     for (i = 0; i <= 5; i++) {
-        if (strcmp(rowText[i], field_0x1b0[i]) != 0)
+        if (strcmp(rowText[i], drawnRowText[i]) != 0)
             goto draw;
     }
     return 1;
@@ -680,7 +680,7 @@ draw:
         if (i >= 2)
             SelectObject(dc, smallFont);
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
-        strcpy(field_0x1b0[i], rowText[i]);
+        strcpy(drawnRowText[i], rowText[i]);
     }
     SelectObject(dc, font);
     if (texture->systemSurface->ReleaseDC(dc) != 0) {
@@ -707,8 +707,8 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->mode.raceSettings.raceMode != 0) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->tagEvent;
-        float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
-        FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         sprintf(rowText[0], "%s %s", label, time);
     }
     if (g_TrackGame->mode.raceSettings.field_0x148) {
@@ -758,7 +758,7 @@ int StatsOverlay::DrawTagStandings()
         sprintf(rowText[5], "  %s", tag);
     }
     for (i = 0; i <= 5; i++) {
-        if (strcmp(rowText[i], field_0x1b0[i]) != 0)
+        if (strcmp(rowText[i], drawnRowText[i]) != 0)
             goto draw;
     }
     return 1;
@@ -773,7 +773,7 @@ draw:
     font = SelectObject(dc, largeFont);
     for (i = 0; i < 6; i++) {
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
-        strcpy(field_0x1b0[i], rowText[i]);
+        strcpy(drawnRowText[i], rowText[i]);
     }
     SelectObject(dc, font);
     if (texture->systemSurface->ReleaseDC(dc) != 0) {
@@ -804,9 +804,9 @@ DropTextOverlay::DropTextOverlay(int flags) : GameObject(flags)
     visible = 0;
     field_0x38 = 0;
     textX = 0;
-    field_0x40 = 0;
+    textYOffset = 0;
     textY = 0;
-    field_0x30 = 1.0f;
+    elapsedTime = 1.0f;
 }
 
 // 0x0051aee0
@@ -844,7 +844,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
 // 0x0051b1f0
 void DropTextOverlay::ReshowText()
 {
-    field_0x30 = 0.0f;
+    elapsedTime = 0.0f;
     visible = 1;
 }
 
@@ -1199,9 +1199,9 @@ void RadarOverlay::DrawFrameRate()
     float average = frameRateSum / readoutCount++;
     if (showFrameRate) {
         sprintf(text, "%.0f/%.0ffps", 1000.0f / averageFrameTime, average);
-        field_0x38->SelectFont("arialsm");
-        void* laidOut = field_0x38->LayoutText(&frameRateRect, text, 0xc8c8dc, &count);
-        field_0x38->DrawVertices(Target(), laidOut, count);
+        textService->SelectFont("arialsm");
+        void* laidOut = textService->LayoutText(&frameRateRect, text, 0xc8c8dc, &count);
+        textService->DrawVertices(Target(), laidOut, count);
     }
     averageFrameTime = frameTimeSum * 1000.0f / frameCount;
     frameTimeSum = 0.0f;
@@ -1310,7 +1310,7 @@ ChatOverlay::ChatOverlay(int flags) : Overlay(flags, 1)
         racers[i] = 0;
     chatFont = 0;
     nameTagFont = 0;
-    field_0x160 = 0;
+    nameLineRight = 0;
     pen = 0;
     inputShown = 0;
     chatInput = new(__FILE__, 2172) UnknownChatInput;
@@ -1318,11 +1318,11 @@ ChatOverlay::ChatOverlay(int flags) : Overlay(flags, 1)
         lastRacerValues[i] = 0;
     leftPanel = 0;
     rightPanel = 0;
-    field_0x1d0 = 0.0f;
-    playerName[0] = '\0';
+    cueSquaredDistance = 0.0f;
+    cueRacerName[0] = '\0';
     nameChanged = 0;
-    field_0x164 = 0;
-    field_0x3dc = 0;
+    cueTagShown = 0;
+    typingEnabled = 0;
 }
 
 // 0x0051cee0
@@ -1341,10 +1341,10 @@ ChatOverlay::~ChatOverlay()
 }
 
 // 0x0051d980
-void ChatOverlay::UnknownFunction51d980(int show)
+void ChatOverlay::ShowCueTag(int show)
 {
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
-        field_0x164 = show;
+        cueTagShown = show;
         NameOverlay* tag = nameTags[racerCount];
         if (tag) {
             if (show)
@@ -1356,15 +1356,15 @@ void ChatOverlay::UnknownFunction51d980(int show)
 }
 
 // 0x0051d9c0
-void ChatOverlay::UnknownFunction51d9c0(float value, const char* name)
+void ChatOverlay::SetCueRacer(float squaredDistance, const char* name)
 {
-    field_0x1d0 = value;
-    if (_stricmp(name, playerName))
+    cueSquaredDistance = squaredDistance;
+    if (_stricmp(name, cueRacerName))
         nameChanged = 1;
     int n = strlen(name);
     int length = n > 0x103 ? 0x103 : n;
-    strncpy(playerName, name, length);
-    playerName[length] = '\0';
+    strncpy(cueRacerName, name, length);
+    cueRacerName[length] = '\0';
 }
 
 // 0x0051da30
@@ -1384,7 +1384,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
                 AddMessage(g_TrackGame->mode.field_0x00, (int)message.text, 0);
             }
             chatInput->ClearLine();
-            field_0x3dc = 0;
+            typingEnabled = 0;
             return 1;
         }
         if (key == 8) {
@@ -1395,7 +1395,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
             *result = 1;
             return 1;
         }
-        if (field_0x3dc && !g_TrackGame->controlInterface->keyboard->ModifierHolds(0xc) && key) {
+        if (typingEnabled && !g_TrackGame->controlInterface->keyboard->ModifierHolds(0xc) && key) {
             chatInput->AppendChar(key);
             return 1;
         }
@@ -1406,7 +1406,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
 // 0x0051dce0
 int ChatOverlay::HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
 {
-    if (inputShown && field_0x3dc && !event->kind)
+    if (inputShown && typingEnabled && !event->kind)
         return 1;
     return 0;
 }
@@ -1538,7 +1538,7 @@ int ChatOverlay::RedrawChat()
     }
     DrawTextA(dc, text, strlen(text), &rect, 0x124);
     int i;
-    for (i = 0; i <= chatInput->field_0x1c0; i++) {
+    for (i = 0; i <= chatInput->historyCount; i++) {
         int n = strlen(chatInput->GetHistory(i, &value));
         int length = n > 0x7f ? 0x7f : n;
         strncpy(text, chatInput->GetHistory(i, &value), length);
@@ -1558,7 +1558,7 @@ int ChatOverlay::RedrawChat()
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
     font = SelectObject(dc, chatFont);
-    for (i = 0; i <= chatInput->field_0x1c0; i++) {
+    for (i = 0; i <= chatInput->historyCount; i++) {
         strcpy(text, chatInput->GetHistory(i, &value));
         rect.top = (i + 1) * lineHeight + 7;
         rect.bottom = rect.top + lineHeight;
@@ -1576,11 +1576,11 @@ fail:
 }
 
 // 0x0051e7c0
-void ChatOverlay::UnknownFunction51e7c0()
+void ChatOverlay::CycleNameTagShade()
 {
-    g_TrackGame->mode.field_0x90++;
-    if (g_TrackGame->mode.field_0x90 == 6)
-        g_TrackGame->mode.field_0x90 = 0;
+    g_TrackGame->mode.nameTagShade++;
+    if (g_TrackGame->mode.nameTagShade == 6)
+        g_TrackGame->mode.nameTagShade = 0;
     RedrawNameTags(-1);
 }
 
@@ -1590,14 +1590,14 @@ void ChatOverlay::RedrawNameLine()
     UnknownOverlayRect rect;
     char text[128];
     rect = nameTagRects[racerCount];
-    rect.right = field_0x160;
+    rect.right = nameLineRight;
     RestoreRect(&rect);
-    sprintf(text, "%d : ", (int)sqrt(field_0x1d0));
-    field_0x38->SelectFont("arialsm");
-    int right = field_0x38->DrawTextInto(overlayTexture, nameTagRects[racerCount].left,
+    sprintf(text, "%d : ", (int)sqrt(cueSquaredDistance));
+    textService->SelectFont("arialsm");
+    int right = textService->DrawTextInto(overlayTexture, nameTagRects[racerCount].left,
                                           nameTagRects[racerCount].top, text, 0);
-    if (right != field_0x160 || nameChanged) {
-        field_0x160 = right;
+    if (right != nameLineRight || nameChanged) {
+        nameLineRight = right;
         nameChanged = 0;
         nameTags[racerCount]->drawWidth = right - nameTagRects[racerCount].left;
         RedrawNameTags(racerCount);
@@ -1612,13 +1612,13 @@ void UnknownChatInput::AddHistory(const char* name, const char* text, int value)
     int textLength = strlen(text);
     strcpy(separator, ": ");
     int separatorLength = strlen(separator);
-    if (field_0x1c0 < 3) {
-        strcpy(history[field_0x1c0].text, name);
-        strcat(history[field_0x1c0].text, separator);
-        strncat(history[field_0x1c0].text, text, 0x31);
-        history[field_0x1c0].text[0x31] = '\0';
-        history[field_0x1c0].value = value;
-        field_0x1c0++;
+    if (historyCount < 3) {
+        strcpy(history[historyCount].text, name);
+        strcat(history[historyCount].text, separator);
+        strncat(history[historyCount].text, text, 0x31);
+        history[historyCount].text[0x31] = '\0';
+        history[historyCount].value = value;
+        historyCount++;
     } else {
         for (int i = 0; i < 2; i++) {
             strncpy(history[i].text, history[i + 1].text, 0x31);
@@ -1632,12 +1632,12 @@ void UnknownChatInput::AddHistory(const char* name, const char* text, int value)
         history[2].value = value;
     }
     if (nameLength + separatorLength + textLength > 0x31) {
-        if (field_0x1c0 < 3) {
-            strcpy(history[field_0x1c0].text, "             ");
-            history[field_0x1c0].text[separatorLength + nameLength] = '\0';
-            strncat(history[field_0x1c0].text, text + 0x31 - separatorLength - nameLength, 0x31);
-            history[field_0x1c0].value = value;
-            field_0x1c0++;
+        if (historyCount < 3) {
+            strcpy(history[historyCount].text, "             ");
+            history[historyCount].text[separatorLength + nameLength] = '\0';
+            strncat(history[historyCount].text, text + 0x31 - separatorLength - nameLength, 0x31);
+            history[historyCount].value = value;
+            historyCount++;
         } else {
             for (int i = 0; i < 2; i++) {
                 strncpy(history[i].text, history[i + 1].text, 0x31);
@@ -1661,7 +1661,7 @@ UnknownChatInput::UnknownChatInput()
         history[i].text[0] = '\0';
     }
     typedLength = 0;
-    field_0x1c0 = 0;
+    historyCount = 0;
 }
 
 // 0x0051ea80
@@ -1717,10 +1717,10 @@ char* UnknownChatInput::GetHistory(int index, int* value)
 
 // 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
 // texture, then colours it with a grey that darkens with the cycle
-// TrackGameMode+0x90.
+// TrackGameMode+0x90 (nameTagShade).
 void ChatOverlay::RedrawNameTags(int index)
 {
-    unsigned char level = 0xff - g_TrackGame->mode.field_0x90 * 0x33;
+    unsigned char level = 0xff - g_TrackGame->mode.nameTagShade * 0x33;
     if (index == -1) {
         for (int i = 0; i < racerCount; i++)
             RestoreRect(&nameTagRects[i]);

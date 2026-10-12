@@ -102,8 +102,8 @@ Game::Game() {
     allowBilinear = 1;
     allowSortIndependentAntialiasing = 0;
     allowTrilinear = 0;
-    field_0x1c4 = 0;
-    field_0x1c8 = 0;
+    paused = 0;
+    stepOneFrame = 0;
     inputSuspended = 0;
     field_0x2d5_bit1 = 0;
     field_0x2d5_bit2 = 1;
@@ -377,10 +377,10 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
     }
     if (field_0x2d4_bit0) {
         if (controlInterface->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
-            field_0x1c4 = 1 - field_0x1c4;
-        } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && field_0x1c4) {
-            field_0x1c8 = 1;
-            field_0x1c4 = 0;
+            paused = 1 - paused;
+        } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && paused) {
+            stepOneFrame = 1;
+            paused = 0;
         }
     }
     return rootObject->UnknownVirtualSlot23(event, entry) != 0;

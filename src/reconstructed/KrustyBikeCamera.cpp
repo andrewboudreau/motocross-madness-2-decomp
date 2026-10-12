@@ -25,11 +25,11 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
     UnknownVirtualSlot71(cameraState);
     krustyBike = 0;
     raceView = 0;
-    field_0x1d8 = 0;
-    field_0x25c = eyePosition;
+    widthKeysEnabled = 0;
+    resumeEyePosition = eyePosition;
     savedCameraState = cameraState;
-    field_0x250 = cameraState;
-    savedParameter = field_0x16c;
+    resumeState = cameraState;
+    savedFieldOfView = fieldOfView;
 }
 
 // 0x00497d80: an explicit empty destructor.
@@ -58,7 +58,7 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
     bool capped = g_TrackGame->mode.GetSelectedSeries() == 3 ||
                   g_TrackGame->mode.GetSelectedSeries() == 4;
     Vector3 ground = *point;
-    field_0x240->QueryGround(&ground, 0, 0, 0);
+    subject->QueryGround(&ground, 0, 0, 0);
     float minimum = ground.y + 3.5f;
     if (minimum > point->y) {
         if (followPitch < 0.0f)
@@ -83,8 +83,8 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
         pressed = true;
     } else {
         pressed = false;
-        field_0x391 = pressed;
-        field_0x392 = pressed;
+        targetPointCached = pressed;
+        targetHeadingCached = pressed;
     }
     if (cameraState == 7)
         return pressed;
@@ -97,7 +97,7 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
 
 // 0x00498130: +0x308 from the fov/zoom ratio and the bike's +0x43c.
 void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
-    float ratio = field_0x16c / field_0x1dc;
+    float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (vehicleMode && !flag &&
             (!krustyBike->field_0x7a4 || g_TrackGame->playerCount > 1))
@@ -115,7 +115,7 @@ void KrustyBikeCamera::UnknownVirtualSlot59() {
         g_TrackGame->mode.field_0x23c0 = followPitch;
         g_TrackGame->mode.field_0x23c4 = followYaw;
         g_TrackGame->mode.field_0x23bc = followDistance;
-        g_TrackGame->mode.field_0x23c8 = field_0x258;
+        g_TrackGame->mode.field_0x23c8 = targetFieldOfView;
     }
 }
 
@@ -124,7 +124,7 @@ void KrustyBikeCamera::UnknownVirtualSlot60() {
     followPitch = g_TrackGame->mode.field_0x23c0;
     followYaw = g_TrackGame->mode.field_0x23c4;
     followDistance = g_TrackGame->mode.field_0x23bc;
-    field_0x258 = g_TrackGame->mode.field_0x23c8;
+    targetFieldOfView = g_TrackGame->mode.field_0x23c8;
 }
 
 // 0x00498280: restores the saved state.
@@ -162,12 +162,12 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
         } else {
             result += bike->field_0x604->field_0x40->field_0x154 * dt;
         }
-    } else if (raceView->field_0x3f8) {
+    } else if (raceView->replayPaused) {
         result = targetPoint;
     } else {
         float dot = KrustyCameraDot(UnknownVirtualSlot33(), field_0x29c);
         float height = field_0x2c0 * 0.009f + 1.0f;
-        float ratio = field_0x16c / field_0x1dc;
+        float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
         float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
         float distance = lag * (height * height * dot / speed) * 35.0f;
@@ -190,7 +190,7 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
     } else if (cameraState == 7) {
         result = targetPoint;
         result.y += 3.0f;
-    } else if (raceView->field_0x3f8 || raceView->field_0x3f9) {
+    } else if (raceView->replayPaused || raceView->replayStepFrame) {
         result = targetPoint;
     } else if (flag) {
         result = UnknownVirtualSlot35(a, dt);

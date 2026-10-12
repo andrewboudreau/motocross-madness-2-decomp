@@ -37,9 +37,9 @@ public:
     GameObject* SetUp(void* owner, int a, TextureMapManager* textures, int b, int c,
                       int d, const char* font, int fontSize, const char* cursor,
                       void (*progress)(), int e);
-    void UnknownFunction485d70(const char* directory);       // 0x00485d70 ("ui")
+    void SetDialogDirectory(const char* directory);       // 0x00485d70 ("ui")
     void SetWaitCursorImage(const char* image);           // 0x00486560 ("ui\\wait.tga")
-    void UnknownFunction4866c0(char* font);                  // 0x004866c0
+    void SetToolTipFont(char* font);                  // 0x004866c0
     void ShowCursors(int value);                             // 0x00486630
     void CloseDialogResource();                            // 0x00485d50 (KrustyUI 0x004999b0)
     UnknownTrackGameObject56cItem* FindInputDialog();        // 0x00485df0
@@ -116,7 +116,7 @@ public:
     int ResolveBikeFile(const char* name, char* text, int size);
     int ResolveRiderFile(const char* name, char* text, int size);
     void ShowCursors();             // 0x00499b00
-    void UnknownFunction499b10();             // 0x00499b10
+    void HideCursors();             // 0x00499b10
     void OpenExitDialog();             // 0x0049a4a0: opens the exit dialog
     // 0x0049b020: fills `names` with `count` distinct random short strings.
     void MakeRandomNames(const char** names, int count);
@@ -126,7 +126,7 @@ public:
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int AddEntry(int a, int scene, int series, const char* name, int d, int e);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
-    void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
+    void ClearEntries();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
     void LoadBikesAndRiders();                // 0x0049a8b0: bikes.pb and riders.pb
     GameObject* Create(RenderTarget* target, int value); // 0x004988a0

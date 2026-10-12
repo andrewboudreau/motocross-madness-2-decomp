@@ -40,7 +40,7 @@ public:
     unsigned char field_0x000[0x10a];
     unsigned char field_0x10a;                // cleared when the followed racer changes (0x004a9e80)
     unsigned char field_0x10b[0x708 - 0x10b];
-    KrustyVCR* field_0x708;
+    KrustyVCR* recorder;                      // +0x708
 };
 
 // The entries at TrackGameViewOwner+0x420 (BikeRace.h walks them as
@@ -85,8 +85,8 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x64;
     GameObject* field_0x68;
     TextQueueOverlay* textQueue;              // +0x6c
-    float field_0x70;                         // compared with TrackGame+0x2eb0, settings +0x140 (EventManager 0x0045eef0)
-    float field_0x74;                         // RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
+    float elapsedMinutes;                     // +0x70 compared with the settings' time limit (EventManager 0x0045eef0)
+    float elapsedSeconds;                     // +0x74 RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
     unsigned char field_0x78[0x9c - 0x78];
     GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
     unsigned char field_0xa0[0xa8 - 0xa0];
@@ -173,10 +173,10 @@ struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
     int detailLevel;                          // +0x18 (TrackGameMode+0xa64): detail level 0..9
 };
 
-struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
+struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes (ResetControlOptions)
     int field_0x00[7];                        // 50 each
     int field_0x1c;
-    int field_0x20;
+    int joystickOn;                           // +0x20 TrackGameMode+0xa88 joystickOn, reset to 1
     int field_0x24;
     int field_0x28;
     int field_0x2c;
@@ -230,7 +230,7 @@ struct UnknownTrackGameModeSettings {
     unsigned char field_0x56[0x138 - 0x56];
     int field_0x138;                          // SelectGamePicProcs.cpp
     int field_0x13c;                          // SelectGamePicProcs.cpp
-    float field_0x140;
+    float timeLimitMinutes;                   // +0x140 "%dm" rows 2..5 (DlgProcs 0x0044e3e0), SelectGamePicProcs.cpp's minutes
     int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
     int field_0x148;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
     UnknownTrackGameModeEntry field_0x14c[8]; // reset by TrackGameMode 0x00522cd0
@@ -314,13 +314,13 @@ public:
     void ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options);
     void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
-    void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
+    void ResetControlOptions(UnknownTrackGameModeOptionsA68* options); // 0x00522800: +0xa68..+0xa94
     void ReloadResourceStrings(char (*names)[0x80]);   // reloads resourceStrings
     void CopyGarageTables(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522cb0(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522cd0();
+    void ResetSuspension(UnknownTrackGameModeOptionsFd8* options); // 0x00522c70: all six at 0.5f
+    void ResetEngineOptions(UnknownTrackGameModeOptionsFd8* options); // 0x00522c90: 250, two stroke, tables
+    void ResetGarageOptions(UnknownTrackGameModeOptionsFd8* options); // 0x00522cb0: the two above
+    void ResetSettingsEntries();              // 0x00522cd0: raceSettings +0x14c
     // 0x00522e20: picks the display mode (640x480x16 preferred) on the
     // adapter whose GUID is `guid`, and stores the adapter GUID.
     void ChooseDisplayMode(const void* guid, int* mode);  // 0x00522e20
@@ -337,7 +337,7 @@ public:
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)
-    int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
+    int nameTagShade;                         // +0x90 name tag grey step 0..5 (ChatOverlay 0x0051e7c0, 0x0051e910)
     int difficulty;                           // +0x94 "RadLODEasy" group (PCNewDlg reads the same group as the difficulty)
     int savedDifficulty;                      // +0x98 saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
     int showNewbieDialog;                 // +0x9c: cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)
@@ -655,8 +655,8 @@ public:
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00521cb0
 
     void MuteSound();             // 0x00521a30
-    void UnknownFunction521a40();             // 0x00521a40
-    int UnknownFunction521cd0();              // 0x00521cd0
+    void StopCDAudio();             // 0x00521a40
+    int InProCircuitCareer();              // 0x00521cd0: proCircuit set and KrustyUI +0x4a8 clear
 
     // 0x00521970: loads string resource `id` into buffer (size bytes), or
     // "Resource String Unavailable"; 1 when loaded.
@@ -679,13 +679,13 @@ public:
     TrackGameMode mode;                       // +0x578..+0x3337
     DirectoryList* profileDirectory;
     int menuIsOpen;
-    CDAudio* field_0x3340;
+    CDAudio* cdAudio;                         // +0x3340
     UnknownControlBinding field_0x3344;
     UnknownControlBinding field_0x3380;
     UnknownControlBinding field_0x33bc;
     UnknownControlMapping* controlMapping;
     UnknownTrackGameObject33fc* field_0x33fc;
-    UnknownTrackGameObject3400* field_0x3400;
+    UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];
     void* languageModule;
     UnknownTrackGameObject3410* networkGameObject;

@@ -22,7 +22,7 @@
   "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?Tell@UnknownTextureStream@@QAEHXZ": "0x00461600",
   "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
-  "?UnknownFunction4b6b30@Palette8@@SAPAV1@PBD@Z": "0x004b6b30",
+  "?LoadShared@Palette8@@SAPAV1@PBD@Z": "0x004b6b30",
   "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z": "0x004e9010",
   "?SetItemObject@UnknownResourceManager@@QAEXPAXH@Z": "0x004e9010",

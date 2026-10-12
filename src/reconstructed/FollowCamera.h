@@ -230,14 +230,14 @@ protected:
     float followYaw;                          // +0x234 yaw slot 49 adds to +0x308 / +0x23c; presets in slots 63-67
     float initialYaw;                         // +0x238 copy of followYaw
     float field_0x23c;          // advanced by pi in VehicleCamera slot 39
-    UnknownFollowCameraSubject* field_0x240;
+    UnknownFollowCameraSubject* subject;      // +0x240 (0x00463600 SetSubject)
     int cameraState;                 // +0x244, current state (slots 70-72, 75)
     int savedCameraState;            // +0x248, saved state (slot 70)
-    float savedParameter;            // +0x24c, saved field_0x258 (slot 70)
-    int field_0x250;
-    float field_0x254;
-    float field_0x258;          // clamped to [10, 70] by slot 68
-    Vector3 field_0x25c;        // copy of Camera field_0x170
+    float savedFieldOfView;          // +0x24c, saved targetFieldOfView (slot 70)
+    int resumeState;                 // +0x250 state to return to when state 7 ends (slot 10)
+    float resumeFieldOfView;         // +0x254 targetFieldOfView on entering state 7
+    float targetFieldOfView;         // +0x258 eased into fieldOfView through +0x294 (slot 10); clamped to [10, 70] by slot 68
+    Vector3 resumeEyePosition;       // +0x25c eyePosition on entering state 7
     int overrideActive;              // +0x268, slot 70 input byte
     int field_0x26c;            // reset by slot 70
     float field_0x270;          // 15.0f
@@ -247,14 +247,15 @@ protected:
     bool field_0x277;           // set when slot 36 ran with enable
     unsigned char field_0x278;
     unsigned char field_0x279;
-    UnknownFollowCameraValue* field_0x27c; // owned values (allocated by 0x00463140, deleted by the destructor)
-    UnknownFollowCameraValue* field_0x280;
-    UnknownFollowCameraValue* field_0x284;
-    UnknownFollowCameraValue* field_0x288;
-    UnknownFollowCameraValue* field_0x28c;
-    UnknownFollowCameraValue* field_0x290;
-    UnknownFollowCameraValue* field_0x294;
-    UnknownFollowCameraValue* field_0x298;
+    // Owned easing values (allocated by 0x00463140 and slot 10, deleted by the destructor).
+    UnknownFollowCameraValue* targetEaseX;    // +0x27c target x
+    UnknownFollowCameraValue* targetEaseY;    // +0x280 target y
+    UnknownFollowCameraValue* targetEaseZ;    // +0x284 target z
+    UnknownFollowCameraValue* positionEaseX;  // +0x288 position x
+    UnknownFollowCameraValue* positionEaseY;  // +0x28c position y
+    UnknownFollowCameraValue* positionEaseZ;  // +0x290 position z
+    UnknownFollowCameraValue* fieldOfViewEase; // +0x294 targetFieldOfView
+    UnknownFollowCameraValue* distanceEase;   // +0x298 followDistance
     Vector3 field_0x29c;        // g_UnknownVector65b438
     Vector3 cachedTarget;             // +0x2a8, cached slot 57 result (slot 69)
     Vector3 targetPoint;              // +0x2b4, target point (slots 34, 37, 68)
@@ -270,11 +271,12 @@ protected:
     UnknownFollowCameraPoint* points; // +0x2e4, owned table
     float yawOffset;                 // +0x2e8, yaw offset (0x00463140, slot 49)
     float field_0x2ec;          // 3.0f
-    float field_0x2f0;          // state-4 saved field_0x258 (slot 71)
-    float field_0x2f4;          // 10.0f
-    float field_0x2f8;          // 280.0f
-    float field_0x2fc;          // 70.0f
-    float field_0x300;          // 20.0f
+    float state4FieldOfView;         // +0x2f0 state-4 saved targetFieldOfView (slot 71)
+    // State 5 maps +0x2c0 linearly from +0x300 .. +0x2f8 onto +0x2fc .. +0x2f4.
+    float heightFovMinimum;          // +0x2f4 10.0f
+    float heightForMinimumFov;       // +0x2f8 280.0f
+    float heightFovMaximum;          // +0x2fc 70.0f
+    float heightForMaximumFov;       // +0x300 20.0f
     float blendClock;                // +0x304, blend clock, advanced by slot 10 up to 1
     float field_0x308;          // set by KrustyBikeCamera slot 42
     int stateIndex;                  // +0x30c, cyclic index into states (slot 72)

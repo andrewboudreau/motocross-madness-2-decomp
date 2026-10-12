@@ -798,7 +798,7 @@ void SPEventDlg::ApplyEventType() {
             sprintf(text, "%dm", i);
             laps->AddRow(text, i, 0);
         }
-        laps->SelectRowByData((int)g_TrackGame->mode.raceSettings.field_0x140);
+        laps->SelectRowByData((int)g_TrackGame->mode.raceSettings.timeLimitMinutes);
     }
     if (settings.eventType == 0) {
         g_TrackGame->mode.SelectSeries(0);
@@ -1320,9 +1320,9 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
             if (g_UnknownGlobal59adfc >= 10) {
                 event->dialog->EndDialog(0);
                 event->handled = 1;
-                g_TrackGame->UnknownFunction521a40();
+                g_TrackGame->StopCDAudio();
                 g_TrackGame->ResetClock();
-                g_TrackGame->eventManager->FindRaceView()->UnknownFunction421050();
+                g_TrackGame->eventManager->FindRaceView()->ResetStartCountdown();
                 if (g_TrackGame->quarryEvent)
                     g_TrackGame->quarryEvent->ResetClock();
                 if (g_TrackGame->tagEvent)
@@ -1348,7 +1348,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
         bar->showPercentage = 0;
         area->Show(0, 1);
         g_TrackGame->ui->progressDialog = (UnknownGameUiPage*)this;
-        g_TrackGame->ui->UnknownFunction499b10();
+        g_TrackGame->ui->HideCursors();
         g_UnknownGlobal59ae84 = 0;
         g_TrackGame->mode.SaveProfile();
         if (g_TrackGame->network)
@@ -2015,7 +2015,7 @@ void LeaveMenusForRace() {
     g_TrackGame->ui->gui->ReleaseBackground();
     if (g_TrackGame->display->freezeFrameIndex)
         g_TrackGame->ui->gui->EnableWindowClipper(0);
-    if (g_TrackGame->playerCount == 1 && !g_TrackGame->UnknownFunction521cd0() &&
+    if (g_TrackGame->playerCount == 1 && !g_TrackGame->InProCircuitCareer() &&
         !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->playingReplay) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.raceSettings,
                sizeof(g_TrackGame->mode.savedSettings));

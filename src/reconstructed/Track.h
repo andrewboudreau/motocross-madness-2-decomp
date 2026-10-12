@@ -28,15 +28,15 @@ struct TrackNode {
 // A segment point (calloc(1, 0x30), Track.cpp line 141), kept in a doubly
 // linked list per node.
 struct TrackSegment {
-    float field_0x00;               // x
-    float field_0x04;               // y
-    float field_0x08;               // z
-    float field_0x0c;
-    float field_0x10;
-    float field_0x14;
-    float field_0x18;
-    float field_0x1c;
-    float field_0x20;
+    float pointX;                             // +0x00 the centre point
+    float pointY;                             // +0x04
+    float pointZ;                             // +0x08
+    float edgeAX;                             // +0x0c the first strip edge point (mode 10)
+    float edgeAY;                             // +0x10
+    float edgeAZ;                             // +0x14
+    float edgeBX;                             // +0x18 the second strip edge point (mode 11)
+    float edgeBY;                             // +0x1c
+    float edgeBZ;                             // +0x20
     float horizontalLength;                   // +0x24 horizontal distance to the next point
     TrackSegment* previous;                   // +0x28
     TrackSegment* next;                       // +0x2c

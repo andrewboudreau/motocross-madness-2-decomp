@@ -27,7 +27,7 @@ public:
     // 0x0044a010: the index of the drive whose volume is `volumeName` (and
     // whose type is `type`, unless 0); 1 when found.
     int FindVolume(const char* volumeName, int* index, unsigned int type);
-    int UnknownFunction44a0b0(int index, char* root);     // 0x0044a0b0
+    int GetDriveRoot(int index, char* root);     // 0x0044a0b0
 
     UnknownDriveEntry* drives;
     int count;
@@ -92,8 +92,8 @@ public:
     CombinedDirectoryList();                               // 0x0044ab10
     virtual ~CombinedDirectoryList();                      // 0x0044aba0 (deleting wrapper 0x0044ab80)
     virtual int UnknownVirtualSlot1();                     // 0x0044ac30
-    void UnknownFunction44abb0(const char* first, const char* second); // 0x0044abb0
+    void SetDirectories(const char* first, const char* second); // 0x0044abb0
 
-    char field_0x21c[0x104];
-    char field_0x320[0x104];
+    char firstDirectory[0x104];                            // +0x21c listed first
+    char secondDirectory[0x104];                           // +0x320 merged into the first
 };

@@ -27,8 +27,8 @@
 // The stream that holds the file: the innermost one.
 static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream)
 {
-    while (stream->field_0x1c) {
-        stream = stream->field_0x1c;
+    while (stream->innerStream) {
+        stream = stream->innerStream;
     }
     return stream;
 }
@@ -38,41 +38,41 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
 // stores, as retail does.
 UnknownTextureStream::UnknownTextureStream(int a)
 {
-    field_0x08 = 0;
-    field_0x10 = 0;
-    field_0x01 = 0;
-    field_0x14 = 0;
-    field_0x03 = 0;
-    field_0x1c = 0;
-    field_0x0c = 0;
-    field_0x130 = 0;
-    field_0x04 = 0;
-    field_0x02 = 'F';
-    field_0x00 = 'A';
-    field_0x20 = 'O';
-    field_0x18 = 'E';
-    char* buffer = field_0x21;
-    field_0x12c = (UnknownResourceManager*)a;
-    field_0x124 = buffer;
-    field_0x128 = buffer;
+    fileEncoded = 0;
+    headerSize = 0;
+    textMode = 0;
+    fileHandle = 0;
+    nameKey = 0;
+    innerStream = 0;
+    keyStartOffset = 0;
+    sliceOffset = 0;
+    sliceLength = 0;
+    headerByte0 = 'F';
+    headerByte1 = 'A';
+    headerByte2 = 'O';
+    headerByte3 = 'E';
+    char* buffer = readBuffer;
+    archives = (UnknownResourceManager*)a;
+    bufferPos = buffer;
+    bufferEnd = buffer;
 }
 
 // 0x00460d60
 UnknownTextureStream::~UnknownTextureStream()
 {
-    if (field_0x14) {
-        fclose(field_0x14);
+    if (fileHandle) {
+        fclose(fileHandle);
     }
 }
 
 // 0x00460d70
 UnknownTextureStream* UnknownTextureStream::FindArchive(const char* name)
 {
-    if (field_0x12c) {
-        ResourceItem* item = field_0x12c->FindItem(name, 0);
+    if (archives) {
+        ResourceItem* item = archives->FindItem(name, 0);
         if (item) {
-            field_0x130 = item->offset;
-            field_0x04 = item->size;
+            sliceOffset = item->offset;
+            sliceLength = item->size;
             return item->archive;
         }
     }
@@ -84,19 +84,19 @@ int UnknownTextureStream::IsValidFile(const char* path)
 {
     char message[0x184];
 
-    if (field_0x14) {
-        fclose(field_0x14);
+    if (fileHandle) {
+        fclose(fileHandle);
     }
     if (path) {
-        if (*path && (field_0x14 = fopen(path, "rb")) != 0) {
+        if (*path && (fileHandle = fopen(path, "rb")) != 0) {
             if (!CheckHeader()) {
-                fclose(field_0x14);
-                field_0x14 = 0;
+                fclose(fileHandle);
+                fileHandle = 0;
                 return 0;
             }
-            if (field_0x14) {
-                fclose(field_0x14);
-                field_0x14 = 0;
+            if (fileHandle) {
+                fclose(fileHandle);
+                fileHandle = 0;
             }
             return 1;
         }
@@ -122,58 +122,58 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
     char extension[0x100];
     char directory[0x100];
 
-    if (field_0x14) {
-        fclose(field_0x14);
-        field_0x08 = 0;
-        field_0x10 = 0;
-        field_0x01 = 0;
-        field_0x14 = 0;
-        field_0x03 = 0;
-        field_0x1c = 0;
+    if (fileHandle) {
+        fclose(fileHandle);
+        fileEncoded = 0;
+        headerSize = 0;
+        textMode = 0;
+        fileHandle = 0;
+        nameKey = 0;
+        innerStream = 0;
     }
-    field_0x1c = FindArchive(path);
-    if (field_0x1c) {
-        field_0x1c->field_0x01 = field_0x1c->field_0x03;
+    innerStream = FindArchive(path);
+    if (innerStream) {
+        innerStream->textMode = innerStream->nameKey;
         SetBufferSize(0x8000);
-        Seek(field_0x130, SEEK_SET, 0);
+        Seek(sliceOffset, SEEK_SET, 0);
         return 1;
     }
     if (*mode == 'r' || *mode == 'a') {
         char buffer[0x184];
         if (!encoded && IsValidFile(path)) {
-            field_0x08 = 1;
-            if (field_0x12c && (field_0x1c = field_0x12c->AddArchive(path, 0)) != 0) {
+            fileEncoded = 1;
+            if (archives && (innerStream = archives->AddArchive(path, 0)) != 0) {
                 return 1;
             }
         }
         if (path) {
-            if (*path && (field_0x14 = fopen(path, mode)) != 0) {
-                if (!encoded && !field_0x08) {
-                    if (fseek(field_0x14, 0, SEEK_SET)) {
-                        fclose(field_0x14);
-                        field_0x14 = 0;
+            if (*path && (fileHandle = fopen(path, mode)) != 0) {
+                if (!encoded && !fileEncoded) {
+                    if (fseek(fileHandle, 0, SEEK_SET)) {
+                        fclose(fileHandle);
+                        fileHandle = 0;
                         sprintf(buffer, "Fseek failed for %s.\n", path);
                         return 0;
                     }
                 } else {
                     if (!CheckHeader()) {
-                        fclose(field_0x14);
-                        field_0x14 = 0;
+                        fclose(fileHandle);
+                        fileHandle = 0;
                         sprintf(buffer, "%s NOT an encrypted file, but expected to be.\n", path);
                         return 0;
                     }
-                    field_0x08 = 1;
-                    field_0x10 = 4;
+                    fileEncoded = 1;
+                    headerSize = 4;
                     _splitpath(path, drive, directory, buffer, extension);
                     strcat(buffer, extension);
-                    field_0x01 = (char)0xfa;
+                    textMode = (char)0xfa;
                     int length = strlen(buffer);
                     char* p = buffer;
                     for (int i = 0; i < length; i++) {
                         char c = *p++;
-                        field_0x01 = ((field_0x01 + 3) ^ c) + field_0x01;
+                        textMode = ((textMode + 3) ^ c) + textMode;
                     }
-                    field_0x03 = field_0x01;
+                    nameKey = textMode;
                 }
             } else {
                 sprintf(buffer, "Error opening %s.\n", path);
@@ -195,16 +195,16 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
             access[1] = '+';
         }
         if (path) {
-            if (*path && (field_0x14 = fopen(path, access)) != 0) {
-                if (fseek(field_0x14, 0, SEEK_SET)) {
-                    fclose(field_0x14);
-                    field_0x14 = 0;
+            if (*path && (fileHandle = fopen(path, access)) != 0) {
+                if (fseek(fileHandle, 0, SEEK_SET)) {
+                    fclose(fileHandle);
+                    fileHandle = 0;
                     sprintf(buffer, "Fseek failed for %s.\n", path);
                     return 0;
                 }
                 if (encoded && !WriteHeader(path)) {
-                    fclose(field_0x14);
-                    field_0x14 = 0;
+                    fclose(fileHandle);
+                    fileHandle = 0;
                     sprintf(buffer, "Write of encrypted file header failed for %s.\n", path);
                     return 0;
                 }
@@ -218,14 +218,14 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
         }
     }
     SetBufferSize(0x8000);
-    Seek(0, SEEK_SET, field_0x08);
+    Seek(0, SEEK_SET, fileEncoded);
     return 1;
 }
 
 // 0x00461310
 int UnknownTextureStream::SetBufferSize(int unused)
 {
-    FILE* file = InnermostStream(this)->field_0x14;
+    FILE* file = InnermostStream(this)->fileHandle;
     return _setmode(file->_file, _O_BINARY);
 }
 
@@ -233,9 +233,9 @@ int UnknownTextureStream::SetBufferSize(int unused)
 int UnknownTextureStream::Tell()
 {
     UnknownTextureStream* stream = InnermostStream(this);
-    int position = ftell(stream->field_0x14) + (stream->field_0x124 - stream->field_0x128);
-    if (position >= stream->field_0x10) {
-        return position - stream->field_0x10;
+    int position = ftell(stream->fileHandle) + (stream->bufferPos - stream->bufferEnd);
+    if (position >= stream->headerSize) {
+        return position - stream->headerSize;
     }
     return -1;
 }
@@ -244,37 +244,37 @@ int UnknownTextureStream::Tell()
 // the end. The decode reads the byte into a temporary and the key straight from the
 // field (no key temporary): that is the only spelling under which VC6 loads the key
 // first and copies it, as retail does; naming the key makes it copy the byte instead.
-// inline_depth(0) keeps the UnknownFunction430ff0 call out of line, as retail has it.
+// inline_depth(0) keeps the AtEnd call out of line, as retail has it.
 #pragma inline_depth(0)
 int UnknownTextureStream::ReadByte()
 {
-    if (field_0x1c) {
-        if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04) {
+    if (innerStream) {
+        if (sliceLength > 0 && Tell() >= sliceOffset + sliceLength) {
             return -1;
         }
-        if (field_0x1c->UnknownFunction430ff0()) {
+        if (innerStream->AtEnd()) {
             return -1;
         }
-        return field_0x1c->ReadByte();
+        return innerStream->ReadByte();
     }
-    if (field_0x124 == field_0x128) {
-        int count = fread(field_0x21, 1, 0x100, field_0x14);
-        if (count != 0x100 && (count == 0 || (field_0x14->_flag & _IOERR))) {
+    if (bufferPos == bufferEnd) {
+        int count = fread(readBuffer, 1, 0x100, fileHandle);
+        if (count != 0x100 && (count == 0 || (fileHandle->_flag & _IOERR))) {
             return -1;
         }
-        field_0x124 = field_0x21;
-        field_0x128 = field_0x124 + count;
+        bufferPos = readBuffer;
+        bufferEnd = bufferPos + count;
     }
-    char* p = field_0x124;
-    if (p < field_0x128) {
-        if (field_0x08) {
+    char* p = bufferPos;
+    if (p < bufferEnd) {
+        if (fileEncoded) {
             char c = *p;
-            char decoded = field_0x01 ^ c;
-            field_0x01 += c;
+            char decoded = textMode ^ c;
+            textMode += c;
             *p = decoded;
-            return (unsigned char)*field_0x124++;
+            return (unsigned char)*bufferPos++;
         }
-        return (unsigned char)*field_0x124++;
+        return (unsigned char)*bufferPos++;
     }
     return -1;
 }
@@ -295,20 +295,20 @@ int UnknownTextureStream::WriteByte(int c)
 #pragma inline_depth(0)
 int UnknownTextureStream::ReadLine(char* buffer, int size)
 {
-    if (field_0x1c) {
-        if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04) {
+    if (innerStream) {
+        if (sliceLength > 0 && Tell() >= sliceOffset + sliceLength) {
             return 0;
         }
-        if (field_0x1c->UnknownFunction430ff0()) {
+        if (innerStream->AtEnd()) {
             return 0;
         }
-        if (field_0x04 > 0) {
-            int left = field_0x130 - Tell() + field_0x04 + 1;
+        if (sliceLength > 0) {
+            int left = sliceOffset - Tell() + sliceLength + 1;
             if (left < size) {
                 size = left;
             }
         }
-        return field_0x1c->ReadLine(buffer, size);
+        return innerStream->ReadLine(buffer, size);
     }
     char* p = buffer;
     *p = (char)ReadByte();
@@ -344,7 +344,7 @@ int UnknownTextureStream::ReadLine(char* buffer, int size)
 static inline int FileTimes(UnknownTextureStream* stream, int* time, int* size)
 {
     struct _stat status;
-    int result = _fstat(stream->field_0x14->_file, &status);
+    int result = _fstat(stream->fileHandle->_file, &status);
     if (result) {
         *time = 0;
         *size = 0;
@@ -362,8 +362,8 @@ int UnknownTextureStream::GetFileTimes(int* time, int* size)
     if (!time || !size) {
         return -1;
     }
-    if (field_0x1c) {
-        return field_0x1c->GetFileTimes(time, size);
+    if (innerStream) {
+        return innerStream->GetFileTimes(time, size);
     }
     return FileTimes(this, time, size);
 }
@@ -371,11 +371,11 @@ int UnknownTextureStream::GetFileTimes(int* time, int* size)
 // 0x00461d20
 void UnknownTextureStream::ResetTextMode()
 {
-    if (field_0x1c) {
-        field_0x1c->ResetTextMode();
+    if (innerStream) {
+        innerStream->ResetTextMode();
         return;
     }
-    field_0x01 = field_0x03;
+    textMode = nameKey;
 }
 
 // 0x00461d40: fprintf.

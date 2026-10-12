@@ -414,7 +414,7 @@ public:
     void Print(int page, const char* format, ...);
     void Title(int page, const char* format, ...);
     unsigned char field_0x0000[0x26c0];
-    int field_0x26c0;                         // next free page
+    int nextPage;                             // +0x26c0 next free page (DebugOverlay.h)
 };
 class UnknownEcoTrackGame {
 public:
@@ -443,11 +443,11 @@ public:
     virtual int GetRegistryFlag(const char* name, int defaultValue); // registry value (Game slot 22)
 
     unsigned char field_0x004[0x10 - 4];
-    UnknownEcoDisplay* field_0x10;
+    UnknownEcoDisplay* display;               // +0x10
     unsigned char field_0x014[0x38 - 0x14];
-    UnknownEcoDebugOverlay* field_0x38;       // the debug overlay (DebugOverlay.h), or 0
+    UnknownEcoDebugOverlay* debugOverlay;     // +0x38 the debug overlay (DebugOverlay.h), or 0
     unsigned char field_0x03c[0x2d0 - 0x3c];
-    int field_0x2d0;                          // software rendering
+    int bladeRenderer;                        // +0x2d0 the "Blade" software renderer (Game.h)
     unsigned char field_0x2d4[0x54c - 0x2d4];
     int field_0x54c;                          // the default texture-stage filters (MAG, MIN, MIP)
     int field_0x550;

@@ -13,13 +13,13 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
     vehicle = 0;
     vehicleMode = true;
-    field_0x391 = 0;
-    field_0x392 = 0;
+    targetPointCached = 0;
+    targetHeadingCached = 0;
     field_0x388 = 0;
     field_0x38c = 0;
     field_0x384 = 0;
-    field_0x3a4 = kVec3Zero;
-    field_0x398 = kVec3Zero;
+    cachedTargetPoint = kVec3Zero;
+    cachedTargetHeading = kVec3Zero;
 }
 
 // 0x0052b9d0: an explicit empty destructor (vptr store, then FollowCamera's).
@@ -47,16 +47,16 @@ Vector3 VehicleCamera::UnknownVirtualSlot33() {
 }
 
 // 0x0052bac0
-Vector3 VehicleCamera::UnknownFunction52bac0() {
+Vector3 VehicleCamera::CachedTargetHeading() {
     if (vehicleMode) {
-        field_0x392 = 0;
+        targetHeadingCached = 0;
         return vehicle->takeoffVelocity;
     }
-    if (!field_0x392) {
-        field_0x398 = UnknownVirtualSlot33();
-        field_0x392 = 1;
+    if (!targetHeadingCached) {
+        cachedTargetHeading = UnknownVirtualSlot33();
+        targetHeadingCached = 1;
     }
-    return field_0x398;
+    return cachedTargetHeading;
 }
 
 // 0x0052bb60: part 0 of the vehicle's +0x3bc in vehicle mode; else the first
@@ -88,16 +88,16 @@ Vector3 VehicleCamera::TargetPoint() {
 }
 
 // 0x0052bc50
-Vector3 VehicleCamera::UnknownFunction52bc50() {
+Vector3 VehicleCamera::CachedTargetPoint() {
     if (vehicleMode) {
-        field_0x391 = 0;
+        targetPointCached = 0;
         return vehicle->takeoffPosition;
     }
-    if (!field_0x391) {
-        field_0x3a4 = TargetPoint();
-        field_0x391 = 1;
+    if (!targetPointCached) {
+        cachedTargetPoint = TargetPoint();
+        targetPointCached = 1;
     }
-    return field_0x3a4;
+    return cachedTargetPoint;
 }
 
 static inline Vector3 Add(const Vector3& a, const Vector3& b) {
@@ -112,12 +112,12 @@ static inline Vector3 Add(const Vector3& a, const Vector3& b) {
 // plain product, hence the float cast), and the 0.19 lift reuses the y of
 // heading * lead.
 void VehicleCamera::UnknownVirtualSlot68() {
-    Vector3 heading = UnknownFunction52bac0();
-    Vector3 base = UnknownFunction52bc50();
+    Vector3 heading = CachedTargetHeading();
+    Vector3 base = CachedTargetPoint();
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
     Vector3 side(heading.z, 0.0f, -heading.x);
     eyePosition = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
-    field_0x240->QueryGround(&eyePosition, 0, 0, 0);
+    subject->QueryGround(&eyePosition, 0, 0, 0);
     if (heading.y > 10.0f)
         base.y += (heading * lead).y * 0.19f;
     if (vehicleMode) {
@@ -134,11 +134,11 @@ void VehicleCamera::UnknownVirtualSlot68() {
     float dx = FollowCameraAbs(eyePosition.x - target.x);
     float dz = FollowCameraAbs(eyePosition.z - target.z);
     float closeness = (200.0f - FastSqrt(dx * dx + dz * dz)) * 0.0055555557f;
-    field_0x258 = closeness * 60.0f + 10.0f;
-    if (field_0x258 < 10.0f)
-        field_0x258 = 10.0f;
-    if (field_0x258 > 70.0f)
-        field_0x258 = 70.0f;
+    targetFieldOfView = closeness * 60.0f + 10.0f;
+    if (targetFieldOfView < 10.0f)
+        targetFieldOfView = 10.0f;
+    if (targetFieldOfView > 70.0f)
+        targetFieldOfView = 70.0f;
     UnknownVirtualSlot29(target);
 }
 
@@ -146,7 +146,7 @@ void VehicleCamera::UnknownVirtualSlot68() {
 // scaled by dt (at most 0.2) while the camera is free to follow.
 Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
     Vector3 result = TargetPoint();
-    if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
+    if (cameraState != 7 && !g_TrackGame->paused) {
         if (vehicleMode) {
             if (!vehicle->crashState) {
                 float lead = 0.2f < dt ? 0.2f : dt;
@@ -165,7 +165,7 @@ void VehicleCamera::UnknownVirtualSlot67() {
     followPitch = 0.75f;
     followYaw = 3.1415927f;
     followDistance = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
-    field_0x258 = 85.0f;
+    targetFieldOfView = 85.0f;
 }
 
 // 0x0052bff0: holds while the vehicle reports +0x444; otherwise cycles the
@@ -296,7 +296,7 @@ float VehicleCamera::UnknownVirtualSlot39() {
 
 // 0x0052cc00: +0x308 from the fov/zoom ratio and the vehicle's +0x43c.
 void VehicleCamera::UnknownVirtualSlot42(bool flag) {
-    float ratio = field_0x16c / field_0x1dc;
+    float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (!flag && vehicleMode)
             field_0x308 = ratio * vehicle->turnRate * 0.3f;
@@ -320,9 +320,9 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
         if (vehicleMode) {
             if (vehicle->field_0x434 > 0.1f) {
                 if (!force && field_0x274 &&
-                    FollowCameraAbs(field_0x288->value - point.x) < 10.0f &&
-                    FollowCameraAbs(field_0x290->value - point.z) < 10.0f &&
-                    FollowCameraAbs(field_0x28c->value - point.y) < 10.0f) {
+                    FollowCameraAbs(positionEaseX->value - point.x) < 10.0f &&
+                    FollowCameraAbs(positionEaseZ->value - point.z) < 10.0f &&
+                    FollowCameraAbs(positionEaseY->value - point.y) < 10.0f) {
                     UnknownVirtualSlot44(point);
                     UnknownVirtualSlot43(cachedTarget);
                 }
@@ -332,9 +332,9 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
                     result = false;
                 else {
                     if (!field_0x274 &&
-                        FollowCameraAbs(field_0x288->value - point.x) < 0.01f &&
-                        FollowCameraAbs(field_0x290->value - point.z) < 0.01f &&
-                        FollowCameraAbs(field_0x28c->value - point.y) < 0.01f) {
+                        FollowCameraAbs(positionEaseX->value - point.x) < 0.01f &&
+                        FollowCameraAbs(positionEaseZ->value - point.z) < 0.01f &&
+                        FollowCameraAbs(positionEaseY->value - point.y) < 0.01f) {
                         UnknownVirtualSlot44(point);
                         UnknownVirtualSlot43(cachedTarget);
                         field_0x277 = true;

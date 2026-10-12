@@ -489,7 +489,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             }
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
             if (view)
-                view->UnknownFunction420590(message->player);
+                view->HandlePlayerLeft(message->player);
         } else if (type == 0x8e) {
             if (message->player == g_TrackGame->network->localPlayer) {
                 if (FindRaceMode()) {
@@ -700,11 +700,11 @@ void EventManager::CheckRaceOver(float frameTime) {
         }
         break;
     case 0:
-        if (g_TrackGame->quarryEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->quarryEvent->elapsedMinutes < g_TrackGame->mode.raceSettings.timeLimitMinutes)
             return;
         break;
     case 4:
-        if (g_TrackGame->tagEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->tagEvent->elapsedMinutes < g_TrackGame->mode.raceSettings.timeLimitMinutes)
             return;
         if (owner->followedRacer == owner->raceView->localRacer) {
             owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;
@@ -923,7 +923,7 @@ void EventManager::CloseRace(int mode) {
             GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
             sprintf(description, "%s %s", date, time);
-            view->UnknownFunction420b00(name, description);
+            view->SaveReplay(name, description);
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.saveGhost) {
             char time[32];

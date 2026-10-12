@@ -96,7 +96,7 @@ int UnknownDriveList::FindVolume(const char* volumeName, int* index, unsigned in
 }
 
 // 0x0044a0b0
-int UnknownDriveList::UnknownFunction44a0b0(int index, char* root) {
+int UnknownDriveList::GetDriveRoot(int index, char* root) {
     strcpy(root, "");
     if (!drives)
         return 0;
@@ -311,8 +311,8 @@ DirectoryList::~DirectoryList() {
 
 // 0x0044ab10
 CombinedDirectoryList::CombinedDirectoryList() {
-    strcpy(field_0x21c, "");
-    strcpy(field_0x320, "");
+    strcpy(firstDirectory, "");
+    strcpy(secondDirectory, "");
 }
 
 // 0x0044aba0
@@ -320,9 +320,9 @@ CombinedDirectoryList::~CombinedDirectoryList() {
 }
 
 // 0x0044abb0
-void CombinedDirectoryList::UnknownFunction44abb0(const char* first, const char* second) {
-    COPY_NAME(field_0x21c, first);
-    COPY_NAME(field_0x320, second);
+void CombinedDirectoryList::SetDirectories(const char* first, const char* second) {
+    COPY_NAME(firstDirectory, first);
+    COPY_NAME(secondDirectory, second);
 }
 
 // 0x0044ac30: lists both directories, then merges them: the second
@@ -348,11 +348,11 @@ int CombinedDirectoryList::UnknownVirtualSlot1() {
     if (!first || !second)
         return 0;
     first->SetPattern(pattern, 1);
-    first->SetDirectory(field_0x21c);
+    first->SetDirectory(firstDirectory);
     first->UnknownVirtualSlot1();
     first->SortByName();
     second->SetPattern(pattern, 1);
-    second->SetDirectory(field_0x320);
+    second->SetDirectory(secondDirectory);
     second->UnknownVirtualSlot1();
     second->SortByName();
 

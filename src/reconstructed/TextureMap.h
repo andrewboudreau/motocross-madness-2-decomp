@@ -13,7 +13,7 @@ struct UnknownTexturePalette {
     // its palette argument.
     unsigned char* GetColors();        // 0x004de270: &field_0x010
     unsigned char* GetIndexFrom555();        // 0x004de280: &field_0x710 (555 to index)
-    unsigned char* UnknownFunction4de290();        // 0x004de290: &field_0x8710 (565 to index)
+    unsigned char* GetIndexFrom565();        // 0x004de290: &field_0x8710 (565 to index)
 
     unsigned char field_0x000[0x10];
     unsigned char field_0x010[256][3];             // RGB entries
@@ -66,59 +66,59 @@ public:
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
     char GetTextMode()
     {
-        if (field_0x1c)
-            return field_0x1c->GetTextMode();
-        return field_0x01;
+        if (innerStream)
+            return innerStream->GetTextMode();
+        return textMode;
     }
     // 0x0043e9b0 (out-of-line copy): sets the text-mode byte.
     void SetTextMode(char mode)
     {
-        if (field_0x1c)
-            field_0x1c->SetTextMode(mode);
+        if (innerStream)
+            innerStream->SetTextMode(mode);
         else
-            field_0x01 = mode;
+            textMode = mode;
     }
     // 0x004e9960 (out-of-line copy after ResourceManager.cpp's code):
-    // field_0x08 of the innermost stream.
-    int UnknownFunction4e9960()
+    // the innermost stream's encoded flag (+0x08).
+    int IsEncoded()
     {
-        if (field_0x1c)
-            return field_0x1c->UnknownFunction4e9960();
-        return field_0x08;
+        if (innerStream)
+            return innerStream->IsEncoded();
+        return fileEncoded;
     }
     // 0x00430ff0 (out-of-line copy): whether the stream is at its end: past
     // its length within the inner stream, else the buffer is drained and the
     // file is at end-of-file.
-    int UnknownFunction430ff0()
+    int AtEnd()
     {
-        if (field_0x1c) {
-            if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04)
+        if (innerStream) {
+            if (sliceLength > 0 && Tell() >= sliceOffset + sliceLength)
                 return 1;
-            return field_0x1c->UnknownFunction430ff0();
+            return innerStream->AtEnd();
         }
-        if (field_0x124 != field_0x128)
+        if (bufferPos != bufferEnd)
             return 0;
-        return feof(field_0x14);
+        return feof(fileHandle);
     }
 
-    char field_0x00;                          // 'A', second byte of the "FAOE" header
-    char field_0x01;                          // text mode; the running key of an encoded file
-    char field_0x02;                          // 'F', first header byte
-    char field_0x03;                          // key derived from the file name (0x00461b90)
-    int field_0x04;                           // length within the inner stream (0: to its end)
-    int field_0x08;                           // 1: the file is encoded
-    int field_0x0c;
-    int field_0x10;                           // header size before the data (4 when encoded)
-    FILE* field_0x14;                         // the open file
-    char field_0x18;                          // 'E', fourth header byte
+    char headerByte1;                         // +0x00 'A', second byte of the "FAOE" header
+    char textMode;                            // +0x01 text mode; the running key of an encoded file
+    char headerByte0;                         // +0x02 'F', first header byte
+    char nameKey;                             // +0x03 key derived from the file name (0x00461b90)
+    int sliceLength;                          // +0x04 length within the inner stream (0: to its end)
+    int fileEncoded;                          // +0x08 1: the file is encoded
+    int keyStartOffset;                       // +0x0c offset where Seek last restarted the key (0x00461340)
+    int headerSize;                           // +0x10 header size before the data (4 when encoded)
+    FILE* fileHandle;                         // +0x14 the open file
+    char headerByte3;                         // +0x18 'E', fourth header byte
     unsigned char field_0x019[0x1c - 0x19];
-    UnknownTextureStream* field_0x1c;         // inner stream
-    char field_0x20;                          // 'O', third header byte
-    char field_0x21[0x124 - 0x21];            // read buffer
-    char* field_0x124;                        // buffer position
-    char* field_0x128;                        // buffer end
-    UnknownResourceManager* field_0x12c;      // the archives (constructor argument)
-    int field_0x130;                          // start offset in the inner stream
+    UnknownTextureStream* innerStream;        // +0x1c inner stream
+    char headerByte2;                         // +0x20 'O', third header byte
+    char readBuffer[0x124 - 0x21];            // +0x21 read buffer
+    char* bufferPos;                          // +0x124 buffer position
+    char* bufferEnd;                          // +0x128 buffer end
+    UnknownResourceManager* archives;         // +0x12c the archives (constructor argument)
+    int sliceOffset;                          // +0x130 start offset in the inner stream
 };
 
 // A render state and its value (RenderTarget slot 8).

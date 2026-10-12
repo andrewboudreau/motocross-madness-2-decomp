@@ -195,20 +195,20 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
         racerCount++;
     }
     for (int i = 0; i < racerCount; i++) {
-        nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
+        nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
             Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
-        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
+        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
             Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {
-            nameTags[racerCount]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
+            nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));
             nameTags[racerCount]->UnknownVirtualSlot4();
-            field_0x160 = nameTagRects[racerCount].right;
+            nameLineRight = nameTagRects[racerCount].right;
             nameTags[racerCount]->drawWidth = 0;
         }
     }
@@ -234,8 +234,8 @@ int StatsOverlay::DrawStandings()
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
-        float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
-        FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        float limit = g_TrackGame->mode.raceSettings.timeLimitMinutes * 60.0f;
+        FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         sprintf(rowText[0], "%s", label);
     }
     iterator = 0;
@@ -275,7 +275,7 @@ int StatsOverlay::DrawStandings()
         sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
                 scores[shown].racer->score);
     for (i = 0; i <= row; i++) {
-        if (strcmp(rowText[i], field_0x1b0[i]) != 0)
+        if (strcmp(rowText[i], drawnRowText[i]) != 0)
             break;
     }
     if (row < i)
@@ -292,7 +292,7 @@ int StatsOverlay::DrawStandings()
         if (i == 0)
             GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
-        strcpy(field_0x1b0[i], rowText[i]);
+        strcpy(drawnRowText[i], rowText[i]);
     }
     SelectObject(dc, font);
     if (texture->systemSurface->ReleaseDC(dc) != 0) {
@@ -403,7 +403,7 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
     UnknownTextExtent size;
     void* font = SelectObject(dc, nameTagFont);
     if (index == racerCount) {
-        sprintf(text, "%s", playerName);
+        sprintf(text, "%s", cueRacerName);
         length = strlen(text);
         UnknownOverlayRect rect = nameTagRects[index];
         rect.left += nameTags[index]->drawWidth;
@@ -484,9 +484,9 @@ void RadarOverlay::DrawTrackOutline(int mode)
         TrackSegment* first = node->firstSegment;
         Vector3 point;
         if (mode == 1)
-            point = *(Vector3*)&first->field_0x18;
+            point = *(Vector3*)&first->edgeBX;
         else if (mode == 2)
-            point = *(Vector3*)&first->field_0x0c;
+            point = *(Vector3*)&first->edgeAX;
         int startX;
         int startY;
         float rim[2];
@@ -500,9 +500,9 @@ void RadarOverlay::DrawTrackOutline(int mode)
         TrackSegment* segment = first->next;
         if (segment) do {
             if (mode == 1)
-                point = *(Vector3*)&segment->field_0x18;
+                point = *(Vector3*)&segment->edgeBX;
             else if (mode == 2)
-                point = *(Vector3*)&segment->field_0x0c;
+                point = *(Vector3*)&segment->edgeAX;
             int wasOutside = outside;
             float from[2];
             from[0] = (float)x;
@@ -706,7 +706,7 @@ void RadarOverlay::DrawRacers(int mode)
                     float dx = racers[i]->position.x - own.x;
                     float dz = racers[i]->position.z - own.z;
                     float distance = dz * dz + dx * dx;
-                    radarView->chatOverlay->UnknownFunction51d9c0(distance, racers[i]->racerName);
+                    radarView->chatOverlay->SetCueRacer(distance, racers[i]->racerName);
                 }
                 if (outside && (g_TrackGame->mode.raceSettings.eventType == 3 ||
                                 g_TrackGame->mode.raceSettings.eventType == 2)) {
@@ -719,13 +719,13 @@ void RadarOverlay::DrawRacers(int mode)
                 for (int k = 0; k < racerCount; k++) {
                     NameOverlay* tag = radarView->chatOverlay->nameTags[k];
                     if (tag->trackedRacer == racers[i])
-                        tag->UnknownFunction5190a0(point, x - mapCenterX > 0, outside);
+                        tag->SetRadarAnchor(point, x - mapCenterX > 0, outside);
                 }
             } else {
                 point.x = -1.0f;
                 point.y = -1.0f;
                 if (radarView->chatOverlay)
-                    radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
+                    radarView->chatOverlay->nameTags[i]->SetRadarAnchor(point, 0, outside);
             }
             if (outside) {
                 if (g_TrackGame->mode.raceSettings.eventType == 3 ||
@@ -754,7 +754,7 @@ void RadarOverlay::DrawRacers(int mode)
             point.x = -1.0f;
             point.y = -1.0f;
             if (radarView->chatOverlay)
-                radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, 1);
+                radarView->chatOverlay->nameTags[i]->SetRadarAnchor(point, 0, 1);
         }
     }
     if (mode == 2 || mode == 3) {

@@ -29,7 +29,7 @@
 int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
                                      UnknownVcrFile* file)
 {
-    field_0x0d8 = 0;
+    replayLength = 0;
     if (mode == 0) {
         COPY_TRUNCATED(magic, "MCMVCR")
         COPY_TRUNCATED(field_0x0e4, "2.0\x1a")
@@ -41,9 +41,9 @@ int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* n
 }
 
 // 0x0049bff0
-void KrustyVCR::UnknownFunction49bff0(float time, int flag)
+void KrustyVCR::SetReplayLength(float time, int flag)
 {
-    field_0x0d8 = time;
+    replayLength = time;
 }
 
 // 0x0049c000
@@ -57,7 +57,7 @@ void KrustyVCR::SaveRecording(float duration, char* description, int flag)
 {
     COPY_TRUNCATED(this->description, description)
     timePlayed = duration;
-    UnknownFunction4e86d0((int)magic, 0xeb0, flag);
+    CloseFile((int)magic, 0xeb0, flag);
 }
 
 // 0x0049c070

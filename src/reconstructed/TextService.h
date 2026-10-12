@@ -27,10 +27,10 @@ struct UnknownOverlayVertex {
 // `format`; the others blend a font texel over a destination texel with
 // `color`: 0x0043b560 32-bit, 0x0043b320 16-bit 4444, 0x0043b440 16-bit
 // 1555.
-unsigned int UnknownFunction43b660(unsigned int color, int format);
-unsigned int UnknownFunction43b560(unsigned int texel, unsigned int dest, unsigned int color);
-unsigned short UnknownFunction43b320(unsigned short texel, unsigned short dest, unsigned short color);
-unsigned short UnknownFunction43b440(unsigned short texel, unsigned short dest, unsigned short color);
+unsigned int ConvertColorToFormat(unsigned int color, int format);
+unsigned int BlendFontTexel32(unsigned int texel, unsigned int dest, unsigned int color);
+unsigned short BlendFontTexel4444(unsigned short texel, unsigned short dest, unsigned short color);
+unsigned short BlendFontTexel1555(unsigned short texel, unsigned short dest, unsigned short color);
 
 // TextService.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\TextService.cpp"
 // at 0x00574b30; code 0x0050ac30-0x0050bed0). No vtable or RTTI, so the

@@ -18,7 +18,7 @@
 // (retail materialises the sete), separate `column`/`row` products, the zero
 // direction test through an inline helper (it places the copy branch first),
 // PodiumLength over a reference (no by-value copy), the nested
-// UnknownFunction521cd0 test (three Winner sprintf copies), and the buffers
+// InProCircuitCareer test (three Winner sprintf copies), and the buffers
 // name[0x80], path[0x104], message[0x184] plus the crowd message's own
 // [0x80] buffer at +0x168. Left: the squared lengths (retail squares each
 // component as it loads it, `fld; fld st(0); fmulp`, and spills z*z; plain,
@@ -63,7 +63,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     g_TrackGame->field_0x3438 = 0;
     g_TrackGame->uiBlockedSeconds = 0;
     if (!g_TrackGame->mode.field_0xa20)
-        g_TrackGame->UnknownFunction521a40();
+        g_TrackGame->StopCDAudio();
     UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_TrackGame->UnknownVirtualSlot19(
@@ -316,7 +316,7 @@ int EventManager::CreatePodiumScene() {
         racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
         while (racer && ((UnknownPodiumRacer*)racer)->field_0x784 != place)
             racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
-        if (g_TrackGame->UnknownFunction521cd0()) {
+        if (g_TrackGame->InProCircuitCareer()) {
             if ((g_TrackGame->proCircuit->careerFlags & 2) &&
                 racer == PODIUM_OWNER(owner)->field_0x34->localRacer)
                 sprintf(name, "%s\\Winnerd.mcf", "Res");

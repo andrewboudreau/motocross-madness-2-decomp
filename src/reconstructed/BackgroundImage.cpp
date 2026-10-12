@@ -24,7 +24,7 @@ CameraRect g_UnknownGlobal5777e8;
 
 // 0x00403d50
 BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
-    field_0x30 = 1;
+    imageVisible = 1;
     copyValid = 0;
     field_0x2c = 0;
     regionTable = 0;
@@ -104,7 +104,7 @@ BackgroundImage::~BackgroundImage() {
 
 // 0x00403ec0
 int BackgroundImage::UnknownVirtualSlot15() {
-    if (field_0x2c && field_0x30) {
+    if (field_0x2c && imageVisible) {
         g_UnknownGlobal5777b8.left = 0;
         g_UnknownGlobal5777b8.top = 0;
         g_UnknownGlobal5777b8.right = field_0x2c->textureWidth;

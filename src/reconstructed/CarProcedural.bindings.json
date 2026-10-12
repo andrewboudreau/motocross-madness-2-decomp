@@ -34,7 +34,7 @@
   "?FindOffsetAtDistance@CarProcedural@@QAEMMM@Z": "0x004308e0",
   "?PositionAtTime@CarProcedural@@QAE?AUVector3@@M@Z": "0x00430b10",
   "?HermiteWeights@CarProcedural@@QAEXMPAM000@Z": "0x00430e60",
-  "?UnknownFunction430ff0@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
+  "?AtEnd@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
   "?Configure@CarProceduralCollision@@QAEXPAXHHH@Z": "0x004320f0",
   "?SetHullShape@CarProceduralCollision@@QAEXPAVCarProceduralModel@@HHHH@Z": "0x00432720",
   "?LoadShape@CarProceduralCollision@@QAEXPAVCarProceduralModel@@PBD@Z": "0x00432800",

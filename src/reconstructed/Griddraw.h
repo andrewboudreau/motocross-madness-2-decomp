@@ -183,7 +183,7 @@ struct GridTerrain {
 // Per-node draw data (DebugCalloc'd 0x1c0 or 0x540 bytes by 0x0047e600;
 // freed with plain delete by the destructor). Offsets tier 2.
 struct GridNodeDrawData {
-    unsigned char field_0x000[17 * 17];        // +0x000 per-vertex bytes (bit 7 tested)
+    unsigned char vertexFlags[17 * 17];        // +0x000 per-vertex bytes, row g_gridRow17[z] + x (bit 7 tested)
     unsigned char b0 : 1;                      // +0x121 bit 0
     unsigned char b1 : 1;                      // +0x121 bit 1
     unsigned char b2 : 1;                      // +0x121 bit 2
@@ -192,16 +192,16 @@ struct GridNodeDrawData {
     unsigned short field_0x124;
     unsigned short field_0x126;
     unsigned short field_0x128;
-    short field_0x12a;
-    short field_0x12c;
+    short triangleCount;                       // +0x12a triangles in this node's index list
+    short childTriangleCount;                  // +0x12c children's +0x12a/+0x12c summed into the parent
     short field_0x12e;
     int field_0x130;
-    void* field_0x134;                         // +0x134 buffer (DebugFree'd, line 0x330/0x35a)
-    void* field_0x138;                         // +0x138 buffer (line 0x337/0x361)
-    short field_0x13c;
-    short field_0x13e;
-    short field_0x140;                         // +0x140 size charged to g_gridDrawMemory for +0x134
-    short field_0x142;                         // +0x142 size charged for +0x138
+    void* vertexBuffer;                        // +0x134 32-byte vertices (DebugFree'd, line 0x330/0x35a)
+    void* indexBuffer;                         // +0x138 16-bit indices (line 0x337/0x361)
+    short vertexCount;                         // +0x13c
+    short indexCount;                          // +0x13e three per triangle
+    short vertexBufferBytes;                   // +0x140 size charged to g_gridDrawMemory for +0x134
+    short indexBufferBytes;                    // +0x142 size charged for +0x138
     GridAgeEntry ageEntry;                     // +0x144
     float field_0x158;
     float field_0x15c;
@@ -258,7 +258,7 @@ public:
     unsigned short gridZ;                      // +0x26
     unsigned char level;                       // +0x28
     unsigned char shift;                       // +0x29
-    unsigned char field_0x2a;
+    unsigned char childIndex;                  // +0x2a slot in the parent's children: x low nibble, z high nibble
     unsigned char field_0x2b;
     int field_0x2c;
     int* childOffsets;                        // +0x30 child stream offsets (0x400 bytes)
@@ -321,9 +321,9 @@ public:
     virtual int UnknownVirtualSlot8(int a) { return 0; }        // 0x004da550 (shared)
 
     void ReleaseVertexBuffers(int recurse);                    // 0x0047edb0 (ret 4)
-    int UnknownFunction47ef70();                                // 0x0047ef70
+    int WalkVisibleFromRoot();                                // 0x0047ef70
     int WalkVisibleQuadrants(int x, int z, int size, int quad); // 0x0047ef80 (ret 0x10)
-    int UnknownFunction47f210();                                // 0x0047f210
+    int RebuildBlockBuffers();                                // 0x0047f210
     int RebuildWholeNodeBuffers();                                // 0x0047f840
     int EmitDiagonalTriangles(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x0047fce0 (ret 0x1c)
     void EmitLeafEdgeFan(int x, int z, int dx, int dz, int n); // 0x0047fe70 (ret 0x14)
@@ -332,21 +332,21 @@ public:
     int UnknownFunction480900(void* target);                    // 0x00480900 (ret 4)
     int UnknownFunction480920(void* target, int a5);            // 0x00480920 (ret 8)
     int DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5); // 0x00480940 (ret 0x18)
-    int UnknownFunction480ad0(void* target, int x, int z, int size, int quad, int a5); // 0x00480ad0 (ret 0x18)
+    int DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5); // 0x00480ad0 (ret 0x18)
     void SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480c90 (ret 0x18)
     void SubmitLitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480fb0 (ret 0x18)
-    int UnknownFunction481170();                                // 0x00481170
-    int UnknownFunction481180(int x, int z, int size, int quad); // 0x00481180 (ret 0x10)
-    int UnknownFunction481300(int x, int z, int size, int quad); // 0x00481300 (ret 0x10)
+    int WalkSlot4FromRoot();                                // 0x00481170: WalkSlot4Quadrants(0, 0, 16, 0)
+    int WalkSlot4Quadrants(int x, int z, int size, int quad); // 0x00481180 (ret 0x10): quadrant walk calling slot 4
+    int WalkSlot4Block(int x, int z, int size, int quad); // 0x00481300 (ret 0x10)
     // 0x004813e0: counts seams where neighbouring children disagree (the
     // count is never used) and recurses into the children.
     void CountEdgeDifferences();
-    void UnknownFunction481580();                               // 0x00481580
+    void TestDroppableVertices();                               // 0x00481580: CanDropVertex over every leaf
     int TestBlockFrustum(int quad);                        // 0x00481a20 (ret 4)
     float BlockDistance(int block);                     // 0x00481b30 (ret 4)
-    float UnknownFunction4815e0(int coarse);                    // 0x004815e0 (ret 4)
+    float ComputeViewerDetail(int coarse);                    // 0x004815e0 (ret 4): from the viewer's distance to the bounds
     int CanDropVertex(int x, int z);                    // 0x00481cc0 (ret 8)
     int TestVisibility(void* a0, void* a1);              // 0x00481db0 (ret 8)
     int UnknownFunction481de0(void* a0, void* a1, float* center, float* extent, int a4, int a5,

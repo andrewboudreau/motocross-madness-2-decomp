@@ -302,8 +302,8 @@ UnknownTgaFile* ReadTgaHeader(UnknownTextureStream* stream, UnknownTgaFile* file
     }
     file->name[0] = 0;
     if (offset == 0) {
-        if (stream->field_0x1c)
-            stream->Seek(stream->field_0x130, 0, 0);
+        if (stream->innerStream)
+            stream->Seek(stream->sliceOffset, 0, 0);
     } else if (offset > 0) {
         stream->Seek(offset, 0, 1);
     }

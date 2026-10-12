@@ -166,7 +166,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     for (i = 0; i < 4; i++)
         users[i] = 0;
     dialogContainer = 0;
-    field_0x2c = 0;
+    modalDialog = 0;
     field_0x34c = 0;
     strcpy(toolTipFontFace, "");
     field_0x3d0 = 0;
@@ -236,7 +236,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         }
     }
     users[0] = (GUIUser*)AppendChild(
-        (new(__FILE__, 188) GUIUser)->UnknownFunction487650(renderContext, this), -1);
+        (new(__FILE__, 188) GUIUser)->Create(renderContext, this), -1);
     if (users[0]) {
         userCount = 1;
         users[0]->AcceptKeyboardAndJoysticks();
@@ -386,7 +386,7 @@ void GUIManager::CloseDialogResource() {
 }
 
 // 0x00485d70
-void GUIManager::UnknownFunction485d70(const char* directory) {
+void GUIManager::SetDialogDirectory(const char* directory) {
     int last = strlen(directory) - 1;
 
     strcpy(dialogDirectory, directory);
@@ -405,7 +405,7 @@ UIDialog* GUIManager::FindInputDialog() {
             found = dialog;
         if (mouseDevice && PtInRect((RECT*)&dialog->screenArea, mouseDevice->pointerPosition))
             found = dialog;
-        if (dialog->field_0x148)
+        if (dialog->isModal)
             found = dialog;
     }
     return found;
@@ -419,9 +419,9 @@ Sound* GUIManager::FindSectionObject(const char* name) {
 }
 
 // 0x00485ee0
-int GUIManager::UnknownFunction485ee0(int value) {
-    int previous = field_0x2c;
-    field_0x2c = value;
+int GUIManager::SwapModalDialog(int value) {
+    int previous = modalDialog;
+    modalDialog = value;
     return previous;
 }
 
@@ -466,7 +466,7 @@ void GUIManager::GrabBackground(int dim) {
     if (guiBackground) {
         grabRegion = guiBackground->AllocRegion(1);
         guiBackground->MarkAllDirty();
-        guiBackground->field_0x30 = 0;
+        guiBackground->imageVisible = 0;
     }
 }
 
@@ -476,7 +476,7 @@ void GUIManager::ReleaseBackgroundGrab() {
         screenGrab->Release();
     if (guiBackground && grabRegion >= 0) {
         guiBackground->ReleaseRegion(grabRegion);
-        guiBackground->field_0x30 = 1;
+        guiBackground->imageVisible = 1;
     }
     screenGrab = 0;
     grabRegion = -1;
@@ -484,7 +484,7 @@ void GUIManager::ReleaseBackgroundGrab() {
 }
 
 // 0x00486150
-void GUIManager::UnknownFunction486150(Palette8* palette) {
+void GUIManager::SetGuiPalette(Palette8* palette) {
     paletteChanged = 1;
     guiPalette = palette;
 }
@@ -565,7 +565,7 @@ void GUIManager::ReleaseCursors() {
 }
 
 // 0x004866c0
-void GUIManager::UnknownFunction4866c0(const char* font) {
+void GUIManager::SetToolTipFont(const char* font) {
     strcpy(toolTipFontFace, font);
     if (toolTipFont)
         DeleteObject((HGDIOBJ)toolTipFont);
@@ -595,8 +595,8 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
             *pixel = fill;
         if (texture->UnknownVirtualSlot4(bits, width, height, width, width, 0x378,
                                          g_TrackGame->renderTarget->surfacePixelFormat,
-                                         (UnknownTexturePalette*)(guiPalette ? guiPalette->field_0x708 : 0), 4,
-                                         guiPalette ? guiPalette->field_0x70c : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
+                                         (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
+                                         guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
             texture->UnknownVirtualSlot18(0xff00ff);
         delete bits;
     }
@@ -866,8 +866,8 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
             return 1;
         }
         if (kind == 1 && ownerUser && ownerUser->userCursor) {
-            pointerPosition.x = ownerUser->userCursor->field_0x54;
-            pointerPosition.y = ownerUser->userCursor->field_0x58;
+            pointerPosition.x = ownerUser->userCursor->cursorX;
+            pointerPosition.y = ownerUser->userCursor->cursorY;
         }
     }
     return 1;
@@ -940,7 +940,7 @@ int GUIUser::UnknownVirtualSlot15() {
 }
 
 // 0x00487650
-GUIUser* GUIUser::UnknownFunction487650(void* target, GUIManager* gui) {
+GUIUser* GUIUser::Create(void* target, GUIManager* gui) {
     GameObject::UnknownVirtualSlot8(target);
     userGui = gui;
     CreateToolTip(target, gui);
@@ -1094,7 +1094,7 @@ void GUIUser::EnableImeInput(int enable) {
 }
 
 // 0x00487bf0
-int GUIUser::UnknownFunction487bf0(UnknownGuiControl** previous) {
+int GUIUser::ClearFocus(UnknownGuiControl** previous) {
     if (focusControl && !focusControl->pendingRelease)
         focusControl->UnknownVirtualSlot33(0);
     if (previous)
@@ -1146,7 +1146,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
     if (g_TrackGame->fullScreen) {
         if (g_TrackGame->renderTarget->surfacePixelFormat > 8 ||
             (g_TrackGame->renderTarget->surfacePixelFormat == 8 && userGui->guiPalette)) {
-            palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
+            palette = userGui->guiPalette ? userGui->guiPalette->colorMapper : 0;
             if (!image)
                 image = cursorImage;
             userCursor = (GUICursor*)AppendChild(
@@ -1159,7 +1159,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
     } else {
         if (g_TrackGame->renderTarget->surfacePixelFormat > 8 ||
             (g_TrackGame->renderTarget->surfacePixelFormat == 8 && userGui->guiPalette)) {
-            palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
+            palette = userGui->guiPalette ? userGui->guiPalette->colorMapper : 0;
             if (!image)
                 image = cursorImage;
             userCursor = (GUICursor*)AppendSibling(
@@ -1172,7 +1172,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
 }
 
 // 0x00487fb0
-void GUIUser::UnknownFunction487fb0(UnknownCursorAnimation* animation) {
+void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
     UnknownCursorAnimation* current;
 
     if (!userCursor)
@@ -1234,7 +1234,7 @@ int GUIUser::UsesDevice(InputDevice* device) {
 }
 
 // 0x004881d0
-int GUIUser::UnknownFunction4881d0(UnknownControlEvent* event) {
+int GUIUser::UsesEventDevice(UnknownControlEvent* event) {
     if (event->kind == 0)
         return UsesDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
@@ -1260,7 +1260,7 @@ GUIInputDevice* GUIUser::FindDevice(InputDevice* device) {
 }
 
 // 0x004882a0
-GUIInputDevice* GUIUser::UnknownFunction4882a0(UnknownControlEvent* event) {
+GUIInputDevice* GUIUser::FindEventDevice(UnknownControlEvent* event) {
     if (event->kind == 0)
         return FindDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
@@ -1283,7 +1283,7 @@ HiResMeter g_UnknownHiResMeter67b468(0);
 HiResMeter::HiResMeter(int flags) : GameObject(flags) {
     overlayPage = -1;
     countsPerMs = 0;
-    UnknownFunction488580();
+    ClearTimers();
     if (UnknownVirtualSlot8(0))
         counterUsable = 1;
     else
@@ -1295,7 +1295,7 @@ HiResMeter::~HiResMeter() {
 }
 
 // 0x00488510
-void HiResMeter::UnknownFunction488510() {
+void HiResMeter::ClearTickTimes() {
     int i;
 
     for (i = 0; i < timerCount; i++) {
@@ -1305,7 +1305,7 @@ void HiResMeter::UnknownFunction488510() {
 }
 
 // 0x00488540
-void HiResMeter::UnknownFunction488540() {
+void HiResMeter::ResetTimerStats() {
     int i;
 
     for (i = 0; i < timerCount; i++) {
@@ -1323,7 +1323,7 @@ void HiResMeter::UnknownFunction488540() {
 }
 
 // 0x00488580
-void HiResMeter::UnknownFunction488580() {
+void HiResMeter::ClearTimers() {
     int i;
 
     for (i = 0; i < 50; i++) {
@@ -1351,7 +1351,7 @@ int HiResMeter::UnknownVirtualSlot10(float frameTime) {
         if (overlayPage < 0)
             overlayPage = g_TrackGame->debugOverlay->NewPage();
         if (g_TrackGame->debugOverlay->field_0x26c4 != overlayPage) {
-            UnknownFunction488540();
+            ResetTimerStats();
             return 1;
         }
         g_TrackGame->debugOverlay->Title(

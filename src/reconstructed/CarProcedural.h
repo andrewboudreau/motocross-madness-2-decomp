@@ -145,12 +145,12 @@ public:
     // 0x00430e60 (ret 0x14): the four cubic Hermite basis weights of t.
     void HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3);
 
-    CarProceduralModel* field_0x34;
-    CarProceduralCollision* field_0x38;
-    CarProceduralCollision* field_0x3c;
-    Vector3 field_0x40;
-    float field_0x4c;
-    int field_0x50;
+    CarProceduralModel* carModel;             // +0x34 the car model (slot 27)
+    CarProceduralCollision* sensorCollider;   // +0x38 two-point mesh collider that finds the ground (slot 10)
+    CarProceduralCollision* bodyCollider;     // +0x3c the body's hull collider (slot 27's collision file)
+    Vector3 pathVelocity;                     // +0x40 flat path direction times velocityScale
+    float groundSpeed;                        // +0x4c |pathVelocity|
+    int steersFrontWheels;                    // +0x50 wheels 0 and 1 steer (slot 27's a9)
     int started;                              // +0x54 set once slot 10 has run its first update
     int field_0x58;
     int field_0x5c;
@@ -165,25 +165,25 @@ public:
     float field_0x17c;
     float field_0x180;
     float inverseWheelRadius;                 // +0x184 1 / wheel radius
-    float field_0x188;
-    float field_0x18c;
-    float field_0x190;
-    float field_0x194;
-    float field_0x198;
-    float field_0x19c;
-    float field_0x1a0;
-    float field_0x1a4;
-    float field_0x1a8;
-    float field_0x1ac;
-    float field_0x1b0;
+    float sensorHalfHeight;                   // +0x188 5: the sensor mesh's half height
+    float wheelSpinAngle;                     // +0x18c radians, wrapped at 2 pi
+    float steeringAngle;                      // +0x190 clamped to +-30 degrees
+    float pathTime;                           // +0x194 seconds, wrapped at the path's period
+    float frontWheelZ;                        // +0x198 z of a wheel ahead of the origin (first update)
+    float trailDistance;                      // +0x19c slot 27's a10: distance behind pathTime
+    float trailTimeOffset;                    // +0x1a0 the time offset for trailDistance
+    float lookAheadTime;                      // +0x1a4 0.1
+    float velocityScale;                      // +0x1a8 10
+    float backBlend;                          // +0x1ac 0.8: weight of the previous smoothedBack
+    float normalBlend;                        // +0x1b0 0.5: weight of the previous smoothedNormal
     CarProceduralKey* pathKeys;               // +0x1b4 path keys
     Vector3 field_0x1b8;
-    Vector3 field_0x1c4;
-    Vector3 field_0x1d0;
-    Vector3 field_0x1dc;
+    Vector3 pathPosition;                     // +0x1c4 path position at pathTime less the trail
+    Vector3 pathOffset;                       // +0x1d0 slot 27's a7, added to the path position
+    Vector3 bodyOffset;                       // +0x1dc the "Body" node's position
     Vector3 field_0x1e8;
-    Vector3 field_0x1f4;
-    Vector3 field_0x200;
+    Vector3 smoothedBack;                     // +0x1f4 smoothed direction to the path behind
+    Vector3 smoothedNormal;                   // +0x200 smoothed ground normal
     void* groundProvider;                     // +0x20c the ground query provider (CarProceduralTerrain in slot 10)
     CarProceduralNode** wheelNodes;           // +0x210 wheels
     Vector3 field_0x214;

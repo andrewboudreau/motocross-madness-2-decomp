@@ -121,11 +121,11 @@ public:
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
     RunwayLights* SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain);
-    void UnknownFunction48ad50(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
+    void SetRacer(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
 
     float blinkTimer;                          // blink timer
-    UnknownRunwayRacer* field_0x30;
-    UnknownRunwayTerrain* field_0x34;
+    UnknownRunwayRacer* trackedRacer;          // +0x30 the lights stand on its track (SetRacer)
+    UnknownRunwayTerrain* groundTerrain;       // +0x34 grounds the lights (SetupLights)
     ArcadeObject* lightModels[5];
 };
 
@@ -168,7 +168,7 @@ public:
     // 0x0048af20 (ret 4): collects the view's racers.
     void CollectRacers(UnknownVisualCueView* view);
     int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
-    int UnknownFunction48bc80();               // 0x0048bc80
+    int CanCycleCues();               // 0x0048bc80: a cue is active and more than one racer exists
 
     // ArcadeObject.h types +0x48/+0x4c as int (0x00401310's `c` and `d`);
     // the cue stores screen fractions there (0.5f, 0.1f from its callers).

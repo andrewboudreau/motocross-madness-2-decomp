@@ -12,7 +12,7 @@ public:
     virtual void UnknownVirtualSlot0(int id) = 0; // drops bindings by id
     virtual ~InputDevice();       // 0x004897d0 (deleting wrapper 0x004897b0)
 
-    int UnknownFunction4897e0(int value); // 0x004897e0
+    int IsDeviceSubtype(int value); // 0x004897e0
     friend class GUIInputDevice;  // reads deviceKind (GUIManager.cpp 0x00487150)
     friend class OptControlsDlg;  // reads deviceKind (OptionProcs.cpp 0x004b2e00)
     friend class UIDialog;        // reads deviceKind (gameui.cpp 0x0046ef00)

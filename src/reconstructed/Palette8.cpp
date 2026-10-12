@@ -10,7 +10,7 @@
 #include "UnknownResourceManager.h"
 
 // 0x004b6b30
-Palette8* Palette8::UnknownFunction4b6b30(const char* name) {
+Palette8* Palette8::LoadShared(const char* name) {
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     Palette8* palette;
 
@@ -35,11 +35,11 @@ Palette8::Palette8(UnknownTextureStream* stream) {
     char* name;
     int i;
 
-    field_0x708 = 0;
-    field_0x70c = 0;
-    if (stream->Read(&field_0x710, 4, 1) != 1)
+    colorMapper = 0;
+    ddPalette = 0;
+    if (stream->Read(&firstEntry, 4, 1) != 1)
         return;
-    if (stream->Read(&field_0x714, 4, 1) != 1)
+    if (stream->Read(&entryCount, 4, 1) != 1)
         return;
     if (stream->Read(&length, 4, 1) != 1)
         return;
@@ -47,42 +47,42 @@ Palette8::Palette8(UnknownTextureStream* stream) {
     if (!name)
         return;
     if (stream->Read(name, length, 1) != 1
-        || stream->Read(field_0x008, sizeof(field_0x008), 1) != 1) {
+        || stream->Read(rgbEntries, sizeof(rgbEntries), 1) != 1) {
         DebugFree(name, __FILE__, 73);
         return;
     }
-    if (field_0x710 == 10) {
+    if (firstEntry == 10) {
         HDC dc = GetDC(0);
-        GetSystemPaletteEntries(dc, 0, 256, (PALETTEENTRY*)field_0x308);
+        GetSystemPaletteEntries(dc, 0, 256, (PALETTEENTRY*)paletteEntries);
         ReleaseDC(0, dc);
         for (i = 0; i < 10; i++)
-            field_0x308[i].flags = 0x40;
+            paletteEntries[i].flags = 0x40;
         for (i = 10; i < 246; i++)
-            field_0x308[i].flags = 0x40;
+            paletteEntries[i].flags = 0x40;
         for (i = 246; i < 256; i++)
-            field_0x308[i].flags = 0x40;
-        for (i = 10; i < field_0x714 + 10; i++) {
-            field_0x308[i].red = field_0x008[i][0];
-            field_0x308[i].green = field_0x008[i][1];
-            field_0x308[i].blue = field_0x008[i][2];
+            paletteEntries[i].flags = 0x40;
+        for (i = 10; i < entryCount + 10; i++) {
+            paletteEntries[i].red = rgbEntries[i][0];
+            paletteEntries[i].green = rgbEntries[i][1];
+            paletteEntries[i].blue = rgbEntries[i][2];
         }
     } else {
-        for (i = field_0x710; i < field_0x714 + field_0x710; i++) {
-            field_0x308[i].red = field_0x008[i][0];
-            field_0x308[i].green = field_0x008[i][1];
-            field_0x308[i].blue = field_0x008[i][2];
-            field_0x308[i].flags = 0x40;
+        for (i = firstEntry; i < entryCount + firstEntry; i++) {
+            paletteEntries[i].red = rgbEntries[i][0];
+            paletteEntries[i].green = rgbEntries[i][1];
+            paletteEntries[i].blue = rgbEntries[i][2];
+            paletteEntries[i].flags = 0x40;
         }
-        for (i = field_0x714 + field_0x710; i < 256; i++) {
-            field_0x308[i].blue = 0xff;
-            field_0x308[i].green = 0xff;
-            field_0x308[i].red = 0xff;
-            field_0x308[i].flags = 0x40;
+        for (i = entryCount + firstEntry; i < 256; i++) {
+            paletteEntries[i].blue = 0xff;
+            paletteEntries[i].green = 0xff;
+            paletteEntries[i].red = 0xff;
+            paletteEntries[i].flags = 0x40;
         }
     }
-    if (g_TrackGame->display->directDraw->CreatePalette(0x44, field_0x308, &field_0x70c, 0) == 0
+    if (g_TrackGame->display->directDraw->CreatePalette(0x44, paletteEntries, &ddPalette, 0) == 0
         && *name)
-        field_0x708 = ColorMapper::UnknownFunction4dddd0(name);
+        colorMapper = ColorMapper::LoadShared(name);
     DebugFree(name, __FILE__, 170);
 }
 
@@ -90,10 +90,10 @@ Palette8::Palette8(UnknownTextureStream* stream) {
 Palette8::~Palette8() {
     void* entry;
 
-    if (field_0x70c)
-        field_0x70c->Release();
-    if (field_0x708)
-        field_0x708->Release();
+    if (ddPalette)
+        ddPalette->Release();
+    if (colorMapper)
+        colorMapper->Release();
     entry = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (entry)
         g_UnknownResourceManager572b44->SetItemObject(entry, 0);

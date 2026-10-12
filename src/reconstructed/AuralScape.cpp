@@ -33,8 +33,8 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // 0x00401a30
 SoundGroup::SoundGroup(int flags) : GameObject(flags) {
     field_0x2c_bit0 = 1;
-    field_0x30 = 0;
-    field_0x34.Init(8, 16);
+    memberVolume = 0;
+    members.Init(8, 16);
 }
 
 // 0x00401af0
@@ -44,32 +44,32 @@ SoundGroup::~SoundGroup() {
 
 // 0x00401b50
 int SoundGroup::AddMember(Sound* sound) {
-    return field_0x34.Add(sound);
+    return members.Add(sound);
 }
 
 // 0x00401be0
 int SoundGroup::RemoveMember(Sound* sound) {
-    return field_0x34.Remove(sound);
+    return members.Remove(sound);
 }
 
 // 0x00401c30: releases the members through a copy of the list (a release
-// removes the sound from field_0x34).
+// removes the sound from members).
 void SoundGroup::ReleaseMembers() {
     ContainerList<Sound*> sounds;
-    sounds.Init(field_0x34.m_count, 16);
+    sounds.Init(members.m_count, 16);
     int i;
-    for (i = 0; i < field_0x34.m_count; i++)
-        sounds.Add(field_0x34.Get(i));
+    for (i = 0; i < members.m_count; i++)
+        sounds.Add(members.Get(i));
     for (i = 0; i < sounds.m_count; i++)
         sounds.Get(i)->Release();
-    field_0x34.Clear();
+    members.Clear();
 }
 
 // 0x00401dd0
-void SoundGroup::UnknownFunction401dd0(long volume) {
-    field_0x30 = volume;
-    for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->SetVolume(volume, 0);
+void SoundGroup::SetMemberVolume(long volume) {
+    memberVolume = volume;
+    for (int i = 0; i < members.m_count; i++)
+        members.Get(i)->SetVolume(volume, 0);
 }
 
 // 0x00401e20
@@ -98,23 +98,23 @@ void SoundGroup::UnknownVirtualSlot7() {
 
 // 0x00401ea0
 int SoundGroup::UnknownVirtualSlot18() {
-    for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->RestoreBuffer();
+    for (int i = 0; i < members.m_count; i++)
+        members.Get(i)->RestoreBuffer();
     return 1;
 }
 
 // 0x00401ee0
 int SoundGroup::UnknownVirtualSlot16(int value) {
     GameObject::UnknownVirtualSlot16(value);
-    for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->SetPaused(value);
+    for (int i = 0; i < members.m_count; i++)
+        members.Get(i)->SetPaused(value);
     return 1;
 }
 
 // 0x00401f30
 int SoundGroup::UnknownVirtualSlot10(float frameTime) {
-    for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->UpdateFade(frameTime);
+    for (int i = 0; i < members.m_count; i++)
+        members.Get(i)->UpdateFade(frameTime);
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
@@ -226,7 +226,7 @@ void SoundEmitter::SetSoundParameters(UnknownSound3DParameters params) {
 }
 
 // 0x00402470
-void SoundEmitter::UnknownFunction402470(Vector3* position, Vector3* velocity) {
+void SoundEmitter::SetPositionAndVelocity(Vector3* position, Vector3* velocity) {
     if (position) {
         previousPosition = soundParameters.position;
         soundParameters.position = *position;
@@ -329,7 +329,7 @@ int SoundEmitter::LoadSound(unsigned long flags) {
         return 1;
     }
     loadedSound->Set3DDistanceRange(soundParameters.minDistance, soundParameters.maxDistance, 1);
-    UnknownFunction402470(&soundParameters.position, &soundParameters.velocity);
+    SetPositionAndVelocity(&soundParameters.position, &soundParameters.velocity);
     return 1;
 }
 
@@ -562,7 +562,7 @@ int AuralScape::AddListener(int index, float doppler, float rolloff) {
 }
 
 // 0x004030a0
-void AuralScape::UnknownFunction4030a0(int index, Vector3* position, Vector3* front, Vector3* top,
+void AuralScape::SetListener(int index, Vector3* position, Vector3* front, Vector3* top,
                                        Vector3* velocity) {
     if (listeners[index]) {
         if (position)

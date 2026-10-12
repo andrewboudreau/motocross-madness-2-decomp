@@ -40,6 +40,6 @@ int SkyCube::UnknownVirtualSlot10(float frameTime) {
     center.x = CAMERA()->eyePosition.x;
     center.y = CAMERA()->eyePosition.y + centerHeight;
     center.z = CAMERA()->eyePosition.z;
-    field_0x2c->UnknownFunction43d400(&center, 0, 0);
+    cubeObject->SetVectors(&center, 0, 0);
     return 1;
 }

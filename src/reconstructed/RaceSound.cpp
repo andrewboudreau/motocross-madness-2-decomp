@@ -27,8 +27,8 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     streamChannel = 0;
     channelsInUse = 0;
     currentRacer = 0;
-    field_0x1290 = 0;
-    field_0x1294 = 0;
+    lastListenerLap = 0;
+    lastListenerGate = 0;
     waypointSound = 0;
     crowdLoop = 0;
     listenerRacer = 0;
@@ -45,7 +45,7 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     field_0x64 = 0;
     launchSound = 0;
     bonusSound = 0;
-    field_0x1208 = 1;
+    assignChannelsPending = 1;
     musicVolume = 0;
     applause1 = 0;
     applause2 = 0;
@@ -463,7 +463,7 @@ void RaceSound::AssignChannels() {
         engineChannels[i].streamSample = 0;
         engineChannels[i].nextSampleKind = 0;
         engineChannels[i].fillHalf = 1;
-        engineChannels[i].field_0x24 = 0;
+        engineChannels[i].wasThrottleOn = 0;
         engineChannels[i].field_0x28 = 0;
         engineChannels[i].wasAirborne = 0;
         engineChannels[i].field_0x30 = 0;
@@ -546,19 +546,19 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
     int i;
 
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x1208) {
+    if (assignChannelsPending) {
         AssignChannels();
-        field_0x1208 = 0;
+        assignChannelsPending = 0;
     }
-    if (SoundSystem()->audioStarted && g_TrackGame->mode.soundOn && !raceView->field_0x3f8) {
+    if (SoundSystem()->audioStarted && g_TrackGame->mode.soundOn && !raceView->replayPaused) {
         ohClock += frameTime;
         applauseClock += frameTime;
         stuntApplauseClock += frameTime;
         listenerRacer = listenerCamera->followedRacer;
         if (listenerRacer != lastListenerRacer) {
             lastListenerRacer = listenerRacer;
-            field_0x1290 = listenerRacer->lapCount;
-            field_0x1294 = listenerRacer->field_0x7b8;
+            lastListenerLap = listenerRacer->lapCount;
+            lastListenerGate = listenerRacer->field_0x7b8;
             lastListenerPosition = listenerRacer->finishPosition;
         }
         UpdateRacerSounds(frameTime);
@@ -732,13 +732,13 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             }
         }
         streamChannel->field_0x28 = streamChannel->field_0x48;
-        streamChannel->field_0x24 = (unsigned char)streamChannel->channelRacer->throttleOn;
+        streamChannel->wasThrottleOn = (unsigned char)streamChannel->channelRacer->throttleOn;
         streamChannel->wasAirborne = (unsigned char)streamChannel->channelRacer->airborne;
         RefillStream();
     }
 
     if (g_TrackGame->mode.positionSounds &&
-        (listenerRacer->field_0x7b8 > field_0x1294 || listenerRacer->lapCount > field_0x1290))
+        (listenerRacer->field_0x7b8 > lastListenerGate || listenerRacer->lapCount > lastListenerLap))
         PlayIfEnabled(waypointSound, 0, 0, 0, 0);
 
     for (i = 0; i < channelsInUse; i++) {
@@ -790,8 +790,8 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             }
         }
     }
-    field_0x1290 = listenerRacer->lapCount;
-    field_0x1294 = listenerRacer->field_0x7b8;
+    lastListenerLap = listenerRacer->lapCount;
+    lastListenerGate = listenerRacer->field_0x7b8;
     lastListenerPosition = listenerRacer->finishPosition;
     return 1;
 }
@@ -853,7 +853,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     owner->textQueue->ReplaceHeadMessage(&message);
             }
             if (g_TrackGame->mode.networkGame)
-                crowdSounds->UnknownFunction401dd0(musicVolume);
+                crowdSounds->SetMemberVolume(musicVolume);
             return 1;
         case 0x1f:
             if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))
@@ -872,8 +872,8 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (g_TrackGame->mode.networkGame)
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
-                    field_0x1294 = listenerRacer->field_0x7b8;
-                    field_0x1290 = listenerRacer->lapCount;
+                    lastListenerGate = listenerRacer->field_0x7b8;
+                    lastListenerLap = listenerRacer->lapCount;
                 }
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
@@ -1018,7 +1018,7 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
     } else {
-        stream->Seek(stream->field_0x130, 0, 1);
+        stream->Seek(stream->sliceOffset, 0, 1);
         stream->Read(&waveHeader, 1, sizeof(waveHeader));
         bytes = waveHeader.dataSize;
         buffer = DebugMalloc(bytes, __FILE__, 1652);

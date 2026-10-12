@@ -205,7 +205,7 @@ public:
     virtual int UnknownVirtualSlot15();       // 0x00486db0
 
     ToolTip* Create(void* target, GUIManager* gui); // 0x00486a10
-    void UnknownFunction486b10(UnknownGuiControl* control);        // 0x00486b10
+    void ShowControlToolTip(UnknownGuiControl* control); // 0x00486b10: control's text at the pointer or below it
     // 0x00486b80: shows `text` near `position` for `time` seconds.
     void ShowText(const char* text, int* position, float time);
 
@@ -258,7 +258,7 @@ public:
     virtual int UnknownVirtualSlot15();       // 0x00487620
 
     void UpdateFocus(int force);              // 0x004875c0: applies the pending focus (+0x1d0) or hover (+0x1cc)
-    GUIUser* UnknownFunction487650(void* target, GUIManager* gui); // 0x00487650
+    GUIUser* Create(void* target, GUIManager* gui); // 0x00487650: base create, GUI and tool tip
     void CreateToolTip(void* target, GUIManager* gui); // 0x00487680: new tool tip
     void ReleaseToolTip();                    // 0x00487710: releases the tool tip
     // 0x00487730 / 0x00487790: make `control` the pending hover (focus also
@@ -269,19 +269,19 @@ public:
     int SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487800: +0x1d8
     int MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487870: moves the focus
     void EnableImeInput(int enable);   // 0x00487990: input method editor on/off
-    int UnknownFunction487bf0(UnknownGuiControl** previous);
+    int ClearFocus(UnknownGuiControl** previous); // 0x00487bf0: drops the focus, returning it
     int AcceptDevice(GUIInputDevice* device); // 0x00487c30: accepts a device
     void AcceptKeyboardAndJoysticks();             // 0x00487d00: accepts the keyboard and joysticks
     void ForgetDevices();             // 0x00487d60: forgets every device
     void CreateCursor(const char* image, int visible); // 0x00487dd0: creates the cursor
-    void UnknownFunction487fb0(UnknownCursorAnimation* animation);
+    void SetCursorAnimation(UnknownCursorAnimation* animation); // 0x00487fb0: default when null
     void RecreateCursor(const char* image, int redraw); // 0x00488010: recreates the cursor
     void ReleaseCursor();             // 0x004880c0: releases the cursor
     int SetPointerDevice(GUIInputDevice* device); // 0x00488120: sets the pointer device
     int UsesDevice(InputDevice* device);      // 0x00488160: pointer or accepted device (1 without a pointer)
-    int UnknownFunction4881d0(UnknownControlEvent* event);
+    int UsesEventDevice(UnknownControlEvent* event); // 0x004881d0: UsesDevice for the event's device
     GUIInputDevice* FindDevice(InputDevice* device); // 0x00488240: its GUIInputDevice
-    GUIInputDevice* UnknownFunction4882a0(UnknownControlEvent* event);
+    GUIInputDevice* FindEventDevice(UnknownControlEvent* event); // 0x004882a0: FindDevice for the event's device
     GUIInputDevice* GetAcceptedDevice(int index);
 
     GUIInputDevice* pointerDevice;            // +0x2c: pointer device
@@ -329,15 +329,15 @@ public:
     void AttachDialog(UIDialog* dialog, int a, int wait); // 0x00485bd0: adds a shown dialog to its container
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
-    void UnknownFunction485d70(const char* directory); // 0x00485d70
+    void SetDialogDirectory(const char* directory); // 0x00485d70
     UIDialog* FindInputDialog();      // 0x00485df0: the dialog taking input
     Sound* FindSectionObject(const char* name); // 0x00485ec0: the opened dialog's section object
-    int UnknownFunction485ee0(int value);     // 0x00485ee0: sets +0x2c, returns the old value
+    int SwapModalDialog(int value);     // 0x00485ee0: sets +0x2c, returns the old value
     void CreateBackground();                  // 0x00485ef0: creates the background
     void ReleaseBackground();             // 0x00485fc0: releases it
     void GrabBackground(int dim);      // 0x004860a0: grabs the screen as the background
     void ReleaseBackgroundGrab();             // 0x004860f0: releases the grab
-    void UnknownFunction486150(Palette8* palette); // 0x00486150
+    void SetGuiPalette(Palette8* palette); // 0x00486150
     // 0x00486170: copies the screen (or `rect`) into a new texture, halving
     // its brightness when `dim`.
     PCTextureMap* CopyScreenToTexture(int dim, CameraRect* rect);
@@ -349,7 +349,7 @@ public:
     void RecreateCursors(const char* image, int redraw); // 0x004865e0
     void ShowCursors(int show);               // 0x00486630: each user's cursor slot 5 (show) or 4
     void ReleaseCursors();             // 0x00486680: releases the cursors
-    void UnknownFunction4866c0(const char* font); // 0x004866c0
+    void SetToolTipFont(const char* font); // 0x004866c0
     // 0x00486740: a `width` x `height` texture filled with `color`.
     PCTextureMap* CreateFilledTexture(int width, int height, unsigned long color);
     // 0x004868b0: creates (CreateClipper) and attaches (SetClipper, SetHWnd
@@ -357,7 +357,7 @@ public:
     int EnableWindowClipper(int enable);
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body)
 
-    int field_0x2c;
+    int modalDialog;                          // +0x2c the newest modal UIDialog (SwapModalDialog)
     UIDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
     Palette8* guiPalette;                     // +0x34
     Palette8* setupPalette;                   // +0x38: SetUp's palette
@@ -426,14 +426,14 @@ public:
     virtual GameObject* UnknownVirtualSlot8(void* value);
     virtual int UnknownVirtualSlot10(float frameTime); // 0x004885c0
 
-    void UnknownFunction488510();             // 0x00488510
-    void UnknownFunction488540();             // 0x00488540
-    void UnknownFunction488580();             // 0x00488580
+    void ClearTickTimes();                    // 0x00488510: per-tick counts (each game tick, 0x00468807)
+    void ResetTimerStats();                   // 0x00488540: all counts of the used timers (page not shown)
+    void ClearTimers();                       // 0x00488580: all 50 entries and their names (constructor)
 
     unsigned char counterUsable;              // +0x2c: slot 8 calibrated the time stamp counter
     float countsPerMs;                        // +0x30: counts per millisecond
     int timerCount;                           // +0x34: entries in use
-    int field_0x38;
+    int field_0x38;                           // +0x38 cleared by the resets; not read in this unit
     int overlayPage;                          // +0x3c: debug overlay page, -1 until assigned
     UnknownHiResMeterEntry timers[50];        // +0x40
 };

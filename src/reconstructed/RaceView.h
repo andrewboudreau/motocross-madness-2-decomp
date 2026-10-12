@@ -178,7 +178,7 @@ struct UnknownEventRacer : virtual public GameObject {
 // KbScoreBoard); only 0x0048d1e0 is declared: shows `score` with `multiplier`
 // (FollowRacer.cpp passes 2500 and 1 for taking over the followed racer).
 struct UnknownScoreBoard {
-    void UnknownFunction48d1e0(float score, float multiplier);  // 0x0048d1e0
+    void ShowValue(float score, float multiplier);  // 0x0048d1e0
 };
 
 // The replay object at UnknownKrustyBikeView+0x1a0; +0x10c is its length.
@@ -192,15 +192,15 @@ struct UnknownKrustyBikeViewReplay {
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
 struct UnknownKrustyBikeView : public GameObject {
-    void UnknownFunction41f1d0(int a, int b, int c); // 0x0041f1d0 (InGameProcs.cpp)
-    void UnknownFunction41f550(int value);   // 0x0041f550 (InGameProcs.cpp)
-    void UnknownFunction420650(int a, int b, int c); // 0x00420650 (InGameProcs.cpp ExitDlg)
-    void UnknownFunction421050();             // 0x00421050 (dlgprocs.cpp LoadingDlg)
-    void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
+    void NextCameraTarget(int a, int b, int c); // 0x0041f1d0 (InGameProcs.cpp)
+    void ToggleReplayPause(int value);   // 0x0041f550 (InGameProcs.cpp)
+    void RestartRace(int a, int b, int c); // 0x00420650 (InGameProcs.cpp ExitDlg)
+    void ResetStartCountdown();             // 0x00421050 (dlgprocs.cpp LoadingDlg)
+    void HandlePlayerLeft(int player);  // 0x00420590 (EventManager slot 24)
     void SetDetailLevel(int level);   // 0x00423790: detail level (QuarryStuntEvent.cpp)
     // 0x00420b00 (near bikerace.cpp's literals): saves the replay to `path`
     // with `description`.
-    void UnknownFunction420b00(char* path, char* description);
+    void SaveReplay(char* path, char* description);
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
     UnknownEventRacer* NextBike(int* iterator);
     // 0x004210f0: writes two positions relative to `reference`.
@@ -240,6 +240,6 @@ struct UnknownKrustyBikeView : public GameObject {
     int field_0x1e4;                     // -2: no replay
     int field_0x1e8;
     unsigned char field_0x1ec[0x3f8 - 0x1ec];
-    bool field_0x3f8;
-    bool field_0x3f9;
+    bool replayPaused;                       // +0x3f8
+    bool replayStepFrame;                    // +0x3f9
 };

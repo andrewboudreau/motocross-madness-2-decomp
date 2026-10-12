@@ -105,12 +105,12 @@ public:
     int BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control);
     // 0x0046fc80: whether `position` is in a double-byte character of `text`.
     int IsInDoubleByteCharacter(const char* text, const char* position, int length);
-    void UnknownFunction46f120();             // 0x0046f120
+    void UpdatePointerHover();             // 0x0046f120
     void RemoveTimer(void* timer);            // 0x0046fec0: removes `timer`
-    void UnknownFunction46ff60();             // 0x0046ff60
+    void AbortWithoutNotify();             // 0x0046ff60
     void UnknownFunction46ffc0(int value);    // 0x0046ffc0
     void SetBackground(void* background); // 0x0046ffd0: the background, also for its parents
-    void UnknownFunction470070(int a, int b, CameraRect* rect); // 0x00470070
+    void SetModalPause(int a, int b, CameraRect* rect); // 0x00470070
     void GrabBackground(int dim, CameraRect* rect); // 0x004700b0: grabs the screen behind it
     void ReleaseBackgroundGrab();             // 0x00470110: releases the grab
     // 0x0046f890: splits `text` into lines for a control; returns 0 when it fits on one.
@@ -141,10 +141,10 @@ public:
     unsigned int textColors[10];              // +0x118: the text colors "~0".."~9" select
     void* dialogPalette;                      // +0x140
     int field_0x144;                          // flags from GUIManager 0x00485a70
-    int field_0x148;                          // takes the input first (GUIManager 0x00485df0)
-    int field_0x14c;                          // GUIManager 0x00485ee0's previous value
+    int isModal;                              // +0x148 flags & 6: takes the input first (GUIManager 0x00485df0)
+    int previousModalDialog;                  // +0x14c GUIManager::SwapModalDialog's previous value, restored on close
     int field_0x150;
-    int field_0x154;                          // notifies the parent when destroyed
+    int notifyParentOnClose;                  // +0x154 the destructor notifies the parent (AbortWithoutNotify clears it)
     int scaleToScreen;                        // +0x158: scales to the screen (not "NoScale")
     int isPopup;                              // +0x15c: "Popup"
     CameraRect screenArea;                    // +0x160

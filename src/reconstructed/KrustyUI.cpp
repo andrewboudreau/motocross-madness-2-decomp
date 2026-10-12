@@ -278,8 +278,8 @@ void KrustyUI::BuildGarageScene(int value) {
         PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
         garageCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
         garageScene->AppendChild(garageCamera, -1);
-        garageCamera->field_0x1d8 = 0;
-        garageCamera->field_0x1d4 = 0;
+        garageCamera->widthKeysEnabled = 0;
+        garageCamera->fovKeysEnabled = 0;
         UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
         lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(renderContext);
         garageScene->AppendChild(lights, -1);
@@ -416,7 +416,7 @@ void KrustyUI::StepProgressBar() {
 }
 
 // 0x0049bb80
-void KrustyUI::UnknownFunction49bb80() {
+void KrustyUI::ClearEntries() {
     if (entries)
         DebugFree(entries, __FILE__, 1453);
     entries = 0;
@@ -491,7 +491,7 @@ void KrustyUI::ShowCursors() {
 }
 
 // 0x00499b10
-void KrustyUI::UnknownFunction499b10() {
+void KrustyUI::HideCursors() {
     if (gui)
         gui->ShowCursors(0);
 }
@@ -871,9 +871,9 @@ void KrustyUI::RecordRaceResults() {
         if (g_TrackGame->mode.raceSettings.lapCount == 10)
             RecordHighScoreTable(2);
     } else {
-        if (g_TrackGame->mode.raceSettings.field_0x140 == 5.0f)
+        if (g_TrackGame->mode.raceSettings.timeLimitMinutes == 5.0f)
             RecordHighScoreTable(1);
-        if (g_TrackGame->mode.raceSettings.field_0x140 == 10.0f)
+        if (g_TrackGame->mode.raceSettings.timeLimitMinutes == 10.0f)
             RecordHighScoreTable(2);
     }
 }
@@ -884,7 +884,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
     char name[128];
     if (!g_TrackGame->mode.raceSettings.treeCollision)
         return;
-    g_TrackGame->field_0x3400->field_0x00 = table;
+    g_TrackGame->highScores->extensionIndex = table;
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 1:
     case 5:
@@ -899,23 +899,23 @@ void KrustyUI::RecordHighScoreTable(int table) {
         break;
     }
     }
-    g_TrackGame->field_0x3400->ReadRecord(
+    g_TrackGame->highScores->ReadRecord(
         (short)g_TrackGame->mode.raceSettings.eventType, name);
     int added = 0;
     if (g_TrackGame->playerCount == 1) {
-        if (!g_TrackGame->field_0x3400->AddRacer(
+        if (!g_TrackGame->highScores->AddRacer(
                 (short)g_TrackGame->mode.raceSettings.eventType, 0))
             return;
     } else {
         for (int i = 0; i < g_TrackGame->playerCount; i++) {
-            if (g_TrackGame->field_0x3400->AddRacer(
+            if (g_TrackGame->highScores->AddRacer(
                     (short)g_TrackGame->mode.raceSettings.eventType, i))
                 added = 1;
         }
         if (!added)
             return;
     }
-    g_TrackGame->field_0x3400->WriteRecord(
+    g_TrackGame->highScores->WriteRecord(
         (short)g_TrackGame->mode.raceSettings.eventType, name,
         g_TrackGame->mode.GetSelectedSeries());
 }

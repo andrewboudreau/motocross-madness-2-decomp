@@ -461,8 +461,8 @@ static inline LightEmitter* FindLight(LightManager* lights)
 {
     LightEmitter* light = 0;
     for (int i = 0; i < lights->lightCount; i++) {
-        if (lights->field_0x30[i]->lightType == 1 || lights->field_0x30[i]->lightType == 2)
-            light = lights->field_0x30[i];
+        if (lights->lights[i]->lightType == 1 || lights->lights[i]->lightType == 2)
+            light = lights->lights[i];
     }
     return light;
 }
