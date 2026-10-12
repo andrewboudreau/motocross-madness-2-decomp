@@ -174,9 +174,9 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot5()
         low = Vector3(0.0f, 0.0f, 0.0f);
         high = Vector3(0.0f, 0.0f, 0.0f);
     }
-    field_0x154 = 1;
-    field_0x158 = (low + high) * 0.5f;
-    field_0x164 = (high - low) * 0.5f;
+    localBoundsValid = 1;
+    localBoundsCenter = (low + high) * 0.5f;
+    localBoundsHalfExtent = (high - low) * 0.5f;
 }
 
 // 0x00444560
@@ -373,7 +373,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
 {
     field_0x2d4 = 0;
     if (!field_0x14c && field_0x190) {
-        if (field_0x18c)
+        if (subtreeDirty)
             UnknownFunction4fe0f0();
         Matrix4 world;
         ((UnknownSoultreeNodeView*)this)->UnknownFunction4fca80(0, &world);
@@ -474,7 +474,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
 {
     if (!lodTable)
         return;
-    if (field_0x18c)
+    if (subtreeDirty)
         TransformVertexGroups(-1);
     Matrix4 identity;
     memset(&identity, 0, sizeof(identity));

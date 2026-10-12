@@ -92,3 +92,18 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004fda60` `CollectDescendants`
 - `0x004fdb60` `LoadFromParameters`
 - `0x004fedb0` `RegisterNode`
+
+## Field names
+
+`SoultreeObject` fields named from their uses here and in
+`src/krusty2/core/SoultreeObject.h` (tier 3 names, tier 1 offsets; each
+declaration keeps its `// +0xNN`): `nodeName` (+0x038, compared by
+`FindByName` 0x004fdae0), `localBoundsValid`/`localBoundsCenter`/
+`localBoundsHalfExtent` (+0x154/+0x158/+0x164, written from the low/high
+box as centre and half extent by `D3DIMSoultreeObject` slot 5,
+0x00444140), `subtreeBoundsCenter`/
+`subtreeBoundsHalfExtent` (+0x174/+0x180, refreshed by 0x004fe0f0) and
+`subtreeDirty` (+0x18c, set up the parent chain by 0x004fdab0).
+`D3DIMSoultreeObject` +0x27c (the current level of detail;
+BoundingBoxTreeBuild.h calls it `currentLod`) stays `field_0x27c` because
+a TU outside this lane reads it.

@@ -54,7 +54,7 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     zero.x = 0.0f;
     field_0x2bc = zero;
     field_0x2d0 = 0;
-    field_0x154 = 0;
+    localBoundsValid = 0;
     field_0x1b0 = 0;
     field_0x260 = 0;
     field_0x2d4 = 1;
@@ -465,7 +465,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
             }
         }
     }
-    field_0x18c = 0;
+    subtreeDirty = 0;
     field_0x27c = saved;
 }
 
@@ -601,7 +601,7 @@ void D3DIMSoultreeObject::UnknownFunction4433f0(int surface, UnknownSoultreeVert
 {
     if (lod == -1)
         lod = field_0x27c;
-    if (field_0x18c || lod != field_0x27c)
+    if (subtreeDirty || lod != field_0x27c)
         TransformVertexGroups(lod);
     *vertices = lodTable[lod].surfaces[surface].vertices;
     *vertexCount = lodTable[lod].surfaces[surface].vertexCount;
@@ -872,7 +872,7 @@ void D3DIMSoultreeObject::UnknownFunction444440()
 // 0x004444c0
 void D3DIMSoultreeObject::UnknownFunction4444c0(int value)
 {
-    field_0x18c = 1;
+    subtreeDirty = 1;
     field_0x1a4 = value;
 }
 
@@ -924,7 +924,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, Soult
     SoultreeObject::SoultreeVirtualSlot8(sourceNode, targetNode);
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
     D3DIMSoultreeObject* target = (D3DIMSoultreeObject*)targetNode;
-    target->field_0x18c = 1;
+    target->subtreeDirty = 1;
     target->field_0x1a4 = source->field_0x1a4;
     target->field_0x1a8 = source->field_0x1a8;
     target->field_0x1ac = source->field_0x1ac;
@@ -964,7 +964,7 @@ void D3DIMSoultreeObject::UnknownFunction444d00(int lod)
     if (lod >= lodCount)
         lod = lodCount - 1;
     if (field_0x27c != lod) {
-        field_0x18c = 1;
+        subtreeDirty = 1;
         field_0x27c = lod;
     }
 }

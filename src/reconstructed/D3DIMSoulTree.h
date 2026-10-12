@@ -82,7 +82,7 @@ public:
     void AddChild(SoultreeObject* child);
     void UnknownFunction4fd990(SoultreeObject* child);
 
-    char field_0x038[0x80];                    // name
+    char nodeName[0x80];                       // +0x038 name (krusty2 SoultreeObject::FindByName compares it)
     Matrix4 localMatrix;                       // local matrix
     Matrix4 worldMatrix;                       // world matrix
     int worldValid;                            // world matrix valid
@@ -92,13 +92,13 @@ public:
     unsigned char field_0x148[0x14c - 0x148];
     int field_0x14c;                           // Krusty3DObjects.cpp: hidden
     int boundsFound;                           // bounds found (slot 5)
-    int field_0x154;                           // bounds valid
-    Vector3 field_0x158;                       // bounds centre
-    Vector3 field_0x164;                       // bounds half extent
+    int localBoundsValid;                      // +0x154 local bounds valid
+    Vector3 localBoundsCenter;                 // +0x158 local bounds centre
+    Vector3 localBoundsHalfExtent;             // +0x164 local bounds half extent
     int field_0x170;                           // Krusty3DObjects.cpp 0x0048c8a0 sets 1
-    Vector3 field_0x174;                       // Krusty3DObjects.cpp 0x0048c8a0
-    Vector3 field_0x180;                       // Krusty3DObjects.cpp 0x0048c8a0
-    int field_0x18c;                           // subtree dirty
+    Vector3 subtreeBoundsCenter;               // +0x174 subtree bounds centre (0x004fe0f0; Krusty3DObjects.cpp 0x0048c8a0)
+    Vector3 subtreeBoundsHalfExtent;           // +0x180 subtree bounds half extent (0x004fe0f0)
+    int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
     int field_0x190;                           // slot 12 tests it before the visibility test
     unsigned char field_0x194[0x1a0 - 0x194];
     UnknownParameterBlock* parameterBlock;     // .slt reader

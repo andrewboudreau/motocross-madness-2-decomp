@@ -1330,15 +1330,15 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         entry->field_0x14->UnknownFunction461640(&count, 4, 1);
         SoultreeObject* node = new(__FILE__, 3447) SoultreeObject(0);
         for (int i = 0; i < count; i++) {
-            entry->field_0x14->UnknownFunction461640(node->field_0x038, 0x80, 1);
+            entry->field_0x14->UnknownFunction461640(node->nodeName, 0x80, 1);
             entry->field_0x14->UnknownFunction461640(&node->localMatrix, 0x40, 1);
             entry->field_0x14->UnknownFunction461640(&node->field_0x14c, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x154, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x158, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x164, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->localBoundsValid, 4, 1);
+            entry->field_0x14->UnknownFunction461640(&node->localBoundsCenter, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->localBoundsHalfExtent, 0xc, 1);
             entry->field_0x14->UnknownFunction461640(&node->field_0x170, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x174, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x180, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->subtreeBoundsCenter, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->subtreeBoundsHalfExtent, 0xc, 1);
         }
         node->Release();
         int* parents = (int*)operator new(count * 4, __FILE__, 3466);

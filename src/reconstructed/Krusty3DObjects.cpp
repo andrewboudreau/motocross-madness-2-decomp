@@ -468,14 +468,14 @@ int BonusObjectManager::UnknownFunction48c8a0(void* value, int a, int b) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
     if (!AppendChild(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
         return 0;
-    strcpy(baseFrame->field_0x038, "Base Bonus Frame");
-    baseFrame->field_0x174 = kVec3Zero;
-    baseFrame->field_0x180 = Vector3(0.9f, 0.22f, 0.09f);
+    strcpy(baseFrame->nodeName, "Base Bonus Frame");
+    baseFrame->subtreeBoundsCenter = kVec3Zero;
+    baseFrame->subtreeBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->field_0x170 = 1;
-    baseFrame->field_0x158 = kVec3Zero;
-    baseFrame->field_0x164 = Vector3(0.9f, 0.22f, 0.09f);
-    baseFrame->field_0x154 = 1;
-    field_0x1e4 = baseFrame->field_0x164.x + baseFrame->field_0x164.x;
+    baseFrame->localBoundsCenter = kVec3Zero;
+    baseFrame->localBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
+    baseFrame->localBoundsValid = 1;
+    field_0x1e4 = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
     return 1;
 }
 
