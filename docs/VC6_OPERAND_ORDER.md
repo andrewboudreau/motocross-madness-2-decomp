@@ -92,6 +92,10 @@ of a call (in `st(0)`):
   loads first (`fld nx; fmul st(1)`) while the other components keep the
   scalar-first form. This made Tire `0x00515c90` exact; the spellings
   `n.x * inv`, `inv * n.x`, `c.x * inv` and inline float helpers did not.
+  In a loop the same works with a vector copy made in the body after the
+  scalar's leaf (`ParticleVec3 g(step.x, step.y, step.z);` before
+  `v + (n - i) * g`): the DirtChunk, DirtSpray and Spark emitters' slot 10
+  (`0x004b8f40`, `0x004b9460`, `0x004b99a0`) became exact with it.
 
 So "a scalar is loaded first when it is a local of the inlined helper"
 (docs/PHYSICS_VALIDATION.md) is the same rule: the helper's `k` is the newest

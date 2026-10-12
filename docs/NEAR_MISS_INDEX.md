@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 153, c 107, total 261. The three class (a) functions of the
+Counts: a 1, b 153, c 104, total 258. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -145,9 +145,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 1570/2619 | c | ApplyContactImpulse, frame 0xb8 and slot order match; termB (other-body branch) builds its cross/dot in a different x87 register order (fstp st(2), +2 bytes), plus scheduling of three struct copies and the `test edi` of `if (other)` |
 | physics/contact/ContactImpulse | `0x005004a0` | 102/1062 | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
 | physics/contact/ObjectPlacement | `0x004b0df0` | 451/3321 (masked) | b | 123 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x1c4 vs 0x1ac, slot order differs |
-| physics/effects/DirtChunkParticleEmitter | `0x004b8f40` | 959/970 | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
-| physics/effects/DirtSprayParticleEmitter | `0x004b9460` | 959/970 | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
-| physics/effects/SparkParticleEmitter | `0x004b99a0` | 1043/1055 | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeBounds | `0x004fe2e0` | 82/1325 | b | frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx); *have clamps are unconditional selects; retail spends one more inline Vec3 site before h |
