@@ -26,16 +26,6 @@
 //   branch (125), function order, and in a standalone TU every int/unsigned/
 //   long type for the states, `enabled` and the colours (char and short
 //   `enabled` are worse).
-// 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
-//   loaded from `file`, otherwise a row naming the TGA file with its header's
-//   size. Calls, constants and the row stores follow retail. Retail places
-//   the function's epilogue after the stream-failure block and sends every
-//   `return 0` (and the final `return 1`) there; VC6 here keeps the epilogue
-//   last, which shifts every later offset. Retail also loads `b` into eax and
-//   the frame's size into ecx/edx (VC6 here: ecx, edx/eax). Fail-first,
-//   if-block, goto, an early stream-failure return and the whole body inside
-//   `if (rowCount < rowCapacity || grow)` with one trailing `return 0` were
-//   tried.
 // 0x00477e90 UIListBox slot 55 (322/342): an `int height` local for the
 //   first GetRowHeight call gives retail's ebx (point) and ebp (row offset);
 //   without it (155/344) the two are swapped. With the local, retail still
@@ -184,59 +174,6 @@ void UIButton::SetEnabled(int enable) {
         currentTextColor = textColor;
         SetFontColor(0x999999);
     }
-}
-
-// 0x00477110
-int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
-    if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
-        return 0;
-    UnknownGameUiListRow row;
-    if (a) {
-        UnknownTextureStream* stream =
-            new(__FILE__, 0x1e20) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (stream->Open(file, "r", 0)) {
-            row.kind = 2;
-            row.text = 0;
-            row.imageFile = 0;
-            row.textLines = 0;
-            UIAnim* image = new(__FILE__, 0x1e27) UIAnim(ownerDialog->dialogTextures, 0);
-            row.image = image;
-            image->LoadFile(file, 0);
-            UIFrame* frame = image->frameList[0];
-            row.flags = b;
-            row.width = frame->frameWidth;
-            row.height = frame->frameHeight;
-            row.field_0x30 = 0;
-            delete stream;
-        } else {
-            delete stream;
-            return 0;
-        }
-    } else {
-        row.kind = 3;
-        row.text = 0;
-        row.image = 0;
-        char* name = (char*)DebugMalloc(strlen(file) + 1, __FILE__, 0x1e37);
-        row.flags = b;
-        row.imageFile = name;
-        strcpy(name, file);
-        row.textLines = 0;
-        row.field_0x30 = 0;
-        UnknownTgaFile* header = OpenAndReadHeader(file, 0, (int)g_UnknownResourceManager572b44);
-        if (!header)
-            return 0;
-        row.width = header->width;
-        row.height = header->height;
-        FreeFile(header);
-    }
-    rowTable[rowCount] = row;
-    SetRowData(rowCount, data);
-    rowCount++;
-    visibleRowCount = CountVisibleRows();
-    UpdateScrollBars();
-    if (autoSort)
-        Sort(1);
-    return 1;
 }
 
 // 0x00477e90

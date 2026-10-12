@@ -26364,6 +26364,15 @@ CASES = [
         'target_size': 566,
         'reason': 'image declared = 0 and freed by one test after the whole .wav if/else (unthreaded, else blocks after the epilogue); _stricmp(".wav", end) argument order',
     },
+    {
+        'name': 'GameUi UIListBox add image file row 0x477110',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '?AddImageFileRow@UIListBox@@QAEHPBDHHH@Z',
+        'target_va': '0x00477110',
+        'target_size': 643,
+        'reason': 'TGA header test as if (header) {...} else return 0 puts the epilogue after the stream-failure block; row.flags = b after the frame size gives retail eax/ecx/edx',
+    },
 ]
 
 def main():

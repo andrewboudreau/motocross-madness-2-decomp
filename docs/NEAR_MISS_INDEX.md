@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 171, c 116, total 287. The three class (a) functions of the
+Counts: a 0, b 171, c 115, total 286. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -296,7 +296,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
 | ui/GameUi | `0x004738a0` | 206/975 | b | 53 code diffs: `mov edi, [esi + 0x1bc] ; mov ebx, eax` vs `mov ecx, [esi + 0x1bc] ; lea ebx, [esi ~`; retail lacks `lea ebp, [esi + 0x1bc]`; frame 0x38 vs 0x40 |
 | ui/GameUi | `0x00474150` | 1018/1044 | c | Backspace: retail gives the cursor eax, VC6 here edx; one local (1004 length / 351 cursor), no locals (339), call as condition and swapped decrements (1002) are worse |
-| ui/GameUi | `0x00477110` | 356/646 | c | 12 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `mov [esp + N], eax ; mov ecx, [esi + 0x~` |
 | ui/GameUi | `0x00477e90` | 322/342 | c | register choice after the row-height call: `mov edx, [esp + N] ; mov ecx, [ebx]` vs `mov ecx, [esp + N] ; mov edx, [ebx + 4]` (rect.top/point register choice) ; without the height local (as in the exact slot 10 at 0x476020) only ebx/ebp are swapped (155/344) |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
 | ui/GameUi | `0x00478e10` | 231/303 | c | frame and head are retail's (the area is tested in place, no RECT copy); the opaque-result tail differs as in UIButton slot 28 `0x004734c0` (retail returns through edi, 8-bit hit sets edi directly) |

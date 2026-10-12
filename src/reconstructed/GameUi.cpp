@@ -2853,6 +2853,63 @@ int UIListBox::AddRow(const char* text, int data, int a) {
     return 0;
 }
 
+// 0x00477110: adds a row for an image file: with `a` the file is loaded as a
+// UIAnim (only when the stream can open it), otherwise the row keeps the TGA
+// file's name and the size from its header.
+int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
+    if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
+        return 0;
+    UnknownGameUiListRow row;
+    if (a) {
+        UnknownTextureStream* stream =
+            new(__FILE__, 0x1e20) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        if (stream->Open(file, "r", 0)) {
+            row.kind = 2;
+            row.text = 0;
+            row.imageFile = 0;
+            row.textLines = 0;
+            UIAnim* image = new(__FILE__, 0x1e27) UIAnim(ownerDialog->dialogTextures, 0);
+            row.image = image;
+            image->LoadFile(file, 0);
+            UIFrame* frame = image->frameList[0];
+            row.width = frame->frameWidth;
+            row.height = frame->frameHeight;
+            row.flags = b;
+            row.field_0x30 = 0;
+            delete stream;
+        } else {
+            delete stream;
+            return 0;
+        }
+    } else {
+        row.kind = 3;
+        row.text = 0;
+        row.image = 0;
+        char* name = (char*)DebugMalloc(strlen(file) + 1, __FILE__, 0x1e37);
+        row.flags = b;
+        row.imageFile = name;
+        strcpy(name, file);
+        row.textLines = 0;
+        row.field_0x30 = 0;
+        UnknownTgaFile* header = OpenAndReadHeader(file, 0, (int)g_UnknownResourceManager572b44);
+        if (header) {
+            row.width = header->width;
+            row.height = header->height;
+            FreeFile(header);
+        } else {
+            return 0;
+        }
+    }
+    rowTable[rowCount] = row;
+    SetRowData(rowCount, data);
+    rowCount++;
+    visibleRowCount = CountVisibleRows();
+    UpdateScrollBars();
+    if (autoSort)
+        Sort(1);
+    return 1;
+}
+
 // 0x004773a0
 int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
     if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))

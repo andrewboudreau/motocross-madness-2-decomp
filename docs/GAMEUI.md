@@ -16,12 +16,13 @@ Extent: `0x00469db0..0x0047b66f`. Evidence:
 - **Vtables:** UIDialog `0x00552a9c` through UIProgressBar `0x00553c68`.
 - **`$E`:** its four kVec3 initializers sit at `0x0046e870..0x0046ea5b`.
 
-Exact: 325 functions compile strict-exact from GameUi.cpp. 318 are
+Exact: 326 functions compile strict-exact from GameUi.cpp. 319 are
 registered as calibration cases, including the 13 drawing, input and layout
-functions in the file's last section ("Drawing and input slots"), the eleven
+functions in the file's last section ("Drawing and input slots"), the twelve
 promoted from the near-miss sample (UIControl slots 22, 23 and 41, UIScrollBar
 `0x004753c0`, UIListBox slots 21 and 56 and `ScrollBy`, UIMultiState slot 48,
-UIDDLListBox slot 66 and UIFrame `0x00472bc0` and `0x00472960`), the UIDialog constructor,
+UIDDLListBox slot 66, UIFrame `0x00472bc0` and `0x00472960` and
+UIListBox `AddImageFileRow` `0x00477110`), the UIDialog constructor,
 destructor and deleting destructor (`0x00469db0`, `0x0046a070`, `0x00469ff0`)
 and `NotifyParent` (`0x0046ff70`). Seven sit
 at the addresses of the deliberately non-strict compiler-shape probes in
@@ -44,6 +45,13 @@ registered too, as are UIScrollCtl slots 55 and 60 (`0x00474880`,
 comparison `0x00477800`.
 
 Source forms the promoted functions needed (each one byte-exact only this way):
+- UIListBox `AddImageFileRow` (`0x00477110`): the TGA header test reads
+  `if (header) { ...; FreeFile(header); } else { return 0; }`; with
+  `if (!header) return 0;` VC6 keeps the epilogue last (356/646), with the
+  else arm it places the epilogue after the stream-failure block and the
+  final `return 1` jumps back, as retail does. `row.flags = b` follows the
+  frame's width and height stores; before them `b` and the size go to
+  ecx/edx/eax instead of retail's eax/ecx/edx (637/643).
 - qsort comparison `0x00477800`: the first comparator call goes through a
   `UIListBox* control` local; calling through the expression puts that
   temporary in edx and the next global load in eax (78/243).
@@ -242,10 +250,9 @@ Other header facts:
   `ShowDialog` passes its int `b` and `d` as the area and the name).
 - GameObject.h befriends UICtlContainer, UIControl and UIDialog.
 
-Near misses (`samples/ui/GameUiNearMisses.cpp`): 20 functions, listed with
-their differences at the top of the sample, among them UIListBox `0x00477110`
-(adds an image row and returns 0/1; retail places the epilogue after the
-stream-failure block), several list-box and scroll slots and the resource
+Near misses (`samples/ui/GameUiNearMisses.cpp`): 19 functions, listed with
+their differences at the top of the sample, among them several list-box and
+scroll slots and the resource
 parser. Most of the remaining ones differ only in register choice (slots 49
 of UIControl and UIButton, UIAnim's constructor and advance, the colour-key
 test) or in block placement (UIDialog slot 10);
