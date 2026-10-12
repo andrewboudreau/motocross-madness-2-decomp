@@ -42,8 +42,8 @@ public:
     UnknownDisplayMode* displayModes;          // +0x10: DebugRealloc'd mode table
     int field_0x14[16];                           // per texture kind (TextureMapManager 0x00511580)
     int totalVideoMemory;                      // +0x54: "Total VidMem"
-    int field_0x58;
-    int field_0x5c;
+    int textureMemory;                         // +0x58: the mode's texture memory (windowed: MeasureTextureMemory)
+    int nonLocalTextureMemory;                 // +0x5c: non-local (AGP) texture memory (windowed: ProbeNonLocalTextureMemory, else 0)
     int textureCacheLimit;                     // +0x60: "TextureCacheLimit" (0x7fffffff if unset)
     int field_0x64;                               // passed to the GUI setup (KrustyUI 0x004988a0)
     int field_0x68;

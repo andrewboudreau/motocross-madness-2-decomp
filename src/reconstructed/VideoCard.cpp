@@ -54,8 +54,8 @@ VideoCard::VideoCard() {
     displayModeCapacity = 0;
     displayModes = 0;
     lastPresentTime = 0;
-    field_0x58 = 0;
-    field_0x5c = 0;
+    textureMemory = 0;
+    nonLocalTextureMemory = 0;
     memset(field_0x90, 0, sizeof(field_0x90));
     field_0x8c = 0;
     use8BitTextures = 0;
