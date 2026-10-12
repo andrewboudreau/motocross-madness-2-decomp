@@ -654,7 +654,7 @@ static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game)
 
 static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game)
 {
-    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
+    return (UnknownOptGraphicsSettings*)&game->mode.displayModeIndex;
 }
 
 static inline UnknownOptControlSettings* UnknownControlSettingsOf(TrackGame* game)
@@ -1061,7 +1061,7 @@ void OptGarageDlg::HandleEvent(UnknownDialogEvent* event)
             for (int band = 0; band < 11; band++) {
                 if (curve < 3)
                     g_UnknownGlobal688808.eqBands[band] =
-                        game->ui->field_0x68[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve][band];
+                        game->ui->standardCurves[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve][band];
                 else
                     g_UnknownGlobal688808.eqBands[band] =
                         game->mode.customGarageCurves[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve - 3][band];
@@ -1121,10 +1121,10 @@ void OptGarageDlg::EqSliderMoved(UIControl* slider)
 {
     int bikeClass = UnknownBikeClassOf(g_UnknownGlobal688808.engineSize);
     int band = slider->attachId;
-    int value = static_cast<UIScrollBar*>(slider)->ScaleThumbPosition(g_TrackGame->ui->field_0x450[bikeClass] - g_TrackGame->ui->field_0x43c[bikeClass]);
-    value += g_TrackGame->ui->field_0x43c[bikeClass];
-    int level = __min(g_UnknownGlobal688808.eqBands[band] + (g_TrackGame->ui->field_0x400[bikeClass] - curveSum),
-                      __min(value, g_TrackGame->ui->field_0x324[bikeClass][band]));
+    int value = static_cast<UIScrollBar*>(slider)->ScaleThumbPosition(g_TrackGame->ui->maxRange[bikeClass] - g_TrackGame->ui->minRange[bikeClass]);
+    value += g_TrackGame->ui->minRange[bikeClass];
+    int level = __min(g_UnknownGlobal688808.eqBands[band] + (g_TrackGame->ui->hpSum[bikeClass] - curveSum),
+                      __min(value, g_TrackGame->ui->bandMaxima[bikeClass][band]));
     g_UnknownGlobal688808.eqBands[band] = level;
     int custom = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1) - 3;
     g_TrackGame->mode.customGarageCurves[bikeClass][custom][band] = level;
@@ -1155,9 +1155,9 @@ void OptGarageDlg::ShowCurve()
         sprintf(name, "SldEQ%d", i);
         UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl(name, 8));
         slider->reversed = 1;
-        slider->SetSnapStepCount(g_TrackGame->ui->field_0x450[bikeClass] - g_TrackGame->ui->field_0x43c[bikeClass] + 1);
-        slider->SetThumbPosition(*level - g_TrackGame->ui->field_0x43c[bikeClass],
-                                      g_TrackGame->ui->field_0x450[bikeClass] - g_TrackGame->ui->field_0x43c[bikeClass]);
+        slider->SetSnapStepCount(g_TrackGame->ui->maxRange[bikeClass] - g_TrackGame->ui->minRange[bikeClass] + 1);
+        slider->SetThumbPosition(*level - g_TrackGame->ui->minRange[bikeClass],
+                                      g_TrackGame->ui->maxRange[bikeClass] - g_TrackGame->ui->minRange[bikeClass]);
         if (curve < 3)
             slider->SetEnabled(0);
         else
@@ -1167,7 +1167,7 @@ void OptGarageDlg::ShowCurve()
         sprintf(text, "%d", *level);
         FindControl(name, 0)->SetText(text);
     }
-    sprintf(text, "%d", g_TrackGame->ui->field_0x400[bikeClass] - curveSum);
+    sprintf(text, "%d", g_TrackGame->ui->hpSum[bikeClass] - curveSum);
     FindControl("HPUnused", 0)->SetText(text);
 }
 

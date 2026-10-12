@@ -38,17 +38,17 @@ static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // dwType, dwPlayerType and dpId.
 struct UnknownEventPlayerMessage {
     int field_0x00;
-    int field_0x04;                                // player (types 0xcc and 0x8e)
-    int field_0x08;                                // dpId (DPSYS_DESTROYPLAYERORGROUP)
+    int player;                                    // +0x04: player (types 0xcc and 0x8e)
+    int dpId;                                      // +0x08: DPSYS_DESTROYPLAYERORGROUP
 };
 struct UnknownEventRacerMessage {                  // type 0x86
     int field_0x00;
-    char field_0x04;                               // the sender's racer index
-    char field_0x05;                               // finished
+    char racerIndex;                               // +0x04: the sender's racer index
+    char finished;                                 // +0x05: racer +0x7a4
     float field_0x08;
-    float field_0x0c;
-    float field_0x10;                              // racer +0x750
-    int field_0x14;
+    float totalRunningTime;                        // +0x0c: racer +0x754
+    float fastestLap;                              // +0x10: racer +0x750
+    int largestStuntPoints;                        // +0x14: racer +0x788
     int field_0x18;
     float field_0x1c;
     float field_0x20;
@@ -391,7 +391,7 @@ void EventManager::EndRace() {
             g_TrackGame->network->SetSessionJoinable(1);
         waitingForRacers = 0;
         UnknownFunction45cdc0(2);
-        UnknownFunction45e710(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
+        LeaveRaceForMenu(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
     }
 }
 
@@ -408,11 +408,11 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
     char line[260];
     if (type == DPSYS_DESTROYPLAYERORGROUP) {
         for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
-            if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == message->field_0x08)
+            if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == message->dpId)
                 g_TrackGame->mode.field_0x1be4[i].field_0xcc = 1;
         }
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !FindRaceMode())
-            UnknownFunction45fbd0(message->field_0x08);
+            UnknownFunction45fbd0(message->dpId);
     } else if (from) {
         if (type == 0x89) {
             for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
@@ -428,18 +428,18 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 return 0;
             for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
                 if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == from &&
-                    g_TrackGame->mode.field_0x1be4[i].field_0xd8 == update->field_0x04) {
+                    g_TrackGame->mode.field_0x1be4[i].field_0xd8 == update->racerIndex) {
                     g_TrackGame->mode.field_0x1be4[i].field_0xcc = 1;
                     if (view->field_0x3c[i]) {
                         view->field_0x3c[i]->field_0x768 = update->field_0x08;
-                        view->field_0x3c[i]->field_0x750 = update->field_0x10;
-                        view->field_0x3c[i]->field_0x7a4 = update->field_0x05;
-                        view->field_0x3c[i]->field_0x788 = update->field_0x14;
+                        view->field_0x3c[i]->field_0x750 = update->fastestLap;
+                        view->field_0x3c[i]->field_0x7a4 = update->finished;
+                        view->field_0x3c[i]->field_0x788 = update->largestStuntPoints;
                         view->field_0x3c[i]->field_0x758 = update->field_0x18;
                         view->field_0x3c[i]->field_0x760 = update->field_0x1c;
                         view->field_0x3c[i]->field_0x764 = update->field_0x20;
                         if (view->field_0x3c[i]->field_0x7a4) {
-                            view->field_0x3c[i]->field_0x754 = update->field_0x0c;
+                            view->field_0x3c[i]->field_0x754 = update->totalRunningTime;
                             // Always false here; retail still tests it.
                             if (!view->field_0x3c[i]->field_0x7a4)
                                 view->field_0x3c[i]->field_0x748 = UnknownFunction4bfa80();
@@ -470,18 +470,18 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             TextQueueOverlay* target = g_TrackGame->eventManager->FindTextQueue();
             if (target) {
                 g_TrackGame->LoadResourceString(0x13d7, text, sizeof(text));
-                if (g_TrackGame->network->GetPlayerName(message->field_0x04, name)) {
+                if (g_TrackGame->network->GetPlayerName(message->player, name)) {
                     sprintf(line, "%s %s", name, text);
                     UnknownMessage notice(line, 3.25f);
                     target->UnknownFunction51b540(&notice);
                 }
             }
-            if (message->field_0x04 == g_TrackGame->network->localPlayer) {
+            if (message->player == g_TrackGame->network->localPlayer) {
                 g_TrackGame->network->StopKeepAlive();
                 endNetworkGamePending = 1;
             } else {
                 for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
-                    if (message->field_0x04 == g_TrackGame->mode.field_0x1be4[i].field_0xd4) {
+                    if (message->player == g_TrackGame->mode.field_0x1be4[i].field_0xd4) {
                         g_TrackGame->mode.field_0x1be4[i].field_0xc8 = 1;
                         g_TrackGame->mode.field_0x1be4[i].field_0xcc = 1;
                     }
@@ -489,9 +489,9 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             }
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
             if (view)
-                view->UnknownFunction420590(message->field_0x04);
+                view->UnknownFunction420590(message->player);
         } else if (type == 0x8e) {
-            if (message->field_0x04 == g_TrackGame->network->localPlayer) {
+            if (message->player == g_TrackGame->network->localPlayer) {
                 if (FindRaceMode()) {
                     TextQueueOverlay* target = FindTextQueue();
                     if (target) {
@@ -552,14 +552,14 @@ void EventManager::SendRacerResults() {
     }
     UnknownEventRacerMessage message;
     message.field_0x08 = view->field_0x38->field_0x768;
-    message.field_0x0c = view->field_0x38->field_0x754;
-    message.field_0x10 = view->field_0x38->field_0x750;
-    message.field_0x05 = view->field_0x38->field_0x7a4;
-    message.field_0x14 = view->field_0x38->field_0x788;
+    message.totalRunningTime = view->field_0x38->field_0x754;
+    message.fastestLap = view->field_0x38->field_0x750;
+    message.finished = view->field_0x38->field_0x7a4;
+    message.largestStuntPoints = view->field_0x38->field_0x788;
     message.field_0x18 = view->field_0x38->field_0x758;
     message.field_0x1c = view->field_0x38->field_0x760;
     message.field_0x20 = view->field_0x38->field_0x764;
-    message.field_0x04 = 0;
+    message.racerIndex = 0;
     g_TrackGame->network->Send(
         0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
@@ -568,14 +568,14 @@ void EventManager::SendRacerResults() {
             view->field_0x40[i]->field_0x748 = 0x7ffffffe;
         }
         message.field_0x08 = view->field_0x40[i]->field_0x768;
-        message.field_0x0c = view->field_0x40[i]->field_0x754;
-        message.field_0x10 = view->field_0x40[i]->field_0x750;
-        message.field_0x05 = view->field_0x40[i]->field_0x7a4;
-        message.field_0x14 = view->field_0x40[i]->field_0x788;
+        message.totalRunningTime = view->field_0x40[i]->field_0x754;
+        message.fastestLap = view->field_0x40[i]->field_0x750;
+        message.finished = view->field_0x40[i]->field_0x7a4;
+        message.largestStuntPoints = view->field_0x40[i]->field_0x788;
         message.field_0x18 = view->field_0x40[i]->field_0x758;
         message.field_0x1c = view->field_0x40[i]->field_0x760;
         message.field_0x20 = view->field_0x40[i]->field_0x764;
-        message.field_0x04 = view->field_0x40[i]->field_0x11c0;
+        message.racerIndex = view->field_0x40[i]->field_0x11c0;
         g_TrackGame->network->Send(
             0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     }

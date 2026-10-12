@@ -31,7 +31,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block.
-void* UnknownFunction47b570(void* block, unsigned int size);
+void* ResizeDebugBlock(void* block, unsigned int size);
 
 // Global at 0x0068a498: 36 short strings loaded from string resources
 // 5000-5035 (KrustyUI 0x004988a0).
@@ -411,7 +411,7 @@ void KrustyUI::UnknownFunction49b530() {
     if (progressDialog) {
         UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->UnknownFunction46ebf0("ProgressBar", 0));
         if (bar)
-            bar->UnknownFunction47b370(1);
+            bar->StepProgress(1);
     }
 }
 
@@ -517,8 +517,8 @@ void KrustyUI::OpenMenu(int menu) {
         gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuLoading:
-        if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
-            g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
+        if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
+            g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
         dialog = new(__FILE__, 695) LoadingDlg(1);
         gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
@@ -626,40 +626,40 @@ void KrustyUI::LoadGarageTables() {
         for (int i = 0; i < 5; i++) {
             sprintf(key, "Category_%d", i + 1);
             block.UnknownFunction4b78f0(key);
-            block.UnknownFunction4b7f10("RPMLowerLimit", 5000, &field_0x2fc[i]);
-            block.UnknownFunction4b7f10("RPMUpperLimit", 10000, &field_0x310[i]);
-            field_0x414[i] = (field_0x310[i] - field_0x2fc[i]) / 10;
-            block.UnknownFunction4b7f10("HPSum", 400, &field_0x400[i]);
-            block.UnknownFunction4b7f10("MinRange", 10, &field_0x43c[i]);
-            block.UnknownFunction4b7f10("Weight", 200, &field_0x428[i]);
+            block.UnknownFunction4b7f10("RPMLowerLimit", 5000, &rpmLowerLimit[i]);
+            block.UnknownFunction4b7f10("RPMUpperLimit", 10000, &rpmUpperLimit[i]);
+            rpmStep[i] = (rpmUpperLimit[i] - rpmLowerLimit[i]) / 10;
+            block.UnknownFunction4b7f10("HPSum", 400, &hpSum[i]);
+            block.UnknownFunction4b7f10("MinRange", 10, &minRange[i]);
+            block.UnknownFunction4b7f10("Weight", 200, &weight[i]);
             int maximum = 0;
             int j;
             for (j = 0; j < 11; j++) {
-                sprintf(key, "RPM%05d", field_0x2fc[i] + field_0x414[i] * j);
-                block.UnknownFunction4b7f10(key, 10, &field_0x324[i][j]);
-                if (maximum <= field_0x324[i][j])
-                    maximum = field_0x324[i][j];
+                sprintf(key, "RPM%05d", rpmLowerLimit[i] + rpmStep[i] * j);
+                block.UnknownFunction4b7f10(key, 10, &bandMaxima[i][j]);
+                if (maximum <= bandMaxima[i][j])
+                    maximum = bandMaxima[i][j];
             }
-            field_0x450[i] = maximum;
+            maxRange[i] = maximum;
             for (int preset = 0; preset < 3; preset++) {
                 sprintf(key, "Category_%dPreset_%d", i + 1, preset + 1);
                 block.UnknownFunction4b78f0(key);
                 for (j = 0; j < 11; j++) {
-                    sprintf(key, "RPM%05d", field_0x2fc[i] + field_0x414[i] * j);
-                    block.UnknownFunction4b7f10(key, 10, &field_0x68[i][preset][j]);
+                    sprintf(key, "RPM%05d", rpmLowerLimit[i] + rpmStep[i] * j);
+                    block.UnknownFunction4b7f10(key, 10, &standardCurves[i][preset][j]);
                 }
             }
         }
     } else {
         for (int i = 0; i < 5; i++) {
-            field_0x2fc[i] = 5000;
-            field_0x310[i] = 10000;
-            field_0x400[i] = 100;
-            field_0x414[i] = (field_0x310[i] - field_0x2fc[i]) / 10;
+            rpmLowerLimit[i] = 5000;
+            rpmUpperLimit[i] = 10000;
+            hpSum[i] = 100;
+            rpmStep[i] = (rpmUpperLimit[i] - rpmLowerLimit[i]) / 10;
             for (int preset = 0; preset < 3; preset++) {
                 for (int j = 0; j < 11; j++) {
-                    field_0x68[i][preset][j] = 10;
-                    field_0x324[i][j] = 40;
+                    standardCurves[i][preset][j] = 10;
+                    bandMaxima[i][j] = 40;
                 }
             }
         }
@@ -707,7 +707,7 @@ void KrustyUI::LoadBikesAndRiders() {
             block.UnknownFunction4b7ec0("UIModelFile", "", uiModel, -1);
             block.UnknownFunction4b7ec0("ModelFile", "", model, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
-            manufacturers = UnknownFunction47b570(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
+            manufacturers = ResizeDebugBlock(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             int length = strlen(name);
             int n = length > 63 ? 63 : length;
             strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name, name, n);
@@ -730,7 +730,7 @@ void KrustyUI::LoadBikesAndRiders() {
                 block.UnknownFunction4b7ec0(key, "(no name)", bikeName, -1);
                 sprintf(key, "BikeTexture_%02d", j);
                 block.UnknownFunction4b7ec0(key, "", texture, -1);
-                bikes = UnknownFunction47b570(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
+                bikes = ResizeDebugBlock(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].manufacturer = manufacturerCount;
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].field_0x88 = 0;
                 length = strlen(bikeName);
@@ -766,7 +766,7 @@ void KrustyUI::LoadBikesAndRiders() {
             block.UnknownFunction4b7ec0("Name", "(no name)", riderName, -1);
             block.UnknownFunction4b7ec0("File", "", file, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
-            riders = UnknownFunction47b570(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
+            riders = ResizeDebugBlock(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             ((UnknownKrustyUIModelEntry*)riders)[riderCount].uiModel = 0;
             int length = strlen(riderName);
             int n = length > 63 ? 63 : length;
@@ -845,7 +845,7 @@ int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
 
 // 0x0049ba70
 int KrustyUI::UnknownFunction49ba70(int a, int scene, int series, const char* name, int d, int e) {
-    entries = (UnknownKrustyUIEntry*)UnknownFunction47b570(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
+    entries = (UnknownKrustyUIEntry*)ResizeDebugBlock(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
     entries[entryCount].field_0x00 = a;
     entries[entryCount].scene = scene;
     entries[entryCount].series = series;

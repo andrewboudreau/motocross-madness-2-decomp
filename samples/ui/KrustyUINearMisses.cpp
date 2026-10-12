@@ -25,7 +25,7 @@
 void UnknownFunction49bda0();
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block.
-void* UnknownFunction47b570(void* block, unsigned int size);
+void* ResizeDebugBlock(void* block, unsigned int size);
 
 // Global at 0x0068a498 (defined in KrustyUI.cpp).
 extern char g_UnknownStrings68a498[36][16];

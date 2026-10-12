@@ -80,7 +80,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
             if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.field_0x1970 & 1)))
                 continue;
         }
-        int flags = g_TrackGame->mode.field_0x1bd4;
+        int flags = g_TrackGame->mode.lobbyPresetFlags;
         if (!flags) {
             sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model].displayName,
                     entry->displayName);
@@ -202,10 +202,10 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     g_TrackGame->field_0x3424 = g_TrackGame->mode.field_0x27f8.field_0x28;
     g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
     int total = g_TrackGame->mode.field_0x1be0;
-    g_TrackGame->mode.field_0x1bd8 =
+    g_TrackGame->mode.maxOpponents =
         lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
-    if (g_TrackGame->mode.field_0x1bd8 < g_TrackGame->mode.field_0x27f8.field_0x28)
-        g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.field_0x1bd8;
+    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.field_0x27f8.field_0x28)
+        g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.maxOpponents;
     if (start) {
         int* bikes = (int*)DebugCalloc(total, 4, __FILE__, 0x1f4);
         int* riders = (int*)DebugCalloc(total, 4, __FILE__, 0x1f5);

@@ -110,7 +110,7 @@ int UnknownTrackGameObject3410::WaitForLobbyRank()
             if (value == -1) {
                 Sleep(1000);
             } else {
-                g_TrackGame->mode.field_0x1bd0 = value;
+                g_TrackGame->mode.lobbyRank = value;
                 break;
             }
         } else {

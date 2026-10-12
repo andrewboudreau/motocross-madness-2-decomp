@@ -739,7 +739,7 @@ public:
     virtual ~UIProgressBar();                 // 0x0047b090 (deleting wrapper 0x0047b070)
     virtual int Draw();                   // slot 40, 0x0047b110: draws the bar and its percentage
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x0047b100
-    void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
+    void StepProgress(int redraw);            // 0x0047b370: one step on
     void SetBarTexture(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 
     float progressFraction;                   // +0x1ec: the part done (0..1)

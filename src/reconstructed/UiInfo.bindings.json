@@ -78,7 +78,7 @@
   "?ClearLeft@UnknownTrackGameRacerSlot@@QAEXXZ": "0x00522050",
   "?UnknownFunction522440@TrackGameMode@@QAEXXZ": "0x00522440",
   "?ResetNetworkRace@TrackGameMode@@QAEHXZ": "0x00522680",
-  "?UnknownFunction522720@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z": "0x00522720",
+  "?ResetInterfaceOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z": "0x00522720",
   "?ResetSoundOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA20@@@Z": "0x00522780",
   "?ResetGraphicsOptions@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA4c@@@Z": "0x005227d0",
   "?UnknownFunction522800@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA68@@@Z": "0x00522800",

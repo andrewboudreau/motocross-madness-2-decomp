@@ -33,15 +33,15 @@ struct UnknownDialogEvent {
 // loop counter, so it is a macro. Needs TrackGame.h and OptionProcs.h.
 #define UNKNOWN_APPLY_BIKE_CLASS(bikeClass, band)                                                     \
     {                                                                                                 \
-        UNKNOWN_GARAGE_SETTINGS->firstBand = g_TrackGame->ui->field_0x2fc[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_TrackGame->ui->field_0x310[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->bandStep = g_TrackGame->ui->field_0x414[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_TrackGame->ui->field_0x428[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->firstBand = g_TrackGame->ui->rpmLowerLimit[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_TrackGame->ui->rpmUpperLimit[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->bandStep = g_TrackGame->ui->rpmStep[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_TrackGame->ui->weight[bikeClass];      \
         int curve = g_TrackGame->mode.garageCurveChoice[bikeClass];                              \
         for (band = 0; band < 11; band++) {                                                           \
             if (curve < 3)                                                                            \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
-                    g_TrackGame->ui->field_0x68[bikeClass][curve][band];                    \
+                    g_TrackGame->ui->standardCurves[bikeClass][curve][band];                    \
             else                                                                                      \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
                     g_TrackGame->mode.customGarageCurves[bikeClass][curve - 3][band];             \

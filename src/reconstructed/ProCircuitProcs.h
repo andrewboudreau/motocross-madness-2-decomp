@@ -15,7 +15,7 @@ class BackgroundImage;
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
 // declared by KrustyUI.cpp).
-void* UnknownFunction47b570(void* block, unsigned int size);
+void* ResizeDebugBlock(void* block, unsigned int size);
 
 // dlgprocs.cpp's 0x0044b0a0 / 0x0044b0e0 (declared in DlgProcs.h too):
 // qsort orders of list rows by their number, ascending / descending.

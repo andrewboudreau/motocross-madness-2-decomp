@@ -148,8 +148,8 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
         } else if (_stricmp("ButContinue", event->controlName) == 0) {
             int row = static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1);
             g_TrackGame->field_0x3444 = new(__FILE__, 142) UnknownTrackGameObject3444;
-            strcpy((char*)g_TrackGame->field_0x3448, careerFiles[row]);
-            if (g_TrackGame->field_0x3444->LoadSaved((char*)g_TrackGame->field_0x3448)) {
+            strcpy(g_TrackGame->careerFile, careerFiles[row]);
+            if (g_TrackGame->field_0x3444->LoadSaved(g_TrackGame->careerFile)) {
                 PCCentralDlg* dialog = new(__FILE__, 146) PCCentralDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             }
@@ -192,8 +192,8 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
             sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, number);
             while (UnknownFileExists(path))
                 sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, ++number);
-            strcpy((char*)g_TrackGame->field_0x3448, path);
-            g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+            strcpy(g_TrackGame->careerFile, path);
+            g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
             EndDialog(0);
             PCNewEventDlg* dialog = new(__FILE__, 214) PCNewEventDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
@@ -262,7 +262,7 @@ void PCStartupDlg::FillLists()
         do {
             sprintf(path, "%s%s", directory, data.cFileName);
             if (circuit.LoadSaved(path)) {
-                careerFiles = (char**)UnknownFunction47b570(careerFiles, (careerFileCount + 1) * 4);
+                careerFiles = (char**)ResizeDebugBlock(careerFiles, (careerFileCount + 1) * 4);
                 careerFiles[careerFileCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 297);
                 strcpy(careerFiles[careerFileCount], path);
                 AddCircuitRow(&circuit, careerFileCount);
@@ -377,7 +377,7 @@ void PCNewDlg::HandleEvent(UnknownDialogEvent* event)
             list->AddRow(number, i, 0);
         }
         list->SelectRowByData(7);
-        guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditBox", 11), 0, 0);
+        guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditBox", 11), 0, 0);
         break;
     }
     case kDialogCommand:
@@ -434,7 +434,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
-            g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+            g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
             PCStartupDlg* dialog = new(__FILE__, 488) PCStartupDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
@@ -705,7 +705,7 @@ void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
         medical->SetSortCompare(CompareCashAscending);
         rank->Sort(1);
         g_TrackGame->field_0x3444->AdvanceAfterRace();
-        g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+        g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
         break;
     }
     case kDialogCommand:
@@ -754,7 +754,7 @@ void PCFailedDlg::HandleEvent(UnknownDialogEvent* event)
     UIControl* label;
     switch (event->kind) {
     case kDialogInit: {
-        g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+        g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
         UIControl* description = FindControl("TxtDescription", 12);
         description->wordWrap = 1;
         description->SetTextFromResource(g_TrackGame->resourceInstance, 0x1464);
@@ -885,7 +885,7 @@ void PCCompleteDlg::HandleEvent(UnknownDialogEvent* event)
         char rank[1024];
         char text[1024];
         char message[2048];
-        g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+        g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
         UnknownSetText(FindControl("TitleText", 12), 0x145d);
         UIControl* description = FindControl("TxtDescription", 12);
         g_TrackGame->LoadResourceString(0x145e, text, 1023);

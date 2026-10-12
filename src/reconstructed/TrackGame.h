@@ -127,15 +127,15 @@ struct UnknownTrackGameModeOptions6ac360 {
 };
 
 struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 bytes
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
+    int instrumentOverlayOn;                  // +0x00 (TrackGameMode +0x6ac)
+    int showRaceStatistics;                   // +0x04 (+0x6b0: TrackOverlay 0x00519980)
+    int chatInputLine;                        // +0x08 (+0x6b4: 1 shows the chat input line)
+    int showNameTags;                         // +0x0c (+0x6b8: TrackOverlay 0x005190e0)
     int field_0x10;
     int field_0x14;
     int field_0x18;
     int field_0x1c;
-    int field_0x20;
+    int introMovieOn;                         // +0x20 (+0x6cc: Intro1Dlg)
     int field_0x24;
     int field_0x28;
     int field_0x2c;
@@ -311,7 +311,7 @@ public:
     // clears the selected session, the racers and the entries.
     int ResetNetworkRace();
     // Reset helpers called by 0x00522440.
-    void UnknownFunction522720(UnknownTrackGameModeOptions6ac* options);
+    void ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options);
     void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
@@ -345,7 +345,7 @@ public:
     int currentSeriesDirectory;           // +0x6a0: a directory name pointer for TrackRecord.cpp 0x0051f2c0; EventManager 0x0045cb70 passes it to 0x00523a60
     int field_0x6a4;                          // cleared when a network race fails to load (dlgprocs.cpp LoadingDlg)
     int field_0x6a8;                          // visual cue and runway lights on (QuarryStuntEvent.cpp)
-    int field_0x6ac;                          // instrument overlay on (QuarryStuntEvent.cpp)
+    int instrumentOverlayOn;                  // +0x6ac: instrument overlay on (QuarryStuntEvent.cpp)
     int field_0x6b0;                          // shows the race statistics (TrackOverlay 0x00519980)
     int field_0x6b4;                          // 1 shows the chat input line (QuarryStuntEvent.cpp)
     int field_0x6b8;                          // shows the racers' name tags (TrackOverlay 0x005190e0)
@@ -353,11 +353,11 @@ public:
     int field_0x6c0;                          // TrackOverlay 0x0051e390
     unsigned char field_0x6c4[0x6c8 - 0x6c4];
     int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
-    int field_0x6cc;                          // intro movie on (dlgprocs.cpp Intro1Dlg)
+    int introMovieOn;                         // +0x6cc: intro movie on (dlgprocs.cpp Intro1Dlg)
     unsigned char field_0x6d0[0x6d4 - 0x6d0];
     int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
     unsigned char field_0x6d8[0x6dc - 0x6d8];
-    int field_0x6dc;                          // most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
+    int maxAIBikes;                           // +0x6dc: most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
     unsigned char field_0x6e0[0x6f4 - 0x6e0];
     char trackNames[6][0x80];             // +0x6f4: a track name per game type (SelectGamePicProcs.cpp)
     int trackIndices[6];                  // +0x9f4: a track index per game type (SelectGamePicProcs.cpp)
@@ -372,13 +372,13 @@ public:
     int field_0xa40;                          // sound volume (racesnd.cpp 0x004e3430)
     unsigned char field_0xa44[0xa48 - 0xa44];
     int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
-    int field_0xa4c;                          // display mode index (EventManager 0x0045e710)
+    int displayModeIndex;                     // +0xa4c: display mode index (EventManager 0x0045e710)
     int field_0xa50;                          // shadows on (QuarryStuntEvent.cpp)
     int field_0xa54;                          // particles on (QuarryStuntEvent.cpp)
     unsigned char field_0xa58[0xa5c - 0xa58];
-    int field_0xa5c;                          // sky cube on (QuarryStuntEvent.cpp)
+    int skyCubeOn;                            // +0xa5c: sky cube on (QuarryStuntEvent.cpp)
     unsigned char field_0xa60[0xa64 - 0xa60];
-    int field_0xa64;                          // detail level 0..9 (QuarryStuntEvent.cpp)
+    int detailLevel;                          // +0xa64: detail level 0..9 (QuarryStuntEvent.cpp)
     unsigned char field_0xa68[0xa88 - 0xa68];
     int field_0xa88;                          // joystick input on (bikerace.cpp slot 16)
     int field_0xa8c;                          // toggled by bikerace.cpp slot 23 (key 0x22)
@@ -387,9 +387,9 @@ public:
     UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
     unsigned char field_0xfd8[0x5c];          // restored from +0x1034 when a replay is left (InGameProcs.cpp)
-    unsigned char field_0x1034[0x5c];
+    unsigned char optionsBackup[0x5c];        // +0x1034: copy of +0xfd8 (DlgProcs.cpp, InGameProcs.cpp)
     unsigned char field_0x1090[0x10ec - 0x1090];
-    int field_0x10ec;                         // SelectGamePicProcs.cpp
+    int championshipInProgress;               // +0x10ec: set when a race-mode 2 series starts (points reset); hides the race count
     int customGarageCurves[5][3][11];     // +0x10f0: custom garage curves per bike class (OptionProcs.cpp)
     int bonusTrackUnlocked[6];            // +0x1384: a bonus track is listed only when set (SelectGamePicProcs.cpp)
     char bonusTrackNames[6][0x20];        // +0x139c: each series' BonusTrack from PCSched.pb (LoadBonusTrackNames)
@@ -400,9 +400,9 @@ public:
     UnknownTrackGameRacerChoice field_0x1a3c;
     unsigned char field_0x1b04[0x1bcc - 0x1b04];
     int field_0x1bcc;                         // SelectGamePicProcs.cpp
-    int field_0x1bd0;                         // SelectGamePicProcs.cpp
-    int field_0x1bd4;                         // SelectGamePicProcs.cpp
-    int field_0x1bd8;                         // largest opponent count (SelectGamePicProcs.cpp)
+    int lobbyRank;                            // +0x1bd0: 0x0049c600 WaitForLobbyRank; 1..100 is copied to +0x1bcc
+    int lobbyPresetFlags;                     // +0x1bd4: 0x0049c2f0 ReadLobbyPreset (-1 until read)
+    int maxOpponents;                         // +0x1bd8: largest opponent count (SelectGamePicProcs.cpp)
     int field_0x1bdc;                         // cleared by TrackGameMode 0x00522440
     int field_0x1be0;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x1be4[8];
@@ -700,7 +700,7 @@ public:
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;
     UnknownTrackGameObject3444* field_0x3444;
-    unsigned char field_0x3448[0x34c8 - 0x3448];
+    char careerFile[0x34c8 - 0x3448];         // +0x3448: the pro circuit career file loaded/saved (ProCircuitProcs.cpp)
     int screenSaverWasActive;
 };
 

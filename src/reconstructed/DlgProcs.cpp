@@ -85,7 +85,7 @@ static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game) {
 }
 
 static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game) {
-    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
+    return (UnknownOptGraphicsSettings*)&game->mode.displayModeIndex;
 }
 
 // 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
@@ -378,8 +378,8 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         tab->SetTextAlign(0x12);
         memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
                sizeof(g_TrackGame->mode.savedSettings));
-        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1034,
-               sizeof(g_TrackGame->mode.field_0x1034));
+        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+               sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                sizeof(g_TrackGame->mode.field_0x1a3c));
         g_TrackGame->mode.field_0x94 = g_TrackGame->mode.field_0x98;
@@ -402,8 +402,8 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             UpdateBoundValues(1);
             memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.field_0x1034, g_TrackGame->mode.field_0xfd8,
-                   sizeof(g_TrackGame->mode.field_0x1034));
+            memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+                   sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
             g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
@@ -445,8 +445,8 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 }
                 memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
                        sizeof(g_TrackGame->mode.savedSettings));
-                memcpy(g_TrackGame->mode.field_0x1034, g_TrackGame->mode.field_0xfd8,
-                       sizeof(g_TrackGame->mode.field_0x1034));
+                memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+                       sizeof(g_TrackGame->mode.optionsBackup));
                 memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                        sizeof(g_TrackGame->mode.field_0x1a3c));
                 g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
@@ -625,7 +625,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
                 value = 999;
             _itoa(value, seed, 10);
             edit->SetEditText(seed);
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
         } else if (!_stricmp("SeedRight", event->controlName)) {
             char seed[32];
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditSeed", 0xb));
@@ -635,7 +635,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
                 value = 0;
             _itoa(value, seed, 10);
             edit->SetEditText(seed);
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
         } else if (!_stricmp("OpponentsLeftArrow", event->controlName) ||
                    !_stricmp("OpponentsRightArrow", event->controlName)) {
             ShowRaceModeControls();
@@ -646,7 +646,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) == 4)
                 ListGhosts();
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) != 2) {
-                g_TrackGame->mode.field_0x10ec = 0;
+                g_TrackGame->mode.championshipInProgress = 0;
                 g_TrackGame->eventManager->racesRun = 0;
             }
             ShowRaceModeControls();
@@ -729,7 +729,7 @@ void SPEventDlg::ShowRaceModeControls() {
         races->AddRow(text, i - 1, 0);
     }
     races->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x0c);
-    if (settings.field_0x00 == 2 && g_TrackGame->mode.field_0x10ec) {
+    if (settings.field_0x00 == 2 && g_TrackGame->mode.championshipInProgress) {
         opponentsLeft->Show(0, 1);
         opponentsRight->Show(0, 1);
         opponents->SetEnabled(0);
@@ -823,7 +823,7 @@ void SPEventDlg::SyncValues(int apply) {
             settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         else
             settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
-        if (!g_TrackGame->mode.field_0x10ec)
+        if (!g_TrackGame->mode.championshipInProgress)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         settings->treeCollision = static_cast<UIMultiState*>(FindControl("ChkTreeCollision", 2))->GetSelectedState();
         strcpy(settings->trackName, "");
@@ -916,11 +916,11 @@ int SPEventDlg::AddGhost(const char* path) {
             if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].fileName) &&
                 header.lengthSeconds > 0.0f &&
                 g_TrackGame->ui->entries[row].scene == header.trackIndex) {
-                ghostHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
+                ghostHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
                     ghostHeaders, (ghostHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
                 ghostHeaders[ghostHeaderCount] = header;
                 ghostHeaderCount++;
-                ghostPaths = (char**)UnknownFunction47b570(ghostPaths, (ghostPathCount + 1) * sizeof(char*));
+                ghostPaths = (char**)ResizeDebugBlock(ghostPaths, (ghostPathCount + 1) * sizeof(char*));
                 ghostPaths[ghostPathCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 1986);
                 strcpy(ghostPaths[ghostPathCount], path);
                 ghostPathCount++;
@@ -1487,7 +1487,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
             EndDialog(0);
             FindControl("OkButton", 0)->SetEnabled(0);
         } else {
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
             FindControl("OkButton", 0)->SetEnabled(0);
         }
         break;
@@ -1508,7 +1508,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
         } else {
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
             edit->SetEditText("");
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
         }
         break;
     case kDialogEditChange: {
@@ -1662,14 +1662,14 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
             g_TrackGame->network->SetSessionJoinable(1);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                 EndNetworkGame();
-                g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
+                g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             } else {
-                g_TrackGame->eventManager->UnknownFunction45e710(kMenuMultiPlayer867);
+                g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMultiPlayer867);
             }
         } else if (!g_TrackGame->field_0x3444) {
-            g_TrackGame->eventManager->UnknownFunction45e710(kMenuSinglePlayer);
+            g_TrackGame->eventManager->LeaveRaceForMenu(kMenuSinglePlayer);
         } else {
-            g_TrackGame->eventManager->UnknownFunction45e710(kMenuPCCentral);
+            g_TrackGame->eventManager->LeaveRaceForMenu(kMenuPCCentral);
         }
         break;
     }
@@ -1912,7 +1912,7 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         g_TrackGame->ui->gui->ShowCursors(0);
         framesShown = 0;
-        g_UnknownGlobal59ae00 = !g_TrackGame->mode.field_0x6cc;
+        g_UnknownGlobal59ae00 = !g_TrackGame->mode.introMovieOn;
         break;
     }
 }
@@ -2019,8 +2019,8 @@ void LeaveMenusForRace() {
         !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->field_0x3428) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
                sizeof(g_TrackGame->mode.savedSettings));
-        memcpy(g_TrackGame->mode.field_0x1034, g_TrackGame->mode.field_0xfd8,
-               sizeof(g_TrackGame->mode.field_0x1034));
+        memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+               sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                sizeof(g_TrackGame->mode.field_0x1a3c));
         g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
@@ -2034,8 +2034,8 @@ void LeaveMenusForRace() {
         memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.field_0x1974,
                sizeof(g_TrackGame->mode.field_0x1b04));
     }
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !g_TrackGame->mode.field_0x10ec) {
-        g_TrackGame->mode.field_0x10ec = 1;
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !g_TrackGame->mode.championshipInProgress) {
+        g_TrackGame->mode.championshipInProgress = 1;
         g_TrackGame->eventManager->racesRun = 0;
         for (int i = 0; i < 11; i++)
             g_TrackGame->eventManager->results[i].points = 0;
@@ -2043,8 +2043,8 @@ void LeaveMenusForRace() {
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
     if (g_TrackGame->ui->gui->field_0x03c)
         g_TrackGame->ui->gui->field_0x03c->UnknownFunction404c80();
-    if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
-        g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
+    if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
+        g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
         g_TrackGame->mode.field_0x26f0 = 0;
         g_TrackGame->mode.field_0x2dbc = 0;
@@ -2263,11 +2263,11 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file) && header.lengthSeconds > 0.0f) {
-            fileHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
+            fileHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
                 fileHeaders, (fileHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
             fileHeaders[fileHeaderCount] = header;
             fileHeaderCount++;
-            filePaths = (char**)UnknownFunction47b570(filePaths, (filePathCount + 1) * sizeof(char*));
+            filePaths = (char**)ResizeDebugBlock(filePaths, (filePathCount + 1) * sizeof(char*));
             filePaths[filePathCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 4657);
             strcpy(filePaths[filePathCount], path);
             filePathCount++;
@@ -2417,11 +2417,11 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file) && header.lengthSeconds > 0.0f) {
-            fileHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
+            fileHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
                 fileHeaders, (fileHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
             fileHeaders[fileHeaderCount] = header;
             fileHeaderCount++;
-            filePaths = (char**)UnknownFunction47b570(filePaths, (filePathCount + 1) * sizeof(char*));
+            filePaths = (char**)ResizeDebugBlock(filePaths, (filePathCount + 1) * sizeof(char*));
             filePaths[filePathCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 4870);
             strcpy(filePaths[filePathCount], path);
             filePathCount++;
@@ -2553,7 +2553,7 @@ void EditBoxDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         editBuffer = 0;
         editBufferSize = 0;
-        guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditBox", 0), 0, 0);
+        guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditBox", 0), 0, 0);
         break;
     case kDialogCommand:
         if (!_stricmp("OkButton", event->controlName)) {
@@ -2597,11 +2597,11 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
             g_TrackGame->eventManager->UnknownFunction45cdc0(2);
             memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1034,
-                   sizeof(g_TrackGame->mode.field_0x1034));
+            memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+                   sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
-            g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
+            g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             guiManager->ShowCursors(1);
         }
         break;

@@ -118,11 +118,11 @@ TrackGameMode::TrackGameMode() {
         bonusTrackUnlocked[i] = 0;
         bonusTrackNames[i][0] = 0;
     }
-    field_0x1bd0 = -1;
-    field_0x1bd4 = -1;
-    field_0x1bd8 = 0;
+    lobbyRank = -1;
+    lobbyPresetFlags = -1;
+    maxOpponents = 0;
     field_0x1be0 = 0;
-    field_0x10ec = 0;
+    championshipInProgress = 0;
     UNKNOWN_SET_DIRECTORY(0, "Teraform\\Quarries")
     UNKNOWN_SET_DIRECTORY(1, "Teraform\\Baja")
     UNKNOWN_SET_DIRECTORY(2, "Teraform\\National")
@@ -160,14 +160,15 @@ int TrackGameMode::ResetNetworkRace() {
     return 1;
 }
 
-// 0x00522720: the defaults of the TrackGameMode+0x6ac options; the last
+// 0x00522720: the defaults of the TrackGameMode+0x6ac options (overlay,
+// name tags, intro movie; the name is inference); the last
 // 0x14 bytes are cleared with an inline memset.
-void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* options) {
-    options->field_0x00 = 1;
-    options->field_0x04 = 1;
+void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options) {
+    options->instrumentOverlayOn = 1;
+    options->showRaceStatistics = 1;
     options->field_0x1c = 1;
-    options->field_0x08 = 0;
-    options->field_0x0c = 1;
+    options->chatInputLine = 0;
+    options->showNameTags = 1;
     options->field_0x10 = 1;
     options->field_0x14 = 1;
     options->field_0x18 = 1;
@@ -177,7 +178,7 @@ void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* option
     options->field_0x3c = 0;
     options->field_0x40 = 0;
     options->field_0x44 = 0;
-    options->field_0x20 = 1;
+    options->introMovieOn = 1;
     options->field_0x24 = 1;
     options->field_0x28 = 1;
     options->field_0x2c = 1;
@@ -262,12 +263,12 @@ void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* option
     int k;
 
     for (i = 0; i < 11; i++)
-        options->field_0x24[i] = g_TrackGame->ui ? g_TrackGame->ui->field_0x68[1][0][i] : 10;
+        options->field_0x24[i] = g_TrackGame->ui ? g_TrackGame->ui->standardCurves[1][0][i] : 10;
     for (k = 0; k < 5; k++) {
         for (j = 0; j < 3; j++) {
             for (i = 0; i < 11; i++)
                 customGarageCurves[k][j][i] =
-                    g_TrackGame->ui ? g_TrackGame->ui->field_0x43c[k] : 0;
+                    g_TrackGame->ui ? g_TrackGame->ui->minRange[k] : 0;
         }
     }
 }
@@ -311,7 +312,7 @@ void TrackGameMode::UnknownFunction522cd0() {
 // 0x00522d00
 int TrackGameMode::CreateDirectoryLists() {
 
-    ChooseDisplayMode(0, &field_0xa4c);
+    ChooseDisplayMode(0, &displayModeIndex);
     field_0x25e0 = new(__FILE__, 383) DirectoryList;
     trackDirectoryList = new(__FILE__, 384) CombinedDirectoryList;
     field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
@@ -426,13 +427,13 @@ int TrackGameMode::LoadProfile() {
     }
     fread(field_0x00, 0x10, 1, file);
     fread(&showNewbieDialog, 4, 1, file);
-    fread(&field_0x6ac, 0x374, 1, file);
+    fread(&instrumentOverlayOn, 0x374, 1, file);
     fread(&field_0xa20, 0x2c, 1, file);
-    fread(&field_0xa4c, 0x1c, 1, file);
+    fread(&displayModeIndex, 0x1c, 1, file);
     fread(field_0xa68, 0x30, 1, file);
     fread(field_0x145c, 0x500, 1, file);
     fread(videoSettings, 0x18, 1, file);
-    fread(field_0x1034, 0x5c, 1, file);
+    fread(optionsBackup, 0x5c, 1, file);
     fread(field_0x1090, 0x5c, 1, file);
     fread(&field_0x1a3c, 0xc8, 1, file);
     fread(field_0x1b04, 0xc8, 1, file);
@@ -453,7 +454,7 @@ int TrackGameMode::LoadProfile() {
     fread(&field_0x1bcc, 4, 1, file);
     fclose(file);
     field_0x27f8.field_0x35 = 0;
-    ChooseDisplayMode(&displayAdapterGuid, &field_0xa4c);
+    ChooseDisplayMode(&displayAdapterGuid, &displayModeIndex);
     g_TrackGame->ui->field_0x48c = 1;
     LoadControllerChoice();
     if (g_TrackGame->soundInterface) {
@@ -462,7 +463,7 @@ int TrackGameMode::LoadProfile() {
     }
     field_0x27f8 = savedSettings;
     field_0x94 = field_0x98;
-    memcpy(field_0xfd8, field_0x1034, sizeof(field_0xfd8));
+    memcpy(field_0xfd8, optionsBackup, sizeof(field_0xfd8));
     memcpy(&field_0x1974, &field_0x1a3c, sizeof(field_0x1974));
     return strcmp(field_0x00, "") != 0;
 }
@@ -480,13 +481,13 @@ void TrackGameMode::SaveProfile() {
         return;
     fwrite(field_0x00, 0x10, 1, file);
     fwrite(&showNewbieDialog, 4, 1, file);
-    fwrite(&field_0x6ac, 0x374, 1, file);
+    fwrite(&instrumentOverlayOn, 0x374, 1, file);
     fwrite(&field_0xa20, 0x2c, 1, file);
-    fwrite(&field_0xa4c, 0x1c, 1, file);
+    fwrite(&displayModeIndex, 0x1c, 1, file);
     fwrite(field_0xa68, 0x30, 1, file);
     fwrite(field_0x145c, 0x500, 1, file);
     fwrite(videoSettings, 0x18, 1, file);
-    fwrite(field_0x1034, 0x5c, 1, file);
+    fwrite(optionsBackup, 0x5c, 1, file);
     fwrite(field_0x1090, 0x5c, 1, file);
     fwrite(&field_0x1a3c, 0xc8, 1, file);
     fwrite(field_0x1b04, 0xc8, 1, file);
