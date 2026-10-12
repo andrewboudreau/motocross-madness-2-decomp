@@ -119,9 +119,9 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
         field_0x2c->field_0x38->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (field_0x38 != g_UnknownKrustyGame56e26c->field_0x10->field_0x08 || field_0x38->fieldOfView != field_0x1dc ||
+        if (field_0x38 != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || field_0x38->fieldOfView != field_0x1dc ||
             field_0x1f0) {
-            field_0x38 = g_UnknownKrustyGame56e26c->field_0x10->field_0x08;
+            field_0x38 = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
             field_0x1dc = field_0x38->fieldOfView;
             Vector3 delta = position - field_0x38->eyePosition;
             field_0x1f0 = 0;
@@ -228,11 +228,11 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->field_0x560->field_0x34->field_0x50->field_0x3b4;
+        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->field_0x50->field_0x3b4;
         if (!ref)
             return 1;
         Vector3 direction =
-            g_UnknownKrustyGame56e26c->field_0x560->field_0xd8[ref->gateIndex].field_0x00 - arcadeView->cameraPosition;
+            g_UnknownKrustyGame56e26c->bajaEnduroEvent->field_0xd8[ref->gateIndex].field_0x00 - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
@@ -259,19 +259,19 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         UNKNOWN_PLACE_CUE();
         if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
             Vector3 target;
-            g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.GetPosition(&target);
+            g_UnknownKrustyGame56e26c->tagEvent->field_0xdc->field_0x21c.GetPosition(&target);
             Vector3 direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
             UnknownVisualCueRacer* followed = 0;
-            if (g_UnknownKrustyGame56e26c->field_0x568->field_0x3c->field_0x25 & 1)
-                followed = g_UnknownKrustyGame56e26c->field_0x568->field_0x3c->field_0x3b4;
-            if (!g_UnknownKrustyGame56e26c->field_0x568->field_0xa8)
+            if (g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x25 & 1)
+                followed = g_UnknownKrustyGame56e26c->tagEvent->raceCamera->field_0x3b4;
+            if (!g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 return 1;
-            if (followed == g_UnknownKrustyGame56e26c->field_0x568->field_0xa8)
+            if (followed == g_UnknownKrustyGame56e26c->tagEvent->followedRacer)
                 goto hide;
-            Vector3 direction = g_UnknownKrustyGame56e26c->field_0x568->field_0xa8->position - arcadeView->cameraPosition;
+            Vector3 direction = g_UnknownKrustyGame56e26c->tagEvent->followedRacer->position - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }
