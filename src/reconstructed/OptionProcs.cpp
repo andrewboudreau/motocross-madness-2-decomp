@@ -811,7 +811,7 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             KrustyUI* ui = g_TrackGame->ui;
             int count = ui->field_0x54;
             for (int i = 0; i < count; i++) {
-                if (((UnknownOptKrustyUIRecord*)ui->field_0x50)[i].field_0x8c == 0xfa) {
+                if (((UnknownOptKrustyUIRecord*)ui->field_0x50)[i].engineSize == 0xfa) {
                     g_TrackGame->mode.field_0x1974.field_0xc4 = i; // TrackGame+0x1fb0
                     break;
                 }

@@ -200,7 +200,7 @@ public:
 // reads them.
 struct UnknownOptKrustyUIRecord {
     unsigned char field_0x00[0x8c];
-    int field_0x8c;
+    int engineSize;                           // +0x8c: engine size (cc), as KrustyUI's bike table
     unsigned char field_0x90[0x94 - 0x90];
 };
 
