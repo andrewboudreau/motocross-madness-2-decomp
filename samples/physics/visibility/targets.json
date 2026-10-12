@@ -6,6 +6,7 @@
     "target_va": "0x0052d610",
     "target_size": 3027,
     "expect": "partial",
-    "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks"
+    "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks",
+    "bindings": "VisibilityQuadTreeTraversal.bindings.json"
   }
 ]
