@@ -1192,7 +1192,7 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         state.field_0xc2 = g_TrackGame->mode.field_0x1974.field_0xc4;
         state.field_0xc3 = g_TrackGame->mode.field_0x6dc;
         state.field_0xc8 = UNKNOWN_GARAGE_SETTINGS->engineSize;
-        state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->field_0x04;
+        state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->fourStroke;
         if (g_TrackGame->mode.field_0x1bd0 > 0 && g_TrackGame->mode.field_0x1bd0 < 0x65)
             g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.field_0x1bd0;
         state.field_0xd0 = g_TrackGame->mode.field_0x1bcc;
@@ -2062,16 +2062,16 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56cb6c[size];
-        UNKNOWN_GARAGE_SETTINGS->field_0x04 = size == 2 || size == 4 ? 1 : 0;
+        UNKNOWN_GARAGE_SETTINGS->fourStroke = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
         ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[g_TrackGame->mode.field_0x1974.field_0xc4]
             .engineSize = UNKNOWN_GARAGE_SETTINGS->engineSize;
         ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[g_TrackGame->mode.field_0x1974.field_0xc4]
-            .field_0x90 = UNKNOWN_GARAGE_SETTINGS->field_0x04;
+            .field_0x90 = UNKNOWN_GARAGE_SETTINGS->fourStroke;
     } else {
         int row = bikes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].engineSize;
-        UNKNOWN_GARAGE_SETTINGS->field_0x04 = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].field_0x90;
+        UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].field_0x90;
         int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }

@@ -985,7 +985,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
     UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->field_0x3444->field_0x465[0].field_0x138;
-    UNKNOWN_GARAGE_SETTINGS->field_0x04 = g_TrackGame->field_0x3444->field_0x465[0].field_0x13c;
+    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->field_0x3444->field_0x465[0].field_0x13c;
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
     _itoa(g_TrackGame->mode.field_0x1bcc, text, 10);
     plate->SetEditText(text);

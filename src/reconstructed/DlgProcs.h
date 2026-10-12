@@ -45,9 +45,9 @@ public:
     UIControl* menuSingleAnimation; // +0x7f60: "MenuSingleAnimation"
     UIControl* menuMultiAnimation; // +0x7f64: "MenuMultiAnimation"
     UIControl* menuUserAnimation;  // +0x7f68: "MenuUserAnimation"
-    int field_0x7f6c;
-    int field_0x7f70;
-    int field_0x7f74;
+    int singleMenuOpen;                       // +0x7f6c: "MenuSingle" toggles it and MenuSingleAnimation
+    int multiMenuOpen;                        // +0x7f70: "MenuMulti" toggles it and MenuMultiAnimation
+    int userMenuOpen;                         // +0x7f74: "MenuUserProfile" toggles it and MenuUserAnimation
     int movieRestartPending;                  // +0x7f78: restart the movie once the delay passes
     float movieRestartTime;                   // +0x7f7c: seconds counted towards the 4 s restart delay
 };
@@ -337,8 +337,8 @@ struct UnknownRecordFileHeader {
     UnknownKrustyUISlot field_0x180[8];       // TrackGame+0x2ebc
     unsigned char field_0x1c0[0x229 - 0x1c0];
     char riderName[0x33c - 0x229];            // +0x229: the rider
-    int field_0x33c;                          // copied to TrackGame+0x1550 (ReplayFilesDlg)
-    int field_0x340;
+    int engineSize;                           // +0x33c: garage engine size, copied to TrackGame+0x1550
+    int fourStroke;                           // +0x340: garage 4-stroke flag (TrackGame+0x1554)
     unsigned char field_0x344[0xeb0 - 0x344];
 };
 

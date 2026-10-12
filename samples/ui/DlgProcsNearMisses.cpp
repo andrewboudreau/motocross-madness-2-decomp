@@ -67,9 +67,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         menuSingleAnimation->Show(0, 0);
         menuMultiAnimation->Show(0, 0);
         menuUserAnimation->Show(0, 0);
-        field_0x7f6c = 0;
-        field_0x7f70 = 0;
-        field_0x7f74 = 0;
+        singleMenuOpen = 0;
+        multiMenuOpen = 0;
+        userMenuOpen = 0;
         movieRestartTime = 0.0f;
         g_TrackGame->ui->field_0x4b0 = 0;
         g_TrackGame->mode.field_0x10ec = 0;
@@ -95,10 +95,10 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case kDialogCommand:
         if (!_stricmp("MenuSingle", event->controlName)) {
-            field_0x7f6c = field_0x7f6c == 0;
-            menuSingleAnimation->Show(field_0x7f6c, 1);
+            singleMenuOpen = singleMenuOpen == 0;
+            menuSingleAnimation->Show(singleMenuOpen, 1);
             movieRestartPending = 1;
-            if (field_0x7f6c) {
+            if (singleMenuOpen) {
                 movieRestartTime = 0.0f;
                 if (movieControl) {
                     movieControl->field_0x1ec->UnknownVirtualSlot16(1);
@@ -108,28 +108,28 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 movieControl->field_0x1ec->UnknownVirtualSlot16(1);
                 movieControl->Show(0, 1);
             }
-            if (field_0x7f70) {
+            if (multiMenuOpen) {
                 menuMultiAnimation->Show(0, 1);
-                field_0x7f70 = 0;
+                multiMenuOpen = 0;
                 EndNetworkGame();
                 g_TrackGame->ui->field_0x4b0 = 0;
             }
-            if (field_0x7f74) {
+            if (userMenuOpen) {
                 menuUserAnimation->Show(0, 1);
-                field_0x7f74 = 0;
+                userMenuOpen = 0;
             }
         } else if (!_stricmp("MenuMulti", event->controlName)) {
-            field_0x7f70 = field_0x7f70 == 0;
-            menuMultiAnimation->Show(field_0x7f70, 1);
-            if (field_0x7f6c) {
+            multiMenuOpen = multiMenuOpen == 0;
+            menuMultiAnimation->Show(multiMenuOpen, 1);
+            if (singleMenuOpen) {
                 menuSingleAnimation->Show(0, 1);
-                field_0x7f6c = 0;
+                singleMenuOpen = 0;
             }
-            if (field_0x7f74) {
+            if (userMenuOpen) {
                 menuUserAnimation->Show(0, 1);
-                field_0x7f74 = 0;
+                userMenuOpen = 0;
             }
-            if (field_0x7f70) {
+            if (multiMenuOpen) {
                 guiManager->UnknownFunction4865e0(guiManager->waitCursorImage, 1);
                 FindControl("ButIPX", 1)->UnknownVirtualSlot49(0);
                 FindControl("ButTCP", 1)->UnknownVirtualSlot49(0);
@@ -157,19 +157,19 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->ui->field_0x4b0 = 0;
             }
         } else if (!_stricmp("MenuUserProfile", event->controlName) || !_stricmp("ButCancelProfile", event->controlName)) {
-            field_0x7f74 = field_0x7f74 == 0;
-            menuUserAnimation->Show(field_0x7f74, 1);
-            if (field_0x7f70) {
+            userMenuOpen = userMenuOpen == 0;
+            menuUserAnimation->Show(userMenuOpen, 1);
+            if (multiMenuOpen) {
                 menuMultiAnimation->Show(0, 1);
-                field_0x7f70 = 0;
+                multiMenuOpen = 0;
                 EndNetworkGame();
                 g_TrackGame->ui->field_0x4b0 = 0;
             }
-            if (field_0x7f74)
+            if (userMenuOpen)
                 UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
-            if (field_0x7f6c) {
+            if (singleMenuOpen) {
                 menuSingleAnimation->Show(0, 1);
-                field_0x7f6c = 0;
+                singleMenuOpen = 0;
             }
         } else if (!_stricmp("MenuOptions", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 345) OptionsDlg;
@@ -237,7 +237,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->UnknownFunction521a30();
             UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
             ShowCurrentProfile();
-            field_0x7f74 = 0;
+            userMenuOpen = 0;
             menuUserAnimation->Show(0, 1);
         } else if (!_stricmp("ButNewProfile", event->controlName)) {
             g_TrackGame->mode.UnknownFunction523580();
@@ -245,7 +245,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
             FillProfileList();
             ShowCurrentProfile();
-            field_0x7f74 = 0;
+            userMenuOpen = 0;
             menuUserAnimation->Show(0, 1);
         } else if (!_stricmp("ButRemoveProfile", event->controlName)) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
@@ -327,7 +327,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             FillProfileList();
             ShowCurrentProfile();
-            if (field_0x7f74)
+            if (userMenuOpen)
                 UnknownFunction470000(list, 0, 0);
         }
         if (event->code == 0x1f)
@@ -347,9 +347,9 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         break;
     case kDialogClose:
-        field_0x7f74 = 0;
-        field_0x7f70 = 0;
-        field_0x7f6c = 0;
+        userMenuOpen = 0;
+        multiMenuOpen = 0;
+        singleMenuOpen = 0;
         menuUserAnimation = 0;
         menuMultiAnimation = 0;
         menuSingleAnimation = 0;
@@ -421,8 +421,8 @@ struct UnknownReplayTapeHeader {
     unsigned char field_0x00[0x34];
     UnknownTrackGameModeSettings field_0x34;
     unsigned char field_0x220[0x33c - 0x220];
-    int field_0x33c;
-    int field_0x340;
+    int engineSize;
+    int fourStroke;
     unsigned char field_0x344[0xeb0 - 0x344];
 };
 
@@ -536,8 +536,8 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x04);
                 g_TrackGame->field_0x3428 = 1;
                 g_TrackGame->field_0x342c = 1;
-                UNKNOWN_GARAGE_SETTINGS->engineSize = header.field_0x33c;
-                UNKNOWN_GARAGE_SETTINGS->field_0x04 = header.field_0x340;
+                UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;
+                UNKNOWN_GARAGE_SETTINGS->fourStroke = header.fourStroke;
                 COPY_TEXT(g_TrackGame->mode.field_0x26f4, "VCRtape.dat", 0x104);
                 UnknownFunction4536e0();
                 parentDialog->UnknownVirtualSlot26();

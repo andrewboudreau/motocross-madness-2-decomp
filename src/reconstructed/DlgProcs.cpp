@@ -148,9 +148,9 @@ void CloseDialogCallback(UIDialog* dialog) {
 
 // 0x0044c6b0
 int MainDlg::UnknownVirtualSlot10(float frameTime) {
-    if (field_0x7f6c) {
+    if (singleMenuOpen) {
         FindControl("ScreenOverCtl", 0)->UnknownVirtualSlot50();
-        if (field_0x7f6c && !menuSingleAnimation->field_0x68 && movieRestartPending) {
+        if (singleMenuOpen && !menuSingleAnimation->field_0x68 && movieRestartPending) {
             if (movieRestartTime < 4.0f) {
                 movieRestartTime = g_TrackGame->frameTime + movieRestartTime;
             } else {
@@ -1213,7 +1213,7 @@ void SPBikeRiderDlg::UnknownFunction4500e0() {
         int size = sizes->GetRowData(-1);
         int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56cb6c[size];
-        UNKNOWN_GARAGE_SETTINGS->field_0x04 = size == 2 || size == 4 ? 1 : 0;
+        UNKNOWN_GARAGE_SETTINGS->fourStroke = size == 2 || size == 4 ? 1 : 0;
         int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         if (current != previous)
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
@@ -1222,7 +1222,7 @@ void SPBikeRiderDlg::UnknownFunction4500e0() {
         int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_GARAGE_SETTINGS->engineSize =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].engineSize;
-        UNKNOWN_GARAGE_SETTINGS->field_0x04 =
+        UNKNOWN_GARAGE_SETTINGS->fourStroke =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].field_0x90;
         int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         if (current != previous)
@@ -2479,8 +2479,8 @@ void ReplayFilesDlg::PlaySelectedReplay() {
     g_TrackGame->mode.UnknownFunction5240e0(header->series);
     g_TrackGame->field_0x3428 = 1;
     g_TrackGame->field_0x342c = 1;
-    *(int*)&g_TrackGame->mode.field_0xfd8[0] = header->field_0x33c;
-    *(int*)&g_TrackGame->mode.field_0xfd8[4] = header->field_0x340;
+    *(int*)&g_TrackGame->mode.field_0xfd8[0] = header->engineSize;
+    *(int*)&g_TrackGame->mode.field_0xfd8[4] = header->fourStroke;
     COPY_TEXT(g_TrackGame->mode.field_0x26f4, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->UnknownVirtualSlot26();
     UnknownFunction4536e0();
