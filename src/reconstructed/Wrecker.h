@@ -186,6 +186,13 @@ struct UnknownWreckerRaceState {
     int field_0xb4;
 };
 
+// The 12-byte pose list at +0x190 (src/krusty2 MotionPoseList).
+struct UnknownWreckerPoseList {
+    int frame;                         // +0x00
+    void* poses;                       // +0x04 0x2c-byte records
+    int count;                         // +0x08
+};
+
 // Object at Wrecker+0x34 (Bike passes its rider character). Its +0x1a0 is
 // the skeleton the probes and the wreck pose are attached to.
 class UnknownWreckerCharacter {
@@ -199,7 +206,9 @@ public:
     virtual void UnknownVirtualSlot6();
     virtual void UnknownVirtualSlot7(float frameTime, int a, int b);
 
-    void UnknownFunction4a8ac0(Vector3* position, int value);      // 0x004a8ac0 (ret 8)
+    // 0x004a8ac0 (ret 8): passes each pose of `list` to slot 6 (src/krusty2
+    // Character::ApplyPoseListSlot6).
+    void ApplyPoseListSlot6(UnknownWreckerPoseList* list, int mask);
     void SetMotionByName(const char* animation);             // 0x004a8b10 (ret 4)
     void SetMotion(int value);                         // 0x004a8b40 (ret 4)
     void BlendToMotion(int value, float blend);            // 0x004a8b80 (ret 8)
@@ -210,7 +219,7 @@ public:
     unsigned char field_0x020[0x34 - 0x20];
     int field_0x34;
     unsigned char field_0x038[0x190 - 0x38];
-    Vector3 field_0x190;
+    UnknownWreckerPoseList restPoseList; // +0x190 rest pose list (src/krusty2 Character::poseList)
     unsigned char field_0x19c[0x1a0 - 0x19c];
     UnknownWreckerSkeleton* skeleton; // +0x1a0
 };

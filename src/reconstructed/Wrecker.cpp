@@ -577,7 +577,7 @@ void Wrecker::EndWreck() {
         pendingAnimation = 0;
         skipProbeEffects = 1;
         character->skeleton->ResetMatrices();
-        character->UnknownFunction4a8ac0(&character->field_0x190, 0);
+        character->ApplyPoseListSlot6(&character->restPoseList, 0);
         UpdateInertia();
     }
 }
