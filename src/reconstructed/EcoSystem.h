@@ -107,17 +107,17 @@ class CollisionObject : public UnknownEcoQuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);      // 0x00431e70
     void Configure(void* a, int b, int c, int d);          // 0x004320f0
-    void UnknownFunction4328b0(const Vector3* vertices, const int* indices, int triangleCount,
+    void SetTriangleMeshHullShape(const Vector3* vertices, const int* indices, int triangleCount,
                                int vertexCount);                       // 0x004328b0: hull
-    void UnknownFunction4329a0(Vector3 center, float radius);          // 0x004329a0: sphere
-    void UnknownFunction432a20(Vector3 p0, Vector3 p1, float radius);  // 0x00432a20: capsule
+    void SetSphereShape(Vector3 center, float radius);          // 0x004329a0: sphere
+    void SetCapsuleShape(Vector3 p0, Vector3 p1, float radius);  // 0x00432a20: capsule
     void SetTransform(const Matrix4* m);                      // 0x00435830: SetTransform
 
     unsigned char field_0x38[0x50 - 0x38];
     int shapeType;                            // +0x50: 0 hull, 3 capsule, 4 sphere
     void* shapeData;                          // +0x54: the shape (by shapeType)
     unsigned char field_0x58[0x64 - 0x58];
-    int field_0x64;
+    int ownerType;                            // +0x64
     unsigned char field_0x68[0xb8 - 0x68];    // 0xb8 bytes (operator new at 0x00457f74)
 };
 
