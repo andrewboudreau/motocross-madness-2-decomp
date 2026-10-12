@@ -59,7 +59,10 @@
 // +0x2e4/+0x276. Moving the pair to any of 28 positions (either order)
 // fills the slot with whichever two stores precede `mov ecx, esi` (515 at
 // best, after +0x298, which is not retail's store order); moving the
-// +0x29c copy (29 positions) is worse.
+// +0x29c copy (29 positions) is worse. All orders of the six statements
+// after the copy (720) or of the six before the slot-71 call (720) keep a
+// non-retail fill (526 at best, with more diffs); 0..33 dead int locals
+// change nothing.
 //
 // FollowCamera::UnknownVirtualSlot36 (0x00465000) is exact in src/reconstructed/FollowCamera.cpp.
 #include "../../src/reconstructed/FollowCamera.h"
