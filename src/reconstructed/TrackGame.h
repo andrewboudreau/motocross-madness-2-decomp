@@ -693,7 +693,7 @@ public:
     float shortNetPacketIntervalSeconds;
     float fullRecordPacketIntervalSeconds;
     float shortRecordPacketIntervalSeconds;
-    int field_0x3424;                          // EventManager 0x0045fbd0 decrements it for a leaving player whose entry has racer +0x11c0 set (Game+0x18 otherwise)
+    int networkAiRacerCount;                   // +0x3424 AI racers in a multiplayer race (multiplayerAiRacerCount at the start; racerCount = it + playerCount); EventManager 0x0045fbd0 decrements it for a leaving player whose entry has racer +0x11c0 set (Game+0x18 otherwise)
     int playingReplay;                        // +0x3428
     int useReplayTape;                        // +0x342c
     int uiInteractionBlocked;

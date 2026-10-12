@@ -242,7 +242,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 0;
         int others;
         if (g_TrackGame->playerCount > 1) {
-            others = g_TrackGame->field_0x3424;
+            others = g_TrackGame->networkAiRacerCount;
         } else if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             others = 1;
         } else {

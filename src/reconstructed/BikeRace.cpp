@@ -456,7 +456,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             ready = 0;
                         } else {
                             racerSlots[i]->UnknownVirtualSlot5();
-                            for (int j = 0; j < g_TrackGame->field_0x3424 + g_TrackGame->playerCount; j++) {
+                            for (int j = 0; j < g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount; j++) {
                                 if (racerSlots[j]->recorderId == id) {
                                     racerSlots[j]->UnknownVirtualSlot5();
                                 }
@@ -464,7 +464,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                         if (player == 0) {
                             racerSlots[i]->UnknownVirtualSlot4();
-                            for (int j = 0; j < g_TrackGame->field_0x3424 + g_TrackGame->playerCount; j++) {
+                            for (int j = 0; j < g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount; j++) {
                                 if (racerSlots[j]->recorderId == id) {
                                     racerSlots[j]->UnknownVirtualSlot4();
                                 }

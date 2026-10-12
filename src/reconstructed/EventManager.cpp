@@ -528,7 +528,7 @@ void EventManager::RemovePlayer(int player) {
             if (!results[i].aiIndex)
                 g_TrackGame->playerCount--;
             else
-                g_TrackGame->field_0x3424--;
+                g_TrackGame->networkAiRacerCount--;
             results[i] = results[g_TrackGame->mode.racerCount - 1];
             if (FindRaceMode())
                 g_TrackGame->mode.racers[i] =

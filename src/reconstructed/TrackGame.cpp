@@ -127,7 +127,7 @@ TrackGame::TrackGame() {
         GetRegistryInt("IntervalBetweenFullNetPacketsMS", 2000) * 0.001f;
     shortNetPacketIntervalSeconds =
         GetRegistryInt("IntervalBetweenShortNetPacketsMS", 67) * 0.001f;
-    field_0x3424 = 0;
+    networkAiRacerCount = 0;
     replaySpeed = 1.0f;
     playingReplay = 0;
     useReplayTape = 0;

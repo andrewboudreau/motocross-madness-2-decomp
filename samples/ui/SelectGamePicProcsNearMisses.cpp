@@ -203,8 +203,8 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     int i;
     g_TrackGame->mode.raceSettings.networkPlayerCount = g_UnknownGlobal689df8 + 1;
     g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
-    g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
-    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+    g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
+    g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
     int total = g_TrackGame->mode.racerCount;
     g_TrackGame->mode.maxOpponents =
         lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);

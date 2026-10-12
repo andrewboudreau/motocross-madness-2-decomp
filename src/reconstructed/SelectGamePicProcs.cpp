@@ -341,8 +341,8 @@ int CompareGridDraws(const void* a, const void* b) {
 void MultiPlayerDlg::FillRacerSlots() {
     int player = g_TrackGame->network->localPlayer;
     g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
-    g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
-    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+    g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
+    g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
     for (int i = 0; i < g_TrackGame->playerCount - 1; i++) {
         g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
         g_TrackGame->mode.racers[i + 1].racerIndex = 0;
@@ -420,8 +420,8 @@ void MultiPlayerDlg::SendSettings() {
     if (++s_UnknownStatic573c0c >= 2) {
         g_TrackGame->mode.raceSettings.networkPlayerCount = g_UnknownGlobal689df8 + 1;
         g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
-        g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
-        g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+        g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
+        g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
         if (eventPage)
             eventPage->UpdateBoundValues(1);
         if (optionsPage)

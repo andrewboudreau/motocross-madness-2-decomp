@@ -277,7 +277,7 @@ void EndNetworkGame() {
         g_TrackGame->network = 0;
     }
     g_TrackGame->playerCount = 1;
-    g_TrackGame->field_0x3424 = 0;
+    g_TrackGame->networkAiRacerCount = 0;
     g_TrackGame->mode.raceSettings.networkPlayerCount = 0;
     g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
 }
