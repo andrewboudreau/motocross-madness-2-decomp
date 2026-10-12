@@ -236,10 +236,10 @@ NameOverlay::NameOverlay(int flags) : Overlay(flags, 1)
 {
     trackedRacer = 0;
     world = 0;
-    field_0x13c = 0;
-    field_0x140 = 0;
+    becameHidden = 0;
+    becameVisible = 0;
     field_0x148 = 0;
-    field_0x14c = 0;
+    wasHidden = 0;
     drawWidth = 0;
     field_0x170 = 0;
     lastVisible = 1;
@@ -254,7 +254,7 @@ NameOverlay::~NameOverlay()
 }
 
 // 0x00518e30
-NameOverlay* NameOverlay::UnknownFunction518e30(RenderTarget* target, TextureMap* texture,
+NameOverlay* NameOverlay::Create(RenderTarget* target, TextureMap* texture,
                                                 const UnknownOverlayRect* rect, int a4,
                                                 const UnknownOverlayRect* source, UnknownEventRacer* a6,
                                                 UnknownNameOverlayWorld* a7, int a8)
@@ -269,10 +269,10 @@ NameOverlay* NameOverlay::UnknownFunction518e30(RenderTarget* target, TextureMap
     sourceHeight = source->bottom - source->top + 1;
     testPhase = a8 % 4;
     frameCounter = 0;
-    field_0x168 = 0;
-    field_0x16c = 1;
-    field_0x150 = s_UnknownVector68a410;
-    field_0x15c = s_UnknownVector68a410;
+    drawLeftOfAnchor = 0;
+    anchorOutsideMap = 1;
+    fixedPosition = s_UnknownVector68a410;
+    radarAnchor = s_UnknownVector68a410;
     return this;
 }
 
@@ -292,17 +292,17 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 }
 
 // 0x00519080
-void NameOverlay::UnknownFunction519080(Vector3 point)
+void NameOverlay::SetFixedPosition(Vector3 point)
 {
-    field_0x150 = point;
+    fixedPosition = point;
 }
 
 // 0x005190a0
-void NameOverlay::UnknownFunction5190a0(Vector3 point, int a4, int a5)
+void NameOverlay::SetRadarAnchor(Vector3 point, int leftOfAnchor, int outsideMap)
 {
-    field_0x15c = point;
-    field_0x168 = a4;
-    field_0x16c = a5;
+    radarAnchor = point;
+    drawLeftOfAnchor = leftOfAnchor;
+    anchorOutsideMap = outsideMap;
 }
 
 // 0x005190e0: draws the tag at a fixed point (no racer), at the racer's
@@ -310,8 +310,8 @@ void NameOverlay::UnknownFunction5190a0(Vector3 point, int a4, int a5)
 int NameOverlay::UnknownVirtualSlot14()
 {
     if (!trackedRacer) {
-        int x = (int)field_0x150.x;
-        int y = (int)field_0x150.y;
+        int x = (int)fixedPosition.x;
+        int y = (int)fixedPosition.y;
         screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x - 1, sourceHeight + y);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
@@ -322,22 +322,22 @@ int NameOverlay::UnknownVirtualSlot14()
         return 1;
     if (!trackedRacer->isEnabled)
         return 1;
-    if ((field_0x15c.x != -1.0f || field_0x15c.y != -1.0f) && g_TrackGame->mode.showNameTags) {
+    if ((radarAnchor.x != -1.0f || radarAnchor.y != -1.0f) && g_TrackGame->mode.showNameTags) {
         int left;
         int right;
-        if (field_0x168) {
-            right = (int)field_0x15c.x;
+        if (drawLeftOfAnchor) {
+            right = (int)radarAnchor.x;
             left = right - drawWidth;
         } else {
-            left = (int)field_0x15c.x;
+            left = (int)radarAnchor.x;
             right = drawWidth + left;
         }
-        int top = (int)field_0x15c.y;
+        int top = (int)radarAnchor.y;
         screenRect = UnknownMakeOverlayRect(left, top, right, sourceHeight + top);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         int alpha = overlayAlpha;
-        overlayAlpha = field_0x16c ? 0xb4 : 0xff;
+        overlayAlpha = anchorOutsideMap ? 0xb4 : 0xff;
         Overlay::UnknownVirtualSlot14();
         overlayAlpha = alpha;
     }
@@ -346,15 +346,15 @@ int NameOverlay::UnknownVirtualSlot14()
     head.y += 1.62f;
     int hidden = !IsPointVisible(&head);
     if (hidden) {
-        if (!field_0x14c) {
-            field_0x13c = 1;
-            field_0x140 = 0;
+        if (!wasHidden) {
+            becameHidden = 1;
+            becameVisible = 0;
         }
-    } else if (field_0x14c) {
-        field_0x140 = 1;
-        field_0x13c = 0;
+    } else if (wasHidden) {
+        becameVisible = 1;
+        becameHidden = 0;
     }
-    field_0x14c = hidden;
+    wasHidden = hidden;
     if (overlayAlpha) {
         Camera* camera = Target()->currentCamera;
         Vector3 screen;

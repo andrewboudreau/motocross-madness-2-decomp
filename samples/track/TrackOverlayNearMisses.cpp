@@ -195,18 +195,18 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
         racerCount++;
     }
     for (int i = 0; i < racerCount; i++) {
-        nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
+        nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->Create(
             Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
-        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
+        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->Create(
             Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {
-            nameTags[racerCount]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
+            nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));
             nameTags[racerCount]->UnknownVirtualSlot4();
             nameLineRight = nameTagRects[racerCount].right;
             nameTags[racerCount]->drawWidth = 0;
@@ -719,13 +719,13 @@ void RadarOverlay::DrawRacers(int mode)
                 for (int k = 0; k < racerCount; k++) {
                     NameOverlay* tag = radarView->chatOverlay->nameTags[k];
                     if (tag->trackedRacer == racers[i])
-                        tag->UnknownFunction5190a0(point, x - mapCenterX > 0, outside);
+                        tag->SetRadarAnchor(point, x - mapCenterX > 0, outside);
                 }
             } else {
                 point.x = -1.0f;
                 point.y = -1.0f;
                 if (radarView->chatOverlay)
-                    radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
+                    radarView->chatOverlay->nameTags[i]->SetRadarAnchor(point, 0, outside);
             }
             if (outside) {
                 if (g_TrackGame->mode.raceSettings.eventType == 3 ||
@@ -754,7 +754,7 @@ void RadarOverlay::DrawRacers(int mode)
             point.x = -1.0f;
             point.y = -1.0f;
             if (radarView->chatOverlay)
-                radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, 1);
+                radarView->chatOverlay->nameTags[i]->SetRadarAnchor(point, 0, 1);
         }
     }
     if (mode == 2 || mode == 3) {

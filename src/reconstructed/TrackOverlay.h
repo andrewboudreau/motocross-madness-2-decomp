@@ -118,13 +118,13 @@ public:
     virtual ~NameOverlay();                   // 0x00518e20 (deleting wrapper 0x00518e00)
     virtual int UnknownVirtualSlot14();       // 0x005190e0
 
-    NameOverlay* UnknownFunction518e30(RenderTarget* target, TextureMap* texture,
+    NameOverlay* Create(RenderTarget* target, TextureMap* texture,
                                        const UnknownOverlayRect* rect, int a4,
                                        const UnknownOverlayRect* source, UnknownEventRacer* a6,
                                        UnknownNameOverlayWorld* a7, int a8); // 0x00518e30
     int IsPointVisible(const Vector3* point);                           // 0x00519000
-    void UnknownFunction519080(Vector3 point);                // 0x00519080
-    void UnknownFunction5190a0(Vector3 point, int a4, int a5); // 0x005190a0
+    void SetFixedPosition(Vector3 point);                // 0x00519080
+    void SetRadarAnchor(Vector3 point, int leftOfAnchor, int outsideMap); // 0x005190a0
 
     UnknownEventRacer* trackedRacer;
     int sourceWidth;                          // source width
@@ -134,15 +134,15 @@ public:
     int testPhase;                            // phase of the every-fourth-frame test
     int frameCounter;                         // frame counter, 0..3
     int lastVisible;                          // last visibility result
-    int field_0x13c;
-    int field_0x140;
+    int becameHidden;                         // +0x13c set when the head goes out of sight
+    int becameVisible;                        // +0x140 set when it comes back into sight
     float fadeTime;                           // fade time, 0.25
     float field_0x148;
-    int field_0x14c;
-    Vector3 field_0x150;
-    Vector3 field_0x15c;
-    int field_0x168;
-    int field_0x16c;
+    int wasHidden;                            // +0x14c the head was out of sight last frame
+    Vector3 fixedPosition;                    // +0x150 where the tag of no racer is drawn (SetFixedPosition)
+    Vector3 radarAnchor;                      // +0x15c screen anchor from the radar, (-1, -1): none
+    int drawLeftOfAnchor;                     // +0x168 the tag ends at the anchor
+    int anchorOutsideMap;                     // +0x16c the racer is off the map: drawn at alpha 0xb4
     int field_0x170;
 };
 
