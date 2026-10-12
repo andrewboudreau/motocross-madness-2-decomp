@@ -739,8 +739,8 @@ struct UnknownBikeRacePickObject {
 // The replay recorder's record kinds -1 (a tick) carry the time played and
 // the tick count.
 struct UnknownBikeRaceVcrTick {
-    float field_0x00;
-    int field_0x04;
+    float time;                               // +0x00 recorded length at the tick
+    int tickCount;                            // +0x04 ticks recorded so far
 };
 
 // Record kind 0x11: the ghost's state (0x3c bytes). Kind 0x10's deltas
@@ -982,8 +982,8 @@ public:
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
     UnknownVcrFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open
-    float field_0x1ac;                        // the record slot 10 queues (+0x1ac..+0x1b7)
-    int field_0x1b0;
+    float recordTickTime;                     // +0x1ac the tick record slot 10 queues (+0x1ac..+0x1b7): replay length
+    int recordTickCount;                      // +0x1b0 ticks queued since the replay restarted
     int field_0x1b4;
     float replayTime;                        // replay time
     float replayLength;                        // replay length

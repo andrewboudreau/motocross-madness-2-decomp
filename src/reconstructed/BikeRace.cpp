@@ -118,8 +118,8 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     field_0x070 = -1;
     field_0x189 = 0;
     field_0x160 = 0;
-    field_0x1ac = 0;
-    field_0x1b0 = 0;
+    recordTickTime = 0;
+    recordTickCount = 0;
     field_0x1b4 = 0;
     replayLength = 0;
     replayTime = 0;
@@ -301,8 +301,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     replayFrames = 0;
                     replayLength = 0;
                     replayLengthFrames = 0;
-                    field_0x1ac = 0;
-                    field_0x1b0 = 0;
+                    recordTickTime = 0;
+                    recordTickCount = 0;
                     field_0x1b4 = 0;
                     localRacer->field_0x13f8 = FLT_MAX / 2;
                 } else {
@@ -327,11 +327,11 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         recorderTickDue = recorderTickElapsed >= g_TrackGame->shortRecordPacketIntervalSeconds;
                         if (recorderTickDue) {
                             recorderTickElapsed -= g_TrackGame->shortRecordPacketIntervalSeconds;
-                            field_0x1ac = replayLength;
-                            field_0x1b0++;
+                            recordTickTime = replayLength;
+                            recordTickCount++;
                             field_0x1b4 = 1;
                             if (replayVcr != 0) {
-                                replayVcr->QueueRecord(-1, 0, &field_0x1ac, 0xc);
+                                replayVcr->QueueRecord(-1, 0, &recordTickTime, 0xc);
                             }
                         }
                     }
@@ -408,8 +408,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         recorderTickDue = recorderTickElapsed >= g_TrackGame->shortRecordPacketIntervalSeconds;
                         if (recorderTickDue) {
                             recorderTickElapsed -= g_TrackGame->shortRecordPacketIntervalSeconds;
-                            field_0x1ac = replayLength;
-                            field_0x1b0++;
+                            recordTickTime = replayLength;
+                            recordTickCount++;
                             TrackGameViewOwner* owner = g_TrackGame->tagEvent;
                             if (owner != 0 && owner->ball != 0 && owner->followedRacer == 0) {
                                 field_0x1b4 = UnknownFunctionRacerCount() + 1;
@@ -418,7 +418,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             }
                             int camera = g_TrackGame->mode.raceSettings.eventType;
                             if (camera == 0 || (camera == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
-                                if (field_0x1b0 % 20 == 0) {
+                                if (recordTickCount % 20 == 0) {
                                     field_0x3fb = true;
                                     field_0x1b4 *= 2;
                                 } else {
@@ -426,7 +426,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                                 }
                             }
                             if (replayVcr != 0) {
-                                replayVcr->QueueRecord(-1, 0, &field_0x1ac, 0xc);
+                                replayVcr->QueueRecord(-1, 0, &recordTickTime, 0xc);
                             }
                         }
                     }
@@ -1493,7 +1493,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
     *keep = 0;
     field_0x1e4 = a;
     if (replayPaused && a == -1) {
-        replayTime = ((UnknownBikeRaceVcrTick*)data)->field_0x00;
+        replayTime = ((UnknownBikeRaceVcrTick*)data)->time;
         replayStepFrame = false;
         return 5;
     }
@@ -1552,12 +1552,12 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
     } else if (a == -1) {
         UnknownBikeRaceVcrTick* tick = (UnknownBikeRaceVcrTick*)data;
         if (replayStepFrame) {
-            replayTime = tick->field_0x00;
+            replayTime = tick->time;
             ToggleReplayPause(0);
             return 7;
         }
         float step = replayTime / (float)replayFrames;
-        float tickStep = tick->field_0x00 / (float)tick->field_0x04;
+        float tickStep = tick->time / (float)tick->tickCount;
         if (replaySeekTarget != -1.0f) {
             if ((replayMode == 9 && replaySeekTarget < replayTime) ||
                 (replayMode == 11 && replaySeekTarget > replayTime)) {
@@ -1570,12 +1570,12 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
                 g_TrackGame->replaySpeed = 15.0f;
             } else {
                 replayMode = 11;
-                replayTime = tick->field_0x00;
+                replayTime = tick->time;
                 return 11;
             }
         }
         if (replayMode == 11) {
-            replayTime = tick->field_0x00;
+            replayTime = tick->time;
             return 11;
         }
         if (replayMode == 12) {
@@ -1592,18 +1592,18 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             return 1;
         }
         if (appliedReplayMode != replayMode) {
-            replayTime = s_UnknownStatic578e8c = tick->field_0x00;
+            replayTime = s_UnknownStatic578e8c = tick->time;
             ClearRacerParts();
         }
-        if (tick->field_0x00 > replayTime) {
-            s_UnknownStatic578e8c = tick->field_0x00;
+        if (tick->time > replayTime) {
+            s_UnknownStatic578e8c = tick->time;
             return 3;
         }
-        if (replayTime - step > s_UnknownStatic578e8c && tickStep + tick->field_0x00 < replayTime) {
-            s_UnknownStatic578e8c = tick->field_0x00;
+        if (replayTime - step > s_UnknownStatic578e8c && tickStep + tick->time < replayTime) {
+            s_UnknownStatic578e8c = tick->time;
             return 2;
         }
-        s_UnknownStatic578e8c = tick->field_0x00;
+        s_UnknownStatic578e8c = tick->time;
         return 1;
     } else if (a == 6) {
         if (replayPaused) {
