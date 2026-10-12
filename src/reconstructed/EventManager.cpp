@@ -103,7 +103,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         field_0x34[0] = racer->field_0x7ac[0];
         field_0x34[1] = racer->field_0x7ac[1];
         field_0x34[2] = racer->field_0x7ac[2];
-        if (g_TrackGame->mode.raceSettings.cameraView == 0 || g_TrackGame->mode.raceSettings.cameraView == 4)
+        if (g_TrackGame->mode.raceSettings.eventType == 0 || g_TrackGame->mode.raceSettings.eventType == 4)
             finished = 1;
         else
             finished = racer->hasFinished;
@@ -452,7 +452,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             }
             if (keepAliveStarted)
                 return 0;
-            if (g_TrackGame->mode.raceSettings.cameraView == 4) {
+            if (g_TrackGame->mode.raceSettings.eventType == 4) {
                 TrackGameViewOwner* owner = FindRaceMode();
                 if (owner->followedRacer == owner->field_0x34->localRacer) {
                     owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;
@@ -624,7 +624,7 @@ int EventManager::UnknownFunction45cb70() {
     g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                       g_TrackGame->mode.raceSettings.trackName, "env", path);
     g_TrackGame->sceneObject->SetSceneDirectory(path);
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 0:
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
         g_TrackGame->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
@@ -660,7 +660,7 @@ void EventManager::CheckRaceOver(float frameTime) {
     UnknownKrustyBikeView* view = FindRaceView();
     if (!view || !view->isRacing)
         return;
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 1:
     case 2:
     case 3:
@@ -735,7 +735,7 @@ void EventManager::RankRacers() {
     int count = 0;
     int iterator = 0;
     UnknownEventRacer* racer;
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 1:
     case 2:
     case 3:
@@ -758,7 +758,7 @@ void EventManager::RankRacers() {
         iterator = 0;
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
             results[count].CopyFromRacer(racer);
-            if ((g_TrackGame->mode.raceSettings.raceMode == 2 || g_TrackGame->field_0x3444) &&
+            if ((g_TrackGame->mode.raceSettings.raceMode == 2 || g_TrackGame->proCircuit) &&
                 !racer->field_0x4a0)
                 AddChampionshipPoints(racer, &results[count].points);
             count++;

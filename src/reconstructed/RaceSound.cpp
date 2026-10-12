@@ -249,7 +249,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     }
     landHardSound = new (__FILE__, 321) Sound(engineGroup, 1);
     LoadSound(landHardSound, "LandHard01.wav", 41, 3);
-    if (g_TrackGame->mode.raceSettings.cameraView != 3) {
+    if (g_TrackGame->mode.raceSettings.eventType != 3) {
         launchSound = new (__FILE__, 326) Sound(effectsGroup, 1);
         LoadSound(launchSound, "launch.wav", 1, 3);
     }
@@ -753,7 +753,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     launchSound->Stop(1);
                     PlayIfEnabled(launchSound, 0, 0, 0, 0);
                 }
-                if (g_TrackGame->mode.raceSettings.cameraView == 3) {
+                if (g_TrackGame->mode.raceSettings.eventType == 3) {
                     if (currentRacer == listenerRacer && currentRacer->finishPosition == 1)
                         PlayIfEnabled(booSound, 0, 0, 0, 0);
                     if (currentRacer == listenerRacer && currentRacer->finishPosition > 1 && ohClock > 30.0f) {
@@ -831,7 +831,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         case 0x2e:
             if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
                 break;
-            if (g_TrackGame->mode.raceSettings.cameraView != 3)
+            if (g_TrackGame->mode.raceSettings.eventType != 3)
                 break;
             switch (musicVolume) {
             case 0:
@@ -1075,9 +1075,9 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
 // (modes 0 and 4); applause01 in mode 3 at most every 15 seconds.
 void RaceSound::PlayScoreSounds(UnknownEventRacer* racer, float value) {
     if (listenerRacer == racer && value >= 10000.0f &&
-        (!g_TrackGame->mode.raceSettings.cameraView || g_TrackGame->mode.raceSettings.cameraView == 4))
+        (!g_TrackGame->mode.raceSettings.eventType || g_TrackGame->mode.raceSettings.eventType == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);
-    if (g_TrackGame->mode.raceSettings.cameraView == 3 && stuntApplauseClock > 15.0f) {
+    if (g_TrackGame->mode.raceSettings.eventType == 3 && stuntApplauseClock > 15.0f) {
         PlayIfEnabled(applause1, 0, 0, 0, 0);
         stuntApplauseClock = 0;
     }

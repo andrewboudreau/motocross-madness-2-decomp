@@ -200,7 +200,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
-    if (g_TrackGame->mode.raceSettings.cameraView == 0) {
+    if (g_TrackGame->mode.raceSettings.eventType == 0) {
         nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
             Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
@@ -319,7 +319,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     rect.top = 0;
     rect.right = 128;
     rect.bottom = 128;
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 0:
         strcpy(name, "BajaScore.tga");
         break;
@@ -708,8 +708,8 @@ void RadarOverlay::DrawRacers(int mode)
                     float distance = dz * dz + dx * dx;
                     radarView->chatOverlay->UnknownFunction51d9c0(distance, racers[i]->racerName);
                 }
-                if (outside && (g_TrackGame->mode.raceSettings.cameraView == 3 ||
-                                g_TrackGame->mode.raceSettings.cameraView == 2)) {
+                if (outside && (g_TrackGame->mode.raceSettings.eventType == 3 ||
+                                g_TrackGame->mode.raceSettings.eventType == 2)) {
                     point.x = -1.0f;
                     point.y = -1.0f;
                 } else {
@@ -728,8 +728,8 @@ void RadarOverlay::DrawRacers(int mode)
                     radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
             }
             if (outside) {
-                if (g_TrackGame->mode.raceSettings.cameraView == 3 ||
-                    g_TrackGame->mode.raceSettings.cameraView == 2)
+                if (g_TrackGame->mode.raceSettings.eventType == 3 ||
+                    g_TrackGame->mode.raceSettings.eventType == 2)
                     continue;
                 lineStart.color = 0x28aa28;
                 lineEnd.color = 0x28aa28;

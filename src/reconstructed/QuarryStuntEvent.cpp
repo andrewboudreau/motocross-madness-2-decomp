@@ -162,17 +162,17 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
     if (g_TrackGame->UnknownFunction521cd0()) {
         int i;
         for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].field_0x00].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].field_0x00].field_0xc4 <= g_TrackGame->proCircuit->maxModelKind)
                 players++;
         }
         for (i = 0; i < g_TrackGame->ui->riderCount; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].field_0xc4 <= g_TrackGame->proCircuit->maxModelKind)
                 opponents++;
         }
-        if (players >= g_TrackGame->field_0x3444->field_0x460)
-            players = g_TrackGame->field_0x3444->field_0x460;
-        if (opponents >= g_TrackGame->field_0x3444->field_0x460)
-            opponents = g_TrackGame->field_0x3444->field_0x460;
+        if (players >= g_TrackGame->proCircuit->racerCount)
+            players = g_TrackGame->proCircuit->racerCount;
+        if (opponents >= g_TrackGame->proCircuit->racerCount)
+            opponents = g_TrackGame->proCircuit->racerCount;
     } else {
         if (g_TrackGame->field_0x18 == 1) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4)
@@ -269,7 +269,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
         sprintf(message, "TextQueueOverlay not created.\n");
 
     if (textQueue) {
-        if (g_TrackGame->mode.raceSettings.cameraView == 1 || g_TrackGame->mode.raceSettings.cameraView == 5)
+        if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5)
             g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.raceSettings.field_0x34);
         else

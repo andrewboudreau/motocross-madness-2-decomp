@@ -210,7 +210,7 @@ struct UnknownTrackGameModeEntry {
 // the copies whole and assigns +0x29e4 to +0x27f8 (rep movsd, 0x7b dwords).
 struct UnknownTrackGameModeSettings {
     int raceMode;                             // +0x00 EventManager 0x0045e600 compares it with 2
-    int cameraView;                           // +0x04 selects KrustyBikeCamera's view (slot 10)
+    int eventType;                            // +0x04 event type (SPEventDlg EventTypeDropDown; ZoneReport sends it plus one); picks the event object
     int series;                               // +0x08 series (SelectGamePicProcs.cpp; uiinfo.cpp 0x005240e0)
     int field_0x0c;                           // cleared by EventManager 0x0045e520
     int treeCollision;                        // +0x10 tree collision (SelectGamePicProcs.cpp)
@@ -665,7 +665,7 @@ public:
     void SetMenuOpen(int open, int id, int sound);
 
     // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
-    // mode.field_0x27f8.field_0x04.
+    // mode.raceSettings.eventType.
     TrackGameViewOwner* field_0x558;
     TrackGameViewOwner* field_0x55c;
     TrackGameViewOwner* field_0x560;
@@ -699,7 +699,7 @@ public:
     int field_0x3438;
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;
-    UnknownTrackGameObject3444* field_0x3444;
+    UnknownTrackGameObject3444* proCircuit;   // +0x3444 the pro circuit career (ProCircuit.h)
     char careerFile[0x34c8 - 0x3448];         // +0x3448: the pro circuit career file loaded/saved (ProCircuitProcs.cpp)
     int screenSaverWasActive;
 };

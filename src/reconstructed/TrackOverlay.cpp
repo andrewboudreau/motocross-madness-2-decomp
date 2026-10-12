@@ -410,7 +410,7 @@ int StatsOverlay::UnknownFunction519880(int value)
 // 0x005198a0: redraws the panel for the view mode; 0 when that failed.
 int StatsOverlay::Redraw()
 {
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 0:
         if (!DrawStandings())
             goto fail;
@@ -461,7 +461,7 @@ int StatsOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
-        switch (g_TrackGame->mode.raceSettings.cameraView) {
+        switch (g_TrackGame->mode.raceSettings.eventType) {
         case 0:
             DrawTimeLeft();
             break;
@@ -1141,7 +1141,7 @@ int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
 // 0x0051bc60
 int RadarOverlay::DrawForViewMode()
 {
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 0:
         DrawRacers(0);
         break;
@@ -1343,7 +1343,7 @@ ChatOverlay::~ChatOverlay()
 // 0x0051d980
 void ChatOverlay::UnknownFunction51d980(int show)
 {
-    if (g_TrackGame->mode.raceSettings.cameraView == 0) {
+    if (g_TrackGame->mode.raceSettings.eventType == 0) {
         field_0x164 = show;
         NameOverlay* tag = nameTags[racerCount];
         if (tag) {
@@ -1483,7 +1483,7 @@ int ChatOverlay::UnknownVirtualSlot13()
                 nameTags[i]->UnknownVirtualSlot5();
         }
     }
-    if (g_TrackGame->mode.raceSettings.cameraView == 0)
+    if (g_TrackGame->mode.raceSettings.eventType == 0)
         RedrawNameLine();
     return 1;
 }

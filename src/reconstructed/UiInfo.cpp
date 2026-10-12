@@ -557,7 +557,7 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
 
 // 0x00523b70
 void TrackGameMode::CopyCurrentSeriesDirectory(char* name) {
-    CopySeriesDirectory((short)raceSettings.cameraView, (short)raceSettings.raceMode, name);
+    CopySeriesDirectory((short)raceSettings.eventType, (short)raceSettings.raceMode, name);
 }
 
 // 0x00523bb0

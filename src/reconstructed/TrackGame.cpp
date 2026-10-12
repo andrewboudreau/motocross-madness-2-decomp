@@ -131,7 +131,7 @@ TrackGame::TrackGame() {
     field_0x2e0 = 1.0f;
     field_0x3428 = 0;
     field_0x342c = 0;
-    field_0x3444 = 0;
+    proCircuit = 0;
     openLocalizedWebPageOnExit = 0;
     openStorePageOnExit = 0;
     g_DebugSocket = 0;
@@ -159,7 +159,7 @@ TrackGame::~TrackGame() {
         FreeLibrary(languageModule);
         languageModule = 0;
     }
-    delete field_0x3444;
+    delete proCircuit;
     delete g_DebugSocket;
     if (osVersion.platformId == kWindowsNtPlatform && screenSaverWasActive)
         SystemParametersInfoA(kSetScreenSaverActive, 1, 0, 2);
@@ -493,7 +493,7 @@ int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
 
 // 0x00521cd0
 int TrackGame::UnknownFunction521cd0() {
-    if (field_0x3444)
+    if (proCircuit)
         return ui->field_0x4a8 == 0;
     return 0;
 }

@@ -416,7 +416,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             } else {
                                 field_0x1b4 = UnknownFunctionRacerCount();
                             }
-                            int camera = g_TrackGame->mode.raceSettings.cameraView;
+                            int camera = g_TrackGame->mode.raceSettings.eventType;
                             if (camera == 0 || (camera == 4 && g_TrackGame->mode.raceSettings.field_0x148)) {
                                 if (field_0x1b0 % 20 == 0) {
                                     field_0x3fb = true;
@@ -537,7 +537,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                                 field_0x06c->field_0x210 = 0;
                             }
                         }
-                        switch (g_TrackGame->mode.raceSettings.cameraView) {
+                        switch (g_TrackGame->mode.raceSettings.eventType) {
                         case 2:
                             chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x564->field_0x64;
                             break;
@@ -558,7 +558,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     }
                 }
                 GameObject::UnknownVirtualSlot10(frameTime);
-                int camera = g_TrackGame->mode.raceSettings.cameraView;
+                int camera = g_TrackGame->mode.raceSettings.eventType;
                 if (camera == 3 || camera == 2 || camera == 5 || camera == 1 || camera == 0) {
                     Track* track = raceTrack;
                     if ((track != 0 || field_0x0c8 != 0 || camera == 0) && isRacing && !field_0x18b &&
@@ -891,7 +891,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 sprintf(text, "%s : %s", title, value);
                 UnknownMessage* message = new (__FILE__, 0xcdd) UnknownMessage(text, 3.25f);
                 TextQueueOverlay* overlay;
-                switch (g_TrackGame->mode.raceSettings.cameraView) {
+                switch (g_TrackGame->mode.raceSettings.eventType) {
                 case 2:
                     overlay = g_TrackGame->field_0x564->field_0x6c;
                     if (overlay != 0 && message != 0) {

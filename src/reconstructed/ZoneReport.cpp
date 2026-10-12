@@ -61,7 +61,7 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         if (eventTypeIndex == -1)
             *flags &= ~3;
         else
-            g_TrackGame->mode.raceSettings.cameraView = eventTypeIndex;
+            g_TrackGame->mode.raceSettings.eventType = eventTypeIndex;
         g_TrackGame->mode.raceSettings.field_0x34 = trackVariant;
         if (eventTypeLocation != -1)
             strcpy(g_TrackGame->mode.raceSettings.trackName, trackName);
@@ -132,10 +132,10 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
     int i;
     int j;
     if (g_TrackGame->network->lobbyConnected) {
-        raceStatus.eventType = g_TrackGame->mode.raceSettings.cameraView + 1;
+        raceStatus.eventType = g_TrackGame->mode.raceSettings.eventType + 1;
         longest = 0;
         i = 0;
-        eventTypeIndex = g_TrackGame->mode.raceSettings.cameraView;
+        eventTypeIndex = g_TrackGame->mode.raceSettings.eventType;
         strcpy(trackName, g_TrackGame->mode.raceSettings.trackName);
         trackVariant = g_TrackGame->mode.raceSettings.field_0x34;
         raceStatus.laps = g_TrackGame->mode.raceSettings.lapCount;
@@ -149,7 +149,7 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
             players[i].position = raceStatus.records[i].position;
             strcpy(players[i].name, g_TrackGame->eventManager->results[i].name);
             if (g_TrackGame->eventManager->results[i].finished) {
-                if (g_TrackGame->mode.raceSettings.cameraView != 0 && g_TrackGame->mode.raceSettings.cameraView != 4)
+                if (g_TrackGame->mode.raceSettings.eventType != 0 && g_TrackGame->mode.raceSettings.eventType != 4)
                     players[i].score = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
                 else
                     players[i].score = (int)g_TrackGame->eventManager->results[i].score;

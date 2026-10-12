@@ -88,9 +88,9 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else {
             g_TrackGame->ui->OpenMenu(0xbba);
         }
-        if (g_TrackGame->field_0x3444) {
-            delete g_TrackGame->field_0x3444;
-            g_TrackGame->field_0x3444 = 0;
+        if (g_TrackGame->proCircuit) {
+            delete g_TrackGame->proCircuit;
+            g_TrackGame->proCircuit = 0;
         }
         FindControl("MenuReplay", 0)->SetEnabled(0);
         FindControl("MenuHighScore", 0)->SetEnabled(0);
@@ -182,7 +182,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButStuntQuarry", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.savedSettings.cameraView = 0;
+            g_TrackGame->mode.savedSettings.eventType = 0;
             g_TrackGame->mode.savedSettings.series = 0;
             g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\Quarries";
             SinglePlayerDlg* dialog = new(__FILE__, 352) SinglePlayerDlg;
@@ -192,7 +192,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButBaja", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.savedSettings.cameraView = 1;
+            g_TrackGame->mode.savedSettings.eventType = 1;
             g_TrackGame->mode.savedSettings.series = 1;
             g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\Baja";
             SinglePlayerDlg* dialog = new(__FILE__, 360) SinglePlayerDlg;
@@ -202,7 +202,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButSupercross", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.savedSettings.cameraView = 3;
+            g_TrackGame->mode.savedSettings.eventType = 3;
             g_TrackGame->mode.savedSettings.series = 3;
             g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\SX";
             SinglePlayerDlg* dialog = new(__FILE__, 368) SinglePlayerDlg;
@@ -212,7 +212,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButEnduro", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.savedSettings.cameraView = 5;
+            g_TrackGame->mode.savedSettings.eventType = 5;
             g_TrackGame->mode.savedSettings.series = 5;
             g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\Enduro";
             SinglePlayerDlg* dialog = new(__FILE__, 376) SinglePlayerDlg;
@@ -222,7 +222,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButNationals", event->controlName)) {
             if (movieControl)
                 movieControl->moviePlayer->Stop();
-            g_TrackGame->mode.savedSettings.cameraView = 2;
+            g_TrackGame->mode.savedSettings.eventType = 2;
             g_TrackGame->mode.savedSettings.series = 2;
             g_TrackGame->mode.currentSeriesDirectory = (int)"Teraform\\National";
             SinglePlayerDlg* dialog = new(__FILE__, 384) SinglePlayerDlg;
@@ -465,7 +465,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         ClearStatsLists(event);
         int i;
         UIListBox* list;
-        switch (g_TrackGame->mode.raceSettings.cameraView) {
+        switch (g_TrackGame->mode.raceSettings.eventType) {
         case 1:
         case 2:
         case 3:
@@ -538,7 +538,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
                 fread(&header, sizeof(header), 1, file);
                 fclose(file);
                 g_TrackGame->mode.raceSettings = header.field_0x34;
-                g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.cameraView);
+                g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.eventType);
                 g_TrackGame->field_0x3428 = 1;
                 g_TrackGame->field_0x342c = 1;
                 UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;
@@ -583,7 +583,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
     ClearStatsLists(event);
     int i;
     UIListBox* list;
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 1:
     case 2:
     case 3:

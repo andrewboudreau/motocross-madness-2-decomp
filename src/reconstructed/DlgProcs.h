@@ -323,8 +323,8 @@ struct UnknownRecordFileHeader {
     unsigned char field_0x00[0x10];
     char description[0x20];                   // +0x10: description
     float lengthSeconds;                      // +0x30: length in seconds
-    int eventType;                            // +0x34: the event type (TrackGame+0x2d70)
-    int raceKind;                             // +0x38: the race kind (TrackGame+0x2d74)
+    int raceMode;                             // +0x34: the race mode (TrackGame+0x2d70)
+    int eventType;                            // +0x38: the event type (TrackGame+0x2d74)
     int series;                               // +0x3c: the series (TrackGame+0x2d78)
     unsigned char field_0x40[0x54 - 0x40];
     int laps;                                 // +0x54: laps (TrackGame+0x2d90)

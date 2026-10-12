@@ -195,11 +195,11 @@ static inline int PodiumIsZero(const Vector3& v) {
 // is the last when there is one).
 static inline int PodiumIsLastRace(UnknownTrackGameObject3444* circuit) {
     int last;
-    if (circuit->field_0x1285[circuit->field_0x40].field_0x08)
-        last = circuit->field_0x1285[circuit->field_0x40].field_0x08 - 1;
+    if (circuit->schedules[circuit->series].bonusTrack)
+        last = circuit->schedules[circuit->series].bonusTrack - 1;
     else
-        last = circuit->field_0x1285[circuit->field_0x40].field_0x04;
-    return circuit->field_0x44 == last;
+        last = circuit->schedules[circuit->series].trackCount;
+    return circuit->raceIndex == last;
 }
 
 // 0x0045d480
@@ -207,7 +207,7 @@ int EventManager::CreatePodiumScene() {
     char name[0x80];
     char path[0x104];
     char message[0x184];
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     TrackGameViewOwner* owner = FindRaceMode();
     UnknownKrustyBikeView* view = FindRaceView();
     int iterator = 0;
@@ -246,7 +246,7 @@ int EventManager::CreatePodiumScene() {
         podiumPosition = grid->field_0x8c;
         direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
     } else {
-        if (g_TrackGame->mode.raceSettings.cameraView == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
+        if (g_TrackGame->mode.raceSettings.eventType == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetPosition(&podiumPosition);
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetAxes(&direction, &up);
         } else {
@@ -317,7 +317,7 @@ int EventManager::CreatePodiumScene() {
         while (racer && ((UnknownPodiumRacer*)racer)->field_0x784 != place)
             racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
         if (g_TrackGame->UnknownFunction521cd0()) {
-            if ((g_TrackGame->field_0x3444->field_0x464 & 2) &&
+            if ((g_TrackGame->proCircuit->careerFlags & 2) &&
                 racer == PODIUM_OWNER(owner)->field_0x34->localRacer)
                 sprintf(name, "%s\\Winnerd.mcf", "Res");
             else

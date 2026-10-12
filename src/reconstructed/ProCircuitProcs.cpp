@@ -96,11 +96,11 @@ int CompareCashDescending(const void* a, const void* b)
 // 0x004d4ba0
 void OpenCareerDialog()
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
-    if (circuit->field_0x464 & 8) {
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    if (circuit->careerFlags & 8) {
         PCCompleteDlg* dialog = new(__FILE__, 78) PCCompleteDlg;
         g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
-    } else if (circuit->field_0x44 == 1) {
+    } else if (circuit->raceIndex == 1) {
         PCNewEventDlg* dialog = new(__FILE__, 80) PCNewEventDlg;
         g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     } else {
@@ -147,9 +147,9 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
             dialog->SetAnswerTargets(newCareerName, &chosenDifficulty, &chosenBikeClass, &chosenOpponentsRow);
         } else if (_stricmp("ButContinue", event->controlName) == 0) {
             int row = static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1);
-            g_TrackGame->field_0x3444 = new(__FILE__, 142) UnknownTrackGameObject3444;
+            g_TrackGame->proCircuit = new(__FILE__, 142) UnknownTrackGameObject3444;
             strcpy(g_TrackGame->careerFile, careerFiles[row]);
-            if (g_TrackGame->field_0x3444->LoadSaved(g_TrackGame->careerFile)) {
+            if (g_TrackGame->proCircuit->LoadSaved(g_TrackGame->careerFile)) {
                 PCCentralDlg* dialog = new(__FILE__, 146) PCCentralDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             }
@@ -171,7 +171,7 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
         break;
     case 9:
         if (event->code == 0x3e9) {
-            g_TrackGame->field_0x3444 = new(__FILE__, 182) UnknownTrackGameObject3444;
+            g_TrackGame->proCircuit = new(__FILE__, 182) UnknownTrackGameObject3444;
             int difficulty;
             switch (chosenDifficulty) {
             case 1:
@@ -184,7 +184,7 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
                 difficulty = 3;
                 break;
             }
-            g_TrackGame->field_0x3444->StartCareer(newCareerName, difficulty, chosenBikeClass,
+            g_TrackGame->proCircuit->StartCareer(newCareerName, difficulty, chosenBikeClass,
                                                                         chosenOpponentsRow + 1);
             char path[128];
             // The first free CircuitNNN.pc.
@@ -193,7 +193,7 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
             while (UnknownFileExists(path))
                 sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, ++number);
             strcpy(g_TrackGame->careerFile, path);
-            g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
+            g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             EndDialog(0);
             PCNewEventDlg* dialog = new(__FILE__, 214) PCNewEventDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
@@ -278,19 +278,19 @@ void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
 {
     char name[64];
     char text[128];
-    int finished = (circuit->field_0x464 >> 3) & 1;
-    int failed = (circuit->field_0x464 >> 2) & 1;
+    int finished = (circuit->careerFlags >> 3) & 1;
+    int failed = (circuit->careerFlags >> 2) & 1;
     const char* prefix = finished || failed ? "LstDone" : "Lst";
 
     sprintf(name, "%s%s", prefix, "Name");
-    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(circuit->field_0x00, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(circuit->careerName, row, 0);
 
     sprintf(name, "%s%s", prefix, "Rank");
-    sprintf(text, "%d / %d", circuit->field_0x465[0].field_0x18.field_0x10, circuit->field_0x460);
+    sprintf(text, "%d / %d", circuit->racers[0].field_0x18.field_0x10, circuit->racerCount);
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Class");
-    switch (circuit->field_0x4c) {
+    switch (circuit->bikeClassRule) {
     case 1:
         strcpy(text, "125");
         break;
@@ -318,11 +318,11 @@ void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Points");
-    _itoa(circuit->field_0x465[0].field_0x18.field_0x00, text, 10);
+    _itoa(circuit->racers[0].field_0x18.field_0x00, text, 10);
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Cash");
-    sprintf(text, "$%d", circuit->field_0x465[0].field_0x30);
+    sprintf(text, "$%d", circuit->racers[0].money);
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     if (finished || failed) {
@@ -434,13 +434,13 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
-            g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
+            g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             PCStartupDlg* dialog = new(__FILE__, 488) PCStartupDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (_stricmp("Start", event->controlName) == 0 || _stricmp("Practice", event->controlName) == 0) {
-            UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+            UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
             g_TrackGame->ui->HideScene();
             g_TrackGame->mode.ghostFile[0] = 0;
             g_TrackGame->mode.raceSettings.field_0x28 = 0;
@@ -452,23 +452,23 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
                 standingsPage->UpdateBoundValues(1);
             g_TrackGame->eventManager->ResetEntries();
             if (_stricmp("Start", event->controlName) == 0) {
-                g_TrackGame->mode.raceSettings.cameraView = circuit->field_0x40;
+                g_TrackGame->mode.raceSettings.eventType = circuit->series;
                 g_TrackGame->mode.raceSettings.raceMode = 1;
-                g_TrackGame->mode.raceSettings.lapCount = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
-                g_TrackGame->mode.raceSettings.aiRacerCount = circuit->field_0x460 - 1;
+                g_TrackGame->mode.raceSettings.lapCount = circuit->schedules[circuit->series].laps;
+                g_TrackGame->mode.raceSettings.aiRacerCount = circuit->racerCount - 1;
             } else {
-                g_TrackGame->mode.raceSettings.cameraView = circuit->field_0x40;
+                g_TrackGame->mode.raceSettings.eventType = circuit->series;
                 g_TrackGame->mode.raceSettings.raceMode = 0;
                 g_TrackGame->mode.raceSettings.aiRacerCount = 0;
             }
-            g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.cameraView);
+            g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.eventType);
             char name[128];
-            strcpy(name, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
+            strcpy(name, circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].trackKey);
             char* extension = strrchr(name, '.');
             if (extension)
                 *extension = 0;
             strcpy(g_TrackGame->mode.raceSettings.trackName, name);
-            if (circuit->field_0x40 == 1 || circuit->field_0x40 == 5)
+            if (circuit->series == 1 || circuit->series == 5)
                 g_TrackGame->mode.raceSettings.field_0x34 = 1;
             else
                 g_TrackGame->mode.raceSettings.field_0x34 = 0;
@@ -540,7 +540,7 @@ void PCCentralDlg::OpenPage(int page)
 // 0x004d7f40
 void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     if (event->kind != kDialogInit)
         return;
     const char* directory;
@@ -548,14 +548,14 @@ void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
     char text[128];
     char image[128];
     char path[260];
-    int purse = (int)(circuit->field_0x1229[circuit->field_0x40] * circuit->field_0x1241);
-    sprintf(text, "$%d", circuit->field_0x1229[circuit->field_0x40]);
+    int purse = (int)(circuit->entryFees[circuit->series] * circuit->purseMultiplier);
+    sprintf(text, "$%d", circuit->entryFees[circuit->series]);
     FindControl("TxtNextFee", 12)->SetText(text);
     sprintf(text, "$%d", purse);
     FindControl("TxtNextPurse", 12)->SetText(text);
     FindControl("TxtNextTrack", 12)
-        ->SetText(circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x04);
-    switch (circuit->field_0x40) {
+        ->SetText(circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].displayName);
+    switch (circuit->series) {
     case 5:
         g_TrackGame->LoadResourceString(0x13f0, text, 128);
         break;
@@ -570,28 +570,28 @@ void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
         break;
     }
     FindControl("TxtNextType", 12)->SetText(text);
-    sprintf(text, "%d/%d", circuit->field_0x44,
-            circuit->field_0x1285[circuit->field_0x40].field_0x08 ? circuit->field_0x1285[circuit->field_0x40].field_0x08 - 1
-                                                                  : circuit->field_0x1285[circuit->field_0x40].field_0x04);
+    sprintf(text, "%d/%d", circuit->raceIndex,
+            circuit->schedules[circuit->series].bonusTrack ? circuit->schedules[circuit->series].bonusTrack - 1
+                                                                  : circuit->schedules[circuit->series].trackCount);
     FindControl("TxtNextRace", 12)->SetText(text);
-    sprintf(text, "$%d", circuit->field_0x465[0].field_0x30);
+    sprintf(text, "$%d", circuit->racers[0].money);
     FindControl("TxtCash", 12)->SetText(text);
     sprintf(text, "$%d", circuit->field_0x454);
     FindControl("TxtFees", 12)->SetText(text);
-    sprintf(text, "$%d", circuit->field_0x465[0].field_0x18.field_0x08);
+    sprintf(text, "$%d", circuit->racers[0].field_0x18.field_0x08);
     FindControl("TxtRepairs", 12)->SetText(text);
-    sprintf(text, "$%d", circuit->field_0x465[0].field_0x18.field_0x0c);
+    sprintf(text, "$%d", circuit->racers[0].field_0x18.field_0x0c);
     FindControl("TxtMedical", 12)->SetText(text);
     UIControl* announcement = FindControl("TxtAnnouncement", 12);
     announcement->wordWrap = 1;
-    announcement->SetText(circuit->field_0x54);
+    announcement->SetText(circuit->messageText);
 
     picture = FindControl("NextTrackPic", 5);
-    strcpy(image, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x08);
+    strcpy(image, circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].keyCopy);
     char* extension = strrchr(image, '.');
     if (extension)
         *extension = 0;
-    int series = circuit->field_0x40;
+    int series = circuit->series;
     switch (series) {
     case 5:
         directory = "Teraform\\Enduro";
@@ -611,10 +611,10 @@ void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
         break;
     }
     g_TrackGame->mode.FindFileDirectory(
-        (int)directory, circuit->field_0x1285[series].field_0x00[circuit->field_0x44 - 1].field_0x00, "env", path);
+        (int)directory, circuit->schedules[series].tracks[circuit->raceIndex - 1].trackKey, "env", path);
     g_TrackGame->sceneObject->SetSceneDirectory(path);
     g_TrackGame->sceneObject->SelectScene(
-        circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00, "scn", 0);
+        circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].trackKey, "scn", 0);
     picture->SetImageFile(0, image);
 }
 
@@ -623,7 +623,7 @@ void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     if (event->kind != kDialogInit)
         return;
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
     UIListBox* name = static_cast<UIListBox*>(FindControl("LstName", 3));
     UIListBox* points = static_cast<UIListBox*>(FindControl("LstPoints", 3));
@@ -632,18 +632,18 @@ void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
     UIListBox* winnings = static_cast<UIListBox*>(FindControl("LstWinnings", 3));
     UIListBox* expenses = static_cast<UIListBox*>(FindControl("LstExpenses", 3));
     char text[128];
-    for (int i = 0; i < circuit->field_0x460; i++) {
-        _itoa(circuit->field_0x465[i].field_0x18.field_0x10, text, 10);
+    for (int i = 0; i < circuit->racerCount; i++) {
+        _itoa(circuit->racers[i].field_0x18.field_0x10, text, 10);
         rank->AddRow(text, i, 0);
-        name->AddRow(circuit->field_0x465[i].field_0xf8, i, 0);
-        _itoa(circuit->field_0x465[i].field_0x18.field_0x00, text, 10);
+        name->AddRow(circuit->racers[i].racerName, i, 0);
+        _itoa(circuit->racers[i].field_0x18.field_0x00, text, 10);
         points->AddRow(text, i, 0);
-        bike->AddRow(circuit->field_0x465[i].field_0x118, i, 0);
-        sprintf(text, "$%d", circuit->field_0x465[i].field_0x30);
+        bike->AddRow(circuit->racers[i].bikeDisplayName, i, 0);
+        sprintf(text, "$%d", circuit->racers[i].money);
         cash->AddRow(text, i, 0);
-        sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x04 + circuit->field_0x465[i].field_0x18.field_0x14);
+        sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x04 + circuit->racers[i].field_0x18.field_0x14);
         winnings->AddRow(text, i, 0);
-        sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x08 + circuit->field_0x465[i].field_0x18.field_0x0c +
+        sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x08 + circuit->racers[i].field_0x18.field_0x0c +
                                  circuit->field_0x454);
         expenses->AddRow(text, i, 0);
     }
@@ -665,7 +665,7 @@ void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
 // 0x004d8660
 void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
@@ -677,18 +677,18 @@ void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
         UIListBox* medical = static_cast<UIListBox*>(FindControl("LstMedical", 3));
         PayOutRace();
         char text[128];
-        for (int i = 0; i < g_TrackGame->field_0x3444->field_0x460; i++) {
-            _itoa(g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x10, text, 10);
+        for (int i = 0; i < g_TrackGame->proCircuit->racerCount; i++) {
+            _itoa(g_TrackGame->proCircuit->racers[i].field_0x00.field_0x10, text, 10);
             rank->AddRow(text, i, 0);
-            name->AddRow(g_TrackGame->field_0x3444->field_0x465[i].field_0xf8, i, 0);
-            _itoa(g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x00, text, 10);
+            name->AddRow(g_TrackGame->proCircuit->racers[i].racerName, i, 0);
+            _itoa(g_TrackGame->proCircuit->racers[i].field_0x00.field_0x00, text, 10);
             points->AddRow(text, i, 0);
-            bike->AddRow(g_TrackGame->field_0x3444->field_0x465[i].field_0x118, i, 0);
-            sprintf(text, "$%d", g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x04);
+            bike->AddRow(g_TrackGame->proCircuit->racers[i].bikeDisplayName, i, 0);
+            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].field_0x00.field_0x04);
             winnings->AddRow(text, i, 0);
-            sprintf(text, "$%d", g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x08);
+            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].field_0x00.field_0x08);
             repairs->AddRow(text, i, 0);
-            sprintf(text, "$%d", g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x0c);
+            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].field_0x00.field_0x0c);
             medical->AddRow(text, i, 0);
         }
         static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
@@ -704,28 +704,28 @@ void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
         static_cast<UIButton*>(FindControl("ButMedical", 1))->SetSortList(medical);
         medical->SetSortCompare(CompareCashAscending);
         rank->Sort(1);
-        g_TrackGame->field_0x3444->AdvanceAfterRace();
-        g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
+        g_TrackGame->proCircuit->AdvanceAfterRace();
+        g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
         break;
     }
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
-            int bonus = circuit->field_0x44 == circuit->field_0x1285[circuit->field_0x40].field_0x08;
-            if (bonus && circuit->field_0x465[0].field_0x18.field_0x10 == 1) {
+            int bonus = circuit->raceIndex == circuit->schedules[circuit->series].bonusTrack;
+            if (bonus && circuit->racers[0].field_0x18.field_0x10 == 1) {
                 PCBonusTrackDlg* dialog = new(__FILE__, 1368) PCBonusTrackDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            } else if (circuit->field_0x465[0].field_0x30 <
-                       circuit->field_0x1229[g_TrackGame->field_0x3444->field_0x40]) {
-                if (!(circuit->field_0x464 & 1)) {
+            } else if (circuit->racers[0].money <
+                       circuit->entryFees[g_TrackGame->proCircuit->series]) {
+                if (!(circuit->careerFlags & 1)) {
                     PCBailoutDlg* dialog = new(__FILE__, 1374) PCBailoutDlg;
                     guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-                    circuit->field_0x464 |= 1;
-                } else if (!(circuit->field_0x464 & 2)) {
+                    circuit->careerFlags |= 1;
+                } else if (!(circuit->careerFlags & 2)) {
                     PCBunnyDlg* dialog = new(__FILE__, 1378) PCBunnyDlg;
                     guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-                    circuit->field_0x464 |= 2;
+                    circuit->careerFlags |= 2;
                 } else {
-                    circuit->field_0x464 |= 4;
+                    circuit->careerFlags |= 4;
                     PCFailedDlg* dialog = new(__FILE__, 1383) PCFailedDlg;
                     guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                 }
@@ -754,7 +754,7 @@ void PCFailedDlg::HandleEvent(UnknownDialogEvent* event)
     UIControl* label;
     switch (event->kind) {
     case kDialogInit: {
-        g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
+        g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
         UIControl* description = FindControl("TxtDescription", 12);
         description->wordWrap = 1;
         description->SetTextFromResource(g_TrackGame->resourceInstance, 0x1464);
@@ -780,7 +780,7 @@ void PCFailedDlg::HandleEvent(UnknownDialogEvent* event)
 // 0x004d94e0
 void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
@@ -791,18 +791,18 @@ void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
         UIListBox* repairs = static_cast<UIListBox*>(FindControl("LstRepairs", 3));
         UIListBox* medical = static_cast<UIListBox*>(FindControl("LstMedical", 3));
         char text[128];
-        for (int i = 0; i < circuit->field_0x460; i++) {
-            _itoa(circuit->field_0x465[i].field_0x18.field_0x10, text, 10);
+        for (int i = 0; i < circuit->racerCount; i++) {
+            _itoa(circuit->racers[i].field_0x18.field_0x10, text, 10);
             rank->AddRow(text, i, 0);
-            name->AddRow(circuit->field_0x465[i].field_0xf8, i, 0);
-            _itoa(circuit->field_0x465[i].field_0x18.field_0x00, text, 10);
+            name->AddRow(circuit->racers[i].racerName, i, 0);
+            _itoa(circuit->racers[i].field_0x18.field_0x00, text, 10);
             points->AddRow(text, i, 0);
-            bike->AddRow(circuit->field_0x465[i].field_0x118, i, 0);
-            sprintf(text, "$%d", circuit->field_0x465[i].field_0x30);
+            bike->AddRow(circuit->racers[i].bikeDisplayName, i, 0);
+            sprintf(text, "$%d", circuit->racers[i].money);
             cash->AddRow(text, i, 0);
-            sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x08);
+            sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x08);
             repairs->AddRow(text, i, 0);
-            sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x0c);
+            sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x0c);
             medical->AddRow(text, i, 0);
         }
         static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
@@ -833,12 +833,12 @@ void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
 // 0x004d9fd0
 void PCNewEventDlg::HandleEvent(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         int description;
         const char* image;
-        switch (circuit->field_0x40) {
+        switch (circuit->series) {
         case 5:
             description = 0x1465;
             image = "WinScreen";
@@ -879,18 +879,18 @@ void PCNewEventDlg::HandleEvent(UnknownDialogEvent* event)
 // 0x004da1b0
 void PCCompleteDlg::HandleEvent(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
     switch (event->kind) {
     case kDialogInit: {
         char rank[1024];
         char text[1024];
         char message[2048];
-        g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
+        g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
         UnknownSetText(FindControl("TitleText", 12), 0x145d);
         UIControl* description = FindControl("TxtDescription", 12);
         g_TrackGame->LoadResourceString(0x145e, text, 1023);
         strcpy(rank, "");
-        if (circuit->field_0x465[0].field_0x18.field_0x10 == 1)
+        if (circuit->racers[0].field_0x18.field_0x10 == 1)
             g_TrackGame->LoadResourceString(0x145f, rank, 1023);
         sprintf(message, "%s\n%s", text, rank);
         description->wordWrap = 1;
@@ -932,7 +932,7 @@ void PCCentralBikeRiderDlg::ApplyChosenRider()
 {
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     riderChanged = 1;
-    g_TrackGame->field_0x3444->field_0x458 = list->GetRowData(-1);
+    g_TrackGame->proCircuit->riderRow = list->GetRowData(-1);
 }
 
 // 0x004d7900: shows the chosen bike and loads its class's garage defaults.
@@ -968,24 +968,24 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
                 dialogBackground->MarkAllDirty();
         }
     }
-    g_TrackGame->field_0x3444->field_0x45c = bikes->GetRowData(-1);
+    g_TrackGame->proCircuit->bikeRow = bikes->GetRowData(-1);
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
-        g_TrackGame->field_0x3444->field_0x465[0].field_0x138 = g_UnknownGlobal56cb6c[size];
-        g_TrackGame->field_0x3444->field_0x465[0].field_0x13c = size == 2 || size == 4 ? 1 : 0;
+        g_TrackGame->proCircuit->racers[0].engineSize = g_UnknownGlobal56cb6c[size];
+        g_TrackGame->proCircuit->racers[0].field_0x13c = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
     } else {
         int row = bikes->GetRowData(-1);
-        g_TrackGame->field_0x3444->field_0x465[0].field_0x138 =
+        g_TrackGame->proCircuit->racers[0].engineSize =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
-        g_TrackGame->field_0x3444->field_0x465[0].field_0x13c =
+        g_TrackGame->proCircuit->racers[0].field_0x13c =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].field_0x90;
-        int bikeClass = UnknownBikeClassOf(g_TrackGame->field_0x3444->field_0x465[0].field_0x138);
+        int bikeClass = UnknownBikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
-    UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->field_0x3444->field_0x465[0].field_0x138;
-    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->field_0x3444->field_0x465[0].field_0x13c;
+    UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->proCircuit->racers[0].engineSize;
+    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->proCircuit->racers[0].field_0x13c;
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
     _itoa(g_TrackGame->mode.field_0x1bcc, text, 10);
     plate->SetEditText(text);
@@ -996,20 +996,20 @@ void PCCentralBikeRiderDlg::SyncValues(int apply)
 {
     if (!apply)
         return;
-    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x38, "");
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeModel, "");
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     int bike = list->GetRowData(-1);
-    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x38,
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeModel,
            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
                [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].model].modelName);
-    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x78,
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeName,
            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48);
-    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x118,
+    strcpy(g_TrackGame->proCircuit->racers[0].bikeDisplayName,
            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].displayName);
-    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0xb8, "");
+    strcpy(g_TrackGame->proCircuit->racers[0].riderModel, "");
     list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     int rider = list->GetRowData(-1);
-    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0xb8,
+    strcpy(g_TrackGame->proCircuit->racers[0].riderModel,
            ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[rider].modelName);
 }
 
@@ -1028,17 +1028,17 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         FillBikeRiderLists();
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
-        if (g_TrackGame->field_0x3444->field_0x4c == 1 || g_TrackGame->field_0x3444->field_0x4c == 3)
+        if (g_TrackGame->proCircuit->bikeClassRule == 1 || g_TrackGame->proCircuit->bikeClassRule == 3)
             list->AddRow("125cc 2-stroke", UnknownBikeClassOf(125), 0);
-        if (g_TrackGame->field_0x3444->field_0x4c == 2 || g_TrackGame->field_0x3444->field_0x4c == 3) {
+        if (g_TrackGame->proCircuit->bikeClassRule == 2 || g_TrackGame->proCircuit->bikeClassRule == 3) {
             list->AddRow("250cc 2-stroke", UnknownBikeClassOf(250), 0);
             list->AddRow("400cc 4-stroke", UnknownBikeClassOf(400), 0);
         }
-        if (g_TrackGame->field_0x3444->field_0x4c == 3) {
+        if (g_TrackGame->proCircuit->bikeClassRule == 3) {
             list->AddRow("500cc 2-stroke", UnknownBikeClassOf(500), 0);
             list->AddRow("600cc 4-stroke", UnknownBikeClassOf(600), 0);
         }
-        list->SelectRowByData(UnknownBikeClassOf(g_TrackGame->field_0x3444->field_0x465[0].field_0x138));
+        list->SelectRowByData(UnknownBikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize));
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
         edit->SetAcceptedCharacters("0123456789");
         g_TrackGame->ui->ShowScene(this);
@@ -1152,7 +1152,7 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     list->RemoveAllRows();
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-        int rule = g_TrackGame->field_0x3444->field_0x4c;
+        int rule = g_TrackGame->proCircuit->bikeClassRule;
         if (rule != 3 && !((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x88) {
             int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize);
             if (bikeClass != 0) {
@@ -1165,11 +1165,11 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
             }
         }
         UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model];
-        if (model->modelKind > g_TrackGame->field_0x3444->field_0x48)
+        if (model->modelKind > g_TrackGame->proCircuit->maxModelKind)
             continue;
         sprintf(text, "%s %s", model->displayName, ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].displayName);
         list->AddRow(text, i, 0);
-        if (g_TrackGame->field_0x3444->field_0x45c == i)
+        if (g_TrackGame->proCircuit->bikeRow == i)
             bike = i;
     }
     if (bike)
@@ -1181,9 +1181,9 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     list->RemoveAllRows();
     for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
         UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j];
-        if (entry->modelKind <= g_TrackGame->field_0x3444->field_0x48 || entry->field_0xc0) {
+        if (entry->modelKind <= g_TrackGame->proCircuit->maxModelKind || entry->field_0xc0) {
             list->AddRow(entry->displayName, j, 0);
-            if (g_TrackGame->field_0x3444->field_0x458 == j)
+            if (g_TrackGame->proCircuit->riderRow == j)
                 rider = j;
         }
     }

@@ -46,33 +46,33 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
     if (stream->Open("PCTables.pb", "r", 0)) {
         block.Attach((UnknownParameterStream*)stream, 0, 1);
         block.SelectSection("ProCircuit");
-        block.GetInt("StartingCapital", 5000, &field_0x1225);
-        block.GetInt("EnduroFee", 300, &field_0x1229[5]);
-        block.GetInt("BajaFee", 500, &field_0x1229[1]);
-        block.GetInt("NationalsFee", 1500, &field_0x1229[2]);
-        block.GetInt("SupercrossFee", 2500, &field_0x1229[3]);
-        block.GetFloat("PurseMultiplier", 17.5f, &field_0x1241);
-        block.GetFloat("RepairCapPct", 0.1f, &field_0x1245);
-        block.GetFloat("MedicalCapPct", 0.05f, &field_0x1249);
-        block.GetFloat("StuntCapPct", 0.075f, &field_0x124d);
+        block.GetInt("StartingCapital", 5000, &startingCapital);
+        block.GetInt("EnduroFee", 300, &entryFees[5]);
+        block.GetInt("BajaFee", 500, &entryFees[1]);
+        block.GetInt("NationalsFee", 1500, &entryFees[2]);
+        block.GetInt("SupercrossFee", 2500, &entryFees[3]);
+        block.GetFloat("PurseMultiplier", 17.5f, &purseMultiplier);
+        block.GetFloat("RepairCapPct", 0.1f, &repairCapPct);
+        block.GetFloat("MedicalCapPct", 0.05f, &medicalCapPct);
+        block.GetFloat("StuntCapPct", 0.075f, &stuntCapPct);
         float total = 0.0f;
         for (int i = 0; i < 11; i++) {
             sprintf(key, "%d_PlacePct", i + 1);
-            block.GetFloat(key, 0.0f, &field_0x1251[i]);
-            total += field_0x1251[i];
+            block.GetFloat(key, 0.0f, &placePct[i]);
+            total += placePct[i];
         }
         if (total <= 1.0f)
-            field_0x1251[0] += 1.0f - total;
+            placePct[0] += 1.0f - total;
     } else {
-        field_0x1225 = 5000;
-        field_0x1229[5] = 300;
-        field_0x1229[1] = 500;
-        field_0x1229[2] = 1500;
-        field_0x1229[3] = 2500;
-        field_0x1241 = 17.5f;
-        field_0x1245 = 0.1f;
-        field_0x1249 = 0.05f;
-        field_0x124d = 0.075f;
+        startingCapital = 5000;
+        entryFees[5] = 300;
+        entryFees[1] = 500;
+        entryFees[2] = 1500;
+        entryFees[3] = 2500;
+        purseMultiplier = 17.5f;
+        repairCapPct = 0.1f;
+        medicalCapPct = 0.05f;
+        stuntCapPct = 0.075f;
         defaults[0] = 33.0f;
         defaults[1] = 23.0f;
         defaults[2] = 14.0f;
@@ -84,45 +84,45 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
         defaults[8] = 2.0f;
         for (int i = 0; i < 11; i++) {
             if (i < 9)
-                field_0x1251[i] = defaults[i];
+                placePct[i] = defaults[i];
             else
-                field_0x1251[i] = 0;
+                placePct[i] = 0;
         }
     }
 
-    field_0x1281 = 0;
-    field_0x127d = 0;
+    racerNameCount = 0;
+    racerNames = 0;
     FILE* file = fopen("ui\\PCNames.txt", "r");
     if (file) {
         while (fgets(line, 64, file)) {
             char* end = strchr(line, '\n');
             if (end)
                 *end = 0;
-            field_0x127d = (char**)DebugRealloc(field_0x127d, (field_0x1281 + 1) * 4, __FILE__, 85);
-            field_0x127d[field_0x1281] = (char*)DebugMalloc(strlen(line) + 1, __FILE__, 86);
-            strcpy(field_0x127d[field_0x1281], line);
-            field_0x1281++;
+            racerNames = (char**)DebugRealloc(racerNames, (racerNameCount + 1) * 4, __FILE__, 85);
+            racerNames[racerNameCount] = (char*)DebugMalloc(strlen(line) + 1, __FILE__, 86);
+            strcpy(racerNames[racerNameCount], line);
+            racerNameCount++;
         }
         fclose(file);
     }
 
     if (stream->Open("PCSched.pb", "r", 0)) {
         block.Attach((UnknownParameterStream*)stream, 0, 1);
-        field_0x1285[0].field_0x00 = 0;
-        field_0x1285[4].field_0x00 = 0;
+        schedules[0].tracks = 0;
+        schedules[4].tracks = 0;
         block.SelectSection("Enduro");
-        ReadSchedule(&block, &field_0x1285[5], "Teraform\\Enduro");
+        ReadSchedule(&block, &schedules[5], "Teraform\\Enduro");
         block.SelectSection("Baja");
-        ReadSchedule(&block, &field_0x1285[1], "Teraform\\Baja");
+        ReadSchedule(&block, &schedules[1], "Teraform\\Baja");
         block.SelectSection("Nationals");
-        ReadSchedule(&block, &field_0x1285[2], "Teraform\\National");
+        ReadSchedule(&block, &schedules[2], "Teraform\\National");
         block.SelectSection("Supercross");
-        ReadSchedule(&block, &field_0x1285[3], "Teraform\\SX");
+        ReadSchedule(&block, &schedules[3], "Teraform\\SX");
     } else {
         for (int i = 0; i < 6; i++) {
-            field_0x1285[i].field_0x00 = 0;
-            field_0x1285[i].field_0x04 = 0;
-            field_0x1285[i].field_0x08 = 0;
+            schedules[i].tracks = 0;
+            schedules[i].trackCount = 0;
+            schedules[i].bonusTrack = 0;
         }
     }
 
@@ -133,54 +133,54 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
 // 0x004d39f0
 UnknownTrackGameObject3444::~UnknownTrackGameObject3444()
 {
-    for (int i = 0; i < field_0x1281; i++)
-        DebugFree(field_0x127d[i], __FILE__, 139);
-    DebugFree(field_0x127d, __FILE__, 141);
+    for (int i = 0; i < racerNameCount; i++)
+        DebugFree(racerNames[i], __FILE__, 139);
+    DebugFree(racerNames, __FILE__, 141);
     for (int j = 0; j < 6; j++)
-        FreeSchedule(&field_0x1285[j]);
+        FreeSchedule(&schedules[j]);
 }
 
 // 0x004d3a60
 void UnknownTrackGameObject3444::FreeSchedule(UnknownProCircuitSchedule* schedule)
 {
-    if (schedule->field_0x00) {
-        for (int i = 0; i < schedule->field_0x04; i++) {
-            if (schedule->field_0x00[i].field_0x04)
-                DebugFree(schedule->field_0x00[i].field_0x04, __FILE__, 153);
-            if (schedule->field_0x00[i].field_0x00)
-                DebugFree(schedule->field_0x00[i].field_0x00, __FILE__, 154);
-            if (schedule->field_0x00[i].field_0x08)
-                DebugFree(schedule->field_0x00[i].field_0x08, __FILE__, 155);
+    if (schedule->tracks) {
+        for (int i = 0; i < schedule->trackCount; i++) {
+            if (schedule->tracks[i].displayName)
+                DebugFree(schedule->tracks[i].displayName, __FILE__, 153);
+            if (schedule->tracks[i].trackKey)
+                DebugFree(schedule->tracks[i].trackKey, __FILE__, 154);
+            if (schedule->tracks[i].keyCopy)
+                DebugFree(schedule->tracks[i].keyCopy, __FILE__, 155);
         }
-        DebugFree(schedule->field_0x00, __FILE__, 158);
+        DebugFree(schedule->tracks, __FILE__, 158);
     }
 }
 
 // 0x004d3b00
 void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int count)
 {
-    field_0x460 = count;
+    racerCount = count;
     field_0x50 = a;
-    field_0x4c = b;
-    field_0x40 = 5;
-    field_0x44 = 1;
-    field_0x48 = 1;
+    bikeClassRule = b;
+    series = 5;
+    raceIndex = 1;
+    maxModelKind = 1;
     field_0x454 = 0;
-    strncpy(field_0x00, name, 64);
-    field_0x00[strlen(name) > 63 ? 63 : strlen(name)] = 0;
+    strncpy(careerName, name, 64);
+    careerName[strlen(name) > 63 ? 63 : strlen(name)] = 0;
 
     char text[256];
-    g_TrackGame->LoadResourceString(0x14bc, field_0x54, 128);
+    g_TrackGame->LoadResourceString(0x14bc, messageText, 128);
     g_TrackGame->LoadResourceString(0x14bd, text, 128);
-    strcat(field_0x54, "\n");
-    strcat(field_0x54, text);
+    strcat(messageText, "\n");
+    strcat(messageText, text);
     g_TrackGame->LoadResourceString(0x14be, text, 128);
-    strcat(field_0x54, "\n");
-    strcat(field_0x54, text);
+    strcat(messageText, "\n");
+    strcat(messageText, text);
     g_TrackGame->LoadResourceString(0x14bf, text, 128);
-    strcat(field_0x54, "\n");
-    strcat(field_0x54, text);
-    field_0x464 = 0;
+    strcat(messageText, "\n");
+    strcat(messageText, text);
+    careerFlags = 0;
 
     UnknownProCircuitStats zero;
     zero.field_0x0c = 0;
@@ -189,24 +189,24 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
     zero.field_0x04 = 0;
     zero.field_0x00 = 0;
     zero.field_0x14 = 0;
-    int* used = (int*)DebugCalloc(field_0x1281, 4, __FILE__, 203);
+    int* used = (int*)DebugCalloc(racerNameCount, 4, __FILE__, 203);
     srand(ReadClock());
     PickComputerRacers();
 
-    for (int i = 0; i < field_0x460; i++) {
-        field_0x465[i].field_0x30 = field_0x1225;
-        field_0x465[i].field_0x34 = 0;
+    for (int i = 0; i < racerCount; i++) {
+        racers[i].money = startingCapital;
+        racers[i].field_0x34 = 0;
         if (i > 0) {
-            int n = (int)(UNKNOWN_RANDOM_UNIT() * (field_0x1281 - 1));
+            int n = (int)(UNKNOWN_RANDOM_UNIT() * (racerNameCount - 1));
             while (used[n])
-                n = (int)(UNKNOWN_RANDOM_UNIT() * (field_0x1281 - 1));
-            UNKNOWN_COPY_TEXT(field_0x465[i].field_0xf8, field_0x127d[n])
+                n = (int)(UNKNOWN_RANDOM_UNIT() * (racerNameCount - 1));
+            UNKNOWN_COPY_TEXT(racers[i].racerName, racerNames[n])
             used[n] = 1;
         } else {
-            UNKNOWN_COPY_TEXT(field_0x465[i].field_0xf8, g_TrackGame->mode.field_0x00)
+            UNKNOWN_COPY_TEXT(racers[i].racerName, g_TrackGame->mode.field_0x00)
         }
-        field_0x465[i].field_0x00 = zero;
-        field_0x465[i].field_0x18 = zero;
+        racers[i].field_0x00 = zero;
+        racers[i].field_0x18 = zero;
     }
 
     KrustyUI* ui = g_TrackGame->ui;
@@ -215,14 +215,14 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
         if (((UnknownKrustyUIModel*)ui->riders)[rider].modelKind == 1)
             break;
     }
-    UNKNOWN_COPY_TEXT(field_0x465[0].field_0xb8, ((UnknownKrustyUIModel*)ui->riders)[rider].modelName)
+    UNKNOWN_COPY_TEXT(racers[0].riderModel, ((UnknownKrustyUIModel*)ui->riders)[rider].modelName)
 
     ui = g_TrackGame->ui;
     int bike;
     for (bike = 0; bike < ui->bikeCount; bike++) {
         if (((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bike].model].modelKind == 1) {
             int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)ui->bikes)[bike].engineSize);
-            switch (field_0x4c) {
+            switch (bikeClassRule) {
             case 1:
                 if (bikeClass == 0)
                     goto found;
@@ -237,14 +237,14 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
         }
     }
 found:
-    UNKNOWN_COPY_TEXT(field_0x465[0].field_0x38,
+    UNKNOWN_COPY_TEXT(racers[0].bikeModel,
                       ((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bike].model].modelName)
-    UNKNOWN_COPY_TEXT(field_0x465[0].field_0x78,
+    UNKNOWN_COPY_TEXT(racers[0].bikeName,
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48)
-    UNKNOWN_COPY_TEXT(field_0x465[0].field_0x118,
+    UNKNOWN_COPY_TEXT(racers[0].bikeDisplayName,
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].displayName)
-    field_0x465[0].field_0x138 = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].engineSize;
-    field_0x465[0].field_0x13c = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x90;
+    racers[0].engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].engineSize;
+    racers[0].field_0x13c = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x90;
     DebugFree(used, __FILE__, 273);
 }
 
@@ -279,68 +279,68 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
     char text[1024];
     char title[2048];
     strcpy(title, "");
-    field_0x44++;
-    int placed = field_0x465[0].field_0x18.field_0x10 <= 1;
-    int bonus = field_0x44 == field_0x1285[field_0x40].field_0x08;
-    int done = field_0x44 > field_0x1285[field_0x40].field_0x04;
-    switch (field_0x40) {
+    raceIndex++;
+    int placed = racers[0].field_0x18.field_0x10 <= 1;
+    int bonus = raceIndex == schedules[series].bonusTrack;
+    int done = raceIndex > schedules[series].trackCount;
+    switch (series) {
     case 1:
         if (done || (bonus && !placed)) {
-            field_0x40 = 2;
-            field_0x44 = 1;
-            field_0x48 = 3;
+            series = 2;
+            raceIndex = 1;
+            maxModelKind = 3;
             PickComputerRacers();
             g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
         break;
     case 2:
         if (done || (bonus && !placed)) {
-            field_0x40 = 3;
-            field_0x44 = 1;
+            series = 3;
+            raceIndex = 1;
             PickComputerRacers();
             g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
         break;
     case 3:
         if (done || (bonus && !placed)) {
-            field_0x464 |= 8;
-            field_0x465[0].field_0x30 += (int)(field_0x465[0].field_0x34 * -1.1f);
+            careerFlags |= 8;
+            racers[0].money += (int)(racers[0].field_0x34 * -1.1f);
             g_TrackGame->LoadResourceString(0x145c, title, 128);
-            if (field_0x465[0].field_0x18.field_0x10 <= 3)
+            if (racers[0].field_0x18.field_0x10 <= 3)
                 *(unsigned char*)&g_TrackGame->mode.bikeUnlockFlags |= 1; // retail ORs the low byte
         }
         break;
     default:
         if (done || (bonus && !placed)) {
-            field_0x48 = 2;
-            field_0x40 = 1;
-            field_0x44 = 1;
+            maxModelKind = 2;
+            series = 1;
+            raceIndex = 1;
             PickComputerRacers();
             g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
         break;
     }
 
-    switch (field_0x40) {
+    switch (series) {
     case 5:
-        id = field_0x44 + 0x149f;
+        id = raceIndex + 0x149f;
         break;
     case 1:
-        id = field_0x44 + 0x14a9;
+        id = raceIndex + 0x14a9;
         break;
     case 2:
-        id = field_0x44 + 0x14e5;
+        id = raceIndex + 0x14e5;
         break;
     case 3:
-        id = field_0x44 + 0x1517;
+        id = raceIndex + 0x1517;
         break;
     }
     g_TrackGame->LoadResourceString(id, text, 1024);
     if (title[0]) {
-        sprintf(field_0x54, "%s\n\n%s", title, text);
+        sprintf(messageText, "%s\n\n%s", title, text);
         return 1;
     }
-    UNKNOWN_COPY_TEXT(field_0x54, text)
+    UNKNOWN_COPY_TEXT(messageText, text)
     return 1;
 }
 
@@ -349,34 +349,34 @@ int UnknownTrackGameObject3444::ReadSchedule(UnknownParameterBlock* block,
                                                       UnknownProCircuitSchedule* schedule,
                                                       const char* directory)
 {
-    block->GetInt("NumberOfTracks", 0, &schedule->field_0x04);
-    block->GetInt("Laps", 3, &schedule->field_0x0c);
-    if (schedule->field_0x04) {
-        schedule->field_0x00 =
-            (UnknownProCircuitTrack*)DebugMalloc(schedule->field_0x04 * sizeof(UnknownProCircuitTrack), __FILE__, 433);
-        for (int i = 0; i < schedule->field_0x04; i++) {
+    block->GetInt("NumberOfTracks", 0, &schedule->trackCount);
+    block->GetInt("Laps", 3, &schedule->laps);
+    if (schedule->trackCount) {
+        schedule->tracks =
+            (UnknownProCircuitTrack*)DebugMalloc(schedule->trackCount * sizeof(UnknownProCircuitTrack), __FILE__, 433);
+        for (int i = 0; i < schedule->trackCount; i++) {
             char key[64];
             char value[64];
             char path[128];
             sprintf(key, "Track_%d", i + 1);
             block->GetString(key, "", value, -1);
-            schedule->field_0x00[i].field_0x00 = (char*)DebugMalloc(strlen(value) + 1, __FILE__, 438);
-            sprintf(schedule->field_0x00[i].field_0x00, "%s", value);
-            g_TrackGame->mode.FindFileDirectory((int)directory, schedule->field_0x00[i].field_0x00,
+            schedule->tracks[i].trackKey = (char*)DebugMalloc(strlen(value) + 1, __FILE__, 438);
+            sprintf(schedule->tracks[i].trackKey, "%s", value);
+            g_TrackGame->mode.FindFileDirectory((int)directory, schedule->tracks[i].trackKey,
                                                              "env", path);
             g_TrackGame->sceneObject->SetSceneDirectory(path);
-            g_TrackGame->sceneObject->ReadSceneName(key, schedule->field_0x00[i].field_0x00, 0,
+            g_TrackGame->sceneObject->ReadSceneName(key, schedule->tracks[i].trackKey, 0,
                                                                       "scn", 0, 0);
-            schedule->field_0x00[i].field_0x04 = (char*)DebugMalloc(strlen(key) + 1, __FILE__, 453);
-            strcpy(schedule->field_0x00[i].field_0x04, key);
-            strcpy(key, schedule->field_0x00[i].field_0x00);
-            schedule->field_0x00[i].field_0x08 = (char*)DebugMalloc(strlen(key) + 1, __FILE__, 458);
-            strcpy(schedule->field_0x00[i].field_0x08, key);
+            schedule->tracks[i].displayName = (char*)DebugMalloc(strlen(key) + 1, __FILE__, 453);
+            strcpy(schedule->tracks[i].displayName, key);
+            strcpy(key, schedule->tracks[i].trackKey);
+            schedule->tracks[i].keyCopy = (char*)DebugMalloc(strlen(key) + 1, __FILE__, 458);
+            strcpy(schedule->tracks[i].keyCopy, key);
         }
     } else {
-        schedule->field_0x00 = 0;
+        schedule->tracks = 0;
     }
-    block->GetInt("BonusTrack", 0, &schedule->field_0x08);
+    block->GetInt("BonusTrack", 0, &schedule->bonusTrack);
     return 1;
 }
 
@@ -389,22 +389,22 @@ void UnknownTrackGameObject3444::PickComputerRacers()
     int i;
     for (i = 0; i < ui->bikeCount; i++) {
         int kind = ((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[i].model].modelKind;
-        if (kind <= field_0x48 && kind > bikeKind)
+        if (kind <= maxModelKind && kind > bikeKind)
             bikeKind = kind;
     }
     for (i = 0; i < ui->riderCount; i++) {
         int kind = ((UnknownKrustyUIModel*)ui->riders)[i].modelKind;
-        if (kind <= field_0x48 && kind > riderKind)
+        if (kind <= maxModelKind && kind > riderKind)
             riderKind = kind;
     }
 
-    for (int racer = 1; racer < field_0x460; racer++) {
+    for (int racer = 1; racer < racerCount; racer++) {
         UnknownKrustyUIModel* rider;
         do {
             ui = g_TrackGame->ui;
             rider = &((UnknownKrustyUIModel*)ui->riders)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
         } while (rider->field_0xc0 || rider->modelKind != riderKind);
-        UNKNOWN_COPY_TEXT(field_0x465[racer].field_0xb8, rider->modelName)
+        UNKNOWN_COPY_TEXT(racers[racer].riderModel, rider->modelName)
 
         UnknownKrustyUIBike* bike;
         for (;;) {
@@ -416,7 +416,7 @@ void UnknownTrackGameObject3444::PickComputerRacers()
                 continue;
             int bikeClass = UnknownBikeClassOf(bike->engineSize);
             float roll = UNKNOWN_RANDOM_UNIT();
-            switch (field_0x4c) {
+            switch (bikeClassRule) {
             case 1:
                 if (bikeClass == 0)
                     goto found;
@@ -437,11 +437,11 @@ void UnknownTrackGameObject3444::PickComputerRacers()
             }
         }
     found:
-        UNKNOWN_COPY_TEXT(field_0x465[racer].field_0x38,
+        UNKNOWN_COPY_TEXT(racers[racer].bikeModel,
                         ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[bike->model].modelName)
-        UNKNOWN_COPY_TEXT(field_0x465[racer].field_0x78, bike->field_0x48)
-        UNKNOWN_COPY_TEXT(field_0x465[racer].field_0x118, bike->displayName)
-        field_0x465[racer].field_0x138 = bike->engineSize;
-        field_0x465[racer].field_0x13c = bike->field_0x90;
+        UNKNOWN_COPY_TEXT(racers[racer].bikeName, bike->field_0x48)
+        UNKNOWN_COPY_TEXT(racers[racer].bikeDisplayName, bike->displayName)
+        racers[racer].engineSize = bike->engineSize;
+        racers[racer].field_0x13c = bike->field_0x90;
     }
 }

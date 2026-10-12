@@ -267,7 +267,7 @@ int RankByScore(int keepRacing) {
     int count;
     int i;
 
-    if (g_TrackGame->mode.raceSettings.cameraView == 0) {
+    if (g_TrackGame->mode.raceSettings.eventType == 0) {
         count = 0;
         UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
         UnknownEventRacer* racer;

@@ -233,8 +233,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             series = g_TrackGame->mode.GetSelectedSeries();
             if (_strnicmp(entry, "Quarry01.env", strlen(entry)) && _strnicmp(entry, "Nat04.env", strlen(entry)))
                 series = -1;
-            if (g_TrackGame->mode.raceSettings.cameraView != 1 &&
-                g_TrackGame->mode.raceSettings.cameraView != 5) {
+            if (g_TrackGame->mode.raceSettings.eventType != 1 &&
+                g_TrackGame->mode.raceSettings.eventType != 5) {
                 g_TrackGame->sceneObject->ReadSceneName(text, entry, 0, "scn", &x, &y);
                 int row;
                 if (g_TrackGame->network && g_TrackGame->network->isHost)
@@ -380,7 +380,7 @@ void MultiPlayerDlg::FillRacerSlots() {
     g_TrackGame->network->SetSessionJoinable(0);
     if (g_TrackGame->ui->gui) {
         if (g_TrackGame->mode.saveReplay) {
-            if (g_TrackGame->mode.raceSettings.cameraView != 4) {
+            if (g_TrackGame->mode.raceSettings.eventType != 4) {
                 g_TrackGame->field_0x342c = 1;
                 g_TrackGame->field_0x3428 = 0;
             } else {
@@ -429,7 +429,7 @@ void MultiPlayerDlg::SendSettings() {
         TrackGame* game = g_TrackGame;
         UnknownLobbySettingsMessage message;
         message.minutes = (int)game->mode.raceSettings.field_0x140;
-        message.eventType = game->mode.raceSettings.cameraView;
+        message.eventType = game->mode.raceSettings.eventType;
         message.raceMode = game->mode.raceSettings.raceMode;
         message.field_0x2d78 = game->mode.raceSettings.series;
         message.laps = game->mode.raceSettings.lapCount;
@@ -550,7 +550,7 @@ void FillTrackList(int largePictures, const char* picture, const char* listName,
     if (!dialog)
         dialog = (UIDialog*)g_TrackGame->ui->gui->FindInputDialog();
     name[0] = 0;
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 3:
         FillFileList(g_TrackGame->mode.trackDirectoryList, "Teraform\\SX", "*.env", "env", largePictures, picture,
                      listName, name, value, dialog, 0, 0);
@@ -784,7 +784,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
     } else if (from && type == 0xf) {
         UnknownLobbySettingsMessage* settings = (UnknownLobbySettingsMessage*)data;
         g_TrackGame->mode.raceSettings.field_0x140 = settings->minutes;
-        g_TrackGame->mode.raceSettings.cameraView = settings->eventType;
+        g_TrackGame->mode.raceSettings.eventType = settings->eventType;
         g_TrackGame->mode.raceSettings.raceMode = settings->raceMode;
         g_TrackGame->mode.raceSettings.series = settings->field_0x2d78;
         g_TrackGame->mode.raceSettings.lapCount = settings->laps;
@@ -938,7 +938,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->mode.raceSettings.field_0x2c = 0;
         g_UnknownGlobal689dfc = g_TrackGame->network->isHost == 0;
         g_UnknownGlobal689e04 = 2;
-        if (g_TrackGame->mode.raceSettings.cameraView == 4) {
+        if (g_TrackGame->mode.raceSettings.eventType == 4) {
             g_UnknownGlobal689e04 = 0;
             g_TrackGame->mode.raceSettings.raceMode = 0;
         } else {
@@ -1361,8 +1361,8 @@ void MultiPlayerDlg::FollowTrackChange() {
     {
         int length = strlen(sceneName);
         int count = length > 0x7f ? 0x7f : length;
-        strncpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.cameraView], sceneName, count);
-        g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.cameraView][count] = 0;
+        strncpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType], sceneName, count);
+        g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType][count] = 0;
     }
 }
 
@@ -1377,7 +1377,7 @@ int MPEventDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int
         selectTrackByName = 1;
         UpdateBoundValues(0);
         UIListBox* list = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
-        if (g_TrackGame->mode.raceSettings.cameraView != 4 && list->rowCount - 1 != g_TrackGame->mode.maxOpponents) {
+        if (g_TrackGame->mode.raceSettings.eventType != 4 && list->rowCount - 1 != g_TrackGame->mode.maxOpponents) {
             list->RemoveAllRows();
             for (int i = 0; i <= g_TrackGame->mode.maxOpponents; i++) {
                 sprintf(text, "%d", i);
@@ -1404,10 +1404,10 @@ void MPEventDlg::ShowHostSettings() {
     list->AddRow(parent->sceneName, 0, 0);
     list->SelectRow(0);
     list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
-    list->SelectRowByData(g_TrackGame->mode.raceSettings.cameraView);
+    list->SelectRowByData(g_TrackGame->mode.raceSettings.eventType);
     list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
     list->SelectRowByData(g_TrackGame->mode.raceSettings.raceMode);
-    if (g_TrackGame->mode.raceSettings.cameraView == 4) {
+    if (g_TrackGame->mode.raceSettings.eventType == 4) {
         FindControl("OpponentsControlBox", 5)->Show(0, 1);
         UIMultiState* check = static_cast<UIMultiState*>(FindControl("ChkTagBall", 2));
         check->Show(1, 1);
@@ -1428,7 +1428,7 @@ void MPEventDlg::ShowHostSettings() {
     }
     if (g_TrackGame->mode.raceSettings.raceMode != 2)
         g_TrackGame->mode.championshipInProgress = 0;
-    if (g_TrackGame->mode.raceSettings.cameraView != 0 && g_TrackGame->mode.raceSettings.cameraView != 4) {
+    if (g_TrackGame->mode.raceSettings.eventType != 0 && g_TrackGame->mode.raceSettings.eventType != 4) {
         UIControl* label = FindControl("LapsLabel", 0xc);
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x929);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
@@ -1541,12 +1541,12 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
             settings->trackNumber = g_TrackGame->ui->entries[index].scene;
             settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
             settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
-            strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.cameraView],
+            strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType],
                    static_cast<UIListBox*>(event->control)->GetRowText(-1));
         }
         break;
     case kDialogClose:
-        if (g_TrackGame->mode.raceSettings.cameraView != 4) {
+        if (g_TrackGame->mode.raceSettings.eventType != 4) {
             UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
             g_TrackGame->mode.raceSettings.field_0x28 = opponents->GetRowData(-1);
         } else
@@ -1645,7 +1645,7 @@ void MPEventDlg::ApplyEventType() {
         g_UnknownGlobal689dfc = 0;
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
     int type = list->GetRowData(-1);
-    int& eventType = g_TrackGame->mode.raceSettings.cameraView;
+    int& eventType = g_TrackGame->mode.raceSettings.eventType;
     eventType = type;
     FindControl("OpponentsListBox", 3);
     UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
@@ -1734,8 +1734,8 @@ void MPEventDlg::SyncValues(int apply) {
         settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
         settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
-        strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.cameraView], list->GetRowText(-1));
-        g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.cameraView] = g_TrackGame->mode.raceSettings.field_0x34;
+        strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType], list->GetRowText(-1));
+        g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.eventType] = g_TrackGame->mode.raceSettings.field_0x34;
         list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         settings->eventType = list->GetRowData(-1);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
@@ -1753,7 +1753,7 @@ void MPEventDlg::SyncValues(int apply) {
         else
             laps->SelectRowByData((int)settings->minutes);
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
-        list->SelectRowByData(g_TrackGame->mode.raceSettings.cameraView);
+        list->SelectRowByData(g_TrackGame->mode.raceSettings.eventType);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.raceMode);
         if (g_TrackGame->network->lobbyConnected && selectTrackByName) {
@@ -1794,7 +1794,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
         return;
     }
     UnknownTextureStream* stream = new(__FILE__, 0xa72) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (g_TrackGame->mode.raceSettings.cameraView == 1 || g_TrackGame->mode.raceSettings.cameraView == 5)
+    if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5)
         sprintf(file, "%s%02ds.tga", name, g_TrackGame->mode.raceSettings.field_0x34);
     else if (g_TrackGame->mode.GetSelectedSeries() == 1 || g_TrackGame->mode.GetSelectedSeries() == 5)
         sprintf(file, "%s01s.tga", name);
@@ -2177,7 +2177,7 @@ void MPOptionsDlg::RefreshValues() {
 void MPOptionsDlg::EnableHostOptions() {
     EnableGroup(0x3f3, g_TrackGame->network->isHost &&
                                      !g_TrackGame->mode.lobbyPresetFlags);
-    if (g_TrackGame->mode.raceSettings.cameraView == 4)
+    if (g_TrackGame->mode.raceSettings.eventType == 4)
         FindControl("ChkRecordRace", 0)->SetEnabled(0);
     else
         FindControl("ChkRecordRace", 0)->SetEnabled(1);

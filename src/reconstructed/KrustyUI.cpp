@@ -542,15 +542,15 @@ void KrustyUI::OpenMenu(int menu) {
         gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuPCCentral:
-        if (g_TrackGame->field_0x3444) {
+        if (g_TrackGame->proCircuit) {
             dialog = new(__FILE__, 747) PCCentralDlg;
             gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
         }
         break;
     case kMenu88e: {
-        UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+        UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
         if (circuit) {
-            if (circuit->field_0x1285[circuit->field_0x40].field_0x08 == circuit->field_0x44) {
+            if (circuit->schedules[circuit->series].bonusTrack == circuit->raceIndex) {
                 circuit->AdvanceAfterRace();
                 OpenCareerDialog();
                 return;
@@ -861,10 +861,10 @@ int KrustyUI::UnknownFunction49ba70(int a, int scene, int series, const char* na
 // 0x0049bbb0
 void KrustyUI::RecordRaceResults() {
     UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.raceSettings;
-    if (settings->cameraView == 1 && settings->field_0x2c)
+    if (settings->eventType == 1 && settings->field_0x2c)
         return;
     RecordHighScoreTable(0);
-    int mode = g_TrackGame->mode.raceSettings.cameraView;
+    int mode = g_TrackGame->mode.raceSettings.eventType;
     if (mode != 0 && mode != 4) {
         if (g_TrackGame->mode.raceSettings.lapCount == 5)
             RecordHighScoreTable(1);
@@ -885,7 +885,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
     if (!g_TrackGame->mode.raceSettings.treeCollision)
         return;
     g_TrackGame->field_0x3400->field_0x00 = table;
-    switch (g_TrackGame->mode.raceSettings.cameraView) {
+    switch (g_TrackGame->mode.raceSettings.eventType) {
     case 1:
     case 5:
         sprintf(name, "%s%d", g_TrackGame->mode.raceSettings.trackName,
@@ -900,23 +900,23 @@ void KrustyUI::RecordHighScoreTable(int table) {
     }
     }
     g_TrackGame->field_0x3400->UnknownFunction51f0b0(
-        (short)g_TrackGame->mode.raceSettings.cameraView, name);
+        (short)g_TrackGame->mode.raceSettings.eventType, name);
     int added = 0;
     if (g_TrackGame->field_0x18 == 1) {
         if (!g_TrackGame->field_0x3400->AddRacer(
-                (short)g_TrackGame->mode.raceSettings.cameraView, 0))
+                (short)g_TrackGame->mode.raceSettings.eventType, 0))
             return;
     } else {
         for (int i = 0; i < g_TrackGame->field_0x18; i++) {
             if (g_TrackGame->field_0x3400->AddRacer(
-                    (short)g_TrackGame->mode.raceSettings.cameraView, i))
+                    (short)g_TrackGame->mode.raceSettings.eventType, i))
                 added = 1;
         }
         if (!added)
             return;
     }
     g_TrackGame->field_0x3400->UnknownFunction51f260(
-        (short)g_TrackGame->mode.raceSettings.cameraView, name,
+        (short)g_TrackGame->mode.raceSettings.eventType, name,
         g_TrackGame->mode.GetSelectedSeries());
 }
 
