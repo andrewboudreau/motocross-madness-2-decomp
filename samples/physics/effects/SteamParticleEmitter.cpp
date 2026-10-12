@@ -12,6 +12,10 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
     field_0x34 = 500.0f;
     field_0x3c = 0.1f;
     field_0x38 = 3.0f;
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
+    previousPosition = position;
     field_0x60 = 0;
     field_0x64 = 14;
     manager = 0;
@@ -23,10 +27,9 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
     for (i = 0; i < 64; i++, t += 4) {
         float r = (float)rand() * (1.0f / 32768.0f);
         float v = (r + r) + 1.0f;
-        t[0] = v;
-        t[1] = v;
-        t[2] = v;
-        t[3] = v;
+        int k;
+        for (k = 0; k < 4; k++)
+            t[k] = v;
     }
     field_0x474 = 0;
     field_0x70 = 0;

@@ -163,8 +163,8 @@ public:
     float field_0x3c;         // +0x3c ctor 0.1
     float field_0x40;         // +0x40 ctor 0.25; Restart copies it to +0x44
     float field_0x44;         // +0x44 ctor 0; Restart copies +0x40 here, Burst stores 0.0001
-    EmitterVec3 position;    // +0x48 ctor 0; SetPosition's arguments
-    EmitterVec3 previousPosition; // +0x54 SetPosition copies position here first
+    ParticleVec3 position;    // +0x48 ctor 0; SetPosition's arguments
+    ParticleVec3 previousPosition; // +0x54 SetPosition copies position here first
     int field_0x60;           // +0x60 ctor 0; Restart sets 1, StopEmitting clears it
     int field_0x64;           // +0x64 ctor 14
     int field_0x68;           // +0x68 ctor 0x80a

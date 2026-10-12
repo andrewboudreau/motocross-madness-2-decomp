@@ -205,8 +205,8 @@
     "candidate_symbol_contains": "??0SteamParticleEmitter",
     "target_va": "0x004b9f40",
     "target_size": 199,
-    "expect": "partial",
-    "notes": "12.8% (184 vs 199 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with one rand() fill loop",
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with one rand() fill loop. Exact with plain ParticleVec3 position/previousPosition, retail store order with previousPosition copied from the zeroed position, and the group of four filled by an inner `for (k = 0; k < 4; k++) t[k] = v;` (retail spills v once and copies it through eax; four explicit stores or chained assignments keep v on the x87 stack).",
     "bindings": "SteamParticleEmitter.bindings.json"
   },
   {
