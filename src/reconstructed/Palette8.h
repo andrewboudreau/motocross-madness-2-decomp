@@ -27,7 +27,7 @@ public:
 
     // 0x004b6b30 (cdecl): the palette loaded from resource `name`, shared
     // through the resource manager (AddRef on reuse); 0 if there is none.
-    static Palette8* UnknownFunction4b6b30(const char* name);
+    static Palette8* LoadShared(const char* name);
 
     unsigned char rgbEntries[256][3];         // +0x008 RGB entries from the stream
     UnknownPaletteEntry paletteEntries[256];  // +0x308 the DirectDraw palette's entries

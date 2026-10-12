@@ -193,7 +193,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
         prefixed = 1;
     else
         prefixed = 0;
-    UnknownFunction51ff40();
+    FreeRows();
     directory->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(pattern, "*%s", g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
     directory->SetPattern(pattern, 1);
@@ -222,13 +222,13 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
                                                               track, "env", pattern);
             g_TrackGame->sceneObject->SetSceneDirectory(pattern);
             g_TrackGame->sceneObject->ReadSceneName(display, track, digit, "scn", 0, 0);
-            static_cast<UIListBox*>(list)->AddRow(display, field_0x7f64, 0);
+            static_cast<UIListBox*>(list)->AddRow(display, rowCount, 0);
             count++;
-            field_0x7f60 = (UnknownTrackRecordRow**)DebugRealloc(field_0x7f60, (field_0x7f64 + 1) * 4, __FILE__, 534);
-            field_0x7f60[field_0x7f64] = new(__FILE__, 535) UnknownTrackRecordRow;
-            field_0x7f60[field_0x7f64]->field_0x00 = strdup(found);
-            field_0x7f60[field_0x7f64]->field_0x04 = 0;
-            field_0x7f64++;
+            rows = (UnknownTrackRecordRow**)DebugRealloc(rows, (rowCount + 1) * 4, __FILE__, 534);
+            rows[rowCount] = new(__FILE__, 535) UnknownTrackRecordRow;
+            rows[rowCount]->field_0x00 = strdup(found);
+            rows[rowCount]->field_0x04 = 0;
+            rowCount++;
             if (!directory->NextName(found))
                 break;
             if (prefixed) {

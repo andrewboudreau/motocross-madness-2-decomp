@@ -75,7 +75,7 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
             if (format == 8 && !palette && *paletteName) {
                 int position = entry->archive->Tell();
                 char mode = entry->archive->GetTextMode();
-                palette = Palette8::UnknownFunction4b6b30(paletteName);
+                palette = Palette8::LoadShared(paletteName);
                 if (!palette) {
                     texturePalette = 0;
                     surfacePalette = 0;

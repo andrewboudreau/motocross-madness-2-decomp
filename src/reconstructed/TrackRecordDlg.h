@@ -97,15 +97,16 @@ public:
     virtual void HandleEvent(UnknownDialogEvent* event);
     void LabelTabs(int series);                                 // 0x0051fc40: labels the tabs
     void ShowTab(UnknownDialogEvent* event, int series); // 0x0051fe80: shows a tab
-    void UnknownFunction51ff40();
+    void FreeRows();                                            // 0x0051ff40: frees the rows
     void ListHighScoreTracks(UIControl* list, DirectoryList* directory, int series); // 0x0051ffe0
-    void FillLists(UnknownDialogEvent* event, int series); // 0x00520390: fills the lists                                           // 0x0051ff40: frees the rows
-    void UnknownFunction520480(UnknownDialogEvent* event, const char* name, float value,
+    void FillLists(UnknownDialogEvent* event, int series); // 0x00520390: fills the lists
+    void AddStatsRow(UnknownDialogEvent* event, const char* name, float value,
                                const char* text);                           // 0x00520480
-    void UnknownFunction5204e0(UnknownDialogEvent* event, int times, const char* name); // 0x005204e0
+    // 0x005204e0: the high scores of `name` (points for series 0, else lap times).
+    void ShowTrackScores(UnknownDialogEvent* event, int times, const char* name);
 
-    int field_0x7f58;                         // selected series (0..5)
+    int selectedSeries;                       // +0x7f58 selected series (0..5)
     int field_0x7f5c;
-    UnknownTrackRecordRow** field_0x7f60;
-    int field_0x7f64;                         // row count
+    UnknownTrackRecordRow** rows;             // +0x7f60 the listed tracks (FreeRows)
+    int rowCount;                             // +0x7f64 row count
 };

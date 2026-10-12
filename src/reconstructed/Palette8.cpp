@@ -10,7 +10,7 @@
 #include "UnknownResourceManager.h"
 
 // 0x004b6b30
-Palette8* Palette8::UnknownFunction4b6b30(const char* name) {
+Palette8* Palette8::LoadShared(const char* name) {
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     Palette8* palette;
 
@@ -82,7 +82,7 @@ Palette8::Palette8(UnknownTextureStream* stream) {
     }
     if (g_TrackGame->display->directDraw->CreatePalette(0x44, paletteEntries, &ddPalette, 0) == 0
         && *name)
-        colorMapper = ColorMapper::UnknownFunction4dddd0(name);
+        colorMapper = ColorMapper::LoadShared(name);
     DebugFree(name, __FILE__, 170);
 }
 
