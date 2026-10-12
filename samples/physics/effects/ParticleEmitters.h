@@ -35,8 +35,8 @@ public:
     float lifetimeScale;      // +0x38 ctor 6.0
     float speed;              // +0x3c ctor 1.0; slot 10 clamps to 0.1..2.0 from distance moved / dt
     float maxAge;             // +0x40 ctor 10.0
-    EmitterVec3 position;    // +0x44 SetPosition's xyz
-    EmitterVec3 previousPosition; // +0x50 SetPosition (and slot 10) copy position here first
+    ParticleVec3 position;    // +0x44 SetPosition's xyz
+    ParticleVec3 previousPosition; // +0x50 SetPosition (and slot 10) copy position here first
     float field_0x5c;         // +0x5c
     int field_0x60;           // +0x60
     int field_0x64;           // +0x64

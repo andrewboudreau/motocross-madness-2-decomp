@@ -6,18 +6,22 @@ extern ParticleGameContext* g_gameContext;   // 0x0056e26c
 
 DustParticleEmitter::DustParticleEmitter(int flags) : GameObject(flags)
 {
-    manager = 0;
-    field_0x70 = 0;
     firstUpdate = 1;
     emitRate = 4000.0f;
-    lifetimeScale = 6.0f;
     speed = 1.0f;
+    lifetimeScale = 6.0f;
     maxAge = 10.0f;
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
+    previousPosition = position;
+    field_0x68 = 0;
+    field_0x6c = 0;
     field_0x5c = 0;
     field_0x60 = 0;
     field_0x64 = 0;
-    field_0x68 = 0;
-    field_0x6c = 0;
+    field_0x70 = 0;
+    manager = 0;
     count = 10;
     intensity = 0;
     color = 0xffffff;
