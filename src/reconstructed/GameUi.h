@@ -726,7 +726,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0047af90
     virtual int Draw();                   // slot 40, 0x0047afa0: copies the movie's frame
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
-    int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
+    int PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
 
     MediaControl* moviePlayer;                // +0x1ec: the player
     int frameRect[4];                         // +0x1f0: the frame's source rectangle
@@ -741,7 +741,7 @@ public:
     virtual int Draw();                   // slot 40, 0x0047b110: draws the bar and its percentage
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x0047b100
     void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
-    void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
+    void SetBarTexture(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 
     float progressFraction;                   // +0x1ec: the part done (0..1)
     int stepCount;                            // +0x1f0: steps (LoadingDlg sets 20)

@@ -1343,7 +1343,7 @@ void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         AddControl(bar, 0, 0);
         bar->SetName("ProgressBar");
         UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");
-        bar->UnknownFunction47b3d0(image->GetCurrentTexture(), 0);
+        bar->SetBarTexture(image->GetCurrentTexture(), 0);
         bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);
@@ -1889,7 +1889,7 @@ void CreditsVidDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         AddControl(movieControl, 0, 1);
         movieControl->UnknownFunction4691f0();
         movieControl->UnknownFunction469260(FindControl("Back", 0), -1);
-        if (!movieControl->UnknownFunction47ae90("ui\\Credits.avi", 1, CloseDialogCallback, this))
+        if (!movieControl->PlayMovie("ui\\Credits.avi", 1, CloseDialogCallback, this))
             EndDialog(0);
         break;
     }

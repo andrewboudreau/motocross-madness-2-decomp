@@ -4851,7 +4851,7 @@ UIVideoStatic::UIVideoStatic(int flags, CameraRect* area, UIDialog* owner)
 }
 
 // 0x0047ae90
-int UIVideoStatic::UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
+int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
     if (moviePlayer)
         moviePlayer->Release();
     moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
@@ -4952,7 +4952,7 @@ int UIProgressBar::Draw() {
 }
 
 // 0x0047b3d0
-void UIProgressBar::UnknownFunction47b3d0(int texture, int owned) {
+void UIProgressBar::SetBarTexture(int texture, int owned) {
     barTexture = (TextureMap*)texture;
     ownsBarTexture = owned;
 }
