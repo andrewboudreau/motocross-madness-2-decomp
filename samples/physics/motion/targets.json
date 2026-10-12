@@ -105,7 +105,7 @@
     "target_va": "0x004a7fd0",
     "target_size": 1121,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. ~56% (was ~27% before UnitVector named its inverse length): same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts",
+    "notes": "cdecl; slot 7 helper. 1097/1121 strict (was 660): UnitVector takes the squared length through the nested PoseLengthSquared inline and scales in an else block, which spends VC6's inline budget like retail (axisY path: DotProduct called, operator* expanded with the constructor called; axisZ path: everything called; identity axis constructor called). Only the axisZ cross product's operand loads differ (b first here, a first in retail); see Motnctrl.cpp for the forms tried",
     "bindings": "Motnctrl.bindings.json"
   },
   {

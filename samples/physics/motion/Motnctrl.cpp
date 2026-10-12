@@ -107,13 +107,24 @@ inline void ClampFloat(float low, float high, float* value)
 // times; VC6 calls the out-of-line copies of DotProduct (0x0040ae30), operator* (0x005015b0) and
 // Vec3::Vec3 (0x00404e60) at some of the sites.
 // Retail stores the inverse length to a stack temp before scaling; the named local reproduces it.
+// The squared length through its own inline (DotProduct nested one level deeper) and the scaling in
+// an else block set VC6's inline budget like retail in 0x004a7fd0: in the axisY path DotProduct is
+// called and operator* expanded (calling the constructor) for the first two unit vectors, the outer
+// DotProduct and ClampFloat are expanded; in the axisZ path all of them are called.
+inline float PoseLengthSquared(const Vec3& v)
+{
+    return DotProduct(v, v);
+}
+
 inline Vec3 UnitVector(const Vec3& v)
 {
-    float lengthSquared = DotProduct(v, v);
+    float lengthSquared = PoseLengthSquared(v);
     if (lengthSquared == 1.0f)
         return v;
-    float inverseLength = FastInvSqrt(lengthSquared);
-    return v * inverseLength;
+    else {
+        float inverseLength = FastInvSqrt(lengthSquared);
+        return v * inverseLength;
+    }
 }
 
 // 0x0042de90 (BoundingBoxTreeBuild.cpp): rotation of 'angle' radians about (x, y, z), row-vector
@@ -178,6 +189,11 @@ void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 // 0x004a7fd0 (cdecl, called twice by slot 7): the rotation taking pose a's axes to pose b's, as
 // an axis and an angle.  It rotates axisY onto axisY when they differ, otherwise axisZ onto axisZ;
 // identical axes give the axis (0, 0, 1) and the angle 0.
+// Near miss (1097/1121): the call sequence and frame match; only the axisZ cross product (laid out
+// first) loads b's component first in each product where retail loads a's (the axisY one matches).
+// No gain from a local cross helper with or without parentheses or with swapped operands, a named
+// cross local, swapped comparison operands, or swapped DotProduct arguments (registers swap, 1099
+// strict but esi/edi exchanged, not kept).
 void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 {
     if (a->axisY.x != b->axisY.x || a->axisY.y != b->axisY.y || a->axisY.z != b->axisY.z) {
