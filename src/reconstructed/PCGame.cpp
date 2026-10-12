@@ -122,7 +122,7 @@ PCGame::PCGame() {
     strcpy(companyName, "Rainbow Studios");
     strcpy(applicationName, "Rainbow Demo");
     strcpy(registryKey, "SOFTWARE\\Rainbow Studios\\Demo");
-    GetCurrentDirectoryA(0x104, field_0x1cc);
+    GetCurrentDirectoryA(0x104, workingDirectory);
     resourceInstance = 0;
     imeLibrary = LoadLibraryA("IMM32.DLL");
     inputContext = ImmCreateContext();

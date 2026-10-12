@@ -543,7 +543,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     field_0x054 = (int)particles;
     raceScene = scene;
     field_0x05c = shadow;
-    if (!g_TrackGame->field_0x1cc) {
+    if (!g_TrackGame->workingDirectory) {
         Release();
         return 0;
     }

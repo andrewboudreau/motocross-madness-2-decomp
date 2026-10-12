@@ -440,9 +440,9 @@ int Game::UnknownVirtualSlot17(int type, void* data, int from, int to, int flags
     return rootObject->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
 }
 
-// 0x00468bd0: `path` = the +0x1cc directory, "\\" and `name`.
+// 0x00468bd0: `path` = workingDirectory (+0x1cc), "\\" and `name`.
 int Game::UnknownVirtualSlot18(const char* name, char* path) {
-    strcpy(path, field_0x1cc);
+    strcpy(path, workingDirectory);
     strcat(path, "\\");
     strcat(path, name);
     return 1;
