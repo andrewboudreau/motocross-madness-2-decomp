@@ -36,7 +36,8 @@
     "target_va": "0x00513490",
     "target_size": 201,
     "expect": "partial",
-    "notes": "98.87% at exact size 201 (175/177 masked): zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap in the origin stores (retail x<-edi, y<-edx, z<-ebx). Also tried without gain: permuted zero.x/y/z store order (worse), chained `zero.x = zero.y = zero.z` and comma forms, zero declared before/after i/zeroValue (`i` last much worse), member-wise copies into pts[i].origin (worse), rim stores first, while loop, pointer/reference to pts[i], scoped zero block, a second zero local, `float zeroValue = 0`, prepended typedefs 0..63 (no change). Lever sweep, no gain: every store order with each component taken from zeroValue or an earlier component (36 forms), origin/point/zero reference or pointer locals, a copied zero inside the loop."
+    "notes": "199/201 strict (175/177 masked): zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap in the origin stores (retail x<-edi, y<-edx, z<-ebx). Also tried without gain: permuted zero.x/y/z store order (worse), chained `zero.x = zero.y = zero.z` and comma forms, zero declared before/after i/zeroValue (`i` last much worse), member-wise copies into pts[i].origin (worse), rim stores first, while loop, pointer/reference to pts[i], scoped zero block, a second zero local, `float zeroValue = 0`, prepended typedefs 0..63 (no change). Lever sweep, no gain: every store order with each component taken from zeroValue or an earlier component (36 forms), origin/point/zero reference or pointer locals, a copied zero inside the loop.",
+    "bindings": "Tire.bindings.json"
   },
   {
     "class": "Tire",
@@ -45,7 +46,8 @@
     "target_va": "0x00515b50",
     "target_size": 316,
     "expect": "partial",
-    "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f` Wave 2: swapping term order, naming s as a local, re-reading s from field_0x288 all compile to identical bytes (VC6 factors the shared field_0x74 multiply and evaluates the field_0x1cc term first); retail multiplies field_0x74 into each term."
+    "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f` Wave 2: swapping term order, naming s as a local, re-reading s from field_0x288 all compile to identical bytes (VC6 factors the shared field_0x74 multiply and evaluates the field_0x1cc term first); retail multiplies field_0x74 into each term.",
+    "bindings": "Tire.bindings.json"
   },
   {
     "class": "Tire",
@@ -73,7 +75,8 @@
     "target_va": "0x00515880",
     "target_size": 703,
     "expect": "partial",
-    "notes": "7.35% (tier 3 name): rotation-frame builder; 677 bytes vs 703 target. Uses TireNormalizeZ helper. Retail has 0x30 locals + push esi (B.z in esi); ours has an extra Vec3 temp and caches y in registers"
+    "notes": "7.35% (tier 3 name): rotation-frame builder; 677 bytes vs 703 target. Uses TireNormalizeZ helper. Retail has 0x30 locals + push esi (B.z in esi); ours has an extra Vec3 temp and caches y in registers",
+    "bindings": "Tire.bindings.json"
   },
   {
     "class": "Tire",
@@ -82,7 +85,8 @@
     "target_va": "0x005135f0",
     "target_size": 1664,
     "expect": "partial",
-    "notes": "559/1666 (tier 3 name): contact-patch update. The normal lever is Cross(TireProjectOnto(axis, n), rel) and the slip vector the CollisionVec3 operators' axis * speed + lever (their temporary gives retail's 0x18 frame). Left: retail homes the projected vector in the dead `axis` argument slot (here a frame temporary), loads the normal through ecx, and differs in the tail paths' copies."
+    "notes": "559/1666 (tier 3 name): contact-patch update. The normal lever is Cross(TireProjectOnto(axis, n), rel) and the slip vector the CollisionVec3 operators' axis * speed + lever (their temporary gives retail's 0x18 frame). Left: retail homes the projected vector in the dead `axis` argument slot (here a frame temporary), loads the normal through ecx, and differs in the tail paths' copies.",
+    "bindings": "Tire.bindings.json"
   },
   {
     "class": "Tire",

@@ -66,7 +66,8 @@
     "target_va": "0x00504d30",
     "target_size": 234,
     "expect": "partial",
-    "notes": "60.7% (230 vs 234 bytes). Same algorithm (axis from two nodes' world positions in a frame, _finite guard); retail keeps y in a stack slot where VC6 keeps it in a register, so register allocation and FPU ordering diverge."
+    "notes": "60.7% (230 vs 234 bytes). Same algorithm (axis from two nodes' world positions in a frame, _finite guard); retail keeps y in a stack slot where VC6 keeps it in a register, so register allocation and FPU ordering diverge.",
+    "bindings": "SteeringControl.bindings.json"
   },
   {
     "class": "MotionManager",
@@ -75,7 +76,8 @@
     "target_va": "0x004a5e40",
     "target_size": 1090,
     "expect": "partial",
-    "notes": "text .VUE loader, lines 0x1c9/0x1ec/0x1f9/0x22a. 48%: identical structure and calls, but register allocation is permuted (retail ebx/ebp and esi/edi swapped relative to ours), which shifts most ModRM bytes"
+    "notes": "text .VUE loader, lines 0x1c9/0x1ec/0x1f9/0x22a. 48%: identical structure and calls, but register allocation is permuted (retail ebx/ebp and esi/edi swapped relative to ours), which shifts most ModRM bytes",
+    "bindings": "Motnctrl.bindings.json"
   },
   {
     "class": "CharacterPose",
@@ -84,7 +86,8 @@
     "target_va": "0x004a7dc0",
     "target_size": 523,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier"
+    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier",
+    "bindings": "Motnctrl.bindings.json"
   },
   {
     "class": "Motion",
@@ -102,7 +105,8 @@
     "target_va": "0x004a7fd0",
     "target_size": 1121,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. ~56% (was ~27% before UnitVector named its inverse length): same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts"
+    "notes": "cdecl; slot 7 helper. ~56% (was ~27% before UnitVector named its inverse length): same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts",
+    "bindings": "Motnctrl.bindings.json"
   },
   {
     "class": "CharacterPose",
@@ -111,7 +115,8 @@
     "target_va": "0x004a8470",
     "target_size": 1205,
     "expect": "partial",
-    "notes": "cdecl; slot 7 / 0x4a9050 helper. ~19%. Same calls in the same order except that VC6 inlines the first CrossProduct (retail calls 0x00515600 twice), which shifts every later byte (inline budget)"
+    "notes": "cdecl; slot 7 / 0x4a9050 helper. ~19%. Same calls in the same order except that VC6 inlines the first CrossProduct (retail calls 0x00515600 twice), which shifts every later byte (inline budget)",
+    "bindings": "Motnctrl.bindings.json"
   },
   {
     "class": "Character",

@@ -6,6 +6,7 @@
   "??_7InlineShock@@6B@": "0x00557b90",
   "??_7RotatingShock@@6B@": "0x00557b9c",
   "??_7Shock@@6B@": "0x00557b84",
+  "?ClampAndStep@InlineShock@@QAEXMMAAUShockVec3@@@Z": "0x004fa090",
   "?ClampAndStep@RotatingShock@@QAEXMM@Z": "0x004fa8b0",
   "?ClearForces@Shock@@UAEXXZ": "0x004f9c70",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
