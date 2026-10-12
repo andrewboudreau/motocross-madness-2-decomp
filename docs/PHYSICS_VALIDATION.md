@@ -334,6 +334,10 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   1e-4 threshold and RotateAboutPoint take the angle, not the squared length); both squared
   lengths load y, x, z into locals and sum `z*z + (x*x + y*y)`, and the in-place scale
   writes the members (`scratchVector.y *= s` addresses `this`, not the copy pointer).
+- Bike.cpp slot 92 `0x0040ba30`: the lean error is computed into a float local and then
+  stored (retail stores `leanError` before reserving `_finite`'s double argument);
+  RotateAboutPoint takes the pivot first; the lean-axis scales go through a by-value helper;
+  the cancel deltas are read by reference and the negative-side clamp is `0.0f > n`.
 
 x87 operand order facts measured on these targets (they add to the list below):
 

@@ -1663,27 +1663,42 @@ Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float t)
 }
 
 // Moves a stored value toward zero by 1.5 * delta without crossing zero.
-static inline void BikeCancelToward(float* value, float delta)
+static inline void BikeCancelToward(float* value, const float& delta)
 {
     if (delta > 0.0f) {
         if (*value < 0.0f) {
             float n = delta * 1.5f + *value;
-            if (n > 0.0f)
+            if (0.0f < n)
                 n = 0.0f;
             *value = n;
         }
     } else if (*value > 0.0f) {
         float n = delta * 1.5f + *value;
-        if (!(n >= 0.0f))
+        if (0.0f > n)
             n = 0.0f;
         *value = n;
     }
+}
+
+// Scales a vector by k (slot 92 scales the local axis by the lean error, then by 1/dt).
+static inline Vec3 BikeScale92(const Vec3& v, float k)
+{
+    Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
 }
 
 // Slot 92: steering-torque limiter.  Derives a target steering angle from
 // speed/lean terms, clamps it (rider lean, field_0x580), computes the residual
 // vs the current angle (slot 57) and applies a corrective force through the
 // transform, then bleeds off the accumulated lean impulses.
+// RotateAboutPoint takes the pivot (*point) first and the local axis second, as retail
+// passes them.  Retail reads each cancel delta from scratchVector2 in place (by reference).
+// Byte-exact: the error goes through a float local (retail stores leanError before reserving
+// _finite's argument), the cancel clamp is written `0.0f > n`, and both scales go through
+// BikeScale92.  Tried: BikeAbsRef in the condition, az/ay/ax locals, explicit t/r scale.
 void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
 {
     float target = (steerState->steerAngle * 0.05f + turnRate * 0.2f) * field_0x4b4;
@@ -1692,9 +1707,7 @@ void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
         target = -target;
     if (field_0x628 != 0.0f) {
         float lim = ((field_0x628 < 0.0f) ? -1.0f : 1.0f) * 0.087f;
-        float absLim = lim;
-        if (absLim < 0.0f)
-            absLim = -absLim;
+        float absLim = (lim < 0.0f) ? -lim : lim;
         if (target < absLim)
             targetLeanAngle = lim;
     }
@@ -1704,29 +1717,25 @@ void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
         else
             targetLeanAngle = maxLeanAngle;
     }
-    leanError = UnknownVirtualSlot57() - targetLeanAngle;
-    if (_finite(leanError) && ((leanError < 0.0f) ? -leanError : leanError) >= 0.0001f) {
+    float err = UnknownVirtualSlot57() - targetLeanAngle;
+    leanError = err;
+    if (_finite(leanError) && BikeAbs(leanError) >= 0.0001f) {
         int errSign = (leanError < 0.0f) ? -1 : 1;
         int steerSign = (bodyRoll < 0.0f) ? -1 : 1;
         float lim = maxLeanRate;
         if (errSign == steerSign)
             lim = lim * 0.8f;
-        float mag = (leanError < 0.0f) ? -leanError : leanError;
+        float mag = BikeAbs(leanError);
         mag = mag * invStepTime;
         if (mag > lim)
             leanError = ((leanError < 0.0f) ? -1.0f : 1.0f) * stepTime * lim;
         if (anyWheelInContact) {
             Vec3 w = modelNode->WorldToLocalDirection(*worldDir);
-            float az = (w.z < 0.0f) ? -w.z : w.z;
-            float ay = (w.y < 0.0f) ? -w.y : w.y;
-            float ax = (w.x < 0.0f) ? -w.x : w.x;
-            if (az > 0.001f || ay > 0.001f || ax > 0.001f) {
-                modelNode->RotateAboutPoint(w, *point, leanError);
-                float k = leanError;
-                float tx = k * w.x;
-                float ty = k * w.y;
-                float tz = k * w.z;
-                scratchVector2 = Vec3(tx * invStepTime, ty * invStepTime, tz * invStepTime);
+            if (((w.z < 0.0f) ? -w.z : w.z) > 0.001f || ((w.y < 0.0f) ? -w.y : w.y) > 0.001f ||
+                ((w.x < 0.0f) ? -w.x : w.x) > 0.001f) {
+                modelNode->RotateAboutPoint(*point, w, leanError);
+                Vec3 t = BikeScale92(w, leanError);
+                scratchVector2 = BikeScale92(t, invStepTime);
                 BikeCancelToward(&angularVelocity.x, scratchVector2.x);
                 BikeCancelToward(&angularVelocity.y, scratchVector2.y);
                 BikeCancelToward(&angularVelocity.z, scratchVector2.z);

@@ -265,8 +265,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot92@Bike",
     "target_va": "0x0040ba30",
     "target_size": 1157,
-    "expect": "partial",
-    "notes": "slot 92: frame 0x18 vs ours 0x1c, ours pushes edi; first divergence at prologue register use [5.7% match under vc6_o2_ml]",
+    "expect": "exact",
+    "notes": "slot 92: byte-exact (strict) under vc6_o2_mt.",
     "bindings": "Bike.bindings.json"
   },
   {

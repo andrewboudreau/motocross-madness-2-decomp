@@ -48,7 +48,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `shadow/` | D3DIMSoultreeShadow: 18 strict cases; `ProjectedShadow.cpp`: 21 strict cases, its near misses and the two inline-asm functions in `samples/physics/shadow/ProjectedShadowNearMisses.cpp`; TerrainShadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
-Every `exact` target under `src/krusty2` is strict exact (682 of 738 targets; the rest are
+Every `exact` target under `src/krusty2` is strict exact (807 of 849 targets; the rest are
 `partial`). The reviewed slices and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
 SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
 family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors
