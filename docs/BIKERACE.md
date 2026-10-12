@@ -120,3 +120,14 @@ Facts the two functions establish:
 - The credits dialog is DemoDlg (vtable `0x00550e18`), constructed inline
   as `UIDialog(1, "credits.dtm")`; DlgProcs.h declares no constructor, so
   the sample uses a local stand-in class bound to that vtable.
+
+## Naming
+
+Field names in `BikeRace.h` come from the evidence each declaration's
+comment records (literal keys such as "RPMLowerLimit" and "Weight", the
+callers' data flow, network message fields); every renamed field keeps its
+`// +0xNN` offset. The renames changed no calibration bytes. Fields that
+`FollowRacer.cpp`, `GameUiHelpers.cpp` or `KrustyVCR.cpp` also read (the
+gate node's centre, direction, half extents and next gate, the ghost
+record, the VCR header and its racers) keep their placeholder names until
+those units are renamed with them.
