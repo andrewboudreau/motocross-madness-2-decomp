@@ -4,7 +4,7 @@
 
 struct UnknownCameraBikeRider {
     unsigned char field_0x000[0x1a0];
-    UnknownVehiclePart* field_0x1a0;     // the rider model; has a "Head" part
+    UnknownVehiclePart* modelNode;            // +0x1a0 the rider model; has a "Head" part
 };
 
 // Object at UnknownCameraBikeState+0x40; KrustyBikeCamera slot 34 leads the
@@ -37,7 +37,7 @@ struct UnknownCameraBike {
     unsigned char field_0x448[0x460 - 0x448];
     int field_0x460;
     unsigned char field_0x464[0x5c4 - 0x464];
-    UnknownCameraBikeRider* field_0x5c4;
+    UnknownCameraBikeRider* riderCharacter;   // +0x5c4
     unsigned char field_0x5c8[0x604 - 0x5c8];
     UnknownCameraBikeState* field_0x604;
 };

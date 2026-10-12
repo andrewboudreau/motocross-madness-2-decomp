@@ -230,7 +230,7 @@ public:
 
 struct UnknownBikeRaceRider {
     unsigned char field_0x000[0x1a0];
-    UnknownBikeRaceModel* field_0x1a0;
+    UnknownBikeRaceModel* modelNode;          // +0x1a0
 };
 
 class BikeRace;
@@ -427,7 +427,7 @@ public:
     unsigned char field_0x4a4[0x5bc - 0x4a4];
     int field_0x5bc;                          // TrackGame+0x1004 copy (slot 23 key 0x22)
     int field_0x5c0;                          // TrackGame+0x1008 copy (slot 23 key 0x30)
-    UnknownBikeRaceRider* field_0x5c4;
+    UnknownBikeRaceRider* riderCharacter;     // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
     CarProceduralCollision* field_0x5f0;      // paired with the other racers' (the loader)
     CarProceduralCollision* field_0x5f4;
@@ -648,12 +648,12 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
         if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
             field_0x3b0->field_0x3bc->SetLowestLod(1);
-            field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(1);
+            field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
             if (field_0x3b0->field_0x3bc->currentDetailLevel == 0) {
                 field_0x3b0->field_0x3bc->SetLod(1);
             }
-            if (field_0x3b0->field_0x5c4->field_0x1a0->currentDetailLevel == 0) {
-                field_0x3b0->field_0x5c4->field_0x1a0->SetLod(1);
+            if (field_0x3b0->riderCharacter->modelNode->currentDetailLevel == 0) {
+                field_0x3b0->riderCharacter->modelNode->SetLod(1);
             }
         }
         field_0x394 = racer;
@@ -668,7 +668,7 @@ struct UnknownBikeRaceCameraView {
         field_0x3b4 = racer;
         if (!racer->field_0x740->field_0x18c) {
             racer->field_0x3bc->SetLowestLod(0);
-            field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(0);
+            field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
         }
         field_0x274 = 0;
     }

@@ -342,7 +342,7 @@ int NameOverlay::UnknownVirtualSlot14()
         overlayAlpha = alpha;
     }
     Vector3 head;
-    trackedRacer->field_0x5c4->field_0x1a0->FindByName("Head")->GetPositionIn(0, &head);
+    trackedRacer->riderCharacter->modelNode->FindByName("Head")->GetPositionIn(0, &head);
     head.y += 1.62f;
     int hidden = !IsPointVisible(&head);
     if (hidden) {

@@ -50,7 +50,7 @@ void BikeCamera::UnknownVirtualSlot40(float a) {
         value10 = 5.0f;
         value14 = 5.0f;
     }
-    UnknownVehiclePart* headPart = bike->field_0x5c4->field_0x1a0->FindByName("Head");
+    UnknownVehiclePart* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
     headPart->GetPositionIn(0, &head);
     SetTableEntry(0, &head, 0, &value10, &value14, 0, 0);
@@ -60,7 +60,7 @@ void BikeCamera::UnknownVirtualSlot40(float a) {
 
 // 0x00416fb0: 38% of the way from the rider's head to the target point.
 Vector3 BikeCamera::UnknownVirtualSlot37() {
-    UnknownVehiclePart* headPart = bike->field_0x5c4->field_0x1a0->FindByName("Head");
+    UnknownVehiclePart* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
     headPart->GetPositionIn(0, &head);
     Vector3 result;
@@ -78,7 +78,7 @@ Vector3 BikeCamera::UnknownVirtualSlot37() {
 Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
     if (field_0x276) {
-        bike->field_0x5c4->field_0x1a0->GetPositionIn(0, &result);
+        bike->riderCharacter->modelNode->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
             Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
             lead = lead * (4.0f - field_0x2c0 * 0.006f);
@@ -102,7 +102,7 @@ Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
 
 // 0x00417290: the rider's head position.
 Vector3 BikeCamera::UnknownVirtualSlot50() {
-    UnknownVehiclePart* headPart = bike->field_0x5c4->field_0x1a0->FindByName("Head");
+    UnknownVehiclePart* headPart = bike->riderCharacter->modelNode->FindByName("Head");
     Vector3 head;
     headPart->GetPositionIn(0, &head);
     return head;
@@ -111,13 +111,13 @@ Vector3 BikeCamera::UnknownVirtualSlot50() {
 // 0x004172e0
 void BikeCamera::UnknownVirtualSlot53() {
     bike->field_0x3bc->UnknownFunction4444e0();
-    bike->field_0x5c4->field_0x1a0->UnknownFunction4444e0();
+    bike->riderCharacter->modelNode->UnknownFunction4444e0();
 }
 
 // 0x00417310
 void BikeCamera::UnknownVirtualSlot54() {
     bike->field_0x3bc->ClearFlag14c();
-    bike->field_0x5c4->field_0x1a0->ClearFlag14c();
+    bike->riderCharacter->modelNode->ClearFlag14c();
 }
 
 // 0x00417340

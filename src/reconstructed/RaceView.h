@@ -126,7 +126,7 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x488[0x4a0 - 0x488];
     int outOfRace;                            // +0x4a0 EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5c4 - 0x4a4];
-    UnknownCameraBikeRider* field_0x5c4;           // as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
+    UnknownCameraBikeRider* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
     unsigned char field_0x5c8[0x5e0 - 0x5c8];
     char racerName[0x10];                     // +0x5e0 name
     UnknownEventRacerModel* field_0x5f0;           // RaceStatus.cpp 0x004e6a50 takes its +0x200 position

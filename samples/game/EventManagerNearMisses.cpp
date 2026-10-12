@@ -129,7 +129,7 @@ struct UnknownPodiumRacerModel {                    // racer +0x5c4
 };
 struct UnknownPodiumRacer {
     unsigned char field_0x000[0x5c4];
-    UnknownPodiumRacerModel* field_0x5c4;
+    UnknownPodiumRacerModel* riderCharacter;      // +0x5c4
     unsigned char field_0x5c8[0x784 - 0x5c8];
     int field_0x784;                                // place
 };
@@ -353,7 +353,7 @@ int EventManager::CreatePodiumScene() {
             character->SetMotion(podiumMotions[place - 1]);
             character->field_0x10 = 0;
             if (racer) {
-                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->field_0x5c4->modelNode->field_0x290;
+                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->field_0x290;
                 if (texture)
                     character->modelNode->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
             }
