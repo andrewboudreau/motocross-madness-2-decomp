@@ -38,10 +38,10 @@ or its helpers cheaper; no padded source is kept. Slot 10 `0x0042fd80` (2909 byt
 in the same sample (221/2844 strict; with relocations and frame offsets
 masked 781 instructions like retail's, 88% aligned): the first update sets
 a two-point mesh on the sensor collider and the wheel height; each frame it
-wraps `field_0x194` with `fmod`, evaluates the path at the look-ahead
+wraps `pathTime` with `fmod`, evaluates the path at the look-ahead
 (result named before the subtraction), behind (`-1.0f`) and steering
-(`-field_0x198`) distances through `0x004308e0`/`0x00430b10` (the last two
-subtract `field_0x1c4` straight from the call result and keep the offset
+(`-frontWheelZ`) distances through `0x004308e0`/`0x00430b10` (the last two
+subtract `pathPosition` straight from the call result and keep the offset
 on the x87 stack, `fld t; fsub st(1)` ... `fstp st(0)`), spins the wheels
 (`fmod` by 2 pi), clamps the steering angle to +-30 degrees, queries the
 ground (`0x00507c10`), builds the sensor collider's transform with an
