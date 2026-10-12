@@ -107,18 +107,25 @@ map; it is rebuilt by compiling the owning game functions, not separately.
 
 ### Unattributed ranges over 16 bytes
 
-9 ranges, 17,830 bytes (the other 8 ranges total 27 bytes).
+9 ranges, 17,830 bytes (the other 8 ranges total 27 bytes) at the snapshot.
+All nine have been registered since; the "Nearest `__FILE__` xref" column
+is the snapshot's guess, the last column the function the range now is
+(start address and extent from the bindings and `targets.json` named).
+The five BVH routines (12,821 bytes) lie between bmpfile.cpp and
+BoundingBoxTreeBuild.cpp in link order; they are physics collision queries,
+not bmpfile.cpp code.
 
-| Range | Bytes | Nearest `__FILE__` xref |
-|---|---:|---|
-| `0x00424ab0..0x004253ac` | 2300 | bmpfile.cpp (-0x4d4) |
-| `0x00425900..0x004269da` | 4314 | bmpfile.cpp (-0x1324) |
-| `0x00426be0..0x004275f0` | 2576 | bmpfile.cpp (-0x2604) |
-| `0x004280e0..0x00428950` | 2160 | BoundingBoxTreeBuild.cpp (+0x367e) |
-| `0x0042a640..0x0042abff` | 1471 | BoundingBoxTreeBuild.cpp (+0x111e) |
-| `0x00481300..0x004813d7` | 215 | Griddraw.cpp (+0x129c) |
-| `0x00532580..0x005327b2` | 562 | wrecker.cpp (+0x3b8) |
-| `0x005329e0..0x00532f00` | 1312 | wrecker.cpp (-0x64) |
+| Range | Bytes | Nearest `__FILE__` xref | Now |
+|---|---:|---|---|
+| `0x00424ab0..0x004253ac` | 2300 | bmpfile.cpp (-0x4d4) | `BoxOverlap`, strict exact in `src/krusty2/bvh/BoundingBoxTreeQuery.cpp` |
+| `0x00425900..0x004269da` | 4314 | bmpfile.cpp (-0x1324) | `BoxCapsuleOverlap`, near miss in `samples/physics/bvh` |
+| `0x00426be0..0x004275f0` | 2576 | bmpfile.cpp (-0x2604) | `BoxTriangleQuery`, near miss in `samples/physics/bvh` |
+| `0x004280e0..0x00428950` | 2160 | BoundingBoxTreeBuild.cpp (+0x367e) | `TreeTreeQueryNodes`, near miss in `samples/physics/bvh` |
+| `0x0042a640..0x0042abff` | 1471 | BoundingBoxTreeBuild.cpp (+0x111e) | `SegmentSegmentDistance`, near miss in `samples/physics/bvh` |
+| `0x0048eea0` (the ninth, not listed at the snapshot) | 2920 | - | KrustyBike slot 102, near miss in `samples/physics/krustybike` |
+| `0x00481300..0x004813d7` | 215 | Griddraw.cpp (+0x129c) | `DrawableGridNode` `0x00481300`, near miss in `samples/render/GriddrawNearMisses.cpp` |
+| `0x00532580..0x005327b2` | 562 | wrecker.cpp (+0x3b8) | `Wrecker::RebuildPoseSteps`, strict exact in `src/reconstructed/Wrecker.cpp` |
+| `0x005329e0..0x00532f00` | 1312 | wrecker.cpp (-0x64) | `Wrecker` `0x005329e0`, near miss in `samples/race/WreckerNearMisses.cpp` |
 
 ## Translation units and link order
 
@@ -374,7 +381,9 @@ rebuilt; allowing `__asm` for exactly these bodies is a project decision.
    `0x004de590`). See [NEAR_MISS_INDEX](NEAR_MISS_INDEX.md).
 2. **No registration**: 17,857 bytes in 17 ranges (table above); the five
    BVH routines between bmpfile.cpp and BoundingBoxTreeBuild.cpp hold 12.8 KB
-   and KrustyBike `0x0048eea0` 2.9 KB of it (both since written as near misses).
+   and KrustyBike `0x0048eea0` 2.9 KB of it. Every range over 16 bytes is
+   registered since (BoxOverlap and Wrecker `0x00532580` strict exact, the
+   rest near misses).
 3. **Promotion**: 51,969 strict-exact bytes live only in `samples/` (six retail
    units and 15 classes have no canonical source).
 4. **Unit layout**: whole-object matching per retail unit (function order,
