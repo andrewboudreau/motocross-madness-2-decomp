@@ -366,7 +366,7 @@ public:
     Vector3 keyScaleChange;                       // scale change
     Vector3 keyAxis;                       // axis
     Vector3 keyAxisChange;                       // axis change
-    float field_0x1dc;                         // camera +0x16c when last placed
+    float placedFieldOfView;                   // +0x1dc the camera's fieldOfView (+0x16c) when last placed
     float field_0x1e0;
     float field_0x1e4;                         // twice the frame's half height
     float sizeFactor;                         // size factor

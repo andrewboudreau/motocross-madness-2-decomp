@@ -26,7 +26,7 @@
 // alias (1164), a `UnknownBonusCamera* const&` alias of camera (1299),
 // a `const float&` alias of the camera's +0x198 (1152), a `float&` alias of
 // field_0x1ec for the chained store, and all 24 orders of the alias, the
-// field_0x1dc store, the delta and `field_0x1f0 = 0`: at best the same 1299.
+// placedFieldOfView store, the delta and `field_0x1f0 = 0`: at best the same 1299.
 //
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
@@ -119,10 +119,10 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
         raceView->localRacer->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (camera != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || camera->fieldOfView != field_0x1dc ||
+        if (camera != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
             field_0x1f0) {
             camera = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
-            field_0x1dc = camera->fieldOfView;
+            placedFieldOfView = camera->fieldOfView;
             Vector3 delta = position - camera->eyePosition;
             field_0x1f0 = 0;
             sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(camera) * field_0x1e4);

@@ -382,7 +382,7 @@ static const UnknownBonusKey g_UnknownBonusKeys[7] = {
 BonusObjectManager::BonusObjectManager(int flags) : GameObject(flags) {
     elapsed = 0;
     camera = 0;
-    field_0x1dc = 0;
+    placedFieldOfView = 0;
     field_0x1ec = 0;
     field_0x1f0 = 0;
     currentKey = -1;
