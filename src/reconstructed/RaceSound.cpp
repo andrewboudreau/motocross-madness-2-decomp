@@ -466,8 +466,8 @@ void RaceSound::AssignChannels() {
         engineChannels[i].wasThrottleOn = 0;
         engineChannels[i].field_0x28 = 0;
         engineChannels[i].wasAirborne = 0;
-        engineChannels[i].field_0x30 = 0;
-        engineChannels[i].field_0x34 = 0;
+        engineChannels[i].airRevArmed = 0;
+        engineChannels[i].groundRevArmed = 0;
         engineChannels[i].airborneTime = 0;
         engineChannels[i].speed = 0;
         engineChannels[i].field_0x48 = 0;
@@ -628,7 +628,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             streamChannel->airborneTime += frameTime;
             if (streamChannel->airborneTime >= 0.2f) {
                 if (!streamChannel->channelRacer->throttleOn)
-                    streamChannel->field_0x30 = 1;
+                    streamChannel->airRevArmed = 1;
                 if (streamChannel->sampleKind != 5 && streamChannel->sampleKind != 6 && streamChannel->sampleKind != 1) {
                     j = rand() % decelCount[streamChannel->engine];
                     streamChannel->streamSample = decelSamples[streamChannel->engine][j];
@@ -638,8 +638,8 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     streamChannel->nextSampleKind = 1;
                     StartStream();
                 }
-                if (streamChannel->field_0x30 == 1 && streamChannel->channelRacer->throttleOn) {
-                    streamChannel->field_0x30 = 0;
+                if (streamChannel->airRevArmed == 1 && streamChannel->channelRacer->throttleOn) {
+                    streamChannel->airRevArmed = 0;
                     j = rand() % revCount[streamChannel->engine];
                     streamChannel->streamSample = revSamples[streamChannel->engine][j];
                     streamChannel->sampleBytes = revSampleBytes[streamChannel->engine][j];
@@ -656,12 +656,12 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             }
         } else {
             streamChannel->airborneTime = 0;
-            streamChannel->field_0x30 = 0;
+            streamChannel->airRevArmed = 0;
             if (streamChannel->wasAirborne == 1 && !landHardSound->IsPlaying() &&
                 streamChannel->channelRacer == listenerRacer)
                 PlayIfEnabled(landHardSound, 0, 0, 0, 0);
             if (!streamChannel->channelRacer->throttleOn)
-                streamChannel->field_0x34 = 1;
+                streamChannel->groundRevArmed = 1;
             if (streamChannel->field_0x48) {
                 if (streamChannel->channelRacer->throttleOn) {
                     if (streamChannel->sampleKind == 6) {
@@ -717,8 +717,8 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     StartStream();
                 }
             } else if (streamChannel->channelRacer->throttleOn == true &&
-                       (streamChannel->field_0x34 == 1 || streamChannel->field_0x28 == 1)) {
-                streamChannel->field_0x34 = 0;
+                       (streamChannel->groundRevArmed == 1 || streamChannel->field_0x28 == 1)) {
+                streamChannel->groundRevArmed = 0;
                 j = rand() % 1;
                 streamChannel->streamSample = revSamples[streamChannel->engine][j];
                 streamChannel->sampleBytes = revSampleBytes[streamChannel->engine][j];
