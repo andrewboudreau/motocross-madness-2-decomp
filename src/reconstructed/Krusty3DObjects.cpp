@@ -161,7 +161,7 @@ void RunwayLights::SetRacer(UnknownRunwayRacer* racer) {
 // 0x0048ad60
 VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
     cueView = 0;
-    field_0xbc = 0;
+    cycleCues = 0;
     skippedRacer = 0;
     currentRacer = 0;
     reportedRacer = -1;
@@ -214,7 +214,7 @@ int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             active++;
     if (TestInputEvent(0x14, 0, event, 0x80000000) && !cueView->chatOpen &&
         cueView->racing && active > 1) {
-        field_0xbc = 1 - field_0xbc;
+        cycleCues = 1 - cycleCues;
         return 1;
     }
     if (TestInputEvent(0xd2, 0, event, 0x80000000)) {
@@ -262,7 +262,7 @@ int VisualCue::NextCueIndex() {
 
 // 0x0048bc80
 int VisualCue::CanCycleCues() {
-    return field_0xbc && cueRacerCount > 1;
+    return cycleCues && cueRacerCount > 1;
 }
 
 // --------------------------------------------------------- NumberObjectManager

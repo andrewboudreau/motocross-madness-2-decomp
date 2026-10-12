@@ -194,7 +194,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
 
     if (!ArcadeObject::UnknownVirtualSlot10(frameTime))
         return 1;
-    if (!field_0xbc) {
+    if (!cycleCues) {
         if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||
             cueView->field_0x50->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
@@ -238,7 +238,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         break;
     }
     case 0: {
-        if (!field_0xbc || cueRacerCount <= 1)
+        if (!cycleCues || cueRacerCount <= 1)
             goto hide;
         isVisible = 1;
         UNKNOWN_PLACE_CUE();

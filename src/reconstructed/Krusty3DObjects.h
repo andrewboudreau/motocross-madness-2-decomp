@@ -182,7 +182,7 @@ public:
     float builtFieldOfView;                          // field of view the offsets were built for
     float screenOffsetX;                          // screen offset along the camera's x axis
     float screenOffsetY;                          // screen offset along the camera's y axis
-    int field_0xbc;                            // toggled by control 0x14
+    int cycleCues;                             // +0xbc toggled by control 0x14 (racing, chat closed, two or more cue racers); keeps the cue shown off the own racer's camera and lets event type 0 cycle racers (CanCycleCues)
     int currentRacer;                            // current racer
     int reportedRacer;                            // last reported racer
     int skippedRacer;                            // racer to skip
