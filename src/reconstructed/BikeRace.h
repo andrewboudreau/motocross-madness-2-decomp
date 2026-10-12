@@ -992,13 +992,13 @@ public:
     float field_0x1c8;
     float ghostTimeLimit;                        // "VCRGhostTimeLimit"
     float recordTimeLimit;                        // "VCRRecordTimeLimit"
-    int field_0x1d4;
-    int field_0x1d8;
+    int replayFrames;                        // +0x1d4 frames played into replayTime (advanced by the replay speed)
+    int replayLengthFrames;                  // +0x1d8 frames recorded into replayLength
     int replayMode;                          // replay mode
-    int field_0x1e0;
+    int appliedReplayMode;                   // +0x1e0 replay mode whose sound state was last applied
     int field_0x1e4;
-    int field_0x1e8;
-    int field_0x1ec;
+    int ghostLap;                            // +0x1e8 lap count when the ghost lap restarted (raceMode 4); ButLeft asks to save the ghost lap when > 0
+    int savedCameraState;                    // +0x1ec camera state saved while a replay plays
     char ghostFilePlayed[0x104];                  // ghost file played
     char ghostFileRecorded[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
     bool replayPaused;                         // +0x3f8: ToggleReplayPause

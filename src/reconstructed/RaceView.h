@@ -239,7 +239,7 @@ struct UnknownKrustyBikeView : public GameObject {
     int replayMode;                           // +0x1dc replay mode (4 play ... 14)
     unsigned char field_0x1e0[0x1e4 - 0x1e0];
     int field_0x1e4;                     // -2: no replay
-    int field_0x1e8;
+    int ghostLap;                             // +0x1e8 lap count when the ghost lap restarted
     unsigned char field_0x1ec[0x3f8 - 0x1ec];
     bool replayPaused;                       // +0x3f8
     bool replayStepFrame;                    // +0x3f9

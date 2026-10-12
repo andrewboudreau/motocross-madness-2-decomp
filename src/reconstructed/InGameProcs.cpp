@@ -34,7 +34,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("ButLeft", event->controlName)) {
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
-            if (view && g_TrackGame->mode.raceSettings.raceMode == 4 && view->field_0x1e8 > 0) {
+            if (view && g_TrackGame->mode.raceSettings.raceMode == 4 && view->ghostLap > 0) {
                 ChoiceDlg* dialog = new(__FILE__, 66) ChoiceDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
                                                   (UIDialog*)this, 0, 0, 1);

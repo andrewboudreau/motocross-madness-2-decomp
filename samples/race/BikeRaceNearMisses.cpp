@@ -553,8 +553,8 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     replayStepFrame = false;
     replayTime = 0;
     replayLength = 0;
-    field_0x1d4 = 0;
-    field_0x1d8 = 0;
+    replayFrames = 0;
+    replayLengthFrames = 0;
     g_TrackGame->ui->StepProgressBar();
 
     int mode = g_TrackGame->mode.raceSettings.eventType;
@@ -783,7 +783,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             ghostVcr = new(__FILE__, 0x2b9) KrustyVCR;
         }
         replayVcr = new(__FILE__, 0x2bd) KrustyVCR;
-        field_0x1e8 = 0;
+        ghostLap = 0;
     } else if (g_TrackGame->useReplayTape) {
         field_0x1a8 = new(__FILE__, 0x2c2) UnknownVcrFile(0, 1);
         replayVcr = new(__FILE__, 0x2c3) KrustyVCR;
@@ -796,7 +796,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                                    field_0x1a8);
                 AppendChild(replayVcr, -1);
             }
-            field_0x1ec = UnknownFunctionCameraView()->cameraState;
+            savedCameraState = UnknownFunctionCameraView()->cameraState;
             raceCamera->UnknownVirtualSlot71(1);
         }
     }
