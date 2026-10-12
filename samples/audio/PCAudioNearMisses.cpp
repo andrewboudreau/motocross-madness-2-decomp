@@ -17,8 +17,17 @@
 // Sound 0x004bd0c0 (refills from the archive or file): retail keeps one
 // `return 1` block shared by both branches; VC6 here folds the archive
 // branch's result into `neg/sbb`. An if/else with one trailing `return 1`,
-// gotos to shared labels, a result variable and an ok flag were tried. The
-// sound factory 0x004bb890 next to it is exact in PCAudio.cpp: its load
+// gotos to shared labels, a result variable and an ok flag were tried.
+// Retail's extent is 412 bytes (0x4bd0c0..0x4bd25c), not 314: it ends with
+// the file branch's failure tail (delete, `xor eax, eax`) and then its
+// success tail (delete, `mov eax, 1`), which the archive branch's success
+// also jumps to; the archive branch's Fill failure has its own epilogue
+// without `xor eax, eax`. Swept against 412 bytes (24 forms): `goto done`
+// for the archive success, `if (filled) return 1; return filled;` (setne),
+// `return filled` after `goto done` (VC6 cross-jumps it to the xor tail),
+// nested ifs, an ok flag and `goto closeFailed` in the file branch. VC6
+// always places the success tail first (`je fail`); best 114/412 masked.
+// The sound factory 0x004bb890 next to it is exact in PCAudio.cpp: its load
 // failures `goto` one delete tail placed inside the last branch, which
 // keeps the early returns' own epilogues (its old 272-byte extent was
 // short; the function is 384 bytes).
