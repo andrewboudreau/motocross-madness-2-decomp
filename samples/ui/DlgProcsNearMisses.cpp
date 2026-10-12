@@ -92,10 +92,10 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             delete g_TrackGame->field_0x3444;
             g_TrackGame->field_0x3444 = 0;
         }
-        FindControl("MenuReplay", 0)->UnknownVirtualSlot49(0);
-        FindControl("MenuHighScore", 0)->UnknownVirtualSlot49(0);
-        FindControl("MenuCredits", 0)->UnknownVirtualSlot49(0);
-        FindControl("ButProCircuit", 0)->UnknownVirtualSlot49(0);
+        FindControl("MenuReplay", 0)->SetEnabled(0);
+        FindControl("MenuHighScore", 0)->SetEnabled(0);
+        FindControl("MenuCredits", 0)->SetEnabled(0);
+        FindControl("ButProCircuit", 0)->SetEnabled(0);
         movieControl = 0;
         break;
     case kDialogCommand:
@@ -136,24 +136,24 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             if (multiMenuOpen) {
                 guiManager->UnknownFunction4865e0(guiManager->waitCursorImage, 1);
-                FindControl("ButIPX", 1)->UnknownVirtualSlot49(0);
-                FindControl("ButTCP", 1)->UnknownVirtualSlot49(0);
-                FindControl("ButZone", 1)->UnknownVirtualSlot49(1);
-                FindControl("ButCable", 1)->UnknownVirtualSlot49(0);
-                FindControl("ButModem", 1)->UnknownVirtualSlot49(0);
+                FindControl("ButIPX", 1)->SetEnabled(0);
+                FindControl("ButTCP", 1)->SetEnabled(0);
+                FindControl("ButZone", 1)->SetEnabled(1);
+                FindControl("ButCable", 1)->SetEnabled(0);
+                FindControl("ButModem", 1)->SetEnabled(0);
                 g_TrackGame->mode.field_0x2bd0.field_0x28 = 0;
                 if (EnsureNetworkInterface()) {
                     ConnectionInfoType connections[5];
                     g_TrackGame->network->EnumConnections(connections, &count);
                     for (int i = 0; i < count; i++) {
                         if (!memcmp(connections[i].provider, &DPSPGUID_IPX, sizeof(GUID)))
-                            FindControl("ButIPX", 1)->UnknownVirtualSlot49(1);
+                            FindControl("ButIPX", 1)->SetEnabled(1);
                         else if (!memcmp(connections[i].provider, &DPSPGUID_TCPIP, sizeof(GUID)))
-                            FindControl("ButTCP", 1)->UnknownVirtualSlot49(1);
+                            FindControl("ButTCP", 1)->SetEnabled(1);
                         else if (!memcmp(connections[i].provider, &DPSPGUID_SERIAL, sizeof(GUID)))
-                            FindControl("ButCable", 1)->UnknownVirtualSlot49(1);
+                            FindControl("ButCable", 1)->SetEnabled(1);
                         else if (!memcmp(connections[i].provider, &DPSPGUID_MODEM, sizeof(GUID)))
-                            FindControl("ButModem", 1)->UnknownVirtualSlot49(1);
+                            FindControl("ButModem", 1)->SetEnabled(1);
                     }
                 }
                 guiManager->UnknownFunction4865e0(guiManager->cursorImage, 0);

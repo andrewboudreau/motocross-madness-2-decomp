@@ -119,7 +119,7 @@ void PCBailoutDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         entryFee = fee;
         UnknownSetText(FindControl("TitleText", 12), 0x144a);
         UIControl* description = FindControl("TxtDescription", 12);
-        description->field_0x1e8 = 1;
+        description->wordWrap = 1;
         UnknownSetText(description, 0x1449);
         unsigned int color = circuit->field_0x465[0].field_0x30 < 0 ? 0xff : 0xff00;
         UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
@@ -173,7 +173,7 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         entryFee = fee;
         UnknownSetText(FindControl("TitleText", 12), 0x1452);
         UIControl* description = FindControl("TxtDescription", 12);
-        description->field_0x1e8 = 1;
+        description->wordWrap = 1;
         UnknownSetText(description, 0x1451);
         unsigned int color = circuit->field_0x465[0].field_0x30 < 0 ? 0xff : 0xff00;
         UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
@@ -246,7 +246,7 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         }
         UnknownSetText(FindControl("TitleText", 12), title);
         UIControl* control = FindControl("TxtDescription", 12);
-        control->field_0x1e8 = 1;
+        control->wordWrap = 1;
         UnknownSetText(control, description);
         UnknownSetText(FindControl("TxtItem1", 12), 0x145b);
         UIControl* item = FindControl("Item1", 12);

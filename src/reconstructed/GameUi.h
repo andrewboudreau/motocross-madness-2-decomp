@@ -135,7 +135,7 @@ struct UnknownGameUiState {
     UIAnim* image;                            // +0x00
     UIAnim* focusImage;                       // +0x04
     char* text;                               // +0x08
-    int field_0x0c;
+    int textLength;                           // +0x0c: strlen(text) (slot 35 returns it)
     int selectable;                           // +0x10
     int textExtent[2];                        // +0x14: the text's length and width
     char* textLines;                          // +0x1c
@@ -159,44 +159,60 @@ public:
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00472130
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00471fd0
 
-    virtual void UnknownVirtualSlot27();      // 0x00471070: advances the state's image
-    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00470990: whether `point` is inside
-    virtual void UnknownVirtualSlot29(int state); // 0x00470970: sets the state
-    virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
-    virtual int UnknownVirtualSlot31();       // 0x004725b0: takes the focus
-    virtual void UnknownVirtualSlot32(int value); // 0x00472630: loses the focus
-    virtual void UnknownVirtualSlot33(int value); // 0x00464e80 (shared empty body)
-    virtual int UnknownVirtualSlot34();       // 0x004703c0
-    virtual int UnknownVirtualSlot35();       // 0x004703d0
-    virtual int UnknownVirtualSlot36();       // 0x004703e0
-    virtual void* UnknownVirtualSlot37();     // 0x004703f0
-    virtual void UnknownVirtualSlot38();      // 0x004710c0
-    virtual void UnknownVirtualSlot39();      // 0x00470f10: scales the area
-    virtual int UnknownVirtualSlot40();       // 0x00471240: draws
-    virtual int UnknownVirtualSlot41();       // 0x004715d0
-    virtual int UnknownVirtualSlot42();       // 0x00471850
-    virtual int UnknownVirtualSlot43();       // 0x00471b30
-    virtual int UnknownVirtualSlot44();       // 0x004719c0
-    virtual int UnknownVirtualSlot45();       // 0x00471c90
-    virtual int UnknownVirtualSlot46();       // 0x00471df0
-    virtual int UnknownVirtualSlot47();       // 0x00471eb0
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00471fa0: the state's texture
-    virtual void UnknownVirtualSlot49(int enable); // 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
-    virtual void UnknownVirtualSlot50();      // 0x00470640: redraws
-    virtual int UnknownVirtualSlot51(tagPOINT point); // 0x004709f0
-    virtual void UnknownVirtualSlot52(int id); // 0x00470400
+    virtual void AdvanceImages(); // slot 27, 0x00471070: advances the state image and the FX animation
+    virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x00470990: whether `point` is inside
+    virtual void SetState(int state); // slot 29, 0x00470970: sets the state
+    // Slot 30: whether the pointer can hover it (EnterHover, slot 51 hits);
+    // UIStatic's returns 0.
+    virtual int IsInteractive(); // 0x00467ae0 (shared body: returns 1)
+    // Slot 31 (0x004725b0): the pointer moved over it (guiUser +0x1d8, the
+    // hovered control, is not yet this): state 1, sound 1, the tool tip.
+    virtual int EnterHover();
+    virtual void LeaveHover(int value); // slot 32, 0x00472630: state 0 if enabled, hides the tool tip
+    // Slot 33: GUIUser calls it on the focused control with the control taking
+    // the focus (or 0); the edit box reports kDialogEditDone.
+    virtual void KillFocus(int value); // 0x00464e80 (shared empty body)
+    virtual int GetControlText(); // slot 34, 0x004703c0: controlText
+    virtual int GetTextLength(); // slot 35, 0x004703d0: controlTextLength
+    virtual int GetTextLines(); // slot 36, 0x004703e0: textLines
+    virtual void* GetTextExtent(); // slot 37, 0x004703f0: textExtent
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x004710c0: sets needsRedraw
+    // Slot 39 (0x00470f10): screenArea = bounds scaled, offset by the anchor or
+    // the dialog; visibleArea is the part on the render target.
+    virtual void ScaleArea();
+    virtual int Draw();                   // slot 40, 0x00471240: draws
+    virtual int GrowStep(); // slot 41, 0x004715d0: "GROW", type 100
+    virtual int SlideLeftStep(); // slot 42, 0x00471850: "LSLIDE", 101
+    virtual int SlideRightStep(); // slot 43, 0x00471b30: "RSLIDE", 102
+    virtual int SlideTopStep(); // slot 44, 0x004719c0: "TSLIDE", 103
+    virtual int SlideBottomStep(); // slot 45, 0x00471c90: "BSLIDE", 104
+    virtual int AnimInStep(); // slot 46, 0x00471df0: "ANIM", 106, showing
+    virtual int AnimOutStep(); // slot 47, 0x00471eb0: "ANIM", hiding
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00471fa0: the state's texture
+    virtual void SetEnabled(int enable); // slot 49, 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
+    virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
+    virtual int HitTest(tagPOINT point); // slot 51, 0x004709f0: the area, or ContainsPoint with ShapeBounds
+    virtual void SetAttachId(int id); // slot 52, 0x00470400: stores attachId
     virtual int UnknownVirtualSlot53();       // 0x004726b0
-    virtual void UnknownVirtualSlot54(int* value); // 0x00470a70 (NetProcs.cpp: binds a value)
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x004721b0
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00472250
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x004722b0
-    virtual void UnknownVirtualSlot58(int index, int a); // 0x00472670: plays sound `index`
-    virtual void UnknownVirtualSlot59(int value); // 0x00464e80 (SelectGamePicProcs.cpp "ChkRecordRace")
-    virtual void UnknownVirtualSlot60(int value); // 0x00464e80
-    virtual int UnknownVirtualSlot61();       // 0x00470410: width
-    virtual int UnknownVirtualSlot62();       // 0x00470420: height
-    virtual void UnknownVirtualSlot63(CameraRect* in, CameraRect* out); // 0x00472860
-    virtual void UnknownVirtualSlot64(CameraRect* in, CameraRect* out); // 0x004728e0
+    virtual void BindValue(int* value); // slot 54, 0x00470a70: stores boundValue (NetProcs.cpp)
+    // Slots 55-57: slot 23 calls 55 with the pressed button (and the pointer
+    // position), slot 22 calls 56 on release, and slot 10 calls 57 each frame
+    // while heldButton is set (a KeyBind press calls 55 then 56).
+    virtual int ButtonDown(int a, int b); // slot 55, 0x004721b0: state 2, sound 2
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00472250: state 3, sound 3
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x004722b0: drags a Moveable control
+    virtual void PlayControlSound(int index, int a); // slot 58, 0x00472670: plays sound `index`
+    // Slot 59: `value` != 0 stores the control's value through boundValue
+    // (BindValue), 0 loads it (SelectGamePicProcs.cpp "ChkRecordRace").
+    virtual void SyncBoundValue(int value); // 0x00464e80
+    virtual void HandleTimer(int value); // slot 60, 0x00464e80: `value` is the UITimer
+    virtual int GetWidth();               // slot 61, 0x00470410: screenArea width
+    virtual int GetHeight();              // slot 62, 0x00470420: screenArea height
+    // Slot 63 (0x00472860): `in`, sized to the drawn texture with SourceBlit.
+    virtual void GetImageRect(CameraRect* in, CameraRect* out);
+    // Slot 64 (0x004728e0): `in` inset by the text margins, moved one pixel
+    // down and right in state 2 (pressed).
+    virtual void GetTextRect(CameraRect* in, CameraRect* out);
 
     // Names from the bodies and from the .dtm keys the dialog loader
     // (UIDialog slot 27) passes to them.
@@ -266,7 +282,7 @@ public:
     int sourceBlit;                           // +0xa4: "SourceBlit"
     unsigned int transitionTime;              // +0xa8
     unsigned int transitionDelay;             // +0xac: "FXDelay"
-    int field_0xb0;
+    int transitionFrameCount;                 // +0xb0: StartTransition's frames (< 0: the step's default)
     int transitionType;                       // +0xb4: StartTransition's type (0x6a picks slots 46/47)
     UIDialog* ownerDialog;         // +0xb8
     GUIManager* ownerGui;                     // +0xbc
@@ -290,7 +306,7 @@ public:
     int bold;                                 // +0x158
     int italic;                               // +0x15c
     int fontHeight;                           // +0x160
-    int field_0x164;
+    int transitionFrame;                      // +0x164: the transition step's frame (or ANIM phase)
     int moveable;                             // +0x168: "Moveable"
     UIAnim* stateImages[5];                   // +0x16c: "AnimNorm", "AnimFocus", "AnimPush", ...
     int mouseAnim;                            // +0x180: "MouseAnim" (a UnknownCursorAnimation*)
@@ -302,7 +318,7 @@ public:
     Sound* slideSound;                        // +0x1a8
     Sound* fxSoundIn;                         // +0x1ac: "FXSoundIn"
     Sound* fxSoundOut;                        // +0x1b0: "FXSoundOut"
-    int* boundValue;                          // +0x1b4: slot 54; written back by slot 59
+    int* boundValue;                          // +0x1b4: BindValue; written back by SyncBoundValue
     int backgroundRegion;                     // +0x1b8
     int redrawFrames;                         // +0x1bc: frames to redraw
     int needsRedraw;                          // +0x1c0
@@ -310,12 +326,12 @@ public:
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
     int (UIControl::*transitionStep)(); // +0x1d0: the running transition (slots 41-47)
-    int field_0x1d4;
+    int heldButton;                           // +0x1d4: the button ButtonDown stored (-1: none)
     int keyBind;                              // +0x1d8: "KeyBind"
     int post3D;                               // +0x1dc: "Pre3D" == 0
     int permanent;                            // +0x1e0: "Permanent"
     unsigned char field_0x1e4[0x1e8 - 0x1e4];
-    int field_0x1e8;
+    int wordWrap;                             // +0x1e8: Draw uses DrawTextA DT_WORDBREAK when set
 };
 
 // RTTI: UIButton : UIControl (vtable 0x00552ce0; 0x1f0 bytes: gameui.cpp's
@@ -324,9 +340,9 @@ class UIButton : public UIControl {
 public:
     UIButton(int id, CameraRect* area, UIDialog* owner); // 0x004731f0
     virtual ~UIButton();                      // 0x004732c0 (deleting wrapper 0x004732a0)
-    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x004734c0
-    virtual void UnknownVirtualSlot49(int enable); // 0x004733a0
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00473410
+    virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x004734c0
+    virtual void SetEnabled(int enable); // slot 49, 0x004733a0
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00473410
 
     // 0x004732d0: the images for the up, over, down, disabled and focus states.
     void SetStateImages(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled);
@@ -345,8 +361,8 @@ class UIStatic : public UIControl {
 public:
     UIStatic(int id, CameraRect* area, UIDialog* owner); // 0x00478f60
     virtual ~UIStatic();                      // 0x00478fb0 (deleting wrapper 0x00478f90)
-    virtual int UnknownVirtualSlot30();       // 0x00478fe0
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478fc0
+    virtual int IsInteractive(); // slot 30, 0x00478fe0
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478fc0
 };
 
 // RTTI: UIEditBox : UIControl (vtable 0x00552de8; 0x230 bytes, `new` at
@@ -358,12 +374,12 @@ public:
     virtual ~UIEditBox();                     // 0x00473770 (deleting wrapper 0x00473750)
     virtual int UnknownVirtualSlot20(int value); // 0x00474150
     virtual int UnknownVirtualSlot21(int value); // 0x00474570
-    virtual void UnknownVirtualSlot33(int value); // 0x004740b0
-    virtual void UnknownVirtualSlot38();      // 0x00479100 (shared with UIStaticText)
-    virtual int UnknownVirtualSlot40();       // 0x004738a0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00474120
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10 (shared with UIScrollCtl)
-    virtual void UnknownVirtualSlot59(int value); // 0x00473840: writes the text back
+    virtual void KillFocus(int value); // slot 33, 0x004740b0
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100 (shared with UIStaticText)
+    virtual int Draw();                   // slot 40, 0x004738a0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00474120
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00474b10 (shared with UIScrollCtl)
+    virtual void SyncBoundValue(int value); // slot 59, 0x00473840: writes the text back
 
     void SetClickSound(int value);    // 0x00473d80
     void SetFullSound(int value);    // 0x00473d90
@@ -407,9 +423,9 @@ class UIScrollCtl : public UIButton {
 public:
     UIScrollCtl(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474820
     virtual ~UIScrollCtl();                   // 0x00474870 (deleting wrapper 0x00474850)
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00474880
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10
-    virtual void UnknownVirtualSlot60(int value); // 0x004749f0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00474880
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00474b10
+    virtual void HandleTimer(int value); // slot 60, 0x004749f0
 };
 
 // RTTI: UIScrollBar : UIControl (vtable 0x00552ff8; 0x220 bytes, `new` at
@@ -419,11 +435,11 @@ public:
     UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474ba0
     virtual ~UIScrollBar();                   // 0x00474c50 (deleting wrapper 0x00474c30)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00474cf0
-    virtual int UnknownVirtualSlot40();       // 0x00474ed0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x004755d0
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00475880
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x00475970
-    virtual void UnknownVirtualSlot59(int value); // 0x00474cb0
+    virtual int Draw();                   // slot 40, 0x00474ed0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x004755d0
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00475880
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x00475970
+    virtual void SyncBoundValue(int value); // slot 59, 0x00474cb0
 
     void SetThumbSizeFromState(int state);    // 0x00475160: the thumb size from a state image
     void UnknownFunction4751c0(int range);    // 0x004751c0
@@ -470,19 +486,19 @@ public:
     UIListBox(int id, int rows, CameraRect* area, UIDialog* owner);
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
-    virtual int UnknownVirtualSlot40();       // 0x004761f0: draws the rows
-    virtual void UnknownVirtualSlot27();      // 0x00475fa0
-    virtual void UnknownVirtualSlot29(int state); // 0x00479220
-    virtual void UnknownVirtualSlot50();      // 0x00477ce0
+    virtual int Draw();                   // slot 40, 0x004761f0: draws the rows
+    virtual void AdvanceImages(); // slot 27, 0x00475fa0
+    virtual void SetState(int state); // slot 29, 0x00479220
+    virtual void RequestRedraw();         // slot 50, 0x00477ce0
     virtual int UnknownVirtualSlot21(int key); // 0x00478040
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00477e90
-    virtual int UnknownVirtualSlot56(int a, int* position); // 0x00477ff0
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x00478190
-    virtual void UnknownVirtualSlot59(int value); // 0x00475fe0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00477e90
+    virtual int ButtonUp(int a, int* position); // slot 56, 0x00477ff0
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x00478190
+    virtual void SyncBoundValue(int value); // slot 59, 0x00475fe0
     // Slots 65 and 66 are UIListBox's own (UIControl's vtable has 65 slots,
     // UIListBox's and UIDDLListBox's 67).
-    virtual int UnknownVirtualSlot65(int row); // 0x004769e0: selects `row`
-    virtual void UnknownVirtualSlot66(int* handled); // 0x00477d30: reports a click (and a double click)
+    virtual int SetSelectedRow(int row); // slot 65, 0x004769e0: selects `row`
+    virtual void ReportClick(int* handled); // slot 66, 0x00477d30: reports a click (and a double click)
 
     int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
     int ScrollToRow(int row, int updateScrollBars); // 0x00476860
@@ -553,17 +569,18 @@ class UIMultiState : public UIControl {
 public:
     UIMultiState(int id, CameraRect* area, UIDialog* owner); // 0x004781f0
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
-    virtual void UnknownVirtualSlot27();      // 0x004784e0
-    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00478e10: whether `point` is on an opaque pixel
-    virtual int UnknownVirtualSlot40();       // 0x00478570: draws
-    virtual void UnknownVirtualSlot29(int state); // 0x00478520
-    virtual int UnknownVirtualSlot34();       // 0x00478260
-    virtual int UnknownVirtualSlot35();       // 0x00478280
-    virtual int UnknownVirtualSlot36();       // 0x004782a0
-    virtual void* UnknownVirtualSlot37();     // 0x004782c0
-    virtual void UnknownVirtualSlot38();      // 0x00478450
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478810
-    virtual void UnknownVirtualSlot59(int value); // 0x00478540
+    virtual void AdvanceImages(); // slot 27, 0x004784e0
+    // Slot 28 (0x00478e10): whether `point` is on an opaque pixel.
+    virtual int ContainsPoint(tagPOINT point, int state);
+    virtual int Draw();                   // slot 40, 0x00478570: draws
+    virtual void SetState(int state); // slot 29, 0x00478520
+    virtual int GetControlText(); // slot 34, 0x00478260: the selected state's text
+    virtual int GetTextLength(); // slot 35, 0x00478280
+    virtual int GetTextLines(); // slot 36, 0x004782a0
+    virtual void* GetTextExtent(); // slot 37, 0x004782c0
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x00478450
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478810
+    virtual void SyncBoundValue(int value); // slot 59, 0x00478540
 
     int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the current state
     int SetStateCount(int count);     // 0x00478860: number of states
@@ -572,7 +589,7 @@ public:
     void SetStateText(int index, const char* text);    // 0x00478ad0: a state's text
     void SetCurrentState(int value);    // 0x00478cf0: sets the current state
     void SelectNextState();             // 0x00478d10: the next selectable state
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00478d70
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00478d70
 
     int stateCount;                           // +0x1ec
     int selectedState;                        // +0x1f0
@@ -586,11 +603,11 @@ public:
     UIStaticText(int id, CameraRect* area, UIDialog* owner, const char* text,
                  unsigned int color);         // 0x00478ff0
     virtual ~UIStaticText();                  // 0x004790f0 (deleting wrapper 0x004790d0)
-    virtual void UnknownVirtualSlot29(int state); // 0x00479220 (shared with UIListBox)
-    virtual int UnknownVirtualSlot30();       // 0x00478fe0 (shared with UIStatic)
-    virtual void UnknownVirtualSlot38();      // 0x00479100
-    virtual int UnknownVirtualSlot40();       // 0x00479170
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00479190 (shared with UIStatic)
+    virtual void SetState(int state); // slot 29, 0x00479220 (shared with UIListBox)
+    virtual int IsInteractive(); // slot 30, 0x00478fe0 (shared with UIStatic)
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100
+    virtual int Draw();                   // slot 40, 0x00479170
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00479190 (shared with UIStatic)
 };
 
 // RTTI: UIRadioButton : UIMultiState (vtable 0x00553528; 0x1f8 bytes, `new`
@@ -600,8 +617,8 @@ public:
     UIRadioButton(int id, CameraRect* area, UIDialog* owner); // 0x00479240
     virtual ~UIRadioButton();                 // 0x004792d0 (deleting wrapper 0x004792b0)
     virtual int UnknownVirtualSlot53();       // 0x004795c0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x004794c0
-    virtual void UnknownVirtualSlot59(int value); // 0x004792e0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x004794c0
+    virtual void SyncBoundValue(int value); // slot 59, 0x004792e0
 
     int SelectInGroup(int index);     // 0x00479310: selects radio button `index` (1-based) of the group
     int GetGroupSelection();              // 0x004793f0: the group's selected button (1-based), 0 when none
@@ -614,9 +631,9 @@ class UIDDLScrollBar : public UIScrollBar {
 public:
     UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* owner,
                    UIDropDownList* list);     // 0x00479640
-    virtual void UnknownVirtualSlot33(int value); // 0x004796e0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00479a00
-    virtual void UnknownVirtualSlot57(int a, int* position); // 0x00479710
+    virtual void KillFocus(int value); // slot 33, 0x004796e0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00479a00
+    virtual void ButtonHeld(int a, int* position); // slot 57, 0x00479710
 
     UIDropDownList* ownerList;                // +0x220
 };
@@ -627,7 +644,7 @@ public:
 class UIDDLStatic : public UIStatic {
 public:
     UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479b50
-    virtual void UnknownVirtualSlot33(int value); // 0x00479bc0
+    virtual void KillFocus(int value); // slot 33, 0x00479bc0
 
     UIDropDownList* ownerList;                // +0x1ec
 };
@@ -637,8 +654,8 @@ public:
 class UIDDLButton : public UIButton {
 public:
     UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479bf0
-    virtual void UnknownVirtualSlot33(int value); // 0x00479ce0
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x00479c90
+    virtual void KillFocus(int value); // slot 33, 0x00479ce0
+    virtual int ButtonDown(int a, int b); // slot 55, 0x00479c90
 
     UIDropDownList* ownerList;                // +0x1f0
 };
@@ -649,9 +666,9 @@ class UIDDLListBox : public UIListBox {
 public:
     UIDDLListBox(int id, int rows, CameraRect* area, UIDialog* owner,
                  UIDropDownList* list);       // 0x00479d10
-    virtual void UnknownVirtualSlot33(int value); // 0x00479e70
-    virtual int UnknownVirtualSlot65(int row); // 0x00479db0
-    virtual void UnknownVirtualSlot66(int* handled); // 0x00479df0
+    virtual void KillFocus(int value); // slot 33, 0x00479e70
+    virtual int SetSelectedRow(int row); // slot 65, 0x00479db0
+    virtual void ReportClick(int* handled); // slot 66, 0x00479df0
 
     UIDropDownList* ownerList;                // +0x250
 };
@@ -663,13 +680,13 @@ public:
     // 0x00479ea0: creates the parts (button, list box, scroll bar and three statics).
     UIDropDownList(int id, CameraRect* area, UIDialog* owner, const char* text, unsigned int color);
     virtual ~UIDropDownList();                // 0x0047a1f0 (deleting wrapper 0x0047a1d0)
-    virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
-    virtual void UnknownVirtualSlot33(int value); // 0x0047a7d0
-    virtual void UnknownVirtualSlot52(int id); // 0x0047a290
-    virtual int UnknownVirtualSlot55(int a, int b); // 0x0047add0
-    virtual void UnknownVirtualSlot59(int value); // 0x0047ad80
-    virtual int UnknownVirtualSlot61();       // 0x0047a850
-    virtual int UnknownVirtualSlot62();       // 0x0047a870
+    virtual int IsInteractive(); // slot 30, 0x00467ae0 (shared body: returns 1)
+    virtual void KillFocus(int value); // slot 33, 0x0047a7d0
+    virtual void SetAttachId(int id); // slot 52, 0x0047a290
+    virtual int ButtonDown(int a, int b); // slot 55, 0x0047add0
+    virtual void SyncBoundValue(int value); // slot 59, 0x0047ad80
+    virtual int GetWidth();               // slot 61, 0x0047a850
+    virtual int GetHeight();              // slot 62, 0x0047a870
 
     void SetOpen(int open);     // 0x0047a2d0: opens or closes the list
     void LayoutParts();             // 0x0047a400: names and lays out the parts
@@ -711,7 +728,7 @@ class UIVideoStatic : public UIStatic {
 public:
     UIVideoStatic(int flags, CameraRect* area, UIDialog* owner); // 0x0047ae30
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0047af90
-    virtual int UnknownVirtualSlot40();       // 0x0047afa0: copies the movie's frame
+    virtual int Draw();                   // slot 40, 0x0047afa0: copies the movie's frame
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
     int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
 
@@ -725,8 +742,8 @@ class UIProgressBar : public UIStatic {
 public:
     UIProgressBar(int flags, CameraRect* area, UIDialog* owner); // 0x0047b020
     virtual ~UIProgressBar();                 // 0x0047b090 (deleting wrapper 0x0047b070)
-    virtual int UnknownVirtualSlot40();       // 0x0047b110: draws the bar and its percentage
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x0047b100
+    virtual int Draw();                   // slot 40, 0x0047b110: draws the bar and its percentage
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x0047b100
     void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
     void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 

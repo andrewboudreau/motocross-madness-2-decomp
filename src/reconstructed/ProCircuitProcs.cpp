@@ -361,9 +361,9 @@ void PCNewDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 11));
         edit->GetEditText(text, 127);
         if (!text[0])
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(0);
+            FindControl("OkButton", 0)->SetEnabled(0);
         else
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(1);
+            FindControl("OkButton", 0)->SetEnabled(1);
         break;
     }
     case kDialogInit: {
@@ -583,7 +583,7 @@ void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     sprintf(text, "$%d", circuit->field_0x465[0].field_0x18.field_0x0c);
     FindControl("TxtMedical", 12)->SetText(text);
     UIControl* announcement = FindControl("TxtAnnouncement", 12);
-    announcement->field_0x1e8 = 1;
+    announcement->wordWrap = 1;
     announcement->SetText(circuit->field_0x54);
 
     picture = FindControl("NextTrackPic", 5);
@@ -756,7 +756,7 @@ void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogInit: {
         g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
         UIControl* description = FindControl("TxtDescription", 12);
-        description->field_0x1e8 = 1;
+        description->wordWrap = 1;
         description->SetTextFromResource(g_TrackGame->resourceInstance, 0x1464);
         label = FindControl("TitleText", 12);
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x1467);
@@ -857,7 +857,7 @@ void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             break;
         }
         UIControl* control = FindControl("TxtDescription", 12);
-        control->field_0x1e8 = 1;
+        control->wordWrap = 1;
         UnknownSetText(control, description);
         UnknownSetText(FindControl("TitleText", 12), 0x1467);
         control = FindControl("ButDecline", 1);
@@ -893,7 +893,7 @@ void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (circuit->field_0x465[0].field_0x18.field_0x10 == 1)
             g_TrackGame->LoadResourceString(0x145f, rank, 1023);
         sprintf(message, "%s\n%s", text, rank);
-        description->field_0x1e8 = 1;
+        description->wordWrap = 1;
         description->SetText(message);
         UIControl* control = FindControl("ButDecline", 1);
         control->Show(0, 1);
@@ -1081,22 +1081,22 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("BikeRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderLeft", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
             previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {
