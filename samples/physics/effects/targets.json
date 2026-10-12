@@ -75,8 +75,8 @@
     "candidate_symbol_contains": "??0DirtChunkParticleEmitter",
     "target_va": "0x004b8df0",
     "target_size": 287,
-    "expect": "partial",
-    "notes": "7.2% (299 vs 287 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops",
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact once position/previousPosition are plain ParticleVec3 (no EmitterVec3 default ctor), the stores follow retail order and previousPosition is struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); randomTable is `((float)rand() / 32768.0f) * 0.25f`, randomVectors components assigned directly.",
     "bindings": "DirtChunkParticleEmitter.bindings.json"
   },
   {

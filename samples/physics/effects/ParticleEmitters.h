@@ -64,8 +64,8 @@ public:
     float field_0x38;         // +0x38 ctor 6.0
     float field_0x3c;         // +0x3c ctor 1.0
     float field_0x40;         // +0x40 ctor 200.0
-    EmitterVec3 position;    // +0x44 ctor 0
-    EmitterVec3 previousPosition; // +0x50 ctor 0
+    ParticleVec3 position;    // +0x44 ctor 0
+    ParticleVec3 previousPosition; // +0x50 ctor 0
     float field_0x5c;         // +0x5c ctor 0
     int field_0x60;           // +0x60 ctor 0
     float field_0x64;         // +0x64 ctor 0; slot 10 keeps the fractional part of dt*rate here
