@@ -262,7 +262,7 @@ void PCStartupDlg::FillLists()
         do {
             sprintf(path, "%s%s", directory, data.cFileName);
             if (circuit.LoadSaved(path)) {
-                careerFiles = (char**)UnknownFunction47b570(careerFiles, (careerFileCount + 1) * 4);
+                careerFiles = (char**)ResizeDebugBlock(careerFiles, (careerFileCount + 1) * 4);
                 careerFiles[careerFileCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 297);
                 strcpy(careerFiles[careerFileCount], path);
                 AddCircuitRow(&circuit, careerFileCount);

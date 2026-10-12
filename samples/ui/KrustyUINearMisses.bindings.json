@@ -43,7 +43,7 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?UnknownFunction460f50@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction469130@GameObject@@QAEHPAV1@@Z": "0x00469130",
-  "?UnknownFunction47b570@@YAPAXPAXI@Z": "0x0047b570",
+  "?ResizeDebugBlock@@YAPAXPAXI@Z": "0x0047b570",
   "?SetUp@UnknownKrustyUIGui@@QAEPAVGameObject@@PAXHPAVTextureMapManager@@HHHPBDH2P6AXXZH@Z": "0x004853b0",
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
   "?UnknownFunction485d70@UnknownKrustyUIGui@@QAEXPBD@Z": "0x00485d70",

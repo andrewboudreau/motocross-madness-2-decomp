@@ -49,7 +49,7 @@ static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
 #define UNKNOWN_MAX(a, b) ((a) < (b) ? (b) : (a))
 
 // cdecl 0x0047b570: resizes a DebugMalloc'd block (KrustyUI.cpp).
-void* UnknownFunction47b570(void* block, unsigned int size);
+void* ResizeDebugBlock(void* block, unsigned int size);
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
 int g_UnknownGlobal65b5c8;
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
@@ -1718,7 +1718,7 @@ int UICtlContainer::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
 }
 
 // 0x0047b570
-void* UnknownFunction47b570(void* block, unsigned int size) {
+void* ResizeDebugBlock(void* block, unsigned int size) {
     if (block && size <= 0) {
         DebugFree(block, __FILE__, 0x2782);
         return 0;
@@ -2751,7 +2751,7 @@ int UIListBox::CountVisibleRows() {
 int UIListBox::ReserveRows(int rows) {
     if (rows > rowCapacity) {
         UnknownGameUiListRow* resized =
-            (UnknownGameUiListRow*)UnknownFunction47b570(rowTable, rows * sizeof(UnknownGameUiListRow));
+            (UnknownGameUiListRow*)ResizeDebugBlock(rowTable, rows * sizeof(UnknownGameUiListRow));
         if (resized) {
             memset(&resized[rowCapacity], 0, (rows - rowCapacity) * sizeof(UnknownGameUiListRow));
             rowCapacity = rows;
@@ -2854,10 +2854,10 @@ int UIMultiState::SetStateCount(int count) {
             if (stateTable[i].textLines)
                 DebugFree(stateTable[i].textLines, __FILE__, 0x21b9);
         }
-        stateTable = (UnknownGameUiState*)UnknownFunction47b570(stateTable,
+        stateTable = (UnknownGameUiState*)ResizeDebugBlock(stateTable,
                                                                          count * sizeof(UnknownGameUiState));
     } else if (stateCount < count) {
-        stateTable = (UnknownGameUiState*)UnknownFunction47b570(stateTable,
+        stateTable = (UnknownGameUiState*)ResizeDebugBlock(stateTable,
                                                                          count * sizeof(UnknownGameUiState));
         for (int i = stateCount; i < count; i++) {
             stateTable[i].image = 0;
@@ -4831,7 +4831,7 @@ void UIDropDownList::SetCornerImage(UIAnim* image) {
 }
 
 // 0x0047b370 (UIProgressBar): one step on; redraws when `redraw`.
-void UIProgressBar::UnknownFunction47b370(int redraw) {
+void UIProgressBar::StepProgress(int redraw) {
     int total = stepCount;
     if (total) {
         stepsDone = UnknownMinInt(stepsDone + 1, total);

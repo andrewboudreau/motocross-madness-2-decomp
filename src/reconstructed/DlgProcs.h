@@ -313,7 +313,7 @@ public:
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
 // declared in ProCircuitProcs.h).
-void* UnknownFunction47b570(void* block, unsigned int size);
+void* ResizeDebugBlock(void* block, unsigned int size);
 
 // A ghost or replay file's 0xeb0-byte header, as GhostFilesDlg and
 // ReplayFilesDlg read it (0x00454640). +0x34..+0x220 is a copy of the race

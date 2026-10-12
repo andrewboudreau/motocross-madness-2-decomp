@@ -346,7 +346,7 @@
   "?SelectInGroup@UIRadioButton@@QAEHH@Z": "0x00479310",
   "?PlayMovie@UIVideoStatic@@QAEHPBDHP6AXPAVUIDialog@@@Z1@Z": "0x0047ae90",
   "?SetBarTexture@UIProgressBar@@QAEXHH@Z": "0x0047b3d0",
-  "?UnknownFunction47b570@@YAPAXPAXI@Z": "0x0047b570",
+  "?ResizeDebugBlock@@YAPAXPAXI@Z": "0x0047b570",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
   "?ReleaseBackground@UnknownKrustyUIGui@@QAEXXZ": "0x00485fc0",

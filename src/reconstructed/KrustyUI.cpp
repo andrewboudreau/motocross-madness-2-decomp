@@ -31,7 +31,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block.
-void* UnknownFunction47b570(void* block, unsigned int size);
+void* ResizeDebugBlock(void* block, unsigned int size);
 
 // Global at 0x0068a498: 36 short strings loaded from string resources
 // 5000-5035 (KrustyUI 0x004988a0).
@@ -411,7 +411,7 @@ void KrustyUI::UnknownFunction49b530() {
     if (progressDialog) {
         UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->UnknownFunction46ebf0("ProgressBar", 0));
         if (bar)
-            bar->UnknownFunction47b370(1);
+            bar->StepProgress(1);
     }
 }
 
@@ -707,7 +707,7 @@ void KrustyUI::LoadBikesAndRiders() {
             block.UnknownFunction4b7ec0("UIModelFile", "", uiModel, -1);
             block.UnknownFunction4b7ec0("ModelFile", "", model, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
-            manufacturers = UnknownFunction47b570(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
+            manufacturers = ResizeDebugBlock(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             int length = strlen(name);
             int n = length > 63 ? 63 : length;
             strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name, name, n);
@@ -730,7 +730,7 @@ void KrustyUI::LoadBikesAndRiders() {
                 block.UnknownFunction4b7ec0(key, "(no name)", bikeName, -1);
                 sprintf(key, "BikeTexture_%02d", j);
                 block.UnknownFunction4b7ec0(key, "", texture, -1);
-                bikes = UnknownFunction47b570(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
+                bikes = ResizeDebugBlock(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].manufacturer = manufacturerCount;
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].field_0x88 = 0;
                 length = strlen(bikeName);
@@ -766,7 +766,7 @@ void KrustyUI::LoadBikesAndRiders() {
             block.UnknownFunction4b7ec0("Name", "(no name)", riderName, -1);
             block.UnknownFunction4b7ec0("File", "", file, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
-            riders = UnknownFunction47b570(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
+            riders = ResizeDebugBlock(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             ((UnknownKrustyUIModelEntry*)riders)[riderCount].uiModel = 0;
             int length = strlen(riderName);
             int n = length > 63 ? 63 : length;
@@ -845,7 +845,7 @@ int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
 
 // 0x0049ba70
 int KrustyUI::UnknownFunction49ba70(int a, int scene, int series, const char* name, int d, int e) {
-    entries = (UnknownKrustyUIEntry*)UnknownFunction47b570(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
+    entries = (UnknownKrustyUIEntry*)ResizeDebugBlock(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
     entries[entryCount].field_0x00 = a;
     entries[entryCount].scene = scene;
     entries[entryCount].series = series;

@@ -916,11 +916,11 @@ int SPEventDlg::AddGhost(const char* path) {
             if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].fileName) &&
                 header.lengthSeconds > 0.0f &&
                 g_TrackGame->ui->entries[row].scene == header.trackIndex) {
-                ghostHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
+                ghostHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
                     ghostHeaders, (ghostHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
                 ghostHeaders[ghostHeaderCount] = header;
                 ghostHeaderCount++;
-                ghostPaths = (char**)UnknownFunction47b570(ghostPaths, (ghostPathCount + 1) * sizeof(char*));
+                ghostPaths = (char**)ResizeDebugBlock(ghostPaths, (ghostPathCount + 1) * sizeof(char*));
                 ghostPaths[ghostPathCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 1986);
                 strcpy(ghostPaths[ghostPathCount], path);
                 ghostPathCount++;
@@ -2263,11 +2263,11 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file) && header.lengthSeconds > 0.0f) {
-            fileHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
+            fileHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
                 fileHeaders, (fileHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
             fileHeaders[fileHeaderCount] = header;
             fileHeaderCount++;
-            filePaths = (char**)UnknownFunction47b570(filePaths, (filePathCount + 1) * sizeof(char*));
+            filePaths = (char**)ResizeDebugBlock(filePaths, (filePathCount + 1) * sizeof(char*));
             filePaths[filePathCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 4657);
             strcpy(filePaths[filePathCount], path);
             filePathCount++;
@@ -2417,11 +2417,11 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file) && header.lengthSeconds > 0.0f) {
-            fileHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
+            fileHeaders = (UnknownRecordFileHeader*)ResizeDebugBlock(
                 fileHeaders, (fileHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
             fileHeaders[fileHeaderCount] = header;
             fileHeaderCount++;
-            filePaths = (char**)UnknownFunction47b570(filePaths, (filePathCount + 1) * sizeof(char*));
+            filePaths = (char**)ResizeDebugBlock(filePaths, (filePathCount + 1) * sizeof(char*));
             filePaths[filePathCount] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 4870);
             strcpy(filePaths[filePathCount], path);
             filePathCount++;
