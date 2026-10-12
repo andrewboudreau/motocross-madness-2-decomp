@@ -11,7 +11,11 @@
 //   (all 120 orders of the five terms give one object); reordering the
 //   points/paid/+0x30 statements, a winnings local, an AddStats inline
 //   helper (pointer or reference), a by-value net helper or a stats pointer
-//   are worse.
+//   are worse. The stats field types do not matter: unsigned int or long
+//   for +0x04, +0x08, +0x0c or +0x14 alone, or for every field of
+//   UnknownProCircuitStats (ProCircuit.h), all give 427. Retail keeps stunt
+//   (ecx) and repairs (edx) and reloads medical for the +0x24 update; VC6
+//   here keeps medical and repairs and reloads stunt.
 // PCBailoutDlg::UnknownVirtualSlot29 (0x004d8fc0, 882 bytes, 836 match) and
 // PCBunnyDlg::UnknownVirtualSlot29 (0x004d9860, 1122 bytes, 1068 match): the
 //   init case reads the fee and the cash into locals and stores the fee

@@ -38,7 +38,12 @@
 //   arguments, `(camera = ...)->` and a function-scope camera, the target
 //   declared at any scope; `eye[1]` gives retail's `add edi, 0xc` but moves
 //   earlier registers (183). The same copy differs in 0x004f8820
-//   (SelectGamePicProcs) and 0x004d72c0 (ProCircuitProcs).
+//   (SelectGamePicProcs) and 0x004d72c0 (ProCircuitProcs). Also 1181 or
+//   worse (11 forms): a comma expression, `1 ? camera : 0`, `&*camera`,
+//   `camera + 0`, inline helpers taking the KrustyUI and the vector (by
+//   value or const reference), an inline camera getter with or without a
+//   redundant test, a `*(Vector3*)&` argument and a qualified
+//   `Camera::UnknownVirtualSlot29` call.
 // SPRaceInfoDlg::UnknownVirtualSlot29 (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::UnknownVirtualSlot29 (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

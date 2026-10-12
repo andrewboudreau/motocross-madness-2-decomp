@@ -8,7 +8,12 @@
 //   colour loop out after the "~1" branch and merges the "%s: %s" sprintf
 //   into the first branch's call, VC6 here keeps source order. Inverting
 //   the tests, swapping the if/else arms and moving the IME test do not
-//   reproduce the layout.
+//   reproduce the layout. With the system branch first (`player == -1`,
+//   `< 0` or `-1 == player`, 62) VC6 merges the system sprintf calls into
+//   the player branch's as retail does, but keeps the system block inline
+//   instead of moving it after the "~1" branch. The IME sprintfs as a
+//   ternary format (104, 48 diffs), `if (imeLibrary)` first (101), a
+//   TrackGame local and an else-if GetPlayerName test do not move it.
 // MPBikeRiderDlg::FillBikeRiderLists (0x004f8220, 833 bytes): the same
 //   flow and calls; retail keeps the bike index in edi and KrustyUI in ebp
 //   and lays the locals out differently (VC6 here swaps the registers).
