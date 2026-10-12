@@ -69,8 +69,8 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
         rect = 0;
         if (flags & 0x10) {
             screen.left = screen.top = 0;
-            screen.right = ((RenderTarget*)field_0x18)->field_0x0c;
-            screen.bottom = ((RenderTarget*)field_0x18)->field_0x10;
+            screen.right = ((RenderTarget*)field_0x18)->targetWidth;
+            screen.bottom = ((RenderTarget*)field_0x18)->targetHeight;
             rect = &screen;
         }
         if (parent)
@@ -116,7 +116,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     unsigned int line;
     unsigned int x;
 
-    format = g_TrackGame->renderTarget->field_0x28;
+    format = g_TrackGame->renderTarget->surfacePixelFormat;
     bytesPerPixel = PixelFormatBytesPerPixel(format);
     if (guiBackground)
         guiBackground->ReleaseDc();
@@ -228,8 +228,8 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             ((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc);
             target = (PCRenderTarget*)field_0x18;
             width = size.cx + 2;
-            if (width >= target->field_0x0c - 2)
-                width = target->field_0x0c - 2;
+            if (width >= target->targetWidth - 2)
+                width = target->targetWidth - 2;
             height = size.cy + 2;
             textArea.top = 0;
             textArea.left = 0;
@@ -239,8 +239,8 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             screenArea.top = position[1];
             x = screenArea.left - width / 2;
             x = x < 0 ? 0 : x;
-            screenArea.left = __min(target->field_0x0c - width, x);
-            screenArea.top = __min(target->field_0x10 - height, screenArea.top);
+            screenArea.left = __min(target->targetWidth - width, x);
+            screenArea.top = __min(target->targetHeight - height, screenArea.top);
             screenArea.right = screenArea.left + width;
             screenArea.bottom = screenArea.top + height;
             texture = tipGui->CreateFilledTexture(width, height, 0x808080);

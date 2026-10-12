@@ -318,7 +318,7 @@ unlock:
 // 0x00472960
 UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
     if (_stricmp(file + strlen(file) - 4, ".wav")) {
-        int format = g_TrackGame->renderTarget->field_0x28;
+        int format = g_TrackGame->renderTarget->surfacePixelFormat;
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
@@ -440,7 +440,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
 // 0x004734c0: whether `point` is on an opaque pixel of the image.
 int UIButton::ContainsPoint(POINT point, int state) {
     int opaque = 0;
-    int format = g_TrackGame->renderTarget->field_0x28;
+    int format = g_TrackGame->renderTarget->surfacePixelFormat;
     RECT rect = *(RECT*)screenArea;
     if (PtInRect(&rect, point)) {
         point.x -= rect.left;
@@ -471,7 +471,7 @@ int UIButton::ContainsPoint(POINT point, int state) {
 // control's own area (no RECT copy: retail passes &screenArea to PtInRect).
 int UIMultiState::ContainsPoint(POINT point, int state) {
     int opaque = 0;
-    int format = g_TrackGame->renderTarget->field_0x28;
+    int format = g_TrackGame->renderTarget->surfacePixelFormat;
     if (PtInRect((RECT*)screenArea, point)) {
         point.x -= ((RECT*)screenArea)->left;
         point.y -= ((RECT*)screenArea)->top;
@@ -843,7 +843,7 @@ char* g_UnknownGlobal65b600;
 int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     char backgroundImage[0x80];
     backgroundImage[0] = 0;
-    int depth = g_TrackGame->renderTarget->field_0x28;
+    int depth = g_TrackGame->renderTarget->surfacePixelFormat;
     memset(sectionTable, 0, sizeof(sectionTable));
     int setType = 1;
     UnknownParameterBlock parameters;
@@ -1012,19 +1012,19 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             switch (sectionTable[i].field_0x38) {
             case 0:
                 if (pass == 0) {
-                    parameters.GetInt("ScreenWidth", g_TrackGame->renderTarget->field_0x0c,
+                    parameters.GetInt("ScreenWidth", g_TrackGame->renderTarget->targetWidth,
                                                      &screenWidth);
-                    parameters.GetInt("ScreenHeight", g_TrackGame->renderTarget->field_0x10,
+                    parameters.GetInt("ScreenHeight", g_TrackGame->renderTarget->targetHeight,
                                                      &screenHeight);
                     parameters.GetInt("NoScale", 0, &scaleToScreen);
                     scaleToScreen = !scaleToScreen;
                     parameters.GetInt("Popup", 1, &isPopup);
                     RenderTarget* target = (RenderTarget*)field_0x18;
                     if (scaleToScreen) {
-                        scaleX = (float)target->field_0x0c / screenWidth;
-                        scaleY = (float)target->field_0x10 / screenHeight;
-                    } else if (screenWidth * 2 > target->field_0x0c ||
-                               screenHeight * 2 > target->field_0x10) {
+                        scaleX = (float)target->targetWidth / screenWidth;
+                        scaleY = (float)target->targetHeight / screenHeight;
+                    } else if (screenWidth * 2 > target->targetWidth ||
+                               screenHeight * 2 > target->targetHeight) {
                         scaleX = scaleY = 1.0f;
                     }
                     if (isPopup) {
@@ -1107,7 +1107,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         field_0x10c = italic;
                         field_0x108 = bold;
                     }
-                    if (g_TrackGame->renderTarget->field_0x28 == 8) {
+                    if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
                         int load = 1;
                         if (guiManager) {
                             if (guiManager->UnknownFunction4864f0())
@@ -1800,11 +1800,11 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             screenArea.right -= screenArea.left;
             screenArea.left = 0;
         } else if (align & 4) {
-            int shift = target->field_0x0c - screenArea.left * 2 - screenArea.right;
+            int shift = target->targetWidth - screenArea.left * 2 - screenArea.right;
             screenArea.left += shift;
             screenArea.right += shift;
         } else {
-            int shift = (target->field_0x0c - screenArea.left - screenArea.right) / 2 -
+            int shift = (target->targetWidth - screenArea.left - screenArea.right) / 2 -
                         screenArea.left;
             screenArea.left += shift;
             screenArea.right += shift;
@@ -1813,11 +1813,11 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             screenArea.bottom -= screenArea.top;
             screenArea.top = 0;
         } else if (align & 0x20) {
-            int shift = target->field_0x10 - screenArea.top * 2 - screenArea.bottom;
+            int shift = target->targetHeight - screenArea.top * 2 - screenArea.bottom;
             screenArea.top += shift;
             screenArea.bottom += shift;
         } else {
-            int shift = (target->field_0x10 - screenArea.top - screenArea.bottom) / 2 -
+            int shift = (target->targetHeight - screenArea.top - screenArea.bottom) / 2 -
                         screenArea.top;
             screenArea.top += shift;
             screenArea.bottom += shift;

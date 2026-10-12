@@ -677,7 +677,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                 else if (selected->field_0xa8 < selected->wantedLevel && selected->field_0xa8 != 8)
                     state = "Lo";
             }
-            int x = target->field_0x0c - selected->field_0x14;
+            int x = target->targetWidth - selected->field_0x14;
             long pitch;
             unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
             if (bits) {
@@ -685,10 +685,10 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                 void* source = selected->UnknownVirtualSlot13(0, &sourcePitch, 0x811);
                 if (source) {
                     int sourceSize = PixelFormatBytesPerPixel(selected->field_0x20);
-                    int size = PixelFormatBytesPerPixel(target->field_0x28);
+                    int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
                     ConvertPixels(bits + x * size + 20 * pitch, source, selected->field_0x14,
                                           selected->field_0x18, pitch / size, sourcePitch / sourceSize,
-                                          target->field_0x28, selected->field_0x20, 0, selected->field_0x2c, 0, 0);
+                                          target->surfacePixelFormat, selected->field_0x20, 0, selected->field_0x2c, 0, 0);
                     selected->systemSurface->Unlock(0);
                 }
                 target->UnknownVirtualSlot5(0);
@@ -756,9 +756,9 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                     locked.size = sizeof(locked);
                     if (!level->Lock(0, &locked, 0x811, 0)) {
                         int sourceSize = PixelFormatBytesPerPixel(managed->field_0x20);
-                        int size = PixelFormatBytesPerPixel(target->field_0x28);
+                        int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
                         ConvertPixels(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
-                                              pitch / size, locked.pitch / sourceSize, target->field_0x28,
+                                              pitch / size, locked.pitch / sourceSize, target->surfacePixelFormat,
                                               managed->field_0x20, 0, managed->field_0x2c, 0, 0);
                         level->Unlock(0);
                     }

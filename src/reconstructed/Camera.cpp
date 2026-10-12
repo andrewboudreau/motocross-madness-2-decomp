@@ -94,11 +94,11 @@ int Camera::UnknownVirtualSlot13() {
 // (both reads through `display` share one index load).
 int Camera::UnknownFunction42e550() {
     RenderTarget* owner = Owner();
-    field_0x1c4 = owner->field_0x0c;
-    field_0x1c8 = owner->field_0x10;
-    UnknownDisplay* display = owner->field_0x04;
+    field_0x1c4 = owner->targetWidth;
+    field_0x1c8 = owner->targetHeight;
+    UnknownDisplay* display = owner->targetDisplay;
     float width = (float)display->displayModes[display->currentDisplayMode].width;
-    float height = (float)owner->field_0x04->displayModes[owner->field_0x04->currentDisplayMode].height;
+    float height = (float)owner->targetDisplay->displayModes[owner->targetDisplay->currentDisplayMode].height;
     displayAspect = width / height;
     field_0x1a0[0] = 0;
     field_0x1a0[1] = 0;
@@ -109,8 +109,8 @@ int Camera::UnknownFunction42e550() {
     if (!owner->UnknownVirtualSlot14(field_0x1a0))
         return 0;
     heightWidthRatio = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
-    field_0x1d0 = Owner()->field_0x14 + 1;
-    field_0x1cc = Owner()->field_0x14 + 1;
+    field_0x1d0 = Owner()->frameModulus + 1;
+    field_0x1cc = Owner()->frameModulus + 1;
     return 1;
 }
 
@@ -172,7 +172,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
 void Camera::SetFieldOfView(float value) {
     if (value != 0.0)
         field_0x16c = value;
-    field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1d0 = Owner()->frameModulus + 1;
 }
 
 float FastInvSqrt(float value); // 0x00460c00
@@ -286,7 +286,7 @@ int Camera::UnknownVirtualSlot29(Vector3 target) {
     else
         right = Vector3(1.0f, 0.0f, 0.0f);
     upDirection = Cross(viewDirection, right);
-    field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1d0 = Owner()->frameModulus + 1;
     return 1;
 }
 
@@ -310,12 +310,12 @@ int Camera::UnknownVirtualSlot32(const Matrix4* value) {
 void Camera::UnknownVirtualSlot5() {
     GameObject::UnknownVirtualSlot5();
     Owner()->SetCamera(this);
-    field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1d0 = Owner()->frameModulus + 1;
 }
 
 int Camera::UnknownVirtualSlot18() {
     GameObject::UnknownVirtualSlot18();
-    field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1d0 = Owner()->frameModulus + 1;
     return 1;
 }
 
@@ -345,7 +345,7 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
     if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
         field_0x1a0[3] = field_0x1c8;
     field_0x1a0[1] = (unsigned int)(field_0x1c8 - field_0x1a0[3]) >> 1;
-    field_0x1cc = field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
     return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
 }
 
@@ -359,7 +359,7 @@ int Camera::SetViewport(int x, int y, int width, int height) {
         field_0x1a0[2] = field_0x1c4;
     if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
         field_0x1a0[3] = field_0x1c8;
-    field_0x1cc = field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
     return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
 }
 

@@ -299,7 +299,7 @@ int EventManager::CreatePodiumScene() {
     context.field_0x00 = g_TrackGame->field_0x3c;
     context.field_0x04 = PODIUM_OWNER(owner)->field_0x94;
     context.field_0x08 = PODIUM_OWNER(owner)->field_0x98;
-    context.field_0x0c = ((RenderTarget*)field_0x18)->field_0x28;
+    context.field_0x0c = ((RenderTarget*)field_0x18)->surfacePixelFormat;
     context.field_0x10 = 0x115c;
     context.field_0x14 = 0;
     PODIUM_ARCADE->UnknownVirtualSlot5();

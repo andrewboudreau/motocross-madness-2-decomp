@@ -39,21 +39,21 @@ public:
     void AdvanceFrame();                        // 0x004e8cc0: advances the frame counters
     void SetCamera(Camera* camera);          // 0x004e8cf0: sets the current camera
 
-    UnknownDisplay* field_0x04;
-    Camera* field_0x08;                  // current camera
-    int field_0x0c;                      // width
-    int field_0x10;                      // height
-    int field_0x14;                      // frame modulus (Camera slots 5/18 read it)
-    int field_0x18;                      // frame index, wraps at field_0x14
-    int field_0x1c;                      // frame count
-    int field_0x20;                      // Z depth (PCRenderTarget: 16 or 32)
-    int field_0x24;                      // surface memory caps (0x4000 video, 0x800 system)
-    int field_0x28;                      // pixel format of the surface
-    float field_0x2c;                    // Z clear value (1.0f)
-    int field_0x30;                      // clear colour
-    int field_0x34;                      // nonzero: slot 12 also clears the target (D3DCLEAR_TARGET, 0x004c5549)
-    int field_0x38;                      // vertices drawn in formats 0x112/0x1e2 (reset by slot 12)
-    int field_0x3c;                      // points drawn
-    int field_0x40;                      // lines drawn
-    int field_0x44;                      // triangles drawn
+    UnknownDisplay* targetDisplay;            // +0x04
+    Camera* currentCamera;                    // +0x08 current camera
+    int targetWidth;                          // +0x0c width
+    int targetHeight;                         // +0x10 height
+    int frameModulus;                         // +0x14 frame modulus (Camera slots 5/18 read it)
+    int frameIndex;                           // +0x18 frame index, wraps at frameModulus
+    int frameCount;                           // +0x1c frame count
+    int zDepth;                               // +0x20 Z depth (PCRenderTarget: 16 or 32)
+    int surfaceCaps;                          // +0x24 surface memory caps (0x4000 video, 0x800 system)
+    int surfacePixelFormat;                   // +0x28 pixel format of the surface
+    float zClearValue;                        // +0x2c Z clear value (1.0f)
+    int clearColor;                           // +0x30 clear colour
+    int clearTarget;                          // +0x34 nonzero: slot 12 also clears the target (D3DCLEAR_TARGET, 0x004c5549)
+    int verticesDrawn;                        // +0x38 vertices drawn in formats 0x112/0x1e2 (reset by slot 12)
+    int pointsDrawn;                          // +0x3c points drawn
+    int linesDrawn;                           // +0x40 lines drawn
+    int trianglesDrawn;                       // +0x44 triangles drawn
 };

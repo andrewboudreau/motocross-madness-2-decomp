@@ -63,7 +63,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     overlayTexture = texture;
     field_0xe4 = a4;
     // Through the Target() accessor VC6 allocates the registers differently.
-    field_0x40 = ((RenderTarget*)field_0x18)->field_0x28;
+    field_0x40 = ((RenderTarget*)field_0x18)->surfacePixelFormat;
     screenRect = *rect;
     if (source) {
         sourceRect = *source;
@@ -84,7 +84,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
         g_UnknownOverlayTexture689110 =
             new(__FILE__, 107) PCTextureMap(g_TrackGame->field_0x3c, 1);
         g_UnknownOverlayTexture689110->UnknownVirtualSlot4(0, 0x100, 0x100, 0x100, 0x100,
-                                                           Target()->field_0x28, Target()->field_0x28,
+                                                           Target()->surfacePixelFormat, Target()->surfacePixelFormat,
                                                            0, 8, 0, 1, 0, 5, 6, 0, 0x80, 0xff00ff);
         void* bits = g_UnknownOverlayTexture689110->UnknownVirtualSlot13(0, 0, 0);
         memset(bits, 0, PixelFormatBytesPerPixel(g_UnknownOverlayTexture689110->field_0x20) << 16);
@@ -168,7 +168,7 @@ void Overlay::LayOutQuad() {
     }
 
     int left, top, maxX, maxY;
-    Camera* camera = Target()->field_0x08;
+    Camera* camera = Target()->currentCamera;
     if (camera) {
         CameraRect viewport;
         camera->GetViewportRect(&viewport);
@@ -177,8 +177,8 @@ void Overlay::LayOutQuad() {
         left = viewport.left;
         top = viewport.top;
     } else {
-        maxX = Target()->field_0x0c - 1;
-        maxY = Target()->field_0x10 - 1;
+        maxX = Target()->targetWidth - 1;
+        maxY = Target()->targetHeight - 1;
         left = 0;
         top = 0;
     }
@@ -216,10 +216,10 @@ void Overlay::LayOutQuad() {
         x0 = 0.0f;
     if (y0 <= 0.0f)
         y0 = 0.0f;
-    float targetWidth = (float)Target()->field_0x0c;
+    float targetWidth = (float)Target()->targetWidth;
     if (x1 >= targetWidth)
         x1 = targetWidth;
-    float targetHeight = (float)Target()->field_0x10;
+    float targetHeight = (float)Target()->targetHeight;
     if (y1 >= targetHeight)
         y1 = targetHeight;
 

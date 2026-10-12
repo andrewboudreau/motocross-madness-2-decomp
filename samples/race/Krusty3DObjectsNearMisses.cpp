@@ -169,19 +169,19 @@ struct UnknownCueOwner {
 #define UNKNOWN_PLACE_CUE() \
     { \
     Vector3 forward; \
-    forward.x = arcadeView->field_0x0ac[0][2]; \
-    forward.y = arcadeView->field_0x0ac[1][2]; \
-    forward.z = arcadeView->field_0x0ac[2][2]; \
-    Vector3 up = Vector3(arcadeView->field_0x0ac[0][1], arcadeView->field_0x0ac[1][1], arcadeView->field_0x0ac[2][1]); \
-    Vector3 right = Vector3(arcadeView->field_0x0ac[0][0], arcadeView->field_0x0ac[1][0], arcadeView->field_0x0ac[2][0]); \
-    if (arcadeView->field_0x16c != builtFieldOfView) { \
-        builtFieldOfView = arcadeView->field_0x16c; \
+    forward.x = arcadeView->cameraMatrix[0][2]; \
+    forward.y = arcadeView->cameraMatrix[1][2]; \
+    forward.z = arcadeView->cameraMatrix[2][2]; \
+    Vector3 up = Vector3(arcadeView->cameraMatrix[0][1], arcadeView->cameraMatrix[1][1], arcadeView->cameraMatrix[2][1]); \
+    Vector3 right = Vector3(arcadeView->cameraMatrix[0][0], arcadeView->cameraMatrix[1][0], arcadeView->cameraMatrix[2][0]); \
+    if (arcadeView->fieldOfView != builtFieldOfView) { \
+        builtFieldOfView = arcadeView->fieldOfView; \
         float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * field_0x44; \
         screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f; \
-        screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->field_0x1b8 * half * 2.0f; \
+        screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->aspectRatio * half * 2.0f; \
         modelScale = field_0x38 * field_0x44 / (arcadeView->field_0x198 * field_0x3c); \
     } \
-    Vector3 position = arcadeView->field_0x170; \
+    Vector3 position = arcadeView->cameraPosition; \
     position += forward * field_0x44; \
     position += right * screenOffsetX; \
     position += up * screenOffsetY; \
@@ -219,7 +219,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         else
             target = cueView->ownRacer->trackPoint;
         field_0xac->QueryGround(&target, 0, 0, 0);
-        Vector3 direction = target - arcadeView->field_0x170;
+        Vector3 direction = target - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
@@ -232,7 +232,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         if (!ref)
             return 1;
         Vector3 direction =
-            g_UnknownKrustyGame56e26c->field_0x560->field_0xd8[ref->gateIndex].field_0x00 - arcadeView->field_0x170;
+            g_UnknownKrustyGame56e26c->field_0x560->field_0xd8[ref->gateIndex].field_0x00 - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
@@ -249,7 +249,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
                 break;
             }
         }
-        Vector3 direction = target - arcadeView->field_0x170;
+        Vector3 direction = target - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
@@ -260,7 +260,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
             Vector3 target;
             g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.GetPosition(&target);
-            Vector3 direction = target - arcadeView->field_0x170;
+            Vector3 direction = target - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
@@ -271,7 +271,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
                 return 1;
             if (followed == g_UnknownKrustyGame56e26c->field_0x568->field_0xa8)
                 goto hide;
-            Vector3 direction = g_UnknownKrustyGame56e26c->field_0x568->field_0xa8->position - arcadeView->field_0x170;
+            Vector3 direction = g_UnknownKrustyGame56e26c->field_0x568->field_0xa8->position - arcadeView->cameraPosition;
             SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }

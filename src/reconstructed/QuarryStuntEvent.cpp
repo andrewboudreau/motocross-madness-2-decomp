@@ -224,10 +224,10 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
 
     // One load each of the height and width feeds two copies: the cue's size
     // uses height/width, its position and the overlays the screen rectangle.
-    height = ((RenderTarget*)field_0x18)->field_0x10;
-    screen.bottom = ((RenderTarget*)field_0x18)->field_0x10;
-    width = ((RenderTarget*)field_0x18)->field_0x0c;
-    screen.right = ((RenderTarget*)field_0x18)->field_0x0c;
+    height = ((RenderTarget*)field_0x18)->targetHeight;
+    screen.bottom = ((RenderTarget*)field_0x18)->targetHeight;
+    width = ((RenderTarget*)field_0x18)->targetWidth;
+    screen.right = ((RenderTarget*)field_0x18)->targetWidth;
     screen.top = 0;
     screen.left = 0;
     if (visualCue) {
@@ -259,7 +259,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
 
     // Retail reads the height and loads 10 and 256 before the allocation and
     // computes the top after it.
-    text.bottom = ((RenderTarget*)field_0x18)->field_0x10;
+    text.bottom = ((RenderTarget*)field_0x18)->targetHeight;
     text.left = 10;
     text.right = 256;
     textQueue = new(__FILE__, 1463) TextQueueOverlay(0);
@@ -374,7 +374,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             EnableByClassName("SkyCube");
         g_TrackGame->mode.skyCubeOn = 1 - g_TrackGame->mode.skyCubeOn;
         ShowOnOffMessage(0x1411, g_TrackGame->mode.skyCubeOn);
-        ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_TrackGame->mode.skyCubeOn);
+        ((RenderTarget*)field_0x18)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
         return 1;
     }
     if (TestInputEvent(0x43, 0, event, 0x80000000)) {
@@ -547,7 +547,7 @@ BaseQuarryEvent::~BaseQuarryEvent() {
         field_0x94->Release();
         field_0x98->Release();
     }
-    ((RenderTarget*)field_0x18)->field_0x08 = 0;
+    ((RenderTarget*)field_0x18)->currentCamera = 0;
 }
 
 // The remaining overrides are bodies the linker folded with identical ones

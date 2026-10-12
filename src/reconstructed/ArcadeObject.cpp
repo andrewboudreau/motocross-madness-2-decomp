@@ -16,23 +16,23 @@ ArcadeObject::ArcadeObject(int flags) : GameObject(flags) {
     field_0x38 = 0;
     field_0x3c = 0;
     arcadeView = 0;
-    field_0x5c = 0;
-    field_0x60 = 0;
-    field_0x64 = 0;
-    field_0x68 = 0;
+    collisionObject = 0;
+    collisionBuilt = 0;
+    lifetimeEnabled = 0;
+    lifetime = 0;
     field_0x6c = 0;
-    field_0x70 = 0;
+    elapsedLifetime = 0;
     field_0x8c = 0;
-    field_0x90 = 0;
-    field_0xa0 = 0;
-    field_0xa4 = 0;
-    field_0x78 = 0;
-    field_0x7c = 0;
-    field_0x84 = 0;
-    field_0x88 = 0;
+    spinning = 0;
+    spinAngle = 0;
+    spinSpeed = 0;
+    delayEnabled = 0;
+    delay = 0;
+    repeatLimit = 0;
+    repeatCount = 0;
     modelWidth = 0;
-    field_0x54 = 0;
-    field_0x58 = 0;
+    modelHeight = 0;
+    transparency = 0;
     modelScale = 1.0f;
     field_0x74 = 1;
 }
@@ -60,7 +60,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
     arcadeView = view;
     arcadeModel->GetSubtreeBounds(&low, &extent);
     modelWidth = extent.x + extent.x;
-    field_0x54 = extent.y + extent.y;
+    modelHeight = extent.y + extent.y;
     if (pixels && arcadeView) {
         field_0x48 = c;
         field_0x4c = d;
@@ -74,10 +74,10 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
         arcadeModel->Scale(scale, scale, scale);
     }
     if (alpha) {
-        field_0x58 = new (__FILE__, 104) TransparencyMod(1);
-        AppendChild(field_0x58, -1);
-        field_0x58->field_0x48 = alpha;
-        arcadeModel->UnknownFunction444d80(field_0x58);
+        transparency = new (__FILE__, 104) TransparencyMod(1);
+        AppendChild(transparency, -1);
+        transparency->field_0x48 = alpha;
+        arcadeModel->UnknownFunction444d80(transparency);
     }
     return this;
 }
@@ -85,8 +85,8 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
 // 0x004014f0
 void ArcadeObject::SetPosition(const Vector3* position) {
     arcadeModel->SetPosition(position);
-    if (field_0x60)
-        field_0x5c->UnknownFunction435fe0();
+    if (collisionBuilt)
+        collisionObject->UnknownFunction435fe0();
 }
 
 // 0x00401520
@@ -95,7 +95,7 @@ void ArcadeObject::SetAxes(const Vector3* a, const Vector3* b, int c, int d) {
 }
 
 // 0x00401540
-int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPickCallback callback,
+int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallback callback,
                                         void* context, unsigned char a, unsigned char b) {
     char tag[0x80];
     char found[0x104];
@@ -103,8 +103,8 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
 
     g_MemTagStack->UnknownFunction4a2da0(tag);
     g_MemTagStack->Push("Collision");
-    field_0x5c = new (__FILE__, 154) CollisionObject(1);
-    field_0x5c->Configure(field_0x18, 1, a, b);
+    collisionObject = new (__FILE__, 154) CollisionObject(1);
+    collisionObject->Configure(field_0x18, 1, a, b);
     strcpy(path, name);
     strcpy(strrchr(path, '.'), ".col");
     UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -113,53 +113,53 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
     if (stream)
         delete stream;
     if (found[0])
-        field_0x5c->LoadShape(arcadeModel, found);
+        collisionObject->LoadShape(arcadeModel, found);
     else
-        field_0x5c->SetHullShape(arcadeModel, 1, 0, 0, 0);
-    field_0x5c->SetOwner(arcadeModel, value);
-    field_0x5c->UnknownFunction435fe0();
-    field_0x5c->field_0x88 = callback;
-    field_0x5c->field_0x8c = context;
-    AppendChild(field_0x5c, -1);
+        collisionObject->SetHullShape(arcadeModel, 1, 0, 0, 0);
+    collisionObject->SetOwner(arcadeModel, value);
+    collisionObject->UnknownFunction435fe0();
+    collisionObject->field_0x88 = callback;
+    collisionObject->field_0x8c = context;
+    AppendChild(collisionObject, -1);
     g_MemTagStack->Push(tag);
-    field_0x60 = 1;
+    collisionBuilt = 1;
     return 1;
 }
 
 // 0x004017a0
-void ArcadeObject::UnknownFunction4017a0(Vector3 axis, float speed) {
-    field_0x90 = 1;
+void ArcadeObject::StartSpin(Vector3 axis, float speed) {
+    spinning = 1;
     if (speed != 0.0f) {
-        field_0x94 = axis;
-        field_0xa0 = 0;
-        field_0xa4 = speed * 0.01745329f;
+        spinAxis = axis;
+        spinAngle = 0;
+        spinSpeed = speed * 0.01745329f;
     }
 }
 
 // 0x00401800
 int ArcadeObject::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x64) {
-        if (field_0x70 > field_0x68)
+    if (lifetimeEnabled) {
+        if (elapsedLifetime > lifetime)
             isVisible = 0;
         else
-            field_0x70 += g_TrackGame->frameTime;
+            elapsedLifetime += g_TrackGame->frameTime;
     }
-    if (field_0x78 && !field_0x74) {
-        field_0x80 += g_TrackGame->frameTime;
-        if (field_0x80 > field_0x7c) {
-            if (field_0x88 < field_0x84 || field_0x84 == 999) {
-                field_0x88++;
+    if (delayEnabled && !field_0x74) {
+        elapsedDelay += g_TrackGame->frameTime;
+        if (elapsedDelay > delay) {
+            if (repeatCount < repeatLimit || repeatLimit == 999) {
+                repeatCount++;
                 field_0x74 = 1;
             }
-            field_0x80 = 0;
+            elapsedDelay = 0;
         }
     }
-    if (field_0x74 && field_0x90) {
-        field_0xa0 = g_TrackGame->frameTime * field_0xa4;
-        while (field_0xa0 > 6.2831855f)
-            field_0xa0 -= 6.2831855f;
-        arcadeModel->Rotate(field_0x94, field_0xa0);
+    if (field_0x74 && spinning) {
+        spinAngle = g_TrackGame->frameTime * spinSpeed;
+        while (spinAngle > 6.2831855f)
+            spinAngle -= 6.2831855f;
+        arcadeModel->Rotate(spinAxis, spinAngle);
     }
     return 1;
 }

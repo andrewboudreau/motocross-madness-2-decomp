@@ -287,8 +287,8 @@ struct UnknownQuarryOverlayHooks {
 
 // The bytes the render target's colour buffers take.
 static inline int FrameBufferBytes(RenderTarget* target) {
-    return PixelFormatBytesPerPixel(target->field_0x28) * (target->field_0x14 + 1) * target->field_0x10 *
-           target->field_0x0c;
+    return PixelFormatBytesPerPixel(target->surfacePixelFormat) * (target->frameModulus + 1) * target->targetHeight *
+           target->targetWidth;
 }
 
 // 0x004de590
@@ -355,15 +355,15 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             modelTextures.field_0x14 = 1;
         }
     } else {
-        int videoMemory = ((PCRenderTarget*)field_0x18)->field_0x04->totalVideoMemory;
-        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)field_0x18)->field_0x04->driverGuidText);
+        int videoMemory = ((PCRenderTarget*)field_0x18)->targetDisplay->totalVideoMemory;
+        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)field_0x18)->targetDisplay->driverGuidText);
         int megabytes = g_TrackGame->GetRegistryInt(key, -1);
         forced = g_TrackGame->mode.videoSettings[0];
         if (megabytes != -1)
             videoMemory = megabytes << 20;
         PCRenderTarget* target = (PCRenderTarget*)field_0x18;
         int available = videoMemory - FrameBufferBytes(target);
-        if (g_TrackGame->osVersion.platformId != 2 && !(target->field_0x04->driverCaps & 0x400)) {
+        if (g_TrackGame->osVersion.platformId != 2 && !(target->targetDisplay->driverCaps & 0x400)) {
             available = videoMemory - 0x400000;
             if (!(target->deviceCaps & 0x4000))
                 available = videoMemory - 0x200000;
@@ -481,14 +481,14 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         }
         if (g_TrackGame->field_0x2d5_bit2) {
             field_0x94 = (GameObject*)g_TrackGame->field_0x3c->CreateGroup(
-                ((PCRenderTarget*)field_0x18)->field_0x28, 0, 2, 1);
+                ((PCRenderTarget*)field_0x18)->surfacePixelFormat, 0, 2, 1);
             field_0x98 = (GameObject*)g_TrackGame->field_0x3c->CreateGroup(0x115c, 0, 2, 1);
         }
     }
     modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->field_0x3c;
     modelTextures.field_0x04 = skyTextures.field_0x04 = terrainTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
     modelTextures.field_0x08 = skyTextures.field_0x08 = terrainTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
-    modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->field_0x28;
+    modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->surfacePixelFormat;
     modelTextures.field_0x10 = skyTextures.field_0x10 = terrainTextures.field_0x10 = 0x115c;
     if (progress)
         progress(0);
@@ -853,7 +853,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         DisableByClassName("TerrainShadow");
         DisableByClassName("D3DIMSoultreeShadow");
     }
-    ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_TrackGame->mode.skyCubeOn);
+    ((RenderTarget*)field_0x18)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
     field_0x50 = (void*)1;
     if (g_TrackGame->field_0x2d5_bit2) {
         g_MemTagStack->Push("TextureCache");

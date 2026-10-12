@@ -27,7 +27,7 @@ ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
 int ObjectPicker::UnknownFunction4b04c0() {
     UnknownCursorPosition position = field_0x34->UnknownFunction43f100();
 
-    return UnknownFunction4b0500(position.x, ((RenderTarget*)field_0x18)->field_0x10 - position.y - 1);
+    return UnknownFunction4b0500(position.x, ((RenderTarget*)field_0x18)->targetHeight - position.y - 1);
 }
 
 // 0x004b0730
@@ -51,10 +51,10 @@ int ObjectPicker::UnknownFunction4b0500(int x, int y) {
 
     field_0x38 = x;
     field_0x3c = y;
-    camera = (UnknownPickCamera*)((RenderTarget*)field_0x18)->field_0x08;
+    camera = (UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera;
     position = camera->field_0x170;
     u = (float)x - camera->field_0x1a0 - camera->field_0x1a8 / 2;
-    v = (float)y - (((RenderTarget*)field_0x18)->field_0x10 - camera->field_0x1a4 - camera->field_0x1ac) -
+    v = (float)y - (((RenderTarget*)field_0x18)->targetHeight - camera->field_0x1a4 - camera->field_0x1ac) -
         camera->field_0x1ac / 2;
     w = camera->field_0x198;
     direction.x = u * camera->field_0x0ac[0][0] + v * camera->field_0x0ac[0][1] + w * camera->field_0x0ac[0][2] +
@@ -103,10 +103,10 @@ ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManage
         field_0x34 = cursor;
     } else {
         field_0x40 = new(__FILE__, 59)
-            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->field_0x08)->field_0x1c4,
+            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera)->field_0x1c4,
                                   0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.1f);
         field_0x44 = new(__FILE__, 60)
-            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->field_0x08)->field_0x1c8,
+            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera)->field_0x1c8,
                                   0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.1f);
         if (g_TrackGame->controlInterface->mouse) {
             g_TrackGame->controlInterface->mouse->AttachBinding(field_0x40);

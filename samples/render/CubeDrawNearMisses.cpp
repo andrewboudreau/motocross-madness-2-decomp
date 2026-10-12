@@ -199,15 +199,15 @@ int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* c
 void DrawableCube::MarkVisibleCells()
 {
     Vector3 forward;
-    forward.x = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[0][2];
-    forward.y = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[1][2];
-    forward.z = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[2][2];
+    forward.x = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[0][2];
+    forward.y = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[1][2];
+    forward.z = ((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix.m[2][2];
     const Vector3& center = field_0x2c->field_0x14;
-    const Vector3& eye = ((UnknownCubeCameraView*)Target()->field_0x08)->position;
+    const Vector3& eye = ((UnknownCubeCameraView*)Target()->currentCamera)->position;
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
         field_0x2c->field_0x38[face].visibleCells = 0;
-        if (!g_UnknownCubeClipper575a98->CanFaceCamera(Target()->field_0x08, &forward,
+        if (!g_UnknownCubeClipper575a98->CanFaceCamera(Target()->currentCamera, &forward,
                                                                 &s_faceNormals[face]))
             continue;
         for (int k = 0; k < 25; k++)
@@ -216,10 +216,10 @@ void DrawableCube::MarkVisibleCells()
             s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
         }
         g_UnknownCubeClipper575a98->TransformPoints(
-            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix, 25);
+            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix, 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
-            if (g_UnknownCubeClipper575a98->IsQuadOnScreen(Target()->field_0x08, s_viewPoints, corner,
+            if (g_UnknownCubeClipper575a98->IsQuadOnScreen(Target()->currentCamera, s_viewPoints, corner,
                                                                   corner + 1, corner + 6, corner + 5))
                 field_0x2c->field_0x38[face].visibleCells |= 1 << i;
         }
@@ -238,7 +238,7 @@ int DrawableCube::UnknownVirtualSlot14()
     s_world.m[3][0] = field_0x2c->field_0x14.x;
     s_world.m[3][1] = field_0x2c->field_0x14.y;
     s_world.m[3][2] = field_0x2c->field_0x14.z;
-    Target()->field_0x08->UnknownVirtualSlot30(&s_world);
+    Target()->currentCamera->UnknownVirtualSlot30(&s_world);
     Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
@@ -282,12 +282,12 @@ int DrawableCube::UnknownVirtualSlot14()
             if (face >= 4 || i <= 7)
                 continue;
             UnknownCubeVertex* v = s_cellVertices[face][i];
-            v[0].diffuse = Target()->field_0x30;
-            v[1].diffuse = Target()->field_0x30;
-            v[2].diffuse = Target()->field_0x30;
-            v[3].diffuse = Target()->field_0x30;
-            v[4].diffuse = Target()->field_0x30;
-            v[5].diffuse = Target()->field_0x30;
+            v[0].diffuse = Target()->clearColor;
+            v[1].diffuse = Target()->clearColor;
+            v[2].diffuse = Target()->clearColor;
+            v[3].diffuse = Target()->clearColor;
+            v[4].diffuse = Target()->clearColor;
+            v[5].diffuse = Target()->clearColor;
             if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)v, 6, 0))
                 return 0;
         }

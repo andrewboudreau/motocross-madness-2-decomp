@@ -749,7 +749,7 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     ((PCRenderTarget*)field_0x18)->renderSurface->Lock(0, &desc, 1, 0);
-    UnknownSoultreeCameraView* camera = (UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08;
+    UnknownSoultreeCameraView* camera = (UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera;
     char* bits = (char*)desc.surface + camera->viewportY * desc.pitch + camera->viewportX;
     int i;
     for (i = rect->field_0x00; i < rect->field_0x08; i++) {
@@ -791,11 +791,11 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
         GetSubtreeBounds(center, extents);
     }
     float distance = Magnitude(LocalToWorldPoint(*center) -
-                               ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
+                               ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->position);
     float range = distance - Magnitude(*extents);
     if (0.1f > range)
         range = 0.1f;
-    float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->imagePlaneDistance / range;
+    float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->imagePlaneDistance / range;
     if (field_0x288) {
         int lod = 0;
         for (int i = 0; i < lodCount - 1; i++) {

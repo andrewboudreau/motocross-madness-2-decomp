@@ -697,7 +697,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             arch->arcadeModel->SoultreeVirtualSlot6();
             arch->SetPosition(&point);
             arch->SetAxes(&direction, &kVec3YAxis, 1, 0);
-            arch->UnknownFunction401540(name, 0x6a, 0, 0, 0, 1);
+            arch->BuildCollision(name, 0x6a, 0, 0, 0, 1);
 
             Vector3 girlOffset;
             Vector3 boxOffset;
@@ -742,7 +742,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             box->arcadeModel->UnknownFunction4444c0(1);
             box->SetPosition(&boxPosition);
             box->SetAxes(&direction, &kVec3YAxis, 1, 0);
-            box->UnknownFunction401540(name, 0x6a, 0, 0, 0, 1);
+            box->BuildCollision(name, 0x6a, 0, 0, 0, 1);
             g_TrackGame->eventManager->RemoveVegetationInRect(girlPosition.x - 4.0f, girlPosition.z - 4.0f,
                                                                        girlPosition.x + 4.0f, girlPosition.z + 4.0f);
         }
@@ -773,7 +773,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                                                     2.0f, 0.5f, 0.5f, 0);
         AppendChild(field_0x060, -1);
         Vector3 axis(0.0f, 1.0f, 0.0f);
-        ((ArcadeObject*)field_0x060)->UnknownFunction4017a0(axis, 75.0f);
+        ((ArcadeObject*)field_0x060)->StartSpin(axis, 75.0f);
         ((ArcadeObject*)field_0x060)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {

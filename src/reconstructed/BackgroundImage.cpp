@@ -58,7 +58,7 @@ static inline int ModeWidth(UnknownDisplay* display)
 // frames are left to restore) the whole copy is restored.
 int BackgroundImage::UnknownVirtualSlot13() {
     if (!fullRestoreFrames) {
-        UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
+        UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->currentCamera;
         if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
             camera->viewportHeight != ModeHeight(g_TrackGame->display) ||
             camera->viewportWidth != ModeWidth(g_TrackGame->display)) {
@@ -67,7 +67,7 @@ int BackgroundImage::UnknownVirtualSlot13() {
                 copyValid = 1;
             }
             ResetPendingRects();
-            if (Target()->field_0x08)
+            if (Target()->currentCamera)
                 ClearRegionDepth();
             RestoreRegions();
             return 1;
@@ -75,7 +75,7 @@ int BackgroundImage::UnknownVirtualSlot13() {
     }
     UnknownVirtualSlot27(Target()->renderSurface);
     copyValid = 0;
-    if (Target()->field_0x08)
+    if (Target()->currentCamera)
         ClearRegionDepth();
     if (regionCount) {
         for (int i = 0; i < regionCapacity; i++)
@@ -130,7 +130,7 @@ GameObject* BackgroundImage::UnknownVirtualSlot8(void* value) {
         goto failed;
     desc.flags = 0x1007;
     desc.caps[0] = 0x2800;
-    if (Target()->field_0x04->directDraw->CreateSurface(&desc, &offscreenCopy, 0) != 0)
+    if (Target()->targetDisplay->directDraw->CreateSurface(&desc, &offscreenCopy, 0) != 0)
         goto failed;
     field_0x44 = 0;
     regionCapacity = 4;
@@ -163,7 +163,7 @@ int BackgroundImage::AllocRegion(int owner) {
     if (regionCapacity > regionCount) {
         for (i = 0; i < regionCapacity; i++) {
             if (regionTable[i].framesLeft == 0) {
-                regionTable[i].framesLeft = Target()->field_0x14 + 1;
+                regionTable[i].framesLeft = Target()->frameModulus + 1;
                 regionTable[i].owner = owner;
                 regionCount++;
                 return i;
@@ -179,8 +179,8 @@ int BackgroundImage::AllocRegion(int owner) {
             regionTable[i].pendingFrame = -1;
             regionTable[i].owner = 0;
         }
-        regionTable[regionCapacity].framesLeft = Target()->field_0x14 + 1;
-        regionTable[regionCapacity].lastFrameCount = Target()->field_0x1c;
+        regionTable[regionCapacity].framesLeft = Target()->frameModulus + 1;
+        regionTable[regionCapacity].lastFrameCount = Target()->frameCount;
         regionTable[regionCapacity].owner = owner;
         regionCapacity += 4;
         regionCount++;
@@ -203,12 +203,12 @@ void BackgroundImage::ReleaseRegion(int index) {
 void BackgroundImage::SetRegionRect(int index, CameraRect* rect) {
     if (rect->bottom + rect->top && rect->right + rect->left) {
         if (regionTable[index].framesLeft) {
-            regionTable[index].frameRects[Target()->field_0x18] = *rect;
-            CameraRect* region = &regionTable[index].frameRects[Target()->field_0x18];
-            region->right = region->right < Target()->field_0x0c ? region->right : Target()->field_0x0c;
-            region->bottom = region->bottom < Target()->field_0x10 ? region->bottom : Target()->field_0x10;
+            regionTable[index].frameRects[Target()->frameIndex] = *rect;
+            CameraRect* region = &regionTable[index].frameRects[Target()->frameIndex];
+            region->right = region->right < Target()->targetWidth ? region->right : Target()->targetWidth;
+            region->bottom = region->bottom < Target()->targetHeight ? region->bottom : Target()->targetHeight;
         }
-        regionTable[index].lastFrameCount = Target()->field_0x1c;
+        regionTable[index].lastFrameCount = Target()->frameCount;
     }
 }
 
@@ -222,7 +222,7 @@ int BackgroundImage::RestoreRegions() {
                     CurrentRegionRect(i).bottom - CurrentRegionRect(i).top > 0 && !regionTable[i].owner)
                     Target()->renderSurface->BltFast(CurrentRegionRect(i).left, CurrentRegionRect(i).top,
                                                          offscreenCopy, &CurrentRegionRect(i), 0x10);
-                if (regionTable[i].framesLeft != Target()->field_0x14)
+                if (regionTable[i].framesLeft != Target()->frameModulus)
                     regionTable[i].framesLeft--;
                 if (regionTable[i].framesLeft == 0)
                     regionCount--;
@@ -235,10 +235,10 @@ int BackgroundImage::RestoreRegions() {
 // 0x004043c0: clears the depth buffer under each region's previous-frame
 // rectangle.
 int BackgroundImage::ClearRegionDepth() {
-    if (regionCount && Target()->field_0x08) {
-        int frame = Target()->field_0x18 - 1;
+    if (regionCount && Target()->currentCamera) {
+        int frame = Target()->frameIndex - 1;
         if (frame < 0)
-            frame = Target()->field_0x14 - 1;
+            frame = Target()->frameModulus - 1;
         int i = 0;
         if (regionCapacity > 0) {
             do {
@@ -246,7 +246,7 @@ int BackgroundImage::ClearRegionDepth() {
                     regionTable[i].frameRects[frame].right - regionTable[i].frameRects[frame].left > 0 &&
                     regionTable[i].frameRects[frame].bottom - regionTable[i].frameRects[frame].top > 0 &&
                     Target()->device->Clear(1, &regionTable[i].frameRects[frame], 2, 0,
-                                            Target()->field_0x2c, 0) != 0)
+                                            Target()->zClearValue, 0) != 0)
                     return 0;
                 i++;
             } while (i < regionCapacity);
@@ -270,7 +270,7 @@ int BackgroundImage::DrawImage(PCTextureMap* image, CameraRect* rect, void* sour
                 (*frames)--;
             } else {
                 for (int i = 0; i < regionCapacity; i++) {
-                    if (regionTable[i].lastFrameCount != Target()->field_0x1c)
+                    if (regionTable[i].lastFrameCount != Target()->frameCount)
                         continue;
                     g_UnknownGlobal577790.left =
                         CurrentRegionRect(i).left > rect->left ? CurrentRegionRect(i).left : rect->left;
@@ -297,7 +297,7 @@ int BackgroundImage::DrawImage(PCTextureMap* image, CameraRect* rect, void* sour
         } else {
             ReleaseDc();
             image->BlitTo(rect, Target()->renderSurface, sourceRect, flags, skip);
-            *frames = Target()->field_0x14;
+            *frames = Target()->frameModulus;
         }
         if (index >= 0)
             MarkRegionPending(index);
@@ -307,7 +307,7 @@ int BackgroundImage::DrawImage(PCTextureMap* image, CameraRect* rect, void* sour
     image->BlitTo(rect, Target()->renderSurface, sourceRect, flags, skip);
     if (index >= 0)
         SetRegionRect(index, rect);
-    *frames = Target()->field_0x14;
+    *frames = Target()->frameModulus;
     return 1;
 }
 
@@ -324,7 +324,7 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
                 (*frames)--;
             } else {
                 for (int i = 0; i < regionCapacity; i++) {
-                    if (regionTable[i].lastFrameCount != Target()->field_0x1c)
+                    if (regionTable[i].lastFrameCount != Target()->frameCount)
                         continue;
                     g_UnknownGlobal5777d8.left =
                         CurrentRegionRect(i).left > rect->left ? CurrentRegionRect(i).left : rect->left;
@@ -349,7 +349,7 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
         } else {
             ReleaseDc();
             image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
-            *frames = Target()->field_0x14;
+            *frames = Target()->frameModulus;
         }
         if (index >= 0)
             MarkRegionPending(index);
@@ -364,7 +364,7 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
         g_UnknownGlobal5777e8.bottom = rect->bottom - rect->top + y;
         SetRegionRect(index, &g_UnknownGlobal5777e8);
     }
-    *frames = Target()->field_0x14;
+    *frames = Target()->frameModulus;
     return 1;
 }
 
@@ -379,7 +379,7 @@ int BackgroundImage::ReleaseDc() {
 
 // 0x00404cb0
 void BackgroundImage::MarkRegionPending(int index) {
-    regionTable[index].pendingFrame = Target()->field_0x18;
+    regionTable[index].pendingFrame = Target()->frameIndex;
 }
 
 // 0x00404cd0
@@ -399,21 +399,21 @@ void BackgroundImage::ResetPendingRects() {
 // 0x00404d30
 void BackgroundImage::ClearRegionRect(int index) {
     regionTable[index].pendingFrame = -1;
-    regionTable[index].frameRects[Target()->field_0x18].top = 0;
-    regionTable[index].frameRects[Target()->field_0x18].bottom = 0;
-    regionTable[index].frameRects[Target()->field_0x18].left = 0;
-    regionTable[index].frameRects[Target()->field_0x18].right = 0;
+    regionTable[index].frameRects[Target()->frameIndex].top = 0;
+    regionTable[index].frameRects[Target()->frameIndex].bottom = 0;
+    regionTable[index].frameRects[Target()->frameIndex].left = 0;
+    regionTable[index].frameRects[Target()->frameIndex].right = 0;
 }
 
 // 0x00404da0: owes a full restore for every buffered frame (and asks the
 // camera to redraw).
 void BackgroundImage::MarkAllDirty() {
-    fullRestoreFrames = Target()->field_0x14 + 1;
-    UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
+    fullRestoreFrames = Target()->frameModulus + 1;
+    UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->currentCamera;
     if (camera) {
-        camera->redrawFrames = Target()->field_0x14 + 1;
-        if ((unsigned)((UnknownBackgroundCamera*)Target()->field_0x08)->viewportHeight < (unsigned)Target()->field_0x10)
-            ((UnknownBackgroundCamera*)Target()->field_0x08)->viewportEnabled = Target()->field_0x14 + 1;
+        camera->redrawFrames = Target()->frameModulus + 1;
+        if ((unsigned)((UnknownBackgroundCamera*)Target()->currentCamera)->viewportHeight < (unsigned)Target()->targetHeight)
+            ((UnknownBackgroundCamera*)Target()->currentCamera)->viewportEnabled = Target()->frameModulus + 1;
     }
 }
 

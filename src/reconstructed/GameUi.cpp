@@ -241,8 +241,8 @@ void UIControl::ScaleArea() {
     visibleArea[1] = -screenArea[1] < 0 ? 0 : -screenArea[1];
     int width = right - left;
     int height = bottom - top;
-    int over = screenArea[2] - g_TrackGame->renderTarget->field_0x0c;
-    int under = screenArea[3] - g_TrackGame->renderTarget->field_0x10;
+    int over = screenArea[2] - g_TrackGame->renderTarget->targetWidth;
+    int under = screenArea[3] - g_TrackGame->renderTarget->targetHeight;
     if (over > 0)
         width -= over;
     visibleArea[2] = width;
@@ -1803,7 +1803,7 @@ UIDialog::~UIDialog() {
     if (guiManager) {
         if (field_0x148)
             guiManager->UnknownFunction485ee0(field_0x14c);
-        if (g_TrackGame->renderTarget->field_0x28 == 8) {
+        if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
             if (!guiManager || !guiManager->UnknownFunction4864f0())
                 guiManager->UnknownFunction464e90();
         }
@@ -2044,7 +2044,7 @@ int UIDialog::UnknownVirtualSlot15() {
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
-    if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->field_0x1c)
+    if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->frameCount)
         UnknownVirtualSlot26();
     return 1;
 }
@@ -2088,7 +2088,7 @@ void UIDialog::EndDialog(int result) {
     if (!isClosing) {
         dialogResult = result;
         isClosing = 1;
-        closeFrame = ((RenderTarget*)field_0x18)->field_0x1c;
+        closeFrame = ((RenderTarget*)field_0x18)->frameCount;
     }
 }
 
@@ -2445,9 +2445,9 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
     screenArea[0] = screenArea[0] < 0 ? 0 : screenArea[0];
     screenArea[1] = screenArea[1] < 0 ? 0 : screenArea[1];
     int right = screenArea[2];
-    screenArea[2] = g_TrackGame->renderTarget->field_0x0c < right ? g_TrackGame->renderTarget->field_0x0c : right;
+    screenArea[2] = g_TrackGame->renderTarget->targetWidth < right ? g_TrackGame->renderTarget->targetWidth : right;
     int bottom = screenArea[3];
-    screenArea[3] = g_TrackGame->renderTarget->field_0x10 < bottom ? g_TrackGame->renderTarget->field_0x10 : bottom;
+    screenArea[3] = g_TrackGame->renderTarget->targetHeight < bottom ? g_TrackGame->renderTarget->targetHeight : bottom;
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
@@ -3923,8 +3923,8 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     } else {
         screenArea.top = 0;
         screenArea.left = 0;
-        screenArea.right = ((RenderTarget*)field_0x18)->field_0x0c;
-        screenArea.bottom = ((RenderTarget*)field_0x18)->field_0x10;
+        screenArea.right = ((RenderTarget*)field_0x18)->targetWidth;
+        screenArea.bottom = ((RenderTarget*)field_0x18)->targetHeight;
     }
     parentDialog = parent;
     if (!(flags & 6))
@@ -5171,7 +5171,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
     if (stream) {
         UnknownTgaFile* image = ReadWholeFile((UnknownTextureStream*)stream, 0, offset);
         if (image) {
-            int format = g_TrackGame->renderTarget->field_0x28;
+            int format = g_TrackGame->renderTarget->surfacePixelFormat;
             frameWidth = image->width;
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)frameTextures, 1);

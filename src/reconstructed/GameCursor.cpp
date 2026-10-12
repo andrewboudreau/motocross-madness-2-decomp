@@ -95,9 +95,9 @@ int GameCursor::UnknownFunction43ebd0(const char* image, TextureMapManager* text
     } else {
         if (!field_0x34->UnknownVirtualSlot4(file->bits, width, height, width, width,
                                              file->bitsPerPixel == 16 ? 0x22b : 0x378,
-                                             ((PCRenderTarget*)field_0x18)->field_0x28,
+                                             ((PCRenderTarget*)field_0x18)->surfacePixelFormat,
                                              (UnknownTexturePalette*)palette, 4,
-                                             ((PCRenderTarget*)field_0x18)->field_0x04->field_0x198, 0, 0, 2, 1, 0,
+                                             ((PCRenderTarget*)field_0x18)->targetDisplay->field_0x198, 0, 0, 2, 1, 0,
                                              0x80, 0xff00ff))
             goto failed;
         field_0x34->UnknownVirtualSlot18(0xff00ff);
@@ -162,8 +162,8 @@ int GameCursor::UnknownVirtualSlot15() {
         }
 
         RenderTarget* target = (RenderTarget*)field_0x18;
-        field_0x54 = (int)((float)target->field_0x0c / area.right * field_0x54);
-        field_0x58 = (int)((float)target->field_0x10 / area.bottom * field_0x58);
+        field_0x54 = (int)((float)target->targetWidth / area.right * field_0x54);
+        field_0x58 = (int)((float)target->targetHeight / area.bottom * field_0x58);
         if (outside)
             return 1;
     }
@@ -173,17 +173,17 @@ int GameCursor::UnknownVirtualSlot15() {
     if (field_0x58 < 0)
         field_0x58 = 0;
     RenderTarget* target = (RenderTarget*)field_0x18;
-    if (field_0x54 >= target->field_0x0c)
-        field_0x54 = target->field_0x0c - 1;
-    if (field_0x58 >= target->field_0x10)
-        field_0x58 = target->field_0x10 - 1;
+    if (field_0x54 >= target->targetWidth)
+        field_0x54 = target->targetWidth - 1;
+    if (field_0x58 >= target->targetHeight)
+        field_0x58 = target->targetHeight - 1;
 
     s_right = (field_0x38 ? ((PCTextureMap*)field_0x38)->field_0x14 : field_0x34->field_0x14) + field_0x54;
     s_bottom = (field_0x38 ? ((PCTextureMap*)field_0x38)->field_0x18 : field_0x34->field_0x18) + field_0x58;
-    if (s_right >= ((RenderTarget*)field_0x18)->field_0x0c)
-        s_right = ((RenderTarget*)field_0x18)->field_0x0c;
-    if (s_bottom >= ((RenderTarget*)field_0x18)->field_0x10)
-        s_bottom = ((RenderTarget*)field_0x18)->field_0x10;
+    if (s_right >= ((RenderTarget*)field_0x18)->targetWidth)
+        s_right = ((RenderTarget*)field_0x18)->targetWidth;
+    if (s_bottom >= ((RenderTarget*)field_0x18)->targetHeight)
+        s_bottom = ((RenderTarget*)field_0x18)->targetHeight;
 
     s_destination.left = field_0x54;
     s_destination.top = field_0x58;

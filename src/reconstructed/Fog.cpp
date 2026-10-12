@@ -13,7 +13,7 @@
 #include "TrackGame.h"
 
 #define TARGET() ((PCRenderTarget*)field_0x18)
-#define VIEWPORT(i) ((unsigned int)TARGET()->field_0x08->field_0x1a0[i])
+#define VIEWPORT(i) ((unsigned int)TARGET()->currentCamera->field_0x1a0[i])
 
 // 0x00462620
 Fog::Fog(int flags)
@@ -38,17 +38,17 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
     if (g_TrackGame->field_0x2d0) {
         renderFog = 0;
     } else {
-        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->targetDisplay->driverGuidText);
         renderFog = g_TrackGame->GetRegistryFlag(name, 1);
         if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGVERTEX) {
             field_0x44 = D3DPRASTERCAPS_FOGVERTEX;
-        } else if (TARGET()->field_0x04->isPowerVR || (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
+        } else if (TARGET()->targetDisplay->isPowerVR || (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
             field_0x44 = D3DPRASTERCAPS_FOGTABLE;
         } else if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGRANGE) {
             field_0x44 = D3DPRASTERCAPS_FOGRANGE;
         }
         // Not Windows NT (VER_PLATFORM_WIN32_NT is 2).
-        if (g_TrackGame->osVersion.platformId != 2 && !(TARGET()->field_0x04->driverCaps & 0x400)
+        if (g_TrackGame->osVersion.platformId != 2 && !(TARGET()->targetDisplay->driverCaps & 0x400)
             && (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
             field_0x44 = D3DPRASTERCAPS_FOGTABLE;
         }
@@ -65,7 +65,7 @@ void Fog::SetParameters(unsigned int color, float visibility, float haziness)
     field_0x40 = haziness;
     fogEnd = (visibility - visibilityOffset) * (farScale - nearScale) + nearScale;
     fogStart = (fogEnd - minimumDistance) * (1.0f - haziness);
-    TARGET()->field_0x30 = color; // the clear colour
+    TARGET()->clearColor = color; // the clear colour
 }
 
 // 0x004627f0
@@ -78,9 +78,9 @@ int Fog::UnknownVirtualSlot10(float frameTime)
 int Fog::UnknownVirtualSlot12()
 {
     if (field_0x25_bit0) {
-        TARGET()->field_0x08->ClampLimits(1.0f, fogEnd);
-        TARGET()->field_0x08->UnknownVirtualSlot28();
-        TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix);
+        TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
+        TARGET()->currentCamera->UnknownVirtualSlot28();
+        TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
     }
     return 1;
 }
@@ -105,13 +105,13 @@ struct UnknownFogBackdropVertex {
 int Fog::UnknownVirtualSlot14()
 {
     if (field_0x25_bit0) {
-        TARGET()->field_0x08->ClampLimits(1.0f, fogEnd);
-        TARGET()->field_0x08->UnknownVirtualSlot28();
-        if (!TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix)) {
+        TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
+        TARGET()->currentCamera->UnknownVirtualSlot28();
+        if (!TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix)) {
             goto failed;
         }
-        if (!drawnByFogOn && TARGET()->field_0x04->isPowerVR
-            && (TARGET()->field_0x34 || TARGET()->fillMode == D3DFILL_WIREFRAME)) {
+        if (!drawnByFogOn && TARGET()->targetDisplay->isPowerVR
+            && (TARGET()->clearTarget || TARGET()->fillMode == D3DFILL_WIREFRAME)) {
             UnknownFogBackdropVertex vertices[4];
             vertices[0].x = (float)VIEWPORT(0);
             vertices[0].y = (float)VIEWPORT(1);
@@ -160,7 +160,7 @@ int Fog::UnknownVirtualSlot14()
                 TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
                 TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
                 density = 0.22f;
-                if (TARGET()->field_0x04->isPowerVR) {
+                if (TARGET()->targetDisplay->isPowerVR) {
                     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
                     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_EXP, 0);
                     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
@@ -193,7 +193,7 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
 
     if (TestInputEvent(0x57, 0, event, 3) && !g_TrackGame->field_0x2d0) {
         renderFog = 1 - renderFog;
-        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->targetDisplay->driverGuidText);
         g_TrackGame->SetRegistryFlag(name, renderFog);
         return 1;
     }
@@ -256,8 +256,8 @@ GameObject* FogOff::UnknownVirtualSlot8(void* value)
 // 0x00462e50
 int FogOff::UnknownVirtualSlot14()
 {
-    TARGET()->field_0x08->ReapplyDefaultLimits();
-    TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix);
+    TARGET()->currentCamera->ReapplyDefaultLimits();
+    TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
     return 1;
 }

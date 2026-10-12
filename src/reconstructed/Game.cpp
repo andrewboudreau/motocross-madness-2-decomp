@@ -216,10 +216,10 @@ int Game::UnknownVirtualSlot8() {
                                                   debugOverlay->field_0x36dc);
                 debugOverlay->Print(profilePage, "RenderPost3D   % 3d (%d)",
                                                   renderPost3D, s_RenderPost3DPeak.Peak());
-                debugOverlay->Print(profilePage, "TotalTransforms% 5d", renderTarget->field_0x38);
-                debugOverlay->Print(profilePage, "TotalPoints    % 5d", renderTarget->field_0x3c);
-                debugOverlay->Print(profilePage, "TotalLines     % 5d", renderTarget->field_0x40);
-                debugOverlay->Print(profilePage, "TotalTriangles % 5d", renderTarget->field_0x44);
+                debugOverlay->Print(profilePage, "TotalTransforms% 5d", renderTarget->verticesDrawn);
+                debugOverlay->Print(profilePage, "TotalPoints    % 5d", renderTarget->pointsDrawn);
+                debugOverlay->Print(profilePage, "TotalLines     % 5d", renderTarget->linesDrawn);
+                debugOverlay->Print(profilePage, "TotalTriangles % 5d", renderTarget->trianglesDrawn);
             }
             static int memoryPage = -1;
             if (memoryPage < 0)

@@ -68,7 +68,7 @@ int Game::UnknownFunction467b70(char*) {
     field_0x1c = field_0x3c;
     field_0x20 = 0;
     field_0x24 = 0;
-    field_0x28 = renderTarget->field_0x28;
+    field_0x28 = renderTarget->surfacePixelFormat;
     field_0x2c = 0x115c;
     field_0x30 = 0;
     if (field_0x2d4_bit2) {

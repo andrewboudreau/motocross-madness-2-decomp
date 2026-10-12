@@ -48,7 +48,7 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
             } else {
                 field_0x60 = 1;
                 for (g_UnknownGlobal5777a0 = 0; g_UnknownGlobal5777a0 < regionCapacity; g_UnknownGlobal5777a0++) {
-                    if (regionTable[g_UnknownGlobal5777a0].lastFrameCount != Target()->field_0x1c)
+                    if (regionTable[g_UnknownGlobal5777a0].lastFrameCount != Target()->frameCount)
                         continue;
                     g_UnknownGlobal5777a8.left = CurrentRegionRect(g_UnknownGlobal5777a0).left > rect->left ? CurrentRegionRect(g_UnknownGlobal5777a0).left : rect->left;
                     g_UnknownGlobal5777a8.right = CurrentRegionRect(g_UnknownGlobal5777a0).right < rect->right ? CurrentRegionRect(g_UnknownGlobal5777a0).right : rect->right;
@@ -78,7 +78,7 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
             }
         } else {
             surface = Target()->renderSurface;
-            *frames = Target()->field_0x14;
+            *frames = Target()->frameModulus;
         }
         if (index >= 0)
             MarkRegionPending(index);
@@ -86,7 +86,7 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
         if (index >= 0)
             SetRegionRect(index, rect);
         surface = Target()->renderSurface;
-        *frames = Target()->field_0x14;
+        *frames = Target()->frameModulus;
     }
     if (!surface)
         return 0;

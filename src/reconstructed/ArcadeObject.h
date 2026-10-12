@@ -24,14 +24,14 @@ typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* othe
 // fields are the camera fields Krusty3DObjects.cpp's VisualCue reads.
 struct UnknownArcadeView {
     unsigned char field_0x000[0xac];
-    float field_0x0ac[4][4];                   // camera matrix (rows of 4)
+    float cameraMatrix[4][4];                 // +0x0ac camera matrix (rows of 4)
     unsigned char field_0x0ec[0x16c - 0xec];
-    float field_0x16c;                         // field of view, degrees
-    Vector3 field_0x170;                       // position
+    float fieldOfView;                        // +0x16c field of view, degrees
+    Vector3 cameraPosition;                   // +0x170 position
     unsigned char field_0x17c[0x198 - 0x17c];
     float field_0x198;
     unsigned char field_0x19c[0x1b8 - 0x19c];
-    float field_0x1b8;                         // aspect ratio
+    float aspectRatio;                        // +0x1b8 aspect ratio
 };
 
 class ArcadeObject : public GameObject {
@@ -52,10 +52,10 @@ public:
     void SetAxes(const Vector3* a, const Vector3* b, int c, int d);
     // 0x00401540 (ret 0x18): builds the collision object (line 154) from
     // "<name>.col" when the archive has it, under the "Collision" category.
-    int UnknownFunction401540(const char* name, int value, UnknownPickCallback callback, void* context,
+    int BuildCollision(const char* name, int value, UnknownPickCallback callback, void* context,
                               unsigned char a, unsigned char b);
     // 0x004017a0 (ret 0x10): spins around `axis` at `speed` degrees per unit time.
-    void UnknownFunction4017a0(Vector3 axis, float speed);
+    void StartSpin(Vector3 axis, float speed);
 
     D3DIMSoultreeObject* arcadeModel;           // model
     int isVisible;                            // visible
@@ -67,23 +67,23 @@ public:
     float field_0x48;                          // screen fraction (0x00401310's c)
     float field_0x4c;                          // screen fraction (0x00401310's d)
     float modelWidth;                          // model width
-    float field_0x54;                          // model height
-    TransparencyMod* field_0x58;
-    CollisionObject* field_0x5c;
-    int field_0x60;                            // collision built
-    int field_0x64;                            // lifetime enabled
-    float field_0x68;                          // lifetime
+    float modelHeight;                        // +0x54 model height
+    TransparencyMod* transparency;            // +0x58
+    CollisionObject* collisionObject;         // +0x5c
+    int collisionBuilt;                       // +0x60 collision built
+    int lifetimeEnabled;                      // +0x64 lifetime enabled
+    float lifetime;                           // +0x68 lifetime
     int field_0x6c;
-    float field_0x70;                          // elapsed lifetime
+    float elapsedLifetime;                    // +0x70 elapsed lifetime
     int field_0x74;
-    int field_0x78;                            // delay enabled
-    float field_0x7c;                          // delay
-    float field_0x80;                          // elapsed delay
-    int field_0x84;                            // repeat limit (999: unlimited)
-    int field_0x88;                            // repeats
+    int delayEnabled;                         // +0x78 delay enabled
+    float delay;                              // +0x7c delay
+    float elapsedDelay;                       // +0x80 elapsed delay
+    int repeatLimit;                          // +0x84 repeat limit (999: unlimited)
+    int repeatCount;                          // +0x88 repeats
     int field_0x8c;
-    int field_0x90;                            // spinning
-    Vector3 field_0x94;                        // spin axis
-    float field_0xa0;                          // spin angle
-    float field_0xa4;                          // spin speed (radians)
+    int spinning;                             // +0x90 spinning
+    Vector3 spinAxis;                         // +0x94 spin axis
+    float spinAngle;                          // +0xa0 spin angle
+    float spinSpeed;                          // +0xa4 spin speed (radians)
 };

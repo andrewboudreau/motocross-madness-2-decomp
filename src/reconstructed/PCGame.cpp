@@ -286,7 +286,7 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
     if (Game::UnknownVirtualSlot13(event, entry))
         return 1;
     if (event->kind == 0 && event->control == 0xb7) {
-        if (renderTarget && !renderTarget->field_0x08)
+        if (renderTarget && !renderTarget->currentCamera)
             PCTarget()->SaveScreenshot();
         return 1;
     }
@@ -311,7 +311,7 @@ int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* 
 int PCGame::UnknownVirtualSlot19(int mode) {
     Camera* camera = 0;
     if (renderTarget)
-        camera = renderTarget->field_0x08;
+        camera = renderTarget->currentCamera;
     if (fullScreen) {
         if (mode != display->currentDisplayMode) {
             if (renderTarget) {

@@ -260,7 +260,7 @@ void KrustyUI::BuildGarageScene(int value) {
 
     field_0x4ac = 0;
     field_0x4a8 = 0;
-    ((RenderTarget*)field_0x18)->field_0x34 = 0;
+    ((RenderTarget*)field_0x18)->clearTarget = 0;
     g_TrackGame->field_0x2d5_bit2 = 1;
     if (!garageScene && (value == 1 || value == -1)) {
         UnknownFunction5053b0(1);
@@ -310,12 +310,12 @@ void KrustyUI::BuildGarageScene(int value) {
         if (!g_TrackGame->field_0x2d0) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
             // (2 MB below 800x600) off the total outside NT without the 0x400 cap.
-            int memory = KRUSTYUI_TARGET->field_0x04->totalVideoMemory;
-            int free = memory - PixelFormatBytesPerPixel(KRUSTYUI_TARGET->field_0x28) *
-                                    (KRUSTYUI_TARGET->field_0x14 + 1) * KRUSTYUI_TARGET->field_0x10 *
-                                    KRUSTYUI_TARGET->field_0x0c;
+            int memory = KRUSTYUI_TARGET->targetDisplay->totalVideoMemory;
+            int free = memory - PixelFormatBytesPerPixel(KRUSTYUI_TARGET->surfacePixelFormat) *
+                                    (KRUSTYUI_TARGET->frameModulus + 1) * KRUSTYUI_TARGET->targetHeight *
+                                    KRUSTYUI_TARGET->targetWidth;
             if (g_TrackGame->osVersion.platformId != 2 &&
-                !(KRUSTYUI_TARGET->field_0x04->driverCaps & 0x400))
+                !(KRUSTYUI_TARGET->targetDisplay->driverCaps & 0x400))
                 free = (KRUSTYUI_TARGET->deviceCaps & 0x4000) ? memory - 0x400000 : memory - 0x200000;
             if (!g_TrackGame->display->isAGP && free < 0x500000)
                 context.field_0x14 = 1;

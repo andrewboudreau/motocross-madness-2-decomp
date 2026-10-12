@@ -99,11 +99,11 @@ InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapMana
     texture->UnknownVirtualSlot8(1, 0, 0);
     Attach(target, texture, &rect, 1, 0, 0.00001f, 0, 0, 0, 0, 1555, 0);
     RenderTarget* owner = Target();
-    dial.field_0x00 = (int)(rect.left * owner->field_0x0c / 640.0f);
-    dial.field_0x04 = (int)(rect.top * owner->field_0x10 / 480.0f);
-    dial.centerX = (int)((owner->field_0x0c / 640.0f) * 64.0f + dial.field_0x00);
-    dial.centerY = (int)((owner->field_0x10 / 480.0f) * 85.0f + dial.field_0x04);
-    dial.length = (owner->field_0x0c / 640.0f) * 35.0f;
+    dial.field_0x00 = (int)(rect.left * owner->targetWidth / 640.0f);
+    dial.field_0x04 = (int)(rect.top * owner->targetHeight / 480.0f);
+    dial.centerX = (int)((owner->targetWidth / 640.0f) * 64.0f + dial.field_0x00);
+    dial.centerY = (int)((owner->targetHeight / 480.0f) * 85.0f + dial.field_0x04);
+    dial.length = (owner->targetWidth / 640.0f) * 35.0f;
     dial.value = 0.0f;
     dial.maximum = 100.0f;
     dial.firstSweepValue = 50.0f;
@@ -129,14 +129,14 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
-        if (owner->field_0x08->field_0x1cc) {
-            dial.field_0x00 = (int)((unsigned int)owner->field_0x08->field_0x1a0[2] * screenRect.left / 640.0f
-                                           + (unsigned int)owner->field_0x08->field_0x1a0[0]);
-            dial.field_0x04 = (int)((unsigned int)owner->field_0x08->field_0x1a0[3] * screenRect.top / 480.0f
-                                           + (unsigned int)owner->field_0x08->field_0x1a0[1]);
-            dial.centerX = (int)(((unsigned int)owner->field_0x08->field_0x1a0[2] / 640.0f) * 64.0f + dial.field_0x00);
-            dial.centerY = (int)(((unsigned int)owner->field_0x08->field_0x1a0[3] / 480.0f) * 85.0f + dial.field_0x04);
-            dial.length = ((unsigned int)owner->field_0x08->field_0x1a0[2] / 640.0f) * 45.0f;
+        if (owner->currentCamera->field_0x1cc) {
+            dial.field_0x00 = (int)((unsigned int)owner->currentCamera->field_0x1a0[2] * screenRect.left / 640.0f
+                                           + (unsigned int)owner->currentCamera->field_0x1a0[0]);
+            dial.field_0x04 = (int)((unsigned int)owner->currentCamera->field_0x1a0[3] * screenRect.top / 480.0f
+                                           + (unsigned int)owner->currentCamera->field_0x1a0[1]);
+            dial.centerX = (int)(((unsigned int)owner->currentCamera->field_0x1a0[2] / 640.0f) * 64.0f + dial.field_0x00);
+            dial.centerY = (int)(((unsigned int)owner->currentCamera->field_0x1a0[3] / 480.0f) * 85.0f + dial.field_0x04);
+            dial.length = ((unsigned int)owner->currentCamera->field_0x1a0[2] / 640.0f) * 45.0f;
             dial.value = 0.0f;
             dial.maximum = 100.0f;
             dial.firstSweepValue = 50.0f;
@@ -282,7 +282,7 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = world->terrain->CastSegment(&((RenderTarget*)field_0x18)->field_0x08->eyePosition, point, &hit, 0, 0, 0);
+        int hidden = world->terrain->CastSegment(&((RenderTarget*)field_0x18)->currentCamera->eyePosition, point, &hit, 0, 0, 0);
         lastVisible = !hidden;
     }
     frameCounter++;
@@ -356,7 +356,7 @@ int NameOverlay::UnknownVirtualSlot14()
     }
     field_0x14c = hidden;
     if (overlayAlpha) {
-        Camera* camera = Target()->field_0x08;
+        Camera* camera = Target()->currentCamera;
         Vector3 screen;
         float depth;
         if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->field_0xec, &head, &screen, &depth)) {

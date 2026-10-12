@@ -84,7 +84,7 @@ int UnknownDisplay::ProbeNonLocalTextureMemory(int* value, RenderTarget* target)
     }
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    FillPixelFormat(render->field_0x28, &desc.pixelFormat);
+    FillPixelFormat(render->surfacePixelFormat, &desc.pixelFormat);
     desc.width = 128;
     desc.height = 128;
     desc.flags = 0x1007;                          // caps, height, width, pixel format
@@ -209,19 +209,19 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
         if (file) {
             image = new (__FILE__, 2078) PCTextureMap(0, 0);
             if (!image->UnknownVirtualSlot4(file->bits, file->width, file->height, file->width, file->width,
-                                            file->bitsPerPixel == 16 ? 0x22b : 0x378, render->field_0x28, 0, 0,
-                                            render->field_0x04->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
+                                            file->bitsPerPixel == 16 ? 0x22b : 0x378, render->surfacePixelFormat, 0, 0,
+                                            render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
                 FreeFile(file);
                 result = -2;
             } else {
                 expected = new (__FILE__, 2097) PCTextureMap(0, 0);
                 expected->UnknownVirtualSlot4(0, file->width, file->height, file->width, file->width,
-                                              render->field_0x28, render->field_0x28, 0, 0,
-                                              render->field_0x04->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                              render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
+                                              render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
                 rendered = new (__FILE__, 2110) PCTextureMap(0, 0);
                 rendered->UnknownVirtualSlot4(0, file->width, file->height, file->width, file->width,
-                                              render->field_0x28, render->field_0x28, 0, 0,
-                                              render->field_0x04->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                              render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
+                                              render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
                 if (!rendered->UnknownVirtualSlot8(1, 0, 1)) {
                     FreeFile(file);
                     result = -4;

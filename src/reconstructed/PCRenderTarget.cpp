@@ -162,14 +162,14 @@ int PCRenderTarget::UnknownVirtualSlot13(int format) {
 int PCRenderTarget::UnknownVirtualSlot15(int type, int vertexFormat, int vertices, int vertexCount,
                                          int indices, int indexCount, int flags) {
     if (vertexFormat == D3DFVF_VERTEX || vertexFormat == D3DFVF_LVERTEX)
-        field_0x38 += vertexCount;
+        verticesDrawn += vertexCount;
     switch (type) {
-    case D3DPT_POINTLIST: field_0x3c += indexCount; break;
+    case D3DPT_POINTLIST: pointsDrawn += indexCount; break;
     case D3DPT_LINELIST:
-    case D3DPT_LINESTRIP: field_0x40 += (unsigned int)indexCount / 2; break;
-    case D3DPT_TRIANGLELIST: field_0x44 += (unsigned int)indexCount / 3; break;
+    case D3DPT_LINESTRIP: linesDrawn += (unsigned int)indexCount / 2; break;
+    case D3DPT_TRIANGLELIST: trianglesDrawn += (unsigned int)indexCount / 3; break;
     case D3DPT_TRIANGLESTRIP:
-    case D3DPT_TRIANGLEFAN: field_0x44 += indexCount; break;
+    case D3DPT_TRIANGLEFAN: trianglesDrawn += indexCount; break;
     }
     return device->DrawIndexedPrimitive(type, vertexFormat, (void*)vertices, vertexCount, (void*)indices,
                                        indexCount, flags) == 0;
@@ -178,14 +178,14 @@ int PCRenderTarget::UnknownVirtualSlot15(int type, int vertexFormat, int vertice
 // 0x004c5bd0: DrawPrimitive with the same counters.
 int PCRenderTarget::UnknownVirtualSlot16(int type, int vertexFormat, int vertices, int count, int flags) {
     if (vertexFormat == D3DFVF_VERTEX || vertexFormat == D3DFVF_LVERTEX)
-        field_0x38 += count;
+        verticesDrawn += count;
     switch (type) {
-    case D3DPT_POINTLIST: field_0x3c += count; break;
+    case D3DPT_POINTLIST: pointsDrawn += count; break;
     case D3DPT_LINELIST:
-    case D3DPT_LINESTRIP: field_0x40 += (unsigned int)count / 2; break;
-    case D3DPT_TRIANGLELIST: field_0x44 += (unsigned int)count / 3; break;
+    case D3DPT_LINESTRIP: linesDrawn += (unsigned int)count / 2; break;
+    case D3DPT_TRIANGLELIST: trianglesDrawn += (unsigned int)count / 3; break;
     case D3DPT_TRIANGLESTRIP:
-    case D3DPT_TRIANGLEFAN: field_0x44 += count; break;
+    case D3DPT_TRIANGLEFAN: trianglesDrawn += count; break;
     }
     return device->DrawPrimitive(type, vertexFormat, (void*)vertices, count, flags) == 0;
 }
@@ -194,12 +194,12 @@ int PCRenderTarget::UnknownVirtualSlot16(int type, int vertexFormat, int vertice
 int PCRenderTarget::UnknownVirtualSlot17(int type, int vertexBuffer, int start, int vertexCount,
                                          int indices, int indexCount, int flags) {
     switch (type) {
-    case D3DPT_POINTLIST: field_0x3c += indexCount; break;
+    case D3DPT_POINTLIST: pointsDrawn += indexCount; break;
     case D3DPT_LINELIST:
-    case D3DPT_LINESTRIP: field_0x40 += (unsigned int)indexCount / 2; break;
-    case D3DPT_TRIANGLELIST: field_0x44 += (unsigned int)indexCount / 3; break;
+    case D3DPT_LINESTRIP: linesDrawn += (unsigned int)indexCount / 2; break;
+    case D3DPT_TRIANGLELIST: trianglesDrawn += (unsigned int)indexCount / 3; break;
     case D3DPT_TRIANGLESTRIP:
-    case D3DPT_TRIANGLEFAN: field_0x44 += indexCount; break;
+    case D3DPT_TRIANGLEFAN: trianglesDrawn += indexCount; break;
     }
     return device->DrawIndexedPrimitiveVB(type, (void*)vertexBuffer, start, vertexCount, (void*)indices,
                                        indexCount, flags) == 0;
@@ -280,12 +280,12 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
     for (; count < 0x4000; count++) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        FillPixelFormat(field_0x28, &desc.pixelFormat);
+        FillPixelFormat(surfacePixelFormat, &desc.pixelFormat);
         desc.width = 0x100;
         desc.height = 0x100;
         desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         desc.caps[0] = DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
-        if (field_0x04->directDraw->CreateSurface(&desc, &surfaces[count], 0) != 0)
+        if (targetDisplay->directDraw->CreateSurface(&desc, &surfaces[count], 0) != 0)
             break;
         surfaces[count]->GetCaps(&caps);
         if (caps.caps & DDSCAPS_LOCALVIDMEM)
@@ -298,12 +298,12 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
     for (; count < 0x4000; count++) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        FillPixelFormat(field_0x28, &desc.pixelFormat);
+        FillPixelFormat(surfacePixelFormat, &desc.pixelFormat);
         desc.width = 0x20;
         desc.height = 0x20;
         desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         desc.caps[0] = DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
-        if (field_0x04->directDraw->CreateSurface(&desc, &surfaces[count], 0) != 0)
+        if (targetDisplay->directDraw->CreateSurface(&desc, &surfaces[count], 0) != 0)
             break;
         surfaces[count]->GetCaps(&caps);
         if (caps.caps & DDSCAPS_LOCALVIDMEM)
@@ -367,8 +367,8 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, co
     UnknownSurfaceDesc desc;
     SetDisplay(display);
     renderSurface = surface;
-    field_0x14 = frames;
-    field_0x04 = display;
+    frameModulus = frames;
+    targetDisplay = display;
     deviceGuid = *deviceId;
     if (display->direct3D->EnumZBufferFormats(&deviceGuid, EnumZBufferFormatCallback, this) != 0)
         goto fail;
@@ -377,22 +377,22 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, co
     desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
     if (renderSurface->GetSurfaceDesc(&desc) != 0)
         goto fail;
-    field_0x0c = desc.width;
-    field_0x10 = desc.height;
+    targetWidth = desc.width;
+    targetHeight = desc.height;
     {
         int memory = desc.caps[0] & DDSCAPS_VIDEOMEMORY;
         memset(&format, 0, sizeof(format));
         format.size = sizeof(format);
         if (renderSurface->GetPixelFormat(&format) != 0)
             goto fail;
-        field_0x28 = FormatFromPixelFormat(&format);
-        field_0x24 = memory ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY;
+        surfacePixelFormat = FormatFromPixelFormat(&format);
+        surfaceCaps = memory ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY;
         int depth;
-        if (field_0x28 == 555 || field_0x28 == 565)
+        if (surfacePixelFormat == 555 || surfacePixelFormat == 565)
             depth = 16;
         else
             depth = 32;
-        field_0x20 = depth;
+        zDepth = depth;
         if (wantZBuffer && depth) {
             int i;
             for (i = 0; i < zbufferFormatCount; i++)
@@ -400,23 +400,23 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, co
                     break;
             if (i == zbufferFormatCount)
                 goto fail;
-            memory = field_0x24 | DDSCAPS_ZBUFFER;
+            memory = surfaceCaps | DDSCAPS_ZBUFFER;
             memset(&desc, 0, sizeof(desc));
             desc.caps[0] = memory;
-            desc.width = field_0x0c;
+            desc.width = targetWidth;
             desc.size = sizeof(desc);
             desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-            desc.height = field_0x10;
+            desc.height = targetHeight;
             desc.pixelFormat = zbufferFormats[i];
             desc.pixelFormat.size = sizeof(UnknownPixelFormat);
-            long result = field_0x04->directDraw->CreateSurface(&desc, &zbuffer, 0);
+            long result = targetDisplay->directDraw->CreateSurface(&desc, &zbuffer, 0);
             if (result == DDERR_OUTOFVIDEOMEMORY || result != 0)
                 goto fail;
             if (renderSurface->AddAttachedSurface(zbuffer) != 0)
                 goto fail;
         }
     }
-    if (field_0x04->direct3D->CreateDevice(&deviceGuid, renderSurface, &device) != 0)
+    if (targetDisplay->direct3D->CreateDevice(&deviceGuid, renderSurface, &device) != 0)
         goto fail;
     memset(&deviceCaps, 0, 0x250 - 0x164); // the D3DDEVICEDESC7
     if (device->GetCaps(&deviceCaps) != 0)
@@ -425,8 +425,8 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, co
     format.size = sizeof(format);
     if (renderSurface->GetPixelFormat(&format) != 0)
         goto fail;
-    field_0x28 = FormatFromPixelFormat(&format);
-    field_0x2c = 1.0f;
+    surfacePixelFormat = FormatFromPixelFormat(&format);
+    zClearValue = 1.0f;
     if (device->EnumTextureFormats(EnumTextureFormatCallback, this) != 0) {
     fail:
         delete this;

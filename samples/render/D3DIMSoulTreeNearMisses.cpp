@@ -380,7 +380,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         Vector3 center;
         Vector3 extents;
         GetSubtreeBounds(&center, &extents);
-        const Matrix4& projection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->viewMatrix;
+        const Matrix4& projection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->viewMatrix;
         UnknownSoultreeMatrix view;
         view._11 = world.m[0][0] * projection.m[0][0] + world.m[0][1] * projection.m[1][0] + world.m[0][2] * projection.m[2][0] + world.m[0][3] * projection.m[3][0];
         view._12 = world.m[0][0] * projection.m[0][1] + world.m[0][1] * projection.m[1][1] + world.m[0][2] * projection.m[2][1] + world.m[0][3] * projection.m[3][1];
@@ -398,7 +398,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         view._42 = world.m[3][0] * projection.m[0][1] + world.m[3][1] * projection.m[1][1] + world.m[3][2] * projection.m[2][1] + world.m[3][3] * projection.m[3][1];
         view._43 = world.m[3][0] * projection.m[0][2] + world.m[3][1] * projection.m[1][2] + world.m[3][2] * projection.m[2][2] + world.m[3][3] * projection.m[3][2];
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
-        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
+        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
                                                                   &field_0x260)) {
             field_0x2d4 = 1;
             SelectLod(&center, &extents);
@@ -482,7 +482,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
     identity.m[1][1] = 1.0f;
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
-    ((RenderTarget*)field_0x18)->field_0x08->UnknownVirtualSlot30(&identity);
+    ((RenderTarget*)field_0x18)->currentCamera->UnknownVirtualSlot30(&identity);
     int savedCull;
     int savedShade;
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot9(4, &savedCull);
@@ -558,7 +558,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 break;
             }
             case 4: {
-                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->position;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
@@ -587,7 +587,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 line[0].diffuse = 0xffff0000;
                 line[1].diffuse = 0xffffffff;
                 if (updateEye)
-                    (Vector3&)eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                    (Vector3&)eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->position;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     Vector3 localEye = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalPoint(&eye);
@@ -632,7 +632,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 if (textureScroll > 100.0f)
                     textureScroll -= 100.0f;
                 float scroll = textureScroll;
-                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->position;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     count = group->vertexCount;
@@ -688,8 +688,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)ring, 32, 0);
                 }
                 if (updateView) {
-                    (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->viewDirection;
-                    (Vector3&)viewPosition = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                    (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->viewDirection;
+                    (Vector3&)viewPosition = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->position;
                 }
                 UnknownSoultreeVertex lines[4];
                 for (i = 0; i < 4; i++) {
@@ -777,7 +777,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     Vector3 lightPosition = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(&light->lightPosition);
                     Vector3 eye = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(
-                        &((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
+                        &((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->currentCamera)->position);
                     for (int v = 0; v < group->vertexCount; v++) {
                         Vector3 position = group->sourceVertices[v].position;
                         Vector3 toLight = Normalized(position - lightPosition);

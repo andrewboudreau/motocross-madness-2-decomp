@@ -589,7 +589,7 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
 // the second copy), and operator() or other copy orders lose the interleaved
 // row copies.
 bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
-    if (Owner()->field_0x08 == this) {
+    if (Owner()->currentCamera == this) {
         frameTime += dt;
         unsigned int count = frameCount;
         float period = count * field_0x270;

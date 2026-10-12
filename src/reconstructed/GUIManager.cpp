@@ -594,7 +594,7 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
         for (pixel = bits; pixel < bits + width * height; pixel++)
             *pixel = fill;
         if (texture->UnknownVirtualSlot4(bits, width, height, width, width, 0x378,
-                                         g_TrackGame->renderTarget->field_0x28,
+                                         g_TrackGame->renderTarget->surfacePixelFormat,
                                          (UnknownTexturePalette*)(guiPalette ? guiPalette->field_0x708 : 0), 4,
                                          guiPalette ? guiPalette->field_0x70c : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
             texture->UnknownVirtualSlot18(0xff00ff);
@@ -733,8 +733,8 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
     rangeX = maxX;
     rangeY = maxY;
     if (minX == 0.0f && maxX == 0.0f && minY == 0.0f && maxY == 0.0f) {
-        rangeX = (float)(((RenderTarget*)field_0x18)->field_0x0c - 1);
-        rangeY = (float)(((RenderTarget*)field_0x18)->field_0x10 - 1);
+        rangeX = (float)(((RenderTarget*)field_0x18)->targetWidth - 1);
+        rangeY = (float)(((RenderTarget*)field_0x18)->targetHeight - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, 0.0f,
                                        g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
@@ -766,8 +766,8 @@ void GUIInputDevice::Rebind() {
     rangeX = rangeMaxX;
     rangeY = rangeMaxY;
     if (rangeMinX == 0.0f && rangeMaxX == 0.0f && rangeMinY == 0.0f && rangeMaxY == 0.0f) {
-        rangeX = (float)(((RenderTarget*)field_0x18)->field_0x0c - 1);
-        rangeY = (float)(((RenderTarget*)field_0x18)->field_0x10 - 1);
+        rangeX = (float)(((RenderTarget*)field_0x18)->targetWidth - 1);
+        rangeY = (float)(((RenderTarget*)field_0x18)->targetHeight - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)x,
                                        g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
@@ -1074,8 +1074,8 @@ void GUIUser::CreateCursor(const char* image, int visible) {
     if (userCursor || !pointerDevice)
         return;
     if (g_TrackGame->fullScreen) {
-        if (g_TrackGame->renderTarget->field_0x28 > 8 ||
-            (g_TrackGame->renderTarget->field_0x28 == 8 && userGui->guiPalette)) {
+        if (g_TrackGame->renderTarget->surfacePixelFormat > 8 ||
+            (g_TrackGame->renderTarget->surfacePixelFormat == 8 && userGui->guiPalette)) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
             if (!image)
                 image = cursorImage;
@@ -1087,8 +1087,8 @@ void GUIUser::CreateCursor(const char* image, int visible) {
                 -1);
         }
     } else {
-        if (g_TrackGame->renderTarget->field_0x28 > 8 ||
-            (g_TrackGame->renderTarget->field_0x28 == 8 && userGui->guiPalette)) {
+        if (g_TrackGame->renderTarget->surfacePixelFormat > 8 ||
+            (g_TrackGame->renderTarget->surfacePixelFormat == 8 && userGui->guiPalette)) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
             if (!image)
                 image = cursorImage;
@@ -1127,7 +1127,7 @@ void GUIUser::RecreateCursor(const char* image, int redraw) {
         return;
     visible = userCursor ? userCursor->field_0x25_bit0 : 1;
     ReleaseCursor();
-    if (g_TrackGame->renderTarget->field_0x28 == 8 && !userGui->guiPalette)
+    if (g_TrackGame->renderTarget->surfacePixelFormat == 8 && !userGui->guiPalette)
         return;
     defaultImage = !image;
     CreateCursor(image ? image : cursorImage, visible);

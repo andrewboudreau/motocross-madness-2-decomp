@@ -188,7 +188,7 @@ void SoultreeMaterial::LoadTexture()
     if (hasColorKey) {
         PCRenderTarget* target = (PCRenderTarget*)field_0x18;
         if ((target->triTextureCaps & 8) && field_0x74.opaqueTextures) {
-            format = target->field_0x28;
+            format = target->surfacePixelFormat;
             colorKey = (g_UnknownInt574060 << 8 | g_UnknownInt574064) << 8 | g_UnknownInt574068;
         } else {
             format = 1555;

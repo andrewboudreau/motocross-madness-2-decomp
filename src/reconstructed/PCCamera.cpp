@@ -41,7 +41,7 @@ int PCCamera::UnknownVirtualSlot32(const Matrix4* projection) {
 int PCCamera::UnknownVirtualSlot13() {
     if (!Camera::UnknownVirtualSlot13())
         return 0;
-    if (Owner()->field_0x08 == this) {
+    if (Owner()->currentCamera == this) {
         PCOwner()->device->SetTransform(D3DTRANSFORMSTATE_VIEW, &viewMatrix);
         PCOwner()->device->SetTransform(D3DTRANSFORMSTATE_PROJECTION, &projectionMatrix);
     }

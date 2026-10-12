@@ -62,7 +62,7 @@ public:
                               CameraRect* clip);
     // Region `index`'s rectangle for the target's current frame.
     CameraRect& CurrentRegionRect(int index) {
-        return regionTable[index].frameRects[((PCRenderTarget*)field_0x18)->field_0x18];
+        return regionTable[index].frameRects[((PCRenderTarget*)field_0x18)->frameIndex];
     }
     int ReleaseDc();                        // 0x00404c80: releases the DC
     void MarkRegionPending(int index);              // 0x00404cb0

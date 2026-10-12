@@ -137,7 +137,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
     float left = (float)x;
     float top = (float)y;
     float bottom = top + lineHeight;
-    if (!(bottom < ((RenderTarget*)field_0x18)->field_0x10))
+    if (!(bottom < ((RenderTarget*)field_0x18)->targetHeight))
         return;
     int index = 0;
     while (length > 0) {
@@ -147,7 +147,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
                 break;
             int ch = text[index];
             float right = (field_0x26d0[ch].u1 - field_0x26d0[ch].u0) * 256.0f + left;
-            if (!(right < ((RenderTarget*)field_0x18)->field_0x0c)) {
+            if (!(right < ((RenderTarget*)field_0x18)->targetWidth)) {
                 if (count)
                     ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
                 return;
@@ -205,7 +205,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
             index++;
         }
         ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
-        ((RenderTarget*)field_0x18)->field_0x44 -= count / 3;
+        ((RenderTarget*)field_0x18)->trianglesDrawn -= count / 3;
         length -= count / 6;
     }
 }

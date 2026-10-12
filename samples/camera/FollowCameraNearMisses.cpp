@@ -470,7 +470,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     Vector3 position;
     Vector3 target;
     Vector3 smoothed;
-    bool current = ((RenderTarget*)field_0x18)->field_0x08 == this;
+    bool current = ((RenderTarget*)field_0x18)->currentCamera == this;
     field_0x29c = UnknownVirtualSlot41();
     if (!field_0x275) {
         field_0x275 = 1;

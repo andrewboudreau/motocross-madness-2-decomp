@@ -53,7 +53,7 @@ MediaControl* MediaControl::Open(void* target, const char* file,
     if (!IsDirectShowInstalled()) {
         goto failed;
     }
-    displayDirectDraw = ((PCRenderTarget*)target)->field_0x04->directDraw;
+    displayDirectDraw = ((PCRenderTarget*)target)->targetDisplay->directDraw;
     doneCallback = done;
     doneOwner = owner;
     if (CoCreateInstance(*(const GUID*)&CLSID_AMMultiMediaStream, 0, CLSCTX_INPROC_SERVER,
@@ -89,7 +89,7 @@ MediaControl* MediaControl::Open(void* target, const char* file,
     frameWidth = format.width;
     frameHeight = format.height;
     surface = 0;
-    if (TARGET()->field_0x04->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&directDraw)) {
+    if (TARGET()->targetDisplay->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&directDraw)) {
         goto failed;
     }
     if (directDraw->CreateSurface((UnknownSurfaceDesc*)&format, &surface, 0)) {

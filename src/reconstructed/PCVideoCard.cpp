@@ -605,8 +605,8 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     vertices[3].v = 1.0f;
     viewport.x = 0;
     viewport.y = 0;
-    viewport.width = target->field_0x0c;
-    viewport.height = target->field_0x10;
+    viewport.width = target->targetWidth;
+    viewport.height = target->targetHeight;
     viewport.minZ = 0.0f;
     viewport.maxZ = 1.0f;
     int failed = target->UnknownVirtualSlot14(&viewport) != 1;
@@ -616,7 +616,7 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
         clear.right = viewport.x + viewport.width;
         clear.top = 0;
         clear.bottom = viewport.y + viewport.height;
-        failed |= target->device->Clear(1, &clear, D3DCLEAR_ZBUFFER, 0, target->field_0x2c, 0) != 0; // Clear z
+        failed |= target->device->Clear(1, &clear, D3DCLEAR_ZBUFFER, 0, target->zClearValue, 0) != 0; // Clear z
         g_TrackGame->UnknownVirtualSlot7();
         rendered->UnknownVirtualSlot19();
         target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
