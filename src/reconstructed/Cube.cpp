@@ -28,27 +28,27 @@ static void SkipToSector(UnknownTextureStream* stream, int base)
 void Cube::Reset()
 {
     textureDataOffset = 0;
-    field_0x610 = 0;
-    field_0x08 = 0;
+    textureGroup = 0;
+    textureStream = 0;
     fileFormat = 0;
     field_0x10 = 0;
     field_0x12 = 0xffff;
-    field_0x14 = kVec3Zero;
+    center = kVec3Zero;
     field_0x20 = kVec3Zero;
     field_0x2c = kVec3Zero;
     for (int face = 0; face < 6; face++) {
-        field_0x38[face].sizeCodes = 0;
-        field_0x38[face].presentTextures = 0;
-        field_0x38[face].field_0x06 = 0;
+        faces[face].sizeCodes = 0;
+        faces[face].presentTextures = 0;
+        faces[face].field_0x06 = 0;
         for (int i = 0; i < 16; i++) {
-            field_0x38[face].textures[i] = 0;
-            field_0x38[face].field_0x48[i] = 0;
-            field_0x38[face].field_0x88[i] = 0xffff;
-            field_0x38[face].field_0xa8[i] = -1;
+            faces[face].textures[i] = 0;
+            faces[face].field_0x48[i] = 0;
+            faces[face].field_0x88[i] = 0xffff;
+            faces[face].field_0xa8[i] = -1;
         }
-        field_0x38[face].field_0xec = 0;
-        field_0x38[face].field_0xf0 = 0;
-        field_0x38[face].field_0xf4 = 0;
+        faces[face].field_0xec = 0;
+        faces[face].field_0xf0 = 0;
+        faces[face].field_0xf4 = 0;
     }
 }
 
@@ -67,15 +67,15 @@ Cube::Cube()
 // the arguments' first use, and that order homes `flags` in the group slot, the
 // face pointer in the stream slot and the face counter in the baseOffset slot
 // (docs/VC6_FRAME_LAYOUT.md).
-Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTextureGroup* group,
+Cube* Cube::Load(UnknownTextureStream* stream, int a, ManagedTextureGroup* group,
                                   int baseOffset)
 {
     short flags;
     int face;
     int i;
 
-    field_0x610 = group;
-    field_0x08 = stream;
+    textureGroup = group;
+    textureStream = stream;
     alignmentBase = baseOffset;
     if (stream->Read(&fileFormat, 4, 1) != 1)
         goto fail;
@@ -84,14 +84,14 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
     if (stream->Read(&field_0x12, 2, 1) != 1)
         goto fail;
     for (face = 0; face < 6; face++) {
-        if (stream->Read(&field_0x38[face].presentTextures, 2, 1) != 1)
+        if (stream->Read(&faces[face].presentTextures, 2, 1) != 1)
             goto fail;
     }
     for (face = 0; face < 6; face++) {
-        if (stream->Read(&field_0x38[face].sizeCodes, 4, 1) != 1)
+        if (stream->Read(&faces[face].sizeCodes, 4, 1) != 1)
             goto fail;
     }
-    if (stream->Read(&field_0x14, 12, 1) != 1)
+    if (stream->Read(&center, 12, 1) != 1)
         goto fail;
     if (stream->Read(&field_0x20, 12, 1) != 1)
         goto fail;
@@ -99,14 +99,14 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
         goto fail;
     if (flags & 4) {
         for (face = 0; face < 6; face++) {
-            if (stream->Read(field_0x38[face].field_0x88, 0x20, 1) != 1)
+            if (stream->Read(faces[face].field_0x88, 0x20, 1) != 1)
                 goto fail;
         }
     }
     if (flags & 1) {
         for (face = 0; face < 6; face++) {
             for (i = 0; i < 16; i++) {
-                if (stream->Read(&field_0x38[face].field_0x48[i], 4, 1) != 1)
+                if (stream->Read(&faces[face].field_0x48[i], 4, 1) != 1)
                     goto fail;
             }
         }
@@ -123,10 +123,10 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
 }
 
 // 0x0043d400
-int Cube::UnknownFunction43d400(const Vector3* a, const Vector3* b, const Vector3* c)
+int Cube::SetVectors(const Vector3* a, const Vector3* b, const Vector3* c)
 {
     if (a)
-        field_0x14 = *a;
+        center = *a;
     if (b)
         field_0x20 = *b;
     if (c)
@@ -138,39 +138,39 @@ int Cube::UnknownFunction43d400(const Vector3* a, const Vector3* b, const Vector
 int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
                                 UnknownCubeTextureContext* context)
 {
-    int size = UnknownFunction43d080(field_0x38[face].sizeCodes, index % 4, index / 4);
+    int size = UnknownFunction43d080(faces[face].sizeCodes, index % 4, index / 4);
     int dataSize;
     if (IsCompressedFormat(fileFormat))
-        field_0x08->Read(&dataSize, 4, 1);
+        textureStream->Read(&dataSize, 4, 1);
     else
         dataSize = BytesPerPixel(fileFormat) * size * size;
 
-    if (context->field_0x04) {
-        ManagedTexture* texture = new (__FILE__, 0x2c3) ManagedTexture(context->field_0x00);
-        context->field_0x04->AddTexture(texture);
-        field_0x38[face].textures[index] = texture;
+    if (context->textureGroup) {
+        ManagedTexture* texture = new (__FILE__, 0x2c3) ManagedTexture(context->manager);
+        context->textureGroup->AddTexture(texture);
+        faces[face].textures[index] = texture;
     } else {
-        field_0x38[face].textures[index] = new (__FILE__, 0x2c8) PCTextureMap(context->field_0x00, 1);
+        faces[face].textures[index] = new (__FILE__, 0x2c8) PCTextureMap(context->manager, 1);
     }
-    if (field_0x38[face].textures[index]) {
-        field_0x38[face].textures[index]->UnknownVirtualSlot5(
-            field_0x08, size, size, 1, fileFormat, dataSize, 0, palette, 2, 0, 2, 1,
+    if (faces[face].textures[index]) {
+        faces[face].textures[index]->UnknownVirtualSlot5(
+            textureStream, size, size, 1, fileFormat, dataSize, 0, palette, 2, 0, 2, 1,
             (UnknownTextureFormatChoice*)context, 0x80, 0xff00ff);
-        if (!field_0x610)
-            field_0x38[face].textures[index]->UnknownVirtualSlot8(1, 0, 0);
+        if (!textureGroup)
+            faces[face].textures[index]->UnknownVirtualSlot8(1, 0, 0);
     }
     if (field_0x10 & 2)
-        SkipToSector(field_0x08, alignmentBase);
+        SkipToSector(textureStream, alignmentBase);
     return 1;
 }
 
 // 0x0043d630
 int Cube::LoadMissingTextures(UnknownTexturePalette* palette, UnknownCubeTextureContext* context)
 {
-    field_0x08->Seek(textureDataOffset, 0, 1);
+    textureStream->Seek(textureDataOffset, 0, 1);
     for (int face = 0; face < 6; face++) {
         for (int i = 0; i < 16; i++) {
-            if ((field_0x38[face].presentTextures & (1 << i)) && !field_0x38[face].textures[i])
+            if ((faces[face].presentTextures & (1 << i)) && !faces[face].textures[i])
                 LoadTexture(face, i, palette, context);
         }
     }
@@ -182,9 +182,9 @@ Cube::~Cube()
 {
     for (int face = 5; face >= 0; face--) {
         for (int i = 15; i >= 0; i--) {
-            if (field_0x38[face].textures[i]) {
-                field_0x38[face].textures[i]->Release();
-                field_0x38[face].textures[i] = 0;
+            if (faces[face].textures[i]) {
+                faces[face].textures[i]->Release();
+                faces[face].textures[i] = 0;
             }
         }
     }

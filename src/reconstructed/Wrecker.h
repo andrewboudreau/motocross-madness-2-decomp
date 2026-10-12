@@ -362,7 +362,7 @@ public:
     UnknownWreckerFrame lastPose; // +0x6c last pose of poseNode
     int hadContact;                           // +0xac
     int contactThisFrame;                     // +0xb0
-    int field_0xb4;
+    int carryRiderPose;        // +0xb4 slot 10 carries the rider's root over by poseNode's motion
     UnknownWreckerSkeleton* poseNode; // +0xb8
     Vector3 linearStep;        // +0xbc
     Vector3 angularStep;       // +0xc8
@@ -381,7 +381,7 @@ public:
     int sprayFrame;            // +0x124
     float randomTable[256];    // +0x128 random values in [0, 1)
     int randomIndex;           // +0x528
-    int field_0x52c;
+    int skipProbeEffects;      // +0x52c set by EndWreck: slot 10 skips one EmitProbeEffects
     int field_0x530;
     int field_0x534;
     int field_0x538;

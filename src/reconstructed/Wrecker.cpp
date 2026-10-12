@@ -33,7 +33,7 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
     ignoreObjectCount = 0;
     wreckState = 0;
     hadContact = 0;
-    field_0xb4 = 0;
+    carryRiderPose = 0;
     pendingAnimation = 0;
     anyProbeHit = 0;
     probePositions = 0;
@@ -47,7 +47,7 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
     for (int i = 0; i < 256; i++)
         randomTable[i] = RANDOM_UNIT();
     randomIndex = 0;
-    field_0x52c = 0;
+    skipProbeEffects = 0;
     field_0x530 = 0;
     field_0x534 = 0;
     field_0x538 = 0;
@@ -266,8 +266,8 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     if (wreckState == 0) {
         collisionModel->UnknownFunctionStep(frameTime);
-        if (field_0x52c)
-            field_0x52c = 0;
+        if (skipProbeEffects)
+            skipProbeEffects = 0;
         else
             EmitProbeEffects(frameTime);
         anyProbeHit = 0;
@@ -297,7 +297,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             if (field_0x538 == 0 && field_0x530 == 0) {
                 field_0x530 = 1;
             } else {
-                field_0xb4 = 1;
+                carryRiderPose = 1;
                 field_0x538 = 0;
                 field_0x530 = 0;
             }
@@ -314,8 +314,8 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                 WreckerStep(gravityModel, step);
                 WreckerStep(rigidBody, step);
             }
-            if (field_0x52c)
-                field_0x52c = 0;
+            if (skipProbeEffects)
+                skipProbeEffects = 0;
             else
                 EmitProbeEffects(frameTime);
             for (int i = 0; i < collisionModel->probeCount; i++)
@@ -353,10 +353,10 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                 }
             }
             if (field_0x530 && !character->field_0x34) {
-                field_0xb4 = 1;
+                carryRiderPose = 1;
                 field_0x530 = 0;
             }
-            if (field_0xb4 && field_0x534) {
+            if (carryRiderPose && field_0x534) {
                 RebuildPoseSteps();
                 linearStep = linearStep * (1.0f / frameTime);
                 angularStep = angularStep * (1.0f / frameTime);
@@ -366,7 +366,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             character->UnknownVirtualSlot7(frameTime, 0, 0);
         }
     }
-    if (field_0xb4) {
+    if (carryRiderPose) {
         // Carry the rider's root over by the motion of the wreck node since
         // the pose lastPose was taken, then re-orthonormalise its axes.
         UnknownWreckerMatrix pose;
@@ -384,7 +384,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         poseNode->GetPositionIn(0, &position);
         Vector3 delta = WreckerSubtractValue(oldPosition, position);
         character->skeleton->SetPositionIn(0, &delta);
-        field_0xb4 = 0;
+        carryRiderPose = 0;
     }
     UpdateInertia();
     return 1;
@@ -504,7 +504,7 @@ void Wrecker::ContinueAsTumble() {
         character->BlendToMotion(pendingAnimation, 0.5f);
         pendingAnimation = 0;
         if (field_0x530) {
-            field_0xb4 = 1;
+            carryRiderPose = 1;
             field_0x538 = 0;
             field_0x530 = 0;
         } else {
@@ -575,7 +575,7 @@ void Wrecker::EndWreck() {
         collisionModel->hasContact = 0;
         g_UnknownGlobal68aba4->Remove(collisionModel, collisionModel->quadtreeCell);
         pendingAnimation = 0;
-        field_0x52c = 1;
+        skipProbeEffects = 1;
         character->skeleton->ResetMatrices();
         character->UnknownFunction4a8ac0(&character->field_0x190, 0);
         UpdateInertia();

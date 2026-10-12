@@ -6,7 +6,7 @@
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7SkyCube@@6B@": "0x00557ba8",
   "??_GSkyCube@@UAEPAXI@Z": "0x004fb200",
-  "?UnknownFunction43d400@Cube@@QAEHPBUVector3@@00@Z": "0x0043d400",
+  "?SetVectors@Cube@@QAEHPBUVector3@@00@Z": "0x0043d400",
   "?Load@DrawableCube@@QAEPAV1@PAXPAVUnknownTextureStream@@PAUUnknownCubeTextureContext@@@Z": "0x0043d980",
   "?Create@SkyCube@@QAEPAV1@PAXPAVUnknownTextureStream@@PAUUnknownCubeTextureContext@@M@Z": "0x004fb230",
   "?UnknownVirtualSlot10@SkyCube@@UAEHM@Z": "0x004fb260"

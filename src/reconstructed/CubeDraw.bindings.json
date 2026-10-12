@@ -15,7 +15,7 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
-  "?UnknownFunction43d230@Cube@@QAEPAV1@PAVUnknownTextureStream@@HPAVManagedTextureGroup@@H@Z": "0x0043d230",
+  "?Load@Cube@@QAEPAV1@PAVUnknownTextureStream@@HPAVManagedTextureGroup@@H@Z": "0x0043d230",
   "?Load@DrawableCube@@QAEPAV1@PAXPAVUnknownTextureStream@@PAUUnknownCubeTextureContext@@@Z": "0x0043d980",
   "?Load@DrawableCube@@QAEPAV1@PAXPAVUnknownTextureStream@@PAUUnknownCubeTextureContext@@@Z$ehhandler": "0x00549fb8",
   "?BuildFaceGeometry@DrawableCube@@QAEHXZ": "0x0043dc60",
