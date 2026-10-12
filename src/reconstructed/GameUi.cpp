@@ -83,22 +83,22 @@ UITimer::~UITimer() {
 // UIControl
 
 // 0x004703c0
-int UIControl::UnknownVirtualSlot34() {
+int UIControl::GetControlText() {
     return (int)controlText;
 }
 
 // 0x004703d0
-int UIControl::UnknownVirtualSlot35() {
+int UIControl::GetTextLength() {
     return controlTextLength;
 }
 
 // 0x004703e0
-int UIControl::UnknownVirtualSlot36() {
+int UIControl::GetTextLines() {
     return (int)textLines;
 }
 
 // 0x004703f0
-void* UIControl::UnknownVirtualSlot37() {
+void* UIControl::GetTextExtent() {
     return textExtent;
 }
 
@@ -432,7 +432,7 @@ int UIControl::UnknownVirtualSlot51(POINT point) {
 }
 
 // 0x00471070
-void UIControl::UnknownVirtualSlot27() {
+void UIControl::AdvanceImages() {
     if (stateImages[currentState])
         stateImages[currentState]->Advance();
     if (transitionState == 1 || transitionState == 2) {
@@ -444,7 +444,7 @@ void UIControl::UnknownVirtualSlot27() {
 }
 
 // 0x004710c0
-void UIControl::UnknownVirtualSlot38() {
+void UIControl::UpdateNeedsRedraw() {
     UIControl* last = FindLastAnchor(0);
     if (!shown || (last && (!last->shown || last->transitionState))) {
         if (--redrawFrames < 0) {
@@ -561,7 +561,7 @@ UIControl* UIControl::NextAttachedControlOfType(GameObjectIterator* iterator) {
 }
 
 // 0x00472860
-void UIControl::UnknownVirtualSlot63(CameraRect* in, CameraRect* out) {
+void UIControl::GetImageRect(CameraRect* in, CameraRect* out) {
     *out = *in;
     if (sourceBlit && drawnTexture) {
         out->right = (int)(drawnTexture->field_0x14 * ownerDialog->scaleX) + out->left;
@@ -570,7 +570,7 @@ void UIControl::UnknownVirtualSlot63(CameraRect* in, CameraRect* out) {
 }
 
 // 0x004728e0
-void UIControl::UnknownVirtualSlot64(CameraRect* in, CameraRect* out) {
+void UIControl::GetTextRect(CameraRect* in, CameraRect* out) {
     *out = *in;
     if (currentState == 2) {
         out->top++;
@@ -952,7 +952,7 @@ int UIMultiState::UnknownFunction4755c0() {
 // UIListBox
 
 // 0x00475fa0
-void UIListBox::UnknownVirtualSlot27() {
+void UIListBox::AdvanceImages() {
     for (int i = 0; i < rowCount; i++) {
         UIAnim* image = rowTable[i].image;
         if (image)
@@ -1291,22 +1291,22 @@ UIMultiState::UIMultiState(int id, CameraRect* area, UIDialog* owner)
 }
 
 // 0x00478260
-int UIMultiState::UnknownVirtualSlot34() {
+int UIMultiState::GetControlText() {
     return (int)stateTable[selectedState].text;
 }
 
 // 0x00478280
-int UIMultiState::UnknownVirtualSlot35() {
+int UIMultiState::GetTextLength() {
     return stateTable[selectedState].field_0x0c;
 }
 
 // 0x004782a0
-int UIMultiState::UnknownVirtualSlot36() {
+int UIMultiState::GetTextLines() {
     return (int)stateTable[selectedState].textLines;
 }
 
 // 0x004782c0
-void* UIMultiState::UnknownVirtualSlot37() {
+void* UIMultiState::GetTextExtent() {
     return stateTable[selectedState].textExtent;
 }
 
@@ -1331,7 +1331,7 @@ UIMultiState::~UIMultiState() {
 }
 
 // 0x00478450
-void UIMultiState::UnknownVirtualSlot38() {
+void UIMultiState::UpdateNeedsRedraw() {
     UIControl* last = FindLastAnchor(0);
     if (!shown || (last && (!last->shown || last->transitionState))) {
         if (--redrawFrames < 0) {
@@ -1352,7 +1352,7 @@ void UIMultiState::UnknownVirtualSlot38() {
 }
 
 // 0x004784e0
-void UIMultiState::UnknownVirtualSlot27() {
+void UIMultiState::AdvanceImages() {
     if (!stateTable)
         return;
     UIAnim* image;
@@ -1436,7 +1436,7 @@ UIStaticText::~UIStaticText() {
 }
 
 // 0x00479100
-void UIStaticText::UnknownVirtualSlot38() {
+void UIStaticText::UpdateNeedsRedraw() {
     int empty = 0;
     if (!controlText || !controlTextLength)
         empty = 1;
@@ -2426,7 +2426,7 @@ void UIControl::SetText(const char* text) {
 
 // 0x00470e00
 int UIControl::UnknownVirtualSlot10(float frameTime) {
-    UnknownVirtualSlot27();
+    AdvanceImages();
     int draw = 1;
     if (shown) {
         UIControl* last = FindLastAnchor(0);
@@ -2435,7 +2435,7 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
     }
     if (draw) {
         drawnTexture = GetStateTexture(-1);
-        UnknownVirtualSlot38();
+        UpdateNeedsRedraw();
         ScaleArea();
         if (ownerDialog->guiUser->pointerDevice && field_0x1d4 != -1) {
             POINT position = ownerDialog->guiUser->pointerDevice->pointerPosition;
@@ -3436,7 +3436,7 @@ void UIDialog::DrawAlignedText(void* dc, CameraRect* rect, const char* text, int
         SetBkMode((HDC)dc, OPAQUE);
     if (flags != 9) {
         if (control) {
-            g_UnknownGlobal65b5e0.cx = ((int*)control->UnknownVirtualSlot37())[1];
+            g_UnknownGlobal65b5e0.cx = ((int*)control->GetTextExtent())[1];
             g_UnknownGlobal65b5e0.cy = control->fontHeight;
         } else {
             GetTextExtentPoint32A((HDC)dc, text, length, &g_UnknownGlobal65b5e0);
@@ -3480,7 +3480,7 @@ void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
     else
         SetBkMode((HDC)dc, OPAQUE);
     if (control->textAlign != 9) {
-        g_UnknownGlobal65b5a0.cx = ((int*)control->UnknownVirtualSlot37())[1];
+        g_UnknownGlobal65b5a0.cx = ((int*)control->GetTextExtent())[1];
         g_UnknownGlobal65b5a0.cy = control->fontHeight;
     }
     if (control->textAlign & 2)
@@ -3496,14 +3496,14 @@ void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
         g_UnknownGlobal65b5c0 = rect.bottom - dialogFontHeight;
     else
         g_UnknownGlobal65b5c0 = rect.top;
-    if (control->UnknownVirtualSlot36())
+    if (control->GetTextLines())
         DrawTextRuns(dc, g_UnknownGlobal65b5e8, g_UnknownGlobal65b5c0,
-                     (const char*)control->UnknownVirtualSlot34(), control->UnknownVirtualSlot35(),
-                     (UnknownGameUiTextRun*)control->UnknownVirtualSlot36(), control->textColor,
+                     (const char*)control->GetControlText(), control->GetTextLength(),
+                     (UnknownGameUiTextRun*)control->GetTextLines(), control->textColor,
                      control->textColor, control->dropColor);
     else
         DrawShadowText(dc, g_UnknownGlobal65b5e8, g_UnknownGlobal65b5c0,
-                       (const char*)control->UnknownVirtualSlot34(), control->UnknownVirtualSlot35(),
+                       (const char*)control->GetControlText(), control->GetTextLength(),
                        control->textColor, control->textDrop, control->dropColor);
 }
 
@@ -4124,7 +4124,7 @@ int UIControl::Draw() {
     int redraw = redrawFrames;
     CameraRect rect;
     if (drawnTexture) {
-        UnknownVirtualSlot63((CameraRect*)screenArea, &rect);
+        GetImageRect((CameraRect*)screenArea, &rect);
         if (ownerDialog->dialogBackground) {
             ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, &rect, visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
@@ -4137,7 +4137,7 @@ int UIControl::Draw() {
     }
     if (controlText && controlTextLength) {
         redrawFrames = redraw;
-        UnknownVirtualSlot64((CameraRect*)screenArea, &rect);
+        GetTextRect((CameraRect*)screenArea, &rect);
         void* dc;
         int more;
         if (ownerDialog->BeginControlDraw(&dc, &rect, &more, this)) {
@@ -4883,7 +4883,7 @@ int UIVideoStatic::Draw() {
         ownerDialog->dialogBackground->UnknownFunction404c80();
         RequestRedraw();
     }
-    UnknownVirtualSlot63((CameraRect*)screenArea, &rect);
+    GetImageRect((CameraRect*)screenArea, &rect);
     return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, moviePlayer->field_0x2c, frameRect,
                                                                       0x1000000, 0) == 0;
 }
@@ -4919,7 +4919,7 @@ int UIProgressBar::Draw() {
     void* dc;
     int more;
     if (barTexture && progressFraction != 0.0f) {
-        UnknownVirtualSlot63((CameraRect*)screenArea, &rect);
+        GetImageRect((CameraRect*)screenArea, &rect);
         CameraRect source = *(CameraRect*)visibleArea;
         source.right = (int)((visibleArea[2] - visibleArea[0]) * progressFraction);
         UIDialog* owner = ownerDialog;
@@ -4936,7 +4936,7 @@ int UIProgressBar::Draw() {
     }
     if (showPercentage) {
         redraw = redrawFrames;
-        UnknownVirtualSlot64((CameraRect*)screenArea, &rect);
+        GetTextRect((CameraRect*)screenArea, &rect);
         char text[16];
         sprintf(text, "%3.0f%%", progressFraction * 100.0f);
         if (ownerDialog->BeginControlDraw(&dc, &rect, &more, this)) {

@@ -159,7 +159,7 @@ public:
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00472130
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00471fd0
 
-    virtual void UnknownVirtualSlot27();      // 0x00471070: advances the state's image
+    virtual void AdvanceImages(); // slot 27, 0x00471070: advances the state image and the FX animation
     virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x00470990: whether `point` is inside
     virtual void SetState(int state); // slot 29, 0x00470970: sets the state
     virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
@@ -168,11 +168,11 @@ public:
     virtual int EnterHover();
     virtual void LeaveHover(int value); // slot 32, 0x00472630: state 0 if enabled, hides the tool tip
     virtual void UnknownVirtualSlot33(int value); // 0x00464e80 (shared empty body)
-    virtual int UnknownVirtualSlot34();       // 0x004703c0
-    virtual int UnknownVirtualSlot35();       // 0x004703d0
-    virtual int UnknownVirtualSlot36();       // 0x004703e0
-    virtual void* UnknownVirtualSlot37();     // 0x004703f0
-    virtual void UnknownVirtualSlot38();      // 0x004710c0
+    virtual int GetControlText(); // slot 34, 0x004703c0: controlText
+    virtual int GetTextLength(); // slot 35, 0x004703d0: controlTextLength
+    virtual int GetTextLines(); // slot 36, 0x004703e0: textLines
+    virtual void* GetTextExtent(); // slot 37, 0x004703f0: textExtent
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x004710c0: sets needsRedraw
     // Slot 39 (0x00470f10): screenArea = bounds scaled, offset by the anchor or
     // the dialog; visibleArea is the part on the render target.
     virtual void ScaleArea();
@@ -199,8 +199,11 @@ public:
     virtual void UnknownVirtualSlot60(int value); // 0x00464e80
     virtual int GetWidth();               // slot 61, 0x00470410: screenArea width
     virtual int GetHeight();              // slot 62, 0x00470420: screenArea height
-    virtual void UnknownVirtualSlot63(CameraRect* in, CameraRect* out); // 0x00472860
-    virtual void UnknownVirtualSlot64(CameraRect* in, CameraRect* out); // 0x004728e0
+    // Slot 63 (0x00472860): `in`, sized to the drawn texture with SourceBlit.
+    virtual void GetImageRect(CameraRect* in, CameraRect* out);
+    // Slot 64 (0x004728e0): `in` inset by the text margins, moved one pixel
+    // down and right in state 2 (pressed).
+    virtual void GetTextRect(CameraRect* in, CameraRect* out);
 
     // Names from the bodies and from the .dtm keys the dialog loader
     // (UIDialog slot 27) passes to them.
@@ -363,7 +366,7 @@ public:
     virtual int UnknownVirtualSlot20(int value); // 0x00474150
     virtual int UnknownVirtualSlot21(int value); // 0x00474570
     virtual void UnknownVirtualSlot33(int value); // 0x004740b0
-    virtual void UnknownVirtualSlot38();      // 0x00479100 (shared with UIStaticText)
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100 (shared with UIStaticText)
     virtual int Draw();                   // slot 40, 0x004738a0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00474120
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10 (shared with UIScrollCtl)
@@ -475,7 +478,7 @@ public:
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
     virtual int Draw();                   // slot 40, 0x004761f0: draws the rows
-    virtual void UnknownVirtualSlot27();      // 0x00475fa0
+    virtual void AdvanceImages(); // slot 27, 0x00475fa0
     virtual void SetState(int state); // slot 29, 0x00479220
     virtual void RequestRedraw();         // slot 50, 0x00477ce0
     virtual int UnknownVirtualSlot21(int key); // 0x00478040
@@ -557,16 +560,16 @@ class UIMultiState : public UIControl {
 public:
     UIMultiState(int id, CameraRect* area, UIDialog* owner); // 0x004781f0
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
-    virtual void UnknownVirtualSlot27();      // 0x004784e0
+    virtual void AdvanceImages(); // slot 27, 0x004784e0
     // Slot 28 (0x00478e10): whether `point` is on an opaque pixel.
     virtual int ContainsPoint(tagPOINT point, int state);
     virtual int Draw();                   // slot 40, 0x00478570: draws
     virtual void SetState(int state); // slot 29, 0x00478520
-    virtual int UnknownVirtualSlot34();       // 0x00478260
-    virtual int UnknownVirtualSlot35();       // 0x00478280
-    virtual int UnknownVirtualSlot36();       // 0x004782a0
-    virtual void* UnknownVirtualSlot37();     // 0x004782c0
-    virtual void UnknownVirtualSlot38();      // 0x00478450
+    virtual int GetControlText(); // slot 34, 0x00478260: the selected state's text
+    virtual int GetTextLength(); // slot 35, 0x00478280
+    virtual int GetTextLines(); // slot 36, 0x004782a0
+    virtual void* GetTextExtent(); // slot 37, 0x004782c0
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x00478450
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478810
     virtual void UnknownVirtualSlot59(int value); // 0x00478540
 
@@ -593,7 +596,7 @@ public:
     virtual ~UIStaticText();                  // 0x004790f0 (deleting wrapper 0x004790d0)
     virtual void SetState(int state); // slot 29, 0x00479220 (shared with UIListBox)
     virtual int UnknownVirtualSlot30();       // 0x00478fe0 (shared with UIStatic)
-    virtual void UnknownVirtualSlot38();      // 0x00479100
+    virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100
     virtual int Draw();                   // slot 40, 0x00479170
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479190 (shared with UIStatic)
 };
