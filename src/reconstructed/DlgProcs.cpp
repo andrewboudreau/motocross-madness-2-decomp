@@ -456,7 +456,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 } else {
                     g_TrackGame->mode.field_0x25ec[0] = 0;
                 }
-                UnknownFunction4536e0();
+                LeaveMenusForRace();
                 UnknownVirtualSlot26();
             }
         } else if (!_stricmp("EventTab", event->controlName)) {
@@ -1390,7 +1390,7 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x00451380
-void UnknownFunction451380(int value, char* text) {
+void FormatDecimal(int value, char* text) {
     _itoa(value, text, 10);
 }
 
@@ -2006,7 +2006,7 @@ int Intro3Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 
 // 0x004536e0: leaves the menus for the race: keeps a copy of the settings and
 // opens the loading dialog of the event type.
-void UnknownFunction4536e0() {
+void LeaveMenusForRace() {
     g_TrackGame->mode.field_0x2dbc = 0;
     g_TrackGame->ui->field_0x4ac = 1;
     g_TrackGame->ui->field_0x4a8 = 0;
@@ -2302,7 +2302,7 @@ void GhostFilesDlg::RaceSelectedGhost() {
     COPY_TEXT(g_TrackGame->mode.field_0x25ec, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->UnknownVirtualSlot26();
     g_TrackGame->mode.UnknownFunction5240e0(header->series);
-    UnknownFunction4536e0();
+    LeaveMenusForRace();
 }
 
 // 0x00454a50
@@ -2483,7 +2483,7 @@ void ReplayFilesDlg::PlaySelectedReplay() {
     *(int*)&g_TrackGame->mode.field_0xfd8[4] = header->fourStroke;
     COPY_TEXT(g_TrackGame->mode.field_0x26f4, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->UnknownVirtualSlot26();
-    UnknownFunction4536e0();
+    LeaveMenusForRace();
 }
 
 // 0x004555b0

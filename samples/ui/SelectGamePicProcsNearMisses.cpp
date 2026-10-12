@@ -247,7 +247,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }
             qsort(g_TrackGame->mode.field_0x27f8.field_0x14c, racer, sizeof(UnknownGridEntry),
-                  UnknownFunction4f2080);
+                  CompareGridEntries);
         } else {
             // At random.
             UnknownGridDraw draws[8];
@@ -258,7 +258,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 draw.field_0x08 = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 draws[i] = draw;
             }
-            qsort(draws, racer, sizeof(UnknownGridDraw), UnknownFunction4f20a0);
+            qsort(draws, racer, sizeof(UnknownGridDraw), CompareGridDraws);
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
                 entry.field_0x00 = draws[i].field_0x00;

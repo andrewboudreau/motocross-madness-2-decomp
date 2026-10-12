@@ -318,7 +318,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
 
 // 0x004f2080: qsort order of the grid entries, by +0x04, largest first
 // (0x004f2340, in the near-miss sample, sorts with it and 0x004f20a0).
-int UnknownFunction4f2080(const void* a, const void* b) {
+int CompareGridEntries(const void* a, const void* b) {
     unsigned char x = ((const UnknownTrackGameModeEntry*)a)->field_0x04;
     unsigned char y = ((const UnknownTrackGameModeEntry*)b)->field_0x04;
     if (x > y)
@@ -327,7 +327,7 @@ int UnknownFunction4f2080(const void* a, const void* b) {
 }
 
 // 0x004f20a0: qsort order of the grid draws, by the key, largest first.
-int UnknownFunction4f20a0(const void* a, const void* b) {
+int CompareGridDraws(const void* a, const void* b) {
     const UnknownGridDraw* x = (const UnknownGridDraw*)a;
     const UnknownGridDraw* y = (const UnknownGridDraw*)b;
     if (x->field_0x04 > y->field_0x04)
@@ -387,7 +387,7 @@ void MultiPlayerDlg::FillRacerSlots() {
                 g_TrackGame->mode.field_0x2dbc = 0;
             }
         }
-        UnknownFunction4536e0();
+        LeaveMenusForRace();
         UnknownVirtualSlot26();
     }
 }
@@ -504,7 +504,7 @@ void UnknownLobbySlotTable::FreeSlot(int id) {
 }
 
 // 0x004f2fc0: qsort order, by the request, smallest first.
-static int UnknownFunction4f2fc0(const void* a, const void* b) {
+static int CompareRequestedRacers(const void* a, const void* b) {
     int x = ((const UnknownLobbySlot*)a)->requestedRacers;
     int y = ((const UnknownLobbySlot*)b)->requestedRacers;
     if (x < y)
@@ -517,7 +517,7 @@ static int UnknownFunction4f2fc0(const void* a, const void* b) {
 int UnknownLobbySlotTable::GrantRacers(int count, int limit) {
     if (count >= 8)
         return 0;
-    qsort(slots, count, sizeof(UnknownLobbySlot), UnknownFunction4f2fc0);
+    qsort(slots, count, sizeof(UnknownLobbySlot), CompareRequestedRacers);
     int total = 0;
     for (int i = 0; i < 8; i++) {
         slots[i].grantedRacers = 0;
@@ -1420,7 +1420,7 @@ void MPEventDlg::ShowHostSettings() {
         UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         if (opponents) {
             opponents->RemoveAllRows();
-            UnknownFunction451380(g_TrackGame->mode.field_0x27f8.field_0x28, text);
+            FormatDecimal(g_TrackGame->mode.field_0x27f8.field_0x28, text);
             opponents->AddRow(text, g_TrackGame->mode.field_0x27f8.field_0x28, 0);
         }
         FindControl("ChkTagBall", 2)->Show(0, 1);
@@ -1433,7 +1433,7 @@ void MPEventDlg::ShowHostSettings() {
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x929);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
-        UnknownFunction451380(g_TrackGame->mode.field_0x27f8.field_0x20, text);
+        FormatDecimal(g_TrackGame->mode.field_0x27f8.field_0x20, text);
         laps->AddRow(text, g_TrackGame->mode.field_0x27f8.field_0x20, 0);
     } else {
         UIControl* label = FindControl("LapsLabel", 0xc);

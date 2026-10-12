@@ -36,9 +36,9 @@ extern int g_UnknownGlobal689dfc;
 int ReadClock();
 
 // dlgprocs.cpp's code (0x004536e0).
-void UnknownFunction4536e0();
+void LeaveMenusForRace();
 // 0x00451380: formats `value` into `text` (near dlgprocs.cpp's code).
-void UnknownFunction451380(int value, char* text);
+void FormatDecimal(int value, char* text);
 // 0x004f17a0: fills the list `listName` of `dialog` with the `pattern`
 // files under `directory` and shows the first one's picture.
 int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,

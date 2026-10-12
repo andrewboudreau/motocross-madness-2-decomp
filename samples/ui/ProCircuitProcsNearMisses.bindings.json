@@ -195,7 +195,7 @@
   "?UnknownFunction444c70@UnknownProCircuitSkinned@@QAEXHPBDPAPAVTextureMapManager@@@Z": "0x00444c70",
   "?CompareRowNumbersAscending@@YAHPBX0@Z": "0x0044b0a0",
   "?CompareRowNumbersDescending@@YAHPBX0@Z": "0x0044b0e0",
-  "?UnknownFunction4536e0@@YAXXZ": "0x004536e0",
+  "?LeaveMenusForRace@@YAXXZ": "0x004536e0",
   "?SetTextsOrResources@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
   "?ResetEntries@EventManager@@QAEXXZ": "0x0045e520",
   "?FindSectionObject@UIDialog@@QAEPAVSound@@PBD@Z": "0x0046e9a0",

@@ -474,7 +474,7 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 g_TrackGame->mode.field_0x27f8.field_0x34 = 0;
             g_TrackGame->mode.field_0x27f8.field_0x10 = 1;
             g_TrackGame->mode.field_0x94 = circuit->field_0x50;
-            UnknownFunction4536e0();
+            LeaveMenusForRace();
             UnknownVirtualSlot26();
         } else if (_stricmp("TabNext", event->controlName) == 0) {
             OpenPage(0);

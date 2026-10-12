@@ -539,7 +539,7 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;
                 UNKNOWN_GARAGE_SETTINGS->fourStroke = header.fourStroke;
                 COPY_TEXT(g_TrackGame->mode.field_0x26f4, "VCRtape.dat", 0x104);
-                UnknownFunction4536e0();
+                LeaveMenusForRace();
                 parentDialog->UnknownVirtualSlot26();
             } else {
                 event->control->Show(0, 1);

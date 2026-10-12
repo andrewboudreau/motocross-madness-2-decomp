@@ -272,7 +272,7 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             else
                 g_TrackGame->mode.field_0x27f8.field_0x34 = 0;
             g_TrackGame->mode.field_0x94 = circuit->field_0x50;
-            UnknownFunction4536e0();
+            LeaveMenusForRace();
             UnknownVirtualSlot26();
         } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->AdvanceAfterRace();
