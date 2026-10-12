@@ -246,7 +246,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
 static inline void RestartKey(UnknownTextureStream* stream)
 {
     if (stream->field_0x1c)
-        stream->field_0x1c->UnknownFunction461d20();
+        stream->field_0x1c->ResetTextMode();
     else
         stream->field_0x01 = stream->field_0x03;
 }

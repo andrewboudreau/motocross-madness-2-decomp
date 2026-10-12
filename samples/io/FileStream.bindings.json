@@ -24,7 +24,7 @@
   "?ReadLine@UnknownTextureStream@@QAEHPADH@Z": "0x00461aa0",
   "?UnknownFunction461b90@UnknownTextureStream@@QAEHPBD@Z": "0x00461b90",
   "?UnknownFunction461cb0@UnknownTextureStream@@QAEHPAH0@Z": "0x00461cb0",
-  "?UnknownFunction461d20@UnknownTextureStream@@QAEXXZ": "0x00461d20",
+  "?ResetTextMode@UnknownTextureStream@@QAEXXZ": "0x00461d20",
   "?UnknownFunction461d40@@YAHPAU_iobuf@@PBDZZ": "0x00461d40",
   "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
   "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",

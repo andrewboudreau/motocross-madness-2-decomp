@@ -75,7 +75,7 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
         if (stream->Read(&offset, 4, 1) != 1)
             goto fail;
         int position = stream->Tell();
-        mode = ((UnknownParameterStream*)stream)->UnknownFunction43e9e0();
+        mode = ((UnknownParameterStream*)stream)->GetTextMode();
         if (stream->Seek(offset + start, 0, 1))
             goto fail;
         if (loadPalette)
@@ -83,13 +83,13 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
         loadPalette = new (__FILE__, 0x5f) ColorMapper(stream);
         if (stream->Seek(position, 0, 1))
             goto fail;
-        ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
+        ((UnknownParameterStream*)stream)->SetTextMode(mode);
     }
     for (i = 0; i < cubeCount; i++) {
         if (stream->Read(&offset, 4, 1) != 1)
             goto fail;
         int position = stream->Tell();
-        mode = ((UnknownParameterStream*)stream)->UnknownFunction43e9e0();
+        mode = ((UnknownParameterStream*)stream)->GetTextMode();
         if (stream->Seek(offset + start, 0, 1))
             goto fail;
         if (field_0x2c)
@@ -99,7 +99,7 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
             goto fail;
         if (stream->Seek(position, 0, 1))
             goto fail;
-        ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
+        ((UnknownParameterStream*)stream)->SetTextMode(mode);
     }
     BuildFaceGeometry();
     LoadTexturesAndCoords(field_0x2c, context);

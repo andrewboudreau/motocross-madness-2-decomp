@@ -74,7 +74,7 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
         if (entry->field_0x14->Read(paletteName, nameSize, 1) == 1) {
             if (format == 8 && !palette && *paletteName) {
                 int position = entry->field_0x14->Tell();
-                char mode = entry->field_0x14->UnknownFunction43e9e0();
+                char mode = entry->field_0x14->GetTextMode();
                 palette = Palette8::UnknownFunction4b6b30(paletteName);
                 if (!palette) {
                     texturePalette = 0;
@@ -84,7 +84,7 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
                     surfacePalette = palette->field_0x70c;
                 }
                 entry->field_0x14->Seek(position, 0, 0);
-                entry->field_0x14->UnknownFunction43e9b0(mode);
+                entry->field_0x14->SetTextMode(mode);
             }
         } else {
             DebugFree(paletteName, __FILE__, 138);

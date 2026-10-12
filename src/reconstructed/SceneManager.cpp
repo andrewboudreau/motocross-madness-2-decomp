@@ -1367,7 +1367,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                 entry->field_0x14->Read(&material->mappingType, 2, 1);
                 entry->field_0x14->Read(&material->field_0xcc, 4, 1);
                 position = entry->field_0x14->Tell();
-                mode = entry->field_0x14->UnknownFunction43e9e0();
+                mode = entry->field_0x14->GetTextMode();
                 if (material->hasTextureName) {
                     if (!AddResource((UnknownResourceManager*)resources, material->textureName, 0))
                         return 1;
@@ -1375,7 +1375,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                         return 0;
                 }
                 entry->field_0x14->Seek(position, 0, 0);
-                entry->field_0x14->UnknownFunction43e9b0(mode);
+                entry->field_0x14->SetTextMode(mode);
             }
             material->Release();
         }

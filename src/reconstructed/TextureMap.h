@@ -62,19 +62,19 @@ public:
     int UnknownFunction4618e0(const void* buffer, int size, int count); // 0x004618e0: writes
     int UnknownFunction461a60(int c);         // 0x00461a60: writes a byte
     int UnknownFunction461b90(const char* path); // 0x00461b90: writes the header, keyed by the name
-    void UnknownFunction461d20();             // 0x00461d20: restarts the key
+    void ResetTextMode();             // 0x00461d20: restarts the key
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
-    char UnknownFunction43e9e0()
+    char GetTextMode()
     {
         if (field_0x1c)
-            return field_0x1c->UnknownFunction43e9e0();
+            return field_0x1c->GetTextMode();
         return field_0x01;
     }
     // 0x0043e9b0 (out-of-line copy): sets the text-mode byte.
-    void UnknownFunction43e9b0(char mode)
+    void SetTextMode(char mode)
     {
         if (field_0x1c)
-            field_0x1c->UnknownFunction43e9b0(mode);
+            field_0x1c->SetTextMode(mode);
         else
             field_0x01 = mode;
     }

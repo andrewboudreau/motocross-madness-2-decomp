@@ -13,8 +13,8 @@ class UnknownParameterStream;
 // that hold a file.
 struct UnknownParameterArchiveEntry {
     unsigned char field_0x00[0x14];
-    UnknownParameterStream* field_0x14;   // stream holding the file
-    int field_0x18;                       // offset of the file in it
+    UnknownParameterStream* holderStream;     // +0x14 stream holding the file
+    int holderOffset;                         // +0x18 offset of the file in it
 };
 
 // The archive list a stream points to at +0x12c. Tier 2: the same retail
@@ -41,38 +41,38 @@ public:
     int Read(void* buffer, int size, int count); // 0x00461640: reads `count` items (SoultreeMaterial.cpp)
 
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
-    char UnknownFunction43e9e0()
+    char GetTextMode()
     {
-        if (field_0x1c)
-            return field_0x1c->UnknownFunction43e9e0();
-        return field_0x01;
+        if (innerStream)
+            return innerStream->GetTextMode();
+        return textMode;
     }
     // 0x0043e9b0 (out-of-line copy): sets the text-mode byte.
-    void UnknownFunction43e9b0(char mode)
+    void SetTextMode(char mode)
     {
-        if (field_0x1c)
-            field_0x1c->UnknownFunction43e9b0(mode);
+        if (innerStream)
+            innerStream->SetTextMode(mode);
         else
-            field_0x01 = mode;
+            textMode = mode;
     }
     // 0x00461d20 (out-of-line copy): restores the text-mode byte from +3.
-    void UnknownFunction461d20()
+    void ResetTextMode()
     {
-        if (field_0x1c)
-            field_0x1c->UnknownFunction461d20();
+        if (innerStream)
+            innerStream->ResetTextMode();
         else
-            field_0x01 = field_0x03;
+            textMode = initialTextMode;
     }
 
     char field_0x00;
-    char field_0x01;                       // text-mode byte
+    char textMode;                         // +0x01 text-mode byte
     char field_0x02;
-    char field_0x03;                       // its initial value
+    char initialTextMode;                  // +0x03 its initial value
     unsigned char field_0x04[0x1c - 0x04];
-    UnknownParameterStream* field_0x1c;    // inner stream
+    UnknownParameterStream* innerStream;      // +0x1c inner stream
     unsigned char field_0x020[0x12c - 0x20];
-    UnknownParameterArchive* field_0x12c;  // archives
-    int field_0x130;                       // start offset in the inner stream
+    UnknownParameterArchive* archives;        // +0x12c archives
+    int startOffset;                          // +0x130 start offset in the inner stream
 };
 
 // One parsed row value: 0 int, 1 float, 2 string (owned, DebugMalloc).
@@ -131,23 +131,23 @@ public:
     int GetSectionNames(char* out, int size);  // section names, '?'-terminated
     void StripBlanks(const char* in, char* out); // strips blanks outside [] and ""
 
-    UnknownParameterStream* field_0x000;  // stream
+    UnknownParameterStream* blockStream;      // +0x000 stream
     int field_0x004;
-    int field_0x008;                      // open
+    int isOpen;                               // +0x008 open
     int field_0x00c;
     char field_0x010[0x104];
     int field_0x114;
-    int field_0x118;                      // section count
-    int field_0x11c;                      // section capacity
-    UnknownParameterSection* field_0x120; // sections
-    int field_0x124;                      // file offset in the stream
-    int field_0x128;                      // loaded line count
-    char** field_0x12c;                   // loaded lines
-    char field_0x130[0x400];              // loaded section name
-    int field_0x530;                      // reading rows
+    int sectionCount;                         // +0x118 section count
+    int sectionCapacity;                      // +0x11c section capacity
+    UnknownParameterSection* sectionTable;    // +0x120 sections
+    int fileOffset;                           // +0x124 file offset in the stream
+    int loadedLineCount;                      // +0x128 loaded line count
+    char** loadedLines;                       // +0x12c loaded lines
+    char loadedSectionName[0x400];            // +0x130 loaded section name
+    int readingRows;                          // +0x530 reading rows
     int field_0x534;
-    int field_0x538;                      // row count
-    int field_0x53c;                      // row index
-    int field_0x540;                      // value count
-    UnknownParameterValue field_0x544[16];
+    int rowCount;                             // +0x538 row count
+    int rowIndex;                             // +0x53c row index
+    int valueCount;                           // +0x540 value count
+    UnknownParameterValue rowValues[16];      // +0x544
 };

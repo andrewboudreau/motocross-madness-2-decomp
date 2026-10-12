@@ -109,21 +109,21 @@ void ParameterValueToString(UnknownParameterValue value, char* out)
 
 UnknownParameterBlock::UnknownParameterBlock()
 {
-    field_0x000 = 0;
+    blockStream = 0;
     field_0x004 = 0;
-    field_0x008 = 0;
+    isOpen = 0;
     field_0x00c = 0;
-    field_0x118 = 0;
-    field_0x11c = 0;
-    field_0x120 = 0;
-    field_0x124 = 0;
-    field_0x128 = 0;
-    field_0x12c = 0;
-    field_0x530 = 0;
+    sectionCount = 0;
+    sectionCapacity = 0;
+    sectionTable = 0;
+    fileOffset = 0;
+    loadedLineCount = 0;
+    loadedLines = 0;
+    readingRows = 0;
     field_0x534 = 0;
-    field_0x538 = 0;
-    field_0x53c = 0;
-    field_0x540 = 0;
+    rowCount = 0;
+    rowIndex = 0;
+    valueCount = 0;
     field_0x114 = 0;
     field_0x010[0] = 0;
 }
@@ -133,17 +133,17 @@ UnknownParameterBlock::UnknownParameterBlock()
 UnknownParameterBlock::~UnknownParameterBlock()
 {
     FreeLines();
-    if (field_0x120) {
-        DebugFree(field_0x120, __FILE__, 141);
-        field_0x120 = 0;
-        field_0x118 = 0;
+    if (sectionTable) {
+        DebugFree(sectionTable, __FILE__, 141);
+        sectionTable = 0;
+        sectionCount = 0;
     }
-    for (int i = 0; i < field_0x540; i++) {
-        if (field_0x544[i].type == 2)
-            DebugFree(field_0x544[i].s, __FILE__, 147);
-        field_0x544[i].s = 0;
+    for (int i = 0; i < valueCount; i++) {
+        if (rowValues[i].type == 2)
+            DebugFree(rowValues[i].s, __FILE__, 147);
+        rowValues[i].s = 0;
     }
-    field_0x540 = 0;
+    valueCount = 0;
 }
 
 // Opens `name` through the stream's archive list (+0x12c): find it, else add
@@ -156,21 +156,21 @@ void UnknownParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
                                                   const char* name, const char* path,
                                                   int index)
 {
-    if (stream->field_0x12c) {
+    if (stream->archives) {
         UnknownParameterArchiveEntry* entry =
-            stream->field_0x12c->FindItem(name, 0);
+            stream->archives->FindItem(name, 0);
         if (!entry) {
-            if (!stream->field_0x12c->AddArchive(path, 0))
-                stream->field_0x12c->AddLooseFile(name, path);
-            entry = stream->field_0x12c->FindItem(name, 0);
+            if (!stream->archives->AddArchive(path, 0))
+                stream->archives->AddLooseFile(name, path);
+            entry = stream->archives->FindItem(name, 0);
             if (!entry) {
                 Attach(stream, 0, index);
                 return;
             }
-            Attach(entry->field_0x14, entry->field_0x18, index);
+            Attach(entry->holderStream, entry->holderOffset, index);
             return;
         }
-        Attach(entry->field_0x14, entry->field_0x18, index);
+        Attach(entry->holderStream, entry->holderOffset, index);
         return;
     }
     Attach(stream, 0, index);
@@ -187,10 +187,10 @@ int UnknownParameterBlock::ScanSection(const char* name)
     char** lines;
     int capacity;
 
-    if (!field_0x008)
+    if (!isOpen)
         return 0;
     for (;;) {
-        if (!field_0x000->ReadLine(line, PB_LINE_SIZE))
+        if (!blockStream->ReadLine(line, PB_LINE_SIZE))
             return 0;
         StripBlanks(line, stripped);
         if (stripped[0] == '[') {
@@ -202,36 +202,36 @@ int UnknownParameterBlock::ScanSection(const char* name)
         }
     }
 
-    if (field_0x12c)
+    if (loadedLines)
         FreeLines();
     lines = 0;
-    field_0x128 = 0;
+    loadedLineCount = 0;
     capacity = 0;
     int nameLength = strlen(name);
     int length = PB_MIN(PB_LINE_SIZE - 1, nameLength);
-    strncpy(field_0x130, name, length);
-    field_0x130[length] = 0;
-    while (field_0x000->ReadLine(line, PB_LINE_SIZE)) {
+    strncpy(loadedSectionName, name, length);
+    loadedSectionName[length] = 0;
+    while (blockStream->ReadLine(line, PB_LINE_SIZE)) {
         StripBlanks(line, stripped);
         if (stripped[0] == '[')
             break;
         if (stripped[0] != 0 && stripped[0] != ';') {
-            if (field_0x128 >= capacity) {
+            if (loadedLineCount >= capacity) {
                 capacity += 20;
                 lines = (char**)DebugRealloc(lines, capacity * sizeof(char*), __FILE__, 273);
             }
-            lines[field_0x128] = new (__FILE__, 275) char[PB_LINE_SIZE];
-            strcpy(lines[field_0x128], stripped);
-            field_0x128++;
+            lines[loadedLineCount] = new (__FILE__, 275) char[PB_LINE_SIZE];
+            strcpy(lines[loadedLineCount], stripped);
+            loadedLineCount++;
         }
     }
-    if (field_0x128 == 0)
+    if (loadedLineCount == 0)
         return 0;
-    field_0x12c = new (__FILE__, 285) char*[field_0x128];
-    for (int i = 0; i < field_0x128; i++)
-        field_0x12c[i] = lines[i];
+    loadedLines = new (__FILE__, 285) char*[loadedLineCount];
+    for (int i = 0; i < loadedLineCount; i++)
+        loadedLines[i] = lines[i];
     DebugFree(lines, __FILE__, 290);
-    field_0x530 = 0;
+    readingRows = 0;
     return 1;
 }
 
@@ -251,58 +251,58 @@ void UnknownParameterBlock::IndexSections(UnknownParameterStream* stream)
             strncpy(header, stripped + 1, length);
             header[length] = 0;
             if (FindSection(header) == -1) {
-                if (field_0x120) {
-                    if (field_0x118 >= field_0x11c) {
-                        field_0x11c += 10;
-                        field_0x120 = (UnknownParameterSection*)DebugRealloc(
-                            field_0x120, field_0x11c * sizeof(UnknownParameterSection),
+                if (sectionTable) {
+                    if (sectionCount >= sectionCapacity) {
+                        sectionCapacity += 10;
+                        sectionTable = (UnknownParameterSection*)DebugRealloc(
+                            sectionTable, sectionCapacity * sizeof(UnknownParameterSection),
                             __FILE__, 318);
                     }
                 } else {
-                    field_0x120 = (UnknownParameterSection*)DebugMalloc(
+                    sectionTable = (UnknownParameterSection*)DebugMalloc(
                         10 * sizeof(UnknownParameterSection), __FILE__, 321);
-                    field_0x11c = 10;
+                    sectionCapacity = 10;
                 }
-                strcpy(field_0x120[field_0x118].name, header);
-                field_0x120[field_0x118].offset = stream->Tell();
-                field_0x120[field_0x118].lineCount = lineIndex;
-                field_0x120[field_0x118].mode = stream->UnknownFunction43e9e0();
-                if (field_0x118 > 0)
-                    field_0x120[field_0x118 - 1].lineCount =
-                        lineIndex - field_0x120[field_0x118 - 1].lineCount - 1;
-                field_0x118++;
+                strcpy(sectionTable[sectionCount].name, header);
+                sectionTable[sectionCount].offset = stream->Tell();
+                sectionTable[sectionCount].lineCount = lineIndex;
+                sectionTable[sectionCount].mode = stream->GetTextMode();
+                if (sectionCount > 0)
+                    sectionTable[sectionCount - 1].lineCount =
+                        lineIndex - sectionTable[sectionCount - 1].lineCount - 1;
+                sectionCount++;
             }
         }
         lineIndex++;
     }
-    if (field_0x118 > 0)
-        field_0x120[field_0x118 - 1].lineCount =
-            lineIndex - field_0x120[field_0x118 - 1].lineCount - 1;
+    if (sectionCount > 0)
+        sectionTable[sectionCount - 1].lineCount =
+            lineIndex - sectionTable[sectionCount - 1].lineCount - 1;
 }
 
 void UnknownParameterBlock::Attach(UnknownParameterStream* stream, int offset,
                                                   int index)
 {
-    field_0x124 = offset;
-    field_0x008 = 1;
+    fileOffset = offset;
+    isOpen = 1;
     field_0x534 = 0;
     field_0x00c = 0;
-    field_0x000 = stream;
-    if (field_0x120) {
-        DebugFree(field_0x120, __FILE__, 362);
-        field_0x120 = 0;
-        field_0x118 = 0;
+    blockStream = stream;
+    if (sectionTable) {
+        DebugFree(sectionTable, __FILE__, 362);
+        sectionTable = 0;
+        sectionCount = 0;
     }
-    stream->Seek(stream->field_0x130 + field_0x124, 0, 0);
+    stream->Seek(stream->startOffset + fileOffset, 0, 0);
     if (index)
         IndexSections(stream);
-    field_0x530 = 0;
+    readingRows = 0;
 }
 
 int UnknownParameterBlock::FindSection(const char* name)
 {
-    for (int i = 0; i < field_0x118; i++) {
-        if (_stricmp(name, field_0x120[i].name) == 0)
+    for (int i = 0; i < sectionCount; i++) {
+        if (_stricmp(name, sectionTable[i].name) == 0)
             return i;
     }
     return -1;
@@ -310,11 +310,11 @@ int UnknownParameterBlock::FindSection(const char* name)
 
 void UnknownParameterBlock::FreeLines()
 {
-    for (int i = 0; i < field_0x128; i++)
-        delete field_0x12c[i];
-    delete field_0x12c;
-    field_0x128 = 0;
-    field_0x12c = 0;
+    for (int i = 0; i < loadedLineCount; i++)
+        delete loadedLines[i];
+    delete loadedLines;
+    loadedLineCount = 0;
+    loadedLines = 0;
 }
 
 // Without an index it rewinds and scans; with one it seeks to the section
@@ -324,37 +324,37 @@ int UnknownParameterBlock::SelectSection(const char* name)
     char stripped[PB_LINE_SIZE];
     char line[PB_LINE_SIZE];
 
-    if (!field_0x008)
+    if (!isOpen)
         return 0;
-    if (!field_0x120) {
-        field_0x000->Seek(field_0x000->field_0x130 + field_0x124, 0, 0);
-        field_0x000->UnknownFunction461d20();
+    if (!sectionTable) {
+        blockStream->Seek(blockStream->startOffset + fileOffset, 0, 0);
+        blockStream->ResetTextMode();
         return ScanSection(name);
     }
     int index = FindSection(name);
     if (index == -1)
         return 0;
-    field_0x000->Seek(field_0x120[index].offset, 0, 0);
-    field_0x000->UnknownFunction43e9b0(field_0x120[index].mode);
-    if (field_0x12c)
+    blockStream->Seek(sectionTable[index].offset, 0, 0);
+    blockStream->SetTextMode(sectionTable[index].mode);
+    if (loadedLines)
         FreeLines();
-    int count = field_0x120[index].lineCount;
-    field_0x12c = new (__FILE__, 459) char*[count];
-    field_0x128 = 0;
+    int count = sectionTable[index].lineCount;
+    loadedLines = new (__FILE__, 459) char*[count];
+    loadedLineCount = 0;
     int nameLength = strlen(name);
     int length = PB_MIN(PB_LINE_SIZE - 1, nameLength);
-    strncpy(field_0x130, name, length);
-    field_0x130[length] = 0;
+    strncpy(loadedSectionName, name, length);
+    loadedSectionName[length] = 0;
     for (int i = 0; i < count; i++) {
-        field_0x000->ReadLine(line, PB_LINE_SIZE);
+        blockStream->ReadLine(line, PB_LINE_SIZE);
         StripBlanks(line, stripped);
         if (stripped[0] != 0 && stripped[0] != ';') {
-            field_0x12c[field_0x128] = new (__FILE__, 471) char[PB_LINE_SIZE];
-            strcpy(field_0x12c[field_0x128], stripped);
-            field_0x128++;
+            loadedLines[loadedLineCount] = new (__FILE__, 471) char[PB_LINE_SIZE];
+            strcpy(loadedLines[loadedLineCount], stripped);
+            loadedLineCount++;
         }
     }
-    field_0x530 = 0;
+    readingRows = 0;
     return 1;
 }
 
@@ -366,10 +366,10 @@ int UnknownParameterBlock::ReadString(const char* key, char* out, int size)
     char text[PB_LINE_SIZE];
     char name[PB_LINE_SIZE];
 
-    for (int i = 0; i < field_0x128; i++) {
-        int lineLength = strlen(field_0x12c[i]);
+    for (int i = 0; i < loadedLineCount; i++) {
+        int lineLength = strlen(loadedLines[i]);
         int length = PB_MIN(PB_LINE_SIZE - 1, lineLength);
-        strncpy(text, field_0x12c[i], length);
+        strncpy(text, loadedLines[i], length);
         text[length] = 0;
         UnknownTokenizer tokens(text);
         char* token = tokens.UnknownFunction515df0("=\n");
@@ -475,11 +475,11 @@ int UnknownParameterBlock::BeginRows(const char* name)
 {
     int index = FindSection(name);
     if (FindSection(name) != -1) {
-        field_0x000->Seek(field_0x120[index].offset, 0, 0);
-        field_0x000->UnknownFunction43e9b0(field_0x120[index].mode);
-        field_0x530 = 1;
-        field_0x53c = 0;
-        return field_0x538 = field_0x120[index].lineCount;
+        blockStream->Seek(sectionTable[index].offset, 0, 0);
+        blockStream->SetTextMode(sectionTable[index].mode);
+        readingRows = 1;
+        rowIndex = 0;
+        return rowCount = sectionTable[index].lineCount;
     }
     return 0;
 }
@@ -489,56 +489,56 @@ int UnknownParameterBlock::ReadRow(char* raw)
     char line[PB_LINE_SIZE];
     char stripped[PB_LINE_SIZE];
 
-    if (!field_0x008)
+    if (!isOpen)
         return 0;
-    if (!field_0x530)
+    if (!readingRows)
         return 0;
-    if (field_0x53c > field_0x538 - 1)
+    if (rowIndex > rowCount - 1)
         return 0;
-    for (int i = 0; i < field_0x540; i++) {
-        if (field_0x544[i].type == 2)
-            DebugFree(field_0x544[i].s, __FILE__, 802);
-        field_0x544[i].s = 0;
+    for (int i = 0; i < valueCount; i++) {
+        if (rowValues[i].type == 2)
+            DebugFree(rowValues[i].s, __FILE__, 802);
+        rowValues[i].s = 0;
     }
-    field_0x000->ReadLine(line, PB_LINE_SIZE);
+    blockStream->ReadLine(line, PB_LINE_SIZE);
     if (raw)
         strcpy(raw, line);
     StripBlanks(line, stripped);
     UnknownTokenizer tokens(stripped);
     char* token = tokens.UnknownFunction515df0(",\n");
-    field_0x540 = 0;
+    valueCount = 0;
     while (token) {
-        ParseParameterValue(token, &field_0x544[field_0x540]);
+        ParseParameterValue(token, &rowValues[valueCount]);
         token = tokens.UnknownFunction515df0(",\n");
-        field_0x540++;
+        valueCount++;
     }
-    field_0x53c++;
-    return field_0x540;
+    rowIndex++;
+    return valueCount;
 }
 
 // The int and float getters accept index == count; the string getter does
 // not (retail's `jle` and `jl`).
 int UnknownParameterBlock::GetRowInt(int index, int* out)
 {
-    if (index > field_0x540)
+    if (index > valueCount)
         return 0;
-    ParameterValueToInt(field_0x544[index], out);
+    ParameterValueToInt(rowValues[index], out);
     return 1;
 }
 
 int UnknownParameterBlock::GetRowFloat(int index, float* out)
 {
-    if (index > field_0x540)
+    if (index > valueCount)
         return 0;
-    ParameterValueToFloat(field_0x544[index], out);
+    ParameterValueToFloat(rowValues[index], out);
     return 1;
 }
 
 int UnknownParameterBlock::GetRowString(int index, char* out)
 {
-    if (index >= field_0x540)
+    if (index >= valueCount)
         return 0;
-    ParameterValueToString(field_0x544[index], out);
+    ParameterValueToString(rowValues[index], out);
     return 1;
 }
 
@@ -547,12 +547,12 @@ int UnknownParameterBlock::GetSectionNames(char* out, int size)
     int total = 0;
     char* cursor = out;
 
-    for (int i = 0; i < field_0x118; i++) {
-        int length = strlen(field_0x120[i].name) + 1;
+    for (int i = 0; i < sectionCount; i++) {
+        int length = strlen(sectionTable[i].name) + 1;
         if (total + length + 1 >= size)
             break;
         total += length;
-        strcpy(cursor, field_0x120[i].name);
+        strcpy(cursor, sectionTable[i].name);
         strcat(cursor, "?");
         cursor += length;
     }

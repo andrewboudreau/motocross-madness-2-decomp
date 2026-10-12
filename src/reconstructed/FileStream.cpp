@@ -252,10 +252,10 @@ int UnknownTextureStream::UnknownFunction461cb0(int* time, int* size)
 }
 
 // 0x00461d20
-void UnknownTextureStream::UnknownFunction461d20()
+void UnknownTextureStream::ResetTextMode()
 {
     if (field_0x1c) {
-        field_0x1c->UnknownFunction461d20();
+        field_0x1c->ResetTextMode();
         return;
     }
     field_0x01 = field_0x03;

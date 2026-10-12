@@ -166,13 +166,13 @@ void SoultreeMaterial::ReadSaved(UnknownParameterStream* stream)
     stream->Read(&mappingType, 2, 1);
     stream->Read(&field_0xcc, 4, 1);
     int position = stream->Tell();
-    char mode = stream->UnknownFunction43e9e0();
+    char mode = stream->GetTextMode();
     if (!_stricmp(textureName, "PROCEDURAL"))
         field_0x74.opaqueTextures = field_0x74.alphaTextures = 0;
     if (hasTextureName)
         LoadTexture();
     stream->Seek(position, 0, 0);
-    stream->UnknownFunction43e9b0(mode);
+    stream->SetTextMode(mode);
 }
 
 // 0x004ff620
