@@ -327,7 +327,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
         Vector3 up;
         Vector3 forward;
         forward = field_0x34->viewDirection;
-        up = field_0x34->field_0x188;
+        up = field_0x34->upDirection;
         int index;
         if (counting) {
             index = (int)field_0x2c->countdown;

@@ -45,9 +45,9 @@ struct UnknownNumberCamera {
     unsigned char field_0x000[0x170];
     Vector3 eyePosition;                      // +0x170
     Vector3 viewDirection;                    // +0x17c forward
-    Vector3 field_0x188;               // up
+    Vector3 upDirection;                      // +0x188 up
     unsigned char field_0x194[0x198 - 0x194];
-    float field_0x198;
+    float focalLength;                        // +0x198
 };
 
 struct UnknownNumberRacerState {
@@ -235,10 +235,10 @@ struct UnknownBonusRacer {
 // The camera a BonusObjectManager faces (its +0x38).
 struct UnknownBonusCamera {
     unsigned char field_0x000[0x16c];
-    float field_0x16c;
+    float fieldOfView;                        // +0x16c
     Vector3 eyePosition;                      // +0x170
     unsigned char field_0x17c[0x198 - 0x17c];
-    float field_0x198;
+    float focalLength;                        // +0x198
 };
 
 // The game global at 0x0056e26c (TrackGame.h's g_TrackGame) as

@@ -56,7 +56,7 @@
 
 // By-value read of the camera's +0x198 value (see slot 10 above).
 static inline float CameraZoom(const UnknownBonusCamera* camera) {
-    return camera->field_0x198;
+    return camera->focalLength;
 }
 
 static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
@@ -119,10 +119,10 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
         field_0x2c->field_0x38->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (field_0x38 != g_UnknownKrustyGame56e26c->field_0x10->field_0x08 || field_0x38->field_0x16c != field_0x1dc ||
+        if (field_0x38 != g_UnknownKrustyGame56e26c->field_0x10->field_0x08 || field_0x38->fieldOfView != field_0x1dc ||
             field_0x1f0) {
             field_0x38 = g_UnknownKrustyGame56e26c->field_0x10->field_0x08;
-            field_0x1dc = field_0x38->field_0x16c;
+            field_0x1dc = field_0x38->fieldOfView;
             Vector3 delta = position - field_0x38->eyePosition;
             field_0x1f0 = 0;
             sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(field_0x38) * field_0x1e4);
@@ -179,7 +179,7 @@ struct UnknownCueOwner {
         float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * field_0x44; \
         screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f; \
         screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->aspectRatio * half * 2.0f; \
-        modelScale = field_0x38 * field_0x44 / (arcadeView->field_0x198 * field_0x3c); \
+        modelScale = field_0x38 * field_0x44 / (arcadeView->focalLength * field_0x3c); \
     } \
     Vector3 position = arcadeView->cameraPosition; \
     position += forward * field_0x44; \
