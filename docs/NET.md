@@ -77,8 +77,8 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
 ## Shared-header changes
 
 - `Game.h`: the `UnknownNetObject` stub became `NetworkInterface` from
-  Net.h. The bindings of Game, EventManager, TrackGame and GameNearMisses
-  were renamed to match.
+  Net.h. The bindings of Game, EventManager and TrackGame were renamed to
+  match.
 - `TrackGame.h`: `SetDirectPlay` takes the DirectPlay interface
   pointers. The WinSock client gained its fields and `0x004ad530`/`0x004ad570`.
 - `EventManager.cpp`: `0x004ac800` now returns `NetPlayer*`.

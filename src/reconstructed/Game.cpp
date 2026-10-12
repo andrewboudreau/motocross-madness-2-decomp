@@ -25,6 +25,17 @@ static char s_UnknownEncoded56b334[] =
     "\x08\x14\x1d\x0f\x0c\x1a\x09\x1e\x07\x09\x3a\x32\x35\x39\x34\x2c\x7b\x08\x2f\x2e\x3f\x32\x34\x28\x07";
 static char s_UnknownEncoded56b350[] = "\x0f\x3e\x28\x2f\x10\x3e\x22";
 
+// ADVAPI32 imports (called through the import table).
+extern "C" __declspec(dllimport) long __stdcall RegOpenKeyExA(void* key, const char* subKey,
+                                                             unsigned long options,
+                                                             unsigned long access, void** result);
+extern "C" __declspec(dllimport) long __stdcall RegQueryValueExA(void* key, const char* name,
+                                                                unsigned long* reserved,
+                                                                unsigned long* type,
+                                                                unsigned char* data,
+                                                                unsigned long* size);
+extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
+
 // KERNEL32 MEMORYSTATUS and its import (slot 8's memory page).
 struct UnknownMemoryStatus {
     unsigned long length;
@@ -121,6 +132,59 @@ int Game::UnknownVirtualSlot6() {
 int Game::UnknownVirtualSlot2() {
     controlInterface = new(__FILE__, 187) PCControlInterface;
     return controlInterface->UnknownVirtualSlot1() != 0;
+}
+
+// 0x00467b70: builds the two root objects (the second a child of the
+// first), the sound interface and the random seed, reads the "TestKey"
+// value under HKEY_LOCAL_MACHINE\\SOFTWARE\\Rainbow Studios into bit 2 of
+// +0x2d4, then (when slot 32 allows) the texture manager, the debug overlay
+// (only with that bit) and the "AllowFreezeCamera" setting.
+int Game::CreateObjects(char*) {
+    rootObject = new(__FILE__, 222) GameObject(1);
+    childRoot = new(__FILE__, 227) GameObject(1);
+    rootObject->AppendChild(childRoot, -1);
+    soundInterface = new(__FILE__, 235) PCSoundInterface;
+    srand(ReadClock());
+    int count = ReadClock() & 0xff;
+    do
+        rand();
+    while (count--);
+    field_0x2d4_bit2 = 0;
+    void* key;
+    unsigned long type;
+    unsigned long value;
+    unsigned long size = sizeof(value);
+    if (RegOpenKeyExA((void*)0x80000002, s_UnknownEncoded56b334, 0, 0x20019, &key) == 0 &&
+        RegQueryValueExA(key, s_UnknownEncoded56b350, 0, &type, (unsigned char*)&value, &size) == 0 &&
+        type == 4)                            // REG_DWORD
+        field_0x2d4_bit2 = value;
+    RegCloseKey(key);
+    if (!UnknownVirtualSlot32())
+        return 0;
+    textureManager = new(__FILE__, 282) TextureMapManager;
+    childRoot->AppendChild(textureManager->UnknownVirtualSlot8(renderTarget), -1);
+    field_0x1c = textureManager;
+    field_0x20 = 0;
+    field_0x24 = 0;
+    field_0x28 = renderTarget->surfacePixelFormat;
+    field_0x2c = 0x115c;
+    field_0x30 = 0;
+    if (field_0x2d4_bit2) {
+        int category = g_MemTagStack->Push("DebugOverlay");
+        debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, textureManager, 8, 3, 3);
+        if (debugOverlay) {
+            rootObject->AppendChild(debugOverlay, -1);
+            if (g_UnknownGlobal56c470->field_0x2c) {
+                rootObject->AppendChild(g_UnknownGlobal56c470, -1);
+                g_UnknownGlobal56c470->UnknownVirtualSlot5();
+            }
+        }
+        g_MemTagStack->Pop(category);
+    }
+    field_0x2d4_bit0 = GetRegistryFlag("AllowFreezeCamera", 0);
+    if (!UnknownVirtualSlot3())
+        return 0;
+    return UnknownVirtualSlot4() != 0;
 }
 
 // 0x00467e80: slot 31's result is kept at +0x10 and handed to the interface.

@@ -26419,6 +26419,15 @@ CASES = [
         'target_size': 1004,
         'reason': 'bikerace caller of the gate race; calls 0x4e5ca0/0x4e59c0/0x4e6120/0x4e6210; `goto next` for the finished racer gives retail layout of the `remaining >= 1` test',
     },
+    {
+        'name': 'Game.cpp CreateObjects 0x467b70',
+        'bindings': 'src/reconstructed/Game.bindings.json',
+        'source': 'src/reconstructed/Game.cpp',
+        'symbol': '?CreateObjects@Game@@QAEHPAD@Z',
+        'target_va': '0x00467b70',
+        'target_size': 775,
+        'reason': 'root objects, sound interface, TestKey registry read (RegQueryValueExA type == REG_DWORD fixes the frame slots), texture manager and debug overlay',
+    },
 ]
 
 def main():

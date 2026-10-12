@@ -114,5 +114,6 @@
   "_s_UnknownFile65b4ac": "0x0065b4ac",
   "_s_UpdateScreenPeak": "0x0065b4e8",
   "_s_WaitForFlipPeak": "0x0065b4b8",
-  "_srand": "0x00534c0e"
+  "_srand": "0x00534c0e",
+  "?CreateObjects@Game@@QAEHPAD@Z": "0x00467b70"
 }

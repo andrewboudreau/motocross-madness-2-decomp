@@ -17,11 +17,16 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 168, c 113, total 283. The three class (a) functions of the
+Counts: a 1, b 168, c 113, total 282. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
 arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
+Game `0x00467b70` (class a, 761/775) is exact too: retail's compare reads
+`type` (`type == REG_DWORD`) where the candidate read `size`, so the
+"use-count change" `tools/frame_layout.py` proposed was a different variable
+in the same instruction, not an extra reference. Check what retail's
+instruction addresses before adding uses.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -47,7 +52,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | game/DeviceSetup | `0x00448560` | 148/1006 | b | 35 code diffs: retail adds `push edi`; `push edi ; xor ebp, ebp` vs `xor edi, edi`; frame 0x11c vs 0x118 |
 | game/EventManager | `0x0045d480` | 2064/4246 | b | frame size 0x460 matches; scalar spill homes below +0x68 differ, the squared lengths load all three components before squaring (retail `fld; fld st(0); fmulp` per component), the Winner branch registers run one step behind retail |
 | game/EventManager | `0x0045e710` | 454/533 | c | 10 code diffs: `mov edx, [ecx + 0xc4c] ; mov [eax + 0x5~` vs `mov ecx, [ecx + 0xc4c] ; mov [eax + 0x5~`; `mov eax, [eax + 0x56c]` vs `mov edx, [eax + 0x56c]` |
-| game/Game | `0x00467b70` | 761/775 | a | compiled inside Game.cpp every instruction matches; retail orders the frame key, size, type, value, `new` temporary, VC6 here size, key, value, temporary, type |
 | game/PCGame | `0x004c0d10` | 1776/1790 | c | retail stores the surface description's size right after the memset, VC6 after pushing the 0x005119c0 arguments ; helpers, a derived-struct constructor, pointer/format locals and sizeof spellings do not move it (retail stores it after the pushes in the matched 0x004c5950) |
 | game/QuarryStuntEvent | `0x004e14a0` | 166/1760 | b | 9 code diffs: `mov edx, [A] ; test edx, edx` vs `mov ecx, [A] ; test ecx, ecx`; `mov eax, [ecx + 0x26c0] ; lea edx, [eax~` vs `mov eax, [eax + 0x38] ; mov ecx, [eax +~`; slots differ |
 | game/QuarryStuntEventLoader | `0x004de590` | 397/7912 | b | camera argument fixed to 1.048f (retail 0x3f8624dd); 2074/2208 normalised insns align (was 2063); scalar stack slots and decision-tree registers left |
@@ -328,7 +332,7 @@ differences.
 A sample compiled with only the headers can differ from the same body
 compiled inside its unit (`#include "../../src/reconstructed/X.cpp"` at the
 top of the sample); the cause is not isolated, the differences show in tail
-merging, block placement and epilogue copies. Game `0x00467b70` (406 -> 761),
+merging, block placement and epilogue copies. Game `0x00467b70` (406 -> 761, now exact),
 Wrecker `0x005329e0` (763 -> 1200, with the unit's own vector operators
 instead of copies) and ControlInterface slot 3 `0x004bf4f0` (43 -> 76) are
 measured that way. Every other sample that did not include its unit was
