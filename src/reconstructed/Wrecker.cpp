@@ -50,7 +50,7 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
     skipProbeEffects = 0;
     blendStarted = 0;
     poseStepsPending = 0;
-    field_0x538 = 0;
+    tumbleStarted = 0;
 }
 
 Wrecker::~Wrecker() {
@@ -294,11 +294,11 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         if (pendingAnimation && !character->blendActive) {
             character->BlendToMotion(pendingAnimation, 0.5f);
             pendingAnimation = 0;
-            if (field_0x538 == 0 && blendStarted == 0) {
+            if (tumbleStarted == 0 && blendStarted == 0) {
                 blendStarted = 1;
             } else {
                 carryRiderPose = 1;
-                field_0x538 = 0;
+                tumbleStarted = 0;
                 blendStarted = 0;
             }
         }
@@ -494,7 +494,7 @@ void Wrecker::StartTumble() {
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     hadContact = 0;
-    field_0x538 = 1;
+    tumbleStarted = 1;
 }
 
 void Wrecker::ContinueAsTumble() {
@@ -505,7 +505,7 @@ void Wrecker::ContinueAsTumble() {
         pendingAnimation = 0;
         if (blendStarted) {
             carryRiderPose = 1;
-            field_0x538 = 0;
+            tumbleStarted = 0;
             blendStarted = 0;
         } else {
             blendStarted = 1;

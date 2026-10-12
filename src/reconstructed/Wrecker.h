@@ -394,7 +394,7 @@ public:
     int skipProbeEffects;      // +0x52c set by EndWreck: slot 10 skips one EmitProbeEffects
     int blendStarted;          // +0x530 a wreck blend is under way; slot 10 sets carryRiderPose once the character's blend ends
     int poseStepsPending;      // +0x534 slot 10 rebuilds the pose steps once carryRiderPose is set
-    int field_0x538;           // +0x538 set by StartTumble; cleared when a second blend starts
+    int tumbleStarted;         // +0x538 set by StartTumble; cleared when a second blend starts
 };
 
 typedef char wrecker_assert_sizeof[(sizeof(Wrecker) == 0x53c) ? 1 : -1];
