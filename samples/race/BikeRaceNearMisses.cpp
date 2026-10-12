@@ -688,7 +688,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
             sprintf(name, "%s\\%s", "Res", "MetalArch.slt");
             ArcadeObject* arch = new(__FILE__, 0x247) ArcadeObject(1);
-            arch = arch->Create(field_0x18, (int)lights, (int)textures, name, kVec3Zero, 0, 0,
+            arch = arch->Create(renderContext, (int)lights, (int)textures, name, kVec3Zero, 0, 0,
                                                2.0f, 0.5f, 0.5f, 0);
             AppendChild(arch, -1);
             arch->arcadeModel->UnknownFunction4444c0(1);
@@ -724,7 +724,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 g_TrackGame->mode.raceSettings.raceMode != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
                 flagGirl = (UnknownBikeRaceCharacter*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
-                AppendChild(flagGirl->UnknownVirtualSlot11(field_0x18, modelName, lights, textures, 1, 1),
+                AppendChild(flagGirl->UnknownVirtualSlot11(renderContext, modelName, lights, textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
                 flagGirl->field_0x1a0->UnknownFunction4444c0(1);
@@ -736,7 +736,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
             sprintf(name, "%s\\%s", "Res", "GirlBox.slt");
             ArcadeObject* box = new(__FILE__, 0x27c) ArcadeObject(1);
-            box = box->Create(field_0x18, (int)lights, (int)textures, name, kVec3Zero, 0, 0, 2.0f,
+            box = box->Create(renderContext, (int)lights, (int)textures, name, kVec3Zero, 0, 0, 2.0f,
                                              0.5f, 0.5f, 0);
             AppendChild(box, -1);
             box->arcadeModel->UnknownFunction4444c0(1);
@@ -748,7 +748,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         }
     } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.field_0x148)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
-        field_0x0bc = (int)bonus->SetupCounter(field_0x18, (int)lights, (int)textures,
+        field_0x0bc = (int)bonus->SetupCounter(renderContext, (int)lights, (int)textures,
                                                (UnknownBonusRacer*)this, (UnknownBonusCamera*)raceCamera);
         if (!AppendChild((GameObject*)field_0x0bc, -1))
             return 0;
@@ -759,7 +759,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     raceScene->field_0x7c0 = 1;
     if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
-        field_0x0c0 = (int)numbers->SetupDigits(field_0x18, (int)textures, (UnknownNumberRacer*)this, 0x1e,
+        field_0x0c0 = (int)numbers->SetupDigits(renderContext, (int)textures, (UnknownNumberRacer*)this, 0x1e,
                                                 (UnknownNumberCamera*)raceCamera, 3.0f);
         if (!AppendChild((GameObject*)field_0x0c0, -1))
             return 0;
@@ -769,7 +769,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         (g_TrackGame->playerCount > 1 || g_TrackGame->mode.raceSettings.aiRacerCount > 0)) {
         sprintf(name, "%s\\%s", "Res", "youind.slt");
         ArcadeObject* marker = new(__FILE__, 0x2a9) ArcadeObject(*(int*)g_TrackGame->mode.field_0x6d0);
-        field_0x060 = marker->Create(field_0x18, (int)lights, (int)textures, name, position, 0, 0,
+        field_0x060 = marker->Create(renderContext, (int)lights, (int)textures, name, position, 0, 0,
                                                     2.0f, 0.5f, 0.5f, 0);
         AppendChild(field_0x060, -1);
         Vector3 axis(0.0f, 1.0f, 0.0f);
@@ -858,7 +858,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    field_0x044 = (UnknownBikeRaceViews*)sound->Create(field_0x18, (UnknownKrustyBikeView*)this,
+    field_0x044 = (UnknownBikeRaceViews*)sound->Create(renderContext, (UnknownKrustyBikeView*)this,
                                                                       (UnknownRaceSoundCamera*)raceCamera, 6);
     AppendChild((GameObject*)field_0x044, -1);
     g_MemTagStack->Push("BikeRace");

@@ -319,7 +319,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
     for (int i = 0; i < 5; i++)
         if (field_0x38[i])
             field_0x38[i]->isVisible = 0;
-    if (((UnknownNumberOwner*)field_0x18)->field_0x08 == field_0x34) {
+    if (((UnknownNumberOwner*)renderContext)->field_0x08 == field_0x34) {
         int counting = field_0x2c->countdown > 0.0f && field_0x2c->field_0x6c == 0;
         if (!(field_0x2c->field_0x38->field_0x76c > 1.0f) && !counting)
             return 1;

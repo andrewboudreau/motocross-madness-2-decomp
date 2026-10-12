@@ -229,10 +229,10 @@ int EventManager::CreatePodiumScene() {
     }
     CloseRace(1);
     PCCamera* camera = new(__FILE__, 0x276) PCCamera(1);
-    podiumCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
+    podiumCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
-    ((RenderTarget*)field_0x18)->SetCamera(podiumCamera);
+    ((RenderTarget*)renderContext)->SetCamera(podiumCamera);
     podiumCamera->InsertBefore(view->field_0x50, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
@@ -299,7 +299,7 @@ int EventManager::CreatePodiumScene() {
     context.field_0x00 = g_TrackGame->textureManager;
     context.field_0x04 = PODIUM_OWNER(owner)->field_0x94;
     context.field_0x08 = PODIUM_OWNER(owner)->field_0x98;
-    context.field_0x0c = ((RenderTarget*)field_0x18)->surfacePixelFormat;
+    context.field_0x0c = ((RenderTarget*)renderContext)->surfacePixelFormat;
     context.field_0x10 = 0x115c;
     context.field_0x14 = 0;
     PODIUM_ARCADE->UnknownVirtualSlot5();
@@ -332,7 +332,7 @@ int EventManager::CreatePodiumScene() {
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(field_0x25_bit0);
-        character->CharacterVirtualSlot11(field_0x18, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
+        character->CharacterVirtualSlot11(renderContext, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {
             if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)

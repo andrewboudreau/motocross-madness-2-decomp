@@ -66,7 +66,7 @@ static inline float UnknownSquareMagnitude(const Vector3* v) {
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
 
-#define ECO_VIEW ((UnknownEcoRenderTarget*)field_0x18)
+#define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
 
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
@@ -334,7 +334,7 @@ int EvictGeometry(void* owner, int context) {
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->camera;
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->renderContext)->camera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
         return;

@@ -237,7 +237,7 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
 #define KRUSTYUI_GARAGE (*(UnknownKrustyUICharacter**)&garageCharacter)
 #define KRUSTYUI_RIDER (*(UnknownKrustyUICharacter**)&riderPreview)
 #define KRUSTYUI_RIDER_POSITION (*(Vector3*)field_0x480)
-#define KRUSTYUI_TARGET ((PCRenderTarget*)field_0x18)
+#define KRUSTYUI_TARGET ((PCRenderTarget*)renderContext)
 #define KRUSTYUI_MODELS ((UnknownKrustyUIModelEntry*)manufacturers)
 
 // 0x00498cf0: builds the garage scene (+0x464) on the first call with 1 or
@@ -260,7 +260,7 @@ void KrustyUI::BuildGarageScene(int value) {
 
     field_0x4ac = 0;
     field_0x4a8 = 0;
-    ((RenderTarget*)field_0x18)->clearTarget = 0;
+    ((RenderTarget*)renderContext)->clearTarget = 0;
     g_TrackGame->field_0x2d5_bit2 = 1;
     if (!garageScene && (value == 1 || value == -1)) {
         UnknownFunction5053b0(1);
@@ -276,21 +276,21 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_RIDER_POSITION.y += 0.1f;
         garageScene = new(__FILE__, 0x105) GameObject(1);
         PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
-        garageCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
+        garageCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
         garageScene->AppendChild(garageCamera, -1);
         garageCamera->field_0x1d8 = 0;
         garageCamera->field_0x1d4 = 0;
         UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
-        lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(field_0x18);
+        lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(renderContext);
         garageScene->AppendChild(lights, -1);
         UnknownKrustyUILight* emitter = new(__FILE__, 0x116) UnknownKrustyUILight(1);
-        light = emitter->Create(field_0x18, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
+        light = emitter->Create(renderContext, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         Vector3 position(-1800.0f, 200.0f, 0.0f);
         Vector3 direction = garageFocus - position;
         emitter = new(__FILE__, 0x121) UnknownKrustyUILight(1);
-        light = emitter->Create(field_0x18, 4, 0xffffff, &position, &direction, 0, 0, 0,
+        light = emitter->Create(renderContext, 4, 0xffffff, &position, &direction, 0, 0, 0,
                                                0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
@@ -302,7 +302,7 @@ void KrustyUI::BuildGarageScene(int value) {
         s448.x -= 24.0f;
         s438 = garageFocus - s448;
         emitter = new(__FILE__, 0x130) UnknownKrustyUILight(1);
-        light = emitter->Create(field_0x18, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
+        light = emitter->Create(renderContext, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->field_0x1c;
@@ -322,29 +322,29 @@ void KrustyUI::BuildGarageScene(int value) {
         }
         KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
-            KRUSTYUI_GARAGE->CharacterVirtualSlot11(field_0x18, "UIgarage.mcf", lights, &context, 1, 1), -1);
+            KRUSTYUI_GARAGE->CharacterVirtualSlot11(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
         KRUSTYUI_GARAGE->field_0x1a0->SetPosition(&garageFocus);
         KRUSTYUI_GARAGE->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->SetMotionByName("Spin");
         KRUSTYUI_GARAGE->AdvanceMotion(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
-        shadow = projected->Init(field_0x18, g_TrackGame->textureManager);
+        shadow = projected->Init(renderContext, g_TrackGame->textureManager);
         UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
-        shadowLink = link->Attach(field_0x18, KRUSTYUI_GARAGE->field_0x1a0, shadow);
+        shadowLink = link->Attach(renderContext, KRUSTYUI_GARAGE->field_0x1a0, shadow);
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
         KRUSTYUI_RIDER = new(__FILE__, 0x194) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
-            KRUSTYUI_RIDER->CharacterVirtualSlot11(field_0x18, "UIRider.mcf", lights,
+            KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
                                                    &g_TrackGame->field_0x1c, 1, 1), -1);
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
         KRUSTYUI_RIDER->field_0x1a0->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->SetMotionByName("WaitR");
         KRUSTYUI_RIDER->AdvanceMotion(0.03f, 0, 0);
-        ((RenderTarget*)field_0x18)->SetCamera(0);
+        ((RenderTarget*)renderContext)->SetCamera(0);
         pending = 1;
         done = 0;
     }
@@ -354,7 +354,7 @@ void KrustyUI::BuildGarageScene(int value) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
             KRUSTYUI_MODELS[i].uiModel = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
             garageScene->AppendChild(
-                KRUSTYUI_MODELS[i].uiModel->CharacterVirtualSlot11(field_0x18, text, lights,
+                KRUSTYUI_MODELS[i].uiModel->CharacterVirtualSlot11(renderContext, text, lights,
                                                                       &g_TrackGame->field_0x1c,
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
@@ -472,7 +472,7 @@ int KrustyUI::UnknownVirtualSlot25(void* value) {
 void KrustyUI::ShowScene(GameObject* parent) {
     if (garageScene) {
         parent->AppendChild(garageScene, -1);
-        ((RenderTarget*)field_0x18)->SetCamera(garageCamera);
+        ((RenderTarget*)renderContext)->SetCamera(garageCamera);
     }
 }
 
@@ -480,7 +480,7 @@ void KrustyUI::ShowScene(GameObject* parent) {
 void KrustyUI::HideScene() {
     if (garageScene) {
         garageScene->Unlink();
-        ((RenderTarget*)field_0x18)->SetCamera(0);
+        ((RenderTarget*)renderContext)->SetCamera(0);
     }
 }
 

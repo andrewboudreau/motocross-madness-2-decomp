@@ -18,7 +18,7 @@ struct UnknownSkyCubeTarget {
     UnknownSkyCubeCamera* field_0x08;
 };
 
-#define CAMERA() (((UnknownSkyCubeTarget*)field_0x18)->field_0x08)
+#define CAMERA() (((UnknownSkyCubeTarget*)renderContext)->field_0x08)
 
 // 0x004fb1e0
 SkyCube::SkyCube(int flags) : DrawableCube(flags) {

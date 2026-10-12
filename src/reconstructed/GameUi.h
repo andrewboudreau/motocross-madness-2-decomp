@@ -232,7 +232,7 @@ public:
     void SetDropColor(int value);             // 0x00470d80: "DropColor"
     void SetName(const char* name);           // 0x00470dc0: the .dtm section name
     char* GetName();                          // 0x00470df0
-    void UnknownInlineSetField18(void* value) { field_0x18 = value; }
+    void UnknownInlineSetField18(void* value) { renderContext = value; }
     // 0x00470870: starts transition `type` (100-106: the loader's "FX" GROW,
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
     void StartTransition(int type, int a, int b, int delay, int c);

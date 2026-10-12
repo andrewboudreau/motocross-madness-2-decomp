@@ -100,7 +100,7 @@ static UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
 
-#define ECO_VIEW ((UnknownEcoRenderTarget*)field_0x18)
+#define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
 
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
@@ -131,7 +131,7 @@ static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
 // (then `fade` is 255), else the fade between the band's two distances.
 void Vegetation::TestDistance(int* billboard, int* fade) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->camera;
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->renderContext)->camera;
     float dx = camera->position.x - quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
     float dz = camera->position.z - quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
     *billboard = 0;

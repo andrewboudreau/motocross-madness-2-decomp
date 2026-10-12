@@ -514,7 +514,7 @@ int UIEditBox::Draw() {
             frames = redrawFrames;
             redrawFrames = redraw;
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
                                                             drawnTexture->usesColorKey ? 0x1008000 : 0x1000000);
             redrawFrames = redraw;
         }
@@ -725,7 +725,7 @@ int UIMultiState::Draw() {
                                                            texture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, texture, 0,
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, texture, 0,
                                                                      texture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -1019,7 +1019,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     parameters.GetInt("NoScale", 0, &scaleToScreen);
                     scaleToScreen = !scaleToScreen;
                     parameters.GetInt("Popup", 1, &isPopup);
-                    RenderTarget* target = (RenderTarget*)field_0x18;
+                    RenderTarget* target = (RenderTarget*)renderContext;
                     if (scaleToScreen) {
                         scaleX = (float)target->targetWidth / screenWidth;
                         scaleY = (float)target->targetHeight / screenHeight;
@@ -1795,7 +1795,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
     }
     if (isPopup && screenWidth && screenHeight) {
         int align = popupAlignment;
-        RenderTarget* target = (RenderTarget*)field_0x18;
+        RenderTarget* target = (RenderTarget*)renderContext;
         if (align & 1) {
             screenArea.right -= screenArea.left;
             screenArea.left = 0;

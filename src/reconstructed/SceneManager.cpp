@@ -980,7 +980,7 @@ void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
     if (shadow && staticModels) {
         for (int i = 0; i < staticModels->casterCount; i++)
             AppendChild((new(__FILE__, 2136) D3DIMSoultreeShadow(flags))
-                                      ->Attach((int)field_0x18, staticModels->casters[i].model,
+                                      ->Attach((int)renderContext, staticModels->casters[i].model,
                                                shadow),
                                   -1);
     }
@@ -1030,7 +1030,7 @@ int Scene::ReadSounds()
                         SoundEmitter* emitter =
                             (new(__FILE__, 2588)
                                  SoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                                ->Create(field_0x18, file, params, flags, oneShotDistance,
+                                ->Create(renderContext, file, params, flags, oneShotDistance,
                                                         randomTriggerPercent, 0, force2D);
                         AppendChild(emitter, -1);
                         if (!emitter) {
@@ -1144,7 +1144,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     ReadVector(&defaultStartPosition, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
     ReadVector(&defaultStartDirection, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
     UnknownFunction464e80("");
-    field_0x18 = owner;
+    renderContext = owner;
     ReadVector(&podiumPosition, "SceneInfo", "PodiumPosition", "0.0,0.0,0.0", 1, 0);
     ReadVector(&podiumDirection, "SceneInfo", "PodiumDirection", "0.0,0.0,0.0", 1, 0);
     if (!ReadEnvironment(sceneManager->sceneDirectory, cubeDirectory))
@@ -1165,7 +1165,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
             int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->textureManager : 0;
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
-                    ->Create(field_0x18, sceneLights[i].type, sceneLights[i].color,
+                    ->Create(renderContext, sceneLights[i].type, sceneLights[i].color,
                                             &sceneLights[i].position, sceneLights[i].field_0x34,
                                             sceneLights[i].range, sceneLights[i].showDebugSphere, 0, camera,
                                             (int)flare, i);

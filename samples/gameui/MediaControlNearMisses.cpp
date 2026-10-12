@@ -37,7 +37,7 @@ extern "C" const UnknownGuid IID_IDirectDrawMediaStream;  // 0x00558e90
 extern "C" const UnknownGuid IID_IDirectDraw;             // 0x00556080
 extern "C" const UnknownGuid IID_IDirectDrawSurface4;     // 0x005560f0
 
-#define TARGET() ((PCRenderTarget*)field_0x18)
+#define TARGET() ((PCRenderTarget*)renderContext)
 
 // 0x004a2560
 MediaControl* MediaControl::Open(void* target, const char* file,

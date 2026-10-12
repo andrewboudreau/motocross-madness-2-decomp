@@ -46,7 +46,7 @@ public:
     // the overlay texture (16-bit formats 4444 and 1555 only) and cleared.
     int TintRows(int row, int count, unsigned short color);
 
-    RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
+    RenderTarget* Target() const { return (RenderTarget*)renderContext; }
 
     TextureMap* overlayTexture;               // released by derived destructors
     TextureMap* backingTexture;               // copied back by 0x004b6710; RadarOverlay: the map

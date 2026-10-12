@@ -64,8 +64,8 @@ public:
     void GetViewportRect(CameraRect* rect);
 
 protected:
-    // field_0x18 (GameObject's owner slot) holds the camera's RenderTarget.
-    RenderTarget* Owner() const { return static_cast<RenderTarget*>(field_0x18); }
+    // renderContext (GameObject +0x18) holds the camera's RenderTarget.
+    RenderTarget* Owner() const { return static_cast<RenderTarget*>(renderContext); }
 
     friend class RenderTarget;
     friend class PCRenderTarget;    // PCRenderTarget.cpp slot 12 clears the viewport (+0x1a0)

@@ -93,7 +93,7 @@ public:
     int RecordTextureUse();                   // 0x0043e210: records texture use
     void MarkVisibleCells();             // 0x0043e330: marks the visible cells
 
-    RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
+    RenderTarget* Target() const { return (RenderTarget*)renderContext; }
 
     Cube* field_0x2c;
     ColorMapper* loadPalette;                 // palette while loading

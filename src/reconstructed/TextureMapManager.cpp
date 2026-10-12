@@ -169,7 +169,7 @@ int TextureMapManager::UnknownVirtualSlot15() {
         for (int i = 0; i < field_0x44.m_count; i++) {
             ManagedTextureGroup* cache = field_0x44.Get(i);
             if (cache)
-                cache->DrawSelection(static_cast<PCRenderTarget*>(field_0x18));
+                cache->DrawSelection(static_cast<PCRenderTarget*>(renderContext));
         }
     }
     return GameObject::UnknownVirtualSlot15();

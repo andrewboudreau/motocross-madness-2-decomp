@@ -28,7 +28,7 @@ GameObject::GameObject(int flags) {
     prevSibling = 0;
     nextSibling = 0;
     firstChild = 0;
-    field_0x18 = 0;
+    renderContext = 0;
     parent = 0;
     field_0x25_bit0 = flags;
     field_0x25_bit1 = flags;
@@ -86,7 +86,7 @@ void GameObject::UnknownVirtualSlot26() {
 
 // 0x004692f0
 GameObject* GameObject::UnknownVirtualSlot8(void* value) {
-    field_0x18 = value;
+    renderContext = value;
     return this;
 }
 
@@ -142,7 +142,7 @@ int GameObject::UnknownVirtualSlot10(float frameTime) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit2 && !child->field_0x25_bit3) {
                 child->UnknownVirtualSlot10(frameTime);
-                char* owner = static_cast<char*>(field_0x18);
+                char* owner = static_cast<char*>(renderContext);
                 if (owner) {
                     UnknownGameObjectOwnerPart* part = *reinterpret_cast<UnknownGameObjectOwnerPart**>(owner + 0x04);
                     if (reinterpret_cast<unsigned char*>(part)[0x70] & 0x04)
@@ -290,7 +290,7 @@ int GameObject::UnknownVirtualSlot25(void* value) {
             child->UnknownVirtualSlot25(value);
         child = next;
     }
-    field_0x18 = value;
+    renderContext = value;
     return 1;
 }
 

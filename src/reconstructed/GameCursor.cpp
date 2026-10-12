@@ -95,9 +95,9 @@ int GameCursor::LoadCursorTexture(const char* image, TextureMapManager* textures
     } else {
         if (!cursorTexture->UnknownVirtualSlot4(file->bits, width, height, width, width,
                                              file->bitsPerPixel == 16 ? 0x22b : 0x378,
-                                             ((PCRenderTarget*)field_0x18)->surfacePixelFormat,
+                                             ((PCRenderTarget*)renderContext)->surfacePixelFormat,
                                              (UnknownTexturePalette*)palette, 4,
-                                             ((PCRenderTarget*)field_0x18)->targetDisplay->field_0x198, 0, 0, 2, 1, 0,
+                                             ((PCRenderTarget*)renderContext)->targetDisplay->field_0x198, 0, 0, 2, 1, 0,
                                              0x80, 0xff00ff))
             goto failed;
         cursorTexture->UnknownVirtualSlot18(0xff00ff);
@@ -161,7 +161,7 @@ int GameCursor::UnknownVirtualSlot15() {
             outside = 1;
         }
 
-        RenderTarget* target = (RenderTarget*)field_0x18;
+        RenderTarget* target = (RenderTarget*)renderContext;
         field_0x54 = (int)((float)target->targetWidth / area.right * field_0x54);
         field_0x58 = (int)((float)target->targetHeight / area.bottom * field_0x58);
         if (outside)
@@ -172,7 +172,7 @@ int GameCursor::UnknownVirtualSlot15() {
         field_0x54 = 0;
     if (field_0x58 < 0)
         field_0x58 = 0;
-    RenderTarget* target = (RenderTarget*)field_0x18;
+    RenderTarget* target = (RenderTarget*)renderContext;
     if (field_0x54 >= target->targetWidth)
         field_0x54 = target->targetWidth - 1;
     if (field_0x58 >= target->targetHeight)
@@ -180,10 +180,10 @@ int GameCursor::UnknownVirtualSlot15() {
 
     s_right = (currentFrame ? ((PCTextureMap*)currentFrame)->textureWidth : cursorTexture->textureWidth) + field_0x54;
     s_bottom = (currentFrame ? ((PCTextureMap*)currentFrame)->textureHeight : cursorTexture->textureHeight) + field_0x58;
-    if (s_right >= ((RenderTarget*)field_0x18)->targetWidth)
-        s_right = ((RenderTarget*)field_0x18)->targetWidth;
-    if (s_bottom >= ((RenderTarget*)field_0x18)->targetHeight)
-        s_bottom = ((RenderTarget*)field_0x18)->targetHeight;
+    if (s_right >= ((RenderTarget*)renderContext)->targetWidth)
+        s_right = ((RenderTarget*)renderContext)->targetWidth;
+    if (s_bottom >= ((RenderTarget*)renderContext)->targetHeight)
+        s_bottom = ((RenderTarget*)renderContext)->targetHeight;
 
     s_destination.left = field_0x54;
     s_destination.top = field_0x58;
@@ -199,12 +199,12 @@ int GameCursor::UnknownVirtualSlot15() {
         backgroundImage->DrawImageRect(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
                                           (frame->usesColorKey != 0) + 0x10, backgroundRegion, 0, &field_0x4c, 0);
     } else if (currentFrame) {
-        if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, ((PCTextureMap*)currentFrame)->systemSurface, &s_source,
+        if (((PCRenderTarget*)renderContext)->renderSurface->Blt(&s_destination, ((PCTextureMap*)currentFrame)->systemSurface, &s_source,
                 (((PCTextureMap*)currentFrame)->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
             goto failed;
     } else {
         PCTextureMap* image = cursorTexture;
-        if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, image->systemSurface, &s_source,
+        if (((PCRenderTarget*)renderContext)->renderSurface->Blt(&s_destination, image->systemSurface, &s_source,
                 (image->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
             goto failed;
     }

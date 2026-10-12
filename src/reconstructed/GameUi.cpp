@@ -1893,7 +1893,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
 // 0x0046a840
 UIControl* UIDialog::SetupControl(UIControl* control, int group, int region) {
     if (control) {
-        control->UnknownInlineSetField18(field_0x18);
+        control->UnknownInlineSetField18(renderContext);
         control->post3D = controlsPost3D;
         control->ownerGui = guiManager;
         control->groupId = group;
@@ -2088,7 +2088,7 @@ void UIDialog::EndDialog(int result) {
     if (!isClosing) {
         dialogResult = result;
         isClosing = 1;
-        closeFrame = ((RenderTarget*)field_0x18)->frameCount;
+        closeFrame = ((RenderTarget*)renderContext)->frameCount;
     }
 }
 
@@ -2250,7 +2250,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     else
         post3D = 1;
     if (owner)
-        field_0x18 = owner->UnknownInlineField18();
+        renderContext = owner->UnknownInlineField18();
     permanent = 0;
     wordWrap = 0;
 }
@@ -3923,8 +3923,8 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     } else {
         screenArea.top = 0;
         screenArea.left = 0;
-        screenArea.right = ((RenderTarget*)field_0x18)->targetWidth;
-        screenArea.bottom = ((RenderTarget*)field_0x18)->targetHeight;
+        screenArea.right = ((RenderTarget*)renderContext)->targetWidth;
+        screenArea.bottom = ((RenderTarget*)renderContext)->targetHeight;
     }
     parentDialog = parent;
     if (!(flags & 6))
@@ -4130,7 +4130,7 @@ int UIControl::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                        &rect, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -4313,7 +4313,7 @@ int UIScrollBar::Draw() {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)track, &rect, 0,
                                                            track->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
-        else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, track, 0,
+        else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, track, 0,
                                                                    track->usesColorKey ? 0x1008000 : 0x1000000))
             goto failed;
         redrawFrames = redraw;
@@ -4339,7 +4339,7 @@ int UIScrollBar::Draw() {
                 needsRedraw = 1;
             else
                 RequestRedraw();
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, thumb, 0,
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, thumb, 0,
                                                                      thumb->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4553,7 +4553,7 @@ int UIListBox::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             redrawFrames = redraw;
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                        screenArea, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4632,7 +4632,7 @@ int UIListBox::Draw() {
                                 done = 0;
                                 frames = redrawFrames;
                             }
-                        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+                        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                                        &rect, texture, 0, texture->usesColorKey ? 0x1008000 : 0x1000000)) {
                             goto failed;
                         }
@@ -4855,7 +4855,7 @@ int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dia
     if (moviePlayer)
         moviePlayer->Release();
     moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
-    if (!moviePlayer->Open(field_0x18, file, done, owner)) {
+    if (!moviePlayer->Open(renderContext, file, done, owner)) {
         moviePlayer = 0;
         return 0;
     }
@@ -4884,7 +4884,7 @@ int UIVideoStatic::Draw() {
         RequestRedraw();
     }
     GetImageRect((CameraRect*)screenArea, &rect);
-    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, moviePlayer->frameSurface, frameRect,
+    return ((PCRenderTarget*)renderContext)->renderSurface->Blt(&rect, moviePlayer->frameSurface, frameRect,
                                                                       0x1000000, 0) == 0;
 }
 
@@ -4929,7 +4929,7 @@ int UIProgressBar::Draw() {
             owner->dialogBackground->DrawImage((PCTextureMap*)barTexture, &rect, &source,
                                                       barTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                       backgroundRegion, needsRedraw, &redraw, 0);
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                        &rect, barTexture, &source, barTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }

@@ -7,7 +7,7 @@
 #include "TrackGame.h"
 
 // The render target the image belongs to (GameObject+0x18).
-#define Target() ((PCRenderTarget*)field_0x18)
+#define Target() ((PCRenderTarget*)renderContext)
 
 // 0x005777b8: the image's own rectangle (slot 15).
 CameraRect g_UnknownGlobal5777b8;

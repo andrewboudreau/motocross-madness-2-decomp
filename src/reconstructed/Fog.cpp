@@ -12,7 +12,7 @@
 #include "PCRenderTarget.h"
 #include "TrackGame.h"
 
-#define TARGET() ((PCRenderTarget*)field_0x18)
+#define TARGET() ((PCRenderTarget*)renderContext)
 #define VIEWPORT(i) ((unsigned int)TARGET()->currentCamera->field_0x1a0[i])
 
 // 0x00462620

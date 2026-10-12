@@ -211,7 +211,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     if (controls->mouse) {
         mouseDevice = (GUIInputDevice*)AppendChild(
             (new(__FILE__, 162) GUIInputDevice)
-                ->Bind(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
+                ->Bind(renderContext, (InputDevice*)controls->mouse, 0, 0, 0, 0),
             -1);
         mouseDevice->InsertBefore(dialogContainer, -1);
         mouseDevice->Rebind();
@@ -219,7 +219,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     if (controls->keyboard) {
         keyboardDevice = (GUIInputDevice*)AppendChild(
             (new(__FILE__, 169) GUIInputDevice)
-                ->Bind(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
+                ->Bind(renderContext, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
             -1);
         keyboardDevice->InsertBefore(dialogContainer, -1);
         keyboardDevice->Rebind();
@@ -228,7 +228,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         for (i = 0; i < controls->joystickCount; i++) {
             joystickDevices[i] = (GUIInputDevice*)AppendChild(
                 (new(__FILE__, 177) GUIInputDevice)
-                    ->Bind(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
+                    ->Bind(renderContext, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
                            2.0f),
                 -1);
             joystickDevices[i]->InsertBefore(dialogContainer, -1);
@@ -236,7 +236,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         }
     }
     users[0] = (GUIUser*)AppendChild(
-        (new(__FILE__, 188) GUIUser)->UnknownFunction487650(field_0x18, this), -1);
+        (new(__FILE__, 188) GUIUser)->UnknownFunction487650(renderContext, this), -1);
     if (users[0]) {
         userCount = 1;
         users[0]->AcceptKeyboardAndJoysticks();
@@ -304,7 +304,7 @@ int GUIManager::UnknownVirtualSlot13() {
         rect.bottom = screenGrab->textureHeight;
         if (guiBackground) {
             guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
             GameObject::UnknownVirtualSlot13();
             return 0;
         }
@@ -325,7 +325,7 @@ int GUIManager::UnknownVirtualSlot15() {
             rect.bottom = screenGrab->textureHeight;
             if (guiBackground) {
                 guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
-            } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
+            } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
                 GameObject::UnknownVirtualSlot15();
                 return 0;
             }
@@ -370,7 +370,7 @@ int GUIManager::OpenDialogResource(const char* resource) {
     CloseDialogResource();
     openedDialog = new(__FILE__, 523) UIDialog(0, resource);
     if (openedDialog) {
-        openedDialog->UnknownVirtualSlot27(field_0x18, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
+        openedDialog->UnknownVirtualSlot27(renderContext, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
                                          14, 0, 0, 0);
         return 1;
     }
@@ -432,12 +432,12 @@ void GUIManager::CreateBackground() {
     if (guiBackground)
         return;
     guiBackground = (BackgroundImage*)AppendChild(
-        (new(__FILE__, 672) BackgroundImage(1))->UnknownVirtualSlot8(field_0x18), -1);
+        (new(__FILE__, 672) BackgroundImage(1))->UnknownVirtualSlot8(renderContext), -1);
     guiBackground->InsertBefore(dialogContainer, -1);
     ownsBackground = 1;
     RecreateCursors(0, 1);
     for (i = 0; i < userCount; i++)
-        GetUser(i)->CreateToolTip(field_0x18, this);
+        GetUser(i)->CreateToolTip(renderContext, this);
 }
 
 // 0x00485fc0
@@ -456,7 +456,7 @@ void GUIManager::ReleaseBackground() {
     while ((dialog = (UIDialog*)iterator.Next()) != 0)
         dialog->SetBackground(0);
     for (i = 0; i < userCount; i++)
-        GetUser(i)->CreateToolTip(field_0x18, this);
+        GetUser(i)->CreateToolTip(renderContext, this);
 }
 
 // 0x004860a0
@@ -688,7 +688,7 @@ int ToolTip::UnknownVirtualSlot15() {
         rect.top = screenArea.top;
         rect.right = screenArea.left + textArea.right;
         rect.bottom = screenArea.top + textArea.bottom;
-        if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, textTexture, &textArea, 0x1008000))
+        if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, textTexture, &textArea, 0x1008000))
             return 0;
     } else if (tipGui && tipGui->guiBackground && backgroundRegion > -1) {
         if (restoreFrames > 0) {
@@ -733,8 +733,8 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
     rangeX = maxX;
     rangeY = maxY;
     if (minX == 0.0f && maxX == 0.0f && minY == 0.0f && maxY == 0.0f) {
-        rangeX = (float)(((RenderTarget*)field_0x18)->targetWidth - 1);
-        rangeY = (float)(((RenderTarget*)field_0x18)->targetHeight - 1);
+        rangeX = (float)(((RenderTarget*)renderContext)->targetWidth - 1);
+        rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, 0.0f,
                                        g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
@@ -766,8 +766,8 @@ void GUIInputDevice::Rebind() {
     rangeX = rangeMaxX;
     rangeY = rangeMaxY;
     if (rangeMinX == 0.0f && rangeMaxX == 0.0f && rangeMinY == 0.0f && rangeMaxY == 0.0f) {
-        rangeX = (float)(((RenderTarget*)field_0x18)->targetWidth - 1);
-        rangeY = (float)(((RenderTarget*)field_0x18)->targetHeight - 1);
+        rangeX = (float)(((RenderTarget*)renderContext)->targetWidth - 1);
+        rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)x,
                                        g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
@@ -1081,7 +1081,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
                 image = cursorImage;
             userCursor = (GUICursor*)AppendChild(
                 (new(__FILE__, 1890) GUICursor(visible))
-                    ->CreateBound(field_0x18, &pointerDevice->bindingX, &pointerDevice->bindingY, image,
+                    ->CreateBound(renderContext, &pointerDevice->bindingX, &pointerDevice->bindingY, image,
                                             userGui->guiTextures, userGui->guiBackground, palette,
                                             userGui->guiPalette),
                 -1);
@@ -1094,7 +1094,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
                 image = cursorImage;
             userCursor = (GUICursor*)AppendSibling(
                 (new(__FILE__, 1898) GUICursor(visible))
-                    ->Create(field_0x18, image, userGui->guiTextures, userGui->guiBackground,
+                    ->Create(renderContext, image, userGui->guiTextures, userGui->guiBackground,
                                             palette, userGui->guiPalette),
                 -1);
         }

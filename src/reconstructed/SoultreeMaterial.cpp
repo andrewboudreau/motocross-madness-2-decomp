@@ -45,7 +45,7 @@ SoultreeMaterial* SoultreeMaterial::Attach(RenderTarget* target, const SoultreeT
     GameObject::UnknownVirtualSlot8(target);
     strcpy(textureName, "");
     textureManager = manager;
-    field_0x18 = target;
+    renderContext = target;
     field_0x70 = 0;
     field_0x74 = *options;
     textureFormat = format;
@@ -71,66 +71,66 @@ void SoultreeMaterial::ApplyRenderStates()
         field_0x70->Select();
         int format = field_0x70->texture->mapFormat;
         if (format != 1555 && format != 4444 && format != 8888) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
         } else if (hasColorKey) {
             if (hasAlpha)
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot18(0);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot18(0);
             else
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot18(0x80);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot18(0x80);
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot18(0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot18(0);
         }
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         if (format == 4444 || format == 8888 || (format == 1555 && hasAlpha)) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
             if (!hasAlpha && mappingType != 6) {
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
             } else {
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+                ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
             }
         } else if (hasAlpha) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     } else {
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot11(0);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot11(0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         if (hasAlpha) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
         }
     }
     if (clampTexture) {
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot6(0, 0xc, &g_UnknownInt689ed0);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot6(0, 0xc, &g_UnknownInt689ed0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
     }
     switch (mappingType) {
     case 3:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 4:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 6:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 8:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 1, 0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 1, 0);
         break;
     }
 }
@@ -139,9 +139,9 @@ void SoultreeMaterial::ApplyRenderStates()
 void SoultreeMaterial::RestoreRenderStates()
 {
     if (mappingType == 8)
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 0, 0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 0, 0);
     if (clampTexture)
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, g_UnknownInt689ed0);
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, g_UnknownInt689ed0);
 }
 
 // 0x004ff450
@@ -186,7 +186,7 @@ void SoultreeMaterial::LoadTexture()
     }
     int format = textureFormat;
     if (hasColorKey) {
-        PCRenderTarget* target = (PCRenderTarget*)field_0x18;
+        PCRenderTarget* target = (PCRenderTarget*)renderContext;
         if ((target->triTextureCaps & 8) && field_0x74.opaqueTextures) {
             format = target->surfacePixelFormat;
             colorKey = (g_UnknownInt574060 << 8 | g_UnknownInt574064) << 8 | g_UnknownInt574068;

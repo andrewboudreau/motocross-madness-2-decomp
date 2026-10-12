@@ -282,7 +282,7 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = world->terrain->CastSegment(&((RenderTarget*)field_0x18)->currentCamera->eyePosition, point, &hit, 0, 0, 0);
+        int hidden = world->terrain->CastSegment(&((RenderTarget*)renderContext)->currentCamera->eyePosition, point, &hit, 0, 0, 0);
         lastVisible = !hidden;
     }
     frameCounter++;
@@ -823,7 +823,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
     if (visible) {
         GameObject::UnknownVirtualSlot15();
         void* dc;
-        if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
+        if (((PCRenderTarget*)renderContext)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
             void* font = SelectObject(dc, textFont);
@@ -832,7 +832,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
             SetTextColor(dc, 0xff00);
             TextOutA(dc, textX, textY, caption, strlen(caption));
             SelectObject(dc, font);
-            if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
+            if (((PCRenderTarget*)renderContext)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
         } else {
             return 0;
@@ -928,7 +928,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
     GameObject::UnknownVirtualSlot15();
     if (queueHead) {
         void* dc;
-        if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
+        if (((PCRenderTarget*)renderContext)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
             void* font = SelectObject(dc, textFont);
@@ -937,7 +937,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
             SetTextColor(dc, textColor);
             DrawTextA(dc, queueHead->line, strlen(queueHead->line), &textRect, 0x124);
             SelectObject(dc, font);
-            if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
+            if (((PCRenderTarget*)renderContext)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
         } else {
             return 0;

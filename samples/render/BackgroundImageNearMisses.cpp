@@ -15,7 +15,7 @@
 #include "../../src/reconstructed/DisplayMode.h"
 #include "../../src/reconstructed/TrackGame.h"
 
-#define Target() ((PCRenderTarget*)field_0x18)
+#define Target() ((PCRenderTarget*)renderContext)
 
 extern CameraRect g_UnknownGlobal5777b8;
 extern CameraRect g_UnknownGlobal577790;

@@ -355,13 +355,13 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             modelTextures.field_0x14 = 1;
         }
     } else {
-        int videoMemory = ((PCRenderTarget*)field_0x18)->targetDisplay->totalVideoMemory;
-        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)field_0x18)->targetDisplay->driverGuidText);
+        int videoMemory = ((PCRenderTarget*)renderContext)->targetDisplay->totalVideoMemory;
+        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)renderContext)->targetDisplay->driverGuidText);
         int megabytes = g_TrackGame->GetRegistryInt(key, -1);
         forced = g_TrackGame->mode.videoSettings[0];
         if (megabytes != -1)
             videoMemory = megabytes << 20;
-        PCRenderTarget* target = (PCRenderTarget*)field_0x18;
+        PCRenderTarget* target = (PCRenderTarget*)renderContext;
         int available = videoMemory - FrameBufferBytes(target);
         if (g_TrackGame->osVersion.platformId != 2 && !(target->targetDisplay->driverCaps & 0x400)) {
             available = videoMemory - 0x400000;
@@ -481,28 +481,28 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         }
         if (g_TrackGame->field_0x2d5_bit2) {
             field_0x94 = (GameObject*)g_TrackGame->textureManager->CreateGroup(
-                ((PCRenderTarget*)field_0x18)->surfacePixelFormat, 0, 2, 1);
+                ((PCRenderTarget*)renderContext)->surfacePixelFormat, 0, 2, 1);
             field_0x98 = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
         }
     }
     modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->textureManager;
     modelTextures.field_0x04 = skyTextures.field_0x04 = terrainTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
     modelTextures.field_0x08 = skyTextures.field_0x08 = terrainTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
-    modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->surfacePixelFormat;
+    modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)renderContext)->surfacePixelFormat;
     modelTextures.field_0x10 = skyTextures.field_0x10 = terrainTextures.field_0x10 = 0x115c;
     if (progress)
         progress(0);
 
     g_MemTagStack->Push("Audio");
     auralScape = (new(__FILE__, 576) AuralScape(g_TrackGame->mode.soundOn))
-                     ->UnknownFunction402f00(field_0x18, 16);
+                     ->UnknownFunction402f00(renderContext, 16);
     auralScape->reverbEnabled = g_TrackGame->mode.eaxEnabled;
     auralScapeListener = auralScape->NextListenerNumber();
     auralScape->AddListener(auralScapeListener, 1.0f, 1.0f);
     g_MemTagStack->Pop(0);
 
     lightManager = new(__FILE__, 582) LightManager(1);
-    AppendChild(lightManager->UnknownVirtualSlot8(field_0x18), -1);
+    AppendChild(lightManager->UnknownVirtualSlot8(renderContext), -1);
     presets[0] = 0;
     presets[1] = 1;
     presets[2] = 2;
@@ -512,7 +512,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     presets[6] = 6;
     presets[7] = 7;
     raceCamera = (UnknownQuarryCamera*)(new(__FILE__, 585) UnknownQuarryBikeCamera(1))
-                     ->Create(field_0x18, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
+                     ->Create(renderContext, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
     if (!AppendChild((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
         return 0;
@@ -530,7 +530,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(text, "Scene not created.\n");
         return 0;
     }
-    if (!eventScene->Load(field_0x18, lightManager, (int)particleManager, (int)g_TrackGame->textureManager,
+    if (!eventScene->Load(renderContext, lightManager, (int)particleManager, (int)g_TrackGame->textureManager,
                                            (int)&modelTextures, "Teraform\\Skies", (void (*)(int))progress,
                                            (int)ceil(sceneSteps * 0.1f)))
         return 0;
@@ -539,7 +539,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("QuadTree");
     UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) UnknownQuarryVisibility(1))
-        ->UnknownFunction52d460(field_0x18, 0, 0,
+        ->UnknownFunction52d460(renderContext, 0, 0,
                                 eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
                                 eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
                                 eventScene, 96.0f);
@@ -565,7 +565,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     if (shadowLight) {
         projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_TrackGame->mode.shadowsOn);
-        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(field_0x18, g_TrackGame->textureManager);
+        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -574,13 +574,13 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     char* cubeFile = eventScene->environment->cubeFile;
     if (cubeFile && *cubeFile) {
         eventFog = (new(__FILE__, 720) UnknownQuarryFog(1))
-                         ->UnknownFunction462680(field_0x18, eventScene->fog->color, eventScene->fog->visibility,
+                         ->UnknownFunction462680(renderContext, eventScene->fog->color, eventScene->fog->visibility,
                                                  eventScene->fog->haziness, 768.0f, 256.0f, 128.0f);
         if (!AppendChild((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
         if (eventFog)
             eventFog->SetDetailLevel(g_TrackGame->mode.videoSettings[4]);
-        AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(field_0x18), -1);
+        AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(renderContext), -1);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
             if (stream)
@@ -588,10 +588,10 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             return 0;
         }
         skyCube = (new(__FILE__, 744) UnknownQuarrySkyCube(g_TrackGame->mode.skyCubeOn))
-                         ->Create(field_0x18, stream, &skyTextures, 1024.0f);
+                         ->Create(renderContext, stream, &skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
-        AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(field_0x18, eventFog), -1);
+        AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(renderContext, eventFog), -1);
         eventFog->SetParameters(eventScene->fog->color, eventFog->field_0x38, eventFog->field_0x40);
     }
     if (progress)
@@ -604,7 +604,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         return 0;
     }
     eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
-                     ->UnknownFunction5059d0(field_0x18, field_0x44, 1, &terrainTextures,
+                     ->UnknownFunction5059d0(renderContext, field_0x44, 1, &terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
@@ -617,7 +617,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->UnknownFunction508b80(field_0x18, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
+                         ->UnknownFunction508b80(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);
@@ -632,7 +632,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
         ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
-                         ->Create(field_0x18, g_TrackGame->textureManager, eventTerrain, lightManager,
+                         ->Create(renderContext, g_TrackGame->textureManager, eventTerrain, lightManager,
                                                  eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
@@ -650,7 +650,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Particles");
     if (particleManager)
         particleManager = ((UnknownQuarryParticles*)particleManager)
-                         ->UnknownVirtualSlot27(field_0x18, g_TrackGame->textureManager,
+                         ->UnknownVirtualSlot27(renderContext, g_TrackGame->textureManager,
                                                 eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!UnknownVirtualSlot27((int)&modelTextures))
@@ -658,7 +658,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
     raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)raceView)
-                     ->Create(field_0x18, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
+                     ->Create(renderContext, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
                                              eventScene, this, projectedShadow);
     if (!raceView) {
         sprintf(text, "BikeRace create failed.\n");
@@ -771,7 +771,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(path, "%s\\%s", "Res", "truckpodium.slt");
     g_TrackGame->eventManager->podiumObject =
         (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
-            ->Create(field_0x18, (int)lightManager, (int)&modelTextures, path,
+            ->Create(renderContext, (int)lightManager, (int)&modelTextures, path,
                                     g_TrackGame->eventManager->podiumPosition, 0, 0, 2.0f, 0.5f, 0.5f, 0);
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
@@ -853,7 +853,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         DisableByClassName("TerrainShadow");
         DisableByClassName("D3DIMSoultreeShadow");
     }
-    ((RenderTarget*)field_0x18)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
+    ((RenderTarget*)renderContext)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
     field_0x50 = (void*)1;
     if (g_TrackGame->field_0x2d5_bit2) {
         g_MemTagStack->Push("TextureCache");
@@ -865,7 +865,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (progress)
         progress(0);
     UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);
-    last->UnknownVirtualSlot8(field_0x18);
+    last->UnknownVirtualSlot8(renderContext);
     AppendChild(last, -1);
     last->InsertNodesInQuadtree();
     return 1;

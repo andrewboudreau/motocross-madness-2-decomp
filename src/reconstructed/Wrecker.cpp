@@ -71,15 +71,15 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     character = rider;
     rider->skeleton->TranslateIn(0, Vector3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
-    gravityModel->UnknownVirtualSlot8(field_0x18);
+    gravityModel->UnknownVirtualSlot8(renderContext);
     AppendChild(gravityModel, -1);
     rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
-    rigidBody->UnknownVirtualSlot8(field_0x18);
+    rigidBody->UnknownVirtualSlot8(renderContext);
     AppendChild(rigidBody, -1);
     rigidBody->UnknownVirtualSlot28(character->skeleton);
     gravityModel->UnknownVirtualSlot27(rigidBody);
     collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
-    collisionModel->UnknownVirtualSlot8(field_0x18);
+    collisionModel->UnknownVirtualSlot8(renderContext);
     collisionModel->SetBody(rigidBody, 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;

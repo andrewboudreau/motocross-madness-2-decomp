@@ -63,7 +63,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     overlayTexture = texture;
     field_0xe4 = a4;
     // Through the Target() accessor VC6 allocates the registers differently.
-    field_0x40 = ((RenderTarget*)field_0x18)->surfacePixelFormat;
+    field_0x40 = ((RenderTarget*)renderContext)->surfacePixelFormat;
     screenRect = *rect;
     if (source) {
         sourceRect = *source;

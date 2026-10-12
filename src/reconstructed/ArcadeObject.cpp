@@ -50,7 +50,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
 
     GameObject::UnknownVirtualSlot8(value);
     arcadeModel = new (__FILE__, 78) D3DIMSoultreeObject(1);
-    if (!AppendChild(arcadeModel->UnknownVirtualSlot9(field_0x18, name, a, b, 1), -1)) {
+    if (!AppendChild(arcadeModel->UnknownVirtualSlot9(renderContext, name, a, b, 1), -1)) {
         Release();
         return 0;
     }
@@ -104,7 +104,7 @@ int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallbac
     g_MemTagStack->CopyCurrentName(tag);
     g_MemTagStack->Push("Collision");
     collisionObject = new (__FILE__, 154) CollisionObject(1);
-    collisionObject->Configure(field_0x18, 1, a, b);
+    collisionObject->Configure(renderContext, 1, a, b);
     strcpy(path, name);
     strcpy(strrchr(path, '.'), ".col");
     UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream((int)g_UnknownResourceManager572b44);

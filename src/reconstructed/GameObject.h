@@ -105,7 +105,7 @@ protected:
     GameObject* nextSibling;                  // +0x0c next sibling
     GameObject* firstChild;                   // +0x10 first child
     GameObject* parent;                       // +0x14 parent
-    void* field_0x18;          // set by slots 8 and 25; Camera's owner object
+    void* renderContext;                      // +0x18 set by slots 8 and 25; the render target the object draws with (cast to RenderTarget/PCRenderTarget by its users)
     int ownFlags;                             // +0x1c flags this object adds to its parent's childFlags (0x004690c0, 0x00469100)
     unsigned int childFlags;                  // +0x20 OR of the children's ownFlags and childFlags; gates slots 12-18 (0x00469100)
     unsigned char field_0x24;

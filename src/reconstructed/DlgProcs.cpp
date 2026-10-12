@@ -1068,7 +1068,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->SetCamera(0);
+        ((RenderTarget*)renderContext)->SetCamera(0);
         break;
     }
 }
