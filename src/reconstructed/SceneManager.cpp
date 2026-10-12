@@ -1365,7 +1365,7 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
                 entry->archive->Read(&material->materialAlpha, 4, 1);
                 entry->archive->Read(&material->textureSpeed, 4, 1);
                 entry->archive->Read(&material->mappingType, 2, 1);
-                entry->archive->Read(&material->field_0xcc, 4, 1);
+                entry->archive->Read(&material->texelRatio, 4, 1);
                 position = entry->archive->Tell();
                 mode = entry->archive->GetTextMode();
                 if (material->hasTextureName) {

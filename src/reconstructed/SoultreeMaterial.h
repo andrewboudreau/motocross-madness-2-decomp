@@ -70,8 +70,8 @@ public:
 
     char textureName[0x40];                   // texture name ("TextureMap")
     TextureMapManager* textureManager;        // loads named textures
-    SurfaceMap* field_0x70;
-    SoultreeTextureOptions field_0x74;
+    SurfaceMap* surfaceMap;                   // +0x70 holds the loaded texture (LoadTexture)
+    SoultreeTextureOptions textureOptions;    // +0x74 copied by Attach; passed to the texture loader
     int textureFormat;                        // "TextureFormat"
     unsigned int colorKey;                    // colour key, 0x00rrggbb ("ColorKey")
     int sourceBlend;                          // "SourceBlend" (1 ZERO .. 13 BOTHINVSRCALPHA)
@@ -88,5 +88,6 @@ public:
     float materialAlpha;                      // "Alpha" (default 1.0)
     float textureSpeed;                       // "TextureSpeed"
     unsigned short mappingType;                      // "MappingType" (0 STANDARD .. 9 NONE)
-    int field_0xcc;
+    int texelRatio;                           // +0xcc float bits: the largest edge/UV ratio over the texture height
+                                              // (D3DIMSoulTree 0x00440810); SelectLod scales the texture size by it
 };

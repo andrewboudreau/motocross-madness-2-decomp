@@ -541,7 +541,7 @@ void BonusObjectManager::HideDigits() {
 
 // 0x0048d620
 int BonusObjectManager::UnknownVirtualSlot14() {
-    if (baseFrame->field_0x2d4)
+    if (baseFrame->visible)
         return GameObject::UnknownVirtualSlot14();
     return 1;
 }

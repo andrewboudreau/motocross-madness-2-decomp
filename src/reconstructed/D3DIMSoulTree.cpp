@@ -20,10 +20,10 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     : SoultreeObject(flags)
 {
     useLighting = 0;
-    field_0x1a8 = 0;
-    field_0x1ac = 0;
-    field_0x1b4 = 1;
-    field_0x1b8 = 1;
+    showNormals = 0;
+    showVertexCrosses = 0;
+    texturePerspective = 1;
+    gouraudShading = 1;
     textureManager = 0;
     textureFormat = 555;
     materialTable = 0;
@@ -35,7 +35,7 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     lodTable = 0;
     autoLodDistances = 0;
     inverseLodThreshold = 1.0f;
-    field_0x288 = 0;
+    useAutoLod = 0;
     lightManager = 0;
     modifierList = 0;
     modifierCount = 0;
@@ -52,12 +52,12 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     zero.z = 0.0f;
     zero.y = 0.0f;
     zero.x = 0.0f;
-    field_0x2bc = zero;
-    field_0x2d0 = 0;
+    lastScrollPosition = zero;
+    showBounds = 0;
     localBoundsValid = 0;
-    field_0x1b0 = 0;
+    showWireframe = 0;
     field_0x260 = 0;
-    field_0x2d4 = 1;
+    visible = 1;
 }
 
 // 0x0043f2b0
@@ -196,8 +196,8 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
         materialTable = 0;
     }
     stream->Read(&lodCount, 4, 1);
-    stream->Read(&field_0x288, 4, 1);
-    if (field_0x288) {
+    stream->Read(&useAutoLod, 4, 1);
+    if (useAutoLod) {
         autoLodDistances = (float*)DebugMalloc(lodCount * 4, __FILE__, 0x166);
         for (int i = 0; i < lodCount - 1; i++)
             stream->Read(&autoLodDistances[i], 4, 1);
@@ -298,9 +298,9 @@ int D3DIMSoultreeObject::ReadLods()
     sprintf(section, "LOD Information");
     parameterBlock->SelectSection(section);
     parameterBlock->GetInt("NumberOfLOD", 0, &lodCount);
-    parameterBlock->GetInt("UseAutoLOD", 0, &field_0x288);
+    parameterBlock->GetInt("UseAutoLOD", 0, &useAutoLod);
     int i;
-    if (field_0x288) {
+    if (useAutoLod) {
         autoLodDistances = (float*)DebugMalloc(lodCount * 4 - 1, __FILE__, 0x1ec);
         for (i = 0; i < lodCount - 1; i++) {
             sprintf(section, "AutoLOD#%i", i);
@@ -796,7 +796,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
     if (0.1f > range)
         range = 0.1f;
     float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->imagePlaneDistance / range;
-    if (field_0x288) {
+    if (useAutoLod) {
         int lod = 0;
         for (int i = 0; i < lodCount - 1; i++) {
             if ((scale * autoLodDistances[i]) * inverseLodThreshold < 1.0f)
@@ -807,11 +807,11 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
     }
     for (int i = 0; i < materialCount; i++) {
         SoultreeMaterial* material = materialTable[i];
-        if (material->field_0x70) {
-            ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
+        if (material->surfaceMap) {
+            ManagedTexture* texture = (ManagedTexture*)material->surfaceMap->texture;
             if (texture->mapFlags & 1) {
                 float width = (float)texture->textureWidth;
-                float size = (scale * *(float*)&material->field_0xcc) * width;
+                float size = (scale * *(float*)&material->texelRatio) * width;
                 if (size > width + width)
                     size = width + width;
                 int power = 1;
@@ -833,10 +833,10 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
 // 0x00444030
 int D3DIMSoultreeObject::UnknownVirtualSlot14()
 {
-    if (!field_0x2d4)
+    if (!visible)
         return 1;
     DrawCurrentLod();
-    if (field_0x2d0) {
+    if (showBounds) {
         DrawScreenRect(&screenRect);
         ComputeSubtreeBounds();
         DrawAxisGizmo();
@@ -926,8 +926,8 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, Soult
     D3DIMSoultreeObject* target = (D3DIMSoultreeObject*)targetNode;
     target->subtreeDirty = 1;
     target->useLighting = source->useLighting;
-    target->field_0x1a8 = source->field_0x1a8;
-    target->field_0x1ac = source->field_0x1ac;
+    target->showNormals = source->showNormals;
+    target->showVertexCrosses = source->showVertexCrosses;
     target->lightManager = source->lightManager;
     int nameLength = strlen(source->modelName);
     int length = nameLength > 0x7f ? 0x7f : nameLength;
@@ -1116,7 +1116,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
 void D3DIMSoultreeObject::ApplyLodSettings(int index)
 {
     SetLodThreshold(g_UnknownSoultreeLodSettings689f18[index].field_0x00);
-    field_0x1b4 = g_UnknownSoultreeLodSettings689f18[index].field_0x04;
-    field_0x1b8 = g_UnknownSoultreeLodSettings689f18[index].field_0x08;
+    texturePerspective = g_UnknownSoultreeLodSettings689f18[index].field_0x04;
+    gouraudShading = g_UnknownSoultreeLodSettings689f18[index].field_0x08;
     UnknownFunction4444c0(g_UnknownSoultreeLodSettings689f18[index].field_0x0c);
 }

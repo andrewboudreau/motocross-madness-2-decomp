@@ -274,36 +274,36 @@ public:
     void ApplyLodSettings(int index);         // 0x004451e0
 
     int useLighting;                           // +0x1a4 set by 0x004444c0; gates the light manager's vertex lighting
-    int field_0x1a8;
-    int field_0x1ac;
-    int field_0x1b0;
-    int field_0x1b4;
-    int field_0x1b8;
-    LightManager* lightManager;                // slot 9's `a`; lights the vertices
-    char modelName[0x80];                      // name (0x7f characters)
-    TextureMapManager* textureManager;         // texture manager (first option dword)
-    int textureFormat;                         // texture format, 555
-    int textureOptions[6];                     // texture options
-    int field_0x260;
-    int modifierCount;                         // first modifier list
-    GameObject** modifierList;
-    int secondModifierCount;                   // second modifier list
-    GameObject** secondModifierList;
-    int lodCount;                              // level-of-detail count
-    int lowestLod;                             // lowest level of detail
-    int currentLod;                           // +0x27c current level of detail
-    float* autoLodDistances;                   // "AutoLOD#%i" distances
+    int showNormals;                           // +0x1a8 DrawNormals per surface (debug)
+    int showVertexCrosses;                     // +0x1ac DrawVertexCrosses per surface (debug)
+    int showWireframe;                         // +0x1b0 DrawWireframe per surface (debug)
+    int texturePerspective;                    // +0x1b4 D3DRENDERSTATE_TEXTUREPERSPECTIVE while drawing
+    int gouraudShading;                        // +0x1b8 D3DRENDERSTATE_SHADEMODE: gouraud when set, else flat
+    LightManager* lightManager;                // +0x1bc slot 9's `a`; lights the vertices
+    char modelName[0x80];                      // +0x1c0 name (0x7f characters)
+    TextureMapManager* textureManager;         // +0x240 texture manager (first option dword)
+    int textureFormat;                         // +0x244 texture format, 555
+    int textureOptions[6];                     // +0x248 texture options
+    int field_0x260;                           // +0x260
+    int modifierCount;                         // +0x264 first modifier list
+    GameObject** modifierList;                 // +0x268
+    int secondModifierCount;                   // +0x26c second modifier list
+    GameObject** secondModifierList;           // +0x270
+    int lodCount;                              // +0x274 level-of-detail count
+    int lowestLod;                             // +0x278 lowest level of detail
+    int currentLod;                            // +0x27c current level of detail
+    float* autoLodDistances;                   // +0x280 "AutoLOD#%i" distances
     float inverseLodThreshold;                 // +0x284 1 / SetLodThreshold's value; SelectLod takes level i + 1 while scale * autoLodDistances[i] < threshold
-    int field_0x288;
-    UnknownSoultreeLod* lodTable;
-    SoultreeMaterial** materialTable;          // materials
-    int materialCount;                         // material count
+    int useAutoLod;                            // +0x288 "UseAutoLOD"
+    UnknownSoultreeLod* lodTable;              // +0x28c
+    SoultreeMaterial** materialTable;          // +0x290 materials
+    int materialCount;                         // +0x294 material count
     UnknownSoultreeScreenRect screenRect;      // +0x298 projected bounds (SelectLod); slot 14 bumps right and bottom
     UnknownSoultreeScreenRect field_0x2a8;     // +0x2a8
-    float lastFrameTime;                       // frame time (slot 10)
-    Vector3 field_0x2bc;
-    float textureScroll;                       // texture scroll (drawing modes 1 and 2)
-    int loadFlag;                              // load flag (slot 9)
-    int field_0x2d0;
-    int field_0x2d4;                           // 1 after construction
+    float lastFrameTime;                       // +0x2b8 frame time (slot 10)
+    Vector3 lastScrollPosition;                // +0x2bc world position at the last mode 2 texture scroll
+    float textureScroll;                       // +0x2c8 texture scroll (drawing modes 1 and 2)
+    int loadFlag;                              // +0x2cc load flag (slot 9)
+    int showBounds;                            // +0x2d0 slot 14 outlines screenRect and draws bounds and axes (debug)
+    int visible;                               // +0x2d4 1 after construction; SelectLod sets it from the clipper test, slot 14 skips drawing when 0
 };
