@@ -15,7 +15,6 @@
   "?ComputeTimeBehind@@YAHPAUUnknownEventRacerPart@@H@Z": "0x004e6210",
   "?RankByScore@@YAHH@Z": "0x004e62d0",
   "?UpdateLapRace@@YAHPAPAUUnknownEventRacerPart@@PAVTrack@@MPAUUnknownBikeRaceNode@@2HH@Z": "0x004e63e0",
-  "?UpdateGateRace@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownBikeRaceNode@@MHH@Z": "0x004e6a50",
   "?ClosestPointOnTrack@Track@@QAEHUVector3@@PAUTrackPos@@PAM@Z": "0x00516980",
   "?PlaceNear@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
   "?DistanceAlong@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",

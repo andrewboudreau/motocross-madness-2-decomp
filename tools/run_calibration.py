@@ -26409,6 +26409,16 @@ CASES = [
         'target_size': 1,
         'reason': 'empty destructor thunk of the function-local s_world (pushed to atexit at 0x43e4f3)',
     },
+    # s11/bigfn
+    {
+        'name': 'RaceStatus.cpp gate race update 0x4e6a50',
+        'bindings': 'src/reconstructed/RaceStatus.bindings.json',
+        'source': 'src/reconstructed/RaceStatus.cpp',
+        'symbol': '?UpdateGateRace@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownBikeRaceNode@@MHH@Z',
+        'target_va': '0x004e6a50',
+        'target_size': 1004,
+        'reason': 'bikerace caller of the gate race; calls 0x4e5ca0/0x4e59c0/0x4e6120/0x4e6210; `goto next` for the finished racer gives retail layout of the `remaining >= 1` test',
+    },
 ]
 
 def main():

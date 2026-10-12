@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 169, c 113, total 284. The three class (a) functions of the
+Counts: a 2, b 168, c 113, total 283. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -203,7 +203,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/Krusty3DObjects | `0x0048ccc0` | 47/1308 | b | 3 code diffs: `je @349` vs `je A`; `jne @349` vs `jne A`; slots differ |
 | race/RaceSound | `0x004e4d10` | 563/2038 | c | 10 code diffs: `je @599` vs `je A`; `jne @280` vs `jne A` |
 | race/RaceStatus | `0x004e5d00` | 168/519 | c | 29 code diffs: retail adds `mov ebp, [esp + N]`; retail adds `test ebp, ebp` |
-| race/RaceStatus | `0x004e6a50` | 490/1003 | b | 6 code diffs: `je @289` vs `je A`; `je @289` vs `je A`; slots differ |
 | race/Recorder | `0x004e6f80` | 652/2180 | c | case 1 `goto opened` reproduces retail's jmp into case 2's tail; left: case 2's `[0xc8]=1; Leave` suffix still cross-jumps into case 4 (retail keeps it), and `name`/`headerSize` slots swap (0x08/0x10); real extent 2148 |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
 | race/Wrecker | `0x00531740` | 1606/1624 | c | slots match; the argument push of two loop constructor calls comes one load earlier (`push ecx` before the particle-pointer load and before `along.y`), two registers differ |

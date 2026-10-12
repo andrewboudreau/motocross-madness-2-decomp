@@ -392,3 +392,97 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
         return 0;
     return ComputeTimeBehind(*list, 0) != 0;
 }
+
+// The view's camera (+0x50), whose +0x3b4 racer is the one followed (as
+// RaceSound.h's UnknownRaceSoundCamera; KrustyBikeCamera keeps it protected).
+struct UnknownRaceStatusCamera {
+    unsigned char field_0x000[0x3b4];
+    UnknownEventRacer* field_0x3b4;
+};
+
+// |v|, exact for unit vectors (as CarProcedural.cpp).
+static inline float Length(Vector3 v) {
+    float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
+    if (squared == 1.0f)
+        return 1.0f;
+    return FastSqrt(squared);
+}
+
+// 0x004e6a50: the gate-race update. Once the local racer has finished in
+// a single-player race, the others get an estimated time. A finished racer
+// leaves that block with `goto next` (retail's block layout and registers
+// for the `remaining >= 1` test; a `continue` there lays the lap-time
+// product out of line), the estimated one with `continue`.
+int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,
+                          int unlimited) {
+    UnknownEventRacerPart* previous = 0;
+    UnknownEventRacerPart* status;
+    UnknownEventRacer* racer;
+
+    if (!list || !firstGate)
+        return 0;
+    PruneStatusList(list);
+    for (status = *list; status; previous = status, status = status->next) {
+        racer = status->racer;
+        if (racer->hasFinished)
+            continue;
+        {
+            int gate = racer->field_0x7b8;
+            status->previousPosition.x = racer->frontWheel->field_0x200.x;
+            status->previousPosition.y = racer->frontWheel->field_0x200.y;
+            status->previousPosition.z = racer->frontWheel->field_0x200.z;
+            if (!AdvanceGate(&status->previousPosition, &status->currentPosition, &status->nextGate, firstGate,
+                                       &racer->gatesPassed, &racer->field_0x7b8, racer->gateTimes, racer->totalRunningTime,
+                                       0, &racer->lapCount, &racer->lastLapTime, &racer->fastestLap,
+                                       &racer->lapStartTime, &racer->hasFinished, lapLimit, unlimited,
+                                       racer->field_0x735, racer->field_0x7c0))
+                return 0;
+            if (g_TrackGame->bajaEnduroEvent && gate != racer->field_0x7b8) {
+                racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
+                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->field_0x50)->field_0x3b4)
+                    g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
+                                                                              racer);
+            }
+        }
+        if (racer->hasFinished && racer == racer->bikeView->localRacer)
+            g_ViewRacerFinished = 1;
+        float before = Length(status->nextGate->center - status->currentPosition);
+        float after = Length(status->nextGate->center - status->previousPosition);
+        status->currentPosition.x = status->previousPosition.x;
+        status->currentPosition.y = status->previousPosition.y;
+        status->currentPosition.z = status->previousPosition.z;
+        status->field_0x14 += before - after;
+        status->field_0x08 = after;
+        if (g_TrackGame->playerCount == 1 && g_ViewRacerFinished) {
+            if (racer->hasFinished)
+                goto next;
+            if (racer->field_0x734) {
+                int remaining = lapLimit - racer->lapCount;
+                if (remaining >= 1) {
+                    if (racer->lapCount < 1)
+                        racer->totalRunningTime = 0;
+                    else
+                        racer->totalRunningTime = remaining * racer->lastLapTime;
+                }
+                if (previous && racer->totalRunningTime < previous->racer->totalRunningTime)
+                    racer->totalRunningTime = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->totalRunningTime + 1.0f;
+                if (lapLimit == 1)
+                    racer->lastLapTime = racer->totalRunningTime;
+                else if (racer->lapCount < 1)
+                    racer->lastLapTime =
+                        UNKNOWN_RANDOM_UNIT() * 10 + racer->bikeView->localRacer->lastLapTime + 1.0f;
+                if (racer->lastLapTime < racer->fastestLap || racer->fastestLap <= 0.0f)
+                    racer->fastestLap = racer->lastLapTime;
+                racer->lapCount = lapLimit;
+                racer->hasFinished = 1;
+                continue;
+            }
+        }
+        if (!racer->hasFinished)
+            racer->totalRunningTime += frameTime;
+next:;
+    }
+    if (!OrderByGates(list))
+        return 0;
+    return ComputeTimeBehind(*list, 1) != 0;
+}

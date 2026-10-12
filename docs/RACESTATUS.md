@@ -22,13 +22,14 @@ vectors, then `0x004e58a0`. A unit's entries are contiguous; this follows
 the cube.cpp pattern. recorder.cpp therefore starts at `0x004e6f80`, and
 the eight `$E` cases moved here from Recorder.cpp.
 
-Exact: 20 calibration cases:
+Exact: 21 calibration cases:
 - The three list helpers `0x004e5c70`, `0x004e5ca0` and `0x004e5f10`.
 - The lap and gate counters `0x004e58c0` and `0x004e59c0`.
 - The orderings by laps and by gates, `0x004e5f40` and `0x004e6120`.
 - The time behind the leader `0x004e6210`.
 - The score ranking `0x004e62d0`.
-- The 1646-byte lap-race update `0x004e63e0`.
+- The 1646-byte lap-race update `0x004e63e0` and the 1004-byte gate-race
+  update `0x004e6a50`.
 - The ten `$E`.
 
 Source forms needed:
@@ -36,11 +37,15 @@ Source forms needed:
 - An integer scale on the random unit, because a float scale lets VC6
   fold the constants.
 - The racer index computed twice in `0x004e6210`.
+- In `0x004e6a50`, `goto next` (not `continue`) for a racer already
+  finished inside the estimated-times block. With `continue` there, VC6
+  emits `remaining >= 1` with the lap-time product out of line and other
+  registers; `remaining > 0` keeps the layout but gives `test; jle`, not
+  retail's `cmp eax, 1; jl`. The estimated racer still leaves with
+  `continue`.
 
 `0x004e5ca0` re-reads `*list` for each access instead of keeping the node in
 a local (GameObject.h grants it friend access to the +0x25 bits).
 
 Near misses (`samples/race/RaceStatusNearMisses.cpp`, notes there):
 - The builder `0x004e5d00`: register allocation only.
-- The gate-race update `0x004e6a50`: one instruction off. Retail compares
-  `>= 1`; written that way, VC6 moves the else branch out of line.
