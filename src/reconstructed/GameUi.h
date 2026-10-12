@@ -245,7 +245,9 @@ public:
     UIControl* NextAttachedControlOfType(GameObjectIterator* iterator);
     UIControl* PreviousFocusableControl(); // 0x004727c0: the previous focusable control
     UIControl* NextFocusableControl(); // 0x00472810: the next focusable control
-    int UnknownFunction472480(int* position); // 0x00472480
+    // 0x00472480: hit-tests `position` through the sibling and child controls
+    // first, then hovers this one if it is hit and interactive (provisional).
+    int UpdateHoverAt(int* position);
 
     int screenArea[4];                        // +0x2c: screen area (scaled +0x3c)
     union {
@@ -524,7 +526,7 @@ public:
     void SetSelectable(int a);                // 0x00477bb0: "Selectable" (+0x224)
     void UpdateScrollBars();                  // 0x00477bc0: the attached scroll bars follow
     void SetPartialRows(int value);           // 0x00477e60: partialRows (SelectGamePicProcs.cpp)
-    char* UnknownFunction476970(int row);     // 0x00476970
+    char* GetRowKind(int row);                // 0x00476970: rowTable[row].kind (0 out of range)
     int GetRowHeight(int row);                // 0x004769a0
     void SetAutoSort(int value);              // 0x00477b90: "AutoSort"
     void ScrollBy(int delta);                 // 0x00477730

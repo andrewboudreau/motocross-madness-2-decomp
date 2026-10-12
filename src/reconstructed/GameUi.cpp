@@ -1160,7 +1160,7 @@ int UIListBox::GetSelectedRow() {
 }
 
 // 0x00476970
-char* UIListBox::UnknownFunction476970(int row) {
+char* UIListBox::GetRowKind(int row) {
     if (rowCount && row >= 0 && row < rowCount)
         return (char*)rowTable[row].kind;
     return 0;
@@ -2561,7 +2561,7 @@ int UIControl::UnknownVirtualSlot21(int value) {
 }
 
 // 0x00472480
-int UIControl::UnknownFunction472480(int* position) {
+int UIControl::UpdateHoverAt(int* position) {
     int result = 0;
     GameObject* next = field_0x0C;
     while (next) {
@@ -2570,12 +2570,12 @@ int UIControl::UnknownFunction472480(int* position) {
         next = next->field_0x0C;
     }
     if (next) {
-        result = ((UIControl*)next)->UnknownFunction472480(position);
+        result = ((UIControl*)next)->UpdateHoverAt(position);
         if (result)
             return result;
     }
     if (field_0x10 && strstr(field_0x10->field_0x28, "UIControl,")) {
-        result = ((UIControl*)field_0x10)->UnknownFunction472480(position);
+        result = ((UIControl*)field_0x10)->UpdateHoverAt(position);
         if (result)
             return result;
     }
@@ -3373,7 +3373,7 @@ void UIDialog::UnknownFunction46f120() {
         POINT position = user->pointerDevice->pointerPosition;
         if (controlContainer->field_0x10) {
             user->field_0x1dc = 0;
-            int result = ((UIControl*)controlContainer->field_0x10)->UnknownFunction472480((int*)&position);
+            int result = ((UIControl*)controlContainer->field_0x10)->UpdateHoverAt((int*)&position);
             if (focus && !guiUser->field_0x1cc && !result)
                 guiUser->UnknownFunction487730(0, 0, 1);
         }
@@ -4585,7 +4585,7 @@ int UIListBox::Draw() {
                     if (height + y > area.bottom)
                         break;
                 }
-                switch ((int)UnknownFunction476970(row)) {
+                switch ((int)GetRowKind(row)) {
                 case 3:
                     if (pass == 1) {
                         if (rowTable[row].imageFile) {
