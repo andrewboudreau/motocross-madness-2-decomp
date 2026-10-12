@@ -253,11 +253,11 @@ int GameObject::UnknownVirtualSlot24(int type, void* data, int from, int to, int
 
 // 0x00469680: recurses to the last sibling first, detaches each object from
 // its predecessor, then releases it.
-int GameObject::UnknownFunction469680() {
+int GameObject::ReleaseSiblings() {
     if (g_UnknownGlobal65b548)
         return 0;
     if (field_0x0C)
-        field_0x0C->UnknownFunction469680();
+        field_0x0C->ReleaseSiblings();
     if (field_0x08)
         field_0x08->field_0x0C = 0;
     field_0x0C = 0;
@@ -271,7 +271,7 @@ int GameObject::Release() {
     if (g_UnknownGlobal65b548)
         return 0;
     if (field_0x10)
-        field_0x10->UnknownFunction469680();
+        field_0x10->ReleaseSiblings();
     if (field_0x08)
         field_0x08->field_0x0C = field_0x0C;
     if (field_0x0C)
@@ -340,7 +340,7 @@ int GameObject::UnknownVirtualSlot11(int) {
 }
 
 // 0x004690c0
-void GameObject::UnknownFunction4690c0(unsigned int flags) {
+void GameObject::AddFlags(unsigned int flags) {
     GameObject* object = this;
     unsigned int combined = object->field_0x20 |= flags;
     while (object->field_0x14) {
@@ -351,17 +351,17 @@ void GameObject::UnknownFunction4690c0(unsigned int flags) {
 }
 
 // 0x00469100
-unsigned int GameObject::UnknownFunction469100() {
+unsigned int GameObject::RecomputeFlags() {
     unsigned int flags = 0;
     for (GameObject* child = field_0x10; child; child = child->field_0x0C)
-        flags |= child->UnknownFunction469100();
+        flags |= child->RecomputeFlags();
     field_0x20 = flags;
     return field_0x1C | flags;
 }
 
 // 0x00469130: appends `object` (and its later siblings) after this object's
 // last sibling, under the same parent; returns `object`.
-int GameObject::UnknownFunction469130(GameObject* object, int value) {
+int GameObject::AppendSibling(GameObject* object, int value) {
     if (g_UnknownGlobal65b548)
         return 0;
     if (object) {
@@ -373,7 +373,7 @@ int GameObject::UnknownFunction469130(GameObject* object, int value) {
         for (GameObject* sibling = object; sibling; sibling = sibling->field_0x0C)
             sibling->field_0x14 = field_0x14;
         object->field_0x1C = value;
-        object->UnknownFunction4690c0(object->field_0x20);
+        object->AddFlags(object->field_0x20);
     }
     return (int)object;
 }
@@ -397,13 +397,13 @@ int GameObject::AppendChild(GameObject* child, int value) {
         for (GameObject* sibling = child; sibling; sibling = sibling->field_0x0C)
             sibling->field_0x14 = this;
         child->field_0x1C = value;
-        child->UnknownFunction4690c0(child->field_0x20);
+        child->AddFlags(child->field_0x20);
     }
     return (int)child;
 }
 
 // 0x004691f0
-int GameObject::UnknownFunction4691f0() {
+int GameObject::Unlink() {
     if (g_UnknownGlobal65b548)
         return 0;
     if (field_0x08)
@@ -415,7 +415,7 @@ int GameObject::UnknownFunction4691f0() {
     GameObject* root = this;
     while (root->field_0x14)
         root = root->field_0x14;
-    root->UnknownFunction469100();
+    root->RecomputeFlags();
     field_0x14 = 0;
     field_0x0C = 0;
     field_0x08 = 0;
@@ -423,10 +423,10 @@ int GameObject::UnknownFunction4691f0() {
 }
 
 // 0x00469260: unlinks this object and inserts it before `next`.
-int GameObject::UnknownFunction469260(GameObject* next, int value) {
+int GameObject::InsertBefore(GameObject* next, int value) {
     if (g_UnknownGlobal65b548)
         return 0;
-    UnknownFunction4691f0();
+    Unlink();
     field_0x08 = next->field_0x08;
     field_0x0C = next;
     if (field_0x08)
@@ -435,23 +435,23 @@ int GameObject::UnknownFunction469260(GameObject* next, int value) {
     if (next->field_0x14 && next->field_0x14->field_0x10 == next)
         next->field_0x14->field_0x10 = this;
     field_0x1C = value;
-    UnknownFunction4690c0(field_0x20);
+    AddFlags(field_0x20);
     return 1;
 }
 
 // 0x00469c80
-void GameObject::UnknownFunction469c80() {
+void GameObject::ReleaseDetached() {
     GameObject* child = field_0x10;
     while (child) {
         if (child->field_0x25_bit3) {
             int previous = g_MemTagStack->Push("UI");
-            child->UnknownFunction4691f0();
+            child->Unlink();
             GameObject* removed = child;
             child = child->field_0x0C;
             removed->Release();
             g_MemTagStack->Pop(previous);
         } else {
-            child->UnknownFunction469c80();
+            child->ReleaseDetached();
             child = child->field_0x0C;
         }
     }
@@ -459,7 +459,7 @@ void GameObject::UnknownFunction469c80() {
 
 // 0x00468dd0: calls slot 4 on every descendant (skipping bit 3) whose name
 // list or RTTI class name starts with or contains "<name>,".
-void GameObject::UnknownFunction468dd0(const char* name) {
+void GameObject::DisableByClassName(const char* name) {
     char className[128];
     char pattern[128];
     GameObject* child = field_0x10;
@@ -478,12 +478,12 @@ void GameObject::UnknownFunction468dd0(const char* name) {
             if (!strncmp(className, pattern, length))
                 child->UnknownVirtualSlot4();
         }
-        child->UnknownFunction468dd0(name);
+        child->DisableByClassName(name);
     }
 }
 
 // 0x00468f10: the same walk calling slot 5.
-void GameObject::UnknownFunction468f10(const char* name) {
+void GameObject::EnableByClassName(const char* name) {
     char className[128];
     char pattern[128];
     GameObject* child = field_0x10;
@@ -502,7 +502,7 @@ void GameObject::UnknownFunction468f10(const char* name) {
             if (!strncmp(className, pattern, length))
                 child->UnknownVirtualSlot5();
         }
-        child->UnknownFunction468f10(name);
+        child->EnableByClassName(name);
     }
 }
 

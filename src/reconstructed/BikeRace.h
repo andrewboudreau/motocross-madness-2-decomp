@@ -217,7 +217,7 @@ public:
     void ClearFlag14c();             // 0x004fdb50
     void GetPosition(Vector3* position); // 0x004fc970: the translation
     // 0x00444c70 (D3DIMSoulTree.cpp): replaces texture `index` with `name`.
-    int UnknownFunction444c70(int index, const char* name, int textures);
+    int ReplaceMaterialTexture(int index, const char* name, int textures);
 
     unsigned char field_0x000[0x274];
     int detailLevelCount;                     // +0x274 detail level count
@@ -827,8 +827,8 @@ struct UnknownBikeRaceUiChoice {
 // applies to the sound and effect children by name.
 class UnknownBikeRaceRoot {
 public:
-    void UnknownFunction468dd0(const char* name);
-    void UnknownFunction468f10(const char* name);
+    void DisableByClassName(const char* name);
+    void EnableByClassName(const char* name);
 };
 
 // The debug lines' row counter (0x00567a88).

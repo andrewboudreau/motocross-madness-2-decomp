@@ -134,13 +134,13 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
                 int channelAxis;
                 if (axis == 0) {
                     channelAxis = axis;
-                    found = block->UnknownFunction4b7e70("XAxis", &probe);
+                    found = block->ReadFloat("XAxis", &probe);
                 } else if (axis == 1) {
                     channelAxis = axis;
-                    found = block->UnknownFunction4b7e70("YAxis", &probe);
+                    found = block->ReadFloat("YAxis", &probe);
                 } else if (axis == 2) {
                     channelAxis = axis;
-                    found = block->UnknownFunction4b7e70("ZAxis", &probe);
+                    found = block->ReadFloat("ZAxis", &probe);
                 }
                 if (!found)
                     continue;
@@ -190,11 +190,11 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
                 sprintf(section, "MorphBastard %i Target %i", i, channel->targetNumbers[t]);
                 block->SelectSection(section);
                 if (channel->axis == 0)
-                    block->UnknownFunction4b7e70("XAxis", &targetValue);
+                    block->ReadFloat("XAxis", &targetValue);
                 else if (channel->axis == 1)
-                    block->UnknownFunction4b7e70("YAxis", &targetValue);
+                    block->ReadFloat("YAxis", &targetValue);
                 else if (channel->axis == 2)
-                    block->UnknownFunction4b7e70("ZAxis", &targetValue);
+                    block->ReadFloat("ZAxis", &targetValue);
                 channel->targets[t].value = targetValue;
                 if (targetValue < channel->minimumValue)
                     channel->minimumValue = targetValue;
@@ -202,16 +202,16 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
                     channel->maximumValue = targetValue;
                 MorphBastardTarget* target = &channel->targets[t];
                 sprintf(section, "MorphBastard %i Target %i Deltas", i, channel->targetNumbers[t]);
-                target->deltaCount = block->UnknownFunction4b7f70(section);
+                target->deltaCount = block->BeginRows(section);
                 target->vertexIndices = (int*)DebugMalloc(target->deltaCount * 4, __FILE__, 217);
                 target->deltas = (Vector3*)DebugMalloc(target->deltaCount * 12, __FILE__, 218);
                 target->lastWeights = (float*)DebugMalloc(target->deltaCount * 4, __FILE__, 219);
                 for (int r = 0; r < target->deltaCount; r++) {
-                    block->UnknownFunction4b8010(0);
-                    block->UnknownFunction4b8180(1, &target->vertexIndices[r]);
-                    block->UnknownFunction4b81c0(2, &target->deltas[r].x);
-                    block->UnknownFunction4b81c0(3, &target->deltas[r].y);
-                    block->UnknownFunction4b81c0(4, &target->deltas[r].z);
+                    block->ReadRow(0);
+                    block->GetRowInt(1, &target->vertexIndices[r]);
+                    block->GetRowFloat(2, &target->deltas[r].x);
+                    block->GetRowFloat(3, &target->deltas[r].y);
+                    block->GetRowFloat(4, &target->deltas[r].z);
                 }
             }
             qsort(channel->targets, channel->targetCount, sizeof(MorphBastardTarget),

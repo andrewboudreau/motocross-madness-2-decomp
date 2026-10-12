@@ -374,9 +374,9 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
             return 0;
         if (field_0x2d4_bit0 && field_0x1c4 != previous) {
             if (field_0x1c4)
-                field_0x34->UnknownFunction468dd0("RaceSound");
+                field_0x34->DisableByClassName("RaceSound");
             else
-                field_0x34->UnknownFunction468f10("RaceSound");
+                field_0x34->EnableByClassName("RaceSound");
         }
     }
     if (!ui)
@@ -419,7 +419,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
             return;
         menu->UnknownVirtualSlot4();
         menuIsOpen = 1;
-        field_0x34->UnknownFunction468dd0("RaceSound");
+        field_0x34->DisableByClassName("RaceSound");
     } else {
         if (!menuIsOpen)
             return;
@@ -433,7 +433,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
             current->UnknownVirtualSlot5();
         menuIsOpen = 0;
         if (sound)
-            field_0x34->UnknownFunction468f10("RaceSound");
+            field_0x34->EnableByClassName("RaceSound");
     }
 }
 

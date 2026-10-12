@@ -333,7 +333,7 @@ Game::~Game() {
 int Game::UnknownVirtualSlot15() {
     field_0x2d5_bit1 = 1;
     if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
-        g_UnknownGlobal56c470->UnknownFunction4691f0();
+        g_UnknownGlobal56c470->Unlink();
     g_UnknownStatic65b478.UnknownFunction4677c0();
     if (rootObject) {
         rootObject->Release();

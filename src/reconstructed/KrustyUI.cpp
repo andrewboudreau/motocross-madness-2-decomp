@@ -479,7 +479,7 @@ void KrustyUI::ShowScene(GameObject* parent) {
 // 0x00499a20
 void KrustyUI::HideScene() {
     if (garageScene) {
-        garageScene->UnknownFunction4691f0();
+        garageScene->Unlink();
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
     }
 }
@@ -611,7 +611,7 @@ void KrustyUI::OpenMenu(int menu) {
 
 // 0x0049a4a0: turns "MediaControl" on, hides the GUI and opens Exit1Dlg.
 void KrustyUI::OpenExitDialog() {
-    UnknownFunction468dd0("MediaControl");
+    DisableByClassName("MediaControl");
     gui->ShowCursors(0);
     gui->ShowDialog(new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
 }
@@ -917,7 +917,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
     }
     g_TrackGame->field_0x3400->UnknownFunction51f260(
         (short)g_TrackGame->mode.field_0x27f8.field_0x04, name,
-        g_TrackGame->mode.UnknownFunction524100());
+        g_TrackGame->mode.GetSelectedSeries());
 }
 
 // 0x0049b020

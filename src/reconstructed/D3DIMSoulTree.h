@@ -258,7 +258,7 @@ public:
     void UnknownFunction4444c0(int value);         // 0x004444c0
     void UnknownFunction4444e0();                  // 0x004444e0
     void UnknownFunction444a40(D3DIMSoultreeObject* source); // 0x00444a40
-    int UnknownFunction444c70(int index, const char* name, int a); // 0x00444c70
+    int ReplaceMaterialTexture(int index, const char* name, int a); // 0x00444c70
     void UnknownFunction444d00(int lod);           // 0x00444d00
     void UnknownFunction444d40(int lod);           // 0x00444d40
     void UnknownFunction444d60(float value);       // 0x00444d60

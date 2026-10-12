@@ -206,7 +206,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
         }
         track[n] = 0;
         for (;;) {
-            int directoryIndex = g_TrackGame->mode.UnknownFunction524100();
+            int directoryIndex = g_TrackGame->mode.GetSelectedSeries();
             sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, found,
                     g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
             FILE* file = fopen(path, "r");

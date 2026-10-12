@@ -334,11 +334,11 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     }
     if (TestInputEvent(0x3e, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0x6a8) {
-            UnknownFunction468dd0("RunwayLights");
-            UnknownFunction468dd0("VisualCue");
+            DisableByClassName("RunwayLights");
+            DisableByClassName("VisualCue");
         } else {
-            UnknownFunction468f10("RunwayLights");
-            UnknownFunction468f10("VisualCue");
+            EnableByClassName("RunwayLights");
+            EnableByClassName("VisualCue");
         }
         g_TrackGame->mode.field_0x6a8 = 1 - g_TrackGame->mode.field_0x6a8;
         ShowOnOffMessage(0x13b6, g_TrackGame->mode.field_0x6a8);
@@ -351,27 +351,27 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     }
     if (TestInputEvent(0x40, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0x6b8)
-            UnknownFunction468dd0("RadarOverlay");
+            DisableByClassName("RadarOverlay");
         else
-            UnknownFunction468f10("RadarOverlay");
+            EnableByClassName("RadarOverlay");
         g_TrackGame->mode.field_0x6b8 = 1 - g_TrackGame->mode.field_0x6b8;
         ShowOnOffMessage(0x1441, g_TrackGame->mode.field_0x6b8);
         return 1;
     }
     if (TestInputEvent(0x41, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.instrumentOverlayOn)
-            UnknownFunction468dd0("InstrumentOverlay");
+            DisableByClassName("InstrumentOverlay");
         else
-            UnknownFunction468f10("InstrumentOverlay");
+            EnableByClassName("InstrumentOverlay");
         g_TrackGame->mode.instrumentOverlayOn = 1 - g_TrackGame->mode.instrumentOverlayOn;
         ShowOnOffMessage(0x1416, g_TrackGame->mode.instrumentOverlayOn);
         return 1;
     }
     if (TestInputEvent(0x42, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.skyCubeOn)
-            UnknownFunction468dd0("SkyCube");
+            DisableByClassName("SkyCube");
         else
-            UnknownFunction468f10("SkyCube");
+            EnableByClassName("SkyCube");
         g_TrackGame->mode.skyCubeOn = 1 - g_TrackGame->mode.skyCubeOn;
         ShowOnOffMessage(0x1411, g_TrackGame->mode.skyCubeOn);
         ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_TrackGame->mode.skyCubeOn);
@@ -379,17 +379,17 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     }
     if (TestInputEvent(0x43, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0xa54) {
-            UnknownFunction468dd0("ParticleManager");
-            UnknownFunction468dd0("DirtParticleEmitter");
-            UnknownFunction468dd0("DustParticleEmitter");
-            UnknownFunction468dd0("DirtChunkParticleEmitter");
-            UnknownFunction468dd0("SteamParticleEmitter");
+            DisableByClassName("ParticleManager");
+            DisableByClassName("DirtParticleEmitter");
+            DisableByClassName("DustParticleEmitter");
+            DisableByClassName("DirtChunkParticleEmitter");
+            DisableByClassName("SteamParticleEmitter");
         } else {
-            UnknownFunction468f10("ParticleManager");
-            UnknownFunction468f10("DirtParticleEmitter");
-            UnknownFunction468f10("DustParticleEmitter");
-            UnknownFunction468f10("DirtChunkParticleEmitter");
-            UnknownFunction468f10("SteamParticleEmitter");
+            EnableByClassName("ParticleManager");
+            EnableByClassName("DirtParticleEmitter");
+            EnableByClassName("DustParticleEmitter");
+            EnableByClassName("DirtChunkParticleEmitter");
+            EnableByClassName("SteamParticleEmitter");
         }
         g_TrackGame->mode.field_0xa54 = 1 - g_TrackGame->mode.field_0xa54;
         ShowOnOffMessage(0x140f, g_TrackGame->mode.field_0xa54);
@@ -397,13 +397,13 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     }
     if (TestInputEvent(0x44, 0, event, 0x80000000)) {
         if (g_TrackGame->mode.field_0xa50) {
-            UnknownFunction468dd0("ProjectedShadow");
-            UnknownFunction468dd0("TerrainShadow");
-            UnknownFunction468dd0("D3DIMSoultreeShadow");
+            DisableByClassName("ProjectedShadow");
+            DisableByClassName("TerrainShadow");
+            DisableByClassName("D3DIMSoultreeShadow");
         } else {
-            UnknownFunction468f10("ProjectedShadow");
-            UnknownFunction468f10("TerrainShadow");
-            UnknownFunction468f10("D3DIMSoultreeShadow");
+            EnableByClassName("ProjectedShadow");
+            EnableByClassName("TerrainShadow");
+            EnableByClassName("D3DIMSoultreeShadow");
         }
         g_TrackGame->mode.field_0xa50 = 1 - g_TrackGame->mode.field_0xa50;
         ShowOnOffMessage(0x1410, g_TrackGame->mode.field_0xa50);

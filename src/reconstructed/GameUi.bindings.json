@@ -271,7 +271,7 @@
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction464e90@GUIManager@@QAEXXZ": "0x00464e90",
-  "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
+  "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
   "?UnknownFunction46a840@UIDialog@@QAEPAVUIControl@@PAV2@HH@Z": "0x0046a840",
   "?UnknownFunction46a920@UIDialog@@QAEHPAXH@Z": "0x0046a920",
   "?UnknownFunction46ea60@UIDialog@@QAEXH@Z": "0x0046ea60",

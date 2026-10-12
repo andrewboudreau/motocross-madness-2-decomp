@@ -66,7 +66,7 @@
   "?RemoveVegetationInRect@EventManager@@QAEXMMMM@Z": "0x0045fce0",
   "?UnknownFunction45fdc0@EventManager@@QAEXMMMM@Z": "0x0045fdc0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
+  "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
   "?UnknownFunction46ebf0@UnknownGameUiPage@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",
   "?UnknownFunction46ff30@UnknownTrackGameObject56cItem@@QAEXH@Z": "0x0046ff30",
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",

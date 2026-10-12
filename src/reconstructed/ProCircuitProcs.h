@@ -60,7 +60,7 @@ int CompareRankPoints(const void* a, const void* b);
 // literals) applies the skin `name` with the game's textures.
 class UnknownProCircuitSkinned {
 public:
-    void UnknownFunction444c70(int a, const char* name, TextureMapManager** textures);
+    void ReplaceMaterialTexture(int a, const char* name, TextureMapManager** textures);
 };
 
 // RTTI: PCBonusTrackDlg : UIDialog (vtable 0x00557434; 0x7f58 bytes).

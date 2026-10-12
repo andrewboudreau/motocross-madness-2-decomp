@@ -201,7 +201,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
         UnknownTextureStream* archive = OpenSceneArchive(scene);
         if (archive) {
             archive->UnknownFunction461cb0(a, b);
-            block.UnknownFunction4b7220((UnknownParameterStream*)archive, scene, path, 0);
+            block.OpenFromArchives((UnknownParameterStream*)archive, scene, path, 0);
             block.SelectSection("SceneInfo");
             block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
             if (index) {
@@ -249,7 +249,7 @@ void UnknownTrackGameObject574::ReadCurrentSceneName(char* name, char* scene, in
     if (sceneDirectory[0]) {
         sprintf(path, "%s\\%s", sceneDirectory, scene);
         UnknownParameterBlock block;
-        block.UnknownFunction4b7220((UnknownParameterStream*)OpenSceneArchive(0), scene, path, 1);
+        block.OpenFromArchives((UnknownParameterStream*)OpenSceneArchive(0), scene, path, 1);
         block.SelectSection("SceneInfo");
         block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
         if (value) {
@@ -1126,7 +1126,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     if (!archive)
         return 0;
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
-    parameters.UnknownFunction4b7220((UnknownParameterStream*)archive, sceneManager->sceneFile,
+    parameters.OpenFromArchives((UnknownParameterStream*)archive, sceneManager->sceneFile,
                                      scenePath, 1);
     parameters.SelectSection("SceneInfo");
     if (logFile)
@@ -1430,7 +1430,7 @@ int Scene::CountObjects(int* count)
     UnknownSceneResourceManager resources;
     char message[0x204];
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
-    parameters.UnknownFunction4b7220((UnknownParameterStream*)archive, sceneManager->sceneFile,
+    parameters.OpenFromArchives((UnknownParameterStream*)archive, sceneManager->sceneFile,
                                      scenePath, 1);
     *count = 1;
     int found = parameters.SelectSection("StaticModels");
@@ -1514,7 +1514,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
         return 0;
     UnknownSceneResourceManager resources;
     sprintf(scenePath, "%s\\%s", sceneManager->sceneDirectory, sceneManager->sceneFile);
-    parameters.UnknownFunction4b7220((UnknownParameterStream*)archive, sceneManager->sceneFile,
+    parameters.OpenFromArchives((UnknownParameterStream*)archive, sceneManager->sceneFile,
                                      scenePath, 1);
     OpenResourceFiles();
     int i = 0;

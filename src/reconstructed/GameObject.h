@@ -48,10 +48,10 @@ public:
     // 0x00469190: appends `child` (and its later siblings) to the children,
     // sets their parent and `child`'s +0x1c; returns `child`.
     int AppendChild(GameObject* child, int value);
-    int UnknownFunction469130(GameObject* child); // 0x00469130 (KrustyUI 0x004988a0)
+    int AppendSibling(GameObject* child); // 0x00469130 (KrustyUI 0x004988a0)
     // 0x00469130 takes two arguments (ret 8); GUIManager.cpp passes -1 as the second.
-    int UnknownFunction469130(GameObject* child, int value);
-    int UnknownFunction469260(GameObject* parent, int value); // 0x00469260 (GUIManager.cpp)
+    int AppendSibling(GameObject* child, int value);
+    int InsertBefore(GameObject* parent, int value); // 0x00469260 (GUIManager.cpp)
     // 0x00469770: finds an object whose class list (+0x28) or RTTI name
     // matches `name`, among the children (mode 0), descendants (1),
     // siblings (2), parent (3) or ancestors (4). GUIManager.cpp passes 1,
@@ -59,25 +59,25 @@ public:
     GameObject* FindByClassName(int mode, const char* name);
     // 0x004691f0: unlinks this object from its siblings and parent and
     // recomputes the root's flags; returns 1 (0 while the global is set).
-    int UnknownFunction4691f0();
+    int Unlink();
     // 0x00469680: releases this object and every later sibling, back to front.
-    int UnknownFunction469680();
+    int ReleaseSiblings();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
     void AppendClassName(GameObject* object);
     // 0x004690c0: ORs `flags` into field_0x20 and propagates the result up
     // through every parent (each adds its own field_0x1C).
-    void UnknownFunction4690c0(unsigned int flags);
+    void AddFlags(unsigned int flags);
     // 0x00469100: recomputes field_0x20 from the children; returns it with
     // field_0x1C added.
-    unsigned int UnknownFunction469100();
+    unsigned int RecomputeFlags();
     // 0x00469c80: unlinks and releases every descendant marked with +0x25 bit 3.
-    void UnknownFunction469c80();
+    void ReleaseDetached();
 
 protected:
     // 0x00468dd0 / 0x00468f10: TrackGame turns the "RaceSound" child on and
     // off through these.
-    void UnknownFunction468dd0(const char* name);
-    void UnknownFunction468f10(const char* name);
+    void DisableByClassName(const char* name);
+    void EnableByClassName(const char* name);
 
     friend class GameObjectIterator; // gameobj.cpp walks the links and names
     friend class Game;      // reads the +0x25 bits of its DebugOverlay

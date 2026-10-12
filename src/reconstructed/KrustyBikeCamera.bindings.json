@@ -15,7 +15,7 @@
   "?GetPositionIn@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?ReplaceHeadMessage@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
-  "?UnknownFunction524100@TrackGameMode@@QAEHXZ": "0x00524100",
+  "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",
   "?UnknownVirtualSlot23@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
   "?UnknownVirtualSlot62@KrustyBikeCamera@@UAEXXZ": "0x00498280",
   "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",

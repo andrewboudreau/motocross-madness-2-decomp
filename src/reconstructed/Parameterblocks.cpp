@@ -16,7 +16,7 @@
 
 // Retail stops the scan at the first letter by setting the index to the
 // length (not with `break`).
-int UnknownFunction4b6f30(const char* text)
+int ClassifyParameterValue(const char* text)
 {
     int length = strlen(text);
     int hasLetter = 0;
@@ -39,9 +39,9 @@ int UnknownFunction4b6f30(const char* text)
 
 // The string case computes the size into a local before the call; passing
 // `strlen(text) + 1` directly schedules the pushes differently.
-void UnknownFunction4b6fb0(const char* text, UnknownParameterValue* value)
+void ParseParameterValue(const char* text, UnknownParameterValue* value)
 {
-    switch (value->type = UnknownFunction4b6f30(text)) {
+    switch (value->type = ClassifyParameterValue(text)) {
     case 2: {
         int size = strlen(text) + 1;
         value->s = (char*)DebugMalloc(size, __FILE__, 44);
@@ -59,7 +59,7 @@ void UnknownFunction4b6fb0(const char* text, UnknownParameterValue* value)
 
 // Retail copies the raw 32 bits for both numeric types (no float-to-int
 // conversion), in two separate case bodies.
-void UnknownFunction4b7040(UnknownParameterValue value, int* out)
+void ParameterValueToInt(UnknownParameterValue value, int* out)
 {
     char* end;
 
@@ -77,7 +77,7 @@ void UnknownFunction4b7040(UnknownParameterValue value, int* out)
 }
 
 // As above: both numeric types load the raw bits as a float.
-void UnknownFunction4b7080(UnknownParameterValue value, float* out)
+void ParameterValueToFloat(UnknownParameterValue value, float* out)
 {
     switch (value.type) {
     case 2:
@@ -92,7 +92,7 @@ void UnknownFunction4b7080(UnknownParameterValue value, float* out)
     }
 }
 
-void UnknownFunction4b70c0(UnknownParameterValue value, char* out)
+void ParameterValueToString(UnknownParameterValue value, char* out)
 {
     switch (value.type) {
     case 2:
@@ -132,7 +132,7 @@ UnknownParameterBlock::UnknownParameterBlock()
 // operator delete (for example 0x00445931).
 UnknownParameterBlock::~UnknownParameterBlock()
 {
-    UnknownFunction4b7890();
+    FreeLines();
     if (field_0x120) {
         DebugFree(field_0x120, __FILE__, 141);
         field_0x120 = 0;
@@ -152,7 +152,7 @@ UnknownParameterBlock::~UnknownParameterBlock()
 // The found call is written out in both branches: VC6 cross-jumps the two
 // copies into retail's single block, and the extra source reference of `this`
 // is what gives it ebx and `path` ebp (one copy swaps the two registers).
-void UnknownParameterBlock::UnknownFunction4b7220(UnknownParameterStream* stream,
+void UnknownParameterBlock::OpenFromArchives(UnknownParameterStream* stream,
                                                   const char* name, const char* path,
                                                   int index)
 {
@@ -179,7 +179,7 @@ void UnknownParameterBlock::UnknownFunction4b7220(UnknownParameterStream* stream
 // Scans forward for `[name]` and loads the section's non-empty,
 // non-comment lines. `lines` must be cleared before the line count and
 // capacity: other orders let VC6 keep a zero register for the whole function.
-int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
+int UnknownParameterBlock::ScanSection(const char* name)
 {
     char stripped[PB_LINE_SIZE];
     char line[PB_LINE_SIZE];
@@ -192,7 +192,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
     for (;;) {
         if (!field_0x000->ReadLine(line, PB_LINE_SIZE))
             return 0;
-        UnknownFunction4b8360(line, stripped);
+        StripBlanks(line, stripped);
         if (stripped[0] == '[') {
             int length = strcspn(stripped + 1, "]\n\r");
             strncpy(header, stripped + 1, length);
@@ -203,7 +203,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
     }
 
     if (field_0x12c)
-        UnknownFunction4b7890();
+        FreeLines();
     lines = 0;
     field_0x128 = 0;
     capacity = 0;
@@ -212,7 +212,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
     strncpy(field_0x130, name, length);
     field_0x130[length] = 0;
     while (field_0x000->ReadLine(line, PB_LINE_SIZE)) {
-        UnknownFunction4b8360(line, stripped);
+        StripBlanks(line, stripped);
         if (stripped[0] == '[')
             break;
         if (stripped[0] != 0 && stripped[0] != ';') {
@@ -237,7 +237,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
 
 // Records every new `[header]`: its stream position, mode byte and, once the
 // next header (or the end) is seen, its line count.
-void UnknownParameterBlock::UnknownFunction4b7560(UnknownParameterStream* stream)
+void UnknownParameterBlock::IndexSections(UnknownParameterStream* stream)
 {
     char header[PB_LINE_SIZE];
     char stripped[PB_LINE_SIZE];
@@ -245,12 +245,12 @@ void UnknownParameterBlock::UnknownFunction4b7560(UnknownParameterStream* stream
     int lineIndex = 0;
 
     while (stream->ReadLine(line, PB_LINE_SIZE)) {
-        UnknownFunction4b8360(line, stripped);
+        StripBlanks(line, stripped);
         if (stripped[0] == '[') {
             int length = strcspn(stripped + 1, "]\n\r");
             strncpy(header, stripped + 1, length);
             header[length] = 0;
-            if (UnknownFunction4b7830(header) == -1) {
+            if (FindSection(header) == -1) {
                 if (field_0x120) {
                     if (field_0x118 >= field_0x11c) {
                         field_0x11c += 10;
@@ -295,11 +295,11 @@ void UnknownParameterBlock::Attach(UnknownParameterStream* stream, int offset,
     }
     stream->Seek(stream->field_0x130 + field_0x124, 0, 0);
     if (index)
-        UnknownFunction4b7560(stream);
+        IndexSections(stream);
     field_0x530 = 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b7830(const char* name)
+int UnknownParameterBlock::FindSection(const char* name)
 {
     for (int i = 0; i < field_0x118; i++) {
         if (_stricmp(name, field_0x120[i].name) == 0)
@@ -308,7 +308,7 @@ int UnknownParameterBlock::UnknownFunction4b7830(const char* name)
     return -1;
 }
 
-void UnknownParameterBlock::UnknownFunction4b7890()
+void UnknownParameterBlock::FreeLines()
 {
     for (int i = 0; i < field_0x128; i++)
         delete field_0x12c[i];
@@ -329,15 +329,15 @@ int UnknownParameterBlock::SelectSection(const char* name)
     if (!field_0x120) {
         field_0x000->Seek(field_0x000->field_0x130 + field_0x124, 0, 0);
         field_0x000->UnknownFunction461d20();
-        return UnknownFunction4b72c0(name);
+        return ScanSection(name);
     }
-    int index = UnknownFunction4b7830(name);
+    int index = FindSection(name);
     if (index == -1)
         return 0;
     field_0x000->Seek(field_0x120[index].offset, 0, 0);
     field_0x000->UnknownFunction43e9b0(field_0x120[index].mode);
     if (field_0x12c)
-        UnknownFunction4b7890();
+        FreeLines();
     int count = field_0x120[index].lineCount;
     field_0x12c = new (__FILE__, 459) char*[count];
     field_0x128 = 0;
@@ -347,7 +347,7 @@ int UnknownParameterBlock::SelectSection(const char* name)
     field_0x130[length] = 0;
     for (int i = 0; i < count; i++) {
         field_0x000->ReadLine(line, PB_LINE_SIZE);
-        UnknownFunction4b8360(line, stripped);
+        StripBlanks(line, stripped);
         if (stripped[0] != 0 && stripped[0] != ';') {
             field_0x12c[field_0x128] = new (__FILE__, 471) char[PB_LINE_SIZE];
             strcpy(field_0x12c[field_0x128], stripped);
@@ -398,7 +398,7 @@ int UnknownParameterBlock::ReadString(const char* key, char* out, int size)
     return 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b7cf0(const char* key, int* out)
+int UnknownParameterBlock::ReadInt(const char* key, int* out)
 {
     char* end;
     char text[PB_LINE_SIZE];
@@ -434,7 +434,7 @@ int UnknownParameterBlock::UnknownFunction4b7cf0(const char* key, int* out)
     return 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b7e70(const char* key, float* out)
+int UnknownParameterBlock::ReadFloat(const char* key, float* out)
 {
     char text[PB_LINE_SIZE];
 
@@ -456,7 +456,7 @@ int UnknownParameterBlock::GetString(const char* key, const char* def, char* out
 
 int UnknownParameterBlock::GetInt(const char* key, int def, int* out)
 {
-    if (UnknownFunction4b7cf0(key, out))
+    if (ReadInt(key, out))
         return 1;
     *out = def;
     return 0;
@@ -464,17 +464,17 @@ int UnknownParameterBlock::GetInt(const char* key, int def, int* out)
 
 int UnknownParameterBlock::GetFloat(const char* key, float def, float* out)
 {
-    if (UnknownFunction4b7e70(key, out))
+    if (ReadFloat(key, out))
         return 1;
     *out = def;
     return 0;
 }
 
 // Retail looks the section up twice and uses the first result.
-int UnknownParameterBlock::UnknownFunction4b7f70(const char* name)
+int UnknownParameterBlock::BeginRows(const char* name)
 {
-    int index = UnknownFunction4b7830(name);
-    if (UnknownFunction4b7830(name) != -1) {
+    int index = FindSection(name);
+    if (FindSection(name) != -1) {
         field_0x000->Seek(field_0x120[index].offset, 0, 0);
         field_0x000->UnknownFunction43e9b0(field_0x120[index].mode);
         field_0x530 = 1;
@@ -484,7 +484,7 @@ int UnknownParameterBlock::UnknownFunction4b7f70(const char* name)
     return 0;
 }
 
-int UnknownParameterBlock::UnknownFunction4b8010(char* raw)
+int UnknownParameterBlock::ReadRow(char* raw)
 {
     char line[PB_LINE_SIZE];
     char stripped[PB_LINE_SIZE];
@@ -503,12 +503,12 @@ int UnknownParameterBlock::UnknownFunction4b8010(char* raw)
     field_0x000->ReadLine(line, PB_LINE_SIZE);
     if (raw)
         strcpy(raw, line);
-    UnknownFunction4b8360(line, stripped);
+    StripBlanks(line, stripped);
     UnknownTokenizer tokens(stripped);
     char* token = tokens.UnknownFunction515df0(",\n");
     field_0x540 = 0;
     while (token) {
-        UnknownFunction4b6fb0(token, &field_0x544[field_0x540]);
+        ParseParameterValue(token, &field_0x544[field_0x540]);
         token = tokens.UnknownFunction515df0(",\n");
         field_0x540++;
     }
@@ -518,31 +518,31 @@ int UnknownParameterBlock::UnknownFunction4b8010(char* raw)
 
 // The int and float getters accept index == count; the string getter does
 // not (retail's `jle` and `jl`).
-int UnknownParameterBlock::UnknownFunction4b8180(int index, int* out)
+int UnknownParameterBlock::GetRowInt(int index, int* out)
 {
     if (index > field_0x540)
         return 0;
-    UnknownFunction4b7040(field_0x544[index], out);
+    ParameterValueToInt(field_0x544[index], out);
     return 1;
 }
 
-int UnknownParameterBlock::UnknownFunction4b81c0(int index, float* out)
+int UnknownParameterBlock::GetRowFloat(int index, float* out)
 {
     if (index > field_0x540)
         return 0;
-    UnknownFunction4b7080(field_0x544[index], out);
+    ParameterValueToFloat(field_0x544[index], out);
     return 1;
 }
 
-int UnknownParameterBlock::UnknownFunction4b8200(int index, char* out)
+int UnknownParameterBlock::GetRowString(int index, char* out)
 {
     if (index >= field_0x540)
         return 0;
-    UnknownFunction4b70c0(field_0x544[index], out);
+    ParameterValueToString(field_0x544[index], out);
     return 1;
 }
 
-int UnknownParameterBlock::UnknownFunction4b8240(char* out, int size)
+int UnknownParameterBlock::GetSectionNames(char* out, int size)
 {
     int total = 0;
     char* cursor = out;
@@ -562,7 +562,7 @@ int UnknownParameterBlock::UnknownFunction4b8240(char* out, int size)
 
 // Drops blanks outside brackets and quotes. The declaration order puts
 // `length` in the dead `in` slot, as retail does.
-void UnknownParameterBlock::UnknownFunction4b8360(const char* in, char* out)
+void UnknownParameterBlock::StripBlanks(const char* in, char* out)
 {
     int count = 0;
     int quoted = 0;

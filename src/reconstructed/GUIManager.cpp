@@ -213,7 +213,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
             (new(__FILE__, 162) GUIInputDevice)
                 ->Bind(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
             -1);
-        mouseDevice->UnknownFunction469260(dialogContainer, -1);
+        mouseDevice->InsertBefore(dialogContainer, -1);
         mouseDevice->Rebind();
     }
     if (controls->keyboard) {
@@ -221,7 +221,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
             (new(__FILE__, 169) GUIInputDevice)
                 ->Bind(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
             -1);
-        keyboardDevice->UnknownFunction469260(dialogContainer, -1);
+        keyboardDevice->InsertBefore(dialogContainer, -1);
         keyboardDevice->Rebind();
     }
     if (controls->joystickCount) {
@@ -231,7 +231,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
                     ->Bind(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
                            2.0f),
                 -1);
-            joystickDevices[i]->UnknownFunction469260(dialogContainer, -1);
+            joystickDevices[i]->InsertBefore(dialogContainer, -1);
             joystickDevices[i]->Rebind();
         }
     }
@@ -350,7 +350,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
 
     dialog->UnknownFunction46ea60(0);
     if (dialog->parentDialog && (dialog->field_0x144 & 1))
-        dialog->parentDialog->controlContainer->UnknownFunction469130(dialog, -1);
+        dialog->parentDialog->controlContainer->AppendSibling(dialog, -1);
     else
         dialogContainer->AppendChild(dialog, -1);
     dialog->UnknownVirtualSlot28(a);
@@ -433,7 +433,7 @@ void GUIManager::CreateBackground() {
         return;
     guiBackground = (BackgroundImage*)AppendChild(
         (new(__FILE__, 672) BackgroundImage(1))->UnknownVirtualSlot8(field_0x18), -1);
-    guiBackground->UnknownFunction469260(dialogContainer, -1);
+    guiBackground->InsertBefore(dialogContainer, -1);
     ownsBackground = 1;
     UnknownFunction4865e0(0, 1);
     for (i = 0; i < userCount; i++)
@@ -1092,7 +1092,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
             if (!image)
                 image = cursorImage;
-            userCursor = (GUICursor*)UnknownFunction469130(
+            userCursor = (GUICursor*)AppendSibling(
                 (new(__FILE__, 1898) GUICursor(visible))
                     ->UnknownFunction43eaf0(field_0x18, image, userGui->guiTextures, userGui->guiBackground,
                                             palette, userGui->guiPalette),

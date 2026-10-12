@@ -656,12 +656,12 @@ void TrackGameMode::LoadBonusTrackNames() {
 }
 
 // 0x005240e0
-void TrackGameMode::UnknownFunction5240e0(int series) {
+void TrackGameMode::SelectSeries(int series) {
     field_0x27f8.field_0x08 = series;
     currentSeriesDirectory = (int)seriesDirectories[series];
 }
 
 // 0x00524100
-int TrackGameMode::UnknownFunction524100() {
+int TrackGameMode::GetSelectedSeries() {
     return field_0x27f8.field_0x08;
 }

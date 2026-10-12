@@ -265,7 +265,7 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
             g_TrackGame->mode.field_0x27f8.field_0x20 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
             g_TrackGame->mode.field_0x27f8.field_0x24 = circuit->field_0x460 - 1;
             g_TrackGame->mode.field_0x27f8.field_0x10 = 1;
-            g_TrackGame->mode.UnknownFunction5240e0(circuit->field_0x40);
+            g_TrackGame->mode.SelectSeries(circuit->field_0x40);
             strcpy(text, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
             char* extension = strrchr(text, '.');
             if (extension)

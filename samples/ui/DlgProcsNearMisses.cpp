@@ -538,7 +538,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
                 fread(&header, sizeof(header), 1, file);
                 fclose(file);
                 g_TrackGame->mode.field_0x27f8 = header.field_0x34;
-                g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x04);
+                g_TrackGame->mode.SelectSeries(g_TrackGame->mode.field_0x27f8.field_0x04);
                 g_TrackGame->field_0x3428 = 1;
                 g_TrackGame->field_0x342c = 1;
                 UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;

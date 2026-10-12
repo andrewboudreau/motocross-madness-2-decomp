@@ -946,23 +946,23 @@ void EventManager::UnknownFunction45cdc0(int mode) {
         }
     }
     if (g_TrackGame->field_0x558) {
-        g_TrackGame->field_0x558->UnknownFunction4691f0();
+        g_TrackGame->field_0x558->Unlink();
         g_TrackGame->field_0x558->Release();
         g_TrackGame->field_0x558 = 0;
     } else if (g_TrackGame->field_0x55c) {
-        g_TrackGame->field_0x55c->UnknownFunction4691f0();
+        g_TrackGame->field_0x55c->Unlink();
         g_TrackGame->field_0x55c->Release();
         g_TrackGame->field_0x55c = 0;
     } else if (g_TrackGame->field_0x560) {
-        g_TrackGame->field_0x560->UnknownFunction4691f0();
+        g_TrackGame->field_0x560->Unlink();
         g_TrackGame->field_0x560->Release();
         g_TrackGame->field_0x560 = 0;
     } else if (g_TrackGame->field_0x564) {
-        g_TrackGame->field_0x564->UnknownFunction4691f0();
+        g_TrackGame->field_0x564->Unlink();
         g_TrackGame->field_0x564->Release();
         g_TrackGame->field_0x564 = 0;
     } else if (g_TrackGame->field_0x568) {
-        g_TrackGame->field_0x568->UnknownFunction4691f0();
+        g_TrackGame->field_0x568->Unlink();
         g_TrackGame->field_0x568->Release();
         g_TrackGame->field_0x568 = 0;
     }

@@ -211,7 +211,7 @@ void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
         control->SetTextAlign(10);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x958);
         field_0x7f58 = 0;
-        g_TrackGame->mode.UnknownFunction5240e0(0);
+        g_TrackGame->mode.SelectSeries(0);
         ShowTab(event, field_0x7f58);
         FillLists(event, field_0x7f58);
         field_0x7f5c = 0;
@@ -385,7 +385,7 @@ void TrackRecordDlg::UnknownFunction51ff40()
 void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
 {
     char text[128];
-    g_TrackGame->mode.UnknownFunction5240e0(field_0x7f58);
+    g_TrackGame->mode.SelectSeries(field_0x7f58);
     LabelTabs(field_0x7f58);
     UIListBox* control = static_cast<UIListBox*>(FindControl("TxtTrack", 12));
     g_TrackGame->LoadResourceString(0xbc6, text, 128);

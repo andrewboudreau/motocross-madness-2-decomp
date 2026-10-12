@@ -361,19 +361,19 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c != 0) {
                                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
                                 }
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("SoundGroup");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("SoundGroup");
                             }
                             if (g_TrackGame->mode.field_0xa54) {
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("ParticleManager");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("DirtParticleEmitter");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("DustParticleEmitter");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("DirtChunkParticleEmitter");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("SteamParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("ParticleManager");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("DirtParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("DustParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("DirtChunkParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("SteamParticleEmitter");
                             }
                             if (g_TrackGame->mode.field_0xa50) {
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("ProjectedShadow");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("TerrainShadow");
-                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468f10("D3DIMSoultreeShadow");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("ProjectedShadow");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("TerrainShadow");
+                                ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->EnableByClassName("D3DIMSoultreeShadow");
                             }
                         }
                     } else if (field_0x1e0 != replayMode) {
@@ -381,15 +381,15 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c != 0) {
                             g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot4();
                         }
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("SoundGroup");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("ParticleManager");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("DirtParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("DustParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("DirtChunkParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("SteamParticleEmitter");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("ProjectedShadow");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("TerrainShadow");
-                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->UnknownFunction468dd0("D3DIMSoultreeShadow");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("SoundGroup");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("ParticleManager");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("DirtParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("DustParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("DirtChunkParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("SteamParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("ProjectedShadow");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("TerrainShadow");
+                        ((UnknownBikeRaceRoot*)g_TrackGame->field_0x34)->DisableByClassName("D3DIMSoultreeShadow");
                     }
                 }
                 if (!g_TrackGame->field_0x3428 && isRacing) {
@@ -1378,7 +1378,7 @@ void BikeRace::UnknownFunction420b00(char* path, char* description) {
         if (path != 0) {
             CopyFileA("VCRtape.dat", path, 1);
         }
-        replayVcr->UnknownFunction4691f0();
+        replayVcr->Unlink();
         replayVcr->Release();
         replayVcr = 0;
         g_TrackGame->ui->replayAvailable = 1;
@@ -1388,7 +1388,7 @@ void BikeRace::UnknownFunction420b00(char* path, char* description) {
 // 0x00420bd0
 void BikeRace::RestartReplay() {
     if (ghostVcr != 0) {
-        ghostVcr->UnknownFunction4691f0();
+        ghostVcr->Unlink();
         ghostVcr->Release();
         ghostVcr = 0;
     }
@@ -1396,7 +1396,7 @@ void BikeRace::RestartReplay() {
         return;
     }
     if (localRacer->field_0x7a0 == 1 && field_0x189) {
-        replayVcr->UnknownFunction4691f0();
+        replayVcr->Unlink();
         replayVcr->Release();
         replayLength = 0;
     } else {
@@ -1407,7 +1407,7 @@ void BikeRace::RestartReplay() {
         GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
         sprintf(description, "%s %s", date, time);
         replayVcr->SaveRecording(localRacer->field_0x74c, description, 0);
-        replayVcr->UnknownFunction4691f0();
+        replayVcr->Unlink();
         replayVcr->Release();
         if (replayLength <= field_0x1c8) {
             field_0x1c8 = replayLength;

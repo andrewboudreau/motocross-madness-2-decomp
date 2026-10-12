@@ -204,12 +204,12 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                     modelVertexCount[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
                 modelIndices[lod] = (unsigned short*)(modelVertices[lod] + modelVertexCount[lod]);
                 sprintf(section, "LOD %d - Surface 0 - Vertices", lod);
-                block->UnknownFunction4b7f70(section);
+                block->BeginRows(section);
                 for (i = 0; i < modelVertexCount[lod]; i++) {
-                    block->UnknownFunction4b8010(0);
-                    block->UnknownFunction4b81c0(0, &modelVertices[lod][i].position.x);
-                    block->UnknownFunction4b81c0(1, &modelVertices[lod][i].position.y);
-                    block->UnknownFunction4b81c0(2, &modelVertices[lod][i].position.z);
+                    block->ReadRow(0);
+                    block->GetRowFloat(0, &modelVertices[lod][i].position.x);
+                    block->GetRowFloat(1, &modelVertices[lod][i].position.y);
+                    block->GetRowFloat(2, &modelVertices[lod][i].position.z);
                     if (modelVertices[lod][i].position.y > maxY)
                         maxY = modelVertices[lod][i].position.y;
                     if (modelVertices[lod][i].position.y < minY)
@@ -218,22 +218,22 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                         maxX = modelVertices[lod][i].position.x;
                     if (modelVertices[lod][i].position.x < minX)
                         minX = modelVertices[lod][i].position.x;
-                    block->UnknownFunction4b81c0(3, &modelVertices[lod][i].normal.x);
-                    block->UnknownFunction4b81c0(4, &modelVertices[lod][i].normal.y);
-                    block->UnknownFunction4b81c0(5, &modelVertices[lod][i].normal.z);
-                    block->UnknownFunction4b81c0(6, &modelVertices[lod][i].tu);
-                    block->UnknownFunction4b81c0(7, &modelVertices[lod][i].tv);
+                    block->GetRowFloat(3, &modelVertices[lod][i].normal.x);
+                    block->GetRowFloat(4, &modelVertices[lod][i].normal.y);
+                    block->GetRowFloat(5, &modelVertices[lod][i].normal.z);
+                    block->GetRowFloat(6, &modelVertices[lod][i].tu);
+                    block->GetRowFloat(7, &modelVertices[lod][i].tv);
                     if (modelVertices[lod][i].tv < 0.0f)
                         modelVertices[lod][i].tv = modelVertices[lod][i].tv + 1.0f;
                 }
                 sprintf(section, "LOD %i - Surface 0 - Faces", lod);
-                block->UnknownFunction4b7f70(section);
+                block->BeginRows(section);
                 unsigned short* index = modelIndices[lod];
                 for (i = 0; i < modelIndexCount[lod] / 3; i++) {
-                    block->UnknownFunction4b8010(0);
-                    block->UnknownFunction4b8180(0, &a);
-                    block->UnknownFunction4b8180(1, &b);
-                    block->UnknownFunction4b8180(2, &c);
+                    block->ReadRow(0);
+                    block->GetRowInt(0, &a);
+                    block->GetRowInt(1, &b);
+                    block->GetRowInt(2, &c);
                     *index++ = (unsigned short)a;
                     *index++ = (unsigned short)b;
                     *index++ = (unsigned short)c;

@@ -1023,12 +1023,12 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         AppendChild(localRacer, -1);
         char ownBikeTexture[0x40];
         g_TrackGame->ui->UnknownFunction49b560(circuit->field_0x465[0].field_0x78, ownBikeTexture, 0x3f);
-        localRacer->field_0x3bc->UnknownFunction444c70(0, ownBikeTexture, (int)textures);
+        localRacer->field_0x3bc->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
         if (!(circuit->field_0x464 & 2)) {
             char ownRiderTexture[0x40];
             g_TrackGame->ui->UnknownFunction49b7f0(circuit->field_0x465[0].field_0xb8, ownRiderTexture,
                                                              0x3f);
-            localRacer->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, ownRiderTexture, (int)textures);
+            localRacer->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
         }
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 1) {
             id = 1;
@@ -1064,8 +1064,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                           racer->field_0xf8, 0, id, &setup, 1, 1, field_0x054,
                                                           raceScene, replayVcr, skill, 1);
                 AppendChild(aiRacers[n - 1], -1);
-                aiRacers[n - 1]->field_0x3bc->UnknownFunction444c70(0, racer->field_0x78, (int)textures);
-                aiRacers[n - 1]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, racer->field_0xb8,
+                aiRacers[n - 1]->field_0x3bc->ReplaceMaterialTexture(0, racer->field_0x78, (int)textures);
+                aiRacers[n - 1]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, racer->field_0xb8,
                                                                                      (int)textures);
                 id++;
             }
@@ -1166,8 +1166,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j]->field_0x5f0->field_0x68 = 1;
                 racerSlots[j]->field_0x5f4->field_0x68 = 1;
             }
-            racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, ownBikeTexture, (int)textures);
-            racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, ownRiderTexture, (int)textures);
+            racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
+            racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
             racerSlots[j]->plateNumber = g_TrackGame->mode.field_0x1bcc;
             if (replayVcr && g_TrackGame->field_0x342c && !g_TrackGame->field_0x3428) {
                 replayVcr->UnknownFunction49c070(playerId, 0, recordIndex++, g_TrackGame->mode.field_0x00,
@@ -1209,12 +1209,12 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
             g_TrackGame->ui->UnknownFunction49b560(slots[j].field_0x40, bikeTexture, 0x3f);
-            racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+            racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
             if (g_TrackGame->GetRegistryInt("MPR", 0) == 123 && slots[j].field_0xf4) {
-                racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, "MPR.tga", (int)textures);
+                racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, "MPR.tga", (int)textures);
             } else {
                 g_TrackGame->ui->UnknownFunction49b7f0(slots[j].field_0x80, riderTexture, 0x3f);
-                racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
             }
             if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
@@ -1260,8 +1260,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
-            racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, slots[j].field_0x40, (int)textures);
-            racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, slots[j].field_0x80, (int)textures);
+            racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, slots[j].field_0x40, (int)textures);
+            racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, slots[j].field_0x80, (int)textures);
             if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
                 racerSlots[j]->field_0x5f0->field_0x68 = 1;
@@ -1300,8 +1300,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             Release();
             return 0;
         }
-        localRacer->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
-        localRacer->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+        localRacer->field_0x3bc->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
+        localRacer->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
         if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
             localRacer->field_0x128->field_0x68 = 1;
             localRacer->field_0x5f0->field_0x68 = 1;
@@ -1422,26 +1422,26 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     char text[0x40];
                     COPY_TEXT(text, bikeTexture, 0x40);
                     g_TrackGame->ui->UnknownFunction49b560(text, bikeTexture, 0x3f);
-                    aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+                    aiRacers[n]->field_0x3bc->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
                     COPY_TEXT(text, riderTexture, 0x40);
                     g_TrackGame->ui->UnknownFunction49b7f0(text, riderTexture, 0x3f);
-                    aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                    aiRacers[n]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
                     aiRacers[n]->plateNumber = plate;
                     recordIndex++;
                 } else if (fromEvent) {
                     g_TrackGame->ui->UnknownFunction49b560(eventAi[n].bikeTexture, bikeTexture, 0x3f);
-                    aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+                    aiRacers[n]->field_0x3bc->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
                     g_TrackGame->ui->UnknownFunction49b7f0(eventAi[n].riderTexture, riderTexture, 0x3f);
-                    aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                    aiRacers[n]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
                     aiRacers[n]->plateNumber = plate;
                 } else {
                     UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes;
                     UnknownBikeRaceUiModel* riderModels = (UnknownBikeRaceUiModel*)g_TrackGame->ui->riders;
                     g_TrackGame->ui->UnknownFunction49b560(choices[bikes[n]].bikeName, bikeTexture, 0x3f);
-                    aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+                    aiRacers[n]->field_0x3bc->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
                     g_TrackGame->ui->UnknownFunction49b7f0(riderModels[riders[n]].field_0x40, riderTexture,
                                                                      0x3f);
-                    aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                    aiRacers[n]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
                     aiRacers[n]->plateNumber = plate;
                 }
                 if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
@@ -1503,8 +1503,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                            -1)) {
                     sprintf(message, "Net Bike%d not loaded\n", j);
                 }
-                racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, slots[j].field_0x40, (int)textures);
-                racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, slots[j].field_0x80, (int)textures);
+                racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, slots[j].field_0x40, (int)textures);
+                racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, slots[j].field_0x80, (int)textures);
                 if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
                     racerSlots[j]->field_0x128->field_0x68 = 1;
                     racerSlots[j]->field_0x5f0->field_0x68 = 1;

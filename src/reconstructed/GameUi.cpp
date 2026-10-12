@@ -3897,10 +3897,10 @@ void UIDropDownList::SetOpen(int open) {
         ownerDialog->controlContainer->AppendChild(scrollBarPart, -1);
         listPart->UpdateScrollBars();
     } else if (isOpen && !open) {
-        staticPart0->UnknownFunction4691f0();
-        staticPart1->UnknownFunction4691f0();
-        listPart->UnknownFunction4691f0();
-        scrollBarPart->UnknownFunction4691f0();
+        staticPart0->Unlink();
+        staticPart1->Unlink();
+        listPart->Unlink();
+        scrollBarPart->Unlink();
         if (ownerDialog->dialogBackground)
             ownerDialog->dialogBackground->MarkAllDirty();
     }

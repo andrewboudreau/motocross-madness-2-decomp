@@ -383,7 +383,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                sizeof(g_TrackGame->mode.field_0x1a3c));
         g_TrackGame->mode.field_0x94 = g_TrackGame->mode.field_0x98;
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x04);
+        g_TrackGame->mode.SelectSeries(g_TrackGame->mode.field_0x27f8.field_0x04);
         if (openingMenu == 0x88e) {
             static_cast<UIRadioButton*>(FindControl("RaceInfoTab", 4))->SelectInGroup(0);
             OpenPage(2);
@@ -759,7 +759,7 @@ void SPEventDlg::ApplyEventType() {
     int type = types->GetRowData(-1);
     UnknownTrackGameModeSettings& settings = g_TrackGame->mode.field_0x27f8;
     settings.field_0x04 = type;
-    g_TrackGame->mode.UnknownFunction5240e0(type);
+    g_TrackGame->mode.SelectSeries(type);
     UIListBox* modes = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
     int row = ((UIListBox*)modes)->FindRowByData(4);
     if (type == 0) {
@@ -801,15 +801,15 @@ void SPEventDlg::ApplyEventType() {
         laps->SelectRowByData((int)g_TrackGame->mode.field_0x27f8.field_0x140);
     }
     if (settings.field_0x04 == 0) {
-        g_TrackGame->mode.UnknownFunction5240e0(0);
+        g_TrackGame->mode.SelectSeries(0);
         FillTrackList(1, "PictureBox", "DDLTextBox", 0, this, 0);
-        g_TrackGame->mode.UnknownFunction5240e0(5);
+        g_TrackGame->mode.SelectSeries(5);
         FillTrackList(1, "PictureBox", "DDLTextBox", 0, this, 1);
     } else {
         FillTrackList(1, "PictureBox", "DDLTextBox", 0, this, 0);
     }
     UpdateBoundValues(0);
-    g_TrackGame->mode.UnknownFunction5240e0(type);
+    g_TrackGame->mode.SelectSeries(type);
     UIListBox* tracks = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
     tracks->SelectRowByText(g_TrackGame->mode.trackNames[type]);
 }
@@ -836,7 +836,7 @@ void SPEventDlg::SyncValues(int apply) {
             strncpy(settings->trackName, name, count);
             settings->trackName[count] = 0;
         }
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
+        g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
         settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
         g_TrackGame->mode.trackIndices[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
@@ -1157,7 +1157,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[list->GetRowData(-1)];
         ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].field_0xc0->plateTexture)
-            ->UnknownFunction444c70(0, bike->field_0x48, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, bike->field_0x48, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }
     if (riderChanged) {
@@ -1165,7 +1165,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
         ((UnknownModelTexture*)ui->riderPreview->plateTexture)
-            ->UnknownFunction444c70(0, rider->modelName, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->field_0x1c);
         riderChanged = 0;
     }
     return result;
@@ -1887,8 +1887,8 @@ void CreditsVidDlg::HandleEvent(UnknownDialogEvent* event) {
         area.bottom = 480;
         movieControl = new(__FILE__, 4108) UIVideoStatic(0, &area, this);
         AddControl(movieControl, 0, 1);
-        movieControl->UnknownFunction4691f0();
-        movieControl->UnknownFunction469260(FindControl("Back", 0), -1);
+        movieControl->Unlink();
+        movieControl->InsertBefore(FindControl("Back", 0), -1);
         if (!movieControl->PlayMovie("ui\\Credits.avi", 1, CloseDialogCallback, this))
             EndDialog(0);
         break;
@@ -2275,7 +2275,7 @@ int GhostFilesDlg::AddGhostFile(const char* path) {
             UIListBox* rider = static_cast<UIListBox*>(FindControl("LstRider", 3));
             UIListBox* length = static_cast<UIListBox*>(FindControl("LstLength", 3));
             UIListBox* description = static_cast<UIListBox*>(FindControl("LstDesc", 3));
-            g_TrackGame->mode.UnknownFunction5240e0(header.series);
+            g_TrackGame->mode.SelectSeries(header.series);
             g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                               header.trackName, "env", env);
             g_TrackGame->sceneObject->SetSceneDirectory(env);
@@ -2302,7 +2302,7 @@ void GhostFilesDlg::RaceSelectedGhost() {
     memcpy(&g_TrackGame->mode.field_0x27f8, &header->eventType, sizeof(g_TrackGame->mode.savedSettings));
     COPY_TEXT(g_TrackGame->mode.ghostFile, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->UnknownVirtualSlot26();
-    g_TrackGame->mode.UnknownFunction5240e0(header->series);
+    g_TrackGame->mode.SelectSeries(header->series);
     LeaveMenusForRace();
 }
 
@@ -2430,7 +2430,7 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
             UIListBox* laps = static_cast<UIListBox*>(FindControl("LstLaps", 3));
             UIListBox* length = static_cast<UIListBox*>(FindControl("LstLength", 3));
             UIListBox* description = static_cast<UIListBox*>(FindControl("LstDesc", 3));
-            g_TrackGame->mode.UnknownFunction5240e0(header.series);
+            g_TrackGame->mode.SelectSeries(header.series);
             g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.currentSeriesDirectory,
                                                               header.trackName, "env", env);
             g_TrackGame->sceneObject->SetSceneDirectory(env);
@@ -2477,7 +2477,7 @@ void ReplayFilesDlg::PlaySelectedReplay() {
     UIListBox* list = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
     memcpy(&g_TrackGame->mode.field_0x27f8, &header->eventType, sizeof(g_TrackGame->mode.savedSettings));
-    g_TrackGame->mode.UnknownFunction5240e0(header->series);
+    g_TrackGame->mode.SelectSeries(header->series);
     g_TrackGame->field_0x3428 = 1;
     g_TrackGame->field_0x342c = 1;
     *(int*)&g_TrackGame->mode.field_0xfd8[0] = header->engineSize;

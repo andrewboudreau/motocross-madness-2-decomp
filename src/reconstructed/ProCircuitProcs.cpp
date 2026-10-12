@@ -461,7 +461,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
                 g_TrackGame->mode.field_0x27f8.field_0x00 = 0;
                 g_TrackGame->mode.field_0x27f8.field_0x24 = 0;
             }
-            g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x04);
+            g_TrackGame->mode.SelectSeries(g_TrackGame->mode.field_0x27f8.field_0x04);
             char name[128];
             strcpy(name, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
             char* extension = strrchr(name, '.');
@@ -1203,7 +1203,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
         int bike = list->GetRowData(-1);
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)ui->bikes)[bike];
         ((UnknownProCircuitSkinned*)((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].field_0xc0->plateTexture)
-            ->UnknownFunction444c70(0, entry->field_0x48, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, entry->field_0x48, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }
     if (riderChanged) {
@@ -1211,7 +1211,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
         ((UnknownProCircuitSkinned*)ui->riderPreview->plateTexture)
-            ->UnknownFunction444c70(0, rider->modelName, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->field_0x1c);
         riderChanged = 0;
     }
     return UIDialog::UnknownVirtualSlot13();

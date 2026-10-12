@@ -279,8 +279,8 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
         parameters.Attach((UnknownParameterStream*)stream, 0, 1);
         parameters.SelectSection(section);
 
-        parameters.UnknownFunction4b7cf0("TotalIdle", &idleCount[k]);
-        parameters.UnknownFunction4b7cf0("TotalIdle", &count);
+        parameters.ReadInt("TotalIdle", &idleCount[k]);
+        parameters.ReadInt("TotalIdle", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -295,7 +295,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalLowTorque", &count);
+        parameters.ReadInt("TotalLowTorque", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -310,7 +310,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalMidTorque", &count);
+        parameters.ReadInt("TotalMidTorque", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -325,7 +325,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalHighTorque", &count);
+        parameters.ReadInt("TotalHighTorque", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -340,7 +340,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalPowerBand", &count);
+        parameters.ReadInt("TotalPowerBand", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -355,7 +355,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalDecel", &count);
+        parameters.ReadInt("TotalDecel", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -370,7 +370,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalSputter", &count);
+        parameters.ReadInt("TotalSputter", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -385,7 +385,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             }
         }
 
-        parameters.UnknownFunction4b7cf0("TotalRev", &count);
+        parameters.ReadInt("TotalRev", &count);
         if (count > 1) {
             count /= sampleDivisor[k];
             if (count < 1)
@@ -519,8 +519,8 @@ void RaceSound::AssignChannels() {
     if (g_TrackGame->mode.field_0x23a4)
         PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
 
-    if (g_TrackGame->mode.UnknownFunction524100() == 3 ||
-        g_TrackGame->mode.UnknownFunction524100() == 4) {
+    if (g_TrackGame->mode.GetSelectedSeries() == 3 ||
+        g_TrackGame->mode.GetSelectedSeries() == 4) {
         environment.environment = 9;
         environment.volume = 0.361f;
         environment.decayTime = 7.0f;
@@ -536,7 +536,7 @@ void RaceSound::AssignChannels() {
     SoundSystem()->SetEAXListenerParameters(&environment);
     SoundSystem()->CommitListenerSettings();
     if (!g_TrackGame->mode.field_0xa28)
-        g_TrackGame->field_0x34->UnknownFunction468dd0("SoundGroup");
+        g_TrackGame->field_0x34->DisableByClassName("SoundGroup");
 }
 
 // 0x004e3730: moves the listener and every racer's engine sound to their
@@ -860,7 +860,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 break;
             g_TrackGame->mode.field_0xa28 = !g_TrackGame->mode.field_0xa28;
             if (g_TrackGame->mode.field_0xa28) {
-                g_TrackGame->field_0x34->UnknownFunction468f10("SoundGroup");
+                g_TrackGame->field_0x34->EnableByClassName("SoundGroup");
                 if (engineGroup)
                     engineGroup->UnknownVirtualSlot16(0);
                 if (field_0x40)
@@ -878,7 +878,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
             } else {
-                g_TrackGame->field_0x34->UnknownFunction468dd0("SoundGroup");
+                g_TrackGame->field_0x34->DisableByClassName("SoundGroup");
                 if (engineGroup)
                     engineGroup->UnknownVirtualSlot16(1);
                 if (field_0x40)

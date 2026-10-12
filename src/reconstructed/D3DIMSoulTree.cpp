@@ -347,24 +347,24 @@ int D3DIMSoultreeObject::ReadLods()
             surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x226);
             surface->uvs = (UnknownSoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x227);
             sprintf(section, "LOD %i - Surface %i - Vertices", lod, s);
-            parameterBlock->UnknownFunction4b7f70(section);
+            parameterBlock->BeginRows(section);
             int v;
             for (v = 0; v < surface->vertexCount; v++) {
                 float red;
                 float green;
                 float blue;
-                parameterBlock->UnknownFunction4b8010(0);
-                parameterBlock->UnknownFunction4b81c0(0, &surface->drawnVertices[v].position.x);
-                parameterBlock->UnknownFunction4b81c0(1, &surface->drawnVertices[v].position.y);
-                parameterBlock->UnknownFunction4b81c0(2, &surface->drawnVertices[v].position.z);
-                parameterBlock->UnknownFunction4b81c0(3, &surface->normals[v].x);
-                parameterBlock->UnknownFunction4b81c0(4, &surface->normals[v].y);
-                parameterBlock->UnknownFunction4b81c0(5, &surface->normals[v].z);
-                parameterBlock->UnknownFunction4b81c0(6, &surface->drawnVertices[v].tu);
-                parameterBlock->UnknownFunction4b81c0(7, &surface->drawnVertices[v].tv);
-                parameterBlock->UnknownFunction4b81c0(12, &red);
-                parameterBlock->UnknownFunction4b81c0(13, &green);
-                parameterBlock->UnknownFunction4b81c0(14, &blue);
+                parameterBlock->ReadRow(0);
+                parameterBlock->GetRowFloat(0, &surface->drawnVertices[v].position.x);
+                parameterBlock->GetRowFloat(1, &surface->drawnVertices[v].position.y);
+                parameterBlock->GetRowFloat(2, &surface->drawnVertices[v].position.z);
+                parameterBlock->GetRowFloat(3, &surface->normals[v].x);
+                parameterBlock->GetRowFloat(4, &surface->normals[v].y);
+                parameterBlock->GetRowFloat(5, &surface->normals[v].z);
+                parameterBlock->GetRowFloat(6, &surface->drawnVertices[v].tu);
+                parameterBlock->GetRowFloat(7, &surface->drawnVertices[v].tv);
+                parameterBlock->GetRowFloat(12, &red);
+                parameterBlock->GetRowFloat(13, &green);
+                parameterBlock->GetRowFloat(14, &blue);
                 long r = (long)(red * 255.0);
                 long g = (long)(green * 255.0);
                 long b = (long)(blue * 255.0);
@@ -375,28 +375,28 @@ int D3DIMSoultreeObject::ReadLods()
                 surface->uvs[v].v = surface->vertices[v].tv;
             }
             sprintf(section, "LOD %i - Surface %i - Faces", lod, s);
-            parameterBlock->UnknownFunction4b7f70(section);
+            parameterBlock->BeginRows(section);
             for (int f = 0; f < surface->faceCount; f++) {
                 int a;
                 int b;
                 int c;
-                parameterBlock->UnknownFunction4b8010(0);
-                parameterBlock->UnknownFunction4b8180(0, &a);
-                parameterBlock->UnknownFunction4b8180(1, &b);
-                parameterBlock->UnknownFunction4b8180(2, &c);
+                parameterBlock->ReadRow(0);
+                parameterBlock->GetRowInt(0, &a);
+                parameterBlock->GetRowInt(1, &b);
+                parameterBlock->GetRowInt(2, &c);
                 surface->indices[f * 3] = a;
                 surface->indices[f * 3 + 1] = b;
                 surface->indices[f * 3 + 2] = c;
             }
             sprintf(section, "LOD %i - Surface %i - Object Pointer List", lod, s);
-            parameterBlock->UnknownFunction4b7f70(section);
+            parameterBlock->BeginRows(section);
             int used = 0;
             for (i = 0; i < count; i++) {
                 int first;
                 int vertices;
-                parameterBlock->UnknownFunction4b8010(0);
-                parameterBlock->UnknownFunction4b8180(0, &first);
-                parameterBlock->UnknownFunction4b8180(1, &vertices);
+                parameterBlock->ReadRow(0);
+                parameterBlock->GetRowInt(0, &first);
+                parameterBlock->GetRowInt(1, &vertices);
                 groups[i].vertexCount = vertices;
                 groups[i].sourceVertices = &surface->vertices[first];
                 groups[i].transformedVertices = &surface->drawnVertices[first];
@@ -942,7 +942,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, Soult
 }
 
 // 0x00444c70
-int D3DIMSoultreeObject::UnknownFunction444c70(int index, const char* name, int a)
+int D3DIMSoultreeObject::ReplaceMaterialTexture(int index, const char* name, int a)
 {
     if (index > materialCount)
         return 0;

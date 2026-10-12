@@ -233,7 +233,7 @@ int EventManager::CreatePodiumScene() {
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
     ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(podiumCamera);
-    podiumCamera->UnknownFunction469260(view->field_0x50, -1);
+    podiumCamera->InsertBefore(view->field_0x50, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
     if (!((int)rows & 1))
@@ -262,7 +262,7 @@ int EventManager::CreatePodiumScene() {
     Vector3 facings[3];
     Vector3 cameraOffset;
     Vector3 lookOffset;
-    int kind = g_TrackGame->mode.UnknownFunction524100();
+    int kind = g_TrackGame->mode.GetSelectedSeries();
     if (kind >= 2 && kind <= 4) {
         offsets[0] = Vector3(0.0f, 0.383f, 0.0f);
         offsets[1] = Vector3(0.0f, 0.383f, 0.0f);
@@ -337,7 +337,7 @@ int EventManager::CreatePodiumScene() {
         if (character) {
             if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
                 character->field_0x1a0->UnknownFunction4444c0(1);
-            int mode = g_TrackGame->mode.UnknownFunction524100();
+            int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {
                 if (chance < 0.5f && podiumCharacterCount != 1)
                     sprintf(name, "Podium3_%02d", place);
@@ -355,7 +355,7 @@ int EventManager::CreatePodiumScene() {
             if (racer) {
                 UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->field_0x5c4->field_0x1a0->field_0x290;
                 if (texture)
-                    character->field_0x1a0->UnknownFunction444c70(0, (*texture)->field_0x2c, &context);
+                    character->field_0x1a0->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
             }
         }
     }

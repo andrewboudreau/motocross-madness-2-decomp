@@ -296,8 +296,8 @@ public:
     int FindCdDirectory(); // 0x00523bf0 (TrackGame slot 1 retries until it passes)
     int FindDataDirectory(); // 0x00523c90 (TrackGame slot 1)
     ~TrackGameMode();            // 0x005225f0
-    int UnknownFunction524100(); // 0x00524100
-    void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
+    int GetSelectedSeries(); // 0x00524100
+    void SelectSeries(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
     // 0x00523d30 (OptionProcs.cpp: "MCM2HELP"): opens `topic`'s .hlp file
     // with ShellExecuteA (passing `parameters`); 1 when found.
     int OpenHelp(const char* topic, const char* parameters);

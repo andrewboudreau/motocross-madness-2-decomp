@@ -201,7 +201,7 @@
   "?UnknownFunction49e470@LightManager@@QAEXPAVLightEmitter@@@Z": "0x0049e470",
   "?AdvanceMotion@UnknownSceneObject@@QAEHMHH@Z": "0x004a6bb0",
   "?SetMotion@UnknownSceneObject@@QAEXPAX@Z": "0x004a8b40",
-  "?UnknownFunction4b7220@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@PBD1H@Z": "0x004b7220",
+  "?OpenFromArchives@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@PBD1H@Z": "0x004b7220",
   "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z": "0x004b7b30",

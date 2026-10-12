@@ -55,8 +55,8 @@ int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownIn
 // 0x00497fa0: keeps the point at least 3.5 above the subject's ground height
 // (easing +0x22c when it lifts it), and in modes 3 and 4 no higher than 400.
 void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
-    bool capped = g_TrackGame->mode.UnknownFunction524100() == 3 ||
-                  g_TrackGame->mode.UnknownFunction524100() == 4;
+    bool capped = g_TrackGame->mode.GetSelectedSeries() == 3 ||
+                  g_TrackGame->mode.GetSelectedSeries() == 4;
     Vector3 ground = *point;
     field_0x240->QueryGround(&ground, 0, 0, 0);
     float minimum = ground.y + 3.5f;

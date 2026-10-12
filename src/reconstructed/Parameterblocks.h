@@ -94,13 +94,13 @@ struct UnknownParameterSection {
 };
 
 // 0x004b6f30: 2 if `text` has a letter, 1 if it has a '.', else 0.
-int UnknownFunction4b6f30(const char* text);
+int ClassifyParameterValue(const char* text);
 // 0x004b6fb0: classifies and parses `text` into `value`.
-void UnknownFunction4b6fb0(const char* text, UnknownParameterValue* value);
+void ParseParameterValue(const char* text, UnknownParameterValue* value);
 // 0x004b7040/0x004b7080/0x004b70c0: convert a value to int, float or text.
-void UnknownFunction4b7040(UnknownParameterValue value, int* out);
-void UnknownFunction4b7080(UnknownParameterValue value, float* out);
-void UnknownFunction4b70c0(UnknownParameterValue value, char* out);
+void ParameterValueToInt(UnknownParameterValue value, int* out);
+void ParameterValueToFloat(UnknownParameterValue value, float* out);
+void ParameterValueToString(UnknownParameterValue value, char* out);
 
 // 0x5c4 bytes (operator new(0x5c4) at 0x004458b5). No vtable; callers
 // `delete` it through 0x004b7190 and the plain operator delete.
@@ -109,27 +109,27 @@ public:
     UnknownParameterBlock();                         // 0x004b7130
     ~UnknownParameterBlock();                        // 0x004b7190
     // 0x004b7220: opens `name` through the stream's archives, else the stream itself.
-    void UnknownFunction4b7220(UnknownParameterStream* stream, const char* name,
+    void OpenFromArchives(UnknownParameterStream* stream, const char* name,
                                const char* path, int index);
-    int UnknownFunction4b72c0(const char* name);     // loads a section by scanning
-    void UnknownFunction4b7560(UnknownParameterStream* stream); // indexes the sections
+    int ScanSection(const char* name);     // loads a section by scanning
+    void IndexSections(UnknownParameterStream* stream); // indexes the sections
     void Attach(UnknownParameterStream* stream, int offset, int index); // opens
-    int UnknownFunction4b7830(const char* name);     // section index or -1
-    void UnknownFunction4b7890();                    // frees the loaded lines
+    int FindSection(const char* name);     // section index or -1
+    void FreeLines();                    // frees the loaded lines
     int SelectSection(const char* name);     // selects a section
     int ReadString(const char* key, char* out, int size); // raw value of `key`
-    int UnknownFunction4b7cf0(const char* key, int* out);
-    int UnknownFunction4b7e70(const char* key, float* out);
+    int ReadInt(const char* key, int* out);
+    int ReadFloat(const char* key, float* out);
     int GetString(const char* key, const char* def, char* out, int size);
     int GetInt(const char* key, int def, int* out);
     int GetFloat(const char* key, float def, float* out);
-    int UnknownFunction4b7f70(const char* name);     // starts reading a section's rows
-    int UnknownFunction4b8010(char* raw);            // reads the next row
-    int UnknownFunction4b8180(int index, int* out);
-    int UnknownFunction4b81c0(int index, float* out);
-    int UnknownFunction4b8200(int index, char* out);
-    int UnknownFunction4b8240(char* out, int size);  // section names, '?'-terminated
-    void UnknownFunction4b8360(const char* in, char* out); // strips blanks outside [] and ""
+    int BeginRows(const char* name);     // starts reading a section's rows
+    int ReadRow(char* raw);            // reads the next row
+    int GetRowInt(int index, int* out);
+    int GetRowFloat(int index, float* out);
+    int GetRowString(int index, char* out);
+    int GetSectionNames(char* out, int size);  // section names, '?'-terminated
+    void StripBlanks(const char* in, char* out); // strips blanks outside [] and ""
 
     UnknownParameterStream* field_0x000;  // stream
     int field_0x004;

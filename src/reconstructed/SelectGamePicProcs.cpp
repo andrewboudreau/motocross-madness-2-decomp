@@ -230,7 +230,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             }
             g_TrackGame->mode.FindFileDirectory((int)directory, entry, kind, found);
             g_TrackGame->sceneObject->SetSceneDirectory(found);
-            series = g_TrackGame->mode.UnknownFunction524100();
+            series = g_TrackGame->mode.GetSelectedSeries();
             if (_strnicmp(entry, "Quarry01.env", strlen(entry)) && _strnicmp(entry, "Nat04.env", strlen(entry)))
                 series = -1;
             if (g_TrackGame->mode.field_0x27f8.field_0x04 != 1 &&
@@ -241,8 +241,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, x, y);
                 else
                     row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, 0, 0);
-                if (g_TrackGame->mode.UnknownFunction524100() == 1 ||
-                    g_TrackGame->mode.UnknownFunction524100() == 5) {
+                if (g_TrackGame->mode.GetSelectedSeries() == 1 ||
+                    g_TrackGame->mode.GetSelectedSeries() == 5) {
                     if (largePictures)
                         sprintf(file, "%s01.tga", entry);
                     else
@@ -801,7 +801,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         g_TrackGame->mode.field_0x27f8.field_0x138 = settings->field_0x0c;
         g_TrackGame->mode.field_0x27f8.field_0x13c = settings->field_0x10;
         g_TrackGame->mode.field_0x94 = settings->detail;
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x08);
+        g_TrackGame->mode.SelectSeries(g_TrackGame->mode.field_0x27f8.field_0x08);
         g_TrackGame->mode.field_0x27f8.field_0x36[0] = 0;
         strncat(g_TrackGame->mode.field_0x27f8.field_0x36, settings->trackName, 0x3f);
         memcpy(lobbySlots.slots, settings->slots, sizeof(lobbySlots.slots));
@@ -1330,7 +1330,7 @@ void MultiPlayerDlg::FollowTrackChange() {
     index = 0;
     value = 0;
     g_TrackGame->sceneObject->SetSceneDirectory(path);
-    if (g_TrackGame->mode.UnknownFunction524100() == 1 || g_TrackGame->mode.UnknownFunction524100() == 5)
+    if (g_TrackGame->mode.GetSelectedSeries() == 1 || g_TrackGame->mode.GetSelectedSeries() == 5)
         g_TrackGame->sceneObject->ReadSceneName(sceneName, g_TrackGame->mode.field_0x27f8.field_0x36,
                                                                   g_TrackGame->mode.field_0x27f8.field_0x34, "scn", &index,
                                                                   &value);
@@ -1530,7 +1530,7 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("DDLTextBox", event->controlName)) {
             int index = static_cast<UIListBox*>(event->control)->GetRowData(-1);
             UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
-            g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
+            g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
             {
                 char* name = g_TrackGame->ui->entries[index].fileName;
                 int length = strlen(name);
@@ -1679,21 +1679,21 @@ void MPEventDlg::ApplyEventType() {
     }
     if (g_TrackGame->network->isHost) {
         if (eventType == 0) {
-            g_TrackGame->mode.UnknownFunction5240e0(0);
+            g_TrackGame->mode.SelectSeries(0);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
-            g_TrackGame->mode.UnknownFunction5240e0(5);
+            g_TrackGame->mode.SelectSeries(5);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
         } else if (eventType == 4) {
-            g_TrackGame->mode.UnknownFunction5240e0(4);
+            g_TrackGame->mode.SelectSeries(4);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
-            g_TrackGame->mode.UnknownFunction5240e0(1);
+            g_TrackGame->mode.SelectSeries(1);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
-            g_TrackGame->mode.UnknownFunction5240e0(5);
+            g_TrackGame->mode.SelectSeries(5);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
-            g_TrackGame->mode.UnknownFunction5240e0(0);
+            g_TrackGame->mode.SelectSeries(0);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
         } else {
-            g_TrackGame->mode.UnknownFunction5240e0(type);
+            g_TrackGame->mode.SelectSeries(type);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
         }
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
@@ -1705,7 +1705,7 @@ void MPEventDlg::ApplyEventType() {
         list->AddRow(parent->sceneName, 0, 0);
         list->SelectRow(0);
     }
-    g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x08);
+    g_TrackGame->mode.SelectSeries(g_TrackGame->mode.field_0x27f8.field_0x08);
 }
 
 // 0x004f7210
@@ -1730,7 +1730,7 @@ void MPEventDlg::SyncValues(int apply) {
             strncpy(settings->trackName, name, count);
             settings->trackName[count] = 0;
         }
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
+        g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
         settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
         settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
@@ -1796,7 +1796,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
     UnknownTextureStream* stream = new(__FILE__, 0xa72) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (g_TrackGame->mode.field_0x27f8.field_0x04 == 1 || g_TrackGame->mode.field_0x27f8.field_0x04 == 5)
         sprintf(file, "%s%02ds.tga", name, g_TrackGame->mode.field_0x27f8.field_0x34);
-    else if (g_TrackGame->mode.UnknownFunction524100() == 1 || g_TrackGame->mode.UnknownFunction524100() == 5)
+    else if (g_TrackGame->mode.GetSelectedSeries() == 1 || g_TrackGame->mode.GetSelectedSeries() == 5)
         sprintf(file, "%s01s.tga", name);
     else
         sprintf(file, "%ss.tga", name);

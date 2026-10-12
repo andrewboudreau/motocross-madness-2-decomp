@@ -849,7 +849,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     UnknownParameterBlock parameters;
     parameters.Attach((UnknownParameterStream*)stream, offset, 1);
     char buffer[0x2800];
-    parameters.UnknownFunction4b8240(buffer, sizeof(buffer));
+    parameters.GetSectionNames(buffer, sizeof(buffer));
     UnknownTokenizer* sections = new(__FILE__, 0x273) UnknownTokenizer(buffer);
     for (char* name = sections->UnknownFunction515df0("?"); name; name = sections->UnknownFunction515df0("?")) {
         if (!_strnicmp(name, "Set_Anim", strlen("Set_Anim"))) {

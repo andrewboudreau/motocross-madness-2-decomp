@@ -262,10 +262,10 @@ void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
     if (block->ReadString("TextureMap", textureName, -1))
         hasTextureName = 1;
     int managed = field_0x74.opaqueTextures || (field_0x74.alphaTextures && hasTextureName);
-    block->UnknownFunction4b7cf0("TextureFormat", &textureFormat);
-    block->UnknownFunction4b7cf0("UseVertexColor", &useVertexColor);
-    block->UnknownFunction4b7cf0("MipMapped", &mipMapped);
-    block->UnknownFunction4b7cf0("ManagedTexture", &managed);
+    block->ReadInt("TextureFormat", &textureFormat);
+    block->ReadInt("UseVertexColor", &useVertexColor);
+    block->ReadInt("MipMapped", &mipMapped);
+    block->ReadInt("ManagedTexture", &managed);
     block->GetInt("ClampTexture", 0, &clampTexture);
     if (block->ReadString("MappingType", value, -1)) {
         if (!_stricmp(value, "STANDARD"))
@@ -301,9 +301,9 @@ void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
         int blue = atoi(tokens.UnknownFunction515df0("\n"));
         colorKey = (red << 8 | green) << 8 | blue;
     }
-    if (block->UnknownFunction4b7e70("Alpha", &materialAlpha))
+    if (block->ReadFloat("Alpha", &materialAlpha))
         hasAlpha = 1;
-    block->UnknownFunction4b7e70("TextureSpeed", &textureSpeed);
+    block->ReadFloat("TextureSpeed", &textureSpeed);
     if (block->ReadString("SourceBlend", value, -1)) {
         hasSourceBlend = 1;
         if (!_stricmp(value, "ZERO"))
