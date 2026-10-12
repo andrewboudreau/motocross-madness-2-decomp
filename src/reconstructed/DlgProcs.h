@@ -21,14 +21,15 @@ void CloseDialogCallback(UIDialog* dialog);
 
 // 0x0044c930 / 0x0044c9f0: label the four "ButStats" buttons from string
 // ids / with texts (a zero argument leaves the button).
-void SetStatsButtonResources(UnknownDialogEvent* event, int a, int b, int c, int d);
-void SetStatsButtonTexts(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
-                         const char* d);
+void SetStatsButtonResources(UnknownDialogEvent* event, int resource1, int resource2, int resource3,
+                             int resource4);
+void SetStatsButtonTexts(UnknownDialogEvent* event, const char* text1, const char* text2, const char* text3,
+                         const char* text4);
 // 0x0044ca80: empties the four "LstStats" lists; 0x0044cae0 adds a row to
 // each (a zero argument skips the list).
 void ClearStatsLists(UnknownDialogEvent* event);
-void AddStatsRows(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
-                  const char* d);
+void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2, const char* row3,
+                  const char* row4);
 
 // RTTI: MainDlg : UIDialog (vtable 0x00554fb8; 0x7f80 bytes, the size
 // KrustyUI 0x00499b20 allocates).
