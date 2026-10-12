@@ -240,7 +240,7 @@ NameOverlay::NameOverlay(int flags) : Overlay(flags, 1)
     field_0x140 = 0;
     field_0x148 = 0;
     field_0x14c = 0;
-    field_0x124 = 0;
+    drawWidth = 0;
     field_0x170 = 0;
     lastVisible = 1;
     alphaBlended = 1;
@@ -312,7 +312,7 @@ int NameOverlay::UnknownVirtualSlot14()
     if (!trackedRacer) {
         int x = (int)field_0x150.x;
         int y = (int)field_0x150.y;
-        screenRect = UnknownMakeOverlayRect(x, y, field_0x124 + x - 1, sourceHeight + y);
+        screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x - 1, sourceHeight + y);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
@@ -327,10 +327,10 @@ int NameOverlay::UnknownVirtualSlot14()
         int right;
         if (field_0x168) {
             right = (int)field_0x15c.x;
-            left = right - field_0x124;
+            left = right - drawWidth;
         } else {
             left = (int)field_0x15c.x;
-            right = field_0x124 + left;
+            right = drawWidth + left;
         }
         int top = (int)field_0x15c.y;
         screenRect = UnknownMakeOverlayRect(left, top, right, sourceHeight + top);
@@ -362,7 +362,7 @@ int NameOverlay::UnknownVirtualSlot14()
         if (g_UnknownGlobal575a98->UnknownFunction52f340(camera, camera->field_0xec, &head, &screen, &depth)) {
             int x = (int)screen.x;
             int y = (int)screen.y;
-            screenRect = UnknownMakeOverlayRect(x, y, field_0x124 + x, sourceHeight + y);
+            screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);
             Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
             Overlay::UnknownVirtualSlot14();
@@ -374,8 +374,8 @@ int NameOverlay::UnknownVirtualSlot14()
 // 0x00519370
 StatsOverlay::StatsOverlay(int flags) : Overlay(flags, 1)
 {
-    field_0x11c = 0;
-    field_0x120 = 0;
+    largeFont = 0;
+    smallFont = 0;
     instrumentSource = 0;
     statsSource = 0;
     timeSinceRedraw = 0;
@@ -390,10 +390,10 @@ StatsOverlay::StatsOverlay(int flags) : Overlay(flags, 1)
 // 0x00519420
 StatsOverlay::~StatsOverlay()
 {
-    if (field_0x11c)
-        DeleteObject(field_0x11c);
-    if (field_0x120)
-        DeleteObject(field_0x120);
+    if (largeFont)
+        DeleteObject(largeFont);
+    if (smallFont)
+        DeleteObject(smallFont);
     if (overlayTexture)
         overlayTexture->Release();
     if (backingTexture)
@@ -571,12 +571,12 @@ draw:
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x11c);
+    font = SelectObject(dc, largeFont);
     for (i = 0; i <= 5; i++) {
         if (i == 5)
             GetTextExtentPoint32A(dc, rowText[5], strlen(rowText[5]), &rowExtent);
         if (i >= 2)
-            SelectObject(dc, field_0x120);
+            SelectObject(dc, smallFont);
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
         strcpy(field_0x1b0[i], rowText[i]);
     }
@@ -675,10 +675,10 @@ draw:
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x11c);
+    font = SelectObject(dc, largeFont);
     for (i = 0; i <= 5; i++) {
         if (i >= 2)
-            SelectObject(dc, field_0x120);
+            SelectObject(dc, smallFont);
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
         strcpy(field_0x1b0[i], rowText[i]);
     }
@@ -770,7 +770,7 @@ draw:
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x11c);
+    font = SelectObject(dc, largeFont);
     for (i = 0; i < 6; i++) {
         DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
         strcpy(field_0x1b0[i], rowText[i]);
@@ -1305,19 +1305,19 @@ ChatOverlay::ChatOverlay(int flags) : Overlay(flags, 1)
     timeSum = 0.0f;
     overlayTexture = 0;
     backingTexture = 0;
-    field_0x198 = 0;
+    racerCount = 0;
     for (int i = 0; i < 11; i++)
         racers[i] = 0;
-    field_0x120 = 0;
-    field_0x124 = 0;
+    chatFont = 0;
+    nameTagFont = 0;
     field_0x160 = 0;
-    field_0x11c = 0;
+    pen = 0;
     inputShown = 0;
     chatInput = new(__FILE__, 2172) UnknownChatInput;
     for (i = 0; i < 11; i++)
         lastRacerValues[i] = 0;
-    field_0x1c8 = 0;
-    field_0x1cc = 0;
+    leftPanel = 0;
+    rightPanel = 0;
     field_0x1d0 = 0.0f;
     playerName[0] = '\0';
     nameChanged = 0;
@@ -1328,12 +1328,12 @@ ChatOverlay::ChatOverlay(int flags) : Overlay(flags, 1)
 // 0x0051cee0
 ChatOverlay::~ChatOverlay()
 {
-    if (field_0x120)
-        DeleteObject(field_0x120);
-    if (field_0x124)
-        DeleteObject(field_0x124);
-    if (field_0x11c)
-        DeleteObject(field_0x11c);
+    if (chatFont)
+        DeleteObject(chatFont);
+    if (nameTagFont)
+        DeleteObject(nameTagFont);
+    if (pen)
+        DeleteObject(pen);
     if (overlayTexture)
         overlayTexture->Release();
     if (backingTexture)
@@ -1345,7 +1345,7 @@ void ChatOverlay::UnknownFunction51d980(int show)
 {
     if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
         field_0x164 = show;
-        NameOverlay* tag = nameTags[field_0x198];
+        NameOverlay* tag = nameTags[racerCount];
         if (tag) {
             if (show)
                 tag->UnknownVirtualSlot5();
@@ -1415,9 +1415,9 @@ int ChatOverlay::UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputE
 void ChatOverlay::UnknownFunction51dd10()
 {
     inputShown = 1;
-    if (field_0x1c8) {
-        field_0x1c8->UnknownVirtualSlot5();
-        field_0x1cc->UnknownVirtualSlot5();
+    if (leftPanel) {
+        leftPanel->UnknownVirtualSlot5();
+        rightPanel->UnknownVirtualSlot5();
     }
 }
 
@@ -1425,9 +1425,9 @@ void ChatOverlay::UnknownFunction51dd10()
 void ChatOverlay::UnknownFunction51dd40()
 {
     inputShown = 0;
-    if (field_0x1c8) {
-        field_0x1c8->UnknownVirtualSlot4();
-        field_0x1cc->UnknownVirtualSlot4();
+    if (leftPanel) {
+        leftPanel->UnknownVirtualSlot4();
+        rightPanel->UnknownVirtualSlot4();
     }
 }
 
@@ -1470,7 +1470,7 @@ int ChatOverlay::UnknownVirtualSlot13()
         RestoreRect(&rect);
         UnknownFunction51e910(-1);
     } else {
-        for (int i = 0; i < field_0x198; i++) {
+        for (int i = 0; i < racerCount; i++) {
             if (g_TrackGame->mode.field_0x6c0 && lastRacerValues[i] != racers[i]->field_0x784) {
                 UnknownFunction51e910(i);
                 lastRacerValues[i] = racers[i]->field_0x784;
@@ -1518,7 +1518,7 @@ int ChatOverlay::RedrawChat()
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x120);
+    font = SelectObject(dc, chatFont);
     strcpy(text, ">");
     strcat(text, chatInput->GetLineTail());
     strcat(text, "_");
@@ -1557,7 +1557,7 @@ int ChatOverlay::RedrawChat()
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x120);
+    font = SelectObject(dc, chatFont);
     for (i = 0; i <= chatInput->field_0x1c0; i++) {
         strcpy(text, chatInput->GetHistory(i, &value));
         rect.top = (i + 1) * lineHeight + 7;
@@ -1589,18 +1589,18 @@ void ChatOverlay::RedrawNameLine()
 {
     UnknownOverlayRect rect;
     char text[128];
-    rect = nameTagRects[field_0x198];
+    rect = nameTagRects[racerCount];
     rect.right = field_0x160;
     RestoreRect(&rect);
     sprintf(text, "%d : ", (int)sqrt(field_0x1d0));
     field_0x38->SelectFont("arialsm");
-    int right = field_0x38->UnknownFunction50b080(overlayTexture, nameTagRects[field_0x198].left,
-                                                   nameTagRects[field_0x198].top, text, 0);
+    int right = field_0x38->UnknownFunction50b080(overlayTexture, nameTagRects[racerCount].left,
+                                                   nameTagRects[racerCount].top, text, 0);
     if (right != field_0x160 || nameChanged) {
         field_0x160 = right;
         nameChanged = 0;
-        nameTags[field_0x198]->field_0x124 = right - nameTagRects[field_0x198].left;
-        UnknownFunction51e910(field_0x198);
+        nameTags[racerCount]->drawWidth = right - nameTagRects[racerCount].left;
+        UnknownFunction51e910(racerCount);
     }
 }
 
@@ -1722,7 +1722,7 @@ void ChatOverlay::UnknownFunction51e910(int index)
 {
     unsigned char level = 0xff - g_TrackGame->mode.field_0x90 * 0x33;
     if (index == -1) {
-        for (int i = 0; i < field_0x198; i++)
+        for (int i = 0; i < racerCount; i++)
             RestoreRect(&nameTagRects[i]);
     } else {
         RestoreRect(&nameTagRects[index]);
@@ -1734,7 +1734,7 @@ void ChatOverlay::UnknownFunction51e910(int index)
         SetBkMode(dc, 1);
         SetTextColor(dc, 0xffffff);
         if (index == -1) {
-            for (int i = 0; i < field_0x198; i++)
+            for (int i = 0; i < racerCount; i++)
                 DrawNameTag(dc, i);
         } else {
             DrawNameTag(dc, index);

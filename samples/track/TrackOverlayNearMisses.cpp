@@ -187,29 +187,29 @@ int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
 {
     int iterator;
     UnknownChatRacer* racer;
-    field_0x198 = 0;
+    racerCount = 0;
     iterator = 0;
     chatView = view;
     while ((racer = chatView->UnknownFunction4204e0(&iterator)) != 0) {
-        racers[field_0x198] = racer;
-        field_0x198++;
+        racers[racerCount] = racer;
+        racerCount++;
     }
-    for (int i = 0; i < field_0x198; i++) {
+    for (int i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
             Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
-        nameTags[field_0x198] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
-            Target(), overlayTexture, &nameTagRects[field_0x198], 0, &nameTagRects[field_0x198], 0,
+        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
+            Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
-        AppendChild(nameTags[field_0x198], -1);
-        if (nameTags[field_0x198]) {
-            nameTags[field_0x198]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
-            nameTags[field_0x198]->UnknownVirtualSlot4();
-            field_0x160 = nameTagRects[field_0x198].right;
-            nameTags[field_0x198]->field_0x124 = 0;
+        AppendChild(nameTags[racerCount], -1);
+        if (nameTags[racerCount]) {
+            nameTags[racerCount]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
+            nameTags[racerCount]->UnknownVirtualSlot4();
+            field_0x160 = nameTagRects[racerCount].right;
+            nameTags[racerCount]->drawWidth = 0;
         }
     }
     UnknownFunction51e910(-1);
@@ -287,7 +287,7 @@ int StatsOverlay::UnknownFunction519a20()
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x11c);
+    font = SelectObject(dc, largeFont);
     for (i = 0; i <= row; i++) {
         if (i == 0)
             GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
@@ -379,9 +379,9 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
         face = "Small Fonts";
     }
     strcpy(logFont.lfFaceName, face);
-    field_0x11c = CreateFontIndirectA(&logFont);
+    largeFont = CreateFontIndirectA(&logFont);
     logFont.lfHeight = 12;
-    field_0x120 = CreateFontIndirectA(&logFont);
+    smallFont = CreateFontIndirectA(&logFont);
     rowRects[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
     rowRects[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
     rowRects[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
@@ -401,22 +401,22 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
     char name[0x80];
     int length;
     UnknownTextExtent size;
-    void* font = SelectObject(dc, field_0x124);
-    if (index == field_0x198) {
+    void* font = SelectObject(dc, nameTagFont);
+    if (index == racerCount) {
         sprintf(text, "%s", playerName);
         length = strlen(text);
         UnknownOverlayRect rect = nameTagRects[index];
-        rect.left += nameTags[index]->field_0x124;
+        rect.left += nameTags[index]->drawWidth;
         DrawTextA(dc, text, length, &rect, 0x8124);
         UnknownTextExtent size;
         GetTextExtentPoint32A(dc, text, length, &size);
-        nameTags[index]->field_0x124 += size.cx;
+        nameTags[index]->drawWidth += size.cx;
         nameTags[index]->sourceRect = nameTagRects[index];
-        if (nameTags[index]->field_0x124 + 4 < nameTags[index]->sourceWidth) {
-            nameTags[index]->field_0x124 += 4;
-            nameTags[index]->sourceRect.right = nameTags[index]->field_0x124 + nameTags[index]->sourceRect.left - 1;
+        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->drawWidth += 4;
+            nameTags[index]->sourceRect.right = nameTags[index]->drawWidth + nameTags[index]->sourceRect.left - 1;
         } else {
-            nameTags[index]->field_0x124 = nameTags[index]->sourceWidth;
+            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
         }
     } else {
         if (s_UnknownGlobal68a444) {
@@ -441,16 +441,16 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
         }
         length = strlen(text);
         GetTextExtentPoint32A(dc, text, length, &size);
-        nameTags[index]->field_0x124 = size.cx;
+        nameTags[index]->drawWidth = size.cx;
         DrawTextA(dc, text, length, &nameTagRects[index], 0x8125);
         nameTags[index]->sourceRect = nameTagRects[index];
-        if (nameTags[index]->field_0x124 + 4 < nameTags[index]->sourceWidth) {
-            nameTags[index]->field_0x124 += 4;
-            int margin = (nameTags[index]->sourceWidth - nameTags[index]->field_0x124) >> 1;
+        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->drawWidth += 4;
+            int margin = (nameTags[index]->sourceWidth - nameTags[index]->drawWidth) >> 1;
             nameTags[index]->sourceRect.left += margin;
             nameTags[index]->sourceRect.right += 1 - margin;
         } else {
-            nameTags[index]->field_0x124 = nameTags[index]->sourceWidth;
+            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
         }
     }
     SelectObject(dc, font);
@@ -617,20 +617,20 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         rect.left -= largeLayout ? 38 : 19;
         source.right = largeLayout ? 38 : 19;
         source.bottom = largeLayout ? 137 : 103;
-        field_0x1c8 = new (__FILE__, 2284) Overlay(0, 1);
-        field_0x1c8->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        AppendChild(field_0x1c8, -1);
+        leftPanel = new (__FILE__, 2284) Overlay(0, 1);
+        leftPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
+        AppendChild(leftPanel, -1);
         source.left += largeLayout ? 38 : 19;
         source.top = 69;
         source.right += largeLayout ? 38 : 19;
         source.bottom = largeLayout ? 137 : 103;
         rect.left = chatRect.right;
         rect.right = chatRect.right + (largeLayout ? 38 : 19);
-        field_0x1cc = new (__FILE__, 2294) Overlay(0, 1);
-        field_0x1cc->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        AppendChild(field_0x1cc, -1);
+        rightPanel = new (__FILE__, 2294) Overlay(0, 1);
+        rightPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
+        AppendChild(rightPanel, -1);
     }
-    field_0x11c = CreatePen(0, 3, 0xc0c0c0);
+    pen = CreatePen(0, 3, 0xc0c0c0);
     logFont.lfHeight = 9;
     logFont.lfWidth = 0;
     logFont.lfEscapement = 0;
@@ -652,11 +652,11 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         logFont.lfWeight = 400;
         strcpy(logFont.lfFaceName, "Lucida Console");
     }
-    field_0x120 = CreateFontIndirectA(&logFont);
+    chatFont = CreateFontIndirectA(&logFont);
     if (*face == '\0')
         strcpy(logFont.lfFaceName, "Small Fonts");
     logFont.lfHeight = 10;
-    field_0x124 = CreateFontIndirectA(&logFont);
+    nameTagFont = CreateFontIndirectA(&logFont);
     nameTagRects[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
     nameTagRects[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
     nameTagRects[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);

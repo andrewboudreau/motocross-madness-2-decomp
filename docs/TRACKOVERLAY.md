@@ -198,3 +198,15 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0051eaf0` `GetLineTail`
 - `0x0051eb10` `GetHistory`
 - `0x0051eb40` `AddHistory`
+
+## Field names
+
+Named from what the loaders create and the draw functions use (tier 3;
+each declaration keeps its `// +0xNN`): StatsOverlay `largeFont` (+0x11c,
+`lfHeight` 16, rows 0-1) and `smallFont` (+0x120, height 12, the other
+rows); ChatOverlay `pen` (+0x11c, `CreatePen(0, 3, 0xc0c0c0)`), `chatFont`
+(+0x120, height 9, RedrawChat), `nameTagFont` (+0x124, height 10,
+DrawNameTag), `racerCount` (+0x198, the `racers` fill count) and
+`leftPanel`/`rightPanel` (+0x1c8/+0x1cc, the overlays attached left and
+right of `chatRect` when the screen is wider than 512); NameOverlay
+`drawWidth` (+0x124, the width of its screen rectangle).

@@ -128,7 +128,7 @@ public:
 
     UnknownEventRacer* trackedRacer;
     int sourceWidth;                          // source width
-    int field_0x124;
+    int drawWidth;                            // +0x124 drawn width (screen rectangle; ChatOverlay sets it)
     int sourceHeight;                         // source height
     UnknownNameOverlayWorld* world;
     int testPhase;                            // phase of the every-fourth-frame test
@@ -191,8 +191,8 @@ public:
     int DrawRacePanel();                      // 0x0051a560
     int DrawTagStandings();                   // 0x0051aa40
 
-    void* field_0x11c;                        // GDI object (DeleteObject)
-    void* field_0x120;                        // GDI object (DeleteObject)
+    void* largeFont;                          // +0x11c 16-high font, rows 0-1 (0x005194b0; DeleteObject)
+    void* smallFont;                          // +0x120 12-high font, the other rows (DeleteObject)
     UnknownStatsSource* statsSource;          // set by 0x00519880; read when TrackGame+0x3428 is set
     UnknownInstrumentSource* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
@@ -438,9 +438,9 @@ public:
     void RedrawNameLine();                    // 0x0051e800: redraws the name line
     void UnknownFunction51e910(int index);    // 0x0051e910: redraws one name tag, or all (-1)
 
-    void* field_0x11c;                        // GDI object (DeleteObject)
-    void* field_0x120;                        // GDI object (DeleteObject)
-    void* field_0x124;                        // GDI object (DeleteObject)
+    void* pen;                                // +0x11c CreatePen(0, 3, 0xc0c0c0) in 0x0051cf80 (DeleteObject)
+    void* chatFont;                           // +0x120 9-high font, selected by RedrawChat (DeleteObject)
+    void* nameTagFont;                        // +0x124 10-high font, selected by DrawNameTag (DeleteObject)
     UnknownChatCamera* chatCamera;
     UnknownChatView* chatView;
     float timeSum;                            // time summed
@@ -453,10 +453,10 @@ public:
     int field_0x164;
     int nameChanged;                          // name changed
     UnknownChatRacer* racers[11];
-    int field_0x198;                          // name tag index
-    int lastRacerValues[11];                  // field_0x16c[i]->field_0x784 last seen
-    Overlay* field_0x1c8;                     // side panels on wide screens (0x0051cf80)
-    Overlay* field_0x1cc;
+    int racerCount;                           // +0x198 entries in racers; also the extra name tag's index
+    int lastRacerValues[11];                  // racers[i]->field_0x784 last seen
+    Overlay* leftPanel;                       // +0x1c8 side panel left of chatRect on wide screens (0x0051cf80)
+    Overlay* rightPanel;                      // +0x1cc side panel right of chatRect
     float field_0x1d0;
     char playerName[0x104];                   // name
     NameOverlay* nameTags[13];
