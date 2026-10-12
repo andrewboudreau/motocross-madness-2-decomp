@@ -81,7 +81,7 @@ void UnknownTrackGameObject3410::UnknownFunction4aa350(UnknownDirectPlay4A* a, U
 // another message arrives first). The response checks are separate `goto
 // failed` tests: that places the failure block right after the last test,
 // falling through from it as in retail; one `||` condition sinks it to the end.
-int UnknownTrackGameObject3410::UnknownFunction4aa360(char* buffer, unsigned int size) {
+int UnknownTrackGameObject3410::GetLobbyPreset(char* buffer, unsigned int size) {
     UnknownLobbyGetPropertyResponse* response;
     UnknownLobbyGetProperty request;
     unsigned long flags = 0;
@@ -125,7 +125,7 @@ failed:
 }
 
 // 0x004aa4e0: the same for the rank property.
-int UnknownTrackGameObject3410::UnknownFunction4aa4e0(char* buffer, unsigned int size) {
+int UnknownTrackGameObject3410::GetLobbyRank(char* buffer, unsigned int size) {
     UnknownLobbyGetPropertyResponse* response;
     UnknownLobbyGetProperty request;
     unsigned long flags = 0;

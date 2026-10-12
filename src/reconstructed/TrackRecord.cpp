@@ -151,9 +151,9 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
     case 3:
     case 5:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->results[racer].field_0x14;
+            value = g_TrackGame->eventManager->results[racer].totalRunningTime;
         else
-            value = g_TrackGame->eventManager->results[racer].field_0x08;
+            value = g_TrackGame->eventManager->results[racer].fastestLap;
         if (field_0xe0 != 0 && value > field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;
@@ -169,7 +169,7 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
         if (field_0x00 > 0 && field_0x00 <= 2)
             value = g_TrackGame->eventManager->results[racer].field_0x2c;
         else
-            value = (float)g_TrackGame->eventManager->results[racer].field_0x0c;
+            value = (float)g_TrackGame->eventManager->results[racer].largestStuntPoints;
         if (field_0xe0 != 0 && value < field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;

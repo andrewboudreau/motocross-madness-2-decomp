@@ -63,12 +63,12 @@ UnknownEventEntry::UnknownEventEntry() {
 void UnknownEventEntry::Reset() {
     playerId = 0;
     position = 1;
-    field_0x08 = 0;
-    field_0x14 = 0;
+    fastestLap = 0;
+    totalRunningTime = 0;
     points = 0;
     field_0x2c = 0;
     field_0x30 = 0;
-    field_0x0c = 0;
+    largestStuntPoints = 0;
     field_0x10 = 0;
     field_0x18 = 0;
     field_0x1c = 0;
@@ -93,9 +93,9 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
     if (!field_0x24) {
         field_0x2c = racer->field_0x768;
         position = racer->field_0x784;
-        field_0x08 = racer->field_0x750;
-        field_0x14 = racer->field_0x754;
-        field_0x0c = racer->field_0x788;
+        fastestLap = racer->field_0x750;
+        totalRunningTime = racer->field_0x754;
+        largestStuntPoints = racer->field_0x788;
         field_0x10 = racer->field_0x758;
         field_0x18 = racer->field_0x760;
         field_0x1c = racer->field_0x764;
@@ -110,9 +110,9 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
     } else {
         field_0x2c = 0;
         position = 99;
-        field_0x08 = 0;
-        field_0x14 = 0;
-        field_0x0c = 0;
+        fastestLap = 0;
+        totalRunningTime = 0;
+        largestStuntPoints = 0;
         field_0x10 = 0;
         field_0x18 = 0;
         field_0x1c = 0;
@@ -301,7 +301,7 @@ void EventManager::WaitForRemoteRacers(float) {
         waitingForRacers = 0;
         EndRace();
         if (g_TrackGame->networkGameObject)
-            g_TrackGame->networkGameObject->UnknownFunction49c770();
+            g_TrackGame->networkGameObject->ReportRaceToZone();
     }
 }
 

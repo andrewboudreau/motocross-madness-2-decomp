@@ -481,9 +481,9 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             button->SetText(title);
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                UnknownFunction518690(time, g_TrackGame->eventManager->results[i].field_0x08);
+                UnknownFunction518690(time, g_TrackGame->eventManager->results[i].fastestLap);
                 if (g_TrackGame->eventManager->results[i].finished)
-                    UnknownFunction518690(best, g_TrackGame->eventManager->results[i].field_0x14);
+                    UnknownFunction518690(best, g_TrackGame->eventManager->results[i].totalRunningTime);
                 else
                     g_TrackGame->LoadResourceString(0xff0, best, 0x80);
                 sprintf(score, "%s (%s)", time, best);
@@ -600,9 +600,9 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
             if (!g_TrackGame->eventManager->results[i].field_0x24) {
                 sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                UnknownFunction518690(time, g_TrackGame->eventManager->results[i].field_0x08);
+                UnknownFunction518690(time, g_TrackGame->eventManager->results[i].fastestLap);
                 if (g_TrackGame->eventManager->results[i].finished)
-                    UnknownFunction518690(best, g_TrackGame->eventManager->results[i].field_0x14);
+                    UnknownFunction518690(best, g_TrackGame->eventManager->results[i].totalRunningTime);
                 else
                     g_TrackGame->LoadResourceString(0xff0, best, 0x80);
                 sprintf(score, "%s (%s)", time, best);

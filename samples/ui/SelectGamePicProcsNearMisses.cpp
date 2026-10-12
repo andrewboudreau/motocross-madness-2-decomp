@@ -91,7 +91,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
             int allowed = 0;
             int byModel = flags & 4;
             if (byModel) {
-                int model = g_TrackGame->networkGameObject->field_0x298;
+                int model = g_TrackGame->networkGameObject->bikeManufacturer;
                 if ((model == entry->model || (!model && entry->model == 7)) &&
                     UnknownBikeClassOf(entry->engineSize) <= 2) {
                     allowed = 1;

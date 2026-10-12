@@ -983,8 +983,8 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         EnableReadyControls();
         if (g_TrackGame->network->lobbyConnected) {
             if (g_TrackGame->mode.field_0x1bd4 == -1) {
-                g_TrackGame->networkGameObject->UnknownFunction49c2f0(&g_TrackGame->mode.field_0x1bd4);
-                g_TrackGame->networkGameObject->UnknownFunction49c600();
+                g_TrackGame->networkGameObject->ReadLobbyPreset(&g_TrackGame->mode.field_0x1bd4);
+                g_TrackGame->networkGameObject->WaitForLobbyRank();
                 if (eventPage) {
                     eventPage->UpdateBoundValues(0);
                     eventPage->ApplyEventType();

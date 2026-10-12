@@ -121,10 +121,10 @@ struct UnknownEventEntry {
 
     int playerId;                                  // +0x00: network player id (racer +0x11bc)
     int position;                                  // +0x04: finishing position (99 when racer +0x4a0 is set)
-    float field_0x08;                              // racer +0x750; TrackRecord.cpp 0x0051f3c0 loads it as a float
-    int field_0x0c;                                // racer +0x788
+    float fastestLap;                              // +0x08: racer +0x750 (ZoneReport "FastestLap"); TrackRecord.cpp 0x0051f3c0 loads it as a float
+    int largestStuntPoints;                        // +0x0c: racer +0x788 (ZoneReport "LargestSingleStuntPoints")
     int field_0x10;                                // racer +0x758
-    float field_0x14;                              // racer +0x754
+    float totalRunningTime;                        // +0x14: racer +0x754 (ZoneReport "TotalrunningTime")
     float field_0x18;                              // racer +0x760
     float field_0x1c;                              // racer +0x764
     int finished;                                  // +0x20: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
