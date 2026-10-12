@@ -43,7 +43,7 @@ DebugOverlay::DebugOverlay(int flags)
 {
     nextPage = 0;
     field_0x26c4 = 0;
-    field_0x36dc = 0;
+    drawTime = 0;
     rowLimit = 0;
     fontHeight = 0;
     pageRowCount = -1;
@@ -126,7 +126,7 @@ int DebugOverlay::UnknownVirtualSlot14()
                                   field_0xb4[i].text, strlen(field_0xb4[i].text), 0xc0ff0000);
     }
     pageRowCount = -1;
-    field_0x36dc = ReadClock() - start;
+    drawTime = ReadClock() - start;
     return 1;
 }
 

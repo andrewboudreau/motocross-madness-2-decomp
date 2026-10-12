@@ -21,11 +21,11 @@ struct UnknownControlBinding;
 // +0x198 as int and keeps these members protected.
 struct UnknownPickCamera {
     unsigned char field_0x000[0xac];
-    float field_0x0ac[3][4];
+    float viewMatrix[3][4];                   // +0x0ac
     unsigned char field_0x0dc[0x170 - 0xdc];
     Vector3 eyePosition;                      // +0x170 (Camera::eyePosition)
     unsigned char field_0x17c[0x198 - 0x17c];
-    float field_0x198;
+    float focalLength;                        // +0x198
     int field_0x19c;
     unsigned int viewportX;                   // +0x1a0 viewport x
     unsigned int viewportY;                   // +0x1a4 viewport y

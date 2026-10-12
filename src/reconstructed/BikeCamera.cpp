@@ -110,19 +110,19 @@ Vector3 BikeCamera::UnknownVirtualSlot50() {
 
 // 0x004172e0
 void BikeCamera::UnknownVirtualSlot53() {
-    bike->field_0x3bc->UnknownFunction4444e0();
+    bike->modelNode->UnknownFunction4444e0();
     bike->riderCharacter->modelNode->UnknownFunction4444e0();
 }
 
 // 0x00417310
 void BikeCamera::UnknownVirtualSlot54() {
-    bike->field_0x3bc->ClearFlag14c();
+    bike->modelNode->ClearFlag14c();
     bike->riderCharacter->modelNode->ClearFlag14c();
 }
 
 // 0x00417340
 float BikeCamera::UnknownVirtualSlot51() {
-    return bike->field_0x58 * bike->field_0x48;
+    return bike->savedCosRoll * bike->savedRoll;
 }
 
 // 0x004174b0

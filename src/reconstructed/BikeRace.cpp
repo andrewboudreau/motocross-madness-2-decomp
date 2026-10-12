@@ -486,7 +486,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             } else {
                 Vector3 position;
                 if (isRacing) {
-                    if (field_0x064 != 0 && ((UnknownBikeRaceSceneCharacter*)field_0x064)->field_0x25_bit0 &&
+                    if (field_0x064 != 0 && ((UnknownBikeRaceSceneCharacter*)field_0x064)->isEnabled &&
                         field_0x160 > 0.0f) {
                         field_0x160 -= g_TrackGame->frameTime;
                         if (field_0x160 <= 0.0f) {
@@ -496,9 +496,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x068) {
                                 NextCameraTarget(1, 1, 0);
                             }
-                            if (field_0x064->field_0x210 != 0) {
-                                field_0x064->field_0x210->Release();
-                                field_0x064->field_0x210 = 0;
+                            if (field_0x064->collisionObject != 0) {
+                                field_0x064->collisionObject->Release();
+                                field_0x064->collisionObject = 0;
                             }
                         }
                     }
@@ -532,9 +532,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x070) {
                                 NextCameraTarget(1, 1, 0);
                             }
-                            if (field_0x06c->field_0x210 != 0) {
-                                field_0x06c->field_0x210->Release();
-                                field_0x06c->field_0x210 = 0;
+                            if (field_0x06c->collisionObject != 0) {
+                                field_0x06c->collisionObject->Release();
+                                field_0x06c->collisionObject = 0;
                             }
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
@@ -583,7 +583,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     field_0x18b = false;
                     isRacing = false;
                 }
-                if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->field_0x25_bit0) {
+                if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->isEnabled) {
                     position = localRacer->carriedFlagPosition;
                     position.y += 4.25f;
                     ((ArcadeObject*)field_0x060)->SetPosition(&position);
@@ -659,7 +659,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         0x14);
                 name[0x14] = 0;
                 raceScene->ResolveSltPath(name);
-                model = localRacer->field_0x3bc;
+                model = localRacer->modelNode;
             } else if (field_0x0b0 == 0) {
                 strncpy(name, raceScene->staticModels->casters[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
@@ -1021,7 +1021,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     g_TrackGame->ui->gui->CreateCursors("ui\\cursor.tga", 0);
                 }
                 if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
-                          ->GetUser(0)->userCursor)->field_0x25_bit0) {
+                          ->GetUser(0)->userCursor)->isEnabled) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;
@@ -1075,7 +1075,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                         for (int i = 0; i < raceScene->animationTable->entryCount; i++) {
                             UnknownSceneEntry* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
-                                if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->field_0x210) {
+                                if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->collisionObject) {
                                     UnknownFunctionCameraView()->followingRacer = 1;
                                     field_0x150 = i;
                                     NextCameraTarget(1, 0, 1);
@@ -1472,9 +1472,9 @@ void BikeRace::UnknownFunction421050() {
             field_0x15c = 8.2f;
             field_0x06c->UnknownVirtualSlot5();
             raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
-            if (field_0x06c->field_0x210 != 0) {
-                field_0x06c->field_0x210->Release();
-                field_0x06c->field_0x210 = 0;
+            if (field_0x06c->collisionObject != 0) {
+                field_0x06c->collisionObject->Release();
+                field_0x06c->collisionObject = 0;
             }
             raceScene->UnknownFunction4eafd0(field_0x070);
         } else {
@@ -2024,16 +2024,16 @@ int BikeRace::UnknownVirtualSlot14() {
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
     g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
-    localRacer->field_0x3bc->ApplyLodSettings(level);
+    localRacer->modelNode->ApplyLodSettings(level);
     localRacer->riderCharacter->modelNode->ApplyLodSettings(level);
     if (g_TrackGame->mode.raceSettings.raceMode != 4) {
         for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
-            aiRacers[i]->field_0x3bc->ApplyLodSettings(level);
+            aiRacers[i]->modelNode->ApplyLodSettings(level);
             aiRacers[i]->riderCharacter->modelNode->ApplyLodSettings(level);
         }
     }
     for (int j = 0; j < g_TrackGame->mode.raceSettings.field_0x35; j++) {
-        racerSlots[j]->field_0x3bc->ApplyLodSettings(level);
+        racerSlots[j]->modelNode->ApplyLodSettings(level);
         racerSlots[j]->riderCharacter->modelNode->ApplyLodSettings(level);
     }
 }

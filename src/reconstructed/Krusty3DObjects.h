@@ -45,9 +45,9 @@ struct UnknownNumberCamera {
     unsigned char field_0x000[0x170];
     Vector3 eyePosition;                      // +0x170
     Vector3 viewDirection;                    // +0x17c forward
-    Vector3 field_0x188;               // up
+    Vector3 upDirection;                      // +0x188 up
     unsigned char field_0x194[0x198 - 0x194];
-    float field_0x198;
+    float focalLength;                        // +0x198
 };
 
 struct UnknownNumberRacerState {
@@ -220,11 +220,11 @@ struct UnknownBonusRacerModel {
 
 struct UnknownBonusRacerState {
     unsigned char field_0x000[0x3bc];
-    UnknownBonusRacerPart* field_0x3bc;
+    UnknownBonusRacerPart* modelNode;         // +0x3bc
     unsigned char field_0x3c0[0x444 - 0x3c0];
-    int field_0x444;
+    int crashState;                           // +0x444
     unsigned char field_0x448[0x5f4 - 0x448];
-    UnknownBonusRacerModel* field_0x5f4;
+    UnknownBonusRacerModel* rearWheel;        // +0x5f4
 };
 
 struct UnknownBonusRacer {
@@ -235,10 +235,10 @@ struct UnknownBonusRacer {
 // The camera a BonusObjectManager faces (its +0x38).
 struct UnknownBonusCamera {
     unsigned char field_0x000[0x16c];
-    float field_0x16c;
+    float fieldOfView;                        // +0x16c
     Vector3 eyePosition;                      // +0x170
     unsigned char field_0x17c[0x198 - 0x17c];
-    float field_0x198;
+    float focalLength;                        // +0x198
 };
 
 // The game global at 0x0056e26c (TrackGame.h's g_TrackGame) as
@@ -246,7 +246,7 @@ struct UnknownBonusCamera {
 // current camera; +0x2d74 the camera mode; +0x3430 blocks the UI.
 struct UnknownBonusRenderTarget {
     unsigned char field_0x00[0x08];
-    UnknownBonusCamera* field_0x08;
+    UnknownBonusCamera* currentCamera;        // +0x08
 };
 
 struct UnknownKrustyRacerRef {
@@ -272,7 +272,7 @@ struct UnknownKrustyGate {
 
 struct UnknownKrustyCourse {
     unsigned char field_0x00[0x34];
-    UnknownKrustyCameraHolder* field_0x34;
+    UnknownKrustyCameraHolder* raceView;      // +0x34
     unsigned char field_0x38[0xd8 - 0x38];
     UnknownKrustyGate field_0xd8[1];
 };
@@ -291,20 +291,20 @@ struct UnknownKrustyNode {
 
 struct UnknownKrustyPlayer {
     unsigned char field_0x00[0x3c];
-    UnknownKrustyFollowed* field_0x3c;
+    UnknownKrustyFollowed* raceCamera;        // +0x3c
     unsigned char field_0x40[0xa8 - 0x40];
-    UnknownVisualCueRacer* field_0xa8;
+    UnknownVisualCueRacer* followedRacer;     // +0xa8
     unsigned char field_0xac[0xdc - 0xac];
     UnknownKrustyNode* field_0xdc;
 };
 
 struct UnknownKrustyGame {
     unsigned char field_0x0000[0x10];
-    UnknownBonusRenderTarget* field_0x10;
+    UnknownBonusRenderTarget* renderTarget;   // +0x10
     unsigned char field_0x0014[0x560 - 0x14];
-    UnknownKrustyCourse* field_0x560;
+    UnknownKrustyCourse* bajaEnduroEvent;     // +0x560
     unsigned char field_0x0564[0x568 - 0x564];
-    UnknownKrustyPlayer* field_0x568;
+    UnknownKrustyPlayer* tagEvent;            // +0x568
     unsigned char field_0x056c[0x2d74 - 0x56c];
     int cameraMode;                           // +0x2d74 camera mode 0..5
     unsigned char field_0x2d78[0x2eb4 - 0x2d78];

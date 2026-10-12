@@ -65,11 +65,11 @@ void UnknownGroundFogShader::FogVertices(UnknownFogVertex* vertices, int count) 
         }
     }
     fog = groundFog;
-    camera = fog->field_0x18->field_0x08;
+    camera = fog->renderContext->currentCamera;
     alphaLimit = fog->alphaLimit;
-    eyeX = camera->field_0x170;
-    eyeY = camera->field_0x174;
-    eyeZ = camera->field_0x178;
+    eyeX = camera->eyeX;
+    eyeY = camera->eyeY;
+    eyeZ = camera->eyeZ;
     depthLimit = (int)fog->depthLimit;
     density = fog->density;
     for (i = 0; i < count; i++) {

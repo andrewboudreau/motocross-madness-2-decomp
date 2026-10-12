@@ -29,7 +29,7 @@ struct UnknownArcadeView {
     float fieldOfView;                        // +0x16c field of view, degrees
     Vector3 cameraPosition;                   // +0x170 position
     unsigned char field_0x17c[0x198 - 0x17c];
-    float field_0x198;
+    float focalLength;                        // +0x198
     unsigned char field_0x19c[0x1b8 - 0x19c];
     float aspectRatio;                        // +0x1b8 aspect ratio
 };

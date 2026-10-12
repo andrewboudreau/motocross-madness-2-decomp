@@ -27,11 +27,11 @@ struct UnknownCameraBikeState {
 // established.
 struct UnknownCameraBike {
     unsigned char field_0x000[0x48];
-    float field_0x48;
+    float savedRoll;                          // +0x48 krusty2 SoultreePhysicsBaseObject
     unsigned char field_0x04c[0x58 - 0x4c];
-    float field_0x58;                    // slot 51 multiplies it with +0x48
+    float savedCosRoll;                       // +0x58 slot 51 multiplies it with savedRoll
     unsigned char field_0x05c[0x3bc - 0x5c];
-    UnknownVehiclePart* field_0x3bc;
+    UnknownVehiclePart* modelNode;            // +0x3bc
     unsigned char field_0x3c0[0x444 - 0x3c0];
     int crashState;                           // +0x444
     unsigned char field_0x448[0x460 - 0x448];

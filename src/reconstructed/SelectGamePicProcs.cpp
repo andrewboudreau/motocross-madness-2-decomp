@@ -1969,7 +1969,7 @@ void MPBikeRiderDlg::PaintPlateNumber(int number) {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
-            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
+            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture, number);
 }
 
 // 0x004f8620
@@ -2033,10 +2033,10 @@ void MPBikeRiderDlg::ApplyChosenBike() {
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((UnknownKrustyUIModel*)ui->manufacturers)[i].field_0xc0->UnknownVirtualSlot4();
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->UnknownVirtualSlot4();
         ui = g_TrackGame->ui;
     }
-    model->field_0xc0->UnknownVirtualSlot5();
+    model->uiModel->UnknownVirtualSlot5();
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -2067,11 +2067,11 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[g_TrackGame->mode.racerChoice.bikeIndex]
             .engineSize = UNKNOWN_GARAGE_SETTINGS->engineSize;
         ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[g_TrackGame->mode.racerChoice.bikeIndex]
-            .field_0x90 = UNKNOWN_GARAGE_SETTINGS->fourStroke;
+            .fourStroke = UNKNOWN_GARAGE_SETTINGS->fourStroke;
     } else {
         int row = bikes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
-        UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].field_0x90;
+        UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
         int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
@@ -2106,7 +2106,7 @@ void MPBikeRiderDlg::SyncValues(int apply) {
         g_TrackGame->mode.racerChoice.bikeModel[count] = 0;
     }
     {
-        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48;
+        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].texture;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
         strncpy(g_TrackGame->mode.racerChoice.bikeName, name, count);

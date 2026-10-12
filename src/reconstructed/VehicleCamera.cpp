@@ -38,9 +38,9 @@ VehicleCamera* VehicleCamera::SetupVehicleCamera(void* value, float rate294, flo
 // first set target, else the global default.
 Vector3 VehicleCamera::UnknownVirtualSlot33() {
     if (vehicleMode)
-        return vehicle->field_0x64;
+        return vehicle->velocity;
     if (field_0x384)
-        return field_0x384->field_0x224;
+        return field_0x384->nodeVelocity;
     if (field_0x388)
         return field_0x388->field_0x40;
     return kVec3Zero;
@@ -65,11 +65,11 @@ Vector3 VehicleCamera::UnknownFunction52bac0() {
 Vector3 VehicleCamera::TargetPoint() {
     Vector3 position;
     if (vehicleMode) {
-        vehicle->field_0x3bc->GetPositionIn(0, &position);
+        vehicle->modelNode->GetPositionIn(0, &position);
         return position;
     }
     if (field_0x384) {
-        UnknownVehiclePart* model = field_0x384->field_0x1a0;
+        UnknownVehiclePart* model = field_0x384->modelNode;
         if (model->firstChild)
             model->firstChild->GetPositionIn(0, &position);
         else
@@ -207,11 +207,11 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
                 velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
             velocity.y = 0.0f;
             if (velocity.x == 0.0f && velocity.z == 0.0f)
-                velocity = vehicle->field_0x88;
-            float scale = vehicle->field_0xbc;
+                velocity = vehicle->bodyForward;
+            float scale = vehicle->linearSpeed;
             if (scale <= 0.01f)
                 scale = 0.01f;
-            Vector3 facing = vehicle->field_0x88 * scale;
+            Vector3 facing = vehicle->bodyForward * scale;
             facing.y = 0.0f;
             if (facing.x == 0.0f && facing.z == 0.0f)
                 facing = velocity;
@@ -253,7 +253,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
     } else {
         Vector3 other;
         if (field_0x384) {
-            UnknownVehiclePart* model = field_0x384->field_0x1a0;
+            UnknownVehiclePart* model = field_0x384->modelNode;
             if (model->firstChild)
                 model->firstChild->GetAxes(&heading, &other);
             else
@@ -280,7 +280,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
 // 0x0052cb80: the vehicle's position 0, raised by 5.
 Vector3 VehicleCamera::UnknownVirtualSlot50() {
     Vector3 position;
-    vehicle->field_0x3bc->GetPositionIn(0, &position);
+    vehicle->modelNode->GetPositionIn(0, &position);
     position.y += 5.0f;
     return position;
 }
@@ -366,7 +366,7 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
 
 // 0x0052cec0
 float VehicleCamera::UnknownVirtualSlot51() {
-    return vehicle->field_0x48;
+    return vehicle->savedRoll;
 }
 
 // 0x0052d010

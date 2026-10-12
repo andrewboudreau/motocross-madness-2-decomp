@@ -69,7 +69,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
             largest = extent.z;
         field_0x3c = largest + largest;
         field_0x38 = (float)pixels;
-        float scale = field_0x38 * field_0x44 / (field_0x3c * arcadeView->field_0x198);
+        float scale = field_0x38 * field_0x44 / (field_0x3c * arcadeView->focalLength);
         modelScale = scale;
         arcadeModel->Scale(scale, scale, scale);
     }

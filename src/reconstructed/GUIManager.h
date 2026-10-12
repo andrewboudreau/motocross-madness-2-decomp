@@ -92,19 +92,19 @@ struct UnknownGuiSurface {
 // Only the members it reads are declared; its class is not established.
 struct UnknownGroundFogCamera {
     unsigned char field_0x000[0x170];
-    float field_0x170;                        // eye position
-    float field_0x174;
-    float field_0x178;
+    float eyeX;                               // +0x170 eye position
+    float eyeY;                               // +0x174
+    float eyeZ;                               // +0x178
 };
 
 struct UnknownGroundFogOwner {
     unsigned char field_0x00[0x08];
-    UnknownGroundFogCamera* field_0x08;
+    UnknownGroundFogCamera* currentCamera;    // +0x08
 };
 
 struct UnknownGroundFog {
     unsigned char field_0x00[0x18];
-    UnknownGroundFogOwner* field_0x18;        // GameObject+0x18
+    UnknownGroundFogOwner* renderContext;     // +0x18 GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];
     float planeHeight;                        // +0x30: fog plane height (compared with each vertex's y)
     float depthLimit;                         // +0x34

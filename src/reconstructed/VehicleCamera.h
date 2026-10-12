@@ -32,16 +32,16 @@ struct UnknownCameraRider {
 
 struct UnknownCameraVehicle {
     unsigned char field_0x000[0x48];
-    float field_0x48;                    // VehicleCamera slot 51
-    float field_0x4c;                    // VehicleCamera slot 35 pitch angle
+    float savedRoll;                          // +0x48 VehicleCamera slot 51; krusty2 SoultreePhysicsBaseObject
+    float savedPitch;                         // +0x4c VehicleCamera slot 35 pitch angle
     unsigned char field_0x050[0x64 - 0x50];
-    Vector3 field_0x64;                  // VehicleCamera slot 33
+    Vector3 velocity;                         // +0x64 VehicleCamera slot 33
     unsigned char field_0x070[0x88 - 0x70];
-    Vector3 field_0x88;                  // VehicleCamera slot 41 heading fallback
+    Vector3 bodyForward;                      // +0x88 VehicleCamera slot 41 heading fallback
     unsigned char field_0x094[0xbc - 0x94];
-    float field_0xbc;                    // VehicleCamera slot 41 (at least 0.01)
+    float linearSpeed;                        // +0xbc |velocity|; VehicleCamera slot 41 (at least 0.01)
     unsigned char field_0x0c0[0x3bc - 0xc0];
-    UnknownVehiclePart* field_0x3bc;     // VehicleCamera slot 50
+    UnknownVehiclePart* modelNode;            // +0x3bc VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float field_0x434;                   // VehicleCamera slot 36 tests > 0.1
     float field_0x438;                   // KrustyBikeCamera slot 34 divisor
@@ -78,9 +78,9 @@ struct UnknownCameraVehicle {
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
 struct UnknownCameraTargetA {
     unsigned char field_0x000[0x1a0];
-    UnknownVehiclePart* field_0x1a0;     // 0x0052bb60
+    UnknownVehiclePart* modelNode;       // +0x1a0 0x0052bb60; the characters' model node (krusty2 Character)
     unsigned char field_0x1a4[0x224 - 0x1a4];
-    Vector3 field_0x224;
+    Vector3 nodeVelocity;                // +0x224 krusty2 CollisionCharacter::nodeVelocity
 };
 
 struct UnknownCameraTargetB {

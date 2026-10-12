@@ -421,7 +421,7 @@ public:
     unsigned char field_0x124[0x128 - 0x124];
     CarProceduralCollision* field_0x128;      // its +0x68 is set without tree collision (the loader)
     unsigned char field_0x12c[0x3bc - 0x12c];
-    UnknownBikeRaceModel* field_0x3bc;
+    UnknownBikeRaceModel* modelNode;          // +0x3bc
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
     int outOfRace;                            // +0x4a0 out of the race (0x0041f1d0 skips it)
     unsigned char field_0x4a4[0x5bc - 0x4a4];
@@ -591,7 +591,7 @@ struct UnknownBikeRaceView6c : virtual public GameObject {
     unsigned char field_0x008[0x1a0 - 0x08];
     UnknownBikeRaceMesh* model;               // +0x1a0 model (the setup places it)
     unsigned char field_0x1a4[0x210 - 0x1a4];
-    UnknownBikeRaceCollider* field_0x210;
+    UnknownBikeRaceCollider* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
 };
 
 // The object at BikeRace+0x4c: 0x00507c10 moves a point (the track debug
@@ -610,7 +610,7 @@ public:
 // (0x0041eb20 tests bit 0 of scene objects).
 struct UnknownBikeRaceObjectFlags {
     unsigned char field_0x00[0x25];
-    unsigned char field_0x25_bit0 : 1;
+    unsigned char isEnabled : 1;              // +0x25
 };
 
 // A scene character (Scene+0xb4 entries with bit 3 set): it reaches its
@@ -647,10 +647,10 @@ struct UnknownBikeRaceCameraView {
     // previous racer's model again and hiding the new one's.
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
         if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
-            field_0x3b0->field_0x3bc->SetLowestLod(1);
+            field_0x3b0->modelNode->SetLowestLod(1);
             field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
-            if (field_0x3b0->field_0x3bc->currentDetailLevel == 0) {
-                field_0x3b0->field_0x3bc->SetLod(1);
+            if (field_0x3b0->modelNode->currentDetailLevel == 0) {
+                field_0x3b0->modelNode->SetLod(1);
             }
             if (field_0x3b0->riderCharacter->modelNode->currentDetailLevel == 0) {
                 field_0x3b0->riderCharacter->modelNode->SetLod(1);
@@ -667,7 +667,7 @@ struct UnknownBikeRaceCameraView {
         field_0x274 = 0;
         field_0x3b4 = racer;
         if (!racer->field_0x740->field_0x18c) {
-            racer->field_0x3bc->SetLowestLod(0);
+            racer->modelNode->SetLowestLod(0);
             field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
         }
         field_0x274 = 0;
@@ -728,7 +728,7 @@ struct UnknownBikeRacePickCaster {
 
 struct UnknownBikeRacePickCharacter {
     unsigned char field_0x000[0x210];
-    int field_0x210;
+    int collisionObject;                      // +0x210 krusty2 CollisionCharacter::collisionObject
 };
 
 struct UnknownBikeRacePickObject {

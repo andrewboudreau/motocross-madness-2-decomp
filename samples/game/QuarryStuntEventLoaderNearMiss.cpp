@@ -106,7 +106,7 @@ struct UnknownQuarryRaceView {
 };
 struct UnknownQuarryRacer {
     unsigned char field_0x000[0x3bc];
-    D3DIMSoultreeObject* field_0x3bc;           // bike model
+    D3DIMSoultreeObject* modelNode;             // +0x3bc bike model
     unsigned char field_0x3c0[0x5c4 - 0x3c0];
     UnknownQuarryRacerRider* riderCharacter;      // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
@@ -126,7 +126,7 @@ struct UnknownQuarryRacer {
 // BikeRace (0x400 bytes, constructor 0x00417c30) as the loader uses it.
 struct UnknownQuarryRaceCharacter {
     unsigned char field_0x000[0x210];
-    UnknownQuarryCollision* field_0x210;
+    UnknownQuarryCollision* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
 };
 class UnknownQuarryRace : public GameObject {
 public:
@@ -686,13 +686,13 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         }
     }
     UnknownQuarryRace* race = (UnknownQuarryRace*)raceView;
-    if (race->field_0x6c && race->field_0x6c->field_0x210) {
-        race->field_0x6c->field_0x210->Release();
-        ((UnknownQuarryRace*)raceView)->field_0x6c->field_0x210 = 0;
+    if (race->field_0x6c && race->field_0x6c->collisionObject) {
+        race->field_0x6c->collisionObject->Release();
+        ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject = 0;
     }
-    if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210) {
-        ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210->Release();
-        ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210 = 0;
+    if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject) {
+        ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject->Release();
+        ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject = 0;
     }
     if (eventScene->animationTable) {
         for (int i = 0; i < eventScene->animationTable->entryCount; i++) {
@@ -783,7 +783,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         AppendChild((GameObject*)projectedShadow, -1);
-        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->field_0x3bc);
+        ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)
             ->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->riderCharacter->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae50(&shadowLight->position, &shadowLight->look, 3);
@@ -808,10 +808,10 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
     UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
     if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {
-        camera->field_0x3b0->field_0x3bc->SetLowestLod(1);
+        camera->field_0x3b0->modelNode->SetLowestLod(1);
         camera->field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
-        if (!camera->field_0x3b0->field_0x3bc->currentLod)
-            camera->field_0x3b0->field_0x3bc->SetLod(1);
+        if (!camera->field_0x3b0->modelNode->currentLod)
+            camera->field_0x3b0->modelNode->SetLod(1);
         if (!camera->field_0x3b0->riderCharacter->modelNode->currentLod)
             camera->field_0x3b0->riderCharacter->modelNode->SetLod(1);
     }
@@ -826,7 +826,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     camera->field_0x274 = 0;
     camera->field_0x3b4 = bike;
     if (!bike->field_0x740->field_0x18c) {
-        bike->field_0x3bc->SetLowestLod(0);
+        bike->modelNode->SetLowestLod(0);
         camera->field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
     }
     camera->field_0x274 = 0;

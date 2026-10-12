@@ -240,11 +240,11 @@ found:
     UNKNOWN_COPY_TEXT(racers[0].bikeModel,
                       ((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bike].model].modelName)
     UNKNOWN_COPY_TEXT(racers[0].bikeName,
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48)
+                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].texture)
     UNKNOWN_COPY_TEXT(racers[0].bikeDisplayName,
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].displayName)
     racers[0].engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].engineSize;
-    racers[0].field_0x13c = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x90;
+    racers[0].field_0x13c = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].fourStroke;
     DebugFree(used, __FILE__, 273);
 }
 
@@ -403,7 +403,7 @@ void UnknownTrackGameObject3444::PickComputerRacers()
         do {
             ui = g_TrackGame->ui;
             rider = &((UnknownKrustyUIModel*)ui->riders)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
-        } while (rider->field_0xc0 || rider->modelKind != riderKind);
+        } while (rider->uiModel || rider->modelKind != riderKind);
         UNKNOWN_COPY_TEXT(racers[racer].riderModel, rider->modelName)
 
         UnknownKrustyUIBike* bike;
@@ -439,9 +439,9 @@ void UnknownTrackGameObject3444::PickComputerRacers()
     found:
         UNKNOWN_COPY_TEXT(racers[racer].bikeModel,
                         ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[bike->model].modelName)
-        UNKNOWN_COPY_TEXT(racers[racer].bikeName, bike->field_0x48)
+        UNKNOWN_COPY_TEXT(racers[racer].bikeName, bike->texture)
         UNKNOWN_COPY_TEXT(racers[racer].bikeDisplayName, bike->displayName)
         racers[racer].engineSize = bike->engineSize;
-        racers[racer].field_0x13c = bike->field_0x90;
+        racers[racer].field_0x13c = bike->fourStroke;
     }
 }

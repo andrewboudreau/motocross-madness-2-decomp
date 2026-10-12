@@ -79,7 +79,7 @@ struct UnknownKrustyUIModel {
     char displayName[0x40];                   // +0x00: display name
     char modelName[0x40];                     // +0x40
     unsigned char field_0x80[0xc0 - 0x80];
-    UnknownKrustyUIModelObject* field_0xc0;
+    UnknownKrustyUIModelObject* uiModel;      // +0xc0
     int modelKind;                            // +0xc4: kind
 };
 
@@ -98,10 +98,10 @@ public:
 struct UnknownKrustyUIBike {
     int model;                                // +0x00: model (KrustyUI+0x48)
     char displayName[0x44];                   // +0x04: display name
-    char field_0x48[0x40];                    // +0x48: texture ("BikeTexture_%02d")
+    char texture[0x40];                       // +0x48: texture ("BikeTexture_%02d")
     int field_0x88;
     int engineSize;                           // +0x8c: engine size
-    int field_0x90;                           // +0x90: four-stroke ("BikeFourStroke_%02d")
+    int fourStroke;                           // +0x90: four-stroke ("BikeFourStroke_%02d")
 };
 
 // The race settings at TrackGame+0x2d70 (0x1ec bytes; InGameProcs.cpp

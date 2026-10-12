@@ -59,7 +59,7 @@ static inline int ModeWidth(UnknownDisplay* display)
 int BackgroundImage::UnknownVirtualSlot13() {
     if (!fullRestoreFrames) {
         UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->currentCamera;
-        if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
+        if (!camera || !camera->isEnabled || !camera->redrawFrames ||
             camera->viewportHeight != ModeHeight(g_TrackGame->display) ||
             camera->viewportWidth != ModeWidth(g_TrackGame->display)) {
             if (!copyValid) {

@@ -81,7 +81,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
             float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
             offset = (float)((1.0f - followDistance * 0.0016666667f) * 1.8f) * (scale * scale * along / speed);
         }
-        float length = vehicleMode ? vehicle->field_0xbc : Length(velocity);
+        float length = vehicleMode ? vehicle->linearSpeed : Length(velocity);
         distance = zoom * distance + ClimbScale(velocity.y, length, offset);
         offset = (1.0f - zoom) * (velocity.y * 0.25f);
     } else {
@@ -97,7 +97,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
         side.y = 0.0f;
         side.z = -field_0x29c.x;
         Vector3 pitched;
-        D3DRMVectorRotate(&pitched, &field_0x29c, &side, -vehicle->field_0x4c);
+        D3DRMVectorRotate(&pitched, &field_0x29c, &side, -vehicle->savedPitch);
         D3DRMVectorRotate(&direction, &pitched, (Vector3*)&kVec3YAxis, field_0x308 * 0.7f);
     } else {
         D3DRMVectorRotate(&direction, &field_0x29c, (Vector3*)&kVec3YAxis, field_0x308 * 0.7f);

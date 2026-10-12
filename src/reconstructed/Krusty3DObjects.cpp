@@ -310,7 +310,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, Unknow
 // The owner a NumberObjectManager compares its camera with (its +0x18).
 struct UnknownNumberOwner {
     unsigned char field_0x00[0x08];
-    UnknownNumberCamera* field_0x08;
+    UnknownNumberCamera* currentCamera;        // +0x08
 };
 
 // 0x0048bfc0
@@ -319,7 +319,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
     for (int i = 0; i < 5; i++)
         if (field_0x38[i])
             field_0x38[i]->isVisible = 0;
-    if (((UnknownNumberOwner*)renderContext)->field_0x08 == field_0x34) {
+    if (((UnknownNumberOwner*)renderContext)->currentCamera == field_0x34) {
         int counting = field_0x2c->countdown > 0.0f && field_0x2c->field_0x6c == 0;
         if (!(field_0x2c->field_0x38->field_0x76c > 1.0f) && !counting)
             return 1;
@@ -327,7 +327,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
         Vector3 up;
         Vector3 forward;
         forward = field_0x34->viewDirection;
-        up = field_0x34->field_0x188;
+        up = field_0x34->upDirection;
         int index;
         if (counting) {
             index = (int)field_0x2c->countdown;
