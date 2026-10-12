@@ -31,12 +31,6 @@
 //   Also <= 89 (48 forms): a `GUIUser* user` local, x and y as if/else
 //   assignments of locals (with a `half` local), a text local, a `tip = this`
 //   alias and an `int* p = position` local.
-// 0x00486b80 (553 bytes, ratio 0.97): retail computes the width limit as
-//   `sub eax, 2` (VC6 here: `add eax, -2`) and spills width/height into the
-//   SIZE slots later. VC6 emits `sub` only for a named `limit` local (the
-//   repeated `field_0x0c - 2` is CSE'd as `add -2`), but that form moves the
-//   textArea stores (218/554); updating `size.cx`/`size.cy` in place gives
-//   retail's tail (457/555) and loses the head.
 // 0x00488120 (52 bytes, 46/52): retail keeps the `device ? owner : 0` branch
 //   (jmp + xor) and tests the owner for zero before comparing it with
 //   `this`. VC6 threads the xor arm into the next test whenever that test is
@@ -199,72 +193,6 @@ void ToolTip::UnknownFunction486b10(UnknownGuiControl* control) {
                          : control->area.left + (control->area.right - control->area.left) / 2;
     position[1] = device ? device->pointerPosition.y + 16 : control->area.bottom;
     ShowText(control->toolTipText, position, 1.0f);
-}
-
-// 0x00486b80
-void ToolTip::ShowText(const char* text, int* position, float time) {
-    PCRenderTarget* target;
-    PCTextureMap* texture;
-    HDC dc;
-    HGDIOBJ previous;
-    SIZE size;
-    int width;
-    int height;
-    int x;
-
-    if (textTexture) {
-        textTexture->Release();
-        textTexture = 0;
-    }
-    if (text) {
-        if (tipGui->guiBackground && backgroundRegion == -1) {
-            backgroundRegion = tipGui->guiBackground->AllocRegion(0);
-            restoreFrames = 3;
-        }
-        if (!((PCRenderTarget*)renderContext)->renderSurface->GetDC((void**)&dc)) {
-            previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
-            GetTextExtentPoint32A(dc, text, strlen(text), &size);
-            SelectObject(dc, previous);
-            ((PCRenderTarget*)renderContext)->renderSurface->ReleaseDC(dc);
-            target = (PCRenderTarget*)renderContext;
-            width = size.cx + 2;
-            if (width >= target->targetWidth - 2)
-                width = target->targetWidth - 2;
-            height = size.cy + 2;
-            textArea.top = 0;
-            textArea.left = 0;
-            textArea.right = width;
-            textArea.bottom = height;
-            screenArea.left = position[0];
-            screenArea.top = position[1];
-            x = screenArea.left - width / 2;
-            x = x < 0 ? 0 : x;
-            screenArea.left = __min(target->targetWidth - width, x);
-            screenArea.top = __min(target->targetHeight - height, screenArea.top);
-            screenArea.right = screenArea.left + width;
-            screenArea.bottom = screenArea.top + height;
-            texture = tipGui->CreateFilledTexture(width, height, 0x808080);
-            textTexture = texture;
-            if (texture && texture->systemSurface) {
-                if (!texture->systemSurface->GetDC((void**)&dc)) {
-                    previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
-                    SetTextColor(dc, 0xcccccc);
-                    SetBkColor(dc, 0x404040);
-                    DrawTextA(dc, text, strlen(text), &textArea, 0x8025);
-                    SelectObject(dc, previous);
-                    texture->systemSurface->ReleaseDC(dc);
-                }
-                shown = 1;
-                showDelay = time;
-                return;
-            }
-            shown = 0;
-            showDelay = -1.0f;
-            return;
-        }
-    }
-    shown = 0;
-    showDelay = -1.0f;
 }
 
 // 0x00488120

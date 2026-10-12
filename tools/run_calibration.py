@@ -26464,6 +26464,15 @@ CASES = [
         'target_size': 948,
         'reason': 'DirectPlay address: the port element points at a WORD atoi local, so `port` stays unaliased and in ebx across lstrlenA',
     },
+    {
+        'name': 'GUIManager.cpp tool-tip show text 0x486b80',
+        'bindings': 'src/reconstructed/GUIManager.bindings.json',
+        'source': 'src/reconstructed/GUIManager.cpp',
+        'symbol': '?ShowText@ToolTip@@QAEXPBDPAHM@Z',
+        'target_va': '0x00486b80',
+        'target_size': 555,
+        'reason': 'tool-tip layout: a named width limit gives `sub eax, 2`, and the padded width/height are written back into the SIZE slots as retail does',
+    },
 ]
 
 def main():

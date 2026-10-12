@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 166, c 111, total 278. The three class (a) functions of the
+Counts: a 1, b 166, c 110, total 277. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -289,7 +289,6 @@ branches, try locals declared in the branches.
 | ui/GUIManager | `0x00485a70` | 62/345 | c | 29 code diffs: retail lacks `mov edx, ebx`; retail lacks `mov ebp, [esp + N]` |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
 | ui/GUIManager | `0x00486b10` | 89/106 | c | two per-component ternaries give retail's `pop edi` placement; retail loads bottom into eax after storing x and passes the text in eax and &position in edx (VC6 here hoists the bottom load into edx beside the cdq and swaps the call registers) |
-| ui/GUIManager | `0x00486b80` | 227/555 | c | 13 code diffs: `add eax, -2` vs `sub eax, 2`; retail adds `mov edi, [esp + N]` (a named `limit` local gives retail's `sub eax, 2`, but retail also writes width/height back into `size`'s slots) |
 | ui/GUIManager | `0x00488120` | 46/52 | c | retail tests the owner for zero before comparing it with `this`; VC6 threads the ternary's xor arm into a leading zero test, so the sample compares with `this` first (samples/ui/GUIManagerNearMisses.cpp) |
 | ui/GameUi | `0x0046a920` | 684/2323 (masked) | b | 17 code diffs: `mov eax, 0x64` vs `mov ecx, 0x64 ; mov eax, 1 ; mov [esp +~`; `mov eax, 1` vs `mov [esp + N], eax`; frame 0x9bf4 vs 0x9c74, slot order differs |
 | ui/GameUi | `0x0046ef00` | 352/555 | c | 13 code diffs: retail adds `mov [edi + 0xc], ebx`; retail lacks `mov [edi + 0xc], ebx` |

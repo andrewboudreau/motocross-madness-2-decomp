@@ -33,16 +33,21 @@ points to it); its timer fields are named after the overlay's column header
 `UnknownKrustyUIGui` / `UnknownKrustyUIGuiLayer` views; unifying them
 would change KrustyUI's mangled names.
 
-Exact: 99 calibration cases, among them `OpenDialogResource` `0x00485c80`
+Exact: 100 calibration cases, among them `OpenDialogResource` `0x00485c80`
 (its `new` allocates the 0x7f58-byte UIDialog that UIDialog.h now declares)
 and `SetUp` `0x004853b0` (its font-size parameter is a `short`: the slot of a
 sub-int parameter is freed at entry, which is where retail homes the
 ControlInterface pointer; docs/VC6_FRAME_LAYOUT.md) and the focus move
 `0x00487870`, whose IME switch is written as
 `if (a && !strcmp(a, "0123456789")) EnableImeInput(0); else EnableImeInput(1);`
-(retail has one call site per value).
+(retail has one call site per value), and the tool-tip `ShowText`
+`0x00486b80`: the width limit is a named local
+(`int limit = target->targetWidth - 2;`, retail's `sub eax, 2`; the repeated
+expression is CSE'd as `add eax, -2`) and the padded width and height are
+written back into the `SIZE` (`size.cx = width; size.cy += 2;`), two dead
+stores retail keeps.
 The dialog is a plain `UIDialog*` everywhere (the former `UnknownGuiDialog`
 view is gone; `FindSectionObject` returns the dialog's `Sound*`). Near misses
-(`samples/ui/GUIManagerNearMisses.cpp`, notes there): show dialog `ShowDialog` `0x00485a70`, the screen grab `0x00486170`, the tool-tip layout `0x00486b10` /
-`0x00486b80` and `0x00488120`. HiResMeter slot 8
+(`samples/ui/GUIManagerNearMisses.cpp`, notes there): show dialog `ShowDialog` `0x00485a70`, the screen grab `0x00486170`, the tool-tip layout `0x00486b10` and
+`0x00488120`. HiResMeter slot 8
 `0x00488440` uses `rdtsc` (inline assembly) and is not attempted.
