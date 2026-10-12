@@ -54,7 +54,7 @@ public:
     UIFrame(void* module, int id, void* textures, int a, int b, int c, void* palette);
     virtual ~UIFrame();                       // 0x00472dc0 (deleting wrapper 0x00472ba0)
     // 0x00472bc0: loads the image at `offset` of `stream`; 0 when it fails.
-    int UnknownFunction472bc0(void* stream, int offset, void* palette);
+    int LoadFromStream(void* stream, int offset, void* palette);
 
     int isSound;                              // +0x08: 1: a sound, not an image
     int frameWidth;                           // +0x0c
@@ -210,7 +210,7 @@ public:
     int IsEnabled();                          // 0x00470720: returns +0x6c
     void SetSound(int index, Sound* sound);   // 0x00470810: "SoundNorm", "SoundFocus", "SoundPush", "SoundClick"
     void SetAnchor(UIControl* anchor, int relative); // 0x00470830: "Anchor" and "RelAnchor"
-    UIControl* UnknownFunction470850(UIControl* none); // 0x00470850: the last linked control
+    UIControl* FindLastAnchor(UIControl* none); // 0x00470850: the last linked control
     void SetShapeBounds(int value);           // 0x004709d0: "ShapeBounds"
     void SetTextDrop(int value);              // 0x00470d60: "TextDrop"
     void SetDropColor(int value);             // 0x00470d80: "DropColor"
@@ -220,15 +220,15 @@ public:
     // 0x00470870: starts transition `type` (100-106: the loader's "FX" GROW,
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
     void StartTransition(int type, int a, int b, int delay, int c);
-    int UnknownFunction471500();              // 0x00471500
-    GameObjectIterator* UnknownFunction4726b0(); // slot 53's body: an iterator over the owner's controls
-    void UnknownFunction472730(GameObjectIterator* iterator); // 0x00472730: deletes it
-    // 0x00472750: the next control with this control's id.
-    UIControl* UnknownFunction472750(GameObjectIterator* iterator);
-    // 0x00472790: the next control with this control's id and another type.
-    UIControl* UnknownFunction472790(GameObjectIterator* iterator);
-    UIControl* UnknownFunction4727c0(); // 0x004727c0: the previous focusable control
-    UIControl* UnknownFunction472810(); // 0x00472810: the next focusable control
+    int RunTransition();              // 0x00471500
+    GameObjectIterator* CreateControlIterator(); // slot 53's body: an iterator over the owner's controls
+    void DeleteControlIterator(GameObjectIterator* iterator); // 0x00472730: deletes it
+    // 0x00472750: the next control with this control's attach id.
+    UIControl* NextAttachedControl(GameObjectIterator* iterator);
+    // 0x00472790: the next control with this control's attach id and type.
+    UIControl* NextAttachedControlOfType(GameObjectIterator* iterator);
+    UIControl* PreviousFocusableControl(); // 0x004727c0: the previous focusable control
+    UIControl* NextFocusableControl(); // 0x00472810: the next focusable control
     int UnknownFunction472480(int* position); // 0x00472480
 
     int field_0x2c[4];                        // screen area (scaled +0x3c)
@@ -328,7 +328,7 @@ public:
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00473410
 
     // 0x004732d0: the images for the up, over, down, disabled and focus states.
-    void UnknownFunction4732d0(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled);
+    void SetStateImages(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled);
     void SetNormalImage(UIAnim* image); // 0x00473310
     void SetFocusImage(UIAnim* image); // 0x00473330
     void SetPushImage(UIAnim* image); // 0x00473350
@@ -364,8 +364,8 @@ public:
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10 (shared with UIScrollCtl)
     virtual void UnknownVirtualSlot59(int value); // 0x00473840: writes the text back
 
-    void UnknownFunction473d80(int value);    // 0x00473d80
-    void UnknownFunction473d90(int value);    // 0x00473d90
+    void SetClickSound(int value);    // 0x00473d80
+    void SetFullSound(int value);    // 0x00473d90
     void BindTextBuffer(char* buffer, int size); // 0x00473820: binds a text buffer (OptionProcs.cpp)
     void SetCapacity(int size);     // 0x00473c70: the text's capacity
     void SetEditText(char* text);   // 0x00473da0: sets the text
@@ -424,10 +424,10 @@ public:
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x00475970
     virtual void UnknownVirtualSlot59(int value); // 0x00474cb0
 
-    void UnknownFunction475160(int state);    // 0x00475160: the thumb size from a state image
+    void SetThumbSizeFromState(int state);    // 0x00475160: the thumb size from a state image
     void UnknownFunction4751c0(int range);    // 0x004751c0
-    int UnknownFunction4751e0(UIListBox* list); // 0x004751e0: `list`'s scroll range
-    int UnknownFunction475200(UIListBox* list); // 0x00475200: follows `list`
+    int GetListScrollRange(UIListBox* list); // 0x004751e0: `list`'s scroll range
+    int FollowList(UIListBox* list); // 0x00475200: follows `list`
     int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
     int UnknownFunction4753c0(int value, int range); // 0x004753c0: sets the position to `value` of `range`
     void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
@@ -497,7 +497,7 @@ public:
     char* GetRowText(int row);                // 0x00476d20: (-1: the selected one)
     int AddRow(const char* text, int data, int a); // 0x00476d80: adds a row ("Item%d")
     int CountVisibleRows();                   // 0x00476ee0: the rows that fit from the first shown
-    int UnknownFunction476f50(int rows);      // 0x00476f50: grows the rows to `rows`
+    int ReserveRows(int rows);      // 0x00476f50: grows the rows to `rows`
     void SetRowText(int row, const char* text); // 0x00476ff0
     int AddImageFileRow(const char* image, int a, int b, int c); // 0x00477110
     int AddImageRow(UIAnim* image, int data, int a); // 0x004773a0 ("Item%d" starting with '@')
@@ -668,13 +668,13 @@ public:
     virtual int UnknownVirtualSlot61();       // 0x0047a850
     virtual int UnknownVirtualSlot62();       // 0x0047a870
 
-    void UnknownFunction47a2d0(int open);     // 0x0047a2d0: opens or closes the list
-    void UnknownFunction47a400();             // 0x0047a400: names and lays out the parts
-    void UnknownFunction47a880(int height);   // 0x0047a880: lays the parts out for a row height
-    void UnknownFunction47a970(UIAnim* image); // 0x0047a970: the static part's image
-    void UnknownFunction47aa40(UIAnim* image); // 0x0047aa40: the button's image
-    void UnknownFunction47ab20(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
-    int UnknownFunction47a800(UIControl* control); // 0x0047a800: whether `control` is a part
+    void SetOpen(int open);     // 0x0047a2d0: opens or closes the list
+    void LayoutParts();             // 0x0047a400: names and lays out the parts
+    void LayoutForRowHeight(int height);   // 0x0047a880: lays the parts out for a row height
+    void SetStaticImage(UIAnim* image); // 0x0047a970: the static part's image
+    void SetButtonImage(UIAnim* image); // 0x0047aa40: the button's image
+    void SetCornerImage(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
+    int IsPart(UIControl* control); // 0x0047a800: whether `control` is a part
     // Inline: the button. SelectGamePicProcs.cpp reads it through this
     // accessor; reading field_0x1ec directly lets VC6 merge the two branches
     // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the

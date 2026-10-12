@@ -194,7 +194,7 @@ void UIButton::UnknownVirtualSlot49(int enable) {
 
 // 0x00477110
 int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
-    if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
+    if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
         return 0;
     UnknownGameUiListRow row;
     if (a) {
@@ -407,14 +407,14 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                 if (focus) {
                     if (x <= -1) {
                         if (joystickCentred) {
-                            UIControl* next = focus->UnknownFunction4727c0();
+                            UIControl* next = focus->PreviousFocusableControl();
                             joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
                         }
                     } else if (x >= 1) {
                         if (joystickCentred) {
-                            UIControl* next = focus->UnknownFunction472810();
+                            UIControl* next = focus->NextFocusableControl();
                             joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
@@ -761,7 +761,7 @@ int UIMultiState::UnknownVirtualSlot40() {
 
 // 0x0047a400: names the parts after the list ("<name>_BUT", "_LB", "_SB",
 // "_LBK", "_SBK", "_TBK") and lays them out below and beside the text.
-void UIDropDownList::UnknownFunction47a400() {
+void UIDropDownList::LayoutParts() {
     int left = field_0x2c[0];
     CameraRect full;
     full.left = 0;
@@ -1416,7 +1416,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         }
                         static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4753c0(position, ticks ? ticks
                                                                          : control->field_0x3c[2] - control->field_0x3c[0] + 1);
-                        scrollBar->UnknownFunction475160(0);
+                        scrollBar->SetThumbSizeFromState(0);
                     }
                 }
 
@@ -1431,10 +1431,10 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick,
                                                      isDefault ? defaultSoundClick : buffer, -1);
                     if (!isDefault)
-                        editBox->UnknownFunction473d80((int)FindSectionObject(buffer));
+                        editBox->SetClickSound((int)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("SoundEnd", defaultSoundEnd, isDefault ? defaultSoundEnd : buffer, -1);
                     if (!isDefault)
-                        editBox->UnknownFunction473d90((int)FindSectionObject(buffer));
+                        editBox->SetFullSound((int)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault) {
                         editBox->SetImage(0, FindSectionObject(buffer));
@@ -1477,12 +1477,12 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         thumb->SetImage(1, FindSectionObject(buffer));
                         thumb->SetImage(2, FindSectionObject(buffer));
                         thumb->SetImage(3, FindSectionObject(buffer));
-                        thumb->UnknownFunction475160(0);
+                        thumb->SetThumbSizeFromState(0);
                     }
                     parameters.UnknownFunction4b7f10("ListHeight", defaultListHeight,
                                                      isDefault ? &defaultListHeight : &value);
                     if (!isDefault) {
-                        dropDownList->UnknownFunction47a880(value);
+                        dropDownList->LayoutForRowHeight(value);
                         dropDownListBox = dropDownList->listPart;
                     }
                     char listKey[0x80];
@@ -1526,7 +1526,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         dropDownList->textTopMargin = topMargin;
                         dropDownList->SetFontColor(textColor);
                         dropDownList->SetDropColor(dropColor);
-                        dropDownList->UnknownFunction47a400();
+                        dropDownList->LayoutParts();
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault) {
@@ -1537,15 +1537,15 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7ec0("AnimTextBack", defaultAnimTextBack,
                                                      isDefault ? defaultAnimTextBack : buffer, -1);
                     if (!isDefault && buffer[0])
-                        dropDownList->UnknownFunction47ab20((UIAnim*)FindSectionObject(buffer));
+                        dropDownList->SetCornerImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimListBack", defaultAnimListBack,
                                                      isDefault ? defaultAnimListBack : buffer, -1);
                     if (!isDefault && buffer[0])
-                        dropDownList->UnknownFunction47a970((UIAnim*)FindSectionObject(buffer));
+                        dropDownList->SetStaticImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimScrollBack", defaultAnimScrollBack,
                                                      isDefault ? defaultAnimScrollBack : buffer, -1);
                     if (!isDefault && buffer[0])
-                        dropDownList->UnknownFunction47aa40((UIAnim*)FindSectionObject(buffer));
+                        dropDownList->SetButtonImage((UIAnim*)FindSectionObject(buffer));
                 }
 
                 // Every control's settings.
