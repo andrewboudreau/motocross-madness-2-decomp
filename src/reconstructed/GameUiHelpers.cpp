@@ -78,7 +78,7 @@ int UnknownFunction47b800(float p0x, float p0y, float d0x, float d0y,
 }
 
 // 0x0047b8a0
-float UnknownFunction47b8a0(const char* section, const char* key, double defaultValue,
+float ReadIniFloat(const char* section, const char* key, double defaultValue,
                             const char* path)
 {
     char text[0x100];

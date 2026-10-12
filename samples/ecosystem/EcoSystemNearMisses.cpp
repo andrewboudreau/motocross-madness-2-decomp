@@ -240,22 +240,22 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
                 strcpy(definitionTable[i]->name, value);
                 GetPrivateProfileString(section, "BillboardName", "NONE", value, 0x80, path);
                 strcpy(definitionTable[i]->billboardName, value);
-                definitionTable[i]->meanHeight = UnknownFunction47b8a0(section, "MeanHeight", 10.0, path);
-                definitionTable[i]->minHeight = UnknownFunction47b8a0(section, "MinHeight", 5.0, path);
-                definitionTable[i]->maxHeight = UnknownFunction47b8a0(section, "MaxHeight", 15.0, path);
-                definitionTable[i]->meanRadius = UnknownFunction47b8a0(section, "MeanRadius", 10.0, path);
-                definitionTable[i]->minRadius = UnknownFunction47b8a0(section, "MinRadius", 5.0, path);
-                definitionTable[i]->maxRadius = UnknownFunction47b8a0(section, "MaxRadius", 15.0, path);
-                definitionTable[i]->uLeft = UnknownFunction47b8a0(section, "ULeft", 0.0, path) * (1.0f / 256.0f);
-                definitionTable[i]->uRight = UnknownFunction47b8a0(section, "URight", 1.0, path) * (1.0f / 256.0f);
-                definitionTable[i]->vBottom = UnknownFunction47b8a0(section, "VBottom", 0.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->meanHeight = ReadIniFloat(section, "MeanHeight", 10.0, path);
+                definitionTable[i]->minHeight = ReadIniFloat(section, "MinHeight", 5.0, path);
+                definitionTable[i]->maxHeight = ReadIniFloat(section, "MaxHeight", 15.0, path);
+                definitionTable[i]->meanRadius = ReadIniFloat(section, "MeanRadius", 10.0, path);
+                definitionTable[i]->minRadius = ReadIniFloat(section, "MinRadius", 5.0, path);
+                definitionTable[i]->maxRadius = ReadIniFloat(section, "MaxRadius", 15.0, path);
+                definitionTable[i]->uLeft = ReadIniFloat(section, "ULeft", 0.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->uRight = ReadIniFloat(section, "URight", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->vBottom = ReadIniFloat(section, "VBottom", 0.0, path) * (1.0f / 256.0f);
                 // Retail crosses these two keys: "VTop" lands in the field the
                 // ctor and WriteEsb treat as uCenter, "UCenter" in vTop.
-                definitionTable[i]->uCenter = UnknownFunction47b8a0(section, "VTop", 1.0, path) * (1.0f / 256.0f);
-                definitionTable[i]->vTop = UnknownFunction47b8a0(section, "UCenter", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->uCenter = ReadIniFloat(section, "VTop", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->vTop = ReadIniFloat(section, "UCenter", 1.0, path) * (1.0f / 256.0f);
                 definitionTable[i]->usePlanarLighting = GetPrivateProfileInt(section, "UsePlanarLighting", 1, path) != 0;
                 definitionTable[i]->blendLods = GetPrivateProfileInt(section, "BlendLODs", 1, path) != 0;
-                definitionTable[i]->percentBias = UnknownFunction47b8a0(section, "PercentBias", 1.0, path);
+                definitionTable[i]->percentBias = ReadIniFloat(section, "PercentBias", 1.0, path);
                 red = GetPrivateProfileInt(section, "KeyColorRed", 0x5a, path);
                 green = GetPrivateProfileInt(section, "KeyColorGreen", 0x5b, path);
                 blue = GetPrivateProfileInt(section, "KeyColorBlue", 0xb, path);
@@ -283,17 +283,17 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
             for (i = 0; i < 256; i++) {
                 if (definitionTable[i]) {
                     sprintf(section, "Vegetation_%d", i);
-                    definitionTable[i]->meanSlope = UnknownFunction47b8a0(section, "MeanSlope", 45.0, path) * (1.0f / 90.0f);
+                    definitionTable[i]->meanSlope = ReadIniFloat(section, "MeanSlope", 45.0, path) * (1.0f / 90.0f);
                     definitionTable[i]->standardDeviationSlope =
-                        UnknownFunction47b8a0(section, "StandardDeviationSlope", 45.0, path) * (1.0f / 90.0f);
+                        ReadIniFloat(section, "StandardDeviationSlope", 45.0, path) * (1.0f / 90.0f);
                     definitionTable[i]->meanAspect =
-                        (UnknownFunction47b8a0(section, "MeanAspect", 180.0, path) - 180.0f) * (1.0f / 90.0f);
+                        (ReadIniFloat(section, "MeanAspect", 180.0, path) - 180.0f) * (1.0f / 90.0f);
                     definitionTable[i]->standardDeviationAspect =
-                        (UnknownFunction47b8a0(section, "StandardDeviationAspect", 180.0, path) - 180.0f) * (1.0f / 90.0f);
-                    definitionTable[i]->meanDrainage = UnknownFunction47b8a0(section, "MeanDrainage", 0.5, path);
-                    definitionTable[i]->standardDeviationDrainage = UnknownFunction47b8a0(section, "StandardDeviationDrainage", 0.5, path);
-                    definitionTable[i]->meanAltitude = UnknownFunction47b8a0(section, "MeanAltitude", 0.5, path);
-                    definitionTable[i]->standardDeviationAltitude = UnknownFunction47b8a0(section, "StandardDeviationAltitude", 0.5, path);
+                        (ReadIniFloat(section, "StandardDeviationAspect", 180.0, path) - 180.0f) * (1.0f / 90.0f);
+                    definitionTable[i]->meanDrainage = ReadIniFloat(section, "MeanDrainage", 0.5, path);
+                    definitionTable[i]->standardDeviationDrainage = ReadIniFloat(section, "StandardDeviationDrainage", 0.5, path);
+                    definitionTable[i]->meanAltitude = ReadIniFloat(section, "MeanAltitude", 0.5, path);
+                    definitionTable[i]->standardDeviationAltitude = ReadIniFloat(section, "StandardDeviationAltitude", 0.5, path);
                     GetPrivateProfileString(section, "ProbabilityTga", "NONE", value, 0x80, path);
                     if (!strcmp(value, "NONE"))
                         definitionTable[i]->probabilityTga[0] = 0;
@@ -301,7 +301,7 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
                         strcpy(definitionTable[i]->probabilityTga, value);
                 }
             }
-            northAngle = UnknownFunction47b8a0("EcoSystem", "NorthAngle", 0.0, path);
+            northAngle = ReadIniFloat("EcoSystem", "NorthAngle", 0.0, path);
             GetPrivateProfileString("EcoSystem", "ProbabilityTga", "NONE", value, 0x80, path);
             if (!strcmp(value, "NONE")) {
                 probabilityTga[0] = 0;

@@ -25644,10 +25644,10 @@ CASES = [
         'reason': '2-D segment/segment intersection parameters',
     },
     {
-        'name': 'GameUiHelpers.cpp 0x47b8a0 UnknownFunction47b8a0',
+        'name': 'GameUiHelpers.cpp 0x47b8a0 ReadIniFloat',
         'bindings': 'src/reconstructed/GameUiHelpers.bindings.json',
         'source': 'src/reconstructed/GameUiHelpers.cpp',
-        'symbol': '?UnknownFunction47b8a0@@YAMPBD0N0@Z',
+        'symbol': '?ReadIniFloat@@YAMPBD0N0@Z',
         'target_va': '0x0047b8a0',
         'target_size': 141,
         'reason': 'float profile value with the "NONE" default sentinel (25 callers)',

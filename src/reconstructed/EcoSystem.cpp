@@ -560,7 +560,7 @@ void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefi
                 shape->start.y = (float)atof(strtok(0, ","));
                 shape->start.z = (float)atof(strtok(0, "\n"));
                 sprintf(key, "CollisionObject%iRadius", i + 1);
-                shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
+                shape->radius = ReadIniFloat(section, key, 0.0, path);
             } else if (!_stricmp(kind, "RADIUSEDLINE")) {
                 shape->type = 3;
                 sprintf(key, "CollisionObject%iStart", i + 1);
@@ -574,7 +574,7 @@ void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefi
                 shape->end.y = (float)atof(strtok(0, ","));
                 shape->end.z = (float)atof(strtok(0, "\n"));
                 sprintf(key, "CollisionObject%iRadius", i + 1);
-                shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
+                shape->radius = ReadIniFloat(section, key, 0.0, path);
             } else if (!_stricmp(kind, "CYLINDER")) {
                 shape->type = 1;
                 sprintf(key, "CollisionObject%iBottom", i + 1);
@@ -583,9 +583,9 @@ void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefi
                 shape->start.y = (float)atof(strtok(0, ","));
                 shape->start.z = (float)atof(strtok(0, "\n"));
                 sprintf(key, "CollisionObject%iRadius", i + 1);
-                shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
+                shape->radius = ReadIniFloat(section, key, 0.0, path);
                 sprintf(key, "CollisionObject%iHeight", i + 1);
-                shape->height = UnknownFunction47b8a0(section, key, 0.0, path);
+                shape->height = ReadIniFloat(section, key, 0.0, path);
             }
         }
     } else {

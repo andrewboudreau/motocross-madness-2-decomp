@@ -26,7 +26,7 @@ int UnknownFunction47b800(float p0x, float p0y, float d0x, float d0y,
 
 // 0x0047b8a0: a profile value as a float, `defaultValue` when the key is
 // missing ("NONE").
-float UnknownFunction47b8a0(const char* section, const char* key, double defaultValue,
+float ReadIniFloat(const char* section, const char* key, double defaultValue,
                             const char* path);
 
 // 0x0047b930, 0x0047b9e0 and 0x0047ba80: the profile API on `file` joined
