@@ -126,17 +126,17 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
 
 // 0x0045c9e0
 EventManager::EventManager(int flags) : GameObject(flags) {
-    field_0x34 = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x44 = 0;
+    waitingForRacers = 0;
+    keepAliveStarted = 0;
+    endNetworkGamePending = 0;
+    anyRacerFinished = 0;
+    allRacersFinished = 0;
     field_0x48 = 0;
     field_0x4c = 0;
     field_0x3c0 = 0;
     keepAliveTimeout = 20.0f;
     keepAliveInterval = 1.0f;
-    field_0x440 = 0;
+    resumeArmed = 0;
     podiumCamera = 0;
     podiumObject = 0;
     field_0x3c4 = Vector3(-1000.0f, -1000.0f, -1000.0f);
@@ -225,8 +225,8 @@ int EventManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputE
     if (g_TrackGame->uiInteractionBlocked && !g_TrackGame->network &&
         (event->kind == 2 || event->kind == 0 && event->control == 1 ||
          event->kind == 0 && event->control == 0x1c || event->kind == 0 && event->control == 0x39) &&
-        field_0x440) {
-        field_0x440 = 0;
+        resumeArmed) {
+        resumeArmed = 0;
         g_TrackGame->uiInteractionBlocked = 0;
         g_TrackGame->field_0x3438 = 1;
         UnknownFunction45e600();
@@ -240,7 +240,7 @@ int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
     if (g_TrackGame->uiInteractionBlocked)
-        field_0x440 = 1;
+        resumeArmed = 1;
     return 0;
 }
 
@@ -249,11 +249,11 @@ int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
 // seconds it lifts the block.
 int EventManager::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x3c) {
+    if (endNetworkGamePending) {
         EndNetworkGame();
-        field_0x3c = 0;
+        endNetworkGamePending = 0;
     }
-    if (field_0x34)
+    if (waitingForRacers)
         WaitForRemoteRacers(frameTime);
     else if (!g_TrackGame->field_0x3428 && !g_TrackGame->uiInteractionBlocked &&
              HasRaceMode())
@@ -284,7 +284,7 @@ void EventManager::ResetEntries() {
 
 // 0x0045e550
 void EventManager::WaitForRemoteRacers(float) {
-    if (!field_0x34)
+    if (!waitingForRacers)
         return;
     int ready = 1;
     int local = g_TrackGame->network->localPlayer;
@@ -298,7 +298,7 @@ void EventManager::WaitForRemoteRacers(float) {
     }
     if (ready) {
         g_TrackGame->network->StopKeepAlive();
-        field_0x34 = 0;
+        waitingForRacers = 0;
         UnknownFunction45e600();
         if (g_TrackGame->networkGameObject)
             g_TrackGame->networkGameObject->UnknownFunction49c770();
@@ -366,7 +366,7 @@ int CompareStandings(const void* a, const void* b) {
 
 // 0x0045e600
 void EventManager::UnknownFunction45e600() {
-    if (g_TrackGame->network && field_0x34)
+    if (g_TrackGame->network && waitingForRacers)
         return;
     if (!g_TrackGame->uiInteractionBlocked && !g_TrackGame->field_0x3438) {
         UnknownFunction45e9d0();
@@ -389,7 +389,7 @@ void EventManager::UnknownFunction45e600() {
         if (g_TrackGame->network &&
             (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 || field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c))
             g_TrackGame->network->SetSessionJoinable(1);
-        field_0x34 = 0;
+        waitingForRacers = 0;
         UnknownFunction45cdc0(2);
         UnknownFunction45e710(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
     }
@@ -450,7 +450,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     }
                 }
             }
-            if (field_0x38)
+            if (keepAliveStarted)
                 return 0;
             if (g_TrackGame->mode.field_0x27f8.field_0x04 == 4) {
                 TrackGameViewOwner* owner = FindRaceMode();
@@ -478,7 +478,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             }
             if (message->field_0x04 == g_TrackGame->network->localPlayer) {
                 g_TrackGame->network->StopKeepAlive();
-                field_0x3c = 1;
+                endNetworkGamePending = 1;
             } else {
                 for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
                     if (message->field_0x04 == g_TrackGame->mode.field_0x1be4[i].field_0xd4) {
@@ -502,7 +502,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 } else {
                     ResetEntries();
                 }
-                field_0x3c = 1;
+                endNetworkGamePending = 1;
             }
         }
     }
@@ -543,7 +543,7 @@ void EventManager::UnknownFunction45fbd0(int player) {
 // 0x0045f9a0: once, sends the local racer's state and then each AI racer's
 // (type 0x86), and starts the network wait.
 void EventManager::UnknownFunction45f9a0() {
-    if (!g_TrackGame->network || field_0x38)
+    if (!g_TrackGame->network || keepAliveStarted)
         return;
     UnknownKrustyBikeView* view = FindRaceView();
     if (!view->field_0x38->field_0x7a4) {
@@ -579,10 +579,10 @@ void EventManager::UnknownFunction45f9a0() {
         g_TrackGame->network->Send(
             0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     }
-    field_0x38 = 1;
+    keepAliveStarted = 1;
     g_TrackGame->network->StartKeepAlive(keepAliveTimeout, keepAliveInterval);
     view->UnknownVirtualSlot4();
-    field_0x34 = 1;
+    waitingForRacers = 1;
 }
 
 // 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
@@ -611,8 +611,8 @@ int EventManager::UnknownFunction45cb70() {
     char path[260];
     g_UnknownGlobal59af54 = 0;
     field_0x3c0 = 0;
-    field_0x38 = 0;
-    field_0x34 = 0;
+    keepAliveStarted = 0;
+    waitingForRacers = 0;
     for (int i = 0; i < 8; i++)
         g_TrackGame->mode.field_0x1be4[i].field_0xcc = 0;
     podiumCharacterCount = 0;
@@ -666,21 +666,21 @@ void EventManager::UnknownFunction45eef0(float frameTime) {
     case 3:
     case 5:
         if (g_TrackGame->network) {
-            field_0x40 = 0;
-            field_0x44 = 1;
+            anyRacerFinished = 0;
+            allRacersFinished = 1;
             int iterator = 0;
             UnknownEventRacer* racer;
             while ((racer = view->UnknownFunction4204e0(&iterator)) != 0) {
                 if (racer->field_0x7a4)
-                    field_0x40 = 1;
+                    anyRacerFinished = 1;
                 else if (!racer->field_0x4a0)
-                    field_0x44 = 0;
+                    allRacersFinished = 0;
             }
-            if (field_0x40)
+            if (anyRacerFinished)
                 field_0x3c0 += g_TrackGame->frameTime;
             // VC6 merges this call pair with the one after the switch.
             float limit = g_TrackGame->mode.field_0x27f8.field_0x18 ? 30.0f : 120.0f;
-            if (field_0x44 || limit < field_0x3c0) {
+            if (allRacersFinished || limit < field_0x3c0) {
                 UnknownFunction45f9a0();
                 UnknownFunction45e600();
             }

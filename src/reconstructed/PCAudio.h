@@ -146,13 +146,13 @@ public:
     int StartRefillThread(Sound* sound);                // 0x004bb740: starts the thread
     static unsigned __stdcall UnknownThreadProc(void* context); // 0x004bb630
 
-    Sound* field_0x00;
-    UnknownSoundNotify* field_0x04;
-    HANDLE field_0x08; // first half played
-    HANDLE field_0x0c; // second half played
-    HANDLE field_0x10; // stop
-    HANDLE field_0x14; // thread
-    unsigned char field_0x18_bit0 : 1;
+    Sound* ownerSound;                 // +0x00
+    UnknownSoundNotify* notify;        // +0x04
+    HANDLE firstHalfEvent;             // +0x08: first half played
+    HANDLE secondHalfEvent;            // +0x0c: second half played
+    HANDLE stopEvent;                  // +0x10
+    HANDLE refillThread;               // +0x14
+    unsigned char skipNotification : 1; // +0x18 bit 0: set at construction, cleared by the next notification instead of a refill
 };
 
 // A volume fade: its length in milliseconds, the volume a fade-out stops
@@ -214,45 +214,45 @@ public:
     int Set3DConeOrientation(Vector3 orientation, int force);
     int Set3DConeOutsideVolume(long volume, int force);
 
-    SoundGroup* field_0x08;
-    UnknownSoundBuffer* field_0x0c;          // buffer
-    UnknownSound3DBuffer* field_0x10;        // its 3D interface
-    UnknownPropertySet* field_0x14;
-    UnknownSoundBuffer* field_0x18;          // buffer being loaded (streaming)
-    UnknownSound3DBuffer* field_0x1c;
-    UnknownSoundBuffer** field_0x20;         // duplicates
-    int field_0x24;                          // duplicate count
-    Sound* field_0x28;                       // source of a duplicate
-    UnknownSoundFade field_0x2c;
-    int field_0x38;                          // fade volume
-    UnknownSoundNotifier* field_0x3c;
-    UnknownTextureStream* field_0x40;        // stream of a streamed sound
-    unsigned long field_0x44;
-    CRITICAL_SECTION field_0x48;
-    char field_0x60[0x104];                  // name
-    int field_0x164;                         // time last played
-    short field_0x168;                       // type
-    UnknownWaveHeader field_0x16a;
-    unsigned long field_0x198;               // buffer bytes
-    unsigned long field_0x19c;               // frequency
-    long field_0x1a0;                        // volume
-    long field_0x1a4;                        // pan
-    UnknownSound3DParameters field_0x1a8;
-    unsigned long field_0x1e8;               // flags: 2 static, 4 streamed, 8 3D, 0x10 cone, 0x20 loop
-    unsigned long field_0x1ec;               // controls set: 0x20 frequency, 0x40 pan, 0x80 volume
-    unsigned long field_0x1f0;               // play flags
-    unsigned char field_0x1f4_bit0 : 1;      // packed in an archive
-    unsigned char field_0x1f4_bit1 : 1;      // a duplicate
+    SoundGroup* soundGroup;                      // +0x08
+    UnknownSoundBuffer* dsBuffer;             // +0x0c
+    UnknownSound3DBuffer* dsBuffer3D;         // +0x10: the buffer's 3D interface
+    UnknownPropertySet* propertySet;         // +0x14
+    UnknownSoundBuffer* pendingBuffer;       // +0x18: buffer being loaded (streaming)
+    UnknownSound3DBuffer* pendingBuffer3D;   // +0x1c
+    UnknownSoundBuffer** duplicateBuffers;        // +0x20
+    int duplicateCount;                      // +0x24
+    Sound* duplicateSource;                  // +0x28: source of a duplicate
+    UnknownSoundFade fade;                   // +0x2c
+    int fadeVolume;                          // +0x38
+    UnknownSoundNotifier* notifier;          // +0x3c
+    UnknownTextureStream* sourceStream;           // +0x40: stream of a streamed sound
+    unsigned long filledHalf;                // +0x44: offset of the half last refilled
+    CRITICAL_SECTION bufferLock;                  // +0x48
+    char soundName[0x104];                       // +0x60
+    int lastPlayTime;                        // +0x164: time last played (0x004bfa80 ms)
+    short soundType;                             // +0x168
+    UnknownWaveHeader waveHeader;                 // +0x16a
+    unsigned long bufferBytes;               // +0x198
+    unsigned long currentFrequency;                // +0x19c
+    long currentVolume;                            // +0x1a0
+    long currentPan;                               // +0x1a4
+    UnknownSound3DParameters parameters3D;   // +0x1a8
+    unsigned long soundFlags;                    // +0x1e8: 2 static, 4 streamed, 8 3D, 0x10 cone, 0x20 loop
+    unsigned long controlsSet;               // +0x1ec: 0x20 frequency, 0x40 pan, 0x80 volume
+    unsigned long lastPlayFlags;                // +0x1f0
+    unsigned char isPacked : 1;              // +0x1f4 bit 0: packed in an archive
+    unsigned char isDuplicate : 1;           // +0x1f4 bit 1
     unsigned char field_0x1f4_bit2 : 1;
-    unsigned char field_0x1f4_bit3 : 1;      // looping
-    unsigned char field_0x1f4_bit4 : 1;      // paused while playing
-    unsigned char field_0x1f4_bit5 : 1;      // fading
+    unsigned char isLooping : 1;             // +0x1f4 bit 3
+    unsigned char pausedWhilePlaying : 1;    // +0x1f4 bit 4
+    unsigned char isFading : 1;              // +0x1f4 bit 5
     unsigned char field_0x1f4_bit6 : 1;
     unsigned char field_0x1f4_bit7 : 1;
-    unsigned char field_0x1f5_bit0 : 1;      // buffer ready
-    unsigned char field_0x1f5_bit1 : 1;      // stopped
-    unsigned char field_0x1f5_bit2 : 1;
-    unsigned char field_0x1f5_bit3 : 1;      // paused
+    unsigned char bufferReady : 1;           // +0x1f5 bit 0
+    unsigned char isStopped : 1;             // +0x1f5 bit 1
+    unsigned char isFilling : 1;             // +0x1f5 bit 2: FillBufferFromStream running
+    unsigned char isPaused : 1;              // +0x1f5 bit 3
 };
 
 // 0x004bb890: loads (or finds) a sound by name; not a member.
@@ -272,12 +272,12 @@ public:
     void MakeRoomForSound(int bytes);                   // 0x004be130: evicts to make room
     void UnloadSound(Sound* sound);                     // 0x004be220: unloads a sound
 
-    HANDLE field_0x00; // thread
-    HANDLE field_0x04; // event signalled to stop the thread
-    HANDLE field_0x08; // event signalled when a load is queued
-    CRITICAL_SECTION field_0x0c;
-    unsigned long field_0x24; // budget in bytes
-    unsigned long field_0x28; // bytes loaded
-    ContainerList<Sound*> field_0x2c; // queued
-    ContainerList<Sound*> field_0x40; // loaded
+    HANDLE loaderThread;               // +0x00
+    HANDLE stopEvent;                  // +0x04: signalled to stop the thread
+    HANDLE queuedEvent;                // +0x08: signalled when a load is queued
+    CRITICAL_SECTION queueLock;        // +0x0c
+    unsigned long byteBudget;          // +0x24: budget in bytes
+    unsigned long loadedBytes;         // +0x28
+    ContainerList<Sound*> queuedSounds; // +0x2c
+    ContainerList<Sound*> loadedSounds; // +0x40
 };

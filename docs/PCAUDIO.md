@@ -75,6 +75,19 @@ buffer's halves from a thread woken through IDirectSoundNotify
 its thread creates and fills queued streamed sounds, evicting the least
 recently played idle ones to stay within the budget.
 
+Member names (PCAudio.h) follow these roles: `dsBuffer`, `dsBuffer3D`,
+`propertySet`, `pendingBuffer`, `duplicateBuffers`/`duplicateCount`,
+`duplicateSource`, `fade`/`fadeVolume`, `notifier`, `sourceStream`,
+`filledHalf` (the half the notifier thread last refilled), `bufferLock`,
+`soundName`, `lastPlayTime`, `waveHeader`, `bufferBytes`, the cached
+`currentFrequency`/`currentVolume`/`currentPan`, `parameters3D`,
+`soundFlags`, `controlsSet` and `lastPlayFlags`; the notifier's
+`firstHalfEvent`/`secondHalfEvent`/`stopEvent`/`refillThread`; the memory
+manager's `loaderThread`, `queuedEvent`, `queueLock`, `byteBudget`,
+`loadedBytes`, `queuedSounds` and `loadedSounds`. SoundInterface's +0x2c
+bit is `audioStarted`. The names are ours (tier 3); the roles come from the
+DirectSound calls and the sample's flow.
+
 Exact (41 more calibration cases): the WAV loader `0x004bbef0` (reads the
 44-byte header, creates the buffer with a hardware-then-software retry for
 looping sounds, registers the sound, fills it and makes duplicates) and the
@@ -107,7 +120,7 @@ Exact (6 more): the frequency, volume and pan setters
 duplicator `0x004bc4c0` and the streamed buffer creator `0x004bd4b0`.
 Their source shapes:
 
-- The duplicate loops are guarded do-whiles (`int i = 0; if (field_0x24 >
+- The duplicate loops are guarded do-whiles (`int i = 0; if (duplicateCount >
   0) do { ... } while (++i ...)`): VC6 leaves a do-while unrotated, which
   gives retail's `jge store; jmp top` exit with the shared `return 0`
   between the loop and the final store. `for`, `while`, `break` with a later

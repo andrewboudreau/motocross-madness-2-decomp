@@ -79,7 +79,7 @@ Exact (43 functions, including the open-menu routine `OpenMenu` `0x00499b20`):
 - `0x0049bbb0` / `0x0049bc50`: record the race in the high-score tables at
   TrackGame+0x3400 (table 0, then 1 and 2 by laps 5/10 or, in modes 0 and 4,
   by the +0x140 setting 5.0/10.0);
-- `0x00498cf0` (3114 bytes): builds the garage scene at +0x464 on the
+- `0x00498cf0` (3114 bytes): builds the garage scene at +0x464 (`garageScene`) on the
   first call with 1 or -1 (camera, light manager and three lights, the
   "UIgarage.mcf" and "UIRider.mcf" characters, a ProjectedShadow and its
   D3DIMSoultreeShadow) and with 2 or -1 later loads every bike model
