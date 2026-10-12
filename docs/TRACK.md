@@ -41,7 +41,7 @@ to finish at Track+0x04.
 
 ## Status
 
-The following 14 functions are exact under `vc6_o2_mt`, with every
+The following 16 functions are exact under `vc6_o2_mt`, with every
 relocation bound:
 
 | VA | Bytes | Body |
@@ -51,6 +51,8 @@ relocation bound:
 | `0x00515e70` | 89 | frees a node array (the loader's failure path) |
 | `0x00516800` | 108 | frees a node, its segments and its links |
 | `0x00516870` | 262 | frees every node reachable from the start |
+| `0x00516980` | 786 | the closest position on the track to a point (horizontal plane) |
+| `0x00516ca0` | 586 | the closest position on one node to a point |
 | `0x00517310` | 39 | whether a segment belongs to a node |
 | `0x00517930` | 99 | frees a work list |
 | `0x005179a0` | 67 | whether b is at or after a on the same node |
@@ -70,9 +72,13 @@ Near miss: the path search `0x005179f0` (929/929 bytes, two differ). Where
 the walk reaches b's node, retail loads the two addends of
 `length + fromStart` in the other order; no source order tried changes it.
 
-Near miss: the closest position on one node `0x00516ca0` (576/586 bytes).
-VC6 here reuses the projection's `p - segment` differences in two of the
-clamping branches, where retail recomputes them.
+Exact: the closest position on one node `0x00516ca0` (586 bytes). The
+segment parameter is clamped to [0, 1] first and the difference chosen after
+the clamp (`t == 1`: the next point, `t == 0`: the segment start, otherwise
+the interpolation). VC6 duplicates the selection into the clamping branches
+and, as retail, recomputes `p - segment` in the `t == 0` copies; with the
+differences computed inside each clamping branch it reused the projection's
+values there instead (576/586).
 
 Near miss: the strip test `0x00516ef0` (1042/1042 bytes, 98.18%). It is a
 point-in-polygon parity test over six edges of the strip between a segment
@@ -93,10 +99,9 @@ declares it `int`.
 The closest-position search `0x00516980` (786 bytes) walks every node
 reachable from the start node (the depth-first list of `0x00516870`) with
 `0x00516ca0`'s segment loop; its third parameter is the optional distance
-output (`float*`; RaceStatus.cpp passes 0). It is a near miss in
-`samples/track/TrackNearMisses.cpp` (465 of 776 compared bytes) with the same
-blocker as `0x00516ca0`: VC6 reuses the `p - segment` differences in the
-t < 0 and t == 0 branches, which retail recomputes.
+output (`float*`; RaceStatus.cpp passes 0). It is exact with the same
+clamp-then-select form as `0x00516ca0` (it was 465 of 776 compared bytes
+with the differences computed inside each clamping branch).
 
 The loader `0x00515ed0` (2342 bytes) reads a chunk stream (an id byte,
 then the chunk's data; ids 1-16 are decoded in
@@ -152,10 +157,9 @@ renames changed no calibration bytes.
 
 Provisional names taken from the behaviour each function's comment records:
 `FreeNodeArray` `0x00515e70`, `FreeNode` `0x00516800`, `FreeReachableNodes`
-`0x00516870`, `NodeHasSegment` `0x00517310` and `IsAtOrAfter` `0x005179a0`;
-the near misses `ClosestPointOnTrack` `0x00516980` and `IsInsideStrip`
-`0x00516ef0`, and `ClosestPointOnNode` `0x00516ca0` and `PlaceNear`
-`0x00517340` (physics' own views keep the address names). The high-score
+`0x00516870`, `NodeHasSegment` `0x00517310`, `IsAtOrAfter` `0x005179a0`,
+`ClosestPointOnTrack` `0x00516980` and `ClosestPointOnNode` `0x00516ca0`;
+the near misses `IsInsideStrip` `0x00516ef0` and `PlaceNear` `0x00517340` (physics' own views keep the address names). The high-score
 lister `0x0051ffe0` keeps its placeholder because TrackRecord.cpp calls it.
 The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
 `0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address

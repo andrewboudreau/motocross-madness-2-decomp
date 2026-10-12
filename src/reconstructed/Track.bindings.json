@@ -33,5 +33,6 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?IsInsideStrip@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z": "0x00516ef0",
   "?PlaceNear@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
-  "?IntersectLines@@YAHMMMMMMMMPAM0@Z": "0x0047b800"
+  "?IntersectLines@@YAHMMMMMMMMPAM0@Z": "0x0047b800",
+  "?ClosestPointOnTrack@Track@@QAEHUVector3@@PAUTrackPos@@PAM@Z": "0x00516980"
 }

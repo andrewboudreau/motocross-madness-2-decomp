@@ -139,6 +139,173 @@ int Track::FreeReachableNodes(TrackNode** start)
     return 1;
 }
 
+// 0x00516980: the closest position on the track to p, in the horizontal
+// plane, over every node reachable from the start node (the depth-first walk
+// of 0x00516870), and optionally its distance. As in 0x00516ca0 the
+// parameter is clamped first and the difference chosen after the clamp.
+int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
+{
+    float best = -1.0f;
+    if (!out)
+        return 0;
+    if (!startNode)
+        return 0;
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 514);
+    if (!item)
+        return 0;
+    item->node = startNode;
+    TrackListItem* list = item;
+    while (list) {
+        TrackNode* node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
+            item = list;
+            list = list->field_0x0c;
+            DebugFree(item, __FILE__, 530);
+        } else {
+            node->flags |= 4;
+            TrackSegment* segment = list->node->firstSegment;
+            if (segment) {
+                if (!segment->next) {
+                    float dx = p.x - segment->field_0x00;
+                    float dz = p.z - segment->field_0x08;
+                    float distanceSquared = dz * dz + dx * dx;
+                    if (distanceSquared < best || best < 0.0f) {
+                        best = distanceSquared;
+                        out->node = list->node;
+                        out->segment = segment;
+                        out->t = 0.0f;
+                    }
+                }
+                for (; segment; segment = segment->next) {
+                    TrackSegment* next = segment->next;
+                    if (!next)
+                        break;
+                    float ex = next->field_0x00 - segment->field_0x00;
+                    float ez = next->field_0x08 - segment->field_0x08;
+                    float t;
+                    float dx;
+                    float dz;
+                    if (ex == 0.0f && ez == 0.0f)
+                        t = 0.0f;
+                    else {
+                        t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                        if (t > 1.0f)
+                            t = 1.0f;
+                        else if (t < 0.0f)
+                            t = 0.0f;
+                    }
+                    if (t == 1.0f) {
+                        dx = p.x - next->field_0x00;
+                        dz = p.z - next->field_0x08;
+                    } else if (t == 0.0f) {
+                        dx = p.x - segment->field_0x00;
+                        dz = p.z - segment->field_0x08;
+                    } else {
+                        dx = (p.x - segment->field_0x00) - t * ex;
+                        dz = (p.z - segment->field_0x08) - t * ez;
+                    }
+                    float distanceSquared = dz * dz + dx * dx;
+                    if (distanceSquared < best || best < 0.0f) {
+                        best = distanceSquared;
+                        out->node = list->node;
+                        out->segment = segment;
+                        out->t = t;
+                    }
+                }
+            }
+            int count = list->node->linkCount;
+            TrackNode** links = list->node->links;
+            for (int i = 0; i < count; i++) {
+                if (!(links[i]->flags & 4)) {
+                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 588);
+                    if (!item)
+                        return 0;
+                    item->node = links[i];
+                    item->field_0x0c = list;
+                    list = item;
+                }
+            }
+        }
+    }
+    if (outDistance) {
+        if (best > 0.0f)
+            *outDistance = FastSqrt(best);
+        else if (best == 0.0f)
+            *outDistance = 0.0f;
+    }
+    return 1;
+}
+
+// 0x00516ca0: the closest position on `node` to p, in the horizontal
+// plane, and optionally its distance. The segment parameter t is clamped
+// to [0, 1] first and the difference picked afterwards (t == 1: the next
+// point, t == 0: the segment start, otherwise the interpolation). VC6 then
+// recomputes `p - segment` in the t == 0 copies as retail does and reuses
+// the projection's differences only in the interpolation.
+int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance)
+{
+    float best = -1.0f;
+    if (!node || !out)
+        return 0;
+    out->node = node;
+    TrackSegment* segment = node->firstSegment;
+    if (segment) {
+        if (!segment->next) {
+            out->segment = segment;
+            out->t = 0.0f;
+            if (outDistance) {
+                float dx = p.x - segment->field_0x00;
+                float dz = p.z - segment->field_0x08;
+                *outDistance = FastSqrt(dz * dz + dx * dx);
+            }
+            return 1;
+        }
+        for (; segment; segment = segment->next) {
+            TrackSegment* next = segment->next;
+            if (!next)
+                break;
+            float ex = next->field_0x00 - segment->field_0x00;
+            float ez = next->field_0x08 - segment->field_0x08;
+            float t;
+            float dx;
+            float dz;
+            if (ex == 0.0f && ez == 0.0f)
+                t = 0.0f;
+            else {
+                t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                if (t > 1.0f)
+                    t = 1.0f;
+                else if (t < 0.0f)
+                    t = 0.0f;
+            }
+            if (t == 1.0f) {
+                dx = p.x - next->field_0x00;
+                dz = p.z - next->field_0x08;
+            } else if (t == 0.0f) {
+                dx = p.x - segment->field_0x00;
+                dz = p.z - segment->field_0x08;
+            } else {
+                dx = (p.x - segment->field_0x00) - t * ex;
+                dz = (p.z - segment->field_0x08) - t * ez;
+            }
+            float distanceSquared = dz * dz + dx * dx;
+            if (distanceSquared < best || best < 0.0f) {
+                best = distanceSquared;
+                out->segment = segment;
+                out->t = t;
+            }
+        }
+    }
+    if (outDistance) {
+        if (best > 0.0f)
+            *outDistance = FastSqrt(best);
+        else if (best == 0.0f)
+            *outDistance = 0.0f;
+    }
+    return 1;
+}
+
 // 0x00517310: whether `segment` belongs to `node`.
 int Track::NodeHasSegment(TrackSegment* segment, TrackNode* node)
 {

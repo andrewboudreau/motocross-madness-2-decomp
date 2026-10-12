@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 168, c 113, total 282. The three class (a) functions of the
+Counts: a 1, b 167, c 112, total 280. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -268,8 +268,6 @@ instruction addresses before adding uses.
 | track/SceneManager | `0x004ecd60` | 2047/4536 | b | 11 code diffs: `je @1189` vs `je A`; `je @1189` vs `je A`; slots differ |
 | track/SceneManager | `0x004edfe0` | 3468/5346 | b | 34 code diffs: `je @1459` vs `je A`; `je @1459` vs `je A`; slot order differs |
 | track/Track | `0x00515ed0` | 117/2400 (masked) | b | draft: frame 0x64 vs retail 0x48 and retail keeps `this` in ebp, so every frame offset differs; dispatch, calls and arithmetic follow retail |
-| track/Track | `0x00516980` | 465/776 (masked) | c | as `0x00516ca0`: VC6 reuses the `p - segment` differences in the t < 0 and t == 0 branches, retail recomputes them; later offsets shift |
-| track/Track | `0x00516ca0` | 307/520 (masked) | b | 20 code diffs; slots differ |
 | track/Track | `0x00516ef0` | 1032/1042 | c | edge 6 of the crossing test computes `b.z - a.z` before `p.x - a.x` in retail; edge 2 matches with the helper's first factor written `((b->x - a->x))` ; retail orders edges 2, 5, 6 one way and 1, 3, 4 the other; ~5,500 parenthesis/cast/struct/local forms give 1032 at best |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
 | track/Track | `0x0051ffe0` | 186/511 (masked) | c | 6 code diffs: `test eax, eax ; je @238` vs `cmp eax, ebx ; je A`; `call A ; movsx ebx, byte ptr [esp + edi~` vs `jmp A` |

@@ -26428,6 +26428,24 @@ CASES = [
         'target_size': 775,
         'reason': 'root objects, sound interface, TestKey registry read (RegQueryValueExA type == REG_DWORD fixes the frame slots), texture manager and debug overlay',
     },
+    {
+        'name': 'Track.cpp closest point on track 0x516980',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?ClosestPointOnTrack@Track@@QAEHUVector3@@PAUTrackPos@@PAM@Z',
+        'target_va': '0x00516980',
+        'target_size': 786,
+        'reason': 'Track.cpp __FILE__ (lines 514/530/588); depth-first node walk with the segment projection clamped first and the difference selected after the clamp',
+    },
+    {
+        'name': 'Track.cpp closest point on node 0x516ca0',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?ClosestPointOnNode@Track@@QAEHUTrackVec3@@PAUTrackNode@@PAUTrackPos@@PAM@Z',
+        'target_va': '0x00516ca0',
+        'target_size': 586,
+        'reason': 'segment projection clamped to [0, 1] before selecting the difference; VC6 recomputes p - segment in the t == 0 copies as retail',
+    },
 ]
 
 def main():
