@@ -388,7 +388,7 @@ public:
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
     unsigned char garageOptions[0x5c];       // +0xfd8 garage settings (UNKNOWN_GARAGE_SETTINGS); restored from +0x1034 when a replay is left (InGameProcs.cpp)
     unsigned char optionsBackup[0x5c];        // +0x1034: copy of +0xfd8 (DlgProcs.cpp, InGameProcs.cpp)
-    unsigned char field_0x1090[0x10ec - 0x1090];
+    unsigned char multiplayerGarageOptions[0x10ec - 0x1090]; // +0x1090 garage settings kept for multiplayer: saved when a multiplayer race starts (0x004536e0), restored by MultiPlayerDlg
     int championshipInProgress;               // +0x10ec: set when a race-mode 2 series starts (points reset); hides the race count
     int customGarageCurves[5][3][11];     // +0x10f0: custom garage curves per bike class (OptionProcs.cpp)
     int bonusTrackUnlocked[6];            // +0x1384: a bonus track is listed only when set (SelectGamePicProcs.cpp)
@@ -398,7 +398,7 @@ public:
     int bikeUnlockFlags;                      // +0x1970 bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
     UnknownTrackGameRacerChoice racerChoice;  // +0x1974 the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
     UnknownTrackGameRacerChoice racerChoiceBackup; // +0x1a3c
-    unsigned char field_0x1b04[0x1bcc - 0x1b04];
+    unsigned char multiplayerRacerChoice[0x1bcc - 0x1b04]; // +0x1b04 racerChoice kept for multiplayer (same paths as +0x1090)
     int plateNumber;                          // +0x1bcc SelectGamePicProcs.cpp
     int lobbyRank;                            // +0x1bd0: 0x0049c600 WaitForLobbyRank; 1..100 is copied to +0x1bcc
     int lobbyPresetFlags;                     // +0x1bd4: 0x0049c2f0 ReadLobbyPreset (-1 until read)
@@ -426,7 +426,7 @@ public:
     char replayFile[0x104];               // +0x26f4: the replay file played (dlgprocs.cpp ReplayFilesDlg)
     UnknownTrackGameModeSettings raceSettings; // +0x27f8 current race settings
     UnknownTrackGameModeSettings savedSettings; // +0x29e4: saved copy, restored when a replay is left (InGameProcs.cpp)
-    UnknownTrackGameModeSettings field_0x2bd0;
+    UnknownTrackGameModeSettings multiplayerSettings; // +0x2bd0 race settings kept for multiplayer (same paths as +0x1090)
     int saveReplay;                           // +0x2dbc saves a replay (EventManager 0x0045cdc0)
 };
 

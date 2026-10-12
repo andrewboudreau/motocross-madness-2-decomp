@@ -141,7 +141,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 FindControl("ButZone", 1)->SetEnabled(1);
                 FindControl("ButCable", 1)->SetEnabled(0);
                 FindControl("ButModem", 1)->SetEnabled(0);
-                g_TrackGame->mode.field_0x2bd0.multiplayerAiRacerCount = 0;
+                g_TrackGame->mode.multiplayerSettings.multiplayerAiRacerCount = 0;
                 if (EnsureNetworkInterface()) {
                     ConnectionInfoType connections[5];
                     g_TrackGame->network->EnumConnections(connections, &count);

@@ -1431,9 +1431,9 @@ void CreateProfile(UnknownDialogEvent* event) {
     }
     strcpy(g_TrackGame->mode.racerChoice.riderName,
            ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[0].modelName);
-    memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
-           sizeof(g_TrackGame->mode.field_0x1b04));
-    memcpy(&g_TrackGame->mode.racerChoiceBackup, g_TrackGame->mode.field_0x1b04,
+    memcpy(g_TrackGame->mode.multiplayerRacerChoice, &g_TrackGame->mode.racerChoice,
+           sizeof(g_TrackGame->mode.multiplayerRacerChoice));
+    memcpy(&g_TrackGame->mode.racerChoiceBackup, g_TrackGame->mode.multiplayerRacerChoice,
            sizeof(g_TrackGame->mode.racerChoiceBackup));
     for (int type = 0; type < 6; type++) {
         g_TrackGame->mode.trackNames[type][0] = 0;
@@ -2027,12 +2027,12 @@ void LeaveMenusForRace() {
     }
     if (g_TrackGame->playerCount > 1 && !g_TrackGame->ui->field_0x4a8 &&
         !g_TrackGame->playingReplay) {
-        memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
-               sizeof(g_TrackGame->mode.field_0x2bd0));
-        memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
-               sizeof(g_TrackGame->mode.field_0x1090));
-        memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
-               sizeof(g_TrackGame->mode.field_0x1b04));
+        memcpy(&g_TrackGame->mode.multiplayerSettings, &g_TrackGame->mode.raceSettings,
+               sizeof(g_TrackGame->mode.multiplayerSettings));
+        memcpy(g_TrackGame->mode.multiplayerGarageOptions, g_TrackGame->mode.garageOptions,
+               sizeof(g_TrackGame->mode.multiplayerGarageOptions));
+        memcpy(g_TrackGame->mode.multiplayerRacerChoice, &g_TrackGame->mode.racerChoice,
+               sizeof(g_TrackGame->mode.multiplayerRacerChoice));
     }
     if (g_TrackGame->mode.raceSettings.raceMode == 2 && !g_TrackGame->mode.championshipInProgress) {
         g_TrackGame->mode.championshipInProgress = 1;

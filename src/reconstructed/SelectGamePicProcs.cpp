@@ -900,11 +900,11 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1468);
         tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1468);
         tab->SetTextAlign(0x22);
-        memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.field_0x2bd0,
+        memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.multiplayerSettings,
                sizeof(g_TrackGame->mode.raceSettings));
-        memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.field_0x1090,
+        memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.multiplayerGarageOptions,
                sizeof(g_TrackGame->mode.garageOptions));
-        memcpy(&g_TrackGame->mode.racerChoice, g_TrackGame->mode.field_0x1b04,
+        memcpy(&g_TrackGame->mode.racerChoice, g_TrackGame->mode.multiplayerRacerChoice,
                sizeof(g_TrackGame->mode.racerChoice));
         strcpy(builtForTrack, "");
         builtForVariant = 0;
@@ -1030,12 +1030,12 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             if (bikeRiderPage)
                 bikeRiderPage->UpdateBoundValues(1);
             UpdateBoundValues(1);
-            memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
-                   sizeof(g_TrackGame->mode.field_0x2bd0));
-            memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
-                   sizeof(g_TrackGame->mode.field_0x1090));
-            memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
-                   sizeof(g_TrackGame->mode.field_0x1b04));
+            memcpy(&g_TrackGame->mode.multiplayerSettings, &g_TrackGame->mode.raceSettings,
+                   sizeof(g_TrackGame->mode.multiplayerSettings));
+            memcpy(g_TrackGame->mode.multiplayerGarageOptions, g_TrackGame->mode.garageOptions,
+                   sizeof(g_TrackGame->mode.multiplayerGarageOptions));
+            memcpy(g_TrackGame->mode.multiplayerRacerChoice, &g_TrackGame->mode.racerChoice,
+                   sizeof(g_TrackGame->mode.multiplayerRacerChoice));
             if (g_TrackGame->network->lobbyConnected) {
                 EndDialog(0);
                 g_TrackGame->ui->OpenExitDialog();
@@ -1091,12 +1091,12 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                     dialog->FindControl("TxtPrompt", 0)->wordWrap = 1;
                     return;
                 }
-                memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
-                       sizeof(g_TrackGame->mode.field_0x2bd0));
-                memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
-                       sizeof(g_TrackGame->mode.field_0x1090));
-                memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
-                       sizeof(g_TrackGame->mode.field_0x1b04));
+                memcpy(&g_TrackGame->mode.multiplayerSettings, &g_TrackGame->mode.raceSettings,
+                       sizeof(g_TrackGame->mode.multiplayerSettings));
+                memcpy(g_TrackGame->mode.multiplayerGarageOptions, g_TrackGame->mode.garageOptions,
+                       sizeof(g_TrackGame->mode.multiplayerGarageOptions));
+                memcpy(g_TrackGame->mode.multiplayerRacerChoice, &g_TrackGame->mode.racerChoice,
+                       sizeof(g_TrackGame->mode.multiplayerRacerChoice));
                 SendStartMessage(1);
             }
         } else if (!_stricmp("ButChatSend", event->controlName)) {

@@ -48,7 +48,7 @@ void TrackGameMode::ResetDefaults() {
     ReloadResourceStrings(resourceStrings);
     ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)garageOptions);
     ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)optionsBackup);
-    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)field_0x1090);
+    ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)multiplayerGarageOptions);
     ResetSettingsEntries();
     raceSettings.gateSeed = 1;
     raceSettings.races = 2;
@@ -64,7 +64,7 @@ void TrackGameMode::ResetDefaults() {
     raceSettings.shortTimeLimit = 0;
     raceSettings.maxBikeClass = 4;
     savedCameraState = 0;
-    memcpy(&field_0x2bd0, &raceSettings, sizeof(field_0x2bd0));
+    memcpy(&multiplayerSettings, &raceSettings, sizeof(multiplayerSettings));
     memcpy(&savedSettings, &raceSettings, sizeof(savedSettings));
     *(unsigned char*)&bikeUnlockFlags &= ~1;
     savedCameraDistance = 10.3f;

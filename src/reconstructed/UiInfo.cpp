@@ -434,9 +434,9 @@ int TrackGameMode::LoadProfile() {
     fread(resourceStrings, 0x500, 1, file);
     fread(videoSettings, 0x18, 1, file);
     fread(optionsBackup, 0x5c, 1, file);
-    fread(field_0x1090, 0x5c, 1, file);
+    fread(multiplayerGarageOptions, 0x5c, 1, file);
     fread(&racerChoiceBackup, 0xc8, 1, file);
-    fread(field_0x1b04, 0xc8, 1, file);
+    fread(multiplayerRacerChoice, 0xc8, 1, file);
     fread(&displayAdapterGuid, 0x10, 1, file);
     fread(&savedCameraState, 4, 1, file);
     fread(&savedCameraDistance, 4, 1, file);
@@ -445,7 +445,7 @@ int TrackGameMode::LoadProfile() {
     fread(&savedCameraFieldOfView, 4, 1, file);
     fread(playerName, 0x80, 1, file);
     fread(&savedSettings, 0x1ec, 1, file);
-    fread(&field_0x2bd0, 0x1ec, 1, file);
+    fread(&multiplayerSettings, 0x1ec, 1, file);
     fread(bonusTrackUnlocked, 0x18, 1, file);
     fread(&field_0x1bdc, 4, 1, file);
     fread(&nameTagShade, 4, 1, file);
@@ -488,9 +488,9 @@ void TrackGameMode::SaveProfile() {
     fwrite(resourceStrings, 0x500, 1, file);
     fwrite(videoSettings, 0x18, 1, file);
     fwrite(optionsBackup, 0x5c, 1, file);
-    fwrite(field_0x1090, 0x5c, 1, file);
+    fwrite(multiplayerGarageOptions, 0x5c, 1, file);
     fwrite(&racerChoiceBackup, 0xc8, 1, file);
-    fwrite(field_0x1b04, 0xc8, 1, file);
+    fwrite(multiplayerRacerChoice, 0xc8, 1, file);
     fwrite(&displayAdapterGuid, 0x10, 1, file);
     fwrite(&savedCameraState, 4, 1, file);
     fwrite(&savedCameraDistance, 4, 1, file);
@@ -499,7 +499,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(&savedCameraFieldOfView, 4, 1, file);
     fwrite(playerName, 0x80, 1, file);
     fwrite(&savedSettings, 0x1ec, 1, file);
-    fwrite(&field_0x2bd0, 0x1ec, 1, file);
+    fwrite(&multiplayerSettings, 0x1ec, 1, file);
     fwrite(bonusTrackUnlocked, 0x18, 1, file);
     fwrite(&field_0x1bdc, 4, 1, file);
     fwrite(&nameTagShade, 4, 1, file);
