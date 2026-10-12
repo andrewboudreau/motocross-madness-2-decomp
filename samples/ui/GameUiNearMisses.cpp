@@ -81,6 +81,10 @@
 //   each format branch (cross-jumped) puts the result in ebp (76/323). A
 //   `result = opaque` copy before Unlock (returned once or from both arms of
 //   the Unlock test, or as `Unlock ? opaque : opaque`) is propagated away.
+//   Also 256 or worse (20-form sweep): an explicit `else opaque = 0` in the
+//   8-bit test (246), `opaque = byte != key`, `else if` and `format == 8 &&`
+//   chains, crossed with a `result` copy, an ignored Unlock result and an
+//   `Unlock(0) != 0` test.
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
