@@ -135,7 +135,7 @@ int UseSelectedProfile(UnknownDialogEvent* event) {
         char name[16];
         COPY_TEXT(name, list->GetRowText(selection), 16);
         COPY_TEXT(g_TrackGame->mode.field_0x00, name, 16);
-        g_TrackGame->mode.UnknownFunction5231f0();
+        g_TrackGame->mode.LoadProfile();
         return 1;
     }
     return 0;
@@ -1271,7 +1271,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
         strncpy(g_TrackGame->mode.field_0x1974.field_0x80, name, count);
         g_TrackGame->mode.field_0x1974.field_0x80[count] = 0;
     }
-    g_TrackGame->mode.UnknownFunction523580();
+    g_TrackGame->mode.SaveProfile();
 }
 
 // 0x00450e30
@@ -1350,7 +1350,7 @@ void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_TrackGame->ui->field_0x490 = (UnknownGameUiPage*)this;
         g_TrackGame->ui->UnknownFunction499b10();
         g_UnknownGlobal59ae84 = 0;
-        g_TrackGame->mode.UnknownFunction523580();
+        g_TrackGame->mode.SaveProfile();
         if (g_TrackGame->network)
             g_TrackGame->network->StartKeepAlive(
                 g_TrackGame->eventManager->keepAliveTimeout,
@@ -1447,9 +1447,9 @@ void CreateProfile(UnknownDialogEvent* event) {
     sprintf(preset, "%s\\%s", "ui", "preset.ctl");
     sprintf(control, "%s\\%s\\%s", "ui\\profile", name, "control.ctl");
     CopyFileA(preset, control, 0);
-    g_TrackGame->mode.UnknownFunction523000();
+    g_TrackGame->mode.LoadControllerChoice();
     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
-    g_TrackGame->mode.UnknownFunction523580();
+    g_TrackGame->mode.SaveProfile();
     g_TrackGame->field_0x33fc->UnknownFunction448e90(control, -1);
     g_TrackGame->UnknownFunction521a30();
     event->dialog->EndDialog(0x1e);
@@ -1503,7 +1503,7 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
             edit->GetEditText(text, 128);
             COPY_TEXT(g_TrackGame->mode.field_0x00, text, 16);
-            g_TrackGame->mode.UnknownFunction5231f0();
+            g_TrackGame->mode.LoadProfile();
             EndDialog(0x1f);
         } else {
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));

@@ -237,7 +237,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (!_stricmp("ButLoadProfile", event->controlName)) {
-            g_TrackGame->mode.UnknownFunction523580();
+            g_TrackGame->mode.SaveProfile();
             if (UseSelectedProfile(event))
                 g_TrackGame->UnknownFunction521a30();
             UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
@@ -245,7 +245,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             userMenuOpen = 0;
             menuUserAnimation->Show(0, 1);
         } else if (!_stricmp("ButNewProfile", event->controlName)) {
-            g_TrackGame->mode.UnknownFunction523580();
+            g_TrackGame->mode.SaveProfile();
             g_TrackGame->ui->OpenMenu(0xbb9);
             UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
             FillProfileList();

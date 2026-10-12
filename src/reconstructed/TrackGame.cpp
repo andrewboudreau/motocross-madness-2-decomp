@@ -314,7 +314,7 @@ int TrackGame::UnknownVirtualSlot4() {
                 int length = count > 15 ? 15 : count;
                 strncpy(mode.field_0x00, name, length);
                 mode.field_0x00[length] = 0;
-                if (!mode.UnknownFunction5231f0())
+                if (!mode.LoadProfile())
                     ui->OpenMenu(0xbbb);
             }
             networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
@@ -481,7 +481,7 @@ int TrackGame::UnknownVirtualSlot15() {
         return 0;
     ui = 0;
     SetLocaleInfoA(kLocaleUserDefault, kLocaleDecimalSeparator, savedDecimalSeparator);
-    mode.UnknownFunction523580();
+    mode.SaveProfile();
     return 1;
 }
 

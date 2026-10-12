@@ -203,7 +203,7 @@ static inline float RandomUnit() {
 
 // cdecl 0x0049bda0: the GUI's progress callback.
 void UnknownFunction49bda0() {
-    g_TrackGame->mode.UnknownFunction523580();
+    g_TrackGame->mode.SaveProfile();
 }
 
 // 0x004987f0

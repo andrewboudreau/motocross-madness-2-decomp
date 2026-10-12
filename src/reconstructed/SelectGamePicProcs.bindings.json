@@ -247,7 +247,7 @@
   "?UnknownFunction521fb0@UnknownTrackGameRacerSlot@@QAEXPAX00@Z": "0x00521fb0",
   "?ResetNetworkRace@TrackGameMode@@QAEHXZ": "0x00522680",
   "?FindFileDirectory@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
-  "?UnknownFunction523b70@TrackGameMode@@QAEXPAD@Z": "0x00523b70",
+  "?CopyCurrentSeriesDirectory@TrackGameMode@@QAEXPAD@Z": "0x00523b70",
   "?OpenHelp@TrackGameMode@@QAEHPBD0@Z": "0x00523d30",
   "?UnknownFunction5240e0@TrackGameMode@@QAEXH@Z": "0x005240e0",
   "?UnknownFunction524100@TrackGameMode@@QAEHXZ": "0x00524100",

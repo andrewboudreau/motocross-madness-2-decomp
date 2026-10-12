@@ -302,10 +302,10 @@ public:
     // with ShellExecuteA (passing `parameters`); 1 when found.
     int OpenHelp(const char* topic, const char* parameters);
     void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
-    void UnknownFunction523000();             // 0x00523000 (OptionProcs.cpp)
+    void LoadControllerChoice();             // 0x00523000 (OptionProcs.cpp)
     void SaveControllerChoice();             // 0x00523130: saves the controller choice
     int WaitForCd();              // 0x00523800: asks for the CD until it is found; 0 on cancel
-    void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
+    void SaveProfile();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     // 0x00522680 (TrackGame slot 4; SelectGamePicProcs.cpp's network start):
     // clears the selected session, the racers and the entries.
@@ -325,9 +325,9 @@ public:
     // adapter whose GUID is `guid`, and stores the adapter GUID.
     void ChooseDisplayMode(const void* guid, int* mode);  // 0x00522e20
     int CreateDirectoryLists();              // 0x00522d00 (TrackGame slot 4): creates the directory lists
-    int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
-    void UnknownFunction523e50();             // 0x00523e50 (KrustyUI 0x004988a0)
-    void UnknownFunction523b70(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
+    int LoadProfile();              // 0x005231f0 (TrackGame slot 4)
+    void LoadBonusTrackNames();             // 0x00523e50 (KrustyUI 0x004988a0)
+    void CopyCurrentSeriesDirectory(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
     int CopySeriesDirectory(short a, short b, char* name); // 0x00523bb0: copies the series' directory
     // 0x00523a60 (near uiinfo.cpp's literals): finds `name`.`kind` (under
     // directory `value` when nonempty) and stores the directory it is in

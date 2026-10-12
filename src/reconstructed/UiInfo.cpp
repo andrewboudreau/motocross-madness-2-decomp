@@ -373,7 +373,7 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
 }
 
 // 0x00523000: loads the profile's control file.
-void TrackGameMode::UnknownFunction523000() {
+void TrackGameMode::LoadControllerChoice() {
     unsigned long size;
     char controller[0x80];
     char last[0x80];
@@ -411,7 +411,7 @@ void TrackGameMode::SaveControllerChoice() {
 // 0x005231f0 (TrackGame slot 4): loads the profile; 1 when it has a name.
 // Without a profile file the name is cleared and a default TrackGameMode is
 // built and destroyed on the stack.
-int TrackGameMode::UnknownFunction5231f0() {
+int TrackGameMode::LoadProfile() {
     char path[0x104];
     FILE* file;
 
@@ -453,7 +453,7 @@ int TrackGameMode::UnknownFunction5231f0() {
     field_0x27f8.field_0x35 = 0;
     ChooseDisplayMode(&field_0x23a8, &field_0xa4c);
     g_TrackGame->ui->field_0x48c = 1;
-    UnknownFunction523000();
+    LoadControllerChoice();
     if (g_TrackGame->soundInterface) {
         ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = field_0xa34;
         ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, field_0xa48 ? 16 : 8);
@@ -466,7 +466,7 @@ int TrackGameMode::UnknownFunction5231f0() {
 }
 
 // 0x00523580: saves the profile.
-void TrackGameMode::UnknownFunction523580() {
+void TrackGameMode::SaveProfile() {
     char path[0x104];
     FILE* file;
 
@@ -553,7 +553,7 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
 }
 
 // 0x00523b70
-void TrackGameMode::UnknownFunction523b70(char* name) {
+void TrackGameMode::CopyCurrentSeriesDirectory(char* name) {
     CopySeriesDirectory((short)field_0x27f8.field_0x04, (short)field_0x27f8.field_0x00, name);
 }
 
@@ -617,7 +617,7 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
 }
 
 // 0x00523e50 (KrustyUI 0x004988a0): the bonus track names from PCSched.pb.
-void TrackGameMode::UnknownFunction523e50() {
+void TrackGameMode::LoadBonusTrackNames() {
     UnknownParameterBlock block;
     char key[0x100];
     UnknownTextureStream* stream = new(__FILE__, 873) UnknownTextureStream((int)g_UnknownResourceManager572b44);

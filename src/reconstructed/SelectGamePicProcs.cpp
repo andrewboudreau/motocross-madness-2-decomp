@@ -1325,7 +1325,7 @@ void MultiPlayerDlg::FollowTrackChange() {
     EnableReadyControls();
     if (!strcmp(builtForTrack, g_TrackGame->mode.field_0x27f8.field_0x36) && builtForVariant == g_TrackGame->mode.field_0x27f8.field_0x34)
         return;
-    g_TrackGame->mode.UnknownFunction523b70(scene);
+    g_TrackGame->mode.CopyCurrentSeriesDirectory(scene);
     g_TrackGame->mode.FindFileDirectory((int)scene, g_TrackGame->mode.field_0x27f8.field_0x36, "env", path);
     index = 0;
     value = 0;

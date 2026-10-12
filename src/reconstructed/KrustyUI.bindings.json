@@ -159,7 +159,7 @@
   "?UnknownFunction511970@@YAHH@Z": "0x00511970",
   "?UnknownFunction51f0b0@UnknownTrackGameObject3400@@QAEHFPBD@Z": "0x0051f0b0",
   "?UnknownFunction51f260@UnknownTrackGameObject3400@@QAEHFPBDH@Z": "0x0051f260",
-  "?UnknownFunction523580@TrackGameMode@@QAEXXZ": "0x00523580",
+  "?SaveProfile@TrackGameMode@@QAEXXZ": "0x00523580",
   "?UnknownFunction524100@TrackGameMode@@QAEHXZ": "0x00524100",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot18@GameObject@@UAEHXZ": "0x004694d0",

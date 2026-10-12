@@ -926,14 +926,14 @@ void GlobalSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 sprintf(preset, "%s\\%s", "ui", "preset.ctl");
                 sprintf(profile, "%s\\%s\\%s", "ui\\profile", name, "control.ctl");
                 CopyFileA(preset, profile, 0);
-                g_TrackGame->mode.UnknownFunction523000();
-                g_TrackGame->mode.UnknownFunction523580();
+                g_TrackGame->mode.LoadControllerChoice();
+                g_TrackGame->mode.SaveProfile();
                 g_TrackGame->field_0x33fc->UnknownFunction448e90(profile, -1);
             } else if (choice == 2) {
                 UIListBox* profiles = static_cast<UIListBox*>(FindControl("LstProfiles", 3));
                 UnknownGameUiListRow* entry = &profiles->rowTable[profiles->GetSelectedRow()];
                 strcpy(g_TrackGame->mode.field_0x00, entry->text);
-                g_TrackGame->mode.UnknownFunction5231f0();
+                g_TrackGame->mode.LoadProfile();
             }
             strcpy(g_TrackGame->mode.field_0x00, name);
             EndDialog(0x51);

@@ -878,7 +878,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
     g_TrackGame->ui->field_0x44 = 0;
     UnknownKrustyBikeView* view = FindRaceView();
     TrackGameViewOwner* owner = FindRaceMode();
-    g_TrackGame->mode.UnknownFunction523580();
+    g_TrackGame->mode.SaveProfile();
     if (mode == 1) {
         if (owner) {
             if (owner->field_0x60)
