@@ -730,7 +730,7 @@ int UIMultiState::Draw() {
             return 0;
         }
     }
-    if ((stateTable && stateTable[selectedState].text && stateTable[selectedState].field_0x0c) ||
+    if ((stateTable && stateTable[selectedState].text && stateTable[selectedState].textLength) ||
         (sourceBlit && controlText && controlTextLength)) {
         void* dc;
         int more;

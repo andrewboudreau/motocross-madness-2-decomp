@@ -135,7 +135,7 @@ struct UnknownGameUiState {
     UIAnim* image;                            // +0x00
     UIAnim* focusImage;                       // +0x04
     char* text;                               // +0x08
-    int field_0x0c;
+    int textLength;                           // +0x0c: strlen(text) (slot 35 returns it)
     int selectable;                           // +0x10
     int textExtent[2];                        // +0x14: the text's length and width
     char* textLines;                          // +0x1c

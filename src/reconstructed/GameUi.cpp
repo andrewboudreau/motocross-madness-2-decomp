@@ -1297,7 +1297,7 @@ int UIMultiState::GetControlText() {
 
 // 0x00478280
 int UIMultiState::GetTextLength() {
-    return stateTable[selectedState].field_0x0c;
+    return stateTable[selectedState].textLength;
 }
 
 // 0x004782a0
@@ -2902,7 +2902,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
                 stateTable[index].textExtent);
             if (!stateTable[index].textLines) {
                 stateTable[index].textExtent[0] = strlen(stateTable[index].text);
-                stateTable[index].field_0x0c = stateTable[index].textExtent[0];
+                stateTable[index].textLength = stateTable[index].textExtent[0];
                 HDC dc;
                 if (!g_TrackGame->PCTarget()->renderSurface->GetDC((void**)&dc)) {
                     HGDIOBJ font =
@@ -2910,7 +2910,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
                     HGDIOBJ old = SelectObject(dc, font);
                     SIZE size;
                     GetTextExtentPoint32A(dc, stateTable[index].text,
-                                          stateTable[index].field_0x0c, &size);
+                                          stateTable[index].textLength, &size);
                     SelectObject(dc, old);
                     g_TrackGame->PCTarget()->renderSurface->ReleaseDC(dc);
                     stateTable[index].textExtent[1] = size.cx;
