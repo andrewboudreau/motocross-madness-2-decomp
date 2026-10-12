@@ -152,3 +152,10 @@ int JoystickDevice::UnknownFunction489c60(int control, int modifier, UnknownInpu
         return 0;
     return UnknownVirtualSlot2(control, modifier, entry);
 }
+
+// 0x00489e20: the current value of `axis`. Only OptionProcs.cpp's controls
+// dialog calls it out of line (0x004b331d, 0x004b57b9), to compare the axes
+// before and after waiting for a moved one.
+float JoystickDevice::UnknownFunction489e20(int axis) {
+    return axisValues[axis];
+}

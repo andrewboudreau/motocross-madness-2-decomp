@@ -94,6 +94,8 @@ unresolved force-feedback virtuals keep their slot names.
   - `0x00489c60` answers a control query. Controls -2 to -13 are axis
     directions: below 16384 or above 49152, for axes enabled by the six bits
     at +0x14. Other controls go through the mapping table to slot 2.
+  - `0x00489e20` returns an axis value (+0x4e4 + 4 * axis); OptionProcs.cpp's
+    controls dialog calls it out of line.
 
   Slot 2 (`0x00489980`) is the button query.
 
