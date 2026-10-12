@@ -1071,8 +1071,9 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
     }
 }
 
-// 0x004e57d0
-void RaceSound::UnknownFunction4e57d0(UnknownEventRacer* racer, float value) {
+// 0x004e57d0: bonus.wav for the listener's scores of 10000 and more
+// (modes 0 and 4); applause01 in mode 3 at most every 15 seconds.
+void RaceSound::PlayScoreSounds(UnknownEventRacer* racer, float value) {
     if (listenerRacer == racer && value >= 10000.0f &&
         (!g_TrackGame->mode.field_0x27f8.field_0x04 || g_TrackGame->mode.field_0x27f8.field_0x04 == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);
@@ -1083,7 +1084,7 @@ void RaceSound::UnknownFunction4e57d0(UnknownEventRacer* racer, float value) {
 }
 
 // 0x004e5860
-void RaceSound::UnknownFunction4e5860() {
+void RaceSound::PlayItSound() {
     PlayIfEnabled(itSound, 0, 0, 0, 0);
 }
 

@@ -66,4 +66,5 @@ picked only when that one has stopped.
 (racer +0x444) have been started and cleared when the crash ends; `ohClock`,
 `applauseClock` and `stuntApplauseClock` (+0x12a4..+0x12ac) count the
 seconds since `oh_01.wav`, applause01/02 and the applause `0x004e57d0` plays,
-each compared against 30 or 15 seconds.
+each compared against 30 or 15 seconds. `PlayScoreSounds` `0x004e57d0` and `PlayItSound`
+`0x004e5860` are named after the sounds they play.
