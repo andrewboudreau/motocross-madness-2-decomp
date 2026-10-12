@@ -16,6 +16,11 @@
 // - Also: wrapping in `if (text)`, a local cursor, top-declared pointers,
 //   `== NULL`, a continue chain and an explicit 0x80004005. None moves the
 //   push placement.
+// - Swept later: an HRESULT local returned early, a `goto fail` single exit,
+//   an else block around `pairCount = 0` and loop pointers declared at the
+//   top, in every combination: all 33/408. The /G6 profile scores 39 with 19
+//   instruction diffs and /O1 scores 9, so the push placement is not a
+//   profile difference either.
 #include "../../src/reconstructed/Parser.h"
 
 HRESULT UnknownParser::Parse(char* text, int length)

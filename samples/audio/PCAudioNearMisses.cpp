@@ -14,13 +14,14 @@
 // parameter types (bool or unsigned char `stereo`: 38) and blockAlign
 // first; avgBytesPerSec from `rate` or as a product scores lower.
 //
-// Sound 0x004bd0c0 (refills from the archive or file) and 0x004bb890 (the
-// sound factory): retail keeps one `return 1` block shared by both branches
-// and inlines the factory's early `return 0` epilogues (the first one
-// without `xor eax, eax`, eax being the null entry); VC6 here folds the
-// archive branch's result into `neg/sbb` and shares the factory's failures.
-// An if/else with one trailing `return 1`, gotos to shared labels, a
-// result variable and an ok flag were tried for 0x004bd0c0.
+// Sound 0x004bd0c0 (refills from the archive or file): retail keeps one
+// `return 1` block shared by both branches; VC6 here folds the archive
+// branch's result into `neg/sbb`. An if/else with one trailing `return 1`,
+// gotos to shared labels, a result variable and an ok flag were tried. The
+// sound factory 0x004bb890 next to it is exact in PCAudio.cpp: its load
+// failures `goto` one delete tail placed inside the last branch, which
+// keeps the early returns' own epilogues (its old 272-byte extent was
+// short; the function is 384 bytes).
 //
 // Sound 0x004bc6b0 (starts a sound): compiled inside PCAudio.cpp (where the
 // UnknownSoundNotifier constructor is defined, so VC6 drops the EH frame
@@ -76,40 +77,6 @@ int PCSoundInterface::SetPrimaryFormat(int rate, int stereo, int bits) {
     return primaryBuffer->SetFormat(&format) >= 0;
 }
 
-
-// 0x004bb890: a new sound for the archive entry `name`: a duplicate of the
-// sound already loaded from it when there is one (unless that one is
-// streamed), otherwise loaded from the entry's stream and recorded there.
-Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
-    if (!entry)
-        return 0;
-    Sound* sound = new (__FILE__, 186) Sound(group, 1);
-    if (!sound)
-        return 0;
-    Sound* loaded = (Sound*)entry->field_0x10;
-    if (loaded) {
-        if (loaded->soundFlags & 4) {
-            entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
-            if (sound->LoadWave(entry->field_0x14, flags, a, b, c))
-                goto named;
-        } else if (sound->DuplicateFrom(loaded)) {
-            goto named;
-        }
-    } else {
-        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
-        if (sound->LoadWave(entry->field_0x14, flags, a, b, c)) {
-            g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, sound);
-            goto named;
-        }
-    }
-    delete sound;
-    return 0;
-named:
-    strncpy(sound->soundName, name, 0x103);
-    sound->isPacked = 1;
-    return sound;
-}
 
 // 0x004bd0c0: refills `buffer` from the sound's archive entry or file,
 // skipping the 44-byte header.

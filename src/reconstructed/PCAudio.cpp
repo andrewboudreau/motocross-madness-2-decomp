@@ -141,6 +141,43 @@ UnknownSoundNotifier::~UnknownSoundNotifier() {
     }
 }
 
+// 0x004bb890: a new sound for the archive entry `name`. When a sound was
+// already loaded from that entry, the new one duplicates its buffer, or
+// re-reads the entry if that sound is streamed (flag 4). Otherwise the
+// sound is loaded from the entry's stream and recorded on the entry. All
+// three load failures share one delete-and-fail tail, which retail lays
+// out inside the last branch; the two early failures keep their own
+// epilogues.
+Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    if (!entry)
+        return 0;
+    Sound* sound = new (__FILE__, 186) Sound(group, 1);
+    if (!sound)
+        return 0;
+    Sound* loaded = (Sound*)entry->field_0x10;
+    if (loaded) {
+        if (loaded->soundFlags & 4) {
+            entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+            if (!sound->LoadWave(entry->field_0x14, flags, a, b, c))
+                goto failed;
+        } else if (!sound->DuplicateFrom(loaded)) {
+            goto failed;
+        }
+    } else {
+        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+        if (!sound->LoadWave(entry->field_0x14, flags, a, b, c)) {
+failed:
+            delete sound;
+            return 0;
+        }
+        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, sound);
+    }
+    strncpy(sound->soundName, name, 0x103);
+    sound->isPacked = 1;
+    return sound;
+}
+
 // 0x004bba10: an empty sound of `type` in `group`.
 Sound::Sound(SoundGroup* group, int type) {
     soundGroup = group;

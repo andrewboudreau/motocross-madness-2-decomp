@@ -4738,6 +4738,15 @@ CASES = [
         'reason': 'unsigned short pixel locals; packed path loads unsigned int pixels in one declaration and counts x unsigned with !=',
     },
     {
+        'name': 'PCAudio sound from archive entry 0x4bb890',
+        'bindings': 'src/reconstructed/PCAudio.bindings.json',
+        'source': 'src/reconstructed/PCAudio.cpp',
+        'symbol': '?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z',
+        'target_va': '0x004bb890',
+        'target_size': 384,
+        'reason': 'EH frame for new Sound; early failures keep their epilogues, load failures share one delete tail inside the last branch',
+    },
+    {
         'name': 'PCAudio UnknownPCAudioObject constructor',
         'bindings': 'src/reconstructed/PCAudio.bindings.json',
         'source': 'src/reconstructed/PCAudio.cpp',

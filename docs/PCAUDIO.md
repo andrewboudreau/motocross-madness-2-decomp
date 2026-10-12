@@ -88,7 +88,7 @@ manager's `loaderThread`, `queuedEvent`, `queueLock`, `byteBudget`,
 bit is `audioStarted`. The names are ours (tier 3); the roles come from the
 DirectSound calls and the sample's flow.
 
-Exact (41 more calibration cases): the WAV loader `0x004bbef0` (reads the
+Exact (42 more calibration cases): the WAV loader `0x004bbef0` (reads the
 44-byte header, creates the buffer with a hardware-then-software retry for
 looping sounds, registers the sound, fills it and makes duplicates) and the
 streaming copy `0x004bd260`; also the notifier's thread, constructor,
@@ -96,7 +96,8 @@ start and destructor (`0x004bb630`–`0x004bb810`); Sound's constructor,
 destructor, play, settings, control flags, property set, stop, playing test,
 positions, restore, pause, fade, release, lock/unlock, buffer creation and
 duplication and the 3D setters (`0x004bba10`–`0x004bdb60`); the qsort
-comparison `0x004bdbd0`; and the manager's start, queue, record, eviction
+comparison `0x004bdbd0`; the archive-entry sound factory `0x004bb890`
+(384 bytes); and the manager's start, queue, record, eviction
 and unload (`0x004bdef0`–`0x004be220`).
 
 Source shapes:
@@ -132,9 +133,13 @@ Their source shapes:
   the inline version keeps the destination address in a register and swaps
   `this` and the source pointer in 0x004bc4c0 and 0x004bc320.
 - The streamed buffer creator computes `stereo` into a local before `is3D`.
+- The factory `0x004bb890` sends its three load failures with `goto` to one
+  `delete sound; return 0;` block inside the last (fresh load) branch. A
+  shared tail after the if/else, or a delete in every branch, changes the
+  layout.
 
 Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
-`0x004be910`, `0x004bd0c0`, the factory `0x004bb890`, the manager's thread
+`0x004be910`, `0x004bd0c0`, the manager's thread
 `0x004bdc00` and the start-up `0x004bc6b0` (in the samples file it also
 gains an EH frame because the notifier's constructor is not defined there;
 inside PCAudio.cpp the frame matches retail).
