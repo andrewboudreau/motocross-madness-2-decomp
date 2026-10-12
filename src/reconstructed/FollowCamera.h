@@ -17,7 +17,7 @@
 
 // cdecl float(float) at 0x00460b50: returns 0 for 0, otherwise an
 // exponent-halving table approximation (square-root-like). Name provisional.
-float UnknownFunction460b50(float value);
+float FastSqrt(float value);
 
 // Inline minimum; slot 73 and UnknownFollowCameraValue::Update need the
 // function form (a ternary reloads the chosen operand).
@@ -86,7 +86,7 @@ struct UnknownFollowCameraPoint {
 // Object at FollowCamera+0x240; slots 43/44 test its +0xbe8.
 struct UnknownFollowCameraSubject {
     // 0x00507c10: adjusts *point (KrustyBikeCamera slot 52 reads its new y).
-    void UnknownFunction507c10(Vector3* point, int a, int b, int c);
+    void QueryGround(Vector3* point, int a, int b, int c);
 
     unsigned char field_0x000[0x40];
     float field_0x40;           // copied to FollowCamera+0x2ec by 0x00463600

@@ -50,7 +50,7 @@ public:
     void UnknownFunction4fc740(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
     Vector3 WorldToLocalDirection(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
     Vector3 LocalToWorldDirection(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
-    void UnknownFunction4fbd70(const Vector3* axisA, const Vector3* axisB, int frame, int flag); // 0x004fbd70 (ret 0x10)
+    void SetAxesPtr(const Vector3* axisA, const Vector3* axisB, int frame, int flag); // 0x004fbd70 (ret 0x10)
 
     int field_0x04;
     int field_0x08;
@@ -87,7 +87,7 @@ struct CarProceduralContact {
 // units declare the same function on their own views of the terrain).
 class CarProceduralTerrain {
 public:
-    void UnknownFunction507c10(Vector3* position, Vector3* normal, int a, int b);
+    void QueryGround(Vector3* position, Vector3* normal, int a, int b);
 };
 
 class CarProceduralQuadTreeObject {

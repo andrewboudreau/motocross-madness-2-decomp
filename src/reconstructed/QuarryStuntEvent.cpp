@@ -245,7 +245,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
     if (chatOverlay && g_TrackGame->mode.field_0x6b4 == 1)
-        chatOverlay->UnknownFunction51dd10();
+        chatOverlay->ShowInputLine();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
     radarOverlay = radarOverlay->LoadMap((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, (int)raceCamera, screen);

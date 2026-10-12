@@ -31,7 +31,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 extern int g_UnknownGlobal65b534;
 
 // cdecl 0x00460b50: table-driven square root (FollowCamera.h).
-float UnknownFunction460b50(float value);
+float FastSqrt(float value);
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
@@ -86,7 +86,7 @@ void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, i
         dz = eyeZ - vertices[i].z;
         if (dy < 0.0f)
             dy = -dy;
-        distance = UnknownFunction460b50(dx * dx + dy * dy + dz * dz);
+        distance = FastSqrt(dx * dx + dy * dy + dz * dz);
         steps = (int)depth;
         if (steps > depthLimit)
             steps = depthLimit;

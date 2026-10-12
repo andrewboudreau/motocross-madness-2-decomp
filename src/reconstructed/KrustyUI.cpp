@@ -47,7 +47,7 @@ void UnknownFunction5053b0(int value);
 // The Soultree object at a character's +0x1a0.
 struct UnknownKrustyUISoultree {
     void UnknownFunction4444c0(int value);                 // 0x004444c0
-    void UnknownFunction4fc660(const Vector3* position);   // 0x004fc660
+    void SetPosition(const Vector3* position);   // 0x004fc660
     void UnknownFunction4fbd10(float a, float b, float c, float d, float e, float f, float g,
                                int h);                     // 0x004fbd10
 };
@@ -324,7 +324,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         garageScene->AppendChild(
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(field_0x18, "UIgarage.mcf", lights, &context, 1, 1), -1);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
-        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fc660(&garageFocus);
+        KRUSTYUI_GARAGE->field_0x1a0->SetPosition(&garageFocus);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->UnknownFunction4a8b10("Spin");
         KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
@@ -340,7 +340,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             KRUSTYUI_RIDER->CharacterVirtualSlot11(field_0x18, "UIRider.mcf", lights,
                                                    &g_TrackGame->field_0x1c, 1, 1), -1);
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
-        KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4fc660(&KRUSTYUI_RIDER_POSITION);
+        KRUSTYUI_RIDER->field_0x1a0->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->UnknownFunction4a8b10("WaitR");
         KRUSTYUI_RIDER->UnknownFunction4a6bb0(0.03f, 0, 0);
@@ -359,7 +359,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             bike->field_0x1a0->UnknownFunction4444c0(1);
-            bike->field_0x1a0->UnknownFunction4fc660(&garageFocus);
+            bike->field_0x1a0->SetPosition(&garageFocus);
             bike->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->UnknownFunction4a8b10("WaitB");
             bike->UnknownFunction4a6bb0(0.03f, 0, 0);

@@ -392,7 +392,7 @@ void FollowCamera::UnknownVirtualSlot68() {
     if (dx < 0.0f) dx = -dx;
     float dz = eyePosition.z - target.z;
     if (dz < 0.0f) dz = -dz;
-    field_0x258 = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
+    field_0x258 = ((200.0f - FastSqrt(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
     if (field_0x258 < 10.0f) field_0x258 = 10.0f;
     if (field_0x258 > 70.0f) field_0x258 = 70.0f;
     UnknownVirtualSlot29(target);
@@ -643,7 +643,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         eyePosition.z = viewMatrix.m[3][2];
         eyePosition += *offset;
         Vector3 ground = eyePosition;
-        field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
+        field_0x240->QueryGround(&ground, 0, 0, 0);
         float height = ground.y + 3.5f;
         if (height > eyePosition.y)
             eyePosition.y = height;

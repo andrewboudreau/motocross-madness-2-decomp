@@ -947,7 +947,7 @@ float RaceSound::GroundDistance(Vector3* a, Vector3* b) {
     if (dz < 0.0f)
         dz = -dz;
     if (dx <= 500.0f && dz <= 500.0f)
-        return UnknownFunction460b50(dz * dz + dx * dx);
+        return FastSqrt(dz * dz + dx * dx);
     return 500.0f;
 }
 

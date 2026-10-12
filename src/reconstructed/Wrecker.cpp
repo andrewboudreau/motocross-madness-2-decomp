@@ -404,7 +404,7 @@ inline Vector3 operator/(const Vector3& v, float s) {
 void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
     Vector3 delta = to - from;
     float lengthSq = (delta.y * delta.y + delta.x * delta.x) + delta.z * delta.z;
-    float length = lengthSq == 1.0f ? 1.0f : UnknownFunction460b50(lengthSq);
+    float length = lengthSq == 1.0f ? 1.0f : FastSqrt(lengthSq);
     float speed = length / frameTime;
     if (speed < 0.5f)
         return;

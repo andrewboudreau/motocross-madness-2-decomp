@@ -267,7 +267,7 @@ void SoundEmitter::UnknownFunction402530(int count, AuralScapeListener** listene
             if (dz < 0.0f)
                 dz = -dz;
         }
-        float distance = UnknownFunction460b50(dx * dx + dz * dz);
+        float distance = FastSqrt(dx * dx + dz * dz);
         if (distance < field_0x19c)
             field_0x19c = distance;
     }
@@ -585,7 +585,7 @@ static inline void UnknownPlaceEmitter(const int& count, AuralScapeListener** li
         float dz = s_UnknownListenerPositions5776f8[j].z - emitter->field_0x150.position.z;
         if (dz < 0.0f)
             dz = -dz;
-        s_UnknownListenerDistances57772c[j] = UnknownFunction460b50(dx * dx + dz * dz);
+        s_UnknownListenerDistances57772c[j] = FastSqrt(dx * dx + dz * dz);
     }
     float nearest = s_UnknownListenerDistances57772c[0];
     Vector3 listener = s_UnknownListenerPositions5776f8[0];
@@ -709,7 +709,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
     unsigned char material = 0;
     if (field_0xa0_bit0 && field_0x98 && field_0x94) {
         Vector3 position = ((UnknownAuralScapeTarget*)field_0x18)->field_0x08->field_0x170;
-        field_0x98->UnknownFunction507c10(&position, 0, 0, (int)&material);
+        field_0x98->QueryGround(&position, 0, 0, (int)&material);
         zone = (material >> 4) & 3;
         environment = field_0x94->field_0xa4->field_0x410[zone];
         SoundSystem()->SetEAXEnvironment(environment);

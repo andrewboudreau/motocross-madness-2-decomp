@@ -6,7 +6,7 @@
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7FollowCamera@@6B@": "0x0055282c",
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?SetupFollowCamera@FollowCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00463140",
   "?SetTableEntry@FollowCamera@@QAE_NHPBUVector3@@PBM1111@Z": "0x00463450",
   "?AppendTableEntry@FollowCamera@@QAE_NABUVector3@@MMMMM@Z": "0x00463520",
@@ -69,7 +69,7 @@
   "?UnknownVirtualSlot36@FollowCamera@@UAE_NABUVector3@@_N1@Z": "0x00465000",
   "__ftol": "0x00534a88",
   "?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
-  "?UnknownFunction507c10@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
+  "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "__real@4@4000e000000000000000": "0x00550b94",
   "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
   "?UnknownVirtualSlot10@Camera@@UAEHM@Z": "0x0042e690"

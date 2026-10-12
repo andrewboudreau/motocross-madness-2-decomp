@@ -154,7 +154,7 @@
   "?UnknownFunction4e8cf0@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
   "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?UnknownFunction4fbd10@UnknownKrustyUISoultree@@QAEXMMMMMMMH@Z": "0x004fbd10",
-  "?UnknownFunction4fc660@UnknownKrustyUISoultree@@QAEXPBUVector3@@@Z": "0x004fc660",
+  "?SetPosition@UnknownKrustyUISoultree@@QAEXPBUVector3@@@Z": "0x004fc660",
   "?UnknownFunction5053b0@@YAXH@Z": "0x005053b0",
   "?UnknownFunction511970@@YAHH@Z": "0x00511970",
   "?UnknownFunction51f0b0@UnknownTrackGameObject3400@@QAEHFPBD@Z": "0x0051f0b0",

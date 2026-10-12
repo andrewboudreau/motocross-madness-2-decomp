@@ -26,7 +26,7 @@
 // 0x0049bf10: starts the recorder on `file` (mode 0 records, 1 plays back).
 // A new recording first stamps the "MCMVCR" signature, the version string and
 // the current race settings into the block it hands over.
-int KrustyVCR::UnknownFunction49bf10(UnknownRecorderCallback callback, int mode, char* name,
+int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
                                      UnknownVcrFile* file)
 {
     field_0x0d8 = 0;
@@ -47,13 +47,13 @@ void KrustyVCR::UnknownFunction49bff0(float time, int flag)
 }
 
 // 0x0049c000
-float KrustyVCR::UnknownFunction49c000()
+float KrustyVCR::RecordedLength()
 {
     return field_0x10c;
 }
 
 // 0x0049c010
-void KrustyVCR::UnknownFunction49c010(float duration, char* description, int flag)
+void KrustyVCR::SaveRecording(float duration, char* description, int flag)
 {
     COPY_TRUNCATED(field_0x0ec, description)
     field_0x10c = duration;

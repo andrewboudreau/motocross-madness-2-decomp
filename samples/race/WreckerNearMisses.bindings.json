@@ -1,6 +1,6 @@
 {
   "??0WreckerVec3Call@@QAE@MMM@Z": "0x00404e60",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?UnknownFunction4a8b80@UnknownWreckerCharacter@@QAEXHM@Z": "0x004a8b80",
   "?UnknownFunction4baa50@UnknownWreckerParticles@@QAEHMPBUVector3@@HMMMIH@Z": "0x004baa50",

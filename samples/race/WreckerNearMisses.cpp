@@ -109,7 +109,7 @@ static inline float WreckerLength(Vector3 v) {
     float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
     if (squared == 1.0f)
         return 1.0f;
-    return UnknownFunction460b50(squared);
+    return FastSqrt(squared);
 }
 
 // The scale with the constructor called out of line.

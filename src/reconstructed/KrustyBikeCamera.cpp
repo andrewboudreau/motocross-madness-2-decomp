@@ -58,7 +58,7 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
     bool capped = g_TrackGame->mode.UnknownFunction524100() == 3 ||
                   g_TrackGame->mode.UnknownFunction524100() == 4;
     Vector3 ground = *point;
-    field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
+    field_0x240->QueryGround(&ground, 0, 0, 0);
     float minimum = ground.y + 3.5f;
     if (minimum > point->y) {
         if (field_0x22c < 0.0f)

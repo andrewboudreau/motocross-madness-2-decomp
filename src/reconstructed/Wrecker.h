@@ -303,7 +303,7 @@ public:
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h declares the
 // same function).
-float UnknownFunction460b50(float value);
+float FastSqrt(float value);
 // 0x00460c00 (cdecl): the matching reciprocal square root.
 float FastInvSqrt(float value);
 

@@ -105,7 +105,7 @@ struct UnknownPodiumOwner : public GameObject {     // TrackGameViewOwner
     int field_0x98;
 };
 struct UnknownPodiumTrackObject {                   // the view's +0x4c
-    void UnknownFunction507c10(Vector3* point, int a, int b, int c); // 0x00507c10
+    void QueryGround(Vector3* point, int a, int b, int c); // 0x00507c10
     unsigned char field_0x00[0x40];
     float field_0x40;                               // grid spacing
 };
@@ -256,7 +256,7 @@ int EventManager::CreatePodiumScene() {
         }
     }
     up = kVec3YAxis;
-    PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->UnknownFunction507c10(&podiumPosition, 0, 0, 0);
+    PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->QueryGround(&podiumPosition, 0, 0, 0);
     float angle = (float)atan2(direction.x, direction.z);
     Vector3 offsets[3];
     Vector3 facings[3];
@@ -348,8 +348,8 @@ int EventManager::CreatePodiumScene() {
             }
             podiumMotions[place - 1] = character->UnknownFunction4a6b30(name, 1);
             Vector3 position = podiumPosition + offsets[place - 1];
-            character->field_0x1a0->UnknownFunction4fc660(&position);
-            character->field_0x1a0->UnknownFunction4fbd70(&facings[place - 1], &kVec3YAxis, 1, 1);
+            character->field_0x1a0->SetPosition(&position);
+            character->field_0x1a0->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
             character->UnknownFunction4a8b40(podiumMotions[place - 1]);
             character->field_0x10 = 0;
             if (racer) {

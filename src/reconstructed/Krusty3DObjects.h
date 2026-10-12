@@ -23,7 +23,7 @@
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h declares the
 // same function).
-float UnknownFunction460b50(float value);
+float FastSqrt(float value);
 
 struct UnknownControlEvent;
 struct UnknownInputEntry;
@@ -110,7 +110,7 @@ struct UnknownRunwayRacer {
 
 // The terrain (NationalRace.cpp's +0x40): 0x00507c10 drops `point` onto it.
 struct UnknownRunwayTerrain {
-    void UnknownFunction507c10(Vector3* point, Vector3* normal, int a, int b);
+    void QueryGround(Vector3* point, Vector3* normal, int a, int b);
 };
 
 // 0x4c bytes (NationalRace.cpp 0x004aa8cd): five "pointer.slt" models.

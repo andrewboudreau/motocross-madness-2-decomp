@@ -91,12 +91,12 @@ public:
 
     // 0x0049bf10: opens `name` in `file` through `callback` for recording
     // (mode 0) or playback (mode 1); 0 on failure.
-    int UnknownFunction49bf10(UnknownRecorderCallback callback, int mode, char* name,
+    int OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
                               UnknownVcrFile* file);
-    float UnknownFunction49c000();            // 0x0049c000: the recorded length
+    float RecordedLength();            // 0x0049c000: the recorded length
     void UnknownFunction49bff0(float time, int flag); // 0x0049bff0
     // 0x0049c010: saves the recording with its length and description.
-    void UnknownFunction49c010(float length, char* description, int flag);
+    void SaveRecording(float length, char* description, int flag);
     // 0x0049c070: describes a racer of the recording: its network id, AI
     // index (a char), record slot, name, model files, bike and rider names,
     // engine size and kind and plate number. 0x0049c1e0 reads one back.
@@ -130,7 +130,7 @@ struct UnknownBikeRaceMesh {
     // setup places the flag girl and the scene's start objects.
     void UnknownFunction4444c0(int value);    // 0x004444c0
     void UnknownFunction4fc630(Vector3 position); // 0x004fc630: sets the translation
-    void UnknownFunction4fbd70(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
+    void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
 
     unsigned char field_0x000[0x274];
     int groupCount;                           // +0x274 group count
@@ -196,7 +196,7 @@ class UnknownBikeRaceOverlay19c {
 public:
     // 0x0051dce0: the chat line's input; nonzero when it took the event.
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
-    void UnknownFunction51dd10();             // 0x0051dd10
+    void ShowInputLine();             // 0x0051dd10
     void HideInputLine();             // 0x0051dd40: closes the chat line
     void UnknownFunction51dd70(char* name, unsigned int* text, int flag); // 0x0051dd70
 
@@ -600,7 +600,7 @@ class UnknownBikeRaceProjector {
 public:
     // 0x00507c10 (Terrain::QueryGround): puts `point` on the ground; the
     // ground normal goes to `normal` when given.
-    void UnknownFunction507c10(Vector3* point, Vector3* normal, int a, unsigned char* b);
+    void QueryGround(Vector3* point, Vector3* normal, int a, unsigned char* b);
 
     unsigned char field_0x00[0x40];
     float field_0x40;                         // scales the start grid (0x004210f0)
@@ -914,7 +914,7 @@ public:
     void RestartRace(int mode, char* path, char* description);
     void RestartReplay();             // 0x00420bd0: restarts the replay and ghost
     // 0x004210f0: writes two positions relative to `reference`.
-    void UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int flags);
+    void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
     void UnknownFunction421050();             // 0x00421050
     // 0x00421d50: the recorder callback's work (0x004230e0 forwards to it).
     int RecordFrame(int a, void* data, int flag, int b, int* keep, int time);

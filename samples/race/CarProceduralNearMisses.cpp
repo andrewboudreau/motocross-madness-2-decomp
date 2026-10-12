@@ -165,7 +165,7 @@ static inline float CarLength(const Vector3& v)
     float squared = z * z + (x * x + y * y);
     if (squared == 1.0f)
         return 1.0f;
-    return UnknownFunction460b50(squared);
+    return FastSqrt(squared);
 }
 // v / |v| in place; the zero vector stays zero.
 static inline void CarNormalizeInPlace(Vector3& v)
@@ -287,7 +287,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     field_0x34->GetPositionIn(0, &position);
     Vector3 ground = position;
     Vector3 normal;
-    ((CarProceduralTerrain*)field_0x20c)->UnknownFunction507c10(&ground, &normal, 0, 0);
+    ((CarProceduralTerrain*)field_0x20c)->QueryGround(&ground, &normal, 0, 0);
     // The sensor collider's frame: the world axes orthonormalised.
     Matrix4 transform;
     CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
@@ -306,7 +306,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     else
         field_0x200 = field_0x200 * field_0x1b0 + normal * (1.0f - field_0x1b0);
     Vector3 flat = field_0x1f4 - field_0x200 * CarDot(field_0x1f4, field_0x200);
-    field_0x34->UnknownFunction4fbd70(&flat, &field_0x200, 0, 1);
+    field_0x34->SetAxesPtr(&flat, &field_0x200, 0, 1);
     Vector3 target(field_0x1d0.x + field_0x1c4.x, ground.y, field_0x1d0.z + field_0x1c4.z);
     Vector3 offset = field_0x34->LocalToWorldDirection(field_0x1dc);
     Vector3 placement = target - offset;
@@ -324,7 +324,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
             axisB.y = axisA.z;
             axisB.z = -axisA.y;
         }
-        field_0x210[i]->UnknownFunction4fbd70(&axisA, &axisB, 0, 1);
+        field_0x210[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
     }
     field_0x3c->UpdatePlacement();
     if (field_0x3c->QueryCollisions()) {

@@ -375,7 +375,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             strncpy(field_0xb8->field_0x04[i].fileName, sltPath, count);
             field_0xb8->field_0x04[i].fileName[count] = 0;
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fc630(position);
-            ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fbd70(&look, &up, 1, 0);
+            ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->SetAxesPtr(&look, &up, 1, 0);
             parameters.UnknownFunction4b7f10("Collision", 1, &collision);
             field_0xb8->field_0x04[i].field_0x0c = 0;
             if (collision && !stadium
@@ -615,9 +615,9 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         field_0xb4->field_0x04[i].field_0x00_bit4 = exclude;
         if (field_0xb4->field_0x04[i].field_0x00_bit3) {
             UnknownFunction4de580(name, "MCF", file);
-            field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4fc660(&field_0xb4->field_0x04[i].position);
+            field_0xb4->field_0x04[i].field_0x04->field_0x1a0->SetPosition(&field_0xb4->field_0x04[i].position);
             if (axes)
-                field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4fbd70(&look, &up, 1, 0);
+                field_0xb4->field_0x04[i].field_0x04->field_0x1a0->SetAxesPtr(&look, &up, 1, 0);
             field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4444c0(useLighting);
             parameters.UnknownFunction4b7f10("UseBlendedKeys", 1, &automatic);
             field_0xb4->field_0x04[i].field_0x00_bit1 = automatic;
@@ -675,7 +675,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             field_0xb4->field_0x04[i].motionCount = 1;
             field_0xb4->field_0x04[i].field_0x08->field_0x34->UnknownFunction4444c0(useLighting);
             if (axes)
-                field_0xb4->field_0x04[i].field_0x08->field_0x34->UnknownFunction4fbd70(&look, &up, 1, 0);
+                field_0xb4->field_0x04[i].field_0x08->field_0x34->SetAxesPtr(&look, &up, 1, 0);
         }
         if (field_0xb4->field_0x04[i].motionCount > 0) {
             if (auralScape) {

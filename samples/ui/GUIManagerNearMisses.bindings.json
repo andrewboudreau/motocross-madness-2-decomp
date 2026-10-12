@@ -130,7 +130,7 @@
   "?UnknownFunction43eaf0@GameCursor@@QAEPAVGameObject@@PAXPBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043eaf0",
   "?UnknownFunction447f40@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?UnknownFunction447fa0@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?UnknownFunction464e90@GUIManager@@QAEXXZ": "0x00464e90",
   "?UnknownFunction468dd0@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?UnknownFunction468f10@GameObject@@IAEXPBD@Z": "0x00468f10",

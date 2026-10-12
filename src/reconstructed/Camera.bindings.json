@@ -22,7 +22,7 @@
   "?SetViewport@Camera@@QAEHHHHH@Z": "0x0042f190",
   "?GetViewportRect@Camera@@QAEXPAUCameraRect@@@Z": "0x0042f210",
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",
   "?UnknownFunction4e8cf0@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
   "?UnknownVirtualSlot13@Camera@@UAEHXZ": "0x0042e630",

@@ -384,7 +384,7 @@ static inline Vector3 Normalize(const Vector3& v) {
 }
 
 // 0x004210f0
-void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int count) {
+void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int count) {
     if (field_0x188 && count != 0) {
         *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         *b = gridDirection;
@@ -578,9 +578,9 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             delete stream;
         }
         if (field_0x148)
-            field_0x04c->UnknownFunction507c10(&finishProbe.field_0x00, 0, 0, 0);
+            field_0x04c->QueryGround(&finishProbe.field_0x00, 0, 0, 0);
         if (field_0x144)
-            field_0x04c->UnknownFunction507c10(&startProbe.field_0x00, 0, 0, 0);
+            field_0x04c->QueryGround(&startProbe.field_0x00, 0, 0, 0);
         if (field_0x148 && field_0x144)
             UpdateTrackSeparation();
         break;
@@ -617,7 +617,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     }
     g_TrackGame->ui->UnknownFunction49b530();
 
-    UnknownFunction4210f0(&position, &direction, event, 0);
+    WriteRelativePositions(&position, &direction, event, 0);
     mode = g_TrackGame->mode.field_0x27f8.field_0x04;
     if (mode == 3 || mode == 2) {
         if (raceTrack) {
@@ -630,7 +630,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 } else {
                     point = position;
                 }
-                terrain->UnknownFunction507c10(&point, &normal, 0, 0);
+                terrain->QueryGround(&point, &normal, 0, 0);
                 field_0x06c = (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("30SecMan.slt", &field_0x070);
                 if (field_0x06c) {
                     raceScene->RestartEntry(field_0x070, 0, 0, 0);
@@ -643,7 +643,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 &&
                     g_TrackGame->mode.field_0x27f8.field_0x00 != 4 && field_0x06c) {
                     field_0x06c->model->UnknownFunction4fc630(point);
-                    field_0x06c->model->UnknownFunction4fbd70(&direction, &kVec3YAxis, 1, 0);
+                    field_0x06c->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 }
                 if (field_0x06c)
                     field_0x06c->UnknownVirtualSlot4();
@@ -655,7 +655,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 } else {
                     point = position;
                 }
-                terrain->UnknownFunction507c10(&point, &normal, 0, 0);
+                terrain->QueryGround(&point, &normal, 0, 0);
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
                     field_0x064 =
                         (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("StartGate.slb", &field_0x068);
@@ -670,7 +670,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                         g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
                         if (field_0x064) {
                             field_0x064->model->UnknownFunction4fc630(point);
-                            field_0x064->model->UnknownFunction4fbd70(&direction, &kVec3YAxis, 1, 0);
+                            field_0x064->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                         }
                     } else if (field_0x064) {
                         field_0x064->UnknownVirtualSlot4();
@@ -680,7 +680,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             if (field_0x148) {
                 point.x = finishProbe.field_0x00.x;
                 point.z = finishProbe.field_0x00.z;
-                terrain->UnknownFunction507c10(&point, 0, 0, 0);
+                terrain->QueryGround(&point, 0, 0, 0);
                 direction.x = finishProbe.field_0x0c.x;
                 direction.y = 0.0f;
                 direction.z = finishProbe.field_0x0c.z;
@@ -711,7 +711,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             D3DRMVectorRotate(&turned, &girlOffset, (Vector3*)&kVec3YAxis, angle);
             girlOffset = UnknownScaled(turned, UnknownVectorLength(girlOffset));
             ground = point + girlOffset;
-            terrain->UnknownFunction507c10(&ground, 0, 0, 0);
+            terrain->QueryGround(&ground, 0, 0, 0);
             float height = ground.y - point.y;
             girlPosition = point + girlOffset;
             D3DRMVectorRotate(&turned, &boxOffset, (Vector3*)&kVec3YAxis, angle);
@@ -729,7 +729,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 ReplaceMeshId(flagGirl, 1, 2);
                 flagGirl->field_0x1a0->UnknownFunction4444c0(1);
                 flagGirl->field_0x1a0->UnknownFunction4fc630(girlPosition);
-                flagGirl->field_0x1a0->UnknownFunction4fbd70(&direction, &kVec3YAxis, 1, 0);
+                flagGirl->field_0x1a0->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 flagGirl->SetMotionByName("Stand");
                 flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
             }
@@ -789,10 +789,10 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         replayVcr = new(__FILE__, 0x2c3) KrustyVCR;
         if (g_TrackGame->field_0x3428) {
             if (g_TrackGame->ui->field_0x4a8) {
-                replayVcr->UnknownFunction49bf10(RecorderCallback, 1, "ui\\demo.rpl", field_0x1a8);
+                replayVcr->OpenRecording(RecorderCallback, 1, "ui\\demo.rpl", field_0x1a8);
                 AppendChild(replayVcr, -1);
             } else {
-                replayVcr->UnknownFunction49bf10(RecorderCallback, 1, g_TrackGame->mode.replayFile,
+                replayVcr->OpenRecording(RecorderCallback, 1, g_TrackGame->mode.replayFile,
                                                    field_0x1a8);
                 AppendChild(replayVcr, -1);
             }
@@ -812,7 +812,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             point.x += localRacer->heading.x * 15.0f;
             point.z += localRacer->heading.z * 15.0f;
         }
-        terrain->UnknownFunction507c10(&point, 0, 0, 0);
+        terrain->QueryGround(&point, 0, 0, 0);
         field_0x06c->model->UnknownFunction4fc630(point);
     }
     if (g_TrackGame->field_0x3428 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
@@ -830,11 +830,11 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         g_TrackGame->ui->UnknownFunction49b530();
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
             COPY_TEXT(ghostFileRecorded, "VCRghost.dat", 0x104);
-            replayVcr->UnknownFunction49bf10(RecorderCallback, 0, ghostFileRecorded, field_0x1a8);
+            replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, field_0x1a8);
             if (ghostVcr) {
                 COPY_TEXT(ghostFilePlayed, "VCRgtemp.dat", 0x104);
-                ghostVcr->UnknownFunction49bf10(RecorderCallback, 1, ghostFilePlayed, field_0x1a8);
-                field_0x1c8 = ghostVcr->UnknownFunction49c000();
+                ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, field_0x1a8);
+                field_0x1c8 = ghostVcr->RecordedLength();
                 aiRacers[0]->UnknownFunction496e20(ghostVcr);
                 if (field_0x189)
                     aiRacers[0]->UnknownVirtualSlot4();
@@ -843,7 +843,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 AppendChild(ghostVcr, -1);
             }
         } else {
-            replayVcr->UnknownFunction49bf10(RecorderCallback, 0, "VCRtape.dat", field_0x1a8);
+            replayVcr->OpenRecording(RecorderCallback, 0, "VCRtape.dat", field_0x1a8);
         }
         AppendChild(replayVcr, -1);
         isRecording = 1;
@@ -991,7 +991,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];
         setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
         setup.weight = g_TrackGame->ui->weight[bikeClass];
-        UnknownFunction4210f0(&position, &direction, event, order[0]);
+        WriteRelativePositions(&position, &direction, event, order[0]);
         sprintf(path, "%s\\%s", "Res", circuit->field_0x465[0].field_0x38);
         if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)bikeFile)) {
             sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
@@ -1039,7 +1039,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 aiRacers[i] = 0;
             for (int n = 1; n < g_TrackGame->field_0x3444->field_0x460; n++) {
                 UnknownProCircuitRacer* racer = &g_TrackGame->field_0x3444->field_0x465[n];
-                UnknownFunction4210f0(&position, &direction, event, order[n]);
+                WriteRelativePositions(&position, &direction, event, order[n]);
                 sprintf(path, "%s\\%s", "Res", racer->field_0x38);
                 if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)bikeFile)) {
                     sprintf(message, "No PC Rider MCF found in resources.  Aborting.\n");
@@ -1136,7 +1136,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     break;
                 }
             }
-            UnknownFunction4210f0(&position, &direction, event, i + 1);
+            WriteRelativePositions(&position, &direction, event, i + 1);
             racerSlots[j] = new(__FILE__, 0x53b) UnknownBikeRaceRacer(1);
             if (!AppendChild(
                     racerSlots[j]->UnknownFunction48fc80(
@@ -1188,7 +1188,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     break;
                 }
             }
-            UnknownFunction4210f0(&position, &direction, event, i + 1);
+            WriteRelativePositions(&position, &direction, event, i + 1);
             setup = *(UnknownBikeRaceBikeSetup*)g_TrackGame->mode.field_0xfd8;
             setup.engineSize = slots[j].field_0xec;
             setup.engineKind = slots[j].field_0xf0;
@@ -1240,7 +1240,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     break;
                 }
             }
-            UnknownFunction4210f0(&position, &direction, event, i + 1);
+            WriteRelativePositions(&position, &direction, event, i + 1);
             setup = *(UnknownBikeRaceBikeSetup*)g_TrackGame->mode.field_0xfd8;
             setup.engineSize = slots[j].field_0xec;
             setup.engineKind = slots[j].field_0xf0;
@@ -1279,7 +1279,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         }
     } else {
         // The player's racer offline (or in a replay).
-        UnknownFunction4210f0(&position, &direction, event, order[0]);
+        WriteRelativePositions(&position, &direction, event, order[0]);
         localRacer = new(__FILE__, 0x4ea) UnknownBikeRaceRacer(1);
         if (!AppendChild(
                 localRacer->UnknownFunction48fc80(
@@ -1326,7 +1326,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
             // The ghost.
             aiRacers = new(__FILE__, 0x674) UnknownBikeRaceRacer*[1];
-            UnknownFunction4210f0(&position, &direction, event, order[0]);
+            WriteRelativePositions(&position, &direction, event, order[0]);
             sprintf(bikeFile, "%s\\%s", "Res", "Ghost.mcf");
             sprintf(riderFile, "%s\\GhostRider.mcf", "Res");
             aiRacers[0] = new(__FILE__, 0x67c) UnknownBikeRaceRacer(1);
@@ -1400,7 +1400,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     float r = rand() * (1.0f / 32768.0f);
                     plate = 101 - (int)(r * -898.0f);
                 }
-                UnknownFunction4210f0(&position, &direction, event, order[n + 1]);
+                WriteRelativePositions(&position, &direction, event, order[n + 1]);
                 setup.engineSize = engineSize;
                 setup.engineKind = engineKind;
                 int bikeClass = UnknownBikeClassOf(setup.engineSize);
@@ -1483,7 +1483,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                         break;
                     }
                 }
-                UnknownFunction4210f0(&position, &direction, event, i + 1);
+                WriteRelativePositions(&position, &direction, event, i + 1);
                 setup = *(UnknownBikeRaceBikeSetup*)g_TrackGame->mode.field_0xfd8;
                 setup.engineSize = slots[j].field_0xec;
                 setup.engineKind = slots[j].field_0xf0;

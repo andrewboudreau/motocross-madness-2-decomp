@@ -765,14 +765,14 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h and
 // Wrecker.h declare it too).
-float UnknownFunction460b50(float value);
+float FastSqrt(float value);
 
 static inline float Magnitude(const Vector3& v)
 {
     float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
     if (squared == 1.0f)
         return 1.0f;
-    return UnknownFunction460b50(squared);
+    return FastSqrt(squared);
 }
 
 // 0x00443de0: picks the level of detail from the projected size of the

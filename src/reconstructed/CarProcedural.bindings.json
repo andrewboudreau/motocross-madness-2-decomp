@@ -40,7 +40,7 @@
   "?UnknownFunction432800@CarProceduralCollision@@QAEXPAVCarProceduralModel@@PBD@Z": "0x00432800",
   "?UnknownFunction435fe0@CarProceduralCollision@@QAEXXZ": "0x00435fe0",
   "?AddIgnoredOwner@CarProceduralCollision@@QAEXPAV1@@Z": "0x00439410",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?UnknownFunction460f50@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461600@UnknownTextureStream@@QAEHXZ": "0x00461600",

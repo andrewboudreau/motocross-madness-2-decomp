@@ -861,7 +861,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                         break;
                     }
                     if (chatOverlay != 0) {
-                        chatOverlay->UnknownFunction51dd10();
+                        chatOverlay->ShowInputLine();
                         chatOverlay->typing = 1;
                     }
                     field_0x194 = 10.0f;
@@ -873,7 +873,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     g_TrackGame->mode.field_0x6b4 = 0;
                 }
                 if (g_TrackGame->mode.field_0x6b4 == 1 && chatOverlay != 0) {
-                    chatOverlay->UnknownFunction51dd10();
+                    chatOverlay->ShowInputLine();
                     chatOverlay->typing = 1;
                     field_0x190 = true;
                 }
@@ -1175,7 +1175,7 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
         if (g_TrackGame->network->GetPlayerName(from, name)) {
             if (g_TrackGame->mode.field_0x6b4 != 2) {
                 if (chatOverlay != 0) {
-                    chatOverlay->UnknownFunction51dd10();
+                    chatOverlay->ShowInputLine();
                 }
                 field_0x194 = 10.0f;
                 field_0x190 = true;
@@ -1311,7 +1311,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         if (replayVcr != 0) {
             if (mode == 0) {
                 g_TrackGame->field_0x3428 = 1;
-                if (!replayVcr->UnknownFunction49bf10(RecorderCallback, 1, "VCRtape.dat",
+                if (!replayVcr->OpenRecording(RecorderCallback, 1, "VCRtape.dat",
                                                         field_0x1a8)) {
                     delete replayVcr;
                     replayVcr = 0;
@@ -1321,7 +1321,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
                     new (__FILE__, 0x1073) VCRDlg(1, "VCR.dtm"), 0, 1, 0, 0, 0, 0, 1);
             } else {
                 g_TrackGame->field_0x3428 = 0;
-                if (!replayVcr->UnknownFunction49bf10(RecorderCallback, 0, "VCRtape.dat",
+                if (!replayVcr->OpenRecording(RecorderCallback, 0, "VCRtape.dat",
                                                         field_0x1a8)) {
                     delete replayVcr;
                     replayVcr = 0;
@@ -1343,7 +1343,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
          racer = UnknownFunction4204e0(&iterator)) {
         racer->UnknownRacerVirtualSlot43();
         racer->restarted = true;
-        UnknownFunction4210f0(&position, &direction, g_TrackGame->field_0x560,
+        WriteRelativePositions(&position, &direction, g_TrackGame->field_0x560,
                               positions[iterator - 1]);
         racer->startPosition = position;
         racer->startDirection = direction;
@@ -1372,7 +1372,7 @@ void BikeRace::UnknownFunction420b00(char* path, char* description) {
         char text[0x80];
         g_TrackGame->LoadResourceString(0x1437, text, sizeof(text));
         if (isRecording) {
-            replayVcr->UnknownFunction49c010(replayLength, description ? description : text,
+            replayVcr->SaveRecording(replayLength, description ? description : text,
                                                path != 0);
         }
         if (path != 0) {
@@ -1406,7 +1406,7 @@ void BikeRace::RestartReplay() {
         GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
         GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
         sprintf(description, "%s %s", date, time);
-        replayVcr->UnknownFunction49c010(localRacer->field_0x74c, description, 0);
+        replayVcr->SaveRecording(localRacer->field_0x74c, description, 0);
         replayVcr->UnknownFunction4691f0();
         replayVcr->Release();
         if (replayLength <= field_0x1c8) {
@@ -1423,7 +1423,7 @@ void BikeRace::RestartReplay() {
     if (replayVcr == 0) {
         return;
     }
-    if (!replayVcr->UnknownFunction49bf10(RecorderCallback, 0, ghostFileRecorded, field_0x1a8)) {
+    if (!replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, field_0x1a8)) {
         return;
     }
     char model[0x104];
@@ -1449,10 +1449,10 @@ void BikeRace::RestartReplay() {
     if (ghostVcr == 0) {
         return;
     }
-    if (!ghostVcr->UnknownFunction49bf10(RecorderCallback, 1, ghostFilePlayed, field_0x1a8)) {
+    if (!ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, field_0x1a8)) {
         return;
     }
-    localRacer->field_0x750 = field_0x1c8 = ghostVcr->UnknownFunction49c000();
+    localRacer->field_0x750 = field_0x1c8 = ghostVcr->RecordedLength();
     aiRacers[0]->UnknownFunction496e20(ghostVcr);
     aiRacers[0]->UnknownVirtualSlot5();
     aiRacers[0]->field_0x11b8 = 0;
@@ -1910,23 +1910,23 @@ void BikeRace::DrawTrack(Track* track) {
                 SetDrawColor(0, 0xff, 0);
                 a = *(Vector3*)&segment->field_0x0c;
                 b = *(Vector3*)&segment->next->field_0x0c;
-                field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
-                field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
+                field_0x04c->QueryGround(&a, 0, 0, 0);
+                field_0x04c->QueryGround(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);
                 a = *(Vector3*)&segment->field_0x18;
                 b = *(Vector3*)&segment->next->field_0x18;
-                field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
-                field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
+                field_0x04c->QueryGround(&a, 0, 0, 0);
+                field_0x04c->QueryGround(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);
                 SetDrawColor(0, 0, 0xff);
                 a = *(Vector3*)&segment->field_0x00;
                 b = *(Vector3*)&segment->next->field_0x00;
-                field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
-                field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
+                field_0x04c->QueryGround(&a, 0, 0, 0);
+                field_0x04c->QueryGround(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);

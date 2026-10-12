@@ -227,9 +227,9 @@ public:
     // half extent ArcadeObject doubles), 0x004fbd70 (ret 0x10) takes four
     // pass-through arguments, 0x004fceb0 (ret 0x10) an axis and an angle,
     // 0x00444d80 (ret 4) attaches a modifier.
-    void UnknownFunction4fc660(const Vector3* position);
+    void SetPosition(const Vector3* position);
     void UnknownFunction4fe850(Vector3* a, Vector3* b);
-    void UnknownFunction4fbd70(const Vector3* a, const Vector3* b, int c, int d); // two axes by pointer
+    void SetAxesPtr(const Vector3* a, const Vector3* b, int c, int d); // two axes by pointer
     void UnknownFunction4fceb0(Vector3 axis, float angle);
     void UnknownFunction444d80(GameObject* modifier);
     // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both

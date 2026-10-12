@@ -140,7 +140,7 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     float t = -(scale * d);
     float px = t * nx;
     float py = t * ny;
-    float root = UnknownFunction460b50(scale);
+    float root = FastSqrt(scale);
     float dx = root * ny;
     float dy = -(root * nx);
     float lengthSquared = dy * dy + dx * dx;
@@ -160,7 +160,7 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
         point[1] = k * dy + py;
         return 1;
     }
-    float q = UnknownFunction460b50(disc);
+    float q = FastSqrt(disc);
     float inverse = 1.0f / lengthSquared;
     float k1 = (proj - q) * inverse;
     float k2 = (proj + q) * inverse;

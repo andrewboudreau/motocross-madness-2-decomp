@@ -1215,7 +1215,7 @@ int RadarOverlay::WorldToMap(Vector3 point, int* x, int* y, float* rimX, float* 
     *x = (int)((dz * mapAngleSin + dx * mapAngleCos) * mapScale);
     *y = -(int)((dz * mapAngleCos - dx * mapAngleSin) * mapScale);
     float angle = (float)atan2((float)*y, (float)*x);
-    float distance = UnknownFunction460b50((float)(*x * *x + *y * *y));
+    float distance = FastSqrt((float)(*x * *x + *y * *y));
     int outside = 0;
     if (distance >= mapRadius) {
         *rimX = cos(angle) * mapRadius + mapCenterX;
@@ -1235,7 +1235,7 @@ int RadarOverlay::LineThrough(const float* a, const float* b, float* nx, float* 
     float lengthSquared = dx * dx + dy * dy;
     if (lengthSquared < 1e-14f)
         return -1;
-    float scale = 1.0f / UnknownFunction460b50(lengthSquared);
+    float scale = 1.0f / FastSqrt(lengthSquared);
     *nx = -(dy * scale);
     *ny = dx * scale;
     *d = (a[0] * b[1] - b[0] * a[1]) * scale;
@@ -1412,7 +1412,7 @@ int ChatOverlay::UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputE
 }
 
 // 0x0051dd10
-void ChatOverlay::UnknownFunction51dd10()
+void ChatOverlay::ShowInputLine()
 {
     inputShown = 1;
     if (leftPanel) {

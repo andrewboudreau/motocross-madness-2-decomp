@@ -79,7 +79,7 @@ static inline float Length(Vector3 v) {
     float squared = v.z * v.z + (v.y * v.y + v.x * v.x);
     if (squared == 1.0f)
         return 1.0f;
-    return UnknownFunction460b50(squared);
+    return FastSqrt(squared);
 }
 
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
@@ -132,7 +132,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             field_0x188 = position - field_0x38->eyePosition;
             Vector3 forward = field_0x188;
             forward.y = 0.0f;
-            baseFrame->UnknownFunction4fbd70(&forward, &kVec3YAxis, 1, 1);
+            baseFrame->SetAxesPtr(&forward, &kVec3YAxis, 1, 1);
         } else {
             Vector3 axis = t * keyAxisChange + keyAxis;
             baseFrame->UnknownFunction4fd090(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);
@@ -218,7 +218,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             cueView->field_0x48->UnknownFunction518080(cueView->ownRacer->field_0x744->field_0x44, &target);
         else
             target = cueView->ownRacer->trackPoint;
-        field_0xac->UnknownFunction507c10(&target, 0, 0, 0);
+        field_0xac->QueryGround(&target, 0, 0, 0);
         Vector3 direction = target - arcadeView->field_0x170;
         UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;

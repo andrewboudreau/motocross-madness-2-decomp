@@ -477,7 +477,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         targetPoint = UnknownVirtualSlot57(0);
         position = field_0x29c * -field_0x220;
         position += targetPoint;
-        field_0x240->UnknownFunction507c10(&position, 0, 0, 0);
+        field_0x240->QueryGround(&position, 0, 0, 0);
         Vector3 direction = position - targetPoint;
         D3DRMVectorRotate(&position, &direction, &kVec3XAxis, field_0x22c);
         D3DRMVectorRotate(&direction, &position, &kVec3YAxis, field_0x234);
@@ -486,7 +486,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         SetFrame(&position, 0, 0, 0, 0);
         target = field_0x29c * field_0x228;
         target += targetPoint;
-        field_0x240->UnknownFunction507c10(&target, 0, 0, 0);
+        field_0x240->QueryGround(&target, 0, 0, 0);
         UnknownVirtualSlot29(target);
         field_0x278 = FollowCameraAbs(field_0x234) > 2.0f;
     }
@@ -507,7 +507,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         float dx = eyePosition.x - targetPoint.x;
         float dy = eyePosition.y - targetPoint.y;
         float dz = eyePosition.z - targetPoint.z;
-        field_0x2c0 = UnknownFunction460b50(dz * dz + dx * dx + dy);
+        field_0x2c0 = FastSqrt(dz * dz + dx * dx + dy);
     }
     bool moved = UnknownVirtualSlot45(current, dt);
     UnknownVirtualSlot42(wide);
@@ -540,7 +540,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         if (dx < 0.0f) dx = -dx;
         float dz = eyePosition.z - target.z;
         if (dz < 0.0f) dz = -dz;
-        field_0x258 = ((200.0f - UnknownFunction460b50(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
+        field_0x258 = ((200.0f - FastSqrt(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
         if (field_0x258 < 10.0f) field_0x258 = 10.0f;
         if (field_0x258 > 70.0f) field_0x258 = 70.0f;
         field_0x294->Set(field_0x258, FLT_MAX);

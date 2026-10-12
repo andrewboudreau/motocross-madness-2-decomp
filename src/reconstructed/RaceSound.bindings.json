@@ -68,7 +68,7 @@
   "?UnknownFunction401dd0@SoundGroup@@QAEXJ@Z": "0x00401dd0",
   "?UnknownFunction4204e0@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?UnknownFunction460f50@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461640@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",

@@ -24,7 +24,7 @@
   "?AddIgnoredOwner@UnknownWreckerCollisionObject@@QAEXPAV1@@Z": "0x00439410",
   "?SetBody@UnknownWreckerCollisionModel@@QAEXPAVUnknownWreckerRigidBody@@HPBD@Z": "0x0043b9e0",
   "?AddProbePoint@UnknownWreckerCollisionModel@@QAEXUVector3@@H@Z": "0x0043c7f0",
-  "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?UnknownFunction4a8ac0@UnknownWreckerCharacter@@QAEXPAUVector3@@H@Z": "0x004a8ac0",
   "?SetMotionByName@UnknownWreckerCharacter@@QAEXPBD@Z": "0x004a8b10",
   "?SetMotion@UnknownWreckerCharacter@@QAEXH@Z": "0x004a8b40",

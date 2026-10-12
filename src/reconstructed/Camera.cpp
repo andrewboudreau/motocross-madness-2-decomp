@@ -114,7 +114,7 @@ int Camera::UnknownFunction42e550() {
     return 1;
 }
 
-float UnknownFunction460b50(float value); // 0x00460b50 (FastSqrt)
+float FastSqrt(float value); // 0x00460b50 (FastSqrt)
 
 // Retail adds the z term last and multiplies b's components into a's; both
 // orders are visible in 0x0042e690.
@@ -130,7 +130,7 @@ static inline float Dot(const Vector3& a, const Vector3& b) {
 // rebuilds the projection through slot 28.
 int Camera::UnknownVirtualSlot10(float frameTime) {
     Vector3 delta(eyePosition.x - field_0x208.x, eyePosition.y - field_0x208.y, eyePosition.z - field_0x208.z);
-    lastMoveDistance = UnknownFunction460b50(Dot(delta, delta));
+    lastMoveDistance = FastSqrt(Dot(delta, delta));
     field_0x208 = eyePosition;
     lastTurnAngle = (float)acos(Dot(viewDirection, field_0x214));
     if (lastTurnAngle < 0.0f)

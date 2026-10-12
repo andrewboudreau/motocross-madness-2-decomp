@@ -47,7 +47,7 @@ static inline float Length(const Vector3& v) {
     float squared = (v.x * v.x) + v.y * v.y + v.z * v.z;
     if (squared == 1.0f)
         return 1.0f;
-    return UnknownFunction460b50(squared);
+    return FastSqrt(squared);
 }
 
 // `value` scaled down while climbing or diving faster than 5.
@@ -117,7 +117,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
             float reach = (float)(FollowCameraAbs(field_0x22c) * 0.63661975f) * 1.2f + 0.3f;
             Vector3 ahead = Add(direction * reach, targetPoint);
             Vector3 ground = ahead;
-            field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
+            field_0x240->QueryGround(&ground, 0, 0, 0);
             if (ground.y > ahead.y)
                 lift = (ground.y - ahead.y) * 0.6f;
             else

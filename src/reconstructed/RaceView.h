@@ -204,7 +204,7 @@ struct UnknownKrustyBikeView : public GameObject {
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
     UnknownEventRacer* UnknownFunction4204e0(int* iterator);
     // 0x004210f0: writes two positions relative to `reference`.
-    void UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int flags);
+    void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
 
     unsigned char field_0x02c[0x38 - 0x2c];
     UnknownEventRacer* field_0x38;                // its own racer
