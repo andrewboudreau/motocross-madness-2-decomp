@@ -400,6 +400,100 @@ StatsOverlay::~StatsOverlay()
         backingTexture->Release();
 }
 
+// 0x005194b0: loads the panel texture for the event type, attaches the
+// overlay with the "arialsm" font and creates the large and small GDI fonts.
+// Two source forms give retail's frame: the face-name copy sits in each
+// branch (the second lfFaceName address use ranks the LOGFONT below the two
+// rectangles, docs/VC6_FRAME_LAYOUT.md fact 2), and lfItalic and lfHeight are
+// written last, as retail stores them. The source rectangle is written
+// top/bottom first.
+StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
+                                                  UnknownOverlayRect screen)
+{
+    const char* font;
+    UnknownLogFont logFont;
+    UnknownOverlayRect rect;
+    UnknownOverlayRect source;
+    char name[260];
+    char path[260];
+    instrumentSource = (UnknownInstrumentSource*)camera;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = 128;
+    rect.bottom = 128;
+    switch (g_TrackGame->mode.raceSettings.eventType) {
+    case 0:
+        strcpy(name, "BajaScore.tga");
+        break;
+    case 1:
+        strcpy(name, "BajaScore.tga");
+        break;
+    case 2:
+        strcpy(name, "BajaScore.tga");
+        break;
+    case 3:
+        strcpy(name, "BajaScore.tga");
+        break;
+    case 4:
+        strcpy(name, "BajaScore.tga");
+        break;
+    case 5:
+        strcpy(name, "BajaScore.tga");
+        break;
+    default:
+        Release();
+        return 0;
+    }
+    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    if (!backingTexture) {
+        Release();
+        return 0;
+    }
+    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    if (overlayTexture->mapFormat == 4444)
+        overlayTexture->SetAddressModes(5, 6);
+    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
+    source.top = 0;
+    source.bottom = 128;
+    source.left = 0;
+    source.right = 128;
+    font = "arialsm";
+    sprintf(path, "%s\\%s", "Res", "Fonts.res");
+    Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
+    logFont.lfWidth = 0;
+    logFont.lfEscapement = 0;
+    logFont.lfOrientation = 0;
+    logFont.lfUnderline = 0;
+    logFont.lfStrikeOut = 0;
+    logFont.lfCharSet = 1;
+    logFont.lfOutPrecision = 0;
+    logFont.lfClipPrecision = 0;
+    logFont.lfQuality = 2;
+    logFont.lfPitchAndFamily = 2;
+    logFont.lfItalic = 0;
+    logFont.lfHeight = 16;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
+    const char* face = gui ? gui->toolTipFontFace : "";
+    if (*face != '\0') {
+        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
+        strcpy(logFont.lfFaceName, face);
+    } else {
+        logFont.lfWeight = 400;
+        strcpy(logFont.lfFaceName, "Small Fonts");
+    }
+    largeFont = CreateFontIndirectA(&logFont);
+    logFont.lfHeight = 12;
+    smallFont = CreateFontIndirectA(&logFont);
+    rowRects[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
+    rowRects[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
+    rowRects[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
+    rowRects[3] = UnknownTrackOverlayRect(14, 128, 69, 79);
+    rowRects[4] = UnknownTrackOverlayRect(14, 128, 87, 97);
+    rowRects[5] = UnknownTrackOverlayRect(14, 100, 105, 115);
+    rowRects[6] = UnknownTrackOverlayRect(5, 86, 34, 49);
+    return this;
+}
+
 // 0x00519880
 int StatsOverlay::UnknownFunction519880(int value)
 {

@@ -26473,6 +26473,15 @@ CASES = [
         'target_size': 555,
         'reason': 'tool-tip layout: a named width limit gives `sub eax, 2`, and the padded width/height are written back into the SIZE slots as retail does',
     },
+    {
+        'name': 'TrackOverlay.cpp StatsOverlay load panel 0x5194b0',
+        'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
+        'source': 'src/reconstructed/TrackOverlay.cpp',
+        'symbol': '?LoadPanel@StatsOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@@Z',
+        'target_va': '0x005194b0',
+        'target_size': 976,
+        'reason': 'StatsOverlay loader: the per-branch face-name copy ranks the LOGFONT below the rectangles (retail frame), lfItalic/lfHeight stored last, source rectangle top/bottom first',
+    },
 ]
 
 def main():

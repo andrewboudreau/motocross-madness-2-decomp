@@ -28,14 +28,6 @@
 // ebp for `this` and the view. A goto out of the loop, a flag, drawing
 // inside the loop and separate loop variables spill the index instead.
 
-// StatsOverlay::LoadPanel (0x005194b0, 976 bytes): the
-// candidate is 956 bytes with the same instruction sequence. Six identical
-// cases give retail's jump table. Retail places the LOGFONT (0x3c bytes)
-// below the two rectangles in the frame; VC6 here puts the rectangles first
-// (with a LOGFONT of 0x38 bytes or less it orders them as retail), so the
-// rectangle stores use different displacements. Declaration order, names,
-// aggregate initializers and UnknownMakeOverlayRect do not move them.
-
 // ChatOverlay::DrawNameTag (0x0051e3f0, 974 bytes, 966 match):
 // the frame and code match except in the racer-tag branch. A racer local in
 // the position branch gives retail's eax there; in the "%.3f" branch retail
@@ -302,94 +294,6 @@ fail:
     TintRows(0, 0x80, 0xffff);
     overlayTexture->UnknownVirtualSlot9(0, -1);
     return 1;
-}
-
-// 0x005194b0
-StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
-                                                  UnknownOverlayRect screen)
-{
-    const char* font;
-    UnknownLogFont logFont;
-    UnknownOverlayRect rect;
-    UnknownOverlayRect source;
-    char name[260];
-    char path[260];
-    instrumentSource = (UnknownInstrumentSource*)camera;
-    rect.left = 0;
-    rect.top = 0;
-    rect.right = 128;
-    rect.bottom = 128;
-    switch (g_TrackGame->mode.raceSettings.eventType) {
-    case 0:
-        strcpy(name, "BajaScore.tga");
-        break;
-    case 1:
-        strcpy(name, "BajaScore.tga");
-        break;
-    case 2:
-        strcpy(name, "BajaScore.tga");
-        break;
-    case 3:
-        strcpy(name, "BajaScore.tga");
-        break;
-    case 4:
-        strcpy(name, "BajaScore.tga");
-        break;
-    case 5:
-        strcpy(name, "BajaScore.tga");
-        break;
-    default:
-        Release();
-        return 0;
-    }
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
-    if (!backingTexture) {
-        Release();
-        return 0;
-    }
-    overlayTexture = backingTexture->UnknownVirtualSlot6();
-    if (overlayTexture->mapFormat == 4444)
-        overlayTexture->SetAddressModes(5, 6);
-    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
-    source.left = 0;
-    source.right = 128;
-    source.top = 0;
-    source.bottom = 128;
-    font = "arialsm";
-    sprintf(path, "%s\\%s", "Res", "Fonts.res");
-    Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
-    logFont.lfHeight = 16;
-    logFont.lfWidth = 0;
-    logFont.lfEscapement = 0;
-    logFont.lfOrientation = 0;
-    logFont.lfItalic = 0;
-    logFont.lfUnderline = 0;
-    logFont.lfStrikeOut = 0;
-    logFont.lfCharSet = 1;
-    logFont.lfOutPrecision = 0;
-    logFont.lfClipPrecision = 0;
-    logFont.lfQuality = 2;
-    logFont.lfPitchAndFamily = 2;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->toolTipFontFace : "";
-    if (*face != '\0') {
-        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
-    } else {
-        logFont.lfWeight = 400;
-        face = "Small Fonts";
-    }
-    strcpy(logFont.lfFaceName, face);
-    largeFont = CreateFontIndirectA(&logFont);
-    logFont.lfHeight = 12;
-    smallFont = CreateFontIndirectA(&logFont);
-    rowRects[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
-    rowRects[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
-    rowRects[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
-    rowRects[3] = UnknownTrackOverlayRect(14, 128, 69, 79);
-    rowRects[4] = UnknownTrackOverlayRect(14, 128, 87, 97);
-    rowRects[5] = UnknownTrackOverlayRect(14, 100, 105, 115);
-    rowRects[6] = UnknownTrackOverlayRect(5, 86, 34, 49);
-    return this;
 }
 
 // 0x0051e3f0: draws name tag `index` into `dc`: the name line for the

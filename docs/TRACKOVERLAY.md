@@ -45,15 +45,21 @@ at lines 2284 and 2294).
 
 ## Status
 
-91 functions are exact under `vc6_o2_mt`, with every relocation bound:
+92 functions are exact under `vc6_o2_mt`, with every relocation bound:
 
 - InstrumentOverlay: `0x00518720`..`0x00518cc0`, 7 functions.
 - The overlay rectangle constructors `0x00518d50` and `0x00518d60`.
 - NameOverlay: `0x00518d80`..`0x005190e0`, 8 functions, among them the
   visibility test `0x00519000`.
 - StatsOverlay: `0x00519370`..`0x00519980`, 7 functions, the score
-  comparator `0x005199f0`, the view-mode redraw `0x005198a0` and the panels
-  `0x00519e10`, `0x00519ef0`, `0x0051a480`, `0x0051a560` and `0x0051aa40`.
+  comparator `0x005199f0`, the view-mode redraw `0x005198a0`, the panels
+  `0x00519e10`, `0x00519ef0`, `0x0051a480`, `0x0051a560` and `0x0051aa40`,
+  and the loader `0x005194b0`. The loader's LOGFONT sits below the two
+  rectangles (retail's frame) once the face-name copy is written in each
+  branch: the second `lfFaceName` address use raises its uses per byte
+  above the rectangles' (docs/VC6_FRAME_LAYOUT.md fact 2). Retail stores
+  lfItalic and lfHeight after the other fields and the source rectangle's
+  top/bottom before left/right; the source writes them in that order.
 - DropTextOverlay: `0x0051ae80`..`0x0051b1f0`, 5 functions.
 - UnknownMessage and TextQueueOverlay: `0x0051b200`..`0x0051b670`, 11
   functions.
@@ -94,10 +100,6 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 - `0x00519a20` (standings, 1002 bytes; candidate 1004): retail keeps the row
   comparison index in edx and `this` in its spill slot. VC6 here does that
   only when the index is read after the loop, which adds a redundant compare.
-- `0x005194b0` (StatsOverlay loader, 976 bytes; candidate 956): retail
-  places the 0x3c-byte LOGFONT below the two rectangles in the frame; VC6
-  here orders them the other way (it matches the retail order for a LOGFONT
-  of 0x38 bytes or less).
 - `0x0051d730` (racer name tags, 586 bytes; candidate 587): the zero and the
   incremented count swap ebx and ebp.
 - `0x0051c4f0` (line/circle intersection, 560 bytes; candidate 550): frame
