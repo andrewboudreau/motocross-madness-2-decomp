@@ -87,7 +87,7 @@ bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, con
 // 0x00463520
 bool FollowCamera::UnknownFunction463520(const Vector3& position, float a, float b, float c,
                                          float d, float e) {
-    if (pointCount < field_0x2dc) {
+    if (pointCount < pointCapacity) {
         points[pointCount].position = position;
         points[pointCount].field_0x0c = a;
         points[pointCount].field_0x10 = b;
@@ -113,10 +113,10 @@ FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, fl
     field_0x228 = value228;
     field_0x2d0 = value2d0;
     field_0x2d4 = value2d0;
-    field_0x2dc = capacity;
+    pointCapacity = capacity;
     if (capacity > 0) {
         points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
-        for (int i = 0; i < field_0x2dc; i++) {
+        for (int i = 0; i < pointCapacity; i++) {
             points[i].position = kVec3Zero;
             points[i].field_0x0c = 0.0f;
             points[i].field_0x10 = 0.0f;
@@ -126,7 +126,7 @@ FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, fl
             points[i].field_0x20 = kVec3Zero;
         }
     }
-    field_0x2e8 = value2e8;
+    yawOffset = value2e8;
     stateCount = count;
     int kept = 0;
     for (int j = 0; j < count; j++) {
@@ -293,13 +293,13 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
                 field_0x22c = 0.0f;
                 field_0x234 = 0.0f;
                 if (field_0x23c < -1.5707964f)
-                    field_0x23c = field_0x2e8 - 3.1415927f;
+                    field_0x23c = yawOffset - 3.1415927f;
                 else
-                    field_0x23c = -field_0x2e8;
+                    field_0x23c = -yawOffset;
             } else if (field_0x23c > 1.5707964f) {
-                field_0x23c = 3.1415927f - field_0x2e8;
+                field_0x23c = 3.1415927f - yawOffset;
             } else {
-                field_0x23c = field_0x2e8;
+                field_0x23c = yawOffset;
             }
             field_0x23c += UnknownVirtualSlot39();
             if (field_0x23c >= 6.2831855f)
@@ -562,22 +562,22 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
     y = FollowCameraNormalize(y);
     z = FollowCameraNormalize(z);
     Vector3 x = UnknownFunction515600(y, z);
-    field_0x344.m[0][0] = x.x;
-    field_0x344.m[0][1] = x.y;
-    field_0x344.m[0][2] = x.z;
-    field_0x344.m[0][3] = 0.0f;
-    field_0x344.m[1][0] = y.x;
-    field_0x344.m[1][1] = y.y;
-    field_0x344.m[1][2] = y.z;
-    field_0x344.m[1][3] = 0.0f;
-    field_0x344.m[2][0] = z.x;
-    field_0x344.m[2][1] = z.y;
-    field_0x344.m[2][2] = z.z;
-    field_0x344.m[2][3] = 0.0f;
-    field_0x344.m[3][0] = 0.0f;
-    field_0x344.m[3][1] = 0.0f;
-    field_0x344.m[3][2] = 0.0f;
-    field_0x344.m[3][3] = 1.0f;
+    orientation.m[0][0] = x.x;
+    orientation.m[0][1] = x.y;
+    orientation.m[0][2] = x.z;
+    orientation.m[0][3] = 0.0f;
+    orientation.m[1][0] = y.x;
+    orientation.m[1][1] = y.y;
+    orientation.m[1][2] = y.z;
+    orientation.m[1][3] = 0.0f;
+    orientation.m[2][0] = z.x;
+    orientation.m[2][1] = z.y;
+    orientation.m[2][2] = z.z;
+    orientation.m[2][3] = 0.0f;
+    orientation.m[3][0] = 0.0f;
+    orientation.m[3][1] = 0.0f;
+    orientation.m[3][2] = 0.0f;
+    orientation.m[3][3] = 1.0f;
 }
 
 // 0x00465720: while this is the owner's active camera, advances the clock,
@@ -585,7 +585,7 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
 // the view; the position (row 3, moved by `offset`) is kept 3.5 above the
 // subject's ground. Otherwise slot 54 runs. Always returns true. The products
 // are written b * a and the rows read through m[][]: with a * b VC6 loads
-// field_0x344's element first in the (0, 0) sum (retail hoists a(0, 3) above
+// orientation's element first in the (0, 0) sum (retail hoists a(0, 3) above
 // the second copy), and operator() or other copy orders lose the interleaved
 // row copies.
 bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
@@ -599,7 +599,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         while (index >= count)
             index -= count;
         Matrix4 a = frames[index];
-        Matrix4 b = field_0x344;
+        Matrix4 b = orientation;
         viewMatrix(0, 0) = b.m[0][0] * a.m[0][0] + b.m[1][0] * a.m[0][1] +
                            b.m[2][0] * a.m[0][2] + b.m[3][0] * a.m[0][3];
         viewMatrix(0, 1) = b.m[0][1] * a.m[0][0] + b.m[1][1] * a.m[0][1] +

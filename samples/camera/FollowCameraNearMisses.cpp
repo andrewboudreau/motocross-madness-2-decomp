@@ -185,7 +185,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x29c = kVec3ZAxis;
     points = 0;
     field_0x276 = 0;
-    field_0x2d8 = 0;
+    lift = 0;
     field_0x228 = 27.0f;
     field_0x258 = field_0x16c;
     field_0x2f0 = field_0x16c;
@@ -202,7 +202,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     overrideActive = 0;
     field_0x26c = 0;
     field_0x274 = 0;
-    field_0x2dc = 0;
+    pointCapacity = 0;
     pointCount = 0;
     field_0x2d4 = 7.0f;
     field_0x2ec = 3.0f;
@@ -220,7 +220,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x278 = 0;
     stateCount = 0;
     stateIndex = 0;
-    field_0x304 = 0;
+    blendClock = 0;
     field_0x308 = 0;
     field_0x279 = 0;
     field_0x270 = 15.0f;
@@ -561,9 +561,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     smoothed.z = field_0x290->Update(position.z, dt);
     if (field_0x279) {
         UnknownVirtualSlot33();
-        field_0x304 += dt;
-        field_0x304 = FollowCameraMin(field_0x304, 1.0f);
-        float blend = field_0x304;
+        blendClock += dt;
+        blendClock = FollowCameraMin(blendClock, 1.0f);
+        float blend = blendClock;
         field_0x274 = 0;
         smoothed.x = (position.x - smoothed.x) * blend + smoothed.x;
         smoothed.y = (position.y - smoothed.y) * blend + smoothed.y;
@@ -571,7 +571,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         if (!moved && blend >= 1.0f) {
             UnknownVirtualSlot44(position);
             UnknownVirtualSlot43(cachedTarget);
-            field_0x304 = 0.0f;
+            blendClock = 0.0f;
             field_0x279 = moved;
         }
     }

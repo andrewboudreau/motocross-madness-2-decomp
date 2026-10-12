@@ -119,13 +119,13 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
             Vector3 ground = ahead;
             field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
             if (ground.y > ahead.y)
-                field_0x2d8 = (ground.y - ahead.y) * 0.6f;
+                lift = (ground.y - ahead.y) * 0.6f;
             else
-                field_0x2d8 *= 0.01f;
+                lift *= 0.01f;
         } else {
-            field_0x2d8 *= 0.01f;
+            lift *= 0.01f;
         }
-        result.y += field_0x2d8;
+        result.y += lift;
     }
     result.y += 3.0f;
     return result;

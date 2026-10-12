@@ -113,7 +113,7 @@ retail addresses when each label is placed at its function offset.
 
 ## Field behavior
 
-| Offset | Observed role |
+| Offset (name) | Observed role |
 |---|---|
 | Camera +0x170 (x, z) | Compared with the +0x2b4 triple in slot 68 |
 | +0x220, +0x22c, +0x234 | Preset parameters |
@@ -127,6 +127,11 @@ retail addresses when each label is placed at its function offset.
 | +0x2c4, +0x2c8, +0x2cc | Snapshot of the three preset parameters |
 | +0x2f0 | State-specific saved copy of +0x258 |
 | +0x30c, +0x310, +0x314 | Cyclic index, count, inline dword table |
+| +0x2d8 `lift` | Eased by VehicleCamera slot 35 |
+| +0x2dc `pointCapacity` | Capacity of the +0x2e4 point table (0x00463140 `capacity`) |
+| +0x2e8 `yawOffset` | Set by 0x00463140; slot 49 derives +0x23c from it (plus or minus pi) |
+| +0x304 `blendClock` | Advanced by slot 10, clamped to 1 |
+| +0x344 `orientation` | Matrix built by 0x004654e0 from forward and up; slot 47 multiplies by it |
 
 Slot 70 saves the previous state/parameter before entering literal state 5 and
 restores them on disable. Slot 72 increments/wraps the index, selects a table
