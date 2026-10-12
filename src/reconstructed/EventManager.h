@@ -99,7 +99,7 @@ public:
     unsigned char field_0x008[0x10 - 0x8];
     int field_0x10;                                // the motion time
     unsigned char field_0x014[0x1a0 - 0x14];
-    UnknownPodiumSoultree* field_0x1a0;
+    UnknownPodiumSoultree* modelNode;         // +0x1a0
     unsigned char field_0x1a4[0x214 - 0x1a4];
 };
 

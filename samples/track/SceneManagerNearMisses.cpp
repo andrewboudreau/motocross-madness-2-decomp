@@ -615,10 +615,10 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         animationTable->entries[i].field_0x00_bit4 = exclude;
         if (animationTable->entries[i].keyFramed) {
             UnknownFunction4de580(name, "MCF", file);
-            animationTable->entries[i].character->field_0x1a0->SetPosition(&animationTable->entries[i].position);
+            animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
             if (axes)
-                animationTable->entries[i].character->field_0x1a0->SetAxesPtr(&look, &up, 1, 0);
-            animationTable->entries[i].character->field_0x1a0->UnknownFunction4444c0(useLighting);
+                animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
+            animationTable->entries[i].character->modelNode->UnknownFunction4444c0(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].field_0x00_bit1 = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
@@ -686,7 +686,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     parameters.GetString("SoundAttachToObject", "", attach, 0x40);
                     UnknownSceneLodObject* node;
                     if (animationTable->entries[i].keyFramed)
-                        node = animationTable->entries[i].character->field_0x1a0;
+                        node = animationTable->entries[i].character->modelNode;
                     else
                         node = animationTable->entries[i].proceduralObject->field_0x34;
                     SoultreeSoundEmitter* emitter =

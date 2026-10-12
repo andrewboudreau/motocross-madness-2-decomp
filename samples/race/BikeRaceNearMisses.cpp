@@ -727,9 +727,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 AppendChild(flagGirl->UnknownVirtualSlot11(renderContext, modelName, lights, textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
-                flagGirl->field_0x1a0->UnknownFunction4444c0(1);
-                flagGirl->field_0x1a0->SetPositionVec3(girlPosition);
-                flagGirl->field_0x1a0->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
+                flagGirl->modelNode->UnknownFunction4444c0(1);
+                flagGirl->modelNode->SetPositionVec3(girlPosition);
+                flagGirl->modelNode->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 flagGirl->SetMotionByName("Stand");
                 flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
             }

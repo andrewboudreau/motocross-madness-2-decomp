@@ -1196,7 +1196,7 @@ void Scene::SetDetailLevel(int level)
         int i;
         for (i = 0; i < animationTable->entryCount; i++) {
             if (animationTable->entries[i].keyFramed)
-                animationTable->entries[i].character->field_0x1a0->ApplyLodSettings(level);
+                animationTable->entries[i].character->modelNode->ApplyLodSettings(level);
             else
                 ((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)
                     ->field_0x34->ApplyLodSettings(level);
@@ -1204,7 +1204,7 @@ void Scene::SetDetailLevel(int level)
         for (i = 0; i < animationTable->randomSetCount; i++) {
             UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
-                entry->character->field_0x1a0->ApplyLodSettings(level);
+                entry->character->modelNode->ApplyLodSettings(level);
             else
                 ((UnknownSceneAnimatedObject*)entry->proceduralObject)->field_0x34->ApplyLodSettings(level);
         }

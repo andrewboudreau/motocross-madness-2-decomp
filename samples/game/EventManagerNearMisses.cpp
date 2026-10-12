@@ -125,7 +125,7 @@ struct UnknownPodiumViewFields {
 };
 struct UnknownPodiumRacerModel {                    // racer +0x5c4
     unsigned char field_0x000[0x1a0];
-    UnknownPodiumSoultree* field_0x1a0;
+    UnknownPodiumSoultree* modelNode;             // +0x1a0
 };
 struct UnknownPodiumRacer {
     unsigned char field_0x000[0x5c4];
@@ -336,7 +336,7 @@ int EventManager::CreatePodiumScene() {
         view->AppendChild(character, -1);
         if (character) {
             if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
-                character->field_0x1a0->UnknownFunction4444c0(1);
+                character->modelNode->UnknownFunction4444c0(1);
             int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {
                 if (chance < 0.5f && podiumCharacterCount != 1)
@@ -348,14 +348,14 @@ int EventManager::CreatePodiumScene() {
             }
             podiumMotions[place - 1] = character->FindMotion(name, 1);
             Vector3 position = podiumPosition + offsets[place - 1];
-            character->field_0x1a0->SetPosition(&position);
-            character->field_0x1a0->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
+            character->modelNode->SetPosition(&position);
+            character->modelNode->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
             character->SetMotion(podiumMotions[place - 1]);
             character->field_0x10 = 0;
             if (racer) {
-                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->field_0x5c4->field_0x1a0->field_0x290;
+                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->field_0x5c4->modelNode->field_0x290;
                 if (texture)
-                    character->field_0x1a0->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
+                    character->modelNode->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
             }
         }
     }

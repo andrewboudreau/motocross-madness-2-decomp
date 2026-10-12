@@ -163,7 +163,7 @@ public:
     unsigned char field_0x004[0x0c - 0x04];
     int motionFinished;                       // +0x00c the motion finished (slot 10 then loops "FlagLoop")
     unsigned char field_0x010[0x1a0 - 0x10];
-    UnknownBikeRaceMesh* field_0x1a0;
+    UnknownBikeRaceMesh* modelNode;           // +0x1a0
 };
 
 // The object at BikeRace+0x44: three GameObjects at +0x3c..+0x44 that a

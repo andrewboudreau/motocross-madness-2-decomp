@@ -75,7 +75,7 @@ public:
     int AdvanceMotion(float time, int a, int b);   // 0x004a6bb0: advances it
 
     unsigned char field_0x008[0x1a0 - 0x8];
-    UnknownKrustyUISoultree* field_0x1a0;
+    UnknownKrustyUISoultree* modelNode;           // +0x1a0
     unsigned char field_0x1a4[0x214 - 0x1a4];
 };
 
@@ -323,15 +323,15 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
-        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
-        KRUSTYUI_GARAGE->field_0x1a0->SetPosition(&garageFocus);
-        KRUSTYUI_GARAGE->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        KRUSTYUI_GARAGE->modelNode->UnknownFunction4444c0(0);
+        KRUSTYUI_GARAGE->modelNode->SetPosition(&garageFocus);
+        KRUSTYUI_GARAGE->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->SetMotionByName("Spin");
         KRUSTYUI_GARAGE->AdvanceMotion(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
         shadow = projected->Init(renderContext, g_TrackGame->textureManager);
         UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
-        shadowLink = link->Attach(renderContext, KRUSTYUI_GARAGE->field_0x1a0, shadow);
+        shadowLink = link->Attach(renderContext, KRUSTYUI_GARAGE->modelNode, shadow);
         garageScene->AppendChild(shadowLink, -1);
         if (shadow)
             garageScene->AppendChild(shadow, -1);
@@ -339,9 +339,9 @@ void KrustyUI::BuildGarageScene(int value) {
         garageScene->AppendChild(
             KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
                                                    &g_TrackGame->field_0x1c, 1, 1), -1);
-        KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
-        KRUSTYUI_RIDER->field_0x1a0->SetPosition(&KRUSTYUI_RIDER_POSITION);
-        KRUSTYUI_RIDER->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        KRUSTYUI_RIDER->modelNode->UnknownFunction4444c0(1);
+        KRUSTYUI_RIDER->modelNode->SetPosition(&KRUSTYUI_RIDER_POSITION);
+        KRUSTYUI_RIDER->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->SetMotionByName("WaitR");
         KRUSTYUI_RIDER->AdvanceMotion(0.03f, 0, 0);
         ((RenderTarget*)renderContext)->SetCamera(0);
@@ -358,16 +358,16 @@ void KrustyUI::BuildGarageScene(int value) {
                                                                       &g_TrackGame->field_0x1c,
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
-            bike->field_0x1a0->UnknownFunction4444c0(1);
-            bike->field_0x1a0->SetPosition(&garageFocus);
-            bike->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+            bike->modelNode->UnknownFunction4444c0(1);
+            bike->modelNode->SetPosition(&garageFocus);
+            bike->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->SetMotionByName("WaitB");
             bike->AdvanceMotion(0.03f, 0, 0);
-            painter.PaintNumber(bike->field_0x1a0, g_TrackGame->mode.plateNumber);
+            painter.PaintNumber(bike->modelNode, g_TrackGame->mode.plateNumber);
         }
         if (shadow) {
-            shadow->AddCaster(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);
-            shadow->AddCaster(KRUSTYUI_RIDER->field_0x1a0);
+            shadow->AddCaster(KRUSTYUI_MODELS[0].uiModel->modelNode);
+            shadow->AddCaster(KRUSTYUI_RIDER->modelNode);
             s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;

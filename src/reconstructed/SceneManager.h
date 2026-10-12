@@ -47,7 +47,7 @@ public:
     int field_0x0c;                       // cleared by 0x004a8b40
     int field_0x10;                       // the motion time (Character +0x10)
     unsigned char field_0x014[0x1a0 - 0x14];
-    UnknownSceneLodObject* field_0x1a0;
+    UnknownSceneLodObject* modelNode;         // +0x1a0
     char field_0x1a4[0x6c];
     void* collisionObject;                // +0x210 CollisionCharacter's CollisionObject (QuarryStuntEvent.cpp)
     unsigned char field_0x214[0x268 - 0x214];

@@ -792,11 +792,11 @@ int BikeRace::AnyRacerRemote() {
 
 // 0x0041ea60
 void BikeRace::ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int to) {
-    for (int i = 0; i < character->field_0x1a0->groupCount; i++) {
-        for (int j = 0; j < character->field_0x1a0->field_0x28c[i].itemCount; j++) {
-            for (int k = 0; k < character->field_0x1a0->field_0x28c[i].field_0x04[j].idCount; k++) {
-                if (character->field_0x1a0->field_0x28c[i].field_0x04[j].ids[k] == from) {
-                    character->field_0x1a0->field_0x28c[i].field_0x04[j].ids[k] = to;
+    for (int i = 0; i < character->modelNode->groupCount; i++) {
+        for (int j = 0; j < character->modelNode->field_0x28c[i].itemCount; j++) {
+            for (int k = 0; k < character->modelNode->field_0x28c[i].field_0x04[j].idCount; k++) {
+                if (character->modelNode->field_0x28c[i].field_0x04[j].ids[k] == from) {
+                    character->modelNode->field_0x28c[i].field_0x04[j].ids[k] = to;
                 }
             }
         }
