@@ -30,16 +30,6 @@
 //   if-block, goto, an early stream-failure return and the whole body inside
 //   `if (rowCount < rowCapacity || grow)` with one trailing `return 0` were
 //   tried.
-// 0x00477800 qsort compare (78/242): the flow and block layout are retail's
-//   (one `result` initialised to 0, the probe loop as `while (1)` with its
-//   exit tests as breaks; `while (cond)` and `for (;;)` rotate it). Retail
-//   puts the first control temporary in eax and the next global load in edx;
-//   VC6 here swaps the two (no declaration-shift k changes it; early returns,
-//   a local list pointer and local order do not either). An early
-//   `return 0` for a missing list with `if (result) return result;` gives
-//   retail's later edx/eax pair but duplicates the epilogues (4/234); the
-//   same returns inside the list test, a result declared without an
-//   initialiser and an assignment in the condition move the layout too.
 // 0x00477e90 UIListBox slot 55 (322/342): an `int height` local for the
 //   first GetRowHeight call gives retail's ebx (point) and ebp (row offset);
 //   without it (155/344) the two are swapped. With the local, retail still
@@ -221,35 +211,6 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     if (autoSort)
         Sort(1);
     return 1;
-}
-
-// 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
-static int UnknownFunction477800(const void* a, const void* b) {
-    int result = 0;
-    if (g_UnknownGlobal65b608->sortingList) {
-        result = g_UnknownGlobal65b608->sortingList->field_0x218_control->field_0x24c(a, b);
-        if (!result) {
-            int left = ((const UnknownGameUiListRow*)a)->sortIndex;
-            int right = ((const UnknownGameUiListRow*)b)->sortIndex;
-            GameObjectIterator* iterator =
-                (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
-            while (1) {
-                UIListBox* other = static_cast<UIListBox*>(
-                    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator));
-                if (!other)
-                    break;
-                if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
-                    result = -1;
-                    break;
-                }
-                result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
-                if (result)
-                    break;
-            }
-            g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
-        }
-    }
-    return result;
 }
 
 // 0x00477e90

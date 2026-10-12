@@ -26300,6 +26300,16 @@ CASES = [
         'target_size': 1267,
         'reason': 'matrix product written b * a (a(0, 3) loads first in the (0, 0) sum); rows copied x, y, z through m[][] in forward, up, position order (interleaved copies)',
     },
+    # s9/ui
+    {
+        'name': 'gameui.cpp list-row qsort compare',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '?UnknownFunction477800@@YAHPBX0@Z',
+        'target_va': '0x00477800',
+        'target_size': 243,
+        'reason': 'qsort comparison passed by 0x00477900; first comparator call through a control local (eax/edx as retail)',
+    },
 ]
 
 def main():

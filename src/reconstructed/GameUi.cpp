@@ -59,8 +59,7 @@ int g_UnknownGlobal65b60c;
 
 // cdecl 0x00477b60: the list rows' default order (by text).
 int UnknownFunction477b60(const void* a, const void* b);
-// cdecl 0x00477800: the qsort comparison 0x00477900 sorts with
-// (samples/ui/GameUiNearMisses.cpp).
+// cdecl 0x00477800: the qsort comparison 0x00477900 sorts with.
 int UnknownFunction477800(const void* a, const void* b);
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`
 // (samples/ui/GameUiNearMisses.cpp).
@@ -3070,6 +3069,38 @@ void UIListBox::RemoveAllRows() {
     lastPageRowCount = 0;
     memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
     UpdateScrollBars();
+}
+
+// 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
+// The first comparator call goes through a `control` local: without it VC6
+// swaps eax and edx for that temporary and the next global load.
+int UnknownFunction477800(const void* a, const void* b) {
+    int result = 0;
+    if (g_UnknownGlobal65b608->sortingList) {
+        UIListBox* control = g_UnknownGlobal65b608->sortingList->field_0x218_control;
+        result = control->field_0x24c(a, b);
+        if (!result) {
+            int left = ((const UnknownGameUiListRow*)a)->sortIndex;
+            int right = ((const UnknownGameUiListRow*)b)->sortIndex;
+            GameObjectIterator* iterator =
+                (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
+            while (1) {
+                UIListBox* other = static_cast<UIListBox*>(
+                    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator));
+                if (!other)
+                    break;
+                if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
+                    result = -1;
+                    break;
+                }
+                result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
+                if (result)
+                    break;
+            }
+            g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
+        }
+    }
+    return result;
 }
 
 // 0x00477900
