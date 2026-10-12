@@ -305,7 +305,7 @@ void KrustyUI::BuildGarageScene(int value) {
         light = emitter->Create(renderContext, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
-        UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->field_0x1c;
+        UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->textureContext;
         context.field_0x14 = 0;
         if (!g_TrackGame->field_0x2d0) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
@@ -338,7 +338,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_RIDER = new(__FILE__, 0x194) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
             KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
-                                                   &g_TrackGame->field_0x1c, 1, 1), -1);
+                                                   &g_TrackGame->textureContext, 1, 1), -1);
         KRUSTYUI_RIDER->modelNode->UnknownFunction4444c0(1);
         KRUSTYUI_RIDER->modelNode->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
@@ -349,13 +349,13 @@ void KrustyUI::BuildGarageScene(int value) {
         done = 0;
     }
     if (pending && !done && (value == 2 || value == -1)) {
-        UnknownKrustyUIPlatePainter painter(g_TrackGame->field_0x1c);
+        UnknownKrustyUIPlatePainter painter(g_TrackGame->textureContext);
         for (int i = 0; i < manufacturerCount; i++) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
             KRUSTYUI_MODELS[i].uiModel = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
             garageScene->AppendChild(
                 KRUSTYUI_MODELS[i].uiModel->CharacterVirtualSlot11(renderContext, text, lights,
-                                                                      &g_TrackGame->field_0x1c,
+                                                                      &g_TrackGame->textureContext,
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             bike->modelNode->UnknownFunction4444c0(1);

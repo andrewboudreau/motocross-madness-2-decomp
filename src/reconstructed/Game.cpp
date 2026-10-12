@@ -163,7 +163,7 @@ int Game::CreateObjects(char*) {
         return 0;
     textureManager = new(__FILE__, 282) TextureMapManager;
     childRoot->AppendChild(textureManager->UnknownVirtualSlot8(renderTarget), -1);
-    field_0x1c = textureManager;
+    textureContext = textureManager;
     field_0x20 = 0;
     field_0x24 = 0;
     field_0x28 = renderTarget->surfacePixelFormat;

@@ -1116,7 +1116,7 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
 
 // 0x0044f950
 void SPBikeRiderDlg::PaintPlateNumber(int number) {
-    UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
+    UnknownBikeNumberPainter painter(g_TrackGame->textureContext);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture, number);
@@ -1157,7 +1157,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[list->GetRowData(-1)];
         ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].uiModel->plateTexture)
-            ->ReplaceMaterialTexture(0, bike->texture, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, bike->texture, &g_TrackGame->textureContext);
         bikeChanged = 0;
     }
     if (riderChanged) {
@@ -1165,7 +1165,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
         ((UnknownModelTexture*)ui->riderPreview->plateTexture)
-            ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->textureContext);
         riderChanged = 0;
     }
     return result;

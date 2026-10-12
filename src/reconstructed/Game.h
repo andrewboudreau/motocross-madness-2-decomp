@@ -103,7 +103,10 @@ public:
     RenderTarget* renderTarget;               // a PCRenderTarget (PCGame slot 31)
     ControlInterface* controlInterface;       // a PCControlInterface (slot 2)
     int playerCount;                          // +0x18 1 initially; KrustyBikeCamera slot 42 tests > 1
-    TextureMapManager* field_0x1c;
+    // +0x1c..+0x30: a texture context block (the manager, the render
+    // target's pixel format at +0x28); the UI painters and
+    // ReplaceMaterialTexture take its address (KrustyUI.cpp copies all six).
+    TextureMapManager* textureContext;        // +0x1c
     int field_0x20;
     int field_0x24;
     int field_0x28;

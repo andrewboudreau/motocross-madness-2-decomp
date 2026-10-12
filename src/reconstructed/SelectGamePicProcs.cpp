@@ -1966,7 +1966,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
 
 // 0x004f8570
 void MPBikeRiderDlg::PaintPlateNumber(int number) {
-    UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
+    UnknownBikeNumberPainter painter(g_TrackGame->textureContext);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture, number);
