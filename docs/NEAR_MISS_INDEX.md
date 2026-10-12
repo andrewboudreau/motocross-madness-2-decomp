@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 153, c 107, total 261. The three class (a) functions of the
+Counts: a 1, b 153, c 106, total 260. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -90,7 +90,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/collision/CollisionObject | `0x00437ef0` | 847/906 | c | ModelVsHullSwept: frame 0x7c matches; mean as ModelVsHull. Left: scheduling of the two box copies, one push and the mean copy registers |
 | krusty2/collision/CollisionObject | `0x00438280` | 699/710 | c | ModelVsModel: as ModelVsHull, with the same per-component mean. Left: one push schedule (`sub esp, 0xc` placement) and the mean copy registers |
 | krusty2/collision/CollisionObject | `0x00438550` | 712/783 | c | ModelVsModelSwept keeps the last contact (no averaging); scheduling of the box copies, register choice in the loop |
-| krusty2/collision/CollisionObject | `0x00438c90` | 61/475 | c | 31 code diffs: `mov ebx, [ecx + 0x54]` vs `xor ebx, ebx`; `xor ebp, ebp` vs `mov ebp, [ecx + 0x54] ; sub edx, ebx` |
 | krusty2/collision/CollisionObject | `0x004392c0` | 303/311 | c | 6 code diffs: `mov eax, [esp + N] ; mov ecx, [eax + 0x~` vs `mov ecx, [esp + N] ; mov eax, [ecx + 0x~`; `dec ecx` vs `dec eax` |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 254/1885 | b | UpdateModelBounds: the Min argument now uses the out-of-line Vec3 ctor 0x404e60 as retail; 445/479 normalised insns align (was 438), 1902 vs 1885 bytes; byte score fell because stack slots shifted |
 | krusty2/collision/CollisionObject | `0x00435830` | 157/1776 | b | SetTransform: the hull case's inline 4x4 product emits its terms as 1,3,2,4 (retail 3,2,1,4 with the local matrix loaded first); frame 0x30 both |

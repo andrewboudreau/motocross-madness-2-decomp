@@ -535,8 +535,8 @@
     "candidate_symbol_contains": "TestMeshAgainst",
     "target_va": "0x00438c90",
     "target_size": 475,
-    "expect": "partial",
-    "notes": "13.2%: type 0 -> 0x428950 mesh vs hull (result vec rotated by hull+0x48); type 1 -> thiscall 0x4392c0 then loop enabled elements; scheduling differs (453 vs 475)",
+    "expect": "exact",
+    "notes": "type 0 -> 0x428950 mesh vs hull (result vec rotated by hull+0x48 through a by-value copy); type 1 -> thiscall 0x4392c0 then loop enabled elements, element address formed before the enabled test",
     "bindings": "CollisionObject.bindings.json"
   },
   {

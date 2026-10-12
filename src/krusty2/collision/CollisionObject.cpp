@@ -2142,10 +2142,20 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
     outMax->z = center.z + ez;
 }
 
+// v * M3x3 written back through `out` from a by-value copy of v (retail copies the vector to
+// the stack before the three rows; the x row's terms are emitted x, y, z).
+inline void CollisionRotateColsInPlace(CollisionVec3* out, CollisionVec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->m[0][0] + v.y * m->m[1][0] + v.z * m->m[2][0];
+    out->y = v.z * m->m[2][1] + v.y * m->m[1][1] + v.x * m->m[0][1];
+    out->z = v.z * m->m[2][2] + v.y * m->m[1][2] + v.x * m->m[0][2];
+}
+
 // 0x00438c90: this is a static mesh (type 2); test it against a hull (0) or a model (1).
 // The mesh's convex geometry (+4) and matrix (+8) go through the box test 0x00428950 with
 // mode 1; on a hit the result vec3 at globalResult+8 is rotated by the hull matrix (v * M).
-// For a model, 0x004392c0 rejects first and every enabled element is tested.
+// For a model, 0x004392c0 rejects first and every enabled element is tested.  Retail forms
+// the element address before reading its enabled flag.
 int CollisionObject::TestMeshAgainst(CollisionObject* other)
 {
     CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
@@ -2154,7 +2164,7 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         CollisionHullBody* hull = (CollisionHullBody*)other->shape;
         if (TreeTreeQuery(mesh->field_0x04, hull->triangleTree, &mesh->field_0x08, &hull->worldTransform, 1,
                         hull->vertices, 0)) {
-            g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &hull->worldTransform);
+            CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &hull->worldTransform);
             return 1;
         }
         break;
@@ -2164,12 +2174,12 @@ int CollisionObject::TestMeshAgainst(CollisionObject* other)
         int hit = 0;
         if (TestMeshBounds(other)) {
             for (int i = 0; i < model->elementCount; i++) {
+                CollisionHullBody* e = &model->elements[i];
                 if (model->elementEnabled[i]) {
-                    CollisionHullBody* e = &model->elements[i];
                     if (TreeTreeQuery(mesh->field_0x04, e->triangleTree, &mesh->field_0x08, &e->worldTransform, 1,
                                     e->vertices, 0)) {
                         hit = 1;
-                        g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &e->worldTransform);
+                        CollisionRotateColsInPlace(&g_CollisionBoxResult->field_0x08, g_CollisionBoxResult->field_0x08, &e->worldTransform);
                     }
                 }
             }
