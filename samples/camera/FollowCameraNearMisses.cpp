@@ -49,6 +49,11 @@
 // bytes match. Registers and the EH frame agree once the frame pointer is taken
 // before the vector maths; retail keeps the two cross products in memory
 // temporaries (12 more frame bytes) where VC6 keeps them on the FPU stack.
+// Retail stores each component of the first product to a temporary, copies
+// it to `side` and reads the temporary (not `side`) in the second product.
+// A named result (`Vector3 r; r.x = ...`), float locals, by-value operands
+// (either or both) and assignment instead of initialisation (41 forms) keep
+// frame 0x180 (508..513).
 //
 // FollowCamera::FollowCamera (0x00462ee0, 564 bytes; 511 of 564): every
 // store value, offset and the static slot-71 call are right. Storing the
