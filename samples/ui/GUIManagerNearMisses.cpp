@@ -13,7 +13,15 @@
 //   compiles the same.
 // 0x00486170 (896 bytes): same logic; retail keeps three more stack locals
 //   (frame 0xb0 against 0xa4) and allocates registers differently around
-//   the row copy and the 8-bit dim loop.
+//   the row copy and the 8-bit dim loop. Retail has two return tails
+//   (`mov eax, edi` for the new texture, `mov eax, ebx` with ebx cleared
+//   at the top for the Lock failure) and never uses that zero for the
+//   null tests or `push 0`; VC6 here caches 0 in ebx for both. A
+//   `return texture` in the success branch gives the two tails (304, 73
+//   instruction diffs) but folds the failure return to `xor eax, eax`;
+//   the texture's zero assigned at its declaration, after the format
+//   read or just before the Lock test does not change that; an early
+//   `return texture` or `return 0` on a Lock failure gives 294.
 // 0x00486b10 (106 bytes, 89/106): one ternary per component (below; two
 //   separate if/else statements compile the same) gives retail's block
 //   order and `pop edi` placement (one if/else block: 86/106). Retail still

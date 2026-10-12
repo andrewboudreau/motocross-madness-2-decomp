@@ -78,8 +78,10 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
   constructor), 2800 of 6756 positions: all 166 calls in retail order, the
   EH states 0..0x10 (`new` lines 0x193..0x367) and the 0x4e8-byte frame with
   the buffers at retail's offsets. Retail spills `z*z` of both vector
-  lengths to a stack temporary (`fstp [t]; faddp; fadd [t]`, a shape found
-  nowhere else in the binary) and orders the girl block's temporaries
+  lengths to a stack temporary (`fstp [t]; faddp; fadd [t]`; the only other
+  copies in the binary are EventManager `0x0045d480`'s two squared lengths
+  at `0x0045dc05` and `0x0045dc99`, there with `fstp st(0)` popping the
+  duplicated component first) and orders the girl block's temporaries
   differently, so most esp offsets below +0x44 differ. The spill is a
   store-and-reload of a memory temporary: a `volatile float zz = v.z *
   v.z` in the length helper reproduces the `fstp [t]`, the `fadd [t]`,

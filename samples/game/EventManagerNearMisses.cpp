@@ -21,7 +21,8 @@
 // InProCircuitCareer test (three Winner sprintf copies), and the buffers
 // name[0x80], path[0x104], message[0x184] plus the crowd message's own
 // [0x80] buffer at +0x168. Left: the squared lengths (retail squares each
-// component as it loads it, `fld; fld st(0); fmulp`, and spills z*z; plain,
+// component as it loads it, `fld; fld st(0); fmulp`, and spills z*z with
+// `fstp [t]; fstp st(0); faddp; fadd [t]`, as BikeRace 0x00417ed0 does; plain,
 // local-copy, Square-helper, dot-product and accumulated forms all load the
 // three components first; so do (2026-10-12) the canonical
 // `v.z * v.z + (v.x * v.x + v.y * v.y)` by reference or by value, helpers

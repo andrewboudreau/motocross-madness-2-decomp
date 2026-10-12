@@ -60,8 +60,9 @@
 // and the 0x4e8-byte frame with its buffers at retail's offsets
 // (0x0a8/0x1ac/0x2b0/0x3b4). 2804 of 6756 positions match; aligned
 // instruction ratio 0.990. What differs: retail spills z*z of each vector
-// length to a stack temporary (`fstp [t]; faddp; fadd [t]`, a shape found
-// nowhere else in the binary) and keeps the youind axis in the slot it
+// length to a stack temporary (`fstp [t]; faddp; fadd [t]`; the only other
+// copies in the binary are EventManager 0x0045d480's squared lengths at
+// 0x0045dc05 and 0x0045dc99) and keeps the youind axis in the slot it
 // shares with the girl block's temporaries above the angle, so the girl
 // block's temporaries (and with them most esp offsets below +0x44) sit 4
 // to 12 bytes apart; one copy store of the girl offset is scheduled after
