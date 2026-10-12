@@ -85,32 +85,12 @@
   {
     "class": "SoultreeObject",
     "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "LocalToWorldPoint",
-    "target_va": "0x004fd660",
-    "target_size": 168,
-    "expect": "exact",
-    "bindings": "SoultreeTransform.bindings.json",
-    "notes": "x/y accumulated by statements, z one expression with its first two products parenthesised (moves mov ecx,eax before the last faddp). Exact members of soultree.cpp: src/krusty2/soultree/soultree.cpp"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
     "candidate_symbol_contains": "WorldToLocalDirection",
     "target_va": "0x004fd710",
     "target_size": 209,
     "expect": "partial",
     "bindings": "SoultreeTransform.bindings.json",
     "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "WorldToLocalPoint",
-    "target_va": "0x004fd7f0",
-    "target_size": 285,
-    "expect": "partial",
-    "bindings": "SoultreeTransform.bindings.json",
-    "notes": "273/285 bytes (InvertRigid + TransformPoint form): y translation term order and the second swap's integer moves differ"
   },
   {
     "class": "SoultreeObject",

@@ -1,6 +1,4 @@
 {
-  "?LocalToWorldPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd660",
   "?UpdateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb4f0",
-  "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
-  "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd7f0"
+  "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710"
 }

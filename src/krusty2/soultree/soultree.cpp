@@ -13,9 +13,8 @@
 //    .bss and only RegisterNode/UnregisterNode write it.
 // Class identity and offsets: core/SoultreeObject.h. Method names are tier 3.
 //
-// Every function below is strict exact. Near misses of the same unit (LocalToWorldPoint
-// 0x004fd660, WorldToLocalDirection 0x004fd710, WorldToLocalPoint 0x004fd7f0, SetMatrixIn
-// 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050,
+// Every function below is strict exact. Near misses of the same unit (WorldToLocalDirection
+// 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050,
 // GetMatrixIn 0x004fca80, RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
 // Scale 0x004fd340 (inline 4x4 product), AccumulateBounds 0x004fe2e0 and GetWorldBounds
 // 0x004fe8a0 are near misses in samples/physics/helpers/SoultreeBounds.cpp.
@@ -517,6 +516,73 @@ Vec3 SoultreeObject::LocalToWorldDirection(const Vec3& v)
     r.z += v.x * worldMatrix._13;
     r.z += v.z * worldMatrix._33;
     return r;
+}
+
+// 0x004fd660. p * worldMatrix with the translation row added. x and y are accumulated
+// statement by statement like 0x004fd5c0; z is one expression whose first two products
+// are parenthesised (docs/VC6_OPERAND_ORDER.md section 3), which issues retail's
+// 'mov ecx,eax' (the result pointer) before the last faddp of z; z written as statements
+// keeps the faddp first (164/168).
+Vec3 SoultreeObject::LocalToWorldPoint(const Vec3& p)
+{
+    UpdateWorldMatrix();
+    Vec3 r;
+    r.x = p.y * worldMatrix._21;
+    r.x += p.z * worldMatrix._31;
+    r.x += p.x * worldMatrix._11;
+    r.x += worldMatrix._41;
+    r.y = p.y * worldMatrix._22;
+    r.y += p.x * worldMatrix._12;
+    r.y += p.z * worldMatrix._32;
+    r.y += worldMatrix._42;
+    r.z = (p.y * worldMatrix._23) + (p.x * worldMatrix._13) + p.z * worldMatrix._33 + worldMatrix._43;
+    return r;
+}
+
+// Swap across the diagonal of the upper 3x3 (retail does this in place on a stack copy).
+static inline void TransposeRotation(Matrix4& m)
+{
+    float t;
+    t = m._12; m._12 = m._21; m._21 = t;
+    t = m._13; m._13 = m._31; m._31 = t;
+    t = m._23; m._23 = m._32; m._32 = t;
+}
+
+// In-place inverse of a rigid transform: transpose the rotation, then the translation
+// becomes -(t * R^T). Stored through a Vec3 temporary into the translation row. Reading
+// the translation into scalars z, y, x first gives retail's y-row term order and the
+// second swap's integer move schedule (with m._41.. read in place: 273/285).
+static inline void InvertRigid(Matrix4& m)
+{
+    TransposeRotation(m);
+    float z = m._43, y = m._42, x = m._41;
+    Vec3 t;
+    t.x = -(x * m._11 + y * m._21 + z * m._31);
+    t.y = -(x * m._12 + y * m._22 + z * m._32);
+    t.z = -(x * m._13 + y * m._23 + z * m._33);
+    m._41 = t.x;
+    m._42 = t.y;
+    m._43 = t.z;
+}
+
+// p * m with the translation row added.
+static inline Vec3 TransformPoint(const Vec3& p, const Matrix4& m)
+{
+    Vec3 r;
+    r.x = p.x * m._11 + p.y * m._21 + p.z * m._31 + m._41;
+    r.y = p.x * m._12 + p.y * m._22 + p.z * m._32 + m._42;
+    r.z = p.x * m._13 + p.y * m._23 + p.z * m._33 + m._43;
+    return r;
+}
+
+// 0x004fd7f0. p * inverse(worldMatrix) for a rigid transform: copy worldMatrix, invert the
+// copy in place, transform the point.
+Vec3 SoultreeObject::WorldToLocalPoint(const Vec3& p)
+{
+    UpdateWorldMatrix();
+    Matrix4 m = worldMatrix;
+    InvertRigid(m);
+    return TransformPoint(p, m);
 }
 
 // 0x004fd910.

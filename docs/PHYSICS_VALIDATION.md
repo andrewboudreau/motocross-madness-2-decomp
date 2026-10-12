@@ -259,15 +259,16 @@ COMDAT; the six near misses are registered as partial).
 Two units are promoted and pass strict comparison.
 
 **`src/krusty2/soultree/soultree.cpp`** (SoultreeObject,
-`0x004fb2b0..0x004fefd8`) passes 56 cases, including the former 78.7%
-partial `UpdateWorldMatrix`.
+`0x004fb2b0..0x004fefd8`) passes 59 cases, including the former 78.7%
+partial `UpdateWorldMatrix`, LocalToWorldPoint `0x004fd660` (moved from the helpers
+samples) and WorldToLocalPoint `0x004fd7f0` (its rigid inverse reads the translation
+into scalars z, y, x first).
 - `core/SoultreeObject.h` gives the real QuadTreeObject + GameObject bases
   only when `SOULTREE_OBJECT_WITH_BASES` is defined. Other physics code
   keeps the flat view.
 - `SetAxes`'s seventh argument is an int.
-- The helpers samples keep the near misses: LocalToWorldPoint,
-  WorldToLocalDirection, WorldToLocalPoint, SetMatrixIn, GetMatrixIn,
-  SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
+- The helpers samples keep the near misses: WorldToLocalDirection,
+  SetMatrixIn, GetMatrixIn, SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
   soultree.cpp once its cross products parenthesise the first product
   (VC6_OPERAND_ORDER.md section 3).
 

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 159, c 110, total 270. The three class (a) functions of the
+Counts: a 1, b 158, c 110, total 269. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -162,7 +162,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/helpers/SoultreeMatrix | `0x004fca80` | 308/458 (masked) | b | 10 code diffs: `mov [ebx + 4], edx` vs `mov [ebx + 8], eax`; `mov [ebx + 8], eax ; add esp, 0xc` vs `mov eax, [esp + N] ; mov [ebx + 0x18], ~`; slots differ |
 | physics/helpers/SoultreeRotate | `0x004fd1f0` | 285/322 (masked) | c | 6 code diffs: `fld st(2) ; fmul [esi + 0xb8] ; fld st(~` vs `fld st(0)`; retail lacks `faddp st(1)` |
 | physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) ; x-row, transpose-order, y/z-order and ~10k structural forms (constructor return, reference plus copy, pointer/by-value matrix, out pointer, Swap helper, inline transpose) do not move `v.x * m._11` |
-| physics/helpers/SoultreeTransform | `0x004fd7f0` | 269/281 (masked) | b | InvertRigid + TransformPoint form; the y translation sums _32*_43 before _12*_41 and the second swap's integer moves come early; a parenthesised t.y fixes both but sinks r.z's last fadd/fstp (255) |
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
 | physics/krustybike/KrustyBike | `0x0048fa60` | 380/440 (masked) | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 147/221 (masked) | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
