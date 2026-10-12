@@ -788,7 +788,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         vcrFile = new(__FILE__, 0x2c2) UnknownVcrFile(0, 1);
         replayVcr = new(__FILE__, 0x2c3) KrustyVCR;
         if (g_TrackGame->playingReplay) {
-            if (g_TrackGame->ui->field_0x4a8) {
+            if (g_TrackGame->ui->playingDemo) {
                 replayVcr->OpenRecording(RecorderCallback, 1, "ui\\demo.rpl", vcrFile);
                 AppendChild(replayVcr, -1);
             } else {
@@ -817,7 +817,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     }
     if (g_TrackGame->playingReplay && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         g_TrackGame->useReplayTape) {
-        if (g_TrackGame->ui->field_0x4a8) {
+        if (g_TrackGame->ui->playingDemo) {
             UnknownBikeRaceDemoDlg* dialog = new(__FILE__, 0x2fb) UnknownBikeRaceDemoDlg(1, "credits.dtm");
             g_TrackGame->ui->gui->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
         } else {

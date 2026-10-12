@@ -1503,7 +1503,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
     if (a == -2) {
         ClearRacerParts();
         g_TrackGame->replaySpeed = 1.0f;
-        if (g_TrackGame->ui->field_0x4a8) {
+        if (g_TrackGame->ui->playingDemo) {
             g_TrackGame->ui->demoEnded = 1;
             return 1;
         }

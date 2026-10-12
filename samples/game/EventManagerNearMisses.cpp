@@ -71,7 +71,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     g_TrackGame->ui->gui->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
     layer->userToolTip->enabled = g_TrackGame->mode.toolTips;
-    if (!g_TrackGame->playingReplay && !g_TrackGame->ui->field_0x4a8 &&
+    if (!g_TrackGame->playingReplay && !g_TrackGame->ui->playingDemo &&
         g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();
     g_TrackGame->ui->gui->ShowCursors(1);

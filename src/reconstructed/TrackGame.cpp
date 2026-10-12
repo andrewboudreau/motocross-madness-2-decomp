@@ -494,6 +494,6 @@ int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
 // 0x00521cd0
 int TrackGame::InProCircuitCareer() {
     if (proCircuit)
-        return ui->field_0x4a8 == 0;
+        return ui->playingDemo == 0;
     return 0;
 }

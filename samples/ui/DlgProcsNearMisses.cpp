@@ -76,11 +76,11 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         multiMenuOpen = 0;
         userMenuOpen = 0;
         movieRestartTime = 0.0f;
-        g_TrackGame->ui->field_0x4b0 = 0;
+        g_TrackGame->ui->userNameDialogOpen = 0;
         g_TrackGame->mode.championshipInProgress = 0;
         FillProfileList();
         ShowCurrentProfile();
-        if (g_TrackGame->profileDirectory->count >= 1 && g_TrackGame->ui->field_0x48c) {
+        if (g_TrackGame->profileDirectory->count >= 1 && g_TrackGame->ui->profileLoaded) {
             if (event->field_0x18 == 0x63) {
                 PlayerRemovedDlg* dialog = new(__FILE__, 168) PlayerRemovedDlg;
                 g_TrackGame->ui->gui->ShowDialog(dialog, 0x1fa, 0xc, 0, (int)this, 0, 0, 1);
@@ -117,7 +117,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 menuMultiAnimation->Show(0, 1);
                 multiMenuOpen = 0;
                 EndNetworkGame();
-                g_TrackGame->ui->field_0x4b0 = 0;
+                g_TrackGame->ui->userNameDialogOpen = 0;
             }
             if (userMenuOpen) {
                 menuUserAnimation->Show(0, 1);
@@ -159,7 +159,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 guiManager->RecreateCursors(guiManager->cursorImage, 0);
             } else {
                 EndNetworkGame();
-                g_TrackGame->ui->field_0x4b0 = 0;
+                g_TrackGame->ui->userNameDialogOpen = 0;
             }
         } else if (!_stricmp("MenuUserProfile", event->controlName) || !_stricmp("ButCancelProfile", event->controlName)) {
             userMenuOpen = userMenuOpen == 0;
@@ -168,7 +168,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 menuMultiAnimation->Show(0, 1);
                 multiMenuOpen = 0;
                 EndNetworkGame();
-                g_TrackGame->ui->field_0x4b0 = 0;
+                g_TrackGame->ui->userNameDialogOpen = 0;
             }
             if (userMenuOpen)
                 RequestHover(FindControl("LstProfiles", 3), 0, 0);
@@ -267,14 +267,14 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             RequestHover(list, 0, 0);
             FillProfileList();
         } else if (!_stricmp("ButIPX", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             if (g_TrackGame->network->CreateAddress(DPSPGUID_IPX, "", "", 0, &address, &size) &&
                 g_TrackGame->network->InitializeConnection(address, size, 1)) {
                 DebugFree(address, __FILE__, 443);
                 g_TrackGame->ui->OpenMenu(0x85c);
             }
         } else if (!_stricmp("ButTCP", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             ChooseTCPMethodDlg* dialog = new(__FILE__, 453) ChooseTCPMethodDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButZone", event->controlName)) {
@@ -283,10 +283,10 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             event->handled = 1;
             g_TrackGame->ui->OpenExitDialog();
         } else if (!_stricmp("ButCable", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             g_TrackGame->ui->OpenMenu(0xd8);
         } else if (!_stricmp("ButModem", event->controlName)) {
-            g_TrackGame->ui->field_0x4b0 = 1;
+            g_TrackGame->ui->userNameDialogOpen = 1;
             ConnectionInfoType connections[5];
             g_TrackGame->network->EnumConnections(connections, &count);
             for (int i = 0; i < count; i++) {

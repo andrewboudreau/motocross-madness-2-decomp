@@ -455,7 +455,7 @@ int TrackGameMode::LoadProfile() {
     fclose(file);
     raceSettings.networkPlayerCount = 0;
     ChooseDisplayMode(&displayAdapterGuid, &displayModeIndex);
-    g_TrackGame->ui->field_0x48c = 1;
+    g_TrackGame->ui->profileLoaded = 1;
     LoadControllerChoice();
     if (g_TrackGame->soundInterface) {
         ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = eaxEnabled;
@@ -509,7 +509,7 @@ void TrackGameMode::SaveProfile() {
     fclose(file);
     g_TrackGame->SetRegistryString("MRUProfile", profileName);
     if (g_TrackGame->ui)
-        g_TrackGame->ui->field_0x48c = 1;
+        g_TrackGame->ui->profileLoaded = 1;
     SaveControllerChoice();
 }
 

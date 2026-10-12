@@ -213,16 +213,16 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     previousMenu = 0;
     field_0x38 = 0;
     currentMenu = 0;
-    field_0x48c = 0;
+    profileLoaded = 0;
     progressDialog = 0;
     garageScene = 0;
     replayAvailable = 0;
     demoEnded = 0;
     savedInputContext = 0;
     allowIme = 0;
-    field_0x4a8 = 0;
+    playingDemo = 0;
     field_0x4ac = 0;
-    field_0x4b0 = 0;
+    userNameDialogOpen = 0;
     field_0x4a4 = 0;
     field_0x4a0 = 0;
     field_0x49c = 0;
@@ -259,7 +259,7 @@ void KrustyUI::BuildGarageScene(int value) {
     char text[260];
 
     field_0x4ac = 0;
-    field_0x4a8 = 0;
+    playingDemo = 0;
     ((RenderTarget*)renderContext)->clearTarget = 0;
     g_TrackGame->field_0x2d5_bit2 = 1;
     if (!garageScene && (value == 1 || value == -1)) {

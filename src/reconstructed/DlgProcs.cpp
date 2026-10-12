@@ -1462,7 +1462,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        g_TrackGame->ui->field_0x4b0 = 1;
+        g_TrackGame->ui->userNameDialogOpen = 1;
         UIControl* control = FindControl("TitleText", 0);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x926);
         control = FindControl("OKButton", 0);
@@ -1521,7 +1521,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
         break;
     }
     case kDialogClose:
-        g_TrackGame->ui->field_0x4b0 = 0;
+        g_TrackGame->ui->userNameDialogOpen = 0;
         break;
     }
 }
@@ -2010,13 +2010,13 @@ int Intro3Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 void LeaveMenusForRace() {
     g_TrackGame->mode.saveReplay = 0;
     g_TrackGame->ui->field_0x4ac = 1;
-    g_TrackGame->ui->field_0x4a8 = 0;
+    g_TrackGame->ui->playingDemo = 0;
     g_TrackGame->ui->Shutdown();
     g_TrackGame->ui->gui->ReleaseBackground();
     if (g_TrackGame->display->freezeFrameIndex)
         g_TrackGame->ui->gui->EnableWindowClipper(0);
     if (g_TrackGame->playerCount == 1 && !g_TrackGame->InProCircuitCareer() &&
-        !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->playingReplay) {
+        !g_TrackGame->ui->playingDemo && !g_TrackGame->playingReplay) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.raceSettings,
                sizeof(g_TrackGame->mode.savedSettings));
         memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.garageOptions,
@@ -2025,7 +2025,7 @@ void LeaveMenusForRace() {
                sizeof(g_TrackGame->mode.racerChoiceBackup));
         g_TrackGame->mode.savedDifficulty = g_TrackGame->mode.difficulty;
     }
-    if (g_TrackGame->playerCount > 1 && !g_TrackGame->ui->field_0x4a8 &&
+    if (g_TrackGame->playerCount > 1 && !g_TrackGame->ui->playingDemo &&
         !g_TrackGame->playingReplay) {
         memcpy(&g_TrackGame->mode.multiplayerSettings, &g_TrackGame->mode.raceSettings,
                sizeof(g_TrackGame->mode.multiplayerSettings));
