@@ -202,7 +202,7 @@ static inline float RandomUnit() {
 }
 
 // cdecl 0x0049bda0: the GUI's progress callback.
-void UnknownFunction49bda0() {
+void GuiProgressCallback() {
     g_TrackGame->mode.SaveProfile();
 }
 
@@ -899,7 +899,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
         break;
     }
     }
-    g_TrackGame->field_0x3400->UnknownFunction51f0b0(
+    g_TrackGame->field_0x3400->ReadRecord(
         (short)g_TrackGame->mode.raceSettings.eventType, name);
     int added = 0;
     if (g_TrackGame->playerCount == 1) {
@@ -915,7 +915,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
         if (!added)
             return;
     }
-    g_TrackGame->field_0x3400->UnknownFunction51f260(
+    g_TrackGame->field_0x3400->WriteRecord(
         (short)g_TrackGame->mode.raceSettings.eventType, name,
         g_TrackGame->mode.GetSelectedSeries());
 }

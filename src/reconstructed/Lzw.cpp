@@ -50,7 +50,7 @@ int g_lzwCodeBits;                                    // 0x00684dfc
 LzwDictionaryEntry* g_lzwDictionary[LZW_TABLE_BANKS]; // 0x00684e00
 
 // 0x004a0310: marks every entry unused and restarts at 9-bit codes.
-void UnknownFunction4a0310()
+void LzwResetTable()
 {
     unsigned int i;
 
@@ -63,7 +63,7 @@ void UnknownFunction4a0310()
 
 // 0x004a0360: allocates the banks still missing. On failure it frees the
 // banks before the failing one and returns 0.
-int UnknownFunction4a0360()
+int LzwAllocateBanks()
 {
     int i;
 
@@ -111,10 +111,10 @@ void ExpandLzw(unsigned char* output, const void* input, int size)
 
     GR_BitString bits(input, size * 8, 0);
     bits.ReadBits(32);
-    if (!UnknownFunction4a0360())
+    if (!LzwAllocateBanks())
         return;
     for (;;) {
-        UnknownFunction4a0310();
+        LzwResetTable();
         oldCode = bits.ReadBits(g_lzwCodeBits);
         if (oldCode == LZW_END_OF_STREAM)
             return;

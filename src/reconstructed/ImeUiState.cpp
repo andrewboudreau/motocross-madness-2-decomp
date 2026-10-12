@@ -19,7 +19,7 @@ static BOOL g_savedShowImeUi;      // 0x0068ace4
 static int g_showImeUiSaved;       // 0x0068ace8
 
 // 0x0052ff00: remembers whether the IME status window is shown.
-void UnknownFunction52ff00()
+void SaveImeStatus()
 {
     SystemParametersInfoA(SPI_GETSHOWIMEUI, 0, &g_savedShowImeUi, 0);
     g_showImeUiSaved = 1;
@@ -27,7 +27,7 @@ void UnknownFunction52ff00()
 
 // 0x0052ff20: drains the message queue, then restores the remembered
 // IME status-window setting.
-void UnknownFunction52ff20()
+void RestoreImeStatus()
 {
     if (g_showImeUiSaved) {
         MSG msg;

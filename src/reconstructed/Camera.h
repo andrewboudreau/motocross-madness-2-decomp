@@ -47,7 +47,7 @@ public:
     // 0x0042e960: +0x1bc = max(minimum, g_UnknownFloat550f6c),
     // +0x1c0 = min(maximum, g_UnknownFloat550f70).
     void ClampLimits(float minimum, float maximum);
-    int UnknownFunction42e550(); // 0x0042e550, called by slot 8
+    int UpdateViewport(); // 0x0042e550, called by slot 8
     // 0x0042e930: stores a nonzero value in +0x16c and refreshes +0x1d0
     // (FollowCamera slot 47 passes 66.0f).
     void SetFieldOfView(float value);

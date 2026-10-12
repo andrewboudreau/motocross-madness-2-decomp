@@ -70,7 +70,7 @@
 #include "../../src/reconstructed/ResourceManager.h"
 
 // 0x0045c6a0 (cdecl): fwrite that encodes the bytes with the running key *key.
-int UnknownFunction45c6a0(const void* buffer, int size, int count, FILE* file, char* key);
+int WriteXorEncoded(const void* buffer, int size, int count, FILE* file, char* key);
 // 0x0045c7b0 (cdecl): fread that decodes the bytes with the running key *key.
 int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
 
@@ -429,7 +429,7 @@ int UnknownTextureStream::Write(const void* buffer, int size, int count)
             fclose(stream->field_0x14);
             stream->field_0x14 = 0;
         }
-        if (!UnknownFunction45c6a0(buffer, size, count, stream->field_0x14, &stream->field_0x01)) {
+        if (!WriteXorEncoded(buffer, size, count, stream->field_0x14, &stream->field_0x01)) {
             return count - 1;
         }
         return count;

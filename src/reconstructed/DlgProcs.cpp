@@ -1366,7 +1366,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
 // 0x00451270
 int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
     if (framesShown == 2 && !g_UnknownGlobal59ae84) {
-        if (!g_TrackGame->eventManager->UnknownFunction45cb70()) {
+        if (!g_TrackGame->eventManager->LoadEvent()) {
             EndDialog(0);
             if (g_TrackGame->network) {
                 UnknownLoadFailedMessage message;

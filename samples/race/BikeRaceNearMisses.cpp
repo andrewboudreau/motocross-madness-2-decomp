@@ -511,7 +511,7 @@ static inline Vector3 UnknownScaled(const Vector3& v, float scale) {
 }
 
 // 0x00417ed0
-BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightManager* lights,
+BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                                           UnknownTextureFormatChoice* textures,
                                           UnknownBikeRaceProjector* terrain, KrustyBikeCamera* camera,
                                           Scene* scene, UnknownBikeRaceNodeOwner* event,

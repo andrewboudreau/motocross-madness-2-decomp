@@ -223,7 +223,7 @@ LRESULT CALLBACK UnknownWindowProc4a0d50(HWND window, UINT message, WPARAM wPara
             if (g_TrackGame->controlInterface)
                 ((PCControlInterface*)g_TrackGame->controlInterface)->SetDevicesAcquired(1);
             if (g_TrackGame->imeLibrary)
-                UnknownFunction52ff20();
+                RestoreImeStatus();
         } else {
             g_TrackGame->UnknownVirtualSlot6();
         }

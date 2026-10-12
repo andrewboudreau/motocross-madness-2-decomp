@@ -129,7 +129,7 @@ public:
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
     void LoadBikesAndRiders();                // 0x0049a8b0: bikes.pb and riders.pb
-    GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
+    GameObject* Create(RenderTarget* target, int value); // 0x004988a0
     void BuildGarageScene(int value);                         // 0x00498cf0
     void OpenMenu(int menu);                                       // 0x00499b20: opens a menu
     void StepProgressBar();                                  // 0x0049b530

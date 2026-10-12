@@ -257,7 +257,7 @@ void TrackGameMode::ReloadResourceStrings(char (*names)[0x80]) {
 #undef UNKNOWN_LOAD_NAME
 
 // 0x00522bf0: the garage tables from KrustyUI (defaults when there is none).
-void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::CopyGarageTables(UnknownTrackGameModeOptionsFd8* options) {
     int i;
     int j;
     int k;
@@ -287,7 +287,7 @@ void TrackGameMode::UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* option
 void TrackGameMode::UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options) {
     options->engineSize = 250;
     options->fourStroke = 0;
-    UnknownFunction522bf0(options);
+    CopyGarageTables(options);
 }
 
 // 0x00522cb0

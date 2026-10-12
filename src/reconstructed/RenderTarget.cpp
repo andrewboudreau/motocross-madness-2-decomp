@@ -41,7 +41,7 @@ void RenderTarget::AdvanceFrame() {
 void RenderTarget::SetCamera(Camera* camera) {
     currentCamera = camera;
     if (camera && (targetWidth != camera->field_0x1c4 || targetHeight != camera->field_0x1c8))
-        camera->UnknownFunction42e550();
+        camera->UpdateViewport();
 }
 
 // 0x004806f0 and 0x0044d710: empty bodies shared with other classes.

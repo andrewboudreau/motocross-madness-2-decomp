@@ -518,7 +518,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(leave->field_0x08);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
-            g_TrackGame->eventManager->UnknownFunction45fbd0(leave->field_0x08);
+            g_TrackGame->eventManager->RemovePlayer(leave->field_0x08);
     } else if (from && type == 0x89) {
         char text[0x80];
         char buffer[0x80];
@@ -528,7 +528,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(from);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
-            g_TrackGame->eventManager->UnknownFunction45fbd0(from);
+            g_TrackGame->eventManager->RemovePlayer(from);
     }
     return 0;
 }

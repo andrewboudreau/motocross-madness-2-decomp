@@ -412,7 +412,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 g_TrackGame->mode.racers[i].isReady = 1;
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 2 && !FindRaceMode())
-            UnknownFunction45fbd0(message->dpId);
+            RemovePlayer(message->dpId);
     } else if (from) {
         if (type == 0x89) {
             for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
@@ -420,7 +420,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     g_TrackGame->mode.racers[i].isReady = 1;
             }
             if (g_TrackGame->mode.raceSettings.raceMode == 2 && !FindRaceMode())
-                UnknownFunction45fbd0(from);
+                RemovePlayer(from);
         } else if (type == 0x86) {
             UnknownEventRacerMessage* update = (UnknownEventRacerMessage*)data;
             UnknownKrustyBikeView* view = FindRaceView();
@@ -520,7 +520,7 @@ int CompareUnsigned(const void* a, const void* b) {
 
 // 0x0045fbd0: removes `player`, moving the last entry and record into its
 // place, then re-sorts the entries.
-void EventManager::UnknownFunction45fbd0(int player) {
+void EventManager::RemovePlayer(int player) {
     if (g_TrackGame->playerCount < 2)
         return;
     for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
@@ -607,7 +607,7 @@ float g_UnknownGlobal59af54;
 // 0x0045cb70: resets the event, loads the track's environment and scene
 // and, for mode 0 (BaseQuarryEvent) or 2 (NationalRace), creates the race
 // object and adds it to the second root; 1 when a race-mode object exists.
-int EventManager::UnknownFunction45cb70() {
+int EventManager::LoadEvent() {
     char path[260];
     g_UnknownGlobal59af54 = 0;
     field_0x3c0 = 0;

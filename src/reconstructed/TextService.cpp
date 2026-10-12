@@ -74,7 +74,7 @@ UnknownOverlayText* UnknownOverlayText::Create(const char* archive, const char**
         strcat(path, ".cell");
         COPY_NAME(textureName, names[i]);
         strcat(textureName, ".tga");
-        FontTexture* font = FontTexture::UnknownFunction4673d0(names[i], path, textureName, format, manager, a10);
+        FontTexture* font = FontTexture::Load(names[i], path, textureName, format, manager, a10);
         if (font)
             text->SetFont(i, font);
     }

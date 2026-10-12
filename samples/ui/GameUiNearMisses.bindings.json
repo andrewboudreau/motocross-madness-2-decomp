@@ -266,7 +266,7 @@
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
   "?SetupControl@UIDialog@@QAEPAVUIControl@@PAV2@HH@Z": "0x0046a840",
-  "?UnknownFunction46a920@UIDialog@@QAEHPAXH@Z": "0x0046a920",
+  "?ReadDialogResource@UIDialog@@QAEHPAXH@Z": "0x0046a920",
   "?SetShown@UIDialog@@QAEXH@Z": "0x0046ea60",
   "?UnknownFunction46f120@UIDialog@@QAEXXZ": "0x0046f120",
   "?UnknownFunction46ff60@UIDialog@@QAEXXZ": "0x0046ff60",

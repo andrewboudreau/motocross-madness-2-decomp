@@ -179,8 +179,8 @@ public:
     void RankRacers();                             // 0x0045e9d0
     void CheckRaceOver(float frameTime);           // 0x0045eef0
     void SendRacerResults();                       // 0x0045f9a0
-    int UnknownFunction45cb70();                   // 0x0045cb70
-    void UnknownFunction45fbd0(int player);        // 0x0045fbd0
+    int LoadEvent();                   // 0x0045cb70
+    void RemovePlayer(int player);        // 0x0045fbd0
     // 0x0045fce0: removes every Vegetation in the rectangle from the
     // collision quadtree (up to 1000).
     void RemoveVegetationInRect(float x0, float z0, float x1, float z1);  // 0x0045fce0

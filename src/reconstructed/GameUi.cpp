@@ -3324,7 +3324,7 @@ int UIDialog::LoadDialogResource(const char* name) {
     int result = 0;
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 1);
     if (entry)
-        result = UnknownFunction46a920(entry->archive, entry->offset);
+        result = ReadDialogResource(entry->archive, entry->offset);
     return result;
 }
 
@@ -3977,7 +3977,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
         UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         if (stream->Open(path, "r", 0)) {
-            if (!UnknownFunction46a920(stream, 0)) {
+            if (!ReadDialogResource(stream, 0)) {
                 delete stream;
                 UnknownFunction46ff60();
                 return 0;

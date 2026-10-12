@@ -294,7 +294,7 @@
   "?Edit@EditBoxDlg@@QAEXPBD0PADH@Z": "0x004558f0",
   "?EditWithResources@EditBoxDlg@@QAEXPBDH0HPADH@Z": "0x00455970",
   "?SetNextMenu@TransDlg@@QAEXH@Z": "0x00455c40",
-  "?UnknownFunction45cb70@EventManager@@QAEHXZ": "0x0045cb70",
+  "?LoadEvent@EventManager@@QAEHXZ": "0x0045cb70",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?UnknownFunction45d270@EventManager@@QAEXXZ": "0x0045d270",
   "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",

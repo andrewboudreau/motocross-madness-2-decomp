@@ -50,7 +50,7 @@
 extern int g_UnknownGlobal59af10;
 
 // 0x0045c040 (cdecl): preloads the ecosystem `path` from `stream`.
-void UnknownFunction45c040(TextureMapManager* manager, const char* path, UnknownTextureStream* stream,
+void PreloadEcosystem(TextureMapManager* manager, const char* path, UnknownTextureStream* stream,
                            int format);
 
 // A CollisionObject (QuadTree object at +0, GameObject at +0xc).
@@ -132,7 +132,7 @@ class UnknownQuarryRace : public GameObject {
 public:
     explicit UnknownQuarryRace(int flags);                     // 0x00417c30
     // 0x00417ed0: loads the race; returns this, or 0.
-    UnknownQuarryRace* UnknownFunction417ed0(void* target, void* particles, LightManager* lights,
+    UnknownQuarryRace* Create(void* target, void* particles, LightManager* lights,
                                              UnknownTextureFormatChoice* textures, UnknownTerrain* terrain,
                                              UnknownQuarryCamera* camera, Scene* scene, BaseQuarryEvent* event,
                                              void* shadow);
@@ -154,7 +154,7 @@ class UnknownQuarryBikeCamera : public GameObject {
 public:
     explicit UnknownQuarryBikeCamera(int flags);               // 0x00497cb0
     // 0x00497d90: sets the camera up; returns it.
-    UnknownQuarryBikeCamera* UnknownFunction497d90(void* target, float a, float b, float c, float d, float e,
+    UnknownQuarryBikeCamera* Create(void* target, float a, float b, float c, float d, float e,
                                                    int f, int count, int* presets);
     void UnknownFunction463600(UnknownTerrain* terrain);       // 0x00463600
 
@@ -331,7 +331,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, ecosystem, "rb", 0))
             sprintf(text, "No Ecosystem found in env file.  Ecosystem not preloaed.\n");
         else
-            UnknownFunction45c040(g_TrackGame->textureManager, ecosystem, stream, 0x115c);
+            PreloadEcosystem(g_TrackGame->textureManager, ecosystem, stream, 0x115c);
     }
 
     // The texture detail levels: 0 keeps every texture, 1 and 2 halve them.
@@ -512,7 +512,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     presets[6] = 6;
     presets[7] = 7;
     raceCamera = (UnknownQuarryCamera*)(new(__FILE__, 585) UnknownQuarryBikeCamera(1))
-                     ->UnknownFunction497d90(field_0x18, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
+                     ->Create(field_0x18, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
     if (!AppendChild((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
         return 0;
@@ -658,7 +658,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
     raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)raceView)
-                     ->UnknownFunction417ed0(field_0x18, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
+                     ->Create(field_0x18, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
                                              eventScene, this, projectedShadow);
     if (!raceView) {
         sprintf(text, "BikeRace create failed.\n");

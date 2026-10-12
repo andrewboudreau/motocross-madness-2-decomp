@@ -54,7 +54,7 @@
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?SetRowHighlight@DebugOverlay@@QAEXHHH@Z": "0x00448000",
   "?SetDetailLevel@EcoSystem@@QAEXH@Z": "0x004594c0",
-  "?UnknownFunction45fbd0@EventManager@@QAEXH@Z": "0x0045fbd0",
+  "?RemovePlayer@EventManager@@QAEXH@Z": "0x0045fbd0",
   "?SetDetailLevel@Fog@@QAEXH@Z": "0x00462db0",
   "?UnknownFunction464e80@StatsOverlay@@QAEXH@Z": "0x00464e80",
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",

@@ -203,7 +203,7 @@ void UnknownEngineGearbox::UnknownFunction4d2f50(float dt, int engaged, unsigned
 
 // 0x004d3030: shifts up past the randomised shift rpm and down below
 // field_0x7c.
-void UnknownEngineGearbox::UnknownFunction4d3030(int arg0, float arg1)
+void UnknownEngineGearbox::AutoShift(int arg0, float arg1)
 {
     if (shiftTimer != 0.0f) {
         return;

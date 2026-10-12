@@ -106,7 +106,7 @@ LRESULT CALLBACK DisplayWindowProc(HWND window, UINT message, WPARAM wParam, LPA
 // without asking (unless PCGame+0x544 forces the dialog), the display
 // "UseVideoCardIdx" names when `useLast` is set, or the dialog's choice;
 // `blade` is set when the software (Blade) entry was chosen.
-UnknownDisplay* UnknownFunction4ccd60(int flag, int useLast, int* blade)
+UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
 {
     char key[0x100];
     int usable = 0;
@@ -307,7 +307,7 @@ LRESULT CALLBACK ControllerWindowProc(HWND window, UINT message, WPARAM wParam, 
 // the device whose instance GUID the registry "UseControllerId" names;
 // otherwise runs the dialog and returns its index (-2 on cancel or
 // failure), saving the GUID.
-int UnknownFunction4cd610(int useLast)
+int ChooseJoystick(int useLast)
 {
     char lastId[0x80];
     char text[0x80];

@@ -1136,7 +1136,7 @@ int EcoSystem::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 // probe block (its slot holds the probe's `new` temporary) while it is live
 // across the stream's `new` (which takes `ownsStream`'s dead slot) and the
 // second loop (whose induction spill gets a slot of its own).
-int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags) {
+int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags) {
     char names[256][0x80];
     char billboardNames[256][0x80];
     unsigned int keyColors[256];
@@ -1253,7 +1253,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
 // The byte is read, then xored with the key; the key accumulates the
 // encoded byte. The block count is the loop bound expression (it stays in
 // a frame slot) and the tail loop counts down.
-int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
+int WriteXorEncoded(const unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
     unsigned char buffer[0x400];
     int total = size * count;
     int block;

@@ -258,4 +258,4 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00459ce0` `GenerateObjects`
 - `0x0045ade0` `SetRenderStates`
 - `0x0045b060` slot 14 (the draw; `UnknownVirtualSlot14`)
-- `0x0045c040` `UnknownFunction45c040` (the texture preload, cdecl)
+- `0x0045c040` `PreloadEcosystem` (the texture preload, cdecl)

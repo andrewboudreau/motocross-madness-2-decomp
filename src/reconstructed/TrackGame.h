@@ -316,7 +316,7 @@ public:
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
     void ReloadResourceStrings(char (*names)[0x80]);   // reloads resourceStrings
-    void UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options);
+    void CopyGarageTables(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522cb0(UnknownTrackGameModeOptionsFd8* options);

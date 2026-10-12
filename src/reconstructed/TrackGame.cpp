@@ -285,7 +285,7 @@ int TrackGame::UnknownVirtualSlot4() {
         return 0;
     g_MemTagStack->Push("UI");
     ui = new(__FILE__, 379) KrustyUI(1);
-    if (!childRoot->AppendChild(ui->UnknownFunction4988a0(renderTarget, 1), -1))
+    if (!childRoot->AppendChild(ui->Create(renderTarget, 1), -1))
         return 0;
     eventManager = new(__FILE__, 382) EventManager(1);
     if (!childRoot->AppendChild(eventManager->UnknownVirtualSlot8(renderTarget), -1))

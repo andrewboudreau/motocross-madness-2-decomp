@@ -79,7 +79,7 @@
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?FindInputDialog@UnknownKrustyUIGui@@QAEPAVUnknownTrackGameObject56cItem@@XZ": "0x00485df0",
   "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
-  "?UnknownFunction4988a0@KrustyUI@@QAEPAVGameObject@@PAVRenderTarget@@H@Z": "0x004988a0",
+  "?Create@KrustyUI@@QAEPAVGameObject@@PAVRenderTarget@@H@Z": "0x004988a0",
   "?BuildGarageScene@KrustyUI@@QAEXH@Z": "0x00498cf0",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
   "?ReportTotals@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",

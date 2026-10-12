@@ -17,7 +17,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x0043d0d0: skips `stream` forward to the next 0x800 boundary past `base`.
-static void UnknownFunction43d0d0(UnknownTextureStream* stream, int base)
+static void SkipToSector(UnknownTextureStream* stream, int base)
 {
     int padding = 0x800 - (stream->Tell() - base) % 0x800;
     if (padding != 0x800)
@@ -112,7 +112,7 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
         }
     }
     if (flags & 2)
-        UnknownFunction43d0d0(stream, alignmentBase);
+        SkipToSector(stream, alignmentBase);
     textureDataOffset = stream->Tell();
     if (a) {
     fail:
@@ -160,7 +160,7 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
             field_0x38[face].textures[index]->UnknownVirtualSlot8(1, 0, 0);
     }
     if (field_0x10 & 2)
-        UnknownFunction43d0d0(field_0x08, alignmentBase);
+        SkipToSector(field_0x08, alignmentBase);
     return 1;
 }
 

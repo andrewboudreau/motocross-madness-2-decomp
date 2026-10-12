@@ -1,7 +1,7 @@
 // Near-miss KrustyUI candidates, kept out of src/reconstructed until they
 // match. See docs/KRUSTYUI.md.
 //
-// KrustyUI::UnknownFunction4988a0 (0x004988a0, 1104 bytes): TrackGame slot
+// KrustyUI::Create (0x004988a0, 1104 bytes): TrackGame slot
 // 4's initialiser. The control flow, calls, both debug `new`s (GUI, line
 // 121; Intro1Dlg, line 201), the strncpy clamps and the frame (text is a
 // 260-byte buffer read 128 at a time) match: 872 of 1104 bytes. From the
@@ -22,7 +22,7 @@
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/UIDialog.h"
 
-void UnknownFunction49bda0();
+void GuiProgressCallback();
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block.
 void* ResizeDebugBlock(void* block, unsigned int size);
@@ -36,7 +36,7 @@ extern char g_UnknownString577738[];
 // 0x004988a0: GameObject's slot 8, then loads the short strings and the GUI
 // settings, creates and sets up the GUI, restores the last profile and the
 // joystick filter, and (offline, when asked) opens the intro dialog.
-GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro) {
+GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     char font[128];
     char text[260];
     float scale;
@@ -68,7 +68,7 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     gui = new(__FILE__, 121) UnknownKrustyUIGui(1);
     if (!AppendSibling(gui->SetUp(
             field_0x18, g_TrackGame->display->field_0x64, g_TrackGame->textureManager, 0,
-            0, 0, "Arial", 15, "ui\\cursor.tga", UnknownFunction49bda0, -1))) {
+            0, 0, "Arial", 15, "ui\\cursor.tga", GuiProgressCallback, -1))) {
         Release();
         return 0;
     }

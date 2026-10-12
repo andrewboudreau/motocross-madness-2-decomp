@@ -76,7 +76,7 @@ int AgeManager::TotalSize(int* stale) {
 }
 
 // 0x00401180: qsort comparator, most recently used first.
-static int UnknownFunction401180(const void* a, const void* b) {
+static int CompareByRecentUse(const void* a, const void* b) {
     int delta = (*(AgeEntry**)b)->age - (*(AgeEntry**)a)->age;
     if (delta < 0)
         return -1;
@@ -87,7 +87,7 @@ static int UnknownFunction401180(const void* a, const void* b) {
 int AgeManager::EvictStale(int limit) {
     if (totalBytes < limit)
         return 0;
-    qsort(entryList, entryCount, sizeof(AgeEntry*), UnknownFunction401180);
+    qsort(entryList, entryCount, sizeof(AgeEntry*), CompareByRecentUse);
     int freed = 0;
     int evicted = 0;
     for (int i = entryCount - 1; i >= 0; i--) {

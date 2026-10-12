@@ -86,7 +86,7 @@ public:
     void SetShown(int value);    // 0x0046ea60
     void EndControlDraw(void* dc);            // 0x0046eeb0: restores the font and releases `dc`
     int LoadDialogResource(const char* name); // 0x0046a8e0: the .dtm `name` from the resource manager
-    int UnknownFunction46a920(void* stream, int offset); // 0x0046a920
+    int ReadDialogResource(void* stream, int offset); // 0x0046a920
     // 0x0046f3c0: TextOutA, with a shadow one pixel up and left when `shadow`.
     void DrawShadowText(void* dc, int x, int y, const char* text, int length,
                         unsigned int color, int shadow, unsigned int shadowColor);

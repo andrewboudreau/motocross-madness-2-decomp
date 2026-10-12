@@ -877,7 +877,7 @@ public:
     // and its probes, the start objects, the flag girl, the number and bonus
     // overlays, the replay recorder, the loader 0x00419970, the dialogs,
     // the sound and the plate numbers. Returns this, or 0 after Release.
-    BikeRace* UnknownFunction417ed0(void* owner, void* particles, LightManager* lights,
+    BikeRace* Create(void* owner, void* particles, LightManager* lights,
                                     UnknownTextureFormatChoice* textures, UnknownBikeRaceProjector* terrain,
                                     KrustyBikeCamera* camera, Scene* scene, UnknownBikeRaceNodeOwner* event,
                                     UnknownBikeRaceShadow* shadow);

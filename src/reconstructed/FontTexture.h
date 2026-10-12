@@ -43,7 +43,7 @@ public:
     TextureMap* GetTexture();                 // 0x004673c0: the texture
     // 0x004673d0 (cdecl): the font `name`, already loaded or read from the
     // cell file `path` with its texture `textureName` (through 0x0050a590).
-    static FontTexture* UnknownFunction4673d0(const char* name, const char* path, const char* textureName,
+    static FontTexture* Load(const char* name, const char* path, const char* textureName,
                                               int format, TextureMapManager* manager, int a5);
 
     // 0x0065b478. A static data member: its atexit destructor 0x00467130 is

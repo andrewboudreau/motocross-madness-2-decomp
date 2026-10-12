@@ -134,7 +134,7 @@
 //   control is spilled. Retail's frame is 0x80 bytes larger: VC6 lays locals
 //   out by uses per byte, ties permuted by a quicksort over the last-use
 //   order (docs/VC6_FRAME_LAYOUT.md; `python3 tools/frame_layout.py OBJ
-//   UnknownFunction46a920 --va 0x46a920` maps the slots). The large arrays,
+//   ReadDialogResource --va 0x46a920` maps the slots). The large arrays,
 //   `parameters` and the most used key buffers have retail's offsets;
 //   `toolTip` has four references here and two in retail, `defaultFontName`
 //   two here and three in retail, the two-use key buffers leave the control
@@ -840,7 +840,7 @@ char* g_UnknownGlobal65b600;
 // the dialog's named entries (+0x9cc), then read in four passes: "Set_Info"
 // (pass 0), the images (1), the sounds (2) and the controls with their
 // "Set_Default" sections (3).
-int UIDialog::UnknownFunction46a920(void* stream, int offset) {
+int UIDialog::ReadDialogResource(void* stream, int offset) {
     char backgroundImage[0x80];
     backgroundImage[0] = 0;
     int depth = g_TrackGame->renderTarget->surfacePixelFormat;

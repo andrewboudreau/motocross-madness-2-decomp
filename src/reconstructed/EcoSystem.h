@@ -387,7 +387,7 @@ int EvictGeometry(void* object, int context);
 
 // 0x0045c6a0 / 0x0045c7b0 (cdecl): fwrite / fread through a running
 // one-byte xor key.
-int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key);
+int WriteXorEncoded(const unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 
 // Griddraw.h / VisibilityQuadTree.h: the visibility clipper 0x00575a98.
@@ -549,7 +549,7 @@ extern UnknownEcoNormalDistribution* g_UnknownGlobal56ece0;
 
 // 0x0045c040 (cdecl): loads every texture a .esb names ahead of the
 // ecosystem itself.
-int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags);
+int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags);
 
 // Helpers reconstructed elsewhere.
 // 0x0047b8a0 (gameui.cpp tail): a float profile value, `defaultValue` when the key is "NONE".
