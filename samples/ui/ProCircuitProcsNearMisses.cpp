@@ -296,8 +296,8 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
     if (pointer && previewDragged && previewDragging) {
-        float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
-        viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
+        float dx = (float)(pointer->pointerPosition.x - guiUser->pointerX);
+        viewEye.y += (pointer->pointerPosition.y - guiUser->pointerY) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
         offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);

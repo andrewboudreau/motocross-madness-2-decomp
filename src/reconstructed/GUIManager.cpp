@@ -824,15 +824,15 @@ GUIUser::GUIUser() : GameObject(1) {
     strcpy(waitImage, "wait.tga");
     strcpy(cursorImage, "cursor.tga");
     focusControl = 0;
-    field_0x1d8 = 0;
-    field_0x1cc = 0;
-    field_0x1d0 = 0;
+    hoverControl = 0;
+    pendingHoverControl = 0;
+    pendingFocusControl = 0;
     acceptedDevices.Init(1, 1);
     pointerDevice = 0;
-    field_0x38 = 0;
-    field_0x34 = 0;
+    pointerY = 0;
+    pointerX = 0;
     for (i = 0; i < 32; i++)
-        field_0x3c[i] = 0;
+        controlDown[i] = 0;
 }
 
 // 0x00487540
@@ -847,15 +847,15 @@ int GUIUser::UnknownVirtualSlot10(float frameTime) {
 
 // 0x004875c0
 void GUIUser::UpdateFocus(int force) {
-    if (field_0x1d0) {
-        MoveFocus(field_0x1d0, 0);
-        field_0x1cc = 0;
-        field_0x1d0 = 0;
+    if (pendingFocusControl) {
+        MoveFocus(pendingFocusControl, 0);
+        pendingHoverControl = 0;
+        pendingFocusControl = 0;
         return;
     }
-    if (field_0x1cc || force) {
-        SetHoverControl(field_0x1cc, 0);
-        field_0x1cc = 0;
+    if (pendingHoverControl || force) {
+        SetHoverControl(pendingHoverControl, 0);
+        pendingHoverControl = 0;
     }
 }
 
@@ -863,8 +863,8 @@ void GUIUser::UpdateFocus(int force) {
 int GUIUser::UnknownVirtualSlot15() {
     GameObject::UnknownVirtualSlot15();
     if (pointerDevice) {
-        field_0x34 = pointerDevice->pointerPosition.x;
-        field_0x38 = pointerDevice->pointerPosition.y;
+        pointerX = pointerDevice->pointerPosition.x;
+        pointerY = pointerDevice->pointerPosition.y;
     }
     return 1;
 }
@@ -893,11 +893,11 @@ void GUIUser::ReleaseToolTip() {
 
 // 0x00487730
 int GUIUser::UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
-    if (field_0x1cc && strstr(field_0x1cc->field_0x28, "UIDDL"))
+    if (pendingHoverControl && strstr(pendingHoverControl->field_0x28, "UIDDL"))
         return 0;
     if (previous)
-        *previous = field_0x1cc;
-    field_0x1cc = control;
+        *previous = pendingHoverControl;
+    pendingHoverControl = control;
     if (update)
         UpdateFocus(1);
     return 1;
@@ -905,12 +905,12 @@ int GUIUser::UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl
 
 // 0x00487790
 int GUIUser::UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
-    if (field_0x1d0 && strstr(field_0x1d0->field_0x28, "UIDDL"))
+    if (pendingFocusControl && strstr(pendingFocusControl->field_0x28, "UIDDL"))
         return 0;
     if (previous)
-        *previous = field_0x1d0;
-    field_0x1cc = control;
-    field_0x1d0 = control;
+        *previous = pendingFocusControl;
+    pendingHoverControl = control;
+    pendingFocusControl = control;
     if (update)
         UpdateFocus(1);
     return 1;
@@ -920,14 +920,14 @@ int GUIUser::UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl
 int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous) {
     int result = 1;
 
-    if (control && control != field_0x1d8)
+    if (control && control != hoverControl)
         result = control->UnknownVirtualSlot31();
     if (result) {
-        if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
-            field_0x1d8->UnknownVirtualSlot32(control);
+        if (hoverControl && !hoverControl->field_0x25_bit3 && hoverControl != control)
+            hoverControl->UnknownVirtualSlot32(control);
         if (previous)
-            *previous = field_0x1d8;
-        field_0x1d8 = control;
+            *previous = hoverControl;
+        hoverControl = control;
     }
     return result;
 }
@@ -937,16 +937,16 @@ int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** pre
 int GUIUser::MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous) {
     int result = 1;
 
-    if (control && control != field_0x1d8)
+    if (control && control != hoverControl)
         result = control->UnknownVirtualSlot31();
     if (result) {
-        if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
-            field_0x1d8->UnknownVirtualSlot32(control);
+        if (hoverControl && !hoverControl->field_0x25_bit3 && hoverControl != control)
+            hoverControl->UnknownVirtualSlot32(control);
         if (focusControl && !focusControl->field_0x25_bit3 && focusControl != control)
             focusControl->UnknownVirtualSlot33(control);
         if (previous)
             *previous = focusControl;
-        field_0x1d8 = control;
+        hoverControl = control;
         focusControl = control;
         if (g_TrackGame->display->freezeFrameIndex) {
             if (control->controlType == 11) {
