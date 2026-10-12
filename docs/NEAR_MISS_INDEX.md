@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 150, c 106, total 257. The three class (a) functions of the
+Counts: a 1, b 149, c 107, total 257. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -111,7 +111,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 51/555 | b | 35 code diffs: retail lacks `fld [eax + 8]`; retail adds `mov ebx, [esp + N] ; mov ecx, [esp + N]`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 258/1578 | b | 87 code diffs: retail adds `xor ebx, ebx`; retail lacks `xor ebp, ebp`; slot order differs |
-| krusty2/vehicle/Vehicle | `0x00526fa0` | 96/1161 | b | 21 code diffs: retail lacks `xor ecx, ecx`; `mov [esp + N], ebp` vs `mov [esp + N], ebx`; slot order differs |
+| krusty2/vehicle/Vehicle | `0x00526fa0` | 1134/1161 | c | frame and slots match; `total = 0` stored from ebp (active) not ebx, `dec ebp` one instruction early, share.y copied before the share.z `fstp` in the blend loops |
 | krusty2/vehicle/Vehicle | `0x005276d0` | 496/523 | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 349/870 | b | 25 code diffs: `jne @99` vs `jne @98 ; mov [esp + N], 0 ; mov edx, [~`; `lea edx, [esi + 0x120]` vs `mov [esi + 0x12c], 0`; slots differ |
 | krusty2/vehicle/Vehicle | `0x00527e30` | 770/831 | c | frame and slots match; the prologue's kVec3Zero copies use edx and load `out` into esi first (retail: esi as the copy temp, then esi = `out`, edi = its copy) |

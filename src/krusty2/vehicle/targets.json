@@ -636,7 +636,7 @@
     "target_va": "0x00526fa0",
     "target_size": 1161,
     "expect": "partial",
-    "notes": "8.8% (1155/1161). Inverse-distance blend of *arg over active contacts/wheels. First divergence +0x2a: branch distance (frame 0x214 matches); retail keeps the share temp at esp+0x10 and running total at 0x1c (we swap them) and the x87 term order of the squared-distance sum differs.",
+    "notes": "1134/1161 strict. Inverse-distance blend of *arg over active contacts/wheels. Fixed by uninitialised last, total declared before share, (dy*dy + dx*dx) + dz*dz, total zeroed before active, and the single-wheel branch zeroing the share temporary. Left: total = 0 stored from ebp (active) not ebx, `dec ebp` one instruction early, share.y copied before the share.z fstp in the three blend loops, and the single-wheel zero registers (edx/edi) swapped. Tried: active-- before/after the weight, VehScale into share or directly, x/y/z and chained zero orders.",
     "bindings": "Vehicle.bindings.json"
   },
   {

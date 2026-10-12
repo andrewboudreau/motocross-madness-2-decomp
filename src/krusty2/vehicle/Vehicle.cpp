@@ -270,6 +270,9 @@ void Vehicle::UnknownVirtualSlot43()
 // weight = 1 - dist_i / sum(dist), so the nearest contact takes the biggest share.
 // Wheel mode: field_0x430 gives every wheel its stored weight (+0x294); otherwise the same
 // blending as for contacts using the wheels' contact points, or a single lead wheel.
+// Retail leaves `last` uninitialised (its slot is the squared-distance temporary), declares
+// the running total before the share temporary, and the single-wheel branch zeroes the share
+// temporary in the loop (z, y, x) instead of copying kVec3Zero like the no-contact branch.
 static inline Vec3 VehScale(const Vec3& v, float k)
 {
     Vec3 r;
@@ -284,7 +287,7 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
     float dx = a.x - b.x;
     float dy = a.y - b.y;
     float dz = a.z - b.z;
-    float d2 = dx * dx + dy * dy + dz * dz;
+    float d2 = (dy * dy + dx * dx) + dz * dz;
     if (d2 == 1.0f)
         return 1.0f;
     return FastSqrt(d2);
@@ -292,17 +295,17 @@ static inline float VehDistance(const Vec3& a, const Vec3& b)
 
 void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
 {
-    Vec3 share;
     float total;
+    Vec3 share;
     float dist[128];
     int i;
     int active;
 
     contactTotal = touchingPointCount + wheelsInContact;
     if (pointsTouching) {
-        active = 0;
         total = 0.0f;
-        int last = 0;
+        active = 0;
+        int last;
         for (i = 0; i < collisionPointCount; i++) {
             VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
             if (c->contactActive) {
@@ -371,7 +374,10 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     } else if (wheelsInContact == 1) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            wheelList[i]->appliedShare = kVec3Zero;
+            share.z = 0.0f;
+            share.y = 0.0f;
+            share.x = 0.0f;
+            wheelList[i]->appliedShare = share;
         }
         primaryWheel->loadWeight = 1.0f;
         primaryWheel->appliedShare = *arg;
