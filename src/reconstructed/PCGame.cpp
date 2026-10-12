@@ -201,7 +201,7 @@ int PCGame::StartUp(char* message) {
     }
     ProfileDisplays();
     display = g_UnknownDisplays68a754[0];
-    int flag = field_0x2d5_bit3 && !field_0x544;
+    int flag = useZBuffer && !field_0x544;
     int useLast = GetRegistryFlag("UseLastVideoCard", 0);
     display = UnknownFunction4ccd60(flag, useLast, &field_0x2d0);
     if (!display) {
@@ -211,15 +211,15 @@ int PCGame::StartUp(char* message) {
     if (field_0x2d0)
         deviceGuid = g_UnknownBladeDevice556040;
     sprintf(name, "DriverInfo\\%s\\AllowDither", display->driverGuidText);
-    field_0x2d4_bit3 = GetRegistryFlag(name, field_0x2d4_bit3);
+    allowDither = GetRegistryFlag(name, allowDither);
     sprintf(name, "DriverInfo\\%s\\AllowMipMapping", display->driverGuidText);
-    field_0x2d4_bit4 = GetRegistryFlag(name, field_0x2d4_bit4);
+    allowMipMapping = GetRegistryFlag(name, allowMipMapping);
     sprintf(name, "DriverInfo\\%s\\AllowBiLinear", display->driverGuidText);
-    field_0x2d4_bit5 = GetRegistryFlag(name, field_0x2d4_bit5);
+    allowBilinear = GetRegistryFlag(name, allowBilinear);
     sprintf(name, "DriverInfo\\%s\\AllowSortIndependantAntiAliasing", display->driverGuidText);
-    field_0x2d4_bit6 = GetRegistryFlag(name, field_0x2d4_bit6);
+    allowSortIndependentAntialiasing = GetRegistryFlag(name, allowSortIndependentAntialiasing);
     sprintf(name, "DriverInfo\\%s\\AllowTriLinear", display->driverGuidText);
-    field_0x2d4_bit7 = GetRegistryFlag(name, field_0x2d4_bit7);
+    allowTrilinear = GetRegistryFlag(name, allowTrilinear);
     int joystick = UnknownFunction4cd610(GetRegistryFlag("UseLastController", 0));
     if (joystick >= 0) {
         controlInterface->activeJoystickIndex = joystick;
@@ -248,7 +248,7 @@ int PCGame::UnknownVirtualSlot5() {
         if ((display && display->primarySurface &&
              display->primarySurface->IsLost() &&
              display->primarySurface->Restore()) ||
-            (field_0x2d5_bit3 && renderTarget && PCTarget()->zbuffer &&
+            (useZBuffer && renderTarget && PCTarget()->zbuffer &&
              PCTarget()->zbuffer->IsLost() &&
              PCTarget()->zbuffer->Restore()))
             return 0;
@@ -269,14 +269,14 @@ int PCGame::UnknownVirtualSlot6() {
 
 // 0x004c0340
 int PCGame::UnknownVirtualSlot35(int value) {
-    if (field_0x2d5_bit0)
+    if (inputSuspended)
         return 1;
     return rootObject->UnknownVirtualSlot20(value);
 }
 
 // 0x004c0370
 int PCGame::UnknownVirtualSlot36(int value) {
-    if (field_0x2d5_bit0)
+    if (inputSuspended)
         return 1;
     return rootObject->UnknownVirtualSlot21(value);
 }
@@ -397,16 +397,16 @@ int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
 // device capabilities.
 int PCGame::UnknownVirtualSlot7() {
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_DITHERENABLE,
-                                    field_0x2d4_bit3 && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_DITHER), 1);
+                                    allowDither && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_DITHER), 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 0, 1);
-    if (field_0x2d4_bit6 && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT))
+    if (allowSortIndependentAntialiasing && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT))
         renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, field_0x2d5_bit3, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, field_0x2d5_bit3, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, useZBuffer, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, useZBuffer, 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
     renderTarget->UnknownVirtualSlot10(7, 0);
     if (field_0x2d0) {
@@ -425,13 +425,13 @@ int PCGame::UnknownVirtualSlot7() {
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 1);
     renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 1);
-    magFilter = field_0x2d4_bit5 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFG_LINEAR
+    magFilter = allowBilinear && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFG_LINEAR
                                                                                                : D3DTFG_POINT;
-    minFilter = field_0x2d4_bit5 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFN_LINEAR
+    minFilter = allowBilinear && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFN_LINEAR
                                                                                                : D3DTFN_POINT;
     mipFilter = D3DTFP_NONE;
-    if (field_0x2d4_bit4) {
-        if (field_0x2d4_bit7 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEARMIPLINEAR))
+    if (allowMipMapping) {
+        if (allowTrilinear && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEARMIPLINEAR))
             mipFilter = D3DTFP_LINEAR;
         else
             mipFilter = D3DTFP_POINT;
@@ -465,7 +465,7 @@ RenderTarget* PCGame::UnknownVirtualSlot31() {
     UnknownSurfaceInterface* surface =
         display->renderSurface ? display->renderSurface : display->backBuffer;
     RenderTarget* target = (new(__FILE__, 984) PCRenderTarget)
-        ->InitializeRenderTarget(display, &deviceGuid, surface, field_0x2d5_bit3, frames);
+        ->InitializeRenderTarget(display, &deviceGuid, surface, useZBuffer, frames);
     if (!target)
         return 0;
     if (field_0x2d4_bit1) {

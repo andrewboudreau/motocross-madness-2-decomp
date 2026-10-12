@@ -120,15 +120,15 @@ public:
     unsigned char field_0x2d4_bit0 : 1;       // "AllowFreezeCamera"; slot 14 key handling
     unsigned char field_0x2d4_bit1 : 1;
     unsigned char field_0x2d4_bit2 : 1;       // registry "TestKey" (debug input, overlay)
-    unsigned char field_0x2d4_bit3 : 1;
-    unsigned char field_0x2d4_bit4 : 1;
-    unsigned char field_0x2d4_bit5 : 1;
-    unsigned char field_0x2d4_bit6 : 1;
-    unsigned char field_0x2d4_bit7 : 1;
-    unsigned char field_0x2d5_bit0 : 1;       // slots 11 and 13
+    unsigned char allowDither : 1;            // +0x2d4 bit 3: "DriverInfo\<guid>\AllowDither" (D3DRENDERSTATE_DITHERENABLE)
+    unsigned char allowMipMapping : 1;        // +0x2d4 bit 4: "AllowMipMapping" (mip filter)
+    unsigned char allowBilinear : 1;          // +0x2d4 bit 5: "AllowBiLinear" (linear mag/min filters)
+    unsigned char allowSortIndependentAntialiasing : 1; // +0x2d4 bit 6: "AllowSortIndependantAntiAliasing"
+    unsigned char allowTrilinear : 1;         // +0x2d4 bit 7: "AllowTriLinear" (linear mip filter)
+    unsigned char inputSuspended : 1;         // +0x2d5 bit 0: set by slot 11; slots 13/14 and PCGame 35/36 then ignore input
     unsigned char field_0x2d5_bit1 : 1;       // set on shutdown
     unsigned char field_0x2d5_bit2 : 1;       // set by the constructor
-    unsigned char field_0x2d5_bit3 : 1;       // set by the constructor
+    unsigned char useZBuffer : 1;             // +0x2d5 bit 3: set by the constructor; Z enable/write and the render target's z-buffer
     unsigned char field_0x2d5_bits : 4;
     unsigned char field_0x02d6[2];
     unsigned int field_0x2d8;                 // time stamps (0x00468880)

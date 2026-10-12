@@ -67,7 +67,7 @@ static inline void DecodeString(char* text) {
 // 0x00467990
 Game::Game() {
     UnknownFunction460ad0();
-    field_0x2d5_bit3 = 1;
+    useZBuffer = 1;
     field_0x2d4_bit2 = 0;
     field_0x2d4_bit1 = 1;
     soundInterface = 0;
@@ -86,14 +86,14 @@ Game::Game() {
     field_0x2dc = 0;
     field_0x2d8 = 0;
     field_0x2e0 = 1.0f;
-    field_0x2d4_bit3 = 1;
-    field_0x2d4_bit4 = 1;
-    field_0x2d4_bit5 = 1;
-    field_0x2d4_bit6 = 0;
-    field_0x2d4_bit7 = 0;
+    allowDither = 1;
+    allowMipMapping = 1;
+    allowBilinear = 1;
+    allowSortIndependentAntialiasing = 0;
+    allowTrilinear = 0;
     field_0x1c4 = 0;
     field_0x1c8 = 0;
-    field_0x2d5_bit0 = 0;
+    inputSuspended = 0;
     field_0x2d5_bit1 = 0;
     field_0x2d5_bit2 = 1;
     field_0x2e4 = 1.0f;
@@ -152,7 +152,7 @@ int Game::UnknownVirtualSlot8() {
     now = UnknownFunction4bfa80();
     int renderPre3D = now - last;
     int render3D = 0;
-    if (field_0x2d5_bit3) {
+    if (useZBuffer) {
         if (!renderTarget->UnknownVirtualSlot1())
             goto failed;
         renderTarget->UnknownVirtualSlot12(0, 0);
@@ -279,7 +279,7 @@ void Game::UnknownFunction468880() {
 int Game::UnknownVirtualSlot11(int value) {
     if (network)
         return 0;
-    field_0x2d5_bit0 = value;
+    inputSuspended = value;
     rootObject->UnknownVirtualSlot16(value);
     return 1;
 }
@@ -289,19 +289,19 @@ int Game::UnknownVirtualSlot12(int value) {
     return rootObject->UnknownVirtualSlot19(value) != 0;
 }
 
-// 0x00468900: releases go to the interface unless bit 0 of +0x2d5 is set.
+// 0x00468900: releases go to the interface unless inputSuspended is set.
 int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (field_0x2d5_bit0)
+    if (inputSuspended)
         return 1;
     return rootObject->UnknownVirtualSlot22(event, entry) != 0;
 }
 
-// 0x00468930: presses go to the interface unless bit 0 of +0x2d5 is set.
+// 0x00468930: presses go to the interface unless inputSuspended is set.
 // Control 0x20 also drives the +0x38 object; with bit 0 of +0x2d4, Ctrl+F
 // (key 0x21 with modifier 0xc) toggles +0x1c4 and E (0x12) clears it,
 // setting +0x1c8.
 int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (field_0x2d5_bit0)
+    if (inputSuspended)
         return 1;
     if (field_0x2d4_bit2 && debugOverlay && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
         if (debugOverlay->field_0x25_bit0) {
