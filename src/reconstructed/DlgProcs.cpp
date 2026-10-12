@@ -1370,9 +1370,9 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
             EndDialog(0);
             if (g_TrackGame->network) {
                 UnknownLoadFailedMessage message;
-                message.field_0x04 = g_TrackGame->network->localPlayer;
+                message.playerId = g_TrackGame->network->localPlayer;
                 g_TrackGame->network->Send(0xcc, &message, sizeof(message),
-                                                                        message.field_0x04, 0);
+                                                                        message.playerId, 0);
                 EndNetworkGame();
             }
             g_TrackGame->ui->UnknownFunction499b00();

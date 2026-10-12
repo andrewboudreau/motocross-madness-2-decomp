@@ -234,7 +234,7 @@ extern int g_UnknownGlobal59ae88;
 // load.
 struct UnknownLoadFailedMessage {
     int field_0x00;
-    int field_0x04;                           // the sender's player id
+    int playerId;                             // +0x04: the sender's player id
 };
 
 // RTTI: LoadingDlg : UIDialog (vtable 0x00554f34; 0x7f5c bytes): loads the
