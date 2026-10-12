@@ -93,9 +93,9 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     digitCounter = 0;
     raceTrack = 0;
     gateList = 0;
-    field_0x14c = 0;
-    field_0x150 = 0;
-    field_0x154 = 0;
+    targetRacer = 0;
+    targetEntry = 0;
+    targetCaster = 0;
     startCountdown = 0;
     isRacing = false;
     restartPending = false;
@@ -152,8 +152,8 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     forceHighLod = g_TrackGame->GetRegistryFlag("ForceHighLOD", 0);
     field_0x3fd = 1;
     lodDebugPage = -1;
-    field_0x0b0 = 0xff;
-    field_0x0ac = 0;
+    targetKind = 0xff;
+    targetIndex = 0;
     objectPicker = 0;
     field_0x034 = 0;
 }
@@ -493,7 +493,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             field_0x160 = 0;
                             raceScene->RestartEntry(field_0x068, 0.0f, 0, 0);
                             field_0x064->UnknownVirtualSlot4();
-                            if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x068) {
+                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == field_0x068) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x064->collisionObject != 0) {
@@ -529,7 +529,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         if (field_0x06c != 0) {
                             raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
                             field_0x06c->UnknownVirtualSlot4();
-                            if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x070) {
+                            if (!UnknownFunctionCameraView()->followingRacer && targetEntry == field_0x070) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x06c->collisionObject != 0) {
@@ -651,7 +651,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             char name[0x20];
             UnknownBikeRaceModel* model;
             int pass = 0;
-            if ((signed char)field_0x0b0 < 0) {
+            if ((signed char)targetKind < 0) {
                 strncpy(name,
                         ((UnknownBikeRaceUiModel*)g_TrackGame->ui->manufacturers)
                             [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes)
@@ -660,14 +660,14 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 name[0x14] = 0;
                 raceScene->ResolveSltPath(name);
                 model = localRacer->modelNode;
-            } else if (field_0x0b0 == 0) {
-                strncpy(name, raceScene->staticModels->casters[field_0x0ac].fileName, 0x14);
+            } else if (targetKind == 0) {
+                strncpy(name, raceScene->staticModels->casters[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
-                model = (UnknownBikeRaceModel*)raceScene->staticModels->casters[field_0x0ac].model;
+                model = (UnknownBikeRaceModel*)raceScene->staticModels->casters[targetIndex].model;
             } else {
-                strncpy(name, raceScene->animationTable->entries[field_0x0ac].fileName, 0x14);
+                strncpy(name, raceScene->animationTable->entries[targetIndex].fileName, 0x14);
                 name[0x14] = 0;
-                UnknownSceneEntry* entry = &raceScene->animationTable->entries[field_0x0ac];
+                UnknownSceneEntry* entry = &raceScene->animationTable->entries[targetIndex];
                 if (entry->keyFramed) {
                     model = ((UnknownBikeRaceRider*)entry->character)->modelNode;
                 } else {
@@ -684,7 +684,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 g_TrackGame->debugOverlay->Print(lodDebugPage, "Current LOD %d out of %d",
                                                                         model->currentDetailLevel + 1, model->detailLevelCount);
                 g_TrackGame->debugOverlay->Print(lodDebugPage, "Number of Faces = %d", faces);
-                if ((signed char)field_0x0b0 < 0) {
+                if ((signed char)targetKind < 0) {
                     if (g_UnknownGlobal567a88 > 5) {
                         if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
                             g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
@@ -703,7 +703,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     int down = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
                     int row = g_UnknownGlobal567a88 - 1;
                     if (down || up) {
-                        if ((signed char)field_0x0b0 < 0) {
+                        if ((signed char)targetKind < 0) {
                             if (g_UnknownGlobal567a88 > 5) {
                                 if (pass == 1) {
                                     row = g_UnknownGlobal567a88 - 8;
@@ -767,7 +767,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         lodDebugPage, "AutoLOD#3 %.2f", model->detailLevelCount > 4 ? model->detailDistances[3] : 0.0f);
                     g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 1);
                 }
-                if ((signed char)field_0x0b0 >= 0) {
+                if ((signed char)targetKind >= 0) {
                     break;
                 }
                 COPY_TEXT(name, "rider.slt", 0x20);
@@ -1038,7 +1038,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     g_TrackGame->debugOverlay->SetRowHighlight(
                         lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                     g_UnknownGlobal567a88++;
-                    if ((signed char)field_0x0b0 < 0) {
+                    if ((signed char)targetKind < 0) {
                         if (g_UnknownGlobal567a88 > 12) {
                             g_UnknownGlobal567a88 = 2;
                         } else if (g_UnknownGlobal567a88 > 5 && g_UnknownGlobal567a88 < 9) {
@@ -1059,13 +1059,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                             if (caster->field_0x00 & 1) {
                                 if (picked == caster->field_0x08->field_0x128) {
                                     UnknownFunctionCameraView()->followingRacer = 1;
-                                    field_0x154 = i;
+                                    targetCaster = i;
                                     NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
                             } else if (picked == caster->field_0x0c) {
                                 UnknownFunctionCameraView()->followingRacer = 1;
-                                field_0x154 = i;
+                                targetCaster = i;
                                 NextCameraTarget(1, 0, 0);
                                 return 1;
                             }
@@ -1077,13 +1077,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                             if (entry->keyFramed) {
                                 if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->collisionObject) {
                                     UnknownFunctionCameraView()->followingRacer = 1;
-                                    field_0x150 = i;
+                                    targetEntry = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
                             } else if (picked == ((UnknownBikeRacePickObject*)entry->proceduralObject)->field_0x3c) {
                                 UnknownFunctionCameraView()->followingRacer = 1;
-                                field_0x150 = i;
+                                targetEntry = i;
                                 NextCameraTarget(1, 0, 1);
                                 return 1;
                             }

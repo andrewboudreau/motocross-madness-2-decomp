@@ -944,8 +944,8 @@ public:
     int field_0x078;
     float field_0x07c[11];
     int lodDebugPage;                         // +0x0a8
-    int field_0x0ac;
-    unsigned char field_0x0b0;
+    int targetIndex;                          // +0xac caster or scene entry index the camera targets
+    unsigned char targetKind;                 // +0xb0 camera target: 0xff a racer, 0 a static caster, 1 a scene entry
     unsigned char field_0x0b1[0xb4 - 0xb1];
     ObjectPicker* objectPicker;                // debug object picker
     int field_0x0b8;
@@ -957,9 +957,9 @@ public:
     UnknownBikeRaceNode finishProbe;          // finish probe
     int hasStartProbe;                        // +0x144 LoadTrack found the start probe (debug draw)
     int hasFinishProbe;                       // +0x148 LoadTrack found the finish probe (debug draw)
-    int field_0x14c;
-    int field_0x150;
-    int field_0x154;
+    int targetRacer;                          // +0x14c racer the camera cycles to (0 local, then the AI racers)
+    int targetEntry;                          // +0x150 scene animation entry the camera cycles to
+    int targetCaster;                         // +0x154 static model caster the camera cycles to
     int racerCount;                          // racer count
     float startCountdown;                     // +0x15c: seconds until the start (8.2 with the +0x6c gate, else 5.2)
     float field_0x160;                        // seconds until +0x64 is shown (slot 10)
