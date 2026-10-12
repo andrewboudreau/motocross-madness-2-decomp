@@ -69,7 +69,7 @@ Game::Game() {
     UnknownFunction460ad0();
     useZBuffer = 1;
     field_0x2d4_bit2 = 0;
-    field_0x2d4_bit1 = 1;
+    fullScreen = 1;
     soundInterface = 0;
     network = 0;
     display = 0;

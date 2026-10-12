@@ -152,7 +152,7 @@ int GameCursor::UnknownVirtualSlot15() {
         field_0x54 = s_mouse.x - client.left;
         field_0x58 = s_mouse.y - client.top;
 
-        if (g_TrackGame->field_0x2d4_bit1) {
+        if (g_TrackGame->fullScreen) {
             field_0x54 = max(0, min(field_0x54, client.right));
             field_0x58 = max(0, min(field_0x58, client.bottom));
         } else if (field_0x54 < 0 || field_0x58 < 0 || field_0x54 > area.right || field_0x58 > area.bottom) {

@@ -177,7 +177,7 @@ int PCGame::StartUp(char* message) {
     } else {
         deviceGuid = IID_IDirect3DHALDevice;
     }
-    field_0x2d4_bit1 = GetRegistryFlag("FullScreen", field_0x2d4_bit1);
+    fullScreen = GetRegistryFlag("FullScreen", fullScreen);
     if (!UnknownVirtualSlot37()) {
         if (message)
             LoadStringA(resourceInstance, 0x13d6, message, 0x100);
@@ -242,7 +242,7 @@ int PCGame::UnknownVirtualSlot15() {
 // restores lost surfaces and runs the root object's slot 18.
 int PCGame::UnknownVirtualSlot5() {
     if (display && GetActiveWindow() == windowHandle) {
-        if (field_0x2d4_bit1)
+        if (fullScreen)
             while (ShowCursor(0) >= 0)
                 ;
         if ((display && display->primarySurface &&
@@ -262,7 +262,7 @@ int PCGame::UnknownVirtualSlot5() {
 int PCGame::UnknownVirtualSlot6() {
     if (rootObject)
         rootObject->UnknownVirtualSlot17();
-    if (field_0x2d4_bit1)
+    if (fullScreen)
         ShowCursor(1);
     return 1;
 }
@@ -312,7 +312,7 @@ int PCGame::UnknownVirtualSlot19(int mode) {
     Camera* camera = 0;
     if (renderTarget)
         camera = renderTarget->field_0x08;
-    if (field_0x2d4_bit1) {
+    if (fullScreen) {
         if (mode != display->currentDisplayMode) {
             if (renderTarget) {
                 delete renderTarget;
@@ -349,7 +349,7 @@ void PCGame::SetWindowRect(const UnknownRect* rect) {
 // memory cannot hold with "MinimumTextureMB" left over.
 int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
     int reserve = g_TrackGame->GetRegistryInt("MinimumTextureMB", 2) << 20;
-    if (field_0x2d4_bit1 && !display->keepAllDisplayModes) {
+    if (fullScreen && !display->keepAllDisplayModes) {
         int i;
         if (GetRegistryFlag("HighestRefreshOnly", 1)) {
             for (i = 0; i < display->displayModeCount; i++) {
@@ -448,7 +448,7 @@ int PCGame::UnknownVirtualSlot7() {
 
 // 0x004c0760
 int PCGame::LimitDisplayModes(UnknownDisplay* display, int width, int height) {
-    if (field_0x2d4_bit1 && !display->keepAllDisplayModes) {
+    if (fullScreen && !display->keepAllDisplayModes) {
         for (int i = 0; i < display->displayModeCount; i++) {
             UnknownDisplayMode* mode = &display->displayModes[i];
             if (mode->width > width || mode->height > height)
@@ -468,7 +468,7 @@ RenderTarget* PCGame::UnknownVirtualSlot31() {
         ->InitializeRenderTarget(display, &deviceGuid, surface, useZBuffer, frames);
     if (!target)
         return 0;
-    if (field_0x2d4_bit1) {
+    if (fullScreen) {
         display->field_0x58 = display->displayModes[display->currentDisplayMode].field_0x1c;
         display->field_0x5c = display->displayModes[display->currentDisplayMode].field_0x20;
     } else {
@@ -507,7 +507,7 @@ int PCGame::UnknownVirtualSlot37() {
 // the cursor in full screen) and runs slot 33.
 int PCGame::UnknownVirtualSlot32() {
     GetWindowRect(windowHandle, &windowRect);
-    if (field_0x2d4_bit1) {
+    if (fullScreen) {
         if (!display->SetFullscreenCooperativeLevel())
             return 0;
         while (ShowCursor(0) >= 0)
@@ -631,7 +631,7 @@ int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
     display->use8BitTextures = GetRegistryFlag(name, 1);
     sprintf(name, "DriverInfo\\%s\\IsAGP", display->driverGuidText);
     display->isAGP = GetRegistryFlag(name, 0);
-    if (field_0x2d4_bit1)
+    if (fullScreen)
         sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", display->driverGuidText);
     else
         sprintf(name, "DriverInfo\\%s\\DisabledWindowed", display->driverGuidText);

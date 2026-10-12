@@ -132,7 +132,7 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         dropDown->SetTextAlign(0x12);
         UIListBox* list = dropDown->listPart;
         int i = 0;
-        if (g_TrackGame->field_0x2d4_bit1) {
+        if (g_TrackGame->fullScreen) {
             if (g_TrackGame->field_0x2d0) {
                 for (; i < g_TrackGame->display->displayModeCount; i++) {
                     UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];

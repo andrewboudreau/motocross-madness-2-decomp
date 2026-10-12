@@ -789,7 +789,7 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     kind = inputDevice->deviceKind;
     if (kind) {
-        if (g_TrackGame->field_0x2d4_bit1) {
+        if (g_TrackGame->fullScreen) {
             POINT* position = &pointerPosition;
             position->x = (int)bindingX.field_0x24;
             position->y = (int)bindingY.field_0x24;
@@ -1073,7 +1073,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
         userGui->guiBackground->UnknownFunction404c80();
     if (userCursor || !pointerDevice)
         return;
-    if (g_TrackGame->field_0x2d4_bit1) {
+    if (g_TrackGame->fullScreen) {
         if (g_TrackGame->renderTarget->field_0x28 > 8 ||
             (g_TrackGame->renderTarget->field_0x28 == 8 && userGui->guiPalette)) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
