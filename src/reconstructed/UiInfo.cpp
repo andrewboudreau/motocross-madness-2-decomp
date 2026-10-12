@@ -384,13 +384,13 @@ void TrackGameMode::LoadControllerChoice() {
     if (!g_TrackGame->field_0x33fc)
         return;
     sprintf(path, "%s\\%s\\%s", "ui\\profile", field_0x00, "control.ctl");
-    g_TrackGame->field_0x33fc->UnknownFunction448990(path);
+    g_TrackGame->field_0x33fc->LoadControlFile(path);
     size = 0x80;
     g_TrackGame->GetRegistryString("UseControllerId", "", controller, &size);
     g_TrackGame->GetRegistryString("LastControllerId", "", last, &size);
     if (!g_TrackGame->GetRegistryFlag("PresetSelected", 0) || strcmp(last, controller))
-        g_TrackGame->field_0x33fc->UnknownFunction449220();
-    g_TrackGame->field_0x33fc->UnknownFunction448e90(path, -1);
+        g_TrackGame->field_0x33fc->ChooseDefaultDevice();
+    g_TrackGame->field_0x33fc->ApplyDevice(path, -1);
 }
 
 // 0x00523130: saves the profile's control file.
@@ -407,7 +407,7 @@ void TrackGameMode::SaveControllerChoice() {
     g_TrackGame->GetRegistryString("UseControllerId", "", controller, &size);
     g_TrackGame->SetRegistryString("LastControllerId", controller);
     sprintf(path, "%s\\%s\\%s", "ui\\profile", field_0x00, "control.ctl");
-    g_TrackGame->field_0x33fc->UnknownFunction4489e0(path);
+    g_TrackGame->field_0x33fc->SaveControlFile(path);
 }
 
 // 0x005231f0 (TrackGame slot 4): loads the profile; 1 when it has a name.

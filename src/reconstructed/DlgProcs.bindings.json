@@ -245,7 +245,7 @@
   "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?UnknownFunction42f190@Camera@@QAEHHHHH@Z": "0x0042f190",
   "?UnknownFunction444c70@UnknownModelTexture@@QAEXHPBDPAPAVTextureMapManager@@@Z": "0x00444c70",
-  "?UnknownFunction448e90@UnknownTrackGameObject33fc@@QAEXPBDH@Z": "0x00448e90",
+  "?ApplyDevice@UnknownTrackGameObject33fc@@QAEXPBDH@Z": "0x00448e90",
   "?UnknownFunction44a1d0@DirectoryList@@QAEXPBD@Z": "0x0044a1d0",
   "?UnknownFunction44a220@DirectoryList@@QAEXPBDH@Z": "0x0044a220",
   "?UnknownFunction44a4c0@DirectoryList@@QAEHPAD@Z": "0x0044a4c0",

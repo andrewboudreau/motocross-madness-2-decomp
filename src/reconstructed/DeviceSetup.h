@@ -12,11 +12,11 @@ void GetDXVersion(unsigned long* dxVersion, unsigned long* dxPlatform, unsigned 
 // Control-file helpers in the unattributed range 0x0047b670..0x0047bb20:
 // each joins the current directory and `file` ("%s\\%s") and calls
 // GetPrivateProfileString / GetPrivateProfileInt / WritePrivateProfileString.
-void UnknownFunction47b930(const char* section, const char* key, const char* defaultValue,
+void ReadIniString(const char* section, const char* key, const char* defaultValue,
                            char* buffer, int size, const char* file);
-int UnknownFunction47b9e0(const char* section, const char* key, int defaultValue,
+int ReadIniInt(const char* section, const char* key, int defaultValue,
                           const char* file);
-void UnknownFunction47ba80(const char* section, const char* key, const char* value,
+void WriteIniString(const char* section, const char* key, const char* value,
                            const char* file);
 
 // 0x00449270: "<resource 0x1406> <GetKeyNameText>" for DirectInput scan code

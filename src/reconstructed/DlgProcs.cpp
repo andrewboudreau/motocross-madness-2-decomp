@@ -1450,7 +1450,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     g_TrackGame->mode.LoadControllerChoice();
     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
     g_TrackGame->mode.SaveProfile();
-    g_TrackGame->field_0x33fc->UnknownFunction448e90(control, -1);
+    g_TrackGame->field_0x33fc->ApplyDevice(control, -1);
     g_TrackGame->UnknownFunction521a30();
     event->dialog->EndDialog(0x1e);
     event->handled = 1;

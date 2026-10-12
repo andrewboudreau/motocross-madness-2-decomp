@@ -520,25 +520,25 @@ class UnknownTrackGameObject33fc {
 public:
     UnknownTrackGameObject33fc();             // 0x00448960
     // OptionProcs.cpp's control mapping dialog (provisional roles).
-    void UnknownFunction448c90(int device, int row, int kind, int code); // 0x00448c90
-    int UnknownFunction448cc0(int row, int kind, int code, int* other);  // 0x00448cc0
-    void UnknownFunction448e90(const char* path, int a);                 // 0x00448e90
-    void UnknownFunction448990(const char* path);                        // 0x00448990 (uiinfo.cpp 0x00523000)
-    void UnknownFunction4489e0(const char* path);                        // 0x004489e0 (uiinfo.cpp 0x00523130)
-    int UnknownFunction449220();                                         // 0x00449220 (uiinfo.cpp 0x00523000)
-    void UnknownFunction449350(int device, int row, char* text);         // 0x00449350
-    int UnknownFunction449380(int kind, int code, char* text);            // 0x00449380
+    void SetAssignment(int device, int row, int kind, int code); // 0x00448c90
+    int FindDuplicateAssignment(int row, int kind, int code, int* other);  // 0x00448cc0
+    void ApplyDevice(const char* path, int device);               // 0x00448e90
+    void LoadControlFile(const char* path);                        // 0x00448990 (uiinfo.cpp 0x00523000)
+    void SaveControlFile(const char* path);                        // 0x004489e0 (uiinfo.cpp 0x00523130)
+    int ChooseDefaultDevice();                                         // 0x00449220 (uiinfo.cpp 0x00523000)
+    void GetAssignmentName(int device, int row, char* text);         // 0x00449350
+    int FormatAssignmentName(int kind, int code, char* text);            // 0x00449380
     // 0x00448a50 / 0x00448bc0: reads / writes "Controller<device>",
     // "Key<row>" of the control file `path`.
-    void UnknownFunction448a50(int device, int row, const char* path);
-    void UnknownFunction448bc0(int device, int row, const char* path);
+    void LoadAssignment(int device, int row, const char* path);
+    void SaveAssignment(int device, int row, const char* path);
     // 0x00448d30: binds an axis binding to the device of `kind`.
-    int UnknownFunction448d30(UnknownControlBinding* binding, int kind, int code, int code2);
+    int BindAxis(UnknownControlBinding* binding, int kind, int code, int code2);
     // 0x00448df0: enters `code` for `control` in TrackGame's control mapping.
-    int UnknownFunction448df0(int control, int code, int kind);
+    int BindButton(int control, int code, int kind);
 
-    int field_0x00;                           // input device (OptionProcs.cpp "InputDeviceDDL")
-    UnknownControlAssignment field_0x04[8][14];  // per input device, per control row
+    int currentDevice;                        // +0x00: input device (OptionProcs.cpp "InputDeviceDDL")
+    UnknownControlAssignment assignments[8][14]; // +0x04: per input device, per control row
 };
 
 // One player reported by 0x004aa670 (0x48 bytes).

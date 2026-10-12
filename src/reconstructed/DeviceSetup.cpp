@@ -23,36 +23,36 @@ UnknownTrackGameObject33fc::UnknownTrackGameObject33fc()
 {
     for (int device = 0; device < 8; device++) {
         for (int row = 0; row < 14; row++) {
-            field_0x04[device][row].kind = -1;
-            field_0x04[device][row].code = -1;
+            assignments[device][row].kind = -1;
+            assignments[device][row].code = -1;
         }
     }
 }
 
 // 0x00448990: reads the current device and every assignment.
-void UnknownTrackGameObject33fc::UnknownFunction448990(const char* path)
+void UnknownTrackGameObject33fc::LoadControlFile(const char* path)
 {
-    field_0x00 = UnknownFunction47b9e0("Setup", "CurrentInputDevice", 0, path);
+    currentDevice = ReadIniInt("Setup", "CurrentInputDevice", 0, path);
     for (int device = 0; device < 8; device++)
         for (int row = 0; row < 14; row++)
-            UnknownFunction448a50(device, row, path);
+            LoadAssignment(device, row, path);
 }
 
 // 0x004489e0: writes the current device and every assignment.
-void UnknownTrackGameObject33fc::UnknownFunction4489e0(const char* path)
+void UnknownTrackGameObject33fc::SaveControlFile(const char* path)
 {
     char value[0x80];
 
-    sprintf(value, "%d", field_0x00);
-    UnknownFunction47ba80("Setup", "CurrentInputDevice", value, path);
+    sprintf(value, "%d", currentDevice);
+    WriteIniString("Setup", "CurrentInputDevice", value, path);
     for (int device = 0; device < 8; device++)
         for (int row = 0; row < 14; row++)
-            UnknownFunction448bc0(device, row, path);
+            SaveAssignment(device, row, path);
 }
 
 // 0x00448a50: an assignment is "<kind digit>,<code>"; "NONE" or empty
 // leaves it unassigned.
-void UnknownTrackGameObject33fc::UnknownFunction448a50(int device, int row, const char* path)
+void UnknownTrackGameObject33fc::LoadAssignment(int device, int row, const char* path)
 {
     char value[0x80];
     char key[0x80];
@@ -61,48 +61,48 @@ void UnknownTrackGameObject33fc::UnknownFunction448a50(int device, int row, cons
 
     sprintf(section, "Controller%d", device);
     sprintf(key, "Key%d", row);
-    UnknownFunction47b930(section, key, "NONE", value, 0x80, path);
+    ReadIniString(section, key, "NONE", value, 0x80, path);
     if (strcmp(value, "NONE") == 0 || strcmp(value, "") == 0) {
-        field_0x04[device][row].kind = -1;
-        field_0x04[device][row].code = 0;
+        assignments[device][row].kind = -1;
+        assignments[device][row].code = 0;
         return;
     }
     sprintf(kind, "%c", value[0]);
-    field_0x04[device][row].kind = atoi(kind);
-    field_0x04[device][row].code = atoi(strchr(value, ',') + 1);
+    assignments[device][row].kind = atoi(kind);
+    assignments[device][row].code = atoi(strchr(value, ',') + 1);
 }
 
 // 0x00448bc0
-void UnknownTrackGameObject33fc::UnknownFunction448bc0(int device, int row, const char* path)
+void UnknownTrackGameObject33fc::SaveAssignment(int device, int row, const char* path)
 {
     char value[0x80];
     char key[0x80];
     char section[0x80];
 
-    if (field_0x04[device][row].kind == -1)
+    if (assignments[device][row].kind == -1)
         strcpy(value, "");
     else
-        sprintf(value, "%d,%d", field_0x04[device][row].kind, field_0x04[device][row].code);
+        sprintf(value, "%d,%d", assignments[device][row].kind, assignments[device][row].code);
     sprintf(section, "Controller%d", device);
     sprintf(key, "Key%d", row);
-    UnknownFunction47ba80(section, key, value, path);
+    WriteIniString(section, key, value, path);
 }
 
 // 0x00448c90
-void UnknownTrackGameObject33fc::UnknownFunction448c90(int device, int row, int kind, int code)
+void UnknownTrackGameObject33fc::SetAssignment(int device, int row, int kind, int code)
 {
-    field_0x04[device][row].kind = kind;
-    field_0x04[device][row].code = code;
+    assignments[device][row].kind = kind;
+    assignments[device][row].code = code;
 }
 
 // 0x00448cc0: whether another row of the current device already has this
 // assignment (its row in `other`).
-int UnknownTrackGameObject33fc::UnknownFunction448cc0(int row, int kind, int code, int* other)
+int UnknownTrackGameObject33fc::FindDuplicateAssignment(int row, int kind, int code, int* other)
 {
-    if (field_0x04[field_0x00][row].kind == kind && field_0x04[field_0x00][row].code == code)
+    if (assignments[currentDevice][row].kind == kind && assignments[currentDevice][row].code == code)
         return 0;
     for (int i = 0; i < 14; i++) {
-        if (field_0x04[field_0x00][i].kind == kind && field_0x04[field_0x00][i].code == code) {
+        if (assignments[currentDevice][i].kind == kind && assignments[currentDevice][i].code == code) {
             *other = i;
             return 1;
         }
@@ -111,7 +111,7 @@ int UnknownTrackGameObject33fc::UnknownFunction448cc0(int row, int kind, int cod
 }
 
 // 0x00448d30
-int UnknownTrackGameObject33fc::UnknownFunction448d30(UnknownControlBinding* binding, int kind,
+int UnknownTrackGameObject33fc::BindAxis(UnknownControlBinding* binding, int kind,
                                                       int code, int code2)
 {
     if (code == -1)
@@ -146,7 +146,7 @@ int UnknownTrackGameObject33fc::UnknownFunction448d30(UnknownControlBinding* bin
 }
 
 // 0x00448df0
-int UnknownTrackGameObject33fc::UnknownFunction448df0(int control, int code, int kind)
+int UnknownTrackGameObject33fc::BindButton(int control, int code, int kind)
 {
     if (code == -1 || code < 0)
         return 0;
@@ -192,62 +192,62 @@ static inline int AxisOfCode(int code)
 // 0x00448e90: installs the assignments of device `device` (the current one
 // when -1): the steering and throttle bindings, an optional third axis and
 // the button mapping of rows 4-13.
-void UnknownTrackGameObject33fc::UnknownFunction448e90(const char* path, int device)
+void UnknownTrackGameObject33fc::ApplyDevice(const char* path, int device)
 {
     if (g_TrackGame->controlMapping)
         g_TrackGame->controlMapping->Clear();
     if (device != -1)
-        field_0x00 = device;
+        currentDevice = device;
     g_TrackGame->field_0x3344.Unbind();
     g_TrackGame->field_0x3380.Unbind();
     g_TrackGame->field_0x33bc.Unbind();
 
     g_TrackGame->field_0x3344 =
         UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),
-                              AxisOfCode(field_0x04[field_0x00][0].code), 0.04f);
+                              AxisOfCode(assignments[currentDevice][0].code), 0.04f);
     g_TrackGame->field_0x3380 =
         UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),
-                              AxisOfCode(field_0x04[field_0x00][2].code), 0.0f);
-    UnknownFunction448d30(&g_TrackGame->field_0x3344, field_0x04[field_0x00][0].kind,
-                          field_0x04[field_0x00][0].code, field_0x04[field_0x00][1].code);
-    UnknownFunction448d30(&g_TrackGame->field_0x3380, field_0x04[field_0x00][2].kind,
-                          field_0x04[field_0x00][2].code, field_0x04[field_0x00][3].code);
+                              AxisOfCode(assignments[currentDevice][2].code), 0.0f);
+    BindAxis(&g_TrackGame->field_0x3344, assignments[currentDevice][0].kind,
+                          assignments[currentDevice][0].code, assignments[currentDevice][1].code);
+    BindAxis(&g_TrackGame->field_0x3380, assignments[currentDevice][2].kind,
+                          assignments[currentDevice][2].code, assignments[currentDevice][3].code);
 
-    if (field_0x04[field_0x00][4].kind == 2 && field_0x04[field_0x00][4].code < 0) {
-        if (field_0x04[field_0x00][4].code == -6 || field_0x04[field_0x00][4].code == -7) {
+    if (assignments[currentDevice][4].kind == 2 && assignments[currentDevice][4].code < 0) {
+        if (assignments[currentDevice][4].code == -6 || assignments[currentDevice][4].code == -7) {
             g_TrackGame->field_0x33bc = UnknownControlBinding(
                 0.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 2, 0.0f);
-            UnknownFunction448d30(&g_TrackGame->field_0x33bc, field_0x04[field_0x00][4].kind, -7, -6);
+            BindAxis(&g_TrackGame->field_0x33bc, assignments[currentDevice][4].kind, -7, -6);
         }
-        if (field_0x04[field_0x00][4].code == -12 || field_0x04[field_0x00][4].code == -13) {
+        if (assignments[currentDevice][4].code == -12 || assignments[currentDevice][4].code == -13) {
             g_TrackGame->field_0x33bc = UnknownControlBinding(
                 1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 5, 0.0f);
-            UnknownFunction448d30(&g_TrackGame->field_0x33bc, field_0x04[field_0x00][4].kind, -13,
+            BindAxis(&g_TrackGame->field_0x33bc, assignments[currentDevice][4].kind, -13,
                                   -12);
         }
     }
 
     for (int row = 4; row < 14; row++)
-        UnknownFunction448df0(row, field_0x04[field_0x00][row].code, field_0x04[field_0x00][row].kind);
+        BindButton(row, assignments[currentDevice][row].code, assignments[currentDevice][row].kind);
 }
 
 // 0x00449220: picks the default device for the active joystick (3 or 4 by
 // its subtype, else 1 with at least four buttons, else 0); 6 without one.
-int UnknownTrackGameObject33fc::UnknownFunction449220()
+int UnknownTrackGameObject33fc::ChooseDefaultDevice()
 {
     ControlInterface* controls = g_TrackGame->controlInterface;
     if (controls->joystickCount && controls->activeJoystick) {
         JoystickDevice* joystick = controls->activeJoystick;
         if (joystick->deviceSubtype == 4)
-            field_0x00 = 3;
+            currentDevice = 3;
         else if (joystick->deviceSubtype == 6)
-            field_0x00 = 4;
+            currentDevice = 4;
         else
-            field_0x00 = joystick->buttonCount >= 4;
+            currentDevice = joystick->buttonCount >= 4;
     } else {
-        field_0x00 = 6;
+        currentDevice = 6;
     }
-    return field_0x00;
+    return currentDevice;
 }
 
 // 0x00449270
@@ -271,13 +271,13 @@ int FormatKeyName(int code, char* text)
 }
 
 // 0x00449350
-void UnknownTrackGameObject33fc::UnknownFunction449350(int device, int row, char* text)
+void UnknownTrackGameObject33fc::GetAssignmentName(int device, int row, char* text)
 {
-    UnknownFunction449380(field_0x04[device][row].kind, field_0x04[device][row].code, text);
+    FormatAssignmentName(assignments[device][row].kind, assignments[device][row].code, text);
 }
 
 // 0x00449380: the display name of an assignment.
-int UnknownTrackGameObject33fc::UnknownFunction449380(int kind, int code, char* text)
+int UnknownTrackGameObject33fc::FormatAssignmentName(int kind, int code, char* text)
 {
     char name[0x80];
 

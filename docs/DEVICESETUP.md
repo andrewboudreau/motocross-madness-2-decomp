@@ -69,7 +69,7 @@ Source forms that mattered:
 - **`AxisOfCode` in `0x00448e90`.** An explicit `case -5` makes the sparse
   switch dense enough for a direct jump table.
 - **`0x00449380`.** The inner joystick switch needs `default: return 0`.
-- **`0x00449220`.** It assigns `field_0x00` and returns it. Retail stores the
+- **`0x00449220`.** It assigns `currentDevice` (+0x00) and returns it. Retail stores the
   field, then reloads it.
 - **`0x00449de0`.** Two shapes are needed:
   - a returned `subtype = 0` local, which keeps zero in `edi`;
