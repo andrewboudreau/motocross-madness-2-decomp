@@ -29,6 +29,16 @@
 //   only when the destination pointer lands in a scratch register; with it
 //   in a callee-saved register (edi, `this` live afterwards) it takes the
 //   pointer first and copies x, y, z in order, whatever the struct type.
+//   VC6 gives retail's order when the callee is one load (EventManager slot
+//   10 0x0045f200, `podiumCamera->UnknownVirtualSlot29(field_0x3d8)`, is
+//   exact) or when the camera comes from a separate tested block, a
+//   volatile local or a register source pointer, all of which add code;
+//   with the two-load chain g_TrackGame->ui->field_0x468 it takes edi = esp
+//   first. Also 1181: compiler flags (-G3/-G5/-Ox), float[3]/union
+//   arguments, `(camera = ...)->` and a function-scope camera, the target
+//   declared at any scope; `eye[1]` gives retail's `add edi, 0xc` but moves
+//   earlier registers (183). The same copy differs in 0x004f8820
+//   (SelectGamePicProcs) and 0x004d72c0 (ProCircuitProcs).
 // SPRaceInfoDlg::UnknownVirtualSlot29 (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::UnknownVirtualSlot29 (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

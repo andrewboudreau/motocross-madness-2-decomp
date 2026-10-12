@@ -19,7 +19,13 @@
 //   same fragments, so the choice is an allocation tie-break. A
 //   `UIControl* self = this;` copy used for any subset of the 13 member
 //   accesses (120 of 8192 sampled with tools/sweep_variants.py) is folded
-//   away: every form gives 91.
+//   away: every form gives 91. Also 91/85: casts on the colours and on
+//   `enabled` in the comparison (18 forms), template inline helpers taking
+//   `T*` (10), 1-8 extern ints or 1-5 forward structs declared before the
+//   functions (54), dead statements at the start of the function and of each
+//   branch (125), function order, and in a standalone TU every int/unsigned/
+//   long type for the states, `enabled` and the colours (char and short
+//   `enabled` are worse).
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places
