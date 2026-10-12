@@ -279,7 +279,7 @@ int UIListBox::ButtonDown(int a, int b) {
 // Drawing, input and loading near misses
 
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`.
-int UnknownFunction47b490(TextureMap* texture, int key) {
+int TextureHasColor(TextureMap* texture, int key) {
     int found = 0;
     unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, 0, 0x11);
     if (bits) {
@@ -333,7 +333,7 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
                                             pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+            if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
         } else {
             char message[100];

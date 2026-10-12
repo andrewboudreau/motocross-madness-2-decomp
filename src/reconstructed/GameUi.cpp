@@ -53,17 +53,17 @@ void* UnknownFunction47b570(void* block, unsigned int size);
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
 int g_UnknownGlobal65b5c8;
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
-UIDialog* g_UnknownGlobal65b608;
+UIDialog* g_SortingDialog;
 // 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
 int g_UnknownGlobal65b60c;
 
 // cdecl 0x00477b60: the list rows' default order (by text).
-int UnknownFunction477b60(const void* a, const void* b);
+int CompareRowText(const void* a, const void* b);
 // cdecl 0x00477800: the qsort comparison 0x00477900 sorts with.
-int UnknownFunction477800(const void* a, const void* b);
+int CompareSortedRows(const void* a, const void* b);
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`
 // (samples/ui/GameUiNearMisses.cpp).
-int UnknownFunction47b490(TextureMap* texture, int key);
+int TextureHasColor(TextureMap* texture, int key);
 
 // ---------------------------------------------------------------------------
 // UICtlContainer
@@ -1064,7 +1064,7 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     lastPageRowCount = 0;
     selectColor = 0xffffff;
     rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
-    sortCompare = UnknownFunction477b60;
+    sortCompare = CompareRowText;
     field_0x218 = (int)this;
     autoSort = 0;
     sorting = 0;
@@ -1194,7 +1194,7 @@ void UIListBox::SetSortCompare(int (*compare)(const void* a, const void* b)) {
 }
 
 // 0x00477b60
-int UnknownFunction477b60(const void* a, const void* b) {
+int CompareRowText(const void* a, const void* b) {
     const char* left = ((const UnknownGameUiListRow*)a)->text;
     if (!left)
         return 1;
@@ -3074,22 +3074,22 @@ void UIListBox::RemoveAllRows() {
 // 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
 // The first comparator call goes through a `control` local: without it VC6
 // swaps eax and edx for that temporary and the next global load.
-int UnknownFunction477800(const void* a, const void* b) {
+int CompareSortedRows(const void* a, const void* b) {
     int result = 0;
-    if (g_UnknownGlobal65b608->sortingList) {
-        UIListBox* control = g_UnknownGlobal65b608->sortingList->field_0x218_control;
+    if (g_SortingDialog->sortingList) {
+        UIListBox* control = g_SortingDialog->sortingList->field_0x218_control;
         result = control->sortCompare(a, b);
         if (!result) {
             int left = ((const UnknownGameUiListRow*)a)->sortIndex;
             int right = ((const UnknownGameUiListRow*)b)->sortIndex;
             GameObjectIterator* iterator =
-                (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
+                (GameObjectIterator*)g_SortingDialog->sortingList->field_0x218_control->UnknownVirtualSlot53();
             while (1) {
                 UIListBox* other = static_cast<UIListBox*>(
-                    g_UnknownGlobal65b608->sortingList->field_0x218_control->NextAttachedControlOfType(iterator));
+                    g_SortingDialog->sortingList->field_0x218_control->NextAttachedControlOfType(iterator));
                 if (!other)
                     break;
-                if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
+                if (other->rowCount != g_SortingDialog->sortingList->field_0x218_control->rowCount) {
                     result = -1;
                     break;
                 }
@@ -3097,7 +3097,7 @@ int UnknownFunction477800(const void* a, const void* b) {
                 if (result)
                     break;
             }
-            g_UnknownGlobal65b608->sortingList->field_0x218_control->DeleteControlIterator(iterator);
+            g_SortingDialog->sortingList->field_0x218_control->DeleteControlIterator(iterator);
         }
     }
     return result;
@@ -3105,9 +3105,9 @@ int UnknownFunction477800(const void* a, const void* b) {
 
 // 0x00477900
 void UIListBox::Sort(int a) {
-    if (a || !ownerDialog->sortingList || !g_UnknownGlobal65b608) {
+    if (a || !ownerDialog->sortingList || !g_SortingDialog) {
         ownerDialog->sortingList = this;
-        g_UnknownGlobal65b608 = ownerDialog;
+        g_SortingDialog = ownerDialog;
     }
     if (!rowCount)
         return;
@@ -3115,7 +3115,7 @@ void UIListBox::Sort(int a) {
     for (int i = 0; i < rowCount; i++)
         rowTable[i].sortIndex = i;
     int selected = selectedRow;
-    qsort(rowTable, rowCount, sizeof(UnknownGameUiListRow), UnknownFunction477800);
+    qsort(rowTable, rowCount, sizeof(UnknownGameUiListRow), CompareSortedRows);
     RequestRedraw();
     if (attachId > 0) {
         GameObjectIterator iterator(ownerDialog->controlContainer, 1, "UIControl");
@@ -5180,7 +5180,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
                                             pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+            if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
             UnknownFunction512dd0(image);
             return 1;
