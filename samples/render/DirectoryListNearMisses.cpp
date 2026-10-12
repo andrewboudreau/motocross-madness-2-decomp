@@ -25,7 +25,7 @@
 #include "../../src/reconstructed/DirectoryList.cpp"
 
 // 0x0044a600
-int DirectoryList::UnknownFunction44a600(const char* name, unsigned int attributes) {
+int DirectoryList::IsListed(const char* name, unsigned int attributes) {
     if (!_stricmp("", name) || !_stricmp(".", name) || !_stricmp("..", name))
         return 0;
     if (!includeFiles)

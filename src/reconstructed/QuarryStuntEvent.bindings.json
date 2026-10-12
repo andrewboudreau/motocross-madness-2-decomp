@@ -63,7 +63,7 @@
   "?UnknownFunction48adf0@VisualCue@@QAEPAV1@PAXPAVLightManager@@HPAVUnknownTerrain@@UVector3@@PAUUnknownKrustyBikeView@@HPAUUnknownQuarryCamera@@MMM@Z": "0x0048adf0",
   "?UnknownFunction48bc30@VisualCue@@QAEHXZ": "0x0048bc30",
   "?UnknownFunction48bc80@VisualCue@@QAEHXZ": "0x0048bc80",
-  "?UnknownFunction4a2bc0@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",
+  "?ReportTotals@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",
   "?CommitListenerSettings@PCSoundInterface@@QAEHXZ": "0x004beb80",
   "?Create@BaseQuarryEvent@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004de3b0",
   "?UnknownFunction4de590@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z": "0x004de590",

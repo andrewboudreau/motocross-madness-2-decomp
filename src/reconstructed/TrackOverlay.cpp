@@ -1381,7 +1381,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
             if (strlen(message.text)) {
                 g_TrackGame->network->Send(
                     0x85, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
-                UnknownFunction51dd70(g_TrackGame->mode.field_0x00, (int)message.text, 0);
+                AddMessage(g_TrackGame->mode.field_0x00, (int)message.text, 0);
             }
             chatInput->ClearLine();
             field_0x3dc = 0;
@@ -1432,7 +1432,7 @@ void ChatOverlay::HideInputLine()
 }
 
 // 0x0051dd70: names longer than ten characters are cut to eight and "..".
-void ChatOverlay::UnknownFunction51dd70(const char* name, int a2, int a3)
+void ChatOverlay::AddMessage(const char* name, int a2, int a3)
 {
     char text[32];
     if (strlen(name) > 10) {

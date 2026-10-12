@@ -198,7 +198,7 @@ public:
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void ShowInputLine();             // 0x0051dd10
     void HideInputLine();             // 0x0051dd40: closes the chat line
-    void UnknownFunction51dd70(char* name, unsigned int* text, int flag); // 0x0051dd70
+    void AddMessage(char* name, unsigned int* text, int flag); // 0x0051dd70
 
     unsigned char field_0x000[0x3dc];
     int typing;                               // +0x3dc typing

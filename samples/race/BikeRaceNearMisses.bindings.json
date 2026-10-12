@@ -240,7 +240,7 @@
   "?UnknownFunction51dce0@UnknownBikeRaceOverlay19c@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z": "0x0051dce0",
   "?ShowInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd10",
   "?HideInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd40",
-  "?UnknownFunction51dd70@UnknownBikeRaceOverlay19c@@QAEXPADPAIH@Z": "0x0051dd70",
+  "?AddMessage@UnknownBikeRaceOverlay19c@@QAEXPADPAIH@Z": "0x0051dd70",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
   "?Load@UnknownVcrFile@@QAEXPAD0@Z": "0x00524b80",

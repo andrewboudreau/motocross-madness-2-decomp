@@ -390,7 +390,7 @@
   "?UnknownFunction521a40@TrackGame@@QAEXXZ": "0x00521a40",
   "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
   "?ClearLeft@UnknownTrackGameRacerSlot@@QAEXXZ": "0x00522050",
-  "?UnknownFunction522440@TrackGameMode@@QAEXXZ": "0x00522440",
+  "?ResetDefaults@TrackGameMode@@QAEXXZ": "0x00522440",
   "?LoadControllerChoice@TrackGameMode@@QAEXXZ": "0x00523000",
   "?LoadProfile@TrackGameMode@@QAEHXZ": "0x005231f0",
   "?SaveProfile@TrackGameMode@@QAEXXZ": "0x00523580",

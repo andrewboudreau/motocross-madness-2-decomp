@@ -301,12 +301,12 @@ public:
     // 0x00523d30 (OptionProcs.cpp: "MCM2HELP"): opens `topic`'s .hlp file
     // with ShellExecuteA (passing `parameters`); 1 when found.
     int OpenHelp(const char* topic, const char* parameters);
-    void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
+    void ResetDefaults();             // 0x00522440 (OptionProcs.cpp)
     void LoadControllerChoice();             // 0x00523000 (OptionProcs.cpp)
     void SaveControllerChoice();             // 0x00523130: saves the controller choice
     int WaitForCd();              // 0x00523800: asks for the CD until it is found; 0 on cancel
     void SaveProfile();                           // 0x00523580 (TrackGame slot 15)
-    int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
+    int FindDataFile(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     // 0x00522680 (TrackGame slot 4; SelectGamePicProcs.cpp's network start):
     // clears the selected session, the racers and the entries.
     int ResetNetworkRace();

@@ -1413,7 +1413,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     sprintf(preset, "%s\\%s", "ui\\profile", name);
     if (!CreateDirectoryA(preset, 0))
         return;
-    g_TrackGame->mode.UnknownFunction522440();
+    g_TrackGame->mode.ResetDefaults();
     COPY_TEXT(g_TrackGame->mode.field_0x00, name, 16);
     g_TrackGame->mode.showNewbieDialog = 1;
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {

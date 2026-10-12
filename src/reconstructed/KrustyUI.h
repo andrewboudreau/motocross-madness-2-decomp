@@ -124,7 +124,7 @@ public:
     // racers (bikes near the player's class).
     void UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoices);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
-    int UnknownFunction49ba70(int a, int scene, int series, const char* name, int d, int e);
+    int AddEntry(int a, int scene, int series, const char* name, int d, int e);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables

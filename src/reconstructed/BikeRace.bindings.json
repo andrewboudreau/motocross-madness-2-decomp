@@ -143,7 +143,7 @@
   "?HandleChatKey@UnknownBikeRaceOverlay19c@@QAEHHPAH@Z": "0x0051da30",
   "?ShowInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd10",
   "?HideInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd40",
-  "?UnknownFunction51dd70@UnknownBikeRaceOverlay19c@@QAEXPADPAIH@Z": "0x0051dd70",
+  "?AddMessage@UnknownBikeRaceOverlay19c@@QAEXPADPAIH@Z": "0x0051dd70",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
   "?UnknownVirtualSlot10@BikeRace@@UAEHM@Z": "0x0041d2b0",

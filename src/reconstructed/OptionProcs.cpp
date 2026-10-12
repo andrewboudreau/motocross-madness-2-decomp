@@ -922,7 +922,7 @@ void GlobalSettingsDlg::HandleEvent(UnknownDialogEvent* event)
             int choice = static_cast<UIRadioButton*>(FindControl("ButFactory", 4))->GetGroupSelection();
             strcpy(name, g_TrackGame->mode.field_0x00);
             if (choice == 1) {
-                g_TrackGame->mode.UnknownFunction522440();
+                g_TrackGame->mode.ResetDefaults();
                 sprintf(preset, "%s\\%s", "ui", "preset.ctl");
                 sprintf(profile, "%s\\%s\\%s", "ui\\profile", name, "control.ctl");
                 CopyFileA(preset, profile, 0);

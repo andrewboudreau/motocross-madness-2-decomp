@@ -382,7 +382,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
     if (!ui)
         return 0;
     if (TestInputEvent(1, 0, event, 0x3f)) {
-        g_MemTagStack->UnknownFunction4a2bc0("In Game");
+        g_MemTagStack->ReportTotals("In Game");
         if (!menuIsOpen) {
             int category = g_MemTagStack->Push("UI");
             SetMenuOpen(1, kMenuExit, 1);
@@ -488,7 +488,7 @@ int TrackGame::UnknownVirtualSlot15() {
 
 // 0x00521cb0
 int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
-    return mode.UnknownFunction5238f0(name, path);
+    return mode.FindDataFile(name, path);
 }
 
 // 0x00521cd0

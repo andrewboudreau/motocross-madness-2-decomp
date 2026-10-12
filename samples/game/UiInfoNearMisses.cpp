@@ -1,7 +1,7 @@
 // Near-miss uiinfo.cpp candidates (0x00521f30..0x00524106),
 // kept out of src/reconstructed/UiInfo.cpp until they match.
 //
-// TrackGameMode::UnknownFunction522440 (0x00522440, 427 bytes): restores the
+// TrackGameMode::ResetDefaults (0x00522440, 427 bytes): restores the
 // default settings. Calls, constants and stores all match; 383 of 427 bytes.
 // The leading +0x27f8 store order 0x30, 0x0c, 0x10, 0x00, 0x14 gives
 // retail's ecx = 1 / edx = 2 constants and &field_0x27f8 setup, and an
@@ -18,7 +18,7 @@
 // An inline settings-reset helper over the 13 stores (720 variants) turns
 // them into [eax + N] stores (174, 394 bytes).
 //
-// TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 190 of 357.
+// TrackGameMode::FindDataFile (0x005238f0, 353 bytes): 190 of 357.
 // The found block written once after the CD retry (`if (file) { ...; return
 // 1; } return 0;`) gives retail's block layout and its single `return 0`
 // tail. Left: retail keeps fopen's result in eax until the found block (mov
@@ -37,7 +37,7 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 // 0x00522440: restores the default settings.
-void TrackGameMode::UnknownFunction522440() {
+void TrackGameMode::ResetDefaults() {
     ResetInterfaceOptions((UnknownTrackGameModeOptions6ac*)&instrumentOverlayOn);
     ResetSoundOptions((UnknownTrackGameModeOptionsA20*)&field_0xa20);
     ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
@@ -85,7 +85,7 @@ void TrackGameMode::UnknownFunction522440() {
 
 // 0x005238f0 (TrackGame slot 18): finds `name` under the installed data
 // directory, else on the CD.
-int TrackGameMode::UnknownFunction5238f0(const char* name, char* path) {
+int TrackGameMode::FindDataFile(const char* name, char* path) {
     char buffer[0x104];
     int skip;
     FILE* file;

@@ -1181,7 +1181,7 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
                 field_0x190 = true;
             }
             if (chatOverlay != 0) {
-                chatOverlay->UnknownFunction51dd70(name, &((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
+                chatOverlay->AddMessage(name, &((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
             }
         }
         return 1;

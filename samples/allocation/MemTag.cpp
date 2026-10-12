@@ -58,7 +58,7 @@ MemTagStack::~MemTagStack()
 }
 
 // 0x004a2bc0: totals both counters (the report that used them is compiled out).
-void MemTagStack::UnknownFunction4a2bc0(const char* tag)
+void MemTagStack::ReportTotals(const char* tag)
 {
     int total = 0;
     int totalDirectX = 0;

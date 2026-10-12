@@ -89,7 +89,7 @@ TrackGameMode::TrackGameMode() {
     int length;
     int count;
 
-    UnknownFunction522440();
+    ResetDefaults();
     networkGame = 0;
     visualCuesOn = 1;
     memset(&displayAdapterGuid, 0, sizeof(displayAdapterGuid));
@@ -546,7 +546,7 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
         sprintf(file, "%s.%s", name, kind);
     else
         sprintf(file, "%s\\%s.%s", (char*)value, name, kind);
-    result = UnknownFunction5238f0(file, found);
+    result = FindDataFile(file, found);
     if (!result)
         return 0;
     _splitpath(found, drive, directory, base, extension);
@@ -610,7 +610,7 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
             sprintf(name, "%s.hlp", topic);
         else
             sprintf(name, "%s\\%s.hlp", UNKNOWN_HELP_DIRECTORY, topic);
-        if (UnknownFunction5238f0(name, path)) {
+        if (FindDataFile(name, path)) {
             SendMessageA(g_TrackGame->windowHandle, 0x112, 0xf020, 0);
             ShellExecuteA(g_TrackGame->windowHandle, 0, path, parameters, directory, 1);
             return 1;

@@ -67,7 +67,7 @@ public:
     int CurrentName(char* name);                 // 0x0044a550: current listed name
     // 0x0044a600: whether a found file is listed: not "", "." or "..", and
     // a directory unless `includeFiles` is set.
-    int UnknownFunction44a600(const char* name, unsigned int attributes);
+    int IsListed(const char* name, unsigned int attributes);
     int Contains(const char* name);           // 0x0044a910: whether `name` is listed
     // 0x004673b0: the entry count (an out-of-line accessor that the linker
     // folded with FontTexture's identical 0x004673b0).

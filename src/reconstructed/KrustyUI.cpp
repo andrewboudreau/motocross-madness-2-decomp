@@ -844,7 +844,7 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
 }
 
 // 0x0049ba70
-int KrustyUI::UnknownFunction49ba70(int a, int scene, int series, const char* name, int d, int e) {
+int KrustyUI::AddEntry(int a, int scene, int series, const char* name, int d, int e) {
     entries = (UnknownKrustyUIEntry*)ResizeDebugBlock(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
     entries[entryCount].field_0x00 = a;
     entries[entryCount].scene = scene;

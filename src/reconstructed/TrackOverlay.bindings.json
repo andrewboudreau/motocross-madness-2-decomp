@@ -124,7 +124,7 @@
   "?UnknownFunction51d980@ChatOverlay@@QAEXH@Z": "0x0051d980",
   "?HandleChatKey@ChatOverlay@@QAEHHPAH@Z": "0x0051da30",
   "?ShowInputLine@ChatOverlay@@QAEXXZ": "0x0051dd10",
-  "?UnknownFunction51dd70@ChatOverlay@@QAEXPBDHH@Z": "0x0051dd70",
+  "?AddMessage@ChatOverlay@@QAEXPBDHH@Z": "0x0051dd70",
   "?RedrawChat@ChatOverlay@@QAEHXZ": "0x0051de10",
   "?RedrawChat@ChatOverlay@@QAEXXZ": "0x0051de10",
   "?DrawNameTag@ChatOverlay@@QAEXPAXH@Z": "0x0051e3f0",

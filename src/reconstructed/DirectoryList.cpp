@@ -225,10 +225,10 @@ int DirectoryList::UnknownVirtualSlot1() {
     find = FindFirstFileA(search, &data);
     if (find == INVALID_HANDLE_VALUE)
         return 0;
-    if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes))
+    if (IsListed(data.cFileName, data.dwFileAttributes))
         found = 1;
     while (FindNextFileA(find, &data)) {
-        if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes))
+        if (IsListed(data.cFileName, data.dwFileAttributes))
             found++;
     }
     FindClose(find);
@@ -240,12 +240,12 @@ int DirectoryList::UnknownVirtualSlot1() {
         find = FindFirstFileA(search, &data);
         if (find == INVALID_HANDLE_VALUE)
             return 0;
-        if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes)) {
+        if (IsListed(data.cFileName, data.dwFileAttributes)) {
             entries[0].UnknownFunctionSet(data.cFileName, data.dwFileAttributes);
             found = 1;
         }
         while (FindNextFileA(find, &data)) {
-            if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes)) {
+            if (IsListed(data.cFileName, data.dwFileAttributes)) {
                 entries[found].UnknownFunctionSet(data.cFileName, data.dwFileAttributes);
                 found++;
             }

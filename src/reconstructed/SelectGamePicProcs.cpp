@@ -238,9 +238,9 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                 g_TrackGame->sceneObject->ReadSceneName(text, entry, 0, "scn", &x, &y);
                 int row;
                 if (g_TrackGame->network && g_TrackGame->network->isHost)
-                    row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, x, y);
+                    row = g_TrackGame->ui->AddEntry(index, 0, series, entry, x, y);
                 else
-                    row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, 0, 0);
+                    row = g_TrackGame->ui->AddEntry(index, 0, series, entry, 0, 0);
                 if (g_TrackGame->mode.GetSelectedSeries() == 1 ||
                     g_TrackGame->mode.GetSelectedSeries() == 5) {
                     if (largePictures)
@@ -270,9 +270,9 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     g_TrackGame->sceneObject->ReadSceneName(text, entry, scene, "scn", &x, &y);
                     int row;
                     if (g_TrackGame->network && g_TrackGame->network->isHost)
-                        row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, x, y);
+                        row = g_TrackGame->ui->AddEntry(index, scene, series, entry, x, y);
                     else
-                        row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, 0, 0);
+                        row = g_TrackGame->ui->AddEntry(index, scene, series, entry, 0, 0);
                     if (largePictures)
                         sprintf(file, "%s%02d.tga", entry, scene);
                     else

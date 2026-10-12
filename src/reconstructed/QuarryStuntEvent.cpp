@@ -67,12 +67,12 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
 // 0x004de3b0
 BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCallback progress) {
     GameObject::UnknownVirtualSlot8(target);
-    g_MemTagStack->UnknownFunction4a2bc0("entering BaseQuarryEvent::Create");
+    g_MemTagStack->ReportTotals("entering BaseQuarryEvent::Create");
     if (!UnknownFunction4de590(progress)) {
         Release();
         return 0;
     }
-    g_MemTagStack->UnknownFunction4a2bc0("exiting BaseQuarryEvent::Create");
+    g_MemTagStack->ReportTotals("exiting BaseQuarryEvent::Create");
     return this;
 }
 
