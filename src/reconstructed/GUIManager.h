@@ -393,7 +393,7 @@ public:
     void* languageModule;                     // +0x348: "uilang.dll" module
     int soundVolume;                          // +0x34c the UI sounds' volume: (uiVolume - 100) * 25 - 200, or -10200 with UI sounds off (OptionProcs.cpp)
     char toolTipFontFace[0x80];               // +0x350: tool tip font face
-    int field_0x3d0;
+    int fontSizeOffset;                       // +0x3d0 a float added to the dialog and control font heights (0x0046a920); string 0xfed (KrustyUI)
     int toolTipBold;                          // +0x3d4: bold
     int toolTipItalic;                        // +0x3d8: italic
     UnknownGuiClipper* windowClipper;         // +0x3dc

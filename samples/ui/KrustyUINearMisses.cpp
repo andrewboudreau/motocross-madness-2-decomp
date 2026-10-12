@@ -78,12 +78,12 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
             gui->toolTipBold = atoi(text);
     }
     if (scale != 0.0f)
-        gui->field_0x3d0 = scale;
+        gui->fontSizeOffset = scale;
     gui->CreateBackground();
     gui->SetDialogDirectory("ui");
     gui->SetWaitCursorImage("ui\\wait.tga");
     gui->GetUser(0)->ForgetDevices();
-    gui->GetUser(0)->AcceptDevice(gui->field_0x30c);
+    gui->GetUser(0)->AcceptDevice(gui->keyboardDevice);
     gui->ShowCursors(0);
     g_UnknownResourceManager572b44->AddArchive("ui\\uires.res", 0);
     g_TrackGame->mode.LoadBonusTrackNames();

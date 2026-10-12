@@ -1007,7 +1007,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                             bold = guiManager->toolTipBold;
                             italic = guiManager->toolTipItalic;
                         }
-                        dialogFontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
+                        dialogFontHeight = (int)((guiManager ? *(float*)&guiManager->fontSizeOffset : 0.0f) +
                                                    dialogFontHeight);
                         dialogFont = CreateFontA(dialogFontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
                                                          0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);
@@ -1574,7 +1574,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                         bold = guiManager->toolTipBold;
                         italic = guiManager->toolTipItalic;
                     }
-                    control->fontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
+                    control->fontHeight = (int)((guiManager ? *(float*)&guiManager->fontSizeOffset : 0.0f) +
                                                  control->fontHeight);
                     if (control->fontHeight != dialogFontHeight || bold != dialogFontBold ||
                         italic != dialogFontItalic) {

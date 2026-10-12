@@ -57,11 +57,11 @@ public:
     unsigned char field_0x040[0xec - 0x40];
     int uiAnimations;                         // +0x0ec GUIManager::uiAnimations; from TrackGame+0xc40 (KrustyUI 0x004988a0)
     unsigned char field_0x0f0[0x30c - 0xf0];
-    int field_0x30c;
+    int keyboardDevice;                       // +0x30c GUIManager::keyboardDevice
     unsigned char field_0x310[0x34c - 0x310];
     int soundVolume;                          // +0x34c GUIManager::soundVolume
     char toolTipFontFace[0x3d0 - 0x350];      // +0x350 font face (TrackOverlay 0x0051b320)
-    float field_0x3d0;                        // string 0xfed's value when nonzero
+    float fontSizeOffset;                     // +0x3d0 string 0xfed's value when nonzero; added to the dialog font heights (0x0046a920)
     int toolTipBold;                          // +0x3d4 string 0x1469's value; bold font
     int toolTipItalic;                        // +0x3d8 italic font (TrackOverlay 0x0051b320)
     unsigned char field_0x3dc[0x3e0 - 0x3dc];

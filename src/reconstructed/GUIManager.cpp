@@ -169,7 +169,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     modalDialog = 0;
     soundVolume = 0;
     strcpy(toolTipFontFace, "");
-    field_0x3d0 = 0;
+    fontSizeOffset = 0;
     toolTipBold = 0;
     toolTipItalic = 0;
     drawGrabFirst = 0;
