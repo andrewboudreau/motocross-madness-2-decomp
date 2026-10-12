@@ -331,7 +331,8 @@ static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
 // the lever's `lea edi` and store are scheduled later, the second TireDot push comes
 // before the y product instead of after it, and one x term of the d-path dot swaps
 // its operands. No gain from a products-first cross or projection for the lever
-// (1571), a TireScaleCopy that copies all three components or none (1548..1555),
+// (1571), a named lever or projection local (1575), a pointer or reference alias of
+// the lever member (767), a TireScaleCopy that copies all three components or none (1548..1555),
 // or the d-path dot written out in any order (1133..1137) or through a helper with
 // copied or swapped x operands (1575..1582).
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
