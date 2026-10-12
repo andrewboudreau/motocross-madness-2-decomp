@@ -20,7 +20,13 @@
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128
-//   probe surface, caps bit 0x20000000) is as written.
+//   probe surface, caps bit 0x20000000) is as written. Retail's ebp holds
+//   `target` outside the mode loop (reloaded from its argument slot after it)
+//   and 480 inside it; VC6 here never pushes ebp. Tried in session 10 (66 of
+//   490 base): `if (!target) {loop} else render = target` (77), `render !=
+//   target` or plain `!target` before each delete (65-85), `*value = 0`
+//   after the `render` declaration, `render = target` as the initialiser;
+//   none puts `target` in a register.
 // float MeanTextureChannelDifference (0x004cb330, 628 bytes): register allocation
 //   (retail: ebp = first, esi/edi = pixel pointers) and the x87 sequence for
 //   the three channel sums (retail keeps the green difference on the stack

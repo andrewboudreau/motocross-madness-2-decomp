@@ -4,7 +4,14 @@
 // 0x004049d0 (678 bytes): retail stores the three leading zeros (and
 // `field_0x60 = 0`) as immediates; VC6 here caches 0 in edi, which shifts
 // the register choice of the region loop. Statement orders and a helper
-// for the DC tail do not change that.
+// for the DC tail do not change that. The DC tail as `if (surface) { ... }
+// return 0;` with the release branch returning on its own gives retail's
+// block order (retail duplicates that `*dc = heldDc; return 1` tail and puts
+// `return 0` last): 39 -> 108 of 606 masked bytes, 65 -> 46 instruction
+// diffs, candidate 678 bytes like retail. Then `*a = 0` before `surface = 0`
+// and `surface` before `*a = 1` in the copy branch align the rest. All six
+// orders of the three leading stores, `surface` initialised at its
+// declaration and `field_0x60 = 0` first in its branch keep the edi zero.
 
 #include <string.h>
 
@@ -31,14 +38,14 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
                                            CameraRect* clip) {
     UnknownSurfaceInterface* surface;
     *dc = 0;
-    surface = 0;
     *a = 0;
+    surface = 0;
     if (dirty) {
         if (copyValid) {
             if (*frames) {
                 if (field_0x60) {
-                    *a = 1;
                     surface = offscreenCopy;
+                    *a = 1;
                     field_0x60 = 0;
                 } else {
                     surface = Target()->renderSurface;
@@ -88,18 +95,21 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
         surface = Target()->renderSurface;
         *frames = Target()->frameModulus;
     }
-    if (!surface)
-        return 0;
-    if (heldDcSurface) {
-        if (surface != heldDcSurface) {
-            ReleaseDc();
+    if (surface) {
+        if (heldDcSurface) {
+            if (surface != heldDcSurface) {
+                ReleaseDc();
+                heldDcSurface = surface;
+                surface->GetDC(&heldDc);
+                *dc = heldDc;
+                return 1;
+            }
+        } else {
             heldDcSurface = surface;
             surface->GetDC(&heldDc);
         }
-    } else {
-        heldDcSurface = surface;
-        surface->GetDC(&heldDc);
+        *dc = heldDc;
+        return 1;
     }
-    *dc = heldDc;
-    return 1;
+    return 0;
 }

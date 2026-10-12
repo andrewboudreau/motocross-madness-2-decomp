@@ -25,7 +25,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
-| audio/PCAudio | `0x004bc6b0` | 47/580 (masked) | c | 54 code diffs: retail lacks `mov eax, fs:[X] ; push -1 ; push A`; retail lacks `mov fs:[X], esp` |
+| audio/PCAudio | `0x004bc6b0` | 238/629 (inside PCAudio.cpp) | c | VC6 cross-jumps the two `Play()` failure tails (streamed `return 0`, the `& 5` branch's `goto failed`) where retail keeps them apart; the sample copy also gains an EH frame |
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |
@@ -208,7 +208,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
 | race/Wrecker | `0x00531740` | 1606/1624 | c | slots match; the argument push of two loop constructor calls comes one load earlier (`push ecx` before the particle-pointer load and before `along.y`), two registers differ |
 | race/Wrecker | `0x005329e0` | 763/1312 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then the y/x extent copies, `p`); retail does not merge the z clip's two `outPrevious` updates |
-| render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
+| render/BackgroundImage | `0x004049d0` | 108/606 (masked) | c | block layout as retail; VC6 caches 0 in edi (`xor edi, edi`, `mov [esp + N], edi`) where retail stores immediates, which moves the region loop's registers |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
