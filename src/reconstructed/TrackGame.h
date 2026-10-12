@@ -152,25 +152,25 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
 struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes
     int field_0x00;
     int field_0x04;
-    int field_0x08;
+    int soundOn;                              // +0x08 (TrackGameMode+0xa28): sound on
     int field_0x0c;
     int field_0x10;
-    int field_0x14;
-    int field_0x18;
+    int eaxEnabled;                           // +0x14 (TrackGameMode+0xa34): LoadProfile passes it to allowEAXExtension
+    int positionSounds;                       // +0x18 (TrackGameMode+0xa38): position sounds on
     int field_0x1c;
-    int field_0x20;
+    int soundVolume;                          // +0x20 (TrackGameMode+0xa40): sound volume
     int field_0x24;
-    int field_0x28;
+    int use16BitSound;                        // +0x28 (TrackGameMode+0xa48): 16-bit (else 8-bit) primary format in LoadProfile
 };
 
 struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
+    int displayMode;                          // +0x00 (TrackGameMode+0xa4c): display mode index
+    int shadows;                              // +0x04 (TrackGameMode+0xa50): shadows on
+    int particles;                            // +0x08 (TrackGameMode+0xa54): particles on
     int field_0x0c;
-    int field_0x10;
+    int skyCube;                              // +0x10 (TrackGameMode+0xa5c): sky cube on
     int field_0x14;
-    int field_0x18;
+    int detailLevel;                          // +0x18 (TrackGameMode+0xa64): detail level 0..9
 };
 
 struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
