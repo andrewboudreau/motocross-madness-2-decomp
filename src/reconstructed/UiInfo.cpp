@@ -576,7 +576,7 @@ int TrackGameMode::FindCdDirectory() {
         driveList->ListDrives();
         if (!driveList->FindVolume("MCM2", &index, 5))
             return 0;
-        if (!driveList->UnknownFunction44a0b0(index, cdDriveRoot))
+        if (!driveList->GetDriveRoot(index, cdDriveRoot))
             return 0;
         sprintf(cdDataDirectory, "%s%s", cdDriveRoot, "game");
     }

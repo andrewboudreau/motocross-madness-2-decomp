@@ -140,7 +140,7 @@
   "?GetEntryStem@DirectoryList@@QAEHHPAD@Z": "0x0044a2f0",
   "?NextName@DirectoryList@@QAEHPAD@Z": "0x0044a4c0",
   "?CurrentName@DirectoryList@@QAEHPAD@Z": "0x0044a550",
-  "?UnknownFunction44abb0@CombinedDirectoryList@@QAEXPBD0@Z": "0x0044abb0",
+  "?SetDirectories@CombinedDirectoryList@@QAEXPBD0@Z": "0x0044abb0",
   "?ApplyChosenRider@MPBikeRiderDlg@@QAEXXZ": "0x004500d0",
   "?FormatDecimal@@YAXHPAD@Z": "0x00451380",
   "?LeaveMenusForRace@@YAXXZ": "0x004536e0",

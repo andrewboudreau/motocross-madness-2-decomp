@@ -19,8 +19,8 @@ void UnknownLightEmitterTarget::SetRgbColor(unsigned int color) {
 }
 
 // 0x0049de90
-void UnknownLightEmitterTarget::UnknownFunction49de90(const Vector3* position) {
-    field_0xb8 = *position;
+void UnknownLightEmitterTarget::SetPosition(const Vector3* position) {
+    targetPosition = *position;
 }
 
 // 0x0049deb0
@@ -110,7 +110,7 @@ void LightEmitter::SetPosition(const Vector3* position) {
             debugSphere->SetPositionVec3(*position);
         lightPosition = *position;
         if (field_0x9c)
-            field_0x9c->UnknownFunction49de90(position);
+            field_0x9c->SetPosition(position);
         if (manager)
             manager->MarkChanged();
     }

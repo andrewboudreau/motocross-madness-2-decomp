@@ -60,7 +60,9 @@ public:
     // starts `mode` (0, 1 or 2); 0 on failure.
     int Start(int a1, int a2, int a3, int mode, int a5, unsigned int size,
                               UnknownRecorderOwner* owner);
-    void UnknownFunction4e86d0(int a, int b, int wait);  // 0x004e86d0
+    // 0x004e86d0: stores the header for worker event 9 (rewrite it, close
+    // the file) and signals it, waiting for the worker with `wait`.
+    void CloseFile(int header, int headerSize, int wait);
     // 0x004e8720: queues `size` bytes of `data` with two header values; 0 when
     // full or stopped.
     int QueueRecord(int a, int b, const void* data, unsigned int size);

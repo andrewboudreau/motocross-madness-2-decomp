@@ -112,7 +112,7 @@
   "?ResolveBikeFile@KrustyUI@@QAEHPBDPADH@Z": "0x0049b560",
   "?ResolveRiderFile@KrustyUI@@QAEHPBDPADH@Z": "0x0049b7f0",
   "?OpenRecording@KrustyVCR@@QAEHP6AHHPAXHHPAHH1@ZHPADPAVUnknownVcrFile@@@Z": "0x0049bf10",
-  "?UnknownFunction49bff0@KrustyVCR@@QAEXMH@Z": "0x0049bff0",
+  "?SetReplayLength@KrustyVCR@@QAEXMH@Z": "0x0049bff0",
   "?RecordedLength@KrustyVCR@@QAEMXZ": "0x0049c000",
   "?SaveRecording@KrustyVCR@@QAEXMPADH@Z": "0x0049c010",
   "?SetRacer@KrustyVCR@@QAEXHDHPAD0000HHH@Z": "0x0049c070",

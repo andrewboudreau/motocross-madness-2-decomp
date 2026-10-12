@@ -201,7 +201,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
         *value = 0;
     sprintf(first, "%s\\%s", g_TrackGame->mode.installDirectory, directory);
     sprintf(second, "%s\\%s", g_TrackGame->mode.cdDataDirectory, directory);
-    ((CombinedDirectoryList*)directories)->UnknownFunction44abb0(first, second);
+    ((CombinedDirectoryList*)directories)->SetDirectories(first, second);
     directories->SetPattern(pattern, 1);
     directories->UnknownVirtualSlot1();
     if (!directories->GetFontName())

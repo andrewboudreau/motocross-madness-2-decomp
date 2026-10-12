@@ -14,10 +14,10 @@
 class UnknownLightEmitterTarget {
 public:
     void SetRgbColor(unsigned int color);           // 0x0049de70
-    void UnknownFunction49de90(const Vector3* position);      // 0x0049de90
+    void SetPosition(const Vector3* position);      // 0x0049de90
 
     unsigned char field_0x00[0xb8];
-    Vector3 field_0xb8;
+    Vector3 targetPosition;                                    // +0xb8 the emitter's position (SetPosition)
     unsigned char field_0xc4[0xd0 - 0xc4];
     unsigned int rgbColor;                                     // colour without alpha
 };

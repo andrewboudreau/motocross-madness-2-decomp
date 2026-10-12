@@ -66,7 +66,7 @@
   "?Rescan@UnknownDriveList@@QAEHXZ": "0x00449e60",
   "?ListDrives@UnknownDriveList@@QAEHXZ": "0x00449e70",
   "?FindVolume@UnknownDriveList@@QAEHPBDPAHI@Z": "0x0044a010",
-  "?UnknownFunction44a0b0@UnknownDriveList@@QAEHHPAD@Z": "0x0044a0b0",
+  "?GetDriveRoot@UnknownDriveList@@QAEHHPAD@Z": "0x0044a0b0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",

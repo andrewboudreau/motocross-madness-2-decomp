@@ -10,7 +10,7 @@
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
-  "?UnknownFunction47bbf0@GhostMod1@@QAEXM@Z": "0x0047bbf0",
+  "?StartFade@GhostMod1@@QAEXM@Z": "0x0047bbf0",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot10@GhostMod1@@UAEHM@Z": "0x0047bc20",
   "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",

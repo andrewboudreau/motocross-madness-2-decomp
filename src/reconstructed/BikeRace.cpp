@@ -353,7 +353,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             field_0x1d8++;
                         }
                     }
-                    replayVcr->UnknownFunction49bff0(replayLength, 0);
+                    replayVcr->SetReplayLength(replayLength, 0);
                     if (replayMode == 4) {
                         if (field_0x1e0 != 4) {
                             field_0x1e0 = 4;

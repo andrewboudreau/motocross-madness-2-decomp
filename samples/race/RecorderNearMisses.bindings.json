@@ -29,7 +29,7 @@
   "?SignalAndWait@VCRInterface@@QAEXPAXK@Z": "0x004e7a00",
   "?Start@VCRInterface@@QAEHHHHHHIPAUUnknownRecorderOwner@@@Z": "0x004e7a90",
   "?Start@VCRInterface@@QAEHHHHHHIPAUUnknownRecorderOwner@@@Z$ehhandler": "0x0054d9e7",
-  "?UnknownFunction4e86d0@VCRInterface@@QAEXHHH@Z": "0x004e86d0",
+  "?CloseFile@VCRInterface@@QAEXHHH@Z": "0x004e86d0",
   "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
   "?TakeRecord@VCRInterface@@QAEHPAH00PAXPAIH@Z": "0x004e8810",
   "?TakeRecord@VCRInterface@@QAEHPAH0PAXPAI0H@Z": "0x004e8810",

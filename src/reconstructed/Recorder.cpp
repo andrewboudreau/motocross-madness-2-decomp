@@ -147,11 +147,11 @@ int VCRInterface::Start(int a1, int a2, int a3, int mode, int a5, unsigned int s
 }
 
 // 0x004e86d0
-void VCRInterface::UnknownFunction4e86d0(int a, int b, int wait) {
+void VCRInterface::CloseFile(int header, int headerSize, int wait) {
     int fast = vcrFile->memory;
 
-    threadParameters.header = a;
-    threadParameters.headerSize = b;
+    threadParameters.header = header;
+    threadParameters.headerSize = headerSize;
     if (wait)
         SignalAndWait(closeFileEvent, fast ? 10 : 200);
     else

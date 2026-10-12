@@ -94,7 +94,7 @@ public:
     int OpenRecording(UnknownRecorderCallback callback, int mode, char* name,
                               UnknownVcrFile* file);
     float RecordedLength();            // 0x0049c000: the recorded length
-    void UnknownFunction49bff0(float time, int flag); // 0x0049bff0
+    void SetReplayLength(float time, int flag); // 0x0049bff0
     // 0x0049c010: saves the recording with its length and description.
     void SaveRecording(float length, char* description, int flag);
     // 0x0049c070: describes a racer of the recording: its network id, AI
@@ -107,7 +107,7 @@ public:
                                char* bikeName, char* riderName, int* engineSize, int* engineKind,
                                int* value);
 
-    float field_0x0d8;                        // 0x0049bff0 stores its first argument
+    float replayLength;                       // +0x0d8 SetReplayLength (BikeRace slot 10 each frame)
     // +0xdc..+0xf8c (0xeb0 bytes) is the block 0x0049bf10 and 0x0049c010 hand
     // to the recorder.
     char magic[8];                            // +0x0dc "MCMVCR" (0x0049bf10, mode 0)

@@ -30,7 +30,7 @@ void GhostMod1::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultre
 }
 
 // 0x0047bbf0
-void GhostMod1::UnknownFunction47bbf0(float duration)
+void GhostMod1::StartFade(float duration)
 {
     if (duration == 0.0f) {
         timeRemaining = GHOST_MOD_NONE;
