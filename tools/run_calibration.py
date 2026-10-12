@@ -26391,6 +26391,24 @@ CASES = [
         'target_size': 14,
         'reason': 'out-of-line axisValues[axis] accessor called from OptionProcs 0x4b331d/0x4b57b9; was bound but undefined',
     },
+    {
+        'name': 'CubeDraw 0x43e4c0 DrawableCube slot 14',
+        'bindings': 'src/reconstructed/CubeDraw.bindings.json',
+        'source': 'src/reconstructed/CubeDraw.cpp',
+        'symbol': '?UnknownVirtualSlot14@DrawableCube@@UAEHXZ',
+        'target_va': '0x0043e4c0',
+        'target_size': 886,
+        'reason': 'draws the textured and bare cube cells; the cell arrays indexed flat (cell = face * 16 + i, first vertex cell * 6) reproduce the recomputed addresses and the zero kept in esi',
+    },
+    {
+        'name': 'CubeDraw 0x43e840 slot 14 static matrix atexit thunk',
+        'bindings': 'src/reconstructed/CubeDraw.bindings.json',
+        'source': 'src/reconstructed/CubeDraw.cpp',
+        'symbol': '_$E26',
+        'target_va': '0x0043e840',
+        'target_size': 1,
+        'reason': 'empty destructor thunk of the function-local s_world (pushed to atexit at 0x43e4f3)',
+    },
 ]
 
 def main():

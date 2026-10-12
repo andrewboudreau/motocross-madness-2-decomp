@@ -19,12 +19,6 @@
 // render target and its camera, the face mask is addressed [face + cube]
 // in retail and [cube + face] here, and the quad test's arguments are
 // evaluated before the camera load in retail.
-//
-// Slot 14 0x0043e4c0 (886 bytes): the render-state sequence matches; retail
-// keeps the zero arguments in esi (the face offset's initial value) and
-// recomputes the cell's vertex and mapping addresses from face * 16 + i,
-// where VC6 here pushes immediates and strength-reduces the addresses. Its
-// static matrix's atexit thunk 0x0043e840 ($E26) matches.
 
 #include <string.h>
 
@@ -37,7 +31,6 @@
 #include "../../src/reconstructed/RenderTarget.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/Tgafile.h"
-#include "../../src/reconstructed/D3DConstants.h"
 
 // CubeDraw.cpp's file statics (same names and addresses).
 static Vector3 s_viewPoints[25];
@@ -226,76 +219,4 @@ void DrawableCube::MarkVisibleCells()
                 field_0x2c->field_0x38[face].visibleCells |= 1 << i;
         }
     }
-}
-
-// 0x0043e4c0
-int DrawableCube::UnknownVirtualSlot14()
-{
-    static Matrix4 s_world = IdentityMatrix();
-    int fog;
-    Target()->UnknownVirtualSlot9(9, &fog);
-    s_world.m[0][0] = 2.0f;
-    s_world.m[1][1] = 2.0f;
-    s_world.m[2][2] = 2.0f;
-    s_world.m[3][0] = field_0x2c->field_0x14.x;
-    s_world.m[3][1] = field_0x2c->field_0x14.y;
-    s_world.m[3][2] = field_0x2c->field_0x14.z;
-    Target()->currentCamera->UnknownVirtualSlot30(&s_world);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    int face;
-    int i;
-    for (face = 0; face < 6; face++) {
-        for (i = 0; i < 16; i++) {
-            if (!(field_0x2c->field_0x38[face].visibleCells & (1 << i)))
-                continue;
-            if (!(field_0x2c->field_0x38[face].presentTextures & (1 << i)))
-                continue;
-            if (!field_0x2c->field_0x38[face].textures[i]->UnknownVirtualSlot7())
-                continue;
-            if (textureGroup && (field_0x2c->field_0x38[face].textures[i]->mapFlags & 1)) {
-                UnknownCubeTextureMapping* mapping = &s_cellMappings[face][i];
-                ((ManagedTexture*)field_0x2c->field_0x38[face].textures[i])
-                    ->RemapTexCoordsIfMoved(&mapping->scale, &mapping->offsetU, &mapping->offsetV,
-                                            &s_cellVertices[face][i][0].tu, &s_cellVertices[face][i][0].tv, 6,
-                                            0x20);
-            }
-            field_0x2c->field_0x38[face].textures[i]->UnknownVirtualSlot19();
-            if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)s_cellVertices[face][i], 6, 0))
-                return 0;
-        }
-    }
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    Target()->UnknownVirtualSlot11(0);
-    for (face = 0; face < 6; face++) {
-        for (i = 0; i < 16; i++) {
-            if (!(field_0x2c->field_0x38[face].visibleCells & (1 << i)))
-                continue;
-            if (field_0x2c->field_0x38[face].presentTextures & (1 << i))
-                continue;
-            if (face >= 4 || i <= 7)
-                continue;
-            UnknownCubeVertex* v = s_cellVertices[face][i];
-            v[0].diffuse = Target()->clearColor;
-            v[1].diffuse = Target()->clearColor;
-            v[2].diffuse = Target()->clearColor;
-            v[3].diffuse = Target()->clearColor;
-            v[4].diffuse = Target()->clearColor;
-            v[5].diffuse = Target()->clearColor;
-            if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)v, 6, 0))
-                return 0;
-        }
-    }
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 1, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, fog, 0);
-    return 1;
 }

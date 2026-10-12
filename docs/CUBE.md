@@ -35,16 +35,23 @@ Exact:
   the face counter in the dead argument slots in that order,
   docs/VC6_FRAME_LAYOUT.md), the destructor and its deleting wrapper, the
   vectors and texture loaders, and the eight `$E`.
-- cubedraw.cpp (22): the constructor, the destructor and its deleting
-  wrapper, the loader `0x0043d980`, `0x0043e210`, slot 12, the eight empty
-  array `$E` (their order cannot be checked because the bodies are
-  identical) and the eight vector `$E`.
+- cubedraw.cpp (24): the constructor, the destructor and its deleting
+  wrapper, the loader `0x0043d980`, `0x0043e210`, slot 12, slot 14
+  `0x0043e4c0` (the cell draw) and its static matrix's atexit thunk
+  `0x0043e840`, the eight empty array `$E` (their order cannot be checked
+  because the bodies are identical) and the eight vector `$E`. Slot 14
+  matches only with the cell arrays indexed flat through named locals
+  (`cell = face * 16 + i`, `first = cell * 6`) on the global arrays:
+  retail then recomputes each cell's vertex and mapping addresses and keeps
+  the zero arguments in `esi`. Two-dimensional indexing, a flat index
+  expression or a local cell pointer all compile to strength-reduced
+  pointers with immediate zeros.
 
 Near misses:
 - `samples/render/CubeDrawNearMisses.cpp`: the geometry builder
-  `0x0043dc60`, the texture coordinates `0x0043e0b0`, the visibility test
-  `0x0043e330` and slot 14 `0x0043e4c0`. They differ in register use,
-  strength reduction and constant materialisation.
+  `0x0043dc60`, the texture coordinates `0x0043e0b0` and the visibility test
+  `0x0043e330`. They differ in register use, strength reduction and
+  constant materialisation.
 
 ## Function names
 

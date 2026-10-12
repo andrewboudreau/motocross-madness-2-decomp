@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 171, c 114, total 285. The three class (a) functions of the
+Counts: a 0, b 171, c 113, total 284. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -213,7 +213,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
 | render/CubeDraw | `0x0043e330` | 90/399 | b | 15 code diffs: `mov ecx, [edi + 0x18] ; mov eax, [ecx +~` vs `mov eax, [edi + 0x18] ; mov ecx, [eax +~`; `mov eax, [ecx + 8] ; mov edx, [eax + 0x~` vs `mov ecx, [eax + 8] ; mov edx, [ecx + 0x~`; slots differ |
-| render/CubeDraw | `0x0043e4c0` | 203/886 | c | 38 code diffs: `sub esp, 0x50` vs `sub esp, 0x54`; `push 0 ; push 0` vs `xor esi, esi ; push esi ; push esi` |
 | render/D3DIMSoulTree | `0x00440810` | 135/1349 | b | 50 code diffs: `jle @345 ; xor esi, esi` vs `jle @340`; `mov [esp + N], esi ; mov eax, [edi + 0x~` vs `mov edx, [edi + 0x1c] ; mov esi, ebx ; ~`; frame 0x84 vs 0x80, slot order differs |
 | render/D3DIMSoulTree | `0x00440f30` | 241/763 (masked) | b | DrawCurrentLod: stale static-local and `$E` bindings fixed (ret stubs 0x442f60/0x442f40), all relocations bound; 1626/1893 normalised insns align; register allocation left |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |

@@ -56,5 +56,12 @@
   "_kVec3Zero": "0x00579920",
   "_s_UnknownGlobal57ee94": "0x0057ee94",
   "_s_UnknownGlobal57ee98": "0x0057ee98",
-  "_s_cellMappings": "0x0057ea10"
+  "_s_cellMappings": "0x0057ea10",
+  "?IdentityMatrix@@YA?AUMatrix4@@XZ": "0x004a1410",
+  "?RemapTexCoordsIfMoved@ManagedTexture@@QAEHPAM0000HI@Z": "0x00510910",
+  "_$E26": "0x0043e840",
+  "_?$S25@?1??UnknownVirtualSlot14@DrawableCube@@UAEHXZ@4EA": "0x005798b4",
+  "_?s_world@?1??UnknownVirtualSlot14@DrawableCube@@UAEHXZ@4UMatrix4@@A": "0x00579ab8",
+  "_atexit": "0x00535430",
+  "_s_cellVertices": "0x0057a210"
 }
