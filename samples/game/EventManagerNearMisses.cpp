@@ -115,7 +115,7 @@ struct UnknownPodiumNode {
 };
 struct UnknownPodiumNodeOwner {                     // the view's +0x64
     unsigned char field_0x000[0x1a0];
-    UnknownPodiumNode* field_0x1a0;
+    UnknownPodiumNode* modelNode;                   // +0x1a0 the characters' model node
 };
 struct UnknownPodiumViewFields {
     unsigned char field_0x00[0x4c];
@@ -247,8 +247,8 @@ int EventManager::CreatePodiumScene() {
         direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
     } else {
         if (g_TrackGame->mode.raceSettings.eventType == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
-            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetPosition(&podiumPosition);
-            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetAxes(&direction, &up);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->modelNode->GetPosition(&podiumPosition);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->modelNode->GetAxes(&direction, &up);
         } else {
             float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->field_0x40;
             podiumPosition = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);

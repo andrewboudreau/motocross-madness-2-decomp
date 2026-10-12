@@ -30,7 +30,7 @@ typedef void (*UnknownProgressCallback)(int* step);
 // BikeCamera's +0x3b0.
 struct UnknownQuarryCameraSubject {
     unsigned char field_0x00[0x64];
-    Vector3 field_0x64;
+    Vector3 velocity;                         // +0x64 krusty2 SoultreePhysicsBaseObject::velocity
 };
 
 struct UnknownQuarryCamera {
