@@ -1435,7 +1435,9 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
 // distance test right after the track loop and jumps back to it from the single-point and
 // no-track paths (the candidate places it after them); the random free-roam target scales
 // through a stored temporary.  The trick search needs the `for` form (a do/while is
-// rotated with the first division folded to * 0.2).
+// rotated with the first division folded to * 0.2).  Declaring difficulty with the
+// other locals, or kind as well, or splitting kind's declaration leaves edi and 394
+// strict; reading difficulty after kind gives 237.
 // 0x00572988: look-ahead distance of the race-kind 2/3 path samples (100.0f).
 extern float g_BikeAILookAhead_00572988;
 
