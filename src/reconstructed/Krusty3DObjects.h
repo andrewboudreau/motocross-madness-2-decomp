@@ -83,7 +83,7 @@ struct UnknownRunwayTrack {
 
 struct UnknownRunwayView {
     unsigned char field_0x00[0x48];
-    UnknownRunwayTrack* field_0x48;
+    UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
 };
 
 // The racer's race status node (RaceView.h's UnknownEventRacerPart).
@@ -100,8 +100,8 @@ struct UnknownRunwayRacer {
     Vector3 trackPoint;                       // +0x10c
     Vector3 trackDirection;                   // +0x118 track direction there
     unsigned char field_0x124[0x740 - 0x124];
-    UnknownRunwayView* field_0x740;
-    UnknownRunwayRacerPart* field_0x744;
+    UnknownRunwayView* bikeView;              // +0x740 (RaceView.h)
+    UnknownRunwayRacerPart* statusNode;       // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x78c - 0x748];
     int field_0x78c;
     unsigned char field_0x790[0x7a4 - 0x790];
@@ -144,9 +144,9 @@ struct UnknownVisualCueView {
     unsigned char field_0x000[0x38];
     UnknownRunwayRacer* ownRacer;             // +0x38 its own racer
     unsigned char field_0x03c[0x48 - 0x3c];
-    UnknownRunwayTrack* field_0x48;
+    UnknownRunwayTrack* raceTrack;            // +0x48 BikeRace's raceTrack
     unsigned char field_0x04c[0x50 - 0x4c];
-    UnknownVisualCueCamera* field_0x50;
+    UnknownVisualCueCamera* raceCamera;       // +0x50 BikeRace's raceCamera
     unsigned char field_0x054[0x18a - 0x54];
     bool racing;                              // +0x18a
     unsigned char field_0x18b[0x190 - 0x18b];
@@ -261,7 +261,7 @@ struct UnknownKrustyCamera {
 
 struct UnknownKrustyCameraHolder {
     unsigned char field_0x00[0x50];
-    UnknownKrustyCamera* field_0x50;
+    UnknownKrustyCamera* raceCamera;          // +0x50 BikeRace's raceCamera
 };
 
 // One 24-byte gate record of the course at the global's +0x560.

@@ -95,9 +95,9 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     Vector3 direction;
     Vector3 position;
     Vector3 next;
-    if (trackedRacer->field_0x740->field_0x48) {
-        trackedRacer->field_0x740->field_0x48->PointAt(trackedRacer->field_0x744->field_0x38, &position);
-        trackedRacer->field_0x740->field_0x48->PointAt(trackedRacer->field_0x744->field_0x44, &next);
+    if (trackedRacer->bikeView->raceTrack) {
+        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->field_0x38, &position);
+        trackedRacer->bikeView->raceTrack->PointAt(trackedRacer->statusNode->field_0x44, &next);
         direction = position - next;
     } else {
         position = trackedRacer->trackPoint;

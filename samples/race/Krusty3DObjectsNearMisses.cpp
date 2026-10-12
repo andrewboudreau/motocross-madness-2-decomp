@@ -196,7 +196,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         return 1;
     if (!cycleCues) {
         if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||
-            cueView->field_0x50->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
+            cueView->raceCamera->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;
             return 1;
@@ -205,7 +205,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     switch (g_UnknownKrustyGame56e26c->cameraMode) {
     case 2:
     case 3: {
-        if (!cueView->field_0x48)
+        if (!cueView->raceTrack)
             goto hide;
         if (cueView->ownRacer->field_0x78c) {
             isVisible = 0;
@@ -214,8 +214,8 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         isVisible = 1;
         UNKNOWN_PLACE_CUE();
         Vector3 target;
-        if (cueView->field_0x48)
-            cueView->field_0x48->PointAt(cueView->ownRacer->field_0x744->field_0x44, &target);
+        if (cueView->raceTrack)
+            cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->field_0x44, &target);
         else
             target = cueView->ownRacer->trackPoint;
         field_0xac->QueryGround(&target, 0, 0, 0);
@@ -228,7 +228,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     case 1:
     case 5: {
         UNKNOWN_PLACE_CUE();
-        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->field_0x50->field_0x3b4;
+        UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->bajaEnduroEvent->raceView->raceCamera->field_0x3b4;
         if (!ref)
             return 1;
         Vector3 direction =
