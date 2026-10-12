@@ -496,9 +496,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x068) {
                                 NextCameraTarget(1, 1, 0);
                             }
-                            if (field_0x064->field_0x210 != 0) {
-                                field_0x064->field_0x210->Release();
-                                field_0x064->field_0x210 = 0;
+                            if (field_0x064->collisionObject != 0) {
+                                field_0x064->collisionObject->Release();
+                                field_0x064->collisionObject = 0;
                             }
                         }
                     }
@@ -532,9 +532,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x070) {
                                 NextCameraTarget(1, 1, 0);
                             }
-                            if (field_0x06c->field_0x210 != 0) {
-                                field_0x06c->field_0x210->Release();
-                                field_0x06c->field_0x210 = 0;
+                            if (field_0x06c->collisionObject != 0) {
+                                field_0x06c->collisionObject->Release();
+                                field_0x06c->collisionObject = 0;
                             }
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
@@ -1075,7 +1075,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                         for (int i = 0; i < raceScene->animationTable->entryCount; i++) {
                             UnknownSceneEntry* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
-                                if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->field_0x210) {
+                                if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->collisionObject) {
                                     UnknownFunctionCameraView()->followingRacer = 1;
                                     field_0x150 = i;
                                     NextCameraTarget(1, 0, 1);
@@ -1472,9 +1472,9 @@ void BikeRace::UnknownFunction421050() {
             field_0x15c = 8.2f;
             field_0x06c->UnknownVirtualSlot5();
             raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
-            if (field_0x06c->field_0x210 != 0) {
-                field_0x06c->field_0x210->Release();
-                field_0x06c->field_0x210 = 0;
+            if (field_0x06c->collisionObject != 0) {
+                field_0x06c->collisionObject->Release();
+                field_0x06c->collisionObject = 0;
             }
             raceScene->UnknownFunction4eafd0(field_0x070);
         } else {

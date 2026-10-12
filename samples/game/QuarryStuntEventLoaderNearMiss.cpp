@@ -126,7 +126,7 @@ struct UnknownQuarryRacer {
 // BikeRace (0x400 bytes, constructor 0x00417c30) as the loader uses it.
 struct UnknownQuarryRaceCharacter {
     unsigned char field_0x000[0x210];
-    UnknownQuarryCollision* field_0x210;
+    UnknownQuarryCollision* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
 };
 class UnknownQuarryRace : public GameObject {
 public:
@@ -686,13 +686,13 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         }
     }
     UnknownQuarryRace* race = (UnknownQuarryRace*)raceView;
-    if (race->field_0x6c && race->field_0x6c->field_0x210) {
-        race->field_0x6c->field_0x210->Release();
-        ((UnknownQuarryRace*)raceView)->field_0x6c->field_0x210 = 0;
+    if (race->field_0x6c && race->field_0x6c->collisionObject) {
+        race->field_0x6c->collisionObject->Release();
+        ((UnknownQuarryRace*)raceView)->field_0x6c->collisionObject = 0;
     }
-    if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210) {
-        ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210->Release();
-        ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210 = 0;
+    if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject) {
+        ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject->Release();
+        ((UnknownQuarryRace*)raceView)->field_0x64->collisionObject = 0;
     }
     if (eventScene->animationTable) {
         for (int i = 0; i < eventScene->animationTable->entryCount; i++) {

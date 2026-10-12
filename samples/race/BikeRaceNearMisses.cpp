@@ -635,9 +635,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 if (field_0x06c) {
                     raceScene->RestartEntry(field_0x070, 0, 0, 0);
                     raceScene->animationTable->entries[field_0x070].field_0x00_bit5 = 1;
-                    if (field_0x06c->field_0x210) {
-                        field_0x06c->field_0x210->Release();
-                        field_0x06c->field_0x210 = 0;
+                    if (field_0x06c->collisionObject) {
+                        field_0x06c->collisionObject->Release();
+                        field_0x06c->collisionObject = 0;
                     }
                 }
                 if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
@@ -661,9 +661,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                         (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("StartGate.slb", &field_0x068);
                     if (field_0x064) {
                         raceScene->RestartEntry(field_0x068, 0, 0, 0);
-                        if (field_0x064->field_0x210) {
-                            field_0x064->field_0x210->Release();
-                            field_0x064->field_0x210 = 0;
+                        if (field_0x064->collisionObject) {
+                            field_0x064->collisionObject->Release();
+                            field_0x064->collisionObject = 0;
                         }
                     }
                     if (g_TrackGame->mode.raceSettings.raceMode != 0 &&

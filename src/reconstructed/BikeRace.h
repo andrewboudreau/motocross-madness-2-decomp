@@ -591,7 +591,7 @@ struct UnknownBikeRaceView6c : virtual public GameObject {
     unsigned char field_0x008[0x1a0 - 0x08];
     UnknownBikeRaceMesh* model;               // +0x1a0 model (the setup places it)
     unsigned char field_0x1a4[0x210 - 0x1a4];
-    UnknownBikeRaceCollider* field_0x210;
+    UnknownBikeRaceCollider* collisionObject; // +0x210 krusty2 CollisionCharacter::collisionObject
 };
 
 // The object at BikeRace+0x4c: 0x00507c10 moves a point (the track debug
@@ -728,7 +728,7 @@ struct UnknownBikeRacePickCaster {
 
 struct UnknownBikeRacePickCharacter {
     unsigned char field_0x000[0x210];
-    int field_0x210;
+    int collisionObject;                      // +0x210 krusty2 CollisionCharacter::collisionObject
 };
 
 struct UnknownBikeRacePickObject {
