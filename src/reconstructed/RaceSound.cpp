@@ -52,8 +52,8 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     applause3 = 0;
     for (i = 0; i < 11; i++) {
         field_0x120c[i] = 0;
-        field_0x1264[i] = 0;
-        field_0x1238[i] = 0;
+        racerFallSound[i] = 0;
+        racerWreckSound[i] = 0;
         engineChannels[i].sampleBuffer = 0;
         engineChannels[i].sampleBuffer = DebugMalloc(44100, __FILE__, 77);
         memset(engineChannels[i].sampleBuffer, 0, 44100);
@@ -745,8 +745,8 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
         currentRacer = engineChannels[i].channelRacer;
         if (!currentRacer->field_0x444) {
             field_0x120c[i] = 0;
-            field_0x1238[i] = 0;
-            field_0x1264[i] = 0;
+            racerWreckSound[i] = 0;
+            racerFallSound[i] = 0;
         } else {
             if (!field_0x120c[i]) {
                 if (currentRacer == listenerRacer && listenerRacer->field_0x460 == 12) {
@@ -763,16 +763,16 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                 }
             }
             if (currentRacer->field_0x484) {
-                if (!field_0x1238[i])
-                    field_0x1238[i] = UnknownFunction4e42e0(currentRacer);
-                else if (!wreckSounds[field_0x1238[i]]->IsPlaying())
-                    field_0x1238[i] = UnknownFunction4e42e0(currentRacer);
+                if (!racerWreckSound[i])
+                    racerWreckSound[i] = PlayWreckSound(currentRacer);
+                else if (!wreckSounds[racerWreckSound[i]]->IsPlaying())
+                    racerWreckSound[i] = PlayWreckSound(currentRacer);
             }
             if (currentRacer->field_0x604->field_0xb0) {
-                if (!field_0x1264[i])
-                    field_0x1264[i] = UnknownFunction4e43a0(currentRacer);
-                else if (!fallSounds[field_0x1264[i]]->IsPlaying())
-                    field_0x1264[i] = UnknownFunction4e43a0(currentRacer);
+                if (!racerFallSound[i])
+                    racerFallSound[i] = PlayFallSound(currentRacer);
+                else if (!fallSounds[racerFallSound[i]]->IsPlaying())
+                    racerFallSound[i] = PlayFallSound(currentRacer);
             }
             field_0x120c[i] = 1;
         }
@@ -898,8 +898,10 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     return 0;
 }
 
-// 0x004e42e0
-int RaceSound::UnknownFunction4e42e0(UnknownEventRacer* racer) {
+// 0x004e42e0: plays one of the six wreck sounds that is not playing (at most
+// ten random picks) at the racer's position; returns its index, 0 when
+// none was free.
+int RaceSound::PlayWreckSound(UnknownEventRacer* racer) {
     Vector3 position;
     int tries = 0;
     int index = rand() % 6;
@@ -915,8 +917,10 @@ int RaceSound::UnknownFunction4e42e0(UnknownEventRacer* racer) {
     return index;
 }
 
-// 0x004e43a0
-int RaceSound::UnknownFunction4e43a0(UnknownEventRacer* racer) {
+// 0x004e43a0: plays one of the six fall sounds that is not playing (at most
+// ten random picks) at the racer's position; returns its index, 0 when
+// none was free.
+int RaceSound::PlayFallSound(UnknownEventRacer* racer) {
     Vector3 position;
     int tries = 0;
     int index = rand() % 6;

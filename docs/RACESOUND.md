@@ -58,3 +58,7 @@ last frame lands, so it is `landHardSound`, not an engine). Channel fields
 follow their use in `0x004e39b0`/`0x004e4d10` (voice index, engine, sample
 kind 1..6, byte count and offset, half being filled, next kind, distance).
 The header keeps each offset as a `// +0xNN` comment.
+`racerWreckSound`/`racerFallSound` (+0x1238/+0x1264, one per racer) hold
+the index `PlayWreckSound` `0x004e42e0` / `PlayFallSound` `0x004e43a0`
+returned (a random free sound of six, played at the racer); a new sound is
+picked only when that one has stopped.

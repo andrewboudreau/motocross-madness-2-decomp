@@ -86,8 +86,8 @@ public:
     int UpdateRacerSounds(float frameTime); // 0x004e39b0: per-racer sounds
     // 0x004e42e0 / 0x004e43a0: plays a random "wreck%02d.wav" (wreckSounds)
     // or "fall%02d.wav" (fallSounds) sound at `racer`; the index, or 0 after ten busy tries.
-    int UnknownFunction4e42e0(UnknownEventRacer* racer);
-    int UnknownFunction4e43a0(UnknownEventRacer* racer);
+    int PlayWreckSound(UnknownEventRacer* racer);
+    int PlayFallSound(UnknownEventRacer* racer);
     // 0x004e4460: the ground distance between two points, 500 when either
     // axis is further apart than that.
     float GroundDistance(Vector3* a, Vector3* b);
@@ -185,8 +185,8 @@ public:
     Sound* waypointSound;                  // +0x1204, "Waypoint.wav"
     int field_0x1208;                     // reset (0x004e3430) on the next frame
     int field_0x120c[11];
-    int field_0x1238[11];
-    int field_0x1264[11];
+    int racerWreckSound[11];                  // +0x1238
+    int racerFallSound[11];                   // +0x1264
     int field_0x1290;
     int field_0x1294;
     int bytesPerSample;                    // +0x1298, 2 with audio_16.ini, 1 with audio_08.ini
