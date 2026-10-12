@@ -108,7 +108,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Bike | `0x0040aec0` | 671/1353 | b | 35 code diffs; slots differ |
 | krusty2/vehicle/Bike | `0x0040ba30` | 58/1157 | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
-| krusty2/vehicle/Vehicle | `0x005257a0` | 585/637 (masked) | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
+| krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 51/555 | b | 35 code diffs: retail lacks `fld [eax + 8]`; retail adds `mov ebx, [esp + N] ; mov ecx, [esp + N]`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 258/1578 | b | 87 code diffs: retail adds `xor ebx, ebx`; retail lacks `xor ebp, ebp`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x00526fa0` | 96/1161 | b | 21 code diffs: retail lacks `xor ecx, ecx`; `mov [esp + N], ebp` vs `mov [esp + N], ebx`; slot order differs |
