@@ -20,7 +20,7 @@ struct UnknownPlayerLeftMessage {
 };
 
 // 0x004886e0
-void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName)) {
@@ -95,7 +95,7 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x00488ad0
-void ContinueDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ContinueDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName)) {
@@ -131,7 +131,7 @@ void FormatTime(char* text, float seconds) {
 }
 
 // 0x00488c90
-void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
     switch (event->kind) {
     case kDialogInit:

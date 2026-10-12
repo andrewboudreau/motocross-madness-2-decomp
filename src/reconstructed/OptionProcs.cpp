@@ -36,7 +36,7 @@ static inline UIListBox* UnknownDropDownList(UIControl* dropDown)
 
 
 // 0x004b2000
-void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptGameSettingsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -81,7 +81,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004b22d0
-void OptGameSettingsDlg::UnknownVirtualSlot31(int save)
+void OptGameSettingsDlg::SyncValues(int save)
 {
     if (save) {
         switch (static_cast<UIMultiState*>(FindControl("MultChatMode", 2))->GetSelectedState()) {
@@ -118,7 +118,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot31(int save)
 }
 
 // 0x004b23b0
-void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     char text[128];
     switch (event->kind) {
@@ -184,7 +184,7 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004b2670
-void OptGraphicsDlg::UnknownVirtualSlot31(int save)
+void OptGraphicsDlg::SyncValues(int save)
 {
     if (save)
         g_UnknownGlobal6887d8.resolutionRow = UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->GetRowData(-1);
@@ -193,7 +193,7 @@ void OptGraphicsDlg::UnknownVirtualSlot31(int save)
 }
 
 // 0x004b26c0
-void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptAdvancedGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     int* settings = g_TrackGame->mode.videoSettings;
     char key[1024];
@@ -268,7 +268,7 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004b2b20
-void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptSoundDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit:
@@ -305,7 +305,7 @@ void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004b2ce0
-void OptSoundDlg::UnknownVirtualSlot31(int save)
+void OptSoundDlg::SyncValues(int save)
 {
     if (save) {
         g_UnknownGlobal688798.sound16Bit = static_cast<UIRadioButton*>(FindControl("Rad16Bit", 4))->GetGroupSelection() - 1;
@@ -330,7 +330,7 @@ void OptSoundDlg::ApplySoundSettings()
 
 
 // 0x004b2e00
-void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     char text[128];
     char path[260];
@@ -452,7 +452,7 @@ void OptControlsDlg::ListMappedKeys()
 }
 
 // 0x004b3470
-void OptControlsDlg::UnknownVirtualSlot31(int save)
+void OptControlsDlg::SyncValues(int save)
 {
     if (save) {
         if (g_TrackGame->field_0x33fc)
@@ -620,7 +620,7 @@ void OptControlsDlg::EndInputWait()
 }
 
 // 0x004b40a0
-void OptMessagesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptMessagesDlg::HandleEvent(UnknownDialogEvent* event)
 {
     if (event->kind == kDialogInit) {
         static_cast<UIEditBox*>(FindControl("Message1", 11))->BindTextBuffer(g_UnknownGlobal688c10[1], 128);
@@ -673,7 +673,7 @@ static inline char (*UnknownMessagesOf(TrackGame* game))[128]
 }
 
 // 0x004b4280
-void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -911,7 +911,7 @@ void OptionsDlg::OpenPage(int page)
 extern "C" __declspec(dllimport) int __stdcall CopyFileA(const char* from, const char* to, int failIfExists);
 
 // 0x004b4e70
-void GlobalSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void GlobalSettingsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case 9:
@@ -996,7 +996,7 @@ void GlobalSettingsDlg::ListOtherProfiles()
 }
 
 // 0x004b5380
-void ConfirmRestoreDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void ConfirmRestoreDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -1026,7 +1026,7 @@ void ConfirmRestoreDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004b3500
-void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void OptGarageDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
@@ -1172,7 +1172,7 @@ void OptGarageDlg::ShowCurve()
 }
 
 // 0x004b3e70
-void OptGarageDlg::UnknownVirtualSlot31(int save)
+void OptGarageDlg::SyncValues(int save)
 {
     if (save) {
         g_UnknownGlobal688808.suspension[0] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontComp", 8))->GetScrollValue() * 0.01f;

@@ -59,11 +59,13 @@ public:
                                            const char* font, int fontSize, GUIManager* gui,
                                            GUIUser* user, const char* name);
     virtual void UnknownVirtualSlot28(int value); // 0x0046e8c0
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00470020: the dialog's procedure
+    virtual void HandleEvent(UnknownDialogEvent* event); // slot 29, 0x00470020: the dialog's procedure (controls report events here)
     virtual void UnknownVirtualSlot30();      // 0x00470040
-    virtual void UnknownVirtualSlot31(int value); // 0x00470050
+    // Slot 31, 0x00470050: UpdateBoundValues calls it after the controls'
+    // SyncBoundValue; 1 stores the dialog's settings, 0 shows them.
+    virtual void SyncValues(int value);
 
-    void UpdateBoundValues(int value);        // 0x0046ecc0: slot 59 on every control with a bound value
+    void UpdateBoundValues(int value);        // 0x0046ecc0: SyncBoundValue on every bound control, then SyncValues
     // 0x0046e9a0: the object (a control, image or sound) built for the .dtm
     // section `name`, else the GUI's (the control loader resolves "SoundNorm",
     // "FXAnimIn" and "Anchor" references through it).
@@ -126,8 +128,8 @@ public:
     int field_0xc0;
     int openingMenu;                          // +0xc4: the menu id it was shown for (GUIManager::ShowDialog's `a`)
     int animatesControls;                     // +0xc8: animates its controls
-    void (*field_0xcc)(UnknownDialogEvent* event); // the procedure (slot 29)
-    void (*field_0xd0)(UIDialog* dialog, int value); // slot 31
+    void (*eventProc)(UnknownDialogEvent* event); // +0xcc: the procedure HandleEvent calls
+    void (*syncProc)(UIDialog* dialog, int value); // +0xd0: called by SyncValues
     void (*field_0xd4)();                     // slot 30
     void* dialogFont;                         // +0xd8
     int dialogFontHeight;                     // +0xdc
@@ -191,7 +193,7 @@ class TransDlg : public UIDialog {
 public:
     TransDlg() : UIDialog(1, "Trans.dtm") {}
     void SetNextMenu(int menu);                   // 0x00455c40: stores +0x7f60
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455b60 (dlgprocs.cpp)
+    void HandleEvent(UnknownDialogEvent* event); // 0x00455b60 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455bd0 (dlgprocs.cpp)
 
     int framesShown;                          // +0x7f58: frames shown (dlgprocs.cpp)
@@ -204,7 +206,7 @@ public:
 class Intro1Dlg : public UIDialog {
 public:
     Intro1Dlg() : UIDialog(1, "intro1.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004532c0 (dlgprocs.cpp)
+    void HandleEvent(UnknownDialogEvent* event); // 0x004532c0 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x004533d0 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00453420 (dlgprocs.cpp)
 
@@ -216,7 +218,7 @@ public:
 class Exit1Dlg : public UIDialog {
 public:
     Exit1Dlg() : UIDialog(1, "Exit1.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455c50 (dlgprocs.cpp)
+    void HandleEvent(UnknownDialogEvent* event); // 0x00455c50 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455d00 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455d70 (dlgprocs.cpp)
 

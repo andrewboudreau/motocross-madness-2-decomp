@@ -182,11 +182,11 @@ class MPEventDlg : public UIDialog {
 public:
     MPEventDlg() : UIDialog(1, "MPEvent.dtm") {}
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f5f30
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f6370
+    void HandleEvent(UnknownDialogEvent* event); // 0x004f6370
     void ShowHostSettings();             // 0x004f6070: shows the host's settings
     void EnableChangeableControls();             // 0x004f69d0: enables the controls the player may change
     void ApplyEventType();             // 0x004f6e60: applies the event type
-    void UnknownVirtualSlot31(int apply);     // 0x004f7210: stores (or shows) the event settings
+    void SyncValues(int apply);     // 0x004f7210: stores (or shows) the event settings
     void ShowTrackPicture();             // 0x004f75d0: shows the track picture
     void LoadTrackPicture(UIControl* picture, const char* directory, const char* name); // 0x004f7640: loads the track picture
 
@@ -200,12 +200,12 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x004f8820: turns the bike view
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004f8780
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f8620
-    void UnknownVirtualSlot31(int apply);     // 0x004f91e0: stores the chosen bike and rider
+    void SyncValues(int apply);     // 0x004f91e0: stores the chosen bike and rider
     void ApplyLargestOpponentClass();             // 0x004f8650: client: selects the host's largest opponent class
     void EnableLargestOpponent();             // 0x004f8700: enables "LargestOpponentDropDown" for the host only
     void PaintPlateNumber(int number);   // 0x004f8570: paints the plate number on every bike
     void FillBikeRiderLists();             // 0x004f8220: fills the bike and rider lists
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f78a0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004f78a0
     void ApplyChosenBike();             // 0x004f8d20: applies the chosen bike
     void ApplyChosenRider();             // 0x004500d0 (in dlgprocs.cpp's code): applies the chosen rider
 
@@ -226,7 +226,7 @@ public:
 class MPRaceInfoDlg : public UIDialog {
 public:
     MPRaceInfoDlg() : UIDialog(1, "MPRInfo.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004513a0 (DlgProcs.cpp)
+    void HandleEvent(UnknownDialogEvent* event); // 0x004513a0 (DlgProcs.cpp)
 };
 
 // RTTI: MPOptionsDlg : UIDialog (vtable 0x005578fc; 0x7f58 bytes).
@@ -234,7 +234,7 @@ class MPOptionsDlg : public UIDialog {
 public:
     MPOptionsDlg() : UIDialog(1, "MPOpt.dtm") {}
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f9570
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f93c0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004f93c0
     void RefreshValues();             // 0x004f95a0: UpdateBoundValues(0)
     void EnableHostOptions();             // 0x004f95b0: enables the host options and "ChkRecordRace"
 };
@@ -245,7 +245,7 @@ class MultiPlayerDlg : public UIDialog {
 public:
     MultiPlayerDlg() : UIDialog(1, "MPBase.dtm") {} // inline (KrustyUI 0x00499b20)
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f3a70
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f4520
+    void HandleEvent(UnknownDialogEvent* event); // 0x004f4520
     void FillRacerSlots();             // 0x004f20d0: fills the racer slots for the race
     void SendStartMessage(short start);  // 0x004f2340: sends the lobby start message (type 0x83)
     void SendSettings();             // 0x004f2b90: sends the lobby settings

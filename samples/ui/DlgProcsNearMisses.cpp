@@ -3,7 +3,7 @@
 // matched functions). Check: compile this file and compare each function with
 // DlgProcsNearMisses.bindings.json.
 //
-// MainDlg::UnknownVirtualSlot29 (0x0044b200, 5232 bytes): the same cases,
+// MainDlg::HandleEvent (0x0044b200, 5232 bytes): the same cases,
 //   calls and strings; retail shares one frame slot between the two
 //   ConnectionInfoType[5] arrays (frame 0x6c4), VC6 here gives each array its
 //   own slot (frame 0xc64), so every later frame offset differs. Retail also
@@ -44,8 +44,8 @@
 //   value or const reference), an inline camera getter with or without a
 //   redundant test, a `*(Vector3*)&` argument and a qualified
 //   `Camera::UnknownVirtualSlot29` call.
-// SPRaceInfoDlg::UnknownVirtualSlot29 (0x004507a0, 1652 bytes) and
-// MPRaceInfoDlg::UnknownVirtualSlot29 (0x004513a0, 2004 bytes): the same
+// SPRaceInfoDlg::HandleEvent (0x004507a0, 1652 bytes) and
+// MPRaceInfoDlg::HandleEvent (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail
 //   reloads TrackGame/EventManager into other registers (VC6 here keeps them
 //   live across the loop), so the loop bodies differ from the first loop on.
@@ -58,7 +58,7 @@
 #include "../../src/reconstructed/DlgProcs.cpp"
 
 // 0x0044b200
-void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void MainDlg::HandleEvent(UnknownDialogEvent* event) {
     char name[16];
     char path[260];
     int count;
@@ -433,7 +433,7 @@ struct UnknownReplayTapeHeader {
 
 // 0x004507a0: fills the result lists (by event type) when the page opens;
 // "ButViewReplay" plays the last race's tape.
-void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
     char position[128];
     char score[128];
     char points[128];
@@ -555,7 +555,7 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004513a0: fills the result lists (by event type) when the page opens.
-void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
     char position[128];
     char score[128];
     char points[128];

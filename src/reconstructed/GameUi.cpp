@@ -612,7 +612,7 @@ int UIButton::ButtonUp(int a, int* position) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
     }
@@ -725,7 +725,7 @@ void UIEditBox::KillFocus(int value) {
     event.dialog = ownerDialog;
     event.gui = ownerGui;
     event.control = this;
-    ownerDialog->UnknownVirtualSlot29(&event);
+    ownerDialog->HandleEvent(&event);
     RequestRedraw();
     UIControl::KillFocus(value);
 }
@@ -776,7 +776,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
             event.dialog = ownerDialog;
             event.control = this;
             event.gui = ownerDialog->guiManager;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         } else {
             iterator = (GameObjectIterator*)CreateControlIterator();
@@ -797,7 +797,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
             event.dialog = ownerDialog;
             event.control = this;
             event.gui = ownerDialog->guiManager;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         }
     }
@@ -833,7 +833,7 @@ void UIScrollCtl::HandleTimer(int value) {
             event.dialog = ownerDialog;
             event.gui = ownerGui;
             event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             break;
         case 10:
             iterator = (GameObjectIterator*)CreateControlIterator();
@@ -848,7 +848,7 @@ void UIScrollCtl::HandleTimer(int value) {
             event.dialog = ownerDialog;
             event.gui = ownerGui;
             event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             break;
         }
         break;
@@ -866,7 +866,7 @@ int UIScrollCtl::ButtonUp(int a, int* position) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
     }
@@ -1467,7 +1467,7 @@ int UIStaticText::ButtonDown(int a, int b) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
     }
@@ -1753,8 +1753,8 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     screenHeight = 480;
     isShown = 1;
     openingMenu = 0;
-    field_0xcc = 0;
-    field_0xd0 = 0;
+    eventProc = 0;
+    syncProc = 0;
     field_0xd4 = 0;
     cursorAnimation = 0;
     field_0x184 = 0;
@@ -1851,14 +1851,14 @@ int UIDialog::Release() {
     UnknownDialogEvent event;
     event.handled = 0;
     UpdateBoundValues(1);
-    UnknownVirtualSlot31(1);
+    SyncValues(1);
     event.gui = guiManager;
     event.kind = kDialogClose;
     event.code = 0;
     event.controlName = 0;
     event.dialog = this;
     event.control = 0;
-    UnknownVirtualSlot29(&event);
+    HandleEvent(&event);
     return GameObject::Release();
 }
 
@@ -1926,7 +1926,7 @@ void UIDialog::UnknownVirtualSlot28(int value) {
     event.field_0x18 = value;
     event.gui = guiManager;
     event.dialog = this;
-    UnknownVirtualSlot29(&event);
+    HandleEvent(&event);
 }
 
 // 0x0046e9a0
@@ -1998,7 +1998,7 @@ void UIDialog::UpdateBoundValues(int value) {
         if (control->boundValue)
             control->SyncBoundValue(value);
     }
-    UnknownVirtualSlot31(value);
+    SyncValues(value);
 }
 
 // 0x0046f1c0
@@ -2079,7 +2079,7 @@ void UIDialog::NotifyParent(int code, int kind) {
         event.dialog = parentDialog;
         event.control = (UIControl*)this;
         event.gui = parentDialog->guiManager;
-        parentDialog->UnknownVirtualSlot29(&event);
+        parentDialog->HandleEvent(&event);
     }
 }
 
@@ -2120,9 +2120,9 @@ int UIDialog::UnknownFunction470000(UIControl* control, int a, int b) {
 }
 
 // 0x00470020
-void UIDialog::UnknownVirtualSlot29(UnknownDialogEvent* event) {
-    if (field_0xcc)
-        field_0xcc(event);
+void UIDialog::HandleEvent(UnknownDialogEvent* event) {
+    if (eventProc)
+        eventProc(event);
 }
 
 // 0x00470040
@@ -2132,9 +2132,9 @@ void UIDialog::UnknownVirtualSlot30() {
 }
 
 // 0x00470050
-void UIDialog::UnknownVirtualSlot31(int value) {
-    if (field_0xd0)
-        field_0xd0(this, value);
+void UIDialog::SyncValues(int value) {
+    if (syncProc)
+        syncProc(this, value);
 }
 
 // 0x00470070
@@ -2529,7 +2529,7 @@ int UIControl::UnknownVirtualSlot20(int value) {
         event.control = this;
         event.key = value;
         event.field_0x18 = 1;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
         if (!event.field_0x18)
@@ -2551,7 +2551,7 @@ int UIControl::UnknownVirtualSlot21(int value) {
         event.control = this;
         event.key = value;
         event.field_0x18 = 1;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
         if (!event.field_0x18)
@@ -2939,7 +2939,7 @@ int UIMultiState::ButtonDown(int a, int b) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
     }
@@ -3008,7 +3008,7 @@ int UIRadioButton::ButtonDown(int a, int b) {
         event.dialog = ownerDialog;
         event.control = this;
         event.gui = ownerDialog->guiManager;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
     }
@@ -3780,7 +3780,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
     }
     dragging = 0;
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
@@ -3790,7 +3790,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         if (event.handled)
             return 1;
     }
@@ -3812,7 +3812,7 @@ void UIListBox::ReportClick(int* handled) {
     event.dialog = ownerDialog;
     event.control = this;
     event.gui = ownerDialog->guiManager;
-    ownerDialog->UnknownVirtualSlot29(&event);
+    ownerDialog->HandleEvent(&event);
     if (handled)
         *handled = 0;
     if (!event.handled) {
@@ -3825,7 +3825,7 @@ void UIListBox::ReportClick(int* handled) {
             event.dialog = ownerDialog;
             event.control = this;
             event.gui = ownerDialog->guiManager;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             if (event.handled) {
                 if (handled)
                     *handled = 1;
@@ -3956,7 +3956,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     event.dialog = this;
     event.control = 0;
     event.gui = guiManager;
-    UnknownVirtualSlot29(&event);
+    HandleEvent(&event);
     if (resourceName[0]) {
         char path[0x100];
         char* dot = strrchr(resourceName, '.');
@@ -4453,7 +4453,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
             event.dialog = ownerDialog;
             event.gui = ownerGui;
             event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             dragging = 1;
         }
         if (!event.handled) {
@@ -4467,7 +4467,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
                 event.dialog = ownerDialog;
                 event.gui = ownerGui;
                 event.control = this;
-                ownerDialog->UnknownVirtualSlot29(&event);
+                ownerDialog->HandleEvent(&event);
             } else {
                 event.kind = 3;
                 event.code = eventCode;
@@ -4475,7 +4475,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
                 event.dialog = ownerDialog;
                 event.gui = ownerGui;
                 event.control = this;
-                ownerDialog->UnknownVirtualSlot29(&event);
+                ownerDialog->HandleEvent(&event);
                 dragX = position[0];
                 dragY = position[1];
                 holdTime = 0.0f;
@@ -4731,7 +4731,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
             event.dialog = ownerDialog;
             event.gui = ownerGui;
             event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             dragging = 1;
         }
         if (!event.handled) {
@@ -4745,7 +4745,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
                 event.dialog = ownerDialog;
                 event.gui = ownerGui;
                 event.control = this;
-                ownerDialog->UnknownVirtualSlot29(&event);
+                ownerDialog->HandleEvent(&event);
             } else {
                 event.kind = 3;
                 event.code = eventCode;
@@ -4753,7 +4753,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
                 event.dialog = ownerDialog;
                 event.gui = ownerGui;
                 event.control = this;
-                ownerDialog->UnknownVirtualSlot29(&event);
+                ownerDialog->HandleEvent(&event);
                 dragX = position[0];
                 dragY = position[1];
                 holdTime = 0.0f;
@@ -5163,7 +5163,7 @@ void UIDDLListBox::ReportClick(int* handled) {
     event.dialog = ownerDialog;
     event.control = this;
     event.gui = ownerDialog->guiManager;
-    ownerDialog->UnknownVirtualSlot29(&event);
+    ownerDialog->HandleEvent(&event);
 }
 
 // 0x00472bc0

@@ -71,7 +71,7 @@ public:
     // button text hides the button).
     void SetTexts(const char* title, const char* prompt, const char* left,
                   const char* middle, const char* right);
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004555b0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004555b0
 };
 
 // RTTI: SessionDlg : UIDialog (vtable 0x00555408; type descriptor 0x0056eb10
@@ -80,5 +80,5 @@ public:
 class SessionDlg : public UIDialog {
 public:
     SessionDlg() : UIDialog(1, "messbox1.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004aefd0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004aefd0
 };

@@ -67,7 +67,7 @@ public:
 class PCBonusTrackDlg : public UIDialog {
 public:
     PCBonusTrackDlg() : UIDialog(1, "PCDeal.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9cd0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d9cd0
 };
 
 // RTTI: PCBailoutDlg : UIDialog (vtable 0x005573b0; 0x7f64 bytes): offers
@@ -75,7 +75,7 @@ public:
 class PCBailoutDlg : public UIDialog {
 public:
     PCBailoutDlg() : UIDialog(1, "PCDeal.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8fc0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d8fc0
 
     int entryFee;                             // +0x7f58: the entry fee
     int playerCash;                           // +0x7f5c: the player's cash
@@ -87,14 +87,14 @@ public:
 class PCFinishedDlg : public UIDialog {
 public:
     PCFinishedDlg() : UIDialog(1, "PCFinish.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d94e0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d94e0
 };
 
 // RTTI: PCBunnyDlg : UIDialog (vtable 0x0055732c; 0x7f64 bytes).
 class PCBunnyDlg : public UIDialog {
 public:
     PCBunnyDlg() : UIDialog(1, "PCDeal.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9860
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d9860
 
     int entryFee;                             // +0x7f58: the entry fee
     int playerCash;                           // +0x7f5c: the player's cash
@@ -105,7 +105,7 @@ public:
 class PCFailedDlg : public UIDialog {
 public:
     PCFailedDlg() : UIDialog(1, "PCTrans.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9340
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d9340
 };
 
 // RTTI: PCLastRaceDlg : UIDialog (vtable 0x00554a90): the last race's
@@ -113,7 +113,7 @@ public:
 class PCLastRaceDlg : public UIDialog {
 public:
     PCLastRaceDlg() : UIDialog(1, "PCLRace.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8660
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d8660
     void PayOutRace();             // 0x004d8c40: pays out the race
 };
 
@@ -121,14 +121,14 @@ public:
 class PCCompleteDlg : public UIDialog {
 public:
     PCCompleteDlg() : UIDialog(1, "PCTrans.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004da1b0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004da1b0
 };
 
 // RTTI: PCNewEventDlg : UIDialog (vtable 0x00556f90; 0x7f58 bytes).
 class PCNewEventDlg : public UIDialog {
 public:
     PCNewEventDlg() : UIDialog(1, "PCTrans.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9fd0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d9fd0
 };
 
 // RTTI: PCCentralNextDlg : UIDialog (vtable 0x0055711c; 0x7f58 bytes): the
@@ -136,7 +136,7 @@ public:
 class PCCentralNextDlg : public UIDialog {
 public:
     PCCentralNextDlg() : UIDialog(1, "PCCNext.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d7f40
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d7f40
 };
 
 // RTTI: PCCentralBikeRiderDlg : UIDialog (vtable 0x005571a0; 0x7f9c bytes):
@@ -151,8 +151,8 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x004d72c0: turns the bike view
     virtual int UnknownVirtualSlot13();       // 0x004d77d0: applies the chosen bike and rider skins
     virtual void UnknownVirtualSlot26();      // 0x004d72a0: hides the bike view
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d6770
-    void UnknownVirtualSlot31(int apply);     // 0x004d7d70: stores the chosen bike and rider
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d6770
+    void SyncValues(int apply);     // 0x004d7d70: stores the chosen bike and rider
     void FillBikeRiderLists();             // 0x004d6fc0: fills the bike and rider lists
     void PaintPlateNumber(int number);   // 0x004d71f0: paints the plate number on every bike
     void ApplyChosenRider();             // 0x004d78c0: takes the chosen rider
@@ -175,7 +175,7 @@ public:
 class PCCentralStandingsDlg : public UIDialog {
 public:
     PCCentralStandingsDlg() : UIDialog(1, "PCCStand.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8380
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d8380
 };
 
 // RTTI: PCCentralDlg : UIDialog (vtable 0x00554a0c; 0x7f64 bytes): the
@@ -183,7 +183,7 @@ public:
 class PCCentralDlg : public UIDialog {
 public:
     PCCentralDlg() : UIDialog(1, "PCC.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d5f70
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d5f70
     void OpenPage(int page);     // 0x004d6570: opens page `page` (0..2)
 
     PCCentralNextDlg* nextPage;               // +0x7f58
@@ -196,7 +196,7 @@ public:
 class PCNewDlg : public UIDialog {
 public:
     PCNewDlg() : UIDialog(1, "PCNew.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d5d20
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d5d20
     // 0x004d5f40: where the answers go.
     void SetAnswerTargets(char* name, int* difficulty, int* bikeClass, int* opponents);
 
@@ -211,7 +211,7 @@ public:
 class PCStartupDlg : public UIDialog {
 public:
     PCStartupDlg() : UIDialog(1, "PCStart.dtm") {} // 0x8074 bytes (PCCentralDlg 0x004d6125)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d4d20
+    void HandleEvent(UnknownDialogEvent* event); // 0x004d4d20
     void EnableButtons();             // 0x004d5600: enables the buttons
     void FillLists();             // 0x004d56c0: fills the lists
     // 0x004d59a0: adds `circuit` as row `row` of the lists.

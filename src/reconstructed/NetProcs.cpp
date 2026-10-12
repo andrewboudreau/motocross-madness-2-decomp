@@ -49,7 +49,7 @@ void JoinSelectedSession(UnknownDialogEvent* event) {
 }
 
 // 0x004ae500
-void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* control = static_cast<UIListBox*>(FindControl("ButJoin", 0));
@@ -172,7 +172,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004aea60
-void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void SerialPopupDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogCommand:
@@ -245,7 +245,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004aee10
-void TCPAddressDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void TCPAddressDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
@@ -292,7 +292,7 @@ int EnsureNetworkInterface() {
 }
 
 // 0x004aefd0
-void SessionDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void SessionDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
@@ -317,7 +317,7 @@ void SessionDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004af100
-void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void WaitOrCallDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButRight", event->controlName)) {
@@ -381,7 +381,7 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004af470
-void ConnectErrorDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ConnectErrorDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName))
@@ -408,7 +408,7 @@ void ConnectErrorDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004af590
-void PlayerRemovedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void PlayerRemovedDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButRight", event->controlName)) {

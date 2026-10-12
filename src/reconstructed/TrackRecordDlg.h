@@ -94,7 +94,7 @@ public:
     TrackRecordDlg() : UIDialog(1, "HiScores.dtm") {} // inline (KrustyUI 0x00499b20)
     // 0x0051f600: the dialog's procedure; its +0x08 is the type (1..6) and
     // +0x0c the dialog whose controls the list helpers fill.
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);
+    virtual void HandleEvent(UnknownDialogEvent* event);
     void LabelTabs(int series);                                 // 0x0051fc40: labels the tabs
     void ShowTab(UnknownDialogEvent* event, int series); // 0x0051fe80: shows a tab
     void UnknownFunction51ff40();

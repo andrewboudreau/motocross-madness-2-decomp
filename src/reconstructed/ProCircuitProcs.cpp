@@ -110,7 +110,7 @@ void OpenCareerDialog()
 }
 
 // 0x004d4d20
-void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit:
@@ -351,7 +351,7 @@ void PCStartupDlg::FreeFileNames()
 }
 
 // 0x004d5d20
-void PCNewDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCNewDlg::HandleEvent(UnknownDialogEvent* event)
 {
     char number[32];
     char text[128];
@@ -404,7 +404,7 @@ void PCNewDlg::SetAnswerTargets(char* name, int* difficulty, int* bikeClass, int
 }
 
 // 0x004d5f70
-void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogClose:
@@ -538,7 +538,7 @@ void PCCentralDlg::OpenPage(int page)
 }
 
 // 0x004d7f40
-void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     if (event->kind != kDialogInit)
@@ -619,7 +619,7 @@ void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004d8380
-void PCCentralStandingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     if (event->kind != kDialogInit)
         return;
@@ -663,7 +663,7 @@ void PCCentralStandingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004d8660
-void PCLastRaceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
@@ -749,7 +749,7 @@ int CompareRankPoints(const void* a, const void* b)
 }
 
 // 0x004d9340
-void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCFailedDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UIControl* label;
     switch (event->kind) {
@@ -778,7 +778,7 @@ void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004d94e0
-void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
@@ -831,7 +831,7 @@ void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004d9fd0
-void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCNewEventDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
@@ -877,7 +877,7 @@ void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004da1b0
-void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCCompleteDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
@@ -992,7 +992,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
 }
 
 // 0x004d7d70
-void PCCentralBikeRiderDlg::UnknownVirtualSlot31(int apply)
+void PCCentralBikeRiderDlg::SyncValues(int apply)
 {
     if (!apply)
         return;
@@ -1015,7 +1015,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot31(int apply)
 
 // 0x004d6770: as SPBikeRiderDlg slot 29 (dlgprocs.cpp 0x0044ef70); the
 // engine sizes offered follow the circuit's bike class rule.
-void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
 {
     char plate[12];
     char typed[12];
