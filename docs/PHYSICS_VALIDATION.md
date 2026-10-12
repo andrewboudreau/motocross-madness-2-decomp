@@ -317,6 +317,10 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
 - Bike.cpp slots 54 `0x0040c8b0` and 55 `0x0040ce60`: `BikeNormalized` receives an operator
   temporary (`(front + rear) * 0.5f`, `front - rear`); a local Vec3 built component by
   component left `x` scalar-first.
+- Bike.cpp slot 46 `0x0040b600`: the both-wheels path assigns `scratchVector` in its own
+  statement before `WorldToLocalDirection`, and the one-wheel path nests the by-value
+  out-of-line operators `0x00421cb0`/`0x00421d00` around the constructor chain, so the
+  transform result reuses retail's temporary slots.
 - Vehicle.cpp impact handlers, slots 18 `0x00529dc0`, 19 `0x00529fe0` and 20 `0x0052a290`:
   each scan posts and returns from inside its loop; slots 18/19 scan with guarded do-while
   loops (unrotated back edge), slot 20 with `for` loops. Slot 19/20's sign factor is

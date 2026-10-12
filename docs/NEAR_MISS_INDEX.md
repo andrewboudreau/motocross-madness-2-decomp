@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 163, c 111, total 275. The three class (a) functions of the
+Counts: a 1, b 162, c 111, total 274. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -111,7 +111,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Bike | `0x00409b30` | 826/1260 (masked) | c | 18 code diffs: `jmp @217` vs `jmp @222 ; mov ecx, [esp + N]`; `mov edx, [esi]` vs `mov [esp + N], ecx ; jmp @222 ; mov edx~` |
 | krusty2/vehicle/Bike | `0x0040a520` | 439/2272 | b | 96 code diffs: retail lacks `test al, al`; retail adds `test al, al`; slots differ |
 | krusty2/vehicle/Bike | `0x0040aec0` | 527/1186 (masked) | b | 35 code diffs; slots differ |
-| krusty2/vehicle/Bike | `0x0040b600` | 1061/1066 | b | slot 46: frame offsets of the one-wheel path's constructor temporaries (sub/half constructor at retail 0x38/0x20, the 0x421cb0 mid at 0x40, the WorldToLocal temporary at 0x48/0x30); the register pair is fixed by `const Vec3&` rear/front locals |
 | krusty2/vehicle/Bike | `0x0040ba30` | 55/973 (masked) | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 135/802 (masked) | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 585/637 (masked) | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |

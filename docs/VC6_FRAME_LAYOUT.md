@@ -325,3 +325,10 @@ exact:
   the helper's return slot; returning the derived type binds the constructor result directly.
   Retail's chain of such helpers in Bike slot 46 (`0x40b600`) shows the copies all landing in
   one slot at frame 0.
+- Temporaries of one full expression stay live to its end; a call result in the next
+  statement can take a dead temporary's slot. Bike slot 46 (`0x40b600`) matched once the
+  transform `*out = node->WorldToLocalDirection(scratchVector)` was its own statement after
+  `scratchVector = <helper chain>` (its result reuses the chain's sum slot), and the
+  one-wheel path's sum/difference were by-value out-of-line operator temporaries
+  (`BikeVec3Sub(BikeVec3Add(front, half), position)`) instead of named pointer-call
+  results, whose own slots kept the transform result off retail's 0x3c.
