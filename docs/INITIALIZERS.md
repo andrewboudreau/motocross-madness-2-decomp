@@ -142,7 +142,7 @@ The audit itself was a linear capstone pass over `.text`, using
 | `0x00491190..0x004912cb` (XCU 155-158, vectors from `0x0067c348`) | src/krusty2/vehicle/KrustyBike.cpp | not traced | consistent |
 | `0x00515740..0x0051587b` (XCU 319-322) | samples/physics/tire/Tire.cpp | Tire code (former `g_Tire*` vectors) | consistent |
 | `0x004a1bd0..0x004a1d0b` (XCU 175-178, `0x00685030..0x00685068`) | MatrixUtil.cpp | 0x4a10e0/0x4a11e0 | consistent |
-| `0x004a2ac0..0x004a2aff` (XCU 183, tracker `0x006850c0`) | samples/allocation/MemTag.cpp | MemTagStack ("Unclaimed" root) | own static |
+| `0x004a2ac0..0x004a2aff` (XCU 183, tracker `0x006850c0`) | src/reconstructed/MemTag.cpp | MemTagStack ("Unclaimed" root) | own static |
 | `0x0047c740..0x0047c87b` (XCU 132-135, `0x0065b620..`) | src/krusty2/core/GraphicsTest.cpp | not traced | position |
 | `0x004b1d80..0x004b1ebb` (XCU 208-211, `0x00688738..0x00688770`) | src/krusty2/contact/ObjectPlacement.cpp | read only by 0x4b0df0 | closes the unit |
 | `0x004a8940..0x004a8a7b` (XCU 188-191, `0x00685120..0x00685158`) | src/krusty2/motion/Motnctrl.cpp | not traced | consistent |

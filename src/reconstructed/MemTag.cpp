@@ -17,8 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../src/reconstructed/MemTag.h"
-#include "../../src/reconstructed/DebugAlloc.h"
+#include "MemTag.h"
+#include "DebugAlloc.h"
 
 // 0x004a3120: memcpy with the caller's file and line (DebugRealloc).
 void* DebugMemcpy(void* destination, const void* source, unsigned int size, const char* file, int line);
