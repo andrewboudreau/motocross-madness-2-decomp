@@ -19510,7 +19510,7 @@ CASES = [
         'name': 'dlgprocs.cpp SPBikeRiderDlg bike class apply',
         'bindings': 'src/reconstructed/DlgProcs.bindings.json',
         'source': 'src/reconstructed/DlgProcs.cpp',
-        'symbol': '?UnknownFunction4500e0@SPBikeRiderDlg@@QAEXXZ',
+        'symbol': '?ApplyChosenBike@SPBikeRiderDlg@@QAEXXZ',
         'target_va': '0x004500e0',
         'target_size': 1263,
         'reason': 'called from SPBikeRiderDlg; dlgprocs.cpp range',

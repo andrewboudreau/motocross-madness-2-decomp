@@ -487,7 +487,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 bikeRiderPage->UpdateBoundValues(0);
                 bikeRiderPage->FillBikeRiderLists();
                 bikeRiderPage->ApplyChosenRider();
-                bikeRiderPage->UnknownFunction4500e0();
+                bikeRiderPage->ApplyChosenBike();
             }
         } else if (code == 0x66) {
             static_cast<UIRadioButton*>(FindControl("EventTab", 4))->SelectInGroup(0);
@@ -992,7 +992,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             previewArea.bottom - previewArea.top);
         viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->field_0x474));
         ApplyChosenRider();
-        UnknownFunction4500e0();
+        ApplyChosenBike();
         PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
         srand(ReadClock());
         if (dialogBackground)
@@ -1001,11 +1001,11 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     }
     case kDialogListSelect:
         if (!_stricmp("DDLBikes", event->controlName))
-            UnknownFunction4500e0();
+            ApplyChosenBike();
         else if (!_stricmp("DDLRiders", event->controlName))
             ApplyChosenRider();
         else if (!_stricmp("DDLEngineSize", event->controlName))
-            UnknownFunction4500e0();
+            ApplyChosenBike();
         break;
     case kDialogCommand:
         if (!_stricmp("BikeLeft", event->controlName)) {
@@ -1176,7 +1176,7 @@ void SPBikeRiderDlg::ApplyChosenRider() {
 }
 
 // 0x004500e0: shows the chosen bike and loads its class's garage defaults.
-void SPBikeRiderDlg::UnknownFunction4500e0() {
+void SPBikeRiderDlg::ApplyChosenBike() {
     char text[12];
     UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     KrustyUI* ui = g_TrackGame->ui;

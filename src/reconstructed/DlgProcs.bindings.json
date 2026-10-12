@@ -273,7 +273,7 @@
   "?PaintPlateNumber@SPBikeRiderDlg@@QAEXH@Z": "0x0044f950",
   "?PaintPlateNumber@SPBikeRiderDlg@@QAEXH@Z$ehhandler": "0x0054a618",
   "?ApplyChosenRider@SPBikeRiderDlg@@QAEXXZ": "0x004500d0",
-  "?UnknownFunction4500e0@SPBikeRiderDlg@@QAEXXZ": "0x004500e0",
+  "?ApplyChosenBike@SPBikeRiderDlg@@QAEXXZ": "0x004500e0",
   "?UnknownFunction451380@@YAXHPAD@Z": "0x00451380",
   "?CreateProfile@@YAXPAUUnknownDialogEvent@@@Z": "0x00451b80",
   "?CreateProfile@@YAXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054a67a",

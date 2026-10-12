@@ -135,7 +135,7 @@ public:
     void PaintPlateNumber(int number);   // 0x0044f950: paints the plate number on every bike
     // 0x004500d0: MPBikeRiderDlg's identical method is folded into it.
     void ApplyChosenRider();
-    void UnknownFunction4500e0();             // 0x004500e0
+    void ApplyChosenBike();                   // 0x004500e0: shows the chosen bike and loads its class's garage defaults
 
     Vector3 viewEye;                          // +0x7f58: the bike view's eye
     Vector3 viewTarget;                       // +0x7f64: and target
