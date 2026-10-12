@@ -5,7 +5,18 @@
 // assignments give retail's y/x/z order) and the cell copies are in place.
 // VC6 here keeps 25600.0f in a register where retail stores immediates, and
 // the stack slots of the five loop variables and the grid pointer's anchor
-// (x here, y in retail) differ.
+// (x here, y in retail) differ. Retail's grid walk runs one pointer through
+// all 25 points (biased by +4, x at -4); its cell copy resets the vertex
+// pointer from a row pointer (+0x300 per row) and advances the grid pointer
+// by 0x80 per row plus 0x20 after it (as if indexed `cell + cellRow`), and
+// writes each vertex's position, diffuse, specular, tu and tv in source
+// order where VC6 here hoists the constant stores. Tried in session 10: a
+// single grid pointer for the face (81-82 of 1052), `&grid[row][column]`
+// or `grid[0][row * 5 + column]` per point (64), the grid index as
+// `cell + cellRow` with the vertex pointer from `cell` (137 of 1068 bytes
+// but 152 instruction diffs against 148; the row reset still folds), slot
+// 14's flat `first = cell * 6` vertex form and
+// `grid[0][cellRow * 5 + cellColumn]` (121).
 //
 // 0x0043e0b0 (352 bytes): the texture-coordinate arithmetic matches once the
 // low value is stored before the high one is computed. Retail keeps a row
