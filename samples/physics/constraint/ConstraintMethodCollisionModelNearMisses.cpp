@@ -104,6 +104,9 @@ static inline float ConDot(const ConVec3& a, const ConVec3& b)
 // as a declared-then-assigned local or folded into one expression; rA as a separate cA local
 // (wrong frame); vB declared at other positions; parenthesised products in the cross product
 // (Math3D's form also exceeds the inline budget: J's scale is then called out of line).
+// Session 12: the cross product's term order and operand order and the dot product's grouping
+// and argument order (32 combinations through separate helpers) all compile to the same bytes:
+// VC6 canonicalises them here, so the termB difference is not an operand-order choice.
 // Kept: b = b + a (a's components load first), vn = c . vRel, the zero vector copied as a
 // whole struct (needed for the frame: component copies put vB in the wrong slot).
 void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,
