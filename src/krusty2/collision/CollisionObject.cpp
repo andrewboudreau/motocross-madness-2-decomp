@@ -1755,10 +1755,13 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
-            if (a->elementEnabled[i] && HullVsHull(&a->elements[i], b, q)) {
-                sum += QueryContact(q);
-                hit = 1;
-                count++;
+            if (a->elementEnabled[i]) {
+                CollisionHullBody* e = &a->elements[i];
+                if (HullVsHull(e, b, q)) {
+                    sum += QueryContact(q);
+                    hit = 1;
+                    count++;
+                }
             }
         }
         if (hit) {
@@ -1800,10 +1803,13 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
-            if (a->elementEnabled[i] && HullVsHullSwept(&a->elements[i], b, q)) {
-                sum += QueryContact(q);
-                hit = 1;
-                count++;
+            if (a->elementEnabled[i]) {
+                CollisionHullBody* e = &a->elements[i];
+                if (HullVsHullSwept(e, b, q)) {
+                    sum += QueryContact(q);
+                    hit = 1;
+                    count++;
+                }
             }
         }
         if (hit) {
@@ -1836,7 +1842,8 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
         sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < b->elementCount; i++) {
-            if (ModelVsHull(a, &b->elements[i], q)) {
+            CollisionHullBody* e = &b->elements[i];
+            if (ModelVsHull(a, e, q)) {
                 sum += QueryContact(q);
                 hit = 1;
                 count++;
@@ -1912,6 +1919,14 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
 // is set.  The query vectors and the scratch points are first rotated into B's frame, the
 // box test runs with mode 2, and on a hit the contact point is averaged over contactCount
 // and transformed back; the vectors/points are always rotated back afterwards.
+// Near miss.  Retail rotates each query vector in place from a by-value copy in one 12-byte
+// slot (frame 0xc), as TestMeshAgainst (0x00438c90) does; with in-place helpers of the form
+// `out->x = (v.y * m->m[0][1] + v.z * m->m[0][2]) + v.x * m->m[0][0]`, a `&q->contact` pointer
+// local and the scratch rows written (x + z) + y, the candidate reaches 779/962 (18 insn
+// diffs).  Left: the x row of the column/point helpers loads v.y before v.z, the loop's z row
+// x/z order and two copy schedules.  These pair orders follow unrelated declaration counts
+// (dead locals reach 801/962), and the column helper's form that suits HullVsHull breaks
+// TestMeshAgainst, so the in-place forms are not applied here.
 int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)
@@ -1996,10 +2011,13 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
         // Retail makes this call (0x004fc9a0); nodePos is never read.
         ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
-            if (b->elementEnabled[i] && HullVsHullSwept(a, &b->elements[i], q)) {
-                sum += QueryContact(q);
-                hit = 1;
-                count++;
+            if (b->elementEnabled[i]) {
+                CollisionHullBody* e = &b->elements[i];
+                if (HullVsHullSwept(a, e, q)) {
+                    sum += QueryContact(q);
+                    hit = 1;
+                    count++;
+                }
             }
         }
         if (hit) {
