@@ -101,6 +101,16 @@
   {
     "class": "CharacterPose",
     "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??0CharacterPose@@QAE@XZ",
+    "target_va": "0x004a8930",
+    "target_size": 3,
+    "expect": "exact",
+    "notes": "CharacterPose's compiler-generated default constructor (`mov eax, ecx; ret`, Vec3 members with an empty user constructor), emitted for slot 7's pose temporaries, which retail calls directly; stays with slot 7 in the sample because the canonical unit has no pose locals",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "CharacterPose",
+    "source": "Motnctrl.cpp",
     "candidate_symbol_contains": "?PoseRotation@@",
     "target_va": "0x004a7fd0",
     "target_size": 1121,
