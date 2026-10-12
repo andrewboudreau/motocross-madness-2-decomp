@@ -369,7 +369,7 @@ allocated:
 
 // 0x00480ad0: draws one 4-cell block from this node's buffers when it has
 // geometry and passed the frustum test, then walks the child nodes.
-int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size, int quad, int a5)
+int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5)
 {
     int vertexStart = 0;
     GridBlockRange* ranges = (GridBlockRange*)data->field_0x17c;
@@ -428,7 +428,7 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
 // 0x00481300: one 4-cell block; draws it when it has geometry and
 // 0x00481a20 accepts it, then walks the child nodes unless this node's
 // buffers stand in for them.
-int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
+int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
 {
     GridBlockRange* ranges = (GridBlockRange*)data->field_0x17c;
     if (ranges) {
@@ -448,7 +448,7 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
                 if (child && child->childMask) {
                     if (child->data->vertexCount != 0 && !child->data->b3)
                         child->UnknownVirtualSlot4(-1);
-                    child->UnknownFunction481180(0, 0, 16, 0);
+                    child->WalkSlot4Quadrants(0, 0, 16, 0);
                 }
             }
         }
@@ -458,7 +458,7 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
 
 
 // 0x0047f210: per-block buffer rebuild (see the note at the top).
-int DrawableGridNode::UnknownFunction47f210()
+int DrawableGridNode::RebuildBlockBuffers()
 {
     int x;
     int z = 0;
@@ -680,7 +680,7 @@ void DrawableGridNode::WalkBorderVertex(int x, int z, int flag, int dir, GridBas
 }
 
 // 0x004815e0: the detail update (see the note at the top).
-float DrawableGridNode::UnknownFunction4815e0(int coarse)
+float DrawableGridNode::ComputeViewerDetail(int coarse)
 {
     float nearX;
     float farX;

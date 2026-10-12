@@ -317,7 +317,7 @@ int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
     if (size == 16 && data->b1) {
         int before = data->childTriangleCount + data->triangleCount;
         if (data->b3)
-            UnknownFunction47f210();
+            RebuildBlockBuffers();
         else
             RebuildWholeNodeBuffers();
         int after = data->childTriangleCount + data->triangleCount;
@@ -658,13 +658,13 @@ int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size,
                 DrawVisibleQuadrants(target, x + 8, z + 8, 8, 12, a5);
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
-                UnknownFunction480ad0(target, x, z, 4, quad, a5);
+                DrawVisibleBlock(target, x, z, 4, quad, a5);
             if (childMask & (0x40 << quad))
-                UnknownFunction480ad0(target, x + 4, z, 4, quad + 1, a5);
+                DrawVisibleBlock(target, x + 4, z, 4, quad + 1, a5);
             if (childMask & (0x80 << quad))
-                UnknownFunction480ad0(target, x, z + 4, 4, quad + 2, a5);
+                DrawVisibleBlock(target, x, z + 4, 4, quad + 2, a5);
             if (childMask & (0x100 << quad))
-                UnknownFunction480ad0(target, x + 4, z + 4, 4, quad + 3, a5);
+                DrawVisibleBlock(target, x + 4, z + 4, 4, quad + 3, a5);
         }
     }
     return 1;
@@ -809,13 +809,13 @@ void DrawableGridNode::SubmitLitRange(int a5, GridVertex* vertices, int vertexCo
 }
 
 // 0x00481170
-int DrawableGridNode::UnknownFunction481170()
+int DrawableGridNode::WalkSlot4FromRoot()
 {
-    return UnknownFunction481180(0, 0, 16, 0);
+    return WalkSlot4Quadrants(0, 0, 16, 0);
 }
 
 // 0x00481180
-int DrawableGridNode::UnknownFunction481180(int x, int z, int size, int quad)
+int DrawableGridNode::WalkSlot4Quadrants(int x, int z, int size, int quad)
 {
     if (data->vertexCount != 0 && childMask != 0 && size == 16 && extra->texture != 0 && !data->b3)
         UnknownVirtualSlot4(-1);
@@ -824,22 +824,22 @@ int DrawableGridNode::UnknownFunction481180(int x, int z, int size, int quad)
         if (size == 8) {
             data->field_0x178 = 0;
             if (childMask & 2)
-                UnknownFunction481180(x, z, 8, 0);
+                WalkSlot4Quadrants(x, z, 8, 0);
             if (childMask & 4)
-                UnknownFunction481180(x + 8, z, 8, 4);
+                WalkSlot4Quadrants(x + 8, z, 8, 4);
             if (childMask & 8)
-                UnknownFunction481180(x, z + 8, 8, 8);
+                WalkSlot4Quadrants(x, z + 8, 8, 8);
             if (childMask & 0x10)
-                UnknownFunction481180(x + 8, z + 8, 8, 12);
+                WalkSlot4Quadrants(x + 8, z + 8, 8, 12);
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
-                UnknownFunction481300(x, z, 4, quad);
+                WalkSlot4Block(x, z, 4, quad);
             if (childMask & (0x40 << quad))
-                UnknownFunction481300(x + 4, z, 4, quad + 1);
+                WalkSlot4Block(x + 4, z, 4, quad + 1);
             if (childMask & (0x80 << quad))
-                UnknownFunction481300(x, z + 4, 4, quad + 2);
+                WalkSlot4Block(x, z + 4, 4, quad + 2);
             if (childMask & (0x100 << quad))
-                UnknownFunction481300(x + 4, z + 4, 4, quad + 3);
+                WalkSlot4Block(x + 4, z + 4, 4, quad + 3);
         }
     }
     return 1;
@@ -891,12 +891,12 @@ void DrawableGridNode::CountEdgeDifferences()
 }
 
 // 0x00481580
-void DrawableGridNode::UnknownFunction481580()
+void DrawableGridNode::TestDroppableVertices()
 {
     if (childMask && children && !data->b0) {
         for (int i = 0; i < 256; i++) {
             if (children[i])
-                ((DrawableGridNode*)children[i])->UnknownFunction481580();
+                ((DrawableGridNode*)children[i])->TestDroppableVertices();
         }
     } else if (childMask) {
         for (int z = 0; z <= 16; z++) {
@@ -911,7 +911,7 @@ void DrawableGridNode::UnknownFunction481580()
 // the stream on first use (the same layout 0x0047e600 reads).
 void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse, int coarse)
 {
-    float detail = UnknownFunction4815e0(coarse);
+    float detail = ComputeViewerDetail(coarse);
     UnknownVirtualSlot3(detail);
     if (field_0x20 <= data->field_0x122 && extra->texture) {
         if (data->b0)
