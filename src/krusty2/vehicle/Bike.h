@@ -299,7 +299,6 @@ struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
 extern BikeGlobal_0056e26c* g_Bike_0056e26c;    // pointer read at 0x0056e26c (frame delta / time step; provisional)
 extern char g_BikeString_00577738[];
 extern Vec3 g_BikeVec3_005778a8;
-extern Vec3 g_BikeVec3_005778c8;
 
 class Bike : public Vehicle {
 public:
@@ -416,7 +415,7 @@ public:
     int field_0x6fc;
     int field_0x700;
     float field_0x704;
-    float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(g_BikeVec3_005778c8, field_0xa0)|; if smaller 'bike is lying on its side' branch
+    float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(kVec3YAxis, field_0xa0)|; if smaller 'bike is lying on its side' branch
     float field_0x70c;             // +0x70c loader: 0.85f
     float field_0x710;
     float wobbleTime;  // +0x714 slot 91 wobble: wobbleTime += field_0x13c each frame, cubed (t*t*t*0.3578) to cap amplitude, halved on sign flip, zeroed by slot 71

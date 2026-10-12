@@ -1340,7 +1340,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         crashReason = 7;
         return 1;
     }
-    float d1 = BikeDot(&g_BikeVec3_005778c8, &savedForward);
+    float d1 = BikeDot(&kVec3YAxis, &savedForward);
     if (d1 < 0.0f)
         d1 = -d1;
     float lieLimit = sideLieThreshold;
@@ -1358,7 +1358,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
     float roll = savedRoll;
     if (roll < 0.0f)
         roll = -roll;
-    if (roll > 1.91986f) {
+    if (roll > 1.919862f) {
         // rolled past ~110 degrees
         if (savedRoll > 0.0f) {
             crashDirection = 5;
