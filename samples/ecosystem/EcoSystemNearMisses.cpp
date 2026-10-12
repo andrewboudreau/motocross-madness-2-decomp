@@ -732,8 +732,8 @@ int EcoSystem::UnknownVirtualSlot14() {
     identity(3, 2) = 0.0f;
     identity(3, 3) = 1.0f;
     ECO_VIEW->camera->UnknownVirtualSlot30(&identity);
-    ECO_VIEW->UnknownVirtualSlot9(D3DRENDERSTATE_TEXTUREPERSPECTIVE, &savedPerspective);
-    ECO_VIEW->UnknownVirtualSlot9(D3DRENDERSTATE_SHADEMODE, &savedShadeMode);
+    ECO_VIEW->GetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, &savedPerspective);
+    ECO_VIEW->GetRenderState(D3DRENDERSTATE_SHADEMODE, &savedShadeMode);
     // The three face normals: the quad's two sides and the face towards
     // the camera, the sides leaned back by a tenth of it.
     right.x = -camera->direction.z;
@@ -770,7 +770,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     g_UnknownGlobal59af08 = 0;
     g_UnknownGlobal59af04 = 0;
     if (g_TrackGame->field_0x2d0)
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->pixelFormat);
         for (i = 0; i < geometryCount; i++) {
@@ -781,7 +781,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     }
     g_UnknownGlobal59aec0 = ReadClock() - start;
     if (g_TrackGame->field_0x2d0)
-        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+        ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
         definitionTable[vegetation[0].definitionIndex]->billboardTexture->UnknownVirtualSlot19();
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->pixelFormat);
@@ -904,7 +904,7 @@ int EcoSystem::UnknownVirtualSlot14() {
                 next++;
             }
             if (g_UnknownGlobal56a12c && vertexCount)
-                ECO_VIEW->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
+                ECO_VIEW->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
                                                billboardIndices, indexCount, 0);
             remaining -= i;
         }
@@ -934,11 +934,11 @@ int EcoSystem::UnknownVirtualSlot14() {
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);
-    ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);
-    ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedPerspective, 0);
-    ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, g_TrackGame->field_0x54c);
-    ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, g_TrackGame->field_0x550);
-    ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, g_TrackGame->field_0x554);
+    ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);
+    ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedPerspective, 0);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, g_TrackGame->field_0x54c);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, g_TrackGame->field_0x550);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, g_TrackGame->field_0x554);
     ECO_VIEW->UnknownVirtualSlot19();
     return GameObject::UnknownVirtualSlot14();
 }
