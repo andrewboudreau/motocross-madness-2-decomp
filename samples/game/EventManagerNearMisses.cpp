@@ -386,7 +386,7 @@ int EventManager::CreatePodiumScene() {
     float z1 = z0 + 32.0f;
     RemoveVegetationInRect(x0, z0, x1, z1);
     UnknownFunction45fdc0(x0, z0, x1, z1);
-    field_0x440 = 0;
+    resumeArmed = 0;
     g_TrackGame->UnknownFunction468880();
     return 1;
 }

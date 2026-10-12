@@ -193,13 +193,13 @@ public:
     // Sleeps +0x80 * 1000 ms between keep-alive (0x4b) sends.
     float keepAliveTimeout;                        // "KeepAliveTimeout" (slot 8), default 20
     float keepAliveInterval;                       // 1.0
-    int field_0x34;
-    int field_0x38;
-    int field_0x3c;
-    int field_0x40;
-    int field_0x44;
+    int waitingForRacers;                          // +0x34: 0x0045e550 runs each frame (set once the keep-alive starts)
+    int keepAliveStarted;                          // +0x38: NetworkInterface StartKeepAlive was called
+    int endNetworkGamePending;                     // +0x3c: slot 10 calls EndNetworkGame once
+    int anyRacerFinished;                          // +0x40: a racer has +0x7a4 set (0x0045eef0)
+    int allRacersFinished;                         // +0x44: every racer has +0x7a4 or +0x4a0 set (0x0045eef0)
     unsigned char field_0x48;
-    int field_0x4c;
+    int field_0x4c;                                // entries filled by 0x0045e9d0
     UnknownEventEntry field_0x50[11];
     float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
     Vector3 field_0x3c4;
@@ -214,6 +214,6 @@ public:
     D3DIMSoultreeCharacter* podiumCharacters[3];
     Motion* podiumMotions[3];                      // "Podium3/4/5_%02d", one per character
     int field_0x43c;
-    int field_0x440;                               // armed by slot 23, consumed by slot 22
+    int resumeArmed;                               // +0x440: armed by slot 23, consumed by slot 22
     unsigned char field_0x444[0xd08 - 0x444];
 };

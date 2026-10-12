@@ -13,6 +13,11 @@ whose bodies are unambiguous are named for them (`OpenDialogResource`,
 `ToolTip::ShowText`, ...). Methods that other files call through
 KrustyUI.h's alias keep their provisional names, and so do the remaining
 members.
+Named members: `setupPalette` (+0x38) and `setupCallback` (+0xd4) hold
+`SetUp`'s palette and last argument; `paletteChanged` (+0x1f0) is set by
+`0x00486150` with the palette, cleared by slot 10 and makes `0x00485bd0` wait
+three frames. GUIUser's +0x34/+0x38, +0x3c, +0x1cc, +0x1d0 and +0x1d8 stay
+placeholders because GameUi.cpp and the dialog-procedure samples read them.
 
 GUIManager owns the dialogs, the background image and screen grab, the
 tool-tip font, the cursors and up to four GUIUsers; each GUIUser routes
