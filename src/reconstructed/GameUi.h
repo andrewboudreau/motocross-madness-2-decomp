@@ -336,7 +336,7 @@ public:
     void SetDisabledImage(UIAnim* image); // 0x00473370
     void SetSortList(UIListBox* list); // 0x00473390: links a column button to its list (ProCircuitProcs.cpp)
 
-    UIListBox* field_0x1ec;                   // the list a column button sorts (slot 56 sorts it)
+    UIListBox* sortList;                      // +0x1ec: the list a column button sorts (slot 56 sorts it)
 };
 
 // RTTI: UIStatic : UIControl (vtable 0x00553318; 0x1ec bytes, `new` at
@@ -383,11 +383,11 @@ public:
     int field_0x200;
     union {
         int field_0x204;
-        Sound* field_0x204_sound;             // the key click
+        Sound* clickSound;                    // +0x204: the key click
     };
     union {
         int field_0x208;
-        Sound* field_0x208_sound;             // the "full" sound
+        Sound* fullSound;                     // +0x208: the "full" sound
     };
     void* backgroundBrush;                    // +0x20c: the background brush (HBRUSH)
     void* acceptedCharacters;                 // +0x210
@@ -437,7 +437,8 @@ public:
 
     union {
         int field_0x1ec;
-        float field_0x1ec_float;              // the thumb's position (0..1)
+        float thumbOffset;                    // +0x1ec: the thumb's offset along the track (pixels; clamped to
+                                              // the track length less the thumb, added to screenArea)
     };
     int field_0x1f0;
     int thumbWidth;                           // +0x1f4
@@ -446,15 +447,15 @@ public:
     int scrollRange;                          // +0x200
     union {
         int field_0x204;
-        UIAnim* field_0x204_image;            // the track image
+        UIAnim* trackImage;                   // +0x204: the track image
     };
     int field_0x208;
     int dragX;                                // +0x20c: the last drag position (x)
     int dragY;                                // +0x210: (y)
-    float field_0x214;
+    float holdDelay;                          // +0x214: 0.2 s; held that long in place, it sends event 0x11
     union {
         int field_0x218;
-        float field_0x218_float;              // time held at one position
+        float holdTime;                       // +0x218: time held at one position
     };
     int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
 };
@@ -713,8 +714,8 @@ public:
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
     int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
 
-    MediaControl* field_0x1ec;                // the player
-    int field_0x1f0[4];                       // the frame's source rectangle
+    MediaControl* moviePlayer;                // +0x1ec: the player
+    int frameRect[4];                         // +0x1f0: the frame's source rectangle
 };
 
 // RTTI: UIProgressBar : UIStatic (vtable 0x00553c68; 0x204 bytes, new'd by
@@ -729,7 +730,7 @@ public:
     void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 
     float progressFraction;                   // +0x1ec: the part done (0..1)
-    int field_0x1f0;                          // steps
+    int stepCount;                            // +0x1f0: steps (LoadingDlg sets 20)
     int stepsDone;                            // +0x1f4: steps done (0x0047b370)
     TextureMap* barTexture;                   // +0x1f8
     int showPercentage;                       // +0x1fc

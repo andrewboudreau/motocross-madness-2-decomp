@@ -594,7 +594,7 @@ void LoadProgressCallback(int* step) {
         if (g_TrackGame->ui->field_0x490) {
             UIControl* bar =
                 g_TrackGame->ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
-            static_cast<UIProgressBar*>(bar)->field_0x1f0 += *step;
+            static_cast<UIProgressBar*>(bar)->stepCount += *step;
         }
     } else {
         g_TrackGame->ui->UnknownFunction49b530();

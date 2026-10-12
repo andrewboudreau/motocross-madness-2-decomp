@@ -156,8 +156,8 @@ int MainDlg::UnknownVirtualSlot10(float frameTime) {
             } else {
                 field_0x7f78 = 0;
                 if (movieControl) {
-                    movieControl->field_0x1ec->Restart();
-                    movieControl->field_0x1ec->UnknownVirtualSlot16(field_0x7f78);
+                    movieControl->moviePlayer->Restart();
+                    movieControl->moviePlayer->UnknownVirtualSlot16(field_0x7f78);
                     movieControl->Show(1, 1);
                 }
             }
@@ -1343,7 +1343,7 @@ void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         bar->SetName("ProgressBar");
         UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");
         bar->UnknownFunction47b3d0(image->GetCurrentTexture(), 0);
-        bar->field_0x1f0 = 20;
+        bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);
         g_TrackGame->ui->field_0x490 = (UnknownGameUiPage*)this;

@@ -613,9 +613,9 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
     event.handled = 0;
     if (!UIControl::UnknownVirtualSlot20(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
-        if (field_0x204_sound) {
-            field_0x204_sound->SetVolume(ownerGui->field_0x34c, 0);
-            field_0x204_sound->PlayWithOptions(1, 0, 0);
+        if (clickSound) {
+            clickSound->SetVolume(ownerGui->field_0x34c, 0);
+            clickSound->PlayWithOptions(1, 0, 0);
         }
         switch (c) {
         case 8:
@@ -675,9 +675,9 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
                 controlText[textLength] = c;
                 textLength++;
                 controlTextLength++;
-            } else if (field_0x208_sound) {
-                field_0x208_sound->SetVolume(ownerGui->field_0x34c, 0);
-                field_0x208_sound->PlayWithOptions(1, 0, 0);
+            } else if (fullSound) {
+                fullSound->SetVolume(ownerGui->field_0x34c, 0);
+                fullSound->PlayWithOptions(1, 0, 0);
             }
             break;
         }
@@ -1401,7 +1401,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
-                        scrollBar->field_0x204_image = (UIAnim*)FindSectionObject(buffer);
+                        scrollBar->trackImage = (UIAnim*)FindSectionObject(buffer);
                     parameters.UnknownFunction4b7ec0("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
                                                      -1);
                     if (!isDefault) {
