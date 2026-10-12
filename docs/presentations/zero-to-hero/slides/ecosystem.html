@@ -1,0 +1,35 @@
+<section id="ecosystem" data-transition="fade" style="background:#16130f;color:#f2ece1;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e;letter-spacing:3px">03 · THE WORLD</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">EcoSystem: forests placed by rules, not by hand</h2>
+</div>
+<div style="display:flex;gap:16px;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:28px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e">1 · PLACE</p>
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Three ways in</h3>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3"><b style="color:#f2ece1">Placement bitmap</b> painted by the designer</p>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3"><b style="color:#f2ece1">Stored .esb</b> data, XOR-obscured</p>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3"><b style="color:#f2ece1">Auto generator</b> weighing slope and altitude on a normal curve, plus probability TGAs</p>
+</div>
+<p style="font-size:48px;color:#f26a2e;align-self:center">→</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:28px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e">2 · STORE</p>
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Compact instances</h3>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3">Each Vegetation is a QuadTreeObject with 16-bit quantized fields.</p>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3">Species come from .est files: LOD count, mean height and more.</p>
+</div>
+<p style="font-size:48px;color:#f26a2e;align-self:center">→</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#1a2230;border:2px solid #5b9cf0;border-radius:12px;padding:28px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#5b9cf0">3 · DRAW</p>
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Billboard or mesh</h3>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3">Detail bands with distances and fades choose 3D geometry up close, billboards far away.</p>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3">Billboards batch 120 quads at a time.</p>
+</div>
+</div>
+<div style="display:flex;gap:32px;align-items:center;border-top:1px solid #3a342b;padding:28px 0px 0px 0px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:36px;color:#f26a2e">radius × scale / depth &gt; 2</p>
+<p style="font-size:28px;color:#c9c0b0">A billboard is worth drawing only when it would cover more than about two pixels.</p>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: ECOSYSTEM docs; GameSpy SportPlanet interview, 2000</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">11</p></div>
+<aside>In the 2000 interview, the team said Mark DeSimone's eco-system "manages tens of thousands of trees, bushes, and shrubbery", placed by rules to make forests and deserts. The decomp shows how. EcoSystem derives from GameObject and GroundFogableObject. Species definitions are .est files. Instances come from a placement bitmap, from stored .esb data decoded with a running XOR key, or from an Auto generator that weighs slope and altitude through a tabulated normal distribution and samples the green channel of probability TGAs, using 5x5 or 6x6 rings chosen by an "EcoGen" registry value. The "two pixels" reading of the billboard threshold is my interpretation of radius*scale/depth > 2; the docs give only the formula. Most of the EcoSystem draw and generator code is still a near miss.</aside>
+</section>

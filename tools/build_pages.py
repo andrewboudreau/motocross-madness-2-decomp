@@ -5,13 +5,16 @@
 
 Links between documents become links between the generated pages; links to
 repository files outside docs/ (sources, headers, AGENTS.md) point at the
-file on GitHub. Rendering is CommonMark with GitHub tables, like GitHub's own
+file on GitHub. Each docs/presentations/<name>/deck.json becomes a slide
+viewer at presentations/<name>/: its slides/<id>.html files in deck order,
+inside docs/presentations/viewer.html. Rendering is CommonMark with GitHub tables, like GitHub's own
 view; needs `pip install markdown-it-py mdit-py-plugins`.
 """
 from __future__ import annotations
 
 import argparse
 import html
+import json
 import posixpath
 import re
 from pathlib import Path
@@ -113,6 +116,33 @@ def title_of(md_text: str, fallback: str) -> str:
     return fallback
 
 
+def build_presentation(deck_dir: Path) -> tuple[str, int]:
+    """Assemble one deck into a viewer page; returns (page, slide count)."""
+    deck = json.loads((deck_dir / 'deck.json').read_text(encoding='utf-8'))
+    viewer = (deck_dir.parent / 'viewer.html').read_text(encoding='utf-8')
+    slides = [(deck_dir / 'slides' / f'{slide}.html').read_text(encoding='utf-8')
+              for slide in deck['order']]
+    fonts = ''.join(f'<link rel="stylesheet" href="{html.escape(face["href"])}">'
+                    for face in deck.get('faces', {}).values())
+    page = (viewer.replace('{{title}}', html.escape(deck['title']))
+            .replace('{{fonts}}', fonts).replace('{{slides}}', '\n'.join(slides)))
+    return page, len(slides)
+
+
+def build_presentations(out: Path) -> list[tuple[str, str, int]]:
+    """Write every deck under docs/presentations; returns (name, title, slides)."""
+    decks = []
+    for deck_json in sorted((ROOT / 'docs' / 'presentations').glob('*/deck.json')):
+        name = deck_json.parent.name
+        page, count = build_presentation(deck_json.parent)
+        target = out / 'presentations' / name / 'index.html'
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(page, encoding='utf-8')
+        title = json.loads(deck_json.read_text(encoding='utf-8'))['title']
+        decks.append((name, title, count))
+    return decks
+
+
 def build(out: Path) -> int:
     docs = sorted((ROOT / 'docs').glob('*.md'))
     stems = {p.stem for p in docs}
@@ -134,13 +164,19 @@ def build(out: Path) -> int:
         listed.update(items)
         sections.append((heading, items))
     sections.append(('Units', sorted(stems - listed)))
+    decks = build_presentations(out)
+    if decks:
+        links = ''.join(f'<li><a href="presentations/{name}/">{html.escape(title)}</a> '
+                        f'<span class="muted">({count} slides)</span></li>'
+                        for name, title, count in decks)
+        body += f'<h2 id="presentations">Presentations</h2><ul>{links}</ul>'
     body += '<h2 id="documents">Documents</h2>'
     for heading, items in sections:
         links = ''.join(f'<li><a href="{page_name(s)}">{html.escape(titles[s])}</a></li>' for s in items)
         body += f'<h3>{html.escape(heading)}</h3><ul class="docs">{links}</ul>'
     (out / 'index.html').write_text(wrap('Overview', body, 'README.md'), encoding='utf-8')
     (out / '.nojekyll').write_text('', encoding='utf-8')
-    return len(docs) + 1
+    return len(docs) + 1 + len(decks)
 
 
 def main() -> None:

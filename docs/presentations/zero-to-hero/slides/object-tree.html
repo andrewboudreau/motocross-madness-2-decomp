@@ -1,0 +1,31 @@
+<section id="object-tree" data-transition="fade" style="background:#f2ece1;color:#1d1914;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a8431a;letter-spacing:3px">02 · OBJECTS AND MEMORY</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Everything is a GameObject in one tree</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:flex-start">
+<div style="width:900px;display:flex;flex-direction:column;align-items:center;gap:12px">
+<div style="width:420px;display:flex;flex-direction:column;gap:4px;background:#fbf8f2;border:2px solid #1d1914;border-radius:10px;padding:18px 24px"><p style="font-family:'JetBrains Mono', monospace;font-size:28px;font-weight:600">BaseObject</p><p style="font-size:24px;color:#5f574c">AddRef · Release · GetRefCount</p></div>
+<p style="font-size:32px;color:#a8431a">↓</p>
+<div style="width:620px;display:flex;flex-direction:column;gap:4px;background:#1d1914;color:#f2ece1;border-radius:10px;padding:18px 24px"><p style="font-family:'JetBrains Mono', monospace;font-size:28px;font-weight:600;color:#f26a2e">GameObject</p><p style="font-size:24px;color:#c9c0b0">parent · owner · first child · prev / next sibling</p></div>
+<p style="font-size:32px;color:#a8431a">↓</p>
+<div style="width:900px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;font-family:'JetBrains Mono', monospace">
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">Scene</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">EventManager</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">EcoSystem</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">ArcadeObject</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">SoultreeObject</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">VCRInterface</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">GraphicsTest → BikeRace · CarProcedural · Wrecker</p>
+<p style="font-size:24px;background:#fbf8f2;border:1px solid #d8cfbf;border-radius:6px;padding:8px 14px">KrustyBike (virtual base)</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:6px;border-left:4px solid #a8431a;padding:0px 0px 0px 24px"><h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">COM-style lifetime</h3><p style="font-size:26px;color:#5f574c;line-height:1.3">Refcount starts at 1; Release deletes at zero.</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;border-left:4px solid #a8431a;padding:0px 0px 0px 24px"><h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Calls fan out</h3><p style="font-size:26px;color:#5f574c;line-height:1.3">Virtual slots 4–26 mostly forward to every child, gated by flags; bit 3 skips a child.</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;border-left:4px solid #a8431a;padding:0px 0px 0px 24px"><h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Types as strings</h3><p style="font-size:26px;color:#5f574c;line-height:1.3">Each object keeps its RTTI class names, comma-joined; FindByClassName searches them.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6b6256">Source: GAMEOBJECT, CLASS_MODEL · all 29 GameObject functions match exactly</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#6b6256">08</p></div>
+<aside>This is the spine of the engine. BaseObject is a tiny COM-like refcount, and it is the README's recommended starting point because all six of its functions match VC6 output byte for byte. GameObject adds an intrusive tree. Update, render passes, input and network messages are all virtual calls that walk this tree: update is slot 10 with a float dt, input arrives as slots 22/23, network messages as slot 24 with type, data, from, to and flags. Every constructor level appends typeid(*this).name() to a heap string, so an object can be found by class name at runtime. KrustyBike reaches GameObject as a virtual base through the Vehicle chain, which is why it has three vtables.</aside>
+</section>

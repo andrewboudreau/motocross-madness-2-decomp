@@ -1,0 +1,30 @@
+<section id="camera-ai" data-transition="fade" style="background:#16130f;color:#f2ece1;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e;letter-spacing:3px">04 · BIKE AND RIDER</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Cameras that ease, opponents that look ahead</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:20px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:36px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#5b9cf0">CAMERA</p>
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#c9c0b0;line-height:1.5">Camera → PCCamera → FollowCamera → VehicleCamera → BikeCamera → KrustyBikeCamera</p>
+<div style="display:flex;flex-direction:column;gap:8px;background:#0f0d0a;border-radius:8px;padding:20px 24px;font-family:'JetBrains Mono', monospace">
+<p style="font-size:24px">v += (target − v) · min(dt, rate) / rate</p>
+<p style="font-size:24px">fov = clamp(((200 − r)/180)·60 + 10, 10, 70)</p>
+</div>
+<p style="font-size:24px;color:#a89f8f;line-height:1.3">Presets live in slots 63–67. Distance is 17 behind the bike, 60 otherwise. The second formula's meaning is the docs' best guess.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#2b2118;border:2px solid #f26a2e;border-radius:12px;padding:36px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e">BikeAI.cpp</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:28px">Landing prediction</p>
+<p style="font-size:28px">Jump prediction</p>
+<p style="font-size:28px"><b>Two-wheel look-ahead simulation</b> <span style="color:#a89f8f">· 17,585 bytes</span></p>
+<p style="font-size:28px">Obstacle queries</p>
+<p style="font-size:28px">Racing-line builder</p>
+</div>
+<p style="font-size:24px;color:#a89f8f;line-height:1.3">AI riders simulate their own bike forward to judge jumps. Most of these functions are near misses.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: FOLLOW_CAMERA, PHYSICS_VALIDATION docs</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">15</p></div>
+<aside>The camera stack is a six-deep inheritance chain; ShadowCamera also derives from PCCamera for terrain shadows. FollowCamera keeps eased 20-byte values that move toward a target by min(dt, rate)/rate each frame, which gives the smooth chase feel. The docs describe the clamped 10-to-70 value as distance-derived FOV "or similar", so treat the label as provisional. On the AI side, BikeAI.cpp contains landing and jump prediction, obstacle queries, a racing-line builder and a 17,585-byte two-wheel look-ahead simulation. "AI riders simulate their own bike forward" is my plain reading of that name. Separately, CarProcedural drives scene vehicles along Hermite paths with steering clamped to plus or minus 30 degrees; these are likely the moving vehicles 2000-era previews mention, though the docs don't call them traffic.</aside>
+</section>

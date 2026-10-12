@@ -1,0 +1,30 @@
+<section id="physics" data-transition="fade" style="background:#16130f;color:#f2ece1;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e;letter-spacing:3px">04 · BIKE AND RIDER</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Physics: a fixed timestep under a variable frame</h2>
+</div>
+<div style="display:flex;gap:56px;align-items:flex-start">
+<div style="width:880px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#0f0d0a;border:1px solid #3a342b;border-radius:12px;padding:32px;font-family:'JetBrains Mono', monospace">
+<p style="font-size:24px;color:#7d7466">// SoultreePhysicsBaseObject</p>
+<p style="font-size:26px">steps = floor((dt + remainder) / step);</p>
+<p style="font-size:26px">steps = min(steps, maxPerFrame);</p>
+<p style="font-size:26px">if (steps &lt; 1) <span style="color:#f26a2e">runOneVariableStep(dt);</span></p>
+<p style="font-size:26px">else <span style="color:#f26a2e">RunSteps(steps);</span></p>
+<p style="font-size:24px;color:#7d7466">// SelectiveGravityModel</p>
+<p style="font-size:26px">gravity = <span style="color:#5b9cf0">32.2f</span>;</p>
+<p style="font-size:26px">F = Vec3(0, -1, 0) * (mass * gravity);</p>
+</div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">KrustyBike : Bike : Vehicle : SoultreePhysicsCharacter</p>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:24px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:800;color:#f26a2e;line-height:1">40°</p><p style="font-size:24px;color:#c9c0b0">max lean angle</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:24px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:800;color:#f26a2e;line-height:1">120°</p><p style="font-size:24px;color:#c9c0b0">max lean rate</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:24px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:800;color:#f26a2e;line-height:1">0.785</p><p style="font-size:24px;color:#c9c0b0">rad steer clamp (45°)</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:24px"><p style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:800;color:#f26a2e;line-height:1">165</p><p style="font-size:24px;color:#c9c0b0">bike load weight</p></div>
+</div>
+</div>
+<p style="font-size:28px;color:#c9c0b0">32.2 matches gravity in ft/s², but the docs don't state units. The sub-step loop RunSteps is still only partly matched.</p>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: PHYSICS_VALIDATION docs · code simplified from the reconstruction</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">13</p></div>
+<aside>The physics core uses a fixed-step accumulator so the simulation stays stable at any frame rate: it counts how many whole steps fit in the elapsed time plus the leftover remainder, caps the count per frame, and if less than one step has elapsed it runs a single variable-length step instead. The code on the slide is a simplified paraphrase; method names are reconstruction names. Gravity is 32.2 in SelectiveGravityModel, and the same constant appears in a load-weight ratio and a camera formula. Reading it as feet per second squared is an inference. Vehicle::LoadVehicle sets max lean 40 degrees and max lean rate 120 degrees, both multiplied by 0.01745329 to radians, and builds a gearbox from GearRatios.cpp. Glenn O'Bannon was the lead programmer on physics and gameplay.</aside>
+</section>

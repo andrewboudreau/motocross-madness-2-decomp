@@ -1,0 +1,39 @@
+<section id="terrain" data-transition="fade" style="background:#f2ece1;color:#1d1914;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a8431a;letter-spacing:3px">03 · THE WORLD</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Terrain: a height field that refines near the camera</h2>
+</div>
+<div style="display:flex;gap:72px;align-items:flex-start">
+<svg aria-label="Quadtree terrain diagram: the square subdivides more finely near the camera in the lower left" width="560" height="560" viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="560" height="560" fill="#e4dccd" stroke="#1d1914" stroke-width="3"/>
+<g stroke="#1d1914" stroke-width="2" fill="none">
+<line x1="280" y1="0" x2="280" y2="560"/><line x1="0" y1="280" x2="560" y2="280"/>
+<line x1="140" y1="280" x2="140" y2="560"/><line x1="0" y1="420" x2="280" y2="420"/>
+<line x1="420" y1="280" x2="420" y2="560"/><line x1="280" y1="420" x2="560" y2="420"/>
+<line x1="140" y1="0" x2="140" y2="280"/><line x1="0" y1="140" x2="280" y2="140"/>
+</g>
+<g stroke="#a8431a" stroke-width="1.5" fill="none">
+<line x1="70" y1="420" x2="70" y2="560"/><line x1="0" y1="490" x2="140" y2="490"/>
+<line x1="210" y1="420" x2="210" y2="560"/><line x1="140" y1="490" x2="280" y2="490"/>
+<line x1="70" y1="280" x2="70" y2="420"/><line x1="0" y1="350" x2="140" y2="350"/>
+<line x1="35" y1="490" x2="35" y2="560"/><line x1="0" y1="525" x2="70" y2="525"/>
+<line x1="105" y1="490" x2="105" y2="560"/><line x1="70" y1="525" x2="140" y2="525"/>
+<line x1="35" y1="420" x2="35" y2="490"/><line x1="0" y1="455" x2="70" y2="455"/>
+</g>
+<circle cx="60" cy="510" r="14" fill="#f26a2e" stroke="#1d1914" stroke-width="2"/>
+<path d="M60 510 L250 330 M60 510 L330 470" stroke="#f26a2e" stroke-width="3" stroke-dasharray="8 6" fill="none"/>
+<text x="84" y="548" font-family="JetBrains Mono, monospace" font-size="20" fill="#1d1914">camera</text>
+</svg>
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;gap:24px;align-items:baseline"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:800;color:#a8431a;width:170px">17×17</p><p style="font-size:28px;line-height:1.3">samples per GridBaseBlock, LZW-compressed when that is smaller</p></div>
+<div style="display:flex;gap:24px;align-items:baseline"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:800;color:#a8431a;width:170px">9</p><p style="font-size:28px;line-height:1.3">levels of detail, split by screen-space error</p></div>
+<div style="display:flex;gap:24px;align-items:baseline"><p style="font-family:'Barlow Condensed', sans-serif;font-size:56px;font-weight:800;color:#a8431a;width:170px">4×4</p><p style="font-size:28px;line-height:1.3">blocks frustum-tested; edges pinned to neighbours so no cracks</p></div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#1d1914;color:#f2ece1;border-radius:12px;padding:24px 28px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:28px;color:#f26a2e">h(i) = (i+1)^(1 + i²/255²) − 1</p>
+<p style="font-size:24px;color:#c9c0b0;line-height:1.3">An 8-bit code becomes 0…65,535: fine steps low, big range high.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6b6256">Source: GRIDDRAW, TERRAIN_SUPPORT, LZW docs · diagram is illustrative</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#6b6256">10</p></div>
+<aside>The terrain lives in Grid1.cpp as GridNode, DrawableGridNode and DrawableGridNodeSharedTextures. Each GridBaseBlock is 0xd50 bytes holding 17x17 eight-byte samples; arrays are LZW-compressed when smaller. Heights pass through the nonlinear curve shown: at i=0 it's 0, at 255 it's 256 squared minus one. Nodes subdivide by screen-space error across 9 levels, pin vertices to neighbours to avoid T-junction cracks, and free GPU buffers when AgeManager evicts them. GridNode slot 1 casts a segment against the height field; it uses inline asm so it's out of reach for now. Collision uses a separate QuadTree, visibility a VisibilityQuadTree with sphere-in-frustum tests. This is also what Armadillo and Photoshop height maps feed in the modding scene.</aside>
+</section>

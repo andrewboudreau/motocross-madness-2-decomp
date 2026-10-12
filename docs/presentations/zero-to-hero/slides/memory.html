@@ -1,0 +1,31 @@
+<section id="memory" data-transition="fade" style="background:#16130f;color:#f2ece1;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e;letter-spacing:3px">02 · OBJECTS AND MEMORY</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Memory: tagged, pooled, and evicted by age</h2>
+</div>
+<div style="display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:16px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:32px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e">MemTagStack</p>
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Every byte has a category</h3>
+<div style="display:flex;flex-wrap:wrap;gap:8px;font-family:'JetBrains Mono', monospace">
+<p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">Terrain</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">EcoSystem</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">TextureCache</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">BikeRace</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">Audio</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">Collision</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">QuadTree</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">Particles</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">Shadow</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">Sky</p><p style="font-size:24px;background:#332d25;padding:4px 10px;border-radius:4px">UI</p><p style="font-size:24px;color:#a89f8f;padding:4px 10px">+4 more</p>
+</div>
+<p style="font-size:24px;color:#a89f8f;line-height:1.3">A push/pop stack in front of malloc; the debug overlay shows the totals.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:32px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e">BlockAllocator</p>
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Fixed-size pools</h3>
+<p style="font-family:'Barlow Condensed', sans-serif;font-size:96px;font-weight:800;color:#f26a2e;line-height:1">40 B</p>
+<p style="font-size:24px;color:#a89f8f;line-height:1.3">Active and spare chains with an intrusive free list. Retail quirks are kept on purpose.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#221e18;border:1px solid #3a342b;border-radius:12px;padding:32px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#5b9cf0">AgeManager</p>
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">LRU for GPU buffers</h3>
+<p style="font-size:26px;color:#c9c0b0;line-height:1.3">Register, touch, then sort and evict the oldest.</p>
+<p style="font-size:24px;color:#a89f8f;line-height:1.3">Terrain nodes, vegetation geometry and textures all free their buffers through it.</p>
+</div>
+</div>
+<p style="font-size:28px;color:#c9c0b0">Allocations record <b style="color:#f2ece1">__FILE__</b> and a literal line number, so reconstructed source has to keep the original line numbers to match.</p>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: ALLOCATION docs</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">09</p></div>
+<aside>Memory accounting was clearly important on 64 MB machines. MemTagStack has 15 labels: 3DObjects, Audio, BikeRace, Collision, DebugOverlay, EcoSystem, Particles, QuadTree, Scene, Shadow, Sky, Startup, Terrain, TextureCache and UI, with "Unclaimed" at the root. BlockAllocator is a 40-byte pool; the decomp preserves quirks like an uninitialized allocatedBytes field and a Clear that frees only the active chain. AgeManager is the cache-eviction policy shared by terrain, eco-system and textures. A fun consequence for decompilation: DebugMalloc and operator new take __FILE__ and __LINE__, and those line numbers are compiled in as immediates, so the reconstructed files must place each allocation on the original line.</aside>
+</section>

@@ -6,7 +6,8 @@ The project is at function/class reconstruction, not a complete game build.
 [Current matches and next targets](docs/VC6_MATCHING.md) ·
 [Decompilation progress](docs/DECOMPILATION_PROGRESS.md) ·
 [Setup](docs/TOOLCHAIN.md) · [Codex Cloud](docs/TOOLCHAIN.md#codex-cloud) ·
-[Agent workflow](AGENTS.md)
+[Agent workflow](AGENTS.md) ·
+[Zero to Hero slides](https://andrewboudreau.github.io/motocross-madness-2-decomp/presentations/zero-to-hero/)
 
 The [progress page](docs/DECOMPILATION_PROGRESS.md) records reviewed strict
 calibration results alongside source, RTTI and executable-size indicators.

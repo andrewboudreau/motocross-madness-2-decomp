@@ -1,0 +1,40 @@
+<section id="layers" data-transition="fade" style="background:#16130f;color:#f2ece1;font-family:'Barlow', sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#f26a2e;letter-spacing:3px">01 · ARCHITECTURE</p>
+<h2 style="font-family:'Barlow Condensed', sans-serif;font-size:72px;font-weight:700;line-height:1.1">Three layers: portable base, PC layer, the game</h2>
+</div>
+<div style="display:flex;gap:40px;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:32px;align-items:center;background:#2b2118;border:2px solid #f26a2e;border-radius:12px;padding:24px 28px">
+<div style="width:260px;display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700;color:#f26a2e">Game</h3><p style="font-size:24px;color:#c9c0b0">trkgame.cpp and friends</p></div>
+<div style="flex:1;display:flex;flex-wrap:wrap;gap:10px;font-family:'JetBrains Mono', monospace;font-size:24px">
+<p style="font-size:24px;background:#3a2a1c;padding:6px 14px;border-radius:6px">TrackGame</p><p style="font-size:24px;background:#3a2a1c;padding:6px 14px;border-radius:6px">KrustyBike</p><p style="font-size:24px;background:#3a2a1c;padding:6px 14px;border-radius:6px">KrustyUI</p><p style="font-size:24px;background:#3a2a1c;padding:6px 14px;border-radius:6px">EventManager</p><p style="font-size:24px;background:#3a2a1c;padding:6px 14px;border-radius:6px">BaseQuarryEvent</p>
+</div>
+</div>
+<div style="display:flex;gap:32px;align-items:center;background:#1a2230;border:2px solid #5b9cf0;border-radius:12px;padding:24px 28px">
+<div style="width:260px;display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700;color:#5b9cf0">PC layer</h3><p style="font-size:24px;color:#c9c0b0">Windows + DirectX</p></div>
+<div style="flex:1;display:flex;flex-wrap:wrap;gap:10px;font-family:'JetBrains Mono', monospace;font-size:24px">
+<p style="font-size:24px;background:#243149;padding:6px 14px;border-radius:6px">PCGame</p><p style="font-size:24px;background:#243149;padding:6px 14px;border-radius:6px">PCRenderTarget</p><p style="font-size:24px;background:#243149;padding:6px 14px;border-radius:6px">PCTextureMap</p><p style="font-size:24px;background:#243149;padding:6px 14px;border-radius:6px">PCVideoCard</p><p style="font-size:24px;background:#243149;padding:6px 14px;border-radius:6px">PCInputDevice</p><p style="font-size:24px;background:#243149;padding:6px 14px;border-radius:6px">PCSoundInterface</p>
+</div>
+</div>
+<div style="display:flex;gap:32px;align-items:center;background:#221e18;border:2px solid #5a5145;border-radius:12px;padding:24px 28px">
+<div style="width:260px;display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700">Portable base</h3><p style="font-size:24px;color:#c9c0b0">abstract interfaces</p></div>
+<div style="flex:1;display:flex;flex-wrap:wrap;gap:10px;font-family:'JetBrains Mono', monospace;font-size:24px">
+<p style="font-size:24px;background:#332d25;padding:6px 14px;border-radius:6px">Game</p><p style="font-size:24px;background:#332d25;padding:6px 14px;border-radius:6px">RenderTarget</p><p style="font-size:24px;background:#332d25;padding:6px 14px;border-radius:6px">TextureMap</p><p style="font-size:24px;background:#332d25;padding:6px 14px;border-radius:6px">VideoCard</p><p style="font-size:24px;background:#332d25;padding:6px 14px;border-radius:6px">InputDevice</p><p style="font-size:24px;background:#332d25;padding:6px 14px;border-radius:6px">SoundInterface</p>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">class TrackGame : PCGame : Game  — inheritance reads bottom-up</p>
+</div>
+<div style="width:400px;display:flex;flex-direction:column;gap:14px;border-left:2px solid #3a342b;padding:0px 0px 0px 36px">
+<h3 style="font-family:'Barlow Condensed', sans-serif;font-size:36px;font-weight:700;color:#5b9cf0">PC layer talks to</h3>
+<p style="font-size:26px;line-height:1.3"><b>DirectDraw 7</b> via blade.dll</p>
+<p style="font-size:26px;line-height:1.3"><b>Direct3D</b> Immediate Mode</p>
+<p style="font-size:26px;line-height:1.3"><b>DirectInput</b> + force feedback</p>
+<p style="font-size:26px;line-height:1.3"><b>DirectSound</b> + EAX 1.0</p>
+<p style="font-size:26px;line-height:1.3"><b>DirectPlay 4</b> lobby + sessions</p>
+<p style="font-size:24px;color:#a89f8f;line-height:1.3">d3drm.dll is imported for one vector-rotate helper, not the Retained Mode renderer.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;bottom:64px;width:1664px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#a89f8f">Source: RTTI chains in the retail EXE (CLASS_MODEL, PCGAME)</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#a89f8f">05</p></div>
+<aside>RTTI type descriptors give us the inheritance chains directly, so this layering is solid evidence rather than guesswork. The portable layer defines abstract services: Game, RenderTarget, TextureMap, VideoCard, InputDevice, SoundInterface, Camera, ControlInterface. Each has a PC subclass that does the Windows and DirectX work. The game itself, TrackGame, derives from PCGame. A curiosity: DirectDraw is not imported from ddraw.dll at all; DirectDrawCreateEx comes from blade.dll, which identifies itself as the Microsoft Blade Software Rasterizer, and there's a "Blade" renderer GUID alongside HAL, RGB, MMX, Ramp and Ref.</aside>
+</section>

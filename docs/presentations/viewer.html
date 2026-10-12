@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>{{fonts}}
+<style>
+*{box-sizing:border-box} html,body{margin:0;height:100%;background:#0b0a08;overflow:hidden}
+h1,h2,h3,p,table{margin:0} td,th{vertical-align:top}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0}
+#stage>section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden}
+#stage>section:not(.on){display:none !important}
+aside{display:none}
+#hud{position:fixed;right:16px;bottom:12px;font:14px monospace;color:#888}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:30%;overflow:auto;background:#111;color:#ddd;font:16px/1.5 sans-serif;padding:16px 24px;display:none}
+</style></head><body>
+<div id="stage">
+{{slides}}
+</div>
+<div id="notes"></div><div id="hud"></div>
+<script>
+const S=[...document.querySelectorAll('#stage>section')];let i=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
+const st=document.getElementById('stage'),hud=document.getElementById('hud'),nt=document.getElementById('notes');
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform=`scale(${k}) translate(-50%,-50%)`;st.style.transformOrigin='0 0';st.style.left='50%';st.style.top='50%';st.style.transform=`translate(-50%,-50%) scale(${k})`;st.style.transformOrigin='center'}
+function show(){S.forEach((s,j)=>s.classList.toggle('on',j===i));hud.textContent=`${i+1} / ${S.length} · ←/→ navigate · N notes`;const a=S[i].querySelector('aside');nt.textContent=a?a.textContent:'';history.replaceState(null,'','#'+(i+1))}
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))i=Math.min(S.length-1,i+1);else if(['ArrowLeft','PageUp'].includes(e.key))i=Math.max(0,i-1);else if(e.key==='n'||e.key==='N'){nt.style.display=nt.style.display==='block'?'none':'block'}else return;e.preventDefault();show()});
+addEventListener('click',e=>{if(e.target.closest('#notes'))return;i=e.clientX>innerWidth/2?Math.min(S.length-1,i+1):Math.max(0,i-1);show()});
+addEventListener('resize',fit);fit();show();
+</script></body></html>
