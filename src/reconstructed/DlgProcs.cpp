@@ -1494,9 +1494,9 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
     }
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
-            UnknownFunction4526b0(0xbb9, event);
+            HandleMenuCancel(0xbb9, event);
         else if (!_stricmp("OKButton", event->controlName))
-            UnknownFunction452930(0xbb9, event);
+            HandleMenuOk(0xbb9, event);
         break;
     case 9:
         if (event->code == 0x1f) {
@@ -1567,9 +1567,9 @@ void RemoveProfileDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case 11:
         if (event->key == 0x1b)
-            UnknownFunction4526b0(0x12f, event);
+            HandleMenuCancel(0x12f, event);
         else if (event->key == 0xd)
-            UnknownFunction452930(0x12f, event);
+            HandleMenuOk(0x12f, event);
         break;
     case kDialogInit: {
         UIControl* title = FindControl("TitleText", 0);
@@ -1591,15 +1591,15 @@ void RemoveProfileDlg::HandleEvent(UnknownDialogEvent* event) {
     }
     case kDialogCommand:
         if (!_stricmp("ButRight", event->controlName))
-            UnknownFunction4526b0(0x12f, event);
+            HandleMenuCancel(0x12f, event);
         else if (!_stricmp("ButLeft", event->controlName))
-            UnknownFunction452930(0x12f, event);
+            HandleMenuOk(0x12f, event);
         break;
     }
 }
 
 // 0x004526b0
-void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
+void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
     switch (menu) {
     case 0xc9:
         g_TrackGame->ui->OpenMenu(kMenuOptions);
@@ -1687,7 +1687,7 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
 }
 
 // 0x00452930
-void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
+void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     void* address;
     unsigned long size;
     char text[128];

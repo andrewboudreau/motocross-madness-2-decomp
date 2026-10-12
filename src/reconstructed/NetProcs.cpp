@@ -181,7 +181,7 @@ void SerialPopupDlg::HandleEvent(UnknownDialogEvent* event) {
             event->handled = 1;
         } else if (!_stricmp("ButOk", event->controlName)) {
             UpdateBoundValues(1);
-            UnknownFunction452930(0xd8, event);
+            HandleMenuOk(0xd8, event);
         }
         break;
     case kDialogInit: {
@@ -249,9 +249,9 @@ void TCPAddressDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
-            UnknownFunction4526b0(0xd9, event);
+            HandleMenuCancel(0xd9, event);
         else if (!_stricmp("OkButton", event->controlName))
-            UnknownFunction452930(0xd9, event);
+            HandleMenuOk(0xd9, event);
         break;
     case kDialogInit: {
         UIControl* control = FindControl("TitleText", 0);
@@ -296,9 +296,9 @@ void SessionDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("CancelButton", event->controlName))
-            UnknownFunction4526b0(300, event);
+            HandleMenuCancel(300, event);
         else if (!_stricmp("OKButton", event->controlName))
-            UnknownFunction452930(300, event);
+            HandleMenuOk(300, event);
         break;
     case kDialogInit: {
         FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x911);
@@ -385,7 +385,7 @@ void ConnectErrorDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName))
-            UnknownFunction452930(0x1f9, event);
+            HandleMenuOk(0x1f9, event);
         break;
     case kDialogInit: {
         UIControl* control = FindControl("TitleText", 0);

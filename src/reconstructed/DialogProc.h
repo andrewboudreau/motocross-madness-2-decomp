@@ -51,8 +51,8 @@ struct UnknownDialogEvent {
 // cdecl entry points in dlgprocs.cpp's code that the procedures pass a menu
 // id and their message to (0x004526b0 near dlgprocs.cpp's line references at
 // 0x00452b8e; 0x00453090 near 0x004531dc).
-void UnknownFunction4526b0(int menu, UnknownDialogEvent* event);
-void UnknownFunction452930(int menu, UnknownDialogEvent* event);
+void HandleMenuCancel(int menu, UnknownDialogEvent* event); // 0x004526b0: Cancel button / Esc for `menu`
+void HandleMenuOk(int menu, UnknownDialogEvent* event);     // 0x00452930: OK button / Enter for `menu`
 void UnknownFunction453090(int menu, UnknownDialogEvent* event);
 
 // RTTI: ChoiceDlg : UIDialog (vtable 0x00551cb0; slot 29 is 0x004555b0 in
