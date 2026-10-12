@@ -26,6 +26,9 @@
 // the in-`if` pointer form (144 combinations: pointer and test forms, the
 // `system` local, the switch operand, increment forms and the `more` operand
 // order) keep the ebx/ebp swap (best 197) and leave the original at 361.
+// Also unchanged or worse: `value` reused as `last`, an inverted head test
+// (326), a `NetMessage* base` local (83), `++index >= 0x100`, a split
+// increment with `== 0x100` (360) and an `== 0xff` reset (318/372).
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

@@ -84,7 +84,15 @@
 //   Also 256 or worse (20-form sweep): an explicit `else opaque = 0` in the
 //   8-bit test (246), `opaque = byte != key`, `else if` and `format == 8 &&`
 //   chains, crossed with a `result` copy, an ignored Unlock result and an
-//   `Unlock(0) != 0` test.
+//   `Unlock(0) != 0` test. Setting `result = 1` and jumping to the unlock in
+//   the 8-bit branch (`goto unlock`; the 16-bit branch keeps `opaque = 1`
+//   and falls into `result = opaque;`) gives retail's prologue and
+//   `mov edi, 1; jmp` (266/354, 332 bytes; 240/303 at 307 bytes for
+//   0x00478e10), but VC6 still sets edi for the 16-bit hit instead of
+//   writing the memory result, drops retail's dead `test eax, eax` after
+//   Unlock and folds the Lock-failure return into `xor eax, eax`: retail
+//   never treats `opaque` as a known constant. Not kept (a goto for a
+//   partial gain).
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
@@ -96,7 +104,11 @@
 //   and the locals before the call (worse) were tried. Also worse
 //   (2026-10-11): only one of the two locals (1004 with `length`, 351 with
 //   `cursor`), neither (339), the call as the if condition, and the two
-//   decrements in the other order (1002).
+//   decrements in the other order (1002). Also <= 1008 (about 60 forms): a
+//   `char* text` local, `cursor + controlText`, a `count` local,
+//   `&controlText[cursor]` with `length + 1 - cursor`, length-first stores,
+//   an Enter-case reorder and all 6 declaration orders x 3 lead-test forms
+//   x 3 decrement forms.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects

@@ -23,7 +23,9 @@
 // edx, eax there); VC6 here gives `file` edx for its whole life and copies
 // it right after each fopen. Nested/goto/condition forms, a combined
 // `!file && ... && (FindCdDirectory() || WaitForCd())` retry and an inline
-// found helper taking the file by value were tried.
+// found helper taking the file by value were tried, and so were `!file`/
+// `file == 0` x three second-fopen forms x five found-block forms (30, best
+// 190; an `int found` flag scores 191 but grows the function to 387 bytes).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
