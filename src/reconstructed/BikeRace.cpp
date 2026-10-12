@@ -98,18 +98,18 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     field_0x154 = 0;
     startCountdown = 0;
     isRacing = false;
-    field_0x18b = false;
+    restartPending = false;
     trackLoaded = false;
     racerCount = 0;
     field_0x188 = false;
-    field_0x18f = false;
+    startStampSent = false;
     if (g_TrackGame->playerCount > 1) {
-        field_0x18e = true;
+        networkStartPending = true;
     } else {
-        field_0x18e = false;
+        networkStartPending = false;
     }
-    field_0x190 = false;
-    field_0x194 = 0;
+    chatOpen = false;
+    chatHideTimer = 0;
     field_0x198 = g_TrackGame->mode.chatInputLine;
     field_0x064 = 0;
     field_0x06c = 0;
@@ -436,16 +436,16 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     replayVcr->sceneTimePending = 0;
                 }
             }
-            if (field_0x18e) {
-                if (!field_0x18f) {
+            if (networkStartPending) {
+                if (!startStampSent) {
                     UnknownBikeRaceNetStamp stamp;
                     stamp.timeStamp = ReadClock();
                     g_TrackGame->network->Send(
                         0x84, &stamp, 8, g_TrackGame->network->localPlayer, 0);
-                    field_0x18f = true;
+                    startStampSent = true;
                 }
             }
-            if (field_0x18e) {
+            if (networkStartPending) {
                 int ready = 1;
                 int self = g_TrackGame->network->localPlayer;
                 for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
@@ -474,7 +474,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 }
                 if (ready) {
                     ResetStartCountdown();
-                    field_0x18e = false;
+                    networkStartPending = false;
                     g_TrackGame->network->StopKeepAlive();
                     if (g_TrackGame->playerCount > 1) {
                         int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
@@ -561,7 +561,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 int camera = g_TrackGame->mode.raceSettings.eventType;
                 if (camera == 3 || camera == 2 || camera == 5 || camera == 1 || camera == 0) {
                     Track* track = raceTrack;
-                    if ((track != 0 || field_0x0c8 != 0 || camera == 0) && isRacing && !field_0x18b &&
+                    if ((track != 0 || field_0x0c8 != 0 || camera == 0) && isRacing && !restartPending &&
                         localRacer != 0) {
                         int keepRacing = g_TrackGame->mode.raceSettings.raceMode == 0 ||
                                          g_TrackGame->mode.raceSettings.raceMode == 4;
@@ -579,8 +579,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                     }
                 }
-                if (isRacing && field_0x18b) {
-                    field_0x18b = false;
+                if (isRacing && restartPending) {
+                    restartPending = false;
                     isRacing = false;
                 }
                 if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->isEnabled) {
@@ -588,15 +588,15 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     position.y += 4.25f;
                     ((ArcadeObject*)field_0x060)->SetPosition(&position);
                 }
-                if (field_0x194 > 0.0f && g_TrackGame->mode.chatInputLine != 1) {
-                    field_0x194 -= g_TrackGame->frameTime;
-                    if (field_0x194 <= 0.0f) {
-                        field_0x194 = 0;
+                if (chatHideTimer > 0.0f && g_TrackGame->mode.chatInputLine != 1) {
+                    chatHideTimer -= g_TrackGame->frameTime;
+                    if (chatHideTimer <= 0.0f) {
+                        chatHideTimer = 0;
                         if (chatOverlay != 0) {
                             chatOverlay->typing = 0;
                             chatOverlay->HideInputLine();
                         }
-                        field_0x190 = false;
+                        chatOpen = false;
                     }
                 }
                 if (flagGirl != 0 && localRacer->statusNode->field_0x44.node != 0) {
@@ -818,9 +818,9 @@ void BikeRace::ToggleReplayPause(int pauseOnly) {
 
 // 0x0041f590
 int BikeRace::UnknownVirtualSlot20(int value) {
-    if (field_0x190 && chatOverlay != 0 && chatOverlay->HandleChatKey(value, &value)) {
+    if (chatOpen && chatOverlay != 0 && chatOverlay->HandleChatKey(value, &value)) {
         if (value == 0) {
-            field_0x194 = 10.0f;
+            chatHideTimer = 10.0f;
         }
         return 1;
     }
@@ -833,11 +833,11 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
     if (g_TrackGame->network != 0 && event->kind == 0) {
         g_TrackGame->controlInterface->keyboard->ModifierHolds(0xc);
     }
-    if (field_0x190 && chatOverlay != 0) {
+    if (chatOpen && chatOverlay != 0) {
         if (event->control == 1 && event->kind == 0) {
-            field_0x194 = 0.1f;
+            chatHideTimer = 0.1f;
             chatOverlay->typing = 0;
-            field_0x190 = false;
+            chatOpen = false;
             return 1;
         }
         if (chatOverlay->HandleChatInput(event, entry, &result)) {
@@ -847,7 +847,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
     if (GameObject::UnknownVirtualSlot23(event, entry)) {
         return 1;
     }
-    if (!field_0x190 && g_TrackGame->uiInteractionBlocked) {
+    if (!chatOpen && g_TrackGame->uiInteractionBlocked) {
         return 0;
     }
     if (event->kind == 0) {
@@ -864,8 +864,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                         chatOverlay->ShowInputLine();
                         chatOverlay->typing = 1;
                     }
-                    field_0x194 = 10.0f;
-                    field_0x190 = true;
+                    chatHideTimer = 10.0f;
+                    chatOpen = true;
                     return 1;
                 }
                 g_TrackGame->mode.chatInputLine++;
@@ -875,7 +875,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 if (g_TrackGame->mode.chatInputLine == 1 && chatOverlay != 0) {
                     chatOverlay->ShowInputLine();
                     chatOverlay->typing = 1;
-                    field_0x190 = true;
+                    chatOpen = true;
                 }
                 char title[0x80];
                 char value[0x80];
@@ -1177,8 +1177,8 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
                 if (chatOverlay != 0) {
                     chatOverlay->ShowInputLine();
                 }
-                field_0x194 = 10.0f;
-                field_0x190 = true;
+                chatHideTimer = 10.0f;
+                chatOpen = true;
             }
             if (chatOverlay != 0) {
                 chatOverlay->AddMessage(name, &((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
@@ -1263,7 +1263,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     if (g_TrackGame->uiInteractionBlocked) {
         return;
     }
-    field_0x18b = true;
+    restartPending = true;
     field_0x188 = false;
     ResetStartCountdown();
     int iterator = 0;

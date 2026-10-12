@@ -212,7 +212,7 @@ int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     for (int i = 0; i < cueRacerCount; i++)
         if (cueRacers[i]->UnknownIsEnabled())
             active++;
-    if (TestInputEvent(0x14, 0, event, 0x80000000) && !cueView->field_0x190 &&
+    if (TestInputEvent(0x14, 0, event, 0x80000000) && !cueView->chatOpen &&
         cueView->racing && active > 1) {
         field_0xbc = 1 - field_0xbc;
         return 1;

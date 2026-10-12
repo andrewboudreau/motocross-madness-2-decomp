@@ -969,14 +969,14 @@ public:
     bool field_0x188;
     unsigned char field_0x189;
     bool isRacing;                         // racing
-    bool field_0x18b;
+    bool restartPending;                      // +0x18b set by RestartRace; stops the race update and clears isRacing next frame
     unsigned char forceHighLod;                // "ForceHighLOD"
     unsigned char trackLoaded;                // the track file loaded (the setup)
-    bool field_0x18e;
-    bool field_0x18f;
-    bool field_0x190;
+    bool networkStartPending;                   // +0x18e set when playerCount > 1; cleared when the per-racer network check passes and the countdown resets
+    bool startStampSent;                      // +0x18f the 0x84 start time stamp was sent
+    bool chatOpen;                            // +0x190 the chat input line is open and takes keys
     unsigned char field_0x191[0x194 - 0x191];
-    float field_0x194;
+    float chatHideTimer;                      // +0x194 seconds until the chat input line hides (10 after a message)
     int field_0x198;
     UnknownBikeRaceOverlay19c* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played

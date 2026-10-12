@@ -150,7 +150,7 @@ struct UnknownVisualCueView {
     unsigned char field_0x054[0x18a - 0x54];
     bool racing;                              // +0x18a
     unsigned char field_0x18b[0x190 - 0x18b];
-    bool field_0x190;
+    bool chatOpen;                            // +0x190 the chat input line is open (BikeRace)
 };
 
 // 0xfc bytes (the allocation at 0x004e06cd).
