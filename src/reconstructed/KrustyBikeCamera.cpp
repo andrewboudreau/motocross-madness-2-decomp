@@ -112,29 +112,29 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
     if (vehicleMode && !bike->crashState) {
-        g_TrackGame->mode.field_0x23c0 = followPitch;
-        g_TrackGame->mode.field_0x23c4 = followYaw;
-        g_TrackGame->mode.field_0x23bc = followDistance;
-        g_TrackGame->mode.field_0x23c8 = targetFieldOfView;
+        g_TrackGame->mode.savedCameraPitch = followPitch;
+        g_TrackGame->mode.savedCameraYaw = followYaw;
+        g_TrackGame->mode.savedCameraDistance = followDistance;
+        g_TrackGame->mode.savedCameraFieldOfView = targetFieldOfView;
     }
 }
 
 // 0x00498230: restores the saved presets.
 void KrustyBikeCamera::UnknownVirtualSlot60() {
-    followPitch = g_TrackGame->mode.field_0x23c0;
-    followYaw = g_TrackGame->mode.field_0x23c4;
-    followDistance = g_TrackGame->mode.field_0x23bc;
-    targetFieldOfView = g_TrackGame->mode.field_0x23c8;
+    followPitch = g_TrackGame->mode.savedCameraPitch;
+    followYaw = g_TrackGame->mode.savedCameraYaw;
+    followDistance = g_TrackGame->mode.savedCameraDistance;
+    targetFieldOfView = g_TrackGame->mode.savedCameraFieldOfView;
 }
 
 // 0x00498280: restores the saved state.
 void KrustyBikeCamera::UnknownVirtualSlot62() {
-    cameraState = g_TrackGame->mode.field_0x23b8;
+    cameraState = g_TrackGame->mode.savedCameraState;
 }
 
 // 0x004982a0: saves the state.
 void KrustyBikeCamera::UnknownVirtualSlot61() {
-    g_TrackGame->mode.field_0x23b8 = cameraState;
+    g_TrackGame->mode.savedCameraState = cameraState;
 }
 
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,

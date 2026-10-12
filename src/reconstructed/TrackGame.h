@@ -408,11 +408,11 @@ public:
     UnknownTrackGameRacerSlot racers[8];      // +0x1be4 the race's racer slots
     int networkGame;                          // +0x23a4 network game (racesnd.cpp 0x004e5780)
     UnknownGuid displayAdapterGuid;       // +0x23a8: display adapter GUID (TrackGameMode 0x00522e20)
-    int field_0x23b8;                         // saved KrustyBikeCamera state (slots 61, 62)
-    float field_0x23bc;                       // saved KrustyBikeCamera presets (slots 59, 60)
-    float field_0x23c0;
-    float field_0x23c4;
-    float field_0x23c8;
+    int savedCameraState;                     // +0x23b8 KrustyBikeCamera state (slots 61, 62); saved in uiinfo
+    float savedCameraDistance;                // +0x23bc KrustyBikeCamera presets (slots 59, 60): follow distance (10.3)
+    float savedCameraPitch;                   // +0x23c0 follow pitch (0.471)
+    float savedCameraYaw;                     // +0x23c4 follow yaw (1.065)
+    float savedCameraFieldOfView;             // +0x23c8 target field of view (85)
     int installType;                      // +0x23cc: 2 when the game runs without the CD (uiinfo.cpp 0x00523c90)
     char installDirectory[0x104];         // +0x23d0: installed data directory (uiinfo.cpp 0x00523c90)
     char cdDataDirectory[0x104];          // +0x24d4: CD data directory (uiinfo.cpp 0x00523bf0)
