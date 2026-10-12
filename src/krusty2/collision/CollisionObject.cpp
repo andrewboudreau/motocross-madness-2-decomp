@@ -722,9 +722,13 @@ void CollisionObject::ResetHitState()
 // 0x00434bb0: after a hull/model test, publishes the hit point (record contact) and the summed,
 // normalised scratch contact normals from this test's scratch entries.
 // Inline normalise as retail emits it: lengths of exactly 1.0f skip the reciprocal square root.
+// The components are read into scalars y, x, z (retail's load order) and the square sum is
+// z*z + (x*x + y*y), which gives retail's x, y, z multiply order; the plain
+// v.x*v.x + v.y*v.y + v.z*v.z loads z, y, x.
 static inline Vec3 ContactNormalized(const Vec3& v)
 {
-    float lengthSquared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float y = v.y, x = v.x, z = v.z;
+    float lengthSquared = z * z + (x * x + y * y);
     if (lengthSquared == 1.0f)
         return v;
     float inverseLength = FastInvSqrt(lengthSquared);
@@ -739,10 +743,9 @@ void CollisionObject::StoreHitResult()
     hitPoint = q->contact;
     Vec3* sum = (Vec3*)&q->contactNormal;
     *sum = Vec3(0.0f, 0.0f, 0.0f);
+    // Vec3::operator+= gives retail's p.x + sum.x, p.y + sum.y but sum.z + p.z
     for (int i = g_CollisionScratchHits; i < g_CollisionScratchCount; i++) {
-        sum->x += g_CollisionScratchPoints[i].x;
-        sum->y += g_CollisionScratchPoints[i].y;
-        sum->z += g_CollisionScratchPoints[i].z;
+        *sum += *(Vec3*)&g_CollisionScratchPoints[i];
     }
     Vec3 normal = ContactNormalized(*sum);
     *sum = normal;
@@ -761,9 +764,7 @@ void CollisionObject::StoreHitNormal()
     *sum = Vec3(0.0f, 0.0f, 0.0f);
     if (g_CollisionScratchCount > 0) {
         for (int i = 0; i < g_CollisionScratchCount; i++) {
-            sum->x += g_CollisionScratchPoints[i].x;
-            sum->y += g_CollisionScratchPoints[i].y;
-            sum->z += g_CollisionScratchPoints[i].z;
+            *sum += *(Vec3*)&g_CollisionScratchPoints[i];
         }
         *sum = ContactNormalized(*sum);
     }

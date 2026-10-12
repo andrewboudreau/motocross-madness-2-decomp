@@ -265,8 +265,8 @@
     "candidate_symbol_contains": "StoreHitResult@CollisionObject",
     "target_va": "0x00434bb0",
     "target_size": 303,
-    "expect": "partial",
-    "notes": "retail accumulates z as sum.z + p.z but x,y as p + sum and loads the dot product operands y,x,z; commutative order is canonicalised by VC6 so source permutations do not move it",
+    "expect": "exact",
+    "notes": "StoreHitResult: the scratch sum goes through Vec3::operator+= (retail p + sum for x, y and sum.z + p.z) and the normalise helper reads y, x, z into scalars and sums z*z + (x*x + y*y) (163 -> 303).",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -275,8 +275,8 @@
     "candidate_symbol_contains": "StoreHitNormal@CollisionObject",
     "target_va": "0x00434cf0",
     "target_size": 446,
-    "expect": "partial",
-    "notes": "same normalise-inline difference as Fn_00434bb0",
+    "expect": "exact",
+    "notes": "StoreHitNormal: same operator+= sum and normalise helper as StoreHitResult (147 -> 446).",
     "bindings": "CollisionObject.bindings.json"
   },
   {

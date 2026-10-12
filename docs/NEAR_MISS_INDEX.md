@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 162, c 111, total 274. The three class (a) functions of the
+Counts: a 1, b 161, c 110, total 272. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -83,8 +83,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
 | krusty2/collision/CollisionObject | `0x004334c0` | 1046/1066 (masked) | b | 11 code diffs: `call A` vs `call @0`; `fmul [edi + 4]` vs `fmul [edi + 0x24]`; slots differ |
 | krusty2/collision/CollisionObject | `0x00434540` | 1054/1068 | b | 8 code diffs: retail adds `fld [eax + 0x38] ; fmul [eax + 4]`; retail lacks `fld [eax + 0x38] ; fmul [eax + 4]`; slots differ |
-| krusty2/collision/CollisionObject | `0x00434bb0` | 163/305 | b | 10 code diffs: `fld [eax - 4]` vs `fld [eax - 8]`; `fld [eax - 0xc]` vs `fld [eax - 0x10]`; slots differ |
-| krusty2/collision/CollisionObject | `0x00434cf0` | 147/448 | c | 16 code diffs: `fld [eax - 4]` vs `fld [eax - 8]`; `fld [eax - 0xc]` vs `fld [eax - 0x10]` |
 | krusty2/collision/CollisionObject | `0x00436100` | 31/804 | c | 35 code diffs: `sub esp, 0x4c` vs `sub esp, 0xac`; `mov eax, [ecx + 0x54]` vs `mov ecx, [ecx + 0x54] ; lea edi, [esp +~` |
 | krusty2/collision/CollisionObject | `0x00436720` | 66/790 (masked) | c | 52 code diffs: `sub esp, 0x18` vs `sub esp, 0xc`; `add esp, 0x18` vs `add esp, 0xc` |
 | krusty2/collision/CollisionObject | `0x00436af0` | 33/812 (masked) | c | 16 code diffs: retail lacks `mov eax, [esp + N]`; `lea esi, [eax + 0x48] ; jle @48` vs `mov edi, [esp + N] ; jle @47` |
