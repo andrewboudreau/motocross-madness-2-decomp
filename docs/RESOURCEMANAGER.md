@@ -25,3 +25,14 @@ Exact: 19 calibration cases. Near miss
 (`samples/render/ResourceManagerNearMisses.cpp`): the archive opener
 `0x004e9030`, where retail also keeps the result in the `new` temporary's
 stack slot.
+
+## Field names
+
+From the allocations and loops in this file (tier 3 names; each declaration
+keeps its `// +0xNN`): the manager's `itemCapacity`, `archiveCapacity`,
+`itemCount`, `archiveCount`, `archives` and `items` (+0x00..+0x14, grown
+by `DebugRealloc` in 0x004e9430, 0x004e96b0 and the 0x004e9030 near
+miss), and ResourceItem's
+`name`, `nameSize` and `object` (+0x08, +0x0c, +0x10). ResourceItem's
+archive and offset (+0x14, +0x18) keep their placeholders because
+FileStream.cpp (UI lane) reads them.

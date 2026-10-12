@@ -125,9 +125,9 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             item = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
         }
         if (item) {
-            if (item->field_0x10) {
+            if (item->object) {
                 item->AddRef();
-                SoultreeVirtualSlot7((SoultreeObject*)item->field_0x10);
+                SoultreeVirtualSlot7((SoultreeObject*)item->object);
                 RegisterNode();
                 return this;
             }
@@ -155,9 +155,9 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                     return this;
                 }
             }
-            if (item->field_0x10) {
+            if (item->object) {
                 item->AddRef();
-                SoultreeVirtualSlot7((SoultreeObject*)item->field_0x10);
+                SoultreeVirtualSlot7((SoultreeObject*)item->object);
                 RegisterNode();
                 return this;
             }
