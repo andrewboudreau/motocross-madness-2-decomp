@@ -27,7 +27,9 @@
 // `list`/`sltPath` (VC6 orders the frame by use, not declaration; the
 // arrays follow retail once `dot` reuses `automatic` and the random-set loop
 // reuses `i`); (2) the "NumberOfMotions" test keeps the count in a register
-// for the allocation (retail compares memory against esi and reloads it);
+// for the allocation (retail compares memory against esi and reloads it;
+// 4 test and 5 count spellings, including pointer arithmetic, an
+// `operator new` call and an unsigned count, give identical bytes);
 // (3) the "Cannot find %s" errors share one sprintf tail where retail keeps
 // two (VUE/SLT and MCF/MotionToPlay/RandomSet); (4) the random-set loop end
 // loads in a different order. 4372 of 5346 compared positions.
