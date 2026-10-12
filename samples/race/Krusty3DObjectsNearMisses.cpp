@@ -22,6 +22,11 @@
 // stack (`fld st(0)`, store at the end; 544). Size helpers taking the length
 // by value, or the camera, `this` and the chained store in any argument
 // order, give 600 or the same 1299.
+// Cycle 3 sweep (156 forms): a `UnknownBonusCamera& camera = *field_0x38`
+// alias (1164), a `UnknownBonusCamera* const&` alias of field_0x38 (1299),
+// a `const float&` alias of the camera's +0x198 (1152), a `float&` alias of
+// field_0x1ec for the chained store, and all 24 orders of the alias, the
+// field_0x1dc store, the delta and `field_0x1f0 = 0`: at best the same 1299.
 //
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode

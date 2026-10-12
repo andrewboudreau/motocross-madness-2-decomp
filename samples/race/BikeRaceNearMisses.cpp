@@ -18,6 +18,10 @@
 // (scene and index by value, either order; table and index; entry base and
 // index), the scene, the table or the index read through a `BikeRace*`
 // (25 forms).
+// Cycle 3: `const int& index = field_0x150` or `int& index` aliases for the
+// head copy and the entry index (1685), and `Scene& scene = *raceScene` for
+// the table reads (1492) are worse than the form above, which keeps the
+// edx/ecx swap.
 //
 // 0x0041f1d0 (881 bytes; next/previous camera target): control flow, the
 // three branches and the shared tail call 0x0041eb20(caster) (the caster
