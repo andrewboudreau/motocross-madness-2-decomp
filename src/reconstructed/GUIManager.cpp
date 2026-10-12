@@ -107,7 +107,7 @@ void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, i
 
 // 0x00485100
 GUICursor::GUICursor(int flags) : GameCursor(flags) {
-    field_0x5c = 0;
+    cursorAnimation = 0;
 }
 
 // 0x00485140
@@ -116,15 +116,15 @@ GUICursor::~GUICursor() {
 
 // 0x00485150
 void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
-    field_0x5c = animation;
+    cursorAnimation = animation;
     if (!animation)
         field_0x38 = 0;
 }
 
 // 0x00485170
 int GUICursor::UnknownVirtualSlot15() {
-    if (field_0x5c)
-        field_0x38 = field_0x5c->AdvancePastSounds();
+    if (cursorAnimation)
+        field_0x38 = cursorAnimation->AdvancePastSounds();
     return GameCursor::UnknownVirtualSlot15();
 }
 
@@ -1109,7 +1109,7 @@ void GUIUser::UnknownFunction487fb0(UnknownCursorAnimation* animation) {
         return;
     if (!animation && cursorAnimation)
         animation = cursorAnimation;
-    current = userCursor->field_0x5c;
+    current = userCursor->cursorAnimation;
     if (current && field_0xc4 && animation != current && animation->field_0x10 > current->field_0x08) {
         animation->field_0x08 = current->field_0x08;
         animation->field_0x0c = current->field_0x0c;

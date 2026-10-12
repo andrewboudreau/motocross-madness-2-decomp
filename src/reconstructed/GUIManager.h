@@ -154,7 +154,7 @@ public:
     virtual int UnknownVirtualSlot15();       // 0x00485170
     void SetAnimation(UnknownCursorAnimation* animation); // 0x00485150
 
-    UnknownCursorAnimation* field_0x5c;
+    UnknownCursorAnimation* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
 };
 
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.
