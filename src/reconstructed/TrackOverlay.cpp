@@ -489,7 +489,7 @@ void StatsOverlay::DrawTimeLeft()
         rect.left += rowExtent.cx + 4;
         sprintf(rowText[0], "%s", text);
         field_0x38->SelectFont("arialsm");
-        void* laidOut = field_0x38->UnknownFunction50ba00(&rect, rowText[0], 0xffffff, &count);
+        void* laidOut = field_0x38->LayoutText(&rect, rowText[0], 0xffffff, &count);
         field_0x38->DrawVertices(Target(), laidOut, count);
     }
 }
@@ -604,7 +604,7 @@ void StatsOverlay::DrawLapTime()
     rect.left += rowExtent.cx + 4;
     sprintf(rowText[5], "%s", text);
     field_0x38->SelectFont("arialsm");
-    void* laidOut = field_0x38->UnknownFunction50ba00(&rect, rowText[5], 0xffffff, &count);
+    void* laidOut = field_0x38->LayoutText(&rect, rowText[5], 0xffffff, &count);
     field_0x38->DrawVertices(Target(), laidOut, count);
 }
 
@@ -1200,7 +1200,7 @@ void RadarOverlay::DrawFrameRate()
     if (showFrameRate) {
         sprintf(text, "%.0f/%.0ffps", 1000.0f / averageFrameTime, average);
         field_0x38->SelectFont("arialsm");
-        void* laidOut = field_0x38->UnknownFunction50ba00(&frameRateRect, text, 0xc8c8dc, &count);
+        void* laidOut = field_0x38->LayoutText(&frameRateRect, text, 0xc8c8dc, &count);
         field_0x38->DrawVertices(Target(), laidOut, count);
     }
     averageFrameTime = frameTimeSum * 1000.0f / frameCount;
@@ -1368,7 +1368,7 @@ void ChatOverlay::UnknownFunction51d9c0(float value, const char* name)
 }
 
 // 0x0051da30
-int ChatOverlay::UnknownFunction51da30(int key, int* result)
+int ChatOverlay::HandleChatKey(int key, int* result)
 {
     UnknownChatMessage message;
     if (inputShown) {

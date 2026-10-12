@@ -266,7 +266,7 @@ public:
     Scene* UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int value, int unused,
                                  char flag);
     // 0x004eaec0: the entry object named like `path`'s file name.
-    UnknownSceneObject* UnknownFunction4eaec0(const char* path, int* index);
+    UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
     void UnknownFunction4eafd0(int index);
     void UnknownFunction4eff30(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void UnknownFunction4eb000(float time);

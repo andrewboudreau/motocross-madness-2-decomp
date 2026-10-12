@@ -101,8 +101,8 @@ Vector3 CarProcedural::UnknownFunction430b10(float time)
         }
         // The fourth weight is written over `time`.
         float h0, h1, h2;
-        UnknownFunction430e60((t - keys[field_0x64].time) / (keys[next].time - keys[field_0x64].time),
-                              &h0, &h1, &h2, &time);
+        HermiteWeights((t - keys[field_0x64].time) / (keys[next].time - keys[field_0x64].time),
+                       &h0, &h1, &h2, &time);
 
         CarProceduralKey* a = &field_0x1b4[field_0x64];
         CarProceduralKey* b = &field_0x1b4[next];

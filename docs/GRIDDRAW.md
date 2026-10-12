@@ -282,3 +282,6 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00483100` `ReleaseBlockCentres`
 - `0x004835c0` `PropagateBorderChange`
 - `0x0047db60` `BuildCurveTables` (Gridbase.cpp)
+- `0x0047d470` `DrawableGridNodeSharedTextures::BuildNodeTexture` (Grid1.h)
+- `0x0047d780` `DrawableGridNodeSharedTextures::BuildBlockTexture` (Grid1.h)
+- `0x00484d70` `GridNode::FindLeaf` (GridNode near-miss sample)

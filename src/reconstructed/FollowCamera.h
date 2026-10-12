@@ -214,8 +214,8 @@ public:
     // 0x3c7, 0x3e1, 0x3e2).
     void UnknownFunction4650e0(const char* path);
     // 0x00463520: appends a table entry while below capacity.
-    bool UnknownFunction463520(const Vector3& position, float a, float b, float c,
-                               float d, float e);
+    bool AppendTableEntry(const Vector3& position, float a, float b, float c,
+                          float d, float e);
     // 0x00463600: stores the subject and copies its +0x40.
     void UnknownFunction463600(UnknownFollowCameraSubject* subject);
 

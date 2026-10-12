@@ -198,8 +198,8 @@ public:
     virtual int UnknownVirtualSlot14();        // 0x0048c290
 
     // 0x0048bd00 (ret 0x18): loads the five digits (lines 0x23d, 0x240).
-    NumberObjectManager* UnknownFunction48bd00(void* value, int b, UnknownNumberRacer* racer, int pixels,
-                                               UnknownNumberCamera* camera, float size);
+    NumberObjectManager* SetupDigits(void* value, int b, UnknownNumberRacer* racer, int pixels,
+                                     UnknownNumberCamera* camera, float size);
 
     UnknownNumberRacer* field_0x2c;
     int field_0x30;
@@ -334,12 +334,12 @@ public:
     virtual int UnknownVirtualSlot14();        // 0x0048d620
 
     // 0x0048c330 (ret 0xc): loads the digit, "x" and decimal point models.
-    int UnknownFunction48c330(void* value, int a, int b);
+    int LoadDigitModels(void* value, int a, int b);
     // 0x0048c8a0 (ret 0xc): creates the frame node (line 0x326).
-    int UnknownFunction48c8a0(void* value, int a, int b);
+    int CreateFrameNode(void* value, int a, int b);
     // 0x0048ca60 (ret 0x14): slot 8, then both loaders; returns this, or 0.
-    BonusObjectManager* UnknownFunction48ca60(void* value, int a, int b, UnknownBonusRacer* racer,
-                                              UnknownBonusCamera* camera);
+    BonusObjectManager* SetupCounter(void* value, int a, int b, UnknownBonusRacer* racer,
+                                     UnknownBonusCamera* camera);
     void NextKey();              // 0x0048cad0: steps to the next key
     void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
     void HideDigits();              // 0x0048d540: hides the shown digits

@@ -430,12 +430,12 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
         // Reading the description through a second name here makes VC6 load the height before
         // the width in the .tga branch's buffer size, as retail does.
         const UnknownSurfaceDesc& level = *desc;
-        UnknownFunction4245f0(&bitmap, level.surface, field_0x2c->field_0x010, level.width, level.height);
+        DescribeBitmap8(&bitmap, level.surface, field_0x2c->field_0x010, level.width, level.height);
         int length = strlen(path);
         int count = length > 0x7f ? 0x7f : length;
         strncpy(bitmap.name, path, count);
         bitmap.name[count] = 0;
-        UnknownFunction424380(&bitmap);
+        WriteBitmap(&bitmap);
     } else {
         void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
         ConvertPixels(pixels, desc->surface, desc->width, desc->height, desc->width,

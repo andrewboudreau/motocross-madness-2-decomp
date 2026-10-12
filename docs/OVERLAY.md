@@ -45,7 +45,7 @@ functions are now exact:
 - `0x0042f0e0` sets the viewport x and width. The height is the width
   times +0x1b8, which is now typed float.
 - `0x0042f190` sets the viewport. Retail stores the width before y.
-- `0x0042f210` returns the viewport rectangle.
+- `0x0042f210` (`GetViewportRect`) returns the viewport rectangle.
 
 So are its eight kVec3 `$E` (`0x0042f250..0x0042f38b`). That is 11 more
 calibration cases.

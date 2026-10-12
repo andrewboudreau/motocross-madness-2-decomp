@@ -238,7 +238,7 @@
   "?UnknownFunction4ea390@UnknownTrackGameObject574@@QAEXPAD0H@Z$ehhandler": "0x0054dc55",
   "?UnknownFunction4ea7e0@Scene@@QAEPAV1@PAVUnknownTrackGameObject574@@HHD@Z": "0x004ea7e0",
   "?UnknownFunction4ea7e0@Scene@@QAEPAV1@PAVUnknownTrackGameObject574@@HHD@Z$ehhandler": "0x0054dca7",
-  "?UnknownFunction4eaec0@Scene@@QAEPAUUnknownSceneObject@@PBDPAH@Z": "0x004eaec0",
+  "?FindEntryByFileName@Scene@@QAEPAUUnknownSceneObject@@PBDPAH@Z": "0x004eaec0",
   "?UnknownFunction4eafd0@Scene@@QAEXH@Z": "0x004eafd0",
   "?UnknownFunction4eb000@Scene@@QAEXM@Z": "0x004eb000",
   "?RestartEntry@Scene@@QAEHHMHH@Z": "0x004eb040",

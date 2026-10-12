@@ -89,7 +89,7 @@ CarProcedural::~CarProcedural()
 }
 
 // 0x00430e60
-void CarProcedural::UnknownFunction430e60(float t, float* h0, float* h1, float* h2, float* h3)
+void CarProcedural::HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3)
 {
     float t2 = t * t;
     float t3 = t2 * t;

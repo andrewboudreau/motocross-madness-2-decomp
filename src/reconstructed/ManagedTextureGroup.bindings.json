@@ -90,7 +90,7 @@
   "?FitTexturesToBudget@@YAHPAV?$ContainerList@PAVManagedTexture@@@@H@Z": "0x0050d800",
   "?UnknownFunction50dad0@ManagedTextureGroup@@QAEXXZ": "0x0050dad0",
   "?UnknownFunction50dad0@ManagedTextureGroup@@QAEXXZ$ehhandler": "0x0054ea1b",
-  "?UnknownFunction50ef70@ManagedTextureGroup@@QAEHPAVPCRenderTarget@@@Z": "0x0050ef70",
+  "?DrawSelection@ManagedTextureGroup@@QAEHPAVPCRenderTarget@@@Z": "0x0050ef70",
   "?ListTextures@CacheTexture@@QAEHPAV?$ContainerList@PAVManagedTexture@@@@@Z": "0x0050f890",
   "?ReserveRegions@CacheTexture@@QAEHPAHH@Z": "0x0050f9b0",
   "?EmptyPage@CacheTexture@@QAEXXZ": "0x0050fc40",

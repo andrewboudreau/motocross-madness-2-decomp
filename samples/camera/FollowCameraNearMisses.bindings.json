@@ -23,7 +23,7 @@
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461aa0@UnknownTextureStream@@QAEHPADH@Z": "0x00461aa0",
   "?UnknownFunction463450@FollowCamera@@QAE_NHPBUVector3@@PBM1111@Z": "0x00463450",
-  "?UnknownFunction463520@FollowCamera@@QAE_NABUVector3@@MMMMM@Z": "0x00463520",
+  "?AppendTableEntry@FollowCamera@@QAE_NABUVector3@@MMMMM@Z": "0x00463520",
   "?UnknownFunction463600@FollowCamera@@QAEXPAUUnknownFollowCameraSubject@@@Z": "0x00463600",
   "?UnknownFunction4650e0@FollowCamera@@QAEXPBD@Z$ehhandler": "0x0054abba",
   "?UnknownFunction5015b0@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",

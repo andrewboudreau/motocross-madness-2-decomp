@@ -277,9 +277,9 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 }
 
 // 0x0048bd00
-NumberObjectManager* NumberObjectManager::UnknownFunction48bd00(void* value, int b, UnknownNumberRacer* racer,
-                                                                int pixels, UnknownNumberCamera* camera,
-                                                                float size) {
+NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, UnknownNumberRacer* racer,
+                                                      int pixels, UnknownNumberCamera* camera,
+                                                      float size) {
     char name[0x104];
 
     GameObject::UnknownVirtualSlot8(value);
@@ -395,7 +395,7 @@ BonusObjectManager::~BonusObjectManager() {
 }
 
 // 0x0048c330
-int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
+int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     char name[0x104];
     Vector3 position;
     int digit;
@@ -464,7 +464,7 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
 }
 
 // 0x0048c8a0
-int BonusObjectManager::UnknownFunction48c8a0(void* value, int a, int b) {
+int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
     if (!AppendChild(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
         return 0;
@@ -480,16 +480,16 @@ int BonusObjectManager::UnknownFunction48c8a0(void* value, int a, int b) {
 }
 
 // 0x0048ca60
-BonusObjectManager* BonusObjectManager::UnknownFunction48ca60(void* value, int a, int b, UnknownBonusRacer* racer,
-                                                              UnknownBonusCamera* camera) {
+BonusObjectManager* BonusObjectManager::SetupCounter(void* value, int a, int b, UnknownBonusRacer* racer,
+                                                     UnknownBonusCamera* camera) {
     GameObject::UnknownVirtualSlot8(value);
     field_0x2c = racer;
     field_0x38 = camera;
-    if (!UnknownFunction48c8a0(value, a, b)) {
+    if (!CreateFrameNode(value, a, b)) {
         Release();
         return 0;
     }
-    if (!UnknownFunction48c330(value, a, b)) {
+    if (!LoadDigitModels(value, a, b)) {
         Release();
         return 0;
     }

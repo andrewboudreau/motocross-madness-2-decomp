@@ -143,7 +143,7 @@ public:
     float FindOffsetAtDistance(float time, float distance);         // 0x004308e0 (ret 8)
     Vector3 UnknownFunction430b10(float time);                       // 0x00430b10 (ret 8)
     // 0x00430e60 (ret 0x14): the four cubic Hermite basis weights of t.
-    void UnknownFunction430e60(float t, float* h0, float* h1, float* h2, float* h3);
+    void HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3);
 
     CarProceduralModel* field_0x34;
     CarProceduralCollision* field_0x38;

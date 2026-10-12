@@ -423,7 +423,7 @@ public:
     void UnknownFunction51d980(int show);     // 0x0051d980
     // 0x0051da30 (bikerace.cpp 0x0041f5b1): a typed key; Enter sends the
     // line as network message 0x85, Escape sets *result.
-    int UnknownFunction51da30(int key, int* result);
+    int HandleChatKey(int key, int* result);
     void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);

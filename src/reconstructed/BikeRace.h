@@ -202,7 +202,7 @@ public:
 
     unsigned char field_0x000[0x3dc];
     int typing;                               // +0x3dc typing
-    int UnknownFunction51da30(int value, int* result); // 0x0051da30
+    int HandleChatKey(int value, int* result); // 0x0051da30
 };
 
 
@@ -886,21 +886,21 @@ public:
     int UnknownFunction419970(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
                               UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event);
     // 0x00417bc0: the racer numbers 1..+0x158 ordered by championship points.
-    void UnknownFunction417bc0(int* order);
+    void RankByPoints(int* order);
     // 0x0041d0d0: appends a node for `source[index]` at `*tail`.
-    int UnknownFunction41d0d0(int index, UnknownBikeRaceNodeSource* source,
-                              UnknownBikeRaceNode*** tail, float scale, int value);
+    int AppendNode(int index, UnknownBikeRaceNodeSource* source,
+                   UnknownBikeRaceNode*** tail, float scale, int value);
     // 0x0041d170: one node per entry of `owner`; 0 when an allocation fails.
-    int UnknownFunction41d170(UnknownBikeRaceNodeOwner* owner);
+    int BuildNodeList(UnknownBikeRaceNodeOwner* owner);
     // 0x0041d1e0: sets +0x189 from the track distance between +0xf8 and +0x134.
     int UnknownFunction41d1e0();
     void UnknownFunction41d2a0(float time);   // 0x0041d2a0: the scene's time
     int UnknownFunction41ea10();              // 0x0041ea10: whether a racer is remote
     // 0x0041ea60: replaces id `from` with `to` in `character`'s mesh groups.
-    void UnknownFunction41ea60(UnknownBikeRaceCharacter* character, int from, int to);
+    void ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int to);
     // 0x0041eb20: points the camera at racer +0x14c (when it follows a
     // racer) or at scene object +0x154 / +0x150; 0 when that one is hidden.
-    int UnknownFunction41eb20(int caster);
+    int AimCamera(int caster);
     UnknownBikeRaceRacer* UnknownFunctionRacerAt(int index);
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
@@ -917,7 +917,7 @@ public:
     void UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int flags);
     void UnknownFunction421050();             // 0x00421050
     // 0x00421d50: the recorder callback's work (0x004230e0 forwards to it).
-    int UnknownFunction421d50(int a, void* data, int flag, int b, int* keep, int time);
+    int RecordFrame(int a, void* data, int flag, int b, int* keep, int time);
     void UnknownFunction422ec0();             // 0x00422ec0: zeroes every racer's parts
     void UnknownFunction423140(Track* track); // 0x00423140: draws the track
     void UnknownFunction423040(int index);    // 0x00423040: zeroes an AI racer's parts
@@ -1017,7 +1017,7 @@ extern unsigned char g_UnknownGlobal574428[];
 
 // 0x00417b00: the debug picker's hit callback (slot 23 passes it to
 // 0x004b0210); stores what was hit in the current race's picker.
-void UnknownFunction417b00(CollisionObject* self, CollisionObject* other);
+void PickerHitCallback(CollisionObject* self, CollisionObject* other);
 // Debug line end points and their flags, drawn by slot 14; BikeAI.cpp
 // (0x00415ac5..0x00416686), RaceStatus.cpp (0x004e5b38..) and 0x0040e30e
 // write them.
@@ -1037,8 +1037,8 @@ extern Vector3 g_UnknownGlobal578dc0[2];
 
 // 0x004230e0 (cdecl; an UnknownRecorderCallback, its address is passed at
 // 0x0041918a and later): the replay time in milliseconds, then 0x00421d50.
-int UnknownFunction4230e0(int a, void* data, int flag, int b, int* keep, int time,
-                          int* milliseconds);
+int RecorderCallback(int a, void* data, int flag, int b, int* keep, int time,
+                     int* milliseconds);
 // 0x00417b30 (cdecl): sorts `keys` in descending order, moving `values`
 // along with them.
-void UnknownFunction417b30(int* keys, int* values, int count);
+void SortDescending(int* keys, int* values, int count);

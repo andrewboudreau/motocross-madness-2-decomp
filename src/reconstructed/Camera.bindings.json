@@ -20,7 +20,7 @@
   "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?UnknownFunction42f0e0@Camera@@QAEHHHH@Z": "0x0042f0e0",
   "?UnknownFunction42f190@Camera@@QAEHHHHH@Z": "0x0042f190",
-  "?UnknownFunction42f210@Camera@@QAEXPAUCameraRect@@@Z": "0x0042f210",
+  "?GetViewportRect@Camera@@QAEXPAUCameraRect@@@Z": "0x0042f210",
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",

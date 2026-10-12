@@ -59,3 +59,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0043dc60` `BuildFaceGeometry`
 - `0x0043e210` `RecordTextureUse`
 - `0x0043e330` `MarkVisibleCells`
+- `0x0043e0b0` `LoadTexturesAndCoords`
+- `0x0052f0a0` `UnknownCubeClipper::TransformPoints`
+- `0x0052f140` `UnknownCubeClipper::CanFaceCamera`
+- `0x0052f4d0` `UnknownCubeClipper::IsQuadOnScreen`

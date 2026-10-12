@@ -86,7 +86,7 @@ int g_UnknownReadBits578e94;
 unsigned int* g_UnknownReadCursor578e98;
 
 // 0x004238c0
-void GR_BitString::UnknownFunction4238c0(int count) {
+void GR_BitString::ShiftTowardFront(int count) {
     int remaining;
     int shiftWords;
     int words;
@@ -120,7 +120,7 @@ void GR_BitString::UnknownFunction4238c0(int count) {
 }
 
 // 0x00423940
-void GR_BitString::UnknownFunction423940(int count) {
+void GR_BitString::ShiftTowardBack(int count) {
     int words;
     int shiftWords;
     int remaining;
@@ -206,9 +206,9 @@ void GR_BitString::UnknownVirtualSlot0() {
 void GR_BitString::UnknownVirtualSlot2(int value) {
     if (field_0x08 && field_0x04) {
         if (value < 0)
-            UnknownFunction4238c0(-value);
+            ShiftTowardFront(-value);
         else if (value > 0)
-            UnknownFunction423940(value);
+            ShiftTowardBack(value);
     }
 }
 

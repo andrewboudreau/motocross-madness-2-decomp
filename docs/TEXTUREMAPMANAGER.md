@@ -143,7 +143,7 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   (declaration order, block scopes and memset order do not move them),
   `dropped = 0` is stored after the empty-list return, and the overlay rows
   rotate eax/ecx/edx, about 216 of 1600 instructions;
-- `0x0050ef70` (1834 bytes), the debug display for manager slot 15: the
+- `0x0050ef70` (1834 bytes, `DrawSelection`), the debug display for manager slot 15: the
   selected texture copied into the top right of the render target with
   its use and Un/Hi/Lo state, or the selected page with its textures and an
   outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Every

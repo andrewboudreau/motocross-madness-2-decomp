@@ -171,7 +171,7 @@ void Overlay::LayOutQuad() {
     Camera* camera = Target()->field_0x08;
     if (camera) {
         CameraRect viewport;
-        camera->UnknownFunction42f210(&viewport);
+        camera->GetViewportRect(&viewport);
         maxX = viewport.right - 1;
         maxY = viewport.bottom - 1;
         left = viewport.left;

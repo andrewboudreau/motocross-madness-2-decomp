@@ -17,7 +17,7 @@ which is already covered.
 
 Exact (15): the constructor, the destructor and its deleting wrapper,
 slot 27 (1020 bytes), the path-file parser `0x0042fa00`, the path distance
-search `0x004308e0`, the Hermite weights `0x00430e60` and the eight `$E`.
+search `0x004308e0`, the Hermite weights `0x00430e60` (`HermiteWeights`) and the eight `$E`.
 Source forms needed:
 - Slot 27 looks up "Body" through a named local, and its clamp is written
   `n > 0xff ? 0xff : n`.

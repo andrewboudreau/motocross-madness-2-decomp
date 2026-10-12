@@ -385,7 +385,7 @@ void Scene::UnknownVirtualSlot7()
 }
 
 // 0x004eaec0
-UnknownSceneObject* Scene::UnknownFunction4eaec0(const char* path, int* index)
+UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
 {
     char name[0x104];
 

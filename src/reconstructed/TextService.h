@@ -65,8 +65,8 @@ public:
 
     // 0x0050ba00: lays `text` out from the top left of `rect` as two
     // triangles per character; returns the vertices, their count in *count.
-    void* UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
-                                unsigned int color, int* count);
+    void* LayoutText(const UnknownOverlayRect* rect, const char* text,
+                     unsigned int color, int* count);
     // 0x0050bd30: draws vertices laid out by 0x0050ba00.
     void DrawVertices(RenderTarget* target, void* vertices, int count);
 

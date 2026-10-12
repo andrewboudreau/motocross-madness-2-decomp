@@ -85,8 +85,8 @@ bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, con
 }
 
 // 0x00463520
-bool FollowCamera::UnknownFunction463520(const Vector3& position, float a, float b, float c,
-                                         float d, float e) {
+bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, float c,
+                                    float d, float e) {
     if (pointCount < pointCapacity) {
         points[pointCount].position = position;
         points[pointCount].field_0x0c = a;

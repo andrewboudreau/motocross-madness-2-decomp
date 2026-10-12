@@ -102,7 +102,7 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
         ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
     }
     BuildFaceGeometry();
-    UnknownFunction43e0b0(field_0x2c, context);
+    LoadTexturesAndCoords(field_0x2c, context);
     loadPalette->Release();
     loadPalette = 0;
     return this;

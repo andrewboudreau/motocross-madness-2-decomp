@@ -61,7 +61,7 @@ public:
     // 0x0042f190: stores the viewport, clamped to +0x1c4/+0x1c8, and resubmits it.
     int UnknownFunction42f190(int x, int y, int width, int height);
     // 0x0042f210: the viewport as left/top/right/bottom.
-    void UnknownFunction42f210(CameraRect* rect);
+    void GetViewportRect(CameraRect* rect);
 
 protected:
     // field_0x18 (GameObject's owner slot) holds the camera's RenderTarget.

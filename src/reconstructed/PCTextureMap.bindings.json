@@ -171,9 +171,9 @@
   "??_C@_0BB@DPEC@C?3?2temp?2?$CFs?$CF03d?$CFs?$AA@": "0x00570548",
   "??_C@_01LHO@r?$AA@": "0x00566a38",
   "_fopen": "0x00534ceb",
-  "?UnknownFunction4245f0@@YAXPAUUnknownBitmapFile@@PAXPAY02EHH@Z": "0x004245f0",
+  "?DescribeBitmap8@@YAXPAUUnknownBitmapFile@@PAXPAY02EHH@Z": "0x004245f0",
   "_strncpy": "0x00534b10",
-  "?UnknownFunction424380@@YAHPAUUnknownBitmapFile@@@Z": "0x00424380",
+  "?WriteBitmap@@YAHPAUUnknownBitmapFile@@@Z": "0x00424380",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?WriteTga32@@YAHPAXHHIPBDH@Z": "0x005127f0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60"

@@ -76,7 +76,7 @@ public:
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body): out of page space
     // 0x0050ef70 (manager slot 15): draws the debug-key selection into
     // `target`; 0 unless this is the manager's selected group.
-    int UnknownFunction50ef70(PCRenderTarget* target);
+    int DrawSelection(PCRenderTarget* target);
 
     unsigned char field_0x08;                 // toggled by debug key 0x21; set: no repacking
     int field_0x0c;                           // pixel format

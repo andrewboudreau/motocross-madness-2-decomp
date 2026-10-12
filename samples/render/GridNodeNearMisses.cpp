@@ -49,7 +49,7 @@ static int g_gridRow17[18] = {
 };
 
 // 0x00484d70
-GridNode* GridNode::UnknownFunction484d70(int x, int z)
+GridNode* GridNode::FindLeaf(int x, int z)
 {
     GridNode* node = this;
     GridNode** table = children;

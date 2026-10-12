@@ -364,7 +364,7 @@ int Camera::UnknownFunction42f190(int x, int y, int width, int height) {
 }
 
 // 0x0042f210
-void Camera::UnknownFunction42f210(CameraRect* rect) {
+void Camera::GetViewportRect(CameraRect* rect) {
     rect->left = field_0x1a0[0];
     rect->right = field_0x1a0[0] + field_0x1a0[2];
     rect->top = field_0x1a0[1];

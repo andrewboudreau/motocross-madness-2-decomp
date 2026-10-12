@@ -140,3 +140,14 @@ node's centre, direction, half extents and next gate, the model's current
 detail level, the camera view's shadow caster and following flag, the VCR
 header and its racers) keep their placeholder names until those units are
 renamed with them.
+
+Function names (Tier 3, from each declaration's recorded behaviour; the
+calibration cases and bindings were rekeyed, bytes unchanged):
+`0x00417b00` `PickerHitCallback` (free; the debug picker's hit callback),
+`0x00417b30` `SortDescending` (free; sorts keys descending with values),
+`0x00417bc0` `RankByPoints`, `0x0041d0d0` `AppendNode`, `0x0041d170`
+`BuildNodeList`, `0x0041ea60` `ReplaceMeshId`, `0x0041eb20` `AimCamera`,
+`0x00421d50` `RecordFrame` and `0x004230e0` `RecorderCallback` (free; the
+UnknownRecorderCallback passed to the VCR). `0x0041f1d0` and `0x004210f0`
+keep their placeholders because InGameProcs.cpp and RaceView.h (UI lane)
+declare or call them.

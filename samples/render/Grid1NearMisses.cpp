@@ -139,7 +139,7 @@ retry:
                                     Extra()->blocks[block].texture = 0;
                                 } else {
                                     Extra()->blocks[block].texture = Terrain()->AcquireOwnedObject();
-                                    UnknownFunction47d780(block, Extra()->blocks[block].texture);
+                                    BuildBlockTexture(block, Extra()->blocks[block].texture);
                                     if (Extra()->blocks[block].texture->field_0x68 & 1)
                                         Extra()->blocks[block].texture->UnknownFunction510670();
                                     Extra()->textureFlags |= 1 << block;
@@ -222,7 +222,7 @@ sharedTexture:
 
 createTexture:
     Extra()->field_0x10 = Terrain()->AcquireOwnedObject();
-    UnknownFunction47d470((ManagedTexture*)Extra()->field_0x10);
+    BuildNodeTexture((ManagedTexture*)Extra()->field_0x10);
     if (((ManagedTexture*)Extra()->field_0x10)->field_0x68 & 1)
         ((ManagedTexture*)Extra()->field_0x10)->UnknownFunction510670();
     Extra()->textureFlags |= 0x10000;
@@ -262,7 +262,7 @@ static unsigned char* g_grid1TextureBuffer;
 // a (tile, length - 1) byte pair; a run copies `length` pixels of one row of
 // a 16 x 16 tile texture, tiled across the 256 x 256 node. A smaller texture
 // gets the result downsampled.
-int DrawableGridNodeSharedTextures::UnknownFunction47d470(ManagedTexture* texture)
+int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
 {
     int tiles[256];
     unsigned char* tileBits[256];
@@ -342,7 +342,7 @@ int DrawableGridNodeSharedTextures::UnknownFunction47d470(ManagedTexture* textur
 
 // 0x0047d780: the same for one 4 x 4 block: its texture is `width` pixels
 // wide, each run cell is 4 x 4 pixels and the tiles are width / 4 wide.
-int DrawableGridNodeSharedTextures::UnknownFunction47d780(int block, ManagedTexture* texture)
+int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture* texture)
 {
     int tiles[256];
     unsigned char* tileBits[256];

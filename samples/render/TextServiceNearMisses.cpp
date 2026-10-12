@@ -36,7 +36,7 @@
 // signed coordinates, swapped declarations and inline pitch expressions are
 // all further off.
 //
-// UnknownFunction50ba00 (0x0050ba00, 802 bytes): 770 of 802; only the
+// LayoutText (0x0050ba00, 802 bytes): 770 of 802; only the
 // scheduling of two stores (v3.sx and v5.sx) differs. Writing through a
 // vertex pointer, other vertex orders, field orders and an inline vertex
 // setter are further off (all 720 orders of the six vertex blocks swept
@@ -226,8 +226,8 @@ int UnknownOverlayText::UnknownFunction50b700(TextureMap* texture, int x, int y,
 
 // 0x0050ba00: cell rectangles are in texture coordinates of a 255-texel
 // font texture.
-void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
-                                                unsigned int color, int* count) {
+void* UnknownOverlayText::LayoutText(const UnknownOverlayRect* rect, const char* text,
+                                     unsigned int color, int* count) {
     Rectangle2D cell(0, 0, 0, 0);
     Rectangle2D size(0, 0, 0, 0);
     float x = rect->left > 0.0f ? (float)rect->left : 0.0f;

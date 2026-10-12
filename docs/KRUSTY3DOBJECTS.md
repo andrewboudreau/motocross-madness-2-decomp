@@ -91,7 +91,12 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 
 ## Remaining uncertainty
 
-All member and method names are provisional. The racer, view, camera and
+All member and method names are provisional. Methods named from their
+recorded behaviour: NumberObjectManager `0x0048bd00` `SetupDigits`;
+BonusObjectManager `0x0048c330` `LoadDigitModels`, `0x0048c8a0`
+`CreateFrameNode` and `0x0048ca60` `SetupCounter`. The light setup
+`0x0048a600` and visual-cue loader `0x0048adf0` keep placeholders because
+NationalRace.cpp and QuarryStuntEvent.cpp call them. The racer, view, camera and
 game-global structs in the header are this unit's views of objects whose
 classes live elsewhere (RaceView.h, TrackGame.h, Camera.h); QuarryEvent.h
 keeps its own partial VisualCue view.
@@ -102,7 +107,7 @@ keeps its own partial VisualCue view.
 python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" --profile vc6_o2_mt \
   src/reconstructed/Krusty3DObjects.cpp -o work/k3d.obj
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x0048c330 --target-size 1385 \
-  --obj work/k3d.obj --symbol '?UnknownFunction48c330@BonusObjectManager@@QAEHPAXHH@Z' \
+  --obj work/k3d.obj --symbol '?LoadDigitModels@BonusObjectManager@@QAEHPAXHH@Z' \
   --bindings src/reconstructed/Krusty3DObjects.bindings.json --json
 ```
 

@@ -238,7 +238,7 @@ public:
     virtual int UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
                                     int* outX, int* outZ); // 0x00483d40
     // 0x00484d70: the leaf whose grid position is (x, z), or 0 (GridNode.cpp).
-    GridNode* UnknownFunction484d70(int x, int z);
+    GridNode* FindLeaf(int x, int z);
     // 0x00483910 (ret 0x14, GridNode.cpp): descends to the leaf holding sample
     // (x, z) and writes the four corner heights, normals and sample bytes of
     // that cell (order (x,z), (x+1,z), (x,z+1), (x+1,z+1)); returns 1, or 0

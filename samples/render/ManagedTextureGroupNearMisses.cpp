@@ -34,7 +34,7 @@
 // arrays and the memset order do not move the arrays; computing
 // `managedTexels` at its row is worse.
 //
-// ManagedTextureGroup::UnknownFunction50ef70 (0x0050ef70, 1834 bytes): the
+// ManagedTextureGroup::DrawSelection (0x0050ef70, 1834 bytes): the
 // debug display behind manager slot 15. Every stack slot matches once the
 // page-drawing tail sits in its own block (`if (page) { ... }`): VC6 lets
 // block-scoped locals reuse the slots of dead earlier locals, but gives a
@@ -652,7 +652,7 @@ struct UnknownBltEffects {
 // below the top 20 rows of `target`: in mode 1 the selected texture (with
 // its use, planned level and Un/Hi/Lo state) and an outline on its page,
 // in mode 2 the selected page with every texture copied into its region.
-int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
+int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
     UnknownSurfaceInterface* surface = target->renderSurface;
     if (field_0x40->field_0x3c != this)
         return 0;

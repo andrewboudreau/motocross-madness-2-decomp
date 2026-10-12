@@ -36,8 +36,8 @@ public:
     virtual void UnknownVirtualSlot3();
     // 0x004238c0 / 0x00423940: shift by `count` bits toward the front / the
     // back, whole words first, then 0x004239c0 / 0x00423b70 for the rest.
-    void UnknownFunction4238c0(int count);
-    void UnknownFunction423940(int count);
+    void ShiftTowardFront(int count);
+    void ShiftTowardBack(int count);
     void UnknownFunction4239c0(int count);
     void UnknownFunction423b70(int count);
     // 0x00423ef0: reads the next `count` bits, most significant first.

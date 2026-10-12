@@ -265,3 +265,4 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004f0d20` `CountObjects`
 - `0x004f0ec0` `ResolveSltPath`
 - `0x004f1130` `CountTextures`
+- `0x004eaec0` `FindEntryByFileName`
