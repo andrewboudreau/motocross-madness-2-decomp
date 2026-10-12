@@ -26,26 +26,26 @@ int UnknownTrackGameObject3410::UnknownFunction49c2f0(int* flags)
     *flags = 0;
     if (UnknownFunction4aa360(response, 0x800)) {
         UnknownParser parser;
-        parser.UnknownFunction4b87f0(response, lstrlen(response));
-        if (parser.UnknownFunction4b89d0("EventTypeIndex", &value) != 0x80070005) {
+        parser.Parse(response, lstrlen(response));
+        if (parser.GetNumber("EventTypeIndex", &value) != 0x80070005) {
             field_0x24c = value - 1;
             *flags |= 1;
         } else {
             field_0x24c = -1;
         }
-        if (parser.UnknownFunction4b89d0("EventTypeLocation", &value) != 0x80070005) {
+        if (parser.GetNumber("EventTypeLocation", &value) != 0x80070005) {
             field_0x250 = value - 1;
             *flags |= 2;
         } else {
             field_0x250 = -1;
         }
-        if (parser.UnknownFunction4b89d0("BikeManufacturer", &value) != 0x80070005) {
+        if (parser.GetNumber("BikeManufacturer", &value) != 0x80070005) {
             field_0x298 = value - 1;
             *flags |= 4;
         } else {
             field_0x298 = -1;
         }
-        if (parser.UnknownFunction4b89d0("BikeType", &value) != 0x80070005) {
+        if (parser.GetNumber("BikeType", &value) != 0x80070005) {
             field_0x29c = value - 1;
             *flags |= 8;
         } else {
@@ -104,8 +104,8 @@ int UnknownTrackGameObject3410::UnknownFunction49c600()
     while (UnknownFunction4bfa80() - start < 20000) {
         if (UnknownFunction4aa4e0(response, 0x800)) {
             UnknownParser parser;
-            parser.UnknownFunction4b87f0(response, lstrlen(response));
-            parser.UnknownFunction4b8990(g_TrackGame->mode.field_0x00, text, 0x800);
+            parser.Parse(response, lstrlen(response));
+            parser.GetText(g_TrackGame->mode.field_0x00, text, 0x800);
             sscanf(text, "%d,%d,%d,%d", &value, &b, &c, &d);
             if (value == -1) {
                 Sleep(1000);

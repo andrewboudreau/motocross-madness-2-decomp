@@ -30,7 +30,8 @@ RTTI `.?AVMediaControl@@` (vtable `0x005551c0`), a GameObject that plays a
 movie through DirectShow multimedia streams; see `MediaControl.h` for the
 GUIDs and interface slots. The COM methods carry their mmstream.h/amstream.h
 names (interface identity from the IIDs passed, method from the slot index).
-Member names are ours: `IsDirectShowInstalled` (`0x004a23d0`), `BlitFrame`
+Member names are ours: `Open` (`0x004a2560`), `IsDirectShowInstalled`
+(`0x004a23d0`), `BlitFrame`
 (`0x004a2a90`), and fields such as `multiMediaStream` (+0x50),
 `videoStream` (+0x5c), `videoDrawStream` (+0x60), `videoSample` (+0x64),
 `pausedTime` (+0x68) and `doneCallback`/`doneOwner` (+0x70/+0x74).

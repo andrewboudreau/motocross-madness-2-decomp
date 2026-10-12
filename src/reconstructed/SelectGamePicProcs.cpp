@@ -169,7 +169,7 @@ struct UnknownGridEntry {
 
 // 0x004f17a0
 int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
-                 int a, const char* picture, const char* listName, char* name, int* value,
+                 int largePictures, const char* picture, const char* listName, char* name, int* value,
                  UIDialog* dialog, int b, int append) {
     char first[260];
     char second[260];
@@ -206,7 +206,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     directories->UnknownVirtualSlot1();
     if (!directories->UnknownFunction4673b0())
         return 1;
-    if (a) {
+    if (largePictures) {
         sprintf(path, "%s\\%s", "ui", "unart.tga");
         g_TrackGame->UnknownVirtualSlot18(path, fallback);
     } else {
@@ -243,12 +243,12 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, 0, 0);
                 if (g_TrackGame->mode.UnknownFunction524100() == 1 ||
                     g_TrackGame->mode.UnknownFunction524100() == 5) {
-                    if (a)
+                    if (largePictures)
                         sprintf(file, "%s01.tga", entry);
                     else
                         sprintf(file, "%s01s.tga", entry);
                 } else {
-                    if (a)
+                    if (largePictures)
                         sprintf(file, "%s.tga", entry);
                     else
                         sprintf(file, "%ss.tga", entry);
@@ -273,7 +273,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                         row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, x, y);
                     else
                         row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, 0, 0);
-                    if (a)
+                    if (largePictures)
                         sprintf(file, "%s%02d.tga", entry, scene);
                     else
                         sprintf(file, "%s%02ds.tga", entry, scene);
@@ -545,31 +545,31 @@ int UnknownLobbySlotTable::GrantRacers(int count, int limit) {
 }
 
 // 0x004f3080
-void FillTrackList(int a, const char* picture, const char* listName, int* value, UIDialog* dialog, int append) {
+void FillTrackList(int largePictures, const char* picture, const char* listName, int* value, UIDialog* dialog, int append) {
     char name[0x80];
     if (!dialog)
         dialog = (UIDialog*)g_TrackGame->ui->field_0x2c->FindInputDialog();
     name[0] = 0;
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 3:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\SX", "*.env", "env", a, picture, listName,
-                     name, value, dialog, 0, 0);
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\SX", "*.env", "env", largePictures, picture,
+                     listName, name, value, dialog, 0, 0);
         break;
     case 1:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Baja", "*.env", "env", a, picture, listName,
-                     name, value, dialog, g_TrackGame->mode.field_0x9f4[1], 0);
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Baja", "*.env", "env", largePictures, picture,
+                     listName, name, value, dialog, g_TrackGame->mode.field_0x9f4[1], 0);
         break;
     case 5:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Enduro", "*.env", "env", a, picture,
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Enduro", "*.env", "env", largePictures, picture,
                      listName, name, value, dialog, g_TrackGame->mode.field_0x9f4[5], 0);
         break;
     case 0:
     case 4:
         FillFileList(g_TrackGame->mode.field_0x25e4, (const char*)g_TrackGame->mode.field_0x6a0,
-                     "*.env", "env", a, picture, listName, name, value, dialog, 0, append);
+                     "*.env", "env", largePictures, picture, listName, name, value, dialog, 0, append);
         break;
     case 2:
-        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\National", "*.env", "env", a, picture,
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\National", "*.env", "env", largePictures, picture,
                      listName, name, value, dialog, 0, 0);
         break;
     }

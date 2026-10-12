@@ -199,45 +199,46 @@ void MainDlg::ShowCurrentProfile() {
 }
 
 // 0x0044c930
-void SetStatsButtonResources(UnknownDialogEvent* event, int a, int b, int c, int d) {
+void SetStatsButtonResources(UnknownDialogEvent* event, int resource1, int resource2, int resource3,
+                             int resource4) {
     UIControl* button;
-    if (a) {
+    if (resource1) {
         button = event->dialog->FindControl("ButStats1", 0);
-        button->SetTextFromResource(g_TrackGame->resourceInstance, a);
+        button->SetTextFromResource(g_TrackGame->resourceInstance, resource1);
     }
-    if (b) {
+    if (resource2) {
         button = event->dialog->FindControl("ButStats2", 0);
-        button->SetTextFromResource(g_TrackGame->resourceInstance, b);
+        button->SetTextFromResource(g_TrackGame->resourceInstance, resource2);
     }
-    if (c) {
+    if (resource3) {
         button = event->dialog->FindControl("ButStats3", 0);
-        button->SetTextFromResource(g_TrackGame->resourceInstance, c);
+        button->SetTextFromResource(g_TrackGame->resourceInstance, resource3);
     }
-    if (d) {
+    if (resource4) {
         button = event->dialog->FindControl("ButStats4", 0);
-        button->SetTextFromResource(g_TrackGame->resourceInstance, d);
+        button->SetTextFromResource(g_TrackGame->resourceInstance, resource4);
     }
 }
 
 // 0x0044c9f0
-void SetStatsButtonTexts(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
-                         const char* d) {
+void SetStatsButtonTexts(UnknownDialogEvent* event, const char* text1, const char* text2, const char* text3,
+                         const char* text4) {
     UIControl* button;
-    if (a) {
+    if (text1) {
         button = event->dialog->FindControl("ButStats1", 0);
-        button->SetText(a);
+        button->SetText(text1);
     }
-    if (b) {
+    if (text2) {
         button = event->dialog->FindControl("ButStats2", 0);
-        button->SetText(b);
+        button->SetText(text2);
     }
-    if (c) {
+    if (text3) {
         button = event->dialog->FindControl("ButStats3", 0);
-        button->SetText(c);
+        button->SetText(text3);
     }
-    if (d) {
+    if (text4) {
         button = event->dialog->FindControl("ButStats4", 0);
-        button->SetText(d);
+        button->SetText(text4);
     }
 }
 
@@ -250,24 +251,24 @@ void ClearStatsLists(UnknownDialogEvent* event) {
 }
 
 // 0x0044cae0
-void AddStatsRows(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
-                  const char* d) {
+void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2, const char* row3,
+                  const char* row4) {
     UIListBox* list;
-    if (a) {
+    if (row1) {
         list = static_cast<UIListBox*>(event->dialog->FindControl("LstStats1", 0));
-        list->AddRow(a, 0, 0);
+        list->AddRow(row1, 0, 0);
     }
-    if (b) {
+    if (row2) {
         list = static_cast<UIListBox*>(event->dialog->FindControl("LstStats2", 0));
-        list->AddRow(b, 0, 0);
+        list->AddRow(row2, 0, 0);
     }
-    if (c) {
+    if (row3) {
         list = static_cast<UIListBox*>(event->dialog->FindControl("LstStats3", 0));
-        list->AddRow(c, 0, 0);
+        list->AddRow(row3, 0, 0);
     }
-    if (d) {
+    if (row4) {
         list = static_cast<UIListBox*>(event->dialog->FindControl("LstStats4", 0));
-        list->AddRow(d, 0, 0);
+        list->AddRow(row4, 0, 0);
     }
 }
 
@@ -1369,9 +1370,9 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
             EndDialog(0);
             if (g_TrackGame->network) {
                 UnknownLoadFailedMessage message;
-                message.field_0x04 = g_TrackGame->network->localPlayer;
+                message.playerId = g_TrackGame->network->localPlayer;
                 g_TrackGame->network->Send(0xcc, &message, sizeof(message),
-                                                                        message.field_0x04, 0);
+                                                                        message.playerId, 0);
                 EndNetworkGame();
             }
             g_TrackGame->ui->UnknownFunction499b00();
@@ -2454,7 +2455,7 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
                                                                       "scn", 0, 0);
             if (!_stricmp(text, "no name")) {
                 g_TrackGame->LoadResourceString(0x143b, name, 128);
-            } else if ((header.raceKind == 1 || header.raceKind == 5) && header.field_0x60) {
+            } else if ((header.raceKind == 1 || header.raceKind == 5) && header.randomGates) {
                 g_TrackGame->sceneObject->UnknownFunction4ea010(text, header.trackName, 0, "scn", 0, 0);
                 sprintf(name, "%s, #%d", text, header.eventNumber);
             } else {

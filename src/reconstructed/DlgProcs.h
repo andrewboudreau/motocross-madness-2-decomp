@@ -21,14 +21,15 @@ void CloseDialogCallback(UIDialog* dialog);
 
 // 0x0044c930 / 0x0044c9f0: label the four "ButStats" buttons from string
 // ids / with texts (a zero argument leaves the button).
-void SetStatsButtonResources(UnknownDialogEvent* event, int a, int b, int c, int d);
-void SetStatsButtonTexts(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
-                         const char* d);
+void SetStatsButtonResources(UnknownDialogEvent* event, int resource1, int resource2, int resource3,
+                             int resource4);
+void SetStatsButtonTexts(UnknownDialogEvent* event, const char* text1, const char* text2, const char* text3,
+                         const char* text4);
 // 0x0044ca80: empties the four "LstStats" lists; 0x0044cae0 adds a row to
 // each (a zero argument skips the list).
 void ClearStatsLists(UnknownDialogEvent* event);
-void AddStatsRows(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
-                  const char* d);
+void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2, const char* row3,
+                  const char* row4);
 
 // RTTI: MainDlg : UIDialog (vtable 0x00554fb8; 0x7f80 bytes, the size
 // KrustyUI 0x00499b20 allocates).
@@ -233,7 +234,7 @@ extern int g_UnknownGlobal59ae88;
 // load.
 struct UnknownLoadFailedMessage {
     int field_0x00;
-    int field_0x04;                           // the sender's player id
+    int playerId;                             // +0x04: the sender's player id
 };
 
 // RTTI: LoadingDlg : UIDialog (vtable 0x00554f34; 0x7f5c bytes): loads the
@@ -328,7 +329,7 @@ struct UnknownRecordFileHeader {
     unsigned char field_0x40[0x54 - 0x40];
     int laps;                                 // +0x54: laps (TrackGame+0x2d90)
     unsigned char field_0x58[0x60 - 0x58];
-    unsigned char field_0x60;
+    unsigned char randomGates;                // +0x60: random gates (TrackGame+0x2d9c)
     unsigned char field_0x61[0x64 - 0x61];
     int eventNumber;                          // +0x64: the event number shown with the track
     unsigned char trackIndex;                 // +0x68: the track index (TrackGame+0x2da4)

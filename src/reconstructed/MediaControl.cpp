@@ -34,10 +34,10 @@ MediaControl::MediaControl(int a)
     videoStream = 0;
     videoDrawStream = 0;
     videoSample = 0;
-    field_0x2c = 0;
+    frameSurface = 0;
     sampleSurface = 0;
-    field_0x30 = 0;
-    field_0x34 = 0;
+    frameWidth = 0;
+    frameHeight = 0;
     directDraw = 0;
     displayDirectDraw = 0;
     doneCallback = 0;
@@ -49,9 +49,9 @@ MediaControl::MediaControl(int a)
 MediaControl::~MediaControl()
 {
     Stop();
-    if (field_0x2c) {
-        field_0x2c->Release();
-        field_0x2c = 0;
+    if (frameSurface) {
+        frameSurface->Release();
+        frameSurface = 0;
     }
     if (sampleSurface) {
         sampleSurface->Release();
@@ -102,7 +102,7 @@ int MediaControl::UnknownVirtualSlot10(float frameTime)
                 doneCallback(doneOwner);
             }
         } else if (videoSample->CompletionStatus(2, 25) == 0) {
-            BlitFrame(field_0x2c, frameRect, 0, 0x1000000);
+            BlitFrame(frameSurface, frameRect, 0, 0x1000000);
             if (videoSample->Update(1, 0, 0, 0) < 0) {
                 return 0;
             }

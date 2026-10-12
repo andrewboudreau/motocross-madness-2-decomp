@@ -4855,15 +4855,15 @@ int UIVideoStatic::UnknownFunction47ae90(const char* file, int a, void (*done)(U
     if (moviePlayer)
         moviePlayer->Release();
     moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
-    if (!moviePlayer->UnknownFunction4a2560(field_0x18, file, done, owner)) {
+    if (!moviePlayer->Open(field_0x18, file, done, owner)) {
         moviePlayer = 0;
         return 0;
     }
     AppendChild(moviePlayer, -1);
     frameRect[0] = 0;
     frameRect[1] = 0;
-    frameRect[2] = moviePlayer->field_0x30;
-    frameRect[3] = moviePlayer->field_0x34;
+    frameRect[2] = moviePlayer->frameWidth;
+    frameRect[3] = moviePlayer->frameHeight;
     if (a)
         moviePlayer->Restart();
     return 1;
@@ -4884,7 +4884,7 @@ int UIVideoStatic::Draw() {
         RequestRedraw();
     }
     GetImageRect((CameraRect*)screenArea, &rect);
-    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, moviePlayer->field_0x2c, frameRect,
+    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, moviePlayer->frameSurface, frameRect,
                                                                       0x1000000, 0) == 0;
 }
 

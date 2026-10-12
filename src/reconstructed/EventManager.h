@@ -169,16 +169,16 @@ public:
     void AddChampionshipPoints(UnknownEventRacer* racer, int* points);  // 0x0045f180
     // 0x0045e600: starts the end-of-race block (or finishes at once), and
     // once it has run its course clears it and moves to the results.
-    void UnknownFunction45e600();
+    void EndRace();
     void UnknownFunction45cdc0(int mode);          // 0x0045cdc0
     // 0x0045d480: creates the camera (+0x3d4) and up to three characters
     // (+0x424) from "%s\\Winner.mcf" with "Podium3/4/5_%02d" motions (also
     // "CrowdLoop.wav"); nonzero when slot 10 should run that scene.
     int CreatePodiumScene();  // 0x0045d480
     void UnknownFunction45e710(int menu);          // 0x0045e710
-    void UnknownFunction45e9d0();                  // 0x0045e9d0
-    void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
-    void UnknownFunction45f9a0();                  // 0x0045f9a0
+    void RankRacers();                             // 0x0045e9d0
+    void CheckRaceOver(float frameTime);           // 0x0045eef0
+    void SendRacerResults();                       // 0x0045f9a0
     int UnknownFunction45cb70();                   // 0x0045cb70
     void UnknownFunction45fbd0(int player);        // 0x0045fbd0
     // 0x0045fce0: removes every Vegetation in the rectangle from the

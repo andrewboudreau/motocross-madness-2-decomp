@@ -103,7 +103,7 @@ public:
     static int IsDirectShowInstalled();
     // 0x004a2560: opens `file` for `target`; `done` is called with `owner`
     // at its end. Releases itself and returns 0 when it fails.
-    MediaControl* UnknownFunction4a2560(void* target, const char* file, void (*done)(UIDialog* dialog),
+    MediaControl* Open(void* target, const char* file, void (*done)(UIDialog* dialog),
                                         UIDialog* owner);
     int Restart();              // 0x004a2900: restarts the movie
     void Stop();             // 0x004a2940: stops the movie
@@ -115,9 +115,9 @@ public:
     // 0x004a2a90: blits the frame into `destination`.
     long BlitFrame(UnknownSurfaceInterface* destination, void* destinationRect, void* sourceRect, int flags);
 
-    UnknownSurfaceInterface* field_0x2c;      // the frame's surface
-    int field_0x30;                           // width
-    int field_0x34;                           // height
+    UnknownSurfaceInterface* frameSurface;    // +0x2c: the frame's surface (the display's DirectDraw)
+    int frameWidth;                           // +0x30: the video format's width
+    int frameHeight;                          // +0x34: and height
     UnknownSurfaceInterface* sampleSurface;   // +0x38: the sample's surface (IDirectDrawSurface4)
     int frameRect[4];                         // +0x3c: the frame rectangle
     UnknownSurfaceInterface* field_0x4c;      // released by the destructor only
