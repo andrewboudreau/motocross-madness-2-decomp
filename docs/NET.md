@@ -1,8 +1,8 @@
 # Net.cpp: the DirectPlay network layer
 
 `src/reconstructed/Net.cpp` reconstructs `D:\aardvark\VC\krusty2\Net.cpp`
-(`0x004aab00`..`0x004ae2e7`). 83 functions match strictly under the default
-VC6 profile and are registered as calibration cases; three near misses
+(`0x004aab00`..`0x004ae2e7`). 84 functions match strictly under the default
+VC6 profile and are registered as calibration cases; two near misses
 are in `samples/net/NetNearMisses.cpp`. The RTTI names are `NetworkInterface`,
 `InfoType`, `PlayerInfoType`, `ConnectionInfoType` and `SessionInfoType`. All
 other type, member and function names are provisional.
@@ -88,7 +88,6 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
 | VA | Size | Match | Difference |
 |---|---:|---:|---|
 | `0x004ab960` | 989 | ~15% | candidate is 1072 bytes; retail keeps zero in ebx and tail-merges the error texts |
-| `0x004abf10` | 948 | 92.4% | MODEM case: `port` is in edx where retail uses ebx |
 | `0x004aced0` | 370 | 95.5% | SIB operand order and how field_0x34 is reloaded after the slot-17 call |
 
 ## Source shapes that mattered
@@ -108,6 +107,12 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
 - VC6 overlays dead parameter slots with locals. In `0x004addc0` the
   address and its size live in the GUID and context argument slots, and
   in `0x004ad0f0` the size lives in the player slot.
+- `0x004abf10`: the TCP/IP port element points at a `WORD` local assigned
+  `atoi(port)`. VC6 puts the WORD in the dead `port` slot and emits no
+  store of atoi's result (retail has none either). Because `port` is never
+  address-taken, the modem branch keeps it in ebx across `lstrlenA`.
+  Pointing the element at `port` itself (the earlier form) cost that
+  register (874/948). The modem branch stores the phone size before its data.
 - `0x004ad3e0`: retail's `mov ebp,2` shared by `socket()` and `sin_family`
   appears only when `sin_family = AF_INET` is written in both branches of
   the gethostbyname test.

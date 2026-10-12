@@ -6,9 +6,6 @@
 // and tail-merges the error paths; VC6 here keeps `connection` in ebx and
 // emits each NET_ERROR_TEXT expansion separately.
 //
-// NetworkInterface::CreateAddress (0x004abf10, 948 bytes): 92.4%.
-// The MODEM case keeps `port` in edx where retail uses ebx.
-//
 // NetworkInterface::DispatchMessages (0x004aced0, 370 bytes): 361/370.
 // Addressing the slot through a byte offset (MessageAt below) fixes the
 // SIB base/index order everywhere (was 355/370 with messages[index]). The
@@ -45,23 +42,6 @@ void ReportDirectPlayError(long result, const char* file, int line);
 
 extern "C" const GUID IID_IDirectPlay4A;                // 0x005567b0
 extern "C" const GUID IID_IDirectPlayLobby3A;           // 0x00556870
-extern "C" const GUID DPSPGUID_IPX;                     // 0x005567d0
-extern "C" const GUID DPSPGUID_TCPIP;                   // 0x005567e0
-extern "C" const GUID DPSPGUID_SERIAL;                  // 0x005567f0
-extern "C" const GUID DPSPGUID_MODEM;                   // 0x00556800
-extern "C" const GUID DPAID_INet;                       // 0x00556940
-extern "C" const GUID DPAID_ServiceProvider;            // 0x005568e0
-extern "C" const GUID DPAID_Modem;                      // 0x00556900
-extern "C" const GUID DPAID_Phone;                      // 0x00556920
-extern "C" const GUID DPAID_INetPort;                   // 0x00556960
-extern "C" const GUID DPAID_ComPort;                    // 0x00556970
-
-// DPCOMPOUNDADDRESSELEMENT (0x18 bytes).
-struct NetAddressElement {
-    GUID type;
-    unsigned long size;
-    void* data;
-};
 
 extern "C" long __stdcall DirectPlayLobbyCreateA(GUID* provider,
                                                  UnknownDirectPlayLobby3A** lobby,
@@ -178,78 +158,6 @@ failed:
     if (connection)
         DebugFree(connection, __FILE__, 892);
     return result;
-}
-
-// 0x004abf10: builds a DirectPlay address for `provider`.
-int NetworkInterface::CreateAddress(GUID provider, char* address, char* port,
-                                            void* comPort, void** result,
-                                            unsigned long* resultSize)
-{
-    NetAddressElement elements[3];
-    unsigned long size = 0;
-    int count;
-    void* buffer;
-
-    if (provider == DPSPGUID_IPX) {
-        elements[0].type = DPAID_ServiceProvider;
-        elements[0].size = sizeof(GUID);
-        elements[0].data = (void*)&DPSPGUID_IPX;
-        count = 1;
-    } else if (provider == DPSPGUID_TCPIP) {
-        elements[0].type = DPAID_ServiceProvider;
-        elements[0].size = sizeof(GUID);
-        elements[0].data = (void*)&DPSPGUID_TCPIP;
-        elements[1].type = DPAID_INet;
-        elements[1].size = lstrlenA(address) + 1;
-        elements[1].data = address;
-        count = 2;
-        if (strcmp(port, "")) {
-            elements[2].type = DPAID_INetPort;
-            elements[2].size = 2;
-            atoi(port);
-            elements[2].data = &port;
-            count = 3;
-        }
-    } else if (provider == DPSPGUID_MODEM) {
-        elements[0].type = DPAID_ServiceProvider;
-        elements[0].size = sizeof(GUID);
-        elements[0].data = (void*)&DPSPGUID_MODEM;
-        count = 1;
-        if (strcmp(port, "")) {
-            elements[1].type = DPAID_Phone;
-            elements[1].data = port;
-            elements[1].size = lstrlenA(port) + 1;
-            count = 2;
-        }
-        elements[count].type = DPAID_Modem;
-        elements[count].size = lstrlenA(address) + 1;
-        elements[count].data = address;
-        count++;
-    } else if (provider == DPSPGUID_SERIAL && comPort) {
-        elements[0].type = DPAID_ServiceProvider;
-        elements[0].size = sizeof(GUID);
-        elements[0].data = (void*)&DPSPGUID_SERIAL;
-        elements[1].type = DPAID_ComPort;
-        elements[1].size = 0x14;
-        elements[1].data = comPort;
-        count = 2;
-    } else {
-        return 0;
-    }
-    if (lobby->CreateCompoundAddress(elements, count, 0, &size) != NET_DPERR_BUFFERTOOSMALL)
-        goto failed;
-    buffer = DebugMalloc(size, __FILE__, 1115);
-    if (!buffer)
-        goto failed;
-    if (lobby->CreateCompoundAddress(elements, count, buffer, &size) < 0) {
-        DebugFree(buffer, __FILE__, 1135);
-        goto failed;
-    }
-    *result = buffer;
-    *resultSize = size;
-    return 1;
-failed:
-    return 0;
 }
 
 // Ring slot at a byte offset into the received-message array. Addressing the

@@ -211,5 +211,12 @@
   "_send@16": "0x005330dc",
   "_socket@12": "0x005330d0",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "_DPAID_ServiceProvider": "0x005568e0",
+  "__imp__lstrlenA@4": "0x005501dc",
+  "_DPAID_INetPort": "0x00556960",
+  "_atoi": "0x00536057",
+  "_DPAID_Phone": "0x00556920",
+  "_DPAID_Modem": "0x00556900",
+  "_DPAID_ComPort": "0x00556970"
 }

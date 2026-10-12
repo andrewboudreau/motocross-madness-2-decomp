@@ -26455,6 +26455,15 @@ CASES = [
         'target_size': 957,
         'reason': 'stream open: a message buffer per branch keeps the error blocks apart, `char c = *p++` key loop, access bytes 1..7 cleared',
     },
+    {
+        'name': 'Net.cpp create address 0x4abf10',
+        'bindings': 'src/reconstructed/Net.bindings.json',
+        'source': 'src/reconstructed/Net.cpp',
+        'symbol': '?CreateAddress@NetworkInterface@@QAEHU_GUID@@PAD1PAXPAPAXPAK@Z',
+        'target_va': '0x004abf10',
+        'target_size': 948,
+        'reason': 'DirectPlay address: the port element points at a WORD atoi local, so `port` stays unaliased and in ebx across lstrlenA',
+    },
 ]
 
 def main():

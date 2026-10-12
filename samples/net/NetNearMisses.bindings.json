@@ -14,7 +14,6 @@
   "?SetPending@NetPendingMessage@@QAEHHFPAXIHH@Z": "0x004aadc0",
   "?Initialize@NetworkInterface@@QAEJH@Z$ehhandler": "0x0054c586",
   "?ConnectUsingLobby@NetworkInterface@@QAEJXZ": "0x004ab960",
-  "?CreateAddress@NetworkInterface@@QAEHU_GUID@@PAD1PAXPAPAXPAK@Z": "0x004abf10",
   "?GetPlayerName@NetworkInterface@@QAEHHPAD@Z": "0x004ac720",
   "?NextPlayer@NetworkInterface@@QAEPAVNetPlayer@@PAH@Z": "0x004ac7c0",
   "?FindPlayer@NetworkInterface@@QAEPAVNetPlayer@@H@Z": "0x004ac800",
