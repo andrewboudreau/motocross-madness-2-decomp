@@ -107,6 +107,9 @@ static inline float ConDot(const ConVec3& a, const ConVec3& b)
 // Session 12: the cross product's term order and operand order and the dot product's grouping
 // and argument order (32 combinations through separate helpers) all compile to the same bytes:
 // VC6 canonicalises them here, so the termB difference is not an operand-order choice.
+// Also identical: termB's transform or either cross computed into float locals before the
+// result is filled (the store-schedule lever of docs/VC6_OPERAND_ORDER.md 1.3); with both
+// crosses and the transform in that form the inline budget runs out (ConScale is called).
 // Kept: b = b + a (a's components load first), vn = c . vRel, the zero vector copied as a
 // whole struct (needed for the frame: component copies put vB in the wrong slot).
 void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,

@@ -139,7 +139,8 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // Swept (tools/sweep_variants.py): every declaration order of pose/rotation/position/axisX/axisZ
 // (hoisted or not) leaves 456 masked; normalising axisZ first gives 448; initialising from
 // Vec3Normalize(src->...), via copies, named or scoped temporaries, and `Vec3 position =
-// src->position` are all worse (55..193).
+// src->position` are all worse (55..193). The position block written as chained
+// assignments or interleaved per component gives 205; storing pose._44 before the position copies leaves 476.
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;
