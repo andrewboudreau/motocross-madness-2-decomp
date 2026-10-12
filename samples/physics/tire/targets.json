@@ -75,7 +75,7 @@
     "target_va": "0x00515880",
     "target_size": 703,
     "expect": "partial",
-    "notes": "7.35% (tier 3 name): rotation-frame builder; 677 bytes vs 703 target. Uses TireNormalizeZ helper. Retail has 0x30 locals + push esi (B.z in esi); ours has an extra Vec3 temp and caches y in registers",
+    "notes": "522/703 strict (tier 3 name): rotation-frame builder. y is normalised through TireNormalizeY (inline TireDotInline dot, `return v` when |v|^2 is exactly 1, out-of-line CollisionVec3 ctor), which gives retail's cached y.x/y.y/y.z in ecx/edx/esi (push esi) and the redundant `y = y` stores; z uses TireNormalizeZ. Remaining: retail spills row 0's z through a stack temp and stores x/y last (VC6 here stores all three directly; 6 row-0 store orders x 2 placements and inline row-0 expressions give 505-529, natural order kept), the keepZ test is scheduled later, and c.y loads z.z first (operand order of the c, r crosses written either way compiles the same).",
     "bindings": "Tire.bindings.json"
   },
   {

@@ -41,6 +41,23 @@ static void TireCollisionCallback(CollisionObject* a, CollisionObject* b)
 // 0x0040ae30 (cdecl, out of line): dot product of two vectors, result in st(0).
 float TireDot(const CollisionVec3* a, const CollisionVec3* b);
 
+// Inline form of the dot product (the out-of-line dot is TireDot).
+static inline float TireDotInline(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+
+// Normalised copy of v (returned unchanged when |v|^2 is exactly 1); retail's y-axis path
+// (inline dot, out-of-line constructor).
+static inline CollisionVec3 TireNormalizeY(const CollisionVec3& v)
+{
+    float lenSq = TireDotInline(v, v);
+    if (lenSq == 1.0f)
+        return v;
+    float s = FastInvSqrt(lenSq);
+    return CollisionVec3(v.x * s, v.y * s, v.z * s);
+}
+
 // Normalised copy of v (returned unchanged when |v|^2 is exactly 1); retail's z-axis path.
 static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
 {
@@ -81,11 +98,7 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
         }
     }
 
-    float lenSq = y.y * y.y + y.z * y.z + y.x * y.x;
-    if (lenSq != 1.0f) {
-        float s = FastInvSqrt(lenSq);
-        y = CollisionVec3(y.x * s, y.y * s, y.z * s);
-    }
+    y = TireNormalizeY(y);
 
     CollisionVec3 n = TireNormalizeZ(z);
 
@@ -194,12 +207,6 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
     CollisionObject::onHitByCallback = 0;
     ownerObject = this;
     return this;
-}
-
-// Inline form of the dot product (the out-of-line dot is TireDot).
-static inline float TireDotInline(const CollisionVec3& a, const CollisionVec3& b)
-{
-    return a.z * b.z + (a.x * b.x + a.y * b.y);
 }
 
 // CollisionPoint slot 1 override (0x00515b50, compiled with this = the CollisionPoint
