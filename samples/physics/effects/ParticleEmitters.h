@@ -12,12 +12,8 @@
 
 #include "effects/ParticleManager.h"
 
-// Vec3 whose default constructor zeroes it; the emitters' ctors store the zeros for position and
-// previousPosition through a shared register, which a member with this constructor explains.
-struct EmitterVec3 : public ParticleVec3 {
-    EmitterVec3() { x = 0.0f; y = 0.0f; z = 0.0f; }
-    EmitterVec3& operator=(const ParticleVec3& o) { x = o.x; y = o.y; z = o.z; return *this; }
-};
+// position and previousPosition are plain ParticleVec3: every emitter ctor zeroes position and then
+// struct-copies it into previousPosition, which is retail's shared-register `lea ecx, [previousPosition]; mov edx, eax`.
 
 // Dust: vtable 0x00555ab8.  Ctor 0x004b8a00, deleting dtor 0x004b8a80, dtor 0x004b8aa0.
 class DustParticleEmitter : public GameObject {
@@ -125,8 +121,8 @@ public:
     float field_0x38;         // +0x38 ctor 0
     float field_0x3c;         // +0x3c ctor 1.0
     float field_0x40;         // +0x40 ctor 2400.0
-    EmitterVec3 position;    // +0x44 ctor 0; SetPosition's arguments
-    EmitterVec3 previousPosition; // +0x50 SetPosition copies position here first
+    ParticleVec3 position;    // +0x44 ctor 0; SetPosition's arguments
+    ParticleVec3 previousPosition; // +0x50 SetPosition copies position here first
     float field_0x5c;         // +0x5c ctor 0
     int field_0x60;           // +0x60 ctor 0
     float field_0x64;         // +0x64 ctor 0; a timer: slot 10 adds dt while idle and emits while it is positive

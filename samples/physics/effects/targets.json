@@ -6,7 +6,7 @@
     "target_va": "0x004b8a00",
     "target_size": 122,
     "expect": "exact",
-    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor; emitRate starts at 4000.0 (retail imm 0x457a0000; the clamp in slot 3 caps it at 1000). Exact with plain ParticleVec3 position/previousPosition and previousPosition struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); an EmitterVec3 default ctor or member-zeroing Vec3 does not reproduce it.",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor; emitRate starts at 4000.0 (retail imm 0x457a0000; the clamp in slot 3 caps it at 1000). Exact with plain ParticleVec3 position/previousPosition and previousPosition struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); a member-zeroing Vec3 default ctor does not reproduce it.",
     "bindings": "DustParticleEmitter.bindings.json"
   },
   {
@@ -76,7 +76,7 @@
     "target_va": "0x004b8df0",
     "target_size": 287,
     "expect": "exact",
-    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact once position/previousPosition are plain ParticleVec3 (no EmitterVec3 default ctor), the stores follow retail order and previousPosition is struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); randomTable is `((float)rand() / 32768.0f) * 0.25f`, randomVectors components assigned directly.",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact once position/previousPosition are plain ParticleVec3 (no zeroing default ctor), the stores follow retail order and previousPosition is struct-copied from the zeroed position (retail `lea ecx,[esi+0x50]; mov edx,eax`); randomTable is `((float)rand() / 32768.0f) * 0.25f`, randomVectors components assigned directly.",
     "bindings": "DirtChunkParticleEmitter.bindings.json"
   },
   {
@@ -155,8 +155,8 @@
     "candidate_symbol_contains": "??0SparkParticleEmitter",
     "target_va": "0x004b9830",
     "target_size": 307,
-    "expect": "partial",
-    "notes": "11.9% (279 vs 307 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops",
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops. Exact with plain ParticleVec3 position/previousPosition, retail store order with previousPosition copied from the zeroed position, and the scale written `((float)rand() / 32768.0f) * k` (without the parentheses VC6 folds 1/32768*k into one constant retail does not have).",
     "bindings": "SparkParticleEmitter.bindings.json"
   },
   {

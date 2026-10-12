@@ -8,29 +8,33 @@ SparkParticleEmitter::SparkParticleEmitter(int flags) : GameObject(flags)
 {
     int i;
     firstUpdate = 1;
-    manager = 0;
     field_0x34 = 500.0f;
     field_0x3c = 1.0f;
     field_0x38 = 0;
     field_0x40 = 2400.0f;
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
     launchVelocity.x = 0;
     launchVelocity.y = 2.0f;
     launchVelocity.z = 0;
+    previousPosition = position;
     field_0x68 = 0;
     field_0x6c = 0;
     field_0x5c = 0;
     field_0x60 = 0;
     field_0x64 = 0;
     field_0x70 = 0x2d;
+    manager = 0;
     field_0x74 = 0x14;
     field_0x484 = 0;
     field_0x608 = 0;
     for (i = 0; i < 256; i++)
-        randomTable[i] = (float)rand() / 32768.0f * 0.075f;
+        randomTable[i] = ((float)rand() / 32768.0f) * 0.075f;
     for (i = 0; i < 8; i++) {
-        randomVectors[i].x = (float)rand() / 32768.0f * 10.0f - 5.0f;
-        randomVectors[i].y = (float)rand() / 32768.0f * 10.0f - 5.0f;
-        randomVectors[i].z = (float)rand() / 32768.0f * 10.0f - 5.0f;
+        randomVectors[i].x = ((float)rand() / 32768.0f) * 10.0f - 5.0f;
+        randomVectors[i].y = ((float)rand() / 32768.0f) * 10.0f - 5.0f;
+        randomVectors[i].z = ((float)rand() / 32768.0f) * 10.0f - 5.0f;
     }
 }
 
