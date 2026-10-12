@@ -88,7 +88,7 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
     if (!from || !to || !current || !*current || !count || !times || !gateIndex)
         return 0;
     if ((!skipTest && CrossesGate(from, to, *current, direction)) || (skipTest && forced)) {
-        *current = (*current)->field_0x38;
+        *current = (*current)->nextGate;
         ++*gateIndex;
         if (!*current) {
             *current = first;
@@ -108,12 +108,12 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
         }
         times[++*count % 600] = now;
     }
-    g_UnknownGlobal689c30[0] = (*current)->field_0x00 - (*current)->field_0x18;
+    g_UnknownGlobal689c30[0] = (*current)->center - (*current)->halfExtents;
     g_UnknownGlobal689c30[0].y += 3.0f;
-    g_UnknownGlobal689c30[1] = (*current)->field_0x18 * 2.0f + g_UnknownGlobal689c30[0];
-    g_UnknownGlobal689c48[0] = (*current)->field_0x00;
+    g_UnknownGlobal689c30[1] = (*current)->halfExtents * 2.0f + g_UnknownGlobal689c30[0];
+    g_UnknownGlobal689c48[0] = (*current)->center;
     g_UnknownGlobal689c48[0].y += 3.0f;
-    g_UnknownGlobal689c48[1] = (*current)->field_0x0c * 10.0f + g_UnknownGlobal689c48[0];
+    g_UnknownGlobal689c48[1] = (*current)->direction * 10.0f + g_UnknownGlobal689c48[0];
     return 1;
 }
 
@@ -208,8 +208,8 @@ int OrderByGates(UnknownEventRacerPart** list) {
     if (!list)
         return 0;
     for (status = *list; status; status = status->field_0x50) {
-        float dx = status->field_0x34->field_0x00.x - status->field_0x1c.x;
-        float dz = status->field_0x34->field_0x00.z - status->field_0x1c.z;
+        float dx = status->field_0x34->center.x - status->field_0x1c.x;
+        float dz = status->field_0x34->center.z - status->field_0x1c.z;
         status->field_0x0c = dx * dx + dz * dz;
         if (status->field_0x0c < 0.0f)
             return 0;

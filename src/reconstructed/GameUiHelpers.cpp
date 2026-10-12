@@ -28,10 +28,10 @@ int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate,
     p0y = to->z;
     d0x = from->x - to->x;
     d0y = from->z - to->z;
-    p1x = gate->field_0x00.x - gate->field_0x18.x;
-    p1y = gate->field_0x00.z - gate->field_0x18.z;
-    d1x = gate->field_0x18.x * 2.0f;
-    d1y = gate->field_0x18.z * 2.0f;
+    p1x = gate->center.x - gate->halfExtents.x;
+    p1y = gate->center.z - gate->halfExtents.z;
+    d1x = gate->halfExtents.x * 2.0f;
+    d1y = gate->halfExtents.z * 2.0f;
     if (!UnknownFunction47b800(p0x, p0y, d0x, d0y, p1x, p1y, d1x, d1y, &t, &u)) {
         return 0;
     }
@@ -44,12 +44,12 @@ int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate,
     dy = from->y - to->y;
     // +0x28 holds the gate's height as a float (BikeRace.h declares it int
     // because 0x0041d0d0 copies it from an int argument).
-    if (dy * t + to->y - gate->field_0x00.y > *(float*)&gate->field_0x28) {
+    if (dy * t + to->y - gate->center.y > *(float*)&gate->field_0x28) {
         return 0;
     }
     if (direction) {
-        if ((from->z - to->z) * gate->field_0x0c.z + (from->x - to->x) * gate->field_0x0c.x +
-                dy * gate->field_0x0c.y < 0.0f) {
+        if ((from->z - to->z) * gate->direction.z + (from->x - to->x) * gate->direction.x +
+                dy * gate->direction.y < 0.0f) {
             return 0;
         }
     }

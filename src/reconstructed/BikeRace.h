@@ -67,15 +67,15 @@ struct UnknownKrustyVcrRecord {
 // one and 0x0049c1e0 reads it back). The strings are copied with their
 // lengths clamped to the array size less one.
 struct UnknownKrustyVcrRacer {
-    int field_0x000;                          // network id
-    char field_0x004;                         // AI index
-    char field_0x005[0x10];                   // name
+    int networkId;                            // +0x000 network id
+    char aiIndex;                             // +0x004 AI index
+    char name[0x10];                          // +0x005 name
     char field_0x015[0x40];
     char field_0x055[0x40];
     char field_0x095[0x40];
     char field_0x0d5[0x40];
-    int field_0x118;                          // engine size
-    int field_0x11c;                          // engine kind
+    int engineSize;                           // +0x118 engine size
+    int engineKind;                           // +0x11c engine kind
     int field_0x120;
 };
 
@@ -110,16 +110,16 @@ public:
     float field_0x0d8;                        // 0x0049bff0 stores its first argument
     // +0xdc..+0xf8c (0xeb0 bytes) is the block 0x0049bf10 and 0x0049c010 hand
     // to the recorder.
-    char field_0x0dc[8];                      // "MCMVCR" (0x0049bf10, mode 0)
+    char magic[8];                            // +0x0dc "MCMVCR" (0x0049bf10, mode 0)
     char field_0x0e4[8];                      // the string at 0x0056da64
-    char field_0x0ec[0x20];                   // description (0x0049c010)
-    float field_0x10c;                        // the time played (0x00421d50)
+    char description[0x20];                   // +0x0ec description (0x0049c010)
+    float timePlayed;                         // +0x10c the time played (0x00421d50)
     // TrackGame+0x2d70's 0x1ec bytes (copied by 0x0049bf10, mode 0).
     unsigned char field_0x110[0x25c - 0x110];
     UnknownKrustyVcrRecord field_0x25c[8];
     unsigned char field_0x29c[0x2fc - 0x29c];
     int racerCount;                           // +0x2fc racers recorded (the loader)
-    UnknownKrustyVcrRacer field_0x300[11];    // 0x0049c070 / 0x0049c1e0
+    UnknownKrustyVcrRacer racers[11];         // +0x300 0x0049c070 / 0x0049c1e0
 };
 
 // The model at +0x1a0 of BikeRace+0x74's object: +0x274 groups at +0x28c
@@ -222,7 +222,7 @@ public:
     unsigned char field_0x000[0x274];
     int detailLevelCount;                     // +0x274 detail level count
     unsigned char field_0x278[0x27c - 0x278];
-    int field_0x27c;                          // current detail level
+    int currentDetailLevel;                   // +0x27c current detail level
     float* detailDistances;                   // +0x280 automatic detail distances (slot 10's debug page)
     unsigned char field_0x284[0x28c - 0x284];
     UnknownBikeRaceMeshGroup* levelGroups;    // +0x28c per level
@@ -540,13 +540,13 @@ struct UnknownBikeRaceRacerPart {
 // draws the probes' boxes; 0x0041d1e0 measures the track distance between
 // the probes' positions.
 struct UnknownBikeRaceNode {
-    Vector3 field_0x00;                       // centre
-    Vector3 field_0x0c;                       // direction
-    Vector3 field_0x18;                       // half extents (across the direction for gates)
+    Vector3 center;                           // +0x00 centre
+    Vector3 direction;                        // +0x0c direction
+    Vector3 halfExtents;                      // +0x18 half extents (across the direction for gates)
     float field_0x24;
     int field_0x28;
     TrackPos field_0x2c;
-    UnknownBikeRaceNode* field_0x38;          // next gate
+    UnknownBikeRaceNode* nextGate;            // +0x38 next gate
 };
 
 // The 0x18-byte source records 0x0041d0d0 copies.
@@ -634,8 +634,8 @@ struct UnknownBikeRaceCameraView {
     unsigned char field_0x275[0x384 - 0x275];
     UnknownBikeRaceSceneCharacter* field_0x384;
     GameObject* field_0x388;
-    void* field_0x38c;                        // a scene shadow caster
-    unsigned char field_0x390;                // following a racer
+    void* shadowCaster;                       // +0x38c a scene shadow caster
+    unsigned char followingRacer;             // +0x390 following a racer
     unsigned char field_0x391;
     unsigned char field_0x392;
     UnknownBikeRaceRacer* field_0x394;
@@ -649,18 +649,18 @@ struct UnknownBikeRaceCameraView {
         if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
             field_0x3b0->field_0x3bc->UnknownFunction444d40(1);
             field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(1);
-            if (field_0x3b0->field_0x3bc->field_0x27c == 0) {
+            if (field_0x3b0->field_0x3bc->currentDetailLevel == 0) {
                 field_0x3b0->field_0x3bc->UnknownFunction444d00(1);
             }
-            if (field_0x3b0->field_0x5c4->field_0x1a0->field_0x27c == 0) {
+            if (field_0x3b0->field_0x5c4->field_0x1a0->currentDetailLevel == 0) {
                 field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d00(1);
             }
         }
         field_0x394 = racer;
         field_0x391 = 0;
         field_0x392 = 0;
-        field_0x390 = true;
-        field_0x38c = 0;
+        followingRacer = true;
+        shadowCaster = 0;
         field_0x384 = 0;
         field_0x388 = 0;
         field_0x3b0 = racer;
@@ -676,10 +676,10 @@ struct UnknownBikeRaceCameraView {
     // Inline (0x0041eb20): the camera targets one scene object instead.
     void UnknownFunctionTargetCaster(void* caster) {
         field_0x274 = 0;
-        field_0x38c = caster;
+        shadowCaster = caster;
         field_0x391 = 0;
         field_0x392 = 0;
-        field_0x390 = false;
+        followingRacer = false;
         field_0x384 = 0;
         field_0x388 = 0;
     }
@@ -688,18 +688,18 @@ struct UnknownBikeRaceCameraView {
         field_0x274 = 0;
         field_0x391 = 0;
         field_0x392 = 0;
-        field_0x390 = false;
+        followingRacer = false;
         field_0x388 = 0;
-        field_0x38c = 0;
+        shadowCaster = 0;
     }
     void UnknownFunctionTargetObject(GameObject* object) {
         field_0x388 = object;
         field_0x274 = 0;
         field_0x391 = 0;
         field_0x392 = 0;
-        field_0x390 = false;
+        followingRacer = false;
         field_0x384 = 0;
-        field_0x38c = 0;
+        shadowCaster = 0;
     }
 };
 
@@ -865,7 +865,7 @@ public:
         if (field_0x0c8 != 0) {
             while (field_0x0c8 != 0) {
                 UnknownBikeRaceNode* node = field_0x0c8;
-                field_0x0c8 = node->field_0x38;
+                field_0x0c8 = node->nextGate;
                 DebugFree(node, __FILE__, 0xd3);
             }
             field_0x0c8 = 0;

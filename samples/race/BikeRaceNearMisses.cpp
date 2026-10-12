@@ -112,7 +112,7 @@
 
 // 0x0041eb20
 int BikeRace::AimCamera(int caster) {
-    if (UnknownFunctionCameraView()->field_0x390) {
+    if (UnknownFunctionCameraView()->followingRacer) {
         field_0x0b0 = 0xff;
         field_0x0ac = 0;
         if (g_TrackGame->field_0x18 > 1) {
@@ -170,7 +170,7 @@ int BikeRace::AimCamera(int caster) {
             UnknownFunctionCameraView()->UnknownFunctionTargetCaster(
                 raceScene->staticModels->casters[field_0x154].model);
         } else {
-            UnknownFunctionCameraView()->field_0x390 = 1;
+            UnknownFunctionCameraView()->followingRacer = 1;
         }
     } else {
         field_0x0b0 = 1;
@@ -197,10 +197,10 @@ int BikeRace::AimCamera(int caster) {
                 }
             }
         } else {
-            UnknownFunctionCameraView()->field_0x390 = 1;
+            UnknownFunctionCameraView()->followingRacer = 1;
         }
     }
-    if (UnknownFunctionCameraView()->field_0x390) {
+    if (UnknownFunctionCameraView()->followingRacer) {
         field_0x0b0 = 0xff;
         field_0x0ac = 0;
     }
@@ -232,8 +232,8 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         (camera->cameraState != 7 || racers || objects)) {
         return;
     }
-    if (camera->field_0x390 != racers) {
-        camera->field_0x390 = racers;
+    if (camera->followingRacer != racers) {
+        camera->followingRacer = racers;
         if (AimCamera(objects == 0)) {
             return;
         }
@@ -265,7 +265,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 field_0x14c = 0;
             }
             if (old == field_0x14c) {
-                UnknownFunctionCameraView()->field_0x390 = 1;
+                UnknownFunctionCameraView()->followingRacer = 1;
                 return;
             }
         } while (UnknownFunctionRacerAt(field_0x14c)->outOfRace != 0);
@@ -273,7 +273,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 0;
         Scene* scene = raceScene;
         if (scene->animationTable == 0 || scene->animationTable->entryCount <= 0) {
-            UnknownFunctionCameraView()->field_0x390 = 1;
+            UnknownFunctionCameraView()->followingRacer = 1;
             return;
         }
         int hidden = 1;
@@ -310,11 +310,11 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 entry = &scene->animationTable->entries[field_0x150];
                 if (entry->keyFramed) {
                     if (!((UnknownBikeRaceSceneCharacter*)entry->character)->field_0x25_bit0) {
-                        view->field_0x390 = 1;
+                        view->followingRacer = 1;
                         return;
                     }
                 } else if (!((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->field_0x25_bit0) {
-                    view->field_0x390 = 1;
+                    view->followingRacer = 1;
                     return;
                 }
                 AimCamera(caster);
@@ -325,7 +325,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         caster = 1;
         UnknownSceneBuffer* casters = raceScene->staticModels;
         if (casters == 0 || casters->casterCount <= 0) {
-            UnknownFunctionCameraView()->field_0x390 = 1;
+            UnknownFunctionCameraView()->followingRacer = 1;
             return;
         }
         int old = field_0x154;
@@ -336,7 +336,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         if (field_0x154 >= raceScene->staticModels->casterCount) {
             field_0x154 = 0;
         }
-        if (old == field_0x154 && UnknownFunctionCameraView()->field_0x38c != 0) {
+        if (old == field_0x154 && UnknownFunctionCameraView()->shadowCaster != 0) {
             return;
         }
     }
@@ -394,11 +394,11 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
     case 2:
     case 3: {
         if (field_0x144) {
-            a->x = startProbe.field_0x00.x;
-            a->z = startProbe.field_0x00.z;
+            a->x = startProbe.center.x;
+            a->z = startProbe.center.z;
             a->y = 0.0f;
-            b->x = startProbe.field_0x0c.x;
-            b->z = startProbe.field_0x0c.z;
+            b->x = startProbe.direction.x;
+            b->z = startProbe.direction.z;
             b->y = 0.0f;
         } else {
             *a = raceScene->defaultStartPosition;
@@ -578,9 +578,9 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             delete stream;
         }
         if (field_0x148)
-            field_0x04c->QueryGround(&finishProbe.field_0x00, 0, 0, 0);
+            field_0x04c->QueryGround(&finishProbe.center, 0, 0, 0);
         if (field_0x144)
-            field_0x04c->QueryGround(&startProbe.field_0x00, 0, 0, 0);
+            field_0x04c->QueryGround(&startProbe.center, 0, 0, 0);
         if (field_0x148 && field_0x144)
             UpdateTrackSeparation();
         break;
@@ -623,10 +623,10 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         if (raceTrack) {
             if (!g_TrackGame->field_0x3428) {
                 if (field_0x144) {
-                    direction.x = -startProbe.field_0x0c.x;
-                    direction.z = -startProbe.field_0x0c.z;
-                    point.x = startProbe.field_0x00.x - direction.x * 15.0f;
-                    point.z = startProbe.field_0x00.z - direction.z * 15.0f;
+                    direction.x = -startProbe.direction.x;
+                    direction.z = -startProbe.direction.z;
+                    point.x = startProbe.center.x - direction.x * 15.0f;
+                    point.z = startProbe.center.z - direction.z * 15.0f;
                 } else {
                     point = position;
                 }
@@ -648,10 +648,10 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 if (field_0x06c)
                     field_0x06c->UnknownVirtualSlot4();
                 if (field_0x144) {
-                    point.x = startProbe.field_0x00.x;
-                    point.z = startProbe.field_0x00.z;
-                    direction.x = startProbe.field_0x0c.x;
-                    direction.z = startProbe.field_0x0c.z;
+                    point.x = startProbe.center.x;
+                    point.z = startProbe.center.z;
+                    direction.x = startProbe.direction.x;
+                    direction.z = startProbe.direction.z;
                 } else {
                     point = position;
                 }
@@ -678,12 +678,12 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 }
             }
             if (field_0x148) {
-                point.x = finishProbe.field_0x00.x;
-                point.z = finishProbe.field_0x00.z;
+                point.x = finishProbe.center.x;
+                point.z = finishProbe.center.z;
                 terrain->QueryGround(&point, 0, 0, 0);
-                direction.x = finishProbe.field_0x0c.x;
+                direction.x = finishProbe.direction.x;
                 direction.y = 0.0f;
-                direction.z = finishProbe.field_0x0c.z;
+                direction.z = finishProbe.direction.z;
             }
 
             sprintf(name, "%s\\%s", "Res", "MetalArch.slt");

@@ -152,8 +152,8 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
         }
         if (racer->field_0x7a4 && racer == racer->field_0x740->field_0x38)
             g_ViewRacerFinished = 1;
-        float before = Length(status->field_0x34->field_0x00 - status->field_0x28);
-        float after = Length(status->field_0x34->field_0x00 - status->field_0x1c);
+        float before = Length(status->field_0x34->center - status->field_0x28);
+        float after = Length(status->field_0x34->center - status->field_0x1c);
         status->field_0x28.x = status->field_0x1c.x;
         status->field_0x28.y = status->field_0x1c.y;
         status->field_0x28.z = status->field_0x1c.z;

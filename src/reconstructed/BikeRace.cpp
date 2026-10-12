@@ -75,8 +75,8 @@ void BikeRace::RankByPoints(int* order) {
 
 // 0x00417c30
 BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
-    startProbe.field_0x38 = 0;
-    finishProbe.field_0x38 = 0;
+    startProbe.nextGate = 0;
+    finishProbe.nextGate = 0;
     field_0x1e8 = 0;
     field_0x078 = 0;
     localRacer = 0;
@@ -196,7 +196,7 @@ BikeRace::~BikeRace() {
     }
     while (field_0x0c8 != 0) {
         UnknownBikeRaceNode* node = field_0x0c8;
-        field_0x0c8 = node->field_0x38;
+        field_0x0c8 = node->nextGate;
         DebugFree(node, __FILE__, 0x82e);
     }
 }
@@ -220,19 +220,19 @@ int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
         return 0;
     }
     UnknownBikeRaceNodeSource* record = &source[index];
-    node->field_0x00.x = record->field_0x00.x;
-    node->field_0x00.y = record->field_0x00.y;
-    node->field_0x00.z = record->field_0x00.z;
-    node->field_0x0c.x = record->field_0x0c.x;
-    node->field_0x0c.y = record->field_0x0c.y;
-    node->field_0x0c.z = record->field_0x0c.z;
+    node->center.x = record->field_0x00.x;
+    node->center.y = record->field_0x00.y;
+    node->center.z = record->field_0x00.z;
+    node->direction.x = record->field_0x0c.x;
+    node->direction.y = record->field_0x0c.y;
+    node->direction.z = record->field_0x0c.z;
     node->field_0x24 = scale;
     node->field_0x28 = value;
-    node->field_0x18.y = 0.0f;
-    node->field_0x18.x = scale * node->field_0x0c.z * 0.5f;
-    node->field_0x18.z = scale * node->field_0x0c.x * -0.5f;
+    node->halfExtents.y = 0.0f;
+    node->halfExtents.x = scale * node->direction.z * 0.5f;
+    node->halfExtents.z = scale * node->direction.x * -0.5f;
     **tail = node;
-    *tail = &node->field_0x38;
+    *tail = &node->nextGate;
     return 1;
 }
 
@@ -284,7 +284,7 @@ static inline float UnknownFunctionMax(float a, float b) {
 // 0x0041d2b0
 int BikeRace::UnknownVirtualSlot10(float frameTime) {
     if (!g_TrackGame->uiInteractionBlocked) {
-        if (UnknownFunctionCameraView()->field_0x390 &&
+        if (UnknownFunctionCameraView()->followingRacer &&
             UnknownFunctionCameraView()->field_0x3b0->outOfRace != 0) {
             NextCameraTarget(0, 1, 0);
         }
@@ -493,7 +493,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             field_0x160 = 0;
                             raceScene->RestartEntry(field_0x068, 0.0f, 0, 0);
                             field_0x064->UnknownVirtualSlot4();
-                            if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x068) {
+                            if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x068) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x064->field_0x210 != 0) {
@@ -529,7 +529,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         if (field_0x06c != 0) {
                             raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
                             field_0x06c->UnknownVirtualSlot4();
-                            if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x070) {
+                            if (!UnknownFunctionCameraView()->followingRacer && field_0x150 == field_0x070) {
                                 NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x06c->field_0x210 != 0) {
@@ -676,13 +676,13 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             }
             do {
                 int faces = 0;
-                UnknownBikeRaceMeshGroup* group = &model->levelGroups[model->field_0x27c];
+                UnknownBikeRaceMeshGroup* group = &model->levelGroups[model->currentDetailLevel];
                 for (int i = 0; i < group->itemCount; i++) {
                     faces += group->field_0x04[i].faceCount;
                 }
                 g_TrackGame->debugOverlay->UnknownFunction447fa0(lodDebugPage, "Soultree LOD (%s)", name);
                 g_TrackGame->debugOverlay->UnknownFunction447f40(lodDebugPage, "Current LOD %d out of %d",
-                                                                        model->field_0x27c + 1, model->detailLevelCount);
+                                                                        model->currentDetailLevel + 1, model->detailLevelCount);
                 g_TrackGame->debugOverlay->UnknownFunction447f40(lodDebugPage, "Number of Faces = %d", faces);
                 if ((signed char)field_0x0b0 < 0) {
                     if (g_UnknownGlobal567a88 > 5) {
@@ -1058,13 +1058,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                                 &((UnknownBikeRacePickCaster*)raceScene->staticModels->casters)[i];
                             if (caster->field_0x00 & 1) {
                                 if (picked == caster->field_0x08->field_0x128) {
-                                    UnknownFunctionCameraView()->field_0x390 = 1;
+                                    UnknownFunctionCameraView()->followingRacer = 1;
                                     field_0x154 = i;
                                     NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
                             } else if (picked == caster->field_0x0c) {
-                                UnknownFunctionCameraView()->field_0x390 = 1;
+                                UnknownFunctionCameraView()->followingRacer = 1;
                                 field_0x154 = i;
                                 NextCameraTarget(1, 0, 0);
                                 return 1;
@@ -1076,13 +1076,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                             UnknownSceneEntry* entry = &raceScene->animationTable->entries[i];
                             if (entry->keyFramed) {
                                 if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->field_0x210) {
-                                    UnknownFunctionCameraView()->field_0x390 = 1;
+                                    UnknownFunctionCameraView()->followingRacer = 1;
                                     field_0x150 = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
                             } else if (picked == ((UnknownBikeRacePickObject*)entry->proceduralObject)->field_0x3c) {
-                                UnknownFunctionCameraView()->field_0x390 = 1;
+                                UnknownFunctionCameraView()->followingRacer = 1;
                                 field_0x150 = i;
                                 NextCameraTarget(1, 0, 1);
                                 return 1;
@@ -1510,7 +1510,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
             return 1;
         }
-        replayTime = replayVcr->field_0x10c;
+        replayTime = replayVcr->timePlayed;
         if (replaySeekTarget != -1.0f && replayTime > replaySeekTarget) {
             replayMode = 11;
             UnknownFunction41f550(0);
@@ -1964,16 +1964,16 @@ int BikeRace::UnknownVirtualSlot14() {
             DrawTrack(raceTrack);
             if (field_0x144) {
                 SetDrawColor(0xff, 0, 0xff);
-                a = startProbe.field_0x00 - startProbe.field_0x18;
-                b = startProbe.field_0x00 + startProbe.field_0x18;
+                a = startProbe.center - startProbe.halfExtents;
+                b = startProbe.center + startProbe.halfExtents;
                 a.y += 2.5f;
                 b.y += 2.5f;
                 DrawLine(&a, &b);
             }
             if (field_0x148) {
                 SetDrawColor(0, 0xff, 0xff);
-                a = finishProbe.field_0x00 - finishProbe.field_0x18;
-                b = finishProbe.field_0x00 + finishProbe.field_0x18;
+                a = finishProbe.center - finishProbe.halfExtents;
+                b = finishProbe.center + finishProbe.halfExtents;
                 a.y += 2.5f;
                 b.y += 2.5f;
                 DrawLine(&a, &b);
