@@ -47,6 +47,8 @@ static CoCreateInstanceProc s_CoCreateInstance;
 static FARPROC(WINAPI* s_BladeGetProcAddress)(HMODULE, LPCSTR);
 static UINT(WINAPI* s_timeBeginPeriod)(UINT);
 static UINT(WINAPI* s_timeEndPeriod)(UINT);
+static LONG(WINAPI* s_RegOpenKeyExA)(HKEY, LPCSTR, DWORD, REGSAM, PHKEY);
+static LONG(WINAPI* s_RegQueryValueExA)(HKEY, LPCSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD);
 static DirectDrawCreateExProc s_InnerDirectDrawCreateEx;
 
 static void LogGuid(const char* label, const GUID* guid)
@@ -266,6 +268,48 @@ static UINT WINAPI GameTimeEndPeriod(UINT period)
     return 0;
 }
 
+/* Registry reads, for settings such as Game's "TestKey" (0x00467b70). */
+static LONG WINAPI TraceRegOpenKeyExA(HKEY key, LPCSTR subKey, DWORD options, REGSAM access,
+                                      PHKEY result)
+{
+    static LONG s_logged;
+    LONG status = s_RegOpenKeyExA(key, subKey, options, access, result);
+    if ((subKey && !strstr(subKey, "Motocross Madness 2")) ||
+        InterlockedIncrement(&s_logged) <= 12)
+        LogLine("RegOpenKeyExA(%p, \"%s\", access 0x%lx) -> %ld, key %p", key,
+                subKey ? subKey : "(null)", access, status,
+                status == ERROR_SUCCESS && result ? *result : 0);
+    /* A key added by hand to the per-user VirtualStore is not seen through
+       virtualized HKLM (Game 0x467b70 reads "SOFTWARE\\Rainbow Studios\\"
+       TestKey and gets ERROR_FILE_NOT_FOUND), so open the store's 32-bit view
+       of the same key directly. */
+    if (status == ERROR_FILE_NOT_FOUND && key == HKEY_LOCAL_MACHINE && subKey &&
+        !_strnicmp(subKey, "SOFTWARE\\", 9)) {
+        char store[MAX_PATH];
+        int length;
+        lstrcpyA(store, "Software\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\WOW6432Node\\");
+        length = lstrlenA(store);
+        lstrcpynA(store + length, subKey + 9, sizeof(store) - length);
+        length = lstrlenA(store);
+        if (store[length - 1] == '\\')
+            store[length - 1] = 0;
+        status = s_RegOpenKeyExA(HKEY_CURRENT_USER, store, options, access, result);
+        LogLine("  retried as HKCU \"%s\" -> %ld", store, status);
+    }
+    return status;
+}
+
+static LONG WINAPI TraceRegQueryValueExA(HKEY key, LPCSTR name, LPDWORD reserved, LPDWORD type,
+                                         LPBYTE data, LPDWORD size)
+{
+    static LONG s_logged;
+    LONG status = s_RegQueryValueExA(key, name, reserved, type, data, size);
+    if ((name && !lstrcmpiA(name, "TestKey")) || InterlockedIncrement(&s_logged) <= 12)
+        LogLine("RegQueryValueExA(%p, \"%s\") -> %ld, size %lu", key, name ? name : "(null)",
+                status, size ? *size : 0);
+    return status;
+}
+
 typedef struct ImportHook {
     const char* module;
     const char* name;     /* NULL: match by ordinal */
@@ -296,6 +340,9 @@ static ImportHook s_hooks[] = {
     {"DSOUND.dll", NULL, 1, TraceDirectSoundCreate, (void**)&s_DirectSoundCreate},
     {"WINMM.dll", "timeBeginPeriod", 0, GameTimeBeginPeriod, (void**)&s_timeBeginPeriod},
     {"WINMM.dll", "timeEndPeriod", 0, GameTimeEndPeriod, (void**)&s_timeEndPeriod},
+    {"ADVAPI32.dll", "RegOpenKeyExA", 0, TraceRegOpenKeyExA, (void**)&s_RegOpenKeyExA},
+    {"ADVAPI32.dll", "RegQueryValueExA", 0, TraceRegQueryValueExA,
+     (void**)&s_RegQueryValueExA},
     {"ole32.dll", "CoCreateInstance", 0, TraceCoCreateInstance, (void**)&s_CoCreateInstance},
 };
 

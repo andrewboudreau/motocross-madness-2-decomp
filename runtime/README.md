@@ -49,6 +49,15 @@ emulates the 16-bit full-screen display around the game's renderer.
    `HardDriveRootPath` is absent. Unelevated, Windows virtualizes the write to
    `HKCU\Software\Classes\VirtualStore\MACHINE\SOFTWARE\WOW6432Node\...`
    because the exe has no manifest.
+   The debug overlay's `TestKey` (`docs/GAME.md`) is read from
+   `HKLM\SOFTWARE\Rainbow Studios\`. When it was added by hand to the
+   VirtualStore copy of that key, virtualized HKLM still returns
+   `ERROR_FILE_NOT_FOUND`. `trace.c` then opens the VirtualStore key directly:
+   ```
+   reg add "HKCU\Software\Classes\VirtualStore\MACHINE\SOFTWARE\WOW6432Node\Rainbow Studios" /v TestKey /t REG_DWORD /d 1 /f
+   ```
+   (From Git Bash, prefix `MSYS_NO_PATHCONV=1`.) Hold the grave key and
+   press D in game.
 4. The trial EULA dialog (`EBUEula.dll`) appears next; the user accepts it.
 5. A hardware-test message box follows; OK continues.
 
@@ -121,7 +130,12 @@ race uses about 22% of one core, against about 50% with Blade.
   second. With the 60 Hz limit the menus use about 13% of one core and a race
   about 50%; the race clock still keeps wall time.
 - Keyboard and mouse are DirectInput devices (mouse: exclusive|foreground,
-  relative axes, cursor drawn by the game). Both work unchanged.
+  relative axes, cursor drawn by the game). PCKeyboardDevice slot 2
+  (0x4c4460) releases the keyboard for the whole session when its first
+  `Acquire` fails. That happens with `DIERR_OTHERAPPHASPRIO` when the window
+  is not in the foreground at start-up. `vtrace.c` reports that first failure
+  as `DI_NOEFFECT`, and the keyboard is acquired when the window gets focus
+  (`WM_SETFOCUS`, `PCControlInterface::SetDevicesAcquired` 0x4bf490).
   `GetCursorPos` is only a fallback when no input axes exist; its hook maps
   the point into the 640x480 image anyway.
 - The trial allows Voodoo Basin (Nationals) and the Donner Pass Stunt

@@ -672,9 +672,40 @@ static HRESULT __stdcall DICreateDeviceEx(void* self, const GUID* guid, const GU
     return result;
 }
 
+/* Devices whose first Acquire has been seen. PCKeyboardDevice slot 2
+   (0x004c4460) releases the keyboard for the whole session when its first
+   Acquire fails, which it does with DIERR_OTHERAPPHASPRIO (E_ACCESSDENIED)
+   whenever the game window does not have the foreground at start-up (for
+   example when the game is launched from a background process). That first
+   failure is reported as DI_NOEFFECT; the readers re-acquire on every
+   DIERR_NOTACQUIRED, so the keyboard works once the window has focus. */
+#define DIERR_OTHERAPPHASPRIO E_ACCESSDENIED
+#define DI_NOEFFECT S_FALSE
+
+static void* s_acquiredOnce[32];
+static LONG s_acquiredOnceCount;
+
+static int FirstAcquire(void* self)
+{
+    LONG i, count = s_acquiredOnceCount;
+    for (i = 0; i < count; i++)
+        if (s_acquiredOnce[i] == self)
+            return 0;
+    if (count < (LONG)(sizeof(s_acquiredOnce) / sizeof(s_acquiredOnce[0]))) {
+        s_acquiredOnce[count] = self;
+        s_acquiredOnceCount = count + 1;
+    }
+    return 1;
+}
+
 static HRESULT __stdcall DIDAcquire(void* self)
 {
     HRESULT result = ((HRESULT(__stdcall*)(void*))Original(s_inputDevice, self, 7))(self);
+    if (FirstAcquire(self) && result == DIERR_OTHERAPPHASPRIO) {
+        LogLine("IDirectInputDevice7(%p)::Acquire -> 0x%08lx at creation (window not in the "
+                "foreground), reported as DI_NOEFFECT", self, result);
+        return DI_NOEFFECT;
+    }
     if (result && result != 1 && InterlockedIncrement(&s_inputFailures) <= 20)
         LogLine("IDirectInputDevice7(%p)::Acquire -> 0x%08lx", self, result);
     return result;

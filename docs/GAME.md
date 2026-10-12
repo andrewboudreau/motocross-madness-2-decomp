@@ -70,6 +70,15 @@ slot 32 allows, it then creates:
   under the "DebugOverlay" memory tag);
 - the "AllowFreezeCamera" setting, stored into bit 0 of +0x2d4.
 
+With the TestKey bit, holding the grave key (DIK 0x29) satisfies keyboard
+modifier 0x80 (`KeyboardDevice::UnknownFunction48a240`). Game slot 14 maps
+control 0x20 (D) with that modifier to the overlay: grave+D shows it and then
+steps through the pages. In the demo they are the profile, memory and
+"MS Timers" pages (checked on screen). The same bit enables PCGame slot 14's
+Shift+F7 (control 0x41, modifier 3 = either Shift) wireframe toggle, and the
+TextureMapManager slot 23 keys T, F, Y, [ and ] (the last two are not checked
+on screen).
+
 It is a near miss (761/775, `samples/game/GameNearMisses.cpp`). Only the
 frame slots of the registry locals and the `new` temporary differ. Game's forwarding calls also line up with GameObject's slots
 16, 19, 22–25 and `Release`. Input events therefore travel down the
