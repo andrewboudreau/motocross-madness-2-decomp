@@ -54,6 +54,13 @@
 //   (2026-10-11): `continue` on the +0x24 test, an `EventManager* const&`
 //   alias, an entry reference or pointer, a TrackGame local, an `(int)`
 //   cast and `(field_0x50 + i)->`.
+//   Probe (2026-10-12): reading the first loop's position through
+//   `(EventManager* volatile&)g_TrackGame->eventManager` gives 1659/1668
+//   for 0x004507a0 (every later loop then matches); only the load's place
+//   differs (retail schedules it after `lea ecx`, which a volatile load
+//   does not allow), so retail's load is an ordinary one that VC6 did not
+//   carry across the branch. Not adopted. Casts through int, char* + 0x570,
+//   `const&`, `void**` and `results + i` stay at 589.
 
 #include "../../src/reconstructed/DlgProcs.cpp"
 
