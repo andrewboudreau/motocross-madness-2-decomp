@@ -499,8 +499,8 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
 
 // 0x004738a0: draws the image, the text scrolled to keep the caret in view,
 // and the caret.
-int UIEditBox::UnknownVirtualSlot40() {
-    int width = UnknownVirtualSlot61();
+int UIEditBox::Draw() {
+    int width = GetWidth();
     int frames = -1;
     int redraw = redrawFrames;
     if (!controlText)
@@ -529,7 +529,7 @@ int UIEditBox::UnknownVirtualSlot40() {
             int offset = width - textWidth;
             field_0x200 = offset > 0 ? 0 : offset;
         } else if (textAlign & 2) {
-            if (UnknownVirtualSlot61() > textWidth)
+            if (GetWidth() > textWidth)
                 field_0x200 = width / 2 - textWidth / 2;
             else
                 field_0x200 = width - textWidth;
@@ -597,7 +597,7 @@ int UIEditBox::UnknownVirtualSlot40() {
     if (frames >= 0)
         redrawFrames = frames;
     if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this)
-        UnknownVirtualSlot50();
+        RequestRedraw();
     else
         needsRedraw = 1;
     return 1;
@@ -694,7 +694,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             SelectObject((HDC)dc, font);
             ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
         }
-        UnknownVirtualSlot50();
+        RequestRedraw();
         redrawFrames++;
         event.kind = kDialogEditChange;
         event.code = eventCode;
@@ -709,7 +709,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
 }
 
 // 0x00478570: draws the state's image, then its text.
-int UIMultiState::UnknownVirtualSlot40() {
+int UIMultiState::Draw() {
     int frames = -1;
     int redraw = redrawFrames;
     CameraRect rect;

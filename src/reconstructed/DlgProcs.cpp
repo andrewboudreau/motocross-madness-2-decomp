@@ -149,7 +149,7 @@ void CloseDialogCallback(UIDialog* dialog) {
 // 0x0044c6b0
 int MainDlg::UnknownVirtualSlot10(float frameTime) {
     if (field_0x7f6c) {
-        FindControl("ScreenOverCtl", 0)->UnknownVirtualSlot50();
+        FindControl("ScreenOverCtl", 0)->RequestRedraw();
         if (field_0x7f6c && !menuSingleAnimation->transitionState && field_0x7f78) {
             if (field_0x7f7c < 4.0f) {
                 field_0x7f7c = g_TrackGame->frameTime + field_0x7f7c;

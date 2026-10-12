@@ -172,7 +172,7 @@ public:
     virtual void* UnknownVirtualSlot37();     // 0x004703f0
     virtual void UnknownVirtualSlot38();      // 0x004710c0
     virtual void UnknownVirtualSlot39();      // 0x00470f10: scales the area
-    virtual int UnknownVirtualSlot40();       // 0x00471240: draws
+    virtual int Draw();                   // slot 40, 0x00471240: draws
     virtual int UnknownVirtualSlot41();       // 0x004715d0
     virtual int UnknownVirtualSlot42();       // 0x00471850
     virtual int UnknownVirtualSlot43();       // 0x00471b30
@@ -182,7 +182,7 @@ public:
     virtual int UnknownVirtualSlot47();       // 0x00471eb0
     virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00471fa0: the state's texture
     virtual void UnknownVirtualSlot49(int enable); // 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
-    virtual void UnknownVirtualSlot50();      // 0x00470640: redraws
+    virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
     virtual int UnknownVirtualSlot51(tagPOINT point); // 0x004709f0
     virtual void UnknownVirtualSlot52(int id); // 0x00470400
     virtual int UnknownVirtualSlot53();       // 0x004726b0
@@ -193,8 +193,8 @@ public:
     virtual void UnknownVirtualSlot58(int index, int a); // 0x00472670: plays sound `index`
     virtual void UnknownVirtualSlot59(int value); // 0x00464e80 (SelectGamePicProcs.cpp "ChkRecordRace")
     virtual void UnknownVirtualSlot60(int value); // 0x00464e80
-    virtual int UnknownVirtualSlot61();       // 0x00470410: width
-    virtual int UnknownVirtualSlot62();       // 0x00470420: height
+    virtual int GetWidth();               // slot 61, 0x00470410: screenArea width
+    virtual int GetHeight();              // slot 62, 0x00470420: screenArea height
     virtual void UnknownVirtualSlot63(CameraRect* in, CameraRect* out); // 0x00472860
     virtual void UnknownVirtualSlot64(CameraRect* in, CameraRect* out); // 0x004728e0
 
@@ -360,7 +360,7 @@ public:
     virtual int UnknownVirtualSlot21(int value); // 0x00474570
     virtual void UnknownVirtualSlot33(int value); // 0x004740b0
     virtual void UnknownVirtualSlot38();      // 0x00479100 (shared with UIStaticText)
-    virtual int UnknownVirtualSlot40();       // 0x004738a0
+    virtual int Draw();                   // slot 40, 0x004738a0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00474120
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10 (shared with UIScrollCtl)
     virtual void UnknownVirtualSlot59(int value); // 0x00473840: writes the text back
@@ -419,7 +419,7 @@ public:
     UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474ba0
     virtual ~UIScrollBar();                   // 0x00474c50 (deleting wrapper 0x00474c30)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00474cf0
-    virtual int UnknownVirtualSlot40();       // 0x00474ed0
+    virtual int Draw();                   // slot 40, 0x00474ed0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x004755d0
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00475880
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x00475970
@@ -470,10 +470,10 @@ public:
     UIListBox(int id, int rows, CameraRect* area, UIDialog* owner);
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
-    virtual int UnknownVirtualSlot40();       // 0x004761f0: draws the rows
+    virtual int Draw();                   // slot 40, 0x004761f0: draws the rows
     virtual void UnknownVirtualSlot27();      // 0x00475fa0
     virtual void UnknownVirtualSlot29(int state); // 0x00479220
-    virtual void UnknownVirtualSlot50();      // 0x00477ce0
+    virtual void RequestRedraw();         // slot 50, 0x00477ce0
     virtual int UnknownVirtualSlot21(int key); // 0x00478040
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00477e90
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00477ff0
@@ -555,7 +555,7 @@ public:
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
     virtual void UnknownVirtualSlot27();      // 0x004784e0
     virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00478e10: whether `point` is on an opaque pixel
-    virtual int UnknownVirtualSlot40();       // 0x00478570: draws
+    virtual int Draw();                   // slot 40, 0x00478570: draws
     virtual void UnknownVirtualSlot29(int state); // 0x00478520
     virtual int UnknownVirtualSlot34();       // 0x00478260
     virtual int UnknownVirtualSlot35();       // 0x00478280
@@ -589,7 +589,7 @@ public:
     virtual void UnknownVirtualSlot29(int state); // 0x00479220 (shared with UIListBox)
     virtual int UnknownVirtualSlot30();       // 0x00478fe0 (shared with UIStatic)
     virtual void UnknownVirtualSlot38();      // 0x00479100
-    virtual int UnknownVirtualSlot40();       // 0x00479170
+    virtual int Draw();                   // slot 40, 0x00479170
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479190 (shared with UIStatic)
 };
 
@@ -668,8 +668,8 @@ public:
     virtual void UnknownVirtualSlot52(int id); // 0x0047a290
     virtual int UnknownVirtualSlot55(int a, int b); // 0x0047add0
     virtual void UnknownVirtualSlot59(int value); // 0x0047ad80
-    virtual int UnknownVirtualSlot61();       // 0x0047a850
-    virtual int UnknownVirtualSlot62();       // 0x0047a870
+    virtual int GetWidth();               // slot 61, 0x0047a850
+    virtual int GetHeight();              // slot 62, 0x0047a870
 
     void SetOpen(int open);     // 0x0047a2d0: opens or closes the list
     void LayoutParts();             // 0x0047a400: names and lays out the parts
@@ -711,7 +711,7 @@ class UIVideoStatic : public UIStatic {
 public:
     UIVideoStatic(int flags, CameraRect* area, UIDialog* owner); // 0x0047ae30
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0047af90
-    virtual int UnknownVirtualSlot40();       // 0x0047afa0: copies the movie's frame
+    virtual int Draw();                   // slot 40, 0x0047afa0: copies the movie's frame
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
     int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
 
@@ -725,7 +725,7 @@ class UIProgressBar : public UIStatic {
 public:
     UIProgressBar(int flags, CameraRect* area, UIDialog* owner); // 0x0047b020
     virtual ~UIProgressBar();                 // 0x0047b090 (deleting wrapper 0x0047b070)
-    virtual int UnknownVirtualSlot40();       // 0x0047b110: draws the bar and its percentage
+    virtual int Draw();                   // slot 40, 0x0047b110: draws the bar and its percentage
     virtual TextureMap* UnknownVirtualSlot48(int state); // 0x0047b100
     void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
     void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
