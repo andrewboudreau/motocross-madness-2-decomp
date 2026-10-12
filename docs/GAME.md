@@ -79,10 +79,9 @@ Shift+F7 (control 0x41, modifier 3 = either Shift) wireframe toggle, and the
 TextureMapManager slot 23 keys T, F, Y, [ and ] (the last two are not checked
 on screen).
 
-It is a near miss (747 of the candidate's 798 bytes against retail's 775,
-`samples/game/GameNearMisses.cpp`). The frame and slots match; only the
-shared epilogue differs (retail returns the failed slot 3/32 calls' zero
-without `xor eax, eax` and lets the slot 4 result fall into it). Game's forwarding calls also line up with GameObject's slots
+It is a near miss (761/775 compiled inside Game.cpp,
+`samples/game/GameNearMisses.cpp`). Only the frame slots of the registry
+locals and the `new` temporary differ. Game's forwarding calls also line up with GameObject's slots
 16, 19, 22–25 and `Release`. Input events therefore travel down the
 GameObject tree: GameObject slots 22 and 23 take ControlInterface's
 (event, entry) pair, and Camera slot 23 matches control 0xb7 against it.

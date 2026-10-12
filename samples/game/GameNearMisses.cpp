@@ -1,36 +1,20 @@
 // Near-miss Game candidates, kept out of src/reconstructed until they
 // match. See docs/GAME.md.
 //
-// Game::UnknownFunction467b70 (0x00467b70, 775 bytes; the candidate is
-// 798): 747 of 798 bytes match. The frame, the slots and the body agree;
-// only the tail differs. Retail's two failure exits (slot 32 and slot 3
-// returning zero) jump to the single epilogue with eax still zero, and the
-// slot 4 result (`neg; sbb; neg`) falls through into it. VC6 here emits
-// `xor eax, eax` in the shared exit and gives the slot 4 return its own
-// copy of the epilogue. Writing the slot 3 test as `if (slot3()) return
-// slot4() != 0; return 0;` merges the two failure exits as retail does
-// (406 -> 747; the early `if (!slot3()) return 0;` duplicated the epilogue
-// for every return). Tried for the tail (session 10): `&&`, a ternary,
-// `!!`, an if/else on a result variable, nesting the body in `if (slot32())`,
-// gotos to a shared label and inline helpers (all 733-747); a result
-// variable holding the call value gives retail's tail but tests it with
-// `cmp eax, ebp` and moves the frame (402-488).
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../../src/reconstructed/DebugAlloc.h"
-#include "../../src/reconstructed/Game.h"
-
-#include "../../src/reconstructed/DebugOverlay.h"
-#include "../../src/reconstructed/GameObject.h"
-#include "../../src/reconstructed/MemTag.h"
-#include "../../src/reconstructed/SoundInterface.h"
-#include "../../src/reconstructed/TextureMapManager.h"
-
-// Static in Game.cpp (decoded in place by Game's constructor).
-extern char s_UnknownEncoded56b334[];
-extern char s_UnknownEncoded56b350[];
+// Game::UnknownFunction467b70 (0x00467b70, 775 bytes): compiled inside
+// Game.cpp (included below), 761 of 775 bytes match with every instruction
+// equal. Only the
+// frame slots differ: retail places the registry key at +0x10, the size at
+// +0x14, the type at +0x18, the value at +0x1c and the `new` temporary at
+// +0x20; VC6 here puts the temporary at +0x0c of the locals and orders the
+// registry locals size, key, value, type (tools/frame_layout.py suggests one
+// more use of `type`). Declaration order, block scope (763), declarations at
+// the top of the function, renamed locals and an inline helper (worse) do
+// not reproduce retail's layout. Compiled on its own (without Game.cpp) VC6
+// gives every `return` its own epilogue copy (406 of 813); there `if
+// (slot3()) return slot4() != 0; return 0;` scores 747 of 798, but inside
+// Game.cpp it is worse (738) than the form below.
+#include "../../src/reconstructed/Game.cpp"
 
 // ADVAPI32 imports (called through the import table).
 extern "C" __declspec(dllimport) long __stdcall RegOpenKeyExA(void* key, const char* subKey,
@@ -91,7 +75,7 @@ int Game::UnknownFunction467b70(char*) {
         g_MemTagStack->Pop(category);
     }
     field_0x2d4_bit0 = GetRegistryFlag("AllowFreezeCamera", 0);
-    if (UnknownVirtualSlot3())
-        return UnknownVirtualSlot4() != 0;
-    return 0;
+    if (!UnknownVirtualSlot3())
+        return 0;
+    return UnknownVirtualSlot4() != 0;
 }
