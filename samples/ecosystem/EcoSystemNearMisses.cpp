@@ -131,9 +131,9 @@ static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
 // (then `fade` is 255), else the fade between the band's two distances.
 void Vegetation::TestDistance(int* billboard, int* fade) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->field_0x08;
-    float dx = camera->field_0x170.x - quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-    float dz = camera->field_0x170.z - quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->camera;
+    float dx = camera->position.x - quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    float dz = camera->position.z - quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
     *billboard = 0;
     float outer = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->detailLevel].geometryDistance;
     float inner = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->detailLevel].fadeStartDistance;
@@ -161,9 +161,9 @@ void Vegetation::TestDistance(int* billboard, int* fade) {
 // 0x004570a0: the definition's collision object `index`, placed at this
 // object. Retail re-reads the shape pointer for every store (hence the
 // per-statement casts) and the hull copy stores y before x.
-#define ECO_SPHERE ((UnknownEcoSphereShape*)object->field_0x54)
-#define ECO_CAPSULE ((UnknownEcoCapsuleShape*)object->field_0x54)
-#define ECO_HULL ((UnknownEcoHullShape*)object->field_0x54)
+#define ECO_SPHERE ((UnknownEcoSphereShape*)object->shapeData)
+#define ECO_CAPSULE ((UnknownEcoCapsuleShape*)object->shapeData)
+#define ECO_HULL ((UnknownEcoHullShape*)object->shapeData)
 
 CollisionObject* Vegetation::GetCollisionObject(int index) {
     int table = definitionIndex;
@@ -175,25 +175,25 @@ CollisionObject* Vegetation::GetCollisionObject(int index) {
     float radius = definition->RadiusForParameter(radiusParam) / definition->meanRadius;
     float height = definition->HeightForParameter(heightParam)
                    / g_UnknownGlobal59aebc->definitionTable[definitionIndex]->meanHeight;
-    if (object->field_0x50 == 4) {
-        ECO_SPHERE->field_0x14 = radius;
-        ECO_SPHERE->field_0x18 = height;
-        ECO_SPHERE->field_0x1c(3, 0) = x;
-        ECO_SPHERE->field_0x1c(3, 1) = y;
-        ECO_SPHERE->field_0x1c(3, 2) = z;
-    } else if (object->field_0x50 == 3) {
-        ECO_CAPSULE->field_0x20 = radius;
-        ECO_CAPSULE->field_0x24 = height;
-        ECO_CAPSULE->field_0x28(3, 0) = x;
-        ECO_CAPSULE->field_0x28(3, 1) = y;
-        ECO_CAPSULE->field_0x28(3, 2) = z;
-    } else if (object->field_0x50 == 0) {
-        Matrix4 m = ECO_HULL->field_0xc8;
+    if (object->shapeType == 4) {
+        ECO_SPHERE->radiusScale = radius;
+        ECO_SPHERE->centreScale = height;
+        ECO_SPHERE->transform(3, 0) = x;
+        ECO_SPHERE->transform(3, 1) = y;
+        ECO_SPHERE->transform(3, 2) = z;
+    } else if (object->shapeType == 3) {
+        ECO_CAPSULE->radiusScale = radius;
+        ECO_CAPSULE->endpointScale = height;
+        ECO_CAPSULE->transform(3, 0) = x;
+        ECO_CAPSULE->transform(3, 1) = y;
+        ECO_CAPSULE->transform(3, 2) = z;
+    } else if (object->shapeType == 0) {
+        Matrix4 m = ECO_HULL->transform;
         m(3, 1) = y;
         m(3, 0) = x;
         m(3, 2) = z;
-        ECO_HULL->field_0xc8(3, 1) = y;
-        ECO_HULL->field_0xc8(3, 2) = z;
+        ECO_HULL->transform(3, 1) = y;
+        ECO_HULL->transform(3, 2) = z;
         object->UnknownFunction435830(&m);
     }
     return object;
@@ -354,7 +354,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
             definition->collisionObjects[i]->field_0x64 = 0x3e9;
             definition->collisionObjects[i]->UnknownFunction4328b0(hull, hullIndices, definition->modelIndexCount[0] / 3,
                                                                definition->modelVertexCount[0]);
-            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->field_0x54)->field_0xc8);
+            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
@@ -384,7 +384,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
                 indices[j * 6 + 5] = j + 16;
             }
             definition->collisionObjects[i]->UnknownFunction4328b0(vertices, indices, 32, 32);
-            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->field_0x54)->field_0xc8);
+            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
         }
     }
     g_MemTagStack->Pop(category);
@@ -428,10 +428,10 @@ static inline float UnknownEcoRandom() {
 // one, scaled to 0..1. Inline shape only (the three branches are expanded
 // at every sample site of the generator).
 static inline float UnknownEcoSampleTga(UnknownTgaFile* tga, float x, float z) {
-    float worldX = g_collisionQuadTree->field_0x50;
+    float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
-    float worldZ = g_collisionQuadTree->field_0x54;
+    float worldZ = g_collisionQuadTree->extentZ;
     int height = tga->height;
     int row = (int)((1.0f - z / worldZ) * height);
     if (column >= width)
@@ -448,10 +448,10 @@ static inline float UnknownEcoSampleTga(UnknownTgaFile* tga, float x, float z) {
 
 // Whether the probability TGA is nonzero at the terrain position.
 static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
-    float worldX = g_collisionQuadTree->field_0x50;
+    float worldX = g_collisionQuadTree->extentX;
     int width = tga->width;
     int column = (int)(x / worldX * width);
-    float worldZ = g_collisionQuadTree->field_0x54;
+    float worldZ = g_collisionQuadTree->extentZ;
     int height = tga->height;
     int row = (int)((1.0f - z / worldZ) * height);
     if (column >= width)
@@ -509,13 +509,13 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         }
     }
     int mode = g_TrackGame->UnknownVirtualSlot20("EcoGen", 0);
-    rangeX = g_collisionQuadTree->field_0x50;
-    rangeZ = g_collisionQuadTree->field_0x54;
+    rangeX = g_collisionQuadTree->extentX;
+    rangeZ = g_collisionQuadTree->extentZ;
     if (mode == 5) {
-        spacing = g_collisionQuadTree->field_0x50 * (1.0f / 5.0f);
+        spacing = g_collisionQuadTree->extentX * (1.0f / 5.0f);
         rangeX = rangeZ = spacing;
     } else if (mode == 6) {
-        spacing = g_collisionQuadTree->field_0x50 * (1.0f / 6.0f);
+        spacing = g_collisionQuadTree->extentX * (1.0f / 6.0f);
         rangeX = rangeZ = spacing;
     }
     if (mode) {
@@ -711,10 +711,10 @@ int EcoSystem::UnknownVirtualSlot14() {
         return 1;
     unsigned int start = ReadClock();
     int category = g_MemTagStack->Push("EcoSystem");
-    UnknownEcoCamera* camera = ECO_VIEW->field_0x08;
-    int verticesBefore = ECO_VIEW->field_0x38;
-    int trianglesBefore = ECO_VIEW->field_0x44;
-    float projectionScale = camera->field_0x198;
+    UnknownEcoCamera* camera = ECO_VIEW->camera;
+    int verticesBefore = ECO_VIEW->verticesDrawn;
+    int trianglesBefore = ECO_VIEW->trianglesDrawn;
+    float projectionScale = camera->projectionScale;
     identity(0, 0) = 1.0f;
     identity(0, 1) = 0.0f;
     identity(0, 2) = 0.0f;
@@ -731,17 +731,17 @@ int EcoSystem::UnknownVirtualSlot14() {
     identity(3, 1) = 0.0f;
     identity(3, 2) = 0.0f;
     identity(3, 3) = 1.0f;
-    ECO_VIEW->field_0x08->UnknownVirtualSlot30(&identity);
+    ECO_VIEW->camera->UnknownVirtualSlot30(&identity);
     ECO_VIEW->UnknownVirtualSlot9(D3DRENDERSTATE_TEXTUREPERSPECTIVE, &savedPerspective);
     ECO_VIEW->UnknownVirtualSlot9(D3DRENDERSTATE_SHADEMODE, &savedShadeMode);
     // The three face normals: the quad's two sides and the face towards
     // the camera, the sides leaned back by a tenth of it.
-    right.x = -camera->field_0x17c.z;
-    right.z = camera->field_0x17c.x;
-    left.x = camera->field_0x17c.z;
-    left.z = -camera->field_0x17c.x;
-    back.x = -camera->field_0x17c.x;
-    back.z = -camera->field_0x17c.z;
+    right.x = -camera->direction.z;
+    right.z = camera->direction.x;
+    left.x = camera->direction.z;
+    left.z = -camera->direction.x;
+    back.x = -camera->direction.x;
+    back.z = -camera->direction.z;
     right.x = right.x - back.x * 0.1f;
     right.z = right.z - back.z * 0.1f;
     left.x = left.x - back.x * 0.1f;
@@ -763,16 +763,16 @@ int EcoSystem::UnknownVirtualSlot14() {
     unsigned int backColor = UnknownEcoLitColor(this, intensity.z);
     unsigned int rightColor = UnknownEcoLitColor(this, intensity.x);
     unsigned int leftColor = UnknownEcoLitColor(this, intensity.y);
-    float inverse = UnknownFunction460c70(camera->field_0x17c.x * camera->field_0x17c.x
-                                          + camera->field_0x17c.z * camera->field_0x17c.z);
-    float sine = inverse * camera->field_0x17c.x;
-    float cosine = inverse * camera->field_0x17c.z;
+    float inverse = UnknownFunction460c70(camera->direction.x * camera->direction.x
+                                          + camera->direction.z * camera->direction.z);
+    float sine = inverse * camera->direction.x;
+    float cosine = inverse * camera->direction.z;
     g_UnknownGlobal59af08 = 0;
     g_UnknownGlobal59af04 = 0;
     if (g_TrackGame->field_0x2d0)
         ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
-        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->field_0x20);
+        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->pixelFormat);
         for (i = 0; i < geometryCount; i++) {
             if (g_UnknownGlobal56a12c)
                 geometryList[i]->DrawGeometry(ECO_VIEW);
@@ -784,10 +784,10 @@ int EcoSystem::UnknownVirtualSlot14() {
         ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
         definitionTable[vegetation[0].definitionIndex]->billboardTexture->UnknownVirtualSlot19();
-        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->field_0x20);
+        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->pixelFormat);
         int next = 0;
         int remaining = billboardCount;
-        float widthScale = (float)(15.0 / ECO_VIEW->field_0x0c);
+        float widthScale = (float)(15.0 / ECO_VIEW->width);
         int stageLighting = g_UnknownGlobal59af14[detailLevel].stageLighting;
         float billboardRange = (float)g_UnknownGlobal59af14[detailLevel].billboardRange;
         int billboardLimit = g_UnknownGlobal59af14[detailLevel].billboardLimit;
@@ -803,7 +803,7 @@ int EcoSystem::UnknownVirtualSlot14() {
                 Vegetation* object = billboardList[next];
                 UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
                 float radius = definition->RadiusForParameter(object->radiusParam);
-                int depthKey = (unsigned short)object->field_0x06;
+                int depthKey = (unsigned short)object->sortKey;
                 float depth = depthKey * depthUnit;
                 if (depth < billboardRange && radius * projectionScale / depth > 2.0f) {
                     float height = definition->HeightForParameter(object->heightParam);
@@ -929,9 +929,9 @@ int EcoSystem::UnknownVirtualSlot14() {
                                                        g_UnknownGlobal59aee4, g_UnknownGlobal59aec0,
                                                        g_UnknownGlobal59aec8.UnknownFunction4cb690());
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Transforms %d",
-                                                       ECO_VIEW->field_0x38 - verticesBefore);
+                                                       ECO_VIEW->verticesDrawn - verticesBefore);
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Triangles  %d",
-                                                       ECO_VIEW->field_0x44 - trianglesBefore);
+                                                       ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);
     ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);

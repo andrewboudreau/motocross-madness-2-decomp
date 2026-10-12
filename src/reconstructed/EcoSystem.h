@@ -56,18 +56,18 @@ class UnknownEcoQuadTreeObject {
 public:
     virtual unsigned short UnknownVirtualSlot0();
     virtual unsigned int UnknownVirtualSlot1(class UnknownEcoQuadTree* tree);
-    UnknownEcoQuadTreeObject() { field_0x04 = 0; field_0x08 = (char)0xff; }
-    short field_0x04;                         // query stamp (ctor 0)
-    short field_0x06;                         // sort key, slot 0's result
-    char field_0x08;                          // object type id (ctor -1)
+    UnknownEcoQuadTreeObject() { queryStamp = 0; typeId = (char)0xff; }
+    short queryStamp;                         // +0x04: query stamp (ctor 0)
+    short sortKey;                            // +0x06: sort key, slot 0's result
+    char typeId;                              // +0x08: object type id (ctor -1)
 };
 
 // src/krusty2/broadphase/Quadtree.h: QuadTree (the global 0x0068aba4).
 class UnknownEcoQuadTree {
 public:
     unsigned char field_0x00[0x50];
-    float field_0x50;                         // world x extent
-    float field_0x54;                         // world z extent
+    float extentX;                            // +0x50: world x extent
+    float extentZ;                            // +0x54: world z extent
 
     unsigned int ComputeCode(float x0, float z0, float x1, float z1); // 0x004dc8c0
     void Insert(UnknownEcoQuadTreeObject* object, unsigned int code, float y0, float y1); // 0x004dcac0
@@ -89,19 +89,19 @@ public:
 // QuadTreeObject at +0, GraphicsTest : GameObject at +0xc).
 struct UnknownEcoHullShape {                // type 0
     unsigned char field_0x00[0xc8];
-    Matrix4 field_0xc8;                       // the shape's own transform
+    Matrix4 transform;                        // +0xc8: the shape's own transform
 };
 struct UnknownEcoCapsuleShape {             // type 3
     unsigned char field_0x00[0x20];
-    float field_0x20;                         // radius scale
-    float field_0x24;                         // endpoint scale
-    Matrix4 field_0x28;
+    float radiusScale;                        // +0x20: radius scale
+    float endpointScale;                      // +0x24: endpoint scale
+    Matrix4 transform;                        // +0x28
 };
 struct UnknownEcoSphereShape {              // type 4
     unsigned char field_0x00[0x14];
-    float field_0x14;                         // radius scale
-    float field_0x18;                         // centre scale
-    Matrix4 field_0x1c;
+    float radiusScale;                        // +0x14: radius scale
+    float centreScale;                        // +0x18: centre scale
+    Matrix4 transform;                        // +0x1c
 };
 class CollisionObject : public UnknownEcoQuadTreeObject, public GameObject {
 public:
@@ -114,8 +114,8 @@ public:
     void UnknownFunction435830(const Matrix4* m);                      // 0x00435830: SetTransform
 
     unsigned char field_0x38[0x50 - 0x38];
-    int field_0x50;                           // shape type (0 hull, 3 capsule, 4 sphere)
-    void* field_0x54;                         // the shape (by field_0x50)
+    int shapeType;                            // +0x50: 0 hull, 3 capsule, 4 sphere
+    void* shapeData;                          // +0x54: the shape (by shapeType)
     unsigned char field_0x58[0x64 - 0x58];
     int field_0x64;
     unsigned char field_0x68[0xb8 - 0x68];    // 0xb8 bytes (operator new at 0x00457f74)
@@ -126,9 +126,9 @@ public:
 class UnknownEcoLight {
 public:
     unsigned char field_0x00[0x54];
-    float field_0x54[4];                      // colour
+    float colour[4];                          // +0x54
     unsigned char field_0x64[0x70 - 0x64];
-    Vector3 field_0x70;                       // direction
+    Vector3 direction;                        // +0x70
 };
 class LightManager {
 public:
@@ -173,14 +173,14 @@ public:
     virtual int UnknownVirtualSlot32(const Matrix4* value); // projection matrix
 
     unsigned char field_0x004[0xac - 4];
-    Matrix4 field_0xac;                       // view matrix
+    Matrix4 viewMatrix;                       // +0xac
     unsigned char field_0xec[0x170 - 0xec];   // the clipper's matrix
-    Vector3 field_0x170;                      // position
-    Vector3 field_0x17c;                      // direction
+    Vector3 position;                         // +0x170
+    Vector3 direction;                        // +0x17c
     unsigned char field_0x188[0x198 - 0x188];
-    float field_0x198;                        // projection scale (the billboard size test)
+    float projectionScale;                    // +0x198: the billboard size test
     unsigned char field_0x19c[0x1c0 - 0x19c];
-    float field_0x1c0;                        // far distance
+    float farDistance;                        // +0x1c0
 };
 class UnknownEcoRenderTarget {
 public:
@@ -207,12 +207,12 @@ public:
     virtual void UnknownVirtualSlot19();
 
     unsigned char field_0x04[4];
-    UnknownEcoCamera* field_0x08;
-    int field_0x0c;                           // width
+    UnknownEcoCamera* camera;                 // +0x08
+    int width;                                // +0x0c
     unsigned char field_0x10[0x38 - 0x10];
-    int field_0x38;                           // vertices drawn
+    int verticesDrawn;                        // +0x38
     unsigned char field_0x3c[0x44 - 0x3c];
-    int field_0x44;                           // triangles drawn
+    int trianglesDrawn;                       // +0x44
 };
 
 // TextureMap.h: the texture objects the definitions hold.
@@ -239,7 +239,7 @@ public:
     virtual int UnknownVirtualSlot18(unsigned int key);
     virtual int UnknownVirtualSlot19();       // selects the texture
     unsigned char field_0x04[0x20 - 4];
-    int field_0x20;                           // pixel format
+    int pixelFormat;                          // +0x20
 };
 // 0x0050a590 (TextureMap.h): loads a texture through the manager.
 UnknownEcoTexture* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
@@ -399,9 +399,9 @@ extern UnknownEcoVisibilityClipper* g_visibilityClipper;        // 0x00575a98
 // (slot 22 is the registry query).
 struct UnknownEcoDisplay {
     unsigned char field_0x000[0x28];
-    int field_0x28;                           // colour-key texture format
+    int colorKeyFormat;                       // +0x28: colour-key texture format
     unsigned char field_0x02c[0x1c0 - 0x2c];
-    int field_0x1c0;                          // capability bits
+    int capabilityBits;                       // +0x1c0
 };
 // DebugOverlay.h: the overlay the draw prints its statistics on.
 class UnknownEcoDebugOverlay {
