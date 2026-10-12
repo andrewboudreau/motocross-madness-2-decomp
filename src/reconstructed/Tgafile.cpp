@@ -404,7 +404,7 @@ int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
     } else {
         UnknownPixel24 color;
         while (pixel < end) {
-            int packet = stream->UnknownFunction461980();
+            int packet = stream->ReadByte();
             if (packet & 0x80) {
                 packet &= 0x7f;
                 if (stream->Read(&color, 3, 1) != 1)
@@ -477,7 +477,7 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
     } else {
         UnknownPixel32 color;
         while (pixel < end) {
-            int packet = stream->UnknownFunction461980();
+            int packet = stream->ReadByte();
             if (packet & 0x80) {
                 packet &= 0x7f;
                 if (stream->Read(&color, 4, 1) != 1)
@@ -554,7 +554,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
     } else {
         unsigned short color;
         while (pixel < end) {
-            int packet = stream->UnknownFunction461980();
+            int packet = stream->ReadByte();
             if (packet & 0x80) {
                 packet &= 0x7f;
                 if (stream->Read(&color, 2, 1) != 1)

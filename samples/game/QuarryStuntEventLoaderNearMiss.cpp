@@ -808,12 +808,12 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
     UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
     if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {
-        camera->field_0x3b0->field_0x3bc->UnknownFunction444d40(1);
-        camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(1);
+        camera->field_0x3b0->field_0x3bc->SetLowestLod(1);
+        camera->field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(1);
         if (!camera->field_0x3b0->field_0x3bc->currentLod)
-            camera->field_0x3b0->field_0x3bc->UnknownFunction444d00(1);
+            camera->field_0x3b0->field_0x3bc->SetLod(1);
         if (!camera->field_0x3b0->field_0x5c4->field_0x1a0->currentLod)
-            camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d00(1);
+            camera->field_0x3b0->field_0x5c4->field_0x1a0->SetLod(1);
     }
     camera->field_0x394 = bike;
     camera->field_0x391 = 0;
@@ -826,8 +826,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     camera->field_0x274 = 0;
     camera->field_0x3b4 = bike;
     if (!bike->field_0x740->field_0x18c) {
-        bike->field_0x3bc->UnknownFunction444d40(0);
-        camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(0);
+        bike->field_0x3bc->SetLowestLod(0);
+        camera->field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(0);
     }
     camera->field_0x274 = 0;
     if (statsOverlay)

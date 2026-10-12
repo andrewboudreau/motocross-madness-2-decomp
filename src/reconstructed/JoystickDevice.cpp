@@ -25,7 +25,7 @@ JoystickDevice::~JoystickDevice() {}
 // only "none" (0, 0x80000000 or 0x3f) is accepted.
 int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry) {
     KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
-    if (((keyboard && keyboard->UnknownFunction48a240(modifier)) ||
+    if (((keyboard && keyboard->ModifierHolds(modifier)) ||
          (!keyboard && (modifier == 0 || modifier == (int)0x80000000 || modifier == 0x3f))) &&
         buttonStates[button].state == 1) {
         if (entry) {
@@ -83,7 +83,7 @@ void JoystickDevice::UnknownVirtualSlot0(int id) {
 }
 
 // 0x00489c00
-void JoystickDevice::UnknownFunction489c00(int axis, float value, float range) {
+void JoystickDevice::FeedAxis(int axis, float value, float range) {
     for (int i = 0; i < axisBindings[axis].m_count; i++)
         axisBindings[axis].Get(i)->SetFromAxis(value, range);
 }

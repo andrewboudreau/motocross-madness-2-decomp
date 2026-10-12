@@ -2114,7 +2114,7 @@ void UIDialog::UnknownFunction46ffd0(void* background) {
 }
 
 // 0x00470000
-int UIDialog::UnknownFunction470000(UIControl* control, int a, int b) {
+int UIDialog::RequestHover(UIControl* control, int a, int b) {
     return guiUser->RequestHover((UnknownGuiControl*)control,
                                                                     (UnknownGuiControl**)a, b);
 }
@@ -2266,7 +2266,7 @@ UIControl::~UIControl() {
             tip = ownerDialog->guiUser->userToolTip;
         }
         if (ownerDialog->guiUser && ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
-            ownerDialog->UnknownFunction470000(0, 0, 1);
+            ownerDialog->RequestHover(0, 0, 1);
             tip = ownerDialog->guiUser->userToolTip;
         }
         if (tip)
@@ -2585,7 +2585,7 @@ int UIControl::UpdateHoverAt(int* position) {
             GUIUser* user = ownerDialog->guiUser;
             UnknownGuiControl* hover = user->hoverControl;
             if (!user->controlDown[0] && !user->controlDown[1] && hover != (UnknownGuiControl*)this) {
-                result = ownerDialog->UnknownFunction470000(this, 0, 0);
+                result = ownerDialog->RequestHover(this, 0, 0);
             } else if (hover == (UnknownGuiControl*)this) {
                 if (user->pendingHoverControl && user->pendingHoverControl != (UnknownGuiControl*)this)
                     user->RequestHover((UnknownGuiControl*)this, 0, 0);
@@ -3997,7 +3997,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         dialogBackground->MarkAllDirty();
     if (user && !user->pointerDevice) {
         GameObjectIterator iterator(controlContainer, 1, "UIControl");
-        UnknownFunction470000((UIControl*)iterator.Next(), 0, 0);
+        RequestHover((UIControl*)iterator.Next(), 0, 0);
     }
     UpdateBoundValues(0);
     sendFrameEvent = 1;

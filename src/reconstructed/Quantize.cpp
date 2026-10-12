@@ -59,7 +59,7 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
         } else {
             if (stream->Read(buffer, size, 1) != 1)
                 return;
-            UnknownFunction4a03d0(entries[0], buffer, 0x300);
+            ExpandLzw(entries[0], buffer, 0x300);
         }
         if (stream->Read(&size, 4, 1) != 1)
             return;
@@ -69,7 +69,7 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
         } else {
             if (stream->Read(buffer, size, 1) != 1)
                 return;
-            UnknownFunction4a03d0(indexFrom555, buffer, 0x8000);
+            ExpandLzw(indexFrom555, buffer, 0x8000);
         }
         if (stream->Read(&size, 4, 1) != 1)
             return;
@@ -79,7 +79,7 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
         } else {
             if (stream->Read(buffer, size, 1) != 1)
                 return;
-            UnknownFunction4a03d0(indexFrom565, buffer, 0x10000);
+            ExpandLzw(indexFrom565, buffer, 0x10000);
         }
         DebugFree(buffer, __FILE__, 261);
     } else {

@@ -10,4 +10,4 @@
 // 0x004a03d0: decodes the LZW stream at `input` into `output`. `size` sets
 // the bit reader's limit (size * 8 bits); callers pass the decoded size.
 // The stream starts with a 32-bit word the decoder skips.
-void UnknownFunction4a03d0(unsigned char* output, const void* input, int size);
+void ExpandLzw(unsigned char* output, const void* input, int size);

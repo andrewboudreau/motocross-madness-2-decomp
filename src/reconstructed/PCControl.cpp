@@ -137,7 +137,7 @@ int PCControlInterface::UnknownVirtualSlot2(int control, int modifier) {
 // 0x004bf5e0
 int PCControlInterface::UnknownVirtualSlot4(int modifier) {
     if (keyboard)
-        return keyboard->UnknownFunction48a240(modifier);
+        return keyboard->ModifierHolds(modifier);
     return 0;
 }
 

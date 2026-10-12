@@ -663,7 +663,7 @@ int UnknownDisplay::SetGDISurfaceVisible(int enable) {
                 return 0;
             if (directDraw->GetGDISurface(&gdi))
                 return 0;
-            g_TrackGame->renderTarget->UnknownFunction4e8cc0();
+            g_TrackGame->renderTarget->AdvanceFrame();
             if (++i > frameBufferCount)
                 return 0;
         } while (primarySurface != gdi);

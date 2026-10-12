@@ -410,14 +410,14 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                             UIControl* next = focus->PreviousFocusableControl();
                             joystickCentred = 0;
                             if (next)
-                                UnknownFunction470000(next, 0, 0);
+                                RequestHover(next, 0, 0);
                         }
                     } else if (x >= 1) {
                         if (joystickCentred) {
                             UIControl* next = focus->NextFocusableControl();
                             joystickCentred = 0;
                             if (next)
-                                UnknownFunction470000(next, 0, 0);
+                                RequestHover(next, 0, 0);
                         }
                     } else if (y <= -1) {
                         if (joystickCentred)
@@ -851,7 +851,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     char buffer[0x2800];
     parameters.GetSectionNames(buffer, sizeof(buffer));
     UnknownTokenizer* sections = new(__FILE__, 0x273) UnknownTokenizer(buffer);
-    for (char* name = sections->UnknownFunction515df0("?"); name; name = sections->UnknownFunction515df0("?")) {
+    for (char* name = sections->NextToken("?"); name; name = sections->NextToken("?")) {
         if (!_strnicmp(name, "Set_Anim", strlen("Set_Anim"))) {
             setType = 1;
         } else if (!_strnicmp(name, "Set_Sound", strlen("Set_Sound"))) {
@@ -1151,7 +1151,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     imageTable[imageCount]->SetFrameCount(loops);
                     parameters.GetString("Files1", "", buffer, -1);
                     UnknownTokenizer files(buffer);
-                    for (char* file = files.UnknownFunction515df0(","); file; file = files.UnknownFunction515df0(",")) {
+                    for (char* file = files.NextToken(","); file; file = files.NextToken(",")) {
                         if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1))
                             imageTable[imageCount]->LoadFromModule(
                                 sectionTable[i].sectionName, (int)g_UnknownResourceManager572b44, (int)soundGroup,

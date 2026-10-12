@@ -87,10 +87,10 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
 // failure path of the four tests falls through, as in retail.
 static inline int HeaderMatches(UnknownTextureStream* stream)
 {
-    if (stream->UnknownFunction461980() != stream->field_0x02
-        || stream->UnknownFunction461980() != stream->field_0x00
-        || stream->UnknownFunction461980() != stream->field_0x20
-        || stream->UnknownFunction461980() != stream->field_0x18) {
+    if (stream->ReadByte() != stream->field_0x02
+        || stream->ReadByte() != stream->field_0x00
+        || stream->ReadByte() != stream->field_0x20
+        || stream->ReadByte() != stream->field_0x18) {
         return 0;
     }
     return 1;

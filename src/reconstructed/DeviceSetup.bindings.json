@@ -44,7 +44,7 @@
   "?WriteIniString@@YAXPBD000@Z": "0x0047ba80",
   "?UnknownFunction489a20@JoystickDevice@@QAEHPAUUnknownControlBinding@@MM@Z": "0x00489a20",
   "?UnknownFunction489f80@KeyboardDevice@@QAEHPAUUnknownControlBinding@@HHMM@Z": "0x00489f80",
-  "?UnknownFunction48a420@MouseDevice@@QAEHPAUUnknownControlBinding@@@Z": "0x0048a420",
+  "?AttachBinding@MouseDevice@@QAEHPAUUnknownControlBinding@@@Z": "0x0048a420",
   "?g_IsWindowsNT@@3HA": "0x0059ada8",
   "?g_KeyboardSubtype@@3HA": "0x005691f8",
   "?g_Pc98ScanCodes@@3PAHA": "0x00568df8",

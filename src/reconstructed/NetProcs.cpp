@@ -65,7 +65,7 @@ void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
         control->BindValue(&g_TrackGame->mode.selectedSession);
         UpdateBoundValues(0);
         control->SelectRow(0);
-        UnknownFunction470000(control, 0, 0);
+        RequestHover(control, 0, 0);
         if (openingMenu != 0x85d)
             AddTimer(0, 1000, 0);
         break;
@@ -139,14 +139,14 @@ void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
                 event->handled = 1;
             }
         } else if (event->code == 0xf) {
-            guiManager->UnknownFunction4865e0(guiManager->waitCursorImage, 1);
+            guiManager->RecreateCursors(guiManager->waitCursorImage, 1);
             g_SessionListCount = 0;
             long result = g_TrackGame->network->EnumSessions(
                 (SessionInfoType*)g_TrackGame->mode.sessions.field_0x00, &g_SessionListCount, 0x81);
             if (g_SessionListCount > 0 && result >= 0 &&
                 g_TrackGame->network->JoinSession(
                     (const GUID*)g_TrackGame->mode.sessions.field_0x00[0].instance, 0)) {
-                guiManager->UnknownFunction4865e0(guiManager->cursorImage, 1);
+                guiManager->RecreateCursors(guiManager->cursorImage, 1);
                 g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
@@ -155,7 +155,7 @@ void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
                     ReportDirectPlayError(result, __FILE__, 207);
                 EndNetworkGame();
                 EnsureNetworkInterface();
-                guiManager->UnknownFunction4865e0(guiManager->cursorImage, 1);
+                guiManager->RecreateCursors(guiManager->cursorImage, 1);
                 g_TrackGame->ui->OpenMenu(kMenuConnectError);
             }
         } else if (event->code == 0xd) {

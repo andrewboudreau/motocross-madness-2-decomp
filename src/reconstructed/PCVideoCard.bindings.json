@@ -42,7 +42,7 @@
   "?TestPartialTextureUpload@@YAHPAVPCRenderTarget@@PAUUnknownRect@@PAVPCTextureMap@@22PAUUnknownDisplay@@H@Z": "0x004caf70",
   "?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z": "0x004cb330",
   "?SetGDISurfaceVisible@UnknownDisplay@@QAEHH@Z": "0x004cb5b0",
-  "?UnknownFunction4e8cc0@RenderTarget@@QAEXXZ": "0x004e8cc0",
+  "?AdvanceFrame@RenderTarget@@QAEXXZ": "0x004e8cc0",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?FillPixelFormat@@YAXHPAX@Z": "0x005119c0",
   "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",

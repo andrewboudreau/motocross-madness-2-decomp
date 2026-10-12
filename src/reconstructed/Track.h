@@ -101,10 +101,10 @@ public:
     // lands in `out`), and otherwise one on the nodes of the work list
     // `path` (passed as an int). Returns whether one was accepted.
     int PlaceNear(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out);
-    int UnknownFunction517930(TrackListItem** list, int all);
+    int FreeWorkList(TrackListItem** list, int all);
     int IsAtOrAfter(TrackPos a, TrackPos b);
-    int UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
-    float UnknownFunction517da0(TrackPos a, TrackPos b);
+    int ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
+    float DistanceAlong(TrackPos a, TrackPos b);
     int UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
     int UnknownFunction518080(TrackPos pos, TrackVec3* out);
     int UnknownFunction518130(TrackSegment* segment, TrackVec3* out);

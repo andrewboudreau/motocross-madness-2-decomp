@@ -49,7 +49,7 @@
   "?UnknownFunction485d70@UnknownKrustyUIGui@@QAEXPBD@Z": "0x00485d70",
   "?CreateBackground@UnknownKrustyUIGui@@QAEXXZ": "0x00485ef0",
   "?GetUser@UnknownKrustyUIGui@@QAEPAUUnknownKrustyUIGuiLayer@@H@Z": "0x00486540",
-  "?UnknownFunction486560@UnknownKrustyUIGui@@QAEXPBD@Z": "0x00486560",
+  "?SetWaitCursorImage@UnknownKrustyUIGui@@QAEXPBD@Z": "0x00486560",
   "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
   "?UnknownFunction4866c0@UnknownKrustyUIGui@@QAEXPAD@Z": "0x004866c0",
   "?AcceptDevice@UnknownKrustyUIGuiLayer@@QAEXH@Z": "0x00487c30",

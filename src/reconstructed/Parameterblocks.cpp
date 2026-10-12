@@ -372,12 +372,12 @@ int UnknownParameterBlock::ReadString(const char* key, char* out, int size)
         strncpy(text, loadedLines[i], length);
         text[length] = 0;
         UnknownTokenizer tokens(text);
-        char* token = tokens.UnknownFunction515df0("=\n");
+        char* token = tokens.NextToken("=\n");
         int tokenLength = strlen(token);
         length = PB_MIN(PB_LINE_SIZE - 1, tokenLength);
         strncpy(name, token, length);
         name[length] = 0;
-        char* value = tokens.UnknownFunction515df0("\n");
+        char* value = tokens.NextToken("\n");
         if (value && _stricmp(name, key) == 0) {
             if (*value == '"')
                 value++;
@@ -505,11 +505,11 @@ int UnknownParameterBlock::ReadRow(char* raw)
         strcpy(raw, line);
     StripBlanks(line, stripped);
     UnknownTokenizer tokens(stripped);
-    char* token = tokens.UnknownFunction515df0(",\n");
+    char* token = tokens.NextToken(",\n");
     valueCount = 0;
     while (token) {
         ParseParameterValue(token, &rowValues[valueCount]);
-        token = tokens.UnknownFunction515df0(",\n");
+        token = tokens.NextToken(",\n");
         valueCount++;
     }
     rowIndex++;

@@ -272,7 +272,7 @@
   "?UnknownFunction46ff60@UIDialog@@QAEXXZ": "0x0046ff60",
   "?UnknownFunction46ffc0@UIDialog@@QAEXH@Z": "0x0046ffc0",
   "?UnknownFunction46ffd0@UIDialog@@QAEXPAX@Z": "0x0046ffd0",
-  "?UnknownFunction470000@UIDialog@@QAEHPAVUIControl@@HH@Z": "0x00470000",
+  "?RequestHover@UIDialog@@QAEHPAVUIControl@@HH@Z": "0x00470000",
   "?UnknownFunction470070@UIDialog@@QAEXHHPAUCameraRect@@@Z": "0x00470070",
   "?FindLastAnchor@UIControl@@QAEPAV1@PAV1@@Z": "0x00470850",
   "?RunTransition@UIControl@@QAEHXZ": "0x00471500",

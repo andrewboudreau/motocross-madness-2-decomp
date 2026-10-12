@@ -12,7 +12,7 @@
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
 
 // cdecl 0x00461d40: formatted output to `file`.
-void UnknownFunction461d40(FILE* file, const char* format, ...);
+void FilePrintf(FILE* file, const char* format, ...);
 
 // Texels of a square level-`level` texture (1 for level 0, none below).
 static inline int LevelArea(int level) {
@@ -160,18 +160,18 @@ void ManagedTextureGroup::RestoreLostPages() {
 void ManagedTextureGroup::WriteDebugReport() {
     FILE* file = fopen("C:\\temp\\TM_debug.txt", "a");
     if (file) {
-        UnknownFunction461d40(file, "----------------------------------------------------------------------\n");
-        UnknownFunction461d40(file, "Texture Format: %d  Cache Textures: %d  Mgd Textures: %d\n", field_0x0c,
+        FilePrintf(file, "----------------------------------------------------------------------\n");
+        FilePrintf(file, "Texture Format: %d  Cache Textures: %d  Mgd Textures: %d\n", field_0x0c,
                               field_0x54.m_count, field_0x44.m_count);
         TextureMap* texture = field_0x44.First();
         for (int index = 1; texture; texture = field_0x44.Next()) {
             ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
-            UnknownFunction461d40(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->field_0x14,
+            FilePrintf(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->field_0x14,
                                   managed->field_0x18, managed->largestUse);
             if (managed->largestUse > 0.0f)
-                UnknownFunction461d40(file, ", Allocd=%d unhappy=%.2f", managed->field_0xa8,
+                FilePrintf(file, ", Allocd=%d unhappy=%.2f", managed->field_0xa8,
                                       managed->UnknownFunction5109b0());
-            UnknownFunction461d40(file, "\n");
+            FilePrintf(file, "\n");
         }
         fclose(file);
     }

@@ -35,9 +35,9 @@ public:
     virtual void UnknownVirtualSlot18(int value); // 0x004806f0 (shared empty body)
     virtual void UnknownVirtualSlot19();          // 0x0044d710 (shared empty body)
 
-    void UnknownFunction4e8ca0(UnknownDisplay* display); // 0x004e8ca0: sets +0x04
-    void UnknownFunction4e8cc0();                        // 0x004e8cc0: advances the frame counters
-    void UnknownFunction4e8cf0(Camera* camera);          // 0x004e8cf0: sets the current camera
+    void SetDisplay(UnknownDisplay* display); // 0x004e8ca0: sets +0x04
+    void AdvanceFrame();                        // 0x004e8cc0: advances the frame counters
+    void SetCamera(Camera* camera);          // 0x004e8cf0: sets the current camera
 
     UnknownDisplay* field_0x04;
     Camera* field_0x08;                  // current camera

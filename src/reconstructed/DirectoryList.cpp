@@ -116,12 +116,12 @@ DirectoryList::DirectoryList() {
 }
 
 // 0x0044a1d0
-void DirectoryList::UnknownFunction44a1d0(const char* directory) {
+void DirectoryList::SetDirectory(const char* directory) {
     COPY_NAME(this->directory, directory);
 }
 
 // 0x0044a220
-void DirectoryList::UnknownFunction44a220(const char* pattern, int includeFiles) {
+void DirectoryList::SetPattern(const char* pattern, int includeFiles) {
     COPY_NAME(this->pattern, pattern);
     this->includeFiles = includeFiles;
 }
@@ -152,7 +152,7 @@ int DirectoryList::UnknownFunction44a2f0(int index, char* name) {
 }
 
 // 0x0044a3b0
-int DirectoryList::UnknownFunction44a3b0(char* path) {
+int DirectoryList::NextEntry(char* path) {
     strcpy(path, "");
     if (++current >= count) {
         current = count - 1;
@@ -163,7 +163,7 @@ int DirectoryList::UnknownFunction44a3b0(char* path) {
 }
 
 // 0x0044a440
-int DirectoryList::UnknownFunction44a440(char* path) {
+int DirectoryList::CurrentEntry(char* path) {
     strcpy(path, "");
     if (count > 0) {
         strcpy(path, entries[current].name);
@@ -173,14 +173,14 @@ int DirectoryList::UnknownFunction44a440(char* path) {
 }
 
 // 0x0044a4c0
-int DirectoryList::UnknownFunction44a4c0(char* name) {
+int DirectoryList::NextName(char* name) {
     char drive[_MAX_DRIVE];
     char fileName[_MAX_FNAME];
     char path[MAX_PATH];
     char extension[_MAX_EXT];
     char dir[_MAX_DIR];
 
-    if (!UnknownFunction44a3b0(path))
+    if (!NextEntry(path))
         return 0;
     _splitpath(path, drive, dir, fileName, extension);
     strcpy(name, fileName);
@@ -188,7 +188,7 @@ int DirectoryList::UnknownFunction44a4c0(char* name) {
 }
 
 // 0x0044a550
-int DirectoryList::UnknownFunction44a550(char* name) {
+int DirectoryList::CurrentName(char* name) {
     char drive[_MAX_DRIVE];
     char fileName[_MAX_FNAME];
     char path[MAX_PATH];
@@ -196,7 +196,7 @@ int DirectoryList::UnknownFunction44a550(char* name) {
     char dir[_MAX_DIR];
 
     strcpy(name, "");
-    if (!UnknownFunction44a440(path))
+    if (!CurrentEntry(path))
         return 0;
     _splitpath(path, drive, dir, fileName, extension);
     strcpy(name, fileName);
@@ -274,8 +274,8 @@ int DirectoryList::UnknownFunction44a960(const char* path) {
 
     if (!list)
         return 0;
-    list->UnknownFunction44a1d0(path);
-    list->UnknownFunction44a220("*", 1);
+    list->SetDirectory(path);
+    list->SetPattern("*", 1);
     list->UnknownVirtualSlot1();
     for (i = 0; i < list->count; i++) {
         sprintf(child, "%s\\%s", path, list->entries[i].name);
@@ -347,12 +347,12 @@ int CombinedDirectoryList::UnknownVirtualSlot1() {
     second = new (__FILE__, 465) DirectoryList;
     if (!first || !second)
         return 0;
-    first->UnknownFunction44a220(pattern, 1);
-    first->UnknownFunction44a1d0(field_0x21c);
+    first->SetPattern(pattern, 1);
+    first->SetDirectory(field_0x21c);
     first->UnknownVirtualSlot1();
     first->UnknownFunction44aab0();
-    second->UnknownFunction44a220(pattern, 1);
-    second->UnknownFunction44a1d0(field_0x320);
+    second->SetPattern(pattern, 1);
+    second->SetDirectory(field_0x320);
     second->UnknownVirtualSlot1();
     second->UnknownFunction44aab0();
 

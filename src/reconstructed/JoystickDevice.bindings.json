@@ -15,7 +15,7 @@
   "?GetJoystickButton@UnknownControlMapping@@QAEXHPAHH@Z": "0x0043cbd0",
   "?SetKeys@UnknownControlBinding@@QAEXHH@Z": "0x0043cce0",
   "?SetFromAxis@UnknownControlBinding@@QAEXMM@Z": "0x0043cd20",
-  "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
+  "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__:containerlist.h": "0x005666e4",

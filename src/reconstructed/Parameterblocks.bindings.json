@@ -37,7 +37,7 @@
   "?FindItem@UnknownParameterArchive@@QAEPAUUnknownParameterArchiveEntry@@PBDH@Z": "0x004e9360",
   "?AddLooseFile@UnknownParameterArchive@@QAEXPBD0@Z": "0x004e9430",
   "??0UnknownTokenizer@@QAE@PAD@Z": "0x00515dc0",
-  "?UnknownFunction515df0@UnknownTokenizer@@QAEPADPBD@Z": "0x00515df0",
+  "?NextToken@UnknownTokenizer@@QAEPADPBD@Z": "0x00515df0",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",

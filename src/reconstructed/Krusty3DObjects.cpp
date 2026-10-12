@@ -126,28 +126,28 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     point = position + direction * 6.0f;
     field_0x34->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
-    lightModels[0]->UnknownFunction4014f0(&point);
-    lightModels[0]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[0]->SetPosition(&point);
+    lightModels[0]->SetAxes(&direction, &normal, 1, 0);
     point = position + direction * 3.0f;
     field_0x34->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
-    lightModels[1]->UnknownFunction4014f0(&point);
-    lightModels[1]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[1]->SetPosition(&point);
+    lightModels[1]->SetAxes(&direction, &normal, 1, 0);
     point = position;
     field_0x34->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
-    lightModels[2]->UnknownFunction4014f0(&point);
-    lightModels[2]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[2]->SetPosition(&point);
+    lightModels[2]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 3.0f;
     field_0x34->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
-    lightModels[3]->UnknownFunction4014f0(&point);
-    lightModels[3]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[3]->SetPosition(&point);
+    lightModels[3]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 6.0f;
     field_0x34->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
-    lightModels[4]->UnknownFunction4014f0(&point);
-    lightModels[4]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[4]->SetPosition(&point);
+    lightModels[4]->SetAxes(&direction, &normal, 1, 0);
     return 1;
 }
 
@@ -334,21 +334,21 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
             if (index >= 5 || index < 0 || !field_0x38[index])
                 return 1;
             field_0x38[index]->isVisible = 1;
-            field_0x38[index]->UnknownFunction401520(&forward, &up, 0, 1);
+            field_0x38[index]->SetAxes(&forward, &up, 0, 1);
             Vector3 position = field_0x34->eyePosition;
             position += up * 2.5f;
             position += forward * 6.0f;
-            field_0x38[index]->UnknownFunction4014f0(&position);
+            field_0x38[index]->SetPosition(&position);
         } else {
             index = 5 - (int)field_0x2c->field_0x38->field_0x76c;
             if (index >= 5 || index < 0 || !field_0x38[index])
                 return 1;
             field_0x38[index]->isVisible = 1;
-            field_0x38[index]->UnknownFunction401520(&forward, &up, 0, 1);
+            field_0x38[index]->SetAxes(&forward, &up, 0, 1);
             Vector3 position = field_0x34->eyePosition;
             position += up * 2.5f;
             position += forward * 6.0f;
-            field_0x38[index]->UnknownFunction4014f0(&position);
+            field_0x38[index]->SetPosition(&position);
         }
     }
     return 1;

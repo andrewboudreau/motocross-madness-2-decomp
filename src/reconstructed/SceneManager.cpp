@@ -1196,23 +1196,23 @@ void Scene::SetDetailLevel(int level)
         int i;
         for (i = 0; i < animationTable->entryCount; i++) {
             if (animationTable->entries[i].keyFramed)
-                animationTable->entries[i].character->field_0x1a0->UnknownFunction4451e0(level);
+                animationTable->entries[i].character->field_0x1a0->ApplyLodSettings(level);
             else
                 ((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)
-                    ->field_0x34->UnknownFunction4451e0(level);
+                    ->field_0x34->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
-                entry->character->field_0x1a0->UnknownFunction4451e0(level);
+                entry->character->field_0x1a0->ApplyLodSettings(level);
             else
-                ((UnknownSceneAnimatedObject*)entry->proceduralObject)->field_0x34->UnknownFunction4451e0(level);
+                ((UnknownSceneAnimatedObject*)entry->proceduralObject)->field_0x34->ApplyLodSettings(level);
         }
     }
     if (staticModels) {
         for (int i = 0; i < staticModels->casterCount; i++) {
             if (staticModels->casters[i].model) {
-                ((UnknownSceneLodObject*)staticModels->casters[i].model)->UnknownFunction4451e0(level);
+                ((UnknownSceneLodObject*)staticModels->casters[i].model)->ApplyLodSettings(level);
                 if (!staticModels->casters[i].useLighting)
                     ((UnknownSceneLodObject*)staticModels->casters[i].model)->UnknownFunction4444c0(0);
             }

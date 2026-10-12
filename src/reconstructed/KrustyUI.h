@@ -38,14 +38,14 @@ public:
                       int d, const char* font, int fontSize, const char* cursor,
                       void (*progress)(), int e);
     void UnknownFunction485d70(const char* directory);       // 0x00485d70 ("ui")
-    void UnknownFunction486560(const char* image);           // 0x00486560 ("ui\\wait.tga")
+    void SetWaitCursorImage(const char* image);           // 0x00486560 ("ui\\wait.tga")
     void UnknownFunction4866c0(char* font);                  // 0x004866c0
     void ShowCursors(int value);                             // 0x00486630
     void CloseDialogResource();                            // 0x00485d50 (KrustyUI 0x004999b0)
     UnknownTrackGameObject56cItem* FindInputDialog();        // 0x00485df0
     void CreateBackground();                                 // 0x00485ef0
     UnknownKrustyUIGuiLayer* GetUser(int index); // 0x00486540: layer `index` (0 past 3)
-    void UnknownFunction486590(const char* image, int visible); // 0x00486590 (bikerace.cpp: "ui\\cursor.tga")
+    void CreateCursors(const char* image, int visible); // 0x00486590 (bikerace.cpp: "ui\\cursor.tga")
     void EnableWindowClipper(int value);                     // 0x004868b0
     // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
     // 0, 0, 1).
@@ -113,8 +113,8 @@ public:
     // an archive entry or a file (in "Res" when it has no directory; then
     // `text` gets that path). Otherwise `text` gets a random bike (+0x50) or
     // rider (+0x58) name and they return 0.
-    int UnknownFunction49b560(const char* name, char* text, int size);
-    int UnknownFunction49b7f0(const char* name, char* text, int size);
+    int ResolveBikeFile(const char* name, char* text, int size);
+    int ResolveRiderFile(const char* name, char* text, int size);
     void UnknownFunction499b00();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
     void OpenExitDialog();             // 0x0049a4a0: opens the exit dialog
@@ -130,9 +130,9 @@ public:
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
     void LoadBikesAndRiders();                // 0x0049a8b0: bikes.pb and riders.pb
     GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
-    void UnknownFunction498cf0(int value);                         // 0x00498cf0
+    void BuildGarageScene(int value);                         // 0x00498cf0
     void OpenMenu(int menu);                                       // 0x00499b20: opens a menu
-    void UnknownFunction49b530();                                  // 0x0049b530
+    void StepProgressBar();                                  // 0x0049b530
     // 0x0049bbb0: records the finished race in the high-score tables
     // (TrackGame+0x3400): table 0, then 1 and 2 by laps (5, 10) or, in
     // modes 0 and 4, by the +0x140 setting (5.0, 10.0).

@@ -53,7 +53,7 @@ void PCMouseDevice::UnknownVirtualSlot3() {
 // a keyboard); copies its entry.
 int PCMouseDevice::UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) {
     KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
-    if ((!keyboard || keyboard->UnknownFunction48a240(modifier)) &&
+    if ((!keyboard || keyboard->ModifierHolds(modifier)) &&
         buttonStates[button].state == 1) {
         if (entry) {
             entry->state = 1;

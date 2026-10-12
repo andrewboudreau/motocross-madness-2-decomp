@@ -79,7 +79,7 @@
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
+  "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?Attach@Overlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUUnknownOverlayRect@@H2MDPBDPAPBDHHH@Z": "0x004b5f50",
   "?RestoreRect@Overlay@@QAEHPBUUnknownOverlayRect@@@Z": "0x004b6710",

@@ -48,7 +48,7 @@ public:
     int Seek(int offset, int origin, int flag); // 0x00461340: seeks
     int Tell();
     int Read(void* buffer, int size, int count);
-    int UnknownFunction461980();              // 0x00461980: reads a byte
+    int ReadByte();              // 0x00461980: reads a byte
     int ReadLine(char* buffer, int size); // 0x00461aa0: reads a line (CarProcedural.cpp)
     int UnknownFunction461cb0(int* time, int* size); // 0x00461cb0: _fstat times (SceneManager 0x004ea0fd)
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the

@@ -45,7 +45,7 @@ int PCKeyboardDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInpu
 
 // 0x004c4570: whether `key` is down with `modifier` held; copies its entry.
 int PCKeyboardDevice::UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry) {
-    if (UnknownFunction48a240(modifier) && keyStates[key].state == 1) {
+    if (ModifierHolds(modifier) && keyStates[key].state == 1) {
         if (entry) {
             entry->state = 1;
             entry->releaseTime = keyStates[key].releaseTime;

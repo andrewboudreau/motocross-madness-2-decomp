@@ -252,7 +252,7 @@ int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
 
 // 0x0041d1e0
 int BikeRace::UpdateTrackSeparation() {
-    if (raceTrack != 0 && raceTrack->UnknownFunction517da0(finishProbe.field_0x2c, startProbe.field_0x2c) > 0.0f) {
+    if (raceTrack != 0 && raceTrack->DistanceAlong(finishProbe.field_0x2c, startProbe.field_0x2c) > 0.0f) {
         field_0x189 = 0;
     } else {
         field_0x189 = 1;
@@ -586,7 +586,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->field_0x25_bit0) {
                     position = localRacer->carriedFlagPosition;
                     position.y += 4.25f;
-                    ((ArcadeObject*)field_0x060)->UnknownFunction4014f0(&position);
+                    ((ArcadeObject*)field_0x060)->SetPosition(&position);
                 }
                 if (field_0x194 > 0.0f && g_TrackGame->mode.field_0x6b4 != 1) {
                     field_0x194 -= g_TrackGame->frameTime;
@@ -605,9 +605,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     int last = lap == laps - 1;
                     int previous = lap == laps - 2;
                     if (previous || last) {
-                        float toFinish = raceTrack->UnknownFunction517da0(localRacer->statusNode->field_0x44,
+                        float toFinish = raceTrack->DistanceAlong(localRacer->statusNode->field_0x44,
                                                                             finishProbe.field_0x2c);
-                        float fromFinish = raceTrack->UnknownFunction517da0(finishProbe.field_0x2c,
+                        float fromFinish = raceTrack->DistanceAlong(finishProbe.field_0x2c,
                                                                               localRacer->statusNode->field_0x44);
                         if (field_0x078 && localRacer->finished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
@@ -831,7 +831,7 @@ int BikeRace::UnknownVirtualSlot20(int value) {
 int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int result;
     if (g_TrackGame->network != 0 && event->kind == 0) {
-        g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(0xc);
+        g_TrackGame->controlInterface->keyboard->ModifierHolds(0xc);
     }
     if (field_0x190 && chatOverlay != 0) {
         if (event->control == 1 && event->kind == 0) {
@@ -1018,7 +1018,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
 
             if (TestInputEvent(0x1c, 0, event, 0x80)) {
                 if (g_TrackGame->ui->gui->GetUser(0)->field_0x30 == 0) {
-                    g_TrackGame->ui->gui->UnknownFunction486590("ui\\cursor.tga", 0);
+                    g_TrackGame->ui->gui->CreateCursors("ui\\cursor.tga", 0);
                 }
                 if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
                           ->GetUser(0)->field_0x30)->field_0x25_bit0) {
@@ -1432,9 +1432,9 @@ void BikeRace::RestartReplay() {
     char bikeName[0x40];
     sprintf(model, "%s\\%s", "Res", "Ghost.mcf");
     sprintf(rider, "%s\\GhostRider.mcf", "Res");
-    g_TrackGame->ui->UnknownFunction49b560(g_TrackGame->mode.field_0x1974.field_0x40,
+    g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.field_0x1974.field_0x40,
                                                      riderName, 0x3f);
-    g_TrackGame->ui->UnknownFunction49b7f0(g_TrackGame->mode.field_0x1974.field_0x80,
+    g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.field_0x1974.field_0x80,
                                                      bikeName, 0x3f);
     replayVcr->UnknownFunction49c070(0, 0, 0, g_TrackGame->mode.field_0x00, model, rider,
                                        riderName, bikeName, aiRacers[0]->engineSize,
@@ -1940,7 +1940,7 @@ void BikeRace::DrawTrack(Track* track) {
                     TrackListItem* next =
                         (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 0x13c9);
                     if (next == 0) {
-                        track->UnknownFunction517930(&list, 0);
+                        track->FreeWorkList(&list, 0);
                         return;
                     }
                     next->node = item->node->links[i];
@@ -2024,17 +2024,17 @@ int BikeRace::UnknownVirtualSlot14() {
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
     g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
-    localRacer->field_0x3bc->UnknownFunction4451e0(level);
-    localRacer->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);
+    localRacer->field_0x3bc->ApplyLodSettings(level);
+    localRacer->field_0x5c4->field_0x1a0->ApplyLodSettings(level);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
         for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
-            aiRacers[i]->field_0x3bc->UnknownFunction4451e0(level);
-            aiRacers[i]->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);
+            aiRacers[i]->field_0x3bc->ApplyLodSettings(level);
+            aiRacers[i]->field_0x5c4->field_0x1a0->ApplyLodSettings(level);
         }
     }
     for (int j = 0; j < g_TrackGame->mode.field_0x27f8.field_0x35; j++) {
-        racerSlots[j]->field_0x3bc->UnknownFunction4451e0(level);
-        racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);
+        racerSlots[j]->field_0x3bc->ApplyLodSettings(level);
+        racerSlots[j]->field_0x5c4->field_0x1a0->ApplyLodSettings(level);
     }
 }
 

@@ -916,7 +916,7 @@ void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
 {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
-        painter.UnknownFunction417670(
+        painter.PaintNumber(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
 }
 
@@ -1136,7 +1136,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        ((RenderTarget*)field_0x18)->SetCamera(0);
         break;
     }
 }

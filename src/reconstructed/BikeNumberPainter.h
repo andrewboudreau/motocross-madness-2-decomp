@@ -20,10 +20,10 @@ public:
     ~UnknownBikeNumberPainter();                            // 0x00417570
     // 0x00417580: copies the digit's 32x32 cell (a 4x3 grid, width from
     // digitWidths) onto `target` at x + 4, y 4.
-    void UnknownFunction417580(int digit, int x, PCTextureMap* target);
+    void PaintDigit(int digit, int x, PCTextureMap* target);
     // 0x00417670: paints `number` on the model's "PROCEDURAL" textures and
     // fits the plate surfaces' texture coordinates to its digit count.
-    void UnknownFunction417670(D3DIMSoultreeObject* model, int number);
+    void PaintNumber(D3DIMSoultreeObject* model, int number);
 
     PCTextureMap* sheet;  // +0x00: BikeNumbers128.tga
     int digitWidths[10];  // +0x04

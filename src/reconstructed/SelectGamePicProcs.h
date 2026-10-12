@@ -90,7 +90,7 @@ class UnknownBikeNumberPainter {
 public:
     UnknownBikeNumberPainter(TextureMapManager* textures); // 0x00417500
     ~UnknownBikeNumberPainter();              // 0x00417570
-    void UnknownFunction417670(void* texture, int number); // 0x00417670: draws `number`
+    void PaintNumber(void* texture, int number); // 0x00417670: draws `number`
 
     unsigned char field_0x00[0x2c];
 };

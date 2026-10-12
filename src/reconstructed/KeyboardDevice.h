@@ -26,7 +26,7 @@ public:
     // 0x0048a0c0: key-repeat stepping for the bindings in list `list`.
     void UnknownFunction48a0c0(int list, int value);
     // 0x0048a240: whether modifier state `modifier` holds.
-    int UnknownFunction48a240(int modifier);
+    int ModifierHolds(int modifier);
 
     friend class ControlInterface; // reads the input entries
 

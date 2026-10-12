@@ -81,7 +81,7 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
         gui->field_0x3d0 = scale;
     gui->CreateBackground();
     gui->UnknownFunction485d70("ui");
-    gui->UnknownFunction486560("ui\\wait.tga");
+    gui->SetWaitCursorImage("ui\\wait.tga");
     gui->GetUser(0)->ForgetDevices();
     gui->GetUser(0)->AcceptDevice(gui->field_0x30c);
     gui->ShowCursors(0);

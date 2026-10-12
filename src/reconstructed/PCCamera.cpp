@@ -52,5 +52,5 @@ int PCCamera::UnknownVirtualSlot13() {
 // to 0x00468880 on the object at 0x0056e26c.
 void PCCamera::UnknownVirtualSlot27() {
     PCOwner()->SaveScreenshot();
-    g_TrackGame->UnknownFunction468880();
+    g_TrackGame->ResetClock();
 }

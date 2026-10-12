@@ -803,7 +803,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
                 lod = i + 1;
         }
         if (currentLod != lod)
-            UnknownFunction444d00(lod);
+            SetLod(lod);
     }
     for (int i = 0; i < materialCount; i++) {
         SoultreeMaterial* material = materialTable[i];
@@ -957,7 +957,7 @@ int D3DIMSoultreeObject::ReplaceMaterialTexture(int index, const char* name, int
 }
 
 // 0x00444d00
-void D3DIMSoultreeObject::UnknownFunction444d00(int lod)
+void D3DIMSoultreeObject::SetLod(int lod)
 {
     if (lod < lowestLod)
         lod = lowestLod;
@@ -970,7 +970,7 @@ void D3DIMSoultreeObject::UnknownFunction444d00(int lod)
 }
 
 // 0x00444d40
-void D3DIMSoultreeObject::UnknownFunction444d40(int lod)
+void D3DIMSoultreeObject::SetLowestLod(int lod)
 {
     if (lod < 0)
         lod = 0;
@@ -1113,7 +1113,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
 }
 
 // 0x004451e0
-void D3DIMSoultreeObject::UnknownFunction4451e0(int index)
+void D3DIMSoultreeObject::ApplyLodSettings(int index)
 {
     UnknownFunction444d60(g_UnknownSoultreeLodSettings689f18[index].field_0x00);
     field_0x1b4 = g_UnknownSoultreeLodSettings689f18[index].field_0x04;

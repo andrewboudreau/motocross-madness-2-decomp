@@ -242,8 +242,8 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         users[0]->AcceptKeyboardAndJoysticks();
         if (mouseDevice) {
             users[0]->SetPointerDevice(mouseDevice);
-            UnknownFunction486590(0, 1);
-            UnknownFunction4865e0(0, 0);
+            CreateCursors(0, 1);
+            RecreateCursors(0, 0);
         }
     }
     users[0]->EnableImeInput(0);
@@ -358,7 +358,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     if (guiBackground)
         guiBackground->MarkAllDirty();
     if (wait)
-        UnknownFunction4865e0(cursorImage, paletteChanged == 0);
+        RecreateCursors(cursorImage, paletteChanged == 0);
     if (paletteChanged)
         waitFrames = 3;
     dialog->UnknownFunction46ea60(visible);
@@ -435,7 +435,7 @@ void GUIManager::CreateBackground() {
         (new(__FILE__, 672) BackgroundImage(1))->UnknownVirtualSlot8(field_0x18), -1);
     guiBackground->InsertBefore(dialogContainer, -1);
     ownsBackground = 1;
-    UnknownFunction4865e0(0, 1);
+    RecreateCursors(0, 1);
     for (i = 0; i < userCount; i++)
         GetUser(i)->CreateToolTip(field_0x18, this);
 }
@@ -451,7 +451,7 @@ void GUIManager::ReleaseBackground() {
     if (guiBackground)
         guiBackground->Release();
     guiBackground = 0;
-    UnknownFunction4865e0(0, 0);
+    RecreateCursors(0, 0);
     GameObjectIterator iterator(this, 1, "UIDialog");
     while ((dialog = (UIDialog*)iterator.Next()) != 0)
         dialog->UnknownFunction46ffd0(0);
@@ -502,7 +502,7 @@ void GUIManager::RedrawFrame() {
     }
     g_TrackGame->UnknownVirtualSlot8();
     g_TrackGame->UnknownVirtualSlot9();
-    g_TrackGame->renderTarget->UnknownFunction4e8cc0();
+    g_TrackGame->renderTarget->AdvanceFrame();
 }
 
 // 0x00486540
@@ -513,12 +513,12 @@ GUIUser* GUIManager::GetUser(int index) {
 }
 
 // 0x00486560
-void GUIManager::UnknownFunction486560(const char* image) {
+void GUIManager::SetWaitCursorImage(const char* image) {
     strcpy(waitCursorImage, image);
 }
 
 // 0x00486590
-void GUIManager::UnknownFunction486590(const char* image, int visible) {
+void GUIManager::CreateCursors(const char* image, int visible) {
     int i;
 
     for (i = 0; i < userCount; i++) {
@@ -528,7 +528,7 @@ void GUIManager::UnknownFunction486590(const char* image, int visible) {
 }
 
 // 0x004865e0
-void GUIManager::UnknownFunction4865e0(const char* image, int redraw) {
+void GUIManager::RecreateCursors(const char* image, int redraw) {
     int i;
 
     for (i = 0; i < userCount; i++) {
@@ -744,8 +744,8 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingX, 0.01f, 0.01f);
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingY, 0.01f, 0.01f);
     } else if (inputDevice->deviceKind == 1) {
-        ((MouseDevice*)inputDevice)->UnknownFunction48a420(&bindingX);
-        ((MouseDevice*)inputDevice)->UnknownFunction48a420(&bindingY);
+        ((MouseDevice*)inputDevice)->AttachBinding(&bindingX);
+        ((MouseDevice*)inputDevice)->AttachBinding(&bindingY);
     }
     return this;
 }
@@ -777,8 +777,8 @@ void GUIInputDevice::Rebind() {
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingX, 0.01f, 0.01f);
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingY, 0.01f, 0.01f);
     } else if (inputDevice->deviceKind == 1) {
-        ((MouseDevice*)inputDevice)->UnknownFunction48a420(&bindingX);
-        ((MouseDevice*)inputDevice)->UnknownFunction48a420(&bindingY);
+        ((MouseDevice*)inputDevice)->AttachBinding(&bindingX);
+        ((MouseDevice*)inputDevice)->AttachBinding(&bindingY);
     }
 }
 

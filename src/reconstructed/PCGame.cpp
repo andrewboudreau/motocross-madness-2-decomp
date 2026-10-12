@@ -333,7 +333,7 @@ int PCGame::UnknownVirtualSlot19(int mode) {
     }
     if (renderTarget && camera) {
         camera->field_0x18 = renderTarget;
-        renderTarget->UnknownFunction4e8cf0(camera);
+        renderTarget->SetCamera(camera);
         renderTarget->UnknownVirtualSlot14(camera->field_0x1a0);
     }
     return 1;

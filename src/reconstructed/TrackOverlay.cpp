@@ -1395,7 +1395,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
             *result = 1;
             return 1;
         }
-        if (field_0x3dc && !g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(0xc) && key) {
+        if (field_0x3dc && !g_TrackGame->controlInterface->keyboard->ModifierHolds(0xc) && key) {
             chatInput->AppendChar(key);
             return 1;
         }

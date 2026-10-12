@@ -211,9 +211,9 @@ public:
 // (D3DIMSoultreeModifier.cpp's code).
 class UnknownBikeRaceModel {
 public:
-    void UnknownFunction4451e0(int level);    // 0x004451e0
-    void UnknownFunction444d00(int value);    // 0x00444d00
-    void UnknownFunction444d40(int value);    // 0x00444d40: hidden for the followed racer
+    void ApplyLodSettings(int level);    // 0x004451e0
+    void SetLod(int value);    // 0x00444d00
+    void SetLowestLod(int value);    // 0x00444d40: hidden for the followed racer
     void ClearFlag14c();             // 0x004fdb50
     void GetPosition(Vector3* position); // 0x004fc970: the translation
     // 0x00444c70 (D3DIMSoulTree.cpp): replaces texture `index` with `name`.
@@ -647,13 +647,13 @@ struct UnknownBikeRaceCameraView {
     // previous racer's model again and hiding the new one's.
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
         if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
-            field_0x3b0->field_0x3bc->UnknownFunction444d40(1);
-            field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(1);
+            field_0x3b0->field_0x3bc->SetLowestLod(1);
+            field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(1);
             if (field_0x3b0->field_0x3bc->currentDetailLevel == 0) {
-                field_0x3b0->field_0x3bc->UnknownFunction444d00(1);
+                field_0x3b0->field_0x3bc->SetLod(1);
             }
             if (field_0x3b0->field_0x5c4->field_0x1a0->currentDetailLevel == 0) {
-                field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d00(1);
+                field_0x3b0->field_0x5c4->field_0x1a0->SetLod(1);
             }
         }
         field_0x394 = racer;
@@ -667,8 +667,8 @@ struct UnknownBikeRaceCameraView {
         field_0x274 = 0;
         field_0x3b4 = racer;
         if (!racer->field_0x740->field_0x18c) {
-            racer->field_0x3bc->UnknownFunction444d40(0);
-            field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(0);
+            racer->field_0x3bc->SetLowestLod(0);
+            field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(0);
         }
         field_0x274 = 0;
     }

@@ -79,7 +79,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
             GrabBackground(flags & 8);
     }
     if (wait)
-        UnknownFunction4865e0(waitCursorImage, paletteChanged == 0);
+        RecreateCursors(waitCursorImage, paletteChanged == 0);
     if (dialog->UnknownVirtualSlot27(field_0x18, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)d)) {
@@ -88,7 +88,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
         return dialog;
     }
     if (wait)
-        UnknownFunction4865e0(cursorImage, paletteChanged == 0);
+        RecreateCursors(cursorImage, paletteChanged == 0);
     return 0;
 }
 
@@ -124,7 +124,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     g_TrackGame->field_0x34->DisableByClassName("ToolTip");
     g_TrackGame->UnknownVirtualSlot8();
     g_TrackGame->UnknownVirtualSlot9();
-    g_TrackGame->renderTarget->UnknownFunction4e8cc0();
+    g_TrackGame->renderTarget->AdvanceFrame();
     g_TrackGame->field_0x34->EnableByClassName("GUICursor");
     g_TrackGame->field_0x34->EnableByClassName("ToolTip");
     memset(&desc, 0, sizeof(desc));

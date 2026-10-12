@@ -129,7 +129,7 @@ int UnknownTextureStream::Tell()
 // first and copies it, as retail does; naming the key makes it copy the byte instead.
 // inline_depth(0) keeps the UnknownFunction430ff0 call out of line, as retail has it.
 #pragma inline_depth(0)
-int UnknownTextureStream::UnknownFunction461980()
+int UnknownTextureStream::ReadByte()
 {
     if (field_0x1c) {
         if (field_0x04 > 0 && Tell() >= field_0x130 + field_0x04) {
@@ -138,7 +138,7 @@ int UnknownTextureStream::UnknownFunction461980()
         if (field_0x1c->UnknownFunction430ff0()) {
             return -1;
         }
-        return field_0x1c->UnknownFunction461980();
+        return field_0x1c->ReadByte();
     }
     if (field_0x124 == field_0x128) {
         int count = fread(field_0x21, 1, 0x100, field_0x14);
@@ -194,7 +194,7 @@ int UnknownTextureStream::ReadLine(char* buffer, int size)
         return field_0x1c->ReadLine(buffer, size);
     }
     char* p = buffer;
-    *p = (char)UnknownFunction461980();
+    *p = (char)ReadByte();
     if (*p == (char)-1) {
         return 0;
     }
@@ -211,7 +211,7 @@ int UnknownTextureStream::ReadLine(char* buffer, int size)
             *p = '\n';
         }
         p++;
-        *p = (char)UnknownFunction461980();
+        *p = (char)ReadByte();
         if (*p == (char)-1) {
             *p = 0;
             break;
@@ -262,7 +262,7 @@ void UnknownTextureStream::ResetTextMode()
 }
 
 // 0x00461d40: fprintf.
-int UnknownFunction461d40(FILE* file, const char* format, ...)
+int FilePrintf(FILE* file, const char* format, ...)
 {
     va_list arguments;
     va_start(arguments, format);

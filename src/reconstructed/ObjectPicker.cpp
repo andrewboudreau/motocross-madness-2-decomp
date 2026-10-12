@@ -109,8 +109,8 @@ ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManage
             UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->field_0x08)->field_0x1c8,
                                   0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.1f);
         if (g_TrackGame->controlInterface->mouse) {
-            g_TrackGame->controlInterface->mouse->UnknownFunction48a420(field_0x40);
-            g_TrackGame->controlInterface->mouse->UnknownFunction48a420(field_0x44);
+            g_TrackGame->controlInterface->mouse->AttachBinding(field_0x40);
+            g_TrackGame->controlInterface->mouse->AttachBinding(field_0x44);
         }
         field_0x34 = (GameCursor*)(new(__FILE__, 66) GameCursor(1))
                          ->UnknownFunction43ea70(field_0x18, field_0x40, field_0x44, "cursor.tga", textures, 0, 0, 0);

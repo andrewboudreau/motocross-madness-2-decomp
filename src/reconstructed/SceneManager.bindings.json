@@ -189,7 +189,7 @@
   "?SetTextMode@UnknownTextureStream@@QAEXD@Z": "0x0043e9b0",
   "?GetTextMode@UnknownTextureStream@@QAEDXZ": "0x0043e9e0",
   "?UnknownFunction4444c0@UnknownSceneLodObject@@QAEXH@Z": "0x004444c0",
-  "?UnknownFunction4451e0@UnknownSceneLodObject@@QAEXH@Z": "0x004451e0",
+  "?ApplyLodSettings@UnknownSceneLodObject@@QAEXH@Z": "0x004451e0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?Tell@UnknownTextureStream@@QAEHXZ": "0x00461600",

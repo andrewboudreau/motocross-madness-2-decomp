@@ -74,7 +74,7 @@ python tools/compile.py src/reconstructed/Lzw.cpp -o work/lzw.obj \
   --vc6-root "$VC6_ROOT" --profile vc6_o2_mt
 python tools/match.py --exe work/game/mcm2.exe --target-va 0x004a03d0 \
   --target-size 522 --obj work/lzw.obj \
-  --symbol '?UnknownFunction4a03d0@@YAXPAEPBXH@Z' \
+  --symbol '?ExpandLzw@@YAXPAEPBXH@Z' \
   --bindings src/reconstructed/Lzw.bindings.json --json
 python tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt \
   --vc6-root "$VC6_ROOT" --exe work/game/mcm2.exe --jobs 8

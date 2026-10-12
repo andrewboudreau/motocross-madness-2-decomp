@@ -44,7 +44,7 @@ public:
     // 0x00489a20: attaches `binding` to the list for its axis.
     int UnknownFunction489a20(UnknownControlBinding* binding, float step, float interval);
     // 0x00489c00: feeds an axis value to every binding on that axis.
-    void UnknownFunction489c00(int axis, float value, float range);
+    void FeedAxis(int axis, float value, float range);
     // 0x00489c60: state of `control` (negative: an axis direction).
     int UnknownFunction489c60(int control, int modifier, UnknownInputEntry* entry);
     float UnknownFunction489e20(int axis);    // 0x00489e20: axis value (OptionProcs.cpp)

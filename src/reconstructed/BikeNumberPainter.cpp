@@ -28,7 +28,7 @@ UnknownBikeNumberPainter::~UnknownBikeNumberPainter() {
 }
 
 // 0x00417580
-void UnknownBikeNumberPainter::UnknownFunction417580(int digit, int x, PCTextureMap* target) {
+void UnknownBikeNumberPainter::PaintDigit(int digit, int x, PCTextureMap* target) {
     int row;
     if (digit < 4)
         row = 0;
@@ -67,7 +67,7 @@ void UnknownBikeNumberPainter::UnknownFunction417580(int digit, int x, PCTexture
 // plate), scales and offsets the texture coordinates of the plate surfaces'
 // vertices with z >= -0.5 to fit them. `number` itself loses its hundreds
 // and tens as they are painted.
-void UnknownBikeNumberPainter::UnknownFunction417670(D3DIMSoultreeObject* model, int number) {
+void UnknownBikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int number) {
     int digits = 0;
     int plate = 0;
     int hundreds = 0;
@@ -96,18 +96,18 @@ void UnknownBikeNumberPainter::UnknownFunction417670(D3DIMSoultreeObject* model,
         int x = 28 - (int)(width * 0.5);
         if (number > 99) {
             int digit = number / 100;
-            UnknownFunction417580(digit, x, texture);
+            PaintDigit(digit, x, texture);
             hundreds = 1;
             x += digitWidths[digit];
             number -= digit * 100;
         }
         if (number > 9 || hundreds) {
             int digit = number / 10;
-            UnknownFunction417580(digit, x, texture);
+            PaintDigit(digit, x, texture);
             x += digitWidths[digit];
             number -= digit * 10;
         }
-        UnknownFunction417580(number, x, texture);
+        PaintDigit(number, x, texture);
         texture->UnknownVirtualSlot15(2);
         if (texture->field_0x68 & 1)
             ((ManagedTexture*)texture)->Reregister();

@@ -19,7 +19,7 @@ RenderTarget::RenderTarget() {
 }
 
 // 0x004e8ca0
-void RenderTarget::UnknownFunction4e8ca0(UnknownDisplay* display) {
+void RenderTarget::SetDisplay(UnknownDisplay* display) {
     field_0x04 = display;
 }
 
@@ -28,7 +28,7 @@ RenderTarget::~RenderTarget() {}
 
 // 0x004e8cc0: unless the global's +0x0c object says otherwise, the frame index
 // advances modulo field_0x14; the frame count always does.
-void RenderTarget::UnknownFunction4e8cc0() {
+void RenderTarget::AdvanceFrame() {
     if (!g_TrackGame->display->freezeFrameIndex) {
         if (++field_0x18 == field_0x14)
             field_0x18 = 0;
@@ -38,7 +38,7 @@ void RenderTarget::UnknownFunction4e8cc0() {
 
 // 0x004e8cf0: a camera whose cached size differs from this target's is
 // refreshed through Camera 0x0042e550.
-void RenderTarget::UnknownFunction4e8cf0(Camera* camera) {
+void RenderTarget::SetCamera(Camera* camera) {
     field_0x08 = camera;
     if (camera && (field_0x0c != camera->field_0x1c4 || field_0x10 != camera->field_0x1c8))
         camera->UnknownFunction42e550();

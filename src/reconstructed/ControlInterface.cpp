@@ -19,7 +19,7 @@ static inline float BindingMin(float a, float b) {
 int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier) {
     if (event->control == control && event->kind == kind &&
         (!g_TrackGame->controlInterface->keyboard ||
-         g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(modifier)))
+         g_TrackGame->controlInterface->keyboard->ModifierHolds(modifier)))
         return 1;
     return 0;
 }

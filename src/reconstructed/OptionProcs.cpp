@@ -968,15 +968,15 @@ void GlobalSettingsDlg::ListOtherProfiles()
     int count = 0;
     UIListBox* profiles = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
     profiles->RemoveAllRows();
-    g_TrackGame->profileDirectory->UnknownFunction44a1d0("ui\\profile");
-    g_TrackGame->profileDirectory->UnknownFunction44a220("*", 0);
+    g_TrackGame->profileDirectory->SetDirectory("ui\\profile");
+    g_TrackGame->profileDirectory->SetPattern("*", 0);
     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
-    g_TrackGame->profileDirectory->UnknownFunction44a550(name);
+    g_TrackGame->profileDirectory->CurrentName(name);
     if (name[0] && strcmp(g_TrackGame->mode.field_0x00, name) != 0) {
         profiles->AddRow(name, 0, 0);
         count = 1;
     }
-    while (g_TrackGame->profileDirectory->UnknownFunction44a4c0(name)) {
+    while (g_TrackGame->profileDirectory->NextName(name)) {
         if (name[0] && strcmp(g_TrackGame->mode.field_0x00, name) != 0) {
             profiles->AddRow(name, 0, 0);
             count++;

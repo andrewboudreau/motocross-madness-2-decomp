@@ -23,7 +23,7 @@ public:
     // maximum.
     void UnknownFunction48a550(int axis, float amount);
     // 0x0048a420: attaches `binding` to the list for its axis (GUIManager.cpp).
-    int UnknownFunction48a420(UnknownControlBinding* binding);
+    int AttachBinding(UnknownControlBinding* binding);
 
     friend class ControlInterface; // reads the input entries
 

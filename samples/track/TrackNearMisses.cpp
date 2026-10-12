@@ -190,11 +190,11 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
     else
         prefixed = 0;
     UnknownFunction51ff40();
-    directory->UnknownFunction44a1d0((const char*)g_TrackGame->mode.currentSeriesDirectory);
+    directory->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(pattern, "*%s", g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
-    directory->UnknownFunction44a220(pattern, 1);
+    directory->SetPattern(pattern, 1);
     directory->UnknownVirtualSlot1();
-    if (directory->UnknownFunction44a550(found)) {
+    if (directory->CurrentName(found)) {
         if (prefixed) {
             n = strlen(found) - 1;
             strncpy(track, found, n);
@@ -225,7 +225,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
             field_0x7f60[field_0x7f64]->field_0x00 = strdup(found);
             field_0x7f60[field_0x7f64]->field_0x04 = 0;
             field_0x7f64++;
-            if (!directory->UnknownFunction44a4c0(found))
+            if (!directory->NextName(found))
                 break;
             if (prefixed) {
                 n = strlen(found) - 1;
@@ -305,7 +305,7 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
                 if (!(links[i]->flags & 4)) {
                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 907);
                     if (!item) {
-                        UnknownFunction517930(&list, 0);
+                        FreeWorkList(&list, 0);
                         return 0;
                     }
                     item->node = links[i];
@@ -322,8 +322,8 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
             found = 1;
         }
         if (!found || out) {
-            float ahead = UnknownFunction517da0(from, candidates->pos);
-            float behind = UnknownFunction517da0(candidates->pos, from);
+            float ahead = DistanceAlong(from, candidates->pos);
+            float behind = DistanceAlong(candidates->pos, from);
             if (ahead >= 0.0f && ahead <= distance || behind >= 0.0f && behind <= range) {
                 found = 1;
                 if (out && (ahead > best || -behind > best)) {
@@ -339,8 +339,8 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
                 start.node = step->node;
                 start.segment = start.node->firstSegment;
                 start.t = 0.0f;
-                ahead = UnknownFunction517da0(start, candidates->pos);
-                behind = UnknownFunction517da0(candidates->pos, start);
+                ahead = DistanceAlong(start, candidates->pos);
+                behind = DistanceAlong(candidates->pos, start);
                 if (NodeHasSegment(candidates->pos.segment, step->node)
                     && (!NodeHasSegment(from.segment, step->node)
                         || ahead >= 0.0f && behind >= 0.0f && ahead < behind)) {
@@ -684,7 +684,7 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
         to.node = startNode;
         to.segment = startNode->firstSegment;
         to.t = 0.0f;
-        UnknownFunction5179f0(from, to, 0, &lapLength);
+        ShortestPath(from, to, 0, &lapLength);
     }
     return 1;
 fail:

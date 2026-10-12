@@ -135,7 +135,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 userMenuOpen = 0;
             }
             if (multiMenuOpen) {
-                guiManager->UnknownFunction4865e0(guiManager->waitCursorImage, 1);
+                guiManager->RecreateCursors(guiManager->waitCursorImage, 1);
                 FindControl("ButIPX", 1)->SetEnabled(0);
                 FindControl("ButTCP", 1)->SetEnabled(0);
                 FindControl("ButZone", 1)->SetEnabled(1);
@@ -156,7 +156,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                             FindControl("ButModem", 1)->SetEnabled(1);
                     }
                 }
-                guiManager->UnknownFunction4865e0(guiManager->cursorImage, 0);
+                guiManager->RecreateCursors(guiManager->cursorImage, 0);
             } else {
                 EndNetworkGame();
                 g_TrackGame->ui->field_0x4b0 = 0;
@@ -171,7 +171,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->ui->field_0x4b0 = 0;
             }
             if (userMenuOpen)
-                UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
+                RequestHover(FindControl("LstProfiles", 3), 0, 0);
             if (singleMenuOpen) {
                 menuSingleAnimation->Show(0, 1);
                 singleMenuOpen = 0;
@@ -240,14 +240,14 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             g_TrackGame->mode.SaveProfile();
             if (UseSelectedProfile(event))
                 g_TrackGame->UnknownFunction521a30();
-            UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
+            RequestHover(FindControl("LstProfiles", 3), 0, 0);
             ShowCurrentProfile();
             userMenuOpen = 0;
             menuUserAnimation->Show(0, 1);
         } else if (!_stricmp("ButNewProfile", event->controlName)) {
             g_TrackGame->mode.SaveProfile();
             g_TrackGame->ui->OpenMenu(0xbb9);
-            UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
+            RequestHover(FindControl("LstProfiles", 3), 0, 0);
             FillProfileList();
             ShowCurrentProfile();
             userMenuOpen = 0;
@@ -264,7 +264,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 guiManager->ShowDialog((UIDialog*)dialog, 0x12f, 4, 0, (UIDialog*)this,
                                                   (int)list->GetRowText(-1), 0, 1);
             }
-            UnknownFunction470000(list, 0, 0);
+            RequestHover(list, 0, 0);
             FillProfileList();
         } else if (!_stricmp("ButIPX", event->controlName)) {
             g_TrackGame->ui->field_0x4b0 = 1;
@@ -333,7 +333,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             FillProfileList();
             ShowCurrentProfile();
             if (userMenuOpen)
-                UnknownFunction470000(list, 0, 0);
+                RequestHover(list, 0, 0);
         }
         if (event->code == 0x1f)
             ShowCurrentProfile();
@@ -461,7 +461,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             }
         }
         UIControl* first = FindControl("LstStats1", 0);
-        UnknownFunction470000(first, 0, 0);
+        RequestHover(first, 0, 0);
         ClearStatsLists(event);
         int i;
         UIListBox* list;
@@ -579,7 +579,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         }
     }
     UIControl* first = FindControl("LstStats1", 0);
-    UnknownFunction470000(first, 0, 0);
+    RequestHover(first, 0, 0);
     ClearStatsLists(event);
     int i;
     UIListBox* list;

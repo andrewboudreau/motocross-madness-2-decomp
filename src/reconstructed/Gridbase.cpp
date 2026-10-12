@@ -49,7 +49,7 @@ GridBaseBlock::GridBaseBlock(UnknownTextureStream* stream)
     stream->Read(&size, 4, 1);
     if (packed < size) {
         stream->Read(g_gridBaseLoadBuffer, 1, packed);
-        UnknownFunction4a03d0((unsigned char*)field_0x908, g_gridBaseLoadBuffer, 0x200);
+        ExpandLzw((unsigned char*)field_0x908, g_gridBaseLoadBuffer, 0x200);
     } else {
         stream->Read(field_0x908, 1, size);
     }
@@ -58,7 +58,7 @@ GridBaseBlock::GridBaseBlock(UnknownTextureStream* stream)
     stream->Read(&size, 4, 1);
     if (packed < size) {
         stream->Read(g_gridBaseLoadBuffer, 1, packed);
-        UnknownFunction4a03d0((unsigned char*)field_0xb08, g_gridBaseLoadBuffer, 0x244);
+        ExpandLzw((unsigned char*)field_0xb08, g_gridBaseLoadBuffer, 0x244);
     } else {
         stream->Read(field_0xb08, 1, size);
     }
@@ -67,7 +67,7 @@ GridBaseBlock::GridBaseBlock(UnknownTextureStream* stream)
     stream->Read(&size, 4, 1);
     if (packed < size) {
         stream->Read(g_gridBaseLoadBuffer, 1, packed);
-        UnknownFunction4a03d0((unsigned char*)cells, g_gridBaseLoadBuffer, 0x908);
+        ExpandLzw((unsigned char*)cells, g_gridBaseLoadBuffer, 0x908);
     } else {
         stream->Read(cells, 1, size);
     }

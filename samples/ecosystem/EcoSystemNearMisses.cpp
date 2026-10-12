@@ -402,7 +402,7 @@ void EcoSystem::WriteListing(const char* path) {
     FILE* file = fopen(name, "w");
     if (!file)
         return;
-    UnknownFunction461d40(file, "%i\n", placedCount);
+    FilePrintf(file, "%i\n", placedCount);
     for (i = 0; i < placedCount; i++) {
         UnknownEcoDefinition* definition = definitionTable[vegetation[i].definitionIndex];
         float radius = definition->RadiusForParameter(vegetation[i].radiusParam);
@@ -410,7 +410,7 @@ void EcoSystem::WriteListing(const char* path) {
         float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
         float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
         float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        UnknownFunction461d40(file, "%i,%f,%f,%f,%f,%f\n", vegetation[i].definitionIndex, x, y, z,
+        FilePrintf(file, "%i,%f,%f,%f,%f,%f\n", vegetation[i].definitionIndex, x, y, z,
                               definition->RadiusForParameter(vegetation[i].radiusParam),
                               definition->HeightForParameter(vegetation[i].heightParam));
     }

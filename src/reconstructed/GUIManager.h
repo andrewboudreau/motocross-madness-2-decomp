@@ -344,9 +344,9 @@ public:
     int UnknownFunction4864f0();              // 0x004864f0
     void RedrawFrame();             // 0x00486500: redraws a frame
     GUIUser* GetUser(int index);              // 0x00486540: user `index` (0 past 3)
-    void UnknownFunction486560(const char* image); // 0x00486560
-    void UnknownFunction486590(const char* image, int visible); // 0x00486590
-    void UnknownFunction4865e0(const char* image, int redraw); // 0x004865e0
+    void SetWaitCursorImage(const char* image); // 0x00486560
+    void CreateCursors(const char* image, int visible); // 0x00486590
+    void RecreateCursors(const char* image, int redraw); // 0x004865e0
     void ShowCursors(int show);               // 0x00486630: each user's cursor slot 5 (show) or 4
     void ReleaseCursors();             // 0x00486680: releases the cursors
     void UnknownFunction4866c0(const char* font); // 0x004866c0

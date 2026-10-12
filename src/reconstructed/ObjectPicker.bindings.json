@@ -23,7 +23,7 @@
   "?UnknownFunction43ea70@GameCursor@@QAEPAVGameObject@@PAXPAUUnknownControlBinding@@1PBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043ea70",
   "?UnknownFunction43f100@GameCursor@@QAE?AUUnknownCursorPosition@@XZ": "0x0043f100",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction48a420@MouseDevice@@QAEHPAUUnknownControlBinding@@@Z": "0x0048a420",
+  "?AttachBinding@MouseDevice@@QAEHPAUUnknownControlBinding@@@Z": "0x0048a420",
   "?UnknownFunction4b0210@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",
   "?UnknownFunction4b0210@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z$ehhandler": "0x0054c6d0",
   "?UnknownFunction4b04c0@ObjectPicker@@QAEHXZ": "0x004b04c0",

@@ -185,7 +185,7 @@ struct UnknownCueOwner {
     position += forward * field_0x44; \
     position += right * screenOffsetX; \
     position += up * screenOffsetY; \
-    UnknownFunction4014f0(&position); \
+    SetPosition(&position); \
     }
 
 // 0x0048b100
@@ -220,7 +220,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             target = cueView->ownRacer->trackPoint;
         field_0xac->QueryGround(&target, 0, 0, 0);
         Vector3 direction = target - arcadeView->field_0x170;
-        UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
+        SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
         return 1;
@@ -233,7 +233,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             return 1;
         Vector3 direction =
             g_UnknownKrustyGame56e26c->field_0x560->field_0xd8[ref->gateIndex].field_0x00 - arcadeView->field_0x170;
-        UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
+        SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
     }
@@ -250,7 +250,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             }
         }
         Vector3 direction = target - arcadeView->field_0x170;
-        UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
+        SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         arcadeModel->Scale(scale, scale, scale);
         return 1;
@@ -261,7 +261,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             Vector3 target;
             g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.GetPosition(&target);
             Vector3 direction = target - arcadeView->field_0x170;
-            UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
+            SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         } else {
             UnknownVisualCueRacer* followed = 0;
@@ -272,7 +272,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             if (followed == g_UnknownKrustyGame56e26c->field_0x568->field_0xa8)
                 goto hide;
             Vector3 direction = g_UnknownKrustyGame56e26c->field_0x568->field_0xa8->position - arcadeView->field_0x170;
-            UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
+            SetAxes(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;
         }
         break;

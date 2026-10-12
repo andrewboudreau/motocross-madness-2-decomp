@@ -365,7 +365,7 @@ RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, co
     UnknownSurfaceInterface* surface, int wantZBuffer, int frames) {
     UnknownPixelFormat format;
     UnknownSurfaceDesc desc;
-    UnknownFunction4e8ca0(display);
+    SetDisplay(display);
     renderSurface = surface;
     field_0x14 = frames;
     field_0x04 = display;

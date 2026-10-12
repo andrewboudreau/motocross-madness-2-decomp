@@ -78,7 +78,7 @@ void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
 // 0x0048a240: 0x3f always holds; with bit 2 of the global's +0x2d4 clear,
 // states with bit 7 never do. 0x80 also holds while key 0x29 is down,
 // 0x80000000 means no modifier, and bit 6 asks for an exact match.
-int KeyboardDevice::UnknownFunction48a240(int modifier) {
+int KeyboardDevice::ModifierHolds(int modifier) {
     if (!g_TrackGame->field_0x2d4_bit2 && (modifier & 0x80))
         return 0;
     if (modifier == 0x3f)

@@ -40,23 +40,23 @@ int PCJoystickDevice::ReadImmediateState(int value) {
         float axis;
         axis = (float)state.axes[0];
         axisValues[0] = axis;
-        UnknownFunction489c00(0, axis, axisMaximums[0]);
+        FeedAxis(0, axis, axisMaximums[0]);
         axis = axisValues[1] = (float)state.axes[1];
         if (directionFlipped)
             axis = axisMaximums[1] - axis;
-        UnknownFunction489c00(1, axis, axisMaximums[1]);
+        FeedAxis(1, axis, axisMaximums[1]);
         axis = (float)state.axes[2];
         axisValues[2] = axis;
-        UnknownFunction489c00(2, axisMaximums[2] - axis, axisMaximums[2]);
+        FeedAxis(2, axisMaximums[2] - axis, axisMaximums[2]);
         axis = (float)state.axes[3];
         axisValues[3] = axis;
-        UnknownFunction489c00(3, axis, axisMaximums[3]);
+        FeedAxis(3, axis, axisMaximums[3]);
         axis = (float)state.axes[4];
         axisValues[4] = axis;
-        UnknownFunction489c00(4, axis, axisMaximums[4]);
+        FeedAxis(4, axis, axisMaximums[4]);
         axis = (float)state.axes[5];
         axisValues[5] = axis;
-        UnknownFunction489c00(5, axis, axisMaximums[5]);
+        FeedAxis(5, axis, axisMaximums[5]);
     }
     for (int i = 0; i < 32; i++) {
         int pressed = state.buttons[i] >> 7;
@@ -158,7 +158,7 @@ int PCJoystickDevice::ReadBufferedState(int) {
                 value = ApplyAxisDeadZone(0, FilterAxisSpike(0, events[i].data));
                 axis = axisValues[0] = (float)value;
                 previousRawAxes[0] = (float)events[i].data;
-                UnknownFunction489c00(0, axis, axisMaximums[0]);
+                FeedAxis(0, axis, axisMaximums[0]);
                 break;
             case 4:
                 value = ApplyAxisDeadZone(1, FilterAxisSpike(1, events[i].data));
@@ -166,31 +166,31 @@ int PCJoystickDevice::ReadBufferedState(int) {
                 previousRawAxes[1] = (float)events[i].data;
                 if (directionFlipped)
                     axis = axisMaximums[1] - axis;
-                UnknownFunction489c00(1, axis, axisMaximums[1]);
+                FeedAxis(1, axis, axisMaximums[1]);
                 break;
             case 8:
                 value = FilterAxisSpike(2, events[i].data);
                 axis = axisValues[2] = (float)value;
                 previousRawAxes[2] = (float)events[i].data;
-                UnknownFunction489c00(2, axisMaximums[2] - axis, axisMaximums[2]);
+                FeedAxis(2, axisMaximums[2] - axis, axisMaximums[2]);
                 break;
             case 12:
                 value = FilterAxisSpike(3, events[i].data);
                 axis = axisValues[3] = (float)value;
                 previousRawAxes[3] = (float)events[i].data;
-                UnknownFunction489c00(3, axis, axisMaximums[3]);
+                FeedAxis(3, axis, axisMaximums[3]);
                 break;
             case 16:
                 value = FilterAxisSpike(4, events[i].data);
                 axis = axisValues[4] = (float)value;
                 previousRawAxes[4] = (float)events[i].data;
-                UnknownFunction489c00(4, axis, axisMaximums[4]);
+                FeedAxis(4, axis, axisMaximums[4]);
                 break;
             case 20:
                 value = FilterAxisSpike(5, events[i].data);
                 axis = axisValues[5] = (float)value;
                 previousRawAxes[5] = (float)events[i].data;
-                UnknownFunction489c00(5, axis, axisMaximums[5]);
+                FeedAxis(5, axis, axisMaximums[5]);
                 break;
             }
         }

@@ -158,8 +158,8 @@ public:
     virtual void UnknownVirtualSlot3();
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
-    void UnknownFunction4014f0(const Vector3* position);                // 0x004014f0
-    void UnknownFunction401520(const Vector3* a, const Vector3* b, int c, int d); // 0x00401520
+    void SetPosition(const Vector3* position);                // 0x004014f0
+    void SetAxes(const Vector3* a, const Vector3* b, int c, int d); // 0x00401520
     unsigned char field_0x04[0x2c - 0x4];
     UnknownPodiumSoultree* field_0x2c;
 };
@@ -232,7 +232,7 @@ int EventManager::CreatePodiumScene() {
     podiumCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
-    ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(podiumCamera);
+    ((RenderTarget*)field_0x18)->SetCamera(podiumCamera);
     podiumCamera->InsertBefore(view->field_0x50, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
@@ -303,8 +303,8 @@ int EventManager::CreatePodiumScene() {
     context.field_0x10 = 0x115c;
     context.field_0x14 = 0;
     PODIUM_ARCADE->UnknownVirtualSlot5();
-    PODIUM_ARCADE->UnknownFunction4014f0(&podiumPosition);
-    PODIUM_ARCADE->UnknownFunction401520(&direction, &up, 0, 1);
+    PODIUM_ARCADE->SetPosition(&podiumPosition);
+    PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
     if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
         PODIUM_ARCADE->field_0x2c->UnknownFunction4444c0(1);
     UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -387,6 +387,6 @@ int EventManager::CreatePodiumScene() {
     RemoveVegetationInRect(x0, z0, x1, z1);
     UnknownFunction45fdc0(x0, z0, x1, z1);
     resumeArmed = 0;
-    g_TrackGame->UnknownFunction468880();
+    g_TrackGame->ResetClock();
     return 1;
 }

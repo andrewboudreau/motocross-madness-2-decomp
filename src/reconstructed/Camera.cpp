@@ -63,7 +63,7 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
     }
     UnknownVirtualSlot28();
     if (field_0x25_bit0)
-        Owner()->UnknownFunction4e8cf0(this);
+        Owner()->SetCamera(this);
     return this;
 }
 
@@ -309,7 +309,7 @@ int Camera::UnknownVirtualSlot32(const Matrix4* value) {
 // +0x1d0. Slot 5 first hands the camera to the owner's non-virtual 0x004e8cf0.
 void Camera::UnknownVirtualSlot5() {
     GameObject::UnknownVirtualSlot5();
-    Owner()->UnknownFunction4e8cf0(this);
+    Owner()->SetCamera(this);
     field_0x1d0 = Owner()->field_0x14 + 1;
 }
 

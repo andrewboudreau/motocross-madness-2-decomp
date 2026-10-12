@@ -95,7 +95,7 @@ public:
     // 0x00467b70: creates the root objects, sound, textures and (with the
     // "DebugOverlay" registry flag) the debug overlay.
     int UnknownFunction467b70(char* message);
-    void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
+    void ResetClock();             // 0x00468880 (PCCamera slot 27)
 
     SoundInterface* soundInterface;           // a PCSoundInterface (initialiser)
     NetworkInterface* network;                // created by slot 16, deleted by NetProcs.cpp's EndNetworkGame

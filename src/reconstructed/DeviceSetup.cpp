@@ -128,10 +128,10 @@ int UnknownTrackGameObject33fc::BindAxis(UnknownControlBinding* binding, int kin
         if (g_TrackGame->controlInterface->mouse) {
             switch (code) {
             case -3:
-                g_TrackGame->controlInterface->mouse->UnknownFunction48a420(binding);
+                g_TrackGame->controlInterface->mouse->AttachBinding(binding);
                 return 1;
             case -5:
-                g_TrackGame->controlInterface->mouse->UnknownFunction48a420(binding);
+                g_TrackGame->controlInterface->mouse->AttachBinding(binding);
                 return 1;
             }
             return 1;

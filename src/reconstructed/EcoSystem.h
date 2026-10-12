@@ -554,7 +554,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
 // Helpers reconstructed elsewhere.
 // 0x0047b8a0 (gameui.cpp tail): a float profile value, `defaultValue` when the key is "NONE".
 float ReadIniFloat(const char* section, const char* key, double defaultValue, const char* path);
-void UnknownFunction461d40(FILE* file, const char* format, ...); // 0x00461d40: fprintf
+void FilePrintf(FILE* file, const char* format, ...); // 0x00461d40: fprintf
 UnknownBitmapFile* UnknownFunction424140(const char* path, UnknownBitmapFile* into); // 0x00424140
 void UnknownFunction4245b0(UnknownBitmapFile* bitmap);                  // 0x004245b0
 UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* into, int a); // 0x005125c0

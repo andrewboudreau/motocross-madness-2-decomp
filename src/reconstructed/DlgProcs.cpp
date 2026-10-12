@@ -171,13 +171,13 @@ void MainDlg::FillProfileList() {
     char name[260];
     UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
     list->RemoveAllRows();
-    g_TrackGame->profileDirectory->UnknownFunction44a1d0("ui\\profile");
-    g_TrackGame->profileDirectory->UnknownFunction44a220("*", 0);
+    g_TrackGame->profileDirectory->SetDirectory("ui\\profile");
+    g_TrackGame->profileDirectory->SetPattern("*", 0);
     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
-    g_TrackGame->profileDirectory->UnknownFunction44a550(name);
+    g_TrackGame->profileDirectory->CurrentName(name);
     if (name[0])
         list->AddRow(name, 0, 0);
-    while (g_TrackGame->profileDirectory->UnknownFunction44a4c0(name)) {
+    while (g_TrackGame->profileDirectory->NextName(name)) {
         if (name[0])
             list->AddRow(name, 0, 0);
     }
@@ -1068,7 +1068,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        ((RenderTarget*)field_0x18)->SetCamera(0);
         break;
     }
 }
@@ -1118,7 +1118,7 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
 void SPBikeRiderDlg::PaintPlateNumber(int number) {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
-        painter.UnknownFunction417670(
+        painter.PaintNumber(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
 }
 
@@ -1321,7 +1321,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 event->dialog->EndDialog(0);
                 event->handled = 1;
                 g_TrackGame->UnknownFunction521a40();
-                g_TrackGame->UnknownFunction468880();
+                g_TrackGame->ResetClock();
                 g_TrackGame->eventManager->FindRaceView()->UnknownFunction421050();
                 if (g_TrackGame->field_0x55c)
                     g_TrackGame->field_0x55c->UnknownFunction4e1f00();
@@ -1920,7 +1920,7 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
 // 0x004533d0
 int Intro1Dlg::UnknownVirtualSlot10(float frameTime) {
     if (++framesShown == 3) {
-        g_TrackGame->ui->UnknownFunction498cf0(1);
+        g_TrackGame->ui->BuildGarageScene(1);
         EndDialog(0);
     }
     return UIDialog::UnknownVirtualSlot10(frameTime);
@@ -1949,7 +1949,7 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
         frameRan = 0;
         secondsShown = 0.0f;
         framesShown = 0;
-        g_TrackGame->UnknownFunction468880();
+        g_TrackGame->ResetClock();
         break;
     }
 }
@@ -1957,7 +1957,7 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
 // 0x00453570
 int Intro2Dlg::UnknownVirtualSlot10(float frameTime) {
     if (++framesShown == 3)
-        g_TrackGame->ui->UnknownFunction498cf0(2);
+        g_TrackGame->ui->BuildGarageScene(2);
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
     if ((g_UnknownGlobal59ae00 || secondsShown > 3.0f) && framesShown >= 3)
@@ -1984,7 +1984,7 @@ void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         frameRan = 0;
         secondsShown = 0.0f;
-        g_TrackGame->UnknownFunction468880();
+        g_TrackGame->ResetClock();
         break;
     }
 }
@@ -2644,7 +2644,7 @@ void TransDlg::HandleEvent(UnknownDialogEvent* event) {
         nextMenu = 100;
         framesShown = 0;
         secondsShown = 0.0f;
-        g_TrackGame->UnknownFunction468880();
+        g_TrackGame->ResetClock();
         break;
     }
 }
@@ -2656,7 +2656,7 @@ int TransDlg::UnknownVirtualSlot10(float frameTime) {
     if (secondsShown > 5.0f && framesShown >= 3)
         EndDialog(0);
     if (framesShown >= 3)
-        g_TrackGame->ui->UnknownFunction498cf0(-1);
+        g_TrackGame->ui->BuildGarageScene(-1);
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }
 
@@ -2677,7 +2677,7 @@ void Exit1Dlg::HandleEvent(UnknownDialogEvent* event) {
         secondsShown = 0.0f;
         framesShown = 0;
         field_0x7f64 = 0;
-        g_TrackGame->UnknownFunction468880();
+        g_TrackGame->ResetClock();
         guiManager->ShowCursors(1);
         break;
     case kDialogCommand:

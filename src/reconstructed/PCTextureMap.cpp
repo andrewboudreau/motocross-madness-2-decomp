@@ -126,7 +126,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                 case 0x19:
                 case 0x1a:
                 case 0x1b:
-                    UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * levelHeight * levelSide);
+                    ExpandLzw(bits, buffer, BytesPerPixel(fileFormat) * levelHeight * levelSide);
                     break;
                 case 0x14:
                     bits = field_0x10->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(sourceFormat) * levelHeight *
@@ -200,7 +200,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         case 10:
         case 11:
         case 12:
-            UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * width * height);
+            ExpandLzw(bits, buffer, BytesPerPixel(fileFormat) * width * height);
             break;
         case 5:
             bits = field_0x10->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(sourceFormat) * width * height + 4);

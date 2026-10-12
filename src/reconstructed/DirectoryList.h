@@ -57,14 +57,14 @@ public:
     // 0x0044a670: lists `pattern` in `directory` (FindFirstFileA/FindNextFileA)
     // into `entries`; 0 when nothing matches.
     virtual int UnknownVirtualSlot1();
-    void UnknownFunction44a1d0(const char* directory);     // 0x0044a1d0
-    void UnknownFunction44a220(const char* pattern, int includeFiles); // 0x0044a220
+    void SetDirectory(const char* directory);     // 0x0044a1d0
+    void SetPattern(const char* pattern, int includeFiles); // 0x0044a220
     int UnknownFunction44a270(int index, char* path);      // 0x0044a270: entry `index`'s name
     int UnknownFunction44a2f0(int index, char* name);      // 0x0044a2f0: ... without its extension
-    int UnknownFunction44a3b0(char* path);                 // 0x0044a3b0: advances to the next entry
-    int UnknownFunction44a440(char* path);                 // 0x0044a440: the current entry
-    int UnknownFunction44a4c0(char* name);                 // 0x0044a4c0: next listed name
-    int UnknownFunction44a550(char* name);                 // 0x0044a550: current listed name
+    int NextEntry(char* path);                 // 0x0044a3b0: advances to the next entry
+    int CurrentEntry(char* path);                 // 0x0044a440: the current entry
+    int NextName(char* name);                 // 0x0044a4c0: next listed name
+    int CurrentName(char* name);                 // 0x0044a550: current listed name
     // 0x0044a600: whether a found file is listed: not "", "." or "..", and
     // a directory unless `includeFiles` is set.
     int UnknownFunction44a600(const char* name, unsigned int attributes);

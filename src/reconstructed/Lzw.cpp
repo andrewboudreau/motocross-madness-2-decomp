@@ -99,7 +99,7 @@ inline unsigned int LzwDecodeString(unsigned int count, unsigned int code)
 // a flush code restarts the dictionary, a bump code widens the codes, and a
 // code not yet in the dictionary (the KwKwK case) decodes as the previous
 // string plus its own first character.
-void UnknownFunction4a03d0(unsigned char* output, const void* input, int size)
+void ExpandLzw(unsigned char* output, const void* input, int size)
 {
     unsigned int newCode;
     unsigned int oldCode;

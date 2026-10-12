@@ -162,10 +162,10 @@ int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRa
     if (!list || !track)
         return 0;
     for (status = *list; status; status = status->field_0x50) {
-        status->field_0x0c = track->UnknownFunction517da0(status->field_0x38, probe->field_0x2c);
+        status->field_0x0c = track->DistanceAlong(status->field_0x38, probe->field_0x2c);
         if (status->field_0x0c < 0.0f)
             return 0;
-        float distance = track->UnknownFunction517da0(status->field_0x38, status->field_0x44);
+        float distance = track->DistanceAlong(status->field_0x38, status->field_0x44);
         if (distance > 0.0f && (distance < status->field_0x10 || status->field_0x10 < 0.0f) &&
             distance > status->field_0x0c)
             status->field_0x18 = -1;
@@ -321,8 +321,8 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 track->ClosestPointOnTrack(status->field_0x1c, &status->field_0x38, 0);
             if (racer->field_0x78c) {
                 racer->field_0x76c = 0;
-                status->field_0x08 = track->UnknownFunction517da0(status->field_0x44, finish->field_0x2c);
-                status->field_0x0c = track->UnknownFunction517da0(status->field_0x38, finish->field_0x2c);
+                status->field_0x08 = track->DistanceAlong(status->field_0x44, finish->field_0x2c);
+                status->field_0x0c = track->DistanceAlong(status->field_0x38, finish->field_0x2c);
                 if (status->field_0x08 < g_UnknownGlobal572988 && status->field_0x08 < status->field_0x0c)
                     COPY_TRACK_POS(status->field_0x38, status->field_0x44);
                 if ((racer->field_0x735 && racer->field_0x7c0) || g_UnknownGlobal572988 < 0.0f ||
@@ -338,7 +338,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 }
                 if (racer->field_0x7a4 && racer == racer->field_0x740->field_0x38)
                     g_ViewRacerFinished = 1;
-                status->field_0x10 = track->UnknownFunction517da0(status->field_0x44, status->field_0x38);
+                status->field_0x10 = track->DistanceAlong(status->field_0x44, status->field_0x38);
                 if (status->field_0x10 > 0.0f && status->field_0x10 < g_UnknownGlobal572988 &&
                     status->field_0x10 < status->field_0x08) {
                     status->field_0x14 += status->field_0x10;

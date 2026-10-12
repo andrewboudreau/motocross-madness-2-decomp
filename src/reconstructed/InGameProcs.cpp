@@ -61,7 +61,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButRight", event->controlName)) {
             guiManager->ShowCursors(0);
             HandleMenuOk(0x191, event);
-            g_TrackGame->UnknownFunction468880();
+            g_TrackGame->ResetClock();
         }
         break;
     case kDialogInit: {
@@ -101,7 +101,7 @@ void ContinueDlg::HandleEvent(UnknownDialogEvent* event) {
         if (!_stricmp("ButMiddle", event->controlName)) {
             guiManager->ShowCursors(0);
             UnknownFunction453090(0x190, event);
-            g_TrackGame->UnknownFunction468880();
+            g_TrackGame->ResetClock();
         }
         break;
     case kDialogInit: {

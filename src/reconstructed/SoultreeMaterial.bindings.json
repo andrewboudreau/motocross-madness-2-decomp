@@ -78,7 +78,7 @@
   "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHPAUSoultreeTextureOptions@@HIHH@Z": "0x0050a590",
   "?AddTexture@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?IsFormat4444Or8888@@YAHH@Z": "0x00511ad0",
-  "?UnknownFunction515df0@UnknownTokenizer@@QAEPADPBD@Z": "0x00515df0",
+  "?NextToken@UnknownTokenizer@@QAEPADPBD@Z": "0x00515df0",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
   "?UnknownVirtualSlot12@GameObject@@UAEHXZ": "0x00469300",

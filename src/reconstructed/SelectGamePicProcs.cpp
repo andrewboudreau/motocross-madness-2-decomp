@@ -202,7 +202,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     sprintf(first, "%s\\%s", g_TrackGame->mode.installDirectory, directory);
     sprintf(second, "%s\\%s", g_TrackGame->mode.cdDataDirectory, directory);
     ((CombinedDirectoryList*)directories)->UnknownFunction44abb0(first, second);
-    directories->UnknownFunction44a220(pattern, 1);
+    directories->SetPattern(pattern, 1);
     directories->UnknownVirtualSlot1();
     if (!directories->UnknownFunction4673b0())
         return 1;
@@ -213,7 +213,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
         sprintf(path, "%s\\%s", "ui", "unarts.tga");
         g_TrackGame->UnknownVirtualSlot18(path, fallback);
     }
-    int more = directories->UnknownFunction44a550(entry);
+    int more = directories->CurrentName(entry);
     UnknownTextureStream* stream = new(__FILE__, 180) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (more) {
         do {
@@ -291,7 +291,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             }
         next:
             index++;
-        } while (directories->UnknownFunction44a4c0(entry));
+        } while (directories->NextName(entry));
     }
     list->Sort(1);
     if (!append) {
@@ -1959,7 +1959,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        ((RenderTarget*)field_0x18)->SetCamera(0);
         break;
     }
 }
@@ -1968,7 +1968,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
 void MPBikeRiderDlg::PaintPlateNumber(int number) {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
-        painter.UnknownFunction417670(
+        painter.PaintNumber(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
 }
 

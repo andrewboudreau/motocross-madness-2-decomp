@@ -133,7 +133,7 @@ class UnknownKrustyUIPlatePainter {
 public:
     UnknownKrustyUIPlatePainter(TextureMapManager* textures);       // 0x00417500
     ~UnknownKrustyUIPlatePainter();                                 // 0x00417570
-    void UnknownFunction417670(UnknownKrustyUISoultree* texture, int number); // 0x00417670
+    void PaintNumber(UnknownKrustyUISoultree* texture, int number); // 0x00417670
     unsigned char field_0x00[0x2c];
 };
 
@@ -243,7 +243,7 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
 // 0x00498cf0: builds the garage scene (+0x464) on the first call with 1 or
 // -1: camera, lights, the garage and rider models and their shadow; with 2
 // or -1 afterwards, loads each bike model with its plate number once.
-void KrustyUI::UnknownFunction498cf0(int value) {
+void KrustyUI::BuildGarageScene(int value) {
     static UnknownKrustyUIVector s408;
     static UnknownKrustyUIVector s438;
     static UnknownKrustyUIVector s448;
@@ -344,7 +344,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         KRUSTYUI_RIDER->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->SetMotionByName("WaitR");
         KRUSTYUI_RIDER->UnknownFunction4a6bb0(0.03f, 0, 0);
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        ((RenderTarget*)field_0x18)->SetCamera(0);
         pending = 1;
         done = 0;
     }
@@ -363,7 +363,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             bike->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->SetMotionByName("WaitB");
             bike->UnknownFunction4a6bb0(0.03f, 0, 0);
-            painter.UnknownFunction417670(bike->field_0x1a0, g_TrackGame->mode.field_0x1bcc);
+            painter.PaintNumber(bike->field_0x1a0, g_TrackGame->mode.field_0x1bcc);
         }
         if (shadow) {
             shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);
@@ -407,7 +407,7 @@ void KrustyUI::Shutdown() {
 }
 
 // 0x0049b530: tells the "ProgressBar" control 1 (0x0047b370).
-void KrustyUI::UnknownFunction49b530() {
+void KrustyUI::StepProgressBar() {
     if (progressDialog) {
         UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->UnknownFunction46ebf0("ProgressBar", 0));
         if (bar)
@@ -472,7 +472,7 @@ int KrustyUI::UnknownVirtualSlot25(void* value) {
 void KrustyUI::ShowScene(GameObject* parent) {
     if (garageScene) {
         parent->AppendChild(garageScene, -1);
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(garageCamera);
+        ((RenderTarget*)field_0x18)->SetCamera(garageCamera);
     }
 }
 
@@ -480,7 +480,7 @@ void KrustyUI::ShowScene(GameObject* parent) {
 void KrustyUI::HideScene() {
     if (garageScene) {
         garageScene->Unlink();
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        ((RenderTarget*)field_0x18)->SetCamera(0);
     }
 }
 
@@ -506,7 +506,7 @@ void KrustyUI::OpenMenu(int menu) {
     case kMenuMain:
         dialog = new(__FILE__, 674) MainDlg;
         gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
-        g_TrackGame->UnknownFunction468880();
+        g_TrackGame->ResetClock();
         break;
     case kMenuSinglePlayer:
         dialog = new(__FILE__, 681) SinglePlayerDlg;
@@ -784,7 +784,7 @@ void KrustyUI::LoadBikesAndRiders() {
 }
 
 // 0x0049b560
-int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
+int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
     char path[128];
     UNKNOWN_COPY_SIZED(text, name, size);
     if (g_UnknownResourceManager572b44->FindItem(name, 1))
@@ -814,7 +814,7 @@ int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
 }
 
 // 0x0049b7f0
-int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
+int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
     char path[128];
     UNKNOWN_COPY_SIZED(text, name, size);
     if (g_UnknownResourceManager572b44->FindItem(name, 1))

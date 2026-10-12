@@ -271,7 +271,7 @@ int Game::UnknownVirtualSlot9() {
 }
 
 // 0x00468880
-void Game::UnknownFunction468880() {
+void Game::ResetClock() {
     field_0x2d8 = field_0x2dc = ReadClock();
 }
 

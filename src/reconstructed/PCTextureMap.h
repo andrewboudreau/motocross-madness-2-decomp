@@ -11,7 +11,7 @@
 extern int g_UnknownGlobal689964;
 
 // Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
-void UnknownFunction4a03d0(void* destination, void* source, int size);
+void ExpandLzw(void* destination, void* source, int size);
 
 // bmpfile.cpp (cdecl): 0x004245f0 describes an 8-bit bitmap and 0x00424380
 // writes it (the level dump).

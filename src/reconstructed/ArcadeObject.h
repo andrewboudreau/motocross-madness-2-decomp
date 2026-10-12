@@ -47,9 +47,9 @@ public:
     ArcadeObject* UnknownFunction401310(void* value, int a, int b, const char* name, Vector3 position,
                                         int pixels, UnknownArcadeView* view, float size, float c, float d,
                                         unsigned char alpha);
-    void UnknownFunction4014f0(const Vector3* position);  // 0x004014f0
+    void SetPosition(const Vector3* position);  // 0x004014f0
     // 0x00401520: forwards two axes and two flags to the model (0x004fbd70).
-    void UnknownFunction401520(const Vector3* a, const Vector3* b, int c, int d);
+    void SetAxes(const Vector3* a, const Vector3* b, int c, int d);
     // 0x00401540 (ret 0x18): builds the collision object (line 154) from
     // "<name>.col" when the archive has it, under the "Collision" category.
     int UnknownFunction401540(const char* name, int value, UnknownPickCallback callback, void* context,

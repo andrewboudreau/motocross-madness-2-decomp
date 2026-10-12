@@ -54,7 +54,7 @@ ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, con
         Release();
         return 0;
     }
-    UnknownFunction4014f0(&position);
+    SetPosition(&position);
     isVisible = 1;
     field_0x44 = size;
     arcadeView = view;
@@ -83,14 +83,14 @@ ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, con
 }
 
 // 0x004014f0
-void ArcadeObject::UnknownFunction4014f0(const Vector3* position) {
+void ArcadeObject::SetPosition(const Vector3* position) {
     arcadeModel->SetPosition(position);
     if (field_0x60)
         field_0x5c->UnknownFunction435fe0();
 }
 
 // 0x00401520
-void ArcadeObject::UnknownFunction401520(const Vector3* a, const Vector3* b, int c, int d) {
+void ArcadeObject::SetAxes(const Vector3* a, const Vector3* b, int c, int d) {
     arcadeModel->SetAxesPtr(a, b, c, d);
 }
 

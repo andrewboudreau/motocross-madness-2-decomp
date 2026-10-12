@@ -255,8 +255,8 @@ int TrackGame::UnknownVirtualSlot4() {
     sceneObject = new(__FILE__, 305) UnknownTrackGameObject574;
     g_MemTagStack->Push("UI");
     profileDirectory = new(__FILE__, 309) DirectoryList;
-    profileDirectory->UnknownFunction44a1d0("ui\\profile");
-    profileDirectory->UnknownFunction44a220("*.*", 1);
+    profileDirectory->SetDirectory("ui\\profile");
+    profileDirectory->SetPattern("*.*", 1);
     profileDirectory->UnknownVirtualSlot1();
     field_0x3400 = new(__FILE__, 313) UnknownTrackGameObject3400;
     mode.CreateDirectoryLists();
@@ -307,7 +307,7 @@ int TrackGame::UnknownVirtualSlot4() {
         }
         if (network->lobbyConnected) {
             ui->gui->ShowCursors(1);
-            ui->UnknownFunction498cf0(-1);
+            ui->BuildGarageScene(-1);
             char name[16];
             network->GetPlayerName(network->localPlayer, name);
             if (strcmp(mode.field_0x00, name)) {
@@ -467,7 +467,7 @@ void TrackGame::UnknownFunction521a40() {
 int TrackGame::UnknownVirtualSlot5() {
     PCGame::UnknownVirtualSlot5();
     if (field_0x55c)
-        UnknownFunction468880();
+        ResetClock();
     return 1;
 }
 

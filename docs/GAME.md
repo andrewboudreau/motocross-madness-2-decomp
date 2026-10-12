@@ -71,7 +71,7 @@ slot 32 allows, it then creates:
 - the "AllowFreezeCamera" setting, stored into bit 0 of +0x2d4.
 
 With the TestKey bit, holding the grave key (DIK 0x29) satisfies keyboard
-modifier 0x80 (`KeyboardDevice::UnknownFunction48a240`). Game slot 14 maps
+modifier 0x80 (`KeyboardDevice::ModifierHolds`). Game slot 14 maps
 control 0x20 (D) with that modifier to the overlay: grave+D shows it and then
 steps through the pages. In the demo they are the profile, memory and
 "MS Timers" pages (checked on screen). The same bit enables PCGame slot 14's

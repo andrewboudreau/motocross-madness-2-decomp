@@ -22,7 +22,7 @@
   "?Recenter@UnknownControlBinding@@QAEXXZ": "0x0043cd10",
   "?Adjust@UnknownControlBinding@@QAEXM@Z": "0x0043cd90",
   "?QueueEvent@ControlInterface@@QAEXHHHH@Z": "0x0043cea0",
-  "?UnknownFunction489c00@JoystickDevice@@QAEXHMM@Z": "0x00489c00",
+  "?FeedAxis@JoystickDevice@@QAEXHMM@Z": "0x00489c00",
   "?GetForceFeedbackEffectName@@YAHUUnknownGuid@@PAD@Z": "0x004beef0",
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?ButtonIndexFromOffset@PCJoystickDevice@@QAEHH@Z": "0x004c2ef0",

@@ -124,9 +124,9 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
     char file[260];
     for (int i = 0; i < 10; i++)
         field_0x14[i] = UnknownTrackRecord();
-    field_0xdc->UnknownFunction44a1d0((const char*)g_TrackGame->mode.currentSeriesDirectory);
+    field_0xdc->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(path, "*%s", field_0x04[field_0x00]);
-    field_0xdc->UnknownFunction44a220(path, 1);
+    field_0xdc->SetPattern(path, 1);
     field_0xdc->UnknownVirtualSlot1();
     sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, name);
     sprintf(file, "%s%s", name, field_0x04[field_0x00]);

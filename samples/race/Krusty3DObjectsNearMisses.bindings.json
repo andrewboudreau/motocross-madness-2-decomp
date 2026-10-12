@@ -1,7 +1,7 @@
 {
   "??0Vector3@@QAE@MMM@Z": "0x00404e60",
-  "?UnknownFunction4014f0@ArcadeObject@@QAEXPBUVector3@@@Z": "0x004014f0",
-  "?UnknownFunction401520@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
+  "?SetPosition@ArcadeObject@@QAEXPBUVector3@@@Z": "0x004014f0",
+  "?SetAxes@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?NextKey@BonusObjectManager@@QAEXXZ": "0x0048cad0",
   "?HideDigits@BonusObjectManager@@QAEXXZ": "0x0048d540",

@@ -259,8 +259,8 @@ public:
     void UnknownFunction4444e0();                  // 0x004444e0
     void UnknownFunction444a40(D3DIMSoultreeObject* source); // 0x00444a40
     int ReplaceMaterialTexture(int index, const char* name, int a); // 0x00444c70
-    void UnknownFunction444d00(int lod);           // 0x00444d00
-    void UnknownFunction444d40(int lod);           // 0x00444d40
+    void SetLod(int lod);           // 0x00444d00
+    void SetLowestLod(int lod);           // 0x00444d40
     void UnknownFunction444d60(float value);       // 0x00444d60
     void UnknownFunction444e80();                  // 0x00444e80
     void UnknownFunction444eb0(GameObject* modifier); // 0x00444eb0
@@ -268,7 +268,7 @@ public:
     int GetVertexCount();                   // 0x00444fe0
     int GetSurfaceCount(int lod);         // 0x00445030: surface count
     int NodeMovesVertices(SoultreeObject* node, int lod);     // 0x00445060: node moves vertices
-    void UnknownFunction4451e0(int index);         // 0x004451e0
+    void ApplyLodSettings(int index);         // 0x004451e0
 
     int field_0x1a4;
     int field_0x1a8;

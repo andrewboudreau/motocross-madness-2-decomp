@@ -6,7 +6,7 @@
   "?ReadBits@GR_BitString@@QAEIH@Z": "0x00423ef0",
   "?UnknownFunction4a0310@@YAXXZ": "0x004a0310",
   "?UnknownFunction4a0360@@YAHXZ": "0x004a0360",
-  "?UnknownFunction4a03d0@@YAXPAEPBXH@Z$ehhandler": "0x0054c368",
+  "?ExpandLzw@@YAXPAEPBXH@Z$ehhandler": "0x0054c368",
   "?g_lzwCodeBits@@3HA": "0x00684dfc",
   "?g_lzwDecodeStack@@3PADA": "0x0067c528",
   "?g_lzwDictionary@@3PAPAULzwDictionaryEntry@@A": "0x00684e00",
