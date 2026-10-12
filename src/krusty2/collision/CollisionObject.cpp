@@ -1897,7 +1897,8 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
         Vec3 last;
         last = Vec3(0.0f, 0.0f, 0.0f);
         for (int i = 0; i < b->elementCount; i++) {
-            if (ModelVsHullSwept(a, &b->elements[i], q)) {
+            CollisionHullBody* e = &b->elements[i];
+            if (ModelVsHullSwept(a, e, q)) {
                 hit = 1;
                 last = QueryContact(q);
             }
