@@ -310,19 +310,19 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
     if (TestInputEvent(0x31, 0, event, 0xc)) {
-        if (g_TrackGame->mode.field_0x6bc && g_TrackGame->mode.field_0x6c0) {
-            g_TrackGame->mode.field_0x6c0 = 0;
+        if (g_TrackGame->mode.showRiderNames && g_TrackGame->mode.showRiderPositions) {
+            g_TrackGame->mode.showRiderPositions = 0;
             ShowOnOffMessage(0x1412, 1);
-        } else if (g_TrackGame->mode.field_0x6bc) {
-            g_TrackGame->mode.field_0x6bc = 0;
-            g_TrackGame->mode.field_0x6c0 = 1;
+        } else if (g_TrackGame->mode.showRiderNames) {
+            g_TrackGame->mode.showRiderNames = 0;
+            g_TrackGame->mode.showRiderPositions = 1;
             ShowOnOffMessage(0x1413, 1);
-        } else if (g_TrackGame->mode.field_0x6c0) {
-            g_TrackGame->mode.field_0x6c0 = 0;
+        } else if (g_TrackGame->mode.showRiderPositions) {
+            g_TrackGame->mode.showRiderPositions = 0;
             ShowOnOffMessage(0x1414, 0);
         } else {
-            g_TrackGame->mode.field_0x6bc = 1;
-            g_TrackGame->mode.field_0x6c0 = 1;
+            g_TrackGame->mode.showRiderNames = 1;
+            g_TrackGame->mode.showRiderPositions = 1;
             ShowOnOffMessage(0x1414, 1);
         }
         chatOverlay->RedrawNameTags(-1);

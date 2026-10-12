@@ -422,7 +422,7 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
         if (s_UnknownGlobal68a444) {
             sprintf(text, "%.3f", racers[index]->field_0x4a4);
         } else {
-            if (g_TrackGame->mode.field_0x6c0) {
+            if (g_TrackGame->mode.showRiderPositions) {
                 UnknownChatRacer* racer = racers[index];
                 if (racer->field_0x784 > 0)
                     sprintf(text, "%d", racer->field_0x784);
@@ -431,11 +431,11 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
             } else {
                 strcpy(text, "");
             }
-            if (g_TrackGame->mode.field_0x6bc)
+            if (g_TrackGame->mode.showRiderNames)
                 strcpy(name, racers[index]->name);
             else
                 strcpy(name, "");
-            if (g_TrackGame->mode.field_0x6c0 && g_TrackGame->mode.field_0x6bc)
+            if (g_TrackGame->mode.showRiderPositions && g_TrackGame->mode.showRiderNames)
                 strcat(text, " : ");
             strcat(text, name);
         }

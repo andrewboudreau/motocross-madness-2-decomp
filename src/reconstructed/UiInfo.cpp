@@ -166,12 +166,12 @@ int TrackGameMode::ResetNetworkRace() {
 void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options) {
     options->instrumentOverlayOn = 1;
     options->showRaceStatistics = 1;
-    options->field_0x1c = 1;
+    options->uiAnimations = 1;
     options->chatInputLine = 0;
     options->showNameTags = 1;
-    options->field_0x10 = 1;
-    options->field_0x14 = 1;
-    options->field_0x18 = 1;
+    options->showRiderNames = 1;
+    options->showRiderPositions = 1;
+    options->showPodiums = 1;
     options->field_0x30 = 2;
     options->field_0x34 = 0;
     options->field_0x38 = 0;
@@ -179,9 +179,9 @@ void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* option
     options->field_0x40 = 0;
     options->field_0x44 = 0;
     options->introMovieOn = 1;
-    options->field_0x24 = 1;
-    options->field_0x28 = 1;
-    options->field_0x2c = 1;
+    options->playerIndicator = 1;
+    options->toolTips = 1;
+    options->wreckResetOnTrack = 1;
     memset(&options->field_0x360, 0, sizeof(options->field_0x360));
 }
 
@@ -190,12 +190,12 @@ void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* option
 void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* options) {
     options->field_0x00 = 0;
     options->soundOn = 1;
-    options->field_0x04 = 1;
+    options->uiSounds = 1;
     options->field_0x0c = 1;
     options->soundVolume = 100;
     options->field_0x24 = 100;
-    options->field_0x10 = 0;
-    options->field_0x1c = 100;
+    options->soundHardware = 0;
+    options->uiVolume = 100;
     options->eaxEnabled = 0;
     options->use16BitSound = 0;
     options->positionSounds = 1;
@@ -214,18 +214,18 @@ void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options
 
 // 0x00522800
 void TrackGameMode::ResetControlOptions(UnknownTrackGameModeOptionsA68* options) {
-    options->field_0x00[0] = 50;
-    options->field_0x1c = 50;
+    options->responseSliders[0] = 50;
+    options->feedback = 50;
     options->joystickOn = 1;
-    options->field_0x00[1] = 50;
-    options->field_0x00[2] = 50;
-    options->field_0x00[3] = 50;
-    options->field_0x00[4] = 50;
-    options->field_0x00[5] = 50;
-    options->field_0x00[6] = 50;
-    options->field_0x24 = 0;
-    options->field_0x28 = 1;
-    options->field_0x2c = 1;
+    options->responseSliders[1] = 50;
+    options->responseSliders[2] = 50;
+    options->responseSliders[3] = 50;
+    options->responseSliders[4] = 50;
+    options->responseSliders[5] = 50;
+    options->responseSliders[6] = 50;
+    options->gasGyro = 0;
+    options->brakeGyro = 1;
+    options->analogAxes = 1;
 }
 
 // 0x00522840: reloads the ten names from string resources 0x1417..0x1420

@@ -1471,7 +1471,7 @@ int ChatOverlay::UnknownVirtualSlot13()
         RedrawNameTags(-1);
     } else {
         for (int i = 0; i < racerCount; i++) {
-            if (g_TrackGame->mode.field_0x6c0 && lastRacerValues[i] != racers[i]->field_0x784) {
+            if (g_TrackGame->mode.showRiderPositions && lastRacerValues[i] != racers[i]->field_0x784) {
                 RedrawNameTags(i);
                 lastRacerValues[i] = racers[i]->field_0x784;
             }
@@ -1496,7 +1496,7 @@ int ChatOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
     }
-    if (g_TrackGame->mode.field_0x6bc || g_TrackGame->mode.field_0x6c0)
+    if (g_TrackGame->mode.showRiderNames || g_TrackGame->mode.showRiderPositions)
         GameObject::UnknownVirtualSlot14();
     return 1;
 }

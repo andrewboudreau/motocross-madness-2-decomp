@@ -131,14 +131,14 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
     int showRaceStatistics;                   // +0x04 (+0x6b0: TrackOverlay 0x00519980)
     int chatInputLine;                        // +0x08 (+0x6b4: 1 shows the chat input line)
     int showNameTags;                         // +0x0c (+0x6b8: TrackOverlay 0x005190e0)
-    int field_0x10;
-    int field_0x14;
-    int field_0x18;
-    int field_0x1c;
+    int showRiderNames;                       // +0x10 RiderNamesCheckBox (OptionProcs.h)
+    int showRiderPositions;                   // +0x14 RiderPositionCheckBox
+    int showPodiums;                          // +0x18 ChkPodiums
+    int uiAnimations;                         // +0x1c ChkUIAnims
     int introMovieOn;                         // +0x20 (+0x6cc: Intro1Dlg)
-    int field_0x24;
-    int field_0x28;
-    int field_0x2c;
+    int playerIndicator;                      // +0x24 ChkPlayerIndicator
+    int toolTips;                             // +0x28 ChkToolTips
+    int wreckResetOnTrack;                    // +0x2c ChkWreckResetOnTrack
     int field_0x30;
     int field_0x34;
     int field_0x38;
@@ -151,13 +151,13 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
 
 struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes
     int field_0x00;
-    int field_0x04;
+    int uiSounds;                             // +0x04 UserInterfaceSoundsCheckBox (OptionProcs.h)
     int soundOn;                              // +0x08 (TrackGameMode+0xa28): sound on
     int field_0x0c;
-    int field_0x10;
+    int soundHardware;                        // +0x10 SoundHardwareCheckBox
     int eaxEnabled;                           // +0x14 (TrackGameMode+0xa34): LoadProfile passes it to allowEAXExtension
     int positionSounds;                       // +0x18 (TrackGameMode+0xa38): position sounds on
-    int field_0x1c;
+    int uiVolume;                             // +0x1c UserInterfaceVolumeSlider
     int soundVolume;                          // +0x20 (TrackGameMode+0xa40): sound volume
     int field_0x24;
     int use16BitSound;                        // +0x28 (TrackGameMode+0xa48): 16-bit (else 8-bit) primary format in LoadProfile
@@ -174,12 +174,12 @@ struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
 };
 
 struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes (ResetControlOptions)
-    int field_0x00[7];                        // 50 each
-    int field_0x1c;
+    int responseSliders[7];                   // +0x00 50 each: Steering, Crossup, Pitch, PressThrottle, PressBrakes, ReleaseThrottle, ReleaseBrakes sliders (OptionProcs.h)
+    int feedback;                             // +0x1c FeedbackSlider
     int joystickOn;                           // +0x20 TrackGameMode+0xa88 joystickOn, reset to 1
-    int field_0x24;
-    int field_0x28;
-    int field_0x2c;
+    int gasGyro;                              // +0x24 ChkGasGyro, reset to 0
+    int brakeGyro;                            // +0x28 ChkBrakeGyro, reset to 1
+    int analogAxes;                           // +0x2c ChkAnalogAxes
 };
 
 // TrackGameMode+0xfd8, +0x1034 and +0x1090 (0x5c bytes each).
@@ -349,26 +349,26 @@ public:
     int showRaceStatistics;                   // +0x6b0 shows the race statistics (TrackOverlay 0x00519980)
     int chatInputLine;                        // +0x6b4 1 shows the chat input line (QuarryStuntEvent.cpp)
     int showNameTags;                         // +0x6b8 shows the racers' name tags (TrackOverlay 0x005190e0)
-    int field_0x6bc;                          // TrackOverlay 0x0051e390
-    int field_0x6c0;                          // TrackOverlay 0x0051e390
-    unsigned char field_0x6c4[0x6c8 - 0x6c4];
-    int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
+    int showRiderNames;                       // +0x6bc RiderNamesCheckBox (OptionProcs.h's TrackGame+0xc24 block); TrackOverlay 0x0051e390
+    int showRiderPositions;                   // +0x6c0 RiderPositionCheckBox; TrackOverlay 0x0051e390
+    unsigned char field_0x6c4[0x6c8 - 0x6c4]; // ChkPodiums (read as an int by EventManager 0x0045d480)
+    int uiAnimations;                         // +0x6c8 ChkUIAnims; copied to the GUI's +0xec (KrustyUI 0x004988a0)
     int introMovieOn;                         // +0x6cc: intro movie on (dlgprocs.cpp Intro1Dlg)
-    unsigned char field_0x6d0[0x6d4 - 0x6d0];
-    int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
-    unsigned char field_0x6d8[0x6dc - 0x6d8];
+    unsigned char field_0x6d0[0x6d4 - 0x6d0]; // ChkPlayerIndicator (read as an int by BikeRace 0x00417ed0)
+    int toolTips;                             // +0x6d4 ChkToolTips; copied into GUI layer 0's tool tip (EventManager 0x0045e710)
+    unsigned char field_0x6d8[0x6dc - 0x6d8]; // ChkWreckResetOnTrack
     int maxAIBikes;                           // +0x6dc: most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
     unsigned char field_0x6e0[0x6f4 - 0x6e0];
     char trackNames[6][0x80];             // +0x6f4: a track name per game type (SelectGamePicProcs.cpp)
     int trackIndices[6];                  // +0x9f4: a track index per game type (SelectGamePicProcs.cpp)
     int garageCurveChoice[5];             // +0xa0c: the garage curve chosen per bike class (OptionProcs.cpp's +0x360)
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
-    int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
+    int uiSounds;                             // +0xa24 UserInterfaceSoundsCheckBox (OptionProcs.h's TrackGame+0xf98 block); selects uiVolume for the GUI's +0x34c (KrustyUI 0x004988a0)
     int soundOn;                              // +0xa28 sound on (racesnd.cpp)
-    unsigned char field_0xa2c[0xa34 - 0xa2c];
+    unsigned char field_0xa2c[0xa34 - 0xa2c]; // +0xa30 SoundHardwareCheckBox
     int eaxEnabled;                           // +0xa34 TrackGame slot 4 audio argument
     int positionSounds;                       // +0xa38 position sounds on (racesnd.cpp 0x004e39b0)
-    int field_0xa3c;
+    int uiVolume;                             // +0xa3c UserInterfaceVolumeSlider
     int soundVolume;                          // +0xa40 sound volume (racesnd.cpp 0x004e3430)
     unsigned char field_0xa44[0xa48 - 0xa44];
     int use16BitSound;                        // +0xa48 selects 16 (else 8) in TrackGame slot 4
@@ -383,7 +383,7 @@ public:
     int joystickOn;                           // +0xa88 joystick input on (bikerace.cpp slot 16)
     int gasGyro;                              // +0xa8c toggled by key 0x22, shown as string 0x140d "Gas Gyro" ON/OFF (bikerace.cpp slot 23)
     int brakeGyro;                            // +0xa90 toggled by key 0x30, shown as string 0x142d "Brake Gyro" ON/OFF (bikerace.cpp slot 23)
-    unsigned char field_0xa94[0xa98 - 0xa94];
+    unsigned char field_0xa94[0xa98 - 0xa94]; // ChkAnalogAxes (OptionProcs.h's TrackGame+0xfe0 block)
     UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
     unsigned char garageOptions[0x5c];       // +0xfd8 garage settings (UNKNOWN_GARAGE_SETTINGS); restored from +0x1034 when a replay is left (InGameProcs.cpp)
