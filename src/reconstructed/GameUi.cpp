@@ -889,7 +889,7 @@ UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner)
     dragY = 0;
     dragX = 0;
     field_0x218 = 0;
-    field_0x21c = 0;
+    reversed = 0;
     scrollRange = 100;
     holdDelay = 0.2f;
 }
@@ -1064,10 +1064,10 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     lastPageRowCount = 0;
     selectColor = 0xffffff;
     rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
-    field_0x24c = UnknownFunction477b60;
+    sortCompare = UnknownFunction477b60;
     field_0x218 = (int)this;
     autoSort = 0;
-    field_0x220 = 0;
+    sorting = 0;
     selectable = 1;
     allowWScroll = 1;
     field_0x234 = 0;
@@ -1079,7 +1079,7 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     firstVisibleRow = 0;
     lastPageRowCount = 0;
     memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
-    field_0x244 = 1;
+    wrapScroll = 1;
     if (!(fontHeight || (ownerDialog && ownerDialog->dialogFontHeight))) {
         visibleRowCount = 1;
     } else {
@@ -1190,7 +1190,7 @@ char* UIListBox::GetRowText(int row) {
 
 // 0x004777f0
 void UIListBox::SetSortCompare(int (*compare)(const void* a, const void* b)) {
-    field_0x24c = compare;
+    sortCompare = compare;
 }
 
 // 0x00477b60
@@ -3078,7 +3078,7 @@ int UnknownFunction477800(const void* a, const void* b) {
     int result = 0;
     if (g_UnknownGlobal65b608->sortingList) {
         UIListBox* control = g_UnknownGlobal65b608->sortingList->field_0x218_control;
-        result = control->field_0x24c(a, b);
+        result = control->sortCompare(a, b);
         if (!result) {
             int left = ((const UnknownGameUiListRow*)a)->sortIndex;
             int right = ((const UnknownGameUiListRow*)b)->sortIndex;
@@ -3093,7 +3093,7 @@ int UnknownFunction477800(const void* a, const void* b) {
                     result = -1;
                     break;
                 }
-                result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
+                result = other->sortCompare(&other->rowTable[left], &other->rowTable[right]);
                 if (result)
                     break;
             }
@@ -3111,7 +3111,7 @@ void UIListBox::Sort(int a) {
     }
     if (!rowCount)
         return;
-    field_0x220 = 1;
+    sorting = 1;
     for (int i = 0; i < rowCount; i++)
         rowTable[i].sortIndex = i;
     int selected = selectedRow;
@@ -3140,7 +3140,7 @@ void UIListBox::Sort(int a) {
             break;
         }
     }
-    field_0x220 = 0;
+    sorting = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -3154,7 +3154,7 @@ int UIScrollBar::GetListScrollRange(UIListBox* list) {
 // 0x00475200
 int UIScrollBar::FollowList(UIListBox* list) {
     UnknownVirtualSlot50();
-    if (field_0x21c) {
+    if (reversed) {
         int count = list->rowCount;
         field_0x1fc = count - list->UnknownFunction4755c0();
     } else {
@@ -3183,9 +3183,9 @@ int UIScrollBar::UnknownFunction475300(int value) {
     unsigned int position;
     int travel;
     if (controlType == 8) {
-        position = (int)(field_0x21c ? width - thumbOffset : thumbOffset);
+        position = (int)(reversed ? width - thumbOffset : thumbOffset);
     } else {
-        position = (int)(field_0x21c ? height - thumbOffset : thumbOffset);
+        position = (int)(reversed ? height - thumbOffset : thumbOffset);
     }
     travel = controlType == 8 ? width - thumbWidth : height - thumbHeight;
     return (int)(travel ? (double)(position * value) / travel : 0.0);
@@ -3196,7 +3196,7 @@ int UIScrollBar::UnknownFunction475500() {
     int width = UnknownVirtualSlot61();
     int height = UnknownVirtualSlot62();
     int position;
-    if (!field_0x21c) {
+    if (!reversed) {
         position = (int)thumbOffset;
         if (position < thumbOffset)
             position++;
@@ -4515,7 +4515,7 @@ int UIListBox::UnknownVirtualSlot10(float frameTime) {
             }
         }
     }
-    field_0x248 = -1;
+    hoverRow = -1;
     GUIUser* user = ownerDialog->guiUser;
     if (user->pointerDevice) {
         POINT cursor = user->pointerDevice->pointerPosition;
@@ -4524,7 +4524,7 @@ int UIListBox::UnknownVirtualSlot10(float frameTime) {
             for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
                 rect.bottom = rect.top + GetRowHeight(row);
                 if (PtInRect(&rect, cursor) && !(rowTable[row].flags & 1)) {
-                    field_0x248 = row;
+                    hoverRow = row;
                     break;
                 }
                 rect.top += GetRowHeight(row);
@@ -4671,7 +4671,7 @@ int UIListBox::UnknownVirtualSlot40() {
                     }
                     break;
                 }
-                if (field_0x248 == row && pass == 0 && visibleRowCount > 1) {
+                if (hoverRow == row && pass == 0 && visibleRowCount > 1) {
                     rect.left = area.left;
                     rect.top = y;
                     rect.bottom = height + y;
@@ -5028,7 +5028,7 @@ int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntr
 
 // 0x004753c0
 int UIScrollBar::UnknownFunction4753c0(int value, int range) {
-    unsigned int position = field_0x21c ? range - value : value;
+    unsigned int position = reversed ? range - value : value;
     UnknownVirtualSlot50();
     if (!field_0x1f0 && UnknownFunction475300(range) == position)
         return 1;
@@ -5053,7 +5053,7 @@ void UIListBox::ScrollBy(int delta) {
     if (!count)
         return;
     int first = firstVisibleRow += delta;
-    if (field_0x244) {
+    if (wrapScroll) {
         if (first < 0)
             firstVisibleRow = first + count;
         int index = firstVisibleRow % count;

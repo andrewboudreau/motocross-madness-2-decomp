@@ -1154,7 +1154,7 @@ void OptGarageDlg::ShowCurve()
         FindControl(name, 0)->SetText(text);
         sprintf(name, "SldEQ%d", i);
         UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl(name, 8));
-        slider->field_0x21c = 1;
+        slider->reversed = 1;
         slider->UnknownFunction4754d0(g_TrackGame->ui->field_0x450[bikeClass] - g_TrackGame->ui->field_0x43c[bikeClass] + 1);
         slider->UnknownFunction4753c0(*level - g_TrackGame->ui->field_0x43c[bikeClass],
                                       g_TrackGame->ui->field_0x450[bikeClass] - g_TrackGame->ui->field_0x43c[bikeClass]);

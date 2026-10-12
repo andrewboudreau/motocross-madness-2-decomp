@@ -457,7 +457,8 @@ public:
         int field_0x218;
         float holdTime;                       // +0x218: time held at one position
     };
-    int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
+    int reversed;                             // +0x21c: the thumb counts from the far end (set on the
+                                              // SldEQ sliders, OptionProcs.cpp)
 };
 
 // RTTI: UIListBox : UIControl (vtable 0x00553100; 0x250 bytes, `new` at
@@ -532,7 +533,7 @@ public:
         UIListBox* field_0x218_control;       // itself
     };
     int autoSort;                             // +0x21c: "AutoSort"
-    int field_0x220;
+    int sorting;                              // +0x220: 1 while Sort runs
     int selectable;                           // +0x224: "Selectable"
     int allowWScroll;                         // +0x228: "AllowWScroll"
     int field_0x22c;
@@ -541,9 +542,9 @@ public:
     int lastClickRow;                         // +0x238: for the double click (slot 66)
     int lastClickTime;                        // +0x23c
     int field_0x240;
-    int field_0x244;
-    int field_0x248;
-    int (*field_0x24c)(const void* a, const void* b); // the rows' sort order
+    int wrapScroll;                           // +0x244: ScrollBy wraps around the rows (1 by default)
+    int hoverRow;                             // +0x248: the row under the cursor, framed (-1: none; slot 10)
+    int (*sortCompare)(const void* a, const void* b); // +0x24c: the rows' sort order (SetSortCompare)
 };
 
 // RTTI: UIMultiState : UIControl (vtable 0x00553210; 0x1f8 bytes, `new` at
