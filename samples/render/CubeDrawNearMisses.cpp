@@ -11,7 +11,9 @@
 // low value is stored before the high one is computed. Retail keeps a row
 // pointer (+0x300 per row) and ends the face loop on it; VC6 here folds the
 // row into a single cell pointer (index, pointer, 3-D cast and explicit row
-// pointer forms all fold, or keep the face counter).
+// pointer forms all fold, or keep the face counter). Also tried: a rowStart
+// index, a 4-D array cast, a loop bounded by the row pointer and a
+// post-incremented vertex pointer (39 of 352 at best).
 //
 // 0x0043e330 (398 bytes): the walk matches; eax and ecx swap roles for the
 // render target and its camera, the face mask is addressed [face + cube]

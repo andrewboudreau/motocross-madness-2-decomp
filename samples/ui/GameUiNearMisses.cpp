@@ -64,7 +64,13 @@
 //   +0x14 is loaded, and the joystick branches after the first sit after the
 //   epilogue. `while (1)`/`for (;;)` device loops, `continue` per branch and
 //   the joystick test as an inline helper (with and without returns) keep
-//   them inline.
+//   them inline. So do `else continue` after the first branch's centred
+//   test or its `if (next)` call, a `continue` after the centring store, a
+//   `deviceKind != 2` continue and a `for` device loop (334); the x test
+//   inverted (`x > -1` first) gives 347. Reading the target through
+//   `timer->targetControl` twice moves the +0x0c store before the load as
+//   retail does, but changes the call's registers (172); a control local
+//   read before or after the store gives 352.
 // 0x004734c0 UIButton slot 28 (256/328) and 0x00478e10 UIMultiState slot 28
 //   (231/303; UIMultiState tests its own area in place, without UIButton's
 //   RECT copy, which gives retail's 0x84 frame and head): retail keeps the 8-bit result in edi and the 16-bit one in

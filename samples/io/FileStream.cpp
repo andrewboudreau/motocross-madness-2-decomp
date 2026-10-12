@@ -107,6 +107,8 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // Also swept (20 forms, best 28): a result local, `!= 0`, `0L`, an extra
 // `&& field_0x14` and an unsigned `> 0` test for the first seek, each with the
 // `encoded`/+0x124/`field_0x08 = 0` statements in three orders and a cast zero.
+// Nested `if (!fseek(...)) { ... } else { fclose ...}` forms, with the header
+// test negated or not, and an if/else-if chain give 25-28.
 int UnknownTextureStream::CheckHeader()
 {
     if (fseek(field_0x14, 0, SEEK_SET)) {

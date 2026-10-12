@@ -8,7 +8,8 @@
 // keeps &size in ebx and calls Receive through ecx; VC6 here loads the
 // buffer later and uses eax/ecx, saving the ebx push. Moving the from/to
 // declarations, a local buffer copy, a local interface pointer and do/while
-// or continue forms all compile identically.
+// or continue forms all compile identically, as do a function-pointer local
+// for Receive and inline accessors for the buffer and the size.
 //
 // HandleReceivedMessage (0x004afa90, 1252 bytes): frame, branch layout and
 // all blocks except two match: the 0x80 acknowledgement (retail holds data in

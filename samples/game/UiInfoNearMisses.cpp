@@ -28,6 +28,8 @@
 // found helper taking the file by value were tried, and so were `!file`/
 // `file == 0` x three second-fopen forms x five found-block forms (30, best
 // 190; an `int found` flag scores 191 but grows the function to 387 bytes).
+// The found block written out in both fopen branches is not merged by VC6
+// (193 of 422).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
