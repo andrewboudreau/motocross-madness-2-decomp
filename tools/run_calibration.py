@@ -18727,7 +18727,7 @@ CASES = [
         'name': 'Krusty3DObjects.cpp RunwayLights set racer',
         'bindings': 'src/reconstructed/Krusty3DObjects.bindings.json',
         'source': 'src/reconstructed/Krusty3DObjects.cpp',
-        'symbol': '?UnknownFunction48ad50@RunwayLights@@QAEXPAUUnknownRunwayRacer@@@Z',
+        'symbol': '?SetRacer@RunwayLights@@QAEXPAUUnknownRunwayRacer@@@Z',
         'target_va': '0x0048ad50',
         'target_size': 10,
         'reason': 'NationalRace 0x4aa87d on its +0xa4 RunwayLights',

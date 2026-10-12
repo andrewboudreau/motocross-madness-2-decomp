@@ -121,11 +121,11 @@ public:
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
     RunwayLights* SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain);
-    void UnknownFunction48ad50(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
+    void SetRacer(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
 
     float blinkTimer;                          // blink timer
-    UnknownRunwayRacer* field_0x30;
-    UnknownRunwayTerrain* field_0x34;
+    UnknownRunwayRacer* trackedRacer;          // +0x30 the lights stand on its track (SetRacer)
+    UnknownRunwayTerrain* groundTerrain;       // +0x34 grounds the lights (SetupLights)
     ArcadeObject* lightModels[5];
 };
 

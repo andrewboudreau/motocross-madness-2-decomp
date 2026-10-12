@@ -24,13 +24,13 @@ struct UnknownRunwayRacer;
 class RunwayLights : public GameObject {
 public:
     explicit RunwayLights(int flags);          // 0x0048a5b0
-    RunwayLights* UnknownFunction48a600(void* value, int a, int b, UnknownRunwayTerrain* terrain); // 0x0048a600
-    void UnknownFunction48ad50(UnknownRunwayRacer* racer); // 0x0048ad50
+    RunwayLights* SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain); // 0x0048a600
+    void SetRacer(UnknownRunwayRacer* racer); // 0x0048ad50
 
-    float field_0x2c;                          // blink timer
-    UnknownRunwayRacer* field_0x30;
-    UnknownRunwayTerrain* field_0x34;
-    ArcadeObject* field_0x38[5];
+    float blinkTimer;                          // +0x2c blink timer
+    UnknownRunwayRacer* trackedRacer;          // +0x30
+    UnknownRunwayTerrain* groundTerrain;       // +0x34
+    ArcadeObject* lightModels[5];              // +0x38
 };
 
 // 0x004aa7f0
@@ -45,7 +45,7 @@ NationalRace* NationalRace::Create(RenderTarget* target, UnknownProgressCallback
     if (!BaseQuarryEvent::Create(target, progress))
         return 0;
     if (runwayLights)
-        runwayLights->UnknownFunction48ad50((UnknownRunwayRacer*)raceView->localRacer);
+        runwayLights->SetRacer((UnknownRunwayRacer*)raceView->localRacer);
     return this;
 }
 
@@ -56,7 +56,7 @@ int NationalRace::UnknownVirtualSlot27(int value) {
     if (!BaseQuarryEvent::UnknownVirtualSlot27(value))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
-                     ->UnknownFunction48a600(renderContext, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
+                     ->SetupLights(renderContext, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;

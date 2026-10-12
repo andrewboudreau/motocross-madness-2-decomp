@@ -49,7 +49,7 @@
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?SetupLights@RunwayLights@@QAEPAV1@PAXHHPAUUnknownRunwayTerrain@@@Z": "0x0048a600",
   "?SetupLights@RunwayLights@@QAEPAV1@PAXHHPAUUnknownRunwayTerrain@@@Z$ehhandler": "0x0054bb47",
-  "?UnknownFunction48ad50@RunwayLights@@QAEXPAUUnknownRunwayRacer@@@Z": "0x0048ad50",
+  "?SetRacer@RunwayLights@@QAEXPAUUnknownRunwayRacer@@@Z": "0x0048ad50",
   "?LoadVisualCue@VisualCue@@QAEPAV1@PAXHHPAUUnknownRunwayTerrain@@UVector3@@PAUUnknownVisualCueView@@HPAUUnknownArcadeView@@MMM@Z": "0x0048adf0",
   "?CollectRacers@VisualCue@@QAEXPAUUnknownVisualCueView@@@Z": "0x0048af20",
   "?NextCueIndex@VisualCue@@QAEHXZ": "0x0048bc30",

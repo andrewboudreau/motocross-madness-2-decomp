@@ -116,7 +116,7 @@ public:
     int paused;                               // +0x1c4: Ctrl+F toggles it (debug keys); BikeRace mirrors its replay pause here
     int stepOneFrame;                         // +0x1c8: set by E while paused and by the replay ButFrame
     char field_0x1cc[0x2d0 - 0x1cc];          // directory for slot 18
-    int field_0x2d0;
+    int field_0x2d0;                          // the "Renderer" setting is "Blade" (PCGame 0x004bfc50); software paths test it
     unsigned char field_0x2d4_bit0 : 1;       // "AllowFreezeCamera"; slot 14 key handling
     unsigned char fullScreen : 1;             // +0x2d4 bit 1: registry "FullScreen" (1 initially)
     unsigned char field_0x2d4_bit2 : 1;       // registry "TestKey" (debug input, overlay)

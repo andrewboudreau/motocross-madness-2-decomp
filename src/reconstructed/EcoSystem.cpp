@@ -171,9 +171,9 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->SelectSection("Material - 0");
             block->ReadString("TextureMap", path, -1);
             int format = 1555;
-            if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->capabilityBits & 8)
+            if (!g_TrackGame->bladeRenderer && (g_TrackGame->display->capabilityBits & 8)
                 && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                format = g_TrackGame->field_0x10->colorKeyFormat;
+                format = g_TrackGame->display->colorKeyFormat;
             modelTexture = UnknownFunction50a590(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->UnknownVirtualSlot7()) {
                 int loaded = modelTexture->pixelFormat;
@@ -795,7 +795,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEco
                                             int textureFormat, int collisions, int level) {
     int i;
     GameObject::UnknownVirtualSlot8(view);
-    g_UnknownGlobal59af14 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
+    g_UnknownGlobal59af14 = g_TrackGame->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     SetDetailLevel(level);
     groundTerrain = terrain;
     textureManager = textures;
@@ -1055,7 +1055,7 @@ int EcoSystem::UnknownVirtualSlot12() {
 void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
     if (format == 1555) {
-        alphaReference = (float)(g_TrackGame->field_0x2d0 ? 0 : 0xc0);
+        alphaReference = (float)(g_TrackGame->bladeRenderer ? 0 : 0xc0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else if (format == 4444 || format == 8888) {
@@ -1100,7 +1100,7 @@ void EcoSystem::SetRenderStates(int format) {
     }
     if (format == 1555) {
         ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        if (g_TrackGame->field_0x2d0) {
+        if (g_TrackGame->bladeRenderer) {
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {
@@ -1226,9 +1226,9 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
                     block->SelectSection("Material - 0");
                     block->ReadString("TextureMap", sltName, -1);
                     int format = 1555;
-                    if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->capabilityBits & 8)
+                    if (!g_TrackGame->bladeRenderer && (g_TrackGame->display->capabilityBits & 8)
                         && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                        format = g_TrackGame->field_0x10->colorKeyFormat;
+                        format = g_TrackGame->display->colorKeyFormat;
                     UnknownEcoTexture* texture = UnknownFunction50a590(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
                     if (!texture->UnknownVirtualSlot7()) {
                         g_UnknownGlobal59af10++;

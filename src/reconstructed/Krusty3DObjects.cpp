@@ -53,7 +53,7 @@ static inline void Normalize(Vector3& v) {
 RunwayLights::RunwayLights(int flags) : GameObject(flags) {
     for (int i = 0; i < 5; i++)
         lightModels[i] = 0;
-    field_0x30 = 0;
+    trackedRacer = 0;
     blinkTimer = 0;
 }
 
@@ -62,7 +62,7 @@ RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunway
     char name[0x104];
 
     GameObject::UnknownVirtualSlot8(value);
-    field_0x34 = terrain;
+    groundTerrain = terrain;
     sprintf(name, "%s\\%s", "Res", "pointer.slt");
     int i = 0;
     Vector3 position(0.0f, 0.0f, 0.0f);
@@ -81,33 +81,33 @@ RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunway
 // 0x0048a760
 int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (!field_0x30)
+    if (!trackedRacer)
         return 1;
     for (int i = 0; i < 5; i++)
         lightModels[i]->isVisible = 0;
-    if (field_0x30->finished)
+    if (trackedRacer->finished)
         return 1;
     blinkTimer += frameTime;
     if (blinkTimer > 1.375f)
         blinkTimer = 0;
-    if (field_0x30->field_0x78c)
+    if (trackedRacer->field_0x78c)
         return 1;
     Vector3 direction;
     Vector3 position;
     Vector3 next;
-    if (field_0x30->field_0x740->field_0x48) {
-        field_0x30->field_0x740->field_0x48->PointAt(field_0x30->field_0x744->field_0x38, &position);
-        field_0x30->field_0x740->field_0x48->PointAt(field_0x30->field_0x744->field_0x44, &next);
+    if (trackedRacer->field_0x740->field_0x48) {
+        trackedRacer->field_0x740->field_0x48->PointAt(trackedRacer->field_0x744->field_0x38, &position);
+        trackedRacer->field_0x740->field_0x48->PointAt(trackedRacer->field_0x744->field_0x44, &next);
         direction = position - next;
     } else {
-        position = field_0x30->trackPoint;
-        next = field_0x30->trackPoint;
-        direction = field_0x30->trackDirection;
+        position = trackedRacer->trackPoint;
+        next = trackedRacer->trackPoint;
+        direction = trackedRacer->trackDirection;
     }
     if (direction.x == 0.0f && direction.z == 0.0f) {
-        position = field_0x30->trackPoint;
-        next = field_0x30->trackPoint;
-        direction = field_0x30->trackDirection;
+        position = trackedRacer->trackPoint;
+        next = trackedRacer->trackPoint;
+        direction = trackedRacer->trackDirection;
     } else {
         Normalize(direction);
     }
@@ -124,27 +124,27 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     Vector3 point;
     Vector3 normal;
     point = position + direction * 6.0f;
-    field_0x34->QueryGround(&point, &normal, 0, 0);
+    groundTerrain->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
     lightModels[0]->SetPosition(&point);
     lightModels[0]->SetAxes(&direction, &normal, 1, 0);
     point = position + direction * 3.0f;
-    field_0x34->QueryGround(&point, &normal, 0, 0);
+    groundTerrain->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
     lightModels[1]->SetPosition(&point);
     lightModels[1]->SetAxes(&direction, &normal, 1, 0);
     point = position;
-    field_0x34->QueryGround(&point, &normal, 0, 0);
+    groundTerrain->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
     lightModels[2]->SetPosition(&point);
     lightModels[2]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 3.0f;
-    field_0x34->QueryGround(&point, &normal, 0, 0);
+    groundTerrain->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
     lightModels[3]->SetPosition(&point);
     lightModels[3]->SetAxes(&direction, &normal, 1, 0);
     point = position - direction * 6.0f;
-    field_0x34->QueryGround(&point, &normal, 0, 0);
+    groundTerrain->QueryGround(&point, &normal, 0, 0);
     point.y += 4.0f;
     lightModels[4]->SetPosition(&point);
     lightModels[4]->SetAxes(&direction, &normal, 1, 0);
@@ -152,8 +152,8 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x0048ad50
-void RunwayLights::UnknownFunction48ad50(UnknownRunwayRacer* racer) {
-    field_0x30 = racer;
+void RunwayLights::SetRacer(UnknownRunwayRacer* racer) {
+    trackedRacer = racer;
 }
 
 // ------------------------------------------------------------------- VisualCue
