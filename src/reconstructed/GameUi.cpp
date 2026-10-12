@@ -509,7 +509,7 @@ int UIControl::EnterHover() {
         PlayControlSound(1, ownerDialog->field_0x180);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip)
-            tip->UnknownFunction486b10((UnknownGuiControl*)this);
+            tip->ShowControlToolTip((UnknownGuiControl*)this);
     }
     return 1;
 }
@@ -2305,7 +2305,7 @@ UIControl::~UIControl() {
         pendingRelease = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
-            ownerDialog->guiUser->UnknownFunction487bf0(0);
+            ownerDialog->guiUser->ClearFocus(0);
             tip = ownerDialog->guiUser->userToolTip;
         }
         if (ownerDialog->guiUser && ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
@@ -5115,7 +5115,7 @@ int UIControl::GrowStep() {
 // 0x00472130
 int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
-    GUIInputDevice* device = ownerDialog->guiUser->UnknownFunction4882a0(event);
+    GUIInputDevice* device = ownerDialog->guiUser->FindEventDevice(event);
     if (device) {
         POINT position = device->pointerPosition;
         if (event->kind)
@@ -5294,7 +5294,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
 // other presses go to slot 55 with the pointer position.
 int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
-    if (ownerDialog->guiUser->UnknownFunction4881d0(event)) {
+    if (ownerDialog->guiUser->UsesEventDevice(event)) {
         if (event->kind == 0) {
             if (keyBind && keyBind == event->control &&
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&

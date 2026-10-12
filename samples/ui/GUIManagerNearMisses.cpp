@@ -191,7 +191,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
 }
 
 // 0x00486b10
-void ToolTip::UnknownFunction486b10(UnknownGuiControl* control) {
+void ToolTip::ShowControlToolTip(UnknownGuiControl* control) {
     int position[2];
     GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
 

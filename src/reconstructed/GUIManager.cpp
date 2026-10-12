@@ -236,7 +236,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         }
     }
     users[0] = (GUIUser*)AppendChild(
-        (new(__FILE__, 188) GUIUser)->UnknownFunction487650(renderContext, this), -1);
+        (new(__FILE__, 188) GUIUser)->Create(renderContext, this), -1);
     if (users[0]) {
         userCount = 1;
         users[0]->AcceptKeyboardAndJoysticks();
@@ -870,7 +870,7 @@ int GUIUser::UnknownVirtualSlot15() {
 }
 
 // 0x00487650
-GUIUser* GUIUser::UnknownFunction487650(void* target, GUIManager* gui) {
+GUIUser* GUIUser::Create(void* target, GUIManager* gui) {
     GameObject::UnknownVirtualSlot8(target);
     userGui = gui;
     CreateToolTip(target, gui);
@@ -1024,7 +1024,7 @@ void GUIUser::EnableImeInput(int enable) {
 }
 
 // 0x00487bf0
-int GUIUser::UnknownFunction487bf0(UnknownGuiControl** previous) {
+int GUIUser::ClearFocus(UnknownGuiControl** previous) {
     if (focusControl && !focusControl->pendingRelease)
         focusControl->UnknownVirtualSlot33(0);
     if (previous)
@@ -1102,7 +1102,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
 }
 
 // 0x00487fb0
-void GUIUser::UnknownFunction487fb0(UnknownCursorAnimation* animation) {
+void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
     UnknownCursorAnimation* current;
 
     if (!userCursor)
@@ -1164,7 +1164,7 @@ int GUIUser::UsesDevice(InputDevice* device) {
 }
 
 // 0x004881d0
-int GUIUser::UnknownFunction4881d0(UnknownControlEvent* event) {
+int GUIUser::UsesEventDevice(UnknownControlEvent* event) {
     if (event->kind == 0)
         return UsesDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
@@ -1190,7 +1190,7 @@ GUIInputDevice* GUIUser::FindDevice(InputDevice* device) {
 }
 
 // 0x004882a0
-GUIInputDevice* GUIUser::UnknownFunction4882a0(UnknownControlEvent* event) {
+GUIInputDevice* GUIUser::FindEventDevice(UnknownControlEvent* event) {
     if (event->kind == 0)
         return FindDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
@@ -1213,7 +1213,7 @@ HiResMeter g_UnknownHiResMeter67b468(0);
 HiResMeter::HiResMeter(int flags) : GameObject(flags) {
     overlayPage = -1;
     countsPerMs = 0;
-    UnknownFunction488580();
+    ClearTimers();
     if (UnknownVirtualSlot8(0))
         counterUsable = 1;
     else
@@ -1225,7 +1225,7 @@ HiResMeter::~HiResMeter() {
 }
 
 // 0x00488510
-void HiResMeter::UnknownFunction488510() {
+void HiResMeter::ClearTickTimes() {
     int i;
 
     for (i = 0; i < timerCount; i++) {
@@ -1235,7 +1235,7 @@ void HiResMeter::UnknownFunction488510() {
 }
 
 // 0x00488540
-void HiResMeter::UnknownFunction488540() {
+void HiResMeter::ResetTimerStats() {
     int i;
 
     for (i = 0; i < timerCount; i++) {
@@ -1253,7 +1253,7 @@ void HiResMeter::UnknownFunction488540() {
 }
 
 // 0x00488580
-void HiResMeter::UnknownFunction488580() {
+void HiResMeter::ClearTimers() {
     int i;
 
     for (i = 0; i < 50; i++) {
@@ -1281,7 +1281,7 @@ int HiResMeter::UnknownVirtualSlot10(float frameTime) {
         if (overlayPage < 0)
             overlayPage = g_TrackGame->debugOverlay->NewPage();
         if (g_TrackGame->debugOverlay->field_0x26c4 != overlayPage) {
-            UnknownFunction488540();
+            ResetTimerStats();
             return 1;
         }
         g_TrackGame->debugOverlay->Title(

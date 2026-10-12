@@ -296,7 +296,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
         }
         GUIUser* user = guiUser;
         UIControl* focus = (UIControl*)user->hoverControl;
-        user->UnknownFunction487fb0(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
+        user->SetCursorAnimation(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
                                                                  : cursorAnimation);
         GUIInputDevice* device;
         int j = 0;
