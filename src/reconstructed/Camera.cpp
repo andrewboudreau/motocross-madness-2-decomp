@@ -22,9 +22,9 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1d0 = 0;
     memset(field_0x1a0, 0, sizeof(field_0x1a0));
     worldMatrix = IdentityMatrix();
-    field_0x17c = Vector3(0.0f, 0.0f, 1.0f);
-    field_0x188 = Vector3(0.0f, 1.0f, 0.0f);
-    field_0x170 = Vector3(0.0f, 0.0f, 0.0f);
+    viewDirection = Vector3(0.0f, 0.0f, 1.0f);
+    upDirection = Vector3(0.0f, 1.0f, 0.0f);
+    eyePosition = Vector3(0.0f, 0.0f, 0.0f);
     roll = 0.0f;
     field_0x1f0 = 0;
     field_0x1fc = 0;
@@ -34,8 +34,8 @@ Camera::Camera(int flags) : GameObject(flags) {
     lastTurnAngle = 0.0f;
     field_0x1d4 = 1;
     field_0x1d8 = 1;
-    field_0x214 = field_0x17c;
-    field_0x208 = field_0x170;
+    field_0x214 = viewDirection;
+    field_0x208 = eyePosition;
 }
 
 // Destructor core 0x0042f020: Camera vptr, close the +0x1e4 file if any, then
@@ -129,13 +129,13 @@ static inline float Dot(const Vector3& a, const Vector3& b) {
 // set) and the viewport width keys (0xd2/0xd3, when +0x1d8 is set) and
 // rebuilds the projection through slot 28.
 int Camera::UnknownVirtualSlot10(float frameTime) {
-    Vector3 delta(field_0x170.x - field_0x208.x, field_0x170.y - field_0x208.y, field_0x170.z - field_0x208.z);
+    Vector3 delta(eyePosition.x - field_0x208.x, eyePosition.y - field_0x208.y, eyePosition.z - field_0x208.z);
     lastMoveDistance = UnknownFunction460b50(Dot(delta, delta));
-    field_0x208 = field_0x170;
-    lastTurnAngle = (float)acos(Dot(field_0x17c, field_0x214));
+    field_0x208 = eyePosition;
+    lastTurnAngle = (float)acos(Dot(viewDirection, field_0x214));
     if (lastTurnAngle < 0.0f)
         lastTurnAngle = -lastTurnAngle;
-    field_0x214 = field_0x17c;
+    field_0x214 = viewDirection;
     if (!field_0x25_bit2) {
         if (field_0x1d0)
             field_0x1d0--;
@@ -189,11 +189,11 @@ static inline Vector3 Normalize(const Vector3& v) {
 void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,
                                    const float* roll, const float* fov) {
     if (position)
-        field_0x170 = *position;
+        eyePosition = *position;
     if (forward)
-        field_0x17c = Normalize(*forward);
+        viewDirection = Normalize(*forward);
     if (up)
-        field_0x188 = Normalize(*up);
+        upDirection = Normalize(*up);
     if (roll)
         this->roll = *roll;
     if (fov)
@@ -270,22 +270,22 @@ static inline Vector3 NormalizeInline(const Vector3& v) {
 // in retail order; with plain member access four pairs swap (659/690), with
 // the reference for all three stores 675/690.
 int Camera::UnknownVirtualSlot29(Vector3 target) {
-    if (target.x == field_0x170.x && target.y == field_0x170.y && target.z == field_0x170.z)
+    if (target.x == eyePosition.x && target.y == eyePosition.y && target.z == eyePosition.z)
         return 0;
-    Vector3& up = field_0x188;
+    Vector3& up = upDirection;
     up.x = 0.0f;
     up.y = 1.0f;
-    field_0x188.z = 0.0f;
-    field_0x17c = NormalizeCall(Diff(target, field_0x170));
-    float y = field_0x17c.y;
+    upDirection.z = 0.0f;
+    viewDirection = NormalizeCall(Diff(target, eyePosition));
+    float y = viewDirection.y;
     if (y < 0.0f)
         y = -y;
     Vector3 right;
     if (y != 1.0f)
-        right = NormalizeInline(Cross(up, field_0x17c));
+        right = NormalizeInline(Cross(up, viewDirection));
     else
         right = Vector3(1.0f, 0.0f, 0.0f);
-    field_0x188 = Cross(field_0x17c, right);
+    upDirection = Cross(viewDirection, right);
     field_0x1d0 = Owner()->field_0x14 + 1;
     return 1;
 }

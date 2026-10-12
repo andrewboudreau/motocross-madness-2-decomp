@@ -116,23 +116,23 @@ void VehicleCamera::UnknownVirtualSlot68() {
     Vector3 base = UnknownFunction52bc50();
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
     Vector3 side(heading.z, 0.0f, -heading.x);
-    field_0x170 = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
-    field_0x240->UnknownFunction507c10(&field_0x170, 0, 0, 0);
+    eyePosition = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
+    field_0x240->UnknownFunction507c10(&eyePosition, 0, 0, 0);
     if (heading.y > 10.0f)
         base.y += (heading * lead).y * 0.19f;
     if (vehicleMode) {
-        float low = field_0x170.y + 7.0f;
+        float low = eyePosition.y + 7.0f;
         float high = base.y - 1.0f;
-        field_0x170.y = high > low ? high : low;
+        eyePosition.y = high > low ? high : low;
     } else {
-        float low = field_0x170.y + 21.0f;
+        float low = eyePosition.y + 21.0f;
         float high = base.y - 1.0f;
-        field_0x170.y = high > low ? high : low;
+        eyePosition.y = high > low ? high : low;
     }
     Vector3 target = targetPoint;
     target.y += 3.0f;
-    float dx = FollowCameraAbs(field_0x170.x - target.x);
-    float dz = FollowCameraAbs(field_0x170.z - target.z);
+    float dx = FollowCameraAbs(eyePosition.x - target.x);
+    float dz = FollowCameraAbs(eyePosition.z - target.z);
     float closeness = (200.0f - UnknownFunction460b50(dx * dx + dz * dz)) * 0.0055555557f;
     field_0x258 = closeness * 60.0f + 10.0f;
     if (field_0x258 < 10.0f)

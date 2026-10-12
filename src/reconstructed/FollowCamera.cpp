@@ -253,7 +253,7 @@ Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
 Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt) {
     Vector3 result;
     if (cameraState == 5 || cameraState == 7) {
-        result = field_0x170;
+        result = eyePosition;
     } else if (orbit) {
         float yaw = field_0x308 + field_0x234;
         if (cameraState != 3) {
@@ -388,9 +388,9 @@ void FollowCamera::UnknownVirtualSlot67() {
 void FollowCamera::UnknownVirtualSlot68() {
     Vector3 target = targetPoint;
     target.y += 3.0f;
-    float dx = field_0x170.x - target.x;
+    float dx = eyePosition.x - target.x;
     if (dx < 0.0f) dx = -dx;
-    float dz = field_0x170.z - target.z;
+    float dz = eyePosition.z - target.z;
     if (dz < 0.0f) dz = -dz;
     field_0x258 = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
     if (field_0x258 < 10.0f) field_0x258 = 10.0f;
@@ -632,21 +632,21 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
                            b.m[2][2] * a.m[3][2] + b.m[3][2] * a.m[3][3];
         viewMatrix(3, 3) = b.m[0][3] * a.m[3][0] + b.m[1][3] * a.m[3][1] +
                            b.m[2][3] * a.m[3][2] + b.m[3][3] * a.m[3][3];
-        field_0x17c.x = viewMatrix.m[2][0];
-        field_0x17c.y = viewMatrix.m[2][1];
-        field_0x17c.z = viewMatrix.m[2][2];
-        field_0x188.x = viewMatrix.m[1][0];
-        field_0x188.y = viewMatrix.m[1][1];
-        field_0x188.z = viewMatrix.m[1][2];
-        field_0x170.x = viewMatrix.m[3][0];
-        field_0x170.y = viewMatrix.m[3][1];
-        field_0x170.z = viewMatrix.m[3][2];
-        field_0x170 += *offset;
-        Vector3 ground = field_0x170;
+        viewDirection.x = viewMatrix.m[2][0];
+        viewDirection.y = viewMatrix.m[2][1];
+        viewDirection.z = viewMatrix.m[2][2];
+        upDirection.x = viewMatrix.m[1][0];
+        upDirection.y = viewMatrix.m[1][1];
+        upDirection.z = viewMatrix.m[1][2];
+        eyePosition.x = viewMatrix.m[3][0];
+        eyePosition.y = viewMatrix.m[3][1];
+        eyePosition.z = viewMatrix.m[3][2];
+        eyePosition += *offset;
+        Vector3 ground = eyePosition;
         field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
         float height = ground.y + 3.5f;
-        if (height > field_0x170.y)
-            field_0x170.y = height;
+        if (height > eyePosition.y)
+            eyePosition.y = height;
         UnknownFunction42e930(66.0f);
         Camera::UnknownVirtualSlot10(dt);
         return true;

@@ -85,9 +85,9 @@ protected:
     // scale (0.5, -0.5, offset 0.5), [0] (+0xec) that times the view matrix.
     Matrix4 field_0xec[2];
     float field_0x16c;              // 77.0f
-    Vector3 field_0x170;       // (0, 0, 0); copied to field_0x208
-    Vector3 field_0x17c;       // (0, 0, 1); copied to field_0x214
-    Vector3 field_0x188;       // (0, 1, 0)
+    Vector3 eyePosition;                      // +0x170 (0, 0, 0); copied to field_0x208
+    Vector3 viewDirection;                    // +0x17c (0, 0, 1); copied to field_0x214
+    Vector3 upDirection;                      // +0x188 (0, 1, 0)
     float roll;                               // +0x194 roll, passed to the view matrix by slot 28
     float focalLength;                        // +0x198 half viewport width / tan(fov / 2) (slot 28)
     float displayAspect;                      // +0x19c display-mode width/height (0x0042e550)

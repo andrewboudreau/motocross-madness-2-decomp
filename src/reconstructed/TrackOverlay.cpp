@@ -282,7 +282,7 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = world->terrain->UnknownFunction506e90(&((RenderTarget*)field_0x18)->field_0x08->field_0x170, point, &hit, 0, 0, 0);
+        int hidden = world->terrain->UnknownFunction506e90(&((RenderTarget*)field_0x18)->field_0x08->eyePosition, point, &hit, 0, 0, 0);
         lastVisible = !hidden;
     }
     frameCounter++;

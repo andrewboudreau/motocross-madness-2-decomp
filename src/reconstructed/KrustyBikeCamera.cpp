@@ -26,7 +26,7 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
     krustyBike = 0;
     raceView = 0;
     field_0x1d8 = 0;
-    field_0x25c = field_0x170;
+    field_0x25c = eyePosition;
     savedCameraState = cameraState;
     field_0x250 = cameraState;
     savedParameter = field_0x16c;

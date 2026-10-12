@@ -186,7 +186,11 @@ its `// +0xNN`): `roll` (+0x194, the setter's `roll` argument, passed to the
 view matrix by slot 28), `focalLength` (+0x198, half the viewport width over
 tan(fov / 2)), `displayAspect` (+0x19c), `heightWidthRatio` (+0x1b8), `file`
 (+0x1e4, a FILE* the destructor closes), `lastMoveDistance` and
-`lastTurnAngle` (+0x200/+0x204, slot 10). No calibration byte changed.
+`lastTurnAngle` (+0x200/+0x204, slot 10), and `eyePosition`, `viewDirection`
+and `upDirection` (+0x170/+0x17c/+0x188: the setter's position, forward and
+up arguments, which slot 28 passes to the view matrix; krusty2's
+ProjectedShadow.h names its +0x170 `eyePosition` too). No calibration byte
+changed.
 
 Destructor evidence. `analysis/deleting_destructors.json` pairs each wrapper
 with its destructor core. Camera's vptr is written in its constructor

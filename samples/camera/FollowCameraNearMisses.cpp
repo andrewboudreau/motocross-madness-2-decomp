@@ -208,7 +208,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x2ec = 3.0f;
     cameraState = 0;
     UnknownVirtualSlot71(0);
-    field_0x25c = field_0x170;
+    field_0x25c = eyePosition;
     savedCameraState = cameraState;
     field_0x250 = cameraState;
     savedParameter = field_0x16c;
@@ -313,9 +313,9 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
         if (FOLLOWCAMERA_KEY(0x4d))
             cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
         if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c))
-            cachedTarget += speed * field_0x17c;
+            cachedTarget += speed * viewDirection;
         if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && field_0x2c0 > 0.0)
-            cachedTarget -= speed * field_0x17c;
+            cachedTarget -= speed * viewDirection;
         if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
             if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
                     ->UnknownVirtualSlot4(0, &x, &y)) {
@@ -326,9 +326,9 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
                     return moved;
             }
             if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0))
-                cachedTarget += speed * field_0x17c;
+                cachedTarget += speed * viewDirection;
             if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 0.0)
-                cachedTarget -= speed * field_0x17c;
+                cachedTarget -= speed * viewDirection;
         }
     } else if (cameraState != 3 && cameraState != 6 && cameraState != 7) {
     float x;
@@ -337,46 +337,46 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
     float speed = dt * 300.0f;
     if (cameraState == 5) {
         if (FOLLOWCAMERA_KEY(0x48)) {
-            field_0x170.y += speed;
+            eyePosition.y += speed;
             moved = true;
         }
         if (FOLLOWCAMERA_KEY(0x50) && field_0x2c0 > 6.5f) {
-            field_0x170.y -= speed;
+            eyePosition.y -= speed;
             moved = true;
         }
         if (FOLLOWCAMERA_KEY(0x4b)) {
-            field_0x170 -= Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
+            eyePosition -= Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
             moved = true;
         }
         if (FOLLOWCAMERA_KEY(0x4d)) {
-            field_0x170 += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
+            eyePosition += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
             moved = true;
         }
         if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c)) {
-            field_0x170 -= speed * field_0x17c;
+            eyePosition -= speed * viewDirection;
             moved = true;
         }
         if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && field_0x2c0 > 6.5f) {
-            field_0x170 += speed * field_0x17c;
+            eyePosition += speed * viewDirection;
             moved = true;
         }
         if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
             if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
                     ->UnknownVirtualSlot4(0, &x, &y)) {
                 if (field_0x2c0 > 6.5f)
-                    field_0x170.y += y * speed;
-                field_0x170 += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
+                    eyePosition.y += y * speed;
+                eyePosition += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
                 if (x != 0.0 || y != 0.0f)
                     moved = true;
                 if (x != 0.0f || y != 0.0f)
                     return moved;
             }
             if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
-                field_0x170 -= speed * field_0x17c;
+                eyePosition -= speed * viewDirection;
                 moved = true;
             }
             if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 6.5f) {
-                field_0x170 += speed * field_0x17c;
+                eyePosition += speed * viewDirection;
                 moved = true;
             }
         }
@@ -504,9 +504,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     else
         targetPoint = UnknownVirtualSlot57(dt);
     if (cameraState == 5) {
-        float dx = field_0x170.x - targetPoint.x;
-        float dy = field_0x170.y - targetPoint.y;
-        float dz = field_0x170.z - targetPoint.z;
+        float dx = eyePosition.x - targetPoint.x;
+        float dy = eyePosition.y - targetPoint.y;
+        float dz = eyePosition.z - targetPoint.z;
         field_0x2c0 = UnknownFunction460b50(dz * dz + dx * dx + dy);
     }
     bool moved = UnknownVirtualSlot45(current, dt);
@@ -536,9 +536,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
                 field_0x258 = (field_0x258 - field_0x16c) * 0.75f + field_0x16c;
         }
     } else if (cameraState == 7) {
-        float dx = field_0x170.x - target.x;
+        float dx = eyePosition.x - target.x;
         if (dx < 0.0f) dx = -dx;
-        float dz = field_0x170.z - target.z;
+        float dz = eyePosition.z - target.z;
         if (dz < 0.0f) dz = -dz;
         field_0x258 = ((200.0f - UnknownFunction460b50(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
         if (field_0x258 < 10.0f) field_0x258 = 10.0f;
@@ -610,7 +610,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
                 field_0x238 = field_0x234;
                 field_0x224 = field_0x220;
                 cameraState = 7;
-                field_0x25c = field_0x170;
+                field_0x25c = eyePosition;
                 UnknownVirtualSlot68();
                 field_0x294->Set(field_0x258, FLT_MAX);
             }
@@ -620,7 +620,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             field_0x234 = field_0x238;
             field_0x220 = field_0x224;
             field_0x258 = field_0x254;
-            field_0x170 = field_0x25c;
+            eyePosition = field_0x25c;
             field_0x250 = 7;
             field_0x294->Set(field_0x258, FLT_MAX);
         }
