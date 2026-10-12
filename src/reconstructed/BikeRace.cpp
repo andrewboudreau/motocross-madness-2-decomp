@@ -411,7 +411,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             field_0x1ac = replayLength;
                             field_0x1b0++;
                             TrackGameViewOwner* owner = g_TrackGame->tagEvent;
-                            if (owner != 0 && owner->field_0xdc != 0 && owner->followedRacer == 0) {
+                            if (owner != 0 && owner->ball != 0 && owner->followedRacer == 0) {
                                 field_0x1b4 = UnknownFunctionRacerCount() + 1;
                             } else {
                                 field_0x1b4 = UnknownFunctionRacerCount();
@@ -958,8 +958,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         case 0x22:
             if (TestInputEvent(0x22, 0, event, 0xc)) {
-                g_TrackGame->mode.field_0xa8c = 1 - g_TrackGame->mode.field_0xa8c;
-                localRacer->field_0x5bc = g_TrackGame->mode.field_0xa8c;
+                g_TrackGame->mode.gasGyro = 1 - g_TrackGame->mode.gasGyro;
+                localRacer->gasGyro = g_TrackGame->mode.gasGyro;
                 TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
                 if (overlay == 0) {
                     return 1;
@@ -968,7 +968,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 char value[0x80];
                 char text[0x80];
                 g_TrackGame->LoadResourceString(0x140d, title, 0x80);
-                if (localRacer->field_0x5bc) {
+                if (localRacer->gasGyro) {
                     g_TrackGame->LoadResourceString(0x1407, value, 0x80);
                 } else {
                     g_TrackGame->LoadResourceString(0x1408, value, 0x80);
@@ -981,8 +981,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         case 0x30:
             if (TestInputEvent(0x30, 0, event, 0xc)) {
-                g_TrackGame->mode.field_0xa90 = 1 - g_TrackGame->mode.field_0xa90;
-                localRacer->field_0x5c0 = g_TrackGame->mode.field_0xa90;
+                g_TrackGame->mode.brakeGyro = 1 - g_TrackGame->mode.brakeGyro;
+                localRacer->brakeGyro = g_TrackGame->mode.brakeGyro;
                 TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
                 if (overlay == 0) {
                     return 1;
@@ -991,7 +991,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 char value[0x80];
                 char text[0x80];
                 g_TrackGame->LoadResourceString(0x142d, title, 0x80);
-                if (localRacer->field_0x5c0) {
+                if (localRacer->brakeGyro) {
                     g_TrackGame->LoadResourceString(0x1407, value, 0x80);
                 } else {
                     g_TrackGame->LoadResourceString(0x1408, value, 0x80);
@@ -1351,8 +1351,8 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         replayPaused = false;
     }
     if (g_TrackGame->tagEvent != 0 &&
-        g_TrackGame->tagEvent->field_0xdc != 0) {
-        g_TrackGame->tagEvent->field_0xdc->SetRecorder(replayVcr);
+        g_TrackGame->tagEvent->ball != 0) {
+        g_TrackGame->tagEvent->ball->SetRecorder(replayVcr);
     }
     if (g_TrackGame->quarryEvent != 0) {
         g_TrackGame->quarryEvent->ResetClock();
@@ -1436,7 +1436,7 @@ void BikeRace::RestartReplay() {
                                                      riderName, 0x3f);
     g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racerChoice.riderName,
                                                      bikeName, 0x3f);
-    replayVcr->SetRacer(0, 0, 0, g_TrackGame->mode.field_0x00, model, rider,
+    replayVcr->SetRacer(0, 0, 0, g_TrackGame->mode.profileName, model, rider,
                                        riderName, bikeName, aiRacers[0]->engineSize,
                                        (unsigned char)aiRacers[0]->engineKind,
                                        g_TrackGame->mode.plateNumber);
@@ -1485,7 +1485,7 @@ void BikeRace::ResetStartCountdown() {
 
 // Inline: TrackGame+0x568's ghost bike, reloaded at each use.
 static inline UnknownBikeRaceGhost* GhostBike() {
-    return (UnknownBikeRaceGhost*)g_TrackGame->tagEvent->field_0xdc;
+    return (UnknownBikeRaceGhost*)g_TrackGame->tagEvent->ball;
 }
 
 // 0x00421d50
@@ -1778,7 +1778,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         }
     } else if (a == 0x11) {
         UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
-        if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->field_0xdc != 0) {
+        if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->ball != 0) {
             GhostBike()->hasState = 1;
             UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
             GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
@@ -1815,7 +1815,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         if (flag) {
             return 1;
         }
-        if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->field_0xdc != 0 &&
+        if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->ball != 0 &&
             GhostBike()->hasState) {
             UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
             GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];

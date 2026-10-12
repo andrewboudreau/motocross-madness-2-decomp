@@ -353,9 +353,9 @@ void MultiPlayerDlg::FillRacerSlots() {
     }
     g_TrackGame->mode.racers[0].networkPlayerId = player;
     {
-        int length = strlen(g_TrackGame->mode.field_0x00);
+        int length = strlen(g_TrackGame->mode.profileName);
         int count = length > 0xf ? 0xf : length;
-        strncpy(g_TrackGame->mode.racers[0].playerName, g_TrackGame->mode.field_0x00, count);
+        strncpy(g_TrackGame->mode.racers[0].playerName, g_TrackGame->mode.profileName, count);
         g_TrackGame->mode.racers[0].playerName[count] = 0;
     }
     g_TrackGame->mode.racers[0].racerIndex = 0;
@@ -459,7 +459,7 @@ void MultiPlayerDlg::SendSettings() {
 int MultiPlayerDlg::CreateLobbyPlayer() {
     UIControl* button = FindControl("ButRdyUser", 1);
     button->SetFontColor(0x808080);
-    return g_TrackGame->network->CreateLocalPlayer(g_TrackGame->mode.field_0x00) != 0;
+    return g_TrackGame->network->CreateLocalPlayer(g_TrackGame->mode.profileName) != 0;
 }
 
 // 0x004f2f00
@@ -1065,7 +1065,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 EnableReadyControls();
                 button->SetFontColor(0xffffff);
                 g_TrackGame->LoadResourceString(0x14d3, format, 0x80);
-                sprintf(line, format, g_TrackGame->mode.field_0x00);
+                sprintf(line, format, g_TrackGame->mode.profileName);
                 SendSystemChatLine(line);
             } else {
                 button->SetFontColor(0x808080);
@@ -1255,11 +1255,11 @@ void MultiPlayerDlg::ReportReadyCleared(int reason) {
     g_UnknownGlobal689df4 = 0;
     if (reason == 2) {
         g_TrackGame->LoadResourceString(0x14d4, text, 0x80);
-        sprintf(value, text, g_TrackGame->mode.field_0x00);
+        sprintf(value, text, g_TrackGame->mode.profileName);
         SendSystemChatLine(value);
     } else if (reason == 3) {
         g_TrackGame->LoadResourceString(0x14db, text, 0x80);
-        sprintf(value, text, g_TrackGame->mode.field_0x00);
+        sprintf(value, text, g_TrackGame->mode.profileName);
         SendSystemChatLine(value);
     }
     FindControl("ButRdyUser", 1)->SetFontColor(0x808080);

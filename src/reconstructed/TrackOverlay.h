@@ -33,10 +33,10 @@ struct UnknownInstrumentState {
     unsigned char field_0x736;
     unsigned char field_0x737[0x74c - 0x737];
     float lastLapTime;                        // last lap time (StatsOverlay 0x0051a560)
-    float field_0x750;
-    float field_0x754;                        // a time (StatsOverlay 0x0051a480)
+    float fastestLap;                         // +0x750 string 0x838 "Best Lap:" row (StatsOverlay 0x00519ef0, 0x0051a560)
+    float trtTime;                            // +0x754 string 0x13b8 "TRT" row (StatsOverlay 0x00519ef0); drawn by 0x0051a480
     unsigned char field_0x758[0x770 - 0x758];
-    float field_0x770;
+    float tblTime;                            // +0x770 string 0x839 "TBL:" row (StatsOverlay 0x00519ef0, 0x0051a560)
     unsigned char field_0x774[0x784 - 0x774];
     int position;                             // position
     unsigned char field_0x788[0x7a0 - 0x788];

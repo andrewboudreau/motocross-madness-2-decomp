@@ -115,8 +115,8 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
         previous->bestTagRun = best > run ? previous->bestTagRun : previous->tagRun;
         previous->tagRun = 0.0f;
         FOLLOWED_RACER_SLOTS(previous)->UnknownVirtualSlot50(1, 5.0f, 0);
-        if (field_0xdc)
-            field_0xdc->field_0x10a = 0;
+        if (ball)
+            ball->field_0x10a = 0;
     }
     *(float*)&field_0xac = 5.0f;
     if (tell)

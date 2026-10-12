@@ -88,7 +88,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     g_UnknownResourceManager572b44->AddArchive("ui\\uires.res", 0);
     g_TrackGame->mode.LoadBonusTrackNames();
     g_TrackGame->GetRegistryString("MRUProfile", g_UnknownString577738,
-                                                 g_TrackGame->mode.field_0x00, &size);
+                                                 g_TrackGame->mode.profileName, &size);
     g_TrackGame->mode.LoadProfile();
     gui->field_0x0ec = g_TrackGame->mode.field_0x6c8;
     if (!g_TrackGame->mode.field_0x6d4)

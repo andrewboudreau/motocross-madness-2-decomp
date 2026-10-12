@@ -255,7 +255,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButRemoveProfile", event->controlName)) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
             short row = list->GetSelectedRow();
-            if (!_stricmp(list->GetRowText(-1), g_TrackGame->mode.field_0x00)) {
+            if (!_stricmp(list->GetRowText(-1), g_TrackGame->mode.profileName)) {
                 NoDelCurProfileDlg* dialog = new(__FILE__, 423) NoDelCurProfileDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             } else if (row != -1) {
@@ -319,9 +319,9 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         if (event->code == 0x1e || event->code == 0x32) {
             UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
             if (event->code == 0x1e) {
-                list->AddRow(g_TrackGame->mode.field_0x00, 0, 0);
+                list->AddRow(g_TrackGame->mode.profileName, 0, 0);
                 list->Sort(1);
-                list->SelectRowByText(g_TrackGame->mode.field_0x00);
+                list->SelectRowByText(g_TrackGame->mode.profileName);
             } else if (event->code == 0x32) {
                 COPY_TEXT(name, list->GetRowText(g_UnknownGlobal59adbc), 16);
                 sprintf(path, "%s\\%s", "ui\\profile", name);

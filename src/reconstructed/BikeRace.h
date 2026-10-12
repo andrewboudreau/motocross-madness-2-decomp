@@ -425,8 +425,8 @@ public:
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
     int outOfRace;                            // +0x4a0 out of the race (0x0041f1d0 skips it)
     unsigned char field_0x4a4[0x5bc - 0x4a4];
-    int field_0x5bc;                          // TrackGame+0x1004 copy (slot 23 key 0x22)
-    int field_0x5c0;                          // TrackGame+0x1008 copy (slot 23 key 0x30)
+    int gasGyro;                              // +0x5bc TrackGameMode gasGyro copy (slot 23 key 0x22)
+    int brakeGyro;                            // +0x5c0 TrackGameMode brakeGyro copy (slot 23 key 0x30)
     UnknownBikeRaceRider* riderCharacter;     // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
     CarProceduralCollision* frontWheel;       // +0x5f0 paired with the other racers' (the loader)

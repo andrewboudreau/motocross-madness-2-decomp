@@ -189,9 +189,9 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
             char path[128];
             // The first free CircuitNNN.pc.
             int number = 1;
-            sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, number);
+            sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.profileName, number);
             while (UnknownFileExists(path))
-                sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, ++number);
+                sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.profileName, ++number);
             strcpy(g_TrackGame->careerFile, path);
             g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             EndDialog(0);
@@ -255,7 +255,7 @@ void PCStartupDlg::FillLists()
     char directory[128];
     char pattern[128];
     WIN32_FIND_DATA data;
-    sprintf(directory, "%s\\%s\\", "ui\\profile", g_TrackGame->mode.field_0x00);
+    sprintf(directory, "%s\\%s\\", "ui\\profile", g_TrackGame->mode.profileName);
     sprintf(pattern, "%s*.pc", directory);
     HANDLE find = FindFirstFileA(pattern, &data);
     if (find != INVALID_HANDLE_VALUE) {
@@ -369,7 +369,7 @@ void PCNewDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogInit: {
         static_cast<UIRadioButton*>(FindControl("RadClass250", 4))->SelectInGroup(0);
         static_cast<UIRadioButton*>(FindControl("RadLODMedium", 4))->SelectInGroup(0);
-        static_cast<UIEditBox*>(FindControl("EditBox", 11))->SetEditText(g_TrackGame->mode.field_0x00);
+        static_cast<UIEditBox*>(FindControl("EditBox", 11))->SetEditText(g_TrackGame->mode.profileName);
         UIListBox* list = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         list->RemoveAllRows();
         for (int i = 3; i < 11; i++) {

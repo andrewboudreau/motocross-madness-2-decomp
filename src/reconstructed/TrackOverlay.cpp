@@ -547,16 +547,16 @@ int StatsOverlay::DrawViewModePanel()
     if (g_TrackGame->mode.raceSettings.raceMode == 4)
         FormatLapTime(time, statsSource->ownRacer->fastestLap);
     else
-        FormatLapTime(time, instrumentSource->state->field_0x750);
+        FormatLapTime(time, instrumentSource->state->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->field_0x770);
+    FormatLapTime(time, instrumentSource->state->tblTime);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13b8, label, 0x80);
     if (g_TrackGame->playingReplay)
         FormatLapTime(time, statsSource->field_0x1b8);
     else
-        FormatLapTime(time, instrumentSource->state->field_0x754);
+        FormatLapTime(time, instrumentSource->state->trtTime);
     sprintf(rowText[5], "%s:", label);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], drawnRowText[i]) != 0)
@@ -599,7 +599,7 @@ void StatsOverlay::DrawLapTime()
     if (g_TrackGame->playingReplay)
         FormatLapTime(text, statsSource->field_0x1b8);
     else
-        FormatLapTime(text, instrumentSource->state->field_0x754);
+        FormatLapTime(text, instrumentSource->state->trtTime);
     rect = rowRects[5];
     rect.left += rowExtent.cx + 4;
     sprintf(rowText[5], "%s", text);
@@ -654,10 +654,10 @@ int StatsOverlay::DrawRacePanel()
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->field_0x750);
+    FormatLapTime(time, instrumentSource->state->fastestLap);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    FormatLapTime(time, instrumentSource->state->field_0x770);
+    FormatLapTime(time, instrumentSource->state->tblTime);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
@@ -753,7 +753,7 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->tagEvent->followedRacer) {
         g_TrackGame->LoadResourceString(0x14b8, tag, 0x40);
         sprintf(rowText[5], "  %s %s", g_TrackGame->tagEvent->followedRacer->racerName, tag);
-    } else if (g_TrackGame->tagEvent->field_0xdc) {
+    } else if (g_TrackGame->tagEvent->ball) {
         g_TrackGame->LoadResourceString(0x14b7, tag, 0x40);
         sprintf(rowText[5], "  %s", tag);
     }
@@ -1381,7 +1381,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
             if (strlen(message.text)) {
                 g_TrackGame->network->Send(
                     0x85, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
-                AddMessage(g_TrackGame->mode.field_0x00, (int)message.text, 0);
+                AddMessage(g_TrackGame->mode.profileName, (int)message.text, 0);
             }
             chatInput->ClearLine();
             typingEnabled = 0;

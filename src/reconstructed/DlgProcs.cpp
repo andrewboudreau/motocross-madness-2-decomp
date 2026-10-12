@@ -134,7 +134,7 @@ int UseSelectedProfile(UnknownDialogEvent* event) {
     if (selection != -1) {
         char name[16];
         COPY_TEXT(name, list->GetRowText(selection), 16);
-        COPY_TEXT(g_TrackGame->mode.field_0x00, name, 16);
+        COPY_TEXT(g_TrackGame->mode.profileName, name, 16);
         g_TrackGame->mode.LoadProfile();
         return 1;
     }
@@ -183,7 +183,7 @@ void MainDlg::FillProfileList() {
     }
     list->Sort(1);
     list->SetRowTextColor(0xfeb97a, -1);
-    list->SelectRowByText(g_TrackGame->mode.field_0x00);
+    list->SelectRowByText(g_TrackGame->mode.profileName);
     list->SetSelectColor(0xffffff);
     list->SetSelectBoxColor(0xfeb97a);
 }
@@ -194,7 +194,7 @@ void MainDlg::ShowCurrentProfile() {
     char text[128];
     UIControl* control = FindControl("TxtCurrentProfile", 12);
     g_TrackGame->LoadResourceString(0x1466, label, 128);
-    sprintf(text, "%s %s", label, g_TrackGame->mode.field_0x00);
+    sprintf(text, "%s %s", label, g_TrackGame->mode.profileName);
     control->SetText(text);
 }
 
@@ -1414,7 +1414,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     if (!CreateDirectoryA(preset, 0))
         return;
     g_TrackGame->mode.ResetDefaults();
-    COPY_TEXT(g_TrackGame->mode.field_0x00, name, 16);
+    COPY_TEXT(g_TrackGame->mode.profileName, name, 16);
     g_TrackGame->mode.showNewbieDialog = 1;
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
         if (((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize == 250) {
@@ -1502,7 +1502,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
         if (event->code == 0x1f) {
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
             edit->GetEditText(text, 128);
-            COPY_TEXT(g_TrackGame->mode.field_0x00, text, 16);
+            COPY_TEXT(g_TrackGame->mode.profileName, text, 16);
             g_TrackGame->mode.LoadProfile();
             EndDialog(0x1f);
         } else {

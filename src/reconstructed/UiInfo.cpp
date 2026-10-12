@@ -384,7 +384,7 @@ void TrackGameMode::LoadControllerChoice() {
 
     if (!g_TrackGame->field_0x33fc)
         return;
-    sprintf(path, "%s\\%s\\%s", "ui\\profile", field_0x00, "control.ctl");
+    sprintf(path, "%s\\%s\\%s", "ui\\profile", profileName, "control.ctl");
     g_TrackGame->field_0x33fc->LoadControlFile(path);
     size = 0x80;
     g_TrackGame->GetRegistryString("UseControllerId", "", controller, &size);
@@ -407,7 +407,7 @@ void TrackGameMode::SaveControllerChoice() {
     size = 0x80;
     g_TrackGame->GetRegistryString("UseControllerId", "", controller, &size);
     g_TrackGame->SetRegistryString("LastControllerId", controller);
-    sprintf(path, "%s\\%s\\%s", "ui\\profile", field_0x00, "control.ctl");
+    sprintf(path, "%s\\%s\\%s", "ui\\profile", profileName, "control.ctl");
     g_TrackGame->field_0x33fc->SaveControlFile(path);
 }
 
@@ -418,14 +418,14 @@ int TrackGameMode::LoadProfile() {
     char path[0x104];
     FILE* file;
 
-    sprintf(path, "%s\\%s\\%s.prf", "ui\\profile", field_0x00, field_0x00);
+    sprintf(path, "%s\\%s\\%s.prf", "ui\\profile", profileName, profileName);
     file = fopen(path, "rb");
     if (!file) {
-        strcpy(field_0x00, "");
+        strcpy(profileName, "");
         TrackGameMode();
         return 0;
     }
-    fread(field_0x00, 0x10, 1, file);
+    fread(profileName, 0x10, 1, file);
     fread(&showNewbieDialog, 4, 1, file);
     fread(&instrumentOverlayOn, 0x374, 1, file);
     fread(&field_0xa20, 0x2c, 1, file);
@@ -465,7 +465,7 @@ int TrackGameMode::LoadProfile() {
     difficulty = savedDifficulty;
     memcpy(garageOptions, optionsBackup, sizeof(garageOptions));
     memcpy(&racerChoice, &racerChoiceBackup, sizeof(racerChoice));
-    return strcmp(field_0x00, "") != 0;
+    return strcmp(profileName, "") != 0;
 }
 
 // 0x00523580: saves the profile.
@@ -473,13 +473,13 @@ void TrackGameMode::SaveProfile() {
     char path[0x104];
     FILE* file;
 
-    if (!field_0x00[0])
+    if (!profileName[0])
         return;
-    sprintf(path, "%s\\%s\\%s.prf", "ui\\profile", field_0x00, field_0x00);
+    sprintf(path, "%s\\%s\\%s.prf", "ui\\profile", profileName, profileName);
     file = fopen(path, "wb");
     if (!file)
         return;
-    fwrite(field_0x00, 0x10, 1, file);
+    fwrite(profileName, 0x10, 1, file);
     fwrite(&showNewbieDialog, 4, 1, file);
     fwrite(&instrumentOverlayOn, 0x374, 1, file);
     fwrite(&field_0xa20, 0x2c, 1, file);
@@ -507,7 +507,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(customGarageCurves, 0x294, 1, file);
     fwrite(&plateNumber, 4, 1, file);
     fclose(file);
-    g_TrackGame->SetRegistryString("MRUProfile", field_0x00);
+    g_TrackGame->SetRegistryString("MRUProfile", profileName);
     if (g_TrackGame->ui)
         g_TrackGame->ui->field_0x48c = 1;
     SaveControllerChoice();

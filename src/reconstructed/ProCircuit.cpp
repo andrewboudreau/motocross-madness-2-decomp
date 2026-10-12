@@ -203,7 +203,7 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
             UNKNOWN_COPY_TEXT(racers[i].racerName, racerNames[n])
             used[n] = 1;
         } else {
-            UNKNOWN_COPY_TEXT(racers[i].racerName, g_TrackGame->mode.field_0x00)
+            UNKNOWN_COPY_TEXT(racers[i].racerName, g_TrackGame->mode.profileName)
         }
         racers[i].field_0x00 = zero;
         racers[i].field_0x18 = zero;

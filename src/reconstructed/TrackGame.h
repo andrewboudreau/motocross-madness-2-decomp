@@ -99,7 +99,7 @@ struct TrackGameViewOwner : public GameObject {
     int field_0xb0;                           // the two picked entries (0x00404df0)
     int field_0xb4;
     unsigned char field_0xb8[0xdc - 0xb8];
-    UnknownTrackGameViewOwnerDc* field_0xdc;
+    UnknownTrackGameViewOwnerDc* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as a ghost bike
     unsigned char field_0xe0[0x420 - 0xe0];
     UnknownTrackGameViewEntry* field_0x420[1];  // +0xac counts them (BikeRace.h)
 };
@@ -335,7 +335,7 @@ public:
     // Returns 0 when the file is not found.
     int FindFileDirectory(int value, char* name, const char* kind, char* path);
 
-    char field_0x00[16];                      // name; slot 4 sets it from the network object
+    char profileName[16];                     // +0x00 "ui\profile\%s\control.ctl", string 0x1466 "Current Profile:"; slot 4 sets it from the network object
     char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)
     int nameTagShade;                         // +0x90 name tag grey step 0..5 (ChatOverlay 0x0051e7c0, 0x0051e910)
     int difficulty;                           // +0x94 "RadLODEasy" group (PCNewDlg reads the same group as the difficulty)
@@ -381,8 +381,8 @@ public:
     int detailLevel;                          // +0xa64: detail level 0..9 (QuarryStuntEvent.cpp)
     unsigned char field_0xa68[0xa88 - 0xa68];
     int joystickOn;                           // +0xa88 joystick input on (bikerace.cpp slot 16)
-    int field_0xa8c;                          // toggled by bikerace.cpp slot 23 (key 0x22)
-    int field_0xa90;                          // toggled by bikerace.cpp slot 23 (key 0x30)
+    int gasGyro;                              // +0xa8c toggled by key 0x22, shown as string 0x140d "Gas Gyro" ON/OFF (bikerace.cpp slot 23)
+    int brakeGyro;                            // +0xa90 toggled by key 0x30, shown as string 0x142d "Brake Gyro" ON/OFF (bikerace.cpp slot 23)
     unsigned char field_0xa94[0xa98 - 0xa94];
     UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)

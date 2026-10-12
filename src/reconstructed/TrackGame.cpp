@@ -310,11 +310,11 @@ int TrackGame::UnknownVirtualSlot4() {
             ui->BuildGarageScene(-1);
             char name[16];
             network->GetPlayerName(network->localPlayer, name);
-            if (strcmp(mode.field_0x00, name)) {
+            if (strcmp(mode.profileName, name)) {
                 int count = strlen(name);
                 int length = count > 15 ? 15 : count;
-                strncpy(mode.field_0x00, name, length);
-                mode.field_0x00[length] = 0;
+                strncpy(mode.profileName, name, length);
+                mode.profileName[length] = 0;
                 if (!mode.LoadProfile())
                     ui->OpenMenu(kMenuUserNameBbb);
             }

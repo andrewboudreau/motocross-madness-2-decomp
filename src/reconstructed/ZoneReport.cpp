@@ -105,7 +105,7 @@ int UnknownTrackGameObject3410::WaitForLobbyRank()
         if (GetLobbyRank(response, 0x800)) {
             UnknownParser parser;
             parser.Parse(response, lstrlen(response));
-            parser.GetText(g_TrackGame->mode.field_0x00, text, 0x800);
+            parser.GetText(g_TrackGame->mode.profileName, text, 0x800);
             sscanf(text, "%d,%d,%d,%d", &value, &b, &c, &d);
             if (value == -1) {
                 Sleep(1000);

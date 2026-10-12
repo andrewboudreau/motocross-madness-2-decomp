@@ -433,7 +433,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         MapMovedInput();
         break;
     case kDialogClose:
-        sprintf(path, "%s\\%s\\%s", "ui\\profile", g_TrackGame->mode.field_0x00, "control.ctl");
+        sprintf(path, "%s\\%s\\%s", "ui\\profile", g_TrackGame->mode.profileName, "control.ctl");
         g_TrackGame->field_0x33fc->ApplyDevice(path, -1);
         break;
     }
@@ -920,7 +920,7 @@ void GlobalSettingsDlg::HandleEvent(UnknownDialogEvent* event)
             char profile[260];
             char preset[260];
             int choice = static_cast<UIRadioButton*>(FindControl("ButFactory", 4))->GetGroupSelection();
-            strcpy(name, g_TrackGame->mode.field_0x00);
+            strcpy(name, g_TrackGame->mode.profileName);
             if (choice == 1) {
                 g_TrackGame->mode.ResetDefaults();
                 sprintf(preset, "%s\\%s", "ui", "preset.ctl");
@@ -932,10 +932,10 @@ void GlobalSettingsDlg::HandleEvent(UnknownDialogEvent* event)
             } else if (choice == 2) {
                 UIListBox* profiles = static_cast<UIListBox*>(FindControl("LstProfiles", 3));
                 UnknownGameUiListRow* entry = &profiles->rowTable[profiles->GetSelectedRow()];
-                strcpy(g_TrackGame->mode.field_0x00, entry->text);
+                strcpy(g_TrackGame->mode.profileName, entry->text);
                 g_TrackGame->mode.LoadProfile();
             }
-            strcpy(g_TrackGame->mode.field_0x00, name);
+            strcpy(g_TrackGame->mode.profileName, name);
             EndDialog(0x51);
         } else if (event->code == 0x61) {
             EndDialog(0);
@@ -972,12 +972,12 @@ void GlobalSettingsDlg::ListOtherProfiles()
     g_TrackGame->profileDirectory->SetPattern("*", 0);
     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
     g_TrackGame->profileDirectory->CurrentName(name);
-    if (name[0] && strcmp(g_TrackGame->mode.field_0x00, name) != 0) {
+    if (name[0] && strcmp(g_TrackGame->mode.profileName, name) != 0) {
         profiles->AddRow(name, 0, 0);
         count = 1;
     }
     while (g_TrackGame->profileDirectory->NextName(name)) {
-        if (name[0] && strcmp(g_TrackGame->mode.field_0x00, name) != 0) {
+        if (name[0] && strcmp(g_TrackGame->mode.profileName, name) != 0) {
             profiles->AddRow(name, 0, 0);
             count++;
         }
@@ -987,7 +987,7 @@ void GlobalSettingsDlg::ListOtherProfiles()
     profiles->SetSelectColor(0xffffff);
     profiles->SetSelectBoxColor(0xfeb97a);
     if (count) {
-        profiles->SelectRowByText(g_TrackGame->mode.field_0x00);
+        profiles->SelectRowByText(g_TrackGame->mode.profileName);
     } else {
         UIControl* copy = FindControl("ButCopyUser", 4);
         copy->SetEnabled(0);
