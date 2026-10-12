@@ -544,7 +544,7 @@ public:
     UnknownGameUiListRow* rowTable;           // +0x214: the rows (OptionProcs.cpp)
     union {
         int field_0x218;
-        UIListBox* field_0x218_control;       // itself
+        UIListBox* selfList;                  // +0x218: the list itself (constructor); CompareSortedRows reads it
     };
     int autoSort;                             // +0x21c: "AutoSort"
     int sorting;                              // +0x220: 1 while Sort runs

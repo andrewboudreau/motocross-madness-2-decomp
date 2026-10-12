@@ -3077,19 +3077,19 @@ void UIListBox::RemoveAllRows() {
 int CompareSortedRows(const void* a, const void* b) {
     int result = 0;
     if (g_SortingDialog->sortingList) {
-        UIListBox* control = g_SortingDialog->sortingList->field_0x218_control;
+        UIListBox* control = g_SortingDialog->sortingList->selfList;
         result = control->sortCompare(a, b);
         if (!result) {
             int left = ((const UnknownGameUiListRow*)a)->sortIndex;
             int right = ((const UnknownGameUiListRow*)b)->sortIndex;
             GameObjectIterator* iterator =
-                (GameObjectIterator*)g_SortingDialog->sortingList->field_0x218_control->CreateControlIterator();
+                (GameObjectIterator*)g_SortingDialog->sortingList->selfList->CreateControlIterator();
             while (1) {
                 UIListBox* other = static_cast<UIListBox*>(
-                    g_SortingDialog->sortingList->field_0x218_control->NextAttachedControlOfType(iterator));
+                    g_SortingDialog->sortingList->selfList->NextAttachedControlOfType(iterator));
                 if (!other)
                     break;
-                if (other->rowCount != g_SortingDialog->sortingList->field_0x218_control->rowCount) {
+                if (other->rowCount != g_SortingDialog->sortingList->selfList->rowCount) {
                     result = -1;
                     break;
                 }
@@ -3097,7 +3097,7 @@ int CompareSortedRows(const void* a, const void* b) {
                 if (result)
                     break;
             }
-            g_SortingDialog->sortingList->field_0x218_control->DeleteControlIterator(iterator);
+            g_SortingDialog->sortingList->selfList->DeleteControlIterator(iterator);
         }
     }
     return result;
