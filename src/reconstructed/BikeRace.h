@@ -966,7 +966,7 @@ public:
     Vector3 gridFirstSlot;                      // start grid: first slot (0x004210f0)
     Vector3 gridSlotStep;                      // start grid: step between slots
     Vector3 gridDirection;                      // start grid: direction
-    bool field_0x188;
+    bool gridReady;                           // +0x188 WriteRelativePositions computed the start grid (cleared by a restart)
     unsigned char field_0x189;
     bool isRacing;                         // racing
     bool restartPending;                      // +0x18b set by RestartRace; stops the race update and clears isRacing next frame

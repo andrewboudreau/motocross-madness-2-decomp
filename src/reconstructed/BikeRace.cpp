@@ -101,7 +101,7 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     restartPending = false;
     trackLoaded = false;
     racerCount = 0;
-    field_0x188 = false;
+    gridReady = false;
     startStampSent = false;
     if (g_TrackGame->playerCount > 1) {
         networkStartPending = true;
@@ -1264,7 +1264,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         return;
     }
     restartPending = true;
-    field_0x188 = false;
+    gridReady = false;
     ResetStartCountdown();
     int iterator = 0;
     Vector3 position;

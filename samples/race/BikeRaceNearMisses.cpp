@@ -385,7 +385,7 @@ static inline Vector3 Normalize(const Vector3& v) {
 
 // 0x004210f0
 void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int count) {
-    if (field_0x188 && count != 0) {
+    if (gridReady && count != 0) {
         *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         *b = gridDirection;
         return;
@@ -484,7 +484,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
     default:
         return;
     }
-    field_0x188 = true;
+    gridReady = true;
 }
 
 // DlgProcs.h's DemoDlg (vtable 0x00550e18, 0x7f58 bytes) with the inline
