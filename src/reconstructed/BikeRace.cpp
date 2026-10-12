@@ -293,10 +293,10 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 localRacer->UnknownRacerVirtualSlot94();
             }
             if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-                unsigned short lap = localRacer->field_0x7a0;
+                unsigned short lap = localRacer->lapCount;
                 if (field_0x1e8 != lap && (!field_0x189 || lap > 0)) {
                     RestartReplay();
-                    field_0x1e8 = localRacer->field_0x7a0;
+                    field_0x1e8 = localRacer->lapCount;
                     replayTime = 0;
                     field_0x1d4 = 0;
                     replayLength = 0;
@@ -601,7 +601,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 }
                 if (flagGirl != 0 && localRacer->statusNode->field_0x44.node != 0) {
                     int laps = g_TrackGame->mode.raceSettings.lapCount;
-                    int lap = localRacer->field_0x7a0;
+                    int lap = localRacer->lapCount;
                     int last = lap == laps - 1;
                     int previous = lap == laps - 2;
                     if (previous || last) {
@@ -1395,7 +1395,7 @@ void BikeRace::RestartReplay() {
     if (replayVcr == 0) {
         return;
     }
-    if (localRacer->field_0x7a0 == 1 && field_0x189) {
+    if (localRacer->lapCount == 1 && field_0x189) {
         replayVcr->Unlink();
         replayVcr->Release();
         replayLength = 0;
@@ -1406,7 +1406,7 @@ void BikeRace::RestartReplay() {
         GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
         GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
         sprintf(description, "%s %s", date, time);
-        replayVcr->SaveRecording(localRacer->field_0x74c, description, 0);
+        replayVcr->SaveRecording(localRacer->lastLapTime, description, 0);
         replayVcr->Unlink();
         replayVcr->Release();
         if (replayLength <= field_0x1c8) {
@@ -1442,7 +1442,7 @@ void BikeRace::RestartReplay() {
                                        g_TrackGame->mode.plateNumber);
     AppendChild(replayVcr, -1);
     localRacer->UnknownFunction496e20(replayVcr);
-    if (field_0x189 && localRacer->field_0x7a0 == 1 && ghostFilePlayed[0] == 0) {
+    if (field_0x189 && localRacer->lapCount == 1 && ghostFilePlayed[0] == 0) {
         return;
     }
     ghostVcr = new (__FILE__, 0x1103) KrustyVCR;
@@ -1452,7 +1452,7 @@ void BikeRace::RestartReplay() {
     if (!ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, field_0x1a8)) {
         return;
     }
-    localRacer->field_0x750 = field_0x1c8 = ghostVcr->RecordedLength();
+    localRacer->fastestLap = field_0x1c8 = ghostVcr->RecordedLength();
     aiRacers[0]->UnknownFunction496e20(ghostVcr);
     aiRacers[0]->UnknownVirtualSlot5();
     aiRacers[0]->field_0x11b8 = 0;
@@ -1643,7 +1643,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             racer->field_0x1384 = state->field_0x1c;
             racer->field_0x1388 = replayMode == 11 ? time : state->field_0x4c;
             if (ghostVcr == 0) {
-                racer->field_0x750 = state->field_0x28;
+                racer->fastestLap = state->field_0x28;
                 racer->field_0x770 = state->field_0x2c;
             }
             *keep = 1;
@@ -1687,7 +1687,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
                 aiRacers[i]->field_0x1384 = state->field_0x1c;
                 aiRacers[i]->field_0x1388 = replayMode == 11 ? time : state->field_0x4c;
                 if (ghostVcr == 0) {
-                    aiRacers[i]->field_0x750 = state->field_0x28;
+                    aiRacers[i]->fastestLap = state->field_0x28;
                     aiRacers[i]->field_0x770 = state->field_0x2c;
                 }
                 *keep = 1;

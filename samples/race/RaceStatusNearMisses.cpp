@@ -76,7 +76,7 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
         return 0;
     status->racer = view->localRacer;
     status->nextGate = view->gateList;
-    view->localRacer->field_0x744 = status;
+    view->localRacer->statusNode = status;
     status->creationOrder = index;
     status->currentPosition = view->localRacer->position;
     *list = status;
@@ -90,7 +90,7 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
                 index++;
                 status->racer = view->aiRacers[i];
                 status->nextGate = view->gateList;
-                view->aiRacers[i]->field_0x744 = status;
+                view->aiRacers[i]->statusNode = status;
                 status->creationOrder = index;
                 status->currentPosition = view->aiRacers[i]->position;
                 *tail = status;
@@ -107,7 +107,7 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
                 index++;
                 status->racer = view->racerSlots[i];
                 status->nextGate = view->gateList;
-                view->racerSlots[i]->field_0x744 = status;
+                view->racerSlots[i]->statusNode = status;
                 status->creationOrder = index;
                 status->currentPosition = view->racerSlots[i]->position;
                 *tail = status;
@@ -138,8 +138,8 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
             status->previousPosition.y = racer->field_0x5f0->field_0x200.y;
             status->previousPosition.z = racer->field_0x5f0->field_0x200.z;
             if (!AdvanceGate(&status->previousPosition, &status->currentPosition, &status->nextGate, firstGate,
-                                       &racer->gatesPassed, &racer->field_0x7b8, racer->gateTimes, racer->field_0x754,
-                                       0, &racer->lapCount, &racer->lastLapTime, &racer->field_0x750,
+                                       &racer->gatesPassed, &racer->field_0x7b8, racer->gateTimes, racer->totalRunningTime,
+                                       0, &racer->lapCount, &racer->lastLapTime, &racer->fastestLap,
                                        &racer->lapStartTime, &racer->hasFinished, lapLimit, unlimited,
                                        racer->field_0x735, racer->field_0x7c0))
                 return 0;
@@ -166,26 +166,26 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
                 int remaining = lapLimit - racer->lapCount;
                 if (remaining > 0) {
                     if (racer->lapCount < 1)
-                        racer->field_0x754 = 0;
+                        racer->totalRunningTime = 0;
                     else
-                        racer->field_0x754 = remaining * racer->lastLapTime;
+                        racer->totalRunningTime = remaining * racer->lastLapTime;
                 }
-                if (previous && racer->field_0x754 < previous->racer->field_0x754)
-                    racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->field_0x754 + 1.0f;
+                if (previous && racer->totalRunningTime < previous->racer->totalRunningTime)
+                    racer->totalRunningTime = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->totalRunningTime + 1.0f;
                 if (lapLimit == 1)
-                    racer->lastLapTime = racer->field_0x754;
+                    racer->lastLapTime = racer->totalRunningTime;
                 else if (racer->lapCount < 1)
                     racer->lastLapTime =
                         UNKNOWN_RANDOM_UNIT() * 10 + racer->bikeView->localRacer->lastLapTime + 1.0f;
-                if (racer->lastLapTime < racer->field_0x750 || racer->field_0x750 <= 0.0f)
-                    racer->field_0x750 = racer->lastLapTime;
+                if (racer->lastLapTime < racer->fastestLap || racer->fastestLap <= 0.0f)
+                    racer->fastestLap = racer->lastLapTime;
                 racer->lapCount = lapLimit;
                 racer->hasFinished = 1;
                 continue;
             }
         }
         if (!racer->hasFinished)
-            racer->field_0x754 += frameTime;
+            racer->totalRunningTime += frameTime;
     }
     if (!OrderByGates(list))
         return 0;

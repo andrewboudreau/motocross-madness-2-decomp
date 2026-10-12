@@ -443,14 +443,14 @@ public:
     UnknownBikeRaceRacerInfo* field_0x740;
     UnknownEventRacerPart* statusNode;        // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x74c - 0x748];
-    float field_0x74c;
-    float field_0x750;
+    float lastLapTime;                        // +0x74c (UnknownEventRacer's last lap time)
+    float fastestLap;                         // +0x750 (0x0045c8b0 copies it to the entry's ZoneReport "FastestLap")
     unsigned char field_0x754[0x768 - 0x754];
     float score;                              // +0x768 score (network message 10)
     unsigned char field_0x76c[0x770 - 0x76c];
     int field_0x770;                          // replayed from message 1's +0x2c
     unsigned char field_0x774[0x7a0 - 0x774];
-    unsigned short field_0x7a0;
+    unsigned short lapCount;                  // +0x7a0 laps (UnknownEventRacer)
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char finished;                            // +0x7a4 finished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];

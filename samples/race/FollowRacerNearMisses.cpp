@@ -68,7 +68,7 @@ void TrackGameViewOwner::PickFollowedRacer()
     UnknownEventRacer* last = 0;
     UnknownEventRacer* racer = raceView->NextBike(&iterator);
     while (racer) {
-        if (racer->field_0x4a0 == 0) {
+        if (racer->outOfRace == 0) {
             last = racer;
             racing++;
         }
@@ -81,7 +81,7 @@ void TrackGameViewOwner::PickFollowedRacer()
     } else {
         int count = raceView->racerCount;
         int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
-        while (raceView->racerSlots[index]->field_0x4a0 == 1 && tries < count) {
+        while (raceView->racerSlots[index]->outOfRace == 1 && tries < count) {
             index++;
             if (index >= count)
                 index = 0;

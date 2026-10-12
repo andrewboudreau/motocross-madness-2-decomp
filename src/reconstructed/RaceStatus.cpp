@@ -130,7 +130,7 @@ int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
 int PruneStatusList(UnknownEventRacerPart** list) {
     while (list && *list) {
         if (!(*list)->racer->field_0x25_bit0) {
-            (*list)->racer->field_0x744 = 0;
+            (*list)->racer->statusNode = 0;
             UnknownEventRacerPart* status = *list;
             *list = status->next;
             DebugFree(status, __FILE__, 193);
@@ -329,7 +329,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                     (!racer->field_0x735 && status->field_0x08 >= 0.0f && status->field_0x08 < g_UnknownGlobal572988)) {
                     if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
                                               &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
-                                              racer->field_0x754, &racer->lapStartTime, &racer->field_0x750, 1,
+                                              racer->totalRunningTime, &racer->lapStartTime, &racer->fastestLap, 1,
                                               unlimited, racer->field_0x735, racer->field_0x7c0)) {
                         status->field_0x44.node = finish->field_0x2c.node;
                         status->field_0x44.segment = finish->field_0x2c.segment;
@@ -357,26 +357,26 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                     int remaining = lapLimit - racer->lapCount;
                     if (remaining >= 1) {
                         if (racer->lapCount < 1)
-                            racer->field_0x754 = 0;
+                            racer->totalRunningTime = 0;
                         else
-                            racer->field_0x754 = remaining * racer->lastLapTime;
+                            racer->totalRunningTime = remaining * racer->lastLapTime;
                     }
-                    if (previous && racer->field_0x754 < previous->racer->field_0x754)
-                        racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->field_0x754 + 1.0f;
+                    if (previous && racer->totalRunningTime < previous->racer->totalRunningTime)
+                        racer->totalRunningTime = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->totalRunningTime + 1.0f;
                     if (lapLimit == 1)
-                        racer->lastLapTime = racer->field_0x754;
+                        racer->lastLapTime = racer->totalRunningTime;
                     else if (racer->lapCount < 1)
                         racer->lastLapTime = UNKNOWN_RANDOM_UNIT() * 10 +
                                              racer->bikeView->localRacer->lastLapTime + 1.0f;
-                    if (racer->lastLapTime < racer->field_0x750 || racer->field_0x750 <= 0.0f)
-                        racer->field_0x750 = racer->lastLapTime;
+                    if (racer->lastLapTime < racer->fastestLap || racer->fastestLap <= 0.0f)
+                        racer->fastestLap = racer->lastLapTime;
                     racer->lapCount = lapLimit;
                     racer->hasFinished = 1;
                     goto next;
                 }
             }
             if (!racer->hasFinished)
-                racer->field_0x754 += frameTime;
+                racer->totalRunningTime += frameTime;
         }
     next:
         if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->next) {

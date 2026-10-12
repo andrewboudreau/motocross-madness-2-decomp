@@ -871,7 +871,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     if (g_TrackGame->mode.raceSettings.eventType)
         BuildStatusList(&field_0x0c4, (UnknownKrustyBikeView*)this);
     if (ghostVcr)
-        localRacer->field_0x750 = field_0x1c8;
+        localRacer->fastestLap = field_0x1c8;
     g_TrackGame->ui->StepProgressBar();
 
     UnknownBikeNumberPainter* painter = new(__FILE__, 0x367) UnknownBikeNumberPainter(textures->field_0x00);

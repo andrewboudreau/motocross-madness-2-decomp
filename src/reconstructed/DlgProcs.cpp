@@ -1654,7 +1654,7 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
             owner->followedRacer && owner->raceView && owner->followedRacer == owner->raceView->localRacer) {
             UnknownEventRacer* racer = owner->raceView->localRacer;
             if (racer)
-                racer->field_0x4a0 = 1;
+                racer->outOfRace = 1;
             g_TrackGame->tagEvent->PickFollowedRacer();
         }
         g_TrackGame->eventManager->CloseRace(2);

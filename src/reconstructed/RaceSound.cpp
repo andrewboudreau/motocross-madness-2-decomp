@@ -172,7 +172,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             enginePresent[0] = 1;
             if (racer == raceView->localRacer)
                 listenerEngine = 0;
-        } else if (!racer->field_0x737) {
+        } else if (!racer->engineKind) {
             enginePresent[1] = 1;
             if (racer == raceView->localRacer)
                 listenerEngine = 1;
@@ -481,7 +481,7 @@ void RaceSound::AssignChannels() {
         if (racer->engineSize < 250)
             engineChannels[count].engine = 0;
         else
-            engineChannels[count].engine = (racer->field_0x737 != 0) + 1;
+            engineChannels[count].engine = (racer->engineKind != 0) + 1;
         kind = engineChannels[count].engine;
         engineChannels[count].streamSample = idleSamples[kind][0];
         engineChannels[count].sampleBytes = idleSampleBytes[kind][0];
@@ -588,7 +588,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     int j;
 
     for (i = 0; i < channelsInUse; i++) {
-        if (!engineChannels[i].channelRacer->field_0x4a0) {
+        if (!engineChannels[i].channelRacer->outOfRace) {
             engineChannels[i].cameraDistance =
                 (int)GroundDistance(&listenerCamera->listenerPosition, &engineChannels[i].channelRacer->position);
         } else {

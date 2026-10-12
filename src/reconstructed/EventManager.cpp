@@ -67,14 +67,14 @@ void UnknownEventEntry::Reset() {
     totalRunningTime = 0;
     points = 0;
     score = 0;
-    field_0x30 = 0;
+    aiIndex = 0;
     largestStuntPoints = 0;
     field_0x10 = 0;
     field_0x18 = 0;
     field_0x1c = 0;
     finished = 0;
     strcpy(name, "");
-    field_0x24 = 0;
+    outOfRace = 0;
     field_0x34[0] = 0;
     field_0x34[1] = 0;
     field_0x34[2] = 0;
@@ -89,17 +89,17 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
     int count = length > 15 ? 15 : length;
     strncpy(name, racer->racerName, count);
     name[count] = 0;
-    field_0x24 = racer->field_0x4a0;
-    if (!field_0x24) {
+    outOfRace = racer->outOfRace;
+    if (!outOfRace) {
         score = racer->score;
         position = racer->finishPosition;
-        fastestLap = racer->field_0x750;
-        totalRunningTime = racer->field_0x754;
-        largestStuntPoints = racer->field_0x788;
+        fastestLap = racer->fastestLap;
+        totalRunningTime = racer->totalRunningTime;
+        largestStuntPoints = racer->largestStuntPoints;
         field_0x10 = racer->field_0x758;
         field_0x18 = racer->field_0x760;
         field_0x1c = racer->field_0x764;
-        field_0x30 = racer->aiIndex;
+        aiIndex = racer->aiIndex;
         field_0x34[0] = racer->field_0x7ac[0];
         field_0x34[1] = racer->field_0x7ac[1];
         field_0x34[2] = racer->field_0x7ac[2];
@@ -116,7 +116,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         field_0x10 = 0;
         field_0x18 = 0;
         field_0x1c = 0;
-        field_0x30 = 0;
+        aiIndex = 0;
         field_0x34[0] = 0;
         field_0x34[1] = 0;
         field_0x34[2] = 0;
@@ -318,9 +318,9 @@ int CompareRankings(const void* a, const void* b) {
             if (first->racer->gatesPassed > second->racer->gatesPassed)
                 return -1;
             if (first->racer->gatesPassed == second->racer->gatesPassed) {
-                if (first->racer->field_0x744->gateDistance < second->racer->field_0x744->gateDistance)
+                if (first->racer->statusNode->gateDistance < second->racer->statusNode->gateDistance)
                     return -1;
-                if (first->racer->field_0x744->gateDistance == second->racer->field_0x744->gateDistance)
+                if (first->racer->statusNode->gateDistance == second->racer->statusNode->gateDistance)
                     return 0;
             }
         }
@@ -432,19 +432,19 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     g_TrackGame->mode.racers[i].isReady = 1;
                     if (view->racerSlots[i]) {
                         view->racerSlots[i]->score = update->score;
-                        view->racerSlots[i]->field_0x750 = update->fastestLap;
+                        view->racerSlots[i]->fastestLap = update->fastestLap;
                         view->racerSlots[i]->hasFinished = update->finished;
-                        view->racerSlots[i]->field_0x788 = update->largestStuntPoints;
+                        view->racerSlots[i]->largestStuntPoints = update->largestStuntPoints;
                         view->racerSlots[i]->field_0x758 = update->field_0x18;
                         view->racerSlots[i]->field_0x760 = update->field_0x1c;
                         view->racerSlots[i]->field_0x764 = update->field_0x20;
                         if (view->racerSlots[i]->hasFinished) {
-                            view->racerSlots[i]->field_0x754 = update->totalRunningTime;
+                            view->racerSlots[i]->totalRunningTime = update->totalRunningTime;
                             // Always false here; retail still tests it.
                             if (!view->racerSlots[i]->hasFinished)
                                 view->racerSlots[i]->finishTimeStamp = ReadClock();
                         } else {
-                            view->racerSlots[i]->field_0x754 = FLT_MAX;
+                            view->racerSlots[i]->totalRunningTime = FLT_MAX;
                             view->racerSlots[i]->finishTimeStamp = 0x7ffffffe;
                         }
                     }
@@ -525,7 +525,7 @@ void EventManager::RemovePlayer(int player) {
         return;
     for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
         if (results[i].playerId == player) {
-            if (!results[i].field_0x30)
+            if (!results[i].aiIndex)
                 g_TrackGame->playerCount--;
             else
                 g_TrackGame->field_0x3424--;
@@ -547,15 +547,15 @@ void EventManager::SendRacerResults() {
         return;
     UnknownKrustyBikeView* view = FindRaceView();
     if (!view->localRacer->hasFinished) {
-        view->localRacer->field_0x754 = FLT_MAX;
+        view->localRacer->totalRunningTime = FLT_MAX;
         view->localRacer->finishTimeStamp = 0x7ffffffe;
     }
     UnknownEventRacerMessage message;
     message.score = view->localRacer->score;
-    message.totalRunningTime = view->localRacer->field_0x754;
-    message.fastestLap = view->localRacer->field_0x750;
+    message.totalRunningTime = view->localRacer->totalRunningTime;
+    message.fastestLap = view->localRacer->fastestLap;
     message.finished = view->localRacer->hasFinished;
-    message.largestStuntPoints = view->localRacer->field_0x788;
+    message.largestStuntPoints = view->localRacer->largestStuntPoints;
     message.field_0x18 = view->localRacer->field_0x758;
     message.field_0x1c = view->localRacer->field_0x760;
     message.field_0x20 = view->localRacer->field_0x764;
@@ -564,14 +564,14 @@ void EventManager::SendRacerResults() {
         0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
         if (!view->aiRacers[i]->hasFinished) {
-            view->aiRacers[i]->field_0x754 = FLT_MAX;
+            view->aiRacers[i]->totalRunningTime = FLT_MAX;
             view->aiRacers[i]->finishTimeStamp = 0x7ffffffe;
         }
         message.score = view->aiRacers[i]->score;
-        message.totalRunningTime = view->aiRacers[i]->field_0x754;
-        message.fastestLap = view->aiRacers[i]->field_0x750;
+        message.totalRunningTime = view->aiRacers[i]->totalRunningTime;
+        message.fastestLap = view->aiRacers[i]->fastestLap;
         message.finished = view->aiRacers[i]->hasFinished;
-        message.largestStuntPoints = view->aiRacers[i]->field_0x788;
+        message.largestStuntPoints = view->aiRacers[i]->largestStuntPoints;
         message.field_0x18 = view->aiRacers[i]->field_0x758;
         message.field_0x1c = view->aiRacers[i]->field_0x760;
         message.field_0x20 = view->aiRacers[i]->field_0x764;
@@ -673,7 +673,7 @@ void EventManager::CheckRaceOver(float frameTime) {
             while ((racer = view->NextBike(&iterator)) != 0) {
                 if (racer->hasFinished)
                     anyRacerFinished = 1;
-                else if (!racer->field_0x4a0)
+                else if (!racer->outOfRace)
                     allRacersFinished = 0;
             }
             if (anyRacerFinished)
@@ -745,8 +745,8 @@ void EventManager::RankRacers() {
             int ranked = 0;
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
-                if (!racer->field_0x4a0) {
-                    rankings[ranked].value = racer->field_0x754;
+                if (!racer->outOfRace) {
+                    rankings[ranked].value = racer->totalRunningTime;
                     rankings[ranked].racer = racer;
                     ranked++;
                 }
@@ -759,7 +759,7 @@ void EventManager::RankRacers() {
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
             results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.raceSettings.raceMode == 2 || g_TrackGame->proCircuit) &&
-                !racer->field_0x4a0)
+                !racer->outOfRace)
                 AddChampionshipPoints(racer, &results[count].points);
             count++;
         }
@@ -770,7 +770,7 @@ void EventManager::RankRacers() {
         int scored = 0;
         int next = 0;
         while ((racer = view->NextBike(&next)) != 0) {
-            if (!racer->field_0x4a0) {
+            if (!racer->outOfRace) {
                 scores[scored].value = racer->score;
                 scores[scored].racer = racer;
                 scored++;
@@ -782,7 +782,7 @@ void EventManager::RankRacers() {
         next = 0;
         for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
             results[count].CopyFromRacer(racer);
-            if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->field_0x4a0)
+            if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                 AddChampionshipPoints(racer, &results[count].points);
             count++;
         }
@@ -794,7 +794,7 @@ void EventManager::RankRacers() {
             int scored = 0;
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
-                if (!racer->field_0x4a0) {
+                if (!racer->outOfRace) {
                     scores[scored].value = racer->score;
                     scores[scored].racer = racer;
                     scored++;
@@ -806,7 +806,7 @@ void EventManager::RankRacers() {
             next = 0;
             for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
-                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->field_0x4a0)
+                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
                 count++;
             }
@@ -815,7 +815,7 @@ void EventManager::RankRacers() {
             int scored = 0;
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
-                if (!racer->field_0x4a0) {
+                if (!racer->outOfRace) {
                     scores[scored].value = racer->field_0x764;
                     scores[scored].racer = racer;
                     scored++;
@@ -827,7 +827,7 @@ void EventManager::RankRacers() {
             next = 0;
             for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
-                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->field_0x4a0)
+                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
                 count++;
             }
@@ -840,7 +840,7 @@ void EventManager::RankRacers() {
         int next = 0;
         int standing = 0;
         while ((racer = view->NextBike(&next)) != 0) {
-            if (!racer->field_0x4a0) {
+            if (!racer->outOfRace) {
                 standings[standing].field_0x00 = results[standing].points;
                 standings[standing].racer = racer;
                 standing++;
@@ -857,7 +857,7 @@ void EventManager::RankRacers() {
                 }
             }
             for (i = 0; i < standing; i++) {
-                if (results[i].playerId == racer->networkPlayerId && results[i].field_0x30 == racer->aiIndex) {
+                if (results[i].playerId == racer->networkPlayerId && results[i].aiIndex == racer->aiIndex) {
                     results[i].position = racer->finishPosition;
                     break;
                 }

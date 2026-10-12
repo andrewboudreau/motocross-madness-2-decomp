@@ -318,7 +318,7 @@ int NameOverlay::UnknownVirtualSlot14()
         Overlay::UnknownVirtualSlot14();
         return 1;
     }
-    if (trackedRacer->field_0x4a0)
+    if (trackedRacer->outOfRace)
         return 1;
     if (!trackedRacer->field_0x25_bit0)
         return 1;
@@ -509,7 +509,7 @@ int StatsOverlay::DrawViewModePanel()
     iterator = 0;
     UnknownEventRacer* racer;
     while ((racer = statsSource->NextBike(&iterator)) != 0) {
-        if (racer->field_0x4a0)
+        if (racer->outOfRace)
             finished++;
     }
     int total;
@@ -538,14 +538,14 @@ int StatsOverlay::DrawViewModePanel()
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->field_0x736)
-            FormatLapTime(time, statsSource->ownRacer->field_0x750);
+            FormatLapTime(time, statsSource->ownRacer->fastestLap);
         else
             FormatLapTime(time, instrumentSource->state->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
     if (g_TrackGame->mode.raceSettings.raceMode == 4)
-        FormatLapTime(time, statsSource->ownRacer->field_0x750);
+        FormatLapTime(time, statsSource->ownRacer->fastestLap);
     else
         FormatLapTime(time, instrumentSource->state->field_0x750);
     sprintf(rowText[3], "%s %s", label, time);
@@ -621,7 +621,7 @@ int StatsOverlay::DrawRacePanel()
     iterator = 0;
     UnknownEventRacer* racer;
     while ((racer = statsSource->NextBike(&iterator)) != 0) {
-        if (racer->field_0x4a0)
+        if (racer->outOfRace)
             finished++;
     }
     g_TrackGame->LoadResourceString(0x835, label, 0x80);
