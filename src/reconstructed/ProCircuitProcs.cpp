@@ -361,9 +361,9 @@ void PCNewDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 11));
         edit->GetEditText(text, 127);
         if (!text[0])
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(0);
+            FindControl("OkButton", 0)->SetEnabled(0);
         else
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(1);
+            FindControl("OkButton", 0)->SetEnabled(1);
         break;
     }
     case kDialogInit: {
@@ -1081,22 +1081,22 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("BikeRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderLeft", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
             previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {

@@ -145,13 +145,13 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             FindControl("ButBeginning", 0)->Show(0, 1);
             FindControl("ButEnd", 0)->Show(0, 1);
             FindControl("ButFrame", 0)->Show(0, 1);
-            FindControl("TogFF", 0)->UnknownVirtualSlot49(0);
-            FindControl("TogFFF", 0)->UnknownVirtualSlot49(0);
-            FindControl("TogReverse", 0)->UnknownVirtualSlot49(0);
-            FindControl("ButBeginning", 0)->UnknownVirtualSlot49(0);
-            FindControl("ButEnd", 0)->UnknownVirtualSlot49(0);
-            FindControl("SliderTime", 8)->UnknownVirtualSlot49(0);
-            FindControl("ButFrame", 0)->UnknownVirtualSlot49(0);
+            FindControl("TogFF", 0)->SetEnabled(0);
+            FindControl("TogFFF", 0)->SetEnabled(0);
+            FindControl("TogReverse", 0)->SetEnabled(0);
+            FindControl("ButBeginning", 0)->SetEnabled(0);
+            FindControl("ButEnd", 0)->SetEnabled(0);
+            FindControl("SliderTime", 8)->SetEnabled(0);
+            FindControl("ButFrame", 0)->SetEnabled(0);
         }
         break;
     case kDialogCommand:

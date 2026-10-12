@@ -40,17 +40,17 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
-        FindControl("RiderPositionCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.showRiderPositions);
-        FindControl("RaceStatsCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.showRaceStats);
-        FindControl("GuagesCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.showGauges);
-        FindControl("ChkUIAnims", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.uiAnimations);
-        FindControl("OverviewCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.showOverview);
-        FindControl("RiderNamesCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.showRiderNames);
-        FindControl("ChkPodiums", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.showPodiums);
-        FindControl("ChkIntroMovie", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.introMovie);
-        FindControl("ChkPlayerIndicator", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.playerIndicator);
-        FindControl("ChkToolTips", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.toolTips);
-        FindControl("ChkWreckResetOnTrack", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.wreckResetOnTrack);
+        FindControl("RiderPositionCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showRiderPositions);
+        FindControl("RaceStatsCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showRaceStats);
+        FindControl("GuagesCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showGauges);
+        FindControl("ChkUIAnims", 0)->BindValue(&g_UnknownGlobal688898.uiAnimations);
+        FindControl("OverviewCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showOverview);
+        FindControl("RiderNamesCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showRiderNames);
+        FindControl("ChkPodiums", 0)->BindValue(&g_UnknownGlobal688898.showPodiums);
+        FindControl("ChkIntroMovie", 0)->BindValue(&g_UnknownGlobal688898.introMovie);
+        FindControl("ChkPlayerIndicator", 0)->BindValue(&g_UnknownGlobal688898.playerIndicator);
+        FindControl("ChkToolTips", 0)->BindValue(&g_UnknownGlobal688898.toolTips);
+        FindControl("ChkWreckResetOnTrack", 0)->BindValue(&g_UnknownGlobal688898.wreckResetOnTrack);
         UIMultiState* chat = static_cast<UIMultiState*>(FindControl("MultChatMode", 2));
         chat->SetStateCount(3);
         chat->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x140b);
@@ -123,10 +123,10 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        FindControl("ShadowsCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.shadows);
-        FindControl("ParticlesCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.particles);
-        FindControl("SkyCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.sky);
-        FindControl("TerrainQualitySliderBar", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.terrainQuality);
+        FindControl("ShadowsCheckBox", 0)->BindValue(&g_UnknownGlobal6887d8.shadows);
+        FindControl("ParticlesCheckBox", 0)->BindValue(&g_UnknownGlobal6887d8.particles);
+        FindControl("SkyCheckBox", 0)->BindValue(&g_UnknownGlobal6887d8.sky);
+        FindControl("TerrainQualitySliderBar", 0)->BindValue(&g_UnknownGlobal6887d8.terrainQuality);
         UIDropDownList* dropDown = static_cast<UIDropDownList*>(FindControl("DisplayResolutionDropDown", 0));
         dropDown->SetFontColor(0xffffff);
         dropDown->SetTextAlign(0x12);
@@ -212,11 +212,11 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         break;
     }
     case kDialogInit: {
-        FindControl("ChkForceVideoMem", 0)->UnknownVirtualSlot54(&settings[0]);
-        FindControl("SldEcosystem", 0)->UnknownVirtualSlot54(&settings[1]);
-        FindControl("SldObjects", 0)->UnknownVirtualSlot54(&settings[2]);
-        FindControl("SldTerrain", 0)->UnknownVirtualSlot54(&settings[3]);
-        FindControl("SldVisibility", 0)->UnknownVirtualSlot54(&settings[4]);
+        FindControl("ChkForceVideoMem", 0)->BindValue(&settings[0]);
+        FindControl("SldEcosystem", 0)->BindValue(&settings[1]);
+        FindControl("SldObjects", 0)->BindValue(&settings[2]);
+        FindControl("SldTerrain", 0)->BindValue(&settings[3]);
+        FindControl("SldVisibility", 0)->BindValue(&settings[4]);
         if (g_TrackGame->field_0x2d0)
             FindControl("Txt3DCard", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x1463);
         else
@@ -240,7 +240,7 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         else if (method == 2)
             static_cast<UIRadioButton*>(FindControl("RadTerrSingle", 4))->SelectInGroup(0);
         if (!dual)
-            FindControl("RadTerrSingle", 4)->UnknownVirtualSlot49(dual);
+            FindControl("RadTerrSingle", 4)->SetEnabled(dual);
         static_cast<UIMultiState*>(FindControl("ChkFilterInput", 2))->SetCurrentState(
             g_TrackGame->GetRegistryFlag("JoystickFilter", 0));
         static_cast<UIMultiState*>(FindControl("ChkShowPickController", 2))->SetCurrentState(
@@ -272,14 +272,14 @@ void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit:
-        FindControl("InGameSoundEffectsCheck", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.inGameSoundEffects);
-        FindControl("SoundHardwareCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.soundHardware);
-        FindControl("UserInterfaceSoundsCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.uiSounds);
-        FindControl("ChkEAX", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.eax);
-        FindControl("ChkWaypointChime", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.waypointChime);
-        FindControl("UserInterfaceVolumeSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.uiVolume);
-        FindControl("InGameVolumeSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.inGameVolume);
-        FindControl("Rad16Bit", 4)->UnknownVirtualSlot49(0);
+        FindControl("InGameSoundEffectsCheck", 0)->BindValue(&g_UnknownGlobal688798.inGameSoundEffects);
+        FindControl("SoundHardwareCheckBox", 0)->BindValue(&g_UnknownGlobal688798.soundHardware);
+        FindControl("UserInterfaceSoundsCheckBox", 0)->BindValue(&g_UnknownGlobal688798.uiSounds);
+        FindControl("ChkEAX", 0)->BindValue(&g_UnknownGlobal688798.eax);
+        FindControl("ChkWaypointChime", 0)->BindValue(&g_UnknownGlobal688798.waypointChime);
+        FindControl("UserInterfaceVolumeSlider", 0)->BindValue(&g_UnknownGlobal688798.uiVolume);
+        FindControl("InGameVolumeSlider", 0)->BindValue(&g_UnknownGlobal688798.inGameVolume);
+        FindControl("Rad16Bit", 4)->SetEnabled(0);
         static_cast<UIRadioButton*>(FindControl("Rad8Bit", 4))->SelectInGroup(0);
         UpdateBoundValues(0);
         break;
@@ -340,17 +340,17 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         waitingForInput = 0;
         inputWaitPending = 0;
         joystickIsKind3 = 0;
-        FindControl("ForceFeedCheck", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.forceFeedback);
-        FindControl("SteeringSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.steering);
-        FindControl("CrossupSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.crossup);
-        FindControl("PitchSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.pitch);
-        FindControl("PressThrottleSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.pressThrottle);
-        FindControl("PressBrakesSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.pressBrakes);
-        FindControl("ReleaseThrottleSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.releaseThrottle);
-        FindControl("ReleaseBrakesSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.releaseBrakes);
-        FindControl("FeedbackSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.feedback);
-        FindControl("ChkGasGyro", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.gasGyro);
-        FindControl("ChkBrakeGyro", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.brakeGyro);
+        FindControl("ForceFeedCheck", 0)->BindValue(&g_UnknownGlobal688868.forceFeedback);
+        FindControl("SteeringSlider", 0)->BindValue(&g_UnknownGlobal688868.steering);
+        FindControl("CrossupSlider", 0)->BindValue(&g_UnknownGlobal688868.crossup);
+        FindControl("PitchSlider", 0)->BindValue(&g_UnknownGlobal688868.pitch);
+        FindControl("PressThrottleSlider", 0)->BindValue(&g_UnknownGlobal688868.pressThrottle);
+        FindControl("PressBrakesSlider", 0)->BindValue(&g_UnknownGlobal688868.pressBrakes);
+        FindControl("ReleaseThrottleSlider", 0)->BindValue(&g_UnknownGlobal688868.releaseThrottle);
+        FindControl("ReleaseBrakesSlider", 0)->BindValue(&g_UnknownGlobal688868.releaseBrakes);
+        FindControl("FeedbackSlider", 0)->BindValue(&g_UnknownGlobal688868.feedback);
+        FindControl("ChkGasGyro", 0)->BindValue(&g_UnknownGlobal688868.gasGyro);
+        FindControl("ChkBrakeGyro", 0)->BindValue(&g_UnknownGlobal688868.brakeGyro);
         UIListBox* actions = static_cast<UIListBox*>(FindControl("ActionListBox", 0));
         for (i = 0; i < 14; i++) {
             g_TrackGame->LoadResourceString(0x192 + i, text, 128);
@@ -370,7 +370,7 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         }
         ColorListRows();
         UIControl* analog = FindControl("ChkAnalogAxes", 0);
-        analog->UnknownVirtualSlot54(&g_UnknownGlobal688868.analogAxes);
+        analog->BindValue(&g_UnknownGlobal688868.analogAxes);
         if (g_TrackGame->controlInterface->activeJoystick)
             g_TrackGame->controlInterface->activeJoystick->UnknownFunction4897e0(4);
         analog->Show(0, 1);
@@ -637,7 +637,7 @@ void OptMessagesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         GameObjectIterator controls(controlContainer, 1, "UIControl");
         GameObject* control;
         while ((control = controls.Next()) != 0)
-            ((UIControl*)control)->UnknownVirtualSlot49(0);
+            ((UIControl*)control)->SetEnabled(0);
     }
 }
 
@@ -990,7 +990,7 @@ void GlobalSettingsDlg::ListOtherProfiles()
         profiles->SelectRowByText(g_TrackGame->mode.field_0x00);
     } else {
         UIControl* copy = FindControl("ButCopyUser", 4);
-        copy->UnknownVirtualSlot49(0);
+        copy->SetEnabled(0);
         copy->SetFontColor(0x757575);
     }
 }
@@ -1037,7 +1037,7 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         GameObjectIterator controls(controlContainer, 1, "UIControl");
         GameObject* control;
         while ((control = controls.Next()) != 0)
-            ((UIControl*)control)->UnknownVirtualSlot49(0);
+            ((UIControl*)control)->SetEnabled(0);
         break;
     }
     case kDialogCommand:
@@ -1045,12 +1045,12 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
             int rows = curves->rowCount;
             curves->SelectRow((curves->GetSelectedRow() + rows - 1) % rows);
-            curves->UnknownVirtualSlot66(0);
+            curves->ReportClick(0);
         } else if (_stricmp("CurveRight", event->controlName) == 0) {
             UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
             int rows = curves->rowCount;
             curves->SelectRow((curves->GetSelectedRow() + 1) % rows);
-            curves->UnknownVirtualSlot66(0);
+            curves->ReportClick(0);
         }
         break;
     case kDialogListSelect:
@@ -1159,9 +1159,9 @@ void OptGarageDlg::ShowCurve()
         slider->UnknownFunction4753c0(*level - g_TrackGame->ui->field_0x43c[bikeClass],
                                       g_TrackGame->ui->field_0x450[bikeClass] - g_TrackGame->ui->field_0x43c[bikeClass]);
         if (curve < 3)
-            slider->UnknownVirtualSlot49(0);
+            slider->SetEnabled(0);
         else
-            slider->UnknownVirtualSlot49(1);
+            slider->SetEnabled(1);
         curveSum += *level;
         sprintf(name, "HP%d", i);
         sprintf(text, "%d", *level);

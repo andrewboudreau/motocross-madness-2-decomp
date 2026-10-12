@@ -157,7 +157,7 @@
 #include "../../src/reconstructed/Tgafile.h"
 
 // 0x004705d0
-void UIControl::UnknownVirtualSlot49(int enable) {
+void UIControl::SetEnabled(int enable) {
     if (enabled == enable)
         return;
     enabled = enable;
@@ -175,7 +175,7 @@ void UIControl::UnknownVirtualSlot49(int enable) {
 }
 
 // 0x004733a0
-void UIButton::UnknownVirtualSlot49(int enable) {
+void UIButton::SetEnabled(int enable) {
     if (enabled == enable)
         return;
     enabled = enable;
@@ -258,7 +258,7 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
                     rect.bottom = rect.top + height;
                     if (PtInRect(&rect, *point) && !(rowTable[row].flags & 1)) {
                         SelectRow(row);
-                        UnknownVirtualSlot66(&found);
+                        ReportClick(&found);
                         break;
                     }
                     if (!found)
@@ -438,7 +438,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x004734c0: whether `point` is on an opaque pixel of the image.
-int UIButton::UnknownVirtualSlot28(POINT point, int state) {
+int UIButton::ContainsPoint(POINT point, int state) {
     int opaque = 0;
     int format = g_TrackGame->renderTarget->field_0x28;
     RECT rect = *(RECT*)screenArea;
@@ -469,7 +469,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
 
 // 0x00478e10: the same test as UIButton slot 28 (0x004734c0), but on the
 // control's own area (no RECT copy: retail passes &screenArea to PtInRect).
-int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
+int UIMultiState::ContainsPoint(POINT point, int state) {
     int opaque = 0;
     int format = g_TrackGame->renderTarget->field_0x28;
     if (PtInRect((RECT*)screenArea, point)) {
@@ -1636,7 +1636,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 if (isDefault)
                     break;
 
-                control->UnknownVirtualSlot52(attachId);
+                control->SetAttachId(attachId);
                 control->groupId = groupId;
                 control->SetAnchor((UIControl*)FindSectionObject(anchor), relAnchor);
                 control->SetName(sectionTable[i].sectionName);
@@ -1762,14 +1762,14 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 control->SetSound(1, FindSectionObject(soundFocus));
                 control->SetSound(2, FindSectionObject(soundPush));
                 control->SetSound(3, FindSectionObject(soundClick));
-                control->UnknownVirtualSlot49(enable != 0);
+                control->SetEnabled(enable != 0);
                 control->Show(show != 0, 1);
                 control->mouseAnim = (int)FindSectionObject(mouseAnim);
                 control->keyBind = keyBind;
                 control->post3D = pre3D == 0;
                 control->permanent = permanent;
                 control->drawnTexture = control->GetStateTexture(-1);
-                control->UnknownVirtualSlot39();
+                control->ScaleArea();
                 sectionTable[i].sectionObject = (Sound*)control;
                 break;
             }
@@ -1790,7 +1790,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             frame->drawnTexture = frame->GetStateTexture(0);
             screenArea.right = screenArea.left + width;
             screenArea.bottom = screenArea.top + imageHeight;
-            frame->UnknownVirtualSlot39();
+            frame->ScaleArea();
         }
     }
     if (isPopup && screenWidth && screenHeight) {

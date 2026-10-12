@@ -571,9 +571,9 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_TrackGame->LoadResourceString(0x13f6, text, 0x80);
         list->AddRow(text, 4, 1);
         list->SelectRow(settings->raceMode);
-        FindControl("OpponentsListBox", 0)->UnknownVirtualSlot54(&settings->opponents);
+        FindControl("OpponentsListBox", 0)->BindValue(&settings->opponents);
         FindControl("ChkRecordRace", 0)->Show(0, 1);
-        FindControl("RadLODEasy", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x94);
+        FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.field_0x94);
         UIListBox* gates = static_cast<UIListBox*>(FindControl("LstNumGates", 3));
         gates->RemoveAllRows();
         for (int i = 10; i <= 30; i++) {
@@ -599,22 +599,22 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("TrackRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("GhostLeft", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLGhostRaces", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("GhostRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLGhostRaces", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("SeedLeft", event->controlName)) {
             char seed[32];
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditSeed", 0xb));
@@ -731,7 +731,7 @@ void SPEventDlg::ShowRaceModeControls() {
     if (settings.field_0x00 == 2 && g_TrackGame->mode.field_0x10ec) {
         opponentsLeft->Show(0, 1);
         opponentsRight->Show(0, 1);
-        opponents->UnknownVirtualSlot49(0);
+        opponents->SetEnabled(0);
         racesLeft->Show(0, 1);
         racesRight->Show(0, 1);
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
@@ -742,7 +742,7 @@ void SPEventDlg::ShowRaceModeControls() {
     } else {
         opponentsLeft->Show(1, 1);
         opponentsRight->Show(1, 1);
-        opponents->UnknownVirtualSlot49(1);
+        opponents->SetEnabled(1);
         racesLeft->Show(1, 1);
         racesRight->Show(1, 1);
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92a);
@@ -1012,22 +1012,22 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("BikeRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderLeft", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
             previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {
@@ -1484,10 +1484,10 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             edit->controlType = 12;
             CreateProfile(event);
             EndDialog(0);
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(0);
+            FindControl("OkButton", 0)->SetEnabled(0);
         } else {
             guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(0);
+            FindControl("OkButton", 0)->SetEnabled(0);
         }
         break;
     }
@@ -1514,9 +1514,9 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 11));
         edit->GetEditText(text, 127);
         if (!text[0])
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(0);
+            FindControl("OkButton", 0)->SetEnabled(0);
         else
-            FindControl("OkButton", 0)->UnknownVirtualSlot49(1);
+            FindControl("OkButton", 0)->SetEnabled(1);
         break;
     }
     case kDialogClose:

@@ -592,35 +592,35 @@ void MultiPlayerDlg::EnableReadyControls() {
         EnableGroup(0x3e8, 0);
     }
     if (g_UnknownGlobal689df4) {
-        FindControl("Options", 1)->UnknownVirtualSlot49(0);
-        FindControl("Joystick", 1)->UnknownVirtualSlot49(0);
-        FindControl("Help", 1)->UnknownVirtualSlot49(0);
+        FindControl("Options", 1)->SetEnabled(0);
+        FindControl("Joystick", 1)->SetEnabled(0);
+        FindControl("Help", 1)->SetEnabled(0);
         if (bikeRiderPage) {
-            bikeRiderPage->FindControl("ButWrench", 0)->UnknownVirtualSlot49(0);
-            bikeRiderPage->FindControl("DDLBikes", 0)->UnknownVirtualSlot49(0);
+            bikeRiderPage->FindControl("ButWrench", 0)->SetEnabled(0);
+            bikeRiderPage->FindControl("DDLBikes", 0)->SetEnabled(0);
             bikeRiderPage->FindControl("BikeLeft", 0)->Show(0, 1);
             bikeRiderPage->FindControl("BikeRight", 0)->Show(0, 1);
-            bikeRiderPage->FindControl("DDLEngineSize", 0)->UnknownVirtualSlot49(0);
+            bikeRiderPage->FindControl("DDLEngineSize", 0)->SetEnabled(0);
             static_cast<UIDropDownList*>(bikeRiderPage->FindControl("DDLEngineSize", 0))->UnknownInlineButton()->Show(0, 1);
             if (g_TrackGame->network->isHost) {
-                bikeRiderPage->FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(0);
+                bikeRiderPage->FindControl("LargestOpponentDropDown", 0)->SetEnabled(0);
                 static_cast<UIDropDownList*>(bikeRiderPage->FindControl("LargestOpponentDropDown", 0))->UnknownInlineButton()
                     ->Show(0, 1);
             }
         }
     } else {
-        FindControl("Options", 1)->UnknownVirtualSlot49(1);
-        FindControl("Joystick", 1)->UnknownVirtualSlot49(1);
-        FindControl("Help", 1)->UnknownVirtualSlot49(1);
+        FindControl("Options", 1)->SetEnabled(1);
+        FindControl("Joystick", 1)->SetEnabled(1);
+        FindControl("Help", 1)->SetEnabled(1);
         if (bikeRiderPage) {
-            bikeRiderPage->FindControl("ButWrench", 0)->UnknownVirtualSlot49(1);
-            bikeRiderPage->FindControl("DDLBikes", 0)->UnknownVirtualSlot49(1);
+            bikeRiderPage->FindControl("ButWrench", 0)->SetEnabled(1);
+            bikeRiderPage->FindControl("DDLBikes", 0)->SetEnabled(1);
             bikeRiderPage->FindControl("BikeLeft", 0)->Show(1, 1);
             bikeRiderPage->FindControl("BikeRight", 0)->Show(1, 1);
-            bikeRiderPage->FindControl("DDLEngineSize", 0)->UnknownVirtualSlot49(1);
+            bikeRiderPage->FindControl("DDLEngineSize", 0)->SetEnabled(1);
             static_cast<UIDropDownList*>(bikeRiderPage->FindControl("DDLEngineSize", 0))->UnknownInlineButton()->Show(1, 1);
             if (g_TrackGame->network->isHost) {
-                bikeRiderPage->FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(1);
+                bikeRiderPage->FindControl("LargestOpponentDropDown", 0)->SetEnabled(1);
                 static_cast<UIDropDownList*>(bikeRiderPage->FindControl("LargestOpponentDropDown", 0))->UnknownInlineButton()
                     ->Show(1, 1);
             }
@@ -634,7 +634,7 @@ void MultiPlayerDlg::ResetReadyButtons() {
     char name[0x80];
     if (g_TrackGame->network->isHost) {
         ShowGroup(0x514, 1);
-        FindControl("Start", 0)->UnknownVirtualSlot49(1);
+        FindControl("Start", 0)->SetEnabled(1);
     } else {
         ShowGroup(0x514, 0);
     }
@@ -1179,9 +1179,9 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     allReady = 0;
             }
             if (g_UnknownGlobal689df4 && allReady && g_UnknownGlobal689df8 >= 1)
-                start->UnknownVirtualSlot49(1);
+                start->SetEnabled(1);
             else
-                start->UnknownVirtualSlot49(0);
+                start->SetEnabled(0);
             lobbySlots.SetSlot(me, g_TrackGame->mode.field_0x6dc);
             SendSettings();
         }
@@ -1476,8 +1476,8 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_TrackGame->LoadResourceString(0x13f5, text, 0x80);
         list->AddRow(text, 2, 1);
         list->SelectRow(settings->raceMode);
-        FindControl("ChkTagBall", 0)->UnknownVirtualSlot54(&settings->tagBall);
-        FindControl("ChkStuntMode", 0)->UnknownVirtualSlot54(&settings->stuntMode);
+        FindControl("ChkTagBall", 0)->BindValue(&settings->tagBall);
+        FindControl("ChkStuntMode", 0)->BindValue(&settings->stuntMode);
         int count = g_TrackGame->mode.field_0x27f8.field_0x28;
         UpdateBoundValues(0);
         ApplyEventType();
@@ -1504,12 +1504,12 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("TrackRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RacesLeftArrow", event->controlName) || !_stricmp("RacesRightArrow", event->controlName)) {
             g_TrackGame->mode.field_0x27f8.field_0x0c = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         }
@@ -1561,7 +1561,7 @@ void MPEventDlg::EnableChangeableControls() {
     GameObjectIterator controls(controlContainer, 1, "UIControl");
     int enable = g_TrackGame->network->isHost && !(g_TrackGame->mode.field_0x1bd4 & 1);
     for (GameObject* control = controls.Next(); control; control = controls.Next())
-        ((UIControl*)control)->UnknownVirtualSlot49(enable);
+        ((UIControl*)control)->SetEnabled(enable);
     if (enable) {
         ShowGroup(0x141, 1);
         static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->UnknownInlineButton()->Show(1, 1);
@@ -1571,10 +1571,10 @@ void MPEventDlg::EnableChangeableControls() {
         static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->UnknownInlineButton()->Show(0, 1);
         static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->UnknownInlineButton()->Show(0, 1);
         if (g_TrackGame->network->isHost && !(g_TrackGame->mode.field_0x1bd4 & 2)) {
-            FindControl("DDLTextBox", 6)->UnknownVirtualSlot49(1);
-            FindControl("TrackLeft", 0)->UnknownVirtualSlot49(1);
+            FindControl("DDLTextBox", 6)->SetEnabled(1);
+            FindControl("TrackLeft", 0)->SetEnabled(1);
             FindControl("TrackLeft", 0)->Show(1, 1);
-            FindControl("TrackRight", 0)->UnknownVirtualSlot49(1);
+            FindControl("TrackRight", 0)->SetEnabled(1);
             FindControl("TrackRight", 0)->Show(1, 1);
         }
     }
@@ -1618,7 +1618,7 @@ void MPEventDlg::EnableChangeableControls() {
         if (g_TrackGame->network->isHost) {
             opponentsLeft->Show(0, 1);
             opponentsRight->Show(0, 1);
-            opponents->UnknownVirtualSlot49(0);
+            opponents->SetEnabled(0);
             racesLeft->Show(0, 1);
             racesRight->Show(0, 1);
         }
@@ -1630,7 +1630,7 @@ void MPEventDlg::EnableChangeableControls() {
         if (g_TrackGame->network->isHost) {
             opponentsLeft->Show(1, 1);
             opponentsRight->Show(1, 1);
-            opponents->UnknownVirtualSlot49(1);
+            opponents->SetEnabled(1);
             racesLeft->Show(1, 1);
             racesRight->Show(1, 1);
         }
@@ -1878,11 +1878,11 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         if (dialogBackground)
             previewRegion = dialogBackground->UnknownFunction4040f0(1);
         if ((g_TrackGame->mode.field_0x1bd4 & 4) || g_UnknownGlobal689df4) {
-            FindControl("ButWrench", 0)->UnknownVirtualSlot49(0);
-            FindControl("DDLBikes", 6)->UnknownVirtualSlot49(0);
+            FindControl("ButWrench", 0)->SetEnabled(0);
+            FindControl("DDLBikes", 6)->SetEnabled(0);
             FindControl("BikeLeft", 0)->Show(0, 1);
             FindControl("BikeRight", 0)->Show(0, 1);
-            FindControl("DDLEngineSize", 6)->UnknownVirtualSlot49(0);
+            FindControl("DDLEngineSize", 6)->SetEnabled(0);
         }
         EnableLargestOpponent();
         break;
@@ -1906,22 +1906,22 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("BikeRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderLeft", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("RiderRight", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
             int rows = list->rowCount;
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
-            list->UnknownVirtualSlot66(0);
+            list->ReportClick(0);
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 0xb19) OptionsDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)parentDialog, 2, 0, 1);
@@ -1998,10 +1998,10 @@ void MPBikeRiderDlg::ApplyLargestOpponentClass() {
 // 0x004f8700
 void MPBikeRiderDlg::EnableLargestOpponent() {
     if (g_TrackGame->network->isHost) {
-        FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(1);
+        FindControl("LargestOpponentDropDown", 0)->SetEnabled(1);
         static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->UnknownInlineButton()->Show(1, 1);
     } else {
-        FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(0);
+        FindControl("LargestOpponentDropDown", 0)->SetEnabled(0);
         static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->UnknownInlineButton()->Show(0, 1);
     }
 }
@@ -2046,7 +2046,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
             if (dialogBackground)
                 dialogBackground->UnknownFunction404da0();
             if (g_UnknownGlobal689df4)
-                engine->UnknownVirtualSlot49(0);
+                engine->SetEnabled(0);
         }
     } else {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -2138,10 +2138,10 @@ void MPOptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->control->UnknownVirtualSlot59(1);
         break;
     case kDialogInit: {
-        FindControl("FastFinishesCheckBox", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x27f8.field_0x18);
-        FindControl("ChkTreeCollision", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x27f8.field_0x10);
-        FindControl("ChkRiderCollision", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x27f8.field_0x14);
-        FindControl("RadLODEasy", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x94);
+        FindControl("FastFinishesCheckBox", 0)->BindValue(&g_TrackGame->mode.field_0x27f8.field_0x18);
+        FindControl("ChkTreeCollision", 0)->BindValue(&g_TrackGame->mode.field_0x27f8.field_0x10);
+        FindControl("ChkRiderCollision", 0)->BindValue(&g_TrackGame->mode.field_0x27f8.field_0x14);
+        FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.field_0x94);
         FindControl("ChkRecordRace", 0)->Show(0, 1);
         static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb))->SetAcceptedCharacters("0123456789");
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb));
@@ -2178,7 +2178,7 @@ void MPOptionsDlg::EnableHostOptions() {
     EnableGroup(0x3f3, g_TrackGame->network->isHost &&
                                      !g_TrackGame->mode.field_0x1bd4);
     if (g_TrackGame->mode.field_0x27f8.field_0x04 == 4)
-        FindControl("ChkRecordRace", 0)->UnknownVirtualSlot49(0);
+        FindControl("ChkRecordRace", 0)->SetEnabled(0);
     else
-        FindControl("ChkRecordRace", 0)->UnknownVirtualSlot49(1);
+        FindControl("ChkRecordRace", 0)->SetEnabled(1);
 }

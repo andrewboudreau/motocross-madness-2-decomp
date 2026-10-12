@@ -160,7 +160,7 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00471fd0
 
     virtual void UnknownVirtualSlot27();      // 0x00471070: advances the state's image
-    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00470990: whether `point` is inside
+    virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x00470990: whether `point` is inside
     virtual void SetState(int state); // slot 29, 0x00470970: sets the state
     virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
     // Slot 31 (0x004725b0): the pointer moved over it (guiUser +0x1d8, the
@@ -173,7 +173,9 @@ public:
     virtual int UnknownVirtualSlot36();       // 0x004703e0
     virtual void* UnknownVirtualSlot37();     // 0x004703f0
     virtual void UnknownVirtualSlot38();      // 0x004710c0
-    virtual void UnknownVirtualSlot39();      // 0x00470f10: scales the area
+    // Slot 39 (0x00470f10): screenArea = bounds scaled, offset by the anchor or
+    // the dialog; visibleArea is the part on the render target.
+    virtual void ScaleArea();
     virtual int Draw();                   // slot 40, 0x00471240: draws
     virtual int UnknownVirtualSlot41();       // 0x004715d0
     virtual int UnknownVirtualSlot42();       // 0x00471850
@@ -183,12 +185,12 @@ public:
     virtual int UnknownVirtualSlot46();       // 0x00471df0
     virtual int UnknownVirtualSlot47();       // 0x00471eb0
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00471fa0: the state's texture
-    virtual void UnknownVirtualSlot49(int enable); // 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
+    virtual void SetEnabled(int enable); // slot 49, 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
     virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
     virtual int UnknownVirtualSlot51(tagPOINT point); // 0x004709f0
-    virtual void UnknownVirtualSlot52(int id); // 0x00470400
+    virtual void SetAttachId(int id); // slot 52, 0x00470400: stores attachId
     virtual int UnknownVirtualSlot53();       // 0x004726b0
-    virtual void UnknownVirtualSlot54(int* value); // 0x00470a70 (NetProcs.cpp: binds a value)
+    virtual void BindValue(int* value); // slot 54, 0x00470a70: stores boundValue (NetProcs.cpp)
     virtual int UnknownVirtualSlot55(int a, int b); // 0x004721b0
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00472250
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x004722b0
@@ -326,8 +328,8 @@ class UIButton : public UIControl {
 public:
     UIButton(int id, CameraRect* area, UIDialog* owner); // 0x004731f0
     virtual ~UIButton();                      // 0x004732c0 (deleting wrapper 0x004732a0)
-    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x004734c0
-    virtual void UnknownVirtualSlot49(int enable); // 0x004733a0
+    virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x004734c0
+    virtual void SetEnabled(int enable); // slot 49, 0x004733a0
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00473410
 
     // 0x004732d0: the images for the up, over, down, disabled and focus states.
@@ -484,7 +486,7 @@ public:
     // Slots 65 and 66 are UIListBox's own (UIControl's vtable has 65 slots,
     // UIListBox's and UIDDLListBox's 67).
     virtual int UnknownVirtualSlot65(int row); // 0x004769e0: selects `row`
-    virtual void UnknownVirtualSlot66(int* handled); // 0x00477d30: reports a click (and a double click)
+    virtual void ReportClick(int* handled); // slot 66, 0x00477d30: reports a click (and a double click)
 
     int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
     int ScrollToRow(int row, int updateScrollBars); // 0x00476860
@@ -556,7 +558,8 @@ public:
     UIMultiState(int id, CameraRect* area, UIDialog* owner); // 0x004781f0
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
     virtual void UnknownVirtualSlot27();      // 0x004784e0
-    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00478e10: whether `point` is on an opaque pixel
+    // Slot 28 (0x00478e10): whether `point` is on an opaque pixel.
+    virtual int ContainsPoint(tagPOINT point, int state);
     virtual int Draw();                   // slot 40, 0x00478570: draws
     virtual void SetState(int state); // slot 29, 0x00478520
     virtual int UnknownVirtualSlot34();       // 0x00478260
@@ -653,7 +656,7 @@ public:
                  UIDropDownList* list);       // 0x00479d10
     virtual void UnknownVirtualSlot33(int value); // 0x00479e70
     virtual int UnknownVirtualSlot65(int row); // 0x00479db0
-    virtual void UnknownVirtualSlot66(int* handled); // 0x00479df0
+    virtual void ReportClick(int* handled); // slot 66, 0x00479df0
 
     UIDropDownList* ownerList;                // +0x250
 };
@@ -667,7 +670,7 @@ public:
     virtual ~UIDropDownList();                // 0x0047a1f0 (deleting wrapper 0x0047a1d0)
     virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
     virtual void UnknownVirtualSlot33(int value); // 0x0047a7d0
-    virtual void UnknownVirtualSlot52(int id); // 0x0047a290
+    virtual void SetAttachId(int id); // slot 52, 0x0047a290
     virtual int UnknownVirtualSlot55(int a, int b); // 0x0047add0
     virtual void UnknownVirtualSlot59(int value); // 0x0047ad80
     virtual int GetWidth();               // slot 61, 0x0047a850

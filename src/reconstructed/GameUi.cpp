@@ -103,7 +103,7 @@ void* UIControl::UnknownVirtualSlot37() {
 }
 
 // 0x00470400
-void UIControl::UnknownVirtualSlot52(int id) {
+void UIControl::SetAttachId(int id) {
     attachId = id;
 }
 
@@ -174,7 +174,7 @@ void UIControl::SetShapeBounds(int value) {
 }
 
 // 0x00470a70
-void UIControl::UnknownVirtualSlot54(int* value) {
+void UIControl::BindValue(int* value) {
     boundValue = value;
 }
 
@@ -216,7 +216,7 @@ char* UIControl::GetName() {
 // 0x00470f10: scales the design rect by the dialog's scale into the screen
 // rect (+0x2c), offsets it by the anchor control or the dialog, and clips
 // the visible part (+0x4c) to the render target.
-void UIControl::UnknownVirtualSlot39() {
+void UIControl::ScaleArea() {
     UIDialog* owner = ownerDialog;
     int left = bounds[0];
     screenArea[0] = (int)(left * owner->scaleX);
@@ -414,7 +414,7 @@ int UIStatic::UnknownVirtualSlot30() {
 // UIControl (continued)
 
 // 0x00470990
-int UIControl::UnknownVirtualSlot28(POINT point, int state) {
+int UIControl::ContainsPoint(POINT point, int state) {
     RECT rect = *(RECT*)screenArea;
     return PtInRect(&rect, point);
 }
@@ -425,7 +425,7 @@ int UIControl::UnknownVirtualSlot51(POINT point) {
     if (!shapeBounds) {
         if (PtInRect(&rect, point))
             return 1;
-    } else if (UnknownVirtualSlot28(point, currentState)) {
+    } else if (ContainsPoint(point, currentState)) {
         return 1;
     }
     return 0;
@@ -669,7 +669,7 @@ UIEditBox::~UIEditBox() {
 
 // 0x00473820
 void UIEditBox::BindTextBuffer(char* buffer, int size) {
-    UIControl::UnknownVirtualSlot54((int*)buffer);
+    UIControl::BindValue((int*)buffer);
     boundBufferSize = size;
 }
 
@@ -1603,8 +1603,8 @@ UIDropDownList::UIDropDownList(int id, CameraRect* area, UIDialog* owner, const 
     buttonPart->SetAnchor(this, 1);
     listPart->SetAnchor(this, 1);
     scrollBarPart->SetAnchor(this, 1);
-    listPart->UnknownVirtualSlot52(0x4d43);
-    scrollBarPart->UnknownVirtualSlot52(0x4d43);
+    listPart->SetAttachId(0x4d43);
+    scrollBarPart->SetAttachId(0x4d43);
     AppendChild(buttonPart, -1);
     AppendChild(staticPart2, -1);
     isOpen = 0;
@@ -1630,12 +1630,12 @@ UIDropDownList::~UIDropDownList() {
 }
 
 // 0x0047a290
-void UIDropDownList::UnknownVirtualSlot52(int id) {
+void UIDropDownList::SetAttachId(int id) {
     attachId = id;
     if (!id)
         id = 0x4d43;
-    listPart->UnknownVirtualSlot52(id);
-    scrollBarPart->UnknownVirtualSlot52(id);
+    listPart->SetAttachId(id);
+    scrollBarPart->SetAttachId(id);
 }
 
 // 0x0047a7d0
@@ -1672,7 +1672,7 @@ void UIDropDownList::UnknownVirtualSlot59(int value) {
         *boundValue = listPart->GetSelectedRow();
     } else {
         listPart->SelectRow(*boundValue);
-        listPart->UnknownVirtualSlot66(0);
+        listPart->ReportClick(0);
     }
 }
 
@@ -1958,7 +1958,7 @@ void UIDialog::EnableGroup(int id, int value) {
     while ((control = (UIControl*)iterator.Next()) != 0) {
         int group = control->groupId;
         if (group == id)
-            control->UnknownVirtualSlot49(value);
+            control->SetEnabled(value);
     }
 }
 
@@ -2436,7 +2436,7 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
     if (draw) {
         drawnTexture = GetStateTexture(-1);
         UnknownVirtualSlot38();
-        UnknownVirtualSlot39();
+        ScaleArea();
         if (ownerDialog->guiUser->pointerDevice && field_0x1d4 != -1) {
             POINT position = ownerDialog->guiUser->pointerDevice->pointerPosition;
             UnknownVirtualSlot57(field_0x1d4, (int*)&position);
@@ -3803,7 +3803,7 @@ int UIScrollBar::UnknownVirtualSlot56(int a, int* position) {
 unsigned int g_UnknownGlobal65b59c;           // time of the last list box click
 
 // 0x00477d30
-void UIListBox::UnknownVirtualSlot66(int* handled) {
+void UIListBox::ReportClick(int* handled) {
     UnknownDialogEvent event;
     event.handled = 0;
     event.kind = kDialogListSelect;
@@ -5068,7 +5068,7 @@ void UIListBox::ScrollBy(int delta) {
     }
     if (visibleRowCount == 1) {
         UnknownVirtualSlot65(firstVisibleRow);
-        UnknownVirtualSlot66(&handled);
+        ReportClick(&handled);
         if (handled)
             return;
     }
@@ -5133,7 +5133,7 @@ int UIListBox::UnknownVirtualSlot21(int key) {
             return 0;
         }
         int handled;
-        UnknownVirtualSlot66(&handled);
+        ReportClick(&handled);
         return 1;
     }
     return 0;
@@ -5152,7 +5152,7 @@ TextureMap* UIMultiState::GetStateTexture(int state) {
 }
 
 // 0x00479df0
-void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
+void UIDDLListBox::ReportClick(int* handled) {
     UnknownDialogEvent event;
     event.handled = 0;
     ownerList->SetText(GetRowText(GetSelectedRow()));

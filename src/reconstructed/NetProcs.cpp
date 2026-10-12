@@ -54,7 +54,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogInit: {
         UIListBox* control = static_cast<UIListBox*>(FindControl("ButJoin", 0));
         if (openingMenu != 0x85d) {
-            control->UnknownVirtualSlot49(0);
+            control->SetEnabled(0);
             control->SetFontColor(0x808080);
         }
         control = static_cast<UIListBox*>(FindControl("LstSessions", 0));
@@ -62,7 +62,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetSelectColor(0xffffff);
         control->SetSelectBoxColor(0xfeb97a);
         g_TrackGame->mode.field_0xfd4 = 0;
-        control->UnknownVirtualSlot54(&g_TrackGame->mode.field_0xfd4);
+        control->BindValue(&g_TrackGame->mode.field_0xfd4);
         UpdateBoundValues(0);
         control->SelectRow(0);
         UnknownFunction470000(control, 0, 0);
@@ -111,11 +111,11 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         list->SelectRowByData(selection);
         if (!g_SessionListCount) {
             UIControl* join = FindControl("ButJoin", 0);
-            join->UnknownVirtualSlot49(0);
+            join->SetEnabled(0);
             join->SetFontColor(0x808080);
         } else {
             UIControl* join = FindControl("ButJoin", 0);
-            join->UnknownVirtualSlot49(1);
+            join->SetEnabled(1);
             join->SetFontColor(0xffffff);
         }
         break;
@@ -192,7 +192,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x147d);
         control->SetStateTextFromResource(3, g_TrackGame->resourceInstance, 0x147e);
         g_SerialSettings.port = 0;
-        control->UnknownVirtualSlot54(&g_SerialSettings.port);
+        control->BindValue(&g_SerialSettings.port);
 
         control = static_cast<UIMultiState*>(FindControl("ButBaud", 2));
         control->SetStateCount(10);
@@ -201,7 +201,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             control->SetStateText(i, text);
         }
         g_SerialSettings.baudRate = 6;
-        control->UnknownVirtualSlot54(&g_SerialSettings.baudRate);
+        control->BindValue(&g_SerialSettings.baudRate);
 
         control = static_cast<UIMultiState*>(FindControl("ButStop", 2));
         control->SetStateCount(3);
@@ -209,7 +209,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1479);
         control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x147a);
         g_SerialSettings.stopBits = 0;
-        control->UnknownVirtualSlot54(&g_SerialSettings.stopBits);
+        control->BindValue(&g_SerialSettings.stopBits);
 
         control = static_cast<UIMultiState*>(FindControl("ButParity", 2));
         control->SetStateCount(4);
@@ -218,7 +218,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x1471);
         control->SetStateTextFromResource(3, g_TrackGame->resourceInstance, 0x1472);
         g_SerialSettings.parity = 0;
-        control->UnknownVirtualSlot54(&g_SerialSettings.parity);
+        control->BindValue(&g_SerialSettings.parity);
 
         control = static_cast<UIMultiState*>(FindControl("ButFlow", 2));
         control->SetStateCount(5);
@@ -228,7 +228,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetStateTextFromResource(3, g_TrackGame->resourceInstance, 0x1477);
         control->SetStateTextFromResource(4, g_TrackGame->resourceInstance, 0x1475);
         g_SerialSettings.flowControl = 4;
-        control->UnknownVirtualSlot54(&g_SerialSettings.flowControl);
+        control->BindValue(&g_SerialSettings.flowControl);
 
         UpdateBoundValues(0);
         break;
