@@ -860,49 +860,58 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
     return r;
 }
 
+static inline Vec3 VehSum(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
 // Slot 46: the point the follow/aim logic looks at, relative to the vehicle position: toward the
 // lead wheel (or the midpoint of two wheels when only the aux one is not yet fully settled),
 // rotated by the frame transform; falls back to field_0x194 when disabled or > 2 wheels.
+// Each branch converts through its own WorldToLocalDirection call (retail has three) and VC6
+// merges the `*out = ` copies; the midpoint goes through three temporaries (difference, half,
+// sum) as retail's 0x24 frame shows.  Left: two FPU/store scheduling spots in the midpoint and
+// lead-wheel branches (3 instructions).  Tried: by-pointer/reference/named-temp lead wheel,
+// a named offset temp, nested helper expressions, early-return and if/else layouts.
 Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 {
-    Vec3* src = &rotationPivot;
-    Vec3 t;
     if (!airborne && !pointsTouching && wheelsInContact <= 2) {
         if (wheelsInContact == 2) {
-            VehicleWheel* a = secondaryWheel;
-            VehicleWheel* b = primaryWheel;
-            if (!a->aux) {
+            // a has the aux object, b is the other wheel
+            VehicleWheel* a;
+            VehicleWheel* b = secondaryWheel;
+            if (b->aux) {
+                a = b;
+                b = primaryWheel;
+            } else {
                 a = primaryWheel;
                 if (!a->aux) {
-                    *out = *src;
+                    *out = rotationPivot;
                     return out;
                 }
-                b = secondaryWheel;
-            } else {
-                b = primaryWheel;
             }
-            // a has the aux object, b is the other wheel
             if (a->field_0x2b8 < 0.9f) {
                 scratchVector = VehOffset(b->wheelPosition, position);
+                *out = modelNode->WorldToLocalDirection(scratchVector);
             } else {
                 Vec3 d = VehOffset(a->wheelPosition, b->wheelPosition);
-                Vec3 mid;
-                mid.x = d.x * 0.5f;
-                mid.y = d.y * 0.5f;
-                mid.z = d.z * 0.5f;
-                mid.x += b->wheelPosition.x;
-                mid.y += b->wheelPosition.y;
-                mid.z += b->wheelPosition.z;
+                Vec3 half = VehScale(d, 0.5f);
+                Vec3 mid = VehSum(half, b->wheelPosition);
                 scratchVector = VehOffset(mid, position);
+                *out = modelNode->WorldToLocalDirection(scratchVector);
             }
         } else {
             Vec3* p = &primaryWheel->wheelPosition;
             scratchVector = VehOffset(*p, position);
+            *out = modelNode->WorldToLocalDirection(scratchVector);
         }
-        t = modelNode->WorldToLocalDirection(scratchVector);
-        src = &t;
+    } else {
+        *out = rotationPivot;
     }
-    *out = *src;
     return out;
 }
 

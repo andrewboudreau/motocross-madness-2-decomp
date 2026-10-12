@@ -676,7 +676,7 @@
     "target_va": "0x5276d0",
     "target_size": 523,
     "expect": "partial",
-    "notes": "8.3% (479/523). Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710, else field_0x194. First divergence +0x0: retail tests flag in al and has frame 0x24 (ours 0x18, dl): retail keeps d.x on the x87 stack across the midpoint temp and routes vecs through int stack temps.",
+    "notes": "Same length (523), 3 instruction diffs. Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710 in each branch, else field_0x194; frame 0x24 from the difference/half/sum temporaries. Left: store/fstp and return-pointer push scheduling in the midpoint and lead-wheel branches.",
     "bindings": "Vehicle.bindings.json"
   },
   {
