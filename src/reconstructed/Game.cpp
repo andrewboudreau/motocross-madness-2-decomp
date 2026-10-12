@@ -175,16 +175,16 @@ int Game::UnknownVirtualSlot8() {
             static int profilePage = -1;
             if (profilePage < 0)
                 profilePage = debugOverlay->NewPage();
-            s_NetPeak.UnknownFunction4cb6b0(g_UnknownNetTime);
-            s_TickPeak.UnknownFunction4cb6b0(g_UnknownTickTime);
-            s_PrepFramePeak.UnknownFunction4cb6b0(g_UnknownPrepFrameTime);
-            s_UpdateScreenPeak.UnknownFunction4cb6b0(g_UnknownUpdateScreenTime);
-            s_PrepareGeometryPeak.UnknownFunction4cb6b0(prepareGeometry);
-            s_WaitForFlipPeak.UnknownFunction4cb6b0(waitForFlip);
-            s_RenderPre3DPeak.UnknownFunction4cb6b0(renderPre3D);
-            s_Render3DPeak.UnknownFunction4cb6b0(render3D);
-            s_RenderPost3DPeak.UnknownFunction4cb6b0(renderPost3D);
-            s_ElapsedPeak.UnknownFunction4cb6b0(elapsed);
+            s_NetPeak.Record(g_UnknownNetTime);
+            s_TickPeak.Record(g_UnknownTickTime);
+            s_PrepFramePeak.Record(g_UnknownPrepFrameTime);
+            s_UpdateScreenPeak.Record(g_UnknownUpdateScreenTime);
+            s_PrepareGeometryPeak.Record(prepareGeometry);
+            s_WaitForFlipPeak.Record(waitForFlip);
+            s_RenderPre3DPeak.Record(renderPre3D);
+            s_Render3DPeak.Record(render3D);
+            s_RenderPost3DPeak.Record(renderPost3D);
+            s_ElapsedPeak.Record(elapsed);
             if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == profilePage) {
                 UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
                 debugOverlay->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
@@ -192,30 +192,30 @@ int Game::UnknownVirtualSlot8() {
                                                   display->frameBufferCount);
                 debugOverlay->UnknownFunction447f40(profilePage, "%s", display->deviceIdentifier.description);
                 debugOverlay->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
-                                                  elapsed, s_ElapsedPeak.UnknownFunction4cb690());
+                                                  elapsed, s_ElapsedPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
                                                   g_UnknownPrepFrameTime,
-                                                  s_PrepFramePeak.UnknownFunction4cb690());
+                                                  s_PrepFramePeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "UpdateScrnTime:% 3d (%d)",
                                                   g_UnknownUpdateScreenTime,
-                                                  s_UpdateScreenPeak.UnknownFunction4cb690());
+                                                  s_UpdateScreenPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "Net            % 3d (%d)",
-                                                  g_UnknownNetTime, s_NetPeak.UnknownFunction4cb690());
+                                                  g_UnknownNetTime, s_NetPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "Tick           % 3d (%d)",
-                                                  g_UnknownTickTime, s_TickPeak.UnknownFunction4cb690());
+                                                  g_UnknownTickTime, s_TickPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "PrepareGeometry% 3d (%d)",
                                                   prepareGeometry,
-                                                  s_PrepareGeometryPeak.UnknownFunction4cb690());
+                                                  s_PrepareGeometryPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "WaitForFlip    % 3d (%d)",
-                                                  waitForFlip, s_WaitForFlipPeak.UnknownFunction4cb690());
+                                                  waitForFlip, s_WaitForFlipPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "RenderPre3D    % 3d (%d)",
-                                                  renderPre3D, s_RenderPre3DPeak.UnknownFunction4cb690());
+                                                  renderPre3D, s_RenderPre3DPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "Render3D       % 3d (%d)",
-                                                  render3D, s_Render3DPeak.UnknownFunction4cb690());
+                                                  render3D, s_Render3DPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "   [this overlay %d]",
                                                   debugOverlay->field_0x36dc);
                 debugOverlay->UnknownFunction447f40(profilePage, "RenderPost3D   % 3d (%d)",
-                                                  renderPost3D, s_RenderPost3DPeak.UnknownFunction4cb690());
+                                                  renderPost3D, s_RenderPost3DPeak.Peak());
                 debugOverlay->UnknownFunction447f40(profilePage, "TotalTransforms% 5d", renderTarget->field_0x38);
                 debugOverlay->UnknownFunction447f40(profilePage, "TotalPoints    % 5d", renderTarget->field_0x3c);
                 debugOverlay->UnknownFunction447f40(profilePage, "TotalLines     % 5d", renderTarget->field_0x40);

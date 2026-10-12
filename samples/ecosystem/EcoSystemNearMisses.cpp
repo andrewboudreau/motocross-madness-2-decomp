@@ -914,8 +914,8 @@ int EcoSystem::UnknownVirtualSlot14() {
     if (overlay) {
         if (g_UnknownGlobal56a128 < 0)
             g_UnknownGlobal56a128 = overlay->field_0x26c0++;
-        g_UnknownGlobal59aef0.UnknownFunction4cb6b0(g_UnknownGlobal59aee8);
-        g_UnknownGlobal59aec8.UnknownFunction4cb6b0(g_UnknownGlobal59aee4);
+        g_UnknownGlobal59aef0.Record(g_UnknownGlobal59aee8);
+        g_UnknownGlobal59aec8.Record(g_UnknownGlobal59aee4);
         g_TrackGame->field_0x38->UnknownFunction447fa0(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
@@ -924,10 +924,10 @@ int EcoSystem::UnknownVirtualSlot14() {
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Memory %d",
                                                        g_MemTagStack->UnknownFunction4a2d20("EcoSystem"));
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
-                                                       g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.UnknownFunction4cb690());
+                                                       g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.Peak());
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
                                                        g_UnknownGlobal59aee4, g_UnknownGlobal59aec0,
-                                                       g_UnknownGlobal59aec8.UnknownFunction4cb690());
+                                                       g_UnknownGlobal59aec8.Peak());
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
         g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Triangles  %d",

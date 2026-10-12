@@ -6,10 +6,10 @@
 class UnknownPeakHold {
 public:
     explicit UnknownPeakHold(unsigned int hold);  // 0x004cb670
-    int UnknownFunction4cb690();                  // 0x004cb690: the peak, 0 once stale
-    void UnknownFunction4cb6b0(int value);        // 0x004cb6b0: raise, or restart when stale
+    int Peak();                                   // 0x004cb690: the peak, 0 once stale
+    void Record(int value);                       // 0x004cb6b0: raise, or restart when stale
 
-    unsigned int field_0x00;                      // time of the peak
-    int field_0x04;                               // peak
-    unsigned int field_0x08;                      // hold time
+    unsigned int peakTime;                        // +0x00: time stamp of the peak
+    int peak;                                     // +0x04: the largest value since peakTime
+    unsigned int holdTime;                        // +0x08: how long the peak is held
 };

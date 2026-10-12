@@ -598,49 +598,49 @@ int Terrain::GameObjectVirtualSlot14()
             int page = g_terrainGame->overlay->pageCount++;
             g_UnknownGlobal574714 = page;
         }
-        g_terrainPeak0.UnknownFunction4cb6b0(g_UnknownGlobal68a308);
-        g_terrainPeak1.UnknownFunction4cb6b0(g_UnknownGlobal68a30c);
-        g_terrainPeak2.UnknownFunction4cb6b0(field_0xc04);
-        g_terrainPeak3.UnknownFunction4cb6b0(field_0xbfc);
-        g_terrainPeak4.UnknownFunction4cb6b0(field_0xc00);
-        g_terrainPeak5.UnknownFunction4cb6b0(g_UnknownGlobal68a310);
-        g_terrainPeak7.UnknownFunction4cb6b0(g_UnknownGlobal68a318);
-        g_terrainPeak8.UnknownFunction4cb6b0(g_UnknownGlobal68a31c);
+        g_terrainPeak0.Record(g_UnknownGlobal68a308);
+        g_terrainPeak1.Record(g_UnknownGlobal68a30c);
+        g_terrainPeak2.Record(field_0xc04);
+        g_terrainPeak3.Record(field_0xbfc);
+        g_terrainPeak4.Record(field_0xc00);
+        g_terrainPeak5.Record(g_UnknownGlobal68a310);
+        g_terrainPeak7.Record(g_UnknownGlobal68a318);
+        g_terrainPeak8.Record(g_UnknownGlobal68a31c);
         g_UnknownGlobal68a320 = g_UnknownGlobal68a318 + g_UnknownGlobal68a31c;
-        g_terrainPeak9.UnknownFunction4cb6b0(g_UnknownGlobal68a320);
+        g_terrainPeak9.Record(g_UnknownGlobal68a320);
         g_terrainGame->overlay->UnknownFunction447fa0(g_UnknownGlobal574714, "Terrain Tolerance:%d",
                                                       drawDistance);
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Memory %d",
                                                       g_MemTagStack->UnknownFunction4a2d20("Terrain"));
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
                                                       g_UnknownGlobal68a308, g_UnknownGlobal68a30c,
-                                                      g_terrainPeak0.UnknownFunction4cb690(),
-                                                      g_terrainPeak1.UnknownFunction4cb690());
+                                                      g_terrainPeak0.Peak(),
+                                                      g_terrainPeak1.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Setup   %d %d",
-                                                      field_0xc04, g_terrainPeak2.UnknownFunction4cb690());
+                                                      field_0xc04, g_terrainPeak2.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Eval    %d[%d] %d",
                                                       field_0xbfc, field_0x90,
-                                                      g_terrainPeak3.UnknownFunction4cb690());
+                                                      g_terrainPeak3.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Mesh    %d[%d] %d",
                                                       field_0xc00, field_0xa4,
-                                                      g_terrainPeak4.UnknownFunction4cb690());
+                                                      g_terrainPeak4.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Cache   %d[%f] %d[%f]",
                                                       g_UnknownGlobal68a310,
                                                       g_UnknownGlobal689ff4 * (1.0f / 1048576.0f),
-                                                      g_terrainPeak5.UnknownFunction4cb690(),
-                                                      g_terrainPeak6.UnknownFunction4cb690() * (1.0f / 1048576.0f));
+                                                      g_terrainPeak5.Peak(),
+                                                      g_terrainPeak6.Peak() * (1.0f / 1048576.0f));
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "  [%f]",
                                                       (ownedObjectArrayCount << 17) * (1.0f / 786432.0f));
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total   %d %d",
-                                                      g_UnknownGlobal68a320, g_terrainPeak9.UnknownFunction4cb690());
+                                                      g_UnknownGlobal68a320, g_terrainPeak9.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Vertex Buffers %d (%d)",
                                                       g_gridDrawMemory, g_gridDrawMemoryPeak);
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "PrepareGeometry% 3d (%d)",
-                                                      g_UnknownGlobal68a318, g_terrainPeak7.UnknownFunction4cb690());
+                                                      g_UnknownGlobal68a318, g_terrainPeak7.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Render3D%        3d (%d)",
-                                                      g_UnknownGlobal68a31c, g_terrainPeak8.UnknownFunction4cb690());
+                                                      g_UnknownGlobal68a31c, g_terrainPeak8.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total%           3d (%d)",
-                                                      g_UnknownGlobal68a320, g_terrainPeak9.UnknownFunction4cb690());
+                                                      g_UnknownGlobal68a320, g_terrainPeak9.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Transforms %d",
                                                       ((TerrainRenderTarget*)field_0x18)->transformCount - transforms);
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Triangles  %d",
