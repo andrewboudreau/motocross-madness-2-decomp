@@ -97,8 +97,8 @@ protected:
     float farPlane;                           // +0x1c0 g_UnknownFloat550f70 (100000.0f); likewise
     int targetWidth;                          // +0x1c4 owner width (0x0042e550)
     int targetHeight;                         // +0x1c8 owner height (0x0042e550)
-    int field_0x1cc;                // enables the slot 13 rectangle
-    int field_0x1d0;                // owner+0x14 plus one (slots 5 and 18)
+    int viewportClearFrames;                  // +0x1cc frames left in which slot 13 clears the viewport (owner slot 12)
+    int projectionChangeFrames;               // +0x1d0 owner buffer count when the view changes, counted down by slot 10
     int fovKeysEnabled;                       // +0x1d4 field-of-view keys 0xc7/0xcf (slot 10)
     int widthKeysEnabled;                     // +0x1d8 viewport width keys 0xd2/0xd3 (slot 10)
     float maxFieldOfView;                     // +0x1dc 109.0f

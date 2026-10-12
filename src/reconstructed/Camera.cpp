@@ -18,8 +18,8 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1ec = 0;
     nearPlane = g_UnknownFloat550f6c;
     farPlane = g_UnknownFloat550f70;
-    field_0x1cc = 0;
-    field_0x1d0 = 0;
+    viewportClearFrames = 0;
+    projectionChangeFrames = 0;
     memset(viewport, 0, sizeof(viewport));
     worldMatrix = IdentityMatrix();
     viewDirection = Vector3(0.0f, 0.0f, 1.0f);
@@ -70,7 +70,7 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
 // If +0x1cc is set, passes the rectangle at +0x1a0 (x, y, width, height) to
 // the owner's slot 12, then calls the non-virtual 0x0042e8e0.
 int Camera::UnknownVirtualSlot13() {
-    if (field_0x1cc) {
+    if (viewportClearFrames) {
         CameraRect rect;
         int x = viewport[0];
         int y = viewport[1];
@@ -109,8 +109,8 @@ int Camera::UpdateViewport() {
     if (!owner->UnknownVirtualSlot14(viewport))
         return 0;
     heightWidthRatio = (float)(unsigned int)viewport[3] / (float)(unsigned int)viewport[2];
-    field_0x1d0 = Owner()->frameModulus + 1;
-    field_0x1cc = Owner()->frameModulus + 1;
+    projectionChangeFrames = Owner()->frameModulus + 1;
+    viewportClearFrames = Owner()->frameModulus + 1;
     return 1;
 }
 
@@ -137,10 +137,10 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
         lastTurnAngle = -lastTurnAngle;
     previousViewDirection = viewDirection;
     if (!isPaused) {
-        if (field_0x1d0)
-            field_0x1d0--;
-        if (field_0x1cc)
-            field_0x1cc--;
+        if (projectionChangeFrames)
+            projectionChangeFrames--;
+        if (viewportClearFrames)
+            viewportClearFrames--;
         if (fovKeysEnabled) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x3f, 0)) {
                 fieldOfView -= 1.0f;
@@ -172,7 +172,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
 void Camera::SetFieldOfView(float value) {
     if (value != 0.0)
         fieldOfView = value;
-    field_0x1d0 = Owner()->frameModulus + 1;
+    projectionChangeFrames = Owner()->frameModulus + 1;
 }
 
 float FastInvSqrt(float value); // 0x00460c00
@@ -286,7 +286,7 @@ int Camera::UnknownVirtualSlot29(Vector3 target) {
     else
         right = Vector3(1.0f, 0.0f, 0.0f);
     upDirection = Cross(viewDirection, right);
-    field_0x1d0 = Owner()->frameModulus + 1;
+    projectionChangeFrames = Owner()->frameModulus + 1;
     return 1;
 }
 
@@ -310,12 +310,12 @@ int Camera::UnknownVirtualSlot32(const Matrix4* value) {
 void Camera::UnknownVirtualSlot5() {
     GameObject::UnknownVirtualSlot5();
     Owner()->SetCamera(this);
-    field_0x1d0 = Owner()->frameModulus + 1;
+    projectionChangeFrames = Owner()->frameModulus + 1;
 }
 
 int Camera::UnknownVirtualSlot18() {
     GameObject::UnknownVirtualSlot18();
-    field_0x1d0 = Owner()->frameModulus + 1;
+    projectionChangeFrames = Owner()->frameModulus + 1;
     return 1;
 }
 
@@ -345,7 +345,7 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
     if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
         viewport[3] = targetHeight;
     viewport[1] = (unsigned int)(targetHeight - viewport[3]) >> 1;
-    field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
+    viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
     return Owner()->UnknownVirtualSlot14(viewport) != 0;
 }
 
@@ -359,7 +359,7 @@ int Camera::SetViewport(int x, int y, int width, int height) {
         viewport[2] = targetWidth;
     if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
         viewport[3] = targetHeight;
-    field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
+    viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
     return Owner()->UnknownVirtualSlot14(viewport) != 0;
 }
 

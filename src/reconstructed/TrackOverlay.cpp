@@ -129,7 +129,7 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
-        if (owner->currentCamera->field_0x1cc) {
+        if (owner->currentCamera->viewportClearFrames) {
             dial.field_0x00 = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
                                            + (unsigned int)owner->currentCamera->viewport[0]);
             dial.field_0x04 = (int)((unsigned int)owner->currentCamera->viewport[3] * screenRect.top / 480.0f
