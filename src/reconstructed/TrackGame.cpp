@@ -319,7 +319,7 @@ int TrackGame::UnknownVirtualSlot4() {
             }
             networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
             if (networkGameObject)
-                networkGameObject->UnknownFunction4aa350(network->directPlay, network->lobby);
+                networkGameObject->SetDirectPlay(network->directPlay, network->lobby);
             ui->OpenMenu(0x866);
         }
     }

@@ -543,9 +543,9 @@ public:
 
 // One player reported by 0x004aa670 (0x48 bytes).
 struct UnknownZonePlayerRecord {
-    char field_0x00[0x40];                    // name
-    unsigned char field_0x40;                 // 1, other nonzero or zero: flags 2, 4 or 16
-    int field_0x44;                           // score
+    char name[0x40];                          // +0x00
+    unsigned char position;                   // +0x40: 1, other nonzero or zero: flags 2, 4 or 16
+    int score;                                // +0x44
 };
 
 // One racer's line of the race status (0x10 bytes). The names are the
@@ -563,7 +563,7 @@ struct UnknownZoneRaceRecord {
 // The race status 0x0049c770 passes to 0x004aa670 with its size (0x88).
 struct UnknownZoneRaceStatus {
     unsigned char eventType;                  // +0x00: event type index plus one
-    unsigned char field_0x01;
+    unsigned char trackEntry;                 // +0x01: 0x0049ca60(2): the track's 1-based entry, 0 when not found
     unsigned char laps;                       // +0x02: laps
     unsigned char field_0x03;
     int longestRunningTime;                   // +0x04: the longest total running time
@@ -578,19 +578,19 @@ public:
 
     // The constructor clears +0 and +4; 0x004aa350 sets them
     // (MSZoneInterface.cpp).
-    UnknownDirectPlay4A* field_0x00;
-    UnknownDirectPlayLobby3A* field_0x04;
-    UnknownZonePlayerRecord field_0x08[8];    // reported by 0x004aa670
+    UnknownDirectPlay4A* directPlay;          // +0x00
+    UnknownDirectPlayLobby3A* lobby;          // +0x04
+    UnknownZonePlayerRecord players[8];       // +0x08: reported by 0x004aa670
     unsigned char field_0x248[0x24c - 0x248];
     // 0x0049c2f0 fills these from the lobby preset: a tag's value minus
     // one, or -1 when the tag is missing.
     int eventTypeIndex;                       // +0x24c: "EventTypeIndex"
     int eventTypeLocation;                    // +0x250: "EventTypeLocation"
-    int field_0x254;                          // the race settings' +0x34 (a byte there)
+    int trackVariant;                         // +0x254: the race settings' +0x34 (a byte there)
     char trackName[0x40];                     // +0x258: track name copied when +0x250 is set
     int bikeManufacturer;                     // +0x298: the lobby's bike model (SelectGamePicProcs.cpp); "BikeManufacturer"
     int bikeType;                             // +0x29c: "BikeType"
-    int field_0x2a0;                          // tested after 0x0049ca60(1)
+    int bikeIndex;                            // +0x2a0: tested after 0x0049ca60(1)
     UnknownZoneRaceStatus raceStatus;         // +0x2a4: sent through 0x004aa670 by 0x0049c770
 };
 
@@ -600,16 +600,16 @@ public:
 // MSZoneInterface.cpp's literals.
 class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
 public:
-    void UnknownFunction4aa350(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
+    void SetDirectPlay(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
     // MSZoneInterface.cpp: 0x004aa360 / 0x004aa4e0 ask the lobby for the
     // preset / rank property and copy it into `buffer` (at most `size`
     // bytes); 0x004aa670 reports `count` players through a COM object.
     int GetLobbyPreset(char* buffer, unsigned int size);
     int GetLobbyRank(char* buffer, unsigned int size);
-    int UnknownFunction4aa670(unsigned int count, void* a, void* b);
+    int SubmitScores(unsigned int count, void* a, void* b);
     int ReportRaceToZone();                   // 0x0049c770 (EventManager 0x0045e550): reports the race to the Zone
     int ReadLobbyPreset(int* flags);          // 0x0049c2f0 (SelectGamePicProcs.cpp: TrackGameMode+0x1bd4)
-    void UnknownFunction49ca60(int kind);     // 0x0049ca60
+    void ConvertLobbyNumbering(int kind);     // 0x0049ca60
     int WaitForLobbyRank();                   // 0x0049c600 (SelectGamePicProcs.cpp): waits up to 20 s for the lobby rank
 };
 
