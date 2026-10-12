@@ -13,6 +13,9 @@ extern "C" char* _strupr(char*);   // 0x00535d3d
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, lines 0x1c9, 0x1ec, 0x1f9, 0x22a)
 // 0x004a5e40: text .VUE file.  A first pass counts the TRANSFORM lines of the first frame (and those
 // naming a node of this character); the second pass reads one frame per line group, swapping y and z.
+// Near miss (505/1090): retail keeps the file in ebx and poses (sharing the zero constant) in ebp, the
+// candidate swaps ebx/ebp and esi/edi.  poses initialised first and the frame index stored before the
+// count move it from 498; declaration/assignment orders do not change the permutation (targets.json).
 int MotionManager::LoadVue(Character* character, const char* path, Motion* motion)
 {
     char line[0x100];
@@ -22,9 +25,9 @@ int MotionManager::LoadVue(Character* character, const char* path, Motion* motio
         sprintf(message, "Unable to open %s\n", path);
         return 0;
     }
+    int poses = 0;
     int transforms = 0;
     int frame = 0;
-    int poses = 0;
     while (file->ReadLine(line, 0xff)) {
         if (frame > 1)
             break;
@@ -49,8 +52,8 @@ int MotionManager::LoadVue(Character* character, const char* path, Motion* motio
         strtok(line, " ");
         MotionPoseList* list = &motion->frames[frame];
         list->poses = (CharacterPose*)DebugMalloc(poses * sizeof(CharacterPose), __FILE__, 0x1f9);
-        list->count = poses;
         list->field_0x00 = frame;
+        list->count = poses;
         int k = 0;
         for (int t = 0; t < transforms; t++) {
             file->ReadLine(line, 0xff);
