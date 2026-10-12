@@ -94,9 +94,9 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/collision/CollisionObject | `0x00434eb0` | 254/1885 | b | UpdateModelBounds: the Min argument now uses the out-of-line Vec3 ctor 0x404e60 as retail; 445/479 normalised insns align (was 438), 1902 vs 1885 bytes; byte score fell because stack slots shifted |
 | krusty2/collision/CollisionObject | `0x00435830` | 157/1776 | b | SetTransform: the hull case's inline 4x4 product emits its terms as 1,3,2,4 (retail 3,2,1,4 with the local matrix loaded first); frame 0x30 both |
 | krusty2/collision/CollisionObject | `0x00439820` | 149/1476 | b | SegmentTouchesObject: pre-test calls match; retail gives each operator result its own slot (frame 0xa8 vs 0x9c), segment pointer in ebx |
-| krusty2/soultree/SoulTreePhysics | `0x00500220` | 270/619 (masked) | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
+| krusty2/soultree/SoulTreePhysics | `0x00500220` | 286/639 | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
-| krusty2/soultree/SoulTreePhysics | `0x00501e90` | 160/471 (masked) | b | 20 code diffs: `jne @56` vs `jne @55 ; mov [esp + N], 0 ; mov edx, [~`; slots differ |
+| krusty2/soultree/SoulTreePhysics | `0x00501e90` | 164/483 | b | 20 code diffs: `jne @56` vs `jne @55 ; mov [esp + N], 0 ; mov edx, [~`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00502f60` | 1804/1930 | c | 0 code diffs: stack-slot packing of the integration temporary and merge outputs; 9 bytes longer |
 | krusty2/vehicle/Bike | `0x00405190` | 139/2381 (masked) | b | 99 code diffs: retail adds `mov edx, [esp + N]`; retail adds `push edi ; xor ebx, ebx ; xor edi, edi`; frame 0x94 vs 0xac, slot order differs |
 | krusty2/vehicle/Bike | `0x004060c0` | 121/1436 (masked) | b | 63 code diffs: `mov edx, [esi + 0x4a8] ; mov eax, [esi ~` vs `mov eax, [esi + 0x4a8] ; mov ecx, [esi ~`; retail lacks `xor ecx, ecx`; frame 0x204 vs 0x214 |
@@ -105,7 +105,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Bike | `0x00407440` | 188/485 | c | clamps are BikeMin(BikeMaxF(t,.25),.75) and BikeMaxF(BikeMin(a,32.2),-32.2), constants bound; left: retail's dead `cnt+=2` store, idx/next/step/cnt register roles swapped, 0.0310559 read from the 0x550790 copy (binding gives 0x550ad0) |
 | krusty2/vehicle/Bike | `0x00409b30` | 898/1374 | c | 18 code diffs: `jmp @217` vs `jmp @222 ; mov ecx, [esp + N]`; `mov edx, [esi]` vs `mov [esp + N], ecx ; jmp @222 ; mov edx~` |
 | krusty2/vehicle/Bike | `0x0040a520` | 439/2272 | b | 96 code diffs: retail lacks `test al, al`; retail adds `test al, al`; slots differ |
-| krusty2/vehicle/Bike | `0x0040aec0` | 527/1186 (masked) | b | 35 code diffs; slots differ |
+| krusty2/vehicle/Bike | `0x0040aec0` | 671/1353 | b | 35 code diffs; slots differ |
 | krusty2/vehicle/Bike | `0x0040ba30` | 58/1157 | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 585/637 (masked) | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
@@ -171,10 +171,10 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/shadow/ProjectedShadow | `0x004db8c0` | 19/840 (masked) | b | 51 code diffs: retail adds `push ebp ; mov ebp, esp`; `mov [esp + N], ebx` vs `mov [ebp - N], ebx`; slot order differs; inline-asm `fistp` exclusion |
 | physics/shadow/ProjectedShadow | `0x004dbd30` | 156/1244 (masked) | b | per-format row loops and the three Duff's-device fills as retail; register assignment of the clip fields and the format-9 constants (retail uses byte ops on field_0x94's low byte) |
 | physics/shadow/ProjectedShadow | `0x004dc2b0` | 29/324 (masked) | b | 29 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x24 vs 0x34, slot order differs; inline-asm `fistp` exclusion |
-| physics/shadow/TerrainShadow | `0x005097d0` | 112/437 (masked) | b | 6 code diffs: retail copies extent onto its own slot through edx on the `extentX <= extentZ` path (`mov edx, [esp + 0xc] ; mov [esp + 0xc], edx`) and reloads `shadow->texture` in eax/edx where the candidate keeps edx; frame and both matrix branches match |
+| physics/shadow/TerrainShadow | `0x005097d0` | 121/486 | b | 6 code diffs: retail copies extent onto its own slot through edx on the `extentX <= extentZ` path (`mov edx, [esp + 0xc] ; mov [esp + 0xc], edx`) and reloads `shadow->texture` in eax/edx where the candidate keeps edx; frame and both matrix branches match |
 | physics/shadow/TerrainShadow | `0x00508bc0` | 353/3031 | b | slot 27 footprint: frame 0xdc vs 0xd0, slot order, the cross product's operand order and the corner loops' form; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |
-| physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 275/404 (masked) | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
+| physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 287/432 | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts give no gain |
 | physics/tire/Tire | `0x005135f0` | 1555/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; slip-vector scale `fld st(0); fmul mem` vs `fld mem; fmul st(1)`; two struct-copy store pairs; one dot-term operand order |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |

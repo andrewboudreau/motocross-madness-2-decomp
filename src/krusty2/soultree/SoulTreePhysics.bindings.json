@@ -123,5 +123,7 @@
   "?g_00572b44@@3HA": "0x00572b44",
   "_strncpy": "0x00534b10",
   "_strrchr": "0x00534a60",
-  "?ContactSolveImpulse@@YAXMPBUVec3@@MPAVSoultreeObject@@000PAU1@2M100022PAM@Z": "0x005004a0"
+  "?ContactSolveImpulse@@YAXMPBUVec3@@MPAVSoultreeObject@@000PAU1@2M100022PAM@Z": "0x005004a0",
+  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0",
+  "__real@8@00000000000000000000": "0x005507e8"
 }

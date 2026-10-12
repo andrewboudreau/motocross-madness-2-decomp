@@ -1559,7 +1559,8 @@ void Bike::UnknownVirtualSlot91()
             // steer the velocity toward the lean plane
             scratchVector2 = Vec3(scratchVector.z, 0.0f, -heading->x);
             float s = (poseParam < 0.5f) ? 1.0f : -1.0f;
-            float k = s * ((1.0f - d) * 3.41296911f * linearSpeed * 0.075f) * stepTime;
+            float a = (1.0f - d) * 3.41296911f;
+            float k = s * (a * linearSpeed * 0.075f) * stepTime;
             velocity += scratchVector2 * k;
             velocity *= linearSpeed / (k + linearSpeed);
             float lenSq = BikeDot(&velocity, &velocity);

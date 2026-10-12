@@ -38,9 +38,12 @@
   "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70",
   "?MarkUsed@TerrainOwned@@QAEXPAX@Z": "0x00401250",
   "?Set@ClipRectangle@@QAEXMMMM@Z": "0x00431350",
+  "?SetLookAt@ShadowCameraProxy@@QAEXPBUShadowVec3@@HHHPAM@Z": "0x0042e9b0",
   "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",
   "?ShadowTransformPointsOrtho@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1b00",
   "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1a50",
+  "?TerrainMatrixIdentityInto@@YAPAUShadowMatrix@@PAU1@@Z": "0x004a1410",
+  "?TerrainMatrixMultiplyInto@@YAPAUShadowMatrix@@PAU1@U1@1@Z": "0x004a1860",
   "?TerrainShadowAddCall@@YAPAUTerrainShadowVec@@PAU1@PBU1@1@Z": "0x00421cb0",
   "?TerrainShadowSubtractCall@@YAPAUTerrainShadowVec@@PAU1@PBU1@1@Z": "0x00421d00",
   "?UnknownFunction506e90@TerrainShadowCaster@@QAEHPBUTerrainShadowVec@@0PAU2@PAPAUTerrainCell@@HH@Z": "0x00506e90",
@@ -56,5 +59,7 @@
   "__real@4@4000c000000000000000": "0x00550774",
   "__real@4@4001a000000000000000": "0x00550794",
   "__real@4@4002a000000000000000": "0x00550780",
-  "__real@4@400c9c40000000000000": "0x00550b44"
+  "__real@4@4005e52ee10000000000": "0x00557634",
+  "__real@4@400c9c40000000000000": "0x00550b44",
+  "__real@8@3ffe8000000000000000": "0x00550d18"
 }
