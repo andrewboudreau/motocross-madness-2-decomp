@@ -378,7 +378,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                 timer->elapsedTime = 0;
                 UIControl* control;
                 if ((control = timer->targetControl) != 0) {
-                    control->UnknownVirtualSlot60((int)timer);
+                    control->HandleTimer((int)timer);
                 } else {
                     UnknownDialogEvent event;
                     event.code = timer->timerId;

@@ -2135,7 +2135,7 @@ void MPOptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ChkRecordRace", event->controlName))
-            event->control->UnknownVirtualSlot59(1);
+            event->control->SyncBoundValue(1);
         break;
     case kDialogInit: {
         FindControl("FastFinishesCheckBox", 0)->BindValue(&g_TrackGame->mode.field_0x27f8.field_0x18);

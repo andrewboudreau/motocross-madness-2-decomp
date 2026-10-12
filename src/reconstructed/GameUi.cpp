@@ -406,7 +406,7 @@ TextureMap* UIStatic::GetStateTexture(int state) {
 }
 
 // 0x00478fe0
-int UIStatic::UnknownVirtualSlot30() {
+int UIStatic::IsInteractive() {
     return 0;
 }
 
@@ -502,7 +502,7 @@ void UIControl::UnknownVirtualSlot57(int a, int* position) {
 
 // 0x004725b0
 int UIControl::EnterHover() {
-    if (UnknownVirtualSlot30() && ownerDialog->guiUser->field_0x1d8 != (UnknownGuiControl*)this) {
+    if (IsInteractive() && ownerDialog->guiUser->field_0x1d8 != (UnknownGuiControl*)this) {
         SetState(1);
         if (stateImages[currentState])
             stateImages[currentState]->Rewind();
@@ -656,7 +656,7 @@ UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a,
 // 0x00473770
 UIEditBox::~UIEditBox() {
     if (boundValue)
-        UnknownVirtualSlot59(1);
+        SyncBoundValue(1);
     if (controlText) {
         DebugFree(controlText, __FILE__, 0x15d2);
         controlText = 0;
@@ -674,7 +674,7 @@ void UIEditBox::BindTextBuffer(char* buffer, int size) {
 }
 
 // 0x00473840
-void UIEditBox::UnknownVirtualSlot59(int value) {
+void UIEditBox::SyncBoundValue(int value) {
     if (boundValue && boundBufferSize) {
         if (value) {
             strncpy((char*)boundValue, controlText, boundBufferSize);
@@ -716,7 +716,7 @@ void UIEditBox::SetBackgroundColor(unsigned long color) {
 }
 
 // 0x004740b0
-void UIEditBox::UnknownVirtualSlot33(int value) {
+void UIEditBox::KillFocus(int value) {
     UnknownDialogEvent event;
     event.handled = 0;
     event.kind = kDialogEditDone;
@@ -727,7 +727,7 @@ void UIEditBox::UnknownVirtualSlot33(int value) {
     event.control = this;
     ownerDialog->UnknownVirtualSlot29(&event);
     RequestRedraw();
-    UIControl::UnknownVirtualSlot33(value);
+    UIControl::KillFocus(value);
 }
 
 // 0x00474120
@@ -807,7 +807,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
 // 0x004749f0: the scroll timer (0x101 starts the repeat timer 0x102, which
 // scrolls the list boxes by one row). Each case has its own copy of the event
 // tail; VC6 cross-jumps case 9's copy into case 10's.
-void UIScrollCtl::UnknownVirtualSlot60(int value) {
+void UIScrollCtl::HandleTimer(int value) {
     UITimer* timer = (UITimer*)value;
     UnknownDialogEvent event;
     event.handled = 0;
@@ -897,11 +897,11 @@ UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner)
 // 0x00474c50
 UIScrollBar::~UIScrollBar() {
     if (boundValue)
-        UnknownVirtualSlot59(1);
+        SyncBoundValue(1);
 }
 
 // 0x00474cb0
-void UIScrollBar::UnknownVirtualSlot59(int value) {
+void UIScrollBar::SyncBoundValue(int value) {
     if (value)
         *boundValue = UnknownFunction475500();
     else
@@ -961,7 +961,7 @@ void UIListBox::AdvanceImages() {
 }
 
 // 0x00475fe0
-void UIListBox::UnknownVirtualSlot59(int value) {
+void UIListBox::SyncBoundValue(int value) {
     if (value) {
         *boundValue = GetSelectedRow();
     } else {
@@ -1091,7 +1091,7 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
 // 0x00475e20
 UIListBox::~UIListBox() {
     if (boundValue)
-        UnknownVirtualSlot59(1);
+        SyncBoundValue(1);
     if (itemBrush)
         DeleteObject((HGDIOBJ)itemBrush);
     if (selectBrush)
@@ -1121,7 +1121,7 @@ int UIListBox::ScrollToRow(int row, int a) {
         last = row;
     firstVisibleRow = last < 0 ? 0 : last;
     if (visibleRowCount == 1)
-        UnknownVirtualSlot65(firstVisibleRow);
+        SetSelectedRow(firstVisibleRow);
     RequestRedraw();
     if (a)
         UpdateScrollBars();
@@ -1371,7 +1371,7 @@ void UIMultiState::SetState(int state) {
 }
 
 // 0x00478540
-void UIMultiState::UnknownVirtualSlot59(int value) {
+void UIMultiState::SyncBoundValue(int value) {
     if (value)
         *boundValue = UnknownFunction4755c0();
     else
@@ -1489,7 +1489,7 @@ UIRadioButton::~UIRadioButton() {
 }
 
 // 0x004792e0
-void UIRadioButton::UnknownVirtualSlot59(int value) {
+void UIRadioButton::SyncBoundValue(int value) {
     if (value)
         *boundValue = GetGroupSelection();
     else
@@ -1513,8 +1513,8 @@ UIDDLScrollBar::UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* own
 }
 
 // 0x004796e0
-void UIDDLScrollBar::UnknownVirtualSlot33(int value) {
-    UIControl::UnknownVirtualSlot33(value);
+void UIDDLScrollBar::KillFocus(int value) {
+    UIControl::KillFocus(value);
     if (!ownerList->IsPart((UIControl*)value))
         ownerList->SetOpen(0);
 }
@@ -1526,8 +1526,8 @@ UIDDLStatic::UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 }
 
 // 0x00479bc0
-void UIDDLStatic::UnknownVirtualSlot33(int value) {
-    UIControl::UnknownVirtualSlot33(value);
+void UIDDLStatic::KillFocus(int value) {
+    UIControl::KillFocus(value);
     if (!ownerList->IsPart((UIControl*)value))
         ownerList->SetOpen(0);
 }
@@ -1547,8 +1547,8 @@ int UIDDLButton::UnknownVirtualSlot55(int a, int b) {
 }
 
 // 0x00479ce0
-void UIDDLButton::UnknownVirtualSlot33(int value) {
-    UIControl::UnknownVirtualSlot33(value);
+void UIDDLButton::KillFocus(int value) {
+    UIControl::KillFocus(value);
     if (!ownerList->IsPart((UIControl*)value))
         ownerList->SetOpen(0);
 }
@@ -1562,16 +1562,16 @@ UIDDLListBox::UIDDLListBox(int id, int rows, CameraRect* area, UIDialog* owner,
 }
 
 // 0x00479db0
-int UIDDLListBox::UnknownVirtualSlot65(int row) {
-    int result = UIListBox::UnknownVirtualSlot65(row);
+int UIDDLListBox::SetSelectedRow(int row) {
+    int result = UIListBox::SetSelectedRow(row);
     if (result)
         ownerList->SetText(GetRowText(row));
     return result;
 }
 
 // 0x00479e70
-void UIDDLListBox::UnknownVirtualSlot33(int value) {
-    UIControl::UnknownVirtualSlot33(value);
+void UIDDLListBox::KillFocus(int value) {
+    UIControl::KillFocus(value);
     if (!ownerList->IsPart((UIControl*)value))
         ownerList->SetOpen(0);
 }
@@ -1620,7 +1620,7 @@ UIDropDownList::UIDropDownList(int id, CameraRect* area, UIDialog* owner, const 
 // 0x0047a1f0
 UIDropDownList::~UIDropDownList() {
     if (boundValue)
-        UnknownVirtualSlot59(1);
+        SyncBoundValue(1);
     if (!isOpen) {
         staticPart0->Release();
         staticPart1->Release();
@@ -1639,8 +1639,8 @@ void UIDropDownList::SetAttachId(int id) {
 }
 
 // 0x0047a7d0
-void UIDropDownList::UnknownVirtualSlot33(int value) {
-    UIControl::UnknownVirtualSlot33(value);
+void UIDropDownList::KillFocus(int value) {
+    UIControl::KillFocus(value);
     if (!IsPart((UIControl*)value))
         SetOpen(0);
 }
@@ -1667,7 +1667,7 @@ int UIDropDownList::GetHeight() {
 }
 
 // 0x0047ad80
-void UIDropDownList::UnknownVirtualSlot59(int value) {
+void UIDropDownList::SyncBoundValue(int value) {
     if (value) {
         *boundValue = listPart->GetSelectedRow();
     } else {
@@ -1996,7 +1996,7 @@ void UIDialog::UpdateBoundValues(int value) {
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->boundValue)
-            control->UnknownVirtualSlot59(value);
+            control->SyncBoundValue(value);
     }
     UnknownVirtualSlot31(value);
 }
@@ -2579,7 +2579,7 @@ int UIControl::UnknownFunction472480(int* position) {
         if (result)
             return result;
     }
-    if (UnknownVirtualSlot51(*(POINT*)position) && UnknownVirtualSlot30()) {
+    if (UnknownVirtualSlot51(*(POINT*)position) && IsInteractive()) {
         UIControl* last = FindLastAnchor(0);
         if (enabled && shown && (!last || (last->shown && !last->transitionState))) {
             GUIUser* user = ownerDialog->guiUser;
@@ -2635,7 +2635,7 @@ UIControl* UIControl::NextFocusableControl() {
 // UIListBox: rows
 
 // 0x004769e0
-int UIListBox::UnknownVirtualSlot65(int row) {
+int UIListBox::SetSelectedRow(int row) {
     if ((rowCount && row < rowCount && row >= 0) || (!rowCount && !row)) {
         selectedRow = row;
         if (row >= firstVisibleRow) {
@@ -2655,13 +2655,13 @@ int UIListBox::UnknownVirtualSlot65(int row) {
 
 // 0x00476a60
 int UIListBox::SelectRow(int row) {
-    int result = UnknownVirtualSlot65(row);
+    int result = SetSelectedRow(row);
     UpdateScrollBars();
     if (ownerDialog) {
         GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
         UIListBox* control;
         while ((control = static_cast<UIListBox*>(NextAttachedControlOfType(iterator))) != 0)
-            control->UnknownVirtualSlot65(row);
+            control->SetSelectedRow(row);
         DeleteControlIterator(iterator);
     }
     return result;
@@ -3038,7 +3038,7 @@ int UIListBox::RemoveRow(int row) {
         int count = rowCount - 1;
         rowCount = count <= 0 ? 0 : count;
         if (selectedRow == row && selectedRow == rowCount) {
-            UnknownVirtualSlot65(selectedRow - 1 <= 0 ? 0 : selectedRow - 1);
+            SetSelectedRow(selectedRow - 1 <= 0 ? 0 : selectedRow - 1);
         }
         UpdateScrollBars();
         return 1;
@@ -5067,7 +5067,7 @@ void UIListBox::ScrollBy(int delta) {
         firstVisibleRow = UnknownMaxInt(first, 0);
     }
     if (visibleRowCount == 1) {
-        UnknownVirtualSlot65(firstVisibleRow);
+        SetSelectedRow(firstVisibleRow);
         ReportClick(&handled);
         if (handled)
             return;
