@@ -63,11 +63,11 @@ Wrecker::~Wrecker() {
 
 Wrecker* Wrecker::SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name) {
     GameObject::UnknownVirtualSlot8(owner);
-    UnknownFunction5301c0(rider, name);
+    CreateBodies(rider, name);
     return this;
 }
 
-void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name) {
+void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     character = rider;
     rider->skeleton->TranslateIn(0, Vector3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
@@ -99,7 +99,7 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     rigidBody->initialVelocity = Vector3(0.0f, 0.0f, 0.0f);
     character->skeleton->subtreeDirty = 1;
     character->SetMotionByName("Fall02");
-    UnknownFunction532150();
+    UpdateInertia();
     rigidBody->UnknownVirtualSlot34(&Vector3(0.0f, 0.0f, 0.0f));
     rigidBody->UnknownVirtualSlot33(&Vector3(0.0f, 0.0f, 0.0f));
     rigidBody->UnknownVirtualSlot44();
@@ -269,9 +269,9 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         if (field_0x52c)
             field_0x52c = 0;
         else
-            UnknownFunction532020(frameTime);
+            EmitProbeEffects(frameTime);
         anyProbeHit = 0;
-        UnknownFunction5329e0(frameTime);
+        PushProbesOutOfBox(frameTime);
         hitCenter = kVec3Zero;
         float touching = 0.0f;
         for (int i = 0; i < collisionModel->probeCount; i++) {
@@ -317,10 +317,10 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             if (field_0x52c)
                 field_0x52c = 0;
             else
-                UnknownFunction532020(frameTime);
+                EmitProbeEffects(frameTime);
             for (int i = 0; i < collisionModel->probeCount; i++)
                 probeHits[i] = collisionModel->probes[i].hit;
-            UnknownFunction5329e0(step);
+            PushProbesOutOfBox(step);
             if (wreckState != 1) {
                 Vector3 position;
                 rigidBody->node->GetPositionIn(0, &position);
@@ -342,7 +342,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             if (wreckState == 1) {
                 UnknownWreckerRaceState* state = character->field_0x18;
                 if ((float)(state->field_0xa8 - *character->field_0x1c) / state->field_0xb4 < 0.5f) {
-                    UnknownFunction532490();
+                    ContinueAsTumble();
                     RebuildPoseSteps();
                     linearStep = linearStep * (1.0f / frameTime);
                     angularStep = angularStep * (1.0f / frameTime);
@@ -386,7 +386,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         character->skeleton->SetPositionIn(0, &delta);
         field_0xb4 = 0;
     }
-    UnknownFunction532150();
+    UpdateInertia();
     return 1;
 }
 
@@ -438,7 +438,7 @@ void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
     }
 }
 
-void Wrecker::UnknownFunction532020(float frameTime) {
+void Wrecker::EmitProbeEffects(float frameTime) {
     for (int i = 0; i < collisionModel->probeCount; i++) {
         if (collisionModel->probes[i].hit) {
             Vector3 point = collisionModel->probes[i].node->LocalToWorldPoint(collisionModel->probes[i].localPoint);
@@ -448,7 +448,7 @@ void Wrecker::UnknownFunction532020(float frameTime) {
     }
 }
 
-void Wrecker::UnknownFunction532150() {
+void Wrecker::UpdateInertia() {
     Vector3 size;
     character->skeleton->GetSubtreeBounds(&rigidBody->centerOfMass, &size);
     rigidBody->inertia(0, 0) = (size.y * size.y + size.z * size.z) * inertiaFactor;
@@ -459,7 +459,7 @@ void Wrecker::UnknownFunction532150() {
     rigidBody->invInertia(2, 2) = 1.0f / rigidBody->inertia(2, 2);
 }
 
-void Wrecker::UnknownFunction532220(int index) {
+void Wrecker::StartAnimatedWreck(int index) {
     collisionModel->shapeCollisionEnabled = 1;
     collisionModel->UnknownFunction435fe0();
     collisionModel->UnknownVirtualSlot5();
@@ -475,7 +475,7 @@ void Wrecker::UnknownFunction532220(int index) {
     hadContact = 0;
 }
 
-void Wrecker::UnknownFunction532310() {
+void Wrecker::StartTumble() {
     collisionModel->shapeCollisionEnabled = 1;
     collisionModel->UnknownFunction435fe0();
     collisionModel->UnknownVirtualSlot5();
@@ -497,7 +497,7 @@ void Wrecker::UnknownFunction532310() {
     field_0x538 = 1;
 }
 
-void Wrecker::UnknownFunction532490() {
+void Wrecker::ContinueAsTumble() {
     wreckState = 2;
     pendingAnimation = randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)];
     if (!character->field_0x34) {
@@ -560,7 +560,7 @@ void Wrecker::RebuildPoseSteps() {
     angularStep = Vec3ScaleCall(angularStep, 1.0f);
 }
 
-void Wrecker::UnknownFunction5327c0() {
+void Wrecker::EndWreck() {
     if (wreckState) {
         for (int i = 0; i < ignoreObjectCount; i++) {
             collisionModel->AddIgnoredOwner(ignoreObjects[i]);
@@ -578,7 +578,7 @@ void Wrecker::UnknownFunction5327c0() {
         field_0x52c = 1;
         character->skeleton->ResetMatrices();
         character->UnknownFunction4a8ac0(&character->field_0x190, 0);
-        UnknownFunction532150();
+        UpdateInertia();
     }
 }
 
@@ -590,13 +590,13 @@ int Wrecker::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry*
     return GameObject::UnknownVirtualSlot23(event, entry);
 }
 
-void Wrecker::UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents) {
+void Wrecker::SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents) {
     boxCenter = center;
     boxHalfExtents = halfExtents;
     boxFrame = frame;
 }
 
-void Wrecker::UnknownFunction532900(Vector3 offset, int bone) {
+void Wrecker::AddProbe(Vector3 offset, int bone) {
     collisionModel->AddProbePoint(offset, bone);
     probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
     probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);

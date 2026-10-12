@@ -327,22 +327,22 @@ public:
 
     // 0x00530190: slot 8 on the owner, then 0x005301c0; returns this.
     Wrecker* SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name);
-    void UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name);
+    void CreateBodies(UnknownWreckerCharacter* rider, const char* name); // 0x005301c0: gravity, rigid body, collision
     void AddContactAnimation(int value);             // appends to contactAnimations
     void AddRandomAnimation(int value);             // appends to randomAnimations
     int AddIndexedAnimation(int value);              // appends to indexedAnimations, returns its index
     void AddIgnoredObject(UnknownWreckerCollisionObject* object); // appends to ignoreObjects
-    void UnknownFunction5327c0();
-    void UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents);
-    void UnknownFunction5329e0(float frameTime);
-    void UnknownFunction532900(Vector3 offset, int bone);
+    void EndWreck();                  // 0x005327c0: back to state 0, the pose reset
+    void SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents); // 0x005328b0: boxFrame/boxCenter/boxHalfExtents
+    void PushProbesOutOfBox(float frameTime); // 0x005329e0: pushImpulse (samples/race/WreckerNearMisses.cpp)
+    void AddProbe(Vector3 offset, int bone); // 0x00532900: a probe point and its position/hit slots
     void SprayContactParticles(Vector3 a, Vector3 b, Vector3 normal, float frameTime);
     void EmitProbeTrail(Vector3 a, Vector3 b, float frameTime);
-    void UnknownFunction532020(float frameTime);
-    void UnknownFunction532150();
-    void UnknownFunction532220(int index);
-    void UnknownFunction532310();
-    void UnknownFunction532490();
+    void EmitProbeEffects(float frameTime); // 0x00532020: trail and spray for each probe that hit
+    void UpdateInertia();             // 0x00532150: box inertia from the skeleton's bounds
+    void StartAnimatedWreck(int index); // 0x00532220: state 1, indexed animation, body disabled
+    void StartTumble();               // 0x00532310: state 2, random animation, body moving with the pose steps
+    void ContinueAsTumble();          // 0x00532490: state 1 -> 2 halfway through the animation (slot 10)
     void RebuildPoseSteps();
 
     UnknownWreckerCharacter* character; // +0x34
