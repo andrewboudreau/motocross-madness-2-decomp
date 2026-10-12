@@ -13,7 +13,13 @@
 // reloads 11025 * bytesPerSample as retail does. Unchanged or worse: a `rest`
 // local in (2) (before or after the first copy), the destination's
 // association (sampleBuffer + avail + 11025 * bytesPerSample, a parenthesised
-// offset, `+ half`), and block-scoped `avail`/`rest` in (1).
+// offset, `+ half`), and block-scoped `avail`/`rest` in (1). Also 806 or
+// worse: in (1) `half - avail` for the second copy and/or the final store
+// (799 each; both, or `rest` computed after the switch, give 1231 bytes
+// only because the frame shrinks to 0x1c: 42 instructions differ against
+// 37); in (2) `rest` set before the first copy with `half - avail` in the
+// copy or the store (806), `+ 11025 * bytesPerSample` for the first
+// copy's destination (806), and `+ half + avail` for the second (779).
 
 #include "../../src/reconstructed/RaceSound.cpp"
 

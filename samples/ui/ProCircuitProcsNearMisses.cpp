@@ -15,7 +15,10 @@
 //   for +0x04, +0x08, +0x0c or +0x14 alone, or for every field of
 //   UnknownProCircuitStats (ProCircuit.h), all give 427. Retail keeps stunt
 //   (ecx) and repairs (edx) and reloads medical for the +0x24 update; VC6
-//   here keeps medical and repairs and reloads stunt.
+//   here keeps medical and repairs and reloads stunt. A `const int&` alias
+//   of medical, repairs, stunt or winnings used in the money expression,
+//   in its +0x18 accumulation or both, and a stats reference for the money
+//   expression, give the same or more instruction diffs (12-25).
 // PCBailoutDlg::HandleEvent (0x004d8fc0, 882 bytes, 836 match) and
 // PCBunnyDlg::HandleEvent (0x004d9860, 1122 bytes, 1068 match): the
 //   init case reads the fee and the cash into locals and stores the fee
