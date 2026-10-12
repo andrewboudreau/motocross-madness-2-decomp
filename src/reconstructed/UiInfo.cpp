@@ -213,10 +213,10 @@ void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options
 }
 
 // 0x00522800
-void TrackGameMode::UnknownFunction522800(UnknownTrackGameModeOptionsA68* options) {
+void TrackGameMode::ResetControlOptions(UnknownTrackGameModeOptionsA68* options) {
     options->field_0x00[0] = 50;
     options->field_0x1c = 50;
-    options->field_0x20 = 1;
+    options->joystickOn = 1;
     options->field_0x00[1] = 50;
     options->field_0x00[2] = 50;
     options->field_0x00[3] = 50;
@@ -274,7 +274,7 @@ void TrackGameMode::CopyGarageTables(UnknownTrackGameModeOptionsFd8* options) {
 }
 
 // 0x00522c70
-void TrackGameMode::UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::ResetSuspension(UnknownTrackGameModeOptionsFd8* options) {
     options->suspension[0] = 0.5f;
     options->suspension[1] = 0.5f;
     options->suspension[2] = 0.5f;
@@ -284,20 +284,20 @@ void TrackGameMode::UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* option
 }
 
 // 0x00522c90
-void TrackGameMode::UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::ResetEngineOptions(UnknownTrackGameModeOptionsFd8* options) {
     options->engineSize = 250;
     options->fourStroke = 0;
     CopyGarageTables(options);
 }
 
 // 0x00522cb0
-void TrackGameMode::UnknownFunction522cb0(UnknownTrackGameModeOptionsFd8* options) {
-    UnknownFunction522c70(options);
-    UnknownFunction522c90(options);
+void TrackGameMode::ResetGarageOptions(UnknownTrackGameModeOptionsFd8* options) {
+    ResetSuspension(options);
+    ResetEngineOptions(options);
 }
 
 // 0x00522cd0
-void TrackGameMode::UnknownFunction522cd0() {
+void TrackGameMode::ResetSettingsEntries() {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -448,7 +448,7 @@ int TrackGameMode::LoadProfile() {
     fread(&field_0x2bd0, 0x1ec, 1, file);
     fread(bonusTrackUnlocked, 0x18, 1, file);
     fread(&field_0x1bdc, 4, 1, file);
-    fread(&field_0x90, 4, 1, file);
+    fread(&nameTagShade, 4, 1, file);
     fread(&savedDifficulty, 4, 1, file);
     fread(customGarageCurves, 0x294, 1, file);
     fread(&plateNumber, 4, 1, file);
@@ -502,7 +502,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(&field_0x2bd0, 0x1ec, 1, file);
     fwrite(bonusTrackUnlocked, 0x18, 1, file);
     fwrite(&field_0x1bdc, 4, 1, file);
-    fwrite(&field_0x90, 4, 1, file);
+    fwrite(&nameTagShade, 4, 1, file);
     fwrite(&savedDifficulty, 4, 1, file);
     fwrite(customGarageCurves, 0x294, 1, file);
     fwrite(&plateNumber, 4, 1, file);

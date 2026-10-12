@@ -168,7 +168,7 @@ public:
     // 0x0048af20 (ret 4): collects the view's racers.
     void CollectRacers(UnknownVisualCueView* view);
     int NextCueIndex();               // 0x0048bc30: the next cue index when it changed, else -1
-    int UnknownFunction48bc80();               // 0x0048bc80
+    int CanCycleCues();               // 0x0048bc80: a cue is active and more than one racer exists
 
     // ArcadeObject.h types +0x48/+0x4c as int (0x00401310's `c` and `d`);
     // the cue stores screen fractions there (0.5f, 0.1f from its callers).

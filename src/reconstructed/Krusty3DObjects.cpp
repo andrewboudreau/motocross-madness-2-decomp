@@ -261,7 +261,7 @@ int VisualCue::NextCueIndex() {
 }
 
 // 0x0048bc80
-int VisualCue::UnknownFunction48bc80() {
+int VisualCue::CanCycleCues() {
     return field_0xbc && cueRacerCount > 1;
 }
 

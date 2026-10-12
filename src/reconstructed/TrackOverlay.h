@@ -434,7 +434,7 @@ public:
     // surface's device context is not available.
     int RedrawChat();
     void DrawNameTag(void* dc, int index);           // 0x0051e3f0: draws name tag `index`
-    void UnknownFunction51e7c0();             // 0x0051e7c0
+    void CycleNameTagShade();                 // 0x0051e7c0: steps nameTagShade (key 0x31), redraws the tags
     void RedrawNameLine();                    // 0x0051e800: redraws the name line
     void RedrawNameTags(int index);    // 0x0051e910: redraws one name tag, or all (-1)
 

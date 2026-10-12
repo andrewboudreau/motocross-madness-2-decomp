@@ -173,10 +173,10 @@ struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
     int detailLevel;                          // +0x18 (TrackGameMode+0xa64): detail level 0..9
 };
 
-struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
+struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes (ResetControlOptions)
     int field_0x00[7];                        // 50 each
     int field_0x1c;
-    int field_0x20;
+    int joystickOn;                           // +0x20 TrackGameMode+0xa88 joystickOn, reset to 1
     int field_0x24;
     int field_0x28;
     int field_0x2c;
@@ -314,13 +314,13 @@ public:
     void ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* options);
     void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
-    void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
+    void ResetControlOptions(UnknownTrackGameModeOptionsA68* options); // 0x00522800: +0xa68..+0xa94
     void ReloadResourceStrings(char (*names)[0x80]);   // reloads resourceStrings
     void CopyGarageTables(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522cb0(UnknownTrackGameModeOptionsFd8* options);
-    void UnknownFunction522cd0();
+    void ResetSuspension(UnknownTrackGameModeOptionsFd8* options); // 0x00522c70: all six at 0.5f
+    void ResetEngineOptions(UnknownTrackGameModeOptionsFd8* options); // 0x00522c90: 250, two stroke, tables
+    void ResetGarageOptions(UnknownTrackGameModeOptionsFd8* options); // 0x00522cb0: the two above
+    void ResetSettingsEntries();              // 0x00522cd0: raceSettings +0x14c
     // 0x00522e20: picks the display mode (640x480x16 preferred) on the
     // adapter whose GUID is `guid`, and stores the adapter GUID.
     void ChooseDisplayMode(const void* guid, int* mode);  // 0x00522e20
@@ -337,7 +337,7 @@ public:
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)
-    int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
+    int nameTagShade;                         // +0x90 name tag grey step 0..5 (ChatOverlay 0x0051e7c0, 0x0051e910)
     int difficulty;                           // +0x94 "RadLODEasy" group (PCNewDlg reads the same group as the difficulty)
     int savedDifficulty;                      // +0x98 saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
     int showNewbieDialog;                 // +0x9c: cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)

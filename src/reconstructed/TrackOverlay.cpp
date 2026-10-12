@@ -1576,11 +1576,11 @@ fail:
 }
 
 // 0x0051e7c0
-void ChatOverlay::UnknownFunction51e7c0()
+void ChatOverlay::CycleNameTagShade()
 {
-    g_TrackGame->mode.field_0x90++;
-    if (g_TrackGame->mode.field_0x90 == 6)
-        g_TrackGame->mode.field_0x90 = 0;
+    g_TrackGame->mode.nameTagShade++;
+    if (g_TrackGame->mode.nameTagShade == 6)
+        g_TrackGame->mode.nameTagShade = 0;
     RedrawNameTags(-1);
 }
 
@@ -1717,10 +1717,10 @@ char* UnknownChatInput::GetHistory(int index, int* value)
 
 // 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
 // texture, then colours it with a grey that darkens with the cycle
-// TrackGameMode+0x90.
+// TrackGameMode+0x90 (nameTagShade).
 void ChatOverlay::RedrawNameTags(int index)
 {
-    unsigned char level = 0xff - g_TrackGame->mode.field_0x90 * 0x33;
+    unsigned char level = 0xff - g_TrackGame->mode.nameTagShade * 0x33;
     if (index == -1) {
         for (int i = 0; i < racerCount; i++)
             RestoreRect(&nameTagRects[i]);

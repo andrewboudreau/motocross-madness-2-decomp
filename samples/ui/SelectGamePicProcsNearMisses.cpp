@@ -245,7 +245,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 racer++;
             }
         }
-        g_TrackGame->mode.UnknownFunction522cd0();
+        g_TrackGame->mode.ResetSettingsEntries();
         if (g_TrackGame->mode.raceSettings.raceMode == 2 && g_TrackGame->eventManager->racesRun > 0) {
             // By the championship points.
             for (i = 0; i < racer; i++) {

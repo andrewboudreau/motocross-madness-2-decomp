@@ -128,7 +128,7 @@
   "?RedrawChat@ChatOverlay@@QAEHXZ": "0x0051de10",
   "?RedrawChat@ChatOverlay@@QAEXXZ": "0x0051de10",
   "?DrawNameTag@ChatOverlay@@QAEXPAXH@Z": "0x0051e3f0",
-  "?UnknownFunction51e7c0@ChatOverlay@@QAEXXZ": "0x0051e7c0",
+  "?CycleNameTagShade@ChatOverlay@@QAEXXZ": "0x0051e7c0",
   "?RedrawNameLine@ChatOverlay@@QAEXXZ": "0x0051e800",
   "?RedrawNameTags@ChatOverlay@@QAEXH@Z": "0x0051e910",
   "?AppendChar@UnknownChatInput@@QAEXD@Z": "0x0051ea80",
