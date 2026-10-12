@@ -55,8 +55,10 @@ last frame, then the field-of-view and viewport-width keys; its two dot
 products need an inline `Dot(a, b)` returning `a.z*b.z + (a.x*b.x +
 a.y*b.y)`, while plain member expressions in any term order get the x87
 operand order wrong), `0x0042e930` and `0x0042e9b0` (the frame setter,
-whose roll and fov arguments are `const float*`). `0x0042e550` is a near
-miss: retail reloads the display-mode index for the height. The kVec3
+whose roll and fov arguments are `const float*`) and `0x0042e550` (the
+viewport setup; retail reads the display-mode index again for the height,
+which VC6 does when the height goes through `owner->field_0x04` and the
+width through the `display` local). The kVec3
 statics sit at the end of Camera.cpp because the `$E` code follows every
 Camera function.
 

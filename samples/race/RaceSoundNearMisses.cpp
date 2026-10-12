@@ -10,7 +10,10 @@
 // copies. (2) Second half, looping path: retail keeps half in ebp and the
 // remainder in edx and spills the available byte count, VC6 here spills a
 // temporary and computes the remainder in ebp. The second copy's destination
-// reloads 11025 * field_0x1298 as retail does.
+// reloads 11025 * field_0x1298 as retail does. Unchanged or worse: a `rest`
+// local in (2) (before or after the first copy), the destination's
+// association (sampleBuffer + avail + 11025 * field_0x1298, a parenthesised
+// offset, `+ half`), and block-scoped `avail`/`rest` in (1).
 
 #include "../../src/reconstructed/RaceSound.cpp"
 

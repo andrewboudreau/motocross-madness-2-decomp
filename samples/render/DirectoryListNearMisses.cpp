@@ -17,7 +17,10 @@
 // `(unsigned char)(attributes >> 4) & 1`, `(bool)`, signed/plain char,
 // `*(unsigned char*)&attributes`, a const reference to the parameter,
 // `& 0xff` and char block locals, `1 & (...)`) give 74-75 of 109 by
-// position, all with the byte load.
+// position, all with the byte load. The attributes as a struct of
+// unsigned int, unsigned char or int bit fields, or a union with a byte
+// member, give 75 at best (an unsigned int bit field: `shr`/`and` on the
+// whole dword, still without retail's `and eax, 0xff`).
 
 #include "../../src/reconstructed/DirectoryList.cpp"
 

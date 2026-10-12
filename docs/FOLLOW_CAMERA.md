@@ -62,10 +62,11 @@ immediate.
 A near miss is kept in `samples/camera/FollowCameraNearMisses.cpp`:
 
 - The constructor (`0x00462ee0`, 564 bytes) has every value and offset right,
-  and its virtual call to slot 71 binds statically to `0x00466e50`. About 141
-  bytes differ: VC6 schedules the +0x274/+0x2dc zero stores into a load-delay
-  slot where retail used +0x2e4/+0x276. Moving those statements does not fix
-  it.
+  and its virtual call to slot 71 binds statically to `0x00466e50`. Copying
+  the saved state and parameter before +0x224 gives retail's second +0x16c
+  load (511 of 564). Left: VC6 schedules the +0x274/+0x2dc zero stores into
+  a load-delay slot where retail used +0x2e4/+0x276. Moving those statements
+  (or the +0x29c copy) does not fix it.
 
 The initializer `0x00463140` (520 bytes) is exact: it allocates the
 +0x294/+0x298 values (lines 0x78/0x79) and the point table (line 0x88).

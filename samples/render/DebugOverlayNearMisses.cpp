@@ -15,7 +15,11 @@
 // (and `e` in ebx before it, pushing edi late); VC6 here stores the
 // immediate and keeps `e` in edi. do/while, for, while(1), pointer rows,
 // a named colour local, an unsigned literal and an inline packer were
-// tried.
+// tried, and the colour spelled as RGB(255, 255, 255), shifted-byte ORs,
+// a DWORD cast, ~0xff000000 or 0xffffffff >> 8 (all fold to the immediate).
+// Retail's late `push edi` should follow from that allocation: VC6 saves a
+// register only on the path that uses it (the PCVideoCard 0x004ca520
+// candidate pushes ebp inside its full-screen block).
 #include <windows.h>
 #include <string.h>
 

@@ -88,16 +88,17 @@ int Camera::UnknownVirtualSlot13() {
 // ratio and a full-target viewport (+0x1a0: x, y, width, height and the
 // minimum/maximum depth 0.0f/1.0f), submits the viewport through the
 // owner's slot 14 and derives the height/width ratio from it.
-// Near miss (docs/NEAR_MISS_INDEX.md): retail keeps the display-mode array in
-// a register, re-reads only the current index for the height and clears edi
-// between the two fild loads; this source reloads the array as well.
+// Retail keeps the display-mode table in a register but reads the current
+// index again for the height: the height goes through owner->field_0x04,
+// which VC6 does not merge with the `display` index read for the width
+// (both reads through `display` share one index load).
 int Camera::UnknownFunction42e550() {
     RenderTarget* owner = Owner();
     field_0x1c4 = owner->field_0x0c;
     field_0x1c8 = owner->field_0x10;
     UnknownDisplay* display = owner->field_0x04;
     float width = (float)display->displayModes[display->currentDisplayMode].width;
-    float height = (float)display->displayModes[display->currentDisplayMode].height;
+    float height = (float)owner->field_0x04->displayModes[owner->field_0x04->currentDisplayMode].height;
     field_0x19c = width / height;
     field_0x1a0[0] = 0;
     field_0x1a0[1] = 0;

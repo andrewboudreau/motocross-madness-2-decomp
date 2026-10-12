@@ -64,8 +64,10 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
 - `0x0041eb20` (camera target), 1699 of 1710 bytes: register swap in the
   scene-object branch (retail loads the index before the table; no
   index/entry spelling or flag changes it).
-- `0x0041f1d0`: retail keeps 0 in a callee-saved register throughout; the
-  candidate does not.
+- `0x0041f1d0`, 266 of 881 bytes (same size): retail keeps 0 in edx from
+  the first instruction (re-zeroed after calls); the candidate does not.
+  Retail repeats the `0x0041eb20(caster)` tail call; the objects scan's
+  found path calls it and returns as retail does.
 - `0x004210f0` (start grid), 975 of 2940 bytes: VC6's inline budget
   places the out-of-line `Vector3` constructor/scale calls differently
   (see the comment in the sample); every frame slot is at retail's

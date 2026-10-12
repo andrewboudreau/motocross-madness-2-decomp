@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 171, c 121, total 292. The three class (a) functions of the
+Counts: a 0, b 171, c 120, total 291. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -30,9 +30,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | audio/PCAudio | `0x004bd0c0` | 110/314 (masked) | c | 16 code diffs |
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
-| camera/Camera | `0x0042e550` | 13/206 | c | retail reloads the display-mode index for the height (`mov edx, [eax + 0xc]` twice) and shares the return tail, so everything after it shifts; named width/height temps and width/height accessors both reuse the index (src/reconstructed/Camera.cpp) |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |
-| camera/FollowCamera | `0x00462ee0` | 418/564 | c | 12 code diffs: retail lacks `mov byte ptr [esi + 0x274], bl ; mov [e~`; retail adds `mov [edx + 8], eax` |
+| camera/FollowCamera | `0x00462ee0` | 511/564 | c | constructor: the post-call copies match; VC6 fills the +0x29c vector copy's load-delay slot with the +0x274/+0x2dc zero stores where retail uses +0x2e4/+0x276 (28 positions of the pair and 29 of the copy tried) |
 | camera/FollowCamera | `0x00463a30` | 903/4042 | b | slot 45 (keyboard/joystick controls), 138 code diffs; aligned instruction ratio 0.937 (samples/camera/FollowCameraNearMisses.cpp) |
 | camera/FollowCamera | `0x004650e0` | 509/937 | b | retail keeps the two cross products in memory temporaries (frame 0x18c vs 0x180); branch targets of the two `je` tests |
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
@@ -198,7 +197,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 1386/13322 | b | frame 0xac4 vs 0xab0, slot order differs (register choice follows); retail keeps one more stream destructor tail |
 | race/BikeRace | `0x0041eb20` | 1697/1710 | c | retail loads the scene-table index (+0x150) before the table pointer in the scene-object branch (edx/ecx swapped at the branch head) and again after the 0x4dab90 call; 162 parenthesisations of the index copy, table test and entry address give identical bytes |
-| race/BikeRace | `0x0041f1d0` | 230/881 | c | 44 code diffs: retail adds `xor edx, edx`; `mov eax, [edi + 0x3430] ; test eax, eax~` vs `cmp [edi + 0x3430], edx ; jne @271` |
+| race/BikeRace | `0x0041f1d0` | 266/881 | c | retail keeps 0 in edx from the first instruction (`cmp [edi + 0x3430], edx`, `xor edx, edx` after calls) and has three 0x0041eb20 call copies; the objects scan's found path now calls and returns (second copy, size matches) |
 | race/BikeRace | `0x004210f0` | 975/2940 | b | inline budget: retail calls the Vector3 constructor in the mode 2/3 tail and expands Scale in mode 4; registers follow |
 | race/CarProcedural | `0x0042fd80` | 221/2844 | b | slot 10: frame 0xd0 vs 0xdc (retail shares the wheel loop's axisA with the orientation's `flat`, axisB with nothing), the steering clamp's memory local, component/scalar load order in the `back` normalisation and blend; masked, 781 instructions like retail's |
 | race/CarProcedural | `0x00430b10` | 299/843 | b | 45 code diffs: retail adds `mov esi, ecx`; `mov edi, ecx ; mov esi, [edi + 0x6c] ; ~` vs `mov edi, [esi + 0x6c] ; mov ebp, [esi +~`; slots differ |

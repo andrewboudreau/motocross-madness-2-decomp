@@ -26328,6 +26328,16 @@ CASES = [
         'target_size': 4810,
         'reason': "track-name tables 'Quarry01'.., bike-type counts 0x0056db00; six arrays initialised quarry..stunt, direction 2's 1-based type computed per branch into a local",
     },
+    # s9/render
+    {
+        'name': 'Camera 0x42e550 viewport setup',
+        'bindings': 'src/reconstructed/Camera.bindings.json',
+        'source': 'src/reconstructed/Camera.cpp',
+        'symbol': '?UnknownFunction42e550@Camera@@QAEHXZ',
+        'target_va': '0x0042e550',
+        'target_size': 211,
+        'reason': 'height read through owner->field_0x04 re-reads the display-mode index (not the table) as retail does; edi becomes the zero register after the table',
+    },
 ]
 
 def main():

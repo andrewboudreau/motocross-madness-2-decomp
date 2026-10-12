@@ -14,6 +14,9 @@
 //   ten spellings of the budget: `m - p * 2`, `2 * p`, `-p * 2 + m`,
 //   `p + p`, `p << 1`, sizeof(short) with casts, ...) give at most 27/124:
 //   VC6 emits the same shl/sub for every spelling and loads +0x74 late.
+//   Also 26 at best: the fields read through a `mode` pointer (retail does
+//   form one with `lea` for +8) with or without `memory`/`pixels` locals,
+//   and the budget written `m + -p * 2`, `m + 2 * -p` or `m - 2 * p`.
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128

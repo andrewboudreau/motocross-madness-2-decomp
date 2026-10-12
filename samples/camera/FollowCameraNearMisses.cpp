@@ -49,13 +49,25 @@
 // bytes match. Registers and the EH frame agree once the frame pointer is taken
 // before the vector maths; retail keeps the two cross products in memory
 // temporaries (12 more frame bytes) where VC6 keeps them on the FPU stack.
+// Retail stores each component of the first product to a temporary, copies
+// it to `side` and reads the temporary (not `side`) in the second product.
+// A named result (`Vector3 r; r.x = ...`), float locals, by-value operands
+// (either or both) and assignment instead of initialisation (41 forms) keep
+// frame 0x180 (508..513).
 //
-// FollowCamera::FollowCamera (0x00462ee0, 564 bytes): every store value,
-// offset and the static slot-71 call are right, but VC6 schedules two zero
-// stores (+0x274, +0x2dc) into the load-delay slot of the
-// +0x29c global-vector copy, where retail placed +0x2e4/+0x276. About 141
-// bytes differ, all instruction order; moving those two statements anywhere
-// earlier does not help.
+// FollowCamera::FollowCamera (0x00462ee0, 564 bytes; 511 of 564): every
+// store value, offset and the static slot-71 call are right. Storing the
+// saved state and parameter before the +0x224 copy (120 orders of the five
+// post-call copies) gives retail's second +0x16c load for +0x254 (418 ->
+// 511). Left: VC6 schedules two zero stores (+0x274, +0x2dc) into the
+// load-delay slot of the +0x29c global-vector copy, where retail placed
+// +0x2e4/+0x276. Moving the pair to any of 28 positions (either order)
+// fills the slot with whichever two stores precede `mov ecx, esi` (515 at
+// best, after +0x298, which is not retail's store order); moving the
+// +0x29c copy (29 positions) is worse. All orders of the six statements
+// after the copy (720) or of the six before the slot-71 call (720) keep a
+// non-retail fill (526 at best, with more diffs); 0..33 dead int locals
+// change nothing.
 //
 // FollowCamera::UnknownVirtualSlot36 (0x00465000) is exact in src/reconstructed/FollowCamera.cpp.
 #include "../../src/reconstructed/FollowCamera.h"
@@ -197,10 +209,10 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     cameraState = 0;
     UnknownVirtualSlot71(0);
     field_0x25c = field_0x170;
-    field_0x224 = field_0x220;
     savedCameraState = cameraState;
     field_0x250 = cameraState;
     savedParameter = field_0x16c;
+    field_0x224 = field_0x220;
     field_0x230 = field_0x22c;
     field_0x238 = field_0x234;
     field_0x254 = field_0x16c;

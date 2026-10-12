@@ -9,7 +9,13 @@
 // local). `remaining > 0` (here) keeps retail's layout and allocation but
 // emits `test eax, eax; jle`; a ternary keeps both but stores the 0 through
 // fld/fstp. RaceStatus.cpp 0x004e63e0 has the same block and matches with
-// `>= 1` and if/else.
+// `>= 1` and if/else. With `>= 1` none of these restore the layout (638 of
+// 1006 at best, against 671 for `> 0`): the loop body wrapped in
+// `if (!racer->field_0x7a4)` as in 0x004e63e0, `goto next` for both
+// `continue`s, `1 <= remaining`, `!(remaining < 1)`, an empty then-branch
+// with the work in `else`, the inner if/else swapped, an int/long/short
+// `remaining`, or `remaining` declared at the top in any order with the
+// other locals.
 //
 // BuildStatusList (0x004e5d00, 519 bytes): builds a view's status
 // list. The statements, calls and loops line up; only register allocation
@@ -18,7 +24,11 @@
 // and keeps `tail` in the view argument's stack slot, while VC6 here folds
 // the first index to 1, keeps `tail` in ebx and reloads `list`. Every
 // declaration order, `tail = list` for the first node and an unsigned index
-// leave that allocation.
+// leave that allocation, as do (72 combinations, all 168 of 519) `index = 1`
+// after the first calloc or before it with `index` as its count, `tail`
+// started from `&(*list)->field_0x50`, the race-mode test against `index`,
+// `++index` in the node store, and the link written as `tail =
+// &(*tail)->field_0x50` or `tail = &(*tail = status)->field_0x50`.
 
 #include "../../src/reconstructed/RaceStatus.h"
 

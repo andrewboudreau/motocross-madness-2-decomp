@@ -17,7 +17,11 @@
 // size expression, `field_0x1f0 = 0` moved, field_0x38 re-read, `this->`
 // spellings and Length helper forms (result local, ?:, != tests) leave
 // that order (at best 1299; parentheses around field_0x1e4 or a plain
-// field_0x38->field_0x198 give 1295).
+// field_0x38->field_0x198 give 1295). Storing the length after the size
+// statement gives retail's `mov edx` first but keeps the length on the x87
+// stack (`fld st(0)`, store at the end; 544). Size helpers taking the length
+// by value, or the camera, `this` and the chained store in any argument
+// order, give 600 or the same 1299.
 //
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
