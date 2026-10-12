@@ -1530,15 +1530,15 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("DDLTextBox", event->controlName)) {
             int index = static_cast<UIListBox*>(event->control)->GetRowData(-1);
             UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
-            g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].field_0x08);
+            g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
             {
-                char* name = g_TrackGame->ui->entries[index].field_0x14;
+                char* name = g_TrackGame->ui->entries[index].fileName;
                 int length = strlen(name);
                 int count = length > 0xff ? 0xff : length;
                 strncpy(settings->trackName, name, count);
                 settings->trackName[count] = 0;
             }
-            settings->trackNumber = g_TrackGame->ui->entries[index].field_0x04;
+            settings->trackNumber = g_TrackGame->ui->entries[index].scene;
             settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
             settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
             strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04],
@@ -1724,14 +1724,14 @@ void MPEventDlg::UnknownVirtualSlot31(int apply) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         int index = list->GetRowData(-1);
         {
-            char* name = g_TrackGame->ui->entries[index].field_0x14;
+            char* name = g_TrackGame->ui->entries[index].fileName;
             int length = strlen(name);
             int count = length > 0xff ? 0xff : length;
             strncpy(settings->trackName, name, count);
             settings->trackName[count] = 0;
         }
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].field_0x08);
-        settings->trackNumber = g_TrackGame->ui->entries[index].field_0x04;
+        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
+        settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
         settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
         strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
@@ -1760,7 +1760,7 @@ void MPEventDlg::UnknownVirtualSlot31(int apply) {
             list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             for (int i = 0; i < list->rowCount; i++) {
                 int row = list->GetRowData(i);
-                if (!_stricmp(g_TrackGame->ui->entries[row].field_0x14, settings->trackName)) {
+                if (!_stricmp(g_TrackGame->ui->entries[row].fileName, settings->trackName)) {
                     list->SelectRowByData(row);
                     return;
                 }

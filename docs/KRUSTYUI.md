@@ -39,7 +39,7 @@ ends with the shared dialog deleting destructor and its vector set:
 | +0x48/+0x4c | `manufacturers`/`manufacturerCount` | `LoadBikesAndRiders` appends one entry per `Manufacturer_%02d` section of bikes.pb |
 | +0x50/+0x54 | `bikes`/`bikeCount` | one entry per bike of those manufacturers |
 | +0x58/+0x5c | `riders`/`riderCount` | one entry per `Rider_%02d` section of riders.pb |
-| +0x60 | `entries` | the list counted by +0x64 (`entryCount`) |
+| +0x60 | `entries` | the track list counted by +0x64 (`entryCount`); `0x0049ba70` appends rows whose `scene` (+0x04), `series` (+0x08) and `fileName` (+0x14, the .env name) come from SelectGamePicProcs.cpp |
 | +0x468 | `garageCamera` | made current while the garage scene (+0x464) is shown |
 | +0x46c/+0x470 | `riderPreview`/`garageCharacter` | dlgprocs.cpp SPBikeRiderDlg slots 13 and 10 |
 | +0x474 | `garageFocus` | the garage scene's look target (the dialog procs aim the camera at it) |

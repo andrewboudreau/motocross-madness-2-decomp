@@ -80,14 +80,16 @@ struct UnknownKrustyUISlot {
     char field_0x04;
 };
 
-// 0x54-byte record in KrustyUI's +0x60 list (appended by 0x0049ba70).
+// 0x54-byte record in KrustyUI's +0x60 list (appended by 0x0049ba70): a
+// track list row; SelectGamePicProcs.cpp passes the scene number, series and
+// .env name.
 struct UnknownKrustyUIEntry {
     int field_0x00;
-    int field_0x04;
-    int field_0x08;
+    int scene;                                // +0x04: scene number; copied to the settings' trackNumber
+    int series;                               // +0x08
     int field_0x0c;
     int field_0x10;
-    char field_0x14[64];
+    char fileName[64];                        // +0x14: the track's .env name
 };
 
 // RTTI: KrustyUI : GameObject (vtable 0x0055488c; 0x1364 bytes, the size
@@ -122,7 +124,7 @@ public:
     // racers (bikes near the player's class).
     void UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoices);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
-    int UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e);
+    int UnknownFunction49ba70(int a, int scene, int series, const char* name, int d, int e);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables

@@ -830,14 +830,14 @@ void SPEventDlg::UnknownVirtualSlot31(int apply) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         int index = list->GetRowData(-1);
         {
-            char* name = g_TrackGame->ui->entries[index].field_0x14;
+            char* name = g_TrackGame->ui->entries[index].fileName;
             int length = strlen(name);
             int count = length > 0xff ? 0xff : length;
             strncpy(settings->trackName, name, count);
             settings->trackName[count] = 0;
         }
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].field_0x08);
-        settings->trackNumber = g_TrackGame->ui->entries[index].field_0x04;
+        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
+        settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
         g_TrackGame->mode.field_0x9f4[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
         if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->UnknownFunction4755c0())
@@ -913,9 +913,9 @@ int SPEventDlg::AddGhost(const char* path) {
         if (fread(&header, sizeof(header), 1, file)) {
             UIListBox* tracks = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int row = tracks->GetRowData(-1);
-            if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].field_0x14) &&
+            if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].fileName) &&
                 header.lengthSeconds > 0.0f &&
-                g_TrackGame->ui->entries[row].field_0x04 == header.trackIndex) {
+                g_TrackGame->ui->entries[row].scene == header.trackIndex) {
                 ghostHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
                     ghostHeaders, (ghostHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
                 ghostHeaders[ghostHeaderCount] = header;
