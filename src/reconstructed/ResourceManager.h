@@ -28,7 +28,7 @@ public:
     void* object;                         // +0x10 object loaded from the entry
     UnknownTextureStream* archive;            // +0x14 archive holding the file
     int offset;                               // +0x18 offset of the file in it
-    int field_0x1c;                       // read after the offset (size?)
+    int size;                                 // +0x1c size of the file (FileStream copies it to the stream's end limit)
 };
 
 // The 0x18-byte object at 0x00689c78 (g_UnknownResourceManager572b44 points

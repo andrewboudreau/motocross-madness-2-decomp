@@ -70,7 +70,7 @@ UnknownTextureStream* UnknownTextureStream::UnknownFunction460d70(const char* na
         ResourceItem* item = field_0x12c->FindItem(name, 0);
         if (item) {
             field_0x130 = item->offset;
-            field_0x04 = item->field_0x1c;
+            field_0x04 = item->size;
             return item->archive;
         }
     }

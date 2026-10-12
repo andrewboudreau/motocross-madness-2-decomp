@@ -34,7 +34,7 @@ void ResourceItem::UnknownFunction4e8de0()
     object = 0;
     archive = 0;
     offset = 0;
-    field_0x1c = 0;
+    size = 0;
 }
 
 // 0x004e8e10
@@ -92,7 +92,7 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
                 return 0;
 
             items[i]->offset = item->offset;
-            items[i]->field_0x1c = item->field_0x1c;
+            items[i]->size = item->size;
             ResourceItem* existing = items[i];
             UnknownTextureStream* old = existing->archive;
             existing->archive = item->archive;
@@ -177,7 +177,7 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
                                     __FILE__, 420);
             strcpy(items[itemCount]->name, name);
             items[itemCount]->offset = 0;
-            items[itemCount]->field_0x1c = 0;
+            items[itemCount]->size = 0;
             items[itemCount]->archive = archive;
             if (MergeWithExisting(items[itemCount])) {
                 items[itemCount]->Release();
@@ -210,7 +210,7 @@ int UnknownResourceManager::AddObject(const char* name, void* object)
                                 __FILE__, 478);
         strcpy(items[itemCount]->name, name);
         items[itemCount]->offset = 0;
-        items[itemCount]->field_0x1c = 0;
+        items[itemCount]->size = 0;
         items[itemCount]->archive = 0;
         items[itemCount]->object = object;
         if (MergeWithExisting(items[itemCount]))
