@@ -454,6 +454,67 @@ int CapsuleTreeQueryWithVertices(const Vec3* ends, float radius, float radiusSq,
     return CapsuleTreeQuery(ends, radius, radiusSq, node, xf, triangles);
 }
 
+// 0x004298c0.  Capsule (segment ends[0]..ends[1], radius) against the tree; the triangle
+// branch clips the segment against the face plane, the point branch measures the distance
+// from the transformed point to the segment.  The misses share one `return 0` tail with the
+// inner node's box test and the second child's call stays out of tail position, as in
+// SphereTreeQuery.  q and e are declared with the branch: the operator temporaries then take
+// the two slots retail gives them instead of q's and e's.  The point is copied and transformed
+// in place, and its distance goes to the length helper by reference.
+int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNode* node,
+                     const Matrix4* xf, int triangles)
+{
+    if (node->volume < 0.0f) {
+        if (triangles) {
+            QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
+            Vec3 q, e;
+            Vec3 p;
+            InverseTransformPointInline(&p, *ends, xf);
+            Vec3 d;
+            Vec3TransformNormalTranspose(&d, Vec3Sub(ends[1], ends[0]), xf);
+            float t = -(Vec3Dot(tri->normal, p) + tri->planeOffset) / Vec3Dot(tri->normal, d);
+            if (!(t < 1.0f))
+                t = 1.0f;
+            else if (t <= 0.0f)
+                t = 0.0f;
+            Vec3 c = Vec3Add(Vec3Scale(d, t), p);
+            float dist = Vec3Dot(Vec3Sub(c, s_vertices[tri->vertex[0]]), tri->normal);
+            if (QueryAbs(dist) <= radius) {
+                q = Vec3Sub(c, Vec3ScaleLeft(dist, tri->normal));
+                if (PointInTriangle(&q, tri))
+                    return 1;
+                e = Vec3Sub(s_vertices[tri->vertex[1]], s_vertices[tri->vertex[0]]);
+                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[0]], &e) > radius)
+                    return 1;
+                e = Vec3Sub(s_vertices[tri->vertex[2]], s_vertices[tri->vertex[1]]);
+                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[1]], &e) > radius)
+                    return 1;
+                e = Vec3Sub(s_vertices[tri->vertex[0]], s_vertices[tri->vertex[2]]);
+                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[2]], &e) > radius)
+                    return 1;
+            }
+            return 0;
+        } else {
+            Vec3 p = ((QueryPointLeaf*)node)->point;
+            TransformPointInline(&p, p, xf);
+            Vec3 dir = Vec3Call(ends[1].x - ends[0].x, ends[1].y - ends[0].y, ends[1].z - ends[0].z);
+            float t = Vec3Dot(dir, Vec3Sub(p, *ends)) / Vec3Dot(dir, dir);
+            if (!(t < 1.0f))
+                t = 1.0f;
+            else if (t <= 0.0f)
+                t = 0.0f;
+            if (Vec3Length(Vec3Sub(p, Vec3Add(Vec3ScaleLeft(t, dir), *ends))) < radius)
+                return 1;
+        }
+    } else if (BoxCapsuleOverlap(&node->center, &node->halfExtents, ends, radius, radiusSq, xf)) {
+        int hit = CapsuleTreeQuery(ends, radius, radiusSq, node->child[0], xf, triangles);
+        if (!hit)
+            hit = CapsuleTreeQuery(ends, radius, radiusSq, node->child[1], xf, triangles);
+        return hit;
+    }
+    return 0;
+}
+
 // 0x00429e60.
 int SegmentTreeQueryWithVertices(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf,
                                  Vec3* vertices)

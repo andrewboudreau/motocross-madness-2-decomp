@@ -162,6 +162,16 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?CapsuleTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
+    "target_va": "0x004298c0",
+    "target_size": 1436,
+    "expect": "exact",
+    "notes": "moved from samples; SphereTreeQuery's tails, q and e declared with the triangle branch, the point transformed in place and its length taken by reference",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "_$E2",
     "target_va": "0x00429400",
     "target_size": 5,

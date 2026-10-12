@@ -274,13 +274,14 @@ rotated into itself through a by-value inline helper, so VC6 copies it as retail
   (VC6_OPERAND_ORDER.md section 3).
 
 **`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
-`0x00424690..0x0042ad2f`) passes 41 cases:
+`0x00424690..0x0042ad2f`) passes 42 cases:
 - its 18 `$E` (the kVec3 set and five empty statics);
 - the segment and sphere box tests;
 - GrowBoxByTransformedBox `0x004290d0`, whose loop writes its own local (VC6 homes it in
   the dead `center` argument slot, so the transformed x is never stored);
-- SphereTreeQuery `0x00429570`, whose misses share one `return 0` tail and whose second
-  recursive call stays out of tail position (VC6 otherwise turns it into a loop);
+- SphereTreeQuery `0x00429570` and CapsuleTreeQuery `0x004298c0`, whose misses share one
+  `return 0` tail and whose second recursive call stays out of tail position (VC6
+  otherwise turns it into a loop);
 - the tree-tree and tree-box queries and the three entry points;
 - the matrix and point helpers.
 
@@ -295,7 +296,7 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The second run reports `41/41 strict exact`. The soultree root reports one
+The second run reports `42/42 strict exact`. The soultree root reports one
 required failure, SoulTreePhysics'
 `0x5036f0`, which predates this slice.
 

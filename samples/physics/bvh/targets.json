@@ -21,16 +21,6 @@
   {
     "class": "(free)",
     "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?CapsuleTreeQuery@@",
-    "target_va": "0x004298c0",
-    "target_size": 1436,
-    "expect": "partial",
-    "notes": "532/1418: matches through the |dist| test; operator-result temporaries and the shared return 1 differ afterwards (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
     "candidate_symbol_contains": "?SegmentTriangleQuery@@",
     "target_va": "0x00427c10",
     "target_size": 1101,

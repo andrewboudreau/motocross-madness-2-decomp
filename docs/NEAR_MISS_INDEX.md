@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 152, c 106, total 259. The three class (a) functions of the
+Counts: a 1, b 151, c 106, total 258. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -135,7 +135,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 349/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
 | physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 773/789 | c | frame and slots match (loop output in its own local, `grown` after the last rotation, z, y, x transform sums); the first two products of the transform's x and z rows load the matrix element first |
-| physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
 | physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
 | physics/collision/CollisionPoint | `0x0043ad80` | 47/599 (masked) | b | body matches; retail returns for a null first argument before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead `points` slot, VC6 in a1's |
