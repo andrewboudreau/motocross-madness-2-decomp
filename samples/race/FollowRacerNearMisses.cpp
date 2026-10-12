@@ -122,7 +122,7 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
     if (tell)
         raceView->localRacer->UnknownFunction4925a0(racer, false);
     if (racer) {
-        ((RaceSound*)raceView->field_0x44)->PlayItSound();
+        ((RaceSound*)raceView->raceSound)->PlayItSound();
         FOLLOWED_RACER_SLOTS(racer)->UnknownVirtualSlot50(1, 5.0f, 0);
     }
     AnnounceFollowedRacer(racer, previous);

@@ -233,7 +233,7 @@ int EventManager::CreatePodiumScene() {
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
     ((RenderTarget*)renderContext)->SetCamera(podiumCamera);
-    podiumCamera->InsertBefore(view->field_0x50, -1);
+    podiumCamera->InsertBefore(view->raceCamera, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
     if (!((int)rows & 1))

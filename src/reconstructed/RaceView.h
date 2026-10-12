@@ -211,11 +211,11 @@ struct UnknownKrustyBikeView : public GameObject {
     UnknownEventRacer* localRacer;            // +0x38 its own racer
     UnknownEventRacer** racerSlots;           // +0x3c all racers, by racer slot
     UnknownEventRacer** aiRacers;             // +0x40 AI racers (TrackGame+0x2d94 of them)
-    GameObject* field_0x44;
+    GameObject* raceSound;                    // +0x44 BikeRace: the RaceSound (FollowRacer plays the "it" sound through it)
     unsigned char field_0x048[0x50 - 0x48];
-    GameObject* field_0x50;
+    GameObject* raceCamera;                   // +0x50 BikeRace: the race camera
     unsigned char field_0x054[0x60 - 0x54];
-    GameObject* field_0x60;
+    GameObject* youIndicator;                 // +0x60 BikeRace: the "youind.slt" marker
     unsigned char field_0x064[0xbc - 0x64];
     UnknownScoreBoard* scoreBoard;            // +0x0bc score board (FollowRacer.cpp 0x004a9e80)
     unsigned char field_0x0c0[0xc8 - 0xc0];
@@ -225,7 +225,7 @@ struct UnknownKrustyBikeView : public GameObject {
     unsigned char field_0x15c[0x18a - 0x15c];
     bool isRacing;                            // +0x18a racing (EventManager 0x0045eef0)
     unsigned char field_0x18b[0x18e - 0x18b];
-    bool viewAvailable;                       // +0x18e slot 10: view available
+    bool networkStartPending;                 // +0x18e BikeRace: the multiplayer start check is pending (the race clock waits, the camera shows the grid)
     unsigned char field_0x18f[0x19c - 0x18f];
     ChatOverlay* chatOverlay;                 // +0x19c the name tags (TrackOverlay 0x0051bed0 updates them)
     UnknownKrustyBikeViewReplay* replayVcr;   // +0x1a0 replay being played (InGameProcs.cpp VCRDlg)

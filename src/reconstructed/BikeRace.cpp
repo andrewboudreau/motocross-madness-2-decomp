@@ -82,7 +82,7 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     localRacer = 0;
     racerSlots = 0;
     aiRacers = 0;
-    field_0x044 = 0;
+    raceSound = 0;
     field_0x04c = 0;
     raceCamera = 0;
     field_0x054 = 0;
@@ -1302,11 +1302,11 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         isRecording = mode;
         g_TrackGame->replaySpeed = 1.0f;
         g_TrackGame->paused = 0;
-        field_0x044->field_0x3c->UnknownVirtualSlot16(0);
-        if (field_0x044->field_0x40 != 0) {
-            field_0x044->field_0x40->UnknownVirtualSlot16(0);
+        raceSound->field_0x3c->UnknownVirtualSlot16(0);
+        if (raceSound->field_0x40 != 0) {
+            raceSound->field_0x40->UnknownVirtualSlot16(0);
         }
-        field_0x044->field_0x44->UnknownVirtualSlot16(0);
+        raceSound->field_0x44->UnknownVirtualSlot16(0);
         replayVcr = new (__FILE__, 0x1068) KrustyVCR;
         if (replayVcr != 0) {
             if (mode == 0) {

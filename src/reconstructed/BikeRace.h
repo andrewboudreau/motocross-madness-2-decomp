@@ -929,7 +929,7 @@ public:
     UnknownBikeRaceRacer* localRacer;        // its own racer
     UnknownBikeRaceRacer** racerSlots;       // all racers, by racer slot
     UnknownBikeRaceRacer** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
-    UnknownBikeRaceViews* field_0x044;
+    UnknownBikeRaceViews* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
     UnknownBikeRaceProjector* field_0x04c;
     KrustyBikeCamera* raceCamera;            // the race camera

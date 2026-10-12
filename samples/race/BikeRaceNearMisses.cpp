@@ -858,9 +858,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    field_0x044 = (UnknownBikeRaceViews*)sound->Create(renderContext, (UnknownKrustyBikeView*)this,
+    raceSound = (UnknownBikeRaceViews*)sound->Create(renderContext, (UnknownKrustyBikeView*)this,
                                                                       (UnknownRaceSoundCamera*)raceCamera, 6);
-    AppendChild((GameObject*)field_0x044, -1);
+    AppendChild((GameObject*)raceSound, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.joystickOn) {
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(0);

@@ -890,11 +890,11 @@ void EventManager::CloseRace(int mode) {
             if (owner->field_0x64)
                 owner->field_0x64->UnknownVirtualSlot4();
         }
-        view->field_0x50->UnknownVirtualSlot4();
-        if (view->field_0x44)
-            view->field_0x44->UnknownVirtualSlot4();
-        if (view->field_0x60)
-            view->field_0x60->UnknownVirtualSlot4();
+        view->raceCamera->UnknownVirtualSlot4();
+        if (view->raceSound)
+            view->raceSound->UnknownVirtualSlot4();
+        if (view->youIndicator)
+            view->youIndicator->UnknownVirtualSlot4();
         int iterator = 0;
         UnknownEventRacer* racer;
         while ((racer = view->NextBike(&iterator)) != 0)
