@@ -164,7 +164,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/krustybike/KrustyBike | `0x00493660` | 2005/8545 | c | 528 code diffs (frame 0x58 and slots exact): retail keeps 1 in ebp and 0 in edi from the second SetAxesPtr call on; retail stores `(len+50)*(len+50)` before the AllowWarping test; velocity y/z `fld s ; fmul` order; pose lerp `c - b` recompute; pose bytes in 0x492670/0x492ad0 scale by 255.0f (0x551420), and 100.0f is 0x5505ec |
 | physics/krustybike/KrustyBike | `0x00496d10` | 5/135 | c | 1 code diffs: `jmp A` vs `jmp @12 ; nop ; nop ` |
 | physics/motion/Motnctrl | `0x004a5e40` | 505/1090 | b | register permutation: retail file in ebx, poses and the zero constant in ebp, path in esi; the candidate swaps ebx/ebp and esi/edi |
-| physics/motion/Motnctrl | `0x004a70c0` | 159/3327 (masked) | b | 733 code diffs: retail calls `CharacterPose::CharacterPose` 2 then 4 times where the candidate calls it 3 then 2; retail calls `operator*`/`operator+` in the first extrapolation loop; frame 0x2dc vs 0x284; slots differ |
+| physics/motion/Motnctrl | `0x004a70c0` | 152/3330 | b | 733 code diffs: retail calls `CharacterPose::CharacterPose` 2 then 4 times where the candidate calls it 3 then 2; retail calls `operator*`/`operator+` in the first extrapolation loop; frame 0x2dc vs 0x284; slots differ |
 | physics/motion/Motnctrl | `0x004a7dc0` | 476/523 | b | 4 code diffs: `fld [esi + 0x20]` vs `mov [esp + N], ecx`; retail lacks `mov [esp + N], ecx`; slots differ |
 | physics/motion/Motnctrl | `0x004a7fd0` | 1097/1121 | c | axisZ cross product loads b's component first in each product (retail a's) |
 | physics/motion/Motnctrl | `0x004a8470` | 245/1241 | c | 43 code diffs: retail adds `push ebp`; retail lacks `push ebp` |
