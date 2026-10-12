@@ -139,7 +139,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     ownsBackground = 0;
     screenGrab = 0;
     grabRegion = -1;
-    field_0xe8 = 0;
+    grabCopyFrames = 0;
     uiAnimations = 1;
     dialogDirectory[0] = 0;
     waitFrames = 0;
@@ -303,7 +303,7 @@ int GUIManager::UnknownVirtualSlot13() {
         rect.right = screenGrab->textureWidth;
         rect.bottom = screenGrab->textureHeight;
         if (guiBackground) {
-            guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
+            guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
         } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
             GameObject::UnknownVirtualSlot13();
             return 0;
@@ -324,7 +324,7 @@ int GUIManager::UnknownVirtualSlot15() {
             rect.right = screenGrab->textureWidth;
             rect.bottom = screenGrab->textureHeight;
             if (guiBackground) {
-                guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
+                guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
             } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
                 GameObject::UnknownVirtualSlot15();
                 return 0;
@@ -480,7 +480,7 @@ void GUIManager::ReleaseBackgroundGrab() {
     }
     screenGrab = 0;
     grabRegion = -1;
-    field_0xe8 = 0;
+    grabCopyFrames = 0;
 }
 
 // 0x00486150
@@ -1180,10 +1180,10 @@ void GUIUser::SetCursorAnimation(UnknownCursorAnimation* animation) {
     if (!animation && cursorAnimation)
         animation = cursorAnimation;
     current = userCursor->cursorAnimation;
-    if (current && field_0xc4 && animation != current && animation->field_0x10 > current->field_0x08) {
-        animation->field_0x08 = current->field_0x08;
-        animation->field_0x0c = current->field_0x0c;
-        animation->field_0x20 = current->field_0x20;
+    if (current && field_0xc4 && animation != current && animation->frameCount > current->currentFrame) {
+        animation->currentFrame = current->currentFrame;
+        animation->playForwards = current->playForwards;
+        animation->lastStepTime = current->lastStepTime;
     }
     userCursor->SetAnimation(animation);
 }

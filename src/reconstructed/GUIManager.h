@@ -134,15 +134,17 @@ struct UnknownGroundFogShader {
     UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
-// Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8).
+// Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8). Its
+// AdvancePastSounds is UIAnim's (0x004730b0) and dialogs cast a control's
+// "MouseAnim" UIAnim to it, so the members follow GameUi.h's UIAnim.
 struct UnknownCursorAnimation {
     int AdvancePastSounds();              // 0x004730b0: current frame
     unsigned char field_0x00[0x08];
-    int field_0x08;
-    int field_0x0c;
-    int field_0x10;
+    int currentFrame;                         // +0x08 UIAnim::currentFrame
+    int playForwards;                         // +0x0c UIAnim::playForwards
+    int frameCount;                           // +0x10 UIAnim::frameCount
     unsigned char field_0x14[0x20 - 0x14];
-    int field_0x20;
+    int lastStepTime;                         // +0x20 UIAnim::lastStepTime
 };
 
 // RTTI: GUICursor : GameCursor (vtable 0x00553ed0; 0x60 bytes, the size
@@ -373,7 +375,7 @@ public:
     PCTextureMap* screenGrab;                 // +0xdc: screen grab
     int drawGrabFirst;                        // +0xe0: draw the grab before the children
     int grabRegion;                           // +0xe4
-    int field_0xe8;
+    int grabCopyFrames;                       // +0xe8: the screen grab's full-copy frames left (BackgroundImage::DrawImage `frames`)
     int uiAnimations;                         // +0xec ChkUIAnims (OptionProcs.cpp); from TrackGame+0xc40 (KrustyUI 0x004988a0); handed to each dialog's animatesControls
     char dialogDirectory[0x100];              // +0xf0: dialog directory
     int paletteChanged;                       // +0x1f0: set by 0x00486150; slot 10 clears it
