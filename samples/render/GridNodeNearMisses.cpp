@@ -21,6 +21,10 @@
 // ecx) while VC6 here re-reads it (`xor eax, eax ; mov al, [ecx+0x28]`, children in
 // eax). A byte local for level gets a stack home and shifts the frame; an int local,
 // a top-level shift, a children local or a leaf/descend swap make it worse.
+// Identical (1040): the leaf test as `!level`, `(int)level == 0`, `level < 1`
+// or `level <= 0`; the shift as `level << 2`, `4 * level`, `(int)level * 4`,
+// `(level & 0xff) * 4` or `(int)(level * 4)`; `if (children)`; and the shift
+// computed between the leaf block and the children test (60 combinations).
 //
 // 0x00483d40 (GridNode slot 1, 4140 bytes): 96/4189. Readable reconstruction of the
 // decoded control flow (grid-line crossings, merge, child recursion, leaf triangles).

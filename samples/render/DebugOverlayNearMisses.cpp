@@ -15,7 +15,10 @@
 // (and `e` in ebx before it, pushing edi late); VC6 here stores the
 // immediate and keeps `e` in edi. do/while, for, while(1), pointer rows,
 // a named colour local, an unsigned literal and an inline packer were
-// tried.
+// tried, and the colour spelled as RGB(255, 255, 255), shifted-byte ORs,
+// a DWORD cast, ~0xff000000 or 0xffffffff >> 8 (all fold to the immediate).
+// Retail's late `push edi` is a shrink-wrapped save, which these VC6
+// samples have not reproduced elsewhere either.
 #include <windows.h>
 #include <string.h>
 
