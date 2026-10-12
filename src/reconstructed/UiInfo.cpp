@@ -184,8 +184,9 @@ void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* option
     memset(&options->field_0x360, 0, sizeof(options->field_0x360));
 }
 
-// 0x00522780
-void TrackGameMode::UnknownFunction522780(UnknownTrackGameModeOptionsA20* options) {
+// 0x00522780: the defaults of +0xa20..+0xa4b, mostly sound settings (sound
+// on at +0xa28, volume 100 at +0xa40, 8-bit at +0xa48); the name is inference.
+void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* options) {
     options->field_0x00 = 0;
     options->field_0x08 = 1;
     options->field_0x04 = 1;
@@ -199,8 +200,9 @@ void TrackGameMode::UnknownFunction522780(UnknownTrackGameModeOptionsA20* option
     options->field_0x18 = 1;
 }
 
-// 0x005227d0
-void TrackGameMode::UnknownFunction5227d0(UnknownTrackGameModeOptionsA4c* options) {
+// 0x005227d0: the defaults of +0xa4c..+0xa67: display mode 0, shadows,
+// particles and sky cube on, detail level 6.
+void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options) {
     options->field_0x00 = 0;
     options->field_0x04 = 1;
     options->field_0x08 = 1;

@@ -312,8 +312,8 @@ public:
     int ResetNetworkRace();
     // Reset helpers called by 0x00522440.
     void UnknownFunction522720(UnknownTrackGameModeOptions6ac* options);
-    void UnknownFunction522780(UnknownTrackGameModeOptionsA20* options);
-    void UnknownFunction5227d0(UnknownTrackGameModeOptionsA4c* options);
+    void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
+    void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
     void UnknownFunction522840(char (*names)[0x80]);   // reloads field_0x145c's strings
     void UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options);
