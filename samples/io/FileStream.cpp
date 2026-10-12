@@ -256,12 +256,17 @@ static inline void RestartKey(UnknownTextureStream* stream)
 // 0x00461340: seeks to `offset` (origin as fseek). An encoded file cannot
 // fseek into the middle of its key stream, so with `flag` it rewinds (or keeps
 // the decoded position +0x0c) and decodes forward through a scratch buffer.
-// Near miss (about 29%, 700 vs 702 bytes): the control flow and the inner
+// Near miss (286 of 702; candidate 705 bytes): the control flow and the inner
 // loop match, but retail keeps the next pointer and the zero in other registers
-// and loads the decoded position +0x0c once, so most instructions differ by
-// register. The 0x418-byte buffer reproduces retail's 0x41c-byte frame;
+// and swaps the origin/offset registers (ebp/ebx), so most instructions differ
+// by register. The 0x418-byte buffer reproduces retail's 0x41c-byte frame;
 // `result = 0` inside the loop reproduces retail's store (the source was likely
-// tail recursion).
+// tail recursion). The decoded position (+0x0c) read once into `position` and
+// cleared when not below `offset` gives retail's load-compare-clear (201 with
+// the ternary, which reads +0x0c twice); retail also threads the SEEK_CUR
+// test into the clear, which VC6 here repeats. A `decoded` local (194), a
+// `next` pointer for the chain walk (194), if/else-if origin checks (196 to
+// 208) and a goto past the decoded read (206) are worse.
 int UnknownTextureStream::Seek(int offset, int origin, int flag)
 {
     unsigned char buffer[0x418];
@@ -283,7 +288,12 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
     if (stream->field_0x08 && flag) {
         if ((origin == SEEK_END && offset != 0) || (origin == SEEK_CUR && offset < 0))
             return 1;
-        int position = origin != SEEK_CUR && stream->field_0x0c < offset ? stream->field_0x0c : 0;
+        int position = 0;
+        if (origin != SEEK_CUR) {
+            position = stream->field_0x0c;
+            if (position >= offset)
+                position = 0;
+        }
         if (origin == SEEK_SET || origin == SEEK_END) {
             result = fseek(stream->field_0x14, stream->field_0x10 + position, SEEK_SET);
             if (result) {
