@@ -21,6 +21,11 @@
 // lower pair early (fewer differing instructions, fewer strict bytes);
 // pixel1 alone in place, interleaved declarations and the lower pair
 // declared first are worse.
+// Session 10: retail reuses dx for pixel0 and pixel1; one reused `pixel`
+// variable for the upper pair gives that (40 differing instructions, 40
+// bytes) but still loads the lower pair at its tests; an inline by-value
+// AddPixel1555 helper for all four pixels compiles as the form here, and
+// with the upper pair read in place it is further off (28).
 //
 // Halve8 (0x004cee30, 1133 bytes; candidate 1093): the palette-index
 // halver. The search for the magenta entry, both block loops, the key test
