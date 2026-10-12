@@ -263,8 +263,8 @@ protected:
     float savedDistance;                      // +0x2c4 snapshot of followDistance (slots 49 and 71)
     float savedPitch;                         // +0x2c8 snapshot of followPitch
     float savedYaw;                           // +0x2cc snapshot of followYaw
-    float field_0x2d0;          // set with field_0x2d4 by 0x00463140
-    float field_0x2d4;          // 7.0f
+    float defaultFollowHeight;  // +0x2d0 set with followHeight by 0x00463140; restored when the view resets
+    float followHeight;         // +0x2d4 7.0f; height above the target the camera sits (points 4/8 raise and lower it)
     float lift;                      // +0x2d8, lift eased by VehicleCamera slot 35
     int pointCapacity;               // +0x2dc, capacity of points (0x00463140)
     int pointCount;                  // +0x2e0, number of entries in points
