@@ -129,7 +129,9 @@ callers' data flow, network message fields); every renamed field keeps its
 `// +0xNN` offset. The renames changed no calibration bytes. The ghost
 record and ghost fields FollowRacer.cpp (race lane) shares (`timeStep`,
 `position`, `runningTime`), the racer's `startPosition` and
-`receivedStates` (+0x11c8, each a received `state`) were renamed with it.
+`receivedStates` (+0x11c8, each a received `state`) and the ghost's
+`receivedStates` (+0x4fc, each holding a `record`) were renamed with it;
+the inline accessor for TrackGame+0x568's ghost is `GhostBike()`.
 Fields that `GameUiHelpers.cpp` or `KrustyVCR.cpp` also read (the gate
 node's centre, direction, half extents and next gate, the model's current
 detail level, the camera view's shadow caster and following flag, the VCR

@@ -35,15 +35,15 @@ void UnknownBikeRaceGhost::UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta
         step = (delta->step >> 1) * 8;
     else
         step = delta->step >> 1;
-    part->field_0x00.timeStep = step;
-    runningTime += part->field_0x00.timeStep;
-    part->field_0x00.runningTime = runningTime;
-    part->field_0x00.position = position;
-    part->field_0x00.field_0x04 = field_0x5e0;
-    part->field_0x00.field_0x1c = field_0x5ec;
-    part->field_0x00.field_0x10 = field_0x5f8;
-    part->field_0x00.field_0x14 = field_0x5fc;
-    part->field_0x00.field_0x18 = field_0x600;
+    part->record.timeStep = step;
+    runningTime += part->record.timeStep;
+    part->record.runningTime = runningTime;
+    part->record.position = position;
+    part->record.field_0x04 = field_0x5e0;
+    part->record.field_0x1c = field_0x5ec;
+    part->record.field_0x10 = field_0x5f8;
+    part->record.field_0x14 = field_0x5fc;
+    part->record.field_0x18 = field_0x600;
 }
 
 // 0x004a9d10

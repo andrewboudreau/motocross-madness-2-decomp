@@ -1485,7 +1485,7 @@ void BikeRace::UnknownFunction421050() {
 }
 
 // Inline: TrackGame+0x568's ghost bike, reloaded at each use.
-static inline UnknownBikeRaceGhost* UnknownFunctionGhost() {
+static inline UnknownBikeRaceGhost* GhostBike() {
     return (UnknownBikeRaceGhost*)g_TrackGame->field_0x568->field_0xdc;
 }
 
@@ -1780,34 +1780,34 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
     } else if (a == 0x11) {
         UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
         if (g_TrackGame->field_0x568 != 0 && g_TrackGame->field_0x568->field_0xdc != 0) {
-            UnknownFunctionGhost()->hasState = 1;
-            UnknownBikeRaceGhostPart* oldest = UnknownFunctionGhost()->field_0x4fc[3];
-            UnknownFunctionGhost()->field_0x4fc[3] = UnknownFunctionGhost()->field_0x4fc[2];
-            UnknownFunctionGhost()->field_0x4fc[2] = UnknownFunctionGhost()->field_0x4fc[1];
-            UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
-            UnknownFunctionGhost()->field_0x4fc[0] = oldest;
-            UnknownFunctionGhost()->field_0x4fc[0]->recordTime = time;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00 = *record;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
-            UnknownFunctionGhost()->field_0x4fc[0]->fresh = 1;
-            UnknownFunctionGhost()->position = record->position;
-            UnknownFunctionGhost()->field_0x5e0 = record->field_0x04;
-            UnknownFunctionGhost()->field_0x5ec = record->field_0x1c;
-            UnknownFunctionGhost()->field_0x5f8 = record->field_0x10;
-            UnknownFunctionGhost()->field_0x5fc = record->field_0x14;
-            UnknownFunctionGhost()->field_0x600 = record->field_0x18;
-            UnknownFunctionGhost()->runningTime = replayMode == 11 ? time : record->runningTime;
+            GhostBike()->hasState = 1;
+            UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
+            GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
+            GhostBike()->receivedStates[2] = GhostBike()->receivedStates[1];
+            GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
+            GhostBike()->receivedStates[0] = oldest;
+            GhostBike()->receivedStates[0]->recordTime = time;
+            GhostBike()->receivedStates[0]->record = *record;
+            GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
+            GhostBike()->receivedStates[0]->fresh = 1;
+            GhostBike()->position = record->position;
+            GhostBike()->field_0x5e0 = record->field_0x04;
+            GhostBike()->field_0x5ec = record->field_0x1c;
+            GhostBike()->field_0x5f8 = record->field_0x10;
+            GhostBike()->field_0x5fc = record->field_0x14;
+            GhostBike()->field_0x600 = record->field_0x18;
+            GhostBike()->runningTime = replayMode == 11 ? time : record->runningTime;
             *keep = 1;
             if (replayMode == 11) {
-                UnknownFunctionGhost()->field_0x4fc[1]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[0]->field_0x00;
-                UnknownFunctionGhost()->field_0x4fc[2]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[1]->field_0x00;
-                UnknownFunctionGhost()->field_0x4fc[3]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[2]->field_0x00;
-                UnknownFunctionGhost()->field_0x4fc[1]->recordTime = UnknownFunctionGhost()->field_0x4fc[0]->recordTime;
-                UnknownFunctionGhost()->field_0x4fc[2]->recordTime = UnknownFunctionGhost()->field_0x4fc[1]->recordTime;
-                UnknownFunctionGhost()->field_0x4fc[3]->recordTime = UnknownFunctionGhost()->field_0x4fc[2]->recordTime;
-                UnknownFunctionGhost()->field_0x4fc[1]->fresh = 1;
-                UnknownFunctionGhost()->field_0x4fc[2]->fresh = 1;
-                UnknownFunctionGhost()->field_0x4fc[3]->fresh = 1;
+                GhostBike()->receivedStates[1]->record = GhostBike()->receivedStates[0]->record;
+                GhostBike()->receivedStates[2]->record = GhostBike()->receivedStates[1]->record;
+                GhostBike()->receivedStates[3]->record = GhostBike()->receivedStates[2]->record;
+                GhostBike()->receivedStates[1]->recordTime = GhostBike()->receivedStates[0]->recordTime;
+                GhostBike()->receivedStates[2]->recordTime = GhostBike()->receivedStates[1]->recordTime;
+                GhostBike()->receivedStates[3]->recordTime = GhostBike()->receivedStates[2]->recordTime;
+                GhostBike()->receivedStates[1]->fresh = 1;
+                GhostBike()->receivedStates[2]->fresh = 1;
+                GhostBike()->receivedStates[3]->fresh = 1;
                 return 11;
             }
             return 1;
@@ -1817,17 +1817,17 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             return 1;
         }
         if (g_TrackGame->field_0x568 != 0 && g_TrackGame->field_0x568->field_0xdc != 0 &&
-            UnknownFunctionGhost()->hasState) {
-            UnknownBikeRaceGhostPart* oldest = UnknownFunctionGhost()->field_0x4fc[3];
-            UnknownFunctionGhost()->field_0x4fc[3] = UnknownFunctionGhost()->field_0x4fc[2];
-            UnknownFunctionGhost()->field_0x4fc[2] = UnknownFunctionGhost()->field_0x4fc[1];
-            UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
-            UnknownFunctionGhost()->field_0x4fc[0] = oldest;
-            UnknownFunctionGhost()->field_0x4fc[0]->recordTime = time;
-            UnknownFunctionGhost()->UnknownFunction4a9aa0((UnknownBikeRaceGhostDelta*)data,
-                                                          UnknownFunctionGhost()->field_0x4fc[0]);
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
-            UnknownFunctionGhost()->field_0x4fc[0]->fresh = 0;
+            GhostBike()->hasState) {
+            UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
+            GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
+            GhostBike()->receivedStates[2] = GhostBike()->receivedStates[1];
+            GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
+            GhostBike()->receivedStates[0] = oldest;
+            GhostBike()->receivedStates[0]->recordTime = time;
+            GhostBike()->UnknownFunction4a9aa0((UnknownBikeRaceGhostDelta*)data,
+                                                          GhostBike()->receivedStates[0]);
+            GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
+            GhostBike()->receivedStates[0]->fresh = 0;
             return 1;
         }
     } else if (a == 0x87) {

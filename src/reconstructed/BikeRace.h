@@ -772,7 +772,7 @@ struct UnknownBikeRaceGhostDelta {
 
 // One of the ghost's four received states (newest first).
 struct UnknownBikeRaceGhostPart {
-    UnknownBikeRaceGhostRecord field_0x00;
+    UnknownBikeRaceGhostRecord record;        // +0x00 the kind 0x11 record
     int recordTime;                           // +0x3c the record's time
     int fresh;                                // +0x40 fresh
 };
@@ -795,7 +795,7 @@ public:
 
     unsigned char field_0x000[0x4f8];
     int hasState;                             // +0x4f8 has a state
-    UnknownBikeRaceGhostPart* field_0x4fc[4];
+    UnknownBikeRaceGhostPart* receivedStates[4]; // +0x4fc newest first (0x00421d50 rotates them)
     unsigned char field_0x50c[0x5d4 - 0x50c];
     Vector3 position;                         // +0x5d4 position
     Vector3 field_0x5e0;
