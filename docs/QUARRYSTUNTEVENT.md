@@ -15,13 +15,13 @@ Evidence:
 Extent: `0x004de2a0..0x004e1fa7`. Quantize.cpp ends at `0x004de29f` and
 RaceSound's constructor starts at `0x004e1fb0`.
 
-Exact: 25 calibration cases:
+Exact: 26 calibration cases:
 - The constructor, the destructor and its deleting wrapper.
 - `Create` `0x004de3b0`.
 - Slots 10, 14, 23, 24, 27, 29, 30 and 34. Slots 14 and 34 are bodies that
   Wrecker's and Scene's vtables also use.
-- The three memory-estimate helpers, the message toggle `0x004e0c30` and
-  the clock reset `0x004e1f00`.
+- The three memory-estimate helpers, the race memory estimate `0x004e0560`,
+  the message toggle `0x004e0c30` and the clock reset `0x004e1f00`.
 - The eight `$E`.
 
 Source forms needed:
@@ -29,12 +29,14 @@ Source forms needed:
   `$E` code sits. Defining them at the top changes the constructor.
 - The render target is read through direct casts; an inline accessor
   changes the destructor's registers.
+- `0x004e0560` sums into a local and picks the field_0x560 constant with
+  an if/else assignment; with the ternary inside the return VC6 keeps
+  g_TrackGame in a register across the first loop and spills a count
+  (frame 0xc against retail's `push ecx`, 22 of 331).
 
-Near misses (`samples/game/QuarryStuntEventNearMisses.cpp`): the memory
-estimate `0x004e0560` (23 of 331 positions; retail's frame is one
-`push ecx` slot where VC6 here allocates 0xc bytes, which shifts every
-stack offset) and slot 12 `0x004e14a0` (166 of 1756; the prologue's
-register choice shifts the rest). The scores are the same with HEAD's
+Near miss (`samples/game/QuarryStuntEventNearMisses.cpp`): slot 12
+`0x004e14a0` (166 of 1756; the prologue's register choice shifts the
+rest). The score is the same with HEAD's
 headers.
 
 The loader `0x004de590` (7952 bytes) is a near miss in

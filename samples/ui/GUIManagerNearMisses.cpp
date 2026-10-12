@@ -28,6 +28,9 @@
 //   ternary, around its arms or around the centre leave it unchanged.
 //   Swept (tools/sweep_variants.py): a `CameraRect& area` alias on every
 //   subset of the four area reads x a text local x x/y order; best 89.
+//   Also <= 89 (48 forms): a `GUIUser* user` local, x and y as if/else
+//   assignments of locals (with a `half` local), a text local, a `tip = this`
+//   alias and an `int* p = position` local.
 // 0x00486b80 (553 bytes, ratio 0.97): retail computes the width limit as
 //   `sub eax, 2` (VC6 here: `add eax, -2`) and spills width/height into the
 //   SIZE slots later. VC6 emits `sub` only for a named `limit` local (the
@@ -46,7 +49,10 @@
 //   Also threaded (15/52): an inline owner helper (early returns or a
 //   ternary) with nested `if (owner) { if (owner == this) ... }`, `!= this`
 //   or `return owner == this;`, a `(GUIUser*)0` or `device != 0` ternary,
-//   a parenthesised ternary and an extra `hasOwner` local.
+//   a parenthesised ternary and an extra `hasOwner` local. Also threaded
+//   (6-18/52): `owner = 0; if (device) owner = ...` with nested tests, a
+//   `result` or `same` local, `return owner == this;` after a zero test, a
+//   nested ternary and a `while (owner)` wrapper.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 

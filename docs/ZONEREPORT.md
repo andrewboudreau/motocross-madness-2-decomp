@@ -7,7 +7,7 @@ These are methods of the TrackGame+0x3410 network object
 (`UnknownTrackGameObject3410`, `TrackGame.h`). Its lobby COM calls live in
 MSZoneInterface.cpp (`0x004aa350..`).
 
-## Matched (4 of 5 starts, strict exact)
+## Matched (5 of 5 starts, strict exact)
 
 - `0x0049c2f0` (763 bytes, `ret 4`). Reads the lobby preset through
   `0x004aa360`, parses it with the krusty2 Parser and stores the tags
@@ -28,6 +28,13 @@ MSZoneInterface.cpp (`0x004aa350..`).
   from `EventManager+0x50` entries, then sends them with `0x004aa670`. The
   record field names come from its debug labels (`FastestLap`,
   `TotalrunningTime`, `LargestSingleStuntPoints`).
+- `0x0049ca60` (4810 bytes, `ret 4`) converts between the lobby's
+  numbering and the game's. `0x0049c2f0` calls it with 1 (bike
+  manufacturer/type to the bike index `+0x2a0`, event type/location to
+  track name `+0x258` and variant `+0x254`) and `0x0049c770` with 2 (the
+  reverse; `+0x2a5` gets the 1-based track entry, matched with
+  `_stricmp`). It uses the bike-type counts `0x0056db00` and six local
+  track tables.
 
 Source forms that mattered:
 
@@ -39,29 +46,20 @@ Source forms that mattered:
 - In `0x0049c770` the induction register is the record base only when the
   loop indexes `field_0x2a4.field_0x08[i]` directly. A record pointer gives
   `record+8`.
+- In `0x0049ca60` the tables are six arrays initialised in the order
+  quarry, baja, national, supercross, tag, stunt (the string pool
+  `0x0056dc04..0x0056dda4` holds the names in the reverse order); the frame
+  rule then lays them out as retail does. Direction 2 computes the 1-based
+  type into its own local in each branch (`index - 27 + 1`,
+  `index - first + 1`) and stores it after the join; retail's
+  `add ebx, -0x1a` in the `>= 30` branch follows. Updating `index` in the
+  branches and adding 1 after the join increments after the join; adding
+  the 1 to `index` inside the else branch spills it (frame 0x5ac).
 
 Header changes: `UnknownParserList` gains its constructor (the shared
 one-dword-zero body `0x004aae20`). `UnknownTrackGameObject3410Base` gains
 the preset fields and `UnknownZoneRaceStatus`. The three methods return
 `int`, so the SelectGamePicProcs and EventManager bindings were renamed.
-
-## Open
-
-- `0x0049ca60` (4810 bytes) converts between the lobby's numbering and the
-  game's. `0x0049c2f0` calls it with 1 (bike manufacturer/type to the bike
-  index `+0x2a0`, event type/location to track name `+0x258` and variant
-  `+0x254`) and `0x0049c770` with 2 (the reverse; `+0x2a5` gets the 1-based
-  track entry, matched with `_stricmp`). It uses the bike-type counts
-  `0x0056db00` and six local track tables. Near miss in
-  `samples/net/ZoneReportNearMisses.cpp`, 4792 of 4810 bytes. The tables are
-  six arrays initialised in the order quarry, baja, national, supercross,
-  tag, stunt (the string pool `0x0056dc04..0x0056dda4` holds the names in
-  the reverse order); the frame rule then lays them out as retail does. The
-  1 of direction 2's 1-based type is added after the join: inside the else
-  branch VC6 forms `index + (1 - first)` with the register holding the
-  tables' constant 1 and spills the index (frame 0x5ac). Still different:
-  retail folds the 1 into the `>= 30` branch (`add ebx, -0x1a`) and
-  increments only in the else branch.
 
 ## Reproduce
 

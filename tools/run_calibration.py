@@ -26300,6 +26300,34 @@ CASES = [
         'target_size': 1267,
         'reason': 'matrix product written b * a (a(0, 3) loads first in the (0, 0) sum); rows copied x, y, z through m[][] in forward, up, position order (interleaved copies)',
     },
+    # s9/ui
+    {
+        'name': 'gameui.cpp list-row qsort compare',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '?UnknownFunction477800@@YAHPBX0@Z',
+        'target_va': '0x00477800',
+        'target_size': 243,
+        'reason': 'qsort comparison passed by 0x00477900; first comparator call through a control local (eax/edx as retail)',
+    },
+    {
+        'name': 'QuarryStuntEvent.cpp BaseQuarryEvent race memory estimate',
+        'bindings': 'src/reconstructed/QuarryStuntEvent.bindings.json',
+        'source': 'src/reconstructed/QuarryStuntEvent.cpp',
+        'symbol': '?UnknownFunction4e0560@BaseQuarryEvent@@QAEHXZ',
+        'target_va': '0x004e0560',
+        'target_size': 311,
+        'reason': 'between 0x004e04f0 and slot 27 0x004e06a0 in QuarryStuntEvent.cpp; sum in a local, field_0x560 constant by if/else (counts in edi/esi, push ecx frame)',
+    },
+    {
+        'name': 'ZoneReport.cpp 0x49ca60 lobby/game numbering',
+        'bindings': 'src/reconstructed/ZoneReport.bindings.json',
+        'source': 'src/reconstructed/ZoneReport.cpp',
+        'symbol': '?UnknownFunction49ca60@UnknownTrackGameObject3410@@QAEXH@Z',
+        'target_va': '0x0049ca60',
+        'target_size': 4810,
+        'reason': "track-name tables 'Quarry01'.., bike-type counts 0x0056db00; six arrays initialised quarry..stunt, direction 2's 1-based type computed per branch into a local",
+    },
     # s9/render
     {
         'name': 'Camera 0x42e550 viewport setup',

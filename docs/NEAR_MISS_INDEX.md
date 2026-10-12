@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 173, c 121, total 294. The three class (a) functions of the
+Counts: a 0, b 171, c 120, total 291. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -51,7 +51,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | game/EventManager | `0x0045e710` | 454/533 | c | 10 code diffs: `mov edx, [ecx + 0xc4c] ; mov [eax + 0x5~` vs `mov ecx, [ecx + 0xc4c] ; mov [eax + 0x5~`; `mov eax, [eax + 0x56c]` vs `mov edx, [eax + 0x56c]` |
 | game/Game | `0x00467b70` | 406/813 | b | 11 code diffs: `jne @128 ; pop edi ; pop esi` vs `je @227`; slot order differs |
 | game/PCGame | `0x004c0d10` | 1776/1790 | c | retail stores the surface description's size right after the memset, VC6 after pushing the 0x005119c0 arguments ; helpers, a derived-struct constructor, pointer/format locals and sizeof spellings do not move it (retail stores it after the pushes in the matched 0x004c5950) |
-| game/QuarryStuntEvent | `0x004e0560` | 22/331 | b | 30 code diffs: `sub esp, N` vs `push ecx`; retail lacks `xor ebx, ebx`; frame 0xc vs 0x0 |
 | game/QuarryStuntEvent | `0x004e14a0` | 166/1760 | b | 9 code diffs: `mov edx, [A] ; test edx, edx` vs `mov ecx, [A] ; test ecx, ecx`; `mov eax, [ecx + 0x26c0] ; lea edx, [eax~` vs `mov eax, [eax + 0x38] ; mov ecx, [eax +~`; slots differ |
 | game/QuarryStuntEventLoader | `0x004de590` | 397/7912 | b | camera argument fixed to 1.048f (retail 0x3f8624dd); 2074/2208 normalised insns align (was 2063); scalar stack slots and decision-tree registers left |
 | game/UiInfo | `0x00522440` | 383/427 | c | 2 diffs: retail schedules the +0x2828 store after `mov edx, 2` and places the second 0x1ec-byte rep movsd after the +0x196c store; ~21,000 store-order/copy-form/zeroing variants swept |
@@ -59,7 +58,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
-| io/FileStream | `0x00460db0` | 27/176 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp) |
+| io/FileStream | `0x00460db0` | 27/186 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp; the extent is 186 bytes, docs/FILESTREAM.md) |
 | io/FileStream | `0x00460f50` | 284/933 | c | 18 code diffs: VC6 here stores access[0] as well; candidate 933 of 957 bytes |
 | io/FileStream | `0x00461340` | 201/700 | c | 29 code diffs: retail loads the decoded position (+0x0c) once and keeps the next pointer in another register |
 | io/FileStream | `0x00461640` | 202/671 | c | 22 code diffs: retail keeps the advanced buffer pointer in a register |
@@ -120,7 +119,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
 | net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
-| net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index); parentheses, `index = index - 27`, `index += -27` and `field_0x29c = ++index` give identical bytes |
 | parser/Parser | `0x004b87f0` | 33/406 | b | prologue: retail pushes ebx/ebp/esi/edi before the null test, VC6 here pushes ebx/ebp after the early return (samples/parser/ParserNearMisses.cpp) |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
 | physics/bikeai/BikeAI | `0x00415640` | 6059/6112 | b | schedule and frame size match (squared distance and k dot grouped `z + ((x) + y)`); the one-use temporaries above +0x100 sit in other slots and the start-up zero vectors are stored x-first (retail z-first); the retail extent includes one nop of padding (candidate 6111 bytes) |
@@ -303,17 +301,16 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x004738a0` | 206/975 | b | 53 code diffs: `mov edi, [esi + 0x1bc] ; mov ebx, eax` vs `mov ecx, [esi + 0x1bc] ; lea ebx, [esi ~`; retail lacks `lea ebp, [esi + 0x1bc]`; frame 0x38 vs 0x40 |
 | ui/GameUi | `0x00474150` | 1018/1044 | c | Backspace: retail gives the cursor eax, VC6 here edx; one local (1004 length / 351 cursor), no locals (339), call as condition and swapped decrements (1002) are worse |
 | ui/GameUi | `0x00477110` | 356/646 | c | 12 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `mov [esp + N], eax ; mov ecx, [esi + 0x~` |
-| ui/GameUi | `0x00477800` | 78/242 | c | 2 register choices: `mov edx, [ecx + 0x218]` vs `mov eax, [ecx + 0x218]`; `mov eax, [A]` vs `mov edx, [A]` (flow and layout are retail's) |
 | ui/GameUi | `0x00477e90` | 322/342 | c | register choice after the row-height call: `mov edx, [esp + N] ; mov ecx, [ebx]` vs `mov ecx, [esp + N] ; mov edx, [ebx + 4]` (rect.top/point register choice) ; without the height local (as in the exact slot 10 at 0x476020) only ebx/ebp are swapped (155/344) |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
 | ui/GameUi | `0x00478e10` | 231/303 | c | frame and head are retail's (the area is tested in place, no RECT copy); the opaque-result tail differs as in UIButton slot 28 `0x004734c0` (retail returns through edi, 8-bit hit sets edi directly) |
 | ui/GameUi | `0x0047a400` | 320/962 | c | 21 code diffs: retail adds `mov [esi + 0x20c], ecx`; `mov [esi + 0x20c], ecx` vs `add ecx, ebp ; mov [esi + 0x210], edx ;~` |
-| ui/GameUi | `0x0047b490` | 116/220 | c | 14 code diffs: retail adds `mov esi, ecx`; `mov esi, ecx ; sar edx, 8 ; sar esi, 5` vs `sar esi, 8 ; sar edx, 5 ; and esi, 0xf8~` |
+| ui/GameUi | `0x0047b490` | 120/220 | c | the key pixel kept in the red term's variable stays in a register and the row counter spills into the key's slot as retail; VC6 ORs green and blue first where retail ORs red and green first, saves edi in the prologue (retail inside the row loop) and steps the row with one lea |
 | ui/KrustyUI | `0x004988a0` | 872/1104 | b | 8 code diffs: `mov edx, [esi + 0x2c] ; mov eax, [esp +~` vs `mov eax, [esi + 0x2c] ; mov ecx, [esp +~`; `mov edx, [eax + 0xc0] ; mov [edx + 0x5c~` vs `mov eax, [eax + 0xc0] ; mov [eax + 0x5c~`; slots differ |
 | ui/ProCircuitProcs | `0x004d72c0` | 1125/1291 | b | 11 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
-| ui/ProCircuitProcs | `0x004d8fc0` | 750/882 | c | 45 code diffs: retail adds `mov fs:[X], esp`; retail lacks `mov fs:[X], esp` |
-| ui/ProCircuitProcs | `0x004d9860` | 225/1123 | b | 20 code diffs: retail adds `mov fs:[X], esp ; sub esp, N`; retail lacks `mov fs:[X], esp ; sub esp, 0x84`; frame 0x0 vs 0x84 |
+| ui/ProCircuitProcs | `0x004d8fc0` | 836/882 | c | 12 instruction diffs: retail loads the message kind into ecx before the circuit (VC6 here: circuit first, kind in eax) and stores the fee member first with other registers |
+| ui/ProCircuitProcs | `0x004d9860` | 1068/1122 | c | 13 instruction diffs: the prologue and init-store differences of `0x004d8fc0` |
 | ui/ProCircuitProcs | `0x004d9cd0` | 48/755 | c | 37 code diffs: retail adds `mov eax, [A]`; retail adds `mov ebp, [eax + 0x3444]` |
 | ui/SelectGamePicProcs | `0x004f2340` | 933/2148 | b | 62 code diffs: `mov [esp + N], ecx` vs `push esi`; `push esi` vs `mov [esp + N], ecx`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f3720` | 92/380 | b | 10 code diffs: retail lacks `jmp @44 ; lea ecx, [esp + N] ; push 0x80`; slots differ |

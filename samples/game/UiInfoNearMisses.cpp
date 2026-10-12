@@ -15,6 +15,8 @@
 // both copies at every position (moving the second copy later costs
 // 100+ bytes). Earlier passes also tried a reference or pointer alias of
 // field_0x27f8 for the stores and the memcpy sources (32 combinations).
+// An inline settings-reset helper over the 13 stores (720 variants) turns
+// them into [eax + N] stores (174, 394 bytes).
 //
 // TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 190 of 357.
 // The found block written once after the CD retry (`if (file) { ...; return
@@ -23,7 +25,9 @@
 // edx, eax there); VC6 here gives `file` edx for its whole life and copies
 // it right after each fopen. Nested/goto/condition forms, a combined
 // `!file && ... && (FindCdDirectory() || WaitForCd())` retry and an inline
-// found helper taking the file by value were tried.
+// found helper taking the file by value were tried, and so were `!file`/
+// `file == 0` x three second-fopen forms x five found-block forms (30, best
+// 190; an `int found` flag scores 191 but grows the function to 387 bytes).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -26,6 +26,17 @@ ends with the shared dialog deleting destructor and its vector set:
   the set at 159-162 (`0x004986b0..0x004987a0`, just before the
   constructor).
 
+## Menu ids
+
+`OpenMenu` stores its argument at +0x3c and constructs one dialog per id;
+`src/reconstructed/MenuId.h` names each id after that dialog's RTTI class
+(`kMenuMain` 100 = `MainDlg`, `kMenuExit` 0x191 = `ExitDlg`, ...). Ids that
+share a dialog (0x85c/0x85d, 0x866-0x868, 0x910/0x911, 0xbb9-0xbbb) keep
+their number as a suffix, as does 0x88e, which opens one of four dialogs.
+KrustyUI.cpp, DlgProcs.cpp, EventManager.cpp and ProCircuitProcs.cpp use the
+names; including the header in SelectGamePicProcs.cpp changes VC6's code for
+`FillFileList` `0x004f17a0`, so that file keeps the numbers.
+
 ## Status
 
 Exact (43 functions, including the open-menu routine `OpenMenu` `0x00499b20`):

@@ -16,7 +16,7 @@ Extent: `0x00469db0..0x0047b66f`. Evidence:
 - **Vtables:** UIDialog `0x00552a9c` through UIProgressBar `0x00553c68`.
 - **`$E`:** its four kVec3 initializers sit at `0x0046e870..0x0046ea5b`.
 
-Exact: 323 functions compile strict-exact from GameUi.cpp. 316 are
+Exact: 324 functions compile strict-exact from GameUi.cpp. 317 are
 registered as calibration cases, including the 13 drawing, input and layout
 functions in the file's last section ("Drawing and input slots"), the ten
 promoted from the near-miss sample (UIControl slots 22, 23 and 41, UIScrollBar
@@ -40,9 +40,13 @@ UIDDLListBox constructor case (`0x00479d10`) is re-keyed to its retail argument 
 The UIControl constructor, destructor and deleting destructor (`0x00470170`,
 `0x00470450`, `0x00470430`) and the UIListBox constructor (`0x00475c70`) are
 registered too, as are UIScrollCtl slots 55 and 60 (`0x00474880`,
-`0x004749f0`) and UIDDLScrollBar slot 57 (`0x00479710`).
+`0x004749f0`), UIDDLScrollBar slot 57 (`0x00479710`) and the list-row qsort
+comparison `0x00477800`.
 
 Source forms the promoted functions needed (each one byte-exact only this way):
+- qsort comparison `0x00477800`: the first comparator call goes through a
+  `UIListBox* control` local; calling through the expression puts that
+  temporary in edx and the next global load in eax (78/243).
 - UIScrollCtl slots 55 (`0x00474880`) and 60 (`0x004749f0`): each branch (or
   case) carries its own copy of the event tail (`UnknownFunction472730`, the
   event, slot 29 and, in slot 55, the repeat timer). VC6 cross-jumps one copy
@@ -229,7 +233,7 @@ Other header facts:
   `ShowDialog` passes its int `b` and `d` as the area and the name).
 - GameObject.h befriends UICtlContainer, UIControl and UIDialog.
 
-Near misses (`samples/ui/GameUiNearMisses.cpp`): 22 functions, listed with
+Near misses (`samples/ui/GameUiNearMisses.cpp`): 21 functions, listed with
 their differences at the top of the sample, among them UIListBox `0x00477110`
 (adds an image row and returns 0/1; retail places the epilogue after the
 stream-failure block), several list-box and scroll slots and the resource

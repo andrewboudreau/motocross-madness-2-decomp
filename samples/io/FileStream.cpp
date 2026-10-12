@@ -24,7 +24,11 @@
 //   helpers taking the stream, a char* or a char&, a char& key alias for some
 //   or all uses and `p` set before strlen; strcpy(name + strlen) gives 166.
 //   Storing the seed before _splitpath matches the lea esi but moves the store ahead
-//   of the call; storing it after strlen also leaves 2 differences.
+//   of the call; storing it after strlen also leaves 2 differences. The
+//   store after `char* p = name;` puts the lea esi where retail has it (one
+//   instruction difference, 255/282) but sinks the store to just before the
+//   jle; `strlen(strcat(..))` (183), `p = strcat(..)` (172) and strcat or
+//   strlen through `p` (225) are worse.
 // - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
 //   VC6 here pushes them from the stack. Register locals, a helper for the fseek
 //   block and an unsigned count do not change it.
@@ -45,7 +49,9 @@
 //   A later 88-variant sweep (fseek `!= 0`, a result local, FILE* locals or
 //   references for some or all reads of field_0x14, comma zeroing, ternary,
 //   else and positive encoded returns, the top-level branch inverted) stays
-//   at 136 or below.
+//   at 136 or below. Locals for buffer, size, count and the file in all 24
+//   read orders keep the fwrite tail at 136; the same for the encoded call
+//   (with a `char* key` local) gives 75.
 // - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
 //   pointer in a different register; the `position` ternary, an explicit if/else
 //   and assigning position before the zero test all give the same or worse code.
@@ -96,7 +102,8 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // into different registers), and stores field_0x08 = 0 as an immediate; VC6 here
 // merges the whole first block into the second and stores fseek's zero result.
 // The plain ||, &&, goto, nested, result-variable and seek-helper shapes compile
-// to the same or worse code.
+// to the same or worse code; so do inline SeekOrClose/SeekOnly helpers for either
+// or both blocks and `!= 0` tests (27/186 over the whole 186-byte extent).
 int UnknownTextureStream::UnknownFunction460db0()
 {
     if (fseek(field_0x14, 0, SEEK_SET)) {

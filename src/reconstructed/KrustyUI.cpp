@@ -16,6 +16,7 @@
 #include "TrackGame.h"
 #include "DlgProcs.h"
 #include "InGameProcs.h"
+#include "MenuId.h"
 #include "NetProcs.h"
 #include "ProCircuitProcs.h"
 #include "SelectGamePicProcs.h"
@@ -502,51 +503,51 @@ void KrustyUI::OpenMenu(int menu) {
         field_0x34 = field_0x3c;
     field_0x3c = menu;
     switch (menu) {
-    case 100:
+    case kMenuMain:
         dialog = new(__FILE__, 674) MainDlg;
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         g_TrackGame->UnknownFunction468880();
         break;
-    case 101:
+    case kMenuSinglePlayer:
         dialog = new(__FILE__, 681) SinglePlayerDlg;
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
-    case 102:
+    case kMenuOptions:
         dialog = new(__FILE__, 685) OptionsDlg;
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
-    case 104:
+    case kMenuLoading:
         if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
             g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
         dialog = new(__FILE__, 695) LoadingDlg(1);
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
-    case 0x85c:
-    case 0x85d:
+    case kMenuHostJoin85c:
+    case kMenuHostJoin85d:
         dialog = new(__FILE__, 727) HostJoinDlg;
         field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x866:
-    case 0x867:
-    case 0x868:
+    case kMenuMultiPlayer866:
+    case kMenuMultiPlayer867:
+    case kMenuMultiPlayer868:
         dialog = new(__FILE__, 733) MultiPlayerDlg;
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
-    case 0xd8:
+    case kMenuSerialPopup:
         dialog = new(__FILE__, 737) SerialPopupDlg;
-        field_0x2c->ShowDialog(dialog, 0xd8, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        field_0x2c->ShowDialog(dialog, kMenuSerialPopup, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0xd9:
+    case kMenuTCPAddress:
         dialog = new(__FILE__, 741) TCPAddressDlg;
         field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x88f:
+    case kMenuPCCentral:
         if (g_TrackGame->field_0x3444) {
             dialog = new(__FILE__, 747) PCCentralDlg;
             field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
         }
         break;
-    case 0x88e: {
+    case kMenu88e: {
         UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
         if (circuit) {
             if (circuit->field_0x1285[circuit->field_0x40].field_0x08 == circuit->field_0x44) {
@@ -556,52 +557,52 @@ void KrustyUI::OpenMenu(int menu) {
             }
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 1) {
                 dialog = new(__FILE__, 760) PCLastRaceDlg;
-                field_0x2c->ShowDialog(dialog, 0x88e, 2, 0, 0, 0, 0, 1);
+                field_0x2c->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
             } else {
                 dialog = new(__FILE__, 763) PCCentralDlg;
                 field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             }
         } else if (g_TrackGame->field_0x18 == 1) {
             dialog = new(__FILE__, 767) SinglePlayerDlg;
-            field_0x2c->ShowDialog(dialog, 0x88e, 2, 0, 0, 0, 0, 1);
+            field_0x2c->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         } else {
             dialog = new(__FILE__, 769) MultiPlayerDlg;
-            field_0x2c->ShowDialog(dialog, 0x88e, 2, 0, 0, 0, 0, 1);
+            field_0x2c->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         }
         break;
     }
-    case 0xfc:
+    case kMenuWaitOrCall:
         dialog = new(__FILE__, 774) WaitOrCallDlg;
         field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x910:
-    case 0x911:
+    case kMenuTrackRecord910:
+    case kMenuTrackRecord911:
         dialog = new(__FILE__, 788) TrackRecordDlg;
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
-    case 0xbb9:
-    case 0xbba:
-    case 0xbbb:
+    case kMenuUserNameBb9:
+    case kMenuUserNameBba:
+    case kMenuUserNameBbb:
         dialog = new(__FILE__, 798) UserNameDlg;
         field_0x2c->ShowDialog(dialog, menu, 0xc, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x12f:
+    case kMenuRemoveProfile:
         dialog = new(__FILE__, 802) RemoveProfileDlg;
         field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x1f9:
+    case kMenuConnectError:
         dialog = new(__FILE__, 806) ConnectErrorDlg;
-        field_0x2c->ShowDialog(dialog, 0x1f9, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        field_0x2c->ShowDialog(dialog, kMenuConnectError, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x1fa:
+    case kMenuPlayerRemoved:
         dialog = new(__FILE__, 810) PlayerRemovedDlg;
-        field_0x2c->ShowDialog(dialog, 0x1fa, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        field_0x2c->ShowDialog(dialog, kMenuPlayerRemoved, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
         break;
-    case 0x191:
+    case kMenuExit:
         dialog = new(__FILE__, 817) ExitDlg;
-        field_0x2c->ShowDialog(dialog, 0x191, 0x1c, 0, 0, 0, 0, 1);
+        field_0x2c->ShowDialog(dialog, kMenuExit, 0x1c, 0, 0, 0, 0, 1);
         break;
-    case 0x190:
+    case kMenuContinue:
         dialog = new(__FILE__, 822) ContinueDlg;
         field_0x2c->ShowDialog(dialog, menu, 0x1c, 0, 0, 0, 0, 1);
         break;

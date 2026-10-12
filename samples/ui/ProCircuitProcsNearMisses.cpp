@@ -12,8 +12,15 @@
 //   points/paid/+0x30 statements, a winnings local, an AddStats inline
 //   helper (pointer or reference), a by-value net helper or a stats pointer
 //   are worse.
-// PCBailoutDlg::UnknownVirtualSlot29 (0x004d8fc0, 882 bytes, 750 match) and
-// PCBunnyDlg::UnknownVirtualSlot29 (0x004d9860, 1120 bytes): retail loads the
+// PCBailoutDlg::UnknownVirtualSlot29 (0x004d8fc0, 882 bytes, 836 match) and
+// PCBunnyDlg::UnknownVirtualSlot29 (0x004d9860, 1122 bytes, 1068 match): the
+//   init case reads the fee and the cash into locals and stores the fee
+//   member last; that gives retail's ecx/edx choices from the first
+//   FindControl call on (750 and 225 with the fee member stored first, as
+//   retail does: its fee goes to ecx with `mov edx, ecx; mov ecx, esi;
+//   sub edx, eax`, and every fee-first form restores the old registers;
+//   all fee/cash store orders, chained and embedded assignments were
+//   swept). What remains: retail loads the
 //   message kind into ecx after moving `this` to esi and before loading
 //   TrackGame+0x3444 (the reverse here), and picks ecx/edx the other way for
 //   the TrackGame/module temporaries. Local order, scopes and a `kind` copy do
@@ -27,7 +34,11 @@
 // PCBonusTrackDlg::UnknownVirtualSlot29 (0x004d9cd0, 752 bytes): the same
 //   prologue difference, and retail copies the circuit pointer from ebp to
 //   edi for the init case (VC6 here keeps one register; `current = circuit`
-//   and using `circuit` directly compile the same).
+//   and using `circuit` directly compile the same). The init stores placed
+//   before `current = g_TrackGame->field_0x3444` match everything after them
+//   (19 instruction diffs) but reload `current` (766 bytes); references,
+//   casts, inline getters, helper parameters and declaration orders for
+//   `current`/`circuit` all give 48.
 // PCCentralBikeRiderDlg::UnknownVirtualSlot10 (0x004d72c0, 1291 bytes, 1233
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
@@ -97,9 +108,11 @@ void PCBailoutDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        entryFee = circuit->field_0x1229[circuit->field_0x40];
-        playerCash = circuit->field_0x465[0].field_0x30;
-        cashShortfall = entryFee - playerCash;
+        int fee = circuit->field_0x1229[circuit->field_0x40];
+        int cash = circuit->field_0x465[0].field_0x30;
+        playerCash = cash;
+        cashShortfall = fee - cash;
+        entryFee = fee;
         UnknownSetText(FindControl("TitleText", 12), 0x144a);
         UIControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;
@@ -149,9 +162,11 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     switch (event->kind) {
     case kDialogInit: {
         int debt = circuit->field_0x465[0].field_0x34;
-        field_0x7f58 = circuit->field_0x1229[circuit->field_0x40];
-        field_0x7f5c = circuit->field_0x465[0].field_0x30;
-        field_0x7f60 = field_0x7f58 - field_0x7f5c + debt;
+        int fee = circuit->field_0x1229[circuit->field_0x40];
+        int cash = circuit->field_0x465[0].field_0x30;
+        field_0x7f5c = cash;
+        field_0x7f60 = fee - cash + debt;
+        field_0x7f58 = fee;
         UnknownSetText(FindControl("TitleText", 12), 0x1452);
         UIControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;

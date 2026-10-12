@@ -19,7 +19,13 @@
 //   same fragments, so the choice is an allocation tie-break. A
 //   `UIControl* self = this;` copy used for any subset of the 13 member
 //   accesses (120 of 8192 sampled with tools/sweep_variants.py) is folded
-//   away: every form gives 91.
+//   away: every form gives 91. Also 91/85: casts on the colours and on
+//   `enabled` in the comparison (18 forms), template inline helpers taking
+//   `T*` (10), 1-8 extern ints or 1-5 forward structs declared before the
+//   functions (54), dead statements at the start of the function and of each
+//   branch (125), function order, and in a standalone TU every int/unsigned/
+//   long type for the states, `enabled` and the colours (char and short
+//   `enabled` are worse).
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places
@@ -30,16 +36,6 @@
 //   if-block, goto, an early stream-failure return and the whole body inside
 //   `if (rowCount < rowCapacity || grow)` with one trailing `return 0` were
 //   tried.
-// 0x00477800 qsort compare (78/242): the flow and block layout are retail's
-//   (one `result` initialised to 0, the probe loop as `while (1)` with its
-//   exit tests as breaks; `while (cond)` and `for (;;)` rotate it). Retail
-//   puts the first control temporary in eax and the next global load in edx;
-//   VC6 here swaps the two (no declaration-shift k changes it; early returns,
-//   a local list pointer and local order do not either). An early
-//   `return 0` for a missing list with `if (result) return result;` gives
-//   retail's later edx/eax pair but duplicates the epilogues (4/234); the
-//   same returns inside the list test, a result declared without an
-//   initialiser and an assignment in the condition move the layout too.
 // 0x00477e90 UIListBox slot 55 (322/342): an `int height` local for the
 //   first GetRowHeight call gives retail's ebx (point) and ebp (row offset);
 //   without it (155/344) the two are swapped. With the local, retail still
@@ -53,17 +49,27 @@
 //   local (`rect.bottom = rect.top + GetRowHeight(row);`, as in the exact
 //   UIListBox slot 10 at 0x00476020) matches retail apart from the
 //   ebx/ebp swap (ebp makes `[ebp]` take a disp8, so 344 bytes); no
-//   declaration shift (k = 0..63) changes either form.
-// 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi,
-//   the width in edx and spills the row counter into the key's argument
-//   slot; VC6 here spills the pixel instead. Hoisting the width or
-//   reordering the red/green/blue terms moves the register pressure
-//   elsewhere; retail ORs red|green then blue, and no term order,
-//   parenthesisation or `pixel |=` split changes VC6 here's blue-first
-//   chain. Retail places `return 0` before `return found` after Unlock;
-//   `if (!Unlock) return 0; return found;` becomes neg/sbb/and, early
-//   returns for a failed Lock duplicate the epilogue, and goto, result
-//   variable, while/for row loops and a row pointer do not give it.
+//   declaration shift (k = 0..63) changes either form. An inline helper
+//   `HitRow(rect, GetRowHeight(row), point)` storing `r.bottom = r.top + h`
+//   gives retail's `add eax, <top>` (319/342, 11 instruction diffs); VC6
+//   then still loads point->x before y.
+// 0x0047b490 colour-key test (120/220): keeping the key pixel in the red
+//   term's variable (`pixel |= green | blue`) keeps it in a register and
+//   spills the row counter into the key's argument slot as retail does;
+//   VC6 still ORs green|blue first where retail ORs red|green then blue
+//   (no term order, parenthesisation or split changes the chain). The
+//   strict 120 form tests `x < width` after the inner loop; the
+//   structurally closest form (14 instruction diffs, 54 strict: the extent
+//   shifts) keeps `found = 1; break;` in the inner loop and walks a row
+//   pointer initialised in the for (`for (rows = .., row = bits; ..)`).
+//   It still differs in the OR chain, in retail's edi save inside the row
+//   loop (VC6 here copies the row pointer before the rows test, so edi is
+//   saved in the prologue) and in the row step (retail `lea eax, [edx +
+//   edx]; add edi, eax`, VC6 here `lea edi, [edi + edx*2]`; a char* step
+//   and `&row[width]` give the same). Retail places `return 0` before
+//   `return found` after Unlock; `if (!Unlock) return 0; return found;`
+//   becomes neg/sbb/and, early returns for a failed Lock duplicate the
+//   epilogue, and goto, result variable and while row loops do not give it.
 // 0x00472960 UIFrame constructor from a file (352/562): retail places the
 //   sprintf (image missing) block after the epilogue, jumping back to the
 //   `if (image)` free test; VC6 here lays it inline and threads its jump past
@@ -85,6 +91,18 @@
 //   each format branch (cross-jumped) puts the result in ebp (76/323). A
 //   `result = opaque` copy before Unlock (returned once or from both arms of
 //   the Unlock test, or as `Unlock ? opaque : opaque`) is propagated away.
+//   Also 256 or worse (20-form sweep): an explicit `else opaque = 0` in the
+//   8-bit test (246), `opaque = byte != key`, `else if` and `format == 8 &&`
+//   chains, crossed with a `result` copy, an ignored Unlock result and an
+//   `Unlock(0) != 0` test. Setting `result = 1` and jumping to the unlock in
+//   the 8-bit branch (`goto unlock`; the 16-bit branch keeps `opaque = 1`
+//   and falls into `result = opaque;`) gives retail's prologue and
+//   `mov edi, 1; jmp` (266/354, 332 bytes; 240/303 at 307 bytes for
+//   0x00478e10), but VC6 still sets edi for the 16-bit hit instead of
+//   writing the memory result, drops retail's dead `test eax, eax` after
+//   Unlock and folds the Lock-failure return into `xor eax, eax`: retail
+//   never treats `opaque` as a known constant. Not kept (a goto for a
+//   partial gain).
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
@@ -96,7 +114,11 @@
 //   and the locals before the call (worse) were tried. Also worse
 //   (2026-10-11): only one of the two locals (1004 with `length`, 351 with
 //   `cursor`), neither (339), the call as the if condition, and the two
-//   decrements in the other order (1002).
+//   decrements in the other order (1002). Also <= 1008 (about 60 forms): a
+//   `char* text` local, `cursor + controlText`, a `count` local,
+//   `&controlText[cursor]` with `length + 1 - cursor`, length-first stores,
+//   an Enter-case reorder and all 6 declaration orders x 3 lead-test forms
+//   x 3 decrement forms.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects
@@ -223,35 +245,6 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     return 1;
 }
 
-// 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
-static int UnknownFunction477800(const void* a, const void* b) {
-    int result = 0;
-    if (g_UnknownGlobal65b608->sortingList) {
-        result = g_UnknownGlobal65b608->sortingList->field_0x218_control->field_0x24c(a, b);
-        if (!result) {
-            int left = ((const UnknownGameUiListRow*)a)->sortIndex;
-            int right = ((const UnknownGameUiListRow*)b)->sortIndex;
-            GameObjectIterator* iterator =
-                (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
-            while (1) {
-                UIListBox* other = static_cast<UIListBox*>(
-                    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator));
-                if (!other)
-                    break;
-                if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
-                    result = -1;
-                    break;
-                }
-                result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
-                if (result)
-                    break;
-            }
-            g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
-        }
-    }
-    return result;
-}
-
 // 0x00477e90
 int UIListBox::UnknownVirtualSlot55(int a, int b) {
     POINT* point = (POINT*)b;
@@ -290,34 +283,34 @@ int UnknownFunction47b490(TextureMap* texture, int key) {
     int found = 0;
     unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, 0, 0x11);
     if (bits) {
-        int red;
+        int pixel;
         int green;
         if (texture->field_0x20 == 0x235) {
-            red = (key >> 8) & 0xf800;
+            pixel = (key >> 8) & 0xf800;
             green = (key >> 5) & 0x7e0;
         } else if (texture->field_0x20 == 0x22b) {
-            red = (key >> 9) & 0x7c00;
+            pixel = (key >> 9) & 0x7c00;
             green = (key >> 6) & 0x3e0;
         } else {
             goto unlock;
         }
-        {
-            int pixel = red | green | ((key >> 3) & 0x1f);
-            if (pixel) {
-                for (int rows = texture->field_0x18; rows > 0; rows--) {
-                    for (int x = 0; x < texture->field_0x14; x++) {
-                        if (bits[x] == pixel) {
-                            found = 1;
-                            break;
-                        }
-                    }
-                    bits += texture->field_0x14;
+        pixel |= green | ((key >> 3) & 0x1f);
+        if (pixel) {
+            for (int rows = texture->field_0x18; rows > 0; rows--) {
+                int x;
+                for (x = 0; x < texture->field_0x14; x++) {
+                    if (bits[x] == pixel)
+                        break;
                 }
+                if (x < texture->field_0x14)
+                    found = 1;
+                bits += texture->field_0x14;
             }
         }
 unlock:
-        if (texture->UnknownVirtualSlot14(0))
-            return found;
+        if (!texture->UnknownVirtualSlot14(0))
+            return 0;
+        return found;
     }
     return 0;
 }
