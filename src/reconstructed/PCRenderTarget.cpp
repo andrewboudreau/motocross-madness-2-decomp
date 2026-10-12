@@ -79,6 +79,53 @@ int PCRenderTarget::UnknownVirtualSlot14(void* viewport) {
     return device->SetViewport(viewport) == 0;
 }
 
+// 0x004c5510: resets the primitive counters and clears `rect`, else the
+// current camera's viewport, else the whole target. Flags 0 clear the Z
+// buffer, plus the target in wireframe or when clearTarget is set. The shared
+// `failed` exit and the left/right/top/bottom store order give retail's
+// layout (three Clear calls, two of them sharing one result test).
+int PCRenderTarget::UnknownVirtualSlot12(const CameraRect* rect, int flags) {
+    verticesDrawn = 0;
+    pointsDrawn = 0;
+    linesDrawn = 0;
+    trianglesDrawn = 0;
+    if (!targetDisplay->isPowerVR) {
+        int clearFlags = flags;
+        if (!clearFlags) {
+            if (fillMode == D3DFILL_WIREFRAME)
+                clearFlags = D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER;
+            else
+                clearFlags = (clearTarget ? D3DCLEAR_TARGET : 0) | D3DCLEAR_ZBUFFER;
+        }
+        CameraRect area;
+        if (rect) {
+            area.left = rect->left;
+            area.right = rect->right;
+            area.top = rect->top;
+            area.bottom = rect->bottom;
+            if (device->Clear(1, &area, clearFlags, clearColor, zClearValue, 0))
+                goto failed;
+        } else if (currentCamera) {
+            area.left = 0;
+            area.right = currentCamera->field_0x1a0[2] + currentCamera->field_0x1a0[0];
+            area.top = 0;
+            area.bottom = currentCamera->field_0x1a0[3] + currentCamera->field_0x1a0[1];
+            if (device->Clear(1, &area, clearFlags, clearColor, zClearValue, 0))
+                goto failed;
+        } else {
+            area.left = 0;
+            area.right = targetWidth;
+            area.top = 0;
+            area.bottom = targetHeight;
+            if (device->Clear(1, &area, clearFlags, clearColor, zClearValue, 0))
+                goto failed;
+        }
+    }
+    return 1;
+failed:
+    return 0;
+}
+
 // 0x004c56e0: skips states whose cached value already matches unless forced.
 void PCRenderTarget::UnknownVirtualSlot8(int state, int value, int force) {
     if (force || renderStates[state].value != value) {

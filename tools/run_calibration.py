@@ -26373,6 +26373,15 @@ CASES = [
         'target_size': 643,
         'reason': 'TGA header test as if (header) {...} else return 0 puts the epilogue after the stream-failure block; row.flags = b after the frame size gives retail eax/ecx/edx',
     },
+    {
+        'name': 'PCRenderTarget clear 0x4c5510',
+        'bindings': 'src/reconstructed/PCRenderTarget.bindings.json',
+        'source': 'src/reconstructed/PCRenderTarget.cpp',
+        'symbol': '?UnknownVirtualSlot12@PCRenderTarget@@UAEHPBUCameraRect@@H@Z',
+        'target_va': '0x004c5510',
+        'target_size': 299,
+        'reason': 'goto failed in each Clear arm (not return 0) keeps retail layout; left/right/top/bottom store order; ternary D3DCLEAR_TARGET flag gives xor+setne',
+    },
 ]
 
 def main():

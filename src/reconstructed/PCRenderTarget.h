@@ -37,7 +37,7 @@ public:
     virtual long UnknownVirtualSlot9(int state, int* value);
     virtual void UnknownVirtualSlot10(int mode, int textureAlpha);
     virtual long UnknownVirtualSlot11(int stage);
-    virtual int UnknownVirtualSlot12(const CameraRect* rect, int flags); // 0x004c5510: near miss (samples/render)
+    virtual int UnknownVirtualSlot12(const CameraRect* rect, int flags); // 0x004c5510
     virtual int UnknownVirtualSlot13(int format);
     virtual int UnknownVirtualSlot14(void* viewport);
     virtual int UnknownVirtualSlot15(int type, int vertexFormat, int vertices, int vertexCount,

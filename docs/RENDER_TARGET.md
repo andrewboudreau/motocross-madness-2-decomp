@@ -65,6 +65,7 @@ value already matches unless forced.
 | 8 | `0x004c56e0` | 54 | Cached render-state set |
 | 9 | `0x004c5720` | 22 | Device method 21 result |
 | 11 | `0x004c5930` | 22 | Device method 35 with a null texture |
+| 12 | `0x004c5510` | 299 | Clear: resets the primitive counters, then (unless PowerVR) device method 10 on `rect`, else the camera viewport, else the whole target; flags 0 mean Z, plus the target in wireframe or with +0x34 |
 | 14 | `0x004c54f0` | 22 | Device method 13 succeeded (Camera's viewport) |
 | 19 | `0x004c5ed0` | 42 | Render states 0x19 = 5, 0x18 = 0, 0x0f = 0, unforced |
 
@@ -86,9 +87,11 @@ RenderTarget fields: +0x20 Z depth, +0x24 memory caps (0x4000/0x800), +0x28
 pixel format, +0x2c Z clear value (float 1.0), +0x30 clear colour, +0x34
 stencil flag, +0x38..+0x44 per-frame primitive counters (reset by slot 12).
 
-Near miss (`samples/render/PCRenderTargetNearMisses.cpp`): slot 12
-`0x004c5510` (Clear), 44/275 — register allocation and the merging of the
-three Clear calls.
+Slot 12's source forms: each arm's failed Clear is `goto failed` to one
+`return 0` after `return 1` (with `return 0` in the arms VC6 cross-jumps the
+calls themselves and moves the success exit to the end), the rectangles are
+written left, right, top, bottom (retail's store schedule), and the target
+bit is `(field_0x34 ? D3DCLEAR_TARGET : 0)` (`!= 0` gives `and edx, 0xff`).
 
 ## Function names
 

@@ -33,5 +33,6 @@
   "_fclose": "0x00534c3d",
   "_fopen": "0x00534ceb",
   "_s_screenshotIndex": "0x0068995c",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?UnknownVirtualSlot12@PCRenderTarget@@UAEHPBUCameraRect@@H@Z": "0x004c5510"
 }
