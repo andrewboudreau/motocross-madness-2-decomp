@@ -74,6 +74,12 @@ scalar deleting destructor and destructor, slots 7, 8, 11 and 19, and
 `0x00510820` (records a use: count, largest value up to 9, manager frame),
 `0x00510910`, `0x00510990` (log2 of the width) and `0x005109b0`.
 
+Provisional names from that behaviour: `UpdatePageCoords` `0x00510610`,
+`ReleasePage` `0x00510700`, `RemapTexCoords` `0x00510780`, `RecordUse`
+`0x00510820`, `RemapTexCoordsIfMoved` `0x00510910` and `SizeLevel`
+`0x00510990`. `0x00510670` keeps its address name because
+BikeNumberPainter.cpp calls it.
+
 ## ManagedTextureGroup
 
 RTTI: `ManagedTextureGroup : BaseObject` (vtable `0x005583c0`, 0x258 bytes).

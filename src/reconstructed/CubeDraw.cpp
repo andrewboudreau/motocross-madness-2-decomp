@@ -119,7 +119,7 @@ int DrawableCube::RecordTextureUse()
             if (textureGroup && (field_0x2c->field_0x38[face].visibleCells & (1 << i))) {
                 TextureMap* texture = field_0x2c->field_0x38[face].textures[i];
                 if (texture && (texture->field_0x68 & 1))
-                    ((ManagedTexture*)texture)->UnknownFunction510820(7.0f);
+                    ((ManagedTexture*)texture)->RecordUse(7.0f);
             }
         }
     }

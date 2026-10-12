@@ -260,7 +260,7 @@ int DrawableCube::UnknownVirtualSlot14()
             if (textureGroup && (field_0x2c->field_0x38[face].textures[i]->field_0x68 & 1)) {
                 UnknownCubeTextureMapping* mapping = &s_cellMappings[face][i];
                 ((ManagedTexture*)field_0x2c->field_0x38[face].textures[i])
-                    ->UnknownFunction510910(&mapping->scale, &mapping->offsetU, &mapping->offsetV,
+                    ->RemapTexCoordsIfMoved(&mapping->scale, &mapping->offsetU, &mapping->offsetV,
                                             &s_cellVertices[face][i][0].tu, &s_cellVertices[face][i][0].tv, 6,
                                             0x20);
             }

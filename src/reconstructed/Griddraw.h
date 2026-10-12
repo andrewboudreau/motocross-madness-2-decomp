@@ -63,11 +63,11 @@ public:
 };
 
 // Boundary view of ManagedTexture (src/reconstructed binds 0x00510910 as
-// ManagedTexture::UnknownFunction510910): bit 0 of +0x68 enables the texture
+// ManagedTexture::RemapTexCoordsIfMoved): bit 0 of +0x68 enables the texture
 // coordinate update that 0x00510910 applies to a vertex range.
 class GridManagedTexture {
 public:
-    int UnknownFunction510910(float* a, float* b, float* c, float* u, float* v, int count,
+    int RemapTexCoordsIfMoved(float* a, float* b, float* c, float* u, float* v, int count,
                               unsigned int stride);  // 0x00510910 (ret 0x1c)
     unsigned char field_0x00[0x68];
     unsigned char field_0x68;

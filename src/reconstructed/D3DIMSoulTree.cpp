@@ -823,7 +823,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
                 float fraction = (size - power) / power;
                 if (fraction < 0.0f)
                     fraction = 0.0f;
-                texture->UnknownFunction510820(level + 1 + fraction);
+                texture->RecordUse(level + 1 + fraction);
             }
         }
     }

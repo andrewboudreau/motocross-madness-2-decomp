@@ -808,7 +808,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 if (material->field_0x70) {
                     ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
                     if (texture->field_0x68 & 1)
-                        texture->UnknownFunction510910(&drawn->field_0x2c, (float*)&drawn->field_0x30,
+                        texture->RemapTexCoordsIfMoved(&drawn->field_0x2c, (float*)&drawn->field_0x30,
                                                        (float*)&drawn->field_0x34, &drawn->vertices->tu,
                                                        &drawn->vertices->tv, drawn->vertexCount, 0x20);
                 }

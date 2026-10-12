@@ -24,7 +24,7 @@ static inline int LevelArea(int level) {
 
 // 0x005102d0
 int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level) {
-    region->field_0x14->UnknownFunction510610(level);
+    region->field_0x14->UpdatePageCoords(level);
     float scale = 1.0f / (1 << level);
     int width = field_0x14;
     UnknownRect rect;

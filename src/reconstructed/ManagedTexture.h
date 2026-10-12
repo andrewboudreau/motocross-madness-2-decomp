@@ -16,19 +16,19 @@ public:
     virtual int UnknownVirtualSlot11();       // 0x005108f0: binds the page or itself
     virtual void UnknownVirtualSlot19();      // 0x00510870
 
-    void UnknownFunction510610(int level);    // 0x00510610: takes the scale and offset of its region
+    void UpdatePageCoords(int level);    // 0x00510610: takes the scale and offset of its region
     void UnknownFunction510670();             // 0x00510670: resets and re-adds itself to its group
-    void UnknownFunction510700();             // 0x00510700: leaves its page
+    void ReleasePage();             // 0x00510700: leaves its page
     int UnknownFunction510760(int a, int b, int c); // 0x00510760: PCTextureMap slot 8, called directly
     // 0x00510780: maps `count` (u, v) pairs, `stride` bytes apart, from the
     // given scale/offset to this texture's, and returns its scale/offset.
-    void UnknownFunction510780(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
+    void RemapTexCoords(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                                unsigned int stride);
-    void UnknownFunction510820(float value);  // 0x00510820: records a use (value at most 9)
+    void RecordUse(float value);  // 0x00510820: records a use (value at most 9)
     // 0x00510910: 0x00510780 unless the scale/offset are already this texture's.
-    int UnknownFunction510910(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
+    int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                               unsigned int stride);
-    int UnknownFunction510990();              // 0x00510990: log2 of the width
+    int SizeLevel();              // 0x00510990: log2 of the width
     float UnknownFunction5109b0();            // 0x005109b0: +0xa4 less +0xac
 
     CacheTexture* field_0x80;                 // page it is placed on

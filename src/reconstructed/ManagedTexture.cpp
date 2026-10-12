@@ -26,11 +26,11 @@ ManagedTexture::~ManagedTexture() {
     if (field_0x90)
         field_0x90->field_0x44.Remove(this);
     if (field_0x80)
-        UnknownFunction510700();
+        ReleasePage();
 }
 
 // 0x00510610
-void ManagedTexture::UnknownFunction510610(int level) {
+void ManagedTexture::UpdatePageCoords(int level) {
     UnknownTextureRegion* region = field_0x94;
     if (region && field_0x80) {
         field_0x84 = (region->field_0x24 - region->field_0x1c) / (1 << level);
@@ -45,7 +45,7 @@ void ManagedTexture::UnknownFunction510670() {
     if (field_0x90)
         field_0x90->field_0x44.Remove(this);
     if (field_0x80)
-        UnknownFunction510700();
+        ReleasePage();
     field_0x80 = 0;
     field_0x94 = 0;
     field_0x8c = 0;
@@ -62,7 +62,7 @@ void ManagedTexture::UnknownFunction510670() {
 }
 
 // 0x00510700
-void ManagedTexture::UnknownFunction510700() {
+void ManagedTexture::ReleasePage() {
     if (field_0x80) {
         field_0x80->UnknownFunction5102b0(this);
         field_0x80 = 0;
@@ -85,7 +85,7 @@ int ManagedTexture::UnknownFunction510760(int a, int b, int c) {
 }
 
 // 0x00510780
-void ManagedTexture::UnknownFunction510780(float* scale, float* offsetU, float* offsetV, float* u, float* v,
+void ManagedTexture::RemapTexCoords(float* scale, float* offsetU, float* offsetV, float* u, float* v,
                                            int count, unsigned int stride) {
     unsigned int step = stride / sizeof(float);
     float ratio = field_0x84 / *scale;
@@ -103,7 +103,7 @@ void ManagedTexture::UnknownFunction510780(float* scale, float* offsetU, float* 
 }
 
 // 0x00510820
-void ManagedTexture::UnknownFunction510820(float value) {
+void ManagedTexture::RecordUse(float value) {
     if (value > 9.0f)
         value = 9.0f;
     if (value > field_0xa4)
@@ -136,11 +136,11 @@ int ManagedTexture::UnknownVirtualSlot11() {
 }
 
 // 0x00510910
-int ManagedTexture::UnknownFunction510910(float* scale, float* offsetU, float* offsetV, float* u, float* v,
+int ManagedTexture::RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v,
                                           int count, unsigned int stride) {
     if (*scale == field_0x84 && *offsetU == field_0x88 && *offsetV == field_0x8c)
         return 0;
-    UnknownFunction510780(scale, offsetU, offsetV, u, v, count, stride);
+    RemapTexCoords(scale, offsetU, offsetV, u, v, count, stride);
     return 1;
 }
 
@@ -150,7 +150,7 @@ int ManagedTexture::UnknownVirtualSlot7() {
 }
 
 // 0x00510990
-int ManagedTexture::UnknownFunction510990() {
+int ManagedTexture::SizeLevel() {
     int size = field_0x14;
     int level = 0;
     if (size == 1)

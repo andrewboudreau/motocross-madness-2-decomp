@@ -712,10 +712,10 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
             if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
                 if (block >= 0) {
                     GridBlockRecord* r = &extra->blockRecords[block];
-                    extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                    extra->texture->RemapTexCoordsIfMoved(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
                                                              &vertices->u, &vertices->v, vertexCount, 0x20);
                 } else {
-                    extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c,
+                    extra->texture->RemapTexCoordsIfMoved(&extra->field_0x28, &extra->field_0x2c,
                                                              &extra->field_0x30, &vertices->u, &vertices->v,
                                                              vertexCount, 0x20);
                 }
@@ -747,10 +747,10 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
         if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
             if (block >= 0) {
                 GridBlockRecord* r = &extra->blockRecords[block];
-                extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                extra->texture->RemapTexCoordsIfMoved(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             } else {
-                extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+                extra->texture->RemapTexCoordsIfMoved(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             }
         }
@@ -783,10 +783,10 @@ void DrawableGridNode::SubmitLitRange(int a5, GridVertex* vertices, int vertexCo
     if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
         if (block >= 0) {
             GridBlockRecord* r = &extra->blockRecords[block];
-            extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
+            extra->texture->RemapTexCoordsIfMoved(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
                                                      &vertices->v, vertexCount, 0x20);
         } else {
-            extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+            extra->texture->RemapTexCoordsIfMoved(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
                                                      &vertices->u, &vertices->v, vertexCount, 0x20);
         }
     }

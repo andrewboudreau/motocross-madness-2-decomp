@@ -114,7 +114,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
     texture = field_0x44.First();
     while (texture) {
         ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
-        field_0x24c += LevelArea(managed->UnknownFunction510990());
+        field_0x24c += LevelArea(managed->SizeLevel());
         if (!managed->field_0xa0) {
             managed->field_0xac = -1;
             int placed = managed->field_0xa8;
@@ -126,8 +126,8 @@ void ManagedTextureGroup::UnknownFunction50c960() {
             continue;
         }
         int level = (int)managed->field_0xa4;
-        if (level > managed->UnknownFunction510990())
-            level = managed->UnknownFunction510990();
+        if (level > managed->SizeLevel())
+            level = managed->SizeLevel();
         if (level < 5)
             level = 5;
         managed->field_0xac = level;
@@ -195,7 +195,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
                 texels += managed->field_0x14 * managed->field_0x18;
             field_0x7c.Remove(managed);
             field_0x16c.Remove(managed);
-            managed->UnknownFunction510700();
+            managed->ReleasePage();
         }
         best->UnknownFunction50fc40();
     }
@@ -208,7 +208,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
         freed -= LevelArea(managed->field_0xac);
         field_0x158.Add(managed);
         field_0x16c.Remove(managed);
-        managed->UnknownFunction510700();
+        managed->ReleasePage();
     }
 
     qsort(field_0x158.m_data, field_0x158.m_count, sizeof(ManagedTexture*), UnknownCompare50ee70);
@@ -335,7 +335,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
     if (!managed)
         return;
     while (managed) {
-        field_0x24c += LevelArea(managed->UnknownFunction510990());
+        field_0x24c += LevelArea(managed->SizeLevel());
         if (!managed->field_0xa0) {
             managed->field_0xac = -1;
             int placed = managed->field_0xa8;
@@ -347,8 +347,8 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
             continue;
         }
         int level = (int)managed->field_0xa4;
-        if (level > managed->UnknownFunction510990())
-            level = managed->UnknownFunction510990();
+        if (level > managed->SizeLevel())
+            level = managed->SizeLevel();
         if (level < 5)
             level = 5;
         managed->field_0xb0 = level;
@@ -375,7 +375,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
         memset(unused, 0, sizeof(unused));
         for (int k = 0; k < 9; k++) {
             for (int j = 0; j < field_0x90[k].m_count; j++)
-                field_0x90[k].Get(j)->UnknownFunction510700();
+                field_0x90[k].Get(j)->ReleasePage();
             field_0x90[k].Clear();
         }
     }
@@ -386,7 +386,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
             managed = field_0x7c.Get(--index);
         int level = managed->field_0xac;
         if (managed->UnknownFunction5109b0() < 0.0f) {
-            managed->UnknownFunction510700();
+            managed->ReleasePage();
             managed->field_0xac = managed->field_0xb0;
         } else {
             managed->field_0xac--;
@@ -403,7 +403,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
     for (i = 0; i < field_0x7c.m_count; i++) {
         managed = field_0x7c.Get(i);
         if (managed->UnknownVirtualSlot7() && managed->field_0xac != managed->field_0xa8)
-            managed->UnknownFunction510700();
+            managed->ReleasePage();
     }
     memset(levels, 0, sizeof(levels));
     int count = field_0x7c.m_count;
@@ -453,7 +453,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
         ContainerList<ManagedTexture*>* list = &field_0x90[level];
         ManagedTexture* last = LastOf(list);
         for (int j = 0; j < count; j++) {
-            last->UnknownFunction510700();
+            last->ReleasePage();
             list->RemoveOrdered(last);
             last = LastOf(list);
         }

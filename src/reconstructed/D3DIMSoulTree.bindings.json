@@ -105,7 +105,7 @@
   "?ReadKeys@SoultreeMaterial@@QAEXPAVUnknownParameterBlock@@H@Z": "0x004ff9e0",
   "?MakeUntextured@SoultreeMaterial@@QAEXXZ": "0x005000b0",
   "?CopyFrom@SoultreeMaterial@@QAEXPBV1@@Z": "0x005000f0",
-  "?UnknownFunction510820@ManagedTexture@@QAEXM@Z": "0x00510820",
+  "?RecordUse@ManagedTexture@@QAEXM@Z": "0x00510820",
   "?UnknownVirtualSlot10@D3DIMSoultreeObject@@UAEHM@Z": "0x00443490",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",

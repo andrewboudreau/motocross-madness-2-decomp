@@ -31,7 +31,7 @@
   "?UnknownFunction510250@CacheTexture@@QAEHPAVManagedTexture@@PAUUnknownTextureRegion@@@Z": "0x00510250",
   "?UnknownFunction5102b0@CacheTexture@@QAEXPAVManagedTexture@@@Z": "0x005102b0",
   "?UnknownFunction5102d0@CacheTexture@@QAEHPAUUnknownTextureRegion@@H@Z": "0x005102d0",
-  "?UnknownFunction510610@ManagedTexture@@QAEXH@Z": "0x00510610",
+  "?UpdatePageCoords@ManagedTexture@@QAEXH@Z": "0x00510610",
   "?UnknownVirtualSlot10@PCTextureMap@@UAEXXZ": "0x004c7610",
   "?UnknownVirtualSlot11@PCTextureMap@@UAEHXZ": "0x004c7970",
   "?UnknownVirtualSlot12@PCTextureMap@@UAEXXZ": "0x004c6040",

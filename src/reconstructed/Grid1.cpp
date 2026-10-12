@@ -106,7 +106,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
         fraction = 0.0f;
     if (!(texture->field_0x68 & 1))
         return;
-    texture->UnknownFunction510820(level + 1 + fraction);
+    texture->RecordUse(level + 1 + fraction);
 
     int count = g_gridTextureCount;
     int i;
