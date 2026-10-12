@@ -57,7 +57,7 @@ void EventManager::UnknownFunction45e710(int menu) {
         item->UnknownFunction46ff30(0);
     if (g_TrackGame->ui->field_0x494)
         ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->field_0x494);
-    if (g_TrackGame->ui->field_0x498)
+    if (g_TrackGame->ui->allowIme)
         g_TrackGame->ui->field_0x2c->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
     g_TrackGame->field_0x3438 = 0;
