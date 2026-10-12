@@ -60,7 +60,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
-| io/FileStream | `0x00460db0` | 27/176 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp) |
+| io/FileStream | `0x00460db0` | 27/186 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp; the extent is 186 bytes, docs/FILESTREAM.md) |
 | io/FileStream | `0x00460f50` | 284/933 | c | 18 code diffs: VC6 here stores access[0] as well; candidate 933 of 957 bytes |
 | io/FileStream | `0x00461340` | 201/700 | c | 29 code diffs: retail loads the decoded position (+0x0c) once and keeps the next pointer in another register |
 | io/FileStream | `0x00461640` | 202/671 | c | 22 code diffs: retail keeps the advanced buffer pointer in a register |

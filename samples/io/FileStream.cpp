@@ -96,7 +96,8 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // into different registers), and stores field_0x08 = 0 as an immediate; VC6 here
 // merges the whole first block into the second and stores fseek's zero result.
 // The plain ||, &&, goto, nested, result-variable and seek-helper shapes compile
-// to the same or worse code.
+// to the same or worse code; so do inline SeekOrClose/SeekOnly helpers for either
+// or both blocks and `!= 0` tests (27/186 over the whole 186-byte extent).
 int UnknownTextureStream::UnknownFunction460db0()
 {
     if (fseek(field_0x14, 0, SEEK_SET)) {
