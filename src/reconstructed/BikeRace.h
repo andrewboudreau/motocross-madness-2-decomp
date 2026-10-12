@@ -455,8 +455,8 @@ public:
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char finished;                            // +0x7a4 finished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
-    int field_0x7b8;
-    int field_0x7bc;
+    int lapGate;                              // +0x7b8 RaceView.h's racer lapGate
+    int nextLapGate;                          // +0x7bc
     unsigned char field_0x7c0[0x11b8 - 0x7c0];
     unsigned char field_0x11b8;
     unsigned char field_0x11b9[0x11bc - 0x11b9];

@@ -558,7 +558,7 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         if (listenerRacer != lastListenerRacer) {
             lastListenerRacer = listenerRacer;
             lastListenerLap = listenerRacer->lapCount;
-            lastListenerGate = listenerRacer->field_0x7b8;
+            lastListenerGate = listenerRacer->lapGate;
             lastListenerPosition = listenerRacer->finishPosition;
         }
         UpdateRacerSounds(frameTime);
@@ -738,7 +738,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     }
 
     if (g_TrackGame->mode.positionSounds &&
-        (listenerRacer->field_0x7b8 > lastListenerGate || listenerRacer->lapCount > lastListenerLap))
+        (listenerRacer->lapGate > lastListenerGate || listenerRacer->lapCount > lastListenerLap))
         PlayIfEnabled(waypointSound, 0, 0, 0, 0);
 
     for (i = 0; i < channelsInUse; i++) {
@@ -791,7 +791,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
         }
     }
     lastListenerLap = listenerRacer->lapCount;
-    lastListenerGate = listenerRacer->field_0x7b8;
+    lastListenerGate = listenerRacer->lapGate;
     lastListenerPosition = listenerRacer->finishPosition;
     return 1;
 }
@@ -872,7 +872,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (g_TrackGame->mode.networkGame)
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
-                    lastListenerGate = listenerRacer->field_0x7b8;
+                    lastListenerGate = listenerRacer->lapGate;
                     lastListenerLap = listenerRacer->lapCount;
                 }
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)

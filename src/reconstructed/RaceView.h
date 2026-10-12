@@ -167,8 +167,8 @@ struct UnknownEventRacer : virtual public GameObject {
     char hasFinished;                         // +0x7a4 finished
     unsigned char field_0x7a5[0x7ac - 0x7a5];
     int field_0x7ac[3];                            // copied by EventManager 0x0045c8b0
-    int field_0x7b8;                               // racesnd.cpp keeps a copy at +0x1294; gate of the lap
-    int field_0x7bc;
+    int lapGate;                              // +0x7b8 gate of the lap (AdvanceGate's gateIndex); racesnd.cpp keeps a copy at +0x1294
+    int nextLapGate;                          // +0x7bc lapGate + 1 wrapped by the owner's gate count (RaceStatus.cpp 0x004e6a50)
     int field_0x7c0;                               // RaceStatus.cpp: passes the current gate without the test
     unsigned char field_0x7c4[0x11bc - 0x7c4];
     int networkPlayerId;                      // +0x11bc network player id
