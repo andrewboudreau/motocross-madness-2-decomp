@@ -314,6 +314,9 @@ exact:
 - An inlined helper taking a struct by value copies the argument only when it can
   change under the call (it aliases the output); an unmodified local is read in place.
   This reproduces retail's two `rep movsd` copies in Wrecker slot 10.
+  The same holds for a 12-byte vector: `RotateByRowsTo(&d, d, m)` (a by-value `Vec3 v` and an
+  out pointer to `d`) copies `d` first, its first row still reading the original, as retail's
+  SoultreeObject::GetMatrixIn `0x004fca80` does; a helper that returns the vector does not.
 - A struct assigned from an inline-constructed value (`sum = Vec3(0, 0, 0)`, `dst = sum * s`
   with an operator that returns `Vec3(...)`) goes through a 12-byte temporary that copies
   field by field; `Vec3 sum(0, 0, 0)` or per-component stores build in place and leave that

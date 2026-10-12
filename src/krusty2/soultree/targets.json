@@ -702,6 +702,16 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z",
+    "target_va": "0x004fca80",
+    "target_size": 494,
+    "expect": "exact",
+    "notes": "the translation delta rotated into itself through a by-value inline helper (RotateByRowsTo(&d, d, parentWorld)) gives retail's copy of the delta (308 -> 494; moved from samples/physics/helpers/SoultreeMatrix.cpp)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
     "candidate_symbol_contains": "?ResetMatrices@SoultreeObject@@QAEXXZ",
     "target_va": "0x004fcc70",
     "target_size": 109,

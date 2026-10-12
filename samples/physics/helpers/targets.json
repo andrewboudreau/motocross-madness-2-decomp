@@ -95,15 +95,6 @@
   {
     "class": "SoultreeObject",
     "source": "SoultreeMatrix.cpp",
-    "candidate_symbol_contains": "GetMatrixIn",
-    "target_va": "0x4fca80",
-    "target_size": 494,
-    "expect": "partial",
-    "notes": "partial ~67%: structure right; retail keeps by-value copy of translation delta and schedules x-sum before out transposition. Inliner budget differs."
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeMatrix.cpp",
     "candidate_symbol_contains": "SetAxesIn",
     "target_va": "0x4fc050",
     "target_size": 1171,

@@ -1,6 +1,6 @@
 // SoultreeMatrix.cpp -- near misses of SoultreeObject (soultree.cpp) frame-relative matrix
-// accessors (declared in core/SoultreeObject.h). The exact members of the unit are in
-// src/krusty2/soultree/soultree.cpp. Class attribution tier 2; names tier 3.
+// accessors (declared in core/SoultreeObject.h). The exact members of the unit, GetMatrixIn
+// 0x004fca80 among them, are in src/krusty2/soultree/soultree.cpp. Class attribution tier 2; names tier 3.
 #include <string.h>
 #include "math/Math3D.h"
 
@@ -77,44 +77,6 @@ static inline Vec3 RotateByRows(Vec3 v, const Matrix4& m)
     r.y = v.x * m._21 + v.y * m._22 + v.z * m._23;
     r.z = v.x * m._31 + v.y * m._32 + v.z * m._33;
     return r;
-}
-
-// 0x004fca80. Frame == this: identity. Otherwise *out = world matrix; when 'frame' has a
-// parent the result is re-expressed relative to that parent's world matrix: the rotation is
-// (parentWorld * transpose(R(world)))^T and the translation is (t - t_parent) rotated by the
-// parent's rows.
-void SoultreeObject::GetMatrixIn(SoultreeObject* frame, Matrix4* out)
-{
-    if (frame == this) {
-        memset(out, 0, sizeof(Matrix4));
-        out->_44 = 1.0f;
-        out->_33 = 1.0f;
-        out->_22 = 1.0f;
-        out->_11 = 1.0f;
-        return;
-    }
-    UpdateWorldMatrix();
-    *out = worldMatrix;
-    if (frame) {
-      if (frame->parent) {
-        frame->parent->UpdateWorldMatrix();
-        Matrix4 parentWorld = frame->parent->worldMatrix;
-        Matrix4 m = *out;
-        Vec3 d;
-        d.x = m._41 - parentWorld._41;
-        d.y = m._42 - parentWorld._42;
-        d.z = m._43 - parentWorld._43;
-        TransposeRotation3(m);
-        MatrixProductRows(out, &m, &parentWorld);
-        TransposeRotation3(*out);
-        Vec3 t = RotateByRows(d, parentWorld);
-        out->_41 = t.x;
-        out->_42 = t.y;
-        out->_43 = t.z;
-        return;
-      }
-      *out = worldMatrix;
-    }
 }
 
 // 0x004fc050. Inverse of GetAxesIn: builds a rotation whose row 2 is *axisZ and row 1 is

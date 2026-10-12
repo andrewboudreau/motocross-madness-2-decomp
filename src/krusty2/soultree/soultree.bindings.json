@@ -22,6 +22,7 @@
   "?ClearFlag14c@SoultreeObject@@QAEXXZ": "0x004fdb50",
   "?CollectDescendants@SoultreeObject@@QAEXPAHPAPAV1@@Z": "0x004fda60",
   "?ComputeCode@QuadTree@@QAEIMMMM@Z": "0x004dc8c0",
+  "?CollisionMatrixMultiply@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
   "?CountNodes@SoultreeObject@@QAEHXZ": "0x004fda30",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",

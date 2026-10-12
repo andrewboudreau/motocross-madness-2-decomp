@@ -15,7 +15,7 @@
 //
 // Every function below is strict exact. Near misses of the same unit (WorldToLocalDirection
 // 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050,
-// GetMatrixIn 0x004fca80, RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
+// RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
 // Scale 0x004fd340 (inline 4x4 product), AccumulateBounds 0x004fe2e0 and GetWorldBounds
 // 0x004fe8a0 are near misses in samples/physics/helpers/SoultreeBounds.cpp.
 #define SOULTREE_OBJECT_WITH_BASES
@@ -33,6 +33,10 @@ public:
 extern TypeRegistry* g_TypeRegistry;             // 0x00575744
 
 extern QuadTree* g_quadTree;                     // 0x0068aba4
+
+// 0x00436500 (cdecl): out = b * a in the row-vector convention (collision area,
+// collision/CollisionObject.cpp).
+void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b);
 
 // 0x004a1410 (cdecl, hidden result pointer): the identity matrix.
 Matrix4 IdentityMatrix();
@@ -103,6 +107,26 @@ static inline void MatrixProduct(Matrix4* out, const Matrix4& a, const Matrix4& 
 SoultreeObject** g_soultreeNodes;
 int g_soultreeNodeCount;
 int g_soultreeNodeCapacity;
+
+// Swap across the diagonal of the upper 3x3 (retail does this in place on a stack copy).
+static inline void TransposeRotation(Matrix4& m)
+{
+    float t;
+    t = m._12; m._12 = m._21; m._21 = t;
+    t = m._13; m._13 = m._31; m._31 = t;
+    t = m._23; m._23 = m._32; m._32 = t;
+}
+
+// v rotated by the transpose of m's upper 3x3 (dot with the ROWS of m) into *r. v is taken by
+// value: GetMatrixIn passes its own delta as both, so VC6 copies v first (retail's copy of
+// the delta, its x row reading the original and the y and z rows the copy). Returning a Vec3
+// (named result, Vec3(...) or a by-value result assigned back) leaves the copy out (308/494).
+static inline void RotateByRowsTo(Vec3* r, Vec3 v, const Matrix4& m)
+{
+    r->x = v.x * m._11 + v.y * m._12 + v.z * m._13;
+    r->y = v.x * m._21 + v.y * m._22 + v.z * m._23;
+    r->z = v.x * m._31 + v.y * m._32 + v.z * m._33;
+}
 
 // 0x004fb2b0. QuadTreeObject's inline constructor, then GameObject(a); identity local
 // matrix, zero world matrix, empty links and bounds; both type-id bytes get the
@@ -444,6 +468,40 @@ void SoultreeObject::GetLocalMatrix(Matrix4* out)
     *out = localMatrix;
 }
 
+// 0x004fca80. Frame == this: identity. Otherwise *out = world matrix; when 'frame' has a
+// parent the result is re-expressed relative to that parent's world matrix: the rotation is
+// (parentWorld * transpose(R(world)))^T and the translation is (t - t_parent) rotated by the
+// parent's rows.
+void SoultreeObject::GetMatrixIn(SoultreeObject* frame, Matrix4* out)
+{
+    if (frame == this) {
+        SetIdentity(out);
+        return;
+    }
+    UpdateWorldMatrix();
+    *out = worldMatrix;
+    if (frame) {
+      if (frame->parent) {
+        frame->parent->UpdateWorldMatrix();
+        Matrix4 parentWorld = frame->parent->worldMatrix;
+        Matrix4 m = *out;
+        Vec3 d;
+        d.x = m._41 - parentWorld._41;
+        d.y = m._42 - parentWorld._42;
+        d.z = m._43 - parentWorld._43;
+        TransposeRotation(m);
+        CollisionMatrixMultiply(out, &m, &parentWorld);
+        TransposeRotation(*out);
+        RotateByRowsTo(&d, d, parentWorld);
+        out->_41 = d.x;
+        out->_42 = d.y;
+        out->_43 = d.z;
+        return;
+      }
+      *out = worldMatrix;
+    }
+}
+
 // 0x004fcc70.
 void SoultreeObject::ResetMatrices()
 {
@@ -537,15 +595,6 @@ Vec3 SoultreeObject::LocalToWorldPoint(const Vec3& p)
     r.y += worldMatrix._42;
     r.z = (p.y * worldMatrix._23) + (p.x * worldMatrix._13) + p.z * worldMatrix._33 + worldMatrix._43;
     return r;
-}
-
-// Swap across the diagonal of the upper 3x3 (retail does this in place on a stack copy).
-static inline void TransposeRotation(Matrix4& m)
-{
-    float t;
-    t = m._12; m._12 = m._21; m._21 = t;
-    t = m._13; m._13 = m._31; m._31 = t;
-    t = m._23; m._23 = m._32; m._32 = t;
 }
 
 // In-place inverse of a rigid transform: transpose the rotation, then the translation
