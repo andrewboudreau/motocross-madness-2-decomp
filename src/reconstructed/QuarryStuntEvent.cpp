@@ -488,7 +488,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 struct UnknownQuarryLeaveMessage {
     int field_0x00;
     int field_0x04;
-    int field_0x08;
+    int playerId;                             // +0x08 matched against racers' networkPlayerId
 };
 
 // 0x004e1cc0
@@ -504,7 +504,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         char buffer[0x80];
         strcpy(name, "");
         for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
-            if (g_TrackGame->mode.racers[i].networkPlayerId == leave->field_0x08) {
+            if (g_TrackGame->mode.racers[i].networkPlayerId == leave->playerId) {
                 int n = strlen(g_TrackGame->mode.racers[i].playerName);
                 int length = n > 0x7f ? 0x7f : n;
                 strncpy(name, g_TrackGame->mode.racers[i].playerName, length);
@@ -516,9 +516,9 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         sprintf(buffer, "%s %s", name, text);
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
-        raceView->HandlePlayerLeft(leave->field_0x08);
+        raceView->HandlePlayerLeft(leave->playerId);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
-            g_TrackGame->eventManager->RemovePlayer(leave->field_0x08);
+            g_TrackGame->eventManager->RemovePlayer(leave->playerId);
     } else if (from && type == 0x89) {
         char text[0x80];
         char buffer[0x80];

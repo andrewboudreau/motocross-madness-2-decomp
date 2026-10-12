@@ -165,7 +165,7 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
     series = 5;
     raceIndex = 1;
     maxModelKind = 1;
-    field_0x454 = 0;
+    feesPaid = 0;
     strncpy(careerName, name, 64);
     careerName[strlen(name) > 63 ? 63 : strlen(name)] = 0;
 
@@ -183,12 +183,12 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
     careerFlags = 0;
 
     UnknownProCircuitStats zero;
-    zero.field_0x0c = 0;
-    zero.field_0x10 = 0;
-    zero.field_0x08 = 0;
-    zero.field_0x04 = 0;
-    zero.field_0x00 = 0;
-    zero.field_0x14 = 0;
+    zero.medicalCost = 0;
+    zero.rank = 0;
+    zero.repairCost = 0;
+    zero.purseWinnings = 0;
+    zero.points = 0;
+    zero.stuntWinnings = 0;
     int* used = (int*)DebugCalloc(racerNameCount, 4, __FILE__, 203);
     srand(ReadClock());
     PickComputerRacers();
@@ -205,8 +205,8 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
         } else {
             UNKNOWN_COPY_TEXT(racers[i].racerName, g_TrackGame->mode.profileName)
         }
-        racers[i].field_0x00 = zero;
-        racers[i].field_0x18 = zero;
+        racers[i].raceStats = zero;
+        racers[i].totalStats = zero;
     }
 
     KrustyUI* ui = g_TrackGame->ui;
@@ -280,7 +280,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
     char title[2048];
     strcpy(title, "");
     raceIndex++;
-    int placed = racers[0].field_0x18.field_0x10 <= 1;
+    int placed = racers[0].totalStats.rank <= 1;
     int bonus = raceIndex == schedules[series].bonusTrack;
     int done = raceIndex > schedules[series].trackCount;
     switch (series) {
@@ -306,7 +306,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
             careerFlags |= 8;
             racers[0].money += (int)(racers[0].field_0x34 * -1.1f);
             g_TrackGame->LoadResourceString(0x145c, title, 128);
-            if (racers[0].field_0x18.field_0x10 <= 3)
+            if (racers[0].totalStats.rank <= 3)
                 *(unsigned char*)&g_TrackGame->mode.bikeUnlockFlags |= 1; // retail ORs the low byte
         }
         break;

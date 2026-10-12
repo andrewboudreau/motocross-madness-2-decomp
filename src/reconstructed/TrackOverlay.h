@@ -153,15 +153,14 @@ struct UnknownTextExtent {
 };
 
 // StatsOverlay+0x124 (set by 0x00519880): a view whose racers 0x0051a560
-// counts (0x004204e0, as UnknownKrustyBikeView in RaceView.h); +0x1b8 is a
-// time (0x0051a480).
+// counts (0x004204e0, as UnknownKrustyBikeView in RaceView.h).
 struct UnknownStatsSource {
     UnknownEventRacer* NextBike(int* iterator); // 0x004204e0
 
     unsigned char field_0x000[0x38];
     UnknownEventRacer* ownRacer;              // its own racer
     unsigned char field_0x03c[0x1b8 - 0x3c];
-    float field_0x1b8;
+    float replayTime;                         // +0x1b8 the "TRT" row while a replay plays (RaceView.h's replayTime)
 };
 
 // RTTI: StatsOverlay : Overlay (vtable 0x00558680), 0x9b8 bytes: the race

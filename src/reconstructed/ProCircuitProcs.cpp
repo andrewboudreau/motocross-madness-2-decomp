@@ -286,7 +286,7 @@ void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(circuit->careerName, row, 0);
 
     sprintf(name, "%s%s", prefix, "Rank");
-    sprintf(text, "%d / %d", circuit->racers[0].field_0x18.field_0x10, circuit->racerCount);
+    sprintf(text, "%d / %d", circuit->racers[0].totalStats.rank, circuit->racerCount);
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Class");
@@ -318,7 +318,7 @@ void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Points");
-    _itoa(circuit->racers[0].field_0x18.field_0x00, text, 10);
+    _itoa(circuit->racers[0].totalStats.points, text, 10);
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Cash");
@@ -576,11 +576,11 @@ void PCCentralNextDlg::HandleEvent(UnknownDialogEvent* event)
     FindControl("TxtNextRace", 12)->SetText(text);
     sprintf(text, "$%d", circuit->racers[0].money);
     FindControl("TxtCash", 12)->SetText(text);
-    sprintf(text, "$%d", circuit->field_0x454);
+    sprintf(text, "$%d", circuit->feesPaid);
     FindControl("TxtFees", 12)->SetText(text);
-    sprintf(text, "$%d", circuit->racers[0].field_0x18.field_0x08);
+    sprintf(text, "$%d", circuit->racers[0].totalStats.repairCost);
     FindControl("TxtRepairs", 12)->SetText(text);
-    sprintf(text, "$%d", circuit->racers[0].field_0x18.field_0x0c);
+    sprintf(text, "$%d", circuit->racers[0].totalStats.medicalCost);
     FindControl("TxtMedical", 12)->SetText(text);
     UIControl* announcement = FindControl("TxtAnnouncement", 12);
     announcement->wordWrap = 1;
@@ -633,18 +633,18 @@ void PCCentralStandingsDlg::HandleEvent(UnknownDialogEvent* event)
     UIListBox* expenses = static_cast<UIListBox*>(FindControl("LstExpenses", 3));
     char text[128];
     for (int i = 0; i < circuit->racerCount; i++) {
-        _itoa(circuit->racers[i].field_0x18.field_0x10, text, 10);
+        _itoa(circuit->racers[i].totalStats.rank, text, 10);
         rank->AddRow(text, i, 0);
         name->AddRow(circuit->racers[i].racerName, i, 0);
-        _itoa(circuit->racers[i].field_0x18.field_0x00, text, 10);
+        _itoa(circuit->racers[i].totalStats.points, text, 10);
         points->AddRow(text, i, 0);
         bike->AddRow(circuit->racers[i].bikeDisplayName, i, 0);
         sprintf(text, "$%d", circuit->racers[i].money);
         cash->AddRow(text, i, 0);
-        sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x04 + circuit->racers[i].field_0x18.field_0x14);
+        sprintf(text, "$%d", circuit->racers[i].totalStats.purseWinnings + circuit->racers[i].totalStats.stuntWinnings);
         winnings->AddRow(text, i, 0);
-        sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x08 + circuit->racers[i].field_0x18.field_0x0c +
-                                 circuit->field_0x454);
+        sprintf(text, "$%d", circuit->racers[i].totalStats.repairCost + circuit->racers[i].totalStats.medicalCost +
+                                 circuit->feesPaid);
         expenses->AddRow(text, i, 0);
     }
     static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
@@ -678,17 +678,17 @@ void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
         PayOutRace();
         char text[128];
         for (int i = 0; i < g_TrackGame->proCircuit->racerCount; i++) {
-            _itoa(g_TrackGame->proCircuit->racers[i].field_0x00.field_0x10, text, 10);
+            _itoa(g_TrackGame->proCircuit->racers[i].raceStats.rank, text, 10);
             rank->AddRow(text, i, 0);
             name->AddRow(g_TrackGame->proCircuit->racers[i].racerName, i, 0);
-            _itoa(g_TrackGame->proCircuit->racers[i].field_0x00.field_0x00, text, 10);
+            _itoa(g_TrackGame->proCircuit->racers[i].raceStats.points, text, 10);
             points->AddRow(text, i, 0);
             bike->AddRow(g_TrackGame->proCircuit->racers[i].bikeDisplayName, i, 0);
-            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].field_0x00.field_0x04);
+            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].raceStats.purseWinnings);
             winnings->AddRow(text, i, 0);
-            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].field_0x00.field_0x08);
+            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].raceStats.repairCost);
             repairs->AddRow(text, i, 0);
-            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].field_0x00.field_0x0c);
+            sprintf(text, "$%d", g_TrackGame->proCircuit->racers[i].raceStats.medicalCost);
             medical->AddRow(text, i, 0);
         }
         static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
@@ -711,7 +711,7 @@ void PCLastRaceDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
             int bonus = circuit->raceIndex == circuit->schedules[circuit->series].bonusTrack;
-            if (bonus && circuit->racers[0].field_0x18.field_0x10 == 1) {
+            if (bonus && circuit->racers[0].totalStats.rank == 1) {
                 PCBonusTrackDlg* dialog = new(__FILE__, 1368) PCBonusTrackDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             } else if (circuit->racers[0].money <
@@ -792,17 +792,17 @@ void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
         UIListBox* medical = static_cast<UIListBox*>(FindControl("LstMedical", 3));
         char text[128];
         for (int i = 0; i < circuit->racerCount; i++) {
-            _itoa(circuit->racers[i].field_0x18.field_0x10, text, 10);
+            _itoa(circuit->racers[i].totalStats.rank, text, 10);
             rank->AddRow(text, i, 0);
             name->AddRow(circuit->racers[i].racerName, i, 0);
-            _itoa(circuit->racers[i].field_0x18.field_0x00, text, 10);
+            _itoa(circuit->racers[i].totalStats.points, text, 10);
             points->AddRow(text, i, 0);
             bike->AddRow(circuit->racers[i].bikeDisplayName, i, 0);
             sprintf(text, "$%d", circuit->racers[i].money);
             cash->AddRow(text, i, 0);
-            sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x08);
+            sprintf(text, "$%d", circuit->racers[i].totalStats.repairCost);
             repairs->AddRow(text, i, 0);
-            sprintf(text, "$%d", circuit->racers[i].field_0x18.field_0x0c);
+            sprintf(text, "$%d", circuit->racers[i].totalStats.medicalCost);
             medical->AddRow(text, i, 0);
         }
         static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
@@ -890,7 +890,7 @@ void PCCompleteDlg::HandleEvent(UnknownDialogEvent* event)
         UIControl* description = FindControl("TxtDescription", 12);
         g_TrackGame->LoadResourceString(0x145e, text, 1023);
         strcpy(rank, "");
-        if (circuit->racers[0].field_0x18.field_0x10 == 1)
+        if (circuit->racers[0].totalStats.rank == 1)
             g_TrackGame->LoadResourceString(0x145f, rank, 1023);
         sprintf(message, "%s\n%s", text, rank);
         description->wordWrap = 1;

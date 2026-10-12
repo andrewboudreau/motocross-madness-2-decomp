@@ -554,7 +554,7 @@ int StatsOverlay::DrawViewModePanel()
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13b8, label, 0x80);
     if (g_TrackGame->playingReplay)
-        FormatLapTime(time, statsSource->field_0x1b8);
+        FormatLapTime(time, statsSource->replayTime);
     else
         FormatLapTime(time, instrumentSource->state->trtTime);
     sprintf(rowText[5], "%s:", label);
@@ -597,7 +597,7 @@ void StatsOverlay::DrawLapTime()
     UnknownOverlayRect rect;
     int count;
     if (g_TrackGame->playingReplay)
-        FormatLapTime(text, statsSource->field_0x1b8);
+        FormatLapTime(text, statsSource->replayTime);
     else
         FormatLapTime(text, instrumentSource->state->trtTime);
     rect = rowRects[5];
