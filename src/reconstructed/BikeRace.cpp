@@ -662,11 +662,11 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 raceScene->UnknownFunction4f0ec0(name);
                 model = localRacer->field_0x3bc;
             } else if (field_0x0b0 == 0) {
-                strncpy(name, raceScene->field_0xb8->field_0x04[field_0x0ac].field_0x10, 0x14);
+                strncpy(name, raceScene->field_0xb8->field_0x04[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
                 model = (UnknownBikeRaceModel*)raceScene->field_0xb8->field_0x04[field_0x0ac].field_0x04;
             } else {
-                strncpy(name, raceScene->field_0xb4->field_0x04[field_0x0ac].field_0x2c, 0x14);
+                strncpy(name, raceScene->field_0xb4->field_0x04[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
                 UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[field_0x0ac];
                 if (entry->field_0x00_bit3) {

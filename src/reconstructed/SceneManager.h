@@ -103,7 +103,7 @@ struct UnknownSceneEntry {
     signed char sequenceIndex;            // index into motionSequence
     unsigned char field_0x27;
     char* motionSequence;                 // motion numbers (1-based, "MotionSequence")
-    char field_0x2c[0x18];                // the MCF or SLT file name, at most 0x14 characters
+    char fileName[0x18];                      // +0x2c the MCF or SLT file name, at most 0x14 characters
 };
 
 // 0x10-byte element of UnknownSceneTable::randomSets (a "RandomSet<n>"
@@ -141,7 +141,7 @@ struct UnknownSceneCaster {
     ShadowCaster* field_0x04;             // the model (a D3DIMSoultreeObject)
     UnknownScenePhysicsObject* field_0x08;
     UnknownSceneCollisionObject* field_0x0c;
-    char field_0x10[0x18];                // the model's file name, at most 0x14 characters
+    char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
 
 // Owned by Scene+0xb8: the shadow casters.
@@ -329,8 +329,8 @@ public:
 
     UnknownTrackGameObject574* sceneManager; // the owner 0x004ea7e0 stores
     char sceneName[0x40];                 // "SceneInfo" "SceneName"
-    Vector3 field_0x70;                   // "SceneInfo" "DefaultStartPosition"
-    Vector3 field_0x7c;                   // "SceneInfo" "DefaultStartDirection"
+    Vector3 defaultStartPosition;             // +0x70 "SceneInfo" "DefaultStartPosition"
+    Vector3 defaultStartDirection;            // +0x7c "SceneInfo" "DefaultStartDirection"
     char field_0x88;
     unsigned char field_0x89[3];
     Vector3 podiumPosition;                          // "PodiumPosition"

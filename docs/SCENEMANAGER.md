@@ -151,6 +151,16 @@ type, member and function names are provisional.
 - `0x004f1130` sets the key-framed flag in each branch (`1`, `0`, `1`) and
   tests it afterwards; VC6 threads the jumps into retail's layout.
 
+## Field names
+
+`Scene::defaultStartPosition`/`defaultStartDirection` ("SceneInfo" keys)
+and the two `fileName` buffers (animation entry +0x2c, static model +0x10)
+are named. The section pointers `+0xa4..+0xbc`, the table, caster, light
+and entry fields keep their placeholders because `QuarryStuntEvent.cpp` and
+its loader sample read them too; renaming them is a joint change with that
+unit. `UnknownSceneObject::field_0x10` cannot take a name without the
+member lookup resolving to the virtual base's protected `field_0x10`.
+
 ## Not reconstructed
 
 - `0x004eab00` (slot 10, 958 bytes): its ebp frame and `fld; fistp` through

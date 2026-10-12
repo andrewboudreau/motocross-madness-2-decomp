@@ -397,8 +397,8 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
             b->z = startProbe.field_0x0c.z;
             b->y = 0.0f;
         } else {
-            *a = raceScene->field_0x70;
-            *b = Normalize(raceScene->field_0x7c);
+            *a = raceScene->defaultStartPosition;
+            *b = Normalize(raceScene->defaultStartDirection);
         }
         if (count <= 0) {
             return;
@@ -428,8 +428,8 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
         break;
     }
     case 0:
-        *a = raceScene->field_0x70;
-        *b = Normalize(raceScene->field_0x7c);
+        *a = raceScene->defaultStartPosition;
+        *b = Normalize(raceScene->defaultStartDirection);
         if (count <= 0) {
             return;
         }
@@ -465,8 +465,8 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
         break;
     }
     case 4:
-        *a = raceScene->field_0x70;
-        *b = Normalize(raceScene->field_0x7c);
+        *a = raceScene->defaultStartPosition;
+        *b = Normalize(raceScene->defaultStartDirection);
         if (count <= 0) {
             return;
         }

@@ -372,8 +372,8 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             AppendChild(object->UnknownVirtualSlot9(field_0x18, sltPath, (int)lights, a4, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
-            strncpy(field_0xb8->field_0x04[i].field_0x10, sltPath, count);
-            field_0xb8->field_0x04[i].field_0x10[count] = 0;
+            strncpy(field_0xb8->field_0x04[i].fileName, sltPath, count);
+            field_0xb8->field_0x04[i].fileName[count] = 0;
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fc630(position);
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fbd70(&look, &up, 1, 0);
             parameters.UnknownFunction4b7f10("Collision", 1, &collision);
@@ -563,8 +563,8 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             UnknownFunction4f0ec0(file);
         int length = strcspn(file, ".");
         int count = length < 0x14 ? length : 0x14;
-        strncpy(field_0xb4->field_0x04[i].field_0x2c, file, count);
-        field_0xb4->field_0x04[i].field_0x2c[count] = 0;
+        strncpy(field_0xb4->field_0x04[i].fileName, file, count);
+        field_0xb4->field_0x04[i].fileName[count] = 0;
         length = strlen(file);
         int size = length > 0x103 ? 0x103 : length;
         strncpy(colPath, file, size);

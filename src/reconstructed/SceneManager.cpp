@@ -286,7 +286,7 @@ void UnknownTrackGameObject574::UnknownFunction4ea390(char* name, char* scene, i
 // 0x004ea660
 Scene::Scene(int flags) : GameObject(flags)
 {
-    field_0x70 = Vector3(0.0f, 0.0f, 0.0f);
+    defaultStartPosition = Vector3(0.0f, 0.0f, 0.0f);
     field_0xa8 = 0;
     field_0xac = 0;
     field_0xb0 = 0;
@@ -295,7 +295,7 @@ Scene::Scene(int flags) : GameObject(flags)
     field_0xb8 = 0;
     sceneName[0] = 0;
     scenePath[0] = 0;
-    field_0x7c = Vector3(0.0f, 0.0f, 0.0f);
+    defaultStartDirection = Vector3(0.0f, 0.0f, 0.0f);
     field_0xbc = 0;
     sounds.Init(4, 4);
     auralScape = 0;
@@ -1141,8 +1141,8 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
     }
     sceneManager->UnknownFunction4ea390(sceneName, sceneManager->field_0x24c, 0);
     UnknownFunction4de580("SceneInfo", "SceneName", sceneName);
-    ReadVector(&field_0x70, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
-    ReadVector(&field_0x7c, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
+    ReadVector(&defaultStartPosition, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
+    ReadVector(&defaultStartDirection, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
     UnknownFunction464e80("");
     field_0x18 = owner;
     ReadVector(&podiumPosition, "SceneInfo", "PodiumPosition", "0.0,0.0,0.0", 1, 0);
