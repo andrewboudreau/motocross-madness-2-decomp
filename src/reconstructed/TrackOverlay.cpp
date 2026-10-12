@@ -130,13 +130,13 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
         if (owner->currentCamera->field_0x1cc) {
-            dial.field_0x00 = (int)((unsigned int)owner->currentCamera->field_0x1a0[2] * screenRect.left / 640.0f
-                                           + (unsigned int)owner->currentCamera->field_0x1a0[0]);
-            dial.field_0x04 = (int)((unsigned int)owner->currentCamera->field_0x1a0[3] * screenRect.top / 480.0f
-                                           + (unsigned int)owner->currentCamera->field_0x1a0[1]);
-            dial.centerX = (int)(((unsigned int)owner->currentCamera->field_0x1a0[2] / 640.0f) * 64.0f + dial.field_0x00);
-            dial.centerY = (int)(((unsigned int)owner->currentCamera->field_0x1a0[3] / 480.0f) * 85.0f + dial.field_0x04);
-            dial.length = ((unsigned int)owner->currentCamera->field_0x1a0[2] / 640.0f) * 45.0f;
+            dial.field_0x00 = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
+                                           + (unsigned int)owner->currentCamera->viewport[0]);
+            dial.field_0x04 = (int)((unsigned int)owner->currentCamera->viewport[3] * screenRect.top / 480.0f
+                                           + (unsigned int)owner->currentCamera->viewport[1]);
+            dial.centerX = (int)(((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 64.0f + dial.field_0x00);
+            dial.centerY = (int)(((unsigned int)owner->currentCamera->viewport[3] / 480.0f) * 85.0f + dial.field_0x04);
+            dial.length = ((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 45.0f;
             dial.value = 0.0f;
             dial.maximum = 100.0f;
             dial.firstSweepValue = 50.0f;
@@ -359,7 +359,7 @@ int NameOverlay::UnknownVirtualSlot14()
         Camera* camera = Target()->currentCamera;
         Vector3 screen;
         float depth;
-        if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->field_0xec, &head, &screen, &depth)) {
+        if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->screenMatrix, &head, &screen, &depth)) {
             int x = (int)screen.x;
             int y = (int)screen.y;
             screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);

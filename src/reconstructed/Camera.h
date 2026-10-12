@@ -83,7 +83,7 @@ protected:
     Matrix4 viewMatrix;        // +0xac, set by slot 31
     // Rebuilt by slot 28: [1] (+0x12c) is the projection times the viewport
     // scale (0.5, -0.5, offset 0.5), [0] (+0xec) that times the view matrix.
-    Matrix4 field_0xec[2];
+    Matrix4 screenMatrix[2];                  // +0xec
     float fieldOfView;                        // +0x16c degrees, 77.0f (keys 0xc7/0xcf step it)
     Vector3 eyePosition;                      // +0x170 (0, 0, 0); copied to field_0x208
     Vector3 viewDirection;                    // +0x17c (0, 0, 1); copied to field_0x214
@@ -91,10 +91,10 @@ protected:
     float roll;                               // +0x194 roll, passed to the view matrix by slot 28
     float focalLength;                        // +0x198 half viewport width / tan(fov / 2) (slot 28)
     float displayAspect;                      // +0x19c display-mode width/height (0x0042e550)
-    int field_0x1a0[6];             // [0..3]: x, y, width, height for slot 13
+    int viewport[6];                          // +0x1a0 x, y, width, height, then min/max depth as floats (owner slot 14)
     float heightWidthRatio;                   // +0x1b8 height/width ratio (0x0042f0e0)
-    float field_0x1bc;              // g_UnknownFloat550f6c (1.0f)
-    float field_0x1c0;              // g_UnknownFloat550f70 (100000.0f)
+    float nearPlane;                          // +0x1bc g_UnknownFloat550f6c (1.0f); slot 28 passes it to 0x004a1460
+    float farPlane;                           // +0x1c0 g_UnknownFloat550f70 (100000.0f); likewise
     int targetWidth;                          // +0x1c4 owner width (0x0042e550)
     int targetHeight;                         // +0x1c8 owner height (0x0042e550)
     int field_0x1cc;                // enables the slot 13 rectangle

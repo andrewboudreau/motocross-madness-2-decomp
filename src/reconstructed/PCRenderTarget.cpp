@@ -107,9 +107,9 @@ int PCRenderTarget::UnknownVirtualSlot12(const CameraRect* rect, int flags) {
                 goto failed;
         } else if (currentCamera) {
             area.left = 0;
-            area.right = currentCamera->field_0x1a0[2] + currentCamera->field_0x1a0[0];
+            area.right = currentCamera->viewport[2] + currentCamera->viewport[0];
             area.top = 0;
-            area.bottom = currentCamera->field_0x1a0[3] + currentCamera->field_0x1a0[1];
+            area.bottom = currentCamera->viewport[3] + currentCamera->viewport[1];
             if (device->Clear(1, &area, clearFlags, clearColor, zClearValue, 0))
                 goto failed;
         } else {

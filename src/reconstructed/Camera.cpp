@@ -16,11 +16,11 @@ Camera::Camera(int flags) : GameObject(flags) {
     file = 0;
     field_0x1e8 = 0;
     field_0x1ec = 0;
-    field_0x1bc = g_UnknownFloat550f6c;
-    field_0x1c0 = g_UnknownFloat550f70;
+    nearPlane = g_UnknownFloat550f6c;
+    farPlane = g_UnknownFloat550f70;
     field_0x1cc = 0;
     field_0x1d0 = 0;
-    memset(field_0x1a0, 0, sizeof(field_0x1a0));
+    memset(viewport, 0, sizeof(viewport));
     worldMatrix = IdentityMatrix();
     viewDirection = Vector3(0.0f, 0.0f, 1.0f);
     upDirection = Vector3(0.0f, 1.0f, 0.0f);
@@ -72,12 +72,12 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
 int Camera::UnknownVirtualSlot13() {
     if (field_0x1cc) {
         CameraRect rect;
-        int x = field_0x1a0[0];
-        int y = field_0x1a0[1];
+        int x = viewport[0];
+        int y = viewport[1];
         rect.left = x;
         rect.top = y;
-        rect.right = x + field_0x1a0[2];
-        rect.bottom = y + field_0x1a0[3];
+        rect.right = x + viewport[2];
+        rect.bottom = y + viewport[3];
         Owner()->UnknownVirtualSlot12(&rect, 0);
     }
     ReapplyDefaultLimits();
@@ -100,15 +100,15 @@ int Camera::UpdateViewport() {
     float width = (float)display->displayModes[display->currentDisplayMode].width;
     float height = (float)owner->targetDisplay->displayModes[owner->targetDisplay->currentDisplayMode].height;
     displayAspect = width / height;
-    field_0x1a0[0] = 0;
-    field_0x1a0[1] = 0;
-    field_0x1a0[2] = targetWidth;
-    field_0x1a0[3] = targetHeight;
-    ((float*)field_0x1a0)[4] = 0.0f;
-    ((float*)field_0x1a0)[5] = 1.0f;
-    if (!owner->UnknownVirtualSlot14(field_0x1a0))
+    viewport[0] = 0;
+    viewport[1] = 0;
+    viewport[2] = targetWidth;
+    viewport[3] = targetHeight;
+    ((float*)viewport)[4] = 0.0f;
+    ((float*)viewport)[5] = 1.0f;
+    if (!owner->UnknownVirtualSlot14(viewport))
         return 0;
-    heightWidthRatio = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
+    heightWidthRatio = (float)(unsigned int)viewport[3] / (float)(unsigned int)viewport[2];
     field_0x1d0 = Owner()->frameModulus + 1;
     field_0x1cc = Owner()->frameModulus + 1;
     return 1;
@@ -157,10 +157,10 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
         }
         if (widthKeysEnabled) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
-                (unsigned int)field_0x1a0[2] < (unsigned int)targetWidth)
+                (unsigned int)viewport[2] < (unsigned int)targetWidth)
                 SetViewportWidth(-1, 2, 0);
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
-                (unsigned int)field_0x1a0[2] > 0x20)
+                (unsigned int)viewport[2] > 0x20)
                 SetViewportWidth(1, -2, 0);
         }
         UnknownVirtualSlot28();
@@ -202,7 +202,7 @@ void Camera::SetFrame(const Vector3* position, const Vector3* forward, const Vec
 
 // 0x0042e8e0
 int Camera::ReapplyDefaultLimits() {
-    if (field_0x1c0 != g_UnknownFloat550f70 || field_0x1bc != g_UnknownFloat550f6c) {
+    if (farPlane != g_UnknownFloat550f70 || nearPlane != g_UnknownFloat550f6c) {
         ClampLimits(g_UnknownFloat550f6c, g_UnknownFloat550f70);
         UnknownVirtualSlot28();
     }
@@ -211,11 +211,11 @@ int Camera::ReapplyDefaultLimits() {
 
 // 0x0042e960
 void Camera::ClampLimits(float minimum, float maximum) {
-    field_0x1bc = (g_UnknownFloat550f6c > minimum) ? g_UnknownFloat550f6c : minimum;
+    nearPlane = (g_UnknownFloat550f6c > minimum) ? g_UnknownFloat550f6c : minimum;
     if (g_UnknownFloat550f70 < maximum)
-        field_0x1c0 = g_UnknownFloat550f70;
+        farPlane = g_UnknownFloat550f70;
     else
-        field_0x1c0 = maximum;
+        farPlane = maximum;
 }
 
 // 0x00467ae0 (shared return-1 body)
@@ -335,40 +335,40 @@ int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* 
 // unsigned against +0x1c8.
 int Camera::SetViewportWidth(int x, int width, int absolute) {
     if (absolute) {
-        field_0x1a0[0] = x;
-        field_0x1a0[2] = width;
+        viewport[0] = x;
+        viewport[2] = width;
     } else {
-        field_0x1a0[0] += x;
-        field_0x1a0[2] += width;
+        viewport[0] += x;
+        viewport[2] += width;
     }
-    field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * heightWidthRatio);
-    if ((unsigned int)field_0x1a0[3] > (unsigned int)targetHeight)
-        field_0x1a0[3] = targetHeight;
-    field_0x1a0[1] = (unsigned int)(targetHeight - field_0x1a0[3]) >> 1;
+    viewport[3] = (int)((float)(unsigned int)viewport[2] * heightWidthRatio);
+    if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
+        viewport[3] = targetHeight;
+    viewport[1] = (unsigned int)(targetHeight - viewport[3]) >> 1;
     field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
-    return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
+    return Owner()->UnknownVirtualSlot14(viewport) != 0;
 }
 
 // 0x0042f190. Retail stores the width before y.
 int Camera::SetViewport(int x, int y, int width, int height) {
-    field_0x1a0[0] = x;
-    field_0x1a0[2] = width;
-    field_0x1a0[1] = y;
-    field_0x1a0[3] = height;
-    if ((unsigned int)field_0x1a0[2] > (unsigned int)targetWidth)
-        field_0x1a0[2] = targetWidth;
-    if ((unsigned int)field_0x1a0[3] > (unsigned int)targetHeight)
-        field_0x1a0[3] = targetHeight;
+    viewport[0] = x;
+    viewport[2] = width;
+    viewport[1] = y;
+    viewport[3] = height;
+    if ((unsigned int)viewport[2] > (unsigned int)targetWidth)
+        viewport[2] = targetWidth;
+    if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
+        viewport[3] = targetHeight;
     field_0x1cc = field_0x1d0 = Owner()->frameModulus + 1;
-    return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
+    return Owner()->UnknownVirtualSlot14(viewport) != 0;
 }
 
 // 0x0042f210
 void Camera::GetViewportRect(CameraRect* rect) {
-    rect->left = field_0x1a0[0];
-    rect->right = field_0x1a0[0] + field_0x1a0[2];
-    rect->top = field_0x1a0[1];
-    rect->bottom = field_0x1a0[1] + field_0x1a0[3];
+    rect->left = viewport[0];
+    rect->right = viewport[0] + viewport[2];
+    rect->top = viewport[1];
+    rect->bottom = viewport[1] + viewport[3];
 }
 
 // Retail initialises the usual four vector constants (0x005796c0, 0x005796d0,
