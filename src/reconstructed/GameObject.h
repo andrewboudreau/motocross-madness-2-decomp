@@ -101,10 +101,10 @@ protected:
     // Offsets and widths are evidenced by the reconstructed methods; names are
     // placeholders. Children are reached through field_0x10 and chained through
     // their field_0x0C (traversal by slots 6, 7, 12-18 and 26).
-    GameObject* field_0x08;    // previous sibling
-    GameObject* field_0x0C;    // next sibling
-    GameObject* field_0x10;    // first child
-    GameObject* field_0x14;    // parent
+    GameObject* prevSibling;                  // +0x08 previous sibling
+    GameObject* nextSibling;                  // +0x0 next sibling
+    GameObject* firstChild;                   // +0x10 first child
+    GameObject* parent;                       // +0x14 parent
     void* field_0x18;          // set by slots 8 and 25; Camera's owner object
     int field_0x1C;
     unsigned int field_0x20;   // flag word gating slots 12-18

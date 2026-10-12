@@ -1691,11 +1691,11 @@ int UIDropDownList::ButtonDown(int a, int b) {
 
 // 0x0047b3f0
 int UICtlContainer::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    GameObject* child = field_0x10;
+    GameObject* child = firstChild;
     if (child) {
-        while (child->field_0x0C)
-            child = child->field_0x0C;
-        for (; child; child = child->field_0x08) {
+        while (child->nextSibling)
+            child = child->nextSibling;
+        for (; child; child = child->prevSibling) {
             if (child->UnknownVirtualSlot23(event, entry))
                 return 1;
         }
@@ -1705,11 +1705,11 @@ int UICtlContainer::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
 
 // 0x0047b440
 int UICtlContainer::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    GameObject* child = field_0x10;
+    GameObject* child = firstChild;
     if (child) {
-        while (child->field_0x0C)
-            child = child->field_0x0C;
-        for (; child; child = child->field_0x08) {
+        while (child->nextSibling)
+            child = child->nextSibling;
+        for (; child; child = child->prevSibling) {
             if (child->UnknownVirtualSlot22(event, entry))
                 return 1;
         }
@@ -2563,19 +2563,19 @@ int UIControl::UnknownVirtualSlot21(int value) {
 // 0x00472480
 int UIControl::UpdateHoverAt(int* position) {
     int result = 0;
-    GameObject* next = field_0x0C;
+    GameObject* next = nextSibling;
     while (next) {
         if (strstr(next->field_0x28, "UIControl,"))
             break;
-        next = next->field_0x0C;
+        next = next->nextSibling;
     }
     if (next) {
         result = ((UIControl*)next)->UpdateHoverAt(position);
         if (result)
             return result;
     }
-    if (field_0x10 && strstr(field_0x10->field_0x28, "UIControl,")) {
-        result = ((UIControl*)field_0x10)->UpdateHoverAt(position);
+    if (firstChild && strstr(firstChild->field_0x28, "UIControl,")) {
+        result = ((UIControl*)firstChild)->UpdateHoverAt(position);
         if (result)
             return result;
     }
@@ -2603,11 +2603,11 @@ UIControl* UIControl::PreviousFocusableControl() {
         if (control != this && control->enabled && control->shown && control->controlType != 5 &&
             control->controlType != 0xc)
             return control;
-        if (control->field_0x08) {
-            control = (UIControl*)control->field_0x08;
+        if (control->prevSibling) {
+            control = (UIControl*)control->prevSibling;
         } else {
-            while (control->field_0x0C)
-                control = (UIControl*)control->field_0x0C;
+            while (control->nextSibling)
+                control = (UIControl*)control->nextSibling;
         }
         if (control == this)
             return 0;
@@ -2622,9 +2622,9 @@ UIControl* UIControl::NextFocusableControl() {
         if (control != this && control->enabled && control->shown && control->controlType != 5 &&
             control->controlType != 0xc)
             return control;
-        control = (UIControl*)control->field_0x0C;
+        control = (UIControl*)control->nextSibling;
         if (!control)
-            control = (UIControl*)ownerDialog->controlContainer->field_0x10;
+            control = (UIControl*)ownerDialog->controlContainer->firstChild;
         if (control == this)
             return 0;
     }
@@ -3365,15 +3365,15 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 
 // 0x0046f120
 void UIDialog::UnknownFunction46f120() {
-    if (guiUser->pointerDevice && controlContainer->field_0x10) {
+    if (guiUser->pointerDevice && controlContainer->firstChild) {
         GUIUser* user = guiUser;
         UnknownGuiControl* focus = user->hoverControl;
         if (focus && ((UIControl*)focus)->ownerDialog != (UIDialog*)this)
             focus = 0;
         POINT position = user->pointerDevice->pointerPosition;
-        if (controlContainer->field_0x10) {
+        if (controlContainer->firstChild) {
             user->field_0x1dc = 0;
-            int result = ((UIControl*)controlContainer->field_0x10)->UpdateHoverAt((int*)&position);
+            int result = ((UIControl*)controlContainer->firstChild)->UpdateHoverAt((int*)&position);
             if (focus && !guiUser->pendingHoverControl && !result)
                 guiUser->RequestHover(0, 0, 1);
         }
