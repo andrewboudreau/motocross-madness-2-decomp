@@ -199,6 +199,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0051eaf0` `GetLineTail`
 - `0x0051eb10` `GetHistory`
 - `0x0051eb40` `AddHistory`
+- `0x00519a20` `DrawStandings` (near-miss sample)
 - `0x0051da30` `ChatOverlay::HandleChatKey` (BikeRace.h's view of +0x19c uses the same name)
 
 ## Field names

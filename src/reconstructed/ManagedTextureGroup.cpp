@@ -186,9 +186,9 @@ void ManagedTextureGroup::RepackPages() {
     for (int i = 0; i < 9; i++)
         field_0x90[i].Clear();
     if (g_TrackGame->display->partialTextureUploadResult <= 0)
-        UnknownFunction50c960();
+        RepackWholePages();
     else
-        UnknownFunction50dad0();
+        RepackWithPartialBlits();
 }
 
 // 0x0050ee70: qsort order of ManagedTexture pointers, by +0xac descending,

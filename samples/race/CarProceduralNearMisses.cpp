@@ -3,7 +3,7 @@
 // CarProceduralNearMisses.bindings.json. Scores are matching bytes under
 // vc6_o2_mt with relocations resolved.
 //
-// CarProcedural::UnknownFunction430b10 (0x00430b10, 842 bytes; 299 of 842):
+// CarProcedural::PositionAtTime (0x00430b10, 842 bytes; 299 of 842):
 // the path evaluation. The key search loops, the Hermite weights call (its
 // fourth weight written over the `time` parameter, as retail's
 // `lea ecx,[esp+0x60]` shows), the tangent temporaries and the final
@@ -80,7 +80,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 // 0x00430b10: the path position at `time` (wrapped to the path's period):
 // a cubic Hermite segment between the keys around it, whose tangents are
 // the neighbouring chords scaled by the key spacing.
-Vector3 CarProcedural::UnknownFunction430b10(float time)
+Vector3 CarProcedural::PositionAtTime(float time)
 {
     unsigned int count = field_0x6c;
     CarProceduralKey* keys = field_0x1b4;
@@ -255,13 +255,13 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     if (field_0x19c > 0.0) {
         field_0x1a0 = FindOffsetAtDistance(field_0x194, field_0x19c);
         t = field_0x194 - field_0x1a0;
-        field_0x1c4 = UnknownFunction430b10(t);
+        field_0x1c4 = PositionAtTime(t);
     } else {
         field_0x1a0 = 0.0f;
         t = field_0x194;
-        field_0x1c4 = UnknownFunction430b10(t);
+        field_0x1c4 = PositionAtTime(t);
     }
-    Vector3 ahead = UnknownFunction430b10(t + field_0x1a4);
+    Vector3 ahead = PositionAtTime(t + field_0x1a4);
     Vector3 forward = ahead - field_0x1c4;
     forward.y = 0.0f;
     field_0x40 = forward * field_0x1a8;
@@ -270,7 +270,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     if (field_0x60 > 0)
         field_0x18c = (float)fmod(field_0x184 * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
     float behind = FindOffsetAtDistance(t, -1.0f);
-    Vector3 back = UnknownFunction430b10(t - behind) - field_0x1c4;
+    Vector3 back = PositionAtTime(t - behind) - field_0x1c4;
     CarNormalizeInPlace(back);
     if (field_0x5c)
         field_0x1f4 = back;
@@ -278,7 +278,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         field_0x1f4 = field_0x1f4 * field_0x1ac + back * (1.0f - field_0x1ac);
     if (field_0x50 && field_0x60 > 0) {
         float wheelbase = FindOffsetAtDistance(t, -field_0x198);
-        Vector3 side = UnknownFunction430b10(t - wheelbase) - field_0x1c4;
+        Vector3 side = PositionAtTime(t - wheelbase) - field_0x1c4;
         Vector3 steer = field_0x34->UnknownFunction4fd710(side);
         field_0x190 = (float)atan2(steer.x, steer.z);
         field_0x190 = CarClamp(field_0x190, -0.52359873f, 0.52359873f);

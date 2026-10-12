@@ -105,7 +105,7 @@
   "?UnknownFunction432720@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@HHHH@Z": "0x00432720",
   "?UnknownFunction432800@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@PBD@Z": "0x00432800",
   "?UnknownFunction435fe0@UnknownSceneCollisionObject@@QAEXXZ": "0x00435fe0",
-  "?UnknownFunction43a330@@YAPAXHPAPAXPBUVector3@@PAXMPAHMH@Z": "0x0043a330",
+  "?AddCollisionPoint@@YAPAXHPAPAXPBUVector3@@PAXMPAHMH@Z": "0x0043a330",
   "?UnknownFunction4444c0@D3DIMSoultreeObject@@QAEXH@Z": "0x004444c0",
   "?UnknownFunction4444c0@UnknownSceneLodObject@@QAEXH@Z": "0x004444c0",
   "?UnknownFunction464e80@Scene@@QAEXPBD@Z": "0x00464e80",

@@ -307,9 +307,9 @@ public:
     DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain* terrain, int a4, int a5,
                      int a6, int a7, int a8, int a9, int a10);  // 0x0047e540 (ret 0x2c)
     virtual ~DrawableGridNode();                                // 0x0047ec60 (slot 0 0x0047e5e0)
-    DrawableGridNode* UnknownFunction47e600(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
-                                            int level, int shift, int x, int z, int index,
-                                            float* boundsMin, float* boundsMax); // 0x0047e600 (ret 0x28)
+    DrawableGridNode* ReadNode(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
+                               int level, int shift, int x, int z, int index,
+                               float* boundsMin, float* boundsMax); // 0x0047e600 (ret 0x28)
     virtual GridNode* UnknownVirtualSlot2(UnknownTextureStream* stream, int a1, DrawableGridNode* parent,
                                           int level, int shift, int x, int z, int index,
                                           void* a8, void* a9) { return 0; }   // 0x004806e0
@@ -322,7 +322,7 @@ public:
 
     void ReleaseVertexBuffers(int recurse);                    // 0x0047edb0 (ret 4)
     int UnknownFunction47ef70();                                // 0x0047ef70
-    int UnknownFunction47ef80(int x, int z, int size, int quad); // 0x0047ef80 (ret 0x10)
+    int WalkVisibleQuadrants(int x, int z, int size, int quad); // 0x0047ef80 (ret 0x10)
     int UnknownFunction47f210();                                // 0x0047f210
     int RebuildWholeNodeBuffers();                                // 0x0047f840
     int EmitDiagonalTriangles(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x0047fce0 (ret 0x1c)
@@ -331,7 +331,7 @@ public:
     int AppendCornerTriangle(int n, int x, int z, int dx, int dz); // 0x00480700 (ret 0x14)
     int UnknownFunction480900(void* target);                    // 0x00480900 (ret 4)
     int UnknownFunction480920(void* target, int a5);            // 0x00480920 (ret 8)
-    int UnknownFunction480940(void* target, int x, int z, int size, int quad, int a5); // 0x00480940 (ret 0x18)
+    int DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5); // 0x00480940 (ret 0x18)
     int UnknownFunction480ad0(void* target, int x, int z, int size, int quad, int a5); // 0x00480ad0 (ret 0x18)
     void SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480c90 (ret 0x18)
@@ -353,7 +353,7 @@ public:
                               int size, int a7, int a8, int a9); // 0x00481de0 (ret 0x28)
     void UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse,
                                int coarse);                     // 0x004824c0 (ret 0x10)
-    void UnknownFunction4826d0();                               // 0x004826d0
+    void PropagateFullMask();                               // 0x004826d0
     void RetestChangedVertices();                               // 0x00482760
     void TestVertex(int x, int z);                   // 0x00482a40 (ret 8)
     void TestNodeVertices();                               // 0x00482ae0
@@ -364,8 +364,8 @@ public:
     int RetestUnpinnedVertex(int x, int z);                    // 0x00482f00 (ret 8)
     int ForceBlockCentres();                                // 0x00483040
     int ReleaseBlockCentres();                                // 0x00483100
-    void UnknownFunction483200(int x, int z, int flag, int dir, GridBaseCell* origin,
-                               int minLevel);                   // 0x00483200 (ret 0x18)
+    void WalkBorderVertex(int x, int z, int flag, int dir, GridBaseCell* origin,
+                          int minLevel);                   // 0x00483200 (ret 0x18)
     void PropagateBorderChange(DrawableGridNode* child, int x, int z, int flag, int dir,
                                GridBaseCell* cell);             // 0x004835c0 (ret 0x18)
     void UnknownFunction464e90();                               // 0x00464e90 (shared empty body)

@@ -27,7 +27,7 @@
 // block locals, the clip written out with named locals, push/previousPush
 // declared at function or loop scope, `sum = sum + push`.
 //
-// UnknownFunction531740 (0x00531740, 1624 bytes; 1606/1624): the contact
+// SprayContactParticles (0x00531740, 1624 bytes; 1606/1624): the contact
 // particle spray. Frame, slot order and every instruction but two match
 // with the normalisations written as nested expressions (their temporaries
 // share slots as retail's do) and the per-particle gravity drift built
@@ -183,7 +183,7 @@ void Wrecker::UnknownFunction5329e0(float frameTime) {
 // from `from` to `to`. Their velocity is the wreck's (or the rigid body's)
 // velocity plus a sideways jitter, plus the remaining gravity drift of the
 // frame; frameTime * 200 particles are emitted per frame.
-void Wrecker::UnknownFunction531740(Vector3 from, Vector3 to, Vector3 normal, float frameTime) {
+void Wrecker::SprayContactParticles(Vector3 from, Vector3 to, Vector3 normal, float frameTime) {
     Vector3 delta = to - from;
     Vector3 velocity;
     if (wreckState == 0)

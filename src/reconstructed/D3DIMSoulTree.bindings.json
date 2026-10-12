@@ -43,7 +43,7 @@
   "?SoultreeVirtualSlot8@D3DIMSoultreeObject@@UAEXPAVSoultreeObject@@0@Z": "0x00444b60",
   "?SoultreeVirtualSlot8@SoultreeObject@@UAEXPAV1@0@Z": "0x004feb30",
   "?ReadLods@D3DIMSoultreeObject@@QAEHXZ": "0x00440060",
-  "?UnknownFunction440810@D3DIMSoultreeObject@@QAEXXZ": "0x00440810",
+  "?UpdateMaterialTexelRatios@D3DIMSoultreeObject@@QAEXXZ": "0x00440810",
   "?TransformVertexGroups@D3DIMSoultreeObject@@QAEXH@Z": "0x00440d40",
   "?DrawCurrentLod@D3DIMSoultreeObject@@QAEXXZ": "0x00440f30",
   "?DrawWireframe@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z": "0x00442f70",

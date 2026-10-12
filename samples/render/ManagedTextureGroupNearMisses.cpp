@@ -1,7 +1,7 @@
 // Near-miss ManagedTextureGroup candidates (TextureCache.cpp), kept out of
 // src/reconstructed until they match. See docs/TEXTUREMAPMANAGER.md.
 //
-// ManagedTextureGroup::UnknownFunction50c960 (0x0050c960, 3742 bytes): the
+// ManagedTextureGroup::RepackWholePages (0x0050c960, 3742 bytes): the
 // repack. The control flow, every call and the inlining pattern line up:
 // VC6 inlines ContainerList::Reserve only in the last two Add calls, as
 // retail does, once the TexMem figures go through TexelMegabytes and
@@ -20,7 +20,7 @@
 // refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
 // registers rotate); an `elapsed` local for `now - field_0x250` (worse).
 //
-// ManagedTextureGroup::UnknownFunction50dad0 (0x0050dad0, 5020 bytes): the
+// ManagedTextureGroup::RepackWithPartialBlits (0x0050dad0, 5020 bytes): the
 // repack with partial texture blits, chosen by 0x0050c8c0. Control flow,
 // calls, inlining and the scalar stack slots line up (the slots only once
 // one `managed` variable serves every loop, and the blit-pass loop only as
@@ -97,7 +97,7 @@ static inline float PageMegabytes(ManagedTextureGroup* group, const int& pages) 
 // unused ones give up their place. The pages least wanted by the planned
 // textures are emptied until the textures that need a place fit, and are
 // refilled largest level first; the figures go to the debug overlay.
-void ManagedTextureGroup::UnknownFunction50c960() {
+void ManagedTextureGroup::RepackWholePages() {
     field_0x1d0 = 0;
     UnknownFunction4bfa80();
     field_0x1cc = 0;
@@ -314,7 +314,7 @@ static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedText
 // still needing a place are placed largest first, collecting those to blit
 // in +0x144. Their blits are spread over up to two passes within +0x74
 // texels; the figures go to the debug overlay.
-void ManagedTextureGroup::UnknownFunction50dad0() {
+void ManagedTextureGroup::RepackWithPartialBlits() {
     field_0x1d0 = 0;
     UnknownFunction4bfa80();
     field_0x1cc = 0;

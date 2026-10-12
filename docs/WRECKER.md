@@ -165,7 +165,8 @@ Renaming changed no calibration bytes.
 
 Function names (tier 3, from behaviour): `0x00531da0` `EmitProbeTrail`
 (particles along a probe's movement) and `0x00532580` `RebuildPoseSteps`
-(the pose's linear and angular steps from the node's frame).
+(the pose's linear and angular steps from the node's frame), and the
+near miss `0x00531740` `SprayContactParticles`.
 
 ## Remaining uncertainty
 

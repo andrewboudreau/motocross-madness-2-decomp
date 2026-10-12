@@ -412,7 +412,7 @@ int StatsOverlay::Redraw()
 {
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 0:
-        if (!UnknownFunction519a20())
+        if (!DrawStandings())
             goto fail;
         break;
     case 1:

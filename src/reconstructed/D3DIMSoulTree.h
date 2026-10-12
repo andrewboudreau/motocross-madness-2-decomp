@@ -240,7 +240,7 @@ public:
 
     // Not reconstructed: 0x00440810, the drawing function 0x00440f30, slot
     // 12 and 0x00443de0 (see samples/render/D3DIMSoulTreeNearMisses.cpp).
-    void UnknownFunction440810();                  // 0x00440810
+    void UpdateMaterialTexelRatios();                  // 0x00440810
     void TransformVertexGroups(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
     void DrawCurrentLod();                         // 0x00440f30: draws the current level of detail
     void SelectLod(Vector3* center, Vector3* extents);             // 0x00443de0 (ret 8): picks the level of detail

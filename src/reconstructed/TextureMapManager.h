@@ -71,8 +71,8 @@ public:
     void RestoreLostPages();             // 0x0050c790: restores lost pages
     void WriteDebugReport();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
     void RepackPages();             // 0x0050c8c0: repacks the pages
-    void UnknownFunction50c960();             // 0x0050c960 (near miss in samples/render)
-    void UnknownFunction50dad0();             // 0x0050dad0 (near miss in samples/render)
+    void RepackWholePages();             // 0x0050c960 (near miss in samples/render)
+    void RepackWithPartialBlits();             // 0x0050dad0 (near miss in samples/render)
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body): out of page space
     // 0x0050ef70 (manager slot 15): draws the debug-key selection into
     // `target`; 0 unless this is the manager's selected group.
@@ -139,7 +139,7 @@ public:
     // 0x005113d0: shares the texture cache limit out among the groups (on
     // AGP displays it restores every grouped texture instead).
     int UnknownFunction5113d0();
-    void UnknownFunction511580();             // 0x00511580 (PCTextureMap slot 12 and destructor)
+    void CountTextureMemory();             // 0x00511580 (PCTextureMap slot 12 and destructor)
     // 0x00511310 / 0x00511370: grow-only scratch buffers of at least
     // `bytes`; 0 when the allocation fails.
     void* UnknownFunction511310(unsigned int bytes);

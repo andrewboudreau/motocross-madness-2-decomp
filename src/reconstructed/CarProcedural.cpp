@@ -231,7 +231,7 @@ float CarProcedural::FindOffsetAtDistance(float time, float distance)
     int forward = 0;
     if (!(distance < 0.0))
         forward = 1;
-    Vector3 previous = UnknownFunction430b10(time);
+    Vector3 previous = PositionAtTime(time);
     for (; count < 200; count++) {
         if (fabs(travelled - distance) <= 0.1f)
             break;
@@ -242,7 +242,7 @@ float CarProcedural::FindOffsetAtDistance(float time, float distance)
                 forward = 1;
             }
             result += step;
-            position = UnknownFunction430b10(time - result);
+            position = PositionAtTime(time - result);
             travelled += Length(position - previous);
             previous = position;
         } else {
@@ -251,7 +251,7 @@ float CarProcedural::FindOffsetAtDistance(float time, float distance)
                 forward = 0;
             }
             result -= step;
-            position = UnknownFunction430b10(time - result);
+            position = PositionAtTime(time - result);
             travelled -= Length(position - previous);
             previous = position;
         }

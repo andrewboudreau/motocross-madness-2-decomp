@@ -81,5 +81,6 @@ TextureMap.h gained `UnknownTextureStream::UnknownFunction461aa0`, which
 reads a line.
 
 The path-file parser `0x0042fa00` is named `ReadPath` and the bisection
-search `0x004308e0` `FindOffsetAtDistance`, from the behaviour their comments
+search `0x004308e0` `FindOffsetAtDistance` (the position at a time,
+`0x00430b10`, is `PositionAtTime`), from the behaviour their comments
 record (provisional names).

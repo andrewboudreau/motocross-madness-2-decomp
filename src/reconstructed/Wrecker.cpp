@@ -443,7 +443,7 @@ void Wrecker::UnknownFunction532020(float frameTime) {
         if (collisionModel->probes[i].hit) {
             Vector3 point = collisionModel->probes[i].node->UnknownFunction4fd660(collisionModel->probes[i].localPoint);
             EmitProbeTrail(probePositions[i], point, frameTime);
-            UnknownFunction531740(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
+            SprayContactParticles(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
         }
     }
 }

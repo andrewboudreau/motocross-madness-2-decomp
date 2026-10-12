@@ -318,7 +318,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                                                                   g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
                                                                   &status->field_0x38);
             else
-                track->UnknownFunction516980(status->field_0x1c, &status->field_0x38, 0);
+                track->ClosestPointOnTrack(status->field_0x1c, &status->field_0x38, 0);
             if (racer->field_0x78c) {
                 racer->field_0x76c = 0;
                 status->field_0x08 = track->UnknownFunction517da0(status->field_0x44, finish->field_0x2c);

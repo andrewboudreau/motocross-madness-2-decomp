@@ -187,7 +187,7 @@ python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" \
   src/reconstructed/Griddraw.cpp -o work/griddraw.obj
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x0047ef80 \
   --target-size 643 --obj work/griddraw.obj \
-  --symbol '?UnknownFunction47ef80@DrawableGridNode@@QAEHHHHH@Z' \
+  --symbol '?WalkVisibleQuadrants@DrawableGridNode@@QAEHHHHH@Z' \
   --bindings src/reconstructed/Griddraw.bindings.json --json
 ```
 
@@ -285,3 +285,6 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0047d470` `DrawableGridNodeSharedTextures::BuildNodeTexture` (Grid1.h)
 - `0x0047d780` `DrawableGridNodeSharedTextures::BuildBlockTexture` (Grid1.h)
 - `0x00484d70` `GridNode::FindLeaf` (GridNode near-miss sample)
+- `0x0047e600` `ReadNode`, `0x0047ef80` `WalkVisibleQuadrants`, `0x00480940`
+  `DrawVisibleQuadrants`, `0x004826d0` `PropagateFullMask` and `0x00483200`
+  `WalkBorderVertex` (near-miss sample)

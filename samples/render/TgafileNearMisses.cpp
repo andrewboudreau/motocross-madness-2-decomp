@@ -1,7 +1,7 @@
 // Near-miss Tgafile.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/TGAFILE.md.
 //
-// UnknownFunction512990 (0x00512990, 1074 bytes): the TGA writer behind
+// WriteTga (0x00512990, 1074 bytes): the TGA writer behind
 // 0x00512720/0x005127f0/0x005128c0. The header writes, the three depth
 // branches and their exits line up, and with a `pitch` local and
 // function-scope loop counters the frame matches (one local plus the four
@@ -24,7 +24,7 @@
 // pixels are swapped in place and written in blocks; 16-bit rows go as
 // they are for 555 and pixel by pixel as 555 for 565. The 16-bit failures
 // return without closing the file, as in retail.
-int UnknownFunction512990(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor) {
+int WriteTga(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor) {
     int row;
     int column;
     unsigned int pitch;

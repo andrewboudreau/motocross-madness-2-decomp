@@ -15,7 +15,7 @@
 // `float d[2]` or 2-D struct for the projection and a constructor-built
 // 2-D delta are worse (202-232).
 //
-// Track::UnknownFunction516ef0 (0x00516ef0, 1042 bytes): 1032/1042. Edge 2
+// Track::IsInsideStrip (0x00516ef0, 1042 bytes): 1032/1042. Edge 2
 // (retail computes b.x - a.x before p.z - a.z) matches with the first factor
 // written `((b->x - a->x))` (docs/VC6_OPERAND_ORDER.md section 3); edge 6
 // still evaluates p.x - a.x before b.z - a.z (retail the other way). All 256
@@ -154,7 +154,7 @@ static inline int UnknownEdgeCrosses(TrackVec3 p, const TrackVec3* a, const Trac
 // 0x00516ef0: whether p lies, in the horizontal plane, inside the strip
 // between segment and next (edge points at +0x0c and +0x18, centre at
 // +0x00), by the crossing-number rule over six edges.
-int Track::UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
+int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
 {
     int inside = 0;
     if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x0c, (TrackVec3*)&next->field_0x0c))
@@ -277,7 +277,7 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
             TrackSegment* next;
             for (TrackSegment* segment = list->field_0x04->field_0x08; segment && (next = segment->field_0x2c) != 0;
                  segment = segment->field_0x2c) {
-                if (UnknownFunction516ef0(*(TrackVec3*)&p, segment, next)) {
+                if (IsInsideStrip(*(TrackVec3*)&p, segment, next)) {
                     float ex = next->field_0x00 - segment->field_0x00;
                     float ez = next->field_0x08 - segment->field_0x08;
                     if (ex == 0.0f && ez == 0.0f) {
@@ -380,7 +380,7 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
 // differences in the t < 0 and t == 0 branches where retail recomputes them,
 // so the branch code is shorter and every later offset shifts. Named px/pz
 // locals (retail stores both before the division) add a second copy instead.
-int Track::UnknownFunction516980(Vector3 p, TrackPos* out, float* outDistance)
+int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
 {
     float best = -1.0f;
     if (!out)
@@ -668,12 +668,12 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
     if (*hasStart) {
         TrackProbe* probe = (TrackProbe*)start;
         probe->field_0x28 = 150.0f;
-        UnknownFunction516980(*(Vector3*)&probe->centre, &probe->pos, 0);
+        ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
     }
     if (*hasFinish) {
         TrackProbe* probe = (TrackProbe*)finish;
         probe->field_0x28 = 150.0f;
-        UnknownFunction516980(*(Vector3*)&probe->centre, &probe->pos, 0);
+        ClosestPointOnTrack(*(Vector3*)&probe->centre, &probe->pos, 0);
     }
     {
         TrackPos from;

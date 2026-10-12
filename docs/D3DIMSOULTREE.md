@@ -76,6 +76,7 @@ method slots and arguments, callers); the address-derived names they
 replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x00440060` `ReadLods`
+- `0x00440810` `UpdateMaterialTexelRatios` (near-miss sample)
 - `0x00440d40` `TransformVertexGroups`
 - `0x00440f30` `DrawCurrentLod`
 - `0x00442f70` `DrawWireframe`

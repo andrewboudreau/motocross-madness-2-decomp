@@ -13,7 +13,7 @@
   "?MarkUsed@GridAgeManager@@QAEXPAUGridAgeEntry@@@Z": "0x00401250",
   "?EvictNodeTexture@@YAHPAX@Z": "0x0047ca00",
   "?EvictBlockTexture@@YAHPAXH@Z": "0x0047ca40",
-  "?UnknownFunction47e600@DrawableGridNode@@QAEPAV1@PAVUnknownTextureStream@@HPAV1@HHHHHPAM2@Z": "0x0047e600",
+  "?ReadNode@DrawableGridNode@@QAEPAV1@PAVUnknownTextureStream@@HPAV1@HHHHHPAM2@Z": "0x0047e600",
   "?BlockDistance@DrawableGridNode@@QAEMH@Z": "0x00481b30",
   "?RecordUse@ManagedTexture@@QAEXM@Z": "0x00510820",
   "?UnknownVirtualSlot2@DrawableGridNodeSharedTextures@@UAEPAVGridNode@@PAVUnknownTextureStream@@HPAVDrawableGridNode@@HHHHHPAX2@Z": "0x0047c960",

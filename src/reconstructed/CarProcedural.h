@@ -141,7 +141,7 @@ public:
 
     void ReadPath(const char* pathFile, const char* name); // 0x0042fa00 (ret 8)
     float FindOffsetAtDistance(float time, float distance);         // 0x004308e0 (ret 8)
-    Vector3 UnknownFunction430b10(float time);                       // 0x00430b10 (ret 8)
+    Vector3 PositionAtTime(float time);                       // 0x00430b10 (ret 8)
     // 0x00430e60 (ret 0x14): the four cubic Hermite basis weights of t.
     void HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3);
 

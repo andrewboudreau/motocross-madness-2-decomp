@@ -142,7 +142,7 @@
   "?UnknownFunction50c6c0@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?UnknownFunction511310@TextureMapManager@@QAEPAXI@Z": "0x00511310",
   "?UnknownFunction511370@TextureMapManager@@QAEPAXI@Z": "0x00511370",
-  "?UnknownFunction511580@TextureMapManager@@QAEXXZ": "0x00511580",
+  "?CountTextureMemory@TextureMapManager@@QAEXXZ": "0x00511580",
   "?BytesPerPixel@@YAHH@Z": "0x00511740",
   "?IsCompressedFormat@@YAHH@Z": "0x00511800",
   "?HasMipLevels@@YAHH@Z": "0x00511850",

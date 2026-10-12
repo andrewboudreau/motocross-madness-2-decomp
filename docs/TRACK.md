@@ -141,7 +141,10 @@ frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
 
 Provisional names taken from the behaviour each function's comment records:
 `FreeNodeArray` `0x00515e70`, `FreeNode` `0x00516800`, `FreeReachableNodes`
-`0x00516870`, `NodeHasSegment` `0x00517310` and `IsAtOrAfter` `0x005179a0`.
+`0x00516870`, `NodeHasSegment` `0x00517310` and `IsAtOrAfter` `0x005179a0`;
+the near misses `ClosestPointOnTrack` `0x00516980` and `IsInsideStrip`
+`0x00516ef0`. `0x00516ca0` (closest point on a node) and the high-score
+lister `0x0051ffe0` keep placeholders: BikeAI and TrackRecord.cpp call them.
 The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
 `0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address
 names because physics declarations (`src/krusty2/vehicle/KrustyBikeTypes.h`)

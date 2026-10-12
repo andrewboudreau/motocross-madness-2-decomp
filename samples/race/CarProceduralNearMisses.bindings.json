@@ -2,7 +2,7 @@
   "?CarCrossCall@@YA?AUVector3@@ABU1@0@Z": "0x00515600",
   "?CarNormalizeCall@@YA?AUVector3@@ABU1@@Z": "0x005087b0",
   "?FindOffsetAtDistance@CarProcedural@@QAEMMM@Z": "0x004308e0",
-  "?UnknownFunction430b10@CarProcedural@@QAE?AUVector3@@M@Z": "0x00430b10",
+  "?PositionAtTime@CarProcedural@@QAE?AUVector3@@M@Z": "0x00430b10",
   "?HermiteWeights@CarProcedural@@QAEXMPAM000@Z": "0x00430e60",
   "?UnknownFunction432ab0@CarProceduralCollision@@QAEXHPAUVector3@@@Z": "0x00432ab0",
   "?UnknownFunction435830@CarProceduralCollision@@QAEXPBUMatrix4@@@Z": "0x00435830",

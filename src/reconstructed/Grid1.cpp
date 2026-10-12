@@ -30,8 +30,8 @@ DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(UnknownTextureStr
     : DrawableGridNode((int)stream, a1, parent, terrain, level, shift, x, z, index, (int)boundsMin,
                        (int)boundsMax)
 {
-    UnknownFunction47e600(stream, a1, (DrawableGridNode*)parent, level, shift, x, z, index, boundsMin,
-                          boundsMax);
+    ReadNode(stream, a1, (DrawableGridNode*)parent, level, shift, x, z, index, boundsMin,
+             boundsMax);
 }
 
 // 0x0047c960

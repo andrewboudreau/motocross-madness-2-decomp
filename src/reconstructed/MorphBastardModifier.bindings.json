@@ -14,7 +14,7 @@
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?CompareTargets@@YAHPBX0@Z": "0x004a3bb0",
   "?AngleBetween@@YAMUVector3@@0@Z": "0x004a3be0",
-  "?UnknownFunction4a3c80@MorphBastardModifier@@QAEXPAUMorphBastardChannel@@UMatrix4@@@Z": "0x004a3c80",
+  "?ControllerAngles@MorphBastardModifier@@QAEXPAUMorphBastardChannel@@UMatrix4@@@Z": "0x004a3c80",
   "?UpdateChannels@MorphBastardModifier@@QAEXPAUMorphBastardObject@@@Z": "0x004a4bb0",
   "?CopyMesh@MorphBastardModifier@@QAEXPAUUnknownSoultreeMesh@@@Z": "0x004a5290",
   "?UnknownFunction4fca60@MorphBastardNode@@QAEXPAUMatrix4@@@Z": "0x004fca60",

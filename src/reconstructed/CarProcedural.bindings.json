@@ -32,7 +32,7 @@
   "?ReadPath@CarProcedural@@QAEXPBD0@Z": "0x0042fa00",
   "?ReadPath@CarProcedural@@QAEXPBD0@Z$ehhandler": "0x00549e0a",
   "?FindOffsetAtDistance@CarProcedural@@QAEMMM@Z": "0x004308e0",
-  "?UnknownFunction430b10@CarProcedural@@QAE?AUVector3@@M@Z": "0x00430b10",
+  "?PositionAtTime@CarProcedural@@QAE?AUVector3@@M@Z": "0x00430b10",
   "?HermiteWeights@CarProcedural@@QAEXMPAM000@Z": "0x00430e60",
   "?UnknownFunction430ff0@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
   "?UnknownFunction4320f0@CarProceduralCollision@@QAEXPAXHHH@Z": "0x004320f0",

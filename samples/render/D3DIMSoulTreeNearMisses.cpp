@@ -32,7 +32,7 @@
 // rotate it; neither does reading the source through the cast parameter at
 // any one of its 15 uses or at all of them, or `from` declared before `to`.
 //
-// UnknownFunction440810 (0x00440810, 1328 bytes): texture density per
+// UpdateMaterialTexelRatios (0x00440810, 1328 bytes): texture density per
 // material. Same 388 instructions; the uv delta is a copy of a zeroed
 // Vector3 (`Vector3 delta = zero`) taken once, which reproduces retail's
 // single z*z. Retail spills `this` and keeps the face offset in ebx; VC6
@@ -279,7 +279,7 @@ static inline float Length(const Vector3& v)
 // largest ratio of edge length to texture-coordinate length over its
 // faces, divided by the texture height, raises each textured material's
 // +0xcc.
-void D3DIMSoultreeObject::UnknownFunction440810()
+void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
 {
     TransformVertexGroups(-1);
     for (int i = 0; i < lodTable[field_0x27c].surfaceCount; i++) {

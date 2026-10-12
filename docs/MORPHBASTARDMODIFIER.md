@@ -32,7 +32,7 @@ Near misses (`samples/render/MorphBastardModifierNearMisses.cpp`):
   existing channel records the target index `j`; the stack homes of the loop
   scalars and the operand order of the channel inverse's products differ.
 - Slot 27 `0x004a4c60`.
-- The controller-angle solver `0x004a3c80..0x004a4ba5` (3878 bytes, not
+- The controller-angle solver `ControllerAngles` `0x004a3c80..0x004a4ba5` (3878 bytes, not
   2340): structure reconstructed; retail calls the out-of-line Vector3
   constructor `0x00404e60` and has a larger frame.
 

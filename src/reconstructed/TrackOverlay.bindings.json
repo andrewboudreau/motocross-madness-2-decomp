@@ -104,7 +104,7 @@
   "?UnknownFunction5194b0@StatsOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@@Z": "0x005194b0",
   "?Redraw@StatsOverlay@@QAEHXZ": "0x005198a0",
   "?UnknownFunction5199f0@@YAHPBX0@Z": "0x005199f0",
-  "?UnknownFunction519a20@StatsOverlay@@QAEHXZ": "0x00519a20",
+  "?DrawStandings@StatsOverlay@@QAEHXZ": "0x00519a20",
   "?DrawTimeLeft@StatsOverlay@@QAEXXZ": "0x00519e10",
   "?DrawViewModePanel@StatsOverlay@@QAEHXZ": "0x00519ef0",
   "?DrawLapTime@StatsOverlay@@QAEXXZ": "0x0051a480",

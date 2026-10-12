@@ -161,7 +161,7 @@ public:
     // nodes of `model`.
     MorphBastardModifier* UnknownFunction4a33b0(void* value, const char* path, MorphBastardNode* model);
     // 0x004a3c80 (ret 0x44)
-    void UnknownFunction4a3c80(MorphBastardChannel* channel, Matrix4 inverse);
+    void ControllerAngles(MorphBastardChannel* channel, Matrix4 inverse);
     // 0x004a4bb0 (ret 4): updates every channel of `object`.
     void UpdateChannels(MorphBastardObject* object);
     // 0x00464e80 (ret 4): the shared empty stub, called with the object index.

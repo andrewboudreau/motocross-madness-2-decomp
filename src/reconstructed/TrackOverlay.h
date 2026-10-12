@@ -184,7 +184,7 @@ public:
     void UnknownFunction464e80(int index);
     int UnknownFunction519880(int value);     // 0x00519880
     int Redraw();                             // 0x005198a0
-    int UnknownFunction519a20();              // 0x00519a20
+    int DrawStandings();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10
     int DrawViewModePanel();              // 0x00519ef0
     void DrawLapTime();                       // 0x0051a480

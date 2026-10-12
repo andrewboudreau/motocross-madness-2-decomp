@@ -37,7 +37,7 @@ PCTextureMap::~PCTextureMap() {
         textureSurface->Release();
         textureSurface = 0;
         if (g_UnknownGlobal689964)
-            field_0x10->UnknownFunction511580();
+            field_0x10->CountTextureMemory();
     }
 }
 
@@ -256,7 +256,7 @@ void PCTextureMap::UnknownVirtualSlot12() {
         UnknownVirtualSlot10();
         UnknownVirtualSlot8(1, 0, 0);
         if (g_UnknownGlobal689964)
-            field_0x10->UnknownFunction511580();
+            field_0x10->CountTextureMemory();
     }
 }
 
@@ -271,7 +271,7 @@ void PCTextureMap::UnknownVirtualSlot10() {
         textureSurface->Release();
         textureSurface = 0;
         if (g_UnknownGlobal689964)
-            field_0x10->UnknownFunction511580();
+            field_0x10->CountTextureMemory();
     }
 }
 
@@ -476,7 +476,7 @@ int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
             if (texturePalette && field_0x20 == 8 && textureSurface->SetPalette(texturePalette))
                 goto failed;
             if (g_UnknownGlobal689964)
-                field_0x10->UnknownFunction511580();
+                field_0x10->CountTextureMemory();
         }
     }
     if (a && textureSurface != systemSurface)

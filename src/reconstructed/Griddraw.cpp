@@ -268,7 +268,7 @@ void DrawableGridNode::ReleaseVertexBuffers(int recurse)
 // 0x0047ef70
 int DrawableGridNode::UnknownFunction47ef70()
 {
-    return UnknownFunction47ef80(0, 0, 16, 0);
+    return WalkVisibleQuadrants(0, 0, 16, 0);
 }
 
 // 0x0047ef80: walks the visible quadrants of this node (8-cell, then 4-cell
@@ -276,7 +276,7 @@ int DrawableGridNode::UnknownFunction47ef70()
 // the top-level call and adds the node's count to its parent's total.
 // `size` is halved in place; the 8-cell branch restores 16 so the top-level
 // rebuild below still runs (retail jumps straight into it from there).
-int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
+int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
 {
     if (childMask == 0)
         return 1;
@@ -287,29 +287,29 @@ int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
         if (size == 8) {
             data->field_0x12c = 0;
             if (childMask & 2)
-                UnknownFunction47ef80(x, z, 8, 0);
+                WalkVisibleQuadrants(x, z, 8, 0);
             if (childMask & 4)
-                UnknownFunction47ef80(x + 8, z, 8, 4);
+                WalkVisibleQuadrants(x + 8, z, 8, 4);
             if (childMask & 8)
-                UnknownFunction47ef80(x, z + 8, 8, 8);
+                WalkVisibleQuadrants(x, z + 8, 8, 8);
             if (childMask & 0x10)
-                UnknownFunction47ef80(x + 8, z + 8, 8, 12);
+                WalkVisibleQuadrants(x + 8, z + 8, 8, 12);
             size = 16;
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
-                UnknownFunction47ef80(x, z, 4, quad);
+                WalkVisibleQuadrants(x, z, 4, quad);
             if (childMask & (0x40 << quad))
-                UnknownFunction47ef80(x + 4, z, 4, quad + 1);
+                WalkVisibleQuadrants(x + 4, z, 4, quad + 1);
             if (childMask & (0x80 << quad))
-                UnknownFunction47ef80(x, z + 4, 4, quad + 2);
+                WalkVisibleQuadrants(x, z + 4, 4, quad + 2);
             if (childMask & (0x100 << quad))
-                UnknownFunction47ef80(x + 4, z + 4, 4, quad + 3);
+                WalkVisibleQuadrants(x + 4, z + 4, 4, quad + 3);
         } else {
             for (int j = 0; j < 64; j += 16) {
                 for (int i = 0; i < 4; i++) {
                     DrawableGridNode* child = (DrawableGridNode*)children[g_gridQuadCell[quad] + i + j];
                     if (child && child->childMask)
-                        child->UnknownFunction47ef80(0, 0, 16, 0);
+                        child->WalkVisibleQuadrants(0, 0, 16, 0);
                 }
             }
         }
@@ -632,30 +632,30 @@ int DrawableGridNode::AppendCornerTriangle(int n, int x, int z, int dx, int dz)
 // 0x00480900
 int DrawableGridNode::UnknownFunction480900(void* target)
 {
-    return UnknownFunction480940(target, 0, 0, 16, 0, 0);
+    return DrawVisibleQuadrants(target, 0, 0, 16, 0, 0);
 }
 
 // 0x00480920
 int DrawableGridNode::UnknownFunction480920(void* target, int a5)
 {
-    return UnknownFunction480940(target, 0, 0, 16, 0, a5);
+    return DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
 }
 
 // 0x00480940: the same quadrant walk as 0x0047ef80; 4-cell blocks go to
 // 0x00480ad0.
-int DrawableGridNode::UnknownFunction480940(void* target, int x, int z, int size, int quad, int a5)
+int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5)
 {
     if (!data->b0 || data->b3) {
         size >>= 1;
         if (size == 8) {
             if (childMask & 2)
-                UnknownFunction480940(target, x, z, 8, 0, a5);
+                DrawVisibleQuadrants(target, x, z, 8, 0, a5);
             if (childMask & 4)
-                UnknownFunction480940(target, x + 8, z, 8, 4, a5);
+                DrawVisibleQuadrants(target, x + 8, z, 8, 4, a5);
             if (childMask & 8)
-                UnknownFunction480940(target, x, z + 8, 8, 8, a5);
+                DrawVisibleQuadrants(target, x, z + 8, 8, 8, a5);
             if (childMask & 0x10)
-                UnknownFunction480940(target, x + 8, z + 8, 8, 12, a5);
+                DrawVisibleQuadrants(target, x + 8, z + 8, 8, 12, a5);
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
                 UnknownFunction480ad0(target, x, z, 4, quad, a5);
@@ -957,14 +957,14 @@ void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a
 
 // 0x004826d0: propagates bit 21 of the mask (all 22 bits set) to the child
 // nodes, rebuilds the edge links and resets the index ranges.
-void DrawableGridNode::UnknownFunction4826d0()
+void DrawableGridNode::PropagateFullMask()
 {
     if (children) {
         for (int i = 0; i < 256; i++) {
             if (children[i]) {
                 if (childMask & 0x200000)
                     ((DrawableGridNode*)children[i])->childMask = 0x3fffff;
-                ((DrawableGridNode*)children[i])->UnknownFunction4826d0();
+                ((DrawableGridNode*)children[i])->PropagateFullMask();
             }
         }
     }
@@ -1332,9 +1332,9 @@ void DrawableGridNode::PropagateBorderChange(DrawableGridNode* child, int x, int
             int shift = 0;
             for (int i = 0; i < level - 1; i++)
                 shift += 4;
-            ((DrawableGridNode*)root)->UnknownFunction483200((child->gridX + x) << shift,
-                                                             (child->gridZ + z) << shift, flag, dir, cell,
-                                                             child->level);
+            ((DrawableGridNode*)root)->WalkBorderVertex((child->gridX + x) << shift,
+                                                        (child->gridZ + z) << shift, flag, dir, cell,
+                                                        child->level);
         }
     }
 }

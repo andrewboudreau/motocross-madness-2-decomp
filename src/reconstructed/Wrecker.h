@@ -336,7 +336,7 @@ public:
     void UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents);
     void UnknownFunction5329e0(float frameTime);
     void UnknownFunction532900(Vector3 offset, int bone);
-    void UnknownFunction531740(Vector3 a, Vector3 b, Vector3 normal, float frameTime);
+    void SprayContactParticles(Vector3 a, Vector3 b, Vector3 normal, float frameTime);
     void EmitProbeTrail(Vector3 a, Vector3 b, float frameTime);
     void UnknownFunction532020(float frameTime);
     void UnknownFunction532150();

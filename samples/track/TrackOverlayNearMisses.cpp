@@ -20,7 +20,7 @@
 // 0x0051baf0, a post-increment index, a for loop and every order of the
 // three initial assignments do not change it.
 
-// StatsOverlay::UnknownFunction519a20 (0x00519a20, 1002 bytes): written
+// StatsOverlay::DrawStandings (0x00519a20, 1002 bytes): written
 // like the exact 0x0051aa40, the candidate is 1004 bytes. Retail keeps the
 // row-comparison index in edx and `this` in its spill slot; VC6 here does so
 // only when the index is read after the loop (the `row < i` test below),
@@ -219,7 +219,7 @@ int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
 // 0x00519a20: the standings, best score first: the time left (as a label),
 // then a row per racer that is shown, ending with the player's own row.
 // Draws only when a row changed.
-int StatsOverlay::UnknownFunction519a20()
+int StatsOverlay::DrawStandings()
 {
     UnknownEventScore scores[11];
     char time[0x80];

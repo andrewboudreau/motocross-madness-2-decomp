@@ -32,7 +32,7 @@
 // object/channel loops differs (retail keeps the object offset in esi and
 // reloads the index from +0x28, the channel in ebp).
 //
-// MorphBastardModifier::UnknownFunction4a3c80 (0x004a3c80..0x004a4ba5,
+// MorphBastardModifier::ControllerAngles (0x004a3c80..0x004a4ba5,
 // 3878 bytes, ret 0x44): the controller angles. Controller matrix times
 // the rest inverse (inline, through a copy), then per axis: rotate the
 // identity's axis onto the controller's (cross product, 0x004a3be0 angle,
@@ -378,7 +378,7 @@ static inline void NormalizeOrZero(Vector3& v)
 // pose (`inverse`), as three angles in degrees. For each axis the identity's
 // axis is rotated onto the controller's; the angle left between the next
 // axes is the rotation about it.
-void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, Matrix4 inverse)
+void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix4 inverse)
 {
     Matrix4 identity;
     memset(&identity, 0, sizeof(identity));

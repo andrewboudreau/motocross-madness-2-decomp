@@ -58,7 +58,7 @@ struct UnknownTgaFile {
 // 0x00512990: writes `file` with descriptor byte `descriptor`; rows lie
 // `stride` bytes apart (0: packed). 16-bit pixels are 555 when `greenMask`
 // is 0x3e0, else 565.
-int UnknownFunction512990(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor);
+int WriteTga(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor);
 
 class UnknownTextureStream;
 

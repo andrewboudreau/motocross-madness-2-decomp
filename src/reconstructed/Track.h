@@ -91,9 +91,9 @@ public:
     int FreeReachableNodes(TrackNode** start);
     // 0x00516980 (RaceStatus.cpp): places `p` on the track (the closest
     // position over every reachable node) and optionally returns its distance.
-    int UnknownFunction516980(Vector3 p, TrackPos* out, float* outDistance);
+    int ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance);
     int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
-    int UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
+    int IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
     int NodeHasSegment(TrackSegment* segment, TrackNode* node);
     // 0x00517340 (RaceStatus.cpp): places `p` on the track near `from`. Every
     // segment whose strip contains p is a candidate; one within `distance`

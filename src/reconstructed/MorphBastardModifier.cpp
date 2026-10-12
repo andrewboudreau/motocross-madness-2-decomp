@@ -91,7 +91,7 @@ void MorphBastardModifier::UpdateChannels(MorphBastardObject* object)
     object->node->UnknownFunction4fca80(0, &m);
     MorphBastardTransposeRotation(m);
     for (int i = 0; i < object->channelCount; i++)
-        UnknownFunction4a3c80(&object->channels[i], m);
+        ControllerAngles(&object->channels[i], m);
 }
 
 // 0x004a5290

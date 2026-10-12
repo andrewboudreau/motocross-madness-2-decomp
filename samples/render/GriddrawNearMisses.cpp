@@ -242,10 +242,10 @@ static inline int GridExtentBelow(const GridVec3& v, float limit)
 // data (with per-block records when any of the 16 header words is not an
 // 0xfffe/0xffff marker), computes the bounding box and, when asked, creates
 // the child nodes through virtual slot 2.
-DrawableGridNode* DrawableGridNode::UnknownFunction47e600(UnknownTextureStream* stream, int a1,
-                                                          DrawableGridNode* parent, int level, int shift,
-                                                          int x, int z, int index, float* boundsMin,
-                                                          float* boundsMax)
+DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a1,
+                                             DrawableGridNode* parent, int level, int shift,
+                                             int x, int z, int index, float* boundsMin,
+                                             float* boundsMax)
 {
     int header;
     int words[16];
@@ -416,7 +416,7 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
                                                          (unsigned short*)child->data->field_0x138,
                                                          child->data->field_0x13e, -1);
                     }
-                    child->UnknownFunction480940(target, 0, 0, 16, 0, a5);
+                    child->DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
                 }
             }
         }
@@ -582,7 +582,7 @@ int DrawableGridNode::UnknownFunction47f210()
 
 // 0x00483200: walks a border vertex down the node tree (VC6 turns the final
 // child call into a loop, as retail does).
-void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, GridBaseCell* origin, int minLevel)
+void DrawableGridNode::WalkBorderVertex(int x, int z, int flag, int dir, GridBaseCell* origin, int minLevel)
 {
     if (level != 0) {
         int shift = 0;
@@ -619,43 +619,43 @@ void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, Gr
                 child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
                 if (child == 0)
                     return;
-                child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+                child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
             } else {
                 if (cz < 16) {
                     child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
                     if (child)
-                        child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+                        child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
                 }
                 if (pz >= 16)
                     return;
                 child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
                 if (child == 0)
                     return;
-                child->UnknownFunction483200(rx, (z & mask) + unit, flag, dir, origin, minLevel);
+                child->WalkBorderVertex(rx, (z & mask) + unit, flag, dir, origin, minLevel);
             }
         } else if (pz == cz) {
             if (cx < 16 && cz < 16) {
                 child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
                 if (child)
-                    child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+                    child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
             }
             if (px >= 16 || cz >= 16)
                 return;
             child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
             if (child == 0)
                 return;
-            child->UnknownFunction483200(rx + unit, z & mask, flag, dir, origin, minLevel);
+            child->WalkBorderVertex(rx + unit, z & mask, flag, dir, origin, minLevel);
         } else {
             if (cx < 16) {
                 if (cz < 16) {
                     child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
                     if (child)
-                        child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+                        child->WalkBorderVertex(rx, z & mask, flag, dir, origin, minLevel);
                 }
                 if (pz < 16) {
                     child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
                     if (child)
-                        child->UnknownFunction483200(rx, z & mask + unit, flag, dir, origin, minLevel);
+                        child->WalkBorderVertex(rx, z & mask + unit, flag, dir, origin, minLevel);
                 }
             }
             if (px >= 16)
@@ -663,14 +663,14 @@ void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, Gr
             if (cz < 16) {
                 child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
                 if (child)
-                    child->UnknownFunction483200(rx + unit, z & mask, flag, dir, origin, minLevel);
+                    child->WalkBorderVertex(rx + unit, z & mask, flag, dir, origin, minLevel);
             }
             if (pz >= 16)
                 return;
             child = (DrawableGridNode*)children[g_gridRow16[pz] + px];
             if (child == 0)
                 return;
-            child->UnknownFunction483200(rx + unit, (z & mask) + unit, flag, dir, origin, minLevel);
+            child->WalkBorderVertex(rx + unit, (z & mask) + unit, flag, dir, origin, minLevel);
         }
         return;
     }

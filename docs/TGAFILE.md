@@ -113,5 +113,6 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x005127a0` `FillTgaHeader24`
 - `0x005127f0` `WriteTga32`
 - `0x00512870` `FillTgaHeader32`
+- `0x00512990` `WriteTga` (near-miss sample)
 - `0x005128c0` `WriteTga16`
 - `0x00512940` `FillTgaHeader16`

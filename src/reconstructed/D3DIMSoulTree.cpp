@@ -278,7 +278,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
         AppendChild(materialTable[count], -1);
         materialTable[count]->MakeUntextured();
     }
-    UnknownFunction440810();
+    UpdateMaterialTexelRatios();
 }
 
 // 0x00440060: reads the levels of detail from the .slt keys; returns 1

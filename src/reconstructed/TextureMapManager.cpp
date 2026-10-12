@@ -301,7 +301,7 @@ int TextureMapManager::UnknownFunction5113d0() {
 // 0x00511580: counts the 32-256 pixel textures and their bytes (with mip
 // levels), and the display's figure for each kind of texture, and formats
 // them and the card's reported texture memory (the text is not output).
-void TextureMapManager::UnknownFunction511580() {
+void TextureMapManager::CountTextureMemory() {
     char text[128];
     UnknownSurfaceCaps caps;
     unsigned long totalMemory;

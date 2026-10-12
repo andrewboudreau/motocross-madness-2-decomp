@@ -156,8 +156,8 @@ public:
 
 // 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
 // `position` to `points` (`*count` of `capacity`).
-void* UnknownFunction43a330(int capacity, void** points, const Vector3* position, void* owner, float a4,
-                            int* count, float friction, int a7);
+void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float a4,
+                        int* count, float friction, int a7);
 // 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch.
 void UnknownFunction4b5d00(Vector3* look, Vector3* up, float heading, float pitch, int a);
 
@@ -301,9 +301,9 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                     ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
                     sprintf(key, "FrictionCoefficient%d", p + 1);
                     parameters.UnknownFunction4b7f40(key, 0.6f, &friction);
-                    UnknownFunction43a330(points, object->field_0x12c, &position,
-                                          object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
-                                          friction, (int)this);
+                    AddCollisionPoint(points, object->field_0x12c, &position,
+                                      object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
+                                      friction, (int)this);
                 }
             if (a2) {
                 int dust = 0;
