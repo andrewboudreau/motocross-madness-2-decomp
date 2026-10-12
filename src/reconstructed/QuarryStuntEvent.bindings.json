@@ -48,7 +48,7 @@
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
-  "?UnknownFunction4030a0@AuralScape@@QAEXHPAUVector3@@000@Z": "0x004030a0",
+  "?SetListener@AuralScape@@QAEXHPAUVector3@@000@Z": "0x004030a0",
   "?HandlePlayerLeft@UnknownKrustyBikeView@@QAEXH@Z": "0x00420590",
   "?SetDetailLevel@UnknownKrustyBikeView@@QAEXH@Z": "0x00423790",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",

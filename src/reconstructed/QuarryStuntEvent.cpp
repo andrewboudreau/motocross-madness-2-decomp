@@ -85,7 +85,7 @@ int BaseQuarryEvent::UnknownVirtualSlot14() {
 int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     if (auralScape)
-        auralScape->UnknownFunction4030a0(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
+        auralScape->SetListener(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
                                           &raceCamera->upDirection, &raceCamera->followedBike->velocity);
     if (g_TrackGame->uiInteractionBlocked)
         return 1;

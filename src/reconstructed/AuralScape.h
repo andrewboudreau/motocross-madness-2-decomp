@@ -61,7 +61,7 @@ public:
                                         unsigned long flags, float oneShotDistance,
                                         float randomTriggerPercent, int is2D, int force2D);
     void SetSoundParameters(UnknownSound3DParameters params); // 0x00402420
-    void UnknownFunction402470(Vector3* position, Vector3* velocity); // 0x00402470
+    void SetPositionAndVelocity(Vector3* position, Vector3* velocity); // 0x00402470: either may be null
     // 0x00402530: the distance to the nearest listener; sets bit 1 when
     // the emitter can be heard.
     void UpdateListenerDistance(int count, AuralScapeListener** listeners);
@@ -150,7 +150,7 @@ public:
     AuralScape* UnknownFunction402f00(void* target, int sounds); // 0x00402f00
     int NextListenerNumber();                  // 0x00403000: next number
     int AddListener(int index, float doppler, float rolloff); // 0x00403010
-    void UnknownFunction4030a0(int index, Vector3* position, Vector3* front, Vector3* top,
+    void SetListener(int index, Vector3* position, Vector3* front, Vector3* top,
                                Vector3* velocity); // 0x004030a0
     void PickEmittersToPlay();                 // 0x00403150: picks the emitters to play
     void UnknownUpdateDistances();                // inline: each emitter's nearest listener

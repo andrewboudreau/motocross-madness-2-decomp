@@ -636,8 +636,8 @@ struct UnknownBikeRaceCameraView {
     GameObject* field_0x388;
     void* shadowCaster;                       // +0x38c a scene shadow caster
     unsigned char followingRacer;             // +0x390 following a racer
-    unsigned char field_0x391;
-    unsigned char field_0x392;
+    unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
+    unsigned char targetHeadingCached;        // +0x392 VehicleCamera 0x0052bac0; cleared on a new target
     UnknownBikeRaceRacer* field_0x394;
     unsigned char field_0x398[0x3b0 - 0x398];
     UnknownBikeRaceRacer* field_0x3b0;
@@ -657,8 +657,8 @@ struct UnknownBikeRaceCameraView {
             }
         }
         field_0x394 = racer;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = true;
         shadowCaster = 0;
         field_0x384 = 0;
@@ -677,8 +677,8 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionTargetCaster(void* caster) {
         field_0x274 = 0;
         shadowCaster = caster;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = false;
         field_0x384 = 0;
         field_0x388 = 0;
@@ -686,8 +686,8 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionTargetCharacter(UnknownBikeRaceSceneCharacter* character) {
         field_0x384 = character;
         field_0x274 = 0;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = false;
         field_0x388 = 0;
         shadowCaster = 0;
@@ -695,8 +695,8 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionTargetObject(GameObject* object) {
         field_0x388 = object;
         field_0x274 = 0;
-        field_0x391 = 0;
-        field_0x392 = 0;
+        targetPointCached = 0;
+        targetHeadingCached = 0;
         followingRacer = false;
         field_0x384 = 0;
         shadowCaster = 0;

@@ -83,8 +83,8 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
         pressed = true;
     } else {
         pressed = false;
-        field_0x391 = pressed;
-        field_0x392 = pressed;
+        targetPointCached = pressed;
+        targetHeadingCached = pressed;
     }
     if (cameraState == 7)
         return pressed;

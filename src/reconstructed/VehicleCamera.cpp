@@ -13,13 +13,13 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
     vehicle = 0;
     vehicleMode = true;
-    field_0x391 = 0;
-    field_0x392 = 0;
+    targetPointCached = 0;
+    targetHeadingCached = 0;
     field_0x388 = 0;
     field_0x38c = 0;
     field_0x384 = 0;
-    field_0x3a4 = kVec3Zero;
-    field_0x398 = kVec3Zero;
+    cachedTargetPoint = kVec3Zero;
+    cachedTargetHeading = kVec3Zero;
 }
 
 // 0x0052b9d0: an explicit empty destructor (vptr store, then FollowCamera's).
@@ -47,16 +47,16 @@ Vector3 VehicleCamera::UnknownVirtualSlot33() {
 }
 
 // 0x0052bac0
-Vector3 VehicleCamera::UnknownFunction52bac0() {
+Vector3 VehicleCamera::CachedTargetHeading() {
     if (vehicleMode) {
-        field_0x392 = 0;
+        targetHeadingCached = 0;
         return vehicle->takeoffVelocity;
     }
-    if (!field_0x392) {
-        field_0x398 = UnknownVirtualSlot33();
-        field_0x392 = 1;
+    if (!targetHeadingCached) {
+        cachedTargetHeading = UnknownVirtualSlot33();
+        targetHeadingCached = 1;
     }
-    return field_0x398;
+    return cachedTargetHeading;
 }
 
 // 0x0052bb60: part 0 of the vehicle's +0x3bc in vehicle mode; else the first
@@ -88,16 +88,16 @@ Vector3 VehicleCamera::TargetPoint() {
 }
 
 // 0x0052bc50
-Vector3 VehicleCamera::UnknownFunction52bc50() {
+Vector3 VehicleCamera::CachedTargetPoint() {
     if (vehicleMode) {
-        field_0x391 = 0;
+        targetPointCached = 0;
         return vehicle->takeoffPosition;
     }
-    if (!field_0x391) {
-        field_0x3a4 = TargetPoint();
-        field_0x391 = 1;
+    if (!targetPointCached) {
+        cachedTargetPoint = TargetPoint();
+        targetPointCached = 1;
     }
-    return field_0x3a4;
+    return cachedTargetPoint;
 }
 
 static inline Vector3 Add(const Vector3& a, const Vector3& b) {
@@ -112,8 +112,8 @@ static inline Vector3 Add(const Vector3& a, const Vector3& b) {
 // plain product, hence the float cast), and the 0.19 lift reuses the y of
 // heading * lead.
 void VehicleCamera::UnknownVirtualSlot68() {
-    Vector3 heading = UnknownFunction52bac0();
-    Vector3 base = UnknownFunction52bc50();
+    Vector3 heading = CachedTargetHeading();
+    Vector3 base = CachedTargetPoint();
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
     Vector3 side(heading.z, 0.0f, -heading.x);
     eyePosition = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);

@@ -113,8 +113,8 @@ public:
     // 0x0052bac0 / 0x0052bc50: the vehicle's +0x494 / +0x488 in vehicle
     // mode; otherwise slot 33 / 0x0052bb60, latched in +0x398 / +0x3a4 by
     // +0x392 / +0x391.
-    Vector3 UnknownFunction52bac0();
-    Vector3 UnknownFunction52bc50();
+    Vector3 CachedTargetHeading();
+    Vector3 CachedTargetPoint();
     // 0x0052bb60: the position of the followed part or target.
     Vector3 TargetPoint();
 
@@ -153,9 +153,9 @@ protected:
     UnknownCameraTargetB* field_0x388;
     UnknownVehiclePart* field_0x38c;     // 0x0052bb60
     bool vehicleMode;                    // +0x390, vehicle mode
-    unsigned char field_0x391;
-    unsigned char field_0x392;
+    unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)
+    unsigned char targetHeadingCached;   // +0x392 cachedTargetHeading is valid
     UnknownCameraVehicle* vehicle;       // +0x394
-    Vector3 field_0x398;
-    Vector3 field_0x3a4;
+    Vector3 cachedTargetHeading;         // +0x398 slot 33's value
+    Vector3 cachedTargetPoint;           // +0x3a4 TargetPoint's value
 };

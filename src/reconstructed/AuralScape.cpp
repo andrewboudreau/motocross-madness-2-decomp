@@ -226,7 +226,7 @@ void SoundEmitter::SetSoundParameters(UnknownSound3DParameters params) {
 }
 
 // 0x00402470
-void SoundEmitter::UnknownFunction402470(Vector3* position, Vector3* velocity) {
+void SoundEmitter::SetPositionAndVelocity(Vector3* position, Vector3* velocity) {
     if (position) {
         previousPosition = soundParameters.position;
         soundParameters.position = *position;
@@ -329,7 +329,7 @@ int SoundEmitter::LoadSound(unsigned long flags) {
         return 1;
     }
     loadedSound->Set3DDistanceRange(soundParameters.minDistance, soundParameters.maxDistance, 1);
-    UnknownFunction402470(&soundParameters.position, &soundParameters.velocity);
+    SetPositionAndVelocity(&soundParameters.position, &soundParameters.velocity);
     return 1;
 }
 
@@ -562,7 +562,7 @@ int AuralScape::AddListener(int index, float doppler, float rolloff) {
 }
 
 // 0x004030a0
-void AuralScape::UnknownFunction4030a0(int index, Vector3* position, Vector3* front, Vector3* top,
+void AuralScape::SetListener(int index, Vector3* position, Vector3* front, Vector3* top,
                                        Vector3* velocity) {
     if (listeners[index]) {
         if (position)
