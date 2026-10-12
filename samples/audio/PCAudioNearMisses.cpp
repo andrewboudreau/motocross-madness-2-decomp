@@ -21,9 +21,14 @@
 // prologue and the slot of `status` agree. Left: VC6 cross-jumps the two
 // `Play()` failure tails (streamed `return 0` and the `& 5` branch's
 // `goto failed`) where retail keeps them apart (the streamed one returns
-// Play's zero without `xor eax, eax`), and retail initialises `queue` after
-// the EnterCriticalSection. Here (outside PCAudio.cpp) VC6 also adds the EH
-// frame.
+// Play's zero without `xor eax, eax`). Declaring `queue` after the
+// EnterCriticalSection gives retail's late `xor ebp, ebp` (238 of 629
+// inside PCAudio.cpp; that cross-jump is the only difference left). Tried
+// against the cross-jump: `return played` of a Play result local, `if
+// (Play()) goto done; return 0;` in either branch, `return 0` instead of
+// `goto failed` in the `& 5` branch, the `failed:` label inside that
+// branch, and the `& 5` branch first (VC6 then moves `done` after it).
+// Here (outside PCAudio.cpp) VC6 also adds the EH frame.
 //
 // UnknownPCAudioObject 0x004bdc00 (the loader thread; retail extent is 483
 // bytes, 0x4bdc00..0x4bdde3): spelling the inner queue loop `while (1)`
@@ -201,8 +206,8 @@ done:
     if (soundFlags & 4)
         LeaveCriticalSection(&bufferLock);
     if (soundFlags & 4) {
-        int queue = 0;
         EnterCriticalSection(&bufferLock);
+        int queue = 0;
         if (!bufferReady && !field_0x1f4_bit7) {
             field_0x1f4_bit7 = 1;
             queue = 1;
