@@ -329,7 +329,7 @@ struct UnknownRecordFileHeader {
     unsigned char field_0x40[0x54 - 0x40];
     int laps;                                 // +0x54: laps (TrackGame+0x2d90)
     unsigned char field_0x58[0x60 - 0x58];
-    unsigned char field_0x60;
+    unsigned char randomGates;                // +0x60: random gates (TrackGame+0x2d9c)
     unsigned char field_0x61[0x64 - 0x61];
     int eventNumber;                          // +0x64: the event number shown with the track
     unsigned char trackIndex;                 // +0x68: the track index (TrackGame+0x2da4)

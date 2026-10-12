@@ -2455,7 +2455,7 @@ int ReplayFilesDlg::AddReplayFile(const char* path) {
                                                                       "scn", 0, 0);
             if (!_stricmp(text, "no name")) {
                 g_TrackGame->LoadResourceString(0x143b, name, 128);
-            } else if ((header.raceKind == 1 || header.raceKind == 5) && header.field_0x60) {
+            } else if ((header.raceKind == 1 || header.raceKind == 5) && header.randomGates) {
                 g_TrackGame->sceneObject->UnknownFunction4ea010(text, header.trackName, 0, "scn", 0, 0);
                 sprintf(name, "%s, #%d", text, header.eventNumber);
             } else {
