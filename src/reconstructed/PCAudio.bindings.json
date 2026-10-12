@@ -40,7 +40,7 @@
   "?EnumSoundDeviceCallback@PCSoundInterface@@SGHPAUUnknownGuid@@PBD1PAX@Z": "0x004be7b0",
   "?AddMember@SoundGroup@@QAEHPAVSound@@@Z": "0x00401b50",
   "?RemoveMember@SoundGroup@@QAEHPAVSound@@@Z": "0x00401be0",
-  "?UnknownFunction430ff0@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
+  "?AtEnd@UnknownTextureStream@@QAEHXZ": "0x00430ff0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?Tell@UnknownTextureStream@@QAEHXZ": "0x00461600",

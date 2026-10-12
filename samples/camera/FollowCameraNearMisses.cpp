@@ -250,7 +250,7 @@ void FollowCamera::LoadCameraFile(const char* path) {
     }
     frames = new(__FILE__, 0x3e1) Matrix4[frameCount];
     field_0x33c = new(__FILE__, 0x3e2) float[frameCount];
-    stream->Seek(stream->field_0x130, 0, 1);
+    stream->Seek(stream->sliceOffset, 0, 1);
     int k = 0;
     while (stream->ReadLine(line, 0xff)) {
         if (!_strnicmp(line, "CAMERA", 6)) {

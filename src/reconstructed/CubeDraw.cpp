@@ -72,8 +72,8 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
     textureGroup = context->field_0x04;
     if (!stream)
         goto fail;
-    if (stream->field_0x1c)
-        stream->Seek(stream->field_0x130, 0, 0);
+    if (stream->innerStream)
+        stream->Seek(stream->sliceOffset, 0, 0);
     start = stream->Tell();
     if (stream->Read(&paletteCount, 4, 1) != 1)
         goto fail;

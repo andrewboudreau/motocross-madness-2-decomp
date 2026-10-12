@@ -39,7 +39,7 @@
   "?AddObject@UnknownResourceManager@@QAEHPBDPAX@Z$ehhandler": "0x0054db37",
   "?RemoveArchiveItems@UnknownResourceManager@@QAEHPAVUnknownTextureStream@@@Z": "0x004e9830",
   "?ReleaseItem@UnknownResourceManager@@QAEXPAVResourceItem@@@Z": "0x004e9900",
-  "?UnknownFunction4e9960@UnknownTextureStream@@QAEHXZ": "0x004e9960",
+  "?IsEncoded@UnknownTextureStream@@QAEHXZ": "0x004e9960",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?g_UnknownResourceManager689c78@@3VUnknownResourceManager@@A": "0x00689c78",
   "_$E1": "0x004e8d40",

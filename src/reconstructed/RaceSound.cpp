@@ -1018,7 +1018,7 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
     if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
     } else {
-        stream->Seek(stream->field_0x130, 0, 1);
+        stream->Seek(stream->sliceOffset, 0, 1);
         stream->Read(&waveHeader, 1, sizeof(waveHeader));
         bytes = waveHeader.dataSize;
         buffer = DebugMalloc(bytes, __FILE__, 1652);

@@ -88,7 +88,7 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(item->name, items[i]->name)) {
             UnknownTextureStream* archive = items[i]->archive;
-            if (archive && archive->UnknownFunction4e9960())
+            if (archive && archive->IsEncoded())
                 return 0;
 
             items[i]->offset = item->offset;
@@ -125,7 +125,7 @@ ResourceItem* UnknownResourceManager::FindItem(const char* name, int a)
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
             UnknownTextureStream* archive = items[i]->archive;
-            if (archive && (a || archive->UnknownFunction4e9960()))
+            if (archive && (a || archive->IsEncoded()))
                 items[i]->archive->Seek(items[i]->offset, 0, 0);
             return items[i];
         }

@@ -226,7 +226,7 @@ Sound::Sound(SoundGroup* group, int type) {
 Sound::~Sound() {
     if (notifier)
         delete notifier;
-    if (sourceStream && !sourceStream->field_0x1c)
+    if (sourceStream && !sourceStream->innerStream)
         delete sourceStream;
     soundGroup->RemoveMember(this);
     if (soundFlags & 4) {
@@ -310,8 +310,8 @@ int Sound::LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned 
     bufferReady = 0;
     ReleaseBuffers();
     strcpy(soundName, "");
-    if (stream->field_0x1c)
-        stream->Seek(stream->field_0x130, 0, 1);
+    if (stream->innerStream)
+        stream->Seek(stream->sliceOffset, 0, 1);
     if (stream->Read(&waveHeader, 0x2c, 1) != 1)
         return 0;
     int stereo = waveHeader.channels > 1;
@@ -491,7 +491,7 @@ int Sound::Stop(int rewind) {
             if (dsBuffer->Stop() < 0)
                 goto failed;
             if (sourceStream && rewind) {
-                sourceStream->Seek(sourceStream->field_0x130 + 0x2c, 0, 1);
+                sourceStream->Seek(sourceStream->sliceOffset + 0x2c, 0, 1);
                 EnterCriticalSection(&bufferLock);
                 FillBufferFromStream(&dsBuffer, sourceStream, 0, bufferBytes);
                 LeaveCriticalSection(&bufferLock);
@@ -763,8 +763,8 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
             delete file;
             return 0;
         }
-        if (file->field_0x1c)
-            file->Seek(file->field_0x130, 0, 0);
+        if (file->innerStream)
+            file->Seek(file->sliceOffset, 0, 0);
         UnknownWaveHeader header;
         if (file->Read(&header, 0x2c, 1) != 1) {
             delete file;
@@ -795,16 +795,16 @@ int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStrea
     if ((*buffer)->Lock(offset, bytes, &first, &firstBytes, &second, &secondBytes, 0) != 0)
         return 0;
     if (firstBytes > 0) {
-        if (stream->UnknownFunction430ff0()) {
-            stream->Seek(stream->field_0x130 + 0x2c, 0, 1);
+        if (stream->AtEnd()) {
+            stream->Seek(stream->sliceOffset + 0x2c, 0, 1);
             if (!isLooping)
                 goto ended;
         }
         stream->Read(first, firstBytes, 1);
     }
     if (secondBytes > 0) {
-        if (stream->UnknownFunction430ff0()) {
-            stream->Seek(stream->field_0x130 + 0x2c, 0, 1);
+        if (stream->AtEnd()) {
+            stream->Seek(stream->sliceOffset + 0x2c, 0, 1);
             if (!isLooping) {
             ended:
                 memset(first, 0, firstBytes);

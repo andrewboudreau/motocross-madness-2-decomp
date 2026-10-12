@@ -189,15 +189,15 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
     UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (stream->Open(pathFile, "r", 0)) {
         pathKeyCount = 0;
-        while (!stream->UnknownFunction430ff0()) {
+        while (!stream->AtEnd()) {
             stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0)
                 pathKeyCount++;
         }
-        stream->Seek(stream->field_0x130, 0, 1);
+        stream->Seek(stream->sliceOffset, 0, 1);
         pathKeys = new (__FILE__, 241) CarProceduralKey[pathKeyCount];
         int i = -1;
-        while (!stream->UnknownFunction430ff0()) {
+        while (!stream->AtEnd()) {
             stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0) {
                 i++;

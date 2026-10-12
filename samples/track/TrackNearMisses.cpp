@@ -547,7 +547,7 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
     char chunk;
     stream->Read(&chunk, 1, 1);
     index = 0;
-    while (!stream->UnknownFunction430ff0()) {
+    while (!stream->AtEnd()) {
         if (chunk == 1) {
             stream->Read(&count, 4, 1);
             if (count <= 0)
