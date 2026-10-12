@@ -100,19 +100,19 @@ int g_UnknownGlobal689dfc;
 // The chat message (types 0x85 and 0x92): 0x4e bytes are sent.
 struct UnknownChatMessage {
     int field_0x00;
-    char field_0x04[0x4a];
+    char text[0x4a];                          // +0x04: the chat text
 };
 
 // A player's state (type 2).
 struct UnknownPlayerStateMessage {
     unsigned char field_0x00;
-    unsigned char field_0x01;                 // ready
-    char field_0x02[0x40];                    // bike name (racer slot +0x40)
-    char field_0x42[0x40];                    // bike model name (racer slot +0x00)
-    char field_0x82[0x40];                    // rider name (racer slot +0x80)
+    unsigned char ready;                      // +0x01: ready
+    char bikeName[0x40];                      // +0x02: bike name (racer slot +0x40)
+    char bikeModelName[0x40];                 // +0x42: bike model name (racer slot +0x00)
+    char riderName[0x40];                     // +0x82: rider name (racer slot +0x80)
     unsigned char field_0xc2;                 // racer slot +0xc4
-    unsigned char field_0xc3;                 // requested racers
-    int field_0xc4;                           // send time
+    unsigned char requestedRacers;            // +0xc3: requested racers
+    int sendTime;                             // +0xc4: send time
     int field_0xc8;                           // racer slot +0xec
     unsigned char field_0xcc;                 // racer slot +0xf0
     unsigned char field_0xcd;                 // racer slot +0xf4
@@ -122,27 +122,27 @@ struct UnknownPlayerStateMessage {
 // The player removal message (type 0x8e).
 struct UnknownKickMessage {
     int field_0x00;
-    int field_0x04;                           // player id
+    int playerId;                             // +0x04: player id
 };
 
 // A racer's random grid key (12 bytes; 0x004f2340 sorts them).
 struct UnknownGridDraw {
-    int field_0x00;                           // player id
-    float field_0x04;                         // random key
-    char field_0x08;                          // racer index
+    int playerId;                             // +0x00: player id
+    float key;                                // +0x04: random key
+    char racerIndex;                          // +0x08: racer index
 };
 
 // The player left message (type 5).
 struct UnknownPlayerLeftMessage {
     int field_0x00;
     int field_0x04;
-    int field_0x08;                           // player id
+    int playerId;                             // +0x08: player id
 };
 
 // The lobby start message (type 0x83, 0x8d8 bytes).
 struct UnknownLobbyStartMessage {
     int field_0x00;
-    short field_0x04;                         // start
+    short start;                              // +0x04: start
     UnknownTrackGameModeSettings field_0x08;  // TrackGame+0x2d70
     int field_0x1f4;                          // TrackGame+0x60c
     int field_0x1f8[8];                       // racer slot +0xc0
@@ -158,13 +158,13 @@ struct UnknownLobbyStartMessage {
 // UnknownTrackGameModeEntry) with the racer index at +5.
 struct UnknownGridEntry {
     UnknownGridEntry() {
-        field_0x00 = 0;
-        field_0x04 = 0;
+        playerId = 0;
+        points = 0;
     }
 
-    int field_0x00;                           // player id
-    char field_0x04;                          // championship points
-    char field_0x05;                          // racer index
+    int playerId;                             // +0x00: player id
+    char points;                              // +0x04: championship points
+    char racerIndex;                          // +0x05: racer index
 };
 
 // 0x004f17a0
@@ -330,9 +330,9 @@ int CompareGridEntries(const void* a, const void* b) {
 int CompareGridDraws(const void* a, const void* b) {
     const UnknownGridDraw* x = (const UnknownGridDraw*)a;
     const UnknownGridDraw* y = (const UnknownGridDraw*)b;
-    if (x->field_0x04 > y->field_0x04)
+    if (x->key > y->key)
         return -1;
-    if (x->field_0x04 == y->field_0x04)
+    if (x->key == y->key)
         return 0;
     return 1;
 }
@@ -657,15 +657,15 @@ void MultiPlayerDlg::SendChatLine() {
     UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditChat", 0xb));
     int length = strlen("");
     int count = length > 0x49 ? 0x49 : length;
-    strncpy(message.field_0x04, "", count);
-    message.field_0x04[count] = 0;
-    edit->GetEditText(message.field_0x04, 0x4a);
-    if (strcmp(message.field_0x04, "")) {
+    strncpy(message.text, "", count);
+    message.text[count] = 0;
+    edit->GetEditText(message.text, 0x4a);
+    if (strcmp(message.text, "")) {
         NetworkInterface* network = g_TrackGame->network;
         int player = network->localPlayer;
         network->Send(0x85, &message, 0x4e, player, 0);
         edit->SetEditText("");
-        AddChatLine(player, message.field_0x04);
+        AddChatLine(player, message.text);
     }
     guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
 }
@@ -675,11 +675,11 @@ void MultiPlayerDlg::SendSystemChatLine(const char* text) {
     UnknownChatMessage message;
     int length = strlen(text);
     int count = length > 0x49 ? 0x49 : length;
-    strncpy(message.field_0x04, text, count);
-    message.field_0x04[count] = 0;
+    strncpy(message.text, text, count);
+    message.text[count] = 0;
     g_TrackGame->network->Send(
         0x92, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
-    AddChatLine(-1, message.field_0x04);
+    AddChatLine(-1, message.text);
     guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
 }
 
@@ -689,9 +689,9 @@ void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
     if (player && player != g_TrackGame->network->localPlayer) {
         UnknownKickMessage message;
         NetworkInterface* network = g_TrackGame->network;
-        message.field_0x04 = player;
+        message.playerId = player;
         network->Send(0x8e, &message, sizeof(message), network->localPlayer, player);
-        lobbySlots.FreeSlot(message.field_0x04);
+        lobbySlots.FreeSlot(message.playerId);
     }
 }
 
@@ -710,10 +710,10 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
             sprintf(name, "ButRdyPlayer%d", i + 2);
             UIControl* button = FindControl(name, 1);
             if (button) {
-                if (state->field_0x01) {
+                if (state->ready) {
                     button->SetFontColor(0xffffff);
                     g_UnknownGlobal689dbc[i] = 1;
-                    lobbySlots.SetSlot(from, state->field_0xc3);
+                    lobbySlots.SetSlot(from, state->requestedRacers);
                     if (!g_UnknownGlobal689dd8[i]) {
                         char text[0x80];
                         char line[0x80];
@@ -732,17 +732,17 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].id;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xd8 = 0;
             COPY_TEXT(g_TrackGame->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].name, 0x10);
-            g_TrackGame->mode.field_0x1be4[i + 1].UnknownFunction521fb0(state->field_0x42, state->field_0x02,
-                                                                                 state->field_0x82);
+            g_TrackGame->mode.field_0x1be4[i + 1].UnknownFunction521fb0(state->bikeModelName, state->bikeName,
+                                                                                 state->riderName);
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xec = state->field_0xc8;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xf0 = state->field_0xcc;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xf4 = state->field_0xcd;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xc0 = state->field_0xd0;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xc4 = state->field_0xc2;
-            float delay = ((float)(unsigned int)flags - (float)(unsigned int)state->field_0xc4);
+            float delay = ((float)(unsigned int)flags - (float)(unsigned int)state->sendTime);
             if (delay < g_TrackGame->mode.field_0x1be4[i + 1].field_0xd0)
                 g_TrackGame->mode.field_0x1be4[i + 1].field_0xd0 = delay;
-            lobbySlots.SetSlot(from, state->field_0xc3);
+            lobbySlots.SetSlot(from, state->requestedRacers);
             if (g_TrackGame->network->isHost && eventPage) {
                 UIListBox* list = static_cast<UIListBox*>(eventPage->FindControl("OpponentsListBox", 0));
                 if (list && list->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
@@ -765,7 +765,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         g_TrackGame->mode.field_0x27f8 = start->field_0x08;
         g_TrackGame->mode.field_0x94 = start->field_0x1f4;
         int total = g_TrackGame->mode.field_0x27f8.field_0x35 + g_TrackGame->mode.field_0x27f8.field_0x28;
-        if (start->field_0x04) {
+        if (start->start) {
             for (i = g_TrackGame->mode.field_0x27f8.field_0x35; i < total; i++) {
                 g_TrackGame->mode.field_0x1be4[i].field_0xc0 = start->field_0x1f8[i];
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0xdc, start->field_0x218[i], 0x10);
@@ -813,7 +813,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         AddChatLine(-1, (const char*)data + 4);
         return 1;
     } else if (type == 5) {
-        lobbySlots.FreeSlot(((UnknownPlayerLeftMessage*)data)->field_0x08);
+        lobbySlots.FreeSlot(((UnknownPlayerLeftMessage*)data)->playerId);
         if (eventPage) {
             UIListBox* list = static_cast<UIListBox*>(eventPage->FindControl("OpponentsListBox", 0));
             if (g_TrackGame->network->isHost && list &&
@@ -834,7 +834,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
     } else if (from && type == 0x8e) {
         UnknownKickMessage* kick = (UnknownKickMessage*)data;
         int player = g_TrackGame->network->localPlayer;
-        if (kick->field_0x04 == player) {
+        if (kick->playerId == player) {
             if (g_TrackGame->network->lobbyConnected) {
                 EndDialog(0);
                 g_TrackGame->ui->OpenExitDialog();
@@ -845,7 +845,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
                                                                          0, 1);
             return 1;
         }
-        lobbySlots.FreeSlot(kick->field_0x04);
+        lobbySlots.FreeSlot(kick->playerId);
         if (eventPage) {
             UIListBox* list = static_cast<UIListBox*>(eventPage->FindControl("OpponentsListBox", 0));
             if (g_TrackGame->network->isHost && list &&
@@ -1185,18 +1185,18 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             lobbySlots.SetSlot(me, g_TrackGame->mode.field_0x6dc);
             SendSettings();
         }
-        state.field_0x01 = g_UnknownGlobal689df4;
-        COPY_TEXT(state.field_0x42, g_TrackGame->mode.field_0x1974.field_0x00, 0x40);
-        COPY_TEXT(state.field_0x02, g_TrackGame->mode.field_0x1974.field_0x40, 0x40);
-        COPY_TEXT(state.field_0x82, g_TrackGame->mode.field_0x1974.field_0x80, 0x40);
+        state.ready = g_UnknownGlobal689df4;
+        COPY_TEXT(state.bikeModelName, g_TrackGame->mode.field_0x1974.field_0x00, 0x40);
+        COPY_TEXT(state.bikeName, g_TrackGame->mode.field_0x1974.field_0x40, 0x40);
+        COPY_TEXT(state.riderName, g_TrackGame->mode.field_0x1974.field_0x80, 0x40);
         state.field_0xc2 = g_TrackGame->mode.field_0x1974.field_0xc4;
-        state.field_0xc3 = g_TrackGame->mode.field_0x6dc;
+        state.requestedRacers = g_TrackGame->mode.field_0x6dc;
         state.field_0xc8 = UNKNOWN_GARAGE_SETTINGS->engineSize;
         state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->fourStroke;
         if (g_TrackGame->mode.field_0x1bd0 > 0 && g_TrackGame->mode.field_0x1bd0 < 0x65)
             g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.field_0x1bd0;
         state.field_0xd0 = g_TrackGame->mode.field_0x1bcc;
-        state.field_0xc4 = ReadClock();
+        state.sendTime = ReadClock();
         g_TrackGame->network->Send(2, &state, sizeof(state),
                                                                g_TrackGame->network->localPlayer, 0);
         break;

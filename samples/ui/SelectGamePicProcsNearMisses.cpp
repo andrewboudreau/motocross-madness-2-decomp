@@ -241,9 +241,9 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
-                entry.field_0x00 = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
-                entry.field_0x04 = g_TrackGame->eventManager->field_0x50[i].field_0x28;
-                entry.field_0x05 = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
+                entry.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
+                entry.points = g_TrackGame->eventManager->field_0x50[i].field_0x28;
+                entry.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }
             qsort(g_TrackGame->mode.field_0x27f8.field_0x14c, racer, sizeof(UnknownGridEntry),
@@ -253,16 +253,16 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             UnknownGridDraw draws[8];
             for (i = 0; i < racer; i++) {
                 UnknownGridDraw draw;
-                draw.field_0x00 = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
-                draw.field_0x04 = RandomUnit() * 10.0f;
-                draw.field_0x08 = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
+                draw.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
+                draw.key = RandomUnit() * 10.0f;
+                draw.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 draws[i] = draw;
             }
             qsort(draws, racer, sizeof(UnknownGridDraw), CompareGridDraws);
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
-                entry.field_0x00 = draws[i].field_0x00;
-                entry.field_0x05 = draws[i].field_0x08;
+                entry.playerId = draws[i].playerId;
+                entry.racerIndex = draws[i].racerIndex;
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }
         }
@@ -270,7 +270,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             DebugFree(names, __FILE__, 0x23e);
     }
     UnknownLobbyStartMessage message;
-    message.field_0x04 = start;
+    message.start = start;
     message.field_0x08 = g_TrackGame->mode.field_0x27f8;
     message.field_0x1f4 = g_TrackGame->mode.field_0x94;
     memcpy(message.field_0x08.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
