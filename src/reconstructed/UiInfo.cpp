@@ -156,7 +156,7 @@ int TrackGameMode::ResetNetworkRace() {
     }
     for (i = 0; i < 8; i++)
         raceSettings.field_0x14c[i] = UnknownTrackGameModeEntry();
-    raceSettings.field_0x35 = 0;
+    raceSettings.networkPlayerCount = 0;
     return 1;
 }
 
@@ -453,7 +453,7 @@ int TrackGameMode::LoadProfile() {
     fread(customGarageCurves, 0x294, 1, file);
     fread(&plateNumber, 4, 1, file);
     fclose(file);
-    raceSettings.field_0x35 = 0;
+    raceSettings.networkPlayerCount = 0;
     ChooseDisplayMode(&displayAdapterGuid, &displayModeIndex);
     g_TrackGame->ui->field_0x48c = 1;
     LoadControllerChoice();

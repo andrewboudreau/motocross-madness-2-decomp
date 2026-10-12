@@ -212,27 +212,27 @@ struct UnknownTrackGameModeSettings {
     int raceMode;                             // +0x00 EventManager 0x0045e600 compares it with 2
     int eventType;                            // +0x04 event type (SPEventDlg EventTypeDropDown; ZoneReport sends it plus one); picks the event object
     int series;                               // +0x08 series (SelectGamePicProcs.cpp; uiinfo.cpp 0x005240e0)
-    int field_0x0c;                           // cleared by EventManager 0x0045e520
+    int races;                                // +0x0c RacesListBox row data, shown as "%d/%d" with racesRun (DlgProcs 0x0044dfc0); cleared by EventManager 0x0045e520
     int treeCollision;                        // +0x10 tree collision (SelectGamePicProcs.cpp)
     int riderCollision;                       // +0x14 rider collision (SelectGamePicProcs.cpp)
     int shortTimeLimit;                       // +0x18 selects a 30 (else 120) second limit (EventManager 0x0045eef0)
     int maxBikeClass;                         // +0x1c largest bike class allowed (SelectGamePicProcs.cpp)
     int lapCount;                             // +0x20 laps (SelectGamePicProcs.cpp)
     int aiRacerCount;                         // +0x24 AI racer count (EventManager 0x0045f9a0)
-    int field_0x28;                           // cleared by NetProcs.cpp 0x004aef40
-    unsigned char field_0x2c;                 // cleared by TrackGameMode 0x00522440
-    unsigned char field_0x2d;                 // 30 (TrackGameMode 0x00522440)
+    int multiplayerAiRacerCount;              // +0x28 MPEventDlg OpponentsListBox row data; multiplayer racer count is this plus playerCount (BikeRace 0x0041d2a0); cleared by NetProcs.cpp 0x004aef40
+    unsigned char randomGates;                // +0x2c ChkRandomGates (DlgProcs 0x0044e6c0); cleared by TrackGameMode 0x00522440
+    unsigned char gateCount;                  // +0x2d LstNumGates row data (DlgProcs 0x0044e6c0); 30 (TrackGameMode 0x00522440)
     unsigned char field_0x2e[0x30 - 0x2e];
-    int field_0x30;                           // 1 (TrackGameMode 0x00522440)
-    unsigned char field_0x34;                 // SelectGamePicProcs.cpp
-    unsigned char field_0x35;                 // decremented when a player leaves (EventManager 0x0045fbd0)
+    int gateSeed;                             // +0x30 atoi of the seed text (DlgProcs 0x0044e6c0); 1 (TrackGameMode 0x00522440)
+    unsigned char trackNumber;                // +0x34 the selected track entry's scene (DlgProcs 0x0044e6c0)
+    unsigned char networkPlayerCount;         // +0x35 lobby message players; decremented when a player leaves (EventManager 0x0045fbd0)
     char trackName[0x20];                     // +0x36 track name (length not established)
     unsigned char field_0x56[0x138 - 0x56];
     int field_0x138;                          // SelectGamePicProcs.cpp
     int field_0x13c;                          // SelectGamePicProcs.cpp
     float timeLimitMinutes;                   // +0x140 "%dm" rows 2..5 (DlgProcs 0x0044e3e0), SelectGamePicProcs.cpp's minutes
     int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
-    int field_0x148;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
+    int stuntMode;                            // +0x148 ChkStuntMode (MPEventDlg 0x004f6370); mode 4 ranks by score, else by tag run (EventManager 0x0045e9d0)
     UnknownTrackGameModeEntry field_0x14c[8]; // reset by TrackGameMode 0x00522cd0
     unsigned char field_0x18c[0x1ec - 0x18c];
 };

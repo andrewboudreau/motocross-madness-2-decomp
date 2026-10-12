@@ -180,7 +180,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
             else
                 opponents = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
         } else {
-            opponents = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+            opponents = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
         }
         players = opponents;
     }
@@ -271,7 +271,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     if (textQueue) {
         if (g_TrackGame->mode.raceSettings.eventType == 1 || g_TrackGame->mode.raceSettings.eventType == 5)
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.raceSettings.field_0x34);
+                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.raceSettings.trackNumber);
         else
             g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->sceneFile, 0);

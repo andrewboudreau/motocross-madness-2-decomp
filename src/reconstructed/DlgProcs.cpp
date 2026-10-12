@@ -429,7 +429,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                                                   (UIDialog*)this, 0, 0, 1);
             } else {
                 g_TrackGame->ui->HideScene();
-                g_TrackGame->mode.raceSettings.field_0x28 = 0;
+                g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
                 if (eventPage)
                     eventPage->UpdateBoundValues(1);
                 if (bikeRiderPage)
@@ -728,7 +728,7 @@ void SPEventDlg::ShowRaceModeControls() {
         sprintf(text, "%d", i);
         races->AddRow(text, i - 1, 0);
     }
-    races->SelectRowByData(g_TrackGame->mode.raceSettings.field_0x0c);
+    races->SelectRowByData(g_TrackGame->mode.raceSettings.races);
     if (settings.raceMode == 2 && g_TrackGame->mode.championshipInProgress) {
         opponentsLeft->Show(0, 1);
         opponentsRight->Show(0, 1);
@@ -737,7 +737,7 @@ void SPEventDlg::ShowRaceModeControls() {
         racesRight->Show(0, 1);
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
         sprintf(text, "%d/%d", g_TrackGame->eventManager->racesRun + 1,
-                g_TrackGame->mode.raceSettings.field_0x0c + 1);
+                g_TrackGame->mode.raceSettings.races + 1);
         races->RemoveAllRows();
         races->AddRow(text, 0, 0);
     } else {
@@ -839,7 +839,7 @@ void SPEventDlg::SyncValues(int apply) {
         g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
         settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType], list->GetRowText(-1));
-        g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.eventType] = g_TrackGame->mode.raceSettings.field_0x34;
+        g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.eventType] = g_TrackGame->mode.raceSettings.trackNumber;
         if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->GetSelectedState())
             settings->randomGates = 1;
         else
@@ -1442,7 +1442,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     strcpy(g_TrackGame->mode.playerName, "");
     strcpy(g_TrackGame->mode.raceSettings.trackName, "");
     g_TrackGame->mode.raceSettings.eventType = 0;
-    g_TrackGame->mode.raceSettings.field_0x34 = 0;
+    g_TrackGame->mode.raceSettings.trackNumber = 0;
     g_TrackGame->mode.raceSettings.series = 0;
     sprintf(preset, "%s\\%s", "ui", "preset.ctl");
     sprintf(control, "%s\\%s\\%s", "ui\\profile", name, "control.ctl");

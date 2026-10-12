@@ -278,8 +278,8 @@ void EndNetworkGame() {
     }
     g_TrackGame->playerCount = 1;
     g_TrackGame->field_0x3424 = 0;
-    g_TrackGame->mode.raceSettings.field_0x35 = 0;
-    g_TrackGame->mode.raceSettings.field_0x28 = 0;
+    g_TrackGame->mode.raceSettings.networkPlayerCount = 0;
+    g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
 }
 
 // 0x004aefa0

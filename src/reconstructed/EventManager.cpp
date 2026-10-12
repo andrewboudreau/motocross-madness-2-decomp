@@ -279,7 +279,7 @@ void EventManager::ResetEntries() {
     for (int i = 0; i < 11; i++)
         results[i].Reset();
     racesRun = 0;
-    g_TrackGame->mode.raceSettings.field_0x0c = 0;
+    g_TrackGame->mode.raceSettings.races = 0;
 }
 
 // 0x0045e550
@@ -387,7 +387,7 @@ void EventManager::EndRace() {
     if (!g_TrackGame->uiInteractionBlocked && g_TrackGame->field_0x3438) {
         g_TrackGame->field_0x3438 = 0;
         if (g_TrackGame->network &&
-            (g_TrackGame->mode.raceSettings.raceMode != 2 || racesRun > g_TrackGame->mode.raceSettings.field_0x0c))
+            (g_TrackGame->mode.raceSettings.raceMode != 2 || racesRun > g_TrackGame->mode.raceSettings.races))
             g_TrackGame->network->SetSessionJoinable(1);
         waitingForRacers = 0;
         CloseRace(2);
@@ -533,7 +533,7 @@ void EventManager::RemovePlayer(int player) {
             if (FindRaceMode())
                 g_TrackGame->mode.racers[i] =
                     g_TrackGame->mode.racers[g_TrackGame->mode.racerCount - 1];
-            g_TrackGame->mode.raceSettings.field_0x35--;
+            g_TrackGame->mode.raceSettings.networkPlayerCount--;
         }
     }
     if (g_TrackGame->mode.racerCount)
@@ -789,7 +789,7 @@ void EventManager::RankRacers() {
         break;
     }
     case 4:
-        if (g_TrackGame->mode.raceSettings.field_0x148) {
+        if (g_TrackGame->mode.raceSettings.stuntMode) {
             UnknownEventScore scores[11];
             int scored = 0;
             int next = 0;

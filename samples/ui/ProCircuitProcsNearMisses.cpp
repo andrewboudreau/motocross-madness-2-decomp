@@ -275,9 +275,9 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
                 *extension = 0;
             strcpy(g_TrackGame->mode.raceSettings.trackName, text);
             if (circuit->series == 1 || circuit->series == 5)
-                g_TrackGame->mode.raceSettings.field_0x34 = 1;
+                g_TrackGame->mode.raceSettings.trackNumber = 1;
             else
-                g_TrackGame->mode.raceSettings.field_0x34 = 0;
+                g_TrackGame->mode.raceSettings.trackNumber = 0;
             g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
             UnknownVirtualSlot26();

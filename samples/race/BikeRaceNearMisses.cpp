@@ -587,10 +587,10 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     }
     case 1:
     case 5:
-        if (mode != 1 || !g_TrackGame->mode.raceSettings.field_0x2c) {
+        if (mode != 1 || !g_TrackGame->mode.raceSettings.randomGates) {
             sprintf(path, "%s\\%s%02d.tdf", g_TrackGame->sceneObject->sceneDirectory,
                     g_TrackGame->mode.raceSettings.trackName,
-                    g_TrackGame->mode.raceSettings.field_0x34);
+                    g_TrackGame->mode.raceSettings.trackNumber);
             UnknownTextureStream* stream =
                 new(__FILE__, 0x1be) UnknownTextureStream((int)g_UnknownResourceManager572b44);
             if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
@@ -746,7 +746,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             g_TrackGame->eventManager->RemoveVegetationInRect(girlPosition.x - 4.0f, girlPosition.z - 4.0f,
                                                                        girlPosition.x + 4.0f, girlPosition.z + 4.0f);
         }
-    } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.field_0x148)) {
+    } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
         field_0x0bc = (int)bonus->SetupCounter(renderContext, (int)lights, (int)textures,
                                                (UnknownBonusRacer*)this, (UnknownBonusCamera*)raceCamera);
@@ -944,11 +944,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     }
 
     if (g_TrackGame->playingReplay) {
-        if (g_TrackGame->mode.raceSettings.field_0x35) {
-            racerCount = g_TrackGame->mode.raceSettings.field_0x35 +
-                          g_TrackGame->mode.raceSettings.field_0x28;
+        if (g_TrackGame->mode.raceSettings.networkPlayerCount) {
+            racerCount = g_TrackGame->mode.raceSettings.networkPlayerCount +
+                          g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
             g_TrackGame->mode.raceSettings.aiRacerCount = racerCount - 1;
-            g_TrackGame->mode.raceSettings.field_0x35 = 0;
+            g_TrackGame->mode.raceSettings.networkPlayerCount = 0;
         } else {
             racerCount = g_TrackGame->mode.raceSettings.aiRacerCount + g_TrackGame->playerCount;
         }
@@ -1109,7 +1109,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                          bikeTexture, 0x3f);
         g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racerChoice.riderName,
                                                          riderTexture, 0x3f);
-        if (!g_TrackGame->mode.raceSettings.field_0x28) {
+        if (!g_TrackGame->mode.raceSettings.multiplayerAiRacerCount) {
             g_TrackGame->ui->PickRandomRacers(bikes, racerCount, riders);
             g_TrackGame->ui->MakeRandomNames(names, racerCount);
         }
@@ -1364,7 +1364,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     g_TrackGame->ui->ResolveBikeFile(recordedBike, bikeTexture, 0x3f);
                     g_TrackGame->ui->ResolveRiderFile(recordedRider, riderTexture, 0x3f);
                 } else {
-                    if (g_TrackGame->mode.raceSettings.field_0x0c > 0 &&
+                    if (g_TrackGame->mode.raceSettings.races > 0 &&
                         g_TrackGame->eventManager->racesRun > 0) {
                         fromEvent = 1;
                         COPY_TEXT(aiName, g_TrackGame->eventManager->results[n + 1].name, 0x10);
@@ -1456,7 +1456,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 }
                 id++;
                 if (g_TrackGame->mode.raceSettings.raceMode == 2 &&
-                    g_TrackGame->mode.raceSettings.field_0x0c > 0 &&
+                    g_TrackGame->mode.raceSettings.races > 0 &&
                     !g_TrackGame->eventManager->racesRun) {
                     strcpy(eventAi[n].bikeTexture, bikeTexture);
                     strcpy(eventAi[n].riderTexture, riderTexture);

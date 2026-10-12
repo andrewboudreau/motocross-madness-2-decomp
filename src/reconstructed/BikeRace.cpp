@@ -274,7 +274,7 @@ static inline int UnknownFunctionRacerCount() {
         }
         return g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     }
-    return g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+    return g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
 }
 
 static inline float UnknownFunctionMax(float a, float b) {
@@ -417,7 +417,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                                 field_0x1b4 = UnknownFunctionRacerCount();
                             }
                             int camera = g_TrackGame->mode.raceSettings.eventType;
-                            if (camera == 0 || (camera == 4 && g_TrackGame->mode.raceSettings.field_0x148)) {
+                            if (camera == 0 || (camera == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
                                 if (field_0x1b0 % 20 == 0) {
                                     field_0x3fb = true;
                                     field_0x1b4 *= 2;
@@ -477,7 +477,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     field_0x18e = false;
                     g_TrackGame->network->StopKeepAlive();
                     if (g_TrackGame->playerCount > 1) {
-                        int count = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+                        int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
                         for (int k = 0; k < count; k++) {
                             racerSlots[k]->UnknownRacerVirtualSlot50(1, racerSlots[k]->UnknownRacerVirtualSlot45(), 0);
                         }
@@ -514,7 +514,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                         if (g_TrackGame->playerCount > 1) {
                             int self = g_TrackGame->network->localPlayer;
-                            int count = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+                            int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
                             for (int i = 0; i < count; i++) {
                                 if (g_TrackGame->mode.racers[i].networkPlayerId == self) {
                                     racerSlots[i]->velocity = kVec3Zero;
@@ -1219,7 +1219,7 @@ UnknownBikeRaceRacer* BikeRace::NextBike(int* iterator) {
     }
     (*iterator)++;
     if (g_TrackGame->playerCount > 1) {
-        if (*iterator > g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount) {
+        if (*iterator > g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount) {
             *iterator = 0;
             return 0;
         }
@@ -2032,7 +2032,7 @@ void BikeRace::SetDetailLevel(int level) {
             aiRacers[i]->riderCharacter->modelNode->ApplyLodSettings(level);
         }
     }
-    for (int j = 0; j < g_TrackGame->mode.raceSettings.field_0x35; j++) {
+    for (int j = 0; j < g_TrackGame->mode.raceSettings.networkPlayerCount; j++) {
         racerSlots[j]->modelNode->ApplyLodSettings(level);
         racerSlots[j]->riderCharacter->modelNode->ApplyLodSettings(level);
     }

@@ -213,7 +213,7 @@ int EventManager::CreatePodiumScene() {
     int iterator = 0;
     int ok;
     if (g_TrackGame->mode.raceSettings.raceMode == 2)
-        ok = racesRun > g_TrackGame->mode.raceSettings.field_0x0c;
+        ok = racesRun > g_TrackGame->mode.raceSettings.races;
     else
         ok = 1;
     if (circuit) {

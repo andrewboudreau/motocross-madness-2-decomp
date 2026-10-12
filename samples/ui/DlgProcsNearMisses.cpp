@@ -141,7 +141,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 FindControl("ButZone", 1)->SetEnabled(1);
                 FindControl("ButCable", 1)->SetEnabled(0);
                 FindControl("ButModem", 1)->SetEnabled(0);
-                g_TrackGame->mode.field_0x2bd0.field_0x28 = 0;
+                g_TrackGame->mode.field_0x2bd0.multiplayerAiRacerCount = 0;
                 if (EnsureNetworkInterface()) {
                     ConnectionInfoType connections[5];
                     g_TrackGame->network->EnumConnections(connections, &count);
@@ -452,9 +452,9 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             UIControl* text = FindControl("TitleText", 0xc);
             g_TrackGame->LoadResourceString(0x93b, position, 0x80);
             sprintf(title, "%s (%d/%d)", position, g_TrackGame->eventManager->racesRun,
-                    g_TrackGame->mode.raceSettings.field_0x0c + 1);
+                    g_TrackGame->mode.raceSettings.races + 1);
             text->SetText(title);
-            if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.field_0x0c) {
+            if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.races) {
                 text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
                 g_TrackGame->mode.championshipInProgress = 0;
                 g_TrackGame->ui->currentMenu = 0x10e;
@@ -570,9 +570,9 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         UIControl* text = FindControl("TitleText", 0xc);
         g_TrackGame->LoadResourceString(0x93b, position, 0x80);
         sprintf(title, "%s (%d/%d)", position, g_TrackGame->eventManager->racesRun,
-                g_TrackGame->mode.raceSettings.field_0x0c + 1);
+                g_TrackGame->mode.raceSettings.races + 1);
         text->SetText(title);
-        if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.field_0x0c) {
+        if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.raceSettings.races) {
             text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
             g_TrackGame->mode.championshipInProgress = 0;
             g_TrackGame->ui->currentMenu = 0x10e;
@@ -648,7 +648,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         break;
     }
     case 4:
-        if (g_TrackGame->mode.raceSettings.field_0x148) {
+        if (g_TrackGame->mode.raceSettings.stuntMode) {
             if (g_TrackGame->mode.raceSettings.raceMode == 2)
             SetStatsButtonResources(event, 0x934, 0, 0x937, 0x938);
         else

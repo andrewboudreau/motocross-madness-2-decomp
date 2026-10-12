@@ -519,7 +519,7 @@ int StatsOverlay::DrawViewModePanel()
         else
             total = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     } else {
-        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+        total = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
     }
     sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
@@ -632,7 +632,7 @@ int StatsOverlay::DrawRacePanel()
         else
             total = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     } else {
-        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
+        total = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount + g_TrackGame->playerCount;
     }
     sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
@@ -711,7 +711,7 @@ int StatsOverlay::DrawTagStandings()
         FormatMinutesSeconds(time, limit - (owner->elapsedMinutes * 60.0f + owner->elapsedSeconds));
         sprintf(rowText[0], "%s %s", label, time);
     }
-    if (g_TrackGame->mode.raceSettings.field_0x148) {
+    if (g_TrackGame->mode.raceSettings.stuntMode) {
         int iterator;
         int own;
         UnknownKrustyBikeView* view = g_TrackGame->tagEvent->raceView;

@@ -861,7 +861,7 @@ int KrustyUI::AddEntry(int a, int scene, int series, const char* name, int d, in
 // 0x0049bbb0
 void KrustyUI::RecordRaceResults() {
     UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.raceSettings;
-    if (settings->eventType == 1 && settings->field_0x2c)
+    if (settings->eventType == 1 && settings->randomGates)
         return;
     RecordHighScoreTable(0);
     int mode = g_TrackGame->mode.raceSettings.eventType;
@@ -889,7 +889,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
     case 1:
     case 5:
         sprintf(name, "%s%d", g_TrackGame->mode.raceSettings.trackName,
-                g_TrackGame->mode.raceSettings.field_0x34);
+                g_TrackGame->mode.raceSettings.trackNumber);
         break;
     default: {
         int length = strlen(g_TrackGame->mode.raceSettings.trackName);

@@ -443,7 +443,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
             UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
             g_TrackGame->ui->HideScene();
             g_TrackGame->mode.ghostFile[0] = 0;
-            g_TrackGame->mode.raceSettings.field_0x28 = 0;
+            g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = 0;
             if (nextPage)
                 nextPage->UpdateBoundValues(1);
             if (bikeRiderPage)
@@ -469,9 +469,9 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
                 *extension = 0;
             strcpy(g_TrackGame->mode.raceSettings.trackName, name);
             if (circuit->series == 1 || circuit->series == 5)
-                g_TrackGame->mode.raceSettings.field_0x34 = 1;
+                g_TrackGame->mode.raceSettings.trackNumber = 1;
             else
-                g_TrackGame->mode.raceSettings.field_0x34 = 0;
+                g_TrackGame->mode.raceSettings.trackNumber = 0;
             g_TrackGame->mode.raceSettings.treeCollision = 1;
             g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
