@@ -131,7 +131,7 @@ struct UnknownEventRacer : virtual public GameObject {
     char racerName[0x10];                     // +0x5e0 name
     UnknownEventRacerModel* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
-    UnknownCameraBikeState* field_0x604;           // racesnd.cpp 0x004e39b0 reads its +0xb0
+    UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
     unsigned char field_0x608[0x734 - 0x608];
     char field_0x734;                              // RaceStatus.cpp 0x004e6a50 finishes the race on its lap count
     unsigned char field_0x735;                     // RaceStatus.cpp: gates are passed without the crossing test

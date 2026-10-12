@@ -768,7 +768,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                 else if (!wreckSounds[racerWreckSound[i]]->IsPlaying())
                     racerWreckSound[i] = PlayWreckSound(currentRacer);
             }
-            if (currentRacer->field_0x604->field_0xb0) {
+            if (currentRacer->wrecker->contactThisFrame) {
                 if (!racerFallSound[i])
                     racerFallSound[i] = PlayFallSound(currentRacer);
                 else if (!fallSounds[racerFallSound[i]]->IsPlaying())

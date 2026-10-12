@@ -156,11 +156,11 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     if (field_0x276) {
         bike->riderCharacter->modelNode->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
-            Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
+            Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
             lead = lead * (4.0f - field_0x2c0 * 0.006f);
             result += lead;
         } else {
-            result += bike->field_0x604->field_0x40->field_0x154 * dt;
+            result += bike->wrecker->rigidBody->velocity * dt;
         }
     } else if (raceView->replayPaused) {
         result = targetPoint;

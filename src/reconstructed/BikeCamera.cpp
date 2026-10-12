@@ -55,7 +55,7 @@ void BikeCamera::UnknownVirtualSlot40(float a) {
     headPart->GetPositionIn(0, &head);
     SetTableEntry(0, &head, 0, &value10, &value14, 0, 0);
     SetTableEntry(1, &targetPoint, 0, &value10, &value14, 0, 0);
-    UnknownVirtualSlot38(a, bike->field_0x604->field_0x44 != 1, special);
+    UnknownVirtualSlot38(a, bike->wrecker->wreckState != 1, special);
 }
 
 // 0x00416fb0: 38% of the way from the rider's head to the target point.
@@ -80,11 +80,11 @@ Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
     if (field_0x276) {
         bike->riderCharacter->modelNode->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
-            Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
+            Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
             lead = lead * (4.0f - field_0x2c0 * 0.006f);
             result += lead;
         } else {
-            result += bike->field_0x604->field_0x40->field_0x154 * dt;
+            result += bike->wrecker->rigidBody->velocity * dt;
         }
     } else {
         float dot = BikeCameraDot(UnknownVirtualSlot33(), field_0x29c);
@@ -128,5 +128,5 @@ float BikeCamera::UnknownVirtualSlot51() {
 // 0x004174b0
 bool BikeCamera::UnknownVirtualSlot75() {
     return FollowCamera::UnknownVirtualSlot75() || !vehicleMode || !bike->crashState ||
-           (bike->crashReason == 6 && bike->field_0x604->field_0x44 != 3);
+           (bike->crashReason == 6 && bike->wrecker->wreckState != 3);
 }
