@@ -1,13 +1,20 @@
 // Near-miss Game candidates, kept out of src/reconstructed until they
 // match. See docs/GAME.md.
 //
-// Game::UnknownFunction467b70 (0x00467b70, 775 bytes): 761 of 775 bytes
-// match. Only the frame slots differ: retail places the registry key at
-// +0x10, the size at +0x14, the type at +0x18, the value at +0x1c and the
-// `new` temporary at +0x20; VC6 here puts the temporary at +0x1c and orders
-// the registry locals differently. Declaration order, block scope (763),
-// declarations at the top of the function, renamed locals and an inline
-// helper (worse) do not reproduce retail's layout.
+// Game::UnknownFunction467b70 (0x00467b70, 775 bytes; the candidate is
+// 798): 747 of 798 bytes match. The frame, the slots and the body agree;
+// only the tail differs. Retail's two failure exits (slot 32 and slot 3
+// returning zero) jump to the single epilogue with eax still zero, and the
+// slot 4 result (`neg; sbb; neg`) falls through into it. VC6 here emits
+// `xor eax, eax` in the shared exit and gives the slot 4 return its own
+// copy of the epilogue. Writing the slot 3 test as `if (slot3()) return
+// slot4() != 0; return 0;` merges the two failure exits as retail does
+// (406 -> 747; the early `if (!slot3()) return 0;` duplicated the epilogue
+// for every return). Tried for the tail (session 10): `&&`, a ternary,
+// `!!`, an if/else on a result variable, nesting the body in `if (slot32())`,
+// gotos to a shared label and inline helpers (all 733-747); a result
+// variable holding the call value gives retail's tail but tests it with
+// `cmp eax, ebp` and moves the frame (402-488).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,7 +91,7 @@ int Game::UnknownFunction467b70(char*) {
         g_MemTagStack->Pop(category);
     }
     field_0x2d4_bit0 = GetRegistryFlag("AllowFreezeCamera", 0);
-    if (!UnknownVirtualSlot3())
-        return 0;
-    return UnknownVirtualSlot4() != 0;
+    if (UnknownVirtualSlot3())
+        return UnknownVirtualSlot4() != 0;
+    return 0;
 }
