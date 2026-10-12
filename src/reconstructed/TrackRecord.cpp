@@ -398,7 +398,7 @@ void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
     control->SetSelectable(0);
     control = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     control->RemoveAllRows();
-    ListHighScoreTracks(control, g_TrackGame->mode.field_0x25e0, series);
+    ListHighScoreTracks(control, g_TrackGame->mode.highScoreDirectoryList, series);
     ((UnknownTrackRecordListBox*)control)->UnknownVirtualSlot66(0);
 }
 

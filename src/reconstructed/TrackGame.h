@@ -338,8 +338,8 @@ public:
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)
     int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
-    int field_0x94;                           // "RadLODEasy" (SelectGamePicProcs.cpp)
-    int field_0x98;                           // saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
+    int difficulty;                           // +0x94 "RadLODEasy" group (PCNewDlg reads the same group as the difficulty)
+    int savedDifficulty;                      // +0x98 saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
     int showNewbieDialog;                 // +0x9c: cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)
     char seriesDirectories[6][0x100];     // +0xa0: directories (TrackRecord.cpp 0x0051f0b0)
     int currentSeriesDirectory;           // +0x6a0: a directory name pointer for TrackRecord.cpp 0x0051f2c0; EventManager 0x0045cb70 passes it to 0x00523a60
@@ -418,7 +418,7 @@ public:
     char cdDataDirectory[0x104];          // +0x24d4: CD data directory (uiinfo.cpp 0x00523bf0)
     char cdDriveRoot[4];                  // +0x25d8: CD drive root (uiinfo.cpp 0x00523bf0)
     UnknownDriveList* driveList;          // +0x25dc: created by the constructor (0x005221e7)
-    DirectoryList* field_0x25e0;              // scanned by TrackRecord.cpp 0x00520390
+    DirectoryList* highScoreDirectoryList;    // +0x25e0 scanned by TrackRecord.cpp 0x00520390
     DirectoryList* trackDirectoryList;    // +0x25e4: track directories (SelectGamePicProcs.cpp)
     CombinedDirectoryList* field_0x25e8;      // created by 0x00522d00
     char ghostFile[0x104];                // +0x25ec: the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
@@ -697,7 +697,7 @@ public:
     int playingReplay;                        // +0x3428
     int useReplayTape;                        // +0x342c
     int uiInteractionBlocked;
-    float field_0x3434;        // seconds UI interaction has been blocked (EventManager slot 10)
+    float uiBlockedSeconds;                   // +0x3434 seconds UI interaction has been blocked (EventManager slot 10)
     int field_0x3438;
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;

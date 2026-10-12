@@ -79,8 +79,8 @@ void TrackGameMode::ResetDefaults() {
     plateNumber = 101;
     for (int i = 0; i < 6; i++)
         bonusTrackUnlocked[i] = 0;
-    field_0x98 = 2;
-    field_0x94 = 2;
+    savedDifficulty = 2;
+    difficulty = 2;
 }
 
 // 0x005238f0 (TrackGame slot 18): finds `name` under the installed data

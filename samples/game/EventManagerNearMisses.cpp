@@ -61,7 +61,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
         g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
     g_TrackGame->field_0x3438 = 0;
-    g_TrackGame->field_0x3434 = 0;
+    g_TrackGame->uiBlockedSeconds = 0;
     if (!g_TrackGame->mode.field_0xa20)
         g_TrackGame->UnknownFunction521a40();
     UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];

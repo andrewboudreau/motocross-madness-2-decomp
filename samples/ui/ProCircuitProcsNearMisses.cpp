@@ -275,7 +275,7 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
                 g_TrackGame->mode.raceSettings.field_0x34 = 1;
             else
                 g_TrackGame->mode.raceSettings.field_0x34 = 0;
-            g_TrackGame->mode.field_0x94 = circuit->field_0x50;
+            g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
             UnknownVirtualSlot26();
         } else if (_stricmp("ButDecline", event->controlName) == 0) {

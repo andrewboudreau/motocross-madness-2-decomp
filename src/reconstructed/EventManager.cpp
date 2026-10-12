@@ -259,13 +259,13 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
              HasRaceMode())
         CheckRaceOver(frameTime);
     if (g_TrackGame->uiInteractionBlocked) {
-        g_TrackGame->field_0x3434 += frameTime;
+        g_TrackGame->uiBlockedSeconds += frameTime;
         for (int i = 0; i < podiumCharacterCount; i++)
             podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
         podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
         podiumCamera->UnknownVirtualSlot29(podiumFocus);
-        if (!g_TrackGame->field_0x3438 && g_TrackGame->field_0x3434 > 7.0f) {
+        if (!g_TrackGame->field_0x3438 && g_TrackGame->uiBlockedSeconds > 7.0f) {
             g_TrackGame->uiInteractionBlocked = 0;
             g_TrackGame->field_0x3438 = 1;
             EndRace();
@@ -375,7 +375,7 @@ void EventManager::EndRace() {
             view->UnknownVirtualSlot5();
         if (CreatePodiumScene()) {
             g_TrackGame->uiInteractionBlocked = 1;
-            g_TrackGame->field_0x3434 = 0;
+            g_TrackGame->uiBlockedSeconds = 0;
             return;
         }
         g_TrackGame->field_0x3438 = 1;

@@ -277,7 +277,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     UnknownLobbyStartMessage message;
     message.start = start;
     message.raceSettings = g_TrackGame->mode.raceSettings;
-    message.field_0x1f4 = g_TrackGame->mode.field_0x94;
+    message.field_0x1f4 = g_TrackGame->mode.difficulty;
     memcpy(message.raceSettings.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
         char name[0x80];

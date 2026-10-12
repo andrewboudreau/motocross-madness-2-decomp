@@ -80,8 +80,8 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         g_TrackGame->mode.raceSettings.field_0x148 = 0;
         g_TrackGame->mode.raceSettings.field_0x2d = 0;
         g_TrackGame->mode.raceSettings.tagBall = 0;
-        g_TrackGame->mode.field_0x98 = 3;
-        g_TrackGame->mode.field_0x94 = 3;
+        g_TrackGame->mode.savedDifficulty = 3;
+        g_TrackGame->mode.difficulty = 3;
         return 1;
     }
     return 0;

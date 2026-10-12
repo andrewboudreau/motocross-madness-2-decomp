@@ -103,7 +103,7 @@ TrackGameMode::TrackGameMode() {
         delete driveList;
         driveList = 0;
     }
-    field_0x25e0 = 0;
+    highScoreDirectoryList = 0;
     trackDirectoryList = 0;
     field_0x25e8 = 0;
     showNewbieDialog = 1;
@@ -135,8 +135,8 @@ TrackGameMode::TrackGameMode() {
 
 // 0x005225f0
 TrackGameMode::~TrackGameMode() {
-    if (field_0x25e0)
-        delete field_0x25e0;
+    if (highScoreDirectoryList)
+        delete highScoreDirectoryList;
     if (trackDirectoryList)
         delete trackDirectoryList;
     if (field_0x25e8)
@@ -313,7 +313,7 @@ void TrackGameMode::UnknownFunction522cd0() {
 int TrackGameMode::CreateDirectoryLists() {
 
     ChooseDisplayMode(0, &displayModeIndex);
-    field_0x25e0 = new(__FILE__, 383) DirectoryList;
+    highScoreDirectoryList = new(__FILE__, 383) DirectoryList;
     trackDirectoryList = new(__FILE__, 384) CombinedDirectoryList;
     field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
     if (driveList && trackDirectoryList && field_0x25e8)
@@ -449,7 +449,7 @@ int TrackGameMode::LoadProfile() {
     fread(bonusTrackUnlocked, 0x18, 1, file);
     fread(&field_0x1bdc, 4, 1, file);
     fread(&field_0x90, 4, 1, file);
-    fread(&field_0x98, 4, 1, file);
+    fread(&savedDifficulty, 4, 1, file);
     fread(customGarageCurves, 0x294, 1, file);
     fread(&plateNumber, 4, 1, file);
     fclose(file);
@@ -462,7 +462,7 @@ int TrackGameMode::LoadProfile() {
         ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, use16BitSound ? 16 : 8);
     }
     raceSettings = savedSettings;
-    field_0x94 = field_0x98;
+    difficulty = savedDifficulty;
     memcpy(garageOptions, optionsBackup, sizeof(garageOptions));
     memcpy(&racerChoice, &racerChoiceBackup, sizeof(racerChoice));
     return strcmp(field_0x00, "") != 0;
@@ -503,7 +503,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(bonusTrackUnlocked, 0x18, 1, file);
     fwrite(&field_0x1bdc, 4, 1, file);
     fwrite(&field_0x90, 4, 1, file);
-    fwrite(&field_0x98, 4, 1, file);
+    fwrite(&savedDifficulty, 4, 1, file);
     fwrite(customGarageCurves, 0x294, 1, file);
     fwrite(&plateNumber, 4, 1, file);
     fclose(file);
