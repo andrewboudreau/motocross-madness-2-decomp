@@ -640,14 +640,14 @@ UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a,
     }
     field_0x204 = a;
     field_0x208 = b;
-    field_0x200 = 0;
+    textScrollX = 0;
     textLength = 0;
     controlTextLength = 0;
     textWidth = 0;
     acceptedCharacters = 0;
     backgroundBrush = 0;
-    field_0x228 = 0;
-    field_0x22c = 0;
+    leadBytePending = 0;
+    dropTrailByte = 0;
     if (!text)
         controlText = (char*)DebugMalloc(textCapacity, __FILE__, 0x15c7);
     controlText[0] = 0;
@@ -3232,7 +3232,7 @@ void UIEditBox::SetCapacity(int size) {
     else if (capacity < 1)
         capacity = 1;
     textCapacity = capacity;
-    field_0x200 = 0;
+    textScrollX = 0;
     textLength = 0;
     textWidth = 0;
     controlTextLength = 0;

@@ -396,7 +396,7 @@ public:
     int field_0x1f4;
     int field_0x1f8;
     int textWidth;                            // +0x1fc
-    int field_0x200;
+    int textScrollX;                          // +0x200: the text's x offset in the box (Draw, by textAlign)
     union {
         int field_0x204;
         Sound* clickSound;                    // +0x204: the key click
@@ -407,13 +407,10 @@ public:
     };
     void* backgroundBrush;                    // +0x20c: the background brush (HBRUSH)
     void* acceptedCharacters;                 // +0x210
-    int field_0x214;
-    int field_0x218;
-    int field_0x21c;
-    int field_0x220;
+    int caretRect[4];                         // +0x214: the caret's CameraRect (Draw); the IME composition position
     int boundBufferSize;                      // +0x224: the bound buffer's size (0x00473820)
-    int field_0x228;
-    int field_0x22c;
+    int leadBytePending;                      // +0x228: a DBCS lead byte was typed; the next key is its trail
+    int dropTrailByte;                        // +0x22c: no room for the pending lead byte's trail
 };
 
 // RTTI: UIScrollCtl : UIButton (vtable 0x00552ef0; 0x1f0 bytes, `new` at

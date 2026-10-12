@@ -527,19 +527,19 @@ int UIEditBox::Draw() {
     do {
         if (textAlign & 1) {
             int offset = width - textWidth;
-            field_0x200 = offset > 0 ? 0 : offset;
+            textScrollX = offset > 0 ? 0 : offset;
         } else if (textAlign & 2) {
             if (GetWidth() > textWidth)
-                field_0x200 = width / 2 - textWidth / 2;
+                textScrollX = width / 2 - textWidth / 2;
             else
-                field_0x200 = width - textWidth;
+                textScrollX = width - textWidth;
         } else if (textAlign & 4) {
-            field_0x200 = width - textWidth;
+            textScrollX = width - textWidth;
         } else {
             int offset = width - textWidth;
-            field_0x200 = offset > 0 ? 0 : offset;
+            textScrollX = offset > 0 ? 0 : offset;
         }
-        int x = screenArea[0] + field_0x200;
+        int x = screenArea[0] + textScrollX;
         int y;
         if (textAlign & 8)
             y = screenArea[1];
@@ -569,7 +569,7 @@ int UIEditBox::Draw() {
                 if (!height)
                     height = ownerDialog->dialogFontHeight;
                 rect.bottom = rect.top + height + 1;
-                CameraRect* caretRect = (CameraRect*)&field_0x214;
+                CameraRect* caretRect = (CameraRect*)caretRect;
                 *caretRect = rect;
                 if (backgroundBrush)
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)backgroundBrush);
@@ -585,8 +585,8 @@ int UIEditBox::Draw() {
                 if (ImmGetOpenStatus(context)) {
                     COMPOSITIONFORM composition;
                     composition.dwStyle = CFS_FORCE_POSITION;
-                    composition.ptCurrentPos.x = ((CameraRect*)&field_0x214)->left;
-                    composition.ptCurrentPos.y = ((CameraRect*)&field_0x214)->top;
+                    composition.ptCurrentPos.x = ((CameraRect*)caretRect)->left;
+                    composition.ptCurrentPos.y = ((CameraRect*)caretRect)->top;
                     ImmSetCompositionWindow(context, &composition);
                 }
                 if (context)
@@ -652,20 +652,20 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
                 return 1;
             break;
         default: {
-            int lead = !field_0x228 && IsDBCSLeadByte(c) ? 1 : 0;
-            if (!field_0x228 && !lead) {
+            int lead = !leadBytePending && IsDBCSLeadByte(c) ? 1 : 0;
+            if (!leadBytePending && !lead) {
                 c = FilterCharacter(c);
                 if (!c)
                     break;
             }
-            field_0x228 = 0;
+            leadBytePending = 0;
             int room;
             if (lead) {
-                field_0x228 = 1;
+                leadBytePending = 1;
                 room = controlTextLength < textCapacity - 2;
-                field_0x22c = !room;
-            } else if (field_0x22c) {
-                field_0x22c = 0;
+                dropTrailByte = !room;
+            } else if (dropTrailByte) {
+                dropTrailByte = 0;
                 room = 0;
             } else {
                 room = controlTextLength < textCapacity - 1;
