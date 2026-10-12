@@ -150,12 +150,12 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     hasFinishProbe = 0;
     chatOverlay = 0;
     forceHighLod = g_TrackGame->GetRegistryFlag("ForceHighLOD", 0);
-    field_0x3fd = 1;
+    drawChildren = 1;
     lodDebugPage = -1;
     targetKind = 0xff;
     targetIndex = 0;
     objectPicker = 0;
-    field_0x034 = 0;
+    debugDraw = 0;
 }
 
 // 0x0041cf30
@@ -1004,7 +1004,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         case 0x1f:
             if (TestInputEvent(0x1f, 0, event, 0x80)) {
-                field_0x034 = 1 - field_0x034;
+                debugDraw = 1 - debugDraw;
             }
             break;
         }
@@ -1956,10 +1956,10 @@ void BikeRace::DrawTrack(Track* track) {
 int BikeRace::UnknownVirtualSlot14() {
     Vector3 a;
     Vector3 b;
-    if (field_0x3fd) {
+    if (drawChildren) {
         GameObject::UnknownVirtualSlot14();
     }
-    if (field_0x034) {
+    if (debugDraw) {
         if (raceTrack != 0) {
             DrawTrack(raceTrack);
             if (hasStartProbe) {
@@ -1979,7 +1979,7 @@ int BikeRace::UnknownVirtualSlot14() {
                 DrawLine(&a, &b);
             }
         }
-        if (field_0x034) {
+        if (debugDraw) {
             if (g_UnknownGlobal577a00) {
                 SetDrawColor(0xff, 0, 0);
             } else {
@@ -2041,7 +2041,7 @@ void BikeRace::SetDetailLevel(int level) {
 // 0x00423880
 int BikeRace::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (TestInputEvent(6, 0, event, 0x80)) {
-        field_0x3fd = 1 - field_0x3fd;
+        drawChildren = 1 - drawChildren;
         return 1;
     }
     return 0;

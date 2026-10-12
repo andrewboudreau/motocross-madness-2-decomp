@@ -853,7 +853,7 @@ public:
     // 0x0041f5e0: keys: chat, camera targets, debug toggles and the debug
     // object picker.
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
-    // 0x00423880: control 0x80 (any modifier) toggles +0x3fd.
+    // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     UnknownBikeRaceCameraView* UnknownFunctionCameraView() {
@@ -924,7 +924,7 @@ public:
     void ClearAiRacerParts(int index);    // 0x00423040: zeroes an AI racer's parts
     void SetDetailLevel(int level);    // 0x00423790: detail level
 
-    unsigned char field_0x034;
+    unsigned char debugDraw;                  // +0x34 toggled by control 0x1f (modifier 0x80): slot 14 draws the track, probes and debug lines
     unsigned char field_0x035[0x38 - 0x35];
     UnknownBikeRaceRacer* localRacer;        // its own racer
     UnknownBikeRaceRacer** racerSlots;       // all racers, by racer slot
@@ -1007,7 +1007,7 @@ public:
     bool recorderTickDue;                     // +0x3fa a short record packet is due this frame
     bool field_0x3fb;
     unsigned char isRecording;                // recording (0x00420650)
-    unsigned char field_0x3fd;                // toggled by slot 22
+    unsigned char drawChildren;               // +0x3fd 1 by the constructor, toggled by control 6 (slot 22): slot 14 runs GameObject's draw only when set
 };
 
 // The global at 0x00689f18 (D3DIMSoultreeModifier.cpp's code reads it):
