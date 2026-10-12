@@ -79,9 +79,9 @@ int Track::UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, fl
     if (!node || !out)
         return 0;
     out->node = node;
-    TrackSegment* segment = node->field_0x08;
+    TrackSegment* segment = node->firstSegment;
     if (segment) {
-        if (!segment->field_0x2c) {
+        if (!segment->next) {
             out->segment = segment;
             out->t = 0.0f;
             if (outDistance) {
@@ -91,8 +91,8 @@ int Track::UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, fl
             }
             return 1;
         }
-        for (; segment; segment = segment->field_0x2c) {
-            TrackSegment* next = segment->field_0x2c;
+        for (; segment; segment = segment->next) {
+            TrackSegment* next = segment->next;
             if (!next)
                 break;
             float ex = next->field_0x00 - segment->field_0x00;
@@ -263,20 +263,20 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
         *out = from;
         best = -range;
     }
-    item->field_0x04 = field_0x00;
+    item->node = startNode;
     list = item;
     do {
-        TrackNode* node = list->field_0x04;
-        if (node->field_0x00 & 4) {
-            node->field_0x00 &= ~4;
+        TrackNode* node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
             item = list;
             list = list->field_0x0c;
             DebugFree(item, __FILE__, 865);
         } else {
-            node->field_0x00 |= 4;
+            node->flags |= 4;
             TrackSegment* next;
-            for (TrackSegment* segment = list->field_0x04->field_0x08; segment && (next = segment->field_0x2c) != 0;
-                 segment = segment->field_0x2c) {
+            for (TrackSegment* segment = list->node->firstSegment; segment && (next = segment->next) != 0;
+                 segment = segment->next) {
                 if (IsInsideStrip(*(TrackVec3*)&p, segment, next)) {
                     float ex = next->field_0x00 - segment->field_0x00;
                     float ez = next->field_0x08 - segment->field_0x08;
@@ -293,22 +293,22 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
                     if (!candidate)
                         return 0;
                     candidate->next = candidates;
-                    candidate->pos.node = list->field_0x04;
+                    candidate->pos.node = list->node;
                     candidate->pos.segment = segment;
                     candidate->pos.t = t;
                     candidates = candidate;
                 }
             }
-            int count = list->field_0x04->field_0x10;
-            TrackNode** links = list->field_0x04->field_0x14;
+            int count = list->node->linkCount;
+            TrackNode** links = list->node->links;
             for (int i = 0; i < count; i++) {
-                if (!(links[i]->field_0x00 & 4)) {
+                if (!(links[i]->flags & 4)) {
                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 907);
                     if (!item) {
                         UnknownFunction517930(&list, 0);
                         return 0;
                     }
-                    item->field_0x04 = links[i];
+                    item->node = links[i];
                     item->field_0x0c = list;
                     list = item;
                 }
@@ -336,13 +336,13 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
             }
             for (TrackListItem* step = (TrackListItem*)path; !found && step; step = step->field_0x0c) {
                 TrackPos start;
-                start.node = step->field_0x04;
-                start.segment = start.node->field_0x08;
+                start.node = step->node;
+                start.segment = start.node->firstSegment;
                 start.t = 0.0f;
                 ahead = UnknownFunction517da0(start, candidates->pos);
                 behind = UnknownFunction517da0(candidates->pos, start);
-                if (NodeHasSegment(candidates->pos.segment, step->field_0x04)
-                    && (!NodeHasSegment(from.segment, step->field_0x04)
+                if (NodeHasSegment(candidates->pos.segment, step->node)
+                    && (!NodeHasSegment(from.segment, step->node)
                         || ahead >= 0.0f && behind >= 0.0f && ahead < behind)) {
                     found = 1;
                     if (out && (ahead > best || -behind > best)) {
@@ -385,37 +385,37 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
     float best = -1.0f;
     if (!out)
         return 0;
-    if (!field_0x00)
+    if (!startNode)
         return 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 514);
     if (!item)
         return 0;
-    item->field_0x04 = field_0x00;
+    item->node = startNode;
     TrackListItem* list = item;
     while (list) {
-        TrackNode* node = list->field_0x04;
-        if (node->field_0x00 & 4) {
-            node->field_0x00 &= ~4;
+        TrackNode* node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
             item = list;
             list = list->field_0x0c;
             DebugFree(item, __FILE__, 530);
         } else {
-            node->field_0x00 |= 4;
-            TrackSegment* segment = list->field_0x04->field_0x08;
+            node->flags |= 4;
+            TrackSegment* segment = list->node->firstSegment;
             if (segment) {
-                if (!segment->field_0x2c) {
+                if (!segment->next) {
                     float dx = p.x - segment->field_0x00;
                     float dz = p.z - segment->field_0x08;
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
                         best = distanceSquared;
-                        out->node = list->field_0x04;
+                        out->node = list->node;
                         out->segment = segment;
                         out->t = 0.0f;
                     }
                 }
-                for (; segment; segment = segment->field_0x2c) {
-                    TrackSegment* next = segment->field_0x2c;
+                for (; segment; segment = segment->next) {
+                    TrackSegment* next = segment->next;
                     if (!next)
                         break;
                     float ex = next->field_0x00 - segment->field_0x00;
@@ -451,20 +451,20 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
                         best = distanceSquared;
-                        out->node = list->field_0x04;
+                        out->node = list->node;
                         out->segment = segment;
                         out->t = t;
                     }
                 }
             }
-            int count = list->field_0x04->field_0x10;
-            TrackNode** links = list->field_0x04->field_0x14;
+            int count = list->node->linkCount;
+            TrackNode** links = list->node->links;
             for (int i = 0; i < count; i++) {
-                if (!(links[i]->field_0x00 & 4)) {
+                if (!(links[i]->flags & 4)) {
                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 588);
                     if (!item)
                         return 0;
-                    item->field_0x04 = links[i];
+                    item->node = links[i];
                     item->field_0x0c = list;
                     list = item;
                 }
@@ -564,62 +564,62 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
             nodes[index] = (TrackNode*)DebugCalloc(1, sizeof(TrackNode), __FILE__, 108);
             if (!nodes[index])
                 goto fail;
-            link = &nodes[index]->field_0x08;
+            link = &nodes[index]->firstSegment;
         } else if (chunk == 6) {
             if (!nodes[index])
                 goto fail;
             int flags;
             stream->UnknownFunction461640(&flags, 4, 1);
-            nodes[index]->field_0x00 = (unsigned char)(flags | 1);
+            nodes[index]->flags = (unsigned char)(flags | 1);
         } else if (chunk == 7) {
             if (!nodes[index])
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->field_0x04, 4, 1);
-            nodes[index]->field_0x04 *= scale;
+            stream->UnknownFunction461640(&nodes[index]->pathLength, 4, 1);
+            nodes[index]->pathLength *= scale;
         } else if (chunk == 8) {
             if (!nodes[index] || !link)
                 goto fail;
             TrackSegment* segment = (TrackSegment*)DebugCalloc(1, sizeof(TrackSegment), __FILE__, 141);
             if (!segment)
                 goto fail;
-            segment->field_0x28 = nodes[index]->field_0x0c;
+            segment->previous = nodes[index]->lastSegment;
             *link = segment;
-            link = &segment->field_0x2c;
-            nodes[index]->field_0x0c = segment;
+            link = &segment->next;
+            nodes[index]->lastSegment = segment;
         } else if (chunk == 9) {
-            if (!nodes[index] || !nodes[index]->field_0x0c)
+            if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x00, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x04, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x08, 4, 1);
-            nodes[index]->field_0x0c->field_0x00 = scale * nodes[index]->field_0x0c->field_0x00 + offsetX;
-            nodes[index]->field_0x0c->field_0x04 = scale * nodes[index]->field_0x0c->field_0x04;
-            nodes[index]->field_0x0c->field_0x08 = scale * nodes[index]->field_0x0c->field_0x08 + offsetZ;
-            TrackSegment* segment = nodes[index]->field_0x0c;
-            TrackSegment* previous = segment->field_0x28;
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x00, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x04, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x08, 4, 1);
+            nodes[index]->lastSegment->field_0x00 = scale * nodes[index]->lastSegment->field_0x00 + offsetX;
+            nodes[index]->lastSegment->field_0x04 = scale * nodes[index]->lastSegment->field_0x04;
+            nodes[index]->lastSegment->field_0x08 = scale * nodes[index]->lastSegment->field_0x08 + offsetZ;
+            TrackSegment* segment = nodes[index]->lastSegment;
+            TrackSegment* previous = segment->previous;
             if (previous) {
                 float dx = segment->field_0x00 - previous->field_0x00;
                 float dz = segment->field_0x08 - previous->field_0x08;
-                previous->field_0x24 = (float)sqrt(dz * dz + dx * dx);
+                previous->horizontalLength = (float)sqrt(dz * dz + dx * dx);
             }
         } else if (chunk == 10) {
-            if (!nodes[index] || !nodes[index]->field_0x0c)
+            if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x0c, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x10, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x14, 4, 1);
-            nodes[index]->field_0x0c->field_0x0c = scale * nodes[index]->field_0x0c->field_0x0c + offsetX;
-            nodes[index]->field_0x0c->field_0x10 = scale * nodes[index]->field_0x0c->field_0x10;
-            nodes[index]->field_0x0c->field_0x14 = scale * nodes[index]->field_0x0c->field_0x14 + offsetZ;
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x0c, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x10, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x14, 4, 1);
+            nodes[index]->lastSegment->field_0x0c = scale * nodes[index]->lastSegment->field_0x0c + offsetX;
+            nodes[index]->lastSegment->field_0x10 = scale * nodes[index]->lastSegment->field_0x10;
+            nodes[index]->lastSegment->field_0x14 = scale * nodes[index]->lastSegment->field_0x14 + offsetZ;
         } else if (chunk == 11) {
-            if (!nodes[index] || !nodes[index]->field_0x0c)
+            if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x18, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x1c, 4, 1);
-            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x20, 4, 1);
-            nodes[index]->field_0x0c->field_0x18 = scale * nodes[index]->field_0x0c->field_0x18 + offsetX;
-            nodes[index]->field_0x0c->field_0x1c = scale * nodes[index]->field_0x0c->field_0x1c;
-            nodes[index]->field_0x0c->field_0x20 = scale * nodes[index]->field_0x0c->field_0x20 + offsetZ;
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x18, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x1c, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->lastSegment->field_0x20, 4, 1);
+            nodes[index]->lastSegment->field_0x18 = scale * nodes[index]->lastSegment->field_0x18 + offsetX;
+            nodes[index]->lastSegment->field_0x1c = scale * nodes[index]->lastSegment->field_0x1c;
+            nodes[index]->lastSegment->field_0x20 = scale * nodes[index]->lastSegment->field_0x20 + offsetZ;
         } else if (chunk == 12) {
             int unused;
             stream->UnknownFunction461640(&unused, 4, 1);
@@ -629,12 +629,12 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
             stream->UnknownFunction461640(&linkCount, 4, 1);
             if (linkCount < 0)
                 goto fail;
-            nodes[index]->field_0x10 = linkCount;
-            nodes[index]->field_0x14 = (TrackNode**)DebugCalloc(linkCount, 4, __FILE__, 231);
-            if (!nodes[index]->field_0x14)
+            nodes[index]->linkCount = linkCount;
+            nodes[index]->links = (TrackNode**)DebugCalloc(linkCount, 4, __FILE__, 231);
+            if (!nodes[index]->links)
                 goto fail;
         } else if (chunk == 14) {
-            if (!nodes[index] || !nodes[index]->field_0x14)
+            if (!nodes[index] || !nodes[index]->links)
                 goto fail;
             int slot;
             int target;
@@ -642,7 +642,7 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
             stream->UnknownFunction461640(&target, 4, 1);
             if (slot < 0 || slot > linkCount || target < 0 || target > count)
                 goto fail;
-            nodes[index]->field_0x14[slot] = (TrackNode*)target;
+            nodes[index]->links[slot] = (TrackNode*)target;
         } else if (chunk == 15) {
             *hasStart = 1;
             ReadProbe(stream, (TrackProbe*)start, scale, offsetX, offsetZ);
@@ -654,16 +654,16 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
     }
     {
         for (int i = 0; i < count; i++) {
-            if (nodes[i] && nodes[i]->field_0x14) {
-                for (int j = 0; j < nodes[i]->field_0x10; j++) {
-                    int k = (int)nodes[i]->field_0x14[j];
+            if (nodes[i] && nodes[i]->links) {
+                for (int j = 0; j < nodes[i]->linkCount; j++) {
+                    int k = (int)nodes[i]->links[j];
                     if (k >= 0 && k < count)
-                        nodes[i]->field_0x14[j] = nodes[k];
+                        nodes[i]->links[j] = nodes[k];
                 }
             }
         }
     }
-    field_0x00 = nodes[0];
+    startNode = nodes[0];
     DebugFree(nodes, __FILE__, 315);
     if (*hasStart) {
         TrackProbe* probe = (TrackProbe*)start;
@@ -677,14 +677,14 @@ int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void
     }
     {
         TrackPos from;
-        from.node = field_0x00;
-        from.segment = field_0x00->field_0x08;
+        from.node = startNode;
+        from.segment = startNode->firstSegment;
         from.t = 0.0001f;
         TrackPos to;
-        to.node = field_0x00;
-        to.segment = field_0x00->field_0x08;
+        to.node = startNode;
+        to.segment = startNode->firstSegment;
         to.t = 0.0f;
-        UnknownFunction5179f0(from, to, 0, &field_0x04);
+        UnknownFunction5179f0(from, to, 0, &lapLength);
     }
     return 1;
 fail:

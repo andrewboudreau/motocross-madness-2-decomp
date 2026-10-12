@@ -88,11 +88,11 @@ protected:
     Vector3 field_0x170;       // (0, 0, 0); copied to field_0x208
     Vector3 field_0x17c;       // (0, 0, 1); copied to field_0x214
     Vector3 field_0x188;       // (0, 1, 0)
-    float field_0x194;              // roll, passed to the view matrix by slot 28
-    float field_0x198;              // half viewport width / tan(fov / 2) (slot 28)
-    float field_0x19c;              // display-mode width/height (0x0042e550)
+    float roll;                               // +0x194 roll, passed to the view matrix by slot 28
+    float focalLength;                        // +0x198 half viewport width / tan(fov / 2) (slot 28)
+    float displayAspect;                      // +0x19c display-mode width/height (0x0042e550)
     int field_0x1a0[6];             // [0..3]: x, y, width, height for slot 13
-    float field_0x1b8;              // height/width ratio (0x0042f0e0)
+    float heightWidthRatio;                   // +0x1b8 height/width ratio (0x0042f0e0)
     float field_0x1bc;              // g_UnknownFloat550f6c (1.0f)
     float field_0x1c0;              // g_UnknownFloat550f70 (100000.0f)
     int field_0x1c4;
@@ -103,15 +103,15 @@ protected:
     int field_0x1d8;
     float field_0x1dc;              // 109.0f
     float field_0x1e0;              // 10.0f
-    _iobuf* field_0x1e4;            // FILE*, closed by the destructor
+    _iobuf* file;                             // +0x1e4 FILE*, closed by the destructor
     int field_0x1e8;
     int field_0x1ec;
     int field_0x1f0;
     int field_0x1f4;
     int field_0x1f8;
     int field_0x1fc;
-    float field_0x200;              // distance moved last frame (slot 10)
-    float field_0x204;              // angle turned last frame (slot 10)
+    float lastMoveDistance;                   // +0x200 distance moved last frame (slot 10)
+    float lastTurnAngle;                      // +0x204 angle turned last frame (slot 10)
     Vector3 field_0x208;
     Vector3 field_0x214;
 };

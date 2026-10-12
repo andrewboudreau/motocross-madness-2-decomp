@@ -16,13 +16,13 @@ struct TrackSegment;
 // A track node (calloc(1, 0x18), Track.cpp line 108): a run of segments
 // plus links to the nodes that follow it.
 struct TrackNode {
-    unsigned char field_0x00;       // bit 0: read from the file (chunk 6); bit 2: visited
+    unsigned char flags;                      // +0x00 bit 0: read from the file (chunk 6); bit 2: visited
     unsigned char field_0x01[3];
-    float field_0x04;               // length used by the path search (0x005179f0)
-    TrackSegment* field_0x08;       // first segment
-    TrackSegment* field_0x0c;       // last segment
-    int field_0x10;                 // link count
-    TrackNode** field_0x14;         // links (indices while loading)
+    float pathLength;                         // +0x04 length used by the path search (0x005179f0)
+    TrackSegment* firstSegment;               // +0x08
+    TrackSegment* lastSegment;                // +0x0c
+    int linkCount;                            // +0x10
+    TrackNode** links;                        // +0x14 links (indices while loading)
 };
 
 // A segment point (calloc(1, 0x30), Track.cpp line 141), kept in a doubly
@@ -37,9 +37,9 @@ struct TrackSegment {
     float field_0x18;
     float field_0x1c;
     float field_0x20;
-    float field_0x24;               // horizontal distance to the next point
-    TrackSegment* field_0x28;       // previous
-    TrackSegment* field_0x2c;       // next
+    float horizontalLength;                   // +0x24 horizontal distance to the next point
+    TrackSegment* previous;                   // +0x28
+    TrackSegment* next;                       // +0x2c
 };
 
 // A position on the track, passed by value (12 bytes).
@@ -58,9 +58,9 @@ struct TrackVec3 {
 // Work-list entry of the graph walks (calloc(1, 0x10)); only +0x04 and
 // +0x0c are used.
 struct TrackListItem {
-    unsigned char field_0x00;       // bit 1: walked in reverse (0x00517ea0)
+    unsigned char flags;                      // +0x00 bit 1: walked in reverse (0x00517ea0)
     unsigned char field_0x01[3];
-    TrackNode* field_0x04;
+    TrackNode* node;                          // +0x04
     TrackListItem* field_0x08;
     TrackListItem* field_0x0c;
 };
@@ -79,7 +79,7 @@ class UnknownTextureStream;
 class Track {
 public:
     // Inline at bikerace.cpp's `new` sites (0x00418147, 0x004182bb).
-    Track() { field_0x00 = 0; }
+    Track() { startNode = 0; }
 
     // 0x00515ed0 (ret 0x14): loads the track file from `stream`, with the
     // start and finish probes (bikerace.cpp's 0x3c-byte gates) and whether
@@ -110,8 +110,8 @@ public:
     int UnknownFunction518130(TrackSegment* segment, TrackVec3* out);
     int UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out, int mode);
 
-    TrackNode* field_0x00;          // start node
-    float field_0x04;               // lap length
+    TrackNode* startNode;                     // +0x00
+    float lapLength;                          // +0x04
 };
 
 // 0x00518640: formats whole seconds as "mm:ss".

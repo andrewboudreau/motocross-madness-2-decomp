@@ -174,8 +174,8 @@ BikeRace::~BikeRace() {
     }
     Track* track = raceTrack;
     if (track != 0) {
-        if (track->field_0x00 != 0) {
-            track->FreeReachableNodes(&track->field_0x00);
+        if (track->startNode != 0) {
+            track->FreeReachableNodes(&track->startNode);
         }
         delete track;
     }
@@ -1893,30 +1893,30 @@ void BikeRace::UnknownFunction423140(Track* track) {
     if (item == 0) {
         return;
     }
-    item->field_0x04 = track->field_0x00;
+    item->node = track->startNode;
     item->field_0x0c = list;
     list = item;
     while (list != 0) {
-        if (list->field_0x04->field_0x00 & 4) {
+        if (list->node->flags & 4) {
             item = list;
             list = list->field_0x0c;
-            item->field_0x04->field_0x00 &= ~4;
+            item->node->flags &= ~4;
             DebugFree(item, __FILE__, 0x13a8);
         } else {
-            TrackSegment* segment = list->field_0x04->field_0x08;
-            while (segment != 0 && segment->field_0x2c != 0) {
+            TrackSegment* segment = list->node->firstSegment;
+            while (segment != 0 && segment->next != 0) {
                 Vector3 a;
                 Vector3 b;
                 SetDrawColor(0, 0xff, 0);
                 a = *(Vector3*)&segment->field_0x0c;
-                b = *(Vector3*)&segment->field_0x2c->field_0x0c;
+                b = *(Vector3*)&segment->next->field_0x0c;
                 field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
                 field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);
                 a = *(Vector3*)&segment->field_0x18;
-                b = *(Vector3*)&segment->field_0x2c->field_0x18;
+                b = *(Vector3*)&segment->next->field_0x18;
                 field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
                 field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
                 a.y += 5.0f;
@@ -1924,26 +1924,26 @@ void BikeRace::UnknownFunction423140(Track* track) {
                 DrawLine(&a, &b);
                 SetDrawColor(0, 0, 0xff);
                 a = *(Vector3*)&segment->field_0x00;
-                b = *(Vector3*)&segment->field_0x2c->field_0x00;
+                b = *(Vector3*)&segment->next->field_0x00;
                 field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
                 field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);
-                segment = segment->field_0x2c;
+                segment = segment->next;
             }
             item = list;
-            item->field_0x04->field_0x00 |= 4;
-            for (int i = 0; i < item->field_0x04->field_0x10; i++) {
-                TrackNode* link = item->field_0x04->field_0x14[i];
-                if (!(link->field_0x00 & 4)) {
+            item->node->flags |= 4;
+            for (int i = 0; i < item->node->linkCount; i++) {
+                TrackNode* link = item->node->links[i];
+                if (!(link->flags & 4)) {
                     TrackListItem* next =
                         (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 0x13c9);
                     if (next == 0) {
                         track->UnknownFunction517930(&list, 0);
                         return;
                     }
-                    next->field_0x04 = item->field_0x04->field_0x14[i];
+                    next->node = item->node->links[i];
                     next->field_0x0c = list;
                     list = next;
                 }

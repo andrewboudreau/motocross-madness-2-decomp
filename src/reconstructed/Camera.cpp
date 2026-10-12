@@ -13,7 +13,7 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1dc = 109.0f;
     field_0x1e0 = 10.0f;
     field_0x16c = 77.0f;
-    field_0x1e4 = 0;
+    file = 0;
     field_0x1e8 = 0;
     field_0x1ec = 0;
     field_0x1bc = g_UnknownFloat550f6c;
@@ -25,13 +25,13 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x17c = Vector3(0.0f, 0.0f, 1.0f);
     field_0x188 = Vector3(0.0f, 1.0f, 0.0f);
     field_0x170 = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x194 = 0.0f;
+    roll = 0.0f;
     field_0x1f0 = 0;
     field_0x1fc = 0;
     field_0x1f4 = 0;
     field_0x1f8 = 0;
-    field_0x200 = 0.0f;
-    field_0x204 = 0.0f;
+    lastMoveDistance = 0.0f;
+    lastTurnAngle = 0.0f;
     field_0x1d4 = 1;
     field_0x1d8 = 1;
     field_0x214 = field_0x17c;
@@ -42,8 +42,8 @@ Camera::Camera(int flags) : GameObject(flags) {
 // the GameObject destructor. VC6 also emits the scalar deleting wrapper
 // 0x0042e4e0 (Camera slot 0).
 Camera::~Camera() {
-    if (field_0x1e4)
-        fclose(field_0x1e4);
+    if (file)
+        fclose(file);
 }
 
 // 0x00499ad0 (an identical forwarding body in another class shares the
@@ -99,7 +99,7 @@ int Camera::UnknownFunction42e550() {
     UnknownDisplay* display = owner->field_0x04;
     float width = (float)display->displayModes[display->currentDisplayMode].width;
     float height = (float)owner->field_0x04->displayModes[owner->field_0x04->currentDisplayMode].height;
-    field_0x19c = width / height;
+    displayAspect = width / height;
     field_0x1a0[0] = 0;
     field_0x1a0[1] = 0;
     field_0x1a0[2] = field_0x1c4;
@@ -108,7 +108,7 @@ int Camera::UnknownFunction42e550() {
     ((float*)field_0x1a0)[5] = 1.0f;
     if (!owner->UnknownVirtualSlot14(field_0x1a0))
         return 0;
-    field_0x1b8 = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
+    heightWidthRatio = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
     field_0x1d0 = Owner()->field_0x14 + 1;
     field_0x1cc = Owner()->field_0x14 + 1;
     return 1;
@@ -130,11 +130,11 @@ static inline float Dot(const Vector3& a, const Vector3& b) {
 // rebuilds the projection through slot 28.
 int Camera::UnknownVirtualSlot10(float frameTime) {
     Vector3 delta(field_0x170.x - field_0x208.x, field_0x170.y - field_0x208.y, field_0x170.z - field_0x208.z);
-    field_0x200 = UnknownFunction460b50(Dot(delta, delta));
+    lastMoveDistance = UnknownFunction460b50(Dot(delta, delta));
     field_0x208 = field_0x170;
-    field_0x204 = (float)acos(Dot(field_0x17c, field_0x214));
-    if (field_0x204 < 0.0f)
-        field_0x204 = -field_0x204;
+    lastTurnAngle = (float)acos(Dot(field_0x17c, field_0x214));
+    if (lastTurnAngle < 0.0f)
+        lastTurnAngle = -lastTurnAngle;
     field_0x214 = field_0x17c;
     if (!field_0x25_bit2) {
         if (field_0x1d0)
@@ -195,7 +195,7 @@ void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forwa
     if (up)
         field_0x188 = Normalize(*up);
     if (roll)
-        field_0x194 = *roll;
+        this->roll = *roll;
     if (fov)
         UnknownFunction42e930(*fov);
 }
@@ -341,7 +341,7 @@ int Camera::UnknownFunction42f0e0(int x, int width, int absolute) {
         field_0x1a0[0] += x;
         field_0x1a0[2] += width;
     }
-    field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * field_0x1b8);
+    field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * heightWidthRatio);
     if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
         field_0x1a0[3] = field_0x1c8;
     field_0x1a0[1] = (unsigned int)(field_0x1c8 - field_0x1a0[3]) >> 1;

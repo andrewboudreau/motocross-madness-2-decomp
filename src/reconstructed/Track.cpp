@@ -87,13 +87,13 @@ int Track::FreeNode(TrackNode* node)
 {
     if (!node)
         return 0;
-    while (node->field_0x08) {
-        TrackSegment* segment = node->field_0x08;
-        node->field_0x08 = segment->field_0x2c;
+    while (node->firstSegment) {
+        TrackSegment* segment = node->firstSegment;
+        node->firstSegment = segment->next;
         DebugFree(segment, __FILE__, 353);
     }
-    if (node->field_0x14)
-        DebugFree(node->field_0x14, __FILE__, 359);
+    if (node->links)
+        DebugFree(node->links, __FILE__, 359);
     DebugFree(node, __FILE__, 361);
     return 1;
 }
@@ -108,28 +108,28 @@ int Track::FreeReachableNodes(TrackNode** start)
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 383);
     if (!item)
         return 0;
-    item->field_0x04 = *start;
+    item->node = *start;
     item->field_0x0c = list;
     list = item;
     while (list) {
-        TrackNode* node = list->field_0x04;
-        if (node->field_0x00 & 4) {
+        TrackNode* node = list->node;
+        if (node->flags & 4) {
             FreeNode(node);
             item = list;
             list = list->field_0x0c;
             DebugFree(item, __FILE__, 400);
         } else {
-            node->field_0x00 |= 4;
-            int count = list->field_0x04->field_0x10;
-            TrackNode** links = list->field_0x04->field_0x14;
+            node->flags |= 4;
+            int count = list->node->linkCount;
+            TrackNode** links = list->node->links;
             for (int i = 0; i < count; i++) {
-                if (!(links[i]->field_0x00 & 4)) {
+                if (!(links[i]->flags & 4)) {
                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 410);
                     if (!item) {
                         UnknownFunction517930(&list, 0);
                         return 0;
                     }
-                    item->field_0x04 = links[i];
+                    item->node = links[i];
                     item->field_0x0c = list;
                     list = item;
                 }
@@ -142,7 +142,7 @@ int Track::FreeReachableNodes(TrackNode** start)
 // 0x00517310: whether `segment` belongs to `node`.
 int Track::NodeHasSegment(TrackSegment* segment, TrackNode* node)
 {
-    for (TrackSegment* s = node->field_0x08; s; s = s->field_0x2c) {
+    for (TrackSegment* s = node->firstSegment; s; s = s->next) {
         if (s == segment)
             return 1;
     }
@@ -157,8 +157,8 @@ int Track::UnknownFunction517930(TrackListItem** list, int all)
         return 0;
     TrackListItem* item;
     while ((item = *list) != 0) {
-        if (item->field_0x04 && (!(item->field_0x04->field_0x00 & 1) || all))
-            FreeNode(item->field_0x04);
+        if (item->node && (!(item->node->flags & 1) || all))
+            FreeNode(item->node);
         *list = (*list)->field_0x0c;
         DebugFree(item, __FILE__, 1021);
     }
@@ -173,7 +173,7 @@ int Track::IsAtOrAfter(TrackPos a, TrackPos b)
             if (a.t <= b.t)
                 return 1;
         } else {
-            for (TrackSegment* s = a.segment; s; s = s->field_0x2c) {
+            for (TrackSegment* s = a.segment; s; s = s->next) {
                 if (s == b.segment)
                     return 1;
             }
@@ -200,18 +200,18 @@ int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, f
             *path = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1175);
             if (!*path)
                 return 0;
-            (*path)->field_0x04 = b.node;
+            (*path)->node = b.node;
         }
         *distance = UnknownFunction517da0(a, b);
         return 1;
     }
     TrackPos pos;
     pos.node = a.node;
-    pos.segment = a.node->field_0x0c;
+    pos.segment = a.node->lastSegment;
     pos.t = 1.0f;
     float toEnd = UnknownFunction517da0(a, pos);
     pos.node = b.node;
-    pos.segment = b.node->field_0x08;
+    pos.segment = b.node->firstSegment;
     pos.t = 0.0f;
     float fromStart = UnknownFunction517da0(pos, b);
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1191);
@@ -220,33 +220,33 @@ int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, f
         UnknownFunction517930(path, 0);
         return 0;
     }
-    item->field_0x04 = a.node;
+    item->node = a.node;
     item->field_0x0c = list;
     list = item;
     length = toEnd;
     while (list) {
-        TrackNode* node = list->field_0x04;
-        if (node->field_0x00 & 4) {
-            length -= node->field_0x04;
+        TrackNode* node = list->node;
+        if (node->flags & 4) {
+            length -= node->pathLength;
             item = list;
             list = list->field_0x0c;
-            item->field_0x04->field_0x00 &= ~4;
+            item->node->flags &= ~4;
             DebugFree(item, __FILE__, 1212);
         } else {
             if (node != a.node && node != b.node)
-                length += node->field_0x04;
-            node->field_0x00 |= 4;
-            int count = list->field_0x04->field_0x10;
-            TrackNode** links = list->field_0x04->field_0x14;
+                length += node->pathLength;
+            node->flags |= 4;
+            int count = list->node->linkCount;
+            TrackNode** links = list->node->links;
             for (int i = 0; i < count; i++) {
-                if (!(links[i]->field_0x00 & 4) && links[i] != b.node) {
+                if (!(links[i]->flags & 4) && links[i] != b.node) {
                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1228);
                     if (!item) {
                         UnknownFunction517930(&list, 0);
                         UnknownFunction517930(path, 0);
                         return 0;
                     }
-                    item->field_0x04 = links[i];
+                    item->node = links[i];
                     item->field_0x0c = list;
                     list = item;
                 } else if (links[i] == b.node) {
@@ -261,18 +261,18 @@ int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, f
                                 UnknownFunction517930(path, 0);
                                 return 0;
                             }
-                            item->field_0x04 = b.node;
+                            item->node = b.node;
                             item->field_0x0c = *path;
                             *path = item;
                             for (TrackListItem* s = list; s; s = s->field_0x0c) {
-                                if (s->field_0x04->field_0x00 & 4) {
+                                if (s->node->flags & 4) {
                                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1258);
                                     if (!item) {
                                         UnknownFunction517930(&list, 0);
                                         UnknownFunction517930(path, 0);
                                         return 0;
                                     }
-                                    item->field_0x04 = s->field_0x04;
+                                    item->node = s->node;
                                     item->field_0x0c = *path;
                                     *path = item;
                                 }
@@ -294,17 +294,17 @@ float Track::UnknownFunction517da0(TrackPos a, TrackPos b)
     if (a.node == b.node) {
         if (a.segment == b.segment) {
             if (a.t <= b.t)
-                return (b.t - a.t) * a.segment->field_0x24;
+                return (b.t - a.t) * a.segment->horizontalLength;
         } else {
             TrackSegment* s;
-            for (s = a.segment; s; s = s->field_0x2c) {
+            for (s = a.segment; s; s = s->next) {
                 if (s == b.segment)
                     break;
-                distance += s->field_0x24;
+                distance += s->horizontalLength;
             }
             if (s == 0)
                 goto search;
-            return b.t * b.segment->field_0x24 - a.t * a.segment->field_0x24 + distance;
+            return b.t * b.segment->horizontalLength - a.t * a.segment->horizontalLength + distance;
         }
     search:
         UnknownFunction5179f0(a, b, 0, &distance);
@@ -320,59 +320,59 @@ float Track::UnknownFunction517da0(TrackPos a, TrackPos b)
 int Track::UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags)
 {
     TrackListItem* item;
-    if (!path || (item = *path) == 0 || pos.node != item->field_0x04)
+    if (!path || (item = *path) == 0 || pos.node != item->node)
         return 0;
     TrackPos cur = pos;
     float travelled = 0.0f;
     while (travelled < distance) {
-        if ((item->field_0x00 & 2) && !(flags & 2) || !(item->field_0x00 & 2) && (flags & 2)) {
+        if ((item->flags & 2) && !(flags & 2) || !(item->flags & 2) && (flags & 2)) {
             if (cur.t == 0.0f) {
-                if (!cur.segment->field_0x28) {
+                if (!cur.segment->previous) {
                     if (flags & 2)
                         item = item->field_0x08;
                     else
                         item = item->field_0x0c;
                     if (!item)
                         break;
-                    cur.node = item->field_0x04;
-                    if ((item->field_0x00 & 2) && !(flags & 2) || !(item->field_0x00 & 2) && (flags & 2))
-                        cur.segment = cur.node->field_0x0c;
+                    cur.node = item->node;
+                    if ((item->flags & 2) && !(flags & 2) || !(item->flags & 2) && (flags & 2))
+                        cur.segment = cur.node->lastSegment;
                     else
-                        cur.segment = cur.node->field_0x08;
+                        cur.segment = cur.node->firstSegment;
                 } else {
-                    cur.segment = cur.segment->field_0x28;
-                    travelled += cur.segment->field_0x24;
+                    cur.segment = cur.segment->previous;
+                    travelled += cur.segment->horizontalLength;
                 }
             } else {
-                travelled += cur.t * cur.segment->field_0x24;
+                travelled += cur.t * cur.segment->horizontalLength;
                 cur.t = 0.0f;
             }
-            if (travelled > distance && cur.segment->field_0x24 != 0.0f)
-                cur.t = (travelled - distance) / cur.segment->field_0x24;
+            if (travelled > distance && cur.segment->horizontalLength != 0.0f)
+                cur.t = (travelled - distance) / cur.segment->horizontalLength;
         } else {
             if (cur.t == 1.0f) {
-                if (!cur.segment->field_0x2c) {
+                if (!cur.segment->next) {
                     if (flags & 2)
                         item = item->field_0x08;
                     else
                         item = item->field_0x0c;
                     if (!item)
                         break;
-                    cur.node = item->field_0x04;
-                    if ((item->field_0x00 & 2) && !(flags & 2) || !(item->field_0x00 & 2) && (flags & 2))
-                        cur.segment = cur.node->field_0x0c;
+                    cur.node = item->node;
+                    if ((item->flags & 2) && !(flags & 2) || !(item->flags & 2) && (flags & 2))
+                        cur.segment = cur.node->lastSegment;
                     else
-                        cur.segment = cur.node->field_0x08;
+                        cur.segment = cur.node->firstSegment;
                 } else {
-                    cur.segment = cur.segment->field_0x2c;
-                    travelled += cur.segment->field_0x24;
+                    cur.segment = cur.segment->next;
+                    travelled += cur.segment->horizontalLength;
                 }
             } else {
-                travelled += (1.0f - cur.t) * cur.segment->field_0x24;
+                travelled += (1.0f - cur.t) * cur.segment->horizontalLength;
                 cur.t = 1.0f;
             }
-            if (travelled > distance && cur.segment->field_0x24 != 0.0f)
-                cur.t = 1.0f - (travelled - distance) / cur.segment->field_0x24;
+            if (travelled > distance && cur.segment->horizontalLength != 0.0f)
+                cur.t = 1.0f - (travelled - distance) / cur.segment->horizontalLength;
         }
     }
     *out = cur;
@@ -385,7 +385,7 @@ int Track::UnknownFunction518080(TrackPos pos, TrackVec3* out)
     TrackSegment* segment = pos.segment;
     if (!segment)
         return 0;
-    TrackSegment* next = segment->field_0x2c;
+    TrackSegment* next = segment->next;
     if (!next) {
         if (pos.t == 0.0f) {
             out->x = segment->field_0x00;
@@ -440,8 +440,8 @@ static inline TrackVec3 TrackNormalized(const TrackVec3& v)
 // stores into a named local scale all three scalar-first.
 int Track::UnknownFunction518130(TrackSegment* segment, TrackVec3* out)
 {
-    if (out && segment && segment->field_0x2c && segment->field_0x24 > 0.0f) {
-        TrackSegment* next = segment->field_0x2c;
+    if (out && segment && segment->next && segment->horizontalLength > 0.0f) {
+        TrackSegment* next = segment->next;
         TrackVec3 d = TrackVector(next->field_0x00 - segment->field_0x00, next->field_0x04 - segment->field_0x04,
                                   next->field_0x08 - segment->field_0x08);
         *out = TrackNormalized(d);
@@ -466,9 +466,9 @@ int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out,
     TrackVec3 q;
     float t;
     float u;    // the second parameter of the cut, then the second distance
-    if (!segment || !segment->field_0x2c || !out)
+    if (!segment || !segment->next || !out)
         return 0;
-    TrackSegment* next = segment->field_0x2c;
+    TrackSegment* next = segment->next;
     switch (mode) {
     case 17:
         a = *(TrackVec3*)&segment->field_0x0c;

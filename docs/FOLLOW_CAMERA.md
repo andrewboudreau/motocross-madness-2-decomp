@@ -181,6 +181,12 @@ world/view/projection. The members at +0x2c/+0xac/+0x6c are therefore named
 `worldMatrix`/`viewMatrix`/`projectionMatrix`. These semantic names remain
 provisional inference from the call shape; identifying the interface from
 creation/import evidence would be needed to confirm them.
+Further Camera fields named from their recorded uses (tier 3, each keeping
+its `// +0xNN`): `roll` (+0x194, the setter's `roll` argument, passed to the
+view matrix by slot 28), `focalLength` (+0x198, half the viewport width over
+tan(fov / 2)), `displayAspect` (+0x19c), `heightWidthRatio` (+0x1b8), `file`
+(+0x1e4, a FILE* the destructor closes), `lastMoveDistance` and
+`lastTurnAngle` (+0x200/+0x204, slot 10). No calibration byte changed.
 
 Destructor evidence. `analysis/deleting_destructors.json` pairs each wrapper
 with its destructor core. Camera's vptr is written in its constructor

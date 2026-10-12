@@ -379,7 +379,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 racer->field_0x754 += frameTime;
         }
     next:
-        if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->field_0x2c) {
+        if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->next) {
             if (!track->UnknownFunction518080(status->field_0x44, (TrackVec3*)&status->field_0x04->field_0x10c))
                 racer->field_0x10c = racer->field_0x00c;
             if (!track->UnknownFunction518130(status->field_0x44.segment,

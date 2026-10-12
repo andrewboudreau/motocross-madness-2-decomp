@@ -469,19 +469,19 @@ void RadarOverlay::DrawTrackOutline(int mode)
 {
     TrackListItem* list = 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
-    item->field_0x04 = ((UnknownRadarView*)radarView)->field_0x48->field_0x00;
+    item->node = ((UnknownRadarView*)radarView)->field_0x48->startNode;
     item->field_0x0c = list;
     list = item;
     while (list) {
-        TrackNode*& node = list->field_0x04;
-        if (node->field_0x00 & 4) {
-            node->field_0x00 &= ~4;
+        TrackNode*& node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
             item = list;
             list = list->field_0x0c;
             DebugFree(item, __FILE__, 2001);
         } else {
-        node->field_0x00 |= 4;
-        TrackSegment* first = node->field_0x08;
+        node->flags |= 4;
+        TrackSegment* first = node->firstSegment;
         Vector3 point;
         if (mode == 1)
             point = *(Vector3*)&first->field_0x18;
@@ -497,7 +497,7 @@ void RadarOverlay::DrawTrackOutline(int mode)
         lineEnd.color = 0xedea5e;
         int x = startX;
         int y = startY;
-        TrackSegment* segment = first->field_0x2c;
+        TrackSegment* segment = first->next;
         if (segment) do {
             if (mode == 1)
                 point = *(Vector3*)&segment->field_0x18;
@@ -551,17 +551,17 @@ void RadarOverlay::DrawTrackOutline(int mode)
                 Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                 lineStart = lineEnd;
             }
-            segment = segment->field_0x2c;
-            if (segment == node->field_0x08) {
+            segment = segment->next;
+            if (segment == node->firstSegment) {
                 lineEnd.sx = (float)startX;
                 lineEnd.sy = (float)startY;
                 break;
             }
         } while (segment);
-        for (int i = 0; i < node->field_0x10; i++) {
-            if (!(node->field_0x14[i]->field_0x00 & 4)) {
+        for (int i = 0; i < node->linkCount; i++) {
+            if (!(node->links[i]->flags & 4)) {
                 item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 2094);
-                item->field_0x04 = node->field_0x14[i];
+                item->node = node->links[i];
                 item->field_0x0c = list;
                 list = item;
             }

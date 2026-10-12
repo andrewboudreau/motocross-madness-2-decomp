@@ -137,6 +137,17 @@ frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
 - Boolean values computed with `fcompp` come out in the inverted sense in
   retail: `(lhs <= rhs) == (p.z >= a->z)`, not `(lhs > rhs) != ...`.
 
+## Field names
+
+Track.h's fields are named from the uses its comments record (tier 3 names,
+tier 1 offsets; each keeps its `// +0xNN`): the node's `flags`,
+`pathLength`, `firstSegment`, `lastSegment`, `linkCount` and `links`; the
+segment's `horizontalLength`, `previous` and `next`; the work-list entry's
+`flags` and `node`; and Track's `startNode` and `lapLength`. The segment's
+point and edge coordinates (+0x00..+0x20) keep offset names. Physics keeps
+its own views (`KbTrack` and the list entry in KrustyBikeTypes.h). The
+renames changed no calibration bytes.
+
 ## Function names
 
 Provisional names taken from the behaviour each function's comment records:

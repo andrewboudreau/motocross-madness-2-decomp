@@ -404,13 +404,13 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
             return;
         }
         float side;
-        if (raceTrack->field_0x00 != 0 && raceTrack->field_0x00->field_0x08 != 0 &&
-            raceTrack->field_0x00->field_0x08->field_0x2c != 0 &&
-            raceTrack->field_0x00->field_0x08->field_0x2c->field_0x2c != 0) {
+        if (raceTrack->startNode != 0 && raceTrack->startNode->firstSegment != 0 &&
+            raceTrack->startNode->firstSegment->next != 0 &&
+            raceTrack->startNode->firstSegment->next->next != 0) {
             TrackVec3 p0;
             TrackVec3 p1;
-            raceTrack->UnknownFunction518130(raceTrack->field_0x00->field_0x08, &p0);
-            raceTrack->UnknownFunction518130(raceTrack->field_0x00->field_0x08->field_0x2c, &p1);
+            raceTrack->UnknownFunction518130(raceTrack->startNode->firstSegment, &p0);
+            raceTrack->UnknownFunction518130(raceTrack->startNode->firstSegment->next, &p1);
             if (p1.x * p0.z - p0.x * p1.z <= 0.0f) {
                 side = 1.0f;
             } else {
@@ -599,8 +599,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                     if (!trackLoaded) {
                         Track* track = raceTrack;
                         if (track != 0) {
-                            if (track->field_0x00 != 0)
-                                track->FreeReachableNodes(&track->field_0x00);
+                            if (track->startNode != 0)
+                                track->FreeReachableNodes(&track->startNode);
                             delete track;
                         }
                     }
