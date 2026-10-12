@@ -21,9 +21,11 @@ Member names follow their only writers and readers: `waitingForRacers`
 `keepAliveStarted` (+0x38), `endNetworkGamePending` (+0x3c, slot 10 calls
 `EndNetworkGame` once), `anyRacerFinished`/`allRacersFinished` (+0x40/+0x44,
 0x0045eef0's racer scan) and `resumeArmed` (+0x440, slot 23 arms it, slot 22
-consumes it). +0x48, +0x4c, +0x50 and +0x3c0 keep placeholder names because
-DlgProcs.cpp, SelectGamePicProcs.cpp, TrackRecord.cpp and TrackOverlay.cpp read
-them.
+consumes it). `RankRacers` names the result block: `racesRun` (+0x48, a
+byte it increments in mode 2; the dialogs show it as "%d/%d" against the
+series length), `resultCount` (+0x4c) and `results` (+0x50, the 11 entries it
+fills). +0x3c0 keeps its placeholder name because TrackOverlay.cpp (render
+lane) reads it.
 
 ## Status
 

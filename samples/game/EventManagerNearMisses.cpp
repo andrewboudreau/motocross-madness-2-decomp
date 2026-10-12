@@ -213,7 +213,7 @@ int EventManager::CreatePodiumScene() {
     int iterator = 0;
     int ok;
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
-        ok = field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c;
+        ok = racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c;
     else
         ok = 1;
     if (circuit) {
@@ -224,7 +224,7 @@ int EventManager::CreatePodiumScene() {
         if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
             return 0;
         if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 && !g_TrackGame->network &&
-            field_0x50[0].field_0x04 > 3)
+            results[0].field_0x04 > 3)
             return 0;
     }
     UnknownFunction45cdc0(1);
@@ -308,7 +308,7 @@ int EventManager::CreatePodiumScene() {
     if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
         PODIUM_ARCADE->field_0x2c->UnknownFunction4444c0(1);
     UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    podiumCharacterCount = field_0x4c < 3 ? field_0x4c : 3;
+    podiumCharacterCount = resultCount < 3 ? resultCount : 3;
     float chance = rand() * (1.0f / 32768);
     for (int place = 1; place - 1 < podiumCharacterCount; place++) {
         UnknownEventRacer* racer = 0;

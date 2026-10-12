@@ -131,8 +131,8 @@ EventManager::EventManager(int flags) : GameObject(flags) {
     endNetworkGamePending = 0;
     anyRacerFinished = 0;
     allRacersFinished = 0;
-    field_0x48 = 0;
-    field_0x4c = 0;
+    racesRun = 0;
+    resultCount = 0;
     field_0x3c0 = 0;
     keepAliveTimeout = 20.0f;
     keepAliveInterval = 1.0f;
@@ -277,8 +277,8 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
 // 0x0045e520
 void EventManager::ResetEntries() {
     for (int i = 0; i < 11; i++)
-        field_0x50[i].Reset();
-    field_0x48 = 0;
+        results[i].Reset();
+    racesRun = 0;
     g_TrackGame->mode.field_0x27f8.field_0x0c = 0;
 }
 
@@ -387,7 +387,7 @@ void EventManager::EndRace() {
     if (!g_TrackGame->uiInteractionBlocked && g_TrackGame->field_0x3438) {
         g_TrackGame->field_0x3438 = 0;
         if (g_TrackGame->network &&
-            (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 || field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c))
+            (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 || racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c))
             g_TrackGame->network->SetSessionJoinable(1);
         waitingForRacers = 0;
         UnknownFunction45cdc0(2);
@@ -524,12 +524,12 @@ void EventManager::UnknownFunction45fbd0(int player) {
     if (g_TrackGame->field_0x18 < 2)
         return;
     for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
-        if (field_0x50[i].field_0x00 == player) {
-            if (!field_0x50[i].field_0x30)
+        if (results[i].field_0x00 == player) {
+            if (!results[i].field_0x30)
                 g_TrackGame->field_0x18--;
             else
                 g_TrackGame->field_0x3424--;
-            field_0x50[i] = field_0x50[g_TrackGame->mode.field_0x1be0 - 1];
+            results[i] = results[g_TrackGame->mode.field_0x1be0 - 1];
             if (FindRaceMode())
                 g_TrackGame->mode.field_0x1be4[i] =
                     g_TrackGame->mode.field_0x1be4[g_TrackGame->mode.field_0x1be0 - 1];
@@ -537,7 +537,7 @@ void EventManager::UnknownFunction45fbd0(int player) {
         }
     }
     if (g_TrackGame->mode.field_0x1be0)
-        qsort(field_0x50, g_TrackGame->mode.field_0x1be0 - 1, sizeof(UnknownEventEntry), CompareUnsigned);
+        qsort(results, g_TrackGame->mode.field_0x1be0 - 1, sizeof(UnknownEventEntry), CompareUnsigned);
 }
 
 // 0x0045f9a0: once, sends the local racer's state and then each AI racer's
@@ -730,7 +730,7 @@ void EventManager::RankRacers() {
     UnknownKrustyBikeView* view = FindRaceView();
     switch (g_TrackGame->mode.field_0x27f8.field_0x00) { // a one-case switch: `sub eax, 2; jne`
     case 2:
-        field_0x48++;
+        racesRun++;
     }
     int count = 0;
     int iterator = 0;
@@ -757,10 +757,10 @@ void EventManager::RankRacers() {
         }
         iterator = 0;
         for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
-            field_0x50[count].CopyFromRacer(racer);
+            results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.field_0x27f8.field_0x00 == 2 || g_TrackGame->field_0x3444) &&
                 !racer->field_0x4a0)
-                AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
+                AddChampionshipPoints(racer, &results[count].field_0x28);
             count++;
         }
         break;
@@ -781,9 +781,9 @@ void EventManager::RankRacers() {
             scores[i].racer->field_0x784 = i + 1;
         next = 0;
         for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
-            field_0x50[count].CopyFromRacer(racer);
+            results[count].CopyFromRacer(racer);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
+                AddChampionshipPoints(racer, &results[count].field_0x28);
             count++;
         }
         break;
@@ -805,9 +805,9 @@ void EventManager::RankRacers() {
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
-                field_0x50[count].CopyFromRacer(racer);
+                results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                    AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
+                    AddChampionshipPoints(racer, &results[count].field_0x28);
                 count++;
             }
         } else {
@@ -826,22 +826,22 @@ void EventManager::RankRacers() {
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
-                field_0x50[count].CopyFromRacer(racer);
+                results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                    AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
+                    AddChampionshipPoints(racer, &results[count].field_0x28);
                 count++;
             }
         }
         break;
     }
-    field_0x4c = count;
+    resultCount = count;
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
         UnknownEventStanding standings[11];
         int next = 0;
         int standing = 0;
         while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
             if (!racer->field_0x4a0) {
-                standings[standing].field_0x00 = field_0x50[standing].field_0x28;
+                standings[standing].field_0x00 = results[standing].field_0x28;
                 standings[standing].racer = racer;
                 standing++;
             }
@@ -857,8 +857,8 @@ void EventManager::RankRacers() {
                 }
             }
             for (i = 0; i < standing; i++) {
-                if (field_0x50[i].field_0x00 == racer->field_0x11bc && field_0x50[i].field_0x30 == racer->field_0x11c0) {
-                    field_0x50[i].field_0x04 = racer->field_0x784;
+                if (results[i].field_0x00 == racer->field_0x11bc && results[i].field_0x30 == racer->field_0x11c0) {
+                    results[i].field_0x04 = racer->field_0x784;
                     break;
                 }
             }

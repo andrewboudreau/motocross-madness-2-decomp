@@ -242,12 +242,12 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             }
         }
         g_TrackGame->mode.UnknownFunction522cd0();
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && g_TrackGame->eventManager->field_0x48 > 0) {
+        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && g_TrackGame->eventManager->racesRun > 0) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
                 entry.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
-                entry.points = g_TrackGame->eventManager->field_0x50[i].field_0x28;
+                entry.points = g_TrackGame->eventManager->results[i].field_0x28;
                 entry.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }

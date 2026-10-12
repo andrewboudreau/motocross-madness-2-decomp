@@ -1361,9 +1361,9 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                     g_TrackGame->ui->UnknownFunction49b7f0(recordedRider, riderTexture, 0x3f);
                 } else {
                     if (g_TrackGame->mode.field_0x27f8.field_0x0c > 0 &&
-                        g_TrackGame->eventManager->field_0x48 > 0) {
+                        g_TrackGame->eventManager->racesRun > 0) {
                         fromEvent = 1;
-                        COPY_TEXT(aiName, g_TrackGame->eventManager->field_0x50[n + 1].field_0x40, 0x10);
+                        COPY_TEXT(aiName, g_TrackGame->eventManager->results[n + 1].field_0x40, 0x10);
                         COPY_TEXT(bikeFile, eventAi[n].field_0x80, 0x104);
                     } else {
                         COPY_TEXT(aiName, names[n], 0x10);
@@ -1453,7 +1453,7 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 id++;
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 &&
                     g_TrackGame->mode.field_0x27f8.field_0x0c > 0 &&
-                    !g_TrackGame->eventManager->field_0x48) {
+                    !g_TrackGame->eventManager->racesRun) {
                     strcpy(eventAi[n].field_0x40, bikeTexture);
                     strcpy(eventAi[n].field_0x00, riderTexture);
                     strcpy(eventAi[n].field_0x80, bikeFile);

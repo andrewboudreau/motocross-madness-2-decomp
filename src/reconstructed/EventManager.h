@@ -198,9 +198,9 @@ public:
     int endNetworkGamePending;                     // +0x3c: slot 10 calls EndNetworkGame once
     int anyRacerFinished;                          // +0x40: a racer has +0x7a4 set (0x0045eef0)
     int allRacersFinished;                         // +0x44: every racer has +0x7a4 or +0x4a0 set (0x0045eef0)
-    unsigned char field_0x48;
-    int field_0x4c;                                // entries filled by 0x0045e9d0
-    UnknownEventEntry field_0x50[11];
+    unsigned char racesRun;                        // +0x48: RankRacers counts mode-2 races; dialogs show it as "%d/%d"
+    int resultCount;                               // +0x4c: entries filled by 0x0045e9d0
+    UnknownEventEntry results[11];                 // +0x50: one per racer, copied by RankRacers
     float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
     Vector3 field_0x3c4;
     ArcadeObject* podiumObject;                     // the podium (0x0045d480)

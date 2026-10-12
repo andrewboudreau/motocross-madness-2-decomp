@@ -647,7 +647,7 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 ListGhosts();
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) != 2) {
                 g_TrackGame->mode.field_0x10ec = 0;
-                g_TrackGame->eventManager->field_0x48 = 0;
+                g_TrackGame->eventManager->racesRun = 0;
             }
             ShowRaceModeControls();
         } else if (!_stricmp("EventTypeDropDown", event->controlName)) {
@@ -736,7 +736,7 @@ void SPEventDlg::ShowRaceModeControls() {
         racesLeft->Show(0, 1);
         racesRight->Show(0, 1);
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
-        sprintf(text, "%d/%d", g_TrackGame->eventManager->field_0x48 + 1,
+        sprintf(text, "%d/%d", g_TrackGame->eventManager->racesRun + 1,
                 g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
         races->RemoveAllRows();
         races->AddRow(text, 0, 0);
@@ -2036,9 +2036,9 @@ void LeaveMenusForRace() {
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !g_TrackGame->mode.field_0x10ec) {
         g_TrackGame->mode.field_0x10ec = 1;
-        g_TrackGame->eventManager->field_0x48 = 0;
+        g_TrackGame->eventManager->racesRun = 0;
         for (int i = 0; i < 11; i++)
-            g_TrackGame->eventManager->field_0x50[i].field_0x28 = 0;
+            g_TrackGame->eventManager->results[i].field_0x28 = 0;
     }
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
     if (g_TrackGame->ui->gui->field_0x03c)

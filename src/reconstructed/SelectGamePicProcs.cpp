@@ -1623,7 +1623,7 @@ void MPEventDlg::EnableChangeableControls() {
             racesRight->Show(0, 1);
         }
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
-        sprintf(text, "%d/%d", g_TrackGame->eventManager->field_0x48 + 1, g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
+        sprintf(text, "%d/%d", g_TrackGame->eventManager->racesRun + 1, g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
         races->RemoveAllRows();
         races->AddRow(text, 0, 0);
     } else {

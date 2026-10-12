@@ -65,8 +65,8 @@ void PCLastRaceDlg::PayOutRace()
     circuit->field_0x454 += fee;
 
     int paid = 0;
-    for (int j = 0; j < g_TrackGame->eventManager->field_0x4c; j++) {
-        UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_TrackGame->eventManager->field_0x50)[j];
+    for (int j = 0; j < g_TrackGame->eventManager->resultCount; j++) {
+        UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_TrackGame->eventManager->results)[j];
         UnknownProCircuitRacer* racer = &circuit->field_0x465[result->racer];
         racer->field_0x00.field_0x0c = (int)__min(purse * circuit->field_0x1249, result->medical * 250.0f);
         racer->field_0x00.field_0x08 = (int)__min(purse * circuit->field_0x1245, result->repairs * 500.0f);
