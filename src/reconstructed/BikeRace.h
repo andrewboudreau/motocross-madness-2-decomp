@@ -111,11 +111,12 @@ public:
     // +0xdc..+0xf8c (0xeb0 bytes) is the block 0x0049bf10 and 0x0049c010 hand
     // to the recorder.
     char magic[8];                            // +0x0dc "MCMVCR" (0x0049bf10, mode 0)
-    char field_0x0e4[8];                      // the string at 0x0056da64
+    char version[8];                          // +0x0e4 version "2.0" plus 0x1a (the string at 0x0056da64)
     char description[0x20];                   // +0x0ec description (0x0049c010)
     float timePlayed;                         // +0x10c the time played (0x00421d50)
-    // TrackGame+0x2d70's 0x1ec bytes (copied by 0x0049bf10, mode 0).
-    unsigned char field_0x110[0x25c - 0x110];
+    // +0x110 TrackGame+0x2d70's 0x1ec bytes, the race settings from
+    // raceMode on (copied by 0x0049bf10, mode 0).
+    unsigned char raceSettings[0x25c - 0x110];
     UnknownKrustyVcrRecord field_0x25c[8];
     unsigned char field_0x29c[0x2fc - 0x29c];
     int racerCount;                           // +0x2fc racers recorded (the loader)

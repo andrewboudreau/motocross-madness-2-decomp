@@ -32,9 +32,9 @@ int KrustyVCR::OpenRecording(UnknownRecorderCallback callback, int mode, char* n
     replayLength = 0;
     if (mode == 0) {
         COPY_TRUNCATED(magic, "MCMVCR")
-        COPY_TRUNCATED(field_0x0e4, "2.0\x1a")
+        COPY_TRUNCATED(version, "2.0\x1a")
         timePlayed = 0;
-        memcpy(field_0x110, &g_TrackGame->mode.raceSettings.raceMode, 0x1ec);
+        memcpy(raceSettings, &g_TrackGame->mode.raceSettings.raceMode, 0x1ec);
     }
     return Start((int)callback, (int)magic, 0xeb0, mode, (int)name, 0x58,
                  (UnknownRecorderOwner*)file);
