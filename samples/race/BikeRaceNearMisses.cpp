@@ -393,7 +393,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 2:
     case 3: {
-        if (field_0x144) {
+        if (hasStartProbe) {
             a->x = startProbe.center.x;
             a->z = startProbe.center.z;
             a->y = 0.0f;
@@ -573,15 +573,15 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         }
         if (stream) {
             raceTrack = new(__FILE__, 0x1a5) Track;
-            trackLoaded = raceTrack->LoadTrack(stream, &startProbe, &finishProbe, &field_0x144,
-                                                 &field_0x148);
+            trackLoaded = raceTrack->LoadTrack(stream, &startProbe, &finishProbe, &hasStartProbe,
+                                                 &hasFinishProbe);
             delete stream;
         }
-        if (field_0x148)
+        if (hasFinishProbe)
             field_0x04c->QueryGround(&finishProbe.center, 0, 0, 0);
-        if (field_0x144)
+        if (hasStartProbe)
             field_0x04c->QueryGround(&startProbe.center, 0, 0, 0);
-        if (field_0x148 && field_0x144)
+        if (hasFinishProbe && hasStartProbe)
             UpdateTrackSeparation();
         break;
     }
@@ -599,7 +599,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 {
                     raceTrack = new(__FILE__, 0x1d0) Track;
                     trackLoaded = raceTrack->LoadTrack(stream, &startProbe, &finishProbe,
-                                                         &field_0x144, &field_0x148);
+                                                         &hasStartProbe, &hasFinishProbe);
                     if (!trackLoaded) {
                         Track* track = raceTrack;
                         if (track != 0) {
@@ -622,7 +622,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     if (mode == 3 || mode == 2) {
         if (raceTrack) {
             if (!g_TrackGame->playingReplay) {
-                if (field_0x144) {
+                if (hasStartProbe) {
                     direction.x = -startProbe.direction.x;
                     direction.z = -startProbe.direction.z;
                     point.x = startProbe.center.x - direction.x * 15.0f;
@@ -647,7 +647,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 }
                 if (field_0x06c)
                     field_0x06c->UnknownVirtualSlot4();
-                if (field_0x144) {
+                if (hasStartProbe) {
                     point.x = startProbe.center.x;
                     point.z = startProbe.center.z;
                     direction.x = startProbe.direction.x;
@@ -677,7 +677,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     }
                 }
             }
-            if (field_0x148) {
+            if (hasFinishProbe) {
                 point.x = finishProbe.center.x;
                 point.z = finishProbe.center.z;
                 terrain->QueryGround(&point, 0, 0, 0);
@@ -748,9 +748,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         }
     } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.stuntMode)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
-        field_0x0bc = (int)bonus->SetupCounter(renderContext, (int)lights, (int)textures,
+        scoreBoard = (int)bonus->SetupCounter(renderContext, (int)lights, (int)textures,
                                                (UnknownBonusRacer*)this, (UnknownBonusCamera*)raceCamera);
-        if (!AppendChild((GameObject*)field_0x0bc, -1))
+        if (!AppendChild((GameObject*)scoreBoard, -1))
             return 0;
     }
     g_TrackGame->ui->StepProgressBar();
@@ -759,9 +759,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     raceScene->field_0x7c0 = 1;
     if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
-        field_0x0c0 = (int)numbers->SetupDigits(renderContext, (int)textures, (UnknownNumberRacer*)this, 0x1e,
+        digitCounter = (int)numbers->SetupDigits(renderContext, (int)textures, (UnknownNumberRacer*)this, 0x1e,
                                                 (UnknownNumberCamera*)raceCamera, 3.0f);
-        if (!AppendChild((GameObject*)field_0x0c0, -1))
+        if (!AppendChild((GameObject*)digitCounter, -1))
             return 0;
     }
     if (g_TrackGame->mode.raceSettings.eventType != 4 &&
@@ -769,12 +769,12 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         (g_TrackGame->playerCount > 1 || g_TrackGame->mode.raceSettings.aiRacerCount > 0)) {
         sprintf(name, "%s\\%s", "Res", "youind.slt");
         ArcadeObject* marker = new(__FILE__, 0x2a9) ArcadeObject(*(int*)g_TrackGame->mode.field_0x6d0);
-        field_0x060 = marker->Create(renderContext, (int)lights, (int)textures, name, position, 0, 0,
+        youIndicator = marker->Create(renderContext, (int)lights, (int)textures, name, position, 0, 0,
                                                     2.0f, 0.5f, 0.5f, 0);
-        AppendChild(field_0x060, -1);
+        AppendChild(youIndicator, -1);
         Vector3 axis(0.0f, 1.0f, 0.0f);
-        ((ArcadeObject*)field_0x060)->StartSpin(axis, 75.0f);
-        ((ArcadeObject*)field_0x060)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
+        ((ArcadeObject*)youIndicator)->StartSpin(axis, 75.0f);
+        ((ArcadeObject*)youIndicator)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
     }
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {
         vcrFile = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
@@ -807,7 +807,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     g_TrackGame->ui->StepProgressBar();
 
     if (field_0x06c) {
-        if (field_0x144) {
+        if (hasStartProbe) {
             localRacer->modelNode->GetPosition(&point);
             point.x += localRacer->heading.x * 15.0f;
             point.z += localRacer->heading.z * 15.0f;

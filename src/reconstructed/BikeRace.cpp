@@ -88,11 +88,11 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     field_0x054 = 0;
     raceScene = 0;
     field_0x05c = 0;
-    field_0x060 = 0;
-    field_0x0bc = 0;
-    field_0x0c0 = 0;
+    youIndicator = 0;
+    scoreBoard = 0;
+    digitCounter = 0;
     raceTrack = 0;
-    field_0x0c8 = 0;
+    gateList = 0;
     field_0x14c = 0;
     field_0x150 = 0;
     field_0x154 = 0;
@@ -146,8 +146,8 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     ghostFilePlayed[0] = 0;
     ghostFileRecorded[0] = 0;
     g_TrackGame->paused = 0;
-    field_0x144 = 0;
-    field_0x148 = 0;
+    hasStartProbe = 0;
+    hasFinishProbe = 0;
     chatOverlay = 0;
     forceHighLod = g_TrackGame->GetRegistryFlag("ForceHighLOD", 0);
     field_0x3fd = 1;
@@ -194,9 +194,9 @@ BikeRace::~BikeRace() {
         g_TrackGame->playingReplay = 0;
         g_TrackGame->useReplayTape = 0;
     }
-    while (field_0x0c8 != 0) {
-        UnknownBikeRaceNode* node = field_0x0c8;
-        field_0x0c8 = node->nextGate;
+    while (gateList != 0) {
+        UnknownBikeRaceNode* node = gateList;
+        gateList = node->nextGate;
         DebugFree(node, __FILE__, 0x82e);
     }
 }
@@ -240,7 +240,7 @@ int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
 int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
     int count = owner->field_0x0ac;
     UnknownBikeRaceNodeSource* sources = owner->field_0x0d8;
-    UnknownBikeRaceNode** tail = &field_0x0c8;
+    UnknownBikeRaceNode** tail = &gateList;
     for (int i = 0; i < count; i++) {
         UnknownBikeRaceNodeEntry* entry = owner->field_0x420[i];
         if (!AppendNode(i, sources, &tail, entry->field_0x50, entry->field_0x54)) {
@@ -561,13 +561,13 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 int camera = g_TrackGame->mode.raceSettings.eventType;
                 if (camera == 3 || camera == 2 || camera == 5 || camera == 1 || camera == 0) {
                     Track* track = raceTrack;
-                    if ((track != 0 || field_0x0c8 != 0 || camera == 0) && isRacing && !restartPending &&
+                    if ((track != 0 || gateList != 0 || camera == 0) && isRacing && !restartPending &&
                         localRacer != 0) {
                         int keepRacing = g_TrackGame->mode.raceSettings.raceMode == 0 ||
                                          g_TrackGame->mode.raceSettings.raceMode == 4;
                         if (!g_TrackGame->playingReplay) {
                             if (camera == 1 || camera == 5) {
-                                UpdateGateRace(&field_0x0c4, field_0x0c8, g_TrackGame->frameTime,
+                                UpdateGateRace(&field_0x0c4, gateList, g_TrackGame->frameTime,
                                                       g_TrackGame->mode.raceSettings.lapCount, keepRacing);
                             } else if (camera == 0) {
                                 RankByScore(keepRacing);
@@ -583,10 +583,10 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     restartPending = false;
                     isRacing = false;
                 }
-                if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->isEnabled) {
+                if (youIndicator != 0 && ((UnknownBikeRaceObjectFlags*)youIndicator)->isEnabled) {
                     position = localRacer->carriedFlagPosition;
                     position.y += 4.25f;
-                    ((ArcadeObject*)field_0x060)->SetPosition(&position);
+                    ((ArcadeObject*)youIndicator)->SetPosition(&position);
                 }
                 if (chatHideTimer > 0.0f && g_TrackGame->mode.chatInputLine != 1) {
                     chatHideTimer -= g_TrackGame->frameTime;
@@ -1962,7 +1962,7 @@ int BikeRace::UnknownVirtualSlot14() {
     if (field_0x034) {
         if (raceTrack != 0) {
             DrawTrack(raceTrack);
-            if (field_0x144) {
+            if (hasStartProbe) {
                 SetDrawColor(0xff, 0, 0xff);
                 a = startProbe.center - startProbe.halfExtents;
                 b = startProbe.center + startProbe.halfExtents;
@@ -1970,7 +1970,7 @@ int BikeRace::UnknownVirtualSlot14() {
                 b.y += 2.5f;
                 DrawLine(&a, &b);
             }
-            if (field_0x148) {
+            if (hasFinishProbe) {
                 SetDrawColor(0, 0xff, 0xff);
                 a = finishProbe.center - finishProbe.halfExtents;
                 b = finishProbe.center + finishProbe.halfExtents;

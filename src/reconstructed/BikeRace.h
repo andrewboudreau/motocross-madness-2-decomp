@@ -860,15 +860,15 @@ public:
     }
 
     // Inline (bikerace.h line 0xd3; the destructor 0x0041cf30): frees the
-    // +0xc8 nodes.
+    // +0xc8 gate list.
     void UnknownFunctionFreeNodes() {
-        if (field_0x0c8 != 0) {
-            while (field_0x0c8 != 0) {
-                UnknownBikeRaceNode* node = field_0x0c8;
-                field_0x0c8 = node->nextGate;
+        if (gateList != 0) {
+            while (gateList != 0) {
+                UnknownBikeRaceNode* node = gateList;
+                gateList = node->nextGate;
                 DebugFree(node, __FILE__, 0xd3);
             }
-            field_0x0c8 = 0;
+            gateList = 0;
         }
     }
 
@@ -935,7 +935,7 @@ public:
     int field_0x054;
     Scene* raceScene;
     UnknownBikeRaceShadow* field_0x05c;
-    GameObject* field_0x060;
+    GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
     UnknownBikeRaceView6c* field_0x064;       // reset by a restart (slot 5)
     int field_0x068;
     UnknownBikeRaceView6c* field_0x06c;
@@ -949,14 +949,14 @@ public:
     unsigned char field_0x0b1[0xb4 - 0xb1];
     ObjectPicker* objectPicker;                // debug object picker
     int field_0x0b8;
-    int field_0x0bc;
-    int field_0x0c0;
+    int scoreBoard;                           // +0xbc score board: BonusObjectManager::SetupCounter's object
+    int digitCounter;                         // +0xc0 NumberObjectManager::SetupDigits's object
     UnknownEventRacerPart* field_0x0c4;
-    UnknownBikeRaceNode* field_0x0c8;
+    UnknownBikeRaceNode* gateList;            // +0xc8 gate nodes linked through nextGate
     UnknownBikeRaceNode startProbe;          // start probe
     UnknownBikeRaceNode finishProbe;          // finish probe
-    int field_0x144;
-    int field_0x148;
+    int hasStartProbe;                        // +0x144 LoadTrack found the start probe (debug draw)
+    int hasFinishProbe;                       // +0x148 LoadTrack found the finish probe (debug draw)
     int field_0x14c;
     int field_0x150;
     int field_0x154;
