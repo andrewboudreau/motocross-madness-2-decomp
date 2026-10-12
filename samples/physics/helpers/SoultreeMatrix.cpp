@@ -68,20 +68,26 @@ static inline Vec3 CrossOfYAndZ(const Vec3& z, const Vec3& y)
     return r;
 }
 
-// v rotated by the transpose of m's upper 3x3 (dot with the ROWS of m). v is passed by value,
-// as in retail.
-static inline Vec3 RotateByRows(Vec3 v, const Matrix4& m)
+// v rotated by the transpose of m's upper 3x3 (dot with the ROWS of m) into *r. v is passed
+// by value; rotating the delta into itself makes VC6 copy it as retail does (GetMatrixIn).
+static inline void RotateByRowsTo(Vec3* r, Vec3 v, const Matrix4& m)
 {
-    Vec3 r;
-    r.x = v.x * m._11 + v.y * m._12 + v.z * m._13;
-    r.y = v.x * m._21 + v.y * m._22 + v.z * m._23;
-    r.z = v.x * m._31 + v.y * m._32 + v.z * m._33;
-    return r;
+    r->x = v.x * m._11 + v.y * m._12 + v.z * m._13;
+    r->y = v.x * m._21 + v.y * m._22 + v.z * m._23;
+    r->z = v.x * m._31 + v.y * m._32 + v.z * m._33;
 }
 
 // 0x004fc050. Inverse of GetAxesIn: builds a rotation whose row 2 is *axisZ and row 1 is
 // *axisY (both given in 'frame' space), row 0 = cross(row1, row2), and stores it into
 // localMatrix, keeping the old local translation. See SoultreeObject.h for the data flow.
+// PARTIAL 1073/1171 (was 392): same instructions and length as retail once the row-0 cross
+// product goes through a named Vec3, the frame == this product passes localMatrix as a and m
+// as b (retail copies m into the last argument first), localMatrix is reached through a
+// pointer held across the parent branch and the delta is rotated into itself (GetMatrixIn's
+// form). Left: three 12-byte slots. Retail puts r (shared with the delta copy) nearest esp,
+// then the cross temporaries, then pos; VC6 here orders the temporaries, pos, r. Dropping the
+// z/y block, bracing x, r at block scope or no named r, constructor-form CrossOfYAndZ (by
+// reference or value) and pos/m/end stores as Vec3 copies did not reorder them.
 void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const Vec3* axisY,
                                int orthogonalize, int keepZ)
 {
@@ -102,15 +108,15 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
         }
         y = Vec3Normalize(y);
         z = Vec3Normalize(z);
-        *(Vec3*)&m._11 = CrossProductCall(y, z);
-        m._14 = 0.0f;
+        Vec3 x = CrossProductCall(y, z);
+        m._11 = x.x; m._12 = x.y; m._13 = x.z; m._14 = 0.0f;
         m._21 = y.x; m._22 = y.y; m._23 = y.z; m._24 = 0.0f;
         m._31 = z.x; m._32 = z.y; m._33 = z.z; m._34 = 0.0f;
     }
     m._41 = pos.x; m._42 = pos.y; m._43 = pos.z; m._44 = 1.0f;
 
     if (frame == this) {
-        MatrixMultiply(&localMatrix, m, localMatrix);
+        MatrixMultiply(&localMatrix, localMatrix, m);
         InvalidateWorldMatrix();
         return;
     }
@@ -118,6 +124,7 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
         frame->UpdateWorldMatrix();
         MatrixMultiply(&m, frame->worldMatrix, m);
     }
+    Matrix4* local = &localMatrix;
     if (parent) {
         parent->UpdateWorldMatrix();
         Matrix4 parentWorld = parent->worldMatrix;
@@ -127,11 +134,14 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
         d.y = t._42 - parentWorld._42;
         d.z = t._43 - parentWorld._43;
         TransposeRotation3(t);
-        MatrixProductRows(&localMatrix, &t, &parentWorld);
-        TransposeRotation3(localMatrix);
-        *(Vec3*)&localMatrix._41 = RotateByRows(d, parentWorld);
+        MatrixProductRows(local, &t, &parentWorld);
+        TransposeRotation3(*local);
+        RotateByRowsTo(&d, d, parentWorld);
+        local->_41 = d.x;
+        local->_42 = d.y;
+        local->_43 = d.z;
     } else {
-        localMatrix = m;
+        *local = m;
     }
     localMatrix._41 = pos.x;
     localMatrix._42 = pos.y;
