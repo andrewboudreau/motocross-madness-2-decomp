@@ -170,8 +170,8 @@ public:
 
     float axisValuesAtWait[6];                // +0x7f58: joystick axis values when the wait began
     int waitingForInput;                      // +0x7f70: waiting for input to map
-    int field_0x7f74;
-    int field_0x7f78;                         // the active joystick has device kind 3
+    int inputWaitPending;                     // +0x7f74: the 250 ms timer before the input wait runs
+    int joystickIsKind3;                      // +0x7f78: the active joystick has device kind 3
 };
 
 // RTTI: OptGarageDlg : UIDialog (vtable 0x00555688; 0x7f5c bytes).
@@ -213,12 +213,12 @@ public:
     virtual void UnknownVirtualSlot31(int save);
     void OpenPage(int page);     // 0x004b4ab0: opens page `page` (0..5)
 
-    OptGameSettingsDlg* field_0x7f58;
-    OptGraphicsDlg* field_0x7f5c;
-    OptSoundDlg* field_0x7f60;
-    OptControlsDlg* field_0x7f64;
-    OptMessagesDlg* field_0x7f68;
-    OptGarageDlg* field_0x7f6c;
+    OptGameSettingsDlg* gameSettingsPage;     // +0x7f58
+    OptGraphicsDlg* graphicsPage;             // +0x7f5c
+    OptSoundDlg* soundPage;                   // +0x7f60
+    OptControlsDlg* controlsPage;             // +0x7f64
+    OptMessagesDlg* messagesPage;             // +0x7f68
+    OptGarageDlg* garagePage;                 // +0x7f6c
 };
 
 // RTTI: GlobalSettingsDlg : UIDialog (vtable 0x00555604; 0x7f58 bytes):
