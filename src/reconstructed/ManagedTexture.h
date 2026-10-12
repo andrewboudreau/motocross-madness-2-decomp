@@ -31,19 +31,19 @@ public:
     int SizeLevel();              // 0x00510990: log2 of the width
     float UnknownFunction5109b0();            // 0x005109b0: +0xa4 less +0xac
 
-    CacheTexture* field_0x80;                 // page it is placed on
-    float field_0x84;                         // scale within the page
-    float field_0x88;                         // u offset within the page
-    float field_0x8c;                         // v offset within the page
-    ManagedTextureGroup* field_0x90;
-    UnknownTextureRegion* field_0x94;
+    CacheTexture* page;                       // +0x80 page it is placed on
+    float pageScale;                          // +0x84 scale within the page
+    float pageOffsetU;                        // +0x88 u offset within the page
+    float pageOffsetV;                        // +0x8c v offset within the page
+    ManagedTextureGroup* group;               // +0x90
+    UnknownTextureRegion* region;             // +0x94
     int field_0x98;
     int field_0x9c;
-    int field_0xa0;                           // uses (0x00510820)
-    float field_0xa4;                         // largest recorded value (0x00510820)
+    int useCount;                             // +0xa0 uses (0x00510820)
+    float largestUse;                         // +0xa4 largest recorded value (0x00510820)
     int field_0xa8;                           // region +0x18
-    int field_0xac;                           // planned level (repacking)
-    int field_0xb0;                           // wanted level
+    int plannedLevel;                         // +0xac planned level (repacking)
+    int wantedLevel;                          // +0xb0 wanted level
     int field_0xb4;
-    int field_0xb8;                           // manager frame of the last use
+    int lastUseFrame;                         // +0xb8 manager frame of the last use
 };

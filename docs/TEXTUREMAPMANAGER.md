@@ -79,6 +79,11 @@ Provisional names from that behaviour: `UpdatePageCoords` `0x00510610`,
 `0x00510820`, `RemapTexCoordsIfMoved` `0x00510910` and `SizeLevel`
 `0x00510990`. `0x00510670` keeps its address name because
 BikeNumberPainter.cpp calls it.
+Fields, from the same behaviour (each keeps its `// +0xNN`): `page`
+(+0x80), `pageScale` and `pageOffsetU`/`pageOffsetV` (+0x84..+0x8c),
+`group` (+0x90), `region` (+0x94), `useCount` and `largestUse`
+(+0xa0/+0xa4, written by `RecordUse`), `plannedLevel` and `wantedLevel`
+(+0xac/+0xb0, repacking) and `lastUseFrame` (+0xb8).
 
 ## ManagedTextureGroup
 

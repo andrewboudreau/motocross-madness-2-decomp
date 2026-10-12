@@ -132,15 +132,15 @@ void ManagedTextureGroup::UnknownFunction50c6c0(ManagedTexture* texture) {
         }
     }
     field_0x44.Append(texture);
-    texture->field_0xb8 = field_0x40->field_0x74;
-    texture->field_0x90 = this;
+    texture->lastUseFrame = field_0x40->field_0x74;
+    texture->group = this;
 }
 
 // 0x0050c760
 void ManagedTextureGroup::UnknownFunction50c760() {
     for (TextureMap* texture = field_0x44.First(); texture; texture = field_0x44.Next()) {
-        static_cast<ManagedTexture*>(texture)->field_0xa0 = 0;
-        static_cast<ManagedTexture*>(texture)->field_0xa4 = 0;
+        static_cast<ManagedTexture*>(texture)->useCount = 0;
+        static_cast<ManagedTexture*>(texture)->largestUse = 0;
     }
 }
 
@@ -167,8 +167,8 @@ void ManagedTextureGroup::UnknownFunction50c7e0() {
         for (int index = 1; texture; texture = field_0x44.Next()) {
             ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
             UnknownFunction461d40(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->field_0x14,
-                                  managed->field_0x18, managed->field_0xa4);
-            if (managed->field_0xa4 > 0.0f)
+                                  managed->field_0x18, managed->largestUse);
+            if (managed->largestUse > 0.0f)
                 UnknownFunction461d40(file, ", Allocd=%d unhappy=%.2f", managed->field_0xa8,
                                       managed->UnknownFunction5109b0());
             UnknownFunction461d40(file, "\n");
@@ -196,7 +196,7 @@ void ManagedTextureGroup::RepackPages() {
 int UnknownCompare50ee70(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
-    int difference = b->field_0xac - a->field_0xac;
+    int difference = b->plannedLevel - a->plannedLevel;
     if (difference)
         return difference;
     return a - b;
@@ -206,7 +206,7 @@ int UnknownCompare50ee70(const void* first, const void* second) {
 int UnknownCompare50eeb0(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
-    int difference = b->field_0xa8 - b->field_0xac - a->field_0xa8 + a->field_0xac;
+    int difference = b->field_0xa8 - b->plannedLevel - a->field_0xa8 + a->plannedLevel;
     if (difference)
         return difference;
     return a - b;
@@ -244,13 +244,13 @@ int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
     qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
     int area = 0;
     for (int i = 0; i < list->m_count; i++)
-        area += LevelArea(list->Get(i)->field_0xac);
+        area += LevelArea(list->Get(i)->plannedLevel);
     while (list->m_count > 0 && area > budget) {
         int index = list->m_count - 1;
         ManagedTexture* texture = list->Get(index);
-        while (list->m_count > 0 && texture->field_0xac == 5) {
+        while (list->m_count > 0 && texture->plannedLevel == 5) {
             if (--index == 0) {
-                texture->field_0xac = -1;
+                texture->plannedLevel = -1;
                 area -= 0x400;
                 list->RemoveOrdered(texture);
                 index = list->m_count - 1;
@@ -259,12 +259,12 @@ int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
                 return area;
             texture = list->Get(index);
         }
-        int level = texture->field_0xac;
+        int level = texture->plannedLevel;
         if (texture->UnknownFunction5109b0() < 0.0f)
-            texture->field_0xac = texture->field_0xb0;
+            texture->plannedLevel = texture->wantedLevel;
         else
-            texture->field_0xac--;
-        int newLevel = texture->field_0xac;
+            texture->plannedLevel--;
+        int newLevel = texture->plannedLevel;
         area -= LevelArea(level);
         area += LevelArea(newLevel);
         if (list->m_count > 1) {

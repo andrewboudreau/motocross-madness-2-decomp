@@ -170,8 +170,8 @@ UnknownTextureRegion* CacheTexture::UnknownFunction50fc60(UnknownTextureRegion* 
 // 0x0050fc90
 void CacheTexture::UnknownFunction50fc90(UnknownTextureRegion* region) {
     if (region->field_0x14) {
-        region->field_0x14->field_0x80 = 0;
-        region->field_0x14->field_0x94 = 0;
+        region->field_0x14->page = 0;
+        region->field_0x14->region = 0;
         region->field_0x14->field_0xa8 = -1;
         region->field_0x14 = 0;
     }
@@ -236,8 +236,8 @@ UnknownTextureRegion* CacheTexture::UnknownFunction50ffa0(UnknownTextureRegion* 
 // 0x00510120
 void CacheTexture::UnknownFunction510120(UnknownTextureRegion* region, int merge) {
     if (region->field_0x14) {
-        region->field_0x14->field_0x80 = 0;
-        region->field_0x14->field_0x94 = 0;
+        region->field_0x14->page = 0;
+        region->field_0x14->region = 0;
         region->field_0x14 = 0;
     }
     if (region->field_0x2c) {
@@ -266,19 +266,19 @@ void CacheTexture::UnknownFunction510120(UnknownTextureRegion* region, int merge
 // 0x00510250
 int CacheTexture::UnknownFunction510250(ManagedTexture* texture, UnknownTextureRegion* region) {
     region->field_0x14 = texture;
-    texture->field_0x94 = region;
-    region->field_0x14->field_0x80 = this;
+    texture->region = region;
+    region->field_0x14->page = this;
     region->field_0x2c = 1;
-    field_0x88[texture->field_0xac]--;
+    field_0x88[texture->plannedLevel]--;
     texture->field_0xa8 = region->field_0x18;
-    texture->field_0x94 = region;
-    texture->field_0x80 = this;
+    texture->region = region;
+    texture->page = this;
     return 1;
 }
 
 // 0x005102b0
 void CacheTexture::UnknownFunction5102b0(ManagedTexture* texture) {
-    UnknownFunction510120(texture->field_0x94, 1);
+    UnknownFunction510120(texture->region, 1);
 }
 
 // 0x0050fdb0
@@ -286,10 +286,10 @@ int CacheTexture::UnknownFunction50fdb0(ContainerList<ManagedTexture*>* textures
                                         ContainerList<ManagedTexture*>* placed) {
     while (textures->m_count > 0) {
         ManagedTexture* texture = textures->Get(0);
-        if (field_0xd0[texture->field_0xac].m_count == 0)
+        if (field_0xd0[texture->plannedLevel].m_count == 0)
             return 0;
-        UnknownTextureRegion* region = field_0xd0[texture->field_0xac].Get(0);
-        field_0xd0[texture->field_0xac].RemoveOrdered(region);
+        UnknownTextureRegion* region = field_0xd0[texture->plannedLevel].Get(0);
+        field_0xd0[texture->plannedLevel].RemoveOrdered(region);
         UnknownFunction510250(texture, region);
         textures->RemoveOrdered(texture);
         if (placed) {

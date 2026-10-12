@@ -114,7 +114,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         manager = field_0x10;
         copy = new(__FILE__, 976) ManagedTexture(manager);
         copy->field_0x68 |= 1;
-        ((ManagedTexture*)this)->field_0x90->UnknownFunction50c6c0((ManagedTexture*)copy);
+        ((ManagedTexture*)this)->group->UnknownFunction50c6c0((ManagedTexture*)copy);
     } else {
         manager = g_TrackGame->field_0x3c;
         copy = new(__FILE__, 986) PCTextureMap(manager, 1);
