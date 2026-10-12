@@ -18,10 +18,11 @@ Close the game before rebuilding: Windows keeps the installed `d3drm.dll`
 locked while it runs.
 
 Status (Windows 11 26200, 3840x2160 desktop): the demo boots, shows the
-title, profile and menu screens, and plays Voodoo Basin at 60 frames a second
-with keyboard and mouse. It renders through the game's own `blade.dll`
-software rasterizer; our code only emulates the 16-bit full-screen display
-around it.
+title, profile and menu screens, and plays Voodoo Basin and the Donner Pass
+stunt quarry at 60 frames a second with keyboard and mouse. It renders with
+hardware Direct3D 7 (tested on an RTX 4080) or, if the game's hardware test
+disabled that, with its own `blade.dll` software rasterizer. Our code only
+emulates the 16-bit full-screen display around the game's renderer.
 
 | Variable | Effect |
 |---|---|
@@ -83,6 +84,31 @@ effect (the log says "already redirected"); all emulation happens on blade's
 outer object. The system shim database entry for MCM2 (matched on `MCM2.ICD`,
 `MCM2.EXE`, `RIDERS\RIDER01.TGA`) applies only IgnoreAltTab and a
 VirtualRegistry INDEO5 fix.
+
+## Hardware Direct3D
+
+`PCGame::StartUp` (0x4bfc50, `src/reconstructed/PCGame.cpp`) reads the
+`Renderer` setting (default `HAL`, hardware Direct3D 7); the display chooser
+(0x4ccd60) falls back to the Blade device when the card's profile under
+`DriverInfo\{driver GUID}` says `DisabledHardware = 1`. Two things kept the
+hardware path from working on a current card:
+
+- Video memory sizes are signed ints. `CreateModeSurfaces` (0x4ca520) fails
+  when the flip chain does not fit in "video memory - 2 * mode size", and 2 GB
+  or more reads as negative, so the game quit right after `SetDisplayMode`.
+  `GetAvailableVidMem` and `GetCaps` now report at most 256 MB.
+- The emulated primary's back buffer was in system memory, which a HAL device
+  cannot render to. For a 3D flip chain requested in video memory it is now
+  an RGB 565 video-memory surface; `CreateDevice(IID_IDirect3DHALDevice)`
+  succeeds on it and Present reads it back.
+
+With both fixes a fresh profile (no `DriverInfo` key) passes the game's
+hardware test on an RTX 4080: every entry gets `DisabledHardware = 0` and
+`TotalVideoMemory = 268435456`, and the game creates the HAL device.
+Profiles written before these fixes may still hold `DisabledHardware = 1` and
+a `TotalVideoMemory` of 2 GB or more; set them to 0 and 268435456 (or delete
+`DriverInfo` so the game profiles the card again). With hardware rendering a
+race uses about 22% of one core, against about 50% with Blade.
 
 ## Timing and input
 

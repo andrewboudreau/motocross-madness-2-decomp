@@ -503,10 +503,38 @@ static HRESULT __stdcall DDEnumDisplayModes(void* self, DWORD flags, void* desc,
     return result;
 }
 
+/*
+ * The game keeps video memory sizes in signed ints: CreateModeSurfaces
+ * (0x4ca520) fails when the flip chain does not fit in "total - 2 * mode
+ * size", and a card with 2 GB or more reads as negative there. Report at
+ * most 256 MB, plenty for a game that targeted 16 and 32 MB cards.
+ */
+#define MAX_VIDEO_MEMORY 0x10000000UL
+
+static void ClampVideoMemory(DWORD* bytes)
+{
+    if (bytes && *bytes > MAX_VIDEO_MEMORY)
+        *bytes = MAX_VIDEO_MEMORY;
+}
+
+/* DDCAPS_DX7: dwSize is DWORD 0, dwVidMemTotal and dwVidMemFree DWORDs 15
+   and 16. */
+static void ClampCapsVideoMemory(DWORD* caps)
+{
+    if (caps && caps[0] >= 17 * sizeof(DWORD)) {
+        ClampVideoMemory(&caps[15]);
+        ClampVideoMemory(&caps[16]);
+    }
+}
+
 static HRESULT __stdcall DDGetCaps(void* self, void* driver, void* emulation)
 {
     HRESULT result =
         ((GetCapsProc)Original(s_directDraw, self, 11))(self, driver, emulation);
+    if (result == 0) {
+        ClampCapsVideoMemory((DWORD*)driver);
+        ClampCapsVideoMemory((DWORD*)emulation);
+    }
     LogLine("IDirectDraw7(%p)::GetCaps -> 0x%08lx, driver dwCaps 0x%08lx dwCaps2 0x%08lx, "
             "emulation dwCaps 0x%08lx", self, result, driver ? ((DWORD*)driver)[1] : 0,
             driver ? ((DWORD*)driver)[2] : 0, emulation ? ((DWORD*)emulation)[1] : 0);
@@ -544,8 +572,16 @@ static HRESULT __stdcall DDGetAvailableVidMem(void* self, void* caps, DWORD* tot
 {
     HRESULT result = ((GetAvailableVidMemProc)Original(s_directDraw, self, 23))(self, caps, total,
                                                                                  free);
-    LogLine("IDirectDraw7(%p)::GetAvailableVidMem(caps 0x%lx) -> 0x%08lx, total %lu free %lu",
-            self, caps ? *(DWORD*)caps : 0, result, total ? *total : 0, free ? *free : 0);
+    LogLine("IDirectDraw7(%p)::GetAvailableVidMem(caps 0x%lx) -> 0x%08lx, total %lu free %lu%s",
+            self, caps ? *(DWORD*)caps : 0, result, total ? *total : 0, free ? *free : 0,
+            result == 0 && ((total && *total > MAX_VIDEO_MEMORY) ||
+                            (free && *free > MAX_VIDEO_MEMORY))
+                ? " (reported as at most 256 MB)"
+                : "");
+    if (result == 0) {
+        ClampVideoMemory(total);
+        ClampVideoMemory(free);
+    }
     return result;
 }
 

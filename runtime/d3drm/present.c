@@ -14,7 +14,9 @@
  *   - surfaces created without a pixel format get RGB 565 instead of the
  *     desktop format;
  *   - the primary surface is an EmulatedPrimary: a small IDirectDrawSurface7
- *     over two RGB 565 system-memory surfaces (front and back). Flip copies
+ *     over two RGB 565 surfaces: a system-memory front buffer and a back
+ *     buffer in video memory for hardware Direct3D (the HAL device renders
+ *     into it), system memory otherwise. Flip copies
  *     the back buffer into the game's window with StretchDIBits, scaled to
  *     fit with black bars, and into the front surface.
  * The game window is made a borderless popup covering the primary monitor
@@ -514,8 +516,8 @@ static void* s_primaryVtable[49] = {
 
 typedef HRESULT(__stdcall* CreateSurfaceCall)(void*, void*, void**, void*);
 
-static HRESULT CreatePlain(void* directDraw, CreateSurfaceCall create, DWORD extraCaps,
-                           void** out)
+static HRESULT CreatePlain(void* directDraw, CreateSurfaceCall create, DWORD memory,
+                           DWORD extraCaps, void** out)
 {
     DWORD desc[SD_DWORDS];
     memset(desc, 0, sizeof(desc));
@@ -523,7 +525,7 @@ static HRESULT CreatePlain(void* directDraw, CreateSurfaceCall create, DWORD ext
     desc[SD_FLAGS] = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT;
     desc[SD_WIDTH] = s_width;
     desc[SD_HEIGHT] = s_height;
-    desc[SD_CAPS] = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY | extraCaps;
+    desc[SD_CAPS] = DDSCAPS_OFFSCREENPLAIN | memory | extraCaps;
     SetRgb565(desc);
     return create(directDraw, desc, out, NULL);
 }
@@ -542,9 +544,18 @@ HRESULT CreateEmulatedPrimary(void* directDraw, const DWORD* desc, void** out,
     primary->references = 1;
     primary->caps = (desc[SD_CAPS] & ~DDSCAPS_SYSTEMMEMORY) | DDSCAPS_FRONTBUFFER |
                     DDSCAPS_VISIBLE | DDSCAPS_VIDEOMEMORY | DDSCAPS_LOCALVIDMEM;
-    result = CreatePlain(directDraw, create, 0, &primary->front);
-    if (result == 0 && backBuffers)
-        result = CreatePlain(directDraw, create, desc[SD_CAPS] & DDSCAPS_3DDEVICE, &primary->back);
+    result = CreatePlain(directDraw, create, DDSCAPS_SYSTEMMEMORY, 0, &primary->front);
+    /* A hardware Direct3D device renders into the back buffer, so that one
+       must be in video memory when the game asks for a 3D flip chain there. */
+    if (result == 0 && backBuffers && (desc[SD_CAPS] & DDSCAPS_3DDEVICE) &&
+        (desc[SD_CAPS] & DDSCAPS_VIDEOMEMORY)) {
+        result = CreatePlain(directDraw, create, DDSCAPS_VIDEOMEMORY, DDSCAPS_3DDEVICE,
+                             &primary->back);
+        LogLine("present: video-memory 3D back buffer -> 0x%08lx", result);
+    } else if (result == 0 && backBuffers) {
+        result = CreatePlain(directDraw, create, DDSCAPS_SYSTEMMEMORY,
+                             desc[SD_CAPS] & DDSCAPS_3DDEVICE, &primary->back);
+    }
     if (result) {
         if (primary->front)
             ((RefProc)SLOT(primary->front, 2))(primary->front);
