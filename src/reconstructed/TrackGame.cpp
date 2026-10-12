@@ -104,7 +104,7 @@ TrackGame::TrackGame() {
     profileDirectory = 0;
     menuIsOpen = 0;
     uiInteractionBlocked = 0;
-    field_0x3340 = 0;
+    cdAudio = 0;
     controlMapping = 0;
     field_0x33fc = 0;
     field_0x3400 = 0;
@@ -150,7 +150,7 @@ TrackGame::~TrackGame() {
         LoadResourceString(0x14df, url, 0x7f);
         ShellExecuteA(0, 0, url, 0, 0, 3);
     }
-    delete field_0x3340;
+    delete cdAudio;
     delete profileDirectory;
     delete controlMapping;
     delete field_0x33fc;
@@ -273,8 +273,8 @@ int TrackGame::UnknownVirtualSlot4() {
         PostMessageA(windowHandle, kCloseWindow, 0, 0);
         return 1;
     }
-    field_0x3340 = new(__FILE__, 343) CDAudio;
-    field_0x3340->Initialize();
+    cdAudio = new(__FILE__, 343) CDAudio;
+    cdAudio->Initialize();
     g_MemTagStack->Push("Startup");
     controlMapping = new(__FILE__, 350) UnknownControlMapping;
     if (!controlMapping)
@@ -458,9 +458,9 @@ void TrackGame::MuteSound() {
 }
 
 // 0x00521a40
-void TrackGame::UnknownFunction521a40() {
-    if (field_0x3340)
-        field_0x3340->Stop();
+void TrackGame::StopCDAudio() {
+    if (cdAudio)
+        cdAudio->Stop();
 }
 
 // 0x00521a50

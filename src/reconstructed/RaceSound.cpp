@@ -853,7 +853,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     owner->textQueue->ReplaceHeadMessage(&message);
             }
             if (g_TrackGame->mode.networkGame)
-                crowdSounds->UnknownFunction401dd0(musicVolume);
+                crowdSounds->SetMemberVolume(musicVolume);
             return 1;
         case 0x1f:
             if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))

@@ -63,7 +63,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     g_TrackGame->field_0x3438 = 0;
     g_TrackGame->uiBlockedSeconds = 0;
     if (!g_TrackGame->mode.field_0xa20)
-        g_TrackGame->UnknownFunction521a40();
+        g_TrackGame->StopCDAudio();
     UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_TrackGame->UnknownVirtualSlot19(

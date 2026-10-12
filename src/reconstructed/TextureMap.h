@@ -13,7 +13,7 @@ struct UnknownTexturePalette {
     // its palette argument.
     unsigned char* GetColors();        // 0x004de270: &field_0x010
     unsigned char* GetIndexFrom555();        // 0x004de280: &field_0x710 (555 to index)
-    unsigned char* UnknownFunction4de290();        // 0x004de290: &field_0x8710 (565 to index)
+    unsigned char* GetIndexFrom565();        // 0x004de290: &field_0x8710 (565 to index)
 
     unsigned char field_0x000[0x10];
     unsigned char field_0x010[256][3];             // RGB entries

@@ -317,7 +317,7 @@ int Sound::LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned 
     int stereo = waveHeader.channels > 1;
     bufferBytes = waveHeader.dataSize;
     if (controlsSet & 0x80)
-        SetVolume(soundGroup->field_0x30, 0);
+        SetVolume(soundGroup->memberVolume, 0);
     if (soundFlags & 2) {
         if (streamBytes == -1)
             bufferBytes = 0x1f400;
@@ -451,7 +451,7 @@ int Sound::DuplicateFrom(Sound* source) {
     source->AddRef();
     CopySoundName(soundName, duplicateSource->soundName);
     if (controlsSet & 0x80)
-        SetVolume(soundGroup->field_0x30, 0);
+        SetVolume(soundGroup->memberVolume, 0);
     return 1;
 }
 

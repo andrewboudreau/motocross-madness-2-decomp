@@ -22,11 +22,11 @@ UnknownResourceManager* g_UnknownResourceManager572b44 = &g_UnknownResourceManag
 // 0x004e8d70
 ResourceItem::ResourceItem()
 {
-    UnknownFunction4e8de0();
+    Reset();
 }
 
 // 0x004e8de0
-void ResourceItem::UnknownFunction4e8de0()
+void ResourceItem::Reset()
 {
     nameSize = 1;
     name = (char*)DebugMalloc(1, __FILE__, 24);

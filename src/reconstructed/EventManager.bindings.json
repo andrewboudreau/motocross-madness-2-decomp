@@ -95,7 +95,7 @@
   "?CompareScoresDescending@@YAHPBX0@Z": "0x005199f0",
   "?ReplaceHeadMessage@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
-  "?UnknownFunction521a40@TrackGame@@QAEXXZ": "0x00521a40",
+  "?StopCDAudio@TrackGame@@QAEXXZ": "0x00521a40",
   "?SaveProfile@TrackGameMode@@QAEXXZ": "0x00523580",
   "?FindFileDirectory@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
   "?Save@UnknownVcrFile@@QAEXPAD@Z": "0x00524d00",

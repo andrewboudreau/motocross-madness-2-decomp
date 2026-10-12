@@ -1320,7 +1320,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
             if (g_UnknownGlobal59adfc >= 10) {
                 event->dialog->EndDialog(0);
                 event->handled = 1;
-                g_TrackGame->UnknownFunction521a40();
+                g_TrackGame->StopCDAudio();
                 g_TrackGame->ResetClock();
                 g_TrackGame->eventManager->FindRaceView()->UnknownFunction421050();
                 if (g_TrackGame->quarryEvent)

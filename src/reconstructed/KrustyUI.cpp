@@ -416,7 +416,7 @@ void KrustyUI::StepProgressBar() {
 }
 
 // 0x0049bb80
-void KrustyUI::UnknownFunction49bb80() {
+void KrustyUI::ClearEntries() {
     if (entries)
         DebugFree(entries, __FILE__, 1453);
     entries = 0;

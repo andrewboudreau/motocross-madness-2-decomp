@@ -118,6 +118,6 @@ unsigned char* ColorMapper::GetIndexFrom555() {
 }
 
 // 0x004de290
-unsigned char* ColorMapper::UnknownFunction4de290() {
+unsigned char* ColorMapper::GetIndexFrom565() {
     return indexFrom565;
 }

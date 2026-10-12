@@ -655,7 +655,7 @@ public:
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00521cb0
 
     void MuteSound();             // 0x00521a30
-    void UnknownFunction521a40();             // 0x00521a40
+    void StopCDAudio();             // 0x00521a40
     int UnknownFunction521cd0();              // 0x00521cd0
 
     // 0x00521970: loads string resource `id` into buffer (size bytes), or
@@ -679,7 +679,7 @@ public:
     TrackGameMode mode;                       // +0x578..+0x3337
     DirectoryList* profileDirectory;
     int menuIsOpen;
-    CDAudio* field_0x3340;
+    CDAudio* cdAudio;                         // +0x3340
     UnknownControlBinding field_0x3344;
     UnknownControlBinding field_0x3380;
     UnknownControlBinding field_0x33bc;

@@ -126,7 +126,7 @@ public:
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int AddEntry(int a, int scene, int series, const char* name, int d, int e);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
-    void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
+    void ClearEntries();             // 0x0049bb80: frees +0x60
     void LoadGarageTables();             // 0x0049a540: loads the garage tables
     void LoadBikesAndRiders();                // 0x0049a8b0: bikes.pb and riders.pb
     GameObject* Create(RenderTarget* target, int value); // 0x004988a0

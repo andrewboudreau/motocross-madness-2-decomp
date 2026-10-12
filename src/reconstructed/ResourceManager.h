@@ -21,7 +21,7 @@ class ResourceItem : public BaseObject {
 public:
     ResourceItem();                       // 0x004e8d70
     virtual ~ResourceItem();              // 0x004e8e10 (deleting 0x004e8dc0)
-    void UnknownFunction4e8de0();         // 0x004e8de0: empty name, no archive
+    void Reset();         // 0x004e8de0: empty name, no archive
 
     char* name;                           // +0x08 name (DebugMalloc'd)
     int nameSize;                         // +0x0c name size including the NUL

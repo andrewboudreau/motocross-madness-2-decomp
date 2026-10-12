@@ -21,7 +21,7 @@ public:
     void Build16BitTables();                             // 0x004ddec0: builds the 16-bit tables
     unsigned char* GetColors();              // 0x004de270: &field_0x10
     unsigned char* GetIndexFrom555();              // 0x004de280: &field_0x710
-    unsigned char* UnknownFunction4de290();              // 0x004de290: &field_0x8710
+    unsigned char* GetIndexFrom565();              // 0x004de290: &field_0x8710
 
     int firstIndex;                     // first palette index used
     int entryCount;                     // number of palette entries

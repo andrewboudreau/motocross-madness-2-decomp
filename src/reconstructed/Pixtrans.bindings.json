@@ -55,7 +55,7 @@
   "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
   "?GetIndexFrom555@UnknownTexturePalette@@QAEPAEXZ": "0x004de280",
-  "?UnknownFunction4de290@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",
+  "?GetIndexFrom565@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",
   "__FILE__:pixtrans.cpp": "0x00571688",
   "?AverageColor@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z": "0x004d24d0"
 }

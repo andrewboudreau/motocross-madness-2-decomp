@@ -65,7 +65,7 @@
   "?RemoveMember@SoundGroup@@QAEHPAVSound@@@Z": "0x00401be0",
   "?ReleaseMembers@SoundGroup@@QAEXXZ": "0x00401c30",
   "?ReleaseMembers@SoundGroup@@QAEXXZ$ehhandler": "0x005496b8",
-  "?UnknownFunction401dd0@SoundGroup@@QAEXJ@Z": "0x00401dd0",
+  "?SetMemberVolume@SoundGroup@@QAEXJ@Z": "0x00401dd0",
   "?VolumeForDistance@@YAXPAUVector3@@0MMMPAJ1@Z": "0x00402070",
   "?Create@SoundEmitter@@QAEPAV1@PAXPBDUUnknownSound3DParameters@@KMMHH@Z": "0x00402260",
   "?Create@SoundEmitter@@QAEPAV1@PAXPBDUUnknownSound3DParameters@@KMMHH@Z$ehhandler": "0x0054972a",

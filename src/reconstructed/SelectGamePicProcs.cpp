@@ -194,7 +194,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
             list->RemoveAllRows();
     }
     if (!append)
-        g_TrackGame->ui->UnknownFunction49bb80();
+        g_TrackGame->ui->ClearEntries();
     COPY_TEXT(selected, name, 260);
     strcpy(name, "");
     if (value)
