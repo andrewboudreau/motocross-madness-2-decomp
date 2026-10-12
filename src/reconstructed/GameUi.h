@@ -448,7 +448,7 @@ public:
     int SetThumbPosition(int value, int range); // 0x004753c0: sets the position to `value` of `range`
     void SetSnapStepCount(int count);         // 0x004754d0: snapSteps = count - 1 (OptionProcs.cpp)
     int GetScrollValue();                     // 0x00475500: the thumb offset scaled to scrollRange (SyncBoundValue)
-    int UnknownFunction4755c0();              // 0x004755c0: snapSteps
+    int GetSnapSteps();              // 0x004755c0: snapSteps
 
     union {
         int field_0x1ec;
@@ -499,7 +499,7 @@ public:
     virtual int SetSelectedRow(int row); // slot 65, 0x004769e0: selects `row`
     virtual void ReportClick(int* handled); // slot 66, 0x00477d30: reports a click (and a double click)
 
-    int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
+    int GetFirstVisibleRow();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
     int ScrollToRow(int row, int updateScrollBars); // 0x00476860
     int GetRowData(int row);                  // 0x004768d0: a row's data (-1: the selected one)
     int FindRowByData(int data);              // 0x00476900: -1 when none
@@ -581,7 +581,7 @@ public:
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478810
     virtual void SyncBoundValue(int value); // slot 59, 0x00478540
 
-    int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the current state
+    int GetSelectedState();              // 0x004755c0 (folded with UIScrollBar's): the current state
     int SetStateCount(int count);     // 0x00478860: number of states
     void SetStateEntry(int index, UIAnim* image, const char* text); // 0x004789f0
     void SetStateTextFromResource(int index, void* module, int id); // 0x00478a50: a state's resource string

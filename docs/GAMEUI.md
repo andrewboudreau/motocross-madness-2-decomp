@@ -186,7 +186,8 @@ dlgprocs.cpp, and from the constructors):
   (0x00475200, UIScrollBar slot 55, UIDDLScrollBar slot 55: the first row
   shown) and on multi-states and radio buttons (0x004793f0, the dialog
   procedures: the current state). UIScrollBar, UIListBox and UIMultiState
-  each declare it; the identical bodies share the one address (the
+  each declare it, as GetSnapSteps, GetFirstVisibleRow and
+  GetSelectedState; the identical bodies share the one address (the
   UIScrollBar copy is the registered case).
 - UIDropDownList has an inline accessor for its button (+0x1ec):
   SelectGamePicProcs.cpp's 0x004f3260, 0x004f69d0 and 0x004f8700 read the

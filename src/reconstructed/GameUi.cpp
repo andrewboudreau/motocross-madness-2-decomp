@@ -931,7 +931,7 @@ void UIScrollBar::SetSnapStepCount(int count) {
 }
 
 // 0x004755c0
-int UIScrollBar::UnknownFunction4755c0() {
+int UIScrollBar::GetSnapSteps() {
     return snapSteps;
 }
 
@@ -940,11 +940,11 @@ int UIScrollBar::UnknownFunction4755c0() {
 // on list boxes, UIRadioButton 0x004793f0 and the dialog procedures on
 // multi-states and radio buttons. All three read +0x1f0; the linker folded
 // the identical bodies.
-int UIListBox::UnknownFunction4755c0() {
+int UIListBox::GetFirstVisibleRow() {
     return firstVisibleRow;
 }
 
-int UIMultiState::UnknownFunction4755c0() {
+int UIMultiState::GetSelectedState() {
     return selectedState;
 }
 
@@ -1373,7 +1373,7 @@ void UIMultiState::SetState(int state) {
 // 0x00478540
 void UIMultiState::SyncBoundValue(int value) {
     if (value)
-        *boundValue = UnknownFunction4755c0();
+        *boundValue = GetSelectedState();
     else
         SetCurrentState(*boundValue);
 }
@@ -2978,7 +2978,7 @@ int UIRadioButton::GetGroupSelection() {
     while ((control = (UIRadioButton*)iterator.Next()) != 0) {
         if (control->attachId == attachId) {
             index++;
-            if (control->UnknownFunction4755c0() == 1)
+            if (control->GetSelectedState() == 1)
                 return index;
         }
     }
@@ -2990,12 +2990,12 @@ int UIRadioButton::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
-        if (!UnknownFunction4755c0()) {
+        if (!GetSelectedState()) {
             SetCurrentState(1);
             GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             UIRadioButton* control;
             while ((control = static_cast<UIRadioButton*>(NextAttachedControlOfType(iterator))) != 0) {
-                if (control != this && control->UnknownFunction4755c0() == 1) {
+                if (control != this && control->GetSelectedState() == 1) {
                     control->SetState(0);
                     control->SetCurrentState(0);
                 }
@@ -3156,9 +3156,9 @@ int UIScrollBar::FollowList(UIListBox* list) {
     RequestRedraw();
     if (reversed) {
         int count = list->rowCount;
-        followedRow = count - list->UnknownFunction4755c0();
+        followedRow = count - list->GetFirstVisibleRow();
     } else {
-        followedRow = list->UnknownFunction4755c0();
+        followedRow = list->GetFirstVisibleRow();
     }
     if (GetListScrollRange(list) == followedRow)
         return 1;
@@ -4251,9 +4251,9 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (position.y <= -1) {
                     if (ownerDialog->joystickCentred) {
-                        if (UnknownFunction4755c0()) {
+                        if (GetSnapSteps()) {
                             if (GetScrollValue())
-                                SetThumbPosition(GetScrollValue() - 1, UnknownFunction4755c0());
+                                SetThumbPosition(GetScrollValue() - 1, GetSnapSteps());
                         } else {
                             if (GetScrollValue())
                                 SetThumbPosition(GetScrollValue() - 1, range);
@@ -4262,9 +4262,9 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
                     }
                 } else if (position.y >= 1) {
                     if (ownerDialog->joystickCentred) {
-                        if (UnknownFunction4755c0()) {
-                            if ((unsigned int)GetScrollValue() < (unsigned int)UnknownFunction4755c0())
-                                SetThumbPosition(GetScrollValue() + 1, UnknownFunction4755c0());
+                        if (GetSnapSteps()) {
+                            if ((unsigned int)GetScrollValue() < (unsigned int)GetSnapSteps())
+                                SetThumbPosition(GetScrollValue() + 1, GetSnapSteps());
                         } else {
                             if ((unsigned int)GetScrollValue() < (unsigned int)range)
                                 SetThumbPosition(GetScrollValue() + 1, range);
@@ -4368,7 +4368,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() + page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() + page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
@@ -4378,7 +4378,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() - page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() - page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
@@ -4397,7 +4397,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() + page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() + page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
@@ -4407,7 +4407,7 @@ int UIScrollBar::ButtonDown(int a, int b) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() - page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() - page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
@@ -4784,10 +4784,10 @@ int UIDDLScrollBar::ButtonDown(int a, int b) {
             if (y > thumbOffset + (top + thumbHeight))
             {
                 int page = list->visibleRowCount;
-                list->ScrollToRow(list->UnknownFunction4755c0() + page, 1);
+                list->ScrollToRow(list->GetFirstVisibleRow() + page, 1);
             } else if (y < top + thumbOffset) {
                 int page = list->visibleRowCount;
-                list->ScrollToRow(list->UnknownFunction4755c0() - page, 1);
+                list->ScrollToRow(list->GetFirstVisibleRow() - page, 1);
             }
         }
     }

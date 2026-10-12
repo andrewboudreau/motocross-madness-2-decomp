@@ -71,7 +71,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("ChkToolTips", event->controlName) == 0) {
-            if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0())
+            if (static_cast<UIMultiState*>(event->control)->GetSelectedState())
                 guiManager->GetUser(0)->userToolTip->enabled = 1;
             else
                 guiManager->GetUser(0)->userToolTip->enabled = 0;
@@ -84,7 +84,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 void OptGameSettingsDlg::UnknownVirtualSlot31(int save)
 {
     if (save) {
-        switch (static_cast<UIMultiState*>(FindControl("MultChatMode", 2))->UnknownFunction4755c0()) {
+        switch (static_cast<UIMultiState*>(FindControl("MultChatMode", 2))->GetSelectedState()) {
         case 1:
             g_UnknownGlobal688898.chatMode = 1;
             break;
@@ -96,7 +96,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot31(int save)
             break;
         }
         if (!g_TrackGame->field_0x2d5_bit1) {
-            if (static_cast<UIMultiState*>(FindControl("ChkToolTips", 2))->UnknownFunction4755c0())
+            if (static_cast<UIMultiState*>(FindControl("ChkToolTips", 2))->GetSelectedState())
                 guiManager->GetUser(0)->userToolTip->enabled = 1;
             else
                 guiManager->GetUser(0)->userToolTip->enabled = 0;
@@ -199,13 +199,13 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     char key[1024];
     switch (event->kind) {
     case kDialogClose: {
-        int showPicker = static_cast<UIMultiState*>(FindControl("ChkShowPick3D", 2))->UnknownFunction4755c0();
+        int showPicker = static_cast<UIMultiState*>(FindControl("ChkShowPick3D", 2))->GetSelectedState();
         g_TrackGame->SetRegistryFlag("UseLastVideoCard", showPicker == 0);
         int method;
-        if (static_cast<UIRadioButton*>(FindControl("RadTerrSingle", 4))->UnknownFunction4755c0())
+        if (static_cast<UIRadioButton*>(FindControl("RadTerrSingle", 4))->GetSelectedState())
             method = 2;
         else
-            method = static_cast<UIRadioButton*>(FindControl("RadTerrDual", 4))->UnknownFunction4755c0() != 0;
+            method = static_cast<UIRadioButton*>(FindControl("RadTerrDual", 4))->GetSelectedState() != 0;
         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_TrackGame->display->driverGuidText);
         g_TrackGame->SetRegistryInt(key, method);
         g_UnknownGlobal6887d8.terrainQuality = (settings[4] + settings[3] + settings[2] + settings[1]) / 4;
@@ -252,12 +252,12 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("Back", event->controlName) == 0) {
             EndDialog(0x52);
         } else if (_stricmp("ChkFilterInput", event->controlName) == 0) {
-            int filter = static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0();
+            int filter = static_cast<UIMultiState*>(event->control)->GetSelectedState();
             g_TrackGame->SetRegistryFlag("JoystickFilter", filter);
             if (g_TrackGame->controlInterface->activeJoystick)
                 ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)->UnknownMethod4c3ae0(filter);
         } else if (_stricmp("ChkShowPickController", event->controlName) == 0) {
-            int useLast = static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 0;
+            int useLast = static_cast<UIMultiState*>(event->control)->GetSelectedState() == 0;
             g_TrackGame->SetRegistryFlag("UseLastController", useLast);
             g_TrackGame->SetRegistryFlag("PresetSelected", 0);
         } else if (_stricmp("Help", event->controlName) == 0) {

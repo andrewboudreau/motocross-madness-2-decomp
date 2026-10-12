@@ -55,7 +55,7 @@
   "?SetScrollRange@UIScrollBar@@QAEXH@Z": "0x004751c0",
   "?SetThumbPosition@UIScrollBar@@QAEHHH@Z": "0x004753c0",
   "?GetScrollValue@UIScrollBar@@QAEHXZ": "0x00475500",
-  "?UnknownFunction4755c0@UIMultiState@@QAEHXZ": "0x004755c0",
+  "?GetSelectedState@UIMultiState@@QAEHXZ": "0x004755c0",
   "?SetCurrentState@UIMultiState@@QAEXH@Z": "0x00478cf0",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",

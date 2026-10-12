@@ -170,7 +170,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("TogFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 8;
@@ -183,7 +183,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("TogFFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 9;
@@ -195,7 +195,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 }
             }
         } else if (!_stricmp("TogReverse", event->controlName)) {
-            if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
+            if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                 if (view->field_0x1dc != 14) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);

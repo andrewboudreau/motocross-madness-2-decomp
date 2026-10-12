@@ -15883,7 +15883,7 @@ CASES = [
         'name': 'gameui.cpp UIControl::fn4755c0',
         'bindings': 'src/reconstructed/GameUi.bindings.json',
         'source': 'src/reconstructed/GameUi.cpp',
-        'symbol': '?UnknownFunction4755c0@UIScrollBar@@QAEHXZ',
+        'symbol': '?GetSnapSteps@UIScrollBar@@QAEHXZ',
         'target_va': '0x004755c0',
         'target_size': 7,
         'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',

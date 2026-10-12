@@ -180,7 +180,7 @@
   "?SetThumbPosition@UIScrollBar@@QAEHHH@Z": "0x004753c0",
   "?SetSnapStepCount@UIScrollBar@@QAEXH@Z": "0x004754d0",
   "?GetScrollValue@UIScrollBar@@QAEHXZ": "0x00475500",
-  "?UnknownFunction4755c0@UIMultiState@@QAEHXZ": "0x004755c0",
+  "?GetSelectedState@UIMultiState@@QAEHXZ": "0x004755c0",
   "?GetRowData@UIListBox@@QAEHH@Z": "0x004768d0",
   "?GetSelectedRow@UIListBox@@QAEHXZ": "0x00476950",
   "?SelectRow@UIListBox@@QAEHH@Z": "0x00476a60",
