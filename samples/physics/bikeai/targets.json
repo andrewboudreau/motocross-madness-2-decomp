@@ -56,7 +56,7 @@
     "target_va": "0x00413200",
     "target_size": 4112,
     "expect": "partial",
-    "notes": "49.1% (2021/4112 strict, candidate size 4114). KrustyBike AI physics step (slot 49 runs it while KbRace+0x18a is set), emitted in BikeAI.cpp: steering from the controls or from the landing prediction and the racing line, the two-point look-ahead model 0x0040eca0, then angular velocity, speed, suspension, wheel roll, crash test and orientation. Calls, constants, branches and the 1120 instructions match; frame 0x74 and most stack slots match; the first three locals sit at other offsets, the cross products in the angular-velocity block load their operands in a different order, the ground-branch lean clamp keeps the value on the FPU stack and the smoother keeps its target in a register. See the file section.",
+    "notes": "49.3% (2026/4112 strict, candidate size 4114). KrustyBike AI physics step (slot 49 runs it while KbRace+0x18a is set), emitted in BikeAI.cpp: steering from the controls or from the landing prediction and the racing line, the two-point look-ahead model 0x0040eca0, then angular velocity, speed, suspension, wheel roll, crash test and orientation. Calls, constants, branches and the 1120 instructions match; frame 0x74 and most stack slots match; the first three locals sit at other offsets, the second lever's cross product loads some operands in a different order, the ground-branch lean clamp keeps the value on the FPU stack and the smoother keeps its target in a register. See the file section.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {

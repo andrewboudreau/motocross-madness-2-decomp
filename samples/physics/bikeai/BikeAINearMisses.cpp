@@ -1500,7 +1500,7 @@ inline void BikeAIClampUnit(float& v)
 // bike is then advanced by the look-ahead model 0x0040eca0 as two wheel points, and the
 // angular velocity, speed, suspension, wheel roll, crash test and orientation are derived
 // from the result.  Names tier 3.
-// Retail shapes reproduced (654 -> 2021 strict, candidate size 4114): the crash flag
+// Retail shapes reproduced (654 -> 2026 strict, candidate size 4114): the crash flag
 // +0x464 as a `?:` (retail `mov eax, 1` / `xor eax, eax` and one store), airborneOut as an
 // unsigned char (retail zero-extends it with `and ecx, 0xff` for slot 71), the travel
 // argument written as `-field_0x7f8` twice (retail keeps the negated value with `fst` and
@@ -1509,14 +1509,19 @@ inline void BikeAIClampUnit(float& v)
 // `float height = position.y;` before BIKEAI_ABS (retail loads it once and fchs's it) and
 // the value-returning smoother BikeAISmoothValue.  Each of the last three alone scores
 // 549..695; the clamp and the height copy together move most stack slots onto retail's
-// (1997), the smoother adds 24.
-// Remaining: the first three locals' slots, the ground-branch clamp still keeping lean on
-// the FPU stack (`fld st(0)` ... `fstp st(0)`; retail reloads it from 0x28), the operand
-// order of the angular-velocity cross products (retail loads a.y then multiplies by b.z;
-// ours loads b.z first) and the smoother tail (retail spills the target to 0x20 and reloads
-// it; ours keeps it with fxch).  The other lean clamp forms (`lean = pitch;` then an
-// if-chain on lean or on pitch, BikeAIClampUnit(lean = pitch)) score 573..626 with the
-// height copy.
+// (1997), the smoother adds 24.  `up` is assigned before `fwd` and the two lever cross
+// products name one operand as the member and one through the pointer: VC6 loads the
+// newer leaf first (docs/VC6_OPERAND_ORDER.md 1.2), which puts the first two cross
+// products in retail's operand order (2026; all-pointer or all-member forms 2023..2026
+// with fewer aligned instructions).
+// Remaining: slot order (retail steps, impact, steerDiff, airborneOut, lean, steer, start,
+// b from esp; ours puts lean first and `a` at the top, where its slot 11 address needs a
+// disp32, 6 bytes early; tools/frame_layout.py finds no use-count change for it), the
+// ground-branch clamp still keeping lean on the FPU stack (`fld st(0)` ... `fstp st(0)`;
+// retail reloads it), the operand order of the second lever's cross product x and y
+// rows, and the smoother tail (retail spills the target and reloads it; ours keeps it
+// with fxch).  The other lean clamp forms (`lean = pitch;` then an if-chain on lean or
+// on pitch, BikeAIClampUnit(lean = pitch)) score 573..626 with the height copy.
 int KrustyBike::Fn_00413200(float dt)
 {
     Vec3 a, c;
@@ -1620,13 +1625,13 @@ int KrustyBike::Fn_00413200(float dt)
         position.y = 0.0f;
 
     Vec3 start = position;
-    Vec3* fwd = &bodyForward;
     Vec3* up = &bodyUp;
+    Vec3* fwd = &bodyForward;
     worldAngularVelocity = *fwd * angularVelocity.z + *up * angularVelocity.y
                            - CrossProduct(*fwd, *up) * angularVelocity.x;
     Vec3* w = &worldAngularVelocity;
-    field_0x7e0 = CrossProduct(*w, *fwd) * 3.5f + velocity;
-    field_0x7ec = velocity - CrossProduct(*w, *fwd) * 3.5f;
+    field_0x7e0 = CrossProduct(*w, bodyForward) * 3.5f + velocity;
+    field_0x7ec = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
     unsigned char airborneOut = airborne;
     UnknownFunction40eca0(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
                           &bodyForward, &bodyUp, dt, dt, field_0x740->field_0x4c, &airborneOut,
