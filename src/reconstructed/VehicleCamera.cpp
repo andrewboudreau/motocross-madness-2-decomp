@@ -70,8 +70,8 @@ Vector3 VehicleCamera::TargetPoint() {
     }
     if (field_0x384) {
         UnknownVehiclePart* model = field_0x384->field_0x1a0;
-        if (model->field_0x140)
-            model->field_0x140->GetPositionIn(0, &position);
+        if (model->firstChild)
+            model->firstChild->GetPositionIn(0, &position);
         else
             model->GetPositionIn(0, &position);
         return position;
@@ -162,9 +162,9 @@ Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
 
 // 0x0052bfa0: preset; distance 17 in vehicle mode, else 60.
 void VehicleCamera::UnknownVirtualSlot67() {
-    field_0x22c = 0.75f;
-    field_0x234 = 3.1415927f;
-    field_0x220 = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
+    followPitch = 0.75f;
+    followYaw = 3.1415927f;
+    followDistance = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
     field_0x258 = 85.0f;
 }
 
@@ -254,8 +254,8 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
         Vector3 other;
         if (field_0x384) {
             UnknownVehiclePart* model = field_0x384->field_0x1a0;
-            if (model->field_0x140)
-                model->field_0x140->GetAxes(&heading, &other);
+            if (model->firstChild)
+                model->firstChild->GetAxes(&heading, &other);
             else
                 model->GetAxes(&heading, &other);
         } else if (field_0x388) {

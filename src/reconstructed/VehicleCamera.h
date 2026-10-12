@@ -7,7 +7,7 @@
 class UnknownVehiclePart {
 public:
     unsigned char field_0x000[0x140];
-    UnknownVehiclePart* field_0x140;     // 0x0052bb60 prefers it when set
+    UnknownVehiclePart* firstChild;           // +0x140 0x0052bb60 prefers it when set
 
     // 0x004fc9a0: writes a position for `index` into *position.
     void GetPositionIn(int index, Vector3* position);
