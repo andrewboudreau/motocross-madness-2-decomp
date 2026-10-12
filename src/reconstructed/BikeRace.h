@@ -197,7 +197,7 @@ public:
     // 0x0051dce0: the chat line's input; nonzero when it took the event.
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void UnknownFunction51dd10();             // 0x0051dd10
-    void UnknownFunction51dd40();             // 0x0051dd40: closes the chat line
+    void HideInputLine();             // 0x0051dd40: closes the chat line
     void UnknownFunction51dd70(char* name, unsigned int* text, int flag); // 0x0051dd70
 
     unsigned char field_0x000[0x3dc];

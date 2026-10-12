@@ -117,7 +117,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
         block->UnknownFunction4b7b30("ObjectName", objectName, -1);
         MorphBastardNode* node = model->UnknownFunction4fdae0(objectName);
         morphObjects[i].node = node;
-        node->UnknownFunction4fca80(0, &morphObjects[i].inverseRestMatrix);
+        node->GetMatrixIn(0, &morphObjects[i].inverseRestMatrix);
         MorphBastardInvertRigid(morphObjects[i].inverseRestMatrix);
         block->UnknownFunction4b7f10("NumberOfTargets", 0, &targetCount);
         morphObjects[i].channelCount = 0;
@@ -169,7 +169,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
                     channel->targetNumbers[0] = -1;
                     channel->targetNumbers[1] = j;
                     channel->field_0x5c = -1;
-                    controller->UnknownFunction4fca80(0, &channel->inverseRestMatrix);
+                    controller->GetMatrixIn(0, &channel->inverseRestMatrix);
                     MorphBastardInvertRigidInPlace(&channel->inverseRestMatrix);
                     morphObjects[i].channelCount++;
                 }
@@ -387,7 +387,7 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
     Matrix4 controller;
-    channel->controller->UnknownFunction4fca80(0, &controller);
+    channel->controller->GetMatrixIn(0, &controller);
     Matrix4 world = controller;
     controller(0, 0) = world(0, 0) * inverse(0, 0) + world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) +
                        world(0, 3) * inverse(3, 0);

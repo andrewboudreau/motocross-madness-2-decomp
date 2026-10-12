@@ -48,8 +48,8 @@ public:
     // local<->world direction maps and the two-axis orientation setter.
     void UnknownFunction4fc9a0(CarProceduralNode* frame, Vector3* position);   // 0x004fc9a0 (ret 8)
     void UnknownFunction4fc740(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
-    Vector3 UnknownFunction4fd710(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
-    Vector3 UnknownFunction4fd5c0(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
+    Vector3 WorldToLocalDirection(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
+    Vector3 LocalToWorldDirection(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
     void UnknownFunction4fbd70(const Vector3* axisA, const Vector3* axisB, int frame, int flag); // 0x004fbd70 (ret 0x10)
 
     int field_0x04;
@@ -107,10 +107,10 @@ public:
     void UnknownFunction432800(CarProceduralModel* model, const char* path); // 0x00432800
     void UnknownFunction435fe0();                                    // 0x00435fe0
     void AddIgnoredOwner(CarProceduralCollision* other);       // 0x00439410
-    void UnknownFunction432ab0(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape
-    void UnknownFunction435830(const Matrix4* transform);            // 0x00435830 (ret 4): sets the transform
-    void UnknownFunction435fb0();                                    // 0x00435fb0: placement update
-    int UnknownFunction438e70();                                     // 0x00438e70: runs the collision query
+    void SetMeshShape(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape
+    void SetTransform(const Matrix4* transform);            // 0x00435830 (ret 4): sets the transform
+    void UpdatePlacement();                                    // 0x00435fb0: placement update
+    int QueryCollisions();                                     // 0x00438e70: runs the collision query
 
     unsigned char field_0x40[0x54 - 0x40];   // the GraphicsTest base ends at +0x40
     CarProceduralBody* field_0x54;

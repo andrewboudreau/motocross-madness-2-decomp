@@ -42,7 +42,7 @@
   "?UnknownFunction4b8010@UnknownParameterBlock@@QAEHPAD@Z": "0x004b8010",
   "?UnknownFunction4b8180@UnknownParameterBlock@@QAEHHPAH@Z": "0x004b8180",
   "?UnknownFunction4b81c0@UnknownParameterBlock@@QAEHHPAM@Z": "0x004b81c0",
-  "?UnknownFunction4fca80@MorphBastardNode@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
+  "?GetMatrixIn@MorphBastardNode@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
   "?UnknownFunction4fdae0@MorphBastardNode@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?UnknownFunction515600@@YA?AUVector3@@PBU1@0@Z": "0x00515600",
   "?UnknownVirtualSlot27@MorphBastardModifier@@UAEXPAVD3DIMSoultreeObject@@PAUUnknownSoultreeMesh@@PAPAU3@@Z": "0x004a4c60",

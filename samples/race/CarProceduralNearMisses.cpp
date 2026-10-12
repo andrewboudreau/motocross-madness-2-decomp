@@ -241,7 +241,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         box[0].y += field_0x188;
         box[1] = kVec3Zero;
         box[1].y -= field_0x188;
-        field_0x38->UnknownFunction432ab0(1, box);
+        field_0x38->SetMeshShape(1, box);
         for (unsigned int i = 0; i < field_0x60; i++) {
             Vector3 position;
             field_0x210[i]->GetPosition(&position);
@@ -266,7 +266,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     forward.y = 0.0f;
     field_0x40 = forward * field_0x1a8;
     field_0x4c = CarLength(field_0x40);
-    Vector3 local = field_0x34->UnknownFunction4fd710(forward);
+    Vector3 local = field_0x34->WorldToLocalDirection(forward);
     if (field_0x60 > 0)
         field_0x18c = (float)fmod(field_0x184 * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
     float behind = FindOffsetAtDistance(t, -1.0f);
@@ -279,7 +279,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     if (field_0x50 && field_0x60 > 0) {
         float wheelbase = FindOffsetAtDistance(t, -field_0x198);
         Vector3 side = PositionAtTime(t - wheelbase) - field_0x1c4;
-        Vector3 steer = field_0x34->UnknownFunction4fd710(side);
+        Vector3 steer = field_0x34->WorldToLocalDirection(side);
         field_0x190 = (float)atan2(steer.x, steer.z);
         field_0x190 = CarClamp(field_0x190, -0.52359873f, 0.52359873f);
     }
@@ -291,8 +291,8 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     // The sensor collider's frame: the world axes orthonormalised.
     Matrix4 transform;
     CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
-    field_0x38->UnknownFunction435830(&transform);
-    field_0x38->UnknownFunction438e70();
+    field_0x38->SetTransform(&transform);
+    field_0x38->QueryCollisions();
     if (field_0x38->field_0x58) {
         CarProceduralContact* contact = field_0x38->field_0x5c;
         Vector3 lifted = kVec3YAxis * ((1.0f - contact->field_0x00.x) * field_0x188 * 2.0f - field_0x188) + position;
@@ -308,7 +308,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     Vector3 flat = field_0x1f4 - field_0x200 * CarDot(field_0x1f4, field_0x200);
     field_0x34->UnknownFunction4fbd70(&flat, &field_0x200, 0, 1);
     Vector3 target(field_0x1d0.x + field_0x1c4.x, ground.y, field_0x1d0.z + field_0x1c4.z);
-    Vector3 offset = field_0x34->UnknownFunction4fd5c0(field_0x1dc);
+    Vector3 offset = field_0x34->LocalToWorldDirection(field_0x1dc);
     Vector3 placement = target - offset;
     field_0x34->UnknownFunction4fc740(0, &placement);
     for (unsigned int i = 0; i < field_0x60; i++) {
@@ -326,8 +326,8 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         }
         field_0x210[i]->UnknownFunction4fbd70(&axisA, &axisB, 0, 1);
     }
-    field_0x3c->UnknownFunction435fb0();
-    if (field_0x3c->UnknownFunction438e70()) {
+    field_0x3c->UpdatePlacement();
+    if (field_0x3c->QueryCollisions()) {
         CarProceduralContact* contact = field_0x3c->field_0x5c;
         field_0x214 = contact->field_0x18;
         field_0x220 = contact->field_0x0c;

@@ -289,7 +289,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         RebuildPoseSteps();
         linearStep = linearStep * (1.0f / frameTime);
         angularStep = angularStep * (1.0f / frameTime);
-        poseNode->UnknownFunction4fca80(0, &lastPose);
+        poseNode->GetMatrixIn(0, &lastPose);
     } else {
         if (pendingAnimation && !character->field_0x34) {
             character->UnknownFunction4a8b80(pendingAnimation, 0.5f);
@@ -349,7 +349,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                     rigidBody->UnknownVirtualSlot44();
                     rigidBody->velocity = linearStep;
                     rigidBody->prevVelocity = linearStep;
-                    rigidBody->angularVelocity = rigidBody->node->UnknownFunction4fd710(angularStep);
+                    rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(angularStep);
                 }
             }
             if (field_0x530 && !character->field_0x34) {
@@ -362,7 +362,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                 angularStep = angularStep * (1.0f / frameTime);
                 field_0x534 = 0;
             }
-            poseNode->UnknownFunction4fca80(0, &lastPose);
+            poseNode->GetMatrixIn(0, &lastPose);
             character->UnknownVirtualSlot7(frameTime, 0, 0);
         }
     }
@@ -371,12 +371,12 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         // the pose lastPose was taken, then re-orthonormalise its axes.
         UnknownWreckerMatrix pose;
         UnknownWreckerMatrix relative;
-        poseNode->UnknownFunction4fca80(0, &pose);
+        poseNode->GetMatrixIn(0, &pose);
         UnknownWreckerFrame* frame = &lastPose;
         Vector3 oldPosition = WreckerCopy(frame->position);
         WreckerInvertRigid(&pose);
         WreckerMatrixProduct(&relative, *(UnknownWreckerMatrix*)frame, pose);
-        character->skeleton->UnknownFunction4fca80(0, &pose);
+        character->skeleton->GetMatrixIn(0, &pose);
         WreckerMatrixProduct(&pose, relative, pose);
         WreckerOrthonormalize(&pose);
         character->skeleton->SetMatrixIn(0, &pose);
@@ -490,7 +490,7 @@ void Wrecker::UnknownFunction532310() {
     rigidBody->UnknownVirtualSlot44();
     rigidBody->velocity = linearStep;
     rigidBody->prevVelocity = linearStep;
-    rigidBody->angularVelocity = rigidBody->node->UnknownFunction4fd710(angularStep);
+    rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(angularStep);
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     hadContact = 0;
@@ -540,7 +540,7 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
 void Wrecker::RebuildPoseSteps() {
     UnknownWreckerFrame pose;
     linearStep = WreckerCopy(lastPose.position);
-    poseNode->UnknownFunction4fca80(0, &pose);
+    poseNode->GetMatrixIn(0, &pose);
     linearStep = pose.position - linearStep;
     Vector3 forward = WreckerCopy(lastPose.forward);
     const Vector3& target = pose.forward;

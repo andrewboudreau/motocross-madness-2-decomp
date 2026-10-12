@@ -57,8 +57,8 @@ inline void MorphBastardInvertRigid(Matrix4& m)
 // has the canonical view.
 class MorphBastardNode {
 public:
-    void UnknownFunction4fca60(Matrix4* out);                    // 0x004fca60: local matrix
-    void UnknownFunction4fca80(MorphBastardNode* frame, Matrix4* out); // 0x004fca80: matrix in frame
+    void GetLocalMatrix(Matrix4* out);                    // 0x004fca60: local matrix
+    void GetMatrixIn(MorphBastardNode* frame, Matrix4* out); // 0x004fca80: matrix in frame
     MorphBastardNode* UnknownFunction4fdae0(const char* name);   // 0x004fdae0: named descendant
 };
 

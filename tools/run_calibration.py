@@ -23684,7 +23684,7 @@ CASES = [
         'name': 'TrackOverlay.cpp 0x51dd40 ChatOverlay hides the input line',
         'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
         'source': 'src/reconstructed/TrackOverlay.cpp',
-        'symbol': '?UnknownFunction51dd40@ChatOverlay@@QAEXXZ',
+        'symbol': '?HideInputLine@ChatOverlay@@QAEXXZ',
         'target_va': '0x0051dd40',
         'target_size': 41,
     },

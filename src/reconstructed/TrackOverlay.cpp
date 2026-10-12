@@ -1422,7 +1422,7 @@ void ChatOverlay::UnknownFunction51dd10()
 }
 
 // 0x0051dd40
-void ChatOverlay::UnknownFunction51dd40()
+void ChatOverlay::HideInputLine()
 {
     inputShown = 0;
     if (leftPanel) {

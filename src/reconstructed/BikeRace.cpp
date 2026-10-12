@@ -594,7 +594,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         field_0x194 = 0;
                         if (chatOverlay != 0) {
                             chatOverlay->typing = 0;
-                            chatOverlay->UnknownFunction51dd40();
+                            chatOverlay->HideInputLine();
                         }
                         field_0x190 = false;
                     }

@@ -45,7 +45,10 @@ subtract `field_0x1c4` straight from the call result and keep the offset
 on the x87 stack, `fld t; fsub st(1)` ... `fstp st(0)`), spins the wheels
 (`fmod` by 2 pi), clamps the steering angle to +-30 degrees, queries the
 ground (`0x00507c10`), builds the sensor collider's transform with an
-inline helper taking the world axes by value (`0x00435830`; the first
+inline helper taking the world axes by value (`0x00435830`
+`SetTransform`, krusty2's CollisionObject name, as are `SetMeshShape`
+`0x00432ab0`, `UpdatePlacement` `0x00435fb0` and `QueryCollisions`
+`0x00438e70` in CarProcedural.h; the first
 cross product expanded, the rest through `0x00515600`/`0x005087b0`),
 blends the surface normal (the sensor contact's normal is at +0x08,
 retail's `add ecx, 8`), orients the body (`0x004fbd70`) with a target

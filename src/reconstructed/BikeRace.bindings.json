@@ -142,7 +142,7 @@
   "?UnknownFunction51b540@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
   "?HandleChatKey@UnknownBikeRaceOverlay19c@@QAEHHPAH@Z": "0x0051da30",
   "?UnknownFunction51dd10@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd10",
-  "?UnknownFunction51dd40@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd40",
+  "?HideInputLine@UnknownBikeRaceOverlay19c@@QAEXXZ": "0x0051dd40",
   "?UnknownFunction51dd70@UnknownBikeRaceOverlay19c@@QAEXPADPAIH@Z": "0x0051dd70",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
