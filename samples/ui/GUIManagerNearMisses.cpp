@@ -84,7 +84,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)d)) {
         dialog->field_0x144 = flags;
-        UnknownFunction485bd0(dialog, a, wait);
+        AttachDialog(dialog, a, wait);
         return dialog;
     }
     if (wait)

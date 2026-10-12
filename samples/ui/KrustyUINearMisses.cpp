@@ -99,7 +99,7 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     field_0x50 = 0;
     field_0x58 = 0;
     field_0x48 = 0;
-    UnknownFunction49a8b0();
+    LoadBikesAndRiders();
     LoadGarageTables();
     field_0x2c->field_0x34c =
         (g_TrackGame->mode.field_0xa24 ? (g_TrackGame->mode.field_0xa3c - 100) * 25 : -10000) -

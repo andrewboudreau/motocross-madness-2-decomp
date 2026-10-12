@@ -152,7 +152,7 @@ public:
     explicit GUICursor(int flags);            // 0x00485100
     virtual ~GUICursor();                     // 0x00485140 (deleting wrapper 0x00485120)
     virtual int UnknownVirtualSlot15();       // 0x00485170
-    void UnknownFunction485150(UnknownCursorAnimation* animation); // 0x00485150
+    void SetAnimation(UnknownCursorAnimation* animation); // 0x00485150
 
     UnknownCursorAnimation* field_0x5c;
 };
@@ -257,14 +257,14 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x004875a0
     virtual int UnknownVirtualSlot15();       // 0x00487620
 
-    void UnknownFunction4875c0(int force);    // 0x004875c0
+    void UpdateFocus(int force);              // 0x004875c0: applies the pending focus (+0x1d0) or hover (+0x1cc)
     GUIUser* UnknownFunction487650(void* target, GUIManager* gui); // 0x00487650
     void CreateToolTip(void* target, GUIManager* gui); // 0x00487680: new tool tip
-    void UnknownFunction487710();             // 0x00487710
+    void ReleaseToolTip();                    // 0x00487710: releases the tool tip
     int UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
     int UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
-    int UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl** previous);
-    int UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous);
+    int SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487800: +0x1d8
+    int MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487870: moves the focus
     void EnableImeInput(int enable);   // 0x00487990: input method editor on/off
     int UnknownFunction487bf0(UnknownGuiControl** previous);
     int AcceptDevice(GUIInputDevice* device); // 0x00487c30: accepts a device
@@ -272,12 +272,12 @@ public:
     void ForgetDevices();             // 0x00487d60: forgets every device
     void CreateCursor(const char* image, int visible); // 0x00487dd0: creates the cursor
     void UnknownFunction487fb0(UnknownCursorAnimation* animation);
-    void UnknownFunction488010(const char* image, int redraw);
+    void RecreateCursor(const char* image, int redraw); // 0x00488010: recreates the cursor
     void ReleaseCursor();             // 0x004880c0: releases the cursor
     int SetPointerDevice(GUIInputDevice* device); // 0x00488120: sets the pointer device
-    int UnknownFunction488160(InputDevice* device);
+    int UsesDevice(InputDevice* device);      // 0x00488160: pointer or accepted device (1 without a pointer)
     int UnknownFunction4881d0(UnknownControlEvent* event);
-    GUIInputDevice* UnknownFunction488240(InputDevice* device);
+    GUIInputDevice* FindDevice(InputDevice* device); // 0x00488240: its GUIInputDevice
     GUIInputDevice* UnknownFunction4882a0(UnknownControlEvent* event);
     GUIInputDevice* UnknownFunction488310(int index);
 
@@ -323,7 +323,7 @@ public:
     // 0x00485a70: shows `dialog`.
     UIDialog* ShowDialog(UIDialog* dialog, int a, int flags, int b,
                                             UIDialog* parent, int c, int d, int wait);
-    void UnknownFunction485bd0(UIDialog* dialog, int a, int wait);
+    void AttachDialog(UIDialog* dialog, int a, int wait); // 0x00485bd0: adds a shown dialog to its container
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
     void UnknownFunction485d70(const char* directory); // 0x00485d70

@@ -115,7 +115,7 @@ GUICursor::~GUICursor() {
 }
 
 // 0x00485150
-void GUICursor::UnknownFunction485150(UnknownCursorAnimation* animation) {
+void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
     field_0x5c = animation;
     if (!animation)
         field_0x38 = 0;
@@ -345,7 +345,7 @@ int GUIManager::UnknownVirtualSlot15() {
 }
 
 // 0x00485bd0
-void GUIManager::UnknownFunction485bd0(UIDialog* dialog, int a, int wait) {
+void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     int visible = dialog->field_0x25_bit0;
 
     dialog->UnknownFunction46ea60(0);
@@ -533,7 +533,7 @@ void GUIManager::UnknownFunction4865e0(const char* image, int redraw) {
 
     for (i = 0; i < userCount; i++) {
         if (users[i])
-            users[i]->UnknownFunction488010(image ? image : cursorImage, redraw);
+            users[i]->RecreateCursor(image ? image : cursorImage, redraw);
     }
 }
 
@@ -841,20 +841,20 @@ GUIUser::~GUIUser() {
 
 // 0x004875a0
 int GUIUser::UnknownVirtualSlot10(float frameTime) {
-    UnknownFunction4875c0(0);
+    UpdateFocus(0);
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
 // 0x004875c0
-void GUIUser::UnknownFunction4875c0(int force) {
+void GUIUser::UpdateFocus(int force) {
     if (field_0x1d0) {
-        UnknownFunction487870(field_0x1d0, 0);
+        MoveFocus(field_0x1d0, 0);
         field_0x1cc = 0;
         field_0x1d0 = 0;
         return;
     }
     if (field_0x1cc || force) {
-        UnknownFunction487800(field_0x1cc, 0);
+        SetHoverControl(field_0x1cc, 0);
         field_0x1cc = 0;
     }
 }
@@ -879,13 +879,13 @@ GUIUser* GUIUser::UnknownFunction487650(void* target, GUIManager* gui) {
 
 // 0x00487680
 void GUIUser::CreateToolTip(void* target, GUIManager* gui) {
-    UnknownFunction487710();
+    ReleaseToolTip();
     userToolTip = (ToolTip*)AppendChild(
         (new(__FILE__, 1639) ToolTip(1))->UnknownFunction486a10(target, gui), -1);
 }
 
 // 0x00487710
-void GUIUser::UnknownFunction487710() {
+void GUIUser::ReleaseToolTip() {
     if (userToolTip)
         userToolTip->Release();
     userToolTip = 0;
@@ -899,7 +899,7 @@ int GUIUser::UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl
         *previous = field_0x1cc;
     field_0x1cc = control;
     if (update)
-        UnknownFunction4875c0(1);
+        UpdateFocus(1);
     return 1;
 }
 
@@ -912,12 +912,12 @@ int GUIUser::UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl
     field_0x1cc = control;
     field_0x1d0 = control;
     if (update)
-        UnknownFunction4875c0(1);
+        UpdateFocus(1);
     return 1;
 }
 
 // 0x00487800
-int GUIUser::UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl** previous) {
+int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous) {
     int result = 1;
 
     if (control && control != field_0x1d8)
@@ -934,7 +934,7 @@ int GUIUser::UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl
 
 // 0x00487870: moves the focus to `control`; a digits-only edit box turns the
 // IME off.
-int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous) {
+int GUIUser::MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous) {
     int result = 1;
 
     if (control && control != field_0x1d8)
@@ -1115,11 +1115,11 @@ void GUIUser::UnknownFunction487fb0(UnknownCursorAnimation* animation) {
         animation->field_0x0c = current->field_0x0c;
         animation->field_0x20 = current->field_0x20;
     }
-    userCursor->UnknownFunction485150(animation);
+    userCursor->SetAnimation(animation);
 }
 
 // 0x00488010
-void GUIUser::UnknownFunction488010(const char* image, int redraw) {
+void GUIUser::RecreateCursor(const char* image, int redraw) {
     int visible;
     int defaultImage;
 
@@ -1132,7 +1132,7 @@ void GUIUser::UnknownFunction488010(const char* image, int redraw) {
     defaultImage = !image;
     CreateCursor(image ? image : cursorImage, visible);
     if (defaultImage && cursorAnimation && userCursor)
-        userCursor->UnknownFunction485150(cursorAnimation);
+        userCursor->SetAnimation(cursorAnimation);
     if (redraw)
         userGui->RedrawFrame();
 }
@@ -1149,7 +1149,7 @@ UIDlgContainer::~UIDlgContainer() {
 }
 
 // 0x00488160
-int GUIUser::UnknownFunction488160(InputDevice* device) {
+int GUIUser::UsesDevice(InputDevice* device) {
     GUIInputDevice* candidate;
     int i;
 
@@ -1166,16 +1166,16 @@ int GUIUser::UnknownFunction488160(InputDevice* device) {
 // 0x004881d0
 int GUIUser::UnknownFunction4881d0(UnknownControlEvent* event) {
     if (event->kind == 0)
-        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->keyboard);
+        return UsesDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
-        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->mouse);
+        return UsesDevice((InputDevice*)g_TrackGame->controlInterface->mouse);
     if (event->kind == 2 || event->kind == 3)
-        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
+        return UsesDevice((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
     return 0;
 }
 
 // 0x00488240
-GUIInputDevice* GUIUser::UnknownFunction488240(InputDevice* device) {
+GUIInputDevice* GUIUser::FindDevice(InputDevice* device) {
     GUIInputDevice* candidate;
     int i;
 
@@ -1192,11 +1192,11 @@ GUIInputDevice* GUIUser::UnknownFunction488240(InputDevice* device) {
 // 0x004882a0
 GUIInputDevice* GUIUser::UnknownFunction4882a0(UnknownControlEvent* event) {
     if (event->kind == 0)
-        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->keyboard);
+        return FindDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
-        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->mouse);
+        return FindDevice((InputDevice*)g_TrackGame->controlInterface->mouse);
     if (event->kind == 2 || event->kind == 3)
-        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
+        return FindDevice((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
     return 0;
 }
 
