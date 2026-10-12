@@ -28,7 +28,12 @@ hidden result, and a `Vector3(x, y, z)` temporary goes through the x87.
 
 RTTI `.?AVMediaControl@@` (vtable `0x005551c0`), a GameObject that plays a
 movie through DirectShow multimedia streams; see `MediaControl.h` for the
-GUIDs and interface slots.
+GUIDs and interface slots. The COM methods carry their mmstream.h/amstream.h
+names (interface identity from the IIDs passed, method from the slot index).
+Member names are ours: `IsDirectShowInstalled` (`0x004a23d0`), `BlitFrame`
+(`0x004a2a90`), and fields such as `multiMediaStream` (+0x50),
+`videoStream` (+0x5c), `videoDrawStream` (+0x60), `videoSample` (+0x64),
+`pausedTime` (+0x68) and `doneCallback`/`doneOwner` (+0x70/+0x74).
 
 - `0x004a2900` `Restart` (50 bytes) matches with a `do { ... break; ... }
   while (0)` body. That form places the shared `return 0` before `return 1`
@@ -37,7 +42,7 @@ GUIDs and interface slots.
 - Near miss: `0x004a2560` (open, 646 bytes) in
   `samples/gameui/MediaControlNearMisses.cpp`. Every call, argument and
   branch target matches. Retail allocates one more callee-saved register
-  (a zero in `ebx`, `&field_0x60` in `ebp`), which shifts every frame
+  (a zero in `ebx`, `&videoDrawStream` in `ebp`), which shifts every frame
   offset by four.
 
 ## Reproduce

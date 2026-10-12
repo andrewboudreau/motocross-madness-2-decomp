@@ -10,6 +10,7 @@
 #include "FollowCamera.h"
 #include "Net.h"
 #include "TrackGame.h"
+#include "MenuId.h"
 
 // The 0x14-byte message 0x89 that a network player sends when it leaves
 // (EventManager slot 24 marks the sender done).
@@ -28,7 +29,7 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
                 if (view && !view->field_0x38->field_0x7a4) {
                     view->UnknownFunction420650(1, 0, 0);
-                    g_TrackGame->SetMenuOpen(0, 0x191, 1);
+                    g_TrackGame->SetMenuOpen(0, kMenuExit, 1);
                 }
             }
         } else if (!_stricmp("ButLeft", event->controlName)) {
@@ -251,7 +252,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
             g_TrackGame->eventManager->UnknownFunction45cdc0(2);
-            g_TrackGame->eventManager->UnknownFunction45e710(100);
+            g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
             guiManager->ShowCursors(1);
             field_0x7f58 = 1;
             break;

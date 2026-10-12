@@ -134,7 +134,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
 
     openedDialog = 0;
     ownsSoundGroup = 0;
-    field_0xd4 = 0;
+    setupCallback = 0;
     guiTextures = 0;
     ownsBackground = 0;
     screenGrab = 0;
@@ -143,14 +143,14 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     field_0xec = 1;
     dialogDirectory[0] = 0;
     waitFrames = 0;
-    field_0x38 = 0;
+    setupPalette = 0;
     guiPalette = 0;
     guiSoundGroup = 0;
     guiBackground = 0;
     toolTipFont = 0;
     languageModule = 0;
     windowClipper = 0;
-    field_0x1f0 = 0;
+    paletteChanged = 0;
     field_0x1f8 = 0;
     redrawBackground = 0;
     field_0x304 = 0;
@@ -197,7 +197,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         ownsSoundGroup = 1;
     }
     dialogContainer = (GameObject*)AppendChild(new(__FILE__, 136) UIDlgContainer, -1);
-    field_0x38 = palette;
+    setupPalette = palette;
     guiPalette = palette;
     guiBackground = background;
     strcpy(dialogFontName, font);
@@ -205,7 +205,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     if (cursor)
         strcpy(cursorImage, cursor);
     UnknownVirtualSlot18();
-    field_0xd4 = callback;
+    setupCallback = callback;
     toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
     controls = g_TrackGame->controlInterface;
     if (controls->mouse) {
@@ -283,8 +283,8 @@ int GUIManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEnt
 int GUIManager::UnknownVirtualSlot10(float frameTime) {
     int previous = g_MemTagStack->Push("UI");
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x1f0) {
-        field_0x1f0 = 0;
+    if (paletteChanged) {
+        paletteChanged = 0;
         UnknownFunction464e90();
     }
     g_MemTagStack->Pop(previous);
@@ -358,8 +358,8 @@ void GUIManager::UnknownFunction485bd0(UIDialog* dialog, int a, int wait) {
     if (guiBackground)
         guiBackground->UnknownFunction404da0();
     if (wait)
-        UnknownFunction4865e0(cursorImage, field_0x1f0 == 0);
-    if (field_0x1f0)
+        UnknownFunction4865e0(cursorImage, paletteChanged == 0);
+    if (paletteChanged)
         waitFrames = 3;
     dialog->UnknownFunction46ea60(visible);
 }
@@ -485,7 +485,7 @@ void GUIManager::ReleaseBackgroundGrab() {
 
 // 0x00486150
 void GUIManager::UnknownFunction486150(Palette8* palette) {
-    field_0x1f0 = 1;
+    paletteChanged = 1;
     guiPalette = palette;
 }
 

@@ -89,7 +89,7 @@ int UIControl::UnknownVirtualSlot34() {
 
 // 0x004703d0
 int UIControl::UnknownVirtualSlot35() {
-    return field_0xd0;
+    return controlTextLength;
 }
 
 // 0x004703e0
@@ -109,12 +109,12 @@ void UIControl::UnknownVirtualSlot52(int id) {
 
 // 0x00470410
 int UIControl::UnknownVirtualSlot61() {
-    return field_0x2c[2] - field_0x2c[0];
+    return screenArea[2] - screenArea[0];
 }
 
 // 0x00470420
 int UIControl::UnknownVirtualSlot62() {
-    return field_0x2c[3] - field_0x2c[1];
+    return screenArea[3] - screenArea[1];
 }
 
 // 0x00470640
@@ -148,7 +148,7 @@ void UIControl::SetAnchor(UIControl* next, int a) {
 }
 
 // 0x00470850
-UIControl* UIControl::UnknownFunction470850(UIControl* none) {
+UIControl* UIControl::FindLastAnchor(UIControl* none) {
     UIControl* control = anchorControl;
     if (control) {
         UIControl* last;
@@ -218,37 +218,37 @@ char* UIControl::GetName() {
 // the visible part (+0x4c) to the render target.
 void UIControl::UnknownVirtualSlot39() {
     UIDialog* owner = ownerDialog;
-    int left = field_0x3c[0];
-    field_0x2c[0] = (int)(left * owner->scaleX);
-    int top = field_0x3c[1];
-    field_0x2c[1] = (int)(top * owner->scaleY);
-    int right = field_0x3c[2];
-    field_0x2c[2] = (int)(right * owner->scaleX);
-    int bottom = field_0x3c[3];
-    field_0x2c[3] = (int)(bottom * owner->scaleY);
+    int left = bounds[0];
+    screenArea[0] = (int)(left * owner->scaleX);
+    int top = bounds[1];
+    screenArea[1] = (int)(top * owner->scaleY);
+    int right = bounds[2];
+    screenArea[2] = (int)(right * owner->scaleX);
+    int bottom = bounds[3];
+    screenArea[3] = (int)(bottom * owner->scaleY);
     if (anchorControl && relAnchor) {
-        field_0x2c[1] += anchorControl->field_0x2c[1];
-        field_0x2c[3] += anchorControl->field_0x2c[1];
-        field_0x2c[0] += anchorControl->field_0x2c[0];
-        field_0x2c[2] += anchorControl->field_0x2c[0];
+        screenArea[1] += anchorControl->screenArea[1];
+        screenArea[3] += anchorControl->screenArea[1];
+        screenArea[0] += anchorControl->screenArea[0];
+        screenArea[2] += anchorControl->screenArea[0];
     } else {
-        field_0x2c[1] += owner->screenArea.top;
-        field_0x2c[3] += owner->screenArea.top;
-        field_0x2c[0] += owner->screenArea.left;
-        field_0x2c[2] += owner->screenArea.left;
+        screenArea[1] += owner->screenArea.top;
+        screenArea[3] += owner->screenArea.top;
+        screenArea[0] += owner->screenArea.left;
+        screenArea[2] += owner->screenArea.left;
     }
-    field_0x4c[0] = -field_0x2c[0] < 0 ? 0 : -field_0x2c[0];
-    field_0x4c[1] = -field_0x2c[1] < 0 ? 0 : -field_0x2c[1];
+    visibleArea[0] = -screenArea[0] < 0 ? 0 : -screenArea[0];
+    visibleArea[1] = -screenArea[1] < 0 ? 0 : -screenArea[1];
     int width = right - left;
     int height = bottom - top;
-    int over = field_0x2c[2] - g_TrackGame->renderTarget->field_0x0c;
-    int under = field_0x2c[3] - g_TrackGame->renderTarget->field_0x10;
+    int over = screenArea[2] - g_TrackGame->renderTarget->field_0x0c;
+    int under = screenArea[3] - g_TrackGame->renderTarget->field_0x10;
     if (over > 0)
         width -= over;
-    field_0x4c[2] = width;
+    visibleArea[2] = width;
     if (under > 0)
         height -= under;
-    field_0x4c[3] = height;
+    visibleArea[3] = height;
 }
 
 // 0x00471fa0
@@ -347,7 +347,7 @@ UIButton::~UIButton() {
 }
 
 // 0x004732d0
-void UIButton::UnknownFunction4732d0(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled) {
+void UIButton::SetStateImages(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled) {
     stateImages[0] = up;
     stateImages[1] = over;
     stateImages[2] = down;
@@ -383,7 +383,7 @@ void UIButton::SetDisabledImage(UIAnim* image) {
 
 // 0x00473390
 void UIButton::SetSortList(UIListBox* list) {
-    field_0x1ec = list;
+    sortList = list;
 }
 
 // ---------------------------------------------------------------------------
@@ -415,13 +415,13 @@ int UIStatic::UnknownVirtualSlot30() {
 
 // 0x00470990
 int UIControl::UnknownVirtualSlot28(POINT point, int state) {
-    RECT rect = *(RECT*)field_0x2c;
+    RECT rect = *(RECT*)screenArea;
     return PtInRect(&rect, point);
 }
 
 // 0x004709f0
 int UIControl::UnknownVirtualSlot51(POINT point) {
-    RECT rect = *(RECT*)field_0x2c;
+    RECT rect = *(RECT*)screenArea;
     if (!shapeBounds) {
         if (PtInRect(&rect, point))
             return 1;
@@ -435,7 +435,7 @@ int UIControl::UnknownVirtualSlot51(POINT point) {
 void UIControl::UnknownVirtualSlot27() {
     if (stateImages[currentState])
         stateImages[currentState]->Advance();
-    if (field_0x68 == 1 || field_0x68 == 2) {
+    if (transitionState == 1 || transitionState == 2) {
         if (fxAnimIn)
             fxAnimIn->Advance();
         if (fxAnimOut)
@@ -445,8 +445,8 @@ void UIControl::UnknownVirtualSlot27() {
 
 // 0x004710c0
 void UIControl::UnknownVirtualSlot38() {
-    UIControl* last = UnknownFunction470850(0);
-    if (!field_0x70 || (last && (!last->field_0x70 || last->field_0x68))) {
+    UIControl* last = FindLastAnchor(0);
+    if (!shown || (last && (!last->shown || last->transitionState))) {
         if (--redrawFrames < 0) {
             redrawFrames = 0;
             needsRedraw = 1;
@@ -467,9 +467,9 @@ void UIControl::UnknownVirtualSlot38() {
 // 0x00471140
 int UIControl::UnknownVirtualSlot13() {
     int result = GameObject::UnknownVirtualSlot13();
-    UIControl* last = UnknownFunction470850(0);
-    if ((!last || (last->field_0x70 && !last->field_0x68)) && !post3D) {
-        if (field_0x70)
+    UIControl* last = FindLastAnchor(0);
+    if ((!last || (last->shown && !last->transitionState)) && !post3D) {
+        if (shown)
             return UnknownVirtualSlot40();
         needsRedraw = 1;
     }
@@ -493,10 +493,10 @@ void UIControl::UnknownVirtualSlot57(int a, int* position) {
         int width = UnknownVirtualSlot61();
         int height = UnknownVirtualSlot62();
         UIDialog* owner = ownerDialog;
-        field_0x3c[0] = position[0] - owner->screenArea.left;
-        field_0x3c[2] = field_0x3c[0] + width;
-        field_0x3c[1] = position[1] - owner->screenArea.top;
-        field_0x3c[3] = field_0x3c[1] + height;
+        bounds[0] = position[0] - owner->screenArea.left;
+        bounds[2] = bounds[0] + width;
+        bounds[1] = position[1] - owner->screenArea.top;
+        bounds[3] = bounds[1] + height;
     }
 }
 
@@ -537,12 +537,12 @@ int UIControl::UnknownVirtualSlot53() {
 }
 
 // 0x00472730
-void UIControl::UnknownFunction472730(GameObjectIterator* iterator) {
+void UIControl::DeleteControlIterator(GameObjectIterator* iterator) {
     delete iterator;
 }
 
 // 0x00472750
-UIControl* UIControl::UnknownFunction472750(GameObjectIterator* iterator) {
+UIControl* UIControl::NextAttachedControl(GameObjectIterator* iterator) {
     if (!attachId)
         return 0;
     UIControl* control;
@@ -553,10 +553,10 @@ UIControl* UIControl::UnknownFunction472750(GameObjectIterator* iterator) {
 }
 
 // 0x00472790
-UIControl* UIControl::UnknownFunction472790(GameObjectIterator* iterator) {
-    UIControl* control = UnknownFunction472750(iterator);
+UIControl* UIControl::NextAttachedControlOfType(GameObjectIterator* iterator) {
+    UIControl* control = NextAttachedControl(iterator);
     while (control && control->controlType != controlType)
-        control = UnknownFunction472750(iterator);
+        control = NextAttachedControl(iterator);
     return control;
 }
 
@@ -590,8 +590,8 @@ void UIControl::UnknownVirtualSlot64(CameraRect* in, CameraRect* out) {
 // 0x004731f0
 UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
     : UIControl(1, id, area, owner) {
-    field_0x1ec = 0;
-    UnknownFunction4732d0(0, 0, 0, 0);
+    sortList = 0;
+    SetStateImages(0, 0, 0, 0);
     SetSound(0, 0);
     SetSound(1, 0);
     SetSound(2, 0);
@@ -604,8 +604,8 @@ int UIButton::UnknownVirtualSlot56(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
         UnknownDialogEvent event;
         event.handled = a;
-        if (field_0x1ec)
-            field_0x1ec->Sort(1);
+        if (sortList)
+            sortList->Sort(1);
         event.kind = kDialogCommand;
         event.code = eventCode;
         event.controlName = GetName();
@@ -642,7 +642,7 @@ UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a,
     field_0x208 = b;
     field_0x200 = 0;
     textLength = 0;
-    field_0xd0 = 0;
+    controlTextLength = 0;
     textWidth = 0;
     acceptedCharacters = 0;
     backgroundBrush = 0;
@@ -686,19 +686,19 @@ void UIEditBox::UnknownVirtualSlot59(int value) {
 }
 
 // 0x00473d80
-void UIEditBox::UnknownFunction473d80(int value) {
+void UIEditBox::SetClickSound(int value) {
     field_0x204 = value;
 }
 
 // 0x00473d90
-void UIEditBox::UnknownFunction473d90(int value) {
+void UIEditBox::SetFullSound(int value) {
     field_0x208 = value;
 }
 
 // 0x00473ef0
 char* UIEditBox::GetEditText(char* buffer, int size) {
-    if (field_0xd0 + 1 < size)
-        size = field_0xd0 + 1;
+    if (controlTextLength + 1 < size)
+        size = controlTextLength + 1;
     strncpy(buffer, controlText, size);
     buffer[size - 1] = 0;
     return buffer;
@@ -759,7 +759,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
         UIControl* control;
         if (controlType == 9) {
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+            for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3) {
                     ((UIListBox*)control)->lastClickTime = 0;
                     ((UIListBox*)control)->ScrollBy(-1);
@@ -769,7 +769,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
                     ((UIDropDownList*)control)->listPart->ScrollBy(-1);
                 }
             }
-            UnknownFunction472730(iterator);
+            DeleteControlIterator(iterator);
             event.code = eventCode;
             event.kind = 0xe;
             event.controlName = controlName;
@@ -780,7 +780,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         } else {
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+            for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3) {
                     ((UIListBox*)control)->lastClickTime = 0;
                     ((UIListBox*)control)->ScrollBy(1);
@@ -790,7 +790,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
                     ((UIDropDownList*)control)->listPart->ScrollBy(1);
                 }
             }
-            UnknownFunction472730(iterator);
+            DeleteControlIterator(iterator);
             event.code = eventCode;
             event.kind = 0xe;
             event.controlName = controlName;
@@ -822,11 +822,11 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
         switch (controlType) {
         case 9:
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+            for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3)
                     ((UIListBox*)control)->ScrollBy(-1);
             }
-            UnknownFunction472730(iterator);
+            DeleteControlIterator(iterator);
             event.kind = 0xe;
             event.code = eventCode;
             event.controlName = GetName();
@@ -837,11 +837,11 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
             break;
         case 10:
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+            for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3)
                     ((UIListBox*)control)->ScrollBy(1);
             }
-            UnknownFunction472730(iterator);
+            DeleteControlIterator(iterator);
             event.kind = 0xe;
             event.code = eventCode;
             event.controlName = GetName();
@@ -889,9 +889,9 @@ UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner)
     dragY = 0;
     dragX = 0;
     field_0x218 = 0;
-    field_0x21c = 0;
+    reversed = 0;
     scrollRange = 100;
-    field_0x214 = 0.2f;
+    holdDelay = 0.2f;
 }
 
 // 0x00474c50
@@ -909,7 +909,7 @@ void UIScrollBar::UnknownVirtualSlot59(int value) {
 }
 
 // 0x00475160
-void UIScrollBar::UnknownFunction475160(int state) {
+void UIScrollBar::SetThumbSizeFromState(int state) {
     UIDialog* owner = ownerDialog;
     thumbWidth = (int)(stateImages[state]->frameList[0]->frameWidth * owner->scaleX);
     thumbHeight = (int)(stateImages[state]->frameList[0]->frameHeight * owner->scaleY);
@@ -983,7 +983,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void
         field_0x20 = (int)textures;
         UnknownResourceEntry* entry =
             ((UnknownResourceManager*)id)->UnknownFunction4e9360((const char*)module, 1);
-        if (!UnknownFunction472bc0(entry->field_0x14, entry->field_0x18, palette) && a) {
+        if (!LoadFromStream(entry->field_0x14, entry->field_0x18, palette) && a) {
             UnknownFunction4bb890((SoundGroup*)a, (const char*)module, 1, 3, c, -1);
             ownsSound = 1;
             isSound = 1;
@@ -1064,10 +1064,10 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     lastPageRowCount = 0;
     selectColor = 0xffffff;
     rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
-    field_0x24c = UnknownFunction477b60;
+    sortCompare = UnknownFunction477b60;
     field_0x218 = (int)this;
     autoSort = 0;
-    field_0x220 = 0;
+    sorting = 0;
     selectable = 1;
     allowWScroll = 1;
     field_0x234 = 0;
@@ -1079,11 +1079,11 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     firstVisibleRow = 0;
     lastPageRowCount = 0;
     memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
-    field_0x244 = 1;
+    wrapScroll = 1;
     if (!(fontHeight || (ownerDialog && ownerDialog->dialogFontHeight))) {
         visibleRowCount = 1;
     } else {
-        int rowsShown = (field_0x2c[3] - field_0x2c[1]) / (fontHeight ? fontHeight : ownerDialog->dialogFontHeight);
+        int rowsShown = (screenArea[3] - screenArea[1]) / (fontHeight ? fontHeight : ownerDialog->dialogFontHeight);
         visibleRowCount = rowsShown < 1 ? 1 : rowsShown;
     }
 }
@@ -1190,7 +1190,7 @@ char* UIListBox::GetRowText(int row) {
 
 // 0x004777f0
 void UIListBox::SetSortCompare(int (*compare)(const void* a, const void* b)) {
-    field_0x24c = compare;
+    sortCompare = compare;
 }
 
 // 0x00477b60
@@ -1228,7 +1228,7 @@ void UIListBox::UpdateScrollBars() {
     int height = 0;
     lastPageRowCount = 0;
     for (int i = rowCount - 1; i >= 0; i--) {
-        if (height + rowTable[i].height > field_0x2c[3] - field_0x2c[1])
+        if (height + rowTable[i].height > screenArea[3] - screenArea[1])
             break;
         height += rowTable[i].height;
         lastPageRowCount++;
@@ -1238,7 +1238,7 @@ void UIListBox::UpdateScrollBars() {
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->attachId == attachId && (control->controlType == 8 || control->controlType == 7))
-            static_cast<UIScrollBar*>(control)->UnknownFunction475200(this);
+            static_cast<UIScrollBar*>(control)->FollowList(this);
     }
     UnknownVirtualSlot50();
 }
@@ -1332,8 +1332,8 @@ UIMultiState::~UIMultiState() {
 
 // 0x00478450
 void UIMultiState::UnknownVirtualSlot38() {
-    UIControl* last = UnknownFunction470850(0);
-    if (!field_0x70 || (last && (!last->field_0x70 || last->field_0x68))) {
+    UIControl* last = FindLastAnchor(0);
+    if (!shown || (last && (!last->shown || last->transitionState))) {
         if (--redrawFrames < 0) {
             redrawFrames = 0;
             needsRedraw = 1;
@@ -1438,10 +1438,10 @@ UIStaticText::~UIStaticText() {
 // 0x00479100
 void UIStaticText::UnknownVirtualSlot38() {
     int empty = 0;
-    if (!controlText || !field_0xd0)
+    if (!controlText || !controlTextLength)
         empty = 1;
-    UIControl* last = UnknownFunction470850(0);
-    if (!field_0x70 || empty || (last && (!last->field_0x70 || last->field_0x68))) {
+    UIControl* last = FindLastAnchor(0);
+    if (!shown || empty || (last && (!last->shown || last->transitionState))) {
         if (--redrawFrames < 0) {
             redrawFrames = 0;
             needsRedraw = 1;
@@ -1515,8 +1515,8 @@ UIDDLScrollBar::UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* own
 // 0x004796e0
 void UIDDLScrollBar::UnknownVirtualSlot33(int value) {
     UIControl::UnknownVirtualSlot33(value);
-    if (!ownerList->UnknownFunction47a800((UIControl*)value))
-        ownerList->UnknownFunction47a2d0(0);
+    if (!ownerList->IsPart((UIControl*)value))
+        ownerList->SetOpen(0);
 }
 
 // 0x00479b50
@@ -1528,8 +1528,8 @@ UIDDLStatic::UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 // 0x00479bc0
 void UIDDLStatic::UnknownVirtualSlot33(int value) {
     UIControl::UnknownVirtualSlot33(value);
-    if (!ownerList->UnknownFunction47a800((UIControl*)value))
-        ownerList->UnknownFunction47a2d0(0);
+    if (!ownerList->IsPart((UIControl*)value))
+        ownerList->SetOpen(0);
 }
 
 // 0x00479bf0
@@ -1542,15 +1542,15 @@ UIDDLButton::UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownLi
 int UIDDLButton::UnknownVirtualSlot55(int a, int b) {
     UIControl::UnknownVirtualSlot55(a, b);
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this)
-        ownerList->UnknownFunction47a2d0(1 - ownerList->isOpen);
+        ownerList->SetOpen(1 - ownerList->isOpen);
     return 0;
 }
 
 // 0x00479ce0
 void UIDDLButton::UnknownVirtualSlot33(int value) {
     UIControl::UnknownVirtualSlot33(value);
-    if (!ownerList->UnknownFunction47a800((UIControl*)value))
-        ownerList->UnknownFunction47a2d0(0);
+    if (!ownerList->IsPart((UIControl*)value))
+        ownerList->SetOpen(0);
 }
 
 // 0x00479d10
@@ -1572,8 +1572,8 @@ int UIDDLListBox::UnknownVirtualSlot65(int row) {
 // 0x00479e70
 void UIDDLListBox::UnknownVirtualSlot33(int value) {
     UIControl::UnknownVirtualSlot33(value);
-    if (!ownerList->UnknownFunction47a800((UIControl*)value))
-        ownerList->UnknownFunction47a2d0(0);
+    if (!ownerList->IsPart((UIControl*)value))
+        ownerList->SetOpen(0);
 }
 
 // ---------------------------------------------------------------------------
@@ -1608,7 +1608,7 @@ UIDropDownList::UIDropDownList(int id, CameraRect* area, UIDialog* owner, const 
     AppendChild(buttonPart, -1);
     AppendChild(staticPart2, -1);
     isOpen = 0;
-    UnknownFunction47a2d0(0);
+    SetOpen(0);
     owner->UnknownFunction46a840(buttonPart, 0, 0);
     owner->UnknownFunction46a840(listPart, 0, 0);
     owner->UnknownFunction46a840(scrollBarPart, 0, 0);
@@ -1641,12 +1641,12 @@ void UIDropDownList::UnknownVirtualSlot52(int id) {
 // 0x0047a7d0
 void UIDropDownList::UnknownVirtualSlot33(int value) {
     UIControl::UnknownVirtualSlot33(value);
-    if (!UnknownFunction47a800((UIControl*)value))
-        UnknownFunction47a2d0(0);
+    if (!IsPart((UIControl*)value))
+        SetOpen(0);
 }
 
 // 0x0047a800
-int UIDropDownList::UnknownFunction47a800(UIControl* control) {
+int UIDropDownList::IsPart(UIControl* control) {
     if (control == this || control == scrollBarPart || control == buttonPart ||
         control == listPart || control == staticPart0 || control == staticPart1 ||
         control == staticPart2)
@@ -1656,14 +1656,14 @@ int UIDropDownList::UnknownFunction47a800(UIControl* control) {
 
 // 0x0047a850
 int UIDropDownList::UnknownVirtualSlot61() {
-    if (!buttonPart->field_0x3c[0])
-        return field_0x3c[2] - field_0x3c[0];
-    return buttonPart->field_0x3c[2] - field_0x3c[0];
+    if (!buttonPart->bounds[0])
+        return bounds[2] - bounds[0];
+    return buttonPart->bounds[2] - bounds[0];
 }
 
 // 0x0047a870
 int UIDropDownList::UnknownVirtualSlot62() {
-    return listPart->field_0x3c[3] - field_0x3c[1];
+    return listPart->bounds[3] - bounds[1];
 }
 
 // 0x0047ad80
@@ -1679,7 +1679,7 @@ void UIDropDownList::UnknownVirtualSlot59(int value) {
 // 0x0047add0
 int UIDropDownList::UnknownVirtualSlot55(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
-        UnknownFunction47a2d0(isOpen == 0);
+        SetOpen(isOpen == 0);
         ownerDialog->guiUser->UnknownFunction487790((UnknownGuiControl*)this, 0, 0);
         return 1;
     }
@@ -2010,7 +2010,7 @@ int UIDialog::UnknownVirtualSlot13() {
             while ((control = (UIControl*)iterator.Next()) != 0) {
                 if (control->backgroundRegion >= 0 && (!control->needsRedraw || control->redrawFrames))
                     dialogBackground->UnknownFunction404240(control->backgroundRegion,
-                                                               (CameraRect*)&control->field_0x2c);
+                                                               (CameraRect*)&control->screenArea);
             }
         }
         GameObject::UnknownVirtualSlot13();
@@ -2183,17 +2183,17 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     controlType = type;
     eventCode = id;
     if (area) {
-        *(CameraRect*)field_0x2c = *area;
-        *(CameraRect*)field_0x3c = *area;
+        *(CameraRect*)screenArea = *area;
+        *(CameraRect*)bounds = *area;
     } else {
-        field_0x3c[0] = field_0x3c[1] = field_0x3c[2] = field_0x3c[3] = 0;
-        *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
+        bounds[0] = bounds[1] = bounds[2] = bounds[3] = 0;
+        *(CameraRect*)screenArea = *(CameraRect*)bounds;
     }
     savedState = 0;
     currentState = 0;
-    field_0x68 = 0;
+    transitionState = 0;
     enabled = 1;
-    field_0x70 = 1;
+    shown = 1;
     groupId = 0;
     attachId = 0;
     ownerDialog = owner;
@@ -2212,7 +2212,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     textDrop = 1;
     dropColor = 0;
     textAlign = 1;
-    field_0xd0 = 0;
+    controlTextLength = 0;
     textLines = 0;
     needsRedraw = 1;
     moveable = 0;
@@ -2242,8 +2242,8 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     textTopMargin = 0;
     textLeftMargin = 0;
     drawnTexture = 0;
-    field_0x1d0 = 0;
-    field_0xb4 = 0;
+    transitionStep = 0;
+    transitionType = 0;
     field_0x1d4 = -1;
     if (owner)
         post3D = owner->field_0x7f18;
@@ -2288,29 +2288,29 @@ UIControl::~UIControl() {
 
 // 0x00470660
 void UIControl::Show(int a, int b) {
-    if (field_0x1d0) {
+    if (transitionStep) {
         if (a) {
-            field_0x68 = 1;
-            if (field_0xb4 == 0x6a)
-                field_0x1d0 = &UIControl::UnknownVirtualSlot46;
+            transitionState = 1;
+            if (transitionType == 0x6a)
+                transitionStep = &UIControl::UnknownVirtualSlot46;
             drawnTexture = 0;
-            field_0x70 = a;
+            shown = a;
             return;
         }
-        if (field_0xb4 == 0x6a && b && ownerDialog->animatesControls) {
+        if (transitionType == 0x6a && b && ownerDialog->animatesControls) {
             drawnTexture = 0;
-            field_0x68 = 2;
-            field_0x1d0 = &UIControl::UnknownVirtualSlot47;
+            transitionState = 2;
+            transitionStep = &UIControl::UnknownVirtualSlot47;
             return;
         }
-        field_0x68 = 2;
-        field_0x70 = 0;
+        transitionState = 2;
+        shown = 0;
         UnknownVirtualSlot50();
         drawnTexture = 0;
         return;
     }
-    field_0x68 = 0;
-    field_0x70 = a;
+    transitionState = 0;
+    shown = a;
     UnknownVirtualSlot50();
 }
 
@@ -2328,30 +2328,30 @@ void UIControl::SetImageFile(int a, const char* image) {
 void UIControl::StartTransition(int type, int a, int b, int delay, int c) {
     if (b) {
         Show(1, 1);
-        field_0x68 = 1;
+        transitionState = 1;
     }
-    field_0xb4 = type;
+    transitionType = type;
     switch (type) {
     case 100:
-        field_0x1d0 = &UIControl::UnknownVirtualSlot41;
+        transitionStep = &UIControl::UnknownVirtualSlot41;
         break;
     case 101:
-        field_0x1d0 = &UIControl::UnknownVirtualSlot42;
+        transitionStep = &UIControl::UnknownVirtualSlot42;
         break;
     case 102:
-        field_0x1d0 = &UIControl::UnknownVirtualSlot43;
+        transitionStep = &UIControl::UnknownVirtualSlot43;
         break;
     case 103:
-        field_0x1d0 = &UIControl::UnknownVirtualSlot44;
+        transitionStep = &UIControl::UnknownVirtualSlot44;
         break;
     case 104:
-        field_0x1d0 = &UIControl::UnknownVirtualSlot45;
+        transitionStep = &UIControl::UnknownVirtualSlot45;
         break;
     case 106:
-        field_0x1d0 = &UIControl::UnknownVirtualSlot46;
+        transitionStep = &UIControl::UnknownVirtualSlot46;
         break;
     default:
-        field_0x1d0 = 0;
+        transitionStep = 0;
         break;
     }
     transitionTime = 0;
@@ -2397,14 +2397,14 @@ void UIControl::SetText(const char* text) {
             textLines = ownerDialog->SplitTextLines(controlText, textColor, (void*)fontHandle,
                                                     field_0x1c4, textExtent);
             if (!textLines) {
-                field_0xd0 = textExtent[0] = strlen(controlText);
+                controlTextLength = textExtent[0] = strlen(controlText);
                 HDC dc;
                 if (!g_TrackGame->PCTarget()->renderSurface->GetDC((void**)&dc)) {
                     HGDIOBJ font =
                         (HGDIOBJ)(fontHandle ? fontHandle : (ownerDialog ? (int)ownerDialog->dialogFont : 0));
                     HGDIOBJ old = SelectObject(dc, font);
                     SIZE size;
-                    GetTextExtentPoint32A(dc, controlText, field_0xd0, &size);
+                    GetTextExtentPoint32A(dc, controlText, controlTextLength, &size);
                     SelectObject(dc, old);
                     g_TrackGame->PCTarget()->renderSurface->ReleaseDC(dc);
                     textExtent[1] = size.cx;
@@ -2428,10 +2428,10 @@ void UIControl::SetText(const char* text) {
 int UIControl::UnknownVirtualSlot10(float frameTime) {
     UnknownVirtualSlot27();
     int draw = 1;
-    if (field_0x70) {
-        UIControl* last = UnknownFunction470850(0);
-        if (!last || (last->field_0x70 && !last->field_0x68))
-            draw = !UnknownFunction471500();
+    if (shown) {
+        UIControl* last = FindLastAnchor(0);
+        if (!last || (last->shown && !last->transitionState))
+            draw = !RunTransition();
     }
     if (draw) {
         drawnTexture = UnknownVirtualSlot48(-1);
@@ -2442,38 +2442,38 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
             UnknownVirtualSlot57(field_0x1d4, (int*)&position);
         }
     }
-    field_0x2c[0] = field_0x2c[0] < 0 ? 0 : field_0x2c[0];
-    field_0x2c[1] = field_0x2c[1] < 0 ? 0 : field_0x2c[1];
-    int right = field_0x2c[2];
-    field_0x2c[2] = g_TrackGame->renderTarget->field_0x0c < right ? g_TrackGame->renderTarget->field_0x0c : right;
-    int bottom = field_0x2c[3];
-    field_0x2c[3] = g_TrackGame->renderTarget->field_0x10 < bottom ? g_TrackGame->renderTarget->field_0x10 : bottom;
+    screenArea[0] = screenArea[0] < 0 ? 0 : screenArea[0];
+    screenArea[1] = screenArea[1] < 0 ? 0 : screenArea[1];
+    int right = screenArea[2];
+    screenArea[2] = g_TrackGame->renderTarget->field_0x0c < right ? g_TrackGame->renderTarget->field_0x0c : right;
+    int bottom = screenArea[3];
+    screenArea[3] = g_TrackGame->renderTarget->field_0x10 < bottom ? g_TrackGame->renderTarget->field_0x10 : bottom;
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
 // 0x004711a0
 int UIControl::UnknownVirtualSlot15() {
     int result = GameObject::UnknownVirtualSlot15();
-    UIControl* last = UnknownFunction470850(0);
-    if ((!last || (last->field_0x70 && !last->field_0x68)) && post3D) {
-        if (field_0x70)
+    UIControl* last = FindLastAnchor(0);
+    if ((!last || (last->shown && !last->transitionState)) && post3D) {
+        if (shown)
             result = UnknownVirtualSlot40();
         else
             needsRedraw = 1;
     }
     BackgroundImage* background = ownerDialog->dialogBackground;
     if (background && backgroundRegion > -1 &&
-        (!field_0x70 || (last && (!last->field_0x70 || last->field_0x68))))
+        (!shown || (last && (!last->shown || last->transitionState))))
         background->UnknownFunction404cb0(backgroundRegion);
     return result;
 }
 
 // 0x00471500
-int UIControl::UnknownFunction471500() {
+int UIControl::RunTransition() {
     int done = 1;
     UIDialog* owner = ownerDialog;
     int (UIControl::*step)();
-    if (owner->animatesControls && (step = field_0x1d0) != 0 && field_0x68 && controlType != 3 && controlType != 0xc) {
+    if (owner->animatesControls && (step = transitionStep) != 0 && transitionState && controlType != 3 && controlType != 0xc) {
         transitionTime += (int)(owner->lastFrameTime * 1000.0f);
         done = 0;
         if (transitionTime < transitionDelay)
@@ -2482,13 +2482,13 @@ int UIControl::UnknownFunction471500() {
         if (!done)
             goto end;
         field_0x164 = 0;
-        field_0x68 = 0;
-    } else if (field_0x68) {
-        field_0x68 = 0;
+        transitionState = 0;
+    } else if (transitionState) {
+        transitionState = 0;
         done = 1;
         UnknownVirtualSlot50();
     }
-    *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
+    *(CameraRect*)screenArea = *(CameraRect*)bounds;
 end:
     return !done;
 }
@@ -2580,8 +2580,8 @@ int UIControl::UnknownFunction472480(int* position) {
             return result;
     }
     if (UnknownVirtualSlot51(*(POINT*)position) && UnknownVirtualSlot30()) {
-        UIControl* last = UnknownFunction470850(0);
-        if (enabled && field_0x70 && (!last || (last->field_0x70 && !last->field_0x68))) {
+        UIControl* last = FindLastAnchor(0);
+        if (enabled && shown && (!last || (last->shown && !last->transitionState))) {
             GUIUser* user = ownerDialog->guiUser;
             UnknownGuiControl* hover = user->field_0x1d8;
             if (!user->field_0x3c[0] && !user->field_0x3c[1] && hover != (UnknownGuiControl*)this) {
@@ -2597,10 +2597,10 @@ int UIControl::UnknownFunction472480(int* position) {
 }
 
 // 0x004727c0
-UIControl* UIControl::UnknownFunction4727c0() {
+UIControl* UIControl::PreviousFocusableControl() {
     UIControl* control = this;
     while (control) {
-        if (control != this && control->enabled && control->field_0x70 && control->controlType != 5 &&
+        if (control != this && control->enabled && control->shown && control->controlType != 5 &&
             control->controlType != 0xc)
             return control;
         if (control->field_0x08) {
@@ -2616,10 +2616,10 @@ UIControl* UIControl::UnknownFunction4727c0() {
 }
 
 // 0x00472810
-UIControl* UIControl::UnknownFunction472810() {
+UIControl* UIControl::NextFocusableControl() {
     UIControl* control = this;
     while (control) {
-        if (control != this && control->enabled && control->field_0x70 && control->controlType != 5 &&
+        if (control != this && control->enabled && control->shown && control->controlType != 5 &&
             control->controlType != 0xc)
             return control;
         control = (UIControl*)control->field_0x0C;
@@ -2660,9 +2660,9 @@ int UIListBox::SelectRow(int row) {
     if (ownerDialog) {
         GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
         UIListBox* control;
-        while ((control = static_cast<UIListBox*>(UnknownFunction472790(iterator))) != 0)
+        while ((control = static_cast<UIListBox*>(NextAttachedControlOfType(iterator))) != 0)
             control->UnknownVirtualSlot65(row);
-        UnknownFunction472730(iterator);
+        DeleteControlIterator(iterator);
     }
     return result;
 }
@@ -2733,7 +2733,7 @@ int UIListBox::CountVisibleRows() {
     int i = firstVisibleRow;
     int count = rowCount;
     if (i < count) {
-        int space = field_0x2c[3] - field_0x2c[1];
+        int space = screenArea[3] - screenArea[1];
         for (; i < count; i++) {
             height += rowTable[i].height;
             if (height > space) {
@@ -2748,7 +2748,7 @@ int UIListBox::CountVisibleRows() {
 }
 
 // 0x00476f50
-int UIListBox::UnknownFunction476f50(int rows) {
+int UIListBox::ReserveRows(int rows) {
     if (rows > rowCapacity) {
         UnknownGameUiListRow* resized =
             (UnknownGameUiListRow*)UnknownFunction47b570(rowTable, rows * sizeof(UnknownGameUiListRow));
@@ -2781,7 +2781,7 @@ void UIListBox::SetRowText(int row, const char* text) {
 
 // 0x00476d80
 int UIListBox::AddRow(const char* text, int data, int a) {
-    if (text && (rowCount < rowCapacity || UnknownFunction476f50(rowCount + 1))) {
+    if (text && (rowCount < rowCapacity || ReserveRows(rowCount + 1))) {
         UnknownGameUiListRow* row = &rowTable[rowCount];
         row->width = strlen(text);
         int height = fontHeight;
@@ -2812,7 +2812,7 @@ int UIListBox::AddRow(const char* text, int data, int a) {
 
 // 0x004773a0
 int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
-    if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
+    if (rowCount >= rowCapacity && !ReserveRows(rowCount + 1))
         return 0;
     UnknownGameUiListRow row;
     row.kind = 2;
@@ -2994,13 +2994,13 @@ int UIRadioButton::UnknownVirtualSlot55(int a, int b) {
             SetCurrentState(1);
             GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             UIRadioButton* control;
-            while ((control = static_cast<UIRadioButton*>(UnknownFunction472790(iterator))) != 0) {
+            while ((control = static_cast<UIRadioButton*>(NextAttachedControlOfType(iterator))) != 0) {
                 if (control != this && control->UnknownFunction4755c0() == 1) {
                     control->UnknownVirtualSlot29(0);
                     control->SetCurrentState(0);
                 }
             }
-            UnknownFunction472730(iterator);
+            DeleteControlIterator(iterator);
         }
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -3078,7 +3078,7 @@ int UnknownFunction477800(const void* a, const void* b) {
     int result = 0;
     if (g_UnknownGlobal65b608->sortingList) {
         UIListBox* control = g_UnknownGlobal65b608->sortingList->field_0x218_control;
-        result = control->field_0x24c(a, b);
+        result = control->sortCompare(a, b);
         if (!result) {
             int left = ((const UnknownGameUiListRow*)a)->sortIndex;
             int right = ((const UnknownGameUiListRow*)b)->sortIndex;
@@ -3086,18 +3086,18 @@ int UnknownFunction477800(const void* a, const void* b) {
                 (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
             while (1) {
                 UIListBox* other = static_cast<UIListBox*>(
-                    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator));
+                    g_UnknownGlobal65b608->sortingList->field_0x218_control->NextAttachedControlOfType(iterator));
                 if (!other)
                     break;
                 if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
                     result = -1;
                     break;
                 }
-                result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
+                result = other->sortCompare(&other->rowTable[left], &other->rowTable[right]);
                 if (result)
                     break;
             }
-            g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
+            g_UnknownGlobal65b608->sortingList->field_0x218_control->DeleteControlIterator(iterator);
         }
     }
     return result;
@@ -3111,7 +3111,7 @@ void UIListBox::Sort(int a) {
     }
     if (!rowCount)
         return;
-    field_0x220 = 1;
+    sorting = 1;
     for (int i = 0; i < rowCount; i++)
         rowTable[i].sortIndex = i;
     int selected = selectedRow;
@@ -3140,27 +3140,27 @@ void UIListBox::Sort(int a) {
             break;
         }
     }
-    field_0x220 = 0;
+    sorting = 0;
 }
 
 // ---------------------------------------------------------------------------
 // UIScrollBar: position
 
 // 0x004751e0
-int UIScrollBar::UnknownFunction4751e0(UIListBox* list) {
+int UIScrollBar::GetListScrollRange(UIListBox* list) {
     return list->rowCount - list->lastPageRowCount;
 }
 
 // 0x00475200
-int UIScrollBar::UnknownFunction475200(UIListBox* list) {
+int UIScrollBar::FollowList(UIListBox* list) {
     UnknownVirtualSlot50();
-    if (field_0x21c) {
+    if (reversed) {
         int count = list->rowCount;
         field_0x1fc = count - list->UnknownFunction4755c0();
     } else {
         field_0x1fc = list->UnknownFunction4755c0();
     }
-    if (UnknownFunction4751e0(list) == field_0x1fc)
+    if (GetListScrollRange(list) == field_0x1fc)
         return 1;
     unsigned int travel;
     if (controlType == 8)
@@ -3170,7 +3170,7 @@ int UIScrollBar::UnknownFunction475200(UIListBox* list) {
     unsigned int range = list->rowCount - list->lastPageRowCount;
     if (range) {
         float position = field_0x1fc * (float)travel / range;
-        field_0x1ec_float = position < travel ? position : travel;
+        thumbOffset = position < travel ? position : travel;
         return 1;
     }
     return 0;
@@ -3183,9 +3183,9 @@ int UIScrollBar::UnknownFunction475300(int value) {
     unsigned int position;
     int travel;
     if (controlType == 8) {
-        position = (int)(field_0x21c ? width - field_0x1ec_float : field_0x1ec_float);
+        position = (int)(reversed ? width - thumbOffset : thumbOffset);
     } else {
-        position = (int)(field_0x21c ? height - field_0x1ec_float : field_0x1ec_float);
+        position = (int)(reversed ? height - thumbOffset : thumbOffset);
     }
     travel = controlType == 8 ? width - thumbWidth : height - thumbHeight;
     return (int)(travel ? (double)(position * value) / travel : 0.0);
@@ -3196,15 +3196,15 @@ int UIScrollBar::UnknownFunction475500() {
     int width = UnknownVirtualSlot61();
     int height = UnknownVirtualSlot62();
     int position;
-    if (!field_0x21c) {
-        position = (int)field_0x1ec_float;
-        if (position < field_0x1ec_float)
+    if (!reversed) {
+        position = (int)thumbOffset;
+        if (position < thumbOffset)
             position++;
     } else {
         if (controlType == 8)
-            position = (int)(width - field_0x1ec_float);
+            position = (int)(width - thumbOffset);
         else
-            position = (int)(height - field_0x1ec_float);
+            position = (int)(height - thumbOffset);
     }
     if (scrollRange && width) {
         if (controlType == 8)
@@ -3235,7 +3235,7 @@ void UIEditBox::SetCapacity(int size) {
     field_0x200 = 0;
     textLength = 0;
     textWidth = 0;
-    field_0xd0 = 0;
+    controlTextLength = 0;
     controlText = (char*)DebugMalloc(capacity, __FILE__, 0x16a3);
     if (kept) {
         int max = textCapacity - 1;
@@ -3267,13 +3267,13 @@ void UIEditBox::SetEditText(char* text) {
     strncpy(controlText, text, length);
     controlText[length] = 0;
     textLength = length;
-    field_0xd0 = length;
+    controlTextLength = length;
     HDC dc;
     if (!g_TrackGame->PCTarget()->renderSurface->GetDC((void**)&dc)) {
         HGDIOBJ font = (HGDIOBJ)(fontHandle ? fontHandle : (ownerDialog ? (int)ownerDialog->dialogFont : 0));
         HGDIOBJ old = SelectObject(dc, font);
         SIZE size;
-        GetTextExtentPoint32A(dc, controlText, field_0xd0, &size);
+        GetTextExtentPoint32A(dc, controlText, controlTextLength, &size);
         SelectObject(dc, old);
         g_TrackGame->PCTarget()->renderSurface->ReleaseDC(dc);
         textExtent[1] = size.cx;
@@ -3470,7 +3470,7 @@ int g_UnknownGlobal65b5c0;
 
 // 0x0046f6c0
 void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
-    CameraRect rect = *(CameraRect*)control->field_0x2c;
+    CameraRect rect = *(CameraRect*)control->screenArea;
     rect.left += control->textLeftMargin;
     rect.top += control->textTopMargin;
     rect.right -= control->textLeftMargin;
@@ -3600,7 +3600,7 @@ int UIControl::UnknownVirtualSlot47() {
         return 0;
     }
     field_0x164 = 0;
-    field_0x70 = 0;
+    shown = 0;
     return 1;
 }
 
@@ -3610,23 +3610,23 @@ int g_UnknownGlobal65b610;                       // frames of the slide
 int UIControl::UnknownVirtualSlot42() {
     if (field_0x164 == 0 && field_0xb0) {
         g_UnknownGlobal65b610 = field_0xb0 < 0 ? 25 : field_0xb0;
-        int left = field_0x3c[0];
-        field_0x80 = (float)(left - field_0x3c[2] - 1);
-        field_0x90 = ((float)left - field_0x80) / g_UnknownGlobal65b610;
+        int left = bounds[0];
+        slideX = (float)(left - bounds[2] - 1);
+        slideStepX = ((float)left - slideX) / g_UnknownGlobal65b610;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->field_0x34c, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
-        field_0x80 += field_0x90;
+        slideX += slideStepX;
     }
     if (field_0x164 == g_UnknownGlobal65b610)
         return 1;
     UnknownVirtualSlot50();
-    *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
-    field_0x2c[0] = (int)field_0x80;
-    field_0x2c[2] = field_0x3c[2] - field_0x3c[0] + field_0x2c[0];
-    if (field_0x2c[2] > 0) {
+    *(CameraRect*)screenArea = *(CameraRect*)bounds;
+    screenArea[0] = (int)slideX;
+    screenArea[2] = bounds[2] - bounds[0] + screenArea[0];
+    if (screenArea[2] > 0) {
         switch (controlType) {
         case 1:
         case 2:
@@ -3651,23 +3651,23 @@ int g_UnknownGlobal65b614;                       // frames of the slide
 int UIControl::UnknownVirtualSlot44() {
     if (field_0x164 == 0 && field_0xb0) {
         g_UnknownGlobal65b614 = field_0xb0 < 0 ? 25 : field_0xb0;
-        int top = field_0x3c[1];
-        field_0x84 = (float)(top - field_0x3c[3]);
-        field_0x94 = ((float)top - field_0x84) / g_UnknownGlobal65b614;
+        int top = bounds[1];
+        slideY = (float)(top - bounds[3]);
+        slideStepY = ((float)top - slideY) / g_UnknownGlobal65b614;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->field_0x34c, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
-        field_0x84 += field_0x94;
+        slideY += slideStepY;
     }
     if (field_0x164 == g_UnknownGlobal65b614)
         return 1;
     UnknownVirtualSlot50();
-    *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
-    field_0x2c[1] = (int)field_0x84;
-    field_0x2c[3] = field_0x3c[3] - field_0x3c[1] + field_0x2c[1];
-    if (field_0x2c[3] > 0) {
+    *(CameraRect*)screenArea = *(CameraRect*)bounds;
+    screenArea[1] = (int)slideY;
+    screenArea[3] = bounds[3] - bounds[1] + screenArea[1];
+    if (screenArea[3] > 0) {
         switch (controlType) {
         case 1:
         case 2:
@@ -3692,22 +3692,22 @@ int g_UnknownGlobal65b618;                       // frames of the slide
 int UIControl::UnknownVirtualSlot43() {
     if (field_0x164 == 0 && field_0xb0) {
         g_UnknownGlobal65b618 = field_0xb0 < 0 ? 25 : field_0xb0;
-        field_0x80 = (float)ownerDialog->screenWidth;
-        field_0x90 = ((float)field_0x3c[0] - field_0x80) / g_UnknownGlobal65b618;
+        slideX = (float)ownerDialog->screenWidth;
+        slideStepX = ((float)bounds[0] - slideX) / g_UnknownGlobal65b618;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->field_0x34c, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
-        field_0x80 += field_0x90;
+        slideX += slideStepX;
     }
     if (field_0x164 == g_UnknownGlobal65b618)
         return 1;
     UnknownVirtualSlot50();
-    *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
-    field_0x2c[0] = (int)field_0x80;
-    field_0x2c[2] = field_0x3c[2] - field_0x3c[0] + field_0x2c[0];
-    if (field_0x2c[0] < ownerDialog->screenWidth) {
+    *(CameraRect*)screenArea = *(CameraRect*)bounds;
+    screenArea[0] = (int)slideX;
+    screenArea[2] = bounds[2] - bounds[0] + screenArea[0];
+    if (screenArea[0] < ownerDialog->screenWidth) {
         switch (controlType) {
         case 1:
         case 2:
@@ -3732,22 +3732,22 @@ int g_UnknownGlobal65b61c;                       // frames of the slide
 int UIControl::UnknownVirtualSlot45() {
     if (field_0x164 == 0 && field_0xb0) {
         g_UnknownGlobal65b61c = field_0xb0 < 0 ? 25 : field_0xb0;
-        field_0x84 = (float)ownerDialog->screenHeight;
-        field_0x94 = ((float)field_0x3c[1] - field_0x84) / g_UnknownGlobal65b61c;
+        slideY = (float)ownerDialog->screenHeight;
+        slideStepY = ((float)bounds[1] - slideY) / g_UnknownGlobal65b61c;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->field_0x34c, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
-        field_0x84 += field_0x94;
+        slideY += slideStepY;
     }
     if (field_0x164 == g_UnknownGlobal65b61c)
         return 1;
     UnknownVirtualSlot50();
-    *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
-    field_0x2c[1] = (int)field_0x84;
-    field_0x2c[3] = field_0x3c[3] - field_0x3c[1] + field_0x2c[1];
-    if (field_0x2c[1] < ownerDialog->screenHeight) {
+    *(CameraRect*)screenArea = *(CameraRect*)bounds;
+    screenArea[1] = (int)slideY;
+    screenArea[3] = bounds[3] - bounds[1] + screenArea[1];
+    if (screenArea[1] < ownerDialog->screenHeight) {
         switch (controlType) {
         case 1:
         case 2:
@@ -3847,45 +3847,45 @@ void UIListBox::UnknownVirtualSlot66(int* handled) {
 // UIDropDownList: layout
 
 // 0x0047a880
-void UIDropDownList::UnknownFunction47a880(int height) {
-    listPart->field_0x2c[3] = listPart->field_0x2c[1] + height;
-    *(CameraRect*)listPart->field_0x3c = *(CameraRect*)listPart->field_0x2c;
-    staticPart0->field_0x2c[3] = staticPart0->field_0x2c[1] + height;
-    *(CameraRect*)staticPart0->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
-    scrollBarPart->field_0x2c[3] = scrollBarPart->field_0x2c[1] + height;
-    scrollBarPart->field_0x2c[1] += 2;
-    scrollBarPart->field_0x2c[3] -= 2;
-    *(CameraRect*)scrollBarPart->field_0x3c = *(CameraRect*)scrollBarPart->field_0x2c;
-    staticPart1->field_0x2c[3] = staticPart1->field_0x2c[1] + height;
-    *(CameraRect*)staticPart1->field_0x3c = *(CameraRect*)staticPart1->field_0x2c;
+void UIDropDownList::LayoutForRowHeight(int height) {
+    listPart->screenArea[3] = listPart->screenArea[1] + height;
+    *(CameraRect*)listPart->bounds = *(CameraRect*)listPart->screenArea;
+    staticPart0->screenArea[3] = staticPart0->screenArea[1] + height;
+    *(CameraRect*)staticPart0->bounds = *(CameraRect*)staticPart0->screenArea;
+    scrollBarPart->screenArea[3] = scrollBarPart->screenArea[1] + height;
+    scrollBarPart->screenArea[1] += 2;
+    scrollBarPart->screenArea[3] -= 2;
+    *(CameraRect*)scrollBarPart->bounds = *(CameraRect*)scrollBarPart->screenArea;
+    staticPart1->screenArea[3] = staticPart1->screenArea[1] + height;
+    *(CameraRect*)staticPart1->bounds = *(CameraRect*)staticPart1->screenArea;
     rowHeight = height;
 }
 
 // 0x0047a970
-void UIDropDownList::UnknownFunction47a970(UIAnim* image) {
+void UIDropDownList::SetStaticImage(UIAnim* image) {
     staticPart0->SetImage(0, image);
-    staticPart0->field_0x2c[2] = image->GetCurrentFrame()->frameWidth + staticPart0->field_0x2c[0];
-    staticPart0->field_0x2c[3] = image->GetCurrentFrame()->frameHeight + staticPart0->field_0x2c[1];
-    *(CameraRect*)staticPart0->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
-    *(CameraRect*)listPart->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
-    *(CameraRect*)listPart->field_0x2c = *(CameraRect*)listPart->field_0x3c;
-    UnknownFunction47a880(image->GetCurrentFrame()->frameHeight);
+    staticPart0->screenArea[2] = image->GetCurrentFrame()->frameWidth + staticPart0->screenArea[0];
+    staticPart0->screenArea[3] = image->GetCurrentFrame()->frameHeight + staticPart0->screenArea[1];
+    *(CameraRect*)staticPart0->bounds = *(CameraRect*)staticPart0->screenArea;
+    *(CameraRect*)listPart->bounds = *(CameraRect*)staticPart0->screenArea;
+    *(CameraRect*)listPart->screenArea = *(CameraRect*)listPart->bounds;
+    LayoutForRowHeight(image->GetCurrentFrame()->frameHeight);
 }
 
 // 0x0047aa40
-void UIDropDownList::UnknownFunction47aa40(UIAnim* image) {
+void UIDropDownList::SetButtonImage(UIAnim* image) {
     staticPart1->SetImage(0, image);
-    staticPart1->field_0x2c[2] = image->GetCurrentFrame()->frameWidth + staticPart1->field_0x2c[0];
-    staticPart1->field_0x2c[3] = image->GetCurrentFrame()->frameHeight + staticPart1->field_0x2c[1];
-    *(CameraRect*)staticPart1->field_0x3c = *(CameraRect*)staticPart1->field_0x2c;
-    *(CameraRect*)scrollBarPart->field_0x2c = *(CameraRect*)staticPart1->field_0x2c;
-    scrollBarPart->field_0x2c[1] += 2;
-    scrollBarPart->field_0x2c[3] -= 2;
-    *(CameraRect*)scrollBarPart->field_0x3c = *(CameraRect*)scrollBarPart->field_0x2c;
+    staticPart1->screenArea[2] = image->GetCurrentFrame()->frameWidth + staticPart1->screenArea[0];
+    staticPart1->screenArea[3] = image->GetCurrentFrame()->frameHeight + staticPart1->screenArea[1];
+    *(CameraRect*)staticPart1->bounds = *(CameraRect*)staticPart1->screenArea;
+    *(CameraRect*)scrollBarPart->screenArea = *(CameraRect*)staticPart1->screenArea;
+    scrollBarPart->screenArea[1] += 2;
+    scrollBarPart->screenArea[3] -= 2;
+    *(CameraRect*)scrollBarPart->bounds = *(CameraRect*)scrollBarPart->screenArea;
 }
 
 // 0x0047a2d0
-void UIDropDownList::UnknownFunction47a2d0(int open) {
+void UIDropDownList::SetOpen(int open) {
     staticPart0->Show(open, 1);
     staticPart1->Show(open, 1);
     listPart->Show(open, 1);
@@ -4124,20 +4124,20 @@ int UIControl::UnknownVirtualSlot40() {
     int redraw = redrawFrames;
     CameraRect rect;
     if (drawnTexture) {
-        UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
+        UnknownVirtualSlot63((CameraRect*)screenArea, &rect);
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, &rect, field_0x4c,
+            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, &rect, visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
-                       &rect, drawnTexture, field_0x4c, drawnTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                       &rect, drawnTexture, visibleArea, drawnTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
             return 0;
         }
     }
-    if (controlText && field_0xd0) {
+    if (controlText && controlTextLength) {
         redrawFrames = redraw;
-        UnknownVirtualSlot64((CameraRect*)field_0x2c, &rect);
+        UnknownVirtualSlot64((CameraRect*)screenArea, &rect);
         void* dc;
         int more;
         if (ownerDialog->BeginControlDraw(&dc, &rect, &more, this)) {
@@ -4155,16 +4155,16 @@ int UIControl::UnknownVirtualSlot40() {
                         rect.right--;
                         rect.bottom--;
                         SetTextColor((HDC)dc, dropColor);
-                        DrawTextA((HDC)dc, controlText, field_0xd0, (RECT*)&rect, format);
+                        DrawTextA((HDC)dc, controlText, controlTextLength, (RECT*)&rect, format);
                         rect.left++;
                         rect.top++;
                         rect.right++;
                         rect.bottom++;
                     }
                     SetTextColor((HDC)dc, textColor);
-                    DrawTextA((HDC)dc, controlText, field_0xd0, (RECT*)&rect, format);
+                    DrawTextA((HDC)dc, controlText, controlTextLength, (RECT*)&rect, format);
                 } else {
-                    ownerDialog->DrawAlignedText(dc, &rect, controlText, field_0xd0, textColor, fontHeight,
+                    ownerDialog->DrawAlignedText(dc, &rect, controlText, controlTextLength, textColor, fontHeight,
                                                       (UnknownGameUiTextRun*)textLines, textDrop, dropColor,
                                                       textAlign, 1, 0);
                 }
@@ -4182,9 +4182,9 @@ int UIControl::UnknownVirtualSlot40() {
 int UIEditBox::UnknownVirtualSlot21(int value) {
     if (!UIControl::UnknownVirtualSlot21(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
-        if (field_0x204_sound) {
-            field_0x204_sound->SetVolume(ownerGui->field_0x34c, 0);
-            field_0x204_sound->PlayWithOptions(1, 0, 0);
+        if (clickSound) {
+            clickSound->SetVolume(ownerGui->field_0x34c, 0);
+            clickSound->PlayWithOptions(1, 0, 0);
         }
         switch (value) {
         case VK_HOME:
@@ -4192,16 +4192,16 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
             textWidth = 0;
             break;
         case VK_END:
-            textLength = field_0xd0;
+            textLength = controlTextLength;
             break;
         case VK_DELETE:
-            if (textLength < field_0xd0) {
+            if (textLength < controlTextLength) {
                 if (IsDBCSLeadByte(controlText[textLength])) {
-                    memmove(controlText + textLength, controlText + textLength + 2, field_0xd0 - textLength - 1);
-                    field_0xd0 -= 2;
+                    memmove(controlText + textLength, controlText + textLength + 2, controlTextLength - textLength - 1);
+                    controlTextLength -= 2;
                 } else {
-                    memmove(controlText + textLength, controlText + textLength + 1, field_0xd0 - textLength);
-                    field_0xd0--;
+                    memmove(controlText + textLength, controlText + textLength + 1, controlTextLength - textLength);
+                    controlTextLength--;
                 }
             }
             break;
@@ -4214,7 +4214,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
             }
             break;
         case VK_RIGHT:
-            if (textLength < field_0xd0) {
+            if (textLength < controlTextLength) {
                 if (IsDBCSLeadByte(controlText[textLength]))
                     textLength += 2;
                 else
@@ -4222,12 +4222,12 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
             }
             break;
         }
-        controlText[field_0xd0] = 0;
+        controlText[controlTextLength] = 0;
         void* dc;
         if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
-            GetTextExtentPoint32A((HDC)dc, controlText, field_0xd0, &size);
+            GetTextExtentPoint32A((HDC)dc, controlText, controlTextLength, &size);
             textExtent[1] = size.cx;
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
@@ -4281,13 +4281,13 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
     if (result) {
         GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
         int full = 0;
-        for (UIControl* control = UnknownFunction472750(iterator); control;
-             control = UnknownFunction472750(iterator)) {
+        for (UIControl* control = NextAttachedControl(iterator); control;
+             control = NextAttachedControl(iterator)) {
             if (control->controlType == 3 &&
                 static_cast<UIListBox*>(control)->visibleRowCount >= static_cast<UIListBox*>(control)->rowCount)
                 full = 1;
         }
-        UnknownFunction472730(iterator);
+        DeleteControlIterator(iterator);
         if (full)
             drawnTexture = 0;
     }
@@ -4298,15 +4298,15 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
 int UIScrollBar::UnknownVirtualSlot40() {
     CameraRect rect;
     TextureMap* thumb;
-    if (field_0x204_image && drawnTexture) {
-        TextureMap* track = field_0x204_image->GetCurrentTexture();
+    if (trackImage && drawnTexture) {
+        TextureMap* track = trackImage->GetCurrentTexture();
         int redraw = redrawFrames;
-        rect = *(CameraRect*)field_0x2c;
+        rect = *(CameraRect*)screenArea;
         if (controlType == 8) {
-            rect.top += UnknownMaxInt((field_0x2c[3] - field_0x2c[1] - track->field_0x18) / 2, 0);
+            rect.top += UnknownMaxInt((screenArea[3] - screenArea[1] - track->field_0x18) / 2, 0);
             rect.bottom = track->field_0x18 + rect.top;
         } else {
-            rect.left += UnknownMaxInt((field_0x2c[2] - field_0x2c[0] - track->field_0x14) / 2, 0);
+            rect.left += UnknownMaxInt((screenArea[2] - screenArea[0] - track->field_0x14) / 2, 0);
             rect.right = track->field_0x14 + rect.left;
         }
         if (ownerDialog->dialogBackground)
@@ -4321,13 +4321,13 @@ int UIScrollBar::UnknownVirtualSlot40() {
     thumb = drawnTexture;
     if (thumb) {
         if (controlType == 8) {
-            rect.top = (field_0x2c[3] - thumbHeight - field_0x2c[1]) / 2 + field_0x2c[1];
-            rect.left = (int)field_0x1ec_float + field_0x2c[0];
+            rect.top = (screenArea[3] - thumbHeight - screenArea[1]) / 2 + screenArea[1];
+            rect.left = (int)thumbOffset + screenArea[0];
             rect.bottom = thumbHeight + rect.top;
             rect.right = thumbWidth + rect.left;
         } else {
-            rect.top = (int)field_0x1ec_float + field_0x2c[1];
-            rect.left = (field_0x2c[2] - thumbWidth - field_0x2c[0]) / 2 + field_0x2c[0];
+            rect.top = (int)thumbOffset + screenArea[1];
+            rect.left = (screenArea[2] - thumbWidth - screenArea[0]) / 2 + screenArea[0];
             rect.bottom = thumbHeight + rect.top;
             rect.right = thumbWidth + rect.left;
         }
@@ -4357,60 +4357,60 @@ int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
         UIControl* list;
         if (controlType == 8) {
             if (field_0x1f0) {
-                field_0x1ec_float = (float)UnknownMinInt(UnknownVirtualSlot61() - thumbWidth,
-                                                         UnknownMaxInt(((int*)b)[0] - field_0x2c[0], 0));
+                thumbOffset = (float)UnknownMinInt(UnknownVirtualSlot61() - thumbWidth,
+                                                         UnknownMaxInt(((int*)b)[0] - screenArea[0], 0));
             } else {
                 float x = (float)((int*)b)[0];
-                float left = (float)field_0x2c[0];
-                if (x > field_0x1ec_float + (left + thumbWidth)) {
+                float left = (float)screenArea[0];
+                if (x > thumbOffset + (left + thumbWidth)) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                    for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
                             listBox->ScrollToRow(listBox->UnknownFunction4755c0() + page, 1);
                         }
                     }
-                    UnknownFunction472730(iterator);
-                } else if (x < left + field_0x1ec_float) {
+                    DeleteControlIterator(iterator);
+                } else if (x < left + thumbOffset) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                    for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
                             listBox->ScrollToRow(listBox->UnknownFunction4755c0() - page, 1);
                         }
                     }
-                    UnknownFunction472730(iterator);
+                    DeleteControlIterator(iterator);
                 }
             }
         } else {
             if (field_0x1f0) {
-                field_0x1ec_float = (float)UnknownMinInt(UnknownVirtualSlot62() - thumbHeight,
-                                                         UnknownMaxInt(((int*)b)[1] - field_0x2c[1], 0));
+                thumbOffset = (float)UnknownMinInt(UnknownVirtualSlot62() - thumbHeight,
+                                                         UnknownMaxInt(((int*)b)[1] - screenArea[1], 0));
             } else {
                 float y = (float)((int*)b)[1];
-                float top = (float)field_0x2c[1];
-                if (y > field_0x1ec_float + (top + thumbHeight)) {
+                float top = (float)screenArea[1];
+                if (y > thumbOffset + (top + thumbHeight)) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                    for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
                             listBox->ScrollToRow(listBox->UnknownFunction4755c0() + page, 1);
                         }
                     }
-                    UnknownFunction472730(iterator);
-                } else if (y < top + field_0x1ec_float) {
+                    DeleteControlIterator(iterator);
+                } else if (y < top + thumbOffset) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                    for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
                             listBox->ScrollToRow(listBox->UnknownFunction4755c0() - page, 1);
                         }
                     }
-                    UnknownFunction472730(iterator);
+                    DeleteControlIterator(iterator);
                 }
             }
         }
@@ -4431,18 +4431,18 @@ void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
         UnknownVirtualSlot50();
         if (controlType == 8) {
             if (field_0x1f0)
-                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0], 0));
+                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - screenArea[0], 0));
             else
-                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0] - thumbWidth / 2, 0));
+                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
             if (field_0x1f0 != 0.0f)
-                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1], 0));
+                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - screenArea[1], 0));
             else
-                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1] - thumbHeight / 2, 0));
+                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
         if (field_0x1f0)
             UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
@@ -4458,8 +4458,8 @@ void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
         }
         if (!event.handled) {
             if (position[0] == dragX && position[1] == dragY) {
-                field_0x218_float += ownerDialog->lastFrameTime;
-                if (field_0x218_float < field_0x214)
+                holdTime += ownerDialog->lastFrameTime;
+                if (holdTime < holdDelay)
                     goto scroll;
                 event.kind = 0x11;
                 event.code = eventCode;
@@ -4478,20 +4478,20 @@ void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
                 ownerDialog->UnknownVirtualSlot29(&event);
                 dragX = position[0];
                 dragY = position[1];
-                field_0x218_float = 0.0f;
+                holdTime = 0.0f;
             }
             if (!event.handled) {
             scroll:
                 GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-                for (UIControl* list = UnknownFunction472750(iterator); list;
-                     list = UnknownFunction472750(iterator)) {
+                for (UIControl* list = NextAttachedControl(iterator); list;
+                     list = NextAttachedControl(iterator)) {
                     if (list->controlType == 3) {
                         UIListBox* listBox = static_cast<UIListBox*>(list);
                         listBox->ScrollToRow(
                             UnknownFunction475300(listBox->rowCount - listBox->lastPageRowCount), 0);
                     }
                 }
-                UnknownFunction472730(iterator);
+                DeleteControlIterator(iterator);
             }
         }
     }
@@ -4515,16 +4515,16 @@ int UIListBox::UnknownVirtualSlot10(float frameTime) {
             }
         }
     }
-    field_0x248 = -1;
+    hoverRow = -1;
     GUIUser* user = ownerDialog->guiUser;
     if (user->pointerDevice) {
         POINT cursor = user->pointerDevice->pointerPosition;
         if (user->field_0x1d8 == (UnknownGuiControl*)this && selectable) {
-            RECT rect = *(RECT*)field_0x2c;
+            RECT rect = *(RECT*)screenArea;
             for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
                 rect.bottom = rect.top + GetRowHeight(row);
                 if (PtInRect(&rect, cursor) && !(rowTable[row].flags & 1)) {
-                    field_0x248 = row;
+                    hoverRow = row;
                     break;
                 }
                 rect.top += GetRowHeight(row);
@@ -4548,17 +4548,17 @@ int UIListBox::UnknownVirtualSlot40() {
     int done = 1;
     if (drawnTexture) {
         if (ownerDialog->dialogBackground) {
-            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)field_0x2c,
-                                                           field_0x4c,
+            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
+                                                           visibleArea,
                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             redrawFrames = redraw;
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
-                       field_0x2c, drawnTexture, field_0x4c, drawnTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                       screenArea, drawnTexture, visibleArea, drawnTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
     }
-    area = *(CameraRect*)field_0x2c;
+    area = *(CameraRect*)screenArea;
     area.left += textLeftMargin;
     area.right -= textLeftMargin;
     area.top += textTopMargin;
@@ -4671,7 +4671,7 @@ int UIListBox::UnknownVirtualSlot40() {
                     }
                     break;
                 }
-                if (field_0x248 == row && pass == 0 && visibleRowCount > 1) {
+                if (hoverRow == row && pass == 0 && visibleRowCount > 1) {
                     rect.left = area.left;
                     rect.top = y;
                     rect.bottom = height + y;
@@ -4709,18 +4709,18 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
         UnknownVirtualSlot50();
         if (controlType == 8) {
             if (field_0x1f0)
-                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0], 0));
+                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - screenArea[0], 0));
             else
-                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0] - thumbWidth / 2, 0));
+                thumbOffset = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
             if (field_0x1f0 != 0.0f)
-                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1], 0));
+                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - screenArea[1], 0));
             else
-                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1] - thumbHeight / 2, 0));
+                thumbOffset = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
         if (field_0x1f0)
             UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
@@ -4736,8 +4736,8 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
         }
         if (!event.handled) {
             if (position[0] == dragX && position[1] == dragY) {
-                field_0x218_float += ownerDialog->lastFrameTime;
-                if (field_0x218_float < field_0x214)
+                holdTime += ownerDialog->lastFrameTime;
+                if (holdTime < holdDelay)
                     goto scroll;
                 event.kind = 0x11;
                 event.code = eventCode;
@@ -4756,7 +4756,7 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
                 ownerDialog->UnknownVirtualSlot29(&event);
                 dragX = position[0];
                 dragY = position[1];
-                field_0x218_float = 0.0f;
+                holdTime = 0.0f;
             }
             if (!event.handled) {
             scroll:
@@ -4776,16 +4776,16 @@ int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
         UIListBox* list = ownerList->listPart;
         if (field_0x1f0) {
-            field_0x1ec_float = (float)UNKNOWN_MIN(UnknownVirtualSlot62() - thumbHeight,
-                                                   UNKNOWN_MAX(((int*)b)[1] - field_0x2c[1], 0));
+            thumbOffset = (float)UNKNOWN_MIN(UnknownVirtualSlot62() - thumbHeight,
+                                                   UNKNOWN_MAX(((int*)b)[1] - screenArea[1], 0));
         } else {
             float y = (float)((int*)b)[1];
-            float top = (float)field_0x2c[1];
-            if (y > field_0x1ec_float + (top + thumbHeight))
+            float top = (float)screenArea[1];
+            if (y > thumbOffset + (top + thumbHeight))
             {
                 int page = list->visibleRowCount;
                 list->ScrollToRow(list->UnknownFunction4755c0() + page, 1);
-            } else if (y < top + field_0x1ec_float) {
+            } else if (y < top + thumbOffset) {
                 int page = list->visibleRowCount;
                 list->ScrollToRow(list->UnknownFunction4755c0() - page, 1);
             }
@@ -4797,42 +4797,42 @@ int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
 }
 
 // 0x0047ab20
-void UIDropDownList::UnknownFunction47ab20(UIAnim* image) {
+void UIDropDownList::SetCornerImage(UIAnim* image) {
     staticPart2->SetImage(0, image);
-    staticPart2->field_0x2c[1] = 0;
-    staticPart2->field_0x2c[0] = 0;
-    staticPart2->field_0x2c[2] = image->GetCurrentFrame()->frameWidth;
-    staticPart2->field_0x2c[3] = image->GetCurrentFrame()->frameHeight;
-    *(CameraRect*)staticPart2->field_0x3c = *(CameraRect*)staticPart2->field_0x2c;
-    field_0x2c[2] = staticPart2->field_0x2c[2] + field_0x2c[0];
-    field_0x2c[3] = staticPart2->field_0x2c[3] + field_0x2c[1];
-    *(CameraRect*)field_0x3c = *(CameraRect*)field_0x2c;
-    staticPart0->field_0x2c[0] = 0;
-    staticPart0->field_0x2c[1] = staticPart2->field_0x2c[3];
-    *(CameraRect*)staticPart0->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
-    *(CameraRect*)listPart->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
-    *(CameraRect*)listPart->field_0x2c = *(CameraRect*)listPart->field_0x3c;
-    if (buttonPart->field_0x3c[0]) {
-        buttonPart->field_0x2c[1] = 0;
-        buttonPart->field_0x2c[0] = staticPart2->field_0x2c[2];
-        buttonPart->field_0x2c[2] =
-            buttonPart->UnknownVirtualSlot48(-1)->field_0x14 + buttonPart->field_0x2c[0];
-        buttonPart->field_0x2c[3] =
-            buttonPart->UnknownVirtualSlot48(-1)->field_0x18 + buttonPart->field_0x2c[1];
-        *(CameraRect*)buttonPart->field_0x3c = *(CameraRect*)buttonPart->field_0x2c;
+    staticPart2->screenArea[1] = 0;
+    staticPart2->screenArea[0] = 0;
+    staticPart2->screenArea[2] = image->GetCurrentFrame()->frameWidth;
+    staticPart2->screenArea[3] = image->GetCurrentFrame()->frameHeight;
+    *(CameraRect*)staticPart2->bounds = *(CameraRect*)staticPart2->screenArea;
+    screenArea[2] = staticPart2->screenArea[2] + screenArea[0];
+    screenArea[3] = staticPart2->screenArea[3] + screenArea[1];
+    *(CameraRect*)bounds = *(CameraRect*)screenArea;
+    staticPart0->screenArea[0] = 0;
+    staticPart0->screenArea[1] = staticPart2->screenArea[3];
+    *(CameraRect*)staticPart0->bounds = *(CameraRect*)staticPart0->screenArea;
+    *(CameraRect*)listPart->bounds = *(CameraRect*)staticPart0->screenArea;
+    *(CameraRect*)listPart->screenArea = *(CameraRect*)listPart->bounds;
+    if (buttonPart->bounds[0]) {
+        buttonPart->screenArea[1] = 0;
+        buttonPart->screenArea[0] = staticPart2->screenArea[2];
+        buttonPart->screenArea[2] =
+            buttonPart->UnknownVirtualSlot48(-1)->field_0x14 + buttonPart->screenArea[0];
+        buttonPart->screenArea[3] =
+            buttonPart->UnknownVirtualSlot48(-1)->field_0x18 + buttonPart->screenArea[1];
+        *(CameraRect*)buttonPart->bounds = *(CameraRect*)buttonPart->screenArea;
     }
-    staticPart1->field_0x2c[0] = staticPart2->field_0x2c[2];
-    staticPart1->field_0x2c[1] = staticPart2->field_0x2c[3];
-    *(CameraRect*)staticPart1->field_0x3c = *(CameraRect*)staticPart1->field_0x2c;
-    *(CameraRect*)scrollBarPart->field_0x2c = *(CameraRect*)staticPart1->field_0x2c;
-    scrollBarPart->field_0x2c[1] += 2;
-    scrollBarPart->field_0x2c[3] -= 2;
-    *(CameraRect*)scrollBarPart->field_0x3c = *(CameraRect*)scrollBarPart->field_0x2c;
+    staticPart1->screenArea[0] = staticPart2->screenArea[2];
+    staticPart1->screenArea[1] = staticPart2->screenArea[3];
+    *(CameraRect*)staticPart1->bounds = *(CameraRect*)staticPart1->screenArea;
+    *(CameraRect*)scrollBarPart->screenArea = *(CameraRect*)staticPart1->screenArea;
+    scrollBarPart->screenArea[1] += 2;
+    scrollBarPart->screenArea[3] -= 2;
+    *(CameraRect*)scrollBarPart->bounds = *(CameraRect*)scrollBarPart->screenArea;
 }
 
 // 0x0047b370 (UIProgressBar): one step on; redraws when `redraw`.
 void UIProgressBar::UnknownFunction47b370(int redraw) {
-    int total = field_0x1f0;
+    int total = stepCount;
     if (total) {
         stepsDone = UnknownMinInt(stepsDone + 1, total);
         progressFraction = (float)stepsDone / total;
@@ -4847,25 +4847,25 @@ void UIProgressBar::UnknownFunction47b370(int redraw) {
 // 0x0047ae30
 UIVideoStatic::UIVideoStatic(int flags, CameraRect* area, UIDialog* owner)
     : UIStatic(flags, area, owner) {
-    field_0x1ec = 0;
+    moviePlayer = 0;
 }
 
 // 0x0047ae90
 int UIVideoStatic::UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
-    if (field_0x1ec)
-        field_0x1ec->Release();
-    field_0x1ec = new(__FILE__, 0x264d) MediaControl(1);
-    if (!field_0x1ec->UnknownFunction4a2560(field_0x18, file, done, owner)) {
-        field_0x1ec = 0;
+    if (moviePlayer)
+        moviePlayer->Release();
+    moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
+    if (!moviePlayer->UnknownFunction4a2560(field_0x18, file, done, owner)) {
+        moviePlayer = 0;
         return 0;
     }
-    AppendChild(field_0x1ec, -1);
-    field_0x1f0[0] = 0;
-    field_0x1f0[1] = 0;
-    field_0x1f0[2] = field_0x1ec->field_0x30;
-    field_0x1f0[3] = field_0x1ec->field_0x34;
+    AppendChild(moviePlayer, -1);
+    frameRect[0] = 0;
+    frameRect[1] = 0;
+    frameRect[2] = moviePlayer->field_0x30;
+    frameRect[3] = moviePlayer->field_0x34;
     if (a)
-        field_0x1ec->Restart();
+        moviePlayer->Restart();
     return 1;
 }
 
@@ -4877,14 +4877,14 @@ int UIVideoStatic::UnknownVirtualSlot10(float frameTime) {
 // 0x0047afa0
 int UIVideoStatic::UnknownVirtualSlot40() {
     CameraRect rect;
-    if (!field_0x1ec)
+    if (!moviePlayer)
         return 0;
     if (ownerDialog->dialogBackground) {
         ownerDialog->dialogBackground->UnknownFunction404c80();
         UnknownVirtualSlot50();
     }
-    UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
-    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, field_0x1ec->field_0x2c, field_0x1f0,
+    UnknownVirtualSlot63((CameraRect*)screenArea, &rect);
+    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, moviePlayer->field_0x2c, frameRect,
                                                                       0x1000000, 0) == 0;
 }
 
@@ -4895,7 +4895,7 @@ int UIVideoStatic::UnknownVirtualSlot40() {
 UIProgressBar::UIProgressBar(int flags, CameraRect* area, UIDialog* owner)
     : UIStatic(flags, area, owner) {
     progressFraction = 0;
-    field_0x1f0 = 0;
+    stepCount = 0;
     stepsDone = 0;
     barTexture = 0;
     showPercentage = 1;
@@ -4919,9 +4919,9 @@ int UIProgressBar::UnknownVirtualSlot40() {
     void* dc;
     int more;
     if (barTexture && progressFraction != 0.0f) {
-        UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
-        CameraRect source = *(CameraRect*)field_0x4c;
-        source.right = (int)((field_0x4c[2] - field_0x4c[0]) * progressFraction);
+        UnknownVirtualSlot63((CameraRect*)screenArea, &rect);
+        CameraRect source = *(CameraRect*)visibleArea;
+        source.right = (int)((visibleArea[2] - visibleArea[0]) * progressFraction);
         UIDialog* owner = ownerDialog;
         rect.right = (int)(source.right * owner->scaleX + rect.left);
         rect.bottom = (int)(source.bottom * owner->scaleY + rect.top);
@@ -4936,7 +4936,7 @@ int UIProgressBar::UnknownVirtualSlot40() {
     }
     if (showPercentage) {
         redraw = redrawFrames;
-        UnknownVirtualSlot64((CameraRect*)field_0x2c, &rect);
+        UnknownVirtualSlot64((CameraRect*)screenArea, &rect);
         char text[16];
         sprintf(text, "%3.0f%%", progressFraction * 100.0f);
         if (ownerDialog->BeginControlDraw(&dc, &rect, &more, this)) {
@@ -4964,37 +4964,37 @@ void UIProgressBar::UnknownFunction47b3d0(int texture, int owned) {
 int UIControl::UnknownVirtualSlot41() {
     if (field_0x164 == 0 && field_0xb0 && !field_0x25_bit2) {
         g_UnknownGlobal65b60c = field_0xb0 < 0 ? 7 : field_0xb0;
-        field_0x88 = 21.0f;
-        field_0x8c = 11.0f;
-        int left = field_0x3c[0];
-        int width = field_0x3c[2] - left;
-        field_0x80 = max(0.0f, (float)(width / 2 + left) - 10.5f);
-        int top = field_0x3c[1];
-        int height = field_0x3c[3] - top;
-        field_0x84 = max(0.0f, (float)(height / 2 + top) - 5.5f);
-        field_0x90 = ((float)left - field_0x80) / g_UnknownGlobal65b60c;
-        field_0x94 = ((float)top - field_0x84) / g_UnknownGlobal65b60c;
-        field_0x98 = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
-        field_0x9c = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
+        zoomWidth = 21.0f;
+        zoomHeight = 11.0f;
+        int left = bounds[0];
+        int width = bounds[2] - left;
+        slideX = max(0.0f, (float)(width / 2 + left) - 10.5f);
+        int top = bounds[1];
+        int height = bounds[3] - top;
+        slideY = max(0.0f, (float)(height / 2 + top) - 5.5f);
+        slideStepX = ((float)left - slideX) / g_UnknownGlobal65b60c;
+        slideStepY = ((float)top - slideY) / g_UnknownGlobal65b60c;
+        zoomStepWidth = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
+        zoomStepHeight = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->field_0x34c, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
-        field_0x80 += field_0x90;
-        field_0x84 += field_0x94;
-        field_0x88 += field_0x98;
-        field_0x8c += field_0x9c;
+        slideX += slideStepX;
+        slideY += slideStepY;
+        zoomWidth += zoomStepWidth;
+        zoomHeight += zoomStepHeight;
     }
     if (field_0x164 == g_UnknownGlobal65b60c)
         return 1;
     UnknownVirtualSlot50();
     if (!field_0x25_bit2 || field_0x164) {
-        float width = field_0x88;
-        field_0x2c[0] = (int)field_0x80;
-        field_0x2c[1] = (int)field_0x84;
-        field_0x2c[2] = (int)(width + field_0x80);
-        field_0x2c[3] = (int)(field_0x84 + field_0x8c);
+        float width = zoomWidth;
+        screenArea[0] = (int)slideX;
+        screenArea[1] = (int)slideY;
+        screenArea[2] = (int)(width + slideX);
+        screenArea[3] = (int)(slideY + zoomHeight);
         switch (controlType) {
         case 1:
         case 4:
@@ -5028,19 +5028,19 @@ int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntr
 
 // 0x004753c0
 int UIScrollBar::UnknownFunction4753c0(int value, int range) {
-    unsigned int position = field_0x21c ? range - value : value;
+    unsigned int position = reversed ? range - value : value;
     UnknownVirtualSlot50();
     if (!field_0x1f0 && UnknownFunction475300(range) == position)
         return 1;
     if (!range) {
-        field_0x1ec_float = position;
+        thumbOffset = position;
         return 1;
     }
     unsigned int travel = controlType == 8 ? UnknownVirtualSlot61() - thumbWidth : UnknownVirtualSlot62() - thumbHeight;
     if ((unsigned int)range > 0) {
         float limit = travel;
         float scaled = (double)(travel * position) / (unsigned int)range;
-        field_0x1ec_float = scaled < limit ? scaled : limit;
+        thumbOffset = scaled < limit ? scaled : limit;
         return 1;
     }
     return 0;
@@ -5053,7 +5053,7 @@ void UIListBox::ScrollBy(int delta) {
     if (!count)
         return;
     int first = firstVisibleRow += delta;
-    if (field_0x244) {
+    if (wrapScroll) {
         if (first < 0)
             firstVisibleRow = first + count;
         int index = firstVisibleRow % count;
@@ -5156,7 +5156,7 @@ void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
     UnknownDialogEvent event;
     event.handled = 0;
     ownerList->SetText(GetRowText(GetSelectedRow()));
-    ownerList->UnknownFunction47a2d0(0);
+    ownerList->SetOpen(0);
     event.kind = kDialogListSelect;
     event.code = eventCode;
     event.controlName = ownerList->GetName();
@@ -5167,7 +5167,7 @@ void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
 }
 
 // 0x00472bc0
-int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
+int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
     if (stream) {
         UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
         if (image) {
@@ -5199,7 +5199,7 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             if (keyBind && keyBind == event->control &&
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0) &&
-                IsEnabled() && field_0x70) {
+                IsEnabled() && shown) {
                 ownerDialog->guiUser->UnknownFunction487730((UnknownGuiControl*)this, 0, 1);
                 UnknownVirtualSlot55(0, 0);
                 UnknownVirtualSlot56(0, 0);

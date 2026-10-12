@@ -150,14 +150,14 @@ void CloseDialogCallback(UIDialog* dialog) {
 int MainDlg::UnknownVirtualSlot10(float frameTime) {
     if (singleMenuOpen) {
         FindControl("ScreenOverCtl", 0)->UnknownVirtualSlot50();
-        if (singleMenuOpen && !menuSingleAnimation->field_0x68 && movieRestartPending) {
+        if (singleMenuOpen && !menuSingleAnimation->transitionState && movieRestartPending) {
             if (movieRestartTime < 4.0f) {
                 movieRestartTime = g_TrackGame->frameTime + movieRestartTime;
             } else {
                 movieRestartPending = 0;
                 if (movieControl) {
-                    movieControl->field_0x1ec->Restart();
-                    movieControl->field_0x1ec->UnknownVirtualSlot16(movieRestartPending);
+                    movieControl->moviePlayer->Restart();
+                    movieControl->moviePlayer->UnknownVirtualSlot16(movieRestartPending);
                     movieControl->Show(1, 1);
                 }
             }
@@ -1193,7 +1193,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (!engine->field_0x70) {
+        if (!engine->shown) {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
@@ -1201,7 +1201,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
         }
     } else {
         UIControl* engine = FindControl("DDLEngineSize", 0);
-        if (engine->field_0x70) {
+        if (engine->shown) {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
             if (dialogBackground)
@@ -1339,12 +1339,12 @@ void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case kDialogInit: {
         UIControl* area = FindControl("StaBarRect", 5);
-        UIProgressBar* bar = new(__FILE__, 2878) UIProgressBar(0, (CameraRect*)area->field_0x3c, this);
+        UIProgressBar* bar = new(__FILE__, 2878) UIProgressBar(0, (CameraRect*)area->bounds, this);
         AddControl(bar, 0, 0);
         bar->SetName("ProgressBar");
         UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");
         bar->UnknownFunction47b3d0(image->GetCurrentTexture(), 0);
-        bar->field_0x1f0 = 20;
+        bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);
         g_TrackGame->ui->field_0x490 = (UnknownGameUiPage*)this;

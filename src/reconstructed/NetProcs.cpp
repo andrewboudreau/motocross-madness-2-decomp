@@ -8,6 +8,7 @@
 #include "DebugAlloc.h"
 #include "Net.h"
 #include "TrackGame.h"
+#include "MenuId.h"
 
 extern "C" const GUID DPSPGUID_TCPIP;         // 0x005567e0
 
@@ -41,7 +42,7 @@ void JoinSelectedSession(UnknownDialogEvent* event) {
         g_TrackGame->network->JoinSession(
             (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance,
             0x80)) {
-        g_TrackGame->ui->OpenMenu(0x866);
+        g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
         event->dialog->EndDialog(0x63);
         event->handled = 1;
     }
@@ -81,7 +82,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButJoin", event->controlName)) {
             UpdateBoundValues(1);
             if (openingMenu == 0x85d)
-                g_TrackGame->ui->OpenMenu(0xd9);
+                g_TrackGame->ui->OpenMenu(kMenuTCPAddress);
             else
                 JoinSelectedSession(event);
         } else if (!_stricmp("ButCancel", event->controlName)) {
@@ -133,7 +134,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             if (g_TrackGame->network->CreateSession(
                     g_TrackGame->mode.field_0x10, 0x80)) {
-                g_TrackGame->ui->OpenMenu(0x866);
+                g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
             }
@@ -146,7 +147,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->network->JoinSession(
                     (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[0].instance, 0)) {
                 guiManager->UnknownFunction4865e0(guiManager->cursorImage, 1);
-                g_TrackGame->ui->OpenMenu(0x866);
+                g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
             } else {
@@ -155,7 +156,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 EndNetworkGame();
                 EnsureNetworkInterface();
                 guiManager->UnknownFunction4865e0(guiManager->cursorImage, 1);
-                g_TrackGame->ui->OpenMenu(0x1f9);
+                g_TrackGame->ui->OpenMenu(kMenuConnectError);
             }
         } else if (event->code == 0xd) {
             EndDialog(0xd);
@@ -340,7 +341,7 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->network->JoinSession(
                     (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance,
                     0)) {
-                g_TrackGame->ui->OpenMenu(0x866);
+                g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
             } else {
@@ -366,7 +367,7 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->mode.field_0x10, 0);
             SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (opened) {
-                g_TrackGame->ui->OpenMenu(0x866);
+                g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
                 return;

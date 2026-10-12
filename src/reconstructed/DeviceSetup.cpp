@@ -251,7 +251,7 @@ int UnknownTrackGameObject33fc::UnknownFunction449220()
 }
 
 // 0x00449270
-int UnknownFunction449270(int code, char* text)
+int FormatKeyName(int code, char* text)
 {
     char name[0x80];
     char prefix[0x80];
@@ -259,8 +259,8 @@ int UnknownFunction449270(int code, char* text)
 
     if (code > 0x80)
         keyData = (keyData & ~0x800000) | 0x1000000;
-    if (UnknownFunction449d40(code) != code)
-        keyData = ((UnknownFunction449e30(code, 0) << 8) + UnknownFunction449d40(code)) << 16;
+    if (TranslatePc98ScanCode(code) != code)
+        keyData = ((ValueUnlessPc98(code, 0) << 8) + TranslatePc98ScanCode(code)) << 16;
     if (!GetKeyNameText(keyData, name, 0x80)) {
         strcpy(text, "Unknown");
         return 0;
@@ -284,78 +284,78 @@ int UnknownTrackGameObject33fc::UnknownFunction449380(int kind, int code, char* 
     strcpy(text, "");
     if (kind == 0) {
         switch (code) {
-        case 0x02: return UnknownFunction449270(0x02, text);
-        case 0x03: return UnknownFunction449270(0x03, text);
-        case 0x04: return UnknownFunction449270(0x04, text);
-        case 0x05: return UnknownFunction449270(0x05, text);
-        case 0x06: return UnknownFunction449270(0x06, text);
-        case 0x07: return UnknownFunction449270(0x07, text);
-        case 0x08: return UnknownFunction449270(0x08, text);
-        case 0x09: return UnknownFunction449270(0x09, text);
-        case 0x0a: return UnknownFunction449270(0x0a, text);
-        case 0x0b: return UnknownFunction449270(0x0b, text);
-        case 0x0e: return UnknownFunction449270(0x0e, text);
-        case 0x10: return UnknownFunction449270(0x10, text);
-        case 0x11: return UnknownFunction449270(0x11, text);
-        case 0x12: return UnknownFunction449270(0x12, text);
-        case 0x13: return UnknownFunction449270(0x13, text);
-        case 0x14: return UnknownFunction449270(0x14, text);
-        case 0x15: return UnknownFunction449270(0x15, text);
-        case 0x16: return UnknownFunction449270(0x16, text);
-        case 0x17: return UnknownFunction449270(0x17, text);
-        case 0x18: return UnknownFunction449270(0x18, text);
-        case 0x19: return UnknownFunction449270(0x19, text);
-        case 0x1a: return UnknownFunction449270(0x1a, text);
-        case 0x1b: return UnknownFunction449270(0x1b, text);
-        case 0x1c: return UnknownFunction449270(0x1c, text);
+        case 0x02: return FormatKeyName(0x02, text);
+        case 0x03: return FormatKeyName(0x03, text);
+        case 0x04: return FormatKeyName(0x04, text);
+        case 0x05: return FormatKeyName(0x05, text);
+        case 0x06: return FormatKeyName(0x06, text);
+        case 0x07: return FormatKeyName(0x07, text);
+        case 0x08: return FormatKeyName(0x08, text);
+        case 0x09: return FormatKeyName(0x09, text);
+        case 0x0a: return FormatKeyName(0x0a, text);
+        case 0x0b: return FormatKeyName(0x0b, text);
+        case 0x0e: return FormatKeyName(0x0e, text);
+        case 0x10: return FormatKeyName(0x10, text);
+        case 0x11: return FormatKeyName(0x11, text);
+        case 0x12: return FormatKeyName(0x12, text);
+        case 0x13: return FormatKeyName(0x13, text);
+        case 0x14: return FormatKeyName(0x14, text);
+        case 0x15: return FormatKeyName(0x15, text);
+        case 0x16: return FormatKeyName(0x16, text);
+        case 0x17: return FormatKeyName(0x17, text);
+        case 0x18: return FormatKeyName(0x18, text);
+        case 0x19: return FormatKeyName(0x19, text);
+        case 0x1a: return FormatKeyName(0x1a, text);
+        case 0x1b: return FormatKeyName(0x1b, text);
+        case 0x1c: return FormatKeyName(0x1c, text);
         case 0x1d:
             g_TrackGame->LoadResourceString(0x13c7, text, 0x80);
             return 1;
-        case 0x1e: return UnknownFunction449270(0x1e, text);
-        case 0x1f: return UnknownFunction449270(0x1f, text);
-        case 0x20: return UnknownFunction449270(0x20, text);
-        case 0x21: return UnknownFunction449270(0x21, text);
-        case 0x22: return UnknownFunction449270(0x22, text);
-        case 0x23: return UnknownFunction449270(0x23, text);
-        case 0x24: return UnknownFunction449270(0x24, text);
-        case 0x25: return UnknownFunction449270(0x25, text);
-        case 0x26: return UnknownFunction449270(0x26, text);
-        case 0x27: return UnknownFunction449270(0x27, text);
-        case 0x28: return UnknownFunction449270(0x28, text);
-        case 0x29: return UnknownFunction449270(0x29, text);
+        case 0x1e: return FormatKeyName(0x1e, text);
+        case 0x1f: return FormatKeyName(0x1f, text);
+        case 0x20: return FormatKeyName(0x20, text);
+        case 0x21: return FormatKeyName(0x21, text);
+        case 0x22: return FormatKeyName(0x22, text);
+        case 0x23: return FormatKeyName(0x23, text);
+        case 0x24: return FormatKeyName(0x24, text);
+        case 0x25: return FormatKeyName(0x25, text);
+        case 0x26: return FormatKeyName(0x26, text);
+        case 0x27: return FormatKeyName(0x27, text);
+        case 0x28: return FormatKeyName(0x28, text);
+        case 0x29: return FormatKeyName(0x29, text);
         case 0x2a:
             g_TrackGame->LoadResourceString(0x13c5, text, 0x80);
             return 1;
-        case 0x2b: return UnknownFunction449270(0x2b, text);
-        case 0x2c: return UnknownFunction449270(0x2c, text);
-        case 0x2d: return UnknownFunction449270(0x2d, text);
-        case 0x2e: return UnknownFunction449270(0x2e, text);
-        case 0x2f: return UnknownFunction449270(0x2f, text);
-        case 0x30: return UnknownFunction449270(0x30, text);
-        case 0x32: return UnknownFunction449270(0x32, text);
+        case 0x2b: return FormatKeyName(0x2b, text);
+        case 0x2c: return FormatKeyName(0x2c, text);
+        case 0x2d: return FormatKeyName(0x2d, text);
+        case 0x2e: return FormatKeyName(0x2e, text);
+        case 0x2f: return FormatKeyName(0x2f, text);
+        case 0x30: return FormatKeyName(0x30, text);
+        case 0x32: return FormatKeyName(0x32, text);
         case 0x36:
             g_TrackGame->LoadResourceString(0x13c6, text, 0x80);
             return 1;
-        case 0x37: return UnknownFunction449270(0x37, text);
+        case 0x37: return FormatKeyName(0x37, text);
         case 0x38:
             g_TrackGame->LoadResourceString(0x13c3, text, 0x80);
             return 1;
-        case 0x39: return UnknownFunction449270(0x39, text);
-        case 0x64: return UnknownFunction449270(0x64, text);
-        case 0x65: return UnknownFunction449270(0x65, text);
-        case 0x66: return UnknownFunction449270(0x66, text);
+        case 0x39: return FormatKeyName(0x39, text);
+        case 0x64: return FormatKeyName(0x64, text);
+        case 0x65: return FormatKeyName(0x65, text);
+        case 0x66: return FormatKeyName(0x66, text);
         case 0x9d:
             g_TrackGame->LoadResourceString(0x13c8, text, 0x80);
             return 1;
-        case 0xb3: return UnknownFunction449270(0xb3, text);
-        case 0xb5: return UnknownFunction449270(0xb5, text);
+        case 0xb3: return FormatKeyName(0xb3, text);
+        case 0xb5: return FormatKeyName(0xb5, text);
         case 0xb8:
             g_TrackGame->LoadResourceString(0x13c4, text, 0x80);
             return 1;
-        case 0xc8: return UnknownFunction449270(0xc8, text);
-        case 0xcb: return UnknownFunction449270(0xcb, text);
-        case 0xcd: return UnknownFunction449270(0xcd, text);
-        case 0xd0: return UnknownFunction449270(0xd0, text);
+        case 0xc8: return FormatKeyName(0xc8, text);
+        case 0xcb: return FormatKeyName(0xcb, text);
+        case 0xcd: return FormatKeyName(0xcd, text);
+        case 0xd0: return FormatKeyName(0xd0, text);
         }
     } else if (kind == 1) {
         if (code < 0) {
@@ -413,12 +413,12 @@ extern int g_KeyboardSubtype;
 extern int g_IsWindowsNT;
 
 // 0x00449d40
-int UnknownFunction449d40(int code)
+int TranslatePc98ScanCode(int code)
 {
     int translated = code;
 
     if (code >= 0 && code <= 0xff) {
-        UnknownFunction449d90();
+        DetectKeyboardLayout();
         if (g_KeyboardSubtype == 0x62 && !g_IsWindowsNT)
             translated = g_Pc98ScanCodes[code];
         return translated == -1 ? code : translated;
@@ -427,16 +427,16 @@ int UnknownFunction449d40(int code)
 }
 
 // 0x00449d90
-void UnknownFunction449d90()
+void DetectKeyboardLayout()
 {
     if (g_KeyboardSubtype == -1) {
-        g_KeyboardSubtype = UnknownFunction449de0();
-        g_IsWindowsNT = UnknownFunction449db0();
+        g_KeyboardSubtype = GetJapaneseKeyboardSubtype();
+        g_IsWindowsNT = IsWindowsNTPlatform();
     }
 }
 
 // 0x00449db0
-int UnknownFunction449db0()
+int IsWindowsNTPlatform()
 {
     OSVERSIONINFO info;
 
@@ -447,7 +447,7 @@ int UnknownFunction449db0()
 
 // 0x00449de0: GetKeyboardType(0) 7 is a Japanese keyboard; the high byte of
 // GetKeyboardType(1) is the OEM (0x0d NEC) and the low byte the subtype.
-int UnknownFunction449de0()
+int GetJapaneseKeyboardSubtype()
 {
     int subtype = 0;
 
@@ -465,11 +465,11 @@ int UnknownFunction449de0()
 }
 
 // 0x00449e30
-int UnknownFunction449e30(int code, int value)
+int ValueUnlessPc98(int code, int value)
 {
     int result = value;
 
-    UnknownFunction449d90();
+    DetectKeyboardLayout();
     if (g_KeyboardSubtype == 0x62 && !g_IsWindowsNT)
         result = 0;
     return result;

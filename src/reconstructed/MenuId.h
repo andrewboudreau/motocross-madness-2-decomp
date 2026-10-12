@@ -8,8 +8,9 @@
 // established. Ids OpenMenu has no dialog for (0xc9-0xcd, 0xd0, 0x104, 0x105,
 // 0x10e, 0x12c) are left numeric.
 //
-// SelectGamePicProcs.cpp does not include it: declaring the enum there
-// changes VC6's code for FillFileList (0x004f17a0).
+// SelectGamePicProcs.cpp and TrackGame.cpp do not include it: declaring the
+// enum there changes VC6's code for FillFileList (0x004f17a0) and TrackGame
+// slot 1 (0x00520ab0).
 enum KrustyMenuId {
     kMenuMain = 100,              // MainDlg
     kMenuSinglePlayer = 101,      // SinglePlayerDlg

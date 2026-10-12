@@ -171,12 +171,12 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->UnknownFunction4b78f0("Material - 0");
             block->UnknownFunction4b7b30("TextureMap", path, -1);
             int format = 1555;
-            if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
+            if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->capabilityBits & 8)
                 && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                format = g_TrackGame->field_0x10->field_0x28;
+                format = g_TrackGame->field_0x10->colorKeyFormat;
             modelTexture = UnknownFunction50a590(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->UnknownVirtualSlot7()) {
-                int loaded = modelTexture->field_0x20;
+                int loaded = modelTexture->pixelFormat;
                 if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
                     modelTexture->UnknownVirtualSlot18(keyColor);
                 modelTexture->UnknownVirtualSlot8(1, 0, 0);
@@ -260,7 +260,7 @@ Vegetation::Vegetation() {
     radiusParam = 0;
     definitionIndex = 0;
     geometryBlock = 0;
-    field_0x08 = g_UnknownGlobal59aebc->vegetationTypeId;
+    typeId = g_UnknownGlobal59aebc->vegetationTypeId;
 }
 
 // 0x00456690
@@ -269,12 +269,12 @@ unsigned short Vegetation::UnknownVirtualSlot0() {
     float depth = ((quantizedPosition.z * (*m)(2, 2) + quantizedPosition.x * (*m)(0, 2)) * g_UnknownGlobal59aebc->unitsPerCoordinate
                    + (*m)(3, 2)) * g_UnknownGlobal59aebc->depthScale;
     if (depth < 0.0)
-        field_0x06 = 0;
+        sortKey = 0;
     else if ((int)depth >= 0xffff)
-        field_0x06 = (short)0xffff;
+        sortKey = (short)0xffff;
     else
-        field_0x06 = (short)(int)depth;
-    return field_0x06;
+        sortKey = (short)(int)depth;
+    return sortKey;
 }
 
 // 0x00456720
@@ -334,7 +334,7 @@ int EvictGeometry(void* owner, int context) {
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->field_0x08;
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->camera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
         return;
@@ -356,11 +356,11 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         float heightScale = definition->HeightForParameter(heightParam) * definition->modelHeightScale;
         float c;
         float s;
-        if (camera->field_0x17c.z != 0.0f) {
-            float inverse = UnknownFunction460c70(camera->field_0x17c.x * camera->field_0x17c.x
-                                                  + camera->field_0x17c.z * camera->field_0x17c.z) * radiusScale;
-            c = inverse * camera->field_0x17c.z;
-            s = -(inverse * camera->field_0x17c.x);
+        if (camera->direction.z != 0.0f) {
+            float inverse = UnknownFunction460c70(camera->direction.x * camera->direction.x
+                                                  + camera->direction.z * camera->direction.z) * radiusScale;
+            c = inverse * camera->direction.z;
+            s = -(inverse * camera->direction.x);
         } else {
             c = radiusScale;
             s = 0.0f;
@@ -801,8 +801,8 @@ EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textu
     textureManager = textures;
     lightManager = lights;
     billboardFormat = textureFormat;
-    float size = g_collisionQuadTree->field_0x54;
-    float width = g_collisionQuadTree->field_0x50;
+    float size = g_collisionQuadTree->extentZ;
+    float width = g_collisionQuadTree->extentX;
     if (width > size)
         size = width;
     coordinatesPerUnit = 65536.0f / size;
@@ -910,9 +910,9 @@ int EcoSystem::PlaceAuthoredObjects() {
     int row;
     int column;
     unsigned char* pixel = (unsigned char*)bitmap->bits;
-    float cellX = g_collisionQuadTree->field_0x50;
+    float cellX = g_collisionQuadTree->extentX;
     cellX /= bitmap->infoHeader.width;
-    float cellZ = g_collisionQuadTree->field_0x54;
+    float cellZ = g_collisionQuadTree->extentZ;
     cellZ /= bitmap->infoHeader.height;
     for (row = 0; row < bitmap->infoHeader.height; row++) {
         for (column = 0; column < bitmap->infoHeader.width; column++) {
@@ -942,9 +942,9 @@ done:
 void EcoSystem::UnknownFunction45a9a0() {
     UnknownEcoLight* light = lightManager->UnknownFunction4a0190(6);
     if (light) {
-        ambientLight.x = light->field_0x54[0];
-        ambientLight.y = light->field_0x54[1];
-        ambientLight.z = light->field_0x54[2];
+        ambientLight.x = light->colour[0];
+        ambientLight.y = light->colour[1];
+        ambientLight.z = light->colour[2];
     } else {
         ambientLight.z = 0.0f;
         ambientLight.y = 0.0f;
@@ -960,12 +960,12 @@ void EcoSystem::UnknownFunction45a9a0() {
             return;
         }
     }
-    lightColor.x = light->field_0x54[0];
-    lightColor.y = light->field_0x54[1];
-    lightColor.z = light->field_0x54[2];
-    lightDirection.x = light->field_0x70.x;
+    lightColor.x = light->colour[0];
+    lightColor.y = light->colour[1];
+    lightColor.z = light->colour[2];
+    lightDirection.x = light->direction.x;
     lightDirection.y = 0.0f;
-    lightDirection.z = light->field_0x70.z;
+    lightDirection.z = light->direction.z;
     float length = UnknownSquareMagnitude(&lightDirection);
     if (length == 0.0f) {
         lightDirection = kVec3Zero;
@@ -992,15 +992,15 @@ int EcoSystem::UnknownVirtualSlot12() {
             ageManager->EvictStale(total - stale);
         ageManager->AdvanceAge();
     }
-    g_UnknownGlobal59af00 = &ECO_VIEW->field_0x08->field_0xac;
-    depthScale = 65535.0f / ECO_VIEW->field_0x08->field_0x1c0;
-    depthUnit = ECO_VIEW->field_0x08->field_0x1c0 * (1.0f / 65535.0f);
+    g_UnknownGlobal59af00 = &ECO_VIEW->camera->viewMatrix;
+    depthScale = 65535.0f / ECO_VIEW->camera->farDistance;
+    depthUnit = ECO_VIEW->camera->farDistance * (1.0f / 65535.0f);
     billboardCount = 0;
     geometryCount = 0;
     g_collisionQuadTree->RestartQuery();
     Vegetation* object = (Vegetation*)g_collisionQuadTree->NextObjectSorted();
     while (object) {
-        if (object->field_0x08 == vegetationTypeId) {
+        if (object->typeId == vegetationTypeId) {
             int billboard = object->isBillboard;
             int fade = object->fadeLevel;
             object->TestDistance(&billboard, &fade);
@@ -1015,7 +1015,7 @@ int EcoSystem::UnknownVirtualSlot12() {
                 center.x = object->quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
                 center.y = object->quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + height;
                 center.z = object->quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
-                visible = g_visibilityClipper->SphereInFrustum(ECO_VIEW->field_0x08, &ECO_VIEW->field_0x08->field_0xec,
+                visible = g_visibilityClipper->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->field_0xec,
                                                                &center, radius, 0);
             }
             if (visible) {
@@ -1226,13 +1226,13 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
                     block->UnknownFunction4b78f0("Material - 0");
                     block->UnknownFunction4b7b30("TextureMap", sltName, -1);
                     int format = 1555;
-                    if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
+                    if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->capabilityBits & 8)
                         && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                        format = g_TrackGame->field_0x10->field_0x28;
+                        format = g_TrackGame->field_0x10->colorKeyFormat;
                     UnknownEcoTexture* texture = UnknownFunction50a590(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
                     if (!texture->UnknownVirtualSlot7()) {
                         g_UnknownGlobal59af10++;
-                        int loaded = texture->field_0x20;
+                        int loaded = texture->pixelFormat;
                         if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
                             texture->UnknownVirtualSlot18(keyColors[i]);
                         texture->UnknownVirtualSlot8(1, 0, 0);

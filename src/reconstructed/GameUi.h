@@ -54,7 +54,7 @@ public:
     UIFrame(void* module, int id, void* textures, int a, int b, int c, void* palette);
     virtual ~UIFrame();                       // 0x00472dc0 (deleting wrapper 0x00472ba0)
     // 0x00472bc0: loads the image at `offset` of `stream`; 0 when it fails.
-    int UnknownFunction472bc0(void* stream, int offset, void* palette);
+    int LoadFromStream(void* stream, int offset, void* palette);
 
     int isSound;                              // +0x08: 1: a sound, not an image
     int frameWidth;                           // +0x0c
@@ -210,7 +210,7 @@ public:
     int IsEnabled();                          // 0x00470720: returns +0x6c
     void SetSound(int index, Sound* sound);   // 0x00470810: "SoundNorm", "SoundFocus", "SoundPush", "SoundClick"
     void SetAnchor(UIControl* anchor, int relative); // 0x00470830: "Anchor" and "RelAnchor"
-    UIControl* UnknownFunction470850(UIControl* none); // 0x00470850: the last linked control
+    UIControl* FindLastAnchor(UIControl* none); // 0x00470850: the last linked control
     void SetShapeBounds(int value);           // 0x004709d0: "ShapeBounds"
     void SetTextDrop(int value);              // 0x00470d60: "TextDrop"
     void SetDropColor(int value);             // 0x00470d80: "DropColor"
@@ -220,60 +220,61 @@ public:
     // 0x00470870: starts transition `type` (100-106: the loader's "FX" GROW,
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
     void StartTransition(int type, int a, int b, int delay, int c);
-    int UnknownFunction471500();              // 0x00471500
-    GameObjectIterator* UnknownFunction4726b0(); // slot 53's body: an iterator over the owner's controls
-    void UnknownFunction472730(GameObjectIterator* iterator); // 0x00472730: deletes it
-    // 0x00472750: the next control with this control's id.
-    UIControl* UnknownFunction472750(GameObjectIterator* iterator);
-    // 0x00472790: the next control with this control's id and another type.
-    UIControl* UnknownFunction472790(GameObjectIterator* iterator);
-    UIControl* UnknownFunction4727c0(); // 0x004727c0: the previous focusable control
-    UIControl* UnknownFunction472810(); // 0x00472810: the next focusable control
+    int RunTransition();              // 0x00471500
+    GameObjectIterator* CreateControlIterator(); // slot 53's body: an iterator over the owner's controls
+    void DeleteControlIterator(GameObjectIterator* iterator); // 0x00472730: deletes it
+    // 0x00472750: the next control with this control's attach id.
+    UIControl* NextAttachedControl(GameObjectIterator* iterator);
+    // 0x00472790: the next control with this control's attach id and type.
+    UIControl* NextAttachedControlOfType(GameObjectIterator* iterator);
+    UIControl* PreviousFocusableControl(); // 0x004727c0: the previous focusable control
+    UIControl* NextFocusableControl(); // 0x00472810: the next focusable control
     int UnknownFunction472480(int* position); // 0x00472480
 
-    int field_0x2c[4];                        // screen area (scaled +0x3c)
+    int screenArea[4];                        // +0x2c: screen area (scaled +0x3c)
     union {
-        int field_0x3c[4];                    // the control's area, a CameraRect (dlgprocs.cpp LoadingDlg)
+        int bounds[4];                        // +0x3c: the control's area, a CameraRect (dlgprocs.cpp LoadingDlg)
         struct {
             int left;
             int top;
             int right;
             int bottom;
-        } field_0x3c_rect;
+        } boundsRect;
     };
-    int field_0x4c[4];                        // the visible part: left and top clipped, width, height
+    int visibleArea[4];                       // +0x4c: the visible part: left and top clipped, width, height
     // Member names follow the .dtm keys the dialog loader (UIDialog slot 27)
     // stores in them ("GroupId", "AttachId", "TextColor", ...).
     int controlType;                          // +0x5c: 5 static, 7/8 scroll bar, 11 edit box, 12 static text (FindControl's filter)
     int currentState;                         // +0x60: state (image index)
     int savedState;                           // +0x64: state before disabling
-    int field_0x68;                           // a movie control's playing flag (dlgprocs.cpp MainDlg slot 10)
+    int transitionState;                      // +0x68: 0 idle, 1 showing, 2 hiding (Show, RunTransition;
+                                              // MainDlg slot 10 waits for its menu animation to clear it)
     int enabled;                              // +0x6c: "Enable" (slot 49)
-    int field_0x70;
+    int shown;                                // +0x70: Show's flag; drawing and hit tests skip hidden controls
     int eventCode;                            // +0x74
     int groupId;                              // +0x78: "GroupId" (UIDialog::EnableGroup, ShowGroup)
     int attachId;                             // +0x7c: "AttachId" (slot 52; lists and their scroll bars share it)
-    float field_0x80;                         // sliding position (x)
-    float field_0x84;                         // sliding position (y)
-    float field_0x88;                         // zooming width
-    float field_0x8c;                         // zooming height
-    float field_0x90;                         // x step per frame
-    float field_0x94;                         // y step per frame
-    float field_0x98;                         // width step per frame
-    float field_0x9c;                         // height step per frame
+    float slideX;                             // +0x80: sliding position (x)
+    float slideY;                             // +0x84: sliding position (y)
+    float zoomWidth;                          // +0x88: zooming width
+    float zoomHeight;                         // +0x8c: zooming height
+    float slideStepX;                         // +0x90: x step per frame
+    float slideStepY;                         // +0x94: y step per frame
+    float zoomStepWidth;                      // +0x98: width step per frame
+    float zoomStepHeight;                     // +0x9c: height step per frame
     int shapeBounds;                          // +0xa0: "ShapeBounds"
     int sourceBlit;                           // +0xa4: "SourceBlit"
     unsigned int transitionTime;              // +0xa8
     unsigned int transitionDelay;             // +0xac: "FXDelay"
     int field_0xb0;
-    int field_0xb4;
+    int transitionType;                       // +0xb4: StartTransition's type (0x6a picks slots 46/47)
     UIDialog* ownerDialog;         // +0xb8
     GUIManager* ownerGui;                     // +0xbc
     char* controlText;                        // +0xc0: "Text" (SetText)
     unsigned int textColor;                   // +0xc4: "TextColor"
     int dropColor;                            // +0xc8: "DropColor"
     unsigned int currentTextColor;            // +0xcc
-    int field_0xd0;
+    int controlTextLength;                    // +0xd0: strlen(controlText)
     int textDrop;                             // +0xd4: "TextDrop"
     int textAlign;                            // +0xd8: "TextAlign"/"TextAlignV" bits
     int textExtent[2];                        // +0xdc: the text's length and width
@@ -308,7 +309,7 @@ public:
     void* field_0x1c4;
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
-    int (UIControl::*field_0x1d0)(); // the running transition (slots 41-47)
+    int (UIControl::*transitionStep)(); // +0x1d0: the running transition (slots 41-47)
     int field_0x1d4;
     int keyBind;                              // +0x1d8: "KeyBind"
     int post3D;                               // +0x1dc: "Pre3D" == 0
@@ -328,14 +329,14 @@ public:
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00473410
 
     // 0x004732d0: the images for the up, over, down, disabled and focus states.
-    void UnknownFunction4732d0(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled);
+    void SetStateImages(UIAnim* up, UIAnim* over, UIAnim* down, UIAnim* disabled);
     void SetNormalImage(UIAnim* image); // 0x00473310
     void SetFocusImage(UIAnim* image); // 0x00473330
     void SetPushImage(UIAnim* image); // 0x00473350
     void SetDisabledImage(UIAnim* image); // 0x00473370
     void SetSortList(UIListBox* list); // 0x00473390: links a column button to its list (ProCircuitProcs.cpp)
 
-    UIListBox* field_0x1ec;                   // the list a column button sorts (slot 56 sorts it)
+    UIListBox* sortList;                      // +0x1ec: the list a column button sorts (slot 56 sorts it)
 };
 
 // RTTI: UIStatic : UIControl (vtable 0x00553318; 0x1ec bytes, `new` at
@@ -364,8 +365,8 @@ public:
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10 (shared with UIScrollCtl)
     virtual void UnknownVirtualSlot59(int value); // 0x00473840: writes the text back
 
-    void UnknownFunction473d80(int value);    // 0x00473d80
-    void UnknownFunction473d90(int value);    // 0x00473d90
+    void SetClickSound(int value);    // 0x00473d80
+    void SetFullSound(int value);    // 0x00473d90
     void BindTextBuffer(char* buffer, int size); // 0x00473820: binds a text buffer (OptionProcs.cpp)
     void SetCapacity(int size);     // 0x00473c70: the text's capacity
     void SetEditText(char* text);   // 0x00473da0: sets the text
@@ -382,11 +383,11 @@ public:
     int field_0x200;
     union {
         int field_0x204;
-        Sound* field_0x204_sound;             // the key click
+        Sound* clickSound;                    // +0x204: the key click
     };
     union {
         int field_0x208;
-        Sound* field_0x208_sound;             // the "full" sound
+        Sound* fullSound;                     // +0x208: the "full" sound
     };
     void* backgroundBrush;                    // +0x20c: the background brush (HBRUSH)
     void* acceptedCharacters;                 // +0x210
@@ -424,10 +425,10 @@ public:
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x00475970
     virtual void UnknownVirtualSlot59(int value); // 0x00474cb0
 
-    void UnknownFunction475160(int state);    // 0x00475160: the thumb size from a state image
+    void SetThumbSizeFromState(int state);    // 0x00475160: the thumb size from a state image
     void UnknownFunction4751c0(int range);    // 0x004751c0
-    int UnknownFunction4751e0(UIListBox* list); // 0x004751e0: `list`'s scroll range
-    int UnknownFunction475200(UIListBox* list); // 0x00475200: follows `list`
+    int GetListScrollRange(UIListBox* list); // 0x004751e0: `list`'s scroll range
+    int FollowList(UIListBox* list); // 0x00475200: follows `list`
     int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
     int UnknownFunction4753c0(int value, int range); // 0x004753c0: sets the position to `value` of `range`
     void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
@@ -436,7 +437,8 @@ public:
 
     union {
         int field_0x1ec;
-        float field_0x1ec_float;              // the thumb's position (0..1)
+        float thumbOffset;                    // +0x1ec: the thumb's offset along the track (pixels; clamped to
+                                              // the track length less the thumb, added to screenArea)
     };
     int field_0x1f0;
     int thumbWidth;                           // +0x1f4
@@ -445,17 +447,18 @@ public:
     int scrollRange;                          // +0x200
     union {
         int field_0x204;
-        UIAnim* field_0x204_image;            // the track image
+        UIAnim* trackImage;                   // +0x204: the track image
     };
     int field_0x208;
     int dragX;                                // +0x20c: the last drag position (x)
     int dragY;                                // +0x210: (y)
-    float field_0x214;
+    float holdDelay;                          // +0x214: 0.2 s; held that long in place, it sends event 0x11
     union {
         int field_0x218;
-        float field_0x218_float;              // time held at one position
+        float holdTime;                       // +0x218: time held at one position
     };
-    int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
+    int reversed;                             // +0x21c: the thumb counts from the far end (set on the
+                                              // SldEQ sliders, OptionProcs.cpp)
 };
 
 // RTTI: UIListBox : UIControl (vtable 0x00553100; 0x250 bytes, `new` at
@@ -497,7 +500,7 @@ public:
     char* GetRowText(int row);                // 0x00476d20: (-1: the selected one)
     int AddRow(const char* text, int data, int a); // 0x00476d80: adds a row ("Item%d")
     int CountVisibleRows();                   // 0x00476ee0: the rows that fit from the first shown
-    int UnknownFunction476f50(int rows);      // 0x00476f50: grows the rows to `rows`
+    int ReserveRows(int rows);      // 0x00476f50: grows the rows to `rows`
     void SetRowText(int row, const char* text); // 0x00476ff0
     int AddImageFileRow(const char* image, int a, int b, int c); // 0x00477110
     int AddImageRow(UIAnim* image, int data, int a); // 0x004773a0 ("Item%d" starting with '@')
@@ -530,7 +533,7 @@ public:
         UIListBox* field_0x218_control;       // itself
     };
     int autoSort;                             // +0x21c: "AutoSort"
-    int field_0x220;
+    int sorting;                              // +0x220: 1 while Sort runs
     int selectable;                           // +0x224: "Selectable"
     int allowWScroll;                         // +0x228: "AllowWScroll"
     int field_0x22c;
@@ -539,9 +542,9 @@ public:
     int lastClickRow;                         // +0x238: for the double click (slot 66)
     int lastClickTime;                        // +0x23c
     int field_0x240;
-    int field_0x244;
-    int field_0x248;
-    int (*field_0x24c)(const void* a, const void* b); // the rows' sort order
+    int wrapScroll;                           // +0x244: ScrollBy wraps around the rows (1 by default)
+    int hoverRow;                             // +0x248: the row under the cursor, framed (-1: none; slot 10)
+    int (*sortCompare)(const void* a, const void* b); // +0x24c: the rows' sort order (SetSortCompare)
 };
 
 // RTTI: UIMultiState : UIControl (vtable 0x00553210; 0x1f8 bytes, `new` at
@@ -668,13 +671,13 @@ public:
     virtual int UnknownVirtualSlot61();       // 0x0047a850
     virtual int UnknownVirtualSlot62();       // 0x0047a870
 
-    void UnknownFunction47a2d0(int open);     // 0x0047a2d0: opens or closes the list
-    void UnknownFunction47a400();             // 0x0047a400: names and lays out the parts
-    void UnknownFunction47a880(int height);   // 0x0047a880: lays the parts out for a row height
-    void UnknownFunction47a970(UIAnim* image); // 0x0047a970: the static part's image
-    void UnknownFunction47aa40(UIAnim* image); // 0x0047aa40: the button's image
-    void UnknownFunction47ab20(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
-    int UnknownFunction47a800(UIControl* control); // 0x0047a800: whether `control` is a part
+    void SetOpen(int open);     // 0x0047a2d0: opens or closes the list
+    void LayoutParts();             // 0x0047a400: names and lays out the parts
+    void LayoutForRowHeight(int height);   // 0x0047a880: lays the parts out for a row height
+    void SetStaticImage(UIAnim* image); // 0x0047a970: the static part's image
+    void SetButtonImage(UIAnim* image); // 0x0047aa40: the button's image
+    void SetCornerImage(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
+    int IsPart(UIControl* control); // 0x0047a800: whether `control` is a part
     // Inline: the button. SelectGamePicProcs.cpp reads it through this
     // accessor; reading field_0x1ec directly lets VC6 merge the two branches
     // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the
@@ -712,8 +715,8 @@ public:
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
     int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
 
-    MediaControl* field_0x1ec;                // the player
-    int field_0x1f0[4];                       // the frame's source rectangle
+    MediaControl* moviePlayer;                // +0x1ec: the player
+    int frameRect[4];                         // +0x1f0: the frame's source rectangle
 };
 
 // RTTI: UIProgressBar : UIStatic (vtable 0x00553c68; 0x204 bytes, new'd by
@@ -728,7 +731,7 @@ public:
     void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 
     float progressFraction;                   // +0x1ec: the part done (0..1)
-    int field_0x1f0;                          // steps
+    int stepCount;                            // +0x1f0: steps (LoadingDlg sets 20)
     int stepsDone;                            // +0x1f4: steps done (0x0047b370)
     TextureMap* barTexture;                   // +0x1f8
     int showPercentage;                       // +0x1fc
