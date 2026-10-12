@@ -391,6 +391,60 @@ int SphereTreeQueryWithVertices(const Vec3* center, float radius, float radiusSq
     return SphereTreeQuery(center, radius, radiusSq, node, xf, triangles);
 }
 
+// 0x00429570.  Sphere (world centre, radius) against a tree: a triangle tree when
+// triangles != 0 (the vertices are in s_vertices), else a point tree.  A triangle hits when
+// the centre is within radius of its plane and either projects inside it or lies within
+// radius of an edge; a point hits within radiusSq (squared).  The misses share one
+// `return 0` tail with the inner node's box test, the first child's nonzero result is
+// returned as is, and the second child's call is not in tail position (VC6 turns
+// `return SphereTreeQuery(...)` into a loop).  The point branch's own block lets its
+// locals share the triangle branch's slots.
+int SphereTreeQuery(const Vec3* center, float radius, float radiusSq, QueryTreeNode* node,
+                    const Matrix4* xf, int triangles)
+{
+    if (node->volume < 0.0f) {
+        if (triangles) {
+            QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
+            Vec3 p = *center;
+            InverseTransformPoint(&p, p, xf);
+            const Vec3& v0 = s_vertices[tri->vertex[0]];
+            Vec3 d = Vec3Call(p.x - v0.x, p.y - v0.y, p.z - v0.z);
+            float dist = QueryDot(d, tri->normal);
+            Vec3 u, q;
+            if (dist <= radius) {
+                // d is dead here and holds the scaled normal (retail's slot for both).
+                q = *Vec3SubtractCall(&u, &p, Vec3ScaleCall(&d, &tri->normal, dist));
+                if (PointInTriangle(&q, tri))
+                    return 1;
+                if (PointSegmentDistance(&p, &s_vertices[tri->vertex[0]], &s_vertices[tri->vertex[1]]) < radius)
+                    return 1;
+                if (PointSegmentDistance(&p, &s_vertices[tri->vertex[1]], &s_vertices[tri->vertex[2]]) < radius)
+                    return 1;
+                if (PointSegmentDistance(&p, &s_vertices[tri->vertex[2]], &s_vertices[tri->vertex[0]]) < radius)
+                    return 1;
+            }
+            return 0;
+        }
+        {
+            Vec3 p = ((QueryPointLeaf*)node)->point;
+            Vec3 w;
+            w.x = p.x * xf->_11 + p.y * xf->_21 + p.z * xf->_31 + xf->_41;
+            w.y = p.x * xf->_12 + p.y * xf->_22 + p.z * xf->_32 + xf->_42;
+            w.z = p.x * xf->_13 + p.y * xf->_23 + p.z * xf->_33 + xf->_43;
+            Vec3 d = w - *center;
+            if (QueryDot(d, d) < radiusSq)
+                return 1;
+        }
+    } else if (BoxSphereOverlap(&node->center, &node->halfExtents, *center, radius, radiusSq, xf)) {
+        int hit = SphereTreeQuery(center, radius, radiusSq, node->child[0], xf, triangles);
+        if (!hit)
+            hit = SphereTreeQuery(center, radius, radiusSq, node->child[1], xf, triangles);
+        return hit;
+    }
+    return 0;
+}
+
+
 // 0x00429890.
 int CapsuleTreeQueryWithVertices(const Vec3* ends, float radius, float radiusSq,
                                  QueryTreeNode* node, const Matrix4* xf, int triangles,

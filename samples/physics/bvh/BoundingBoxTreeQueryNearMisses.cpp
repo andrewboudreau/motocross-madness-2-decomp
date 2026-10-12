@@ -2,11 +2,6 @@
 // (src/krusty2/bvh/BoundingBoxTreeQuery.cpp, 0x00424690..0x0042ad2f).  Names are tier 3.
 //
 // Status (VC6 SP3, vc6_o2_ml; tools/run_physics_samples.py scores):
-// - SphereTreeQuery 0x00429570 (831 vs 789 bytes): retail shares one `return 0` / `return 1`
-//   tail between the triangle and point branches and keeps the second recursive call
-//   un-merged (it returns the first child's nonzero result as is); this source gives
-//   separate epilogues.  An if / else-if form with `int hit = child0; if (!hit) hit = child1;`
-//   gives retail's block order and tails but moves the triangle branch's stack slots.
 // - MoveBox 0x00428db0 (789 bytes, 773 strict): the GrowBoxByTransformedBox body on pointer
 //   arguments (that one is exact in the src file).  With the loop output in its own local
 //   (`mid`), `grown` assigned after the last rotation and the z, y, x sums of the transform,
@@ -17,6 +12,8 @@
 //
 // LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
 // exact in the src file.
+//
+// SphereTreeQuery 0x00429570 is exact in the src file too.
 //
 // SweptBoxOverlap 0x00424730, BoxOverlap 0x00424ab0 and PointInTriangle 0x004278d0 are exact
 // in the src file as well (the last two with Math3D.h's parenthesised CrossProduct and
@@ -88,49 +85,6 @@ static Matrix4 s_relativeBA;        // 0x00578eb0
 static Matrix4 s_motion;            // 0x00579018
 static int s_mode;                  // 0x0057905c
 extern QueryHit* g_CollisionBoxResult;   // 0x00579058
-
-// 0x00429570.  Sphere (world centre, radius) against a tree: a triangle tree when
-// triangles != 0 (the vertices are in s_vertices), else a point tree.
-int SphereTreeQuery(const Vec3* center, float radius, float radiusSq, QueryTreeNode* node,
-                    const Matrix4* xf, int triangles)
-{
-    if (node->volume < 0.0f) {
-        if (triangles) {
-            QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
-            Vec3 p = *center;
-            InverseTransformPoint(&p, p, xf);
-            const Vec3& v0 = s_vertices[tri->vertex[0]];
-            Vec3 d = Vec3Call(p.x - v0.x, p.y - v0.y, p.z - v0.z);
-            float dist = QueryDot(d, tri->normal);
-            if (dist > radius)
-                return 0;
-            Vec3 t, q;
-            q = *Vec3SubtractCall(&q, &p, Vec3ScaleCall(&t, &tri->normal, dist));
-            if (PointInTriangle(&q, tri))
-                return 1;
-            if (PointSegmentDistance(&p, &s_vertices[tri->vertex[0]], &s_vertices[tri->vertex[1]]) < radiusSq)
-                return 1;
-            if (PointSegmentDistance(&p, &s_vertices[tri->vertex[1]], &s_vertices[tri->vertex[2]]) < radiusSq)
-                return 1;
-            if (PointSegmentDistance(&p, &s_vertices[tri->vertex[2]], &s_vertices[tri->vertex[0]]) < radiusSq)
-                return 1;
-            return 0;
-        }
-        Vec3 p = ((QueryPointLeaf*)node)->point;
-        Vec3 w;
-        w.x = p.x * xf->_11 + p.y * xf->_21 + p.z * xf->_31 + xf->_41;
-        w.y = p.x * xf->_12 + p.y * xf->_22 + p.z * xf->_32 + xf->_42;
-        w.z = p.x * xf->_13 + p.y * xf->_23 + p.z * xf->_33 + xf->_43;
-        Vec3 d = w - *center;
-        if (QueryDot(d, d) < radiusSq)
-            return 1;
-        return 0;
-    }
-    if (!BoxSphereOverlap(&node->center, &node->halfExtents, *center, radius, radiusSq, xf))
-        return 0;
-    return SphereTreeQuery(center, radius, radiusSq, node->child[0], xf, triangles) ||
-           SphereTreeQuery(center, radius, radiusSq, node->child[1], xf, triangles);
-}
 
 // MoveBox's transform: the x and z rows sum z, y, x (no grouping), which also gives retail's
 // slot order for d and half.

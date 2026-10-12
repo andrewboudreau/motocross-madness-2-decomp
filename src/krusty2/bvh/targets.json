@@ -152,6 +152,16 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
+    "target_va": "0x00429570",
+    "target_size": 789,
+    "expect": "exact",
+    "notes": "moved from samples; one shared return-0 tail, the second child's call kept out of tail position, d reused for the scaled normal; edges compare against radius",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "_$E2",
     "target_va": "0x00429400",
     "target_size": 5,

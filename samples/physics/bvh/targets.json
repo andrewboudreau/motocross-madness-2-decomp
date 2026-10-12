@@ -11,16 +11,6 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
-    "target_va": "0x00429570",
-    "target_size": 789,
-    "expect": "partial",
-    "notes": "near miss: retail merges the return-0/return-1 tails; control flow and calls otherwise match",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
     "candidate_symbol_contains": "?MoveBox@@YAXPAUVec3@@0PBUMatrix4@@@Z",
     "target_va": "0x00428db0",
     "target_size": 789,
