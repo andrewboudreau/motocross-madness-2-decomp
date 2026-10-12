@@ -213,7 +213,7 @@ int Game::UnknownVirtualSlot8() {
                 debugOverlay->Print(profilePage, "Render3D       % 3d (%d)",
                                                   render3D, s_Render3DPeak.Peak());
                 debugOverlay->Print(profilePage, "   [this overlay %d]",
-                                                  debugOverlay->field_0x36dc);
+                                                  debugOverlay->drawTime);
                 debugOverlay->Print(profilePage, "RenderPost3D   % 3d (%d)",
                                                   renderPost3D, s_RenderPost3DPeak.Peak());
                 debugOverlay->Print(profilePage, "TotalTransforms% 5d", renderTarget->verticesDrawn);

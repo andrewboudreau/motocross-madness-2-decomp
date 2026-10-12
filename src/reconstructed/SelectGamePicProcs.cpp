@@ -2067,11 +2067,11 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[g_TrackGame->mode.racerChoice.bikeIndex]
             .engineSize = UNKNOWN_GARAGE_SETTINGS->engineSize;
         ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[g_TrackGame->mode.racerChoice.bikeIndex]
-            .field_0x90 = UNKNOWN_GARAGE_SETTINGS->fourStroke;
+            .fourStroke = UNKNOWN_GARAGE_SETTINGS->fourStroke;
     } else {
         int row = bikes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
-        UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].field_0x90;
+        UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
         int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
@@ -2106,7 +2106,7 @@ void MPBikeRiderDlg::SyncValues(int apply) {
         g_TrackGame->mode.racerChoice.bikeModel[count] = 0;
     }
     {
-        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48;
+        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].texture;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
         strncpy(g_TrackGame->mode.racerChoice.bikeName, name, count);

@@ -87,5 +87,5 @@ public:
     int fontHeight;                           // font height
     TextureMapManager* field_0x36d4;
     PCTextureMap* fontTexture;                // font texture
-    int field_0x36dc;                         // Game slot 8: "[this overlay %d]"
+    int drawTime;                             // +0x36dc ReadClock() ticks slot 14 took; Game slot 8: "[this overlay %d]"
 };

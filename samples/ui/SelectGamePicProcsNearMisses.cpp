@@ -235,13 +235,13 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                                   .modelName,
                           0x40);
                 COPY_TEXT(g_TrackGame->mode.racers[racer].bikeName,
-                          ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x48, 0x40);
+                          ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].texture, 0x40);
                 COPY_TEXT(g_TrackGame->mode.racers[racer].riderName,
                           ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[riders[racer]].modelName, 0x40);
                 g_TrackGame->mode.racers[racer].engineSize =
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].engineSize;
                 g_TrackGame->mode.racers[racer].fourStroke =
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x90;
+                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].fourStroke;
                 racer++;
             }
         }

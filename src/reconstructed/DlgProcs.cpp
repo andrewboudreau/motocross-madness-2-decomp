@@ -1157,7 +1157,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[list->GetRowData(-1)];
         ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].field_0xc0->plateTexture)
-            ->ReplaceMaterialTexture(0, bike->field_0x48, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, bike->texture, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }
     if (riderChanged) {
@@ -1224,7 +1224,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
         UNKNOWN_GARAGE_SETTINGS->engineSize =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         UNKNOWN_GARAGE_SETTINGS->fourStroke =
-            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].field_0x90;
+            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
         int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         if (current != previous)
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
@@ -1250,7 +1250,7 @@ void SPBikeRiderDlg::SyncValues(int apply) {
         g_TrackGame->mode.racerChoice.bikeModel[count] = 0;
     }
     {
-        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48;
+        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].texture;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
         strncpy(g_TrackGame->mode.racerChoice.bikeName, name, count);
@@ -1425,7 +1425,7 @@ void CreateProfile(UnknownDialogEvent* event) {
                    ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
                        [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model].modelName);
             strcpy(g_TrackGame->mode.racerChoice.bikeName,
-                   ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x48);
+                   ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].texture);
             break;
         }
     }

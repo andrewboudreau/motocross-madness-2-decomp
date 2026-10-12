@@ -980,7 +980,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
         g_TrackGame->proCircuit->racers[0].engineSize =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         g_TrackGame->proCircuit->racers[0].field_0x13c =
-            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].field_0x90;
+            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
         int bikeClass = UnknownBikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
@@ -1003,7 +1003,7 @@ void PCCentralBikeRiderDlg::SyncValues(int apply)
            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
                [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].model].modelName);
     strcpy(g_TrackGame->proCircuit->racers[0].bikeName,
-           ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48);
+           ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].texture);
     strcpy(g_TrackGame->proCircuit->racers[0].bikeDisplayName,
            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].displayName);
     strcpy(g_TrackGame->proCircuit->racers[0].riderModel, "");
@@ -1203,7 +1203,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
         int bike = list->GetRowData(-1);
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)ui->bikes)[bike];
         ((UnknownProCircuitSkinned*)((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].field_0xc0->plateTexture)
-            ->ReplaceMaterialTexture(0, entry->field_0x48, &g_TrackGame->field_0x1c);
+            ->ReplaceMaterialTexture(0, entry->texture, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }
     if (riderChanged) {
