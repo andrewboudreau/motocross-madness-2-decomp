@@ -1135,8 +1135,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot95@Vehicle",
     "target_va": "0x0052a6a0",
     "target_size": 399,
-    "expect": "partial",
-    "notes": "5.7% (387/399). Rotate scene node about field_0x194 by |v|*dt. Retail loads y,x,z then does the three squares with the lenSq kept in memory and no ebx; all source permutations of the sum (fields, locals, helpers) compile to the same z,y,x load order.",
+    "expect": "exact",
+    "notes": "Strict exact. Rotates the scene node about rotationPivot by |angularVelocity| * stepTime around its direction; both squared lengths go through a helper that loads y, x, z first and sums z*z + (x*x + y*y), the in-place scale is written on the member.",
     "bindings": "Vehicle.bindings.json"
   },
   {

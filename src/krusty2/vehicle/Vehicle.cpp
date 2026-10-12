@@ -1636,36 +1636,41 @@ int Vehicle::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c, c
     return 0;
 }
 
-static inline float VehLenSq(const Vec3& v)
+// Both helpers load y, x, z first and sum z*z + (x*x + y*y), as retail's x87 sequence shows.
+static inline float VehSqLength(const Vec3& v)
 {
-    return v.x * v.x + v.y * v.y + v.z * v.z;
+    float y = v.y, x = v.x, z = v.z;
+    return z * z + (x * x + y * y);
 }
 
-// Tier 3 reading: when field_0xd8 (a velocity-like vector) is long enough, remembers its
-// direction in field_0x1ac and rotates the scene node about field_0x194 by |v| * dt.
+static inline float VehMagnitude(const Vec3& v)
+{
+    float sq = VehSqLength(v);
+    if (sq == 0.0f)
+        return 0.0f;
+    if (sq == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(sq);
+}
+
+// Tier 3 reading: turns the scene node about rotationPivot by |angularVelocity| * stepTime,
+// around the angular velocity's direction (kept in scratchVector), when that angle is finite
+// and at least 1e-4.
 void Vehicle::UnknownVirtualSlot95()
 {
-    float lenSq = SquareMagnitude(angularVelocity);
-    float len;
-    if (lenSq == 0.0f)
-        len = 0.0f;
-    else if (lenSq == 1.0f)
-        len = 1.0f;
-    else
-        len = 1.0f / FastInvSqrt(lenSq);
-    float mag = len * stepTime;
-    if (_finite(mag) && lenSq >= 0.0001f) {
+    float angle = VehMagnitude(angularVelocity) * stepTime;
+    if (_finite(angle) && angle >= 0.0001f) {
         scratchVector = angularVelocity;
-        float sq = VehLenSq(scratchVector);
+        float sq = VehSqLength(scratchVector);
         if (sq == 0.0f) {
             scratchVector = kVec3Zero;
         } else {
             float s = FastInvSqrt(sq);
-            scratchVector.x = s * scratchVector.x;
-            scratchVector.y = s * scratchVector.y;
-            scratchVector.z = s * scratchVector.z;
+            scratchVector.x *= s;
+            scratchVector.y *= s;
+            scratchVector.z *= s;
         }
-        modelNode->RotateAboutPoint(rotationPivot, scratchVector, lenSq);
+        modelNode->RotateAboutPoint(rotationPivot, scratchVector, angle);
     }
 }
 

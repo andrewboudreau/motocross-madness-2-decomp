@@ -330,6 +330,10 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   each scan posts and returns from inside its loop; slots 18/19 scan with guarded do-while
   loops (unrotated back edge), slot 20 with `for` loops. Slot 19/20's sign factor is
   `turnAngle >= 0 ? -1 : 1` and the scrape clamps go through a by-value min helper.
+- Vehicle.cpp slot 95 `0x0052a6a0`: the rotation angle is |angularVelocity| * stepTime (the
+  1e-4 threshold and RotateAboutPoint take the angle, not the squared length); both squared
+  lengths load y, x, z into locals and sum `z*z + (x*x + y*y)`, and the in-place scale
+  writes the members (`scratchVector.y *= s` addresses `this`, not the copy pointer).
 
 x87 operand order facts measured on these targets (they add to the list below):
 

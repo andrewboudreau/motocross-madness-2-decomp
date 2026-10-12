@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 152, c 105, total 258. The three class (a) functions of the
+Counts: a 1, b 151, c 105, total 257. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -117,7 +117,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Vehicle | `0x00527e30` | 31/831 | b | 42 code diffs: `push ebp` vs `push ebx ; mov ebx, ecx ; xor ecx, ecx`; retail adds `mov eax, [ebx + 0x444]`; frame 0x28 vs 0x2c |
 | krusty2/vehicle/Vehicle | `0x005281b0` | 40/479 (masked) | b | 37 code diffs: retail adds `mov esi, [esp + N]`; `mov edi, [esp + N] ; mov esi, ecx` vs `mov edi, ecx`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 263/782 | b | slot 56: frame 0x3c matches; retail shares the ground-normal output with the projection and n with the side vector; register roles |
-| krusty2/vehicle/Vehicle | `0x0052a6a0` | 19/331 (masked) | b | 22 code diffs: `push ecx ; push ebx` vs `sub esp, 8`; retail lacks `fld [edi + 0xe0]`; frame 0x0 vs 0x8 |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 304/3018 (masked) | b | 120 code diffs: `test eax, eax ; mov [esp + N], eax ; jn~` vs `mov ebp, eax ; xor ebx, ebx ; cmp ebp, ~`; `push 0` vs `push ebx`; frame 0xdc vs 0x104, slot order differs |
 | net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |

@@ -39,7 +39,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 46 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 60 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
-| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
+| `vehicle/` | `Vehicle.cpp` (73 strict cases of 83 registered), `Bike.cpp` (44 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 42 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
