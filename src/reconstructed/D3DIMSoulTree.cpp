@@ -523,8 +523,8 @@ void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
             from.y = surface->groups[i].transformedVertices[j].position.y;
             from.z = surface->groups[i].transformedVertices[j].position.z;
             Vector3 to = from + length * surface->groups[i].normals[j];
-            from = surface->groups[i].node->UnknownFunction4fd660(from);
-            to = surface->groups[i].node->UnknownFunction4fd660(to);
+            from = surface->groups[i].node->LocalToWorldPoint(from);
+            to = surface->groups[i].node->LocalToWorldPoint(to);
             line[0].position.x = from.x;
             line[0].position.y = from.y;
             line[0].position.z = from.z;
@@ -583,7 +583,7 @@ void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
                 point.y = surface->groups[i].transformedVertices[j].position.y;
                 point.z = surface->groups[i].transformedVertices[j].position.z;
                 point += offsets[k];
-                point = surface->groups[i].node->UnknownFunction4fd660(point);
+                point = surface->groups[i].node->LocalToWorldPoint(point);
                 cross[k].position.x = point.x;
                 cross[k].position.y = point.y;
                 cross[k].position.z = point.z;
@@ -664,7 +664,7 @@ void D3DIMSoultreeObject::DrawAxisGizmo()
     points[3].z = 0.25f;
     UnknownSoultreeVertex vertices[4];
     for (int i = 0; i < 4; i++) {
-        points[i] = UnknownFunction4fd660(points[i]);
+        points[i] = LocalToWorldPoint(points[i]);
         vertices[i].position.x = points[i].x;
         vertices[i].position.y = points[i].y;
         vertices[i].position.z = points[i].z;
@@ -726,7 +726,7 @@ void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int fl
         corners[i].x = center.x + corners[i].x;
         corners[i].y = center.y + corners[i].y;
         corners[i].z = center.z + corners[i].z;
-        corners[i] = UnknownFunction4fd660(corners[i]);
+        corners[i] = LocalToWorldPoint(corners[i]);
         vertices[i].position.x = corners[i].x;
         vertices[i].position.y = corners[i].y;
         vertices[i].position.z = corners[i].z;
@@ -790,7 +790,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
         extents = &boundsExtents;
         UnknownFunction4fe850(center, extents);
     }
-    float distance = Magnitude(UnknownFunction4fd660(*center) -
+    float distance = Magnitude(LocalToWorldPoint(*center) -
                                ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
     float range = distance - Magnitude(*extents);
     if (0.1f > range)

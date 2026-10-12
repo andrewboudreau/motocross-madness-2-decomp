@@ -151,7 +151,7 @@ void Wrecker::UnknownFunction5329e0(float frameTime) {
     Vector3 sum = Vector3(0.0f, 0.0f, 0.0f);
     int hits = 0;
     for (int i = 0; i < collisionModel->probeCount; i++) {
-        Vector3 p = collisionModel->probes[i].node->UnknownFunction4fd660(collisionModel->probes[i].localPoint);
+        Vector3 p = collisionModel->probes[i].node->LocalToWorldPoint(collisionModel->probes[i].localPoint);
         probePositions[i] = p;
         p = boxFrame->UnknownFunction4fd7f0(p) - boxCenter;
         if (fabs(p.x) < boxHalfExtents.x && fabs(p.y) < boxHalfExtents.y && fabs(p.z) < boxHalfExtents.z) {

@@ -70,7 +70,7 @@ public:
     void UnknownFunction4fe0a0(Vector3* a, Vector3* b);            // 0x004fe0a0
     void UnknownFunction4fe0f0();                                  // 0x004fe0f0
     void UpdateWorldMatrix();                                      // 0x004fb4f0: world matrix
-    Vector3 UnknownFunction4fd660(const Vector3& p);               // 0x004fd660: local -> world point
+    Vector3 LocalToWorldPoint(const Vector3& p);               // 0x004fd660: local -> world point
     void RegisterNode();                                           // 0x004fedb0: registers the node
     // Seen from Krusty3DObjects.cpp (src/krusty2/core/SoultreeObject.h
     // describes the same functions): 0x004fc690 (ret 0x10) moves the node

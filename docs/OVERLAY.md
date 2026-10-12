@@ -42,7 +42,7 @@ instructions are the same, but the registers are allocated differently.
 
 Camera.cpp ends at `0x0042f38b`, before CarProcedural.cpp. Its last three
 functions are now exact:
-- `0x0042f0e0` sets the viewport x and width. The height is the width
+- `0x0042f0e0` (`SetViewportWidth`) sets the viewport x and width. The height is the width
   times +0x1b8, which is now typed float.
 - `0x0042f190` sets the viewport. Retail stores the width before y.
 - `0x0042f210` (`GetViewportRect`) returns the viewport rectangle.

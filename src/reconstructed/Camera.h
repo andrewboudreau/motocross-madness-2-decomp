@@ -57,7 +57,7 @@ public:
                                const float* roll, const float* fov);
     // 0x0042f0e0: sets (absolute) or offsets the viewport x/width, derives the
     // height from +0x1b8, centres it vertically in +0x1c8 and resubmits it.
-    int UnknownFunction42f0e0(int x, int width, int absolute);
+    int SetViewportWidth(int x, int width, int absolute);
     // 0x0042f190: stores the viewport, clamped to +0x1c4/+0x1c8, and resubmits it.
     int UnknownFunction42f190(int x, int y, int width, int height);
     // 0x0042f210: the viewport as left/top/right/bottom.

@@ -116,9 +116,9 @@ int BikeRace::AimCamera(int caster) {
             UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
             UnknownFunctionCameraView()->UnknownFunctionFollow(racerSlots[field_0x14c]);
             if (field_0x05c != 0) {
-                field_0x05c->UnknownFunction4dab90();
-                field_0x05c->UnknownFunction4dab00(racerSlots[field_0x14c]->field_0x3bc);
-                field_0x05c->UnknownFunction4dab00(racerSlots[field_0x14c]->field_0x5c4->field_0x1a0);
+                field_0x05c->ClearCasters();
+                field_0x05c->AddCaster(racerSlots[field_0x14c]->field_0x3bc);
+                field_0x05c->AddCaster(racerSlots[field_0x14c]->field_0x5c4->field_0x1a0);
             }
             if (g_TrackGame->field_0x560 != 0) {
                 UnknownBikeRaceRacer* racer = racerSlots[field_0x14c];
@@ -130,9 +130,9 @@ int BikeRace::AimCamera(int caster) {
             UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
             UnknownFunctionCameraView()->UnknownFunctionFollow(localRacer);
             if (field_0x05c != 0) {
-                field_0x05c->UnknownFunction4dab90();
-                field_0x05c->UnknownFunction4dab00(localRacer->field_0x3bc);
-                field_0x05c->UnknownFunction4dab00(localRacer->field_0x5c4->field_0x1a0);
+                field_0x05c->ClearCasters();
+                field_0x05c->AddCaster(localRacer->field_0x3bc);
+                field_0x05c->AddCaster(localRacer->field_0x5c4->field_0x1a0);
             }
             if (g_TrackGame->field_0x560 != 0) {
                 UnknownBikeRaceRacer* racer = localRacer;
@@ -145,9 +145,9 @@ int BikeRace::AimCamera(int caster) {
             int index = field_0x14c - 1;
             UnknownFunctionCameraView()->UnknownFunctionFollow(aiRacers[index]);
             if (field_0x05c != 0) {
-                field_0x05c->UnknownFunction4dab90();
-                field_0x05c->UnknownFunction4dab00(aiRacers[index]->field_0x3bc);
-                field_0x05c->UnknownFunction4dab00(aiRacers[index]->field_0x5c4->field_0x1a0);
+                field_0x05c->ClearCasters();
+                field_0x05c->AddCaster(aiRacers[index]->field_0x3bc);
+                field_0x05c->AddCaster(aiRacers[index]->field_0x5c4->field_0x1a0);
             }
             if (g_TrackGame->field_0x560 != 0) {
                 UnknownBikeRaceRacer* racer = aiRacers[index];
@@ -161,7 +161,7 @@ int BikeRace::AimCamera(int caster) {
         field_0x0ac = field_0x154;
         if (raceScene->field_0xb8 != 0 && raceScene->field_0xb8->field_0x00 > 0) {
             if (field_0x05c != 0) {
-                field_0x05c->UnknownFunction4dab90();
+                field_0x05c->ClearCasters();
             }
             UnknownFunctionCameraView()->UnknownFunctionTargetCaster(
                 raceScene->field_0xb8->field_0x04[field_0x154].field_0x04);
@@ -173,7 +173,7 @@ int BikeRace::AimCamera(int caster) {
         field_0x0ac = field_0x150;
         if (raceScene->field_0xb4 != 0 && raceScene->field_0xb4->field_0x00 != 0) {
             if (field_0x05c != 0) {
-                field_0x05c->UnknownFunction4dab90();
+                field_0x05c->ClearCasters();
             }
             UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[field_0x150];
             if (entry->field_0x00_bit3) {

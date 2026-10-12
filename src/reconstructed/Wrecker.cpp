@@ -441,7 +441,7 @@ void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
 void Wrecker::UnknownFunction532020(float frameTime) {
     for (int i = 0; i < collisionModel->probeCount; i++) {
         if (collisionModel->probes[i].hit) {
-            Vector3 point = collisionModel->probes[i].node->UnknownFunction4fd660(collisionModel->probes[i].localPoint);
+            Vector3 point = collisionModel->probes[i].node->LocalToWorldPoint(collisionModel->probes[i].localPoint);
             EmitProbeTrail(probePositions[i], point, frameTime);
             SprayContactParticles(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
         }

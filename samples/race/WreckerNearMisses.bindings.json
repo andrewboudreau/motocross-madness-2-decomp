@@ -10,7 +10,7 @@
   "?UnknownFunction4fc9a0@UnknownWreckerSkeleton@@QAEXPAU1@PAUVector3@@@Z": "0x004fc9a0",
   "?UnknownFunction4fca80@UnknownWreckerSkeleton@@QAEXPAU1@PAUUnknownWreckerFrame@@@Z": "0x004fca80",
   "?UnknownFunction4fca80@UnknownWreckerSkeleton@@QAEXPAU1@PAUUnknownWreckerMatrix@@@Z": "0x004fca80",
-  "?UnknownFunction4fd660@UnknownWreckerSkeleton@@QAE?AUVector3@@ABU2@@Z": "0x004fd660",
+  "?LocalToWorldPoint@UnknownWreckerSkeleton@@QAE?AUVector3@@ABU2@@Z": "0x004fd660",
   "?UnknownFunction4fd710@UnknownWreckerSkeleton@@QAE?AUVector3@@ABU2@@Z": "0x004fd710",
   "?UnknownFunction4fd7f0@UnknownWreckerSkeleton@@QAE?AUVector3@@ABU2@@Z": "0x004fd7f0",
   "?Vec3ScaleCall@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",

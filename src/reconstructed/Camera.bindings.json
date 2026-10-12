@@ -18,7 +18,7 @@
   "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
   "?UnknownFunction42e960@Camera@@QAEXMM@Z": "0x0042e960",
   "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
-  "?UnknownFunction42f0e0@Camera@@QAEHHHH@Z": "0x0042f0e0",
+  "?SetViewportWidth@Camera@@QAEHHHH@Z": "0x0042f0e0",
   "?UnknownFunction42f190@Camera@@QAEHHHHH@Z": "0x0042f190",
   "?GetViewportRect@Camera@@QAEXPAUCameraRect@@@Z": "0x0042f210",
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",

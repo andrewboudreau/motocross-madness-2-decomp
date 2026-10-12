@@ -11320,7 +11320,7 @@ CASES = [
         'name': 'Camera.cpp Camera 0x42f0e0 viewport x/width',
         'bindings': 'src/reconstructed/Camera.bindings.json',
         'source': 'src/reconstructed/Camera.cpp',
-        'symbol': '?UnknownFunction42f0e0@Camera@@QAEHHHH@Z',
+        'symbol': '?SetViewportWidth@Camera@@QAEHHHH@Z',
         'target_va': '0x0042f0e0',
         'target_size': 165,
         'reason': 'Camera +0x1a0 viewport, called from Camera 0x42e897/0x42e8ca; before CarProcedural.cpp 0x42f390',

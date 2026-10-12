@@ -92,6 +92,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00445360` `RemoveObject`
 - `0x004a1b00` `TransformPoints`
 - `0x004fb4f0` `UpdateWorldMatrix`
+- `0x004fd660` `LocalToWorldPoint` (krusty2's name for the address)
 - `0x004fda60` `CollectDescendants`
 - `0x004fdb60` `LoadFromParameters`
 - `0x004fedb0` `RegisterNode`

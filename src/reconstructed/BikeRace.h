@@ -706,8 +706,8 @@ struct UnknownBikeRaceCameraView {
 // The ProjectedShadow at BikeRace+0x5c (ProjectedShadow.cpp's code).
 class UnknownBikeRaceShadow {
 public:
-    void UnknownFunction4dab00(UnknownBikeRaceModel* model); // 0x004dab00: adds a caster
-    void UnknownFunction4dab90();             // 0x004dab90: clears the casters
+    void AddCaster(UnknownBikeRaceModel* model); // 0x004dab00: adds a caster
+    void ClearCasters();             // 0x004dab90: clears the casters
 };
 
 // What slot 23 compares a pick against: a Scene+0xb8 caster's model (+0x08,

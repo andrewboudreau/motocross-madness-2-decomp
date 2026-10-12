@@ -158,10 +158,10 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
         if (field_0x1d8) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
                 (unsigned int)field_0x1a0[2] < (unsigned int)field_0x1c4)
-                UnknownFunction42f0e0(-1, 2, 0);
+                SetViewportWidth(-1, 2, 0);
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
                 (unsigned int)field_0x1a0[2] > 0x20)
-                UnknownFunction42f0e0(1, -2, 0);
+                SetViewportWidth(1, -2, 0);
         }
         UnknownVirtualSlot28();
     }
@@ -333,7 +333,7 @@ int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* 
 
 // 0x0042f0e0. The width is converted as unsigned and the height compared
 // unsigned against +0x1c8.
-int Camera::UnknownFunction42f0e0(int x, int width, int absolute) {
+int Camera::SetViewportWidth(int x, int width, int absolute) {
     if (absolute) {
         field_0x1a0[0] = x;
         field_0x1a0[2] = width;

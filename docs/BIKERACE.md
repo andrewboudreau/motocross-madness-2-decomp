@@ -154,4 +154,6 @@ declaration), `0x0041d2a0` `SetSceneTime`, `0x0041ea10` `AnyRacerRemote`,
 `0x00420650` `RestartRace`, `0x00420bd0` `RestartReplay`, `0x00422ec0`
 `ClearRacerParts`, `0x00423040` `ClearAiRacerParts`, `0x00423140`
 `DrawTrack` and `0x00423790` `SetDetailLevel`. `0x004210f0` keeps its placeholder because RaceView.h (UI
-lane) declares it for a camera sample.
+lane) declares it for a camera sample. The ground shadow's `0x004dab00`
+`AddCaster` and `0x004dab90` `ClearCasters` take the names krusty2 gives
+those addresses.
