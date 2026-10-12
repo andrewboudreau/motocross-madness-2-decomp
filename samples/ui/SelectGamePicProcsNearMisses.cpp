@@ -198,7 +198,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
     int total = g_TrackGame->mode.field_0x1be0;
     g_TrackGame->mode.field_0x1bd8 =
-        lobbySlots.UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
+        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
     if (g_TrackGame->mode.field_0x1bd8 < g_TrackGame->mode.field_0x27f8.field_0x28)
         g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.field_0x1bd8;
     if (start) {
