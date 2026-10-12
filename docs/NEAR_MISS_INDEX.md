@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 157, c 110, total 268. The three class (a) functions of the
+Counts: a 1, b 156, c 111, total 268. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -140,7 +140,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/bvh/BoundingBoxTreeQuery | `0x00429570` | 246/831 | b | 17 code diffs: `jne @82 ; xor eax, eax ; pop edi` vs `je @272`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
-| physics/collision/CollisionPoint | `0x0043aa30` | 377/791 (masked) | b | frame and blocks match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, the squared normal length squares y, x, z (y consumed), one push fstp scheduled later |
+| physics/collision/CollisionPoint | `0x0043aa30` | 820/845 | c | frame, blocks and the y, x, z accumulated squared normal length match (samples/physics/collision/CollisionPointNearMisses.cpp); sum * (1/merged) loads y component-first in retail, one push fstp scheduled later |
 | physics/collision/CollisionPoint | `0x0043ad80` | 47/599 (masked) | b | body matches; retail returns for a null first argument before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead `points` slot, VC6 in a1's |
 | physics/constraint/ConstraintMethodCollisionModel | `0x0043bdb0` | 1570/2619 | c | ApplyContactImpulse, frame 0xb8 and slot order match; termB (other-body branch) builds its cross/dot in a different x87 register order (fstp st(2), +2 bytes), plus scheduling of three struct copies and the `test edi` of `if (other)` |
 | physics/contact/ContactImpulse | `0x005004a0` | 104/927 (masked) | b | 47 code diffs: retail adds `fmul [esi + 4]`; retail lacks `fxch st(1) ; fmul [esi + 4]`; slot order differs |
