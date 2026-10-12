@@ -278,11 +278,11 @@ struct UnknownBikeRaceNetPlayer {
     unsigned char field_0x06[2];
 };
 
-// The object at a racer's +0x740: +0x18c set keeps the racer's model shown
-// when the camera follows it.
+// The object at a racer's +0x740 (its view, BikeRace): +0x18c set keeps the
+// racer's model at full detail when the camera follows another one.
 struct UnknownBikeRaceRacerInfo {
     unsigned char field_0x000[0x18c];
-    char field_0x18c;
+    char forceHighLod;                        // +0x18c BikeRace's "ForceHighLOD"
 };
 
 // A racer as BikeRace's own code reaches it (its primary vtable at +0 and,
@@ -441,7 +441,7 @@ public:
     char engineKind;                          // +0x737 engine kind
     int engineSize;                           // +0x738 engine size
     int plateNumber;                          // +0x73c plate number (the setup paints it)
-    UnknownBikeRaceRacerInfo* field_0x740;
+    UnknownBikeRaceRacerInfo* bikeView;       // +0x740 the racer's view (RaceView.h)
     UnknownEventRacerPart* statusNode;        // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x74c - 0x748];
     float lastLapTime;                        // +0x74c (UnknownEventRacer's last lap time)
@@ -647,7 +647,7 @@ struct UnknownBikeRaceCameraView {
     // Inline (three times in 0x0041eb20): follows `racer`, showing the
     // previous racer's model again and hiding the new one's.
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
-        if (followedBike != 0 && !racer->field_0x740->field_0x18c) {
+        if (followedBike != 0 && !racer->bikeView->forceHighLod) {
             followedBike->modelNode->SetLowestLod(1);
             followedBike->riderCharacter->modelNode->SetLowestLod(1);
             if (followedBike->modelNode->currentDetailLevel == 0) {
@@ -667,7 +667,7 @@ struct UnknownBikeRaceCameraView {
         followedBike = racer;
         field_0x274 = 0;
         followedRacer = racer;
-        if (!racer->field_0x740->field_0x18c) {
+        if (!racer->bikeView->forceHighLod) {
             racer->modelNode->SetLowestLod(0);
             followedBike->riderCharacter->modelNode->SetLowestLod(0);
         }
