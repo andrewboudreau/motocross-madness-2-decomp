@@ -242,14 +242,14 @@ int StatsOverlay::DrawStandings()
     UnknownEventRacer* racer;
     while ((racer = view->NextBike(&iterator)) != 0) {
         if (racer->field_0x25_bit0) {
-            scores[count].value = racer->field_0x768;
+            scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
         }
     }
     qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
     for (i = 0; i < count; i++) {
-        if (scores[i].racer == view->field_0x38) {
+        if (scores[i].racer == view->localRacer) {
             own = i;
             break;
         }
@@ -264,16 +264,16 @@ int StatsOverlay::DrawStandings()
     int row;
     int shown = 0;
     for (row = first; row < count - 1; row++) {
-        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
-                scores[shown].racer->field_0x768);
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                scores[shown].racer->score);
         shown++;
     }
     if (own >= shown)
-        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->field_0x5e0,
-                scores[own].racer->field_0x768);
+        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
+                scores[own].racer->score);
     else
-        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
-                scores[shown].racer->field_0x768);
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                scores[shown].racer->score);
     for (i = 0; i <= row; i++) {
         if (strcmp(rowText[i], field_0x1b0[i]) != 0)
             break;
@@ -685,8 +685,8 @@ void RadarOverlay::DrawRacers(int mode)
     Vector3 point;
     for (i = 0; i < racerCount; i++) {
         if (racers[i] == radarCamera->followedRacer) {
-            mapOrigin = racers[i]->field_0x00c;
-            mapAngle = -racers[i]->field_0x050;
+            mapOrigin = racers[i]->position;
+            mapAngle = -racers[i]->heading;
             if (racers[i]->field_0x444)
                 mapAngle = heldMapAngle;
             else
@@ -699,14 +699,14 @@ void RadarOverlay::DrawRacers(int mode)
     mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
         if (i != followedIndex && racers[i]->field_0x25_bit0) {
-            outside = WorldToMap(racers[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
+            outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
             if (field_0x174 && field_0x16c == i) {
-                if (radarView->field_0x19c) {
-                    Vector3& own = racers[followedIndex]->field_0x00c;
-                    float dx = racers[i]->field_0x00c.x - own.x;
-                    float dz = racers[i]->field_0x00c.z - own.z;
+                if (radarView->chatOverlay) {
+                    Vector3& own = racers[followedIndex]->position;
+                    float dx = racers[i]->position.x - own.x;
+                    float dz = racers[i]->position.z - own.z;
                     float distance = dz * dz + dx * dx;
-                    radarView->field_0x19c->UnknownFunction51d9c0(distance, racers[i]->field_0x5e0);
+                    radarView->chatOverlay->UnknownFunction51d9c0(distance, racers[i]->racerName);
                 }
                 if (outside && (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
                                 g_TrackGame->mode.field_0x27f8.field_0x04 == 2)) {
@@ -717,15 +717,15 @@ void RadarOverlay::DrawRacers(int mode)
                     point.y = (float)(int)(((mapRect.top + outside) ? rim.y : (float)y) - 6.4f);
                 }
                 for (int k = 0; k < racerCount; k++) {
-                    NameOverlay* tag = radarView->field_0x19c->nameTags[k];
+                    NameOverlay* tag = radarView->chatOverlay->nameTags[k];
                     if (tag->trackedRacer == racers[i])
                         tag->UnknownFunction5190a0(point, x - mapCenterX > 0, outside);
                 }
             } else {
                 point.x = -1.0f;
                 point.y = -1.0f;
-                if (radarView->field_0x19c)
-                    radarView->field_0x19c->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
+                if (radarView->chatOverlay)
+                    radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
             }
             if (outside) {
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
@@ -753,8 +753,8 @@ void RadarOverlay::DrawRacers(int mode)
         } else {
             point.x = -1.0f;
             point.y = -1.0f;
-            if (radarView->field_0x19c)
-                radarView->field_0x19c->nameTags[i]->UnknownFunction5190a0(point, 0, 1);
+            if (radarView->chatOverlay)
+                radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, 1);
         }
     }
     if (mode == 2 || mode == 3) {

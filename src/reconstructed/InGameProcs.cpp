@@ -27,7 +27,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
             guiManager->ShowCursors(0);
             if (!g_TrackGame->uiInteractionBlocked) {
                 UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
-                if (view && !view->field_0x38->field_0x7a4) {
+                if (view && !view->localRacer->hasFinished) {
                     view->UnknownFunction420650(1, 0, 0);
                     g_TrackGame->SetMenuOpen(0, kMenuExit, 1);
                 }
@@ -70,7 +70,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
         control = FindControl("ButMiddle", 1);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13da);
         UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
-        if (g_TrackGame->network || view->field_0x38->field_0x7a4 ||
+        if (g_TrackGame->network || view->localRacer->hasFinished ||
             g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
             control->Show(0, 1);
         control = FindControl("ButLeft", 1);
@@ -159,13 +159,13 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             if (view->field_0x1e4 != -2) {
                 view->UnknownFunction41f550(1);
                 view->UnknownFunction41f550(0);
-                view->field_0x1dc = 4;
+                view->replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
             }
         } else if (!_stricmp("TogPause", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 view->UnknownFunction41f550(0);
-                view->field_0x1dc = 4;
+                view->replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
             }
         } else if (!_stricmp("TogFF", event->controlName)) {
@@ -173,11 +173,11 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
-                    view->field_0x1dc = 8;
+                    view->replayMode = 8;
                     g_TrackGame->field_0x2e0 = 2.0f;
                 } else {
                     view->UnknownFunction41f550(1);
-                    view->field_0x1dc = 4;
+                    view->replayMode = 4;
                     g_TrackGame->field_0x2e0 = 1.0f;
                 }
             }
@@ -186,25 +186,25 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
-                    view->field_0x1dc = 9;
+                    view->replayMode = 9;
                     g_TrackGame->field_0x2e0 = 8.0f;
                 } else {
                     view->UnknownFunction41f550(1);
-                    view->field_0x1dc = 4;
+                    view->replayMode = 4;
                     g_TrackGame->field_0x2e0 = 1.0f;
                 }
             }
         } else if (!_stricmp("TogReverse", event->controlName)) {
             if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
-                if (view->field_0x1dc != 14) {
+                if (view->replayMode != 14) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
-                    view->field_0x1dc = 11;
+                    view->replayMode = 11;
                     g_TrackGame->field_0x2e0 = 0.0f;
                 }
             } else {
                 view->UnknownFunction41f550(1);
-                view->field_0x1dc = 4;
+                view->replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
             }
         } else if (!_stricmp("ButFrame", event->controlName)) {
@@ -217,12 +217,12 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButBeginning", event->controlName)) {
             if (view->field_0x3f8)
                 view->UnknownFunction41f550(0);
-            view->field_0x1dc = 12;
+            view->replayMode = 12;
         } else if (!_stricmp("ButEnd", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 if (view->field_0x3f8)
                     view->UnknownFunction41f550(0);
-                view->field_0x1dc = 9;
+                view->replayMode = 9;
                 g_TrackGame->field_0x2e0 = 30.0f;
             }
         } else if (!_stricmp("ButCamera", event->controlName)) {
@@ -263,7 +263,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         if (!_stricmp("SliderTime", event->controlName)) {
             float fraction = static_cast<UIScrollBar*>(event->control)->GetScrollValue() / 1000.0f;
             UnknownKrustyBikeView* replay = g_TrackGame->eventManager->FindRaceView();
-            replay->field_0x1c4 = fraction * replay->field_0x1a0->field_0x10c;
+            replay->replaySeekTarget = fraction * replay->replayVcr->replayLength;
         }
         break;
     case kDialogClose:
@@ -280,14 +280,14 @@ int VCRDlg::UnknownVirtualSlot10(float frameTime) {
     UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl("SliderTime", 8));
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
     UIControl* control = FindControl("TxtTime", 12);
-    FormatTime(text, view->field_0x1b8);
+    FormatTime(text, view->replayTime);
     control->SetText(text);
     control = FindControl("TxtTimeEnd", 12);
-    FormatTime(text, view->field_0x1a0->field_0x10c);
+    FormatTime(text, view->replayVcr->replayLength);
     control->SetText(text);
-    if (view->field_0x1c4 == -1.0f)
-        slider->SetThumbPosition((int)(view->field_0x1b8 * 1000.0f),
-                                      (int)(view->field_0x1a0->field_0x10c * 1000.0f));
+    if (view->replaySeekTarget == -1.0f)
+        slider->SetThumbPosition((int)(view->replayTime * 1000.0f),
+                                      (int)(view->replayVcr->replayLength * 1000.0f));
     ShowReplayMode();
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }
@@ -308,7 +308,7 @@ void VCRDlg::ShowReplayMode() {
         fasterForward->SetCurrentState(0);
         return;
     }
-    switch (view->field_0x1dc) {
+    switch (view->replayMode) {
     case 4:
         play->SetCurrentState(1);
         pause->SetCurrentState(0);

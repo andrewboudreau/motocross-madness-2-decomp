@@ -75,26 +75,26 @@ void TrackGameViewOwner::PickFollowedRacer()
         racer = field_0x34->NextBike(&iterator);
     }
     if (racing == 0) {
-        field_0xa8 = field_0x34->field_0x38;
+        field_0xa8 = field_0x34->localRacer;
     } else if (racing == 1) {
         field_0xa8 = last;
     } else {
-        int count = field_0x34->field_0x158;
+        int count = field_0x34->racerCount;
         int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
-        while (field_0x34->field_0x3c[index]->field_0x4a0 == 1 && tries < count) {
+        while (field_0x34->racerSlots[index]->field_0x4a0 == 1 && tries < count) {
             index++;
             if (index >= count)
                 index = 0;
             tries++;
         }
-        field_0xa8 = field_0x34->field_0x3c[index];
+        field_0xa8 = field_0x34->racerSlots[index];
     }
     UnknownBikeRaceVcrFollow follow;
     follow.field_0x04 = 0;
-    follow.field_0x08 = field_0xa8->field_0x11bc;
+    follow.field_0x08 = field_0xa8->networkPlayerId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
-    if (field_0x34->field_0x1a0 && g_TrackGame->mode.field_0x2dbc && !g_TrackGame->field_0x3428)
-        ((VCRInterface*)field_0x34->field_0x1a0)->QueueRecord(0x87, field_0xa8->field_0x11bc, &follow, 1);
+    if (field_0x34->replayVcr && g_TrackGame->mode.field_0x2dbc && !g_TrackGame->field_0x3428)
+        ((VCRInterface*)field_0x34->replayVcr)->QueueRecord(0x87, field_0xa8->networkPlayerId, &follow, 1);
 }
 
 // 0x004a9e80: switches the followed racer from `previous` to `racer`. The
@@ -116,16 +116,16 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
     }
     *(float*)&field_0xac = 5.0f;
     if (tell)
-        field_0x34->field_0x38->UnknownFunction4925a0(racer, false);
+        field_0x34->localRacer->UnknownFunction4925a0(racer, false);
     if (racer) {
         ((RaceSound*)field_0x34->field_0x44)->PlayItSound();
         FOLLOWED_RACER_SLOTS(racer)->UnknownVirtualSlot50(1, 5.0f, 0);
     }
     AnnounceFollowedRacer(racer, previous);
-    if (racer == field_0x34->field_0x38 && previous && previous != racer) {
-        racer->field_0x768 += 2500.0f;
-        if (field_0x34->field_0x0bc)
-            field_0x34->field_0x0bc->UnknownFunction48d1e0(2500.0f, 1.0f);
+    if (racer == field_0x34->localRacer && previous && previous != racer) {
+        racer->score += 2500.0f;
+        if (field_0x34->scoreBoard)
+            field_0x34->scoreBoard->UnknownFunction48d1e0(2500.0f, 1.0f);
     }
     field_0xa8 = racer;
 }

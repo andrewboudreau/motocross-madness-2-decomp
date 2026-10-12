@@ -99,7 +99,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
         radarOverlay->field_0x174 = visualCue->UnknownFunction48bc80();
         chatOverlay->UnknownFunction51d980(visualCue->UnknownFunction48bc80());
     }
-    if (!g_TrackGame->eventManager->waitingForRacers && !raceView->field_0x18e && raceView->field_0x18a) {
+    if (!g_TrackGame->eventManager->waitingForRacers && !raceView->viewAvailable && raceView->isRacing) {
         clockSeconds += g_TrackGame->frameTime;
         while (clockSeconds >= 60.0f) {
             clockMinutes += 1.0f;
@@ -107,7 +107,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
             if (clockSeconds < 0.0f)
                 clockSeconds = 0.0f;
         }
-    } else if (raceView->field_0x18e) {
+    } else if (raceView->viewAvailable) {
         ResetClock();
     }
     SoundSystem()->CommitListenerSettings();

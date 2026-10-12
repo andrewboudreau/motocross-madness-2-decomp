@@ -1651,8 +1651,8 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
         g_TrackGame->SetMenuOpen(0, kMenuExit, 0);
         TrackGameViewOwner* owner = g_TrackGame->field_0x568;
         if (owner && g_TrackGame->network && g_TrackGame->network->isHost &&
-            owner->field_0xa8 && owner->field_0x34 && owner->field_0xa8 == owner->field_0x34->field_0x38) {
-            UnknownEventRacer* racer = owner->field_0x34->field_0x38;
+            owner->field_0xa8 && owner->field_0x34 && owner->field_0xa8 == owner->field_0x34->localRacer) {
+            UnknownEventRacer* racer = owner->field_0x34->localRacer;
             if (racer)
                 racer->field_0x4a0 = 1;
             g_TrackGame->field_0x568->PickFollowedRacer();
@@ -2615,7 +2615,7 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
 // 0x00455ae0
 int DemoDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
-    if (view && view->field_0x18a)
+    if (view && view->isRacing)
         EndDialog(0);
     return 1;
 }

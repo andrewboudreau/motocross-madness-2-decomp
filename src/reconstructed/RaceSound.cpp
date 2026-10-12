@@ -168,17 +168,17 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     enginePresent[2] = 0;
     iterator = 0;
     while ((racer = raceView->NextBike(&iterator)) != 0) {
-        if (racer->field_0x738 < 250) {
+        if (racer->engineSize < 250) {
             enginePresent[0] = 1;
-            if (racer == raceView->field_0x38)
+            if (racer == raceView->localRacer)
                 listenerEngine = 0;
         } else if (!racer->field_0x737) {
             enginePresent[1] = 1;
-            if (racer == raceView->field_0x38)
+            if (racer == raceView->localRacer)
                 listenerEngine = 1;
         } else {
             enginePresent[2] = 1;
-            if (racer == raceView->field_0x38)
+            if (racer == raceView->localRacer)
                 listenerEngine = 2;
         }
     }
@@ -478,7 +478,7 @@ void RaceSound::AssignChannels() {
     count = 0;
     while ((racer = raceView->NextBike(&iterator)) != 0) {
         engineChannels[count].channelRacer = racer;
-        if (racer->field_0x738 < 250)
+        if (racer->engineSize < 250)
             engineChannels[count].engine = 0;
         else
             engineChannels[count].engine = (racer->field_0x737 != 0) + 1;
@@ -557,24 +557,24 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         listenerRacer = listenerCamera->followedRacer;
         if (listenerRacer != lastListenerRacer) {
             lastListenerRacer = listenerRacer;
-            field_0x1290 = listenerRacer->field_0x7a0;
+            field_0x1290 = listenerRacer->lapCount;
             field_0x1294 = listenerRacer->field_0x7b8;
-            lastListenerPosition = listenerRacer->field_0x784;
+            lastListenerPosition = listenerRacer->finishPosition;
         }
         UpdateRacerSounds(frameTime);
         SoundSystem()->SetListenerPosition(listenerCamera->listenerPosition);
         SoundSystem()->SetListenerOrientation(listenerCamera->listenerForward, listenerCamera->listenerUp);
-        SoundSystem()->SetListenerVelocity(listenerCamera->followedBike->field_0x064);
+        SoundSystem()->SetListenerVelocity(listenerCamera->followedBike->velocity);
         for (i = 0; i < channelsInUse; i++) {
             if (engineChannels[i].channelSound) {
-                engineChannels[i].channelRacer->field_0x3bc->GetPosition(&position);
+                engineChannels[i].channelRacer->vehicleModel->GetPosition(&position);
                 engineChannels[i].channelSound->Set3DPosition(position, 0);
-                engineChannels[i].channelSound->Set3DVelocity(engineChannels[i].channelRacer->field_0x064, 0);
+                engineChannels[i].channelSound->Set3DVelocity(engineChannels[i].channelRacer->velocity, 0);
             }
         }
-        listenerRacer->field_0x3bc->GetPosition(&position);
+        listenerRacer->vehicleModel->GetPosition(&position);
         landHardSound->Set3DPosition(position, 0);
-        landHardSound->Set3DVelocity(listenerRacer->field_0x064, 0);
+        landHardSound->Set3DVelocity(listenerRacer->velocity, 0);
         SoundSystem()->CommitListenerSettings();
     }
     return 1;
@@ -590,7 +590,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     for (i = 0; i < channelsInUse; i++) {
         if (!engineChannels[i].channelRacer->field_0x4a0) {
             engineChannels[i].cameraDistance =
-                (int)GroundDistance(&listenerCamera->listenerPosition, &engineChannels[i].channelRacer->field_0x00c);
+                (int)GroundDistance(&listenerCamera->listenerPosition, &engineChannels[i].channelRacer->position);
         } else {
             engineChannels[i].cameraDistance = 1000000;
             engineChannels[i].channelSound = 0;
@@ -624,10 +624,10 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             streamChannel->field_0x48 = 0;
         else
             streamChannel->field_0x48 = 1;
-        if (streamChannel->channelRacer->field_0x108) {
+        if (streamChannel->channelRacer->airborne) {
             streamChannel->airborneTime += frameTime;
             if (streamChannel->airborneTime >= 0.2f) {
-                if (!streamChannel->channelRacer->field_0x478)
+                if (!streamChannel->channelRacer->throttleOn)
                     streamChannel->field_0x30 = 1;
                 if (streamChannel->sampleKind != 5 && streamChannel->sampleKind != 6 && streamChannel->sampleKind != 1) {
                     j = rand() % decelCount[streamChannel->engine];
@@ -638,7 +638,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     streamChannel->nextSampleKind = 1;
                     StartStream();
                 }
-                if (streamChannel->field_0x30 == 1 && streamChannel->channelRacer->field_0x478) {
+                if (streamChannel->field_0x30 == 1 && streamChannel->channelRacer->throttleOn) {
                     streamChannel->field_0x30 = 0;
                     j = rand() % revCount[streamChannel->engine];
                     streamChannel->streamSample = revSamples[streamChannel->engine][j];
@@ -660,10 +660,10 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             if (streamChannel->wasAirborne == 1 && !landHardSound->IsPlaying() &&
                 streamChannel->channelRacer == listenerRacer)
                 PlayIfEnabled(landHardSound, 0, 0, 0, 0);
-            if (!streamChannel->channelRacer->field_0x478)
+            if (!streamChannel->channelRacer->throttleOn)
                 streamChannel->field_0x34 = 1;
             if (streamChannel->field_0x48) {
-                if (streamChannel->channelRacer->field_0x478) {
+                if (streamChannel->channelRacer->throttleOn) {
                     if (streamChannel->sampleKind == 6) {
                         j = rand() % highTorqueCount[streamChannel->engine];
                         streamChannel->streamSample = highTorqueSamples[streamChannel->engine][j];
@@ -674,7 +674,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                         StartStream();
                     }
                     if (streamChannel->sampleKind == 1 || streamChannel->sampleKind == 5) {
-                        streamChannel->speed = (int)(streamChannel->channelRacer->field_0x0b8 * 0.68182f);
+                        streamChannel->speed = (int)(streamChannel->channelRacer->previousSpeed * 0.68182f);
                         if (streamChannel->speed < lowTorqueMaxSpeed[streamChannel->engine]) {
                             j = rand() % lowTorqueCount[streamChannel->engine];
                             streamChannel->streamSample = lowTorqueSamples[streamChannel->engine][j];
@@ -716,7 +716,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     streamChannel->nextSampleKind = 1;
                     StartStream();
                 }
-            } else if (streamChannel->channelRacer->field_0x478 == true &&
+            } else if (streamChannel->channelRacer->throttleOn == true &&
                        (streamChannel->field_0x34 == 1 || streamChannel->field_0x28 == 1)) {
                 streamChannel->field_0x34 = 0;
                 j = rand() % 1;
@@ -732,13 +732,13 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             }
         }
         streamChannel->field_0x28 = streamChannel->field_0x48;
-        streamChannel->field_0x24 = (unsigned char)streamChannel->channelRacer->field_0x478;
-        streamChannel->wasAirborne = (unsigned char)streamChannel->channelRacer->field_0x108;
+        streamChannel->field_0x24 = (unsigned char)streamChannel->channelRacer->throttleOn;
+        streamChannel->wasAirborne = (unsigned char)streamChannel->channelRacer->airborne;
         RefillStream();
     }
 
     if (g_TrackGame->mode.field_0xa38 &&
-        (listenerRacer->field_0x7b8 > field_0x1294 || listenerRacer->field_0x7a0 > field_0x1290))
+        (listenerRacer->field_0x7b8 > field_0x1294 || listenerRacer->lapCount > field_0x1290))
         PlayIfEnabled(waypointSound, 0, 0, 0, 0);
 
     for (i = 0; i < channelsInUse; i++) {
@@ -754,15 +754,15 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     PlayIfEnabled(launchSound, 0, 0, 0, 0);
                 }
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
-                    if (currentRacer == listenerRacer && currentRacer->field_0x784 == 1)
+                    if (currentRacer == listenerRacer && currentRacer->finishPosition == 1)
                         PlayIfEnabled(booSound, 0, 0, 0, 0);
-                    if (currentRacer == listenerRacer && currentRacer->field_0x784 > 1 && ohClock > 30.0f) {
+                    if (currentRacer == listenerRacer && currentRacer->finishPosition > 1 && ohClock > 30.0f) {
                         PlayIfEnabled(ohSound, 0, 0, 0, 0);
                         ohClock = 0;
                     }
                 }
             }
-            if (currentRacer->field_0x484) {
+            if (currentRacer->justLanded) {
                 if (!racerWreckSound[i])
                     racerWreckSound[i] = PlayWreckSound(currentRacer);
                 else if (!wreckSounds[racerWreckSound[i]]->IsPlaying())
@@ -776,8 +776,8 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             }
             crashHandled[i] = 1;
         }
-        if (currentRacer == listenerRacer && currentRacer->field_0x784 < lastListenerPosition) {
-            if (currentRacer->field_0x784 == 1) {
+        if (currentRacer == listenerRacer && currentRacer->finishPosition < lastListenerPosition) {
+            if (currentRacer->finishPosition == 1) {
                 if (applause3)
                     PlayIfEnabled(applause3, 0, 0, 0, 0);
             } else if (applauseClock > 15.0f) {
@@ -790,9 +790,9 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             }
         }
     }
-    field_0x1290 = listenerRacer->field_0x7a0;
+    field_0x1290 = listenerRacer->lapCount;
     field_0x1294 = listenerRacer->field_0x7b8;
-    lastListenerPosition = listenerRacer->field_0x784;
+    lastListenerPosition = listenerRacer->finishPosition;
     return 1;
 }
 
@@ -873,7 +873,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
                     field_0x1294 = listenerRacer->field_0x7b8;
-                    field_0x1290 = listenerRacer->field_0x7a0;
+                    field_0x1290 = listenerRacer->lapCount;
                 }
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
@@ -911,7 +911,7 @@ int RaceSound::PlayWreckSound(UnknownEventRacer* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->field_0x3bc->GetPosition(&position);
+    racer->vehicleModel->GetPosition(&position);
     wreckSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(wreckSounds[index], 0, 0, 0, 0);
     return index;
@@ -930,7 +930,7 @@ int RaceSound::PlayFallSound(UnknownEventRacer* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->field_0x3bc->GetPosition(&position);
+    racer->vehicleModel->GetPosition(&position);
     fallSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(fallSounds[index], 0, 0, 0, 0);
     return index;

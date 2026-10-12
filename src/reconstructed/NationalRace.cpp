@@ -45,7 +45,7 @@ NationalRace* NationalRace::Create(RenderTarget* target, UnknownProgressCallback
     if (!BaseQuarryEvent::Create(target, progress))
         return 0;
     if (runwayLights)
-        runwayLights->UnknownFunction48ad50((UnknownRunwayRacer*)raceView->field_0x38);
+        runwayLights->UnknownFunction48ad50((UnknownRunwayRacer*)raceView->localRacer);
     return this;
 }
 
@@ -89,8 +89,8 @@ int NationalRace::UnknownVirtualSlot10(float frameTime) {
     BaseQuarryEvent::UnknownVirtualSlot10(frameTime);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
         !g_TrackGame->uiInteractionBlocked && !finishTextShown) {
-        if (raceView->field_0x38->field_0x7a0 + 1 == g_TrackGame->mode.field_0x27f8.field_0x20 &&
-            raceView->field_0x18a) {
+        if (raceView->localRacer->lapCount + 1 == g_TrackGame->mode.field_0x27f8.field_0x20 &&
+            raceView->isRacing) {
             if (finishText)
                 finishText->ReshowText();
             finishTextShown = 1;

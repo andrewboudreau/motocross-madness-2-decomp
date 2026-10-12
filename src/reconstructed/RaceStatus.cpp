@@ -119,8 +119,8 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
 
 // 0x004e5c70
 int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
-    for (; list; list = list->field_0x50) {
-        if (list->field_0x04 == racer)
+    for (; list; list = list->next) {
+        if (list->racer == racer)
             return 1;
     }
     return 0;
@@ -129,13 +129,13 @@ int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
 // 0x004e5ca0
 int PruneStatusList(UnknownEventRacerPart** list) {
     while (list && *list) {
-        if (!(*list)->field_0x04->field_0x25_bit0) {
-            (*list)->field_0x04->field_0x744 = 0;
+        if (!(*list)->racer->field_0x25_bit0) {
+            (*list)->racer->field_0x744 = 0;
             UnknownEventRacerPart* status = *list;
-            *list = status->field_0x50;
+            *list = status->next;
             DebugFree(status, __FILE__, 193);
         } else {
-            list = &(*list)->field_0x50;
+            list = &(*list)->next;
         }
     }
     return 1;
@@ -145,7 +145,7 @@ int PruneStatusList(UnknownEventRacerPart** list) {
 int FreeStatusList(UnknownEventRacerPart* list) {
     while (list) {
         UnknownEventRacerPart* status = list;
-        list = list->field_0x50;
+        list = list->next;
         DebugFree(status, __FILE__, 285);
     }
     return 0;
@@ -161,39 +161,39 @@ int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRa
 
     if (!list || !track)
         return 0;
-    for (status = *list; status; status = status->field_0x50) {
-        status->field_0x0c = track->DistanceAlong(status->field_0x38, probe->field_0x2c);
-        if (status->field_0x0c < 0.0f)
+    for (status = *list; status; status = status->next) {
+        status->gateDistance = track->DistanceAlong(status->field_0x38, probe->field_0x2c);
+        if (status->gateDistance < 0.0f)
             return 0;
         float distance = track->DistanceAlong(status->field_0x38, status->field_0x44);
         if (distance > 0.0f && (distance < status->field_0x10 || status->field_0x10 < 0.0f) &&
-            distance > status->field_0x0c)
+            distance > status->gateDistance)
             status->field_0x18 = -1;
         else
             status->field_0x18 = 0;
     }
     for (at = list; *at; ) {
-        if (!(*at)->field_0x50)
+        if (!(*at)->next)
             break;
-        if (!(*at)->field_0x04->field_0x7a4) {
-            key = (*at)->field_0x04->field_0x7a0 + (*at)->field_0x18;
-            for (next = &(*at)->field_0x50; (status = *next) != 0; ) {
-                int other = status->field_0x04->field_0x7a0 + status->field_0x18;
-                if (other > key || (other == key && status->field_0x0c < (*at)->field_0x0c)) {
-                    *next = status->field_0x50;
-                    status->field_0x50 = *at;
+        if (!(*at)->racer->hasFinished) {
+            key = (*at)->racer->lapCount + (*at)->field_0x18;
+            for (next = &(*at)->next; (status = *next) != 0; ) {
+                int other = status->racer->lapCount + status->field_0x18;
+                if (other > key || (other == key && status->gateDistance < (*at)->gateDistance)) {
+                    *next = status->next;
+                    status->next = *at;
                     *at = status;
-                    key = status->field_0x04->field_0x7a0 + status->field_0x18;
+                    key = status->racer->lapCount + status->field_0x18;
                 }
                 if (*next)
-                    next = &(*next)->field_0x50;
+                    next = &(*next)->next;
             }
         }
         if (*at)
-            at = &(*at)->field_0x50;
+            at = &(*at)->next;
     }
-    for (status = *list, i = 1; status; status = status->field_0x50, i++)
-        status->field_0x04->field_0x784 = i;
+    for (status = *list, i = 1; status; status = status->next, i++)
+        status->racer->finishPosition = i;
     return 1;
 }
 
@@ -207,35 +207,35 @@ int OrderByGates(UnknownEventRacerPart** list) {
 
     if (!list)
         return 0;
-    for (status = *list; status; status = status->field_0x50) {
-        float dx = status->field_0x34->center.x - status->field_0x1c.x;
-        float dz = status->field_0x34->center.z - status->field_0x1c.z;
-        status->field_0x0c = dx * dx + dz * dz;
-        if (status->field_0x0c < 0.0f)
+    for (status = *list; status; status = status->next) {
+        float dx = status->nextGate->center.x - status->previousPosition.x;
+        float dz = status->nextGate->center.z - status->previousPosition.z;
+        status->gateDistance = dx * dx + dz * dz;
+        if (status->gateDistance < 0.0f)
             return 0;
     }
     for (at = list; *at; ) {
-        if (!(*at)->field_0x50)
+        if (!(*at)->next)
             break;
-        if (!(*at)->field_0x04->field_0x7a4) {
-            key = (*at)->field_0x04->field_0x790;
-            for (next = &(*at)->field_0x50; (status = *next) != 0; ) {
-                int other = status->field_0x04->field_0x790;
-                if (other > key || (other == key && status->field_0x0c < (*at)->field_0x0c)) {
-                    *next = status->field_0x50;
-                    status->field_0x50 = *at;
+        if (!(*at)->racer->hasFinished) {
+            key = (*at)->racer->gatesPassed;
+            for (next = &(*at)->next; (status = *next) != 0; ) {
+                int other = status->racer->gatesPassed;
+                if (other > key || (other == key && status->gateDistance < (*at)->gateDistance)) {
+                    *next = status->next;
+                    status->next = *at;
                     *at = status;
-                    key = status->field_0x04->field_0x790;
+                    key = status->racer->gatesPassed;
                 }
                 if (*next)
-                    next = &(*next)->field_0x50;
+                    next = &(*next)->next;
             }
         }
         if (*at)
-            at = &(*at)->field_0x50;
+            at = &(*at)->next;
     }
-    for (status = *list, i = 1; status; status = status->field_0x50, i++)
-        status->field_0x04->field_0x784 = i;
+    for (status = *list, i = 1; status; status = status->next, i++)
+        status->racer->finishPosition = i;
     return 1;
 }
 
@@ -243,19 +243,19 @@ int OrderByGates(UnknownEventRacerPart** list) {
 int ComputeTimeBehind(UnknownEventRacerPart* list, int mode) {
     UnknownEventRacerPart* status;
 
-    for (status = list; status; status = status->field_0x50) {
-        UnknownEventRacer* racer = status->field_0x04;
-        if (racer->field_0x784 > 1) {
+    for (status = list; status; status = status->next) {
+        UnknownEventRacer* racer = status->racer;
+        if (racer->finishPosition > 1) {
             if (mode == 1)
-                racer->field_0x770 = racer->field_0x780[racer->field_0x790 % 600] -
-                                     list->field_0x04->field_0x780[racer->field_0x790 % 600];
+                racer->timeBehindLeader = racer->gateTimes[racer->gatesPassed % 600] -
+                                     list->racer->gateTimes[racer->gatesPassed % 600];
             else
-                racer->field_0x770 = racer->field_0x77c[racer->field_0x7a0 % 100] -
-                                     list->field_0x04->field_0x77c[racer->field_0x7a0 % 100];
-            if (status->field_0x04->field_0x770 >= 0.0f)
+                racer->timeBehindLeader = racer->lapStartTimes[racer->lapCount % 100] -
+                                     list->racer->lapStartTimes[racer->lapCount % 100];
+            if (status->racer->timeBehindLeader >= 0.0f)
                 continue;
         }
-        status->field_0x04->field_0x770 = 0;
+        status->racer->timeBehindLeader = 0;
     }
     return 1;
 }
@@ -274,20 +274,20 @@ int RankByScore(int keepRacing) {
         iterator = 0;
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
             if (racer->field_0x25_bit0) {
-                scores[count].value = racer->field_0x768;
+                scores[count].value = racer->score;
                 scores[count].racer = racer;
                 count++;
             }
         }
         qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
         for (i = 0; i < count; i++)
-            scores[i].racer->field_0x784 = i + 1;
+            scores[i].racer->finishPosition = i + 1;
         if (!keepRacing) {
             TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
             if (owner->field_0x70 * 60.0f + owner->field_0x74 >=
                 g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f - 1.0f) {
                 for (i = 0; i < count; i++)
-                    scores[i].racer->field_0x7a4 = 1;
+                    scores[i].racer->hasFinished = 1;
             }
         }
     }
@@ -304,39 +304,39 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
     if (!list || !track)
         return 0;
     PruneStatusList(list);
-    for (status = *list; status; previous = status, status = status->field_0x50) {
-        racer = status->field_0x04;
-        if (!racer->field_0x7a4) {
-            status->field_0x1c = racer->field_0x088 * 3.5f + racer->field_0x00c;
+    for (status = *list; status; previous = status, status = status->next) {
+        racer = status->racer;
+        if (!racer->hasFinished) {
+            status->previousPosition = racer->field_0x088 * 3.5f + racer->position;
             if (!status->field_0x38.node) {
                 status->field_0x44.node = start->field_0x2c.node;
                 status->field_0x44.segment = start->field_0x2c.segment;
                 status->field_0x44.t = start->field_0x2c.t + 0.1f;
             }
             if (!racer->field_0x735)
-                racer->field_0x78c = track->PlaceNear(status->field_0x1c, status->field_0x44,
+                racer->field_0x78c = track->PlaceNear(status->previousPosition, status->field_0x44,
                                                                   g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
                                                                   &status->field_0x38);
             else
-                track->ClosestPointOnTrack(status->field_0x1c, &status->field_0x38, 0);
+                track->ClosestPointOnTrack(status->previousPosition, &status->field_0x38, 0);
             if (racer->field_0x78c) {
-                racer->field_0x76c = 0;
+                racer->offTrackTime = 0;
                 status->field_0x08 = track->DistanceAlong(status->field_0x44, finish->field_0x2c);
-                status->field_0x0c = track->DistanceAlong(status->field_0x38, finish->field_0x2c);
-                if (status->field_0x08 < g_UnknownGlobal572988 && status->field_0x08 < status->field_0x0c)
+                status->gateDistance = track->DistanceAlong(status->field_0x38, finish->field_0x2c);
+                if (status->field_0x08 < g_UnknownGlobal572988 && status->field_0x08 < status->gateDistance)
                     COPY_TRACK_POS(status->field_0x38, status->field_0x44);
                 if ((racer->field_0x735 && racer->field_0x7c0) || g_UnknownGlobal572988 < 0.0f ||
                     (!racer->field_0x735 && status->field_0x08 >= 0.0f && status->field_0x08 < g_UnknownGlobal572988)) {
-                    if (CountLap(&status->field_0x1c, &status->field_0x28, &racer->field_0x7a0, finish,
-                                              &racer->field_0x7a4, lapLimit, &racer->field_0x74c, racer->field_0x77c,
-                                              racer->field_0x754, &racer->field_0x774, &racer->field_0x750, 1,
+                    if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
+                                              &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
+                                              racer->field_0x754, &racer->lapStartTime, &racer->field_0x750, 1,
                                               unlimited, racer->field_0x735, racer->field_0x7c0)) {
                         status->field_0x44.node = finish->field_0x2c.node;
                         status->field_0x44.segment = finish->field_0x2c.segment;
                         status->field_0x44.t = finish->field_0x2c.t + 1e-5f;
                     }
                 }
-                if (racer->field_0x7a4 && racer == racer->field_0x740->field_0x38)
+                if (racer->hasFinished && racer == racer->bikeView->localRacer)
                     g_ViewRacerFinished = 1;
                 status->field_0x10 = track->DistanceAlong(status->field_0x44, status->field_0x38);
                 if (status->field_0x10 > 0.0f && status->field_0x10 < g_UnknownGlobal572988 &&
@@ -345,47 +345,47 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                     COPY_TRACK_POS(status->field_0x44, status->field_0x38);
                 }
             } else {
-                racer->field_0x76c += frameTime;
+                racer->offTrackTime += frameTime;
             }
-            status->field_0x28.x = status->field_0x1c.x;
-            status->field_0x28.y = status->field_0x1c.y;
-            status->field_0x28.z = status->field_0x1c.z;
+            status->currentPosition.x = status->previousPosition.x;
+            status->currentPosition.y = status->previousPosition.y;
+            status->currentPosition.z = status->previousPosition.z;
             if (g_TrackGame->field_0x18 == 1 && g_ViewRacerFinished) {
-                if (racer->field_0x7a4)
+                if (racer->hasFinished)
                     goto next;
                 if (racer->field_0x734) {
-                    int remaining = lapLimit - racer->field_0x7a0;
+                    int remaining = lapLimit - racer->lapCount;
                     if (remaining >= 1) {
-                        if (racer->field_0x7a0 < 1)
+                        if (racer->lapCount < 1)
                             racer->field_0x754 = 0;
                         else
-                            racer->field_0x754 = remaining * racer->field_0x74c;
+                            racer->field_0x754 = remaining * racer->lastLapTime;
                     }
-                    if (previous && racer->field_0x754 < previous->field_0x04->field_0x754)
-                        racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->field_0x04->field_0x754 + 1.0f;
+                    if (previous && racer->field_0x754 < previous->racer->field_0x754)
+                        racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->field_0x754 + 1.0f;
                     if (lapLimit == 1)
-                        racer->field_0x74c = racer->field_0x754;
-                    else if (racer->field_0x7a0 < 1)
-                        racer->field_0x74c = UNKNOWN_RANDOM_UNIT() * 10 +
-                                             racer->field_0x740->field_0x38->field_0x74c + 1.0f;
-                    if (racer->field_0x74c < racer->field_0x750 || racer->field_0x750 <= 0.0f)
-                        racer->field_0x750 = racer->field_0x74c;
-                    racer->field_0x7a0 = lapLimit;
-                    racer->field_0x7a4 = 1;
+                        racer->lastLapTime = racer->field_0x754;
+                    else if (racer->lapCount < 1)
+                        racer->lastLapTime = UNKNOWN_RANDOM_UNIT() * 10 +
+                                             racer->bikeView->localRacer->lastLapTime + 1.0f;
+                    if (racer->lastLapTime < racer->field_0x750 || racer->field_0x750 <= 0.0f)
+                        racer->field_0x750 = racer->lastLapTime;
+                    racer->lapCount = lapLimit;
+                    racer->hasFinished = 1;
                     goto next;
                 }
             }
-            if (!racer->field_0x7a4)
+            if (!racer->hasFinished)
                 racer->field_0x754 += frameTime;
         }
     next:
         if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->next) {
-            if (!track->PointAt(status->field_0x44, (TrackVec3*)&status->field_0x04->field_0x10c))
-                racer->field_0x10c = racer->field_0x00c;
+            if (!track->PointAt(status->field_0x44, (TrackVec3*)&status->racer->trackPoint))
+                racer->trackPoint = racer->position;
             if (!track->SegmentDirection(status->field_0x44.segment,
-                                              (TrackVec3*)&status->field_0x04->field_0x118))
-                racer->field_0x118 = racer->field_0x088;
-            status->field_0x04->field_0x10c -= status->field_0x04->field_0x118 * 3.5f;
+                                              (TrackVec3*)&status->racer->trackDirection))
+                racer->trackDirection = racer->field_0x088;
+            status->racer->trackPoint -= status->racer->trackDirection * 3.5f;
         }
     }
     if (!OrderByLapDistance(list, track, finish))

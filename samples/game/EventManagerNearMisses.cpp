@@ -318,7 +318,7 @@ int EventManager::CreatePodiumScene() {
             racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
         if (g_TrackGame->UnknownFunction521cd0()) {
             if ((g_TrackGame->field_0x3444->field_0x464 & 2) &&
-                racer == PODIUM_OWNER(owner)->field_0x34->field_0x38)
+                racer == PODIUM_OWNER(owner)->field_0x34->localRacer)
                 sprintf(name, "%s\\Winnerd.mcf", "Res");
             else
                 sprintf(name, "%s\\Winner.mcf", "Res");

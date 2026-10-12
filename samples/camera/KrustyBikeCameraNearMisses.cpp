@@ -50,7 +50,7 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
                 break;
         }
     }
-    if (raceView->field_0x18e) {
+    if (raceView->viewAvailable) {
         Vector3 first;
         Vector3 second;
         if (!s_UnknownActive67c3f4) {
@@ -59,7 +59,7 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
             FollowCamera::UnknownVirtualSlot46(&first, &s_UnknownVector67c3e8);
         }
         raceView->WriteRelativePositions(&first, &second, g_TrackGame->field_0x560, 0);
-        first.y = raceView->field_0x38->field_0x00c.y + 2.0f;
+        first.y = raceView->localRacer->position.y + 2.0f;
         FollowCamera::UnknownVirtualSlot47(frameTime, &first);
         return 1;
     }

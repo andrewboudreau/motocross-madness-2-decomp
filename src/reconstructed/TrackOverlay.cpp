@@ -718,13 +718,13 @@ int StatsOverlay::DrawTagStandings()
         iterator = 0;
         UnknownEventRacer* racer;
         while ((racer = view->NextBike(&iterator)) != 0) {
-            scores[count].value = racer->field_0x768;
+            scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
         }
         qsort(scores, count, sizeof(UnknownEventScore), CompareScoresDescending);
         for (i = 0; i < count; i++) {
-            if (scores[i].racer == view->field_0x38) {
+            if (scores[i].racer == view->localRacer) {
                 own = i;
                 break;
             }
@@ -739,20 +739,20 @@ int StatsOverlay::DrawTagStandings()
         int row;
         int shown = 0;
         for (row = first; row < count - 1; row++) {
-            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
-                    scores[shown].racer->field_0x768);
+            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                    scores[shown].racer->score);
             shown++;
         }
         if (own >= shown)
-            sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->field_0x5e0,
-                    scores[own].racer->field_0x768);
+            sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->racerName,
+                    scores[own].racer->score);
         else
-            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
-                    scores[shown].racer->field_0x768);
+            sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
+                    scores[shown].racer->score);
     }
     if (g_TrackGame->field_0x568->field_0xa8) {
         g_TrackGame->LoadResourceString(0x14b8, tag, 0x40);
-        sprintf(rowText[5], "  %s %s", g_TrackGame->field_0x568->field_0xa8->field_0x5e0, tag);
+        sprintf(rowText[5], "  %s %s", g_TrackGame->field_0x568->field_0xa8->racerName, tag);
     } else if (g_TrackGame->field_0x568->field_0xdc) {
         g_TrackGame->LoadResourceString(0x14b7, tag, 0x40);
         sprintf(rowText[5], "  %s", tag);

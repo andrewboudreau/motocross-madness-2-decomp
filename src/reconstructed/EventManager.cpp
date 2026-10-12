@@ -84,29 +84,29 @@ void UnknownEventEntry::Reset() {
 // position 99 with nothing else; in modes 0 and 4 every racer counts as
 // finished.
 void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
-    playerId = racer->field_0x11bc;
-    int length = strlen(racer->field_0x5e0);
+    playerId = racer->networkPlayerId;
+    int length = strlen(racer->racerName);
     int count = length > 15 ? 15 : length;
-    strncpy(name, racer->field_0x5e0, count);
+    strncpy(name, racer->racerName, count);
     name[count] = 0;
     field_0x24 = racer->field_0x4a0;
     if (!field_0x24) {
-        score = racer->field_0x768;
-        position = racer->field_0x784;
+        score = racer->score;
+        position = racer->finishPosition;
         fastestLap = racer->field_0x750;
         totalRunningTime = racer->field_0x754;
         largestStuntPoints = racer->field_0x788;
         field_0x10 = racer->field_0x758;
         field_0x18 = racer->field_0x760;
         field_0x1c = racer->field_0x764;
-        field_0x30 = racer->field_0x11c0;
+        field_0x30 = racer->aiIndex;
         field_0x34[0] = racer->field_0x7ac[0];
         field_0x34[1] = racer->field_0x7ac[1];
         field_0x34[2] = racer->field_0x7ac[2];
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0 || g_TrackGame->mode.field_0x27f8.field_0x04 == 4)
             finished = 1;
         else
-            finished = racer->field_0x7a4;
+            finished = racer->hasFinished;
     } else {
         score = 0;
         position = 99;
@@ -312,15 +312,15 @@ int CompareRankings(const void* a, const void* b) {
     if (first->value < second->value)
         return -1;
     if (first->value == second->value) {
-        if (first->racer->field_0x7a0 > second->racer->field_0x7a0)
+        if (first->racer->lapCount > second->racer->lapCount)
             return -1;
-        if (first->racer->field_0x7a0 == second->racer->field_0x7a0) {
-            if (first->racer->field_0x790 > second->racer->field_0x790)
+        if (first->racer->lapCount == second->racer->lapCount) {
+            if (first->racer->gatesPassed > second->racer->gatesPassed)
                 return -1;
-            if (first->racer->field_0x790 == second->racer->field_0x790) {
-                if (first->racer->field_0x744->field_0x0c < second->racer->field_0x744->field_0x0c)
+            if (first->racer->gatesPassed == second->racer->gatesPassed) {
+                if (first->racer->field_0x744->gateDistance < second->racer->field_0x744->gateDistance)
                     return -1;
-                if (first->racer->field_0x744->field_0x0c == second->racer->field_0x744->field_0x0c)
+                if (first->racer->field_0x744->gateDistance == second->racer->field_0x744->gateDistance)
                     return 0;
             }
         }
@@ -341,8 +341,8 @@ void EventManager::AddChampionshipPoints(UnknownEventRacer* racer, int* points) 
     table[7] = 5;
     table[8] = 3;
     table[9] = 1;
-    if (racer->field_0x784 >= 1 && racer->field_0x784 <= 10)
-        *points += table[racer->field_0x784 - 1];
+    if (racer->finishPosition >= 1 && racer->finishPosition <= 10)
+        *points += table[racer->finishPosition - 1];
 }
 
 // 0x0045d3d0
@@ -358,7 +358,7 @@ int CompareStandings(const void* a, const void* b) {
             if (first->field_0x08 < second->field_0x08)
                 return -1;
             if (first->field_0x08 == second->field_0x08)
-                return strcmp(first->racer->field_0x5e0, second->racer->field_0x5e0);
+                return strcmp(first->racer->racerName, second->racer->racerName);
         }
     }
     return 1;
@@ -430,22 +430,22 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == from &&
                     g_TrackGame->mode.field_0x1be4[i].field_0xd8 == update->racerIndex) {
                     g_TrackGame->mode.field_0x1be4[i].field_0xcc = 1;
-                    if (view->field_0x3c[i]) {
-                        view->field_0x3c[i]->field_0x768 = update->score;
-                        view->field_0x3c[i]->field_0x750 = update->fastestLap;
-                        view->field_0x3c[i]->field_0x7a4 = update->finished;
-                        view->field_0x3c[i]->field_0x788 = update->largestStuntPoints;
-                        view->field_0x3c[i]->field_0x758 = update->field_0x18;
-                        view->field_0x3c[i]->field_0x760 = update->field_0x1c;
-                        view->field_0x3c[i]->field_0x764 = update->field_0x20;
-                        if (view->field_0x3c[i]->field_0x7a4) {
-                            view->field_0x3c[i]->field_0x754 = update->totalRunningTime;
+                    if (view->racerSlots[i]) {
+                        view->racerSlots[i]->score = update->score;
+                        view->racerSlots[i]->field_0x750 = update->fastestLap;
+                        view->racerSlots[i]->hasFinished = update->finished;
+                        view->racerSlots[i]->field_0x788 = update->largestStuntPoints;
+                        view->racerSlots[i]->field_0x758 = update->field_0x18;
+                        view->racerSlots[i]->field_0x760 = update->field_0x1c;
+                        view->racerSlots[i]->field_0x764 = update->field_0x20;
+                        if (view->racerSlots[i]->hasFinished) {
+                            view->racerSlots[i]->field_0x754 = update->totalRunningTime;
                             // Always false here; retail still tests it.
-                            if (!view->field_0x3c[i]->field_0x7a4)
-                                view->field_0x3c[i]->field_0x748 = ReadClock();
+                            if (!view->racerSlots[i]->hasFinished)
+                                view->racerSlots[i]->finishTimeStamp = ReadClock();
                         } else {
-                            view->field_0x3c[i]->field_0x754 = FLT_MAX;
-                            view->field_0x3c[i]->field_0x748 = 0x7ffffffe;
+                            view->racerSlots[i]->field_0x754 = FLT_MAX;
+                            view->racerSlots[i]->finishTimeStamp = 0x7ffffffe;
                         }
                     }
                 }
@@ -454,7 +454,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 return 0;
             if (g_TrackGame->mode.field_0x27f8.field_0x04 == 4) {
                 TrackGameViewOwner* owner = FindRaceMode();
-                if (owner->field_0xa8 == owner->field_0x34->field_0x38) {
+                if (owner->field_0xa8 == owner->field_0x34->localRacer) {
                     owner->field_0xa8->field_0x764 += owner->field_0xa8->field_0x75c;
                     // Compared through locals, kept as the best of +0x75c.
                     float best = owner->field_0xa8->field_0x760;
@@ -546,36 +546,36 @@ void EventManager::SendRacerResults() {
     if (!g_TrackGame->network || keepAliveStarted)
         return;
     UnknownKrustyBikeView* view = FindRaceView();
-    if (!view->field_0x38->field_0x7a4) {
-        view->field_0x38->field_0x754 = FLT_MAX;
-        view->field_0x38->field_0x748 = 0x7ffffffe;
+    if (!view->localRacer->hasFinished) {
+        view->localRacer->field_0x754 = FLT_MAX;
+        view->localRacer->finishTimeStamp = 0x7ffffffe;
     }
     UnknownEventRacerMessage message;
-    message.score = view->field_0x38->field_0x768;
-    message.totalRunningTime = view->field_0x38->field_0x754;
-    message.fastestLap = view->field_0x38->field_0x750;
-    message.finished = view->field_0x38->field_0x7a4;
-    message.largestStuntPoints = view->field_0x38->field_0x788;
-    message.field_0x18 = view->field_0x38->field_0x758;
-    message.field_0x1c = view->field_0x38->field_0x760;
-    message.field_0x20 = view->field_0x38->field_0x764;
+    message.score = view->localRacer->score;
+    message.totalRunningTime = view->localRacer->field_0x754;
+    message.fastestLap = view->localRacer->field_0x750;
+    message.finished = view->localRacer->hasFinished;
+    message.largestStuntPoints = view->localRacer->field_0x788;
+    message.field_0x18 = view->localRacer->field_0x758;
+    message.field_0x1c = view->localRacer->field_0x760;
+    message.field_0x20 = view->localRacer->field_0x764;
     message.racerIndex = 0;
     g_TrackGame->network->Send(
         0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
-        if (!view->field_0x40[i]->field_0x7a4) {
-            view->field_0x40[i]->field_0x754 = FLT_MAX;
-            view->field_0x40[i]->field_0x748 = 0x7ffffffe;
+        if (!view->aiRacers[i]->hasFinished) {
+            view->aiRacers[i]->field_0x754 = FLT_MAX;
+            view->aiRacers[i]->finishTimeStamp = 0x7ffffffe;
         }
-        message.score = view->field_0x40[i]->field_0x768;
-        message.totalRunningTime = view->field_0x40[i]->field_0x754;
-        message.fastestLap = view->field_0x40[i]->field_0x750;
-        message.finished = view->field_0x40[i]->field_0x7a4;
-        message.largestStuntPoints = view->field_0x40[i]->field_0x788;
-        message.field_0x18 = view->field_0x40[i]->field_0x758;
-        message.field_0x1c = view->field_0x40[i]->field_0x760;
-        message.field_0x20 = view->field_0x40[i]->field_0x764;
-        message.racerIndex = view->field_0x40[i]->field_0x11c0;
+        message.score = view->aiRacers[i]->score;
+        message.totalRunningTime = view->aiRacers[i]->field_0x754;
+        message.fastestLap = view->aiRacers[i]->field_0x750;
+        message.finished = view->aiRacers[i]->hasFinished;
+        message.largestStuntPoints = view->aiRacers[i]->field_0x788;
+        message.field_0x18 = view->aiRacers[i]->field_0x758;
+        message.field_0x1c = view->aiRacers[i]->field_0x760;
+        message.field_0x20 = view->aiRacers[i]->field_0x764;
+        message.racerIndex = view->aiRacers[i]->aiIndex;
         g_TrackGame->network->Send(
             0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     }
@@ -658,7 +658,7 @@ void EventManager::CheckRaceOver(float frameTime) {
         !owner->field_0x25_bit0)
         return;
     UnknownKrustyBikeView* view = FindRaceView();
-    if (!view || !view->field_0x18a)
+    if (!view || !view->isRacing)
         return;
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 1:
@@ -671,7 +671,7 @@ void EventManager::CheckRaceOver(float frameTime) {
             int iterator = 0;
             UnknownEventRacer* racer;
             while ((racer = view->NextBike(&iterator)) != 0) {
-                if (racer->field_0x7a4)
+                if (racer->hasFinished)
                     anyRacerFinished = 1;
                 else if (!racer->field_0x4a0)
                     allRacersFinished = 0;
@@ -686,15 +686,15 @@ void EventManager::CheckRaceOver(float frameTime) {
             }
             return;
         } else {
-            UnknownEventRacer* racer = view->field_0x38;
-            if (!racer->field_0x7a4)
+            UnknownEventRacer* racer = view->localRacer;
+            if (!racer->hasFinished)
                 return;
-            if (racer->field_0x784 == 1) {
-                if (racer->field_0x7a4 >= 3)
+            if (racer->finishPosition == 1) {
+                if (racer->hasFinished >= 3)
                     EndRace();
                 return;
             }
-            if (racer->field_0x7a4 >= 3 && ReadClock() - racer->field_0x748 >= 3000)
+            if (racer->hasFinished >= 3 && ReadClock() - racer->finishTimeStamp >= 3000)
                 EndRace();
             return;
         }
@@ -706,7 +706,7 @@ void EventManager::CheckRaceOver(float frameTime) {
     case 4:
         if (g_TrackGame->field_0x568->field_0x70 < g_TrackGame->mode.field_0x27f8.field_0x140)
             return;
-        if (owner->field_0xa8 == owner->field_0x34->field_0x38) {
+        if (owner->field_0xa8 == owner->field_0x34->localRacer) {
             owner->field_0xa8->field_0x764 += owner->field_0xa8->field_0x75c;
             // Compared through locals, kept as the best of +0x75c.
             float best = owner->field_0xa8->field_0x760;
@@ -753,7 +753,7 @@ void EventManager::RankRacers() {
             }
             qsort(rankings, ranked, sizeof(rankings[0]), CompareRankings);
             for (int i = 0; i < ranked; i++)
-                rankings[i].racer->field_0x784 = i + 1;
+                rankings[i].racer->finishPosition = i + 1;
         }
         iterator = 0;
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
@@ -771,14 +771,14 @@ void EventManager::RankRacers() {
         int next = 0;
         while ((racer = view->NextBike(&next)) != 0) {
             if (!racer->field_0x4a0) {
-                scores[scored].value = racer->field_0x768;
+                scores[scored].value = racer->score;
                 scores[scored].racer = racer;
                 scored++;
             }
         }
         qsort(scores, scored, sizeof(scores[0]), CompareScoresDescending);
         for (int i = 0; i < scored; i++)
-            scores[i].racer->field_0x784 = i + 1;
+            scores[i].racer->finishPosition = i + 1;
         next = 0;
         for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
             results[count].CopyFromRacer(racer);
@@ -795,14 +795,14 @@ void EventManager::RankRacers() {
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
                 if (!racer->field_0x4a0) {
-                    scores[scored].value = racer->field_0x768;
+                    scores[scored].value = racer->score;
                     scores[scored].racer = racer;
                     scored++;
                 }
             }
             qsort(scores, scored, sizeof(scores[0]), CompareScoresDescending);
             for (int i = 0; i < scored; i++)
-                scores[i].racer->field_0x784 = i + 1;
+                scores[i].racer->finishPosition = i + 1;
             next = 0;
             for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
@@ -823,7 +823,7 @@ void EventManager::RankRacers() {
             }
             qsort(scores, scored, sizeof(scores[0]), CompareScoresDescending);
             for (int i = 0; i < scored; i++)
-                scores[i].racer->field_0x784 = i + 1;
+                scores[i].racer->finishPosition = i + 1;
             next = 0;
             for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
@@ -852,13 +852,13 @@ void EventManager::RankRacers() {
             int i;
             for (i = 0; i < standing; i++) {
                 if (standings[i].racer == racer) {
-                    racer->field_0x784 = i + 1;
+                    racer->finishPosition = i + 1;
                     break;
                 }
             }
             for (i = 0; i < standing; i++) {
-                if (results[i].playerId == racer->field_0x11bc && results[i].field_0x30 == racer->field_0x11c0) {
-                    results[i].position = racer->field_0x784;
+                if (results[i].playerId == racer->networkPlayerId && results[i].field_0x30 == racer->aiIndex) {
+                    results[i].position = racer->finishPosition;
                     break;
                 }
             }
@@ -910,7 +910,7 @@ void EventManager::CloseRace(int mode) {
                 scene, g_TrackGame->sceneObject->sceneFile, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
-            sprintf(name, "%s_%s_%s_%s", scene, view->field_0x38->field_0x5e0, date, time);
+            sprintf(name, "%s_%s_%s_%s", scene, view->localRacer->racerName, date, time);
             int length = strlen(name);
             int count = 0;
             filtered[0] = 0;
@@ -931,7 +931,7 @@ void EventManager::CloseRace(int mode) {
                 scene, g_TrackGame->sceneObject->sceneFile, 0);
             GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
             GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
-            sprintf(name, "%s_%s_%s_%s", scene, view->field_0x38->field_0x5e0, date, time);
+            sprintf(name, "%s_%s_%s_%s", scene, view->localRacer->racerName, date, time);
             int length = strlen(name);
             int count = 0;
             filtered[0] = 0;

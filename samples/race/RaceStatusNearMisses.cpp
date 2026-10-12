@@ -74,44 +74,44 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 214);
     if (!status)
         return 0;
-    status->field_0x04 = view->field_0x38;
-    status->field_0x34 = view->field_0x0c8;
-    view->field_0x38->field_0x744 = status;
-    status->field_0x00 = index;
-    status->field_0x28 = view->field_0x38->field_0x00c;
+    status->racer = view->localRacer;
+    status->nextGate = view->gateList;
+    view->localRacer->field_0x744 = status;
+    status->creationOrder = index;
+    status->currentPosition = view->localRacer->position;
     *list = status;
-    tail = &status->field_0x50;
+    tail = &status->next;
     if (g_TrackGame->field_0x18 == 1 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
         for (i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
-            if (!HasStatusNode(*list, view->field_0x40[i])) {
+            if (!HasStatusNode(*list, view->aiRacers[i])) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 235);
                 if (!status)
                     return 0;
                 index++;
-                status->field_0x04 = view->field_0x40[i];
-                status->field_0x34 = view->field_0x0c8;
-                view->field_0x40[i]->field_0x744 = status;
-                status->field_0x00 = index;
-                status->field_0x28 = view->field_0x40[i]->field_0x00c;
+                status->racer = view->aiRacers[i];
+                status->nextGate = view->gateList;
+                view->aiRacers[i]->field_0x744 = status;
+                status->creationOrder = index;
+                status->currentPosition = view->aiRacers[i]->position;
                 *tail = status;
-                tail = &status->field_0x50;
+                tail = &status->next;
             }
         }
     }
-    if (view->field_0x3c) {
-        for (i = 0; i < view->field_0x158; i++) {
-            if (!HasStatusNode(*list, view->field_0x3c[i]) && view->field_0x3c[i] != view->field_0x38) {
+    if (view->racerSlots) {
+        for (i = 0; i < view->racerCount; i++) {
+            if (!HasStatusNode(*list, view->racerSlots[i]) && view->racerSlots[i] != view->localRacer) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 257);
                 if (!status)
                     return 0;
                 index++;
-                status->field_0x04 = view->field_0x3c[i];
-                status->field_0x34 = view->field_0x0c8;
-                view->field_0x3c[i]->field_0x744 = status;
-                status->field_0x00 = index;
-                status->field_0x28 = view->field_0x3c[i]->field_0x00c;
+                status->racer = view->racerSlots[i];
+                status->nextGate = view->gateList;
+                view->racerSlots[i]->field_0x744 = status;
+                status->creationOrder = index;
+                status->currentPosition = view->racerSlots[i]->position;
                 *tail = status;
-                tail = &status->field_0x50;
+                tail = &status->next;
             }
         }
     }
@@ -128,63 +128,63 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
     if (!list || !firstGate)
         return 0;
     PruneStatusList(list);
-    for (status = *list; status; previous = status, status = status->field_0x50) {
-        racer = status->field_0x04;
-        if (racer->field_0x7a4)
+    for (status = *list; status; previous = status, status = status->next) {
+        racer = status->racer;
+        if (racer->hasFinished)
             continue;
         {
             int gate = racer->field_0x7b8;
-            status->field_0x1c.x = racer->field_0x5f0->field_0x200.x;
-            status->field_0x1c.y = racer->field_0x5f0->field_0x200.y;
-            status->field_0x1c.z = racer->field_0x5f0->field_0x200.z;
-            if (!AdvanceGate(&status->field_0x1c, &status->field_0x28, &status->field_0x34, firstGate,
-                                       &racer->field_0x790, &racer->field_0x7b8, racer->field_0x780, racer->field_0x754,
-                                       0, &racer->field_0x7a0, &racer->field_0x74c, &racer->field_0x750,
-                                       &racer->field_0x774, &racer->field_0x7a4, lapLimit, unlimited,
+            status->previousPosition.x = racer->field_0x5f0->field_0x200.x;
+            status->previousPosition.y = racer->field_0x5f0->field_0x200.y;
+            status->previousPosition.z = racer->field_0x5f0->field_0x200.z;
+            if (!AdvanceGate(&status->previousPosition, &status->currentPosition, &status->nextGate, firstGate,
+                                       &racer->gatesPassed, &racer->field_0x7b8, racer->gateTimes, racer->field_0x754,
+                                       0, &racer->lapCount, &racer->lastLapTime, &racer->field_0x750,
+                                       &racer->lapStartTime, &racer->hasFinished, lapLimit, unlimited,
                                        racer->field_0x735, racer->field_0x7c0))
                 return 0;
             if (g_TrackGame->field_0x560 && gate != racer->field_0x7b8) {
                 racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->field_0x560->field_0xac;
-                if (racer == ((UnknownRaceStatusCamera*)racer->field_0x740->field_0x50)->field_0x3b4)
+                if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->field_0x50)->field_0x3b4)
                     g_TrackGame->field_0x560->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
                                                                               racer);
             }
         }
-        if (racer->field_0x7a4 && racer == racer->field_0x740->field_0x38)
+        if (racer->hasFinished && racer == racer->bikeView->localRacer)
             g_ViewRacerFinished = 1;
-        float before = Length(status->field_0x34->center - status->field_0x28);
-        float after = Length(status->field_0x34->center - status->field_0x1c);
-        status->field_0x28.x = status->field_0x1c.x;
-        status->field_0x28.y = status->field_0x1c.y;
-        status->field_0x28.z = status->field_0x1c.z;
+        float before = Length(status->nextGate->center - status->currentPosition);
+        float after = Length(status->nextGate->center - status->previousPosition);
+        status->currentPosition.x = status->previousPosition.x;
+        status->currentPosition.y = status->previousPosition.y;
+        status->currentPosition.z = status->previousPosition.z;
         status->field_0x14 += before - after;
         status->field_0x08 = after;
         if (g_TrackGame->field_0x18 == 1 && g_ViewRacerFinished) {
-            if (racer->field_0x7a4)
+            if (racer->hasFinished)
                 continue;
             if (racer->field_0x734) {
-                int remaining = lapLimit - racer->field_0x7a0;
+                int remaining = lapLimit - racer->lapCount;
                 if (remaining > 0) {
-                    if (racer->field_0x7a0 < 1)
+                    if (racer->lapCount < 1)
                         racer->field_0x754 = 0;
                     else
-                        racer->field_0x754 = remaining * racer->field_0x74c;
+                        racer->field_0x754 = remaining * racer->lastLapTime;
                 }
-                if (previous && racer->field_0x754 < previous->field_0x04->field_0x754)
-                    racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->field_0x04->field_0x754 + 1.0f;
+                if (previous && racer->field_0x754 < previous->racer->field_0x754)
+                    racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->field_0x754 + 1.0f;
                 if (lapLimit == 1)
-                    racer->field_0x74c = racer->field_0x754;
-                else if (racer->field_0x7a0 < 1)
-                    racer->field_0x74c =
-                        UNKNOWN_RANDOM_UNIT() * 10 + racer->field_0x740->field_0x38->field_0x74c + 1.0f;
-                if (racer->field_0x74c < racer->field_0x750 || racer->field_0x750 <= 0.0f)
-                    racer->field_0x750 = racer->field_0x74c;
-                racer->field_0x7a0 = lapLimit;
-                racer->field_0x7a4 = 1;
+                    racer->lastLapTime = racer->field_0x754;
+                else if (racer->lapCount < 1)
+                    racer->lastLapTime =
+                        UNKNOWN_RANDOM_UNIT() * 10 + racer->bikeView->localRacer->lastLapTime + 1.0f;
+                if (racer->lastLapTime < racer->field_0x750 || racer->field_0x750 <= 0.0f)
+                    racer->field_0x750 = racer->lastLapTime;
+                racer->lapCount = lapLimit;
+                racer->hasFinished = 1;
                 continue;
             }
         }
-        if (!racer->field_0x7a4)
+        if (!racer->hasFinished)
             racer->field_0x754 += frameTime;
     }
     if (!OrderByGates(list))
