@@ -168,22 +168,22 @@ int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRa
         float distance = track->DistanceAlong(status->field_0x38, status->field_0x44);
         if (distance > 0.0f && (distance < status->field_0x10 || status->field_0x10 < 0.0f) &&
             distance > status->gateDistance)
-            status->field_0x18 = -1;
+            status->lapOffset = -1;
         else
-            status->field_0x18 = 0;
+            status->lapOffset = 0;
     }
     for (at = list; *at; ) {
         if (!(*at)->next)
             break;
         if (!(*at)->racer->hasFinished) {
-            key = (*at)->racer->lapCount + (*at)->field_0x18;
+            key = (*at)->racer->lapCount + (*at)->lapOffset;
             for (next = &(*at)->next; (status = *next) != 0; ) {
-                int other = status->racer->lapCount + status->field_0x18;
+                int other = status->racer->lapCount + status->lapOffset;
                 if (other > key || (other == key && status->gateDistance < (*at)->gateDistance)) {
                     *next = status->next;
                     status->next = *at;
                     *at = status;
-                    key = status->racer->lapCount + status->field_0x18;
+                    key = status->racer->lapCount + status->lapOffset;
                 }
                 if (*next)
                     next = &(*next)->next;
