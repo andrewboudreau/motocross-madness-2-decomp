@@ -164,9 +164,9 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         int debt = circuit->field_0x465[0].field_0x34;
         int fee = circuit->field_0x1229[circuit->field_0x40];
         int cash = circuit->field_0x465[0].field_0x30;
-        field_0x7f5c = cash;
-        field_0x7f60 = fee - cash + debt;
-        field_0x7f58 = fee;
+        playerCash = cash;
+        loanAmount = fee - cash + debt;
+        entryFee = fee;
         UnknownSetText(FindControl("TitleText", 12), 0x1452);
         UIControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;
@@ -174,12 +174,12 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         unsigned int color = circuit->field_0x465[0].field_0x30 < 0 ? 0xff : 0xff00;
         UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
         UIControl* item = FindControl("Item1", 12);
-        sprintf(text, "$%d", field_0x7f5c);
+        sprintf(text, "$%d", playerCash);
         item->SetText(text);
         item->SetFontColor(color);
         UnknownSetText(FindControl("TxtItem2", 12), 0x144d);
         item = FindControl("Item2", 12);
-        sprintf(text, "$%d", field_0x7f58);
+        sprintf(text, "$%d", entryFee);
         item->SetText(text);
         item->SetFontColor(0xff);
         UnknownSetText(FindControl("TxtItem3", 12), 0x1453);
@@ -189,7 +189,7 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         item->SetFontColor(0xff);
         UnknownSetText(FindControl("TxtItem4", 12), 0x144f);
         item = FindControl("Item4", 12);
-        sprintf(text, "$%d", field_0x7f60);
+        sprintf(text, "$%d", loanAmount);
         item->SetText(text);
         item->SetFontColor(0xff00);
         UnknownSetText(FindControl("TxtItem5", 12), 0x1450);
@@ -202,7 +202,7 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("ButAccept", event->controlName) == 0) {
-            circuit->field_0x465[0].field_0x30 += field_0x7f60 - circuit->field_0x465[0].field_0x34;
+            circuit->field_0x465[0].field_0x30 += loanAmount - circuit->field_0x465[0].field_0x34;
             circuit->field_0x465[0].field_0x34 = 0;
             g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
@@ -272,7 +272,7 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             else
                 g_TrackGame->mode.field_0x27f8.field_0x34 = 0;
             g_TrackGame->mode.field_0x94 = circuit->field_0x50;
-            UnknownFunction4536e0();
+            LeaveMenusForRace();
             UnknownVirtualSlot26();
         } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->AdvanceAfterRace();
@@ -291,30 +291,30 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
     Vector3 offset;
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
-    if (pointer && field_0x7f78 && field_0x7f7c) {
+    if (pointer && previewDragged && previewDragging) {
         float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
-        field_0x7f58.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
-        field_0x7f58.y = __max(1.0f, __min(field_0x7f58.y, 10.0f));
-        offset = UnknownVectorDifference(field_0x7f58, g_TrackGame->ui->field_0x474);
+        viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
+        viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
+        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
-        float distance = field_0x7f70;
+        float distance = viewDistance;
         turned *= distance;
-        field_0x7f58 = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
-        field_0x7f78 = 1;
+        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
+        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
+        previewDragged = 1;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
-    } else if (!field_0x7f78) {
-        offset = UnknownVectorDifference(field_0x7f58, g_TrackGame->ui->field_0x474);
+    } else if (!previewDragged) {
+        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
-        turned *= field_0x7f70;
-        field_0x7f58 = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
+        turned *= viewDistance;
+        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
+        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
     }
     g_TrackGame->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_TrackGame->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
-    if (field_0x7f80 && rand() % 200 == 1) {
+    if (idleMotionPlaying && rand() % 200 == 1) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);
         switch (rand() % 3) {
@@ -328,18 +328,18 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
             g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
             break;
         }
-        field_0x7f80 = 0;
+        idleMotionPlaying = 0;
     }
-    if (!field_0x7f80 && g_TrackGame->ui->field_0x46c->motionFinished) {
+    if (!idleMotionPlaying && g_TrackGame->ui->field_0x46c->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)].model];
         model->field_0xc0->UnknownFunction4a8b10("WaitB");
         g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
-        field_0x7f80 = 1;
+        idleMotionPlaying = 1;
     }
     if (dialogBackground)
-        dialogBackground->UnknownFunction404240(field_0x7f74, (CameraRect*)&field_0x7f8c);
+        dialogBackground->UnknownFunction404240(previewRegion, (CameraRect*)&previewArea);
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }

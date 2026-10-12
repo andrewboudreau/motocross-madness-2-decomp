@@ -36,9 +36,9 @@ extern int g_UnknownGlobal689dfc;
 int ReadClock();
 
 // dlgprocs.cpp's code (0x004536e0).
-void UnknownFunction4536e0();
+void LeaveMenusForRace();
 // 0x00451380: formats `value` into `text` (near dlgprocs.cpp's code).
-void UnknownFunction451380(int value, char* text);
+void FormatDecimal(int value, char* text);
 // 0x004f17a0: fills the list `listName` of `dialog` with the `pattern`
 // files under `directory` and shows the first one's picture.
 int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
@@ -95,10 +95,10 @@ public:
 struct UnknownKrustyUIBike {
     int model;                                // +0x00: model (KrustyUI+0x48)
     char displayName[0x44];                   // +0x04: display name
-    char field_0x48[0x40];
+    char field_0x48[0x40];                    // +0x48: texture ("BikeTexture_%02d")
     int field_0x88;
     int engineSize;                           // +0x8c: engine size
-    int field_0x90;
+    int field_0x90;                           // +0x90: four-stroke ("BikeFourStroke_%02d")
 };
 
 // The race settings at TrackGame+0x2d70 (0x1ec bytes; InGameProcs.cpp
@@ -144,9 +144,9 @@ public:
     UnknownLobbySlotTable();                  // 0x004f2f00
     void SetSlot(int id, int value); // 0x004f2f20: adds or updates `id`
     void FreeSlot(int id);       // 0x004f2f80: frees `id`'s slot
-    int UnknownFunction4f2fe0(int count, int limit); // 0x004f2fe0
+    int GrantRacers(int count, int limit); // 0x004f2fe0: grants requested racers in slot order
 
-    UnknownLobbySlot field_0x00[8];
+    UnknownLobbySlot slots[8];
 };
 
 // The lobby settings message (type 0xf, 0xb4 bytes) the host sends.
@@ -181,13 +181,13 @@ public:
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f5f30
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f6370
     void ShowHostSettings();             // 0x004f6070: shows the host's settings
-    void UnknownFunction4f69d0();             // 0x004f69d0
+    void EnableChangeableControls();             // 0x004f69d0: enables the controls the player may change
     void ApplyEventType();             // 0x004f6e60: applies the event type
     void UnknownVirtualSlot31(int apply);     // 0x004f7210: stores (or shows) the event settings
     void ShowTrackPicture();             // 0x004f75d0: shows the track picture
-    void UnknownFunction4f7640(UIControl* picture, const char* directory, const char* name); // 0x004f7640
+    void LoadTrackPicture(UIControl* picture, const char* directory, const char* name); // 0x004f7640: loads the track picture
 
-    int field_0x7f58;
+    int field_0x7f58;                         // +0x7f58: 0 at init, 1 after slot 24 handles message 0x101; slot 31 then selects the track by name
 };
 
 // RTTI: MPBikeRiderDlg : UIDialog (vtable 0x00557a04; 0x7f9c bytes).
@@ -198,8 +198,8 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004f8780
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f8620
     void UnknownVirtualSlot31(int apply);     // 0x004f91e0: stores the chosen bike and rider
-    void UnknownFunction4f8650();             // 0x004f8650
-    void UnknownFunction4f8700();             // 0x004f8700
+    void ApplyLargestOpponentClass();             // 0x004f8650: client: selects the host's largest opponent class
+    void EnableLargestOpponent();             // 0x004f8700: enables "LargestOpponentDropDown" for the host only
     void PaintPlateNumber(int number);   // 0x004f8570: paints the plate number on every bike
     void FillBikeRiderLists();             // 0x004f8220: fills the bike and rider lists
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f78a0
@@ -210,11 +210,11 @@ public:
     Vector3 viewTarget;                       // +0x7f64: and target
     float viewDistance;                       // +0x7f70: their distance
     int previewRegion;                        // +0x7f74: background region
-    int field_0x7f78;
-    int field_0x7f7c;
-    int field_0x7f80;
-    int field_0x7f84;
-    int field_0x7f88;
+    int previewDragged;                       // +0x7f78: the bike preview was dragged
+    int previewDragging;                      // +0x7f7c: the bike preview is being dragged
+    int idleMotionPlaying;                    // +0x7f80: the rider's idle motion is playing
+    int bikeChanged;                          // +0x7f84: the bike changed
+    int riderChanged;                         // +0x7f88: the rider changed
     RECT previewArea;                         // +0x7f8c: the bike view
 };
 
@@ -232,8 +232,8 @@ public:
     MPOptionsDlg() : UIDialog(1, "MPOpt.dtm") {}
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f9570
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f93c0
-    void UnknownFunction4f95a0();             // 0x004f95a0
-    void UnknownFunction4f95b0();             // 0x004f95b0
+    void RefreshValues();             // 0x004f95a0: UpdateBoundValues(0)
+    void EnableHostOptions();             // 0x004f95b0: enables the host options and "ChkRecordRace"
 };
 
 // RTTI: MultiPlayerDlg : UIDialog (vtable 0x00554b14; 0x8110 bytes, the
@@ -246,23 +246,23 @@ public:
     void FillRacerSlots();             // 0x004f20d0: fills the racer slots for the race
     void SendStartMessage(short start);  // 0x004f2340: sends the lobby start message (type 0x83)
     void SendSettings();             // 0x004f2b90: sends the lobby settings
-    int UnknownFunction4f2ec0();              // 0x004f2ec0
-    void UnknownFunction4f3260();             // 0x004f3260
-    void UnknownFunction4f3620();             // 0x004f3620
+    int CreateLobbyPlayer();              // 0x004f2ec0: greys "ButRdyUser" and creates the local player
+    void EnableReadyControls();             // 0x004f3260: enables the controls for the ready state
+    void ResetReadyButtons();             // 0x004f3620: shows the host controls and resets the ready buttons
     void AddChatLine(int player, const char* text); // 0x004f3720: adds a chat line
     void SendChatLine();             // 0x004f38a0: sends the typed chat line
     void SendSystemChatLine(const char* text); // 0x004f3980: sends a system chat line
     void RemoveLobbyPlayer(int index);    // 0x004f3a10: removes player `index`
-    void UnknownFunction4f57c0(int reason);   // 0x004f57c0
+    void ReportReadyCleared(int reason);   // 0x004f57c0: reports why the ready state was cleared
     void ShowPage(int page);     // 0x004f5a00: shows page `page`
     void FollowTrackChange();             // 0x004f5ca0: follows a track change
 
-    MPEventDlg* field_0x7f58;
-    MPBikeRiderDlg* field_0x7f5c;
-    MPRaceInfoDlg* field_0x7f60;
-    MPOptionsDlg* field_0x7f64;
-    UnknownLobbySlotTable field_0x7f68;
+    MPEventDlg* eventPage;                    // +0x7f58: MPEventDlg page
+    MPBikeRiderDlg* bikeRiderPage;            // +0x7f5c: MPBikeRiderDlg page
+    MPRaceInfoDlg* raceInfoPage;              // +0x7f60: MPRaceInfoDlg page
+    MPOptionsDlg* optionsPage;                // +0x7f64: MPOptionsDlg page
+    UnknownLobbySlotTable lobbySlots;         // +0x7f68
     char builtForTrack[0x104];                // +0x7fc8: track name the page was built for
-    int field_0x80cc;
-    char field_0x80d0[0x40];
+    int builtForVariant;                      // +0x80cc: track variant the page was built for
+    char sceneName[0x40];                     // +0x80d0: scene name ("no name": resource 0x143b)
 };
