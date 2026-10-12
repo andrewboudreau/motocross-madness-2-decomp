@@ -14,7 +14,7 @@
   "?EvictNodeTexture@@YAHPAX@Z": "0x0047ca00",
   "?EvictBlockTexture@@YAHPAXH@Z": "0x0047ca40",
   "?UnknownFunction47e600@DrawableGridNode@@QAEPAV1@PAVUnknownTextureStream@@HPAV1@HHHHHPAM2@Z": "0x0047e600",
-  "?UnknownFunction481b30@DrawableGridNode@@QAEMH@Z": "0x00481b30",
+  "?BlockDistance@DrawableGridNode@@QAEMH@Z": "0x00481b30",
   "?UnknownFunction510820@ManagedTexture@@QAEXM@Z": "0x00510820",
   "?UnknownVirtualSlot2@DrawableGridNodeSharedTextures@@UAEPAVGridNode@@PAVUnknownTextureStream@@HPAVDrawableGridNode@@HHHHHPAX2@Z": "0x0047c960",
   "?UnknownVirtualSlot2@DrawableGridNodeSharedTextures@@UAEPAVGridNode@@PAVUnknownTextureStream@@HPAVDrawableGridNode@@HHHHHPAX2@Z$ehhandler": "0x0054b6c4",

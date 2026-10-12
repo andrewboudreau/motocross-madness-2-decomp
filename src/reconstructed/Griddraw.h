@@ -320,53 +320,53 @@ public:
     virtual void UnknownVirtualSlot7(int a) {}                  // 0x004806f0 (shared)
     virtual int UnknownVirtualSlot8(int a) { return 0; }        // 0x004da550 (shared)
 
-    void UnknownFunction47edb0(int recurse);                    // 0x0047edb0 (ret 4)
+    void ReleaseVertexBuffers(int recurse);                    // 0x0047edb0 (ret 4)
     int UnknownFunction47ef70();                                // 0x0047ef70
     int UnknownFunction47ef80(int x, int z, int size, int quad); // 0x0047ef80 (ret 0x10)
     int UnknownFunction47f210();                                // 0x0047f210
-    int UnknownFunction47f840();                                // 0x0047f840
-    int UnknownFunction47fce0(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x0047fce0 (ret 0x1c)
-    void UnknownFunction47fe70(int x, int z, int dx, int dz, int n); // 0x0047fe70 (ret 0x14)
-    int UnknownFunction480200(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x00480200 (ret 0x1c)
-    int UnknownFunction480700(int n, int x, int z, int dx, int dz); // 0x00480700 (ret 0x14)
+    int RebuildWholeNodeBuffers();                                // 0x0047f840
+    int EmitDiagonalTriangles(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x0047fce0 (ret 0x1c)
+    void EmitLeafEdgeFan(int x, int z, int dx, int dz, int n); // 0x0047fe70 (ret 0x14)
+    int EmitEdgeTriangles(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x00480200 (ret 0x1c)
+    int AppendCornerTriangle(int n, int x, int z, int dx, int dz); // 0x00480700 (ret 0x14)
     int UnknownFunction480900(void* target);                    // 0x00480900 (ret 4)
     int UnknownFunction480920(void* target, int a5);            // 0x00480920 (ret 8)
     int UnknownFunction480940(void* target, int x, int z, int size, int quad, int a5); // 0x00480940 (ret 0x18)
     int UnknownFunction480ad0(void* target, int x, int z, int size, int quad, int a5); // 0x00480ad0 (ret 0x18)
-    void UnknownFunction480c90(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+    void SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480c90 (ret 0x18)
-    void UnknownFunction480fb0(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+    void SubmitLitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                int indexCount, int block);      // 0x00480fb0 (ret 0x18)
     int UnknownFunction481170();                                // 0x00481170
     int UnknownFunction481180(int x, int z, int size, int quad); // 0x00481180 (ret 0x10)
     int UnknownFunction481300(int x, int z, int size, int quad); // 0x00481300 (ret 0x10)
     // 0x004813e0: counts seams where neighbouring children disagree (the
     // count is never used) and recurses into the children.
-    void UnknownFunction4813e0();
+    void CountEdgeDifferences();
     void UnknownFunction481580();                               // 0x00481580
-    int UnknownFunction481a20(int quad);                        // 0x00481a20 (ret 4)
-    float UnknownFunction481b30(int block);                     // 0x00481b30 (ret 4)
+    int TestBlockFrustum(int quad);                        // 0x00481a20 (ret 4)
+    float BlockDistance(int block);                     // 0x00481b30 (ret 4)
     float UnknownFunction4815e0(int coarse);                    // 0x004815e0 (ret 4)
-    int UnknownFunction481cc0(int x, int z);                    // 0x00481cc0 (ret 8)
-    int UnknownFunction481db0(void* a0, void* a1);              // 0x00481db0 (ret 8)
+    int CanDropVertex(int x, int z);                    // 0x00481cc0 (ret 8)
+    int TestVisibility(void* a0, void* a1);              // 0x00481db0 (ret 8)
     int UnknownFunction481de0(void* a0, void* a1, float* center, float* extent, int a4, int a5,
                               int size, int a7, int a8, int a9); // 0x00481de0 (ret 0x28)
-    void UnknownFunction4824c0(UnknownTextureStream* stream, void* a1, int recurse,
+    void UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse,
                                int coarse);                     // 0x004824c0 (ret 0x10)
     void UnknownFunction4826d0();                               // 0x004826d0
-    void UnknownFunction482760();                               // 0x00482760
-    void UnknownFunction482a40(int x, int z);                   // 0x00482a40 (ret 8)
-    void UnknownFunction482ae0();                               // 0x00482ae0
-    void UnknownFunction482b40(int x0, int z0, int x1, int z1, int half, int start, int step,
+    void RetestChangedVertices();                               // 0x00482760
+    void TestVertex(int x, int z);                   // 0x00482a40 (ret 8)
+    void TestNodeVertices();                               // 0x00482ae0
+    void TestRectangleLevel(int x0, int z0, int x1, int z1, int half, int start, int step,
                                int rowStep);                    // 0x00482b40 (ret 0x20)
-    void UnknownFunction482c90(int x, int z, int flag);         // 0x00482c90 (ret 0xc)
-    void UnknownFunction482dd0(int x, int z, int flag, int dir, GridBaseCell* origin); // 0x00482dd0 (ret 0x14)
-    int UnknownFunction482f00(int x, int z);                    // 0x00482f00 (ret 8)
-    int UnknownFunction483040();                                // 0x00483040
-    int UnknownFunction483100();                                // 0x00483100
+    void PropagateVertexChange(int x, int z, int flag);         // 0x00482c90 (ret 0xc)
+    void SetVertexDirection(int x, int z, int flag, int dir, GridBaseCell* origin); // 0x00482dd0 (ret 0x14)
+    int RetestUnpinnedVertex(int x, int z);                    // 0x00482f00 (ret 8)
+    int ForceBlockCentres();                                // 0x00483040
+    int ReleaseBlockCentres();                                // 0x00483100
     void UnknownFunction483200(int x, int z, int flag, int dir, GridBaseCell* origin,
                                int minLevel);                   // 0x00483200 (ret 0x18)
-    void UnknownFunction4835c0(DrawableGridNode* child, int x, int z, int flag, int dir,
+    void PropagateBorderChange(DrawableGridNode* child, int x, int z, int flag, int dir,
                                GridBaseCell* cell);             // 0x004835c0 (ret 0x18)
     void UnknownFunction464e90();                               // 0x00464e90 (shared empty body)
 
@@ -379,7 +379,7 @@ public:
 };
 
 // 0x0047ecc0: AgeManager eviction callback for a node's vertex buffers.
-int UnknownFunction47ecc0(void* owner);
+int EvictNodeBuffers(void* owner);
 
 // One link of the 17 x 17 vertex grid (0x006754e0, 32 bytes each). The
 // first two words are filled by 0x0047e4d0, the rest by 0x0047e340.
@@ -396,9 +396,9 @@ struct GridEdge {
 extern GridEdge g_gridEdges[17 * 17];                   // 0x006754e0
 
 // 0x0047e340: fills the neighbours of (x, z) for one subdivision step.
-void UnknownFunction47e340(int x, int z, int h, int v, int maskX, int maskZ, GridEdge* out);
+void FindEdgeNeighbours(int x, int z, int h, int v, int maskX, int maskZ, GridEdge* out);
 // 0x0047e430: one subdivision level of the edge table.
-void UnknownFunction47e430(int half, int start, int step, int rowStep);
+void BuildEdgeLevel(int half, int start, int step, int rowStep);
 
 // One cached vertex (32 bytes; tier 2 from 0x0047de90's stores).
 struct GridVertex {

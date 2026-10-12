@@ -80,7 +80,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
 
     float detail;
     if (block != -1) {
-        float distance = UnknownFunction481b30(block);
+        float distance = BlockDistance(block);
         if (distance != 0.0f)
             Extra()->blocks[block].detail =
                 (float)((16 << shift) * Terrain()->field_0x70) / (distance * 4.0f);

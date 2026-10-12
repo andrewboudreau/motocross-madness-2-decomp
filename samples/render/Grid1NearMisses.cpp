@@ -124,7 +124,7 @@ retry:
     case 3:
         if (Extra()->blocks) {
             keep = data->b3;
-            UnknownFunction483040();
+            ForceBlockCentres();
             data->field_0x158 = 0.0f;
             data->field_0x15c = 0.0f;
             data->field_0x160 = 1.0f;
@@ -135,7 +135,7 @@ retry:
                     if (record->own) {
                         if (!(Extra()->textureFlags & (1 << block))) {
                             if (stage == wanted) {
-                                if (!UnknownFunction481a20(block)) {
+                                if (!TestBlockFrustum(block)) {
                                     Extra()->blocks[block].texture = 0;
                                 } else {
                                     Extra()->blocks[block].texture = Terrain()->AcquireOwnedObject();
@@ -183,7 +183,7 @@ retry:
 
 parentTexture:
     Extra()->texture = Terrain()->textures[((DrawableGridNodeSharedTextures*)parent)->Extra()->index];
-    UnknownFunction483100();
+    ReleaseBlockCentres();
     {
         int z = field_0x2a >> 4;
         int x = field_0x2a % 16;
@@ -196,7 +196,7 @@ parentTexture:
 
 parentBlockTexture:
     Extra()->texture = Terrain()->textures[index];
-    UnknownFunction483100();
+    ReleaseBlockCentres();
     {
         int z = field_0x2a >> 4;
         int x = field_0x2a % 16;
@@ -209,7 +209,7 @@ parentBlockTexture:
 
 sharedTexture:
     Extra()->texture = Terrain()->textures[Extra()->index];
-    UnknownFunction483100();
+    ReleaseBlockCentres();
     scale = 1.0f;
     data->field_0x158 = 0.0f;
     data->field_0x15c = 0.0f;
@@ -231,7 +231,7 @@ createTexture:
                                                   UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
 ownTexture:
     Extra()->texture = (ManagedTexture*)Extra()->field_0x10;
-    UnknownFunction483100();
+    ReleaseBlockCentres();
     scale = 1.0f;
     data->field_0x158 = 0.0f;
     data->field_0x15c = 0.0f;

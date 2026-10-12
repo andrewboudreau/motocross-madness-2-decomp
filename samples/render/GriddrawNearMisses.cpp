@@ -390,11 +390,11 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
         }
         if (vertexCount != 0 && (data->field_0x178 & (1 << block))) {
             if (terrain->lowestQualityOverride)
-                UnknownFunction480fb0(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
+                SubmitLitRange(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
                                       (unsigned short*)data->field_0x138 + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
             else
-                UnknownFunction480c90(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
+                SubmitUnlitRange(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
                                       (unsigned short*)data->field_0x138 + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
         }
@@ -406,12 +406,12 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
                 if (child && child->childMask) {
                     if (child->data->field_0x13c != 0 && !child->data->b3) {
                         if (terrain->lowestQualityOverride)
-                            child->UnknownFunction480fb0(a5, (GridVertex*)child->data->field_0x134,
+                            child->SubmitLitRange(a5, (GridVertex*)child->data->field_0x134,
                                                          child->data->field_0x13c,
                                                          (unsigned short*)child->data->field_0x138,
                                                          child->data->field_0x13e, -1);
                         else
-                            child->UnknownFunction480c90(a5, (GridVertex*)child->data->field_0x134,
+                            child->SubmitUnlitRange(a5, (GridVertex*)child->data->field_0x134,
                                                          child->data->field_0x13c,
                                                          (unsigned short*)child->data->field_0x138,
                                                          child->data->field_0x13e, -1);
@@ -438,7 +438,7 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
             count = ranges[0].end;
         else
             count = ranges[block].end - ranges[block - 1].end;
-        if (count != 0 && UnknownFunction481a20(block))
+        if (count != 0 && TestBlockFrustum(block))
             UnknownVirtualSlot4(block);
     }
     if (children && !data->b0) {
@@ -486,16 +486,16 @@ int DrawableGridNode::UnknownFunction47f210()
             int indexStart = indexTotal;
             n = 0;
             m = n;
-            n = UnknownFunction47fce0(4, n, x, z + 4, 2, -2, &closed);
+            n = EmitDiagonalTriangles(4, n, x, z + 4, 2, -2, &closed);
             if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
                 ((DrawableGridNode*)parent)->extra->texture == 0)
-                n = UnknownFunction480700(n, x, z + 4, 4, -4);
+                n = AppendCornerTriangle(n, x, z + 4, 4, -4);
             m = n;
             x += 4;
-            n = UnknownFunction47fce0(4, n, x, z, -2, 2, &closed);
+            n = EmitDiagonalTriangles(4, n, x, z, -2, 2, &closed);
             if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
                 ((DrawableGridNode*)parent)->extra->texture == 0)
-                n = UnknownFunction480700(n, x, z, -4, 4);
+                n = AppendCornerTriangle(n, x, z, -4, 4);
             vertexTotal += g_gridVertexCache.count;
             indexTotal += n * 3;
             ((GridBlockRange*)data->field_0x17c)[b].centerY = (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
@@ -560,7 +560,7 @@ int DrawableGridNode::UnknownFunction47f210()
         z += 4;
     }
     if (data->ageEntry.size == 0)
-        terrain->ageManager->Register(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+        terrain->ageManager->Register(&data->ageEntry, EvictNodeBuffers, this, 0,
                                                    data->field_0x142 + data->field_0x140);
     else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
         data->ageEntry.size = data->field_0x142 + data->field_0x140;
@@ -594,7 +594,7 @@ void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, Gr
         if (rx == 0 && (z & mask) == 0) {
             GridBaseCell* cell = &block->cells[g_gridRow17[z >> shift] + (x >> shift)];
             if (cell != origin)
-                UnknownFunction482dd0(x >> shift, z >> shift, flag, dir, origin);
+                SetVertexDirection(x >> shift, z >> shift, flag, dir, origin);
         }
         if (children == 0 || level <= minLevel)
             return;
@@ -676,7 +676,7 @@ void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, Gr
     }
     GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
     if (cell != origin)
-        UnknownFunction482dd0(x, z, flag, dir, origin);
+        SetVertexDirection(x, z, flag, dir, origin);
 }
 
 // 0x004815e0: the detail update (see the note at the top).
@@ -797,7 +797,7 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
             corners = 0;
         if (size == 16) {
             if (visible) {
-                UnknownFunction4824c0((UnknownTextureStream*)a0, a1, 0, a9);
+                UpdateLevelOfDetail((UnknownTextureStream*)a0, a1, 0, a9);
                 if (data->b0) {
                     count = 1;
                     if (childMask == 0) {
@@ -851,7 +851,7 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
                                 child->childMask = 0x1fffff;
                                 changed = 1;
                             }
-                            child->UnknownFunction4824c0((UnknownTextureStream*)a0, a1, 0, a9);
+                            child->UpdateLevelOfDetail((UnknownTextureStream*)a0, a1, 0, a9);
                             count++;
                         } else if (child->childMask) {
                             child->childMask = 0;
@@ -872,7 +872,7 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
                             if (child->children)
                                 child->data->b1 = 1;
                         }
-                        child->UnknownFunction4824c0((UnknownTextureStream*)a0, a1, 1, a9);
+                        child->UpdateLevelOfDetail((UnknownTextureStream*)a0, a1, 1, a9);
                         count++;
                     }
                 }
