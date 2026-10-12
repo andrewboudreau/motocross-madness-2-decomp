@@ -141,6 +141,14 @@ int UnknownTextureStream::CheckHeader()
 // (retail zeroes only bytes 1..7), shares the fclose/sprintf tails of error
 // blocks that retail keeps apart, and swaps dl/cl in the key loop as in
 // 0x00461b90; the rest matches up to branch targets.
+// Session 10 (284/957 strict, 34 instruction differences): the extra store is the
+// access[0] zero; `= ""` (string literal), memset(access, 0, 8) and a zeroing loop
+// give 208. The merged tail is the header-failure block of the write branch, which
+// VC6 cross-jumps into the read branch NOT-encrypted block by moving the
+// field_0x14 store ahead of the format push. A CloseFile(FILE*&) helper, NULL,
+// `if (!encoded) {} else if` and a FILE* local closed after the reset (190) do not
+// keep it apart. `char c = *p++;` in the key loop matches the loop and the
+// key reload after it but merges two more tails (201).
 int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
 {
     char drive[4];
