@@ -48,8 +48,8 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
         randomTable[i] = RANDOM_UNIT();
     randomIndex = 0;
     skipProbeEffects = 0;
-    field_0x530 = 0;
-    field_0x534 = 0;
+    blendStarted = 0;
+    poseStepsPending = 0;
     field_0x538 = 0;
 }
 
@@ -291,15 +291,15 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         angularStep = angularStep * (1.0f / frameTime);
         poseNode->GetMatrixIn(0, &lastPose);
     } else {
-        if (pendingAnimation && !character->field_0x34) {
+        if (pendingAnimation && !character->blendActive) {
             character->BlendToMotion(pendingAnimation, 0.5f);
             pendingAnimation = 0;
-            if (field_0x538 == 0 && field_0x530 == 0) {
-                field_0x530 = 1;
+            if (field_0x538 == 0 && blendStarted == 0) {
+                blendStarted = 1;
             } else {
                 carryRiderPose = 1;
                 field_0x538 = 0;
-                field_0x530 = 0;
+                blendStarted = 0;
             }
         }
         float remaining = frameTime;
@@ -340,8 +340,8 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         }
         if (wreckState) {
             if (wreckState == 1) {
-                UnknownWreckerRaceState* state = character->field_0x18;
-                if ((float)(state->field_0xa8 - *character->field_0x1c) / state->field_0xb4 < 0.5f) {
+                UnknownWreckerMotion* motion = character->currentMotion;
+                if ((float)(motion->frameCount - character->currentFrame->frame) / motion->fps < 0.5f) {
                     ContinueAsTumble();
                     RebuildPoseSteps();
                     linearStep = linearStep * (1.0f / frameTime);
@@ -352,15 +352,15 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                     rigidBody->angularVelocity = rigidBody->node->WorldToLocalDirection(angularStep);
                 }
             }
-            if (field_0x530 && !character->field_0x34) {
+            if (blendStarted && !character->blendActive) {
                 carryRiderPose = 1;
-                field_0x530 = 0;
+                blendStarted = 0;
             }
-            if (carryRiderPose && field_0x534) {
+            if (carryRiderPose && poseStepsPending) {
                 RebuildPoseSteps();
                 linearStep = linearStep * (1.0f / frameTime);
                 angularStep = angularStep * (1.0f / frameTime);
-                field_0x534 = 0;
+                poseStepsPending = 0;
             }
             poseNode->GetMatrixIn(0, &lastPose);
             character->UnknownVirtualSlot7(frameTime, 0, 0);
@@ -484,8 +484,8 @@ void Wrecker::StartTumble() {
     collisionModel->applyImpulses = 1;
     wreckState = 2;
     character->BlendToMotion(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)], 0.5f);
-    field_0x530 = 1;
-    field_0x534 = 1;
+    blendStarted = 1;
+    poseStepsPending = 1;
     rigidBody->isEnabled = 1;
     rigidBody->UnknownVirtualSlot44();
     rigidBody->velocity = linearStep;
@@ -500,21 +500,21 @@ void Wrecker::StartTumble() {
 void Wrecker::ContinueAsTumble() {
     wreckState = 2;
     pendingAnimation = randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)];
-    if (!character->field_0x34) {
+    if (!character->blendActive) {
         character->BlendToMotion(pendingAnimation, 0.5f);
         pendingAnimation = 0;
-        if (field_0x530) {
+        if (blendStarted) {
             carryRiderPose = 1;
             field_0x538 = 0;
-            field_0x530 = 0;
+            blendStarted = 0;
         } else {
-            field_0x530 = 1;
+            blendStarted = 1;
         }
     }
     rigidBody->isEnabled = 1;
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x534 = 1;
+    poseStepsPending = 1;
 }
 
 // The parenthesised first product puts each fsubp between the load and the
