@@ -111,10 +111,12 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
   reference to the list entry, an if/else for visited nodes and a
   `do ... while` segment walk; the frame (0x8c in retail, 0x74 here) and
   two store/reload orders differ.
-- `0x0051cf80` (ChatOverlay loader, 1953 bytes; candidate 1947): frame and
-  calls match with the side-panel rectangle declared inside the wide-screen
-  block; that block's scheduling, the LOGFONT store order and the
-  thirteenth name-tag rectangle's temporary slot differ.
+- `0x0051cf80` (ChatOverlay loader, 1953 bytes; candidate 1953, 1768 of
+  1785 non-relocation bytes): frame, calls and stores match with the
+  side-panel rectangle declared inside the wide-screen block, the left
+  panel's source rectangle written before its screen rectangle and the
+  LOGFONT's lfItalic and lfHeight stored last. Only the right panel's
+  block swaps eax and ecx (largeLayout and the panel width).
 
 ### Not reconstructed
 

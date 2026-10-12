@@ -52,14 +52,17 @@
 // entering clip's hit point, and the child loop, where retail reloads the
 // node from edi in the body instead of reusing the loop test's eax.
 
-// ChatOverlay::Setup (0x0051cf80, 1953 bytes; candidate
-// 1947): the loader. Frame layout, calls, the font set-up and the
-// rectangles match once the side-panel rectangle is declared inside the
-// wide-screen block. Left: scheduling in that block (retail keeps the chat
-// rectangle's left edge in ebx and later -1 in ebx for both the EH state and
-// the 0x00469190 argument), the order of the LOGFONT field stores, and the
-// thirteenth name-tag rectangle, whose constructor temporary retail places
-// in a separate frame slot (0x74) where VC6 here reuses the first one.
+// ChatOverlay::Setup (0x0051cf80, 1953 bytes; candidate 1953, 1768 of the
+// 1785 non-relocation bytes): the loader. Frame layout, calls, the font
+// set-up and the rectangles match once the side-panel rectangle is declared
+// inside the wide-screen block. The left panel's source rectangle is written
+// before its screen rectangle (left edge first, from chatRect), and the
+// LOGFONT stores lfItalic and lfHeight last, as in StatsOverlay::LoadPanel.
+// Left: in the right panel's block retail loads largeLayout into eax and
+// forms the panel width in ecx; VC6 here swaps the two registers. All 720
+// orders of that block's six statements, the four spellings of each
+// ternary, a width local, `rect.right = rect.left + ...` and
+// `rect.left = rect.right + 256` leave the swap (or are worse).
 
 
 // RadarOverlay::DrawRacers (0x0051bed0, 1160 bytes; 1129 match):
@@ -517,10 +520,10 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
         UnknownOverlayRect rect = chatRect;
         source.left = 3;
         source.top = 69;
-        rect.right = rect.left;
-        rect.left -= largeLayout ? 38 : 19;
         source.right = largeLayout ? 38 : 19;
         source.bottom = largeLayout ? 137 : 103;
+        rect.left = chatRect.left - (largeLayout ? 38 : 19);
+        rect.right = chatRect.left;
         leftPanel = new (__FILE__, 2284) Overlay(0, 1);
         leftPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
         AppendChild(leftPanel, -1);
@@ -535,11 +538,9 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
         AppendChild(rightPanel, -1);
     }
     pen = CreatePen(0, 3, 0xc0c0c0);
-    logFont.lfHeight = 9;
     logFont.lfWidth = 0;
     logFont.lfEscapement = 0;
     logFont.lfOrientation = 0;
-    logFont.lfItalic = 0;
     logFont.lfUnderline = 0;
     logFont.lfStrikeOut = 0;
     logFont.lfCharSet = 1;
@@ -547,6 +548,8 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     logFont.lfClipPrecision = 0;
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
+    logFont.lfItalic = 0;
+    logFont.lfHeight = 9;
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
