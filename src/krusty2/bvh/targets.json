@@ -142,6 +142,16 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?GrowBoxByTransformedBox@@YAXPAUVec3@@0U1@1PBUMatrix4@@@Z",
+    "target_va": "0x004290d0",
+    "target_size": 805,
+    "expect": "exact",
+    "notes": "moved from samples; the loop output in its own local (homed in the dead center argument slot), so the transformed x is never stored",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
     "candidate_symbol_contains": "_$E2",
     "target_va": "0x00429400",
     "target_size": 5,

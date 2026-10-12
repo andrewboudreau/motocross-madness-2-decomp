@@ -25,17 +25,7 @@
     "target_va": "0x00428db0",
     "target_size": 789,
     "expect": "partial",
-    "notes": "near miss: stack slots of the axis temporaries and the moved centre",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?GrowBoxByTransformedBox@@YAXPAUVec3@@0U1@1PBUMatrix4@@@Z",
-    "target_va": "0x004290d0",
-    "target_size": 805,
-    "expect": "partial",
-    "notes": "near miss: one extra store of the transformed centre x (retail keeps it on the FPU stack)",
+    "notes": "near miss (773/789): operand order of the first two products of the transform's x and z rows",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {

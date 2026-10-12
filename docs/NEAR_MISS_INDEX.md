@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 165, c 110, total 276. The three class (a) functions of the
+Counts: a 1, b 163, c 111, total 275. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -140,8 +140,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/bvh/BoundingBoxTreeQuery | `0x00426be0` | 1673/2572 | b | cross products match; min/max of the projections (retail keeps p2 on the x87 stack and stores p1 twice), one operand pair of a vertex transform and the frame (0x160 vs 0x164) |
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 349/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
-| physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 429/797 | b | 10 code diffs: retail lacks `mov [esp + N], eax`; retail adds `mov [esp + N], eax`; slot order differs |
-| physics/bvh/BoundingBoxTreeQuery | `0x004290d0` | 564/813 | b | 6 code diffs: retail lacks `fstp [esp + N]`; retail lacks `fld [esp + N]`; slots differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 773/789 | c | frame and slots match (loop output in its own local, `grown` after the last rotation, z, y, x transform sums); the first two products of the transform's x and z rows load the matrix element first |
 | physics/bvh/BoundingBoxTreeQuery | `0x00429570` | 246/831 | b | 17 code diffs: `jne @82 ; xor eax, eax ; pop edi` vs `je @272`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |

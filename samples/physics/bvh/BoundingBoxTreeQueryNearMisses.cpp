@@ -7,11 +7,13 @@
 //   un-merged (it returns the first child's nonzero result as is); this source gives
 //   separate epilogues.  An if / else-if form with `int hit = child0; if (!hit) hit = child1;`
 //   gives retail's block order and tails but moves the triangle branch's stack slots.
-// - GrowBoxByTransformedBox 0x004290d0 (813 vs 805 bytes): one store of the transformed
-//   centre's x, which retail keeps on the FPU stack, and stack slots.  The x and z rows of the
-//   transform need the parenthesised grouping below (MoveBox prefers the same grouping).
-// - MoveBox 0x00428db0 (797 vs 789 bytes): the GrowBoxByTransformedBox body on pointer
-//   arguments; stack slots of the axis temporaries and of the moved centre differ.
+// - MoveBox 0x00428db0 (789 bytes, 773 strict): the GrowBoxByTransformedBox body on pointer
+//   arguments (that one is exact in the src file).  With the loop output in its own local
+//   (`mid`), `grown` assigned after the last rotation and the z, y, x sums of the transform,
+//   frame and slots match.  Left: the first two products of the transform's x and z rows load
+//   the matrix element first (retail the point component); written order, per-term
+//   reference/pointer aliases of the point or the matrix, by-reference, by-value-return and
+//   in-body transforms do not move them.
 //
 // LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
 // exact in the src file.
@@ -130,55 +132,13 @@ int SphereTreeQuery(const Vec3* center, float radius, float radiusSq, QueryTreeN
            SphereTreeQuery(center, radius, radiusSq, node->child[1], xf, triangles);
 }
 
-inline void TransformPointGB(Vec3* out, Vec3 v, const Matrix4* m)
-{
-    out->x = v.x * m->_11 + (v.y * m->_21 + v.z * m->_31) + m->_41;
-    out->y = v.x * m->_12 + v.y * m->_22 + v.z * m->_32 + m->_42;
-    out->z = v.x * m->_13 + (v.y * m->_23 + v.z * m->_33) + m->_43;
-}
-// 0x004290d0.  Grows the box (outCenter, outHalfExtents) to contain the box (center,
-// halfExtents) moved by m.
-void GrowBoxByTransformedBox(Vec3* outCenter, Vec3* outHalfExtents, Vec3 center,
-                             Vec3 halfExtents, const Matrix4* m)
-{
-    Vec3 axes[3];
-    RotateVectorInline(&axes[0], Vec3(halfExtents.x, 0.0f, 0.0f), m);
-    RotateVectorInline(&axes[1], Vec3(0.0f, halfExtents.y, 0.0f), m);
-    Vec3 grown;
-    grown.x = outHalfExtents->x;
-    grown.y = outHalfExtents->y;
-    grown.z = outHalfExtents->z;
-    RotateVectorInline(&axes[2], Vec3(0.0f, 0.0f, halfExtents.z), m);
-    Vec3& ax = axes[0];
-    Vec3& ay = axes[1];
-    Vec3& az = axes[2];
-    Vec3 half;
-    half.x = QueryAbs(ax.x) + QueryAbs(ay.x) + QueryAbs(az.x);
-    half.y = QueryAbs(ax.y) + QueryAbs(ay.y) + QueryAbs(az.y);
-    half.z = QueryAbs(ax.z) + QueryAbs(ay.z) + QueryAbs(az.z);
-    TransformPointGB(&center, center, m);
-    Vec3 d;
-    d.x = center.x - outCenter->x;
-    d.y = center.y - outCenter->y;
-    d.z = center.z - outCenter->z;
-    for (int i = 0; i < 3; i++) {
-        float lo = d[i] - half[i];
-        float hi = half[i] + d[i];
-        if (-grown[i] < lo)
-            lo = -grown[i];
-        hi = QueryMax(grown[i], hi);
-        center[i] = (hi + lo) * 0.5f;
-        grown[i] = (hi - lo) * 0.5f;
-    }
-    *outCenter += center;
-    *outHalfExtents = grown;
-}
-
+// MoveBox's transform: the x and z rows sum z, y, x (no grouping), which also gives retail's
+// slot order for d and half.
 inline void TransformPointPtrInline(Vec3* out, const Vec3* v, const Matrix4* m)
 {
-    out->x = v->x * m->_11 + (v->y * m->_21 + v->z * m->_31) + m->_41;
+    out->x = v->z * m->_31 + v->y * m->_21 + v->x * m->_11 + m->_41;
     out->y = v->x * m->_12 + v->y * m->_22 + v->z * m->_32 + m->_42;
-    out->z = v->x * m->_13 + (v->y * m->_23 + v->z * m->_33) + m->_43;
+    out->z = v->z * m->_33 + v->y * m->_23 + v->x * m->_13 + m->_43;
 }
 // 0x00428db0.  Grows the box (center, halfExtents) in place to also contain itself moved by m.
 void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
@@ -189,11 +149,13 @@ void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
     Vec3 axes[3];
     RotateVectorInline(&axes[0], hx, m);
     RotateVectorInline(&axes[1], hy, m);
+    RotateVectorInline(&axes[2], hz, m);
+    // Assigned after the last rotation: VC6 hoists the x and y copies but keeps the z copy
+    // after the last read of hz.z, whose slot it shares.
     Vec3 grown;
     grown.x = halfExtents->x;
     grown.y = halfExtents->y;
     grown.z = halfExtents->z;
-    RotateVectorInline(&axes[2], hz, m);
     Vec3& ax = axes[0];
     Vec3& ay = axes[1];
     Vec3& az = axes[2];
@@ -207,16 +169,17 @@ void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
     d.x = moved.x - center->x;
     d.y = moved.y - center->y;
     d.z = moved.z - center->z;
+    Vec3 mid;
     for (int i = 0; i < 3; i++) {
         float lo = d[i] - half[i];
         float hi = half[i] + d[i];
         if (-grown[i] < lo)
             lo = -grown[i];
         hi = QueryMax(grown[i], hi);
-        moved[i] = (hi + lo) * 0.5f;
+        mid[i] = (hi + lo) * 0.5f;
         grown[i] = (hi - lo) * 0.5f;
     }
-    *center += moved;
+    *center += mid;
     *halfExtents = grown;
 }
 

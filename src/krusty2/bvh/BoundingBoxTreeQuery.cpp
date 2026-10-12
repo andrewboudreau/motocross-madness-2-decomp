@@ -333,6 +333,55 @@ int TreeBoxOverlap(QueryTreeNode* a, QueryTreeNode* b, const Matrix4* xfA, const
     return BoxOverlap(&a->center, &a->halfExtents, b->center, b->halfExtents, &s_relativeAB);
 }
 
+// v * m with the translation row, as GrowBoxByTransformedBox expands it.
+inline void TransformPointGB(Vec3* out, Vec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->_11 + (v.y * m->_21 + v.z * m->_31) + m->_41;
+    out->y = v.x * m->_12 + v.y * m->_22 + v.z * m->_32 + m->_42;
+    out->z = v.x * m->_13 + (v.y * m->_23 + v.z * m->_33) + m->_43;
+}
+
+// 0x004290d0.  Grows the box (outCenter, outHalfExtents) to contain the box (center,
+// halfExtents) moved by m.  The x and z rows of the transform need the parenthesised
+// grouping.  The loop writes a new local (`mid`), which VC6 homes in the dead `center`
+// argument slot; the transformed centre's x is then only read by d.x and is not stored.
+void GrowBoxByTransformedBox(Vec3* outCenter, Vec3* outHalfExtents, Vec3 center,
+                             Vec3 halfExtents, const Matrix4* m)
+{
+    Vec3 axes[3];
+    RotateVectorInline(&axes[0], Vec3(halfExtents.x, 0.0f, 0.0f), m);
+    RotateVectorInline(&axes[1], Vec3(0.0f, halfExtents.y, 0.0f), m);
+    Vec3 grown;
+    grown.x = outHalfExtents->x;
+    grown.y = outHalfExtents->y;
+    grown.z = outHalfExtents->z;
+    RotateVectorInline(&axes[2], Vec3(0.0f, 0.0f, halfExtents.z), m);
+    Vec3& ax = axes[0];
+    Vec3& ay = axes[1];
+    Vec3& az = axes[2];
+    Vec3 half;
+    half.x = QueryAbs(ax.x) + QueryAbs(ay.x) + QueryAbs(az.x);
+    half.y = QueryAbs(ax.y) + QueryAbs(ay.y) + QueryAbs(az.y);
+    half.z = QueryAbs(ax.z) + QueryAbs(ay.z) + QueryAbs(az.z);
+    TransformPointGB(&center, center, m);
+    Vec3 d;
+    d.x = center.x - outCenter->x;
+    d.y = center.y - outCenter->y;
+    d.z = center.z - outCenter->z;
+    Vec3 mid;
+    for (int i = 0; i < 3; i++) {
+        float lo = d[i] - half[i];
+        float hi = half[i] + d[i];
+        if (-grown[i] < lo)
+            lo = -grown[i];
+        hi = QueryMax(grown[i], hi);
+        mid[i] = (hi + lo) * 0.5f;
+        grown[i] = (hi - lo) * 0.5f;
+    }
+    *outCenter += mid;
+    *outHalfExtents = grown;
+}
+
 // 0x00429540.
 int SphereTreeQueryWithVertices(const Vec3* center, float radius, float radiusSq,
                                 QueryTreeNode* node, const Matrix4* xf, int triangles,

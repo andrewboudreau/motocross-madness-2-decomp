@@ -272,9 +272,11 @@ partial `UpdateWorldMatrix`.
   (VC6_OPERAND_ORDER.md section 3).
 
 **`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
-`0x00424690..0x0042ad2f`) passes 33 cases:
+`0x00424690..0x0042ad2f`) passes 40 cases:
 - its 18 `$E` (the kVec3 set and five empty statics);
 - the segment and sphere box tests;
+- GrowBoxByTransformedBox `0x004290d0`, whose loop writes its own local (VC6 homes it in
+  the dead `center` argument slot, so the transformed x is never stored);
 - the tree-tree and tree-box queries and the three entry points;
 - the matrix and point helpers.
 
@@ -289,7 +291,7 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The second run reports `33/33 strict exact`. The soultree root reports one
+The second run reports `40/40 strict exact`. The soultree root reports one
 required failure, SoulTreePhysics'
 `0x5036f0`, which predates this slice.
 
