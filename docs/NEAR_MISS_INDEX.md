@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 167, c 112, total 280. The three class (a) functions of the
+Counts: a 1, b 167, c 111, total 279. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -27,6 +27,11 @@ Game `0x00467b70` (class a, 761/775) is exact too: retail's compare reads
 "use-count change" `tools/frame_layout.py` proposed was a different variable
 in the same instruction, not an extra reference. Check what retail's
 instruction addresses before adding uses.
+FileStream open `0x00460f50` (class c, 284/957) is exact too: each branch
+declares its own message buffer. With one function-wide buffer VC6
+cross-jumps error blocks of one branch into identical tails of the other;
+retail keeps them apart. When retail repeats a tail that VC6 merges across
+branches, try locals declared in the branches.
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -61,7 +66,6 @@ instruction addresses before adding uses.
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
 | io/FileStream | `0x00460db0` | 27/186 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp; the extent is 186 bytes, docs/FILESTREAM.md) |
-| io/FileStream | `0x00460f50` | 284/933 | c | 18 code diffs: VC6 here stores access[0] as well; candidate 933 of 957 bytes |
 | io/FileStream | `0x00461340` | 286/702 | c | +0x0c read once into `position` and cleared when not below `offset` (201 with the ternary); left: origin/offset in ebp/ebx swapped, the zero and next pointer in other registers, the SEEK_CUR test repeated where retail threads it |
 | io/FileStream | `0x00461640` | 389/671 | c | a separate `out` pointer gives retail's homed buffer copy; left: file pointer in edx (retail eax/ebx), a third 45c7b0 call retail cross-jumps, and the two `(done + read) / size` returns merged |
 | io/FileStream | `0x004618e0` | 136/152 | c | 7 code diffs: retail loads buffer/size/count into registers before the pushes |

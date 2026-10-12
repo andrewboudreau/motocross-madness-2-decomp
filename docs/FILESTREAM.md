@@ -24,7 +24,7 @@ class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
 - Encoded files start with "FAOE". Their bytes go through a running key at
   `+0x01`, seeded from the file name.
 
-## Exact (12), `src/reconstructed/FileStream.cpp`
+## Exact (13), `src/reconstructed/FileStream.cpp`
 
 | VA | Size (bytes) |
 |---|---|
@@ -32,6 +32,7 @@ class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
 | `0x00460d60` | 15 |
 | `0x00460d70` | 57 |
 | `0x00460e70` | 209 |
+| `0x00460f50` | 957 |
 | `0x00461310` | 39 |
 | `0x00461600` | 63 |
 | `0x00461980` | 224 |
@@ -48,6 +49,15 @@ Source forms that mattered:
   keep the buffer address in ecx for both pointer stores.
 - **`0x00460e70`:** the NULL test guards the rest, so its message is
   emitted last.
+- **`0x00460f50`:** three forms mattered.
+  - Each branch (read, write) declares its own message buffer. With one
+    buffer for the function, VC6 cross-jumps the write branch's
+    header-failure and "filename is NULL!" blocks into their read-branch
+    twins; retail keeps them apart.
+  - The key loop reads the byte into a `char` first
+    (`char c = *p++;`), as in `0x00461b90`.
+  - Retail clears only bytes 1..7 of the access string before strncpy
+    overwrites it (`memset(access + 1, 0, sizeof(access) - 1)`).
 - **`0x00461980`:** the decode reads the byte into a `char` temporary and
   the key straight from the field: `c = *p; decoded = key ^ c; key += c;
   *p = decoded;`. That is the one spelling under which VC6 loads the key
@@ -60,24 +70,22 @@ Source forms that mattered:
 - **`0x00461cb0`:** returns `_fstat`'s result, not void. `TextureMap.h` and
   `SceneManager.bindings.json` now use the `int` signature.
 
-## Near misses (6), `samples/io/FileStream.cpp`
+## Near misses (5), `samples/io/FileStream.cpp`
 
 The notes are in the source header.
 
 | VA | Size (bytes) | Masked match | Function |
 |---|---|---|---|
 | `0x00460db0` | 186 | 16% | header check |
-| `0x00460f50` | 957 | 30% | open |
 | `0x00461340` | 702 | 41% | seek |
 | `0x00461640` | 663 | 59% | read |
 | `0x004618e0` | 152 | 88% | write |
 | `0x00461b90` | 282 | 90% | write the header |
 
 Each miss comes down to one of:
-- register assignment;
+- register assignment, or
 - instruction scheduling (the 0xfa seed store and the name pointer in
-  `0x00461b90`, the argument loads in `0x004618e0`);
-- tail merging.
+  `0x00461b90`, the argument loads in `0x004618e0`).
 
 The control flow of each one is reconstructed.
 

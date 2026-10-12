@@ -26446,6 +26446,15 @@ CASES = [
         'target_size': 586,
         'reason': 'segment projection clamped to [0, 1] before selecting the difference; VC6 recomputes p - segment in the t == 0 copies as retail',
     },
+    {
+        'name': 'FileStream.cpp open 0x460f50',
+        'bindings': 'src/reconstructed/FileStream.bindings.json',
+        'source': 'src/reconstructed/FileStream.cpp',
+        'symbol': '?Open@UnknownTextureStream@@QAEHPBD0H@Z',
+        'target_va': '0x00460f50',
+        'target_size': 957,
+        'reason': 'stream open: a message buffer per branch keeps the error blocks apart, `char c = *p++` key loop, access bytes 1..7 cleared',
+    },
 ]
 
 def main():

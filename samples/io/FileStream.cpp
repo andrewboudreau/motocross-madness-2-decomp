@@ -1,7 +1,7 @@
 // FileStream.cpp -- near misses of the buffered file stream (UnknownTextureStream,
-// declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The twelve
-// methods that match retail are in src/reconstructed/FileStream.cpp; these six
-// (header check, open, seek, read, write, write-header) stay here with
+// declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The thirteen
+// methods that match retail are in src/reconstructed/FileStream.cpp; these five
+// (header check, seek, read, write, write-header) stay here with
 // their notes. The bindings file covers both.
 //
 // A stream reads a file directly or a slice (+0x130, +0x04) of an inner stream (+0x1c);
@@ -14,8 +14,8 @@
 //   read straight from the field (no key temporary) makes VC6 load the key first and
 //   copy it, as retail does; this matched 0x00461980 and is the DecodeBytes shape.
 // - In the seed loop of 0x00461b90, `char c = *p++;` before the key update gives
-//   retail's loop body (85% -> 90%); the same spelling in 0x00460f50 regresses it,
-//   where retail keeps `*p++` inside the expression.
+//   retail's loop body (85% -> 90%); it is also the spelling of 0x00460f50's
+//   loop, which matches once each branch declares its own message buffer.
 // - 0x00461b90: retail stores the 0xfa seed inside the inlined strcat and sets up the
 //   name pointer (lea esi) right after strlen; no statement order, helper, index or
 //   countdown loop shape moves those two. Swept without gain (257/282 best):
@@ -130,125 +130,6 @@ int UnknownTextureStream::CheckHeader()
     }
     field_0x08 = encoded;
     field_0x124 = field_0x128;
-    return 1;
-}
-
-// 0x00460f50: opens `path` with fopen `mode` ("r"/"a" read, "w" write) or as a
-// slice of an archive (0x00460d70); `encoded` asks for the "FAOE" encoding (a
-// write mode gains '+'). The messages go to a local buffer that is never shown.
-// The buffer is 0x184 bytes, as in 0x00460e70; _splitpath reuses it for the name.
-// Near miss (about 30%, 933 vs 957 bytes): VC6 here stores access[0] as well
-// (retail zeroes only bytes 1..7), shares the fclose/sprintf tails of error
-// blocks that retail keeps apart, and swaps dl/cl in the key loop as in
-// 0x00461b90; the rest matches up to branch targets.
-// Session 10 (284/957 strict, 34 instruction differences): the extra store is the
-// access[0] zero; `= ""` (string literal), memset(access, 0, 8) and a zeroing loop
-// give 208. The merged tail is the header-failure block of the write branch, which
-// VC6 cross-jumps into the read branch NOT-encrypted block by moving the
-// field_0x14 store ahead of the format push. A CloseFile(FILE*&) helper, NULL,
-// `if (!encoded) {} else if` and a FILE* local closed after the reset (190) do not
-// keep it apart. `char c = *p++;` in the key loop matches the loop and the
-// key reload after it but merges two more tails (201).
-int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
-{
-    char drive[4];
-    char buffer[0x184];
-    char extension[0x100];
-    char directory[0x100];
-
-    if (field_0x14) {
-        fclose(field_0x14);
-        field_0x08 = 0;
-        field_0x10 = 0;
-        field_0x01 = 0;
-        field_0x14 = 0;
-        field_0x03 = 0;
-        field_0x1c = 0;
-    }
-    field_0x1c = FindArchive(path);
-    if (field_0x1c) {
-        field_0x1c->field_0x01 = field_0x1c->field_0x03;
-        SetBufferSize(0x8000);
-        Seek(field_0x130, SEEK_SET, 0);
-        return 1;
-    }
-    if (*mode == 'r' || *mode == 'a') {
-        if (!encoded && IsValidFile(path)) {
-            field_0x08 = 1;
-            if (field_0x12c && (field_0x1c = field_0x12c->AddArchive(path, 0)) != 0) {
-                return 1;
-            }
-        }
-        if (path) {
-            if (*path && (field_0x14 = fopen(path, mode)) != 0) {
-                if (!encoded && !field_0x08) {
-                    if (fseek(field_0x14, 0, SEEK_SET)) {
-                        fclose(field_0x14);
-                        field_0x14 = 0;
-                        sprintf(buffer, "Fseek failed for %s.\n", path);
-                        return 0;
-                    }
-                } else {
-                    if (!CheckHeader()) {
-                        fclose(field_0x14);
-                        field_0x14 = 0;
-                        sprintf(buffer, "%s NOT an encrypted file, but expected to be.\n", path);
-                        return 0;
-                    }
-                    field_0x08 = 1;
-                    field_0x10 = 4;
-                    _splitpath(path, drive, directory, buffer, extension);
-                    strcat(buffer, extension);
-                    field_0x01 = (char)0xfa;
-                    int length = strlen(buffer);
-                    char* p = buffer;
-                    for (int i = 0; i < length; i++) {
-                        field_0x01 = ((field_0x01 + 3) ^ *p++) + field_0x01;
-                    }
-                    field_0x03 = field_0x01;
-                }
-            } else {
-                sprintf(buffer, "Error opening %s.\n", path);
-                return 0;
-            }
-        } else {
-            sprintf(buffer, "filename is NULL!\n");
-            return 0;
-        }
-    } else if (*mode == 'w') {
-        char access[8] = {0};
-        strncpy(access, mode, 8);
-        if (encoded && mode[1] != '+') {
-            for (int i = 7; i > 1; i--) {
-                access[i] = access[i - 1];
-            }
-            access[1] = '+';
-        }
-        if (path) {
-            if (*path && (field_0x14 = fopen(path, access)) != 0) {
-                if (fseek(field_0x14, 0, SEEK_SET)) {
-                    fclose(field_0x14);
-                    field_0x14 = 0;
-                    sprintf(buffer, "Fseek failed for %s.\n", path);
-                    return 0;
-                }
-                if (encoded && !WriteHeader(path)) {
-                    fclose(field_0x14);
-                    field_0x14 = 0;
-                    sprintf(buffer, "Write of encrypted file header failed for %s.\n", path);
-                    return 0;
-                }
-            } else {
-                sprintf(buffer, "Error opening %s.\n", path);
-                return 0;
-            }
-        } else {
-            sprintf(buffer, "filename is NULL!\n");
-            return 0;
-        }
-    }
-    SetBufferSize(0x8000);
-    Seek(0, SEEK_SET, field_0x08);
     return 1;
 }
 

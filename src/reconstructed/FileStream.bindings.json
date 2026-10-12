@@ -25,5 +25,15 @@
   "_fread": "0x00534f65",
   "_ftell": "0x005365d6",
   "_sprintf": "0x00534aaf",
-  "_vfprintf": "0x00536b23"
+  "_vfprintf": "0x00536b23",
+  "??_C@_0BG@LACB@Fseek?5failed?5for?5?$CFs?4?6?$AA@": "0x0056b08c",
+  "??_C@_0CP@CNEL@Write?5of?5encrypted?5file?5header?5f@": "0x0056b05c",
+  "??_C@_0CP@OGFA@?$CFs?5NOT?5an?5encrypted?5file?0?5but?5ex@": "0x0056b02c",
+  "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
+  "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
+  "?WriteHeader@UnknownTextureStream@@QAEHPBD@Z": "0x00461b90",
+  "?AddArchive@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
+  "__splitpath": "0x005359d2",
+  "_fseek": "0x00534eac",
+  "_strncpy": "0x00534b10"
 }
