@@ -135,8 +135,8 @@
     "candidate_symbol_contains": "SolveContact@InlineShock",
     "target_va": "0x004fa400",
     "target_size": 764,
-    "expect": "partial",
-    "notes": "partial 68%: 758 of 764 bytes; projection temporary lands in a separate slot",
+    "expect": "exact",
+    "notes": "strict exact: the projection is written through an inline out-pointer helper in its own block, so it reuses the dead `d` slot, and the final dot is a named local",
     "bindings": "Shock.bindings.json"
   },
   {

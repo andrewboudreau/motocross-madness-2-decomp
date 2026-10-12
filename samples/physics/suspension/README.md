@@ -17,15 +17,18 @@ Evidence
 - RotatingShock::SolveContact (0x4fac60) uses a 4-entry jump table at 0x4fafc0; the extent
   is 880 bytes including the table.
 
-Diagnostic counts: 25 relocation-masked matches, 2 partial of 27 targets (the four `$E`
+Diagnostic counts: 26 relocation-masked matches, 1 partial of 27 targets (the four `$E`
 wrappers match once their bodies are bound).
 These are not strict acceptance; reviewed bindings are still required.
 - UpdateAxis 0x4f9f90 is strict exact only with the `axisLength` store embedded in the divisor
   (`axis * (1.0f / (axisLength = len))`); as a separate statement VC6 emits
   `fld [1.0]; fdiv st(1)` instead of retail's `fld st(0); fdivr [1.0]`.
-- partial: InlineShock::SolveContact 0x4fa400 (758/764 bytes, 68%: the projection temporary is
-  allocated in its own slot rather than reusing the dead `d` slot); RotatingShock::SolveContact
-  0x4fac60 (880/880 bytes, 94.1%: only the placement of the `mov [r.x], ecx` struct-copy
-  relative to `fsubp` differs in the four cross-product cases).
+- InlineShock::SolveContact 0x4fa400 is strict exact when the projection is written through an
+  inline out-pointer helper (`ProjectInto`) inside its own block, which lets VC6 reuse the dead
+  `d` slot, and the final dot is a named local (inline in the subtraction, VC6 swaps the x
+  term's operands).
+- partial: RotatingShock::SolveContact 0x4fac60 (880/880 bytes, 94.1%: only the placement of
+  the `mov [r.x], ecx` struct-copy relative to `fsubp` differs in the four cross-product
+  cases).
 
 Field and method names are tier 3 (provisional).

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 165, c 110, total 276. The three class (a) functions of the
+Counts: a 1, b 163, c 106, total 270. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -188,7 +188,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/shadow/TerrainShadow | `0x00508bc0` | 353/3031 | b | slot 27 footprint: frame 0xdc vs 0xd0, slot order, the cross product's operand order and the corner loops' form; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 275/404 (masked) | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
-| physics/suspension/Shock | `0x004fa400` | 502/764 | b | 20 code diffs: `je @160 ; mov eax, [A]` vs `je @162`; `jmp @180` vs `mov eax, [A] ; mov [esp + N], ecx ; mov~`; slots differ |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts give no gain |
 | physics/tire/Tire | `0x005135f0` | 1555/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; slip-vector scale `fld st(0); fmul mem` vs `fld mem; fmul st(1)`; two struct-copy store pairs; one dot-term operand order |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |

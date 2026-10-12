@@ -176,11 +176,14 @@ void InlineShock::Retract(float amount, const ShockCarrier* carrier)
     Shock::ClearForces();
 }
 
-static inline ShockVec3 ProjectInline(const ShockVec3& v, const ShockVec3& onto)
+// *out = the projection of v onto `onto` (zero when `onto` is zero).  Writing through
+// an out pointer lets VC6 place the result in the dead `d` slot like retail.
+static inline void ProjectInto(ShockVec3* out, const ShockVec3& v, const ShockVec3& onto)
 {
     if (onto.x == kShockZero.x && onto.y == kShockZero.y && onto.z == kShockZero.z)
-        return kShockZero;
-    return ShockScaleCall(onto, ShockDotCall(v, onto) / ShockDotCall(onto, onto));
+        *out = kShockZero;
+    else
+        *out = ShockScaleCall(onto, ShockDotCall(v, onto) / ShockDotCall(onto, onto));
 }
 void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec3* base,
                                const ShockVec3* point, const ShockVec3* normal, float limit,
@@ -212,9 +215,10 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
     ShockVec3 pos = axis * -length;
     ShockVec3 w = *base + *offset;
     {
-    ShockVec3 proj = ProjectInline(w, displacement);
-    float u = ShockDotCall(proj, proj);
-    speed = (u == 1.0f) ? 1.0f : FastSqrt(u);
+        ShockVec3 proj;
+        ProjectInto(&proj, w, displacement);
+        float u = ShockDotCall(proj, proj);
+        speed = (u == 1.0f) ? 1.0f : FastSqrt(u);
     }
     ClampAndStep(speed * dt, dt, pos);
     if (atLimit == 0 && miss == 0) {
@@ -222,7 +226,8 @@ void InlineShock::SolveContact(float dt, const ShockVec3* offset, const ShockVec
         *outActive = 0;
         return;
     }
-    *outLoad = limit - ShockDot(field_0x80, *normal);
+    float load = ShockDot(field_0x80, *normal);
+    *outLoad = limit - load;
     *outActive = 1;
 }
 
