@@ -77,7 +77,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         userMenuOpen = 0;
         movieRestartTime = 0.0f;
         g_TrackGame->ui->field_0x4b0 = 0;
-        g_TrackGame->mode.field_0x10ec = 0;
+        g_TrackGame->mode.championshipInProgress = 0;
         FillProfileList();
         ShowCurrentProfile();
         if (g_TrackGame->profileDirectory->count >= 1 && g_TrackGame->ui->field_0x48c) {
@@ -456,7 +456,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             text->SetText(title);
             if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c) {
                 text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
-                g_TrackGame->mode.field_0x10ec = 0;
+                g_TrackGame->mode.championshipInProgress = 0;
                 g_TrackGame->ui->currentMenu = 0x10e;
             }
         }
@@ -574,7 +574,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         text->SetText(title);
         if (g_TrackGame->eventManager->racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c) {
             text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
-            g_TrackGame->mode.field_0x10ec = 0;
+            g_TrackGame->mode.championshipInProgress = 0;
             g_TrackGame->ui->currentMenu = 0x10e;
         }
     }

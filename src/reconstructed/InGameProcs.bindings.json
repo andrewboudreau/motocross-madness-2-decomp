@@ -45,7 +45,7 @@
   "?UnknownFunction45cdc0@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
-  "?UnknownFunction45e710@EventManager@@QAEXH@Z": "0x0045e710",
+  "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",
   "?FindControl@UIDialog@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",
   "?EndDialog@UIDialog@@QAEXH@Z": "0x0046ff30",

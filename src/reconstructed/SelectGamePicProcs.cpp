@@ -1427,7 +1427,7 @@ void MPEventDlg::ShowHostSettings() {
         FindControl("ChkStuntMode", 2)->Show(0, 1);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2)
-        g_TrackGame->mode.field_0x10ec = 0;
+        g_TrackGame->mode.championshipInProgress = 0;
     if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4) {
         UIControl* label = FindControl("LapsLabel", 0xc);
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x929);
@@ -1520,7 +1520,7 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
             g_TrackGame->mode.field_0x27f8.field_0x00 = list->GetRowData(-1);
             EnableChangeableControls();
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) != 2) {
-                g_TrackGame->mode.field_0x10ec = 0;
+                g_TrackGame->mode.championshipInProgress = 0;
                 g_TrackGame->network->SetSessionJoinable(1);
             }
         } else if (!_stricmp("EventTypeDropDown", event->controlName)) {
@@ -1614,7 +1614,7 @@ void MPEventDlg::EnableChangeableControls() {
         races->AddRow(text, i - 1, 0);
     }
     races->SelectRowByData(selection);
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && g_TrackGame->mode.field_0x10ec) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && g_TrackGame->mode.championshipInProgress) {
         if (g_TrackGame->network->isHost) {
             opponentsLeft->Show(0, 1);
             opponentsRight->Show(0, 1);
@@ -1718,7 +1718,7 @@ void MPEventDlg::SyncValues(int apply) {
             settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         else
             settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
-        if (!g_TrackGame->mode.field_0x10ec)
+        if (!g_TrackGame->mode.championshipInProgress)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         strcpy(settings->trackName, "");
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;

@@ -391,7 +391,7 @@ void EventManager::EndRace() {
             g_TrackGame->network->SetSessionJoinable(1);
         waitingForRacers = 0;
         UnknownFunction45cdc0(2);
-        UnknownFunction45e710(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
+        LeaveRaceForMenu(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
     }
 }
 

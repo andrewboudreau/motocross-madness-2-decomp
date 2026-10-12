@@ -378,8 +378,8 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         tab->SetTextAlign(0x12);
         memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
                sizeof(g_TrackGame->mode.savedSettings));
-        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1034,
-               sizeof(g_TrackGame->mode.field_0x1034));
+        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+               sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                sizeof(g_TrackGame->mode.field_0x1a3c));
         g_TrackGame->mode.field_0x94 = g_TrackGame->mode.field_0x98;
@@ -402,8 +402,8 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             UpdateBoundValues(1);
             memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.field_0x1034, g_TrackGame->mode.field_0xfd8,
-                   sizeof(g_TrackGame->mode.field_0x1034));
+            memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+                   sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
             g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
@@ -445,8 +445,8 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 }
                 memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
                        sizeof(g_TrackGame->mode.savedSettings));
-                memcpy(g_TrackGame->mode.field_0x1034, g_TrackGame->mode.field_0xfd8,
-                       sizeof(g_TrackGame->mode.field_0x1034));
+                memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+                       sizeof(g_TrackGame->mode.optionsBackup));
                 memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                        sizeof(g_TrackGame->mode.field_0x1a3c));
                 g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
@@ -646,7 +646,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) == 4)
                 ListGhosts();
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) != 2) {
-                g_TrackGame->mode.field_0x10ec = 0;
+                g_TrackGame->mode.championshipInProgress = 0;
                 g_TrackGame->eventManager->racesRun = 0;
             }
             ShowRaceModeControls();
@@ -729,7 +729,7 @@ void SPEventDlg::ShowRaceModeControls() {
         races->AddRow(text, i - 1, 0);
     }
     races->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x0c);
-    if (settings.field_0x00 == 2 && g_TrackGame->mode.field_0x10ec) {
+    if (settings.field_0x00 == 2 && g_TrackGame->mode.championshipInProgress) {
         opponentsLeft->Show(0, 1);
         opponentsRight->Show(0, 1);
         opponents->SetEnabled(0);
@@ -823,7 +823,7 @@ void SPEventDlg::SyncValues(int apply) {
             settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         else
             settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
-        if (!g_TrackGame->mode.field_0x10ec)
+        if (!g_TrackGame->mode.championshipInProgress)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         settings->treeCollision = static_cast<UIMultiState*>(FindControl("ChkTreeCollision", 2))->GetSelectedState();
         strcpy(settings->trackName, "");
@@ -1662,14 +1662,14 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
             g_TrackGame->network->SetSessionJoinable(1);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                 EndNetworkGame();
-                g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
+                g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             } else {
-                g_TrackGame->eventManager->UnknownFunction45e710(kMenuMultiPlayer867);
+                g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMultiPlayer867);
             }
         } else if (!g_TrackGame->field_0x3444) {
-            g_TrackGame->eventManager->UnknownFunction45e710(kMenuSinglePlayer);
+            g_TrackGame->eventManager->LeaveRaceForMenu(kMenuSinglePlayer);
         } else {
-            g_TrackGame->eventManager->UnknownFunction45e710(kMenuPCCentral);
+            g_TrackGame->eventManager->LeaveRaceForMenu(kMenuPCCentral);
         }
         break;
     }
@@ -2019,8 +2019,8 @@ void LeaveMenusForRace() {
         !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->field_0x3428) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
                sizeof(g_TrackGame->mode.savedSettings));
-        memcpy(g_TrackGame->mode.field_0x1034, g_TrackGame->mode.field_0xfd8,
-               sizeof(g_TrackGame->mode.field_0x1034));
+        memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+               sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.field_0x1a3c, &g_TrackGame->mode.field_0x1974,
                sizeof(g_TrackGame->mode.field_0x1a3c));
         g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
@@ -2034,8 +2034,8 @@ void LeaveMenusForRace() {
         memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.field_0x1974,
                sizeof(g_TrackGame->mode.field_0x1b04));
     }
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !g_TrackGame->mode.field_0x10ec) {
-        g_TrackGame->mode.field_0x10ec = 1;
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !g_TrackGame->mode.championshipInProgress) {
+        g_TrackGame->mode.championshipInProgress = 1;
         g_TrackGame->eventManager->racesRun = 0;
         for (int i = 0; i < 11; i++)
             g_TrackGame->eventManager->results[i].points = 0;
@@ -2597,11 +2597,11 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
             g_TrackGame->eventManager->UnknownFunction45cdc0(2);
             memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1034,
-                   sizeof(g_TrackGame->mode.field_0x1034));
+            memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+                   sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
-            g_TrackGame->eventManager->UnknownFunction45e710(kMenuMain);
+            g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             guiManager->ShowCursors(1);
         }
         break;

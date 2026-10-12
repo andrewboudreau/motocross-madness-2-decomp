@@ -387,9 +387,9 @@ public:
     UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
     unsigned char field_0xfd8[0x5c];          // restored from +0x1034 when a replay is left (InGameProcs.cpp)
-    unsigned char field_0x1034[0x5c];
+    unsigned char optionsBackup[0x5c];        // +0x1034: copy of +0xfd8 (DlgProcs.cpp, InGameProcs.cpp)
     unsigned char field_0x1090[0x10ec - 0x1090];
-    int field_0x10ec;                         // SelectGamePicProcs.cpp
+    int championshipInProgress;               // +0x10ec: set when a race-mode 2 series starts (points reset); hides the race count
     int customGarageCurves[5][3][11];     // +0x10f0: custom garage curves per bike class (OptionProcs.cpp)
     int bonusTrackUnlocked[6];            // +0x1384: a bonus track is listed only when set (SelectGamePicProcs.cpp)
     char bonusTrackNames[6][0x20];        // +0x139c: each series' BonusTrack from PCSched.pb (LoadBonusTrackNames)

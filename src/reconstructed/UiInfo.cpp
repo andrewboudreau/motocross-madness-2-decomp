@@ -122,7 +122,7 @@ TrackGameMode::TrackGameMode() {
     lobbyPresetFlags = -1;
     maxOpponents = 0;
     field_0x1be0 = 0;
-    field_0x10ec = 0;
+    championshipInProgress = 0;
     UNKNOWN_SET_DIRECTORY(0, "Teraform\\Quarries")
     UNKNOWN_SET_DIRECTORY(1, "Teraform\\Baja")
     UNKNOWN_SET_DIRECTORY(2, "Teraform\\National")
@@ -432,7 +432,7 @@ int TrackGameMode::LoadProfile() {
     fread(field_0xa68, 0x30, 1, file);
     fread(field_0x145c, 0x500, 1, file);
     fread(videoSettings, 0x18, 1, file);
-    fread(field_0x1034, 0x5c, 1, file);
+    fread(optionsBackup, 0x5c, 1, file);
     fread(field_0x1090, 0x5c, 1, file);
     fread(&field_0x1a3c, 0xc8, 1, file);
     fread(field_0x1b04, 0xc8, 1, file);
@@ -462,7 +462,7 @@ int TrackGameMode::LoadProfile() {
     }
     field_0x27f8 = savedSettings;
     field_0x94 = field_0x98;
-    memcpy(field_0xfd8, field_0x1034, sizeof(field_0xfd8));
+    memcpy(field_0xfd8, optionsBackup, sizeof(field_0xfd8));
     memcpy(&field_0x1974, &field_0x1a3c, sizeof(field_0x1974));
     return strcmp(field_0x00, "") != 0;
 }
@@ -486,7 +486,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(field_0xa68, 0x30, 1, file);
     fwrite(field_0x145c, 0x500, 1, file);
     fwrite(videoSettings, 0x18, 1, file);
-    fwrite(field_0x1034, 0x5c, 1, file);
+    fwrite(optionsBackup, 0x5c, 1, file);
     fwrite(field_0x1090, 0x5c, 1, file);
     fwrite(&field_0x1a3c, 0xc8, 1, file);
     fwrite(field_0x1b04, 0xc8, 1, file);

@@ -175,7 +175,7 @@ public:
     // (+0x424) from "%s\\Winner.mcf" with "Podium3/4/5_%02d" motions (also
     // "CrowdLoop.wav"); nonzero when slot 10 should run that scene.
     int CreatePodiumScene();  // 0x0045d480
-    void UnknownFunction45e710(int menu);          // 0x0045e710
+    void LeaveRaceForMenu(int menu);          // 0x0045e710
     void RankRacers();                             // 0x0045e9d0
     void CheckRaceOver(float frameTime);           // 0x0045eef0
     void SendRacerResults();                       // 0x0045f9a0

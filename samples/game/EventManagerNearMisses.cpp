@@ -1,7 +1,7 @@
 // Near-miss EventManager candidates, kept out of src/reconstructed until
 // they match. See docs/EVENTMANAGER.md.
 //
-// EventManager::UnknownFunction45e710 (0x0045e710, 531 bytes): leaves the
+// EventManager::LeaveRaceForMenu (0x0045e710, 531 bytes): leaves the
 // race for a menu. Control flow, calls, the TransDlg `new` (retail line 1064)
 // and its EH state match; 454 of 533 bytes. After the `new` retail loads the
 // global into eax (the short form, 2 bytes less) and the menu into edx where
@@ -49,7 +49,7 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 
 // 0x0045e710: leaves the race for `menu`: restores the UI, the window's
 // input context and 640x480x16, and shows the transition dialog.
-void EventManager::UnknownFunction45e710(int menu) {
+void EventManager::LeaveRaceForMenu(int menu) {
     if (!g_TrackGame->ui)
         return;
     UnknownTrackGameObject56cItem* item = g_TrackGame->ui->gui->FindInputDialog();

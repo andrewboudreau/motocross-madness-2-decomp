@@ -299,7 +299,7 @@
   "?UnknownFunction45d270@EventManager@@QAEXXZ": "0x0045d270",
   "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
   "?ResetEntries@EventManager@@QAEXXZ": "0x0045e520",
-  "?UnknownFunction45e710@EventManager@@QAEXH@Z": "0x0045e710",
+  "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",
   "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
   "?UnknownFunction469260@GameObject@@QAEHPAV1@H@Z": "0x00469260",

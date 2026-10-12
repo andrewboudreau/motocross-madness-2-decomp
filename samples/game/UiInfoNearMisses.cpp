@@ -45,7 +45,7 @@ void TrackGameMode::UnknownFunction522440() {
     UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
     UnknownFunction522840(field_0x145c);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0xfd8);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1034);
+    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)optionsBackup);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1090);
     UnknownFunction522cd0();
     field_0x27f8.field_0x30 = 1;
