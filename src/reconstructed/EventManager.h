@@ -125,8 +125,8 @@ struct UnknownEventEntry {
     int largestStuntPoints;                        // +0x0c: racer +0x788 (ZoneReport "LargestSingleStuntPoints")
     int field_0x10;                                // racer +0x758
     float totalRunningTime;                        // +0x14: racer +0x754 (ZoneReport "TotalrunningTime")
-    float field_0x18;                              // racer +0x760
-    float field_0x1c;                              // racer +0x764
+    float field_0x18;                              // racer +0x760 bestTagRun
+    float field_0x1c;                              // racer +0x764 totalTagRun
     int finished;                                  // +0x20: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
     int outOfRace;                            // +0x24 racer +0x4a0
     int points;                                    // +0x28: championship points (AddChampionshipPoints)

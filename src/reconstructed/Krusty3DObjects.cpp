@@ -269,11 +269,11 @@ int VisualCue::CanCycleCues() {
 
 // 0x0048bca0
 NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
-    field_0x2c = 0;
-    field_0x30 = 1;
-    field_0x34 = 0;
+    countdownRacer = 0;
+    drawEnabled = 1;
+    digitCamera = 0;
     for (int i = 0; i < 5; i++)
-        field_0x38[i] = 0;
+        digitModels[i] = 0;
 }
 
 // 0x0048bd00
@@ -283,21 +283,21 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, Unknow
     char name[0x104];
 
     GameObject::UnknownVirtualSlot8(value);
-    field_0x2c = racer;
+    countdownRacer = racer;
     char names[5][16] = {"one.slt", "two.slt", "three.slt", "four.slt", "five.slt"};
     if (!pixels || !camera) {
         Release();
         return 0;
     }
-    field_0x34 = camera;
+    digitCamera = camera;
     UnknownTextureStream* stream = new (__FILE__, 0x23d) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < 5; i++) {
         sprintf(name, "%s\\%s", "Res", names[i]);
-        field_0x38[i] = (new (__FILE__, 0x240) ArcadeObject(1))
+        digitModels[i] = (new (__FILE__, 0x240) ArcadeObject(1))
                             ->Create(value, 0, b, name, position, pixels,
                                                     (UnknownArcadeView*)camera, size, 0.5f, 0.1f, 0);
-        if (!AppendChild(field_0x38[i], -1)) {
+        if (!AppendChild(digitModels[i], -1)) {
             Release();
             return 0;
         }
@@ -317,38 +317,38 @@ struct UnknownNumberOwner {
 int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     for (int i = 0; i < 5; i++)
-        if (field_0x38[i])
-            field_0x38[i]->isVisible = 0;
-    if (((UnknownNumberOwner*)renderContext)->currentCamera == field_0x34) {
-        int counting = field_0x2c->countdown > 0.0f && field_0x2c->field_0x6c == 0;
-        if (!(field_0x2c->field_0x38->field_0x76c > 1.0f) && !counting)
+        if (digitModels[i])
+            digitModels[i]->isVisible = 0;
+    if (((UnknownNumberOwner*)renderContext)->currentCamera == digitCamera) {
+        int counting = countdownRacer->countdown > 0.0f && countdownRacer->field_0x6c == 0;
+        if (!(countdownRacer->field_0x38->field_0x76c > 1.0f) && !counting)
             return 1;
-        field_0x30 = 1;
+        drawEnabled = 1;
         Vector3 up;
         Vector3 forward;
-        forward = field_0x34->viewDirection;
-        up = field_0x34->upDirection;
+        forward = digitCamera->viewDirection;
+        up = digitCamera->upDirection;
         int index;
         if (counting) {
-            index = (int)field_0x2c->countdown;
-            if (index >= 5 || index < 0 || !field_0x38[index])
+            index = (int)countdownRacer->countdown;
+            if (index >= 5 || index < 0 || !digitModels[index])
                 return 1;
-            field_0x38[index]->isVisible = 1;
-            field_0x38[index]->SetAxes(&forward, &up, 0, 1);
-            Vector3 position = field_0x34->eyePosition;
+            digitModels[index]->isVisible = 1;
+            digitModels[index]->SetAxes(&forward, &up, 0, 1);
+            Vector3 position = digitCamera->eyePosition;
             position += up * 2.5f;
             position += forward * 6.0f;
-            field_0x38[index]->SetPosition(&position);
+            digitModels[index]->SetPosition(&position);
         } else {
-            index = 5 - (int)field_0x2c->field_0x38->field_0x76c;
-            if (index >= 5 || index < 0 || !field_0x38[index])
+            index = 5 - (int)countdownRacer->field_0x38->field_0x76c;
+            if (index >= 5 || index < 0 || !digitModels[index])
                 return 1;
-            field_0x38[index]->isVisible = 1;
-            field_0x38[index]->SetAxes(&forward, &up, 0, 1);
-            Vector3 position = field_0x34->eyePosition;
+            digitModels[index]->isVisible = 1;
+            digitModels[index]->SetAxes(&forward, &up, 0, 1);
+            Vector3 position = digitCamera->eyePosition;
             position += up * 2.5f;
             position += forward * 6.0f;
-            field_0x38[index]->SetPosition(&position);
+            digitModels[index]->SetPosition(&position);
         }
     }
     return 1;
@@ -356,7 +356,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
 
 // 0x0048c290
 int NumberObjectManager::UnknownVirtualSlot14() {
-    if (field_0x30)
+    if (drawEnabled)
         return GameObject::UnknownVirtualSlot14();
     return 1;
 }

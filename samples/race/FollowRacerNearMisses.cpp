@@ -102,18 +102,18 @@ void TrackGameViewOwner::PickFollowedRacer()
 }
 
 // 0x004a9e80: switches the followed racer from `previous` to `racer`. The
-// previous racer banks its run (+0x75c into +0x764, the best into +0x760),
+// previous racer banks its run (tagRun into totalTagRun, the best into bestTagRun),
 // both racers get their tier-3 role for five seconds and every other racer
 // hears of it; the view's own racer taking over scores 2500.
 void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell)
 {
     if (previous) {
-        previous->field_0x764 += previous->field_0x75c;
-        // Compared through locals, as EventManager.cpp keeps the best of +0x75c.
-        float best = previous->field_0x760;
-        float run = previous->field_0x75c;
-        previous->field_0x760 = best > run ? previous->field_0x760 : previous->field_0x75c;
-        previous->field_0x75c = 0.0f;
+        previous->totalTagRun += previous->tagRun;
+        // Compared through locals, as EventManager.cpp keeps the best run.
+        float best = previous->bestTagRun;
+        float run = previous->tagRun;
+        previous->bestTagRun = best > run ? previous->bestTagRun : previous->tagRun;
+        previous->tagRun = 0.0f;
         FOLLOWED_RACER_SLOTS(previous)->UnknownVirtualSlot50(1, 5.0f, 0);
         if (field_0xdc)
             field_0xdc->field_0x10a = 0;

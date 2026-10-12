@@ -145,10 +145,11 @@ struct UnknownEventRacer : virtual public GameObject {
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)
     float totalRunningTime;                   // +0x754 FLT_MAX until finished; ZoneReport "TotalrunningTime" (0x0045c8b0)
-    int field_0x758;
-    float field_0x75c;
-    float field_0x760;                             // best of +0x75c
-    float field_0x764;                             // sum of +0x75c
+    int field_0x758;                          // +0x758
+    float tagRun;                             // +0x75c the current run as the followed racer in tag (mode 4); banked by
+                                              // TrackGameViewOwner 0x004a9e80 and EventManager 0x0045eef0
+    float bestTagRun;                         // +0x760 best banked run
+    float totalTagRun;                        // +0x764 sum of the banked runs; EventManager 0x0045e9d0 ranks by it
     float score;                              // +0x768 a score (sorted with TrackOverlay's 0x005199f0)
     float offTrackTime;                       // +0x76c time off the track (RaceStatus.cpp 0x004e63e0)
     float timeBehindLeader;                   // +0x770 time behind the leader (RaceStatus.cpp 0x004e6210)

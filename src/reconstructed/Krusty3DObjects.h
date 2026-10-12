@@ -201,10 +201,10 @@ public:
     NumberObjectManager* SetupDigits(void* value, int b, UnknownNumberRacer* racer, int pixels,
                                      UnknownNumberCamera* camera, float size);
 
-    UnknownNumberRacer* field_0x2c;
-    int field_0x30;
-    UnknownNumberCamera* field_0x34;
-    ArcadeObject* field_0x38[5];
+    UnknownNumberRacer* countdownRacer;       // +0x2c whose count-down the digits show
+    int drawEnabled;                          // +0x30 slot 14 draws only when set (1 from the constructor and slot 10)
+    UnknownNumberCamera* digitCamera;         // +0x34 the digits show only through this camera
+    ArcadeObject* digitModels[5];             // +0x38 "one.slt" .. "five.slt"
 };
 
 // The racer a BonusObjectManager follows (its +0x2c).
