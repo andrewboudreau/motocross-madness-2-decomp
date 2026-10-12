@@ -37,7 +37,7 @@ PCTextureMap::~PCTextureMap() {
         textureSurface->Release();
         textureSurface = 0;
         if (g_UnknownGlobal689964)
-            field_0x10->UnknownFunction511580();
+            field_0x10->CountTextureMemory();
     }
 }
 
@@ -73,10 +73,10 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     } else {
         field_0x6c = 0;
     }
-    void* buffer = field_0x10->UnknownFunction511310(LargerPixelSize(sourceFormat, format) * width * height);
+    void* buffer = field_0x10->GrowScratchBuffer(LargerPixelSize(sourceFormat, format) * width * height);
     if (!buffer)
         return 0;
-    void* bits = field_0x10->UnknownFunction511370(LargerPixelSize(sourceFormat, format) * width * height + 4);
+    void* bits = field_0x10->GrowSecondScratchBuffer(LargerPixelSize(sourceFormat, format) * width * height + 4);
     if (!bits)
         return 0;
     if (HasMipLevels(fileFormat)) {
@@ -129,8 +129,8 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                     UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * levelHeight * levelSide);
                     break;
                 case 0x14:
-                    bits = field_0x10->UnknownFunction511370(UnknownFunction511970(sourceFormat) * levelHeight *
-                                                             levelSide + 4);
+                    bits = field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(sourceFormat) * levelHeight *
+                                                               levelSide + 4);
                     if (!bits)
                         return 0;
                     break;
@@ -156,7 +156,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                     if (surface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
                         return 0;
                     int stride = desc.pitch / UnknownFunction511970(format);
-                    UnknownFunction4d1d20(desc.surface, bits, levelSide, levelHeight, stride, levelSide, field_0x20,
+                    ConvertPixels(desc.surface, bits, levelSide, levelHeight, stride, levelSide, field_0x20,
                                           sourceFormat, 0, palette, alphaThreshold, key);
                     if (surface->Unlock(0))
                         return 0;
@@ -203,7 +203,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
             UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * width * height);
             break;
         case 5:
-            bits = field_0x10->UnknownFunction511370(UnknownFunction511970(sourceFormat) * width * height + 4);
+            bits = field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(sourceFormat) * width * height + 4);
             if (!bits)
                 return 0;
             break;
@@ -236,7 +236,7 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
     for (; *formats; formats++) {
         field_0x20 = *formats;
         if (desc->flags & 0x1000)
-            UnknownFunction5119c0(field_0x20, &desc->pixelFormat);
+            FillPixelFormat(field_0x20, &desc->pixelFormat);
         if ((flags & 4 || g_TrackGame->renderTarget->UnknownVirtualSlot13(field_0x20)) &&
             !g_TrackGame->display->directDraw->CreateSurface(desc, &systemSurface, 0)) {
             float scale = 1.0f;
@@ -256,7 +256,7 @@ void PCTextureMap::UnknownVirtualSlot12() {
         UnknownVirtualSlot10();
         UnknownVirtualSlot8(1, 0, 0);
         if (g_UnknownGlobal689964)
-            field_0x10->UnknownFunction511580();
+            field_0x10->CountTextureMemory();
     }
 }
 
@@ -271,7 +271,7 @@ void PCTextureMap::UnknownVirtualSlot10() {
         textureSurface->Release();
         textureSurface = 0;
         if (g_UnknownGlobal689964)
-            field_0x10->UnknownFunction511580();
+            field_0x10->CountTextureMemory();
     }
 }
 
@@ -430,15 +430,15 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
         // Reading the description through a second name here makes VC6 load the height before
         // the width in the .tga branch's buffer size, as retail does.
         const UnknownSurfaceDesc& level = *desc;
-        UnknownFunction4245f0(&bitmap, level.surface, field_0x2c->field_0x010, level.width, level.height);
+        DescribeBitmap8(&bitmap, level.surface, field_0x2c->field_0x010, level.width, level.height);
         int length = strlen(path);
         int count = length > 0x7f ? 0x7f : length;
         strncpy(bitmap.name, path, count);
         bitmap.name[count] = 0;
-        UnknownFunction424380(&bitmap);
+        WriteBitmap(&bitmap);
     } else {
         void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
-        UnknownFunction4d1d20(pixels, desc->surface, desc->width, desc->height, desc->width,
+        ConvertPixels(pixels, desc->surface, desc->width, desc->height, desc->width,
                               desc->pitch / UnknownFunction511970(field_0x20), 8888, field_0x20, 0, 0, 0x80,
                               0xff00ff);
         WriteTga32(pixels, desc->width, desc->height, 0, path, 32);
@@ -476,7 +476,7 @@ int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
             if (texturePalette && field_0x20 == 8 && textureSurface->SetPalette(texturePalette))
                 goto failed;
             if (g_UnknownGlobal689964)
-                field_0x10->UnknownFunction511580();
+                field_0x10->CountTextureMemory();
         }
     }
     if (a && textureSurface != systemSurface)

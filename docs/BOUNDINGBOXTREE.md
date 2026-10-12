@@ -35,7 +35,7 @@ matched.
 
 Exact: 9 calibration cases. These are the constructor, the destructor and
 its deleting wrapper, slots 0-3, and the whole-word shifts `0x004238c0`
-and `0x00423940`. In `0x004238c0` the fill-only branch counts a separate
+(`ShiftTowardFront`) and `0x00423940` (`ShiftTowardBack`; provisional names). In `0x004238c0` the fill-only branch counts a separate
 `remaining = words` down (counting `words` itself swaps esi and edi). GR_BitString.h drops the inline `~GR_PixelString`. With it,
 VC6 gives `~GR_BitString` an EH frame that retail lacks. Near misses
 (`samples/render/GR_BitStringNearMisses.cpp`): the two sub-word shift

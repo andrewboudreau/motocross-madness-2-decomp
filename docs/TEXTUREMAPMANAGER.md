@@ -74,6 +74,17 @@ scalar deleting destructor and destructor, slots 7, 8, 11 and 19, and
 `0x00510820` (records a use: count, largest value up to 9, manager frame),
 `0x00510910`, `0x00510990` (log2 of the width) and `0x005109b0`.
 
+Provisional names from that behaviour: `UpdatePageCoords` `0x00510610`,
+`ReleasePage` `0x00510700`, `RemapTexCoords` `0x00510780`, `RecordUse`
+`0x00510820`, `RemapTexCoordsIfMoved` `0x00510910` and `SizeLevel`
+`0x00510990`. `0x00510670` keeps its address name because
+BikeNumberPainter.cpp calls it.
+Fields, from the same behaviour (each keeps its `// +0xNN`): `page`
+(+0x80), `pageScale` and `pageOffsetU`/`pageOffsetV` (+0x84..+0x8c),
+`group` (+0x90), `region` (+0x94), `useCount` and `largestUse`
+(+0xa0/+0xa4, written by `RecordUse`), `plannedLevel` and `wantedLevel`
+(+0xac/+0xb0, repacking) and `lastUseFrame` (+0xb8).
+
 ## ManagedTextureGroup
 
 RTTI: `ManagedTextureGroup : BaseObject` (vtable `0x005583c0`, 0x258 bytes).
@@ -132,7 +143,7 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   (declaration order, block scopes and memset order do not move them),
   `dropped = 0` is stored after the empty-list return, and the overlay rows
   rotate eax/ecx/edx, about 216 of 1600 instructions;
-- `0x0050ef70` (1834 bytes), the debug display for manager slot 15: the
+- `0x0050ef70` (1834 bytes, `DrawSelection`), the debug display for manager slot 15: the
   selected texture copied into the top right of the render target with
   its use and Un/Hi/Lo state, or the selected page with its textures and an
   outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Every
@@ -141,6 +152,17 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   Left: retail saves ebx/esi only after the first early return, reloads
   the page at the bottom of the texture loop and multiplies the outline's
   `left`/`top` as `fld [field]; fmul st(1)`; about 31 of 575 instructions.
+
+Provisional names from the behaviour their comments record: `SetPageCount`
+`0x0050c4a0`, `RepackPages` `0x0050c8c0` and the free function
+`FitTexturesToBudget` `0x0050d800`. `ClearUseRecords` `0x0050c760`, `RestoreLostPages`
+`0x0050c790` and `WriteDebugReport` `0x0050c7e0` (the `C:	emp\TM_debug.txt`
+report) follow the same header comments. The near-miss repacks are
+`RepackWholePages` `0x0050c960` and `RepackWithPartialBlits` `0x0050dad0`;
+the manager's memory count `0x00511580` is `CountTextureMemory`, and its
+grow-only scratch buffers `0x00511310`/`0x00511370` are `GrowScratchBuffer`
+and `GrowSecondScratchBuffer`. `0x0050c6c0` (adds a texture) keeps its
+address name because Cube.cpp, SoultreeMaterial.cpp and TextureMap.cpp call it.
 
 ## CacheTexture
 
@@ -171,6 +193,16 @@ per level (+0xd0, nine `ContainerList`s of 32). Exact:
   depth in ebp) follows the walk's initialisation order (`depth`, `first`,
   then `region`); the final walk reads a step's region before its index,
   which bases the strength-reduced step pointer at the index field.
+
+Provisional names from that behaviour: `ListTextures` `0x0050f890`,
+`CollectOccupants` `0x0050f8e0`, `ReserveRegions` `0x0050f9b0`, `EmptyPage`
+`0x0050fc40`, `FirstQuarter` `0x0050fc60`, `EvictRegion` `0x0050fc90`,
+`FreeQuarters` `0x0050fd60`, `PlaceTextures` `0x0050fdb0`, `SplitRegion`
+`0x0050ffa0`, `ReleaseRegion` `0x00510120`, `PlaceTexture` `0x00510250`,
+`RemoveTexture` `0x005102b0` and `CopyMipLevels` `0x005102d0`; fields
+`ownerGroup` (+0x80), `rootRegion` (+0x84), `freeLeafCounts` (+0x88),
+`reservedLeafCounts` (+0xac), `reservedLeaves` (+0xd0) and `texelCount`
+(+0x184).
 
 Two recurring VC6 shapes: chained assignments (`a = b = 0`) give retail's
 reversed store order, and the region `Init` helper is inlined wherever a

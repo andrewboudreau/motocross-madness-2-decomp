@@ -1,7 +1,7 @@
 // Near-miss CacheTexture candidates, kept out of src/reconstructed until they
 // match. See docs/TEXTUREMAPMANAGER.md.
 //
-// CacheTexture::UnknownFunction5102d0 (0x005102d0, 558 bytes): blits the
+// CacheTexture::CopyMipLevels (0x005102d0, 558 bytes): blits the
 // occupant's mip levels into its region. Everything lines up except that
 // retail places the shared `return 0` block between the second loop and the
 // overlay check (its loop ends `jle; jmp top`); VC6 here puts it after the
@@ -23,8 +23,8 @@ static inline int LevelArea(int level) {
 }
 
 // 0x005102d0
-int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level) {
-    region->field_0x14->UnknownFunction510610(level);
+int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
+    region->field_0x14->UpdatePageCoords(level);
     float scale = 1.0f / (1 << level);
     int width = field_0x14;
     UnknownRect rect;
@@ -55,7 +55,7 @@ int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level)
         while (sourceSide > 0) {
             if (destination->Blt(&rect, source, 0, 0x1000000, 0))
                 return 0;
-            field_0x80->field_0x1d0 += (rect.bottom - rect.top) * (rect.right - rect.left);
+            ownerGroup->field_0x1d0 += (rect.bottom - rect.top) * (rect.right - rect.left);
             long sourceResult = source->GetAttachedSurface(&caps, &nextSource);
             long destinationResult = destination->GetAttachedSurface(&caps, &nextDestination);
             if (sourceResult || destinationResult)

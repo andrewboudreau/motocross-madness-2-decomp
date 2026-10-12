@@ -137,6 +137,31 @@ frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
 - Boolean values computed with `fcompp` come out in the inverted sense in
   retail: `(lhs <= rhs) == (p.z >= a->z)`, not `(lhs > rhs) != ...`.
 
+## Field names
+
+Track.h's fields are named from the uses its comments record (tier 3 names,
+tier 1 offsets; each keeps its `// +0xNN`): the node's `flags`,
+`pathLength`, `firstSegment`, `lastSegment`, `linkCount` and `links`; the
+segment's `horizontalLength`, `previous` and `next`; the work-list entry's
+`flags` and `node`; and Track's `startNode` and `lapLength`. The segment's
+point and edge coordinates (+0x00..+0x20) keep offset names. Physics keeps
+its own views (`KbTrack` and the list entry in KrustyBikeTypes.h). The
+renames changed no calibration bytes.
+
+## Function names
+
+Provisional names taken from the behaviour each function's comment records:
+`FreeNodeArray` `0x00515e70`, `FreeNode` `0x00516800`, `FreeReachableNodes`
+`0x00516870`, `NodeHasSegment` `0x00517310` and `IsAtOrAfter` `0x005179a0`;
+the near misses `ClosestPointOnTrack` `0x00516980` and `IsInsideStrip`
+`0x00516ef0`, and `ClosestPointOnNode` `0x00516ca0` and `PlaceNear`
+`0x00517340` (physics' own views keep the address names). The high-score
+lister `0x0051ffe0` keeps its placeholder because TrackRecord.cpp calls it.
+The path and distance helpers `0x00517930`, `0x005179f0`, `0x00517da0`,
+`0x00517ea0`, `0x00518080`, `0x00518130` and `0x00518230` keep their address
+names because physics declarations (`src/krusty2/vehicle/KrustyBikeTypes.h`)
+call them. The file loader `0x00515ed0` is `LoadTrack`.
+
 ## Reproduce
 
 ```bash

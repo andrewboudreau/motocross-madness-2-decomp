@@ -179,6 +179,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00519000` `IsPointVisible`
 - `0x005198a0` `Redraw`
 - `0x00519e10` `DrawTimeLeft`
+- `0x00519ef0` `DrawViewModePanel`
 - `0x0051a480` `DrawLapTime`
 - `0x0051a560` `DrawRacePanel`
 - `0x0051aa40` `DrawTagStandings`
@@ -198,3 +199,29 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0051eaf0` `GetLineTail`
 - `0x0051eb10` `GetHistory`
 - `0x0051eb40` `AddHistory`
+- `0x00519a20` `DrawStandings` (near-miss sample)
+- `0x0051baf0` `TakeRacers` and `0x0051d730` `CollectRacers` (the loader
+  sample keeps its own address-named declarations)
+- `0x0051da30` `ChatOverlay::HandleChatKey` (BikeRace.h's view of +0x19c uses the same name)
+- `0x0051dd40` `ChatOverlay::HideInputLine` (also in BikeRace.h's view); its
+  neighbour `0x0051dd10` (shows the line) stays address-named because
+  QuarryStuntEvent.cpp declares it
+
+## Field names
+
+Named from what the loaders create and the draw functions use (tier 3;
+each declaration keeps its `// +0xNN`): StatsOverlay `largeFont` (+0x11c,
+`lfHeight` 16, rows 0-1) and `smallFont` (+0x120, height 12, the other
+rows); ChatOverlay `pen` (+0x11c, `CreatePen(0, 3, 0xc0c0c0)`), `chatFont`
+(+0x120, height 9, RedrawChat), `nameTagFont` (+0x124, height 10,
+DrawNameTag), `racerCount` (+0x198, the `racers` fill count) and
+`leftPanel`/`rightPanel` (+0x1c8/+0x1cc, the overlays attached left and
+right of `chatRect` when the screen is wider than 512); NameOverlay
+`drawWidth` (+0x124, the width of its screen rectangle).
+RadarOverlay (from DrawRacers, `0x0051bed0`, and WorldToMap): `mapOrigin`
+(+0x17c, the followed racer's position), `mapAngle` (+0x188, its negated
+heading), `heldMapAngle` (+0x18c, the angle kept while the racer's +0x444 is
+set), `mapAngleCos`/`mapAngleSin` (+0x190/+0x194) and `lineStart`/`lineEnd`
+(+0x1b8/+0x1d8, the two-vertex line strip DrawGates and DrawTrackOutline
+submit). +0x170 (the followed racer's index) keeps its offset name because
+QuarryStuntEvent.cpp reads it.

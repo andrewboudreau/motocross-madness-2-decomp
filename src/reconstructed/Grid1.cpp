@@ -30,8 +30,8 @@ DrawableGridNodeSharedTextures::DrawableGridNodeSharedTextures(UnknownTextureStr
     : DrawableGridNode((int)stream, a1, parent, terrain, level, shift, x, z, index, (int)boundsMin,
                        (int)boundsMax)
 {
-    UnknownFunction47e600(stream, a1, (DrawableGridNode*)parent, level, shift, x, z, index, boundsMin,
-                          boundsMax);
+    ReadNode(stream, a1, (DrawableGridNode*)parent, level, shift, x, z, index, boundsMin,
+             boundsMax);
 }
 
 // 0x0047c960
@@ -80,7 +80,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
 
     float detail;
     if (block != -1) {
-        float distance = UnknownFunction481b30(block);
+        float distance = BlockDistance(block);
         if (distance != 0.0f)
             Extra()->blocks[block].detail =
                 (float)((16 << shift) * Terrain()->field_0x70) / (distance * 4.0f);
@@ -106,7 +106,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
         fraction = 0.0f;
     if (!(texture->field_0x68 & 1))
         return;
-    texture->UnknownFunction510820(level + 1 + fraction);
+    texture->RecordUse(level + 1 + fraction);
 
     int count = g_gridTextureCount;
     int i;

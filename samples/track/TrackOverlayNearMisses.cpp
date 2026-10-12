@@ -13,14 +13,14 @@
 // Declaration order, operand order of the distance sums and the store order
 // of the result do not change it.
 
-// ChatOverlay::UnknownFunction51d730 (0x0051d730, 586 bytes, 44%): the
+// ChatOverlay::CollectRacers (0x0051d730, 586 bytes, 44%): the
 // candidate is 587 bytes with the same instructions. Retail keeps the zero
 // in ebx and the incremented count in ebp; VC6 here swaps them, which
 // shifts later register choices. The racer loop written as in RadarOverlay
 // 0x0051baf0, a post-increment index, a for loop and every order of the
 // three initial assignments do not change it.
 
-// StatsOverlay::UnknownFunction519a20 (0x00519a20, 1002 bytes): written
+// StatsOverlay::DrawStandings (0x00519a20, 1002 bytes): written
 // like the exact 0x0051aa40, the candidate is 1004 bytes. Retail keeps the
 // row-comparison index in edx and `this` in its spill slot; VC6 here does so
 // only when the index is read after the loop (the `row < i` test below),
@@ -183,33 +183,33 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
 }
 
 // 0x0051d730
-int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
+int ChatOverlay::CollectRacers(UnknownChatView* view)
 {
     int iterator;
     UnknownChatRacer* racer;
-    field_0x198 = 0;
+    racerCount = 0;
     iterator = 0;
     chatView = view;
     while ((racer = chatView->UnknownFunction4204e0(&iterator)) != 0) {
-        racers[field_0x198] = racer;
-        field_0x198++;
+        racers[racerCount] = racer;
+        racerCount++;
     }
-    for (int i = 0; i < field_0x198; i++) {
+    for (int i = 0; i < racerCount; i++) {
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
             Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
-        nameTags[field_0x198] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
-            Target(), overlayTexture, &nameTagRects[field_0x198], 0, &nameTagRects[field_0x198], 0,
+        nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
+            Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
-        AppendChild(nameTags[field_0x198], -1);
-        if (nameTags[field_0x198]) {
-            nameTags[field_0x198]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
-            nameTags[field_0x198]->UnknownVirtualSlot4();
-            field_0x160 = nameTagRects[field_0x198].right;
-            nameTags[field_0x198]->field_0x124 = 0;
+        AppendChild(nameTags[racerCount], -1);
+        if (nameTags[racerCount]) {
+            nameTags[racerCount]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
+            nameTags[racerCount]->UnknownVirtualSlot4();
+            field_0x160 = nameTagRects[racerCount].right;
+            nameTags[racerCount]->drawWidth = 0;
         }
     }
     UnknownFunction51e910(-1);
@@ -219,7 +219,7 @@ int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
 // 0x00519a20: the standings, best score first: the time left (as a label),
 // then a row per racer that is shown, ending with the player's own row.
 // Draws only when a row changed.
-int StatsOverlay::UnknownFunction519a20()
+int StatsOverlay::DrawStandings()
 {
     UnknownEventScore scores[11];
     char time[0x80];
@@ -287,7 +287,7 @@ int StatsOverlay::UnknownFunction519a20()
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
     SetTextColor(dc, 0xffffff);
-    font = SelectObject(dc, field_0x11c);
+    font = SelectObject(dc, largeFont);
     for (i = 0; i <= row; i++) {
         if (i == 0)
             GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
@@ -379,9 +379,9 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
         face = "Small Fonts";
     }
     strcpy(logFont.lfFaceName, face);
-    field_0x11c = CreateFontIndirectA(&logFont);
+    largeFont = CreateFontIndirectA(&logFont);
     logFont.lfHeight = 12;
-    field_0x120 = CreateFontIndirectA(&logFont);
+    smallFont = CreateFontIndirectA(&logFont);
     rowRects[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
     rowRects[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
     rowRects[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
@@ -401,22 +401,22 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
     char name[0x80];
     int length;
     UnknownTextExtent size;
-    void* font = SelectObject(dc, field_0x124);
-    if (index == field_0x198) {
+    void* font = SelectObject(dc, nameTagFont);
+    if (index == racerCount) {
         sprintf(text, "%s", playerName);
         length = strlen(text);
         UnknownOverlayRect rect = nameTagRects[index];
-        rect.left += nameTags[index]->field_0x124;
+        rect.left += nameTags[index]->drawWidth;
         DrawTextA(dc, text, length, &rect, 0x8124);
         UnknownTextExtent size;
         GetTextExtentPoint32A(dc, text, length, &size);
-        nameTags[index]->field_0x124 += size.cx;
+        nameTags[index]->drawWidth += size.cx;
         nameTags[index]->sourceRect = nameTagRects[index];
-        if (nameTags[index]->field_0x124 + 4 < nameTags[index]->sourceWidth) {
-            nameTags[index]->field_0x124 += 4;
-            nameTags[index]->sourceRect.right = nameTags[index]->field_0x124 + nameTags[index]->sourceRect.left - 1;
+        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->drawWidth += 4;
+            nameTags[index]->sourceRect.right = nameTags[index]->drawWidth + nameTags[index]->sourceRect.left - 1;
         } else {
-            nameTags[index]->field_0x124 = nameTags[index]->sourceWidth;
+            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
         }
     } else {
         if (s_UnknownGlobal68a444) {
@@ -441,16 +441,16 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
         }
         length = strlen(text);
         GetTextExtentPoint32A(dc, text, length, &size);
-        nameTags[index]->field_0x124 = size.cx;
+        nameTags[index]->drawWidth = size.cx;
         DrawTextA(dc, text, length, &nameTagRects[index], 0x8125);
         nameTags[index]->sourceRect = nameTagRects[index];
-        if (nameTags[index]->field_0x124 + 4 < nameTags[index]->sourceWidth) {
-            nameTags[index]->field_0x124 += 4;
-            int margin = (nameTags[index]->sourceWidth - nameTags[index]->field_0x124) >> 1;
+        if (nameTags[index]->drawWidth + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->drawWidth += 4;
+            int margin = (nameTags[index]->sourceWidth - nameTags[index]->drawWidth) >> 1;
             nameTags[index]->sourceRect.left += margin;
             nameTags[index]->sourceRect.right += 1 - margin;
         } else {
-            nameTags[index]->field_0x124 = nameTags[index]->sourceWidth;
+            nameTags[index]->drawWidth = nameTags[index]->sourceWidth;
         }
     }
     SelectObject(dc, font);
@@ -469,19 +469,19 @@ void RadarOverlay::DrawTrackOutline(int mode)
 {
     TrackListItem* list = 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
-    item->field_0x04 = ((UnknownRadarView*)radarView)->field_0x48->field_0x00;
+    item->node = ((UnknownRadarView*)radarView)->field_0x48->startNode;
     item->field_0x0c = list;
     list = item;
     while (list) {
-        TrackNode*& node = list->field_0x04;
-        if (node->field_0x00 & 4) {
-            node->field_0x00 &= ~4;
+        TrackNode*& node = list->node;
+        if (node->flags & 4) {
+            node->flags &= ~4;
             item = list;
             list = list->field_0x0c;
             DebugFree(item, __FILE__, 2001);
         } else {
-        node->field_0x00 |= 4;
-        TrackSegment* first = node->field_0x08;
+        node->flags |= 4;
+        TrackSegment* first = node->firstSegment;
         Vector3 point;
         if (mode == 1)
             point = *(Vector3*)&first->field_0x18;
@@ -491,13 +491,13 @@ void RadarOverlay::DrawTrackOutline(int mode)
         int startY;
         float rim[2];
         int outside = WorldToMap(point, &startX, &startY, &rim[0], &rim[1]);
-        field_0x1b8.sx = (float)startX;
-        field_0x1b8.sy = (float)startY;
-        field_0x1b8.color = 0xedea5e;
-        field_0x1d8.color = 0xedea5e;
+        lineStart.sx = (float)startX;
+        lineStart.sy = (float)startY;
+        lineStart.color = 0xedea5e;
+        lineEnd.color = 0xedea5e;
         int x = startX;
         int y = startY;
-        TrackSegment* segment = first->field_0x2c;
+        TrackSegment* segment = first->next;
         if (segment) do {
             if (mode == 1)
                 point = *(Vector3*)&segment->field_0x18;
@@ -510,8 +510,8 @@ void RadarOverlay::DrawTrackOutline(int mode)
             outside = WorldToMap(point, &x, &y, &rim[0], &rim[1]);
             if (outside) {
                 if (wasOutside) {
-                    field_0x1b8.sx = (float)x;
-                    field_0x1b8.sy = (float)y;
+                    lineStart.sx = (float)x;
+                    lineStart.sy = (float)y;
                 } else {
                     float to[2];
                     float circle[3];
@@ -522,10 +522,10 @@ void RadarOverlay::DrawTrackOutline(int mode)
                     circle[0] = (float)mapCenterX;
                     circle[1] = (float)mapCenterY;
                     if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
-                        field_0x1d8.sx = hit[0];
-                        field_0x1d8.sy = hit[1];
-                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-                        field_0x1b8 = field_0x1d8;
+                        lineEnd.sx = hit[0];
+                        lineEnd.sy = hit[1];
+                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                        lineStart = lineEnd;
                     }
                 }
             } else if (wasOutside) {
@@ -538,30 +538,30 @@ void RadarOverlay::DrawTrackOutline(int mode)
                 circle[0] = (float)mapCenterX;
                 circle[1] = (float)mapCenterY;
                 if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
-                    field_0x1b8.sy = hit[1];
-                    field_0x1d8.sy = (float)y;
-                    field_0x1d8.sx = (float)x;
-                    field_0x1b8.sx = hit[0];
-                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-                    field_0x1b8 = field_0x1d8;
+                    lineStart.sy = hit[1];
+                    lineEnd.sy = (float)y;
+                    lineEnd.sx = (float)x;
+                    lineStart.sx = hit[0];
+                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                    lineStart = lineEnd;
                 }
             } else {
-                field_0x1d8.sx = (float)x;
-                field_0x1d8.sy = (float)y;
-                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-                field_0x1b8 = field_0x1d8;
+                lineEnd.sx = (float)x;
+                lineEnd.sy = (float)y;
+                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                lineStart = lineEnd;
             }
-            segment = segment->field_0x2c;
-            if (segment == node->field_0x08) {
-                field_0x1d8.sx = (float)startX;
-                field_0x1d8.sy = (float)startY;
+            segment = segment->next;
+            if (segment == node->firstSegment) {
+                lineEnd.sx = (float)startX;
+                lineEnd.sy = (float)startY;
                 break;
             }
         } while (segment);
-        for (int i = 0; i < node->field_0x10; i++) {
-            if (!(node->field_0x14[i]->field_0x00 & 4)) {
+        for (int i = 0; i < node->linkCount; i++) {
+            if (!(node->links[i]->flags & 4)) {
                 item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 2094);
-                item->field_0x04 = node->field_0x14[i];
+                item->node = node->links[i];
                 item->field_0x0c = list;
                 list = item;
             }
@@ -617,20 +617,20 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         rect.left -= largeLayout ? 38 : 19;
         source.right = largeLayout ? 38 : 19;
         source.bottom = largeLayout ? 137 : 103;
-        field_0x1c8 = new (__FILE__, 2284) Overlay(0, 1);
-        field_0x1c8->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        AppendChild(field_0x1c8, -1);
+        leftPanel = new (__FILE__, 2284) Overlay(0, 1);
+        leftPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
+        AppendChild(leftPanel, -1);
         source.left += largeLayout ? 38 : 19;
         source.top = 69;
         source.right += largeLayout ? 38 : 19;
         source.bottom = largeLayout ? 137 : 103;
         rect.left = chatRect.right;
         rect.right = chatRect.right + (largeLayout ? 38 : 19);
-        field_0x1cc = new (__FILE__, 2294) Overlay(0, 1);
-        field_0x1cc->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        AppendChild(field_0x1cc, -1);
+        rightPanel = new (__FILE__, 2294) Overlay(0, 1);
+        rightPanel->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
+        AppendChild(rightPanel, -1);
     }
-    field_0x11c = CreatePen(0, 3, 0xc0c0c0);
+    pen = CreatePen(0, 3, 0xc0c0c0);
     logFont.lfHeight = 9;
     logFont.lfWidth = 0;
     logFont.lfEscapement = 0;
@@ -652,11 +652,11 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         logFont.lfWeight = 400;
         strcpy(logFont.lfFaceName, "Lucida Console");
     }
-    field_0x120 = CreateFontIndirectA(&logFont);
+    chatFont = CreateFontIndirectA(&logFont);
     if (*face == '\0')
         strcpy(logFont.lfFaceName, "Small Fonts");
     logFont.lfHeight = 10;
-    field_0x124 = CreateFontIndirectA(&logFont);
+    nameTagFont = CreateFontIndirectA(&logFont);
     nameTagRects[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
     nameTagRects[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
     nameTagRects[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
@@ -685,18 +685,18 @@ void RadarOverlay::DrawRacers(int mode)
     Vector3 point;
     for (i = 0; i < racerCount; i++) {
         if (racers[i] == radarCamera->followedRacer) {
-            field_0x17c = racers[i]->field_0x00c;
-            field_0x188 = -racers[i]->field_0x050;
+            mapOrigin = racers[i]->field_0x00c;
+            mapAngle = -racers[i]->field_0x050;
             if (racers[i]->field_0x444)
-                field_0x188 = field_0x18c;
+                mapAngle = heldMapAngle;
             else
-                field_0x18c = field_0x188;
+                heldMapAngle = mapAngle;
             field_0x170 = i;
             break;
         }
     }
-    field_0x190 = cos(field_0x188);
-    field_0x194 = sin(field_0x188);
+    mapAngleCos = cos(mapAngle);
+    mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
         if (i != field_0x170 && racers[i]->field_0x25_bit0) {
             outside = WorldToMap(racers[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
@@ -731,25 +731,25 @@ void RadarOverlay::DrawRacers(int mode)
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
                     g_TrackGame->mode.field_0x27f8.field_0x04 == 2)
                     continue;
-                field_0x1b8.color = 0x28aa28;
-                field_0x1d8.color = 0x28aa28;
-                field_0x1b8.sx = rim.x;
-                field_0x1b8.sy = rim.y;
+                lineStart.color = 0x28aa28;
+                lineEnd.color = 0x28aa28;
+                lineStart.sx = rim.x;
+                lineStart.sy = rim.y;
             } else {
-                field_0x1b8.color = 0x50e650;
-                field_0x1d8.color = 0x50e650;
-                field_0x1b8.sx = (float)x;
-                field_0x1b8.sy = (float)y;
+                lineStart.color = 0x50e650;
+                lineEnd.color = 0x50e650;
+                lineStart.sx = (float)x;
+                lineStart.sy = (float)y;
             }
-            field_0x1d8 = field_0x1b8;
-            field_0x1d8.sx += 3.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-            field_0x1b8.sy += 1.0f;
-            field_0x1d8.sy += 1.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
-            field_0x1b8.sy -= 2.0f;
-            field_0x1d8.sy -= 2.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
+            lineEnd = lineStart;
+            lineEnd.sx += 3.0f;
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            lineStart.sy += 1.0f;
+            lineEnd.sy += 1.0f;
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            lineStart.sy -= 2.0f;
+            lineEnd.sy -= 2.0f;
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
         } else {
             point.x = -1.0f;
             point.y = -1.0f;

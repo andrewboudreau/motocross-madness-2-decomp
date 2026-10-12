@@ -29,7 +29,7 @@ VehicleCamera::~VehicleCamera() {}
 VehicleCamera* VehicleCamera::UnknownFunction52b9e0(void* value, float rate294, float rate298, float value228,
                                                     float value2d0, float value2e8, int capacity, int count,
                                                     const int* list) {
-    if (!UnknownFunction463140(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+    if (!SetupFollowCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
         return 0;
     return this;
 }
@@ -62,7 +62,7 @@ Vector3 VehicleCamera::UnknownFunction52bac0() {
 // 0x0052bb60: part 0 of the vehicle's +0x3bc in vehicle mode; else the first
 // target's model (its +0x140 child when set), the second target's +0x34
 // translation, the +0x38c translation, or the global default.
-Vector3 VehicleCamera::UnknownFunction52bb60() {
+Vector3 VehicleCamera::TargetPoint() {
     Vector3 position;
     if (vehicleMode) {
         vehicle->field_0x3bc->UnknownFunction4fc9a0(0, &position);
@@ -77,11 +77,11 @@ Vector3 VehicleCamera::UnknownFunction52bb60() {
         return position;
     }
     if (field_0x388) {
-        field_0x388->field_0x34->UnknownFunction4fc970(&position);
+        field_0x388->field_0x34->GetPosition(&position);
         return position;
     }
     if (field_0x38c) {
-        field_0x38c->UnknownFunction4fc970(&position);
+        field_0x38c->GetPosition(&position);
         return position;
     }
     return kVec3Zero;
@@ -94,7 +94,7 @@ Vector3 VehicleCamera::UnknownFunction52bc50() {
         return vehicle->field_0x488;
     }
     if (!field_0x391) {
-        field_0x3a4 = UnknownFunction52bb60();
+        field_0x3a4 = TargetPoint();
         field_0x391 = 1;
     }
     return field_0x3a4;
@@ -116,23 +116,23 @@ void VehicleCamera::UnknownVirtualSlot68() {
     Vector3 base = UnknownFunction52bc50();
     float lead = (float)(heading.y * 0.0310559f) * 1.5f;
     Vector3 side(heading.z, 0.0f, -heading.x);
-    field_0x170 = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
-    field_0x240->UnknownFunction507c10(&field_0x170, 0, 0, 0);
+    eyePosition = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
+    field_0x240->UnknownFunction507c10(&eyePosition, 0, 0, 0);
     if (heading.y > 10.0f)
         base.y += (heading * lead).y * 0.19f;
     if (vehicleMode) {
-        float low = field_0x170.y + 7.0f;
+        float low = eyePosition.y + 7.0f;
         float high = base.y - 1.0f;
-        field_0x170.y = high > low ? high : low;
+        eyePosition.y = high > low ? high : low;
     } else {
-        float low = field_0x170.y + 21.0f;
+        float low = eyePosition.y + 21.0f;
         float high = base.y - 1.0f;
-        field_0x170.y = high > low ? high : low;
+        eyePosition.y = high > low ? high : low;
     }
     Vector3 target = targetPoint;
     target.y += 3.0f;
-    float dx = FollowCameraAbs(field_0x170.x - target.x);
-    float dz = FollowCameraAbs(field_0x170.z - target.z);
+    float dx = FollowCameraAbs(eyePosition.x - target.x);
+    float dz = FollowCameraAbs(eyePosition.z - target.z);
     float closeness = (200.0f - UnknownFunction460b50(dx * dx + dz * dz)) * 0.0055555557f;
     field_0x258 = closeness * 60.0f + 10.0f;
     if (field_0x258 < 10.0f)
@@ -145,7 +145,7 @@ void VehicleCamera::UnknownVirtualSlot68() {
 // 0x0052ca10: 0x0052bb60's position, led by the tracked point (slot 33)
 // scaled by dt (at most 0.2) while the camera is free to follow.
 Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
-    Vector3 result = UnknownFunction52bb60();
+    Vector3 result = TargetPoint();
     if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
         if (vehicleMode) {
             if (!vehicle->field_0x444) {
@@ -255,11 +255,11 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
         if (field_0x384) {
             UnknownVehiclePart* model = field_0x384->field_0x1a0;
             if (model->field_0x140)
-                model->field_0x140->UnknownFunction4fc4f0(&heading, &other);
+                model->field_0x140->GetAxes(&heading, &other);
             else
-                model->UnknownFunction4fc4f0(&heading, &other);
+                model->GetAxes(&heading, &other);
         } else if (field_0x388) {
-            field_0x388->field_0x34->UnknownFunction4fc4f0(&heading, &other);
+            field_0x388->field_0x34->GetAxes(&heading, &other);
         } else {
             heading = kVec3ZAxis;
         }

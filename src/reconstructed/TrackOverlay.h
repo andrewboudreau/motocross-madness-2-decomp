@@ -128,7 +128,7 @@ public:
 
     UnknownEventRacer* trackedRacer;
     int sourceWidth;                          // source width
-    int field_0x124;
+    int drawWidth;                            // +0x124 drawn width (screen rectangle; ChatOverlay sets it)
     int sourceHeight;                         // source height
     UnknownNameOverlayWorld* world;
     int testPhase;                            // phase of the every-fourth-frame test
@@ -184,15 +184,15 @@ public:
     void UnknownFunction464e80(int index);
     int UnknownFunction519880(int value);     // 0x00519880
     int Redraw();                             // 0x005198a0
-    int UnknownFunction519a20();              // 0x00519a20
+    int DrawStandings();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10
-    int UnknownFunction519ef0();              // 0x00519ef0
+    int DrawViewModePanel();              // 0x00519ef0
     void DrawLapTime();                       // 0x0051a480
     int DrawRacePanel();                      // 0x0051a560
     int DrawTagStandings();                   // 0x0051aa40
 
-    void* field_0x11c;                        // GDI object (DeleteObject)
-    void* field_0x120;                        // GDI object (DeleteObject)
+    void* largeFont;                          // +0x11c 16-high font, rows 0-1 (0x005194b0; DeleteObject)
+    void* smallFont;                          // +0x120 12-high font, the other rows (DeleteObject)
     UnknownStatsSource* statsSource;          // set by 0x00519880; read when TrackGame+0x3428 is set
     UnknownInstrumentSource* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
@@ -254,7 +254,7 @@ public:
     // top and right edges are read).
     RadarOverlay* UnknownFunction51b840(RenderTarget* target, TextureMapManager* manager, int a3,
                                         UnknownOverlayRect screen);
-    int UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
+    int TakeRacers(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
     void DrawFrameRate();                     // 0x0051bdc0: frame-rate readout
     // 0x0051bed0: places every racer's name tag and draws its map dot, then
@@ -294,18 +294,18 @@ public:
     int field_0x170;
     int field_0x174;
     int largeMap;                             // uses the 256-pixel map
-    Vector3 field_0x17c;
-    float field_0x188;
-    float field_0x18c;
-    float field_0x190;
-    float field_0x194;
+    Vector3 mapOrigin;                        // +0x17c
+    float mapAngle;                           // +0x188
+    float heldMapAngle;                       // +0x18c
+    float mapAngleCos;                        // +0x190
+    float mapAngleSin;                        // +0x194
     float mapScale;                           // map scale
     float mapRadius;                          // map radius, pixels
     int mapCenterX;                           // map centre
     int mapCenterY;
     UnknownOverlayRect frameRateRect;         // frame-rate text rectangle
-    UnknownOverlayVertex field_0x1b8;
-    UnknownOverlayVertex field_0x1d8;
+    UnknownOverlayVertex lineStart;           // +0x1b8
+    UnknownOverlayVertex lineEnd;             // +0x1d8
     UnknownOverlayRect mapRect;               // map rectangle
 };
 
@@ -419,16 +419,16 @@ public:
                                        UnknownOverlayRect screen, UnknownOverlayRect cue);
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.
-    int UnknownFunction51d730(UnknownChatView* view);
+    int CollectRacers(UnknownChatView* view);
     void UnknownFunction51d980(int show);     // 0x0051d980
     // 0x0051da30 (bikerace.cpp 0x0041f5b1): a typed key; Enter sends the
     // line as network message 0x85, Escape sets *result.
-    int UnknownFunction51da30(int key, int* result);
+    int HandleChatKey(int key, int* result);
     void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void UnknownFunction51dd10();             // 0x0051dd10: shows the input line
-    void UnknownFunction51dd40();             // 0x0051dd40: hides it
+    void HideInputLine();             // 0x0051dd40: hides it
     void UnknownFunction51dd70(const char* name, int a2, int a3); // 0x0051dd70: a2 is the text (0x0051eb40)
     // 0x0051de10: redraws the input line and the history; 0 when the
     // surface's device context is not available.
@@ -438,9 +438,9 @@ public:
     void RedrawNameLine();                    // 0x0051e800: redraws the name line
     void UnknownFunction51e910(int index);    // 0x0051e910: redraws one name tag, or all (-1)
 
-    void* field_0x11c;                        // GDI object (DeleteObject)
-    void* field_0x120;                        // GDI object (DeleteObject)
-    void* field_0x124;                        // GDI object (DeleteObject)
+    void* pen;                                // +0x11c CreatePen(0, 3, 0xc0c0c0) in 0x0051cf80 (DeleteObject)
+    void* chatFont;                           // +0x120 9-high font, selected by RedrawChat (DeleteObject)
+    void* nameTagFont;                        // +0x124 10-high font, selected by DrawNameTag (DeleteObject)
     UnknownChatCamera* chatCamera;
     UnknownChatView* chatView;
     float timeSum;                            // time summed
@@ -453,10 +453,10 @@ public:
     int field_0x164;
     int nameChanged;                          // name changed
     UnknownChatRacer* racers[11];
-    int field_0x198;                          // name tag index
-    int lastRacerValues[11];                  // field_0x16c[i]->field_0x784 last seen
-    Overlay* field_0x1c8;                     // side panels on wide screens (0x0051cf80)
-    Overlay* field_0x1cc;
+    int racerCount;                           // +0x198 entries in racers; also the extra name tag's index
+    int lastRacerValues[11];                  // racers[i]->field_0x784 last seen
+    Overlay* leftPanel;                       // +0x1c8 side panel left of chatRect on wide screens (0x0051cf80)
+    Overlay* rightPanel;                      // +0x1cc side panel right of chatRect
     float field_0x1d0;
     char playerName[0x104];                   // name
     NameOverlay* nameTags[13];

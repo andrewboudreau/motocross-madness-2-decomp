@@ -70,19 +70,19 @@ public:
     void UnknownFunction4fe0a0(Vector3* a, Vector3* b);            // 0x004fe0a0
     void UnknownFunction4fe0f0();                                  // 0x004fe0f0
     void UpdateWorldMatrix();                                      // 0x004fb4f0: world matrix
-    Vector3 UnknownFunction4fd660(const Vector3& p);               // 0x004fd660: local -> world point
+    Vector3 LocalToWorldPoint(const Vector3& p);               // 0x004fd660: local -> world point
     void RegisterNode();                                           // 0x004fedb0: registers the node
     // Seen from Krusty3DObjects.cpp (src/krusty2/core/SoultreeObject.h
     // describes the same functions): 0x004fc690 (ret 0x10) moves the node
     // by `delta` in `frame`, 0x004fd090 (ret 0x10) sets the rotation about
     // the axis (x, y, z), 0x004fd910 (ret 4) appends `child`, 0x004fd990
     // (ret 4) unlinks `child`.
-    void UnknownFunction4fc690(SoultreeObject* frame, Vector3 delta);
+    void TranslateIn(SoultreeObject* frame, Vector3 delta);
     void UnknownFunction4fd090(float x, float y, float z, float angle);
     void AddChild(SoultreeObject* child);
     void UnknownFunction4fd990(SoultreeObject* child);
 
-    char field_0x038[0x80];                    // name
+    char nodeName[0x80];                       // +0x038 name (krusty2 SoultreeObject::FindByName compares it)
     Matrix4 localMatrix;                       // local matrix
     Matrix4 worldMatrix;                       // world matrix
     int worldValid;                            // world matrix valid
@@ -92,13 +92,13 @@ public:
     unsigned char field_0x148[0x14c - 0x148];
     int field_0x14c;                           // Krusty3DObjects.cpp: hidden
     int boundsFound;                           // bounds found (slot 5)
-    int field_0x154;                           // bounds valid
-    Vector3 field_0x158;                       // bounds centre
-    Vector3 field_0x164;                       // bounds half extent
+    int localBoundsValid;                      // +0x154 local bounds valid
+    Vector3 localBoundsCenter;                 // +0x158 local bounds centre
+    Vector3 localBoundsHalfExtent;             // +0x164 local bounds half extent
     int field_0x170;                           // Krusty3DObjects.cpp 0x0048c8a0 sets 1
-    Vector3 field_0x174;                       // Krusty3DObjects.cpp 0x0048c8a0
-    Vector3 field_0x180;                       // Krusty3DObjects.cpp 0x0048c8a0
-    int field_0x18c;                           // subtree dirty
+    Vector3 subtreeBoundsCenter;               // +0x174 subtree bounds centre (0x004fe0f0; Krusty3DObjects.cpp 0x0048c8a0)
+    Vector3 subtreeBoundsHalfExtent;           // +0x180 subtree bounds half extent (0x004fe0f0)
+    int subtreeDirty;                          // +0x18c subtree bounds dirty (set up the parent chain by 0x004fdab0)
     int field_0x190;                           // slot 12 tests it before the visibility test
     unsigned char field_0x194[0x1a0 - 0x194];
     UnknownParameterBlock* parameterBlock;     // .slt reader
@@ -240,14 +240,14 @@ public:
 
     // Not reconstructed: 0x00440810, the drawing function 0x00440f30, slot
     // 12 and 0x00443de0 (see samples/render/D3DIMSoulTreeNearMisses.cpp).
-    void UnknownFunction440810();                  // 0x00440810
+    void UpdateMaterialTexelRatios();                  // 0x00440810
     void TransformVertexGroups(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
     void DrawCurrentLod();                         // 0x00440f30: draws the current level of detail
     void SelectLod(Vector3* center, Vector3* extents);             // 0x00443de0 (ret 8): picks the level of detail
     void UnknownFunction4439c0(UnknownSoultreeCounters* counters); // 0x004439c0 (ret 4)
     void ComputeSubtreeBounds();                   // 0x004434b0: bounding boxes of the subtree
-    void UnknownFunction4435b0();                  // 0x004435b0: axes of the subtree
-    void UnknownFunction443740(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
+    void DrawAxisGizmo();                  // 0x004435b0: axes of the subtree
+    void DrawBoxOutline(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
     void DrawWireframe(UnknownSoultreeSurface* surface);          // 0x00442f70 (ret 4): wireframe
     void DrawNormals(UnknownSoultreeSurface* surface);            // 0x00442fe0 (ret 4): normals
     void DrawVertexCrosses(UnknownSoultreeSurface* surface);      // 0x004431f0 (ret 4): vertex crosses

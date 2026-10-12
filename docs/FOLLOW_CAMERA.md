@@ -68,7 +68,8 @@ A near miss is kept in `samples/camera/FollowCameraNearMisses.cpp`:
   a load-delay slot where retail used +0x2e4/+0x276. Moving those statements
   (or the +0x29c copy) does not fix it.
 
-The initializer `0x00463140` (520 bytes) is exact: it allocates the
+The initializer `0x00463140` (`SetupFollowCamera`; the text-file loader
+`0x004650e0` is `LoadCameraFile`) (520 bytes) is exact: it allocates the
 +0x294/+0x298 values (lines 0x78/0x79) and the point table (line 0x88).
 It matched once the value constructor stores `value, rate, maximum,
 minimum, scale` in that order, which slot 10's six inlined constructions
@@ -113,7 +114,7 @@ retail addresses when each label is placed at its function offset.
 
 ## Field behavior
 
-| Offset | Observed role |
+| Offset (name) | Observed role |
 |---|---|
 | Camera +0x170 (x, z) | Compared with the +0x2b4 triple in slot 68 |
 | +0x220, +0x22c, +0x234 | Preset parameters |
@@ -127,6 +128,11 @@ retail addresses when each label is placed at its function offset.
 | +0x2c4, +0x2c8, +0x2cc | Snapshot of the three preset parameters |
 | +0x2f0 | State-specific saved copy of +0x258 |
 | +0x30c, +0x310, +0x314 | Cyclic index, count, inline dword table |
+| +0x2d8 `lift` | Eased by VehicleCamera slot 35 |
+| +0x2dc `pointCapacity` | Capacity of the +0x2e4 point table (0x00463140 `capacity`) |
+| +0x2e8 `yawOffset` | Set by 0x00463140; slot 49 derives +0x23c from it (plus or minus pi) |
+| +0x304 `blendClock` | Advanced by slot 10, clamped to 1 |
+| +0x344 `orientation` | Matrix built by 0x004654e0 from forward and up; slot 47 multiplies by it |
 
 Slot 70 saves the previous state/parameter before entering literal state 5 and
 restores them on disable. Slot 72 increments/wraps the index, selects a table
@@ -176,6 +182,16 @@ world/view/projection. The members at +0x2c/+0xac/+0x6c are therefore named
 `worldMatrix`/`viewMatrix`/`projectionMatrix`. These semantic names remain
 provisional inference from the call shape; identifying the interface from
 creation/import evidence would be needed to confirm them.
+Further Camera fields named from their recorded uses (tier 3, each keeping
+its `// +0xNN`): `roll` (+0x194, the setter's `roll` argument, passed to the
+view matrix by slot 28), `focalLength` (+0x198, half the viewport width over
+tan(fov / 2)), `displayAspect` (+0x19c), `heightWidthRatio` (+0x1b8), `file`
+(+0x1e4, a FILE* the destructor closes), `lastMoveDistance` and
+`lastTurnAngle` (+0x200/+0x204, slot 10), and `eyePosition`, `viewDirection`
+and `upDirection` (+0x170/+0x17c/+0x188: the setter's position, forward and
+up arguments, which slot 28 passes to the view matrix; krusty2's
+ProjectedShadow.h names its +0x170 `eyePosition` too). No calibration byte
+changed.
 
 Destructor evidence. `analysis/deleting_destructors.json` pairs each wrapper
 with its destructor core. Camera's vptr is written in its constructor
@@ -213,7 +229,7 @@ references. All bodies below are strict exact under the default profile.
 | VehicleCamera destructor / wrapper | `0x0052b9d0` / `0x0052b9b0` | 11 / 30 | Explicit empty destructor (vptr store, jump to `~FollowCamera`) |
 | VehicleCamera 33 | `0x0052ba30` | 142 | Tracked point: vehicle +0x64 in vehicle mode, else target +0x384 (+0x224) or +0x388 (+0x40), else the zero vector |
 | VehicleCamera `0x0052bac0` / `0x0052bc50` | `0x0052bac0`, `0x0052bc50` | 158 / 155 | Vehicle +0x494 / +0x488 in vehicle mode (clearing +0x392 / +0x391); otherwise slot 33 / `0x0052bb60`, latched in +0x398 / +0x3a4 |
-| VehicleCamera `0x0052bb60` | `0x0052bb60` | 225 | Part 0 of vehicle +0x3bc; else target +0x384's model (its +0x140 child first), target +0x388's +0x34 translation, +0x38c's translation, or the zero vector |
+| VehicleCamera `0x0052bb60` (`TargetPoint`, provisional name) | `0x0052bb60` | 225 | Part 0 of vehicle +0x3bc; else target +0x384's model (its +0x140 child first), target +0x388's +0x34 translation, +0x38c's translation, or the zero vector |
 | VehicleCamera 57 | `0x0052ca10` | 356 | `0x0052bb60` plus slot 33 × min(dt, 0.2) unless state 7, game +0x1c4 or vehicle +0x444 |
 | VehicleCamera `$E` | `0x0052ced0..0x0052d00b` | 8 × 5/60 | `.CRT$XCU` 336-339: zero, x, y, z axes at `0x0068a728`, `0x0068a738`, `0x0068a748`, `0x0068a718` |
 | VehicleCamera 42 | `0x0052cc00` | 122 | +0x308 = fov/zoom ratio × vehicle +0x43c × 0.3 (0.4 in state 3), 0 otherwise |
@@ -361,7 +377,9 @@ The unit's own kVec3 set (`.CRT$XCU` 113-116, `0x00466f10..0x004670fb`) is
 interleaved with slots 72 and 70. Its vectors `0x0065b438..0x0065b468` are
 read only by FollowCam code, so they are now file statics.
 
-This wave adds 13 calibration cases: the point-table append `0x00463520`,
+This wave adds 13 calibration cases: the point-table append `0x00463520` (`AppendTableEntry`; the subject
+setter `0x00463600` is `SetSubject` and KrustyBikeCamera's flyby setup
+`0x00497d90` `SetupFlyby`),
 set subject `0x00463600`, slot 38 (point-table steering, with its jump
 table), slot 49 (camera position), slot 23 (controls) and the eight `$E`.
 

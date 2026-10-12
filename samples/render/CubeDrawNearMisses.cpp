@@ -45,7 +45,7 @@ static UnknownCubeVertex s_cellVertices[6][16][6];
 static UnknownCubeTextureMapping s_cellMappings[6][16];
 
 // 0x0043dc60
-int DrawableCube::UnknownFunction43dc60()
+int DrawableCube::BuildFaceGeometry()
 {
     UnknownCubeVertex grid[5][5];
     for (int face = 0; face < 6; face++) {
@@ -144,7 +144,7 @@ int DrawableCube::UnknownFunction43dc60()
 }
 
 // 0x0043e0b0
-int DrawableCube::UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* context)
+int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context)
 {
     field_0x2c = cube;
     cube->LoadMissingTextures((UnknownTexturePalette*)loadPalette, context);
@@ -196,7 +196,7 @@ int DrawableCube::UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* c
 }
 
 // 0x0043e330
-void DrawableCube::UnknownFunction43e330()
+void DrawableCube::MarkVisibleCells()
 {
     Vector3 forward;
     forward.x = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[0][2];
@@ -207,7 +207,7 @@ void DrawableCube::UnknownFunction43e330()
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
         field_0x2c->field_0x38[face].visibleCells = 0;
-        if (!g_UnknownCubeClipper575a98->UnknownFunction52f140(Target()->field_0x08, &forward,
+        if (!g_UnknownCubeClipper575a98->CanFaceCamera(Target()->field_0x08, &forward,
                                                                 &s_faceNormals[face]))
             continue;
         for (int k = 0; k < 25; k++)
@@ -215,11 +215,11 @@ void DrawableCube::UnknownFunction43e330()
             const Vector3& point = s_facePoints[face][k];
             s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
         }
-        g_UnknownCubeClipper575a98->UnknownFunction52f0a0(
+        g_UnknownCubeClipper575a98->TransformPoints(
             s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix, 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
-            if (g_UnknownCubeClipper575a98->UnknownFunction52f4d0(Target()->field_0x08, s_viewPoints, corner,
+            if (g_UnknownCubeClipper575a98->IsQuadOnScreen(Target()->field_0x08, s_viewPoints, corner,
                                                                   corner + 1, corner + 6, corner + 5))
                 field_0x2c->field_0x38[face].visibleCells |= 1 << i;
         }
@@ -260,7 +260,7 @@ int DrawableCube::UnknownVirtualSlot14()
             if (textureGroup && (field_0x2c->field_0x38[face].textures[i]->field_0x68 & 1)) {
                 UnknownCubeTextureMapping* mapping = &s_cellMappings[face][i];
                 ((ManagedTexture*)field_0x2c->field_0x38[face].textures[i])
-                    ->UnknownFunction510910(&mapping->scale, &mapping->offsetU, &mapping->offsetV,
+                    ->RemapTexCoordsIfMoved(&mapping->scale, &mapping->offsetU, &mapping->offsetV,
                                             &s_cellVertices[face][i][0].tu, &s_cellVertices[face][i][0].tv, 6,
                                             0x20);
             }

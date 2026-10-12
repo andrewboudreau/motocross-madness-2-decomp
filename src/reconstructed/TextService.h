@@ -59,14 +59,14 @@ public:
     // width; returns the x past its end. 0x0050b700 (format 1555) and
     // 0x0050b400 (format 4444) are the 16-bit versions; they take the
     // colour already converted.
-    int UnknownFunction50b080(TextureMap* texture, int x, int y, const char* text, int color);
-    int UnknownFunction50b400(TextureMap* texture, int x, int y, const char* text, int color);
-    int UnknownFunction50b700(TextureMap* texture, int x, int y, const char* text, int color);
+    int DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color);
+    int DrawText4444(TextureMap* texture, int x, int y, const char* text, int color);
+    int DrawText1555(TextureMap* texture, int x, int y, const char* text, int color);
 
     // 0x0050ba00: lays `text` out from the top left of `rect` as two
     // triangles per character; returns the vertices, their count in *count.
-    void* UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
-                                unsigned int color, int* count);
+    void* LayoutText(const UnknownOverlayRect* rect, const char* text,
+                     unsigned int color, int* count);
     // 0x0050bd30: draws vertices laid out by 0x0050ba00.
     void DrawVertices(RenderTarget* target, void* vertices, int count);
 

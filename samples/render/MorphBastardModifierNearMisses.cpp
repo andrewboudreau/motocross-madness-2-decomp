@@ -2,7 +2,7 @@
 // until they match. See src/reconstructed/MorphBastardModifier.h for the
 // class evidence.
 //
-// MorphBastardModifier::UnknownFunction4a33b0 (0x004a33b0, 2046 bytes): the
+// MorphBastardModifier::LoadParameterFile (0x004a33b0, 2046 bytes): the
 // parameter-file loader, 1938 of 2046 positions. Calls, strings, lines,
 // field offsets and the frame size (0x350) match retail; the object's rigid
 // inverse is MorphBastardInvertRigid (an inline building a Vector3; the
@@ -32,7 +32,7 @@
 // object/channel loops differs (retail keeps the object offset in esi and
 // reloads the index from +0x28, the channel in ebp).
 //
-// MorphBastardModifier::UnknownFunction4a3c80 (0x004a3c80..0x004a4ba5,
+// MorphBastardModifier::ControllerAngles (0x004a3c80..0x004a4ba5,
 // 3878 bytes, ret 0x44): the controller angles. Controller matrix times
 // the rest inverse (inline, through a copy), then per axis: rotate the
 // identity's axis onto the controller's (cross product, 0x004a3be0 angle,
@@ -91,7 +91,7 @@ inline void MorphBastardInvertRigidInPlace(Matrix4* m)
 }
 
 // 0x004a33b0
-MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, const char* path,
+MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const char* path,
                                                                  MorphBastardNode* model)
 {
     char section[0x100];
@@ -117,7 +117,7 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
         block->UnknownFunction4b7b30("ObjectName", objectName, -1);
         MorphBastardNode* node = model->UnknownFunction4fdae0(objectName);
         morphObjects[i].node = node;
-        node->UnknownFunction4fca80(0, &morphObjects[i].inverseRestMatrix);
+        node->GetMatrixIn(0, &morphObjects[i].inverseRestMatrix);
         MorphBastardInvertRigid(morphObjects[i].inverseRestMatrix);
         block->UnknownFunction4b7f10("NumberOfTargets", 0, &targetCount);
         morphObjects[i].channelCount = 0;
@@ -169,7 +169,7 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
                     channel->targetNumbers[0] = -1;
                     channel->targetNumbers[1] = j;
                     channel->field_0x5c = -1;
-                    controller->UnknownFunction4fca80(0, &channel->inverseRestMatrix);
+                    controller->GetMatrixIn(0, &channel->inverseRestMatrix);
                     MorphBastardInvertRigidInPlace(&channel->inverseRestMatrix);
                     morphObjects[i].channelCount++;
                 }
@@ -378,7 +378,7 @@ static inline void NormalizeOrZero(Vector3& v)
 // pose (`inverse`), as three angles in degrees. For each axis the identity's
 // axis is rotated onto the controller's; the angle left between the next
 // axes is the rotation about it.
-void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, Matrix4 inverse)
+void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix4 inverse)
 {
     Matrix4 identity;
     memset(&identity, 0, sizeof(identity));
@@ -387,7 +387,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
     Matrix4 controller;
-    channel->controller->UnknownFunction4fca80(0, &controller);
+    channel->controller->GetMatrixIn(0, &controller);
     Matrix4 world = controller;
     controller(0, 0) = world(0, 0) * inverse(0, 0) + world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) +
                        world(0, 3) * inverse(3, 0);

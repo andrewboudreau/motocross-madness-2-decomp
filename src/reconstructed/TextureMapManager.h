@@ -36,15 +36,15 @@ int UnknownCompare50eeb0(const void* first, const void* second);
 int UnknownCompare50ef00(const void* first, const void* second);
 
 // 0x0050d800 (cdecl): fits a size list's planned levels into `budget` texels.
-int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget);
+int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget);
 
 // Interval timer (PCVideoCard.cpp; constructor 0x004cb670 records the
 // current time and the interval), 12 bytes.
 class UnknownTimer {
 public:
     explicit UnknownTimer(int interval);
-    int UnknownFunction4cb690();              // 0x004cb690: the largest recent sample
-    void UnknownFunction4cb6b0(int sample);   // 0x004cb6b0: records a sample
+    int LargestRecentSample();              // 0x004cb690: the largest recent sample
+    void RecordSample(int sample);   // 0x004cb6b0: records a sample
 
     int field_0x00;                           // start time
     int field_0x04;
@@ -65,18 +65,18 @@ public:
     // 0x0050bed0
     ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV);
     virtual ~ManagedTextureGroup();           // 0x0050c2e0 (deleting wrapper 0x0050c2c0)
-    int UnknownFunction50c4a0(int count);     // 0x0050c4a0: sets the page count; 0 on failure
+    int SetPageCount(int count);     // 0x0050c4a0: sets the page count; 0 on failure
     void UnknownFunction50c6c0(ManagedTexture* texture); // 0x0050c6c0: adds a texture
-    void UnknownFunction50c760();             // 0x0050c760: clears the textures' use records
-    void UnknownFunction50c790();             // 0x0050c790: restores lost pages
-    void UnknownFunction50c7e0();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
-    void UnknownFunction50c8c0();             // 0x0050c8c0: repacks the pages
-    void UnknownFunction50c960();             // 0x0050c960 (near miss in samples/render)
-    void UnknownFunction50dad0();             // 0x0050dad0 (near miss in samples/render)
+    void ClearUseRecords();             // 0x0050c760: clears the textures' use records
+    void RestoreLostPages();             // 0x0050c790: restores lost pages
+    void WriteDebugReport();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
+    void RepackPages();             // 0x0050c8c0: repacks the pages
+    void RepackWholePages();             // 0x0050c960 (near miss in samples/render)
+    void RepackWithPartialBlits();             // 0x0050dad0 (near miss in samples/render)
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body): out of page space
     // 0x0050ef70 (manager slot 15): draws the debug-key selection into
     // `target`; 0 unless this is the manager's selected group.
-    int UnknownFunction50ef70(PCRenderTarget* target);
+    int DrawSelection(PCRenderTarget* target);
 
     unsigned char field_0x08;                 // toggled by debug key 0x21; set: no repacking
     int field_0x0c;                           // pixel format
@@ -139,11 +139,11 @@ public:
     // 0x005113d0: shares the texture cache limit out among the groups (on
     // AGP displays it restores every grouped texture instead).
     int UnknownFunction5113d0();
-    void UnknownFunction511580();             // 0x00511580 (PCTextureMap slot 12 and destructor)
+    void CountTextureMemory();             // 0x00511580 (PCTextureMap slot 12 and destructor)
     // 0x00511310 / 0x00511370: grow-only scratch buffers of at least
     // `bytes`; 0 when the allocation fails.
-    void* UnknownFunction511310(unsigned int bytes);
-    void* UnknownFunction511370(unsigned int bytes);
+    void* GrowScratchBuffer(unsigned int bytes);
+    void* GrowSecondScratchBuffer(unsigned int bytes);
 
     UnknownTextureMapList field_0x2c;         // every registered texture
     ManagedTextureGroup* field_0x3c;          // cache selected by the debug keys

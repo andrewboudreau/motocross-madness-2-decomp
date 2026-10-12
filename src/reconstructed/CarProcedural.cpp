@@ -89,7 +89,7 @@ CarProcedural::~CarProcedural()
 }
 
 // 0x00430e60
-void CarProcedural::UnknownFunction430e60(float t, float* h0, float* h1, float* h2, float* h3)
+void CarProcedural::HermiteWeights(float t, float* h0, float* h1, float* h2, float* h3)
 {
     float t2 = t * t;
     float t3 = t2 * t;
@@ -123,7 +123,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     field_0x50 = a9;
     field_0x18c = 0.0f;
     CarProceduralNode* body = field_0x34->UnknownFunction4fdae0("Body");
-    body->UnknownFunction4fc970(&field_0x1dc);
+    body->GetPosition(&field_0x1dc);
 
     field_0x60 = wheelCount;
     if (field_0x60 > 0) {
@@ -164,10 +164,10 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
         field_0x3c->UnknownFunction432720(field_0x34, 0, 1, 0, 0);
     field_0x3c->field_0x54->field_0x00 = 1;
     field_0x3c->UnknownFunction435fe0();
-    field_0x38->UnknownFunction439410(field_0x3c);
+    field_0x38->AddIgnoredOwner(field_0x3c);
     g_MemTagStack->Pop(tag);
 
-    UnknownFunction42fa00(pathFile, field_0x34->field_0x38);
+    ReadPath(pathFile, field_0x34->field_0x38);
     field_0x170 = speed;
     if (speed > 0.0)
         field_0x174 = 1.0f / speed;
@@ -180,7 +180,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
 // 0x0042fa00: reads the path from `pathFile`: one key per "FRAME <n>" line,
 // whose position is the translation of the "transform" line naming the
 // model (in quotes). The file's y and z are swapped.
-void CarProcedural::UnknownFunction42fa00(const char* pathFile, const char* name)
+void CarProcedural::ReadPath(const char* pathFile, const char* name)
 {
     char quoted[0x100];
     char line[0x400];
@@ -222,7 +222,7 @@ void CarProcedural::UnknownFunction42fa00(const char* pathFile, const char* name
 
 // 0x004308e0: searches, by bisection on the path parameter, for the offset
 // before `time` at which the path is `distance` long (at most 200 steps).
-float CarProcedural::UnknownFunction4308e0(float time, float distance)
+float CarProcedural::FindOffsetAtDistance(float time, float distance)
 {
     unsigned int count = 0;
     float result = 0.0f;
@@ -231,7 +231,7 @@ float CarProcedural::UnknownFunction4308e0(float time, float distance)
     int forward = 0;
     if (!(distance < 0.0))
         forward = 1;
-    Vector3 previous = UnknownFunction430b10(time);
+    Vector3 previous = PositionAtTime(time);
     for (; count < 200; count++) {
         if (fabs(travelled - distance) <= 0.1f)
             break;
@@ -242,7 +242,7 @@ float CarProcedural::UnknownFunction4308e0(float time, float distance)
                 forward = 1;
             }
             result += step;
-            position = UnknownFunction430b10(time - result);
+            position = PositionAtTime(time - result);
             travelled += Length(position - previous);
             previous = position;
         } else {
@@ -251,7 +251,7 @@ float CarProcedural::UnknownFunction4308e0(float time, float distance)
                 forward = 0;
             }
             result -= step;
-            position = UnknownFunction430b10(time - result);
+            position = PositionAtTime(time - result);
             travelled -= Length(position - previous);
             previous = position;
         }

@@ -147,7 +147,7 @@ void* PCRenderTarget::UnknownVirtualSlot4(void* rect, long* pitch, int flags) {
 // 0x004c5640: whether the device enumerated a texture format matching `format`.
 int PCRenderTarget::UnknownVirtualSlot13(int format) {
     UnknownPixelFormat wanted;
-    UnknownFunction5119c0(format, &wanted);
+    FillPixelFormat(format, &wanted);
     for (int i = 0; i < textureFormatCount; i++) {
         UnknownPixelFormat entry = textureFormats[i];
         if (entry.flags == wanted.flags && entry.fourCC == wanted.fourCC && entry.bitCount == wanted.bitCount &&
@@ -280,7 +280,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
     for (; count < 0x4000; count++) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        UnknownFunction5119c0(field_0x28, &desc.pixelFormat);
+        FillPixelFormat(field_0x28, &desc.pixelFormat);
         desc.width = 0x100;
         desc.height = 0x100;
         desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
@@ -298,7 +298,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
     for (; count < 0x4000; count++) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        UnknownFunction5119c0(field_0x28, &desc.pixelFormat);
+        FillPixelFormat(field_0x28, &desc.pixelFormat);
         desc.width = 0x20;
         desc.height = 0x20;
         desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;

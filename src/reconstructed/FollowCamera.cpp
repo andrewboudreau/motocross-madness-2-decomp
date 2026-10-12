@@ -85,9 +85,9 @@ bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, con
 }
 
 // 0x00463520
-bool FollowCamera::UnknownFunction463520(const Vector3& position, float a, float b, float c,
-                                         float d, float e) {
-    if (pointCount < field_0x2dc) {
+bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, float c,
+                                    float d, float e) {
+    if (pointCount < pointCapacity) {
         points[pointCount].position = position;
         points[pointCount].field_0x0c = a;
         points[pointCount].field_0x10 = b;
@@ -103,7 +103,7 @@ bool FollowCamera::UnknownFunction463520(const Vector3& position, float a, float
 // 0x00463140: Camera slot 8, then the +0x294/+0x298 values, presets, the
 // point table and the state list (states 5-7 and values outside 0..7 are
 // dropped); releases itself when no state is left.
-FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, float rate298,
+FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float rate298,
                                                   float value228, float value2d0, float value2e8,
                                                   int capacity, int count, const int* list) {
     if (!Camera::UnknownVirtualSlot8(value))
@@ -113,10 +113,10 @@ FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, fl
     field_0x228 = value228;
     field_0x2d0 = value2d0;
     field_0x2d4 = value2d0;
-    field_0x2dc = capacity;
+    pointCapacity = capacity;
     if (capacity > 0) {
         points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
-        for (int i = 0; i < field_0x2dc; i++) {
+        for (int i = 0; i < pointCapacity; i++) {
             points[i].position = kVec3Zero;
             points[i].field_0x0c = 0.0f;
             points[i].field_0x10 = 0.0f;
@@ -126,7 +126,7 @@ FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, fl
             points[i].field_0x20 = kVec3Zero;
         }
     }
-    field_0x2e8 = value2e8;
+    yawOffset = value2e8;
     stateCount = count;
     int kept = 0;
     for (int j = 0; j < count; j++) {
@@ -144,7 +144,7 @@ FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, fl
 }
 
 // 0x00463600
-void FollowCamera::UnknownFunction463600(UnknownFollowCameraSubject* subject) {
+void FollowCamera::SetSubject(UnknownFollowCameraSubject* subject) {
     field_0x240 = subject;
     field_0x2ec = subject->field_0x40;
 }
@@ -253,7 +253,7 @@ Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
 Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt) {
     Vector3 result;
     if (cameraState == 5 || cameraState == 7) {
-        result = field_0x170;
+        result = eyePosition;
     } else if (orbit) {
         float yaw = field_0x308 + field_0x234;
         if (cameraState != 3) {
@@ -293,13 +293,13 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
                 field_0x22c = 0.0f;
                 field_0x234 = 0.0f;
                 if (field_0x23c < -1.5707964f)
-                    field_0x23c = field_0x2e8 - 3.1415927f;
+                    field_0x23c = yawOffset - 3.1415927f;
                 else
-                    field_0x23c = -field_0x2e8;
+                    field_0x23c = -yawOffset;
             } else if (field_0x23c > 1.5707964f) {
-                field_0x23c = 3.1415927f - field_0x2e8;
+                field_0x23c = 3.1415927f - yawOffset;
             } else {
-                field_0x23c = field_0x2e8;
+                field_0x23c = yawOffset;
             }
             field_0x23c += UnknownVirtualSlot39();
             if (field_0x23c >= 6.2831855f)
@@ -388,9 +388,9 @@ void FollowCamera::UnknownVirtualSlot67() {
 void FollowCamera::UnknownVirtualSlot68() {
     Vector3 target = targetPoint;
     target.y += 3.0f;
-    float dx = field_0x170.x - target.x;
+    float dx = eyePosition.x - target.x;
     if (dx < 0.0f) dx = -dx;
-    float dz = field_0x170.z - target.z;
+    float dz = eyePosition.z - target.z;
     if (dz < 0.0f) dz = -dz;
     field_0x258 = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
     if (field_0x258 < 10.0f) field_0x258 = 10.0f;
@@ -531,9 +531,9 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
 // Out-of-line vector helpers that slot 46's inline normalisation calls (VC6
 // did not expand them there). See src/krusty2/math/Math3D.h, whose call views
 // describe the same addresses; names here are provisional.
-float UnknownFunction460c00(float value);                          // 0x00460c00: 1/sqrt approximation
+float FastInvSqrt(float value);                          // 0x00460c00: 1/sqrt approximation
 float UnknownFunction40ae30(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
-Vector3 UnknownFunction5015b0(const Vector3& v, float scale);      // 0x005015b0: v * scale
+Vector3 Vec3ScaleCall(const Vector3& v, float scale);      // 0x005015b0: v * scale
 Vector3 UnknownFunction515600(const Vector3& a, const Vector3& b); // 0x00515600: cross product
 
 // Inline cross product (expanded by slot 46). The parenthesised first
@@ -548,8 +548,8 @@ inline Vector3 FollowCameraNormalize(const Vector3& v) {
     float lengthSquared = UnknownFunction40ae30(&v, &v);
     if (lengthSquared == 1.0f)
         return v;
-    float scale = UnknownFunction460c00(lengthSquared);
-    return UnknownFunction5015b0(v, scale);
+    float scale = FastInvSqrt(lengthSquared);
+    return Vec3ScaleCall(v, scale);
 }
 
 // 0x004654e0: an orthonormal basis from `forward` and `up` (up is made
@@ -562,22 +562,22 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
     y = FollowCameraNormalize(y);
     z = FollowCameraNormalize(z);
     Vector3 x = UnknownFunction515600(y, z);
-    field_0x344.m[0][0] = x.x;
-    field_0x344.m[0][1] = x.y;
-    field_0x344.m[0][2] = x.z;
-    field_0x344.m[0][3] = 0.0f;
-    field_0x344.m[1][0] = y.x;
-    field_0x344.m[1][1] = y.y;
-    field_0x344.m[1][2] = y.z;
-    field_0x344.m[1][3] = 0.0f;
-    field_0x344.m[2][0] = z.x;
-    field_0x344.m[2][1] = z.y;
-    field_0x344.m[2][2] = z.z;
-    field_0x344.m[2][3] = 0.0f;
-    field_0x344.m[3][0] = 0.0f;
-    field_0x344.m[3][1] = 0.0f;
-    field_0x344.m[3][2] = 0.0f;
-    field_0x344.m[3][3] = 1.0f;
+    orientation.m[0][0] = x.x;
+    orientation.m[0][1] = x.y;
+    orientation.m[0][2] = x.z;
+    orientation.m[0][3] = 0.0f;
+    orientation.m[1][0] = y.x;
+    orientation.m[1][1] = y.y;
+    orientation.m[1][2] = y.z;
+    orientation.m[1][3] = 0.0f;
+    orientation.m[2][0] = z.x;
+    orientation.m[2][1] = z.y;
+    orientation.m[2][2] = z.z;
+    orientation.m[2][3] = 0.0f;
+    orientation.m[3][0] = 0.0f;
+    orientation.m[3][1] = 0.0f;
+    orientation.m[3][2] = 0.0f;
+    orientation.m[3][3] = 1.0f;
 }
 
 // 0x00465720: while this is the owner's active camera, advances the clock,
@@ -585,7 +585,7 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
 // the view; the position (row 3, moved by `offset`) is kept 3.5 above the
 // subject's ground. Otherwise slot 54 runs. Always returns true. The products
 // are written b * a and the rows read through m[][]: with a * b VC6 loads
-// field_0x344's element first in the (0, 0) sum (retail hoists a(0, 3) above
+// orientation's element first in the (0, 0) sum (retail hoists a(0, 3) above
 // the second copy), and operator() or other copy orders lose the interleaved
 // row copies.
 bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
@@ -599,7 +599,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         while (index >= count)
             index -= count;
         Matrix4 a = frames[index];
-        Matrix4 b = field_0x344;
+        Matrix4 b = orientation;
         viewMatrix(0, 0) = b.m[0][0] * a.m[0][0] + b.m[1][0] * a.m[0][1] +
                            b.m[2][0] * a.m[0][2] + b.m[3][0] * a.m[0][3];
         viewMatrix(0, 1) = b.m[0][1] * a.m[0][0] + b.m[1][1] * a.m[0][1] +
@@ -632,22 +632,22 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
                            b.m[2][2] * a.m[3][2] + b.m[3][2] * a.m[3][3];
         viewMatrix(3, 3) = b.m[0][3] * a.m[3][0] + b.m[1][3] * a.m[3][1] +
                            b.m[2][3] * a.m[3][2] + b.m[3][3] * a.m[3][3];
-        field_0x17c.x = viewMatrix.m[2][0];
-        field_0x17c.y = viewMatrix.m[2][1];
-        field_0x17c.z = viewMatrix.m[2][2];
-        field_0x188.x = viewMatrix.m[1][0];
-        field_0x188.y = viewMatrix.m[1][1];
-        field_0x188.z = viewMatrix.m[1][2];
-        field_0x170.x = viewMatrix.m[3][0];
-        field_0x170.y = viewMatrix.m[3][1];
-        field_0x170.z = viewMatrix.m[3][2];
-        field_0x170 += *offset;
-        Vector3 ground = field_0x170;
+        viewDirection.x = viewMatrix.m[2][0];
+        viewDirection.y = viewMatrix.m[2][1];
+        viewDirection.z = viewMatrix.m[2][2];
+        upDirection.x = viewMatrix.m[1][0];
+        upDirection.y = viewMatrix.m[1][1];
+        upDirection.z = viewMatrix.m[1][2];
+        eyePosition.x = viewMatrix.m[3][0];
+        eyePosition.y = viewMatrix.m[3][1];
+        eyePosition.z = viewMatrix.m[3][2];
+        eyePosition += *offset;
+        Vector3 ground = eyePosition;
         field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
         float height = ground.y + 3.5f;
-        if (height > field_0x170.y)
-            field_0x170.y = height;
-        UnknownFunction42e930(66.0f);
+        if (height > eyePosition.y)
+            eyePosition.y = height;
+        SetFieldOfView(66.0f);
         Camera::UnknownVirtualSlot10(dt);
         return true;
     }

@@ -6,7 +6,7 @@
 #include "DebugAlloc.h"
 
 // 0x00424140
-UnknownBitmapFile* UnknownFunction424140(const char* name, UnknownBitmapFile* bitmap) {
+UnknownBitmapFile* ReadBitmap(const char* name, UnknownBitmapFile* bitmap) {
     FILE* file;
     int stride;
     unsigned char* bits;
@@ -75,7 +75,7 @@ UnknownBitmapFile* UnknownFunction424140(const char* name, UnknownBitmapFile* bi
 }
 
 // 0x00424380
-int UnknownFunction424380(UnknownBitmapFile* bitmap) {
+int WriteBitmap(UnknownBitmapFile* bitmap) {
     FILE* file;
     int stride;
     int x;
@@ -125,7 +125,7 @@ int UnknownFunction424380(UnknownBitmapFile* bitmap) {
 }
 
 // 0x004245b0
-void UnknownFunction4245b0(UnknownBitmapFile* bitmap) {
+void FreeBitmap(UnknownBitmapFile* bitmap) {
     if (bitmap) {
         if (bitmap->bits)
             DebugFree(bitmap->bits, __FILE__, 200);
@@ -134,8 +134,8 @@ void UnknownFunction4245b0(UnknownBitmapFile* bitmap) {
 }
 
 // 0x004245f0
-void UnknownFunction4245f0(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,
-                           int height) {
+void DescribeBitmap8(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width,
+                     int height) {
     int i;
 
     bitmap->fileHeader.type = *(unsigned short*)"BM";

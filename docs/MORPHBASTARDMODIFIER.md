@@ -28,11 +28,11 @@ its deleting wrapper, the qsort comparator `0x004a3bb0`, the vector angle
 - The mesh's +0x20/+0x24 pair is one 8-byte struct.
 
 Near misses (`samples/render/MorphBastardModifierNearMisses.cpp`):
-- The 2046-byte parameter-file loader `0x004a33b0` (1938 of 2046): an
+- The 2046-byte parameter-file loader `LoadParameterFile` `0x004a33b0` (1938 of 2046): an
   existing channel records the target index `j`; the stack homes of the loop
   scalars and the operand order of the channel inverse's products differ.
 - Slot 27 `0x004a4c60`.
-- The controller-angle solver `0x004a3c80..0x004a4ba5` (3878 bytes, not
+- The controller-angle solver `ControllerAngles` `0x004a3c80..0x004a4ba5` (3878 bytes, not
   2340): structure reconstructed; retail calls the out-of-line Vector3
   constructor `0x00404e60` and has a larger frame.
 

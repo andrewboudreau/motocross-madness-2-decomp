@@ -151,6 +151,16 @@ type, member and function names are provisional.
 - `0x004f1130` sets the key-framed flag in each branch (`1`, `0`, `1`) and
   tests it afterwards; VC6 threads the jumps into retail's layout.
 
+## Field names
+
+`Scene::defaultStartPosition`/`defaultStartDirection` ("SceneInfo" keys)
+and the two `fileName` buffers (animation entry +0x2c, static model +0x10)
+are named. The section pointers `+0xa4..+0xbc`, the table, caster, light
+and entry fields keep their placeholders because `QuarryStuntEvent.cpp` and
+its loader sample read them too; renaming them is a joint change with that
+unit. `UnknownSceneObject::field_0x10` cannot take a name without the
+member lookup resolving to the virtual base's protected `field_0x10`.
+
 ## Not reconstructed
 
 - `0x004eab00` (slot 10, 958 bytes): its ebp frame and `fld; fistp` through
@@ -236,6 +246,7 @@ method slots and arguments, callers); the address-derived names they
 replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x004e9980` `FindKeyword`
+- `0x004eb040` `RestartEntry`
 - `0x004eb160` `ReadVector`
 - `0x004eb300` `ReadColor`
 - `0x004eb480` `ReadFlags`
@@ -252,4 +263,8 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004f0310` `AddResource`
 - `0x004f0390` `CountModelTextures`
 - `0x004f0d20` `CountObjects`
+- `0x004f0ec0` `ResolveSltPath`
 - `0x004f1130` `CountTextures`
+- `0x004eaec0` `FindEntryByFileName`
+- `0x0043a330` `AddCollisionPoint` (the near-miss sample's copy; the name
+  krusty2's CollisionPoint.cpp gives the same address)

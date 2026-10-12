@@ -68,11 +68,11 @@ struct UnknownCubeCameraView {
 class UnknownCubeClipper {
 public:
     // 0x0052f0a0: transforms `count` points of `source` by `matrix`.
-    void UnknownFunction52f0a0(Vector3* destination, Vector3* source, Matrix4* matrix, int count);
+    void TransformPoints(Vector3* destination, Vector3* source, Matrix4* matrix, int count);
     // 0x0052f140: whether a face with `normal` can face the camera looking along `forward`.
-    int UnknownFunction52f140(Camera* camera, Vector3* forward, Vector3* normal);
+    int CanFaceCamera(Camera* camera, Vector3* forward, Vector3* normal);
     // 0x0052f4d0: whether the quad of `points` a, b, c, d is on screen.
-    int UnknownFunction52f4d0(Camera* camera, Vector3* points, int a, int b, int c, int d);
+    int IsQuadOnScreen(Camera* camera, Vector3* points, int a, int b, int c, int d);
 };
 extern UnknownCubeClipper* g_UnknownCubeClipper575a98;
 
@@ -87,11 +87,11 @@ public:
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
     DrawableCube* Load(void* value, UnknownTextureStream* stream,
                                         UnknownCubeTextureContext* context);
-    int UnknownFunction43dc60();              // 0x0043dc60: builds the face geometry
+    int BuildFaceGeometry();              // 0x0043dc60: builds the face geometry
     // 0x0043e0b0: loads the cube's textures and sets the cells' texture coordinates.
-    int UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* context);
+    int LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* context);
     int RecordTextureUse();                   // 0x0043e210: records texture use
-    void UnknownFunction43e330();             // 0x0043e330: marks the visible cells
+    void MarkVisibleCells();             // 0x0043e330: marks the visible cells
 
     RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
 

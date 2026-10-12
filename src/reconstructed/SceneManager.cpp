@@ -286,7 +286,7 @@ void UnknownTrackGameObject574::UnknownFunction4ea390(char* name, char* scene, i
 // 0x004ea660
 Scene::Scene(int flags) : GameObject(flags)
 {
-    field_0x70 = Vector3(0.0f, 0.0f, 0.0f);
+    defaultStartPosition = Vector3(0.0f, 0.0f, 0.0f);
     field_0xa8 = 0;
     field_0xac = 0;
     field_0xb0 = 0;
@@ -295,7 +295,7 @@ Scene::Scene(int flags) : GameObject(flags)
     field_0xb8 = 0;
     sceneName[0] = 0;
     scenePath[0] = 0;
-    field_0x7c = Vector3(0.0f, 0.0f, 0.0f);
+    defaultStartDirection = Vector3(0.0f, 0.0f, 0.0f);
     field_0xbc = 0;
     sounds.Init(4, 4);
     auralScape = 0;
@@ -385,7 +385,7 @@ void Scene::UnknownVirtualSlot7()
 }
 
 // 0x004eaec0
-UnknownSceneObject* Scene::UnknownFunction4eaec0(const char* path, int* index)
+UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
 {
     char name[0x104];
 
@@ -421,7 +421,7 @@ void Scene::UnknownFunction4eb000(float time)
 {
     if (field_0xb4) {
         for (int i = 0; i < field_0xb4->field_0x00; i++)
-            UnknownFunction4eb040(i, time, 1, 0);
+            RestartEntry(i, time, 1, 0);
     }
 }
 
@@ -429,7 +429,7 @@ void Scene::UnknownFunction4eb000(float time)
 // character entry (bit 3) switches to its motion number `motion` (0 when out
 // of range) unless it is idle and `force` is clear; another entry's object
 // gets the time and, unless the time was clamped, one slot 10 step.
-int Scene::UnknownFunction4eb040(int index, float time, int force, int motion)
+int Scene::RestartEntry(int index, float time, int force, int motion)
 {
     if (field_0xb4) {
         int running = 1;
@@ -447,10 +447,10 @@ int Scene::UnknownFunction4eb040(int index, float time, int force, int motion)
                     entry->sequenceIndex = motion;
                 field_0xb4->field_0x04[index].currentMotion =
                     field_0xb4->field_0x04[index].motionSequence[field_0xb4->field_0x04[index].sequenceIndex] - 1;
-                object->UnknownFunction4a8b40(
+                object->SetMotion(
                     field_0xb4->field_0x04[index].motions[field_0xb4->field_0x04[index].currentMotion]);
                 object->field_0x10 = 0;
-                field_0xb4->field_0x04[index].field_0x18 = object->UnknownFunction4a6bb0(time, 0, 0);
+                field_0xb4->field_0x04[index].field_0x18 = object->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {
@@ -1141,8 +1141,8 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
     }
     sceneManager->UnknownFunction4ea390(sceneName, sceneManager->field_0x24c, 0);
     UnknownFunction4de580("SceneInfo", "SceneName", sceneName);
-    ReadVector(&field_0x70, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
-    ReadVector(&field_0x7c, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
+    ReadVector(&defaultStartPosition, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
+    ReadVector(&defaultStartDirection, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
     UnknownFunction464e80("");
     field_0x18 = owner;
     ReadVector(&podiumPosition, "SceneInfo", "PodiumPosition", "0.0,0.0,0.0", 1, 0);
@@ -1330,15 +1330,15 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         entry->field_0x14->UnknownFunction461640(&count, 4, 1);
         SoultreeObject* node = new(__FILE__, 3447) SoultreeObject(0);
         for (int i = 0; i < count; i++) {
-            entry->field_0x14->UnknownFunction461640(node->field_0x038, 0x80, 1);
+            entry->field_0x14->UnknownFunction461640(node->nodeName, 0x80, 1);
             entry->field_0x14->UnknownFunction461640(&node->localMatrix, 0x40, 1);
             entry->field_0x14->UnknownFunction461640(&node->field_0x14c, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x154, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x158, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x164, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->localBoundsValid, 4, 1);
+            entry->field_0x14->UnknownFunction461640(&node->localBoundsCenter, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->localBoundsHalfExtent, 0xc, 1);
             entry->field_0x14->UnknownFunction461640(&node->field_0x170, 4, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x174, 0xc, 1);
-            entry->field_0x14->UnknownFunction461640(&node->field_0x180, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->subtreeBoundsCenter, 0xc, 1);
+            entry->field_0x14->UnknownFunction461640(&node->subtreeBoundsHalfExtent, 0xc, 1);
         }
         node->Release();
         int* parents = (int*)operator new(count * 4, __FILE__, 3466);
@@ -1457,7 +1457,7 @@ int Scene::CountObjects(int* count)
 
 // 0x004f0ec0: replaces `path` (a model file) with the SLT file its "General
 // info" section names, prefixed with its content directory.
-int Scene::UnknownFunction4f0ec0(char* path)
+int Scene::ResolveSltPath(char* path)
 {
     char drive[_MAX_DRIVE];
     char name[0x104];
@@ -1580,7 +1580,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
                 sprintf(animationPath, "%s\\%s", "Res", file);
                 if (keyFramed) {
                     UnknownFunction4de580(animation, "MCF", animationPath);
-                    UnknownFunction4f0ec0(animationPath);
+                    ResolveSltPath(animationPath);
                 }
                 UnknownFunction4de580(animation, "SLT", animationPath);
                 if (!CountModelTextures(animationPath, &resources, counts))

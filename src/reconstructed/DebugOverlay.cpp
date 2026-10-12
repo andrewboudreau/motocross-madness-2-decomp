@@ -224,7 +224,7 @@ int DebugOverlay::UnknownVirtualSlot25(void* value)
     GameObject::UnknownVirtualSlot25(value);
     if (!fontTexture->RestoreTextureSurface()) {
         fontTexture->Release();
-        return UnknownFunction447a00();
+        return LoadFont();
     }
     return 1;
 }

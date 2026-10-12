@@ -42,10 +42,10 @@ instructions are the same, but the registers are allocated differently.
 
 Camera.cpp ends at `0x0042f38b`, before CarProcedural.cpp. Its last three
 functions are now exact:
-- `0x0042f0e0` sets the viewport x and width. The height is the width
+- `0x0042f0e0` (`SetViewportWidth`) sets the viewport x and width. The height is the width
   times +0x1b8, which is now typed float.
 - `0x0042f190` sets the viewport. Retail stores the width before y.
-- `0x0042f210` returns the viewport rectangle.
+- `0x0042f210` (`GetViewportRect`) returns the viewport rectangle.
 
 So are its eight kVec3 `$E` (`0x0042f250..0x0042f38b`). That is 11 more
 calibration cases.
@@ -54,7 +54,7 @@ Also exact: slot 10 `0x0042e690` (distance moved and angle turned since the
 last frame, then the field-of-view and viewport-width keys; its two dot
 products need an inline `Dot(a, b)` returning `a.z*b.z + (a.x*b.x +
 a.y*b.y)`, while plain member expressions in any term order get the x87
-operand order wrong), `0x0042e930` and `0x0042e9b0` (the frame setter,
+operand order wrong), `0x0042e930` (`SetFieldOfView`) and `0x0042e9b0` (the frame setter,
 whose roll and fov arguments are `const float*`) and `0x0042e550` (the
 viewport setup; retail reads the display-mode index again for the height,
 which VC6 does when the height goes through `owner->field_0x04` and the

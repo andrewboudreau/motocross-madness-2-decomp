@@ -88,7 +88,7 @@ void GridVertexCache::Reset(DrawableGridNode* newNode)
 
 // 0x0047e340: the two neighbours (x0, z0) and (x1, z1) a vertex at (x, z)
 // interpolates between at a given subdivision step.
-void UnknownFunction47e340(int x, int z, int h, int v, int maskX, int maskZ, GridEdge* out)
+void FindEdgeNeighbours(int x, int z, int h, int v, int maskX, int maskZ, GridEdge* out)
 {
     if (!v) {
         if (z & h) {
@@ -126,7 +126,7 @@ void UnknownFunction47e340(int x, int z, int h, int v, int maskX, int maskZ, Gri
 // 0x0047e430: one subdivision level of the edge table. Retail loads the row
 // offset before x (`mov edx, [ebp]; add edx, esi`), which only a copy of x as
 // the inner loop variable reproduces.
-void UnknownFunction47e430(int half, int start, int step, int rowStep)
+void BuildEdgeLevel(int half, int start, int step, int rowStep)
 {
     int z = start;
     int row = 0;
@@ -137,7 +137,7 @@ void UnknownFunction47e430(int half, int start, int step, int rowStep)
         else
             x = half;
         for (int n = x; n <= 16; n += step)
-            UnknownFunction47e340(n, z, half, start, step, rowStep, &g_gridEdges[g_gridRow17[z] + n]);
+            FindEdgeNeighbours(n, z, half, start, step, rowStep, &g_gridEdges[g_gridRow17[z] + n]);
     }
 }
 
@@ -148,9 +148,9 @@ static void UnknownFunction47e4d0()
     int step = 2;
     int rowStep = 1;
     while (half < 16) {
-        UnknownFunction47e430(half, 0, step, rowStep);
+        BuildEdgeLevel(half, 0, step, rowStep);
         rowStep <<= 1;
-        UnknownFunction47e430(half, half, step, rowStep);
+        BuildEdgeLevel(half, half, step, rowStep);
         half <<= 1;
         step <<= 1;
     }
@@ -168,14 +168,14 @@ DrawableGridNode::DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain
 {
     this->terrain = terrain;
     if (g_gridEdgesBuilt == 0) {
-        UnknownFunction47db60();
+        BuildCurveTables();
         UnknownFunction47e4d0();
         for (int i = 0; i < 17 * 17; i++)
             this->terrain->field_0xb8[i] = 0;
         g_gridEdgesBuilt = 1;
     }
     children = 0;
-    field_0x30 = 0;
+    childOffsets = 0;
     block = 0;
     childMask = 0;
     data = 0;
@@ -193,7 +193,7 @@ DrawableGridNode::~DrawableGridNode()
 // 0x0047ecc0: AgeManager eviction callback (registered by 0x0047f210 and
 // 0x0047f840 with the node as owner): frees both vertex buffers and marks
 // the node for a rebuild.
-int UnknownFunction47ecc0(void* owner)
+int EvictNodeBuffers(void* owner)
 {
     GridNodeDrawData* d = ((DrawableGridNode*)owner)->data;
     if (d->field_0x134) {
@@ -223,7 +223,7 @@ int UnknownFunction47ecc0(void* owner)
 
 // 0x0047edb0: releases the vertex buffers of this node (and, when asked, of
 // every descendant) and takes its count out of the parent's total.
-void DrawableGridNode::UnknownFunction47edb0(int recurse)
+void DrawableGridNode::ReleaseVertexBuffers(int recurse)
 {
     if (parent) {
         ((DrawableGridNode*)parent)->data->field_0x12c -= data->field_0x12c + data->field_0x12a;
@@ -236,7 +236,7 @@ void DrawableGridNode::UnknownFunction47edb0(int recurse)
     if (recurse && children) {
         for (int i = 0; i < 256; i++) {
             if (children[i])
-                ((DrawableGridNode*)children[i])->UnknownFunction47edb0(recurse);
+                ((DrawableGridNode*)children[i])->ReleaseVertexBuffers(recurse);
         }
     }
     if (data->field_0x134) {
@@ -268,7 +268,7 @@ void DrawableGridNode::UnknownFunction47edb0(int recurse)
 // 0x0047ef70
 int DrawableGridNode::UnknownFunction47ef70()
 {
-    return UnknownFunction47ef80(0, 0, 16, 0);
+    return WalkVisibleQuadrants(0, 0, 16, 0);
 }
 
 // 0x0047ef80: walks the visible quadrants of this node (8-cell, then 4-cell
@@ -276,7 +276,7 @@ int DrawableGridNode::UnknownFunction47ef70()
 // the top-level call and adds the node's count to its parent's total.
 // `size` is halved in place; the 8-cell branch restores 16 so the top-level
 // rebuild below still runs (retail jumps straight into it from there).
-int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
+int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
 {
     if (childMask == 0)
         return 1;
@@ -287,29 +287,29 @@ int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
         if (size == 8) {
             data->field_0x12c = 0;
             if (childMask & 2)
-                UnknownFunction47ef80(x, z, 8, 0);
+                WalkVisibleQuadrants(x, z, 8, 0);
             if (childMask & 4)
-                UnknownFunction47ef80(x + 8, z, 8, 4);
+                WalkVisibleQuadrants(x + 8, z, 8, 4);
             if (childMask & 8)
-                UnknownFunction47ef80(x, z + 8, 8, 8);
+                WalkVisibleQuadrants(x, z + 8, 8, 8);
             if (childMask & 0x10)
-                UnknownFunction47ef80(x + 8, z + 8, 8, 12);
+                WalkVisibleQuadrants(x + 8, z + 8, 8, 12);
             size = 16;
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
-                UnknownFunction47ef80(x, z, 4, quad);
+                WalkVisibleQuadrants(x, z, 4, quad);
             if (childMask & (0x40 << quad))
-                UnknownFunction47ef80(x + 4, z, 4, quad + 1);
+                WalkVisibleQuadrants(x + 4, z, 4, quad + 1);
             if (childMask & (0x80 << quad))
-                UnknownFunction47ef80(x, z + 4, 4, quad + 2);
+                WalkVisibleQuadrants(x, z + 4, 4, quad + 2);
             if (childMask & (0x100 << quad))
-                UnknownFunction47ef80(x + 4, z + 4, 4, quad + 3);
+                WalkVisibleQuadrants(x + 4, z + 4, 4, quad + 3);
         } else {
             for (int j = 0; j < 64; j += 16) {
                 for (int i = 0; i < 4; i++) {
                     DrawableGridNode* child = (DrawableGridNode*)children[g_gridQuadCell[quad] + i + j];
                     if (child && child->childMask)
-                        child->UnknownFunction47ef80(0, 0, 16, 0);
+                        child->WalkVisibleQuadrants(0, 0, 16, 0);
                 }
             }
         }
@@ -319,7 +319,7 @@ int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
         if (data->b3)
             UnknownFunction47f210();
         else
-            UnknownFunction47f840();
+            RebuildWholeNodeBuffers();
         int after = data->field_0x12c + data->field_0x12a;
         if ((before >= 2 && after < 2) || (before < 2 && after >= 2)) {
             if (parent)
@@ -340,40 +340,40 @@ int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
 // picked by the node's position in its parent), each falling back to one
 // big triangle when nothing finer is drawn. Returns 0 when an allocation
 // fails.
-int DrawableGridNode::UnknownFunction47f840()
+int DrawableGridNode::RebuildWholeNodeBuffers()
 {
     int closed;
     int before = data->field_0x12a;
     int n;
     int m;
-    terrain->field_0xa4++;
+    terrain->bufferRebuilds++;
     g_gridOriginX = 0;
     g_gridOriginZ = 0;
     g_gridVertexCache.Reset(this);
     if ((field_0x2a & 0x11) != 0x11 && (field_0x2a & 0x11) != 0) {
         n = 0;
         m = n;
-        n = UnknownFunction47fce0(8, n, 0, 0, 8, 8, &closed);
+        n = EmitDiagonalTriangles(8, n, 0, 0, 8, 8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
-            n = UnknownFunction480700(n, 0, 0, 16, 16);
+            n = AppendCornerTriangle(n, 0, 0, 16, 16);
         m = n;
-        n = UnknownFunction47fce0(8, n, 16, 16, -8, -8, &closed);
+        n = EmitDiagonalTriangles(8, n, 16, 16, -8, -8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
-            n = UnknownFunction480700(n, 16, 16, -16, -16);
+            n = AppendCornerTriangle(n, 16, 16, -16, -16);
     } else {
         n = 0;
         m = n;
-        n = UnknownFunction47fce0(8, n, 0, 16, 8, -8, &closed);
+        n = EmitDiagonalTriangles(8, n, 0, 16, 8, -8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
-            n = UnknownFunction480700(n, 0, 16, 16, -16);
+            n = AppendCornerTriangle(n, 0, 16, 16, -16);
         m = n;
-        n = UnknownFunction47fce0(8, n, 16, 0, -8, 8, &closed);
+        n = EmitDiagonalTriangles(8, n, 16, 0, -8, 8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
             ((DrawableGridNode*)parent)->extra->texture == 0)
-            n = UnknownFunction480700(n, 16, 0, -16, 16);
+            n = AppendCornerTriangle(n, 16, 0, -16, 16);
     }
     data->field_0x12a = n;
     if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
@@ -422,7 +422,7 @@ int DrawableGridNode::UnknownFunction47f840()
         memcpy(data->field_0x134, g_gridVertexCache.vertices, data->field_0x13c * 32);
         memcpy(data->field_0x138, g_gridIndices, data->field_0x13e * 2);
         if (data->ageEntry.size == 0)
-            terrain->ageManager->Register(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+            terrain->ageManager->Register(&data->ageEntry, EvictNodeBuffers, this, 0,
                                                        data->field_0x142 + data->field_0x140);
         else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
             data->ageEntry.size = data->field_0x142 + data->field_0x140;
@@ -435,7 +435,7 @@ int DrawableGridNode::UnknownFunction47f840()
 
 // 0x0047fce0: the diagonal counterpart of 0x00480200; *closed reports whether
 // vertex (x + dx, z + dz) is in use.
-int DrawableGridNode::UnknownFunction47fce0(int level, int n, int x, int z, int dx, int dz, int* closed)
+int DrawableGridNode::EmitDiagonalTriangles(int level, int n, int x, int z, int dx, int dz, int* closed)
 {
     int a;
     int b;
@@ -447,8 +447,8 @@ int DrawableGridNode::UnknownFunction47fce0(int level, int n, int x, int z, int 
         return n;
     }
     if (level != 0) {
-        n = UnknownFunction480200(level, n, x, z, -dx, 0, &a);
-        n = UnknownFunction480200(level, n, x, z, 0, -dz, &b);
+        n = EmitEdgeTriangles(level, n, x, z, -dx, 0, &a);
+        n = EmitEdgeTriangles(level, n, x, z, 0, -dz, &b);
     } else {
         if (children) {
             *closed = 1;
@@ -476,7 +476,7 @@ int DrawableGridNode::UnknownFunction47fce0(int level, int n, int x, int z, int 
 
 // 0x0047fe70: the four triangles around a leaf edge vertex; bit 0 of a
 // cell's +7 byte picks the diagonal (written `1 - bit` as retail computes it).
-void DrawableGridNode::UnknownFunction47fe70(int x, int z, int dx, int dz, int n)
+void DrawableGridNode::EmitLeafEdgeFan(int x, int z, int dx, int dz, int n)
 {
     int k = n * 3;
     int i = g_gridRow17[z] + x;
@@ -534,7 +534,7 @@ static inline int Blocked(DrawableGridNode* c)
 // 0x00480200: the triangles on one edge of a cell, split at the edge midpoint
 // while subdivision levels remain (0x0047fce0 handles the diagonal halves).
 // Leaf nodes without children emit the full fan through 0x0047fe70.
-int DrawableGridNode::UnknownFunction480200(int level, int n, int x, int z, int dx, int dz, int* closed)
+int DrawableGridNode::EmitEdgeTriangles(int level, int n, int x, int z, int dx, int dz, int* closed)
 {
     int a;
     int b;
@@ -550,12 +550,12 @@ int DrawableGridNode::UnknownFunction480200(int level, int n, int x, int z, int 
     if (level != 0) {
         if (dx == 0) {
             int h = dz < 0 ? -dz >> 1 : -(dz >> 1);
-            n = UnknownFunction47fce0(level, n, x, z, h, h, &a);
-            n = UnknownFunction47fce0(level, n, x, z, -h, h, &b);
+            n = EmitDiagonalTriangles(level, n, x, z, h, h, &a);
+            n = EmitDiagonalTriangles(level, n, x, z, -h, h, &b);
         } else {
             int h = dx < 0 ? -dx >> 1 : -(dx >> 1);
-            n = UnknownFunction47fce0(level, n, x, z, h, h, &a);
-            n = UnknownFunction47fce0(level, n, x, z, h, -h, &b);
+            n = EmitDiagonalTriangles(level, n, x, z, h, h, &a);
+            n = EmitDiagonalTriangles(level, n, x, z, h, -h, &b);
         }
     } else if (children != 0) {
         if (data->b0) {
@@ -578,7 +578,7 @@ int DrawableGridNode::UnknownFunction480200(int level, int n, int x, int z, int 
             }
         }
     } else {
-        UnknownFunction47fe70(x, z, dx, dz, n);
+        EmitLeafEdgeFan(x, z, dx, dz, n);
         *closed = 1;
         return n + 2;
     }
@@ -614,7 +614,7 @@ int DrawableGridNode::UnknownFunction480200(int level, int n, int x, int z, int 
 
 // 0x00480700: appends triangle n of a cell corner: (x, z), (x + dx, z) and
 // (x, z + dz), wound by whether the step signs agree.
-int DrawableGridNode::UnknownFunction480700(int n, int x, int z, int dx, int dz)
+int DrawableGridNode::AppendCornerTriangle(int n, int x, int z, int dx, int dz)
 {
     int k = n * 3;
     if (dx == dz) {
@@ -632,30 +632,30 @@ int DrawableGridNode::UnknownFunction480700(int n, int x, int z, int dx, int dz)
 // 0x00480900
 int DrawableGridNode::UnknownFunction480900(void* target)
 {
-    return UnknownFunction480940(target, 0, 0, 16, 0, 0);
+    return DrawVisibleQuadrants(target, 0, 0, 16, 0, 0);
 }
 
 // 0x00480920
 int DrawableGridNode::UnknownFunction480920(void* target, int a5)
 {
-    return UnknownFunction480940(target, 0, 0, 16, 0, a5);
+    return DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
 }
 
 // 0x00480940: the same quadrant walk as 0x0047ef80; 4-cell blocks go to
 // 0x00480ad0.
-int DrawableGridNode::UnknownFunction480940(void* target, int x, int z, int size, int quad, int a5)
+int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5)
 {
     if (!data->b0 || data->b3) {
         size >>= 1;
         if (size == 8) {
             if (childMask & 2)
-                UnknownFunction480940(target, x, z, 8, 0, a5);
+                DrawVisibleQuadrants(target, x, z, 8, 0, a5);
             if (childMask & 4)
-                UnknownFunction480940(target, x + 8, z, 8, 4, a5);
+                DrawVisibleQuadrants(target, x + 8, z, 8, 4, a5);
             if (childMask & 8)
-                UnknownFunction480940(target, x, z + 8, 8, 8, a5);
+                DrawVisibleQuadrants(target, x, z + 8, 8, 8, a5);
             if (childMask & 0x10)
-                UnknownFunction480940(target, x + 8, z + 8, 8, 12, a5);
+                DrawVisibleQuadrants(target, x + 8, z + 8, 8, 12, a5);
         } else if (size == 4) {
             if (childMask & (0x20 << quad))
                 UnknownFunction480ad0(target, x, z, 4, quad, a5);
@@ -674,7 +674,7 @@ int DrawableGridNode::UnknownFunction480940(void* target, int x, int z, int size
 // path. With lighting off (Terrain+0xc3c) the vertices get flat colours (white
 // close up, the terrain's unlit colours further away); with it on and `a5`
 // set, close-up ranges get texture coordinates from the packed offsets.
-void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
     float detail;
@@ -712,10 +712,10 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
             if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
                 if (block >= 0) {
                     GridBlockRecord* r = &extra->blockRecords[block];
-                    extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                    extra->texture->RemapTexCoordsIfMoved(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
                                                              &vertices->u, &vertices->v, vertexCount, 0x20);
                 } else {
-                    extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c,
+                    extra->texture->RemapTexCoordsIfMoved(&extra->field_0x28, &extra->field_0x2c,
                                                              &extra->field_0x30, &vertices->u, &vertices->v,
                                                              vertexCount, 0x20);
                 }
@@ -747,10 +747,10 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
         if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
             if (block >= 0) {
                 GridBlockRecord* r = &extra->blockRecords[block];
-                extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                extra->texture->RemapTexCoordsIfMoved(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             } else {
-                extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+                extra->texture->RemapTexCoordsIfMoved(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             }
         }
@@ -766,7 +766,7 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
 // selects the texture through slot 6 or 7, lets the managed texture update
 // the texture coordinates, switches the close-up stage states on or off by
 // the detail limit, marks the buffers used and draws.
-void DrawableGridNode::UnknownFunction480fb0(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+void DrawableGridNode::SubmitLitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
     if (g_gridGameSettings->softwareRenderer || !a5)
@@ -783,23 +783,23 @@ void DrawableGridNode::UnknownFunction480fb0(int a5, GridVertex* vertices, int v
     if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
         if (block >= 0) {
             GridBlockRecord* r = &extra->blockRecords[block];
-            extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
+            extra->texture->RemapTexCoordsIfMoved(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
                                                      &vertices->v, vertexCount, 0x20);
         } else {
-            extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+            extra->texture->RemapTexCoordsIfMoved(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
                                                      &vertices->u, &vertices->v, vertexCount, 0x20);
         }
     }
     if (terrain->qualityParamA < detail) {
-        if (terrain->field_0xcb4 == 0) {
+        if (terrain->closeUpStateSet == 0) {
             terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, D3DTFN_LINEAR);
             terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, D3DTFP_NONE);
-            terrain->field_0xcb4 = 1;
+            terrain->closeUpStateSet = 1;
         }
-    } else if (terrain->field_0xcb4 != 0) {
+    } else if (terrain->closeUpStateSet != 0) {
         terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, g_gridGameSettings->minFilter);
         terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, g_gridGameSettings->mipFilter);
-        terrain->field_0xcb4 = 0;
+        terrain->closeUpStateSet = 0;
     }
     terrain->ageManager->MarkUsed(&data->ageEntry);
     if (terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
@@ -849,7 +849,7 @@ int DrawableGridNode::UnknownFunction481180(int x, int z, int size, int quad)
 // lower neighbour (height, curve index and vertex bit 7) and counts the
 // differences, which nothing reads. Retail recurses into children[row]
 // once per column inside the scan, then into every child.
-void DrawableGridNode::UnknownFunction4813e0()
+void DrawableGridNode::CountEdgeDifferences()
 {
     int mismatches = 0;
     if (childMask && children && !data->b0) {
@@ -878,14 +878,14 @@ void DrawableGridNode::UnknownFunction4813e0()
                     }
                 }
                 if (children[i])
-                    ((DrawableGridNode*)children[i])->UnknownFunction4813e0();
+                    ((DrawableGridNode*)children[i])->CountEdgeDifferences();
             }
         }
     }
     if (children) {
         for (int i = 0; i < 256; i++) {
             if (children[i])
-                ((DrawableGridNode*)children[i])->UnknownFunction4813e0();
+                ((DrawableGridNode*)children[i])->CountEdgeDifferences();
         }
     }
 }
@@ -901,7 +901,7 @@ void DrawableGridNode::UnknownFunction481580()
     } else if (childMask) {
         for (int z = 0; z <= 16; z++) {
             for (int x = 0; x <= 16; x++)
-                UnknownFunction481cc0(x, z);
+                CanDropVertex(x, z);
         }
     }
 }
@@ -909,7 +909,7 @@ void DrawableGridNode::UnknownFunction481580()
 // 0x004824c0: updates the node's level of detail; nodes that stay coarse
 // release their children's buffers, finer ones load their child nodes from
 // the stream on first use (the same layout 0x0047e600 reads).
-void DrawableGridNode::UnknownFunction4824c0(UnknownTextureStream* stream, void* a1, int recurse, int coarse)
+void DrawableGridNode::UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse, int coarse)
 {
     float detail = UnknownFunction4815e0(coarse);
     UnknownVirtualSlot3(detail);
@@ -921,7 +921,7 @@ void DrawableGridNode::UnknownFunction4824c0(UnknownTextureStream* stream, void*
         if (children && recurse) {
             for (int i = 0; i < 256; i++) {
                 if (children[i])
-                    ((DrawableGridNode*)children[i])->UnknownFunction47edb0(1);
+                    ((DrawableGridNode*)children[i])->ReleaseVertexBuffers(1);
             }
         }
         return;
@@ -934,12 +934,12 @@ void DrawableGridNode::UnknownFunction4824c0(UnknownTextureStream* stream, void*
         return;
     if (children == 0) {
         children = new (__FILE__, 3383) GridNode*[256];
-        field_0x30 = new (__FILE__, 3384) int[256];
-        stream->UnknownFunction461340(terrain->field_0xc38 + field_0x2c, 0, 1);
-        stream->UnknownFunction461640(field_0x30, 0x400, 1);
+        childOffsets = new (__FILE__, 3384) int[256];
+        stream->UnknownFunction461340(terrain->childTableOffset + field_0x2c, 0, 1);
+        stream->UnknownFunction461640(childOffsets, 0x400, 1);
         for (int i = 0; i < 256; i++) {
-            if (field_0x30[i]) {
-                stream->UnknownFunction461340(terrain->field_0xc38 + field_0x30[i], 0, 1);
+            if (childOffsets[i]) {
+                stream->UnknownFunction461340(terrain->childTableOffset + childOffsets[i], 0, 1);
                 children[i] = UnknownVirtualSlot2(stream, 0, this, level - 1, shift - 4,
                                                   (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i, 0, 0);
             } else {
@@ -950,25 +950,25 @@ void DrawableGridNode::UnknownFunction4824c0(UnknownTextureStream* stream, void*
     if (recurse) {
         for (int i = 0; i < 256; i++) {
             if (children[i])
-                ((DrawableGridNode*)children[i])->UnknownFunction4824c0(stream, a1, 1, data->b0 | coarse);
+                ((DrawableGridNode*)children[i])->UpdateLevelOfDetail(stream, a1, 1, data->b0 | coarse);
         }
     }
 }
 
 // 0x004826d0: propagates bit 21 of the mask (all 22 bits set) to the child
 // nodes, rebuilds the edge links and resets the index ranges.
-void DrawableGridNode::UnknownFunction4826d0()
+void DrawableGridNode::PropagateFullMask()
 {
     if (children) {
         for (int i = 0; i < 256; i++) {
             if (children[i]) {
                 if (childMask & 0x200000)
                     ((DrawableGridNode*)children[i])->childMask = 0x3fffff;
-                ((DrawableGridNode*)children[i])->UnknownFunction4826d0();
+                ((DrawableGridNode*)children[i])->PropagateFullMask();
             }
         }
     }
-    UnknownFunction482ae0();
+    TestNodeVertices();
     data->field_0x130 = terrain->field_0xb4;
     data->field_0x126 = 0;
     data->field_0x122 = 0;
@@ -980,7 +980,7 @@ void DrawableGridNode::UnknownFunction4826d0()
 // node's old and new detail limits (GridBaseBlock keeps the vertices sorted by
 // curve value, +0x908 indexes the sorted list): newly coarse ones are
 // released, newly fine ones pinned, the rest of the band re-tested.
-void DrawableGridNode::UnknownFunction482760()
+void DrawableGridNode::RetestChangedVertices()
 {
     if (childMask == 0)
         return;
@@ -989,7 +989,7 @@ void DrawableGridNode::UnknownFunction482760()
             if (children[i]) {
                 if (childMask == 0x200000)
                     ((DrawableGridNode*)children[i])->childMask = 0x3fffff;
-                ((DrawableGridNode*)children[i])->UnknownFunction482760();
+                ((DrawableGridNode*)children[i])->RetestChangedVertices();
             }
         }
     }
@@ -1011,7 +1011,7 @@ void DrawableGridNode::UnknownFunction482760()
             if (!(data->field_0x000[i] & 0x10) && (data->field_0x000[i] & 0x80)) {
                 data->field_0x000[i] &= ~0x80;
                 data->b1 = 1;
-                UnknownFunction482c90(g_gridEdges[i].x, g_gridEdges[i].z, 0);
+                PropagateVertexChange(g_gridEdges[i].x, g_gridEdges[i].z, 0);
             }
         }
     }
@@ -1024,7 +1024,7 @@ void DrawableGridNode::UnknownFunction482760()
                 if (!(data->field_0x000[i] & 0x80)) {
                     data->field_0x000[i] |= 0x80;
                     data->b1 = 1;
-                    UnknownFunction482c90(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
+                    PropagateVertexChange(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
                 }
             }
         }
@@ -1034,18 +1034,18 @@ void DrawableGridNode::UnknownFunction482760()
         if (data->field_0x000[i] & 0xf)
             terrain->field_0xb8[i] = terrain->field_0x53c;
         else
-            UnknownFunction482a40(g_gridEdges[i].x, g_gridEdges[i].z);
+            TestVertex(g_gridEdges[i].x, g_gridEdges[i].z);
     }
     data->field_0x130 = terrain->field_0xb4;
 }
 
 // 0x00482a40: re-tests one vertex and flags it (bit 6: failed the test,
 // bit 7: in use) and its neighbours when its state changes.
-void DrawableGridNode::UnknownFunction482a40(int x, int z)
+void DrawableGridNode::TestVertex(int x, int z)
 {
-    terrain->field_0xb0++;
+    terrain->vertexTests++;
     int i = g_gridRow17[z] + x;
-    if (!UnknownFunction481cc0(x, z)) {
+    if (!CanDropVertex(x, z)) {
         data->field_0x000[i] |= 0x40;
         if (data->field_0x000[i] & 0x80)
             return;
@@ -1059,31 +1059,31 @@ void DrawableGridNode::UnknownFunction482a40(int x, int z)
         data->field_0x000[i] &= ~0x80;
     }
     data->b1 = 1;
-    UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
+    PropagateVertexChange(x, z, data->field_0x000[i] & 0x80);
 }
 
 // 0x00482ae0: the same subdivision sequence as 0x0047e4d0 over the whole
 // node, then one pass with step 16.
-void DrawableGridNode::UnknownFunction482ae0()
+void DrawableGridNode::TestNodeVertices()
 {
     int half = 1;
     int step = 2;
     int rowStep = 1;
     while (half < 16) {
-        UnknownFunction482b40(0, 0, 16, 16, half, 0, step, rowStep);
+        TestRectangleLevel(0, 0, 16, 16, half, 0, step, rowStep);
         rowStep <<= 1;
-        UnknownFunction482b40(0, 0, 16, 16, half, half, step, rowStep);
+        TestRectangleLevel(0, 0, 16, 16, half, half, step, rowStep);
         half <<= 1;
         step <<= 1;
     }
-    UnknownFunction482b40(0, 0, 16, 16, 0, 0, 16, 16);
+    TestRectangleLevel(0, 0, 16, 16, 0, 0, 16, 16);
 }
 
 // 0x00482b40: 0x00482a40's test over one subdivision level of a
 // rectangle, skipping vertices pinned by a direction bit. Retail loads the
 // row offset before x, which the row pointer and the inner loop's own copy
 // of x reproduce.
-void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int half, int start,
+void DrawableGridNode::TestRectangleLevel(int x0, int z0, int w, int h, int half, int start,
                                              int step, int rowStep)
 {
     int row = 0;
@@ -1100,7 +1100,7 @@ void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int h
             int i = *r + n;
             if (data->field_0x000[i] & 0xf)
                 continue;
-            if (!UnknownFunction481cc0(n, z)) {
+            if (!CanDropVertex(n, z)) {
                 data->field_0x000[i] |= 0x40;
                 if (data->field_0x000[i] & 0x80)
                     continue;
@@ -1114,7 +1114,7 @@ void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int h
                 data->field_0x000[i] &= ~0x80;
             }
             data->b1 = 1;
-            UnknownFunction482c90(n, z, data->field_0x000[i] & 0x80);
+            PropagateVertexChange(n, z, data->field_0x000[i] & 0x80);
         }
     }
 }
@@ -1123,24 +1123,24 @@ void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int h
 // the centre vertex depends on two corners of the parent node, picked by
 // the node's position in the parent (+0x2a: x in the low nibble, z in the
 // high nibble).
-void DrawableGridNode::UnknownFunction482c90(int x, int z, int flag)
+void DrawableGridNode::PropagateVertexChange(int x, int z, int flag)
 {
     terrain->field_0xa0++;
     int i = g_gridRow17[z] + x;
     if (x == 8 && z == x) {
         if (parent) {
             if ((field_0x2a & 0x11) != 0x11 && (field_0x2a & 0x11) != 0) {
-                ((DrawableGridNode*)parent)->UnknownFunction482dd0(field_0x2a & 0xf, field_0x2a >> 4, flag, 8, 0);
-                ((DrawableGridNode*)parent)->UnknownFunction482dd0((field_0x2a & 0xf) + 1, (field_0x2a >> 4) + 1, flag, 1, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection(field_0x2a & 0xf, field_0x2a >> 4, flag, 8, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection((field_0x2a & 0xf) + 1, (field_0x2a >> 4) + 1, flag, 1, 0);
             } else {
-                ((DrawableGridNode*)parent)->UnknownFunction482dd0(field_0x2a & 0xf, (field_0x2a >> 4) + 1, flag, 2, 0);
-                ((DrawableGridNode*)parent)->UnknownFunction482dd0((field_0x2a & 0xf) + 1, field_0x2a >> 4, flag, 4, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection(field_0x2a & 0xf, (field_0x2a >> 4) + 1, flag, 2, 0);
+                ((DrawableGridNode*)parent)->SetVertexDirection((field_0x2a & 0xf) + 1, field_0x2a >> 4, flag, 4, 0);
             }
         }
     } else {
         if (g_gridEdges[i].x0 != g_gridEdges[i].x1 || g_gridEdges[i].z0 != g_gridEdges[i].z1) {
-            UnknownFunction482dd0(g_gridEdges[i].x0, g_gridEdges[i].z0, flag, g_gridEdges[i].dir0, 0);
-            UnknownFunction482dd0(g_gridEdges[i].x1, g_gridEdges[i].z1, flag, g_gridEdges[i].dir1, 0);
+            SetVertexDirection(g_gridEdges[i].x0, g_gridEdges[i].z0, flag, g_gridEdges[i].dir0, 0);
+            SetVertexDirection(g_gridEdges[i].x1, g_gridEdges[i].z1, flag, g_gridEdges[i].dir1, 0);
         }
     }
 }
@@ -1150,7 +1150,7 @@ void DrawableGridNode::UnknownFunction482c90(int x, int z, int flag)
 // `notify` flag; VC6 then threads it into a single notify block and places
 // the `!changed` return after it, as retail does (gotos or two notify blocks
 // place the return check inline).
-void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, GridBaseCell* origin)
+void DrawableGridNode::SetVertexDirection(int x, int z, int flag, int dir, GridBaseCell* origin)
 {
     if (x < 0 || z < 0 || x > 16 || z > 16)
         return;
@@ -1170,28 +1170,28 @@ void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, Gr
         }
     } else {
         data->field_0x000[i] &= ~(unsigned char)dir;
-        if (!(data->field_0x000[i] & 0xf) && UnknownFunction482f00(x, z))
+        if (!(data->field_0x000[i] & 0xf) && RetestUnpinnedVertex(x, z))
             notify = 1;
     }
     if (notify) {
         data->b1 = 1;
-        UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
+        PropagateVertexChange(x, z, data->field_0x000[i] & 0x80);
     } else if (flag && !changed)
         return;
     if (parent && !origin && (x == 0 || x == 16 || z == 0 || z == 16))
-        ((DrawableGridNode*)parent)->UnknownFunction4835c0(this, x, z, flag, dir, cell);
+        ((DrawableGridNode*)parent)->PropagateBorderChange(this, x, z, flag, dir, cell);
 }
 
 // 0x00482f00: re-tests a vertex that lost its pins; returns 1 when the
 // vertex was dropped.
-int DrawableGridNode::UnknownFunction482f00(int x, int z)
+int DrawableGridNode::RetestUnpinnedVertex(int x, int z)
 {
     int i = g_gridRow17[z] + x;
     GridBaseCell* cell = &block->cells[i];
     int result = 0;
     if (childMask && (data->field_0x130 == terrain->field_0xb4 ||
                       terrain->field_0xb8[i] == terrain->field_0x53c)) {
-        if (UnknownFunction481cc0(x, z)) {
+        if (CanDropVertex(x, z)) {
             data->field_0x000[i] &= ~0x40;
             if ((data->field_0x000[i] & 0x80) && !(data->field_0x000[i] & 0x10)) {
                 data->field_0x000[i] &= ~0x80;
@@ -1220,7 +1220,7 @@ int DrawableGridNode::UnknownFunction482f00(int x, int z)
 
 // 0x00483040: forces the sixteen block centres (2 + 4i, 2 + 4j) in (bit 4
 // and bit 7) and marks the node.
-int DrawableGridNode::UnknownFunction483040()
+int DrawableGridNode::ForceBlockCentres()
 {
     if (data->b3)
         return 1;
@@ -1230,7 +1230,7 @@ int DrawableGridNode::UnknownFunction483040()
             data->field_0x000[i] |= 0x10;
             if (!(data->field_0x000[i] & 0x80)) {
                 data->field_0x000[i] |= 0x80;
-                UnknownFunction482c90(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
+                PropagateVertexChange(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
             }
         }
     }
@@ -1241,7 +1241,7 @@ int DrawableGridNode::UnknownFunction483040()
 }
 
 // 0x00483100: undoes 0x00483040 for the centres nothing else needs.
-int DrawableGridNode::UnknownFunction483100()
+int DrawableGridNode::ReleaseBlockCentres()
 {
     if (data->b3) {
         int i = 2 * 17 + 2;
@@ -1252,8 +1252,8 @@ int DrawableGridNode::UnknownFunction483100()
                     if (!(data->field_0x000[i] & 0x4f)) {
                         int x = g_gridEdges[i].x;
                         int z = g_gridEdges[i].z;
-                        if (UnknownFunction482f00(x, z))
-                            UnknownFunction482c90(x, z, 0);
+                        if (RetestUnpinnedVertex(x, z))
+                            PropagateVertexChange(x, z, 0);
                     }
                 }
             }
@@ -1271,7 +1271,7 @@ int DrawableGridNode::UnknownFunction483100()
 // 0x004835c0: a vertex on the border of `child` changed; passes the change to
 // the neighbouring children of this node, or for children on this node's own
 // border, down from the root node through 0x00483200.
-void DrawableGridNode::UnknownFunction4835c0(DrawableGridNode* child, int x, int z, int flag, int dir,
+void DrawableGridNode::PropagateBorderChange(DrawableGridNode* child, int x, int z, int flag, int dir,
                                             GridBaseCell* cell)
 {
     DrawableGridNode* n;
@@ -1280,49 +1280,49 @@ void DrawableGridNode::UnknownFunction4835c0(DrawableGridNode* child, int x, int
         if (x == 0) {
             n = (DrawableGridNode*)children[child->field_0x2a - 1];
             if (n)
-                n->UnknownFunction482dd0(16, z, flag, dir, cell);
+                n->SetVertexDirection(16, z, flag, dir, cell);
             if (z == 0) {
                 n = (DrawableGridNode*)children[child->field_0x2a - 17];
                 if (n)
-                    n->UnknownFunction482dd0(16, 16, flag, dir, cell);
+                    n->SetVertexDirection(16, 16, flag, dir, cell);
                 n = (DrawableGridNode*)children[child->field_0x2a - 16];
                 if (n)
-                    n->UnknownFunction482dd0(0, 16, flag, dir, cell);
+                    n->SetVertexDirection(0, 16, flag, dir, cell);
             } else if (z == 16) {
                 n = (DrawableGridNode*)children[child->field_0x2a + 15];
                 if (n)
-                    n->UnknownFunction482dd0(16, 0, flag, dir, cell);
+                    n->SetVertexDirection(16, 0, flag, dir, cell);
                 n = (DrawableGridNode*)children[child->field_0x2a + 16];
                 if (n)
-                    n->UnknownFunction482dd0(0, 0, flag, dir, cell);
+                    n->SetVertexDirection(0, 0, flag, dir, cell);
             }
         } else if (x == 16) {
             n = (DrawableGridNode*)children[child->field_0x2a + 1];
             if (n)
-                n->UnknownFunction482dd0(0, z, flag, dir, cell);
+                n->SetVertexDirection(0, z, flag, dir, cell);
             if (z == 0) {
                 n = (DrawableGridNode*)children[child->field_0x2a - 15];
                 if (n)
-                    n->UnknownFunction482dd0(0, 16, flag, dir, cell);
+                    n->SetVertexDirection(0, 16, flag, dir, cell);
                 n = (DrawableGridNode*)children[child->field_0x2a - 16];
                 if (n)
-                    n->UnknownFunction482dd0(16, 16, flag, dir, cell);
+                    n->SetVertexDirection(16, 16, flag, dir, cell);
             } else if (z == 16) {
                 n = (DrawableGridNode*)children[child->field_0x2a + 17];
                 if (n)
-                    n->UnknownFunction482dd0(0, 0, flag, dir, cell);
+                    n->SetVertexDirection(0, 0, flag, dir, cell);
                 n = (DrawableGridNode*)children[child->field_0x2a + 16];
                 if (n)
-                    n->UnknownFunction482dd0(16, 0, flag, dir, cell);
+                    n->SetVertexDirection(16, 0, flag, dir, cell);
             }
         } else if (z == 0) {
             n = (DrawableGridNode*)children[child->field_0x2a - 16];
             if (n)
-                n->UnknownFunction482dd0(x, 16, flag, dir, cell);
+                n->SetVertexDirection(x, 16, flag, dir, cell);
         } else if (z == 16) {
             n = (DrawableGridNode*)children[child->field_0x2a + 16];
             if (n)
-                n->UnknownFunction482dd0(x, 0, flag, dir, cell);
+                n->SetVertexDirection(x, 0, flag, dir, cell);
         }
     } else {
         GridNode* root = this;
@@ -1332,16 +1332,16 @@ void DrawableGridNode::UnknownFunction4835c0(DrawableGridNode* child, int x, int
             int shift = 0;
             for (int i = 0; i < level - 1; i++)
                 shift += 4;
-            ((DrawableGridNode*)root)->UnknownFunction483200((child->gridX + x) << shift,
-                                                             (child->gridZ + z) << shift, flag, dir, cell,
-                                                             child->level);
+            ((DrawableGridNode*)root)->WalkBorderVertex((child->gridX + x) << shift,
+                                                        (child->gridZ + z) << shift, flag, dir, cell,
+                                                        child->level);
         }
     }
 }
 
 // 0x00481a20: frustum test of 4 x 4 block `block` (Z order); records the
 // result in bit `block` of the draw data's +0x178 mask.
-int DrawableGridNode::UnknownFunction481a20(int block)
+int DrawableGridNode::TestBlockFrustum(int block)
 {
     float boxExtent[3];
     float boxCenter[3];
@@ -1363,7 +1363,7 @@ int DrawableGridNode::UnknownFunction481a20(int block)
 }
 
 // 0x00481b30: distance from the viewer to a 4 x 4 block's box.
-float DrawableGridNode::UnknownFunction481b30(int block)
+float DrawableGridNode::BlockDistance(int block)
 {
     float ex = terrain->viewerX;
     float ey = terrain->viewerY;
@@ -1405,14 +1405,14 @@ float DrawableGridNode::UnknownFunction481b30(int block)
 
 // 0x00481db0: the root call of the visibility walk 0x00481de0 with the
 // node's bounding box (+0x44 centre, +0x50 half extents).
-int DrawableGridNode::UnknownFunction481db0(void* a0, void* a1)
+int DrawableGridNode::TestVisibility(void* a0, void* a1)
 {
     return UnknownFunction481de0(a0, a1, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
 }
 
 // 0x00481cc0: screen-space error test of vertex (x, z): returns 1 when the
 // vertex's curve error, seen from the viewer, is small enough to drop it.
-int DrawableGridNode::UnknownFunction481cc0(int x, int z)
+int DrawableGridNode::CanDropVertex(int x, int z)
 {
     GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
     float error = (float)g_gridBaseCurve[cell->field_0x1] * field_0x14 * field_0x10;
@@ -1423,7 +1423,7 @@ int DrawableGridNode::UnknownFunction481cc0(int x, int z)
     float horizontal = dx * dx + dz * dz;
     float distance = dy * dy + horizontal;
     float limit = distance * terrain->field_0x78 * distance;
-    terrain->field_0x90++;
+    terrain->vertexErrorTests++;
     if (horizontal * error * error <= limit)
         return 1;
     return 0;

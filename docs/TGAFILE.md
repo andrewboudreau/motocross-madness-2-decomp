@@ -113,5 +113,9 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x005127a0` `FillTgaHeader24`
 - `0x005127f0` `WriteTga32`
 - `0x00512870` `FillTgaHeader32`
+- `0x00512990` `WriteTga` (near-miss sample)
+- `0x005119c0` `FillPixelFormat`; the other pixel-format and whole-file
+  helpers keep address names because UI, TextureMap and SoultreeMaterial
+  code reaches them through this header
 - `0x005128c0` `WriteTga16`
 - `0x00512940` `FillTgaHeader16`

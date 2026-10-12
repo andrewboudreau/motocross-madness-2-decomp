@@ -44,7 +44,7 @@ static inline void Normalize(Vector3& v) {
     if (squared == 0.0f)
         v = kVec3Zero;
     else
-        v *= UnknownFunction460c00(squared);
+        v *= FastInvSqrt(squared);
 }
 
 // ---------------------------------------------------------------- RunwayLights
@@ -58,7 +58,7 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 }
 
 // 0x0048a600
-RunwayLights* RunwayLights::UnknownFunction48a600(void* value, int a, int b, UnknownRunwayTerrain* terrain) {
+RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain) {
     char name[0x104];
 
     GameObject::UnknownVirtualSlot8(value);
@@ -85,7 +85,7 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
         return 1;
     for (int i = 0; i < 5; i++)
         lightModels[i]->isVisible = 0;
-    if (field_0x30->field_0x7a4)
+    if (field_0x30->finished)
         return 1;
     blinkTimer += frameTime;
     if (blinkTimer > 1.375f)
@@ -100,14 +100,14 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
         field_0x30->field_0x740->field_0x48->UnknownFunction518080(field_0x30->field_0x744->field_0x44, &next);
         direction = position - next;
     } else {
-        position = field_0x30->field_0x10c;
-        next = field_0x30->field_0x10c;
-        direction = field_0x30->field_0x118;
+        position = field_0x30->trackPoint;
+        next = field_0x30->trackPoint;
+        direction = field_0x30->trackDirection;
     }
     if (direction.x == 0.0f && direction.z == 0.0f) {
-        position = field_0x30->field_0x10c;
-        next = field_0x30->field_0x10c;
-        direction = field_0x30->field_0x118;
+        position = field_0x30->trackPoint;
+        next = field_0x30->trackPoint;
+        direction = field_0x30->trackDirection;
     } else {
         Normalize(direction);
     }
@@ -172,7 +172,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
 }
 
 // 0x0048adf0
-VisualCue* VisualCue::UnknownFunction48adf0(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
+VisualCue* VisualCue::LoadVisualCue(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
                                             UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
                                             float size, float c, float d) {
     char name[0x104];
@@ -213,7 +213,7 @@ int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         if (cueRacers[i]->UnknownIsEnabled())
             active++;
     if (UnknownFunction43caa0(0x14, 0, event, 0x80000000) && !cueView->field_0x190 &&
-        cueView->field_0x18a && active > 1) {
+        cueView->racing && active > 1) {
         field_0xbc = 1 - field_0xbc;
         return 1;
     }
@@ -246,7 +246,7 @@ int VisualCue::UnknownVirtualSlot14() {
 }
 
 // 0x0048bc30
-int VisualCue::UnknownFunction48bc30() {
+int VisualCue::NextCueIndex() {
     if (reportedRacer != currentRacer) {
         reportedRacer = currentRacer;
         return currentRacer;
@@ -277,9 +277,9 @@ NumberObjectManager::NumberObjectManager(int flags) : GameObject(flags) {
 }
 
 // 0x0048bd00
-NumberObjectManager* NumberObjectManager::UnknownFunction48bd00(void* value, int b, UnknownNumberRacer* racer,
-                                                                int pixels, UnknownNumberCamera* camera,
-                                                                float size) {
+NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, UnknownNumberRacer* racer,
+                                                      int pixels, UnknownNumberCamera* camera,
+                                                      float size) {
     char name[0x104];
 
     GameObject::UnknownVirtualSlot8(value);
@@ -320,22 +320,22 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
         if (field_0x38[i])
             field_0x38[i]->isVisible = 0;
     if (((UnknownNumberOwner*)field_0x18)->field_0x08 == field_0x34) {
-        int counting = field_0x2c->field_0x15c > 0.0f && field_0x2c->field_0x6c == 0;
+        int counting = field_0x2c->countdown > 0.0f && field_0x2c->field_0x6c == 0;
         if (!(field_0x2c->field_0x38->field_0x76c > 1.0f) && !counting)
             return 1;
         field_0x30 = 1;
         Vector3 up;
         Vector3 forward;
-        forward = field_0x34->field_0x17c;
+        forward = field_0x34->viewDirection;
         up = field_0x34->field_0x188;
         int index;
         if (counting) {
-            index = (int)field_0x2c->field_0x15c;
+            index = (int)field_0x2c->countdown;
             if (index >= 5 || index < 0 || !field_0x38[index])
                 return 1;
             field_0x38[index]->isVisible = 1;
             field_0x38[index]->UnknownFunction401520(&forward, &up, 0, 1);
-            Vector3 position = field_0x34->field_0x170;
+            Vector3 position = field_0x34->eyePosition;
             position += up * 2.5f;
             position += forward * 6.0f;
             field_0x38[index]->UnknownFunction4014f0(&position);
@@ -345,7 +345,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
                 return 1;
             field_0x38[index]->isVisible = 1;
             field_0x38[index]->UnknownFunction401520(&forward, &up, 0, 1);
-            Vector3 position = field_0x34->field_0x170;
+            Vector3 position = field_0x34->eyePosition;
             position += up * 2.5f;
             position += forward * 6.0f;
             field_0x38[index]->UnknownFunction4014f0(&position);
@@ -395,7 +395,7 @@ BonusObjectManager::~BonusObjectManager() {
 }
 
 // 0x0048c330
-int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
+int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     char name[0x104];
     Vector3 position;
     int digit;
@@ -464,32 +464,32 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
 }
 
 // 0x0048c8a0
-int BonusObjectManager::UnknownFunction48c8a0(void* value, int a, int b) {
+int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
     if (!AppendChild(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
         return 0;
-    strcpy(baseFrame->field_0x038, "Base Bonus Frame");
-    baseFrame->field_0x174 = kVec3Zero;
-    baseFrame->field_0x180 = Vector3(0.9f, 0.22f, 0.09f);
+    strcpy(baseFrame->nodeName, "Base Bonus Frame");
+    baseFrame->subtreeBoundsCenter = kVec3Zero;
+    baseFrame->subtreeBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->field_0x170 = 1;
-    baseFrame->field_0x158 = kVec3Zero;
-    baseFrame->field_0x164 = Vector3(0.9f, 0.22f, 0.09f);
-    baseFrame->field_0x154 = 1;
-    field_0x1e4 = baseFrame->field_0x164.x + baseFrame->field_0x164.x;
+    baseFrame->localBoundsCenter = kVec3Zero;
+    baseFrame->localBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
+    baseFrame->localBoundsValid = 1;
+    field_0x1e4 = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
     return 1;
 }
 
 // 0x0048ca60
-BonusObjectManager* BonusObjectManager::UnknownFunction48ca60(void* value, int a, int b, UnknownBonusRacer* racer,
-                                                              UnknownBonusCamera* camera) {
+BonusObjectManager* BonusObjectManager::SetupCounter(void* value, int a, int b, UnknownBonusRacer* racer,
+                                                     UnknownBonusCamera* camera) {
     GameObject::UnknownVirtualSlot8(value);
     field_0x2c = racer;
     field_0x38 = camera;
-    if (!UnknownFunction48c8a0(value, a, b)) {
+    if (!CreateFrameNode(value, a, b)) {
         Release();
         return 0;
     }
-    if (!UnknownFunction48c330(value, a, b)) {
+    if (!LoadDigitModels(value, a, b)) {
         Release();
         return 0;
     }
@@ -499,9 +499,9 @@ BonusObjectManager* BonusObjectManager::UnknownFunction48ca60(void* value, int a
 // 0x0048cad0
 void BonusObjectManager::NextKey() {
     int i = ++currentKey;
-    keyDuration = g_UnknownBonusKeys[i + 1].field_0x04 - g_UnknownBonusKeys[i].field_0x04;
-    keyAngle = g_UnknownBonusKeys[i].field_0x2c;
-    keyAngleChange = g_UnknownBonusKeys[i + 1].field_0x2c - keyAngle;
+    keyDuration = g_UnknownBonusKeys[i + 1].time - g_UnknownBonusKeys[i].time;
+    keyAngle = g_UnknownBonusKeys[i].rotationAngle;
+    keyAngleChange = g_UnknownBonusKeys[i + 1].rotationAngle - keyAngle;
     Vector3 next = KEY_VECTOR(i + 1, field_0x14);
     keyPosition = KEY_VECTOR(i, field_0x14);
     keyPositionChange = next - keyPosition;

@@ -1,7 +1,7 @@
 {
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?UnknownFunction461640@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
-  "?UnknownFunction47db60@@YAXXZ": "0x0047db60",
+  "?BuildCurveTables@@YAXXZ": "0x0047db60",
   "?UnknownFunction4a03d0@@YAXPAEPBXH@Z": "0x004a03d0",
   "?g_gridBaseCurve@@3PAGA": "0x006752a4",
   "?g_gridBaseCurveBuilt@@3HA": "0x006754a4",

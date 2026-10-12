@@ -5,12 +5,12 @@
 // samples/race/WreckerNearMisses.bindings.json.
 //
 // UnknownFunction5329e0 (0x005329e0, 1312 bytes; 763/1312): pushes probes
-// back out of the box field_0xe8/field_0xf4 and turns the mean push into the
-// impulse field_0x10c. Every block matches in shape, including the per-axis
+// back out of the box boxCenter/boxHalfExtents and turns the mean push into the
+// impulse pushImpulse. Every block matches in shape, including the per-axis
 // clip (an inline helper with by-value parameters, which explains the local
 // copies of the extent and the previous position) and the retail use of the
 // previous position's y for the x axis. Retail runs out of inline budget at
-// the end (docs/VC6_INLINE_BUDGET.md): it expands `sum * field_0x118` but
+// the end (docs/VC6_INLINE_BUDGET.md): it expands `sum * pushScale` but
 // calls the Vector3 constructor inside it (0x00404e60), then calls the
 // out-of-line `operator*` (0x005015b0) for `* frameTime`; the scaled
 // temporary is passed straight through, which gives retail's 0x94 frame.
@@ -27,7 +27,7 @@
 // block locals, the clip written out with named locals, push/previousPush
 // declared at function or loop scope, `sum = sum + push`.
 //
-// UnknownFunction531740 (0x00531740, 1624 bytes; 1606/1624): the contact
+// SprayContactParticles (0x00531740, 1624 bytes; 1606/1624): the contact
 // particle spray. Frame, slot order and every instruction but two match
 // with the normalisations written as nested expressions (their temporaries
 // share slots as retail's do) and the per-particle gravity drift built
@@ -124,14 +124,14 @@ static inline Vector3 WreckerNormalizeFirst(const Vector3& v) {
     float squared = WreckerDotCall(&v, &v);
     if (squared == 1.0f)
         return v;
-    return WreckerScaleCtorCall(v, UnknownFunction460c00(squared));
+    return WreckerScaleCtorCall(v, FastInvSqrt(squared));
 }
 static inline Vector3 WreckerNormalizeTail(const Vector3& v) {
     float squared = WreckerDotCall(&v, &v);
     if (squared == 1.0f)
         return v;
-    float inv = UnknownFunction460c00(squared);
-    return UnknownFunction5015b0(v, inv);
+    float inv = FastInvSqrt(squared);
+    return Vec3ScaleCall(v, inv);
 }
 
 static inline Vector3 WreckerAddCtorCall(const Vector3& a, const Vector3& b) {
@@ -141,7 +141,7 @@ static inline Vector3 WreckerAddCtorCall(const Vector3& a, const Vector3& b) {
 // The mean push divides through the inline `operator/` that Wrecker.cpp uses in
 // 0x00531da0 (`v * (1.0f / s)`): retail keeps the reciprocal on the stack for
 // the first component (`fld st(0); fmul [sum.x]`), and the later scale by
-// field_0x118 then loads sum.x as a new leaf, as retail does.
+// pushScale then loads sum.x as a new leaf, as retail does.
 inline Vector3 operator/(const Vector3& v, float s) {
     return v * (1.0f / s);
 }
@@ -150,46 +150,46 @@ void Wrecker::UnknownFunction5329e0(float frameTime) {
     Vector3 previousSum = Vector3(0.0f, 0.0f, 0.0f);
     Vector3 sum = Vector3(0.0f, 0.0f, 0.0f);
     int hits = 0;
-    for (int i = 0; i < field_0x38->field_0x100; i++) {
-        Vector3 p = field_0x38->field_0x104[i].field_0x0c->UnknownFunction4fd660(field_0x38->field_0x104[i].field_0x00);
-        field_0x104[i] = p;
-        p = field_0x100->UnknownFunction4fd7f0(p) - field_0xe8;
-        if (fabs(p.x) < field_0xf4.x && fabs(p.y) < field_0xf4.y && fabs(p.z) < field_0xf4.z) {
+    for (int i = 0; i < collisionModel->probeCount; i++) {
+        Vector3 p = collisionModel->probes[i].node->LocalToWorldPoint(collisionModel->probes[i].localPoint);
+        probePositions[i] = p;
+        p = boxFrame->UnknownFunction4fd7f0(p) - boxCenter;
+        if (fabs(p.x) < boxHalfExtents.x && fabs(p.y) < boxHalfExtents.y && fabs(p.z) < boxHalfExtents.z) {
             Vector3 push = Vector3(0.0f, 0.0f, 0.0f);
             Vector3 previousPush = Vector3(0.0f, 0.0f, 0.0f);
-            WreckerClipAxis(p.x, field_0xf4.x, field_0x104[i].y, push.x, previousPush.x);
-            WreckerClipAxis(p.y, field_0xf4.y, field_0x104[i].y, push.y, previousPush.y);
-            WreckerClipAxis(p.z, field_0xf4.z, field_0x104[i].z, push.z, previousPush.z);
-            if (push.x != 0.0f || push.y != field_0xf4.y || push.z != field_0xf4.z) {
+            WreckerClipAxis(p.x, boxHalfExtents.x, probePositions[i].y, push.x, previousPush.x);
+            WreckerClipAxis(p.y, boxHalfExtents.y, probePositions[i].y, push.y, previousPush.y);
+            WreckerClipAxis(p.z, boxHalfExtents.z, probePositions[i].z, push.z, previousPush.z);
+            if (push.x != 0.0f || push.y != boxHalfExtents.y || push.z != boxHalfExtents.z) {
                 sum += push;
                 hits++;
             }
-            if (previousPush.x != 0.0f || previousPush.y != field_0xf4.y || previousPush.z != field_0xf4.z)
+            if (previousPush.x != 0.0f || previousPush.y != boxHalfExtents.y || previousPush.z != boxHalfExtents.z)
                 previousSum += previousPush;
         }
     }
     if (hits)
         sum = sum / hits;
-    field_0x10c = UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime);
+    pushImpulse = Vec3ScaleCall(WreckerScaleCtorCall(sum, pushScale), frameTime);
 }
 
 // The particle the next free entry of the manager's table.
-#define WRECKER_NEXT_PARTICLE() (field_0x11c->field_0x40[field_0x11c->field_0x2c])
+#define WRECKER_NEXT_PARTICLE() (particles->particles[particles->activeCount])
 // The current entry of the random table, and the advance that wraps at 256.
-#define WRECKER_RANDOM_TABLE() (field_0x128[field_0x528])
-#define WRECKER_ADVANCE_RANDOM() if (++field_0x528 == 256) field_0x528 = 0
+#define WRECKER_RANDOM_TABLE() (randomTable[randomIndex])
+#define WRECKER_ADVANCE_RANDOM() if (++randomIndex == 256) randomIndex = 0
 
 // 0x00531740 (1624 bytes): sprays contact particles along a probe's slide
 // from `from` to `to`. Their velocity is the wreck's (or the rigid body's)
 // velocity plus a sideways jitter, plus the remaining gravity drift of the
 // frame; frameTime * 200 particles are emitted per frame.
-void Wrecker::UnknownFunction531740(Vector3 from, Vector3 to, Vector3 normal, float frameTime) {
+void Wrecker::SprayContactParticles(Vector3 from, Vector3 to, Vector3 normal, float frameTime) {
     Vector3 delta = to - from;
     Vector3 velocity;
-    if (field_0x44 == 0)
-        velocity = field_0xbc;
+    if (wreckState == 0)
+        velocity = linearStep;
     else
-        velocity = field_0x40->field_0x154;
+        velocity = rigidBody->velocity;
     float speed = WreckerLength(velocity);
     if (speed < 1.0f)
         return;
@@ -201,28 +201,28 @@ void Wrecker::UnknownFunction531740(Vector3 from, Vector3 to, Vector3 normal, fl
     Vector3 step = delta * inv;                           // the step per particle
     // The gravity drift per particle; nested, the inner temporary shares the
     // particle drift's slot as retail's does.
-    Vector3 dirStep = WreckerScaleCtorCall(WreckerScaleCtorCall(field_0x11c->field_0x1f98, frameTime), inv);
+    Vector3 dirStep = WreckerScaleCtorCall(WreckerScaleCtorCall(particles->gravity, frameTime), inv);
     for (int i = 0; i < count; i++) {
-        if (field_0x11c->field_0x2c != 1000) {
-            WRECKER_NEXT_PARTICLE()->field_0x14 = 0.0f;
+        if (particles->activeCount != 1000) {
+            WRECKER_NEXT_PARTICLE()->age = 0.0f;
             Vector3 along = WreckerScaleCtorCall(step, (float)i);
-            WRECKER_NEXT_PARTICLE()->field_0x00 = WreckerAddCtorCall(along, from);
-            WRECKER_NEXT_PARTICLE()->field_0x10 = field_0x124;
-            WRECKER_NEXT_PARTICLE()->field_0x1c = WRECKER_RANDOM_TABLE() * 0.15f;
-            WRECKER_NEXT_PARTICLE()->field_0x20 = WRECKER_RANDOM_TABLE() * 0.3f;
+            WRECKER_NEXT_PARTICLE()->position = WreckerAddCtorCall(along, from);
+            WRECKER_NEXT_PARTICLE()->frame = sprayFrame;
+            WRECKER_NEXT_PARTICLE()->size = WRECKER_RANDOM_TABLE() * 0.15f;
+            WRECKER_NEXT_PARTICLE()->growth = WRECKER_RANDOM_TABLE() * 0.3f;
             WRECKER_ADVANCE_RANDOM();
-            WRECKER_NEXT_PARTICLE()->field_0x18 = 375.0f;
+            WRECKER_NEXT_PARTICLE()->lifetime = 375.0f;
             float jitter = WRECKER_RANDOM_TABLE() * 2.0f - 1.0f;
             WRECKER_ADVANCE_RANDOM();
             Vector3 drift = WreckerScaleCtorCall(dirStep, count - (float)i);
             Vector3 sideways = WreckerScaleCtorCall(spread, jitter);
             Vector3 sum = WreckerAddCtorCall(sideways, scaled);
             Vector3 result;
-            WRECKER_NEXT_PARTICLE()->field_0x38 = *WreckerAddCall(&result, &sum, &drift);
-            WRECKER_NEXT_PARTICLE()->field_0x34 = 0x14;
-            field_0x11c->field_0x2c++;
+            WRECKER_NEXT_PARTICLE()->velocity = *WreckerAddCall(&result, &sum, &drift);
+            WRECKER_NEXT_PARTICLE()->flags = 0x14;
+            particles->activeCount++;
         }
-        if (++field_0x124 >= 0x2d)
-            field_0x124 = 0x1d;
+        if (++sprayFrame >= 0x2d)
+            sprayFrame = 0x1d;
     }
 }

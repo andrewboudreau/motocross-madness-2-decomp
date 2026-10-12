@@ -9,7 +9,8 @@ RTTI `Palette8 : BaseObject` (vtable `0x00555aa4`), `FontTexture`
 
 - `bmpfile.cpp` (`src/reconstructed/bmpfile.cpp`): read, write, free and
   describe an 8-bit `.bmp` (`0x00424140`, `0x00424380`, `0x004245b0`,
-  `0x004245f0`). The file/info headers are pack(2) layouts inferred from
+  `0x004245f0`: `ReadBitmap`, `WriteBitmap`, `FreeBitmap` and
+  `DescribeBitmap8`; EcoSystem.cpp's own declarations keep the address names). The file/info headers are pack(2) layouts inferred from
   offsets and stored constants. PCTextureMap.h now includes `bmpfile.h`.
 - `Palette8.cpp`: the loader `0x004b6b30`, constructor, destructor and
   deleting wrapper. It uses Quantize's `ColorMapper::UnknownFunction4dddd0`.

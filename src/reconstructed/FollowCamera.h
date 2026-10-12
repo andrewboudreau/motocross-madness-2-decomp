@@ -206,18 +206,18 @@ public:
     // the point table (line 0x88) and the state list; states 5-7 and values
     // outside 0..7 are dropped. Releases itself and returns 0 when no state
     // is left.
-    FollowCamera* UnknownFunction463140(void* value, float rate294, float rate298,
+    FollowCamera* SetupFollowCamera(void* value, float rate294, float rate298,
                                         float value228, float value2d0, float value2e8,
                                         int capacity, int count, const int* list);
     // 0x004650e0 (KrustyBikeCamera's constructor): loads the "CAMERA" records
     // of the text file `path` into frames/field_0x33c (FollowCam.cpp lines
     // 0x3c7, 0x3e1, 0x3e2).
-    void UnknownFunction4650e0(const char* path);
+    void LoadCameraFile(const char* path);
     // 0x00463520: appends a table entry while below capacity.
-    bool UnknownFunction463520(const Vector3& position, float a, float b, float c,
-                               float d, float e);
+    bool AppendTableEntry(const Vector3& position, float a, float b, float c,
+                          float d, float e);
     // 0x00463600: stores the subject and copies its +0x40.
-    void UnknownFunction463600(UnknownFollowCameraSubject* subject);
+    void SetSubject(UnknownFollowCameraSubject* subject);
 
 protected:
     friend class VCRDlg;        // InGameProcs.cpp: ButCamera restores the saved state
@@ -264,18 +264,18 @@ protected:
     float field_0x2cc;          // snapshot of field_0x234
     float field_0x2d0;          // set with field_0x2d4 by 0x00463140
     float field_0x2d4;          // 7.0f
-    float field_0x2d8;          // lift eased by VehicleCamera slot 35
-    int field_0x2dc;                 // capacity of points (0x00463140)
+    float lift;                      // +0x2d8, lift eased by VehicleCamera slot 35
+    int pointCapacity;               // +0x2dc, capacity of points (0x00463140)
     int pointCount;                  // +0x2e0, number of entries in points
     UnknownFollowCameraPoint* points; // +0x2e4, owned table
-    float field_0x2e8;          // yaw offset (0x00463140, slot 49)
+    float yawOffset;                 // +0x2e8, yaw offset (0x00463140, slot 49)
     float field_0x2ec;          // 3.0f
     float field_0x2f0;          // state-4 saved field_0x258 (slot 71)
     float field_0x2f4;          // 10.0f
     float field_0x2f8;          // 280.0f
     float field_0x2fc;          // 70.0f
     float field_0x300;          // 20.0f
-    float field_0x304;          // blend clock, advanced by slot 10 up to 1
+    float blendClock;                // +0x304, blend clock, advanced by slot 10 up to 1
     float field_0x308;          // set by KrustyBikeCamera slot 42
     int stateIndex;                  // +0x30c, cyclic index into states (slot 72)
     int stateCount;                  // +0x310, number of entries in states
@@ -284,5 +284,5 @@ protected:
     Matrix4* frames;                 // +0x338, one matrix per record (FollowCam.cpp line 0x3e1)
     float* field_0x33c;              // +0x33c, one value per record (line 0x3e2)
     float frameTime;                 // +0x340, playback clock (slot 47)
-    Matrix4 field_0x344;             // orientation built by slot 46
+    Matrix4 orientation;             // +0x344, orientation built by slot 46
 };

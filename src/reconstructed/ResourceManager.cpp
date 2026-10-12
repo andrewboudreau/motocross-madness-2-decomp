@@ -28,10 +28,10 @@ ResourceItem::ResourceItem()
 // 0x004e8de0
 void ResourceItem::UnknownFunction4e8de0()
 {
-    field_0x0c = 1;
-    field_0x08 = (char*)DebugMalloc(1, __FILE__, 24);
-    field_0x08[0] = 0;
-    field_0x10 = 0;
+    nameSize = 1;
+    name = (char*)DebugMalloc(1, __FILE__, 24);
+    name[0] = 0;
+    object = 0;
     field_0x14 = 0;
     field_0x18 = 0;
     field_0x1c = 0;
@@ -40,19 +40,19 @@ void ResourceItem::UnknownFunction4e8de0()
 // 0x004e8e10
 ResourceItem::~ResourceItem()
 {
-    if (field_0x08)
-        DebugFree(field_0x08, __FILE__, 42);
+    if (name)
+        DebugFree(name, __FILE__, 42);
 }
 
 // 0x004e8e80
 UnknownResourceManager::UnknownResourceManager()
 {
-    field_0x08 = 0;
-    field_0x14 = 0;
-    field_0x0c = 0;
-    field_0x10 = 0;
-    field_0x00 = 0;
-    field_0x04 = 0;
+    itemCount = 0;
+    items = 0;
+    archiveCount = 0;
+    archives = 0;
+    itemCapacity = 0;
+    archiveCapacity = 0;
 }
 
 // 0x004e8ea0
@@ -60,40 +60,40 @@ UnknownResourceManager::~UnknownResourceManager()
 {
     int i;
 
-    if (field_0x10) {
-        for (i = 0; i < field_0x0c; i++) {
-            if (field_0x10[i])
-                delete field_0x10[i];
+    if (archives) {
+        for (i = 0; i < archiveCount; i++) {
+            if (archives[i])
+                delete archives[i];
         }
-        DebugFree(field_0x10, __FILE__, 135);
+        DebugFree(archives, __FILE__, 135);
     }
-    if (field_0x14) {
-        for (i = 0; i < field_0x08; i++) {
-            if (field_0x14[i])
-                field_0x14[i]->Release();
+    if (items) {
+        for (i = 0; i < itemCount; i++) {
+            if (items[i])
+                items[i]->Release();
         }
-        DebugFree(field_0x14, __FILE__, 139);
+        DebugFree(items, __FILE__, 139);
     }
-    field_0x08 = 0;
-    field_0x14 = 0;
-    field_0x0c = 0;
-    field_0x10 = 0;
-    field_0x00 = 0;
-    field_0x04 = 0;
+    itemCount = 0;
+    items = 0;
+    archiveCount = 0;
+    archives = 0;
+    itemCapacity = 0;
+    archiveCapacity = 0;
 }
 
 // 0x004e8f40
-int UnknownResourceManager::UnknownFunction4e8f40(ResourceItem* item)
+int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
 {
-    for (int i = 0; i < field_0x08; i++) {
-        if (!_stricmp(item->field_0x08, field_0x14[i]->field_0x08)) {
-            UnknownTextureStream* archive = field_0x14[i]->field_0x14;
+    for (int i = 0; i < itemCount; i++) {
+        if (!_stricmp(item->name, items[i]->name)) {
+            UnknownTextureStream* archive = items[i]->field_0x14;
             if (archive && archive->UnknownFunction4e9960())
                 return 0;
 
-            field_0x14[i]->field_0x18 = item->field_0x18;
-            field_0x14[i]->field_0x1c = item->field_0x1c;
-            ResourceItem* existing = field_0x14[i];
+            items[i]->field_0x18 = item->field_0x18;
+            items[i]->field_0x1c = item->field_0x1c;
+            ResourceItem* existing = items[i];
             UnknownTextureStream* old = existing->field_0x14;
             existing->field_0x14 = item->field_0x14;
             if (old != item->field_0x14) {
@@ -107,13 +107,13 @@ int UnknownResourceManager::UnknownFunction4e8f40(ResourceItem* item)
 }
 
 // 0x004e9010
-void UnknownResourceManager::UnknownFunction4e9010(void* entry, void* object)
+void UnknownResourceManager::SetItemObject(void* entry, void* object)
 {
     ResourceItem* item = (ResourceItem*)entry;
 
-    item->field_0x10 = object;
+    item->object = object;
     if (!object && !item->field_0x14)
-        UnknownFunction4e9900(item);
+        ReleaseItem(item);
 }
 
 // 0x004e9030 (opens an "RS2" archive and adds its items) is a near miss:
@@ -122,23 +122,23 @@ void UnknownResourceManager::UnknownFunction4e9010(void* entry, void* object)
 // 0x004e9360
 ResourceItem* UnknownResourceManager::UnknownFunction4e9360(const char* name, int a)
 {
-    for (int i = 0; i < field_0x08; i++) {
-        if (!_stricmp(field_0x14[i]->field_0x08, name)) {
-            UnknownTextureStream* archive = field_0x14[i]->field_0x14;
+    for (int i = 0; i < itemCount; i++) {
+        if (!_stricmp(items[i]->name, name)) {
+            UnknownTextureStream* archive = items[i]->field_0x14;
             if (archive && (a || archive->UnknownFunction4e9960()))
-                field_0x14[i]->field_0x14->UnknownFunction461340(field_0x14[i]->field_0x18, 0, 0);
-            return field_0x14[i];
+                items[i]->field_0x14->UnknownFunction461340(items[i]->field_0x18, 0, 0);
+            return items[i];
         }
     }
     return 0;
 }
 
 // 0x004e93f0
-void* UnknownResourceManager::UnknownFunction4e93f0(void* object)
+void* UnknownResourceManager::FindItemByObject(void* object)
 {
-    for (int i = 0; i < field_0x08; i++) {
-        if (field_0x14[i]->field_0x10 == object)
-            return field_0x14[i];
+    for (int i = 0; i < itemCount; i++) {
+        if (items[i]->object == object)
+            return items[i];
     }
     return 0;
 }
@@ -155,35 +155,35 @@ int UnknownResourceManager::UnknownFunction4e9430(const char* name, const char* 
 
     UnknownTextureStream* archive = new(__FILE__, 387) UnknownTextureStream((int)this);
     if (archive->UnknownFunction460f50(buffer, "rb", archive->UnknownFunction460e70(buffer))) {
-        if (field_0x08 + 1 > field_0x00) {
-            field_0x14 = (ResourceItem**)DebugRealloc(field_0x14, (field_0x08 + 1) * 4, __FILE__, 393);
-            if (field_0x14) {
-                field_0x14[field_0x08] = 0;
-                field_0x00 = field_0x08 + 1;
+        if (itemCount + 1 > itemCapacity) {
+            items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 393);
+            if (items) {
+                items[itemCount] = 0;
+                itemCapacity = itemCount + 1;
             }
         }
-        if (field_0x0c + 1 > field_0x04) {
-            field_0x10 = (UnknownTextureStream**)DebugRealloc(field_0x10, (field_0x0c + 8) * 4, __FILE__, 405);
-            if (field_0x10) {
-                field_0x04 = field_0x0c + 8;
-                field_0x10[field_0x0c++] = archive;
+        if (archiveCount + 1 > archiveCapacity) {
+            archives = (UnknownTextureStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 405);
+            if (archives) {
+                archiveCapacity = archiveCount + 8;
+                archives[archiveCount++] = archive;
             }
         }
-        if (field_0x10 && field_0x14) {
-            field_0x14[field_0x08] = new(__FILE__, 418) ResourceItem;
-            field_0x14[field_0x08]->field_0x0c = strlen(name) + 1;
-            field_0x14[field_0x08]->field_0x08 =
-                (char*)DebugRealloc(field_0x14[field_0x08]->field_0x08, field_0x14[field_0x08]->field_0x0c,
+        if (archives && items) {
+            items[itemCount] = new(__FILE__, 418) ResourceItem;
+            items[itemCount]->nameSize = strlen(name) + 1;
+            items[itemCount]->name =
+                (char*)DebugRealloc(items[itemCount]->name, items[itemCount]->nameSize,
                                     __FILE__, 420);
-            strcpy(field_0x14[field_0x08]->field_0x08, name);
-            field_0x14[field_0x08]->field_0x18 = 0;
-            field_0x14[field_0x08]->field_0x1c = 0;
-            field_0x14[field_0x08]->field_0x14 = archive;
-            if (UnknownFunction4e8f40(field_0x14[field_0x08])) {
-                field_0x14[field_0x08]->Release();
+            strcpy(items[itemCount]->name, name);
+            items[itemCount]->field_0x18 = 0;
+            items[itemCount]->field_0x1c = 0;
+            items[itemCount]->field_0x14 = archive;
+            if (MergeWithExisting(items[itemCount])) {
+                items[itemCount]->Release();
                 return 1;
             }
-            field_0x08++;
+            itemCount++;
         }
         return 1;
     }
@@ -195,28 +195,28 @@ int UnknownResourceManager::UnknownFunction4e9430(const char* name, const char* 
 // 0x004e96b0
 int UnknownResourceManager::UnknownFunction4e96b0(const char* name, void* object)
 {
-    if (field_0x08 + 1 > field_0x00) {
-        field_0x14 = (ResourceItem**)DebugRealloc(field_0x14, (field_0x08 + 1) * 4, __FILE__, 464);
-        if (field_0x14) {
-            field_0x14[field_0x08] = 0;
-            field_0x00 = field_0x08 + 1;
+    if (itemCount + 1 > itemCapacity) {
+        items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 464);
+        if (items) {
+            items[itemCount] = 0;
+            itemCapacity = itemCount + 1;
         }
     }
-    if (field_0x14) {
-        field_0x14[field_0x08] = new(__FILE__, 476) ResourceItem;
-        field_0x14[field_0x08]->field_0x0c = strlen(name) + 1;
-        field_0x14[field_0x08]->field_0x08 =
-            (char*)DebugRealloc(field_0x14[field_0x08]->field_0x08, field_0x14[field_0x08]->field_0x0c,
+    if (items) {
+        items[itemCount] = new(__FILE__, 476) ResourceItem;
+        items[itemCount]->nameSize = strlen(name) + 1;
+        items[itemCount]->name =
+            (char*)DebugRealloc(items[itemCount]->name, items[itemCount]->nameSize,
                                 __FILE__, 478);
-        strcpy(field_0x14[field_0x08]->field_0x08, name);
-        field_0x14[field_0x08]->field_0x18 = 0;
-        field_0x14[field_0x08]->field_0x1c = 0;
-        field_0x14[field_0x08]->field_0x14 = 0;
-        field_0x14[field_0x08]->field_0x10 = object;
-        if (UnknownFunction4e8f40(field_0x14[field_0x08]))
-            field_0x14[field_0x08]->Release();
+        strcpy(items[itemCount]->name, name);
+        items[itemCount]->field_0x18 = 0;
+        items[itemCount]->field_0x1c = 0;
+        items[itemCount]->field_0x14 = 0;
+        items[itemCount]->object = object;
+        if (MergeWithExisting(items[itemCount]))
+            items[itemCount]->Release();
         else
-            field_0x08++;
+            itemCount++;
     }
     return 1;
 }
@@ -228,27 +228,27 @@ int UnknownResourceManager::UnknownFunction4e9830(UnknownTextureStream* archive)
     int used = 0;
     int i;
 
-    for (i = 0; i < field_0x08; i++) {
-        if (field_0x14[i]->field_0x14 == archive) {
+    for (i = 0; i < itemCount; i++) {
+        if (items[i]->field_0x14 == archive) {
             used++;
             // Retail compares unsigned (`ja`): held by anyone but the table.
-            if ((unsigned int)field_0x14[i]->GetRefCount() > 1)
+            if ((unsigned int)items[i]->GetRefCount() > 1)
                 return 0;
         }
     }
     if (used) {
-        for (i = 0; i < field_0x0c; i++) {
-            if (field_0x10[i] == archive) {
-                field_0x10[i] = field_0x10[field_0x0c - 1];
-                field_0x0c--;
+        for (i = 0; i < archiveCount; i++) {
+            if (archives[i] == archive) {
+                archives[i] = archives[archiveCount - 1];
+                archiveCount--;
                 break;
             }
         }
-        for (i = 0; i < field_0x08; i++) {
-            if (field_0x14[i]->field_0x14 == archive && !field_0x14[i]->Release()) {
-                field_0x14[i] = field_0x14[field_0x08 - 1];
-                field_0x14[field_0x08 - 1] = 0;
-                field_0x08--;
+        for (i = 0; i < itemCount; i++) {
+            if (items[i]->field_0x14 == archive && !items[i]->Release()) {
+                items[i] = items[itemCount - 1];
+                items[itemCount - 1] = 0;
+                itemCount--;
                 i--;
             }
         }
@@ -257,13 +257,13 @@ int UnknownResourceManager::UnknownFunction4e9830(UnknownTextureStream* archive)
 }
 
 // 0x004e9900
-void UnknownResourceManager::UnknownFunction4e9900(ResourceItem* item)
+void UnknownResourceManager::ReleaseItem(ResourceItem* item)
 {
-    for (int i = 0; i < field_0x08; i++) {
-        if (field_0x14[i] == item && !field_0x14[i]->Release()) {
-            field_0x14[i] = field_0x14[field_0x08 - 1];
-            field_0x14[field_0x08 - 1] = 0;
-            field_0x08--;
+    for (int i = 0; i < itemCount; i++) {
+        if (items[i] == item && !items[i]->Release()) {
+            items[i] = items[itemCount - 1];
+            items[itemCount - 1] = 0;
+            itemCount--;
             return;
         }
     }

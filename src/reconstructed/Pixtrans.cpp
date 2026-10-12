@@ -965,7 +965,7 @@ void Convert24To8888(void* destination, void* source, int width, int height, int
 
 // 0x004cfe70: converts 24-bit to 8888 (0x004cfda0, keyed) at `levels`
 // times the size, then halves it down through 0x004cdf10.
-int UnknownFunction4cfe70(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample24To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, unsigned int key) {
     if (levels == 0) {
         Convert24To8888(destination, source, width, height, destinationStride, sourceStride, key);
@@ -1030,7 +1030,7 @@ int Convert555To8(void* destination, void* source, int width, int height, int de
 // 0x004d1d20: converts `source` (pixel format `sourceFormat`) into
 // `destination` (`format`) with the matching converter; same-format copies
 // go through the downsamplers with no halving. 0 for unsupported pairs.
-int UnknownFunction4d1d20(void* destination, void* source, int width, int height, int destinationStride,
+int ConvertPixels(void* destination, void* source, int width, int height, int destinationStride,
                            int sourceStride, int format, int sourceFormat, int dither,
                            UnknownTexturePalette* palette, int alphaThreshold, unsigned int key) {
     switch (sourceFormat) {
@@ -1097,7 +1097,7 @@ int UnknownFunction4d1d20(void* destination, void* source, int width, int height
             else
                 return Downsample24(destination, source, width, height, destinationStride, sourceStride, 0);
         case 8888:
-            return UnknownFunction4cfe70(destination, source, width, height, destinationStride, sourceStride, 0, key);
+            return Downsample24To8888(destination, source, width, height, destinationStride, sourceStride, 0, key);
         case 1555:
             return Convert24To1555(destination, source, width, height, destinationStride, sourceStride, key);
         }
@@ -1154,7 +1154,7 @@ int UnknownFunction4d1d20(void* destination, void* source, int width, int height
 // cases return the same expression each: VC6 cross-jumps the 24-bit copy
 // into the palette case's, which is retail's layout; a shared return after
 // the switch lands after the 24-bit loop instead.
-int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int format,
+int AverageColor(void* bits, int width, int height, int stride, int format,
                           UnknownTexturePalette* palette) {
     unsigned int alpha = 0;
     unsigned int red = 0;

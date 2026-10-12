@@ -187,7 +187,7 @@ python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" \
   src/reconstructed/Griddraw.cpp -o work/griddraw.obj
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x0047ef80 \
   --target-size 643 --obj work/griddraw.obj \
-  --symbol '?UnknownFunction47ef80@DrawableGridNode@@QAEHHHHH@Z' \
+  --symbol '?WalkVisibleQuadrants@DrawableGridNode@@QAEHHHHH@Z' \
   --bindings src/reconstructed/Griddraw.bindings.json --json
 ```
 
@@ -222,7 +222,8 @@ destructor `0x004838a0` and its deleting wrapper `0x004838f0`. Near misses
 | `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame and four bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687) from an `__asm fld/fistp` rounding helper while `__ftol` is still called for the other casts, which the no-inline-asm rule rules out; `/Oy-` only fakes the frame and leaves the x87 crossing loops different |
 | `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index (eax vs ecx) and the gridX/gridZ compare order; invariant under ~30 spellings, /G6, /O1 and /Oy- |
 
-What the two large functions do (names tier 3): `0x00483910(x, z, heights,
+What the two large functions do (names tier 3; `0x00483910` is
+`GetCellCorners` in Griddraw.h): `0x00483910(x, z, heights,
 normals, bytes)` descends to the leaf holding sample (x, z), clamping out of
 range indices to the border child, and writes the four corner heights
 `((h - base) * field_0x10 + base) * field_0x14`, normals (signed bytes / 127,
@@ -237,6 +238,15 @@ triangles (diagonal chosen by the parity of ix ^ iy) through
 `0x004a1300`; a hit inside the segment's box is written in parent units
 (`gridX << (level * 4)` added) and returns 1.
 
+## Field names
+
+`GridTerrain` takes `appliedDrawDistance` (+0x6c) and `canSinglePassDual`
+(+0xcac, printed as "CanSinglePassDual" by Terrain slot 14) from
+`src/krusty2/broadphase/Terrain.h`; the statistics counters (+0x90, +0x98,
++0xa4, +0xb0), the child-table stream offset (+0xc38), the close-up state
+flag (+0xcb4) and `GridNode::childOffsets` (+0x30) are named from the code
+that writes them (tier 3). The renames changed no calibration bytes.
+
 ## Function names
 
 Names given from each function's behaviour (string literals, D3D/DirectDraw
@@ -245,3 +255,37 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x0047ca00` `EvictNodeTexture`
 - `0x0047ca40` `EvictBlockTexture`
+- `0x0047e340` `FindEdgeNeighbours`
+- `0x0047e430` `BuildEdgeLevel`
+- `0x0047ecc0` `EvictNodeBuffers`
+- `0x0047edb0` `ReleaseVertexBuffers`
+- `0x0047f840` `RebuildWholeNodeBuffers`
+- `0x0047fce0` `EmitDiagonalTriangles`
+- `0x0047fe70` `EmitLeafEdgeFan`
+- `0x00480200` `EmitEdgeTriangles`
+- `0x00480700` `AppendCornerTriangle`
+- `0x00480c90` `SubmitUnlitRange`
+- `0x00480fb0` `SubmitLitRange`
+- `0x004813e0` `CountEdgeDifferences`
+- `0x00481a20` `TestBlockFrustum`
+- `0x00481b30` `BlockDistance`
+- `0x00481cc0` `CanDropVertex`
+- `0x00481db0` `TestVisibility`
+- `0x004824c0` `UpdateLevelOfDetail`
+- `0x00482760` `RetestChangedVertices`
+- `0x00482a40` `TestVertex`
+- `0x00482ae0` `TestNodeVertices`
+- `0x00482b40` `TestRectangleLevel`
+- `0x00482c90` `PropagateVertexChange`
+- `0x00482dd0` `SetVertexDirection`
+- `0x00482f00` `RetestUnpinnedVertex`
+- `0x00483040` `ForceBlockCentres`
+- `0x00483100` `ReleaseBlockCentres`
+- `0x004835c0` `PropagateBorderChange`
+- `0x0047db60` `BuildCurveTables` (Gridbase.cpp)
+- `0x0047d470` `DrawableGridNodeSharedTextures::BuildNodeTexture` (Grid1.h)
+- `0x0047d780` `DrawableGridNodeSharedTextures::BuildBlockTexture` (Grid1.h)
+- `0x00484d70` `GridNode::FindLeaf` (GridNode near-miss sample)
+- `0x0047e600` `ReadNode`, `0x0047ef80` `WalkVisibleQuadrants`, `0x00480940`
+  `DrawVisibleQuadrants`, `0x004826d0` `PropagateFullMask` and `0x00483200`
+  `WalkBorderVertex` (near-miss sample)

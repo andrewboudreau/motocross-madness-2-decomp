@@ -156,8 +156,8 @@ public:
 
 // 0x0043a330 (cdecl, CollisionPoint.cpp): adds a collision point at
 // `position` to `points` (`*count` of `capacity`).
-void* UnknownFunction43a330(int capacity, void** points, const Vector3* position, void* owner, float a4,
-                            int* count, float friction, int a7);
+void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float a4,
+                        int* count, float friction, int a7);
 // 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch.
 void UnknownFunction4b5d00(Vector3* look, Vector3* up, float heading, float pitch, int a);
 
@@ -301,9 +301,9 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                     ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
                     sprintf(key, "FrictionCoefficient%d", p + 1);
                     parameters.UnknownFunction4b7f40(key, 0.6f, &friction);
-                    UnknownFunction43a330(points, object->field_0x12c, &position,
-                                          object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
-                                          friction, (int)this);
+                    AddCollisionPoint(points, object->field_0x12c, &position,
+                                      object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
+                                      friction, (int)this);
                 }
             if (a2) {
                 int dust = 0;
@@ -372,8 +372,8 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             AppendChild(object->UnknownVirtualSlot9(field_0x18, sltPath, (int)lights, a4, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
-            strncpy(field_0xb8->field_0x04[i].field_0x10, sltPath, count);
-            field_0xb8->field_0x04[i].field_0x10[count] = 0;
+            strncpy(field_0xb8->field_0x04[i].fileName, sltPath, count);
+            field_0xb8->field_0x04[i].fileName[count] = 0;
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fc630(position);
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fbd70(&look, &up, 1, 0);
             parameters.UnknownFunction4b7f10("Collision", 1, &collision);
@@ -560,11 +560,11 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         }
         sprintf(sltPath, "%s\\%s", "Res", file);
         if (field_0xb4->field_0x04[i].field_0x00_bit3)
-            UnknownFunction4f0ec0(file);
+            ResolveSltPath(file);
         int length = strcspn(file, ".");
         int count = length < 0x14 ? length : 0x14;
-        strncpy(field_0xb4->field_0x04[i].field_0x2c, file, count);
-        field_0xb4->field_0x04[i].field_0x2c[count] = 0;
+        strncpy(field_0xb4->field_0x04[i].fileName, file, count);
+        field_0xb4->field_0x04[i].fileName[count] = 0;
         length = strlen(file);
         int size = length > 0x103 ? 0x103 : length;
         strncpy(colPath, file, size);
@@ -635,7 +635,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     }
                     UnknownFunction4de580(name, key, motion);
                     field_0xb4->field_0x04[i].motions[m] =
-                        field_0xb4->field_0x04[i].field_0x04->UnknownFunction4a6b30(motion, 1);
+                        field_0xb4->field_0x04[i].field_0x04->FindMotion(motion, 1);
                 }
                 if (parameters.UnknownFunction4b7ec0("MotionSequence", "", sequence, 0x40)) {
                     char* token = strtok(sequence, ",");
@@ -655,7 +655,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                         if (field_0xb4->field_0x04[i].sequenceIndex >= field_0xb4->field_0x04[i].sequenceLength)
                             field_0xb4->field_0x04[i].sequenceIndex = 0;
                         field_0xb4->field_0x04[i].currentMotion = field_0xb4->field_0x04[i].sequenceIndex;
-                        UnknownFunction4eb040(i, field_0xb4->field_0x04[i].sequenceIndex, 0, 0);
+                        RestartEntry(i, field_0xb4->field_0x04[i].sequenceIndex, 0, 0);
                     } else {
                         field_0xb4->field_0x04[i].sequenceIndex = 0;
                         sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, scenePath);

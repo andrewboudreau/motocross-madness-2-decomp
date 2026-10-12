@@ -76,12 +76,15 @@ method slots and arguments, callers); the address-derived names they
 replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x00440060` `ReadLods`
+- `0x00440810` `UpdateMaterialTexelRatios` (near-miss sample)
 - `0x00440d40` `TransformVertexGroups`
 - `0x00440f30` `DrawCurrentLod`
 - `0x00442f70` `DrawWireframe`
 - `0x00442fe0` `DrawNormals`
 - `0x004431f0` `DrawVertexCrosses`
 - `0x004434b0` `ComputeSubtreeBounds`
+- `0x004435b0` `DrawAxisGizmo`
+- `0x00443740` `DrawBoxOutline`
 - `0x00443de0` `SelectLod`
 - `0x00445030` `GetSurfaceCount`
 - `0x00445060` `NodeMovesVertices`
@@ -89,6 +92,25 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00445360` `RemoveObject`
 - `0x004a1b00` `TransformPoints`
 - `0x004fb4f0` `UpdateWorldMatrix`
+- `0x004fca60` `GetLocalMatrix`, `0x004fca80` `GetMatrixIn`, `0x004fd5c0`
+  `LocalToWorldDirection`, `0x004fd660` `LocalToWorldPoint` and `0x004fd710`
+  `WorldToLocalDirection` (krusty2's names for those addresses; the lane
+  views' declarations use them, the classes stay local views)
 - `0x004fda60` `CollectDescendants`
 - `0x004fdb60` `LoadFromParameters`
 - `0x004fedb0` `RegisterNode`
+
+## Field names
+
+`SoultreeObject` fields named from their uses here and in
+`src/krusty2/core/SoultreeObject.h` (tier 3 names, tier 1 offsets; each
+declaration keeps its `// +0xNN`): `nodeName` (+0x038, compared by
+`FindByName` 0x004fdae0), `localBoundsValid`/`localBoundsCenter`/
+`localBoundsHalfExtent` (+0x154/+0x158/+0x164, written from the low/high
+box as centre and half extent by `D3DIMSoultreeObject` slot 5,
+0x00444140), `subtreeBoundsCenter`/
+`subtreeBoundsHalfExtent` (+0x174/+0x180, refreshed by 0x004fe0f0) and
+`subtreeDirty` (+0x18c, set up the parent chain by 0x004fdab0).
+`D3DIMSoultreeObject` +0x27c (the current level of detail;
+BoundingBoxTreeBuild.h calls it `currentLod`) stays `field_0x27c` because
+a TU outside this lane reads it.

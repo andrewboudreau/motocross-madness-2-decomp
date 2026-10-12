@@ -87,11 +87,11 @@ float AngleBetween(Vector3 a, Vector3 b)
 void MorphBastardModifier::UpdateChannels(MorphBastardObject* object)
 {
     Matrix4 m;
-    object->node->UnknownFunction4fca60(&m);
-    object->node->UnknownFunction4fca80(0, &m);
+    object->node->GetLocalMatrix(&m);
+    object->node->GetMatrixIn(0, &m);
     MorphBastardTransposeRotation(m);
     for (int i = 0; i < object->channelCount; i++)
-        UnknownFunction4a3c80(&object->channels[i], m);
+        ControllerAngles(&object->channels[i], m);
 }
 
 // 0x004a5290

@@ -16,8 +16,8 @@
 // 0x004838a0
 GridNode::~GridNode()
 {
-    if (field_0x30) {
-        delete field_0x30;
+    if (childOffsets) {
+        delete childOffsets;
     }
     if (children) {
         for (int i = 0; i < 256; i++) {

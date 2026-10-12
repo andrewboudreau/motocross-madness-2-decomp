@@ -92,7 +92,8 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
   `+0x30` (`height` / `angle`, 7), the two extra uses being the spilled
   square at each site; `axis` moves from `+0x20` to `+0x28` and the
   seven-use classes from `+0x24` / `+0x28` to `+0x2c` / `+0x30`.
-- `0x00419970` (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
+- `0x00419970` (`CreateRacers`; `0x0041d1e0`, which sets +0x189 from the
+  track distance between +0xf8 and +0x134, is `UpdateTrackSeparation`) (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
   13322 positions: completely decoded (pro circuit, network, offline,
   ghost and AI racers, collision pairing; EH states for `new` lines
   0x3b6..0x78f, frees at lines 0x4ff..0x501, 0x550..0x552 and
@@ -120,3 +121,40 @@ Facts the two functions establish:
 - The credits dialog is DemoDlg (vtable `0x00550e18`), constructed inline
   as `UIDialog(1, "credits.dtm")`; DlgProcs.h declares no constructor, so
   the sample uses a local stand-in class bound to that vtable.
+
+## Naming
+
+Field names in `BikeRace.h` come from the evidence each declaration's
+comment records (literal keys such as "RPMLowerLimit" and "Weight", the
+callers' data flow, network message fields); every renamed field keeps its
+`// +0xNN` offset. The renames changed no calibration bytes. The ghost
+record and ghost fields FollowRacer.cpp (race lane) shares (`timeStep`,
+`position`, `runningTime`), the racer's `startPosition` and
+`receivedStates` (+0x11c8, each a received `state`) and the ghost's
+`receivedStates` (+0x4fc, each holding a `record`) were renamed with it;
+the inline accessor for TrackGame+0x568's ghost is `GhostBike()`.
+BikeRace's `lodDebugPage` (+0x0a8) is the debug overlay page the
+"Soultree LOD" readout gets from `NewPage`, and `chatOverlay` (+0x19c) the
+mode's chat overlay (its methods are ChatOverlay's `0x0051dce0`..`0x0051dd70`).
+Fields that `GameUiHelpers.cpp` or `KrustyVCR.cpp` also read (the gate
+node's centre, direction, half extents and next gate, the model's current
+detail level, the camera view's shadow caster and following flag, the VCR
+header and its racers) keep their placeholder names until those units are
+renamed with them.
+
+Function names (Tier 3, from each declaration's recorded behaviour; the
+calibration cases and bindings were rekeyed, bytes unchanged):
+`0x00417b00` `PickerHitCallback` (free; the debug picker's hit callback),
+`0x00417b30` `SortDescending` (free; sorts keys descending with values),
+`0x00417bc0` `RankByPoints`, `0x0041d0d0` `AppendNode`, `0x0041d170`
+`BuildNodeList`, `0x0041ea60` `ReplaceMeshId`, `0x0041eb20` `AimCamera`,
+`0x00421d50` `RecordFrame` and `0x004230e0` `RecorderCallback` (free; the
+UnknownRecorderCallback passed to the VCR) and `0x0041f1d0`
+`NextCameraTarget` (InGameProcs.cpp keeps its own address-named
+declaration), `0x0041d2a0` `SetSceneTime`, `0x0041ea10` `AnyRacerRemote`,
+`0x00420650` `RestartRace`, `0x00420bd0` `RestartReplay`, `0x00422ec0`
+`ClearRacerParts`, `0x00423040` `ClearAiRacerParts`, `0x00423140`
+`DrawTrack` and `0x00423790` `SetDetailLevel`. `0x004210f0` keeps its placeholder because RaceView.h (UI
+lane) declares it for a camera sample. The ground shadow's `0x004dab00`
+`AddCaster` and `0x004dab90` `ClearCasters` take the names krusty2 gives
+those addresses.

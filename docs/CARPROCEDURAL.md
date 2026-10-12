@@ -17,7 +17,7 @@ which is already covered.
 
 Exact (15): the constructor, the destructor and its deleting wrapper,
 slot 27 (1020 bytes), the path-file parser `0x0042fa00`, the path distance
-search `0x004308e0`, the Hermite weights `0x00430e60` and the eight `$E`.
+search `0x004308e0`, the Hermite weights `0x00430e60` (`HermiteWeights`) and the eight `$E`.
 Source forms needed:
 - Slot 27 looks up "Body" through a named local, and its clamp is written
   `n > 0xff ? 0xff : n`.
@@ -45,7 +45,10 @@ subtract `field_0x1c4` straight from the call result and keep the offset
 on the x87 stack, `fld t; fsub st(1)` ... `fstp st(0)`), spins the wheels
 (`fmod` by 2 pi), clamps the steering angle to +-30 degrees, queries the
 ground (`0x00507c10`), builds the sensor collider's transform with an
-inline helper taking the world axes by value (`0x00435830`; the first
+inline helper taking the world axes by value (`0x00435830`
+`SetTransform`, krusty2's CollisionObject name, as are `SetMeshShape`
+`0x00432ab0`, `UpdatePlacement` `0x00435fb0` and `QueryCollisions`
+`0x00438e70` in CarProcedural.h; the first
 cross product expanded, the rest through `0x00515600`/`0x005087b0`),
 blends the surface normal (the sensor contact's normal is at +0x08,
 retail's `add ecx, 8`), orients the body (`0x004fbd70`) with a target
@@ -79,3 +82,8 @@ that source is rejected.
 
 TextureMap.h gained `UnknownTextureStream::UnknownFunction461aa0`, which
 reads a line.
+
+The path-file parser `0x0042fa00` is named `ReadPath` and the bisection
+search `0x004308e0` `FindOffsetAtDistance` (the position at a time,
+`0x00430b10`, is `PositionAtTime`), from the behaviour their comments
+record (provisional names).

@@ -114,7 +114,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         manager = field_0x10;
         copy = new(__FILE__, 976) ManagedTexture(manager);
         copy->field_0x68 |= 1;
-        ((ManagedTexture*)this)->field_0x90->UnknownFunction50c6c0((ManagedTexture*)copy);
+        ((ManagedTexture*)this)->group->UnknownFunction50c6c0((ManagedTexture*)copy);
     } else {
         manager = g_TrackGame->field_0x3c;
         copy = new(__FILE__, 986) PCTextureMap(manager, 1);
@@ -188,7 +188,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     if (choice)
         format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
     field_0x20 = format;
-    UnknownFunction5119c0(format, pixelFormat);
+    FillPixelFormat(format, pixelFormat);
     mipmapped = flags & 2;
     field_0x24 = 1;
     if (!mipmapped) {
@@ -277,7 +277,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
         }
         if (bits && sourceFormat != field_0x20 &&
             (!checkMemory || UnknownFunction511970(565) > UnknownFunction511970(sourceFormat)) &&
-            !field_0x10->UnknownFunction511370(UnknownFunction511970(565) * width * height))
+            !field_0x10->GrowSecondScratchBuffer(UnknownFunction511970(565) * width * height))
             return 0;
         if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));
@@ -360,10 +360,10 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             goto failed;
         void* destination = desc.surface;
         int bytesPerPixel = UnknownFunction511970(field_0x20);
-        UnknownFunction4d1d20(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
+        ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
                               sourceFormat, 0, palette, alphaThreshold, key);
         if (!(flags & 4))
-            field_0x3c = UnknownFunction4d24d0(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
+            field_0x3c = AverageColor(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
                                                field_0x20, palette);
         if (systemSurface->Unlock(0))
             goto failed;

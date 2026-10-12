@@ -16,7 +16,7 @@
   "?Downsample24@@YAHPAX0HHHHH@Z": "0x004cfaf0",
   "?Downsample8888@@YAHPAX0HHHHH@Z": "0x004cfc40",
   "?Convert24To8888@@YAXPAX0HHHHI@Z": "0x004cfda0",
-  "?UnknownFunction4cfe70@@YAHPAX0HHHHHI@Z": "0x004cfe70",
+  "?Downsample24To8888@@YAHPAX0HHHHHI@Z": "0x004cfe70",
   "?Downsample4444@@YAHPAX0HHHHH@Z": "0x004d0020",
   "?Downsample1555@@YAHPAX0HHHHH@Z": "0x004d0170",
   "?Downsample565@@YAHPAX0HHHHHH@Z": "0x004d02c0",
@@ -53,9 +53,9 @@
   "?ReplaceColor16@@YAHPAXGGHHH@Z": "0x004d1ac0",
   "?ReplaceColor8@@YAHPAXEEHHH@Z": "0x004d1b40",
   "?UnknownFunction4d1b90@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
-  "?UnknownFunction4d1d20@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
+  "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
   "?UnknownFunction4de280@UnknownTexturePalette@@QAEPAEXZ": "0x004de280",
   "?UnknownFunction4de290@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",
   "__FILE__:pixtrans.cpp": "0x00571688",
-  "?UnknownFunction4d24d0@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z": "0x004d24d0"
+  "?AverageColor@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z": "0x004d24d0"
 }

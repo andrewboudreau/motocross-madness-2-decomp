@@ -146,7 +146,7 @@ int TextureMapManager::UnknownVirtualSlot12() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
-            cache->UnknownFunction50c760();
+            cache->ClearUseRecords();
     }
     return GameObject::UnknownVirtualSlot12();
 }
@@ -158,7 +158,7 @@ int TextureMapManager::UnknownVirtualSlot13() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
-            cache->UnknownFunction50c8c0();
+            cache->RepackPages();
     }
     return GameObject::UnknownVirtualSlot13();
 }
@@ -169,7 +169,7 @@ int TextureMapManager::UnknownVirtualSlot15() {
         for (int i = 0; i < field_0x44.m_count; i++) {
             ManagedTextureGroup* cache = field_0x44.Get(i);
             if (cache)
-                cache->UnknownFunction50ef70(static_cast<PCRenderTarget*>(field_0x18));
+                cache->DrawSelection(static_cast<PCRenderTarget*>(field_0x18));
         }
     }
     return GameObject::UnknownVirtualSlot15();
@@ -220,7 +220,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
             }
         } else if (UnknownFunction43caa0(0x15, 0, event, 0x80)) {
             if (field_0x3c)
-                field_0x3c->UnknownFunction50c7e0();
+                field_0x3c->WriteDebugReport();
         } else {
             handled = 0;
         }
@@ -231,7 +231,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
 // 0x00511180
 ManagedTextureGroup* TextureMapManager::UnknownFunction511180(int format, int pages, int addressU, int addressV) {
     ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
-    cache->UnknownFunction50c4a0(pages);
+    cache->SetPageCount(pages);
     field_0x44.Add(cache);
     if (!field_0x3c)
         field_0x3c = cache;
@@ -245,7 +245,7 @@ int TextureMapManager::UnknownVirtualSlot18() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
-            cache->UnknownFunction50c790();
+            cache->RestoreLostPages();
     }
     return GameObject::UnknownVirtualSlot18();
 }
@@ -288,7 +288,7 @@ int TextureMapManager::UnknownFunction5113d0() {
             total += 0x2aaaa;
             if (total > g_TrackGame->display->textureCacheLimit)
                 break;
-            if (!field_0x44.Get(best)->UnknownFunction50c4a0(steps[best] + 1))
+            if (!field_0x44.Get(best)->SetPageCount(steps[best] + 1))
                 break;
             steps[best]++;
         }
@@ -301,7 +301,7 @@ int TextureMapManager::UnknownFunction5113d0() {
 // 0x00511580: counts the 32-256 pixel textures and their bytes (with mip
 // levels), and the display's figure for each kind of texture, and formats
 // them and the card's reported texture memory (the text is not output).
-void TextureMapManager::UnknownFunction511580() {
+void TextureMapManager::CountTextureMemory() {
     char text[128];
     UnknownSurfaceCaps caps;
     unsigned long totalMemory;
@@ -359,7 +359,7 @@ void TextureMapManager::UnknownFunction511300(TextureMap* texture) {
 }
 
 // 0x00511310
-void* TextureMapManager::UnknownFunction511310(unsigned int bytes) {
+void* TextureMapManager::GrowScratchBuffer(unsigned int bytes) {
     if (field_0x64 < bytes) {
         if (field_0x5c) {
             DebugFree(field_0x5c, __FILE__, 497);
@@ -374,7 +374,7 @@ void* TextureMapManager::UnknownFunction511310(unsigned int bytes) {
 }
 
 // 0x00511370
-void* TextureMapManager::UnknownFunction511370(unsigned int bytes) {
+void* TextureMapManager::GrowSecondScratchBuffer(unsigned int bytes) {
     if (field_0x68 < bytes) {
         if (field_0x60) {
             DebugFree(field_0x60, __FILE__, 512);

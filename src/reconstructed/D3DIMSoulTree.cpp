@@ -54,7 +54,7 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
     zero.x = 0.0f;
     field_0x2bc = zero;
     field_0x2d0 = 0;
-    field_0x154 = 0;
+    localBoundsValid = 0;
     field_0x1b0 = 0;
     field_0x260 = 0;
     field_0x2d4 = 1;
@@ -84,9 +84,9 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
     }
     UnknownFunction444e80();
     UnknownFunction444fb0();
-    void* item = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
+    void* item = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (item)
-        g_UnknownResourceManager572b44->UnknownFunction4e9010(item, 0);
+        g_UnknownResourceManager572b44->SetItemObject(item, 0);
 }
 
 // 0x0043f4b0
@@ -125,9 +125,9 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             item = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
         }
         if (item) {
-            if (item->field_0x10) {
+            if (item->object) {
                 item->AddRef();
-                SoultreeVirtualSlot7((SoultreeObject*)item->field_0x10);
+                SoultreeVirtualSlot7((SoultreeObject*)item->object);
                 RegisterNode();
                 return this;
             }
@@ -155,9 +155,9 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                     return this;
                 }
             }
-            if (item->field_0x10) {
+            if (item->object) {
                 item->AddRef();
-                SoultreeVirtualSlot7((SoultreeObject*)item->field_0x10);
+                SoultreeVirtualSlot7((SoultreeObject*)item->object);
                 RegisterNode();
                 return this;
             }
@@ -167,7 +167,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             delete stream;
         }
         if (item)
-            g_UnknownResourceManager572b44->UnknownFunction4e9010(item, this);
+            g_UnknownResourceManager572b44->SetItemObject(item, this);
         RegisterNode();
     }
     return this;
@@ -278,7 +278,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
         AppendChild(materialTable[count], -1);
         materialTable[count]->MakeUntextured();
     }
-    UnknownFunction440810();
+    UpdateMaterialTexelRatios();
 }
 
 // 0x00440060: reads the levels of detail from the .slt keys; returns 1
@@ -465,7 +465,7 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
             }
         }
     }
-    field_0x18c = 0;
+    subtreeDirty = 0;
     field_0x27c = saved;
 }
 
@@ -523,8 +523,8 @@ void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
             from.y = surface->groups[i].transformedVertices[j].position.y;
             from.z = surface->groups[i].transformedVertices[j].position.z;
             Vector3 to = from + length * surface->groups[i].normals[j];
-            from = surface->groups[i].node->UnknownFunction4fd660(from);
-            to = surface->groups[i].node->UnknownFunction4fd660(to);
+            from = surface->groups[i].node->LocalToWorldPoint(from);
+            to = surface->groups[i].node->LocalToWorldPoint(to);
             line[0].position.x = from.x;
             line[0].position.y = from.y;
             line[0].position.z = from.z;
@@ -583,7 +583,7 @@ void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
                 point.y = surface->groups[i].transformedVertices[j].position.y;
                 point.z = surface->groups[i].transformedVertices[j].position.z;
                 point += offsets[k];
-                point = surface->groups[i].node->UnknownFunction4fd660(point);
+                point = surface->groups[i].node->LocalToWorldPoint(point);
                 cross[k].position.x = point.x;
                 cross[k].position.y = point.y;
                 cross[k].position.z = point.z;
@@ -601,7 +601,7 @@ void D3DIMSoultreeObject::UnknownFunction4433f0(int surface, UnknownSoultreeVert
 {
     if (lod == -1)
         lod = field_0x27c;
-    if (field_0x18c || lod != field_0x27c)
+    if (subtreeDirty || lod != field_0x27c)
         TransformVertexGroups(lod);
     *vertices = lodTable[lod].surfaces[surface].vertices;
     *vertexCount = lodTable[lod].surfaces[surface].vertexCount;
@@ -626,10 +626,10 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
     Vector3 extents;
     if (!parent) {
         UnknownFunction4fe850(&center, &extents);
-        UnknownFunction443740(center, extents, 1);
+        DrawBoxOutline(center, extents, 1);
     }
     UnknownFunction4fe0a0(&center, &extents);
-    UnknownFunction443740(center, extents, 0);
+    DrawBoxOutline(center, extents, 0);
     if (nextSibling)
         ((D3DIMSoultreeObject*)nextSibling)->ComputeSubtreeBounds();
     if (firstChild)
@@ -640,7 +640,7 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
 // world space). Each transformed point is copied into the vertex per
 // component; a Vector3 assignment lets VC6 copy from the call result and
 // schedule the index and point stores in another order.
-void D3DIMSoultreeObject::UnknownFunction4435b0()
+void D3DIMSoultreeObject::DrawAxisGizmo()
 {
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
@@ -664,7 +664,7 @@ void D3DIMSoultreeObject::UnknownFunction4435b0()
     points[3].z = 0.25f;
     UnknownSoultreeVertex vertices[4];
     for (int i = 0; i < 4; i++) {
-        points[i] = UnknownFunction4fd660(points[i]);
+        points[i] = LocalToWorldPoint(points[i]);
         vertices[i].position.x = points[i].x;
         vertices[i].position.y = points[i].y;
         vertices[i].position.z = points[i].z;
@@ -679,16 +679,16 @@ void D3DIMSoultreeObject::UnknownFunction4435b0()
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 4, (int)indices, 6, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
     if (nextSibling)
-        ((D3DIMSoultreeObject*)nextSibling)->UnknownFunction4435b0();
+        ((D3DIMSoultreeObject*)nextSibling)->DrawAxisGizmo();
     if (firstChild)
-        ((D3DIMSoultreeObject*)firstChild)->UnknownFunction4435b0();
+        ((D3DIMSoultreeObject*)firstChild)->DrawAxisGizmo();
 }
 
 // 0x00443740: the outline of the box center +- extents (specular 0 when
 // `flag` is set, red otherwise). The corners are stored per
 // component, which lets VC6 share each negated extent across corners
 // (retail's fchs/fst chains); Vector3 temporaries evaluate each corner apart.
-void D3DIMSoultreeObject::UnknownFunction443740(Vector3 center, Vector3 extents, int flag)
+void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int flag)
 {
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
@@ -726,7 +726,7 @@ void D3DIMSoultreeObject::UnknownFunction443740(Vector3 center, Vector3 extents,
         corners[i].x = center.x + corners[i].x;
         corners[i].y = center.y + corners[i].y;
         corners[i].z = center.z + corners[i].z;
-        corners[i] = UnknownFunction4fd660(corners[i]);
+        corners[i] = LocalToWorldPoint(corners[i]);
         vertices[i].position.x = corners[i].x;
         vertices[i].position.y = corners[i].y;
         vertices[i].position.z = corners[i].z;
@@ -790,7 +790,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
         extents = &boundsExtents;
         UnknownFunction4fe850(center, extents);
     }
-    float distance = Magnitude(UnknownFunction4fd660(*center) -
+    float distance = Magnitude(LocalToWorldPoint(*center) -
                                ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
     float range = distance - Magnitude(*extents);
     if (0.1f > range)
@@ -823,7 +823,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
                 float fraction = (size - power) / power;
                 if (fraction < 0.0f)
                     fraction = 0.0f;
-                texture->UnknownFunction510820(level + 1 + fraction);
+                texture->RecordUse(level + 1 + fraction);
             }
         }
     }
@@ -839,7 +839,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot14()
     if (field_0x2d0) {
         UnknownFunction4439c0(&field_0x298);
         ComputeSubtreeBounds();
-        UnknownFunction4435b0();
+        DrawAxisGizmo();
     }
     GameObject::UnknownVirtualSlot14();
     field_0x298.field_0x08++;
@@ -872,7 +872,7 @@ void D3DIMSoultreeObject::UnknownFunction444440()
 // 0x004444c0
 void D3DIMSoultreeObject::UnknownFunction4444c0(int value)
 {
-    field_0x18c = 1;
+    subtreeDirty = 1;
     field_0x1a4 = value;
 }
 
@@ -924,7 +924,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot8(SoultreeObject* sourceNode, Soult
     SoultreeObject::SoultreeVirtualSlot8(sourceNode, targetNode);
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
     D3DIMSoultreeObject* target = (D3DIMSoultreeObject*)targetNode;
-    target->field_0x18c = 1;
+    target->subtreeDirty = 1;
     target->field_0x1a4 = source->field_0x1a4;
     target->field_0x1a8 = source->field_0x1a8;
     target->field_0x1ac = source->field_0x1ac;
@@ -964,7 +964,7 @@ void D3DIMSoultreeObject::UnknownFunction444d00(int lod)
     if (lod >= lodCount)
         lod = lodCount - 1;
     if (field_0x27c != lod) {
-        field_0x18c = 1;
+        subtreeDirty = 1;
         field_0x27c = lod;
     }
 }

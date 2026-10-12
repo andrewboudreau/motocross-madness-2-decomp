@@ -101,8 +101,8 @@ public:
 
     // 0x0047d470 / 0x0047d780: build the node-wide texture (or one block's)
     // from the node's run-length texture indices (tier 3 names).
-    int UnknownFunction47d470(ManagedTexture* texture);         // 0x0047d470 (ret 4)
-    int UnknownFunction47d780(int block, ManagedTexture* texture);  // 0x0047d780 (ret 8)
+    int BuildNodeTexture(ManagedTexture* texture);         // 0x0047d470 (ret 4)
+    int BuildBlockTexture(int block, ManagedTexture* texture);  // 0x0047d780 (ret 8)
 
     Grid1NodeExtra* Extra() { return (Grid1NodeExtra*)extra; }
     Grid1Terrain* Terrain() { return (Grid1Terrain*)terrain; }

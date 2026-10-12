@@ -77,7 +77,7 @@ ManagedTextureGroup::~ManagedTextureGroup() {
 
 // 0x0050c4a0: creates the shared 256x256 texture on first use, then adds
 // pages sharing its system surface or drops pages from the end.
-int ManagedTextureGroup::UnknownFunction50c4a0(int count) {
+int ManagedTextureGroup::SetPageCount(int count) {
     int pages = field_0x54.m_count;
     int change = count - pages;
     if (count > 0 && !field_0x1c0) {
@@ -102,7 +102,7 @@ int ManagedTextureGroup::UnknownFunction50c4a0(int count) {
                 page->Release();
                 return 0;
             }
-            field_0x3c += page->field_0x184;
+            field_0x3c += page->texelCount;
             page->field_0x18 = 256;
             page->field_0x14 = 256;
             field_0x54.Append(page);
@@ -110,7 +110,7 @@ int ManagedTextureGroup::UnknownFunction50c4a0(int count) {
     } else if (change < 0) {
         TextureMap* page = field_0x54.Last();
         while (change++ < 0) {
-            field_0x3c -= static_cast<CacheTexture*>(page)->field_0x184;
+            field_0x3c -= static_cast<CacheTexture*>(page)->texelCount;
             field_0x54.Remove(page);
             page = field_0x54.Last();
         }
@@ -132,32 +132,32 @@ void ManagedTextureGroup::UnknownFunction50c6c0(ManagedTexture* texture) {
         }
     }
     field_0x44.Append(texture);
-    texture->field_0xb8 = field_0x40->field_0x74;
-    texture->field_0x90 = this;
+    texture->lastUseFrame = field_0x40->field_0x74;
+    texture->group = this;
 }
 
 // 0x0050c760
-void ManagedTextureGroup::UnknownFunction50c760() {
+void ManagedTextureGroup::ClearUseRecords() {
     for (TextureMap* texture = field_0x44.First(); texture; texture = field_0x44.Next()) {
-        static_cast<ManagedTexture*>(texture)->field_0xa0 = 0;
-        static_cast<ManagedTexture*>(texture)->field_0xa4 = 0;
+        static_cast<ManagedTexture*>(texture)->useCount = 0;
+        static_cast<ManagedTexture*>(texture)->largestUse = 0;
     }
 }
 
 // 0x0050c790
-void ManagedTextureGroup::UnknownFunction50c790() {
+void ManagedTextureGroup::RestoreLostPages() {
     for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {
         CacheTexture* cache = static_cast<CacheTexture*>(page);
         if (cache->textureSurface && cache->textureSurface->IsLost()) {
             cache->UnknownVirtualSlot10();
             cache->UnknownVirtualSlot8(1, 0, 0);
-            cache->UnknownFunction50fc40();
+            cache->EmptyPage();
         }
     }
 }
 
 // 0x0050c7e0
-void ManagedTextureGroup::UnknownFunction50c7e0() {
+void ManagedTextureGroup::WriteDebugReport() {
     FILE* file = fopen("C:\\temp\\TM_debug.txt", "a");
     if (file) {
         UnknownFunction461d40(file, "----------------------------------------------------------------------\n");
@@ -167,8 +167,8 @@ void ManagedTextureGroup::UnknownFunction50c7e0() {
         for (int index = 1; texture; texture = field_0x44.Next()) {
             ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
             UnknownFunction461d40(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->field_0x14,
-                                  managed->field_0x18, managed->field_0xa4);
-            if (managed->field_0xa4 > 0.0f)
+                                  managed->field_0x18, managed->largestUse);
+            if (managed->largestUse > 0.0f)
                 UnknownFunction461d40(file, ", Allocd=%d unhappy=%.2f", managed->field_0xa8,
                                       managed->UnknownFunction5109b0());
             UnknownFunction461d40(file, "\n");
@@ -179,16 +179,16 @@ void ManagedTextureGroup::UnknownFunction50c7e0() {
 
 // 0x0050c8c0: unless frozen by the debug key, empties the size lists and
 // repacks the pages (through 0x0050dad0 when partial texture blits are on).
-void ManagedTextureGroup::UnknownFunction50c8c0() {
+void ManagedTextureGroup::RepackPages() {
     if (g_TrackGame->field_0x2d4_bit2 && field_0x08)
         return;
     field_0x7c.Clear();
     for (int i = 0; i < 9; i++)
         field_0x90[i].Clear();
     if (g_TrackGame->display->partialTextureUploadResult <= 0)
-        UnknownFunction50c960();
+        RepackWholePages();
     else
-        UnknownFunction50dad0();
+        RepackWithPartialBlits();
 }
 
 // 0x0050ee70: qsort order of ManagedTexture pointers, by +0xac descending,
@@ -196,7 +196,7 @@ void ManagedTextureGroup::UnknownFunction50c8c0() {
 int UnknownCompare50ee70(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
-    int difference = b->field_0xac - a->field_0xac;
+    int difference = b->plannedLevel - a->plannedLevel;
     if (difference)
         return difference;
     return a - b;
@@ -206,7 +206,7 @@ int UnknownCompare50ee70(const void* first, const void* second) {
 int UnknownCompare50eeb0(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
-    int difference = b->field_0xa8 - b->field_0xac - a->field_0xa8 + a->field_0xac;
+    int difference = b->field_0xa8 - b->plannedLevel - a->field_0xa8 + a->plannedLevel;
     if (difference)
         return difference;
     return a - b;
@@ -240,17 +240,17 @@ static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedText
 // 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
 // of the least needy texture until the planned texels fit `budget`; a
 // texture already at level 5 is dropped (level -1). Returns the texels.
-int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget) {
+int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
     qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
     int area = 0;
     for (int i = 0; i < list->m_count; i++)
-        area += LevelArea(list->Get(i)->field_0xac);
+        area += LevelArea(list->Get(i)->plannedLevel);
     while (list->m_count > 0 && area > budget) {
         int index = list->m_count - 1;
         ManagedTexture* texture = list->Get(index);
-        while (list->m_count > 0 && texture->field_0xac == 5) {
+        while (list->m_count > 0 && texture->plannedLevel == 5) {
             if (--index == 0) {
-                texture->field_0xac = -1;
+                texture->plannedLevel = -1;
                 area -= 0x400;
                 list->RemoveOrdered(texture);
                 index = list->m_count - 1;
@@ -259,12 +259,12 @@ int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget) {
                 return area;
             texture = list->Get(index);
         }
-        int level = texture->field_0xac;
+        int level = texture->plannedLevel;
         if (texture->UnknownFunction5109b0() < 0.0f)
-            texture->field_0xac = texture->field_0xb0;
+            texture->plannedLevel = texture->wantedLevel;
         else
-            texture->field_0xac--;
-        int newLevel = texture->field_0xac;
+            texture->plannedLevel--;
+        int newLevel = texture->plannedLevel;
         area -= LevelArea(level);
         area += LevelArea(newLevel);
         if (list->m_count > 1) {

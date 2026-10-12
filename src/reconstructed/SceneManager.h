@@ -39,9 +39,9 @@ public:
     // 0x004319c0: loads the character and returns the GameObject to add.
     GameObject* UnknownFunction4319c0(void* owner, const char* name, const char* colPath,
                                       LightManager* lights, int a4, int a5, int a6);
-    void* UnknownFunction4a6b30(const char* name, int a); // 0x004a6b30 (FindMotion)
-    void UnknownFunction4a8b40(void* motion);          // 0x004a8b40 (SetMotion)
-    int UnknownFunction4a6bb0(float time, int a, int b); // 0x004a6bb0: advances the motion
+    void* FindMotion(const char* name, int a); // 0x004a6b30 (FindMotion)
+    void SetMotion(void* motion);          // 0x004a8b40 (SetMotion)
+    int AdvanceMotion(float time, int a, int b); // 0x004a6bb0: advances the motion
 
     unsigned char field_0x008[0x0c - 0x08];
     int field_0x0c;                       // cleared by 0x004a8b40
@@ -103,7 +103,7 @@ struct UnknownSceneEntry {
     signed char sequenceIndex;            // index into motionSequence
     unsigned char field_0x27;
     char* motionSequence;                 // motion numbers (1-based, "MotionSequence")
-    char field_0x2c[0x18];                // the MCF or SLT file name, at most 0x14 characters
+    char fileName[0x18];                      // +0x2c the MCF or SLT file name, at most 0x14 characters
 };
 
 // 0x10-byte element of UnknownSceneTable::randomSets (a "RandomSet<n>"
@@ -141,7 +141,7 @@ struct UnknownSceneCaster {
     ShadowCaster* field_0x04;             // the model (a D3DIMSoultreeObject)
     UnknownScenePhysicsObject* field_0x08;
     UnknownSceneCollisionObject* field_0x0c;
-    char field_0x10[0x18];                // the model's file name, at most 0x14 characters
+    char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
 
 // Owned by Scene+0xb8: the shadow casters.
@@ -266,11 +266,11 @@ public:
     Scene* UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int value, int unused,
                                  char flag);
     // 0x004eaec0: the entry object named like `path`'s file name.
-    UnknownSceneObject* UnknownFunction4eaec0(const char* path, int* index);
+    UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
     void UnknownFunction4eafd0(int index);
     void UnknownFunction4eff30(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void UnknownFunction4eb000(float time);
-    int UnknownFunction4eb040(int index, float time, int force, int motion);
+    int RestartEntry(int index, float time, int force, int motion);
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1
     // flag list from `block` (default: the scene file, parameters). Parameter names provisional.
     int ReadVector(Vector3* out, const char* section, const char* key,
@@ -321,7 +321,7 @@ public:
     // among others), called directly with the formatted "Cannot find data" text.
     void UnknownFunction464e80(const char* message);
     int CountObjects(int* count);         // 0x004f0d20: loads the scene file, counts its objects
-    int UnknownFunction4f0ec0(char* path);           // model path -> its SLT file
+    int ResolveSltPath(char* path);           // model path -> its SLT file
     // 0x004f1130: counts the textures of the scene's models and animations
     // by width (0x004f0390) and reads the terrain width, whether a cube file
     // is set and the ecosystem file path, without building anything.
@@ -329,8 +329,8 @@ public:
 
     UnknownTrackGameObject574* sceneManager; // the owner 0x004ea7e0 stores
     char sceneName[0x40];                 // "SceneInfo" "SceneName"
-    Vector3 field_0x70;                   // "SceneInfo" "DefaultStartPosition"
-    Vector3 field_0x7c;                   // "SceneInfo" "DefaultStartDirection"
+    Vector3 defaultStartPosition;             // +0x70 "SceneInfo" "DefaultStartPosition"
+    Vector3 defaultStartDirection;            // +0x7c "SceneInfo" "DefaultStartDirection"
     char field_0x88;
     unsigned char field_0x89[3];
     Vector3 podiumPosition;                          // "PodiumPosition"

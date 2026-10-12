@@ -84,7 +84,7 @@ int UnknownDisplay::ProbeNonLocalTextureMemory(int* value, RenderTarget* target)
     }
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    UnknownFunction5119c0(render->field_0x28, &desc.pixelFormat);
+    FillPixelFormat(render->field_0x28, &desc.pixelFormat);
     desc.width = 128;
     desc.height = 128;
     desc.flags = 0x1007;                          // caps, height, width, pixel format

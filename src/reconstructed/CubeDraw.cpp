@@ -101,8 +101,8 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
             goto fail;
         ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
     }
-    UnknownFunction43dc60();
-    UnknownFunction43e0b0(field_0x2c, context);
+    BuildFaceGeometry();
+    LoadTexturesAndCoords(field_0x2c, context);
     loadPalette->Release();
     loadPalette = 0;
     return this;
@@ -119,7 +119,7 @@ int DrawableCube::RecordTextureUse()
             if (textureGroup && (field_0x2c->field_0x38[face].visibleCells & (1 << i))) {
                 TextureMap* texture = field_0x2c->field_0x38[face].textures[i];
                 if (texture && (texture->field_0x68 & 1))
-                    ((ManagedTexture*)texture)->UnknownFunction510820(7.0f);
+                    ((ManagedTexture*)texture)->RecordUse(7.0f);
             }
         }
     }
@@ -142,7 +142,7 @@ DrawableCube::~DrawableCube()
 // 0x0043e850
 int DrawableCube::UnknownVirtualSlot12()
 {
-    UnknownFunction43e330();
+    MarkVisibleCells();
     RecordTextureUse();
     return 1;
 }

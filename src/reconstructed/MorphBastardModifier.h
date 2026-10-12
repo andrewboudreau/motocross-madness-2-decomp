@@ -57,8 +57,8 @@ inline void MorphBastardInvertRigid(Matrix4& m)
 // has the canonical view.
 class MorphBastardNode {
 public:
-    void UnknownFunction4fca60(Matrix4* out);                    // 0x004fca60: local matrix
-    void UnknownFunction4fca80(MorphBastardNode* frame, Matrix4* out); // 0x004fca80: matrix in frame
+    void GetLocalMatrix(Matrix4* out);                    // 0x004fca60: local matrix
+    void GetMatrixIn(MorphBastardNode* frame, Matrix4* out); // 0x004fca80: matrix in frame
     MorphBastardNode* UnknownFunction4fdae0(const char* name);   // 0x004fdae0: named descendant
 };
 
@@ -159,9 +159,9 @@ public:
 
     // 0x004a33b0 (ret 0xc): slot 8 of the base, then loads `path` with the
     // nodes of `model`.
-    MorphBastardModifier* UnknownFunction4a33b0(void* value, const char* path, MorphBastardNode* model);
+    MorphBastardModifier* LoadParameterFile(void* value, const char* path, MorphBastardNode* model);
     // 0x004a3c80 (ret 0x44)
-    void UnknownFunction4a3c80(MorphBastardChannel* channel, Matrix4 inverse);
+    void ControllerAngles(MorphBastardChannel* channel, Matrix4 inverse);
     // 0x004a4bb0 (ret 4): updates every channel of `object`.
     void UpdateChannels(MorphBastardObject* object);
     // 0x00464e80 (ret 4): the shared empty stub, called with the object index.

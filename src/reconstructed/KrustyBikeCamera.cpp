@@ -26,7 +26,7 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
     krustyBike = 0;
     raceView = 0;
     field_0x1d8 = 0;
-    field_0x25c = field_0x170;
+    field_0x25c = eyePosition;
     savedCameraState = cameraState;
     field_0x250 = cameraState;
     savedParameter = field_0x16c;
@@ -36,12 +36,12 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
 KrustyBikeCamera::~KrustyBikeCamera() {}
 
 // 0x00497d90
-KrustyBikeCamera* KrustyBikeCamera::UnknownFunction497d90(void* value, float rate294, float rate298,
+KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float rate298,
                                                           float value228, float value2d0, float value2e8,
                                                           int capacity, int count, const int* list) {
     if (!UnknownFunction416e80(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
         return 0;
-    UnknownFunction4650e0("FlybyCam.vue");
+    LoadCameraFile("FlybyCam.vue");
     return this;
 }
 

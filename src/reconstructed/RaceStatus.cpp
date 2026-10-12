@@ -60,7 +60,7 @@ int CountLap(Vector3* from, Vector3* to, unsigned short* laps, UnknownBikeRaceNo
     if (!from || !to || !laps || !gate || !finished || !lapTime || !lapTimes || !bestLap)
         return 0;
     if (!skipTest) {
-        if (!UnknownFunction47b670(from, to, gate, direction))
+        if (!CrossesGate(from, to, gate, direction))
             return 0;
     } else if (!forced) {
         return 0;
@@ -87,7 +87,7 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
                           int lapLimit, int unlimited, int skipTest, int forced) {
     if (!from || !to || !current || !*current || !count || !times || !gateIndex)
         return 0;
-    if ((!skipTest && UnknownFunction47b670(from, to, *current, direction)) || (skipTest && forced)) {
+    if ((!skipTest && CrossesGate(from, to, *current, direction)) || (skipTest && forced)) {
         *current = (*current)->field_0x38;
         ++*gateIndex;
         if (!*current) {
@@ -314,11 +314,11 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 status->field_0x44.t = start->field_0x2c.t + 0.1f;
             }
             if (!racer->field_0x735)
-                racer->field_0x78c = track->UnknownFunction517340(status->field_0x1c, status->field_0x44,
+                racer->field_0x78c = track->PlaceNear(status->field_0x1c, status->field_0x44,
                                                                   g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
                                                                   &status->field_0x38);
             else
-                track->UnknownFunction516980(status->field_0x1c, &status->field_0x38, 0);
+                track->ClosestPointOnTrack(status->field_0x1c, &status->field_0x38, 0);
             if (racer->field_0x78c) {
                 racer->field_0x76c = 0;
                 status->field_0x08 = track->UnknownFunction517da0(status->field_0x44, finish->field_0x2c);
@@ -379,7 +379,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 racer->field_0x754 += frameTime;
         }
     next:
-        if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->field_0x2c) {
+        if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->next) {
             if (!track->UnknownFunction518080(status->field_0x44, (TrackVec3*)&status->field_0x04->field_0x10c))
                 racer->field_0x10c = racer->field_0x00c;
             if (!track->UnknownFunction518130(status->field_0x44.segment,

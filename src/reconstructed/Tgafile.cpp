@@ -218,7 +218,7 @@ int UnknownFunction511970(int format) {
 // 0x005119c0: fills a DirectDraw pixel format (flags 0x40 RGB, 0x41 with
 // alpha, 0x60 palettised). 8888 falls into the 24-bit case, so it reports
 // 24 bits, and 1555 into 555, as in retail.
-void UnknownFunction5119c0(int format, void* pixelFormat) {
+void FillPixelFormat(int format, void* pixelFormat) {
     UnknownPixelFormat* description = (UnknownPixelFormat*)pixelFormat;
     memset(description, 0, sizeof(*description));
     description->size = sizeof(*description);
@@ -637,7 +637,7 @@ int WriteTga24(void* bits, int width, int height, unsigned int stride, const cha
     UnknownTgaFile file;
     FillTgaHeader24(&file, bits, width, height);
     strcpy(file.name, path);
-    return UnknownFunction512990(&file, stride, 0, descriptor);
+    return WriteTga(&file, stride, 0, descriptor);
 }
 
 // 0x005127a0: fills a 24-bit uncompressed true-colour header for `bits`.
@@ -662,7 +662,7 @@ int WriteTga32(void* bits, int width, int height, unsigned int stride, const cha
     UnknownTgaFile file;
     FillTgaHeader32(&file, bits, width, height);
     strcpy(file.name, path);
-    return UnknownFunction512990(&file, stride, 0, descriptor);
+    return WriteTga(&file, stride, 0, descriptor);
 }
 
 // 0x00512870: fills a 32-bit uncompressed true-colour header for `bits`.
@@ -688,7 +688,7 @@ int WriteTga16(void* bits, int width, int height, unsigned int stride, int green
     UnknownTgaFile file;
     FillTgaHeader16(&file, bits, width, height);
     strcpy(file.name, path);
-    return UnknownFunction512990(&file, stride, greenMask, descriptor);
+    return WriteTga(&file, stride, greenMask, descriptor);
 }
 
 // 0x00512940: fills a 16-bit uncompressed true-colour header for `bits`.

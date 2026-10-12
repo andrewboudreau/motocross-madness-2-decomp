@@ -91,7 +91,18 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 
 ## Remaining uncertainty
 
-All member and method names are provisional. The racer, view, camera and
+All member and method names are provisional. Methods named from their
+recorded behaviour: NumberObjectManager `0x0048bd00` `SetupDigits`;
+BonusObjectManager `0x0048c330` `LoadDigitModels`, `0x0048c8a0`
+`CreateFrameNode` and `0x0048ca60` `SetupCounter`; RunwayLights `0x0048a600`
+`SetupLights` and VisualCue `0x0048adf0` `LoadVisualCue` (NationalRace.cpp and
+QuarryStuntEvent.cpp keep their own address-named declarations).
+The view structs' fields with a recorded use are named (each keeps its
+`// +0xNN`): the camera views' `eyePosition`/`viewDirection` (Camera's
+names for +0x170/+0x17c), the racer views' `position`, `countdown`,
+`trackPoint`, `trackDirection`, `finished` and `gateIndex`, the cue view's
+`ownRacer` and `racing`, the game's `cameraMode` (+0x2d74) and the bonus
+key's `frame`, `time` and `rotationAngle`. No calibration byte changed. The racer, view, camera and
 game-global structs in the header are this unit's views of objects whose
 classes live elsewhere (RaceView.h, TrackGame.h, Camera.h); QuarryEvent.h
 keeps its own partial VisualCue view.
@@ -102,7 +113,7 @@ keeps its own partial VisualCue view.
 python tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" --profile vc6_o2_mt \
   src/reconstructed/Krusty3DObjects.cpp -o work/k3d.obj
 python tools/match.py --exe "$MCM2_EXE" --target-va 0x0048c330 --target-size 1385 \
-  --obj work/k3d.obj --symbol '?UnknownFunction48c330@BonusObjectManager@@QAEHPAXHH@Z' \
+  --obj work/k3d.obj --symbol '?LoadDigitModels@BonusObjectManager@@QAEHPAXHH@Z' \
   --bindings src/reconstructed/Krusty3DObjects.bindings.json --json
 ```
 

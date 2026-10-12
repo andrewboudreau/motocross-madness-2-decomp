@@ -87,7 +87,7 @@ relocation resolved by the bindings. Two near misses are parked in
 | `0x005300a0` | 30 | scalar deleting destructor | compiler generated |
 | `0x005300c0` | 195 | destructor | `DebugFree(p, __FILE__, line)` per array |
 | `0x00530190` | 36 | setup | qualified `GameObject::UnknownVirtualSlot8`, returns `this` |
-| `0x005301c0` | 995 | builds the physics objects | `field_0xe8`, `field_0xf4`, then `field_0x100 = 0` |
+| `0x005301c0` | 995 | builds the physics objects | `boxCenter`, `boxHalfExtents`, then `boxFrame = 0` |
 | `0x005305b0`, `0x005305f0`, `0x00530630`, `0x00530680` | 60-82 | appends | `DebugRealloc(p, n * 4 + 4, ...)`; `0x00530630` returns `count - 1` |
 | `0x00531da0` | 634 | probe trail particles | `step = delta / (float)count` through an inline `operator/` returning `v * (1.0f / s)`; the squared length `(y*y + x*x) + z*z` |
 | `0x00532020` | 293 | probe contact pass | index the probe array in every expression (a probe pointer local reorders the loads) |
@@ -112,10 +112,10 @@ relocation resolved by the bindings. Two near misses are parked in
   count)`, a `scale` local, free or member `operator*`, per-component
   constructors) loads `delta.x` first.
 - In the constructor the integer members are zeroed before the two vector
-  members. Assigning `field_0xdc` first makes VC6 build the temporary with
+  members. Assigning `hitCenter` first makes VC6 build the temporary with
   immediates instead of the zero register.
-- `0x005301c0` stores `field_0xe8`, then `field_0xf4`, then `field_0x100`.
-  The other order makes VC6 address `field_0xf4` through `ebx`.
+- `0x005301c0` stores `boxCenter`, then `boxHalfExtents`, then `boxFrame`.
+  The other order makes VC6 address `boxHalfExtents` through `ebx`.
 - `0x00532580` (the linear and angular step) needs two references: `target`
   for the new forward row in the equality tests (its components become newer
   leaves than the copied old forward, so each cross product loads them first)
@@ -128,11 +128,15 @@ relocation resolved by the bindings. Two near misses are parked in
   text; inlined, VC6 copies only the member pose in the first and the output
   operand in the second), the axis rebuild `WreckerOrthonormalize` (up =
   forward x right), the old position copied through `WreckerCopy` from a
-  pointer to `field_0x6c` and the subtract called by value. The last term
+  pointer to `lastPose` and the subtract called by value. The last term
   pair (`relative._23` adds `a._23 * b._22` before `a._33 * b._23`) needs the
   named view pointer in `WreckerStep`: VC6 orders those equal terms by the
   count of referenced local symbols created before the product, modulo 8
   (two to seven more than the cast written inline give retail's order).
+- `0x00530190` is `SetupWrecker`. The krusty2 names `SetBody` (`0x0043b9e0`),
+  `AddProbePoint` (`0x0043c7f0`), `FindMotion`/`SetMotion`/`AdvanceMotion`/
+  `SetMotionByName` (`0x004a6b30`/`0x004a8b40`/`0x004a6bb0`/`0x004a8b10`)
+  replace the address names in the lane's views.
 - `0x005301c0` passes the literal "Fall02" (`0x0056d418`) to `0x004a8b10`.
 - `GameObject.h` gains `friend class Wrecker`: Wrecker clears and sets
   bit 0 of its rigid body's `+0x25` byte (bitfield code: `and cl, 0xfe` and
@@ -145,9 +149,49 @@ relocation resolved by the bindings. Two near misses are parked in
 | `0x005329e0` | 1312 | 763/1312 | frame 0x94 (retail's) with the scaled temporary passed straight to the out-of-line scale `0x005015b0`; the clip sums written `out = out + (extent - p)` (with `+=` the probe-array address is formed base first, 240/1312) and the mean through the unit's inline `operator/` give retail's instructions except one block: retail keeps the z clip's two `outPrevious` updates separate. The slot order differs (retail: `push`, the y and x extent copies, `p`, the z extent copy, `previousPush`, `sum`) |
 | `0x00531740` | 1624 | 1606/1624 | contact particle spray; frame 0xc4 and slot order match with the two normalisations written as nested expressions (`WreckerNormalizeFirst(velocity) * (speed + 2.0f)`, `WreckerNormalizeTail(WreckerCross(...))`) and the per-particle gravity drift as the nested out-of-line scale. Left: the argument push of two constructor calls in the loop comes one load earlier (before the particle-pointer load and before `along.y` is copied), which changes two registers; not sensitive to the declaration count |
 
+## Naming
+
+Field names of the collaborator views follow the canonical krusty2 layouts:
+`CollisionObject.h` and `ConstraintMethodCollisionModel.h` (collision model,
+probe record), `samples/physics/rigidbody/PhysicsBody.h` (rigid body),
+`SoultreeObject.h` (`firstChild`, `subtreeDirty`) and `ParticleManager.h`
+(particle manager and particle). Wrecker's own fields are named from the
+data flow in the layout table: the three `int` arrays hold values passed to
+the rider's animation calls `0x004a8b40`/`0x004a8b80` (`indexedAnimations`
+by the index `0x00530630` returns, `randomAnimations` by `RANDOM_UNIT()`,
+`contactAnimations` when the collision model reports contact), the
+`ignoreObjects` list feeds `0x00439410` both ways, and `hitCenter` is the
+mean of the hit probes' positions (`anyProbeHit` set when one hits).
+`contactThisFrame` (+0xb0) is cleared before the frame's physics steps and
+set when the collision model reports contact; `hadContact` (+0xac) is set
+with it and cleared only when the wreck starts or is reset.
+Renaming changed no calibration bytes.
+
+Function names (tier 3, from behaviour): `0x00531da0` `EmitProbeTrail`
+(particles along a probe's movement) and `0x00532580` `RebuildPoseSteps`
+(the pose's linear and angular steps from the node's frame), and the
+near miss `0x00531740` `SprayContactParticles`. The list appenders
+`0x005305b0`..`0x00530680` are `AddContactAnimation`, `AddRandomAnimation`,
+`AddIndexedAnimation` and `AddIgnoredObject`.
+
+Calls into code another unit owns now use that unit's canonical name where
+krusty2 already names the address and no other lane's header shares the
+declaration: `AddIgnoredOwner` `0x00439410`, `SoultreeObject`'s
+`SetMatrixIn` `0x004fb8c0`, `SetPositionIn` `0x004fc890`, `TranslateIn`
+`0x004fc690`, `GetPosition` `0x004fc970` and `GetAxes` `0x004fc4f0`,
+`Vec3ScaleCall` `0x005015b0` and `FastInvSqrt` `0x00460c00` (in the Wrecker,
+CarProcedural, BikeRace, Krusty3DObjects, RaceSound, VehicleCamera,
+FollowCamera and D3DIMSoulTree views). `FastSqrt` `0x00460b50`, `FindByName`
+`0x004fdae0`, `GetPositionIn` `0x004fc9a0`, `CountNodes` `0x004fda30`,
+`SetPosition` `0x004fc660`, `QueryGround` `0x00507c10` and `SelectQuality`
+`0x00507960` keep their address names because AuralScape.cpp, BikeCamera.cpp,
+ArcadeObject.cpp, QuarryStuntEvent.cpp or a game sample reach them through
+these headers.
+
 ## Remaining uncertainty
 
-All names are provisional. Field meanings beyond the offsets above are
+All method and class names are provisional, as are the field names above
+that come from data flow rather than literal strings. Field meanings beyond the offsets above are
 inferred from the decoded data flow. Whether `+0x34` belongs to GraphicsTest
 (the krusty2 tree gives GraphicsTest a `+0x34` field) is open. The X-axis
 clip in `0x005329e0` reads the previous position's `y`; that is what retail

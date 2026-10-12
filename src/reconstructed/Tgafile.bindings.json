@@ -21,7 +21,7 @@
   "?FillTgaHeader24@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x005127a0",
   "?FillTgaHeader32@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512870",
   "?FillTgaHeader16@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512940",
-  "?UnknownFunction512990@@YAHPAUUnknownTgaFile@@IHH@Z": "0x00512990",
+  "?WriteTga@@YAHPAUUnknownTgaFile@@IHH@Z": "0x00512990",
   "?g_UnknownGlobal577738@@3PADA": "0x00577738",
   "__FILE__": "0x00574fc8"
 }

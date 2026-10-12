@@ -7,7 +7,9 @@
 // slot of the `new` temporary ([esp+0x14], stored right after the EH state
 // reset) and returns it from there; VC6 here keeps it in ebx only. Tried
 // without effect: declaration order, separate declaration and assignment,
-// a second `result` variable, a single shared return.
+// a second `result` variable (declared at the top or at the `new`, assigned
+// from `archive` or receiving the `new` and copied to `archive`; all 95 of
+// 798 by match.py), a single shared return.
 
 #include "../../src/reconstructed/ResourceManager.cpp"
 
@@ -22,41 +24,41 @@ UnknownTextureStream* UnknownResourceManager::UnknownFunction4e9030(const char* 
     if (archive->UnknownFunction460f50(path, "rb", flags || archive->UnknownFunction460e70(path))) {
         if (archive->UnknownFunction461640(magic, 4, 1) == 1 && !_stricmp(magic, "RS2")
             && archive->UnknownFunction461640(&count, 4, 1) == 1) {
-            if (field_0x08 + count > field_0x00) {
-                field_0x14 = (ResourceItem**)DebugRealloc(field_0x14, (field_0x08 + count) * 4, __FILE__, 231);
-                if (field_0x14) {
-                    for (i = field_0x00; i < field_0x08 + count; i++)
-                        field_0x14[i] = 0;
-                    field_0x00 = field_0x08 + count;
+            if (itemCount + count > itemCapacity) {
+                items = (ResourceItem**)DebugRealloc(items, (itemCount + count) * 4, __FILE__, 231);
+                if (items) {
+                    for (i = itemCapacity; i < itemCount + count; i++)
+                        items[i] = 0;
+                    itemCapacity = itemCount + count;
                 }
             }
-            if (field_0x0c + 1 > field_0x04) {
-                field_0x10 = (UnknownTextureStream**)DebugRealloc(field_0x10, (field_0x0c + 8) * 4, __FILE__, 246);
-                if (field_0x10) {
-                    field_0x04 = field_0x0c + 8;
-                    field_0x10[field_0x0c++] = archive;
+            if (archiveCount + 1 > archiveCapacity) {
+                archives = (UnknownTextureStream**)DebugRealloc(archives, (archiveCount + 8) * 4, __FILE__, 246);
+                if (archives) {
+                    archiveCapacity = archiveCount + 8;
+                    archives[archiveCount++] = archive;
                 }
             }
-            if (field_0x10 && field_0x14) {
+            if (archives && items) {
                 for (i = 0; i < count; i++) {
-                    field_0x14[field_0x08 + i] = new(__FILE__, 261) ResourceItem;
-                    archive->UnknownFunction461640(&field_0x14[field_0x08 + i]->field_0x0c, 4, 1);
-                    field_0x14[field_0x08 + i]->field_0x08 =
-                        (char*)DebugRealloc(field_0x14[field_0x08 + i]->field_0x08,
-                                            field_0x14[field_0x08 + i]->field_0x0c, __FILE__, 268);
-                    archive->UnknownFunction461640(field_0x14[field_0x08 + i]->field_0x08,
-                                                   field_0x14[field_0x08 + i]->field_0x0c, 1);
-                    archive->UnknownFunction461640(&field_0x14[field_0x08 + i]->field_0x18, 4, 1);
-                    archive->UnknownFunction461640(&field_0x14[field_0x08 + i]->field_0x1c, 4, 1);
-                    field_0x14[field_0x08 + i]->field_0x14 = archive;
-                    if (UnknownFunction4e8f40(field_0x14[field_0x08 + i])) {
-                        field_0x14[field_0x08 + i]->Release();
+                    items[itemCount + i] = new(__FILE__, 261) ResourceItem;
+                    archive->UnknownFunction461640(&items[itemCount + i]->nameSize, 4, 1);
+                    items[itemCount + i]->name =
+                        (char*)DebugRealloc(items[itemCount + i]->name,
+                                            items[itemCount + i]->nameSize, __FILE__, 268);
+                    archive->UnknownFunction461640(items[itemCount + i]->name,
+                                                   items[itemCount + i]->nameSize, 1);
+                    archive->UnknownFunction461640(&items[itemCount + i]->field_0x18, 4, 1);
+                    archive->UnknownFunction461640(&items[itemCount + i]->field_0x1c, 4, 1);
+                    items[itemCount + i]->field_0x14 = archive;
+                    if (MergeWithExisting(items[itemCount + i])) {
+                        items[itemCount + i]->Release();
                         i--;
                         count--;
                     }
                 }
             }
-            field_0x08 += count;
+            itemCount += count;
             return archive;
         }
         if (archive)

@@ -42,10 +42,29 @@ names and the `*MaxSpeed` limits (20/55/100 by default). It loads the
 crowd sounds only in network games (+0x291c).
 
 `0x004e39b0` matches with two source forms worth knowing. Both "state 6"
-resets are written `if (field_0x10 != 6) ... else ...` with identical
+resets are written `if (sampleKind != 6) ... else ...` with identical
 arms, which reproduces retail's dead `cmp ecx, 6`; the source comments
 this. The wreck and fall cues use `if (!index) f(); else if (!playing) f();`.
 
 Near miss (`samples/race/RaceSoundNearMisses.cpp`, notes there): the
 half-buffer refill `0x004e4d10`, where two register-allocation
 differences remain.
+
+Field names come from the loader's literals: the sample tables are named
+after their audio_*.ini keys (`idle_%d` .. `Rev_%d`, the `Total*` counts,
+the `*MaxSpeed` limits) and the Sound members after the file each one
+loads (`+0x83c` is `LandHard01.wav`, played when a racer that was airborne
+last frame lands, so it is `landHardSound`, not an engine). Channel fields
+follow their use in `0x004e39b0`/`0x004e4d10` (voice index, engine, sample
+kind 1..6, byte count and offset, half being filled, next kind, distance).
+The header keeps each offset as a `// +0xNN` comment.
+`racerWreckSound`/`racerFallSound` (+0x1238/+0x1264, one per racer) hold
+the index `PlayWreckSound` `0x004e42e0` / `PlayFallSound` `0x004e43a0`
+returned (a random free sound of six, played at the racer); a new sound is
+picked only when that one has stopped.
+`crashHandled` (+0x120c) is set once the one-shot sounds of a racer's crash
+(racer +0x444) have been started and cleared when the crash ends; `ohClock`,
+`applauseClock` and `stuntApplauseClock` (+0x12a4..+0x12ac) count the
+seconds since `oh_01.wav`, applause01/02 and the applause `0x004e57d0` plays,
+each compared against 30 or 15 seconds. `PlayScoreSounds` `0x004e57d0` and `PlayItSound`
+`0x004e5860` are named after the sounds they play.

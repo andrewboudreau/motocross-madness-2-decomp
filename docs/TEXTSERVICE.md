@@ -38,3 +38,6 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0050ae60` `SetFont`
 - `0x0050ae80` `Create`
 - `0x0050bd30` `DrawVertices`
+- `0x0050b080` `DrawTextInto` (dispatches to the 16-bit versions), `0x0050b400`
+  `DrawText4444`, `0x0050b700` `DrawText1555` (near-miss sample)
+- `0x0050ba00` `UnknownOverlayText::LayoutText`

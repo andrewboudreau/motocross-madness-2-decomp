@@ -118,7 +118,7 @@ void TrackGameViewOwner::UnknownFunction4a9e80(UnknownEventRacer* racer, Unknown
     if (tell)
         field_0x34->field_0x38->UnknownFunction4925a0(racer, false);
     if (racer) {
-        ((RaceSound*)field_0x34->field_0x44)->UnknownFunction4e5860();
+        ((RaceSound*)field_0x34->field_0x44)->PlayItSound();
         FOLLOWED_RACER_SLOTS(racer)->UnknownVirtualSlot50(1, 5.0f, 0);
     }
     UnknownFunction4a9f90(racer, previous);

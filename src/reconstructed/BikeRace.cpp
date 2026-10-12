@@ -37,7 +37,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 }
 
 // 0x00417b00
-void UnknownFunction417b00(CollisionObject* self, CollisionObject* other) {
+void PickerHitCallback(CollisionObject* self, CollisionObject* other) {
     BikeRace* race = (BikeRace*)g_TrackGame->eventManager->FindRaceView();
     if (race != 0 && race->objectPicker != 0) {
         race->objectPicker->field_0x2c = (int)other;
@@ -45,7 +45,7 @@ void UnknownFunction417b00(CollisionObject* self, CollisionObject* other) {
 }
 
 // 0x00417b30
-void UnknownFunction417b30(int* keys, int* values, int count) {
+void SortDescending(int* keys, int* values, int count) {
     int swapped = 1;
     for (int pass = 0; pass <= count && swapped; pass++) {
         swapped = 0;
@@ -64,13 +64,13 @@ void UnknownFunction417b30(int* keys, int* values, int count) {
 }
 
 // 0x00417bc0
-void BikeRace::UnknownFunction417bc0(int* order) {
+void BikeRace::RankByPoints(int* order) {
     int points[11];
     for (int i = 0; i < racerCount; i++) {
         points[i] = g_TrackGame->eventManager->results[i].points;
         order[i] = i + 1;
     }
-    UnknownFunction417b30(points, order, racerCount);
+    SortDescending(points, order, racerCount);
 }
 
 // 0x00417c30
@@ -148,10 +148,10 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     g_TrackGame->field_0x1c4 = 0;
     field_0x144 = 0;
     field_0x148 = 0;
-    field_0x19c = 0;
+    chatOverlay = 0;
     forceHighLod = g_TrackGame->GetRegistryFlag("ForceHighLOD", 0);
     field_0x3fd = 1;
-    field_0x0a8 = -1;
+    lodDebugPage = -1;
     field_0x0b0 = 0xff;
     field_0x0ac = 0;
     objectPicker = 0;
@@ -174,8 +174,8 @@ BikeRace::~BikeRace() {
     }
     Track* track = raceTrack;
     if (track != 0) {
-        if (track->field_0x00 != 0) {
-            track->UnknownFunction516870(&track->field_0x00);
+        if (track->startNode != 0) {
+            track->FreeReachableNodes(&track->startNode);
         }
         delete track;
     }
@@ -188,7 +188,7 @@ BikeRace::~BikeRace() {
         delete field_0x1a8;
         field_0x1a8 = 0;
         if (g_TrackGame->field_0x3428) {
-            UnknownFunctionCameraView()->field_0x244 = field_0x1ec;
+            UnknownFunctionCameraView()->cameraState = field_0x1ec;
             raceCamera->UnknownVirtualSlot61();
         }
         g_TrackGame->field_0x3428 = 0;
@@ -212,8 +212,8 @@ int BikeRace::UnknownVirtualSlot16(int value) {
 }
 
 // 0x0041d0d0
-int BikeRace::UnknownFunction41d0d0(int index, UnknownBikeRaceNodeSource* source,
-                                    UnknownBikeRaceNode*** tail, float scale, int value) {
+int BikeRace::AppendNode(int index, UnknownBikeRaceNodeSource* source,
+                         UnknownBikeRaceNode*** tail, float scale, int value) {
     UnknownBikeRaceNode* node =
         (UnknownBikeRaceNode*)DebugCalloc(1, sizeof(UnknownBikeRaceNode), __FILE__, 0x840);
     if (node == 0) {
@@ -237,14 +237,13 @@ int BikeRace::UnknownFunction41d0d0(int index, UnknownBikeRaceNodeSource* source
 }
 
 // 0x0041d170
-int BikeRace::UnknownFunction41d170(UnknownBikeRaceNodeOwner* owner) {
+int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
     int count = owner->field_0x0ac;
     UnknownBikeRaceNodeSource* sources = owner->field_0x0d8;
     UnknownBikeRaceNode** tail = &field_0x0c8;
     for (int i = 0; i < count; i++) {
         UnknownBikeRaceNodeEntry* entry = owner->field_0x420[i];
-        if (!UnknownFunction41d0d0(i, sources, &tail, entry->field_0x50,
-                                   entry->field_0x54)) {
+        if (!AppendNode(i, sources, &tail, entry->field_0x50, entry->field_0x54)) {
             return 0;
         }
     }
@@ -252,7 +251,7 @@ int BikeRace::UnknownFunction41d170(UnknownBikeRaceNodeOwner* owner) {
 }
 
 // 0x0041d1e0
-int BikeRace::UnknownFunction41d1e0() {
+int BikeRace::UpdateTrackSeparation() {
     if (raceTrack != 0 && raceTrack->UnknownFunction517da0(finishProbe.field_0x2c, startProbe.field_0x2c) > 0.0f) {
         field_0x189 = 0;
     } else {
@@ -262,7 +261,7 @@ int BikeRace::UnknownFunction41d1e0() {
 }
 
 // 0x0041d2a0
-void BikeRace::UnknownFunction41d2a0(float time) {
+void BikeRace::SetSceneTime(float time) {
     raceScene->UnknownFunction4eb000(time);
 }
 
@@ -286,8 +285,8 @@ static inline float UnknownFunctionMax(float a, float b) {
 int BikeRace::UnknownVirtualSlot10(float frameTime) {
     if (!g_TrackGame->uiInteractionBlocked) {
         if (UnknownFunctionCameraView()->field_0x390 &&
-            UnknownFunctionCameraView()->field_0x3b0->field_0x4a0 != 0) {
-            UnknownFunction41f1d0(0, 1, 0);
+            UnknownFunctionCameraView()->field_0x3b0->outOfRace != 0) {
+            NextCameraTarget(0, 1, 0);
         }
         if (!g_TrackGame->field_0x1c4) {
             if (g_TrackGame->mode.field_0xa88) {
@@ -296,7 +295,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
                 unsigned short lap = localRacer->field_0x7a0;
                 if (field_0x1e8 != lap && (!field_0x189 || lap > 0)) {
-                    UnknownFunction420bd0();
+                    RestartReplay();
                     field_0x1e8 = localRacer->field_0x7a0;
                     replayTime = 0;
                     field_0x1d4 = 0;
@@ -433,14 +432,14 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     }
                 }
                 if (replayVcr != 0 && replayVcr->field_0xcc) {
-                    UnknownFunction41d2a0(replayVcr->field_0xd0);
+                    SetSceneTime(replayVcr->field_0xd0);
                     replayVcr->field_0xcc = 0;
                 }
             }
             if (field_0x18e) {
                 if (!field_0x18f) {
                     UnknownBikeRaceNetStamp stamp;
-                    stamp.field_0x04 = UnknownFunction4bfa80();
+                    stamp.timeStamp = UnknownFunction4bfa80();
                     g_TrackGame->network->Send(
                         0x84, &stamp, 8, g_TrackGame->network->localPlayer, 0);
                     field_0x18f = true;
@@ -458,7 +457,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         } else {
                             racerSlots[i]->UnknownVirtualSlot5();
                             for (int j = 0; j < g_TrackGame->field_0x3424 + g_TrackGame->field_0x18; j++) {
-                                if (racerSlots[j]->field_0x11bc == id) {
+                                if (racerSlots[j]->recorderId == id) {
                                     racerSlots[j]->UnknownVirtualSlot5();
                                 }
                             }
@@ -466,7 +465,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         if (player == 0) {
                             racerSlots[i]->UnknownVirtualSlot4();
                             for (int j = 0; j < g_TrackGame->field_0x3424 + g_TrackGame->field_0x18; j++) {
-                                if (racerSlots[j]->field_0x11bc == id) {
+                                if (racerSlots[j]->recorderId == id) {
                                     racerSlots[j]->UnknownVirtualSlot4();
                                 }
                             }
@@ -492,10 +491,10 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         field_0x160 -= g_TrackGame->frameTime;
                         if (field_0x160 <= 0.0f) {
                             field_0x160 = 0;
-                            raceScene->UnknownFunction4eb040(field_0x068, 0.0f, 0, 0);
+                            raceScene->RestartEntry(field_0x068, 0.0f, 0, 0);
                             field_0x064->UnknownVirtualSlot4();
                             if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x068) {
-                                UnknownFunction41f1d0(1, 1, 0);
+                                NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x064->field_0x210 != 0) {
                                 field_0x064->field_0x210->Release();
@@ -505,7 +504,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     }
                 } else {
                     field_0x15c -= g_TrackGame->frameTime;
-                    if (field_0x15c <= 0.0f || UnknownFunction41ea10()) {
+                    if (field_0x15c <= 0.0f || AnyRacerRemote()) {
                         field_0x15c = 0;
                         isRacing = true;
                         raceScene->field_0x7c0 = 0;
@@ -518,7 +517,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             int count = g_TrackGame->mode.field_0x27f8.field_0x28 + g_TrackGame->field_0x18;
                             for (int i = 0; i < count; i++) {
                                 if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == self) {
-                                    racerSlots[i]->field_0x064 = kVec3Zero;
+                                    racerSlots[i]->velocity = kVec3Zero;
                                     racerSlots[i]->field_0x0bc = 0;
                                 }
                             }
@@ -528,10 +527,10 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         replayLength = 0;
                         field_0x1d8 = 0;
                         if (field_0x06c != 0) {
-                            raceScene->UnknownFunction4eb040(field_0x070, 0.0f, 0, 0);
+                            raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
                             field_0x06c->UnknownVirtualSlot4();
                             if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x070) {
-                                UnknownFunction41f1d0(1, 1, 0);
+                                NextCameraTarget(1, 1, 0);
                             }
                             if (field_0x06c->field_0x210 != 0) {
                                 field_0x06c->field_0x210->Release();
@@ -540,20 +539,20 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                         switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
                         case 2:
-                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x564->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x564->field_0x64;
                             break;
                         case 3:
-                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x558->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x558->field_0x64;
                             break;
                         case 0:
-                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x55c->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x55c->field_0x64;
                             break;
                         case 1:
                         case 5:
-                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x560->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x560->field_0x64;
                             break;
                         case 4:
-                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x568->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x568->field_0x64;
                             break;
                         }
                     }
@@ -585,7 +584,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     isRacing = false;
                 }
                 if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->field_0x25_bit0) {
-                    position = localRacer->field_0x018;
+                    position = localRacer->carriedFlagPosition;
                     position.y += 4.25f;
                     ((ArcadeObject*)field_0x060)->UnknownFunction4014f0(&position);
                 }
@@ -593,46 +592,46 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     field_0x194 -= g_TrackGame->frameTime;
                     if (field_0x194 <= 0.0f) {
                         field_0x194 = 0;
-                        if (field_0x19c != 0) {
-                            field_0x19c->field_0x3dc = 0;
-                            field_0x19c->UnknownFunction51dd40();
+                        if (chatOverlay != 0) {
+                            chatOverlay->typing = 0;
+                            chatOverlay->HideInputLine();
                         }
                         field_0x190 = false;
                     }
                 }
-                if (flagGirl != 0 && localRacer->field_0x744->field_0x44.node != 0) {
+                if (flagGirl != 0 && localRacer->statusNode->field_0x44.node != 0) {
                     int laps = g_TrackGame->mode.field_0x27f8.field_0x20;
                     int lap = localRacer->field_0x7a0;
                     int last = lap == laps - 1;
                     int previous = lap == laps - 2;
                     if (previous || last) {
-                        float toFinish = raceTrack->UnknownFunction517da0(localRacer->field_0x744->field_0x44,
+                        float toFinish = raceTrack->UnknownFunction517da0(localRacer->statusNode->field_0x44,
                                                                             finishProbe.field_0x2c);
                         float fromFinish = raceTrack->UnknownFunction517da0(finishProbe.field_0x2c,
-                                                                              localRacer->field_0x744->field_0x44);
-                        if (field_0x078 && localRacer->field_0x7a4 && fromFinish > 100.0f) {
-                            UnknownFunction41ea60(flagGirl, 1, 2);
-                            flagGirl->UnknownFunction4a8b10("Stand");
+                                                                              localRacer->statusNode->field_0x44);
+                        if (field_0x078 && localRacer->finished && fromFinish > 100.0f) {
+                            ReplaceMeshId(flagGirl, 1, 2);
+                            flagGirl->SetMotionByName("Stand");
                             field_0x078 = 0;
                         } else if ((previous && toFinish < 300.0f) || (last && fromFinish < 100.0f)) {
                             if (field_0x078 != 1) {
-                                UnknownFunction41ea60(flagGirl, 1, 2);
+                                ReplaceMeshId(flagGirl, 1, 2);
                                 field_0x078 = 1;
-                                flagGirl->UnknownFunction4a8b10("FlagStart");
-                            } else if (flagGirl->field_0x00c) {
-                                flagGirl->UnknownFunction4a8b10("FlagLoop");
+                                flagGirl->SetMotionByName("FlagStart");
+                            } else if (flagGirl->motionFinished) {
+                                flagGirl->SetMotionByName("FlagLoop");
                             }
                         } else if (field_0x078 && field_0x078 < 3 &&
                                    ((previous && toFinish > 100.0f) || (last && fromFinish > 100.0f))) {
-                            flagGirl->UnknownFunction4a8b10("Stand");
+                            flagGirl->SetMotionByName("Stand");
                             field_0x078 = 0;
-                        } else if ((last && toFinish < 300.0f) || (localRacer->field_0x7a4 && fromFinish < 100.0f)) {
+                        } else if ((last && toFinish < 300.0f) || (localRacer->finished && fromFinish < 100.0f)) {
                             if (field_0x078 < 3) {
-                                UnknownFunction41ea60(flagGirl, 2, 1);
+                                ReplaceMeshId(flagGirl, 2, 1);
                                 field_0x078 = 3;
-                                flagGirl->UnknownFunction4a8b10("FlagStart");
-                            } else if (flagGirl->field_0x00c) {
-                                flagGirl->UnknownFunction4a8b10("FlagLoop");
+                                flagGirl->SetMotionByName("FlagStart");
+                            } else if (flagGirl->motionFinished) {
+                                flagGirl->SetMotionByName("FlagLoop");
                                 field_0x078 = 4;
                             }
                         }
@@ -645,10 +644,10 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
         }
     }
     if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay != 0) {
-        if (field_0x0a8 < 0) {
-            field_0x0a8 = g_TrackGame->debugOverlay->NewPage();
+        if (lodDebugPage < 0) {
+            lodDebugPage = g_TrackGame->debugOverlay->NewPage();
         }
-        if (g_TrackGame->debugOverlay->field_0x26c4 == field_0x0a8) {
+        if (g_TrackGame->debugOverlay->field_0x26c4 == lodDebugPage) {
             char name[0x20];
             UnknownBikeRaceModel* model;
             int pass = 0;
@@ -659,14 +658,14 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                                  [g_TrackGame->mode.field_0x1974.field_0xc4].field_0x00].field_0x40,
                         0x14);
                 name[0x14] = 0;
-                raceScene->UnknownFunction4f0ec0(name);
+                raceScene->ResolveSltPath(name);
                 model = localRacer->field_0x3bc;
             } else if (field_0x0b0 == 0) {
-                strncpy(name, raceScene->field_0xb8->field_0x04[field_0x0ac].field_0x10, 0x14);
+                strncpy(name, raceScene->field_0xb8->field_0x04[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
                 model = (UnknownBikeRaceModel*)raceScene->field_0xb8->field_0x04[field_0x0ac].field_0x04;
             } else {
-                strncpy(name, raceScene->field_0xb4->field_0x04[field_0x0ac].field_0x2c, 0x14);
+                strncpy(name, raceScene->field_0xb4->field_0x04[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
                 UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[field_0x0ac];
                 if (entry->field_0x00_bit3) {
@@ -677,29 +676,29 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             }
             do {
                 int faces = 0;
-                UnknownBikeRaceMeshGroup* group = &model->field_0x28c[model->field_0x27c];
-                for (int i = 0; i < group->field_0x00; i++) {
-                    faces += group->field_0x04[i].field_0x0c;
+                UnknownBikeRaceMeshGroup* group = &model->levelGroups[model->field_0x27c];
+                for (int i = 0; i < group->itemCount; i++) {
+                    faces += group->field_0x04[i].faceCount;
                 }
-                g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x0a8, "Soultree LOD (%s)", name);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x0a8, "Current LOD %d out of %d",
-                                                                        model->field_0x27c + 1, model->field_0x274);
-                g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x0a8, "Number of Faces = %d", faces);
+                g_TrackGame->debugOverlay->UnknownFunction447fa0(lodDebugPage, "Soultree LOD (%s)", name);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(lodDebugPage, "Current LOD %d out of %d",
+                                                                        model->field_0x27c + 1, model->detailLevelCount);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(lodDebugPage, "Number of Faces = %d", faces);
                 if ((signed char)field_0x0b0 < 0) {
                     if (g_UnknownGlobal567a88 > 5) {
-                        if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->field_0x274) || g_UnknownGlobal567a88 < 2) {
-                            g_TrackGame->debugOverlay->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                        if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
+                            g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                             g_UnknownGlobal567a88 = 2;
                         }
-                    } else if ((pass == 0 && g_UnknownGlobal567a88 > model->field_0x274) || g_UnknownGlobal567a88 < 2) {
-                        g_TrackGame->debugOverlay->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                    } else if ((pass == 0 && g_UnknownGlobal567a88 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
+                        g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                         g_UnknownGlobal567a88 = 9;
                     }
-                } else if (g_UnknownGlobal567a88 > model->field_0x274 || g_UnknownGlobal567a88 < 2) {
-                    g_TrackGame->debugOverlay->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                } else if (g_UnknownGlobal567a88 > model->detailLevelCount || g_UnknownGlobal567a88 < 2) {
+                    g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                     g_UnknownGlobal567a88 = 2;
                 }
-                if (model->field_0x274 > 1) {
+                if (model->detailLevelCount > 1) {
                     int up = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
                     int down = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
                     int row = g_UnknownGlobal567a88 - 1;
@@ -717,56 +716,56 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                         switch (row) {
                         case 1:
-                            if (model->field_0x274 > 1) {
+                            if (model->detailLevelCount > 1) {
                                 if (down) {
-                                    model->field_0x280[0] += 0.05f;
+                                    model->detailDistances[0] += 0.05f;
                                 } else {
-                                    model->field_0x280[0] -= 0.05f;
-                                    model->field_0x280[0] = UnknownFunctionMax(model->field_0x280[0], 0.0f);
+                                    model->detailDistances[0] -= 0.05f;
+                                    model->detailDistances[0] = UnknownFunctionMax(model->detailDistances[0], 0.0f);
                                 }
                             }
                             break;
                         case 2:
-                            if (model->field_0x274 > 2) {
+                            if (model->detailLevelCount > 2) {
                                 if (down) {
-                                    model->field_0x280[1] += 0.05f;
+                                    model->detailDistances[1] += 0.05f;
                                 } else {
-                                    model->field_0x280[1] -= 0.05f;
-                                    model->field_0x280[1] = UnknownFunctionMax(model->field_0x280[1], 0.0f);
+                                    model->detailDistances[1] -= 0.05f;
+                                    model->detailDistances[1] = UnknownFunctionMax(model->detailDistances[1], 0.0f);
                                 }
                             }
                             break;
                         case 3:
-                            if (model->field_0x274 > 3) {
+                            if (model->detailLevelCount > 3) {
                                 if (down) {
-                                    model->field_0x280[2] += 0.05f;
+                                    model->detailDistances[2] += 0.05f;
                                 } else {
-                                    model->field_0x280[2] -= 0.05f;
-                                    model->field_0x280[2] = UnknownFunctionMax(model->field_0x280[2], 0.0f);
+                                    model->detailDistances[2] -= 0.05f;
+                                    model->detailDistances[2] = UnknownFunctionMax(model->detailDistances[2], 0.0f);
                                 }
                             }
                             break;
                         case 4:
-                            if (model->field_0x274 > 4) {
+                            if (model->detailLevelCount > 4) {
                                 if (down) {
-                                    model->field_0x280[3] += 0.05f;
+                                    model->detailDistances[3] += 0.05f;
                                 } else {
-                                    model->field_0x280[3] -= 0.05f;
-                                    model->field_0x280[3] = UnknownFunctionMax(model->field_0x280[3], 0.0f);
+                                    model->detailDistances[3] -= 0.05f;
+                                    model->detailDistances[3] = UnknownFunctionMax(model->detailDistances[3], 0.0f);
                                 }
                             }
                             break;
                         }
                     }
                     g_TrackGame->debugOverlay->UnknownFunction447f40(
-                        field_0x0a8, "AutoLOD#0 %.2f", model->field_0x274 > 1 ? model->field_0x280[0] : 0.0f);
+                        lodDebugPage, "AutoLOD#0 %.2f", model->detailLevelCount > 1 ? model->detailDistances[0] : 0.0f);
                     g_TrackGame->debugOverlay->UnknownFunction447f40(
-                        field_0x0a8, "AutoLOD#1 %.2f", model->field_0x274 > 2 ? model->field_0x280[1] : 0.0f);
+                        lodDebugPage, "AutoLOD#1 %.2f", model->detailLevelCount > 2 ? model->detailDistances[1] : 0.0f);
                     g_TrackGame->debugOverlay->UnknownFunction447f40(
-                        field_0x0a8, "AutoLOD#2 %.2f", model->field_0x274 > 3 ? model->field_0x280[2] : 0.0f);
+                        lodDebugPage, "AutoLOD#2 %.2f", model->detailLevelCount > 3 ? model->detailDistances[2] : 0.0f);
                     g_TrackGame->debugOverlay->UnknownFunction447f40(
-                        field_0x0a8, "AutoLOD#3 %.2f", model->field_0x274 > 4 ? model->field_0x280[3] : 0.0f);
-                    g_TrackGame->debugOverlay->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 1);
+                        lodDebugPage, "AutoLOD#3 %.2f", model->detailLevelCount > 4 ? model->detailDistances[3] : 0.0f);
+                    g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 1);
                 }
                 if ((signed char)field_0x0b0 >= 0) {
                     break;
@@ -780,7 +779,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x0041ea10
-int BikeRace::UnknownFunction41ea10() {
+int BikeRace::AnyRacerRemote() {
     if (g_TrackGame->field_0x18 > 1) {
         for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
             if (racerSlots[i]->UnknownFunction495c00()) {
@@ -792,12 +791,12 @@ int BikeRace::UnknownFunction41ea10() {
 }
 
 // 0x0041ea60
-void BikeRace::UnknownFunction41ea60(UnknownBikeRaceCharacter* character, int from, int to) {
-    for (int i = 0; i < character->field_0x1a0->field_0x274; i++) {
-        for (int j = 0; j < character->field_0x1a0->field_0x28c[i].field_0x00; j++) {
-            for (int k = 0; k < character->field_0x1a0->field_0x28c[i].field_0x04[j].field_0x20; k++) {
-                if (character->field_0x1a0->field_0x28c[i].field_0x04[j].field_0x24[k] == from) {
-                    character->field_0x1a0->field_0x28c[i].field_0x04[j].field_0x24[k] = to;
+void BikeRace::ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int to) {
+    for (int i = 0; i < character->field_0x1a0->groupCount; i++) {
+        for (int j = 0; j < character->field_0x1a0->field_0x28c[i].itemCount; j++) {
+            for (int k = 0; k < character->field_0x1a0->field_0x28c[i].field_0x04[j].idCount; k++) {
+                if (character->field_0x1a0->field_0x28c[i].field_0x04[j].ids[k] == from) {
+                    character->field_0x1a0->field_0x28c[i].field_0x04[j].ids[k] = to;
                 }
             }
         }
@@ -819,7 +818,7 @@ void BikeRace::UnknownFunction41f550(int value) {
 
 // 0x0041f590
 int BikeRace::UnknownVirtualSlot20(int value) {
-    if (field_0x190 && field_0x19c != 0 && field_0x19c->UnknownFunction51da30(value, &value)) {
+    if (field_0x190 && chatOverlay != 0 && chatOverlay->HandleChatKey(value, &value)) {
         if (value == 0) {
             field_0x194 = 10.0f;
         }
@@ -834,14 +833,14 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
     if (g_TrackGame->network != 0 && event->kind == 0) {
         g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(0xc);
     }
-    if (field_0x190 && field_0x19c != 0) {
+    if (field_0x190 && chatOverlay != 0) {
         if (event->control == 1 && event->kind == 0) {
             field_0x194 = 0.1f;
-            field_0x19c->field_0x3dc = 0;
+            chatOverlay->typing = 0;
             field_0x190 = false;
             return 1;
         }
-        if (field_0x19c->UnknownFunction51dce0(event, entry, &result)) {
+        if (chatOverlay->UnknownFunction51dce0(event, entry, &result)) {
             return 1;
         }
     }
@@ -861,9 +860,9 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     if (g_TrackGame->mode.field_0x6b4 == 2) {
                         break;
                     }
-                    if (field_0x19c != 0) {
-                        field_0x19c->UnknownFunction51dd10();
-                        field_0x19c->field_0x3dc = 1;
+                    if (chatOverlay != 0) {
+                        chatOverlay->UnknownFunction51dd10();
+                        chatOverlay->typing = 1;
                     }
                     field_0x194 = 10.0f;
                     field_0x190 = true;
@@ -873,9 +872,9 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 if (g_TrackGame->mode.field_0x6b4 == 3) {
                     g_TrackGame->mode.field_0x6b4 = 0;
                 }
-                if (g_TrackGame->mode.field_0x6b4 == 1 && field_0x19c != 0) {
-                    field_0x19c->UnknownFunction51dd10();
-                    field_0x19c->field_0x3dc = 1;
+                if (g_TrackGame->mode.field_0x6b4 == 1 && chatOverlay != 0) {
+                    chatOverlay->UnknownFunction51dd10();
+                    chatOverlay->typing = 1;
                     field_0x190 = true;
                 }
                 char title[0x80];
@@ -927,33 +926,33 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         case 0x1b:
             if ((g_TrackGame->field_0x2d4_bit2) &&
                 UnknownFunction43caa0(0x1b, 0, event, 3)) {
-                UnknownFunction41f1d0(1, 0, 0);
+                NextCameraTarget(1, 0, 0);
                 return 1;
             }
             if (!UnknownFunction43caa0(0x1b, 0, event, 0x80)) {
-                UnknownFunction41f1d0(1, 0, 1);
+                NextCameraTarget(1, 0, 1);
             }
             return 1;
         case 0x1a:
             if ((g_TrackGame->field_0x2d4_bit2) &&
                 UnknownFunction43caa0(0x1a, 0, event, 3)) {
-                UnknownFunction41f1d0(0, 0, 0);
+                NextCameraTarget(0, 0, 0);
                 return 1;
             }
             if (!UnknownFunction43caa0(0x1a, 0, event, 0x80)) {
-                UnknownFunction41f1d0(0, 0, 1);
+                NextCameraTarget(0, 0, 1);
             }
             return 1;
 
         case 0xc9:
             if (UnknownFunction43caa0(0xc9, 0, event, 0x80000000)) {
-                UnknownFunction41f1d0(1, 1, 0);
+                NextCameraTarget(1, 1, 0);
                 return 1;
             }
             break;
         case 0xd1:
             if (UnknownFunction43caa0(0xd1, 0, event, 0x80000000)) {
-                UnknownFunction41f1d0(0, 1, 0);
+                NextCameraTarget(0, 1, 0);
                 return 1;
             }
             break;
@@ -1011,11 +1010,11 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         }
     }
     if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay != 0) {
-        if (field_0x0a8 < 0) {
-            field_0x0a8 = g_TrackGame->debugOverlay->NewPage();
+        if (lodDebugPage < 0) {
+            lodDebugPage = g_TrackGame->debugOverlay->NewPage();
         }
         int shown = g_TrackGame->debugOverlay->field_0x26c4;
-        if (shown == field_0x0a8) {
+        if (shown == lodDebugPage) {
 
             if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
                 if (g_TrackGame->ui->gui->GetUser(0)->field_0x30 == 0) {
@@ -1027,7 +1026,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;
                         picker->UnknownFunction4b0210(
-                            g_TrackGame->renderTarget, 0, UnknownFunction417b00,
+                            g_TrackGame->renderTarget, 0, PickerHitCallback,
                             (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->field_0x30);
                         if (AppendChild(objectPicker, -1)) {
                             g_TrackGame->ui->UnknownFunction499b00();
@@ -1037,7 +1036,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     }
                 } else {
                     g_TrackGame->debugOverlay->UnknownFunction448000(
-                        field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                        lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                     g_UnknownGlobal567a88++;
                     if ((signed char)field_0x0b0 < 0) {
                         if (g_UnknownGlobal567a88 > 12) {
@@ -1061,13 +1060,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                                 if (picked == caster->field_0x08->field_0x128) {
                                     UnknownFunctionCameraView()->field_0x390 = 1;
                                     field_0x154 = i;
-                                    UnknownFunction41f1d0(1, 0, 0);
+                                    NextCameraTarget(1, 0, 0);
                                     return 1;
                                 }
                             } else if (picked == caster->field_0x0c) {
                                 UnknownFunctionCameraView()->field_0x390 = 1;
                                 field_0x154 = i;
-                                UnknownFunction41f1d0(1, 0, 0);
+                                NextCameraTarget(1, 0, 0);
                                 return 1;
                             }
                         }
@@ -1079,13 +1078,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                                 if (picked == ((UnknownBikeRacePickCharacter*)entry->field_0x04)->field_0x210) {
                                     UnknownFunctionCameraView()->field_0x390 = 1;
                                     field_0x150 = i;
-                                    UnknownFunction41f1d0(1, 0, 1);
+                                    NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
                             } else if (picked == ((UnknownBikeRacePickObject*)entry->field_0x08)->field_0x3c) {
                                 UnknownFunctionCameraView()->field_0x390 = 1;
                                 field_0x150 = i;
-                                UnknownFunction41f1d0(1, 0, 1);
+                                NextCameraTarget(1, 0, 1);
                                 return 1;
                             }
                         }
@@ -1117,15 +1116,15 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
             int id = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
             if (id != self && id == from) {
                 UnknownBikeRaceRacer* racer = racerSlots[i];
-                if (racer != 0 && racer->field_0x734 == state->field_0x54) {
+                if (racer != 0 && racer->netIndex == state->racerIndex) {
                     racerSlots[i]->field_0x11b8 = 1;
-                    UnknownBikeRaceRacerPart* oldest = racerSlots[i]->field_0x11c8[2];
-                    racerSlots[i]->field_0x11c8[2] = racerSlots[i]->field_0x11c8[1];
-                    racerSlots[i]->field_0x11c8[1] = racerSlots[i]->field_0x11c8[0];
-                    racerSlots[i]->field_0x11c8[0] = oldest;
-                    racerSlots[i]->field_0x11c8[0]->field_0x58 = flags;
-                    racerSlots[i]->field_0x11c8[0]->field_0x00 = *state;
-                    racerSlots[i]->field_0x11c8[0]->field_0x5c = 1;
+                    UnknownBikeRaceRacerPart* oldest = racerSlots[i]->receivedStates[2];
+                    racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
+                    racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
+                    racerSlots[i]->receivedStates[0] = oldest;
+                    racerSlots[i]->receivedStates[0]->messageFlags = flags;
+                    racerSlots[i]->receivedStates[0]->state = *state;
+                    racerSlots[i]->receivedStates[0]->fresh = 1;
                     racerSlots[i]->field_0x1358 = state->field_0x3c;
                     racerSlots[i]->field_0x1364 = state->field_0x08;
                     racerSlots[i]->field_0x1370 = state->field_0x30;
@@ -1143,17 +1142,17 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
         for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
             int id = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
             if (id != self && id == from && racerSlots[i] != 0 &&
-                racerSlots[i]->field_0x734 == message->field_0x16) {
+                racerSlots[i]->netIndex == message->racerIndex) {
                 if (!racerSlots[i]->field_0x11b8) {
                     return 1;
                 }
-                UnknownBikeRaceRacerPart* oldest = racerSlots[i]->field_0x11c8[2];
-                racerSlots[i]->field_0x11c8[2] = racerSlots[i]->field_0x11c8[1];
-                racerSlots[i]->field_0x11c8[1] = racerSlots[i]->field_0x11c8[0];
-                racerSlots[i]->field_0x11c8[0] = oldest;
-                racerSlots[i]->field_0x11c8[0]->field_0x58 = flags;
-                racerSlots[i]->UnknownFunction4933e0(message, racerSlots[i]->field_0x11c8[0]);
-                racerSlots[i]->field_0x11c8[0]->field_0x5c = 0;
+                UnknownBikeRaceRacerPart* oldest = racerSlots[i]->receivedStates[2];
+                racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
+                racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
+                racerSlots[i]->receivedStates[0] = oldest;
+                racerSlots[i]->receivedStates[0]->messageFlags = flags;
+                racerSlots[i]->UnknownFunction4933e0(message, racerSlots[i]->receivedStates[0]);
+                racerSlots[i]->receivedStates[0]->fresh = 0;
                 return 1;
             }
         }
@@ -1165,8 +1164,8 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
             int id = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
             if (id != self && id == from) {
                 UnknownBikeRaceRacer* racer = racerSlots[i];
-                if (racer != 0 && racer->field_0x734 == score->field_0x01) {
-                    racerSlots[i]->field_0x768 = score->field_0x04;
+                if (racer != 0 && racer->netIndex == score->racerIndex) {
+                    racerSlots[i]->score = score->field_0x04;
                     return 1;
                 }
             }
@@ -1175,14 +1174,14 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
         char name[0x14];
         if (g_TrackGame->network->GetPlayerName(from, name)) {
             if (g_TrackGame->mode.field_0x6b4 != 2) {
-                if (field_0x19c != 0) {
-                    field_0x19c->UnknownFunction51dd10();
+                if (chatOverlay != 0) {
+                    chatOverlay->UnknownFunction51dd10();
                 }
                 field_0x194 = 10.0f;
                 field_0x190 = true;
             }
-            if (field_0x19c != 0) {
-                field_0x19c->UnknownFunction51dd70(name, &((UnknownBikeRaceNetStamp*)data)->field_0x04, 1);
+            if (chatOverlay != 0) {
+                chatOverlay->UnknownFunction51dd70(name, &((UnknownBikeRaceNetStamp*)data)->timeStamp, 1);
             }
         }
         return 1;
@@ -1190,7 +1189,7 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
         UnknownBikeRaceNetStamp* stamp = (UnknownBikeRaceNetStamp*)data;
         for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
             if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == from) {
-                float delay = (float)(unsigned int)flags - (float)stamp->field_0x04;
+                float delay = (float)(unsigned int)flags - (float)stamp->timeStamp;
                 if (delay < g_TrackGame->mode.field_0x1be4[i].field_0xd0) {
                     g_TrackGame->mode.field_0x1be4[i].field_0xd0 = delay;
                 }
@@ -1257,7 +1256,7 @@ void BikeRace::UnknownFunction420590(int player) {
 }
 
 // 0x00420650
-void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
+void BikeRace::RestartRace(int mode, char* path, char* description) {
     if (g_TrackGame->network != 0) {
         return;
     }
@@ -1277,7 +1276,7 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
     int positions[11];
     int order[11];
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-        UnknownFunction417bc0(order);
+        RankByPoints(order);
         for (int i = 0; i < racerCount; i++) {
             for (int j = 0; j < racerCount; j++) {
                 if (order[j] == i + 1) {
@@ -1312,7 +1311,7 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
         if (replayVcr != 0) {
             if (mode == 0) {
                 g_TrackGame->field_0x3428 = 1;
-                if (!replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, "VCRtape.dat",
+                if (!replayVcr->UnknownFunction49bf10(RecorderCallback, 1, "VCRtape.dat",
                                                         field_0x1a8)) {
                     delete replayVcr;
                     replayVcr = 0;
@@ -1322,7 +1321,7 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
                     new (__FILE__, 0x1073) VCRDlg(1, "VCR.dtm"), 0, 1, 0, 0, 0, 0, 1);
             } else {
                 g_TrackGame->field_0x3428 = 0;
-                if (!replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 0, "VCRtape.dat",
+                if (!replayVcr->UnknownFunction49bf10(RecorderCallback, 0, "VCRtape.dat",
                                                         field_0x1a8)) {
                     delete replayVcr;
                     replayVcr = 0;
@@ -1334,20 +1333,20 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
         }
     }
     if (flagGirl != 0) {
-        UnknownFunction41ea60(flagGirl, 1, 2);
-        flagGirl->UnknownFunction4a8b10("Stand");
+        ReplaceMeshId(flagGirl, 1, 2);
+        flagGirl->SetMotionByName("Stand");
         field_0x078 = 0;
     }
-    UnknownFunction41d2a0(0.0001f);
+    SetSceneTime(0.0001f);
     raceScene->field_0x7c0 = 1;
     for (UnknownBikeRaceRacer* racer = UnknownFunction4204e0(&iterator); racer != 0;
          racer = UnknownFunction4204e0(&iterator)) {
         racer->UnknownRacerVirtualSlot43();
-        racer->field_0x109 = true;
+        racer->restarted = true;
         UnknownFunction4210f0(&position, &direction, g_TrackGame->field_0x560,
                               positions[iterator - 1]);
-        racer->field_0x10c = position;
-        racer->field_0x118 = direction;
+        racer->startPosition = position;
+        racer->startDirection = direction;
         racer->UnknownFunction496e20(replayVcr);
         field_0x3f8 = false;
     }
@@ -1387,7 +1386,7 @@ void BikeRace::UnknownFunction420b00(char* path, char* description) {
 }
 
 // 0x00420bd0
-void BikeRace::UnknownFunction420bd0() {
+void BikeRace::RestartReplay() {
     if (ghostVcr != 0) {
         ghostVcr->UnknownFunction4691f0();
         ghostVcr->Release();
@@ -1424,7 +1423,7 @@ void BikeRace::UnknownFunction420bd0() {
     if (replayVcr == 0) {
         return;
     }
-    if (!replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 0, ghostFileRecorded, field_0x1a8)) {
+    if (!replayVcr->UnknownFunction49bf10(RecorderCallback, 0, ghostFileRecorded, field_0x1a8)) {
         return;
     }
     char model[0x104];
@@ -1438,8 +1437,8 @@ void BikeRace::UnknownFunction420bd0() {
     g_TrackGame->ui->UnknownFunction49b7f0(g_TrackGame->mode.field_0x1974.field_0x80,
                                                      bikeName, 0x3f);
     replayVcr->UnknownFunction49c070(0, 0, 0, g_TrackGame->mode.field_0x00, model, rider,
-                                       riderName, bikeName, aiRacers[0]->field_0x738,
-                                       (unsigned char)aiRacers[0]->field_0x737,
+                                       riderName, bikeName, aiRacers[0]->engineSize,
+                                       (unsigned char)aiRacers[0]->engineKind,
                                        g_TrackGame->mode.field_0x1bcc);
     AppendChild(replayVcr, -1);
     localRacer->UnknownFunction496e20(replayVcr);
@@ -1450,14 +1449,14 @@ void BikeRace::UnknownFunction420bd0() {
     if (ghostVcr == 0) {
         return;
     }
-    if (!ghostVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, ghostFilePlayed, field_0x1a8)) {
+    if (!ghostVcr->UnknownFunction49bf10(RecorderCallback, 1, ghostFilePlayed, field_0x1a8)) {
         return;
     }
     localRacer->field_0x750 = field_0x1c8 = ghostVcr->UnknownFunction49c000();
     aiRacers[0]->UnknownFunction496e20(ghostVcr);
     aiRacers[0]->UnknownVirtualSlot5();
     aiRacers[0]->field_0x11b8 = 0;
-    UnknownFunction423040(0);
+    ClearAiRacerParts(0);
     AppendChild(ghostVcr, -1);
 }
 
@@ -1472,7 +1471,7 @@ void BikeRace::UnknownFunction421050() {
         if (field_0x06c != 0) {
             field_0x15c = 8.2f;
             field_0x06c->UnknownVirtualSlot5();
-            raceScene->UnknownFunction4eb040(field_0x070, 0.0f, 0, 0);
+            raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
             if (field_0x06c->field_0x210 != 0) {
                 field_0x06c->field_0x210->Release();
                 field_0x06c->field_0x210 = 0;
@@ -1485,12 +1484,12 @@ void BikeRace::UnknownFunction421050() {
 }
 
 // Inline: TrackGame+0x568's ghost bike, reloaded at each use.
-static inline UnknownBikeRaceGhost* UnknownFunctionGhost() {
+static inline UnknownBikeRaceGhost* GhostBike() {
     return (UnknownBikeRaceGhost*)g_TrackGame->field_0x568->field_0xdc;
 }
 
 // 0x00421d50
-int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* keep, int time) {
+int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int time) {
     *keep = 0;
     field_0x1e4 = a;
     if (field_0x3f8 && a == -1) {
@@ -1502,7 +1501,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
         return 0;
     }
     if (a == -2) {
-        UnknownFunction422ec0();
+        ClearRacerParts();
         g_TrackGame->field_0x2e0 = 1.0f;
         if (g_TrackGame->ui->field_0x4a8) {
             g_TrackGame->ui->demoEnded = 1;
@@ -1530,7 +1529,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
         }
         return 1;
     } else if (a == -3) {
-        UnknownFunction422ec0();
+        ClearRacerParts();
         g_TrackGame->field_0x2e0 = 1.0f;
         if (replayMode == 14) {
             UnknownFunction41f550(1);
@@ -1562,7 +1561,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
         if (replaySeekTarget != -1.0f) {
             if ((replayMode == 9 && replaySeekTarget < replayTime) ||
                 (replayMode == 11 && replaySeekTarget > replayTime)) {
-                UnknownFunction422ec0();
+                ClearRacerParts();
                 replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
                 replaySeekTarget = -1.0f;
@@ -1587,14 +1586,14 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
         if (replayMode == 14) {
             if (replayTime > 0.5f) {
                 UnknownFunction41f550(0);
-                UnknownFunction422ec0();
+                ClearRacerParts();
                 return 5;
             }
             return 1;
         }
         if (field_0x1e0 != replayMode) {
             replayTime = s_UnknownStatic578e8c = tick->field_0x00;
-            UnknownFunction422ec0();
+            ClearRacerParts();
         }
         if (tick->field_0x00 > replayTime) {
             s_UnknownStatic578e8c = tick->field_0x00;
@@ -1614,7 +1613,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
     } else if (a == 1) {
         UnknownBikeRaceNetState* state = (UnknownBikeRaceNetState*)data;
         UnknownBikeRaceRacer* racer = localRacer;
-        if (b == racer->field_0x11bc && racer->field_0x734 == state->field_0x54) {
+        if (b == racer->recorderId && racer->netIndex == state->racerIndex) {
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
                 racer = aiRacers[0];
             }
@@ -1624,18 +1623,18 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             racer->field_0x11b8 = 1;
             UnknownBikeRaceRacerPart* oldest;
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
-                oldest = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[2];
             } else {
-                oldest = racer->field_0x11c8[3];
-                racer->field_0x11c8[3] = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[3];
+                racer->receivedStates[3] = racer->receivedStates[2];
             }
-            racer->field_0x11c8[2] = racer->field_0x11c8[1];
-            racer->field_0x11c8[1] = racer->field_0x11c8[0];
-            racer->field_0x11c8[0] = oldest;
-            oldest->field_0x58 = time;
-            racer->field_0x11c8[0]->field_0x00 = *state;
-            racer->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-            racer->field_0x11c8[0]->field_0x5c = 1;
+            racer->receivedStates[2] = racer->receivedStates[1];
+            racer->receivedStates[1] = racer->receivedStates[0];
+            racer->receivedStates[0] = oldest;
+            oldest->messageFlags = time;
+            racer->receivedStates[0]->state = *state;
+            racer->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->receivedStates[0]->fresh = 1;
             racer->field_0x1358 = state->field_0x3c;
             racer->field_0x1364 = state->field_0x08;
             racer->field_0x1370 = state->field_0x30;
@@ -1649,37 +1648,37 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             }
             *keep = 1;
             if (replayMode == 11) {
-                racer->field_0x11c8[1]->field_0x00 = racer->field_0x11c8[0]->field_0x00;
-                racer->field_0x11c8[2]->field_0x00 = racer->field_0x11c8[1]->field_0x00;
-                racer->field_0x11c8[3]->field_0x00 = racer->field_0x11c8[2]->field_0x00;
-                racer->field_0x11c8[1]->field_0x58 = racer->field_0x11c8[0]->field_0x58;
-                racer->field_0x11c8[2]->field_0x58 = racer->field_0x11c8[1]->field_0x58;
-                racer->field_0x11c8[3]->field_0x58 = racer->field_0x11c8[2]->field_0x58;
-                racer->field_0x11c8[1]->field_0x5c = 1;
-                racer->field_0x11c8[2]->field_0x5c = 1;
-                racer->field_0x11c8[3]->field_0x5c = 1;
+                racer->receivedStates[1]->state = racer->receivedStates[0]->state;
+                racer->receivedStates[2]->state = racer->receivedStates[1]->state;
+                racer->receivedStates[3]->state = racer->receivedStates[2]->state;
+                racer->receivedStates[1]->messageFlags = racer->receivedStates[0]->messageFlags;
+                racer->receivedStates[2]->messageFlags = racer->receivedStates[1]->messageFlags;
+                racer->receivedStates[3]->messageFlags = racer->receivedStates[2]->messageFlags;
+                racer->receivedStates[1]->fresh = 1;
+                racer->receivedStates[2]->fresh = 1;
+                racer->receivedStates[3]->fresh = 1;
                 return 11;
             }
             return 1;
         }
         for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
-            if (aiRacers[i] != 0 && b == aiRacers[i]->field_0x11bc &&
-                aiRacers[i]->field_0x734 == state->field_0x54) {
+            if (aiRacers[i] != 0 && b == aiRacers[i]->recorderId &&
+                aiRacers[i]->netIndex == state->racerIndex) {
                 aiRacers[i]->field_0x11b8 = 1;
                 UnknownBikeRaceRacerPart* oldest;
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
-                    oldest = aiRacers[i]->field_0x11c8[2];
+                    oldest = aiRacers[i]->receivedStates[2];
                 } else {
-                    oldest = aiRacers[i]->field_0x11c8[3];
-                    aiRacers[i]->field_0x11c8[3] = aiRacers[i]->field_0x11c8[2];
+                    oldest = aiRacers[i]->receivedStates[3];
+                    aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
                 }
-                aiRacers[i]->field_0x11c8[2] = aiRacers[i]->field_0x11c8[1];
-                aiRacers[i]->field_0x11c8[1] = aiRacers[i]->field_0x11c8[0];
-                aiRacers[i]->field_0x11c8[0] = oldest;
-                aiRacers[i]->field_0x11c8[0]->field_0x58 = time;
-                aiRacers[i]->field_0x11c8[0]->field_0x00 = *state;
-                aiRacers[i]->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-                aiRacers[i]->field_0x11c8[0]->field_0x5c = 1;
+                aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
+                aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
+                aiRacers[i]->receivedStates[0] = oldest;
+                aiRacers[i]->receivedStates[0]->messageFlags = time;
+                aiRacers[i]->receivedStates[0]->state = *state;
+                aiRacers[i]->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+                aiRacers[i]->receivedStates[0]->fresh = 1;
                 aiRacers[i]->field_0x1358 = state->field_0x3c;
                 aiRacers[i]->field_0x1364 = state->field_0x08;
                 aiRacers[i]->field_0x1370 = state->field_0x30;
@@ -1693,15 +1692,15 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
                 }
                 *keep = 1;
                 if (replayMode == 11) {
-                    aiRacers[i]->field_0x11c8[1]->field_0x00 = aiRacers[i]->field_0x11c8[0]->field_0x00;
-                    aiRacers[i]->field_0x11c8[2]->field_0x00 = aiRacers[i]->field_0x11c8[1]->field_0x00;
-                    aiRacers[i]->field_0x11c8[3]->field_0x00 = aiRacers[i]->field_0x11c8[2]->field_0x00;
-                    aiRacers[i]->field_0x11c8[1]->field_0x58 = aiRacers[i]->field_0x11c8[0]->field_0x58;
-                    aiRacers[i]->field_0x11c8[2]->field_0x58 = aiRacers[i]->field_0x11c8[1]->field_0x58;
-                    aiRacers[i]->field_0x11c8[3]->field_0x58 = aiRacers[i]->field_0x11c8[2]->field_0x58;
-                    aiRacers[i]->field_0x11c8[1]->field_0x5c = 1;
-                    aiRacers[i]->field_0x11c8[2]->field_0x5c = 1;
-                    aiRacers[i]->field_0x11c8[3]->field_0x5c = 1;
+                    aiRacers[i]->receivedStates[1]->state = aiRacers[i]->receivedStates[0]->state;
+                    aiRacers[i]->receivedStates[2]->state = aiRacers[i]->receivedStates[1]->state;
+                    aiRacers[i]->receivedStates[3]->state = aiRacers[i]->receivedStates[2]->state;
+                    aiRacers[i]->receivedStates[1]->messageFlags = aiRacers[i]->receivedStates[0]->messageFlags;
+                    aiRacers[i]->receivedStates[2]->messageFlags = aiRacers[i]->receivedStates[1]->messageFlags;
+                    aiRacers[i]->receivedStates[3]->messageFlags = aiRacers[i]->receivedStates[2]->messageFlags;
+                    aiRacers[i]->receivedStates[1]->fresh = 1;
+                    aiRacers[i]->receivedStates[2]->fresh = 1;
+                    aiRacers[i]->receivedStates[3]->fresh = 1;
                     return 11;
                 }
                 return 1;
@@ -1713,7 +1712,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             return 1;
         }
         UnknownBikeRaceRacer* racer = localRacer;
-        if (b == racer->field_0x11bc && racer->field_0x734 == message->field_0x16) {
+        if (b == racer->recorderId && racer->netIndex == message->racerIndex) {
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
                 racer = aiRacers[0];
             }
@@ -1722,18 +1721,18 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             }
             UnknownBikeRaceRacerPart* oldest;
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
-                oldest = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[2];
             } else {
-                oldest = racer->field_0x11c8[3];
-                racer->field_0x11c8[3] = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[3];
+                racer->receivedStates[3] = racer->receivedStates[2];
             }
-            racer->field_0x11c8[2] = racer->field_0x11c8[1];
-            racer->field_0x11c8[1] = racer->field_0x11c8[0];
-            racer->field_0x11c8[0] = oldest;
-            oldest->field_0x58 = time;
-            racer->UnknownFunction4933e0(message, racer->field_0x11c8[0]);
-            racer->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-            racer->field_0x11c8[0]->field_0x5c = 0;
+            racer->receivedStates[2] = racer->receivedStates[1];
+            racer->receivedStates[1] = racer->receivedStates[0];
+            racer->receivedStates[0] = oldest;
+            oldest->messageFlags = time;
+            racer->UnknownFunction4933e0(message, racer->receivedStates[0]);
+            racer->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->receivedStates[0]->fresh = 0;
             return 1;
         }
         int i = 0;
@@ -1741,38 +1740,38 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             return 1;
         }
         for (; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
-            if (aiRacers[i] != 0 && b == aiRacers[i]->field_0x11bc &&
-                aiRacers[i]->field_0x734 == message->field_0x16) {
+            if (aiRacers[i] != 0 && b == aiRacers[i]->recorderId &&
+                aiRacers[i]->netIndex == message->racerIndex) {
                 if (!aiRacers[i]->field_0x11b8) {
                     return 0;
                 }
-                UnknownBikeRaceRacerPart* oldest = aiRacers[i]->field_0x11c8[3];
-                aiRacers[i]->field_0x11c8[3] = aiRacers[i]->field_0x11c8[2];
-                aiRacers[i]->field_0x11c8[2] = aiRacers[i]->field_0x11c8[1];
-                aiRacers[i]->field_0x11c8[1] = aiRacers[i]->field_0x11c8[0];
-                aiRacers[i]->field_0x11c8[0] = oldest;
-                aiRacers[i]->field_0x11c8[0]->field_0x58 = time;
-                aiRacers[i]->UnknownFunction4933e0(message, aiRacers[i]->field_0x11c8[0]);
-                aiRacers[i]->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-                aiRacers[i]->field_0x11c8[0]->field_0x5c = 0;
+                UnknownBikeRaceRacerPart* oldest = aiRacers[i]->receivedStates[3];
+                aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
+                aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
+                aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
+                aiRacers[i]->receivedStates[0] = oldest;
+                aiRacers[i]->receivedStates[0]->messageFlags = time;
+                aiRacers[i]->UnknownFunction4933e0(message, aiRacers[i]->receivedStates[0]);
+                aiRacers[i]->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+                aiRacers[i]->receivedStates[0]->fresh = 0;
                 return 1;
             }
         }
     } else if (a == 10) {
         UnknownBikeRaceNetScore* score = (UnknownBikeRaceNetScore*)data;
         UnknownBikeRaceRacer* racer = localRacer;
-        if (b == racer->field_0x11bc && racer->field_0x734 == score->field_0x01) {
+        if (b == racer->recorderId && racer->netIndex == score->racerIndex) {
             if (racer == 0) {
                 return 0;
             }
-            racer->field_0x768 = score->field_0x04;
+            racer->score = score->field_0x04;
             *keep = 1;
             return 1;
         }
         for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
-            if (aiRacers[i] != 0 && b == aiRacers[i]->field_0x11bc &&
-                aiRacers[i]->field_0x734 == score->field_0x01) {
-                aiRacers[i]->field_0x768 = score->field_0x04;
+            if (aiRacers[i] != 0 && b == aiRacers[i]->recorderId &&
+                aiRacers[i]->netIndex == score->racerIndex) {
+                aiRacers[i]->score = score->field_0x04;
                 *keep = 1;
                 return 1;
             }
@@ -1780,34 +1779,34 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
     } else if (a == 0x11) {
         UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
         if (g_TrackGame->field_0x568 != 0 && g_TrackGame->field_0x568->field_0xdc != 0) {
-            UnknownFunctionGhost()->field_0x4f8 = 1;
-            UnknownBikeRaceGhostPart* oldest = UnknownFunctionGhost()->field_0x4fc[3];
-            UnknownFunctionGhost()->field_0x4fc[3] = UnknownFunctionGhost()->field_0x4fc[2];
-            UnknownFunctionGhost()->field_0x4fc[2] = UnknownFunctionGhost()->field_0x4fc[1];
-            UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
-            UnknownFunctionGhost()->field_0x4fc[0] = oldest;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c = time;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00 = *record;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x40 = 1;
-            UnknownFunctionGhost()->field_0x5d4 = record->field_0x28;
-            UnknownFunctionGhost()->field_0x5e0 = record->field_0x04;
-            UnknownFunctionGhost()->field_0x5ec = record->field_0x1c;
-            UnknownFunctionGhost()->field_0x5f8 = record->field_0x10;
-            UnknownFunctionGhost()->field_0x5fc = record->field_0x14;
-            UnknownFunctionGhost()->field_0x600 = record->field_0x18;
-            UnknownFunctionGhost()->field_0x604 = replayMode == 11 ? time : record->field_0x34;
+            GhostBike()->hasState = 1;
+            UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
+            GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
+            GhostBike()->receivedStates[2] = GhostBike()->receivedStates[1];
+            GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
+            GhostBike()->receivedStates[0] = oldest;
+            GhostBike()->receivedStates[0]->recordTime = time;
+            GhostBike()->receivedStates[0]->record = *record;
+            GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
+            GhostBike()->receivedStates[0]->fresh = 1;
+            GhostBike()->position = record->position;
+            GhostBike()->field_0x5e0 = record->field_0x04;
+            GhostBike()->field_0x5ec = record->field_0x1c;
+            GhostBike()->field_0x5f8 = record->field_0x10;
+            GhostBike()->field_0x5fc = record->field_0x14;
+            GhostBike()->field_0x600 = record->field_0x18;
+            GhostBike()->runningTime = replayMode == 11 ? time : record->runningTime;
             *keep = 1;
             if (replayMode == 11) {
-                UnknownFunctionGhost()->field_0x4fc[1]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[0]->field_0x00;
-                UnknownFunctionGhost()->field_0x4fc[2]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[1]->field_0x00;
-                UnknownFunctionGhost()->field_0x4fc[3]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[2]->field_0x00;
-                UnknownFunctionGhost()->field_0x4fc[1]->field_0x3c = UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c;
-                UnknownFunctionGhost()->field_0x4fc[2]->field_0x3c = UnknownFunctionGhost()->field_0x4fc[1]->field_0x3c;
-                UnknownFunctionGhost()->field_0x4fc[3]->field_0x3c = UnknownFunctionGhost()->field_0x4fc[2]->field_0x3c;
-                UnknownFunctionGhost()->field_0x4fc[1]->field_0x40 = 1;
-                UnknownFunctionGhost()->field_0x4fc[2]->field_0x40 = 1;
-                UnknownFunctionGhost()->field_0x4fc[3]->field_0x40 = 1;
+                GhostBike()->receivedStates[1]->record = GhostBike()->receivedStates[0]->record;
+                GhostBike()->receivedStates[2]->record = GhostBike()->receivedStates[1]->record;
+                GhostBike()->receivedStates[3]->record = GhostBike()->receivedStates[2]->record;
+                GhostBike()->receivedStates[1]->recordTime = GhostBike()->receivedStates[0]->recordTime;
+                GhostBike()->receivedStates[2]->recordTime = GhostBike()->receivedStates[1]->recordTime;
+                GhostBike()->receivedStates[3]->recordTime = GhostBike()->receivedStates[2]->recordTime;
+                GhostBike()->receivedStates[1]->fresh = 1;
+                GhostBike()->receivedStates[2]->fresh = 1;
+                GhostBike()->receivedStates[3]->fresh = 1;
                 return 11;
             }
             return 1;
@@ -1817,17 +1816,17 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             return 1;
         }
         if (g_TrackGame->field_0x568 != 0 && g_TrackGame->field_0x568->field_0xdc != 0 &&
-            UnknownFunctionGhost()->field_0x4f8) {
-            UnknownBikeRaceGhostPart* oldest = UnknownFunctionGhost()->field_0x4fc[3];
-            UnknownFunctionGhost()->field_0x4fc[3] = UnknownFunctionGhost()->field_0x4fc[2];
-            UnknownFunctionGhost()->field_0x4fc[2] = UnknownFunctionGhost()->field_0x4fc[1];
-            UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
-            UnknownFunctionGhost()->field_0x4fc[0] = oldest;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c = time;
-            UnknownFunctionGhost()->UnknownFunction4a9aa0((UnknownBikeRaceGhostDelta*)data,
-                                                          UnknownFunctionGhost()->field_0x4fc[0]);
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x40 = 0;
+            GhostBike()->hasState) {
+            UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
+            GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
+            GhostBike()->receivedStates[2] = GhostBike()->receivedStates[1];
+            GhostBike()->receivedStates[1] = GhostBike()->receivedStates[0];
+            GhostBike()->receivedStates[0] = oldest;
+            GhostBike()->receivedStates[0]->recordTime = time;
+            GhostBike()->ApplyReplayDelta((UnknownBikeRaceGhostDelta*)data,
+                                                          GhostBike()->receivedStates[0]);
+            GhostBike()->receivedStates[0]->record.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
+            GhostBike()->receivedStates[0]->fresh = 0;
             return 1;
         }
     } else if (a == 0x87) {
@@ -1838,7 +1837,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
                 int iterator = 0;
                 for (UnknownBikeRaceRacer* racer = UnknownFunction4204e0(&iterator); racer != 0;
                      racer = UnknownFunction4204e0(&iterator)) {
-                    if (racer->field_0x11bc == follow->field_0x08) {
+                    if (racer->recorderId == follow->field_0x08) {
                         g_TrackGame->field_0x568->field_0xa8 = (UnknownEventRacer*)racer;
                         break;
                     }
@@ -1850,74 +1849,74 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
 }
 
 // 0x00423040
-void BikeRace::UnknownFunction423040(int index) {
+void BikeRace::ClearAiRacerParts(int index) {
     UnknownBikeRaceRacer* racer = aiRacers[index];
     if (racer != 0) {
-        racer->field_0x11c8[0]->field_0x00.field_0x08 = kVec3Zero;
-        racer->field_0x11c8[1]->field_0x00.field_0x08 = kVec3Zero;
-        racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
-        racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
+        racer->receivedStates[0]->state.field_0x08 = kVec3Zero;
+        racer->receivedStates[1]->state.field_0x08 = kVec3Zero;
+        racer->receivedStates[2]->state.field_0x08 = kVec3Zero;
+        racer->receivedStates[3]->state.field_0x08 = kVec3Zero;
     }
 }
 
 // 0x00422ec0
-void BikeRace::UnknownFunction422ec0() {
+void BikeRace::ClearRacerParts() {
     UnknownBikeRaceRacer* racer = localRacer;
-    racer->field_0x11c8[0]->field_0x00.field_0x08 = kVec3Zero;
-    racer->field_0x11c8[1]->field_0x00.field_0x08 = kVec3Zero;
-    racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
-    racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
+    racer->receivedStates[0]->state.field_0x08 = kVec3Zero;
+    racer->receivedStates[1]->state.field_0x08 = kVec3Zero;
+    racer->receivedStates[2]->state.field_0x08 = kVec3Zero;
+    racer->receivedStates[3]->state.field_0x08 = kVec3Zero;
     for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++) {
         racer = aiRacers[i];
         if (racer != 0) {
-            racer->field_0x11c8[0]->field_0x00.field_0x08 = kVec3Zero;
-            racer->field_0x11c8[1]->field_0x00.field_0x08 = kVec3Zero;
-            racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
-            racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
+            racer->receivedStates[0]->state.field_0x08 = kVec3Zero;
+            racer->receivedStates[1]->state.field_0x08 = kVec3Zero;
+            racer->receivedStates[2]->state.field_0x08 = kVec3Zero;
+            racer->receivedStates[3]->state.field_0x08 = kVec3Zero;
         }
     }
 }
 
 // 0x004230e0
-int UnknownFunction4230e0(int a, void* data, int flag, int b, int* keep, int time,
-                          int* milliseconds) {
+int RecorderCallback(int a, void* data, int flag, int b, int* keep, int time,
+                     int* milliseconds) {
     BikeRace* race = (BikeRace*)g_TrackGame->eventManager->FindRaceView();
     *milliseconds = (int)(race->replayTime * 1000.0f);
-    return race->UnknownFunction421d50(a, data, flag, b, keep, time);
+    return race->RecordFrame(a, data, flag, b, keep, time);
 }
 
 // 0x00423140
-void BikeRace::UnknownFunction423140(Track* track) {
+void BikeRace::DrawTrack(Track* track) {
     TrackListItem* list = 0;
     TrackListItem* item =
         (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 0x139d);
     if (item == 0) {
         return;
     }
-    item->field_0x04 = track->field_0x00;
+    item->node = track->startNode;
     item->field_0x0c = list;
     list = item;
     while (list != 0) {
-        if (list->field_0x04->field_0x00 & 4) {
+        if (list->node->flags & 4) {
             item = list;
             list = list->field_0x0c;
-            item->field_0x04->field_0x00 &= ~4;
+            item->node->flags &= ~4;
             DebugFree(item, __FILE__, 0x13a8);
         } else {
-            TrackSegment* segment = list->field_0x04->field_0x08;
-            while (segment != 0 && segment->field_0x2c != 0) {
+            TrackSegment* segment = list->node->firstSegment;
+            while (segment != 0 && segment->next != 0) {
                 Vector3 a;
                 Vector3 b;
                 SetDrawColor(0, 0xff, 0);
                 a = *(Vector3*)&segment->field_0x0c;
-                b = *(Vector3*)&segment->field_0x2c->field_0x0c;
+                b = *(Vector3*)&segment->next->field_0x0c;
                 field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
                 field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);
                 a = *(Vector3*)&segment->field_0x18;
-                b = *(Vector3*)&segment->field_0x2c->field_0x18;
+                b = *(Vector3*)&segment->next->field_0x18;
                 field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
                 field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
                 a.y += 5.0f;
@@ -1925,26 +1924,26 @@ void BikeRace::UnknownFunction423140(Track* track) {
                 DrawLine(&a, &b);
                 SetDrawColor(0, 0, 0xff);
                 a = *(Vector3*)&segment->field_0x00;
-                b = *(Vector3*)&segment->field_0x2c->field_0x00;
+                b = *(Vector3*)&segment->next->field_0x00;
                 field_0x04c->UnknownFunction507c10(&a, 0, 0, 0);
                 field_0x04c->UnknownFunction507c10(&b, 0, 0, 0);
                 a.y += 5.0f;
                 b.y += 5.0f;
                 DrawLine(&a, &b);
-                segment = segment->field_0x2c;
+                segment = segment->next;
             }
             item = list;
-            item->field_0x04->field_0x00 |= 4;
-            for (int i = 0; i < item->field_0x04->field_0x10; i++) {
-                TrackNode* link = item->field_0x04->field_0x14[i];
-                if (!(link->field_0x00 & 4)) {
+            item->node->flags |= 4;
+            for (int i = 0; i < item->node->linkCount; i++) {
+                TrackNode* link = item->node->links[i];
+                if (!(link->flags & 4)) {
                     TrackListItem* next =
                         (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 0x13c9);
                     if (next == 0) {
                         track->UnknownFunction517930(&list, 0);
                         return;
                     }
-                    next->field_0x04 = item->field_0x04->field_0x14[i];
+                    next->node = item->node->links[i];
                     next->field_0x0c = list;
                     list = next;
                 }
@@ -1962,7 +1961,7 @@ int BikeRace::UnknownVirtualSlot14() {
     }
     if (field_0x034) {
         if (raceTrack != 0) {
-            UnknownFunction423140(raceTrack);
+            DrawTrack(raceTrack);
             if (field_0x144) {
                 SetDrawColor(0xff, 0, 0xff);
                 a = startProbe.field_0x00 - startProbe.field_0x18;
@@ -2023,7 +2022,7 @@ int BikeRace::UnknownVirtualSlot14() {
 }
 
 // 0x00423790
-void BikeRace::UnknownFunction423790(int level) {
+void BikeRace::SetDetailLevel(int level) {
     g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
     localRacer->field_0x3bc->UnknownFunction4451e0(level);
     localRacer->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);

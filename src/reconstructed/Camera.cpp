@@ -13,7 +13,7 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1dc = 109.0f;
     field_0x1e0 = 10.0f;
     field_0x16c = 77.0f;
-    field_0x1e4 = 0;
+    file = 0;
     field_0x1e8 = 0;
     field_0x1ec = 0;
     field_0x1bc = g_UnknownFloat550f6c;
@@ -22,28 +22,28 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1d0 = 0;
     memset(field_0x1a0, 0, sizeof(field_0x1a0));
     worldMatrix = IdentityMatrix();
-    field_0x17c = Vector3(0.0f, 0.0f, 1.0f);
-    field_0x188 = Vector3(0.0f, 1.0f, 0.0f);
-    field_0x170 = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x194 = 0.0f;
+    viewDirection = Vector3(0.0f, 0.0f, 1.0f);
+    upDirection = Vector3(0.0f, 1.0f, 0.0f);
+    eyePosition = Vector3(0.0f, 0.0f, 0.0f);
+    roll = 0.0f;
     field_0x1f0 = 0;
     field_0x1fc = 0;
     field_0x1f4 = 0;
     field_0x1f8 = 0;
-    field_0x200 = 0.0f;
-    field_0x204 = 0.0f;
+    lastMoveDistance = 0.0f;
+    lastTurnAngle = 0.0f;
     field_0x1d4 = 1;
     field_0x1d8 = 1;
-    field_0x214 = field_0x17c;
-    field_0x208 = field_0x170;
+    field_0x214 = viewDirection;
+    field_0x208 = eyePosition;
 }
 
 // Destructor core 0x0042f020: Camera vptr, close the +0x1e4 file if any, then
 // the GameObject destructor. VC6 also emits the scalar deleting wrapper
 // 0x0042e4e0 (Camera slot 0).
 Camera::~Camera() {
-    if (field_0x1e4)
-        fclose(field_0x1e4);
+    if (file)
+        fclose(file);
 }
 
 // 0x00499ad0 (an identical forwarding body in another class shares the
@@ -99,7 +99,7 @@ int Camera::UnknownFunction42e550() {
     UnknownDisplay* display = owner->field_0x04;
     float width = (float)display->displayModes[display->currentDisplayMode].width;
     float height = (float)owner->field_0x04->displayModes[owner->field_0x04->currentDisplayMode].height;
-    field_0x19c = width / height;
+    displayAspect = width / height;
     field_0x1a0[0] = 0;
     field_0x1a0[1] = 0;
     field_0x1a0[2] = field_0x1c4;
@@ -108,7 +108,7 @@ int Camera::UnknownFunction42e550() {
     ((float*)field_0x1a0)[5] = 1.0f;
     if (!owner->UnknownVirtualSlot14(field_0x1a0))
         return 0;
-    field_0x1b8 = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
+    heightWidthRatio = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
     field_0x1d0 = Owner()->field_0x14 + 1;
     field_0x1cc = Owner()->field_0x14 + 1;
     return 1;
@@ -129,13 +129,13 @@ static inline float Dot(const Vector3& a, const Vector3& b) {
 // set) and the viewport width keys (0xd2/0xd3, when +0x1d8 is set) and
 // rebuilds the projection through slot 28.
 int Camera::UnknownVirtualSlot10(float frameTime) {
-    Vector3 delta(field_0x170.x - field_0x208.x, field_0x170.y - field_0x208.y, field_0x170.z - field_0x208.z);
-    field_0x200 = UnknownFunction460b50(Dot(delta, delta));
-    field_0x208 = field_0x170;
-    field_0x204 = (float)acos(Dot(field_0x17c, field_0x214));
-    if (field_0x204 < 0.0f)
-        field_0x204 = -field_0x204;
-    field_0x214 = field_0x17c;
+    Vector3 delta(eyePosition.x - field_0x208.x, eyePosition.y - field_0x208.y, eyePosition.z - field_0x208.z);
+    lastMoveDistance = UnknownFunction460b50(Dot(delta, delta));
+    field_0x208 = eyePosition;
+    lastTurnAngle = (float)acos(Dot(viewDirection, field_0x214));
+    if (lastTurnAngle < 0.0f)
+        lastTurnAngle = -lastTurnAngle;
+    field_0x214 = viewDirection;
     if (!field_0x25_bit2) {
         if (field_0x1d0)
             field_0x1d0--;
@@ -146,22 +146,22 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
                 field_0x16c -= 1.0f;
                 if (field_0x16c < field_0x1e0)
                     field_0x16c = field_0x1e0;
-                UnknownFunction42e930(field_0x16c);
+                SetFieldOfView(field_0x16c);
             }
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x3f, 0)) {
                 field_0x16c += 1.0f;
                 if (field_0x16c > field_0x1dc)
                     field_0x16c = field_0x1dc;
-                UnknownFunction42e930(field_0x16c);
+                SetFieldOfView(field_0x16c);
             }
         }
         if (field_0x1d8) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
                 (unsigned int)field_0x1a0[2] < (unsigned int)field_0x1c4)
-                UnknownFunction42f0e0(-1, 2, 0);
+                SetViewportWidth(-1, 2, 0);
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
                 (unsigned int)field_0x1a0[2] > 0x20)
-                UnknownFunction42f0e0(1, -2, 0);
+                SetViewportWidth(1, -2, 0);
         }
         UnknownVirtualSlot28();
     }
@@ -169,7 +169,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x0042e930: a zero value keeps the current +0x16c.
-void Camera::UnknownFunction42e930(float value) {
+void Camera::SetFieldOfView(float value) {
     if (value != 0.0)
         field_0x16c = value;
     field_0x1d0 = Owner()->field_0x14 + 1;
@@ -189,15 +189,15 @@ static inline Vector3 Normalize(const Vector3& v) {
 void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,
                                    const float* roll, const float* fov) {
     if (position)
-        field_0x170 = *position;
+        eyePosition = *position;
     if (forward)
-        field_0x17c = Normalize(*forward);
+        viewDirection = Normalize(*forward);
     if (up)
-        field_0x188 = Normalize(*up);
+        upDirection = Normalize(*up);
     if (roll)
-        field_0x194 = *roll;
+        this->roll = *roll;
     if (fov)
-        UnknownFunction42e930(*fov);
+        SetFieldOfView(*fov);
 }
 
 // 0x0042e8e0
@@ -270,22 +270,22 @@ static inline Vector3 NormalizeInline(const Vector3& v) {
 // in retail order; with plain member access four pairs swap (659/690), with
 // the reference for all three stores 675/690.
 int Camera::UnknownVirtualSlot29(Vector3 target) {
-    if (target.x == field_0x170.x && target.y == field_0x170.y && target.z == field_0x170.z)
+    if (target.x == eyePosition.x && target.y == eyePosition.y && target.z == eyePosition.z)
         return 0;
-    Vector3& up = field_0x188;
+    Vector3& up = upDirection;
     up.x = 0.0f;
     up.y = 1.0f;
-    field_0x188.z = 0.0f;
-    field_0x17c = NormalizeCall(Diff(target, field_0x170));
-    float y = field_0x17c.y;
+    upDirection.z = 0.0f;
+    viewDirection = NormalizeCall(Diff(target, eyePosition));
+    float y = viewDirection.y;
     if (y < 0.0f)
         y = -y;
     Vector3 right;
     if (y != 1.0f)
-        right = NormalizeInline(Cross(up, field_0x17c));
+        right = NormalizeInline(Cross(up, viewDirection));
     else
         right = Vector3(1.0f, 0.0f, 0.0f);
-    field_0x188 = Cross(field_0x17c, right);
+    upDirection = Cross(viewDirection, right);
     field_0x1d0 = Owner()->field_0x14 + 1;
     return 1;
 }
@@ -333,7 +333,7 @@ int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* 
 
 // 0x0042f0e0. The width is converted as unsigned and the height compared
 // unsigned against +0x1c8.
-int Camera::UnknownFunction42f0e0(int x, int width, int absolute) {
+int Camera::SetViewportWidth(int x, int width, int absolute) {
     if (absolute) {
         field_0x1a0[0] = x;
         field_0x1a0[2] = width;
@@ -341,7 +341,7 @@ int Camera::UnknownFunction42f0e0(int x, int width, int absolute) {
         field_0x1a0[0] += x;
         field_0x1a0[2] += width;
     }
-    field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * field_0x1b8);
+    field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * heightWidthRatio);
     if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
         field_0x1a0[3] = field_0x1c8;
     field_0x1a0[1] = (unsigned int)(field_0x1c8 - field_0x1a0[3]) >> 1;
@@ -364,7 +364,7 @@ int Camera::UnknownFunction42f190(int x, int y, int width, int height) {
 }
 
 // 0x0042f210
-void Camera::UnknownFunction42f210(CameraRect* rect) {
+void Camera::GetViewportRect(CameraRect* rect) {
     rect->left = field_0x1a0[0];
     rect->right = field_0x1a0[0] + field_0x1a0[2];
     rect->top = field_0x1a0[1];
