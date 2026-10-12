@@ -626,10 +626,10 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
     Vector3 extents;
     if (!parent) {
         UnknownFunction4fe850(&center, &extents);
-        UnknownFunction443740(center, extents, 1);
+        DrawBoxOutline(center, extents, 1);
     }
     UnknownFunction4fe0a0(&center, &extents);
-    UnknownFunction443740(center, extents, 0);
+    DrawBoxOutline(center, extents, 0);
     if (nextSibling)
         ((D3DIMSoultreeObject*)nextSibling)->ComputeSubtreeBounds();
     if (firstChild)
@@ -640,7 +640,7 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
 // world space). Each transformed point is copied into the vertex per
 // component; a Vector3 assignment lets VC6 copy from the call result and
 // schedule the index and point stores in another order.
-void D3DIMSoultreeObject::UnknownFunction4435b0()
+void D3DIMSoultreeObject::DrawAxisGizmo()
 {
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
@@ -679,16 +679,16 @@ void D3DIMSoultreeObject::UnknownFunction4435b0()
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 4, (int)indices, 6, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
     if (nextSibling)
-        ((D3DIMSoultreeObject*)nextSibling)->UnknownFunction4435b0();
+        ((D3DIMSoultreeObject*)nextSibling)->DrawAxisGizmo();
     if (firstChild)
-        ((D3DIMSoultreeObject*)firstChild)->UnknownFunction4435b0();
+        ((D3DIMSoultreeObject*)firstChild)->DrawAxisGizmo();
 }
 
 // 0x00443740: the outline of the box center +- extents (specular 0 when
 // `flag` is set, red otherwise). The corners are stored per
 // component, which lets VC6 share each negated extent across corners
 // (retail's fchs/fst chains); Vector3 temporaries evaluate each corner apart.
-void D3DIMSoultreeObject::UnknownFunction443740(Vector3 center, Vector3 extents, int flag)
+void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int flag)
 {
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
@@ -839,7 +839,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot14()
     if (field_0x2d0) {
         UnknownFunction4439c0(&field_0x298);
         ComputeSubtreeBounds();
-        UnknownFunction4435b0();
+        DrawAxisGizmo();
     }
     GameObject::UnknownVirtualSlot14();
     field_0x298.field_0x08++;

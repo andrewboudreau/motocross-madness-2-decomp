@@ -246,8 +246,8 @@ public:
     void SelectLod(Vector3* center, Vector3* extents);             // 0x00443de0 (ret 8): picks the level of detail
     void UnknownFunction4439c0(UnknownSoultreeCounters* counters); // 0x004439c0 (ret 4)
     void ComputeSubtreeBounds();                   // 0x004434b0: bounding boxes of the subtree
-    void UnknownFunction4435b0();                  // 0x004435b0: axes of the subtree
-    void UnknownFunction443740(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
+    void DrawAxisGizmo();                  // 0x004435b0: axes of the subtree
+    void DrawBoxOutline(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
     void DrawWireframe(UnknownSoultreeSurface* surface);          // 0x00442f70 (ret 4): wireframe
     void DrawNormals(UnknownSoultreeSurface* surface);            // 0x00442fe0 (ret 4): normals
     void DrawVertexCrosses(UnknownSoultreeSurface* surface);      // 0x004431f0 (ret 4): vertex crosses

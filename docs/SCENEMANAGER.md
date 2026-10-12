@@ -246,6 +246,7 @@ method slots and arguments, callers); the address-derived names they
 replace are in Git history. Tier 3 unless the entry says otherwise.
 
 - `0x004e9980` `FindKeyword`
+- `0x004eb040` `RestartEntry`
 - `0x004eb160` `ReadVector`
 - `0x004eb300` `ReadColor`
 - `0x004eb480` `ReadFlags`
@@ -262,4 +263,5 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004f0310` `AddResource`
 - `0x004f0390` `CountModelTextures`
 - `0x004f0d20` `CountObjects`
+- `0x004f0ec0` `ResolveSltPath`
 - `0x004f1130` `CountTextures`

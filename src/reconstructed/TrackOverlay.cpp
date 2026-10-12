@@ -422,7 +422,7 @@ int StatsOverlay::Redraw()
         break;
     case 2:
     case 3:
-        if (!UnknownFunction519ef0())
+        if (!DrawViewModePanel())
             goto fail;
         break;
     case 4:
@@ -496,7 +496,7 @@ void StatsOverlay::DrawTimeLeft()
 
 // 0x00519ef0: the race panel of the other view modes; in mode 4 the lap
 // times come from the view's own racer.
-int StatsOverlay::UnknownFunction519ef0()
+int StatsOverlay::DrawViewModePanel()
 {
     void* dc;
     int i;

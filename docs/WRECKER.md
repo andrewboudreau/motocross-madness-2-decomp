@@ -160,6 +160,10 @@ by the index `0x00530630` returns, `randomAnimations` by `RANDOM_UNIT()`,
 mean of the hit probes' positions (`anyProbeHit` set when one hits).
 Renaming changed no calibration bytes.
 
+Function names (tier 3, from behaviour): `0x00531da0` `EmitProbeTrail`
+(particles along a probe's movement) and `0x00532580` `RebuildPoseSteps`
+(the pose's linear and angular steps from the node's frame).
+
 ## Remaining uncertainty
 
 All method and class names are provisional, as are the field names above

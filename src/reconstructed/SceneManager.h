@@ -270,7 +270,7 @@ public:
     void UnknownFunction4eafd0(int index);
     void UnknownFunction4eff30(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void UnknownFunction4eb000(float time);
-    int UnknownFunction4eb040(int index, float time, int force, int motion);
+    int RestartEntry(int index, float time, int force, int motion);
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1
     // flag list from `block` (default: the scene file, parameters). Parameter names provisional.
     int ReadVector(Vector3* out, const char* section, const char* key,
@@ -321,7 +321,7 @@ public:
     // among others), called directly with the formatted "Cannot find data" text.
     void UnknownFunction464e80(const char* message);
     int CountObjects(int* count);         // 0x004f0d20: loads the scene file, counts its objects
-    int UnknownFunction4f0ec0(char* path);           // model path -> its SLT file
+    int ResolveSltPath(char* path);           // model path -> its SLT file
     // 0x004f1130: counts the textures of the scene's models and animations
     // by width (0x004f0390) and reads the terrain width, whether a cube file
     // is set and the ecosystem file path, without building anything.

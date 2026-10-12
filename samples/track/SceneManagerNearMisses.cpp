@@ -560,7 +560,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         }
         sprintf(sltPath, "%s\\%s", "Res", file);
         if (field_0xb4->field_0x04[i].field_0x00_bit3)
-            UnknownFunction4f0ec0(file);
+            ResolveSltPath(file);
         int length = strcspn(file, ".");
         int count = length < 0x14 ? length : 0x14;
         strncpy(field_0xb4->field_0x04[i].fileName, file, count);
@@ -655,7 +655,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                         if (field_0xb4->field_0x04[i].sequenceIndex >= field_0xb4->field_0x04[i].sequenceLength)
                             field_0xb4->field_0x04[i].sequenceIndex = 0;
                         field_0xb4->field_0x04[i].currentMotion = field_0xb4->field_0x04[i].sequenceIndex;
-                        UnknownFunction4eb040(i, field_0xb4->field_0x04[i].sequenceIndex, 0, 0);
+                        RestartEntry(i, field_0xb4->field_0x04[i].sequenceIndex, 0, 0);
                     } else {
                         field_0xb4->field_0x04[i].sequenceIndex = 0;
                         sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, scenePath);

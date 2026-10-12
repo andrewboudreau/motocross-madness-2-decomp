@@ -82,6 +82,8 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00442fe0` `DrawNormals`
 - `0x004431f0` `DrawVertexCrosses`
 - `0x004434b0` `ComputeSubtreeBounds`
+- `0x004435b0` `DrawAxisGizmo`
+- `0x00443740` `DrawBoxOutline`
 - `0x00443de0` `SelectLod`
 - `0x00445030` `GetSurfaceCount`
 - `0x00445060` `NodeMovesVertices`

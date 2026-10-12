@@ -286,7 +286,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         }
         if (anyProbeHit)
             hitCenter *= 1.0f / touching;
-        UnknownFunction532580();
+        RebuildPoseSteps();
         linearStep = linearStep * (1.0f / frameTime);
         angularStep = angularStep * (1.0f / frameTime);
         poseNode->UnknownFunction4fca80(0, &lastPose);
@@ -343,7 +343,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                 UnknownWreckerRaceState* state = character->field_0x18;
                 if ((float)(state->field_0xa8 - *character->field_0x1c) / state->field_0xb4 < 0.5f) {
                     UnknownFunction532490();
-                    UnknownFunction532580();
+                    RebuildPoseSteps();
                     linearStep = linearStep * (1.0f / frameTime);
                     angularStep = angularStep * (1.0f / frameTime);
                     rigidBody->UnknownVirtualSlot44();
@@ -357,7 +357,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                 field_0x530 = 0;
             }
             if (field_0xb4 && field_0x534) {
-                UnknownFunction532580();
+                RebuildPoseSteps();
                 linearStep = linearStep * (1.0f / frameTime);
                 angularStep = angularStep * (1.0f / frameTime);
                 field_0x534 = 0;
@@ -401,7 +401,7 @@ inline Vector3 operator/(const Vector3& v, float s) {
 // 0x00531da0: emits a trail of particles along a probe's movement. Retail
 // needs the squared length written `(y*y + x*x) + z*z` (or
 // `z*z + (x*x + y*y)`); `x*x + y*y + z*z` reuses delta.z from the FPU stack.
-void Wrecker::UnknownFunction531da0(Vector3 from, Vector3 to, float frameTime) {
+void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
     Vector3 delta = to - from;
     float lengthSq = (delta.y * delta.y + delta.x * delta.x) + delta.z * delta.z;
     float length = lengthSq == 1.0f ? 1.0f : UnknownFunction460b50(lengthSq);
@@ -442,7 +442,7 @@ void Wrecker::UnknownFunction532020(float frameTime) {
     for (int i = 0; i < collisionModel->probeCount; i++) {
         if (collisionModel->probes[i].hit) {
             Vector3 point = collisionModel->probes[i].node->UnknownFunction4fd660(collisionModel->probes[i].localPoint);
-            UnknownFunction531da0(probePositions[i], point, frameTime);
+            EmitProbeTrail(probePositions[i], point, frameTime);
             UnknownFunction531740(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
         }
     }
@@ -537,7 +537,7 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
 // `up` for the old up row gives retail's schedule of the step's last store
 // and the forward copy around the up-row loads (a pointer, a reference to
 // linearStep for the subtract or the reference for up.x alone do the same).
-void Wrecker::UnknownFunction532580() {
+void Wrecker::RebuildPoseSteps() {
     UnknownWreckerFrame pose;
     linearStep = WreckerCopy(lastPose.position);
     poseNode->UnknownFunction4fca80(0, &pose);

@@ -629,7 +629,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 terrain->UnknownFunction507c10(&point, &normal, 0, 0);
                 field_0x06c = (UnknownBikeRaceView6c*)raceScene->UnknownFunction4eaec0("30SecMan.slt", &field_0x070);
                 if (field_0x06c) {
-                    raceScene->UnknownFunction4eb040(field_0x070, 0, 0, 0);
+                    raceScene->RestartEntry(field_0x070, 0, 0, 0);
                     raceScene->field_0xb4->field_0x04[field_0x070].field_0x00_bit5 = 1;
                     if (field_0x06c->field_0x210) {
                         field_0x06c->field_0x210->Release();
@@ -656,7 +656,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                     field_0x064 =
                         (UnknownBikeRaceView6c*)raceScene->UnknownFunction4eaec0("StartGate.slb", &field_0x068);
                     if (field_0x064) {
-                        raceScene->UnknownFunction4eb040(field_0x068, 0, 0, 0);
+                        raceScene->RestartEntry(field_0x068, 0, 0, 0);
                         if (field_0x064->field_0x210) {
                             field_0x064->field_0x210->Release();
                             field_0x064->field_0x210 = 0;

@@ -186,7 +186,7 @@ public:
     int Redraw();                             // 0x005198a0
     int UnknownFunction519a20();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10
-    int UnknownFunction519ef0();              // 0x00519ef0
+    int DrawViewModePanel();              // 0x00519ef0
     void DrawLapTime();                       // 0x0051a480
     int DrawRacePanel();                      // 0x0051a560
     int DrawTagStandings();                   // 0x0051aa40

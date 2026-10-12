@@ -421,7 +421,7 @@ void Scene::UnknownFunction4eb000(float time)
 {
     if (field_0xb4) {
         for (int i = 0; i < field_0xb4->field_0x00; i++)
-            UnknownFunction4eb040(i, time, 1, 0);
+            RestartEntry(i, time, 1, 0);
     }
 }
 
@@ -429,7 +429,7 @@ void Scene::UnknownFunction4eb000(float time)
 // character entry (bit 3) switches to its motion number `motion` (0 when out
 // of range) unless it is idle and `force` is clear; another entry's object
 // gets the time and, unless the time was clamped, one slot 10 step.
-int Scene::UnknownFunction4eb040(int index, float time, int force, int motion)
+int Scene::RestartEntry(int index, float time, int force, int motion)
 {
     if (field_0xb4) {
         int running = 1;
@@ -1457,7 +1457,7 @@ int Scene::CountObjects(int* count)
 
 // 0x004f0ec0: replaces `path` (a model file) with the SLT file its "General
 // info" section names, prefixed with its content directory.
-int Scene::UnknownFunction4f0ec0(char* path)
+int Scene::ResolveSltPath(char* path)
 {
     char drive[_MAX_DRIVE];
     char name[0x104];
@@ -1580,7 +1580,7 @@ int Scene::CountTextures(unsigned long* counts, float* width, int* hasCube, char
                 sprintf(animationPath, "%s\\%s", "Res", file);
                 if (keyFramed) {
                     UnknownFunction4de580(animation, "MCF", animationPath);
-                    UnknownFunction4f0ec0(animationPath);
+                    ResolveSltPath(animationPath);
                 }
                 UnknownFunction4de580(animation, "SLT", animationPath);
                 if (!CountModelTextures(animationPath, &resources, counts))

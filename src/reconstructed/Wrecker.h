@@ -337,13 +337,13 @@ public:
     void UnknownFunction5329e0(float frameTime);
     void UnknownFunction532900(Vector3 offset, int bone);
     void UnknownFunction531740(Vector3 a, Vector3 b, Vector3 normal, float frameTime);
-    void UnknownFunction531da0(Vector3 a, Vector3 b, float frameTime);
+    void EmitProbeTrail(Vector3 a, Vector3 b, float frameTime);
     void UnknownFunction532020(float frameTime);
     void UnknownFunction532150();
     void UnknownFunction532220(int index);
     void UnknownFunction532310();
     void UnknownFunction532490();
-    void UnknownFunction532580();
+    void RebuildPoseSteps();
 
     UnknownWreckerCharacter* character; // +0x34
     UnknownWreckerCollisionModel* collisionModel; // +0x38

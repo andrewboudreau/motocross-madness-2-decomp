@@ -179,6 +179,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00519000` `IsPointVisible`
 - `0x005198a0` `Redraw`
 - `0x00519e10` `DrawTimeLeft`
+- `0x00519ef0` `DrawViewModePanel`
 - `0x0051a480` `DrawLapTime`
 - `0x0051a560` `DrawRacePanel`
 - `0x0051aa40` `DrawTagStandings`
