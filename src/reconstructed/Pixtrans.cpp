@@ -535,7 +535,7 @@ int Convert1555To565(void* destination, void* source, int width, int height, int
 }
 
 // 0x004d1b90: hands the downsampling to the helper for `format`.
-int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, int format, UnknownTexturePalette* palette, int filter) {
     switch (format) {
     case 8:

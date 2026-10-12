@@ -112,7 +112,7 @@
 class UnknownSoultreeNodeView : public SoultreeObject {
 public:
     void GetMatrixIn(SoultreeObject* frame, Matrix4* out); // 0x004fca80: matrix in `frame` (0: world)
-    void UnknownFunction4fc9a0(SoultreeObject* frame, Vector3* out); // 0x004fc9a0: position in `frame` (0: world)
+    void GetPositionIn(SoultreeObject* frame, Vector3* out); // 0x004fc9a0: position in `frame` (0: world)
     Vector3 WorldToLocalDirection(const Vector3* v);                 // 0x004fd710: world to local direction
     Vector3 UnknownFunction4fd7f0(const Vector3* v);                 // 0x004fd7f0: world to local point
     Vector3 LocalToWorldDirection(const Vector3* v);                 // 0x004fd5c0: local to world direction
@@ -199,7 +199,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
             autoLodDistances[i] = source->autoLodDistances[i];
     }
     if (source->lodTable) {
-        int count = UnknownFunction4fda30();
+        int count = CountNodes();
         SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x897);
         int index = 1;
         nodes[0] = this;
@@ -543,7 +543,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
                     Vector3 position;
-                    ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fc9a0(0, &position);
+                    ((UnknownSoultreeNodeView*)group->node)->GetPositionIn(0, &position);
                     Vector3 direction = NormalizedByCall(position - lightPosition);
                     direction = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
@@ -563,7 +563,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
                     int vertices = group->vertexCount;
                     Vector3 position;
-                    ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fc9a0(0, &position);
+                    ((UnknownSoultreeNodeView*)group->node)->GetPositionIn(0, &position);
                     Vector3 direction = NormalizedByCall(position - eye);
                     direction = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalDirection(&direction);
                     for (int v = 0; v < vertices; v++) {
@@ -658,7 +658,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             }
             case 5: {
                 Vector3 center(0.0f, 15.8278f, 0.0f);
-                ((UnknownSoultreeNodeView*)this)->UnknownFunction4fc9a0(0, &center);
+                ((UnknownSoultreeNodeView*)this)->GetPositionIn(0, &center);
                 center.y = 15.8278f;
                 Vector3 circle[16];
                 int i;

@@ -78,7 +78,7 @@ int Fog::UnknownVirtualSlot10(float frameTime)
 int Fog::UnknownVirtualSlot12()
 {
     if (field_0x25_bit0) {
-        TARGET()->field_0x08->UnknownFunction42e960(1.0f, fogEnd);
+        TARGET()->field_0x08->ClampLimits(1.0f, fogEnd);
         TARGET()->field_0x08->UnknownVirtualSlot28();
         TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix);
     }
@@ -105,7 +105,7 @@ struct UnknownFogBackdropVertex {
 int Fog::UnknownVirtualSlot14()
 {
     if (field_0x25_bit0) {
-        TARGET()->field_0x08->UnknownFunction42e960(1.0f, fogEnd);
+        TARGET()->field_0x08->ClampLimits(1.0f, fogEnd);
         TARGET()->field_0x08->UnknownVirtualSlot28();
         if (!TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix)) {
             goto failed;
@@ -256,7 +256,7 @@ GameObject* FogOff::UnknownVirtualSlot8(void* value)
 // 0x00462e50
 int FogOff::UnknownVirtualSlot14()
 {
-    TARGET()->field_0x08->UnknownFunction42e8e0();
+    TARGET()->field_0x08->ReapplyDefaultLimits();
     TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix);
     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
     return 1;

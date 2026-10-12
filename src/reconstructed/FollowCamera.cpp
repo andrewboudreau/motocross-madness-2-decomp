@@ -63,7 +63,7 @@ void FollowCamera::UnknownVirtualSlot73(const Vector3& from, const Vector3& to, 
 }
 
 // 0x00463450
-bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, const float* a,
+bool FollowCamera::SetTableEntry(int index, const Vector3* position, const float* a,
                                          const float* b, const float* c, const float* d,
                                          const float* e) {
     if (index < pointCount) {
@@ -219,7 +219,7 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
 // slot 38 runs.
 void FollowCamera::UnknownVirtualSlot40(float a) {
     if (pointCount > 0) {
-        UnknownFunction463450(0, &targetPoint, 0, 0, 0, 0, 0);
+        SetTableEntry(0, &targetPoint, 0, 0, 0, 0, 0);
         UnknownVirtualSlot38(a, 0, 0);
     }
 }

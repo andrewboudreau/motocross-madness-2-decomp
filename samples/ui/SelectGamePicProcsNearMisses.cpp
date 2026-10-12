@@ -132,7 +132,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
 // 0x004f8820: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0).
 int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     if (dialogBackground)
-        dialogBackground->UnknownFunction404da0();
+        dialogBackground->MarkAllDirty();
     Vector3 offset;
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
@@ -145,7 +145,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         float distance = viewDistance;
         turned *= distance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
         previewDragged = 1;
     } else if (!previewDragged) {
@@ -153,7 +153,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
     }
     g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);

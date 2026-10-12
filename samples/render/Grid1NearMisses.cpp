@@ -141,7 +141,7 @@ retry:
                                     Extra()->blocks[block].texture = Terrain()->AcquireOwnedObject();
                                     BuildBlockTexture(block, Extra()->blocks[block].texture);
                                     if (Extra()->blocks[block].texture->field_0x68 & 1)
-                                        Extra()->blocks[block].texture->UnknownFunction510670();
+                                        Extra()->blocks[block].texture->Reregister();
                                     Extra()->textureFlags |= 1 << block;
                                     g_grid1OwnTextureCount++;
                                     Terrain()->textureAgeManager->Register(
@@ -224,7 +224,7 @@ createTexture:
     Extra()->field_0x10 = Terrain()->AcquireOwnedObject();
     BuildNodeTexture((ManagedTexture*)Extra()->field_0x10);
     if (((ManagedTexture*)Extra()->field_0x10)->field_0x68 & 1)
-        ((ManagedTexture*)Extra()->field_0x10)->UnknownFunction510670();
+        ((ManagedTexture*)Extra()->field_0x10)->Reregister();
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
     Terrain()->textureAgeManager->Register(&Extra()->ageEntry, EvictNodeTexture, this, 0,
@@ -332,7 +332,7 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
     for (int i = 0; i < count; i++)
         Terrain()->textures[tiles[i]]->UnknownVirtualSlot17(16);
     if (texture->field_0x14 != 0x100)
-        UnknownFunction4d1b90(bits, g_grid1TextureBuffer, texture->field_0x14, texture->field_0x14,
+        Downsample(bits, g_grid1TextureBuffer, texture->field_0x14, texture->field_0x14,
                               texture->field_0x14, texture->field_0x14 * 2, 1, texture->field_0x20,
                               texture->field_0x2c, 2);
     texture->UnknownVirtualSlot14(0);

@@ -68,7 +68,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     UnknownSurfaceDesc desc;
     int sourceFormat = DecodedFormat(fileFormat);
     if (choice) {
-        format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
+        format = IsFormat4444Or8888(format) ? choice->field_0x10 : choice->field_0x0c;
         field_0x6c = choice->field_0x14;
     } else {
         field_0x6c = 0;
@@ -216,7 +216,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     if (choice) {
         int count = choice->field_0x14;
         while (width > 32 && count--) {
-            if (UnknownFunction4d1b90(buffer, bits, width / 2, height / 2, width / 2, width, 1, sourceFormat,
+            if (Downsample(buffer, bits, width / 2, height / 2, width / 2, width, 1, sourceFormat,
                                       palette, 2)) {
                 width /= 2;
                 height /= 2;
@@ -571,7 +571,7 @@ int PCTextureMap::UnknownVirtualSlot15(int filter) {
             goto failed;
         int sourceStride = stride;
         stride = desc.pitch / bytesPerPixel;
-        UnknownFunction4d1b90(desc.surface, sourceBits, desc.width, desc.height, stride, sourceStride, 1,
+        Downsample(desc.surface, sourceBits, desc.width, desc.height, stride, sourceStride, 1,
                               field_0x20, field_0x2c, filter);
         if (parent->Unlock(0))
             goto failed;

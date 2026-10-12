@@ -133,12 +133,12 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x00511180: creates and registers a texture group with `pages` pages.
-    ManagedTextureGroup* UnknownFunction511180(int format, int pages, int addressU, int addressV);
-    void UnknownFunction5112f0(TextureMap* texture); // 0x005112f0: registers a texture
-    void UnknownFunction511300(TextureMap* texture); // 0x00511300: unregisters it
+    ManagedTextureGroup* CreateGroup(int format, int pages, int addressU, int addressV);
+    void RegisterTexture(TextureMap* texture); // 0x005112f0: registers a texture
+    void UnregisterTexture(TextureMap* texture); // 0x00511300: unregisters it
     // 0x005113d0: shares the texture cache limit out among the groups (on
     // AGP displays it restores every grouped texture instead).
-    int UnknownFunction5113d0();
+    int ShareCacheLimit();
     void CountTextureMemory();             // 0x00511580 (PCTextureMap slot 12 and destructor)
     // 0x00511310 / 0x00511370: grow-only scratch buffers of at least
     // `bytes`; 0 when the allocation fails.

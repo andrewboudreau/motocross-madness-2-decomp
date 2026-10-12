@@ -534,7 +534,7 @@ int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out,
     return 1;
 }
 
-void UnknownFunction518640(char* text, float seconds)
+void FormatMinutesSeconds(char* text, float seconds)
 {
     int minutes = 0;
     while (seconds >= 60.0f) {
@@ -544,7 +544,7 @@ void UnknownFunction518640(char* text, float seconds)
     sprintf(text, "%2.2d:%2.2d", minutes, (int)seconds);
 }
 
-void UnknownFunction518690(char* text, float seconds)
+void FormatLapTime(char* text, float seconds)
 {
     if (seconds == 0.0f || seconds == FLT_MAX) {
         strcpy(text, "--:--.--");

@@ -698,7 +698,7 @@ int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
     int i;
     esbStreamInArchive = 0;
     if (!stream) {
-        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(path, 1);
+        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(path, 1);
         if (!entry) {
             stream = new(__FILE__, 0x520) UnknownTextureStream(g_UnknownResourceManager572b44);
             if (!stream->UnknownFunction460f50(path, "rb", 0)) {
@@ -855,7 +855,7 @@ EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textu
         if (method == 1)
             PlaceAuthoredObjects();
         else
-            GenerateObjects(UnknownFunction511ad0(textureFormat));
+            GenerateObjects(IsFormat4444Or8888(textureFormat));
         WriteEsb(path);
     }
     return this;
@@ -1168,7 +1168,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
         int collisionCount;
         UnknownTextureStream* esb = stream;
         if (!esb) {
-            UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(path, 1);
+            UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(path, 1);
             if (!entry) {
                 esb = new(__FILE__, 0xaf8) UnknownTextureStream(g_UnknownResourceManager572b44);
                 if (!esb->UnknownFunction460f50(path, "rb", 0)) {

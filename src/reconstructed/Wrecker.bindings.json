@@ -35,7 +35,7 @@
   "?TranslateIn@UnknownWreckerSkeleton@@QAEXPAU1@UVector3@@@Z": "0x004fc690",
   "?UnknownFunction4fc740@UnknownWreckerSkeleton@@QAEXPAU1@PAUVector3@@@Z": "0x004fc740",
   "?SetPositionIn@UnknownWreckerSkeleton@@QAEXPAU1@PBUVector3@@@Z": "0x004fc890",
-  "?UnknownFunction4fc9a0@UnknownWreckerSkeleton@@QAEXPAU1@PAUVector3@@@Z": "0x004fc9a0",
+  "?GetPositionIn@UnknownWreckerSkeleton@@QAEXPAU1@PAUVector3@@@Z": "0x004fc9a0",
   "?GetMatrixIn@UnknownWreckerSkeleton@@QAEXPAU1@PAUUnknownWreckerFrame@@@Z": "0x004fca80",
   "?GetMatrixIn@UnknownWreckerSkeleton@@QAEXPAU1@PAUUnknownWreckerMatrix@@@Z": "0x004fca80",
   "?UnknownFunction4fcc70@UnknownWreckerSkeleton@@QAEXXZ": "0x004fcc70",

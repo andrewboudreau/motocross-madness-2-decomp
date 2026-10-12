@@ -119,7 +119,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     format = g_TrackGame->renderTarget->field_0x28;
     bytesPerPixel = UnknownFunction511970(format);
     if (guiBackground)
-        guiBackground->UnknownFunction404c80();
+        guiBackground->ReleaseDc();
     g_TrackGame->field_0x34->UnknownFunction468dd0("GUICursor");
     g_TrackGame->field_0x34->UnknownFunction468dd0("ToolTip");
     g_TrackGame->UnknownVirtualSlot8();
@@ -218,7 +218,7 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
     }
     if (text) {
         if (tipGui->guiBackground && backgroundRegion == -1) {
-            backgroundRegion = tipGui->guiBackground->UnknownFunction4040f0(0);
+            backgroundRegion = tipGui->guiBackground->AllocRegion(0);
             restoreFrames = 3;
         }
         if (!((PCRenderTarget*)field_0x18)->renderSurface->GetDC((void**)&dc)) {

@@ -80,7 +80,7 @@ int Camera::UnknownVirtualSlot13() {
         rect.bottom = y + field_0x1a0[3];
         Owner()->UnknownVirtualSlot12(&rect, 0);
     }
-    UnknownFunction42e8e0();
+    ReapplyDefaultLimits();
     return 1;
 }
 
@@ -186,7 +186,7 @@ static inline Vector3 Normalize(const Vector3& v) {
 }
 
 // 0x0042e9b0
-void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,
+void Camera::SetFrame(const Vector3* position, const Vector3* forward, const Vector3* up,
                                    const float* roll, const float* fov) {
     if (position)
         eyePosition = *position;
@@ -201,16 +201,16 @@ void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forwa
 }
 
 // 0x0042e8e0
-int Camera::UnknownFunction42e8e0() {
+int Camera::ReapplyDefaultLimits() {
     if (field_0x1c0 != g_UnknownFloat550f70 || field_0x1bc != g_UnknownFloat550f6c) {
-        UnknownFunction42e960(g_UnknownFloat550f6c, g_UnknownFloat550f70);
+        ClampLimits(g_UnknownFloat550f6c, g_UnknownFloat550f70);
         UnknownVirtualSlot28();
     }
     return 1;
 }
 
 // 0x0042e960
-void Camera::UnknownFunction42e960(float minimum, float maximum) {
+void Camera::ClampLimits(float minimum, float maximum) {
     field_0x1bc = (g_UnknownFloat550f6c > minimum) ? g_UnknownFloat550f6c : minimum;
     if (g_UnknownFloat550f70 < maximum)
         field_0x1c0 = g_UnknownFloat550f70;
@@ -350,7 +350,7 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
 }
 
 // 0x0042f190. Retail stores the width before y.
-int Camera::UnknownFunction42f190(int x, int y, int width, int height) {
+int Camera::SetViewport(int x, int y, int width, int height) {
     field_0x1a0[0] = x;
     field_0x1a0[2] = width;
     field_0x1a0[1] = y;

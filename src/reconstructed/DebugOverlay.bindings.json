@@ -15,7 +15,7 @@
   "?UnknownFunction447fa0@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
   "?UnknownFunction448000@DebugOverlay@@QAEXHHH@Z": "0x00448000",
   "?DrawString@DebugOverlay@@QAEXHHPBDHI@Z": "0x00448200",
-  "?UnknownFunction4484f0@DebugOverlay@@QAEHXZ": "0x004484f0",
+  "?ShowNextPage@DebugOverlay@@QAEHXZ": "0x004484f0",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
   "?RestoreTextureSurface@PCTextureMap@@QAEHXZ": "0x004c7420",
   "?UnknownVirtualSlot14@DebugOverlay@@UAEHXZ": "0x00448030",

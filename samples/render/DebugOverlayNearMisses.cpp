@@ -10,7 +10,7 @@
 // head (retail reads it into eax once from its stack slot), which shifts the
 // frame by 4; retail shares the row pointer's slot with the v0 temporary.
 //
-// DebugOverlay::UnknownFunction447de0 (0x00447de0, 174 bytes): 66/171 by
+// DebugOverlay::Setup (0x00447de0, 174 bytes): 66/171 by
 // position. Retail keeps the row colour 0xffffff in ebx inside the row loop
 // (and `e` in ebx before it, pushing edi late); VC6 here stores the
 // immediate and keeps `e` in edi. do/while, for, while(1), pointer rows,
@@ -129,7 +129,7 @@ failed:
 }
 
 
-DebugOverlay* DebugOverlay::UnknownFunction447de0(RenderTarget* a, TextureMapManager* b,
+DebugOverlay* DebugOverlay::Setup(RenderTarget* a, TextureMapManager* b,
                                                   int c, int d, int e)
 {
     GameObject::UnknownVirtualSlot8(a);

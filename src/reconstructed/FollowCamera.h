@@ -197,7 +197,7 @@ public:
 
     // 0x00463450: writes entry `index` of the +0x2e4 table; each non-null
     // pointer supplies one field. Returns false when index >= +0x2e0.
-    bool UnknownFunction463450(int index, const Vector3* position, const float* a,
+    bool SetTableEntry(int index, const Vector3* position, const float* a,
                                const float* b, const float* c, const float* d,
                                const float* e);
 

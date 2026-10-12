@@ -982,7 +982,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void
         frameSound = 0;
         frameTextures = (int)textures;
         UnknownResourceEntry* entry =
-            ((UnknownResourceManager*)id)->UnknownFunction4e9360((const char*)module, 1);
+            ((UnknownResourceManager*)id)->FindItem((const char*)module, 1);
         if (!LoadFromStream(entry->field_0x14, entry->field_0x18, palette) && a) {
             UnknownFunction4bb890((SoundGroup*)a, (const char*)module, 1, 3, c, -1);
             ownsSound = 1;
@@ -1813,7 +1813,7 @@ UIDialog::~UIDialog() {
             guiManager->ReleaseBackgroundGrab();
     }
     if (dialogBackground && !g_TrackGame->field_0x2d5_bit1)
-        dialogBackground->UnknownFunction404da0();
+        dialogBackground->MarkAllDirty();
     if (parentDialog) {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
             parentDialog->guiManager && !parentDialog->guiManager->UnknownFunction4864f0())
@@ -1830,7 +1830,7 @@ UIDialog::~UIDialog() {
         }
     }
     if (!g_TrackGame->field_0x2d5_bit1 && g_UnknownResourceManager572b44 && resourceArchive)
-        g_UnknownResourceManager572b44->UnknownFunction4e9830(resourceArchive);
+        g_UnknownResourceManager572b44->RemoveArchiveItems(resourceArchive);
     if ((ownsPalette && dialogPalette && !parentDialog) ||
         (dialogPalette && parentDialog && parentDialog->dialogPalette != dialogPalette))
         ((Palette8*)dialogPalette)->Release();
@@ -1839,7 +1839,7 @@ UIDialog::~UIDialog() {
         dialogBackground->SetImage(parentBackground);
     }
     if (!g_TrackGame->field_0x2d5_bit1 && parentDialog && parentDialog->dialogBackground)
-        parentDialog->dialogBackground->UnknownFunction404da0();
+        parentDialog->dialogBackground->MarkAllDirty();
     int i = 0;
     UITimer* timer;
     while ((timer = timerList.Get(i++)) != 0)
@@ -1899,7 +1899,7 @@ UIControl* UIDialog::UnknownFunction46a840(UIControl* control, int group, int re
         control->groupId = group;
         control->fontHeight = dialogFontHeight;
         if (dialogBackground)
-            control->backgroundRegion = dialogBackground->UnknownFunction4040f0(region);
+            control->backgroundRegion = dialogBackground->AllocRegion(region);
         return control;
     }
     return 0;
@@ -1971,7 +1971,7 @@ void UIDialog::ShowGroup(int id, int value) {
             control->Show(value, 1);
     }
     if (!value && dialogBackground)
-        dialogBackground->UnknownFunction404da0();
+        dialogBackground->MarkAllDirty();
 }
 
 // 0x0046ebf0
@@ -2153,8 +2153,8 @@ void UIDialog::GrabBackground(int dim, CameraRect* rect) {
         rect = &screenArea;
     screenGrab = guiManager->CopyScreenToTexture(dim, rect);
     if (dialogBackground) {
-        grabRegion = dialogBackground->UnknownFunction4040f0(1);
-        dialogBackground->UnknownFunction404da0();
+        grabRegion = dialogBackground->AllocRegion(1);
+        dialogBackground->MarkAllDirty();
         dialogBackground->field_0x30 = 0;
     }
 }
@@ -2164,7 +2164,7 @@ void UIDialog::ReleaseBackgroundGrab() {
     if (screenGrab)
         screenGrab->Release();
     if (dialogBackground && grabRegion >= 0) {
-        dialogBackground->UnknownFunction404200(grabRegion);
+        dialogBackground->ReleaseRegion(grabRegion);
         dialogBackground->field_0x30 = 1;
     }
     screenGrab = 0;
@@ -2273,7 +2273,7 @@ UIControl::~UIControl() {
             tip->ShowText(0, 0, 1.0f);
     }
     if (backgroundRegion != -1 && ownerDialog && ownerDialog->dialogBackground)
-        ownerDialog->dialogBackground->UnknownFunction404200(backgroundRegion);
+        ownerDialog->dialogBackground->ReleaseRegion(backgroundRegion);
     if (controlText)
         DebugFree(controlText, __FILE__, 0xba3);
     if (toolTipText)
@@ -2505,7 +2505,7 @@ int UIControl::ButtonDown(int a, int b) {
         }
         heldButton = a;
         if (a == 1 && ownerDialog->dialogBackground)
-            ownerDialog->dialogBackground->UnknownFunction404da0();
+            ownerDialog->dialogBackground->MarkAllDirty();
         ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip) {
@@ -3322,7 +3322,7 @@ char UIEditBox::FilterCharacter(char c) {
 // 0x0046a8e0
 int UIDialog::LoadDialogResource(const char* name) {
     int result = 0;
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 1);
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 1);
     if (entry)
         result = UnknownFunction46a920(entry->field_0x14, entry->field_0x18);
     return result;
@@ -3902,7 +3902,7 @@ void UIDropDownList::SetOpen(int open) {
         listPart->UnknownFunction4691f0();
         scrollBarPart->UnknownFunction4691f0();
         if (ownerDialog->dialogBackground)
-            ownerDialog->dialogBackground->UnknownFunction404da0();
+            ownerDialog->dialogBackground->MarkAllDirty();
     }
     isOpen = open;
 }
@@ -3994,7 +3994,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     if (parent && !dialogBackground)
         dialogBackground = parent->dialogBackground;
     if (dialogBackground)
-        dialogBackground->UnknownFunction404da0();
+        dialogBackground->MarkAllDirty();
     if (user && !user->pointerDevice) {
         GameObjectIterator iterator(controlContainer, 1, "UIControl");
         UnknownFunction470000((UIControl*)iterator.Next(), 0, 0);
@@ -4880,7 +4880,7 @@ int UIVideoStatic::Draw() {
     if (!moviePlayer)
         return 0;
     if (ownerDialog->dialogBackground) {
-        ownerDialog->dialogBackground->UnknownFunction404c80();
+        ownerDialog->dialogBackground->ReleaseDc();
         RequestRedraw();
     }
     GetImageRect((CameraRect*)screenArea, &rect);
@@ -5169,7 +5169,7 @@ void UIDDLListBox::ReportClick(int* handled) {
 // 0x00472bc0
 int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
     if (stream) {
-        UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
+        UnknownTgaFile* image = ReadWholeFile((UnknownTextureStream*)stream, 0, offset);
         if (image) {
             int format = g_TrackGame->renderTarget->field_0x28;
             frameWidth = image->width;
@@ -5182,7 +5182,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
                                             pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
-            UnknownFunction512dd0(image);
+            FreeFile(image);
             return 1;
         }
     }

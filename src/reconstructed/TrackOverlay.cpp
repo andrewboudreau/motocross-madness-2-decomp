@@ -342,7 +342,7 @@ int NameOverlay::UnknownVirtualSlot14()
         overlayAlpha = alpha;
     }
     Vector3 head;
-    trackedRacer->field_0x5c4->field_0x1a0->UnknownFunction4fdae0("Head")->UnknownFunction4fc9a0(0, &head);
+    trackedRacer->field_0x5c4->field_0x1a0->FindByName("Head")->GetPositionIn(0, &head);
     head.y += 1.62f;
     int hidden = !IsPointVisible(&head);
     if (hidden) {
@@ -484,7 +484,7 @@ void StatsOverlay::DrawTimeLeft()
     if (game->mode.field_0x27f8.field_0x00 != 0 && game->mode.field_0x27f8.field_0x00 != 4) {
         TrackGameViewOwner* owner = game->field_0x55c;
         float limit = game->mode.field_0x27f8.field_0x140 * 60.0f;
-        UnknownFunction518640(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        FormatMinutesSeconds(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         rect = rowRects[0];
         rect.left += rowExtent.cx + 4;
         sprintf(rowText[0], "%s", text);
@@ -533,30 +533,30 @@ int StatsOverlay::DrawViewModePanel()
     else
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
-        UnknownFunction518690(time, g_TrackGame->eventManager->field_0x3c0);
+        FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
         sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->field_0x7a4);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4 && instrumentSource->state->field_0x736)
-            UnknownFunction518690(time, statsSource->ownRacer->field_0x750);
+            FormatLapTime(time, statsSource->ownRacer->field_0x750);
         else
-            UnknownFunction518690(time, instrumentSource->state->lastLapTime);
+            FormatLapTime(time, instrumentSource->state->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
-        UnknownFunction518690(time, statsSource->ownRacer->field_0x750);
+        FormatLapTime(time, statsSource->ownRacer->field_0x750);
     else
-        UnknownFunction518690(time, instrumentSource->state->field_0x750);
+        FormatLapTime(time, instrumentSource->state->field_0x750);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    UnknownFunction518690(time, instrumentSource->state->field_0x770);
+    FormatLapTime(time, instrumentSource->state->field_0x770);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13b8, label, 0x80);
     if (g_TrackGame->field_0x3428)
-        UnknownFunction518690(time, statsSource->field_0x1b8);
+        FormatLapTime(time, statsSource->field_0x1b8);
     else
-        UnknownFunction518690(time, instrumentSource->state->field_0x754);
+        FormatLapTime(time, instrumentSource->state->field_0x754);
     sprintf(rowText[5], "%s:", label);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], field_0x1b0[i]) != 0)
@@ -597,9 +597,9 @@ void StatsOverlay::DrawLapTime()
     UnknownOverlayRect rect;
     int count;
     if (g_TrackGame->field_0x3428)
-        UnknownFunction518690(text, statsSource->field_0x1b8);
+        FormatLapTime(text, statsSource->field_0x1b8);
     else
-        UnknownFunction518690(text, instrumentSource->state->field_0x754);
+        FormatLapTime(text, instrumentSource->state->field_0x754);
     rect = rowRects[5];
     rect.left += rowExtent.cx + 4;
     sprintf(rowText[5], "%s", text);
@@ -646,18 +646,18 @@ int StatsOverlay::DrawRacePanel()
     else
         sprintf(rowText[1], "%s %d", label, lap);
     if (s_UnknownGlobal68a440) {
-        UnknownFunction518690(time, g_TrackGame->eventManager->field_0x3c0);
+        FormatLapTime(time, g_TrackGame->eventManager->field_0x3c0);
         sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->field_0x7a4);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
-        UnknownFunction518690(time, instrumentSource->state->lastLapTime);
+        FormatLapTime(time, instrumentSource->state->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
-    UnknownFunction518690(time, instrumentSource->state->field_0x750);
+    FormatLapTime(time, instrumentSource->state->field_0x750);
     sprintf(rowText[3], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x839, label, 0x80);
-    UnknownFunction518690(time, instrumentSource->state->field_0x770);
+    FormatLapTime(time, instrumentSource->state->field_0x770);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
@@ -708,7 +708,7 @@ int StatsOverlay::DrawTagStandings()
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->field_0x568;
         float limit = g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f;
-        UnknownFunction518640(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s %s", label, time);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x148) {
@@ -842,7 +842,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
 }
 
 // 0x0051b1f0
-void DropTextOverlay::UnknownFunction51b1f0()
+void DropTextOverlay::ReshowText()
 {
     field_0x30 = 0.0f;
     visible = 1;
@@ -1033,7 +1033,7 @@ RadarOverlay::~RadarOverlay()
 }
 
 // 0x0051b840
-RadarOverlay* RadarOverlay::UnknownFunction51b840(RenderTarget* target, TextureMapManager* manager,
+RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* manager,
                                                   int a3, UnknownOverlayRect screen)
 {
     const char* font;
@@ -1468,11 +1468,11 @@ int ChatOverlay::UnknownVirtualSlot13()
         rect.right = 0xff;
         rect.bottom = 0xff;
         RestoreRect(&rect);
-        UnknownFunction51e910(-1);
+        RedrawNameTags(-1);
     } else {
         for (int i = 0; i < racerCount; i++) {
             if (g_TrackGame->mode.field_0x6c0 && lastRacerValues[i] != racers[i]->field_0x784) {
-                UnknownFunction51e910(i);
+                RedrawNameTags(i);
                 lastRacerValues[i] = racers[i]->field_0x784;
             }
             if (racers[i]->racerState->hideNameTag)
@@ -1581,7 +1581,7 @@ void ChatOverlay::UnknownFunction51e7c0()
     g_TrackGame->mode.field_0x90++;
     if (g_TrackGame->mode.field_0x90 == 6)
         g_TrackGame->mode.field_0x90 = 0;
-    UnknownFunction51e910(-1);
+    RedrawNameTags(-1);
 }
 
 // 0x0051e800
@@ -1600,7 +1600,7 @@ void ChatOverlay::RedrawNameLine()
         field_0x160 = right;
         nameChanged = 0;
         nameTags[racerCount]->drawWidth = right - nameTagRects[racerCount].left;
-        UnknownFunction51e910(racerCount);
+        RedrawNameTags(racerCount);
     }
 }
 
@@ -1718,7 +1718,7 @@ char* UnknownChatInput::GetHistory(int index, int* value)
 // 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
 // texture, then colours it with a grey that darkens with the cycle
 // TrackGameMode+0x90.
-void ChatOverlay::UnknownFunction51e910(int index)
+void ChatOverlay::RedrawNameTags(int index)
 {
     unsigned char level = 0xff - g_TrackGame->mode.field_0x90 * 0x33;
     if (index == -1) {

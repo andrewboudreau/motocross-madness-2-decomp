@@ -92,7 +92,7 @@ int NationalRace::UnknownVirtualSlot10(float frameTime) {
         if (raceView->field_0x38->field_0x7a0 + 1 == g_TrackGame->mode.field_0x27f8.field_0x20 &&
             raceView->field_0x18a) {
             if (finishText)
-                finishText->UnknownFunction51b1f0();
+                finishText->ReshowText();
             finishTextShown = 1;
         }
     }

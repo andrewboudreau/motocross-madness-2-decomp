@@ -110,7 +110,7 @@ void UnknownBikeNumberPainter::UnknownFunction417670(D3DIMSoultreeObject* model,
         UnknownFunction417580(number, x, texture);
         texture->UnknownVirtualSlot15(2);
         if (texture->field_0x68 & 1)
-            ((ManagedTexture*)texture)->UnknownFunction510670();
+            ((ManagedTexture*)texture)->Reregister();
         else
             texture->UnknownVirtualSlot9(0, -1);
     }

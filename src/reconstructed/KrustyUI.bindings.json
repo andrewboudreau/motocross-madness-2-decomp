@@ -152,7 +152,7 @@
   "?UnknownFunction4dae30@UnknownKrustyUIShadow@@QAEXH@Z": "0x004dae30",
   "?UnknownFunction4dae50@UnknownKrustyUIShadow@@QAEXPBUVector3@@0H@Z": "0x004dae50",
   "?UnknownFunction4e8cf0@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
-  "?UnknownFunction4e9360@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
+  "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?UnknownFunction4fbd10@UnknownKrustyUISoultree@@QAEXMMMMMMMH@Z": "0x004fbd10",
   "?UnknownFunction4fc660@UnknownKrustyUISoultree@@QAEXPBUVector3@@@Z": "0x004fc660",
   "?UnknownFunction5053b0@@YAXH@Z": "0x005053b0",

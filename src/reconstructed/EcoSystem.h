@@ -557,6 +557,6 @@ float ReadIniFloat(const char* section, const char* key, double defaultValue, co
 void UnknownFunction461d40(FILE* file, const char* format, ...); // 0x00461d40: fprintf
 UnknownBitmapFile* UnknownFunction424140(const char* path, UnknownBitmapFile* into); // 0x00424140
 void UnknownFunction4245b0(UnknownBitmapFile* bitmap);                  // 0x004245b0
-UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* into, int a); // 0x005125c0
-void UnknownFunction512dd0(UnknownTgaFile* tga);                        // 0x00512dd0
-int UnknownFunction511ad0(int format);                                  // 0x00511ad0
+UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* into, int a); // 0x005125c0
+void FreeFile(UnknownTgaFile* tga);                        // 0x00512dd0
+int IsFormat4444Or8888(int format);                                  // 0x00511ad0

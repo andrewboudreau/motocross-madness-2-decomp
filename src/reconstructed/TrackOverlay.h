@@ -90,7 +90,7 @@ public:
     int UnknownFunction506e90(const Vector3* from, const Vector3* to, Vector3* out, int a4, int a5, int a6);
     // 0x00507960 (ret 4): selects the detail level (QuarryStuntEvent.cpp;
     // Terrain::SelectQuality in src/krusty2/broadphase/Terrain.h).
-    void UnknownFunction507960(int level);
+    void SelectQuality(int level);
 };
 
 class Camera;
@@ -177,7 +177,7 @@ public:
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
     // screen rectangle `screen`; returns this, or 0.
-    StatsOverlay* UnknownFunction5194b0(RenderTarget* target, TextureMapManager* manager, void* camera,
+    StatsOverlay* LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
                                         UnknownOverlayRect screen);
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
@@ -215,7 +215,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0051b070 (not reconstructed)
     virtual int UnknownVirtualSlot15();       // 0x0051b0f0
 
-    void UnknownFunction51b1f0();             // 0x0051b1f0: shows the text again
+    void ReshowText();             // 0x0051b1f0: shows the text again
     // 0x0051af00 (ret 0x18): slot 8 on `value`, then sets up the text (size
     // characters) with the game's texture manager; returns this or 0
     // (NationalRace.cpp is the caller).
@@ -252,7 +252,7 @@ public:
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
-    RadarOverlay* UnknownFunction51b840(RenderTarget* target, TextureMapManager* manager, int a3,
+    RadarOverlay* LoadMap(RenderTarget* target, TextureMapManager* manager, int a3,
                                         UnknownOverlayRect screen);
     int TakeRacers(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
     int DrawForViewMode();                    // 0x0051bc60: draws for the view mode
@@ -436,7 +436,7 @@ public:
     void DrawNameTag(void* dc, int index);           // 0x0051e3f0: draws name tag `index`
     void UnknownFunction51e7c0();             // 0x0051e7c0
     void RedrawNameLine();                    // 0x0051e800: redraws the name line
-    void UnknownFunction51e910(int index);    // 0x0051e910: redraws one name tag, or all (-1)
+    void RedrawNameTags(int index);    // 0x0051e910: redraws one name tag, or all (-1)
 
     void* pen;                                // +0x11c CreatePen(0, 3, 0xc0c0c0) in 0x0051cf80 (DeleteObject)
     void* chatFont;                           // +0x120 9-high font, selected by RedrawChat (DeleteObject)

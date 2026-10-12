@@ -3,7 +3,7 @@
   "??1GR_BitString@@UAE@XZ": "0x00423dd0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
-  "?UnknownFunction423ef0@GR_BitString@@QAEIH@Z": "0x00423ef0",
+  "?ReadBits@GR_BitString@@QAEIH@Z": "0x00423ef0",
   "?UnknownFunction4a0310@@YAXXZ": "0x004a0310",
   "?UnknownFunction4a0360@@YAHXZ": "0x004a0360",
   "?UnknownFunction4a03d0@@YAXPAEPBXH@Z$ehhandler": "0x0054c368",

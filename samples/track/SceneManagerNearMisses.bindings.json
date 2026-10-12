@@ -132,7 +132,7 @@
   "?UnknownFunction4fbd70@UnknownSceneLodObject@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
   "?UnknownFunction4fc630@D3DIMSoultreeObject@@QAEXUVector3@@@Z": "0x004fc630",
   "?UnknownFunction4fc660@UnknownSceneLodObject@@QAEXPBUVector3@@@Z": "0x004fc660",
-  "?UnknownFunction4fda30@SoultreeObject@@QAEHXZ": "0x004fda30",
+  "?CountNodes@SoultreeObject@@QAEHXZ": "0x004fda30",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",

@@ -49,11 +49,11 @@ public:
     void SetItemObject(void* entry, void* object);
     // 0x004e9030: opens the "RS2" archive `path` and adds its items.
     UnknownTextureStream* UnknownFunction4e9030(const char* path, int flags);
-    ResourceItem* UnknownFunction4e9360(const char* name, int a); // finds `name`
+    ResourceItem* FindItem(const char* name, int a); // finds `name`
     void* FindItemByObject(void* object);       // the item recording `object`
-    int UnknownFunction4e9430(const char* name, const char* path); // adds a loose file
-    int UnknownFunction4e96b0(const char* name, void* object);     // adds an object
-    int UnknownFunction4e9830(UnknownTextureStream* archive);     // removes an archive's items
+    int AddLooseFile(const char* name, const char* path); // adds a loose file
+    int AddObject(const char* name, void* object);     // adds an object
+    int RemoveArchiveItems(UnknownTextureStream* archive);     // removes an archive's items
     void ReleaseItem(ResourceItem* item);               // releases `item`
 
     // Inline (no out-of-line copy): whether an item still comes from

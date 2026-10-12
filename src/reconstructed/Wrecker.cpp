@@ -323,7 +323,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
             UnknownFunction5329e0(step);
             if (wreckState != 1) {
                 Vector3 position;
-                rigidBody->node->UnknownFunction4fc9a0(0, &position);
+                rigidBody->node->GetPositionIn(0, &position);
                 position += pushImpulse;
                 rigidBody->node->UnknownFunction4fc740(0, &position);
             }
@@ -381,7 +381,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         WreckerOrthonormalize(&pose);
         character->skeleton->SetMatrixIn(0, &pose);
         Vector3 position;
-        poseNode->UnknownFunction4fc9a0(0, &position);
+        poseNode->GetPositionIn(0, &position);
         Vector3 delta = WreckerSubtractValue(oldPosition, position);
         character->skeleton->SetPositionIn(0, &delta);
         field_0xb4 = 0;

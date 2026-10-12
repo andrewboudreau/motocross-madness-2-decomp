@@ -104,7 +104,7 @@
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
   "?UnknownFunction4e9010@UnknownResourceManager@@QAEXPAX0@Z": "0x004e9010",
   "?UnknownFunction4e9010@UnknownResourceManager@@QAEXPAXH@Z": "0x004e9010",
-  "?UnknownFunction4e9360@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
+  "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?UnknownFunction4e93f0@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
   "?UnknownThreadProc@UnknownPCAudioObject@@SGIPAX@Z": "0x004bdc00",
   "?UnknownThreadProc@UnknownSoundNotifier@@SGIPAX@Z": "0x004bb630",

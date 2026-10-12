@@ -158,11 +158,11 @@ void UnknownParameterBlock::UnknownFunction4b7220(UnknownParameterStream* stream
 {
     if (stream->field_0x12c) {
         UnknownParameterArchiveEntry* entry =
-            stream->field_0x12c->UnknownFunction4e9360(name, 0);
+            stream->field_0x12c->FindItem(name, 0);
         if (!entry) {
             if (!stream->field_0x12c->UnknownFunction4e9030(path, 0))
-                stream->field_0x12c->UnknownFunction4e9430(name, path);
-            entry = stream->field_0x12c->UnknownFunction4e9360(name, 0);
+                stream->field_0x12c->AddLooseFile(name, path);
+            entry = stream->field_0x12c->FindItem(name, 0);
             if (!entry) {
                 UnknownFunction4b77a0(stream, 0, index);
                 return;

@@ -26,7 +26,7 @@ int UnknownFunction511970(int format);
 void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x00511ad0: whether a pixel format is 4444 or 8888.
-int UnknownFunction511ad0(int format);
+int IsFormat4444Or8888(int format);
 
 // 0x00511af0: the pixel format a DirectDraw pixel format describes.
 int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat);
@@ -75,16 +75,16 @@ int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream);
 int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream);
 
 // 0x00511d00: opens `path` and reads its header (0x00511b40).
-UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, int a);
+UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int a);
 
 // 0x00511dd0: reads a whole file from `stream`; 0 on failure.
-UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, UnknownTgaFile* file, int offset);
+UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file, int offset);
 
 // 0x005125c0: loads the whole file at `path`, named after it; 0 on failure.
-UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, int a);
+UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int a);
 
 // 0x00512dd0: frees a loaded file.
-void UnknownFunction512dd0(UnknownTgaFile* file);
+void FreeFile(UnknownTgaFile* file);
 
 // Writers: fill a 24-bit (0x005127a0), 32-bit (0x00512870) or 16-bit
 // (0x00512940) header for `bits`, name it `path` and write it.

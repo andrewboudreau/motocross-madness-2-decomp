@@ -284,7 +284,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         field_0x190 = CarClamp(field_0x190, -0.52359873f, 0.52359873f);
     }
     Vector3 position;
-    field_0x34->UnknownFunction4fc9a0(0, &position);
+    field_0x34->GetPositionIn(0, &position);
     Vector3 ground = position;
     Vector3 normal;
     ((CarProceduralTerrain*)field_0x20c)->UnknownFunction507c10(&ground, &normal, 0, 0);

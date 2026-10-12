@@ -93,7 +93,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
     if (!buffer)
         return 0;
     if (isPacked) {
-        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(soundName, 0);
+        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(soundName, 0);
         if (!entry)
             return 0;
         entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);

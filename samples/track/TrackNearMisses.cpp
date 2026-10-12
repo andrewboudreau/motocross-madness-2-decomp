@@ -50,7 +50,7 @@
 // do not change it. The fifth parameter is the work list (RaceStatus.cpp's
 // binding declares it int).
 //
-// TrackRecordDlg::UnknownFunction51ffe0 (TrackRecord.cpp, 0x0051ffe0, 932
+// TrackRecordDlg::ListHighScoreTracks (TrackRecord.cpp, 0x0051ffe0, 932
 // bytes): the candidate is 964 bytes. The frame (0x350, so one buffer is
 // 260 bytes), stack slots, calls and the body of the loop agree. Retail
 // cross-jumps the two copies of the digit-suffix branch: the first-file copy
@@ -174,7 +174,7 @@ int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
 
 // 0x0051ffe0: lists the tracks with a high-score file. For series 1 and 5
 // the name's last character is a digit that selects the variant.
-void TrackRecordDlg::UnknownFunction51ffe0(UIControl* list, DirectoryList* directory, int series)
+void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directory, int series)
 {
     char found[128];
     char track[128];

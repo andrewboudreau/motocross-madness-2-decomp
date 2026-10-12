@@ -76,7 +76,7 @@ unsigned int g_UnknownLowMasks5681a0[33] = {
     0xffffffff,
 };
 
-// 0x00568224: the table UnknownFunction423ef0 reads its masks through.
+// 0x00568224: the table ReadBits reads its masks through.
 unsigned int* g_UnknownLowMaskTable568224 = g_UnknownLowMasks5681a0;
 
 // The sequential reader's state (0x00578e90..0x00578e9b): the current word in

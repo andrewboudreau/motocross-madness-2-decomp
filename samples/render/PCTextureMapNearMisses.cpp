@@ -186,7 +186,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     field_0x2c = palette;
     texturePalette = surfacePalette;
     if (choice)
-        format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
+        format = IsFormat4444Or8888(format) ? choice->field_0x10 : choice->field_0x0c;
     field_0x20 = format;
     FillPixelFormat(format, pixelFormat);
     mipmapped = flags & 2;
@@ -372,11 +372,11 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     }
     if (g_UnknownGlobal689968)
         DumpLevel(systemSurface, 0);
-    if (UnknownFunction511ad0(format) & !UnknownFunction511ad0(field_0x20)) {
+    if (IsFormat4444Or8888(format) & !IsFormat4444Or8888(field_0x20)) {
         UnknownVirtualSlot18(0xff00ff);
         return 1;
     }
-    if (UnknownFunction511ad0(field_0x20)) {
+    if (IsFormat4444Or8888(field_0x20)) {
         AppendRenderStatePair(this, 0x29, 0);
         AppendRenderStatePair(this, 0x1b, 1);
         AppendRenderStatePair(this, 0x13, addressU);

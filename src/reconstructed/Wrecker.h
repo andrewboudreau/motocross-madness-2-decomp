@@ -163,7 +163,7 @@ struct UnknownWreckerMatrix {
 struct UnknownWreckerSkeleton {
     void TranslateIn(UnknownWreckerSkeleton* frame, Vector3 delta); // 0x004fc690 (ret 0x10)
     void UnknownFunction4fc740(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
-    void UnknownFunction4fc9a0(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc9a0 (ret 8)
+    void GetPositionIn(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc9a0 (ret 8)
     void GetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerFrame* out);        // 0x004fca80 (ret 8)
     void GetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* out);       // the same function, for a matrix local
     void SetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* matrix);    // 0x004fb8c0 (ret 8): sets this node's matrix in `frame` space

@@ -14,7 +14,7 @@
   "?UnknownFunction4fbd70@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
   "?UnknownFunction4fc740@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc740",
   "?GetPosition@CarProceduralNode@@QAEXPAUVector3@@@Z": "0x004fc970",
-  "?UnknownFunction4fc9a0@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc9a0",
+  "?GetPositionIn@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc9a0",
   "?LocalToWorldDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "0x004fd5c0",
   "?WorldToLocalDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "0x004fd710",
   "?UnknownFunction507c10@CarProceduralTerrain@@QAEXPAUVector3@@0HH@Z": "0x00507c10",

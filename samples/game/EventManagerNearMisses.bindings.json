@@ -38,7 +38,7 @@
   "?UnknownFunction4014f0@UnknownPodiumArcade@@QAEXPBUVector3@@@Z": "0x004014f0",
   "?UnknownFunction401520@UnknownPodiumArcade@@QAEXPBUVector3@@0HH@Z": "0x00401520",
   "?UnknownFunction4204e0@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
-  "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
+  "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?UnknownFunction4444c0@UnknownPodiumSoultree@@QAEXH@Z": "0x004444c0",
   "?UnknownFunction444c70@UnknownPodiumSoultree@@QAEXHPBDPAX@Z": "0x00444c70",
   "?UnknownFunction45cdc0@EventManager@@QAEXH@Z": "0x0045cdc0",

@@ -93,7 +93,7 @@ UnknownTextureStream* UnknownTrackGameObject574::UnknownFunction4e9ba0(const cha
     sprintf(path, "%s\\%s", field_0x44, scene);
     strcpy(strrchr(path, '.'), ".env");
     if (field_0x00) {
-        g_UnknownResourceManager572b44->UnknownFunction4e9830(field_0x00);
+        g_UnknownResourceManager572b44->RemoveArchiveItems(field_0x00);
         delete field_0x00;
     }
     field_0x00 = g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 1);
@@ -1231,7 +1231,7 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
     int header1;
     int width = 0;
     UnknownResourceEntry* entry =
-        g_UnknownResourceManager572b44->UnknownFunction4e9360(texture->textureName, 0);
+        g_UnknownResourceManager572b44->FindItem(texture->textureName, 0);
     if (entry) {
         entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
         if (entry->field_0x14->UnknownFunction461640(&header0, 4, 1) != 1
@@ -1239,12 +1239,12 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
             || entry->field_0x14->UnknownFunction461640(&width, 4, 1) != 1)
             return 0;
     } else {
-        UnknownTgaFile* file = UnknownFunction511d00(texture->textureName, 0,
+        UnknownTgaFile* file = OpenAndReadHeader(texture->textureName, 0,
                                                      (int)g_UnknownResourceManager572b44);
         if (!file)
             return 0;
         width = file->width;
-        UnknownFunction512dd0(file);
+        FreeFile(file);
     }
     switch (width) {
     case 0x100:
@@ -1268,13 +1268,13 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
 // `manager` already has it.
 int AddResource(UnknownResourceManager* manager, const char* name, const char* path)
 {
-    UnknownResourceEntry* global = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
-    if (!manager->UnknownFunction4e9360(name, 0)) {
+    UnknownResourceEntry* global = g_UnknownResourceManager572b44->FindItem(name, 0);
+    if (!manager->FindItem(name, 0)) {
         if (global)
-            manager->UnknownFunction4e96b0(name, 0);
+            manager->AddObject(name, 0);
         else
-            manager->UnknownFunction4e9430(name, path);
-        UnknownResourceEntry* entry = manager->UnknownFunction4e9360(name, 0);
+            manager->AddLooseFile(name, path);
+        UnknownResourceEntry* entry = manager->FindItem(name, 0);
         if (entry)
             delete entry->field_0x14;
         return 1;
@@ -1320,10 +1320,10 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     strcat(file, ".slb");
     if (!AddResource((UnknownResourceManager*)resources, name, file))
         return 1;
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     if (!entry) {
-        g_UnknownResourceManager572b44->UnknownFunction4e9430(name, file);
-        entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+        g_UnknownResourceManager572b44->AddLooseFile(name, file);
+        entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     }
     if (entry) {
         entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
@@ -1389,9 +1389,9 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
     strcat(file, ".slt");
     if (!AddResource((UnknownResourceManager*)resources, name, file))
         return 1;
-    if (!g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0)) {
-        g_UnknownResourceManager572b44->UnknownFunction4e9430(name, file);
-        if (!g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0))
+    if (!g_UnknownResourceManager572b44->FindItem(name, 0)) {
+        g_UnknownResourceManager572b44->AddLooseFile(name, file);
+        if (!g_UnknownResourceManager572b44->FindItem(name, 0))
             return 1;
     }
     UnknownTextureStream* stream = new(__FILE__, 3622) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -1470,9 +1470,9 @@ int Scene::ResolveSltPath(char* path)
     char dir[_MAX_DIR];
     _splitpath(path, drive, dir, name, ext);
     strcat(name, ext);
-    if (!g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0)) {
-        g_UnknownResourceManager572b44->UnknownFunction4e9430(name, path);
-        if (!g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0)) {
+    if (!g_UnknownResourceManager572b44->FindItem(name, 0)) {
+        g_UnknownResourceManager572b44->AddLooseFile(name, path);
+        if (!g_UnknownResourceManager572b44->FindItem(name, 0)) {
             delete stream;
             return 0;
         }

@@ -92,7 +92,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
         return 0;
     if (heldDcSurface) {
         if (surface != heldDcSurface) {
-            UnknownFunction404c80();
+            ReleaseDc();
             heldDcSurface = surface;
             surface->GetDC(&heldDc);
         }

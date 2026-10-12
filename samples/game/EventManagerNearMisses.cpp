@@ -378,7 +378,7 @@ int EventManager::CreatePodiumScene() {
     D3DRMVectorRotate(&rotated, &lookOffset, &kVec3YAxis, angle);
     podiumCameraTarget = rotated * PodiumLength(lookOffset) + podiumPosition;
     podiumPanSpeed = podiumCameraTarget - podiumCameraPosition;
-    podiumCamera->UnknownFunction42e9b0(&podiumCameraPosition, 0, 0, 0, 0);
+    podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
     podiumCamera->UnknownVirtualSlot29(podiumFocus);
     float x0 = podiumPosition.x - 16.0f;
     float x1 = x0 + 32.0f;

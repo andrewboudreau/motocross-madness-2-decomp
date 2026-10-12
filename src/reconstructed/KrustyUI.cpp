@@ -787,7 +787,7 @@ void KrustyUI::LoadBikesAndRiders() {
 int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
     char path[128];
     UNKNOWN_COPY_SIZED(text, name, size);
-    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 1))
+    if (g_UnknownResourceManager572b44->FindItem(name, 1))
         return 1;
     if (!strchr(name, '\\')) {
         sprintf(path, "%s\\%s", "Res", name);
@@ -817,7 +817,7 @@ int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
 int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
     char path[128];
     UNKNOWN_COPY_SIZED(text, name, size);
-    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 1))
+    if (g_UnknownResourceManager572b44->FindItem(name, 1))
         return 1;
     if (!strchr(name, '\\')) {
         sprintf(path, "%s\\%s", "Res", name);

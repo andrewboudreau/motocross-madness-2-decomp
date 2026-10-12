@@ -122,24 +122,24 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     field_0x1f4 = kVec3Zero;
     field_0x50 = a9;
     field_0x18c = 0.0f;
-    CarProceduralNode* body = field_0x34->UnknownFunction4fdae0("Body");
+    CarProceduralNode* body = field_0x34->FindByName("Body");
     body->GetPosition(&field_0x1dc);
 
     field_0x60 = wheelCount;
     if (field_0x60 > 0) {
         field_0x210 = new (__FILE__, 126) CarProceduralNode*[field_0x60];
         if (field_0x60 > 0)
-            field_0x210[0] = field_0x34->UnknownFunction4fdae0("TireFrontL");
+            field_0x210[0] = field_0x34->FindByName("TireFrontL");
         if (field_0x60 > 1)
-            field_0x210[1] = field_0x34->UnknownFunction4fdae0("TireFrontR");
+            field_0x210[1] = field_0x34->FindByName("TireFrontR");
         if (field_0x60 > 2)
-            field_0x210[2] = field_0x34->UnknownFunction4fdae0("TireBackL");
+            field_0x210[2] = field_0x34->FindByName("TireBackL");
         if (field_0x60 > 3)
-            field_0x210[3] = field_0x34->UnknownFunction4fdae0("TireBackR");
+            field_0x210[3] = field_0x34->FindByName("TireBackR");
         if (field_0x60 > 4)
-            field_0x210[4] = field_0x34->UnknownFunction4fdae0("TireMidL");
+            field_0x210[4] = field_0x34->FindByName("TireMidL");
         if (field_0x60 > 5)
-            field_0x210[5] = field_0x34->UnknownFunction4fdae0("TireMidR");
+            field_0x210[5] = field_0x34->FindByName("TireMidR");
         Vector3 minimum;
         Vector3 maximum;
         field_0x210[0]->UnknownFunction4fe0a0(&minimum, &maximum);

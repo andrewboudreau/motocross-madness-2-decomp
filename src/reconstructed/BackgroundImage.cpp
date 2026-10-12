@@ -148,16 +148,16 @@ failed:
 void BackgroundImage::SetImage(PCTextureMap* image) {
     if (image) {
         if (!field_0x2c)
-            imageRegion = UnknownFunction4040f0(0);
+            imageRegion = AllocRegion(0);
         field_0x2c = image;
     } else {
-        UnknownFunction404200(imageRegion);
+        ReleaseRegion(imageRegion);
         field_0x2c = 0;
     }
 }
 
 // 0x004040f0: a free region, or four more.
-int BackgroundImage::UnknownFunction4040f0(int owner) {
+int BackgroundImage::AllocRegion(int owner) {
     int i;
 
     if (regionCapacity > regionCount) {
@@ -190,7 +190,7 @@ int BackgroundImage::UnknownFunction4040f0(int owner) {
 }
 
 // 0x00404200
-void BackgroundImage::UnknownFunction404200(int index) {
+void BackgroundImage::ReleaseRegion(int index) {
     if (regionTable && index < regionCapacity) {
         if (regionTable[index].framesLeft)
             regionTable[index].framesLeft--;
@@ -264,7 +264,7 @@ int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect
     if (dirty) {
         if (copyValid) {
             if (*frames) {
-                UnknownFunction404c80();
+                ReleaseDc();
                 image->BlitTo(rect, offscreenCopy, sourceRect, flags, skip);
                 image->BlitTo(rect, Target()->renderSurface, sourceRect, flags, skip);
                 (*frames)--;
@@ -282,7 +282,7 @@ int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect
                         CurrentRegionRect(i).bottom < rect->bottom ? CurrentRegionRect(i).bottom : rect->bottom;
                     if (g_UnknownGlobal577790.left < g_UnknownGlobal577790.right &&
                         g_UnknownGlobal577790.top < g_UnknownGlobal577790.bottom) {
-                        UnknownFunction404c80();
+                        ReleaseDc();
                         g_UnknownGlobal577808.left = g_UnknownGlobal577790.left - rect->left;
                         g_UnknownGlobal577808.right = g_UnknownGlobal577790.right - rect->left;
                         g_UnknownGlobal577808.top = g_UnknownGlobal577790.top - rect->top;
@@ -295,7 +295,7 @@ int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect
                 }
             }
         } else {
-            UnknownFunction404c80();
+            ReleaseDc();
             image->BlitTo(rect, Target()->renderSurface, sourceRect, flags, skip);
             *frames = Target()->field_0x14;
         }
@@ -303,7 +303,7 @@ int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect
             UnknownFunction404cb0(index);
         return 1;
     }
-    UnknownFunction404c80();
+    ReleaseDc();
     image->BlitTo(rect, Target()->renderSurface, sourceRect, flags, skip);
     if (index >= 0)
         UnknownFunction404240(index, rect);
@@ -318,7 +318,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
     if (dirty) {
         if (copyValid) {
             if (*frames) {
-                UnknownFunction404c80();
+                ReleaseDc();
                 image->CopyRectTo(x, y, offscreenCopy, (UnknownRect*)rect, flags, table);
                 image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
                 (*frames)--;
@@ -336,7 +336,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
                         CurrentRegionRect(i).bottom < rect->bottom ? CurrentRegionRect(i).bottom : rect->bottom;
                     if (g_UnknownGlobal5777d8.left < g_UnknownGlobal5777d8.right &&
                         g_UnknownGlobal5777d8.top < g_UnknownGlobal5777d8.bottom) {
-                        UnknownFunction404c80();
+                        ReleaseDc();
                         g_UnknownGlobal5777c8.left = g_UnknownGlobal5777d8.left - rect->left;
                         g_UnknownGlobal5777c8.right = g_UnknownGlobal5777d8.right - rect->left;
                         g_UnknownGlobal5777c8.top = g_UnknownGlobal5777d8.top - rect->top;
@@ -347,7 +347,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
                 }
             }
         } else {
-            UnknownFunction404c80();
+            ReleaseDc();
             image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
             *frames = Target()->field_0x14;
         }
@@ -355,7 +355,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
             UnknownFunction404cb0(index);
         return 1;
     }
-    UnknownFunction404c80();
+    ReleaseDc();
     image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
     if (index >= 0) {
         g_UnknownGlobal5777e8.left = x;
@@ -369,7 +369,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
 }
 
 // 0x00404c80
-int BackgroundImage::UnknownFunction404c80() {
+int BackgroundImage::ReleaseDc() {
     if (heldDcSurface)
         heldDcSurface->ReleaseDC(heldDc);
     heldDcSurface = 0;
@@ -407,7 +407,7 @@ void BackgroundImage::UnknownFunction404d30(int index) {
 
 // 0x00404da0: owes a full restore for every buffered frame (and asks the
 // camera to redraw).
-void BackgroundImage::UnknownFunction404da0() {
+void BackgroundImage::MarkAllDirty() {
     fullRestoreFrames = Target()->field_0x14 + 1;
     UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
     if (camera) {
@@ -419,7 +419,7 @@ void BackgroundImage::UnknownFunction404da0() {
 
 // 0x00404de0
 int BackgroundImage::UnknownVirtualSlot18() {
-    UnknownFunction404da0();
+    MarkAllDirty();
     return 1;
 }
 

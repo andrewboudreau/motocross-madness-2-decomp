@@ -23,9 +23,9 @@ struct UnknownParameterArchiveEntry {
 // so this view declares the three members it calls with their own addresses.
 class UnknownParameterArchive {
 public:
-    UnknownParameterArchiveEntry* UnknownFunction4e9360(const char* name, int a); // 0x004e9360: finds `name`
+    UnknownParameterArchiveEntry* FindItem(const char* name, int a); // 0x004e9360: finds `name`
     int UnknownFunction4e9030(const char* path, int flags);   // 0x004e9030: adds an archive
-    void UnknownFunction4e9430(const char* name, const char* path); // 0x004e9430: loads `name` from `path`
+    void AddLooseFile(const char* name, const char* path); // 0x004e9430: loads `name` from `path`
 };
 
 // The stream a parameter block reads. Tier 2: the same retail object as

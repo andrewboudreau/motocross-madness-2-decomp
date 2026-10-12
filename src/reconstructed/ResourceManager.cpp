@@ -120,7 +120,7 @@ void UnknownResourceManager::SetItemObject(void* entry, void* object)
 // samples/render/ResourceManagerNearMisses.cpp.
 
 // 0x004e9360
-ResourceItem* UnknownResourceManager::UnknownFunction4e9360(const char* name, int a)
+ResourceItem* UnknownResourceManager::FindItem(const char* name, int a)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
@@ -144,7 +144,7 @@ void* UnknownResourceManager::FindItemByObject(void* object)
 }
 
 // 0x004e9430
-int UnknownResourceManager::UnknownFunction4e9430(const char* name, const char* path)
+int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
 {
     char buffer[0x104];
 
@@ -193,7 +193,7 @@ int UnknownResourceManager::UnknownFunction4e9430(const char* name, const char* 
 }
 
 // 0x004e96b0
-int UnknownResourceManager::UnknownFunction4e96b0(const char* name, void* object)
+int UnknownResourceManager::AddObject(const char* name, void* object)
 {
     if (itemCount + 1 > itemCapacity) {
         items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 464);
@@ -223,7 +223,7 @@ int UnknownResourceManager::UnknownFunction4e96b0(const char* name, void* object
 
 // 0x004e9830: refuses (0) while another holder references one of the
 // archive's items; the archive itself is not deleted here.
-int UnknownResourceManager::UnknownFunction4e9830(UnknownTextureStream* archive)
+int UnknownResourceManager::RemoveArchiveItems(UnknownTextureStream* archive)
 {
     int used = 0;
     int i;

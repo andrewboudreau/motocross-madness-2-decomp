@@ -17,7 +17,7 @@
   "?UnknownFunction461cb0@UnknownTextureStream@@QAEHPAH0@Z": "0x00461cb0",
   "?UnknownFunction461d20@UnknownTextureStream@@QAEXXZ": "0x00461d20",
   "?UnknownFunction461d40@@YAHPAU_iobuf@@PBDZZ": "0x00461d40",
-  "?UnknownFunction4e9360@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
+  "?FindItem@UnknownResourceManager@@QAEPAVResourceItem@@PBDH@Z": "0x004e9360",
   "__fstat": "0x00536890",
   "__setmode": "0x0053651c",
   "_fclose": "0x00534c3d",

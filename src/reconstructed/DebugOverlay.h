@@ -54,14 +54,14 @@ public:
     virtual int UnknownVirtualSlot25(void* value); // 0x00448520
 
     // 0x00447de0: sets the overlay up; returns it, or 0.
-    DebugOverlay* UnknownFunction447de0(RenderTarget* a, TextureMapManager* b,
+    DebugOverlay* Setup(RenderTarget* a, TextureMapManager* b,
                                         int c, int d, int e);
     // 0x00447a00: loads "DebugOverlayText.tga", or renders the font
     // ("Courier", height field_0x36d0) into a new 256x256 texture through GDI.
     int LoadFont();
     // 0x00447e90 (ret 0xc): sets the text of row `row` when it changed.
     void SetRowText(int row, const char* text, int flag);
-    int UnknownFunction4484f0();                                        // 0x004484f0: next page
+    int ShowNextPage();                                        // 0x004484f0: next page
     // 0x00447f40 and 0x00447fa0: format a row onto page `page` when that page
     // is shown (+0x25 bit 0 and +0x26c4); cdecl, `this` on the stack.
     void UnknownFunction447f40(int page, const char* format, ...);

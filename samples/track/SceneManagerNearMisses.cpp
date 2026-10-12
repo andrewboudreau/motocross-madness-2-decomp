@@ -379,7 +379,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             parameters.UnknownFunction4b7f10("Collision", 1, &collision);
             field_0xb8->field_0x04[i].field_0x0c = 0;
             if (collision && !stadium
-                && ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fda30() == 1) {
+                && ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->CountNodes() == 1) {
                 g_MemTagStack->Push("Collision");
                 field_0xb8->field_0x04[i].field_0x0c = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
                 field_0xb8->field_0x04[i].field_0x0c->UnknownFunction4320f0(field_0x18, 1, 0, 1);

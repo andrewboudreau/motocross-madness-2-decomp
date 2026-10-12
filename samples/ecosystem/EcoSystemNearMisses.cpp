@@ -490,10 +490,10 @@ int EcoSystem::GenerateObjects(int checkCodes) {
     UnknownTgaFile* tga = 0;
     memset(tgas, 0, sizeof(tgas));
     if (probabilityTga[0])
-        tga = UnknownFunction5125c0(probabilityTga, 0, (int)g_UnknownResourceManager572b44);
+        tga = LoadFile(probabilityTga, 0, (int)g_UnknownResourceManager572b44);
     for (i = 0; i < 256; i++) {
         if (definitionTable[i] && definitionTable[i]->probabilityTga[0])
-            tgas[i] = UnknownFunction5125c0(definitionTable[i]->probabilityTga, 0, (int)g_UnknownResourceManager572b44);
+            tgas[i] = LoadFile(definitionTable[i]->probabilityTga, 0, (int)g_UnknownResourceManager572b44);
     }
     groundTerrain->GetHeightRange(&minHeight, &maxHeight);
     unsigned int attempt = 0;
@@ -654,10 +654,10 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         failures = 0;
     }
     if (tga)
-        UnknownFunction512dd0(tga);
+        FreeFile(tga);
     for (i = 0; i < 256; i++) {
         if (tgas[i])
-            UnknownFunction512dd0(tgas[i]);
+            FreeFile(tgas[i]);
     }
     return 1;
 }

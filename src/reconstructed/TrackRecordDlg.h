@@ -98,7 +98,7 @@ public:
     void LabelTabs(int series);                                 // 0x0051fc40: labels the tabs
     void ShowTab(UnknownDialogEvent* event, int series); // 0x0051fe80: shows a tab
     void UnknownFunction51ff40();
-    void UnknownFunction51ffe0(UIControl* list, DirectoryList* directory, int series); // 0x0051ffe0
+    void ListHighScoreTracks(UIControl* list, DirectoryList* directory, int series); // 0x0051ffe0
     void FillLists(UnknownDialogEvent* event, int series); // 0x00520390: fills the lists                                           // 0x0051ff40: frees the rows
     void UnknownFunction520480(UnknownDialogEvent* event, const char* name, float value,
                                const char* text);                           // 0x00520480

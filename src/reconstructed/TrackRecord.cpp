@@ -398,7 +398,7 @@ void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
     control->SetSelectable(0);
     control = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     control->RemoveAllRows();
-    UnknownFunction51ffe0(control, g_TrackGame->mode.field_0x25e0, series);
+    ListHighScoreTracks(control, g_TrackGame->mode.field_0x25e0, series);
     ((UnknownTrackRecordListBox*)control)->UnknownVirtualSlot66(0);
 }
 
@@ -441,7 +441,7 @@ void TrackRecordDlg::UnknownFunction5204e0(UnknownDialogEvent* event, int times,
             if (!times)
                 sprintf(text, "%.0f", table->field_0x14[i].field_0x10);
             else
-                UnknownFunction518690(text, table->field_0x14[i].field_0x10);
+                FormatLapTime(text, table->field_0x14[i].field_0x10);
             UnknownFunction520480(event, g_TrackGame->field_0x3400->field_0x14[i].field_0x00, 0.0f, text);
         }
     }

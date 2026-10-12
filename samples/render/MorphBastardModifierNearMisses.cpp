@@ -115,7 +115,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
         sprintf(section, "MorphBastard %i", i);
         block->UnknownFunction4b78f0(section);
         block->UnknownFunction4b7b30("ObjectName", objectName, -1);
-        MorphBastardNode* node = model->UnknownFunction4fdae0(objectName);
+        MorphBastardNode* node = model->FindByName(objectName);
         morphObjects[i].node = node;
         node->GetMatrixIn(0, &morphObjects[i].inverseRestMatrix);
         MorphBastardInvertRigid(morphObjects[i].inverseRestMatrix);
@@ -127,7 +127,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
             sprintf(section, "MorphBastard %i Target %i", i, j);
             block->UnknownFunction4b78f0(section);
             block->UnknownFunction4b7b30("ControllerName", controllerName, -1);
-            MorphBastardNode* controller = model->UnknownFunction4fdae0(controllerName);
+            MorphBastardNode* controller = model->FindByName(controllerName);
             int isNew = 1;
             for (int axis = 0; axis < 3; axis++) {
                 int found;

@@ -335,12 +335,12 @@ int GUIManager::UnknownVirtualSlot15() {
         waitFrames = waitFrames - 1 < 0 ? 0 : waitFrames - 1;
         g_TrackGame->renderTarget->UnknownVirtualSlot12(0, 0);
         if (!waitFrames && redrawBackground) {
-            redrawBackground->UnknownFunction404da0();
+            redrawBackground->MarkAllDirty();
             redrawBackground = 0;
         }
     }
     if (guiBackground)
-        guiBackground->UnknownFunction404c80();
+        guiBackground->ReleaseDc();
     return 1;
 }
 
@@ -356,7 +356,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     dialog->UnknownVirtualSlot28(a);
     dialog->animatesControls = field_0xec;
     if (guiBackground)
-        guiBackground->UnknownFunction404da0();
+        guiBackground->MarkAllDirty();
     if (wait)
         UnknownFunction4865e0(cursorImage, paletteChanged == 0);
     if (paletteChanged)
@@ -464,8 +464,8 @@ void GUIManager::GrabBackground(int dim) {
     ReleaseBackgroundGrab();
     screenGrab = CopyScreenToTexture(dim, 0);
     if (guiBackground) {
-        grabRegion = guiBackground->UnknownFunction4040f0(1);
-        guiBackground->UnknownFunction404da0();
+        grabRegion = guiBackground->AllocRegion(1);
+        guiBackground->MarkAllDirty();
         guiBackground->field_0x30 = 0;
     }
 }
@@ -475,7 +475,7 @@ void GUIManager::ReleaseBackgroundGrab() {
     if (screenGrab)
         screenGrab->Release();
     if (guiBackground && grabRegion >= 0) {
-        guiBackground->UnknownFunction404200(grabRegion);
+        guiBackground->ReleaseRegion(grabRegion);
         guiBackground->field_0x30 = 1;
     }
     screenGrab = 0;
@@ -497,8 +497,8 @@ int GUIManager::UnknownFunction4864f0() {
 // 0x00486500
 void GUIManager::RedrawFrame() {
     if (guiBackground) {
-        guiBackground->UnknownFunction404c80();
-        guiBackground->UnknownFunction404da0();
+        guiBackground->ReleaseDc();
+        guiBackground->MarkAllDirty();
     }
     g_TrackGame->UnknownVirtualSlot8();
     g_TrackGame->UnknownVirtualSlot9();
@@ -654,7 +654,7 @@ ToolTip::~ToolTip() {
     if (textTexture)
         textTexture->Release();
     if (tipGui && tipGui->guiBackground && backgroundRegion > -1)
-        tipGui->guiBackground->UnknownFunction404200(backgroundRegion);
+        tipGui->guiBackground->ReleaseRegion(backgroundRegion);
 }
 
 // 0x00486ab0
@@ -1070,7 +1070,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
     void* palette;
 
     if (userGui && userGui->guiBackground)
-        userGui->guiBackground->UnknownFunction404c80();
+        userGui->guiBackground->ReleaseDc();
     if (userCursor || !pointerDevice)
         return;
     if (g_TrackGame->fullScreen) {

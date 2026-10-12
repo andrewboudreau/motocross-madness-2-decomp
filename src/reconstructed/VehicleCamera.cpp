@@ -65,15 +65,15 @@ Vector3 VehicleCamera::UnknownFunction52bac0() {
 Vector3 VehicleCamera::TargetPoint() {
     Vector3 position;
     if (vehicleMode) {
-        vehicle->field_0x3bc->UnknownFunction4fc9a0(0, &position);
+        vehicle->field_0x3bc->GetPositionIn(0, &position);
         return position;
     }
     if (field_0x384) {
         UnknownVehiclePart* model = field_0x384->field_0x1a0;
         if (model->field_0x140)
-            model->field_0x140->UnknownFunction4fc9a0(0, &position);
+            model->field_0x140->GetPositionIn(0, &position);
         else
-            model->UnknownFunction4fc9a0(0, &position);
+            model->GetPositionIn(0, &position);
         return position;
     }
     if (field_0x388) {
@@ -280,7 +280,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
 // 0x0052cb80: the vehicle's position 0, raised by 5.
 Vector3 VehicleCamera::UnknownVirtualSlot50() {
     Vector3 position;
-    vehicle->field_0x3bc->UnknownFunction4fc9a0(0, &position);
+    vehicle->field_0x3bc->GetPositionIn(0, &position);
     position.y += 5.0f;
     return position;
 }

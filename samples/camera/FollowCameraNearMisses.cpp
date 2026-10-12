@@ -483,7 +483,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         D3DRMVectorRotate(&direction, &position, &kVec3YAxis, field_0x234);
         direction *= field_0x220;
         position = direction + targetPoint;
-        UnknownFunction42e9b0(&position, 0, 0, 0, 0);
+        SetFrame(&position, 0, 0, 0, 0);
         target = field_0x29c * field_0x228;
         target += targetPoint;
         field_0x240->UnknownFunction507c10(&target, 0, 0, 0);
@@ -600,7 +600,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             roll = 0.0f;
             UnknownVirtualSlot54();
         }
-        UnknownFunction42e9b0(&smoothed, 0, 0, &roll, 0);
+        SetFrame(&smoothed, 0, 0, &roll, 0);
         UnknownVirtualSlot29(cachedTarget);
         if (UnknownVirtualSlot56()) {
             if (cameraState != 7 && !field_0x276) {

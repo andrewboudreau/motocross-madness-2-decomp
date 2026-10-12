@@ -119,10 +119,10 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
         strcat(fullPath, dir);
         strcat(fullPath, fname);
         strcat(fullPath, ".slb");
-        ResourceItem* item = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+        ResourceItem* item = g_UnknownResourceManager572b44->FindItem(name, 0);
         if (!item) {
-            g_UnknownResourceManager572b44->UnknownFunction4e9430(name, fullPath);
-            item = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+            g_UnknownResourceManager572b44->AddLooseFile(name, fullPath);
+            item = g_UnknownResourceManager572b44->FindItem(name, 0);
         }
         if (item) {
             if (item->object) {
@@ -146,10 +146,10 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             strcat(fullPath, dir);
             strcat(fullPath, fname);
             strcat(fullPath, ".slt");
-            item = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+            item = g_UnknownResourceManager572b44->FindItem(name, 0);
             if (!item) {
-                g_UnknownResourceManager572b44->UnknownFunction4e9430(name, fullPath);
-                item = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+                g_UnknownResourceManager572b44->AddLooseFile(name, fullPath);
+                item = g_UnknownResourceManager572b44->FindItem(name, 0);
                 if (!item) {
                     RegisterNode();
                     return this;
@@ -177,7 +177,7 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
 void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
 {
     SoultreeObject::SoultreeVirtualSlot2(stream);
-    int count = UnknownFunction4fda30();
+    int count = CountNodes();
     SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x14e);
     int index = 1;
     nodes[0] = this;
@@ -289,7 +289,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
 int D3DIMSoultreeObject::ReadLods()
 {
     int untextured = 0;
-    int count = UnknownFunction4fda30();
+    int count = CountNodes();
     SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x1dd);
     int index = 1;
     nodes[0] = this;
@@ -858,7 +858,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot4(SoultreeObject** out)
 // 0x00444440
 void D3DIMSoultreeObject::UnknownFunction444440()
 {
-    int count = UnknownFunction4fda30();
+    int count = CountNodes();
     SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x80b);
     int index = 1;
     nodes[0] = this;

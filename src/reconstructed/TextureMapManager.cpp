@@ -229,7 +229,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
 }
 
 // 0x00511180
-ManagedTextureGroup* TextureMapManager::UnknownFunction511180(int format, int pages, int addressU, int addressV) {
+ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int addressU, int addressV) {
     ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
     cache->SetPageCount(pages);
     field_0x44.Add(cache);
@@ -253,7 +253,7 @@ int TextureMapManager::UnknownVirtualSlot18() {
 // 0x005113d0: on AGP displays, restores every grouped texture; otherwise
 // hands out the "TextureCacheLimit" in 0x2aaaa-byte steps, each to the group
 // with the fewest steps for its texture count.
-int TextureMapManager::UnknownFunction5113d0() {
+int TextureMapManager::ShareCacheLimit() {
     int count = field_0x44.m_count;
     int* steps = new(__FILE__, 531) int[count];
     int* sizes = new(__FILE__, 532) int[count];
@@ -349,12 +349,12 @@ void TextureMapManager::CountTextureMemory() {
 }
 
 // 0x005112f0
-void TextureMapManager::UnknownFunction5112f0(TextureMap* texture) {
+void TextureMapManager::RegisterTexture(TextureMap* texture) {
     field_0x2c.Append(texture);
 }
 
 // 0x00511300
-void TextureMapManager::UnknownFunction511300(TextureMap* texture) {
+void TextureMapManager::UnregisterTexture(TextureMap* texture) {
     field_0x2c.Remove(texture);
 }
 

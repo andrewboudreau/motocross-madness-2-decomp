@@ -149,7 +149,7 @@ UnknownSoundNotifier::~UnknownSoundNotifier() {
 // out inside the last branch; the two early failures keep their own
 // epilogues.
 Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     if (!entry)
         return 0;
     Sound* sound = new (__FILE__, 186) Sound(group, 1);

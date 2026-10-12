@@ -59,7 +59,7 @@ class MorphBastardNode {
 public:
     void GetLocalMatrix(Matrix4* out);                    // 0x004fca60: local matrix
     void GetMatrixIn(MorphBastardNode* frame, Matrix4* out); // 0x004fca80: matrix in frame
-    MorphBastardNode* UnknownFunction4fdae0(const char* name);   // 0x004fdae0: named descendant
+    MorphBastardNode* FindByName(const char* name);   // 0x004fdae0: named descendant
 };
 
 // One delta set (0x14 bytes, sorted by value with qsort 0x4a3bb0).

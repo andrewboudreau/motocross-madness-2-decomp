@@ -154,7 +154,7 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
 Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
     if (field_0x276) {
-        bike->field_0x5c4->field_0x1a0->UnknownFunction4fc9a0(0, &result);
+        bike->field_0x5c4->field_0x1a0->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
             Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
             lead = lead * (4.0f - field_0x2c0 * 0.006f);

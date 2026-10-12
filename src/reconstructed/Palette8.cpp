@@ -11,7 +11,7 @@
 
 // 0x004b6b30
 Palette8* Palette8::UnknownFunction4b6b30(const char* name) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     Palette8* palette;
 
     if (!entry)

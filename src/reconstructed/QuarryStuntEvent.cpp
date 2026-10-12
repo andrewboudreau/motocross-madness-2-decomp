@@ -248,12 +248,12 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
         chatOverlay->UnknownFunction51dd10();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
-    radarOverlay = radarOverlay->UnknownFunction51b840((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, (int)raceCamera, screen);
+    radarOverlay = radarOverlay->LoadMap((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, (int)raceCamera, screen);
     if (!radarOverlay)
         sprintf(message, "Radar Overlay not created.\n");
 
     statsOverlay = new(__FILE__, 1451) StatsOverlay(1);
-    statsOverlay = statsOverlay->UnknownFunction5194b0((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen);
+    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen);
     if (!statsOverlay)
         sprintf(message, "Stats Overlay not created.\n");
 
@@ -325,7 +325,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             g_TrackGame->mode.field_0x6c0 = 1;
             ShowOnOffMessage(0x1414, 1);
         }
-        chatOverlay->UnknownFunction51e910(-1);
+        chatOverlay->RedrawNameTags(-1);
         return 1;
     }
     if (UnknownFunction43caa0(0x31, 0, event, 0x80000000) && statsOverlay) {
@@ -418,7 +418,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         g_TrackGame->mode.videoSettings[1] = level;
         g_TrackGame->mode.videoSettings[2] = level;
         g_TrackGame->mode.videoSettings[4] = level;
-        eventTerrain->UnknownFunction507960(level);
+        eventTerrain->SelectQuality(level);
         if (ecoSystem)
             ecoSystem->UnknownFunction4594c0(level);
         if (eventFog)
@@ -444,7 +444,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         g_TrackGame->mode.videoSettings[1] = level;
         g_TrackGame->mode.videoSettings[2] = level;
         g_TrackGame->mode.videoSettings[4] = level;
-        eventTerrain->UnknownFunction507960(level);
+        eventTerrain->SelectQuality(level);
         if (ecoSystem)
             ecoSystem->UnknownFunction4594c0(level);
         if (eventFog)

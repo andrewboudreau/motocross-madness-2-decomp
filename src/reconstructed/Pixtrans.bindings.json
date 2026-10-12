@@ -52,7 +52,7 @@
   "?ReplaceColor24@@YAHPAXUUnknownPixel24@@1HHH@Z": "0x004d1a20",
   "?ReplaceColor16@@YAHPAXGGHHH@Z": "0x004d1ac0",
   "?ReplaceColor8@@YAHPAXEEHHH@Z": "0x004d1b40",
-  "?UnknownFunction4d1b90@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
+  "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
   "?UnknownFunction4de280@UnknownTexturePalette@@QAEPAEXZ": "0x004de280",
   "?UnknownFunction4de290@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",

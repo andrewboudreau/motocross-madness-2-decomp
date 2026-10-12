@@ -957,7 +957,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
-                dialogBackground->UnknownFunction404da0();
+                dialogBackground->MarkAllDirty();
         }
     } else {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -965,7 +965,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
             if (dialogBackground)
-                dialogBackground->UnknownFunction404da0();
+                dialogBackground->MarkAllDirty();
         }
     }
     g_TrackGame->field_0x3444->field_0x45c = bikes->GetRowData(-1);
@@ -1054,9 +1054,9 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         viewEye.y = 1.0f;
         *target = g_TrackGame->ui->garageFocus;
         viewTarget.y += 3.0f;
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
+        g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(*target);
-        g_TrackGame->ui->garageCamera->UnknownFunction42f190(
+        g_TrackGame->ui->garageCamera->SetViewport(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);
         viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
@@ -1065,7 +1065,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
         srand(ReadClock());
         if (dialogBackground)
-            previewRegion = dialogBackground->UnknownFunction4040f0(0);
+            previewRegion = dialogBackground->AllocRegion(0);
         break;
     }
     case kDialogListSelect:
@@ -1135,7 +1135,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogClose:
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
-            dialogBackground->UnknownFunction404200(previewRegion);
+            dialogBackground->ReleaseRegion(previewRegion);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
         break;
     }

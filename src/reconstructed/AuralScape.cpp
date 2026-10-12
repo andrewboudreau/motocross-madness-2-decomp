@@ -395,7 +395,7 @@ SoultreeSoundEmitter* SoultreeSoundEmitter::UnknownFunction4029f0(void* target, 
         Release();
         return 0;
     }
-    field_0x1a8 = part->UnknownFunction4fdae0(partName);
+    field_0x1a8 = part->FindByName(partName);
     return this;
 }
 
@@ -403,9 +403,9 @@ SoultreeSoundEmitter* SoultreeSoundEmitter::UnknownFunction4029f0(void* target, 
 int SoultreeSoundEmitter::UnknownVirtualSlot10(float frameTime) {
     Vector3 position = kVec3Zero;
     if (field_0x1a8)
-        field_0x1a8->UnknownFunction4fc9a0(0, &position);
+        field_0x1a8->GetPositionIn(0, &position);
     else
-        field_0x1a4->UnknownFunction4fc9a0(0, &position);
+        field_0x1a4->GetPositionIn(0, &position);
     field_0x190 = field_0x150.position;
     field_0x150.position = position;
     if (field_0x34)

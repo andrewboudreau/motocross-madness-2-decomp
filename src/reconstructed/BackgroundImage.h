@@ -46,8 +46,8 @@ public:
     virtual int UnknownVirtualSlot27(UnknownSurfaceInterface* surface);
 
     void SetImage(PCTextureMap* image);                // 0x004040b0: sets the image
-    int UnknownFunction4040f0(int owner);               // 0x004040f0: allocates a region
-    void UnknownFunction404200(int index);              // 0x00404200: releases a region
+    int AllocRegion(int owner);               // 0x004040f0: allocates a region
+    void ReleaseRegion(int index);              // 0x00404200: releases a region
     void UnknownFunction404240(int index, CameraRect* rect); // 0x00404240
     int RestoreRegions();                               // 0x004042e0: restores the regions
     int ClearRegionDepth();                             // 0x004043c0: clears their depth
@@ -64,11 +64,11 @@ public:
     CameraRect& CurrentRegionRect(int index) {
         return regionTable[index].frameRects[((PCRenderTarget*)field_0x18)->field_0x18];
     }
-    int UnknownFunction404c80();                        // 0x00404c80: releases the DC
+    int ReleaseDc();                        // 0x00404c80: releases the DC
     void UnknownFunction404cb0(int index);              // 0x00404cb0
     void ResetPendingRects();                           // 0x00404cd0: resets pending rectangles
     void UnknownFunction404d30(int index);              // 0x00404d30
-    void UnknownFunction404da0();                       // 0x00404da0: marks everything dirty
+    void MarkAllDirty();                       // 0x00404da0: marks everything dirty
 
     PCTextureMap* field_0x2c;              // image
     int field_0x30;                        // visible

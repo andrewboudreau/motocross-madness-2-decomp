@@ -18,14 +18,14 @@ struct UnknownResourceEntry {
 // full declaration ResourceManager.cpp compiles against (do not include both).
 class UnknownResourceManager {
 public:
-    UnknownResourceEntry* UnknownFunction4e9360(const char* name, int a); // 0x004e9360: finds `name`
+    UnknownResourceEntry* FindItem(const char* name, int a); // 0x004e9360: finds `name`
     // 0x004e9030: adds an archive and returns it; 0x004e9830 removes one.
     UnknownTextureStream* UnknownFunction4e9030(const char* path, int flags);
-    void UnknownFunction4e9830(UnknownTextureStream* archive);
+    void RemoveArchiveItems(UnknownTextureStream* archive);
     // 0x004e9430 loads `name` from `path`; 0x004e96b0 takes `name` over from
     // the global manager (SceneManager 0x004f0310).
-    void UnknownFunction4e9430(const char* name, const char* path);
-    void UnknownFunction4e96b0(const char* name, int a);
+    void AddLooseFile(const char* name, const char* path);
+    void AddObject(const char* name, int a);
     // 0x004e93f0 / 0x004e9010: the entry recorded for `object` (0 if none),
     // and its removal (TextureMap's destructor).
     void* UnknownFunction4e93f0(void* object);

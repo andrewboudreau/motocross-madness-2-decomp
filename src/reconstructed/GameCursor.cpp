@@ -40,7 +40,7 @@ GameObject* GameCursor::UnknownFunction43ea70(void* target, UnknownControlBindin
     field_0x34 = 0;
     field_0x44 = background;
     if (background)
-        field_0x48 = background->UnknownFunction4040f0(0);
+        field_0x48 = background->AllocRegion(0);
     field_0x3c = x;
     field_0x40 = y;
     if (UnknownFunction43ebd0(image, textures, palette, palette8))
@@ -60,7 +60,7 @@ GameObject* GameCursor::UnknownFunction43eaf0(void* target, const char* image, T
     field_0x34 = 0;
     field_0x44 = background;
     if (background)
-        field_0x48 = background->UnknownFunction4040f0(0);
+        field_0x48 = background->AllocRegion(0);
     if (UnknownFunction43ebd0(image, textures, palette, palette8))
         return this;
     Release();
@@ -72,13 +72,13 @@ GameCursor::~GameCursor() {
     if (field_0x34)
         field_0x34->Release();
     if (field_0x44)
-        field_0x44->UnknownFunction404200(field_0x48);
+        field_0x44->ReleaseRegion(field_0x48);
 }
 
 // 0x0043ebd0
 int GameCursor::UnknownFunction43ebd0(const char* image, TextureMapManager* textures, void* palette,
                                       Palette8* palette8) {
-    UnknownTgaFile* file = UnknownFunction5125c0(image, 0, (int)g_UnknownResourceManager572b44);
+    UnknownTgaFile* file = LoadFile(image, 0, (int)g_UnknownResourceManager572b44);
     if (!file)
         return 0;
 
@@ -102,11 +102,11 @@ int GameCursor::UnknownFunction43ebd0(const char* image, TextureMapManager* text
             goto failed;
         field_0x34->UnknownVirtualSlot18(0xff00ff);
     }
-    UnknownFunction512dd0(file);
+    FreeFile(file);
     return 1;
 
 failed:
-    UnknownFunction512dd0(file);
+    FreeFile(file);
     return 0;
 }
 

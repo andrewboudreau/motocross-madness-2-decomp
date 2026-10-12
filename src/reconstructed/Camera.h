@@ -43,23 +43,23 @@ public:
 
     // 0x0042e8e0, called by slot 13: re-applies the default limits through
     // 0x0042e960 and slot 28 when +0x1bc/+0x1c0 differ from them.
-    int UnknownFunction42e8e0();
+    int ReapplyDefaultLimits();
     // 0x0042e960: +0x1bc = max(minimum, g_UnknownFloat550f6c),
     // +0x1c0 = min(maximum, g_UnknownFloat550f70).
-    void UnknownFunction42e960(float minimum, float maximum);
+    void ClampLimits(float minimum, float maximum);
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
     // 0x0042e930: stores a nonzero value in +0x16c and refreshes +0x1d0
     // (FollowCamera slot 47 passes 66.0f).
     void SetFieldOfView(float value);
     // 0x0042e9b0 (EventManager slot 10): sets each non-null part of the
     // camera frame; the two directions are stored normalized.
-    void UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,
+    void SetFrame(const Vector3* position, const Vector3* forward, const Vector3* up,
                                const float* roll, const float* fov);
     // 0x0042f0e0: sets (absolute) or offsets the viewport x/width, derives the
     // height from +0x1b8, centres it vertically in +0x1c8 and resubmits it.
     int SetViewportWidth(int x, int width, int absolute);
     // 0x0042f190: stores the viewport, clamped to +0x1c4/+0x1c8, and resubmits it.
-    int UnknownFunction42f190(int x, int y, int width, int height);
+    int SetViewport(int x, int y, int width, int height);
     // 0x0042f210: the viewport as left/top/right/bottom.
     void GetViewportRect(CameraRect* rect);
 

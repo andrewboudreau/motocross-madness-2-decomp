@@ -115,6 +115,6 @@ public:
 };
 
 // 0x00518640: formats whole seconds as "mm:ss".
-void UnknownFunction518640(char* text, float seconds);
+void FormatMinutesSeconds(char* text, float seconds);
 // 0x00518690: formats a lap time as "m:ss.ss", or "--:--.--" when unset.
-void UnknownFunction518690(char* text, float seconds);
+void FormatLapTime(char* text, float seconds);

@@ -210,7 +210,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
     }
 }
 
-int DebugOverlay::UnknownFunction4484f0()
+int DebugOverlay::ShowNextPage()
 {
     if (++field_0x26c4 >= nextPage) {
         field_0x26c4 = 0;

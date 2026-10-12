@@ -26,7 +26,7 @@ TextureMap::TextureMap(TextureMapManager* manager, int registered) {
     field_0x18 = 0;
     field_0x20 = 0;
     if (registered && manager)
-        manager->UnknownFunction5112f0(this);
+        manager->RegisterTexture(this);
     field_0x44 = 0;
     field_0x30 = 0;
     field_0x28 = 0;
@@ -52,7 +52,7 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
     int dataSize;
     if (choice)
         manager = choice->field_0x00;
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     if (entry) {
         if (entry->field_0x10) {
             if (addRef)
@@ -92,14 +92,14 @@ failed:
             return 0;
         }
     } else {
-        file = UnknownFunction5125c0(name, 0, (int)g_UnknownResourceManager572b44);
+        file = LoadFile(name, 0, (int)g_UnknownResourceManager572b44);
         if (!file)
             return 0;
         width = file->width;
         height = file->height;
     }
 
-    int alpha = UnknownFunction511ad0(format);
+    int alpha = IsFormat4444Or8888(format);
     TextureMap* map;
     if (choice && (alpha && choice->field_0x08 || !alpha && choice->field_0x04))
         map = new(__FILE__, 207) ManagedTexture(manager);
@@ -125,7 +125,7 @@ failed:
         int halvings = choice->field_0x14;
         while (width > 32 && halvings--) {
             int sourceFormat = file->bitsPerPixel == 16 ? 0x22b : (file->bitsPerPixel == 24 ? 0x378 : 0x22b8);
-            if (UnknownFunction4d1b90(file->bits, file->bits, width / 2, height / 2, width / 2, width, 1,
+            if (Downsample(file->bits, file->bits, width / 2, height / 2, width / 2, width, 1,
                                       sourceFormat, texturePalette, 2)) {
                 width /= 2;
                 height /= 2;
@@ -137,9 +137,9 @@ failed:
         map->UnknownVirtualSlot4(file->bits, width, height, width, minimumSize, sourceFormat, format,
                                  texturePalette, flags, surfacePalette, 1, 0, addressU, addressV, choice,
                                  alphaThreshold, key);
-        UnknownFunction512dd0(file);
+        FreeFile(file);
         if (!entry)
-            g_UnknownResourceManager572b44->UnknownFunction4e96b0(name, (int)map);
+            g_UnknownResourceManager572b44->AddObject(name, (int)map);
     } else if (map->UnknownVirtualSlot5(entry->field_0x14, width, height, minimumSize, fileFormat, dataSize,
                                         format, texturePalette, flags, surfacePalette, addressU, addressV,
                                         choice, alphaThreshold, key)) {
@@ -156,7 +156,7 @@ TextureMap::~TextureMap() {
     if (field_0x28)
         field_0x28->Release();
     if (field_0x10)
-        field_0x10->UnknownFunction511300(this);
+        field_0x10->UnregisterTexture(this);
     void* entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
     if (entry)
         g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, 0);
@@ -164,7 +164,7 @@ TextureMap::~TextureMap() {
 
 // 0x0050abd0
 int TextureMap::UnknownFunction50abd0(int addressU, int addressV) {
-    if (UnknownFunction511ad0(field_0x20)) {
+    if (IsFormat4444Or8888(field_0x20)) {
         for (int i = 0; i < field_0x44; i++) {
             if (field_0x48[i].state == 0x13)
                 field_0x48[i].value = addressU;

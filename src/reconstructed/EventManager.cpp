@@ -263,7 +263,7 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
         for (int i = 0; i < podiumCharacterCount; i++)
             podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
-        podiumCamera->UnknownFunction42e9b0(&podiumCameraPosition, 0, 0, 0, 0);
+        podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
         podiumCamera->UnknownVirtualSlot29(podiumFocus);
         if (!g_TrackGame->field_0x3438 && g_TrackGame->field_0x3434 > 7.0f) {
             g_TrackGame->uiInteractionBlocked = 0;

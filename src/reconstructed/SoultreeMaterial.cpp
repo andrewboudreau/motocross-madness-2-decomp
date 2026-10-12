@@ -202,7 +202,7 @@ void SoultreeMaterial::LoadTexture()
     int procedural = 0;
     if (!_stricmp(textureName, "PROCEDURAL"))
         procedural = 1;
-    int alpha = UnknownFunction511ad0(format);
+    int alpha = IsFormat4444Or8888(format);
     TextureMap* texture;
     if (procedural) {
         if (field_0x74.opaqueTextures && field_0x74.alphaTextures) {

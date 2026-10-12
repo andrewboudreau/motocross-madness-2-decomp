@@ -67,7 +67,7 @@ UnknownTextureStream::~UnknownTextureStream()
 UnknownTextureStream* UnknownTextureStream::UnknownFunction460d70(const char* name)
 {
     if (field_0x12c) {
-        ResourceItem* item = field_0x12c->UnknownFunction4e9360(name, 0);
+        ResourceItem* item = field_0x12c->FindItem(name, 0);
         if (item) {
             field_0x130 = item->field_0x18;
             field_0x04 = item->field_0x1c;

@@ -28,7 +28,7 @@
 // ebp for `this` and the view. A goto out of the loop, a flag, drawing
 // inside the loop and separate loop variables spill the index instead.
 
-// StatsOverlay::UnknownFunction5194b0 (0x005194b0, 976 bytes): the
+// StatsOverlay::LoadPanel (0x005194b0, 976 bytes): the
 // candidate is 956 bytes with the same instruction sequence. Six identical
 // cases give retail's jump table. Retail places the LOGFONT (0x3c bytes)
 // below the two rectangles in the frame; VC6 here puts the rectangles first
@@ -212,7 +212,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
             nameTags[racerCount]->drawWidth = 0;
         }
     }
-    UnknownFunction51e910(-1);
+    RedrawNameTags(-1);
     return 1;
 }
 
@@ -235,7 +235,7 @@ int StatsOverlay::DrawStandings()
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
         float limit = g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f;
-        UnknownFunction518640(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s", label);
     }
     iterator = 0;
@@ -305,7 +305,7 @@ fail:
 }
 
 // 0x005194b0
-StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureMapManager* manager, void* camera,
+StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* manager, void* camera,
                                                   UnknownOverlayRect screen)
 {
     const char* font;

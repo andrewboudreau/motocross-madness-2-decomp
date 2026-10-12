@@ -183,7 +183,7 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
     area.bottom = 256;
     rendered = 0;
     expected = 0;
-    UnknownTgaFile* file = UnknownFunction5125c0("partblt.tga", 0, 0);
+    UnknownTgaFile* file = LoadFile("partblt.tga", 0, 0);
     RenderTarget* render = target;
     if (!render) {
         for (int i = 0; i < displayModeCount; i++) {
@@ -211,7 +211,7 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
             if (!image->UnknownVirtualSlot4(file->bits, file->width, file->height, file->width, file->width,
                                             file->bitsPerPixel == 16 ? 0x22b : 0x378, render->field_0x28, 0, 0,
                                             render->field_0x04->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
-                UnknownFunction512dd0(file);
+                FreeFile(file);
                 result = -2;
             } else {
                 expected = new (__FILE__, 2097) PCTextureMap(0, 0);
@@ -223,10 +223,10 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
                                               render->field_0x28, render->field_0x28, 0, 0,
                                               render->field_0x04->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
                 if (!rendered->UnknownVirtualSlot8(1, 0, 1)) {
-                    UnknownFunction512dd0(file);
+                    FreeFile(file);
                     result = -4;
                 } else {
-                    UnknownFunction512dd0(file);
+                    FreeFile(file);
                     if (TestPartialTextureUpload((PCRenderTarget*)render, &area, image, expected, rendered, this, 1) != 1) {
                         result = -1;
                     } else {

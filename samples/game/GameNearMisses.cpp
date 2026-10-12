@@ -73,7 +73,7 @@ int Game::UnknownFunction467b70(char*) {
     field_0x30 = 0;
     if (field_0x2d4_bit2) {
         int category = g_MemTagStack->Push("DebugOverlay");
-        debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->UnknownFunction447de0(renderTarget, field_0x3c, 8, 3, 3);
+        debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, field_0x3c, 8, 3, 3);
         if (debugOverlay) {
             rootObject->AppendChild(debugOverlay, -1);
             if (g_UnknownGlobal56c470->field_0x2c) {

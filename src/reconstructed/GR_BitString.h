@@ -41,7 +41,7 @@ public:
     void UnknownFunction4239c0(int count);
     void UnknownFunction423b70(int count);
     // 0x00423ef0: reads the next `count` bits, most significant first.
-    unsigned int UnknownFunction423ef0(int count);
+    unsigned int ReadBits(int count);
 
     int field_0x04;
     void* field_0x08;

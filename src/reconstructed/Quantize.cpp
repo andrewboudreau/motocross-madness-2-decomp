@@ -7,7 +7,7 @@
 
 // 0x004dddd0
 ColorMapper* ColorMapper::UnknownFunction4dddd0(const char* name) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     ColorMapper* mapper;
 
     if (!entry)

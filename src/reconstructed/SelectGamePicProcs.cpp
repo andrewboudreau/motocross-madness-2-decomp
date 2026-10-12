@@ -1440,7 +1440,7 @@ void MPEventDlg::ShowHostSettings() {
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x92f);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
-        UnknownFunction518640(text, g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f);
+        FormatMinutesSeconds(text, g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f);
         laps->AddRow(text, (int)g_TrackGame->mode.field_0x27f8.field_0x140, 0);
     }
     if (g_TrackGame->mode.lobbyRank > 0 && g_TrackGame->mode.lobbyRank < 0x65)
@@ -1672,7 +1672,7 @@ void MPEventDlg::ApplyEventType() {
         label->SetTextFromResource(g_TrackGame->resourceInstance, 0x92f);
         laps->RemoveAllRows();
         for (int i = 2; i <= 5; i++) {
-            UnknownFunction518640(text, i * 60.0f);
+            FormatMinutesSeconds(text, i * 60.0f);
             laps->AddRow(text, i, 0);
         }
         laps->SelectRowByData((int)g_TrackGame->mode.field_0x27f8.field_0x140);
@@ -1865,9 +1865,9 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         viewEye.y = 1.0f;
         *target = g_TrackGame->ui->garageFocus;
         viewTarget.y += 3.0f;
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
+        g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(*target);
-        g_TrackGame->ui->garageCamera->UnknownFunction42f190(
+        g_TrackGame->ui->garageCamera->SetViewport(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);
         viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
@@ -1876,7 +1876,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
         srand(ReadClock());
         if (dialogBackground)
-            previewRegion = dialogBackground->UnknownFunction4040f0(1);
+            previewRegion = dialogBackground->AllocRegion(1);
         if ((g_TrackGame->mode.lobbyPresetFlags & 4) || g_UnknownGlobal689df4) {
             FindControl("ButWrench", 0)->SetEnabled(0);
             FindControl("DDLBikes", 6)->SetEnabled(0);
@@ -1958,7 +1958,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
-            dialogBackground->UnknownFunction404200(previewRegion);
+            dialogBackground->ReleaseRegion(previewRegion);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
         break;
     }
@@ -2044,7 +2044,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
-                dialogBackground->UnknownFunction404da0();
+                dialogBackground->MarkAllDirty();
             if (g_UnknownGlobal689df4)
                 engine->SetEnabled(0);
         }
@@ -2054,7 +2054,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
             if (dialogBackground)
-                dialogBackground->UnknownFunction404da0();
+                dialogBackground->MarkAllDirty();
         }
     }
     g_TrackGame->mode.field_0x1974.field_0xc4 = bikes->GetRowData(-1);

@@ -180,7 +180,7 @@ int Downsample24To8888(void* destination, void* source, int width, int height, i
 
 // 0x004d1b90: downsamples `source` into the width x height `destination`
 // with the helper for `format`; 0 for other formats.
-int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, int format, UnknownTexturePalette* palette, int filter);
 
 // 0x004d1d20: copies `source` into `destination`, converting the format;

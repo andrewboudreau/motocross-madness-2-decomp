@@ -986,9 +986,9 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         viewEye.y = 1.0f;
         *target = g_TrackGame->ui->garageFocus;
         viewTarget.y += 3.0f;
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
+        g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(*target);
-        g_TrackGame->ui->garageCamera->UnknownFunction42f190(
+        g_TrackGame->ui->garageCamera->SetViewport(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);
         viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
@@ -997,7 +997,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
         srand(ReadClock());
         if (dialogBackground)
-            previewRegion = dialogBackground->UnknownFunction4040f0(1);
+            previewRegion = dialogBackground->AllocRegion(1);
         break;
     }
     case kDialogListSelect:
@@ -1067,7 +1067,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
-            dialogBackground->UnknownFunction404200(previewRegion);
+            dialogBackground->ReleaseRegion(previewRegion);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
         break;
     }
@@ -1151,7 +1151,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
 int SPBikeRiderDlg::UnknownVirtualSlot13() {
     int result = UIDialog::UnknownVirtualSlot13();
     if (dialogBackground)
-        dialogBackground->UnknownFunction404c80();
+        dialogBackground->ReleaseDc();
     if (bikeChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
@@ -1197,7 +1197,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
-                dialogBackground->UnknownFunction404da0();
+                dialogBackground->MarkAllDirty();
         }
     } else {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -1205,7 +1205,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
             if (dialogBackground)
-                dialogBackground->UnknownFunction404da0();
+                dialogBackground->MarkAllDirty();
         }
     }
     g_TrackGame->mode.field_0x1974.field_0xc4 = bikes->GetRowData(-1);
@@ -2042,7 +2042,7 @@ void LeaveMenusForRace() {
     }
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
     if (g_TrackGame->ui->gui->field_0x03c)
-        g_TrackGame->ui->gui->field_0x03c->UnknownFunction404c80();
+        g_TrackGame->ui->gui->field_0x03c->ReleaseDc();
     if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
         g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {

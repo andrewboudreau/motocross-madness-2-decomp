@@ -291,7 +291,7 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
 int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
 {
     if (dialogBackground)
-        dialogBackground->UnknownFunction404da0();
+        dialogBackground->MarkAllDirty();
     Vector3 offset;
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
@@ -304,7 +304,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         float distance = viewDistance;
         turned *= distance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
         previewDragged = 1;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
@@ -313,7 +313,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
     }
     g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);

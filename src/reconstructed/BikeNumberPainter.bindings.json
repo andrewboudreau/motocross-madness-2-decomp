@@ -3,7 +3,7 @@
   "??_C@_0L@COPB@PROCEDURAL?$AA@": "0x005679f0",
   "?UnknownFunction417580@UnknownBikeNumberPainter@@QAEXHHPAVPCTextureMap@@@Z": "0x00417580",
   "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHPAUSoultreeTextureOptions@@HIHH@Z": "0x0050a590",
-  "?UnknownFunction510670@ManagedTexture@@QAEXXZ": "0x00510670",
+  "?Reregister@ManagedTexture@@QAEXXZ": "0x00510670",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ffbcccccd0000000000": "0x005507d0",

@@ -110,18 +110,18 @@ void UnknownFunction4a03d0(unsigned char* output, const void* input, int size)
     unsigned char* dst = output;
 
     GR_BitString bits(input, size * 8, 0);
-    bits.UnknownFunction423ef0(32);
+    bits.ReadBits(32);
     if (!UnknownFunction4a0360())
         return;
     for (;;) {
         UnknownFunction4a0310();
-        oldCode = bits.UnknownFunction423ef0(g_lzwCodeBits);
+        oldCode = bits.ReadBits(g_lzwCodeBits);
         if (oldCode == LZW_END_OF_STREAM)
             return;
         character = oldCode;
         *dst++ = (unsigned char)oldCode;
         for (;;) {
-            newCode = bits.UnknownFunction423ef0(g_lzwCodeBits);
+            newCode = bits.ReadBits(g_lzwCodeBits);
             if (newCode == LZW_END_OF_STREAM)
                 return;
             if (newCode == LZW_FLUSH_CODE)

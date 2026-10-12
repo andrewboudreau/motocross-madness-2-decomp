@@ -41,7 +41,7 @@ void ManagedTexture::UpdatePageCoords(int level) {
 }
 
 // 0x00510670
-void ManagedTexture::UnknownFunction510670() {
+void ManagedTexture::Reregister() {
     if (group)
         group->field_0x44.Remove(this);
     if (page)

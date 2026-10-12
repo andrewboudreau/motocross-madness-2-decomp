@@ -14,7 +14,7 @@
   "?UnknownFunction50c6c0@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?RemoveTexture@CacheTexture@@QAEXPAVManagedTexture@@@Z": "0x005102b0",
   "?UpdatePageCoords@ManagedTexture@@QAEXH@Z": "0x00510610",
-  "?UnknownFunction510670@ManagedTexture@@QAEXXZ": "0x00510670",
+  "?Reregister@ManagedTexture@@QAEXXZ": "0x00510670",
   "?ReleasePage@ManagedTexture@@QAEXXZ": "0x00510700",
   "?UnknownFunction510760@ManagedTexture@@QAEHHHH@Z": "0x00510760",
   "?RemapTexCoords@ManagedTexture@@QAEXPAM0000HI@Z": "0x00510780",

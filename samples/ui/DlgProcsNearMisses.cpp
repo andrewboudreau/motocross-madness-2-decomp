@@ -366,7 +366,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
 // itself), animates the previews and now and then plays a rider idle motion.
 int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     if (dialogBackground)
-        dialogBackground->UnknownFunction404da0();
+        dialogBackground->MarkAllDirty();
     Vector3 offset;
     Vector3 turned;
     GUIInputDevice* pointer = guiUser->pointerDevice;
@@ -379,7 +379,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         float distance = viewDistance;
         turned *= distance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
         previewDragged = 1;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
@@ -388,7 +388,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
-        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
         g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
     }
     g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
@@ -481,9 +481,9 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             button->SetText(title);
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                UnknownFunction518690(time, g_TrackGame->eventManager->results[i].fastestLap);
+                FormatLapTime(time, g_TrackGame->eventManager->results[i].fastestLap);
                 if (g_TrackGame->eventManager->results[i].finished)
-                    UnknownFunction518690(best, g_TrackGame->eventManager->results[i].totalRunningTime);
+                    FormatLapTime(best, g_TrackGame->eventManager->results[i].totalRunningTime);
                 else
                     g_TrackGame->LoadResourceString(0xff0, best, 0x80);
                 sprintf(score, "%s (%s)", time, best);
@@ -600,9 +600,9 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
             if (!g_TrackGame->eventManager->results[i].field_0x24) {
                 sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                UnknownFunction518690(time, g_TrackGame->eventManager->results[i].fastestLap);
+                FormatLapTime(time, g_TrackGame->eventManager->results[i].fastestLap);
                 if (g_TrackGame->eventManager->results[i].finished)
-                    UnknownFunction518690(best, g_TrackGame->eventManager->results[i].totalRunningTime);
+                    FormatLapTime(best, g_TrackGame->eventManager->results[i].totalRunningTime);
                 else
                     g_TrackGame->LoadResourceString(0xff0, best, 0x80);
                 sprintf(score, "%s (%s)", time, best);
@@ -683,8 +683,8 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 if (!g_TrackGame->eventManager->results[i].field_0x24) {
                     sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
-                    UnknownFunction518690(score, g_TrackGame->eventManager->results[i].field_0x1c);
-                    UnknownFunction518690(points, g_TrackGame->eventManager->results[i].field_0x18);
+                    FormatLapTime(score, g_TrackGame->eventManager->results[i].field_0x1c);
+                    FormatLapTime(points, g_TrackGame->eventManager->results[i].field_0x18);
                     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
                         sprintf(points, "%d", g_TrackGame->eventManager->results[i].points);
                         AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score,

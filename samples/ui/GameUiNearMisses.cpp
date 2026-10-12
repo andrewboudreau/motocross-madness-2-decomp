@@ -228,12 +228,12 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
         strcpy(name, file);
         row.textLines = 0;
         row.field_0x30 = 0;
-        UnknownTgaFile* header = UnknownFunction511d00(file, 0, (int)g_UnknownResourceManager572b44);
+        UnknownTgaFile* header = OpenAndReadHeader(file, 0, (int)g_UnknownResourceManager572b44);
         if (!header)
             return 0;
         row.width = header->width;
         row.height = header->height;
-        UnknownFunction512dd0(header);
+        FreeFile(header);
     }
     rowTable[rowCount] = row;
     SetRowData(rowCount, data);
@@ -323,7 +323,7 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
         isSound = 0;
         frameSound = 0;
         frameTextures = (int)textures;
-        UnknownTgaFile* image = UnknownFunction5125c0(file, 0, (int)g_UnknownResourceManager572b44);
+        UnknownTgaFile* image = LoadFile(file, 0, (int)g_UnknownResourceManager572b44);
         if (image) {
             frameWidth = image->width;
             frameHeight = image->height;
@@ -341,7 +341,7 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             sprintf(message, "UIFrame(): Warning! Error loading frame: %s\n", file);
         }
         if (image)
-            UnknownFunction512dd0(image);
+            FreeFile(image);
     } else {
         frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
         frameSound->UnknownFunction4bc320(file, 0, 1, 3, b, -1);
@@ -580,7 +580,7 @@ int UIEditBox::Draw() {
             if (g_TrackGame->display->freezeFrameIndex &&
                 ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (ownerDialog && ownerDialog->dialogBackground)
-                    ownerDialog->dialogBackground->UnknownFunction404c80();
+                    ownerDialog->dialogBackground->ReleaseDc();
                 HIMC context = ImmGetContext((HWND)g_TrackGame->windowHandle);
                 if (ImmGetOpenStatus(context)) {
                     COMPOSITIONFORM composition;
@@ -1054,7 +1054,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
                     parameters.UnknownFunction4b7ec0("BackgroundFile", "", buffer, -1);
                     if (buffer[0] && dialogBackground) {
-                        UnknownTgaFile* file = UnknownFunction5125c0(buffer, 0, (int)g_UnknownResourceManager572b44);
+                        UnknownTgaFile* file = LoadFile(buffer, 0, (int)g_UnknownResourceManager572b44);
                         if (file) {
                             ownsBackground = 1;
                             if (parentDialog)
@@ -1066,8 +1066,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                                 dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialogPalette)->field_0x708 : 0,
                                 4, dialogPalette ? ((Palette8*)dialogPalette)->field_0x70c : 0, 0, 0, 2, 1, 0,
                                 0x80, 0xff00ff);
-                            dialogBackground->UnknownFunction404da0();
-                            UnknownFunction512dd0(file);
+                            dialogBackground->MarkAllDirty();
+                            FreeFile(file);
                         }
                     } else if (parentDialog) {
                         dialogBackground = parentDialog->dialogBackground;
@@ -1116,7 +1116,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         }
                         parameters.UnknownFunction4b7ec0("PaletteFile", "", buffer, -1);
                         if (buffer[0] && load) {
-                            UnknownResourceEntry* resource = g_UnknownResourceManager572b44->UnknownFunction4e9360(buffer, 1);
+                            UnknownResourceEntry* resource = g_UnknownResourceManager572b44->FindItem(buffer, 1);
                             if (resource) {
                                 dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->field_0x14);
                                 ownsPalette = 1;
@@ -1152,11 +1152,11 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7ec0("Files1", "", buffer, -1);
                     UnknownTokenizer files(buffer);
                     for (char* file = files.UnknownFunction515df0(","); file; file = files.UnknownFunction515df0(",")) {
-                        if (g_UnknownResourceManager572b44->UnknownFunction4e9360(sectionTable[i].sectionName, 1))
+                        if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1))
                             imageTable[imageCount]->LoadFromModule(
                                 sectionTable[i].sectionName, (int)g_UnknownResourceManager572b44, (int)soundGroup,
                                 dialogPalette);
-                        else if (g_UnknownResourceManager572b44->UnknownFunction4e9360(file, 1))
+                        else if (g_UnknownResourceManager572b44->FindItem(file, 1))
                             imageTable[imageCount]->LoadFromModule(
                                 file, (int)g_UnknownResourceManager572b44, (int)soundGroup, dialogPalette);
                         else
@@ -1174,10 +1174,10 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("Copies", 0, &copies);
                     parameters.UnknownFunction4b7ec0("File", "", buffer, -1);
                     int flags = isStatic ? 1 : 2;
-                    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(sectionTable[i].sectionName, 1)) {
+                    if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1)) {
                         soundTable[soundCount] =
                             UnknownFunction4bb890(soundGroup, sectionTable[i].sectionName, flags, 3, copies, -1);
-                    } else if (g_UnknownResourceManager572b44->UnknownFunction4e9360(buffer, 1)) {
+                    } else if (g_UnknownResourceManager572b44->FindItem(buffer, 1)) {
                         soundTable[soundCount] =
                             UnknownFunction4bb890(soundGroup, buffer, flags, 3, copies, -1);
                     } else {

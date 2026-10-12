@@ -47,7 +47,7 @@
   "?UnknownFunction461aa0@UnknownTextureStream@@QAEHPADH@Z": "0x00461aa0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?GetPosition@CarProceduralNode@@QAEXPAUVector3@@@Z": "0x004fc970",
-  "?UnknownFunction4fdae0@CarProceduralNode@@QAEPAV1@PBD@Z": "0x004fdae0",
+  "?FindByName@CarProceduralNode@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?UnknownFunction4fe0a0@CarProceduralNode@@QAEXPAUVector3@@0@Z": "0x004fe0a0",
   "?UnknownVirtualSlot27@CarProcedural@@UAEPAV1@PAXPBD1HH01PBUVector3@@MHMHIMMM@Z": "0x0042f600",
   "?UnknownVirtualSlot27@CarProcedural@@UAEPAV1@PAXPBD1HH01PBUVector3@@MHMHIMMM@Z$ehhandler": "0x00549de2",

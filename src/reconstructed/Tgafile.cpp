@@ -264,7 +264,7 @@ void FillPixelFormat(int format, void* pixelFormat) {
 }
 
 // 0x00511ad0: whether a pixel format is 4444 or 8888.
-int UnknownFunction511ad0(int format) {
+int IsFormat4444Or8888(int format) {
     if (format != 4444)
         return format == 8888;
     return 1;
@@ -333,7 +333,7 @@ failed:
 
 // 0x00511d00: opens `path` "rb" in a new stream (Tgafile.cpp line 494) and
 // reads its header; 0 when it cannot be opened.
-UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, int a) {
+UnknownTgaFile* OpenAndReadHeader(const char* path, UnknownTgaFile* file, int a) {
     UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream(a);
     if (!stream->UnknownFunction460f50(path, "rb", 0)) {
         delete stream;
@@ -346,7 +346,7 @@ UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, in
 
 // 0x00511dd0: reads the header and then the pixels for its depth; frees
 // the file when the pixels cannot be read.
-UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
+UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
     file = ReadTgaHeader(stream, file, offset);
     if (!file)
         return 0;
@@ -601,7 +601,7 @@ int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
 // and the pixels for its depth and names the file after the path; frees the
 // file when the pixels cannot be read. Each failure deletes the stream on
 // its own path.
-UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, int a) {
+UnknownTgaFile* LoadFile(const char* path, UnknownTgaFile* file, int a) {
     UnknownTextureStream* stream = new(__FILE__, 567) UnknownTextureStream(a);
     if (!stream->UnknownFunction460f50(path, "rb", 0)) {
         delete stream;
@@ -709,7 +709,7 @@ void FillTgaHeader16(UnknownTgaFile* file, void* bits, int width, int height) {
 }
 
 // 0x00512dd0: frees a loaded file, its pixels and +0x120.
-void UnknownFunction512dd0(UnknownTgaFile* file) {
+void FreeFile(UnknownTgaFile* file) {
     if (file) {
         if (file->bits)
             DebugFree(file->bits, __FILE__, 865);

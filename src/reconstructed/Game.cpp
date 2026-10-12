@@ -305,7 +305,7 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
         return 1;
     if (field_0x2d4_bit2 && debugOverlay && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
         if (debugOverlay->field_0x25_bit0) {
-            if (debugOverlay->UnknownFunction4484f0())
+            if (debugOverlay->ShowNextPage())
                 debugOverlay->UnknownVirtualSlot4();
         } else {
             debugOverlay->UnknownVirtualSlot5();

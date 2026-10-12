@@ -62,7 +62,7 @@ public:
     virtual void SoultreeVirtualSlot8(SoultreeObject* source, SoultreeObject* target); // 0x004feb30 (ret 8)
 
     // soultree.cpp helpers (thiscall).
-    int UnknownFunction4fda30();                                   // 0x004fda30: node count of the subtree
+    int CountNodes();                                   // 0x004fda30: node count of the subtree
     void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
     void UnknownFunction4fdb40();                                  // 0x004fdb40
     void UnknownFunction4fdb50();                                  // 0x004fdb50

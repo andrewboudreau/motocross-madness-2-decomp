@@ -480,9 +480,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             }
         }
         if (g_TrackGame->field_0x2d5_bit2) {
-            field_0x94 = (GameObject*)g_TrackGame->field_0x3c->UnknownFunction511180(
+            field_0x94 = (GameObject*)g_TrackGame->field_0x3c->CreateGroup(
                 ((PCRenderTarget*)field_0x18)->field_0x28, 0, 2, 1);
-            field_0x98 = (GameObject*)g_TrackGame->field_0x3c->UnknownFunction511180(0x115c, 0, 2, 1);
+            field_0x98 = (GameObject*)g_TrackGame->field_0x3c->CreateGroup(0x115c, 0, 2, 1);
         }
     }
     modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->field_0x3c;
@@ -679,7 +679,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction435fe0();
                 ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction432120(1);
                 ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction4394d0(caster->field_0x08, 0x68);
-            } else if (caster->field_0x0c && ((D3DIMSoultreeObject*)caster->field_0x04)->UnknownFunction4fda30() == 1) {
+            } else if (caster->field_0x0c && ((D3DIMSoultreeObject*)caster->field_0x04)->CountNodes() == 1) {
                 ((UnknownQuarryCollision*)caster->field_0x0c)->UnknownFunction435fe0();
                 ((UnknownQuarryCollision*)caster->field_0x0c)->UnknownFunction432120(1);
             }
@@ -857,7 +857,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     field_0x50 = (void*)1;
     if (g_TrackGame->field_0x2d5_bit2) {
         g_MemTagStack->Push("TextureCache");
-        g_TrackGame->field_0x3c->UnknownFunction5113d0();
+        g_TrackGame->field_0x3c->ShareCacheLimit();
     }
     g_MemTagStack->Pop(0);
     eventScene->UnknownFunction4eff30(g_TrackGame->mode.videoSettings[2]);
