@@ -429,8 +429,8 @@ public:
     int field_0x5c0;                          // TrackGame+0x1008 copy (slot 23 key 0x30)
     UnknownBikeRaceRider* riderCharacter;     // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
-    CarProceduralCollision* field_0x5f0;      // paired with the other racers' (the loader)
-    CarProceduralCollision* field_0x5f4;
+    CarProceduralCollision* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
+    CarProceduralCollision* rearWheel;        // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
     UnknownBikeRaceRacerPart604* field_0x604;
     unsigned char field_0x608[0x734 - 0x608];

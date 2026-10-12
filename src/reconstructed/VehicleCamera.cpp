@@ -148,7 +148,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
     Vector3 result = TargetPoint();
     if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
         if (vehicleMode) {
-            if (!vehicle->field_0x444) {
+            if (!vehicle->crashState) {
                 float lead = 0.2f < dt ? 0.2f : dt;
                 result += UnknownVirtualSlot33() * lead;
             }
@@ -171,7 +171,7 @@ void VehicleCamera::UnknownVirtualSlot67() {
 // 0x0052bff0: holds while the vehicle reports +0x444; otherwise cycles the
 // state list in vehicle mode or resets to state 0.
 void VehicleCamera::UnknownVirtualSlot72() {
-    if (vehicleMode && vehicle && vehicle->field_0x444)
+    if (vehicleMode && vehicle && vehicle->crashState)
         return;
     if (!vehicleMode) {
         cameraState = 0;

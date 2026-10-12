@@ -687,7 +687,7 @@ void RadarOverlay::DrawRacers(int mode)
         if (racers[i] == radarCamera->followedRacer) {
             mapOrigin = racers[i]->position;
             mapAngle = -racers[i]->heading;
-            if (racers[i]->field_0x444)
+            if (racers[i]->crashState)
                 mapAngle = heldMapAngle;
             else
                 heldMapAngle = mapAngle;

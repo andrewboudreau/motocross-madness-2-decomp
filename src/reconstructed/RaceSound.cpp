@@ -743,13 +743,13 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
 
     for (i = 0; i < channelsInUse; i++) {
         currentRacer = engineChannels[i].channelRacer;
-        if (!currentRacer->field_0x444) {
+        if (!currentRacer->crashState) {
             crashHandled[i] = 0;
             racerWreckSound[i] = 0;
             racerFallSound[i] = 0;
         } else {
             if (!crashHandled[i]) {
-                if (currentRacer == listenerRacer && listenerRacer->field_0x460 == 12) {
+                if (currentRacer == listenerRacer && listenerRacer->crashReason == 12) {
                     launchSound->Stop(1);
                     PlayIfEnabled(launchSound, 0, 0, 0, 0);
                 }

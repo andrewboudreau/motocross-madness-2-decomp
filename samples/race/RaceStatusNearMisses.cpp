@@ -134,9 +134,9 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
             continue;
         {
             int gate = racer->field_0x7b8;
-            status->previousPosition.x = racer->field_0x5f0->field_0x200.x;
-            status->previousPosition.y = racer->field_0x5f0->field_0x200.y;
-            status->previousPosition.z = racer->field_0x5f0->field_0x200.z;
+            status->previousPosition.x = racer->frontWheel->field_0x200.x;
+            status->previousPosition.y = racer->frontWheel->field_0x200.y;
+            status->previousPosition.z = racer->frontWheel->field_0x200.z;
             if (!AdvanceGate(&status->previousPosition, &status->currentPosition, &status->nextGate, firstGate,
                                        &racer->gatesPassed, &racer->field_0x7b8, racer->gateTimes, racer->totalRunningTime,
                                        0, &racer->lapCount, &racer->lastLapTime, &racer->fastestLap,

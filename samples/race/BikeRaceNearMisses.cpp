@@ -1163,8 +1163,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                              ownRiderTexture, 0x3f);
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
-                racerSlots[j]->field_0x5f0->field_0x68 = 1;
-                racerSlots[j]->field_0x5f4->field_0x68 = 1;
+                racerSlots[j]->frontWheel->field_0x68 = 1;
+                racerSlots[j]->rearWheel->field_0x68 = 1;
             }
             racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
             racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
@@ -1218,8 +1218,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             }
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
-                racerSlots[j]->field_0x5f0->field_0x68 = 1;
-                racerSlots[j]->field_0x5f4->field_0x68 = 1;
+                racerSlots[j]->frontWheel->field_0x68 = 1;
+                racerSlots[j]->rearWheel->field_0x68 = 1;
             }
             racerSlots[j]->UnknownVirtualSlot4();
             racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
@@ -1264,8 +1264,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, slots[j].riderName, (int)textures);
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
-                racerSlots[j]->field_0x5f0->field_0x68 = 1;
-                racerSlots[j]->field_0x5f4->field_0x68 = 1;
+                racerSlots[j]->frontWheel->field_0x68 = 1;
+                racerSlots[j]->rearWheel->field_0x68 = 1;
             }
             racerSlots[j]->UnknownVirtualSlot4();
             racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
@@ -1304,8 +1304,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
         if (!g_TrackGame->mode.raceSettings.treeCollision) {
             localRacer->field_0x128->field_0x68 = 1;
-            localRacer->field_0x5f0->field_0x68 = 1;
-            localRacer->field_0x5f4->field_0x68 = 1;
+            localRacer->frontWheel->field_0x68 = 1;
+            localRacer->rearWheel->field_0x68 = 1;
         }
         localRacer->engineSize = ((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->engineSize;
         localRacer->engineKind = (char)((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->engineKind;
@@ -1446,8 +1446,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 }
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     aiRacers[n]->field_0x128->field_0x68 = 1;
-                    aiRacers[n]->field_0x5f0->field_0x68 = 1;
-                    aiRacers[n]->field_0x5f4->field_0x68 = 1;
+                    aiRacers[n]->frontWheel->field_0x68 = 1;
+                    aiRacers[n]->rearWheel->field_0x68 = 1;
                 }
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(id, 1, recordIndex++, aiName, path, riderFile, bikeTexture,
@@ -1507,8 +1507,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, slots[j].riderName, (int)textures);
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     racerSlots[j]->field_0x128->field_0x68 = 1;
-                    racerSlots[j]->field_0x5f0->field_0x68 = 1;
-                    racerSlots[j]->field_0x5f4->field_0x68 = 1;
+                    racerSlots[j]->frontWheel->field_0x68 = 1;
+                    racerSlots[j]->rearWheel->field_0x68 = 1;
                 }
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(slots[j].networkPlayerId, (char)slots[j].racerIndex, recordIndex++,
@@ -1532,29 +1532,29 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 if (racerSlots[b]->field_0x735) {
                     racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x1418);
                     racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x1414);
-                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
-                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->rearWheel);
                     racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
                     racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x1418);
                     racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x1414);
-                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
-                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->rearWheel);
                     racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
                 }
-                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x1418);
-                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x1414);
-                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
-                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
-                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
-                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x1418);
-                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x1414);
-                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
-                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
-                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->rearWheel);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->rearWheel);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
                 racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x1418);
                 racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x1414);
-                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
-                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->rearWheel);
                 racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(
                     racerSlots[b]->field_0x604->field_0x38);
             }

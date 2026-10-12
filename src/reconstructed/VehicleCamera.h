@@ -47,10 +47,10 @@ struct UnknownCameraVehicle {
     float field_0x438;                   // KrustyBikeCamera slot 34 divisor
     float field_0x43c;                   // VehicleCamera slot 42 scale
     int field_0x440;
-    int field_0x444;                     // VehicleCamera slots 72, 74, 75
+    int crashState;                           // +0x444 VehicleCamera slots 72, 74, 75
     unsigned char field_0x448[0x45c - 0x448];
     float field_0x45c;                   // VehicleCamera slot 39
-    int field_0x460;                     // BikeCamera slot 75 tests 6
+    int crashReason;                          // +0x460 BikeCamera slot 75 tests 6
     int field_0x464;                     // VehicleCamera slot 39
     unsigned char field_0x468[0x488 - 0x468];
     Vector3 field_0x488;                 // 0x0052bc50 in vehicle mode
@@ -134,7 +134,7 @@ public:
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
     virtual bool UnknownVirtualSlot74() {
         if (vehicleMode) {
-            bool active = vehicle->field_0x444 != 0;
+            bool active = vehicle->crashState != 0;
             return active;
         }
         return false;
@@ -145,7 +145,7 @@ public:
     int UnknownInlineIdle() {
         if (!vehicleMode)
             return 1;
-        return vehicle->field_0x444 == 0;
+        return vehicle->crashState == 0;
     }
 
 protected:

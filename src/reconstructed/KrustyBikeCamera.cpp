@@ -111,7 +111,7 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
 
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
-    if (vehicleMode && !bike->field_0x444) {
+    if (vehicleMode && !bike->crashState) {
         g_TrackGame->mode.field_0x23c0 = field_0x22c;
         g_TrackGame->mode.field_0x23c4 = field_0x234;
         g_TrackGame->mode.field_0x23bc = field_0x220;

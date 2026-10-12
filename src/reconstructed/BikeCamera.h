@@ -33,9 +33,9 @@ struct UnknownCameraBike {
     unsigned char field_0x05c[0x3bc - 0x5c];
     UnknownVehiclePart* field_0x3bc;
     unsigned char field_0x3c0[0x444 - 0x3c0];
-    int field_0x444;
+    int crashState;                           // +0x444
     unsigned char field_0x448[0x460 - 0x448];
-    int field_0x460;
+    int crashReason;                          // +0x460
     unsigned char field_0x464[0x5c4 - 0x464];
     UnknownCameraBikeRider* riderCharacter;   // +0x5c4
     unsigned char field_0x5c8[0x604 - 0x5c8];

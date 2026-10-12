@@ -110,8 +110,8 @@ struct UnknownQuarryRacer {
     unsigned char field_0x3c0[0x5c4 - 0x3c0];
     UnknownQuarryRacerRider* riderCharacter;      // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
-    UnknownQuarryCollision* field_0x5f0;
-    UnknownQuarryCollision* field_0x5f4;
+    UnknownQuarryCollision* frontWheel;           // +0x5f0
+    UnknownQuarryCollision* rearWheel;            // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
     UnknownQuarryRacerState* field_0x604;
     unsigned char field_0x608[0x735 - 0x608];
@@ -709,8 +709,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                             if (!racer->field_0x735) {
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x1418);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x1414);
-                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x5f0);
-                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x5f4);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->frontWheel);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->rearWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)
                                     ->AddIgnoredOwner(racer->field_0x604->field_0x38);
                             }
@@ -740,8 +740,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                     if (!racer->field_0x735) {
                         ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1418);
                         ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1414);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x5f0);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x5f4);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->frontWheel);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->rearWheel);
                         ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x604->field_0x38);
                     }
                 }

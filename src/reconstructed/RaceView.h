@@ -115,9 +115,9 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x124[0x3bc - 0x124];
     UnknownVehiclePart* vehicleModel;         // +0x3bc model; racesnd.cpp reads its position
     unsigned char field_0x3c0[0x444 - 0x3c0];
-    int field_0x444;                               // racesnd.cpp 0x004e39b0
+    int crashState;                           // +0x444 racesnd.cpp 0x004e39b0
     unsigned char field_0x448[0x460 - 0x448];
-    int field_0x460;                               // racesnd.cpp tests 12
+    int crashReason;                          // +0x460 racesnd.cpp tests 12
     unsigned char field_0x464[0x478 - 0x464];
     bool throttleOn;                          // +0x478 racesnd.cpp: throttle on
     bool field_0x479;
@@ -129,7 +129,7 @@ struct UnknownEventRacer : virtual public GameObject {
     UnknownCameraBikeRider* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
     unsigned char field_0x5c8[0x5e0 - 0x5c8];
     char racerName[0x10];                     // +0x5e0 name
-    UnknownEventRacerModel* field_0x5f0;           // RaceStatus.cpp 0x004e6a50 takes its +0x200 position
+    UnknownEventRacerModel* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
     UnknownCameraBikeState* field_0x604;           // racesnd.cpp 0x004e39b0 reads its +0xb0
     unsigned char field_0x608[0x734 - 0x608];
