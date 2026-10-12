@@ -371,9 +371,9 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->field_0x350 : "";
+    const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
-        logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
+        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
     } else {
         logFont.lfWeight = 400;
         face = "Small Fonts";
@@ -644,9 +644,9 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->field_0x350 : "";
+    const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
-        logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
+        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
         strcpy(logFont.lfFaceName, face);
     } else {
         logFont.lfWeight = 400;

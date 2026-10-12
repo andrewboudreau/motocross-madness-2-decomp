@@ -23,7 +23,7 @@ struct UnknownPickCamera {
     unsigned char field_0x000[0xac];
     float field_0x0ac[3][4];
     unsigned char field_0x0dc[0x170 - 0xdc];
-    Vector3 position;                         // +0x170 position
+    Vector3 eyePosition;                      // +0x170 (Camera::eyePosition)
     unsigned char field_0x17c[0x198 - 0x17c];
     float field_0x198;
     int field_0x19c;

@@ -21,9 +21,9 @@ struct UnknownKrustyUIGuiLayer {
     void ForgetDevices();             // 0x00487d60
 
     unsigned char field_0x00[0x30];
-    GameObject* field_0x30;                   // the cursor (bikerace.cpp slot 23 tests its +0x25 bit 0)
+    GameObject* userCursor;                   // +0x30 the cursor (bikerace.cpp slot 23 tests its +0x25 bit 0)
     unsigned char field_0x34[0xc0 - 0x34];
-    UnknownKrustyUIGuiLayerItem* field_0xc0;
+    UnknownKrustyUIGuiLayerItem* userToolTip; // +0xc0
 };
 
 class TextureMapManager;
@@ -53,17 +53,17 @@ public:
     void ReleaseBackground();                            // 0x00485fc0: releases the background
 
     unsigned char field_0x000[0x3c];
-    BackgroundImage* field_0x03c;             // the background (dlgprocs.cpp 0x004536e0)
+    BackgroundImage* guiBackground;           // +0x03c the background (dlgprocs.cpp 0x004536e0)
     unsigned char field_0x040[0xec - 0x40];
     int field_0x0ec;                          // from TrackGame+0xc40 (KrustyUI 0x004988a0)
     unsigned char field_0x0f0[0x30c - 0xf0];
     int field_0x30c;
     unsigned char field_0x310[0x34c - 0x310];
     int field_0x34c;
-    char field_0x350[0x3d0 - 0x350];          // font face (TrackOverlay 0x0051b320)
+    char toolTipFontFace[0x3d0 - 0x350];      // +0x350 font face (TrackOverlay 0x0051b320)
     float field_0x3d0;                        // string 0xfed's value when nonzero
-    int field_0x3d4;                          // string 0x1469's value; bold font
-    int field_0x3d8;                          // italic font (TrackOverlay 0x0051b320)
+    int toolTipBold;                          // +0x3d4 string 0x1469's value; bold font
+    int toolTipItalic;                        // +0x3d8 italic font (TrackOverlay 0x0051b320)
     unsigned char field_0x3dc[0x3e0 - 0x3dc];
 };
 

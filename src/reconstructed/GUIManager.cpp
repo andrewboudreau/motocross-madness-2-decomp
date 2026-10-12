@@ -118,13 +118,13 @@ GUICursor::~GUICursor() {
 void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
     cursorAnimation = animation;
     if (!animation)
-        field_0x38 = 0;
+        currentFrame = 0;
 }
 
 // 0x00485170
 int GUICursor::UnknownVirtualSlot15() {
     if (cursorAnimation)
-        field_0x38 = cursorAnimation->AdvancePastSounds();
+        currentFrame = cursorAnimation->AdvancePastSounds();
     return GameCursor::UnknownVirtualSlot15();
 }
 

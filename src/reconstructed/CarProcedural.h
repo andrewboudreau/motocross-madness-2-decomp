@@ -114,7 +114,7 @@ public:
 
     unsigned char field_0x40[0x54 - 0x40];   // the GraphicsTest base ends at +0x40
     CarProceduralBody* field_0x54;
-    int field_0x58;                            // has contact
+    int hasContact;                           // +0x58 has contact
     CarProceduralContact* field_0x5c;
     unsigned char field_0x60[0x68 - 0x60];
     int field_0x68;
@@ -151,20 +151,20 @@ public:
     Vector3 field_0x40;
     float field_0x4c;
     int field_0x50;
-    int field_0x54;                            // set once slot 10 has run its first update
+    int started;                              // +0x54 set once slot 10 has run its first update
     int field_0x58;
     int field_0x5c;
-    unsigned int field_0x60;                   // wheel count
-    unsigned int field_0x64;                   // current path key
+    unsigned int numWheels;                   // +0x60 wheel count
+    unsigned int currentPathKey;              // +0x64 current path key
     int field_0x68;
-    unsigned int field_0x6c;                   // path key count
-    char field_0x70[0x100];                    // name (at most 0xff characters)
-    float field_0x170;                         // speed
-    float field_0x174;                         // 1 / speed
+    unsigned int pathKeyCount;                // +0x6c path key count
+    char carName[0x100];                      // +0x70 name (at most 0xff characters)
+    float pathSpeed;                          // +0x170 speed
+    float inversePathSpeed;                   // +0x174 1 / speed
     float field_0x178;
     float field_0x17c;
     float field_0x180;
-    float field_0x184;                         // 1 / wheel radius
+    float inverseWheelRadius;                 // +0x184 1 / wheel radius
     float field_0x188;
     float field_0x18c;
     float field_0x190;
@@ -176,7 +176,7 @@ public:
     float field_0x1a8;
     float field_0x1ac;
     float field_0x1b0;
-    CarProceduralKey* field_0x1b4;             // path keys
+    CarProceduralKey* pathKeys;               // +0x1b4 path keys
     Vector3 field_0x1b8;
     Vector3 field_0x1c4;
     Vector3 field_0x1d0;
@@ -184,8 +184,8 @@ public:
     Vector3 field_0x1e8;
     Vector3 field_0x1f4;
     Vector3 field_0x200;
-    void* field_0x20c;                         // the ground query provider (CarProceduralTerrain in slot 10)
-    CarProceduralNode** field_0x210;           // wheels
+    void* groundProvider;                     // +0x20c the ground query provider (CarProceduralTerrain in slot 10)
+    CarProceduralNode** wheelNodes;           // +0x210 wheels
     Vector3 field_0x214;
     Vector3 field_0x220;
 };

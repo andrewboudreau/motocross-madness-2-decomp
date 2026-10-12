@@ -46,14 +46,14 @@ public:
     // +0x2c/+0x30.
     UnknownCursorPosition CursorPosition();
 
-    int field_0x2c;                           // hot spot offset
-    int field_0x30;
-    PCTextureMap* field_0x34;                 // image
-    int field_0x38;                           // current frame (a PCTextureMap*), 0: the image
-    UnknownControlBinding* field_0x3c;        // x
-    UnknownControlBinding* field_0x40;        // y
-    BackgroundImage* field_0x44;
-    int field_0x48;                           // background region, -1 when none
+    int hotSpotX;                             // +0x2c hot spot offset
+    int hotSpotY;                             // +0x30
+    PCTextureMap* cursorTexture;              // +0x34 image
+    int currentFrame;                         // +0x38 current frame (a PCTextureMap*), 0: the image
+    UnknownControlBinding* bindingX;          // +0x3c x
+    UnknownControlBinding* bindingY;          // +0x40 y
+    BackgroundImage* backgroundImage;         // +0x44
+    int backgroundRegion;                     // +0x48 background region, -1 when none
     int field_0x4c;
     float field_0x50;                         // scale of the destination's far corner
     int field_0x54;                           // position

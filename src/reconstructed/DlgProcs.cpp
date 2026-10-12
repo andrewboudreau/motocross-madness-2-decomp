@@ -2041,8 +2041,8 @@ void LeaveMenusForRace() {
             g_TrackGame->eventManager->results[i].points = 0;
     }
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
-    if (g_TrackGame->ui->gui->field_0x03c)
-        g_TrackGame->ui->gui->field_0x03c->ReleaseDc();
+    if (g_TrackGame->ui->gui->guiBackground)
+        g_TrackGame->ui->gui->guiBackground->ReleaseDc();
     if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
         g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {

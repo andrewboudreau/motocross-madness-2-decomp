@@ -890,14 +890,14 @@ TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
 {
     GameObject::UnknownVirtualSlot8(target);
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->field_0x350 : "";
+    const char* face = gui ? gui->toolTipFontFace : "";
     int weight = 700;
     int italic = 1;
     if (*face == '\0') {
         face = "Arial";
     } else {
-        weight = gui->field_0x3d4 ? 700 : 500;
-        italic = gui->field_0x3d8;
+        weight = gui->toolTipBold ? 700 : 500;
+        italic = gui->toolTipItalic;
     }
     textFont = CreateFontA(17, 0, 0, 0, weight, italic, 0, 0, 1, 0, 0, 2, 2, face);
     shadowRect = rect;

@@ -52,7 +52,7 @@ int ObjectPicker::PickAt(int x, int y) {
     lastPickX = x;
     lastPickY = y;
     camera = (UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera;
-    position = camera->position;
+    position = camera->eyePosition;
     u = (float)x - camera->viewportX - camera->viewportWidth / 2;
     v = (float)y - (((RenderTarget*)field_0x18)->targetHeight - camera->viewportY - camera->viewportHeight) -
         camera->viewportHeight / 2;

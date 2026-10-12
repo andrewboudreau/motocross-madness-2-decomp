@@ -18,14 +18,14 @@
 
 // 0x0043ea00
 GameCursor::GameCursor(int flags) : GameObject(flags) {
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x34 = 0;
-    field_0x38 = 0;
-    field_0x2c = 1;
-    field_0x30 = 1;
-    field_0x44 = 0;
-    field_0x48 = -1;
+    bindingX = 0;
+    bindingY = 0;
+    cursorTexture = 0;
+    currentFrame = 0;
+    hotSpotX = 1;
+    hotSpotY = 1;
+    backgroundImage = 0;
+    backgroundRegion = -1;
     field_0x4c = 0;
     field_0x50 = 1.0f;
 }
@@ -35,14 +35,14 @@ GameObject* GameCursor::CreateBound(void* target, UnknownControlBinding* x, Unkn
                                               const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
     GameObject::UnknownVirtualSlot8(target);
-    field_0x2c = 1;
-    field_0x30 = 1;
-    field_0x34 = 0;
-    field_0x44 = background;
+    hotSpotX = 1;
+    hotSpotY = 1;
+    cursorTexture = 0;
+    backgroundImage = background;
     if (background)
-        field_0x48 = background->AllocRegion(0);
-    field_0x3c = x;
-    field_0x40 = y;
+        backgroundRegion = background->AllocRegion(0);
+    bindingX = x;
+    bindingY = y;
     if (LoadCursorTexture(image, textures, palette, palette8))
         return this;
     Release();
@@ -53,14 +53,14 @@ GameObject* GameCursor::CreateBound(void* target, UnknownControlBinding* x, Unkn
 GameObject* GameCursor::Create(void* target, const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
     GameObject::UnknownVirtualSlot8(target);
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x2c = 1;
-    field_0x30 = 1;
-    field_0x34 = 0;
-    field_0x44 = background;
+    bindingX = 0;
+    bindingY = 0;
+    hotSpotX = 1;
+    hotSpotY = 1;
+    cursorTexture = 0;
+    backgroundImage = background;
     if (background)
-        field_0x48 = background->AllocRegion(0);
+        backgroundRegion = background->AllocRegion(0);
     if (LoadCursorTexture(image, textures, palette, palette8))
         return this;
     Release();
@@ -69,10 +69,10 @@ GameObject* GameCursor::Create(void* target, const char* image, TextureMapManage
 
 // 0x0043eb60
 GameCursor::~GameCursor() {
-    if (field_0x34)
-        field_0x34->Release();
-    if (field_0x44)
-        field_0x44->ReleaseRegion(field_0x48);
+    if (cursorTexture)
+        cursorTexture->Release();
+    if (backgroundImage)
+        backgroundImage->ReleaseRegion(backgroundRegion);
 }
 
 // 0x0043ebd0
@@ -84,23 +84,23 @@ int GameCursor::LoadCursorTexture(const char* image, TextureMapManager* textures
 
     int height = file->height;
     int width = file->width;
-    if (field_0x34)
-        field_0x34->Release();
-    field_0x34 = new(__FILE__, 128) PCTextureMap(textures, 1);
+    if (cursorTexture)
+        cursorTexture->Release();
+    cursorTexture = new(__FILE__, 128) PCTextureMap(textures, 1);
 
     if (file->bitsPerPixel == 32) {
-        if (!field_0x34->UnknownVirtualSlot4(file->bits, width, height, width, width, 0x22b8, 0x115c, 0, 4, 0,
+        if (!cursorTexture->UnknownVirtualSlot4(file->bits, width, height, width, width, 0x22b8, 0x115c, 0, 4, 0,
                                              0, 0, 2, 1, 0, 0x80, 0xff00ff))
             goto failed;
     } else {
-        if (!field_0x34->UnknownVirtualSlot4(file->bits, width, height, width, width,
+        if (!cursorTexture->UnknownVirtualSlot4(file->bits, width, height, width, width,
                                              file->bitsPerPixel == 16 ? 0x22b : 0x378,
                                              ((PCRenderTarget*)field_0x18)->surfacePixelFormat,
                                              (UnknownTexturePalette*)palette, 4,
                                              ((PCRenderTarget*)field_0x18)->targetDisplay->field_0x198, 0, 0, 2, 1, 0,
                                              0x80, 0xff00ff))
             goto failed;
-        field_0x34->UnknownVirtualSlot18(0xff00ff);
+        cursorTexture->UnknownVirtualSlot18(0xff00ff);
     }
     FreeFile(file);
     return 1;
@@ -125,9 +125,9 @@ int GameCursor::UnknownVirtualSlot15() {
     GameObject::UnknownVirtualSlot15();
 
     int outside = 0;
-    if (field_0x3c && field_0x40) {
-        field_0x54 = (int)field_0x3c->currentValue;
-        field_0x58 = (int)field_0x40->currentValue;
+    if (bindingX && bindingY) {
+        field_0x54 = (int)bindingX->currentValue;
+        field_0x58 = (int)bindingY->currentValue;
     } else {
         RECT window;
         RECT client;
@@ -178,8 +178,8 @@ int GameCursor::UnknownVirtualSlot15() {
     if (field_0x58 >= target->targetHeight)
         field_0x58 = target->targetHeight - 1;
 
-    s_right = (field_0x38 ? ((PCTextureMap*)field_0x38)->textureWidth : field_0x34->textureWidth) + field_0x54;
-    s_bottom = (field_0x38 ? ((PCTextureMap*)field_0x38)->textureHeight : field_0x34->textureHeight) + field_0x58;
+    s_right = (currentFrame ? ((PCTextureMap*)currentFrame)->textureWidth : cursorTexture->textureWidth) + field_0x54;
+    s_bottom = (currentFrame ? ((PCTextureMap*)currentFrame)->textureHeight : cursorTexture->textureHeight) + field_0x58;
     if (s_right >= ((RenderTarget*)field_0x18)->targetWidth)
         s_right = ((RenderTarget*)field_0x18)->targetWidth;
     if (s_bottom >= ((RenderTarget*)field_0x18)->targetHeight)
@@ -194,16 +194,16 @@ int GameCursor::UnknownVirtualSlot15() {
     s_source.right = s_right - field_0x54;
     s_source.bottom = s_bottom - field_0x58;
 
-    if (field_0x44) {
-        PCTextureMap* frame = field_0x38 ? (PCTextureMap*)field_0x38 : field_0x34;
-        field_0x44->DrawImageRect(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
-                                          (frame->usesColorKey != 0) + 0x10, field_0x48, 0, &field_0x4c, 0);
-    } else if (field_0x38) {
-        if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, ((PCTextureMap*)field_0x38)->systemSurface, &s_source,
-                (((PCTextureMap*)field_0x38)->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
+    if (backgroundImage) {
+        PCTextureMap* frame = currentFrame ? (PCTextureMap*)currentFrame : cursorTexture;
+        backgroundImage->DrawImageRect(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
+                                          (frame->usesColorKey != 0) + 0x10, backgroundRegion, 0, &field_0x4c, 0);
+    } else if (currentFrame) {
+        if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, ((PCTextureMap*)currentFrame)->systemSurface, &s_source,
+                (((PCTextureMap*)currentFrame)->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
             goto failed;
     } else {
-        PCTextureMap* image = field_0x34;
+        PCTextureMap* image = cursorTexture;
         if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, image->systemSurface, &s_source,
                 (image->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
             goto failed;
@@ -218,14 +218,14 @@ UnknownCursorPosition GameCursor::CursorPosition() {
     POINT point;
     UnknownCursorPosition position;
 
-    if (field_0x3c && field_0x40) {
-        point.x = (int)field_0x3c->currentValue;
-        point.y = (int)field_0x40->currentValue;
+    if (bindingX && bindingY) {
+        point.x = (int)bindingX->currentValue;
+        point.y = (int)bindingY->currentValue;
     } else {
         GetCursorPos(&point);
     }
-    point.x += field_0x2c;
-    point.y += field_0x30;
+    point.x += hotSpotX;
+    point.y += hotSpotY;
     position.x = point.x;
     position.y = point.y;
     return position;

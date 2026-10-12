@@ -1017,17 +1017,17 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         if (shown == lodDebugPage) {
 
             if (TestInputEvent(0x1c, 0, event, 0x80)) {
-                if (g_TrackGame->ui->gui->GetUser(0)->field_0x30 == 0) {
+                if (g_TrackGame->ui->gui->GetUser(0)->userCursor == 0) {
                     g_TrackGame->ui->gui->CreateCursors("ui\\cursor.tga", 0);
                 }
                 if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
-                          ->GetUser(0)->field_0x30)->field_0x25_bit0) {
+                          ->GetUser(0)->userCursor)->field_0x25_bit0) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;
                         picker->Create(
                             g_TrackGame->renderTarget, 0, PickerHitCallback,
-                            (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->field_0x30);
+                            (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->userCursor);
                         if (AppendChild(objectPicker, -1)) {
                             g_TrackGame->ui->ShowCursors();
                         }

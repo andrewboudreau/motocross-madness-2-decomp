@@ -75,7 +75,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     if (font[0] && _strnicmp(font, "NONE", 4)) {
         gui->UnknownFunction4866c0(font);
         if (g_TrackGame->LoadResourceString(0x1469, text, 128))
-            gui->field_0x3d4 = atoi(text);
+            gui->toolTipBold = atoi(text);
     }
     if (scale != 0.0f)
         gui->field_0x3d0 = scale;
@@ -92,7 +92,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     g_TrackGame->mode.LoadProfile();
     gui->field_0x0ec = g_TrackGame->mode.field_0x6c8;
     if (!g_TrackGame->mode.field_0x6d4)
-        gui->GetUser(0)->field_0xc0->field_0x5c = 0;
+        gui->GetUser(0)->userToolTip->field_0x5c = 0;
     if (g_TrackGame->controlInterface->activeJoystick)
         ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)
             ->UnknownMethod4c3ae0(g_TrackGame->GetRegistryFlag("JoystickFilter", 0));
