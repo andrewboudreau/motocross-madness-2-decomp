@@ -42,10 +42,19 @@ names and the `*MaxSpeed` limits (20/55/100 by default). It loads the
 crowd sounds only in network games (+0x291c).
 
 `0x004e39b0` matches with two source forms worth knowing. Both "state 6"
-resets are written `if (field_0x10 != 6) ... else ...` with identical
+resets are written `if (sampleKind != 6) ... else ...` with identical
 arms, which reproduces retail's dead `cmp ecx, 6`; the source comments
 this. The wreck and fall cues use `if (!index) f(); else if (!playing) f();`.
 
 Near miss (`samples/race/RaceSoundNearMisses.cpp`, notes there): the
 half-buffer refill `0x004e4d10`, where two register-allocation
 differences remain.
+
+Field names come from the loader's literals: the sample tables are named
+after their audio_*.ini keys (`idle_%d` .. `Rev_%d`, the `Total*` counts,
+the `*MaxSpeed` limits) and the Sound members after the file each one
+loads (`+0x83c` is `LandHard01.wav`, played when a racer that was airborne
+last frame lands, so it is `landHardSound`, not an engine). Channel fields
+follow their use in `0x004e39b0`/`0x004e4d10` (voice index, engine, sample
+kind 1..6, byte count and offset, half being filled, next kind, distance).
+The header keeps each offset as a `// +0xNN` comment.

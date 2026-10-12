@@ -10,9 +10,9 @@
 // copies. (2) Second half, looping path: retail keeps half in ebp and the
 // remainder in edx and spills the available byte count, VC6 here spills a
 // temporary and computes the remainder in ebp. The second copy's destination
-// reloads 11025 * field_0x1298 as retail does. Unchanged or worse: a `rest`
+// reloads 11025 * bytesPerSample as retail does. Unchanged or worse: a `rest`
 // local in (2) (before or after the first copy), the destination's
-// association (sampleBuffer + avail + 11025 * field_0x1298, a parenthesised
+// association (sampleBuffer + avail + 11025 * bytesPerSample, a parenthesised
 // offset, `+ half`), and block-scoped `avail`/`rest` in (1).
 
 #include "../../src/reconstructed/RaceSound.cpp"
@@ -35,127 +35,127 @@ void RaceSound::RefillStream() {
     if (!streamChannel->channelSound)
         return;
     streamChannel->channelSound->GetBufferPosition(&play, &write);
-    if (streamChannel->field_0x1c == 1) {
-        if (write < (unsigned long)(16537 * field_0x1298))
+    if (streamChannel->fillHalf == 1) {
+        if (write < (unsigned long)(16537 * bytesPerSample))
             return;
         streamChannel->channelSound->LockBuffer(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
-        if (streamChannel->field_0x20 == 0) {
-            half = 11025 * field_0x1298;
-            avail = streamChannel->field_0x14 - streamChannel->field_0x18;
+        if (streamChannel->nextSampleKind == 0) {
+            half = 11025 * bytesPerSample;
+            avail = streamChannel->sampleBytes - streamChannel->sampleOffset;
             if (half > avail) {
                 rest = half - avail;
-                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->field_0x18, avail);
+                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->sampleOffset, avail);
                 memcpy((char*)streamChannel->sampleBuffer + avail, streamChannel->streamSample, rest);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 = rest;
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset = rest;
             } else {
-                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->field_0x18, half);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 += half;
+                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->sampleOffset, half);
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset += half;
             }
         } else {
-            half = 11025 * field_0x1298;
-            avail = streamChannel->field_0x14 - streamChannel->field_0x18;
+            half = 11025 * bytesPerSample;
+            avail = streamChannel->sampleBytes - streamChannel->sampleOffset;
             if (half > avail) {
                 rest = half - avail;
-                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->field_0x18, avail);
-                switch (streamChannel->field_0x20) {
+                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->sampleOffset, avail);
+                switch (streamChannel->nextSampleKind) {
                 case 1:
-                    j = rand() % field_0x1128[streamChannel->field_0x0c];
-                    streamChannel->streamSample = field_0x840[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x18 = 0;
-                    streamChannel->field_0x14 = field_0xc00[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x10 = 1;
-                    streamChannel->field_0x20 = 0;
+                    j = rand() % idleCount[streamChannel->engine];
+                    streamChannel->streamSample = idleSamples[streamChannel->engine][j];
+                    streamChannel->sampleOffset = 0;
+                    streamChannel->sampleBytes = idleSampleBytes[streamChannel->engine][j];
+                    streamChannel->sampleKind = 1;
+                    streamChannel->nextSampleKind = 0;
                     break;
                 case 3:
-                    j = rand() % field_0x1158[streamChannel->field_0x0c];
-                    streamChannel->streamSample = field_0xa20[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x18 = 0;
-                    streamChannel->field_0x14 = field_0xde0[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x10 = 3;
-                    streamChannel->field_0x20 = 4;
+                    j = rand() % powerBandCount[streamChannel->engine];
+                    streamChannel->streamSample = powerBandSamples[streamChannel->engine][j];
+                    streamChannel->sampleOffset = 0;
+                    streamChannel->sampleBytes = powerBandSampleBytes[streamChannel->engine][j];
+                    streamChannel->sampleKind = 3;
+                    streamChannel->nextSampleKind = 4;
                     break;
                 case 4:
-                    j = rand() % field_0x1170[streamChannel->field_0x0c];
-                    streamChannel->streamSample = field_0xb10[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x18 = 0;
-                    streamChannel->field_0x14 = field_0xed0[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x10 = 4;
-                    streamChannel->field_0x20 = 3;
+                    j = rand() % sputterCount[streamChannel->engine];
+                    streamChannel->streamSample = sputterSamples[streamChannel->engine][j];
+                    streamChannel->sampleOffset = 0;
+                    streamChannel->sampleBytes = sputterSampleBytes[streamChannel->engine][j];
+                    streamChannel->sampleKind = 4;
+                    streamChannel->nextSampleKind = 3;
                     break;
                 }
                 memcpy((char*)streamChannel->sampleBuffer + avail, streamChannel->streamSample, rest);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 = rest;
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset = rest;
             } else {
-                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->field_0x18, half);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 += half;
+                memcpy((char*)streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->sampleOffset, half);
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset += half;
             }
         }
         streamChannel->channelSound->UnlockBuffer(first, half, second, 0);
-        streamChannel->field_0x1c = 2;
-    } else if (streamChannel->field_0x1c == 2) {
-        if (write < (unsigned long)(5512 * field_0x1298) || write > (unsigned long)(11025 * field_0x1298))
+        streamChannel->fillHalf = 2;
+    } else if (streamChannel->fillHalf == 2) {
+        if (write < (unsigned long)(5512 * bytesPerSample) || write > (unsigned long)(11025 * bytesPerSample))
             return;
         streamChannel->channelSound->LockBuffer(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
-        if (streamChannel->field_0x20 == 0) {
-            half = 11025 * field_0x1298;
-            avail = streamChannel->field_0x14 - streamChannel->field_0x18;
+        if (streamChannel->nextSampleKind == 0) {
+            half = 11025 * bytesPerSample;
+            avail = streamChannel->sampleBytes - streamChannel->sampleOffset;
             if (half > avail) {
-                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->field_0x18, avail);
-                memcpy((char*)streamChannel->sampleBuffer + 11025 * field_0x1298 + avail, streamChannel->streamSample, half - avail);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 = half - avail;
+                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->sampleOffset, avail);
+                memcpy((char*)streamChannel->sampleBuffer + 11025 * bytesPerSample + avail, streamChannel->streamSample, half - avail);
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset = half - avail;
             } else {
-                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->field_0x18, half);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 += half;
+                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->sampleOffset, half);
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset += half;
             }
         } else {
-            half = 11025 * field_0x1298;
-            avail = streamChannel->field_0x14 - streamChannel->field_0x18;
+            half = 11025 * bytesPerSample;
+            avail = streamChannel->sampleBytes - streamChannel->sampleOffset;
             if (half > avail) {
                 rest = half - avail;
-                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->field_0x18, avail);
-                switch (streamChannel->field_0x20) {
+                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->sampleOffset, avail);
+                switch (streamChannel->nextSampleKind) {
                 case 1:
-                    j = rand() % field_0x1128[streamChannel->field_0x0c];
-                    streamChannel->streamSample = field_0x840[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x18 = 0;
-                    streamChannel->field_0x14 = field_0xc00[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x10 = 1;
-                    streamChannel->field_0x20 = 0;
+                    j = rand() % idleCount[streamChannel->engine];
+                    streamChannel->streamSample = idleSamples[streamChannel->engine][j];
+                    streamChannel->sampleOffset = 0;
+                    streamChannel->sampleBytes = idleSampleBytes[streamChannel->engine][j];
+                    streamChannel->sampleKind = 1;
+                    streamChannel->nextSampleKind = 0;
                     break;
                 case 3:
-                    j = rand() % field_0x1158[streamChannel->field_0x0c];
-                    streamChannel->streamSample = field_0xa20[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x18 = 0;
-                    streamChannel->field_0x14 = field_0xde0[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x10 = 3;
-                    streamChannel->field_0x20 = 4;
+                    j = rand() % powerBandCount[streamChannel->engine];
+                    streamChannel->streamSample = powerBandSamples[streamChannel->engine][j];
+                    streamChannel->sampleOffset = 0;
+                    streamChannel->sampleBytes = powerBandSampleBytes[streamChannel->engine][j];
+                    streamChannel->sampleKind = 3;
+                    streamChannel->nextSampleKind = 4;
                     break;
                 case 4:
-                    j = rand() % field_0x1170[streamChannel->field_0x0c];
-                    streamChannel->streamSample = field_0xb10[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x18 = 0;
-                    streamChannel->field_0x14 = field_0xed0[streamChannel->field_0x0c][j];
-                    streamChannel->field_0x10 = 4;
-                    streamChannel->field_0x20 = 3;
+                    j = rand() % sputterCount[streamChannel->engine];
+                    streamChannel->streamSample = sputterSamples[streamChannel->engine][j];
+                    streamChannel->sampleOffset = 0;
+                    streamChannel->sampleBytes = sputterSampleBytes[streamChannel->engine][j];
+                    streamChannel->sampleKind = 4;
+                    streamChannel->nextSampleKind = 3;
                     break;
                 }
-                memcpy((char*)streamChannel->sampleBuffer + 11025 * field_0x1298 + avail, streamChannel->streamSample, rest);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 = rest;
+                memcpy((char*)streamChannel->sampleBuffer + 11025 * bytesPerSample + avail, streamChannel->streamSample, rest);
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset = rest;
             } else {
-                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->field_0x18, half);
-                memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
-                streamChannel->field_0x18 += half;
+                memcpy((char*)streamChannel->sampleBuffer + half, (char*)streamChannel->streamSample + streamChannel->sampleOffset, half);
+                memcpy(first, streamChannel->sampleBuffer, 22050 * bytesPerSample);
+                streamChannel->sampleOffset += half;
             }
         }
-        streamChannel->channelSound->UnlockBuffer(first, 22050 * field_0x1298, second, 0);
-        streamChannel->field_0x1c = 1;
+        streamChannel->channelSound->UnlockBuffer(first, 22050 * bytesPerSample, second, 0);
+        streamChannel->fillHalf = 1;
     }
 }
 
