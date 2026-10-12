@@ -67,14 +67,17 @@ public:
 
 struct UnknownWreckerSkeleton;
 
-// 32-byte probe record of the collision model (+0x104, count +0x100).
+// 32-byte probe record of the collision model (+0x104, count +0x100). Field
+// names follow ConstraintProbe in src/krusty2/constraint/ConstraintMethodCollisionModel.h.
 struct UnknownWreckerProbe {
-    Vector3 field_0x00;        // point in the node's space
-    UnknownWreckerSkeleton* field_0x0c;
-    int field_0x10;            // nonzero while the probe touches something
-    Vector3 field_0x14;        // contact normal
+    Vector3 localPoint;        // +0x00 point in the node's space
+    UnknownWreckerSkeleton* node; // +0x0c
+    int hit;                   // +0x10 nonzero while the probe touches something
+    Vector3 normal;            // +0x14 contact normal
 };
 
+// Field names follow src/krusty2/collision/CollisionObject.h (+0x58..+0x84)
+// and ConstraintMethodCollisionModel.h (+0xe8..+0x108).
 class UnknownWreckerCollisionObject : public UnknownWreckerQuadTreeObject, public GraphicsTest {
 public:
     // 0x00439410 (thiscall, ret 4): appends `owner` to the ignore list.
@@ -89,12 +92,12 @@ public:
     }
 
     unsigned char field_0x40[0x58 - 0x40];  // GraphicsTest subobject ends at +0x40
-    int field_0x58;
+    int hasContact;            // +0x58
     unsigned char field_0x5c[0x6c - 0x5c];
-    int field_0x6c;
-    int field_0x70;
+    int collisionEnabled;      // +0x6c
+    int collidable;            // +0x70
     unsigned char field_0x74[0x84 - 0x74];
-    int field_0x84;            // quadtree cell, passed to QuadTree::Remove
+    int quadtreeCell;          // +0x84 quadtree cell, passed to QuadTree::Remove
 };
 
 class UnknownWreckerRigidBody;
@@ -109,15 +112,15 @@ public:
     void UnknownFunction43c7f0(Vector3 offset, int bone);
 
     unsigned char field_0x88[0xe8 - 0x88];
-    int field_0xe8;
-    int field_0xec;
-    float field_0xf0;
-    float field_0xf4;
-    float field_0xf8;
+    int manualStep;            // +0xe8
+    int shapeCollisionEnabled; // +0xec
+    float damping;             // +0xf0
+    float impulseLoss;         // +0xf4
+    float maxImpulse;          // +0xf8
     unsigned char field_0xfc[0x100 - 0xfc];
-    int field_0x100;           // probe count
-    UnknownWreckerProbe* field_0x104;
-    int field_0x108;
+    int probeCount;            // +0x100 probe count
+    UnknownWreckerProbe* probes; // +0x104
+    int applyImpulses;         // +0x108
 };
 
 // Global collision quadtree (0x0068aba4, VisibilityQuadTree's constructor
@@ -155,7 +158,8 @@ struct UnknownWreckerMatrix {
 };
 
 // Scene-graph node (0x004fxxxx methods; the rider's +0x1a0, the rigid
-// body's +0x234 and Wrecker+0xb8 all point at one). Names provisional.
+// body's +0x234 and Wrecker+0xb8 all point at one). Method names provisional;
+// the two field names follow SoultreeObject in src/krusty2/core/SoultreeObject.h.
 struct UnknownWreckerSkeleton {
     void UnknownFunction4fc690(UnknownWreckerSkeleton* frame, Vector3 delta); // 0x004fc690 (ret 0x10)
     void UnknownFunction4fc740(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
@@ -170,9 +174,9 @@ struct UnknownWreckerSkeleton {
     Vector3 UnknownFunction4fd7f0(const Vector3& point);           // 0x004fd7f0 (ret 8)
     void UnknownFunction4fe850(Vector3* a, Vector3* b);            // 0x004fe850 (ret 8)
     unsigned char field_0x000[0x140];
-    UnknownWreckerSkeleton* field_0x140;
+    UnknownWreckerSkeleton* firstChild; // +0x140
     unsigned char field_0x144[0x18c - 0x144];
-    int field_0x18c;
+    int subtreeDirty;          // +0x18c
 };
 
 struct UnknownWreckerRaceState {
@@ -208,11 +212,13 @@ public:
     unsigned char field_0x038[0x190 - 0x38];
     Vector3 field_0x190;
     unsigned char field_0x19c[0x1a0 - 0x19c];
-    UnknownWreckerSkeleton* field_0x1a0;
+    UnknownWreckerSkeleton* skeleton; // +0x1a0
 };
 
 // Object at Wrecker+0x40: RTTI PhysicsRigidBody (new 0x2a8 at line 0x5f,
 // constructor 0x004cc120). Slots past GameObject's 27 are called by number.
+// Field names follow samples/physics/rigidbody/PhysicsBody.h (+0x178 is the
+// mass 0x00532150 scales by 1/12 for the box inertia).
 class UnknownWreckerRigidBody : public GameObject {
 public:
     explicit UnknownWreckerRigidBody(int flags);                   // 0x004cc120
@@ -236,20 +242,20 @@ public:
     virtual void UnknownVirtualSlot44();
 
     unsigned char field_0x02c[0x13c - 0x2c];
-    Vector3 field_0x13c;
-    Vector3 field_0x148;
-    Vector3 field_0x154;
-    Vector3 field_0x160;
-    Vector3 field_0x16c;
-    float field_0x178;
+    Vector3 initialVelocity;   // +0x13c
+    Vector3 initialAngularVelocity; // +0x148
+    Vector3 velocity;          // +0x154
+    Vector3 prevVelocity;      // +0x160
+    Vector3 angularVelocity;   // +0x16c
+    float mass;                // +0x178
     unsigned char field_0x17c[0x190 - 0x17c];
-    Matrix4 field_0x190;
-    Matrix4 field_0x1d0;
+    Matrix4 inertia;           // +0x190
+    Matrix4 invInertia;        // +0x1d0
     unsigned char field_0x210[0x228 - 0x210];
-    Vector3 field_0x228;
-    UnknownWreckerSkeleton* field_0x234;
+    Vector3 centerOfMass;      // +0x228
+    UnknownWreckerSkeleton* node; // +0x234
     unsigned char field_0x238[0x2a4 - 0x238];
-    int field_0x2a4;
+    int stepDisabled;          // +0x2a4
 };
 
 // Object at Wrecker+0x3c: RTTI SelectiveGravityModel (new 0x3c at line
@@ -266,33 +272,33 @@ public:
 // ParticleManager.h documents; 0x00531740 fills position, frame, age,
 // lifetime, size, growth, flags and velocity directly).
 struct UnknownWreckerParticle {
-    Vector3 field_0x00;        // position
-    int field_0x0c;            // colour
-    int field_0x10;            // sprite frame
-    float field_0x14;          // age
-    float field_0x18;          // lifetime
-    float field_0x1c;          // size
-    float field_0x20;          // growth per tick
+    Vector3 position;          // +0x00 position
+    int color;                 // +0x0c colour
+    int frame;                 // +0x10 sprite frame
+    float age;                 // +0x14 age
+    float lifetime;            // +0x18 lifetime
+    float size;                // +0x1c size
+    float growth;              // +0x20 growth per tick
     unsigned char field_0x24[0x34 - 0x24];
-    unsigned int field_0x34;   // flags (4: integrate position, 0x10: gravity)
-    Vector3 field_0x38;        // velocity
-    void* field_0x44;
+    unsigned int flags;        // +0x34 flags (4: integrate position, 0x10: gravity)
+    Vector3 velocity;          // +0x38 velocity
+    void* vertex;              // +0x44
 };
 
 // Particle system at Wrecker+0x11c (Bike hands over its own; RTTI
 // ParticleManager). 0x004baa50 (thiscall, ret 0x20) adds one particle;
-// 0x00531740 takes the next free entry of field_0x40 itself.
+// 0x00531740 takes the next free entry of particles itself.
 class UnknownWreckerParticles : public GameObject {
 public:
     int UnknownFunction4baa50(float age, const Vector3* position, int frame, float size,
                               float lifetime, float growth, unsigned int flags, int color);
 
-    int field_0x2c;            // live particle count (the next free index)
+    int activeCount;           // +0x2c live particle count (the next free index)
     int field_0x30;
     unsigned char field_0x34[0x40 - 0x34];
-    UnknownWreckerParticle* field_0x40[1000];
+    UnknownWreckerParticle* particles[1000]; // +0x40
     unsigned char field_0xfe0[0x1f98 - 0xfe0];
-    Vector3 field_0x1f98;      // gravity (0, -64, 0)
+    Vector3 gravity;           // +0x1f98 gravity (0, -64, 0)
 };
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h declares the
@@ -320,12 +326,12 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00532890
 
     // 0x00530190: slot 8 on the owner, then 0x005301c0; returns this.
-    Wrecker* UnknownFunction530190(void* owner, UnknownWreckerCharacter* character, const char* name);
-    void UnknownFunction5301c0(UnknownWreckerCharacter* character, const char* name);
-    void UnknownFunction5305b0(int value);             // appends to field_0x58
-    void UnknownFunction5305f0(int value);             // appends to field_0x50
-    int UnknownFunction530630(int value);              // appends to field_0x48, returns its index
-    void UnknownFunction530680(UnknownWreckerCollisionObject* object); // appends to field_0x60
+    Wrecker* UnknownFunction530190(void* owner, UnknownWreckerCharacter* rider, const char* name);
+    void UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name);
+    void UnknownFunction5305b0(int value);             // appends to contactAnimations
+    void UnknownFunction5305f0(int value);             // appends to randomAnimations
+    int UnknownFunction530630(int value);              // appends to indexedAnimations, returns its index
+    void UnknownFunction530680(UnknownWreckerCollisionObject* object); // appends to ignoreObjects
     void UnknownFunction5327c0();
     void UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents);
     void UnknownFunction5329e0(float frameTime);
@@ -339,42 +345,42 @@ public:
     void UnknownFunction532490();
     void UnknownFunction532580();
 
-    UnknownWreckerCharacter* field_0x34;
-    UnknownWreckerCollisionModel* field_0x38;
-    UnknownWreckerGravityModel* field_0x3c;
-    UnknownWreckerRigidBody* field_0x40;
-    int field_0x44;            // wreck state (0 idle, 1..3)
-    int* field_0x48;
-    int field_0x4c;
-    int* field_0x50;
-    int field_0x54;
-    int* field_0x58;
-    int field_0x5c;
-    UnknownWreckerCollisionObject** field_0x60;
-    int field_0x64;
-    float field_0x68;
-    UnknownWreckerFrame field_0x6c; // last pose of field_0xb8
+    UnknownWreckerCharacter* character; // +0x34
+    UnknownWreckerCollisionModel* collisionModel; // +0x38
+    UnknownWreckerGravityModel* gravityModel; // +0x3c
+    UnknownWreckerRigidBody* rigidBody; // +0x40
+    int wreckState;            // +0x44 wreck state (0 idle, 1..3)
+    int* indexedAnimations;    // +0x48
+    int indexedAnimationCount; // +0x4c
+    int* randomAnimations;     // +0x50
+    int randomAnimationCount;  // +0x54
+    int* contactAnimations;    // +0x58
+    int contactAnimationCount; // +0x5c
+    UnknownWreckerCollisionObject** ignoreObjects; // +0x60
+    int ignoreObjectCount;     // +0x64
+    float inertiaFactor;       // +0x68
+    UnknownWreckerFrame lastPose; // +0x6c last pose of poseNode
     int field_0xac;
     int field_0xb0;
     int field_0xb4;
-    UnknownWreckerSkeleton* field_0xb8;
-    Vector3 field_0xbc;
-    Vector3 field_0xc8;
-    int field_0xd4;
-    int field_0xd8;
-    Vector3 field_0xdc;
-    Vector3 field_0xe8;
-    Vector3 field_0xf4;
-    UnknownWreckerSkeleton* field_0x100; // space of the box field_0xe8/field_0xf4
-    Vector3* field_0x104;      // one per collision-model probe
-    int* field_0x108;          // one per collision-model probe
-    Vector3 field_0x10c;
-    float field_0x118;
-    UnknownWreckerParticles* field_0x11c;
-    int field_0x120;           // particle frame, cycles 0..12
-    int field_0x124;
-    float field_0x128[256];    // random values in [0, 1)
-    int field_0x528;
+    UnknownWreckerSkeleton* poseNode; // +0xb8
+    Vector3 linearStep;        // +0xbc
+    Vector3 angularStep;       // +0xc8
+    int pendingAnimation;      // +0xd4
+    int anyProbeHit;           // +0xd8
+    Vector3 hitCenter;         // +0xdc
+    Vector3 boxCenter;         // +0xe8
+    Vector3 boxHalfExtents;    // +0xf4
+    UnknownWreckerSkeleton* boxFrame; // +0x100 space of the box boxCenter/boxHalfExtents
+    Vector3* probePositions;   // +0x104 one per collision-model probe
+    int* probeHits;            // +0x108 one per collision-model probe
+    Vector3 pushImpulse;       // +0x10c
+    float pushScale;           // +0x118
+    UnknownWreckerParticles* particles; // +0x11c
+    int trailFrame;            // +0x120 particle frame, cycles 0..12
+    int sprayFrame;            // +0x124
+    float randomTable[256];    // +0x128 random values in [0, 1)
+    int randomIndex;           // +0x528
     int field_0x52c;
     int field_0x530;
     int field_0x534;

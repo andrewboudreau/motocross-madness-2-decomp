@@ -23,30 +23,30 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 #define RANDOM_UNIT() (rand() * (1.0f / 32768))
 
 Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
-    field_0x48 = 0;
-    field_0x4c = 0;
-    field_0x50 = 0;
-    field_0x54 = 0;
-    field_0x58 = 0;
-    field_0x5c = 0;
-    field_0x60 = 0;
-    field_0x64 = 0;
-    field_0x44 = 0;
+    indexedAnimations = 0;
+    indexedAnimationCount = 0;
+    randomAnimations = 0;
+    randomAnimationCount = 0;
+    contactAnimations = 0;
+    contactAnimationCount = 0;
+    ignoreObjects = 0;
+    ignoreObjectCount = 0;
+    wreckState = 0;
     field_0xac = 0;
     field_0xb4 = 0;
-    field_0xd4 = 0;
-    field_0xd8 = 0;
-    field_0x104 = 0;
-    field_0x108 = 0;
-    field_0xdc = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x10c = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x118 = 5.0f;
-    field_0x120 = 0;
-    field_0x124 = 0x1d;
-    field_0x11c = 0;
+    pendingAnimation = 0;
+    anyProbeHit = 0;
+    probePositions = 0;
+    probeHits = 0;
+    hitCenter = Vector3(0.0f, 0.0f, 0.0f);
+    pushImpulse = Vector3(0.0f, 0.0f, 0.0f);
+    pushScale = 5.0f;
+    trailFrame = 0;
+    sprayFrame = 0x1d;
+    particles = 0;
     for (int i = 0; i < 256; i++)
-        field_0x128[i] = RANDOM_UNIT();
-    field_0x528 = 0;
+        randomTable[i] = RANDOM_UNIT();
+    randomIndex = 0;
     field_0x52c = 0;
     field_0x530 = 0;
     field_0x534 = 0;
@@ -54,89 +54,89 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
 }
 
 Wrecker::~Wrecker() {
-    if (field_0x104) DebugFree(field_0x104, __FILE__, 0x3e);
-    if (field_0x108) DebugFree(field_0x108, __FILE__, 0x40);
-    if (field_0x58) DebugFree(field_0x58, __FILE__, 0x43);
-    if (field_0x50) DebugFree(field_0x50, __FILE__, 0x45);
-    if (field_0x48) DebugFree(field_0x48, __FILE__, 0x47);
+    if (probePositions) DebugFree(probePositions, __FILE__, 0x3e);
+    if (probeHits) DebugFree(probeHits, __FILE__, 0x40);
+    if (contactAnimations) DebugFree(contactAnimations, __FILE__, 0x43);
+    if (randomAnimations) DebugFree(randomAnimations, __FILE__, 0x45);
+    if (indexedAnimations) DebugFree(indexedAnimations, __FILE__, 0x47);
 }
 
-Wrecker* Wrecker::UnknownFunction530190(void* owner, UnknownWreckerCharacter* character, const char* name) {
+Wrecker* Wrecker::UnknownFunction530190(void* owner, UnknownWreckerCharacter* rider, const char* name) {
     GameObject::UnknownVirtualSlot8(owner);
-    UnknownFunction5301c0(character, name);
+    UnknownFunction5301c0(rider, name);
     return this;
 }
 
-void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* character, const char* name) {
-    field_0x34 = character;
-    character->field_0x1a0->UnknownFunction4fc690(0, Vector3(0.0f, 120.0f, 0.0f));
-    field_0x3c = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
-    field_0x3c->UnknownVirtualSlot8(field_0x18);
-    AppendChild(field_0x3c, -1);
-    field_0x40 = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
-    field_0x40->UnknownVirtualSlot8(field_0x18);
-    AppendChild(field_0x40, -1);
-    field_0x40->UnknownVirtualSlot28(field_0x34->field_0x1a0);
-    field_0x3c->UnknownVirtualSlot27(field_0x40);
-    field_0x38 = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
-    field_0x38->UnknownVirtualSlot8(field_0x18);
-    field_0x38->UnknownFunction43b9e0(field_0x40, 1, name);
-    AppendChild(field_0x38, -1);
-    field_0x38->field_0xec = 0;
-    field_0x38->field_0x6c = 0;
-    field_0x38->field_0x70 = 0;
-    field_0x38->field_0x108 = 0;
-    field_0x38->field_0xf0 = 0.99f;
-    field_0x38->field_0xf4 = 0.95f;
-    field_0x38->field_0xf8 = 2000.0f;
-    g_UnknownGlobal68aba4->UnknownFunction4dcf20(field_0x38, field_0x38->field_0x84);
-    field_0x40->UnknownVirtualSlot29(200.0f);
-    field_0x68 = field_0x40->field_0x178 * (1.0f / 12);
-    field_0x40->field_0x190 = ZeroMatrix();
-    field_0x40->field_0x1d0 = ZeroMatrix();
-    field_0x40->field_0x25_bit0 = 0;
-    field_0x40->field_0x148 = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x40->field_0x13c = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x34->field_0x1a0->field_0x18c = 1;
-    field_0x34->UnknownFunction4a8b10("Fall02");
+void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name) {
+    character = rider;
+    rider->skeleton->UnknownFunction4fc690(0, Vector3(0.0f, 120.0f, 0.0f));
+    gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
+    gravityModel->UnknownVirtualSlot8(field_0x18);
+    AppendChild(gravityModel, -1);
+    rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
+    rigidBody->UnknownVirtualSlot8(field_0x18);
+    AppendChild(rigidBody, -1);
+    rigidBody->UnknownVirtualSlot28(character->skeleton);
+    gravityModel->UnknownVirtualSlot27(rigidBody);
+    collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
+    collisionModel->UnknownVirtualSlot8(field_0x18);
+    collisionModel->UnknownFunction43b9e0(rigidBody, 1, name);
+    AppendChild(collisionModel, -1);
+    collisionModel->shapeCollisionEnabled = 0;
+    collisionModel->collisionEnabled = 0;
+    collisionModel->collidable = 0;
+    collisionModel->applyImpulses = 0;
+    collisionModel->damping = 0.99f;
+    collisionModel->impulseLoss = 0.95f;
+    collisionModel->maxImpulse = 2000.0f;
+    g_UnknownGlobal68aba4->UnknownFunction4dcf20(collisionModel, collisionModel->quadtreeCell);
+    rigidBody->UnknownVirtualSlot29(200.0f);
+    inertiaFactor = rigidBody->mass * (1.0f / 12);
+    rigidBody->inertia = ZeroMatrix();
+    rigidBody->invInertia = ZeroMatrix();
+    rigidBody->field_0x25_bit0 = 0;
+    rigidBody->initialAngularVelocity = Vector3(0.0f, 0.0f, 0.0f);
+    rigidBody->initialVelocity = Vector3(0.0f, 0.0f, 0.0f);
+    character->skeleton->subtreeDirty = 1;
+    character->UnknownFunction4a8b10("Fall02");
     UnknownFunction532150();
-    field_0x40->UnknownVirtualSlot34(&Vector3(0.0f, 0.0f, 0.0f));
-    field_0x40->UnknownVirtualSlot33(&Vector3(0.0f, 0.0f, 0.0f));
-    field_0x40->UnknownVirtualSlot44();
-    field_0xb8 = field_0x34->field_0x1a0->field_0x140;
-    field_0x38->field_0xe8 = 1;
-    field_0x40->field_0x2a4 = 1;
-    field_0x3c->field_0x38 = 1;
-    field_0xe8 = Vector3(0.0f, 0.0f, 0.0f);
-    field_0xf4 = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x100 = 0;
+    rigidBody->UnknownVirtualSlot34(&Vector3(0.0f, 0.0f, 0.0f));
+    rigidBody->UnknownVirtualSlot33(&Vector3(0.0f, 0.0f, 0.0f));
+    rigidBody->UnknownVirtualSlot44();
+    poseNode = character->skeleton->firstChild;
+    collisionModel->manualStep = 1;
+    rigidBody->stepDisabled = 1;
+    gravityModel->field_0x38 = 1;
+    boxCenter = Vector3(0.0f, 0.0f, 0.0f);
+    boxHalfExtents = Vector3(0.0f, 0.0f, 0.0f);
+    boxFrame = 0;
 }
 
 void Wrecker::UnknownFunction5305b0(int value) {
-    field_0x58 = (int*)DebugRealloc(field_0x58, field_0x5c * 4 + 4, __FILE__, 0x9d);
-    field_0x58[field_0x5c] = value;
-    field_0x5c++;
+    contactAnimations = (int*)DebugRealloc(contactAnimations, contactAnimationCount * 4 + 4, __FILE__, 0x9d);
+    contactAnimations[contactAnimationCount] = value;
+    contactAnimationCount++;
 }
 
 void Wrecker::UnknownFunction5305f0(int value) {
-    field_0x50 = (int*)DebugRealloc(field_0x50, field_0x54 * 4 + 4, __FILE__, 0xa4);
-    field_0x50[field_0x54] = value;
-    field_0x54++;
+    randomAnimations = (int*)DebugRealloc(randomAnimations, randomAnimationCount * 4 + 4, __FILE__, 0xa4);
+    randomAnimations[randomAnimationCount] = value;
+    randomAnimationCount++;
 }
 
 int Wrecker::UnknownFunction530630(int value) {
-    field_0x48 = (int*)DebugRealloc(field_0x48, field_0x4c * 4 + 4, __FILE__, 0xac);
-    field_0x48[field_0x4c] = value;
-    field_0x4c++;
-    return field_0x4c - 1;
+    indexedAnimations = (int*)DebugRealloc(indexedAnimations, indexedAnimationCount * 4 + 4, __FILE__, 0xac);
+    indexedAnimations[indexedAnimationCount] = value;
+    indexedAnimationCount++;
+    return indexedAnimationCount - 1;
 }
 
 void Wrecker::UnknownFunction530680(UnknownWreckerCollisionObject* object) {
-    field_0x60 = (UnknownWreckerCollisionObject**)DebugRealloc(field_0x60, field_0x64 * 4 + 4, __FILE__, 0xb4);
-    field_0x60[field_0x64] = object;
-    field_0x64++;
-    field_0x38->UnknownFunction439410(object);
-    object->UnknownFunction439410(field_0x38);
+    ignoreObjects = (UnknownWreckerCollisionObject**)DebugRealloc(ignoreObjects, ignoreObjectCount * 4 + 4, __FILE__, 0xb4);
+    ignoreObjects[ignoreObjectCount] = object;
+    ignoreObjectCount++;
+    collisionModel->UnknownFunction439410(object);
+    object->UnknownFunction439410(collisionModel);
 }
 
 // Vector helpers in the d3dvec.inl style (MatrixUtil.h's Vector3 has only
@@ -264,36 +264,36 @@ static inline void WreckerMatrixProduct(UnknownWreckerMatrix* out, UnknownWrecke
 // forward x right. See WreckerStep for the last term order.
 int Wrecker::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x44 == 0) {
-        field_0x38->UnknownFunctionStep(frameTime);
+    if (wreckState == 0) {
+        collisionModel->UnknownFunctionStep(frameTime);
         if (field_0x52c)
             field_0x52c = 0;
         else
             UnknownFunction532020(frameTime);
-        field_0xd8 = 0;
+        anyProbeHit = 0;
         UnknownFunction5329e0(frameTime);
-        field_0xdc = kVec3Zero;
+        hitCenter = kVec3Zero;
         float touching = 0.0f;
-        for (int i = 0; i < field_0x38->field_0x100; i++) {
-            if (field_0x38->field_0x104[i].field_0x10) {
-                field_0x108[i] = 1;
-                field_0xd8 = 1;
-                field_0xdc += field_0x104[i];
+        for (int i = 0; i < collisionModel->probeCount; i++) {
+            if (collisionModel->probes[i].hit) {
+                probeHits[i] = 1;
+                anyProbeHit = 1;
+                hitCenter += probePositions[i];
                 touching += 1.0f;
             } else {
-                field_0x108[i] = 0;
+                probeHits[i] = 0;
             }
         }
-        if (field_0xd8)
-            field_0xdc *= 1.0f / touching;
+        if (anyProbeHit)
+            hitCenter *= 1.0f / touching;
         UnknownFunction532580();
-        field_0xbc = field_0xbc * (1.0f / frameTime);
-        field_0xc8 = field_0xc8 * (1.0f / frameTime);
-        field_0xb8->UnknownFunction4fca80(0, &field_0x6c);
+        linearStep = linearStep * (1.0f / frameTime);
+        angularStep = angularStep * (1.0f / frameTime);
+        poseNode->UnknownFunction4fca80(0, &lastPose);
     } else {
-        if (field_0xd4 && !field_0x34->field_0x34) {
-            field_0x34->UnknownFunction4a8b80(field_0xd4, 0.5f);
-            field_0xd4 = 0;
+        if (pendingAnimation && !character->field_0x34) {
+            character->UnknownFunction4a8b80(pendingAnimation, 0.5f);
+            pendingAnimation = 0;
             if (field_0x538 == 0 && field_0x530 == 0) {
                 field_0x530 = 1;
             } else {
@@ -310,80 +310,80 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         while (remaining > 0.0f) {
             if (remaining < step)
                 step = remaining;
-            if (field_0x44 != 1) {
-                WreckerStep(field_0x3c, step);
-                WreckerStep(field_0x40, step);
+            if (wreckState != 1) {
+                WreckerStep(gravityModel, step);
+                WreckerStep(rigidBody, step);
             }
             if (field_0x52c)
                 field_0x52c = 0;
             else
                 UnknownFunction532020(frameTime);
-            for (int i = 0; i < field_0x38->field_0x100; i++)
-                field_0x108[i] = field_0x38->field_0x104[i].field_0x10;
+            for (int i = 0; i < collisionModel->probeCount; i++)
+                probeHits[i] = collisionModel->probes[i].hit;
             UnknownFunction5329e0(step);
-            if (field_0x44 != 1) {
+            if (wreckState != 1) {
                 Vector3 position;
-                field_0x40->field_0x234->UnknownFunction4fc9a0(0, &position);
-                position += field_0x10c;
-                field_0x40->field_0x234->UnknownFunction4fc740(0, &position);
+                rigidBody->node->UnknownFunction4fc9a0(0, &position);
+                position += pushImpulse;
+                rigidBody->node->UnknownFunction4fc740(0, &position);
             }
-            field_0x38->UnknownFunctionStep(step);
+            collisionModel->UnknownFunctionStep(step);
             remaining -= step;
         }
-        if (field_0x38->field_0x58) {
+        if (collisionModel->hasContact) {
             field_0xb0 = 1;
             field_0xac = 1;
-            if (field_0x44 == 2) {
-                field_0x44 = 3;
-                field_0xd4 = field_0x58[(int)(RANDOM_UNIT() * field_0x5c)];
+            if (wreckState == 2) {
+                wreckState = 3;
+                pendingAnimation = contactAnimations[(int)(RANDOM_UNIT() * contactAnimationCount)];
             }
         }
-        if (field_0x44) {
-            if (field_0x44 == 1) {
-                UnknownWreckerRaceState* state = field_0x34->field_0x18;
-                if ((float)(state->field_0xa8 - *field_0x34->field_0x1c) / state->field_0xb4 < 0.5f) {
+        if (wreckState) {
+            if (wreckState == 1) {
+                UnknownWreckerRaceState* state = character->field_0x18;
+                if ((float)(state->field_0xa8 - *character->field_0x1c) / state->field_0xb4 < 0.5f) {
                     UnknownFunction532490();
                     UnknownFunction532580();
-                    field_0xbc = field_0xbc * (1.0f / frameTime);
-                    field_0xc8 = field_0xc8 * (1.0f / frameTime);
-                    field_0x40->UnknownVirtualSlot44();
-                    field_0x40->field_0x154 = field_0xbc;
-                    field_0x40->field_0x160 = field_0xbc;
-                    field_0x40->field_0x16c = field_0x40->field_0x234->UnknownFunction4fd710(field_0xc8);
+                    linearStep = linearStep * (1.0f / frameTime);
+                    angularStep = angularStep * (1.0f / frameTime);
+                    rigidBody->UnknownVirtualSlot44();
+                    rigidBody->velocity = linearStep;
+                    rigidBody->prevVelocity = linearStep;
+                    rigidBody->angularVelocity = rigidBody->node->UnknownFunction4fd710(angularStep);
                 }
             }
-            if (field_0x530 && !field_0x34->field_0x34) {
+            if (field_0x530 && !character->field_0x34) {
                 field_0xb4 = 1;
                 field_0x530 = 0;
             }
             if (field_0xb4 && field_0x534) {
                 UnknownFunction532580();
-                field_0xbc = field_0xbc * (1.0f / frameTime);
-                field_0xc8 = field_0xc8 * (1.0f / frameTime);
+                linearStep = linearStep * (1.0f / frameTime);
+                angularStep = angularStep * (1.0f / frameTime);
                 field_0x534 = 0;
             }
-            field_0xb8->UnknownFunction4fca80(0, &field_0x6c);
-            field_0x34->UnknownVirtualSlot7(frameTime, 0, 0);
+            poseNode->UnknownFunction4fca80(0, &lastPose);
+            character->UnknownVirtualSlot7(frameTime, 0, 0);
         }
     }
     if (field_0xb4) {
         // Carry the rider's root over by the motion of the wreck node since
-        // the pose field_0x6c was taken, then re-orthonormalise its axes.
+        // the pose lastPose was taken, then re-orthonormalise its axes.
         UnknownWreckerMatrix pose;
         UnknownWreckerMatrix relative;
-        field_0xb8->UnknownFunction4fca80(0, &pose);
-        UnknownWreckerFrame* frame = &field_0x6c;
+        poseNode->UnknownFunction4fca80(0, &pose);
+        UnknownWreckerFrame* frame = &lastPose;
         Vector3 oldPosition = WreckerCopy(frame->position);
         WreckerInvertRigid(&pose);
         WreckerMatrixProduct(&relative, *(UnknownWreckerMatrix*)frame, pose);
-        field_0x34->field_0x1a0->UnknownFunction4fca80(0, &pose);
+        character->skeleton->UnknownFunction4fca80(0, &pose);
         WreckerMatrixProduct(&pose, relative, pose);
         WreckerOrthonormalize(&pose);
-        field_0x34->field_0x1a0->UnknownFunction4fb8c0(0, &pose);
+        character->skeleton->UnknownFunction4fb8c0(0, &pose);
         Vector3 position;
-        field_0xb8->UnknownFunction4fc9a0(0, &position);
+        poseNode->UnknownFunction4fc9a0(0, &position);
         Vector3 delta = WreckerSubtractValue(oldPosition, position);
-        field_0x34->field_0x1a0->UnknownFunction4fc890(0, &delta);
+        character->skeleton->UnknownFunction4fc890(0, &delta);
         field_0xb4 = 0;
     }
     UnknownFunction532150();
@@ -409,7 +409,7 @@ void Wrecker::UnknownFunction531da0(Vector3 from, Vector3 to, float frameTime) {
     if (speed < 0.5f)
         return;
     speed *= 0.013333f;
-    if (field_0x44) {
+    if (wreckState) {
         if (speed < 1.5f)
             speed = 1.5f;
         else if (speed > 2.0f)
@@ -432,77 +432,77 @@ void Wrecker::UnknownFunction531da0(Vector3 from, Vector3 to, float frameTime) {
     Vector3 step = delta / (float)count;
     for (int i = 0; i < count; i++) {
         Vector3 position = from + step * (float)i;
-        field_0x11c->UnknownFunction4baa50(age, &position, field_0x120, speed, lifetime, speed + speed, 10, 0xffffff);
-        if (++field_0x120 >= 13)
-            field_0x120 = 0;
+        particles->UnknownFunction4baa50(age, &position, trailFrame, speed, lifetime, speed + speed, 10, 0xffffff);
+        if (++trailFrame >= 13)
+            trailFrame = 0;
     }
 }
 
 void Wrecker::UnknownFunction532020(float frameTime) {
-    for (int i = 0; i < field_0x38->field_0x100; i++) {
-        if (field_0x38->field_0x104[i].field_0x10) {
-            Vector3 point = field_0x38->field_0x104[i].field_0x0c->UnknownFunction4fd660(field_0x38->field_0x104[i].field_0x00);
-            UnknownFunction531da0(field_0x104[i], point, frameTime);
-            UnknownFunction531740(field_0x104[i], point, field_0x38->field_0x104[i].field_0x14, frameTime);
+    for (int i = 0; i < collisionModel->probeCount; i++) {
+        if (collisionModel->probes[i].hit) {
+            Vector3 point = collisionModel->probes[i].node->UnknownFunction4fd660(collisionModel->probes[i].localPoint);
+            UnknownFunction531da0(probePositions[i], point, frameTime);
+            UnknownFunction531740(probePositions[i], point, collisionModel->probes[i].normal, frameTime);
         }
     }
 }
 
 void Wrecker::UnknownFunction532150() {
     Vector3 size;
-    field_0x34->field_0x1a0->UnknownFunction4fe850(&field_0x40->field_0x228, &size);
-    field_0x40->field_0x190(0, 0) = (size.y * size.y + size.z * size.z) * field_0x68;
-    field_0x40->field_0x190(1, 1) = (size.x * size.x + size.z * size.z) * field_0x68;
-    field_0x40->field_0x190(2, 2) = (size.x * size.x + size.y * size.y) * field_0x68;
-    field_0x40->field_0x1d0(0, 0) = 1.0f / field_0x40->field_0x190(0, 0);
-    field_0x40->field_0x1d0(1, 1) = 1.0f / field_0x40->field_0x190(1, 1);
-    field_0x40->field_0x1d0(2, 2) = 1.0f / field_0x40->field_0x190(2, 2);
+    character->skeleton->UnknownFunction4fe850(&rigidBody->centerOfMass, &size);
+    rigidBody->inertia(0, 0) = (size.y * size.y + size.z * size.z) * inertiaFactor;
+    rigidBody->inertia(1, 1) = (size.x * size.x + size.z * size.z) * inertiaFactor;
+    rigidBody->inertia(2, 2) = (size.x * size.x + size.y * size.y) * inertiaFactor;
+    rigidBody->invInertia(0, 0) = 1.0f / rigidBody->inertia(0, 0);
+    rigidBody->invInertia(1, 1) = 1.0f / rigidBody->inertia(1, 1);
+    rigidBody->invInertia(2, 2) = 1.0f / rigidBody->inertia(2, 2);
 }
 
 void Wrecker::UnknownFunction532220(int index) {
-    field_0x38->field_0xec = 1;
-    field_0x38->UnknownFunction435fe0();
-    field_0x38->UnknownVirtualSlot5();
-    field_0x38->field_0x6c = 1;
-    field_0x38->field_0x70 = 1;
-    field_0x38->field_0x108 = 1;
-    field_0x34->UnknownFunction4a8b40(field_0x48[index]);
-    field_0x44 = 1;
-    field_0x40->field_0x25_bit0 = 0;
-    field_0x40->UnknownVirtualSlot44();
-    field_0x40->field_0x16c = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x40->field_0x154 = Vector3(0.0f, 0.0f, 0.0f);
+    collisionModel->shapeCollisionEnabled = 1;
+    collisionModel->UnknownFunction435fe0();
+    collisionModel->UnknownVirtualSlot5();
+    collisionModel->collisionEnabled = 1;
+    collisionModel->collidable = 1;
+    collisionModel->applyImpulses = 1;
+    character->UnknownFunction4a8b40(indexedAnimations[index]);
+    wreckState = 1;
+    rigidBody->field_0x25_bit0 = 0;
+    rigidBody->UnknownVirtualSlot44();
+    rigidBody->angularVelocity = Vector3(0.0f, 0.0f, 0.0f);
+    rigidBody->velocity = Vector3(0.0f, 0.0f, 0.0f);
     field_0xac = 0;
 }
 
 void Wrecker::UnknownFunction532310() {
-    field_0x38->field_0xec = 1;
-    field_0x38->UnknownFunction435fe0();
-    field_0x38->UnknownVirtualSlot5();
-    field_0x38->field_0x6c = 1;
-    field_0x38->field_0x70 = 1;
-    field_0x38->field_0x108 = 1;
-    field_0x44 = 2;
-    field_0x34->UnknownFunction4a8b80(field_0x50[(int)(RANDOM_UNIT() * field_0x54)], 0.5f);
+    collisionModel->shapeCollisionEnabled = 1;
+    collisionModel->UnknownFunction435fe0();
+    collisionModel->UnknownVirtualSlot5();
+    collisionModel->collisionEnabled = 1;
+    collisionModel->collidable = 1;
+    collisionModel->applyImpulses = 1;
+    wreckState = 2;
+    character->UnknownFunction4a8b80(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)], 0.5f);
     field_0x530 = 1;
     field_0x534 = 1;
-    field_0x40->field_0x25_bit0 = 1;
-    field_0x40->UnknownVirtualSlot44();
-    field_0x40->field_0x154 = field_0xbc;
-    field_0x40->field_0x160 = field_0xbc;
-    field_0x40->field_0x16c = field_0x40->field_0x234->UnknownFunction4fd710(field_0xc8);
-    for (int i = 0; i < field_0x38->field_0x100; i++)
-        field_0x104[i] = Vector3(0.0f, 0.0f, 0.0f);
+    rigidBody->field_0x25_bit0 = 1;
+    rigidBody->UnknownVirtualSlot44();
+    rigidBody->velocity = linearStep;
+    rigidBody->prevVelocity = linearStep;
+    rigidBody->angularVelocity = rigidBody->node->UnknownFunction4fd710(angularStep);
+    for (int i = 0; i < collisionModel->probeCount; i++)
+        probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     field_0xac = 0;
     field_0x538 = 1;
 }
 
 void Wrecker::UnknownFunction532490() {
-    field_0x44 = 2;
-    field_0xd4 = field_0x50[(int)(RANDOM_UNIT() * field_0x54)];
-    if (!field_0x34->field_0x34) {
-        field_0x34->UnknownFunction4a8b80(field_0xd4, 0.5f);
-        field_0xd4 = 0;
+    wreckState = 2;
+    pendingAnimation = randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)];
+    if (!character->field_0x34) {
+        character->UnknownFunction4a8b80(pendingAnimation, 0.5f);
+        pendingAnimation = 0;
         if (field_0x530) {
             field_0xb4 = 1;
             field_0x538 = 0;
@@ -511,9 +511,9 @@ void Wrecker::UnknownFunction532490() {
             field_0x530 = 1;
         }
     }
-    field_0x40->field_0x25_bit0 = 1;
-    for (int i = 0; i < field_0x38->field_0x100; i++)
-        field_0x104[i] = Vector3(0.0f, 0.0f, 0.0f);
+    rigidBody->field_0x25_bit0 = 1;
+    for (int i = 0; i < collisionModel->probeCount; i++)
+        probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     field_0x534 = 1;
 }
 
@@ -528,56 +528,56 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     return r;
 }
 
-// 0x00532580: rebuilds the wreck pose's linear (field_0xbc) and angular
-// (field_0xc8) step from the node's frame. Two references fix the leaf ages
+// 0x00532580: rebuilds the wreck pose's linear (linearStep) and angular
+// (angularStep) step from the node's frame. Two references fix the leaf ages
 // (docs/VC6_OPERAND_ORDER.md section 1.2): `target` for the new forward row
 // in the equality tests makes its components newer than the copied old
 // forward, so the cross product loads them first as retail does (511 -> 523
 // of 562; through the reference only in the cross product it stays 511), and
 // `up` for the old up row gives retail's schedule of the step's last store
 // and the forward copy around the up-row loads (a pointer, a reference to
-// field_0xbc for the subtract or the reference for up.x alone do the same).
+// linearStep for the subtract or the reference for up.x alone do the same).
 void Wrecker::UnknownFunction532580() {
     UnknownWreckerFrame pose;
-    field_0xbc = WreckerCopy(field_0x6c.position);
-    field_0xb8->UnknownFunction4fca80(0, &pose);
-    field_0xbc = pose.position - field_0xbc;
-    Vector3 forward = WreckerCopy(field_0x6c.forward);
+    linearStep = WreckerCopy(lastPose.position);
+    poseNode->UnknownFunction4fca80(0, &pose);
+    linearStep = pose.position - linearStep;
+    Vector3 forward = WreckerCopy(lastPose.forward);
     const Vector3& target = pose.forward;
     // The old up row stays on the FPU stack: float locals.
-    const Vector3& up = field_0x6c.up;
+    const Vector3& up = lastPose.up;
     float upX = up.x;
     float upY = up.y;
     float upZ = up.z;
     if (upX == pose.up.x && upY == pose.up.y && upZ == pose.up.z) {
         if (forward.x == target.x && forward.y == target.y && forward.z == target.z)
-            field_0xc8 = Vector3(0.0f, 0.0f, 0.0f);
+            angularStep = Vector3(0.0f, 0.0f, 0.0f);
         else
-            field_0xc8 = WreckerCross(forward, pose.forward);
+            angularStep = WreckerCross(forward, pose.forward);
     } else {
-        field_0xc8 = WreckerCross(Vector3(upX, upY, upZ), pose.up);
+        angularStep = WreckerCross(Vector3(upX, upY, upZ), pose.up);
     }
-    field_0xc8 = UnknownFunction5015b0(field_0xc8, 1.0f);
+    angularStep = UnknownFunction5015b0(angularStep, 1.0f);
 }
 
 void Wrecker::UnknownFunction5327c0() {
-    if (field_0x44) {
-        for (int i = 0; i < field_0x64; i++) {
-            field_0x38->UnknownFunction439410(field_0x60[i]);
-            field_0x60[i]->UnknownFunction439410(field_0x38);
+    if (wreckState) {
+        for (int i = 0; i < ignoreObjectCount; i++) {
+            collisionModel->UnknownFunction439410(ignoreObjects[i]);
+            ignoreObjects[i]->UnknownFunction439410(collisionModel);
         }
-        field_0x44 = 0;
-        field_0x40->field_0x25_bit0 = 0;
-        field_0x38->field_0xec = 0;
-        field_0x38->field_0x6c = 0;
-        field_0x38->field_0x70 = 0;
-        field_0x38->field_0x108 = 0;
-        field_0x38->field_0x58 = 0;
-        g_UnknownGlobal68aba4->UnknownFunction4dcf20(field_0x38, field_0x38->field_0x84);
-        field_0xd4 = 0;
+        wreckState = 0;
+        rigidBody->field_0x25_bit0 = 0;
+        collisionModel->shapeCollisionEnabled = 0;
+        collisionModel->collisionEnabled = 0;
+        collisionModel->collidable = 0;
+        collisionModel->applyImpulses = 0;
+        collisionModel->hasContact = 0;
+        g_UnknownGlobal68aba4->UnknownFunction4dcf20(collisionModel, collisionModel->quadtreeCell);
+        pendingAnimation = 0;
         field_0x52c = 1;
-        field_0x34->field_0x1a0->UnknownFunction4fcc70();
-        field_0x34->UnknownFunction4a8ac0(&field_0x34->field_0x190, 0);
+        character->skeleton->UnknownFunction4fcc70();
+        character->UnknownFunction4a8ac0(&character->field_0x190, 0);
         UnknownFunction532150();
     }
 }
@@ -591,15 +591,15 @@ int Wrecker::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry*
 }
 
 void Wrecker::UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents) {
-    field_0xe8 = center;
-    field_0xf4 = halfExtents;
-    field_0x100 = frame;
+    boxCenter = center;
+    boxHalfExtents = halfExtents;
+    boxFrame = frame;
 }
 
 void Wrecker::UnknownFunction532900(Vector3 offset, int bone) {
-    field_0x38->UnknownFunction43c7f0(offset, bone);
-    field_0x104 = (Vector3*)DebugRealloc(field_0x104, field_0x38->field_0x100 * sizeof(Vector3), __FILE__, 0x308);
-    field_0x104[field_0x38->field_0x100 - 1] = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x108 = (int*)DebugRealloc(field_0x108, field_0x38->field_0x100 * 4, __FILE__, 0x30b);
-    field_0x108[field_0x38->field_0x100 - 1] = 0;
+    collisionModel->UnknownFunction43c7f0(offset, bone);
+    probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
+    probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);
+    probeHits = (int*)DebugRealloc(probeHits, collisionModel->probeCount * 4, __FILE__, 0x30b);
+    probeHits[collisionModel->probeCount - 1] = 0;
 }
