@@ -53,17 +53,17 @@ void* UnknownFunction47b570(void* block, unsigned int size);
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
 int g_UnknownGlobal65b5c8;
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
-UIDialog* g_UnknownGlobal65b608;
+UIDialog* g_SortingDialog;
 // 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
 int g_UnknownGlobal65b60c;
 
 // cdecl 0x00477b60: the list rows' default order (by text).
-int UnknownFunction477b60(const void* a, const void* b);
+int CompareRowText(const void* a, const void* b);
 // cdecl 0x00477800: the qsort comparison 0x00477900 sorts with.
-int UnknownFunction477800(const void* a, const void* b);
+int CompareSortedRows(const void* a, const void* b);
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`
 // (samples/ui/GameUiNearMisses.cpp).
-int UnknownFunction47b490(TextureMap* texture, int key);
+int TextureHasColor(TextureMap* texture, int key);
 
 // ---------------------------------------------------------------------------
 // UICtlContainer
@@ -266,7 +266,7 @@ TextureMap* UIControl::GetStateTexture(int state) {
 // 0x00472f20
 void UIAnim::SetFrameCount(int count) {
     passesLeft = count;
-    field_0x18 = count;
+    passCountdown = count;
     Rewind();
 }
 
@@ -323,7 +323,7 @@ UIFrame* UIAnim::Advance() {
                 currentFrame--;
             } else {
                 playForwards = 0;
-                if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                if (passesLeft == 0x7fff || (passesLeft && --passCountdown > 0))
                     currentFrame = frameCount;
             }
         } else {
@@ -331,7 +331,7 @@ UIFrame* UIAnim::Advance() {
                 currentFrame++;
             } else {
                 playForwards = 0;
-                if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                if (passesLeft == 0x7fff || (passesLeft && --passCountdown > 0))
                     currentFrame = 0;
             }
         }
@@ -532,7 +532,7 @@ void UIControl::PlayControlSound(int index, int a) {
 }
 
 // 0x004726b0
-int UIControl::UnknownVirtualSlot53() {
+int UIControl::CreateControlIterator() {
     return (int)new(__FILE__, 0x1267) GameObjectIterator(ownerDialog->controlContainer, 1, "UIControl");
 }
 
@@ -640,14 +640,14 @@ UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a,
     }
     field_0x204 = a;
     field_0x208 = b;
-    field_0x200 = 0;
+    textScrollX = 0;
     textLength = 0;
     controlTextLength = 0;
     textWidth = 0;
     acceptedCharacters = 0;
     backgroundBrush = 0;
-    field_0x228 = 0;
-    field_0x22c = 0;
+    leadBytePending = 0;
+    dropTrailByte = 0;
     if (!text)
         controlText = (char*)DebugMalloc(textCapacity, __FILE__, 0x15c7);
     controlText[0] = 0;
@@ -758,7 +758,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
         GameObjectIterator* iterator;
         UIControl* control;
         if (controlType == 9) {
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3) {
                     ((UIListBox*)control)->lastClickTime = 0;
@@ -779,7 +779,7 @@ int UIScrollCtl::ButtonDown(int a, int b) {
             ownerDialog->UnknownVirtualSlot29(&event);
             ownerDialog->AddTimer(0x101, 0xfa, (int)this);
         } else {
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3) {
                     ((UIListBox*)control)->lastClickTime = 0;
@@ -821,7 +821,7 @@ void UIScrollCtl::HandleTimer(int value) {
     case 0x102:
         switch (controlType) {
         case 9:
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3)
                     ((UIListBox*)control)->ScrollBy(-1);
@@ -836,7 +836,7 @@ void UIScrollCtl::HandleTimer(int value) {
             ownerDialog->UnknownVirtualSlot29(&event);
             break;
         case 10:
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            iterator = (GameObjectIterator*)CreateControlIterator();
             for (control = NextAttachedControl(iterator); control; control = NextAttachedControl(iterator)) {
                 if (control->controlType == 3)
                     ((UIListBox*)control)->ScrollBy(1);
@@ -880,11 +880,11 @@ int UIScrollCtl::ButtonUp(int a, int* position) {
 UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner)
     : UIControl(type, id, area, owner) {
     field_0x1ec = 0;
-    field_0x1f0 = 0;
+    snapSteps = 0;
     thumbWidth = 0;
     thumbHeight = 0;
-    field_0x1fc = 0;
-    field_0x208 = 0;
+    followedRow = 0;
+    dragging = 0;
     field_0x204 = 0;
     dragY = 0;
     dragX = 0;
@@ -903,9 +903,9 @@ UIScrollBar::~UIScrollBar() {
 // 0x00474cb0
 void UIScrollBar::SyncBoundValue(int value) {
     if (value)
-        *boundValue = UnknownFunction475500();
+        *boundValue = GetScrollValue();
     else
-        UnknownFunction4753c0(*boundValue, scrollRange);
+        SetThumbPosition(*boundValue, scrollRange);
 }
 
 // 0x00475160
@@ -916,23 +916,23 @@ void UIScrollBar::SetThumbSizeFromState(int state) {
 }
 
 // 0x004751c0
-void UIScrollBar::UnknownFunction4751c0(int range) {
+void UIScrollBar::SetScrollRange(int range) {
     scrollRange = range;
     RequestRedraw();
 }
 
 // 0x004754d0
-void UIScrollBar::UnknownFunction4754d0(int range) {
-    if (range > 0)
-        field_0x1f0 = range - 1;
+void UIScrollBar::SetSnapStepCount(int count) {
+    if (count > 0)
+        snapSteps = count - 1;
     else
-        field_0x1f0 = 0;
+        snapSteps = 0;
     RequestRedraw();
 }
 
 // 0x004755c0
-int UIScrollBar::UnknownFunction4755c0() {
-    return field_0x1f0;
+int UIScrollBar::GetSnapSteps() {
+    return snapSteps;
 }
 
 // UIListBox's first shown row and UIMultiState's current state are read
@@ -940,11 +940,11 @@ int UIScrollBar::UnknownFunction4755c0() {
 // on list boxes, UIRadioButton 0x004793f0 and the dialog procedures on
 // multi-states and radio buttons. All three read +0x1f0; the linker folded
 // the identical bodies.
-int UIListBox::UnknownFunction4755c0() {
+int UIListBox::GetFirstVisibleRow() {
     return firstVisibleRow;
 }
 
-int UIMultiState::UnknownFunction4755c0() {
+int UIMultiState::GetSelectedState() {
     return selectedState;
 }
 
@@ -980,7 +980,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
-        field_0x20 = (int)textures;
+        frameTextures = (int)textures;
         UnknownResourceEntry* entry =
             ((UnknownResourceManager*)id)->UnknownFunction4e9360((const char*)module, 1);
         if (!LoadFromStream(entry->field_0x14, entry->field_0x18, palette) && a) {
@@ -1009,7 +1009,7 @@ UIAnim::UIAnim(void* textures, void* palette) {
     currentFrame = 0;
     frameCount = 0;
     passesLeft = 0;
-    field_0x18 = 0;
+    passCountdown = 0;
     lastStepTime = 0;
     animTextures = textures;
     playForwards = 1;
@@ -1064,17 +1064,17 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     lastPageRowCount = 0;
     selectColor = 0xffffff;
     rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
-    sortCompare = UnknownFunction477b60;
+    sortCompare = CompareRowText;
     field_0x218 = (int)this;
     autoSort = 0;
     sorting = 0;
     selectable = 1;
     allowWScroll = 1;
-    field_0x234 = 0;
-    field_0x230 = 0;
-    field_0x22c = 0;
+    dragOffsetX = 0;
+    scrollOffsetX = 0;
+    dragStartX = 0;
     lastClickTime = 0;
-    field_0x240 = 0;
+    partialRows = 0;
     rowCount = 0;
     firstVisibleRow = 0;
     lastPageRowCount = 0;
@@ -1160,7 +1160,7 @@ int UIListBox::GetSelectedRow() {
 }
 
 // 0x00476970
-char* UIListBox::UnknownFunction476970(int row) {
+char* UIListBox::GetRowKind(int row) {
     if (rowCount && row >= 0 && row < rowCount)
         return (char*)rowTable[row].kind;
     return 0;
@@ -1194,7 +1194,7 @@ void UIListBox::SetSortCompare(int (*compare)(const void* a, const void* b)) {
 }
 
 // 0x00477b60
-int UnknownFunction477b60(const void* a, const void* b) {
+int CompareRowText(const void* a, const void* b) {
     const char* left = ((const UnknownGameUiListRow*)a)->text;
     if (!left)
         return 1;
@@ -1253,8 +1253,8 @@ void UIListBox::RequestRedraw() {
 }
 
 // 0x00477e60
-void UIListBox::UnknownFunction477e60(int a) {
-    field_0x240 = a;
+void UIListBox::SetPartialRows(int value) {
+    partialRows = value;
     if (!visibleRowCount)
         visibleRowCount = 1;
 }
@@ -1262,11 +1262,11 @@ void UIListBox::UnknownFunction477e60(int a) {
 // 0x00478190
 void UIListBox::ButtonHeld(int a, int* position) {
     if (a == 1 && position) {
-        int delta = position[0] - field_0x22c;
-        field_0x234 = delta;
-        if (delta >= -field_0x230)
-            delta = -field_0x230;
-        field_0x234 = delta;
+        int delta = position[0] - dragStartX;
+        dragOffsetX = delta;
+        if (delta >= -scrollOffsetX)
+            delta = -scrollOffsetX;
+        dragOffsetX = delta;
         RequestRedraw();
     }
     UIControl::ButtonHeld(a, position);
@@ -1373,7 +1373,7 @@ void UIMultiState::SetState(int state) {
 // 0x00478540
 void UIMultiState::SyncBoundValue(int value) {
     if (value)
-        *boundValue = UnknownFunction4755c0();
+        *boundValue = GetSelectedState();
     else
         SetCurrentState(*boundValue);
 }
@@ -1497,7 +1497,7 @@ void UIRadioButton::SyncBoundValue(int value) {
 }
 
 // 0x004795c0
-int UIRadioButton::UnknownVirtualSlot53() {
+int UIRadioButton::CreateControlIterator() {
     return (int)new(__FILE__, 0x23b9) GameObjectIterator(ownerDialog->controlContainer, 1, "UIRadioButton");
 }
 
@@ -2218,7 +2218,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     moveable = 0;
     keyBind = 0;
     field_0x1c8 = 0;
-    field_0x1c4 = 0;
+    tabStops = 0;
     mouseAnim = 0;
     for (int i = 0; i < 5; i++) {
         stateImages[i] = 0;
@@ -2282,8 +2282,8 @@ UIControl::~UIControl() {
         DeleteObject((HGDIOBJ)fontHandle);
     if (textLines)
         DebugFree(textLines, __FILE__, 0xba8);
-    if (field_0x1c4)
-        DebugFree(field_0x1c4, __FILE__, 0xba9);
+    if (tabStops)
+        DebugFree(tabStops, __FILE__, 0xba9);
 }
 
 // 0x00470660
@@ -2395,7 +2395,7 @@ void UIControl::SetText(const char* text) {
             controlText = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0xcc4);
             strcpy(controlText, text);
             textLines = ownerDialog->SplitTextLines(controlText, textColor, (void*)fontHandle,
-                                                    field_0x1c4, textExtent);
+                                                    tabStops, textExtent);
             if (!textLines) {
                 controlTextLength = textExtent[0] = strlen(controlText);
                 HDC dc;
@@ -2561,7 +2561,7 @@ int UIControl::UnknownVirtualSlot21(int value) {
 }
 
 // 0x00472480
-int UIControl::UnknownFunction472480(int* position) {
+int UIControl::UpdateHoverAt(int* position) {
     int result = 0;
     GameObject* next = field_0x0C;
     while (next) {
@@ -2570,12 +2570,12 @@ int UIControl::UnknownFunction472480(int* position) {
         next = next->field_0x0C;
     }
     if (next) {
-        result = ((UIControl*)next)->UnknownFunction472480(position);
+        result = ((UIControl*)next)->UpdateHoverAt(position);
         if (result)
             return result;
     }
     if (field_0x10 && strstr(field_0x10->field_0x28, "UIControl,")) {
-        result = ((UIControl*)field_0x10)->UnknownFunction472480(position);
+        result = ((UIControl*)field_0x10)->UpdateHoverAt(position);
         if (result)
             return result;
     }
@@ -2658,7 +2658,7 @@ int UIListBox::SelectRow(int row) {
     int result = SetSelectedRow(row);
     UpdateScrollBars();
     if (ownerDialog) {
-        GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+        GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
         UIListBox* control;
         while ((control = static_cast<UIListBox*>(NextAttachedControlOfType(iterator))) != 0)
             control->SetSelectedRow(row);
@@ -2737,7 +2737,7 @@ int UIListBox::CountVisibleRows() {
         for (; i < count; i++) {
             height += rowTable[i].height;
             if (height > space) {
-                if (!rows && field_0x240)
+                if (!rows && partialRows)
                     rows = 1;
                 return rows;
             }
@@ -2774,7 +2774,7 @@ void UIListBox::SetRowText(int row, const char* text) {
         rowTable[row].text = (char*)DebugMalloc(rowTable[row].width + 1, __FILE__, 0x1e0e);
         strcpy(rowTable[row].text, text);
         rowTable[row].textLines = ownerDialog->SplitTextLines(
-            rowTable[row].text, textColor, (void*)fontHandle, field_0x1c4, 0);
+            rowTable[row].text, textColor, (void*)fontHandle, tabStops, 0);
     }
     RequestRedraw();
 }
@@ -2797,7 +2797,7 @@ int UIListBox::AddRow(const char* text, int data, int a) {
         row->text = (char*)DebugMalloc(row->width + 1, __FILE__, 0x1dc7);
         strcpy(row->text, text);
         row->textLines = ownerDialog->SplitTextLines(row->text, textColor, (void*)fontHandle,
-                                                     field_0x1c4, 0);
+                                                     tabStops, 0);
         SetRowData(rowCount, data);
         row->field_0x30 = 0;
         rowCount++;
@@ -2898,7 +2898,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
             stateTable[index].text = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0x2213);
             strcpy(stateTable[index].text, text);
             stateTable[index].textLines = ownerDialog->SplitTextLines(
-                stateTable[index].text, textColor, (void*)fontHandle, field_0x1c4,
+                stateTable[index].text, textColor, (void*)fontHandle, tabStops,
                 stateTable[index].textExtent);
             if (!stateTable[index].textLines) {
                 stateTable[index].textExtent[0] = strlen(stateTable[index].text);
@@ -2978,7 +2978,7 @@ int UIRadioButton::GetGroupSelection() {
     while ((control = (UIRadioButton*)iterator.Next()) != 0) {
         if (control->attachId == attachId) {
             index++;
-            if (control->UnknownFunction4755c0() == 1)
+            if (control->GetSelectedState() == 1)
                 return index;
         }
     }
@@ -2990,12 +2990,12 @@ int UIRadioButton::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
         event.handled = a;
-        if (!UnknownFunction4755c0()) {
+        if (!GetSelectedState()) {
             SetCurrentState(1);
-            GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
             UIRadioButton* control;
             while ((control = static_cast<UIRadioButton*>(NextAttachedControlOfType(iterator))) != 0) {
-                if (control != this && control->UnknownFunction4755c0() == 1) {
+                if (control != this && control->GetSelectedState() == 1) {
                     control->SetState(0);
                     control->SetCurrentState(0);
                 }
@@ -3074,22 +3074,22 @@ void UIListBox::RemoveAllRows() {
 // 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
 // The first comparator call goes through a `control` local: without it VC6
 // swaps eax and edx for that temporary and the next global load.
-int UnknownFunction477800(const void* a, const void* b) {
+int CompareSortedRows(const void* a, const void* b) {
     int result = 0;
-    if (g_UnknownGlobal65b608->sortingList) {
-        UIListBox* control = g_UnknownGlobal65b608->sortingList->field_0x218_control;
+    if (g_SortingDialog->sortingList) {
+        UIListBox* control = g_SortingDialog->sortingList->selfList;
         result = control->sortCompare(a, b);
         if (!result) {
             int left = ((const UnknownGameUiListRow*)a)->sortIndex;
             int right = ((const UnknownGameUiListRow*)b)->sortIndex;
             GameObjectIterator* iterator =
-                (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
+                (GameObjectIterator*)g_SortingDialog->sortingList->selfList->CreateControlIterator();
             while (1) {
                 UIListBox* other = static_cast<UIListBox*>(
-                    g_UnknownGlobal65b608->sortingList->field_0x218_control->NextAttachedControlOfType(iterator));
+                    g_SortingDialog->sortingList->selfList->NextAttachedControlOfType(iterator));
                 if (!other)
                     break;
-                if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
+                if (other->rowCount != g_SortingDialog->sortingList->selfList->rowCount) {
                     result = -1;
                     break;
                 }
@@ -3097,7 +3097,7 @@ int UnknownFunction477800(const void* a, const void* b) {
                 if (result)
                     break;
             }
-            g_UnknownGlobal65b608->sortingList->field_0x218_control->DeleteControlIterator(iterator);
+            g_SortingDialog->sortingList->selfList->DeleteControlIterator(iterator);
         }
     }
     return result;
@@ -3105,9 +3105,9 @@ int UnknownFunction477800(const void* a, const void* b) {
 
 // 0x00477900
 void UIListBox::Sort(int a) {
-    if (a || !ownerDialog->sortingList || !g_UnknownGlobal65b608) {
+    if (a || !ownerDialog->sortingList || !g_SortingDialog) {
         ownerDialog->sortingList = this;
-        g_UnknownGlobal65b608 = ownerDialog;
+        g_SortingDialog = ownerDialog;
     }
     if (!rowCount)
         return;
@@ -3115,7 +3115,7 @@ void UIListBox::Sort(int a) {
     for (int i = 0; i < rowCount; i++)
         rowTable[i].sortIndex = i;
     int selected = selectedRow;
-    qsort(rowTable, rowCount, sizeof(UnknownGameUiListRow), UnknownFunction477800);
+    qsort(rowTable, rowCount, sizeof(UnknownGameUiListRow), CompareSortedRows);
     RequestRedraw();
     if (attachId > 0) {
         GameObjectIterator iterator(ownerDialog->controlContainer, 1, "UIControl");
@@ -3156,11 +3156,11 @@ int UIScrollBar::FollowList(UIListBox* list) {
     RequestRedraw();
     if (reversed) {
         int count = list->rowCount;
-        field_0x1fc = count - list->UnknownFunction4755c0();
+        followedRow = count - list->GetFirstVisibleRow();
     } else {
-        field_0x1fc = list->UnknownFunction4755c0();
+        followedRow = list->GetFirstVisibleRow();
     }
-    if (GetListScrollRange(list) == field_0x1fc)
+    if (GetListScrollRange(list) == followedRow)
         return 1;
     unsigned int travel;
     if (controlType == 8)
@@ -3169,7 +3169,7 @@ int UIScrollBar::FollowList(UIListBox* list) {
         travel = GetHeight() - thumbHeight;
     unsigned int range = list->rowCount - list->lastPageRowCount;
     if (range) {
-        float position = field_0x1fc * (float)travel / range;
+        float position = followedRow * (float)travel / range;
         thumbOffset = position < travel ? position : travel;
         return 1;
     }
@@ -3177,7 +3177,7 @@ int UIScrollBar::FollowList(UIListBox* list) {
 }
 
 // 0x00475300
-int UIScrollBar::UnknownFunction475300(int value) {
+int UIScrollBar::ScaleThumbPosition(int range) {
     int width = GetWidth();
     int height = GetHeight();
     unsigned int position;
@@ -3188,11 +3188,11 @@ int UIScrollBar::UnknownFunction475300(int value) {
         position = (int)(reversed ? height - thumbOffset : thumbOffset);
     }
     travel = controlType == 8 ? width - thumbWidth : height - thumbHeight;
-    return (int)(travel ? (double)(position * value) / travel : 0.0);
+    return (int)(travel ? (double)(position * range) / travel : 0.0);
 }
 
 // 0x00475500
-int UIScrollBar::UnknownFunction475500() {
+int UIScrollBar::GetScrollValue() {
     int width = GetWidth();
     int height = GetHeight();
     int position;
@@ -3232,7 +3232,7 @@ void UIEditBox::SetCapacity(int size) {
     else if (capacity < 1)
         capacity = 1;
     textCapacity = capacity;
-    field_0x200 = 0;
+    textScrollX = 0;
     textLength = 0;
     textWidth = 0;
     controlTextLength = 0;
@@ -3373,7 +3373,7 @@ void UIDialog::UnknownFunction46f120() {
         POINT position = user->pointerDevice->pointerPosition;
         if (controlContainer->field_0x10) {
             user->field_0x1dc = 0;
-            int result = ((UIControl*)controlContainer->field_0x10)->UnknownFunction472480((int*)&position);
+            int result = ((UIControl*)controlContainer->field_0x10)->UpdateHoverAt((int*)&position);
             if (focus && !guiUser->field_0x1cc && !result)
                 guiUser->UnknownFunction487730(0, 0, 1);
         }
@@ -3382,12 +3382,12 @@ void UIDialog::UnknownFunction46f120() {
 
 // A colored run of dialog text (0x18 bytes).
 struct UnknownGameUiTextRun {
-    const char* field_0x00;                   // text
-    int field_0x04;                           // 1: sets the color, 2: sets the position
-    int field_0x08;                           // length
-    unsigned int field_0x0c;                  // color
-    int field_0x10;                           // width
-    int field_0x14;                           // position
+    const char* text;                         // +0x00
+    int kind;                                 // +0x04: 1 sets the color, 2 the position
+    int length;                               // +0x08
+    unsigned int color;                       // +0x0c: "~N" picks textColors[N]
+    int width;                                // +0x10: GetTextExtentPoint32A cx
+    int position;                             // +0x14: "|x" picks the tab-stop table entry x
 };
 
 int g_UnknownGlobal65b604;                    // the run being drawn
@@ -3405,22 +3405,22 @@ void UIDialog::DrawTextRuns(void* dc, int x, int y, const char* text, int length
     g_UnknownGlobal65b564 = x;
     SetTextColor((HDC)dc, color);
     g_UnknownGlobal65b574 = color;
-    while (runs[g_UnknownGlobal65b604].field_0x00) {
-        if (runs[g_UnknownGlobal65b604].field_0x04 == 2)
-            g_UnknownGlobal65b564 = runs[g_UnknownGlobal65b604].field_0x14 + x;
+    while (runs[g_UnknownGlobal65b604].text) {
+        if (runs[g_UnknownGlobal65b604].kind == 2)
+            g_UnknownGlobal65b564 = runs[g_UnknownGlobal65b604].position + x;
         if (shadow) {
             SetTextColor((HDC)dc, shadowColor);
-            TextOutA((HDC)dc, g_UnknownGlobal65b564 + 1, y + 1, runs[g_UnknownGlobal65b604].field_0x00,
-                     runs[g_UnknownGlobal65b604].field_0x08);
+            TextOutA((HDC)dc, g_UnknownGlobal65b564 + 1, y + 1, runs[g_UnknownGlobal65b604].text,
+                     runs[g_UnknownGlobal65b604].length);
             SetTextColor((HDC)dc, g_UnknownGlobal65b574);
         }
-        if (runs[g_UnknownGlobal65b604].field_0x04 == 1) {
-            g_UnknownGlobal65b574 = runs[g_UnknownGlobal65b604].field_0x0c;
+        if (runs[g_UnknownGlobal65b604].kind == 1) {
+            g_UnknownGlobal65b574 = runs[g_UnknownGlobal65b604].color;
             SetTextColor((HDC)dc, g_UnknownGlobal65b574);
         }
-        TextOutA((HDC)dc, g_UnknownGlobal65b564, y, runs[g_UnknownGlobal65b604].field_0x00,
-                 runs[g_UnknownGlobal65b604].field_0x08);
-        g_UnknownGlobal65b564 += runs[g_UnknownGlobal65b604].field_0x10;
+        TextOutA((HDC)dc, g_UnknownGlobal65b564, y, runs[g_UnknownGlobal65b604].text,
+                 runs[g_UnknownGlobal65b604].length);
+        g_UnknownGlobal65b564 += runs[g_UnknownGlobal65b604].width;
         g_UnknownGlobal65b604++;
     }
 }
@@ -3773,7 +3773,7 @@ int UIControl::SlideBottomStep() {
 int UIScrollBar::ButtonUp(int a, int* position) {
     UnknownDialogEvent event;
     event.handled = 0;
-    if (field_0x208) {
+    if (dragging) {
         event.kind = 0x10;
         event.code = eventCode;
         event.controlName = GetName();
@@ -3782,7 +3782,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
         event.control = this;
         ownerDialog->UnknownVirtualSlot29(&event);
     }
-    field_0x208 = 0;
+    dragging = 0;
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
         event.kind = kDialogCommand;
         event.code = eventCode;
@@ -4019,9 +4019,9 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
     int i = 0;
     int count = 0;
     if (text[0] != '~' && text[0] != '|') {
-        runs[0].field_0x00 = text;
-        runs[0].field_0x0c = color;
-        runs[0].field_0x04 = 1;
+        runs[0].text = text;
+        runs[0].color = color;
+        runs[0].kind = 1;
         count = 1;
     }
     char* start = text;
@@ -4041,17 +4041,17 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
             continue;
         }
         UnknownGameUiTextRun* run = &runs[count];
-        run->field_0x00 = &text[i + 2];
+        run->text = &text[i + 2];
         if (c == '~') {
             int index = text[i + 1] - '0';
-            run->field_0x04 = 1;
+            run->kind = 1;
             if (index > 9)
                 index = 9;
             else if (index < 0)
                 index = 0;
-            run->field_0x0c = textColors[index];
+            run->color = textColors[index];
         } else {
-            run->field_0x04 = 2;
+            run->kind = 2;
             if (table) {
                 char key = text[i + 1];
                 char digit;
@@ -4063,54 +4063,54 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
                     digit = key - 'A' + 10;
                 else
                     digit = 0;
-                run->field_0x14 = ((int*)table)[digit];
+                run->position = ((int*)table)[digit];
             } else {
-                run->field_0x14 = 0;
+                run->position = 0;
             }
         }
         i += 2;
         if (count) {
             UnknownGameUiTextRun* last = run - 1;
             if (mark)
-                last->field_0x08 = mark - start;
+                last->length = mark - start;
             else
-                last->field_0x08 = run->field_0x00 - start - 2;
+                last->length = run->text - start - 2;
             if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
                 HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
-                GetTextExtentPoint32A((HDC)dc, last->field_0x00, last->field_0x08, &extent);
+                GetTextExtentPoint32A((HDC)dc, last->text, last->length, &extent);
                 SelectObject((HDC)dc, old);
                 ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
             }
-            last->field_0x10 = extent.cx;
+            last->width = extent.cx;
         }
-        start = (char*)run->field_0x00;
+        start = (char*)run->text;
         mark = 0;
         count++;
     }
     if (count) {
         if (mark)
-            runs[count - 1].field_0x08 = mark - runs[count - 1].field_0x00;
+            runs[count - 1].length = mark - runs[count - 1].text;
         else
-            runs[count - 1].field_0x08 = length - (runs[count - 1].field_0x00 - text);
+            runs[count - 1].length = length - (runs[count - 1].text - text);
         if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
-            GetTextExtentPoint32A((HDC)dc, runs[count - 1].field_0x00, runs[count - 1].field_0x08, &extent);
+            GetTextExtentPoint32A((HDC)dc, runs[count - 1].text, runs[count - 1].length, &extent);
             SelectObject((HDC)dc, old);
             ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
-            runs[count - 1].field_0x10 = extent.cx;
+            runs[count - 1].width = extent.cx;
         } else {
-            runs[count - 1].field_0x10 = 0;
+            runs[count - 1].width = 0;
         }
     }
     if (size) {
         size[1] = 0;
         size[0] = length - count * 2;
         for (int j = 0; j < count; j++)
-            size[1] += runs[j].field_0x10;
+            size[1] += runs[j].width;
     }
-    runs[count].field_0x00 = 0;
-    runs[count].field_0x08 = 0;
-    runs[count].field_0x04 = 0;
+    runs[count].text = 0;
+    runs[count].length = 0;
+    runs[count].kind = 0;
     UnknownGameUiTextRun* result =
         (UnknownGameUiTextRun*)DebugMalloc((count + 1) * sizeof(UnknownGameUiTextRun), __FILE__, 0xa5b);
     if (result)
@@ -4251,23 +4251,23 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (position.y <= -1) {
                     if (ownerDialog->joystickCentred) {
-                        if (UnknownFunction4755c0()) {
-                            if (UnknownFunction475500())
-                                UnknownFunction4753c0(UnknownFunction475500() - 1, UnknownFunction4755c0());
+                        if (GetSnapSteps()) {
+                            if (GetScrollValue())
+                                SetThumbPosition(GetScrollValue() - 1, GetSnapSteps());
                         } else {
-                            if (UnknownFunction475500())
-                                UnknownFunction4753c0(UnknownFunction475500() - 1, range);
+                            if (GetScrollValue())
+                                SetThumbPosition(GetScrollValue() - 1, range);
                         }
                         ownerDialog->joystickCentred = 0;
                     }
                 } else if (position.y >= 1) {
                     if (ownerDialog->joystickCentred) {
-                        if (UnknownFunction4755c0()) {
-                            if ((unsigned int)UnknownFunction475500() < (unsigned int)UnknownFunction4755c0())
-                                UnknownFunction4753c0(UnknownFunction475500() + 1, UnknownFunction4755c0());
+                        if (GetSnapSteps()) {
+                            if ((unsigned int)GetScrollValue() < (unsigned int)GetSnapSteps())
+                                SetThumbPosition(GetScrollValue() + 1, GetSnapSteps());
                         } else {
-                            if ((unsigned int)UnknownFunction475500() < (unsigned int)range)
-                                UnknownFunction4753c0(UnknownFunction475500() + 1, range);
+                            if ((unsigned int)GetScrollValue() < (unsigned int)range)
+                                SetThumbPosition(GetScrollValue() + 1, range);
                         }
                         ownerDialog->joystickCentred = 0;
                     }
@@ -4279,7 +4279,7 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
     }
     int result = UIControl::UnknownVirtualSlot10(frameTime);
     if (result) {
-        GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+        GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
         int full = 0;
         for (UIControl* control = NextAttachedControl(iterator); control;
              control = NextAttachedControl(iterator)) {
@@ -4356,66 +4356,66 @@ int UIScrollBar::ButtonDown(int a, int b) {
         GameObjectIterator* iterator;
         UIControl* list;
         if (controlType == 8) {
-            if (field_0x1f0) {
+            if (snapSteps) {
                 thumbOffset = (float)UnknownMinInt(GetWidth() - thumbWidth,
                                                          UnknownMaxInt(((int*)b)[0] - screenArea[0], 0));
             } else {
                 float x = (float)((int*)b)[0];
                 float left = (float)screenArea[0];
                 if (x > thumbOffset + (left + thumbWidth)) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() + page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() + page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
                 } else if (x < left + thumbOffset) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() - page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() - page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
                 }
             }
         } else {
-            if (field_0x1f0) {
+            if (snapSteps) {
                 thumbOffset = (float)UnknownMinInt(GetHeight() - thumbHeight,
                                                          UnknownMaxInt(((int*)b)[1] - screenArea[1], 0));
             } else {
                 float y = (float)((int*)b)[1];
                 float top = (float)screenArea[1];
                 if (y > thumbOffset + (top + thumbHeight)) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() + page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() + page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
                 } else if (y < top + thumbOffset) {
-                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    iterator = (GameObjectIterator*)CreateControlIterator();
                     for (list = NextAttachedControl(iterator); list; list = NextAttachedControl(iterator)) {
                         if (list->controlType == 3) {
                             UIListBox* listBox = static_cast<UIListBox*>(list);
                             int page = listBox->visibleRowCount;
-                            listBox->ScrollToRow(listBox->UnknownFunction4755c0() - page, 1);
+                            listBox->ScrollToRow(listBox->GetFirstVisibleRow() - page, 1);
                         }
                     }
                     DeleteControlIterator(iterator);
                 }
             }
         }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+        if (snapSteps)
+            SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
     }
     return UIControl::ButtonDown(a, b);
 }
@@ -4430,23 +4430,23 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
         int height = GetHeight();
         RequestRedraw();
         if (controlType == 8) {
-            if (field_0x1f0)
+            if (snapSteps)
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0], 0));
             else
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
-            if (field_0x1f0 != 0.0f)
+            if (snapSteps != 0.0f)
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1], 0));
             else
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
-        if (!field_0x208) {
+        if (snapSteps)
+            SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
+        if (!dragging) {
             event.kind = 0xf;
             event.code = eventCode;
             event.controlName = GetName();
@@ -4454,7 +4454,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
             event.gui = ownerGui;
             event.control = this;
             ownerDialog->UnknownVirtualSlot29(&event);
-            field_0x208 = 1;
+            dragging = 1;
         }
         if (!event.handled) {
             if (position[0] == dragX && position[1] == dragY) {
@@ -4482,13 +4482,13 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
             }
             if (!event.handled) {
             scroll:
-                GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
                 for (UIControl* list = NextAttachedControl(iterator); list;
                      list = NextAttachedControl(iterator)) {
                     if (list->controlType == 3) {
                         UIListBox* listBox = static_cast<UIListBox*>(list);
                         listBox->ScrollToRow(
-                            UnknownFunction475300(listBox->rowCount - listBox->lastPageRowCount), 0);
+                            ScaleThumbPosition(listBox->rowCount - listBox->lastPageRowCount), 0);
                     }
                 }
                 DeleteControlIterator(iterator);
@@ -4578,14 +4578,14 @@ int UIListBox::Draw() {
             for (int row = firstVisibleRow; row < rowCount; row++) {
                 int height = GetRowHeight(row);
                 int whole;
-                if (field_0x240 && visible <= 0) {
+                if (partialRows && visible <= 0) {
                     whole = 0;
                 } else {
                     whole = 1;
                     if (height + y > area.bottom)
                         break;
                 }
-                switch ((int)UnknownFunction476970(row)) {
+                switch ((int)GetRowKind(row)) {
                 case 3:
                     if (pass == 1) {
                         if (rowTable[row].imageFile) {
@@ -4610,12 +4610,12 @@ int UIListBox::Draw() {
                     if (pass == 1 && rowTable[row].image) {
                         int width = rowTable[row].image->GetCurrentFrame()->frameWidth;
                         int imageHeight = rowTable[row].image->GetCurrentFrame()->frameHeight;
-                        rect.left = field_0x230 + area.left;
+                        rect.left = scrollOffsetX + area.left;
                         rect.top = y;
                         rect.right = rect.left + width;
                         if (rect.right >= area.right)
                             rect.right = area.right;
-                        if (field_0x240) {
+                        if (partialRows) {
                             if (imageHeight + y >= area.bottom)
                                 rect.bottom = area.bottom;
                             else
@@ -4659,8 +4659,8 @@ int UIListBox::Draw() {
                                 color = textColor;
                         }
                         if (rowTable[row].width) {
-                            rect.left += field_0x234 + field_0x230;
-                            rect.right += field_0x234 + field_0x230;
+                            rect.left += dragOffsetX + scrollOffsetX;
+                            rect.right += dragOffsetX + scrollOffsetX;
                             ownerDialog->DrawAlignedText(dc, &rect, rowTable[row].text,
                                                               rowTable[row].width, color, fontHeight,
                                                               (UnknownGameUiTextRun*)rowTable[row].textLines,
@@ -4708,23 +4708,23 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
         int height = GetHeight();
         RequestRedraw();
         if (controlType == 8) {
-            if (field_0x1f0)
+            if (snapSteps)
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0], 0));
             else
                 thumbOffset = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - screenArea[0] - thumbWidth / 2, 0));
         } else {
-            if (field_0x1f0 != 0.0f)
+            if (snapSteps != 0.0f)
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1], 0));
             else
                 thumbOffset = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - screenArea[1] - thumbHeight / 2, 0));
         }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
-        if (!field_0x208) {
+        if (snapSteps)
+            SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
+        if (!dragging) {
             event.kind = 0xf;
             event.code = eventCode;
             event.controlName = ownerList->GetName();
@@ -4732,7 +4732,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
             event.gui = ownerGui;
             event.control = this;
             ownerDialog->UnknownVirtualSlot29(&event);
-            field_0x208 = 1;
+            dragging = 1;
         }
         if (!event.handled) {
             if (position[0] == dragX && position[1] == dragY) {
@@ -4764,7 +4764,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
                 if (list != 0) {
                     int count = list->rowCount;
                     int page = list->lastPageRowCount;
-                    list->ScrollToRow(UnknownFunction475300(count - page), 0);
+                    list->ScrollToRow(ScaleThumbPosition(count - page), 0);
                 }
             }
         }
@@ -4775,7 +4775,7 @@ void UIDDLScrollBar::ButtonHeld(int a, int* position) {
 int UIDDLScrollBar::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
         UIListBox* list = ownerList->listPart;
-        if (field_0x1f0) {
+        if (snapSteps) {
             thumbOffset = (float)UNKNOWN_MIN(GetHeight() - thumbHeight,
                                                    UNKNOWN_MAX(((int*)b)[1] - screenArea[1], 0));
         } else {
@@ -4784,15 +4784,15 @@ int UIDDLScrollBar::ButtonDown(int a, int b) {
             if (y > thumbOffset + (top + thumbHeight))
             {
                 int page = list->visibleRowCount;
-                list->ScrollToRow(list->UnknownFunction4755c0() + page, 1);
+                list->ScrollToRow(list->GetFirstVisibleRow() + page, 1);
             } else if (y < top + thumbOffset) {
                 int page = list->visibleRowCount;
-                list->ScrollToRow(list->UnknownFunction4755c0() - page, 1);
+                list->ScrollToRow(list->GetFirstVisibleRow() - page, 1);
             }
         }
     }
-    if (field_0x1f0)
-        UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+    if (snapSteps)
+        SetThumbPosition(ScaleThumbPosition(snapSteps), snapSteps);
     return UIControl::ButtonDown(a, b);
 }
 
@@ -4851,7 +4851,7 @@ UIVideoStatic::UIVideoStatic(int flags, CameraRect* area, UIDialog* owner)
 }
 
 // 0x0047ae90
-int UIVideoStatic::UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
+int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
     if (moviePlayer)
         moviePlayer->Release();
     moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
@@ -4952,7 +4952,7 @@ int UIProgressBar::Draw() {
 }
 
 // 0x0047b3d0
-void UIProgressBar::UnknownFunction47b3d0(int texture, int owned) {
+void UIProgressBar::SetBarTexture(int texture, int owned) {
     barTexture = (TextureMap*)texture;
     ownsBarTexture = owned;
 }
@@ -5027,10 +5027,10 @@ int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntr
 }
 
 // 0x004753c0
-int UIScrollBar::UnknownFunction4753c0(int value, int range) {
+int UIScrollBar::SetThumbPosition(int value, int range) {
     unsigned int position = reversed ? range - value : value;
     RequestRedraw();
-    if (!field_0x1f0 && UnknownFunction475300(range) == position)
+    if (!snapSteps && ScaleThumbPosition(range) == position)
         return 1;
     if (!range) {
         thumbOffset = position;
@@ -5079,8 +5079,8 @@ void UIListBox::ScrollBy(int delta) {
 // 0x00477ff0
 int UIListBox::ButtonUp(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && a == 1) {
-        field_0x230 += field_0x234;
-        field_0x234 = 0;
+        scrollOffsetX += dragOffsetX;
+        dragOffsetX = 0;
     }
     return UIControl::ButtonUp(a, position);
 }
@@ -5174,13 +5174,13 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             int format = g_TrackGame->renderTarget->field_0x28;
             frameWidth = image->width;
             frameHeight = image->height;
-            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
                                             pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+            if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
             UnknownFunction512dd0(image);
             return 1;

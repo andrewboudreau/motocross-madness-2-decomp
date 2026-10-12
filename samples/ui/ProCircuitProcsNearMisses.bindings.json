@@ -214,7 +214,7 @@
   "?SetEditText@UIEditBox@@QAEXPAD@Z": "0x00473da0",
   "?GetEditText@UIEditBox@@QAEPADPADH@Z": "0x00473ef0",
   "?SetAcceptedCharacters@UIEditBox@@QAEXPBD@Z": "0x00473f30",
-  "?UnknownFunction4755c0@UIMultiState@@QAEHXZ": "0x004755c0",
+  "?GetSelectedState@UIMultiState@@QAEHXZ": "0x004755c0",
   "?GetRowData@UIListBox@@QAEHH@Z": "0x004768d0",
   "?GetSelectedRow@UIListBox@@QAEHXZ": "0x00476950",
   "?SelectRow@UIListBox@@QAEHH@Z": "0x00476a60",

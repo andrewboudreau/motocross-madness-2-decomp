@@ -704,7 +704,7 @@ void SPEventDlg::ShowRaceModeControls() {
     UnknownTrackGameModeSettings& settings = g_TrackGame->mode.field_0x27f8;
     if (settings.field_0x04 == 1 && modes->GetRowData(-1) != 4) {
         waypoints->Show(1, 1);
-        if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->UnknownFunction4755c0()) {
+        if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->GetSelectedState()) {
             EnableGroup(0x6f, 1);
             FindControl("LstNumGates", 0)->Show(1, 1);
             FindControl("EditSeed", 0)->Show(1, 1);
@@ -825,7 +825,7 @@ void SPEventDlg::UnknownVirtualSlot31(int apply) {
             settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         if (!g_TrackGame->mode.field_0x10ec)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
-        settings->treeCollision = static_cast<UIMultiState*>(FindControl("ChkTreeCollision", 2))->UnknownFunction4755c0();
+        settings->treeCollision = static_cast<UIMultiState*>(FindControl("ChkTreeCollision", 2))->GetSelectedState();
         strcpy(settings->trackName, "");
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         int index = list->GetRowData(-1);
@@ -840,7 +840,7 @@ void SPEventDlg::UnknownVirtualSlot31(int apply) {
         settings->trackNumber = g_TrackGame->ui->field_0x60[index].field_0x04;
         strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
         g_TrackGame->mode.trackIndices[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
-        if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->UnknownFunction4755c0())
+        if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->GetSelectedState())
             settings->randomGates = 1;
         else
             settings->randomGates = 0;
@@ -1030,7 +1030,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
             list->ReportClick(0);
         } else if (!_stricmp("ChkAutoRotate", event->controlName)) {
-            previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
+            previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->GetSelectedState();
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 2135) OptionsDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
@@ -1343,7 +1343,7 @@ void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         AddControl(bar, 0, 0);
         bar->SetName("ProgressBar");
         UnknownDialogImage* image = (UnknownDialogImage*)FindSectionObject("BlueBar");
-        bar->UnknownFunction47b3d0(image->GetCurrentTexture(), 0);
+        bar->SetBarTexture(image->GetCurrentTexture(), 0);
         bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);
@@ -1889,7 +1889,7 @@ void CreditsVidDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         AddControl(movieControl, 0, 1);
         movieControl->UnknownFunction4691f0();
         movieControl->UnknownFunction469260(FindControl("Back", 0), -1);
-        if (!movieControl->UnknownFunction47ae90("ui\\Credits.avi", 1, CloseDialogCallback, this))
+        if (!movieControl->PlayMovie("ui\\Credits.avi", 1, CloseDialogCallback, this))
             EndDialog(0);
         break;
     }

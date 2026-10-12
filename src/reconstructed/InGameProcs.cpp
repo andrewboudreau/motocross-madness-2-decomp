@@ -136,7 +136,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit:
         field_0x7f58 = 0;
-        static_cast<UIScrollBar*>(FindControl("SliderTime", 8))->UnknownFunction4751c0(1000);
+        static_cast<UIScrollBar*>(FindControl("SliderTime", 8))->SetScrollRange(1000);
         FindControl("ButSave", 0)->Show(0, 1);
         if (!g_TrackGame->GetRegistryFlag("AllowVCRControls", 0)) {
             FindControl("TogFF", 0)->Show(0, 1);
@@ -170,7 +170,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("TogFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 8;
@@ -183,7 +183,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("TogFFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 9;
@@ -195,7 +195,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 }
             }
         } else if (!_stricmp("TogReverse", event->controlName)) {
-            if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
+            if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                 if (view->field_0x1dc != 14) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
@@ -261,7 +261,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 16:
         if (!_stricmp("SliderTime", event->controlName)) {
-            float fraction = static_cast<UIScrollBar*>(event->control)->UnknownFunction475500() / 1000.0f;
+            float fraction = static_cast<UIScrollBar*>(event->control)->GetScrollValue() / 1000.0f;
             UnknownKrustyBikeView* replay = g_TrackGame->eventManager->FindRaceView();
             replay->field_0x1c4 = fraction * replay->field_0x1a0->field_0x10c;
         }
@@ -286,7 +286,7 @@ int VCRDlg::UnknownVirtualSlot10(float frameTime) {
     FormatTime(text, view->field_0x1a0->field_0x10c);
     control->SetText(text);
     if (view->field_0x1c4 == -1.0f)
-        slider->UnknownFunction4753c0((int)(view->field_0x1b8 * 1000.0f),
+        slider->SetThumbPosition((int)(view->field_0x1b8 * 1000.0f),
                                       (int)(view->field_0x1a0->field_0x10c * 1000.0f));
     ShowReplayMode();
     return UIDialog::UnknownVirtualSlot10(frameTime);

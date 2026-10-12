@@ -196,7 +196,7 @@
   "?RemoveAllRows@UIListBox@@QAEXXZ": "0x004775f0",
   "?Sort@UIListBox@@QAEXH@Z": "0x00477900",
   "?SetSelectable@UIListBox@@QAEXH@Z": "0x00477bb0",
-  "?UnknownFunction477e60@UIListBox@@QAEXH@Z": "0x00477e60",
+  "?SetPartialRows@UIListBox@@QAEXH@Z": "0x00477e60",
   "?SetStateTextFromResource@UIMultiState@@QAEXHPAXH@Z": "0x00478a50",
   "?SetCurrentState@UIMultiState@@QAEXH@Z": "0x00478cf0",
   "?SelectInGroup@UIRadioButton@@QAEHH@Z": "0x00479310",

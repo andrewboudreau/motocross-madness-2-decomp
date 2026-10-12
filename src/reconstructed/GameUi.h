@@ -62,7 +62,7 @@ public:
     Sound* frameSound;                        // +0x14
     TextureMap* frameTexture;                 // +0x18
     int ownsSound;                            // +0x1c: owns +0x14
-    int field_0x20;
+    int frameTextures;                        // +0x20: the TextureMapManager the texture is made in
 };
 
 // RTTI: UIAnim : BaseObject (vtable 0x00552ccc; 0xf8 bytes, new'd at
@@ -90,7 +90,7 @@ public:
     int playForwards;                         // +0x0c: 1: playing forwards
     int frameCount;                           // +0x10
     int passesLeft;                           // +0x14: passes left (0x7fff: forever)
-    int field_0x18;
+    int passCountdown;                        // +0x18: counts passesLeft down (Advance)
     int frameDelay;                           // +0x1c
     int lastStepTime;                         // +0x20
     int playBackwards;                        // +0x24: 1: plays backwards
@@ -193,7 +193,7 @@ public:
     virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
     virtual int HitTest(tagPOINT point); // slot 51, 0x004709f0: the area, or ContainsPoint with ShapeBounds
     virtual void SetAttachId(int id); // slot 52, 0x00470400: stores attachId
-    virtual int UnknownVirtualSlot53();       // 0x004726b0
+    virtual int CreateControlIterator();      // slot 53, 0x004726b0: a GameObjectIterator over the owner's "UIControl"s
     virtual void BindValue(int* value); // slot 54, 0x00470a70: stores boundValue (NetProcs.cpp)
     // Slots 55-57: slot 23 calls 55 with the pressed button (and the pointer
     // position), slot 22 calls 56 on release, and slot 10 calls 57 each frame
@@ -237,7 +237,6 @@ public:
     // LSLIDE, RSLIDE, TSLIDE, BSLIDE and ANIM).
     void StartTransition(int type, int a, int b, int delay, int c);
     int RunTransition();              // 0x00471500
-    GameObjectIterator* CreateControlIterator(); // slot 53's body: an iterator over the owner's controls
     void DeleteControlIterator(GameObjectIterator* iterator); // 0x00472730: deletes it
     // 0x00472750: the next control with this control's attach id.
     UIControl* NextAttachedControl(GameObjectIterator* iterator);
@@ -245,7 +244,9 @@ public:
     UIControl* NextAttachedControlOfType(GameObjectIterator* iterator);
     UIControl* PreviousFocusableControl(); // 0x004727c0: the previous focusable control
     UIControl* NextFocusableControl(); // 0x00472810: the next focusable control
-    int UnknownFunction472480(int* position); // 0x00472480
+    // 0x00472480: hit-tests `position` through the sibling and child controls
+    // first, then hovers this one if it is hit and interactive (provisional).
+    int UpdateHoverAt(int* position);
 
     int screenArea[4];                        // +0x2c: screen area (scaled +0x3c)
     union {
@@ -322,7 +323,7 @@ public:
     int backgroundRegion;                     // +0x1b8
     int redrawFrames;                         // +0x1bc: frames to redraw
     int needsRedraw;                          // +0x1c0
-    void* field_0x1c4;
+    void* tabStops;                           // +0x1c4: int table for the "|x" text codes (SplitTextLines)
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
     int (UIControl::*transitionStep)(); // +0x1d0: the running transition (slots 41-47)
@@ -396,7 +397,7 @@ public:
     int field_0x1f4;
     int field_0x1f8;
     int textWidth;                            // +0x1fc
-    int field_0x200;
+    int textScrollX;                          // +0x200: the text's x offset in the box (Draw, by textAlign)
     union {
         int field_0x204;
         Sound* clickSound;                    // +0x204: the key click
@@ -407,13 +408,10 @@ public:
     };
     void* backgroundBrush;                    // +0x20c: the background brush (HBRUSH)
     void* acceptedCharacters;                 // +0x210
-    int field_0x214;
-    int field_0x218;
-    int field_0x21c;
-    int field_0x220;
+    int caretRect[4];                         // +0x214: the caret's CameraRect (Draw); the IME composition position
     int boundBufferSize;                      // +0x224: the bound buffer's size (0x00473820)
-    int field_0x228;
-    int field_0x22c;
+    int leadBytePending;                      // +0x228: a DBCS lead byte was typed; the next key is its trail
+    int dropTrailByte;                        // +0x22c: no room for the pending lead byte's trail
 };
 
 // RTTI: UIScrollCtl : UIButton (vtable 0x00552ef0; 0x1f0 bytes, `new` at
@@ -442,30 +440,30 @@ public:
     virtual void SyncBoundValue(int value); // slot 59, 0x00474cb0
 
     void SetThumbSizeFromState(int state);    // 0x00475160: the thumb size from a state image
-    void UnknownFunction4751c0(int range);    // 0x004751c0
+    void SetScrollRange(int range);           // 0x004751c0: stores scrollRange and redraws
     int GetListScrollRange(UIListBox* list); // 0x004751e0: `list`'s scroll range
     int FollowList(UIListBox* list); // 0x00475200: follows `list`
-    int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
-    int UnknownFunction4753c0(int value, int range); // 0x004753c0: sets the position to `value` of `range`
-    void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
-    int UnknownFunction475500();              // 0x00475500
-    int UnknownFunction4755c0();              // 0x004755c0: +0x1f0
+    int ScaleThumbPosition(int range);        // 0x00475300: the thumb offset scaled to 0..`range` (OptionProcs.cpp)
+    int SetThumbPosition(int value, int range); // 0x004753c0: sets the position to `value` of `range`
+    void SetSnapStepCount(int count);         // 0x004754d0: snapSteps = count - 1 (OptionProcs.cpp)
+    int GetScrollValue();                     // 0x00475500: the thumb offset scaled to scrollRange (SyncBoundValue)
+    int GetSnapSteps();              // 0x004755c0: snapSteps
 
     union {
         int field_0x1ec;
         float thumbOffset;                    // +0x1ec: the thumb's offset along the track (pixels; clamped to
                                               // the track length less the thumb, added to screenArea)
     };
-    int field_0x1f0;
+    int snapSteps;                            // +0x1f0: the last step when the thumb snaps to steps (0 = free)
     int thumbWidth;                           // +0x1f4
     int thumbHeight;                          // +0x1f8
-    int field_0x1fc;
+    int followedRow;                          // +0x1fc: the followed list's first shown row (FollowList)
     int scrollRange;                          // +0x200
     union {
         int field_0x204;
         UIAnim* trackImage;                   // +0x204: the track image
     };
-    int field_0x208;
+    int dragging;                             // +0x208: drag event 0xf sent; ButtonUp sends 0x10 and clears it
     int dragX;                                // +0x20c: the last drag position (x)
     int dragY;                                // +0x210: (y)
     float holdDelay;                          // +0x214: 0.2 s; held that long in place, it sends event 0x11
@@ -500,7 +498,7 @@ public:
     virtual int SetSelectedRow(int row); // slot 65, 0x004769e0: selects `row`
     virtual void ReportClick(int* handled); // slot 66, 0x00477d30: reports a click (and a double click)
 
-    int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
+    int GetFirstVisibleRow();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
     int ScrollToRow(int row, int updateScrollBars); // 0x00476860
     int GetRowData(int row);                  // 0x004768d0: a row's data (-1: the selected one)
     int FindRowByData(int data);              // 0x00476900: -1 when none
@@ -526,8 +524,8 @@ public:
     void Sort(int a);                         // 0x00477900: qsorts the rows
     void SetSelectable(int a);                // 0x00477bb0: "Selectable" (+0x224)
     void UpdateScrollBars();                  // 0x00477bc0: the attached scroll bars follow
-    void UnknownFunction477e60(int a);        // 0x00477e60
-    char* UnknownFunction476970(int row);     // 0x00476970
+    void SetPartialRows(int value);           // 0x00477e60: partialRows (SelectGamePicProcs.cpp)
+    char* GetRowKind(int row);                // 0x00476970: rowTable[row].kind (0 out of range)
     int GetRowHeight(int row);                // 0x004769a0
     void SetAutoSort(int value);              // 0x00477b90: "AutoSort"
     void ScrollBy(int delta);                 // 0x00477730
@@ -546,18 +544,18 @@ public:
     UnknownGameUiListRow* rowTable;           // +0x214: the rows (OptionProcs.cpp)
     union {
         int field_0x218;
-        UIListBox* field_0x218_control;       // itself
+        UIListBox* selfList;                  // +0x218: the list itself (constructor); CompareSortedRows reads it
     };
     int autoSort;                             // +0x21c: "AutoSort"
     int sorting;                              // +0x220: 1 while Sort runs
     int selectable;                           // +0x224: "Selectable"
     int allowWScroll;                         // +0x228: "AllowWScroll"
-    int field_0x22c;
-    int field_0x230;
-    int field_0x234;
+    int dragStartX;                           // +0x22c: x where the AllowWScroll drag began (ButtonDown)
+    int scrollOffsetX;                        // +0x230: the rows' horizontal offset (<= 0)
+    int dragOffsetX;                          // +0x234: the drag in progress, added to +0x230 on ButtonUp
     int lastClickRow;                         // +0x238: for the double click (slot 66)
     int lastClickTime;                        // +0x23c
-    int field_0x240;
+    int partialRows;                          // +0x240: a clipped last row is drawn and counted (provisional)
     int wrapScroll;                           // +0x244: ScrollBy wraps around the rows (1 by default)
     int hoverRow;                             // +0x248: the row under the cursor, framed (-1: none; slot 10)
     int (*sortCompare)(const void* a, const void* b); // +0x24c: the rows' sort order (SetSortCompare)
@@ -582,7 +580,7 @@ public:
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478810
     virtual void SyncBoundValue(int value); // slot 59, 0x00478540
 
-    int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the current state
+    int GetSelectedState();              // 0x004755c0 (folded with UIScrollBar's): the current state
     int SetStateCount(int count);     // 0x00478860: number of states
     void SetStateEntry(int index, UIAnim* image, const char* text); // 0x004789f0
     void SetStateTextFromResource(int index, void* module, int id); // 0x00478a50: a state's resource string
@@ -616,7 +614,7 @@ class UIRadioButton : public UIMultiState {
 public:
     UIRadioButton(int id, CameraRect* area, UIDialog* owner); // 0x00479240
     virtual ~UIRadioButton();                 // 0x004792d0 (deleting wrapper 0x004792b0)
-    virtual int UnknownVirtualSlot53();       // 0x004795c0
+    virtual int CreateControlIterator();      // slot 53, 0x004795c0: iterates the "UIRadioButton"s
     virtual int ButtonDown(int a, int b); // slot 55, 0x004794c0
     virtual void SyncBoundValue(int value); // slot 59, 0x004792e0
 
@@ -709,10 +707,7 @@ public:
     UIDDLScrollBar* scrollBarPart;            // +0x200
     int rowHeight;                            // +0x204
     int isOpen;                               // +0x208
-    int field_0x20c;
-    int field_0x210;
-    int field_0x214;
-    int field_0x218;
+    int openArea[4];                          // +0x20c: the dropped-down CameraRect, button to list bottom (LayoutParts)
 };
 
 inline UIDDLButton* UIDropDownList::UnknownInlineButton() { return buttonPart; }
@@ -730,7 +725,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0047af90
     virtual int Draw();                   // slot 40, 0x0047afa0: copies the movie's frame
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
-    int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
+    int PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
 
     MediaControl* moviePlayer;                // +0x1ec: the player
     int frameRect[4];                         // +0x1f0: the frame's source rectangle
@@ -745,7 +740,7 @@ public:
     virtual int Draw();                   // slot 40, 0x0047b110: draws the bar and its percentage
     virtual TextureMap* GetStateTexture(int state); // slot 48, 0x0047b100
     void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
-    void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
+    void SetBarTexture(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 
     float progressFraction;                   // +0x1ec: the part done (0..1)
     int stepCount;                            // +0x1f0: steps (LoadingDlg sets 20)

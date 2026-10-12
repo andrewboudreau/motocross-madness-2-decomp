@@ -268,7 +268,7 @@ int UIListBox::ButtonDown(int a, int b) {
                     return 1;
             }
         } else if (a == 1 && allowWScroll) {
-            field_0x22c = point->x;
+            dragStartX = point->x;
             return UIControl::ButtonDown(a, b);
         }
     }
@@ -279,7 +279,7 @@ int UIListBox::ButtonDown(int a, int b) {
 // Drawing, input and loading near misses
 
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`.
-int UnknownFunction47b490(TextureMap* texture, int key) {
+int TextureHasColor(TextureMap* texture, int key) {
     int found = 0;
     unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, 0, 0x11);
     if (bits) {
@@ -322,18 +322,18 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
-        field_0x20 = (int)textures;
+        frameTextures = (int)textures;
         UnknownTgaFile* image = UnknownFunction5125c0(file, 0, (int)g_UnknownResourceManager572b44);
         if (image) {
             frameWidth = image->width;
             frameHeight = image->height;
-            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
                                             pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+            if (TextureHasColor(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
         } else {
             char message[100];
@@ -527,19 +527,19 @@ int UIEditBox::Draw() {
     do {
         if (textAlign & 1) {
             int offset = width - textWidth;
-            field_0x200 = offset > 0 ? 0 : offset;
+            textScrollX = offset > 0 ? 0 : offset;
         } else if (textAlign & 2) {
             if (GetWidth() > textWidth)
-                field_0x200 = width / 2 - textWidth / 2;
+                textScrollX = width / 2 - textWidth / 2;
             else
-                field_0x200 = width - textWidth;
+                textScrollX = width - textWidth;
         } else if (textAlign & 4) {
-            field_0x200 = width - textWidth;
+            textScrollX = width - textWidth;
         } else {
             int offset = width - textWidth;
-            field_0x200 = offset > 0 ? 0 : offset;
+            textScrollX = offset > 0 ? 0 : offset;
         }
-        int x = screenArea[0] + field_0x200;
+        int x = screenArea[0] + textScrollX;
         int y;
         if (textAlign & 8)
             y = screenArea[1];
@@ -569,7 +569,7 @@ int UIEditBox::Draw() {
                 if (!height)
                     height = ownerDialog->dialogFontHeight;
                 rect.bottom = rect.top + height + 1;
-                CameraRect* caretRect = (CameraRect*)&field_0x214;
+                CameraRect* caretRect = (CameraRect*)caretRect;
                 *caretRect = rect;
                 if (backgroundBrush)
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)backgroundBrush);
@@ -585,8 +585,8 @@ int UIEditBox::Draw() {
                 if (ImmGetOpenStatus(context)) {
                     COMPOSITIONFORM composition;
                     composition.dwStyle = CFS_FORCE_POSITION;
-                    composition.ptCurrentPos.x = ((CameraRect*)&field_0x214)->left;
-                    composition.ptCurrentPos.y = ((CameraRect*)&field_0x214)->top;
+                    composition.ptCurrentPos.x = ((CameraRect*)caretRect)->left;
+                    composition.ptCurrentPos.y = ((CameraRect*)caretRect)->top;
                     ImmSetCompositionWindow(context, &composition);
                 }
                 if (context)
@@ -652,20 +652,20 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
                 return 1;
             break;
         default: {
-            int lead = !field_0x228 && IsDBCSLeadByte(c) ? 1 : 0;
-            if (!field_0x228 && !lead) {
+            int lead = !leadBytePending && IsDBCSLeadByte(c) ? 1 : 0;
+            if (!leadBytePending && !lead) {
                 c = FilterCharacter(c);
                 if (!c)
                     break;
             }
-            field_0x228 = 0;
+            leadBytePending = 0;
             int room;
             if (lead) {
-                field_0x228 = 1;
+                leadBytePending = 1;
                 room = controlTextLength < textCapacity - 2;
-                field_0x22c = !room;
-            } else if (field_0x22c) {
-                field_0x22c = 0;
+                dropTrailByte = !room;
+            } else if (dropTrailByte) {
+                dropTrailByte = 0;
                 room = 0;
             } else {
                 room = controlTextLength < textCapacity - 1;
@@ -789,7 +789,7 @@ void UIDropDownList::LayoutParts() {
     scroll.bottom -= 2;
     scroll.left = button.left;
     scroll.right = button.right;
-    CameraRect* area = (CameraRect*)&field_0x20c;
+    CameraRect* area = (CameraRect*)openArea;
     char name[50];
     area->left = left;
     area->top = top;
@@ -1396,8 +1396,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &position);
                     parameters.UnknownFunction4b7f10("Scale", defaultScale, isDefault ? &defaultScale : &scale);
                     if (!isDefault) {
-                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4754d0(ticks);
-                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4751c0(scale);
+                        static_cast<UIScrollBar*>(scrollBar)->SetSnapStepCount(ticks);
+                        static_cast<UIScrollBar*>(scrollBar)->SetScrollRange(scale);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
@@ -1414,7 +1414,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             control->bounds[2] = image->frameList[0]->frameWidth + control->bounds[0];
                             control->bounds[3] = control->bounds[1] + image->frameList[0]->frameHeight;
                         }
-                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4753c0(position, ticks ? ticks
+                        static_cast<UIScrollBar*>(scrollBar)->SetThumbPosition(position, ticks ? ticks
                                                                          : control->bounds[2] - control->bounds[0] + 1);
                         scrollBar->SetThumbSizeFromState(0);
                     }
