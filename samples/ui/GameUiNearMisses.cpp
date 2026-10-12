@@ -331,7 +331,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                 }
             }
         }
-        UnknownFunction46f120();
+        UpdatePointerHover();
         GameObject::UnknownVirtualSlot10(lastFrameTime);
     }
     return 1;

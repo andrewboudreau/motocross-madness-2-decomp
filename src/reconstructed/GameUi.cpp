@@ -1825,7 +1825,7 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     animatesControls = 1;
     memset(sectionTable, 0, sizeof(sectionTable));
     sectionCount = 0;
-    field_0x154 = 1;
+    notifyParentOnClose = 1;
     lastFrameTime = 0.0f;
     controlsPost3D = 1;
     timerList.Init(2, 1);
@@ -1851,7 +1851,7 @@ UIDialog::~UIDialog() {
                 guiManager->UnknownFunction464e90();
         }
         if (field_0x148 && parentDialog)
-            parentDialog->UnknownFunction470070(0, 0, 0);
+            parentDialog->SetModalPause(0, 0, 0);
         if ((field_0x144 & 4) && (field_0x144 & 0x10))
             guiManager->ReleaseBackgroundGrab();
     }
@@ -1861,7 +1861,7 @@ UIDialog::~UIDialog() {
         if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
             parentDialog->guiManager && !parentDialog->guiManager->UnknownFunction4864f0())
             parentDialog->guiManager->SetGuiPalette((Palette8*)parentDialog->dialogPalette);
-        if (field_0x154)
+        if (notifyParentOnClose)
             NotifyParent(dialogResult, 9);
     }
     if (dialogFont)
@@ -1911,7 +1911,7 @@ int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         guiUser->controlDown[event->control] = 1;
     if (!isPaused) {
         if (event->kind == 1)
-            UnknownFunction46f120();
+            UpdatePointerHover();
         return GameObject::UnknownVirtualSlot23(event, entry);
     }
     return 0;
@@ -1923,7 +1923,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
         guiUser->controlDown[event->control] = 0;
     if (!isPaused) {
         if (event->kind == 1)
-            UnknownFunction46f120();
+            UpdatePointerHover();
         if (event->kind) {
             RemoveTimers(0x101);
             RemoveTimers(0x102);
@@ -2136,8 +2136,8 @@ void UIDialog::EndDialog(int result) {
 }
 
 // 0x0046ff60
-void UIDialog::UnknownFunction46ff60() {
-    field_0x154 = 0;
+void UIDialog::AbortWithoutNotify() {
+    notifyParentOnClose = 0;
     UnknownVirtualSlot26();
 }
 
@@ -2181,7 +2181,7 @@ void UIDialog::SyncValues(int value) {
 }
 
 // 0x00470070
-void UIDialog::UnknownFunction470070(int a, int b, CameraRect* rect) {
+void UIDialog::SetModalPause(int a, int b, CameraRect* rect) {
     if (a)
         GrabBackground(b, rect);
     else
@@ -3464,7 +3464,7 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 }
 
 // 0x0046f120
-void UIDialog::UnknownFunction46f120() {
+void UIDialog::UpdatePointerHover() {
     if (guiUser->pointerDevice && controlContainer->firstChild) {
         GUIUser* user = guiUser;
         UnknownGuiControl* focus = user->hoverControl;
@@ -4079,14 +4079,14 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         if (stream->Open(path, "r", 0)) {
             if (!ReadDialogResource(stream, 0)) {
                 delete stream;
-                UnknownFunction46ff60();
+                AbortWithoutNotify();
                 return 0;
             }
             delete stream;
         } else {
             delete stream;
             if (!LoadDialogResource(resourceName)) {
-                UnknownFunction46ff60();
+                AbortWithoutNotify();
                 return 0;
             }
         }

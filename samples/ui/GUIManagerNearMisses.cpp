@@ -74,7 +74,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
             rect = &screen;
         }
         if (parent)
-            parent->UnknownFunction470070(1, flags & 8, rect);
+            parent->SetModalPause(1, flags & 8, rect);
         else if ((flags & 4) && (flags & 0x10))
             GrabBackground(flags & 8);
     }
