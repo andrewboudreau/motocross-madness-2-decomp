@@ -205,8 +205,8 @@
     "candidate_symbol_contains": "DrawTreeMotion@CollisionObject",
     "target_va": "0x004334c0",
     "target_size": 1130,
-    "expect": "partial",
-    "notes": "98.1%: remaining diff is FPU operand order in the q (motion) transform rows y/z (retail sums z,y then x)",
+    "expect": "exact",
+    "notes": "the q (motion) transform reads the point into scalars x, y, z and brackets the z row as x*_13 + (y*_23 + z*_33) + _43 (1110 -> 1130)",
     "bindings": "CollisionObject.bindings.json"
   },
   {

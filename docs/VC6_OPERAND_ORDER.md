@@ -546,6 +546,13 @@ without effect, as noted.
   order in VehicleInlines `0x0040c4c0`; an unused int, braces and declaration shifts
   did not. `const Vec3& rear = ..., & front = ...;` declared rear first fixed Bike
   slot 46's register pair (`0x0040b600`).
+- **Components read into scalars first.** `float y = v.y, x = v.x, z = v.z;` before a
+  square sum or a matrix row sets the x87 load order (the declaration order) and frees the
+  product order: CollisionObject StoreHitResult `0x00434bb0` and StoreHitNormal `0x00434cf0`
+  matched with that declaration and `z * z + (x * x + y * y)`; DrawTreeMotion `0x004334c0`
+  with `float x = v.x, y = v.y, z = v.z;` and a z row `x * m->_13 + (y * m->_23 + z * m->_33)
+  + m->_43`. Reading `v.x` in place with the same bracketing stayed 1-3 products off. It did
+  not help SoultreeObject::WorldToLocalDirection `0x004fd710` (207 -> 203).
 - **Written operand order of a product between two struct copies.** For FollowCamera
   slot 47 `0x00465720` `b.m[k][j] * a.m[i][k]` (not `a * b`) gives retail's hoisted
   `a(0,3)` load, and `m[r][c]` access instead of `operator()` lets VC6 interleave the

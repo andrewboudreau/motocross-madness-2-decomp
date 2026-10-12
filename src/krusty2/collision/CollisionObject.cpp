@@ -916,6 +916,17 @@ inline void DebugTransformPointRef(Vec3* out, const Vec3& v, const Matrix4* m)
     out->z = v.x * m->_13 + v.y * m->_23 + v.z * m->_33 + m->_43;
 }
 
+// DrawTreeMotion's motion transform: the components read into scalars and the z row's last
+// two products parenthesised give retail's operand order in every row of q[0..2] (with
+// v.x/v.y/v.z read directly the same bracketing leaves q[0].z x-first, 1120/1130).
+inline void DebugTransformPointQ(Vec3* out, const Vec3& v, const Matrix4* m)
+{
+    float x = v.x, y = v.y, z = v.z;
+    out->x = x * m->_11 + y * m->_21 + z * m->_31 + m->_41;
+    out->y = x * m->_12 + y * m->_22 + z * m->_32 + m->_42;
+    out->z = x * m->_13 + (y * m->_23 + z * m->_33) + m->_43;
+}
+
 // v * M3x3 (no translation), like 0x0042a450.
 inline void DebugRotateVector(Vec3* out, Vec3 v, const Matrix4* m)
 {
@@ -953,9 +964,6 @@ void CollisionObject::DrawTree(CollisionTreeNode* node, int depth, const Matrix4
 // 0x004334c0 (ret 0x14).  Like DrawTree, but also shows where `motion` moves each node.
 // A box is drawn, moved by 0x00428db0 and drawn again.  A triangle is drawn and each
 // corner is joined (in red) to its image under `motion`.
-// Near miss (1046/1066): rows y/z of q[1], q[2] sum (z, y), x in retail and (x, z), y here;
-// a uniform sweep of DebugTransformPointRef forms (that also keeps 0x00433930 exact) found
-// nothing better.
 void CollisionObject::DrawTreeMotion(CollisionTreeNode* node, int depth, const Matrix4* xf,
                                      const Matrix4* motion, const Vec3* verts)
 {
@@ -980,9 +988,9 @@ void CollisionObject::DrawTreeMotion(CollisionTreeNode* node, int depth, const M
             DebugTransformPoint(&p[1], verts[tri->vertex[1]], xf);
             DebugTransformPoint(&p[2], verts[tri->vertex[2]], xf);
             // q reads p in place (no stack copy), hence the by-reference transform.
-            DebugTransformPointRef(&q[0], p[0], motion);
-            DebugTransformPointRef(&q[1], p[1], motion);
-            DebugTransformPointRef(&q[2], p[2], motion);
+            DebugTransformPointQ(&q[0], p[0], motion);
+            DebugTransformPointQ(&q[1], p[1], motion);
+            DebugTransformPointQ(&q[2], p[2], motion);
             DrawLine(&p[0], &p[1]);
             DrawLine(&p[1], &p[2]);
             DrawLine(&p[2], &p[0]);
