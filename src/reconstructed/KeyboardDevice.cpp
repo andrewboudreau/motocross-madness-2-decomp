@@ -26,7 +26,7 @@ int KeyboardDevice::UnknownFunction489f80(UnknownControlBinding* binding, int ke
     binding->field_0x1c = step;
     binding->field_0x20 = interval;
     axisBindings[binding->field_0x08].Add(binding);
-    binding->UnknownFunction43cce0(key, key2);
+    binding->SetKeys(key, key2);
     return 1;
 }
 
@@ -51,27 +51,27 @@ void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
         binding->field_0x14 += g_TrackGame->frameTime;
         if (UnknownVirtualSlot5(binding->field_0x0c, 0x3f, 0)) {
             if (binding->field_0x14 - g_TrackGame->frameTime > binding->field_0x20) {
-                binding->UnknownFunction43cd10();
+                binding->Recenter();
                 binding->field_0x14 = 0;
             }
             while (binding->field_0x14 > binding->field_0x20) {
-                binding->UnknownFunction43cd90(-binding->field_0x1c);
+                binding->Adjust(-binding->field_0x1c);
                 binding->field_0x14 -= binding->field_0x20;
             }
         }
         if (UnknownVirtualSlot5(binding->field_0x10, 0x3f, 0)) {
             if (binding->field_0x18 - g_TrackGame->frameTime > binding->field_0x20) {
-                binding->UnknownFunction43cd10();
+                binding->Recenter();
                 binding->field_0x18 = 0;
             }
             while (binding->field_0x18 > binding->field_0x20) {
-                binding->UnknownFunction43cd90(binding->field_0x1c);
+                binding->Adjust(binding->field_0x1c);
                 binding->field_0x18 -= binding->field_0x20;
             }
         }
         if (!UnknownVirtualSlot5(binding->field_0x0c, 0x3f, 0) &&
             !UnknownVirtualSlot5(binding->field_0x10, 0x3f, 0))
-            binding->UnknownFunction43cd10();
+            binding->Recenter();
     }
 }
 

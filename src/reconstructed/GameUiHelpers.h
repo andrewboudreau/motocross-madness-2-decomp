@@ -26,14 +26,14 @@ int UnknownFunction47b800(float p0x, float p0y, float d0x, float d0y,
 
 // 0x0047b8a0: a profile value as a float, `defaultValue` when the key is
 // missing ("NONE").
-float UnknownFunction47b8a0(const char* section, const char* key, double defaultValue,
+float ReadIniFloat(const char* section, const char* key, double defaultValue,
                             const char* path);
 
 // 0x0047b930, 0x0047b9e0 and 0x0047ba80: the profile API on `file` joined
 // to the current directory ("%s\\%s") unless it already holds a backslash.
-void UnknownFunction47b930(const char* section, const char* key, const char* defaultValue,
+void ReadIniString(const char* section, const char* key, const char* defaultValue,
                            char* buffer, int size, const char* file);
-int UnknownFunction47b9e0(const char* section, const char* key, int defaultValue,
+int ReadIniInt(const char* section, const char* key, int defaultValue,
                           const char* file);
-void UnknownFunction47ba80(const char* section, const char* key, const char* value,
+void WriteIniString(const char* section, const char* key, const char* value,
                            const char* file);

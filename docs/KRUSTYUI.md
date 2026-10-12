@@ -26,6 +26,26 @@ ends with the shared dialog deleting destructor and its vector set:
   the set at 159-162 (`0x004986b0..0x004987a0`, just before the
   constructor).
 
+## Field names
+
+| Offset | Name | Evidence |
+|---|---|---|
+| +0x2c | `gui` | the GUIManager built by constructor `0x00485190`; every dialog is shown through it |
+| +0x30 | `returnMenu` | DlgProcs.cpp saves `currentMenu` here for events 0x104/0x105 and later reopens it |
+| +0x34 | `previousMenu` | `OpenMenu` copies `currentMenu` here before opening menu 0xd0 |
+| +0x3c | `currentMenu` | `OpenMenu` stores its argument here |
+| +0x40 | `replayAvailable` | BikeRace `0x00420b00` sets it after closing a replay VCR; the results dialog then shows "ButViewReplay" |
+| +0x44 | `demoEnded` | BikeRace sets it at race end while +0x4a8 is set; `DemoDlg` slot 10 consumes it and ends the dialog |
+| +0x48/+0x4c | `manufacturers`/`manufacturerCount` | `LoadBikesAndRiders` appends one entry per `Manufacturer_%02d` section of bikes.pb |
+| +0x50/+0x54 | `bikes`/`bikeCount` | one entry per bike of those manufacturers |
+| +0x58/+0x5c | `riders`/`riderCount` | one entry per `Rider_%02d` section of riders.pb |
+| +0x60 | `entries` | the track list counted by +0x64 (`entryCount`); `0x0049ba70` appends rows whose `scene` (+0x04), `series` (+0x08) and `fileName` (+0x14, the .env name) come from SelectGamePicProcs.cpp |
+| +0x468 | `garageCamera` | made current while the garage scene (+0x464) is shown |
+| +0x46c/+0x470 | `riderPreview`/`garageCharacter` | dlgprocs.cpp SPBikeRiderDlg slots 13 and 10 |
+| +0x474 | `garageFocus` | the garage scene's look target (the dialog procs aim the camera at it) |
+| +0x490 | `progressDialog` | DlgProcs.cpp stores the dialog that owns "ProgressBar" and clears it on close |
+| +0x494 | `savedInputContext` | `ImmAssociateContext`'s result (DlgProcs.cpp), restored by EventManager `0x0045e710` |
+
 ## Menu ids
 
 `OpenMenu` stores its argument at +0x3c and constructs one dialog per id;
@@ -33,9 +53,11 @@ ends with the shared dialog deleting destructor and its vector set:
 (`kMenuMain` 100 = `MainDlg`, `kMenuExit` 0x191 = `ExitDlg`, ...). Ids that
 share a dialog (0x85c/0x85d, 0x866-0x868, 0x910/0x911, 0xbb9-0xbbb) keep
 their number as a suffix, as does 0x88e, which opens one of four dialogs.
-KrustyUI.cpp, DlgProcs.cpp, EventManager.cpp and ProCircuitProcs.cpp use the
-names; including the header in SelectGamePicProcs.cpp changes VC6's code for
-`FillFileList` `0x004f17a0`, so that file keeps the numbers.
+KrustyUI.cpp, DlgProcs.cpp, EventManager.cpp, ProCircuitProcs.cpp,
+NetProcs.cpp, InGameProcs.cpp and TrackRecord.cpp use the names. Including
+the header changes VC6's code for `FillFileList` `0x004f17a0` in
+SelectGamePicProcs.cpp and for TrackGame slot 1 `0x00520ab0` in
+TrackGame.cpp, so those two files keep the numbers.
 
 ## Status
 
@@ -77,7 +99,7 @@ Exact (43 functions, including the open-menu routine `OpenMenu` `0x00499b20`):
 - `0x0049bbb0` / `0x0049bc50`: record the race in the high-score tables at
   TrackGame+0x3400 (table 0, then 1 and 2 by laps 5/10 or, in modes 0 and 4,
   by the +0x140 setting 5.0/10.0);
-- `0x00498cf0` (3114 bytes): builds the garage scene at +0x464 on the
+- `0x00498cf0` (3114 bytes): builds the garage scene at +0x464 (`garageScene`) on the
   first call with 1 or -1 (camera, light manager and three lights, the
   "UIgarage.mcf" and "UIRider.mcf" characters, a ProjectedShadow and its
   D3DIMSoultreeShadow) and with 2 or -1 later loads every bike model

@@ -78,7 +78,7 @@ int UnknownFunction47b800(float p0x, float p0y, float d0x, float d0y,
 }
 
 // 0x0047b8a0
-float UnknownFunction47b8a0(const char* section, const char* key, double defaultValue,
+float ReadIniFloat(const char* section, const char* key, double defaultValue,
                             const char* path)
 {
     char text[0x100];
@@ -91,7 +91,7 @@ float UnknownFunction47b8a0(const char* section, const char* key, double default
 }
 
 // 0x0047b930
-void UnknownFunction47b930(const char* section, const char* key, const char* defaultValue,
+void ReadIniString(const char* section, const char* key, const char* defaultValue,
                            char* buffer, int size, const char* file)
 {
     char directory[200];
@@ -107,7 +107,7 @@ void UnknownFunction47b930(const char* section, const char* key, const char* def
 }
 
 // 0x0047b9e0
-int UnknownFunction47b9e0(const char* section, const char* key, int defaultValue,
+int ReadIniInt(const char* section, const char* key, int defaultValue,
                           const char* file)
 {
     char directory[200];
@@ -123,7 +123,7 @@ int UnknownFunction47b9e0(const char* section, const char* key, int defaultValue
 }
 
 // 0x0047ba80
-void UnknownFunction47ba80(const char* section, const char* key, const char* value,
+void WriteIniString(const char* section, const char* key, const char* value,
                            const char* file)
 {
     char directory[200];

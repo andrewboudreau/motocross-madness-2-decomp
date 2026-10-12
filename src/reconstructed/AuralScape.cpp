@@ -120,7 +120,7 @@ int SoundGroup::UnknownVirtualSlot10(float frameTime) {
 
 // 0x00401f80
 SoundInterface::SoundInterface() {
-    field_0x2c_bit0 = 0;
+    audioStarted = 0;
 }
 
 // 0x00401fe0
@@ -745,7 +745,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
                 sounds++;
                 if (sound->IsPlaying())
                     playing++;
-                bytes += sound->field_0x198;
+                bytes += sound->bufferBytes;
             }
         }
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Sounds %d Playing %d", sounds,
@@ -768,7 +768,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Total Wave Memory %d", bytes);
         if (SoundSystem()->soundMemoryManager)
             g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "SoundCacheBytes %d",
-                                                                     SoundSystem()->soundMemoryManager->field_0x28);
+                                                                     SoundSystem()->soundMemoryManager->loadedBytes);
     }
     return GameObject::UnknownVirtualSlot10(frameTime);
 }

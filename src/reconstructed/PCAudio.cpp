@@ -42,29 +42,29 @@ unsigned __stdcall UnknownSoundNotifier::UnknownThreadProc(void* context) {
     HANDLE events[3];
     unsigned long result;
 
-    events[0] = sound->field_0x3c->field_0x08;
-    events[1] = sound->field_0x3c->field_0x0c;
-    events[2] = sound->field_0x3c->field_0x10;
+    events[0] = sound->notifier->firstHalfEvent;
+    events[1] = sound->notifier->secondHalfEvent;
+    events[2] = sound->notifier->stopEvent;
     while ((result = WaitForMultipleObjects(3, events, FALSE, INFINITE)) != WAIT_FAILED) {
         switch (result) {
         case 0:
         case 1:
-            if (sound && sound->field_0x0c) {
-                if (!sound->field_0x3c->field_0x18_bit0) {
+            if (sound && sound->dsBuffer) {
+                if (!sound->notifier->skipNotification) {
                     unsigned long play;
                     unsigned long write;
-                    EnterCriticalSection(&sound->field_0x48);
-                    if (sound->field_0x0c->GetCurrentPosition(&play, &write) >= 0) {
-                        unsigned long half = sound->field_0x198 / 2;
+                    EnterCriticalSection(&sound->bufferLock);
+                    if (sound->dsBuffer->GetCurrentPosition(&play, &write) >= 0) {
+                        unsigned long half = sound->bufferBytes / 2;
                         unsigned long offset = half < play ? 0 : half;
-                        if (offset != sound->field_0x44) {
-                            sound->FillBufferFromStream(&sound->field_0x0c, sound->field_0x40, offset, half);
-                            sound->field_0x44 = offset;
+                        if (offset != sound->filledHalf) {
+                            sound->FillBufferFromStream(&sound->dsBuffer, sound->sourceStream, offset, half);
+                            sound->filledHalf = offset;
                         }
                     }
-                    LeaveCriticalSection(&sound->field_0x48);
+                    LeaveCriticalSection(&sound->bufferLock);
                 } else {
-                    sound->field_0x3c->field_0x18_bit0 = 0;
+                    sound->notifier->skipNotification = 0;
                 }
             }
             break;
@@ -79,13 +79,13 @@ stopped:
 
 // 0x004bb720
 UnknownSoundNotifier::UnknownSoundNotifier() {
-    field_0x00 = 0;
-    field_0x04 = 0;
-    field_0x08 = 0;
-    field_0x0c = 0;
-    field_0x10 = 0;
-    field_0x14 = 0;
-    field_0x18_bit0 = 1;
+    ownerSound = 0;
+    notify = 0;
+    firstHalfEvent = 0;
+    secondHalfEvent = 0;
+    stopEvent = 0;
+    refillThread = 0;
+    skipNotification = 1;
 }
 
 // 0x004bb740: creates the events and thread and asks for notifications at
@@ -94,119 +94,156 @@ int UnknownSoundNotifier::StartRefillThread(Sound* sound) {
     UnknownNotifyPosition positions[2];
     unsigned threadId;
 
-    field_0x00 = sound;
-    field_0x08 = CreateEventA(0, 0, 0, 0);
-    field_0x0c = CreateEventA(0, 0, 0, 0);
-    field_0x10 = CreateEventA(0, 0, 0, 0);
-    field_0x14 = (HANDLE)_beginthreadex(0, 0, UnknownThreadProc, sound, 0, &threadId);
-    if (!field_0x08 || !field_0x0c || !field_0x10 || !field_0x14)
+    ownerSound = sound;
+    firstHalfEvent = CreateEventA(0, 0, 0, 0);
+    secondHalfEvent = CreateEventA(0, 0, 0, 0);
+    stopEvent = CreateEventA(0, 0, 0, 0);
+    refillThread = (HANDLE)_beginthreadex(0, 0, UnknownThreadProc, sound, 0, &threadId);
+    if (!firstHalfEvent || !secondHalfEvent || !stopEvent || !refillThread)
         return 0;
-    if (sound->field_0x0c->QueryInterface(IID_IDirectSoundNotify, (void**)&field_0x04) < 0)
+    if (sound->dsBuffer->QueryInterface(IID_IDirectSoundNotify, (void**)&notify) < 0)
         return 0;
     positions[0].offset = 0;
-    positions[0].event = field_0x08;
-    positions[1].offset = sound->field_0x198 / 2;
-    positions[1].event = field_0x0c;
-    field_0x04->SetNotificationPositions(2, positions);
+    positions[0].event = firstHalfEvent;
+    positions[1].offset = sound->bufferBytes / 2;
+    positions[1].event = secondHalfEvent;
+    notify->SetNotificationPositions(2, positions);
     return 1;
 }
 
 // 0x004bb810: stops the thread and closes the handles.
 UnknownSoundNotifier::~UnknownSoundNotifier() {
-    if (field_0x00) {
-        if (field_0x14) {
-            SetEvent(field_0x10);
-            WaitForSingleObject(field_0x14, INFINITE);
-            if (field_0x14) {
-                CloseHandle(field_0x14);
-                field_0x14 = 0;
+    if (ownerSound) {
+        if (refillThread) {
+            SetEvent(stopEvent);
+            WaitForSingleObject(refillThread, INFINITE);
+            if (refillThread) {
+                CloseHandle(refillThread);
+                refillThread = 0;
             }
         }
-        if (field_0x10) {
-            CloseHandle(field_0x10);
-            field_0x10 = 0;
+        if (stopEvent) {
+            CloseHandle(stopEvent);
+            stopEvent = 0;
         }
-        if (field_0x08) {
-            CloseHandle(field_0x08);
-            field_0x08 = 0;
+        if (firstHalfEvent) {
+            CloseHandle(firstHalfEvent);
+            firstHalfEvent = 0;
         }
-        if (field_0x0c) {
-            CloseHandle(field_0x0c);
-            field_0x0c = 0;
+        if (secondHalfEvent) {
+            CloseHandle(secondHalfEvent);
+            secondHalfEvent = 0;
         }
-        if (field_0x04) {
-            field_0x04->Release();
-            field_0x04 = 0;
+        if (notify) {
+            notify->Release();
+            notify = 0;
         }
     }
 }
 
+// 0x004bb890: a new sound for the archive entry `name`. When a sound was
+// already loaded from that entry, the new one duplicates its buffer, or
+// re-reads the entry if that sound is streamed (flag 4). Otherwise the
+// sound is loaded from the entry's stream and recorded on the entry. All
+// three load failures share one delete-and-fail tail, which retail lays
+// out inside the last branch; the two early failures keep their own
+// epilogues.
+Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
+    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(name, 0);
+    if (!entry)
+        return 0;
+    Sound* sound = new (__FILE__, 186) Sound(group, 1);
+    if (!sound)
+        return 0;
+    Sound* loaded = (Sound*)entry->field_0x10;
+    if (loaded) {
+        if (loaded->soundFlags & 4) {
+            entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+            if (!sound->LoadWave(entry->field_0x14, flags, a, b, c))
+                goto failed;
+        } else if (!sound->DuplicateFrom(loaded)) {
+            goto failed;
+        }
+    } else {
+        entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
+        if (!sound->LoadWave(entry->field_0x14, flags, a, b, c)) {
+failed:
+            delete sound;
+            return 0;
+        }
+        g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, sound);
+    }
+    strncpy(sound->soundName, name, 0x103);
+    sound->isPacked = 1;
+    return sound;
+}
+
 // 0x004bba10: an empty sound of `type` in `group`.
 Sound::Sound(SoundGroup* group, int type) {
-    field_0x08 = group;
+    soundGroup = group;
     group->UnknownFunction401b50(this);
-    field_0x0c = 0;
-    field_0x10 = 0;
-    field_0x18 = 0;
-    field_0x1c = 0;
-    field_0x14 = 0;
-    field_0x20 = 0;
-    field_0x24 = 0;
-    field_0x28 = 0;
-    memset(&field_0x2c, 0, sizeof(field_0x2c));
-    field_0x38 = 0;
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x44 = 0;
-    InitializeCriticalSection(&field_0x48);
-    strcpy(field_0x60, "");
-    field_0x168 = type;
-    field_0x164 = 0;
-    memset(&field_0x16a, 0, sizeof(field_0x16a));
-    field_0x198 = 0;
-    field_0x19c = 0;
-    field_0x1a0 = 0;
-    field_0x1a4 = 0;
-    memset(&field_0x1a8, 0, sizeof(field_0x1a8));
-    field_0x1f5_bit0 = 0;
-    field_0x1f5_bit1 = 0;
-    field_0x1f5_bit2 = 0;
-    field_0x1f5_bit3 = 0;
-    field_0x1e8 = 0;
-    field_0x1ec = 0;
-    field_0x1f0 = 0;
-    field_0x1f4_bit0 = 0;
-    field_0x1f4_bit1 = 0;
+    dsBuffer = 0;
+    dsBuffer3D = 0;
+    pendingBuffer = 0;
+    pendingBuffer3D = 0;
+    propertySet = 0;
+    duplicateBuffers = 0;
+    duplicateCount = 0;
+    duplicateSource = 0;
+    memset(&fade, 0, sizeof(fade));
+    fadeVolume = 0;
+    notifier = 0;
+    sourceStream = 0;
+    filledHalf = 0;
+    InitializeCriticalSection(&bufferLock);
+    strcpy(soundName, "");
+    soundType = type;
+    lastPlayTime = 0;
+    memset(&waveHeader, 0, sizeof(waveHeader));
+    bufferBytes = 0;
+    currentFrequency = 0;
+    currentVolume = 0;
+    currentPan = 0;
+    memset(&parameters3D, 0, sizeof(parameters3D));
+    bufferReady = 0;
+    isStopped = 0;
+    isFilling = 0;
+    isPaused = 0;
+    soundFlags = 0;
+    controlsSet = 0;
+    lastPlayFlags = 0;
+    isPacked = 0;
+    isDuplicate = 0;
     field_0x1f4_bit2 = 0;
-    field_0x1f4_bit3 = 0;
-    field_0x1f4_bit4 = 0;
-    field_0x1f4_bit5 = 0;
+    isLooping = 0;
+    pausedWhilePlaying = 0;
+    isFading = 0;
     field_0x1f4_bit6 = 0;
     field_0x1f4_bit7 = 0;
 }
 
 // 0x004bbb60: unloads the sound and unregisters it everywhere.
 Sound::~Sound() {
-    if (field_0x3c)
-        delete field_0x3c;
-    if (field_0x40 && !field_0x40->field_0x1c)
-        delete field_0x40;
-    field_0x08->UnknownFunction401be0(this);
-    if (field_0x1e8 & 4) {
-        if (field_0x1f5_bit0)
+    if (notifier)
+        delete notifier;
+    if (sourceStream && !sourceStream->field_0x1c)
+        delete sourceStream;
+    soundGroup->UnknownFunction401be0(this);
+    if (soundFlags & 4) {
+        if (bufferReady)
             SoundSystem()->soundMemoryManager->UnloadSound(this);
     } else {
         ReleaseBuffers();
     }
-    DeleteCriticalSection(&field_0x48);
-    if (field_0x28) {
-        field_0x28->Release();
-        field_0x28 = 0;
+    DeleteCriticalSection(&bufferLock);
+    if (duplicateSource) {
+        duplicateSource->Release();
+        duplicateSource = 0;
     }
     void* entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);
     if (entry)
         g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, 0);
-    if (field_0x10)
+    if (dsBuffer3D)
         SoundSystem()->field_0x18.Remove(this);
     SoundSystem()->field_0x04.Remove(this);
 }
@@ -214,19 +251,19 @@ Sound::~Sound() {
 // 0x004bbcd0: plays the sound (with its play flags; flag 2 asks for a
 // hardware voice, retried in software).
 int Sound::Play() {
-    if (SoundSystem()->field_0x2c_bit0 && field_0x0c) {
-        field_0x164 = UnknownFunction4bfa80();
+    if (SoundSystem()->audioStarted && dsBuffer) {
+        lastPlayTime = UnknownFunction4bfa80();
         ApplyCachedSettings();
-        field_0x1f4_bit3 = field_0x1f0 & 1;
-        if ((field_0x1e8 & 0x20) && field_0x0c->Play(0, 0, field_0x1f0) < 0)
+        isLooping = lastPlayFlags & 1;
+        if ((soundFlags & 0x20) && dsBuffer->Play(0, 0, lastPlayFlags) < 0)
             goto failed;
-        if (field_0x1f0 & 2) {
-            if (field_0x0c->Play(0, field_0x168, field_0x1f0) < 0) {
-                field_0x1f0 = (field_0x1f0 & ~2) | 4;
-                if (field_0x0c->Play(0, field_0x168, field_0x1f0) < 0)
+        if (lastPlayFlags & 2) {
+            if (dsBuffer->Play(0, soundType, lastPlayFlags) < 0) {
+                lastPlayFlags = (lastPlayFlags & ~2) | 4;
+                if (dsBuffer->Play(0, soundType, lastPlayFlags) < 0)
                     goto failed;
             }
-        } else if (field_0x0c->Play(0, 0, field_0x1f0) < 0) {
+        } else if (dsBuffer->Play(0, 0, lastPlayFlags) < 0) {
             goto failed;
         }
         SoundSystem()->RefreshSoundCaps();
@@ -238,20 +275,20 @@ failed:
 
 // 0x004bbdc0: applies the cached frequency, volume, pan and 3D settings.
 int Sound::ApplyCachedSettings() {
-    if ((field_0x1ec & 0x20) && !SetFrequency(field_0x19c, 1))
+    if ((controlsSet & 0x20) && !SetFrequency(currentFrequency, 1))
         return 0;
-    if ((field_0x1ec & 0x80) && !SetVolume(field_0x1a0, 1))
+    if ((controlsSet & 0x80) && !SetVolume(currentVolume, 1))
         return 0;
-    if ((field_0x1ec & 0x40) && !SetPan(field_0x1a4, 1))
+    if ((controlsSet & 0x40) && !SetPan(currentPan, 1))
         return 0;
-    if (field_0x1e8 & 8) {
-        Set3DPosition(field_0x1a8.position, 1);
-        Set3DVelocity(field_0x1a8.velocity, 1);
-        Set3DDistanceRange(field_0x1a8.minDistance, field_0x1a8.maxDistance, 1);
-        if (field_0x1e8 & 0x10) {
-            Set3DConeAngles(field_0x1a8.insideConeAngle, field_0x1a8.outsideConeAngle, 1);
-            Set3DConeOrientation(field_0x1a8.coneOrientation, 1);
-            Set3DConeOutsideVolume(field_0x1a8.coneOutsideVolume, 1);
+    if (soundFlags & 8) {
+        Set3DPosition(parameters3D.position, 1);
+        Set3DVelocity(parameters3D.velocity, 1);
+        Set3DDistanceRange(parameters3D.minDistance, parameters3D.maxDistance, 1);
+        if (soundFlags & 0x10) {
+            Set3DConeAngles(parameters3D.insideConeAngle, parameters3D.outsideConeAngle, 1);
+            Set3DConeOrientation(parameters3D.coneOrientation, 1);
+            Set3DConeOutsideVolume(parameters3D.coneOutsideVolume, 1);
         }
     }
     return 1;
@@ -265,79 +302,79 @@ int Sound::ApplyCachedSettings() {
 // header.
 int Sound::LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
     int duplicates, int streamBytes) {
-    if (!stream || !SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+    if (!stream || !SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
     int is3D = (flags >> 3) & 1;
-    field_0x1ec = GetBufferControlFlags(controls);
-    field_0x1e8 = flags;
-    field_0x1f5_bit0 = 0;
+    controlsSet = GetBufferControlFlags(controls);
+    soundFlags = flags;
+    bufferReady = 0;
     ReleaseBuffers();
-    strcpy(field_0x60, "");
+    strcpy(soundName, "");
     if (stream->field_0x1c)
         stream->UnknownFunction461340(stream->field_0x130, 0, 1);
-    if (stream->UnknownFunction461640(&field_0x16a, 0x2c, 1) != 1)
+    if (stream->UnknownFunction461640(&waveHeader, 0x2c, 1) != 1)
         return 0;
-    int stereo = field_0x16a.channels > 1;
-    field_0x198 = field_0x16a.dataSize;
-    if (field_0x1ec & 0x80)
-        SetVolume(field_0x08->field_0x30, 0);
-    if (field_0x1e8 & 2) {
+    int stereo = waveHeader.channels > 1;
+    bufferBytes = waveHeader.dataSize;
+    if (controlsSet & 0x80)
+        SetVolume(soundGroup->field_0x30, 0);
+    if (soundFlags & 2) {
         if (streamBytes == -1)
-            field_0x198 = 0x1f400;
+            bufferBytes = 0x1f400;
         else
-            field_0x198 = streamBytes;
-        field_0x44 = field_0x198 / 2;
-    } else if (field_0x1e8 & 4) {
+            bufferBytes = streamBytes;
+        filledHalf = bufferBytes / 2;
+    } else if (soundFlags & 4) {
         return 1;
     }
-    int isStatic = field_0x1e8 & 1;
-    if (field_0x1e8 & 0x20) {
-        if (!CreateBuffer(&field_0x0c, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
-                                   field_0x16a.blockAlign, stereo, is3D, isStatic, field_0x1ec, 1) &&
-            !CreateBuffer(&field_0x0c, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
-                                   field_0x16a.blockAlign, stereo, is3D, isStatic, field_0x1ec, 0))
+    int isStatic = soundFlags & 1;
+    if (soundFlags & 0x20) {
+        if (!CreateBuffer(&dsBuffer, bufferBytes, waveHeader.samplesPerSec, waveHeader.bitsPerSample,
+                                   waveHeader.blockAlign, stereo, is3D, isStatic, controlsSet, 1) &&
+            !CreateBuffer(&dsBuffer, bufferBytes, waveHeader.samplesPerSec, waveHeader.bitsPerSample,
+                                   waveHeader.blockAlign, stereo, is3D, isStatic, controlsSet, 0))
             goto failed;
-    } else if (!CreateBuffer(&field_0x0c, field_0x198, field_0x16a.samplesPerSec,
-                                      field_0x16a.bitsPerSample, field_0x16a.blockAlign, stereo, is3D, isStatic,
-                                      field_0x1ec, 0)) {
+    } else if (!CreateBuffer(&dsBuffer, bufferBytes, waveHeader.samplesPerSec,
+                                      waveHeader.bitsPerSample, waveHeader.blockAlign, stereo, is3D, isStatic,
+                                      controlsSet, 0)) {
         goto failed;
     }
     if (is3D) {
-        if (!Query3DBuffer(field_0x0c, &field_0x10))
+        if (!Query3DBuffer(dsBuffer, &dsBuffer3D))
             goto failed;
         SoundSystem()->field_0x18.Add(this);
     }
     SoundSystem()->field_0x04.Add(this);
     if (!is3D)
         Set3DMode(2);
-    if (field_0x1e8 & 3) {
-        if (!FillBufferFromStream(&field_0x0c, stream, 0, field_0x198))
+    if (soundFlags & 3) {
+        if (!FillBufferFromStream(&dsBuffer, stream, 0, bufferBytes))
             goto failed;
-        field_0x1f5_bit0 = 1;
+        bufferReady = 1;
     }
-    if ((field_0x1e8 & 1) && duplicates > 0) {
-        field_0x20 = new (__FILE__, 496) UnknownSoundBuffer*[duplicates];
-        field_0x24 = duplicates;
-        for (int i = 0; i < field_0x24; i++) {
-            if (SoundSystem()->directSound->DuplicateSoundBuffer(field_0x0c, &field_0x20[i]) != 0)
+    if ((soundFlags & 1) && duplicates > 0) {
+        duplicateBuffers = new (__FILE__, 496) UnknownSoundBuffer*[duplicates];
+        duplicateCount = duplicates;
+        for (int i = 0; i < duplicateCount; i++) {
+            if (SoundSystem()->directSound->DuplicateSoundBuffer(dsBuffer, &duplicateBuffers[i]) != 0)
                 goto failed;
         }
     }
     return 1;
 failed:
-    for (int j = 0; j < field_0x24; j++) {
-        if (field_0x20[j]) {
-            field_0x20[j]->Release();
-            field_0x20[j] = 0;
+    for (int j = 0; j < duplicateCount; j++) {
+        if (duplicateBuffers[j]) {
+            duplicateBuffers[j]->Release();
+            duplicateBuffers[j] = 0;
         }
     }
-    if (field_0x0c) {
-        field_0x0c->Release();
-        field_0x0c = 0;
+    if (dsBuffer) {
+        dsBuffer->Release();
+        dsBuffer = 0;
     }
-    if (field_0x10) {
-        field_0x10->Release();
-        field_0x10 = 0;
+    if (dsBuffer3D) {
+        dsBuffer3D->Release();
+        dsBuffer3D = 0;
     }
     return 0;
 }
@@ -348,7 +385,7 @@ failed:
 int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c) {
     UnknownTextureStream* file;
 
-    if (!SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
     if (!stream) {
         file = new (__FILE__, 544) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -365,16 +402,16 @@ int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream,
         if (!stream)
             delete file;
     } else if (flags & 2) {
-        field_0x40 = file;
+        sourceStream = file;
         if (!LoadWave(file, flags, a, b, c))
             goto failed;
     }
-    CopySoundName(field_0x60, name);
+    CopySoundName(soundName, name);
     return 1;
 failed:
     if (!stream)
         delete file;
-    field_0x40 = 0;
+    sourceStream = 0;
     return 0;
 }
 
@@ -393,28 +430,28 @@ unsigned long Sound::GetBufferControlFlags(unsigned long flags) {
 
 // 0x004bc4c0: shares `source`'s buffer.
 int Sound::DuplicateFrom(Sound* source) {
-    if (!source || !SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+    if (!source || !SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
     ReleaseBuffers();
-    strcpy(field_0x60, "");
+    strcpy(soundName, "");
     UnknownSoundBuffer* duplicate = 0;
     if (!DuplicateBuffer(&duplicate, source))
         return 0;
-    field_0x0c = duplicate;
-    if (source->field_0x10) {
-        if (field_0x10) {
-            field_0x10->Release();
-            field_0x10 = 0;
+    dsBuffer = duplicate;
+    if (source->dsBuffer3D) {
+        if (dsBuffer3D) {
+            dsBuffer3D->Release();
+            dsBuffer3D = 0;
         }
-        if (!Query3DBuffer(field_0x0c, &field_0x10))
+        if (!Query3DBuffer(dsBuffer, &dsBuffer3D))
             return 0;
     }
-    field_0x28 = source;
-    field_0x1f4_bit1 = 1;
+    duplicateSource = source;
+    isDuplicate = 1;
     source->AddRef();
-    CopySoundName(field_0x60, field_0x28->field_0x60);
-    if (field_0x1ec & 0x80)
-        SetVolume(field_0x08->field_0x30, 0);
+    CopySoundName(soundName, duplicateSource->soundName);
+    if (controlsSet & 0x80)
+        SetVolume(soundGroup->field_0x30, 0);
     return 1;
 }
 
@@ -422,7 +459,7 @@ int Sound::DuplicateFrom(Sound* source) {
 // property `id` of `set`.
 int Sound::SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned long support) {
     unsigned long supported;
-    if ((field_0x14 || QueryPropertySet()) && field_0x14->QuerySupport(set, id, &supported) >= 0 &&
+    if ((propertySet || QueryPropertySet()) && propertySet->QuerySupport(set, id, &supported) >= 0 &&
         (supported & support) == support)
         return 1;
     return 0;
@@ -431,45 +468,45 @@ int Sound::SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned l
 // 0x004bc640: sets a property through the buffer's property set.
 int Sound::SetProperty(const UnknownGuid* set, unsigned long id, void* instance,
     unsigned long instanceSize, void* data, unsigned long dataSize) {
-    if (!SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
-    if (!field_0x14 && !QueryPropertySet())
+    if (!propertySet && !QueryPropertySet())
         return 0;
-    return field_0x14->Set(set, id, instance, instanceSize, data, dataSize) >= 0;
+    return propertySet->Set(set, id, instance, instanceSize, data, dataSize) >= 0;
 }
 
 // 0x004bc940: stops a playing sound (a streamed one is refilled from its
 // start); `rewind` also moves the play position back to 0.
 int Sound::Stop(int rewind) {
-    if (!SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem()->audioStarted)
         return 1;
-    if (field_0x0c && field_0x1f5_bit0) {
+    if (dsBuffer && bufferReady) {
         unsigned long status;
-        if (field_0x0c->GetStatus(&status) < 0)
+        if (dsBuffer->GetStatus(&status) < 0)
             goto failed;
         if ((status & 1) == 1) {
-            if (field_0x3c)
-                delete field_0x3c;
-            field_0x3c = 0;
-            if (field_0x0c->Stop() < 0)
+            if (notifier)
+                delete notifier;
+            notifier = 0;
+            if (dsBuffer->Stop() < 0)
                 goto failed;
-            if (field_0x40 && rewind) {
-                field_0x40->UnknownFunction461340(field_0x40->field_0x130 + 0x2c, 0, 1);
-                EnterCriticalSection(&field_0x48);
-                FillBufferFromStream(&field_0x0c, field_0x40, 0, field_0x198);
-                LeaveCriticalSection(&field_0x48);
-                field_0x44 = field_0x198 / 2;
+            if (sourceStream && rewind) {
+                sourceStream->UnknownFunction461340(sourceStream->field_0x130 + 0x2c, 0, 1);
+                EnterCriticalSection(&bufferLock);
+                FillBufferFromStream(&dsBuffer, sourceStream, 0, bufferBytes);
+                LeaveCriticalSection(&bufferLock);
+                filledHalf = bufferBytes / 2;
                 SetBufferPosition(0);
             }
             if (rewind && !SetBufferPosition(0))
                 goto failed;
         }
     }
-    if (field_0x1e8 & 4)
-        EnterCriticalSection(&field_0x48);
-    field_0x1f5_bit1 = 1;
-    if (field_0x1e8 & 4)
-        LeaveCriticalSection(&field_0x48);
+    if (soundFlags & 4)
+        EnterCriticalSection(&bufferLock);
+    isStopped = 1;
+    if (soundFlags & 4)
+        LeaveCriticalSection(&bufferLock);
     return 1;
 failed:
     return 0;
@@ -477,49 +514,49 @@ failed:
 
 // 0x004bca80: whether the sound is playing (or, streamed, waiting to).
 int Sound::IsPlaying() {
-    if (!SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem()->audioStarted)
         return 0;
-    if (field_0x1e8 & 4) {
-        EnterCriticalSection(&field_0x48);
-        if (!field_0x1f5_bit0 && field_0x1f4_bit7) {
-            LeaveCriticalSection(&field_0x48);
+    if (soundFlags & 4) {
+        EnterCriticalSection(&bufferLock);
+        if (!bufferReady && field_0x1f4_bit7) {
+            LeaveCriticalSection(&bufferLock);
             return 1;
         }
     }
-    if (field_0x0c && field_0x1f5_bit0) {
+    if (dsBuffer && bufferReady) {
         unsigned long status;
-        if (field_0x0c->GetStatus(&status) >= 0 && (status & 1) == 1) {
-            if (field_0x1e8 & 4)
-                LeaveCriticalSection(&field_0x48);
+        if (dsBuffer->GetStatus(&status) >= 0 && (status & 1) == 1) {
+            if (soundFlags & 4)
+                LeaveCriticalSection(&bufferLock);
             return 1;
         }
     }
-    if (field_0x1e8 & 4)
-        LeaveCriticalSection(&field_0x48);
+    if (soundFlags & 4)
+        LeaveCriticalSection(&bufferLock);
     return 0;
 }
 
 // 0x004bcb30: sets the frequency (100..100000 Hz) of the sound and its
 // duplicates; unless `force`, only while playing and when it changes.
 int Sound::SetFrequency(unsigned long frequency, int force) {
-    if (!SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem()->audioStarted)
         return 1;
-    if (field_0x0c && field_0x1f5_bit0 &&
-        (force || (field_0x19c != frequency && IsPlaying()))) {
+    if (dsBuffer && bufferReady &&
+        (force || (currentFrequency != frequency && IsPlaying()))) {
         if (frequency < 100 || frequency > 100000)
             goto failed;
-        if (field_0x0c->SetFrequency(frequency) < 0)
+        if (dsBuffer->SetFrequency(frequency) < 0)
             goto failed;
         int i = 0;
-        if (field_0x24 > 0) {
+        if (duplicateCount > 0) {
             do {
-                if (field_0x20[i] && field_0x20[i]->SetFrequency(frequency) < 0)
+                if (duplicateBuffers[i] && duplicateBuffers[i]->SetFrequency(frequency) < 0)
                     goto failed;
                 i++;
-            } while (i < field_0x24);
+            } while (i < duplicateCount);
         }
     }
-    field_0x19c = frequency;
+    currentFrequency = frequency;
     return 1;
 failed:
     return 0;
@@ -527,28 +564,28 @@ failed:
 
 // 0x004bcbe0: sets the volume (-10000..0) of a 2D sound and its duplicates.
 int Sound::SetVolume(long volume, int force) {
-    if (!SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem()->audioStarted)
         return 1;
-    if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
-        (force || (field_0x1a0 != volume && IsPlaying()))) {
+    if (dsBuffer && !dsBuffer3D && bufferReady &&
+        (force || (currentVolume != volume && IsPlaying()))) {
         if (volume >= -10000) {
             if (volume > 0)
                 volume = 0;
         } else {
             volume = -10000;
         }
-        if (field_0x0c->SetVolume(volume) < 0)
+        if (dsBuffer->SetVolume(volume) < 0)
             goto failed;
         int i = 0;
-        if (field_0x24 > 0) {
+        if (duplicateCount > 0) {
             do {
-                if (field_0x20[i] && field_0x20[i]->SetVolume(volume) < 0)
+                if (duplicateBuffers[i] && duplicateBuffers[i]->SetVolume(volume) < 0)
                     goto failed;
                 i++;
-            } while (i < field_0x24);
+            } while (i < duplicateCount);
         }
     }
-    field_0x1a0 = volume;
+    currentVolume = volume;
     return 1;
 failed:
     return 0;
@@ -556,22 +593,22 @@ failed:
 
 // 0x004bcca0: sets the pan of a 2D sound and its duplicates.
 int Sound::SetPan(long pan, int force) {
-    if (!SoundSystem()->field_0x2c_bit0)
+    if (!SoundSystem()->audioStarted)
         return 1;
-    if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
-        (force || (field_0x1a4 != pan && IsPlaying()))) {
-        if (field_0x0c->SetPan(pan) < 0)
+    if (dsBuffer && !dsBuffer3D && bufferReady &&
+        (force || (currentPan != pan && IsPlaying()))) {
+        if (dsBuffer->SetPan(pan) < 0)
             goto failed;
         int i = 0;
-        if (field_0x24 > 0) {
+        if (duplicateCount > 0) {
             do {
-                if (field_0x20[i] && field_0x20[i]->SetPan(pan) < 0)
+                if (duplicateBuffers[i] && duplicateBuffers[i]->SetPan(pan) < 0)
                     goto failed;
                 i++;
-            } while (i < field_0x24);
+            } while (i < duplicateCount);
         }
     }
-    field_0x1a4 = pan;
+    currentPan = pan;
     return 1;
 failed:
     return 0;
@@ -579,28 +616,28 @@ failed:
 
 // 0x004bcd40
 int Sound::GetBufferPosition(unsigned long* play, unsigned long* write) {
-    if (!SoundSystem()->field_0x2c_bit0 || !field_0x0c)
+    if (!SoundSystem()->audioStarted || !dsBuffer)
         return 1;
-    return field_0x0c->GetCurrentPosition(play, write) >= 0;
+    return dsBuffer->GetCurrentPosition(play, write) >= 0;
 }
 
 // 0x004bcd80
 int Sound::SetBufferPosition(unsigned long position) {
-    if (!SoundSystem()->field_0x2c_bit0 || !field_0x0c)
+    if (!SoundSystem()->audioStarted || !dsBuffer)
         return 1;
-    return field_0x0c->SetCurrentPosition(position) >= 0;
+    return dsBuffer->SetCurrentPosition(position) >= 0;
 }
 
 // 0x004bcdc0: restores a lost buffer and refills a static or archived one.
 int Sound::RestoreBuffer() {
     unsigned long status;
-    if (field_0x0c) {
-        field_0x0c->GetStatus(&status);
+    if (dsBuffer) {
+        dsBuffer->GetStatus(&status);
         if (status == 2) {
-            if (field_0x0c->Restore() < 0)
+            if (dsBuffer->Restore() < 0)
                 return 0;
-            if ((field_0x1e8 & 5) && field_0x0c)
-                FillBufferFromFile(&field_0x0c);
+            if ((soundFlags & 5) && dsBuffer)
+                FillBufferFromFile(&dsBuffer);
         }
     }
     return 1;
@@ -609,41 +646,41 @@ int Sound::RestoreBuffer() {
 // 0x004bce20: pauses (stopping a playing sound) or resumes it.
 int Sound::SetPaused(int paused) {
     if (paused) {
-        if (!field_0x1f5_bit3) {
-            field_0x1f4_bit4 = IsPlaying();
-            if (field_0x1f4_bit4)
+        if (!isPaused) {
+            pausedWhilePlaying = IsPlaying();
+            if (pausedWhilePlaying)
                 Stop(0);
         }
-    } else if (field_0x1f5_bit3 && field_0x1f4_bit4) {
+    } else if (isPaused && pausedWhilePlaying) {
         Play();
-        field_0x1f4_bit4 = 0;
+        pausedWhilePlaying = 0;
     }
-    field_0x1f5_bit3 = paused;
+    isPaused = paused;
     return 1;
 }
 
 // 0x004bcea0: advances a fade by `elapsed` seconds; a fade-out stops the
 // sound at its target volume, a fade-in ends at full volume.
 int Sound::UpdateFade(float elapsed) {
-    if (field_0x1f4_bit5) {
+    if (isFading) {
         int step = 0;
-        if (field_0x2c.length)
-            step = (int)(elapsed * 1000.0f / field_0x2c.length * 10000.0f);
-        if (field_0x2c.flags & 2) {
-            field_0x38 -= step;
-            if (field_0x38 < field_0x2c.target) {
-                Stop(field_0x2c.flags & 1);
-                field_0x38 = 0;
-                field_0x1f4_bit5 = 0;
+        if (fade.length)
+            step = (int)(elapsed * 1000.0f / fade.length * 10000.0f);
+        if (fade.flags & 2) {
+            fadeVolume -= step;
+            if (fadeVolume < fade.target) {
+                Stop(fade.flags & 1);
+                fadeVolume = 0;
+                isFading = 0;
             }
         } else {
-            field_0x38 += step;
-            if (field_0x38 > 0) {
-                field_0x38 = 0;
-                field_0x1f4_bit5 = 0;
+            fadeVolume += step;
+            if (fadeVolume > 0) {
+                fadeVolume = 0;
+                isFading = 0;
             }
         }
-        SetVolume(field_0x38, 0);
+        SetVolume(fadeVolume, 0);
     }
     return 1;
 }
@@ -651,55 +688,55 @@ int Sound::UpdateFade(float elapsed) {
 // 0x004bcf50: releases the buffers. A streamed sound being filled spins
 // until the fill ends (retail reads the flag once, so it never ends).
 void Sound::ReleaseBuffers() {
-    EnterCriticalSection(&field_0x48);
-    if (field_0x1e8 & 4) {
-        while (field_0x1f5_bit2) {
+    EnterCriticalSection(&bufferLock);
+    if (soundFlags & 4) {
+        while (isFilling) {
         }
     }
-    for (int i = 0; i < field_0x24; i++) {
-        if (field_0x20[i]) {
-            field_0x20[i]->Release();
-            field_0x20[i] = 0;
+    for (int i = 0; i < duplicateCount; i++) {
+        if (duplicateBuffers[i]) {
+            duplicateBuffers[i]->Release();
+            duplicateBuffers[i] = 0;
         }
     }
-    if (field_0x20) {
-        delete field_0x20;
-        field_0x20 = 0;
+    if (duplicateBuffers) {
+        delete duplicateBuffers;
+        duplicateBuffers = 0;
     }
-    if (field_0x14) {
-        field_0x14->Release();
-        field_0x14 = 0;
+    if (propertySet) {
+        propertySet->Release();
+        propertySet = 0;
     }
-    if (field_0x10) {
-        field_0x10->Release();
-        field_0x10 = 0;
+    if (dsBuffer3D) {
+        dsBuffer3D->Release();
+        dsBuffer3D = 0;
     }
-    if (field_0x0c) {
-        field_0x0c->Release();
-        field_0x0c = 0;
+    if (dsBuffer) {
+        dsBuffer->Release();
+        dsBuffer = 0;
     }
-    g_MemTagStack->UnknownFunction4a2e00(field_0x198);
-    field_0x1f5_bit0 = 0;
+    g_MemTagStack->UnknownFunction4a2e00(bufferBytes);
+    bufferReady = 0;
     field_0x1f4_bit6 = 0;
-    LeaveCriticalSection(&field_0x48);
+    LeaveCriticalSection(&bufferLock);
 }
 
 // 0x004bd020: locks part of the buffer.
 int Sound::LockBuffer(unsigned long offset, unsigned long bytes, void** first,
     unsigned long* firstBytes, void** second, unsigned long* secondBytes,
     unsigned long flags) {
-    if (!field_0x0c) {
+    if (!dsBuffer) {
         *first = 0;
         *second = 0;
         return 0;
     }
-    return field_0x0c->Lock(offset, bytes, first, firstBytes, second, secondBytes, flags) >= 0;
+    return dsBuffer->Lock(offset, bytes, first, firstBytes, second, secondBytes, flags) >= 0;
 }
 
 // 0x004bd080
 int Sound::UnlockBuffer(void* first, unsigned long firstBytes, void* second, unsigned long secondBytes) {
-    if (field_0x0c && first)
-        return field_0x0c->Unlock(first, firstBytes, second, secondBytes) >= 0;
+    if (dsBuffer && first)
+        return dsBuffer->Unlock(first, firstBytes, second, secondBytes) >= 0;
     return 0;
 }
 
@@ -715,13 +752,13 @@ int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStrea
 
     if (!stream || !buffer)
         return 0;
-    field_0x1f5_bit2 = 1;
+    isFilling = 1;
     if ((*buffer)->Lock(offset, bytes, &first, &firstBytes, &second, &secondBytes, 0) != 0)
         return 0;
     if (firstBytes > 0) {
         if (stream->UnknownFunction430ff0()) {
             stream->UnknownFunction461340(stream->field_0x130 + 0x2c, 0, 1);
-            if (!field_0x1f4_bit3)
+            if (!isLooping)
                 goto ended;
         }
         stream->UnknownFunction461640(first, firstBytes, 1);
@@ -729,37 +766,37 @@ int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStrea
     if (secondBytes > 0) {
         if (stream->UnknownFunction430ff0()) {
             stream->UnknownFunction461340(stream->field_0x130 + 0x2c, 0, 1);
-            if (!field_0x1f4_bit3) {
+            if (!isLooping) {
             ended:
                 memset(first, 0, firstBytes);
                 memset(second, 0, secondBytes);
-                field_0x44 = 0;
+                filledHalf = 0;
                 (*buffer)->SetCurrentPosition(0);
                 (*buffer)->Stop();
             }
             (*buffer)->Unlock(first, firstBytes, second, secondBytes);
-            field_0x1f5_bit2 = 0;
+            isFilling = 0;
             return 1;
         }
         stream->UnknownFunction461640(second, secondBytes, 1);
     }
     long result = (*buffer)->Unlock(first, firstBytes, second, secondBytes);
-    field_0x1f5_bit2 = 0;
+    isFilling = 0;
     if (result != 0)
         return 0;
-    field_0x1f5_bit0 = 1;
+    bufferReady = 1;
     return 1;
 }
 
 // 0x004bd4b0: creates the buffer a streamed sound is loaded into.
 int Sound::CreatePendingBuffer() {
     ReleaseBuffers();
-    int stereo = field_0x16a.channels > 1;
-    int is3D = (field_0x1e8 >> 3) & 1;
-    if (!CreateBuffer(&field_0x18, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
-                               field_0x16a.blockAlign, stereo, is3D, 1, field_0x1ec, 0))
+    int stereo = waveHeader.channels > 1;
+    int is3D = (soundFlags >> 3) & 1;
+    if (!CreateBuffer(&pendingBuffer, bufferBytes, waveHeader.samplesPerSec, waveHeader.bitsPerSample,
+                               waveHeader.blockAlign, stereo, is3D, 1, controlsSet, 0))
         goto failed;
-    if (is3D && !Query3DBuffer(field_0x18, &field_0x1c))
+    if (is3D && !Query3DBuffer(pendingBuffer, &pendingBuffer3D))
         goto failed;
     return 1;
 failed:
@@ -780,11 +817,11 @@ int Sound::CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsign
     format.samplesPerSec = rate;
     format.blockAlign = blockAlign;
     format.avgBytesPerSec = format.blockAlign * rate;
-    field_0x19c = rate;
+    currentFrequency = rate;
     format.bitsPerSample = bits;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (field_0x1e8 & 2)
+    if (soundFlags & 2)
         desc.flags = flags | 0x10108;
     else if (hardware)
         desc.flags = flags | 0x10004;
@@ -801,16 +838,16 @@ int Sound::CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsign
     if (SoundSystem()->directSound->CreateSoundBuffer(&desc, buffer, 0) < 0)
         return 0;
     g_MemTagStack->UnknownFunction4a2de0(bytes);
-    field_0x198 = bytes;
+    bufferBytes = bytes;
     SoundSystem()->RefreshSoundCaps();
     return 1;
 }
 
 // 0x004bd6a0
 int Sound::DuplicateBuffer(UnknownSoundBuffer** duplicate, Sound* source) {
-    if (!source || !source->field_0x0c)
+    if (!source || !source->dsBuffer)
         return 0;
-    return SoundSystem()->directSound->DuplicateSoundBuffer(source->field_0x0c, duplicate) >= 0;
+    return SoundSystem()->directSound->DuplicateSoundBuffer(source->dsBuffer, duplicate) >= 0;
 }
 
 // 0x004bd6e0
@@ -826,18 +863,18 @@ failed:
 
 // 0x004bd710
 int Sound::QueryPropertySet() {
-    if (!field_0x0c)
+    if (!dsBuffer)
         return 0;
-    if (field_0x0c->QueryInterface(IID_IKsPropertySet, (void**)&field_0x14) < 0)
+    if (dsBuffer->QueryInterface(IID_IKsPropertySet, (void**)&propertySet) < 0)
         return 0;
-    return field_0x14 != 0;
+    return propertySet != 0;
 }
 
 // 0x004bd740
 int Sound::Set3DParameters(UnknownSound3DParameters* parameters) {
-    if (SoundSystem()->field_0x2c_bit0 && field_0x0c && field_0x10 && field_0x1f5_bit0) {
+    if (SoundSystem()->audioStarted && dsBuffer && dsBuffer3D && bufferReady) {
         parameters->size = sizeof(*parameters);
-        if (field_0x10->SetAllParameters(parameters, 1) < 0)
+        if (dsBuffer3D->SetAllParameters(parameters, 1) < 0)
             return 0;
     }
     return 1;
@@ -845,8 +882,8 @@ int Sound::Set3DParameters(UnknownSound3DParameters* parameters) {
 
 // 0x004bd790
 int Sound::Set3DMode(unsigned long mode) {
-    if (SoundSystem()->field_0x2c_bit0 && field_0x0c && field_0x10 && field_0x1f5_bit0) {
-        if (field_0x10->SetMode(mode, 1) < 0)
+    if (SoundSystem()->audioStarted && dsBuffer && dsBuffer3D && bufferReady) {
+        if (dsBuffer3D->SetMode(mode, 1) < 0)
             return 0;
     }
     return 1;
@@ -855,85 +892,85 @@ int Sound::Set3DMode(unsigned long mode) {
 // 0x004bd7e0-0x004bdb60: cache a 3D setting and, when forced or changed
 // while playing, apply it (deferred).
 int Sound::Set3DPosition(Vector3 position, int force) {
-    if (SoundSystem()->field_0x2c_bit0) {
-        if (field_0x0c && field_0x10 && field_0x1f5_bit0 &&
-            (force || ((field_0x1a8.position.x != position.x || field_0x1a8.position.y != position.y ||
-                        field_0x1a8.position.z != position.z) &&
+    if (SoundSystem()->audioStarted) {
+        if (dsBuffer && dsBuffer3D && bufferReady &&
+            (force || ((parameters3D.position.x != position.x || parameters3D.position.y != position.y ||
+                        parameters3D.position.z != position.z) &&
                        IsPlaying()))) {
-            if (field_0x10->SetPosition(position.x, position.y, position.z, 1) < 0)
+            if (dsBuffer3D->SetPosition(position.x, position.y, position.z, 1) < 0)
                 return 0;
         }
-        field_0x1a8.position = position;
+        parameters3D.position = position;
     }
     return 1;
 }
 
 int Sound::Set3DVelocity(Vector3 velocity, int force) {
-    if (SoundSystem()->field_0x2c_bit0) {
-        if (field_0x0c && field_0x10 && field_0x1f5_bit0 &&
-            (force || ((field_0x1a8.velocity.x != velocity.x || field_0x1a8.velocity.y != velocity.y ||
-                        field_0x1a8.velocity.z != velocity.z) &&
+    if (SoundSystem()->audioStarted) {
+        if (dsBuffer && dsBuffer3D && bufferReady &&
+            (force || ((parameters3D.velocity.x != velocity.x || parameters3D.velocity.y != velocity.y ||
+                        parameters3D.velocity.z != velocity.z) &&
                        IsPlaying()))) {
-            if (field_0x10->SetVelocity(velocity.x, velocity.y, velocity.z, 1) < 0)
+            if (dsBuffer3D->SetVelocity(velocity.x, velocity.y, velocity.z, 1) < 0)
                 return 0;
         }
-        field_0x1a8.velocity = velocity;
+        parameters3D.velocity = velocity;
     }
     return 1;
 }
 
 int Sound::Set3DDistanceRange(float minDistance, float maxDistance, int force) {
-    if (SoundSystem()->field_0x2c_bit0) {
-        if (field_0x0c && field_0x10 && field_0x1f5_bit0 &&
-            (force || ((field_0x1a8.minDistance != minDistance || field_0x1a8.maxDistance != maxDistance) &&
+    if (SoundSystem()->audioStarted) {
+        if (dsBuffer && dsBuffer3D && bufferReady &&
+            (force || ((parameters3D.minDistance != minDistance || parameters3D.maxDistance != maxDistance) &&
                        IsPlaying()))) {
-            if (field_0x10->SetMinDistance(minDistance, 1) < 0 || field_0x10->SetMaxDistance(maxDistance, 1) < 0)
+            if (dsBuffer3D->SetMinDistance(minDistance, 1) < 0 || dsBuffer3D->SetMaxDistance(maxDistance, 1) < 0)
                 return 0;
         }
-        field_0x1a8.minDistance = minDistance;
-        field_0x1a8.maxDistance = maxDistance;
+        parameters3D.minDistance = minDistance;
+        parameters3D.maxDistance = maxDistance;
     }
     return 1;
 }
 
 int Sound::Set3DConeAngles(unsigned long insideConeAngle, unsigned long outsideConeAngle, int force) {
-    if (SoundSystem()->field_0x2c_bit0) {
-        if (field_0x0c && field_0x10 && field_0x1f5_bit0 &&
-            (force || ((field_0x1a8.insideConeAngle != insideConeAngle ||
-                        field_0x1a8.outsideConeAngle != outsideConeAngle) &&
+    if (SoundSystem()->audioStarted) {
+        if (dsBuffer && dsBuffer3D && bufferReady &&
+            (force || ((parameters3D.insideConeAngle != insideConeAngle ||
+                        parameters3D.outsideConeAngle != outsideConeAngle) &&
                        IsPlaying()))) {
-            if (field_0x10->SetConeAngles(insideConeAngle, outsideConeAngle, 1) < 0)
+            if (dsBuffer3D->SetConeAngles(insideConeAngle, outsideConeAngle, 1) < 0)
                 return 0;
         }
-        field_0x1a8.insideConeAngle = insideConeAngle;
-        field_0x1a8.outsideConeAngle = outsideConeAngle;
+        parameters3D.insideConeAngle = insideConeAngle;
+        parameters3D.outsideConeAngle = outsideConeAngle;
     }
     return 1;
 }
 
 int Sound::Set3DConeOrientation(Vector3 orientation, int force) {
-    if (SoundSystem()->field_0x2c_bit0) {
-        if (field_0x0c && field_0x10 && field_0x1f5_bit0 &&
-            (force || ((field_0x1a8.coneOrientation.x != orientation.x ||
-                        field_0x1a8.coneOrientation.y != orientation.y ||
-                        field_0x1a8.coneOrientation.z != orientation.z) &&
+    if (SoundSystem()->audioStarted) {
+        if (dsBuffer && dsBuffer3D && bufferReady &&
+            (force || ((parameters3D.coneOrientation.x != orientation.x ||
+                        parameters3D.coneOrientation.y != orientation.y ||
+                        parameters3D.coneOrientation.z != orientation.z) &&
                        IsPlaying()))) {
-            if (field_0x10->SetConeOrientation(orientation.x, orientation.y, orientation.z, 1) < 0)
+            if (dsBuffer3D->SetConeOrientation(orientation.x, orientation.y, orientation.z, 1) < 0)
                 return 0;
         }
-        field_0x1a8.coneOrientation = orientation;
+        parameters3D.coneOrientation = orientation;
     }
     return 1;
 }
 
 int Sound::Set3DConeOutsideVolume(long volume, int force) {
-    if (SoundSystem()->field_0x2c_bit0) {
-        if (field_0x0c && field_0x10 && field_0x1f5_bit0 &&
-            (force || (field_0x1a8.coneOutsideVolume != volume && IsPlaying()))) {
-            if (field_0x10->SetConeOutsideVolume(volume, 1) < 0)
+    if (SoundSystem()->audioStarted) {
+        if (dsBuffer && dsBuffer3D && bufferReady &&
+            (force || (parameters3D.coneOutsideVolume != volume && IsPlaying()))) {
+            if (dsBuffer3D->SetConeOutsideVolume(volume, 1) < 0)
                 return 0;
         }
-        field_0x1a8.coneOutsideVolume = volume;
+        parameters3D.coneOutsideVolume = volume;
     }
     return 1;
 }
@@ -942,100 +979,100 @@ int Sound::Set3DConeOutsideVolume(long volume, int force) {
 static int __cdecl CompareSounds(const void* a, const void* b) {
     Sound* first = *(Sound**)a;
     Sound* second = *(Sound**)b;
-    if (first->field_0x164 < second->field_0x164)
+    if (first->lastPlayTime < second->lastPlayTime)
         return -1;
-    return first->field_0x164 != second->field_0x164;
+    return first->lastPlayTime != second->lastPlayTime;
 }
 
 // 0x004bddf0
 UnknownPCAudioObject::UnknownPCAudioObject() {
-    field_0x00 = 0;
-    field_0x04 = 0;
-    field_0x08 = 0;
-    InitializeCriticalSection(&field_0x0c);
-    field_0x28 = 0;
-    field_0x24 = 0;
+    loaderThread = 0;
+    stopEvent = 0;
+    queuedEvent = 0;
+    InitializeCriticalSection(&queueLock);
+    loadedBytes = 0;
+    byteBudget = 0;
 }
 
 // 0x004bde40: signals the thread to stop and waits for it.
 UnknownPCAudioObject::~UnknownPCAudioObject() {
-    if (field_0x00) {
-        SetEvent(field_0x04);
-        WaitForSingleObject(field_0x00, INFINITE);
-        if (field_0x00) {
-            CloseHandle(field_0x00);
-            field_0x00 = 0;
+    if (loaderThread) {
+        SetEvent(stopEvent);
+        WaitForSingleObject(loaderThread, INFINITE);
+        if (loaderThread) {
+            CloseHandle(loaderThread);
+            loaderThread = 0;
         }
     }
-    if (field_0x04) {
-        CloseHandle(field_0x04);
-        field_0x04 = 0;
+    if (stopEvent) {
+        CloseHandle(stopEvent);
+        stopEvent = 0;
     }
-    if (field_0x08) {
-        CloseHandle(field_0x08);
-        field_0x08 = 0;
+    if (queuedEvent) {
+        CloseHandle(queuedEvent);
+        queuedEvent = 0;
     }
-    DeleteCriticalSection(&field_0x0c);
+    DeleteCriticalSection(&queueLock);
 }
 
 // 0x004bdef0: starts the loader thread with a budget of `budget` bytes.
 int UnknownPCAudioObject::StartLoaderThread(int budget) {
     unsigned threadId;
 
-    field_0x24 = budget;
-    field_0x08 = CreateEventA(0, 0, 0, 0);
-    field_0x04 = CreateEventA(0, 0, 0, 0);
-    field_0x00 = (HANDLE)_beginthreadex(0, 0, UnknownThreadProc, this, 0, &threadId);
-    if (!field_0x08 || !field_0x04 || !field_0x00)
+    byteBudget = budget;
+    queuedEvent = CreateEventA(0, 0, 0, 0);
+    stopEvent = CreateEventA(0, 0, 0, 0);
+    loaderThread = (HANDLE)_beginthreadex(0, 0, UnknownThreadProc, this, 0, &threadId);
+    if (!queuedEvent || !stopEvent || !loaderThread)
         return 0;
-    SetThreadPriority(field_0x00, THREAD_PRIORITY_BELOW_NORMAL);
-    if (!field_0x2c.Init(8, 16))
+    SetThreadPriority(loaderThread, THREAD_PRIORITY_BELOW_NORMAL);
+    if (!queuedSounds.Init(8, 16))
         return 0;
-    return field_0x40.Init(8, 16);
+    return loadedSounds.Init(8, 16);
 }
 
 // 0x004bdfc0: queues a streamed sound whose buffer is not ready.
 void UnknownPCAudioObject::QueueSoundLoad(Sound* sound) {
-    if (sound && (sound->field_0x1e8 & 4)) {
-        EnterCriticalSection(&sound->field_0x48);
-        int ready = sound->field_0x1f5_bit0;
-        LeaveCriticalSection(&sound->field_0x48);
+    if (sound && (sound->soundFlags & 4)) {
+        EnterCriticalSection(&sound->bufferLock);
+        int ready = sound->bufferReady;
+        LeaveCriticalSection(&sound->bufferLock);
         if (!ready) {
-            EnterCriticalSection(&field_0x0c);
-            field_0x2c.Add(sound);
-            LeaveCriticalSection(&field_0x0c);
-            SetEvent(field_0x08);
+            EnterCriticalSection(&queueLock);
+            queuedSounds.Add(sound);
+            LeaveCriticalSection(&queueLock);
+            SetEvent(queuedEvent);
         }
     }
 }
 
 // 0x004be0a0
 void UnknownPCAudioObject::RecordLoadedSound(Sound* sound, int bytes) {
-    field_0x28 += bytes;
-    field_0x40.Add(sound);
+    loadedBytes += bytes;
+    loadedSounds.Add(sound);
 }
 
 // 0x004be130: unloads the least recently played idle sounds until `bytes`
 // more fit in the budget.
 void UnknownPCAudioObject::MakeRoomForSound(int bytes) {
-    unsigned long total = field_0x28 + bytes;
-    if (total < field_0x24)
+    unsigned long total = loadedBytes + bytes;
+    if (total < byteBudget)
         return;
-    qsort(field_0x40.m_data, field_0x40.m_count, sizeof(Sound*), CompareSounds);
-    for (int i = 0; i < field_0x40.m_count; i++) {
-        Sound* sound = field_0x40.Get(i);
+    qsort(loadedSounds.m_data, loadedSounds.m_count, sizeof(Sound*), CompareSounds);
+    for (int i = 0; i < loadedSounds.m_count; i++) {
+        Sound* sound = loadedSounds.Get(i);
         if (sound) {
             int queued = 0;
-            for (int j = 0; j < field_0x2c.m_count; j++) {
-                if (field_0x40.Get(j) == sound)
+            for (int j = 0; j < queuedSounds.m_count; j++) {
+                if (loadedSounds.Get(j) == sound)
                     queued = 1;
             }
             if (!sound->IsPlaying() && !queued) {
                 UnloadSound(sound);
-                total -= sound->field_0x198;
+                total -= sound->bufferBytes;
                 i--;
             }
-            if (total < field_0x24)
+            if (total < byteBudget)
                 return;
         }
     }
@@ -1045,8 +1082,8 @@ void UnknownPCAudioObject::MakeRoomForSound(int bytes) {
 void UnknownPCAudioObject::UnloadSound(Sound* sound) {
     sound->IsPlaying();
     sound->ReleaseBuffers();
-    field_0x28 -= sound->field_0x198;
-    field_0x40.Remove(sound);
+    loadedBytes -= sound->bufferBytes;
+    loadedSounds.Remove(sound);
 }
 
 // 0x004be280: an empty device record.
@@ -1132,9 +1169,9 @@ PCSoundInterface::~PCSoundInterface() {
 long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value, int allowEax) {
     long result;
 
-    if (field_0x2c_bit0)
+    if (audioStarted)
         return 0x8878000a;
-    field_0x2c_bit0 = 0;
+    audioStarted = 0;
     allowSoundEnumeration = 0;
     allowEAXExtension = allowEax;
     if (allowSoundEnumeration) {
@@ -1163,7 +1200,7 @@ long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value
     soundMemoryManager = new (__FILE__, 2367) UnknownPCAudioObject;
     if (!soundMemoryManager || !soundMemoryManager->StartLoaderThread(value))
         return 0;
-    field_0x2c_bit0 = 1;
+    audioStarted = 1;
     RefreshSoundCaps();
     field_0x04.Init(8, 8);
     field_0x18.Init(8, 8);
@@ -1189,7 +1226,7 @@ int __stdcall PCSoundInterface::EnumSoundDeviceCallback(UnknownGuid* guid, const
 
 // 0x004be800: a new listener interface from the primary buffer, or 0.
 UnknownSoundListener* PCSoundInterface::QueryListener() {
-    if (!field_0x2c_bit0 && !primaryBuffer)
+    if (!audioStarted && !primaryBuffer)
         return 0;
     UnknownSoundListener* listener = 0;
     long result = primaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void**)&listener);
@@ -1203,7 +1240,7 @@ int PCSoundInterface::RefreshSoundCaps() {
 
 // 0x004be860: fills `caps` from DirectSound.
 int PCSoundInterface::GetSoundCaps(UnknownSoundCaps* caps) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     if (caps && directSound) {
         caps->size = sizeof(*caps);
@@ -1219,7 +1256,7 @@ void PCSoundInterface::FormatSoundCapsReport() {
     UnknownSoundCaps caps;
     char text[512];
 
-    if (field_0x2c_bit0) {
+    if (audioStarted) {
         GetSoundCaps(&caps);
         sprintf(text,
                 "\nSound Card reports:\n"
@@ -1234,7 +1271,7 @@ void PCSoundInterface::FormatSoundCapsReport() {
 
 // 0x004be9b0: sets the primary buffer's volume.
 int PCSoundInterface::SetPrimaryVolume(long volume) {
-    if (field_0x2c_bit0 && primaryBuffer)
+    if (audioStarted && primaryBuffer)
         return primaryBuffer->SetVolume(volume) >= 0;
     return 0;
 }
@@ -1243,12 +1280,12 @@ int PCSoundInterface::SetPrimaryVolume(long volume) {
 // allowed and mixing buffers available, a small 3D buffer that supports the
 // EAX listener properties enables them with value 9.
 void PCSoundInterface::ProbeEAXSupport() {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return;
     eaxProbeGroup = new (__FILE__, 2574) SoundGroup(1);
     eaxProbeSound = new (__FILE__, 2575) Sound(eaxProbeGroup, 1);
     if (eaxProbeGroup && eaxProbeSound && allowSoundHardware && soundCaps.maxHwMixingAllBuffers >= 1 &&
-        eaxProbeSound->CreateBuffer(&eaxProbeSound->field_0x0c, 0x400, 11025, 16, 2, 0, 1, 1, 16, 1) &&
+        eaxProbeSound->CreateBuffer(&eaxProbeSound->dsBuffer, 0x400, 11025, 16, 2, 0, 1, 1, 16, 1) &&
         eaxProbeSound->SupportsProperty(&DSPROPSETID_EAX_ListenerProperties, 0, 3)) {
         eaxAvailable = 1;
         SetEAXEnvironment(9);
@@ -1271,57 +1308,57 @@ UnknownSoundBuffer* PCSoundInterface::CreatePrimaryBuffer() {
 // 0x004beb80-0x004becd0: listener settings, deferred (flag 1) until
 // 0x004beb80 commits them.
 int PCSoundInterface::CommitListenerSettings() {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->CommitDeferredSettings() >= 0;
 }
 
 int PCSoundInterface::SetListenerDistanceFactor(float factor) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->SetDistanceFactor(factor, 1) >= 0;
 }
 
 int PCSoundInterface::SetListenerDopplerFactor(float factor) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->SetDopplerFactor(factor, 1) >= 0;
 }
 
 int PCSoundInterface::SetListenerOrientation(Vector3 front, Vector3 top) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->SetOrientation(front.x, front.y, front.z, top.x, top.y, top.z, 1) >= 0;
 }
 
 int PCSoundInterface::SetListenerPosition(Vector3 position) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->SetPosition(position.x, position.y, position.z, 1) >= 0;
 }
 
 int PCSoundInterface::SetListenerVelocity(Vector3 velocity) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->SetVelocity(velocity.x, velocity.y, velocity.z, 1) >= 0;
 }
 
 int PCSoundInterface::SetListenerRolloffFactor(float factor) {
-    if (!field_0x2c_bit0)
+    if (!audioStarted)
         return 0;
     return listener->SetRolloffFactor(factor, 1) >= 0;
 }
 
 // 0x004bed00: sets EAX listener property 1 when EAX is available and allowed.
 int PCSoundInterface::SetEAXEnvironment(unsigned long value) {
-    if (field_0x2c_bit0 && eaxAvailable && eaxProbeSound && allowEAXExtension)
+    if (audioStarted && eaxAvailable && eaxProbeSound && allowEAXExtension)
         return eaxProbeSound->SetProperty(&DSPROPSETID_EAX_ListenerProperties, 1, 0, 0, &value, 4);
     return 0;
 }
 
 // 0x004bed40: sets all 16 bytes of EAX listener property 0.
 int PCSoundInterface::SetEAXListenerParameters(void* parameters) {
-    if (field_0x2c_bit0 && eaxAvailable && eaxProbeSound && allowEAXExtension)
+    if (audioStarted && eaxAvailable && eaxProbeSound && allowEAXExtension)
         return eaxProbeSound->SetProperty(&DSPROPSETID_EAX_ListenerProperties, 0, 0, 0, parameters,
                                                   16);
     return 0;

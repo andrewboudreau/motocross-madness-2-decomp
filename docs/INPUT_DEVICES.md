@@ -198,8 +198,8 @@ input code uses. Its layout:
 | +0x30 | Mouse |
 | +0x34 | Keyboard (FollowCamera queries left Alt and left Shift, 0x38 and 0x2a, through its slot 5) |
 | +0x38 | Event count |
-| +0x3c | 160 queued 20-byte events, added by `0x0043cea0` |
-| +0xcbc | Mapping table, set by `0x0043ce70` |
+| +0x3c | 160 queued 20-byte events, added by `QueueEvent` (`0x0043cea0`) |
+| +0xcbc | Mapping table, set by `SetMapping` (`0x0043ce70`) |
 
 Its update, `0x0043cf00` (380 bytes with its jump table, exact), has every
 device read, then hands each queued event, with the keyboard's modifier

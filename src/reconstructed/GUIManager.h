@@ -106,11 +106,11 @@ struct UnknownGroundFog {
     unsigned char field_0x00[0x18];
     UnknownGroundFogOwner* field_0x18;        // GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];
-    float field_0x30;                         // fog plane height
-    float field_0x34;                         // depth limit
-    int field_0x38;                           // alpha limit
+    float planeHeight;                        // +0x30: fog plane height (compared with each vertex's y)
+    float depthLimit;                         // +0x34
+    int alphaLimit;                           // +0x38
     unsigned char field_0x3c[0x40 - 0x3c];
-    float field_0x40;                         // density
+    float density;                            // +0x40
 };
 
 // A 0x20-byte lit vertex (D3DLVERTEX layout): position, colour, specular.
@@ -131,7 +131,7 @@ struct UnknownGroundFogShader {
     // 0x00484f10: fogs `count` vertices by their depth below the fog plane.
     void UnknownFunction484f10(UnknownFogVertex* vertices, int count);
 
-    UnknownGroundFog* field_0x00;
+    UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
 // Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8).
@@ -152,7 +152,7 @@ public:
     explicit GUICursor(int flags);            // 0x00485100
     virtual ~GUICursor();                     // 0x00485140 (deleting wrapper 0x00485120)
     virtual int UnknownVirtualSlot15();       // 0x00485170
-    void UnknownFunction485150(UnknownCursorAnimation* animation); // 0x00485150
+    void SetAnimation(UnknownCursorAnimation* animation); // 0x00485150
 
     UnknownCursorAnimation* field_0x5c;
 };
@@ -257,14 +257,14 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x004875a0
     virtual int UnknownVirtualSlot15();       // 0x00487620
 
-    void UnknownFunction4875c0(int force);    // 0x004875c0
+    void UpdateFocus(int force);              // 0x004875c0: applies the pending focus (+0x1d0) or hover (+0x1cc)
     GUIUser* UnknownFunction487650(void* target, GUIManager* gui); // 0x00487650
     void CreateToolTip(void* target, GUIManager* gui); // 0x00487680: new tool tip
-    void UnknownFunction487710();             // 0x00487710
+    void ReleaseToolTip();                    // 0x00487710: releases the tool tip
     int UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
     int UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
-    int UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl** previous);
-    int UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous);
+    int SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487800: +0x1d8
+    int MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487870: moves the focus
     void EnableImeInput(int enable);   // 0x00487990: input method editor on/off
     int UnknownFunction487bf0(UnknownGuiControl** previous);
     int AcceptDevice(GUIInputDevice* device); // 0x00487c30: accepts a device
@@ -272,30 +272,30 @@ public:
     void ForgetDevices();             // 0x00487d60: forgets every device
     void CreateCursor(const char* image, int visible); // 0x00487dd0: creates the cursor
     void UnknownFunction487fb0(UnknownCursorAnimation* animation);
-    void UnknownFunction488010(const char* image, int redraw);
+    void RecreateCursor(const char* image, int redraw); // 0x00488010: recreates the cursor
     void ReleaseCursor();             // 0x004880c0: releases the cursor
     int SetPointerDevice(GUIInputDevice* device); // 0x00488120: sets the pointer device
-    int UnknownFunction488160(InputDevice* device);
+    int UsesDevice(InputDevice* device);      // 0x00488160: pointer or accepted device (1 without a pointer)
     int UnknownFunction4881d0(UnknownControlEvent* event);
-    GUIInputDevice* UnknownFunction488240(InputDevice* device);
+    GUIInputDevice* FindDevice(InputDevice* device); // 0x00488240: its GUIInputDevice
     GUIInputDevice* UnknownFunction4882a0(UnknownControlEvent* event);
     GUIInputDevice* UnknownFunction488310(int index);
 
     GUIInputDevice* pointerDevice;            // +0x2c: pointer device
     GUICursor* userCursor;                    // +0x30
-    int field_0x34;                           // pointer position
-    int field_0x38;
-    int field_0x3c[32];
+    int pointerX;                             // +0x34: pointer position, copied from the pointer device (0x00487620)
+    int pointerY;                             // +0x38
+    int controlDown[32];                      // +0x3c: UIDialog slot 23 sets a control's flag, slot 22 clears it
     GUIManager* userGui;                      // +0xbc
     ToolTip* userToolTip;                     // +0xc0
     int field_0xc4;
     char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
     char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
     UnknownCursorAnimation* cursorAnimation;  // +0x1c8
-    UnknownGuiControl* field_0x1cc;
-    UnknownGuiControl* field_0x1d0;
+    UnknownGuiControl* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
+    UnknownGuiControl* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
     UnknownGuiControl* focusControl;          // +0x1d4: focus
-    UnknownGuiControl* field_0x1d8;
+    UnknownGuiControl* hoverControl;          // +0x1d8: set by SetHoverControl and MoveFocus
     int field_0x1dc;
     ContainerList<GUIInputDevice*> acceptedDevices; // +0x1e0: accepted devices
 };
@@ -323,7 +323,7 @@ public:
     // 0x00485a70: shows `dialog`.
     UIDialog* ShowDialog(UIDialog* dialog, int a, int flags, int b,
                                             UIDialog* parent, int c, int d, int wait);
-    void UnknownFunction485bd0(UIDialog* dialog, int a, int wait);
+    void AttachDialog(UIDialog* dialog, int a, int wait); // 0x00485bd0: adds a shown dialog to its container
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
     void UnknownFunction485d70(const char* directory); // 0x00485d70
@@ -357,7 +357,7 @@ public:
     int field_0x2c;
     UIDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
     Palette8* guiPalette;                     // +0x34
-    Palette8* field_0x38;
+    Palette8* setupPalette;                   // +0x38: SetUp's palette
     BackgroundImage* guiBackground;           // +0x3c
     BackgroundImage* redrawBackground;        // +0x40: redrawn when +0x1f4 runs out
     SoundGroup* guiSoundGroup;                // +0x44
@@ -365,7 +365,7 @@ public:
     int ownsSoundGroup;                       // +0x4c: owns +0x44
     char dialogFontName[0x80];                // +0x50: dialog font
     short dialogFontSize;                     // +0xd0: dialog font size
-    int field_0xd4;
+    int setupCallback;                        // +0xd4: SetUp's last argument
     TextureMapManager* guiTextures;           // +0xd8
     PCTextureMap* screenGrab;                 // +0xdc: screen grab
     int drawGrabFirst;                        // +0xe0: draw the grab before the children
@@ -373,7 +373,7 @@ public:
     int field_0xe8;
     int field_0xec;                           // from TrackGame+0xc40 (KrustyUI 0x004988a0)
     char dialogDirectory[0x100];              // +0xf0: dialog directory
-    int field_0x1f0;
+    int paletteChanged;                       // +0x1f0: set by 0x00486150; slot 10 clears it
     int waitFrames;                           // +0x1f4: frames to wait
     int field_0x1f8;
     void* toolTipFont;                        // +0x1fc: tool tip font (HFONT)
@@ -402,14 +402,16 @@ public:
 struct UnknownHiResMeterEntry {
     float field_0x00;
     float field_0x04;
-    float field_0x08;                         // calls
-    float field_0x0c;                         // total time
-    float field_0x10;                         // calls this tick
-    float field_0x14;                         // time this tick
-    float field_0x18;                         // time over all ticks
-    float field_0x1c;                         // ticks
-    float field_0x20;                         // peak
-    char field_0x24[0x24];                    // name
+    // Named after slot 10's "MS Timers [CallsThisTick-->TotMSThisTick
+    // (AvgMSPerTick)] : (Per-call Peak/Avg)" columns.
+    float calls;                              // +0x08
+    float totalMs;                            // +0x0c: total time (per-call average = totalMs / calls)
+    float callsThisTick;                      // +0x10
+    float msThisTick;                         // +0x14
+    float msAllTicks;                         // +0x18: msThisTick summed each tick
+    float ticks;                              // +0x1c
+    float peakMs;                             // +0x20: per-call peak
+    char name[0x24];                          // +0x24
 };
 
 class HiResMeter : public GameObject {
@@ -425,10 +427,10 @@ public:
     void UnknownFunction488540();             // 0x00488540
     void UnknownFunction488580();             // 0x00488580
 
-    unsigned char field_0x2c;                 // the counter is usable
-    float field_0x30;                         // counts per millisecond
-    int field_0x34;                           // entries in use
+    unsigned char counterUsable;              // +0x2c: slot 8 calibrated the time stamp counter
+    float countsPerMs;                        // +0x30: counts per millisecond
+    int timerCount;                           // +0x34: entries in use
     int field_0x38;
-    int field_0x3c;                           // overlay page, -1 until assigned
-    UnknownHiResMeterEntry field_0x40[50];
+    int overlayPage;                          // +0x3c: debug overlay page, -1 until assigned
+    UnknownHiResMeterEntry timers[50];        // +0x40
 };

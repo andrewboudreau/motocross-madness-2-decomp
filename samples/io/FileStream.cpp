@@ -104,6 +104,9 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // The plain ||, &&, goto, nested, result-variable and seek-helper shapes compile
 // to the same or worse code; so do inline SeekOrClose/SeekOnly helpers for either
 // or both blocks and `!= 0` tests (27/186 over the whole 186-byte extent).
+// Also swept (20 forms, best 28): a result local, `!= 0`, `0L`, an extra
+// `&& field_0x14` and an unsigned `> 0` test for the first seek, each with the
+// `encoded`/+0x124/`field_0x08 = 0` statements in three orders and a cast zero.
 int UnknownTextureStream::UnknownFunction460db0()
 {
     if (fseek(field_0x14, 0, SEEK_SET)) {

@@ -278,7 +278,7 @@ int TrackGame::UnknownVirtualSlot4() {
     controlMapping = new(__FILE__, 350) UnknownControlMapping;
     if (!controlMapping)
         return 0;
-    controlInterface->UnknownFunction43ce70(controlMapping);
+    controlInterface->SetMapping(controlMapping);
     field_0x33fc = new(__FILE__, 360) UnknownTrackGameObject33fc;
     if (!field_0x33fc)
         return 0;
@@ -305,7 +305,7 @@ int TrackGame::UnknownVirtualSlot4() {
             }
         }
         if (network->lobbyConnected) {
-            ui->field_0x2c->ShowCursors(1);
+            ui->gui->ShowCursors(1);
             ui->UnknownFunction498cf0(-1);
             char name[16];
             network->GetPlayerName(network->localPlayer, name);
@@ -314,12 +314,12 @@ int TrackGame::UnknownVirtualSlot4() {
                 int length = count > 15 ? 15 : count;
                 strncpy(mode.field_0x00, name, length);
                 mode.field_0x00[length] = 0;
-                if (!mode.UnknownFunction5231f0())
+                if (!mode.LoadProfile())
                     ui->OpenMenu(0xbbb);
             }
             networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
             if (networkGameObject)
-                networkGameObject->UnknownFunction4aa350(network->directPlay, network->lobby);
+                networkGameObject->SetDirectPlay(network->directPlay, network->lobby);
             ui->OpenMenu(0x866);
         }
     }
@@ -422,11 +422,11 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
     } else {
         if (!menuIsOpen)
             return;
-        if (!ui->field_0x2c->FindInputDialog())
+        if (!ui->gui->FindInputDialog())
             return;
-        if (id != ui->field_0x3c)
+        if (id != ui->currentMenu)
             return;
-        ui->field_0x2c->FindInputDialog()->UnknownVirtualSlot26();
+        ui->gui->FindInputDialog()->UnknownVirtualSlot26();
         GameObject* current = eventManager->FindRaceMode();
         if (current)
             current->UnknownVirtualSlot5();
@@ -481,7 +481,7 @@ int TrackGame::UnknownVirtualSlot15() {
         return 0;
     ui = 0;
     SetLocaleInfoA(kLocaleUserDefault, kLocaleDecimalSeparator, savedDecimalSeparator);
-    mode.UnknownFunction523580();
+    mode.SaveProfile();
     return 1;
 }
 

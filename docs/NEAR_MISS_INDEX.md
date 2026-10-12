@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 171, c 120, total 291. The three class (a) functions of the
+Counts: a 0, b 171, c 119, total 290. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -25,9 +25,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
-| audio/PCAudio | `0x004bb890` | 35/272 (masked) | c | 11 code diffs: `je @65` vs `jne @23 ; mov ecx, [esp + N] ; mov fs:[~`; `je @65` vs `jne @51 ; xor eax, eax ; mov ecx, [esp ~` |
 | audio/PCAudio | `0x004bc6b0` | 47/580 (masked) | c | 54 code diffs: retail lacks `mov eax, fs:[X] ; push -1 ; push A`; retail lacks `mov fs:[X], esp` |
-| audio/PCAudio | `0x004bd0c0` | 110/314 (masked) | c | 16 code diffs |
+| audio/PCAudio | `0x004bd0c0` | 110/412 (masked) | c | retail extent 412 (old index 314); retail puts the file branch's failure tail before its success tail and keeps the archive Fill failure's own epilogue |
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |

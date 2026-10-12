@@ -50,22 +50,22 @@ int JoystickDevice::UnknownFunction489a20(UnknownControlBinding* binding, float 
     axisBindings[binding->field_0x08].Add(binding);
     switch (binding->field_0x08) {
     case 0:
-        binding->UnknownFunction43cce0(-2, -3);
+        binding->SetKeys(-2, -3);
         break;
     case 1:
-        binding->UnknownFunction43cce0(-5, -4);
+        binding->SetKeys(-5, -4);
         break;
     case 2:
-        binding->UnknownFunction43cce0(-7, -6);
+        binding->SetKeys(-7, -6);
         break;
     case 3:
-        binding->UnknownFunction43cce0(-9, -8);
+        binding->SetKeys(-9, -8);
         break;
     case 4:
-        binding->UnknownFunction43cce0(-11, -10);
+        binding->SetKeys(-11, -10);
         break;
     case 5:
-        binding->UnknownFunction43cce0(-13, -12);
+        binding->SetKeys(-13, -12);
         break;
     }
     return 1;
@@ -85,7 +85,7 @@ void JoystickDevice::UnknownVirtualSlot0(int id) {
 // 0x00489c00
 void JoystickDevice::UnknownFunction489c00(int axis, float value, float range) {
     for (int i = 0; i < axisBindings[axis].m_count; i++)
-        axisBindings[axis].Get(i)->UnknownFunction43cd20(value, range);
+        axisBindings[axis].Get(i)->SetFromAxis(value, range);
 }
 
 // 0x00489c60: controls -2 to -13 are axis directions (below 16384 or above
@@ -147,7 +147,7 @@ int JoystickDevice::UnknownFunction489c60(int control, int modifier, UnknownInpu
     UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
-    mapping->UnknownFunction43cbd0(control, &control, joystickIndex);
+    mapping->GetJoystickButton(control, &control, joystickIndex);
     if (control == -1)
         return 0;
     return UnknownVirtualSlot2(control, modifier, entry);

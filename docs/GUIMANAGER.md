@@ -13,13 +13,23 @@ whose bodies are unambiguous are named for them (`OpenDialogResource`,
 `ToolTip::ShowText`, ...). Methods that other files call through
 KrustyUI.h's alias keep their provisional names, and so do the remaining
 members.
+Named members: `setupPalette` (+0x38) and `setupCallback` (+0xd4) hold
+`SetUp`'s palette and last argument; `paletteChanged` (+0x1f0) is set by
+`0x00486150` with the palette, cleared by slot 10 and makes `0x00485bd0` wait
+three frames. GUIUser: `pointerX`/`pointerY` (+0x34/+0x38, copied from the
+pointer device by `0x00487620`), `controlDown` (+0x3c, 32 flags that UIDialog
+slots 23 and 22 set and clear by control index), `pendingHoverControl` and
+`pendingFocusControl` (+0x1cc/+0x1d0, stored by `0x00487730`/`0x00487790`
+and applied by `UpdateFocus` through `SetHoverControl`/`MoveFocus`) and
+`hoverControl` (+0x1d8, what those two methods last set).
 
 GUIManager owns the dialogs, the background image and screen grab, the
 tool-tip font, the cursors and up to four GUIUsers; each GUIUser routes
 input devices (a `ContainerList<GUIInputDevice*>` at +0x1e0), focus,
 hover/capture, IME state, a ToolTip and a GUICursor. HiResMeter is the
 "MS Timers" overlay at `0x0067b468` (Game.h's `g_UnknownGlobal56c470`
-points to it). KrustyUI.h still declares GUIManager and GUIUser as
+points to it); its timer fields are named after the overlay's column header
+(`callsThisTick`, `msThisTick`, `peakMs`, ...). KrustyUI.h still declares GUIManager and GUIUser as
 `UnknownKrustyUIGui` / `UnknownKrustyUIGuiLayer` views; unifying them
 would change KrustyUI's mangled names.
 

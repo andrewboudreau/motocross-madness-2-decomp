@@ -66,11 +66,11 @@ int PCJoystickDevice::ReadImmediateState(int value) {
             if (pressed == 0) {
                 buttonStates[i].previousReleaseTime = 0;
                 buttonStates[i].releaseTime = 0;
-                g_TrackGame->controlInterface->UnknownFunction43cea0(i, 2, 0, joystickIndex);
+                g_TrackGame->controlInterface->QueueEvent(i, 2, 0, joystickIndex);
             } else {
                 buttonStates[i].previousPressTime = 0;
                 buttonStates[i].pressTime = 0;
-                g_TrackGame->controlInterface->UnknownFunction43cea0(i, 2, 1, joystickIndex);
+                g_TrackGame->controlInterface->QueueEvent(i, 2, 1, joystickIndex);
             }
         }
     }
@@ -122,12 +122,12 @@ int PCJoystickDevice::ReadBufferedState(int) {
                 buttonStates[button].state = 1;
                 buttonStates[button].previousPressTime = buttonStates[button].pressTime;
                 buttonStates[button].pressTime = events[i].timeStamp;
-                g_TrackGame->controlInterface->UnknownFunction43cea0(button, 2, 1, joystickIndex);
+                g_TrackGame->controlInterface->QueueEvent(button, 2, 1, joystickIndex);
             } else {
                 buttonStates[button].state = 0;
                 buttonStates[button].previousReleaseTime = buttonStates[button].releaseTime;
                 buttonStates[button].releaseTime = events[i].timeStamp;
-                g_TrackGame->controlInterface->UnknownFunction43cea0(button, 2, 0, joystickIndex);
+                g_TrackGame->controlInterface->QueueEvent(button, 2, 0, joystickIndex);
             }
             continue;
         }

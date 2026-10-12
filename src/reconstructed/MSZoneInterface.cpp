@@ -71,9 +71,9 @@ struct UnknownZoneScore {
 };
 
 // 0x004aa350
-void UnknownTrackGameObject3410::UnknownFunction4aa350(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b) {
-    field_0x00 = a;
-    field_0x04 = b;
+void UnknownTrackGameObject3410::SetDirectPlay(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b) {
+    directPlay = a;
+    lobby = b;
 }
 
 // 0x004aa360: sends a GETPROPERTY request for the preset and waits up to
@@ -81,7 +81,7 @@ void UnknownTrackGameObject3410::UnknownFunction4aa350(UnknownDirectPlay4A* a, U
 // another message arrives first). The response checks are separate `goto
 // failed` tests: that places the failure block right after the last test,
 // falling through from it as in retail; one `||` condition sinks it to the end.
-int UnknownTrackGameObject3410::UnknownFunction4aa360(char* buffer, unsigned int size) {
+int UnknownTrackGameObject3410::GetLobbyPreset(char* buffer, unsigned int size) {
     UnknownLobbyGetPropertyResponse* response;
     UnknownLobbyGetProperty request;
     unsigned long flags = 0;
@@ -95,10 +95,10 @@ int UnknownTrackGameObject3410::UnknownFunction4aa360(char* buffer, unsigned int
     request.requestId = 1;
     request.player = g_UnknownGuid556db0;
     request.property = g_UnknownGuid556dd0;
-    result = field_0x04->SendLobbyMessage(2, 0, &request, sizeof(request));
+    result = lobby->SendLobbyMessage(2, 0, &request, sizeof(request));
     start = UnknownFunction4bfa80();
     while (UnknownFunction4bfa80() - start < 15000) {
-        result = field_0x04->ReceiveLobbyMessage(0, 0, &flags, response, &responseSize);
+        result = lobby->ReceiveLobbyMessage(0, 0, &flags, response, &responseSize);
         if (result >= 0)
             break;
         Sleep(100);
@@ -125,7 +125,7 @@ failed:
 }
 
 // 0x004aa4e0: the same for the rank property.
-int UnknownTrackGameObject3410::UnknownFunction4aa4e0(char* buffer, unsigned int size) {
+int UnknownTrackGameObject3410::GetLobbyRank(char* buffer, unsigned int size) {
     UnknownLobbyGetPropertyResponse* response;
     UnknownLobbyGetProperty request;
     unsigned long flags = 0;
@@ -139,10 +139,10 @@ int UnknownTrackGameObject3410::UnknownFunction4aa4e0(char* buffer, unsigned int
     request.requestId = 2;
     request.player = g_UnknownGuid556db0;
     request.property = g_UnknownGuid556de0;
-    result = field_0x04->SendLobbyMessage(2, 0, &request, sizeof(request));
+    result = lobby->SendLobbyMessage(2, 0, &request, sizeof(request));
     start = UnknownFunction4bfa80();
     while (UnknownFunction4bfa80() - start < 15000) {
-        result = field_0x04->ReceiveLobbyMessage(0, 0, &flags, response, &responseSize);
+        result = lobby->ReceiveLobbyMessage(0, 0, &flags, response, &responseSize);
         if (result >= 0)
             break;
         Sleep(100);
@@ -170,7 +170,7 @@ failed:
 
 // 0x004aa670: creates the score object, adds `count` players and sends the
 // result through the lobby.
-int UnknownTrackGameObject3410::UnknownFunction4aa670(unsigned int count, void* a, void* b) {
+int UnknownTrackGameObject3410::SubmitScores(unsigned int count, void* a, void* b) {
     UnknownZoneScore* score = 0;
     unsigned int i;
     int flags;
@@ -181,18 +181,18 @@ int UnknownTrackGameObject3410::UnknownFunction4aa670(unsigned int count, void* 
         goto failed;
     SendDebugMessage("\nSending The RaceStatus to the Zone\n");
     for (i = 0; i < count; i++) {
-        if (field_0x08[i].field_0x40 == 1)
+        if (players[i].position == 1)
             flags = 2;
         else
-            flags = field_0x08[i].field_0x40 ? 4 : 16;
-        if (score->UnknownMethod4(i, field_0x08[i].field_0x00, field_0x08[i].field_0x44, 0, flags) < 0)
+            flags = players[i].position ? 4 : 16;
+        if (score->UnknownMethod4(i, players[i].name, players[i].score, 0, flags) < 0)
             goto failed;
-        SendDebugMessage("\nPlayer %s:%d,%d\n", field_0x08[i].field_0x00, field_0x08[i].field_0x40,
-                              field_0x08[i].field_0x44);
+        SendDebugMessage("\nPlayer %s:%d,%d\n", players[i].name, players[i].position,
+                              players[i].score);
     }
     if (score->UnknownMethod6(a, b) < 0)
         goto failed;
-    if (score->UnknownMethod15(field_0x04) < 0)
+    if (score->UnknownMethod15(lobby) < 0)
         goto failed;
     SendDebugMessage("Sent The Final Score to the Zone successfully\n");
     score->Release();

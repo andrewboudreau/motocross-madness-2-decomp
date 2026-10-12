@@ -67,7 +67,7 @@ void SortDescending(int* keys, int* values, int count) {
 void BikeRace::RankByPoints(int* order) {
     int points[11];
     for (int i = 0; i < racerCount; i++) {
-        points[i] = g_TrackGame->eventManager->field_0x50[i].field_0x28;
+        points[i] = g_TrackGame->eventManager->results[i].points;
         order[i] = i + 1;
     }
     SortDescending(points, order, racerCount);
@@ -653,8 +653,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             int pass = 0;
             if ((signed char)field_0x0b0 < 0) {
                 strncpy(name,
-                        ((UnknownBikeRaceUiModel*)g_TrackGame->ui->field_0x48)
-                            [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->field_0x50)
+                        ((UnknownBikeRaceUiModel*)g_TrackGame->ui->manufacturers)
+                            [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes)
                                  [g_TrackGame->mode.field_0x1974.field_0xc4].field_0x00].field_0x40,
                         0x14);
                 name[0x14] = 0;
@@ -1017,17 +1017,17 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         if (shown == lodDebugPage) {
 
             if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
-                if (g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30 == 0) {
-                    g_TrackGame->ui->field_0x2c->UnknownFunction486590("ui\\cursor.tga", 0);
+                if (g_TrackGame->ui->gui->GetUser(0)->field_0x30 == 0) {
+                    g_TrackGame->ui->gui->UnknownFunction486590("ui\\cursor.tga", 0);
                 }
-                if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->field_0x2c
+                if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
                           ->GetUser(0)->field_0x30)->field_0x25_bit0) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;
                         picker->UnknownFunction4b0210(
                             g_TrackGame->renderTarget, 0, PickerHitCallback,
-                            (GameCursor*)g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30);
+                            (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->field_0x30);
                         if (AppendChild(objectPicker, -1)) {
                             g_TrackGame->ui->UnknownFunction499b00();
                         }
@@ -1316,8 +1316,8 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
                     delete replayVcr;
                     replayVcr = 0;
                 }
-                g_TrackGame->ui->field_0x2c->ShowCursors(1);
-                g_TrackGame->ui->field_0x2c->ShowDialog(
+                g_TrackGame->ui->gui->ShowCursors(1);
+                g_TrackGame->ui->gui->ShowDialog(
                     new (__FILE__, 0x1073) VCRDlg(1, "VCR.dtm"), 0, 1, 0, 0, 0, 0, 1);
             } else {
                 g_TrackGame->field_0x3428 = 0;
@@ -1367,7 +1367,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
 
 // 0x00420b00
 void BikeRace::UnknownFunction420b00(char* path, char* description) {
-    g_TrackGame->ui->field_0x40 = 0;
+    g_TrackGame->ui->replayAvailable = 0;
     if (replayVcr != 0) {
         char text[0x80];
         g_TrackGame->LoadResourceString(0x1437, text, sizeof(text));
@@ -1381,7 +1381,7 @@ void BikeRace::UnknownFunction420b00(char* path, char* description) {
         replayVcr->UnknownFunction4691f0();
         replayVcr->Release();
         replayVcr = 0;
-        g_TrackGame->ui->field_0x40 = 1;
+        g_TrackGame->ui->replayAvailable = 1;
     }
 }
 
@@ -1504,7 +1504,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         ClearRacerParts();
         g_TrackGame->field_0x2e0 = 1.0f;
         if (g_TrackGame->ui->field_0x4a8) {
-            g_TrackGame->ui->field_0x44 = 1;
+            g_TrackGame->ui->demoEnded = 1;
             return 1;
         }
         if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {

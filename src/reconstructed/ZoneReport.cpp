@@ -18,53 +18,53 @@ unsigned int UnknownFunction4bfa80();   // 0x004bfa80: milliseconds
 // at 0x0049c5f0 for the unwind funclets; the normal paths inline it.
 // Writing the body inside `if (...) { ... return 1; } return 0;` gives
 // retail's explicit `xor eax, eax` on the failure path.
-int UnknownTrackGameObject3410::UnknownFunction49c2f0(int* flags)
+int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
 {
     char response[0x800];
     char name[0x40];
     unsigned long value;
     *flags = 0;
-    if (UnknownFunction4aa360(response, 0x800)) {
+    if (GetLobbyPreset(response, 0x800)) {
         UnknownParser parser;
-        parser.UnknownFunction4b87f0(response, lstrlen(response));
-        if (parser.UnknownFunction4b89d0("EventTypeIndex", &value) != 0x80070005) {
-            field_0x24c = value - 1;
+        parser.Parse(response, lstrlen(response));
+        if (parser.GetNumber("EventTypeIndex", &value) != 0x80070005) {
+            eventTypeIndex = value - 1;
             *flags |= 1;
         } else {
-            field_0x24c = -1;
+            eventTypeIndex = -1;
         }
-        if (parser.UnknownFunction4b89d0("EventTypeLocation", &value) != 0x80070005) {
-            field_0x250 = value - 1;
+        if (parser.GetNumber("EventTypeLocation", &value) != 0x80070005) {
+            eventTypeLocation = value - 1;
             *flags |= 2;
         } else {
-            field_0x250 = -1;
+            eventTypeLocation = -1;
         }
-        if (parser.UnknownFunction4b89d0("BikeManufacturer", &value) != 0x80070005) {
-            field_0x298 = value - 1;
+        if (parser.GetNumber("BikeManufacturer", &value) != 0x80070005) {
+            bikeManufacturer = value - 1;
             *flags |= 4;
         } else {
-            field_0x298 = -1;
+            bikeManufacturer = -1;
         }
-        if (parser.UnknownFunction4b89d0("BikeType", &value) != 0x80070005) {
-            field_0x29c = value - 1;
+        if (parser.GetNumber("BikeType", &value) != 0x80070005) {
+            bikeType = value - 1;
             *flags |= 8;
         } else {
-            field_0x29c = -1;
+            bikeType = -1;
         }
-        UnknownFunction49ca60(1);
-        if (field_0x2a0 == -1) {
+        ConvertLobbyNumbering(1);
+        if (bikeIndex == -1) {
             *flags &= ~0xc;
         } else {
-            g_TrackGame->mode.field_0x1974.field_0xc0 = field_0x298;
-            g_TrackGame->mode.field_0x1974.field_0xc4 = field_0x2a0;
+            g_TrackGame->mode.field_0x1974.field_0xc0 = bikeManufacturer;
+            g_TrackGame->mode.field_0x1974.field_0xc4 = bikeIndex;
         }
-        if (field_0x24c == -1)
+        if (eventTypeIndex == -1)
             *flags &= ~3;
         else
-            g_TrackGame->mode.field_0x27f8.field_0x04 = field_0x24c;
-        g_TrackGame->mode.field_0x27f8.field_0x34 = field_0x254;
-        if (field_0x250 != -1)
-            strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, field_0x258);
+            g_TrackGame->mode.field_0x27f8.field_0x04 = eventTypeIndex;
+        g_TrackGame->mode.field_0x27f8.field_0x34 = trackVariant;
+        if (eventTypeLocation != -1)
+            strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, trackName);
         if (g_TrackGame->network->isHost)
             g_TrackGame->sceneObject->UnknownFunction4ea010(name, g_TrackGame->mode.field_0x27f8.field_0x36, 0, "scn",
                                                              &g_TrackGame->mode.field_0x27f8.field_0x138,
@@ -92,7 +92,7 @@ int UnknownTrackGameObject3410::UnknownFunction49c2f0(int* flags)
 // number is stored in TrackGameMode+0x1bd0. -1 means not ready yet; it
 // returns 0 on failure, -1 or -2. The `else return 0` inside the loop keeps
 // one shared epilogue; an early `if (!...) return 0;` duplicates it.
-int UnknownTrackGameObject3410::UnknownFunction49c600()
+int UnknownTrackGameObject3410::WaitForLobbyRank()
 {
     int value;
     int b;
@@ -102,10 +102,10 @@ int UnknownTrackGameObject3410::UnknownFunction49c600()
     char text[0x800];
     unsigned int start = UnknownFunction4bfa80();
     while (UnknownFunction4bfa80() - start < 20000) {
-        if (UnknownFunction4aa4e0(response, 0x800)) {
+        if (GetLobbyRank(response, 0x800)) {
             UnknownParser parser;
-            parser.UnknownFunction4b87f0(response, lstrlen(response));
-            parser.UnknownFunction4b8990(g_TrackGame->mode.field_0x00, text, 0x800);
+            parser.Parse(response, lstrlen(response));
+            parser.GetText(g_TrackGame->mode.field_0x00, text, 0x800);
             sscanf(text, "%d,%d,%d,%d", &value, &b, &c, &d);
             if (value == -1) {
                 Sleep(1000);
@@ -124,54 +124,54 @@ int UnknownTrackGameObject3410::UnknownFunction49c600()
 
 // 0x0049c770 (EventManager 0x0045e550): fills the race status from the
 // event entries and sends it to the Zone (0x004aa670). Returns 1 without
-// a lobby connection. Indexing field_0x2a4.field_0x08[i] directly (not
+// a lobby connection. Indexing raceStatus.records[i] directly (not
 // through a record pointer) gives retail's induction register.
-int UnknownTrackGameObject3410::UnknownFunction49c770()
+int UnknownTrackGameObject3410::ReportRaceToZone()
 {
     int longest;
     int i;
     int j;
     if (g_TrackGame->network->lobbyConnected) {
-        field_0x2a4.field_0x00 = g_TrackGame->mode.field_0x27f8.field_0x04 + 1;
+        raceStatus.eventType = g_TrackGame->mode.field_0x27f8.field_0x04 + 1;
         longest = 0;
         i = 0;
-        field_0x24c = g_TrackGame->mode.field_0x27f8.field_0x04;
-        strcpy(field_0x258, g_TrackGame->mode.field_0x27f8.field_0x36);
-        field_0x254 = g_TrackGame->mode.field_0x27f8.field_0x34;
-        field_0x2a4.field_0x02 = g_TrackGame->mode.field_0x27f8.field_0x20;
+        eventTypeIndex = g_TrackGame->mode.field_0x27f8.field_0x04;
+        strcpy(trackName, g_TrackGame->mode.field_0x27f8.field_0x36);
+        trackVariant = g_TrackGame->mode.field_0x27f8.field_0x34;
+        raceStatus.laps = g_TrackGame->mode.field_0x27f8.field_0x20;
         for (; i < g_TrackGame->field_0x18; i++) {
-            field_0x2a4.field_0x08[i].field_0x02 = g_TrackGame->eventManager->field_0x50[i].field_0x04;
-            field_0x2a4.field_0x08[i].field_0x04 = (int)(g_TrackGame->eventManager->field_0x50[i].field_0x08 * 100.0f);
-            field_0x2a4.field_0x08[i].field_0x08 = (int)(g_TrackGame->eventManager->field_0x50[i].field_0x14 * 100.0f);
-            if (longest < field_0x2a4.field_0x08[i].field_0x08)
-                longest = field_0x2a4.field_0x08[i].field_0x08;
-            field_0x2a4.field_0x08[i].field_0x0c = g_TrackGame->eventManager->field_0x50[i].field_0x0c;
-            field_0x08[i].field_0x40 = field_0x2a4.field_0x08[i].field_0x02;
-            strcpy(field_0x08[i].field_0x00, g_TrackGame->eventManager->field_0x50[i].field_0x40);
-            if (g_TrackGame->eventManager->field_0x50[i].field_0x20) {
+            raceStatus.records[i].position = g_TrackGame->eventManager->results[i].position;
+            raceStatus.records[i].fastestLap = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
+            raceStatus.records[i].totalRunningTime = (int)(g_TrackGame->eventManager->results[i].totalRunningTime * 100.0f);
+            if (longest < raceStatus.records[i].totalRunningTime)
+                longest = raceStatus.records[i].totalRunningTime;
+            raceStatus.records[i].largestStuntPoints = g_TrackGame->eventManager->results[i].largestStuntPoints;
+            players[i].position = raceStatus.records[i].position;
+            strcpy(players[i].name, g_TrackGame->eventManager->results[i].name);
+            if (g_TrackGame->eventManager->results[i].finished) {
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4)
-                    field_0x08[i].field_0x44 = (int)(g_TrackGame->eventManager->field_0x50[i].field_0x08 * 100.0f);
+                    players[i].score = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
                 else
-                    field_0x08[i].field_0x44 = (int)g_TrackGame->eventManager->field_0x50[i].field_0x2c;
+                    players[i].score = (int)g_TrackGame->eventManager->results[i].field_0x2c;
             }
             for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
-                if (g_TrackGame->eventManager->field_0x50[i].field_0x00 == g_TrackGame->mode.field_0x1be4[j].field_0xd4) {
-                    field_0x2a0 = g_TrackGame->mode.field_0x1be4[j].field_0xc4;
+                if (g_TrackGame->eventManager->results[i].playerId == g_TrackGame->mode.field_0x1be4[j].field_0xd4) {
+                    bikeIndex = g_TrackGame->mode.field_0x1be4[j].field_0xc4;
                     break;
                 }
             }
-            UnknownFunction49ca60(2);
-            field_0x2a4.field_0x08[i].field_0x00 = field_0x298;
-            field_0x2a4.field_0x08[i].field_0x01 = field_0x29c;
+            ConvertLobbyNumbering(2);
+            raceStatus.records[i].bikeManufacturer = bikeManufacturer;
+            raceStatus.records[i].bikeType = bikeType;
             SendDebugMessage("\nPlayer %d\n", i + 1);
-            SendDebugMessage("Bike %d-%d (%d)\n", field_0x2a4.field_0x08[i].field_0x00, field_0x2a4.field_0x08[i].field_0x01, field_0x2a0);
-            SendDebugMessage("Position %d\n", field_0x2a4.field_0x08[i].field_0x02);
-            SendDebugMessage("FastestLap %d (scaled)\n", field_0x2a4.field_0x08[i].field_0x04);
-            SendDebugMessage("TotalrunningTime %d (scaled)\n", field_0x2a4.field_0x08[i].field_0x08);
-            SendDebugMessage("LargestSingleStuntPoints %d\n", field_0x2a4.field_0x08[i].field_0x0c);
+            SendDebugMessage("Bike %d-%d (%d)\n", raceStatus.records[i].bikeManufacturer, raceStatus.records[i].bikeType, bikeIndex);
+            SendDebugMessage("Position %d\n", raceStatus.records[i].position);
+            SendDebugMessage("FastestLap %d (scaled)\n", raceStatus.records[i].fastestLap);
+            SendDebugMessage("TotalrunningTime %d (scaled)\n", raceStatus.records[i].totalRunningTime);
+            SendDebugMessage("LargestSingleStuntPoints %d\n", raceStatus.records[i].largestStuntPoints);
         }
-        field_0x2a4.field_0x04 = longest;
-        return UnknownFunction4aa670(g_TrackGame->field_0x18, &field_0x2a4, (void*)sizeof(field_0x2a4));
+        raceStatus.longestRunningTime = longest;
+        return SubmitScores(g_TrackGame->field_0x18, &raceStatus, (void*)sizeof(raceStatus));
     }
     return 1;
 }
@@ -198,7 +198,7 @@ struct UnknownTrackNameList {
 // supercross, tag, stunt; VC6's frame rule then lays them out as retail.
 // Direction 2 computes the 1-based type into its own local in each branch
 // (retail folds the +1 into the >= 30 branch as `add ebx, -0x1a`).
-void UnknownTrackGameObject3410::UnknownFunction49ca60(int direction)
+void UnknownTrackGameObject3410::ConvertLobbyNumbering(int direction)
 {
     UnknownTrackNameEntry quarry[5] = {
         {"Quarry05", 0}, {"Quarry01", 0}, {"Quarry04", 0}, {"Quarry03", 0}, {"Quarry02", 0},
@@ -237,36 +237,36 @@ void UnknownTrackGameObject3410::UnknownFunction49ca60(int direction)
 
     switch (direction) {
     case 1:
-        if (field_0x298 >= 0 && field_0x298 <= 4) {
+        if (bikeManufacturer >= 0 && bikeManufacturer <= 4) {
             first = 0;
-            if (field_0x298 == 4)
-                field_0x298 = 6;
-            if (field_0x298 == 0 && field_0x29c >= 3) {
-                field_0x2a0 = field_0x29c + 27;
+            if (bikeManufacturer == 4)
+                bikeManufacturer = 6;
+            if (bikeManufacturer == 0 && bikeType >= 3) {
+                bikeIndex = bikeType + 27;
             } else {
-                for (i = 0; i < field_0x298; i++)
+                for (i = 0; i < bikeManufacturer; i++)
                     first += kBikeTypeCounts[i];
                 if (i < 7)
-                    field_0x2a0 = field_0x29c + first;
+                    bikeIndex = bikeType + first;
                 else
-                    field_0x2a0 = -1;
+                    bikeIndex = -1;
             }
         } else {
-            field_0x2a0 = -1;
+            bikeIndex = -1;
         }
-        if (field_0x24c >= 0 && field_0x24c <= 5) {
-            entry = &lists[field_0x24c].entries[field_0x250];
-            field_0x254 = entry->variant;
-            strcpy(field_0x258, entry->name);
+        if (eventTypeIndex >= 0 && eventTypeIndex <= 5) {
+            entry = &lists[eventTypeIndex].entries[eventTypeLocation];
+            trackVariant = entry->variant;
+            strcpy(trackName, entry->name);
         } else {
-            field_0x24c = -1;
+            eventTypeIndex = -1;
         }
         break;
     case 2:
-        index = field_0x2a0;
+        index = bikeIndex;
         first = 0;
         if (index >= 30) {
-            field_0x298 = 1;
+            bikeManufacturer = 1;
             type = index - 27 + 1;
         } else {
             for (i = 0; i < 7; i++) {
@@ -274,17 +274,17 @@ void UnknownTrackGameObject3410::UnknownFunction49ca60(int direction)
                     break;
                 first += kBikeTypeCounts[i];
             }
-            field_0x298 = i + 1;
-            if (field_0x298 == 7)
-                field_0x298 = 5;
+            bikeManufacturer = i + 1;
+            if (bikeManufacturer == 7)
+                bikeManufacturer = 5;
             type = index - first + 1;
         }
-        field_0x29c = type;
-        field_0x2a4.field_0x01 = 0;
-        entry = lists[field_0x24c].entries;
+        bikeType = type;
+        raceStatus.trackEntry = 0;
+        entry = lists[eventTypeIndex].entries;
         for (i = 0; i < 16; i++, entry++) {
-            if (!_stricmp(entry->name, field_0x258) && field_0x254 == entry->variant) {
-                field_0x2a4.field_0x01 = i + 1;
+            if (!_stricmp(entry->name, trackName) && trackVariant == entry->variant) {
+                raceStatus.trackEntry = i + 1;
                 return;
             }
         }

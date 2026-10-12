@@ -36,6 +36,6 @@ void MouseDevice::UnknownVirtualSlot0(int id) {
 void MouseDevice::UnknownFunction48a550(int axis, float amount) {
     for (int i = 0; i < axisBindings[axis].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[axis].Get(i);
-        binding->UnknownFunction43cd90(amount * binding->field_0x30 * (1.0f / 375.0f));
+        binding->Adjust(amount * binding->field_0x30 * (1.0f / 375.0f));
     }
 }

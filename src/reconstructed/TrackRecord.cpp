@@ -7,6 +7,7 @@
 #include "TrackGame.h"
 #include "TrackRecordDlg.h"
 #include "DebugAlloc.h"
+#include "MenuId.h"
 
 // 0x0051ee90: an empty name and no value.
 UnknownTrackRecord::UnknownTrackRecord()
@@ -71,7 +72,7 @@ void UnknownTrackGameObject3400::Clear()
 int UnknownTrackGameObject3400::UnknownFunction51f0b0(short directory, const char* name)
 {
     char path[260];
-    sprintf(path, "%s\\%s", g_TrackGame->mode.field_0xa0[directory], name);
+    sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
     return Read(path);
 }
 
@@ -111,7 +112,7 @@ int UnknownTrackGameObject3400::Write(const char* path, int value)
 int UnknownTrackGameObject3400::UnknownFunction51f260(short directory, const char* name, int value)
 {
     char path[260];
-    sprintf(path, "%s\\%s", g_TrackGame->mode.field_0xa0[directory], name);
+    sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
     return Write(path, value);
 }
 
@@ -123,11 +124,11 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
     char file[260];
     for (int i = 0; i < 10; i++)
         field_0x14[i] = UnknownTrackRecord();
-    field_0xdc->UnknownFunction44a1d0((const char*)g_TrackGame->mode.field_0x6a0);
+    field_0xdc->UnknownFunction44a1d0((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(path, "*%s", field_0x04[field_0x00]);
     field_0xdc->UnknownFunction44a220(path, 1);
     field_0xdc->UnknownVirtualSlot1();
-    sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.field_0x6a0, name);
+    sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, name);
     sprintf(file, "%s%s", name, field_0x04[field_0x00]);
     if (field_0xdc->UnknownFunction44a910(file))
         Read(path);
@@ -139,9 +140,9 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
 int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 {
     char name[16];
-    int n = strlen(g_TrackGame->eventManager->field_0x50[racer].field_0x40);
+    int n = strlen(g_TrackGame->eventManager->results[racer].name);
     int length = n > 15 ? 15 : n;
-    strncpy(name, g_TrackGame->eventManager->field_0x50[racer].field_0x40, length);
+    strncpy(name, g_TrackGame->eventManager->results[racer].name, length);
     name[length] = 0;
     float value = 0.0f;
     switch (kind) {
@@ -150,25 +151,25 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
     case 3:
     case 5:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x14;
+            value = g_TrackGame->eventManager->results[racer].totalRunningTime;
         else
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x08;
+            value = g_TrackGame->eventManager->results[racer].fastestLap;
         if (field_0xe0 != 0 && value > field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;
     case 4:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x1c;
+            value = g_TrackGame->eventManager->results[racer].field_0x1c;
         else
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x18;
+            value = g_TrackGame->eventManager->results[racer].field_0x18;
         if (field_0xe0 != 0 && value < field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;
     case 0:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x2c;
+            value = g_TrackGame->eventManager->results[racer].field_0x2c;
         else
-            value = (float)g_TrackGame->eventManager->field_0x50[racer].field_0x0c;
+            value = (float)g_TrackGame->eventManager->results[racer].largestStuntPoints;
         if (field_0xe0 != 0 && value < field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;
@@ -197,7 +198,7 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 
 // 0x0051f600: the dialog's messages: 5 sets it up, 1 handles the buttons
 // and tabs, 2 a track chosen in the list, 6 frees the rows.
-void TrackRecordDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
 {
     char name[128];
     char path[260];
@@ -237,7 +238,7 @@ void TrackRecordDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         break;
     case 1:
         if (!_stricmp("Back", event->controlName)) {
-            g_TrackGame->ui->OpenMenu(100);
+            g_TrackGame->ui->OpenMenu(kMenuMain);
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (!_stricmp("TabQuarry", event->controlName)) {

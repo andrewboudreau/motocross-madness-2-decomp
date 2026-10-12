@@ -190,7 +190,7 @@ void TrackRecordDlg::UnknownFunction51ffe0(UIControl* list, DirectoryList* direc
     else
         prefixed = 0;
     UnknownFunction51ff40();
-    directory->UnknownFunction44a1d0((const char*)g_TrackGame->mode.field_0x6a0);
+    directory->UnknownFunction44a1d0((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(pattern, "*%s", g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
     directory->UnknownFunction44a220(pattern, 1);
     directory->UnknownVirtualSlot1();
@@ -207,14 +207,14 @@ void TrackRecordDlg::UnknownFunction51ffe0(UIControl* list, DirectoryList* direc
         track[n] = 0;
         for (;;) {
             int directoryIndex = g_TrackGame->mode.UnknownFunction524100();
-            sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.field_0x6a0, found,
+            sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, found,
                     g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
             FILE* file = fopen(path, "r");
             if (file) {
                 fread(&directoryIndex, 4, 1, file);
                 fclose(file);
             }
-            g_TrackGame->mode.FindFileDirectory((int)g_TrackGame->mode.field_0xa0[directoryIndex],
+            g_TrackGame->mode.FindFileDirectory((int)g_TrackGame->mode.seriesDirectories[directoryIndex],
                                                               track, "env", pattern);
             g_TrackGame->sceneObject->UnknownFunction4e9b80(pattern);
             g_TrackGame->sceneObject->UnknownFunction4ea010(display, track, digit, "scn", 0, 0);

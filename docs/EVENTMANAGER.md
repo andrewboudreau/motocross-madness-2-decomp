@@ -16,6 +16,20 @@ scene reads the last two; the next TU starts at `0x0045ff80`). The eight
 
 TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
+Member names follow their only writers and readers: `waitingForRacers`
+(+0x34, set after `StartKeepAlive`, drives `WaitForRemoteRacers`),
+`keepAliveStarted` (+0x38), `endNetworkGamePending` (+0x3c, slot 10 calls
+`EndNetworkGame` once), `anyRacerFinished`/`allRacersFinished` (+0x40/+0x44,
+0x0045eef0's racer scan) and `resumeArmed` (+0x440, slot 23 arms it, slot 22
+consumes it). `RankRacers` names the result block: `racesRun` (+0x48, a
+byte it increments in mode 2; the dialogs show it as "%d/%d" against the
+series length), `resultCount` (+0x4c) and `results` (+0x50, the 11 entries it
+fills). +0x3c0 keeps its placeholder name because TrackOverlay.cpp (render
+lane) reads it. In each `results` entry (`UnknownEventEntry`), `CopyFromRacer`
+names `playerId` (+0x00, racer +0x11bc), `position` (+0x04, 99 for a racer
+with +0x4a0 set), `finished` (+0x20, racer +0x7a4) and `name` (+0x40, racer
++0x5e0); `points` (+0x28) is what `AddChampionshipPoints` adds to.
+
 ## Status
 
 Exact (31 calibration cases):

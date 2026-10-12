@@ -49,14 +49,14 @@ unattributed range `0x0047b670..0x0047bb20`.
 | `0x00448df0` | 148 | maps a button row through the control mapping |
 | `0x00448e90` | 912 | installs the current device (two in-extent jump tables) |
 | `0x00449220` | 80 | default device for the active joystick |
-| `0x00449270` | 224 | key name: resource 0x1406 + `GetKeyNameText`, `"Unknown"` |
+| `0x00449270` | 224 | `FormatKeyName`: resource 0x1406 + `GetKeyNameText`, `"Unknown"` |
 | `0x00449350` | 43 | name of a row's assignment |
 | `0x00449380` | 2492 | assignment display name (three in-extent jump tables) |
-| `0x00449d40` | 67 | NEC PC-98 scan-code translation on Windows 9x |
-| `0x00449d90` | 30 | detects the keyboard subtype and the platform once |
-| `0x00449db0` | 44 | `GetVersionEx` platform is NT |
-| `0x00449de0` | 77 | Japanese keyboard subtype from `GetKeyboardType` |
-| `0x00449e30` | 36 | `value`, or 0 with the PC-98 keyboard on Windows 9x |
+| `0x00449d40` | 67 | `TranslatePc98ScanCode`: NEC PC-98 scan-code translation on Windows 9x |
+| `0x00449d90` | 30 | `DetectKeyboardLayout`: detects the keyboard subtype and the platform once |
+| `0x00449db0` | 44 | `IsWindowsNTPlatform`: `GetVersionEx` platform is NT |
+| `0x00449de0` | 77 | `GetJapaneseKeyboardSubtype`: Japanese keyboard subtype from `GetKeyboardType` |
+| `0x00449e30` | 36 | `ValueUnlessPc98`: `value`, or 0 with the PC-98 keyboard on Windows 9x |
 
 Globals:
 - `g_Pc98ScanCodes` (`0x00568df8`);
@@ -69,7 +69,7 @@ Source forms that mattered:
 - **`AxisOfCode` in `0x00448e90`.** An explicit `case -5` makes the sparse
   switch dense enough for a direct jump table.
 - **`0x00449380`.** The inner joystick switch needs `default: return 0`.
-- **`0x00449220`.** It assigns `field_0x00` and returns it. Retail stores the
+- **`0x00449220`.** It assigns `currentDevice` (+0x00) and returns it. Retail stores the
   field, then reloads it.
 - **`0x00449de0`.** Two shapes are needed:
   - a returned `subtype = 0` local, which keeps zero in `edi`;

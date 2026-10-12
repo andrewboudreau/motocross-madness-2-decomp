@@ -124,7 +124,7 @@ int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEn
     UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
-    mapping->UnknownFunction43cc10(control, &control);
+    mapping->GetMouseButton(control, &control);
     if (control == -1)
         return 0;
     return UnknownVirtualSlot5(control, modifier, entry);
@@ -175,12 +175,12 @@ int PCMouseDevice::UnknownVirtualSlot6(int value) {
             buttonStates[button].state = 1;
             buttonStates[button].previousPressTime = buttonStates[button].pressTime;
             buttonStates[button].pressTime = events[i].timeStamp;
-            g_TrackGame->controlInterface->UnknownFunction43cea0(button, deviceKind, 1, 0);
+            g_TrackGame->controlInterface->QueueEvent(button, deviceKind, 1, 0);
         } else {
             buttonStates[button].state = 0;
             buttonStates[button].previousReleaseTime = buttonStates[button].releaseTime;
             buttonStates[button].releaseTime = events[i].timeStamp;
-            g_TrackGame->controlInterface->UnknownFunction43cea0(button, deviceKind, 0, 0);
+            g_TrackGame->controlInterface->QueueEvent(button, deviceKind, 0, 0);
         }
     }
     if (device->GetDeviceState(sizeof(movement), movement) < 0)

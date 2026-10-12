@@ -139,5 +139,7 @@
   "_g_UnknownSound3DAlgorithm": "0x00556cf0",
   "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
+  "?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z$ehhandler": "0x0054c9d7"
 }

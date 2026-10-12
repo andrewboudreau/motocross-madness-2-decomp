@@ -118,7 +118,7 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
     message[0] = 0;
     if (!g_TrackGame->StartUp(message)) {
         DestroyWindow(g_MainWindow);
-        if (g_TrackGame->field_0x2d4_bit1)
+        if (g_TrackGame->fullScreen)
             ShowCursor(TRUE);
         if (message[0])
             MessageBox(0, message, g_TrackGame->applicationName, MB_ICONHAND);

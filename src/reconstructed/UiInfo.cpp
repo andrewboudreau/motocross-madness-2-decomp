@@ -57,23 +57,23 @@ UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
 }
 
 // 0x00521fb0
-void UnknownTrackGameRacerSlot::UnknownFunction521fb0(void* a, void* b, void* c) {
-    int length = strlen((char*)a);
+void UnknownTrackGameRacerSlot::SetBikeAndRiderNames(void* bikeModelName, void* bikeName, void* riderName) {
+    int length = strlen((char*)bikeModelName);
     int count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x00, (char*)a, count);
+    strncpy(field_0x00, (char*)bikeModelName, count);
     field_0x00[count] = 0;
-    length = strlen((char*)b);
+    length = strlen((char*)bikeName);
     count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x40, (char*)b, count);
+    strncpy(field_0x40, (char*)bikeName, count);
     field_0x40[count] = 0;
-    length = strlen((char*)c);
+    length = strlen((char*)riderName);
     count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x80, (char*)c, count);
+    strncpy(field_0x80, (char*)riderName, count);
     field_0x80[count] = 0;
 }
 
 // 0x00522050
-void UnknownTrackGameRacerSlot::UnknownFunction522050() {
+void UnknownTrackGameRacerSlot::ClearLeft() {
     field_0xc8 = 0;
 }
 
@@ -81,8 +81,8 @@ void UnknownTrackGameRacerSlot::UnknownFunction522050() {
 #define UNKNOWN_SET_DIRECTORY(index, name)                                        \
     length = strlen(name);                                                        \
     count = length > 0xff ? 0xff : length;                                        \
-    strncpy(field_0xa0[index], name, count);                                      \
-    field_0xa0[index][count] = 0;
+    strncpy(seriesDirectories[index], name, count);                                      \
+    seriesDirectories[index][count] = 0;
 
 TrackGameMode::TrackGameMode() {
     int i;
@@ -92,31 +92,31 @@ TrackGameMode::TrackGameMode() {
     UnknownFunction522440();
     field_0x23a4 = 0;
     field_0x6a8 = 1;
-    memset(&field_0x23a8, 0, sizeof(field_0x23a8));
-    field_0x23cc = 2;
-    strcpy(field_0x23d0, "");
-    strcpy(field_0x24d4, "");
-    strcpy(field_0x25d8, "");
-    field_0x25dc = 0;
-    field_0x25dc = new(__FILE__, 71) UnknownDriveList;
-    if (!field_0x25dc->UnknownFunction449e60()) {
-        delete field_0x25dc;
-        field_0x25dc = 0;
+    memset(&displayAdapterGuid, 0, sizeof(displayAdapterGuid));
+    installType = 2;
+    strcpy(installDirectory, "");
+    strcpy(cdDataDirectory, "");
+    strcpy(cdDriveRoot, "");
+    driveList = 0;
+    driveList = new(__FILE__, 71) UnknownDriveList;
+    if (!driveList->UnknownFunction449e60()) {
+        delete driveList;
+        driveList = 0;
     }
     field_0x25e0 = 0;
-    field_0x25e4 = 0;
+    trackDirectoryList = 0;
     field_0x25e8 = 0;
-    field_0x9c = 1;
-    field_0x25ec[0] = 0;
+    showNewbieDialog = 1;
+    ghostFile[0] = 0;
     field_0x26f0 = 0;
-    field_0x26f4[0] = 0;
+    replayFile[0] = 0;
     field_0x1974.field_0xc0 = -1;
     field_0x1bcc = (int)((rand() * (1.0f / 32768.0f)) * 999.0f);
     if (field_0x1bcc <= 99)
         field_0x1bcc += 100;
     for (i = 0; i < 6; i++) {
-        field_0x1384[i] = 0;
-        field_0x139c[i][0] = 0;
+        bonusTrackUnlocked[i] = 0;
+        bonusTrackNames[i][0] = 0;
     }
     field_0x1bd0 = -1;
     field_0x1bd4 = -1;
@@ -137,8 +137,8 @@ TrackGameMode::TrackGameMode() {
 TrackGameMode::~TrackGameMode() {
     if (field_0x25e0)
         delete field_0x25e0;
-    if (field_0x25e4)
-        delete field_0x25e4;
+    if (trackDirectoryList)
+        delete trackDirectoryList;
     if (field_0x25e8)
         delete field_0x25e8;
 }
@@ -148,7 +148,7 @@ int TrackGameMode::ResetNetworkRace() {
     int i;
 
     field_0x6a4 = 0;
-    field_0xfd4 = 0;
+    selectedSession = 0;
     field_0x1be0 = 0;
     if (field_0x27f8.field_0x00 != 2) {
         for (i = 0; i < 8; i++)
@@ -184,29 +184,31 @@ void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* option
     memset(&options->field_0x360, 0, sizeof(options->field_0x360));
 }
 
-// 0x00522780
-void TrackGameMode::UnknownFunction522780(UnknownTrackGameModeOptionsA20* options) {
+// 0x00522780: the defaults of +0xa20..+0xa4b, mostly sound settings (sound
+// on at +0xa28, volume 100 at +0xa40, 8-bit at +0xa48); the name is inference.
+void TrackGameMode::ResetSoundOptions(UnknownTrackGameModeOptionsA20* options) {
     options->field_0x00 = 0;
-    options->field_0x08 = 1;
+    options->soundOn = 1;
     options->field_0x04 = 1;
     options->field_0x0c = 1;
-    options->field_0x20 = 100;
+    options->soundVolume = 100;
     options->field_0x24 = 100;
     options->field_0x10 = 0;
     options->field_0x1c = 100;
-    options->field_0x14 = 0;
-    options->field_0x28 = 0;
-    options->field_0x18 = 1;
+    options->eaxEnabled = 0;
+    options->use16BitSound = 0;
+    options->positionSounds = 1;
 }
 
-// 0x005227d0
-void TrackGameMode::UnknownFunction5227d0(UnknownTrackGameModeOptionsA4c* options) {
-    options->field_0x00 = 0;
-    options->field_0x04 = 1;
-    options->field_0x08 = 1;
+// 0x005227d0: the defaults of +0xa4c..+0xa67: display mode 0, shadows,
+// particles and sky cube on, detail level 6.
+void TrackGameMode::ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options) {
+    options->displayMode = 0;
+    options->shadows = 1;
+    options->particles = 1;
     options->field_0x0c = 0;
-    options->field_0x10 = 1;
-    options->field_0x18 = 6;
+    options->skyCube = 1;
+    options->detailLevel = 6;
 }
 
 // 0x00522800
@@ -264,7 +266,7 @@ void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* option
     for (k = 0; k < 5; k++) {
         for (j = 0; j < 3; j++) {
             for (i = 0; i < 11; i++)
-                field_0x10f0[k][j][i] =
+                customGarageCurves[k][j][i] =
                     g_TrackGame->ui ? g_TrackGame->ui->field_0x43c[k] : 0;
         }
     }
@@ -311,9 +313,9 @@ int TrackGameMode::CreateDirectoryLists() {
 
     ChooseDisplayMode(0, &field_0xa4c);
     field_0x25e0 = new(__FILE__, 383) DirectoryList;
-    field_0x25e4 = new(__FILE__, 384) CombinedDirectoryList;
+    trackDirectoryList = new(__FILE__, 384) CombinedDirectoryList;
     field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
-    if (field_0x25dc && field_0x25e4 && field_0x25e8)
+    if (driveList && trackDirectoryList && field_0x25e8)
         return 1;
     return 0;
 }
@@ -369,11 +371,11 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
             }
         }
     }
-    field_0x23a8 = g_TrackGame->display->driverGuid;
+    displayAdapterGuid = g_TrackGame->display->driverGuid;
 }
 
 // 0x00523000: loads the profile's control file.
-void TrackGameMode::UnknownFunction523000() {
+void TrackGameMode::LoadControllerChoice() {
     unsigned long size;
     char controller[0x80];
     char last[0x80];
@@ -382,13 +384,13 @@ void TrackGameMode::UnknownFunction523000() {
     if (!g_TrackGame->field_0x33fc)
         return;
     sprintf(path, "%s\\%s\\%s", "ui\\profile", field_0x00, "control.ctl");
-    g_TrackGame->field_0x33fc->UnknownFunction448990(path);
+    g_TrackGame->field_0x33fc->LoadControlFile(path);
     size = 0x80;
     g_TrackGame->GetRegistryString("UseControllerId", "", controller, &size);
     g_TrackGame->GetRegistryString("LastControllerId", "", last, &size);
     if (!g_TrackGame->GetRegistryFlag("PresetSelected", 0) || strcmp(last, controller))
-        g_TrackGame->field_0x33fc->UnknownFunction449220();
-    g_TrackGame->field_0x33fc->UnknownFunction448e90(path, -1);
+        g_TrackGame->field_0x33fc->ChooseDefaultDevice();
+    g_TrackGame->field_0x33fc->ApplyDevice(path, -1);
 }
 
 // 0x00523130: saves the profile's control file.
@@ -405,13 +407,13 @@ void TrackGameMode::SaveControllerChoice() {
     g_TrackGame->GetRegistryString("UseControllerId", "", controller, &size);
     g_TrackGame->SetRegistryString("LastControllerId", controller);
     sprintf(path, "%s\\%s\\%s", "ui\\profile", field_0x00, "control.ctl");
-    g_TrackGame->field_0x33fc->UnknownFunction4489e0(path);
+    g_TrackGame->field_0x33fc->SaveControlFile(path);
 }
 
 // 0x005231f0 (TrackGame slot 4): loads the profile; 1 when it has a name.
 // Without a profile file the name is cleared and a default TrackGameMode is
 // built and destroyed on the stack.
-int TrackGameMode::UnknownFunction5231f0() {
+int TrackGameMode::LoadProfile() {
     char path[0x104];
     FILE* file;
 
@@ -423,42 +425,42 @@ int TrackGameMode::UnknownFunction5231f0() {
         return 0;
     }
     fread(field_0x00, 0x10, 1, file);
-    fread(&field_0x9c, 4, 1, file);
+    fread(&showNewbieDialog, 4, 1, file);
     fread(&field_0x6ac, 0x374, 1, file);
     fread(&field_0xa20, 0x2c, 1, file);
     fread(&field_0xa4c, 0x1c, 1, file);
     fread(field_0xa68, 0x30, 1, file);
     fread(field_0x145c, 0x500, 1, file);
-    fread(field_0x195c, 0x18, 1, file);
+    fread(videoSettings, 0x18, 1, file);
     fread(field_0x1034, 0x5c, 1, file);
     fread(field_0x1090, 0x5c, 1, file);
     fread(&field_0x1a3c, 0xc8, 1, file);
     fread(field_0x1b04, 0xc8, 1, file);
-    fread(&field_0x23a8, 0x10, 1, file);
+    fread(&displayAdapterGuid, 0x10, 1, file);
     fread(&field_0x23b8, 4, 1, file);
     fread(&field_0x23bc, 4, 1, file);
     fread(&field_0x23c0, 4, 1, file);
     fread(&field_0x23c4, 4, 1, file);
     fread(&field_0x23c8, 4, 1, file);
-    fread(field_0x10, 0x80, 1, file);
-    fread(&field_0x29e4, 0x1ec, 1, file);
+    fread(playerName, 0x80, 1, file);
+    fread(&savedSettings, 0x1ec, 1, file);
     fread(&field_0x2bd0, 0x1ec, 1, file);
-    fread(field_0x1384, 0x18, 1, file);
+    fread(bonusTrackUnlocked, 0x18, 1, file);
     fread(&field_0x1bdc, 4, 1, file);
     fread(&field_0x90, 4, 1, file);
     fread(&field_0x98, 4, 1, file);
-    fread(field_0x10f0, 0x294, 1, file);
+    fread(customGarageCurves, 0x294, 1, file);
     fread(&field_0x1bcc, 4, 1, file);
     fclose(file);
     field_0x27f8.field_0x35 = 0;
-    ChooseDisplayMode(&field_0x23a8, &field_0xa4c);
+    ChooseDisplayMode(&displayAdapterGuid, &field_0xa4c);
     g_TrackGame->ui->field_0x48c = 1;
-    UnknownFunction523000();
+    LoadControllerChoice();
     if (g_TrackGame->soundInterface) {
         ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = field_0xa34;
         ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, field_0xa48 ? 16 : 8);
     }
-    field_0x27f8 = field_0x29e4;
+    field_0x27f8 = savedSettings;
     field_0x94 = field_0x98;
     memcpy(field_0xfd8, field_0x1034, sizeof(field_0xfd8));
     memcpy(&field_0x1974, &field_0x1a3c, sizeof(field_0x1974));
@@ -466,7 +468,7 @@ int TrackGameMode::UnknownFunction5231f0() {
 }
 
 // 0x00523580: saves the profile.
-void TrackGameMode::UnknownFunction523580() {
+void TrackGameMode::SaveProfile() {
     char path[0x104];
     FILE* file;
 
@@ -477,31 +479,31 @@ void TrackGameMode::UnknownFunction523580() {
     if (!file)
         return;
     fwrite(field_0x00, 0x10, 1, file);
-    fwrite(&field_0x9c, 4, 1, file);
+    fwrite(&showNewbieDialog, 4, 1, file);
     fwrite(&field_0x6ac, 0x374, 1, file);
     fwrite(&field_0xa20, 0x2c, 1, file);
     fwrite(&field_0xa4c, 0x1c, 1, file);
     fwrite(field_0xa68, 0x30, 1, file);
     fwrite(field_0x145c, 0x500, 1, file);
-    fwrite(field_0x195c, 0x18, 1, file);
+    fwrite(videoSettings, 0x18, 1, file);
     fwrite(field_0x1034, 0x5c, 1, file);
     fwrite(field_0x1090, 0x5c, 1, file);
     fwrite(&field_0x1a3c, 0xc8, 1, file);
     fwrite(field_0x1b04, 0xc8, 1, file);
-    fwrite(&field_0x23a8, 0x10, 1, file);
+    fwrite(&displayAdapterGuid, 0x10, 1, file);
     fwrite(&field_0x23b8, 4, 1, file);
     fwrite(&field_0x23bc, 4, 1, file);
     fwrite(&field_0x23c0, 4, 1, file);
     fwrite(&field_0x23c4, 4, 1, file);
     fwrite(&field_0x23c8, 4, 1, file);
-    fwrite(field_0x10, 0x80, 1, file);
-    fwrite(&field_0x29e4, 0x1ec, 1, file);
+    fwrite(playerName, 0x80, 1, file);
+    fwrite(&savedSettings, 0x1ec, 1, file);
     fwrite(&field_0x2bd0, 0x1ec, 1, file);
-    fwrite(field_0x1384, 0x18, 1, file);
+    fwrite(bonusTrackUnlocked, 0x18, 1, file);
     fwrite(&field_0x1bdc, 4, 1, file);
     fwrite(&field_0x90, 4, 1, file);
     fwrite(&field_0x98, 4, 1, file);
-    fwrite(field_0x10f0, 0x294, 1, file);
+    fwrite(customGarageCurves, 0x294, 1, file);
     fwrite(&field_0x1bcc, 4, 1, file);
     fclose(file);
     g_TrackGame->SetRegistryString("MRUProfile", field_0x00);
@@ -553,13 +555,13 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
 }
 
 // 0x00523b70
-void TrackGameMode::UnknownFunction523b70(char* name) {
+void TrackGameMode::CopyCurrentSeriesDirectory(char* name) {
     CopySeriesDirectory((short)field_0x27f8.field_0x04, (short)field_0x27f8.field_0x00, name);
 }
 
 // 0x00523bb0
 int TrackGameMode::CopySeriesDirectory(short a, short b, char* name) {
-    strcpy(name, field_0xa0[field_0x27f8.field_0x08]);
+    strcpy(name, seriesDirectories[field_0x27f8.field_0x08]);
     return 1;
 }
 
@@ -567,15 +569,15 @@ int TrackGameMode::CopySeriesDirectory(short a, short b, char* name) {
 int TrackGameMode::FindCdDirectory() {
     int index;
 
-    if (field_0x23cc != 2) {
-        if (!field_0x25dc)
+    if (installType != 2) {
+        if (!driveList)
             return 0;
-        field_0x25dc->UnknownFunction449e70();
-        if (!field_0x25dc->UnknownFunction44a010("MCM2", &index, 5))
+        driveList->UnknownFunction449e70();
+        if (!driveList->UnknownFunction44a010("MCM2", &index, 5))
             return 0;
-        if (!field_0x25dc->UnknownFunction44a0b0(index, field_0x25d8))
+        if (!driveList->UnknownFunction44a0b0(index, cdDriveRoot))
             return 0;
-        sprintf(field_0x24d4, "%s%s", field_0x25d8, "game");
+        sprintf(cdDataDirectory, "%s%s", cdDriveRoot, "game");
     }
     return 1;
 }
@@ -589,11 +591,11 @@ int TrackGameMode::FindDataDirectory() {
     if (!g_TrackGame->GetRegistryString("InstallType", "", text, &size))
         return 0;
     if (!_stricmp(text, "Full"))
-        field_0x23cc = 2;
+        installType = 2;
     else
-        field_0x23cc = 1;
+        installType = 1;
     size = 0x104;
-    return g_TrackGame->GetRegistryString("HardDriveRootPath", "", field_0x23d0, &size) != 0;
+    return g_TrackGame->GetRegistryString("HardDriveRootPath", "", installDirectory, &size) != 0;
 }
 
 // 0x00523d30
@@ -617,15 +619,15 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
 }
 
 // 0x00523e50 (KrustyUI 0x004988a0): the bonus track names from PCSched.pb.
-void TrackGameMode::UnknownFunction523e50() {
+void TrackGameMode::LoadBonusTrackNames() {
     UnknownParameterBlock block;
     char key[0x100];
     UnknownTextureStream* stream = new(__FILE__, 873) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     int i;
 
     for (i = 0; i < 6; i++) {
-        field_0x1384[i] = 0;
-        field_0x139c[i][0] = 0;
+        bonusTrackUnlocked[i] = 0;
+        bonusTrackNames[i][0] = 0;
     }
     if (stream->UnknownFunction460f50("PCSched.pb", "r", 0)) {
         int track;
@@ -634,19 +636,19 @@ void TrackGameMode::UnknownFunction523e50() {
         block.UnknownFunction4b78f0("Enduro");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", field_0x139c[5], -1);
+        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[5], -1);
         block.UnknownFunction4b78f0("Baja");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", field_0x139c[1], -1);
+        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[1], -1);
         block.UnknownFunction4b78f0("Nationals");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", field_0x139c[2], -1);
+        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[2], -1);
         block.UnknownFunction4b78f0("Supercross");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", field_0x139c[3], -1);
+        block.UnknownFunction4b7ec0(key, "", bonusTrackNames[3], -1);
     }
     if (stream)
         delete stream;
@@ -655,7 +657,7 @@ void TrackGameMode::UnknownFunction523e50() {
 // 0x005240e0
 void TrackGameMode::UnknownFunction5240e0(int series) {
     field_0x27f8.field_0x08 = series;
-    field_0x6a0 = (int)field_0xa0[series];
+    currentSeriesDirectory = (int)seriesDirectories[series];
 }
 
 // 0x00524100

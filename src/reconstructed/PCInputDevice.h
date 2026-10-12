@@ -25,9 +25,10 @@ enum DIKeyCode {
 // called before Release when the device is destroyed, consistent with
 // IDirectInputDevice::Unacquire, and PCJoystickDevice uses method 22 like
 // IDirectInputDevice2::SendForceFeedbackCommand; the identity is inference.
+// Uncalled slots carry the IDirectInputDevice2A names for that order.
 struct UnknownInputInterface {
-    virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall QueryInterface(const struct UnknownGuid& iid, void** object);
+    virtual long __stdcall AddRef();
     virtual long __stdcall Release();
     virtual long __stdcall GetCapabilities(struct UnknownDeviceCaps* caps);
     virtual long __stdcall EnumObjects(int (__stdcall* callback)(const struct UnknownObjectInstance*, void*),
@@ -40,24 +41,24 @@ struct UnknownInputInterface {
     virtual long __stdcall GetDeviceData(unsigned long size, struct UnknownDeviceObjectData* data,
                                            long* count, unsigned long flags); // GetDeviceData
     virtual long __stdcall SetDataFormat(const struct UnknownDataFormat* format);
-    virtual long __stdcall UnknownMethod12();
+    virtual long __stdcall SetEventNotification(void* event);
     virtual long __stdcall SetCooperativeLevel(void* window, unsigned long flags);
     virtual long __stdcall GetObjectInfo(struct UnknownObjectInstance* info, unsigned long object,
                                            unsigned long how); // GetObjectInfo
     virtual long __stdcall GetDeviceInfo(struct UnknownDeviceInstance* info);
-    virtual long __stdcall UnknownMethod16();
-    virtual long __stdcall UnknownMethod17();
+    virtual long __stdcall RunControlPanel(void* owner, unsigned long flags);
+    virtual long __stdcall Initialize(void* instance, unsigned long version, const struct UnknownGuid& guid);
     virtual long __stdcall CreateEffect(const struct UnknownGuid& type,
                                            const struct UnknownEffectParams* params,
                                            struct UnknownEffectInterface** effect,
                                            void* outer); // CreateEffect
     virtual long __stdcall EnumEffects(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
                                            void* context, unsigned long type); // EnumEffects
-    virtual long __stdcall UnknownMethod20();
-    virtual long __stdcall UnknownMethod21();
+    virtual long __stdcall GetEffectInfo(struct UnknownEffectInfo* info, const struct UnknownGuid& guid);
+    virtual long __stdcall GetForceFeedbackState(unsigned long* state);
     virtual long __stdcall SendForceFeedbackCommand(int command);
-    virtual long __stdcall UnknownMethod23();
-    virtual long __stdcall UnknownMethod24();
+    virtual long __stdcall EnumCreatedEffectObjects(void* callback, void* context, unsigned long flags);
+    virtual long __stdcall Escape(void* escape);
     virtual long __stdcall Poll();
 };
 

@@ -49,13 +49,14 @@ struct UnknownJoystickState {
 // COM-style effect object held at PCJoystickDevice+0x578. Methods 7-9 are used
 // like IDirectInputEffect::Start, Stop and GetEffectStatus; the identity is
 // inference.
+// Uncalled slots carry the IDirectInputEffect names for that order.
 struct UnknownEffectInterface {
-    virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall QueryInterface(const struct UnknownGuid& iid, void** object);
+    virtual long __stdcall AddRef();
     virtual long __stdcall Release();
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall Initialize(void* instance, unsigned long version, const struct UnknownGuid& guid);
+    virtual long __stdcall GetEffectGuid(struct UnknownGuid* guid);
+    virtual long __stdcall GetParameters(struct UnknownEffectParams* params, unsigned long flags);
     virtual long __stdcall SetParameters(const struct UnknownEffectParams* params,
                                           unsigned long flags); // SetParameters
     virtual long __stdcall Start(unsigned long iterations, unsigned long flags);

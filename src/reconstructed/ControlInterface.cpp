@@ -26,11 +26,11 @@ int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* even
 
 // 0x0043cae0
 UnknownControlMapping::UnknownControlMapping() {
-    UnknownFunction43caf0();
+    Clear();
 }
 
 // 0x0043caf0
-void UnknownControlMapping::UnknownFunction43caf0() {
+void UnknownControlMapping::Clear() {
     for (int i = 0; i < 50; i++) {
         keys[i] = -1;
         for (int j = 0; j < 8; j++)
@@ -40,25 +40,25 @@ void UnknownControlMapping::UnknownFunction43caf0() {
 }
 
 // 0x0043cb30
-void UnknownControlMapping::UnknownFunction43cb30(int control, int key) {
+void UnknownControlMapping::SetKey(int control, int key) {
     if (control >= 0 && control < 50)
         keys[control] = key;
 }
 
 // 0x0043cb50
-void UnknownControlMapping::UnknownFunction43cb50(int control, int button, int device) {
+void UnknownControlMapping::SetJoystickButton(int control, int button, int device) {
     if (control >= 0 && control < 50 && device < 8)
         joystickButtons[device][control] = button;
 }
 
 // 0x0043cb80
-void UnknownControlMapping::UnknownFunction43cb80(int control, int button) {
+void UnknownControlMapping::SetMouseButton(int control, int button) {
     if (control >= 0 && control < 50)
         mouseButtons[control] = button;
 }
 
 // 0x0043cba0
-void UnknownControlMapping::UnknownFunction43cba0(int control, int* result) {
+void UnknownControlMapping::GetKey(int control, int* result) {
     if (control >= 0 && control < 50)
         *result = keys[control];
     else
@@ -66,7 +66,7 @@ void UnknownControlMapping::UnknownFunction43cba0(int control, int* result) {
 }
 
 // 0x0043cbd0
-void UnknownControlMapping::UnknownFunction43cbd0(int control, int* result, int device) {
+void UnknownControlMapping::GetJoystickButton(int control, int* result, int device) {
     if (control >= 0 && control < 50 && device < 8)
         *result = joystickButtons[device][control];
     else
@@ -74,7 +74,7 @@ void UnknownControlMapping::UnknownFunction43cbd0(int control, int* result, int 
 }
 
 // 0x0043cc10
-void UnknownControlMapping::UnknownFunction43cc10(int control, int* result) {
+void UnknownControlMapping::GetMouseButton(int control, int* result) {
     if (control >= 0 && control < 50)
         *result = mouseButtons[control];
     else
@@ -83,13 +83,13 @@ void UnknownControlMapping::UnknownFunction43cc10(int control, int* result) {
 
 // 0x0043cc40
 UnknownControlBinding::UnknownControlBinding() {
-    UnknownFunction43cca0();
+    Reset();
 }
 
 // 0x0043cc50
 UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float center,
                                              int id, int axis, float deadZone) {
-    UnknownFunction43cca0();
+    Reset();
     field_0x2c = minimum;
     field_0x30 = maximum;
     field_0x24 = center;
@@ -101,7 +101,7 @@ UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float
 }
 
 // 0x0043cca0
-void UnknownControlBinding::UnknownFunction43cca0() {
+void UnknownControlBinding::Reset() {
     field_0x24 = 0;
     field_0x28 = 0;
     field_0x2c = 0;
@@ -120,24 +120,24 @@ void UnknownControlBinding::UnknownFunction43cca0() {
 }
 
 // 0x0043cce0
-void UnknownControlBinding::UnknownFunction43cce0(int a, int b) {
+void UnknownControlBinding::SetKeys(int a, int b) {
     field_0x0c = a;
     field_0x10 = b;
 }
 
 // 0x0043cd00
 UnknownControlBinding::~UnknownControlBinding() {
-    UnknownFunction43cde0();
+    Unbind();
 }
 
 // 0x0043cd10
-void UnknownControlBinding::UnknownFunction43cd10() {
+void UnknownControlBinding::Recenter() {
     field_0x24 = field_0x28;
 }
 
 // 0x0043cd20: maps value/range onto [min, max]; inside the dead zone the
 // value snaps to the centre.
-void UnknownControlBinding::UnknownFunction43cd20(float value, float range) {
+void UnknownControlBinding::SetFromAxis(float value, float range) {
     float mapped = (field_0x30 - field_0x2c) * (value / range) + field_0x2c;
     if (mapped < field_0x34 && mapped > field_0x38)
         mapped = field_0x28;
@@ -145,13 +145,13 @@ void UnknownControlBinding::UnknownFunction43cd20(float value, float range) {
 }
 
 // 0x0043cd90
-void UnknownControlBinding::UnknownFunction43cd90(float delta) {
+void UnknownControlBinding::Adjust(float delta) {
     field_0x24 += delta;
     field_0x24 = BindingMin(BindingMax(field_0x24, field_0x2c), field_0x30);
 }
 
 // 0x0043cde0: asks the owning device to drop bindings with this id.
-void UnknownControlBinding::UnknownFunction43cde0() {
+void UnknownControlBinding::Unbind() {
     if (g_TrackGame->controlInterface && field_0x00)
         field_0x00->UnknownVirtualSlot0(field_0x04);
 }
@@ -173,7 +173,7 @@ ControlInterface::ControlInterface() {
 ControlInterface::~ControlInterface() {}
 
 // 0x0043ce70
-int ControlInterface::UnknownFunction43ce70(UnknownControlMapping* newMapping) {
+int ControlInterface::SetMapping(UnknownControlMapping* newMapping) {
     if (!newMapping)
         return 0;
     mapping = newMapping;
@@ -181,7 +181,7 @@ int ControlInterface::UnknownFunction43ce70(UnknownControlMapping* newMapping) {
 }
 
 // 0x0043cea0
-void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed, int device) {
+void ControlInterface::QueueEvent(int control, int kind, int pressed, int device) {
     events[queuedEventCount].control = control;
     events[queuedEventCount].device = device;
     events[queuedEventCount].kind = kind;
@@ -194,7 +194,7 @@ void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed,
 // passes each queued event, stamped with the keyboard's modifier state, to
 // the global object (slot 13 for releases, 14 for presses) with the
 // device's entry for that control.
-int ControlInterface::UnknownFunction43cf00(int value) {
+int ControlInterface::DispatchInput(int value) {
     queuedEventCount = 0;
     if (keyboard)
         keyboard->UnknownVirtualSlot6(value);

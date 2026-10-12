@@ -1,7 +1,7 @@
 // Near-miss Parser.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/PARSER.md.
 //
-// UnknownParser::UnknownFunction4b87f0 (0x004b87f0, 408 bytes): parses
+// UnknownParser::Parse (0x004b87f0, 408 bytes): parses
 // `<Tag>value</Tag>` pairs. Each pair needs a non-empty tag, end tag and value
 // and matching tags. It then counts the pair and appends it to the list.
 // The loop body, register assignment, stack layout and call sequence are
@@ -16,9 +16,14 @@
 // - Also: wrapping in `if (text)`, a local cursor, top-declared pointers,
 //   `== NULL`, a continue chain and an explicit 0x80004005. None moves the
 //   push placement.
+// - Swept later: an HRESULT local returned early, a `goto fail` single exit,
+//   an else block around `pairCount = 0` and loop pointers declared at the
+//   top, in every combination: all 33/408. The /G6 profile scores 39 with 19
+//   instruction diffs and /O1 scores 9, so the push placement is not a
+//   profile difference either.
 #include "../../src/reconstructed/Parser.h"
 
-HRESULT UnknownParser::UnknownFunction4b87f0(char* text, int length)
+HRESULT UnknownParser::Parse(char* text, int length)
 {
     char tag[0x200];
     char endTag[0x200];
@@ -26,39 +31,39 @@ HRESULT UnknownParser::UnknownFunction4b87f0(char* text, int length)
 
     if (!text)
         return E_FAIL;
-    field_0x00 = 0;
+    pairCount = 0;
     while (1) {
-        char* p = UnknownFunction4b8720(text, 0);
+        char* p = SkipBlanks(text, 0);
         if (!p)
             break;
-        char* open = UnknownFunction4b87b0(p, '<', 0);
+        char* open = FindChar(p, '<', 0);
         if (!open)
             break;
-        char* close = UnknownFunction4b87b0(open, '>', 0);
+        char* close = FindChar(open, '>', 0);
         if (!close)
             break;
         lstrcpyn(tag, open + 1, close - open);
-        p = UnknownFunction4b8720(close + 1, 0);
+        p = SkipBlanks(close + 1, 0);
         if (!p)
             break;
-        open = UnknownFunction4b87b0(p, '<', 0);
+        open = FindChar(p, '<', 0);
         if (!open)
             break;
         lstrcpyn(value, p, open - p + 1);
-        p = UnknownFunction4b8720(open, 0);
+        p = SkipBlanks(open, 0);
         if (!p)
             break;
-        open = UnknownFunction4b87b0(p, '<', 0);
+        open = FindChar(p, '<', 0);
         if (!open)
             break;
-        close = UnknownFunction4b87b0(open, '>', 0);
+        close = FindChar(open, '>', 0);
         if (!close)
             break;
         lstrcpyn(endTag, open + 2, close - open - 1);
         text = close + 1;
         if (lstrlen(tag) && lstrlen(endTag) && lstrlen(value) && lstrcmp(tag, endTag) == 0) {
-            field_0x00++;
-            field_0x04.UnknownFunction4b8510(tag, value);
+            pairCount++;
+            pairs.Append(tag, value);
         }
     }
     return S_OK;

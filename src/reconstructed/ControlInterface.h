@@ -33,12 +33,12 @@ struct UnknownControlBinding {
 
     ~UnknownControlBinding();                                 // 0x0043cd00: unbinds
 
-    void UnknownFunction43cca0();                             // 0x0043cca0: reset
-    void UnknownFunction43cce0(int a, int b);                 // 0x0043cce0
-    void UnknownFunction43cd10();                             // 0x0043cd10: recentre
-    void UnknownFunction43cd20(float value, float range);     // 0x0043cd20
-    void UnknownFunction43cd90(float delta);                  // 0x0043cd90
-    void UnknownFunction43cde0();                             // 0x0043cde0: unbind
+    void Reset();                                             // 0x0043cca0: clears everything, ids -1
+    void SetKeys(int a, int b);                               // 0x0043cce0: +0x0c and +0x10 (the keyboard's keys)
+    void Recenter();                                          // 0x0043cd10: value = centre
+    void SetFromAxis(float value, float range);               // 0x0043cd20: maps value/range, dead zone
+    void Adjust(float delta);                                 // 0x0043cd90: adds delta, clamped
+    void Unbind();                                            // 0x0043cde0: the device drops this id
 
     InputDevice* field_0x00;  // owning device
     int field_0x04;           // id the device's slot 0 unbinds by
@@ -72,13 +72,13 @@ struct UnknownControlEvent {
 class UnknownControlMapping {
 public:
     UnknownControlMapping();                                       // 0x0043cae0
-    void UnknownFunction43caf0();                                  // 0x0043caf0: clear
-    void UnknownFunction43cb30(int control, int key);              // 0x0043cb30
-    void UnknownFunction43cb50(int control, int button, int device); // 0x0043cb50
-    void UnknownFunction43cb80(int control, int button);           // 0x0043cb80
-    void UnknownFunction43cba0(int control, int* result);          // 0x0043cba0
-    void UnknownFunction43cbd0(int control, int* result, int device); // 0x0043cbd0
-    void UnknownFunction43cc10(int control, int* result);          // 0x0043cc10
+    void Clear();                                             // 0x0043caf0: unmaps every control
+    void SetKey(int control, int key);                        // 0x0043cb30
+    void SetJoystickButton(int control, int button, int device); // 0x0043cb50
+    void SetMouseButton(int control, int button);             // 0x0043cb80
+    void GetKey(int control, int* result);                    // 0x0043cba0: -1 when out of range
+    void GetJoystickButton(int control, int* result, int device); // 0x0043cbd0
+    void GetMouseButton(int control, int* result);            // 0x0043cc10
 
     int keys[50];
     int joystickButtons[8][50];
@@ -107,9 +107,9 @@ public:
     virtual int UnknownVirtualSlot3(int control, int kind, int modifier, int device) = 0;
     virtual int UnknownVirtualSlot4(int modifier) = 0;           // modifier test
 
-    int UnknownFunction43ce70(UnknownControlMapping* newMapping);           // 0x0043ce70
-    void UnknownFunction43cea0(int control, int kind, int pressed, int device); // 0x0043cea0
-    int UnknownFunction43cf00(int value);   // 0x0043cf00: reads the devices, dispatches the events
+    int SetMapping(UnknownControlMapping* newMapping);        // 0x0043ce70: 0 for a null mapping
+    void QueueEvent(int control, int kind, int pressed, int device); // 0x0043cea0: the device readers call it
+    int DispatchInput(int value);                             // 0x0043cf00: reads the devices, dispatches the events
     int UnknownFunction43ce90();            // 0x0043ce90: next binding id (GUIManager.cpp)
 
     int joystickCount;                        // joystick count

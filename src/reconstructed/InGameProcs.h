@@ -14,14 +14,14 @@ void FormatTime(char* text, float seconds);
 class ExitDlg : public UIDialog {
 public:
     ExitDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004886e0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004886e0
 };
 
 // RTTI: ContinueDlg : UIDialog (vtable 0x00554d24).
 class ContinueDlg : public UIDialog {
 public:
     ContinueDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00488ad0
+    void HandleEvent(UnknownDialogEvent* event); // 0x00488ad0
 };
 
 // RTTI: VCRDlg : UIDialog (vtable 0x00550d94): the replay controls.
@@ -30,7 +30,7 @@ public:
     // Inline at bikerace.cpp's `new` (0x00420650, line 0x1073).
     VCRDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x004893c0
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00488c90
+    void HandleEvent(UnknownDialogEvent* event); // 0x00488c90
     void ShowReplayMode();             // 0x004894c0: shows the replay mode on the toggles
 
     int field_0x7f58;                         // set once the replay is left

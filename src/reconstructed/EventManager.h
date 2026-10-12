@@ -119,22 +119,22 @@ struct UnknownEventEntry {
     // +0x4a0 set it clears them instead and sets position 99.
     void CopyFromRacer(UnknownEventRacer* racer);  // 0x0045c8b0
 
-    int field_0x00;                                // network player id
-    int field_0x04;                                // finishing position (99 when racer +0x4a0 is set)
-    float field_0x08;                              // racer +0x750; TrackRecord.cpp 0x0051f3c0 loads it as a float
-    int field_0x0c;                                // racer +0x788
+    int playerId;                                  // +0x00: network player id (racer +0x11bc)
+    int position;                                  // +0x04: finishing position (99 when racer +0x4a0 is set)
+    float fastestLap;                              // +0x08: racer +0x750 (ZoneReport "FastestLap"); TrackRecord.cpp 0x0051f3c0 loads it as a float
+    int largestStuntPoints;                        // +0x0c: racer +0x788 (ZoneReport "LargestSingleStuntPoints")
     int field_0x10;                                // racer +0x758
-    float field_0x14;                              // racer +0x754
+    float totalRunningTime;                        // +0x14: racer +0x754 (ZoneReport "TotalrunningTime")
     float field_0x18;                              // racer +0x760
     float field_0x1c;                              // racer +0x764
-    int field_0x20;                                // finished: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
+    int finished;                                  // +0x20: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
     int field_0x24;                                // racer +0x4a0
-    int field_0x28;                                // championship points
+    int points;                                    // +0x28: championship points (AddChampionshipPoints)
     float field_0x2c;                              // racer +0x768
     unsigned char field_0x30;                      // racer +0x11c0; counted in TrackGame+0x3424 (else Game+0x18)
     unsigned char field_0x31[0x34 - 0x31];
     int field_0x34[3];                             // racer +0x7ac..+0x7b4
-    char field_0x40[16];                           // racer name
+    char name[16];                                 // +0x40: racer name (racer +0x5e0)
 };
 
 // RTTI: EventManager : GameObject (vtable 0x0055259c; 0xd08 bytes, the size
@@ -169,16 +169,16 @@ public:
     void AddChampionshipPoints(UnknownEventRacer* racer, int* points);  // 0x0045f180
     // 0x0045e600: starts the end-of-race block (or finishes at once), and
     // once it has run its course clears it and moves to the results.
-    void UnknownFunction45e600();
+    void EndRace();
     void UnknownFunction45cdc0(int mode);          // 0x0045cdc0
     // 0x0045d480: creates the camera (+0x3d4) and up to three characters
     // (+0x424) from "%s\\Winner.mcf" with "Podium3/4/5_%02d" motions (also
     // "CrowdLoop.wav"); nonzero when slot 10 should run that scene.
     int CreatePodiumScene();  // 0x0045d480
     void UnknownFunction45e710(int menu);          // 0x0045e710
-    void UnknownFunction45e9d0();                  // 0x0045e9d0
-    void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
-    void UnknownFunction45f9a0();                  // 0x0045f9a0
+    void RankRacers();                             // 0x0045e9d0
+    void CheckRaceOver(float frameTime);           // 0x0045eef0
+    void SendRacerResults();                       // 0x0045f9a0
     int UnknownFunction45cb70();                   // 0x0045cb70
     void UnknownFunction45fbd0(int player);        // 0x0045fbd0
     // 0x0045fce0: removes every Vegetation in the rectangle from the
@@ -193,19 +193,19 @@ public:
     // Sleeps +0x80 * 1000 ms between keep-alive (0x4b) sends.
     float keepAliveTimeout;                        // "KeepAliveTimeout" (slot 8), default 20
     float keepAliveInterval;                       // 1.0
-    int field_0x34;
-    int field_0x38;
-    int field_0x3c;
-    int field_0x40;
-    int field_0x44;
-    unsigned char field_0x48;
-    int field_0x4c;
-    UnknownEventEntry field_0x50[11];
+    int waitingForRacers;                          // +0x34: 0x0045e550 runs each frame (set once the keep-alive starts)
+    int keepAliveStarted;                          // +0x38: NetworkInterface StartKeepAlive was called
+    int endNetworkGamePending;                     // +0x3c: slot 10 calls EndNetworkGame once
+    int anyRacerFinished;                          // +0x40: a racer has +0x7a4 set (0x0045eef0)
+    int allRacersFinished;                         // +0x44: every racer has +0x7a4 or +0x4a0 set (0x0045eef0)
+    unsigned char racesRun;                        // +0x48: RankRacers counts mode-2 races; dialogs show it as "%d/%d"
+    int resultCount;                               // +0x4c: entries filled by 0x0045e9d0
+    UnknownEventEntry results[11];                 // +0x50: one per racer, copied by RankRacers
     float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
-    Vector3 field_0x3c4;
+    Vector3 podiumPosition;                        // +0x3c4: where 0x0045d480 places the podium; characters stand at offsets from it
     ArcadeObject* podiumObject;                     // the podium (0x0045d480)
     Camera* podiumCamera;                           // a PCCamera (0x0045d480; constructor 0x004bed80)
-    Vector3 field_0x3d8;
+    Vector3 podiumFocus;                           // +0x3d8: podiumPosition + (0, 6, 0), or + (0, 6, -6) in the other layout; 0x0045d480 and slot 10 aim podiumCamera (slot 29) at it
     Vector3 podiumCameraPosition;                           // podium camera position (0x0045d480)
     Vector3 podiumCameraTarget;                           // its look target
     unsigned char field_0x3fc[0x414 - 0x3fc];
@@ -214,6 +214,6 @@ public:
     D3DIMSoultreeCharacter* podiumCharacters[3];
     Motion* podiumMotions[3];                      // "Podium3/4/5_%02d", one per character
     int field_0x43c;
-    int field_0x440;                               // armed by slot 23, consumed by slot 22
+    int resumeArmed;                               // +0x440: armed by slot 23, consumed by slot 22
     unsigned char field_0x444[0xd08 - 0x444];
 };

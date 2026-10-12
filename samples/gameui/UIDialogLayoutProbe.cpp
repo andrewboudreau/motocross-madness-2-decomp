@@ -56,7 +56,7 @@ DIALOG_OFFSET(scaleX, 0x9c4);
 DIALOG_OFFSET(sectionTable, 0x9cc);
 DIALOG_OFFSET(sectionCount, 0x7efc);
 DIALOG_OFFSET(ownsPalette, 0x7f0c);
-DIALOG_OFFSET(field_0x7f18, 0x7f18);
+DIALOG_OFFSET(controlsPost3D, 0x7f18);
 DIALOG_OFFSET(dialogTextures, 0x7f20);
 DIALOG_OFFSET(timerList, 0x7f24);
 DIALOG_OFFSET(controlContainer, 0x7f3c);

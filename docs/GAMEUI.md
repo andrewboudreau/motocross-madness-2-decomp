@@ -48,7 +48,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
   `UIListBox* control` local; calling through the expression puts that
   temporary in edx and the next global load in eax (78/243).
 - UIScrollCtl slots 55 (`0x00474880`) and 60 (`0x004749f0`): each branch (or
-  case) carries its own copy of the event tail (`UnknownFunction472730`, the
+  case) carries its own copy of the event tail (`DeleteControlIterator`, the
   event, slot 29 and, in slot 55, the repeat timer). VC6 cross-jumps one copy
   into the other, which gives retail's layout (slot 60's case 9 after case
   10's epilogue) and register plan; one shared tail after the branches does
@@ -58,7 +58,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
   `count - page`; a single `rows` difference local or the inline expression
   puts the page count into ebp or ebx.
 - UIControl constructor (`0x00470170`): the owner is tested twice,
-  `if (owner) post3D = owner->field_0x7f18; else post3D = 1;` and then
+  `if (owner) post3D = owner->controlsPost3D; else post3D = 1;` and then
   `if (owner) field_0x18 = ...`; VC6 threads the second test and places the
   ownerless store after the epilogue, as retail does.
 - UIControl destructor (`0x00470450`): two independent
@@ -74,7 +74,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
   `return 1` inside the branches, with or without a goto, duplicates the
   epilogue; retail jumps back to one.
 - UIControl slot 41 (`0x004715d0`): the zoom's right edge is
-  `(int)(width + field_0x80)` with `float width = field_0x88` loaded into a
+  `(int)(width + slideX)` with `float width = zoomWidth` loaded into a
   local first (both member orders give `fld +0x80`), and the switch has
   cases 1, 4, 5, 9 and 10 (the retail index table maps type 2 to default).
 - UIScrollBar `0x004753c0`: `float limit = travel` before the division, so
@@ -84,7 +84,7 @@ Source forms the promoted functions needed (each one byte-exact only this way):
 - UIListBox slot 21 (`0x00478040`): VK_END compares and selects
   `rowCount - 1` twice (VC6 keeps it in a `lea`); a local gives `dec`.
 - UIListBox slot 56 (`0x00477ff0`): `guiUser->field_0x1d8 == this` in that
-  operand order and `field_0x230 += field_0x234; field_0x234 = 0;`.
+  operand order and `scrollOffsetX += dragOffsetX; dragOffsetX = 0;`.
 - UIMultiState slot 48 (`0x00478810`): `if (currentState == 4 &&
   stateTable[..].focusImage) image = focusImage; else image = image;` then
   one `if (image)`.
@@ -133,7 +133,7 @@ procedure bodies read them:
   +0x9c0 `lastFrameTime`, +0x9c4/+0x9c8 the scales (1.0f), +0x9cc
   `sectionTable[500]` (0x3c-byte `UnknownGameUiSection`, memset to 0),
   +0x7efc `sectionCount`.
-- +0x7f00/+0x7f04 the control-draw clip region and replaced font, +0x7f18
+- +0x7f00 `drawClipRegion`/+0x7f04 `previousFont` (the control-draw clip region and replaced font), +0x7f18 `controlsPost3D`
   (1), +0x7f1c `joystickCentred` (1), +0x7f20 `dialogTextures`, +0x7f24
   `ContainerList<UITimer*> timerList` (Init(2, 1)), +0x7f3c
   `controlContainer`, +0x7f40 `sendFrameEvent`, +0x7f44 `screenGrab`,
@@ -186,7 +186,8 @@ dlgprocs.cpp, and from the constructors):
   (0x00475200, UIScrollBar slot 55, UIDDLScrollBar slot 55: the first row
   shown) and on multi-states and radio buttons (0x004793f0, the dialog
   procedures: the current state). UIScrollBar, UIListBox and UIMultiState
-  each declare it; the identical bodies share the one address (the
+  each declare it, as GetSnapSteps, GetFirstVisibleRow and
+  GetSelectedState; the identical bodies share the one address (the
   UIScrollBar copy is the registered case).
 - UIDropDownList has an inline accessor for its button (+0x1ec):
   SelectGamePicProcs.cpp's 0x004f3260, 0x004f69d0 and 0x004f8700 read the

@@ -889,7 +889,7 @@ TextQueueOverlay::~TextQueueOverlay()
 TextQueueOverlay* TextQueueOverlay::UnknownFunction51b320(void* target, UnknownOverlayRect rect)
 {
     GameObject::UnknownVirtualSlot8(target);
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->field_0x2c;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->field_0x350 : "";
     int weight = 700;
     int italic = 1;

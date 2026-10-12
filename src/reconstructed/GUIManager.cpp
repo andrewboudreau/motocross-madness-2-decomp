@@ -55,32 +55,32 @@ void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, i
     int alpha;
     int i;
 
-    if (field_0x00 == (UnknownGroundFog*)1)
+    if (groundFog == (UnknownGroundFog*)1)
         return;
-    if (!field_0x00) {
-        field_0x00 = (UnknownGroundFog*)g_TrackGame->field_0x34->FindByClassName(1, "GroundFog");
-        if (!field_0x00) {
-            field_0x00 = (UnknownGroundFog*)1;
+    if (!groundFog) {
+        groundFog = (UnknownGroundFog*)g_TrackGame->field_0x34->FindByClassName(1, "GroundFog");
+        if (!groundFog) {
+            groundFog = (UnknownGroundFog*)1;
             return;
         }
     }
-    fog = field_0x00;
+    fog = groundFog;
     camera = fog->field_0x18->field_0x08;
-    alphaLimit = fog->field_0x38;
+    alphaLimit = fog->alphaLimit;
     eyeX = camera->field_0x170;
     eyeY = camera->field_0x174;
     eyeZ = camera->field_0x178;
-    depthLimit = (int)fog->field_0x34;
-    density = fog->field_0x40;
+    depthLimit = (int)fog->depthLimit;
+    density = fog->density;
     for (i = 0; i < count; i++) {
-        if (vertices[i].y >= field_0x00->field_0x30 && field_0x00->field_0x30 <= eyeY) {
+        if (vertices[i].y >= groundFog->planeHeight && groundFog->planeHeight <= eyeY) {
             vertices[i].specular = 0xff000000;
             continue;
         }
-        if (field_0x00->field_0x30 > eyeY && vertices[i].y > eyeY)
-            depth = field_0x00->field_0x30 - eyeY;
+        if (groundFog->planeHeight > eyeY && vertices[i].y > eyeY)
+            depth = groundFog->planeHeight - eyeY;
         else
-            depth = field_0x00->field_0x30 - vertices[i].y;
+            depth = groundFog->planeHeight - vertices[i].y;
         dx = eyeX - vertices[i].x;
         dy = eyeY - vertices[i].y;
         dz = eyeZ - vertices[i].z;
@@ -115,7 +115,7 @@ GUICursor::~GUICursor() {
 }
 
 // 0x00485150
-void GUICursor::UnknownFunction485150(UnknownCursorAnimation* animation) {
+void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
     field_0x5c = animation;
     if (!animation)
         field_0x38 = 0;
@@ -134,7 +134,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
 
     openedDialog = 0;
     ownsSoundGroup = 0;
-    field_0xd4 = 0;
+    setupCallback = 0;
     guiTextures = 0;
     ownsBackground = 0;
     screenGrab = 0;
@@ -143,14 +143,14 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     field_0xec = 1;
     dialogDirectory[0] = 0;
     waitFrames = 0;
-    field_0x38 = 0;
+    setupPalette = 0;
     guiPalette = 0;
     guiSoundGroup = 0;
     guiBackground = 0;
     toolTipFont = 0;
     languageModule = 0;
     windowClipper = 0;
-    field_0x1f0 = 0;
+    paletteChanged = 0;
     field_0x1f8 = 0;
     redrawBackground = 0;
     field_0x304 = 0;
@@ -197,7 +197,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         ownsSoundGroup = 1;
     }
     dialogContainer = (GameObject*)AppendChild(new(__FILE__, 136) UIDlgContainer, -1);
-    field_0x38 = palette;
+    setupPalette = palette;
     guiPalette = palette;
     guiBackground = background;
     strcpy(dialogFontName, font);
@@ -205,7 +205,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     if (cursor)
         strcpy(cursorImage, cursor);
     UnknownVirtualSlot18();
-    field_0xd4 = callback;
+    setupCallback = callback;
     toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
     controls = g_TrackGame->controlInterface;
     if (controls->mouse) {
@@ -283,8 +283,8 @@ int GUIManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEnt
 int GUIManager::UnknownVirtualSlot10(float frameTime) {
     int previous = g_MemTagStack->Push("UI");
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x1f0) {
-        field_0x1f0 = 0;
+    if (paletteChanged) {
+        paletteChanged = 0;
         UnknownFunction464e90();
     }
     g_MemTagStack->Pop(previous);
@@ -345,7 +345,7 @@ int GUIManager::UnknownVirtualSlot15() {
 }
 
 // 0x00485bd0
-void GUIManager::UnknownFunction485bd0(UIDialog* dialog, int a, int wait) {
+void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     int visible = dialog->field_0x25_bit0;
 
     dialog->UnknownFunction46ea60(0);
@@ -358,8 +358,8 @@ void GUIManager::UnknownFunction485bd0(UIDialog* dialog, int a, int wait) {
     if (guiBackground)
         guiBackground->UnknownFunction404da0();
     if (wait)
-        UnknownFunction4865e0(cursorImage, field_0x1f0 == 0);
-    if (field_0x1f0)
+        UnknownFunction4865e0(cursorImage, paletteChanged == 0);
+    if (paletteChanged)
         waitFrames = 3;
     dialog->UnknownFunction46ea60(visible);
 }
@@ -485,7 +485,7 @@ void GUIManager::ReleaseBackgroundGrab() {
 
 // 0x00486150
 void GUIManager::UnknownFunction486150(Palette8* palette) {
-    field_0x1f0 = 1;
+    paletteChanged = 1;
     guiPalette = palette;
 }
 
@@ -533,7 +533,7 @@ void GUIManager::UnknownFunction4865e0(const char* image, int redraw) {
 
     for (i = 0; i < userCount; i++) {
         if (users[i])
-            users[i]->UnknownFunction488010(image ? image : cursorImage, redraw);
+            users[i]->RecreateCursor(image ? image : cursorImage, redraw);
     }
 }
 
@@ -713,8 +713,8 @@ GUIInputDevice::GUIInputDevice() : GameObject(1) {
 // 0x00486f20
 GUIInputDevice::~GUIInputDevice() {
     if (inputDevice->deviceKind) {
-        bindingX.UnknownFunction43cde0();
-        bindingY.UnknownFunction43cde0();
+        bindingX.Unbind();
+        bindingY.Unbind();
     }
 }
 
@@ -789,7 +789,7 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     kind = inputDevice->deviceKind;
     if (kind) {
-        if (g_TrackGame->field_0x2d4_bit1) {
+        if (g_TrackGame->fullScreen) {
             POINT* position = &pointerPosition;
             position->x = (int)bindingX.field_0x24;
             position->y = (int)bindingY.field_0x24;
@@ -824,15 +824,15 @@ GUIUser::GUIUser() : GameObject(1) {
     strcpy(waitImage, "wait.tga");
     strcpy(cursorImage, "cursor.tga");
     focusControl = 0;
-    field_0x1d8 = 0;
-    field_0x1cc = 0;
-    field_0x1d0 = 0;
+    hoverControl = 0;
+    pendingHoverControl = 0;
+    pendingFocusControl = 0;
     acceptedDevices.Init(1, 1);
     pointerDevice = 0;
-    field_0x38 = 0;
-    field_0x34 = 0;
+    pointerY = 0;
+    pointerX = 0;
     for (i = 0; i < 32; i++)
-        field_0x3c[i] = 0;
+        controlDown[i] = 0;
 }
 
 // 0x00487540
@@ -841,21 +841,21 @@ GUIUser::~GUIUser() {
 
 // 0x004875a0
 int GUIUser::UnknownVirtualSlot10(float frameTime) {
-    UnknownFunction4875c0(0);
+    UpdateFocus(0);
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
 // 0x004875c0
-void GUIUser::UnknownFunction4875c0(int force) {
-    if (field_0x1d0) {
-        UnknownFunction487870(field_0x1d0, 0);
-        field_0x1cc = 0;
-        field_0x1d0 = 0;
+void GUIUser::UpdateFocus(int force) {
+    if (pendingFocusControl) {
+        MoveFocus(pendingFocusControl, 0);
+        pendingHoverControl = 0;
+        pendingFocusControl = 0;
         return;
     }
-    if (field_0x1cc || force) {
-        UnknownFunction487800(field_0x1cc, 0);
-        field_0x1cc = 0;
+    if (pendingHoverControl || force) {
+        SetHoverControl(pendingHoverControl, 0);
+        pendingHoverControl = 0;
     }
 }
 
@@ -863,8 +863,8 @@ void GUIUser::UnknownFunction4875c0(int force) {
 int GUIUser::UnknownVirtualSlot15() {
     GameObject::UnknownVirtualSlot15();
     if (pointerDevice) {
-        field_0x34 = pointerDevice->pointerPosition.x;
-        field_0x38 = pointerDevice->pointerPosition.y;
+        pointerX = pointerDevice->pointerPosition.x;
+        pointerY = pointerDevice->pointerPosition.y;
     }
     return 1;
 }
@@ -879,13 +879,13 @@ GUIUser* GUIUser::UnknownFunction487650(void* target, GUIManager* gui) {
 
 // 0x00487680
 void GUIUser::CreateToolTip(void* target, GUIManager* gui) {
-    UnknownFunction487710();
+    ReleaseToolTip();
     userToolTip = (ToolTip*)AppendChild(
         (new(__FILE__, 1639) ToolTip(1))->UnknownFunction486a10(target, gui), -1);
 }
 
 // 0x00487710
-void GUIUser::UnknownFunction487710() {
+void GUIUser::ReleaseToolTip() {
     if (userToolTip)
         userToolTip->Release();
     userToolTip = 0;
@@ -893,60 +893,60 @@ void GUIUser::UnknownFunction487710() {
 
 // 0x00487730
 int GUIUser::UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
-    if (field_0x1cc && strstr(field_0x1cc->field_0x28, "UIDDL"))
+    if (pendingHoverControl && strstr(pendingHoverControl->field_0x28, "UIDDL"))
         return 0;
     if (previous)
-        *previous = field_0x1cc;
-    field_0x1cc = control;
+        *previous = pendingHoverControl;
+    pendingHoverControl = control;
     if (update)
-        UnknownFunction4875c0(1);
+        UpdateFocus(1);
     return 1;
 }
 
 // 0x00487790
 int GUIUser::UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
-    if (field_0x1d0 && strstr(field_0x1d0->field_0x28, "UIDDL"))
+    if (pendingFocusControl && strstr(pendingFocusControl->field_0x28, "UIDDL"))
         return 0;
     if (previous)
-        *previous = field_0x1d0;
-    field_0x1cc = control;
-    field_0x1d0 = control;
+        *previous = pendingFocusControl;
+    pendingHoverControl = control;
+    pendingFocusControl = control;
     if (update)
-        UnknownFunction4875c0(1);
+        UpdateFocus(1);
     return 1;
 }
 
 // 0x00487800
-int GUIUser::UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl** previous) {
+int GUIUser::SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous) {
     int result = 1;
 
-    if (control && control != field_0x1d8)
+    if (control && control != hoverControl)
         result = control->UnknownVirtualSlot31();
     if (result) {
-        if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
-            field_0x1d8->UnknownVirtualSlot32(control);
+        if (hoverControl && !hoverControl->field_0x25_bit3 && hoverControl != control)
+            hoverControl->UnknownVirtualSlot32(control);
         if (previous)
-            *previous = field_0x1d8;
-        field_0x1d8 = control;
+            *previous = hoverControl;
+        hoverControl = control;
     }
     return result;
 }
 
 // 0x00487870: moves the focus to `control`; a digits-only edit box turns the
 // IME off.
-int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous) {
+int GUIUser::MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous) {
     int result = 1;
 
-    if (control && control != field_0x1d8)
+    if (control && control != hoverControl)
         result = control->UnknownVirtualSlot31();
     if (result) {
-        if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
-            field_0x1d8->UnknownVirtualSlot32(control);
+        if (hoverControl && !hoverControl->field_0x25_bit3 && hoverControl != control)
+            hoverControl->UnknownVirtualSlot32(control);
         if (focusControl && !focusControl->field_0x25_bit3 && focusControl != control)
             focusControl->UnknownVirtualSlot33(control);
         if (previous)
             *previous = focusControl;
-        field_0x1d8 = control;
+        hoverControl = control;
         focusControl = control;
         if (g_TrackGame->display->freezeFrameIndex) {
             if (control->controlType == 11) {
@@ -1073,7 +1073,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
         userGui->guiBackground->UnknownFunction404c80();
     if (userCursor || !pointerDevice)
         return;
-    if (g_TrackGame->field_0x2d4_bit1) {
+    if (g_TrackGame->fullScreen) {
         if (g_TrackGame->renderTarget->field_0x28 > 8 ||
             (g_TrackGame->renderTarget->field_0x28 == 8 && userGui->guiPalette)) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
@@ -1115,11 +1115,11 @@ void GUIUser::UnknownFunction487fb0(UnknownCursorAnimation* animation) {
         animation->field_0x0c = current->field_0x0c;
         animation->field_0x20 = current->field_0x20;
     }
-    userCursor->UnknownFunction485150(animation);
+    userCursor->SetAnimation(animation);
 }
 
 // 0x00488010
-void GUIUser::UnknownFunction488010(const char* image, int redraw) {
+void GUIUser::RecreateCursor(const char* image, int redraw) {
     int visible;
     int defaultImage;
 
@@ -1132,7 +1132,7 @@ void GUIUser::UnknownFunction488010(const char* image, int redraw) {
     defaultImage = !image;
     CreateCursor(image ? image : cursorImage, visible);
     if (defaultImage && cursorAnimation && userCursor)
-        userCursor->UnknownFunction485150(cursorAnimation);
+        userCursor->SetAnimation(cursorAnimation);
     if (redraw)
         userGui->RedrawFrame();
 }
@@ -1149,7 +1149,7 @@ UIDlgContainer::~UIDlgContainer() {
 }
 
 // 0x00488160
-int GUIUser::UnknownFunction488160(InputDevice* device) {
+int GUIUser::UsesDevice(InputDevice* device) {
     GUIInputDevice* candidate;
     int i;
 
@@ -1166,16 +1166,16 @@ int GUIUser::UnknownFunction488160(InputDevice* device) {
 // 0x004881d0
 int GUIUser::UnknownFunction4881d0(UnknownControlEvent* event) {
     if (event->kind == 0)
-        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->keyboard);
+        return UsesDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
-        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->mouse);
+        return UsesDevice((InputDevice*)g_TrackGame->controlInterface->mouse);
     if (event->kind == 2 || event->kind == 3)
-        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
+        return UsesDevice((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
     return 0;
 }
 
 // 0x00488240
-GUIInputDevice* GUIUser::UnknownFunction488240(InputDevice* device) {
+GUIInputDevice* GUIUser::FindDevice(InputDevice* device) {
     GUIInputDevice* candidate;
     int i;
 
@@ -1192,11 +1192,11 @@ GUIInputDevice* GUIUser::UnknownFunction488240(InputDevice* device) {
 // 0x004882a0
 GUIInputDevice* GUIUser::UnknownFunction4882a0(UnknownControlEvent* event) {
     if (event->kind == 0)
-        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->keyboard);
+        return FindDevice((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
-        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->mouse);
+        return FindDevice((InputDevice*)g_TrackGame->controlInterface->mouse);
     if (event->kind == 2 || event->kind == 3)
-        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
+        return FindDevice((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
     return 0;
 }
 
@@ -1211,13 +1211,13 @@ HiResMeter g_UnknownHiResMeter67b468(0);
 
 // 0x00488380
 HiResMeter::HiResMeter(int flags) : GameObject(flags) {
-    field_0x3c = -1;
-    field_0x30 = 0;
+    overlayPage = -1;
+    countsPerMs = 0;
     UnknownFunction488580();
     if (UnknownVirtualSlot8(0))
-        field_0x2c = 1;
+        counterUsable = 1;
     else
-        field_0x2c = 0;
+        counterUsable = 0;
 }
 
 // 0x00488430
@@ -1228,9 +1228,9 @@ HiResMeter::~HiResMeter() {
 void HiResMeter::UnknownFunction488510() {
     int i;
 
-    for (i = 0; i < field_0x34; i++) {
-        field_0x40[i].field_0x10 = 0;
-        field_0x40[i].field_0x14 = 0;
+    for (i = 0; i < timerCount; i++) {
+        timers[i].callsThisTick = 0;
+        timers[i].msThisTick = 0;
     }
 }
 
@@ -1238,16 +1238,16 @@ void HiResMeter::UnknownFunction488510() {
 void HiResMeter::UnknownFunction488540() {
     int i;
 
-    for (i = 0; i < field_0x34; i++) {
-        field_0x40[i].field_0x08 = 0;
-        field_0x40[i].field_0x0c = 0;
-        field_0x40[i].field_0x00 = 0;
-        field_0x40[i].field_0x04 = 0;
-        field_0x40[i].field_0x10 = 0;
-        field_0x40[i].field_0x14 = 0;
-        field_0x40[i].field_0x18 = 0;
-        field_0x40[i].field_0x1c = 0;
-        field_0x40[i].field_0x20 = 0;
+    for (i = 0; i < timerCount; i++) {
+        timers[i].calls = 0;
+        timers[i].totalMs = 0;
+        timers[i].field_0x00 = 0;
+        timers[i].field_0x04 = 0;
+        timers[i].callsThisTick = 0;
+        timers[i].msThisTick = 0;
+        timers[i].msAllTicks = 0;
+        timers[i].ticks = 0;
+        timers[i].peakMs = 0;
     }
     field_0x38 = 0;
 }
@@ -1257,18 +1257,18 @@ void HiResMeter::UnknownFunction488580() {
     int i;
 
     for (i = 0; i < 50; i++) {
-        field_0x40[i].field_0x08 = 0;
-        field_0x40[i].field_0x0c = 0;
-        field_0x40[i].field_0x00 = 0;
-        field_0x40[i].field_0x04 = 0;
-        field_0x40[i].field_0x10 = 0;
-        field_0x40[i].field_0x14 = 0;
-        field_0x40[i].field_0x18 = 0;
-        field_0x40[i].field_0x1c = 0;
-        field_0x40[i].field_0x20 = 0;
-        field_0x40[i].field_0x24[0] = 0;
+        timers[i].calls = 0;
+        timers[i].totalMs = 0;
+        timers[i].field_0x00 = 0;
+        timers[i].field_0x04 = 0;
+        timers[i].callsThisTick = 0;
+        timers[i].msThisTick = 0;
+        timers[i].msAllTicks = 0;
+        timers[i].ticks = 0;
+        timers[i].peakMs = 0;
+        timers[i].name[0] = 0;
     }
-    field_0x34 = 0;
+    timerCount = 0;
     field_0x38 = 0;
 }
 
@@ -1278,25 +1278,25 @@ int HiResMeter::UnknownVirtualSlot10(float frameTime) {
     int i;
 
     if (g_TrackGame->debugOverlay) {
-        if (field_0x3c < 0)
-            field_0x3c = g_TrackGame->debugOverlay->NewPage();
-        if (g_TrackGame->debugOverlay->field_0x26c4 != field_0x3c) {
+        if (overlayPage < 0)
+            overlayPage = g_TrackGame->debugOverlay->NewPage();
+        if (g_TrackGame->debugOverlay->field_0x26c4 != overlayPage) {
             UnknownFunction488540();
             return 1;
         }
         g_TrackGame->debugOverlay->UnknownFunction447fa0(
-            field_0x3c, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
-        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x3c, "Previous Game Tick: % 3d  MS",
+            overlayPage, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(overlayPage, "Previous Game Tick: % 3d  MS",
                                                                 g_UnknownGlobal65b534);
-        for (i = 0; i < field_0x34; i++) {
-            entry = &field_0x40[i];
-            if (entry->field_0x08 != 0.0f) {
-                entry->field_0x1c += 1.0f;
-                entry->field_0x18 = entry->field_0x18 + entry->field_0x14;
+        for (i = 0; i < timerCount; i++) {
+            entry = &timers[i];
+            if (entry->calls != 0.0f) {
+                entry->ticks += 1.0f;
+                entry->msAllTicks = entry->msAllTicks + entry->msThisTick;
                 g_TrackGame->debugOverlay->UnknownFunction447f40(
-                    field_0x3c, "%24.24s [%4.0f --> %6.3f (%6.3f)] : (%6.3f / %5.3f) MS", entry->field_0x24,
-                    entry->field_0x10, entry->field_0x14, entry->field_0x18 / entry->field_0x1c,
-                    entry->field_0x20, entry->field_0x0c / entry->field_0x08);
+                    overlayPage, "%24.24s [%4.0f --> %6.3f (%6.3f)] : (%6.3f / %5.3f) MS", entry->name,
+                    entry->callsThisTick, entry->msThisTick, entry->msAllTicks / entry->ticks,
+                    entry->peakMs, entry->totalMs / entry->calls);
             }
         }
     }

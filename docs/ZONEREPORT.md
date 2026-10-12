@@ -65,6 +65,6 @@ the preset fields and `UnknownZoneRaceStatus`. The three methods return
 
 ```bash
 python3 tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" src/reconstructed/ZoneReport.cpp -o work/ZoneReport.obj
-python3 tools/match.py --exe "$MCM2_EXE" --target-va 0x0049c770 --target-size 739 --obj work/ZoneReport.obj --symbol '?UnknownFunction49c770' --bindings src/reconstructed/ZoneReport.bindings.json
+python3 tools/match.py --exe "$MCM2_EXE" --target-va 0x0049c770 --target-size 739 --obj work/ZoneReport.obj --symbol '?ReportRaceToZone' --bindings src/reconstructed/ZoneReport.bindings.json
 python3 tools/run_calibration.py --exe "$MCM2_EXE" --compiler vc6 --vc6-root "$VC6_ROOT"
 ```

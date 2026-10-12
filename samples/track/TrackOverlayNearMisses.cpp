@@ -370,7 +370,7 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
     logFont.lfClipPrecision = 0;
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->field_0x2c;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->field_0x350 : "";
     if (*face != '\0') {
         logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
@@ -643,7 +643,7 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
     logFont.lfClipPrecision = 0;
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
-    UnknownKrustyUIGui* gui = g_TrackGame->ui->field_0x2c;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->field_0x350 : "";
     if (*face != '\0') {
         logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;

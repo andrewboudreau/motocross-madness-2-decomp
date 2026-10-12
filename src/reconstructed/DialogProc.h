@@ -37,14 +37,14 @@ struct UnknownDialogEvent {
         UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_TrackGame->ui->field_0x310[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->bandStep = g_TrackGame->ui->field_0x414[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_TrackGame->ui->field_0x428[bikeClass];      \
-        int curve = g_TrackGame->mode.field_0xa0c[bikeClass];                              \
+        int curve = g_TrackGame->mode.garageCurveChoice[bikeClass];                              \
         for (band = 0; band < 11; band++) {                                                           \
             if (curve < 3)                                                                            \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
                     g_TrackGame->ui->field_0x68[bikeClass][curve][band];                    \
             else                                                                                      \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
-                    g_TrackGame->mode.field_0x10f0[bikeClass][curve - 3][band];             \
+                    g_TrackGame->mode.customGarageCurves[bikeClass][curve - 3][band];             \
         }                                                                                             \
     }
 
@@ -71,7 +71,7 @@ public:
     // button text hides the button).
     void SetTexts(const char* title, const char* prompt, const char* left,
                   const char* middle, const char* right);
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004555b0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004555b0
 };
 
 // RTTI: SessionDlg : UIDialog (vtable 0x00555408; type descriptor 0x0056eb10
@@ -80,5 +80,5 @@ public:
 class SessionDlg : public UIDialog {
 public:
     SessionDlg() : UIDialog(1, "messbox1.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004aefd0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004aefd0
 };

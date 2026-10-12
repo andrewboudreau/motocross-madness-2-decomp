@@ -72,7 +72,7 @@ struct UnknownOptControlSettings {            // 0x30 bytes (TrackGame+0xfe0)
 
 struct UnknownOptGarageSettings {             // 0x5c bytes (TrackGame+0x1550)
     int engineSize;                           // +0x00: engine size in cc ("%dcc")
-    int field_0x04;
+    int fourStroke;                           // +0x04: 4-stroke engine (the 400cc and 600cc DDLEngineSize rows)
     int field_0x08;
     float suspension[6];                      // +0x0c: suspension sliders (SldFrontComp ...)
     int eqBands[11];                          // +0x24: SldEQ1..11
@@ -119,16 +119,16 @@ inline int UnknownBikeClassOf(int cc)
 class OptGameSettingsDlg : public UIDialog {
 public:
     OptGameSettingsDlg() : UIDialog(1, "OptGame.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2000
-    virtual void UnknownVirtualSlot31(int save);                    // 0x004b22d0
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2000
+    virtual void SyncValues(int save);                    // 0x004b22d0
 };
 
 // RTTI: OptGraphicsDlg : UIDialog (vtable 0x00555898; 0x7f58 bytes).
 class OptGraphicsDlg : public UIDialog {
 public:
     OptGraphicsDlg() : UIDialog(1, "OptGraph.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b23b0
-    virtual void UnknownVirtualSlot31(int save);                    // 0x004b2670
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b23b0
+    virtual void SyncValues(int save);                    // 0x004b2670
 };
 
 // RTTI: OptAdvancedGraphicsDlg : UIDialog (vtable 0x00555580; 0x7f58
@@ -136,16 +136,16 @@ public:
 class OptAdvancedGraphicsDlg : public UIDialog {
 public:
     OptAdvancedGraphicsDlg() : UIDialog(1, "OptAdvG.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b26c0
-    virtual void UnknownVirtualSlot31(int save);
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b26c0
+    virtual void SyncValues(int save);
 };
 
 // RTTI: OptSoundDlg : UIDialog (vtable 0x00555814; 0x7f58 bytes).
 class OptSoundDlg : public UIDialog {
 public:
     OptSoundDlg() : UIDialog(1, "OptSound.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2b20
-    virtual void UnknownVirtualSlot31(int save);                    // 0x004b2ce0
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2b20
+    virtual void SyncValues(int save);                    // 0x004b2ce0
     void ApplySoundSettings();             // 0x004b2d40: applies the sound settings
 };
 
@@ -161,8 +161,8 @@ public:
     OptControlsDlg() : UIDialog(1, "OptCont.dtm") {}
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b5600
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b55d0
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2e00
-    virtual void UnknownVirtualSlot31(int save);                    // 0x004b3470
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2e00
+    virtual void SyncValues(int save);                    // 0x004b3470
     void ListMappedKeys();             // 0x004b3410: lists the mapped keys
     void ColorListRows();             // 0x004b54c0: colours the list rows
     void MapMovedInput();             // 0x004b5760: maps a moved axis or mouse direction
@@ -170,16 +170,16 @@ public:
 
     float axisValuesAtWait[6];                // +0x7f58: joystick axis values when the wait began
     int waitingForInput;                      // +0x7f70: waiting for input to map
-    int field_0x7f74;
-    int field_0x7f78;                         // the active joystick has device kind 3
+    int inputWaitPending;                     // +0x7f74: the 250 ms timer before the input wait runs
+    int joystickIsKind3;                      // +0x7f78: the active joystick has device kind 3
 };
 
 // RTTI: OptGarageDlg : UIDialog (vtable 0x00555688; 0x7f5c bytes).
 class OptGarageDlg : public UIDialog {
 public:
     OptGarageDlg() : UIDialog(1, "OptGar.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b3500
-    virtual void UnknownVirtualSlot31(int save);                    // 0x004b3e70
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b3500
+    virtual void SyncValues(int save);                    // 0x004b3e70
     void FillCurveList();             // 0x004b38f0: fills DDLCurves
     void EqSliderMoved(UIControl* slider); // 0x004b3aa0: an SldEQ slider moved
     void ShowCurve();             // 0x004b3bc0: shows the curve
@@ -192,15 +192,15 @@ public:
 class OptMessagesDlg : public UIDialog {
 public:
     OptMessagesDlg() : UIDialog(1, "OptMess.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b40a0
-    virtual void UnknownVirtualSlot31(int save);
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b40a0
+    virtual void SyncValues(int save);
 };
 
 // The 0x94-byte records at KrustyUI+0x50 (+0x54 counts them) as OptionsDlg
 // reads them.
 struct UnknownOptKrustyUIRecord {
     unsigned char field_0x00[0x8c];
-    int field_0x8c;
+    int engineSize;                           // +0x8c: engine size (cc), as KrustyUI's bike table
     unsigned char field_0x90[0x94 - 0x90];
 };
 
@@ -209,16 +209,16 @@ struct UnknownOptKrustyUIRecord {
 class OptionsDlg : public UIDialog {
 public:
     OptionsDlg() : UIDialog(1, "OptBase.dtm") {} // SelectGamePicProcs.cpp 0x004f8047 allocates 0x7f70 bytes
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b4280
-    virtual void UnknownVirtualSlot31(int save);
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b4280
+    virtual void SyncValues(int save);
     void OpenPage(int page);     // 0x004b4ab0: opens page `page` (0..5)
 
-    OptGameSettingsDlg* field_0x7f58;
-    OptGraphicsDlg* field_0x7f5c;
-    OptSoundDlg* field_0x7f60;
-    OptControlsDlg* field_0x7f64;
-    OptMessagesDlg* field_0x7f68;
-    OptGarageDlg* field_0x7f6c;
+    OptGameSettingsDlg* gameSettingsPage;     // +0x7f58
+    OptGraphicsDlg* graphicsPage;             // +0x7f5c
+    OptSoundDlg* soundPage;                   // +0x7f60
+    OptControlsDlg* controlsPage;             // +0x7f64
+    OptMessagesDlg* messagesPage;             // +0x7f68
+    OptGarageDlg* garagePage;                 // +0x7f6c
 };
 
 // RTTI: GlobalSettingsDlg : UIDialog (vtable 0x00555604; 0x7f58 bytes):
@@ -226,8 +226,8 @@ public:
 class GlobalSettingsDlg : public UIDialog {
 public:
     GlobalSettingsDlg() : UIDialog(1, "GlobSet.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b4e70
-    virtual void UnknownVirtualSlot31(int save);
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b4e70
+    virtual void SyncValues(int save);
     void ListOtherProfiles();             // 0x004b51a0: lists the other profiles
 };
 
@@ -235,6 +235,6 @@ public:
 class ConfirmRestoreDlg : public UIDialog {
 public:
     ConfirmRestoreDlg() : UIDialog(1, "messbox2.dtm") {}
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b5380
-    virtual void UnknownVirtualSlot31(int save);
+    virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b5380
+    virtual void SyncValues(int save);
 };
