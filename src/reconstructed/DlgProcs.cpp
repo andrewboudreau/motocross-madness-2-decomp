@@ -2015,7 +2015,7 @@ void LeaveMenusForRace() {
     g_TrackGame->ui->gui->ReleaseBackground();
     if (g_TrackGame->display->freezeFrameIndex)
         g_TrackGame->ui->gui->EnableWindowClipper(0);
-    if (g_TrackGame->playerCount == 1 && !g_TrackGame->UnknownFunction521cd0() &&
+    if (g_TrackGame->playerCount == 1 && !g_TrackGame->InProCircuitCareer() &&
         !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->playingReplay) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.raceSettings,
                sizeof(g_TrackGame->mode.savedSettings));

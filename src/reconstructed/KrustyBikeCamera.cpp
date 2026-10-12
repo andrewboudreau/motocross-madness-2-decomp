@@ -162,7 +162,7 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
         } else {
             result += bike->field_0x604->field_0x40->field_0x154 * dt;
         }
-    } else if (raceView->field_0x3f8) {
+    } else if (raceView->replayPaused) {
         result = targetPoint;
     } else {
         float dot = KrustyCameraDot(UnknownVirtualSlot33(), field_0x29c);
@@ -190,7 +190,7 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
     } else if (cameraState == 7) {
         result = targetPoint;
         result.y += 3.0f;
-    } else if (raceView->field_0x3f8 || raceView->field_0x3f9) {
+    } else if (raceView->replayPaused || raceView->replayStepFrame) {
         result = targetPoint;
     } else if (flag) {
         result = UnknownVirtualSlot35(a, dt);

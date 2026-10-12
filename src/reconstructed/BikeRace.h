@@ -905,7 +905,7 @@ public:
     // 0x0041f1d0: the next (`forward`) or previous camera target: a racer
     // (`racers`), a scene object or a shadow caster.
     void NextCameraTarget(int forward, int racers, int objects);
-    void UnknownFunction41f550(int value);    // 0x0041f550: toggles +0x3f8
+    void ToggleReplayPause(int pauseOnly); // 0x0041f550: pauses, or with 0 toggles, +0x3f8
     UnknownBikeRaceRacer* NextBike(int* iterator); // 0x004204e0
     void UnknownFunction420590(int player);   // 0x00420590
     void UnknownFunction420b00(char* path, char* description); // 0x00420b00
@@ -1001,8 +1001,8 @@ public:
     int field_0x1ec;
     char ghostFilePlayed[0x104];                  // ghost file played
     char ghostFileRecorded[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
-    bool field_0x3f8;
-    bool field_0x3f9;
+    bool replayPaused;                         // +0x3f8: ToggleReplayPause
+    bool replayStepFrame;                      // +0x3f9: ButFrame: advance one frame
     bool field_0x3fa;
     bool field_0x3fb;
     unsigned char isRecording;                // recording (0x00420650)

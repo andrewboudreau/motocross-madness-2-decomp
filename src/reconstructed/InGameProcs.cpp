@@ -157,26 +157,26 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogCommand:
         if (!_stricmp("TogPlay", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                view->UnknownFunction41f550(1);
-                view->UnknownFunction41f550(0);
+                view->ToggleReplayPause(1);
+                view->ToggleReplayPause(0);
                 view->replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
             }
         } else if (!_stricmp("TogPause", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                view->UnknownFunction41f550(0);
+                view->ToggleReplayPause(0);
                 view->replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
             }
         } else if (!_stricmp("TogFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
-                    if (view->field_0x3f8)
-                        view->UnknownFunction41f550(0);
+                    if (view->replayPaused)
+                        view->ToggleReplayPause(0);
                     view->replayMode = 8;
                     g_TrackGame->field_0x2e0 = 2.0f;
                 } else {
-                    view->UnknownFunction41f550(1);
+                    view->ToggleReplayPause(1);
                     view->replayMode = 4;
                     g_TrackGame->field_0x2e0 = 1.0f;
                 }
@@ -184,12 +184,12 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("TogFFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
-                    if (view->field_0x3f8)
-                        view->UnknownFunction41f550(0);
+                    if (view->replayPaused)
+                        view->ToggleReplayPause(0);
                     view->replayMode = 9;
                     g_TrackGame->field_0x2e0 = 8.0f;
                 } else {
-                    view->UnknownFunction41f550(1);
+                    view->ToggleReplayPause(1);
                     view->replayMode = 4;
                     g_TrackGame->field_0x2e0 = 1.0f;
                 }
@@ -197,31 +197,31 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("TogReverse", event->controlName)) {
             if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                 if (view->replayMode != 14) {
-                    if (view->field_0x3f8)
-                        view->UnknownFunction41f550(0);
+                    if (view->replayPaused)
+                        view->ToggleReplayPause(0);
                     view->replayMode = 11;
                     g_TrackGame->field_0x2e0 = 0.0f;
                 }
             } else {
-                view->UnknownFunction41f550(1);
+                view->ToggleReplayPause(1);
                 view->replayMode = 4;
                 g_TrackGame->field_0x2e0 = 1.0f;
             }
         } else if (!_stricmp("ButFrame", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (view->field_0x3f8)
-                    view->UnknownFunction41f550(0);
-                view->field_0x3f9 = 1;
-                g_TrackGame->field_0x1c8 = 1;
+                if (view->replayPaused)
+                    view->ToggleReplayPause(0);
+                view->replayStepFrame = 1;
+                g_TrackGame->stepOneFrame = 1;
             }
         } else if (!_stricmp("ButBeginning", event->controlName)) {
-            if (view->field_0x3f8)
-                view->UnknownFunction41f550(0);
+            if (view->replayPaused)
+                view->ToggleReplayPause(0);
             view->replayMode = 12;
         } else if (!_stricmp("ButEnd", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (view->field_0x3f8)
-                    view->UnknownFunction41f550(0);
+                if (view->replayPaused)
+                    view->ToggleReplayPause(0);
                 view->replayMode = 9;
                 g_TrackGame->field_0x2e0 = 30.0f;
             }
@@ -300,7 +300,7 @@ void VCRDlg::ShowReplayMode() {
     UIMultiState* reverse = static_cast<UIMultiState*>(FindControl("TogReverse", 2));
     UIMultiState* fastForward = static_cast<UIMultiState*>(FindControl("TogFF", 2));
     UIMultiState* fasterForward = static_cast<UIMultiState*>(FindControl("TogFFF", 2));
-    if (view->field_0x3f8) {
+    if (view->replayPaused) {
         play->SetCurrentState(0);
         pause->SetCurrentState(1);
         reverse->SetCurrentState(0);

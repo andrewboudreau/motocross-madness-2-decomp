@@ -18,7 +18,7 @@
 // (retail materialises the sete), separate `column`/`row` products, the zero
 // direction test through an inline helper (it places the copy branch first),
 // PodiumLength over a reference (no by-value copy), the nested
-// UnknownFunction521cd0 test (three Winner sprintf copies), and the buffers
+// InProCircuitCareer test (three Winner sprintf copies), and the buffers
 // name[0x80], path[0x104], message[0x184] plus the crowd message's own
 // [0x80] buffer at +0x168. Left: the squared lengths (retail squares each
 // component as it loads it, `fld; fld st(0); fmulp`, and spills z*z; plain,
@@ -316,7 +316,7 @@ int EventManager::CreatePodiumScene() {
         racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
         while (racer && ((UnknownPodiumRacer*)racer)->field_0x784 != place)
             racer = PODIUM_OWNER(owner)->field_0x34->NextBike(&iterator);
-        if (g_TrackGame->UnknownFunction521cd0()) {
+        if (g_TrackGame->InProCircuitCareer()) {
             if ((g_TrackGame->proCircuit->careerFlags & 2) &&
                 racer == PODIUM_OWNER(owner)->field_0x34->localRacer)
                 sprintf(name, "%s\\Winnerd.mcf", "Res");

@@ -221,7 +221,7 @@
   "?SetVolume@Sound@@QAEHJH@Z": "0x004bcbe0",
   "?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z": "0x004be910",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
-  "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
+  "?InProCircuitCareer@TrackGame@@QAEHXZ": "0x00521cd0",
   "?ResetDefaults@TrackGameMode@@QAEXXZ": "0x00522440",
   "?LoadControllerChoice@TrackGameMode@@QAEXXZ": "0x00523000",
   "?LoadProfile@TrackGameMode@@QAEHXZ": "0x005231f0",

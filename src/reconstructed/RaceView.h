@@ -193,7 +193,7 @@ struct UnknownKrustyBikeViewReplay {
 // fits KrustyBike's primary base chain; its class is not established.
 struct UnknownKrustyBikeView : public GameObject {
     void UnknownFunction41f1d0(int a, int b, int c); // 0x0041f1d0 (InGameProcs.cpp)
-    void UnknownFunction41f550(int value);   // 0x0041f550 (InGameProcs.cpp)
+    void ToggleReplayPause(int value);   // 0x0041f550 (InGameProcs.cpp)
     void UnknownFunction420650(int a, int b, int c); // 0x00420650 (InGameProcs.cpp ExitDlg)
     void UnknownFunction421050();             // 0x00421050 (dlgprocs.cpp LoadingDlg)
     void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
@@ -240,6 +240,6 @@ struct UnknownKrustyBikeView : public GameObject {
     int field_0x1e4;                     // -2: no replay
     int field_0x1e8;
     unsigned char field_0x1ec[0x3f8 - 0x1ec];
-    bool field_0x3f8;
-    bool field_0x3f9;
+    bool replayPaused;                       // +0x3f8
+    bool replayStepFrame;                    // +0x3f9
 };

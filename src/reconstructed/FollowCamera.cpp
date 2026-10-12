@@ -665,7 +665,7 @@ int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
         return 0;
     if (g_TrackGame->field_0x2d4_bit0) {
         if (TestInputEvent(0x21, 0, event, 0xc) && cameraState != 6) {
-            UnknownVirtualSlot70(g_TrackGame->field_0x1c4);
+            UnknownVirtualSlot70(g_TrackGame->paused);
             return 1;
         }
         if (overrideActive) {

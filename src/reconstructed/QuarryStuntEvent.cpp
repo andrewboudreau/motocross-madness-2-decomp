@@ -159,7 +159,7 @@ struct UnknownQuarryBikeChoice {
 int BaseQuarryEvent::UnknownFunction4e0560() {
     int players = 0;
     int opponents = 0;
-    if (g_TrackGame->UnknownFunction521cd0()) {
+    if (g_TrackGame->InProCircuitCareer()) {
         int i;
         for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
             if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].field_0x00].field_0xc4 <= g_TrackGame->proCircuit->maxModelKind)

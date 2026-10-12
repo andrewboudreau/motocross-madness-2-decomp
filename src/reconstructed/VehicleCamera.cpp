@@ -146,7 +146,7 @@ void VehicleCamera::UnknownVirtualSlot68() {
 // scaled by dt (at most 0.2) while the camera is free to follow.
 Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
     Vector3 result = TargetPoint();
-    if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
+    if (cameraState != 7 && !g_TrackGame->paused) {
         if (vehicleMode) {
             if (!vehicle->crashState) {
                 float lead = 0.2f < dt ? 0.2f : dt;

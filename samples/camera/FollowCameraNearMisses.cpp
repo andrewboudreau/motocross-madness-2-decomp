@@ -647,7 +647,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
 
             }
         }
-        if (g_TrackGame->field_0x1c4 || (cameraState != 5 && cameraState != 7)) {
+        if (g_TrackGame->paused || (cameraState != 5 && cameraState != 7)) {
             if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
                 field_0x258 -= 3.0f;
                 if (field_0x258 < field_0x1e0)

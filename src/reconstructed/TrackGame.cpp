@@ -369,11 +369,11 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         }
     }
     {
-        int previous = field_0x1c4;
+        int previous = paused;
         if (PCGame::UnknownVirtualSlot14(event, entry))
             return 0;
-        if (field_0x2d4_bit0 && field_0x1c4 != previous) {
-            if (field_0x1c4)
+        if (field_0x2d4_bit0 && paused != previous) {
+            if (paused)
                 childRoot->DisableByClassName("RaceSound");
             else
                 childRoot->EnableByClassName("RaceSound");
@@ -492,7 +492,7 @@ int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
 }
 
 // 0x00521cd0
-int TrackGame::UnknownFunction521cd0() {
+int TrackGame::InProCircuitCareer() {
     if (proCircuit)
         return ui->field_0x4a8 == 0;
     return 0;

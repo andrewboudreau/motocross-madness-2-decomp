@@ -656,7 +656,7 @@ public:
 
     void MuteSound();             // 0x00521a30
     void StopCDAudio();             // 0x00521a40
-    int UnknownFunction521cd0();              // 0x00521cd0
+    int InProCircuitCareer();              // 0x00521cd0: proCircuit set and KrustyUI +0x4a8 clear
 
     // 0x00521970: loads string resource `id` into buffer (size bytes), or
     // "Resource String Unavailable"; 1 when loaded.

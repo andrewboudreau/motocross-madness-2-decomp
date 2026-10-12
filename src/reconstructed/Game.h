@@ -113,8 +113,8 @@ public:
     DebugOverlay* debugOverlay;               // created with the "DebugOverlay" registry flag
     TextureMapManager* textureManager;        // +0x3c
     char field_0x40[0x1c4 - 0x40];            // empty string initially
-    int field_0x1c4;
-    int field_0x1c8;
+    int paused;                               // +0x1c4: Ctrl+F toggles it (debug keys); BikeRace mirrors its replay pause here
+    int stepOneFrame;                         // +0x1c8: set by E while paused and by the replay ButFrame
     char field_0x1cc[0x2d0 - 0x1cc];          // directory for slot 18
     int field_0x2d0;
     unsigned char field_0x2d4_bit0 : 1;       // "AllowFreezeCamera"; slot 14 key handling

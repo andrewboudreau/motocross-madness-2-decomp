@@ -550,7 +550,7 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         AssignChannels();
         field_0x1208 = 0;
     }
-    if (SoundSystem()->audioStarted && g_TrackGame->mode.soundOn && !raceView->field_0x3f8) {
+    if (SoundSystem()->audioStarted && g_TrackGame->mode.soundOn && !raceView->replayPaused) {
         ohClock += frameTime;
         applauseClock += frameTime;
         stuntApplauseClock += frameTime;

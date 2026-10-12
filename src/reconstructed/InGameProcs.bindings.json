@@ -35,7 +35,7 @@
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?UnknownFunction41f1d0@UnknownKrustyBikeView@@QAEXHHH@Z": "0x0041f1d0",
-  "?UnknownFunction41f550@UnknownKrustyBikeView@@QAEXH@Z": "0x0041f550",
+  "?ToggleReplayPause@UnknownKrustyBikeView@@QAEXH@Z": "0x0041f550",
   "?UnknownFunction420650@UnknownKrustyBikeView@@QAEXHHH@Z": "0x00420650",
   "?HandleMenuCancel@@YAXHPAUUnknownDialogEvent@@@Z": "0x004526b0",
   "?HandleMenuOk@@YAXHPAUUnknownDialogEvent@@@Z": "0x00452930",

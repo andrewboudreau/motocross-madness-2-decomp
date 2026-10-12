@@ -388,7 +388,7 @@
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?MuteSound@TrackGame@@QAEXXZ": "0x00521a30",
   "?StopCDAudio@TrackGame@@QAEXXZ": "0x00521a40",
-  "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
+  "?InProCircuitCareer@TrackGame@@QAEHXZ": "0x00521cd0",
   "?ClearLeft@UnknownTrackGameRacerSlot@@QAEXXZ": "0x00522050",
   "?ResetDefaults@TrackGameMode@@QAEXXZ": "0x00522440",
   "?LoadControllerChoice@TrackGameMode@@QAEXXZ": "0x00523000",

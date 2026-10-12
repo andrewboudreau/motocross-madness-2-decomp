@@ -724,7 +724,7 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
             OpenPage(0);
             static_cast<UIRadioButton*>(FindControl("GameSettings", 4))->SelectInGroup(0);
         }
-        if (g_TrackGame->UnknownFunction521cd0())
+        if (g_TrackGame->InProCircuitCareer())
             FindControl("Restore", 0)->Show(0, 1);
         break;
     }

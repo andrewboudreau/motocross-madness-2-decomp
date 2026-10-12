@@ -130,12 +130,12 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     ghostVcr = 0;
     field_0x1a8 = 0;
     g_TrackGame->field_0x2e0 = 1.0f;
-    field_0x3f9 = false;
+    replayStepFrame = false;
     ghostTimeLimit = (float)g_TrackGame->GetRegistryInt("VCRGhostTimeLimit", 300);
     recordTimeLimit = (float)g_TrackGame->GetRegistryInt("VCRRecordTimeLimit", 3600);
     recorderTickElapsed = 0;
-    field_0x3f8 = false;
-    field_0x3f9 = false;
+    replayPaused = false;
+    replayStepFrame = false;
     replayMode = 4;
     field_0x1e0 = 4;
     field_0x1e4 = 0;
@@ -145,7 +145,7 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     isRecording = 0;
     ghostFilePlayed[0] = 0;
     ghostFileRecorded[0] = 0;
-    g_TrackGame->field_0x1c4 = 0;
+    g_TrackGame->paused = 0;
     field_0x144 = 0;
     field_0x148 = 0;
     chatOverlay = 0;
@@ -165,7 +165,7 @@ BikeRace::~BikeRace() {
         racerSlots = 0;
     }
     if (aiRacers != 0) {
-        if (g_TrackGame->UnknownFunction521cd0()) {
+        if (g_TrackGame->InProCircuitCareer()) {
             DebugFree(aiRacers, __FILE__, 0x809);
         } else {
             delete aiRacers;
@@ -288,7 +288,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             UnknownFunctionCameraView()->field_0x3b0->outOfRace != 0) {
             NextCameraTarget(0, 1, 0);
         }
-        if (!g_TrackGame->field_0x1c4) {
+        if (!g_TrackGame->paused) {
             if (g_TrackGame->mode.joystickOn) {
                 localRacer->UnknownRacerVirtualSlot94();
             }
@@ -338,7 +338,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 }
             }
             if (g_TrackGame->useReplayTape) {
-                if (!field_0x3f8) {
+                if (!replayPaused) {
                     if (replayMode == 8) {
                         replayTime += g_TrackGame->frameTime * g_TrackGame->field_0x2e0;
                         field_0x1d4 += (int)g_TrackGame->field_0x2e0;
@@ -804,16 +804,16 @@ void BikeRace::ReplaceMeshId(UnknownBikeRaceCharacter* character, int from, int 
 }
 
 // 0x0041f550
-void BikeRace::UnknownFunction41f550(int value) {
-    if (value) {
-        if (field_0x3f8) {
+void BikeRace::ToggleReplayPause(int pauseOnly) {
+    if (pauseOnly) {
+        if (replayPaused) {
             return;
         }
-        field_0x3f8 = true;
+        replayPaused = true;
     } else {
-        field_0x3f8 = !field_0x3f8;
+        replayPaused = !replayPaused;
     }
-    g_TrackGame->field_0x1c4 = field_0x3f8;
+    g_TrackGame->paused = replayPaused;
 }
 
 // 0x0041f590
@@ -1297,11 +1297,11 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         replayLength = 0;
         field_0x1d8 = 0;
         replayMode = 4;
-        field_0x3f8 = false;
-        field_0x3f9 = false;
+        replayPaused = false;
+        replayStepFrame = false;
         isRecording = mode;
         g_TrackGame->field_0x2e0 = 1.0f;
-        g_TrackGame->field_0x1c4 = 0;
+        g_TrackGame->paused = 0;
         field_0x044->field_0x3c->UnknownVirtualSlot16(0);
         if (field_0x044->field_0x40 != 0) {
             field_0x044->field_0x40->UnknownVirtualSlot16(0);
@@ -1348,7 +1348,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         racer->startPosition = position;
         racer->startDirection = direction;
         racer->UnknownFunction496e20(replayVcr);
-        field_0x3f8 = false;
+        replayPaused = false;
     }
     if (g_TrackGame->tagEvent != 0 &&
         g_TrackGame->tagEvent->field_0xdc != 0) {
@@ -1492,9 +1492,9 @@ static inline UnknownBikeRaceGhost* GhostBike() {
 int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int time) {
     *keep = 0;
     field_0x1e4 = a;
-    if (field_0x3f8 && a == -1) {
+    if (replayPaused && a == -1) {
         replayTime = ((UnknownBikeRaceVcrTick*)data)->field_0x00;
-        field_0x3f9 = false;
+        replayStepFrame = false;
         return 5;
     }
     if (g_TrackGame->uiInteractionBlocked) {
@@ -1513,18 +1513,18 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         replayTime = replayVcr->timePlayed;
         if (replaySeekTarget != -1.0f && replayTime > replaySeekTarget) {
             replayMode = 11;
-            UnknownFunction41f550(0);
+            ToggleReplayPause(0);
             return 11;
         }
         if (replayMode == 12) {
             replayMode = 4;
             replayTime = 0;
-            UnknownFunction41f550(0);
+            ToggleReplayPause(0);
             return 12;
         }
-        UnknownFunction41f550(1);
+        ToggleReplayPause(1);
         if (replayMode == 11) {
-            UnknownFunction41f550(0);
+            ToggleReplayPause(0);
             return 11;
         }
         return 1;
@@ -1532,14 +1532,14 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         ClearRacerParts();
         g_TrackGame->field_0x2e0 = 1.0f;
         if (replayMode == 14) {
-            UnknownFunction41f550(1);
+            ToggleReplayPause(1);
             replayMode = 4;
             return 1;
         }
         if (replaySeekTarget != -1.0f && replaySeekTarget > replayTime) {
             replayMode = 9;
             g_TrackGame->field_0x2e0 = 15.0f;
-            UnknownFunction41f550(0);
+            ToggleReplayPause(0);
             return 1;
         }
         if (replaySeekTarget != -1.0f) {
@@ -1551,9 +1551,9 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         return 1;
     } else if (a == -1) {
         UnknownBikeRaceVcrTick* tick = (UnknownBikeRaceVcrTick*)data;
-        if (field_0x3f9) {
+        if (replayStepFrame) {
             replayTime = tick->field_0x00;
-            UnknownFunction41f550(0);
+            ToggleReplayPause(0);
             return 7;
         }
         float step = replayTime / (float)field_0x1d4;
@@ -1585,7 +1585,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         }
         if (replayMode == 14) {
             if (replayTime > 0.5f) {
-                UnknownFunction41f550(0);
+                ToggleReplayPause(0);
                 ClearRacerParts();
                 return 5;
             }
@@ -1606,8 +1606,8 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         s_UnknownStatic578e8c = tick->field_0x00;
         return 1;
     } else if (a == 6) {
-        if (field_0x3f8) {
-            UnknownFunction41f550(0);
+        if (replayPaused) {
+            ToggleReplayPause(0);
         }
         return replayMode == 11 ? 11 : 1;
     } else if (a == 1) {

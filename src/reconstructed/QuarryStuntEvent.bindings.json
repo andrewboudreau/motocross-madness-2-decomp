@@ -156,5 +156,5 @@
   "_sprintf": "0x00534aaf",
   "_strncpy": "0x00534b10",
   "?UnknownFunction4e0560@BaseQuarryEvent@@QAEHXZ": "0x004e0560",
-  "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0"
+  "?InProCircuitCareer@TrackGame@@QAEHXZ": "0x00521cd0"
 }
