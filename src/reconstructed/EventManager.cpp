@@ -139,7 +139,7 @@ EventManager::EventManager(int flags) : GameObject(flags) {
     resumeArmed = 0;
     podiumCamera = 0;
     podiumObject = 0;
-    field_0x3c4 = Vector3(-1000.0f, -1000.0f, -1000.0f);
+    podiumPosition = Vector3(-1000.0f, -1000.0f, -1000.0f);
 }
 
 // 0x0045cae0
@@ -264,7 +264,7 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
             podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
         podiumCamera->UnknownFunction42e9b0(&podiumCameraPosition, 0, 0, 0, 0);
-        podiumCamera->UnknownVirtualSlot29(field_0x3d8);
+        podiumCamera->UnknownVirtualSlot29(podiumFocus);
         if (!g_TrackGame->field_0x3438 && g_TrackGame->field_0x3434 > 7.0f) {
             g_TrackGame->uiInteractionBlocked = 0;
             g_TrackGame->field_0x3438 = 1;

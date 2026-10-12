@@ -772,7 +772,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_TrackGame->eventManager->podiumObject =
         (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
             ->UnknownFunction401310(field_0x18, (int)lightManager, (int)&modelTextures, path,
-                                    g_TrackGame->eventManager->field_0x3c4, 0, 0, 2.0f, 0.5f, 0.5f, 0);
+                                    g_TrackGame->eventManager->podiumPosition, 0, 0, 2.0f, 0.5f, 0.5f, 0);
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
     if (auralScape) {

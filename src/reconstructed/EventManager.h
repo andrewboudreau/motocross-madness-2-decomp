@@ -202,10 +202,10 @@ public:
     int resultCount;                               // +0x4c: entries filled by 0x0045e9d0
     UnknownEventEntry results[11];                 // +0x50: one per racer, copied by RankRacers
     float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
-    Vector3 field_0x3c4;
+    Vector3 podiumPosition;                        // +0x3c4: where 0x0045d480 places the podium; characters stand at offsets from it
     ArcadeObject* podiumObject;                     // the podium (0x0045d480)
     Camera* podiumCamera;                           // a PCCamera (0x0045d480; constructor 0x004bed80)
-    Vector3 field_0x3d8;
+    Vector3 podiumFocus;                           // +0x3d8: podiumPosition + (0, 6, 0), or + (0, 6, -6) in the other layout; 0x0045d480 and slot 10 aim podiumCamera (slot 29) at it
     Vector3 podiumCameraPosition;                           // podium camera position (0x0045d480)
     Vector3 podiumCameraTarget;                           // its look target
     unsigned char field_0x3fc[0x414 - 0x3fc];
