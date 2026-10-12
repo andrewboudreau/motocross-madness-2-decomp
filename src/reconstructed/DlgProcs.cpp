@@ -1103,7 +1103,7 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
     list->RemoveAllRows();
     for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
         UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j];
-        if (model->modelKind == 2 || model->modelKind == 3 || model->field_0xc0) {
+        if (model->modelKind == 2 || model->modelKind == 3 || model->uiModel) {
             list->AddRow(model->displayName, j, 0);
             if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j].modelName,
                         g_TrackGame->mode.racerChoice.riderName))
@@ -1119,7 +1119,7 @@ void SPBikeRiderDlg::PaintPlateNumber(int number) {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
-            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
+            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture, number);
 }
 
 // 0x0044fa00: a click inside the bike preview (inset by 50 and 30 pixels)
@@ -1156,7 +1156,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[list->GetRowData(-1)];
-        ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].field_0xc0->plateTexture)
+        ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].uiModel->plateTexture)
             ->ReplaceMaterialTexture(0, bike->texture, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }
@@ -1186,10 +1186,10 @@ void SPBikeRiderDlg::ApplyChosenBike() {
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((UnknownKrustyUIModel*)ui->manufacturers)[i].field_0xc0->UnknownVirtualSlot4();
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->UnknownVirtualSlot4();
         ui = g_TrackGame->ui;
     }
-    model->field_0xc0->UnknownVirtualSlot5();
+    model->uiModel->UnknownVirtualSlot5();
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);

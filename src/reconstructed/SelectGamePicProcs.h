@@ -79,7 +79,7 @@ struct UnknownKrustyUIModel {
     char displayName[0x40];                   // +0x00: display name
     char modelName[0x40];                     // +0x40
     unsigned char field_0x80[0xc0 - 0x80];
-    UnknownKrustyUIModelObject* field_0xc0;
+    UnknownKrustyUIModelObject* uiModel;      // +0xc0
     int modelKind;                            // +0xc4: kind
 };
 

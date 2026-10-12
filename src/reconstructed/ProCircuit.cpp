@@ -403,7 +403,7 @@ void UnknownTrackGameObject3444::PickComputerRacers()
         do {
             ui = g_TrackGame->ui;
             rider = &((UnknownKrustyUIModel*)ui->riders)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->riderCount - 1))];
-        } while (rider->field_0xc0 || rider->modelKind != riderKind);
+        } while (rider->uiModel || rider->modelKind != riderKind);
         UNKNOWN_COPY_TEXT(racers[racer].riderModel, rider->modelName)
 
         UnknownKrustyUIBike* bike;

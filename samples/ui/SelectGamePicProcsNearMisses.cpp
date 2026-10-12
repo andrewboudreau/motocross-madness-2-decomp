@@ -123,7 +123,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
     list->RemoveAllRows();
     for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
         UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j];
-        if (entry->modelKind == 2 || entry->modelKind == 3 || entry->field_0xc0) {
+        if (entry->modelKind == 2 || entry->modelKind == 3 || entry->uiModel) {
             list->AddRow(entry->displayName, j, 0);
             if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j].modelName,
                         g_TrackGame->mode.racerChoice.riderName))
@@ -183,7 +183,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)].model];
-        model->field_0xc0->SetMotionByName("WaitB");
+        model->uiModel->SetMotionByName("WaitB");
         g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
         idleMotionPlaying = 1;
     }

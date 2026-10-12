@@ -917,7 +917,7 @@ void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.PaintNumber(
-            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
+            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].uiModel->plateTexture, number);
 }
 
 // 0x004d72a0
@@ -946,10 +946,10 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((UnknownKrustyUIModel*)ui->manufacturers)[i].field_0xc0->UnknownVirtualSlot4();
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->UnknownVirtualSlot4();
         ui = g_TrackGame->ui;
     }
-    model->field_0xc0->UnknownVirtualSlot5();
+    model->uiModel->UnknownVirtualSlot5();
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -1181,7 +1181,7 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     list->RemoveAllRows();
     for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
         UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j];
-        if (entry->modelKind <= g_TrackGame->proCircuit->maxModelKind || entry->field_0xc0) {
+        if (entry->modelKind <= g_TrackGame->proCircuit->maxModelKind || entry->uiModel) {
             list->AddRow(entry->displayName, j, 0);
             if (g_TrackGame->proCircuit->riderRow == j)
                 rider = j;
@@ -1202,7 +1202,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
         KrustyUI* ui = g_TrackGame->ui;
         int bike = list->GetRowData(-1);
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)ui->bikes)[bike];
-        ((UnknownProCircuitSkinned*)((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].field_0xc0->plateTexture)
+        ((UnknownProCircuitSkinned*)((UnknownKrustyUIModel*)ui->manufacturers)[entry->model].uiModel->plateTexture)
             ->ReplaceMaterialTexture(0, entry->texture, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }

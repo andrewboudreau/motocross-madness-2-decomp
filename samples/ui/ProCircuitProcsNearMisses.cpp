@@ -342,7 +342,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)].model];
-        model->field_0xc0->SetMotionByName("WaitB");
+        model->uiModel->SetMotionByName("WaitB");
         g_TrackGame->ui->riderPreview->SetMotionByName("WaitR");
         idleMotionPlaying = 1;
     }
