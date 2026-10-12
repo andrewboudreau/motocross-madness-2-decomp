@@ -340,9 +340,14 @@ static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 }
 
 // 0x00461640: reads `count` items of `size` bytes, from the buffer first, and
-// returns how many it read. Near miss (about 32%): retail keeps the advanced
-// buffer pointer in ecx and tail-merges the two encoded 45c7b0 calls; VC6 here
-// does neither.
+// returns how many it read. Near miss (389 of 671): a separate `out` pointer
+// for the advanced buffer (202 when `buffer` itself is advanced) gives
+// retail's ecx copy homed in the dead `buffer` slot. Left: retail loads the
+// file pointer (+0x14) into eax or ebx where VC6 here uses edx, cross-jumps
+// the empty-buffer encoded call into the later one (VC6 here keeps three
+// 45c7b0 calls) and keeps the two `(done + read) / size` failure returns
+// apart (VC6 here merges them). A key pointer local (24) and `left`
+// computed before the encoded test (372) are worse.
 int UnknownTextureStream::Read(void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
@@ -363,29 +368,29 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
         }
         memcpy(buffer, stream->field_0x124, available);
         stream->field_0x124 = stream->field_0x128;
-        buffer = (char*)buffer + available;
+        char* out = (char*)buffer + available;
         int part = (unsigned)available % (unsigned)size;
         if (part) {
             if (stream->field_0x08) {
-                if (!ReadXorDecoded((unsigned char*)buffer, part, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+                if (!ReadXorDecoded((unsigned char*)out, part, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
                     return 0;
                 }
-            } else if (!fread(buffer, part, 1, stream->field_0x14)) {
+            } else if (!fread(out, part, 1, stream->field_0x14)) {
                 return (unsigned)available / (unsigned)size;
             }
             if (part == total - available) {
                 return count;
             }
-            buffer = (char*)buffer + part;
+            out += part;
         }
         if (stream->field_0x08) {
-            if (!ReadXorDecoded((unsigned char*)buffer, size, count - (unsigned)(part + available) / (unsigned)size, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+            if (!ReadXorDecoded((unsigned char*)out, size, count - (unsigned)(part + available) / (unsigned)size, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
                 return count - 1;
             }
             return count;
         }
         int left = count - (unsigned)(part + available) / (unsigned)size;
-        int read = fread(buffer, size, left, stream->field_0x14);
+        int read = fread(out, size, left, stream->field_0x14);
         if (read == left) {
             return count;
         }
