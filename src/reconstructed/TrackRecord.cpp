@@ -140,9 +140,9 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
 int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 {
     char name[16];
-    int n = strlen(g_TrackGame->eventManager->results[racer].field_0x40);
+    int n = strlen(g_TrackGame->eventManager->results[racer].name);
     int length = n > 15 ? 15 : n;
-    strncpy(name, g_TrackGame->eventManager->results[racer].field_0x40, length);
+    strncpy(name, g_TrackGame->eventManager->results[racer].name, length);
     name[length] = 0;
     float value = 0.0f;
     switch (kind) {

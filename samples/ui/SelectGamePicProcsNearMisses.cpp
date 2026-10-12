@@ -247,7 +247,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
                 entry.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
-                entry.points = g_TrackGame->eventManager->results[i].field_0x28;
+                entry.points = g_TrackGame->eventManager->results[i].points;
                 entry.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
                 ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
             }

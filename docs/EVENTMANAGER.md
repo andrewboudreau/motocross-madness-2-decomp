@@ -25,7 +25,10 @@ consumes it). `RankRacers` names the result block: `racesRun` (+0x48, a
 byte it increments in mode 2; the dialogs show it as "%d/%d" against the
 series length), `resultCount` (+0x4c) and `results` (+0x50, the 11 entries it
 fills). +0x3c0 keeps its placeholder name because TrackOverlay.cpp (render
-lane) reads it.
+lane) reads it. In each `results` entry (`UnknownEventEntry`), `CopyFromRacer`
+names `playerId` (+0x00, racer +0x11bc), `position` (+0x04, 99 for a racer
+with +0x4a0 set), `finished` (+0x20, racer +0x7a4) and `name` (+0x40, racer
++0x5e0); `points` (+0x28) is what `AddChampionshipPoints` adds to.
 
 ## Status
 

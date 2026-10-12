@@ -67,7 +67,7 @@ void UnknownFunction417b30(int* keys, int* values, int count) {
 void BikeRace::UnknownFunction417bc0(int* order) {
     int points[11];
     for (int i = 0; i < racerCount; i++) {
-        points[i] = g_TrackGame->eventManager->results[i].field_0x28;
+        points[i] = g_TrackGame->eventManager->results[i].points;
         order[i] = i + 1;
     }
     UnknownFunction417b30(points, order, racerCount);

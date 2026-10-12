@@ -140,22 +140,22 @@ int UnknownTrackGameObject3410::UnknownFunction49c770()
         field_0x254 = g_TrackGame->mode.field_0x27f8.field_0x34;
         field_0x2a4.field_0x02 = g_TrackGame->mode.field_0x27f8.field_0x20;
         for (; i < g_TrackGame->field_0x18; i++) {
-            field_0x2a4.field_0x08[i].field_0x02 = g_TrackGame->eventManager->results[i].field_0x04;
+            field_0x2a4.field_0x08[i].field_0x02 = g_TrackGame->eventManager->results[i].position;
             field_0x2a4.field_0x08[i].field_0x04 = (int)(g_TrackGame->eventManager->results[i].field_0x08 * 100.0f);
             field_0x2a4.field_0x08[i].field_0x08 = (int)(g_TrackGame->eventManager->results[i].field_0x14 * 100.0f);
             if (longest < field_0x2a4.field_0x08[i].field_0x08)
                 longest = field_0x2a4.field_0x08[i].field_0x08;
             field_0x2a4.field_0x08[i].field_0x0c = g_TrackGame->eventManager->results[i].field_0x0c;
             field_0x08[i].field_0x40 = field_0x2a4.field_0x08[i].field_0x02;
-            strcpy(field_0x08[i].field_0x00, g_TrackGame->eventManager->results[i].field_0x40);
-            if (g_TrackGame->eventManager->results[i].field_0x20) {
+            strcpy(field_0x08[i].field_0x00, g_TrackGame->eventManager->results[i].name);
+            if (g_TrackGame->eventManager->results[i].finished) {
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4)
                     field_0x08[i].field_0x44 = (int)(g_TrackGame->eventManager->results[i].field_0x08 * 100.0f);
                 else
                     field_0x08[i].field_0x44 = (int)g_TrackGame->eventManager->results[i].field_0x2c;
             }
             for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
-                if (g_TrackGame->eventManager->results[i].field_0x00 == g_TrackGame->mode.field_0x1be4[j].field_0xd4) {
+                if (g_TrackGame->eventManager->results[i].playerId == g_TrackGame->mode.field_0x1be4[j].field_0xd4) {
                     field_0x2a0 = g_TrackGame->mode.field_0x1be4[j].field_0xc4;
                     break;
                 }

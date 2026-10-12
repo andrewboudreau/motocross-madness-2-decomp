@@ -2038,7 +2038,7 @@ void LeaveMenusForRace() {
         g_TrackGame->mode.field_0x10ec = 1;
         g_TrackGame->eventManager->racesRun = 0;
         for (int i = 0; i < 11; i++)
-            g_TrackGame->eventManager->results[i].field_0x28 = 0;
+            g_TrackGame->eventManager->results[i].points = 0;
     }
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
     if (g_TrackGame->ui->gui->field_0x03c)

@@ -224,7 +224,7 @@ int EventManager::CreatePodiumScene() {
         if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
             return 0;
         if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 && !g_TrackGame->network &&
-            results[0].field_0x04 > 3)
+            results[0].position > 3)
             return 0;
     }
     UnknownFunction45cdc0(1);

@@ -61,19 +61,19 @@ UnknownEventEntry::UnknownEventEntry() {
 
 // 0x0045c840: an empty entry in position 1.
 void UnknownEventEntry::Reset() {
-    field_0x00 = 0;
-    field_0x04 = 1;
+    playerId = 0;
+    position = 1;
     field_0x08 = 0;
     field_0x14 = 0;
-    field_0x28 = 0;
+    points = 0;
     field_0x2c = 0;
     field_0x30 = 0;
     field_0x0c = 0;
     field_0x10 = 0;
     field_0x18 = 0;
     field_0x1c = 0;
-    field_0x20 = 0;
-    strcpy(field_0x40, "");
+    finished = 0;
+    strcpy(name, "");
     field_0x24 = 0;
     field_0x34[0] = 0;
     field_0x34[1] = 0;
@@ -84,15 +84,15 @@ void UnknownEventEntry::Reset() {
 // position 99 with nothing else; in modes 0 and 4 every racer counts as
 // finished.
 void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
-    field_0x00 = racer->field_0x11bc;
+    playerId = racer->field_0x11bc;
     int length = strlen(racer->field_0x5e0);
     int count = length > 15 ? 15 : length;
-    strncpy(field_0x40, racer->field_0x5e0, count);
-    field_0x40[count] = 0;
+    strncpy(name, racer->field_0x5e0, count);
+    name[count] = 0;
     field_0x24 = racer->field_0x4a0;
     if (!field_0x24) {
         field_0x2c = racer->field_0x768;
-        field_0x04 = racer->field_0x784;
+        position = racer->field_0x784;
         field_0x08 = racer->field_0x750;
         field_0x14 = racer->field_0x754;
         field_0x0c = racer->field_0x788;
@@ -104,12 +104,12 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         field_0x34[1] = racer->field_0x7ac[1];
         field_0x34[2] = racer->field_0x7ac[2];
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0 || g_TrackGame->mode.field_0x27f8.field_0x04 == 4)
-            field_0x20 = 1;
+            finished = 1;
         else
-            field_0x20 = racer->field_0x7a4;
+            finished = racer->field_0x7a4;
     } else {
         field_0x2c = 0;
-        field_0x04 = 99;
+        position = 99;
         field_0x08 = 0;
         field_0x14 = 0;
         field_0x0c = 0;
@@ -120,7 +120,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         field_0x34[0] = 0;
         field_0x34[1] = 0;
         field_0x34[2] = 0;
-        field_0x20 = 0;
+        finished = 0;
     }
 }
 
@@ -524,7 +524,7 @@ void EventManager::UnknownFunction45fbd0(int player) {
     if (g_TrackGame->field_0x18 < 2)
         return;
     for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
-        if (results[i].field_0x00 == player) {
+        if (results[i].playerId == player) {
             if (!results[i].field_0x30)
                 g_TrackGame->field_0x18--;
             else
@@ -760,7 +760,7 @@ void EventManager::RankRacers() {
             results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.field_0x27f8.field_0x00 == 2 || g_TrackGame->field_0x3444) &&
                 !racer->field_0x4a0)
-                AddChampionshipPoints(racer, &results[count].field_0x28);
+                AddChampionshipPoints(racer, &results[count].points);
             count++;
         }
         break;
@@ -783,7 +783,7 @@ void EventManager::RankRacers() {
         for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
             results[count].CopyFromRacer(racer);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                AddChampionshipPoints(racer, &results[count].field_0x28);
+                AddChampionshipPoints(racer, &results[count].points);
             count++;
         }
         break;
@@ -807,7 +807,7 @@ void EventManager::RankRacers() {
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                    AddChampionshipPoints(racer, &results[count].field_0x28);
+                    AddChampionshipPoints(racer, &results[count].points);
                 count++;
             }
         } else {
@@ -828,7 +828,7 @@ void EventManager::RankRacers() {
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
                 results[count].CopyFromRacer(racer);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                    AddChampionshipPoints(racer, &results[count].field_0x28);
+                    AddChampionshipPoints(racer, &results[count].points);
                 count++;
             }
         }
@@ -841,7 +841,7 @@ void EventManager::RankRacers() {
         int standing = 0;
         while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
             if (!racer->field_0x4a0) {
-                standings[standing].field_0x00 = results[standing].field_0x28;
+                standings[standing].field_0x00 = results[standing].points;
                 standings[standing].racer = racer;
                 standing++;
             }
@@ -857,8 +857,8 @@ void EventManager::RankRacers() {
                 }
             }
             for (i = 0; i < standing; i++) {
-                if (results[i].field_0x00 == racer->field_0x11bc && results[i].field_0x30 == racer->field_0x11c0) {
-                    results[i].field_0x04 = racer->field_0x784;
+                if (results[i].playerId == racer->field_0x11bc && results[i].field_0x30 == racer->field_0x11c0) {
+                    results[i].position = racer->field_0x784;
                     break;
                 }
             }

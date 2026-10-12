@@ -480,19 +480,19 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UIControl* button = FindControl("ButStats3", 0);
             button->SetText(title);
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
-                sprintf(position, "%d", g_TrackGame->eventManager->results[i].field_0x04);
+                sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
                 UnknownFunction518690(time, g_TrackGame->eventManager->results[i].field_0x08);
-                if (g_TrackGame->eventManager->results[i].field_0x20)
+                if (g_TrackGame->eventManager->results[i].finished)
                     UnknownFunction518690(best, g_TrackGame->eventManager->results[i].field_0x14);
                 else
                     g_TrackGame->LoadResourceString(0xff0, best, 0x80);
                 sprintf(score, "%s (%s)", time, best);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-                    sprintf(points, "%d", g_TrackGame->eventManager->results[i].field_0x28);
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, position,
+                    sprintf(points, "%d", g_TrackGame->eventManager->results[i].points);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position,
                                  score, points);
                 } else {
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, position,
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position,
                                  score, 0);
                 }
             }
@@ -513,10 +513,10 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].field_0x2c);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-                    sprintf(score, "%d", g_TrackGame->eventManager->results[i].field_0x28);
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, 0, position, score);
+                    sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, score);
                 } else {
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, 0, position, 0);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, 0);
                 }
             }
             UIListBox* stats = static_cast<UIListBox*>(FindControl("LstStats4", 0));
@@ -599,19 +599,19 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         button->SetText(title);
         for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
             if (!g_TrackGame->eventManager->results[i].field_0x24) {
-                sprintf(position, "%d", g_TrackGame->eventManager->results[i].field_0x04);
+                sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
                 UnknownFunction518690(time, g_TrackGame->eventManager->results[i].field_0x08);
-                if (g_TrackGame->eventManager->results[i].field_0x20)
+                if (g_TrackGame->eventManager->results[i].finished)
                     UnknownFunction518690(best, g_TrackGame->eventManager->results[i].field_0x14);
                 else
                     g_TrackGame->LoadResourceString(0xff0, best, 0x80);
                 sprintf(score, "%s (%s)", time, best);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-                    sprintf(points, "%d", g_TrackGame->eventManager->results[i].field_0x28);
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, position, score,
+                    sprintf(points, "%d", g_TrackGame->eventManager->results[i].points);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score,
                                  points);
                 } else {
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, position, score, 0);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score, 0);
                 }
             }
         }
@@ -632,10 +632,10 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             if (!g_TrackGame->eventManager->results[i].field_0x24) {
                 sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].field_0x2c);
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-                    sprintf(score, "%d", g_TrackGame->eventManager->results[i].field_0x28);
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, 0, position, score);
+                    sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, score);
                 } else {
-                    AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, 0, position, 0);
+                    AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, 0);
                 }
             }
         }
@@ -657,10 +657,10 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 if (!g_TrackGame->eventManager->results[i].field_0x24) {
                     sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].field_0x2c);
                     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-                        sprintf(score, "%d", g_TrackGame->eventManager->results[i].field_0x28);
-                        AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, 0, position, score);
+                        sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
+                        AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, score);
                     } else {
-                        AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, 0, position, 0);
+                        AddStatsRows(event, g_TrackGame->eventManager->results[i].name, 0, position, 0);
                     }
                 }
             }
@@ -682,15 +682,15 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
                 if (!g_TrackGame->eventManager->results[i].field_0x24) {
-                    sprintf(position, "%d", g_TrackGame->eventManager->results[i].field_0x04);
+                    sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
                     UnknownFunction518690(score, g_TrackGame->eventManager->results[i].field_0x1c);
                     UnknownFunction518690(points, g_TrackGame->eventManager->results[i].field_0x18);
                     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
-                        sprintf(points, "%d", g_TrackGame->eventManager->results[i].field_0x28);
-                        AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, position, score,
+                        sprintf(points, "%d", g_TrackGame->eventManager->results[i].points);
+                        AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score,
                                      points);
                     } else {
-                        AddStatsRows(event, g_TrackGame->eventManager->results[i].field_0x40, position, score,
+                        AddStatsRows(event, g_TrackGame->eventManager->results[i].name, position, score,
                                      points);
                     }
                 }
