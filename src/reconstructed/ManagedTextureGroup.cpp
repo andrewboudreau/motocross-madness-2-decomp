@@ -102,7 +102,7 @@ int ManagedTextureGroup::SetPageCount(int count) {
                 page->Release();
                 return 0;
             }
-            field_0x3c += page->field_0x184;
+            field_0x3c += page->texelCount;
             page->field_0x18 = 256;
             page->field_0x14 = 256;
             field_0x54.Append(page);
@@ -110,7 +110,7 @@ int ManagedTextureGroup::SetPageCount(int count) {
     } else if (change < 0) {
         TextureMap* page = field_0x54.Last();
         while (change++ < 0) {
-            field_0x3c -= static_cast<CacheTexture*>(page)->field_0x184;
+            field_0x3c -= static_cast<CacheTexture*>(page)->texelCount;
             field_0x54.Remove(page);
             page = field_0x54.Last();
         }
@@ -151,7 +151,7 @@ void ManagedTextureGroup::UnknownFunction50c790() {
         if (cache->textureSurface && cache->textureSurface->IsLost()) {
             cache->UnknownVirtualSlot10();
             cache->UnknownVirtualSlot8(1, 0, 0);
-            cache->UnknownFunction50fc40();
+            cache->EmptyPage();
         }
     }
 }

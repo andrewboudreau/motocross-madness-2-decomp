@@ -64,7 +64,7 @@ void ManagedTexture::UnknownFunction510670() {
 // 0x00510700
 void ManagedTexture::ReleasePage() {
     if (page) {
-        page->UnknownFunction5102b0(this);
+        page->RemoveTexture(this);
         page = 0;
         region = 0;
         pageOffsetV = 0;

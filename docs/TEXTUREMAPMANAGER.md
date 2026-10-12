@@ -188,6 +188,16 @@ per level (+0xd0, nine `ContainerList`s of 32). Exact:
   then `region`); the final walk reads a step's region before its index,
   which bases the strength-reduced step pointer at the index field.
 
+Provisional names from that behaviour: `ListTextures` `0x0050f890`,
+`CollectOccupants` `0x0050f8e0`, `ReserveRegions` `0x0050f9b0`, `EmptyPage`
+`0x0050fc40`, `FirstQuarter` `0x0050fc60`, `EvictRegion` `0x0050fc90`,
+`FreeQuarters` `0x0050fd60`, `PlaceTextures` `0x0050fdb0`, `SplitRegion`
+`0x0050ffa0`, `ReleaseRegion` `0x00510120`, `PlaceTexture` `0x00510250`,
+`RemoveTexture` `0x005102b0` and `CopyMipLevels` `0x005102d0`; fields
+`ownerGroup` (+0x80), `rootRegion` (+0x84), `freeLeafCounts` (+0x88),
+`reservedLeafCounts` (+0xac), `reservedLeaves` (+0xd0) and `texelCount`
+(+0x184).
+
 Two recurring VC6 shapes: chained assignments (`a = b = 0`) give retail's
 reversed store order, and the region `Init` helper is inlined wherever a
 block is taken.

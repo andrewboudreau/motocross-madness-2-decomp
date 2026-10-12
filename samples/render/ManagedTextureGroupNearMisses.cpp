@@ -163,7 +163,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
     for (texture = field_0x54.First(); texture; texture = field_0x54.Next()) {
         CacheTexture* page = static_cast<CacheTexture*>(texture);
         page->field_0x18c = -(page->field_0x14 * page->field_0x18);
-        page->UnknownFunction50f890(&field_0x180);
+        page->ListTextures(&field_0x180);
         for (int j = 0; j < field_0x180.m_count; j++) {
             ManagedTexture* managed = field_0x180.Get(j);
             if (managed->plannedLevel > 0)
@@ -187,7 +187,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
             break;
         field_0x54.Remove(best);
         emptied.Append(best);
-        best->UnknownFunction50f890(&field_0x194);
+        best->ListTextures(&field_0x194);
         freed += best->field_0x14 * best->field_0x18;
         for (int j = 0; j < field_0x194.m_count; j++) {
             ManagedTexture* managed = field_0x194.Get(j);
@@ -197,7 +197,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
             field_0x16c.Remove(managed);
             managed->ReleasePage();
         }
-        best->UnknownFunction50fc40();
+        best->EmptyPage();
     }
 
     freed -= FitTexturesToBudget(&field_0x158, freed); // now the spare texels
@@ -223,8 +223,8 @@ void ManagedTextureGroup::UnknownFunction50c960() {
             break;
         CacheTexture* page = static_cast<CacheTexture*>(texture);
         filled++;
-        page->UnknownFunction50f9b0(levels, 8);
-        page->UnknownFunction50fdb0(&field_0x158, 0);
+        page->ReserveRegions(levels, 8);
+        page->PlaceTextures(&field_0x158, 0);
         page->UnknownVirtualSlot9(0, -1);
     }
     field_0x54.AppendList(&emptied);
@@ -468,7 +468,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
     pages[8] = 0;
     while (whole && texture) {
         TextureMap* next = texture->field_0x08;
-        UnknownTextureRegion* region = static_cast<CacheTexture*>(texture)->field_0x84;
+        UnknownTextureRegion* region = static_cast<CacheTexture*>(texture)->rootRegion;
         if (region && region->field_0x2c && !region->field_0x00[0]) {
             field_0x54.Remove(texture);
             emptied.Append(texture);
@@ -483,19 +483,19 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
         TextureMap* previous = texture->field_0x0c;
         field_0x54.Remove(texture);
         emptied.Append(texture);
-        static_cast<CacheTexture*>(texture)->UnknownFunction50f9b0(wanted, 8);
+        static_cast<CacheTexture*>(texture)->ReserveRegions(wanted, 8);
         whole--;
         texture = previous;
     }
     texture = field_0x54.First();
     while (texture) {
-        int full = static_cast<CacheTexture*>(texture)->UnknownFunction50f9b0(pages, 8);
+        int full = static_cast<CacheTexture*>(texture)->ReserveRegions(pages, 8);
         texture = field_0x54.Next();
         if (full)
             break;
     }
     for (; texture; texture = field_0x54.Next())
-        static_cast<CacheTexture*>(texture)->UnknownFunction50fc40();
+        static_cast<CacheTexture*>(texture)->EmptyPage();
 
     i = 0;
     while (i < field_0x7c.m_count) {
@@ -513,13 +513,13 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
     if (field_0x7c.m_count > 0) {
         texture = field_0x54.Last();
         while (field_0x7c.m_count > 0 && field_0x7c.Get(0)->plannedLevel == 8) {
-            static_cast<CacheTexture*>(texture)->UnknownFunction50fdb0(&field_0x7c, &field_0x144);
+            static_cast<CacheTexture*>(texture)->PlaceTextures(&field_0x7c, &field_0x144);
             field_0x1cc++;
             texture = field_0x54.Previous();
         }
         texture = field_0x54.First();
         while (texture) {
-            int done = static_cast<CacheTexture*>(texture)->UnknownFunction50fdb0(&field_0x7c, &field_0x144);
+            int done = static_cast<CacheTexture*>(texture)->PlaceTextures(&field_0x7c, &field_0x144);
             field_0x1cc++;
             if (done)
                 break;
@@ -561,7 +561,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
         for (i = 0; i < field_0x144.m_count; i++) {
             managed = field_0x144.Get(i);
             managed->field_0x98 = managed->field_0x9c;
-            managed->page->UnknownFunction5102d0(managed->region, managed->field_0x9c);
+            managed->page->CopyMipLevels(managed->region, managed->field_0x9c);
         }
     }
 
@@ -729,7 +729,7 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
         rect.right = page->field_0x14;
         rect.bottom = page->field_0x18 + 20;
         surface->Blt(&rect, 0, 0, 0x400, &effects);
-        static_cast<CacheTexture*>(page)->UnknownFunction50f890(&field_0x1a8);
+        static_cast<CacheTexture*>(page)->ListTextures(&field_0x1a8);
         long pitch;
         unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
         if (bits) {
