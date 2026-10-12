@@ -85,7 +85,7 @@
     "target_va": "0x005135f0",
     "target_size": 1664,
     "expect": "partial",
-    "notes": "559/1666 (tier 3 name): contact-patch update. The normal lever is Cross(TireProjectOnto(axis, n), rel) and the slip vector the CollisionVec3 operators' axis * speed + lever (their temporary gives retail's 0x18 frame). Left: retail homes the projected vector in the dead `axis` argument slot (here a frame temporary), loads the normal through ecx, and differs in the tail paths' copies.",
+    "notes": "1555/1664 strict (tier 3 name): contact-patch update. The reject output is a `tangent` local, so VC6 reuses the dead `axis` slot like retail; `(-c) * x` keeps the negation inside each branch. Left: scheduling of the lever store, the slip-vector scale operand order, two struct-copy store pairs and one dot-term operand order (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {

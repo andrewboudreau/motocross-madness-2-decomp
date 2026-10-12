@@ -252,10 +252,18 @@ static inline float TireLengthFromSq(float lenSq)
     return FastSqrt(lenSq);
 }
 
+// v / len through the out-of-line constructor; the reciprocal is taken from the
+// loaded length (`fld len; fdivr 1.0`).
+static inline CollisionVec3 TireDivide(const CollisionVec3& v, float len)
+{
+    float inv = 1.0f / len;
+    return CollisionVec3(v.x * inv, v.y * inv, v.z * inv);
+}
+
 // The part of v along the unit normal n.
 static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const CollisionVec3& n)
 {
-    float k = v.y * n.y + v.x * n.x + v.z * n.z;
+    float k = TireDotInline(v, n);
     CollisionVec3 p;
     p.x = k * n.x;
     p.y = k * n.y;
@@ -267,11 +275,19 @@ static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const Collis
 // members are addressed through the subobject (+0xb8).
 //   field_0x38 = contact position - *pos, field_0x5c = axis x field_0x38;
 //   field_0x218 = (n (axis . n)) x field_0x38 with n = the contact normal field_0x2c.
-// When minLength > 0.001 the axis is first projected off the normal (0x0043b190) and
-// renormalised and the tangent vector field_0x1e8 = field_0x90 * axis + field_0x218;
-// otherwise (or when the projected dot is <= 0.001) field_0x1e8 = field_0x218.
+// When minLength > 0.001, `ref` is rejected from the normal into `tangent` (0x0043b190)
+// and renormalised, field_0x90 = tangent . ref and the slip vector field_0x1e8 =
+// field_0x90 * tangent + field_0x218; otherwise (or when that dot is <= 0.001, which
+// also zeroes field_0x90) field_0x1e8 = field_0x218.
 // field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
 // |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
+// Near miss, 1555 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
+// projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps retail's
+// fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. Left: the
+// lever's `lea edi` and store are scheduled later, the slip vector is scaled as
+// `fld st(0); fmul mem` (retail `fld mem; fmul st(1)`) with its TireDot pushes
+// together, two struct-copy stores trade places, and one x term of the d-path dot
+// swaps its operands.
 void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                               float minLength, float* outValue, int* outSign)
 {
@@ -287,16 +303,17 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
                                       this->CollisionPoint::relativePosition);
 
     if (minLength > 0.001f) {
-        if (CollisionRejectFrom(&axis, &ref, &this->CollisionPoint::surfaceNormal)) {
+        CollisionVec3 tangent;
+        if (CollisionRejectFrom(&tangent, &ref, &this->CollisionPoint::surfaceNormal)) {
             CollisionVec3 n;
-            axis = *Vec3Normalize(&n, &axis);
+            tangent = *Vec3Normalize(&n, &tangent);
         }
-        float d = axis.y * ref.y + axis.x * ref.x + axis.z * ref.z;
+        float d = tangent.y * ref.y + tangent.x * ref.x + tangent.z * ref.z;
         this->CollisionPoint::tangentSpeed = d;
         if (d > 0.001f) {
             if (reportContactOutputs)
                 *outValue = d;
-            slipVector = axis * this->CollisionPoint::tangentSpeed + normalLeverCross;
+            slipVector = tangent * this->CollisionPoint::tangentSpeed + normalLeverCross;
             float lenSq = TireDot(&slipVector, &slipVector);
             float len;
             if (lenSq == 0.0f)
@@ -306,46 +323,41 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             else
                 len = 1.0f / FastInvSqrt(lenSq);
             float inv = 1.0f / len;
-            this->CollisionPoint::frictionDirection.x = slipVector.x * inv;
-            this->CollisionPoint::frictionDirection.y = slipVector.y * inv;
-            this->CollisionPoint::frictionDirection.z = slipVector.z * inv;
+            this->CollisionPoint::frictionDirection = slipVector * inv;
             lenSq = TireDot(&normalLeverCross, &normalLeverCross);
             this->CollisionPoint::spinSpeed = TireLengthFromSq(lenSq);
-            float c = this->CollisionPoint::frictionDirection.y * rollDirection.y + this->CollisionPoint::frictionDirection.x * rollDirection.x +
-                      this->CollisionPoint::frictionDirection.z * rollDirection.z;
-            lenSq = TireDot(&slipVector, &slipVector);
+            float c = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
             if (c >= 0.0f) {
-                slipSpeed = TireLengthFromSq(lenSq) * c;
+                slipSpeed = TireLengthFromSq(TireDot(&slipVector, &slipVector)) * c;
                 if (reportContactOutputs)
                     *outSign = 1;
             } else {
-                slipSpeed = -c * TireLengthFromSq(lenSq);
+                slipSpeed = (-c) * TireLengthFromSq(TireDot(&slipVector, &slipVector));
                 if (reportContactOutputs)
                     *outSign = 0;
             }
             return;
         }
         // d <= 0.001: same tail as the short-axis case below, with the dot product inlined.
+        this->CollisionPoint::tangentSpeed = 0.0f;
         slipVector = normalLeverCross;
         float len = TireLengthFromSq(TireDot(&slipVector, &slipVector));
         this->CollisionPoint::spinSpeed = len;
         if (reportContactOutputs)
             *outValue = len;
         if (this->CollisionPoint::spinSpeed > 0.001f) {
-            float inv = 1.0f / this->CollisionPoint::spinSpeed;
-            this->CollisionPoint::frictionDirection = CollisionVec3(slipVector.x * inv, slipVector.y * inv, slipVector.z * inv);
+            this->CollisionPoint::frictionDirection = TireDivide(slipVector, this->CollisionPoint::spinSpeed);
         } else {
             this->CollisionPoint::frictionDirection = kVec3Zero;
             this->CollisionPoint::spinSpeed = 0.0f;
         }
-        float c = this->CollisionPoint::frictionDirection.y * rollDirection.y + this->CollisionPoint::frictionDirection.x * rollDirection.x +
-                  this->CollisionPoint::frictionDirection.z * rollDirection.z;
+        float c = TireDotInline(this->CollisionPoint::frictionDirection, rollDirection);
         if (c >= 0.0f) {
             slipSpeed = c * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 1;
         } else {
-            slipSpeed = -c * this->CollisionPoint::spinSpeed;
+            slipSpeed = (-c) * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 0;
         }
@@ -357,8 +369,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
         if (reportContactOutputs)
             *outValue = len;
         if (this->CollisionPoint::spinSpeed > 0.001f) {
-            float inv = 1.0f / this->CollisionPoint::spinSpeed;
-            this->CollisionPoint::frictionDirection = CollisionVec3(slipVector.x * inv, slipVector.y * inv, slipVector.z * inv);
+            this->CollisionPoint::frictionDirection = TireDivide(slipVector, this->CollisionPoint::spinSpeed);
         } else {
             this->CollisionPoint::frictionDirection = kVec3Zero;
             this->CollisionPoint::spinSpeed = 0.0f;
@@ -369,7 +380,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             if (reportContactOutputs)
                 *outSign = 1;
         } else {
-            slipSpeed = -c * this->CollisionPoint::spinSpeed;
+            slipSpeed = (-c) * this->CollisionPoint::spinSpeed;
             if (reportContactOutputs)
                 *outSign = 0;
         }
