@@ -20,6 +20,10 @@
 // const-reference aliases of the fields, and the fields read directly in the
 // ternary; a `keep` local for the selected value, block-scoping the two
 // locals and the /G6 and /ML profiles leave the fstp where it is.
+// Session 10 also left it in place with an inline StartRole wrapper, a
+// slots pointer local, a by-pointer BankRun helper, a reference alias of
+// the racer, the zero store folded into an argument or as an int store,
+// and bool/char/short/pointer/float types for the slot 50 arguments.
 
 #include <stdlib.h>
 
