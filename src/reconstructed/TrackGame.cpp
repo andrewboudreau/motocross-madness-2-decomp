@@ -305,7 +305,7 @@ int TrackGame::UnknownVirtualSlot4() {
             }
         }
         if (network->lobbyConnected) {
-            ui->field_0x2c->ShowCursors(1);
+            ui->gui->ShowCursors(1);
             ui->UnknownFunction498cf0(-1);
             char name[16];
             network->GetPlayerName(network->localPlayer, name);
@@ -422,11 +422,11 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
     } else {
         if (!menuIsOpen)
             return;
-        if (!ui->field_0x2c->FindInputDialog())
+        if (!ui->gui->FindInputDialog())
             return;
-        if (id != ui->field_0x3c)
+        if (id != ui->currentMenu)
             return;
-        ui->field_0x2c->FindInputDialog()->UnknownVirtualSlot26();
+        ui->gui->FindInputDialog()->UnknownVirtualSlot26();
         GameObject* current = eventManager->FindRaceMode();
         if (current)
             current->UnknownVirtualSlot5();

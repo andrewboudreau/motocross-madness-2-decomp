@@ -526,19 +526,19 @@ void SinglePlayerDlg::OpenPage(int page) {
     case 0:
         if (!eventPage) {
             eventPage = new(__FILE__, 1401) SPEventDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(eventPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(eventPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!bikeRiderPage) {
             bikeRiderPage = new(__FILE__, 1407) SPBikeRiderDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(bikeRiderPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(bikeRiderPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!raceInfoPage) {
             raceInfoPage = new(__FILE__, 1413) SPRaceInfoDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(raceInfoPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(raceInfoPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     }
@@ -647,7 +647,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
                 ListGhosts();
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) != 2) {
                 g_TrackGame->mode.field_0x10ec = 0;
-                g_TrackGame->eventManager->field_0x48 = 0;
+                g_TrackGame->eventManager->racesRun = 0;
             }
             ShowRaceModeControls();
         } else if (!_stricmp("EventTypeDropDown", event->controlName)) {
@@ -736,7 +736,7 @@ void SPEventDlg::ShowRaceModeControls() {
         racesLeft->Show(0, 1);
         racesRight->Show(0, 1);
         racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
-        sprintf(text, "%d/%d", g_TrackGame->eventManager->field_0x48 + 1,
+        sprintf(text, "%d/%d", g_TrackGame->eventManager->racesRun + 1,
                 g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
         races->RemoveAllRows();
         races->AddRow(text, 0, 0);
@@ -830,14 +830,14 @@ void SPEventDlg::SyncValues(int apply) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         int index = list->GetRowData(-1);
         {
-            char* name = g_TrackGame->ui->field_0x60[index].field_0x14;
+            char* name = g_TrackGame->ui->entries[index].fileName;
             int length = strlen(name);
             int count = length > 0xff ? 0xff : length;
             strncpy(settings->trackName, name, count);
             settings->trackName[count] = 0;
         }
-        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->field_0x60[index].field_0x08);
-        settings->trackNumber = g_TrackGame->ui->field_0x60[index].field_0x04;
+        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->entries[index].series);
+        settings->trackNumber = g_TrackGame->ui->entries[index].scene;
         strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
         g_TrackGame->mode.trackIndices[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
         if (static_cast<UIMultiState*>(FindControl("ChkRandomGates", 2))->GetSelectedState())
@@ -913,9 +913,9 @@ int SPEventDlg::AddGhost(const char* path) {
         if (fread(&header, sizeof(header), 1, file)) {
             UIListBox* tracks = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             int row = tracks->GetRowData(-1);
-            if (!_stricmp(header.trackName, g_TrackGame->ui->field_0x60[row].field_0x14) &&
+            if (!_stricmp(header.trackName, g_TrackGame->ui->entries[row].fileName) &&
                 header.lengthSeconds > 0.0f &&
-                g_TrackGame->ui->field_0x60[row].field_0x04 == header.trackIndex) {
+                g_TrackGame->ui->entries[row].scene == header.trackIndex) {
                 ghostHeaders = (UnknownRecordFileHeader*)UnknownFunction47b570(
                     ghostHeaders, (ghostHeaderCount + 1) * sizeof(UnknownRecordFileHeader));
                 ghostHeaders[ghostHeaderCount] = header;
@@ -984,14 +984,14 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         Vector3* target = &viewTarget;
         viewEye.z = 15.0f;
         viewEye.y = 1.0f;
-        *target = g_TrackGame->ui->field_0x474;
+        *target = g_TrackGame->ui->garageFocus;
         viewTarget.y += 3.0f;
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(*target);
-        g_TrackGame->ui->field_0x468->UnknownFunction42f190(
+        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
+        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(*target);
+        g_TrackGame->ui->garageCamera->UnknownFunction42f190(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);
-        viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->field_0x474));
+        viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->garageFocus));
         ApplyChosenRider();
         ApplyChosenBike();
         PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
@@ -1081,14 +1081,14 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
     SPBikeRiderDlg* self = this;
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     list->RemoveAllRows();
-    for (int i = 0; i < g_TrackGame->ui->field_0x54; i++) {
-        if (!((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].field_0x88) {
-            int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].model].modelKind;
+    for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
+        if (!((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x88) {
+            int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model].modelKind;
             if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.field_0x1970 & 1)))
                 continue;
         }
-        UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i];
-        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[entry->model];
+        UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i];
+        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model];
         sprintf(text, "%s %s", model->displayName, entry->displayName);
         list->AddRow(text, i, 0);
         if (g_TrackGame->mode.field_0x1974.field_0xc4 == i)
@@ -1101,11 +1101,11 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
     list->Sort(1);
     list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
     list->RemoveAllRows();
-    for (int j = 0; j < g_TrackGame->ui->field_0x5c; j++) {
-        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j];
+    for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
+        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j];
         if (model->modelKind == 2 || model->modelKind == 3 || model->field_0xc0) {
             list->AddRow(model->displayName, j, 0);
-            if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j].modelName,
+            if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j].modelName,
                         g_TrackGame->mode.field_0x1974.field_0x80))
                 rider = j;
         }
@@ -1117,9 +1117,9 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
 // 0x0044f950
 void SPBikeRiderDlg::PaintPlateNumber(int number) {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
-    for (int i = 0; i < g_TrackGame->ui->field_0x4c; i++)
+    for (int i = 0; i < g_TrackGame->ui->manufacturerCount; i++)
         painter.UnknownFunction417670(
-            ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[i].field_0xc0->plateTexture, number);
+            ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[i].field_0xc0->plateTexture, number);
 }
 
 // 0x0044fa00: a click inside the bike preview (inset by 50 and 30 pixels)
@@ -1155,16 +1155,16 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
     if (bikeChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
-        UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[list->GetRowData(-1)];
-        ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->field_0x48)[bike->model].field_0xc0->plateTexture)
+        UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[list->GetRowData(-1)];
+        ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].field_0xc0->plateTexture)
             ->UnknownFunction444c70(0, bike->field_0x48, &g_TrackGame->field_0x1c);
         bikeChanged = 0;
     }
     if (riderChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
-        UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->field_0x58)[list->GetRowData(-1)];
-        ((UnknownModelTexture*)ui->field_0x46c->plateTexture)
+        UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->riders)[list->GetRowData(-1)];
+        ((UnknownModelTexture*)ui->riderPreview->plateTexture)
             ->UnknownFunction444c70(0, rider->modelName, &g_TrackGame->field_0x1c);
         riderChanged = 0;
     }
@@ -1181,12 +1181,12 @@ void SPBikeRiderDlg::ApplyChosenBike() {
     char text[12];
     UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     KrustyUI* ui = g_TrackGame->ui;
-    UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)];
-    UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->field_0x48)[bike->model];
+    UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)];
+    UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->manufacturers)[bike->model];
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
-    for (i = 0; i < ui->field_0x4c; i++) {
-        ((UnknownKrustyUIModel*)ui->field_0x48)[i].field_0xc0->UnknownVirtualSlot4();
+    for (i = 0; i < ui->manufacturerCount; i++) {
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].field_0xc0->UnknownVirtualSlot4();
         ui = g_TrackGame->ui;
     }
     model->field_0xc0->UnknownVirtualSlot5();
@@ -1222,9 +1222,9 @@ void SPBikeRiderDlg::ApplyChosenBike() {
         int row = bikes->GetRowData(-1);
         int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_GARAGE_SETTINGS->engineSize =
-            ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].engineSize;
+            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         UNKNOWN_GARAGE_SETTINGS->fourStroke =
-            ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].field_0x90;
+            ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].field_0x90;
         int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         if (current != previous)
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
@@ -1242,15 +1242,15 @@ void SPBikeRiderDlg::SyncValues(int apply) {
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     int bike = list->GetRowData(-1);
     {
-        UnknownKrustyUIBike* bikes = (UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50;
-        char* name = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[bikes[bike].model].modelName;
+        UnknownKrustyUIBike* bikes = (UnknownKrustyUIBike*)g_TrackGame->ui->bikes;
+        char* name = ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[bikes[bike].model].modelName;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
         strncpy(g_TrackGame->mode.field_0x1974.field_0x00, name, count);
         g_TrackGame->mode.field_0x1974.field_0x00[count] = 0;
     }
     {
-        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].field_0x48;
+        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].field_0x48;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
         strncpy(g_TrackGame->mode.field_0x1974.field_0x40, name, count);
@@ -1265,7 +1265,7 @@ void SPBikeRiderDlg::SyncValues(int apply) {
     list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     int rider = list->GetRowData(-1);
     {
-        char* name = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[rider].modelName;
+        char* name = ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[rider].modelName;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
         strncpy(g_TrackGame->mode.field_0x1974.field_0x80, name, count);
@@ -1335,7 +1335,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         RemoveTimers(0);
         guiManager->ShowCursors(0);
-        g_TrackGame->ui->field_0x490 = 0;
+        g_TrackGame->ui->progressDialog = 0;
         break;
     case kDialogInit: {
         UIControl* area = FindControl("StaBarRect", 5);
@@ -1347,7 +1347,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
         bar->stepCount = 20;
         bar->showPercentage = 0;
         area->Show(0, 1);
-        g_TrackGame->ui->field_0x490 = (UnknownGameUiPage*)this;
+        g_TrackGame->ui->progressDialog = (UnknownGameUiPage*)this;
         g_TrackGame->ui->UnknownFunction499b10();
         g_UnknownGlobal59ae84 = 0;
         g_TrackGame->mode.SaveProfile();
@@ -1406,7 +1406,7 @@ void CreateProfile(UnknownDialogEvent* event) {
         return;
     if (g_TrackGame->profileDirectory->UnknownFunction44a910(name)) {
         ProfileExistsDlg* dialog = new(__FILE__, 3416) ProfileExistsDlg;
-        g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 4, 0, (int)event->dialog,
+        g_TrackGame->ui->gui->ShowDialog(dialog, 0, 4, 0, (int)event->dialog,
                                                                      (int)name, 0, 1);
         return;
     }
@@ -1416,21 +1416,21 @@ void CreateProfile(UnknownDialogEvent* event) {
     g_TrackGame->mode.UnknownFunction522440();
     COPY_TEXT(g_TrackGame->mode.field_0x00, name, 16);
     g_TrackGame->mode.showNewbieDialog = 1;
-    for (int i = 0; i < g_TrackGame->ui->field_0x54; i++) {
-        if (((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].engineSize == 250) {
+    for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
+        if (((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize == 250) {
             g_TrackGame->mode.field_0x1974.field_0xc4 = i;
             g_TrackGame->mode.field_0x1974.field_0xc0 =
-                ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].model;
+                ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model;
             strcpy(g_TrackGame->mode.field_0x1974.field_0x00,
-                   ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)
-                       [((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].model].modelName);
+                   ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
+                       [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model].modelName);
             strcpy(g_TrackGame->mode.field_0x1974.field_0x40,
-                   ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].field_0x48);
+                   ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x48);
             break;
         }
     }
     strcpy(g_TrackGame->mode.field_0x1974.field_0x80,
-           ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[0].modelName);
+           ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[0].modelName);
     memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.field_0x1974,
            sizeof(g_TrackGame->mode.field_0x1b04));
     memcpy(&g_TrackGame->mode.field_0x1a3c, g_TrackGame->mode.field_0x1b04,
@@ -1469,7 +1469,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control = FindControl("CancelButton", 0);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
-        int menu = g_TrackGame->ui->field_0x3c;
+        int menu = g_TrackGame->ui->currentMenu;
         if (menu == 0xbba || menu == 0xbbb)
             ShowGroup(0x65, 0);
         UIControl* prompt = FindControl("TxtPrompt", 12);
@@ -1478,7 +1478,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
         edit->SetCapacity(15);
         edit->SetAcceptedCharacters(kProfileNameCharacters);
-        if (g_TrackGame->ui->field_0x3c == 0xbbb) {
+        if (g_TrackGame->ui->currentMenu == 0xbbb) {
             g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer,
                                                                     playerName);
             edit->SetEditText(playerName);
@@ -1617,7 +1617,7 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
         event->handled = 1;
         break;
     case 0xcd:
-        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->field_0x30);
+        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->returnMenu);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1695,7 +1695,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
     case 0xc9:
         event->dialog->UpdateBoundValues(1);
         *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
-        g_TrackGame->ui->field_0x2c->field_0x0ec = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
+        g_TrackGame->ui->gui->field_0x0ec = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
@@ -1777,7 +1777,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
     }
     case 0x104:
     case 0x105:
-        g_TrackGame->ui->field_0x30 = g_TrackGame->ui->field_0x3c;
+        g_TrackGame->ui->returnMenu = g_TrackGame->ui->currentMenu;
         switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
         case 0:
         case 2:
@@ -1837,7 +1837,7 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
         event->handled = 1;
         break;
     case kMenuOptions:
-        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->field_0x30);
+        g_TrackGame->ui->OpenMenu(g_TrackGame->ui->returnMenu);
         event->dialog->EndDialog(0);
         event->handled = 1;
         break;
@@ -1849,9 +1849,9 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
     case kMenuTrackRecord910:
     case kMenuTrackRecord911: {
         KrustyUI* ui = g_TrackGame->ui;
-        if (ui->field_0x3c == kMenuTrackRecord910)
+        if (ui->currentMenu == kMenuTrackRecord910)
             ui->OpenMenu(kMenuSinglePlayer);
-        else if (ui->field_0x3c == kMenuTrackRecord911)
+        else if (ui->currentMenu == kMenuTrackRecord911)
             ui->OpenMenu(ui->field_0x38);
         event->dialog->EndDialog(0);
         event->handled = 1;
@@ -1906,11 +1906,11 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
             Intro2Dlg* dialog = new(__FILE__, 4217) Intro2Dlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
+            g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
         }
         break;
     case kDialogInit:
-        g_TrackGame->ui->field_0x2c->ShowCursors(0);
+        g_TrackGame->ui->gui->ShowCursors(0);
         framesShown = 0;
         g_UnknownGlobal59ae00 = !g_TrackGame->mode.field_0x6cc;
         break;
@@ -1938,10 +1938,10 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
         if (!g_TrackGame->field_0x2d5_bit1) {
             if (!g_UnknownGlobal59ae00) {
                 Intro3Dlg* dialog = new(__FILE__, 4256) Intro3Dlg;
-                g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
+                g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
             } else {
                 g_TrackGame->ui->OpenMenu(kMenuMain);
-                g_TrackGame->ui->field_0x2c->ShowCursors(1);
+                g_TrackGame->ui->gui->ShowCursors(1);
             }
         }
         break;
@@ -1978,7 +1978,7 @@ void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
             g_TrackGame->ui->OpenMenu(kMenuMain);
-            g_TrackGame->ui->field_0x2c->ShowCursors(1);
+            g_TrackGame->ui->gui->ShowCursors(1);
         }
         break;
     case kDialogInit:
@@ -2012,9 +2012,9 @@ void LeaveMenusForRace() {
     g_TrackGame->ui->field_0x4ac = 1;
     g_TrackGame->ui->field_0x4a8 = 0;
     g_TrackGame->ui->Shutdown();
-    g_TrackGame->ui->field_0x2c->ReleaseBackground();
+    g_TrackGame->ui->gui->ReleaseBackground();
     if (g_TrackGame->display->freezeFrameIndex)
-        g_TrackGame->ui->field_0x2c->EnableWindowClipper(0);
+        g_TrackGame->ui->gui->EnableWindowClipper(0);
     if (g_TrackGame->field_0x18 == 1 && !g_TrackGame->UnknownFunction521cd0() &&
         !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->field_0x3428) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.field_0x27f8,
@@ -2036,13 +2036,13 @@ void LeaveMenusForRace() {
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && !g_TrackGame->mode.field_0x10ec) {
         g_TrackGame->mode.field_0x10ec = 1;
-        g_TrackGame->eventManager->field_0x48 = 0;
+        g_TrackGame->eventManager->racesRun = 0;
         for (int i = 0; i < 11; i++)
-            g_TrackGame->eventManager->field_0x50[i].field_0x28 = 0;
+            g_TrackGame->eventManager->results[i].points = 0;
     }
-    g_TrackGame->ui->field_0x494 = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
-    if (g_TrackGame->ui->field_0x2c->field_0x03c)
-        g_TrackGame->ui->field_0x2c->field_0x03c->UnknownFunction404c80();
+    g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
+    if (g_TrackGame->ui->gui->field_0x03c)
+        g_TrackGame->ui->gui->field_0x03c->UnknownFunction404c80();
     if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
         g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
@@ -2052,22 +2052,22 @@ void LeaveMenusForRace() {
     }
     switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 3:
-        g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 4405) LoadSupercrossDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4405) LoadSupercrossDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 5:
-        g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 4408) LoadEnduroDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4408) LoadEnduroDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 0:
-        g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 4411) LoadQuarryDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4411) LoadQuarryDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 4:
-        g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 4414) LoadTagDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4414) LoadTagDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 1:
-        g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 4417) LoadBajaDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4417) LoadBajaDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     case 2:
-        g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 4420) LoadNationalsDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        g_TrackGame->ui->gui->ShowDialog(new(__FILE__, 4420) LoadNationalsDlg(1), 0, 2, 0, 0, 0, 0, 0);
         break;
     }
 }
@@ -2139,13 +2139,13 @@ void GhostReplayDlg::OpenPage(int page) {
     case 0:
         if (!ghostPage) {
             ghostPage = new(__FILE__, 4498) GhostFilesDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(ghostPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(ghostPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!replayPage) {
             replayPage = new(__FILE__, 4504) ReplayFilesDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(replayPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(replayPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     }
@@ -2623,8 +2623,8 @@ int DemoDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry*
 // 0x00455b20
 int DemoDlg::UnknownVirtualSlot10(float frameTime) {
     KrustyUI* ui = g_TrackGame->ui;
-    if (ui->field_0x44) {
-        ui->field_0x44 = 0;
+    if (ui->demoEnded) {
+        ui->demoEnded = 0;
         EndDialog(0);
         return 0;
     }
@@ -2637,7 +2637,7 @@ void TransDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
             g_TrackGame->ui->OpenMenu(nextMenu);
-            g_TrackGame->ui->field_0x2c->ShowCursors(1);
+            g_TrackGame->ui->gui->ShowCursors(1);
         }
         break;
     case kDialogInit:

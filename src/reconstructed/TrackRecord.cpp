@@ -140,9 +140,9 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
 int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 {
     char name[16];
-    int n = strlen(g_TrackGame->eventManager->field_0x50[racer].field_0x40);
+    int n = strlen(g_TrackGame->eventManager->results[racer].name);
     int length = n > 15 ? 15 : n;
-    strncpy(name, g_TrackGame->eventManager->field_0x50[racer].field_0x40, length);
+    strncpy(name, g_TrackGame->eventManager->results[racer].name, length);
     name[length] = 0;
     float value = 0.0f;
     switch (kind) {
@@ -151,25 +151,25 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
     case 3:
     case 5:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x14;
+            value = g_TrackGame->eventManager->results[racer].field_0x14;
         else
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x08;
+            value = g_TrackGame->eventManager->results[racer].field_0x08;
         if (field_0xe0 != 0 && value > field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;
     case 4:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x1c;
+            value = g_TrackGame->eventManager->results[racer].field_0x1c;
         else
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x18;
+            value = g_TrackGame->eventManager->results[racer].field_0x18;
         if (field_0xe0 != 0 && value < field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;
     case 0:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->field_0x50[racer].field_0x2c;
+            value = g_TrackGame->eventManager->results[racer].field_0x2c;
         else
-            value = (float)g_TrackGame->eventManager->field_0x50[racer].field_0x0c;
+            value = (float)g_TrackGame->eventManager->results[racer].field_0x0c;
         if (field_0xe0 != 0 && value < field_0x14[field_0xe0 - 1].field_0x10)
             return 0;
         break;

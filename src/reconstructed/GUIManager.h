@@ -106,11 +106,11 @@ struct UnknownGroundFog {
     unsigned char field_0x00[0x18];
     UnknownGroundFogOwner* field_0x18;        // GameObject+0x18
     unsigned char field_0x1c[0x30 - 0x1c];
-    float field_0x30;                         // fog plane height
-    float field_0x34;                         // depth limit
-    int field_0x38;                           // alpha limit
+    float planeHeight;                        // +0x30: fog plane height (compared with each vertex's y)
+    float depthLimit;                         // +0x34
+    int alphaLimit;                           // +0x38
     unsigned char field_0x3c[0x40 - 0x3c];
-    float field_0x40;                         // density
+    float density;                            // +0x40
 };
 
 // A 0x20-byte lit vertex (D3DLVERTEX layout): position, colour, specular.
@@ -131,7 +131,7 @@ struct UnknownGroundFogShader {
     // 0x00484f10: fogs `count` vertices by their depth below the fog plane.
     void UnknownFunction484f10(UnknownFogVertex* vertices, int count);
 
-    UnknownGroundFog* field_0x00;
+    UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };
 
 // Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8).
@@ -283,19 +283,19 @@ public:
 
     GUIInputDevice* pointerDevice;            // +0x2c: pointer device
     GUICursor* userCursor;                    // +0x30
-    int field_0x34;                           // pointer position
-    int field_0x38;
-    int field_0x3c[32];
+    int pointerX;                             // +0x34: pointer position, copied from the pointer device (0x00487620)
+    int pointerY;                             // +0x38
+    int controlDown[32];                      // +0x3c: UIDialog slot 23 sets a control's flag, slot 22 clears it
     GUIManager* userGui;                      // +0xbc
     ToolTip* userToolTip;                     // +0xc0
     int field_0xc4;
     char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
     char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
     UnknownCursorAnimation* cursorAnimation;  // +0x1c8
-    UnknownGuiControl* field_0x1cc;
-    UnknownGuiControl* field_0x1d0;
+    UnknownGuiControl* pendingHoverControl;   // +0x1cc: set by 0x00487730/0x00487790; UpdateFocus passes it to SetHoverControl
+    UnknownGuiControl* pendingFocusControl;   // +0x1d0: set by 0x00487790; UpdateFocus passes it to MoveFocus
     UnknownGuiControl* focusControl;          // +0x1d4: focus
-    UnknownGuiControl* field_0x1d8;
+    UnknownGuiControl* hoverControl;          // +0x1d8: set by SetHoverControl and MoveFocus
     int field_0x1dc;
     ContainerList<GUIInputDevice*> acceptedDevices; // +0x1e0: accepted devices
 };
@@ -402,14 +402,16 @@ public:
 struct UnknownHiResMeterEntry {
     float field_0x00;
     float field_0x04;
-    float field_0x08;                         // calls
-    float field_0x0c;                         // total time
-    float field_0x10;                         // calls this tick
-    float field_0x14;                         // time this tick
-    float field_0x18;                         // time over all ticks
-    float field_0x1c;                         // ticks
-    float field_0x20;                         // peak
-    char field_0x24[0x24];                    // name
+    // Named after slot 10's "MS Timers [CallsThisTick-->TotMSThisTick
+    // (AvgMSPerTick)] : (Per-call Peak/Avg)" columns.
+    float calls;                              // +0x08
+    float totalMs;                            // +0x0c: total time (per-call average = totalMs / calls)
+    float callsThisTick;                      // +0x10
+    float msThisTick;                         // +0x14
+    float msAllTicks;                         // +0x18: msThisTick summed each tick
+    float ticks;                              // +0x1c
+    float peakMs;                             // +0x20: per-call peak
+    char name[0x24];                          // +0x24
 };
 
 class HiResMeter : public GameObject {
@@ -425,10 +427,10 @@ public:
     void UnknownFunction488540();             // 0x00488540
     void UnknownFunction488580();             // 0x00488580
 
-    unsigned char field_0x2c;                 // the counter is usable
-    float field_0x30;                         // counts per millisecond
-    int field_0x34;                           // entries in use
+    unsigned char counterUsable;              // +0x2c: slot 8 calibrated the time stamp counter
+    float countsPerMs;                        // +0x30: counts per millisecond
+    int timerCount;                           // +0x34: entries in use
     int field_0x38;
-    int field_0x3c;                           // overlay page, -1 until assigned
-    UnknownHiResMeterEntry field_0x40[50];
+    int overlayPage;                          // +0x3c: debug overlay page, -1 until assigned
+    UnknownHiResMeterEntry timers[50];        // +0x40
 };
