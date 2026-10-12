@@ -167,7 +167,7 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
         break;
     case 0:
         if (field_0x00 > 0 && field_0x00 <= 2)
-            value = g_TrackGame->eventManager->results[racer].field_0x2c;
+            value = g_TrackGame->eventManager->results[racer].score;
         else
             value = (float)g_TrackGame->eventManager->results[racer].largestStuntPoints;
         if (field_0xe0 != 0 && value < field_0x14[field_0xe0 - 1].field_0x10)

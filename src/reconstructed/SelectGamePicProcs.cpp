@@ -113,8 +113,8 @@ struct UnknownPlayerStateMessage {
     unsigned char field_0xc2;                 // racer slot +0xc4
     unsigned char requestedRacers;            // +0xc3: requested racers
     int sendTime;                             // +0xc4: send time
-    int field_0xc8;                           // racer slot +0xec
-    unsigned char field_0xcc;                 // racer slot +0xf0
+    int engineSize;                           // +0xc8: engine size (racer slot +0xec)
+    unsigned char fourStroke;                 // +0xcc: four-stroke (racer slot +0xf0)
     unsigned char field_0xcd;                 // racer slot +0xf4
     int field_0xd0;                           // racer slot +0xc0
 };
@@ -150,8 +150,8 @@ struct UnknownLobbyStartMessage {
     char bikeModelNames[8][0x40];             // +0x298: racer slot +0x00 (bike model name)
     char bikeNames[8][0x40];                  // +0x498: racer slot +0x40 (bike name)
     char riderNames[8][0x40];                 // +0x698: racer slot +0x80 (rider name)
-    int field_0x898[8];                       // racer slot +0xec
-    int field_0x8b8[8];                       // racer slot +0xf0
+    int engineSizes[8];                       // +0x898: racer slot +0xec (engine size)
+    int fourStrokes[8];                       // +0x8b8: racer slot +0xf0 (four-stroke)
 };
 
 // A grid entry at race settings +0x14c (TrackGame.h's
@@ -718,7 +718,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
                         char text[0x80];
                         char line[0x80];
                         g_TrackGame->LoadResourceString(0x14d5, text, 0x80);
-                        sprintf(line, text, g_UnknownGlobal689d08[i].name, state->field_0xc8);
+                        sprintf(line, text, g_UnknownGlobal689d08[i].name, state->engineSize);
                         AddChatLine(-1, line);
                         g_UnknownGlobal689dd8[i] = 1;
                     }
@@ -734,8 +734,8 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
             COPY_TEXT(g_TrackGame->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].name, 0x10);
             g_TrackGame->mode.field_0x1be4[i + 1].SetBikeAndRiderNames(state->bikeModelName, state->bikeName,
                                                                                  state->riderName);
-            g_TrackGame->mode.field_0x1be4[i + 1].field_0xec = state->field_0xc8;
-            g_TrackGame->mode.field_0x1be4[i + 1].field_0xf0 = state->field_0xcc;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xec = state->engineSize;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xf0 = state->fourStroke;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xf4 = state->field_0xcd;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xc0 = state->field_0xd0;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xc4 = state->field_0xc2;
@@ -773,8 +773,8 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x00, start->bikeModelNames[i], 0x40);
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x40, start->bikeNames[i], 0x40);
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x80, start->riderNames[i], 0x40);
-                g_TrackGame->mode.field_0x1be4[i].field_0xec = start->field_0x898[i];
-                g_TrackGame->mode.field_0x1be4[i].field_0xf0 = start->field_0x8b8[i];
+                g_TrackGame->mode.field_0x1be4[i].field_0xec = start->engineSizes[i];
+                g_TrackGame->mode.field_0x1be4[i].field_0xf0 = start->fourStrokes[i];
             }
             memcpy(lobbySlots.slots, start->raceSettings.field_0x18c, sizeof(lobbySlots.slots));
             FillRacerSlots();
@@ -1191,8 +1191,8 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         COPY_TEXT(state.riderName, g_TrackGame->mode.field_0x1974.field_0x80, 0x40);
         state.field_0xc2 = g_TrackGame->mode.field_0x1974.field_0xc4;
         state.requestedRacers = g_TrackGame->mode.maxAIBikes;
-        state.field_0xc8 = UNKNOWN_GARAGE_SETTINGS->engineSize;
-        state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->fourStroke;
+        state.engineSize = UNKNOWN_GARAGE_SETTINGS->engineSize;
+        state.fourStroke = UNKNOWN_GARAGE_SETTINGS->fourStroke;
         if (g_TrackGame->mode.lobbyRank > 0 && g_TrackGame->mode.lobbyRank < 0x65)
             g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.lobbyRank;
         state.field_0xd0 = g_TrackGame->mode.field_0x1bcc;

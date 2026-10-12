@@ -45,7 +45,7 @@ struct UnknownEventRacerMessage {                  // type 0x86
     int field_0x00;
     char racerIndex;                               // +0x04: the sender's racer index
     char finished;                                 // +0x05: racer +0x7a4
-    float field_0x08;
+    float score;                                   // +0x08: racer +0x768
     float totalRunningTime;                        // +0x0c: racer +0x754
     float fastestLap;                              // +0x10: racer +0x750
     int largestStuntPoints;                        // +0x14: racer +0x788
@@ -66,7 +66,7 @@ void UnknownEventEntry::Reset() {
     fastestLap = 0;
     totalRunningTime = 0;
     points = 0;
-    field_0x2c = 0;
+    score = 0;
     field_0x30 = 0;
     largestStuntPoints = 0;
     field_0x10 = 0;
@@ -91,7 +91,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
     name[count] = 0;
     field_0x24 = racer->field_0x4a0;
     if (!field_0x24) {
-        field_0x2c = racer->field_0x768;
+        score = racer->field_0x768;
         position = racer->field_0x784;
         fastestLap = racer->field_0x750;
         totalRunningTime = racer->field_0x754;
@@ -108,7 +108,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         else
             finished = racer->field_0x7a4;
     } else {
-        field_0x2c = 0;
+        score = 0;
         position = 99;
         fastestLap = 0;
         totalRunningTime = 0;
@@ -431,7 +431,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     g_TrackGame->mode.field_0x1be4[i].field_0xd8 == update->racerIndex) {
                     g_TrackGame->mode.field_0x1be4[i].field_0xcc = 1;
                     if (view->field_0x3c[i]) {
-                        view->field_0x3c[i]->field_0x768 = update->field_0x08;
+                        view->field_0x3c[i]->field_0x768 = update->score;
                         view->field_0x3c[i]->field_0x750 = update->fastestLap;
                         view->field_0x3c[i]->field_0x7a4 = update->finished;
                         view->field_0x3c[i]->field_0x788 = update->largestStuntPoints;
@@ -551,7 +551,7 @@ void EventManager::SendRacerResults() {
         view->field_0x38->field_0x748 = 0x7ffffffe;
     }
     UnknownEventRacerMessage message;
-    message.field_0x08 = view->field_0x38->field_0x768;
+    message.score = view->field_0x38->field_0x768;
     message.totalRunningTime = view->field_0x38->field_0x754;
     message.fastestLap = view->field_0x38->field_0x750;
     message.finished = view->field_0x38->field_0x7a4;
@@ -567,7 +567,7 @@ void EventManager::SendRacerResults() {
             view->field_0x40[i]->field_0x754 = FLT_MAX;
             view->field_0x40[i]->field_0x748 = 0x7ffffffe;
         }
-        message.field_0x08 = view->field_0x40[i]->field_0x768;
+        message.score = view->field_0x40[i]->field_0x768;
         message.totalRunningTime = view->field_0x40[i]->field_0x754;
         message.fastestLap = view->field_0x40[i]->field_0x750;
         message.finished = view->field_0x40[i]->field_0x7a4;

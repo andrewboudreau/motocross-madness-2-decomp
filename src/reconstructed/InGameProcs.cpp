@@ -56,11 +56,11 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
                     }
                 }
                 guiManager->ShowCursors(0);
-                UnknownFunction4526b0(0x191, event);
+                HandleMenuCancel(0x191, event);
             }
         } else if (!_stricmp("ButRight", event->controlName)) {
             guiManager->ShowCursors(0);
-            UnknownFunction452930(0x191, event);
+            HandleMenuOk(0x191, event);
             g_TrackGame->UnknownFunction468880();
         }
         break;
@@ -84,11 +84,11 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
         if (event->code == 0x65) {
             g_TrackGame->mode.field_0x26f0 = 1;
             guiManager->ShowCursors(0);
-            UnknownFunction4526b0(0x191, event);
+            HandleMenuCancel(0x191, event);
         } else if (event->code == 0x67) {
             g_TrackGame->mode.field_0x26f0 = 0;
             guiManager->ShowCursors(0);
-            UnknownFunction4526b0(0x191, event);
+            HandleMenuCancel(0x191, event);
         }
         break;
     }
