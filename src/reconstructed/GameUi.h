@@ -706,10 +706,7 @@ public:
     UIDDLScrollBar* scrollBarPart;            // +0x200
     int rowHeight;                            // +0x204
     int isOpen;                               // +0x208
-    int field_0x20c;
-    int field_0x210;
-    int field_0x214;
-    int field_0x218;
+    int openArea[4];                          // +0x20c: the dropped-down CameraRect, button to list bottom (LayoutParts)
 };
 
 inline UIDDLButton* UIDropDownList::UnknownInlineButton() { return buttonPart; }

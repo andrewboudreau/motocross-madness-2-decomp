@@ -789,7 +789,7 @@ void UIDropDownList::LayoutParts() {
     scroll.bottom -= 2;
     scroll.left = button.left;
     scroll.right = button.right;
-    CameraRect* area = (CameraRect*)&field_0x20c;
+    CameraRect* area = (CameraRect*)openArea;
     char name[50];
     area->left = left;
     area->top = top;
