@@ -62,7 +62,7 @@ public:
     Sound* frameSound;                        // +0x14
     TextureMap* frameTexture;                 // +0x18
     int ownsSound;                            // +0x1c: owns +0x14
-    int field_0x20;
+    int frameTextures;                        // +0x20: the TextureMapManager the texture is made in
 };
 
 // RTTI: UIAnim : BaseObject (vtable 0x00552ccc; 0xf8 bytes, new'd at
@@ -90,7 +90,7 @@ public:
     int playForwards;                         // +0x0c: 1: playing forwards
     int frameCount;                           // +0x10
     int passesLeft;                           // +0x14: passes left (0x7fff: forever)
-    int field_0x18;
+    int passCountdown;                        // +0x18: counts passesLeft down (Advance)
     int frameDelay;                           // +0x1c
     int lastStepTime;                         // +0x20
     int playBackwards;                        // +0x24: 1: plays backwards

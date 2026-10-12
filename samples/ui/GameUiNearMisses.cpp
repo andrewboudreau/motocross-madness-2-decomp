@@ -322,12 +322,12 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
-        field_0x20 = (int)textures;
+        frameTextures = (int)textures;
         UnknownTgaFile* image = UnknownFunction5125c0(file, 0, (int)g_UnknownResourceManager572b44);
         if (image) {
             frameWidth = image->width;
             frameHeight = image->height;
-            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,

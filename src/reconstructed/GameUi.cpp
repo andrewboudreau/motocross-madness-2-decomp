@@ -266,7 +266,7 @@ TextureMap* UIControl::GetStateTexture(int state) {
 // 0x00472f20
 void UIAnim::SetFrameCount(int count) {
     passesLeft = count;
-    field_0x18 = count;
+    passCountdown = count;
     Rewind();
 }
 
@@ -323,7 +323,7 @@ UIFrame* UIAnim::Advance() {
                 currentFrame--;
             } else {
                 playForwards = 0;
-                if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                if (passesLeft == 0x7fff || (passesLeft && --passCountdown > 0))
                     currentFrame = frameCount;
             }
         } else {
@@ -331,7 +331,7 @@ UIFrame* UIAnim::Advance() {
                 currentFrame++;
             } else {
                 playForwards = 0;
-                if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                if (passesLeft == 0x7fff || (passesLeft && --passCountdown > 0))
                     currentFrame = 0;
             }
         }
@@ -980,7 +980,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
-        field_0x20 = (int)textures;
+        frameTextures = (int)textures;
         UnknownResourceEntry* entry =
             ((UnknownResourceManager*)id)->UnknownFunction4e9360((const char*)module, 1);
         if (!LoadFromStream(entry->field_0x14, entry->field_0x18, palette) && a) {
@@ -1009,7 +1009,7 @@ UIAnim::UIAnim(void* textures, void* palette) {
     currentFrame = 0;
     frameCount = 0;
     passesLeft = 0;
-    field_0x18 = 0;
+    passCountdown = 0;
     lastStepTime = 0;
     animTextures = textures;
     playForwards = 1;
@@ -5174,7 +5174,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             int format = g_TrackGame->renderTarget->field_0x28;
             frameWidth = image->width;
             frameHeight = image->height;
-            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
