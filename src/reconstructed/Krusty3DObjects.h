@@ -36,15 +36,15 @@ struct UnknownVisualCueRacer : virtual public GameObject {
     int UnknownIsEnabled() { return field_0x25_bit0; }
 
     unsigned char field_0x08[0x0c - 0x08];
-    Vector3 field_0x0c;                // position
+    Vector3 position;                         // +0x0c
 };
 
 // The camera NumberObjectManager places its digits in front of (its +0x34,
 // also the ArcadeObject view whose +0x198 scales the models).
 struct UnknownNumberCamera {
     unsigned char field_0x000[0x170];
-    Vector3 field_0x170;               // position
-    Vector3 field_0x17c;               // forward
+    Vector3 eyePosition;                      // +0x170
+    Vector3 viewDirection;                    // +0x17c forward
     Vector3 field_0x188;               // up
     unsigned char field_0x194[0x198 - 0x194];
     float field_0x198;
@@ -62,7 +62,7 @@ struct UnknownNumberRacer {
     unsigned char field_0x03c[0x6c - 0x3c];
     int field_0x6c;
     unsigned char field_0x070[0x15c - 0x70];
-    float field_0x15c;                 // count-down value
+    float countdown;                          // +0x15c count-down value
 };
 
 // 0x00460c00 (cdecl): 1/sqrt of `value` (table driven).
@@ -97,15 +97,15 @@ struct UnknownRunwayRacerPart {
 // +0x38; RaceView.h's UnknownEventRacer).
 struct UnknownRunwayRacer {
     unsigned char field_0x000[0x10c];
-    Vector3 field_0x10c;               // track point
-    Vector3 field_0x118;               // track direction there
+    Vector3 trackPoint;                       // +0x10c
+    Vector3 trackDirection;                   // +0x118 track direction there
     unsigned char field_0x124[0x740 - 0x124];
     UnknownRunwayView* field_0x740;
     UnknownRunwayRacerPart* field_0x744;
     unsigned char field_0x748[0x78c - 0x748];
     int field_0x78c;
     unsigned char field_0x790[0x7a4 - 0x790];
-    char field_0x7a4;                  // finished
+    char finished;                            // +0x7a4
 };
 
 // The terrain (NationalRace.cpp's +0x40): 0x00507c10 drops `point` onto it.
@@ -142,13 +142,13 @@ struct UnknownVisualCueView {
     UnknownVisualCueRacer* UnknownFunction4204e0(int* iterator);
 
     unsigned char field_0x000[0x38];
-    UnknownRunwayRacer* field_0x38;    // its own racer
+    UnknownRunwayRacer* ownRacer;             // +0x38 its own racer
     unsigned char field_0x03c[0x48 - 0x3c];
     UnknownRunwayTrack* field_0x48;
     unsigned char field_0x04c[0x50 - 0x4c];
     UnknownVisualCueCamera* field_0x50;
     unsigned char field_0x054[0x18a - 0x54];
-    bool field_0x18a;                  // racing
+    bool racing;                              // +0x18a
     unsigned char field_0x18b[0x190 - 0x18b];
     bool field_0x190;
 };
@@ -236,7 +236,7 @@ struct UnknownBonusRacer {
 struct UnknownBonusCamera {
     unsigned char field_0x000[0x16c];
     float field_0x16c;
-    Vector3 field_0x170;               // position
+    Vector3 eyePosition;                      // +0x170
     unsigned char field_0x17c[0x198 - 0x17c];
     float field_0x198;
 };
@@ -251,7 +251,7 @@ struct UnknownBonusRenderTarget {
 
 struct UnknownKrustyRacerRef {
     unsigned char field_0x000[0x7b8];
-    int field_0x7b8;                   // gate index
+    int gateIndex;                            // +0x7b8
 };
 
 struct UnknownKrustyCamera {
@@ -306,7 +306,7 @@ struct UnknownKrustyGame {
     unsigned char field_0x0564[0x568 - 0x564];
     UnknownKrustyPlayer* field_0x568;
     unsigned char field_0x056c[0x2d74 - 0x56c];
-    int field_0x2d74;                  // camera mode 0..5
+    int cameraMode;                           // +0x2d74 camera mode 0..5
     unsigned char field_0x2d78[0x2eb4 - 0x2d78];
     int field_0x2eb4;
     unsigned char field_0x2eb8[0x3430 - 0x2eb8];
@@ -317,12 +317,12 @@ extern UnknownKrustyGame* g_UnknownKrustyGame56e26c;
 // One 0x30-byte key of the bonus animation table at 0x0056c820 (seven
 // keys); plain floats, as the table is static data.
 struct UnknownBonusKey {
-    int field_0x00;                    // frame
-    float field_0x04;                  // time
+    int frame;                                // +0x00
+    float time;                               // +0x04
     float field_0x08[3];               // scale
     float field_0x14[3];               // position
     float field_0x20[3];               // rotation axis
-    float field_0x2c;                  // rotation angle
+    float rotationAngle;                      // +0x2c
 };
 
 // "Base Bonus Frame" and its digit models.

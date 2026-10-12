@@ -96,7 +96,13 @@ recorded behaviour: NumberObjectManager `0x0048bd00` `SetupDigits`;
 BonusObjectManager `0x0048c330` `LoadDigitModels`, `0x0048c8a0`
 `CreateFrameNode` and `0x0048ca60` `SetupCounter`. The light setup
 `0x0048a600` and visual-cue loader `0x0048adf0` keep placeholders because
-NationalRace.cpp and QuarryStuntEvent.cpp call them. The racer, view, camera and
+NationalRace.cpp and QuarryStuntEvent.cpp call them.
+The view structs' fields with a recorded use are named (each keeps its
+`// +0xNN`): the camera views' `eyePosition`/`viewDirection` (Camera's
+names for +0x170/+0x17c), the racer views' `position`, `countdown`,
+`trackPoint`, `trackDirection`, `finished` and `gateIndex`, the cue view's
+`ownRacer` and `racing`, the game's `cameraMode` (+0x2d74) and the bonus
+key's `frame`, `time` and `rotationAngle`. No calibration byte changed. The racer, view, camera and
 game-global structs in the header are this unit's views of objects whose
 classes live elsewhere (RaceView.h, TrackGame.h, Camera.h); QuarryEvent.h
 keeps its own partial VisualCue view.
