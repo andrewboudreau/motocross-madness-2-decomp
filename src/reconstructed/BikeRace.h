@@ -907,7 +907,7 @@ public:
     void NextCameraTarget(int forward, int racers, int objects);
     void ToggleReplayPause(int pauseOnly); // 0x0041f550: pauses, or with 0 toggles, +0x3f8
     UnknownBikeRaceRacer* NextBike(int* iterator); // 0x004204e0
-    void UnknownFunction420590(int player);   // 0x00420590
+    void HandlePlayerLeft(int player);   // 0x00420590
     void UnknownFunction420b00(char* path, char* description); // 0x00420b00
     // 0x00420650 (InGameProcs.cpp ExitDlg): restarts the race; `mode` 0
     // plays the replay just recorded, otherwise records a new one.
@@ -915,7 +915,7 @@ public:
     void RestartReplay();             // 0x00420bd0: restarts the replay and ghost
     // 0x004210f0: writes two positions relative to `reference`.
     void WriteRelativePositions(Vector3* a, Vector3* b, void* reference, int flags);
-    void UnknownFunction421050();             // 0x00421050
+    void ResetStartCountdown();             // 0x00421050
     // 0x00421d50: the recorder callback's work (0x004230e0 forwards to it).
     int RecordFrame(int a, void* data, int flag, int b, int* keep, int time);
     void ClearRacerParts();             // 0x00422ec0: zeroes every racer's parts
@@ -961,7 +961,7 @@ public:
     int field_0x150;
     int field_0x154;
     int racerCount;                          // racer count
-    float field_0x15c;
+    float startCountdown;                     // +0x15c: seconds until the start (8.2 with the +0x6c gate, else 5.2)
     float field_0x160;                        // seconds until +0x64 is shown (slot 10)
     Vector3 gridFirstSlot;                      // start grid: first slot (0x004210f0)
     Vector3 gridSlotStep;                      // start grid: step between slots

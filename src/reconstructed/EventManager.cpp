@@ -489,7 +489,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             }
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
             if (view)
-                view->UnknownFunction420590(message->player);
+                view->HandlePlayerLeft(message->player);
         } else if (type == 0x8e) {
             if (message->player == g_TrackGame->network->localPlayer) {
                 if (FindRaceMode()) {

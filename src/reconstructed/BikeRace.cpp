@@ -96,7 +96,7 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     field_0x14c = 0;
     field_0x150 = 0;
     field_0x154 = 0;
-    field_0x15c = 0;
+    startCountdown = 0;
     isRacing = false;
     field_0x18b = false;
     trackLoaded = false;
@@ -473,7 +473,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     }
                 }
                 if (ready) {
-                    UnknownFunction421050();
+                    ResetStartCountdown();
                     field_0x18e = false;
                     g_TrackGame->network->StopKeepAlive();
                     if (g_TrackGame->playerCount > 1) {
@@ -503,9 +503,9 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                     }
                 } else {
-                    field_0x15c -= g_TrackGame->frameTime;
-                    if (field_0x15c <= 0.0f || AnyRacerRemote()) {
-                        field_0x15c = 0;
+                    startCountdown -= g_TrackGame->frameTime;
+                    if (startCountdown <= 0.0f || AnyRacerRemote()) {
+                        startCountdown = 0;
                         isRacing = true;
                         raceScene->field_0x7c0 = 0;
                         if (field_0x064 != 0) {
@@ -1234,7 +1234,7 @@ UnknownBikeRaceRacer* BikeRace::NextBike(int* iterator) {
 }
 
 // 0x00420590
-void BikeRace::UnknownFunction420590(int player) {
+void BikeRace::HandlePlayerLeft(int player) {
     if (g_TrackGame->uiInteractionBlocked) {
         return;
     }
@@ -1265,7 +1265,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     field_0x18b = true;
     field_0x188 = false;
-    UnknownFunction421050();
+    ResetStartCountdown();
     int iterator = 0;
     Vector3 position;
     Vector3 direction;
@@ -1461,15 +1461,15 @@ void BikeRace::RestartReplay() {
 }
 
 // 0x00421050
-void BikeRace::UnknownFunction421050() {
+void BikeRace::ResetStartCountdown() {
     if (g_TrackGame->playingReplay) {
-        field_0x15c = 0.0f;
+        startCountdown = 0.0f;
         return;
     }
     int mode = g_TrackGame->mode.raceSettings.raceMode;
     if (mode != 0 && mode != 4) {
         if (field_0x06c != 0) {
-            field_0x15c = 8.2f;
+            startCountdown = 8.2f;
             field_0x06c->UnknownVirtualSlot5();
             raceScene->RestartEntry(field_0x070, 0.0f, 0, 0);
             if (field_0x06c->collisionObject != 0) {
@@ -1478,7 +1478,7 @@ void BikeRace::UnknownFunction421050() {
             }
             raceScene->UnknownFunction4eafd0(field_0x070);
         } else {
-            field_0x15c = 5.2f;
+            startCountdown = 5.2f;
         }
     }
 }
