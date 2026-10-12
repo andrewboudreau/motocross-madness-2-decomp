@@ -298,7 +298,7 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
 int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Game::UnknownVirtualSlot14(event, entry))
         return 1;
-    if (field_0x2d4_bit2 && TestInputEvent(0x41, 0, event, 3)) {
+    if (testKey && TestInputEvent(0x41, 0, event, 3)) {
         PCTarget()->fillMode = PCTarget()->fillMode == D3DFILL_SOLID ? D3DFILL_WIREFRAME : D3DFILL_SOLID;
         return 1;
     }

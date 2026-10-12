@@ -106,7 +106,7 @@ TrackGame::TrackGame() {
     uiInteractionBlocked = 0;
     cdAudio = 0;
     controlMapping = 0;
-    field_0x33fc = 0;
+    controlSetup = 0;
     highScores = 0;
     languageModule = LoadLibraryA("lang.dll");
     if (languageModule)
@@ -153,7 +153,7 @@ TrackGame::~TrackGame() {
     delete cdAudio;
     delete profileDirectory;
     delete controlMapping;
-    delete field_0x33fc;
+    delete controlSetup;
     delete highScores;
     if (languageModule) {
         FreeLibrary(languageModule);
@@ -280,8 +280,8 @@ int TrackGame::UnknownVirtualSlot4() {
     if (!controlMapping)
         return 0;
     controlInterface->SetMapping(controlMapping);
-    field_0x33fc = new(__FILE__, 360) UnknownTrackGameObject33fc;
-    if (!field_0x33fc)
+    controlSetup = new(__FILE__, 360) UnknownTrackGameObject33fc;
+    if (!controlSetup)
         return 0;
     g_MemTagStack->Push("UI");
     ui = new(__FILE__, 379) KrustyUI(1);
@@ -372,7 +372,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         int previous = paused;
         if (PCGame::UnknownVirtualSlot14(event, entry))
             return 0;
-        if (field_0x2d4_bit0 && paused != previous) {
+        if (allowFreezeCamera && paused != previous) {
             if (paused)
                 childRoot->DisableByClassName("RaceSound");
             else

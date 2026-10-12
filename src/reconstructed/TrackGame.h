@@ -684,7 +684,7 @@ public:
     UnknownControlBinding field_0x3380;
     UnknownControlBinding field_0x33bc;
     UnknownControlMapping* controlMapping;
-    UnknownTrackGameObject33fc* field_0x33fc;
+    UnknownTrackGameObject33fc* controlSetup; // +0x33fc control assignments: the profile's "control.ctl", OptControlsDlg InputDeviceDDL
     UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)
     char savedDecimalSeparator[8];
     void* languageModule;

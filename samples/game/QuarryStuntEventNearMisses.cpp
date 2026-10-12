@@ -27,7 +27,7 @@ static int s_DebugRow;
 // 0x004e14a0
 int BaseQuarryEvent::UnknownVirtualSlot12() {
     GameObject::UnknownVirtualSlot12();
-    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay) {
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
         if (g_TrackGame->debugOverlay->field_0x26c4 == s_DebugPage) {

@@ -365,7 +365,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         ListMappedKeys();
         UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 0));
         for (i = 0; i < 14; i++) {
-            g_TrackGame->field_0x33fc->GetAssignmentName(g_TrackGame->field_0x33fc->currentDevice, i, text);
+            g_TrackGame->controlSetup->GetAssignmentName(g_TrackGame->controlSetup->currentDevice, i, text);
             keys->AddRow(text, i, 0);
         }
         ColorListRows();
@@ -407,7 +407,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         if (waitingForInput || inputWaitPending)
             break;
         if (_stricmp("InputDeviceDDL", event->controlName) == 0) {
-            g_TrackGame->field_0x33fc->currentDevice =
+            g_TrackGame->controlSetup->currentDevice =
                 UnknownDropDownList(FindControl("InputDeviceDDL", 6))->GetRowData(-1);
             ListMappedKeys();
         } else if (_stricmp("MapKeyListBox", event->controlName) == 0 || _stricmp("ActionListBox", event->controlName) == 0) {
@@ -434,7 +434,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         break;
     case kDialogClose:
         sprintf(path, "%s\\%s\\%s", "ui\\profile", g_TrackGame->mode.profileName, "control.ctl");
-        g_TrackGame->field_0x33fc->ApplyDevice(path, -1);
+        g_TrackGame->controlSetup->ApplyDevice(path, -1);
         break;
     }
 }
@@ -446,7 +446,7 @@ void OptControlsDlg::ListMappedKeys()
     UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
     keys->RemoveAllRows();
     for (int i = 0; i < 14; i++) {
-        g_TrackGame->field_0x33fc->GetAssignmentName(g_TrackGame->field_0x33fc->currentDevice, i, text);
+        g_TrackGame->controlSetup->GetAssignmentName(g_TrackGame->controlSetup->currentDevice, i, text);
         keys->AddRow(text, i, 0);
     }
 }
@@ -455,11 +455,11 @@ void OptControlsDlg::ListMappedKeys()
 void OptControlsDlg::SyncValues(int save)
 {
     if (save) {
-        if (g_TrackGame->field_0x33fc)
-            g_TrackGame->field_0x33fc->currentDevice =
+        if (g_TrackGame->controlSetup)
+            g_TrackGame->controlSetup->currentDevice =
                 UnknownDropDownList(FindControl("InputDeviceDDL", 6))->GetRowData(-1);
-    } else if (g_TrackGame->field_0x33fc) {
-        UnknownDropDownList(FindControl("InputDeviceDDL", 6))->SelectRowByData(g_TrackGame->field_0x33fc->currentDevice);
+    } else if (g_TrackGame->controlSetup) {
+        UnknownDropDownList(FindControl("InputDeviceDDL", 6))->SelectRowByData(g_TrackGame->controlSetup->currentDevice);
         ListMappedKeys();
     }
 }
@@ -469,7 +469,7 @@ void OptControlsDlg::ColorListRows()
 {
     UIListBox* list;
     int i;
-    if (g_TrackGame->field_0x33fc->currentDevice == 1) {
+    if (g_TrackGame->controlSetup->currentDevice == 1) {
         list = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
         for (i = 0; i < 4; i++)
             list->SetItemBoxColor(0x5555ff, i);
@@ -492,7 +492,7 @@ int GetInputText(int row, int kind, int code, char* text)
     strcpy(text, "");
     if (row < 4 && kind != 0)
         return 0;
-    return g_TrackGame->field_0x33fc->FormatAssignmentName(kind, code, text);
+    return g_TrackGame->controlSetup->FormatAssignmentName(kind, code, text);
 }
 
 // 0x004b55d0
@@ -513,7 +513,7 @@ int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
     if (event->kind == 0 && event->control == 1) {
         UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
         int row = keys->GetSelectedRow();
-        g_TrackGame->field_0x33fc->GetAssignmentName(g_TrackGame->field_0x33fc->currentDevice, row, text);
+        g_TrackGame->controlSetup->GetAssignmentName(g_TrackGame->controlSetup->currentDevice, row, text);
         keys->SetRowText(row, text);
         EndInputWait();
         return 1;
@@ -522,12 +522,12 @@ int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
         int row = keys->GetSelectedRow();
         if (!GetInputText(row, event->kind, event->control, text))
             return 1;
-        if (g_TrackGame->field_0x33fc->FindDuplicateAssignment(row, event->kind, event->control, &other)) {
+        if (g_TrackGame->controlSetup->FindDuplicateAssignment(row, event->kind, event->control, &other)) {
             keys->SetRowText(other, "");
-            g_TrackGame->field_0x33fc->SetAssignment(g_TrackGame->field_0x33fc->currentDevice, other, -1, 0);
+            g_TrackGame->controlSetup->SetAssignment(g_TrackGame->controlSetup->currentDevice, other, -1, 0);
         }
         keys->SetRowText(row, text);
-        g_TrackGame->field_0x33fc->SetAssignment(g_TrackGame->field_0x33fc->currentDevice, row, event->kind, event->control);
+        g_TrackGame->controlSetup->SetAssignment(g_TrackGame->controlSetup->currentDevice, row, event->kind, event->control);
     }
     EndInputWait();
     return 1;
@@ -591,19 +591,19 @@ void OptControlsDlg::MapMovedInput()
 found:
     if (row % 2)
         row--;
-    if (g_TrackGame->field_0x33fc->FindDuplicateAssignment(row, kind, code, &other)) {
+    if (g_TrackGame->controlSetup->FindDuplicateAssignment(row, kind, code, &other)) {
         keys->SetRowText(other, "");
-        g_TrackGame->field_0x33fc->SetAssignment(g_TrackGame->field_0x33fc->currentDevice, other, -1, 0);
+        g_TrackGame->controlSetup->SetAssignment(g_TrackGame->controlSetup->currentDevice, other, -1, 0);
         if (other < 4) {
-            g_TrackGame->field_0x33fc->SetAssignment(g_TrackGame->field_0x33fc->currentDevice, other + 1, -1, 0);
+            g_TrackGame->controlSetup->SetAssignment(g_TrackGame->controlSetup->currentDevice, other + 1, -1, 0);
             keys->SetRowText(other + 1, "");
         }
     }
-    g_TrackGame->field_0x33fc->SetAssignment(g_TrackGame->field_0x33fc->currentDevice, row, kind, code);
-    g_TrackGame->field_0x33fc->GetAssignmentName(g_TrackGame->field_0x33fc->currentDevice, row, text);
+    g_TrackGame->controlSetup->SetAssignment(g_TrackGame->controlSetup->currentDevice, row, kind, code);
+    g_TrackGame->controlSetup->GetAssignmentName(g_TrackGame->controlSetup->currentDevice, row, text);
     keys->SetRowText(row, text);
     if (row < 4) {
-        g_TrackGame->field_0x33fc->SetAssignment(g_TrackGame->field_0x33fc->currentDevice, row + 1, kind, code);
+        g_TrackGame->controlSetup->SetAssignment(g_TrackGame->controlSetup->currentDevice, row + 1, kind, code);
         keys->SetRowText(row + 1, text);
     }
     EndInputWait();
@@ -928,7 +928,7 @@ void GlobalSettingsDlg::HandleEvent(UnknownDialogEvent* event)
                 CopyFileA(preset, profile, 0);
                 g_TrackGame->mode.LoadControllerChoice();
                 g_TrackGame->mode.SaveProfile();
-                g_TrackGame->field_0x33fc->ApplyDevice(profile, -1);
+                g_TrackGame->controlSetup->ApplyDevice(profile, -1);
             } else if (choice == 2) {
                 UIListBox* profiles = static_cast<UIListBox*>(FindControl("LstProfiles", 3));
                 UnknownGameUiListRow* entry = &profiles->rowTable[profiles->GetSelectedRow()];

@@ -643,7 +643,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             replayVcr->UnknownVirtualSlot10(frameTime);
         }
     }
-    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay != 0) {
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay != 0) {
         if (lodDebugPage < 0) {
             lodDebugPage = g_TrackGame->debugOverlay->NewPage();
         }
@@ -924,7 +924,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             }
             break;
         case 0x1b:
-            if ((g_TrackGame->field_0x2d4_bit2) &&
+            if ((g_TrackGame->testKey) &&
                 TestInputEvent(0x1b, 0, event, 3)) {
                 NextCameraTarget(1, 0, 0);
                 return 1;
@@ -934,7 +934,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             }
             return 1;
         case 0x1a:
-            if ((g_TrackGame->field_0x2d4_bit2) &&
+            if ((g_TrackGame->testKey) &&
                 TestInputEvent(0x1a, 0, event, 3)) {
                 NextCameraTarget(0, 0, 0);
                 return 1;
@@ -1009,7 +1009,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         }
     }
-    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay != 0) {
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay != 0) {
         if (lodDebugPage < 0) {
             lodDebugPage = g_TrackGame->debugOverlay->NewPage();
         }

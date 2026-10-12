@@ -663,7 +663,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
 int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Camera::UnknownVirtualSlot23(event, entry) || event->kind)
         return 0;
-    if (g_TrackGame->field_0x2d4_bit0) {
+    if (g_TrackGame->allowFreezeCamera) {
         if (TestInputEvent(0x21, 0, event, 0xc) && cameraState != 6) {
             UnknownVirtualSlot70(g_TrackGame->paused);
             return 1;

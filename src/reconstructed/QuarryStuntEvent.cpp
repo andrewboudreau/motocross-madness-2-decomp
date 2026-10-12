@@ -461,7 +461,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         }
         return 1;
     }
-    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay) {
+    if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
         if (TestInputEvent(0x1c, 0, event, 0x80)) {

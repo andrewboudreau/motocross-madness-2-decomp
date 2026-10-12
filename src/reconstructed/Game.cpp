@@ -79,7 +79,7 @@ static inline void DecodeString(char* text) {
 Game::Game() {
     InitFastMath();
     useZBuffer = 1;
-    field_0x2d4_bit2 = 0;
+    testKey = 0;
     fullScreen = 1;
     soundInterface = 0;
     network = 0;
@@ -149,7 +149,7 @@ int Game::CreateObjects(char*) {
     do
         rand();
     while (count--);
-    field_0x2d4_bit2 = 0;
+    testKey = 0;
     void* key;
     unsigned long type;
     unsigned long value;
@@ -157,7 +157,7 @@ int Game::CreateObjects(char*) {
     if (RegOpenKeyExA((void*)0x80000002, s_UnknownEncoded56b334, 0, 0x20019, &key) == 0 &&
         RegQueryValueExA(key, s_UnknownEncoded56b350, 0, &type, (unsigned char*)&value, &size) == 0 &&
         type == 4)                            // REG_DWORD
-        field_0x2d4_bit2 = value;
+        testKey = value;
     RegCloseKey(key);
     if (!UnknownVirtualSlot32())
         return 0;
@@ -169,7 +169,7 @@ int Game::CreateObjects(char*) {
     field_0x28 = renderTarget->surfacePixelFormat;
     field_0x2c = 0x115c;
     field_0x30 = 0;
-    if (field_0x2d4_bit2) {
+    if (testKey) {
         int category = g_MemTagStack->Push("DebugOverlay");
         debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, textureManager, 8, 3, 3);
         if (debugOverlay) {
@@ -181,7 +181,7 @@ int Game::CreateObjects(char*) {
         }
         g_MemTagStack->Pop(category);
     }
-    field_0x2d4_bit0 = GetRegistryFlag("AllowFreezeCamera", 0);
+    allowFreezeCamera = GetRegistryFlag("AllowFreezeCamera", 0);
     if (!UnknownVirtualSlot3())
         return 0;
     return UnknownVirtualSlot4() != 0;
@@ -234,7 +234,7 @@ int Game::UnknownVirtualSlot8() {
     now = ReadClock();
     int renderPost3D = now - last;
     int elapsed = now - s_LastFrameTime;
-    if (field_0x2d4_bit2) {
+    if (testKey) {
         if (debugOverlay) {
             static int profilePage = -1;
             if (profilePage < 0)
@@ -367,7 +367,7 @@ int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* en
 int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (inputSuspended)
         return 1;
-    if (field_0x2d4_bit2 && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
+    if (testKey && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
         if (debugOverlay->isEnabled) {
             if (debugOverlay->ShowNextPage())
                 debugOverlay->UnknownVirtualSlot4();
@@ -375,7 +375,7 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
             debugOverlay->UnknownVirtualSlot5();
         }
     }
-    if (field_0x2d4_bit0) {
+    if (allowFreezeCamera) {
         if (controlInterface->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
             paused = 1 - paused;
         } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && paused) {

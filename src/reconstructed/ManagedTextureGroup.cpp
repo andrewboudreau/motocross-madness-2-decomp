@@ -180,7 +180,7 @@ void ManagedTextureGroup::WriteDebugReport() {
 // 0x0050c8c0: unless frozen by the debug key, empties the size lists and
 // repacks the pages (through 0x0050dad0 when partial texture blits are on).
 void ManagedTextureGroup::RepackPages() {
-    if (g_TrackGame->field_0x2d4_bit2 && noRepacking)
+    if (g_TrackGame->testKey && noRepacking)
         return;
     field_0x7c.Clear();
     for (int i = 0; i < 9; i++)
