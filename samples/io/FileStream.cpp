@@ -155,7 +155,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
         field_0x03 = 0;
         field_0x1c = 0;
     }
-    field_0x1c = UnknownFunction460d70(path);
+    field_0x1c = FindArchive(path);
     if (field_0x1c) {
         field_0x1c->field_0x01 = field_0x1c->field_0x03;
         SetBufferSize(0x8000);
@@ -163,7 +163,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
         return 1;
     }
     if (*mode == 'r' || *mode == 'a') {
-        if (!encoded && UnknownFunction460e70(path)) {
+        if (!encoded && IsValidFile(path)) {
             field_0x08 = 1;
             if (field_0x12c && (field_0x1c = field_0x12c->AddArchive(path, 0)) != 0) {
                 return 1;

@@ -228,7 +228,7 @@ int PCGame::StartUp(char* message) {
         *message = 0;
         return 0;
     }
-    return Game::UnknownFunction467b70(message);
+    return Game::CreateObjects(message);
 }
 
 // 0x004c0230

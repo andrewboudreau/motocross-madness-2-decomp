@@ -415,7 +415,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
 // 0x0040ae30 (cdecl): the out-of-line dot product.
 float Vec3Dot(const Vector3* a, const Vector3* b);
 // 0x004a10e0 (cdecl): *out = v - 2 (v.n) n.
-void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out);
+void ReflectAndNormalize(const Vector3* v, const Vector3* n, Vector3* out);
 
 // The vector type of the drawing function's local statics: their atexit
 // entries are the `ret` stubs 0x00442f40/0x00442f50/0x00442f60, so the type
@@ -600,7 +600,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         direction.z = group->transformedVertices[v].position.z - localEye.z;
                         direction = Normalized(direction);
                         Vector3 reflected;
-                        UnknownFunction4a10e0(&direction, &group->normals[v], &reflected);
+                        ReflectAndNormalize(&direction, &group->normals[v], &reflected);
                         if (drawReflections) {
                             Vector3 world = ((UnknownSoultreeNodeView*)group->node)->LocalToWorldDirection(&reflected);
                             line[0].position.x = group->sourceVertices[v].position.x;

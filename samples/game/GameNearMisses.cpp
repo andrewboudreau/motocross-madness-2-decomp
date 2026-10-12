@@ -1,7 +1,7 @@
 // Near-miss Game candidates, kept out of src/reconstructed until they
 // match. See docs/GAME.md.
 //
-// Game::UnknownFunction467b70 (0x00467b70, 775 bytes): 761 of 775 bytes
+// Game::CreateObjects (0x00467b70, 775 bytes): 761 of 775 bytes
 // match. Only the frame slots differ: retail places the registry key at
 // +0x10, the size at +0x14, the type at +0x18, the value at +0x1c and the
 // `new` temporary at +0x20; VC6 here puts the temporary at +0x1c and orders
@@ -41,7 +41,7 @@ extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
 // value under HKEY_LOCAL_MACHINE\\SOFTWARE\\Rainbow Studios into bit 2 of
 // +0x2d4, then (when slot 32 allows) the texture manager, the debug overlay
 // (only with that bit) and the "AllowFreezeCamera" setting.
-int Game::UnknownFunction467b70(char*) {
+int Game::CreateObjects(char*) {
     rootObject = new(__FILE__, 222) GameObject(1);
     childRoot = new(__FILE__, 227) GameObject(1);
     rootObject->AppendChild(childRoot, -1);

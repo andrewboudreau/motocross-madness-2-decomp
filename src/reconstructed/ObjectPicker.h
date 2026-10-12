@@ -82,11 +82,11 @@ public:
 
     // 0x004b04c0: picks at the cursor's position (y counted from the bottom
     // of the render target).
-    int UnknownFunction4b04c0();
+    int PickAtCursor();
     int PickAt(int x, int y); // 0x004b0500: picks at (x, y)
     // 0x004b0210: builds the pick ray and the cursor (unless `cursor` is
     // given); deletes itself and returns 0 when there is no cursor.
-    ObjectPicker* UnknownFunction4b0210(void* target, TextureMapManager* textures, UnknownPickCallback callback,
+    ObjectPicker* Create(void* target, TextureMapManager* textures, UnknownPickCallback callback,
                                         GameCursor* cursor);
 
     int field_0x2c;

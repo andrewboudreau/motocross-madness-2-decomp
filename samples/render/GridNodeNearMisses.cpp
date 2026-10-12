@@ -277,7 +277,7 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             Vector3 v0(fx, fy, h00);
             Vector3 v1(fx1, fy, h10);
             Vector3 v2(fx, fy1, h01);
-            UnknownFunction4a1300(from, to, &v0, &v1, &v2, &hit);
+            LinePlaneIntersection(from, to, &v0, &v1, &v2, &hit);
             if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
                 float a = hit.x - fx;
                 float b = hit.y - fy;
@@ -291,7 +291,7 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
                 Vector3 w0(fx1, fy, h10);
                 Vector3 w1(fx1, fy1, h11);
                 Vector3 w2(fx, fy1, h01);
-                UnknownFunction4a1300(from, to, &w0, &w1, &w2, &hit);
+                LinePlaneIntersection(from, to, &w0, &w1, &w2, &hit);
                 if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
                     float a = hit.x - fx;
                     float b = hit.y - fy;
@@ -306,7 +306,7 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             Vector3 v0(fx, fy, h00);
             Vector3 v1(fx1, fy, h10);
             Vector3 v2(fx1, fy1, h11);
-            UnknownFunction4a1300(from, to, &v0, &v1, &v2, &hit);
+            LinePlaneIntersection(from, to, &v0, &v1, &v2, &hit);
             if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
                 float a = hit.x - fx1;
                 float b = hit.y - fy;
@@ -320,7 +320,7 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
                 Vector3 w0(fx, fy, h00);
                 Vector3 w1(fx1, fy1, h11);
                 Vector3 w2(fx, fy1, h01);
-                UnknownFunction4a1300(from, to, &w0, &w1, &w2, &hit);
+                LinePlaneIntersection(from, to, &w0, &w1, &w2, &hit);
                 if (hit.x <= fx1 && hit.x >= fx && hit.y <= fy1 && hit.y >= fy) {
                     float a = hit.x - fx1;
                     float b = hit.y - fy;

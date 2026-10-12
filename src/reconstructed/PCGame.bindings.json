@@ -55,7 +55,7 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?UnknownFunction467b70@Game@@QAEHPAD@Z": "0x00467b70",
+  "?CreateObjects@Game@@QAEHPAD@Z": "0x00467b70",
   "?LimitDisplayModes@PCGame@@QAEHPAUUnknownDisplay@@HH@Z": "0x004c0760",
   "?ProfileDisplays@PCGame@@QAEHXZ": "0x004c0d10",
   "?ProfileDisplays@PCGame@@QAEHXZ$ehhandler": "0x0054cc0a",

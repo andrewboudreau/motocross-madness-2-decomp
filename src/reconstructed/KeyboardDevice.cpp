@@ -20,7 +20,7 @@ KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {
 
 // 0x00489f80: attaches `binding` to this device's list for its axis and
 // gives it the keys that step it down and up.
-int KeyboardDevice::UnknownFunction489f80(UnknownControlBinding* binding, int key, int key2,
+int KeyboardDevice::BindKeys(UnknownControlBinding* binding, int key, int key2,
                                           float step, float interval) {
     binding->field_0x00 = this;
     binding->field_0x1c = step;
@@ -44,7 +44,7 @@ void KeyboardDevice::UnknownVirtualSlot0(int id) {
 // 0x0048a0c0: while key +0x0c (or +0x10) is held, its timer advances by
 // the frame time and every elapsed interval steps the binding down (or up);
 // with neither key held the binding recentres.
-void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
+void KeyboardDevice::RepeatKeys(int list, int value) {
     for (int i = 0; i < axisBindings[list].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[list].Get(i);
         binding->field_0x18 += g_TrackGame->frameTime;

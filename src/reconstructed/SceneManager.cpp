@@ -200,7 +200,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
         UnknownParameterBlock block;
         UnknownTextureStream* archive = OpenSceneArchive(scene);
         if (archive) {
-            archive->UnknownFunction461cb0(a, b);
+            archive->GetFileTimes(a, b);
             block.OpenFromArchives((UnknownParameterStream*)archive, scene, path, 0);
             block.SelectSection("SceneInfo");
             block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
@@ -1030,7 +1030,7 @@ int Scene::ReadSounds()
                         SoundEmitter* emitter =
                             (new(__FILE__, 2588)
                                  SoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                                ->UnknownFunction402260(field_0x18, file, params, flags, oneShotDistance,
+                                ->Create(field_0x18, file, params, flags, oneShotDistance,
                                                         randomTriggerPercent, 0, force2D);
                         AppendChild(emitter, -1);
                         if (!emitter) {

@@ -410,7 +410,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                 SoultreeSoundEmitter* emitter =
                     (new(__FILE__, 2015)
                          SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                        ->UnknownFunction4029f0(field_0x18, sound, "",
+                        ->CreateFollowing(field_0x18, sound, "",
                                                 (UnknownVehiclePart*)staticModels->casters[i].model,
                                                 params, flags, oneShotDistance, randomTriggerPercent, 0,
                                                 force2D);
@@ -692,7 +692,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
                              SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                            ->UnknownFunction4029f0(field_0x18, sound, attach, (UnknownVehiclePart*)node, params,
+                            ->CreateFollowing(field_0x18, sound, attach, (UnknownVehiclePart*)node, params,
                                                     flags, oneShotDistance, randomTriggerPercent, 0, force2D);
                     if (!emitter) {
                         sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);

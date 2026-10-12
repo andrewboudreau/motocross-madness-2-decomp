@@ -573,8 +573,8 @@ int TrackGameMode::FindCdDirectory() {
     if (installType != 2) {
         if (!driveList)
             return 0;
-        driveList->UnknownFunction449e70();
-        if (!driveList->UnknownFunction44a010("MCM2", &index, 5))
+        driveList->ListDrives();
+        if (!driveList->FindVolume("MCM2", &index, 5))
             return 0;
         if (!driveList->UnknownFunction44a0b0(index, cdDriveRoot))
             return 0;

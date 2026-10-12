@@ -921,7 +921,7 @@ void KrustyUI::RecordHighScoreTable(int table) {
 }
 
 // 0x0049b020
-void KrustyUI::UnknownFunction49b020(const char** names, int count) {
+void KrustyUI::MakeRandomNames(const char** names, int count) {
     int* used = (int*)DebugCalloc(36, sizeof(int), __FILE__, 1120);
     srand(ReadClock());
     for (int i = count; i > 0; i--) {
@@ -948,7 +948,7 @@ void KrustyUI::UnknownFunction49b020(const char** names, int count) {
 // class always); otherwise the next unused bike after it is taken. The
 // class 1/2 test is one `||` of two `&&` pairs: if/else, goto and ternary
 // forms of it lay the second arm out before the probe loop, retail after it.
-void KrustyUI::UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoices) {
+void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) {
     int* usedBikes = (int*)DebugCalloc(bikeCount, sizeof(int), __FILE__, 1164);
     int* usedRiders = (int*)DebugCalloc(riderCount, sizeof(int), __FILE__, 1165);
     int playerClass = UnknownBikeClassOf(

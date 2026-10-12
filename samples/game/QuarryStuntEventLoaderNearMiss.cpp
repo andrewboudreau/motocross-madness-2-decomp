@@ -242,7 +242,7 @@ public:
 class UnknownQuarrySkyCube : public GameObject {
 public:
     explicit UnknownQuarrySkyCube(int flags);                  // 0x004fb1e0
-    GameObject* UnknownFunction4fb230(void* target, UnknownTextureStream* stream,
+    GameObject* Create(void* target, UnknownTextureStream* stream,
                                       UnknownTextureFormatChoice* textures, float size);
 
     unsigned char field_0x2c[0x48 - 0x2c];
@@ -588,7 +588,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             return 0;
         }
         skyCube = (new(__FILE__, 744) UnknownQuarrySkyCube(g_TrackGame->mode.skyCubeOn))
-                         ->UnknownFunction4fb230(field_0x18, stream, &skyTextures, 1024.0f);
+                         ->Create(field_0x18, stream, &skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(field_0x18, eventFog), -1);

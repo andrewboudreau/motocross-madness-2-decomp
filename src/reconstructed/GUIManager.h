@@ -129,7 +129,7 @@ struct UnknownFogVertex {
 // the lookup, 1 when there is none). Its class is not established.
 struct UnknownGroundFogShader {
     // 0x00484f10: fogs `count` vertices by their depth below the fog plane.
-    void UnknownFunction484f10(UnknownFogVertex* vertices, int count);
+    void FogVertices(UnknownFogVertex* vertices, int count);
 
     UnknownGroundFog* groundFog;              // +0x00: FindByClassName(1, "GroundFog"), or 1 when none
 };

@@ -47,7 +47,7 @@ inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 }
 
 // 0x004a10e0: out = normalize(v - 2 (v . n) n).
-void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out) {
+void ReflectAndNormalize(const Vector3* v, const Vector3* n, Vector3* out) {
     float d = v->z * n->z + (v->x * n->x + v->y * n->y);
     Vector3 twice(n->x + n->x, n->y + n->y, n->z + n->z);
     Vector3 s = twice * d;
@@ -73,7 +73,7 @@ void TriangleNormal(const Vector3* a, const Vector3* b, const Vector3* c, Vector
 
 // 0x004a1300: the triangle's plane (normal, offset) from TriangleNormal, then
 // from + (to - from) * t with t = -(normal . from + offset) / (normal . direction).
-void UnknownFunction4a1300(const Vector3* from, const Vector3* to, const Vector3* a, const Vector3* b,
+void LinePlaneIntersection(const Vector3* from, const Vector3* to, const Vector3* a, const Vector3* b,
                            const Vector3* c, Vector3* out) {
     Vector3 normal;
     float offset;

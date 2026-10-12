@@ -75,7 +75,7 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
     if (!g_TrackGame->UnknownVirtualSlot1())
         exit(0);
 
-    if (!UnknownFunction4a0c50(instance, showCommand))
+    if (!CreateMainWindow(instance, showCommand))
         return TRUE;
 
     ShowWindow(g_MainWindow, SW_SHOWNORMAL);
@@ -157,7 +157,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine, in
 }
 
 // 0x004a0c50
-int UnknownFunction4a0c50(HINSTANCE instance, int showCommand)
+int CreateMainWindow(HINSTANCE instance, int showCommand)
 {
     WNDCLASS windowClass;
     windowClass.style = CS_DBLCLKS;

@@ -33,7 +33,7 @@ FontTexture::~FontTexture() {
     unsigned int count;
     unsigned int i;
 
-    s_UnknownManager65b478.UnknownFunction467760(this);
+    s_UnknownManager65b478.DeleteFont(this);
     count = cells->Count();
     for (i = 0; i < count; i++) {
         if ((*cells)[i]) {
@@ -101,7 +101,7 @@ FontTexture* FontTexture::UnknownFunction4673d0(const char* name, const char* pa
     unsigned int i;
     TextureMap* texture;
 
-    node = s_UnknownManager65b478.UnknownFunction4677f0(name);
+    node = s_UnknownManager65b478.FindFont(name);
     if (node && node->font) {
         font = node->font;
     } else {

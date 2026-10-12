@@ -1110,8 +1110,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racerChoice.riderName,
                                                          riderTexture, 0x3f);
         if (!g_TrackGame->mode.raceSettings.field_0x28) {
-            g_TrackGame->ui->UnknownFunction49b0d0(bikes, racerCount, riders);
-            g_TrackGame->ui->UnknownFunction49b020(names, racerCount);
+            g_TrackGame->ui->PickRandomRacers(bikes, racerCount, riders);
+            g_TrackGame->ui->MakeRandomNames(names, racerCount);
         }
         strcpy(name, g_TrackGame->mode.field_0x00);
         plate = g_TrackGame->mode.plateNumber;

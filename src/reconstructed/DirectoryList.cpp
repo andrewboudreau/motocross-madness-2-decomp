@@ -25,11 +25,11 @@ inline void UnknownDirectoryEntry::UnknownFunctionSet(const char* fileName, unsi
 
 // 0x00449e60
 int UnknownDriveList::Rescan() {
-    return UnknownFunction449e70();
+    return ListDrives();
 }
 
 // 0x00449e70
-int UnknownDriveList::UnknownFunction449e70() {
+int UnknownDriveList::ListDrives() {
     char root[4];
     char* strings;
     int size;
@@ -73,7 +73,7 @@ UnknownDriveList::~UnknownDriveList() {
 }
 
 // 0x0044a010
-int UnknownDriveList::UnknownFunction44a010(const char* volumeName, int* index, unsigned int type) {
+int UnknownDriveList::FindVolume(const char* volumeName, int* index, unsigned int type) {
     int i;
 
     *index = 0;

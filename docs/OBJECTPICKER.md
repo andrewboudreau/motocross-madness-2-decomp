@@ -16,7 +16,7 @@ by two control bindings (+0x40, +0x44). `0x004b04c0` picks at the cursor
 which reads the camera's position, viewport and camera-to-world rows. The
 camera fields are read through `UnknownPickCamera`, because Camera.h keeps
 them protected and declares +0x198 as int while this code loads it as a
-float. GameCursor gained `UnknownFunction43f100` (`0x0043f100`), which
+float. GameCursor gained `CursorPosition` (`0x0043f100`), which
 returns the cursor position as two ints through a hidden pointer.
 
 Exact: 14 calibration cases. These are the constructor, the destructor,

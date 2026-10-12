@@ -210,8 +210,8 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         int* bikes = (int*)DebugCalloc(total, 4, __FILE__, 0x1f4);
         int* riders = (int*)DebugCalloc(total, 4, __FILE__, 0x1f5);
         const char** names = (const char**)DebugMalloc(total * 4, __FILE__, 0x1f6);
-        g_TrackGame->ui->UnknownFunction49b0d0(bikes, total, riders);
-        g_TrackGame->ui->UnknownFunction49b020(names, total);
+        g_TrackGame->ui->PickRandomRacers(bikes, total, riders);
+        g_TrackGame->ui->MakeRandomNames(names, total);
         for (i = 0; i < g_TrackGame->playerCount - 1; i++) {
             g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
             g_TrackGame->mode.racers[i + 1].racerIndex = 0;

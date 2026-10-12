@@ -840,7 +840,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             field_0x190 = false;
             return 1;
         }
-        if (chatOverlay->UnknownFunction51dce0(event, entry, &result)) {
+        if (chatOverlay->HandleChatInput(event, entry, &result)) {
             return 1;
         }
     }
@@ -1025,7 +1025,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;
-                        picker->UnknownFunction4b0210(
+                        picker->Create(
                             g_TrackGame->renderTarget, 0, PickerHitCallback,
                             (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->field_0x30);
                         if (AppendChild(objectPicker, -1)) {
@@ -1050,7 +1050,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 }
             }
             if (TestInputEvent(0, 1, event, 0x80000000)) {
-                int picked = objectPicker->UnknownFunction4b04c0();
+                int picked = objectPicker->PickAtCursor();
                 if (picked != 0) {
                     if (raceScene->staticModels != 0) {
                         for (int i = 0; i < raceScene->staticModels->casterCount; i++) {

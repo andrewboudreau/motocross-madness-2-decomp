@@ -241,8 +241,8 @@
   "?CreateCursors@UnknownKrustyUIGui@@QAEXPBDH@Z": "0x00486590",
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?ShowCursors@KrustyUI@@QAEXXZ": "0x00499b00",
-  "?UnknownFunction4b0210@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",
-  "?UnknownFunction4b04c0@ObjectPicker@@QAEHXZ": "0x004b04c0",
-  "?UnknownFunction51dce0@UnknownBikeRaceOverlay19c@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z": "0x0051dce0",
+  "?Create@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",
+  "?PickAtCursor@ObjectPicker@@QAEHXZ": "0x004b04c0",
+  "?HandleChatInput@UnknownBikeRaceOverlay19c@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z": "0x0051dce0",
   "?UnknownVirtualSlot23@BikeRace@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z$ehhandler": "0x00549cd4"
 }

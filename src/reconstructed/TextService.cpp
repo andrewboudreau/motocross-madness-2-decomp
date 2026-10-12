@@ -44,7 +44,7 @@ UnknownOverlayText::~UnknownOverlayText() {
     for (i = 0; i < count; i++) {
         FontTexture* font = (*fonts)[i];
         (*fonts)[i] = 0;
-        FontTexture::s_UnknownManager65b478.UnknownFunction467760(font);
+        FontTexture::s_UnknownManager65b478.DeleteFont(font);
     }
     currentFont = 0;
     delete fonts;

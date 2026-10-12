@@ -24,8 +24,8 @@ ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
 }
 
 // 0x004b04c0
-int ObjectPicker::UnknownFunction4b04c0() {
-    UnknownCursorPosition position = field_0x34->UnknownFunction43f100();
+int ObjectPicker::PickAtCursor() {
+    UnknownCursorPosition position = field_0x34->CursorPosition();
 
     return PickAt(position.x, ((RenderTarget*)field_0x18)->targetHeight - position.y - 1);
 }
@@ -86,7 +86,7 @@ int ObjectPicker::PickAt(int x, int y) {
 }
 
 // 0x004b0210
-ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManager* textures,
+ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
                                                   UnknownPickCallback callback, GameCursor* cursor) {
     Vector3 segment[2];
 
@@ -113,7 +113,7 @@ ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManage
             g_TrackGame->controlInterface->mouse->AttachBinding(field_0x44);
         }
         field_0x34 = (GameCursor*)(new(__FILE__, 66) GameCursor(1))
-                         ->UnknownFunction43ea70(field_0x18, field_0x40, field_0x44, "cursor.tga", textures, 0, 0, 0);
+                         ->CreateBound(field_0x18, field_0x40, field_0x44, "cursor.tga", textures, 0, 0, 0);
         AppendChild(field_0x34, -1);
     }
     if (!field_0x34) {

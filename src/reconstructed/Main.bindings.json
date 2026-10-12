@@ -3,7 +3,7 @@
   "?UnknownFunction4a0680@@YGHPAUHINSTANCE__@@0PADH@Z": "0x004a0680",
   "_WinMain@16": "0x004a0bc0",
   "_WinMain@16$scopetable": "0x005551b0",
-  "?UnknownFunction4a0c50@@YAHPAUHINSTANCE__@@H@Z": "0x004a0c50",
+  "?CreateMainWindow@@YAHPAUHINSTANCE__@@H@Z": "0x004a0c50",
   "?UnknownWindowProc4a0d50@@YGJPAUHWND__@@IIJ@Z": "0x004a0d50",
   "?g_AppActive@@3HA": "0x0056de98",
   "?g_MainWindow@@3PAUHWND__@@A": "0x00685024",

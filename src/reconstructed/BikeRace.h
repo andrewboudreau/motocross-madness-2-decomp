@@ -195,7 +195,7 @@ struct UnknownBikeRaceMeshItem {
 class UnknownBikeRaceOverlay19c {
 public:
     // 0x0051dce0: the chat line's input; nonzero when it took the event.
-    int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
+    int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void ShowInputLine();             // 0x0051dd10
     void HideInputLine();             // 0x0051dd40: closes the chat line
     void AddMessage(char* name, unsigned int* text, int flag); // 0x0051dd70

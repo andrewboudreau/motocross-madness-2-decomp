@@ -36,7 +36,7 @@ float FastSqrt(float value);
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // 0x00484f10
-void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, int count) {
+void UnknownGroundFogShader::FogVertices(UnknownFogVertex* vertices, int count) {
     UnknownGroundFog* fog;
     UnknownGroundFogCamera* camera;
     float eyeX;
@@ -1081,7 +1081,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
                 image = cursorImage;
             userCursor = (GUICursor*)AppendChild(
                 (new(__FILE__, 1890) GUICursor(visible))
-                    ->UnknownFunction43ea70(field_0x18, &pointerDevice->bindingX, &pointerDevice->bindingY, image,
+                    ->CreateBound(field_0x18, &pointerDevice->bindingX, &pointerDevice->bindingY, image,
                                             userGui->guiTextures, userGui->guiBackground, palette,
                                             userGui->guiPalette),
                 -1);
@@ -1094,7 +1094,7 @@ void GUIUser::CreateCursor(const char* image, int visible) {
                 image = cursorImage;
             userCursor = (GUICursor*)AppendSibling(
                 (new(__FILE__, 1898) GUICursor(visible))
-                    ->UnknownFunction43eaf0(field_0x18, image, userGui->guiTextures, userGui->guiBackground,
+                    ->Create(field_0x18, image, userGui->guiTextures, userGui->guiBackground,
                                             palette, userGui->guiPalette),
                 -1);
         }

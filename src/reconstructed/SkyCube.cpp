@@ -25,7 +25,7 @@ SkyCube::SkyCube(int flags) : DrawableCube(flags) {
 }
 
 // 0x004fb230
-SkyCube* SkyCube::UnknownFunction4fb230(void* value, UnknownTextureStream* stream, UnknownCubeTextureContext* context,
+SkyCube* SkyCube::Create(void* value, UnknownTextureStream* stream, UnknownCubeTextureContext* context,
                                         float height) {
     if (DrawableCube::Load(value, stream, context)) {
         centerHeight = height;

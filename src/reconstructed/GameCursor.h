@@ -33,18 +33,18 @@ public:
     // position and draws it.
     virtual int UnknownVirtualSlot15();
     // 0x0043ea70: an input-driven cursor following the two bindings.
-    GameObject* UnknownFunction43ea70(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
+    GameObject* CreateBound(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
                                       const char* image, TextureMapManager* textures,
                                       BackgroundImage* background, void* palette, Palette8* palette8);
     // 0x0043eaf0: a cursor without bindings.
-    GameObject* UnknownFunction43eaf0(void* target, const char* image, TextureMapManager* textures,
+    GameObject* Create(void* target, const char* image, TextureMapManager* textures,
                                       BackgroundImage* background, void* palette, Palette8* palette8);
     // 0x0043ebd0: loads `image` into a new texture (+0x34); 0 on failure.
-    int UnknownFunction43ebd0(const char* image, TextureMapManager* textures, void* palette,
+    int LoadCursorTexture(const char* image, TextureMapManager* textures, void* palette,
                               Palette8* palette8);
     // 0x0043f100: the bindings' values (or GetCursorPos's) plus the offset at
     // +0x2c/+0x30.
-    UnknownCursorPosition UnknownFunction43f100();
+    UnknownCursorPosition CursorPosition();
 
     int field_0x2c;                           // hot spot offset
     int field_0x30;

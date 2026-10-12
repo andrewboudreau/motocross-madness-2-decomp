@@ -119,10 +119,10 @@ public:
     void UnknownFunction499b10();             // 0x00499b10
     void OpenExitDialog();             // 0x0049a4a0: opens the exit dialog
     // 0x0049b020: fills `names` with `count` distinct random short strings.
-    void UnknownFunction49b020(const char** names, int count);
+    void MakeRandomNames(const char** names, int count);
     // 0x0049b0d0: picks `count` distinct random bikes and riders for the AI
     // racers (bikes near the player's class).
-    void UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoices);
+    void PickRandomRacers(int* bikeChoices, int count, int* riderChoices);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int AddEntry(int a, int scene, int series, const char* name, int d, int e);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)

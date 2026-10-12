@@ -90,7 +90,7 @@ void JoystickDevice::FeedAxis(int axis, float value, float range) {
 
 // 0x00489c60: controls -2 to -13 are axis directions (below 16384 or above
 // 49152, for enabled axes); others go through the control mapping to slot 2.
-int JoystickDevice::UnknownFunction489c60(int control, int modifier, UnknownInputEntry* entry) {
+int JoystickDevice::GetControlState(int control, int modifier, UnknownInputEntry* entry) {
     if (control < 0) {
         switch (control) {
         case -2:

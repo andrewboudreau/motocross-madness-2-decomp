@@ -13,7 +13,7 @@
   "?UnknownFunction444f10@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444f10",
   "?AddObject@D3DIMSoultreeModifier@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x004452f0",
   "?RemoveObject@D3DIMSoultreeModifier@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x00445360",
-  "?UnknownFunction4453e0@D3DIMSoultreeModifier@@QAEXXZ": "0x004453e0",
+  "?DetachFromAll@D3DIMSoultreeModifier@@QAEXXZ": "0x004453e0",
   "?UnknownVirtualSlot8@D3DIMSoultreeModifier@@UAEPAVGameObject@@PAX@Z": "0x004452e0",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "__FILE__:d3dimsoultreemodifier.cpp": "0x00568b24"

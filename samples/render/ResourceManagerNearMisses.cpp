@@ -21,7 +21,7 @@ UnknownTextureStream* UnknownResourceManager::AddArchive(const char* path, int f
     int i;
 
     UnknownTextureStream* archive = new(__FILE__, 212) UnknownTextureStream((int)this);
-    if (archive->Open(path, "rb", flags || archive->UnknownFunction460e70(path))) {
+    if (archive->Open(path, "rb", flags || archive->IsValidFile(path))) {
         if (archive->Read(magic, 4, 1) == 1 && !_stricmp(magic, "RS2")
             && archive->Read(&count, 4, 1) == 1) {
             if (itemCount + count > itemCapacity) {

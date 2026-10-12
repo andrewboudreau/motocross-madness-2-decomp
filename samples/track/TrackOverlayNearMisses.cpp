@@ -349,7 +349,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->UnknownFunction50abd0(5, 6);
+        overlayTexture->SetAddressModes(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = 128;
@@ -600,7 +600,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->UnknownFunction50abd0(5, 6);
+        overlayTexture->SetAddressModes(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = largeLayout ? 256 : 128;

@@ -704,7 +704,7 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
                     return;
             }
         } else {
-            terrain->vertexLighter.UnknownFunction484f10(vertices, vertexCount);
+            terrain->vertexLighter.FogVertices(vertices, vertexCount);
             if (block >= 0)
                 UnknownVirtualSlot7(block);
             else
@@ -739,7 +739,7 @@ void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertex
             }
         }
     } else {
-        terrain->vertexLighter.UnknownFunction484f10(vertices, vertexCount);
+        terrain->vertexLighter.FogVertices(vertices, vertexCount);
         if (block >= 0)
             UnknownVirtualSlot7(block);
         else

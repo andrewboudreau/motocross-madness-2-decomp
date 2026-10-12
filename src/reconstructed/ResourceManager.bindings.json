@@ -22,7 +22,7 @@
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@BaseObject@@UAEHXZ": "0x00405170",
-  "?UnknownFunction460e70@UnknownTextureStream@@QAEHPBD@Z": "0x00460e70",
+  "?IsValidFile@UnknownTextureStream@@QAEHPBD@Z": "0x00460e70",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?Seek@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",

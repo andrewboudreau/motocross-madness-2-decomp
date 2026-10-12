@@ -1078,7 +1078,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->UnknownFunction50abd0(5, 6);
+        overlayTexture->SetAddressModes(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = largeMap ? 256 : 128;
@@ -1404,7 +1404,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
 }
 
 // 0x0051dce0
-int ChatOverlay::UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
+int ChatOverlay::HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
 {
     if (inputShown && field_0x3dc && !event->kind)
         return 1;

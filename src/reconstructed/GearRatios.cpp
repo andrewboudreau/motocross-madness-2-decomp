@@ -232,7 +232,7 @@ void UnknownEngineGearbox::UnknownFunction4d3030(int arg0, float arg1)
 }
 
 // 0x004d31b0
-void UnknownEngineGearbox::UnknownFunction4d31b0(float speedRatio, const Vector3* direction, float scale,
+void UnknownEngineGearbox::DriveForce(float speedRatio, const Vector3* direction, float scale,
                                                  bool braking, float brakeValue, Vector3* force,
                                                  float* magnitude)
 {

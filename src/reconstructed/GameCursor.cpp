@@ -31,7 +31,7 @@ GameCursor::GameCursor(int flags) : GameObject(flags) {
 }
 
 // 0x0043ea70
-GameObject* GameCursor::UnknownFunction43ea70(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
+GameObject* GameCursor::CreateBound(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
                                               const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
     GameObject::UnknownVirtualSlot8(target);
@@ -43,14 +43,14 @@ GameObject* GameCursor::UnknownFunction43ea70(void* target, UnknownControlBindin
         field_0x48 = background->AllocRegion(0);
     field_0x3c = x;
     field_0x40 = y;
-    if (UnknownFunction43ebd0(image, textures, palette, palette8))
+    if (LoadCursorTexture(image, textures, palette, palette8))
         return this;
     Release();
     return 0;
 }
 
 // 0x0043eaf0
-GameObject* GameCursor::UnknownFunction43eaf0(void* target, const char* image, TextureMapManager* textures,
+GameObject* GameCursor::Create(void* target, const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
     GameObject::UnknownVirtualSlot8(target);
     field_0x3c = 0;
@@ -61,7 +61,7 @@ GameObject* GameCursor::UnknownFunction43eaf0(void* target, const char* image, T
     field_0x44 = background;
     if (background)
         field_0x48 = background->AllocRegion(0);
-    if (UnknownFunction43ebd0(image, textures, palette, palette8))
+    if (LoadCursorTexture(image, textures, palette, palette8))
         return this;
     Release();
     return 0;
@@ -76,7 +76,7 @@ GameCursor::~GameCursor() {
 }
 
 // 0x0043ebd0
-int GameCursor::UnknownFunction43ebd0(const char* image, TextureMapManager* textures, void* palette,
+int GameCursor::LoadCursorTexture(const char* image, TextureMapManager* textures, void* palette,
                                       Palette8* palette8) {
     UnknownTgaFile* file = LoadFile(image, 0, (int)g_UnknownResourceManager572b44);
     if (!file)
@@ -214,7 +214,7 @@ failed:
 }
 
 // 0x0043f100
-UnknownCursorPosition GameCursor::UnknownFunction43f100() {
+UnknownCursorPosition GameCursor::CursorPosition() {
     POINT point;
     UnknownCursorPosition position;
 

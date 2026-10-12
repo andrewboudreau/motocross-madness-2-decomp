@@ -57,7 +57,7 @@ public:
 
     // 0x00402260: records the settings, checks `name` exists in the Res
     // archive and joins the scape; releases itself and returns 0 on failure.
-    SoundEmitter* UnknownFunction402260(void* target, const char* name, UnknownSound3DParameters params,
+    SoundEmitter* Create(void* target, const char* name, UnknownSound3DParameters params,
                                         unsigned long flags, float oneShotDistance,
                                         float randomTriggerPercent, int is2D, int force2D);
     void SetSoundParameters(UnknownSound3DParameters params); // 0x00402420
@@ -103,7 +103,7 @@ public:
 
     // 0x004029f0: SoundEmitter's loader, then the part (and its child
     // `partName`) to follow.
-    SoultreeSoundEmitter* UnknownFunction4029f0(void* target, const char* name, const char* partName,
+    SoultreeSoundEmitter* CreateFollowing(void* target, const char* name, const char* partName,
                                                 UnknownVehiclePart* part, UnknownSound3DParameters params,
                                                 unsigned long flags, float oneShotDistance,
                                                 float randomTriggerPercent, int is2D, int force2D);
@@ -174,5 +174,5 @@ public:
 
 // 0x00402070: volume (and pan, always 0) for a sound `distance` from the
 // listener: 0 inside `minDistance`, -2500 at `maxDistance` and beyond.
-void UnknownFunction402070(Vector3* listener, Vector3* position, float distance, float minDistance,
+void VolumeForDistance(Vector3* listener, Vector3* position, float distance, float minDistance,
                            float maxDistance, long* volume, long* pan);

@@ -109,7 +109,7 @@
   "?AttachCasterShadows@Scene@@QAEXPAVProjectedShadow@@H@Z": "0x004edf20",
   "?Load@Scene@@QAEHPAXPAVLightManager@@HHHPBDP6AXH@ZH@Z": "0x004efb20",
   "?SetDetailLevel@Scene@@QAEXH@Z": "0x004eff30",
-  "?UnknownFunction4fb230@UnknownQuarrySkyCube@@QAEPAVGameObject@@PAXPAVUnknownTextureStream@@PAUUnknownTextureFormatChoice@@M@Z": "0x004fb230",
+  "?Create@UnknownQuarrySkyCube@@QAEPAVGameObject@@PAXPAVUnknownTextureStream@@PAUUnknownTextureFormatChoice@@M@Z": "0x004fb230",
   "?CountNodes@SoultreeObject@@QAEHXZ": "0x004fda30",
   "?InsertNodesInQuadtree@UnknownQuarryRaceObject@@QAEXXZ": "0x005046e0",
   "?UnknownFunction5059d0@UnknownQuarryTerrainObject@@QAEPAVUnknownTerrain@@PAXPAVUnknownTextureStream@@HPAUUnknownTextureFormatChoice@@HHPBDH@Z": "0x005059d0",
