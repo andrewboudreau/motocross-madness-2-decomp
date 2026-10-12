@@ -981,7 +981,7 @@ public:
     UnknownBikeRaceOverlay19c* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
-    UnknownVcrFile* field_0x1a8;
+    UnknownVcrFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open
     float field_0x1ac;                        // the record slot 10 queues (+0x1ac..+0x1b7)
     int field_0x1b0;
     int field_0x1b4;
@@ -989,7 +989,7 @@ public:
     float replayLength;                        // replay length
     float recorderTickElapsed;                        // seconds since the last recorder tick (slot 10)
     float replaySeekTarget;                        // replay seek target, -1 when none
-    float field_0x1c8;
+    float bestGhostLength;                    // +0x1c8 best ghost lap length (FLT_MAX until one is recorded); seeds the racer's fastestLap
     float ghostTimeLimit;                        // "VCRGhostTimeLimit"
     float recordTimeLimit;                        // "VCRRecordTimeLimit"
     int replayFrames;                        // +0x1d4 frames played into replayTime (advanced by the replay speed)
@@ -1003,7 +1003,7 @@ public:
     char ghostFileRecorded[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
     bool replayPaused;                         // +0x3f8: ToggleReplayPause
     bool replayStepFrame;                      // +0x3f9: ButFrame: advance one frame
-    bool field_0x3fa;
+    bool recorderTickDue;                     // +0x3fa a short record packet is due this frame
     bool field_0x3fb;
     unsigned char isRecording;                // recording (0x00420650)
     unsigned char field_0x3fd;                // toggled by slot 22

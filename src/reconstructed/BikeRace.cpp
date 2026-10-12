@@ -125,10 +125,10 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     replayTime = 0;
     replayLengthFrames = 0;
     replayFrames = 0;
-    field_0x1c8 = FLT_MAX;
+    bestGhostLength = FLT_MAX;
     replayVcr = 0;
     ghostVcr = 0;
-    field_0x1a8 = 0;
+    vcrFile = 0;
     g_TrackGame->replaySpeed = 1.0f;
     replayStepFrame = false;
     ghostTimeLimit = (float)g_TrackGame->GetRegistryInt("VCRGhostTimeLimit", 300);
@@ -140,7 +140,7 @@ BikeRace::BikeRace(int flags) : GraphicsTest(flags) {
     appliedReplayMode = 4;
     field_0x1e4 = 0;
     replaySeekTarget = -1.0f;
-    field_0x3fa = false;
+    recorderTickDue = false;
     field_0x3fb = false;
     isRecording = 0;
     ghostFilePlayed[0] = 0;
@@ -184,9 +184,9 @@ BikeRace::~BikeRace() {
         FreeStatusList(field_0x0c4);
         field_0x0c4 = 0;
     }
-    if (field_0x1a8 != 0) {
-        delete field_0x1a8;
-        field_0x1a8 = 0;
+    if (vcrFile != 0) {
+        delete vcrFile;
+        vcrFile = 0;
         if (g_TrackGame->playingReplay) {
             UnknownFunctionCameraView()->cameraState = savedCameraState;
             raceCamera->UnknownVirtualSlot61();
@@ -324,8 +324,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                     } else {
                         recorderTickElapsed += g_TrackGame->frameTime;
-                        field_0x3fa = recorderTickElapsed >= g_TrackGame->shortRecordPacketIntervalSeconds;
-                        if (field_0x3fa) {
+                        recorderTickDue = recorderTickElapsed >= g_TrackGame->shortRecordPacketIntervalSeconds;
+                        if (recorderTickDue) {
                             recorderTickElapsed -= g_TrackGame->shortRecordPacketIntervalSeconds;
                             field_0x1ac = replayLength;
                             field_0x1b0++;
@@ -405,8 +405,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                     } else {
                         recorderTickElapsed += g_TrackGame->frameTime;
-                        field_0x3fa = recorderTickElapsed >= g_TrackGame->shortRecordPacketIntervalSeconds;
-                        if (field_0x3fa) {
+                        recorderTickDue = recorderTickElapsed >= g_TrackGame->shortRecordPacketIntervalSeconds;
+                        if (recorderTickDue) {
                             recorderTickElapsed -= g_TrackGame->shortRecordPacketIntervalSeconds;
                             field_0x1ac = replayLength;
                             field_0x1b0++;
@@ -1312,7 +1312,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
             if (mode == 0) {
                 g_TrackGame->playingReplay = 1;
                 if (!replayVcr->OpenRecording(RecorderCallback, 1, "VCRtape.dat",
-                                                        field_0x1a8)) {
+                                                        vcrFile)) {
                     delete replayVcr;
                     replayVcr = 0;
                 }
@@ -1322,7 +1322,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
             } else {
                 g_TrackGame->playingReplay = 0;
                 if (!replayVcr->OpenRecording(RecorderCallback, 0, "VCRtape.dat",
-                                                        field_0x1a8)) {
+                                                        vcrFile)) {
                     delete replayVcr;
                     replayVcr = 0;
                 }
@@ -1409,8 +1409,8 @@ void BikeRace::RestartReplay() {
         replayVcr->SaveRecording(localRacer->lastLapTime, description, 0);
         replayVcr->Unlink();
         replayVcr->Release();
-        if (replayLength <= field_0x1c8) {
-            field_0x1c8 = replayLength;
+        if (replayLength <= bestGhostLength) {
+            bestGhostLength = replayLength;
             COPY_TEXT(ghostFilePlayed, ghostFileRecorded, 0x104);
             if (strcmp(ghostFileRecorded, "VCRghost.dat") == 0) {
                 COPY_TEXT(ghostFileRecorded, "VCRgtemp.dat", 0x104);
@@ -1423,7 +1423,7 @@ void BikeRace::RestartReplay() {
     if (replayVcr == 0) {
         return;
     }
-    if (!replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, field_0x1a8)) {
+    if (!replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, vcrFile)) {
         return;
     }
     char model[0x104];
@@ -1449,10 +1449,10 @@ void BikeRace::RestartReplay() {
     if (ghostVcr == 0) {
         return;
     }
-    if (!ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, field_0x1a8)) {
+    if (!ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, vcrFile)) {
         return;
     }
-    localRacer->fastestLap = field_0x1c8 = ghostVcr->RecordedLength();
+    localRacer->fastestLap = bestGhostLength = ghostVcr->RecordedLength();
     aiRacers[0]->UnknownFunction496e20(ghostVcr);
     aiRacers[0]->UnknownVirtualSlot5();
     aiRacers[0]->field_0x11b8 = 0;

@@ -941,8 +941,8 @@ void EventManager::CloseRace(int mode) {
             }
             filtered[count] = 0;
             sprintf(name, "Record\\%s.gho", filtered);
-            if (view->field_0x1a8)
-                view->field_0x1a8->Save(name);
+            if (view->vcrFile)
+                view->vcrFile->Save(name);
         }
     }
     if (g_TrackGame->supercrossEvent) {

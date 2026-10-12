@@ -777,23 +777,23 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         ((ArcadeObject*)field_0x060)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
     }
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {
-        field_0x1a8 = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
+        vcrFile = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
         if (g_TrackGame->mode.ghostFile[0]) {
-            field_0x1a8->Load(g_TrackGame->mode.ghostFile, "VCRgtemp.dat");
+            vcrFile->Load(g_TrackGame->mode.ghostFile, "VCRgtemp.dat");
             ghostVcr = new(__FILE__, 0x2b9) KrustyVCR;
         }
         replayVcr = new(__FILE__, 0x2bd) KrustyVCR;
         ghostLap = 0;
     } else if (g_TrackGame->useReplayTape) {
-        field_0x1a8 = new(__FILE__, 0x2c2) UnknownVcrFile(0, 1);
+        vcrFile = new(__FILE__, 0x2c2) UnknownVcrFile(0, 1);
         replayVcr = new(__FILE__, 0x2c3) KrustyVCR;
         if (g_TrackGame->playingReplay) {
             if (g_TrackGame->ui->field_0x4a8) {
-                replayVcr->OpenRecording(RecorderCallback, 1, "ui\\demo.rpl", field_0x1a8);
+                replayVcr->OpenRecording(RecorderCallback, 1, "ui\\demo.rpl", vcrFile);
                 AppendChild(replayVcr, -1);
             } else {
                 replayVcr->OpenRecording(RecorderCallback, 1, g_TrackGame->mode.replayFile,
-                                                   field_0x1a8);
+                                                   vcrFile);
                 AppendChild(replayVcr, -1);
             }
             savedCameraState = UnknownFunctionCameraView()->cameraState;
@@ -830,11 +830,11 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         g_TrackGame->ui->StepProgressBar();
         if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             COPY_TEXT(ghostFileRecorded, "VCRghost.dat", 0x104);
-            replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, field_0x1a8);
+            replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, vcrFile);
             if (ghostVcr) {
                 COPY_TEXT(ghostFilePlayed, "VCRgtemp.dat", 0x104);
-                ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, field_0x1a8);
-                field_0x1c8 = ghostVcr->RecordedLength();
+                ghostVcr->OpenRecording(RecorderCallback, 1, ghostFilePlayed, vcrFile);
+                bestGhostLength = ghostVcr->RecordedLength();
                 aiRacers[0]->UnknownFunction496e20(ghostVcr);
                 if (field_0x189)
                     aiRacers[0]->UnknownVirtualSlot4();
@@ -843,7 +843,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 AppendChild(ghostVcr, -1);
             }
         } else {
-            replayVcr->OpenRecording(RecorderCallback, 0, "VCRtape.dat", field_0x1a8);
+            replayVcr->OpenRecording(RecorderCallback, 0, "VCRtape.dat", vcrFile);
         }
         AppendChild(replayVcr, -1);
         isRecording = 1;
@@ -871,7 +871,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     if (g_TrackGame->mode.raceSettings.eventType)
         BuildStatusList(&field_0x0c4, (UnknownKrustyBikeView*)this);
     if (ghostVcr)
-        localRacer->fastestLap = field_0x1c8;
+        localRacer->fastestLap = bestGhostLength;
     g_TrackGame->ui->StepProgressBar();
 
     UnknownBikeNumberPainter* painter = new(__FILE__, 0x367) UnknownBikeNumberPainter(textures->field_0x00);

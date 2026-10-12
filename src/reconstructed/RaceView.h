@@ -230,7 +230,7 @@ struct UnknownKrustyBikeView : public GameObject {
     ChatOverlay* chatOverlay;                 // +0x19c the name tags (TrackOverlay 0x0051bed0 updates them)
     UnknownKrustyBikeViewReplay* replayVcr;   // +0x1a0 replay being played (InGameProcs.cpp VCRDlg)
     unsigned char field_0x1a4[0x1a8 - 0x1a4];
-    UnknownVcrFile* field_0x1a8;         // ghost recording (EventManager 0x0045cdc0)
+    UnknownVcrFile* vcrFile;             // +0x1a8 VCR file the recordings open; EventManager 0x0045cdc0 saves it as Record\*.gho
     unsigned char field_0x1ac[0x1b8 - 0x1ac];
     float replayTime;                         // +0x1b8 replay time (InGameProcs.cpp VCRDlg)
     unsigned char field_0x1bc[0x1c4 - 0x1bc];
