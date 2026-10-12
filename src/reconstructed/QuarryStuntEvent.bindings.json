@@ -82,7 +82,7 @@
   "?AppendMessage@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b5e0",
   "?LoadMap@RadarOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@HUUnknownOverlayRect@@@Z": "0x0051b840",
   "?Setup@ChatOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@PAXUUnknownOverlayRect@@3@Z": "0x0051cf80",
-  "?UnknownFunction51d980@ChatOverlay@@QAEXH@Z": "0x0051d980",
+  "?ShowCueTag@ChatOverlay@@QAEXH@Z": "0x0051d980",
   "?ShowInputLine@ChatOverlay@@QAEXXZ": "0x0051dd10",
   "?UnknownFunction51e7c0@ChatOverlay@@QAEXXZ": "0x0051e7c0",
   "?RedrawNameTags@ChatOverlay@@QAEXH@Z": "0x0051e910",

@@ -97,7 +97,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
             statsOverlay->UnknownFunction464e80(index);
         }
         radarOverlay->field_0x174 = visualCue->UnknownFunction48bc80();
-        chatOverlay->UnknownFunction51d980(visualCue->UnknownFunction48bc80());
+        chatOverlay->ShowCueTag(visualCue->UnknownFunction48bc80());
     }
     if (!g_TrackGame->eventManager->waitingForRacers && !raceView->viewAvailable && raceView->isRacing) {
         clockSeconds += g_TrackGame->frameTime;

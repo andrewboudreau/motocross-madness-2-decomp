@@ -121,7 +121,7 @@
   "?WorldToMap@RadarOverlay@@QAEHUVector3@@PAH1PAM2@Z": "0x0051c360",
   "?LineThrough@RadarOverlay@@QAEHPBM0PAM11@Z": "0x0051c460",
   "?DrawGates@RadarOverlay@@QAEXXZ": "0x0051cb20",
-  "?UnknownFunction51d980@ChatOverlay@@QAEXH@Z": "0x0051d980",
+  "?ShowCueTag@ChatOverlay@@QAEXH@Z": "0x0051d980",
   "?HandleChatKey@ChatOverlay@@QAEHHPAH@Z": "0x0051da30",
   "?ShowInputLine@ChatOverlay@@QAEXXZ": "0x0051dd10",
   "?AddMessage@ChatOverlay@@QAEXPBDHH@Z": "0x0051dd70",

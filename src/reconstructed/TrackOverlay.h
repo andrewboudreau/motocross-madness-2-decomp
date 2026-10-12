@@ -197,7 +197,7 @@ public:
     UnknownInstrumentSource* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
     UnknownTrackOverlayRect rowRects[8];
-    char field_0x1b0[8][0x80];
+    char drawnRowText[8][0x80];               // +0x1b0 the rows last drawn; a row is redrawn when its text changes
     char rowText[8][0x80];                    // the text drawn into field_0x130[i]
     UnknownTextExtent rowExtent;              // extent of the first row (GetTextExtentPoint32A)
 };
@@ -223,11 +223,11 @@ public:
                                            const char* text);
 
     void* textFont;                           // font (DeleteObject)
-    float field_0x30;                         // 1.0
+    float elapsedTime;                        // +0x30 1.0; slot 10 adds the frame time while visible
     int visible;                              // shown
     int field_0x38;
     int textX;                                // text x
-    int field_0x40;
+    int textYOffset;                          // +0x40 slot 10 adds it to the dropped y
     int textY;                                // text y
     char caption[0x80];                       // text
 };
@@ -400,7 +400,7 @@ public:
     char typedLine[0x4c];                     // the line being typed
     UnknownChatEntry history[4];
     int typedLength;                          // length of field_0x000
-    int field_0x1c0;
+    int historyCount;                         // +0x1c0 used history lines (0x0051eb40 adds while below 3)
 };
 
 // RTTI: ChatOverlay : Overlay (vtable 0x00558854), 0x3e0 bytes (the
@@ -420,11 +420,11 @@ public:
     // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
     // `view` and gives each a name tag; in view mode 0 one more.
     int CollectRacers(UnknownChatView* view);
-    void UnknownFunction51d980(int show);     // 0x0051d980
+    void ShowCueTag(int show);     // 0x0051d980
     // 0x0051da30 (bikerace.cpp 0x0041f5b1): a typed key; Enter sends the
     // line as network message 0x85, Escape sets *result.
     int HandleChatKey(int key, int* result);
-    void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
+    void SetCueRacer(float squaredDistance, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
     int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void ShowInputLine();             // 0x0051dd10: shows the input line
@@ -449,17 +449,17 @@ public:
     UnknownChatInput* chatInput;
     UnknownOverlayRect chatRect;              // chat rectangle (set by 0x0051cf80)
     UnknownOverlayRect cueRect;               // cue rectangle; left/top place the extra name tag (0x0051d730)
-    int field_0x160;
-    int field_0x164;
+    int nameLineRight;                        // +0x160 right edge of the drawn cue line (0x0051e800)
+    int cueTagShown;                          // +0x164 ShowCueTag's flag
     int nameChanged;                          // name changed
     UnknownChatRacer* racers[11];
     int racerCount;                           // +0x198 entries in racers; also the extra name tag's index
     int lastRacerValues[11];                  // racers[i]->field_0x784 last seen
     Overlay* leftPanel;                       // +0x1c8 side panel left of chatRect on wide screens (0x0051cf80)
     Overlay* rightPanel;                      // +0x1cc side panel right of chatRect
-    float field_0x1d0;
-    char playerName[0x104];                   // name
+    float cueSquaredDistance;                 // +0x1d0 drawn as its square root (0x0051e800)
+    char cueRacerName[0x104];                 // +0x1d4 SetCueRacer's name
     NameOverlay* nameTags[13];
     UnknownTrackOverlayRect nameTagRects[13];
-    int field_0x3dc;
+    int typingEnabled;                        // +0x3dc typed keys go to the input line; Enter clears it
 };
