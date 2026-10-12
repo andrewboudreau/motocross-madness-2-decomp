@@ -157,15 +157,15 @@ public:
     int entryCount;                           // +0x64: entries in +0x60
     // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg), read
     // from presets.pb by 0x0049a540 (keys in the comments).
-    int field_0x68[5][3][11];                 // standard curves ("Category_%dPreset_%d" RPM%05d)
-    int field_0x2fc[5];                       // "RPMLowerLimit"
-    int field_0x310[5];                       // "RPMUpperLimit"
-    int field_0x324[5][11];                   // band maxima ("Category_%d" RPM%05d)
-    int field_0x400[5];                       // total of the bands ("HPSum")
-    int field_0x414[5];                       // RPM step: a tenth of the limits' range
-    int field_0x428[5];                       // "Weight"
-    int field_0x43c[5];                       // slider minimum ("MinRange")
-    int field_0x450[5];                       // slider maximum (the largest band maximum)
+    int standardCurves[5][3][11];             // +0x68: standard curves ("Category_%dPreset_%d" RPM%05d)
+    int rpmLowerLimit[5];                     // +0x2fc: "RPMLowerLimit"
+    int rpmUpperLimit[5];                     // +0x310: "RPMUpperLimit"
+    int bandMaxima[5][11];                    // +0x324: band maxima ("Category_%d" RPM%05d)
+    int hpSum[5];                             // +0x400: total of the bands ("HPSum")
+    int rpmStep[5];                           // +0x414: RPM step: a tenth of the limits' range
+    int weight[5];                            // +0x428: "Weight"
+    int minRange[5];                          // +0x43c: slider minimum ("MinRange")
+    int maxRange[5];                          // +0x450: slider maximum (the largest band maximum)
     GameObject* garageScene;                  // +0x464: the garage scene (built by 0x00498cf0); released by 0x004999b0
     Camera* garageCamera;                     // +0x468: made current while +0x464 is shown
     UnknownKrustyUIModelObject* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)

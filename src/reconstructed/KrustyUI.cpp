@@ -626,40 +626,40 @@ void KrustyUI::LoadGarageTables() {
         for (int i = 0; i < 5; i++) {
             sprintf(key, "Category_%d", i + 1);
             block.UnknownFunction4b78f0(key);
-            block.UnknownFunction4b7f10("RPMLowerLimit", 5000, &field_0x2fc[i]);
-            block.UnknownFunction4b7f10("RPMUpperLimit", 10000, &field_0x310[i]);
-            field_0x414[i] = (field_0x310[i] - field_0x2fc[i]) / 10;
-            block.UnknownFunction4b7f10("HPSum", 400, &field_0x400[i]);
-            block.UnknownFunction4b7f10("MinRange", 10, &field_0x43c[i]);
-            block.UnknownFunction4b7f10("Weight", 200, &field_0x428[i]);
+            block.UnknownFunction4b7f10("RPMLowerLimit", 5000, &rpmLowerLimit[i]);
+            block.UnknownFunction4b7f10("RPMUpperLimit", 10000, &rpmUpperLimit[i]);
+            rpmStep[i] = (rpmUpperLimit[i] - rpmLowerLimit[i]) / 10;
+            block.UnknownFunction4b7f10("HPSum", 400, &hpSum[i]);
+            block.UnknownFunction4b7f10("MinRange", 10, &minRange[i]);
+            block.UnknownFunction4b7f10("Weight", 200, &weight[i]);
             int maximum = 0;
             int j;
             for (j = 0; j < 11; j++) {
-                sprintf(key, "RPM%05d", field_0x2fc[i] + field_0x414[i] * j);
-                block.UnknownFunction4b7f10(key, 10, &field_0x324[i][j]);
-                if (maximum <= field_0x324[i][j])
-                    maximum = field_0x324[i][j];
+                sprintf(key, "RPM%05d", rpmLowerLimit[i] + rpmStep[i] * j);
+                block.UnknownFunction4b7f10(key, 10, &bandMaxima[i][j]);
+                if (maximum <= bandMaxima[i][j])
+                    maximum = bandMaxima[i][j];
             }
-            field_0x450[i] = maximum;
+            maxRange[i] = maximum;
             for (int preset = 0; preset < 3; preset++) {
                 sprintf(key, "Category_%dPreset_%d", i + 1, preset + 1);
                 block.UnknownFunction4b78f0(key);
                 for (j = 0; j < 11; j++) {
-                    sprintf(key, "RPM%05d", field_0x2fc[i] + field_0x414[i] * j);
-                    block.UnknownFunction4b7f10(key, 10, &field_0x68[i][preset][j]);
+                    sprintf(key, "RPM%05d", rpmLowerLimit[i] + rpmStep[i] * j);
+                    block.UnknownFunction4b7f10(key, 10, &standardCurves[i][preset][j]);
                 }
             }
         }
     } else {
         for (int i = 0; i < 5; i++) {
-            field_0x2fc[i] = 5000;
-            field_0x310[i] = 10000;
-            field_0x400[i] = 100;
-            field_0x414[i] = (field_0x310[i] - field_0x2fc[i]) / 10;
+            rpmLowerLimit[i] = 5000;
+            rpmUpperLimit[i] = 10000;
+            hpSum[i] = 100;
+            rpmStep[i] = (rpmUpperLimit[i] - rpmLowerLimit[i]) / 10;
             for (int preset = 0; preset < 3; preset++) {
                 for (int j = 0; j < 11; j++) {
-                    field_0x68[i][preset][j] = 10;
-                    field_0x324[i][j] = 40;
+                    standardCurves[i][preset][j] = 10;
+                    bandMaxima[i][j] = 40;
                 }
             }
         }

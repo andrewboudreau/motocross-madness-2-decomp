@@ -262,12 +262,12 @@ void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* option
     int k;
 
     for (i = 0; i < 11; i++)
-        options->field_0x24[i] = g_TrackGame->ui ? g_TrackGame->ui->field_0x68[1][0][i] : 10;
+        options->field_0x24[i] = g_TrackGame->ui ? g_TrackGame->ui->standardCurves[1][0][i] : 10;
     for (k = 0; k < 5; k++) {
         for (j = 0; j < 3; j++) {
             for (i = 0; i < 11; i++)
                 customGarageCurves[k][j][i] =
-                    g_TrackGame->ui ? g_TrackGame->ui->field_0x43c[k] : 0;
+                    g_TrackGame->ui ? g_TrackGame->ui->minRange[k] : 0;
         }
     }
 }

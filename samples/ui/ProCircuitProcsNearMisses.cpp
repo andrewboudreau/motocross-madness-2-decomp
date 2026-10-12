@@ -144,7 +144,7 @@ void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
         if (_stricmp("ButAccept", event->controlName) == 0) {
             circuit->field_0x465[0].field_0x30 += cashShortfall;
             circuit->field_0x465[0].field_0x34 += cashShortfall;
-            g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+            g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
             PCCentralDlg* dialog = new(__FILE__, 1551) PCCentralDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
@@ -208,7 +208,7 @@ void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
         if (_stricmp("ButAccept", event->controlName) == 0) {
             circuit->field_0x465[0].field_0x30 += loanAmount - circuit->field_0x465[0].field_0x34;
             circuit->field_0x465[0].field_0x34 = 0;
-            g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+            g_TrackGame->field_0x3444->Save(g_TrackGame->careerFile);
             PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);

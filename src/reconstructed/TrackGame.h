@@ -700,7 +700,7 @@ public:
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;
     UnknownTrackGameObject3444* field_0x3444;
-    unsigned char field_0x3448[0x34c8 - 0x3448];
+    char careerFile[0x34c8 - 0x3448];         // +0x3448: the pro circuit career file loaded/saved (ProCircuitProcs.cpp)
     int screenSaverWasActive;
 };
 
