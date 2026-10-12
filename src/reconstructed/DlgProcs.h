@@ -36,7 +36,7 @@ void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2,
 class MainDlg : public UIDialog {
 public:
     MainDlg() : UIDialog(1, "mainmenu.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044b200
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044b200
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0044c6b0
     void FillProfileList();             // 0x0044c7a0: fills "LstProfiles"
     void ShowCurrentProfile();             // 0x0044c8c0: shows the current profile
@@ -57,21 +57,21 @@ public:
 class ChooseTCPMethodDlg : public UIDialog {
 public:
     ChooseTCPMethodDlg() : UIDialog(1, "messbox2.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044cb80
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044cb80
 };
 
 // RTTI: NewbieDlg : UIDialog (vtable 0x00551c2c; 0x7f58 bytes).
 class NewbieDlg : public UIDialog {
 public:
     NewbieDlg() : UIDialog(1, "messbox2.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ccf0
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044ccf0
 };
 
 // RTTI: NoDelCurProfileDlg : UIDialog (vtable 0x0055198c).
 class NoDelCurProfileDlg : public UIDialog {
 public:
     NoDelCurProfileDlg() : UIDialog(1, "messbox2.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ce10
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044ce10
 };
 
 class BackgroundImage;
@@ -91,7 +91,7 @@ public:
 class SinglePlayerDlg : public UIDialog {
 public:
     SinglePlayerDlg() : UIDialog(1, "SPBase.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044cf20
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044cf20
     void OpenPage(int page);     // 0x0044d740: opens page `page` (0..2)
 
     SPEventDlg* eventPage;                    // +0x7f58: SPEventDlg page
@@ -105,10 +105,10 @@ struct UnknownRecordFileHeader;
 class SPEventDlg : public UIDialog {
 public:
     SPEventDlg() : UIDialog(1, "SPEvent.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044d950
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044d950
     void ShowRaceModeControls();             // 0x0044dfc0: shows the controls for the race mode
     void ApplyEventType();             // 0x0044e3e0: applies the chosen event type
-    void UnknownVirtualSlot31(int apply);     // 0x0044e6c0: stores (or shows) the event settings
+    void SyncValues(int apply);     // 0x0044e6c0: stores (or shows) the event settings
     void ListGhosts();             // 0x0044eb40: lists the ghosts for the track
     int AddGhost(const char* path); // 0x0044ec50: adds a ghost; 0 when unusable
     void ForgetGhosts();             // 0x0044eed0: forgets the ghosts
@@ -123,7 +123,7 @@ public:
 class SPBikeRiderDlg : public UIDialog {
 public:
     SPBikeRiderDlg() : UIDialog(1, "SPBikeR.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ef70
+    void HandleEvent(UnknownDialogEvent* event); // 0x0044ef70
     // 0x0044fab0 / 0x0044fa00 (a near miss): MPBikeRiderDlg's and
     // PCCentralBikeRiderDlg's slot 22 and PCCentralBikeRiderDlg's slot 23
     // share these bodies.
@@ -131,7 +131,7 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0044fae0: turns the bike view
     virtual int UnknownVirtualSlot13();       // 0x0044ffc0: names the chosen bike's and rider's textures
-    void UnknownVirtualSlot31(int apply);     // 0x004505d0: stores the chosen bike and rider
+    void SyncValues(int apply);     // 0x004505d0: stores the chosen bike and rider
     void FillBikeRiderLists();             // 0x0044f750: fills the bike and rider lists (a near miss)
     void PaintPlateNumber(int number);   // 0x0044f950: paints the plate number on every bike
     // 0x004500d0: MPBikeRiderDlg's identical method is folded into it.
@@ -154,14 +154,14 @@ public:
 class SPRaceInfoDlg : public UIDialog {
 public:
     SPRaceInfoDlg() : UIDialog(1, "SPRInfo.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004507a0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004507a0
 };
 
 // RTTI: CreditsVidDlg : UIDialog (vtable 0x005516f8).
 class CreditsVidDlg : public UIDialog {
 public:
     CreditsVidDlg() : UIDialog(1, "credits.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453170
+    void HandleEvent(UnknownDialogEvent* event); // 0x00453170
 
     UIVideoStatic* movieControl;              // +0x7f58: the credits movie
 };
@@ -174,7 +174,7 @@ extern int g_UnknownGlobal59ae00;
 class Intro2Dlg : public UIDialog {
 public:
     Intro2Dlg() : UIDialog(1, "intro2.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453430
+    void HandleEvent(UnknownDialogEvent* event); // 0x00453430
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00453570
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004535f0
 
@@ -187,7 +187,7 @@ public:
 class Intro3Dlg : public UIDialog {
 public:
     Intro3Dlg() : UIDialog(1, "intro3.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453610
+    void HandleEvent(UnknownDialogEvent* event); // 0x00453610
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00453670
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004536c0
 
@@ -199,7 +199,7 @@ public:
 class EditBoxDlg : public UIDialog {
 public:
     EditBoxDlg() : UIDialog(1, "messbox1.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455840
+    void HandleEvent(UnknownDialogEvent* event); // 0x00455840
     // 0x004558f0: sets the title and prompt and edits `buffer` (`size` bytes).
     void Edit(const char* title, const char* prompt, char* buffer, int size);
     // 0x00455970: the same with string resource ids (used when nonzero).
@@ -213,7 +213,7 @@ public:
 // RTTI: DemoDlg : UIDialog (vtable 0x00550e18; 0x7f58 bytes).
 class DemoDlg : public UIDialog {
 public:
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455a10
+    void HandleEvent(UnknownDialogEvent* event); // 0x00455a10
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455b20
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455ae0
 };
@@ -242,7 +242,7 @@ struct UnknownLoadFailedMessage {
 class LoadingDlg : public UIDialog {
 public:
     explicit LoadingDlg(int flags) : UIDialog(flags, "loading.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00451020
+    void HandleEvent(UnknownDialogEvent* event); // 0x00451020
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00451270
 
     int framesShown;                          // +0x7f58: frames shown
@@ -294,21 +294,21 @@ void CreateProfile(UnknownDialogEvent* event);
 class UserNameDlg : public UIDialog {
 public:
     UserNameDlg() : UIDialog(1, "messbox1.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00451ff0
+    void HandleEvent(UnknownDialogEvent* event); // 0x00451ff0
 };
 
 // RTTI: ProfileExistsDlg : UIDialog (vtable 0x005521dc; 0x7f58 bytes).
 class ProfileExistsDlg : public UIDialog {
 public:
     ProfileExistsDlg() : UIDialog(1, "messbox2.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00452370
+    void HandleEvent(UnknownDialogEvent* event); // 0x00452370
 };
 
 // RTTI: RemoveProfileDlg : UIDialog (vtable 0x00551908).
 class RemoveProfileDlg : public UIDialog {
 public:
     RemoveProfileDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004524f0
+    void HandleEvent(UnknownDialogEvent* event); // 0x004524f0
 };
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
@@ -351,7 +351,7 @@ class ReplayFilesDlg;
 class GhostReplayDlg : public UIDialog {
 public:
     GhostReplayDlg() : UIDialog(1, "GRBase.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453b20
+    void HandleEvent(UnknownDialogEvent* event); // 0x00453b20
     void OpenPage(int page);     // 0x00453e90: opens page `page` (0 ghosts, 1 replays)
 
     GhostFilesDlg* ghostPage;                 // +0x7f58: GhostFilesDlg page
@@ -362,7 +362,7 @@ public:
 class GhostFilesDlg : public UIDialog {
 public:
     GhostFilesDlg() : UIDialog(1, "GhostFil.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00454030
+    void HandleEvent(UnknownDialogEvent* event); // 0x00454030
     void ListGhostFiles();             // 0x00454470: lists the ghost files
     int AddGhostFile(const char* path); // 0x00454640: adds a ghost file; 0 when unusable
     void RaceSelectedGhost();             // 0x00454970: races the selected ghost
@@ -378,7 +378,7 @@ public:
 class ReplayFilesDlg : public UIDialog {
 public:
     ReplayFilesDlg() : UIDialog(1, "ReplyFil.dtm") {}
-    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00454a50
+    void HandleEvent(UnknownDialogEvent* event); // 0x00454a50
     void ListReplayFiles();             // 0x00454e60: lists the replay files
     int AddReplayFile(const char* path); // 0x00455040: adds a replay file; 0 when unusable
     void PlaySelectedReplay();             // 0x00455490: plays the selected replay

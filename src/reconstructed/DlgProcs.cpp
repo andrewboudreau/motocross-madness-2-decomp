@@ -273,7 +273,7 @@ void AddStatsRows(UnknownDialogEvent* event, const char* row1, const char* row2,
 }
 
 // 0x0044cb80
-void ChooseTCPMethodDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ChooseTCPMethodDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 1);
@@ -305,7 +305,7 @@ void ChooseTCPMethodDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x0044ccf0
-void NewbieDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void NewbieDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 1);
@@ -332,7 +332,7 @@ void NewbieDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x0044ce10
-void NoDelCurProfileDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void NoDelCurProfileDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 1);
@@ -357,7 +357,7 @@ void NoDelCurProfileDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x0044cf20
-void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         eventPage = 0;
@@ -545,7 +545,7 @@ void SinglePlayerDlg::OpenPage(int page) {
 }
 
 // 0x0044d950
-void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
@@ -815,7 +815,7 @@ void SPEventDlg::ApplyEventType() {
 }
 
 // 0x0044e6c0
-void SPEventDlg::UnknownVirtualSlot31(int apply) {
+void SPEventDlg::SyncValues(int apply) {
     char seed[128];
     UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
     if (apply) {
@@ -952,7 +952,7 @@ void SPEventDlg::ForgetGhosts() {
 }
 
 // 0x0044ef70
-void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
     char plate[12];
     char typed[12];
     switch (event->kind) {
@@ -1235,7 +1235,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
 }
 
 // 0x004505d0
-void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
+void SPBikeRiderDlg::SyncValues(int apply) {
     if (!apply)
         return;
     strcpy(g_TrackGame->mode.field_0x1974.field_0x00, "");
@@ -1305,7 +1305,7 @@ LoadBajaDlg::LoadBajaDlg(int flags) : LoadingDlg(flags) {
 }
 
 // 0x00451020
-void LoadingDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogTimer:
         if (g_TrackGame->network) {
@@ -1457,7 +1457,7 @@ void CreateProfile(UnknownDialogEvent* event) {
 }
 
 // 0x00451ff0
-void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
     char playerName[16];
     char text[128];
     switch (event->kind) {
@@ -1527,7 +1527,7 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x00452370
-void ProfileExistsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ProfileExistsDlg::HandleEvent(UnknownDialogEvent* event) {
     char label[128];
     char text[256];
     switch (event->kind) {
@@ -1562,7 +1562,7 @@ void ProfileExistsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004524f0
-void RemoveProfileDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void RemoveProfileDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[128];
     switch (event->kind) {
     case 11:
@@ -1873,7 +1873,7 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
 }
 
 // 0x00453170
-void CreditsVidDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void CreditsVidDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1)
@@ -1901,7 +1901,7 @@ void CreditsVidDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 }
 
 // 0x004532c0
-void Intro1Dlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
@@ -1932,7 +1932,7 @@ int Intro1Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 }
 
 // 0x00453430
-void Intro2Dlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
@@ -1973,7 +1973,7 @@ int Intro2Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 }
 
 // 0x00453610
-void Intro3Dlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
@@ -2073,7 +2073,7 @@ void LeaveMenusForRace() {
 }
 
 // 0x00453b20
-void GhostReplayDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void GhostReplayDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         ghostPage = 0;
@@ -2152,7 +2152,7 @@ void GhostReplayDlg::OpenPage(int page) {
 }
 
 // 0x00454030
-void GhostFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void GhostFilesDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[256];
     switch (event->kind) {
     case kDialogInit:
@@ -2307,7 +2307,7 @@ void GhostFilesDlg::RaceSelectedGhost() {
 }
 
 // 0x00454a50
-void ReplayFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ReplayFilesDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[256];
     switch (event->kind) {
     case kDialogInit:
@@ -2488,7 +2488,7 @@ void ReplayFilesDlg::PlaySelectedReplay() {
 }
 
 // 0x004555b0
-void ChoiceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void ChoiceDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogCommand:
         if (!_stricmp("ButLeft", event->controlName))
@@ -2548,7 +2548,7 @@ void ChoiceDlg::SetTextsOrResources(const char* title, int titleId, const char* 
 }
 
 // 0x00455840
-void EditBoxDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void EditBoxDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit:
         editBuffer = 0;
@@ -2590,7 +2590,7 @@ void EditBoxDlg::EditWithResources(const char* title, int titleId, const char* p
 }
 
 // 0x00455a10
-void DemoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
@@ -2632,7 +2632,7 @@ int DemoDlg::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x00455b60
-void TransDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void TransDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
@@ -2666,7 +2666,7 @@ void TransDlg::SetNextMenu(int menu) {
 }
 
 // 0x00455c50
-void Exit1Dlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void Exit1Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1)

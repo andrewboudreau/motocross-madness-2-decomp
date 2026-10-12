@@ -367,7 +367,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
         event.controlName = 0;
         event.dialog = this;
         event.control = 0;
-        UnknownVirtualSlot29(&event);
+        HandleEvent(&event);
         sendFrameEvent = 0;
     }
     if (!field_0x25_bit2 && !isClosing) {
@@ -388,7 +388,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                     event.controlName = 0;
                     event.dialog = this;
                     event.control = 0;
-                    UnknownVirtualSlot29(&event);
+                    HandleEvent(&event);
                     if (event.handled)
                         return 1;
                 }
@@ -647,7 +647,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             event.dialog = ownerDialog;
             event.gui = ownerGui;
             event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->HandleEvent(&event);
             if (event.handled)
                 return 1;
             break;
@@ -702,7 +702,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
         event.dialog = ownerDialog;
         event.gui = ownerGui;
         event.control = this;
-        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->HandleEvent(&event);
         result = 1;
     }
     return result;

@@ -16,8 +16,8 @@
 //   UnknownProCircuitStats (ProCircuit.h), all give 427. Retail keeps stunt
 //   (ecx) and repairs (edx) and reloads medical for the +0x24 update; VC6
 //   here keeps medical and repairs and reloads stunt.
-// PCBailoutDlg::UnknownVirtualSlot29 (0x004d8fc0, 882 bytes, 836 match) and
-// PCBunnyDlg::UnknownVirtualSlot29 (0x004d9860, 1122 bytes, 1068 match): the
+// PCBailoutDlg::HandleEvent (0x004d8fc0, 882 bytes, 836 match) and
+// PCBunnyDlg::HandleEvent (0x004d9860, 1122 bytes, 1068 match): the
 //   init case reads the fee and the cash into locals and stores the fee
 //   member last; that gives retail's ecx/edx choices from the first
 //   FindControl call on (750 and 225 with the fee member stored first, as
@@ -35,7 +35,7 @@
 //   local and `self = this` are worse or the same, and no typedef count
 //   (0..63) ahead of the TU makes 0x004d8c40, 0x004d8fc0, 0x004d9860 or
 //   0x004d9cd0 exact, so it is not a symbol-arena tie-break.
-// PCBonusTrackDlg::UnknownVirtualSlot29 (0x004d9cd0, 752 bytes): the same
+// PCBonusTrackDlg::HandleEvent (0x004d9cd0, 752 bytes): the same
 //   prologue difference, and retail copies the circuit pointer from ebp to
 //   edi for the init case (VC6 here keeps one register; `current = circuit`
 //   and using `circuit` directly compile the same). The init stores placed
@@ -105,7 +105,7 @@ void PCLastRaceDlg::PayOutRace()
 }
 
 // 0x004d8fc0
-void PCBailoutDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     UIControl* label;
@@ -159,7 +159,7 @@ void PCBailoutDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004d9860
-void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     char text[128];
@@ -223,7 +223,7 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 }
 
 // 0x004d9cd0
-void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     char text[128];

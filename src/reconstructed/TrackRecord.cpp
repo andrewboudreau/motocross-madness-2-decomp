@@ -198,7 +198,7 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 
 // 0x0051f600: the dialog's messages: 5 sets it up, 1 handles the buttons
 // and tabs, 2 a track chosen in the list, 6 frees the rows.
-void TrackRecordDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+void TrackRecordDlg::HandleEvent(UnknownDialogEvent* event)
 {
     char name[128];
     char path[260];

@@ -871,7 +871,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
 int g_UnknownGlobal689e04;
 
 // 0x004f4520: the lobby's dialog procedure.
-void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
     char name[0x10];
     char text[0x80];
     UnknownPlayerStateMessage state;
@@ -1448,7 +1448,7 @@ void MPEventDlg::ShowHostSettings() {
 }
 
 // 0x004f6370
-void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[0x80];
     char number[0x80];
     switch (event->kind) {
@@ -1709,7 +1709,7 @@ void MPEventDlg::ApplyEventType() {
 }
 
 // 0x004f7210
-void MPEventDlg::UnknownVirtualSlot31(int apply) {
+void MPEventDlg::SyncValues(int apply) {
     UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
     if (!g_TrackGame->network || !g_TrackGame->network->isHost)
         return;
@@ -1815,7 +1815,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
 }
 
 // 0x004f78a0
-void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
     char plate[12];
     char typed[12];
     char text[0x80];
@@ -2086,7 +2086,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
 }
 
 // 0x004f91e0
-void MPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
+void MPBikeRiderDlg::SyncValues(int apply) {
     if (!apply)
         return;
     {
@@ -2130,7 +2130,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
 }
 
 // 0x004f93c0
-void MPOptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void MPOptionsDlg::HandleEvent(UnknownDialogEvent* event) {
     char text[0x80];
     switch (event->kind) {
     case kDialogCommand:
