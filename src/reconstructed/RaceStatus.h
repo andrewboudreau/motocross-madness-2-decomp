@@ -18,7 +18,7 @@ extern int g_ViewRacerFinished;
 
 // 0x0047b670 (gameui.cpp): whether moving from `from` to `to` crosses
 // `gate`.
-int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate, int direction);
+int CrossesGate(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate, int direction);
 
 // 0x004e58c0: counts a lap when `from`..`to` crosses the finish `gate`
 // (or `forced` when `skipTest`): lap time, lap start times by lap % 100,

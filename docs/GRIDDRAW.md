@@ -222,7 +222,8 @@ destructor `0x004838a0` and its deleting wrapper `0x004838f0`. Near misses
 | `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame and four bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687) from an `__asm fld/fistp` rounding helper while `__ftol` is still called for the other casts, which the no-inline-asm rule rules out; `/Oy-` only fakes the frame and leaves the x87 crossing loops different |
 | `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index (eax vs ecx) and the gridX/gridZ compare order; invariant under ~30 spellings, /G6, /O1 and /Oy- |
 
-What the two large functions do (names tier 3): `0x00483910(x, z, heights,
+What the two large functions do (names tier 3; `0x00483910` is
+`GetCellCorners` in Griddraw.h): `0x00483910(x, z, heights,
 normals, bytes)` descends to the leaf holding sample (x, z), clamping out of
 range indices to the border child, and writes the four corner heights
 `((h - base) * field_0x10 + base) * field_0x14`, normals (signed bytes / 127,

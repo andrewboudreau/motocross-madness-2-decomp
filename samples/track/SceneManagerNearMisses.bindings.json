@@ -110,7 +110,7 @@
   "?UnknownFunction4444c0@UnknownSceneLodObject@@QAEXH@Z": "0x004444c0",
   "?UnknownFunction464e80@Scene@@QAEXPBD@Z": "0x00464e80",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction4a6b30@UnknownSceneObject@@QAEPAXPBDH@Z": "0x004a6b30",
+  "?FindMotion@UnknownSceneObject@@QAEPAXPBDH@Z": "0x004a6b30",
   "?UnknownFunction4b5d00@@YAXPAUVector3@@0MMH@Z": "0x004b5d00",
   "?UnknownFunction4b78f0@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?UnknownFunction4b7ec0@UnknownParameterBlock@@QAEHPBD0PADH@Z": "0x004b7ec0",

@@ -107,9 +107,9 @@ public:
     explicit UnknownWreckerCollisionModel(int flags);              // 0x0043b8d0
     // 0x0043b9e0 (thiscall, ret 0xc): binds the model to `body`; `name`
     // is the collision file Bike passes ("rider.col").
-    void UnknownFunction43b9e0(UnknownWreckerRigidBody* body, int value, const char* name);
+    void SetBody(UnknownWreckerRigidBody* body, int value, const char* name);
     // 0x0043c7f0 (thiscall, ret 0x10): adds a probe at `offset` on `bone`.
-    void UnknownFunction43c7f0(Vector3 offset, int bone);
+    void AddProbePoint(Vector3 offset, int bone);
 
     unsigned char field_0x88[0xe8 - 0x88];
     int manualStep;            // +0xe8
@@ -200,8 +200,8 @@ public:
     virtual void UnknownVirtualSlot7(float frameTime, int a, int b);
 
     void UnknownFunction4a8ac0(Vector3* position, int value);      // 0x004a8ac0 (ret 8)
-    void UnknownFunction4a8b10(const char* animation);             // 0x004a8b10 (ret 4)
-    void UnknownFunction4a8b40(int value);                         // 0x004a8b40 (ret 4)
+    void SetMotionByName(const char* animation);             // 0x004a8b10 (ret 4)
+    void SetMotion(int value);                         // 0x004a8b40 (ret 4)
     void UnknownFunction4a8b80(int value, float blend);            // 0x004a8b80 (ret 8)
 
     unsigned char field_0x004[0x18 - 0x4];
@@ -326,7 +326,7 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00532890
 
     // 0x00530190: slot 8 on the owner, then 0x005301c0; returns this.
-    Wrecker* UnknownFunction530190(void* owner, UnknownWreckerCharacter* rider, const char* name);
+    Wrecker* SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name);
     void UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name);
     void AddContactAnimation(int value);             // appends to contactAnimations
     void AddRandomAnimation(int value);             // appends to randomAnimations

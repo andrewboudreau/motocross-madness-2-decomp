@@ -133,6 +133,10 @@ relocation resolved by the bindings. Two near misses are parked in
   named view pointer in `WreckerStep`: VC6 orders those equal terms by the
   count of referenced local symbols created before the product, modulo 8
   (two to seven more than the cast written inline give retail's order).
+- `0x00530190` is `SetupWrecker`. The krusty2 names `SetBody` (`0x0043b9e0`),
+  `AddProbePoint` (`0x0043c7f0`), `FindMotion`/`SetMotion`/`AdvanceMotion`/
+  `SetMotionByName` (`0x004a6b30`/`0x004a8b40`/`0x004a6bb0`/`0x004a8b10`)
+  replace the address names in the lane's views.
 - `0x005301c0` passes the literal "Fall02" (`0x0056d418`) to `0x004a8b10`.
 - `GameObject.h` gains `friend class Wrecker`: Wrecker clears and sets
   bit 0 of its rigid body's `+0x25` byte (bitfield code: `and cl, 0xfe` and

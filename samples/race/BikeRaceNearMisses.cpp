@@ -578,7 +578,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         if (field_0x144)
             field_0x04c->UnknownFunction507c10(&startProbe.field_0x00, 0, 0, 0);
         if (field_0x148 && field_0x144)
-            UnknownFunction41d1e0();
+            UpdateTrackSeparation();
         break;
     }
     case 1:
@@ -726,7 +726,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 flagGirl->field_0x1a0->UnknownFunction4444c0(1);
                 flagGirl->field_0x1a0->UnknownFunction4fc630(girlPosition);
                 flagGirl->field_0x1a0->UnknownFunction4fbd70(&direction, &kVec3YAxis, 1, 0);
-                flagGirl->UnknownFunction4a8b10("Stand");
+                flagGirl->SetMotionByName("Stand");
                 flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
             }
 
@@ -798,7 +798,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     }
     g_TrackGame->ui->UnknownFunction49b530();
 
-    if (!UnknownFunction419970(owner, lights, textures, terrain, event))
+    if (!CreateRacers(owner, lights, textures, terrain, event))
         return 0;
     g_TrackGame->ui->UnknownFunction49b530();
 
@@ -909,7 +909,7 @@ static inline float UnknownRandomSkill(float base, float range) {
 }
 
 // 0x00419970
-int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
+int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
                                     UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event) {
     char path[0x104];
     char message[0x184];

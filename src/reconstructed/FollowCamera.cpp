@@ -103,7 +103,7 @@ bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, f
 // 0x00463140: Camera slot 8, then the +0x294/+0x298 values, presets, the
 // point table and the state list (states 5-7 and values outside 0..7 are
 // dropped); releases itself when no state is left.
-FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, float rate298,
+FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float rate298,
                                                   float value228, float value2d0, float value2e8,
                                                   int capacity, int count, const int* list) {
     if (!Camera::UnknownVirtualSlot8(value))

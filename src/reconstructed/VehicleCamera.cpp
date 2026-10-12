@@ -29,7 +29,7 @@ VehicleCamera::~VehicleCamera() {}
 VehicleCamera* VehicleCamera::UnknownFunction52b9e0(void* value, float rate294, float rate298, float value228,
                                                     float value2d0, float value2e8, int capacity, int count,
                                                     const int* list) {
-    if (!UnknownFunction463140(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+    if (!SetupFollowCamera(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
         return 0;
     return this;
 }

@@ -71,7 +71,7 @@ GridNode* GridNode::FindLeaf(int x, int z)
 // float right after the GridNode vtable). Retail's loop is VC6's
 // tail-recursion elimination of the child call; the clamped copies of x and
 // z (xx, zz) are what retail keeps in ebp/[esp+0x14] and in z's argument home.
-int GridNode::UnknownFunction483910(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes)
+int GridNode::GetCellCorners(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes)
 {
     int xx = x;
     int zz = z;
@@ -141,7 +141,7 @@ int GridNode::UnknownFunction483910(int x, int z, float* heights, GridVec3* norm
         int one = 1 << shift;
         GridNode* child;
         if (cx < 16 && cz < 16 && (child = children[g_gridRow16[cz] + cx]) != 0) {
-            return child->UnknownFunction483910(x & mask, z & mask, heights, normals, bytes);
+            return child->GetCellCorners(x & mask, z & mask, heights, normals, bytes);
         }
         if (cx < 0) {
             cx = 0;
@@ -163,7 +163,7 @@ int GridNode::UnknownFunction483910(int x, int z, float* heights, GridVec3* norm
         if (child == 0) {
             goto missing;
         }
-        return child->UnknownFunction483910(xx & mask, zz & mask, heights, normals, bytes);
+        return child->GetCellCorners(xx & mask, zz & mask, heights, normals, bytes);
     }
 missing:
     for (int i = 0; i < 4; i++) {

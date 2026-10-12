@@ -206,13 +206,13 @@ public:
     // the point table (line 0x88) and the state list; states 5-7 and values
     // outside 0..7 are dropped. Releases itself and returns 0 when no state
     // is left.
-    FollowCamera* UnknownFunction463140(void* value, float rate294, float rate298,
+    FollowCamera* SetupFollowCamera(void* value, float rate294, float rate298,
                                         float value228, float value2d0, float value2e8,
                                         int capacity, int count, const int* list);
     // 0x004650e0 (KrustyBikeCamera's constructor): loads the "CAMERA" records
     // of the text file `path` into frames/field_0x33c (FollowCam.cpp lines
     // 0x3c7, 0x3e1, 0x3e2).
-    void UnknownFunction4650e0(const char* path);
+    void LoadCameraFile(const char* path);
     // 0x00463520: appends a table entry while below capacity.
     bool AppendTableEntry(const Vector3& position, float a, float b, float c,
                           float d, float e);

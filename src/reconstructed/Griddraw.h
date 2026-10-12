@@ -243,7 +243,7 @@ public:
     // (x, z) and writes the four corner heights, normals and sample bytes of
     // that cell (order (x,z), (x+1,z), (x,z+1), (x+1,z+1)); returns 1, or 0
     // with heights 0, normals (0,1,0) and bytes 0 when no leaf exists.
-    int UnknownFunction483910(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes);
+    int GetCellCorners(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes);
 
     GridNode** children;                       // +0x04 256 entries (0x400 bytes)
     GridNode* parent;                          // +0x08

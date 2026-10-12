@@ -8,7 +8,7 @@
   "??_GVehicleCamera@@UAEPAXI@Z": "0x0052b9b0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
-  "?UnknownFunction463140@FollowCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00463140",
+  "?SetupFollowCamera@FollowCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00463140",
   "?GetAxes@UnknownVehiclePart@@QAEXPAUVector3@@0@Z": "0x004fc4f0",
   "?GetPosition@UnknownVehiclePart@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?UnknownFunction4fc9a0@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",

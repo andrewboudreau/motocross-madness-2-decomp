@@ -92,7 +92,8 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
   `+0x30` (`height` / `angle`, 7), the two extra uses being the spilled
   square at each site; `axis` moves from `+0x20` to `+0x28` and the
   seven-use classes from `+0x24` / `+0x28` to `+0x2c` / `+0x30`.
-- `0x00419970` (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
+- `0x00419970` (`CreateRacers`; `0x0041d1e0`, which sets +0x189 from the
+  track distance between +0xf8 and +0x134, is `UpdateTrackSeparation`) (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
   13322 positions: completely decoded (pro circuit, network, offline,
   ghost and AI racers, collision pairing; EH states for `new` lines
   0x3b6..0x78f, frees at lines 0x4ff..0x501, 0x550..0x552 and

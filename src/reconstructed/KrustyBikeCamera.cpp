@@ -41,7 +41,7 @@ KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float
                                                           int capacity, int count, const int* list) {
     if (!UnknownFunction416e80(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
         return 0;
-    UnknownFunction4650e0("FlybyCam.vue");
+    LoadCameraFile("FlybyCam.vue");
     return this;
 }
 

@@ -60,7 +60,7 @@ int CountLap(Vector3* from, Vector3* to, unsigned short* laps, UnknownBikeRaceNo
     if (!from || !to || !laps || !gate || !finished || !lapTime || !lapTimes || !bestLap)
         return 0;
     if (!skipTest) {
-        if (!UnknownFunction47b670(from, to, gate, direction))
+        if (!CrossesGate(from, to, gate, direction))
             return 0;
     } else if (!forced) {
         return 0;
@@ -87,7 +87,7 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
                           int lapLimit, int unlimited, int skipTest, int forced) {
     if (!from || !to || !current || !*current || !count || !times || !gateIndex)
         return 0;
-    if ((!skipTest && UnknownFunction47b670(from, to, *current, direction)) || (skipTest && forced)) {
+    if ((!skipTest && CrossesGate(from, to, *current, direction)) || (skipTest && forced)) {
         *current = (*current)->field_0x38;
         ++*gateIndex;
         if (!*current) {

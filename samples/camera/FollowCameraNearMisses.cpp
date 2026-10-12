@@ -45,7 +45,7 @@
 // sum on the FPU stack), and the key queries must be macros: with inline
 // helpers VC6 runs out of inline budget and calls the Vector3 constructor.
 //
-// FollowCamera::UnknownFunction4650e0 (0x004650e0, 1012 bytes): about half the
+// FollowCamera::LoadCameraFile (0x004650e0, 1012 bytes): about half the
 // bytes match. Registers and the EH frame agree once the frame pointer is taken
 // before the vector maths; retail keeps the two cross products in memory
 // temporaries (12 more frame bytes) where VC6 keeps them on the FPU stack.
@@ -235,7 +235,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
 // numbers, a direction, an up hint and a position (each stored x, z, y) and
 // one more value. The frame matrix gets the side, the corrected up and the
 // direction as rows 0-2 and the position as row 3.
-void FollowCamera::UnknownFunction4650e0(const char* path) {
+void FollowCamera::LoadCameraFile(const char* path) {
     UnknownTextureStream* stream =
         new(__FILE__, 0x3c7) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (!stream->UnknownFunction460f50(path, "rt", 0)) {

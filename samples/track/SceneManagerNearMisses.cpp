@@ -635,7 +635,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     }
                     UnknownFunction4de580(name, key, motion);
                     field_0xb4->field_0x04[i].motions[m] =
-                        field_0xb4->field_0x04[i].field_0x04->UnknownFunction4a6b30(motion, 1);
+                        field_0xb4->field_0x04[i].field_0x04->FindMotion(motion, 1);
                 }
                 if (parameters.UnknownFunction4b7ec0("MotionSequence", "", sequence, 0x40)) {
                     char* token = strtok(sequence, ",");

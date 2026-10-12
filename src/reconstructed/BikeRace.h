@@ -158,7 +158,7 @@ public:
                                              UnknownTextureFormatChoice* textures, int a, int b);
 
     // 0x004a8b10: plays a motion ("Stand", "FlagStart", "FlagLoop").
-    void UnknownFunction4a8b10(const char* motion);
+    void SetMotionByName(const char* motion);
 
     unsigned char field_0x004[0x0c - 0x04];
     int motionFinished;                       // +0x00c the motion finished (slot 10 then loops "FlagLoop")
@@ -883,7 +883,7 @@ public:
                                     UnknownBikeRaceShadow* shadow);
     // 0x00419970 (ret 0x14): loads the rider models and creates the racers;
     // 0 on failure.
-    int UnknownFunction419970(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
+    int CreateRacers(void* owner, LightManager* lights, UnknownTextureFormatChoice* textures,
                               UnknownBikeRaceProjector* terrain, UnknownBikeRaceNodeOwner* event);
     // 0x00417bc0: the racer numbers 1..+0x158 ordered by championship points.
     void RankByPoints(int* order);
@@ -893,7 +893,7 @@ public:
     // 0x0041d170: one node per entry of `owner`; 0 when an allocation fails.
     int BuildNodeList(UnknownBikeRaceNodeOwner* owner);
     // 0x0041d1e0: sets +0x189 from the track distance between +0xf8 and +0x134.
-    int UnknownFunction41d1e0();
+    int UpdateTrackSeparation();
     void SetSceneTime(float time);   // 0x0041d2a0: the scene's time
     int AnyRacerRemote();              // 0x0041ea10: whether a racer is remote
     // 0x0041ea60: replaces id `from` with `to` in `character`'s mesh groups.

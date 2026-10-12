@@ -61,7 +61,7 @@ Wrecker::~Wrecker() {
     if (indexedAnimations) DebugFree(indexedAnimations, __FILE__, 0x47);
 }
 
-Wrecker* Wrecker::UnknownFunction530190(void* owner, UnknownWreckerCharacter* rider, const char* name) {
+Wrecker* Wrecker::SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name) {
     GameObject::UnknownVirtualSlot8(owner);
     UnknownFunction5301c0(rider, name);
     return this;
@@ -80,7 +80,7 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     gravityModel->UnknownVirtualSlot27(rigidBody);
     collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
     collisionModel->UnknownVirtualSlot8(field_0x18);
-    collisionModel->UnknownFunction43b9e0(rigidBody, 1, name);
+    collisionModel->SetBody(rigidBody, 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;
     collisionModel->collisionEnabled = 0;
@@ -98,7 +98,7 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     rigidBody->initialAngularVelocity = Vector3(0.0f, 0.0f, 0.0f);
     rigidBody->initialVelocity = Vector3(0.0f, 0.0f, 0.0f);
     character->skeleton->subtreeDirty = 1;
-    character->UnknownFunction4a8b10("Fall02");
+    character->SetMotionByName("Fall02");
     UnknownFunction532150();
     rigidBody->UnknownVirtualSlot34(&Vector3(0.0f, 0.0f, 0.0f));
     rigidBody->UnknownVirtualSlot33(&Vector3(0.0f, 0.0f, 0.0f));
@@ -466,7 +466,7 @@ void Wrecker::UnknownFunction532220(int index) {
     collisionModel->collisionEnabled = 1;
     collisionModel->collidable = 1;
     collisionModel->applyImpulses = 1;
-    character->UnknownFunction4a8b40(indexedAnimations[index]);
+    character->SetMotion(indexedAnimations[index]);
     wreckState = 1;
     rigidBody->field_0x25_bit0 = 0;
     rigidBody->UnknownVirtualSlot44();
@@ -597,7 +597,7 @@ void Wrecker::UnknownFunction5328b0(UnknownWreckerSkeleton* frame, Vector3 cente
 }
 
 void Wrecker::UnknownFunction532900(Vector3 offset, int bone) {
-    collisionModel->UnknownFunction43c7f0(offset, bone);
+    collisionModel->AddProbePoint(offset, bone);
     probePositions = (Vector3*)DebugRealloc(probePositions, collisionModel->probeCount * sizeof(Vector3), __FILE__, 0x308);
     probePositions[collisionModel->probeCount - 1] = Vector3(0.0f, 0.0f, 0.0f);
     probeHits = (int*)DebugRealloc(probeHits, collisionModel->probeCount * 4, __FILE__, 0x30b);

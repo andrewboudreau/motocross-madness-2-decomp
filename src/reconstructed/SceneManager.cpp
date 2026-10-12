@@ -447,10 +447,10 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
                     entry->sequenceIndex = motion;
                 field_0xb4->field_0x04[index].currentMotion =
                     field_0xb4->field_0x04[index].motionSequence[field_0xb4->field_0x04[index].sequenceIndex] - 1;
-                object->UnknownFunction4a8b40(
+                object->SetMotion(
                     field_0xb4->field_0x04[index].motions[field_0xb4->field_0x04[index].currentMotion]);
                 object->field_0x10 = 0;
-                field_0xb4->field_0x04[index].field_0x18 = object->UnknownFunction4a6bb0(time, 0, 0);
+                field_0xb4->field_0x04[index].field_0x18 = object->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {

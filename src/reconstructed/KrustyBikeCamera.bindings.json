@@ -10,7 +10,7 @@
   "?FindTextQueue@EventManager@@QAEPAVTextQueueOverlay@@XZ": "0x0045d340",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction416e80@BikeCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00416e80",
-  "?UnknownFunction4650e0@FollowCamera@@QAEXPBD@Z": "0x004650e0",
+  "?LoadCameraFile@FollowCamera@@QAEXPBD@Z": "0x004650e0",
   "?SetupFlyby@KrustyBikeCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x00497d90",
   "?UnknownFunction4fc9a0@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?UnknownFunction507c10@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",

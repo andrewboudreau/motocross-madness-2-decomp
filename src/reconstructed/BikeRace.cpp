@@ -251,7 +251,7 @@ int BikeRace::BuildNodeList(UnknownBikeRaceNodeOwner* owner) {
 }
 
 // 0x0041d1e0
-int BikeRace::UnknownFunction41d1e0() {
+int BikeRace::UpdateTrackSeparation() {
     if (raceTrack != 0 && raceTrack->UnknownFunction517da0(finishProbe.field_0x2c, startProbe.field_0x2c) > 0.0f) {
         field_0x189 = 0;
     } else {
@@ -611,27 +611,27 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                                                                               localRacer->statusNode->field_0x44);
                         if (field_0x078 && localRacer->finished && fromFinish > 100.0f) {
                             ReplaceMeshId(flagGirl, 1, 2);
-                            flagGirl->UnknownFunction4a8b10("Stand");
+                            flagGirl->SetMotionByName("Stand");
                             field_0x078 = 0;
                         } else if ((previous && toFinish < 300.0f) || (last && fromFinish < 100.0f)) {
                             if (field_0x078 != 1) {
                                 ReplaceMeshId(flagGirl, 1, 2);
                                 field_0x078 = 1;
-                                flagGirl->UnknownFunction4a8b10("FlagStart");
+                                flagGirl->SetMotionByName("FlagStart");
                             } else if (flagGirl->motionFinished) {
-                                flagGirl->UnknownFunction4a8b10("FlagLoop");
+                                flagGirl->SetMotionByName("FlagLoop");
                             }
                         } else if (field_0x078 && field_0x078 < 3 &&
                                    ((previous && toFinish > 100.0f) || (last && fromFinish > 100.0f))) {
-                            flagGirl->UnknownFunction4a8b10("Stand");
+                            flagGirl->SetMotionByName("Stand");
                             field_0x078 = 0;
                         } else if ((last && toFinish < 300.0f) || (localRacer->finished && fromFinish < 100.0f)) {
                             if (field_0x078 < 3) {
                                 ReplaceMeshId(flagGirl, 2, 1);
                                 field_0x078 = 3;
-                                flagGirl->UnknownFunction4a8b10("FlagStart");
+                                flagGirl->SetMotionByName("FlagStart");
                             } else if (flagGirl->motionFinished) {
-                                flagGirl->UnknownFunction4a8b10("FlagLoop");
+                                flagGirl->SetMotionByName("FlagLoop");
                                 field_0x078 = 4;
                             }
                         }
@@ -1334,7 +1334,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
     }
     if (flagGirl != 0) {
         ReplaceMeshId(flagGirl, 1, 2);
-        flagGirl->UnknownFunction4a8b10("Stand");
+        flagGirl->SetMotionByName("Stand");
         field_0x078 = 0;
     }
     SetSceneTime(0.0001f);

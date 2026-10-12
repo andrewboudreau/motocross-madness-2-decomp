@@ -68,7 +68,8 @@ A near miss is kept in `samples/camera/FollowCameraNearMisses.cpp`:
   a load-delay slot where retail used +0x2e4/+0x276. Moving those statements
   (or the +0x29c copy) does not fix it.
 
-The initializer `0x00463140` (520 bytes) is exact: it allocates the
+The initializer `0x00463140` (`SetupFollowCamera`; the text-file loader
+`0x004650e0` is `LoadCameraFile`) (520 bytes) is exact: it allocates the
 +0x294/+0x298 values (lines 0x78/0x79) and the point table (line 0x88).
 It matched once the value constructor stores `value, rate, maximum,
 minimum, scale` in that order, which slot 10's six inlined constructions
