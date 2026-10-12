@@ -45,22 +45,26 @@ public:
     void SetDirection(const Vector3* direction);           // 0x0049e1e0
 
     int lightType;                          // type (LightManager 0x004a0190 searches it)
-    int field_0x30;                         // derived from the type, default 3
+    // +0x30..+0x97 has the D3DLIGHT7 layout (strong inference: 0x68 bytes, a
+    // type 1..4 picked from the emitter type, default 3 = directional; SetColor
+    // copies the diffuse colour into the next two; the constructor's 1, 1, 0, 0
+    // and pi / 4, pi / 2 are D3D's falloff, attenuation and spot-cone values).
+    int d3dLightType;                       // +0x30 dltType, default 3
     float colorRGBA[4];                     // colour (r, g, b, a)
-    float field_0x44[4];
-    float field_0x54[4];
+    float specularRGBA[4];                  // +0x44 dcvSpecular
+    float field_0x54[4];                    // dcvAmbient (named in the loader near miss's lane)
     Vector3 lightPosition;                  // position
     Vector3 lightDirection;                 // direction
     float lightRange;                       // range, sqrt(FLT_MAX) when unbounded
-    float field_0x80;
-    float field_0x84;
-    float field_0x88;
-    float field_0x8c;
-    float field_0x90;                       // pi / 4
-    float field_0x94;                       // pi / 2
+    float falloff;                          // +0x80 dvFalloff
+    float attenuation0;                     // +0x84 dvAttenuation0
+    float attenuation1;                     // +0x88
+    float attenuation2;                     // +0x8c
+    float spotInnerAngle;                   // +0x90 dvTheta, pi / 4
+    float spotOuterAngle;                   // +0x94 dvPhi, pi / 2
     D3DIMSoultreeObject* debugSphere;       // "sphere.slt" model
     UnknownLightEmitterTarget* field_0x9c;
-    int field_0xa0;
+    int lightIndex;                         // +0xa0 Create's last argument, -1 by default
     LightManager* manager;                  // owner (set by 0x0049e470)
     unsigned int field_0xa8;                // compared, never written here
 };

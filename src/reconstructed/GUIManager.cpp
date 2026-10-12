@@ -466,7 +466,7 @@ void GUIManager::GrabBackground(int dim) {
     if (guiBackground) {
         grabRegion = guiBackground->AllocRegion(1);
         guiBackground->MarkAllDirty();
-        guiBackground->field_0x30 = 0;
+        guiBackground->imageVisible = 0;
     }
 }
 
@@ -476,7 +476,7 @@ void GUIManager::ReleaseBackgroundGrab() {
         screenGrab->Release();
     if (guiBackground && grabRegion >= 0) {
         guiBackground->ReleaseRegion(grabRegion);
-        guiBackground->field_0x30 = 1;
+        guiBackground->imageVisible = 1;
     }
     screenGrab = 0;
     grabRegion = -1;

@@ -144,7 +144,10 @@ tier 1 offsets; each keeps its `// +0xNN`): the node's `flags`,
 `pathLength`, `firstSegment`, `lastSegment`, `linkCount` and `links`; the
 segment's `horizontalLength`, `previous` and `next`; the work-list entry's
 `flags` and `node`; and Track's `startNode` and `lapLength`. The segment's
-point and edge coordinates (+0x00..+0x20) keep offset names. Physics keeps
+centre point is `pointX`..`pointZ` (+0x00..+0x08, read as the point by
+`0x00518130`) and its edge points `edgeAX`..`edgeAZ` (+0x0c, mode 10 of
+`0x00518230`) and `edgeBX`..`edgeBZ` (+0x18, mode 11); which edge is left
+is not settled. Physics keeps
 its own views (`KbTrack` and the list entry in KrustyBikeTypes.h). The
 renames changed no calibration bytes.
 

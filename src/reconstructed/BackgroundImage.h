@@ -70,8 +70,8 @@ public:
     void ClearRegionRect(int index);              // 0x00404d30
     void MarkAllDirty();                       // 0x00404da0: marks everything dirty
 
-    PCTextureMap* field_0x2c;              // image
-    int field_0x30;                        // visible
+    PCTextureMap* field_0x2c;              // image (UIDialog's resource parser near miss uses it)
+    int imageVisible;                      // +0x30 visible
     int imageRegion;                       // the image's region
     int fullRedrawsOwed;                   // full redraws the image still owes
     UnknownSurfaceInterface* offscreenCopy; // off-screen copy

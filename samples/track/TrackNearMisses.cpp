@@ -89,8 +89,8 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
             out->segment = segment;
             out->t = 0.0f;
             if (outDistance) {
-                float dx = p.x - segment->field_0x00;
-                float dz = p.z - segment->field_0x08;
+                float dx = p.x - segment->pointX;
+                float dz = p.z - segment->pointZ;
                 *outDistance = FastSqrt(dz * dz + dx * dx);
             }
             return 1;
@@ -99,34 +99,34 @@ int Track::ClosestPointOnNode(TrackVec3 p, TrackNode* node, TrackPos* out, float
             TrackSegment* next = segment->next;
             if (!next)
                 break;
-            float ex = next->field_0x00 - segment->field_0x00;
-            float ez = next->field_0x08 - segment->field_0x08;
+            float ex = next->pointX - segment->pointX;
+            float ez = next->pointZ - segment->pointZ;
             float t;
             float dx;
             float dz;
             if (ex == 0.0f && ez == 0.0f) {
                 t = 0.0f;
-                dx = p.x - segment->field_0x00;
-                dz = p.z - segment->field_0x08;
+                dx = p.x - segment->pointX;
+                dz = p.z - segment->pointZ;
             } else {
-                t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                t = ((p.z - segment->pointZ) * ez + (p.x - segment->pointX) * ex) / (ez * ez + ex * ex);
                 if (t > 1.0f) {
                     t = 1.0f;
-                    dx = p.x - next->field_0x00;
-                    dz = p.z - next->field_0x08;
+                    dx = p.x - next->pointX;
+                    dz = p.z - next->pointZ;
                 } else if (t < 0.0f) {
                     t = 0.0f;
-                    dx = p.x - segment->field_0x00;
-                    dz = p.z - segment->field_0x08;
+                    dx = p.x - segment->pointX;
+                    dz = p.z - segment->pointZ;
                 } else if (t == 1.0f) {
-                    dx = p.x - next->field_0x00;
-                    dz = p.z - next->field_0x08;
+                    dx = p.x - next->pointX;
+                    dz = p.z - next->pointZ;
                 } else if (t == 0.0f) {
-                    dx = p.x - segment->field_0x00;
-                    dz = p.z - segment->field_0x08;
+                    dx = p.x - segment->pointX;
+                    dz = p.z - segment->pointZ;
                 } else {
-                    dx = (p.x - segment->field_0x00) - t * ex;
-                    dz = (p.z - segment->field_0x08) - t * ez;
+                    dx = (p.x - segment->pointX) - t * ex;
+                    dz = (p.z - segment->pointZ) - t * ez;
                 }
             }
             float distanceSquared = dz * dz + dx * dx;
@@ -161,17 +161,17 @@ static inline int UnknownEdgeCrosses(TrackVec3 p, const TrackVec3* a, const Trac
 int Track::IsInsideStrip(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
 {
     int inside = 0;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x0c, (TrackVec3*)&next->field_0x0c))
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeAX, (TrackVec3*)&next->edgeAX))
         inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x0c, (TrackVec3*)&segment->field_0x00))
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeAX, (TrackVec3*)&segment->pointX))
         inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x18, (TrackVec3*)&segment->field_0x00))
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeBX, (TrackVec3*)&segment->pointX))
         inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x18, (TrackVec3*)&next->field_0x18))
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->edgeBX, (TrackVec3*)&next->edgeBX))
         inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->field_0x0c, (TrackVec3*)&next->field_0x00))
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->edgeAX, (TrackVec3*)&next->pointX))
         inside = 1 - inside;
-    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->field_0x18, (TrackVec3*)&next->field_0x00))
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->edgeBX, (TrackVec3*)&next->pointX))
         inside = 1 - inside;
     return inside;
 }
@@ -282,12 +282,12 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
             for (TrackSegment* segment = list->node->firstSegment; segment && (next = segment->next) != 0;
                  segment = segment->next) {
                 if (IsInsideStrip(*(TrackVec3*)&p, segment, next)) {
-                    float ex = next->field_0x00 - segment->field_0x00;
-                    float ez = next->field_0x08 - segment->field_0x08;
+                    float ex = next->pointX - segment->pointX;
+                    float ez = next->pointZ - segment->pointZ;
                     if (ex == 0.0f && ez == 0.0f) {
                         t = 0.0f;
                     } else {
-                        t = ((p.x - segment->field_0x00) * ex + (p.z - segment->field_0x08) * ez) / (ez * ez + ex * ex);
+                        t = ((p.x - segment->pointX) * ex + (p.z - segment->pointZ) * ez) / (ez * ez + ex * ex);
                         if (t > 1.0f)
                             t = 1.0f;
                         else if (t < 0.0f)
@@ -408,8 +408,8 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
             TrackSegment* segment = list->node->firstSegment;
             if (segment) {
                 if (!segment->next) {
-                    float dx = p.x - segment->field_0x00;
-                    float dz = p.z - segment->field_0x08;
+                    float dx = p.x - segment->pointX;
+                    float dz = p.z - segment->pointZ;
                     float distanceSquared = dz * dz + dx * dx;
                     if (distanceSquared < best || best < 0.0f) {
                         best = distanceSquared;
@@ -422,34 +422,34 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
                     TrackSegment* next = segment->next;
                     if (!next)
                         break;
-                    float ex = next->field_0x00 - segment->field_0x00;
-                    float ez = next->field_0x08 - segment->field_0x08;
+                    float ex = next->pointX - segment->pointX;
+                    float ez = next->pointZ - segment->pointZ;
                     float t;
                     float dx;
                     float dz;
                     if (ex == 0.0f && ez == 0.0f) {
                         t = 0.0f;
-                        dx = p.x - segment->field_0x00;
-                        dz = p.z - segment->field_0x08;
+                        dx = p.x - segment->pointX;
+                        dz = p.z - segment->pointZ;
                     } else {
-                        t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                        t = ((p.z - segment->pointZ) * ez + (p.x - segment->pointX) * ex) / (ez * ez + ex * ex);
                         if (t > 1.0f) {
                             t = 1.0f;
-                            dx = p.x - next->field_0x00;
-                            dz = p.z - next->field_0x08;
+                            dx = p.x - next->pointX;
+                            dz = p.z - next->pointZ;
                         } else if (t < 0.0f) {
                             t = 0.0f;
-                            dx = p.x - segment->field_0x00;
-                            dz = p.z - segment->field_0x08;
+                            dx = p.x - segment->pointX;
+                            dz = p.z - segment->pointZ;
                         } else if (t == 1.0f) {
-                            dx = p.x - next->field_0x00;
-                            dz = p.z - next->field_0x08;
+                            dx = p.x - next->pointX;
+                            dz = p.z - next->pointZ;
                         } else if (t == 0.0f) {
-                            dx = p.x - segment->field_0x00;
-                            dz = p.z - segment->field_0x08;
+                            dx = p.x - segment->pointX;
+                            dz = p.z - segment->pointZ;
                         } else {
-                            dx = (p.x - segment->field_0x00) - t * ex;
-                            dz = (p.z - segment->field_0x08) - t * ez;
+                            dx = (p.x - segment->pointX) - t * ex;
+                            dz = (p.z - segment->pointZ) - t * ez;
                         }
                     }
                     float distanceSquared = dz * dz + dx * dx;
@@ -593,37 +593,37 @@ int Track::LoadTrack(UnknownTextureStream* stream, void* start, void* finish, in
         } else if (chunk == 9) {
             if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->Read(&nodes[index]->lastSegment->field_0x00, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->field_0x04, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->field_0x08, 4, 1);
-            nodes[index]->lastSegment->field_0x00 = scale * nodes[index]->lastSegment->field_0x00 + offsetX;
-            nodes[index]->lastSegment->field_0x04 = scale * nodes[index]->lastSegment->field_0x04;
-            nodes[index]->lastSegment->field_0x08 = scale * nodes[index]->lastSegment->field_0x08 + offsetZ;
+            stream->Read(&nodes[index]->lastSegment->pointX, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->pointY, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->pointZ, 4, 1);
+            nodes[index]->lastSegment->pointX = scale * nodes[index]->lastSegment->pointX + offsetX;
+            nodes[index]->lastSegment->pointY = scale * nodes[index]->lastSegment->pointY;
+            nodes[index]->lastSegment->pointZ = scale * nodes[index]->lastSegment->pointZ + offsetZ;
             TrackSegment* segment = nodes[index]->lastSegment;
             TrackSegment* previous = segment->previous;
             if (previous) {
-                float dx = segment->field_0x00 - previous->field_0x00;
-                float dz = segment->field_0x08 - previous->field_0x08;
+                float dx = segment->pointX - previous->pointX;
+                float dz = segment->pointZ - previous->pointZ;
                 previous->horizontalLength = (float)sqrt(dz * dz + dx * dx);
             }
         } else if (chunk == 10) {
             if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->Read(&nodes[index]->lastSegment->field_0x0c, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->field_0x10, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->field_0x14, 4, 1);
-            nodes[index]->lastSegment->field_0x0c = scale * nodes[index]->lastSegment->field_0x0c + offsetX;
-            nodes[index]->lastSegment->field_0x10 = scale * nodes[index]->lastSegment->field_0x10;
-            nodes[index]->lastSegment->field_0x14 = scale * nodes[index]->lastSegment->field_0x14 + offsetZ;
+            stream->Read(&nodes[index]->lastSegment->edgeAX, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeAY, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeAZ, 4, 1);
+            nodes[index]->lastSegment->edgeAX = scale * nodes[index]->lastSegment->edgeAX + offsetX;
+            nodes[index]->lastSegment->edgeAY = scale * nodes[index]->lastSegment->edgeAY;
+            nodes[index]->lastSegment->edgeAZ = scale * nodes[index]->lastSegment->edgeAZ + offsetZ;
         } else if (chunk == 11) {
             if (!nodes[index] || !nodes[index]->lastSegment)
                 goto fail;
-            stream->Read(&nodes[index]->lastSegment->field_0x18, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->field_0x1c, 4, 1);
-            stream->Read(&nodes[index]->lastSegment->field_0x20, 4, 1);
-            nodes[index]->lastSegment->field_0x18 = scale * nodes[index]->lastSegment->field_0x18 + offsetX;
-            nodes[index]->lastSegment->field_0x1c = scale * nodes[index]->lastSegment->field_0x1c;
-            nodes[index]->lastSegment->field_0x20 = scale * nodes[index]->lastSegment->field_0x20 + offsetZ;
+            stream->Read(&nodes[index]->lastSegment->edgeBX, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeBY, 4, 1);
+            stream->Read(&nodes[index]->lastSegment->edgeBZ, 4, 1);
+            nodes[index]->lastSegment->edgeBX = scale * nodes[index]->lastSegment->edgeBX + offsetX;
+            nodes[index]->lastSegment->edgeBY = scale * nodes[index]->lastSegment->edgeBY;
+            nodes[index]->lastSegment->edgeBZ = scale * nodes[index]->lastSegment->edgeBZ + offsetZ;
         } else if (chunk == 12) {
             int unused;
             stream->Read(&unused, 4, 1);

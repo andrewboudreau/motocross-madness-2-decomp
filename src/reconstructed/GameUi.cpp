@@ -2198,7 +2198,7 @@ void UIDialog::GrabBackground(int dim, CameraRect* rect) {
     if (dialogBackground) {
         grabRegion = dialogBackground->AllocRegion(1);
         dialogBackground->MarkAllDirty();
-        dialogBackground->field_0x30 = 0;
+        dialogBackground->imageVisible = 0;
     }
 }
 
@@ -2208,7 +2208,7 @@ void UIDialog::ReleaseBackgroundGrab() {
         screenGrab->Release();
     if (dialogBackground && grabRegion >= 0) {
         dialogBackground->ReleaseRegion(grabRegion);
-        dialogBackground->field_0x30 = 1;
+        dialogBackground->imageVisible = 1;
     }
     screenGrab = 0;
     grabRegion = -1;

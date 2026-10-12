@@ -28,15 +28,15 @@ LightEmitter::LightEmitter(int flags) : GameObject(flags) {
     lightType = 0;
     debugSphere = 0;
     field_0x9c = 0;
-    field_0x30 = 3;
+    d3dLightType = 3;
     colorRGBA[0] = 1.0f;
     colorRGBA[1] = 1.0f;
     colorRGBA[2] = 1.0f;
     colorRGBA[3] = 0.0f;
-    field_0x44[0] = 1.0f;
-    field_0x44[1] = 1.0f;
-    field_0x44[2] = 1.0f;
-    field_0x44[3] = 0.0f;
+    specularRGBA[0] = 1.0f;
+    specularRGBA[1] = 1.0f;
+    specularRGBA[2] = 1.0f;
+    specularRGBA[3] = 0.0f;
     field_0x54[0] = 1.0f;
     field_0x54[1] = 1.0f;
     field_0x54[2] = 1.0f;
@@ -44,13 +44,13 @@ LightEmitter::LightEmitter(int flags) : GameObject(flags) {
     lightPosition = Vector3(0.0f, 0.0f, 0.0f);
     lightDirection = Vector3(1.0f, 0.0f, 0.0f);
     lightRange = (float)sqrt(FLT_MAX);
-    field_0x80 = 1.0f;
-    field_0x84 = 1.0f;
-    field_0x88 = 0.0f;
-    field_0x8c = 0.0f;
-    field_0x94 = 1.5707964f;
-    field_0x90 = 0.7853982f;
-    field_0xa0 = -1;
+    falloff = 1.0f;
+    attenuation0 = 1.0f;
+    attenuation1 = 0.0f;
+    attenuation2 = 0.0f;
+    spotOuterAngle = 1.5707964f;
+    spotInnerAngle = 0.7853982f;
+    lightIndex = -1;
     manager = 0;
     field_0xa8 = 0;
 }
@@ -78,10 +78,10 @@ void LightEmitter::SetColor(unsigned int color) {
     colorRGBA[1] = (float)((color >> 8) & 0xff) * (1.0f / 255.0f);
     colorRGBA[2] = (float)(color & 0xff) * (1.0f / 255.0f);
     colorRGBA[3] = 0.0f;
-    field_0x44[0] = colorRGBA[0];
-    field_0x44[1] = colorRGBA[1];
-    field_0x44[2] = colorRGBA[2];
-    field_0x44[3] = 0.0f;
+    specularRGBA[0] = colorRGBA[0];
+    specularRGBA[1] = colorRGBA[1];
+    specularRGBA[2] = colorRGBA[2];
+    specularRGBA[3] = 0.0f;
     field_0x54[0] = colorRGBA[0];
     field_0x54[1] = colorRGBA[1];
     field_0x54[2] = colorRGBA[2];
@@ -132,7 +132,7 @@ LightEmitter* LightEmitter::Create(void* value, int type, unsigned int color,
                                                   int index) {
     GameObject::UnknownVirtualSlot8(value);
     lightType = type;
-    field_0xa0 = index;
+    lightIndex = index;
     if (sphere) {
         debugSphere = new(__FILE__, 183) D3DIMSoultreeObject(1);
         AppendChild(debugSphere->UnknownVirtualSlot9(renderContext, "sphere.slt", 0, 0, 1), -1);
@@ -154,16 +154,16 @@ LightEmitter* LightEmitter::Create(void* value, int type, unsigned int color,
     case 7:
         return this;
     case 1:
-        field_0x30 = 1;
+        d3dLightType = 1;
         break;
     case 5:
-        field_0x30 = 2;
+        d3dLightType = 2;
         break;
     case 4:
-        field_0x30 = 3;
+        d3dLightType = 3;
         break;
     case 2:
-        field_0x30 = 4;
+        d3dLightType = 4;
         break;
     }
     return this;
