@@ -2,7 +2,7 @@
   "??_C@_01PCFE@?2?$AA@": "0x00568c24",
   "??_C@_04MHIC@NONE?$AA@": "0x00568c60",
   "??_C@_05KEJO@?$CFs?2?$CFs?$AA@": "0x005667dc",
-  "?UnknownFunction47b670@@YAHPAUVector3@@0PAUUnknownBikeRaceNode@@H@Z": "0x0047b670",
+  "?CrossesGate@@YAHPAUVector3@@0PAUUnknownBikeRaceNode@@H@Z": "0x0047b670",
   "?IntersectLines@@YAHMMMMMMMMPAM0@Z": "0x0047b800",
   "?ReadIniFloat@@YAMPBD0N0@Z": "0x0047b8a0",
   "?ReadIniString@@YAXPBD00PADH0@Z": "0x0047b930",

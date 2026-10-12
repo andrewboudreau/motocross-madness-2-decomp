@@ -16,8 +16,8 @@ MouseDevice::MouseDevice() : PCInputDevice(1) {
 
 // 0x0048a420: attaches `binding` to this device's list for its axis.
 int MouseDevice::AttachBinding(UnknownControlBinding* binding) {
-    binding->field_0x00 = this;
-    axisBindings[binding->field_0x08].Add(binding);
+    binding->owner = this;
+    axisBindings[binding->axisIndex].Add(binding);
     return 1;
 }
 
@@ -26,16 +26,16 @@ void MouseDevice::UnknownVirtualSlot0(int id) {
     for (int list = 0; list < 2; list++) {
         for (int i = 0; i < axisBindings[list].m_count; i++) {
             UnknownControlBinding* binding = axisBindings[list].Get(i);
-            if (binding->field_0x04 == id)
+            if (binding->bindingId == id)
                 axisBindings[list].Remove(binding);
         }
     }
 }
 
 // 0x0048a550
-void MouseDevice::UnknownFunction48a550(int axis, float amount) {
+void MouseDevice::MoveAxis(int axis, float amount) {
     for (int i = 0; i < axisBindings[axis].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[axis].Get(i);
-        binding->Adjust(amount * binding->field_0x30 * (1.0f / 375.0f));
+        binding->Adjust(amount * binding->maxValue * (1.0f / 375.0f));
     }
 }

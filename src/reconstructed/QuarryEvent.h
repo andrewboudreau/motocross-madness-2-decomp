@@ -35,11 +35,11 @@ struct UnknownQuarryCameraSubject {
 
 struct UnknownQuarryCamera {
     unsigned char field_0x000[0x170];
-    Vector3 field_0x170;                      // position
-    Vector3 field_0x17c;                      // forward
-    Vector3 field_0x188;                      // up
+    Vector3 eyePosition;                      // +0x170 position
+    Vector3 viewDirection;                    // +0x17c forward
+    Vector3 upDirection;                      // +0x188 up
     unsigned char field_0x194[0x3b0 - 0x194];
-    UnknownQuarryCameraSubject* field_0x3b0;  // followed bike
+    UnknownQuarryCameraSubject* followedBike; // +0x3b0 followed bike
 };
 
 // RTTI: VisualCue : GameObject (vtable 0x00554320; Krusty3DObjects.cpp).

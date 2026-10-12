@@ -70,35 +70,35 @@ void TrackGameViewOwner::PickFollowedRacer()
     int iterator = 0;
     int tries = 0;
     UnknownEventRacer* last = 0;
-    UnknownEventRacer* racer = field_0x34->NextBike(&iterator);
+    UnknownEventRacer* racer = raceView->NextBike(&iterator);
     while (racer) {
-        if (racer->field_0x4a0 == 0) {
+        if (racer->outOfRace == 0) {
             last = racer;
             racing++;
         }
-        racer = field_0x34->NextBike(&iterator);
+        racer = raceView->NextBike(&iterator);
     }
     if (racing == 0) {
-        followedRacer = field_0x34->localRacer;
+        followedRacer = raceView->localRacer;
     } else if (racing == 1) {
         followedRacer = last;
     } else {
-        int count = field_0x34->racerCount;
+        int count = raceView->racerCount;
         int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
-        while (field_0x34->racerSlots[index]->field_0x4a0 == 1 && tries < count) {
+        while (raceView->racerSlots[index]->outOfRace == 1 && tries < count) {
             index++;
             if (index >= count)
                 index = 0;
             tries++;
         }
-        followedRacer = field_0x34->racerSlots[index];
+        followedRacer = raceView->racerSlots[index];
     }
     UnknownBikeRaceVcrFollow follow;
     follow.field_0x04 = 0;
     follow.field_0x08 = followedRacer->networkPlayerId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
-    if (field_0x34->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay)
-        ((VCRInterface*)field_0x34->replayVcr)->QueueRecord(0x87, followedRacer->networkPlayerId, &follow, 1);
+    if (raceView->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay)
+        ((VCRInterface*)raceView->replayVcr)->QueueRecord(0x87, followedRacer->networkPlayerId, &follow, 1);
 }
 
 // 0x004a9e80: switches the followed racer from `previous` to `racer`. The
@@ -120,16 +120,16 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
     }
     *(float*)&field_0xac = 5.0f;
     if (tell)
-        field_0x34->localRacer->UnknownFunction4925a0(racer, false);
+        raceView->localRacer->UnknownFunction4925a0(racer, false);
     if (racer) {
-        ((RaceSound*)field_0x34->field_0x44)->PlayItSound();
+        ((RaceSound*)raceView->field_0x44)->PlayItSound();
         FOLLOWED_RACER_SLOTS(racer)->UnknownVirtualSlot50(1, 5.0f, 0);
     }
     AnnounceFollowedRacer(racer, previous);
-    if (racer == field_0x34->localRacer && previous && previous != racer) {
+    if (racer == raceView->localRacer && previous && previous != racer) {
         racer->score += 2500.0f;
-        if (field_0x34->scoreBoard)
-            field_0x34->scoreBoard->UnknownFunction48d1e0(2500.0f, 1.0f);
+        if (raceView->scoreBoard)
+            raceView->scoreBoard->UnknownFunction48d1e0(2500.0f, 1.0f);
     }
     followedRacer = racer;
 }

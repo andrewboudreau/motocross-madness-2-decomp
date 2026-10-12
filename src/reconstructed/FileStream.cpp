@@ -64,7 +64,7 @@ UnknownTextureStream::~UnknownTextureStream()
 }
 
 // 0x00460d70
-UnknownTextureStream* UnknownTextureStream::UnknownFunction460d70(const char* name)
+UnknownTextureStream* UnknownTextureStream::FindArchive(const char* name)
 {
     if (field_0x12c) {
         ResourceItem* item = field_0x12c->FindItem(name, 0);
@@ -78,7 +78,7 @@ UnknownTextureStream* UnknownTextureStream::UnknownFunction460d70(const char* na
 }
 
 // 0x00460e70. The NULL test guards the rest, so its message comes last.
-int UnknownTextureStream::UnknownFunction460e70(const char* path)
+int UnknownTextureStream::IsValidFile(const char* path)
 {
     char message[0x184];
 
@@ -240,13 +240,13 @@ static inline int FileTimes(UnknownTextureStream* stream, int* time, int* size)
 
 // 0x00461cb0. Writing the _fstat call inline keeps the recursion a call;
 // through FileTimes VC6 turns it into the loop retail has.
-int UnknownTextureStream::UnknownFunction461cb0(int* time, int* size)
+int UnknownTextureStream::GetFileTimes(int* time, int* size)
 {
     if (!time || !size) {
         return -1;
     }
     if (field_0x1c) {
-        return field_0x1c->UnknownFunction461cb0(time, size);
+        return field_0x1c->GetFileTimes(time, size);
     }
     return FileTimes(this, time, size);
 }

@@ -29,7 +29,7 @@ public:
     void DrawLine(const Vector3* a, const Vector3* b);
 
 protected:
-    int field_0x2c;            // packed draw colour (0x0047c690)
+    int drawColor;                            // +0x2c packed draw colour (0x0047c690)
     int field_0x30;            // zeroed by the GraphicsTest constructor
 };
 

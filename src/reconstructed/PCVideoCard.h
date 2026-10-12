@@ -42,8 +42,8 @@ extern unsigned short g_UnknownGammaRamp570570[3][256];
 
 // cdecl helpers after wrecker.cpp's code, called around cooperative level
 // changes when PCGame+0x538 (IMM32.DLL) is loaded.
-void UnknownFunction52ff00();
-void UnknownFunction52ff20();
+void SaveImeStatus();
+void RestoreImeStatus();
 
 // 0x004c9600: enumerates the DirectDraw devices for `window` into
 // g_UnknownDisplays68a754; returns their count.

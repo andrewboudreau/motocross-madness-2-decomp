@@ -282,7 +282,7 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = world->terrain->CastSegment(&((RenderTarget*)field_0x18)->currentCamera->eyePosition, point, &hit, 0, 0, 0);
+        int hidden = world->terrain->CastSegment(&((RenderTarget*)renderContext)->currentCamera->eyePosition, point, &hit, 0, 0, 0);
         lastVisible = !hidden;
     }
     frameCounter++;
@@ -318,9 +318,9 @@ int NameOverlay::UnknownVirtualSlot14()
         Overlay::UnknownVirtualSlot14();
         return 1;
     }
-    if (trackedRacer->field_0x4a0)
+    if (trackedRacer->outOfRace)
         return 1;
-    if (!trackedRacer->field_0x25_bit0)
+    if (!trackedRacer->isEnabled)
         return 1;
     if ((field_0x15c.x != -1.0f || field_0x15c.y != -1.0f) && g_TrackGame->mode.showNameTags) {
         int left;
@@ -342,7 +342,7 @@ int NameOverlay::UnknownVirtualSlot14()
         overlayAlpha = alpha;
     }
     Vector3 head;
-    trackedRacer->field_0x5c4->field_0x1a0->FindByName("Head")->GetPositionIn(0, &head);
+    trackedRacer->riderCharacter->modelNode->FindByName("Head")->GetPositionIn(0, &head);
     head.y += 1.62f;
     int hidden = !IsPointVisible(&head);
     if (hidden) {
@@ -482,7 +482,7 @@ void StatsOverlay::DrawTimeLeft()
     int count;
     TrackGame* game = g_TrackGame;
     if (game->mode.raceSettings.raceMode != 0 && game->mode.raceSettings.raceMode != 4) {
-        TrackGameViewOwner* owner = game->field_0x55c;
+        TrackGameViewOwner* owner = game->quarryEvent;
         float limit = game->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         rect = rowRects[0];
@@ -509,7 +509,7 @@ int StatsOverlay::DrawViewModePanel()
     iterator = 0;
     UnknownEventRacer* racer;
     while ((racer = statsSource->NextBike(&iterator)) != 0) {
-        if (racer->field_0x4a0)
+        if (racer->outOfRace)
             finished++;
     }
     int total;
@@ -538,14 +538,14 @@ int StatsOverlay::DrawViewModePanel()
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
         if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->field_0x736)
-            FormatLapTime(time, statsSource->ownRacer->field_0x750);
+            FormatLapTime(time, statsSource->ownRacer->fastestLap);
         else
             FormatLapTime(time, instrumentSource->state->lastLapTime);
         sprintf(rowText[2], "%s %s", label, time);
     }
     g_TrackGame->LoadResourceString(0x838, label, 0x80);
     if (g_TrackGame->mode.raceSettings.raceMode == 4)
-        FormatLapTime(time, statsSource->ownRacer->field_0x750);
+        FormatLapTime(time, statsSource->ownRacer->fastestLap);
     else
         FormatLapTime(time, instrumentSource->state->field_0x750);
     sprintf(rowText[3], "%s %s", label, time);
@@ -621,7 +621,7 @@ int StatsOverlay::DrawRacePanel()
     iterator = 0;
     UnknownEventRacer* racer;
     while ((racer = statsSource->NextBike(&iterator)) != 0) {
-        if (racer->field_0x4a0)
+        if (racer->outOfRace)
             finished++;
     }
     g_TrackGame->LoadResourceString(0x835, label, 0x80);
@@ -661,7 +661,7 @@ int StatsOverlay::DrawRacePanel()
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
-            g_TrackGame->field_0x560->field_0xac);
+            g_TrackGame->bajaEnduroEvent->field_0xac);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], field_0x1b0[i]) != 0)
             goto draw;
@@ -706,7 +706,7 @@ int StatsOverlay::DrawTagStandings()
     int count = 0;
     if (g_TrackGame->mode.raceSettings.raceMode != 0) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
-        TrackGameViewOwner* owner = g_TrackGame->field_0x568;
+        TrackGameViewOwner* owner = g_TrackGame->tagEvent;
         float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s %s", label, time);
@@ -714,7 +714,7 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->mode.raceSettings.field_0x148) {
         int iterator;
         int own;
-        UnknownKrustyBikeView* view = g_TrackGame->field_0x568->field_0x34;
+        UnknownKrustyBikeView* view = g_TrackGame->tagEvent->raceView;
         iterator = 0;
         UnknownEventRacer* racer;
         while ((racer = view->NextBike(&iterator)) != 0) {
@@ -750,10 +750,10 @@ int StatsOverlay::DrawTagStandings()
             sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
                     scores[shown].racer->score);
     }
-    if (g_TrackGame->field_0x568->followedRacer) {
+    if (g_TrackGame->tagEvent->followedRacer) {
         g_TrackGame->LoadResourceString(0x14b8, tag, 0x40);
-        sprintf(rowText[5], "  %s %s", g_TrackGame->field_0x568->followedRacer->racerName, tag);
-    } else if (g_TrackGame->field_0x568->field_0xdc) {
+        sprintf(rowText[5], "  %s %s", g_TrackGame->tagEvent->followedRacer->racerName, tag);
+    } else if (g_TrackGame->tagEvent->field_0xdc) {
         g_TrackGame->LoadResourceString(0x14b7, tag, 0x40);
         sprintf(rowText[5], "  %s", tag);
     }
@@ -823,7 +823,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
     if (visible) {
         GameObject::UnknownVirtualSlot15();
         void* dc;
-        if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
+        if (((PCRenderTarget*)renderContext)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
             void* font = SelectObject(dc, textFont);
@@ -832,7 +832,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
             SetTextColor(dc, 0xff00);
             TextOutA(dc, textX, textY, caption, strlen(caption));
             SelectObject(dc, font);
-            if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
+            if (((PCRenderTarget*)renderContext)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
         } else {
             return 0;
@@ -890,14 +890,14 @@ TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
 {
     GameObject::UnknownVirtualSlot8(target);
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->field_0x350 : "";
+    const char* face = gui ? gui->toolTipFontFace : "";
     int weight = 700;
     int italic = 1;
     if (*face == '\0') {
         face = "Arial";
     } else {
-        weight = gui->field_0x3d4 ? 700 : 500;
-        italic = gui->field_0x3d8;
+        weight = gui->toolTipBold ? 700 : 500;
+        italic = gui->toolTipItalic;
     }
     textFont = CreateFontA(17, 0, 0, 0, weight, italic, 0, 0, 1, 0, 0, 2, 2, face);
     shadowRect = rect;
@@ -928,7 +928,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
     GameObject::UnknownVirtualSlot15();
     if (queueHead) {
         void* dc;
-        if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
+        if (((PCRenderTarget*)renderContext)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
             void* font = SelectObject(dc, textFont);
@@ -937,7 +937,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
             SetTextColor(dc, textColor);
             DrawTextA(dc, queueHead->line, strlen(queueHead->line), &textRect, 0x124);
             SelectObject(dc, font);
-            if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
+            if (((PCRenderTarget*)renderContext)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
         } else {
             return 0;
@@ -1078,7 +1078,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->UnknownFunction50abd0(5, 6);
+        overlayTexture->SetAddressModes(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = largeMap ? 256 : 128;
@@ -1243,7 +1243,7 @@ int RadarOverlay::LineThrough(const float* a, const float* b, float* nx, float* 
 }
 
 // The race object RadarOverlay's gate drawing reads (see TrackOverlay.h).
-#define RadarRace() ((UnknownRadarGateOwner*)g_TrackGame->field_0x560)
+#define RadarRace() ((UnknownRadarGateOwner*)g_TrackGame->bajaEnduroEvent)
 
 // Cross product as 0x0051cb20 inlines it. The doubled parentheses matter:
 // with them VC6 keeps the folded zero term on the x87 stack and loads the
@@ -1381,7 +1381,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
             if (strlen(message.text)) {
                 g_TrackGame->network->Send(
                     0x85, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
-                UnknownFunction51dd70(g_TrackGame->mode.field_0x00, (int)message.text, 0);
+                AddMessage(g_TrackGame->mode.field_0x00, (int)message.text, 0);
             }
             chatInput->ClearLine();
             field_0x3dc = 0;
@@ -1404,7 +1404,7 @@ int ChatOverlay::HandleChatKey(int key, int* result)
 }
 
 // 0x0051dce0
-int ChatOverlay::UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
+int ChatOverlay::HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
 {
     if (inputShown && field_0x3dc && !event->kind)
         return 1;
@@ -1432,7 +1432,7 @@ void ChatOverlay::HideInputLine()
 }
 
 // 0x0051dd70: names longer than ten characters are cut to eight and "..".
-void ChatOverlay::UnknownFunction51dd70(const char* name, int a2, int a3)
+void ChatOverlay::AddMessage(const char* name, int a2, int a3)
 {
     char text[32];
     if (strlen(name) > 10) {

@@ -23,17 +23,17 @@ struct UnknownPickCamera {
     unsigned char field_0x000[0xac];
     float field_0x0ac[3][4];
     unsigned char field_0x0dc[0x170 - 0xdc];
-    Vector3 field_0x170;                  // position
+    Vector3 eyePosition;                      // +0x170 (Camera::eyePosition)
     unsigned char field_0x17c[0x198 - 0x17c];
     float field_0x198;
     int field_0x19c;
-    unsigned int field_0x1a0;             // viewport x
-    unsigned int field_0x1a4;             // viewport y
-    unsigned int field_0x1a8;             // viewport width
-    unsigned int field_0x1ac;             // viewport height
+    unsigned int viewportX;                   // +0x1a0 viewport x
+    unsigned int viewportY;                   // +0x1a4 viewport y
+    unsigned int viewportWidth;               // +0x1a8 viewport width
+    unsigned int viewportHeight;              // +0x1ac viewport height
     unsigned char field_0x1b0[0x1c4 - 0x1b0];
-    int field_0x1c4;                      // cursor x range
-    int field_0x1c8;                      // cursor y range
+    int cursorRangeX;                         // +0x1c4 cursor x range
+    int cursorRangeY;                         // +0x1c8 cursor y range
 };
 
 // The members of CollisionObject (krusty2/collision/CollisionObject.h) that
@@ -68,10 +68,10 @@ public:
     void UnknownFunction435fe0();
 
     unsigned char field_0x38[0x68 - 0x38];
-    int field_0x68;                       // ignore vegetation
+    int ignoreVegetation;                     // +0x68 ignore vegetation
     unsigned char field_0x6c[0x88 - 0x6c];
-    UnknownPickCallback field_0x88;       // on-hit callback
-    void* field_0x8c;                     // set with the callback by ArcadeObject 0x00401540
+    UnknownPickCallback onHitCallback;        // +0x88 on-hit callback
+    void* onHitByCallback;                    // +0x8c set with the callback by ArcadeObject 0x00401540
     unsigned char field_0x90[0xb8 - 0x90];
 };
 
@@ -82,18 +82,18 @@ public:
 
     // 0x004b04c0: picks at the cursor's position (y counted from the bottom
     // of the render target).
-    int UnknownFunction4b04c0();
+    int PickAtCursor();
     int PickAt(int x, int y); // 0x004b0500: picks at (x, y)
     // 0x004b0210: builds the pick ray and the cursor (unless `cursor` is
     // given); deletes itself and returns 0 when there is no cursor.
-    ObjectPicker* UnknownFunction4b0210(void* target, TextureMapManager* textures, UnknownPickCallback callback,
+    ObjectPicker* Create(void* target, TextureMapManager* textures, UnknownPickCallback callback,
                                         GameCursor* cursor);
 
     int field_0x2c;
-    CollisionObject* field_0x30;          // pick ray
+    CollisionObject* pickRay;                 // +0x30 pick ray
     GameCursor* field_0x34;
-    int field_0x38;                       // last picked x
-    int field_0x3c;                       // last picked y
-    UnknownControlBinding* field_0x40;    // cursor x binding
-    UnknownControlBinding* field_0x44;    // cursor y binding
+    int lastPickX;                            // +0x38 last picked x
+    int lastPickY;                            // +0x3c last picked y
+    UnknownControlBinding* cursorBindingX;    // +0x40 cursor x binding
+    UnknownControlBinding* cursorBindingY;    // +0x44 cursor y binding
 };

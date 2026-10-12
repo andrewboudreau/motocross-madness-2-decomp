@@ -73,7 +73,7 @@ public:
     int raceIndex;                            // +0x44 race in the series
     int maxModelKind;                         // +0x48 highest model kind the racers may use
     int bikeClassRule;                        // +0x4c bike class rule (1..3)
-    int field_0x50;
+    int difficulty;                           // +0x50 StartCareer argument 2 (PCNewDlg "RadLODEasy"); copied to TrackGameMode+0x94
     char messageText[0x400];                  // +0x54 message text
     int field_0x454;
     int riderRow;                             // +0x458 chosen rider row (ProCircuitProcs.cpp)

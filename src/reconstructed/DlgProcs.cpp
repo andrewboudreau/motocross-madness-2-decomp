@@ -382,7 +382,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.racerChoice, &g_TrackGame->mode.racerChoiceBackup,
                sizeof(g_TrackGame->mode.racerChoiceBackup));
-        g_TrackGame->mode.field_0x94 = g_TrackGame->mode.field_0x98;
+        g_TrackGame->mode.difficulty = g_TrackGame->mode.savedDifficulty;
         g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.eventType);
         if (openingMenu == 0x88e) {
             static_cast<UIRadioButton*>(FindControl("RaceInfoTab", 4))->SelectInGroup(0);
@@ -406,7 +406,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                    sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.racerChoiceBackup, &g_TrackGame->mode.racerChoice,
                    sizeof(g_TrackGame->mode.racerChoiceBackup));
-            g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
+            g_TrackGame->mode.savedDifficulty = g_TrackGame->mode.difficulty;
             g_TrackGame->ui->OpenMenu(kMenuMain);
             event->dialog->EndDialog(0);
             event->handled = 1;
@@ -449,7 +449,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                        sizeof(g_TrackGame->mode.optionsBackup));
                 memcpy(&g_TrackGame->mode.racerChoiceBackup, &g_TrackGame->mode.racerChoice,
                        sizeof(g_TrackGame->mode.racerChoiceBackup));
-                g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
+                g_TrackGame->mode.savedDifficulty = g_TrackGame->mode.difficulty;
                 if (g_TrackGame->mode.raceSettings.raceMode == 4 && g_TrackGame->mode.ghostFile[0]) {
                     // KrustyUI+0x4e8 holds a copy of the race settings.
                     memcpy(&g_TrackGame->mode.raceSettings, (unsigned char*)g_TrackGame->ui + 0x4e8,
@@ -574,7 +574,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
         list->SelectRow(settings->raceMode);
         FindControl("OpponentsListBox", 0)->BindValue(&settings->opponents);
         FindControl("ChkRecordRace", 0)->Show(0, 1);
-        FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.field_0x94);
+        FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.difficulty);
         UIListBox* gates = static_cast<UIListBox*>(FindControl("LstNumGates", 3));
         gates->RemoveAllRows();
         for (int i = 10; i <= 30; i++) {
@@ -1068,7 +1068,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->SetCamera(0);
+        ((RenderTarget*)renderContext)->SetCamera(0);
         break;
     }
 }
@@ -1323,10 +1323,10 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->UnknownFunction521a40();
                 g_TrackGame->ResetClock();
                 g_TrackGame->eventManager->FindRaceView()->UnknownFunction421050();
-                if (g_TrackGame->field_0x55c)
-                    g_TrackGame->field_0x55c->ResetClock();
-                if (g_TrackGame->field_0x568)
-                    g_TrackGame->field_0x568->ResetClock();
+                if (g_TrackGame->quarryEvent)
+                    g_TrackGame->quarryEvent->ResetClock();
+                if (g_TrackGame->tagEvent)
+                    g_TrackGame->tagEvent->ResetClock();
                 g_TrackGame->eventManager->UnknownFunction45d270();
             }
             g_UnknownGlobal59adfc++;
@@ -1366,7 +1366,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
 // 0x00451270
 int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
     if (framesShown == 2 && !g_UnknownGlobal59ae84) {
-        if (!g_TrackGame->eventManager->UnknownFunction45cb70()) {
+        if (!g_TrackGame->eventManager->LoadEvent()) {
             EndDialog(0);
             if (g_TrackGame->network) {
                 UnknownLoadFailedMessage message;
@@ -1413,7 +1413,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     sprintf(preset, "%s\\%s", "ui\\profile", name);
     if (!CreateDirectoryA(preset, 0))
         return;
-    g_TrackGame->mode.UnknownFunction522440();
+    g_TrackGame->mode.ResetDefaults();
     COPY_TEXT(g_TrackGame->mode.field_0x00, name, 16);
     g_TrackGame->mode.showNewbieDialog = 1;
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
@@ -1649,13 +1649,13 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
         break;
     case kMenuExit: {
         g_TrackGame->SetMenuOpen(0, kMenuExit, 0);
-        TrackGameViewOwner* owner = g_TrackGame->field_0x568;
+        TrackGameViewOwner* owner = g_TrackGame->tagEvent;
         if (owner && g_TrackGame->network && g_TrackGame->network->isHost &&
-            owner->followedRacer && owner->field_0x34 && owner->followedRacer == owner->field_0x34->localRacer) {
-            UnknownEventRacer* racer = owner->field_0x34->localRacer;
+            owner->followedRacer && owner->raceView && owner->followedRacer == owner->raceView->localRacer) {
+            UnknownEventRacer* racer = owner->raceView->localRacer;
             if (racer)
-                racer->field_0x4a0 = 1;
-            g_TrackGame->field_0x568->PickFollowedRacer();
+                racer->outOfRace = 1;
+            g_TrackGame->tagEvent->PickFollowedRacer();
         }
         g_TrackGame->eventManager->CloseRace(2);
         if (g_TrackGame->network) {
@@ -2023,7 +2023,7 @@ void LeaveMenusForRace() {
                sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.racerChoiceBackup, &g_TrackGame->mode.racerChoice,
                sizeof(g_TrackGame->mode.racerChoiceBackup));
-        g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
+        g_TrackGame->mode.savedDifficulty = g_TrackGame->mode.difficulty;
     }
     if (g_TrackGame->playerCount > 1 && !g_TrackGame->ui->field_0x4a8 &&
         !g_TrackGame->playingReplay) {
@@ -2041,14 +2041,14 @@ void LeaveMenusForRace() {
             g_TrackGame->eventManager->results[i].points = 0;
     }
     g_TrackGame->ui->savedInputContext = (void*)ImmAssociateContext((HWND)g_TrackGame->windowHandle, 0);
-    if (g_TrackGame->ui->gui->field_0x03c)
-        g_TrackGame->ui->gui->field_0x03c->ReleaseDc();
+    if (g_TrackGame->ui->gui->guiBackground)
+        g_TrackGame->ui->gui->guiBackground->ReleaseDc();
     if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
         g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {
         g_TrackGame->mode.saveGhost = 0;
         g_TrackGame->mode.saveReplay = 0;
-        g_TrackGame->mode.field_0x94 = 2;
+        g_TrackGame->mode.difficulty = 2;
     }
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 3:

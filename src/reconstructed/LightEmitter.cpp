@@ -135,7 +135,7 @@ LightEmitter* LightEmitter::Create(void* value, int type, unsigned int color,
     field_0xa0 = index;
     if (sphere) {
         debugSphere = new(__FILE__, 183) D3DIMSoultreeObject(1);
-        AppendChild(debugSphere->UnknownVirtualSlot9(field_0x18, "sphere.slt", 0, 0, 1), -1);
+        AppendChild(debugSphere->UnknownVirtualSlot9(renderContext, "sphere.slt", 0, 0, 1), -1);
         if (debugSphere)
             debugSphere->Scale(0.4f, 0.4f, 0.4f);
     }

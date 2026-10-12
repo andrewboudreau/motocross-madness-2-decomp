@@ -124,7 +124,7 @@
 //   control is spilled. Retail's frame is 0x80 bytes larger: VC6 lays locals
 //   out by uses per byte, ties permuted by a quicksort over the last-use
 //   order (docs/VC6_FRAME_LAYOUT.md; `python3 tools/frame_layout.py OBJ
-//   UnknownFunction46a920 --va 0x46a920` maps the slots). The large arrays,
+//   ReadDialogResource --va 0x46a920` maps the slots). The large arrays,
 //   `parameters` and the most used key buffers have retail's offsets;
 //   `toolTip` has four references here and two in retail, `defaultFontName`
 //   two here and three in retail, the two-use key buffers leave the control
@@ -270,7 +270,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
         HandleEvent(&event);
         sendFrameEvent = 0;
     }
-    if (!field_0x25_bit2 && !isClosing) {
+    if (!isPaused && !isClosing) {
         UITimer* timer;
         for (int i = 0; (timer = timerList.Get(i)) != 0; i++) {
             timer->elapsedTime += (int)(frameTime * 1000.0f);
@@ -414,7 +414,7 @@ int UIEditBox::Draw() {
             frames = redrawFrames;
             redrawFrames = redraw;
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
+            ((RenderTarget*)renderContext)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
                                                             drawnTexture->usesColorKey ? 0x1008000 : 0x1000000);
             redrawFrames = redraw;
         }
@@ -625,7 +625,7 @@ int UIMultiState::Draw() {
                                                            texture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, texture, 0,
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, texture, 0,
                                                                      texture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -740,7 +740,7 @@ char* g_UnknownGlobal65b600;
 // the dialog's named entries (+0x9cc), then read in four passes: "Set_Info"
 // (pass 0), the images (1), the sounds (2) and the controls with their
 // "Set_Default" sections (3).
-int UIDialog::UnknownFunction46a920(void* stream, int offset) {
+int UIDialog::ReadDialogResource(void* stream, int offset) {
     char backgroundImage[0x80];
     backgroundImage[0] = 0;
     int depth = g_TrackGame->renderTarget->surfacePixelFormat;
@@ -919,7 +919,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.GetInt("NoScale", 0, &scaleToScreen);
                     scaleToScreen = !scaleToScreen;
                     parameters.GetInt("Popup", 1, &isPopup);
-                    RenderTarget* target = (RenderTarget*)field_0x18;
+                    RenderTarget* target = (RenderTarget*)renderContext;
                     if (scaleToScreen) {
                         scaleX = (float)target->targetWidth / screenWidth;
                         scaleY = (float)target->targetHeight / screenHeight;
@@ -1695,7 +1695,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     }
     if (isPopup && screenWidth && screenHeight) {
         int align = popupAlignment;
-        RenderTarget* target = (RenderTarget*)field_0x18;
+        RenderTarget* target = (RenderTarget*)renderContext;
         if (align & 1) {
             screenArea.right -= screenArea.left;
             screenArea.left = 0;

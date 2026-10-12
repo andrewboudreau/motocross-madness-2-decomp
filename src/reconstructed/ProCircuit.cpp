@@ -160,7 +160,7 @@ void UnknownTrackGameObject3444::FreeSchedule(UnknownProCircuitSchedule* schedul
 void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int count)
 {
     racerCount = count;
-    field_0x50 = a;
+    difficulty = a;
     bikeClassRule = b;
     series = 5;
     raceIndex = 1;

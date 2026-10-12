@@ -598,7 +598,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         UIControl* button = FindControl("ButStats3", 0);
         button->SetText(title);
         for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
-            if (!g_TrackGame->eventManager->results[i].field_0x24) {
+            if (!g_TrackGame->eventManager->results[i].outOfRace) {
                 sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
                 FormatLapTime(time, g_TrackGame->eventManager->results[i].fastestLap);
                 if (g_TrackGame->eventManager->results[i].finished)
@@ -629,7 +629,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         else
             SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
         for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
-            if (!g_TrackGame->eventManager->results[i].field_0x24) {
+            if (!g_TrackGame->eventManager->results[i].outOfRace) {
                 sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].score);
                 if (g_TrackGame->mode.raceSettings.raceMode == 2) {
                     sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
@@ -654,7 +654,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
         else
             SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
-                if (!g_TrackGame->eventManager->results[i].field_0x24) {
+                if (!g_TrackGame->eventManager->results[i].outOfRace) {
                     sprintf(position, "%d", (int)g_TrackGame->eventManager->results[i].score);
                     if (g_TrackGame->mode.raceSettings.raceMode == 2) {
                         sprintf(score, "%d", g_TrackGame->eventManager->results[i].points);
@@ -681,7 +681,7 @@ void MPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
                 SetStatsButtonTexts(event, position, score, points, title);
             }
             for (i = 0; i < g_TrackGame->eventManager->resultCount; i++) {
-                if (!g_TrackGame->eventManager->results[i].field_0x24) {
+                if (!g_TrackGame->eventManager->results[i].outOfRace) {
                     sprintf(position, "%d", g_TrackGame->eventManager->results[i].position);
                     FormatLapTime(score, g_TrackGame->eventManager->results[i].field_0x1c);
                     FormatLapTime(points, g_TrackGame->eventManager->results[i].field_0x18);

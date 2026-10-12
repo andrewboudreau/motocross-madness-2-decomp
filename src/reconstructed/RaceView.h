@@ -115,36 +115,36 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x124[0x3bc - 0x124];
     UnknownVehiclePart* vehicleModel;         // +0x3bc model; racesnd.cpp reads its position
     unsigned char field_0x3c0[0x444 - 0x3c0];
-    int field_0x444;                               // racesnd.cpp 0x004e39b0
+    int crashState;                           // +0x444 racesnd.cpp 0x004e39b0
     unsigned char field_0x448[0x460 - 0x448];
-    int field_0x460;                               // racesnd.cpp tests 12
+    int crashReason;                          // +0x460 racesnd.cpp tests 12
     unsigned char field_0x464[0x478 - 0x464];
     bool throttleOn;                          // +0x478 racesnd.cpp: throttle on
     bool field_0x479;
     unsigned char field_0x47a[0x484 - 0x47a];
     int justLanded;                           // +0x484 racesnd.cpp 0x004e39b0
     unsigned char field_0x488[0x4a0 - 0x488];
-    int field_0x4a0;                               // EventManager 0x0045eef0: counts as done when set
+    int outOfRace;                            // +0x4a0 EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5c4 - 0x4a4];
-    UnknownCameraBikeRider* field_0x5c4;           // as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
+    UnknownCameraBikeRider* riderCharacter;   // +0x5c4 as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
     unsigned char field_0x5c8[0x5e0 - 0x5c8];
     char racerName[0x10];                     // +0x5e0 name
-    UnknownEventRacerModel* field_0x5f0;           // RaceStatus.cpp 0x004e6a50 takes its +0x200 position
+    UnknownEventRacerModel* frontWheel;       // +0x5f0 RaceStatus.cpp 0x004e6a50 takes its +0x200 position
     unsigned char field_0x5f4[0x604 - 0x5f4];
     UnknownCameraBikeState* field_0x604;           // racesnd.cpp 0x004e39b0 reads its +0xb0
     unsigned char field_0x608[0x734 - 0x608];
     char field_0x734;                              // RaceStatus.cpp 0x004e6a50 finishes the race on its lap count
     unsigned char field_0x735;                     // RaceStatus.cpp: gates are passed without the crossing test
     unsigned char field_0x736;
-    char field_0x737;                              // selects engine 2 over 1 (racesnd.cpp 0x004e3430)
+    char engineKind;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char field_0x73c[0x740 - 0x73c];
     UnknownKrustyBikeView* bikeView;          // +0x740 the view (RaceStatus.cpp compares its +0x38 and +0x50)
-    UnknownEventRacerPart* field_0x744;
+    UnknownEventRacerPart* statusNode;        // +0x744 race status node (UnknownBikeRaceRacer)
     int finishTimeStamp;                      // +0x748 time stamp; 0x7ffffffe until finished
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
-    float field_0x750;                             // EventManager 0x0045c8b0 copies it to a float TrackRecord reads
-    float field_0x754;                             // FLT_MAX until finished
+    float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)
+    float totalRunningTime;                   // +0x754 FLT_MAX until finished; ZoneReport "TotalrunningTime" (0x0045c8b0)
     int field_0x758;
     float field_0x75c;
     float field_0x760;                             // best of +0x75c
@@ -157,7 +157,7 @@ struct UnknownEventRacer : virtual public GameObject {
     float* lapStartTimes;                     // +0x77c lap start times, by lap % 100
     float* gateTimes;                         // +0x780 gate times, by gate count % 600
     int finishPosition;                       // +0x784 finishing position (1-based)
-    int field_0x788;
+    int largestStuntPoints;                   // +0x788 ZoneReport "LargestSingleStuntPoints" (0x0045c8b0)
     int field_0x78c;                               // RaceStatus.cpp 0x004e63e0: Track 0x00517340's result
     int gatesPassed;                          // +0x790 gates passed
     unsigned char field_0x794[0x7a0 - 0x794];

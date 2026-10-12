@@ -89,7 +89,7 @@ TrackGameMode::TrackGameMode() {
     int length;
     int count;
 
-    UnknownFunction522440();
+    ResetDefaults();
     networkGame = 0;
     visualCuesOn = 1;
     memset(&displayAdapterGuid, 0, sizeof(displayAdapterGuid));
@@ -103,7 +103,7 @@ TrackGameMode::TrackGameMode() {
         delete driveList;
         driveList = 0;
     }
-    field_0x25e0 = 0;
+    highScoreDirectoryList = 0;
     trackDirectoryList = 0;
     field_0x25e8 = 0;
     showNewbieDialog = 1;
@@ -135,8 +135,8 @@ TrackGameMode::TrackGameMode() {
 
 // 0x005225f0
 TrackGameMode::~TrackGameMode() {
-    if (field_0x25e0)
-        delete field_0x25e0;
+    if (highScoreDirectoryList)
+        delete highScoreDirectoryList;
     if (trackDirectoryList)
         delete trackDirectoryList;
     if (field_0x25e8)
@@ -257,7 +257,7 @@ void TrackGameMode::ReloadResourceStrings(char (*names)[0x80]) {
 #undef UNKNOWN_LOAD_NAME
 
 // 0x00522bf0: the garage tables from KrustyUI (defaults when there is none).
-void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options) {
+void TrackGameMode::CopyGarageTables(UnknownTrackGameModeOptionsFd8* options) {
     int i;
     int j;
     int k;
@@ -287,7 +287,7 @@ void TrackGameMode::UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* option
 void TrackGameMode::UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options) {
     options->engineSize = 250;
     options->fourStroke = 0;
-    UnknownFunction522bf0(options);
+    CopyGarageTables(options);
 }
 
 // 0x00522cb0
@@ -313,7 +313,7 @@ void TrackGameMode::UnknownFunction522cd0() {
 int TrackGameMode::CreateDirectoryLists() {
 
     ChooseDisplayMode(0, &displayModeIndex);
-    field_0x25e0 = new(__FILE__, 383) DirectoryList;
+    highScoreDirectoryList = new(__FILE__, 383) DirectoryList;
     trackDirectoryList = new(__FILE__, 384) CombinedDirectoryList;
     field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
     if (driveList && trackDirectoryList && field_0x25e8)
@@ -449,7 +449,7 @@ int TrackGameMode::LoadProfile() {
     fread(bonusTrackUnlocked, 0x18, 1, file);
     fread(&field_0x1bdc, 4, 1, file);
     fread(&field_0x90, 4, 1, file);
-    fread(&field_0x98, 4, 1, file);
+    fread(&savedDifficulty, 4, 1, file);
     fread(customGarageCurves, 0x294, 1, file);
     fread(&plateNumber, 4, 1, file);
     fclose(file);
@@ -462,7 +462,7 @@ int TrackGameMode::LoadProfile() {
         ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, use16BitSound ? 16 : 8);
     }
     raceSettings = savedSettings;
-    field_0x94 = field_0x98;
+    difficulty = savedDifficulty;
     memcpy(garageOptions, optionsBackup, sizeof(garageOptions));
     memcpy(&racerChoice, &racerChoiceBackup, sizeof(racerChoice));
     return strcmp(field_0x00, "") != 0;
@@ -503,7 +503,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(bonusTrackUnlocked, 0x18, 1, file);
     fwrite(&field_0x1bdc, 4, 1, file);
     fwrite(&field_0x90, 4, 1, file);
-    fwrite(&field_0x98, 4, 1, file);
+    fwrite(&savedDifficulty, 4, 1, file);
     fwrite(customGarageCurves, 0x294, 1, file);
     fwrite(&plateNumber, 4, 1, file);
     fclose(file);
@@ -546,7 +546,7 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
         sprintf(file, "%s.%s", name, kind);
     else
         sprintf(file, "%s\\%s.%s", (char*)value, name, kind);
-    result = UnknownFunction5238f0(file, found);
+    result = FindDataFile(file, found);
     if (!result)
         return 0;
     _splitpath(found, drive, directory, base, extension);
@@ -573,8 +573,8 @@ int TrackGameMode::FindCdDirectory() {
     if (installType != 2) {
         if (!driveList)
             return 0;
-        driveList->UnknownFunction449e70();
-        if (!driveList->UnknownFunction44a010("MCM2", &index, 5))
+        driveList->ListDrives();
+        if (!driveList->FindVolume("MCM2", &index, 5))
             return 0;
         if (!driveList->UnknownFunction44a0b0(index, cdDriveRoot))
             return 0;
@@ -610,7 +610,7 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
             sprintf(name, "%s.hlp", topic);
         else
             sprintf(name, "%s\\%s.hlp", UNKNOWN_HELP_DIRECTORY, topic);
-        if (UnknownFunction5238f0(name, path)) {
+        if (FindDataFile(name, path)) {
             SendMessageA(g_TrackGame->windowHandle, 0x112, 0xf020, 0);
             ShellExecuteA(g_TrackGame->windowHandle, 0, path, parameters, directory, 1);
             return 1;

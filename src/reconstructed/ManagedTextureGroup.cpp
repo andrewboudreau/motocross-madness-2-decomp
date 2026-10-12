@@ -132,7 +132,7 @@ void ManagedTextureGroup::AddTexture(ManagedTexture* texture) {
         }
     }
     managedTextures.Append(texture);
-    texture->lastUseFrame = groupManager->field_0x74;
+    texture->lastUseFrame = groupManager->frameCount;
     texture->group = this;
 }
 

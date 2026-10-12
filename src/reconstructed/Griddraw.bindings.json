@@ -65,7 +65,7 @@
   "?ReleaseBlockCentres@DrawableGridNode@@QAEHXZ": "0x00483100",
   "?WalkBorderVertex@DrawableGridNode@@QAEXHHHHPAUGridBaseCell@@H@Z": "0x00483200",
   "?PropagateBorderChange@DrawableGridNode@@QAEXPAV1@HHHHPAUGridBaseCell@@@Z": "0x004835c0",
-  "?UnknownFunction484f10@GridVertexLighter@@QAEXPAUGridVertex@@H@Z": "0x00484f10",
+  "?FogVertices@GridVertexLighter@@QAEXPAUGridVertex@@H@Z": "0x00484f10",
   "?UnknownFunction49e4a0@GridVertexSink@@QAEXPAXH00HH@Z": "0x0049e4a0",
   "?RemapTexCoordsIfMoved@GridManagedTexture@@QAEHPAM0000HI@Z": "0x00510910",
   "?UnknownVirtualSlot1@GridNode@@UAEHPAX00HHH@Z": "0x00483d40",

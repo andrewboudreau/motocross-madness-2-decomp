@@ -69,8 +69,8 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
         rect = 0;
         if (flags & 0x10) {
             screen.left = screen.top = 0;
-            screen.right = ((RenderTarget*)field_0x18)->targetWidth;
-            screen.bottom = ((RenderTarget*)field_0x18)->targetHeight;
+            screen.right = ((RenderTarget*)renderContext)->targetWidth;
+            screen.bottom = ((RenderTarget*)renderContext)->targetHeight;
             rect = &screen;
         }
         if (parent)
@@ -80,7 +80,7 @@ UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
     }
     if (wait)
         RecreateCursors(waitCursorImage, paletteChanged == 0);
-    if (dialog->UnknownVirtualSlot27(field_0x18, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
+    if (dialog->UnknownVirtualSlot27(renderContext, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
                                      parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
                                      (const char*)d)) {
         dialog->field_0x144 = flags;
@@ -221,12 +221,12 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             backgroundRegion = tipGui->guiBackground->AllocRegion(0);
             restoreFrames = 3;
         }
-        if (!((PCRenderTarget*)field_0x18)->renderSurface->GetDC((void**)&dc)) {
+        if (!((PCRenderTarget*)renderContext)->renderSurface->GetDC((void**)&dc)) {
             previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
             GetTextExtentPoint32A(dc, text, strlen(text), &size);
             SelectObject(dc, previous);
-            ((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc);
-            target = (PCRenderTarget*)field_0x18;
+            ((PCRenderTarget*)renderContext)->renderSurface->ReleaseDC(dc);
+            target = (PCRenderTarget*)renderContext;
             width = size.cx + 2;
             if (width >= target->targetWidth - 2)
                 width = target->targetWidth - 2;

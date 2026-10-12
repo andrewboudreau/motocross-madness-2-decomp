@@ -304,7 +304,7 @@ void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
     static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Diff");
-    switch (circuit->field_0x50) {
+    switch (circuit->difficulty) {
     case 1:
         g_TrackGame->LoadResourceString(0x14cb, text, 127);
         break;
@@ -473,7 +473,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
             else
                 g_TrackGame->mode.raceSettings.field_0x34 = 0;
             g_TrackGame->mode.raceSettings.treeCollision = 1;
-            g_TrackGame->mode.field_0x94 = circuit->field_0x50;
+            g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
             UnknownVirtualSlot26();
         } else if (_stricmp("TabNext", event->controlName) == 0) {
@@ -1136,7 +1136,7 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->SetCamera(0);
+        ((RenderTarget*)renderContext)->SetCamera(0);
         break;
     }
 }

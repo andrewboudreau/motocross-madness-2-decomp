@@ -86,7 +86,7 @@ public:
     void SetShown(int value);    // 0x0046ea60
     void EndControlDraw(void* dc);            // 0x0046eeb0: restores the font and releases `dc`
     int LoadDialogResource(const char* name); // 0x0046a8e0: the .dtm `name` from the resource manager
-    int UnknownFunction46a920(void* stream, int offset); // 0x0046a920
+    int ReadDialogResource(void* stream, int offset); // 0x0046a920
     // 0x0046f3c0: TextOutA, with a shadow one pixel up and left when `shadow`.
     void DrawShadowText(void* dc, int x, int y, const char* text, int length,
                         unsigned int color, int shadow, unsigned int shadowColor);
@@ -117,7 +117,7 @@ public:
     char* SplitTextLines(char* text, unsigned int color, void* font, void* a, int* size);
 
     // The render target (GameObject +0x18) as the controls read it.
-    void* UnknownInlineField18() { return field_0x18; }
+    void* UnknownInlineField18() { return renderContext; }
 
     UIDialog* parentDialog;                   // +0x2c: parent dialog
     GUIManager* guiManager;                   // +0x30

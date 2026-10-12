@@ -24,7 +24,7 @@
   "??_C@_0P@PDOO@GUID_RampForce?$AA@": "0x0056fc14",
   "?EnumJoystickCallback@PCControlInterface@@SGHPBUUnknownDeviceInstance@@PAX@Z": "0x004bf3c0",
   "?EnumJoystickCallback@PCControlInterface@@SGHPBUUnknownDeviceInstance@@PAX@Z$ehhandler": "0x0054cb94",
-  "?UnknownFunction489c60@JoystickDevice@@QAEHHHPAUUnknownInputEntry@@@Z": "0x00489c60",
+  "?GetControlState@JoystickDevice@@QAEHHHPAUUnknownInputEntry@@@Z": "0x00489c60",
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?OpenDevice@PCJoystickDevice@@QAEHPBUUnknownDeviceInstance@@@Z": "0x004c2930",
   "?SetAcquired@PCInputDevice@@QAEHH@Z": "0x004c26d0",

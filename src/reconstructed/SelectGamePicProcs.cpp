@@ -238,9 +238,9 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                 g_TrackGame->sceneObject->ReadSceneName(text, entry, 0, "scn", &x, &y);
                 int row;
                 if (g_TrackGame->network && g_TrackGame->network->isHost)
-                    row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, x, y);
+                    row = g_TrackGame->ui->AddEntry(index, 0, series, entry, x, y);
                 else
-                    row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, 0, 0);
+                    row = g_TrackGame->ui->AddEntry(index, 0, series, entry, 0, 0);
                 if (g_TrackGame->mode.GetSelectedSeries() == 1 ||
                     g_TrackGame->mode.GetSelectedSeries() == 5) {
                     if (largePictures)
@@ -270,9 +270,9 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     g_TrackGame->sceneObject->ReadSceneName(text, entry, scene, "scn", &x, &y);
                     int row;
                     if (g_TrackGame->network && g_TrackGame->network->isHost)
-                        row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, x, y);
+                        row = g_TrackGame->ui->AddEntry(index, scene, series, entry, x, y);
                     else
-                        row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, 0, 0);
+                        row = g_TrackGame->ui->AddEntry(index, scene, series, entry, 0, 0);
                     if (largePictures)
                         sprintf(file, "%s%02d.tga", entry, scene);
                     else
@@ -444,7 +444,7 @@ void MultiPlayerDlg::SendSettings() {
         message.bikeClass = game->mode.raceSettings.maxBikeClass;
         message.field_0x0c = game->mode.raceSettings.field_0x138;
         message.field_0x10 = game->mode.raceSettings.field_0x13c;
-        message.detail = game->mode.field_0x94;
+        message.difficulty = game->mode.difficulty;
         message.trackNumber = game->mode.raceSettings.field_0x34;
         memcpy(message.slots, slots->slots, sizeof(message.slots));
         message.trackName[0] = 0;
@@ -763,7 +763,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
     } else if (from && type == 0x83) {
         UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
         g_TrackGame->mode.raceSettings = start->raceSettings;
-        g_TrackGame->mode.field_0x94 = start->field_0x1f4;
+        g_TrackGame->mode.difficulty = start->field_0x1f4;
         int total = g_TrackGame->mode.raceSettings.field_0x35 + g_TrackGame->mode.raceSettings.field_0x28;
         if (start->start) {
             for (i = g_TrackGame->mode.raceSettings.field_0x35; i < total; i++) {
@@ -800,7 +800,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         g_TrackGame->mode.raceSettings.field_0x34 = settings->trackNumber;
         g_TrackGame->mode.raceSettings.field_0x138 = settings->field_0x0c;
         g_TrackGame->mode.raceSettings.field_0x13c = settings->field_0x10;
-        g_TrackGame->mode.field_0x94 = settings->detail;
+        g_TrackGame->mode.difficulty = settings->difficulty;
         g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.series);
         g_TrackGame->mode.raceSettings.trackName[0] = 0;
         strncat(g_TrackGame->mode.raceSettings.trackName, settings->trackName, 0x3f);
@@ -1959,7 +1959,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->ReleaseRegion(previewRegion);
-        ((RenderTarget*)field_0x18)->SetCamera(0);
+        ((RenderTarget*)renderContext)->SetCamera(0);
         break;
     }
 }
@@ -2141,7 +2141,7 @@ void MPOptionsDlg::HandleEvent(UnknownDialogEvent* event) {
         FindControl("FastFinishesCheckBox", 0)->BindValue(&g_TrackGame->mode.raceSettings.shortTimeLimit);
         FindControl("ChkTreeCollision", 0)->BindValue(&g_TrackGame->mode.raceSettings.treeCollision);
         FindControl("ChkRiderCollision", 0)->BindValue(&g_TrackGame->mode.raceSettings.riderCollision);
-        FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.field_0x94);
+        FindControl("RadLODEasy", 0)->BindValue(&g_TrackGame->mode.difficulty);
         FindControl("ChkRecordRace", 0)->Show(0, 1);
         static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb))->SetAcceptedCharacters("0123456789");
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb));

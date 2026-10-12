@@ -287,7 +287,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             if (minPoints >= points - 1)
                 minPoints = points - 1;
             UnknownScenePhysicsObject* object = new(__FILE__, 1845) UnknownScenePhysicsObject(1, 1);
-            AppendChild(object->UnknownVirtualSlot40(field_0x18, sltPath, lights, a4, position, look, up,
+            AppendChild(object->UnknownVirtualSlot40(renderContext, sltPath, lights, a4, position, look, up,
                                                                0, a2, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, field_0x88, 1),
@@ -326,7 +326,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
+                            node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
                             object->UnknownVirtualSlot37(1, emitter, *object->field_0x12c, 0);
                             dust = 1;
                         }
@@ -338,7 +338,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
+                            node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
                             object->UnknownVirtualSlot37(2, emitter, *object->field_0x12c, 0);
                             chunk = 1;
                         }
@@ -350,7 +350,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->AppendChild(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
+                            node->AppendChild(emitter->UnknownVirtualSlot27(renderContext, a2), -1);
                             object->UnknownVirtualSlot37(3, emitter, *object->field_0x12c, 0);
                             spray = 1;
                         }
@@ -369,7 +369,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
             staticModels->casters[i].model = (ShadowCaster*)object;
-            AppendChild(object->UnknownVirtualSlot9(field_0x18, sltPath, (int)lights, a4, 1), -1);
+            AppendChild(object->UnknownVirtualSlot9(renderContext, sltPath, (int)lights, a4, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
             strncpy(staticModels->casters[i].fileName, sltPath, count);
@@ -382,7 +382,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                 && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
                 g_MemTagStack->Push("Collision");
                 staticModels->casters[i].collisionObject = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
-                staticModels->casters[i].collisionObject->Configure(field_0x18, 1, 0, 1);
+                staticModels->casters[i].collisionObject->Configure(renderContext, 1, 0, 1);
                 staticModels->casters[i].collisionObject->field_0x60 =
                     (D3DIMSoultreeObject*)staticModels->casters[i].model;
                 if (!colPath[0])
@@ -409,8 +409,8 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                                       &oneShot, &force2D);
                 SoultreeSoundEmitter* emitter =
                     (new(__FILE__, 2015)
-                         SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                        ->UnknownFunction4029f0(field_0x18, sound, "",
+                         SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
+                        ->CreateFollowing(renderContext, sound, "",
                                                 (UnknownVehiclePart*)staticModels->casters[i].model,
                                                 params, flags, oneShotDistance, randomTriggerPercent, 0,
                                                 force2D);
@@ -581,7 +581,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (animationTable->entries[i].keyFramed) {
             UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
             animationTable->entries[i].character = character;
-            if (!AppendChild(character->UnknownFunction4319c0(field_0x18, sltPath, colPath, lights, a4, 1, 1),
+            if (!AppendChild(character->UnknownFunction4319c0(renderContext, sltPath, colPath, lights, a4, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
                 UnknownFunction464e80(message);
@@ -591,7 +591,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (!animationTable->entries[i].keyFramed) {
             UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
             animationTable->entries[i].proceduralObject = car;
-            if (!AppendChild(car->UnknownVirtualSlot27(field_0x18, sltPath, colPath, lights, a4, 0, vuePath,
+            if (!AppendChild(car->UnknownVirtualSlot27(renderContext, sltPath, colPath, lights, a4, 0, vuePath,
                                                                  &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
@@ -615,10 +615,10 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         animationTable->entries[i].field_0x00_bit4 = exclude;
         if (animationTable->entries[i].keyFramed) {
             UnknownFunction4de580(name, "MCF", file);
-            animationTable->entries[i].character->field_0x1a0->SetPosition(&animationTable->entries[i].position);
+            animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
             if (axes)
-                animationTable->entries[i].character->field_0x1a0->SetAxesPtr(&look, &up, 1, 0);
-            animationTable->entries[i].character->field_0x1a0->UnknownFunction4444c0(useLighting);
+                animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
+            animationTable->entries[i].character->modelNode->UnknownFunction4444c0(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].field_0x00_bit1 = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
@@ -686,13 +686,13 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     parameters.GetString("SoundAttachToObject", "", attach, 0x40);
                     UnknownSceneLodObject* node;
                     if (animationTable->entries[i].keyFramed)
-                        node = animationTable->entries[i].character->field_0x1a0;
+                        node = animationTable->entries[i].character->modelNode;
                     else
                         node = animationTable->entries[i].proceduralObject->field_0x34;
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
-                             SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                            ->UnknownFunction4029f0(field_0x18, sound, attach, (UnknownVehiclePart*)node, params,
+                             SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
+                            ->CreateFollowing(renderContext, sound, attach, (UnknownVehiclePart*)node, params,
                                                     flags, oneShotDistance, randomTriggerPercent, 0, force2D);
                     if (!emitter) {
                         sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);

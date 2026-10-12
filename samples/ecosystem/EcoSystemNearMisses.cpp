@@ -100,7 +100,7 @@ static UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
 
-#define ECO_VIEW ((UnknownEcoRenderTarget*)field_0x18)
+#define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
 
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
@@ -131,7 +131,7 @@ static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
 // (then `fade` is 255), else the fade between the band's two distances.
 void Vegetation::TestDistance(int* billboard, int* fade) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->camera;
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->renderContext)->camera;
     float dx = camera->position.x - quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
     float dz = camera->position.z - quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
     *billboard = 0;
@@ -339,9 +339,9 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
         definition->collisionObjects[i]->Configure(g_TrackGame->field_0x10, 0, 0, 1);
         AppendChild(definition->collisionObjects[i], -1);
-        definition->collisionObjects[i]->field_0x64 = 0x3e8;
+        definition->collisionObjects[i]->ownerType = 0x3e8;
         if (shape->type == 0) {
-            definition->collisionObjects[i]->field_0x64 = 0x3e9;
+            definition->collisionObjects[i]->ownerType = 0x3e9;
             Vector3* hull = new(__FILE__, 0x3b8) Vector3[definition->modelVertexCount[0]];
             int* hullIndices = new(__FILE__, 0x3b9) int[definition->modelIndexCount[0]];
             for (j = 0; j < definition->modelIndexCount[0]; j++)
@@ -351,18 +351,18 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
                 hull[j].y = definition->modelVertices[0][j].position.y;
                 hull[j].z = definition->modelVertices[0][j].position.z;
             }
-            definition->collisionObjects[i]->field_0x64 = 0x3e9;
-            definition->collisionObjects[i]->UnknownFunction4328b0(hull, hullIndices, definition->modelIndexCount[0] / 3,
+            definition->collisionObjects[i]->ownerType = 0x3e9;
+            definition->collisionObjects[i]->SetTriangleMeshHullShape(hull, hullIndices, definition->modelIndexCount[0] / 3,
                                                                definition->modelVertexCount[0]);
             UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
             delete hull;
             delete hullIndices;
         } else if (shape->type == 2) {
-            definition->collisionObjects[i]->UnknownFunction4329a0(shape->start, shape->radius);
+            definition->collisionObjects[i]->SetSphereShape(shape->start, shape->radius);
         } else if (shape->type == 3) {
-            definition->collisionObjects[i]->UnknownFunction432a20(shape->start, shape->end, shape->radius);
+            definition->collisionObjects[i]->SetCapsuleShape(shape->start, shape->end, shape->radius);
         } else if (shape->type == 1) {
-            definition->collisionObjects[i]->field_0x64 = 0x3e9;
+            definition->collisionObjects[i]->ownerType = 0x3e9;
             for (j = 0; j < 16; j++) {
                 float angle = j * 0.39269909f;
                 vertices[j].x = vertices[j + 16].x = (float)cos(angle) * shape->radius;
@@ -383,7 +383,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
                 indices[j * 6 + 4] = next + 16;
                 indices[j * 6 + 5] = j + 16;
             }
-            definition->collisionObjects[i]->UnknownFunction4328b0(vertices, indices, 32, 32);
+            definition->collisionObjects[i]->SetTriangleMeshHullShape(vertices, indices, 32, 32);
             UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->shapeData)->transform);
         }
     }

@@ -66,7 +66,7 @@ static inline float UnknownSquareMagnitude(const Vector3* v) {
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
 
-#define ECO_VIEW ((UnknownEcoRenderTarget*)field_0x18)
+#define ECO_VIEW ((UnknownEcoRenderTarget*)renderContext)
 
 #define ECO_RGBA(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 
@@ -334,7 +334,7 @@ int EvictGeometry(void* owner, int context) {
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->camera;
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->renderContext)->camera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
         return;
@@ -1136,7 +1136,7 @@ int EcoSystem::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 // probe block (its slot holds the probe's `new` temporary) while it is live
 // across the stream's `new` (which takes `ownsStream`'s dead slot) and the
 // second loop (whose induction spill gets a slot of its own).
-int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags) {
+int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags) {
     char names[256][0x80];
     char billboardNames[256][0x80];
     unsigned int keyColors[256];
@@ -1253,7 +1253,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
 // The byte is read, then xored with the key; the key accumulates the
 // encoded byte. The block count is the loop bound expression (it stays in
 // a frame slot) and the tail loop counts down.
-int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
+int WriteXorEncoded(const unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
     unsigned char buffer[0x400];
     int total = size * count;
     int block;

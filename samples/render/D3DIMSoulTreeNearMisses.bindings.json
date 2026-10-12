@@ -93,7 +93,7 @@
   "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction49e4a0@LightManager@@QAEXPAXH00H0@Z": "0x0049e4a0",
-  "?UnknownFunction4a10e0@@YAXPBUVector3@@0PAU1@@Z": "0x004a10e0",
+  "?ReflectAndNormalize@@YAXPBUVector3@@0PAU1@@Z": "0x004a10e0",
   "?TransformPoints@@YAXPBXPAXPBUMatrix4@@HHH@Z": "0x004a1b00",
   "?SelectSection@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?GetInt@UnknownParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",

@@ -70,7 +70,7 @@
 #include "../../src/reconstructed/ResourceManager.h"
 
 // 0x0045c6a0 (cdecl): fwrite that encodes the bytes with the running key *key.
-int UnknownFunction45c6a0(const void* buffer, int size, int count, FILE* file, char* key);
+int WriteXorEncoded(const void* buffer, int size, int count, FILE* file, char* key);
 // 0x0045c7b0 (cdecl): fread that decodes the bytes with the running key *key.
 int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
 
@@ -157,7 +157,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
         field_0x03 = 0;
         field_0x1c = 0;
     }
-    field_0x1c = UnknownFunction460d70(path);
+    field_0x1c = FindArchive(path);
     if (field_0x1c) {
         field_0x1c->field_0x01 = field_0x1c->field_0x03;
         SetBufferSize(0x8000);
@@ -165,7 +165,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
         return 1;
     }
     if (*mode == 'r' || *mode == 'a') {
-        if (!encoded && UnknownFunction460e70(path)) {
+        if (!encoded && IsValidFile(path)) {
             field_0x08 = 1;
             if (field_0x12c && (field_0x1c = field_0x12c->AddArchive(path, 0)) != 0) {
                 return 1;
@@ -436,7 +436,7 @@ int UnknownTextureStream::Write(const void* buffer, int size, int count)
             fclose(stream->field_0x14);
             stream->field_0x14 = 0;
         }
-        if (!UnknownFunction45c6a0(buffer, size, count, stream->field_0x14, &stream->field_0x01)) {
+        if (!WriteXorEncoded(buffer, size, count, stream->field_0x14, &stream->field_0x01)) {
             return count - 1;
         }
         return count;

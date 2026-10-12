@@ -13,7 +13,7 @@ BOOL CALLBACK UnknownEnumWindowsProc4a05e0(HWND window, LPARAM found);
 int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine,
                                  int showCommand);
 // 0x004a0c50: registers the window class and creates the full-screen window.
-int UnknownFunction4a0c50(HINSTANCE instance, int showCommand);
+int CreateMainWindow(HINSTANCE instance, int showCommand);
 // 0x004a0d50: the main window's window procedure.
 LRESULT CALLBACK UnknownWindowProc4a0d50(HWND window, UINT message, WPARAM wParam,
                                          LPARAM lParam);

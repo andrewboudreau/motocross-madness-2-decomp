@@ -56,7 +56,7 @@ int NationalRace::UnknownVirtualSlot27(int value) {
     if (!BaseQuarryEvent::UnknownVirtualSlot27(value))
         return 0;
     runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
-                     ->UnknownFunction48a600(field_0x18, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
+                     ->UnknownFunction48a600(renderContext, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;
@@ -72,7 +72,7 @@ void NationalRace::UnknownVirtualSlot29() {
     BaseQuarryEvent::UnknownVirtualSlot29();
     g_TrackGame->LoadResourceString(0x913, name, sizeof(name));
     finishText = new (__FILE__, 71) DropTextOverlay(1);
-    finishText = finishText->UnknownFunction51af00(field_0x18, g_TrackGame->textureManager, 3.0f, 0,
+    finishText = finishText->UnknownFunction51af00(renderContext, g_TrackGame->textureManager, 3.0f, 0,
                                                    sizeof(name), name);
     if (!finishText)
         sprintf(message, "Drop Text Overlay not created.\n");

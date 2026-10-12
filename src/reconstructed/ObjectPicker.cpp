@@ -17,25 +17,25 @@ float FastInvSqrt(float x); // 0x00460c00
 // 0x004b01c0
 ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
     field_0x34 = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x44 = 0;
+    lastPickX = 0;
+    lastPickY = 0;
+    cursorBindingX = 0;
+    cursorBindingY = 0;
 }
 
 // 0x004b04c0
-int ObjectPicker::UnknownFunction4b04c0() {
-    UnknownCursorPosition position = field_0x34->UnknownFunction43f100();
+int ObjectPicker::PickAtCursor() {
+    UnknownCursorPosition position = field_0x34->CursorPosition();
 
-    return PickAt(position.x, ((RenderTarget*)field_0x18)->targetHeight - position.y - 1);
+    return PickAt(position.x, ((RenderTarget*)renderContext)->targetHeight - position.y - 1);
 }
 
 // 0x004b0730
 ObjectPicker::~ObjectPicker() {
-    if (field_0x40)
-        delete field_0x40;
-    if (field_0x44)
-        delete field_0x44;
+    if (cursorBindingX)
+        delete cursorBindingX;
+    if (cursorBindingY)
+        delete cursorBindingY;
 }
 
 // 0x004b0500
@@ -49,13 +49,13 @@ int ObjectPicker::PickAt(int x, int y) {
     float w;
     float length;
 
-    field_0x38 = x;
-    field_0x3c = y;
-    camera = (UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera;
-    position = camera->field_0x170;
-    u = (float)x - camera->field_0x1a0 - camera->field_0x1a8 / 2;
-    v = (float)y - (((RenderTarget*)field_0x18)->targetHeight - camera->field_0x1a4 - camera->field_0x1ac) -
-        camera->field_0x1ac / 2;
+    lastPickX = x;
+    lastPickY = y;
+    camera = (UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera;
+    position = camera->eyePosition;
+    u = (float)x - camera->viewportX - camera->viewportWidth / 2;
+    v = (float)y - (((RenderTarget*)renderContext)->targetHeight - camera->viewportY - camera->viewportHeight) -
+        camera->viewportHeight / 2;
     w = camera->field_0x198;
     direction.x = u * camera->field_0x0ac[0][0] + v * camera->field_0x0ac[0][1] + w * camera->field_0x0ac[0][2] +
                   camera->field_0x0ac[0][3];
@@ -78,42 +78,42 @@ int ObjectPicker::PickAt(int x, int y) {
     direction += position;
     segment[0] = position;
     segment[1] = direction;
-    field_0x30->SetMeshShape(1, segment);
-    field_0x30->UpdatePlacement();
-    if (field_0x30->QueryCollisions())
+    pickRay->SetMeshShape(1, segment);
+    pickRay->UpdatePlacement();
+    if (pickRay->QueryCollisions())
         return field_0x2c;
     return 0;
 }
 
 // 0x004b0210
-ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManager* textures,
+ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
                                                   UnknownPickCallback callback, GameCursor* cursor) {
     Vector3 segment[2];
 
     GameObject::UnknownVirtualSlot8(target);
-    field_0x30 = new(__FILE__, 36) CollisionObject(1);
-    field_0x30->Configure(target, 1, 1, 1);
+    pickRay = new(__FILE__, 36) CollisionObject(1);
+    pickRay->Configure(target, 1, 1, 1);
     segment[0] = Vector3(0.0f, 0.0f, 0.0f);
     segment[1] = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x30->SetMeshShape(1, segment);
-    field_0x30->field_0x88 = callback;
-    field_0x30->field_0x68 = 1;
-    AppendChild(field_0x30, -1);
+    pickRay->SetMeshShape(1, segment);
+    pickRay->onHitCallback = callback;
+    pickRay->ignoreVegetation = 1;
+    AppendChild(pickRay, -1);
     if (cursor) {
         field_0x34 = cursor;
     } else {
-        field_0x40 = new(__FILE__, 59)
-            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera)->field_0x1c4,
+        cursorBindingX = new(__FILE__, 59)
+            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
                                   0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.1f);
-        field_0x44 = new(__FILE__, 60)
-            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->currentCamera)->field_0x1c8,
+        cursorBindingY = new(__FILE__, 60)
+            UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeY,
                                   0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.1f);
         if (g_TrackGame->controlInterface->mouse) {
-            g_TrackGame->controlInterface->mouse->AttachBinding(field_0x40);
-            g_TrackGame->controlInterface->mouse->AttachBinding(field_0x44);
+            g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingX);
+            g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingY);
         }
         field_0x34 = (GameCursor*)(new(__FILE__, 66) GameCursor(1))
-                         ->UnknownFunction43ea70(field_0x18, field_0x40, field_0x44, "cursor.tga", textures, 0, 0, 0);
+                         ->CreateBound(renderContext, cursorBindingX, cursorBindingY, "cursor.tga", textures, 0, 0, 0);
         AppendChild(field_0x34, -1);
     }
     if (!field_0x34) {

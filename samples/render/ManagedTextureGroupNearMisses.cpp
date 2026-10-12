@@ -137,7 +137,7 @@ void ManagedTextureGroup::RepackWholePages() {
         if (managed->field_0xa8 > level)
             level = managed->field_0xa8;
         managed->plannedLevel = level;
-        managed->lastUseFrame = groupManager->field_0x74;
+        managed->lastUseFrame = groupManager->frameCount;
         field_0x7c.Add(managed);
         texture = managedTextures.Next();
         texels += LevelArea(level);
@@ -356,7 +356,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         field_0x244 += LevelArea(level);
         if (managed->field_0xa8 > level)
             level = managed->field_0xa8;
-        managed->lastUseFrame = groupManager->field_0x74;
+        managed->lastUseFrame = groupManager->frameCount;
         managed->plannedLevel = level;
         field_0x7c.Add(managed);
         managed = static_cast<ManagedTexture*>(managedTextures.Next());
@@ -469,7 +469,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     while (whole && texture) {
         TextureMap* next = texture->nextTexture;
         UnknownTextureRegion* region = static_cast<CacheTexture*>(texture)->rootRegion;
-        if (region && region->field_0x2c && !region->field_0x00[0]) {
+        if (region && region->reserved && !region->quarters[0]) {
             cachePages.Remove(texture);
             emptied.Append(texture);
             whole--;
@@ -654,14 +654,14 @@ struct UnknownBltEffects {
 // in mode 2 the selected page with every texture copied into its region.
 int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
     UnknownSurfaceInterface* surface = target->renderSurface;
-    if (groupManager->field_0x3c != this)
+    if (groupManager->debugGroup != this)
         return 0;
     if (!g_TrackGame->field_0x2d4_bit2)
         return 1;
     char text[0x50];
     ManagedTexture* selected = 0;
     TextureMap* page;
-    int mode = groupManager->field_0x58;
+    int mode = groupManager->debugKeyMode;
     if (mode == 1 && textureCursor >= 0 && textureCursor < managedTextures.m_count) {
         int index = textureCursor;
         selected = static_cast<ManagedTexture*>(managedTextures.First());
@@ -702,7 +702,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             }
         }
     }
-    if (groupManager->field_0x58 == 1 && selected) {
+    if (groupManager->debugKeyMode == 1 && selected) {
         int index = 0;
         for (page = cachePages.First(); page; page = cachePages.Next(), index++) {
             if (page == selected->page)
@@ -711,7 +711,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
         if (!page)
             return 1;
         pageCursor = index;
-    } else if (groupManager->field_0x58 == 2) {
+    } else if (groupManager->debugKeyMode == 2) {
         page = cachePages.First();
         for (int i = 0; i < pageCursor; i++)
             page = cachePages.Next();
@@ -736,8 +736,8 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             for (int j = 0; j < field_0x1a8.m_count; j++) {
                 ManagedTexture* managed = field_0x1a8.Get(j);
                 UnknownTextureRegion* region = managed->region;
-                int left = (int)(page->textureWidth * region->field_0x1c);
-                int top = (int)(page->textureHeight * region->field_0x20) + 20;
+                int left = (int)(page->textureWidth * region->left);
+                int top = (int)(page->textureHeight * region->top) + 20;
                 int side = (int)(managed->pageScale * 256.0f);
                 int levelSide = managed->textureWidth;
                 UnknownSurfaceInterface* level = managed->systemSurface;

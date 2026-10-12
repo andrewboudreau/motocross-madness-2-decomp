@@ -61,8 +61,8 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
     field_0x240->QueryGround(&ground, 0, 0, 0);
     float minimum = ground.y + 3.5f;
     if (minimum > point->y) {
-        if (field_0x22c < 0.0f)
-            field_0x22c = (minimum - point->y) / field_0x220 + field_0x22c;
+        if (followPitch < 0.0f)
+            followPitch = (minimum - point->y) / followDistance + followPitch;
         point->y = minimum;
     } else if (capped && point->y > 400.0f) {
         point->y = 400.0f;
@@ -111,19 +111,19 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
 
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
-    if (vehicleMode && !bike->field_0x444) {
-        g_TrackGame->mode.field_0x23c0 = field_0x22c;
-        g_TrackGame->mode.field_0x23c4 = field_0x234;
-        g_TrackGame->mode.field_0x23bc = field_0x220;
+    if (vehicleMode && !bike->crashState) {
+        g_TrackGame->mode.field_0x23c0 = followPitch;
+        g_TrackGame->mode.field_0x23c4 = followYaw;
+        g_TrackGame->mode.field_0x23bc = followDistance;
         g_TrackGame->mode.field_0x23c8 = field_0x258;
     }
 }
 
 // 0x00498230: restores the saved presets.
 void KrustyBikeCamera::UnknownVirtualSlot60() {
-    field_0x22c = g_TrackGame->mode.field_0x23c0;
-    field_0x234 = g_TrackGame->mode.field_0x23c4;
-    field_0x220 = g_TrackGame->mode.field_0x23bc;
+    followPitch = g_TrackGame->mode.field_0x23c0;
+    followYaw = g_TrackGame->mode.field_0x23c4;
+    followDistance = g_TrackGame->mode.field_0x23bc;
     field_0x258 = g_TrackGame->mode.field_0x23c8;
 }
 
@@ -154,7 +154,7 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
 Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
     if (field_0x276) {
-        bike->field_0x5c4->field_0x1a0->GetPositionIn(0, &result);
+        bike->riderCharacter->modelNode->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
             Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
             lead = lead * (4.0f - field_0x2c0 * 0.006f);

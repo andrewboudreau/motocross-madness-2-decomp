@@ -82,43 +82,43 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 // the neighbouring chords scaled by the key spacing.
 Vector3 CarProcedural::PositionAtTime(float time)
 {
-    unsigned int count = field_0x6c;
-    CarProceduralKey* keys = field_0x1b4;
-    float period = keys[count - 1].time * field_0x174;
+    unsigned int count = pathKeyCount;
+    CarProceduralKey* keys = pathKeys;
+    float period = keys[count - 1].time * inversePathSpeed;
     float t = fmod(time, period);
     if (t < 0.0)
         t += period;
     if (count > 0) {
-        t *= field_0x170;
-        unsigned int next = field_0x64 + 1;
+        t *= pathSpeed;
+        unsigned int next = currentPathKey + 1;
         while (next < count && t > keys[next].time) {
-            field_0x64++;
+            currentPathKey++;
             next++;
         }
-        while (field_0x64 > 0 && t < keys[field_0x64].time) {
-            field_0x64--;
+        while (currentPathKey > 0 && t < keys[currentPathKey].time) {
+            currentPathKey--;
             next--;
         }
         // The fourth weight is written over `time`.
         float h0, h1, h2;
-        HermiteWeights((t - keys[field_0x64].time) / (keys[next].time - keys[field_0x64].time),
+        HermiteWeights((t - keys[currentPathKey].time) / (keys[next].time - keys[currentPathKey].time),
                        &h0, &h1, &h2, &time);
 
-        CarProceduralKey* a = &field_0x1b4[field_0x64];
-        CarProceduralKey* b = &field_0x1b4[next];
+        CarProceduralKey* a = &pathKeys[currentPathKey];
+        CarProceduralKey* b = &pathKeys[next];
         Vector3 chord;
         chord.x = b->position.x - a->position.x;
         chord.y = b->position.y - a->position.y;
         chord.z = b->position.z - a->position.z;
         Vector3 t0;
-        if (field_0x64 == 0) {
+        if (currentPathKey == 0) {
             t0 = chord;
         } else {
             float s = (b->time - a->time) / (b->time - a[-1].time);
             t0 = ((a->position - a[-1].position) + chord) * s;
         }
         Vector3 t1;
-        if (next == field_0x6c - 1) {
+        if (next == pathKeyCount - 1) {
             t1 = chord;
         } else {
             float s = (b->time - a->time) / (b[1].time - a->time);
@@ -233,7 +233,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     int result = GameObject::UnknownVirtualSlot10(frameTime);
     if (frameTime <= 0.0)
         return result;
-    if (!field_0x54) {
+    if (!started) {
         // First update: a two-point mesh for the sensor collider, and the
         // wheels' height from the first wheel above the origin.
         Vector3 box[2];
@@ -242,15 +242,15 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         box[1] = kVec3Zero;
         box[1].y -= field_0x188;
         field_0x38->SetMeshShape(1, box);
-        for (unsigned int i = 0; i < field_0x60; i++) {
+        for (unsigned int i = 0; i < numWheels; i++) {
             Vector3 position;
-            field_0x210[i]->GetPosition(&position);
+            wheelNodes[i]->GetPosition(&position);
             if (position.z > 0.0)
                 field_0x198 = position.z;
         }
-        field_0x54 = 1;
+        started = 1;
     }
-    field_0x194 = (float)fmod(frameTime + field_0x194, field_0x1b4[field_0x6c - 1].time * field_0x174);
+    field_0x194 = (float)fmod(frameTime + field_0x194, pathKeys[pathKeyCount - 1].time * inversePathSpeed);
     float t;
     if (field_0x19c > 0.0) {
         field_0x1a0 = FindOffsetAtDistance(field_0x194, field_0x19c);
@@ -267,8 +267,8 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     field_0x40 = forward * field_0x1a8;
     field_0x4c = CarLength(field_0x40);
     Vector3 local = field_0x34->WorldToLocalDirection(forward);
-    if (field_0x60 > 0)
-        field_0x18c = (float)fmod(field_0x184 * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
+    if (numWheels > 0)
+        field_0x18c = (float)fmod(inverseWheelRadius * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
     float behind = FindOffsetAtDistance(t, -1.0f);
     Vector3 back = PositionAtTime(t - behind) - field_0x1c4;
     CarNormalizeInPlace(back);
@@ -276,7 +276,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         field_0x1f4 = back;
     else
         field_0x1f4 = field_0x1f4 * field_0x1ac + back * (1.0f - field_0x1ac);
-    if (field_0x50 && field_0x60 > 0) {
+    if (field_0x50 && numWheels > 0) {
         float wheelbase = FindOffsetAtDistance(t, -field_0x198);
         Vector3 side = PositionAtTime(t - wheelbase) - field_0x1c4;
         Vector3 steer = field_0x34->WorldToLocalDirection(side);
@@ -287,13 +287,13 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     field_0x34->GetPositionIn(0, &position);
     Vector3 ground = position;
     Vector3 normal;
-    ((CarProceduralTerrain*)field_0x20c)->QueryGround(&ground, &normal, 0, 0);
+    ((CarProceduralTerrain*)groundProvider)->QueryGround(&ground, &normal, 0, 0);
     // The sensor collider's frame: the world axes orthonormalised.
     Matrix4 transform;
     CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
     field_0x38->SetTransform(&transform);
     field_0x38->QueryCollisions();
-    if (field_0x38->field_0x58) {
+    if (field_0x38->hasContact) {
         CarProceduralContact* contact = field_0x38->field_0x5c;
         Vector3 lifted = kVec3YAxis * ((1.0f - contact->field_0x00.x) * field_0x188 * 2.0f - field_0x188) + position;
         if (lifted.y > ground.y) {
@@ -311,7 +311,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     Vector3 offset = field_0x34->LocalToWorldDirection(field_0x1dc);
     Vector3 placement = target - offset;
     field_0x34->SetPositionInFrame(0, &placement);
-    for (unsigned int i = 0; i < field_0x60; i++) {
+    for (unsigned int i = 0; i < numWheels; i++) {
         Vector3 axisA;
         Vector3 axisB;
         if (field_0x50 && i < 2) {
@@ -324,7 +324,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
             axisB.y = axisA.z;
             axisB.z = -axisA.y;
         }
-        field_0x210[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
+        wheelNodes[i]->SetAxesPtr(&axisA, &axisB, 0, 1);
     }
     field_0x3c->UpdatePlacement();
     if (field_0x3c->QueryCollisions()) {

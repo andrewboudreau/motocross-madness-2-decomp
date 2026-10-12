@@ -31,7 +31,7 @@
 
 // 0x004a1a50: `count` points transformed by `matrix` with the perspective
 // divide; a zero `sourceStride` means `targetStride`.
-void UnknownFunction4a1a50(void* target, const void* source, const Matrix4* matrix, int count,
+void ProjectPoints(void* target, const void* source, const Matrix4* matrix, int count,
                            int targetStride, int sourceStride)
 {
     const Vector3* p = (const Vector3*)source;

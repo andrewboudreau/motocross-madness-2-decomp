@@ -67,12 +67,12 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
 // 0x004de3b0
 BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCallback progress) {
     GameObject::UnknownVirtualSlot8(target);
-    g_MemTagStack->UnknownFunction4a2bc0("entering BaseQuarryEvent::Create");
+    g_MemTagStack->ReportTotals("entering BaseQuarryEvent::Create");
     if (!UnknownFunction4de590(progress)) {
         Release();
         return 0;
     }
-    g_MemTagStack->UnknownFunction4a2bc0("exiting BaseQuarryEvent::Create");
+    g_MemTagStack->ReportTotals("exiting BaseQuarryEvent::Create");
     return this;
 }
 
@@ -85,8 +85,8 @@ int BaseQuarryEvent::UnknownVirtualSlot14() {
 int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     if (auralScape)
-        auralScape->UnknownFunction4030a0(auralScapeListener, &raceCamera->field_0x170, &raceCamera->field_0x17c,
-                                          &raceCamera->field_0x188, &raceCamera->field_0x3b0->field_0x64);
+        auralScape->UnknownFunction4030a0(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
+                                          &raceCamera->upDirection, &raceCamera->followedBike->field_0x64);
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
     if (radarOverlay && visualCue && statsOverlay) {
@@ -186,7 +186,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
     }
     int total = opponents * 0x80000 / 3 + opponents * 0x8000 / 3 + players * 0x80000 / 3 + 0x80000 / 3;
     int extra;
-    if (g_TrackGame->field_0x560)
+    if (g_TrackGame->bajaEnduroEvent)
         extra = 2 * (0x80000 / 3);
     else
         extra = 3 * (0x80000 / 3);
@@ -197,7 +197,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
 int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
     char message[388];
     visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
-                     ->UnknownFunction48adf0(field_0x18, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
+                     ->UnknownFunction48adf0(renderContext, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
                                              raceView, 45, raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
         sprintf(message, "Visual Cue not loaded.\n");
@@ -217,17 +217,17 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     int height;
 
     instrumentOverlay = new(__FILE__, 1412) InstrumentOverlay(g_TrackGame->mode.instrumentOverlayOn);
-    instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->textureManager,
+    instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager,
                                                    (UnknownInstrumentSource*)raceCamera);
     if (!instrumentOverlay)
         sprintf(message, "Instrument Overlay not created.\n");
 
     // One load each of the height and width feeds two copies: the cue's size
     // uses height/width, its position and the overlays the screen rectangle.
-    height = ((RenderTarget*)field_0x18)->targetHeight;
-    screen.bottom = ((RenderTarget*)field_0x18)->targetHeight;
-    width = ((RenderTarget*)field_0x18)->targetWidth;
-    screen.right = ((RenderTarget*)field_0x18)->targetWidth;
+    height = ((RenderTarget*)renderContext)->targetHeight;
+    screen.bottom = ((RenderTarget*)renderContext)->targetHeight;
+    width = ((RenderTarget*)renderContext)->targetWidth;
+    screen.right = ((RenderTarget*)renderContext)->targetWidth;
     screen.top = 0;
     screen.left = 0;
     if (visualCue) {
@@ -241,30 +241,30 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     cue.right = cue.left - (int)(width * -0.046875f);
 
     chatOverlay = new(__FILE__, 1433) ChatOverlay(1);
-    chatOverlay = chatOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->textureManager, raceCamera, screen, cue);
+    chatOverlay = chatOverlay->Setup((RenderTarget*)renderContext, g_TrackGame->textureManager, raceCamera, screen, cue);
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
     if (chatOverlay && g_TrackGame->mode.chatInputLine == 1)
         chatOverlay->ShowInputLine();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
-    radarOverlay = radarOverlay->LoadMap((RenderTarget*)field_0x18, g_TrackGame->textureManager, (int)raceCamera, screen);
+    radarOverlay = radarOverlay->LoadMap((RenderTarget*)renderContext, g_TrackGame->textureManager, (int)raceCamera, screen);
     if (!radarOverlay)
         sprintf(message, "Radar Overlay not created.\n");
 
     statsOverlay = new(__FILE__, 1451) StatsOverlay(1);
-    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)field_0x18, g_TrackGame->textureManager, raceCamera, screen);
+    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)renderContext, g_TrackGame->textureManager, raceCamera, screen);
     if (!statsOverlay)
         sprintf(message, "Stats Overlay not created.\n");
 
     // Retail reads the height and loads 10 and 256 before the allocation and
     // computes the top after it.
-    text.bottom = ((RenderTarget*)field_0x18)->targetHeight;
+    text.bottom = ((RenderTarget*)renderContext)->targetHeight;
     text.left = 10;
     text.right = 256;
     textQueue = new(__FILE__, 1463) TextQueueOverlay(0);
     text.top = text.bottom - 20;
-    textQueue = textQueue->Setup(field_0x18, text);
+    textQueue = textQueue->Setup(renderContext, text);
     if (!textQueue)
         sprintf(message, "TextQueueOverlay not created.\n");
 
@@ -374,7 +374,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             EnableByClassName("SkyCube");
         g_TrackGame->mode.skyCubeOn = 1 - g_TrackGame->mode.skyCubeOn;
         ShowOnOffMessage(0x1411, g_TrackGame->mode.skyCubeOn);
-        ((RenderTarget*)field_0x18)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
+        ((RenderTarget*)renderContext)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
         return 1;
     }
     if (TestInputEvent(0x43, 0, event, 0x80000000)) {
@@ -518,7 +518,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(leave->field_0x08);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
-            g_TrackGame->eventManager->UnknownFunction45fbd0(leave->field_0x08);
+            g_TrackGame->eventManager->RemovePlayer(leave->field_0x08);
     } else if (from && type == 0x89) {
         char text[0x80];
         char buffer[0x80];
@@ -528,7 +528,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(from);
         if (g_TrackGame->mode.raceSettings.raceMode == 2)
-            g_TrackGame->eventManager->UnknownFunction45fbd0(from);
+            g_TrackGame->eventManager->RemovePlayer(from);
     }
     return 0;
 }
@@ -547,7 +547,7 @@ BaseQuarryEvent::~BaseQuarryEvent() {
         field_0x94->Release();
         field_0x98->Release();
     }
-    ((RenderTarget*)field_0x18)->currentCamera = 0;
+    ((RenderTarget*)renderContext)->currentCamera = 0;
 }
 
 // The remaining overrides are bodies the linker folded with identical ones

@@ -13,7 +13,7 @@ D3DIMSoultreeModifier::D3DIMSoultreeModifier(int flags)
 
 D3DIMSoultreeModifier::~D3DIMSoultreeModifier()
 {
-    UnknownFunction4453e0();
+    DetachFromAll();
 }
 
 GameObject* D3DIMSoultreeModifier::UnknownVirtualSlot8(void* value)
@@ -50,7 +50,7 @@ void D3DIMSoultreeModifier::RemoveObject(D3DIMSoultreeObject* object)
     objectCount--;
 }
 
-void D3DIMSoultreeModifier::UnknownFunction4453e0()
+void D3DIMSoultreeModifier::DetachFromAll()
 {
     if (objectCount) {
         D3DIMSoultreeObject** objects =

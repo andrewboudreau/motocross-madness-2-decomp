@@ -72,7 +72,7 @@ void DebugOverlay::SetRowText(int row, const char* text, int flag)
 
 void DebugOverlay::Print(int page, const char* format, ...)
 {
-    if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
+    if (isEnabled && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
         vsprintf(rowText, format, args);
@@ -82,7 +82,7 @@ void DebugOverlay::Print(int page, const char* format, ...)
 
 void DebugOverlay::Title(int page, const char* format, ...)
 {
-    if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
+    if (isEnabled && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
         vsprintf(rowText, format, args);
@@ -92,27 +92,27 @@ void DebugOverlay::Title(int page, const char* format, ...)
 
 void DebugOverlay::SetRowHighlight(int page, int row, int flag)
 {
-    if (field_0x25_bit0 && page == field_0x26c4)
+    if (isEnabled && page == field_0x26c4)
         field_0xb4[row].highlighted = flag;
 }
 
 int DebugOverlay::UnknownVirtualSlot14()
 {
     fontTexture->UnknownVirtualSlot19();
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
     unsigned int start = ReadClock();
     int i;
     for (i = 0; i <= pageRowCount; i++) {
@@ -137,7 +137,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
     float left = (float)x;
     float top = (float)y;
     float bottom = top + lineHeight;
-    if (!(bottom < ((RenderTarget*)field_0x18)->targetHeight))
+    if (!(bottom < ((RenderTarget*)renderContext)->targetHeight))
         return;
     int index = 0;
     while (length > 0) {
@@ -147,9 +147,9 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
                 break;
             int ch = text[index];
             float right = (field_0x26d0[ch].u1 - field_0x26d0[ch].u0) * 256.0f + left;
-            if (!(right < ((RenderTarget*)field_0x18)->targetWidth)) {
+            if (!(right < ((RenderTarget*)renderContext)->targetWidth)) {
                 if (count)
-                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
+                    ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
                 return;
             }
             vertices[count].x = left;
@@ -204,8 +204,8 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
             count += 6;
             index++;
         }
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
-        ((RenderTarget*)field_0x18)->trianglesDrawn -= count / 3;
+        ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
+        ((RenderTarget*)renderContext)->trianglesDrawn -= count / 3;
         length -= count / 6;
     }
 }

@@ -107,17 +107,17 @@ class CollisionObject : public UnknownEcoQuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);      // 0x00431e70
     void Configure(void* a, int b, int c, int d);          // 0x004320f0
-    void UnknownFunction4328b0(const Vector3* vertices, const int* indices, int triangleCount,
+    void SetTriangleMeshHullShape(const Vector3* vertices, const int* indices, int triangleCount,
                                int vertexCount);                       // 0x004328b0: hull
-    void UnknownFunction4329a0(Vector3 center, float radius);          // 0x004329a0: sphere
-    void UnknownFunction432a20(Vector3 p0, Vector3 p1, float radius);  // 0x00432a20: capsule
+    void SetSphereShape(Vector3 center, float radius);          // 0x004329a0: sphere
+    void SetCapsuleShape(Vector3 p0, Vector3 p1, float radius);  // 0x00432a20: capsule
     void SetTransform(const Matrix4* m);                      // 0x00435830: SetTransform
 
     unsigned char field_0x38[0x50 - 0x38];
     int shapeType;                            // +0x50: 0 hull, 3 capsule, 4 sphere
     void* shapeData;                          // +0x54: the shape (by shapeType)
     unsigned char field_0x58[0x64 - 0x58];
-    int field_0x64;
+    int ownerType;                            // +0x64
     unsigned char field_0x68[0xb8 - 0x68];    // 0xb8 bytes (operator new at 0x00457f74)
 };
 
@@ -387,7 +387,7 @@ int EvictGeometry(void* object, int context);
 
 // 0x0045c6a0 / 0x0045c7b0 (cdecl): fwrite / fread through a running
 // one-byte xor key.
-int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key);
+int WriteXorEncoded(const unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 
 // Griddraw.h / VisibilityQuadTree.h: the visibility clipper 0x00575a98.
@@ -549,7 +549,7 @@ extern UnknownEcoNormalDistribution* g_UnknownGlobal56ece0;
 
 // 0x0045c040 (cdecl): loads every texture a .esb names ahead of the
 // ecosystem itself.
-int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags);
+int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags);
 
 // Helpers reconstructed elsewhere.
 // 0x0047b8a0 (gameui.cpp tail): a float profile value, `defaultValue` when the key is "NONE".

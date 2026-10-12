@@ -137,7 +137,7 @@ static float s_UnknownListenerDistances57772c[2];
 static int s_UnknownEmitterCount577734;
 
 // 0x00402070
-void UnknownFunction402070(Vector3* listener, Vector3* position, float distance, float minDistance,
+void VolumeForDistance(Vector3* listener, Vector3* position, float distance, float minDistance,
                            float maxDistance, long* volume, long* pan) {
     *volume = -2500;
     *pan = 0;
@@ -183,7 +183,7 @@ SoundEmitter::~SoundEmitter() {
 }
 
 // 0x00402260
-SoundEmitter* SoundEmitter::UnknownFunction402260(void* target, const char* name, UnknownSound3DParameters params,
+SoundEmitter* SoundEmitter::Create(void* target, const char* name, UnknownSound3DParameters params,
                                                   unsigned long flags, float oneShotDistance,
                                                   float randomTriggerPercent, int is2D, int force2D) {
     char path[0x104];
@@ -382,13 +382,13 @@ SoultreeSoundEmitter::SoultreeSoundEmitter(AuralScape* scape, SoundGroup* group,
 }
 
 // 0x004029f0
-SoultreeSoundEmitter* SoultreeSoundEmitter::UnknownFunction4029f0(void* target, const char* name,
+SoultreeSoundEmitter* SoultreeSoundEmitter::CreateFollowing(void* target, const char* name,
                                                                   const char* partName, UnknownVehiclePart* part,
                                                                   UnknownSound3DParameters params,
                                                                   unsigned long flags, float oneShotDistance,
                                                                   float randomTriggerPercent, int is2D,
                                                                   int force2D) {
-    if (!UnknownFunction402260(target, name, params, flags, oneShotDistance, randomTriggerPercent, is2D, force2D))
+    if (!Create(target, name, params, flags, oneShotDistance, randomTriggerPercent, is2D, force2D))
         return 0;
     followedPart = part;
     if (!part) {
@@ -597,7 +597,7 @@ static inline void UnknownPlaceEmitter(const int& count, AuralScapeListener** li
     }
     long volume;
     long pan;
-    UnknownFunction402070(&listener, &emitter->soundParameters.position, nearest,
+    VolumeForDistance(&listener, &emitter->soundParameters.position, nearest,
                           emitter->soundParameters.minDistance, emitter->soundParameters.maxDistance, &volume,
                           &pan);
     emitter->SetVolume(volume);
@@ -708,7 +708,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
     unsigned long environment = 0;
     unsigned char material = 0;
     if (reverbEnabled && groundSubject && reverbOwner) {
-        Vector3 position = ((UnknownAuralScapeTarget*)field_0x18)->field_0x08->field_0x170;
+        Vector3 position = ((UnknownAuralScapeTarget*)renderContext)->field_0x08->field_0x170;
         groundSubject->QueryGround(&position, 0, 0, (int)&material);
         zone = (material >> 4) & 3;
         environment = reverbOwner->field_0xa4->field_0x410[zone];

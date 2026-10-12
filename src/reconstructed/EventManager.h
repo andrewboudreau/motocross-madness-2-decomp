@@ -99,7 +99,7 @@ public:
     unsigned char field_0x008[0x10 - 0x8];
     int field_0x10;                                // the motion time
     unsigned char field_0x014[0x1a0 - 0x14];
-    UnknownPodiumSoultree* field_0x1a0;
+    UnknownPodiumSoultree* modelNode;         // +0x1a0
     unsigned char field_0x1a4[0x214 - 0x1a4];
 };
 
@@ -128,10 +128,10 @@ struct UnknownEventEntry {
     float field_0x18;                              // racer +0x760
     float field_0x1c;                              // racer +0x764
     int finished;                                  // +0x20: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
-    int field_0x24;                                // racer +0x4a0
+    int outOfRace;                            // +0x24 racer +0x4a0
     int points;                                    // +0x28: championship points (AddChampionshipPoints)
     float score;                                   // +0x2c: racer +0x768 (score)
-    unsigned char field_0x30;                      // racer +0x11c0; counted in TrackGame+0x3424 (else Game+0x18)
+    unsigned char aiIndex;                    // +0x30 racer +0x11c0; counted in TrackGame+0x3424 (else Game+0x18)
     unsigned char field_0x31[0x34 - 0x31];
     int field_0x34[3];                             // racer +0x7ac..+0x7b4
     char name[16];                                 // +0x40: racer name (racer +0x5e0)
@@ -179,8 +179,8 @@ public:
     void RankRacers();                             // 0x0045e9d0
     void CheckRaceOver(float frameTime);           // 0x0045eef0
     void SendRacerResults();                       // 0x0045f9a0
-    int UnknownFunction45cb70();                   // 0x0045cb70
-    void UnknownFunction45fbd0(int player);        // 0x0045fbd0
+    int LoadEvent();                   // 0x0045cb70
+    void RemovePlayer(int player);        // 0x0045fbd0
     // 0x0045fce0: removes every Vegetation in the rectangle from the
     // collision quadtree (up to 1000).
     void RemoveVegetationInRect(float x0, float z0, float x1, float z1);  // 0x0045fce0

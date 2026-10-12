@@ -7,7 +7,7 @@
   "?Register@AgeManager@@QAEXPAUAgeEntry@@P6AHPAXH@Z1HH@Z": "0x00401050",
   "?Unregister@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x004010d0",
   "?TotalSize@AgeManager@@QAEHPAH@Z": "0x00401130",
-  "?UnknownFunction401180@@YAHPBX0@Z": "0x00401180",
+  "?CompareByRecentUse@@YAHPBX0@Z": "0x00401180",
   "?EvictStale@AgeManager@@QAEHH@Z": "0x004011b0",
   "?MarkUsed@AgeManager@@QAEXPAUAgeEntry@@@Z": "0x00401250",
   "__FILE__:agemanager.cpp": "0x005665c0",

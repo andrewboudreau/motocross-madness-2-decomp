@@ -33,10 +33,10 @@ ManagedTexture::~ManagedTexture() {
 void ManagedTexture::UpdatePageCoords(int level) {
     UnknownTextureRegion* placed = region;
     if (placed && page) {
-        pageScale = (placed->field_0x24 - placed->field_0x1c) / (1 << level);
-        pageOffsetU = placed->field_0x1c;
-        pageOffsetV = placed->field_0x20;
-        field_0xa8 = placed->field_0x18;
+        pageScale = (placed->right - placed->left) / (1 << level);
+        pageOffsetU = placed->left;
+        pageOffsetV = placed->top;
+        field_0xa8 = placed->sizeLevel;
     }
 }
 
@@ -109,7 +109,7 @@ void ManagedTexture::RecordUse(float value) {
     if (value > largestUse)
         largestUse = value;
     useCount++;
-    lastUseFrame = ownerManager->field_0x74;
+    lastUseFrame = ownerManager->frameCount;
 }
 
 // 0x00510870: with a page, applies the render states, the colour key and

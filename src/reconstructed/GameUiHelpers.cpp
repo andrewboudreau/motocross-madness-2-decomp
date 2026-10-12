@@ -11,7 +11,7 @@
 #include "BikeRace.h"
 
 // 0x0047b670
-int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate, int direction)
+int CrossesGate(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate, int direction)
 {
     float u;
     float t;

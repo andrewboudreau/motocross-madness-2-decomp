@@ -172,7 +172,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
             enginePresent[0] = 1;
             if (racer == raceView->localRacer)
                 listenerEngine = 0;
-        } else if (!racer->field_0x737) {
+        } else if (!racer->engineKind) {
             enginePresent[1] = 1;
             if (racer == raceView->localRacer)
                 listenerEngine = 1;
@@ -481,7 +481,7 @@ void RaceSound::AssignChannels() {
         if (racer->engineSize < 250)
             engineChannels[count].engine = 0;
         else
-            engineChannels[count].engine = (racer->field_0x737 != 0) + 1;
+            engineChannels[count].engine = (racer->engineKind != 0) + 1;
         kind = engineChannels[count].engine;
         engineChannels[count].streamSample = idleSamples[kind][0];
         engineChannels[count].sampleBytes = idleSampleBytes[kind][0];
@@ -588,7 +588,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     int j;
 
     for (i = 0; i < channelsInUse; i++) {
-        if (!engineChannels[i].channelRacer->field_0x4a0) {
+        if (!engineChannels[i].channelRacer->outOfRace) {
             engineChannels[i].cameraDistance =
                 (int)GroundDistance(&listenerCamera->listenerPosition, &engineChannels[i].channelRacer->position);
         } else {
@@ -743,13 +743,13 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
 
     for (i = 0; i < channelsInUse; i++) {
         currentRacer = engineChannels[i].channelRacer;
-        if (!currentRacer->field_0x444) {
+        if (!currentRacer->crashState) {
             crashHandled[i] = 0;
             racerWreckSound[i] = 0;
             racerFallSound[i] = 0;
         } else {
             if (!crashHandled[i]) {
-                if (currentRacer == listenerRacer && listenerRacer->field_0x460 == 12) {
+                if (currentRacer == listenerRacer && listenerRacer->crashReason == 12) {
                     launchSound->Stop(1);
                     PlayIfEnabled(launchSound, 0, 0, 0, 0);
                 }
@@ -850,7 +850,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             {
                 UnknownMessage message(text, 1.5f);
                 if (owner)
-                    owner->field_0x6c->ReplaceHeadMessage(&message);
+                    owner->textQueue->ReplaceHeadMessage(&message);
             }
             if (g_TrackGame->mode.networkGame)
                 crowdSounds->UnknownFunction401dd0(musicVolume);

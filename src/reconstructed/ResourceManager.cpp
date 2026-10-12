@@ -154,7 +154,7 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
         strncpy(buffer, name, sizeof(buffer));
 
     UnknownTextureStream* archive = new(__FILE__, 387) UnknownTextureStream((int)this);
-    if (archive->Open(buffer, "rb", archive->UnknownFunction460e70(buffer))) {
+    if (archive->Open(buffer, "rb", archive->IsValidFile(buffer))) {
         if (itemCount + 1 > itemCapacity) {
             items = (ResourceItem**)DebugRealloc(items, (itemCount + 1) * 4, __FILE__, 393);
             if (items) {

@@ -212,9 +212,9 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     savedCameraState = cameraState;
     field_0x250 = cameraState;
     savedParameter = field_0x16c;
-    field_0x224 = field_0x220;
-    field_0x230 = field_0x22c;
-    field_0x238 = field_0x234;
+    initialDistance = followDistance;
+    initialPitch = followPitch;
+    initialYaw = followYaw;
     field_0x254 = field_0x16c;
     field_0x277 = 0;
     field_0x278 = 0;
@@ -383,71 +383,71 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
         return moved;
     }
     if (FOLLOWCAMERA_KEY(0x48)) {
-        if (field_0x220 < 50.0)
-            FollowCameraTilt(field_0x22c, (3.0f - field_0x220 * 0.04f) * turn * 0.01745329f);
+        if (followDistance < 50.0)
+            FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * turn * 0.01745329f);
         else
-            FollowCameraTilt(field_0x22c, turn * 0.01745329f);
+            FollowCameraTilt(followPitch, turn * 0.01745329f);
         moved = true;
     }
     if (FOLLOWCAMERA_KEY(0x50)) {
-        if (field_0x220 < 50.0)
-            FollowCameraTilt(field_0x22c, (3.0f - field_0x220 * 0.04f) * turn * -0.01745329f);
+        if (followDistance < 50.0)
+            FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * turn * -0.01745329f);
         else
-            FollowCameraTiltBack(field_0x22c, turn * 0.01745329f);
+            FollowCameraTiltBack(followPitch, turn * 0.01745329f);
         moved = true;
     }
     if (FOLLOWCAMERA_KEY(0x4b)) {
-        if (field_0x220 < 50.0)
-            FollowCameraTurn(field_0x234, (3.0f - field_0x220 * 0.04f) * turn * 0.01745329f);
+        if (followDistance < 50.0)
+            FollowCameraTurn(followYaw, (3.0f - followDistance * 0.04f) * turn * 0.01745329f);
         else
-            FollowCameraTurn(field_0x234, turn * 0.01745329f);
+            FollowCameraTurn(followYaw, turn * 0.01745329f);
         moved = true;
     }
     if (FOLLOWCAMERA_KEY(0x4d)) {
-        if (field_0x220 < 50.0)
-            FollowCameraTurn(field_0x234, (3.0f - field_0x220 * 0.04f) * turn * -0.01745329f);
+        if (followDistance < 50.0)
+            FollowCameraTurn(followYaw, (3.0f - followDistance * 0.04f) * turn * -0.01745329f);
         else
-            FollowCameraTurnBack(field_0x234, turn * 0.01745329f);
+            FollowCameraTurnBack(followYaw, turn * 0.01745329f);
         moved = true;
     }
     if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c)) {
-        field_0x220 += turn;
-        if (field_0x220 < 7.0f)
-            field_0x220 = 7.0f;
+        followDistance += turn;
+        if (followDistance < 7.0f)
+            followDistance = 7.0f;
         moved = true;
     }
     if (FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) {
-        field_0x220 -= turn;
-        if (field_0x220 < 7.0f)
-            field_0x220 = 7.0f;
+        followDistance -= turn;
+        if (followDistance < 7.0f)
+            followDistance = 7.0f;
         moved = true;
     }
     if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
         if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
                 ->UnknownVirtualSlot4(0, &x, &y)) {
-            if (field_0x220 < 50.0)
-                FollowCameraTilt(field_0x22c, (3.0f - field_0x220 * 0.04f) * y * turn * 0.01745329f);
+            if (followDistance < 50.0)
+                FollowCameraTilt(followPitch, (3.0f - followDistance * 0.04f) * y * turn * 0.01745329f);
             else
-                FollowCameraTilt(field_0x22c, y * turn * 0.01745329f);
-            if (field_0x220 < 50.0)
-                FollowCameraTurn(field_0x234, (3.0f - field_0x220 * 0.04f) * x * turn * -0.01745329f);
+                FollowCameraTilt(followPitch, y * turn * 0.01745329f);
+            if (followDistance < 50.0)
+                FollowCameraTurn(followYaw, (3.0f - followDistance * 0.04f) * x * turn * -0.01745329f);
             else
-                FollowCameraTurn(field_0x234, x * turn * -0.01745329f);
+                FollowCameraTurn(followYaw, x * turn * -0.01745329f);
             if (x != 0.0 || y != 0.0f)
                 moved = true;
             if (x != 0.0f || y != 0.0f)
                 return moved;
         }
         if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
-            field_0x220 += turn;
-            if (field_0x220 < 7.0f)
-                field_0x220 = 7.0f;
+            followDistance += turn;
+            if (followDistance < 7.0f)
+                followDistance = 7.0f;
             moved = true;
         }
         if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0)) {
-            field_0x220 -= turn;
-            if (field_0x220 < 7.0f)
-                field_0x220 = 7.0f;
+            followDistance -= turn;
+            if (followDistance < 7.0f)
+                followDistance = 7.0f;
             moved = true;
         }
     }
@@ -470,33 +470,33 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     Vector3 position;
     Vector3 target;
     Vector3 smoothed;
-    bool current = ((RenderTarget*)field_0x18)->currentCamera == this;
+    bool current = ((RenderTarget*)renderContext)->currentCamera == this;
     field_0x29c = UnknownVirtualSlot41();
     if (!field_0x275) {
         field_0x275 = 1;
         targetPoint = UnknownVirtualSlot57(0);
-        position = field_0x29c * -field_0x220;
+        position = field_0x29c * -followDistance;
         position += targetPoint;
         field_0x240->QueryGround(&position, 0, 0, 0);
         Vector3 direction = position - targetPoint;
-        D3DRMVectorRotate(&position, &direction, &kVec3XAxis, field_0x22c);
-        D3DRMVectorRotate(&direction, &position, &kVec3YAxis, field_0x234);
-        direction *= field_0x220;
+        D3DRMVectorRotate(&position, &direction, &kVec3XAxis, followPitch);
+        D3DRMVectorRotate(&direction, &position, &kVec3YAxis, followYaw);
+        direction *= followDistance;
         position = direction + targetPoint;
         SetFrame(&position, 0, 0, 0, 0);
         target = field_0x29c * field_0x228;
         target += targetPoint;
         field_0x240->QueryGround(&target, 0, 0, 0);
         UnknownVirtualSlot29(target);
-        field_0x278 = FollowCameraAbs(field_0x234) > 2.0f;
+        field_0x278 = FollowCameraAbs(followYaw) > 2.0f;
     }
     if (cameraState != 6 && field_0x276 && !UnknownVirtualSlot74()) {
         field_0x276 = 0;
-        field_0x220 = field_0x2c4;
-        field_0x22c = field_0x2c8;
-        field_0x234 = field_0x2cc;
+        followDistance = savedDistance;
+        followPitch = savedPitch;
+        followYaw = savedYaw;
     }
-    bool wide = FollowCameraAbs(field_0x234) > 2.0f;
+    bool wide = FollowCameraAbs(followYaw) > 2.0f;
     if (cameraState != 6 && !field_0x278 && wide)
         field_0x279 = 1;
     if (overrideActive)
@@ -606,9 +606,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             if (cameraState != 7 && !field_0x276) {
                 field_0x250 = cameraState;
                 field_0x254 = field_0x258;
-                field_0x230 = field_0x22c;
-                field_0x238 = field_0x234;
-                field_0x224 = field_0x220;
+                initialPitch = followPitch;
+                initialYaw = followYaw;
+                initialDistance = followDistance;
                 cameraState = 7;
                 field_0x25c = eyePosition;
                 UnknownVirtualSlot68();
@@ -616,9 +616,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             }
         } else if (cameraState == 7) {
             cameraState = field_0x250;
-            field_0x22c = field_0x230;
-            field_0x234 = field_0x238;
-            field_0x220 = field_0x224;
+            followPitch = initialPitch;
+            followYaw = initialYaw;
+            followDistance = initialDistance;
             field_0x258 = field_0x254;
             eyePosition = field_0x25c;
             field_0x250 = 7;
@@ -628,9 +628,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             if (UnknownVirtualSlot55()) {
                 if (cameraState != 6 && !field_0x276) {
                     savedCameraState = cameraState;
-                    field_0x230 = field_0x22c;
-                    field_0x238 = field_0x234;
-                    field_0x224 = field_0x220;
+                    initialPitch = followPitch;
+                    initialYaw = followYaw;
+                    initialDistance = followDistance;
                     cameraState = 6;
                     savedParameter = field_0x258;
                     UnknownVirtualSlot67();
@@ -640,9 +640,9 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
                 cameraState = savedCameraState;
                 field_0x258 = savedParameter;
                 savedCameraState = 6;
-                field_0x22c = field_0x230;
-                field_0x234 = field_0x238;
-                field_0x220 = field_0x224;
+                followPitch = initialPitch;
+                followYaw = initialYaw;
+                followDistance = initialDistance;
                 field_0x294->Set(field_0x258 = savedParameter, FLT_MAX);
 
             }

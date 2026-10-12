@@ -40,14 +40,14 @@ static inline float Length(Vector3 v)
 // 0x0042f390
 CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
 {
-    field_0x54 = 0;
+    started = 0;
     field_0x50 = 1;
     field_0x58 = 0;
-    field_0x60 = 0;
-    field_0x64 = 0;
+    numWheels = 0;
+    currentPathKey = 0;
     field_0x68 = 0;
-    field_0x6c = 0;
-    field_0x170 = 120.0f;
+    pathKeyCount = 0;
+    pathSpeed = 120.0f;
     field_0x178 = 0.0f;
     field_0x17c = 0.0f;
     field_0x180 = 0.0f;
@@ -62,7 +62,7 @@ CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
     field_0x1a0 = 0.0f;
     field_0x4c = 0.0f;
     field_0x194 = 1e30f;
-    field_0x1b4 = 0;
+    pathKeys = 0;
     field_0x1b8 = kVec3Zero;
     field_0x1c4 = kVec3Zero;
     field_0x1d0 = kVec3Zero;
@@ -71,9 +71,9 @@ CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
     field_0x1e8 = kVec3Zero;
     field_0x200 = kVec3YAxis;
     field_0x40 = kVec3Zero;
-    field_0x20c = 0;
+    groundProvider = 0;
     field_0x34 = 0;
-    field_0x210 = 0;
+    wheelNodes = 0;
     field_0x38 = 0;
     field_0x3c = 0;
     field_0x5c = 1;
@@ -82,10 +82,10 @@ CarProcedural::CarProcedural(int flags) : GraphicsTest(flags)
 // 0x0042f590 (scalar deleting wrapper 0x0042f570)
 CarProcedural::~CarProcedural()
 {
-    if (field_0x210)
-        delete field_0x210;
-    if (field_0x1b4)
-        delete field_0x1b4;
+    if (wheelNodes)
+        delete wheelNodes;
+    if (pathKeys)
+        delete pathKeys;
 }
 
 // 0x00430e60
@@ -110,8 +110,8 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     GameObject::UnknownVirtualSlot8(a0);
     int n = strlen(name);
     int length = n > 0xff ? 0xff : n;
-    strncpy(field_0x70, name, length);
-    field_0x70[length] = 0;
+    strncpy(carName, name, length);
+    carName[length] = 0;
 
     field_0x34 = new (__FILE__, 99) CarProceduralModel(1);
     field_0x34->UnknownNodeVirtualSlot9(a0, name, a3, a4, 1);
@@ -125,27 +125,27 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     CarProceduralNode* body = field_0x34->FindByName("Body");
     body->GetPosition(&field_0x1dc);
 
-    field_0x60 = wheelCount;
-    if (field_0x60 > 0) {
-        field_0x210 = new (__FILE__, 126) CarProceduralNode*[field_0x60];
-        if (field_0x60 > 0)
-            field_0x210[0] = field_0x34->FindByName("TireFrontL");
-        if (field_0x60 > 1)
-            field_0x210[1] = field_0x34->FindByName("TireFrontR");
-        if (field_0x60 > 2)
-            field_0x210[2] = field_0x34->FindByName("TireBackL");
-        if (field_0x60 > 3)
-            field_0x210[3] = field_0x34->FindByName("TireBackR");
-        if (field_0x60 > 4)
-            field_0x210[4] = field_0x34->FindByName("TireMidL");
-        if (field_0x60 > 5)
-            field_0x210[5] = field_0x34->FindByName("TireMidR");
+    numWheels = wheelCount;
+    if (numWheels > 0) {
+        wheelNodes = new (__FILE__, 126) CarProceduralNode*[numWheels];
+        if (numWheels > 0)
+            wheelNodes[0] = field_0x34->FindByName("TireFrontL");
+        if (numWheels > 1)
+            wheelNodes[1] = field_0x34->FindByName("TireFrontR");
+        if (numWheels > 2)
+            wheelNodes[2] = field_0x34->FindByName("TireBackL");
+        if (numWheels > 3)
+            wheelNodes[3] = field_0x34->FindByName("TireBackR");
+        if (numWheels > 4)
+            wheelNodes[4] = field_0x34->FindByName("TireMidL");
+        if (numWheels > 5)
+            wheelNodes[5] = field_0x34->FindByName("TireMidR");
         Vector3 minimum;
         Vector3 maximum;
-        field_0x210[0]->GetLocalBounds(&minimum, &maximum);
-        field_0x184 = 1.0f / maximum.y;
+        wheelNodes[0]->GetLocalBounds(&minimum, &maximum);
+        inverseWheelRadius = 1.0f / maximum.y;
     }
-    field_0x20c = a5;
+    groundProvider = a5;
 
     field_0x38 = new (__FILE__, 149) CarProceduralCollision(1);
     field_0x38->Configure(a0, 1, 1, 0);
@@ -168,9 +168,9 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     g_MemTagStack->Pop(tag);
 
     ReadPath(pathFile, field_0x34->field_0x38);
-    field_0x170 = speed;
+    pathSpeed = speed;
     if (speed > 0.0)
-        field_0x174 = 1.0f / speed;
+        inversePathSpeed = 1.0f / speed;
     field_0x178 = a13;
     field_0x17c = a14;
     field_0x180 = a15;
@@ -188,14 +188,14 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
     sprintf(quoted, "\"%s\"", name);
     UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (stream->Open(pathFile, "r", 0)) {
-        field_0x6c = 0;
+        pathKeyCount = 0;
         while (!stream->UnknownFunction430ff0()) {
             stream->ReadLine(line, 0x400);
             if (strncmp(line, "FRAME", strlen("FRAME")) == 0)
-                field_0x6c++;
+                pathKeyCount++;
         }
         stream->Seek(stream->field_0x130, 0, 1);
-        field_0x1b4 = new (__FILE__, 241) CarProceduralKey[field_0x6c];
+        pathKeys = new (__FILE__, 241) CarProceduralKey[pathKeyCount];
         int i = -1;
         while (!stream->UnknownFunction430ff0()) {
             stream->ReadLine(line, 0x400);
@@ -204,7 +204,7 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
                 char tag[0x400];
                 unsigned long frame;
                 sscanf(line, "%s %ld", tag, &frame);
-                field_0x1b4[i].time = (float)frame;
+                pathKeys[i].time = (float)frame;
             } else if (strncmp(line, "transform", strlen("transform")) == 0) {
                 char key[0x100];
                 char object[0x100];
@@ -213,7 +213,7 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
                 sscanf(line, "%s %s %f %f %f %f %f %f %f %f %f %f %f %f", key, object, &m[0], &m[1],
                        &m[2], &m[3], &m[4], &m[5], &m[6], &m[7], &m[8], &p.x, &p.z, &p.y);
                 if (strcmp(object, quoted) == 0)
-                    field_0x1b4[i].position = p;
+                    pathKeys[i].position = p;
             }
         }
     }

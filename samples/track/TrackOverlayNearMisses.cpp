@@ -230,10 +230,10 @@ int StatsOverlay::DrawStandings()
     void* font;
     int i;
     int count = 0;
-    UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
+    UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
-        TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
+        TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
         float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s", label);
@@ -241,7 +241,7 @@ int StatsOverlay::DrawStandings()
     iterator = 0;
     UnknownEventRacer* racer;
     while ((racer = view->NextBike(&iterator)) != 0) {
-        if (racer->field_0x25_bit0) {
+        if (racer->isEnabled) {
             scores[count].value = racer->score;
             scores[count].racer = racer;
             count++;
@@ -349,7 +349,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->UnknownFunction50abd0(5, 6);
+        overlayTexture->SetAddressModes(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = 128;
@@ -371,9 +371,9 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->field_0x350 : "";
+    const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
-        logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
+        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
     } else {
         logFont.lfWeight = 400;
         face = "Small Fonts";
@@ -600,7 +600,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
     if (overlayTexture->mapFormat == 4444)
-        overlayTexture->UnknownFunction50abd0(5, 6);
+        overlayTexture->SetAddressModes(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = largeLayout ? 256 : 128;
@@ -644,9 +644,9 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
-    const char* face = gui ? gui->field_0x350 : "";
+    const char* face = gui ? gui->toolTipFontFace : "";
     if (*face != '\0') {
-        logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
+        logFont.lfWeight = gui->toolTipBold ? 700 : 500;
         strcpy(logFont.lfFaceName, face);
     } else {
         logFont.lfWeight = 400;
@@ -687,7 +687,7 @@ void RadarOverlay::DrawRacers(int mode)
         if (racers[i] == radarCamera->followedRacer) {
             mapOrigin = racers[i]->position;
             mapAngle = -racers[i]->heading;
-            if (racers[i]->field_0x444)
+            if (racers[i]->crashState)
                 mapAngle = heldMapAngle;
             else
                 heldMapAngle = mapAngle;
@@ -698,7 +698,7 @@ void RadarOverlay::DrawRacers(int mode)
     mapAngleCos = cos(mapAngle);
     mapAngleSin = sin(mapAngle);
     for (i = 0; i < racerCount; i++) {
-        if (i != followedIndex && racers[i]->field_0x25_bit0) {
+        if (i != followedIndex && racers[i]->isEnabled) {
             outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
             if (field_0x174 && field_0x16c == i) {
                 if (radarView->chatOverlay) {

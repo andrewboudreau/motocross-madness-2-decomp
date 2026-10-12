@@ -163,7 +163,7 @@ public:
     unsigned char field_0x004[0x0c - 0x04];
     int motionFinished;                       // +0x00c the motion finished (slot 10 then loops "FlagLoop")
     unsigned char field_0x010[0x1a0 - 0x10];
-    UnknownBikeRaceMesh* field_0x1a0;
+    UnknownBikeRaceMesh* modelNode;           // +0x1a0
 };
 
 // The object at BikeRace+0x44: three GameObjects at +0x3c..+0x44 that a
@@ -195,10 +195,10 @@ struct UnknownBikeRaceMeshItem {
 class UnknownBikeRaceOverlay19c {
 public:
     // 0x0051dce0: the chat line's input; nonzero when it took the event.
-    int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
+    int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void ShowInputLine();             // 0x0051dd10
     void HideInputLine();             // 0x0051dd40: closes the chat line
-    void UnknownFunction51dd70(char* name, unsigned int* text, int flag); // 0x0051dd70
+    void AddMessage(char* name, unsigned int* text, int flag); // 0x0051dd70
 
     unsigned char field_0x000[0x3dc];
     int typing;                               // +0x3dc typing
@@ -230,7 +230,7 @@ public:
 
 struct UnknownBikeRaceRider {
     unsigned char field_0x000[0x1a0];
-    UnknownBikeRaceModel* field_0x1a0;
+    UnknownBikeRaceModel* modelNode;          // +0x1a0
 };
 
 class BikeRace;
@@ -427,10 +427,10 @@ public:
     unsigned char field_0x4a4[0x5bc - 0x4a4];
     int field_0x5bc;                          // TrackGame+0x1004 copy (slot 23 key 0x22)
     int field_0x5c0;                          // TrackGame+0x1008 copy (slot 23 key 0x30)
-    UnknownBikeRaceRider* field_0x5c4;
+    UnknownBikeRaceRider* riderCharacter;     // +0x5c4
     unsigned char field_0x5c8[0x5f0 - 0x5c8];
-    CarProceduralCollision* field_0x5f0;      // paired with the other racers' (the loader)
-    CarProceduralCollision* field_0x5f4;
+    CarProceduralCollision* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
+    CarProceduralCollision* rearWheel;        // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
     UnknownBikeRaceRacerPart604* field_0x604;
     unsigned char field_0x608[0x734 - 0x608];
@@ -443,14 +443,14 @@ public:
     UnknownBikeRaceRacerInfo* field_0x740;
     UnknownEventRacerPart* statusNode;        // +0x744 race status node (RaceView.h)
     unsigned char field_0x748[0x74c - 0x748];
-    float field_0x74c;
-    float field_0x750;
+    float lastLapTime;                        // +0x74c (UnknownEventRacer's last lap time)
+    float fastestLap;                         // +0x750 (0x0045c8b0 copies it to the entry's ZoneReport "FastestLap")
     unsigned char field_0x754[0x768 - 0x754];
     float score;                              // +0x768 score (network message 10)
     unsigned char field_0x76c[0x770 - 0x76c];
     int field_0x770;                          // replayed from message 1's +0x2c
     unsigned char field_0x774[0x7a0 - 0x774];
-    unsigned short field_0x7a0;
+    unsigned short lapCount;                  // +0x7a0 laps (UnknownEventRacer)
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char finished;                            // +0x7a4 finished
     unsigned char field_0x7a5[0x7b8 - 0x7a5];
@@ -648,12 +648,12 @@ struct UnknownBikeRaceCameraView {
     void UnknownFunctionFollow(UnknownBikeRaceRacer* racer) {
         if (field_0x3b0 != 0 && !racer->field_0x740->field_0x18c) {
             field_0x3b0->field_0x3bc->SetLowestLod(1);
-            field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(1);
+            field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
             if (field_0x3b0->field_0x3bc->currentDetailLevel == 0) {
                 field_0x3b0->field_0x3bc->SetLod(1);
             }
-            if (field_0x3b0->field_0x5c4->field_0x1a0->currentDetailLevel == 0) {
-                field_0x3b0->field_0x5c4->field_0x1a0->SetLod(1);
+            if (field_0x3b0->riderCharacter->modelNode->currentDetailLevel == 0) {
+                field_0x3b0->riderCharacter->modelNode->SetLod(1);
             }
         }
         field_0x394 = racer;
@@ -668,7 +668,7 @@ struct UnknownBikeRaceCameraView {
         field_0x3b4 = racer;
         if (!racer->field_0x740->field_0x18c) {
             racer->field_0x3bc->SetLowestLod(0);
-            field_0x3b0->field_0x5c4->field_0x1a0->SetLowestLod(0);
+            field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
         }
         field_0x274 = 0;
     }
@@ -877,7 +877,7 @@ public:
     // and its probes, the start objects, the flag girl, the number and bonus
     // overlays, the replay recorder, the loader 0x00419970, the dialogs,
     // the sound and the plate numbers. Returns this, or 0 after Release.
-    BikeRace* UnknownFunction417ed0(void* owner, void* particles, LightManager* lights,
+    BikeRace* Create(void* owner, void* particles, LightManager* lights,
                                     UnknownTextureFormatChoice* textures, UnknownBikeRaceProjector* terrain,
                                     KrustyBikeCamera* camera, Scene* scene, UnknownBikeRaceNodeOwner* event,
                                     UnknownBikeRaceShadow* shadow);

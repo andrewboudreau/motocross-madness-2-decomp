@@ -61,7 +61,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
         g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
     g_TrackGame->field_0x3438 = 0;
-    g_TrackGame->field_0x3434 = 0;
+    g_TrackGame->uiBlockedSeconds = 0;
     if (!g_TrackGame->mode.field_0xa20)
         g_TrackGame->UnknownFunction521a40();
     UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
@@ -70,7 +70,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
     g_TrackGame->ui->gui->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
-    layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
+    layer->userToolTip->field_0x5c = g_TrackGame->mode.field_0x6d4;
     if (!g_TrackGame->playingReplay && !g_TrackGame->ui->field_0x4a8 &&
         g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();
@@ -125,11 +125,11 @@ struct UnknownPodiumViewFields {
 };
 struct UnknownPodiumRacerModel {                    // racer +0x5c4
     unsigned char field_0x000[0x1a0];
-    UnknownPodiumSoultree* field_0x1a0;
+    UnknownPodiumSoultree* modelNode;             // +0x1a0
 };
 struct UnknownPodiumRacer {
     unsigned char field_0x000[0x5c4];
-    UnknownPodiumRacerModel* field_0x5c4;
+    UnknownPodiumRacerModel* riderCharacter;      // +0x5c4
     unsigned char field_0x5c8[0x784 - 0x5c8];
     int field_0x784;                                // place
 };
@@ -229,10 +229,10 @@ int EventManager::CreatePodiumScene() {
     }
     CloseRace(1);
     PCCamera* camera = new(__FILE__, 0x276) PCCamera(1);
-    podiumCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
+    podiumCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
-    ((RenderTarget*)field_0x18)->SetCamera(podiumCamera);
+    ((RenderTarget*)renderContext)->SetCamera(podiumCamera);
     podiumCamera->InsertBefore(view->field_0x50, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
@@ -299,13 +299,13 @@ int EventManager::CreatePodiumScene() {
     context.field_0x00 = g_TrackGame->textureManager;
     context.field_0x04 = PODIUM_OWNER(owner)->field_0x94;
     context.field_0x08 = PODIUM_OWNER(owner)->field_0x98;
-    context.field_0x0c = ((RenderTarget*)field_0x18)->surfacePixelFormat;
+    context.field_0x0c = ((RenderTarget*)renderContext)->surfacePixelFormat;
     context.field_0x10 = 0x115c;
     context.field_0x14 = 0;
     PODIUM_ARCADE->UnknownVirtualSlot5();
     PODIUM_ARCADE->SetPosition(&podiumPosition);
     PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
-    if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
+    if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
         PODIUM_ARCADE->field_0x2c->UnknownFunction4444c0(1);
     UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
@@ -331,12 +331,12 @@ int EventManager::CreatePodiumScene() {
             return 0;
         }
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
-        character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(field_0x25_bit0);
-        character->CharacterVirtualSlot11(field_0x18, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
+        character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(isEnabled);
+        character->CharacterVirtualSlot11(renderContext, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
         view->AppendChild(character, -1);
         if (character) {
-            if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
-                character->field_0x1a0->UnknownFunction4444c0(1);
+            if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
+                character->modelNode->UnknownFunction4444c0(1);
             int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {
                 if (chance < 0.5f && podiumCharacterCount != 1)
@@ -348,14 +348,14 @@ int EventManager::CreatePodiumScene() {
             }
             podiumMotions[place - 1] = character->FindMotion(name, 1);
             Vector3 position = podiumPosition + offsets[place - 1];
-            character->field_0x1a0->SetPosition(&position);
-            character->field_0x1a0->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
+            character->modelNode->SetPosition(&position);
+            character->modelNode->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
             character->SetMotion(podiumMotions[place - 1]);
             character->field_0x10 = 0;
             if (racer) {
-                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->field_0x5c4->field_0x1a0->field_0x290;
+                UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->riderCharacter->modelNode->field_0x290;
                 if (texture)
-                    character->field_0x1a0->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
+                    character->modelNode->ReplaceMaterialTexture(0, (*texture)->field_0x2c, &context);
             }
         }
     }

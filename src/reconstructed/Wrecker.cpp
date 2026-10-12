@@ -71,15 +71,15 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     character = rider;
     rider->skeleton->TranslateIn(0, Vector3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
-    gravityModel->UnknownVirtualSlot8(field_0x18);
+    gravityModel->UnknownVirtualSlot8(renderContext);
     AppendChild(gravityModel, -1);
     rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
-    rigidBody->UnknownVirtualSlot8(field_0x18);
+    rigidBody->UnknownVirtualSlot8(renderContext);
     AppendChild(rigidBody, -1);
     rigidBody->UnknownVirtualSlot28(character->skeleton);
     gravityModel->UnknownVirtualSlot27(rigidBody);
     collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
-    collisionModel->UnknownVirtualSlot8(field_0x18);
+    collisionModel->UnknownVirtualSlot8(renderContext);
     collisionModel->SetBody(rigidBody, 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;
@@ -94,7 +94,7 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     inertiaFactor = rigidBody->mass * (1.0f / 12);
     rigidBody->inertia = ZeroMatrix();
     rigidBody->invInertia = ZeroMatrix();
-    rigidBody->field_0x25_bit0 = 0;
+    rigidBody->isEnabled = 0;
     rigidBody->initialAngularVelocity = Vector3(0.0f, 0.0f, 0.0f);
     rigidBody->initialVelocity = Vector3(0.0f, 0.0f, 0.0f);
     character->skeleton->subtreeDirty = 1;
@@ -468,7 +468,7 @@ void Wrecker::UnknownFunction532220(int index) {
     collisionModel->applyImpulses = 1;
     character->SetMotion(indexedAnimations[index]);
     wreckState = 1;
-    rigidBody->field_0x25_bit0 = 0;
+    rigidBody->isEnabled = 0;
     rigidBody->UnknownVirtualSlot44();
     rigidBody->angularVelocity = Vector3(0.0f, 0.0f, 0.0f);
     rigidBody->velocity = Vector3(0.0f, 0.0f, 0.0f);
@@ -486,7 +486,7 @@ void Wrecker::UnknownFunction532310() {
     character->BlendToMotion(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)], 0.5f);
     field_0x530 = 1;
     field_0x534 = 1;
-    rigidBody->field_0x25_bit0 = 1;
+    rigidBody->isEnabled = 1;
     rigidBody->UnknownVirtualSlot44();
     rigidBody->velocity = linearStep;
     rigidBody->prevVelocity = linearStep;
@@ -511,7 +511,7 @@ void Wrecker::UnknownFunction532490() {
             field_0x530 = 1;
         }
     }
-    rigidBody->field_0x25_bit0 = 1;
+    rigidBody->isEnabled = 1;
     for (int i = 0; i < collisionModel->probeCount; i++)
         probePositions[i] = Vector3(0.0f, 0.0f, 0.0f);
     field_0x534 = 1;
@@ -567,7 +567,7 @@ void Wrecker::UnknownFunction5327c0() {
             ignoreObjects[i]->AddIgnoredOwner(collisionModel);
         }
         wreckState = 0;
-        rigidBody->field_0x25_bit0 = 0;
+        rigidBody->isEnabled = 0;
         collisionModel->shapeCollisionEnabled = 0;
         collisionModel->collisionEnabled = 0;
         collisionModel->collidable = 0;

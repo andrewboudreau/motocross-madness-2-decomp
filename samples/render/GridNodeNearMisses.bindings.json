@@ -1,5 +1,5 @@
 {
-  "?UnknownFunction4a1300@@YAXPBUVector3@@0000PAU1@@Z": "0x004a1300",
+  "?LinePlaneIntersection@@YAXPBUVector3@@0000PAU1@@Z": "0x004a1300",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ff88102040000000000": "0x00553ec8",

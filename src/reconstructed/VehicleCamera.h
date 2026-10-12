@@ -7,7 +7,7 @@
 class UnknownVehiclePart {
 public:
     unsigned char field_0x000[0x140];
-    UnknownVehiclePart* field_0x140;     // 0x0052bb60 prefers it when set
+    UnknownVehiclePart* firstChild;           // +0x140 0x0052bb60 prefers it when set
 
     // 0x004fc9a0: writes a position for `index` into *position.
     void GetPositionIn(int index, Vector3* position);
@@ -45,27 +45,27 @@ struct UnknownCameraVehicle {
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float field_0x434;                   // VehicleCamera slot 36 tests > 0.1
     float field_0x438;                   // KrustyBikeCamera slot 34 divisor
-    float field_0x43c;                   // VehicleCamera slot 42 scale
-    int field_0x440;
-    int field_0x444;                     // VehicleCamera slots 72, 74, 75
+    float turnRate;                           // +0x43c VehicleCamera slot 42 scale
+    int movingForward;                        // +0x440
+    int crashState;                           // +0x444 VehicleCamera slots 72, 74, 75
     unsigned char field_0x448[0x45c - 0x448];
     float field_0x45c;                   // VehicleCamera slot 39
-    int field_0x460;                     // BikeCamera slot 75 tests 6
+    int crashReason;                          // +0x460 BikeCamera slot 75 tests 6
     int field_0x464;                     // VehicleCamera slot 39
     unsigned char field_0x468[0x488 - 0x468];
-    Vector3 field_0x488;                 // 0x0052bc50 in vehicle mode
-    Vector3 field_0x494;                 // 0x0052bac0 in vehicle mode
+    Vector3 takeoffPosition;                  // +0x488 0x0052bc50 in vehicle mode
+    Vector3 takeoffVelocity;                  // +0x494 0x0052bac0 in vehicle mode
     unsigned char field_0x4a0[0x53c - 0x4a0];
     UnknownCameraRider** riders;              // +0x53c riders (VehicleCamera slot 35)
-    int field_0x540;
+    int wheelCapacity;                        // +0x540
     int riderCount;                           // +0x544 rider count
     unsigned char field_0x548[0x56c - 0x548];
-    int field_0x56c;                     // nonzero: look for a rider with +0x2a8 set
+    int auxWheelCount;                        // +0x56c nonzero: look for a rider with +0x2a8 set
 
     // Inlined by VehicleCamera slot 35: the first rider with +0x2a8 set
     // when +0x56c asks for one, else the first rider.
     UnknownCameraRider* UnknownInlineRider() {
-        if (field_0x56c) {
+        if (auxWheelCount) {
             for (int i = 0; i < riderCount; i++) {
                 if (riders[i]->field_0x2a8)
                     return riders[i];
@@ -134,7 +134,7 @@ public:
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
     virtual bool UnknownVirtualSlot74() {
         if (vehicleMode) {
-            bool active = vehicle->field_0x444 != 0;
+            bool active = vehicle->crashState != 0;
             return active;
         }
         return false;
@@ -145,7 +145,7 @@ public:
     int UnknownInlineIdle() {
         if (!vehicleMode)
             return 1;
-        return vehicle->field_0x444 == 0;
+        return vehicle->crashState == 0;
     }
 
 protected:

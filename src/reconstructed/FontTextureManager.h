@@ -25,10 +25,10 @@ public:
     void AddFont(FontTexture* font); // 0x004676c0: appends
     // 0x00467760: unlinks `font` and deletes it (through 0x00467280);
     // nothing when it is not listed.
-    void UnknownFunction467760(FontTexture* font);
+    void DeleteFont(FontTexture* font);
     void DeleteFonts();             // 0x004677c0: deletes every font
     // 0x004677f0: the node of the font named `name`, or 0.
-    UnknownFontTextureNode* UnknownFunction4677f0(const char* name);
+    UnknownFontTextureNode* FindFont(const char* name);
 
     UnknownFontTextureNode* firstNode;        // first node
     int nodeCount;                            // node count

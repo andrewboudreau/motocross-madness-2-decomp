@@ -1734,11 +1734,11 @@ int UIDropDownList::ButtonDown(int a, int b) {
 
 // 0x0047b3f0
 int UICtlContainer::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    GameObject* child = field_0x10;
+    GameObject* child = firstChild;
     if (child) {
-        while (child->field_0x0C)
-            child = child->field_0x0C;
-        for (; child; child = child->field_0x08) {
+        while (child->nextSibling)
+            child = child->nextSibling;
+        for (; child; child = child->prevSibling) {
             if (child->UnknownVirtualSlot23(event, entry))
                 return 1;
         }
@@ -1748,11 +1748,11 @@ int UICtlContainer::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
 
 // 0x0047b440
 int UICtlContainer::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    GameObject* child = field_0x10;
+    GameObject* child = firstChild;
     if (child) {
-        while (child->field_0x0C)
-            child = child->field_0x0C;
-        for (; child; child = child->field_0x08) {
+        while (child->nextSibling)
+            child = child->nextSibling;
+        for (; child; child = child->prevSibling) {
             if (child->UnknownVirtualSlot22(event, entry))
                 return 1;
         }
@@ -1909,7 +1909,7 @@ int UIDialog::Release() {
 int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 1;
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         if (event->kind == 1)
             UnknownFunction46f120();
         return GameObject::UnknownVirtualSlot23(event, entry);
@@ -1921,7 +1921,7 @@ int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
 int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 0;
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         if (event->kind == 1)
             UnknownFunction46f120();
         if (event->kind) {
@@ -1936,7 +1936,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
 // 0x0046a840
 UIControl* UIDialog::SetupControl(UIControl* control, int group, int region) {
     if (control) {
-        control->UnknownInlineSetField18(field_0x18);
+        control->UnknownInlineSetField18(renderContext);
         control->post3D = controlsPost3D;
         control->ownerGui = guiManager;
         control->groupId = group;
@@ -2046,7 +2046,7 @@ void UIDialog::UpdateBoundValues(int value) {
 
 // 0x0046f1c0
 int UIDialog::UnknownVirtualSlot13() {
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         GameObjectIterator iterator(controlContainer, 1, "UIControl");
         if (dialogBackground) {
             UIControl* control;
@@ -2070,14 +2070,14 @@ int UIDialog::UnknownVirtualSlot13() {
 
 // 0x0046f300
 int UIDialog::UnknownVirtualSlot14() {
-    if (!field_0x25_bit2)
+    if (!isPaused)
         return GameObject::UnknownVirtualSlot14();
     return 1;
 }
 
 // 0x0046f320
 int UIDialog::UnknownVirtualSlot15() {
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         GameObject::UnknownVirtualSlot15();
     } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
@@ -2131,7 +2131,7 @@ void UIDialog::EndDialog(int result) {
     if (!isClosing) {
         dialogResult = result;
         isClosing = 1;
-        closeFrame = ((RenderTarget*)field_0x18)->frameCount;
+        closeFrame = ((RenderTarget*)renderContext)->frameCount;
     }
 }
 
@@ -2293,7 +2293,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     else
         post3D = 1;
     if (owner)
-        field_0x18 = owner->UnknownInlineField18();
+        renderContext = owner->UnknownInlineField18();
     permanent = 0;
     wordWrap = 0;
 }
@@ -2302,7 +2302,7 @@ UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
 // nesting them inside one test keeps the focus control in a register.
 UIControl::~UIControl() {
     if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
-        field_0x25_bit3 = 1;
+        pendingRelease = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
             ownerDialog->guiUser->UnknownFunction487bf0(0);
@@ -2606,19 +2606,19 @@ int UIControl::UnknownVirtualSlot21(int value) {
 // 0x00472480
 int UIControl::UpdateHoverAt(int* position) {
     int result = 0;
-    GameObject* next = field_0x0C;
+    GameObject* next = nextSibling;
     while (next) {
-        if (strstr(next->field_0x28, "UIControl,"))
+        if (strstr(next->classNames, "UIControl,"))
             break;
-        next = next->field_0x0C;
+        next = next->nextSibling;
     }
     if (next) {
         result = ((UIControl*)next)->UpdateHoverAt(position);
         if (result)
             return result;
     }
-    if (field_0x10 && strstr(field_0x10->field_0x28, "UIControl,")) {
-        result = ((UIControl*)field_0x10)->UpdateHoverAt(position);
+    if (firstChild && strstr(firstChild->classNames, "UIControl,")) {
+        result = ((UIControl*)firstChild)->UpdateHoverAt(position);
         if (result)
             return result;
     }
@@ -2646,11 +2646,11 @@ UIControl* UIControl::PreviousFocusableControl() {
         if (control != this && control->enabled && control->shown && control->controlType != 5 &&
             control->controlType != 0xc)
             return control;
-        if (control->field_0x08) {
-            control = (UIControl*)control->field_0x08;
+        if (control->prevSibling) {
+            control = (UIControl*)control->prevSibling;
         } else {
-            while (control->field_0x0C)
-                control = (UIControl*)control->field_0x0C;
+            while (control->nextSibling)
+                control = (UIControl*)control->nextSibling;
         }
         if (control == this)
             return 0;
@@ -2665,9 +2665,9 @@ UIControl* UIControl::NextFocusableControl() {
         if (control != this && control->enabled && control->shown && control->controlType != 5 &&
             control->controlType != 0xc)
             return control;
-        control = (UIControl*)control->field_0x0C;
+        control = (UIControl*)control->nextSibling;
         if (!control)
-            control = (UIControl*)ownerDialog->controlContainer->field_0x10;
+            control = (UIControl*)ownerDialog->controlContainer->firstChild;
         if (control == this)
             return 0;
     }
@@ -3424,7 +3424,7 @@ int UIDialog::LoadDialogResource(const char* name) {
     int result = 0;
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 1);
     if (entry)
-        result = UnknownFunction46a920(entry->archive, entry->offset);
+        result = ReadDialogResource(entry->archive, entry->offset);
     return result;
 }
 
@@ -3465,15 +3465,15 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 
 // 0x0046f120
 void UIDialog::UnknownFunction46f120() {
-    if (guiUser->pointerDevice && controlContainer->field_0x10) {
+    if (guiUser->pointerDevice && controlContainer->firstChild) {
         GUIUser* user = guiUser;
         UnknownGuiControl* focus = user->hoverControl;
         if (focus && ((UIControl*)focus)->ownerDialog != (UIDialog*)this)
             focus = 0;
         POINT position = user->pointerDevice->pointerPosition;
-        if (controlContainer->field_0x10) {
+        if (controlContainer->firstChild) {
             user->field_0x1dc = 0;
-            int result = ((UIControl*)controlContainer->field_0x10)->UpdateHoverAt((int*)&position);
+            int result = ((UIControl*)controlContainer->firstChild)->UpdateHoverAt((int*)&position);
             if (focus && !guiUser->pendingHoverControl && !result)
                 guiUser->RequestHover(0, 0, 1);
         }
@@ -4023,8 +4023,8 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     } else {
         screenArea.top = 0;
         screenArea.left = 0;
-        screenArea.right = ((RenderTarget*)field_0x18)->targetWidth;
-        screenArea.bottom = ((RenderTarget*)field_0x18)->targetHeight;
+        screenArea.right = ((RenderTarget*)renderContext)->targetWidth;
+        screenArea.bottom = ((RenderTarget*)renderContext)->targetHeight;
     }
     parentDialog = parent;
     if (!(flags & 6))
@@ -4077,7 +4077,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
         UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         if (stream->Open(path, "r", 0)) {
-            if (!UnknownFunction46a920(stream, 0)) {
+            if (!ReadDialogResource(stream, 0)) {
                 delete stream;
                 UnknownFunction46ff60();
                 return 0;
@@ -4230,7 +4230,7 @@ int UIControl::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                        &rect, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -4413,7 +4413,7 @@ int UIScrollBar::Draw() {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)track, &rect, 0,
                                                            track->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
-        else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, track, 0,
+        else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, track, 0,
                                                                    track->usesColorKey ? 0x1008000 : 0x1000000))
             goto failed;
         redrawFrames = redraw;
@@ -4439,7 +4439,7 @@ int UIScrollBar::Draw() {
                 needsRedraw = 1;
             else
                 RequestRedraw();
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, thumb, 0,
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, thumb, 0,
                                                                      thumb->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4653,7 +4653,7 @@ int UIListBox::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             redrawFrames = redraw;
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                        screenArea, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4732,7 +4732,7 @@ int UIListBox::Draw() {
                                 done = 0;
                                 frames = redrawFrames;
                             }
-                        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+                        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                                        &rect, texture, 0, texture->usesColorKey ? 0x1008000 : 0x1000000)) {
                             goto failed;
                         }
@@ -4955,7 +4955,7 @@ int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dia
     if (moviePlayer)
         moviePlayer->Release();
     moviePlayer = new(__FILE__, 0x264d) MediaControl(1);
-    if (!moviePlayer->Open(field_0x18, file, done, owner)) {
+    if (!moviePlayer->Open(renderContext, file, done, owner)) {
         moviePlayer = 0;
         return 0;
     }
@@ -4984,7 +4984,7 @@ int UIVideoStatic::Draw() {
         RequestRedraw();
     }
     GetImageRect((CameraRect*)screenArea, &rect);
-    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, moviePlayer->frameSurface, frameRect,
+    return ((PCRenderTarget*)renderContext)->renderSurface->Blt(&rect, moviePlayer->frameSurface, frameRect,
                                                                       0x1000000, 0) == 0;
 }
 
@@ -5029,7 +5029,7 @@ int UIProgressBar::Draw() {
             owner->dialogBackground->DrawImage((PCTextureMap*)barTexture, &rect, &source,
                                                       barTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                       backgroundRegion, needsRedraw, &redraw, 0);
-        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
                        &rect, barTexture, &source, barTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -5062,7 +5062,7 @@ void UIProgressBar::SetBarTexture(int texture, int owned) {
 
 // 0x004715d0
 int UIControl::GrowStep() {
-    if (transitionFrame == 0 && transitionFrameCount && !field_0x25_bit2) {
+    if (transitionFrame == 0 && transitionFrameCount && !isPaused) {
         g_UnknownGlobal65b60c = transitionFrameCount < 0 ? 7 : transitionFrameCount;
         zoomWidth = 21.0f;
         zoomHeight = 11.0f;
@@ -5089,7 +5089,7 @@ int UIControl::GrowStep() {
     if (transitionFrame == g_UnknownGlobal65b60c)
         return 1;
     RequestRedraw();
-    if (!field_0x25_bit2 || transitionFrame) {
+    if (!isPaused || transitionFrame) {
         float width = zoomWidth;
         screenArea[0] = (int)slideX;
         screenArea[1] = (int)slideY;

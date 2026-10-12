@@ -13,7 +13,7 @@
   "?IdentityMatrix@@YA?AUMatrix4@@XZ": "0x004a1410",
   "?SaveScreenshot@PCRenderTarget@@QAEXXZ": "0x004c5d00",
   "?Vec3Dot@@YAMPBUVector3@@0@Z": "0x0040ae30",
-  "?UnknownFunction42e550@Camera@@QAEHXZ": "0x0042e550",
+  "?UpdateViewport@Camera@@QAEHXZ": "0x0042e550",
   "?ReapplyDefaultLimits@Camera@@QAEHXZ": "0x0042e8e0",
   "?SetFieldOfView@Camera@@QAEXM@Z": "0x0042e930",
   "?ClampLimits@Camera@@QAEXMM@Z": "0x0042e960",

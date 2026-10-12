@@ -185,8 +185,8 @@ int PCMouseDevice::UnknownVirtualSlot6(int value) {
     }
     if (device->GetDeviceState(sizeof(movement), movement) < 0)
         goto failed;
-    UnknownFunction48a550(0, (float)movement[0]);
-    UnknownFunction48a550(1, (float)movement[1]);
+    MoveAxis(0, (float)movement[0]);
+    MoveAxis(1, (float)movement[1]);
     return 1;
 failed:
     return 0;

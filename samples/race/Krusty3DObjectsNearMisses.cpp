@@ -195,7 +195,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     if (!ArcadeObject::UnknownVirtualSlot10(frameTime))
         return 1;
     if (!field_0xbc) {
-        if (((UnknownCueOwner*)field_0x18)->field_0x08 != arcadeView ||
+        if (((UnknownCueOwner*)renderContext)->field_0x08 != arcadeView ||
             cueView->field_0x50->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;

@@ -67,14 +67,14 @@ void UnknownEventEntry::Reset() {
     totalRunningTime = 0;
     points = 0;
     score = 0;
-    field_0x30 = 0;
+    aiIndex = 0;
     largestStuntPoints = 0;
     field_0x10 = 0;
     field_0x18 = 0;
     field_0x1c = 0;
     finished = 0;
     strcpy(name, "");
-    field_0x24 = 0;
+    outOfRace = 0;
     field_0x34[0] = 0;
     field_0x34[1] = 0;
     field_0x34[2] = 0;
@@ -89,17 +89,17 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
     int count = length > 15 ? 15 : length;
     strncpy(name, racer->racerName, count);
     name[count] = 0;
-    field_0x24 = racer->field_0x4a0;
-    if (!field_0x24) {
+    outOfRace = racer->outOfRace;
+    if (!outOfRace) {
         score = racer->score;
         position = racer->finishPosition;
-        fastestLap = racer->field_0x750;
-        totalRunningTime = racer->field_0x754;
-        largestStuntPoints = racer->field_0x788;
+        fastestLap = racer->fastestLap;
+        totalRunningTime = racer->totalRunningTime;
+        largestStuntPoints = racer->largestStuntPoints;
         field_0x10 = racer->field_0x758;
         field_0x18 = racer->field_0x760;
         field_0x1c = racer->field_0x764;
-        field_0x30 = racer->aiIndex;
+        aiIndex = racer->aiIndex;
         field_0x34[0] = racer->field_0x7ac[0];
         field_0x34[1] = racer->field_0x7ac[1];
         field_0x34[2] = racer->field_0x7ac[2];
@@ -116,7 +116,7 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         field_0x10 = 0;
         field_0x18 = 0;
         field_0x1c = 0;
-        field_0x30 = 0;
+        aiIndex = 0;
         field_0x34[0] = 0;
         field_0x34[1] = 0;
         field_0x34[2] = 0;
@@ -168,52 +168,52 @@ void EventManager::UnknownFunction45d270() {
 
 // 0x0045d2b0
 TrackGameViewOwner* EventManager::FindRaceMode() {
-    if (g_TrackGame->field_0x558)
-        return g_TrackGame->field_0x558;
-    if (g_TrackGame->field_0x55c)
-        return g_TrackGame->field_0x55c;
-    if (g_TrackGame->field_0x560)
-        return g_TrackGame->field_0x560;
-    if (g_TrackGame->field_0x564)
-        return g_TrackGame->field_0x564;
-    return g_TrackGame->field_0x568;
+    if (g_TrackGame->supercrossEvent)
+        return g_TrackGame->supercrossEvent;
+    if (g_TrackGame->quarryEvent)
+        return g_TrackGame->quarryEvent;
+    if (g_TrackGame->bajaEnduroEvent)
+        return g_TrackGame->bajaEnduroEvent;
+    if (g_TrackGame->nationalEvent)
+        return g_TrackGame->nationalEvent;
+    return g_TrackGame->tagEvent;
 }
 
 // 0x0045d2f0
 UnknownKrustyBikeView* EventManager::FindRaceView() {
-    if (g_TrackGame->field_0x558)
-        return g_TrackGame->field_0x558->field_0x34;
-    if (g_TrackGame->field_0x55c)
-        return g_TrackGame->field_0x55c->field_0x34;
-    if (g_TrackGame->field_0x560)
-        return g_TrackGame->field_0x560->field_0x34;
-    if (g_TrackGame->field_0x564)
-        return g_TrackGame->field_0x564->field_0x34;
-    if (g_TrackGame->field_0x568)
-        return g_TrackGame->field_0x568->field_0x34;
+    if (g_TrackGame->supercrossEvent)
+        return g_TrackGame->supercrossEvent->raceView;
+    if (g_TrackGame->quarryEvent)
+        return g_TrackGame->quarryEvent->raceView;
+    if (g_TrackGame->bajaEnduroEvent)
+        return g_TrackGame->bajaEnduroEvent->raceView;
+    if (g_TrackGame->nationalEvent)
+        return g_TrackGame->nationalEvent->raceView;
+    if (g_TrackGame->tagEvent)
+        return g_TrackGame->tagEvent->raceView;
     return 0;
 }
 
 // 0x0045d340
 TextQueueOverlay* EventManager::FindTextQueue() {
-    if (g_TrackGame->field_0x558)
-        return g_TrackGame->field_0x558->field_0x6c;
-    if (g_TrackGame->field_0x55c)
-        return g_TrackGame->field_0x55c->field_0x6c;
-    if (g_TrackGame->field_0x560)
-        return g_TrackGame->field_0x560->field_0x6c;
-    if (g_TrackGame->field_0x564)
-        return g_TrackGame->field_0x564->field_0x6c;
-    if (g_TrackGame->field_0x568)
-        return g_TrackGame->field_0x568->field_0x6c;
+    if (g_TrackGame->supercrossEvent)
+        return g_TrackGame->supercrossEvent->textQueue;
+    if (g_TrackGame->quarryEvent)
+        return g_TrackGame->quarryEvent->textQueue;
+    if (g_TrackGame->bajaEnduroEvent)
+        return g_TrackGame->bajaEnduroEvent->textQueue;
+    if (g_TrackGame->nationalEvent)
+        return g_TrackGame->nationalEvent->textQueue;
+    if (g_TrackGame->tagEvent)
+        return g_TrackGame->tagEvent->textQueue;
     return 0;
 }
 
 // 0x0045d390
 int EventManager::HasRaceMode() {
-    if (g_TrackGame->field_0x558 || g_TrackGame->field_0x55c ||
-        g_TrackGame->field_0x560 || g_TrackGame->field_0x564 ||
-        g_TrackGame->field_0x568)
+    if (g_TrackGame->supercrossEvent || g_TrackGame->quarryEvent ||
+        g_TrackGame->bajaEnduroEvent || g_TrackGame->nationalEvent ||
+        g_TrackGame->tagEvent)
         return 1;
     return 0;
 }
@@ -259,13 +259,13 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
              HasRaceMode())
         CheckRaceOver(frameTime);
     if (g_TrackGame->uiInteractionBlocked) {
-        g_TrackGame->field_0x3434 += frameTime;
+        g_TrackGame->uiBlockedSeconds += frameTime;
         for (int i = 0; i < podiumCharacterCount; i++)
             podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
         podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
         podiumCamera->UnknownVirtualSlot29(podiumFocus);
-        if (!g_TrackGame->field_0x3438 && g_TrackGame->field_0x3434 > 7.0f) {
+        if (!g_TrackGame->field_0x3438 && g_TrackGame->uiBlockedSeconds > 7.0f) {
             g_TrackGame->uiInteractionBlocked = 0;
             g_TrackGame->field_0x3438 = 1;
             EndRace();
@@ -318,9 +318,9 @@ int CompareRankings(const void* a, const void* b) {
             if (first->racer->gatesPassed > second->racer->gatesPassed)
                 return -1;
             if (first->racer->gatesPassed == second->racer->gatesPassed) {
-                if (first->racer->field_0x744->gateDistance < second->racer->field_0x744->gateDistance)
+                if (first->racer->statusNode->gateDistance < second->racer->statusNode->gateDistance)
                     return -1;
-                if (first->racer->field_0x744->gateDistance == second->racer->field_0x744->gateDistance)
+                if (first->racer->statusNode->gateDistance == second->racer->statusNode->gateDistance)
                     return 0;
             }
         }
@@ -375,7 +375,7 @@ void EventManager::EndRace() {
             view->UnknownVirtualSlot5();
         if (CreatePodiumScene()) {
             g_TrackGame->uiInteractionBlocked = 1;
-            g_TrackGame->field_0x3434 = 0;
+            g_TrackGame->uiBlockedSeconds = 0;
             return;
         }
         g_TrackGame->field_0x3438 = 1;
@@ -412,7 +412,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 g_TrackGame->mode.racers[i].isReady = 1;
         }
         if (g_TrackGame->mode.raceSettings.raceMode == 2 && !FindRaceMode())
-            UnknownFunction45fbd0(message->dpId);
+            RemovePlayer(message->dpId);
     } else if (from) {
         if (type == 0x89) {
             for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
@@ -420,7 +420,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     g_TrackGame->mode.racers[i].isReady = 1;
             }
             if (g_TrackGame->mode.raceSettings.raceMode == 2 && !FindRaceMode())
-                UnknownFunction45fbd0(from);
+                RemovePlayer(from);
         } else if (type == 0x86) {
             UnknownEventRacerMessage* update = (UnknownEventRacerMessage*)data;
             UnknownKrustyBikeView* view = FindRaceView();
@@ -432,19 +432,19 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                     g_TrackGame->mode.racers[i].isReady = 1;
                     if (view->racerSlots[i]) {
                         view->racerSlots[i]->score = update->score;
-                        view->racerSlots[i]->field_0x750 = update->fastestLap;
+                        view->racerSlots[i]->fastestLap = update->fastestLap;
                         view->racerSlots[i]->hasFinished = update->finished;
-                        view->racerSlots[i]->field_0x788 = update->largestStuntPoints;
+                        view->racerSlots[i]->largestStuntPoints = update->largestStuntPoints;
                         view->racerSlots[i]->field_0x758 = update->field_0x18;
                         view->racerSlots[i]->field_0x760 = update->field_0x1c;
                         view->racerSlots[i]->field_0x764 = update->field_0x20;
                         if (view->racerSlots[i]->hasFinished) {
-                            view->racerSlots[i]->field_0x754 = update->totalRunningTime;
+                            view->racerSlots[i]->totalRunningTime = update->totalRunningTime;
                             // Always false here; retail still tests it.
                             if (!view->racerSlots[i]->hasFinished)
                                 view->racerSlots[i]->finishTimeStamp = ReadClock();
                         } else {
-                            view->racerSlots[i]->field_0x754 = FLT_MAX;
+                            view->racerSlots[i]->totalRunningTime = FLT_MAX;
                             view->racerSlots[i]->finishTimeStamp = 0x7ffffffe;
                         }
                     }
@@ -454,7 +454,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 return 0;
             if (g_TrackGame->mode.raceSettings.eventType == 4) {
                 TrackGameViewOwner* owner = FindRaceMode();
-                if (owner->followedRacer == owner->field_0x34->localRacer) {
+                if (owner->followedRacer == owner->raceView->localRacer) {
                     owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;
                     // Compared through locals, kept as the best of +0x75c.
                     float best = owner->followedRacer->field_0x760;
@@ -520,12 +520,12 @@ int CompareUnsigned(const void* a, const void* b) {
 
 // 0x0045fbd0: removes `player`, moving the last entry and record into its
 // place, then re-sorts the entries.
-void EventManager::UnknownFunction45fbd0(int player) {
+void EventManager::RemovePlayer(int player) {
     if (g_TrackGame->playerCount < 2)
         return;
     for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
         if (results[i].playerId == player) {
-            if (!results[i].field_0x30)
+            if (!results[i].aiIndex)
                 g_TrackGame->playerCount--;
             else
                 g_TrackGame->field_0x3424--;
@@ -547,15 +547,15 @@ void EventManager::SendRacerResults() {
         return;
     UnknownKrustyBikeView* view = FindRaceView();
     if (!view->localRacer->hasFinished) {
-        view->localRacer->field_0x754 = FLT_MAX;
+        view->localRacer->totalRunningTime = FLT_MAX;
         view->localRacer->finishTimeStamp = 0x7ffffffe;
     }
     UnknownEventRacerMessage message;
     message.score = view->localRacer->score;
-    message.totalRunningTime = view->localRacer->field_0x754;
-    message.fastestLap = view->localRacer->field_0x750;
+    message.totalRunningTime = view->localRacer->totalRunningTime;
+    message.fastestLap = view->localRacer->fastestLap;
     message.finished = view->localRacer->hasFinished;
-    message.largestStuntPoints = view->localRacer->field_0x788;
+    message.largestStuntPoints = view->localRacer->largestStuntPoints;
     message.field_0x18 = view->localRacer->field_0x758;
     message.field_0x1c = view->localRacer->field_0x760;
     message.field_0x20 = view->localRacer->field_0x764;
@@ -564,14 +564,14 @@ void EventManager::SendRacerResults() {
         0x86, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);
     for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
         if (!view->aiRacers[i]->hasFinished) {
-            view->aiRacers[i]->field_0x754 = FLT_MAX;
+            view->aiRacers[i]->totalRunningTime = FLT_MAX;
             view->aiRacers[i]->finishTimeStamp = 0x7ffffffe;
         }
         message.score = view->aiRacers[i]->score;
-        message.totalRunningTime = view->aiRacers[i]->field_0x754;
-        message.fastestLap = view->aiRacers[i]->field_0x750;
+        message.totalRunningTime = view->aiRacers[i]->totalRunningTime;
+        message.fastestLap = view->aiRacers[i]->fastestLap;
         message.finished = view->aiRacers[i]->hasFinished;
-        message.largestStuntPoints = view->aiRacers[i]->field_0x788;
+        message.largestStuntPoints = view->aiRacers[i]->largestStuntPoints;
         message.field_0x18 = view->aiRacers[i]->field_0x758;
         message.field_0x1c = view->aiRacers[i]->field_0x760;
         message.field_0x20 = view->aiRacers[i]->field_0x764;
@@ -607,7 +607,7 @@ float g_UnknownGlobal59af54;
 // 0x0045cb70: resets the event, loads the track's environment and scene
 // and, for mode 0 (BaseQuarryEvent) or 2 (NationalRace), creates the race
 // object and adds it to the second root; 1 when a race-mode object exists.
-int EventManager::UnknownFunction45cb70() {
+int EventManager::LoadEvent() {
     char path[260];
     g_UnknownGlobal59af54 = 0;
     field_0x3c0 = 0;
@@ -627,16 +627,16 @@ int EventManager::UnknownFunction45cb70() {
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 0:
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
-        g_TrackGame->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
+        g_TrackGame->quarryEvent = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
-        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->field_0x55c, -1))
+        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->quarryEvent, -1))
             return 0;
         break;
     case 2:
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
-        g_TrackGame->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
+        g_TrackGame->nationalEvent = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
-        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->field_0x564, -1))
+        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->nationalEvent, -1))
             return 0;
         break;
     }
@@ -655,7 +655,7 @@ void EventManager::CheckRaceOver(float frameTime) {
     }
     TrackGameViewOwner* owner = FindRaceMode();
     if (g_TrackGame->mode.raceSettings.raceMode == 0 || g_TrackGame->mode.raceSettings.raceMode == 4 || !owner ||
-        !owner->field_0x25_bit0)
+        !owner->isEnabled)
         return;
     UnknownKrustyBikeView* view = FindRaceView();
     if (!view || !view->isRacing)
@@ -673,7 +673,7 @@ void EventManager::CheckRaceOver(float frameTime) {
             while ((racer = view->NextBike(&iterator)) != 0) {
                 if (racer->hasFinished)
                     anyRacerFinished = 1;
-                else if (!racer->field_0x4a0)
+                else if (!racer->outOfRace)
                     allRacersFinished = 0;
             }
             if (anyRacerFinished)
@@ -700,13 +700,13 @@ void EventManager::CheckRaceOver(float frameTime) {
         }
         break;
     case 0:
-        if (g_TrackGame->field_0x55c->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->quarryEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
             return;
         break;
     case 4:
-        if (g_TrackGame->field_0x568->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->tagEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
             return;
-        if (owner->followedRacer == owner->field_0x34->localRacer) {
+        if (owner->followedRacer == owner->raceView->localRacer) {
             owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;
             // Compared through locals, kept as the best of +0x75c.
             float best = owner->followedRacer->field_0x760;
@@ -745,8 +745,8 @@ void EventManager::RankRacers() {
             int ranked = 0;
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
-                if (!racer->field_0x4a0) {
-                    rankings[ranked].value = racer->field_0x754;
+                if (!racer->outOfRace) {
+                    rankings[ranked].value = racer->totalRunningTime;
                     rankings[ranked].racer = racer;
                     ranked++;
                 }
@@ -759,7 +759,7 @@ void EventManager::RankRacers() {
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
             results[count].CopyFromRacer(racer);
             if ((g_TrackGame->mode.raceSettings.raceMode == 2 || g_TrackGame->proCircuit) &&
-                !racer->field_0x4a0)
+                !racer->outOfRace)
                 AddChampionshipPoints(racer, &results[count].points);
             count++;
         }
@@ -770,7 +770,7 @@ void EventManager::RankRacers() {
         int scored = 0;
         int next = 0;
         while ((racer = view->NextBike(&next)) != 0) {
-            if (!racer->field_0x4a0) {
+            if (!racer->outOfRace) {
                 scores[scored].value = racer->score;
                 scores[scored].racer = racer;
                 scored++;
@@ -782,7 +782,7 @@ void EventManager::RankRacers() {
         next = 0;
         for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
             results[count].CopyFromRacer(racer);
-            if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->field_0x4a0)
+            if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                 AddChampionshipPoints(racer, &results[count].points);
             count++;
         }
@@ -794,7 +794,7 @@ void EventManager::RankRacers() {
             int scored = 0;
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
-                if (!racer->field_0x4a0) {
+                if (!racer->outOfRace) {
                     scores[scored].value = racer->score;
                     scores[scored].racer = racer;
                     scored++;
@@ -806,7 +806,7 @@ void EventManager::RankRacers() {
             next = 0;
             for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
-                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->field_0x4a0)
+                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
                 count++;
             }
@@ -815,7 +815,7 @@ void EventManager::RankRacers() {
             int scored = 0;
             int next = 0;
             while ((racer = view->NextBike(&next)) != 0) {
-                if (!racer->field_0x4a0) {
+                if (!racer->outOfRace) {
                     scores[scored].value = racer->field_0x764;
                     scores[scored].racer = racer;
                     scored++;
@@ -827,7 +827,7 @@ void EventManager::RankRacers() {
             next = 0;
             for (racer = view->NextBike(&next); racer; racer = view->NextBike(&next)) {
                 results[count].CopyFromRacer(racer);
-                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->field_0x4a0)
+                if (g_TrackGame->mode.raceSettings.raceMode == 2 && !racer->outOfRace)
                     AddChampionshipPoints(racer, &results[count].points);
                 count++;
             }
@@ -840,7 +840,7 @@ void EventManager::RankRacers() {
         int next = 0;
         int standing = 0;
         while ((racer = view->NextBike(&next)) != 0) {
-            if (!racer->field_0x4a0) {
+            if (!racer->outOfRace) {
                 standings[standing].field_0x00 = results[standing].points;
                 standings[standing].racer = racer;
                 standing++;
@@ -857,7 +857,7 @@ void EventManager::RankRacers() {
                 }
             }
             for (i = 0; i < standing; i++) {
-                if (results[i].playerId == racer->networkPlayerId && results[i].field_0x30 == racer->aiIndex) {
+                if (results[i].playerId == racer->networkPlayerId && results[i].aiIndex == racer->aiIndex) {
                     results[i].position = racer->finishPosition;
                     break;
                 }
@@ -945,26 +945,26 @@ void EventManager::CloseRace(int mode) {
                 view->field_0x1a8->Save(name);
         }
     }
-    if (g_TrackGame->field_0x558) {
-        g_TrackGame->field_0x558->Unlink();
-        g_TrackGame->field_0x558->Release();
-        g_TrackGame->field_0x558 = 0;
-    } else if (g_TrackGame->field_0x55c) {
-        g_TrackGame->field_0x55c->Unlink();
-        g_TrackGame->field_0x55c->Release();
-        g_TrackGame->field_0x55c = 0;
-    } else if (g_TrackGame->field_0x560) {
-        g_TrackGame->field_0x560->Unlink();
-        g_TrackGame->field_0x560->Release();
-        g_TrackGame->field_0x560 = 0;
-    } else if (g_TrackGame->field_0x564) {
-        g_TrackGame->field_0x564->Unlink();
-        g_TrackGame->field_0x564->Release();
-        g_TrackGame->field_0x564 = 0;
-    } else if (g_TrackGame->field_0x568) {
-        g_TrackGame->field_0x568->Unlink();
-        g_TrackGame->field_0x568->Release();
-        g_TrackGame->field_0x568 = 0;
+    if (g_TrackGame->supercrossEvent) {
+        g_TrackGame->supercrossEvent->Unlink();
+        g_TrackGame->supercrossEvent->Release();
+        g_TrackGame->supercrossEvent = 0;
+    } else if (g_TrackGame->quarryEvent) {
+        g_TrackGame->quarryEvent->Unlink();
+        g_TrackGame->quarryEvent->Release();
+        g_TrackGame->quarryEvent = 0;
+    } else if (g_TrackGame->bajaEnduroEvent) {
+        g_TrackGame->bajaEnduroEvent->Unlink();
+        g_TrackGame->bajaEnduroEvent->Release();
+        g_TrackGame->bajaEnduroEvent = 0;
+    } else if (g_TrackGame->nationalEvent) {
+        g_TrackGame->nationalEvent->Unlink();
+        g_TrackGame->nationalEvent->Release();
+        g_TrackGame->nationalEvent = 0;
+    } else if (g_TrackGame->tagEvent) {
+        g_TrackGame->tagEvent->Unlink();
+        g_TrackGame->tagEvent->Release();
+        g_TrackGame->tagEvent = 0;
     }
 }
 

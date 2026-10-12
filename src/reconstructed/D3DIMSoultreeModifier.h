@@ -41,7 +41,7 @@ public:
     // 0x004453e0: detaches the modifier from every object (lines 64 and 80);
     // field_0x3c selects the object's first (0x00444de0) or second
     // (0x00444f10) modifier list.
-    void UnknownFunction4453e0();
+    void DetachFromAll();
 
     D3DIMSoultreeObject** modifiedObjects;            // objects
     int objectCount;                                  // object count

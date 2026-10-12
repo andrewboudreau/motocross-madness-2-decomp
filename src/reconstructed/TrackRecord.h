@@ -26,11 +26,11 @@ public:
     UnknownTrackGameObject3400();             // 0x0051ef30
     ~UnknownTrackGameObject3400();            // 0x0051efc0
     void Clear();             // 0x0051efe0: clears the table
-    int UnknownFunction51f0b0(short directory, const char* name); // 0x0051f0b0
+    int ReadRecord(short directory, const char* name); // 0x0051f0b0
     int Read(const char* path);                  // 0x0051f110: reads
     int Write(const char* path, int value);       // 0x0051f1b0: writes
-    int UnknownFunction51f260(short directory, const char* name, int value); // 0x0051f260
-    void UnknownFunction51f2c0(int unused, const char* name);    // 0x0051f2c0
+    int WriteRecord(short directory, const char* name, int value); // 0x0051f260
+    void ReadListedRecord(int unused, const char* name);    // 0x0051f2c0
     int AddRacer(short kind, int racer);             // 0x0051f3c0: adds a racer
 
     int field_0x00;                           // selects the file extension

@@ -76,7 +76,7 @@ struct TrackGameViewOwner : public GameObject {
 
     UnknownTrackGameViewPart* field_0x2c;
     unsigned char field_0x30[0x34 - 0x30];
-    UnknownKrustyBikeView* field_0x34;
+    UnknownKrustyBikeView* raceView;          // +0x34
     unsigned char field_0x38[0x3c - 0x38];
     FollowCamera* raceCamera;                 // +0x3c the race camera (InGameProcs.cpp VCRDlg)
     unsigned char field_0x40[0x5c - 0x40];
@@ -84,7 +84,7 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x60;
     GameObject* field_0x64;
     GameObject* field_0x68;
-    TextQueueOverlay* field_0x6c;
+    TextQueueOverlay* textQueue;              // +0x6c
     float field_0x70;                         // compared with TrackGame+0x2eb0, settings +0x140 (EventManager 0x0045eef0)
     float field_0x74;                         // RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
     unsigned char field_0x78[0x9c - 0x78];
@@ -301,12 +301,12 @@ public:
     // 0x00523d30 (OptionProcs.cpp: "MCM2HELP"): opens `topic`'s .hlp file
     // with ShellExecuteA (passing `parameters`); 1 when found.
     int OpenHelp(const char* topic, const char* parameters);
-    void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
+    void ResetDefaults();             // 0x00522440 (OptionProcs.cpp)
     void LoadControllerChoice();             // 0x00523000 (OptionProcs.cpp)
     void SaveControllerChoice();             // 0x00523130: saves the controller choice
     int WaitForCd();              // 0x00523800: asks for the CD until it is found; 0 on cancel
     void SaveProfile();                           // 0x00523580 (TrackGame slot 15)
-    int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
+    int FindDataFile(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     // 0x00522680 (TrackGame slot 4; SelectGamePicProcs.cpp's network start):
     // clears the selected session, the racers and the entries.
     int ResetNetworkRace();
@@ -316,7 +316,7 @@ public:
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
     void ReloadResourceStrings(char (*names)[0x80]);   // reloads resourceStrings
-    void UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options);
+    void CopyGarageTables(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522cb0(UnknownTrackGameModeOptionsFd8* options);
@@ -338,8 +338,8 @@ public:
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char playerName[0x80];                // +0x10: player name (NetProcs.cpp opens sessions with it)
     int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
-    int field_0x94;                           // "RadLODEasy" (SelectGamePicProcs.cpp)
-    int field_0x98;                           // saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
+    int difficulty;                           // +0x94 "RadLODEasy" group (PCNewDlg reads the same group as the difficulty)
+    int savedDifficulty;                      // +0x98 saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
     int showNewbieDialog;                 // +0x9c: cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)
     char seriesDirectories[6][0x100];     // +0xa0: directories (TrackRecord.cpp 0x0051f0b0)
     int currentSeriesDirectory;           // +0x6a0: a directory name pointer for TrackRecord.cpp 0x0051f2c0; EventManager 0x0045cb70 passes it to 0x00523a60
@@ -418,7 +418,7 @@ public:
     char cdDataDirectory[0x104];          // +0x24d4: CD data directory (uiinfo.cpp 0x00523bf0)
     char cdDriveRoot[4];                  // +0x25d8: CD drive root (uiinfo.cpp 0x00523bf0)
     UnknownDriveList* driveList;          // +0x25dc: created by the constructor (0x005221e7)
-    DirectoryList* field_0x25e0;              // scanned by TrackRecord.cpp 0x00520390
+    DirectoryList* highScoreDirectoryList;    // +0x25e0 scanned by TrackRecord.cpp 0x00520390
     DirectoryList* trackDirectoryList;    // +0x25e4: track directories (SelectGamePicProcs.cpp)
     CombinedDirectoryList* field_0x25e8;      // created by 0x00522d00
     char ghostFile[0x104];                // +0x25ec: the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
@@ -664,13 +664,15 @@ public:
     // 0x00521860: opens (`open`) or closes the in-game menu `id`.
     void SetMenuOpen(int open, int id, int sound);
 
-    // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
-    // mode.raceSettings.eventType.
-    TrackGameViewOwner* field_0x558;
-    TrackGameViewOwner* field_0x55c;
-    TrackGameViewOwner* field_0x560;
-    TrackGameViewOwner* field_0x564;
-    TrackGameViewOwner* field_0x568;
+    // The event objects, one per mode.raceSettings.eventType: KrustyBikeCamera
+    // slot 10 (0x00497e20) takes +0x34 of the one for the event type, and
+    // the type also picks the series directory (0x005240e0: Quarries, Baja,
+    // National, SX, Tag, Enduro). 0x0045cb70 creates types 0 and 2.
+    TrackGameViewOwner* supercrossEvent;      // +0x558 event type 3 (SX)
+    TrackGameViewOwner* quarryEvent;          // +0x55c event type 0 (BaseQuarryEvent)
+    TrackGameViewOwner* bajaEnduroEvent;      // +0x560 event types 1 and 5 (Baja, Enduro)
+    TrackGameViewOwner* nationalEvent;        // +0x564 event type 2 (NationalRace)
+    TrackGameViewOwner* tagEvent;             // +0x568 event type 4 (Tag)
     KrustyUI* ui;
     EventManager* eventManager;
     UnknownTrackGameObject574* sceneObject;
@@ -695,7 +697,7 @@ public:
     int playingReplay;                        // +0x3428
     int useReplayTape;                        // +0x342c
     int uiInteractionBlocked;
-    float field_0x3434;        // seconds UI interaction has been blocked (EventManager slot 10)
+    float uiBlockedSeconds;                   // +0x3434 seconds UI interaction has been blocked (EventManager slot 10)
     int field_0x3438;
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;

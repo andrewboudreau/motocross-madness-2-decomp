@@ -17,9 +17,9 @@ SDK where noted.
 
 | Function | Retail VA | Bytes | Status | Notes |
 |---|---|---:|---|---|
-| `UnknownFunction4a10e0` (reflect) | `0x004a10e0` | 247 | strict exact | `normalize(v - 2 (v . n) n)`; FastInvSqrt `0x460c00`; the dot and squared length sum as z + (x + y) |
+| `ReflectAndNormalize` (reflect) | `0x004a10e0` | 247 | strict exact | `normalize(v - 2 (v . n) n)`; FastInvSqrt `0x460c00`; the dot and squared length sum as z + (x + y) |
 | `TriangleNormal` | `0x004a11e0` | 281 | strict exact | Cross product through the Vector3 constructor with four parenthesised products; squared length `z*z + ((x*x) + (y*y))` |
-| `UnknownFunction4a1300` (line/plane) | `0x004a1300` | 211 | strict exact | TriangleNormal, then `from + (to - from) * t`; dots through `Vector3::operator[]` |
+| `LinePlaneIntersection` (line/plane) | `0x004a1300` | 211 | strict exact | TriangleNormal, then `from + (to - from) * t`; dots through `Vector3::operator[]` |
 | `ZeroMatrix` | `0x004a13e0` | 41 | strict exact | Nested loop folds to `rep stosd` |
 | `IdentityMatrix` | `0x004a1410` | 71 | strict exact | `(row == column) ? 1.0f : 0.0f` |
 | `ProjectionMatrix` | `0x004a1460` | 156 | strict exact | Takes an aspect ratio (not in the SDK); cot(fov/2) diagonal, Q = 1/(1 - near/far) |
@@ -27,7 +27,7 @@ SDK where noted.
 | `RotateZMatrix` | `0x004a17f0` | 106 | strict exact | |
 | `MatrixMult` | `0x004a1860` | 123 | strict exact | Both matrices by value; `result(i, j) += a(k, j) * b(i, k)` |
 | `MatrixInverse` | `0x004a18e0` | 362 | strict exact | Upper 3x3 by cofactors, `inverse * (...)`; `ZeroMatrix` when the determinant is zero |
-| `UnknownFunction4a1a50` (strided perspective transform) | `0x004a1a50` | 175 | near miss (97.66%) | `samples/render/MatrixUtilNearMisses.cpp`; one `fld`/`fmul` operand pair in the last row |
+| `ProjectPoints` (strided perspective transform) | `0x004a1a50` | 175 | near miss (97.66%) | `samples/render/MatrixUtilNearMisses.cpp`; one `fld`/`fmul` operand pair in the last row |
 | (hand-scheduled x87) | `0x004a1b00` | 196 | inline assembly | ebp frame, `fxch` pairing, negative-index loop; not reconstructed |
 | `kVec3` set `_$E1`..`_$E11` | `0x004a1bd0..0x004a1d0b` | | strict exact | 8 initializers, globals `0x685030..0x685068` |
 

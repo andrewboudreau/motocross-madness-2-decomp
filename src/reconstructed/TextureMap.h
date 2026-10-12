@@ -50,13 +50,13 @@ public:
     int Read(void* buffer, int size, int count);
     int ReadByte();              // 0x00461980: reads a byte
     int ReadLine(char* buffer, int size); // 0x00461aa0: reads a line (CarProcedural.cpp)
-    int UnknownFunction461cb0(int* time, int* size); // 0x00461cb0: _fstat times (SceneManager 0x004ea0fd)
+    int GetFileTimes(int* time, int* size); // 0x00461cb0: _fstat times (SceneManager 0x004ea0fd)
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
     // file is closed again (ResourceManager.cpp passes it to 0x00460f50).
-    int UnknownFunction460e70(const char* path);
+    int IsValidFile(const char* path);
     // 0x00460d70: the archive holding `name` (its offset and length go to
     // +0x130 and +0x04), or 0 (FileStream.cpp).
-    UnknownTextureStream* UnknownFunction460d70(const char* name);
+    UnknownTextureStream* FindArchive(const char* name);
     int CheckHeader();              // 0x00460db0: checks the "FAOE" header
     int SetBufferSize(int unused);    // 0x00461310: binary mode
     int Write(const void* buffer, int size, int count); // 0x004618e0: writes
@@ -162,7 +162,7 @@ public:
 
     // 0x0050abd0: sets the address-mode render states (0x13, 0x14) of an
     // alpha texture; 0 for other formats.
-    int UnknownFunction50abd0(int addressU, int addressV);
+    int SetAddressModes(int addressU, int addressV);
 
     TextureMap* nextTexture;                  // +0x08 next in the manager's list
     TextureMap* previousTexture;              // +0x0c previous in the manager's list

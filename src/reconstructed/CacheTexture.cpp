@@ -25,10 +25,10 @@ CacheTexture::CacheTexture(TextureMapManager* manager, ManagedTextureGroup* grou
         freeLeafCounts[i] = reservedLeafCounts[i] = 0;
         reservedLeaves[i].Init(32, 32);
     }
-    rootRegion = (UnknownTextureRegion*)ownerManager->field_0x70->Alloc();
+    rootRegion = (UnknownTextureRegion*)ownerManager->regionAllocator->Alloc();
     rootRegion->Init(0, level);
-    rootRegion->field_0x1c = rootRegion->field_0x20 = 0.0f;
-    rootRegion->field_0x24 = rootRegion->field_0x28 = 1.0f;
+    rootRegion->left = rootRegion->top = 0.0f;
+    rootRegion->right = rootRegion->bottom = 1.0f;
     freeLeafCounts[level] = 1;
     field_0x188 = 0;
 }
@@ -43,13 +43,13 @@ int CacheTexture::ListTextures(ContainerList<ManagedTexture*>* textures) {
 
 // 0x0050f8e0
 int CacheTexture::CollectOccupants(ContainerList<ManagedTexture*>* textures, UnknownTextureRegion* region) {
-    if (region->field_0x00[0]) {
+    if (region->quarters[0]) {
         int count = 0;
         for (int i = 0; i < 4; i++)
-            count += CollectOccupants(textures, region->field_0x00[i]);
+            count += CollectOccupants(textures, region->quarters[i]);
         return count;
     }
-    ManagedTexture* texture = region->field_0x14;
+    ManagedTexture* texture = region->occupant;
     if (texture) {
         textures->Add(texture);
         return 1;
@@ -116,20 +116,20 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
         if (!first) {
             while (steps[depth].index++ == 3)
                 depth--;
-            region = steps[depth].region->field_0x00[steps[depth].index];
+            region = steps[depth].region->quarters[steps[depth].index];
         } else {
             first = 0;
         }
-        while (region->field_0x18 > level) {
+        while (region->sizeLevel > level) {
             depth++;
             steps[depth].region = region;
             steps[depth].index = 0;
             region = FirstQuarter(region);
         }
         FreeQuarters(region);
-        if (region->field_0x2c)
+        if (region->reserved)
             continue;
-        region->field_0x2c = 1;
+        region->reserved = 1;
         reservedLeafCounts[level]++;
         freeLeafCounts[level]--;
         reservedLeaves[level].Add(region);
@@ -138,8 +138,8 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
         UnknownTextureRegion* parent = steps[depth].region;
         int i = steps[depth].index + 1;
         for (; i < 4; i++) {
-            UnknownTextureRegion* quarter = parent->field_0x00[i];
-            if (quarter->field_0x00[0])
+            UnknownTextureRegion* quarter = parent->quarters[i];
+            if (quarter->quarters[0])
                 FreeQuarters(quarter);
             else
                 EvictRegion(quarter);
@@ -151,7 +151,7 @@ int CacheTexture::ReserveRegions(int* levels, int count) {
 // 0x0050fc40
 void CacheTexture::EmptyPage() {
     UnknownTextureRegion* root = rootRegion;
-    if (root->field_0x00[0])
+    if (root->quarters[0])
         FreeQuarters(root);
     else
         EvictRegion(root);
@@ -159,7 +159,7 @@ void CacheTexture::EmptyPage() {
 
 // 0x0050fc60
 UnknownTextureRegion* CacheTexture::FirstQuarter(UnknownTextureRegion* region) {
-    UnknownTextureRegion* first = region->field_0x00[0];
+    UnknownTextureRegion* first = region->quarters[0];
     if (!first) {
         EvictRegion(region);
         first = SplitRegion(region);
@@ -169,108 +169,108 @@ UnknownTextureRegion* CacheTexture::FirstQuarter(UnknownTextureRegion* region) {
 
 // 0x0050fc90
 void CacheTexture::EvictRegion(UnknownTextureRegion* region) {
-    if (region->field_0x14) {
-        region->field_0x14->page = 0;
-        region->field_0x14->region = 0;
-        region->field_0x14->field_0xa8 = -1;
-        region->field_0x14 = 0;
+    if (region->occupant) {
+        region->occupant->page = 0;
+        region->occupant->region = 0;
+        region->occupant->field_0xa8 = -1;
+        region->occupant = 0;
     }
-    if (region->field_0x2c) {
-        reservedLeafCounts[region->field_0x18]--;
-        reservedLeaves[region->field_0x18].RemoveOrdered(region);
-        region->field_0x2c = 0;
-        freeLeafCounts[region->field_0x18]++;
+    if (region->reserved) {
+        reservedLeafCounts[region->sizeLevel]--;
+        reservedLeaves[region->sizeLevel].RemoveOrdered(region);
+        region->reserved = 0;
+        freeLeafCounts[region->sizeLevel]++;
     }
 }
 
 // 0x0050fd60
 void CacheTexture::FreeQuarters(UnknownTextureRegion* region) {
-    if (!region->field_0x00[0])
+    if (!region->quarters[0])
         return;
     for (int i = 0; i < 4; i++) {
-        UnknownTextureRegion* quarter = region->field_0x00[i];
+        UnknownTextureRegion* quarter = region->quarters[i];
         if (quarter) {
-            if (quarter->field_0x00[0])
+            if (quarter->quarters[0])
                 FreeQuarters(quarter);
             else
                 EvictRegion(quarter);
-            ownerManager->field_0x70->Free(region->field_0x00[i]);
-            region->field_0x00[i] = 0;
+            ownerManager->regionAllocator->Free(region->quarters[i]);
+            region->quarters[i] = 0;
         }
     }
 }
 
 // 0x0050ffa0
 UnknownTextureRegion* CacheTexture::SplitRegion(UnknownTextureRegion* region) {
-    float left = region->field_0x1c;
-    float right = region->field_0x24;
-    float top = region->field_0x20;
-    float bottom = region->field_0x28;
-    float middleU = (region->field_0x24 - region->field_0x1c) * 0.5f + left;
-    float middleV = (region->field_0x28 - region->field_0x20) * 0.5f + top;
+    float left = region->left;
+    float right = region->right;
+    float top = region->top;
+    float bottom = region->bottom;
+    float middleU = (region->right - region->left) * 0.5f + left;
+    float middleV = (region->bottom - region->top) * 0.5f + top;
     for (int i = 0; i < 4; i++) {
-        region->field_0x00[i] = (UnknownTextureRegion*)ownerManager->field_0x70->Alloc();
-        region->field_0x00[i]->Init(region, region->field_0x18 - 1);
+        region->quarters[i] = (UnknownTextureRegion*)ownerManager->regionAllocator->Alloc();
+        region->quarters[i]->Init(region, region->sizeLevel - 1);
     }
-    region->field_0x00[0]->field_0x1c = left;
-    region->field_0x00[0]->field_0x20 = top;
-    region->field_0x00[0]->field_0x24 = middleU;
-    region->field_0x00[0]->field_0x28 = middleV;
-    region->field_0x00[1]->field_0x1c = middleU;
-    region->field_0x00[1]->field_0x20 = top;
-    region->field_0x00[1]->field_0x24 = right;
-    region->field_0x00[1]->field_0x28 = middleV;
-    region->field_0x00[2]->field_0x1c = left;
-    region->field_0x00[2]->field_0x20 = middleV;
-    region->field_0x00[2]->field_0x24 = middleU;
-    region->field_0x00[2]->field_0x28 = bottom;
-    region->field_0x00[3]->field_0x1c = middleU;
-    region->field_0x00[3]->field_0x20 = middleV;
-    region->field_0x00[3]->field_0x24 = right;
-    region->field_0x00[3]->field_0x28 = bottom;
-    freeLeafCounts[region->field_0x18]--;
-    freeLeafCounts[region->field_0x18 - 1] += 4;
-    return region->field_0x00[0];
+    region->quarters[0]->left = left;
+    region->quarters[0]->top = top;
+    region->quarters[0]->right = middleU;
+    region->quarters[0]->bottom = middleV;
+    region->quarters[1]->left = middleU;
+    region->quarters[1]->top = top;
+    region->quarters[1]->right = right;
+    region->quarters[1]->bottom = middleV;
+    region->quarters[2]->left = left;
+    region->quarters[2]->top = middleV;
+    region->quarters[2]->right = middleU;
+    region->quarters[2]->bottom = bottom;
+    region->quarters[3]->left = middleU;
+    region->quarters[3]->top = middleV;
+    region->quarters[3]->right = right;
+    region->quarters[3]->bottom = bottom;
+    freeLeafCounts[region->sizeLevel]--;
+    freeLeafCounts[region->sizeLevel - 1] += 4;
+    return region->quarters[0];
 }
 
 // 0x00510120
 void CacheTexture::ReleaseRegion(UnknownTextureRegion* region, int merge) {
-    if (region->field_0x14) {
-        region->field_0x14->page = 0;
-        region->field_0x14->region = 0;
-        region->field_0x14 = 0;
+    if (region->occupant) {
+        region->occupant->page = 0;
+        region->occupant->region = 0;
+        region->occupant = 0;
     }
-    if (region->field_0x2c) {
-        reservedLeafCounts[region->field_0x18]--;
-        reservedLeaves[region->field_0x18].RemoveOrdered(region);
-        region->field_0x2c = 0;
-        freeLeafCounts[region->field_0x18]++;
+    if (region->reserved) {
+        reservedLeafCounts[region->sizeLevel]--;
+        reservedLeaves[region->sizeLevel].RemoveOrdered(region);
+        region->reserved = 0;
+        freeLeafCounts[region->sizeLevel]++;
     }
     if (!merge)
         return;
-    for (UnknownTextureRegion* parent = region->field_0x10; parent; parent = parent->field_0x10) {
+    for (UnknownTextureRegion* parent = region->parentRegion; parent; parent = parent->parentRegion) {
         int i;
         for (i = 0; i < 4; i++) {
-            if (parent->field_0x00[i]->field_0x00[0] || parent->field_0x00[i]->field_0x2c)
+            if (parent->quarters[i]->quarters[0] || parent->quarters[i]->reserved)
                 return;
         }
         for (i = 0; i < 4; i++) {
-            ownerManager->field_0x70->Free(parent->field_0x00[i]);
-            parent->field_0x00[i] = 0;
+            ownerManager->regionAllocator->Free(parent->quarters[i]);
+            parent->quarters[i] = 0;
         }
-        freeLeafCounts[parent->field_0x18 - 1] -= 4;
-        freeLeafCounts[parent->field_0x18]++;
+        freeLeafCounts[parent->sizeLevel - 1] -= 4;
+        freeLeafCounts[parent->sizeLevel]++;
     }
 }
 
 // 0x00510250
 int CacheTexture::PlaceTexture(ManagedTexture* texture, UnknownTextureRegion* region) {
-    region->field_0x14 = texture;
+    region->occupant = texture;
     texture->region = region;
-    region->field_0x14->page = this;
-    region->field_0x2c = 1;
+    region->occupant->page = this;
+    region->reserved = 1;
     freeLeafCounts[texture->plannedLevel]--;
-    texture->field_0xa8 = region->field_0x18;
+    texture->field_0xa8 = region->sizeLevel;
     texture->region = region;
     texture->page = this;
     return 1;

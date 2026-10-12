@@ -72,14 +72,14 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
     if (cameraState != 3) {
         Vector3 velocity = UnknownVirtualSlot33();
         float along = velocity.z * field_0x29c.z + (velocity.x * field_0x29c.x + velocity.y * field_0x29c.y);
-        distance = AngleWeight(field_0x234) * AngleWeight(field_0x22c);
+        distance = AngleWeight(followYaw) * AngleWeight(followPitch);
         float zoom = field_0x16c / field_0x1dc;
-        float scale = (float)(field_0x220 * 0.0111f) * zoom + 1.0f;
+        float scale = (float)(followDistance * 0.0111f) * zoom + 1.0f;
         if (a) {
             offset = 0.0f;
         } else {
             float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
-            offset = (float)((1.0f - field_0x220 * 0.0016666667f) * 1.8f) * (scale * scale * along / speed);
+            offset = (float)((1.0f - followDistance * 0.0016666667f) * 1.8f) * (scale * scale * along / speed);
         }
         float length = vehicleMode ? vehicle->field_0xbc : Length(velocity);
         distance = zoom * distance + ClimbScale(velocity.y, length, offset);
@@ -114,7 +114,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
     result.y = position.y + offset;
     if (vehicle->riderCount > 0) {
         if (vehicle->UnknownInlineRider()->field_0x150 > -0.5f) {
-            float reach = (float)(FollowCameraAbs(field_0x22c) * 0.63661975f) * 1.2f + 0.3f;
+            float reach = (float)(FollowCameraAbs(followPitch) * 0.63661975f) * 1.2f + 0.3f;
             Vector3 ahead = Add(direction * reach, targetPoint);
             Vector3 ground = ahead;
             field_0x240->QueryGround(&ground, 0, 0, 0);

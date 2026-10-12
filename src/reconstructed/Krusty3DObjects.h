@@ -33,7 +33,7 @@ struct UnknownInputEntry;
 // +4. Only the +0x25 bit 0 test is used.
 struct UnknownVisualCueRacer : virtual public GameObject {
     virtual void UnknownVirtualSlot0();
-    int UnknownIsEnabled() { return field_0x25_bit0; }
+    int UnknownIsEnabled() { return isEnabled; }
 
     unsigned char field_0x08[0x0c - 0x08];
     Vector3 position;                         // +0x0c

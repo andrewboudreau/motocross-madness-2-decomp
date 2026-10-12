@@ -224,14 +224,14 @@ int UnknownDisplay::SetFullscreenCooperativeLevel() {
                    GetWindowLongA((HWND)windowHandle, GWL_STYLE) & (WS_POPUP | WS_SYSMENU));
     ShowWindow((HWND)windowHandle, SW_SHOW);
     if (g_TrackGame->imeLibrary)
-        UnknownFunction52ff00();
+        SaveImeStatus();
     if (directDraw->SetCooperativeLevel(windowHandle,
                                       DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT | DDSCL_EXCLUSIVE |
                                           DDSCL_FPUSETUP))
         return 0;
     cooperativeLevel = DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT | DDSCL_EXCLUSIVE | DDSCL_FPUSETUP;
     if (g_TrackGame->imeLibrary)
-        UnknownFunction52ff20();
+        RestoreImeStatus();
     return 1;
 }
 
@@ -242,7 +242,7 @@ int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int hei
     RECT workArea;
 
     if (g_TrackGame->imeLibrary)
-        UnknownFunction52ff00();
+        SaveImeStatus();
     if (directDraw->SetCooperativeLevel(windowHandle, DDSCL_NORMAL | DDSCL_FPUSETUP))
         return 0;
     cooperativeLevel = DDSCL_NORMAL | DDSCL_FPUSETUP;
@@ -260,7 +260,7 @@ int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int hei
     if (!width && !height)
         ShowWindow((HWND)windowHandle, SW_HIDE);
     if (g_TrackGame->imeLibrary)
-        UnknownFunction52ff20();
+        RestoreImeStatus();
     return 1;
 }
 

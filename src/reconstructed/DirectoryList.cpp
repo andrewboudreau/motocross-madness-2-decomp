@@ -25,11 +25,11 @@ inline void UnknownDirectoryEntry::UnknownFunctionSet(const char* fileName, unsi
 
 // 0x00449e60
 int UnknownDriveList::Rescan() {
-    return UnknownFunction449e70();
+    return ListDrives();
 }
 
 // 0x00449e70
-int UnknownDriveList::UnknownFunction449e70() {
+int UnknownDriveList::ListDrives() {
     char root[4];
     char* strings;
     int size;
@@ -73,7 +73,7 @@ UnknownDriveList::~UnknownDriveList() {
 }
 
 // 0x0044a010
-int UnknownDriveList::UnknownFunction44a010(const char* volumeName, int* index, unsigned int type) {
+int UnknownDriveList::FindVolume(const char* volumeName, int* index, unsigned int type) {
     int i;
 
     *index = 0;
@@ -225,10 +225,10 @@ int DirectoryList::UnknownVirtualSlot1() {
     find = FindFirstFileA(search, &data);
     if (find == INVALID_HANDLE_VALUE)
         return 0;
-    if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes))
+    if (IsListed(data.cFileName, data.dwFileAttributes))
         found = 1;
     while (FindNextFileA(find, &data)) {
-        if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes))
+        if (IsListed(data.cFileName, data.dwFileAttributes))
             found++;
     }
     FindClose(find);
@@ -240,12 +240,12 @@ int DirectoryList::UnknownVirtualSlot1() {
         find = FindFirstFileA(search, &data);
         if (find == INVALID_HANDLE_VALUE)
             return 0;
-        if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes)) {
+        if (IsListed(data.cFileName, data.dwFileAttributes)) {
             entries[0].UnknownFunctionSet(data.cFileName, data.dwFileAttributes);
             found = 1;
         }
         while (FindNextFileA(find, &data)) {
-            if (UnknownFunction44a600(data.cFileName, data.dwFileAttributes)) {
+            if (IsListed(data.cFileName, data.dwFileAttributes)) {
                 entries[found].UnknownFunctionSet(data.cFileName, data.dwFileAttributes);
                 found++;
             }

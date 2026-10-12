@@ -127,7 +127,7 @@ void PCControlInterface::SetDevicesAcquired(int acquire) {
 int PCControlInterface::UnknownVirtualSlot2(int control, int modifier) {
     if (keyboard && keyboard->UnknownVirtualSlot4(control, modifier, 0))
         return 1;
-    if (joysticks[activeJoystickIndex] && joysticks[activeJoystickIndex]->UnknownFunction489c60(control, modifier, 0))
+    if (joysticks[activeJoystickIndex] && joysticks[activeJoystickIndex]->GetControlState(control, modifier, 0))
         return 1;
     if (mouse && mouse->UnknownVirtualSlot4(control, modifier, 0))
         return 1;

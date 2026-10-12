@@ -246,8 +246,8 @@ public:
     int SetDwordProperty(int property, unsigned long object, unsigned long how,
         unsigned long data);
 
-    friend struct UnknownDisplay* UnknownFunction4ccd60(int flag, int useLast, int* blade); // PickDevice.cpp
-    friend int UnknownFunction4cd610(int useLast);                                           // PickDevice.cpp
+    friend struct UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade); // PickDevice.cpp
+    friend int ChooseJoystick(int useLast);                                           // PickDevice.cpp
 
 protected:
     UnknownDeviceInstance deviceInfo;          // +0x18; cleared by the constructor

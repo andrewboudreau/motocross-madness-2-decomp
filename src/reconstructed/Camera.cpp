@@ -57,12 +57,12 @@ void Camera::UnknownVirtualSlot4() {
 // bit 0 is set, the owner is handed the camera.
 GameObject* Camera::UnknownVirtualSlot8(void* value) {
     GameObject::UnknownVirtualSlot8(value);
-    if (!UnknownFunction42e550()) {
+    if (!UpdateViewport()) {
         Release();
         return 0;
     }
     UnknownVirtualSlot28();
-    if (field_0x25_bit0)
+    if (isEnabled)
         Owner()->SetCamera(this);
     return this;
 }
@@ -92,7 +92,7 @@ int Camera::UnknownVirtualSlot13() {
 // index again for the height: the height goes through owner->field_0x04,
 // which VC6 does not merge with the `display` index read for the width
 // (both reads through `display` share one index load).
-int Camera::UnknownFunction42e550() {
+int Camera::UpdateViewport() {
     RenderTarget* owner = Owner();
     field_0x1c4 = owner->targetWidth;
     field_0x1c8 = owner->targetHeight;
@@ -136,7 +136,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
     if (lastTurnAngle < 0.0f)
         lastTurnAngle = -lastTurnAngle;
     field_0x214 = viewDirection;
-    if (!field_0x25_bit2) {
+    if (!isPaused) {
         if (field_0x1d0)
             field_0x1d0--;
         if (field_0x1cc)

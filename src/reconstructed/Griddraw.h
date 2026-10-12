@@ -77,7 +77,7 @@ public:
 // vertex range before an unlit draw. Tier 3.
 class GridVertexLighter {
 public:
-    void UnknownFunction484f10(GridVertex* vertices, int count);  // 0x00484f10 (ret 8)
+    void FogVertices(GridVertex* vertices, int count);  // 0x00484f10 (ret 8)
     int field_0x00;
     int field_0x04;
     int field_0x08;

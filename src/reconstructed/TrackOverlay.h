@@ -426,10 +426,10 @@ public:
     int HandleChatKey(int key, int* result);
     void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
-    int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
+    int HandleChatInput(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void ShowInputLine();             // 0x0051dd10: shows the input line
     void HideInputLine();             // 0x0051dd40: hides it
-    void UnknownFunction51dd70(const char* name, int a2, int a3); // 0x0051dd70: a2 is the text (0x0051eb40)
+    void AddMessage(const char* name, int a2, int a3); // 0x0051dd70: a2 is the text (0x0051eb40)
     // 0x0051de10: redraws the input line and the history; 0 when the
     // surface's device context is not available.
     int RedrawChat();

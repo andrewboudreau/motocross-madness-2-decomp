@@ -31,22 +31,22 @@ static inline int LevelArea(int level) {
 
 // 0x005102d0
 int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
-    region->field_0x14->UpdatePageCoords(level);
+    region->occupant->UpdatePageCoords(level);
     float scale = 1.0f / (1 << level);
     int width = textureWidth;
     UnknownRect rect;
-    rect.left = (long)(width * region->field_0x1c);
-    rect.top = (long)(textureHeight * region->field_0x20);
-    rect.right = (long)(((region->field_0x24 - region->field_0x1c) * scale + region->field_0x1c) * width);
-    rect.bottom = (long)(((region->field_0x28 - region->field_0x20) * scale + region->field_0x20) * textureHeight);
+    rect.left = (long)(width * region->left);
+    rect.top = (long)(textureHeight * region->top);
+    rect.right = (long)(((region->right - region->left) * scale + region->left) * width);
+    rect.bottom = (long)(((region->bottom - region->top) * scale + region->top) * textureHeight);
     int side = rect.right - rect.left;
     int levelWidth = width;
     UnknownRect whole = rect;
-    UnknownSurfaceInterface* source = region->field_0x14->systemSurface;
+    UnknownSurfaceInterface* source = region->occupant->systemSurface;
     UnknownSurfaceInterface* destination = systemSurface;
     UnknownSurfaceInterface* nextSource = 0;
     UnknownSurfaceInterface* nextDestination = 0;
-    int sourceSide = region->field_0x14->textureWidth;
+    int sourceSide = region->occupant->textureWidth;
     UnknownSurfaceCaps caps;
     memset(&caps, 0, sizeof(caps));
     caps.caps = 0x401000;

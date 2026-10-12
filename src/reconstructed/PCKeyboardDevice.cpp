@@ -113,7 +113,7 @@ int PCKeyboardDevice::UnknownVirtualSlot6(int value) {
         }
     }
     for (int list = 0; list < 6; list++)
-        UnknownFunction48a0c0(list, value);
+        RepeatKeys(list, value);
     RefreshModifierState();
     return 1;
 }

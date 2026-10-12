@@ -12,7 +12,7 @@
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?Pop@MemTagStack@@QAEXH@Z": "0x004a2d90",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
-  "?UnknownFunction4a2bc0@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",
+  "?ReportTotals@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",
   "?FindOrAddTag@MemTagStack@@QAEHPBD@Z": "0x004a2bf0",
   "?GetBytes@MemTagStack@@QAEHPBD@Z": "0x004a2d20",
   "?CopyCurrentName@MemTagStack@@QAEXPAD@Z": "0x004a2da0",

@@ -222,13 +222,13 @@ public:
 protected:
     friend class VCRDlg;        // InGameProcs.cpp: ButCamera restores the saved state
     // Layout from the constructor (0x00462ee0) and destructor (0x00463350).
-    float field_0x220;          // preset distance-like value (slots 63-67)
-    float field_0x224;          // copy of field_0x220 (constructor)
+    float followDistance;                     // +0x220 distance behind the target (slot 49 scales the direction by -it); presets in slots 63-67
+    float initialDistance;                    // +0x224 copy of followDistance (constructor)
     float field_0x228;          // 27.0f
-    float field_0x22c;          // preset angle-like value (slots 63-67)
-    float field_0x230;          // copy of field_0x22c
-    float field_0x234;          // preset angle-like value (slots 63-67)
-    float field_0x238;          // copy of field_0x234
+    float followPitch;                        // +0x22c pitch slot 49 rotates the view direction by; presets in slots 63-67
+    float initialPitch;                       // +0x230 copy of followPitch
+    float followYaw;                          // +0x234 yaw slot 49 adds to +0x308 / +0x23c; presets in slots 63-67
+    float initialYaw;                         // +0x238 copy of followYaw
     float field_0x23c;          // advanced by pi in VehicleCamera slot 39
     UnknownFollowCameraSubject* field_0x240;
     int cameraState;                 // +0x244, current state (slots 70-72, 75)
@@ -259,9 +259,9 @@ protected:
     Vector3 cachedTarget;             // +0x2a8, cached slot 57 result (slot 69)
     Vector3 targetPoint;              // +0x2b4, target point (slots 34, 37, 68)
     float field_0x2c0;          // height-like value: slot 45 needs it above 0 or 6.5 to descend
-    float field_0x2c4;          // snapshot of field_0x220 (slot 71)
-    float field_0x2c8;          // snapshot of field_0x22c
-    float field_0x2cc;          // snapshot of field_0x234
+    float savedDistance;                      // +0x2c4 snapshot of followDistance (slots 49 and 71)
+    float savedPitch;                         // +0x2c8 snapshot of followPitch
+    float savedYaw;                           // +0x2cc snapshot of followYaw
     float field_0x2d0;          // set with field_0x2d4 by 0x00463140
     float field_0x2d4;          // 7.0f
     float lift;                      // +0x2d8, lift eased by VehicleCamera slot 35

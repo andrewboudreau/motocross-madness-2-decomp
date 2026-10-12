@@ -50,7 +50,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot33() {
 Vector3 VehicleCamera::UnknownFunction52bac0() {
     if (vehicleMode) {
         field_0x392 = 0;
-        return vehicle->field_0x494;
+        return vehicle->takeoffVelocity;
     }
     if (!field_0x392) {
         field_0x398 = UnknownVirtualSlot33();
@@ -70,8 +70,8 @@ Vector3 VehicleCamera::TargetPoint() {
     }
     if (field_0x384) {
         UnknownVehiclePart* model = field_0x384->field_0x1a0;
-        if (model->field_0x140)
-            model->field_0x140->GetPositionIn(0, &position);
+        if (model->firstChild)
+            model->firstChild->GetPositionIn(0, &position);
         else
             model->GetPositionIn(0, &position);
         return position;
@@ -91,7 +91,7 @@ Vector3 VehicleCamera::TargetPoint() {
 Vector3 VehicleCamera::UnknownFunction52bc50() {
     if (vehicleMode) {
         field_0x391 = 0;
-        return vehicle->field_0x488;
+        return vehicle->takeoffPosition;
     }
     if (!field_0x391) {
         field_0x3a4 = TargetPoint();
@@ -148,7 +148,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
     Vector3 result = TargetPoint();
     if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
         if (vehicleMode) {
-            if (!vehicle->field_0x444) {
+            if (!vehicle->crashState) {
                 float lead = 0.2f < dt ? 0.2f : dt;
                 result += UnknownVirtualSlot33() * lead;
             }
@@ -162,16 +162,16 @@ Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
 
 // 0x0052bfa0: preset; distance 17 in vehicle mode, else 60.
 void VehicleCamera::UnknownVirtualSlot67() {
-    field_0x22c = 0.75f;
-    field_0x234 = 3.1415927f;
-    field_0x220 = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
+    followPitch = 0.75f;
+    followYaw = 3.1415927f;
+    followDistance = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
     field_0x258 = 85.0f;
 }
 
 // 0x0052bff0: holds while the vehicle reports +0x444; otherwise cycles the
 // state list in vehicle mode or resets to state 0.
 void VehicleCamera::UnknownVirtualSlot72() {
-    if (vehicleMode && vehicle && vehicle->field_0x444)
+    if (vehicleMode && vehicle && vehicle->crashState)
         return;
     if (!vehicleMode) {
         cameraState = 0;
@@ -203,7 +203,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
     if (vehicleMode) {
         if (FollowCameraAbs(vehicle->field_0x434) < 10.0f) {
             Vector3 velocity = UnknownVirtualSlot33();
-            if (!vehicle->field_0x440)
+            if (!vehicle->movingForward)
                 velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
             velocity.y = 0.0f;
             if (velocity.x == 0.0f && velocity.z == 0.0f)
@@ -216,7 +216,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
             if (facing.x == 0.0f && facing.z == 0.0f)
                 facing = velocity;
             heading = Add(Sub(velocity, facing) * (FollowCameraAbs(vehicle->field_0x434) / 10.0f), facing);
-            if (!vehicle->field_0x440)
+            if (!vehicle->movingForward)
                 heading.y = heading.y * 0.5f;
             else
                 heading.y = 0.0f;
@@ -234,7 +234,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
             heading.z = field_0x29c.z * 0.82f + heading.z * 0.18f;
         } else {
             heading = UnknownVirtualSlot33();
-            if (!vehicle->field_0x440) {
+            if (!vehicle->movingForward) {
                 heading = Vector3(-heading.x, -heading.y, -heading.z);
                 heading.y = (float)(heading.y * 0.5f) * 0.18f + field_0x29c.y * 0.82f;
             } else {
@@ -254,8 +254,8 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
         Vector3 other;
         if (field_0x384) {
             UnknownVehiclePart* model = field_0x384->field_0x1a0;
-            if (model->field_0x140)
-                model->field_0x140->GetAxes(&heading, &other);
+            if (model->firstChild)
+                model->firstChild->GetAxes(&heading, &other);
             else
                 model->GetAxes(&heading, &other);
         } else if (field_0x388) {
@@ -299,11 +299,11 @@ void VehicleCamera::UnknownVirtualSlot42(bool flag) {
     float ratio = field_0x16c / field_0x1dc;
     if (cameraState != 3) {
         if (!flag && vehicleMode)
-            field_0x308 = ratio * vehicle->field_0x43c * 0.3f;
+            field_0x308 = ratio * vehicle->turnRate * 0.3f;
         else
             field_0x308 = 0.0f;
     } else {
-        field_0x308 = ratio * vehicle->field_0x43c * 0.4f;
+        field_0x308 = ratio * vehicle->turnRate * 0.4f;
     }
 }
 

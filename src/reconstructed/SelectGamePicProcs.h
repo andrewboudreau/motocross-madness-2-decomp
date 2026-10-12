@@ -169,7 +169,7 @@ struct UnknownLobbySettingsMessage {
     unsigned char bikeClass : 3;              // +0x2d8c
     unsigned char tagBall : 1;                // +0x2eb4
     unsigned char stuntMode : 1;              // +0x2eb8
-    unsigned char detail : 2;                 // +0x60c
+    unsigned char difficulty : 2;             // +0x60c
     unsigned char trackNumber;                // +0x09: track number (+0x2da4)
     int field_0x0c;                           // +0x2ea8
     int field_0x10;                           // +0x2eac

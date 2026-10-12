@@ -147,7 +147,7 @@ stopped:
 // held (retail behaviour).
 int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardware) {
     if (!SoundSystem()->audioStarted || !soundGroup || !soundGroup->field_0x2c_bit0 ||
-        soundGroup->field_0x25_bit2)
+        soundGroup->isPaused)
         return 1;
     int looping = playFlags & 1;
     lastPlayFlags = playFlags;

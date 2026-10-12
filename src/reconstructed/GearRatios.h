@@ -23,9 +23,9 @@ public:
                          int rpmStep, int arg6, float riseRate, float fallRate);
 
     void UnknownFunction4d2f50(float dt, int engaged, unsigned char arg2);   // 0x004d2f50
-    void UnknownFunction4d3030(int arg0, float arg1);                        // 0x004d3030
+    void AutoShift(int arg0, float arg1);                        // 0x004d3030
     // 0x004d31b0: drive force along `direction` and its magnitude.
-    void UnknownFunction4d31b0(float speedRatio, const Vector3* direction, float scale, bool braking,
+    void DriveForce(float speedRatio, const Vector3* direction, float scale, bool braking,
                                float brakeValue, Vector3* force, float* magnitude);
 
     // Curve lookups at the current rpm (field_0x04); inline in retail.

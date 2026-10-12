@@ -33,7 +33,7 @@ FontTexture::~FontTexture() {
     unsigned int count;
     unsigned int i;
 
-    s_UnknownManager65b478.UnknownFunction467760(this);
+    s_UnknownManager65b478.DeleteFont(this);
     count = cells->Count();
     for (i = 0; i < count; i++) {
         if ((*cells)[i]) {
@@ -92,7 +92,7 @@ TextureMap* FontTexture::GetTexture() {
 // code and four rectangle values. The lookup hit and the load path share one
 // return: an early `return node->font;` lets VC6 delay the esi/edi saves past
 // it, and a block around the cell loop's locals moves their stack slots.
-FontTexture* FontTexture::UnknownFunction4673d0(const char* name, const char* path, const char* textureName,
+FontTexture* FontTexture::Load(const char* name, const char* path, const char* textureName,
                                                 int format, TextureMapManager* manager, int a5) {
     UnknownFontTextureNode* node;
     UnknownTextureStream* stream;
@@ -101,7 +101,7 @@ FontTexture* FontTexture::UnknownFunction4673d0(const char* name, const char* pa
     unsigned int i;
     TextureMap* texture;
 
-    node = s_UnknownManager65b478.UnknownFunction4677f0(name);
+    node = s_UnknownManager65b478.FindFont(name);
     if (node && node->font) {
         font = node->font;
     } else {

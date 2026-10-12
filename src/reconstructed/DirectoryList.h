@@ -23,10 +23,10 @@ public:
     ~UnknownDriveList();                                  // 0x0044a000
     int Rescan();                          // 0x00449e60: rescans
     // 0x00449e70: lists the fixed and CD-ROM drives; 0 when out of memory.
-    int UnknownFunction449e70();
+    int ListDrives();
     // 0x0044a010: the index of the drive whose volume is `volumeName` (and
     // whose type is `type`, unless 0); 1 when found.
-    int UnknownFunction44a010(const char* volumeName, int* index, unsigned int type);
+    int FindVolume(const char* volumeName, int* index, unsigned int type);
     int UnknownFunction44a0b0(int index, char* root);     // 0x0044a0b0
 
     UnknownDriveEntry* drives;
@@ -67,7 +67,7 @@ public:
     int CurrentName(char* name);                 // 0x0044a550: current listed name
     // 0x0044a600: whether a found file is listed: not "", "." or "..", and
     // a directory unless `includeFiles` is set.
-    int UnknownFunction44a600(const char* name, unsigned int attributes);
+    int IsListed(const char* name, unsigned int attributes);
     int Contains(const char* name);           // 0x0044a910: whether `name` is listed
     // 0x004673b0: the entry count (an out-of-line accessor that the linker
     // folded with FontTexture's identical 0x004673b0).

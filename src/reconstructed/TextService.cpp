@@ -44,7 +44,7 @@ UnknownOverlayText::~UnknownOverlayText() {
     for (i = 0; i < count; i++) {
         FontTexture* font = (*fonts)[i];
         (*fonts)[i] = 0;
-        FontTexture::s_UnknownManager65b478.UnknownFunction467760(font);
+        FontTexture::s_UnknownManager65b478.DeleteFont(font);
     }
     currentFont = 0;
     delete fonts;
@@ -74,7 +74,7 @@ UnknownOverlayText* UnknownOverlayText::Create(const char* archive, const char**
         strcat(path, ".cell");
         COPY_NAME(textureName, names[i]);
         strcat(textureName, ".tga");
-        FontTexture* font = FontTexture::UnknownFunction4673d0(names[i], path, textureName, format, manager, a10);
+        FontTexture* font = FontTexture::Load(names[i], path, textureName, format, manager, a10);
         if (font)
             text->SetFont(i, font);
     }

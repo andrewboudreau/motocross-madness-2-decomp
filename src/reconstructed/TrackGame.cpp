@@ -93,11 +93,11 @@ void SendDebugMessage(const char* format, ...)
 // 0x00520870
 TrackGame::TrackGame() {
     sceneObject = 0;
-    field_0x558 = 0;
-    field_0x55c = 0;
-    field_0x560 = 0;
-    field_0x564 = 0;
-    field_0x568 = 0;
+    supercrossEvent = 0;
+    quarryEvent = 0;
+    bajaEnduroEvent = 0;
+    nationalEvent = 0;
+    tagEvent = 0;
     ui = 0;
     eventManager = 0;
     textureManager = 0;
@@ -285,7 +285,7 @@ int TrackGame::UnknownVirtualSlot4() {
         return 0;
     g_MemTagStack->Push("UI");
     ui = new(__FILE__, 379) KrustyUI(1);
-    if (!childRoot->AppendChild(ui->UnknownFunction4988a0(renderTarget, 1), -1))
+    if (!childRoot->AppendChild(ui->Create(renderTarget, 1), -1))
         return 0;
     eventManager = new(__FILE__, 382) EventManager(1);
     if (!childRoot->AppendChild(eventManager->UnknownVirtualSlot8(renderTarget), -1))
@@ -382,7 +382,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
     if (!ui)
         return 0;
     if (TestInputEvent(1, 0, event, 0x3f)) {
-        g_MemTagStack->UnknownFunction4a2bc0("In Game");
+        g_MemTagStack->ReportTotals("In Game");
         if (!menuIsOpen) {
             int category = g_MemTagStack->Push("UI");
             SetMenuOpen(1, kMenuExit, 1);
@@ -410,12 +410,12 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
         return;
     if (open) {
         GameObject* other = eventManager->FindRaceView();
-        if (other && !other->field_0x25_bit0)
+        if (other && !other->isEnabled)
             return;
         if (menuIsOpen)
             return;
         ui->OpenMenu(id);
-        if (!menu->field_0x25_bit0)
+        if (!menu->isEnabled)
             return;
         menu->UnknownVirtualSlot4();
         menuIsOpen = 1;
@@ -466,7 +466,7 @@ void TrackGame::UnknownFunction521a40() {
 // 0x00521a50
 int TrackGame::UnknownVirtualSlot5() {
     PCGame::UnknownVirtualSlot5();
-    if (field_0x55c)
+    if (quarryEvent)
         ResetClock();
     return 1;
 }
@@ -488,7 +488,7 @@ int TrackGame::UnknownVirtualSlot15() {
 
 // 0x00521cb0
 int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
-    return mode.UnknownFunction5238f0(name, path);
+    return mode.FindDataFile(name, path);
 }
 
 // 0x00521cd0

@@ -69,7 +69,7 @@ void UnknownTrackGameObject3400::Clear()
 }
 
 // 0x0051f0b0: reads `name` from one of TrackGameMode's directories.
-int UnknownTrackGameObject3400::UnknownFunction51f0b0(short directory, const char* name)
+int UnknownTrackGameObject3400::ReadRecord(short directory, const char* name)
 {
     char path[260];
     sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
@@ -109,7 +109,7 @@ int UnknownTrackGameObject3400::Write(const char* path, int value)
 }
 
 // 0x0051f260: writes `name` into one of TrackGameMode's directories.
-int UnknownTrackGameObject3400::UnknownFunction51f260(short directory, const char* name, int value)
+int UnknownTrackGameObject3400::WriteRecord(short directory, const char* name, int value)
 {
     char path[260];
     sprintf(path, "%s\\%s", g_TrackGame->mode.seriesDirectories[directory], name);
@@ -118,7 +118,7 @@ int UnknownTrackGameObject3400::UnknownFunction51f260(short directory, const cha
 
 // 0x0051f2c0: reads `name` when the directory scan lists it; the first
 // argument is unused.
-void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* name)
+void UnknownTrackGameObject3400::ReadListedRecord(int unused, const char* name)
 {
     char path[260];
     char file[260];
@@ -398,7 +398,7 @@ void TrackRecordDlg::FillLists(UnknownDialogEvent* event, int series)
     control->SetSelectable(0);
     control = static_cast<UIListBox*>(FindControl("LstTrack", 3));
     control->RemoveAllRows();
-    ListHighScoreTracks(control, g_TrackGame->mode.field_0x25e0, series);
+    ListHighScoreTracks(control, g_TrackGame->mode.highScoreDirectoryList, series);
     ((UnknownTrackRecordListBox*)control)->UnknownVirtualSlot66(0);
 }
 
@@ -428,7 +428,7 @@ void TrackRecordDlg::UnknownFunction5204e0(UnknownDialogEvent* event, int times,
     else
         g_TrackGame->LoadResourceString(0xbc5, text, 128);
     control->SetText(text);
-    g_TrackGame->field_0x3400->UnknownFunction51f2c0(times, name);
+    g_TrackGame->field_0x3400->ReadListedRecord(times, name);
     control = static_cast<UIListBox*>(event->dialog->FindControl("LstStats1", 0));
     control->RemoveAllRows();
     control->SetSelectable(0);

@@ -163,7 +163,7 @@ TextureMap::~TextureMap() {
 }
 
 // 0x0050abd0
-int TextureMap::UnknownFunction50abd0(int addressU, int addressV) {
+int TextureMap::SetAddressModes(int addressU, int addressV) {
     if (IsFormat4444Or8888(mapFormat)) {
         for (int i = 0; i < statePairCount; i++) {
             if (statePairs[i].state == 0x13)

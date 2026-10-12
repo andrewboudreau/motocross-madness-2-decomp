@@ -44,11 +44,11 @@ int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEn
 // -(2n + 3) (high).
 int JoystickDevice::AttachAxisBinding(UnknownControlBinding* binding, float step,
                                           float interval) {
-    binding->field_0x00 = this;
-    binding->field_0x1c = step;
-    binding->field_0x20 = interval;
-    axisBindings[binding->field_0x08].Add(binding);
-    switch (binding->field_0x08) {
+    binding->owner = this;
+    binding->repeatStep = step;
+    binding->repeatInterval = interval;
+    axisBindings[binding->axisIndex].Add(binding);
+    switch (binding->axisIndex) {
     case 0:
         binding->SetKeys(-2, -3);
         break;
@@ -76,7 +76,7 @@ void JoystickDevice::UnknownVirtualSlot0(int id) {
     for (int axis = 0; axis < 6; axis++) {
         for (int i = 0; i < axisBindings[axis].m_count; i++) {
             UnknownControlBinding* binding = axisBindings[axis].Get(i);
-            if (binding->field_0x04 == id)
+            if (binding->bindingId == id)
                 axisBindings[axis].Remove(binding);
         }
     }
@@ -90,7 +90,7 @@ void JoystickDevice::FeedAxis(int axis, float value, float range) {
 
 // 0x00489c60: controls -2 to -13 are axis directions (below 16384 or above
 // 49152, for enabled axes); others go through the control mapping to slot 2.
-int JoystickDevice::UnknownFunction489c60(int control, int modifier, UnknownInputEntry* entry) {
+int JoystickDevice::GetControlState(int control, int modifier, UnknownInputEntry* entry) {
     if (control < 0) {
         switch (control) {
         case -2:

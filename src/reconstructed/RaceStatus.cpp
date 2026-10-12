@@ -129,8 +129,8 @@ int HasStatusNode(UnknownEventRacerPart* list, UnknownEventRacer* racer) {
 // 0x004e5ca0
 int PruneStatusList(UnknownEventRacerPart** list) {
     while (list && *list) {
-        if (!(*list)->racer->field_0x25_bit0) {
-            (*list)->racer->field_0x744 = 0;
+        if (!(*list)->racer->isEnabled) {
+            (*list)->racer->statusNode = 0;
             UnknownEventRacerPart* status = *list;
             *list = status->next;
             DebugFree(status, __FILE__, 193);
@@ -269,11 +269,11 @@ int RankByScore(int keepRacing) {
 
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         count = 0;
-        UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
+        UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
         UnknownEventRacer* racer;
         iterator = 0;
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
-            if (racer->field_0x25_bit0) {
+            if (racer->isEnabled) {
                 scores[count].value = racer->score;
                 scores[count].racer = racer;
                 count++;
@@ -283,7 +283,7 @@ int RankByScore(int keepRacing) {
         for (i = 0; i < count; i++)
             scores[i].racer->finishPosition = i + 1;
         if (!keepRacing) {
-            TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
+            TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
             if (owner->field_0x70 * 60.0f + owner->field_0x74 >=
                 g_TrackGame->mode.raceSettings.field_0x140 * 60.0f - 1.0f) {
                 for (i = 0; i < count; i++)
@@ -329,7 +329,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                     (!racer->field_0x735 && status->field_0x08 >= 0.0f && status->field_0x08 < g_UnknownGlobal572988)) {
                     if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
                                               &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
-                                              racer->field_0x754, &racer->lapStartTime, &racer->field_0x750, 1,
+                                              racer->totalRunningTime, &racer->lapStartTime, &racer->fastestLap, 1,
                                               unlimited, racer->field_0x735, racer->field_0x7c0)) {
                         status->field_0x44.node = finish->field_0x2c.node;
                         status->field_0x44.segment = finish->field_0x2c.segment;
@@ -357,26 +357,26 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                     int remaining = lapLimit - racer->lapCount;
                     if (remaining >= 1) {
                         if (racer->lapCount < 1)
-                            racer->field_0x754 = 0;
+                            racer->totalRunningTime = 0;
                         else
-                            racer->field_0x754 = remaining * racer->lastLapTime;
+                            racer->totalRunningTime = remaining * racer->lastLapTime;
                     }
-                    if (previous && racer->field_0x754 < previous->racer->field_0x754)
-                        racer->field_0x754 = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->field_0x754 + 1.0f;
+                    if (previous && racer->totalRunningTime < previous->racer->totalRunningTime)
+                        racer->totalRunningTime = UNKNOWN_RANDOM_UNIT() * 10 + previous->racer->totalRunningTime + 1.0f;
                     if (lapLimit == 1)
-                        racer->lastLapTime = racer->field_0x754;
+                        racer->lastLapTime = racer->totalRunningTime;
                     else if (racer->lapCount < 1)
                         racer->lastLapTime = UNKNOWN_RANDOM_UNIT() * 10 +
                                              racer->bikeView->localRacer->lastLapTime + 1.0f;
-                    if (racer->lastLapTime < racer->field_0x750 || racer->field_0x750 <= 0.0f)
-                        racer->field_0x750 = racer->lastLapTime;
+                    if (racer->lastLapTime < racer->fastestLap || racer->fastestLap <= 0.0f)
+                        racer->fastestLap = racer->lastLapTime;
                     racer->lapCount = lapLimit;
                     racer->hasFinished = 1;
                     goto next;
                 }
             }
             if (!racer->hasFinished)
-                racer->field_0x754 += frameTime;
+                racer->totalRunningTime += frameTime;
         }
     next:
         if (status->field_0x44.node && status->field_0x44.segment && status->field_0x44.segment->next) {

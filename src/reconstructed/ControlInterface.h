@@ -40,21 +40,21 @@ struct UnknownControlBinding {
     void Adjust(float delta);                                 // 0x0043cd90: adds delta, clamped
     void Unbind();                                            // 0x0043cde0: the device drops this id
 
-    InputDevice* field_0x00;  // owning device
-    int field_0x04;           // id the device's slot 0 unbinds by
-    int field_0x08;           // axis or list index; -1 when reset
-    int field_0x0c;           // -1 when reset
-    int field_0x10;           // -1 when reset
-    float field_0x14;         // KeyboardDevice 0x0048a0c0: timer for key +0x0c
-    float field_0x18;         // timer for key +0x10
-    float field_0x1c;         // step per repeat
-    float field_0x20;         // repeat interval
-    float field_0x24;         // current value, kept within [min, max]
-    float field_0x28;         // centre; used inside the dead zone
-    float field_0x2c;         // minimum
-    float field_0x30;         // maximum
-    float field_0x34;         // centre + dead zone
-    float field_0x38;         // centre - dead zone
+    InputDevice* owner;                       // +0x00 owning device
+    int bindingId;                            // +0x04 id the device's slot 0 unbinds by
+    int axisIndex;                            // +0x08 axis or list index; -1 when reset
+    int firstKey;                             // +0x0c -1 when reset
+    int secondKey;                            // +0x10 -1 when reset
+    float firstKeyTimer;                      // +0x14 KeyboardDevice 0x0048a0c0: timer for key +0x0c
+    float secondKeyTimer;                     // +0x18 timer for key +0x10
+    float repeatStep;                         // +0x1c step per repeat
+    float repeatInterval;                     // +0x20 repeat interval
+    float currentValue;                       // +0x24 current value, kept within [min, max]
+    float centerValue;                        // +0x28 centre; used inside the dead zone
+    float minValue;                           // +0x2c minimum
+    float maxValue;                           // +0x30 maximum
+    float deadZoneHigh;                       // +0x34 centre + dead zone
+    float deadZoneLow;                        // +0x38 centre - dead zone
 };
 
 // 20-byte input event queued by 0x0043cea0.

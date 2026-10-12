@@ -138,7 +138,7 @@ int UnknownTrackGameObject33fc::BindAxis(UnknownControlBinding* binding, int kin
         }
         break;
     case 0:
-        g_TrackGame->controlInterface->keyboard->UnknownFunction489f80(binding, code, code2, 0.018f,
+        g_TrackGame->controlInterface->keyboard->BindKeys(binding, code, code2, 0.018f,
                                                                       0.01f);
         return 1;
     }

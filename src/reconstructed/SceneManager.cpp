@@ -200,7 +200,7 @@ void UnknownTrackGameObject574::ReadSceneName(char* out, char* name, int index,
         UnknownParameterBlock block;
         UnknownTextureStream* archive = OpenSceneArchive(scene);
         if (archive) {
-            archive->UnknownFunction461cb0(a, b);
+            archive->GetFileTimes(a, b);
             block.OpenFromArchives((UnknownParameterStream*)archive, scene, path, 0);
             block.SelectSection("SceneInfo");
             block.GetInt("NumberOfWaypointRaces", 0, &waypointRaceCount);
@@ -314,7 +314,7 @@ Scene* Scene::UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int valu
     sceneManager = manager;
     auralScape = value;
     field_0x88 = flag;
-    soundGroup = new(__FILE__, 622) SoundGroup(field_0x25_bit0);
+    soundGroup = new(__FILE__, 622) SoundGroup(isEnabled);
     AppendChild(soundGroup, -1);
     return this;
 }
@@ -980,7 +980,7 @@ void Scene::AttachCasterShadows(ProjectedShadow* shadow, int flags)
     if (shadow && staticModels) {
         for (int i = 0; i < staticModels->casterCount; i++)
             AppendChild((new(__FILE__, 2136) D3DIMSoultreeShadow(flags))
-                                      ->Attach((int)field_0x18, staticModels->casters[i].model,
+                                      ->Attach((int)renderContext, staticModels->casters[i].model,
                                                shadow),
                                   -1);
     }
@@ -1029,8 +1029,8 @@ int Scene::ReadSounds()
                         }
                         SoundEmitter* emitter =
                             (new(__FILE__, 2588)
-                                 SoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
-                                ->UnknownFunction402260(field_0x18, file, params, flags, oneShotDistance,
+                                 SoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))
+                                ->Create(renderContext, file, params, flags, oneShotDistance,
                                                         randomTriggerPercent, 0, force2D);
                         AppendChild(emitter, -1);
                         if (!emitter) {
@@ -1144,7 +1144,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     ReadVector(&defaultStartPosition, "SceneInfo", "DefaultStartPosition", "1152.0,100.0,1152.0", 1, 0);
     ReadVector(&defaultStartDirection, "SceneInfo", "DefaultStartDirection", "0.0,0.0,1.0", 1, 0);
     UnknownFunction464e80("");
-    field_0x18 = owner;
+    renderContext = owner;
     ReadVector(&podiumPosition, "SceneInfo", "PodiumPosition", "0.0,0.0,0.0", 1, 0);
     ReadVector(&podiumDirection, "SceneInfo", "PodiumDirection", "0.0,0.0,0.0", 1, 0);
     if (!ReadEnvironment(sceneManager->sceneDirectory, cubeDirectory))
@@ -1165,7 +1165,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
             int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->textureManager : 0;
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
-                    ->Create(field_0x18, sceneLights[i].type, sceneLights[i].color,
+                    ->Create(renderContext, sceneLights[i].type, sceneLights[i].color,
                                             &sceneLights[i].position, sceneLights[i].field_0x34,
                                             sceneLights[i].range, sceneLights[i].showDebugSphere, 0, camera,
                                             (int)flare, i);
@@ -1196,7 +1196,7 @@ void Scene::SetDetailLevel(int level)
         int i;
         for (i = 0; i < animationTable->entryCount; i++) {
             if (animationTable->entries[i].keyFramed)
-                animationTable->entries[i].character->field_0x1a0->ApplyLodSettings(level);
+                animationTable->entries[i].character->modelNode->ApplyLodSettings(level);
             else
                 ((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)
                     ->field_0x34->ApplyLodSettings(level);
@@ -1204,7 +1204,7 @@ void Scene::SetDetailLevel(int level)
         for (i = 0; i < animationTable->randomSetCount; i++) {
             UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
-                entry->character->field_0x1a0->ApplyLodSettings(level);
+                entry->character->modelNode->ApplyLodSettings(level);
             else
                 ((UnknownSceneAnimatedObject*)entry->proceduralObject)->field_0x34->ApplyLodSettings(level);
         }
