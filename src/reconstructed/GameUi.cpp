@@ -1070,11 +1070,11 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     sorting = 0;
     selectable = 1;
     allowWScroll = 1;
-    field_0x234 = 0;
-    field_0x230 = 0;
-    field_0x22c = 0;
+    dragOffsetX = 0;
+    scrollOffsetX = 0;
+    dragStartX = 0;
     lastClickTime = 0;
-    field_0x240 = 0;
+    partialRows = 0;
     rowCount = 0;
     firstVisibleRow = 0;
     lastPageRowCount = 0;
@@ -1253,8 +1253,8 @@ void UIListBox::RequestRedraw() {
 }
 
 // 0x00477e60
-void UIListBox::UnknownFunction477e60(int a) {
-    field_0x240 = a;
+void UIListBox::SetPartialRows(int value) {
+    partialRows = value;
     if (!visibleRowCount)
         visibleRowCount = 1;
 }
@@ -1262,11 +1262,11 @@ void UIListBox::UnknownFunction477e60(int a) {
 // 0x00478190
 void UIListBox::ButtonHeld(int a, int* position) {
     if (a == 1 && position) {
-        int delta = position[0] - field_0x22c;
-        field_0x234 = delta;
-        if (delta >= -field_0x230)
-            delta = -field_0x230;
-        field_0x234 = delta;
+        int delta = position[0] - dragStartX;
+        dragOffsetX = delta;
+        if (delta >= -scrollOffsetX)
+            delta = -scrollOffsetX;
+        dragOffsetX = delta;
         RequestRedraw();
     }
     UIControl::ButtonHeld(a, position);
@@ -2737,7 +2737,7 @@ int UIListBox::CountVisibleRows() {
         for (; i < count; i++) {
             height += rowTable[i].height;
             if (height > space) {
-                if (!rows && field_0x240)
+                if (!rows && partialRows)
                     rows = 1;
                 return rows;
             }
@@ -4578,7 +4578,7 @@ int UIListBox::Draw() {
             for (int row = firstVisibleRow; row < rowCount; row++) {
                 int height = GetRowHeight(row);
                 int whole;
-                if (field_0x240 && visible <= 0) {
+                if (partialRows && visible <= 0) {
                     whole = 0;
                 } else {
                     whole = 1;
@@ -4610,12 +4610,12 @@ int UIListBox::Draw() {
                     if (pass == 1 && rowTable[row].image) {
                         int width = rowTable[row].image->GetCurrentFrame()->frameWidth;
                         int imageHeight = rowTable[row].image->GetCurrentFrame()->frameHeight;
-                        rect.left = field_0x230 + area.left;
+                        rect.left = scrollOffsetX + area.left;
                         rect.top = y;
                         rect.right = rect.left + width;
                         if (rect.right >= area.right)
                             rect.right = area.right;
-                        if (field_0x240) {
+                        if (partialRows) {
                             if (imageHeight + y >= area.bottom)
                                 rect.bottom = area.bottom;
                             else
@@ -4659,8 +4659,8 @@ int UIListBox::Draw() {
                                 color = textColor;
                         }
                         if (rowTable[row].width) {
-                            rect.left += field_0x234 + field_0x230;
-                            rect.right += field_0x234 + field_0x230;
+                            rect.left += dragOffsetX + scrollOffsetX;
+                            rect.right += dragOffsetX + scrollOffsetX;
                             ownerDialog->DrawAlignedText(dc, &rect, rowTable[row].text,
                                                               rowTable[row].width, color, fontHeight,
                                                               (UnknownGameUiTextRun*)rowTable[row].textLines,
@@ -5079,8 +5079,8 @@ void UIListBox::ScrollBy(int delta) {
 // 0x00477ff0
 int UIListBox::ButtonUp(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && a == 1) {
-        field_0x230 += field_0x234;
-        field_0x234 = 0;
+        scrollOffsetX += dragOffsetX;
+        dragOffsetX = 0;
     }
     return UIControl::ButtonUp(a, position);
 }

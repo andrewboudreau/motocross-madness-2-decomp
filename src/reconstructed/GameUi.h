@@ -526,7 +526,7 @@ public:
     void Sort(int a);                         // 0x00477900: qsorts the rows
     void SetSelectable(int a);                // 0x00477bb0: "Selectable" (+0x224)
     void UpdateScrollBars();                  // 0x00477bc0: the attached scroll bars follow
-    void UnknownFunction477e60(int a);        // 0x00477e60
+    void SetPartialRows(int value);           // 0x00477e60: partialRows (SelectGamePicProcs.cpp)
     char* UnknownFunction476970(int row);     // 0x00476970
     int GetRowHeight(int row);                // 0x004769a0
     void SetAutoSort(int value);              // 0x00477b90: "AutoSort"
@@ -552,12 +552,12 @@ public:
     int sorting;                              // +0x220: 1 while Sort runs
     int selectable;                           // +0x224: "Selectable"
     int allowWScroll;                         // +0x228: "AllowWScroll"
-    int field_0x22c;
-    int field_0x230;
-    int field_0x234;
+    int dragStartX;                           // +0x22c: x where the AllowWScroll drag began (ButtonDown)
+    int scrollOffsetX;                        // +0x230: the rows' horizontal offset (<= 0)
+    int dragOffsetX;                          // +0x234: the drag in progress, added to +0x230 on ButtonUp
     int lastClickRow;                         // +0x238: for the double click (slot 66)
     int lastClickTime;                        // +0x23c
-    int field_0x240;
+    int partialRows;                          // +0x240: a clipped last row is drawn and counted (provisional)
     int wrapScroll;                           // +0x244: ScrollBy wraps around the rows (1 by default)
     int hoverRow;                             // +0x248: the row under the cursor, framed (-1: none; slot 10)
     int (*sortCompare)(const void* a, const void* b); // +0x24c: the rows' sort order (SetSortCompare)

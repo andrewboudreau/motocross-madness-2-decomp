@@ -268,7 +268,7 @@ int UIListBox::ButtonDown(int a, int b) {
                     return 1;
             }
         } else if (a == 1 && allowWScroll) {
-            field_0x22c = point->x;
+            dragStartX = point->x;
             return UIControl::ButtonDown(a, b);
         }
     }

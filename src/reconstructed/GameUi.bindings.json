@@ -309,7 +309,7 @@
   "?ReserveRows@UIListBox@@QAEHH@Z": "0x00476f50",
   "?UnknownFunction477800@@YAHPBX0@Z": "0x00477800",
   "?UnknownFunction477b60@@YAHPBX0@Z": "0x00477b60",
-  "?UnknownFunction477e60@UIListBox@@QAEXH@Z": "0x00477e60",
+  "?SetPartialRows@UIListBox@@QAEXH@Z": "0x00477e60",
   "?SetOpen@UIDropDownList@@QAEXH@Z": "0x0047a2d0",
   "?LayoutParts@UIDropDownList@@QAEXXZ": "0x0047a400",
   "?IsPart@UIDropDownList@@QAEHPAVUIControl@@@Z": "0x0047a800",

@@ -185,7 +185,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     if (!dialog)
         dialog = (UIDialog*)g_TrackGame->ui->field_0x2c->FindInputDialog();
     UIListBox* pictures = static_cast<UIListBox*>(dialog->FindControl(picture, 0));
-    pictures->UnknownFunction477e60(1);
+    pictures->SetPartialRows(1);
     if (!append)
         pictures->RemoveAllRows();
     if (strcmp(listName, "")) {

@@ -16216,7 +16216,7 @@ CASES = [
         'name': 'gameui.cpp UIControl::fn477e60',
         'bindings': 'src/reconstructed/GameUi.bindings.json',
         'source': 'src/reconstructed/GameUi.cpp',
-        'symbol': '?UnknownFunction477e60@UIListBox@@QAEXH@Z',
+        'symbol': '?SetPartialRows@UIListBox@@QAEXH@Z',
         'target_va': '0x00477e60',
         'target_size': 33,
         'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',
