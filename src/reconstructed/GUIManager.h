@@ -319,7 +319,7 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004857f0
 
     // 0x004853b0: sets the GUI up (KrustyUI 0x004988a0 passes its target,
-    // Display+0x64, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"
+    // Display+0x64 palette, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"
     // and a callback).
     GUIManager* SetUp(void* target, Palette8* palette, TextureMapManager* textures,
                       BackgroundImage* background, int startSound, SoundGroup* sound,

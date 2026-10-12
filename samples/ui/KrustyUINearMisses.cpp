@@ -67,7 +67,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     font[count] = 0;
     gui = new(__FILE__, 121) UnknownKrustyUIGui(1);
     if (!AppendSibling(gui->SetUp(
-            renderContext, g_TrackGame->display->field_0x64, g_TrackGame->textureManager, 0,
+            renderContext, g_TrackGame->display->palette, g_TrackGame->textureManager, 0,
             0, 0, "Arial", 15, "ui\\cursor.tga", GuiProgressCallback, -1))) {
         Release();
         return 0;

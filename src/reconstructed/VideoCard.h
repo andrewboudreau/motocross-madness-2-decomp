@@ -45,7 +45,7 @@ public:
     int textureMemory;                         // +0x58: the mode's texture memory (windowed: MeasureTextureMemory)
     int nonLocalTextureMemory;                 // +0x5c: non-local (AGP) texture memory (windowed: ProbeNonLocalTextureMemory, else 0)
     int textureCacheLimit;                     // +0x60: "TextureCacheLimit" (0x7fffffff if unset)
-    int field_0x64;                               // passed to the GUI setup (KrustyUI 0x004988a0)
+    int palette;                               // +0x64: GUIManager::SetUp's Palette8* (KrustyUI 0x004988a0)
     int field_0x68;
     int freezeFrameIndex;                      // +0x6c: freezes RenderTarget's frame index (0x004e8cc0)
     unsigned char use8BitTextures : 1;         // +0x70 bit 0: "Use8BitTextures"

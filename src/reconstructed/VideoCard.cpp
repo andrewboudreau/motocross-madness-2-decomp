@@ -47,7 +47,7 @@ VideoCard::VideoCard() {
     field_0x68 = 0;
     lastFrameTime = 0x7fffffff;
     shortestFrameTime = 0x7fffffff;
-    field_0x64 = 0;
+    palette = 0;
     currentDisplayMode = -1;
     field_0x88 = 0;
     frameBufferCount = 0;
