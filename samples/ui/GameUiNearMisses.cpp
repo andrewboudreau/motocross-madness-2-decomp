@@ -1011,8 +1011,8 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                                                    dialogFontHeight);
                         dialogFont = CreateFontA(dialogFontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
                                                          0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);
-                        field_0x10c = italic;
-                        field_0x108 = bold;
+                        dialogFontItalic = italic;
+                        dialogFontBold = bold;
                     }
                     if (g_TrackGame->renderTarget->surfacePixelFormat == 8) {
                         int load = 1;
@@ -1576,8 +1576,8 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     }
                     control->fontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
                                                  control->fontHeight);
-                    if (control->fontHeight != dialogFontHeight || bold != field_0x108 ||
-                        italic != field_0x10c) {
+                    if (control->fontHeight != dialogFontHeight || bold != dialogFontBold ||
+                        italic != dialogFontItalic) {
                         control->fontHeight = (int)(control->fontHeight * scaleY);
                         control->fontHandle = (int)CreateFontA(control->fontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM,
                                                                 italic, 0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);

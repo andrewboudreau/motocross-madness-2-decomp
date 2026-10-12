@@ -134,8 +134,8 @@ public:
     void* dialogFont;                         // +0xd8
     int dialogFontHeight;                     // +0xdc
     char dialogFontFace[0x108 - 0xe0];        // +0xe0
-    int field_0x108;                          // bold (GUIManager.cpp)
-    int field_0x10c;
+    int dialogFontBold;                       // +0x108: FW_BOLD for the dialog font (GUIManager.cpp)
+    int dialogFontItalic;                     // +0x10c: the dialog font's italic flag (0x0046a920)
     BackgroundImage* dialogBackground;        // +0x110
     SoundGroup* soundGroup;                   // +0x114
     unsigned int textColors[10];              // +0x118: the text colors "~0".."~9" select
@@ -182,7 +182,7 @@ public:
     int sendFrameEvent;                       // +0x7f40: sends kind 0x12 on the next frame
     PCTextureMap* screenGrab;                 // +0x7f44: the screen behind it
     int grabRegion;                           // +0x7f48: -1 by default
-    int field_0x7f4c;
+    int grabCopyFrames;                       // +0x7f4c: the screen grab's full-copy frames left (BackgroundImage::DrawImage `frames`)
     int isClosing;                            // +0x7f50
     int closeFrame;                           // +0x7f54: the frame it closed on
 };
@@ -225,5 +225,5 @@ public:
     int framesShown;                          // +0x7f58: frames shown (dlgprocs.cpp)
     float secondsShown;                       // +0x7f5c: seconds shown (dlgprocs.cpp)
     int frameRan;                             // +0x7f60: set once a frame has run (dlgprocs.cpp)
-    int field_0x7f64;                             // a key or the "GoLink" button closes it (dlgprocs.cpp)
+    int closeRequested;                       // +0x7f64: a key or the "GoLink" button asks to close (dlgprocs.cpp)
 };

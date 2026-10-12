@@ -1789,8 +1789,8 @@ UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
     guiManager = 0;
     dialogResult = 0;
     dialogFont = 0;
-    field_0x108 = 0;
-    field_0x10c = 0;
+    dialogFontBold = 0;
+    dialogFontItalic = 0;
     dialogFontFace[0] = 0;
     screenWidth = 640;
     screenHeight = 480;
@@ -2060,7 +2060,7 @@ int UIDialog::UnknownVirtualSlot13() {
     } else if (screenGrab && !controlsPost3D) {
         if (dialogBackground)
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
-                                                       grabRegion, 1, &field_0x7f4c, 0);
+                                                       grabRegion, 1, &grabCopyFrames, 0);
         else
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
@@ -2082,7 +2082,7 @@ int UIDialog::UnknownVirtualSlot15() {
     } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
-                                                       grabRegion, 1, &field_0x7f4c, 0);
+                                                       grabRegion, 1, &grabCopyFrames, 0);
         else
             ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
@@ -2212,7 +2212,7 @@ void UIDialog::ReleaseBackgroundGrab() {
     }
     screenGrab = 0;
     grabRegion = -1;
-    field_0x7f4c = 0;
+    grabCopyFrames = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -4045,8 +4045,8 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
     strcpy(dialogFontFace, font);
     dialogFont = CreateFontA(dialogFontHeight, 0, 0, 0, FW_MEDIUM, 0, 0, 0, DEFAULT_CHARSET, 0, 0, PROOF_QUALITY,
                              VARIABLE_PITCH, dialogFontFace);
-    field_0x108 = 0;
-    field_0x10c = 0;
+    dialogFontBold = 0;
+    dialogFontItalic = 0;
     controlContainer = (GameObject*)AppendChild(new(__FILE__, 0x16e) UICtlContainer, -1);
     UnknownDialogEvent event;
     event.handled = 0;

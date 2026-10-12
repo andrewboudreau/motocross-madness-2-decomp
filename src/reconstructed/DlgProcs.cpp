@@ -2676,14 +2676,14 @@ void Exit1Dlg::HandleEvent(UnknownDialogEvent* event) {
         frameRan = 0;
         secondsShown = 0.0f;
         framesShown = 0;
-        field_0x7f64 = 0;
+        closeRequested = 0;
         g_TrackGame->ResetClock();
         guiManager->ShowCursors(1);
         break;
     case kDialogCommand:
         if (!_stricmp("GoLink", event->controlName)) {
             g_TrackGame->openStorePageOnExit = 1;
-            field_0x7f64 = 1;
+            closeRequested = 1;
         }
         break;
     }
@@ -2694,7 +2694,7 @@ int Exit1Dlg::UnknownVirtualSlot10(float frameTime) {
     secondsShown = frameTime + secondsShown;
     framesShown++;
     frameRan = 1;
-    if ((field_0x7f64 || secondsShown > 15.0f) && framesShown >= 3)
+    if ((closeRequested || secondsShown > 15.0f) && framesShown >= 3)
         EndDialog(0);
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }
@@ -2702,6 +2702,6 @@ int Exit1Dlg::UnknownVirtualSlot10(float frameTime) {
 // 0x00455d70
 int Exit1Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1 && !event->kind)
-        field_0x7f64 = 1;
+        closeRequested = 1;
     return UIDialog::UnknownVirtualSlot23(event, entry);
 }

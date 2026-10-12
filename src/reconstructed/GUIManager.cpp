@@ -1068,7 +1068,7 @@ void GUIUser::EnableImeInput(int enable) {
         } else if (control->ownerDialog->dialogFontFace[0]) {
             face = control->ownerDialog->dialogFontFace;
             font.lfHeight = control->ownerDialog->dialogFontHeight;
-            font.lfWeight = control->ownerDialog->field_0x108 ? 700 : 500;
+            font.lfWeight = control->ownerDialog->dialogFontBold ? 700 : 500;
         } else {
             face = control->ownerGui->dialogFontName;
             font.lfHeight = control->ownerGui->dialogFontSize;
