@@ -47,7 +47,7 @@ int DebugOverlay::LoadFont()
                                           ((RenderTarget*)field_0x18)->surfacePixelFormat, 0, 8, 0, 1, 0,
                                           5, 6, 0, 0x80, 0xff00ff);
         void* bits = fontTexture->UnknownVirtualSlot13(0, 0, 0);
-        memset(bits, 0, PixelFormatBytesPerPixel(fontTexture->field_0x20) << 16);
+        memset(bits, 0, PixelFormatBytesPerPixel(fontTexture->mapFormat) << 16);
         fontTexture->UnknownVirtualSlot14(0);
 
         LOGFONT font;

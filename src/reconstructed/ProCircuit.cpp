@@ -111,13 +111,13 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
         field_0x1285[0].field_0x00 = 0;
         field_0x1285[4].field_0x00 = 0;
         block.SelectSection("Enduro");
-        UnknownFunction4d4420(&block, &field_0x1285[5], "Teraform\\Enduro");
+        ReadSchedule(&block, &field_0x1285[5], "Teraform\\Enduro");
         block.SelectSection("Baja");
-        UnknownFunction4d4420(&block, &field_0x1285[1], "Teraform\\Baja");
+        ReadSchedule(&block, &field_0x1285[1], "Teraform\\Baja");
         block.SelectSection("Nationals");
-        UnknownFunction4d4420(&block, &field_0x1285[2], "Teraform\\National");
+        ReadSchedule(&block, &field_0x1285[2], "Teraform\\National");
         block.SelectSection("Supercross");
-        UnknownFunction4d4420(&block, &field_0x1285[3], "Teraform\\SX");
+        ReadSchedule(&block, &field_0x1285[3], "Teraform\\SX");
     } else {
         for (int i = 0; i < 6; i++) {
             field_0x1285[i].field_0x00 = 0;
@@ -157,7 +157,7 @@ void UnknownTrackGameObject3444::FreeSchedule(UnknownProCircuitSchedule* schedul
 }
 
 // 0x004d3b00
-void UnknownTrackGameObject3444::UnknownFunction4d3b00(const char* name, int a, int b, int count)
+void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int count)
 {
     field_0x460 = count;
     field_0x50 = a;
@@ -345,7 +345,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
 }
 
 // 0x004d4420
-int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* block,
+int UnknownTrackGameObject3444::ReadSchedule(UnknownParameterBlock* block,
                                                       UnknownProCircuitSchedule* schedule,
                                                       const char* directory)
 {

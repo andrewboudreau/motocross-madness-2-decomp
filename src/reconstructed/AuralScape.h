@@ -60,36 +60,36 @@ public:
     SoundEmitter* UnknownFunction402260(void* target, const char* name, UnknownSound3DParameters params,
                                         unsigned long flags, float oneShotDistance,
                                         float randomTriggerPercent, int is2D, int force2D);
-    void UnknownFunction402420(UnknownSound3DParameters params); // 0x00402420
+    void SetSoundParameters(UnknownSound3DParameters params); // 0x00402420
     void UnknownFunction402470(Vector3* position, Vector3* velocity); // 0x00402470
     // 0x00402530: the distance to the nearest listener; sets bit 1 when
     // the emitter can be heard.
-    void UnknownFunction402530(int count, AuralScapeListener** listeners);
-    int UnknownFunction402680();             // 0x00402680: whether playing
-    int UnknownFunction402690(long volume);  // 0x00402690
-    int UnknownFunction4026b0(long pan);     // 0x004026b0
-    int UnknownFunction4026d0();             // 0x004026d0: stops
-    int UnknownFunction402700(unsigned long flags); // 0x00402700: loads the sound
-    void UnknownFunction4027f0();            // 0x004027f0: releases the sound
-    int UnknownFunction402810();             // 0x00402810: starts playing
+    void UpdateListenerDistance(int count, AuralScapeListener** listeners);
+    int IsPlaying();             // 0x00402680: whether playing
+    int SetVolume(long volume);  // 0x00402690
+    int SetPan(long pan);     // 0x004026b0
+    int Stop();             // 0x004026d0: stops
+    int LoadSound(unsigned long flags); // 0x00402700: loads the sound
+    void ReleaseSound();            // 0x004027f0: releases the sound
+    int Play();             // 0x00402810: starts playing
 
-    AuralScape* field_0x2c;
-    SoundGroup* field_0x30;
-    Sound* field_0x34;
-    float field_0x38;                        // one-shot distance
-    float field_0x3c;                        // random trigger percent (100)
-    short field_0x40;                        // type
-    int field_0x44;                          // serial number (0x00577734)
-    char field_0x48[0x104];                  // file name
-    unsigned long field_0x14c;               // flags: 1 one-shot, 2 3D, 4, 8 loop, 0x10/0x20 buffer kind
-    UnknownSound3DParameters field_0x150;
-    Vector3 field_0x190;                     // previous position
-    float field_0x19c;                       // distance to the nearest listener
-    unsigned char field_0x1a0_bit0 : 1;      // one-shot fired
-    unsigned char field_0x1a0_bit1 : 1;      // audible
+    AuralScape* ownerScape;                   // +0x2c
+    SoundGroup* emitterGroup;                 // +0x30
+    Sound* loadedSound;                       // +0x34
+    float oneShotRange;                       // +0x38 one-shot distance
+    float triggerPercent;                     // +0x3c random trigger percent (100)
+    short emitterType;                        // +0x40 type
+    int serialNumber;                         // +0x44 serial number (0x00577734)
+    char fileName[0x104];                     // +0x48 file name
+    unsigned long emitterFlags;               // +0x14c flags: 1 one-shot, 2 3D, 4, 8 loop, 0x10/0x20 buffer kind
+    UnknownSound3DParameters soundParameters; // +0x150
+    Vector3 previousPosition;                 // +0x190 previous position
+    float listenerDistance;                   // +0x19c distance to the nearest listener
+    unsigned char oneShotFired : 1;           // +0x1a0 one-shot fired
+    unsigned char audible : 1;                // +0x1a0 audible
     unsigned char field_0x1a0_bit2 : 1;
     unsigned char field_0x1a0_bit3 : 1;
-    unsigned char field_0x1a0_bit4 : 1;      // started
+    unsigned char started : 1;                // +0x1a0 started
 };
 
 // RTTI: SoultreeSoundEmitter : SoundEmitter (0x1ac bytes): an emitter that
@@ -108,8 +108,8 @@ public:
                                                 unsigned long flags, float oneShotDistance,
                                                 float randomTriggerPercent, int is2D, int force2D);
 
-    UnknownVehiclePart* field_0x1a4;
-    UnknownVehiclePart* field_0x1a8;
+    UnknownVehiclePart* followedPart;         // +0x1a4
+    UnknownVehiclePart* childPart;            // +0x1a8
 };
 
 // What AuralScape+0x94 points at: +0xa4 holds a table whose +0x410 has four
@@ -148,28 +148,28 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime);
 
     AuralScape* UnknownFunction402f00(void* target, int sounds); // 0x00402f00
-    int UnknownFunction403000();                  // 0x00403000: next number
-    int UnknownFunction403010(int index, float doppler, float rolloff); // 0x00403010
+    int NextListenerNumber();                  // 0x00403000: next number
+    int AddListener(int index, float doppler, float rolloff); // 0x00403010
     void UnknownFunction4030a0(int index, Vector3* position, Vector3* front, Vector3* top,
                                Vector3* velocity); // 0x004030a0
-    void UnknownFunction403150();                 // 0x00403150: picks the emitters to play
+    void PickEmittersToPlay();                 // 0x00403150: picks the emitters to play
     void UnknownUpdateDistances();                // inline: each emitter's nearest listener
-    int UnknownFunction403b20(SoundEmitter* emitter); // 0x00403b20
-    int UnknownFunction403bc0(SoundEmitter* emitter); // 0x00403bc0
+    int AddEmitter(SoundEmitter* emitter); // 0x00403b20
+    int RemoveEmitter(SoundEmitter* emitter); // 0x00403bc0
 
-    int field_0x2c;
-    int field_0x30;                          // sound budget
-    int field_0x34;                          // sounds loaded
-    int field_0x38;                          // listener count
-    AuralScapeListener* field_0x3c[2];
-    ContainerList<SoundEmitter*> field_0x44; // all
-    ContainerList<SoundEmitter*> field_0x58; // audible
-    ContainerList<SoundEmitter*> field_0x6c; // playing
-    ContainerList<SoundEmitter*> field_0x80; // waiting for a sound
-    UnknownAuralScapeReverbOwner* field_0x94;
-    UnknownFollowCameraSubject* field_0x98;
-    int field_0x9c;                          // debug page
-    unsigned char field_0xa0_bit0 : 1;       // reverb enabled
+    int listenerNumber;                       // +0x2c
+    int soundBudget;                          // +0x30 sound budget
+    int soundsLoaded;                         // +0x34 sounds loaded
+    int listenerCount;                        // +0x38 listener count
+    AuralScapeListener* listeners[2];         // +0x3c
+    ContainerList<SoundEmitter*> allEmitters; // +0x44 all
+    ContainerList<SoundEmitter*> audibleEmitters; // +0x58 audible
+    ContainerList<SoundEmitter*> playingEmitters; // +0x6c playing
+    ContainerList<SoundEmitter*> waitingEmitters; // +0x80 waiting for a sound
+    UnknownAuralScapeReverbOwner* reverbOwner; // +0x94
+    UnknownFollowCameraSubject* groundSubject; // +0x98
+    int debugPage;                            // +0x9c debug page
+    unsigned char reverbEnabled : 1;          // +0xa0 reverb enabled
 };
 
 // 0x00402070: volume (and pan, always 0) for a sound `distance` from the

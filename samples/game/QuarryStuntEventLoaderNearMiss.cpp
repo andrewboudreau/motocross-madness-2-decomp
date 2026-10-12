@@ -496,9 +496,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Audio");
     auralScape = (new(__FILE__, 576) AuralScape(g_TrackGame->mode.soundOn))
                      ->UnknownFunction402f00(field_0x18, 16);
-    auralScape->field_0xa0_bit0 = g_TrackGame->mode.eaxEnabled;
-    auralScapeListener = auralScape->UnknownFunction403000();
-    auralScape->UnknownFunction403010(auralScapeListener, 1.0f, 1.0f);
+    auralScape->reverbEnabled = g_TrackGame->mode.eaxEnabled;
+    auralScapeListener = auralScape->NextListenerNumber();
+    auralScape->AddListener(auralScapeListener, 1.0f, 1.0f);
     g_MemTagStack->Pop(0);
 
     lightManager = new(__FILE__, 582) LightManager(1);
@@ -776,7 +776,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
     if (auralScape) {
-        auralScape->field_0x98 = (UnknownFollowCameraSubject*)eventTerrain;
+        auralScape->groundSubject = (UnknownFollowCameraSubject*)eventTerrain;
         AppendChild(auralScape, -1);
     }
 

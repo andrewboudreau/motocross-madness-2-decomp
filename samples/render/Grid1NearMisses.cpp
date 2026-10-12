@@ -140,7 +140,7 @@ retry:
                                 } else {
                                     Extra()->blocks[block].texture = Terrain()->AcquireOwnedObject();
                                     BuildBlockTexture(block, Extra()->blocks[block].texture);
-                                    if (Extra()->blocks[block].texture->field_0x68 & 1)
+                                    if (Extra()->blocks[block].texture->mapFlags & 1)
                                         Extra()->blocks[block].texture->Reregister();
                                     Extra()->textureFlags |= 1 << block;
                                     g_grid1OwnTextureCount++;
@@ -214,7 +214,7 @@ sharedTexture:
     data->field_0x158 = 0.0f;
     data->field_0x15c = 0.0f;
     data->field_0x160 = 1.0f / 16.0f;
-    if (Extra()->texture->field_0x14 == 0x40) {
+    if (Extra()->texture->textureWidth == 0x40) {
         scale = 0.25f;
         data->field_0x160 = 1.0f;
     }
@@ -223,7 +223,7 @@ sharedTexture:
 createTexture:
     Extra()->field_0x10 = Terrain()->AcquireOwnedObject();
     BuildNodeTexture((ManagedTexture*)Extra()->field_0x10);
-    if (((ManagedTexture*)Extra()->field_0x10)->field_0x68 & 1)
+    if (((ManagedTexture*)Extra()->field_0x10)->mapFlags & 1)
         ((ManagedTexture*)Extra()->field_0x10)->Reregister();
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
@@ -236,10 +236,10 @@ ownTexture:
     data->field_0x158 = 0.0f;
     data->field_0x15c = 0.0f;
     data->field_0x160 = 1.0f / 16.0f;
-    if (Extra()->texture->field_0x14 == 0x40) {
+    if (Extra()->texture->textureWidth == 0x40) {
         scale = 0.25f;
         data->field_0x160 = 1.0f;
-    } else if (Extra()->texture->field_0x14 == 0x80) {
+    } else if (Extra()->texture->textureWidth == 0x80) {
         scale = 0.5f;
         data->field_0x160 = 1.0f / 16.0f;
     }
@@ -279,8 +279,8 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
         return 0;
 
     unsigned char* bits = (unsigned char*)texture->UnknownVirtualSlot13(0, 0, 0);
-    unsigned char* out = texture->field_0x14 == 0x100 ? bits : g_grid1TextureBuffer;
-    int bpp = PixelFormatBytesPerPixel(texture->field_0x20);
+    unsigned char* out = texture->textureWidth == 0x100 ? bits : g_grid1TextureBuffer;
+    int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int tileStride = bpp << 4;
     unsigned char* runs = (unsigned char*)Extra()->field_0x04 + index * 2;
     do {
@@ -331,9 +331,9 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
 
     for (int i = 0; i < count; i++)
         Terrain()->textures[tiles[i]]->UnknownVirtualSlot17(16);
-    if (texture->field_0x14 != 0x100)
-        Downsample(bits, g_grid1TextureBuffer, texture->field_0x14, texture->field_0x14,
-                              texture->field_0x14, texture->field_0x14 * 2, 1, texture->field_0x20,
+    if (texture->textureWidth != 0x100)
+        Downsample(bits, g_grid1TextureBuffer, texture->textureWidth, texture->textureWidth,
+                              texture->textureWidth, texture->textureWidth * 2, 1, texture->mapFormat,
                               texture->field_0x2c, 2);
     texture->UnknownVirtualSlot14(0);
     texture->UnknownVirtualSlot15(1);
@@ -359,9 +359,9 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
         return 0;
 
     unsigned char* out = (unsigned char*)texture->UnknownVirtualSlot13(0, 0, 0);
-    int width = texture->field_0x14;
+    int width = texture->textureWidth;
     int tileSize = width / 4;
-    int bpp = PixelFormatBytesPerPixel(texture->field_0x20);
+    int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int pitch = bpp * width;
     int tileStride = bpp * tileSize;
     unsigned char* runs = (unsigned char*)Extra()->field_0x04 + index * 2;

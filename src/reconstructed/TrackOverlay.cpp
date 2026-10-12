@@ -1077,7 +1077,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         return 0;
     }
     overlayTexture = backingTexture->UnknownVirtualSlot6();
-    if (overlayTexture->field_0x20 == 4444)
+    if (overlayTexture->mapFormat == 4444)
         overlayTexture->UnknownFunction50abd0(5, 6);
     overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;

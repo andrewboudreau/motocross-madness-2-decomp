@@ -19,9 +19,9 @@ UnknownTextureMapList::UnknownTextureMapList() {
 // 0x00510a60
 UnknownTextureMapList::~UnknownTextureMapList() {
     for (m_cursor = m_head; m_cursor;) {
-        TextureMap* next = m_cursor->field_0x08;
-        m_cursor->field_0x08 = 0;
-        m_cursor->field_0x0c = 0;
+        TextureMap* next = m_cursor->nextTexture;
+        m_cursor->nextTexture = 0;
+        m_cursor->previousTexture = 0;
         m_cursor = next;
     }
 }
@@ -39,14 +39,14 @@ TextureMap* UnknownTextureMapList::Last() {
 // 0x00510ab0
 TextureMap* UnknownTextureMapList::Next() {
     if (m_cursor)
-        m_cursor = m_cursor->field_0x08;
+        m_cursor = m_cursor->nextTexture;
     return m_cursor;
 }
 
 // 0x00510ad0
 TextureMap* UnknownTextureMapList::Previous() {
     if (m_cursor)
-        m_cursor = m_cursor->field_0x0c;
+        m_cursor = m_cursor->previousTexture;
     return m_cursor;
 }
 
@@ -55,13 +55,13 @@ void UnknownTextureMapList::Append(TextureMap* texture) {
     if (!m_head) {
         m_tail = texture;
         m_head = texture;
-        texture->field_0x0c = 0;
-        texture->field_0x08 = 0;
+        texture->previousTexture = 0;
+        texture->nextTexture = 0;
         m_count++;
     } else {
-        m_tail->field_0x08 = texture;
-        texture->field_0x0c = m_tail;
-        texture->field_0x08 = 0;
+        m_tail->nextTexture = texture;
+        texture->previousTexture = m_tail;
+        texture->nextTexture = 0;
         m_tail = texture;
         m_count++;
     }
@@ -69,14 +69,14 @@ void UnknownTextureMapList::Append(TextureMap* texture) {
 
 // 0x00510b30
 void UnknownTextureMapList::Remove(TextureMap* texture) {
-    if (texture->field_0x0c)
-        texture->field_0x0c->field_0x08 = texture->field_0x08;
-    if (texture->field_0x08)
-        texture->field_0x08->field_0x0c = texture->field_0x0c;
+    if (texture->previousTexture)
+        texture->previousTexture->nextTexture = texture->nextTexture;
+    if (texture->nextTexture)
+        texture->nextTexture->previousTexture = texture->previousTexture;
     if (m_head == texture)
-        m_head = texture->field_0x08;
+        m_head = texture->nextTexture;
     if (m_tail == texture)
-        m_tail = texture->field_0x0c;
+        m_tail = texture->previousTexture;
     m_count--;
 }
 
@@ -93,8 +93,8 @@ void UnknownTextureMapList::AppendList(UnknownTextureMapList* other) {
             m_count += count;
             m_head = head;
         } else {
-            m_tail->field_0x08 = head;
-            head->field_0x0c = m_tail;
+            m_tail->nextTexture = head;
+            head->previousTexture = m_tail;
             m_tail = tail;
             m_count += count;
         }
@@ -188,19 +188,19 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
         if (TestInputEvent(0x14, 0, event, 0x80)) {
             if (++field_0x58 > 2)
                 field_0x58 = 0;
-            if (!field_0x3c->field_0x44.m_count && field_0x58 == 1)
+            if (!field_0x3c->managedTextures.m_count && field_0x58 == 1)
                 field_0x58 = 2;
-            if (!field_0x3c->field_0x54.m_count && field_0x58 == 2)
+            if (!field_0x3c->cachePages.m_count && field_0x58 == 2)
                 field_0x58 = 0;
         } else if (TestInputEvent(0x21, 0, event, 0x80)) {
-            field_0x3c->field_0x08 ^= 1;
+            field_0x3c->noRepacking ^= 1;
         } else if (TestInputEvent(0x1b, 0, event, 0x80)) {
             if (field_0x58 == 1) {
-                if (++field_0x3c->field_0x1c8 >= field_0x3c->field_0x44.m_count)
-                    field_0x3c->field_0x1c8 = 0;
+                if (++field_0x3c->textureCursor >= field_0x3c->managedTextures.m_count)
+                    field_0x3c->textureCursor = 0;
             } else if (field_0x58 == 2) {
-                if (++field_0x3c->field_0x1c4 >= field_0x3c->field_0x54.m_count)
-                    field_0x3c->field_0x1c4 = 0;
+                if (++field_0x3c->pageCursor >= field_0x3c->cachePages.m_count)
+                    field_0x3c->pageCursor = 0;
             } else if (field_0x58 == 0) {
                 if (++field_0x40 >= field_0x44.m_count)
                     field_0x40 = 0;
@@ -208,11 +208,11 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
             }
         } else if (TestInputEvent(0x1a, 0, event, 0x80)) {
             if (field_0x58 == 1) {
-                if (--field_0x3c->field_0x1c8 < 0)
-                    field_0x3c->field_0x1c8 = field_0x3c->field_0x44.m_count - 1;
+                if (--field_0x3c->textureCursor < 0)
+                    field_0x3c->textureCursor = field_0x3c->managedTextures.m_count - 1;
             } else if (field_0x58 == 2) {
-                if (--field_0x3c->field_0x1c4 < 0)
-                    field_0x3c->field_0x1c4 = field_0x3c->field_0x54.m_count - 1;
+                if (--field_0x3c->pageCursor < 0)
+                    field_0x3c->pageCursor = field_0x3c->cachePages.m_count - 1;
             } else if (field_0x58 == 0) {
                 if (--field_0x40 < 0)
                     field_0x40 = field_0x44.m_count;
@@ -261,13 +261,13 @@ int TextureMapManager::ShareCacheLimit() {
     for (i = 0; i < count; i++) {
         ManagedTextureGroup* group = field_0x44.Get(i);
         steps[i] = 0;
-        sizes[i] = group->field_0x44.m_count;
+        sizes[i] = group->managedTextures.m_count;
         if (!sizes[i])
             sizes[i] = 1;
     }
     if (g_TrackGame->display->isAGP) {
         for (i = 0; i < count; i++) {
-            UnknownTextureMapList* textures = &field_0x44.Get(i)->field_0x44;
+            UnknownTextureMapList* textures = &field_0x44.Get(i)->managedTextures;
             for (TextureMap* texture = textures->First(); texture; texture = textures->Next())
                 static_cast<ManagedTexture*>(texture)->UnknownFunction510760(1, 0, 0);
         }
@@ -319,27 +319,27 @@ void TextureMapManager::CountTextureMemory() {
     for (; texture; texture = field_0x2c.Next()) {
         int kind = 0;
         if (static_cast<PCTextureMap*>(texture)->textureSurface) {
-            if (texture->field_0x14 == 32) {
+            if (texture->textureWidth == 32) {
                 count32++;
                 kind |= 6;
             }
-            if (texture->field_0x14 == 64) {
+            if (texture->textureWidth == 64) {
                 count64++;
                 kind |= 4;
             }
-            if (texture->field_0x14 == 128) {
+            if (texture->textureWidth == 128) {
                 count128++;
                 kind |= 2;
             }
-            if (texture->field_0x14 == 256)
+            if (texture->textureWidth == 256)
                 count256++;
-            kind |= texture->field_0x14 > texture->field_0x1c;
-            kind |= PixelFormatBytesPerPixel(texture->field_0x20) == 1 ? 8 : 0;
+            kind |= texture->textureWidth > texture->field_0x1c;
+            kind |= PixelFormatBytesPerPixel(texture->mapFormat) == 1 ? 8 : 0;
             int pixels = 0;
-            for (int width = texture->field_0x14, height = texture->field_0x18; width >= texture->field_0x1c;
+            for (int width = texture->textureWidth, height = texture->textureHeight; width >= texture->field_0x1c;
                  width /= 2, height /= 2)
                 pixels += height * width;
-            bytes += PixelFormatBytesPerPixel(texture->field_0x20) * pixels;
+            bytes += PixelFormatBytesPerPixel(texture->mapFormat) * pixels;
             cost += g_TrackGame->display->field_0x14[kind];
         }
     }

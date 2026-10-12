@@ -178,8 +178,8 @@ int GameCursor::UnknownVirtualSlot15() {
     if (field_0x58 >= target->targetHeight)
         field_0x58 = target->targetHeight - 1;
 
-    s_right = (field_0x38 ? ((PCTextureMap*)field_0x38)->field_0x14 : field_0x34->field_0x14) + field_0x54;
-    s_bottom = (field_0x38 ? ((PCTextureMap*)field_0x38)->field_0x18 : field_0x34->field_0x18) + field_0x58;
+    s_right = (field_0x38 ? ((PCTextureMap*)field_0x38)->textureWidth : field_0x34->textureWidth) + field_0x54;
+    s_bottom = (field_0x38 ? ((PCTextureMap*)field_0x38)->textureHeight : field_0x34->textureHeight) + field_0x58;
     if (s_right >= ((RenderTarget*)field_0x18)->targetWidth)
         s_right = ((RenderTarget*)field_0x18)->targetWidth;
     if (s_bottom >= ((RenderTarget*)field_0x18)->targetHeight)
@@ -197,15 +197,15 @@ int GameCursor::UnknownVirtualSlot15() {
     if (field_0x44) {
         PCTextureMap* frame = field_0x38 ? (PCTextureMap*)field_0x38 : field_0x34;
         field_0x44->DrawImageRect(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
-                                          (frame->field_0x30 != 0) + 0x10, field_0x48, 0, &field_0x4c, 0);
+                                          (frame->usesColorKey != 0) + 0x10, field_0x48, 0, &field_0x4c, 0);
     } else if (field_0x38) {
         if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, ((PCTextureMap*)field_0x38)->systemSurface, &s_source,
-                (((PCTextureMap*)field_0x38)->field_0x30 ? 0x8000 : 0) + 0x1000000, 0))
+                (((PCTextureMap*)field_0x38)->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
             goto failed;
     } else {
         PCTextureMap* image = field_0x34;
         if (((PCRenderTarget*)field_0x18)->renderSurface->Blt(&s_destination, image->systemSurface, &s_source,
-                (image->field_0x30 ? 0x8000 : 0) + 0x1000000, 0))
+                (image->usesColorKey ? 0x8000 : 0) + 0x1000000, 0))
             goto failed;
     }
     return 1;

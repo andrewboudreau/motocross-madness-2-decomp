@@ -39,23 +39,23 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
     field_0x1d8 = arg6;
     field_0x1dc = riseRate;
     field_0x1e0 = fallRate;
-    field_0x88 = 0.05f;
-    field_0x14[0] = 2.0f;
-    field_0x14[1] = 1.97f;
-    field_0x14[2] = 1.95f;
-    field_0x14[3] = 1.9f;
-    field_0x14[4] = 1.85f;
-    field_0x14[5] = -1.0f;
-    field_0x14[6] = 1.0f;
-    field_0x90 = 0;
+    shiftTime = 0.05f;
+    gearRatios[0] = 2.0f;
+    gearRatios[1] = 1.97f;
+    gearRatios[2] = 1.95f;
+    gearRatios[3] = 1.9f;
+    gearRatios[4] = 1.85f;
+    gearRatios[5] = -1.0f;
+    gearRatios[6] = 1.0f;
+    gearCount = 0;
     for (i = 0; i < 6; i++) {
-        if (field_0x14[i] < 0.0) {
+        if (gearRatios[i] < 0.0) {
             if (i < 4) {
                 sprintf(message, "Gear Ratios invalid in %s\n", name);
             }
             break;
         }
-        field_0x90++;
+        gearCount++;
     }
 
     field_0x74 = 0;
@@ -65,23 +65,23 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
     } else {
         field_0x14c = (float)rpmHigh;
     }
-    field_0x04 = 0;
-    field_0x00 = 0;
+    currentRpm = 0;
+    throttleFraction = 0;
     if (rpmHigh <= 0) {
-        field_0x150 = 3000.0f;
-        field_0x154 = 10250.0f;
+        rpmLowLimit = 3000.0f;
+        rpmHighLimit = 10250.0f;
     } else {
-        field_0x150 = (float)rpmLow;
-        field_0x154 = (float)rpmHigh;
+        rpmLowLimit = (float)rpmLow;
+        rpmHighLimit = (float)rpmHigh;
     }
 
-    field_0x94 = 0;
-    if (field_0x150 != 0.0f && field_0x154 != 0.0f && field_0x150 <= field_0x154) {
+    curvePointCount = 0;
+    if (rpmLowLimit != 0.0f && rpmHighLimit != 0.0f && rpmLowLimit <= rpmHighLimit) {
         rpm[0] = 0.0f;
         torque[0] = 0.0f;
-        field_0x94 = 1;
+        curvePointCount = 1;
         if (rpmHigh <= 0) {
-            field_0x94 = 13;
+            curvePointCount = 13;
             rpm[1] = 3000.0f;
             rpm[2] = 3250.0f;
             rpm[3] = 3750.0f;
@@ -107,128 +107,128 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
             torque[11] = 28.5f;
             torque[12] = 25.0f;
         } else {
-            for (int r = (int)field_0x150; r < (int)field_0x154 + 1; r += rpmStep) {
-                if (field_0x94 > 12) {
+            for (int r = (int)rpmLowLimit; r < (int)rpmHighLimit + 1; r += rpmStep) {
+                if (curvePointCount > 12) {
                     break;
                 }
-                rpm[field_0x94] = (float)r;
-                torque[field_0x94] = (float)torqueTable[field_0x94 - 1];
-                field_0x94++;
+                rpm[curvePointCount] = (float)r;
+                torque[curvePointCount] = (float)torqueTable[curvePointCount - 1];
+                curvePointCount++;
             }
         }
 
-        field_0x158 = -1.0f;
-        field_0x15c = 0;
-        if (field_0x94 > 1) {
-            for (i = 0; i < field_0x94; i++) {
-                field_0x98[i] = rpm[i];
-                field_0xd4[i] = torque[i];
+        peakPower = -1.0f;
+        peakPowerPoint = 0;
+        if (curvePointCount > 1) {
+            for (i = 0; i < curvePointCount; i++) {
+                curveRpm[i] = rpm[i];
+                curveTorque[i] = torque[i];
                 if (i == 0) {
-                    field_0x160[i] = 0;
+                    curvePower[i] = 0;
                 } else {
-                    field_0x160[i] = field_0xd4[i] * 5252.1128f / field_0x98[i];
+                    curvePower[i] = curveTorque[i] * 5252.1128f / curveRpm[i];
                 }
-                if (field_0x160[i] > field_0x158) {
-                    field_0x158 = field_0x160[i];
-                    field_0x15c = i;
+                if (curvePower[i] > peakPower) {
+                    peakPower = curvePower[i];
+                    peakPowerPoint = i;
                 }
                 if (i > 0) {
-                    field_0x110[i] = (field_0xd4[i] - field_0xd4[i - 1]) / (field_0x98[i] - field_0x98[i - 1]);
-                    field_0x19c[i] = (field_0x160[i] - field_0x160[i - 1]) / (field_0x98[i] - field_0x98[i - 1]);
+                    torqueSlope[i] = (curveTorque[i] - curveTorque[i - 1]) / (curveRpm[i] - curveRpm[i - 1]);
+                    powerSlope[i] = (curvePower[i] - curvePower[i - 1]) / (curveRpm[i] - curveRpm[i - 1]);
                 } else {
-                    field_0x110[i] = 0;
-                    field_0x19c[i] = 0;
+                    torqueSlope[i] = 0;
+                    powerSlope[i] = 0;
                 }
             }
         }
     } else {
-        sprintf(message, "Rpm Limits (%d,%d) invalid in %s\n", field_0x150, field_0x154, name);
+        sprintf(message, "Rpm Limits (%d,%d) invalid in %s\n", rpmLowLimit, rpmHighLimit, name);
     }
 
-    for (int gear = 0; gear < field_0x90 - 1; gear++) {
-        float step = field_0x14[gear + 1] / field_0x14[gear];
+    for (int gear = 0; gear < gearCount - 1; gear++) {
+        float step = gearRatios[gear + 1] / gearRatios[gear];
         float bestDifference = 3.4028235e+38f;
         float bestRpm;
-        for (int j = field_0x15c + 1; j < field_0x94; j++) {
-            field_0x04 = UnknownMin(step * field_0x98[j], field_0x98[field_0x15c]);
-            float difference = field_0x160[j] - UnknownPower();
+        for (int j = peakPowerPoint + 1; j < curvePointCount; j++) {
+            currentRpm = UnknownMin(step * curveRpm[j], curveRpm[peakPowerPoint]);
+            float difference = curvePower[j] - UnknownPower();
             if (difference < 0) {
                 difference = -difference;
             }
             if (difference < bestDifference) {
                 bestDifference = difference;
-                bestRpm = field_0x98[j];
+                bestRpm = curveRpm[j];
             }
         }
         if (bestDifference != 3.4028235e+38f) {
-            field_0x30[gear].field_0x00 = UnknownMax(bestRpm - 100.0f, 0.0f);
-            field_0x30[gear].field_0x04 = UnknownMin(bestRpm + 100.0f, field_0x154);
-            field_0x60[gear] = field_0x30[gear].field_0x04 - field_0x30[gear].field_0x00;
+            shiftRanges[gear].lowerRpm = UnknownMax(bestRpm - 100.0f, 0.0f);
+            shiftRanges[gear].upperRpm = UnknownMin(bestRpm + 100.0f, rpmHighLimit);
+            shiftWindowWidths[gear] = shiftRanges[gear].upperRpm - shiftRanges[gear].lowerRpm;
         } else {
             sprintf(message, "Unable to find optimum shift range for GEAR=%d\n", gear);
         }
     }
 
-    field_0x7c = 1500.0f;
+    downShiftRpm = 1500.0f;
     field_0x80 = 3000.0f;
     field_0x8c = 1.0f;
-    field_0x10 = 0;
-    field_0x04 = 0;
-    field_0x84 = 0;
-    field_0x00 = 0;
-    field_0x0c = 0;
+    currentGear = 0;
+    currentRpm = 0;
+    lastUpdateRpm = 0;
+    throttleFraction = 0;
+    shiftTimer = 0;
     field_0x08 = 1;
     float random = UNKNOWN_RANDOM_UNIT();
-    field_0x78 = random * field_0x60[field_0x10] + field_0x30[field_0x10].field_0x00;
+    upShiftRpm = random * shiftWindowWidths[currentGear] + shiftRanges[currentGear].lowerRpm;
 }
 
 // 0x004d2f50
 void UnknownEngineGearbox::UnknownFunction4d2f50(float dt, int engaged, unsigned char arg2)
 {
-    if (engaged && field_0x0c == 0.0f) {
+    if (engaged && shiftTimer == 0.0f) {
         field_0x08 = arg2;
-        if (field_0x00 < 1.0f) {
-            field_0x00 += dt / field_0x8c * field_0x1dc;
-            field_0x00 = UnknownMin(field_0x00, 1.0f);
+        if (throttleFraction < 1.0f) {
+            throttleFraction += dt / field_0x8c * field_0x1dc;
+            throttleFraction = UnknownMin(throttleFraction, 1.0f);
         }
     } else {
         field_0x08 = 1;
-        if (field_0x00 > 0.0f) {
-            field_0x00 -= (field_0x0c != 0.0f ? dt * field_0x1e0 * 0.2f : dt * field_0x1e0 * 0.6f);
-            field_0x00 = UnknownMax(field_0x00, 0.0f);
+        if (throttleFraction > 0.0f) {
+            throttleFraction -= (shiftTimer != 0.0f ? dt * field_0x1e0 * 0.2f : dt * field_0x1e0 * 0.6f);
+            throttleFraction = UnknownMax(throttleFraction, 0.0f);
         }
     }
-    field_0x04 = field_0x154 * field_0x00;
+    currentRpm = rpmHighLimit * throttleFraction;
 }
 
 // 0x004d3030: shifts up past the randomised shift rpm and down below
 // field_0x7c.
 void UnknownEngineGearbox::UnknownFunction4d3030(int arg0, float arg1)
 {
-    if (field_0x0c != 0.0f) {
+    if (shiftTimer != 0.0f) {
         return;
     }
-    if (field_0x04 >= field_0x84 && field_0x04 > field_0x78 && field_0x10 < field_0x90 - 1) {
-        field_0x10++;
-        field_0x00 = UnknownMin(field_0x14[field_0x10] * field_0x00 / field_0x14[field_0x10 - 1], 1.0f);
-        field_0x04 = field_0x00 * field_0x154;
-        if (field_0x04 > field_0x78 && field_0x10 == field_0x90 - 1) {
-            field_0x04 = field_0x78;
+    if (currentRpm >= lastUpdateRpm && currentRpm > upShiftRpm && currentGear < gearCount - 1) {
+        currentGear++;
+        throttleFraction = UnknownMin(gearRatios[currentGear] * throttleFraction / gearRatios[currentGear - 1], 1.0f);
+        currentRpm = throttleFraction * rpmHighLimit;
+        if (currentRpm > upShiftRpm && currentGear == gearCount - 1) {
+            currentRpm = upShiftRpm;
         }
-        field_0x0c = field_0x88;
+        shiftTimer = shiftTime;
         float random = UNKNOWN_RANDOM_UNIT();
-        field_0x78 = random * field_0x60[field_0x10] + field_0x30[field_0x10].field_0x00;
-    } else if (field_0x10 > 0 && (field_0x04 < field_0x84 || field_0x04 == 0.0f) && field_0x04 < field_0x7c) {
-        field_0x10--;
-        field_0x00 = UnknownMin(field_0x14[field_0x10] * field_0x00 / field_0x14[field_0x10 + 1], 1.0f);
-        field_0x04 = field_0x00 * field_0x154;
-        field_0x0c = field_0x88;
+        upShiftRpm = random * shiftWindowWidths[currentGear] + shiftRanges[currentGear].lowerRpm;
+    } else if (currentGear > 0 && (currentRpm < lastUpdateRpm || currentRpm == 0.0f) && currentRpm < downShiftRpm) {
+        currentGear--;
+        throttleFraction = UnknownMin(gearRatios[currentGear] * throttleFraction / gearRatios[currentGear + 1], 1.0f);
+        currentRpm = throttleFraction * rpmHighLimit;
+        shiftTimer = shiftTime;
         float random = UNKNOWN_RANDOM_UNIT();
-        field_0x78 = random * field_0x60[field_0x10] + field_0x30[field_0x10].field_0x00;
+        upShiftRpm = random * shiftWindowWidths[currentGear] + shiftRanges[currentGear].lowerRpm;
     } else {
-        field_0x0c = 0;
+        shiftTimer = 0;
     }
-    field_0x84 = field_0x04;
+    lastUpdateRpm = currentRpm;
 }
 
 // 0x004d31b0
@@ -247,9 +247,9 @@ void UnknownEngineGearbox::UnknownFunction4d31b0(float speedRatio, const Vector3
         return;
     }
     if (speedRatio < 1.01f) {
-        *magnitude = UnknownTorque() * field_0x14[field_0x10] * 341.62f;
+        *magnitude = UnknownTorque() * gearRatios[currentGear] * 341.62f;
     } else {
-        *magnitude = UnknownTorque() * field_0x14[field_0x10] * 341.62f / speedRatio;
+        *magnitude = UnknownTorque() * gearRatios[currentGear] * 341.62f / speedRatio;
     }
     *force = scale * *magnitude * *direction;
 }

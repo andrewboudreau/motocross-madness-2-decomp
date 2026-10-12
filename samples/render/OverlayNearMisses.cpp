@@ -20,11 +20,11 @@ int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
     int height = rect->bottom - rect->top;
     int whole;
     int bytes;
-    if (width == overlayTexture->field_0x14) {
-        bytes = PixelFormatBytesPerPixel(overlayTexture->field_0x20) * overlayTexture->field_0x14 * height;
+    if (width == overlayTexture->textureWidth) {
+        bytes = PixelFormatBytesPerPixel(overlayTexture->mapFormat) * overlayTexture->textureWidth * height;
         whole = 1;
     } else {
-        bytes = PixelFormatBytesPerPixel(overlayTexture->field_0x20) * width;
+        bytes = PixelFormatBytesPerPixel(overlayTexture->mapFormat) * width;
         whole = 0;
     }
 
@@ -38,7 +38,7 @@ int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
         memcpy(bits + rect->top * pitch, source + rect->top * sourcePitch, bytes);
     } else {
         int offset = rect->top * sourcePitch;
-        offset += PixelFormatBytesPerPixel(overlayTexture->field_0x20) * rect->left;
+        offset += PixelFormatBytesPerPixel(overlayTexture->mapFormat) * rect->left;
         source += offset;
         bits += offset;
         for (int y = 0; y < height; y++) {

@@ -10,8 +10,8 @@
 
 // Shift window for one gear (+0x30 + 8 * gear).
 struct UnknownGearShiftRange {
-    float field_0x00;                            // lower rpm
-    float field_0x04;                            // upper rpm
+    float lowerRpm;                           // +0x00 lower rpm
+    float upperRpm;                           // +0x04 upper rpm
 };
 
 class UnknownEngineGearbox {
@@ -31,47 +31,47 @@ public:
     // Curve lookups at the current rpm (field_0x04); inline in retail.
     float UnknownTorque() const {
         int i = 0;
-        while (i < field_0x94 && field_0x98[i] < field_0x04) {
+        while (i < curvePointCount && curveRpm[i] < currentRpm) {
             i++;
         }
-        return (field_0x04 - field_0x98[i]) * field_0x110[i] + field_0xd4[i];
+        return (currentRpm - curveRpm[i]) * torqueSlope[i] + curveTorque[i];
     }
     float UnknownPower() const {
         int i = 0;
-        while (i < field_0x94 && field_0x98[i] < field_0x04) {
+        while (i < curvePointCount && curveRpm[i] < currentRpm) {
             i++;
         }
-        return (field_0x04 - field_0x98[i]) * field_0x19c[i] + field_0x160[i];
+        return (currentRpm - curveRpm[i]) * powerSlope[i] + curvePower[i];
     }
 
-    float field_0x00;                            // throttle fraction, clamped to [0, 1]
-    float field_0x04;                            // current rpm
+    float throttleFraction;                   // +0x00 throttle fraction, clamped to [0, 1]
+    float currentRpm;                         // +0x04 current rpm
     int field_0x08;
-    float field_0x0c;                            // shift timer
-    unsigned char field_0x10;                    // current gear
+    float shiftTimer;                         // +0x0c shift timer
+    unsigned char currentGear;                // +0x10 current gear
     char pad_0x11[3];
-    float field_0x14[7];                         // gear ratios; a negative entry ends the list
-    UnknownGearShiftRange field_0x30[6];
-    float field_0x60[5];                         // shift window widths
+    float gearRatios[7];                      // +0x14 gear ratios; a negative entry ends the list
+    UnknownGearShiftRange shiftRanges[6];     // +0x30
+    float shiftWindowWidths[5];               // +0x60 shift window widths
     int field_0x74;
-    float field_0x78;                            // randomised up-shift rpm
-    float field_0x7c;                            // down-shift rpm
+    float upShiftRpm;                         // +0x78 randomised up-shift rpm
+    float downShiftRpm;                       // +0x7c down-shift rpm
     float field_0x80;
-    float field_0x84;                            // rpm at the last update
-    float field_0x88;                            // shift time
+    float lastUpdateRpm;                      // +0x84 rpm at the last update
+    float shiftTime;                          // +0x88 shift time
     float field_0x8c;
-    int field_0x90;                              // gear count
-    int field_0x94;                              // curve point count
-    float field_0x98[15];                        // curve rpm
-    float field_0xd4[15];                        // curve torque
-    float field_0x110[15];                       // torque slope
+    int gearCount;                            // +0x90 gear count
+    int curvePointCount;                      // +0x94 curve point count
+    float curveRpm[15];                       // +0x98 curve rpm
+    float curveTorque[15];                    // +0xd4 curve torque
+    float torqueSlope[15];                    // +0x110 torque slope
     float field_0x14c;
-    float field_0x150;                           // rpm low limit
-    float field_0x154;                           // rpm high limit
-    float field_0x158;                           // peak power
-    int field_0x15c;                             // peak power point
-    float field_0x160[15];                       // power
-    float field_0x19c[15];                       // power slope
+    float rpmLowLimit;                        // +0x150 rpm low limit
+    float rpmHighLimit;                       // +0x154 rpm high limit
+    float peakPower;                          // +0x158 peak power
+    int peakPowerPoint;                       // +0x15c peak power point
+    float curvePower[15];                     // +0x160 power
+    float powerSlope[15];                     // +0x19c power slope
     int field_0x1d8;
     float field_0x1dc;
     float field_0x1e0;

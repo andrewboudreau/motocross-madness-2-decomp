@@ -27,11 +27,11 @@ static inline int LevelArea(int level) {
 // 0x0050bed0
 ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV)
     : field_0x1d4(5000), field_0x1e0(5000), field_0x1ec(5000) {
-    field_0x10 = addressU;
-    field_0x14 = addressV;
-    field_0x40 = manager;
-    field_0x0c = format;
-    field_0x3c = 0;
+    groupAddressU = addressU;
+    groupAddressV = addressV;
+    groupManager = manager;
+    groupFormat = format;
+    pageMemory = 0;
     field_0x7c.Init(64, 64);
     field_0x144.Init(64, 64);
     field_0x158.Init(16, 16);
@@ -42,59 +42,59 @@ ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format,
     for (int i = 0; i < 9; i++)
         field_0x90[i].Init(64, 64);
     memset(field_0x18, 0, sizeof(field_0x18));
-    field_0x1c4 = 0;
-    field_0x1c8 = 0;
+    pageCursor = 0;
+    textureCursor = 0;
     field_0x1cc = 0;
     field_0x1d0 = 0;
     field_0x74 = 0x10000;
-    field_0x78 = 6 / PixelFormatBytesPerPixel(field_0x0c);
-    field_0x1f8 = 0;
-    field_0x1bc = 0;
-    field_0x08 = 0;
+    field_0x78 = 6 / PixelFormatBytesPerPixel(groupFormat);
+    gdiObject = 0;
+    groupPalette = 0;
+    noRepacking = 0;
     field_0x254 = -1;
-    field_0x1c0 = 0;
+    surfaceTexture = 0;
 }
 
 // 0x0050c2e0: leaves the manager and releases the textures and pages.
 ManagedTextureGroup::~ManagedTextureGroup() {
-    field_0x40->field_0x44.Remove(this);
+    groupManager->field_0x44.Remove(this);
     TextureMap* texture;
-    while ((texture = field_0x44.Last()) != 0) {
-        field_0x44.Remove(texture);
+    while ((texture = managedTextures.Last()) != 0) {
+        managedTextures.Remove(texture);
         texture->Release();
     }
-    while ((texture = field_0x54.Last()) != 0) {
-        field_0x54.Remove(texture);
+    while ((texture = cachePages.Last()) != 0) {
+        cachePages.Remove(texture);
         texture->Release();
     }
-    if (field_0x1f8) {
-        DeleteObject(field_0x1f8);
-        field_0x1f8 = 0;
+    if (gdiObject) {
+        DeleteObject(gdiObject);
+        gdiObject = 0;
     }
-    if (field_0x1c0)
-        field_0x1c0->Release();
+    if (surfaceTexture)
+        surfaceTexture->Release();
 }
 
 // 0x0050c4a0: creates the shared 256x256 texture on first use, then adds
 // pages sharing its system surface or drops pages from the end.
 int ManagedTextureGroup::SetPageCount(int count) {
-    int pages = field_0x54.m_count;
+    int pages = cachePages.m_count;
     int change = count - pages;
-    if (count > 0 && !field_0x1c0) {
-        field_0x1c0 = new(__FILE__, 107) PCTextureMap(field_0x40, 1);
-        if (!field_0x1c0->UnknownVirtualSlot4(0, 256, 256, 0, 1, field_0x0c, field_0x0c, 0, 2, field_0x1bc, 1, 0,
-                                              field_0x10, field_0x14, 0, 0x80, 0xff00ff)) {
-            delete field_0x1c0;
+    if (count > 0 && !surfaceTexture) {
+        surfaceTexture = new(__FILE__, 107) PCTextureMap(groupManager, 1);
+        if (!surfaceTexture->UnknownVirtualSlot4(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
+                                              groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
+            delete surfaceTexture;
             return 0;
         }
     }
     if (change > 0) {
         while (change-- > 0) {
-            CacheTexture* page = new(__FILE__, 121) CacheTexture(field_0x40, this, 8);
-            page->systemSurface = field_0x1c0->systemSurface;
+            CacheTexture* page = new(__FILE__, 121) CacheTexture(groupManager, this, 8);
+            page->systemSurface = surfaceTexture->systemSurface;
             page->systemSurface->AddRef();
-            if (!page->UnknownVirtualSlot4(0, 256, 256, 0, 1, field_0x0c, field_0x0c, 0, 2, field_0x1bc, 1, 0,
-                                           field_0x10, field_0x14, 0, 0x80, 0xff00ff)) {
+            if (!page->UnknownVirtualSlot4(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
+                                           groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
                 delete page;
                 return 0;
             }
@@ -102,17 +102,17 @@ int ManagedTextureGroup::SetPageCount(int count) {
                 page->Release();
                 return 0;
             }
-            field_0x3c += page->texelCount;
-            page->field_0x18 = 256;
-            page->field_0x14 = 256;
-            field_0x54.Append(page);
+            pageMemory += page->texelCount;
+            page->textureHeight = 256;
+            page->textureWidth = 256;
+            cachePages.Append(page);
         }
     } else if (change < 0) {
-        TextureMap* page = field_0x54.Last();
+        TextureMap* page = cachePages.Last();
         while (change++ < 0) {
-            field_0x3c -= static_cast<CacheTexture*>(page)->texelCount;
-            field_0x54.Remove(page);
-            page = field_0x54.Last();
+            pageMemory -= static_cast<CacheTexture*>(page)->texelCount;
+            cachePages.Remove(page);
+            page = cachePages.Last();
         }
     }
     return 1;
@@ -121,24 +121,24 @@ int ManagedTextureGroup::SetPageCount(int count) {
 // 0x0050c6c0: the first texture of an 8-bit group supplies the pages'
 // palette.
 void ManagedTextureGroup::AddTexture(ManagedTexture* texture) {
-    if (field_0x0c == 8 && !field_0x1bc) {
-        field_0x1bc = texture->texturePalette;
-        for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {
+    if (groupFormat == 8 && !groupPalette) {
+        groupPalette = texture->texturePalette;
+        for (TextureMap* page = cachePages.First(); page; page = cachePages.Next()) {
             CacheTexture* cache = static_cast<CacheTexture*>(page);
-            cache->texturePalette = field_0x1bc;
-            cache->systemSurface->SetPalette(field_0x1bc);
-            cache->textureSurface->SetPalette(field_0x1bc);
+            cache->texturePalette = groupPalette;
+            cache->systemSurface->SetPalette(groupPalette);
+            cache->textureSurface->SetPalette(groupPalette);
             cache->field_0x2c = texture->field_0x2c;
         }
     }
-    field_0x44.Append(texture);
-    texture->lastUseFrame = field_0x40->field_0x74;
+    managedTextures.Append(texture);
+    texture->lastUseFrame = groupManager->field_0x74;
     texture->group = this;
 }
 
 // 0x0050c760
 void ManagedTextureGroup::ClearUseRecords() {
-    for (TextureMap* texture = field_0x44.First(); texture; texture = field_0x44.Next()) {
+    for (TextureMap* texture = managedTextures.First(); texture; texture = managedTextures.Next()) {
         static_cast<ManagedTexture*>(texture)->useCount = 0;
         static_cast<ManagedTexture*>(texture)->largestUse = 0;
     }
@@ -146,7 +146,7 @@ void ManagedTextureGroup::ClearUseRecords() {
 
 // 0x0050c790
 void ManagedTextureGroup::RestoreLostPages() {
-    for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {
+    for (TextureMap* page = cachePages.First(); page; page = cachePages.Next()) {
         CacheTexture* cache = static_cast<CacheTexture*>(page);
         if (cache->textureSurface && cache->textureSurface->IsLost()) {
             cache->UnknownVirtualSlot10();
@@ -161,13 +161,13 @@ void ManagedTextureGroup::WriteDebugReport() {
     FILE* file = fopen("C:\\temp\\TM_debug.txt", "a");
     if (file) {
         FilePrintf(file, "----------------------------------------------------------------------\n");
-        FilePrintf(file, "Texture Format: %d  Cache Textures: %d  Mgd Textures: %d\n", field_0x0c,
-                              field_0x54.m_count, field_0x44.m_count);
-        TextureMap* texture = field_0x44.First();
-        for (int index = 1; texture; texture = field_0x44.Next()) {
+        FilePrintf(file, "Texture Format: %d  Cache Textures: %d  Mgd Textures: %d\n", groupFormat,
+                              cachePages.m_count, managedTextures.m_count);
+        TextureMap* texture = managedTextures.First();
+        for (int index = 1; texture; texture = managedTextures.Next()) {
             ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
-            FilePrintf(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->field_0x14,
-                                  managed->field_0x18, managed->largestUse);
+            FilePrintf(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->textureWidth,
+                                  managed->textureHeight, managed->largestUse);
             if (managed->largestUse > 0.0f)
                 FilePrintf(file, ", Allocd=%d unhappy=%.2f", managed->field_0xa8,
                                       managed->UnknownFunction5109b0());
@@ -180,7 +180,7 @@ void ManagedTextureGroup::WriteDebugReport() {
 // 0x0050c8c0: unless frozen by the debug key, empties the size lists and
 // repacks the pages (through 0x0050dad0 when partial texture blits are on).
 void ManagedTextureGroup::RepackPages() {
-    if (g_TrackGame->field_0x2d4_bit2 && field_0x08)
+    if (g_TrackGame->field_0x2d4_bit2 && noRepacking)
         return;
     field_0x7c.Clear();
     for (int i = 0; i < 9; i++)

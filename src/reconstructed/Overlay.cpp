@@ -87,7 +87,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
                                                            Target()->surfacePixelFormat, Target()->surfacePixelFormat,
                                                            0, 8, 0, 1, 0, 5, 6, 0, 0x80, 0xff00ff);
         void* bits = g_UnknownOverlayTexture689110->UnknownVirtualSlot13(0, 0, 0);
-        memset(bits, 0, PixelFormatBytesPerPixel(g_UnknownOverlayTexture689110->field_0x20) << 16);
+        memset(bits, 0, PixelFormatBytesPerPixel(g_UnknownOverlayTexture689110->mapFormat) << 16);
         g_UnknownOverlayTexture689110->UnknownVirtualSlot14(0);
         sharedTexture = g_UnknownOverlayTexture689110;
     } else {
@@ -109,7 +109,7 @@ int Overlay::UnknownVirtualSlot14() {
     if (field_0x118)
         LayOutQuad();
 
-    int format = overlayTexture->field_0x20;
+    int format = overlayTexture->mapFormat;
     if (format != 4444 && format != 8888) {
         Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
         Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -154,9 +154,9 @@ int Overlay::UnknownVirtualSlot14() {
 void Overlay::LayOutQuad() {
     float u0, v0, u1, v1;
     if (hasSourceRect) {
-        float width = (float)overlayTexture->field_0x14;
+        float width = (float)overlayTexture->textureWidth;
         u0 = (float)sourceRect.left / width;
-        float height = (float)overlayTexture->field_0x18;
+        float height = (float)overlayTexture->textureHeight;
         v0 = (float)sourceRect.top / height;
         u1 = (float)sourceRect.right / width;
         v1 = (float)sourceRect.bottom / height;
@@ -269,13 +269,13 @@ int Overlay::TintRows(int row, int count, unsigned short color) {
     if (!source || !bits)
         return 0;
 
-    if (overlayTexture->field_0x20 == 4444) {
+    if (overlayTexture->mapFormat == 4444) {
         unsigned short* from = (unsigned short*)source + sourcePitch * row / 2;
         unsigned short* to = (unsigned short*)bits + pitch * row / 2;
         for (int y = 0; y < count; y++) {
             unsigned short* s = from;
             unsigned short* d = to;
-            for (int x = 0; x < overlayTexture->field_0x14; x++) {
+            for (int x = 0; x < overlayTexture->textureWidth; x++) {
                 if ((*s & 0x7fff) == 0x7fff) {
                     *d = (unsigned short)color;
                     *s = 0;
@@ -286,7 +286,7 @@ int Overlay::TintRows(int row, int count, unsigned short color) {
             to += pitch / 2;
             from += sourcePitch / 2;
         }
-    } else if (overlayTexture->field_0x20 == 1555) {
+    } else if (overlayTexture->mapFormat == 1555) {
         unsigned short* from = (unsigned short*)source + sourcePitch * row / 2;
         unsigned short* to = (unsigned short*)bits + pitch * row / 2;
         unsigned short converted =
@@ -294,7 +294,7 @@ int Overlay::TintRows(int row, int count, unsigned short color) {
         for (int y = 0; y < count; y++) {
             unsigned short* s = from;
             unsigned short* d = to;
-            for (int x = 0; x < overlayTexture->field_0x14; x++) {
+            for (int x = 0; x < overlayTexture->textureWidth; x++) {
                 if ((*s & 0x7fff) == 0x7fff) {
                     *d = converted;
                     *s = 0;

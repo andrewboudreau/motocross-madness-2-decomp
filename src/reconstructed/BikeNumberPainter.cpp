@@ -83,8 +83,8 @@ void UnknownBikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int numbe
         CameraRect rect;
         rect.left = 0;
         rect.top = 0;
-        rect.right = texture->field_0x14;
-        rect.bottom = texture->field_0x18;
+        rect.right = texture->textureWidth;
+        rect.bottom = texture->textureHeight;
         texture->systemSurface->Blt(&rect, 0, 0, DDBLT_COLORFILL, &fx);
         int width = 0;
         for (int n = number; n > 0;) {
@@ -109,7 +109,7 @@ void UnknownBikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int numbe
         }
         PaintDigit(number, x, texture);
         texture->UnknownVirtualSlot15(2);
-        if (texture->field_0x68 & 1)
+        if (texture->mapFlags & 1)
             ((ManagedTexture*)texture)->Reregister();
         else
             texture->UnknownVirtualSlot9(0, -1);

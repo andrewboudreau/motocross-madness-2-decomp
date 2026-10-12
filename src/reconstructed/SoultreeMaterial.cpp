@@ -69,7 +69,7 @@ void SoultreeMaterial::ApplyRenderStates()
 {
     if (field_0x70) {
         field_0x70->Select();
-        int format = field_0x70->texture->field_0x20;
+        int format = field_0x70->texture->mapFormat;
         if (format != 1555 && format != 4444 && format != 8888) {
             ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
         } else if (hasColorKey) {

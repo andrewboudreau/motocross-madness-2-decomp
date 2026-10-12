@@ -514,8 +514,8 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
         target->renderSurface->Unlock(0);
         return 0;
     }
-    int rows = texture->field_0x18;
-    int rowSize = PixelFormatBytesPerPixel(texture->field_0x20) * texture->field_0x14;
+    int rows = texture->textureHeight;
+    int rowSize = PixelFormatBytesPerPixel(texture->mapFormat) * texture->textureWidth;
     char* source = (char*)desc.surface;
     while (rows--) {
         memcpy(bits, source, rowSize);
@@ -582,22 +582,22 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     vertices[0].z = 0.1f;
     vertices[0].rhw = 1.0f;
     vertices[0].color = 0xffffffff;
-    vertices[1].x = (float)rendered->field_0x14;
+    vertices[1].x = (float)rendered->textureWidth;
     vertices[1].y = 0.0f;
     vertices[1].z = 0.1f;
     vertices[1].rhw = 1.0f;
     vertices[1].color = 0xffffffff;
     vertices[1].u = 1.0f;
     vertices[1].v = 0.0f;
-    vertices[2].x = (float)rendered->field_0x14;
-    vertices[2].y = (float)rendered->field_0x14;
+    vertices[2].x = (float)rendered->textureWidth;
+    vertices[2].y = (float)rendered->textureWidth;
     vertices[2].z = 0.1f;
     vertices[2].rhw = 1.0f;
     vertices[2].color = 0xffffffff;
     vertices[2].u = 1.0f;
     vertices[2].v = 1.0f;
     vertices[3].x = 0.0f;
-    vertices[3].y = (float)rendered->field_0x14;
+    vertices[3].y = (float)rendered->textureWidth;
     vertices[3].z = 0.1f;
     vertices[3].rhw = 1.0f;
     vertices[3].color = 0xffffffff;

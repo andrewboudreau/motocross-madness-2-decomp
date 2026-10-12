@@ -17,14 +17,14 @@ ManagedTexture::ManagedTexture(TextureMapManager* manager) : PCTextureMap(manage
     group = 0;
     field_0x98 = 0;
     field_0x9c = 0;
-    field_0x68 |= 1;
+    mapFlags |= 1;
     pageScale = 1.0f;
 }
 
 // 0x005105a0
 ManagedTexture::~ManagedTexture() {
     if (group)
-        group->field_0x44.Remove(this);
+        group->managedTextures.Remove(this);
     if (page)
         ReleasePage();
 }
@@ -43,7 +43,7 @@ void ManagedTexture::UpdatePageCoords(int level) {
 // 0x00510670
 void ManagedTexture::Reregister() {
     if (group)
-        group->field_0x44.Remove(this);
+        group->managedTextures.Remove(this);
     if (page)
         ReleasePage();
     page = 0;
@@ -109,16 +109,16 @@ void ManagedTexture::RecordUse(float value) {
     if (value > largestUse)
         largestUse = value;
     useCount++;
-    lastUseFrame = field_0x10->field_0x74;
+    lastUseFrame = ownerManager->field_0x74;
 }
 
 // 0x00510870: with a page, applies the render states, the colour key and
 // the page; otherwise the PCTextureMap behaviour.
 void ManagedTexture::UnknownVirtualSlot19() {
     if (page) {
-        for (int i = 0; i < field_0x44; i++)
-            g_TrackGame->renderTarget->UnknownVirtualSlot8(field_0x48[i].state, field_0x48[i].value, 0);
-        if (field_0x30 && page->textureSurface && page->textureSurface->SetColorKey(8, &field_0x34))
+        for (int i = 0; i < statePairCount; i++)
+            g_TrackGame->renderTarget->UnknownVirtualSlot8(statePairs[i].state, statePairs[i].value, 0);
+        if (usesColorKey && page->textureSurface && page->textureSurface->SetColorKey(8, &colorKeyValue))
             return;
         page->UnknownVirtualSlot11();
     } else if (textureSurface) {
@@ -151,7 +151,7 @@ int ManagedTexture::UnknownVirtualSlot7() {
 
 // 0x00510990
 int ManagedTexture::SizeLevel() {
-    int size = field_0x14;
+    int size = textureWidth;
     int level = 0;
     if (size == 1)
         return 0;

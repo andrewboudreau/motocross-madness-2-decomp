@@ -235,7 +235,7 @@
   "?HideScene@KrustyUI@@QAEXXZ": "0x00499a20",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
   "?SetMotionByName@UnknownKrustyUIModelObject@@QAEXPBD@Z": "0x004a8b10",
-  "?UnknownFunction4d3b00@UnknownTrackGameObject3444@@QAEXPBDHHH@Z": "0x004d3b00",
+  "?StartCareer@UnknownTrackGameObject3444@@QAEXPBDHHH@Z": "0x004d3b00",
   "?LoadSaved@UnknownTrackGameObject3444@@QAEHPBD@Z": "0x004d4100",
   "?Save@UnknownTrackGameObject3444@@QAEHPBD@Z": "0x004d4150",
   "?AdvanceAfterRace@UnknownTrackGameObject3444@@QAEHXZ": "0x004d41a0",

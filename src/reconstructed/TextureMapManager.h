@@ -46,9 +46,9 @@ public:
     int LargestRecentSample();              // 0x004cb690: the largest recent sample
     void RecordSample(int sample);   // 0x004cb6b0: records a sample
 
-    int field_0x00;                           // start time
+    int timerStart;                           // +0x00 start time
     int field_0x04;
-    int field_0x08;                           // interval
+    int timerInterval;                        // +0x08 interval
 };
 
 class CacheTexture;
@@ -78,15 +78,15 @@ public:
     // `target`; 0 unless this is the manager's selected group.
     int DrawSelection(PCRenderTarget* target);
 
-    unsigned char field_0x08;                 // toggled by debug key 0x21; set: no repacking
-    int field_0x0c;                           // pixel format
-    int field_0x10;                           // address mode u
-    int field_0x14;                           // address mode v
+    unsigned char noRepacking;                // +0x08 toggled by debug key 0x21; set: no repacking
+    int groupFormat;                          // +0x0c pixel format
+    int groupAddressU;                        // +0x10 address mode u
+    int groupAddressV;                        // +0x14 address mode v
     int field_0x18[9];
-    int field_0x3c;                           // pages' memory
-    TextureMapManager* field_0x40;
-    UnknownTextureMapList field_0x44;         // ManagedTextures, stepped through by +0x1c8
-    UnknownTextureMapList field_0x54;         // CacheTexture pages, stepped through by +0x1c4
+    int pageMemory;                           // +0x3c pages' memory
+    TextureMapManager* groupManager;          // +0x40
+    UnknownTextureMapList managedTextures;    // +0x44 ManagedTextures, stepped through by +0x1c8
+    UnknownTextureMapList cachePages;         // +0x54 CacheTexture pages, stepped through by +0x1c4
     UnknownTextureMapList field_0x64;
     int field_0x74;
     int field_0x78;                           // 6 / bytes per pixel
@@ -98,16 +98,16 @@ public:
     ContainerList<ManagedTexture*> field_0x180;
     ContainerList<ManagedTexture*> field_0x194;
     ContainerList<ManagedTexture*> field_0x1a8;
-    void* field_0x1bc;                        // palette of 8-bit groups
-    PCTextureMap* field_0x1c0;                // 256x256 texture whose system surface the pages share
-    int field_0x1c4;                          // debug key cursor (pages)
-    int field_0x1c8;                          // debug key cursor (textures)
+    void* groupPalette;                       // +0x1bc palette of 8-bit groups
+    PCTextureMap* surfaceTexture;             // +0x1c0 256x256 texture whose system surface the pages share
+    int pageCursor;                           // +0x1c4 debug key cursor (pages)
+    int textureCursor;                        // +0x1c8 debug key cursor (textures)
     int field_0x1cc;
     int field_0x1d0;
     UnknownTimer field_0x1d4;
     UnknownTimer field_0x1e0;
     UnknownTimer field_0x1ec;
-    void* field_0x1f8;                        // GDI object (DeleteObject)
+    void* gdiObject;                          // +0x1f8 GDI object (DeleteObject)
     int field_0x1fc[9];
     int field_0x220[9];
     int field_0x244;

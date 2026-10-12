@@ -184,7 +184,7 @@ void PCStartupDlg::HandleEvent(UnknownDialogEvent* event)
                 difficulty = 3;
                 break;
             }
-            g_TrackGame->field_0x3444->UnknownFunction4d3b00(newCareerName, difficulty, chosenBikeClass,
+            g_TrackGame->field_0x3444->StartCareer(newCareerName, difficulty, chosenBikeClass,
                                                                         chosenOpponentsRow + 1);
             char path[128];
             // The first free CircuitNNN.pc.

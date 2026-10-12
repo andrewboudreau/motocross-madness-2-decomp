@@ -326,7 +326,7 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
         for (int k = 0; k < surface->materialCount; k++) {
             SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
             if (material->field_0x70) {
-                float scale = best / material->field_0x70->texture->field_0x18;
+                float scale = best / material->field_0x70->texture->textureHeight;
                 float current = *(float*)&material->field_0xcc;
                 *(float*)&material->field_0xcc = current > scale ? current : scale;
             }
@@ -807,7 +807,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             if (drawn->vertexCount) {
                 if (material->field_0x70) {
                     ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
-                    if (texture->field_0x68 & 1)
+                    if (texture->mapFlags & 1)
                         texture->RemapTexCoordsIfMoved(&drawn->field_0x2c, (float*)&drawn->field_0x30,
                                                        (float*)&drawn->field_0x34, &drawn->vertices->tu,
                                                        &drawn->vertices->tv, drawn->vertexCount, 0x20);

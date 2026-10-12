@@ -109,11 +109,11 @@ failed:
 TextureMap* PCTextureMap::UnknownVirtualSlot6() {
     TextureMap* copy;
     TextureMapManager* manager;
-    int cached = (field_0x68 & 1) != 0;
+    int cached = (mapFlags & 1) != 0;
     if (cached) {
-        manager = field_0x10;
+        manager = ownerManager;
         copy = new(__FILE__, 976) ManagedTexture(manager);
-        copy->field_0x68 |= 1;
+        copy->mapFlags |= 1;
         ((ManagedTexture*)this)->group->AddTexture((ManagedTexture*)copy);
     } else {
         manager = g_TrackGame->field_0x3c;
@@ -130,20 +130,20 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
                 systemMemory = 8;
             if (!(desc.caps[0] & 0x1000))
                 noAlpha = 4;
-            int created = copy->UnknownVirtualSlot4(desc.surface, field_0x14, field_0x18,
-                                                    desc.pitch / PixelFormatBytesPerPixel(field_0x20), field_0x1c,
-                                                    field_0x20, field_0x20, field_0x2c, noAlpha | systemMemory,
+            int created = copy->UnknownVirtualSlot4(desc.surface, textureWidth, textureHeight,
+                                                    desc.pitch / PixelFormatBytesPerPixel(mapFormat), field_0x1c,
+                                                    mapFormat, mapFormat, field_0x2c, noAlpha | systemMemory,
                                                     texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (!systemSurface->Unlock(0) && created) {
-                if (field_0x30) {
-                    if (field_0x20 == 8) {
-                        copy->UnknownVirtualSlot18((field_0x2c->field_0x010[field_0x34][0] << 8 |
-                                                    field_0x2c->field_0x010[field_0x34][1]) << 8 |
-                                                   field_0x2c->field_0x010[field_0x34][2]);
+                if (usesColorKey) {
+                    if (mapFormat == 8) {
+                        copy->UnknownVirtualSlot18((field_0x2c->field_0x010[colorKeyValue][0] << 8 |
+                                                    field_0x2c->field_0x010[colorKeyValue][1]) << 8 |
+                                                   field_0x2c->field_0x010[colorKeyValue][2]);
                     } else {
-                        unsigned int key = field_0x34;
+                        unsigned int key = colorKeyValue;
                         unsigned int color;
-                        if (field_0x20 == 555)
+                        if (mapFormat == 555)
                             color = (key & 0x7c00) << 9 | (key & 0x3e0) << 6 | (key & 0x1f) << 3;
                         else
                             color = (key & 0xf800) << 8 | (key & 0x7e0) << 5 | (key & 0x1f) << 3;
@@ -160,9 +160,9 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
 
 // Appends a render-state pair for slot 19 to apply.
 static inline void AppendRenderStatePair(TextureMap* map, int state, int value) {
-    map->field_0x48[map->field_0x44].state = state;
-    map->field_0x48[map->field_0x44].value = value;
-    map->field_0x44++;
+    map->statePairs[map->statePairCount].state = state;
+    map->statePairs[map->statePairCount].value = value;
+    map->statePairCount++;
 }
 
 // 0x004c69c0: sets the texture up from `bits` (or empty): picks the format,
@@ -180,17 +180,17 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     unsigned char pixelFormat[0x20];
     UnknownSurfaceCaps caps;
     int shared;
-    field_0x14 = width;
-    field_0x18 = height;
+    textureWidth = width;
+    textureHeight = height;
     field_0x1c = minimumSize;
     field_0x2c = palette;
     texturePalette = surfacePalette;
     if (choice)
         format = IsFormat4444Or8888(format) ? choice->field_0x10 : choice->field_0x0c;
-    field_0x20 = format;
+    mapFormat = format;
     FillPixelFormat(format, pixelFormat);
     mipmapped = flags & 2;
-    field_0x24 = 1;
+    mipCount = 1;
     if (!mipmapped) {
         field_0x1c = width;
         if (!systemSurface) {
@@ -207,10 +207,10 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 desc.caps[0] = 0x1000;
                 if (!(flags & 8) && !g_TrackGame->field_0x2d0 &&
                     !(g_TrackGame->field_0x2d5_bit2) &&
-                    (field_0x20 == 555 || field_0x20 == 565)) {
+                    (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
-                    if (g_UnknownSharedSurfaces68a394[field_0x24]) {
-                        systemSurface = g_UnknownSharedSurfaces68a394[field_0x24];
+                    if (g_UnknownSharedSurfaces68a394[mipCount]) {
+                        systemSurface = g_UnknownSharedSurfaces68a394[mipCount];
                         systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x1800;
@@ -220,36 +220,36 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (!systemSurface) {
-                if (field_0x20 == 4444) {
-                    formats[0] = field_0x20;
+                if (mapFormat == 4444) {
+                    formats[0] = mapFormat;
                     formats[1] = 1555;
                     formats[2] = 555;
                     formats[3] = 565;
                     formats[4] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 1555) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 1555) {
+                    formats[0] = mapFormat;
                     formats[1] = 555;
                     formats[2] = 565;
                     formats[3] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 8) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 8) {
+                    formats[0] = mapFormat;
                     formats[1] = 555;
                     formats[2] = 565;
                     formats[3] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 555) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 555) {
+                    formats[0] = mapFormat;
                     formats[1] = 565;
                     formats[2] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 565) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 565) {
+                    formats[0] = mapFormat;
                     formats[1] = 555;
                     formats[2] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
@@ -259,10 +259,10 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (shared) {
-                g_UnknownSharedSurfaces68a394[field_0x24] = systemSurface;
+                g_UnknownSharedSurfaces68a394[mipCount] = systemSurface;
                 systemSurface->AddRef();
             }
-            if (texturePalette && field_0x20 == 8 && systemSurface->SetPalette(texturePalette))
+            if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
                 goto failed;
         }
     } else {
@@ -273,18 +273,18 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             levelHeight >>= 1;
             if (levelWidth < minimumSize && levelHeight < minimumSize)
                 break;
-            field_0x24++;
+            mipCount++;
         }
-        if (bits && sourceFormat != field_0x20 &&
+        if (bits && sourceFormat != mapFormat &&
             (!checkMemory || PixelFormatBytesPerPixel(565) > PixelFormatBytesPerPixel(sourceFormat)) &&
-            !field_0x10->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(565) * width * height))
+            !ownerManager->GrowSecondScratchBuffer(PixelFormatBytesPerPixel(565) * width * height))
             return 0;
         if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);
             desc.height = height;
             desc.width = width;
-            desc.mipMapCount = field_0x24;
+            desc.mipMapCount = mipCount;
             memcpy(&desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
             shared = 0;
             desc.flags = 0x21007;
@@ -294,10 +294,10 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 desc.caps[0] = 0x401008;
                 if (!(flags & 8) && !g_TrackGame->field_0x2d0 &&
                     !(g_TrackGame->field_0x2d5_bit2) &&
-                    (field_0x20 == 555 || field_0x20 == 565)) {
+                    (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
-                    if (g_UnknownSharedMipSurfaces68a36c[field_0x24]) {
-                        systemSurface = g_UnknownSharedMipSurfaces68a36c[field_0x24];
+                    if (g_UnknownSharedMipSurfaces68a36c[mipCount]) {
+                        systemSurface = g_UnknownSharedMipSurfaces68a36c[mipCount];
                         systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x401808;
@@ -307,36 +307,36 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (!systemSurface) {
-                if (field_0x20 == 4444) {
-                    formats[0] = field_0x20;
+                if (mapFormat == 4444) {
+                    formats[0] = mapFormat;
                     formats[1] = 1555;
                     formats[2] = 555;
                     formats[3] = 565;
                     formats[4] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 1555) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 1555) {
+                    formats[0] = mapFormat;
                     formats[1] = 555;
                     formats[2] = 565;
                     formats[3] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 8) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 8) {
+                    formats[0] = mapFormat;
                     formats[1] = 555;
                     formats[2] = 565;
                     formats[3] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 555) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 555) {
+                    formats[0] = mapFormat;
                     formats[1] = 565;
                     formats[2] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 565) {
-                    formats[0] = field_0x20;
+                } else if (mapFormat == 565) {
+                    formats[0] = mapFormat;
                     formats[1] = 555;
                     formats[2] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
@@ -344,10 +344,10 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (shared) {
-                g_UnknownSharedMipSurfaces68a36c[field_0x24] = systemSurface;
+                g_UnknownSharedMipSurfaces68a36c[mipCount] = systemSurface;
                 systemSurface->AddRef();
             }
-            if (texturePalette && field_0x20 == 8 && systemSurface->SetPalette(texturePalette))
+            if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
                 goto failed;
         }
     }
@@ -359,12 +359,12 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
         if (systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
             goto failed;
         void* destination = desc.surface;
-        int bytesPerPixel = PixelFormatBytesPerPixel(field_0x20);
-        ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
+        int bytesPerPixel = PixelFormatBytesPerPixel(mapFormat);
+        ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, mapFormat,
                               sourceFormat, 0, palette, alphaThreshold, key);
         if (!(flags & 4))
             field_0x3c = AverageColor(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
-                                               field_0x20, palette);
+                                               mapFormat, palette);
         if (systemSurface->Unlock(0))
             goto failed;
         if (mipmapped && !UnknownVirtualSlot15(2))
@@ -372,11 +372,11 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     }
     if (g_UnknownGlobal689968)
         DumpLevel(systemSurface, 0);
-    if (IsFormat4444Or8888(format) & !IsFormat4444Or8888(field_0x20)) {
+    if (IsFormat4444Or8888(format) & !IsFormat4444Or8888(mapFormat)) {
         UnknownVirtualSlot18(0xff00ff);
         return 1;
     }
-    if (IsFormat4444Or8888(field_0x20)) {
+    if (IsFormat4444Or8888(mapFormat)) {
         AppendRenderStatePair(this, 0x29, 0);
         AppendRenderStatePair(this, 0x1b, 1);
         AppendRenderStatePair(this, 0x13, addressU);

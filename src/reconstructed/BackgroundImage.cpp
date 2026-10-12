@@ -107,8 +107,8 @@ int BackgroundImage::UnknownVirtualSlot15() {
     if (field_0x2c && field_0x30) {
         g_UnknownGlobal5777b8.left = 0;
         g_UnknownGlobal5777b8.top = 0;
-        g_UnknownGlobal5777b8.right = field_0x2c->field_0x14;
-        g_UnknownGlobal5777b8.bottom = field_0x2c->field_0x18;
+        g_UnknownGlobal5777b8.right = field_0x2c->textureWidth;
+        g_UnknownGlobal5777b8.bottom = field_0x2c->textureHeight;
         DrawImage(field_0x2c, &g_UnknownGlobal5777b8, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
                               0);
         field_0x5c = 1;

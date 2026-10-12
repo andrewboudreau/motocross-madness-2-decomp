@@ -300,8 +300,8 @@ int GUIManager::UnknownVirtualSlot13() {
     if (screenGrab && drawGrabFirst) {
         rect.left = 0;
         rect.top = 0;
-        rect.right = screenGrab->field_0x14;
-        rect.bottom = screenGrab->field_0x18;
+        rect.right = screenGrab->textureWidth;
+        rect.bottom = screenGrab->textureHeight;
         if (guiBackground) {
             guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
@@ -321,8 +321,8 @@ int GUIManager::UnknownVirtualSlot15() {
         if (screenGrab && !drawGrabFirst) {
             rect.left = 0;
             rect.top = 0;
-            rect.right = screenGrab->field_0x14;
-            rect.bottom = screenGrab->field_0x18;
+            rect.right = screenGrab->textureWidth;
+            rect.bottom = screenGrab->textureHeight;
             if (guiBackground) {
                 guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &field_0xe8, 0);
             } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {

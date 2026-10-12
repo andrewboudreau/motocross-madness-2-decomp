@@ -285,10 +285,10 @@ int TextureHasColor(TextureMap* texture, int key) {
     if (bits) {
         int pixel;
         int green;
-        if (texture->field_0x20 == 0x235) {
+        if (texture->mapFormat == 0x235) {
             pixel = (key >> 8) & 0xf800;
             green = (key >> 5) & 0x7e0;
-        } else if (texture->field_0x20 == 0x22b) {
+        } else if (texture->mapFormat == 0x22b) {
             pixel = (key >> 9) & 0x7c00;
             green = (key >> 6) & 0x3e0;
         } else {
@@ -296,15 +296,15 @@ int TextureHasColor(TextureMap* texture, int key) {
         }
         pixel |= green | ((key >> 3) & 0x1f);
         if (pixel) {
-            for (int rows = texture->field_0x18; rows > 0; rows--) {
+            for (int rows = texture->textureHeight; rows > 0; rows--) {
                 int x;
-                for (x = 0; x < texture->field_0x14; x++) {
+                for (x = 0; x < texture->textureWidth; x++) {
                     if (bits[x] == pixel)
                         break;
                 }
-                if (x < texture->field_0x14)
+                if (x < texture->textureWidth)
                     found = 1;
-                bits += texture->field_0x14;
+                bits += texture->textureWidth;
             }
         }
 unlock:
@@ -509,13 +509,13 @@ int UIEditBox::Draw() {
         if (ownerDialog->dialogBackground) {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
                                                            visibleArea,
-                                                           drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
             redrawFrames = redraw;
         } else {
             ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
-                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000);
+                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000);
             redrawFrames = redraw;
         }
     } else {
@@ -717,16 +717,16 @@ int UIMultiState::Draw() {
         TextureMap* texture = drawnTexture;
         rect = *(CameraRect*)screenArea;
         if (sourceBlit) {
-            rect.right = (int)(texture->field_0x14 * ownerDialog->scaleX) + rect.left;
-            rect.bottom = (int)(texture->field_0x18 * ownerDialog->scaleY) + rect.top;
+            rect.right = (int)(texture->textureWidth * ownerDialog->scaleX) + rect.left;
+            rect.bottom = (int)(texture->textureHeight * ownerDialog->scaleY) + rect.top;
         }
         if (ownerDialog->dialogBackground) {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)texture, &rect, 0,
-                                                           texture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           texture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, texture, 0,
-                                                                     texture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                                                                     texture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
     }
@@ -1781,8 +1781,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
         UIControl* frame = FindControl("FRMBIStatic", 5);
         UIAnim* image = (UIAnim*)FindSectionObject(backgroundImage);
         if (image) {
-            int width = image->GetCurrentTexture()->field_0x14;
-            int imageHeight = image->GetCurrentTexture()->field_0x18;
+            int width = image->GetCurrentTexture()->textureWidth;
+            int imageHeight = image->GetCurrentTexture()->textureHeight;
             frame->SetImage(0, image);
             frame->screenArea[2] = width;
             frame->screenArea[3] = imageHeight;

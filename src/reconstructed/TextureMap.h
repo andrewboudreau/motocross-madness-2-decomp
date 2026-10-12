@@ -164,24 +164,24 @@ public:
     // alpha texture; 0 for other formats.
     int UnknownFunction50abd0(int addressU, int addressV);
 
-    TextureMap* field_0x08;                   // next in the manager's list
-    TextureMap* field_0x0c;                   // previous in the manager's list
-    TextureMapManager* field_0x10;            // manager (constructor argument)
-    int field_0x14;                           // width
-    int field_0x18;                           // height
+    TextureMap* nextTexture;                  // +0x08 next in the manager's list
+    TextureMap* previousTexture;              // +0x0c previous in the manager's list
+    TextureMapManager* ownerManager;          // +0x10 manager (constructor argument)
+    int textureWidth;                         // +0x14 width
+    int textureHeight;                        // +0x18 height
     int field_0x1c;
-    int field_0x20;                           // pixel format
-    int field_0x24;                           // mip level count
-    BaseObject* field_0x28;                   // released by the destructor
+    int mapFormat;                            // +0x20 pixel format
+    int mipCount;                             // +0x24 mip level count
+    BaseObject* sourcePalette;                // +0x28 released by the destructor
     UnknownTexturePalette* field_0x2c;
-    int field_0x30;                           // has a colour key
-    int field_0x34;                           // colour key (also +0x38)
+    int usesColorKey;                         // +0x30 has a colour key
+    int colorKeyValue;                        // +0x34 colour key (also +0x38)
     int field_0x38;
     int field_0x3c;                           // from Pixtrans 0x004d24d0 (slot 4)
     int field_0x40;
-    int field_0x44;                           // render-state pair count
-    UnknownRenderStatePair field_0x48[4];     // applied by slot 19 (length not established)
-    int field_0x68;                           // bit 0: a ManagedTexture
+    int statePairCount;                       // +0x44 render-state pair count
+    UnknownRenderStatePair statePairs[4];     // +0x48 applied by slot 19 (length not established)
+    int mapFlags;                             // +0x68 bit 0: a ManagedTexture
     int field_0x6c;                           // format choice +0x14 (slot 5)
 };
 

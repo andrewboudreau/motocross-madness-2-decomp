@@ -564,8 +564,8 @@ UIControl* UIControl::NextAttachedControlOfType(GameObjectIterator* iterator) {
 void UIControl::GetImageRect(CameraRect* in, CameraRect* out) {
     *out = *in;
     if (sourceBlit && drawnTexture) {
-        out->right = (int)(drawnTexture->field_0x14 * ownerDialog->scaleX) + out->left;
-        out->bottom = (int)(drawnTexture->field_0x18 * ownerDialog->scaleY) + out->top;
+        out->right = (int)(drawnTexture->textureWidth * ownerDialog->scaleX) + out->left;
+        out->bottom = (int)(drawnTexture->textureHeight * ownerDialog->scaleY) + out->top;
     }
 }
 
@@ -4127,11 +4127,11 @@ int UIControl::Draw() {
         GetImageRect((CameraRect*)screenArea, &rect);
         if (ownerDialog->dialogBackground) {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)drawnTexture, &rect, visibleArea,
-                                                           drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
-                       &rect, drawnTexture, visibleArea, drawnTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                       &rect, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
     }
@@ -4303,18 +4303,18 @@ int UIScrollBar::Draw() {
         int redraw = redrawFrames;
         rect = *(CameraRect*)screenArea;
         if (controlType == 8) {
-            rect.top += UnknownMaxInt((screenArea[3] - screenArea[1] - track->field_0x18) / 2, 0);
-            rect.bottom = track->field_0x18 + rect.top;
+            rect.top += UnknownMaxInt((screenArea[3] - screenArea[1] - track->textureHeight) / 2, 0);
+            rect.bottom = track->textureHeight + rect.top;
         } else {
-            rect.left += UnknownMaxInt((screenArea[2] - screenArea[0] - track->field_0x14) / 2, 0);
-            rect.right = track->field_0x14 + rect.left;
+            rect.left += UnknownMaxInt((screenArea[2] - screenArea[0] - track->textureWidth) / 2, 0);
+            rect.right = track->textureWidth + rect.left;
         }
         if (ownerDialog->dialogBackground)
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)track, &rect, 0,
-                                                           track->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           track->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
         else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, track, 0,
-                                                                   track->field_0x30 ? 0x1008000 : 0x1000000))
+                                                                   track->usesColorKey ? 0x1008000 : 0x1000000))
             goto failed;
         redrawFrames = redraw;
     }
@@ -4333,14 +4333,14 @@ int UIScrollBar::Draw() {
         }
         if (ownerDialog->dialogBackground) {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)thumb, &rect, 0,
-                                                           thumb->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           thumb->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             if (stateImages[currentState]->frameCount == 1)
                 needsRedraw = 1;
             else
                 RequestRedraw();
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, thumb, 0,
-                                                                     thumb->field_0x30 ? 0x1008000 : 0x1000000)) {
+                                                                     thumb->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
     }
@@ -4550,11 +4550,11 @@ int UIListBox::Draw() {
         if (ownerDialog->dialogBackground) {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)drawnTexture, (CameraRect*)screenArea,
                                                            visibleArea,
-                                                           drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             redrawFrames = redraw;
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
-                       screenArea, drawnTexture, visibleArea, drawnTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                       screenArea, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
     }
@@ -4626,14 +4626,14 @@ int UIListBox::Draw() {
                         TextureMap* texture = rowTable[row].image->GetCurrentFrame()->frameTexture;
                         if (ownerDialog->dialogBackground) {
                             ownerDialog->dialogBackground->DrawImage(
-                                (PCTextureMap*)texture, &rect, 0, texture->field_0x30 ? 0x1008000 : 0x1000000,
+                                (PCTextureMap*)texture, &rect, 0, texture->usesColorKey ? 0x1008000 : 0x1000000,
                                 backgroundRegion, needsRedraw, &redrawFrames, 0);
                             if (rowTable[row].image->frameCount > 1) {
                                 done = 0;
                                 frames = redrawFrames;
                             }
                         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
-                                       &rect, texture, 0, texture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                                       &rect, texture, 0, texture->usesColorKey ? 0x1008000 : 0x1000000)) {
                             goto failed;
                         }
                         visible++;
@@ -4816,9 +4816,9 @@ void UIDropDownList::SetCornerImage(UIAnim* image) {
         buttonPart->screenArea[1] = 0;
         buttonPart->screenArea[0] = staticPart2->screenArea[2];
         buttonPart->screenArea[2] =
-            buttonPart->GetStateTexture(-1)->field_0x14 + buttonPart->screenArea[0];
+            buttonPart->GetStateTexture(-1)->textureWidth + buttonPart->screenArea[0];
         buttonPart->screenArea[3] =
-            buttonPart->GetStateTexture(-1)->field_0x18 + buttonPart->screenArea[1];
+            buttonPart->GetStateTexture(-1)->textureHeight + buttonPart->screenArea[1];
         *(CameraRect*)buttonPart->bounds = *(CameraRect*)buttonPart->screenArea;
     }
     staticPart1->screenArea[0] = staticPart2->screenArea[2];
@@ -4927,10 +4927,10 @@ int UIProgressBar::Draw() {
         rect.bottom = (int)(source.bottom * owner->scaleY + rect.top);
         if (owner->dialogBackground) {
             owner->dialogBackground->DrawImage((PCTextureMap*)barTexture, &rect, &source,
-                                                      barTexture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                      barTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                       backgroundRegion, needsRedraw, &redraw, 0);
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
-                       &rect, barTexture, &source, barTexture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                       &rect, barTexture, &source, barTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
     }

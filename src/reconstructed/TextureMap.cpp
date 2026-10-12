@@ -18,20 +18,20 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x0050a4e0
 TextureMap::TextureMap(TextureMapManager* manager, int registered) {
-    field_0x08 = 0;
-    field_0x0c = 0;
-    field_0x10 = manager;
-    field_0x24 = 0;
-    field_0x14 = 0;
-    field_0x18 = 0;
-    field_0x20 = 0;
+    nextTexture = 0;
+    previousTexture = 0;
+    ownerManager = manager;
+    mipCount = 0;
+    textureWidth = 0;
+    textureHeight = 0;
+    mapFormat = 0;
     if (registered && manager)
         manager->RegisterTexture(this);
-    field_0x44 = 0;
-    field_0x30 = 0;
-    field_0x28 = 0;
+    statePairCount = 0;
+    usesColorKey = 0;
+    sourcePalette = 0;
     field_0x40 = 0;
-    field_0x68 = 0;
+    mapFlags = 0;
     field_0x6c = 0;
 }
 
@@ -117,7 +117,7 @@ failed:
     if (palette) {
         texturePalette = (UnknownTexturePalette*)palette->field_0x708;
         surfacePalette = palette->field_0x70c;
-        map->field_0x28 = palette;
+        map->sourcePalette = palette;
         if (addRef)
             palette->AddRef();
     }
@@ -153,10 +153,10 @@ failed:
 // 0x0050ab40: releases +0x28, unregisters from the manager and drops the
 // resource manager's entry for the texture.
 TextureMap::~TextureMap() {
-    if (field_0x28)
-        field_0x28->Release();
-    if (field_0x10)
-        field_0x10->UnregisterTexture(this);
+    if (sourcePalette)
+        sourcePalette->Release();
+    if (ownerManager)
+        ownerManager->UnregisterTexture(this);
     void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
     if (entry)
         g_UnknownResourceManager572b44->SetItemObject(entry, 0);
@@ -164,12 +164,12 @@ TextureMap::~TextureMap() {
 
 // 0x0050abd0
 int TextureMap::UnknownFunction50abd0(int addressU, int addressV) {
-    if (IsFormat4444Or8888(field_0x20)) {
-        for (int i = 0; i < field_0x44; i++) {
-            if (field_0x48[i].state == 0x13)
-                field_0x48[i].value = addressU;
-            else if (field_0x48[i].state == 0x14)
-                field_0x48[i].value = addressV;
+    if (IsFormat4444Or8888(mapFormat)) {
+        for (int i = 0; i < statePairCount; i++) {
+            if (statePairs[i].state == 0x13)
+                statePairs[i].value = addressU;
+            else if (statePairs[i].state == 0x14)
+                statePairs[i].value = addressV;
         }
         return 1;
     }

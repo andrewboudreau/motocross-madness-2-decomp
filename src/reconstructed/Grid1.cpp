@@ -90,7 +90,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
     } else {
         detail = Extra()->detail;
     }
-    float width = (float)texture->field_0x14 * 2;
+    float width = (float)texture->textureWidth * 2;
     if (detail > width)
         detail = width;
 
@@ -104,7 +104,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
     size <<= 1;
     if (fraction < 0.0f)
         fraction = 0.0f;
-    if (!(texture->field_0x68 & 1))
+    if (!(texture->mapFlags & 1))
         return;
     texture->RecordUse(level + 1 + fraction);
 
@@ -173,7 +173,7 @@ int DrawableGridNodeSharedTextures::UnknownVirtualSlot8(int block)
         else
             texture = Terrain()->textures[index];
         if (texture)
-            return texture->field_0x14 << texture->field_0x6c;
+            return texture->textureWidth << texture->field_0x6c;
     }
     return 0;
 }

@@ -68,17 +68,17 @@ void UnknownOverlayText::SelectFont(const char* font) {
 
 // 0x0050b080
 int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const char* text, int color) {
-    if (texture->field_0x20 == 1555)
-        return DrawText1555(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
-    if (texture->field_0x20 == 4444)
-        return DrawText4444(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
+    if (texture->mapFormat == 1555)
+        return DrawText1555(texture, x, y, text, UnknownFunction43b660(color, texture->mapFormat));
+    if (texture->mapFormat == 4444)
+        return DrawText4444(texture, x, y, text, UnknownFunction43b660(color, texture->mapFormat));
 
     TextureMap* fontTexture = currentFont->GetTexture();
-    unsigned int width = texture->field_0x14;
+    unsigned int width = texture->textureWidth;
     long pitch = 0;
     long fontPitch = 0;
-    unsigned int fontWidth = fontTexture->field_0x14;
-    unsigned int fontHeight = fontTexture->field_0x18;
+    unsigned int fontWidth = fontTexture->textureWidth;
+    unsigned int fontHeight = fontTexture->textureHeight;
     unsigned int* bits = (unsigned int*)texture->UnknownVirtualSlot13(0, &pitch, 0);
     unsigned int* fontBits = (unsigned int*)fontTexture->UnknownVirtualSlot13(0, &fontPitch, 0);
     Rectangle2D cell(0, 0, 0, 0);
@@ -125,11 +125,11 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
 // 0x0050b400
 int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const char* text, int color) {
     TextureMap* fontTexture = currentFont->GetTexture();
-    unsigned int width = texture->field_0x14;
+    unsigned int width = texture->textureWidth;
     long pitch = 0;
     long fontPitch = 0;
-    unsigned int fontWidth = fontTexture->field_0x14;
-    unsigned int fontHeight = fontTexture->field_0x18;
+    unsigned int fontWidth = fontTexture->textureWidth;
+    unsigned int fontHeight = fontTexture->textureHeight;
     unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, &pitch, 0);
     unsigned short* fontBits = (unsigned short*)fontTexture->UnknownVirtualSlot13(0, &fontPitch, 0);
     Rectangle2D cell(0, 0, 0, 0);
@@ -176,11 +176,11 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
 // 0x0050b700
 int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const char* text, int color) {
     TextureMap* fontTexture = currentFont->GetTexture();
-    unsigned int width = texture->field_0x14;
+    unsigned int width = texture->textureWidth;
     long pitch = 0;
     long fontPitch = 0;
-    unsigned int fontWidth = fontTexture->field_0x14;
-    unsigned int fontHeight = fontTexture->field_0x18;
+    unsigned int fontWidth = fontTexture->textureWidth;
+    unsigned int fontHeight = fontTexture->textureHeight;
     unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, &pitch, 0);
     unsigned short* fontBits = (unsigned short*)fontTexture->UnknownVirtualSlot13(0, &fontPitch, 0);
     Rectangle2D cell(0, 0, 0, 0);

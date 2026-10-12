@@ -95,7 +95,7 @@ void UnknownOverlayText::DrawVertices(RenderTarget* target, void* vertices, int 
     target->UnknownVirtualSlot6(0, 0xc, &saved);
     target->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
     target->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
-    int format = texture->field_0x20;
+    int format = texture->mapFormat;
     if (format == 4444 || format == 8888) {
         target->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
         target->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

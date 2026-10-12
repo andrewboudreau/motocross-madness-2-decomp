@@ -129,13 +129,13 @@ float MeanTextureChannelDifference(TextureMap* first, TextureMap* second) {
         second->UnknownVirtualSlot14(0);
         return -1.0f;
     }
-    int width = first->field_0x14;
-    int is555 = first->field_0x20 == 0x22b;
+    int width = first->textureWidth;
+    int is555 = first->mapFormat == 0x22b;
     float total = 0.0f;
     int firstSkip = firstPitch / sizeof(unsigned short) - width;
     int secondSkip = secondPitch / sizeof(unsigned short) - width;
     int count = 0;
-    for (int rows = first->field_0x18; rows--;) {
+    for (int rows = first->textureHeight; rows--;) {
         for (int columns = width; columns--;) {
             int pixelA;
             int pixelB;

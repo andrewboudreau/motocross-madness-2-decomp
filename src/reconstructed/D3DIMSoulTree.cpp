@@ -809,8 +809,8 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
         SoultreeMaterial* material = materialTable[i];
         if (material->field_0x70) {
             ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
-            if (texture->field_0x68 & 1) {
-                float width = (float)texture->field_0x14;
+            if (texture->mapFlags & 1) {
+                float width = (float)texture->textureWidth;
                 float size = (scale * *(float*)&material->field_0xcc) * width;
                 if (size > width + width)
                     size = width + width;
