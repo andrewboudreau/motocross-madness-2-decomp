@@ -274,8 +274,8 @@
     "candidate_symbol_contains": "Fn_00515c90@Tire",
     "target_va": "0x00515c90",
     "target_size": 292,
-    "expect": "partial",
-    "notes": "287/292 strict: normalised cross product with fallback; only the x scale loads the scalar first (see Tire.cpp).",
+    "expect": "exact",
+    "notes": "Normalised cross product with fallback; strict exact once the x scale reads its component through a local stored after the FastInvSqrt call (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   }
 ]

@@ -769,25 +769,18 @@ static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec
     return r;
 }
 
-// 0x00515c90 (near miss, 287/292): the normalised cross product a x b; the
-// fallback when it is exactly zero (this is unused). Three source shapes give
+// 0x00515c90 (exact, 292 bytes): the normalised cross product a x b; the
+// fallback when it is exactly zero (this is unused). Source shapes that give
 // retail's leaf ages (docs/VC6_OPERAND_ORDER.md section 1.2): the reference
 // `av` for a.y in the first product puts the y and z products' b components
-// first (231 -> 238); assigning n after its declaration instead of
-// initialising it gives retail's esi/ecx/edx result registers (242); testing
-// n.y and n.z (not c) for zero makes those components older than the
-// FastInvSqrt result, so their scales load the scalar first and the last one
-// consumes it (287). The parenthesised first products give retail's copy
-// schedule. Left: the x scale loads the scalar first (`fld st(0); fmul c.x`),
-// retail the component. Unchanged (287): x written as n.x * inv, inv * n.x,
-// c.x * inv, through a reference, pointer or float pointer; the x test on c
-// or n; the squared length through the helper or in the body on c or n;
-// `n = c` through a reference; a member-wise copy is far worse (91). With
-// the scales reading c for y and z the schedule matches but the addresses do
-// not; the 64 a/b alias placements (reference or pointer) peak at 238.
-// 0..40 dead initialised int locals at the top, before the scales or in the
-// cross-product helper give 287 at every count: this operand order is not the
-// declaration-count tie-break (docs/VC6_OPERAND_ORDER.md, second 2026-10-11 pass).
+// first; assigning n after its declaration instead of initialising it gives
+// retail's esi/ecx/edx result registers; testing n's components for zero
+// makes y and z older than the FastInvSqrt result, so their scales load the
+// scalar first and the last one consumes it. The x scale reads its component
+// through a local stored after the call (`nx`), a leaf newer than the scalar,
+// so it loads the component first (`fld c.x; fmul st(1)`) like retail; every
+// spelling of `n.x * inv`, inline float helpers by value or reference and
+// helper-based zero tests kept `fld st(0); fmul c.x` (287).
 CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                  const CollisionVec3* fallback)
 {
@@ -806,7 +799,8 @@ CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, con
             n = kVec3Zero;
         } else {
             float inv = FastInvSqrt(lenSq);
-            n.x *= inv;
+            float nx = n.x;
+            n.x = nx * inv;
             n.y *= inv;
             n.z *= inv;
         }

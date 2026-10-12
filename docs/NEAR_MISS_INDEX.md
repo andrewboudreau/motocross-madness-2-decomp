@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 154, c 107, total 262. The three class (a) functions of the
+Counts: a 1, b 153, c 107, total 261. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -188,7 +188,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/tire/Tire | `0x00514550` | 175/4438 | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
 | physics/tire/Tire | `0x00515880` | 522/703 | c | row 0 of the frame: retail spills its z through a stack temp and stores x/y last; the keepZ test is scheduled later; c.y loads z.z first |
 | physics/tire/Tire | `0x00515b50` | 305/316 | c | side friction term: VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2) ; fmul [ecx + 0x74]`), and one frictionForce copy store is scheduled earlier |
-| physics/tire/Tire | `0x00515c90` | 287/292 | b | true extent 292; the x component of the normalisation scale loads the scalar first (`fld st(0); fmul c.x`), retail the component; cross product, registers and y/z scales match (samples/physics/tire/Tire.cpp) |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2046/2814 (masked) | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 1386/13322 | b | frame 0xac4 vs 0xab0, slot order differs (register choice follows); retail keeps one more stream destructor tail |

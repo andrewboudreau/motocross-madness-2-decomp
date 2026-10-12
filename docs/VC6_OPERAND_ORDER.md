@@ -87,6 +87,11 @@ of a call (in `st(0)`):
   last product of the group consumes the scalar (`fmul v.z`).
 - A scalar stored to memory first (`fillf(&s)`) is the newest leaf and loads
   first (`fld s; fmul v.x`) for all three components.
+- The converse for one component: copying it into a local after the call
+  (`float nx = n.x; n.x = nx * inv;`) makes that local the newer leaf, so it
+  loads first (`fld nx; fmul st(1)`) while the other components keep the
+  scalar-first form. This made Tire `0x00515c90` exact; the spellings
+  `n.x * inv`, `inv * n.x`, `c.x * inv` and inline float helpers did not.
 
 So "a scalar is loaded first when it is a local of the inlined helper"
 (docs/PHYSICS_VALIDATION.md) is the same rule: the helper's `k` is the newest
