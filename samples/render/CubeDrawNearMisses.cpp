@@ -13,7 +13,12 @@
 // row into a single cell pointer (index, pointer, 3-D cast and explicit row
 // pointer forms all fold, or keep the face counter). Also tried: a rowStart
 // index, a 4-D array cast, a loop bounded by the row pointer and a
-// post-incremented vertex pointer (39 of 352 at best).
+// post-incremented vertex pointer (39 of 352 at best). Session 10 also
+// tried slot 14's flat form (cell = face * 16 + row * 4 + column, first =
+// cell * 6 on the global array), a per-row first-vertex index, the cell
+// index in the innermost loop, a down-counting column loop, rows stepped
+// by 4 cells, a byte-offset cell address and a column-offset cell pointer:
+// all compile to the same 30 of 352 (the row reset still folds away).
 //
 // 0x0043e330 (398 bytes): the walk matches; eax and ecx swap roles for the
 // render target and its camera, the face mask is addressed [face + cube]
