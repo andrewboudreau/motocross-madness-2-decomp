@@ -33,20 +33,20 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
     if (!raceView) {
         switch (g_TrackGame->mode.raceSettings.eventType) {
             case 2:
-                raceView = g_TrackGame->field_0x564->field_0x34;
+                raceView = g_TrackGame->nationalEvent->raceView;
                 break;
             case 3:
-                raceView = g_TrackGame->field_0x558->field_0x34;
+                raceView = g_TrackGame->supercrossEvent->raceView;
                 break;
             case 0:
-                raceView = g_TrackGame->field_0x55c->field_0x34;
+                raceView = g_TrackGame->quarryEvent->raceView;
                 break;
             case 1:
             case 5:
-                raceView = g_TrackGame->field_0x560->field_0x34;
+                raceView = g_TrackGame->bajaEnduroEvent->raceView;
                 break;
             case 4:
-                raceView = g_TrackGame->field_0x568->field_0x34;
+                raceView = g_TrackGame->tagEvent->raceView;
                 break;
         }
     }
@@ -55,10 +55,10 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
         Vector3 second;
         if (!s_UnknownActive67c3f4) {
             s_UnknownActive67c3f4 = true;
-            raceView->WriteRelativePositions(&second, &first, g_TrackGame->field_0x560, 0);
+            raceView->WriteRelativePositions(&second, &first, g_TrackGame->bajaEnduroEvent, 0);
             FollowCamera::UnknownVirtualSlot46(&first, &s_UnknownVector67c3e8);
         }
-        raceView->WriteRelativePositions(&first, &second, g_TrackGame->field_0x560, 0);
+        raceView->WriteRelativePositions(&first, &second, g_TrackGame->bajaEnduroEvent, 0);
         first.y = raceView->localRacer->position.y + 2.0f;
         FollowCamera::UnknownVirtualSlot47(frameTime, &first);
         return 1;

@@ -76,7 +76,7 @@ struct TrackGameViewOwner : public GameObject {
 
     UnknownTrackGameViewPart* field_0x2c;
     unsigned char field_0x30[0x34 - 0x30];
-    UnknownKrustyBikeView* field_0x34;
+    UnknownKrustyBikeView* raceView;          // +0x34
     unsigned char field_0x38[0x3c - 0x38];
     FollowCamera* raceCamera;                 // +0x3c the race camera (InGameProcs.cpp VCRDlg)
     unsigned char field_0x40[0x5c - 0x40];
@@ -84,7 +84,7 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x60;
     GameObject* field_0x64;
     GameObject* field_0x68;
-    TextQueueOverlay* field_0x6c;
+    TextQueueOverlay* textQueue;              // +0x6c
     float field_0x70;                         // compared with TrackGame+0x2eb0, settings +0x140 (EventManager 0x0045eef0)
     float field_0x74;                         // RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
     unsigned char field_0x78[0x9c - 0x78];
@@ -664,13 +664,15 @@ public:
     // 0x00521860: opens (`open`) or closes the in-game menu `id`.
     void SetMenuOpen(int open, int id, int sound);
 
-    // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
-    // mode.raceSettings.eventType.
-    TrackGameViewOwner* field_0x558;
-    TrackGameViewOwner* field_0x55c;
-    TrackGameViewOwner* field_0x560;
-    TrackGameViewOwner* field_0x564;
-    TrackGameViewOwner* field_0x568;
+    // The event objects, one per mode.raceSettings.eventType: KrustyBikeCamera
+    // slot 10 (0x00497e20) takes +0x34 of the one for the event type, and
+    // the type also picks the series directory (0x005240e0: Quarries, Baja,
+    // National, SX, Tag, Enduro). 0x0045cb70 creates types 0 and 2.
+    TrackGameViewOwner* supercrossEvent;      // +0x558 event type 3 (SX)
+    TrackGameViewOwner* quarryEvent;          // +0x55c event type 0 (BaseQuarryEvent)
+    TrackGameViewOwner* bajaEnduroEvent;      // +0x560 event types 1 and 5 (Baja, Enduro)
+    TrackGameViewOwner* nationalEvent;        // +0x564 event type 2 (NationalRace)
+    TrackGameViewOwner* tagEvent;             // +0x568 event type 4 (Tag)
     KrustyUI* ui;
     EventManager* eventManager;
     UnknownTrackGameObject574* sceneObject;

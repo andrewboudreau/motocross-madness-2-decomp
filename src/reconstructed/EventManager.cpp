@@ -168,52 +168,52 @@ void EventManager::UnknownFunction45d270() {
 
 // 0x0045d2b0
 TrackGameViewOwner* EventManager::FindRaceMode() {
-    if (g_TrackGame->field_0x558)
-        return g_TrackGame->field_0x558;
-    if (g_TrackGame->field_0x55c)
-        return g_TrackGame->field_0x55c;
-    if (g_TrackGame->field_0x560)
-        return g_TrackGame->field_0x560;
-    if (g_TrackGame->field_0x564)
-        return g_TrackGame->field_0x564;
-    return g_TrackGame->field_0x568;
+    if (g_TrackGame->supercrossEvent)
+        return g_TrackGame->supercrossEvent;
+    if (g_TrackGame->quarryEvent)
+        return g_TrackGame->quarryEvent;
+    if (g_TrackGame->bajaEnduroEvent)
+        return g_TrackGame->bajaEnduroEvent;
+    if (g_TrackGame->nationalEvent)
+        return g_TrackGame->nationalEvent;
+    return g_TrackGame->tagEvent;
 }
 
 // 0x0045d2f0
 UnknownKrustyBikeView* EventManager::FindRaceView() {
-    if (g_TrackGame->field_0x558)
-        return g_TrackGame->field_0x558->field_0x34;
-    if (g_TrackGame->field_0x55c)
-        return g_TrackGame->field_0x55c->field_0x34;
-    if (g_TrackGame->field_0x560)
-        return g_TrackGame->field_0x560->field_0x34;
-    if (g_TrackGame->field_0x564)
-        return g_TrackGame->field_0x564->field_0x34;
-    if (g_TrackGame->field_0x568)
-        return g_TrackGame->field_0x568->field_0x34;
+    if (g_TrackGame->supercrossEvent)
+        return g_TrackGame->supercrossEvent->raceView;
+    if (g_TrackGame->quarryEvent)
+        return g_TrackGame->quarryEvent->raceView;
+    if (g_TrackGame->bajaEnduroEvent)
+        return g_TrackGame->bajaEnduroEvent->raceView;
+    if (g_TrackGame->nationalEvent)
+        return g_TrackGame->nationalEvent->raceView;
+    if (g_TrackGame->tagEvent)
+        return g_TrackGame->tagEvent->raceView;
     return 0;
 }
 
 // 0x0045d340
 TextQueueOverlay* EventManager::FindTextQueue() {
-    if (g_TrackGame->field_0x558)
-        return g_TrackGame->field_0x558->field_0x6c;
-    if (g_TrackGame->field_0x55c)
-        return g_TrackGame->field_0x55c->field_0x6c;
-    if (g_TrackGame->field_0x560)
-        return g_TrackGame->field_0x560->field_0x6c;
-    if (g_TrackGame->field_0x564)
-        return g_TrackGame->field_0x564->field_0x6c;
-    if (g_TrackGame->field_0x568)
-        return g_TrackGame->field_0x568->field_0x6c;
+    if (g_TrackGame->supercrossEvent)
+        return g_TrackGame->supercrossEvent->textQueue;
+    if (g_TrackGame->quarryEvent)
+        return g_TrackGame->quarryEvent->textQueue;
+    if (g_TrackGame->bajaEnduroEvent)
+        return g_TrackGame->bajaEnduroEvent->textQueue;
+    if (g_TrackGame->nationalEvent)
+        return g_TrackGame->nationalEvent->textQueue;
+    if (g_TrackGame->tagEvent)
+        return g_TrackGame->tagEvent->textQueue;
     return 0;
 }
 
 // 0x0045d390
 int EventManager::HasRaceMode() {
-    if (g_TrackGame->field_0x558 || g_TrackGame->field_0x55c ||
-        g_TrackGame->field_0x560 || g_TrackGame->field_0x564 ||
-        g_TrackGame->field_0x568)
+    if (g_TrackGame->supercrossEvent || g_TrackGame->quarryEvent ||
+        g_TrackGame->bajaEnduroEvent || g_TrackGame->nationalEvent ||
+        g_TrackGame->tagEvent)
         return 1;
     return 0;
 }
@@ -454,7 +454,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 return 0;
             if (g_TrackGame->mode.raceSettings.eventType == 4) {
                 TrackGameViewOwner* owner = FindRaceMode();
-                if (owner->followedRacer == owner->field_0x34->localRacer) {
+                if (owner->followedRacer == owner->raceView->localRacer) {
                     owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;
                     // Compared through locals, kept as the best of +0x75c.
                     float best = owner->followedRacer->field_0x760;
@@ -627,16 +627,16 @@ int EventManager::UnknownFunction45cb70() {
     switch (g_TrackGame->mode.raceSettings.eventType) {
     case 0:
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
-        g_TrackGame->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
+        g_TrackGame->quarryEvent = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
-        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->field_0x55c, -1))
+        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->quarryEvent, -1))
             return 0;
         break;
     case 2:
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
-        g_TrackGame->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
+        g_TrackGame->nationalEvent = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
-        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->field_0x564, -1))
+        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->nationalEvent, -1))
             return 0;
         break;
     }
@@ -700,13 +700,13 @@ void EventManager::CheckRaceOver(float frameTime) {
         }
         break;
     case 0:
-        if (g_TrackGame->field_0x55c->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->quarryEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
             return;
         break;
     case 4:
-        if (g_TrackGame->field_0x568->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
+        if (g_TrackGame->tagEvent->field_0x70 < g_TrackGame->mode.raceSettings.field_0x140)
             return;
-        if (owner->followedRacer == owner->field_0x34->localRacer) {
+        if (owner->followedRacer == owner->raceView->localRacer) {
             owner->followedRacer->field_0x764 += owner->followedRacer->field_0x75c;
             // Compared through locals, kept as the best of +0x75c.
             float best = owner->followedRacer->field_0x760;
@@ -945,26 +945,26 @@ void EventManager::CloseRace(int mode) {
                 view->field_0x1a8->Save(name);
         }
     }
-    if (g_TrackGame->field_0x558) {
-        g_TrackGame->field_0x558->Unlink();
-        g_TrackGame->field_0x558->Release();
-        g_TrackGame->field_0x558 = 0;
-    } else if (g_TrackGame->field_0x55c) {
-        g_TrackGame->field_0x55c->Unlink();
-        g_TrackGame->field_0x55c->Release();
-        g_TrackGame->field_0x55c = 0;
-    } else if (g_TrackGame->field_0x560) {
-        g_TrackGame->field_0x560->Unlink();
-        g_TrackGame->field_0x560->Release();
-        g_TrackGame->field_0x560 = 0;
-    } else if (g_TrackGame->field_0x564) {
-        g_TrackGame->field_0x564->Unlink();
-        g_TrackGame->field_0x564->Release();
-        g_TrackGame->field_0x564 = 0;
-    } else if (g_TrackGame->field_0x568) {
-        g_TrackGame->field_0x568->Unlink();
-        g_TrackGame->field_0x568->Release();
-        g_TrackGame->field_0x568 = 0;
+    if (g_TrackGame->supercrossEvent) {
+        g_TrackGame->supercrossEvent->Unlink();
+        g_TrackGame->supercrossEvent->Release();
+        g_TrackGame->supercrossEvent = 0;
+    } else if (g_TrackGame->quarryEvent) {
+        g_TrackGame->quarryEvent->Unlink();
+        g_TrackGame->quarryEvent->Release();
+        g_TrackGame->quarryEvent = 0;
+    } else if (g_TrackGame->bajaEnduroEvent) {
+        g_TrackGame->bajaEnduroEvent->Unlink();
+        g_TrackGame->bajaEnduroEvent->Release();
+        g_TrackGame->bajaEnduroEvent = 0;
+    } else if (g_TrackGame->nationalEvent) {
+        g_TrackGame->nationalEvent->Unlink();
+        g_TrackGame->nationalEvent->Release();
+        g_TrackGame->nationalEvent = 0;
+    } else if (g_TrackGame->tagEvent) {
+        g_TrackGame->tagEvent->Unlink();
+        g_TrackGame->tagEvent->Release();
+        g_TrackGame->tagEvent = 0;
     }
 }
 

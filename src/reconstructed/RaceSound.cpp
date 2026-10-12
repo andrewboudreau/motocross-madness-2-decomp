@@ -850,7 +850,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             {
                 UnknownMessage message(text, 1.5f);
                 if (owner)
-                    owner->field_0x6c->ReplaceHeadMessage(&message);
+                    owner->textQueue->ReplaceHeadMessage(&message);
             }
             if (g_TrackGame->mode.networkGame)
                 crowdSounds->UnknownFunction401dd0(musicVolume);

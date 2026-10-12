@@ -237,7 +237,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButPrevRider", event->controlName) ||
                    !_stricmp("ButNextRider", event->controlName)) {
             UnknownKrustyBikeView* racers =
-                g_TrackGame->eventManager->FindRaceMode()->field_0x34;
+                g_TrackGame->eventManager->FindRaceMode()->raceView;
             if (!_stricmp("ButPrevRider", event->controlName))
                 racers->UnknownFunction41f1d0(1, 1, 0);
             else

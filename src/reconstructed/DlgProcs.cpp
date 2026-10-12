@@ -1323,10 +1323,10 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->UnknownFunction521a40();
                 g_TrackGame->ResetClock();
                 g_TrackGame->eventManager->FindRaceView()->UnknownFunction421050();
-                if (g_TrackGame->field_0x55c)
-                    g_TrackGame->field_0x55c->ResetClock();
-                if (g_TrackGame->field_0x568)
-                    g_TrackGame->field_0x568->ResetClock();
+                if (g_TrackGame->quarryEvent)
+                    g_TrackGame->quarryEvent->ResetClock();
+                if (g_TrackGame->tagEvent)
+                    g_TrackGame->tagEvent->ResetClock();
                 g_TrackGame->eventManager->UnknownFunction45d270();
             }
             g_UnknownGlobal59adfc++;
@@ -1649,13 +1649,13 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
         break;
     case kMenuExit: {
         g_TrackGame->SetMenuOpen(0, kMenuExit, 0);
-        TrackGameViewOwner* owner = g_TrackGame->field_0x568;
+        TrackGameViewOwner* owner = g_TrackGame->tagEvent;
         if (owner && g_TrackGame->network && g_TrackGame->network->isHost &&
-            owner->followedRacer && owner->field_0x34 && owner->followedRacer == owner->field_0x34->localRacer) {
-            UnknownEventRacer* racer = owner->field_0x34->localRacer;
+            owner->followedRacer && owner->raceView && owner->followedRacer == owner->raceView->localRacer) {
+            UnknownEventRacer* racer = owner->raceView->localRacer;
             if (racer)
                 racer->field_0x4a0 = 1;
-            g_TrackGame->field_0x568->PickFollowedRacer();
+            g_TrackGame->tagEvent->PickFollowedRacer();
         }
         g_TrackGame->eventManager->CloseRace(2);
         if (g_TrackGame->network) {

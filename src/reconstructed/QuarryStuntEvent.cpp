@@ -186,7 +186,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
     }
     int total = opponents * 0x80000 / 3 + opponents * 0x8000 / 3 + players * 0x80000 / 3 + 0x80000 / 3;
     int extra;
-    if (g_TrackGame->field_0x560)
+    if (g_TrackGame->bajaEnduroEvent)
         extra = 2 * (0x80000 / 3);
     else
         extra = 3 * (0x80000 / 3);

@@ -410,7 +410,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                             recorderTickElapsed -= g_TrackGame->shortRecordPacketIntervalSeconds;
                             field_0x1ac = replayLength;
                             field_0x1b0++;
-                            TrackGameViewOwner* owner = g_TrackGame->field_0x568;
+                            TrackGameViewOwner* owner = g_TrackGame->tagEvent;
                             if (owner != 0 && owner->field_0xdc != 0 && owner->followedRacer == 0) {
                                 field_0x1b4 = UnknownFunctionRacerCount() + 1;
                             } else {
@@ -539,20 +539,20 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
                         case 2:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x564->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->nationalEvent->field_0x64;
                             break;
                         case 3:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x558->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->supercrossEvent->field_0x64;
                             break;
                         case 0:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x55c->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->quarryEvent->field_0x64;
                             break;
                         case 1:
                         case 5:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x560->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->bajaEnduroEvent->field_0x64;
                             break;
                         case 4:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->field_0x568->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->tagEvent->field_0x64;
                             break;
                         }
                     }
@@ -893,26 +893,26 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 TextQueueOverlay* overlay;
                 switch (g_TrackGame->mode.raceSettings.eventType) {
                 case 2:
-                    overlay = g_TrackGame->field_0x564->field_0x6c;
+                    overlay = g_TrackGame->nationalEvent->textQueue;
                     if (overlay != 0 && message != 0) {
                         overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 case 0:
-                    overlay = g_TrackGame->field_0x55c->field_0x6c;
+                    overlay = g_TrackGame->quarryEvent->textQueue;
                     if (overlay != 0 && message != 0) {
                         overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 case 1:
                 case 5:
-                    overlay = g_TrackGame->field_0x560->field_0x6c;
+                    overlay = g_TrackGame->bajaEnduroEvent->textQueue;
                     if (overlay != 0 && message != 0) {
                         overlay->ReplaceHeadMessage(message);
                     }
                     break;
                 case 4:
-                    overlay = g_TrackGame->field_0x568->field_0x6c;
+                    overlay = g_TrackGame->tagEvent->textQueue;
                     if (overlay != 0 && message != 0) {
                         overlay->ReplaceHeadMessage(message);
                     }
@@ -1243,7 +1243,7 @@ void BikeRace::UnknownFunction420590(int player) {
         int id = g_TrackGame->mode.racers[i].networkPlayerId;
         if (id != self && id == player && racerSlots[i] != 0) {
             racerSlots[i]->UnknownRacerVirtualSlot44();
-            TrackGameViewOwner* owner = g_TrackGame->field_0x568;
+            TrackGameViewOwner* owner = g_TrackGame->tagEvent;
             if (owner != 0 && owner->followedRacer == (UnknownEventRacer*)racerSlots[i]) {
                 if (g_TrackGame->mode.raceSettings.tagBall) {
                     owner->followedRacer = 0;
@@ -1343,25 +1343,25 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
          racer = NextBike(&iterator)) {
         racer->UnknownRacerVirtualSlot43();
         racer->restarted = true;
-        WriteRelativePositions(&position, &direction, g_TrackGame->field_0x560,
+        WriteRelativePositions(&position, &direction, g_TrackGame->bajaEnduroEvent,
                               positions[iterator - 1]);
         racer->startPosition = position;
         racer->startDirection = direction;
         racer->UnknownFunction496e20(replayVcr);
         field_0x3f8 = false;
     }
-    if (g_TrackGame->field_0x568 != 0 &&
-        g_TrackGame->field_0x568->field_0xdc != 0) {
-        g_TrackGame->field_0x568->field_0xdc->SetRecorder(replayVcr);
+    if (g_TrackGame->tagEvent != 0 &&
+        g_TrackGame->tagEvent->field_0xdc != 0) {
+        g_TrackGame->tagEvent->field_0xdc->SetRecorder(replayVcr);
     }
-    if (g_TrackGame->field_0x55c != 0) {
-        g_TrackGame->field_0x55c->ResetClock();
+    if (g_TrackGame->quarryEvent != 0) {
+        g_TrackGame->quarryEvent->ResetClock();
     }
-    if (g_TrackGame->field_0x568 != 0) {
-        g_TrackGame->field_0x568->ResetClock();
+    if (g_TrackGame->tagEvent != 0) {
+        g_TrackGame->tagEvent->ResetClock();
     }
-    if (g_TrackGame->field_0x560 != 0) {
-        g_TrackGame->field_0x560->UnknownFunction404df0(0, 1, UnknownFunctionCameraView()->field_0x3b4);
+    if (g_TrackGame->bajaEnduroEvent != 0) {
+        g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(0, 1, UnknownFunctionCameraView()->field_0x3b4);
     }
 }
 
@@ -1485,7 +1485,7 @@ void BikeRace::UnknownFunction421050() {
 
 // Inline: TrackGame+0x568's ghost bike, reloaded at each use.
 static inline UnknownBikeRaceGhost* GhostBike() {
-    return (UnknownBikeRaceGhost*)g_TrackGame->field_0x568->field_0xdc;
+    return (UnknownBikeRaceGhost*)g_TrackGame->tagEvent->field_0xdc;
 }
 
 // 0x00421d50
@@ -1778,7 +1778,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         }
     } else if (a == 0x11) {
         UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
-        if (g_TrackGame->field_0x568 != 0 && g_TrackGame->field_0x568->field_0xdc != 0) {
+        if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->field_0xdc != 0) {
             GhostBike()->hasState = 1;
             UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
             GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
@@ -1815,7 +1815,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         if (flag) {
             return 1;
         }
-        if (g_TrackGame->field_0x568 != 0 && g_TrackGame->field_0x568->field_0xdc != 0 &&
+        if (g_TrackGame->tagEvent != 0 && g_TrackGame->tagEvent->field_0xdc != 0 &&
             GhostBike()->hasState) {
             UnknownBikeRaceGhostPart* oldest = GhostBike()->receivedStates[3];
             GhostBike()->receivedStates[3] = GhostBike()->receivedStates[2];
@@ -1831,14 +1831,14 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
         }
     } else if (a == 0x87) {
         UnknownBikeRaceVcrFollow* follow = (UnknownBikeRaceVcrFollow*)data;
-        if (g_TrackGame->field_0x568 != 0) {
-            g_TrackGame->field_0x568->followedRacer = 0;
+        if (g_TrackGame->tagEvent != 0) {
+            g_TrackGame->tagEvent->followedRacer = 0;
             if (follow->field_0x08 != 0) {
                 int iterator = 0;
                 for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
                      racer = NextBike(&iterator)) {
                     if (racer->recorderId == follow->field_0x08) {
-                        g_TrackGame->field_0x568->followedRacer = (UnknownEventRacer*)racer;
+                        g_TrackGame->tagEvent->followedRacer = (UnknownEventRacer*)racer;
                         break;
                     }
                 }

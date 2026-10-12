@@ -93,11 +93,11 @@ void SendDebugMessage(const char* format, ...)
 // 0x00520870
 TrackGame::TrackGame() {
     sceneObject = 0;
-    field_0x558 = 0;
-    field_0x55c = 0;
-    field_0x560 = 0;
-    field_0x564 = 0;
-    field_0x568 = 0;
+    supercrossEvent = 0;
+    quarryEvent = 0;
+    bajaEnduroEvent = 0;
+    nationalEvent = 0;
+    tagEvent = 0;
     ui = 0;
     eventManager = 0;
     textureManager = 0;
@@ -466,7 +466,7 @@ void TrackGame::UnknownFunction521a40() {
 // 0x00521a50
 int TrackGame::UnknownVirtualSlot5() {
     PCGame::UnknownVirtualSlot5();
-    if (field_0x55c)
+    if (quarryEvent)
         ResetClock();
     return 1;
 }

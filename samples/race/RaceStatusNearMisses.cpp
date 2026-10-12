@@ -143,10 +143,10 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
                                        &racer->lapStartTime, &racer->hasFinished, lapLimit, unlimited,
                                        racer->field_0x735, racer->field_0x7c0))
                 return 0;
-            if (g_TrackGame->field_0x560 && gate != racer->field_0x7b8) {
-                racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->field_0x560->field_0xac;
+            if (g_TrackGame->bajaEnduroEvent && gate != racer->field_0x7b8) {
+                racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
                 if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->field_0x50)->field_0x3b4)
-                    g_TrackGame->field_0x560->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
+                    g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
                                                                               racer);
             }
         }

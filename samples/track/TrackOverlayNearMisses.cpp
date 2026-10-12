@@ -230,10 +230,10 @@ int StatsOverlay::DrawStandings()
     void* font;
     int i;
     int count = 0;
-    UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
+    UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
     if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
-        TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
+        TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
         float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s", label);

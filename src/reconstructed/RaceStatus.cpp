@@ -269,7 +269,7 @@ int RankByScore(int keepRacing) {
 
     if (g_TrackGame->mode.raceSettings.eventType == 0) {
         count = 0;
-        UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
+        UnknownKrustyBikeView* view = g_TrackGame->quarryEvent->raceView;
         UnknownEventRacer* racer;
         iterator = 0;
         for (racer = view->NextBike(&iterator); racer; racer = view->NextBike(&iterator)) {
@@ -283,7 +283,7 @@ int RankByScore(int keepRacing) {
         for (i = 0; i < count; i++)
             scores[i].racer->finishPosition = i + 1;
         if (!keepRacing) {
-            TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
+            TrackGameViewOwner* owner = g_TrackGame->quarryEvent;
             if (owner->field_0x70 * 60.0f + owner->field_0x74 >=
                 g_TrackGame->mode.raceSettings.field_0x140 * 60.0f - 1.0f) {
                 for (i = 0; i < count; i++)

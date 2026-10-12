@@ -124,9 +124,9 @@ int BikeRace::AimCamera(int caster) {
                 field_0x05c->AddCaster(racerSlots[field_0x14c]->field_0x3bc);
                 field_0x05c->AddCaster(racerSlots[field_0x14c]->field_0x5c4->field_0x1a0);
             }
-            if (g_TrackGame->field_0x560 != 0) {
+            if (g_TrackGame->bajaEnduroEvent != 0) {
                 UnknownBikeRaceRacer* racer = racerSlots[field_0x14c];
-                g_TrackGame->field_0x560->UnknownFunction404df0(racer->field_0x7b8,
+                g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8,
                                                                           racer->field_0x7bc, racer);
             }
         } else if (field_0x14c == 0) {
@@ -138,9 +138,9 @@ int BikeRace::AimCamera(int caster) {
                 field_0x05c->AddCaster(localRacer->field_0x3bc);
                 field_0x05c->AddCaster(localRacer->field_0x5c4->field_0x1a0);
             }
-            if (g_TrackGame->field_0x560 != 0) {
+            if (g_TrackGame->bajaEnduroEvent != 0) {
                 UnknownBikeRaceRacer* racer = localRacer;
-                g_TrackGame->field_0x560->UnknownFunction404df0(racer->field_0x7b8,
+                g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8,
                                                                           racer->field_0x7bc, racer);
             }
         } else {
@@ -153,9 +153,9 @@ int BikeRace::AimCamera(int caster) {
                 field_0x05c->AddCaster(aiRacers[index]->field_0x3bc);
                 field_0x05c->AddCaster(aiRacers[index]->field_0x5c4->field_0x1a0);
             }
-            if (g_TrackGame->field_0x560 != 0) {
+            if (g_TrackGame->bajaEnduroEvent != 0) {
                 UnknownBikeRaceRacer* racer = aiRacers[index];
-                g_TrackGame->field_0x560->UnknownFunction404df0(racer->field_0x7b8,
+                g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->field_0x7b8,
                                                                           racer->field_0x7bc, racer);
             }
         }

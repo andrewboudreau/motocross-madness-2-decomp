@@ -482,7 +482,7 @@ void StatsOverlay::DrawTimeLeft()
     int count;
     TrackGame* game = g_TrackGame;
     if (game->mode.raceSettings.raceMode != 0 && game->mode.raceSettings.raceMode != 4) {
-        TrackGameViewOwner* owner = game->field_0x55c;
+        TrackGameViewOwner* owner = game->quarryEvent;
         float limit = game->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         rect = rowRects[0];
@@ -661,7 +661,7 @@ int StatsOverlay::DrawRacePanel()
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13ad, label, 0x80);
     sprintf(rowText[5], "%s %d / %d", label, instrumentSource->state->lapGate + 1,
-            g_TrackGame->field_0x560->field_0xac);
+            g_TrackGame->bajaEnduroEvent->field_0xac);
     for (i = 0; i <= 5; i++) {
         if (strcmp(rowText[i], field_0x1b0[i]) != 0)
             goto draw;
@@ -706,7 +706,7 @@ int StatsOverlay::DrawTagStandings()
     int count = 0;
     if (g_TrackGame->mode.raceSettings.raceMode != 0) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
-        TrackGameViewOwner* owner = g_TrackGame->field_0x568;
+        TrackGameViewOwner* owner = g_TrackGame->tagEvent;
         float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s %s", label, time);
@@ -714,7 +714,7 @@ int StatsOverlay::DrawTagStandings()
     if (g_TrackGame->mode.raceSettings.field_0x148) {
         int iterator;
         int own;
-        UnknownKrustyBikeView* view = g_TrackGame->field_0x568->field_0x34;
+        UnknownKrustyBikeView* view = g_TrackGame->tagEvent->raceView;
         iterator = 0;
         UnknownEventRacer* racer;
         while ((racer = view->NextBike(&iterator)) != 0) {
@@ -750,10 +750,10 @@ int StatsOverlay::DrawTagStandings()
             sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->racerName,
                     scores[shown].racer->score);
     }
-    if (g_TrackGame->field_0x568->followedRacer) {
+    if (g_TrackGame->tagEvent->followedRacer) {
         g_TrackGame->LoadResourceString(0x14b8, tag, 0x40);
-        sprintf(rowText[5], "  %s %s", g_TrackGame->field_0x568->followedRacer->racerName, tag);
-    } else if (g_TrackGame->field_0x568->field_0xdc) {
+        sprintf(rowText[5], "  %s %s", g_TrackGame->tagEvent->followedRacer->racerName, tag);
+    } else if (g_TrackGame->tagEvent->field_0xdc) {
         g_TrackGame->LoadResourceString(0x14b7, tag, 0x40);
         sprintf(rowText[5], "  %s", tag);
     }
@@ -1243,7 +1243,7 @@ int RadarOverlay::LineThrough(const float* a, const float* b, float* nx, float* 
 }
 
 // The race object RadarOverlay's gate drawing reads (see TrackOverlay.h).
-#define RadarRace() ((UnknownRadarGateOwner*)g_TrackGame->field_0x560)
+#define RadarRace() ((UnknownRadarGateOwner*)g_TrackGame->bajaEnduroEvent)
 
 // Cross product as 0x0051cb20 inlines it. The doubled parentheses matter:
 // with them VC6 keeps the folded zero term on the x87 stack and loads the
