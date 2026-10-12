@@ -836,7 +836,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "263/782: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
+    "notes": "291/784: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail); perp declared just before s (263 -> 291). Tried: perp at the top (a gets ebx but perp ebp, 190), s/d before n, a member-first cross helper and CrossB (no gain). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
     "bindings": "Vehicle.bindings.json"
   },
   {

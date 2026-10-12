@@ -429,9 +429,9 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
         n = *GetAverageGroundNormal(&t);
     } else
         n = *c;
+    Vec3* perp = &scratchVector2;
     Vec3 s;
     Vec3 proj = *Vec3ScaleCall(&s, a, Vec3DotCall(&n, a));
-    Vec3* perp = &scratchVector2;
     Vec3 d;
     *perp = *Vec3SubtractCall(&d, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
