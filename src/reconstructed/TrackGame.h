@@ -266,8 +266,8 @@ struct UnknownTrackGameRacerChoice {
 struct UnknownTrackGameRacerSlot {
     UnknownTrackGameRacerSlot();              // 0x00521f30
     // 0x00521fb0 (SelectGamePicProcs.cpp passes TrackGameMode+0x1974, +0x19b4 and +0x19f4).
-    void UnknownFunction521fb0(void* a, void* b, void* c);
-    void UnknownFunction522050();             // 0x00522050 (dlgprocs.cpp LoadingDlg)
+    void SetBikeAndRiderNames(void* bikeModelName, void* bikeName, void* riderName);
+    void ClearLeft();                         // 0x00522050 (dlgprocs.cpp LoadingDlg): clears +0xc8
 
     char field_0x00[0x40];                    // 0x00521fb0 copies three names (at most 63 chars)
     char field_0x40[0x40];

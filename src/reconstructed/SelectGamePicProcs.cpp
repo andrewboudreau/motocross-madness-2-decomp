@@ -359,7 +359,7 @@ void MultiPlayerDlg::FillRacerSlots() {
         g_TrackGame->mode.field_0x1be4[0].field_0xdc[count] = 0;
     }
     g_TrackGame->mode.field_0x1be4[0].field_0xd8 = 0;
-    g_TrackGame->mode.field_0x1be4[0].UnknownFunction521fb0(
+    g_TrackGame->mode.field_0x1be4[0].SetBikeAndRiderNames(
         g_TrackGame->mode.field_0x1974.field_0x00, g_TrackGame->mode.field_0x1974.field_0x40,
         g_TrackGame->mode.field_0x1974.field_0x80);
     g_TrackGame->mode.field_0x1be4[0].field_0xc4 =
@@ -732,7 +732,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].id;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xd8 = 0;
             COPY_TEXT(g_TrackGame->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].name, 0x10);
-            g_TrackGame->mode.field_0x1be4[i + 1].UnknownFunction521fb0(state->bikeModelName, state->bikeName,
+            g_TrackGame->mode.field_0x1be4[i + 1].SetBikeAndRiderNames(state->bikeModelName, state->bikeName,
                                                                                  state->riderName);
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xec = state->field_0xc8;
             g_TrackGame->mode.field_0x1be4[i + 1].field_0xf0 = state->field_0xcc;

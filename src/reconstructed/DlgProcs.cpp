@@ -1381,7 +1381,7 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
         }
         if (g_TrackGame->network) {
             for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++)
-                g_TrackGame->mode.field_0x1be4[i].UnknownFunction522050();
+                g_TrackGame->mode.field_0x1be4[i].ClearLeft();
         }
         g_UnknownGlobal59ae84 = 1;
         AddTimer(0, 100, 0);

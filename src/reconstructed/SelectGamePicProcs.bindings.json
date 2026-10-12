@@ -244,7 +244,7 @@
   "?EnableHostOptions@MPOptionsDlg@@QAEXXZ": "0x004f95b0",
   "?UnknownFunction518640@@YAXPADM@Z": "0x00518640",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
-  "?UnknownFunction521fb0@UnknownTrackGameRacerSlot@@QAEXPAX00@Z": "0x00521fb0",
+  "?SetBikeAndRiderNames@UnknownTrackGameRacerSlot@@QAEXPAX00@Z": "0x00521fb0",
   "?ResetNetworkRace@TrackGameMode@@QAEHXZ": "0x00522680",
   "?FindFileDirectory@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
   "?CopyCurrentSeriesDirectory@TrackGameMode@@QAEXPAD@Z": "0x00523b70",

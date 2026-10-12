@@ -57,23 +57,23 @@ UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
 }
 
 // 0x00521fb0
-void UnknownTrackGameRacerSlot::UnknownFunction521fb0(void* a, void* b, void* c) {
-    int length = strlen((char*)a);
+void UnknownTrackGameRacerSlot::SetBikeAndRiderNames(void* bikeModelName, void* bikeName, void* riderName) {
+    int length = strlen((char*)bikeModelName);
     int count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x00, (char*)a, count);
+    strncpy(field_0x00, (char*)bikeModelName, count);
     field_0x00[count] = 0;
-    length = strlen((char*)b);
+    length = strlen((char*)bikeName);
     count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x40, (char*)b, count);
+    strncpy(field_0x40, (char*)bikeName, count);
     field_0x40[count] = 0;
-    length = strlen((char*)c);
+    length = strlen((char*)riderName);
     count = length > 0x3f ? 0x3f : length;
-    strncpy(field_0x80, (char*)c, count);
+    strncpy(field_0x80, (char*)riderName, count);
     field_0x80[count] = 0;
 }
 
 // 0x00522050
-void UnknownTrackGameRacerSlot::UnknownFunction522050() {
+void UnknownTrackGameRacerSlot::ClearLeft() {
     field_0xc8 = 0;
 }
 
