@@ -24,7 +24,7 @@ void UnknownBikeRaceGhost::UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta
     Vector3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
     Vector3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
     Vector3 d2(delta->delta2[0] * GHOST_ANGLE_STEP, delta->delta2[1] * GHOST_ANGLE_STEP, delta->delta2[2] * GHOST_ANGLE_STEP);
-    field_0x5d4 += d0;
+    position += d0;
     field_0x5e0 += d1;
     field_0x5ec += d2;
     field_0x5f8 += delta->delta3[0] * GHOST_ANGLE_STEP;
@@ -35,10 +35,10 @@ void UnknownBikeRaceGhost::UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta
         step = (delta->step >> 1) * 8;
     else
         step = delta->step >> 1;
-    part->field_0x00.field_0x02 = step;
-    field_0x604 += part->field_0x00.field_0x02;
-    part->field_0x00.field_0x34 = field_0x604;
-    part->field_0x00.field_0x28 = field_0x5d4;
+    part->field_0x00.timeStep = step;
+    runningTime += part->field_0x00.timeStep;
+    part->field_0x00.runningTime = runningTime;
+    part->field_0x00.position = position;
     part->field_0x00.field_0x04 = field_0x5e0;
     part->field_0x00.field_0x1c = field_0x5ec;
     part->field_0x00.field_0x10 = field_0x5f8;

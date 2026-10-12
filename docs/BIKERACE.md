@@ -126,8 +126,12 @@ Facts the two functions establish:
 Field names in `BikeRace.h` come from the evidence each declaration's
 comment records (literal keys such as "RPMLowerLimit" and "Weight", the
 callers' data flow, network message fields); every renamed field keeps its
-`// +0xNN` offset. The renames changed no calibration bytes. Fields that
-`FollowRacer.cpp`, `GameUiHelpers.cpp` or `KrustyVCR.cpp` also read (the
-gate node's centre, direction, half extents and next gate, the ghost
-record, the VCR header and its racers) keep their placeholder names until
-those units are renamed with them.
+`// +0xNN` offset. The renames changed no calibration bytes. The ghost
+record and ghost fields FollowRacer.cpp (race lane) shares (`timeStep`,
+`position`, `runningTime`), the racer's `startPosition` and
+`receivedStates` (+0x11c8, each a received `state`) were renamed with it.
+Fields that `GameUiHelpers.cpp` or `KrustyVCR.cpp` also read (the gate
+node's centre, direction, half extents and next gate, the model's current
+detail level, the camera view's shadow caster and following flag, the VCR
+header and its racers) keep their placeholder names until those units are
+renamed with them.

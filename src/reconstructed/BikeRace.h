@@ -416,7 +416,7 @@ public:
     unsigned char field_0x0c0[0x109 - 0xc0];
     bool restarted;                           // +0x109 set on a restart
     unsigned char field_0x10a[0x10c - 0x10a];
-    Vector3 field_0x10c;                      // start position (0x004210f0)
+    Vector3 startPosition;                    // +0x10c start position (0x004210f0)
     Vector3 startDirection;                   // +0x118 start direction
     unsigned char field_0x124[0x128 - 0x124];
     CarProceduralCollision* field_0x128;      // its +0x68 is set without tree collision (the loader)
@@ -463,7 +463,7 @@ public:
     char aiMessageIndex;                      // +0x11c0 AI racer's index in its messages (RaceView.h)
     unsigned char field_0x11c1[0x11c4 - 0x11c1];
     float messageDelay;                       // +0x11c4 the player's message delay (racer slot +0xd0)
-    UnknownBikeRaceRacerPart* field_0x11c8[4];
+    UnknownBikeRaceRacerPart* receivedStates[4]; // +0x11c8 received network states, newest first
     unsigned char field_0x11d8[0x1358 - 0x11d8];
     Vector3 field_0x1358;
     Vector3 field_0x1364;
@@ -524,7 +524,7 @@ struct UnknownBikeRaceNetStamp {
 
 // One of a racer's three received states (+0x11c8, newest first).
 struct UnknownBikeRaceRacerPart {
-    UnknownBikeRaceNetState field_0x00;
+    UnknownBikeRaceNetState state;            // +0x00 the received state
     int messageFlags;                         // +0x58 the message's flags
     int fresh;                                // +0x5c fresh
 };
@@ -747,14 +747,14 @@ struct UnknownBikeRaceVcrTick {
 // (UnknownBikeRaceGhostDelta) accumulate into the ghost's copy of it.
 struct UnknownBikeRaceGhostRecord {
     short field_0x00;
-    unsigned short field_0x02;                // time step (0x004a9aa0)
+    unsigned short timeStep;                  // +0x02 time step (0x004a9aa0)
     Vector3 field_0x04;                       // ghost +0x5e0
     float field_0x10;                         // ghost +0x5f8
     float field_0x14;                         // ghost +0x5fc
     float field_0x18;                         // ghost +0x600
     Vector3 field_0x1c;                       // ghost +0x5ec
-    Vector3 field_0x28;                       // ghost +0x5d4 (position)
-    int field_0x34;                           // ghost +0x604 (running time)
+    Vector3 position;                         // +0x28 ghost +0x5d4
+    int runningTime;                          // +0x34 ghost +0x604
     int field_0x38;
 };
 
@@ -797,13 +797,13 @@ public:
     int hasState;                             // +0x4f8 has a state
     UnknownBikeRaceGhostPart* field_0x4fc[4];
     unsigned char field_0x50c[0x5d4 - 0x50c];
-    Vector3 field_0x5d4;                      // position
+    Vector3 position;                         // +0x5d4 position
     Vector3 field_0x5e0;
     Vector3 field_0x5ec;
     float field_0x5f8;
     float field_0x5fc;
     float field_0x600;
-    int field_0x604;                          // running time
+    int runningTime;                          // +0x604 running time
 };
 
 // KrustyUI+0x48 records (0xc8 bytes; slot 10's debug page names the

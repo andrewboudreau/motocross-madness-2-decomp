@@ -1119,13 +1119,13 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
                 UnknownBikeRaceRacer* racer = racerSlots[i];
                 if (racer != 0 && racer->netIndex == state->racerIndex) {
                     racerSlots[i]->field_0x11b8 = 1;
-                    UnknownBikeRaceRacerPart* oldest = racerSlots[i]->field_0x11c8[2];
-                    racerSlots[i]->field_0x11c8[2] = racerSlots[i]->field_0x11c8[1];
-                    racerSlots[i]->field_0x11c8[1] = racerSlots[i]->field_0x11c8[0];
-                    racerSlots[i]->field_0x11c8[0] = oldest;
-                    racerSlots[i]->field_0x11c8[0]->messageFlags = flags;
-                    racerSlots[i]->field_0x11c8[0]->field_0x00 = *state;
-                    racerSlots[i]->field_0x11c8[0]->fresh = 1;
+                    UnknownBikeRaceRacerPart* oldest = racerSlots[i]->receivedStates[2];
+                    racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
+                    racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
+                    racerSlots[i]->receivedStates[0] = oldest;
+                    racerSlots[i]->receivedStates[0]->messageFlags = flags;
+                    racerSlots[i]->receivedStates[0]->state = *state;
+                    racerSlots[i]->receivedStates[0]->fresh = 1;
                     racerSlots[i]->field_0x1358 = state->field_0x3c;
                     racerSlots[i]->field_0x1364 = state->field_0x08;
                     racerSlots[i]->field_0x1370 = state->field_0x30;
@@ -1147,13 +1147,13 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
                 if (!racerSlots[i]->field_0x11b8) {
                     return 1;
                 }
-                UnknownBikeRaceRacerPart* oldest = racerSlots[i]->field_0x11c8[2];
-                racerSlots[i]->field_0x11c8[2] = racerSlots[i]->field_0x11c8[1];
-                racerSlots[i]->field_0x11c8[1] = racerSlots[i]->field_0x11c8[0];
-                racerSlots[i]->field_0x11c8[0] = oldest;
-                racerSlots[i]->field_0x11c8[0]->messageFlags = flags;
-                racerSlots[i]->UnknownFunction4933e0(message, racerSlots[i]->field_0x11c8[0]);
-                racerSlots[i]->field_0x11c8[0]->fresh = 0;
+                UnknownBikeRaceRacerPart* oldest = racerSlots[i]->receivedStates[2];
+                racerSlots[i]->receivedStates[2] = racerSlots[i]->receivedStates[1];
+                racerSlots[i]->receivedStates[1] = racerSlots[i]->receivedStates[0];
+                racerSlots[i]->receivedStates[0] = oldest;
+                racerSlots[i]->receivedStates[0]->messageFlags = flags;
+                racerSlots[i]->UnknownFunction4933e0(message, racerSlots[i]->receivedStates[0]);
+                racerSlots[i]->receivedStates[0]->fresh = 0;
                 return 1;
             }
         }
@@ -1346,7 +1346,7 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
         racer->restarted = true;
         UnknownFunction4210f0(&position, &direction, g_TrackGame->field_0x560,
                               positions[iterator - 1]);
-        racer->field_0x10c = position;
+        racer->startPosition = position;
         racer->startDirection = direction;
         racer->UnknownFunction496e20(replayVcr);
         field_0x3f8 = false;
@@ -1624,18 +1624,18 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             racer->field_0x11b8 = 1;
             UnknownBikeRaceRacerPart* oldest;
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
-                oldest = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[2];
             } else {
-                oldest = racer->field_0x11c8[3];
-                racer->field_0x11c8[3] = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[3];
+                racer->receivedStates[3] = racer->receivedStates[2];
             }
-            racer->field_0x11c8[2] = racer->field_0x11c8[1];
-            racer->field_0x11c8[1] = racer->field_0x11c8[0];
-            racer->field_0x11c8[0] = oldest;
+            racer->receivedStates[2] = racer->receivedStates[1];
+            racer->receivedStates[1] = racer->receivedStates[0];
+            racer->receivedStates[0] = oldest;
             oldest->messageFlags = time;
-            racer->field_0x11c8[0]->field_0x00 = *state;
-            racer->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-            racer->field_0x11c8[0]->fresh = 1;
+            racer->receivedStates[0]->state = *state;
+            racer->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->receivedStates[0]->fresh = 1;
             racer->field_0x1358 = state->field_0x3c;
             racer->field_0x1364 = state->field_0x08;
             racer->field_0x1370 = state->field_0x30;
@@ -1649,15 +1649,15 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             }
             *keep = 1;
             if (replayMode == 11) {
-                racer->field_0x11c8[1]->field_0x00 = racer->field_0x11c8[0]->field_0x00;
-                racer->field_0x11c8[2]->field_0x00 = racer->field_0x11c8[1]->field_0x00;
-                racer->field_0x11c8[3]->field_0x00 = racer->field_0x11c8[2]->field_0x00;
-                racer->field_0x11c8[1]->messageFlags = racer->field_0x11c8[0]->messageFlags;
-                racer->field_0x11c8[2]->messageFlags = racer->field_0x11c8[1]->messageFlags;
-                racer->field_0x11c8[3]->messageFlags = racer->field_0x11c8[2]->messageFlags;
-                racer->field_0x11c8[1]->fresh = 1;
-                racer->field_0x11c8[2]->fresh = 1;
-                racer->field_0x11c8[3]->fresh = 1;
+                racer->receivedStates[1]->state = racer->receivedStates[0]->state;
+                racer->receivedStates[2]->state = racer->receivedStates[1]->state;
+                racer->receivedStates[3]->state = racer->receivedStates[2]->state;
+                racer->receivedStates[1]->messageFlags = racer->receivedStates[0]->messageFlags;
+                racer->receivedStates[2]->messageFlags = racer->receivedStates[1]->messageFlags;
+                racer->receivedStates[3]->messageFlags = racer->receivedStates[2]->messageFlags;
+                racer->receivedStates[1]->fresh = 1;
+                racer->receivedStates[2]->fresh = 1;
+                racer->receivedStates[3]->fresh = 1;
                 return 11;
             }
             return 1;
@@ -1668,18 +1668,18 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
                 aiRacers[i]->field_0x11b8 = 1;
                 UnknownBikeRaceRacerPart* oldest;
                 if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
-                    oldest = aiRacers[i]->field_0x11c8[2];
+                    oldest = aiRacers[i]->receivedStates[2];
                 } else {
-                    oldest = aiRacers[i]->field_0x11c8[3];
-                    aiRacers[i]->field_0x11c8[3] = aiRacers[i]->field_0x11c8[2];
+                    oldest = aiRacers[i]->receivedStates[3];
+                    aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
                 }
-                aiRacers[i]->field_0x11c8[2] = aiRacers[i]->field_0x11c8[1];
-                aiRacers[i]->field_0x11c8[1] = aiRacers[i]->field_0x11c8[0];
-                aiRacers[i]->field_0x11c8[0] = oldest;
-                aiRacers[i]->field_0x11c8[0]->messageFlags = time;
-                aiRacers[i]->field_0x11c8[0]->field_0x00 = *state;
-                aiRacers[i]->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-                aiRacers[i]->field_0x11c8[0]->fresh = 1;
+                aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
+                aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
+                aiRacers[i]->receivedStates[0] = oldest;
+                aiRacers[i]->receivedStates[0]->messageFlags = time;
+                aiRacers[i]->receivedStates[0]->state = *state;
+                aiRacers[i]->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+                aiRacers[i]->receivedStates[0]->fresh = 1;
                 aiRacers[i]->field_0x1358 = state->field_0x3c;
                 aiRacers[i]->field_0x1364 = state->field_0x08;
                 aiRacers[i]->field_0x1370 = state->field_0x30;
@@ -1693,15 +1693,15 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
                 }
                 *keep = 1;
                 if (replayMode == 11) {
-                    aiRacers[i]->field_0x11c8[1]->field_0x00 = aiRacers[i]->field_0x11c8[0]->field_0x00;
-                    aiRacers[i]->field_0x11c8[2]->field_0x00 = aiRacers[i]->field_0x11c8[1]->field_0x00;
-                    aiRacers[i]->field_0x11c8[3]->field_0x00 = aiRacers[i]->field_0x11c8[2]->field_0x00;
-                    aiRacers[i]->field_0x11c8[1]->messageFlags = aiRacers[i]->field_0x11c8[0]->messageFlags;
-                    aiRacers[i]->field_0x11c8[2]->messageFlags = aiRacers[i]->field_0x11c8[1]->messageFlags;
-                    aiRacers[i]->field_0x11c8[3]->messageFlags = aiRacers[i]->field_0x11c8[2]->messageFlags;
-                    aiRacers[i]->field_0x11c8[1]->fresh = 1;
-                    aiRacers[i]->field_0x11c8[2]->fresh = 1;
-                    aiRacers[i]->field_0x11c8[3]->fresh = 1;
+                    aiRacers[i]->receivedStates[1]->state = aiRacers[i]->receivedStates[0]->state;
+                    aiRacers[i]->receivedStates[2]->state = aiRacers[i]->receivedStates[1]->state;
+                    aiRacers[i]->receivedStates[3]->state = aiRacers[i]->receivedStates[2]->state;
+                    aiRacers[i]->receivedStates[1]->messageFlags = aiRacers[i]->receivedStates[0]->messageFlags;
+                    aiRacers[i]->receivedStates[2]->messageFlags = aiRacers[i]->receivedStates[1]->messageFlags;
+                    aiRacers[i]->receivedStates[3]->messageFlags = aiRacers[i]->receivedStates[2]->messageFlags;
+                    aiRacers[i]->receivedStates[1]->fresh = 1;
+                    aiRacers[i]->receivedStates[2]->fresh = 1;
+                    aiRacers[i]->receivedStates[3]->fresh = 1;
                     return 11;
                 }
                 return 1;
@@ -1722,18 +1722,18 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             }
             UnknownBikeRaceRacerPart* oldest;
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
-                oldest = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[2];
             } else {
-                oldest = racer->field_0x11c8[3];
-                racer->field_0x11c8[3] = racer->field_0x11c8[2];
+                oldest = racer->receivedStates[3];
+                racer->receivedStates[3] = racer->receivedStates[2];
             }
-            racer->field_0x11c8[2] = racer->field_0x11c8[1];
-            racer->field_0x11c8[1] = racer->field_0x11c8[0];
-            racer->field_0x11c8[0] = oldest;
+            racer->receivedStates[2] = racer->receivedStates[1];
+            racer->receivedStates[1] = racer->receivedStates[0];
+            racer->receivedStates[0] = oldest;
             oldest->messageFlags = time;
-            racer->UnknownFunction4933e0(message, racer->field_0x11c8[0]);
-            racer->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-            racer->field_0x11c8[0]->fresh = 0;
+            racer->UnknownFunction4933e0(message, racer->receivedStates[0]);
+            racer->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->receivedStates[0]->fresh = 0;
             return 1;
         }
         int i = 0;
@@ -1746,15 +1746,15 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
                 if (!aiRacers[i]->field_0x11b8) {
                     return 0;
                 }
-                UnknownBikeRaceRacerPart* oldest = aiRacers[i]->field_0x11c8[3];
-                aiRacers[i]->field_0x11c8[3] = aiRacers[i]->field_0x11c8[2];
-                aiRacers[i]->field_0x11c8[2] = aiRacers[i]->field_0x11c8[1];
-                aiRacers[i]->field_0x11c8[1] = aiRacers[i]->field_0x11c8[0];
-                aiRacers[i]->field_0x11c8[0] = oldest;
-                aiRacers[i]->field_0x11c8[0]->messageFlags = time;
-                aiRacers[i]->UnknownFunction4933e0(message, aiRacers[i]->field_0x11c8[0]);
-                aiRacers[i]->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
-                aiRacers[i]->field_0x11c8[0]->fresh = 0;
+                UnknownBikeRaceRacerPart* oldest = aiRacers[i]->receivedStates[3];
+                aiRacers[i]->receivedStates[3] = aiRacers[i]->receivedStates[2];
+                aiRacers[i]->receivedStates[2] = aiRacers[i]->receivedStates[1];
+                aiRacers[i]->receivedStates[1] = aiRacers[i]->receivedStates[0];
+                aiRacers[i]->receivedStates[0] = oldest;
+                aiRacers[i]->receivedStates[0]->messageFlags = time;
+                aiRacers[i]->UnknownFunction4933e0(message, aiRacers[i]->receivedStates[0]);
+                aiRacers[i]->receivedStates[0]->state.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+                aiRacers[i]->receivedStates[0]->fresh = 0;
                 return 1;
             }
         }
@@ -1788,15 +1788,15 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             UnknownFunctionGhost()->field_0x4fc[0] = oldest;
             UnknownFunctionGhost()->field_0x4fc[0]->recordTime = time;
             UnknownFunctionGhost()->field_0x4fc[0]->field_0x00 = *record;
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
             UnknownFunctionGhost()->field_0x4fc[0]->fresh = 1;
-            UnknownFunctionGhost()->field_0x5d4 = record->field_0x28;
+            UnknownFunctionGhost()->position = record->position;
             UnknownFunctionGhost()->field_0x5e0 = record->field_0x04;
             UnknownFunctionGhost()->field_0x5ec = record->field_0x1c;
             UnknownFunctionGhost()->field_0x5f8 = record->field_0x10;
             UnknownFunctionGhost()->field_0x5fc = record->field_0x14;
             UnknownFunctionGhost()->field_0x600 = record->field_0x18;
-            UnknownFunctionGhost()->field_0x604 = replayMode == 11 ? time : record->field_0x34;
+            UnknownFunctionGhost()->runningTime = replayMode == 11 ? time : record->runningTime;
             *keep = 1;
             if (replayMode == 11) {
                 UnknownFunctionGhost()->field_0x4fc[1]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[0]->field_0x00;
@@ -1826,7 +1826,7 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             UnknownFunctionGhost()->field_0x4fc[0]->recordTime = time;
             UnknownFunctionGhost()->UnknownFunction4a9aa0((UnknownBikeRaceGhostDelta*)data,
                                                           UnknownFunctionGhost()->field_0x4fc[0]);
-            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.runningTime = (int)(s_UnknownStatic578e8c * 1000.0f);
             UnknownFunctionGhost()->field_0x4fc[0]->fresh = 0;
             return 1;
         }
@@ -1853,27 +1853,27 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
 void BikeRace::UnknownFunction423040(int index) {
     UnknownBikeRaceRacer* racer = aiRacers[index];
     if (racer != 0) {
-        racer->field_0x11c8[0]->field_0x00.field_0x08 = kVec3Zero;
-        racer->field_0x11c8[1]->field_0x00.field_0x08 = kVec3Zero;
-        racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
-        racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
+        racer->receivedStates[0]->state.field_0x08 = kVec3Zero;
+        racer->receivedStates[1]->state.field_0x08 = kVec3Zero;
+        racer->receivedStates[2]->state.field_0x08 = kVec3Zero;
+        racer->receivedStates[3]->state.field_0x08 = kVec3Zero;
     }
 }
 
 // 0x00422ec0
 void BikeRace::UnknownFunction422ec0() {
     UnknownBikeRaceRacer* racer = localRacer;
-    racer->field_0x11c8[0]->field_0x00.field_0x08 = kVec3Zero;
-    racer->field_0x11c8[1]->field_0x00.field_0x08 = kVec3Zero;
-    racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
-    racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
+    racer->receivedStates[0]->state.field_0x08 = kVec3Zero;
+    racer->receivedStates[1]->state.field_0x08 = kVec3Zero;
+    racer->receivedStates[2]->state.field_0x08 = kVec3Zero;
+    racer->receivedStates[3]->state.field_0x08 = kVec3Zero;
     for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++) {
         racer = aiRacers[i];
         if (racer != 0) {
-            racer->field_0x11c8[0]->field_0x00.field_0x08 = kVec3Zero;
-            racer->field_0x11c8[1]->field_0x00.field_0x08 = kVec3Zero;
-            racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
-            racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
+            racer->receivedStates[0]->state.field_0x08 = kVec3Zero;
+            racer->receivedStates[1]->state.field_0x08 = kVec3Zero;
+            racer->receivedStates[2]->state.field_0x08 = kVec3Zero;
+            racer->receivedStates[3]->state.field_0x08 = kVec3Zero;
         }
     }
 }
