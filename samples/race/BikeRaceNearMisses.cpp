@@ -815,11 +815,11 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         g_TrackGame->field_0x342c) {
         if (g_TrackGame->ui->field_0x4a8) {
             UnknownBikeRaceDemoDlg* dialog = new(__FILE__, 0x2fb) UnknownBikeRaceDemoDlg(1, "credits.dtm");
-            g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
         } else {
-            g_TrackGame->ui->field_0x2c->ShowCursors(1);
+            g_TrackGame->ui->gui->ShowCursors(1);
             VCRDlg* dialog = new(__FILE__, 0x2ff) VCRDlg(1, "VCR.dtm");
-            g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(dialog, 0, 1, 0, 0, 0, 0, 1);
         }
     }
     if (replayVcr && !g_TrackGame->field_0x3428) {
@@ -1367,8 +1367,8 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                         COPY_TEXT(bikeFile, eventAi[n].field_0x80, 0x104);
                     } else {
                         COPY_TEXT(aiName, names[n], 0x10);
-                        UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->field_0x50;
-                        UnknownBikeRaceUiModel* models = (UnknownBikeRaceUiModel*)g_TrackGame->ui->field_0x48;
+                        UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes;
+                        UnknownBikeRaceUiModel* models = (UnknownBikeRaceUiModel*)g_TrackGame->ui->manufacturers;
                         sprintf(bikeFile, "%s\\%s", "Res", models[choices[bikes[n]].field_0x00].field_0x40);
                     }
                     ai = 1;
@@ -1385,7 +1385,7 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                         engineKind = eventAi[n].field_0xc4;
                         skill = eventAi[n].field_0xc8;
                     } else {
-                        UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->field_0x50;
+                        UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes;
                         engineSize = choices[bikes[n]].field_0x8c;
                         engineKind = choices[bikes[n]].field_0x90;
                         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0)
@@ -1431,8 +1431,8 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                     aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
                     aiRacers[n]->field_0x73c = plate;
                 } else {
-                    UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->field_0x50;
-                    UnknownBikeRaceUiModel* riderModels = (UnknownBikeRaceUiModel*)g_TrackGame->ui->field_0x58;
+                    UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes;
+                    UnknownBikeRaceUiModel* riderModels = (UnknownBikeRaceUiModel*)g_TrackGame->ui->riders;
                     g_TrackGame->ui->UnknownFunction49b560(choices[bikes[n]].field_0x48, bikeTexture, 0x3f);
                     aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
                     g_TrackGame->ui->UnknownFunction49b7f0(riderModels[riders[n]].field_0x40, riderTexture,

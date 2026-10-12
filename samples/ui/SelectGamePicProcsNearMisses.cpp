@@ -73,16 +73,16 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
     MPBikeRiderDlg* self = this;
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     list->RemoveAllRows();
-    for (int i = 0; i < g_TrackGame->ui->field_0x54; i++) {
-        UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i];
+    for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
+        UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i];
         if (!entry->field_0x88) {
-            int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[entry->model].modelKind;
+            int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model].modelKind;
             if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.field_0x1970 & 1)))
                 continue;
         }
         int flags = g_TrackGame->mode.field_0x1bd4;
         if (!flags) {
-            sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[entry->model].displayName,
+            sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model].displayName,
                     entry->displayName);
             list->AddRow(text, i, flags);
         } else {
@@ -103,7 +103,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
                 allowed = 1;
             if (!allowed)
                 continue;
-            sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[entry->model].displayName,
+            sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model].displayName,
                     entry->displayName);
             list->AddRow(text, i, 0);
         }
@@ -117,11 +117,11 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
     list->Sort(1);
     list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
     list->RemoveAllRows();
-    for (int j = 0; j < g_TrackGame->ui->field_0x5c; j++) {
-        UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j];
+    for (int j = 0; j < g_TrackGame->ui->riderCount; j++) {
+        UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j];
         if (entry->modelKind == 2 || entry->modelKind == 3 || entry->field_0xc0) {
             list->AddRow(entry->displayName, j, 0);
-            if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j].modelName,
+            if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j].modelName,
                         g_TrackGame->mode.field_0x1974.field_0x80))
                 rider = j;
         }
@@ -140,47 +140,47 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
         viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
-        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
+        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
         float distance = viewDistance;
         turned *= distance;
-        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
+        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
+        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
         previewDragged = 1;
     } else if (!previewDragged) {
-        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
+        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
-        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
+        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
+        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
     }
-    g_TrackGame->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
-    g_TrackGame->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
+    g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
+    g_TrackGame->ui->garageCharacter->ModelVirtualSlot7(frameTime, 0, 0);
     if (idleMotionPlaying && rand() % 200 == 1) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);
         switch (rand() % 3) {
         case 0:
-            g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("LookLeftR");
+            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookLeftR");
             break;
         case 1:
-            g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("LookRightR");
+            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookRightR");
             break;
         case 2:
-            g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
+            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("StretchR");
             break;
         }
         idleMotionPlaying = 0;
     }
-    if (!idleMotionPlaying && g_TrackGame->ui->field_0x46c->motionFinished) {
+    if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
-            &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)].model];
+            &((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)].model];
         model->field_0xc0->UnknownFunction4a8b10("WaitB");
-        g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
+        g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("WaitR");
         idleMotionPlaying = 1;
     }
     if (dialogBackground)
@@ -226,18 +226,18 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0xdc, names[racer], 0x10);
                 g_TrackGame->mode.field_0x1be4[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0x00,
-                          ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)
-                              [((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bikes[racer]].model]
+                          ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
+                              [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].model]
                                   .modelName,
                           0x40);
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0x40,
-                          ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bikes[racer]].field_0x48, 0x40);
+                          ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x48, 0x40);
                 COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0x80,
-                          ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[riders[racer]].modelName, 0x40);
+                          ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[riders[racer]].modelName, 0x40);
                 g_TrackGame->mode.field_0x1be4[racer].field_0xec =
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bikes[racer]].engineSize;
+                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].engineSize;
                 g_TrackGame->mode.field_0x1be4[racer].field_0xf0 =
-                    ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bikes[racer]].field_0x90;
+                    ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x90;
                 racer++;
             }
         }

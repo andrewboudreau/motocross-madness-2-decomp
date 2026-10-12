@@ -26,6 +26,22 @@ ends with the shared dialog deleting destructor and its vector set:
   the set at 159-162 (`0x004986b0..0x004987a0`, just before the
   constructor).
 
+## Field names
+
+| Offset | Name | Evidence |
+|---|---|---|
+| +0x2c | `gui` | the GUIManager built by constructor `0x00485190`; every dialog is shown through it |
+| +0x3c | `currentMenu` | `OpenMenu` stores its argument here (+0x34 keeps the old value for menu 0xd0) |
+| +0x48/+0x4c | `manufacturers`/`manufacturerCount` | `LoadBikesAndRiders` appends one entry per `Manufacturer_%02d` section of bikes.pb |
+| +0x50/+0x54 | `bikes`/`bikeCount` | one entry per bike of those manufacturers |
+| +0x58/+0x5c | `riders`/`riderCount` | one entry per `Rider_%02d` section of riders.pb |
+| +0x60 | `entries` | the list counted by +0x64 (`entryCount`) |
+| +0x468 | `garageCamera` | made current while the garage scene (+0x464) is shown |
+| +0x46c/+0x470 | `riderPreview`/`garageCharacter` | dlgprocs.cpp SPBikeRiderDlg slots 13 and 10 |
+| +0x474 | `garageFocus` | the garage scene's look target (the dialog procs aim the camera at it) |
+| +0x490 | `progressDialog` | DlgProcs.cpp stores the dialog that owns "ProgressBar" and clears it on close |
+| +0x494 | `savedInputContext` | `ImmAssociateContext`'s result (DlgProcs.cpp), restored by EventManager `0x0045e710` |
+
 ## Menu ids
 
 `OpenMenu` stores its argument at +0x3c and constructs one dialog per id;

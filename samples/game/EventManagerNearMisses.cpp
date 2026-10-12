@@ -52,13 +52,13 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 void EventManager::UnknownFunction45e710(int menu) {
     if (!g_TrackGame->ui)
         return;
-    UnknownTrackGameObject56cItem* item = g_TrackGame->ui->field_0x2c->FindInputDialog();
+    UnknownTrackGameObject56cItem* item = g_TrackGame->ui->gui->FindInputDialog();
     if (item)
         item->UnknownFunction46ff30(0);
-    if (g_TrackGame->ui->field_0x494)
-        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->field_0x494);
+    if (g_TrackGame->ui->savedInputContext)
+        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->savedInputContext);
     if (g_TrackGame->ui->allowIme)
-        g_TrackGame->ui->field_0x2c->EnableWindowClipper(1);
+        g_TrackGame->ui->gui->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
     g_TrackGame->field_0x3438 = 0;
     g_TrackGame->field_0x3434 = 0;
@@ -68,15 +68,15 @@ void EventManager::UnknownFunction45e710(int menu) {
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_TrackGame->UnknownVirtualSlot19(
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
-    g_TrackGame->ui->field_0x2c->CreateBackground();
-    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->field_0x2c->GetUser(0);
+    g_TrackGame->ui->gui->CreateBackground();
+    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
     layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
     if (!g_TrackGame->field_0x3428 && !g_TrackGame->ui->field_0x4a8 &&
         g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
         g_TrackGame->ui->RecordRaceResults();
-    g_TrackGame->ui->field_0x2c->ShowCursors(1);
+    g_TrackGame->ui->gui->ShowCursors(1);
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;
-    g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+    g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     dialog->SetNextMenu(menu);
     ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryVolume(0);
 }

@@ -299,48 +299,48 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
         viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
         viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
-        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
+        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
         float distance = viewDistance;
         turned *= distance;
-        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
+        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
+        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
         previewDragged = 1;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
     } else if (!previewDragged) {
-        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->field_0x474);
+        offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
         turned *= viewDistance;
-        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->field_0x474);
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
+        viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
+        g_TrackGame->ui->garageCamera->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
     }
-    g_TrackGame->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
-    g_TrackGame->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
+    g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
+    g_TrackGame->ui->garageCharacter->ModelVirtualSlot7(frameTime, 0, 0);
     if (idleMotionPlaying && rand() % 200 == 1) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         bikes->GetRowData(-1);
         switch (rand() % 3) {
         case 0:
-            g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("LookLeftR");
+            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookLeftR");
             break;
         case 1:
-            g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("LookRightR");
+            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("LookRightR");
             break;
         case 2:
-            g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
+            g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("StretchR");
             break;
         }
         idleMotionPlaying = 0;
     }
-    if (!idleMotionPlaying && g_TrackGame->ui->field_0x46c->motionFinished) {
+    if (!idleMotionPlaying && g_TrackGame->ui->riderPreview->motionFinished) {
         UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* model =
-            &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)].model];
+            &((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bikes->GetRowData(-1)].model];
         model->field_0xc0->UnknownFunction4a8b10("WaitB");
-        g_TrackGame->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
+        g_TrackGame->ui->riderPreview->UnknownFunction4a8b10("WaitR");
         idleMotionPlaying = 1;
     }
     if (dialogBackground)

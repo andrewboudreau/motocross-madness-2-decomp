@@ -161,12 +161,12 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
     int opponents = 0;
     if (g_TrackGame->UnknownFunction521cd0()) {
         int i;
-        for (i = 0; i < g_TrackGame->ui->field_0x54; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->field_0x48)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->field_0x50)[i].field_0x00].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
+        for (i = 0; i < g_TrackGame->ui->bikeCount; i++) {
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->manufacturers)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->bikes)[i].field_0x00].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
                 players++;
         }
-        for (i = 0; i < g_TrackGame->ui->field_0x5c; i++) {
-            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->field_0x58)[i].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
+        for (i = 0; i < g_TrackGame->ui->riderCount; i++) {
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->riders)[i].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
                 opponents++;
         }
         if (players >= g_TrackGame->field_0x3444->field_0x460)

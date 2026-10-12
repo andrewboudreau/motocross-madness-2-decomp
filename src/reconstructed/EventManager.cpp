@@ -591,9 +591,9 @@ void EventManager::SendRacerResults() {
 // final add swapped.
 void LoadProgressCallback(int* step) {
     if (step) {
-        if (g_TrackGame->ui->field_0x490) {
+        if (g_TrackGame->ui->progressDialog) {
             UIControl* bar =
-                g_TrackGame->ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
+                g_TrackGame->ui->progressDialog->UnknownFunction46ebf0("ProgressBar", 0);
             static_cast<UIProgressBar*>(bar)->stepCount += *step;
         }
     } else {
@@ -647,7 +647,7 @@ int EventManager::UnknownFunction45cb70() {
 // unused; Game+0x2f0 is read instead). After 315 seconds without an open
 // menu item it always ends; otherwise by mode (TrackGame+0x2d74).
 void EventManager::CheckRaceOver(float frameTime) {
-    if (!g_TrackGame->ui->field_0x2c->FindInputDialog())
+    if (!g_TrackGame->ui->gui->FindInputDialog())
         g_UnknownGlobal59af54 += g_TrackGame->frameTime;
     if (g_UnknownGlobal59af54 >= 315.0f) {
         SendRacerResults();

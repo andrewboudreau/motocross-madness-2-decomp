@@ -654,8 +654,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
             int pass = 0;
             if ((signed char)field_0x0b0 < 0) {
                 strncpy(name,
-                        ((UnknownBikeRaceUiModel*)g_TrackGame->ui->field_0x48)
-                            [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->field_0x50)
+                        ((UnknownBikeRaceUiModel*)g_TrackGame->ui->manufacturers)
+                            [((UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes)
                                  [g_TrackGame->mode.field_0x1974.field_0xc4].field_0x00].field_0x40,
                         0x14);
                 name[0x14] = 0;
@@ -1018,17 +1018,17 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         if (shown == field_0x0a8) {
 
             if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
-                if (g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30 == 0) {
-                    g_TrackGame->ui->field_0x2c->UnknownFunction486590("ui\\cursor.tga", 0);
+                if (g_TrackGame->ui->gui->GetUser(0)->field_0x30 == 0) {
+                    g_TrackGame->ui->gui->UnknownFunction486590("ui\\cursor.tga", 0);
                 }
-                if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->field_0x2c
+                if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->gui
                           ->GetUser(0)->field_0x30)->field_0x25_bit0) {
                     if (objectPicker == 0) {
                         ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
                         objectPicker = picker;
                         picker->UnknownFunction4b0210(
                             g_TrackGame->renderTarget, 0, UnknownFunction417b00,
-                            (GameCursor*)g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30);
+                            (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->field_0x30);
                         if (AppendChild(objectPicker, -1)) {
                             g_TrackGame->ui->UnknownFunction499b00();
                         }
@@ -1317,8 +1317,8 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
                     delete replayVcr;
                     replayVcr = 0;
                 }
-                g_TrackGame->ui->field_0x2c->ShowCursors(1);
-                g_TrackGame->ui->field_0x2c->ShowDialog(
+                g_TrackGame->ui->gui->ShowCursors(1);
+                g_TrackGame->ui->gui->ShowDialog(
                     new (__FILE__, 0x1073) VCRDlg(1, "VCR.dtm"), 0, 1, 0, 0, 0, 0, 1);
             } else {
                 g_TrackGame->field_0x3428 = 0;

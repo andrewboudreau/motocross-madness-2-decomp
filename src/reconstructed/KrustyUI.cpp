@@ -208,17 +208,17 @@ void UnknownFunction49bda0() {
 
 // 0x004987f0
 KrustyUI::KrustyUI(int flags) : GameObject(flags) {
-    field_0x2c = 0;
+    gui = 0;
     field_0x30 = 0;
     field_0x34 = 0;
     field_0x38 = 0;
-    field_0x3c = 0;
+    currentMenu = 0;
     field_0x48c = 0;
-    field_0x490 = 0;
+    progressDialog = 0;
     garageScene = 0;
     field_0x40 = 0;
     field_0x44 = 0;
-    field_0x494 = 0;
+    savedInputContext = 0;
     allowIme = 0;
     field_0x4a8 = 0;
     field_0x4ac = 0;
@@ -226,7 +226,7 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     field_0x4a4 = 0;
     field_0x4a0 = 0;
     field_0x49c = 0;
-    field_0x60 = 0;
+    entries = 0;
     entryCount = 0;
 }
 
@@ -234,11 +234,11 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
 // KrustyUI.h leaves +0x480 as bytes and types +0x46c and +0x470 as the
 // selection dialogs' model views; 0x00498cf0 stores the garage character at
 // +0x470, the rider at +0x46c and the rider's position (a Vector3) at +0x480.
-#define KRUSTYUI_GARAGE (*(UnknownKrustyUICharacter**)&field_0x470)
-#define KRUSTYUI_RIDER (*(UnknownKrustyUICharacter**)&field_0x46c)
+#define KRUSTYUI_GARAGE (*(UnknownKrustyUICharacter**)&garageCharacter)
+#define KRUSTYUI_RIDER (*(UnknownKrustyUICharacter**)&riderPreview)
 #define KRUSTYUI_RIDER_POSITION (*(Vector3*)field_0x480)
 #define KRUSTYUI_TARGET ((PCRenderTarget*)field_0x18)
-#define KRUSTYUI_MODELS ((UnknownKrustyUIModelEntry*)field_0x48)
+#define KRUSTYUI_MODELS ((UnknownKrustyUIModelEntry*)manufacturers)
 
 // 0x00498cf0: builds the garage scene (+0x464) on the first call with 1 or
 // -1: camera, lights, the garage and rider models and their shadow; with 2
@@ -269,17 +269,17 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             allowIme = atoi(text) != 0;
         allowIme = g_TrackGame->GetRegistryFlag("AllowIME", allowIme);
         if (allowIme)
-            field_0x2c->EnableWindowClipper(1);
-        ((UnknownKrustyUIGuiView*)field_0x2c)->OpenDialogResource("global.dtm");
-        field_0x474 = kVec3Zero;
+            gui->EnableWindowClipper(1);
+        ((UnknownKrustyUIGuiView*)gui)->OpenDialogResource("global.dtm");
+        garageFocus = kVec3Zero;
         KRUSTYUI_RIDER_POSITION = kVec3Zero;
         KRUSTYUI_RIDER_POSITION.y += 0.1f;
         garageScene = new(__FILE__, 0x105) GameObject(1);
         PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
-        field_0x468 = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
-        garageScene->AppendChild(field_0x468, -1);
-        field_0x468->field_0x1d8 = 0;
-        field_0x468->field_0x1d4 = 0;
+        garageCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
+        garageScene->AppendChild(garageCamera, -1);
+        garageCamera->field_0x1d8 = 0;
+        garageCamera->field_0x1d4 = 0;
         UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
         lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(field_0x18);
         garageScene->AppendChild(lights, -1);
@@ -288,19 +288,19 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         Vector3 position(-1800.0f, 200.0f, 0.0f);
-        Vector3 direction = field_0x474 - position;
+        Vector3 direction = garageFocus - position;
         emitter = new(__FILE__, 0x121) UnknownKrustyUILight(1);
         light = emitter->UnknownFunction49e230(field_0x18, 4, 0xffffff, &position, &direction, 0, 0, 0,
                                                0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
-        s488 = field_0x474;
+        s488 = garageFocus;
         s488.y += 8.0f;
         s488.x += 12.0f;
-        s408 = field_0x474 - s488;
+        s408 = garageFocus - s488;
         s448 = s488;
         s448.x -= 24.0f;
-        s438 = field_0x474 - s448;
+        s438 = garageFocus - s448;
         emitter = new(__FILE__, 0x130) UnknownKrustyUILight(1);
         light = emitter->UnknownFunction49e230(field_0x18, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
@@ -324,7 +324,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         garageScene->AppendChild(
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(field_0x18, "UIgarage.mcf", lights, &context, 1, 1), -1);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
-        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fc660(&field_0x474);
+        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fc660(&garageFocus);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->UnknownFunction4a8b10("Spin");
         KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
@@ -350,7 +350,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
     }
     if (pending && !done && (value == 2 || value == -1)) {
         UnknownKrustyUIPlatePainter painter(g_TrackGame->field_0x1c);
-        for (int i = 0; i < field_0x4c; i++) {
+        for (int i = 0; i < manufacturerCount; i++) {
             sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].uiModelFile);
             KRUSTYUI_MODELS[i].uiModel = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
             garageScene->AppendChild(
@@ -359,7 +359,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             bike->field_0x1a0->UnknownFunction4444c0(1);
-            bike->field_0x1a0->UnknownFunction4fc660(&field_0x474);
+            bike->field_0x1a0->UnknownFunction4fc660(&garageFocus);
             bike->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->UnknownFunction4a8b10("WaitB");
             bike->UnknownFunction4a6bb0(0.03f, 0, 0);
@@ -368,10 +368,10 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         if (shadow) {
             shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].uiModel->field_0x1a0);
             shadow->UnknownFunction4dab00(KRUSTYUI_RIDER->field_0x1a0);
-            s468 = field_0x474;
+            s468 = garageFocus;
             s468.y += 40.0f;
             s468.x += 15.0f;
-            s478 = field_0x474 - s468;
+            s478 = garageFocus - s468;
             // Retail passes the key light's vectors here, not the two just set.
             shadow->UnknownFunction4dae50(&s488, &s408, 3);
             shadow->UnknownFunction4dace0(0x20);
@@ -385,21 +385,21 @@ void KrustyUI::UnknownFunction498cf0(int value) {
 // 0x0049b470
 KrustyUI::~KrustyUI() {
     Shutdown();
-    if (field_0x48)
-        DebugFree(field_0x48, __FILE__, 1306);
-    if (field_0x50)
-        DebugFree(field_0x50, __FILE__, 1307);
-    if (field_0x58)
-        DebugFree(field_0x58, __FILE__, 1308);
-    if (field_0x60)
-        DebugFree(field_0x60, __FILE__, 1309);
+    if (manufacturers)
+        DebugFree(manufacturers, __FILE__, 1306);
+    if (bikes)
+        DebugFree(bikes, __FILE__, 1307);
+    if (riders)
+        DebugFree(riders, __FILE__, 1308);
+    if (entries)
+        DebugFree(entries, __FILE__, 1309);
 }
 
 // 0x004999b0
 void KrustyUI::Shutdown() {
     UnknownFunction5053b0(0);
     if (!g_TrackGame->field_0x2d5_bit1)
-        field_0x2c->CloseDialogResource();
+        gui->CloseDialogResource();
     if (garageScene) {
         garageScene->Release();
         garageScene = 0;
@@ -408,8 +408,8 @@ void KrustyUI::Shutdown() {
 
 // 0x0049b530: tells the "ProgressBar" control 1 (0x0047b370).
 void KrustyUI::UnknownFunction49b530() {
-    if (field_0x490) {
-        UIProgressBar* bar = static_cast<UIProgressBar*>(field_0x490->UnknownFunction46ebf0("ProgressBar", 0));
+    if (progressDialog) {
+        UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->UnknownFunction46ebf0("ProgressBar", 0));
         if (bar)
             bar->UnknownFunction47b370(1);
     }
@@ -417,9 +417,9 @@ void KrustyUI::UnknownFunction49b530() {
 
 // 0x0049bb80
 void KrustyUI::UnknownFunction49bb80() {
-    if (field_0x60)
-        DebugFree(field_0x60, __FILE__, 1453);
-    field_0x60 = 0;
+    if (entries)
+        DebugFree(entries, __FILE__, 1453);
+    entries = 0;
     entryCount = 0;
 }
 
@@ -472,7 +472,7 @@ int KrustyUI::UnknownVirtualSlot25(void* value) {
 void KrustyUI::ShowScene(GameObject* parent) {
     if (garageScene) {
         parent->AppendChild(garageScene, -1);
-        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(field_0x468);
+        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(garageCamera);
     }
 }
 
@@ -486,65 +486,65 @@ void KrustyUI::HideScene() {
 
 // 0x00499b00
 void KrustyUI::UnknownFunction499b00() {
-    if (field_0x2c)
-        field_0x2c->ShowCursors(1);
+    if (gui)
+        gui->ShowCursors(1);
 }
 
 // 0x00499b10
 void KrustyUI::UnknownFunction499b10() {
-    if (field_0x2c)
-        field_0x2c->ShowCursors(0);
+    if (gui)
+        gui->ShowCursors(0);
 }
 
 // 0x00499b20: opens menu `menu` (each id has its dialog class).
 void KrustyUI::OpenMenu(int menu) {
     UIDialog* dialog;
     if (menu == 0xd0)
-        field_0x34 = field_0x3c;
-    field_0x3c = menu;
+        field_0x34 = currentMenu;
+    currentMenu = menu;
     switch (menu) {
     case kMenuMain:
         dialog = new(__FILE__, 674) MainDlg;
-        field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         g_TrackGame->UnknownFunction468880();
         break;
     case kMenuSinglePlayer:
         dialog = new(__FILE__, 681) SinglePlayerDlg;
-        field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuOptions:
         dialog = new(__FILE__, 685) OptionsDlg;
-        field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuLoading:
         if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
             g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
         dialog = new(__FILE__, 695) LoadingDlg(1);
-        field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuHostJoin85c:
     case kMenuHostJoin85d:
         dialog = new(__FILE__, 727) HostJoinDlg;
-        field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuMultiPlayer866:
     case kMenuMultiPlayer867:
     case kMenuMultiPlayer868:
         dialog = new(__FILE__, 733) MultiPlayerDlg;
-        field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuSerialPopup:
         dialog = new(__FILE__, 737) SerialPopupDlg;
-        field_0x2c->ShowDialog(dialog, kMenuSerialPopup, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, kMenuSerialPopup, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuTCPAddress:
         dialog = new(__FILE__, 741) TCPAddressDlg;
-        field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuPCCentral:
         if (g_TrackGame->field_0x3444) {
             dialog = new(__FILE__, 747) PCCentralDlg;
-            field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+            gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
         }
         break;
     case kMenu88e: {
@@ -557,54 +557,54 @@ void KrustyUI::OpenMenu(int menu) {
             }
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 1) {
                 dialog = new(__FILE__, 760) PCLastRaceDlg;
-                field_0x2c->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
+                gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
             } else {
                 dialog = new(__FILE__, 763) PCCentralDlg;
-                field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+                gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             }
         } else if (g_TrackGame->field_0x18 == 1) {
             dialog = new(__FILE__, 767) SinglePlayerDlg;
-            field_0x2c->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
+            gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         } else {
             dialog = new(__FILE__, 769) MultiPlayerDlg;
-            field_0x2c->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
+            gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         }
         break;
     }
     case kMenuWaitOrCall:
         dialog = new(__FILE__, 774) WaitOrCallDlg;
-        field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuTrackRecord910:
     case kMenuTrackRecord911:
         dialog = new(__FILE__, 788) TrackRecordDlg;
-        field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case kMenuUserNameBb9:
     case kMenuUserNameBba:
     case kMenuUserNameBbb:
         dialog = new(__FILE__, 798) UserNameDlg;
-        field_0x2c->ShowDialog(dialog, menu, 0xc, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 0xc, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuRemoveProfile:
         dialog = new(__FILE__, 802) RemoveProfileDlg;
-        field_0x2c->ShowDialog(dialog, menu, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuConnectError:
         dialog = new(__FILE__, 806) ConnectErrorDlg;
-        field_0x2c->ShowDialog(dialog, kMenuConnectError, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, kMenuConnectError, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuPlayerRemoved:
         dialog = new(__FILE__, 810) PlayerRemovedDlg;
-        field_0x2c->ShowDialog(dialog, kMenuPlayerRemoved, 4, 0, (int)field_0x2c->FindInputDialog(), 0, 0, 1);
+        gui->ShowDialog(dialog, kMenuPlayerRemoved, 4, 0, (int)gui->FindInputDialog(), 0, 0, 1);
         break;
     case kMenuExit:
         dialog = new(__FILE__, 817) ExitDlg;
-        field_0x2c->ShowDialog(dialog, kMenuExit, 0x1c, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, kMenuExit, 0x1c, 0, 0, 0, 0, 1);
         break;
     case kMenuContinue:
         dialog = new(__FILE__, 822) ContinueDlg;
-        field_0x2c->ShowDialog(dialog, menu, 0x1c, 0, 0, 0, 0, 1);
+        gui->ShowDialog(dialog, menu, 0x1c, 0, 0, 0, 0, 1);
         break;
     }
 }
@@ -612,8 +612,8 @@ void KrustyUI::OpenMenu(int menu) {
 // 0x0049a4a0: turns "MediaControl" on, hides the GUI and opens Exit1Dlg.
 void KrustyUI::OpenExitDialog() {
     UnknownFunction468dd0("MediaControl");
-    field_0x2c->ShowCursors(0);
-    field_0x2c->ShowDialog(new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
+    gui->ShowCursors(0);
+    gui->ShowDialog(new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
 }
 
 // 0x0049a540: reads presets.pb's garage tables, or sets the defaults.
@@ -676,17 +676,17 @@ void KrustyUI::LoadBikesAndRiders() {
     char key[256];
     UnknownParameterBlock block;
     UnknownTextureStream* stream = new(__FILE__, 913) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (field_0x48)
-        DebugFree(field_0x48, __FILE__, 918);
-    if (field_0x50)
-        DebugFree(field_0x50, __FILE__, 919);
-    if (field_0x58)
-        DebugFree(field_0x58, __FILE__, 920);
-    field_0x50 = 0;
-    field_0x58 = 0;
-    field_0x5c = 0;
-    field_0x54 = 0;
-    field_0x4c = 0;
+    if (manufacturers)
+        DebugFree(manufacturers, __FILE__, 918);
+    if (bikes)
+        DebugFree(bikes, __FILE__, 919);
+    if (riders)
+        DebugFree(riders, __FILE__, 920);
+    bikes = 0;
+    riders = 0;
+    riderCount = 0;
+    bikeCount = 0;
+    manufacturerCount = 0;
     if (stream->UnknownFunction460f50("bikes.pb", "r", 0)) {
         block.UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
         block.UnknownFunction4b78f0("Information");
@@ -695,33 +695,33 @@ void KrustyUI::LoadBikesAndRiders() {
         for (int i = 1; i <= count; i++) {
             if (i != 7 && i != 3)
                 continue;
-            int bikeCount;
+            int manufacturerBikeCount;
             int availability;
             char name[260];
             char uiModel[260];
             char model[260];
             sprintf(key, "Manufacturer_%02d", i);
             block.UnknownFunction4b78f0(key);
-            block.UnknownFunction4b7f10("NumberOfBikes", 0, &bikeCount);
+            block.UnknownFunction4b7f10("NumberOfBikes", 0, &manufacturerBikeCount);
             block.UnknownFunction4b7ec0("Name", "(no name)", name, -1);
             block.UnknownFunction4b7ec0("UIModelFile", "", uiModel, -1);
             block.UnknownFunction4b7ec0("ModelFile", "", model, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
-            field_0x48 = UnknownFunction47b570(field_0x48, (field_0x4c + 1) * sizeof(UnknownKrustyUIModelEntry));
+            manufacturers = UnknownFunction47b570(manufacturers, (manufacturerCount + 1) * sizeof(UnknownKrustyUIModelEntry));
             int length = strlen(name);
             int n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].name, name, n);
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].name[n] = 0;
+            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name, name, n);
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].name[n] = 0;
             length = strlen(model);
             n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].modelFile, model, n);
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].modelFile[n] = 0;
+            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].modelFile, model, n);
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].modelFile[n] = 0;
             length = strlen(uiModel);
             n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].uiModelFile, uiModel, n);
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].uiModelFile[n] = 0;
-            ((UnknownKrustyUIModelEntry*)field_0x48)[field_0x4c].availability = availability;
-            for (int j = 1; j <= bikeCount; j++) {
+            strncpy(((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].uiModelFile, uiModel, n);
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].uiModelFile[n] = 0;
+            ((UnknownKrustyUIModelEntry*)manufacturers)[manufacturerCount].availability = availability;
+            for (int j = 1; j <= manufacturerBikeCount; j++) {
                 if (j != 2)
                     continue;
                 char bikeName[260];
@@ -730,24 +730,24 @@ void KrustyUI::LoadBikesAndRiders() {
                 block.UnknownFunction4b7ec0(key, "(no name)", bikeName, -1);
                 sprintf(key, "BikeTexture_%02d", j);
                 block.UnknownFunction4b7ec0(key, "", texture, -1);
-                field_0x50 = UnknownFunction47b570(field_0x50, (field_0x54 + 1) * sizeof(UnknownKrustyUIBikeEntry));
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].manufacturer = field_0x4c;
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].field_0x88 = 0;
+                bikes = UnknownFunction47b570(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].manufacturer = manufacturerCount;
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].field_0x88 = 0;
                 length = strlen(bikeName);
                 n = length > 63 ? 63 : length;
-                strncpy(((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].name, bikeName, n);
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].name[n] = 0;
+                strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name, bikeName, n);
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name[n] = 0;
                 length = strlen(texture);
                 n = length > 63 ? 63 : length;
-                strncpy(((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].texture, texture, n);
-                ((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].texture[n] = 0;
+                strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture, texture, n);
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].texture[n] = 0;
                 sprintf(key, "BikeEngineSize_%02d", j);
-                block.UnknownFunction4b7f10(key, 250, &((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].engineSize);
+                block.UnknownFunction4b7f10(key, 250, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].engineSize);
                 sprintf(key, "BikeFourStroke_%02d", j);
-                block.UnknownFunction4b7f10(key, 0, &((UnknownKrustyUIBikeEntry*)field_0x50)[field_0x54].fourStroke);
-                field_0x54++;
+                block.UnknownFunction4b7f10(key, 0, &((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].fourStroke);
+                bikeCount++;
             }
-            field_0x4c++;
+            manufacturerCount++;
         }
     }
     if (stream->UnknownFunction460f50("riders.pb", "r", 0)) {
@@ -766,18 +766,18 @@ void KrustyUI::LoadBikesAndRiders() {
             block.UnknownFunction4b7ec0("Name", "(no name)", riderName, -1);
             block.UnknownFunction4b7ec0("File", "", file, -1);
             block.UnknownFunction4b7f10("Availability", 1, &availability);
-            field_0x58 = UnknownFunction47b570(field_0x58, (field_0x5c + 1) * sizeof(UnknownKrustyUIModelEntry));
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].uiModel = 0;
+            riders = UnknownFunction47b570(riders, (riderCount + 1) * sizeof(UnknownKrustyUIModelEntry));
+            ((UnknownKrustyUIModelEntry*)riders)[riderCount].uiModel = 0;
             int length = strlen(riderName);
             int n = length > 63 ? 63 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].name, riderName, n);
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].name[n] = 0;
+            strncpy(((UnknownKrustyUIModelEntry*)riders)[riderCount].name, riderName, n);
+            ((UnknownKrustyUIModelEntry*)riders)[riderCount].name[n] = 0;
             length = strlen(file);
             n = length > 127 ? 127 : length;
-            strncpy(((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].modelFile, file, n);
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].modelFile[n] = 0;
-            ((UnknownKrustyUIModelEntry*)field_0x58)[field_0x5c].availability = availability;
-            field_0x5c++;
+            strncpy(((UnknownKrustyUIModelEntry*)riders)[riderCount].modelFile, file, n);
+            ((UnknownKrustyUIModelEntry*)riders)[riderCount].modelFile[n] = 0;
+            ((UnknownKrustyUIModelEntry*)riders)[riderCount].availability = availability;
+            riderCount++;
         }
     }
     delete stream;
@@ -806,10 +806,10 @@ int KrustyUI::UnknownFunction49b560(const char* name, char* text, int size) {
     delete stream;
     int index;
     do {
-        index = (int)(RandomUnit() * (field_0x54 - 1));
-    } while (((UnknownKrustyUIBikeEntry*)field_0x50)[index].field_0x88
-             || ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[index].manufacturer].availability != 3);
-    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIBikeEntry*)field_0x50)[index].texture, size);
+        index = (int)(RandomUnit() * (bikeCount - 1));
+    } while (((UnknownKrustyUIBikeEntry*)bikes)[index].field_0x88
+             || ((UnknownKrustyUIModelEntry*)manufacturers)[((UnknownKrustyUIBikeEntry*)bikes)[index].manufacturer].availability != 3);
+    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIBikeEntry*)bikes)[index].texture, size);
     return 0;
 }
 
@@ -836,25 +836,25 @@ int KrustyUI::UnknownFunction49b7f0(const char* name, char* text, int size) {
     delete stream;
     int index;
     do {
-        index = (int)(RandomUnit() * (field_0x5c - 1));
-    } while (((UnknownKrustyUIModelEntry*)field_0x58)[index].uiModel
-             || ((UnknownKrustyUIModelEntry*)field_0x58)[index].availability != 3);
-    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIModelEntry*)field_0x58)[index].modelFile, size);
+        index = (int)(RandomUnit() * (riderCount - 1));
+    } while (((UnknownKrustyUIModelEntry*)riders)[index].uiModel
+             || ((UnknownKrustyUIModelEntry*)riders)[index].availability != 3);
+    UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIModelEntry*)riders)[index].modelFile, size);
     return 0;
 }
 
 // 0x0049ba70
 int KrustyUI::UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e) {
-    field_0x60 = (UnknownKrustyUIEntry*)UnknownFunction47b570(field_0x60, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
-    field_0x60[entryCount].field_0x00 = a;
-    field_0x60[entryCount].field_0x04 = b;
-    field_0x60[entryCount].field_0x08 = c;
+    entries = (UnknownKrustyUIEntry*)UnknownFunction47b570(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
+    entries[entryCount].field_0x00 = a;
+    entries[entryCount].field_0x04 = b;
+    entries[entryCount].field_0x08 = c;
     int length = strlen(name);
     int count = length > 63 ? 63 : length;
-    strncpy(field_0x60[entryCount].field_0x14, name, count);
-    field_0x60[entryCount].field_0x14[count] = 0;
-    field_0x60[entryCount].field_0x0c = d;
-    field_0x60[entryCount].field_0x10 = e;
+    strncpy(entries[entryCount].field_0x14, name, count);
+    entries[entryCount].field_0x14[count] = 0;
+    entries[entryCount].field_0x0c = d;
+    entries[entryCount].field_0x10 = e;
     return ++entryCount - 1;
 }
 
@@ -948,25 +948,25 @@ void KrustyUI::UnknownFunction49b020(const char** names, int count) {
 // class always); otherwise the next unused bike after it is taken. The
 // class 1/2 test is one `||` of two `&&` pairs: if/else, goto and ternary
 // forms of it lay the second arm out before the probe loop, retail after it.
-void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
-    int* usedBikes = (int*)DebugCalloc(field_0x54, sizeof(int), __FILE__, 1164);
-    int* usedRiders = (int*)DebugCalloc(field_0x5c, sizeof(int), __FILE__, 1165);
+void KrustyUI::UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoices) {
+    int* usedBikes = (int*)DebugCalloc(bikeCount, sizeof(int), __FILE__, 1164);
+    int* usedRiders = (int*)DebugCalloc(riderCount, sizeof(int), __FILE__, 1165);
     int playerClass = UnknownBikeClassOf(
         ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.field_0xfd8)->field_0x00);
     srand(UnknownFunction4bfa80());
     int i;
-    for (i = 0; i < field_0x5c; i++) {
-        int type = ((UnknownKrustyUIModelEntry*)field_0x58)[i].availability;
+    for (i = 0; i < riderCount; i++) {
+        int type = ((UnknownKrustyUIModelEntry*)riders)[i].availability;
         if (type < 2 || type > 3)
             usedRiders[i] = -1;
     }
-    for (i = 0; i < field_0x54; i++) {
-        int type = ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[i].manufacturer].availability;
+    for (i = 0; i < bikeCount; i++) {
+        int type = ((UnknownKrustyUIModelEntry*)manufacturers)[((UnknownKrustyUIBikeEntry*)bikes)[i].manufacturer].availability;
         if (type < 2 || type > 3) {
             usedBikes[i] = -1;
             continue;
         }
-        int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[i].engineSize);
+        int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)bikes)[i].engineSize);
         if (playerClass == bikeClass || (playerClass == 1 && bikeClass == 2)
             || (playerClass == 2 && bikeClass == 1) || (playerClass == 3 && bikeClass == 4)
             || (playerClass == 4 && bikeClass == 3))
@@ -978,12 +978,12 @@ void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
         float chance;
         int bikeClass;
         do {
-            index = (int)(RandomUnit() * (field_0x54 - 1));
+            index = (int)(RandomUnit() * (bikeCount - 1));
         } while (usedBikes[index] == -1);
         int start = index;
         if (!usedBikes[index]) {
             chance = RandomUnit();
-            bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[index].engineSize);
+            bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)bikes)[index].engineSize);
             switch (bikeClass) {
             case 1:
             case 2:
@@ -1000,26 +1000,26 @@ void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
             }
         }
         do {
-            if (++index == field_0x54)
+            if (++index == bikeCount)
                 index = 0;
             if (index == start)
                 break;
         } while (usedBikes[index]);
     found:
         usedBikes[index] = 1;
-        bikes[k] = index;
+        bikeChoices[k] = index;
         do {
-            index = (int)(RandomUnit() * (field_0x5c - 1));
+            index = (int)(RandomUnit() * (riderCount - 1));
         } while (usedRiders[index] == -1);
         start = index;
         while (usedRiders[index]) {
-            if (++index == field_0x5c)
+            if (++index == riderCount)
                 index = 0;
             if (index == start)
                 break;
         }
         usedRiders[index] = 1;
-        riders[k] = index;
+        riderChoices[k] = index;
     }
     DebugFree(usedBikes, __FILE__, 1299);
     DebugFree(usedRiders, __FILE__, 1300);

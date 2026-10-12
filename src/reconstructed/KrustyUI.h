@@ -120,7 +120,7 @@ public:
     void UnknownFunction49b020(const char** names, int count);
     // 0x0049b0d0: picks `count` distinct random bikes and riders for the AI
     // racers (bikes near the player's class).
-    void UnknownFunction49b0d0(int* bikes, int count, int* riders);
+    void UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoices);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e);
     void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
@@ -137,20 +137,21 @@ public:
     void RecordRaceResults();
     void RecordHighScoreTable(int table);                          // 0x0049bc50
 
-    UnknownKrustyUIGui* field_0x2c;
+    UnknownKrustyUIGui* gui;                  // +0x2c: the GUIManager (constructor 0x00485190)
     int field_0x30;
     int field_0x34;
     int field_0x38;
-    int field_0x3c;                           // current menu
+    int currentMenu;                          // +0x3c: set by OpenMenu
     int field_0x40;
     int field_0x44;                           // cleared by EventManager 0x0045cdc0
-    void* field_0x48;                         // DebugMalloc'd; freed by the destructor
-    int field_0x4c;
-    void* field_0x50;
-    int field_0x54;
-    void* field_0x58;
-    int field_0x5c;
-    UnknownKrustyUIEntry* field_0x60;         // also freed by 0x0049bb80
+    // Lists that LoadBikesAndRiders reads from bikes.pb and riders.pb.
+    void* manufacturers;                      // +0x48: "Manufacturer_%02d" entries; freed by the destructor
+    int manufacturerCount;                    // +0x4c
+    void* bikes;                              // +0x50: each manufacturer's bikes
+    int bikeCount;                            // +0x54
+    void* riders;                             // +0x58: "Rider_%02d" entries
+    int riderCount;                           // +0x5c
+    UnknownKrustyUIEntry* entries;            // +0x60: also freed by 0x0049bb80
     int entryCount;                           // +0x64: entries in +0x60
     // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg), read
     // from presets.pb by 0x0049a540 (keys in the comments).
@@ -164,14 +165,14 @@ public:
     int field_0x43c[5];                       // slider minimum ("MinRange")
     int field_0x450[5];                       // slider maximum (the largest band maximum)
     GameObject* garageScene;                  // +0x464: the garage scene (built by 0x00498cf0); released by 0x004999b0
-    Camera* field_0x468;                      // made current while +0x464 is shown
-    UnknownKrustyUIModelObject* field_0x46c;  // the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
-    UnknownKrustyUIModelObject* field_0x470;  // the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
-    Vector3 field_0x474;                      // the +0x464 scene's focus (SelectGamePicProcs.cpp)
+    Camera* garageCamera;                     // +0x468: made current while +0x464 is shown
+    UnknownKrustyUIModelObject* riderPreview; // +0x46c: the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
+    UnknownKrustyUIModelObject* garageCharacter; // +0x470: the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
+    Vector3 garageFocus;                      // +0x474: the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char field_0x480[0x48c - 0x480];
     int field_0x48c;
-    UnknownGameUiPage* field_0x490;
-    void* field_0x494;                        // input context, restored to the window (EventManager 0x0045e710)
+    UnknownGameUiPage* progressDialog;        // +0x490: the dialog holding "ProgressBar" (DlgProcs.cpp sets and clears it)
+    void* savedInputContext;                  // +0x494: ImmAssociateContext's result (DlgProcs.cpp), restored to the window (EventManager 0x0045e710)
     int allowIme;                             // +0x498: "AllowIME" registry flag (0x00498cf0)
     int field_0x49c;
     int field_0x4a0;

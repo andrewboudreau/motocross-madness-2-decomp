@@ -809,9 +809,9 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 garagePage->ShowCurve();
             }
             KrustyUI* ui = g_TrackGame->ui;
-            int count = ui->field_0x54;
+            int count = ui->bikeCount;
             for (int i = 0; i < count; i++) {
-                if (((UnknownOptKrustyUIRecord*)ui->field_0x50)[i].engineSize == 0xfa) {
+                if (((UnknownOptKrustyUIRecord*)ui->bikes)[i].engineSize == 0xfa) {
                     g_TrackGame->mode.field_0x1974.field_0xc4 = i; // TrackGame+0x1fb0
                     break;
                 }
@@ -872,37 +872,37 @@ void OptionsDlg::OpenPage(int page)
     case 0:
         if (!gameSettingsPage) {
             gameSettingsPage = new(__FILE__, 1066) OptGameSettingsDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(gameSettingsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(gameSettingsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!graphicsPage) {
             graphicsPage = new(__FILE__, 1072) OptGraphicsDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(graphicsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(graphicsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!soundPage) {
             soundPage = new(__FILE__, 1078) OptSoundDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(soundPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(soundPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 3:
         if (!controlsPage) {
             controlsPage = new(__FILE__, 1084) OptControlsDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(controlsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(controlsPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 4:
         if (!messagesPage) {
             messagesPage = new(__FILE__, 1090) OptMessagesDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(messagesPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(messagesPage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     case 5:
         if (!garagePage) {
             garagePage = new(__FILE__, 1096) OptGarageDlg;
-            g_TrackGame->ui->field_0x2c->ShowDialog(garagePage, 0, 1, (int)&area, (int)this, 0, 0, 1);
+            g_TrackGame->ui->gui->ShowDialog(garagePage, 0, 1, (int)&area, (int)this, 0, 0, 1);
         }
         break;
     }
