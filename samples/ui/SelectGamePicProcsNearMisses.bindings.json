@@ -203,7 +203,7 @@
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
   "?FindInputDialog@UnknownKrustyUIGui@@QAEPAVUnknownTrackGameObject56cItem@@XZ": "0x00485df0",
-  "?UnknownFunction487790@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
+  "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
   "?ShowScene@KrustyUI@@QAEXPAVGameObject@@@Z": "0x004999f0",
   "?HideScene@KrustyUI@@QAEXXZ": "0x00499a20",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",

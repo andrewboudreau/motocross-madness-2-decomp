@@ -62,7 +62,7 @@
   "?SetStateText@UIMultiState@@QAEXHPBD@Z": "0x00478ad0",
   "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
   "?UnknownFunction4865e0@GUIManager@@QAEXPBDH@Z": "0x004865e0",
-  "?UnknownFunction487790@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
+  "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
   "?OpenMenu@KrustyUI@@QAEXH@Z": "0x00499b20",
   "?InitializeConnection@NetworkInterface@@QAEHPAXHH@Z": "0x004abdf0",
   "?CreateAddress@NetworkInterface@@QAEHU_GUID@@PAD1PAXPAPAXPAK@Z": "0x004abf10",

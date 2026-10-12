@@ -355,7 +355,7 @@
   "?ShowCursors@GUIManager@@QAEXH@Z": "0x00486630",
   "?ShowCursors@UnknownKrustyUIGui@@QAEXH@Z": "0x00486630",
   "?EnableWindowClipper@UnknownKrustyUIGui@@QAEXH@Z": "0x004868b0",
-  "?UnknownFunction487790@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
+  "?RequestFocus@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
   "?FormatTime@@YAXPADM@Z": "0x00488bd0",
   "?UnknownFunction498cf0@KrustyUI@@QAEXH@Z": "0x00498cf0",
   "?Shutdown@KrustyUI@@QAEXXZ": "0x004999b0",

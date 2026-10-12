@@ -261,8 +261,11 @@ public:
     GUIUser* UnknownFunction487650(void* target, GUIManager* gui); // 0x00487650
     void CreateToolTip(void* target, GUIManager* gui); // 0x00487680: new tool tip
     void ReleaseToolTip();                    // 0x00487710: releases the tool tip
-    int UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
-    int UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
+    // 0x00487730 / 0x00487790: make `control` the pending hover (focus also
+    // sets hover), unless the pending one is a drop-down list ("UIDDL");
+    // `update` applies it at once through 0x004875c0.
+    int RequestHover(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
+    int RequestFocus(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
     int SetHoverControl(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487800: +0x1d8
     int MoveFocus(UnknownGuiControl* control, UnknownGuiControl** previous); // 0x00487870: moves the focus
     void EnableImeInput(int enable);   // 0x00487990: input method editor on/off

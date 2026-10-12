@@ -1680,7 +1680,7 @@ void UIDropDownList::SyncBoundValue(int value) {
 int UIDropDownList::ButtonDown(int a, int b) {
     if (ownerDialog->guiUser->hoverControl == (UnknownGuiControl*)this) {
         SetOpen(isOpen == 0);
-        ownerDialog->guiUser->UnknownFunction487790((UnknownGuiControl*)this, 0, 0);
+        ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
         return 1;
     }
     return UIControl::ButtonDown(a, b);
@@ -2115,7 +2115,7 @@ void UIDialog::UnknownFunction46ffd0(void* background) {
 
 // 0x00470000
 int UIDialog::UnknownFunction470000(UIControl* control, int a, int b) {
-    return guiUser->UnknownFunction487730((UnknownGuiControl*)control,
+    return guiUser->RequestHover((UnknownGuiControl*)control,
                                                                     (UnknownGuiControl**)a, b);
 }
 
@@ -2506,7 +2506,7 @@ int UIControl::ButtonDown(int a, int b) {
         heldButton = a;
         if (a == 1 && ownerDialog->dialogBackground)
             ownerDialog->dialogBackground->UnknownFunction404da0();
-        ownerDialog->guiUser->UnknownFunction487790((UnknownGuiControl*)this, 0, 0);
+        ownerDialog->guiUser->RequestFocus((UnknownGuiControl*)this, 0, 0);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip) {
             tip->shown = 0;
@@ -2588,7 +2588,7 @@ int UIControl::UpdateHoverAt(int* position) {
                 result = ownerDialog->UnknownFunction470000(this, 0, 0);
             } else if (hover == (UnknownGuiControl*)this) {
                 if (user->pendingHoverControl && user->pendingHoverControl != (UnknownGuiControl*)this)
-                    user->UnknownFunction487730((UnknownGuiControl*)this, 0, 0);
+                    user->RequestHover((UnknownGuiControl*)this, 0, 0);
                 result = 1;
             }
         }
@@ -3375,7 +3375,7 @@ void UIDialog::UnknownFunction46f120() {
             user->field_0x1dc = 0;
             int result = ((UIControl*)controlContainer->field_0x10)->UpdateHoverAt((int*)&position);
             if (focus && !guiUser->pendingHoverControl && !result)
-                guiUser->UnknownFunction487730(0, 0, 1);
+                guiUser->RequestHover(0, 0, 1);
         }
     }
 }
@@ -5200,7 +5200,7 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
                 !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0) &&
                 IsEnabled() && shown) {
-                ownerDialog->guiUser->UnknownFunction487730((UnknownGuiControl*)this, 0, 1);
+                ownerDialog->guiUser->RequestHover((UnknownGuiControl*)this, 0, 1);
                 ButtonDown(0, 0);
                 ButtonUp(0, 0);
                 return 1;

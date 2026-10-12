@@ -892,7 +892,7 @@ void GUIUser::ReleaseToolTip() {
 }
 
 // 0x00487730
-int GUIUser::UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
+int GUIUser::RequestHover(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
     if (pendingHoverControl && strstr(pendingHoverControl->field_0x28, "UIDDL"))
         return 0;
     if (previous)
@@ -904,7 +904,7 @@ int GUIUser::UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl
 }
 
 // 0x00487790
-int GUIUser::UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
+int GUIUser::RequestFocus(UnknownGuiControl* control, UnknownGuiControl** previous, int update) {
     if (pendingFocusControl && strstr(pendingFocusControl->field_0x28, "UIDDL"))
         return 0;
     if (previous)

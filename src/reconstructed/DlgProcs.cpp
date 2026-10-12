@@ -625,7 +625,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
                 value = 999;
             _itoa(value, seed, 10);
             edit->SetEditText(seed);
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
         } else if (!_stricmp("SeedRight", event->controlName)) {
             char seed[32];
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditSeed", 0xb));
@@ -635,7 +635,7 @@ void SPEventDlg::HandleEvent(UnknownDialogEvent* event) {
                 value = 0;
             _itoa(value, seed, 10);
             edit->SetEditText(seed);
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
         } else if (!_stricmp("OpponentsLeftArrow", event->controlName) ||
                    !_stricmp("OpponentsRightArrow", event->controlName)) {
             ShowRaceModeControls();
@@ -1487,7 +1487,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
             EndDialog(0);
             FindControl("OkButton", 0)->SetEnabled(0);
         } else {
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
             FindControl("OkButton", 0)->SetEnabled(0);
         }
         break;
@@ -1508,7 +1508,7 @@ void UserNameDlg::HandleEvent(UnknownDialogEvent* event) {
         } else {
             UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditBox", 0));
             edit->SetEditText("");
-            guiUser->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+            guiUser->RequestFocus((UnknownGuiControl*)edit, 0, 0);
         }
         break;
     case kDialogEditChange: {
@@ -2553,7 +2553,7 @@ void EditBoxDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         editBuffer = 0;
         editBufferSize = 0;
-        guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditBox", 0), 0, 0);
+        guiUser->RequestFocus((UnknownGuiControl*)FindControl("EditBox", 0), 0, 0);
         break;
     case kDialogCommand:
         if (!_stricmp("OkButton", event->controlName)) {

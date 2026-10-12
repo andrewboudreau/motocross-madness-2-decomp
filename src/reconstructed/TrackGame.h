@@ -400,9 +400,9 @@ public:
     UnknownTrackGameRacerChoice field_0x1a3c;
     unsigned char field_0x1b04[0x1bcc - 0x1b04];
     int field_0x1bcc;                         // SelectGamePicProcs.cpp
-    int field_0x1bd0;                         // SelectGamePicProcs.cpp
-    int field_0x1bd4;                         // SelectGamePicProcs.cpp
-    int field_0x1bd8;                         // largest opponent count (SelectGamePicProcs.cpp)
+    int lobbyRank;                            // +0x1bd0: 0x0049c600 WaitForLobbyRank; 1..100 is copied to +0x1bcc
+    int lobbyPresetFlags;                     // +0x1bd4: 0x0049c2f0 ReadLobbyPreset (-1 until read)
+    int maxOpponents;                         // +0x1bd8: largest opponent count (SelectGamePicProcs.cpp)
     int field_0x1bdc;                         // cleared by TrackGameMode 0x00522440
     int field_0x1be0;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x1be4[8];

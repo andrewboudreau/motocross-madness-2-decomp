@@ -118,9 +118,9 @@ TrackGameMode::TrackGameMode() {
         bonusTrackUnlocked[i] = 0;
         bonusTrackNames[i][0] = 0;
     }
-    field_0x1bd0 = -1;
-    field_0x1bd4 = -1;
-    field_0x1bd8 = 0;
+    lobbyRank = -1;
+    lobbyPresetFlags = -1;
+    maxOpponents = 0;
     field_0x1be0 = 0;
     field_0x10ec = 0;
     UNKNOWN_SET_DIRECTORY(0, "Teraform\\Quarries")
