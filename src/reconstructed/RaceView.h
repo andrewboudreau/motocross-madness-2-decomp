@@ -68,7 +68,7 @@ class UnknownVehiclePart;
 struct UnknownEventRacerPart {
     int creationOrder;                        // +0x00 1-based order of creation
     UnknownEventRacer* racer;                 // +0x04 racer
-    float field_0x08;
+    float goalDistance;                       // +0x08 progressPos to the finish probe (track races) or to the next gate's centre (gate races), 0x004e6a50
     float gateDistance;                       // +0x0c distance to the next gate (sort key)
     float progressStep;                       // +0x10 progressPos..placedPos distance this frame (0x004e6a50)
     float progressTotal;                      // +0x14 sum of accepted progress steps (gate races: of gate approach)

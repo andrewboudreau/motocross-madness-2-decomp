@@ -321,12 +321,12 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 track->ClosestPointOnTrack(status->previousPosition, &status->placedPos, 0);
             if (racer->onTrack) {
                 racer->offTrackTime = 0;
-                status->field_0x08 = track->DistanceAlong(status->progressPos, finish->field_0x2c);
+                status->goalDistance = track->DistanceAlong(status->progressPos, finish->field_0x2c);
                 status->gateDistance = track->DistanceAlong(status->placedPos, finish->field_0x2c);
-                if (status->field_0x08 < g_UnknownGlobal572988 && status->field_0x08 < status->gateDistance)
+                if (status->goalDistance < g_UnknownGlobal572988 && status->goalDistance < status->gateDistance)
                     COPY_TRACK_POS(status->placedPos, status->progressPos);
                 if ((racer->field_0x735 && racer->field_0x7c0) || g_UnknownGlobal572988 < 0.0f ||
-                    (!racer->field_0x735 && status->field_0x08 >= 0.0f && status->field_0x08 < g_UnknownGlobal572988)) {
+                    (!racer->field_0x735 && status->goalDistance >= 0.0f && status->goalDistance < g_UnknownGlobal572988)) {
                     if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
                                               &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
                                               racer->totalRunningTime, &racer->lapStartTime, &racer->fastestLap, 1,
@@ -340,7 +340,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                     g_ViewRacerFinished = 1;
                 status->progressStep = track->DistanceAlong(status->progressPos, status->placedPos);
                 if (status->progressStep > 0.0f && status->progressStep < g_UnknownGlobal572988 &&
-                    status->progressStep < status->field_0x08) {
+                    status->progressStep < status->goalDistance) {
                     status->progressTotal += status->progressStep;
                     COPY_TRACK_POS(status->progressPos, status->placedPos);
                 }
@@ -452,7 +452,7 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
         status->currentPosition.y = status->previousPosition.y;
         status->currentPosition.z = status->previousPosition.z;
         status->progressTotal += before - after;
-        status->field_0x08 = after;
+        status->goalDistance = after;
         if (g_TrackGame->playerCount == 1 && g_ViewRacerFinished) {
             if (racer->hasFinished)
                 goto next;
