@@ -72,7 +72,7 @@
 // 0x0045c6a0 (cdecl): fwrite that encodes the bytes with the running key *key.
 int UnknownFunction45c6a0(const void* buffer, int size, int count, FILE* file, char* key);
 // 0x0045c7b0 (cdecl): fread that decodes the bytes with the running key *key.
-int UnknownFunction45c7b0(unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
+int ReadXorDecoded(unsigned char* buffer, int size, int count, FILE* file, unsigned char* key);
 
 // The stream that holds the file: the innermost one.
 static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream)
@@ -297,14 +297,14 @@ int UnknownTextureStream::Seek(int offset, int origin, int flag)
                 int blocks = skip / 0x400;
                 int tail = skip % 0x400;
                 for (; blocks; blocks--) {
-                    if (!UnknownFunction45c7b0(buffer, 0x400, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
+                    if (!ReadXorDecoded(buffer, 0x400, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
                         return -1;
                 }
-                if (tail && !UnknownFunction45c7b0(buffer, tail, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
+                if (tail && !ReadXorDecoded(buffer, tail, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
                     return -1;
             }
         } else if (origin == SEEK_END) {
-            while (UnknownFunction45c7b0(buffer, 0x400, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
+            while (ReadXorDecoded(buffer, 0x400, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01))
                 ;
             if (ferror(stream->field_0x14))
                 return -1;
@@ -365,7 +365,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
         int part = (unsigned)available % (unsigned)size;
         if (part) {
             if (stream->field_0x08) {
-                if (!UnknownFunction45c7b0((unsigned char*)buffer, part, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+                if (!ReadXorDecoded((unsigned char*)buffer, part, 1, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
                     return 0;
                 }
             } else if (!fread(buffer, part, 1, stream->field_0x14)) {
@@ -377,7 +377,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
             buffer = (char*)buffer + part;
         }
         if (stream->field_0x08) {
-            if (!UnknownFunction45c7b0((unsigned char*)buffer, size, count - (unsigned)(part + available) / (unsigned)size, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+            if (!ReadXorDecoded((unsigned char*)buffer, size, count - (unsigned)(part + available) / (unsigned)size, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
                 return count - 1;
             }
             return count;
@@ -390,7 +390,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
         return count - read;
     }
     if (stream->field_0x08) {
-        if (!UnknownFunction45c7b0((unsigned char*)buffer, size, count, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
+        if (!ReadXorDecoded((unsigned char*)buffer, size, count, stream->field_0x14, (unsigned char*)&stream->field_0x01)) {
             return count - 1;
         }
         return count;

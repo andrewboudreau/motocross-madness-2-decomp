@@ -29,7 +29,7 @@
   "?Read@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?EnableByClassName@GameObject@@IAEXPBD@Z": "0x00468f10",
-  "?UnknownFunction4bc320@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
+  "?Load@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
   "?PlayWithOptions@Sound@@QAEHHKH@Z": "0x004bc6b0",
   "?Stop@Sound@@QAEHH@Z": "0x004bc940",
   "?IsPlaying@Sound@@QAEHXZ": "0x004bca80",

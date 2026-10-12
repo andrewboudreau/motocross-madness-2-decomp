@@ -325,7 +325,7 @@ int TrackGame::UnknownVirtualSlot4() {
         }
     }
     g_MemTagStack->Push("Audio");
-    UnknownFunction521a30();
+    MuteSound();
     g_MemTagStack->Pop(category);
     return 1;
 }
@@ -453,7 +453,7 @@ int TrackGame::LoadResourceString(int id, char* buffer, int size) {
 }
 
 // 0x00521a30
-void TrackGame::UnknownFunction521a30() {
+void TrackGame::MuteSound() {
     ((PCSoundInterface*)soundInterface)->SetPrimaryVolume(0);
 }
 

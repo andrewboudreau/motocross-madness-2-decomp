@@ -321,7 +321,7 @@ int SoundEmitter::UnknownFunction402700(unsigned long flags) {
     int buffer = 0;
     if (field_0x14c & 0x10)
         buffer = 8;
-    field_0x34 = UnknownFunction4bb890(field_0x30, field_0x48, buffer | 4, 3, 0, -1);
+    field_0x34 = LoadEntrySound(field_0x30, field_0x48, buffer | 4, 3, 0, -1);
     if (!field_0x34)
         return 0;
     if (field_0x14c & 4) {

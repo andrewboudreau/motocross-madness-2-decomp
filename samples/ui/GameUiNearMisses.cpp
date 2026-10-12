@@ -344,7 +344,7 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             FreeFile(image);
     } else {
         frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
-        frameSound->UnknownFunction4bc320(file, 0, 1, 3, b, -1);
+        frameSound->Load(file, 0, 1, 3, b, -1);
         ownsSound = 1;
         isSound = 1;
         frameWidth = 0;
@@ -400,7 +400,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                                                                  : cursorAnimation);
         GUIInputDevice* device;
         int j = 0;
-        while ((device = guiUser->UnknownFunction488310(j++)) != 0) {
+        while ((device = guiUser->GetAcceptedDevice(j++)) != 0) {
             if (device->inputDevice->deviceKind == 2) {
                 int x = device->pointerPosition.x;
                 int y = device->pointerPosition.y;
@@ -1136,7 +1136,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         frame->SetName("FRMBIStatic");
                         frame->permanent = 1;
                         controlContainer->AppendChild(frame, -1);
-                        UnknownFunction46a840(frame, 0, 0);
+                        SetupControl(frame, 0, 0);
                     }
                 }
                 break;
@@ -1176,13 +1176,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     int flags = isStatic ? 1 : 2;
                     if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1)) {
                         soundTable[soundCount] =
-                            UnknownFunction4bb890(soundGroup, sectionTable[i].sectionName, flags, 3, copies, -1);
+                            LoadEntrySound(soundGroup, sectionTable[i].sectionName, flags, 3, copies, -1);
                     } else if (g_UnknownResourceManager572b44->FindItem(buffer, 1)) {
                         soundTable[soundCount] =
-                            UnknownFunction4bb890(soundGroup, buffer, flags, 3, copies, -1);
+                            LoadEntrySound(soundGroup, buffer, flags, 3, copies, -1);
                     } else {
                         soundTable[soundCount] = new(__FILE__, 0x41e) Sound(soundGroup, 1);
-                        soundTable[soundCount]->UnknownFunction4bc320(buffer, 0, flags, 3, copies, -1);
+                        soundTable[soundCount]->Load(buffer, 0, flags, 3, copies, -1);
                     }
                     sectionTable[i].sectionObject = soundTable[soundCount];
                     soundCount++;

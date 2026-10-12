@@ -78,7 +78,7 @@ struct UnknownRunwayTrackPos {
 // The track a racer's view holds at +0x48 (Track.h's Track).
 struct UnknownRunwayTrack {
     // 0x00518080: the world point of `pos`.
-    int UnknownFunction518080(UnknownRunwayTrackPos pos, Vector3* out);
+    int PointAt(UnknownRunwayTrackPos pos, Vector3* out);
 };
 
 struct UnknownRunwayView {

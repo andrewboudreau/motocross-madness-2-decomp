@@ -20,7 +20,7 @@ int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate,
 
 // 0x0047b800: intersects the segment p0 + t * d0 with p1 + u * d1 (2-D),
 // writing the parameters. 0 when the lines are parallel or a pointer is null.
-int UnknownFunction47b800(float p0x, float p0y, float d0x, float d0y,
+int IntersectLines(float p0x, float p0y, float d0x, float d0y,
                           float p1x, float p1y, float d1x, float d1y,
                           float* t, float* u);
 

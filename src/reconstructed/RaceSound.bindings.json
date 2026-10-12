@@ -80,7 +80,7 @@
   "?ReadString@UnknownParameterBlock@@QAEHPBDPADH@Z": "0x004b7b30",
   "?ReadInt@UnknownParameterBlock@@QAEHPBDPAH@Z": "0x004b7cf0",
   "?GetInt@UnknownParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",
-  "?UnknownFunction4bc320@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
+  "?Load@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
   "?PlayWithOptions@Sound@@QAEHHKH@Z": "0x004bc6b0",
   "?Stop@Sound@@QAEHH@Z": "0x004bc940",
   "?IsPlaying@Sound@@QAEHXZ": "0x004bca80",

@@ -67,7 +67,7 @@ public:
     void Print(int page, const char* format, ...);
     void Title(int page, const char* format, ...);
     // 0x00448000 (ret 0xc): sets field_0x90 of row `row` on a shown page.
-    void UnknownFunction448000(int page, int row, int flag);
+    void SetRowHighlight(int page, int row, int flag);
     // 0x00448200 (ret 0x14): draws `length` characters of `text` at (x, y).
     void DrawString(int x, int y, const char* text, int length, unsigned int color);
     int NewPage() { return nextPage++; }

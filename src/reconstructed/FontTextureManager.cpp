@@ -80,7 +80,7 @@ UnknownFontTextureNode* UnknownStatic65b478::UnknownFunction4677f0(const char* n
     while (1) {
         if (!node)
             break;
-        if (strcmp(name, node->font->UnknownFunction4673b0()) == 0)
+        if (strcmp(name, node->font->GetFontName()) == 0)
             break;
         node = node->next;
     }

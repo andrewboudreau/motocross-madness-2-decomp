@@ -13,7 +13,7 @@
   "?SetRowText@DebugOverlay@@QAEXHPBDH@Z": "0x00447e90",
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
-  "?UnknownFunction448000@DebugOverlay@@QAEXHHH@Z": "0x00448000",
+  "?SetRowHighlight@DebugOverlay@@QAEXHHH@Z": "0x00448000",
   "?DrawString@DebugOverlay@@QAEXHHPBDHI@Z": "0x00448200",
   "?ShowNextPage@DebugOverlay@@QAEHXZ": "0x004484f0",
   "?ReadClock@@YAIXZ": "0x004bfa80",

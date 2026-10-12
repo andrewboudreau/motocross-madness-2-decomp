@@ -34,11 +34,11 @@ public:
     // 0x0049e230 (ret 0x2c): slot 8 of the base, then the type, colour,
     // range, optional position/direction and sphere model; arguments 8-10
     // are unused.
-    LightEmitter* UnknownFunction49e230(void* value, int type, unsigned int color,
+    LightEmitter* Create(void* value, int type, unsigned int color,
                                         const Vector3* position, const Vector3* direction,
                                         float range, int sphere, int a8, int a9, int a10,
                                         int index);
-    unsigned int UnknownFunction49dfd0();                  // 0x0049dfd0: packed ARGB colour
+    unsigned int PackedColor();                  // 0x0049dfd0: packed ARGB colour
     void UnknownFunction49e020(unsigned int color);        // 0x0049e020: sets the colours
     void SetRange(float range);                            // 0x0049e0f0
     void SetPosition(const Vector3* position);             // 0x0049e150
@@ -74,7 +74,7 @@ public:
 
     void UnknownFunction49e470(LightEmitter* light);      // 0x0049e470: adds a light
     void UnknownFunction49e490();                         // 0x0049e490: counts a change
-    LightEmitter* UnknownFunction4a0190(int type);        // 0x004a0190: first light of `type`
+    LightEmitter* FindLightOfType(int type);        // 0x004a0190: first light of `type`
     // 0x0049e4a0 lights `count` vertices (Griddraw.h's GridVertexSink is
     // this function seen from the terrain). Not reconstructed: it and its
     // three workers 0x0049e6b0, 0x0049f1c0 and 0x0049f8d0 (ebp frames) round

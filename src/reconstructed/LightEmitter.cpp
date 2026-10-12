@@ -65,7 +65,7 @@ int LightEmitter::UnknownVirtualSlot12() {
 }
 
 // 0x0049dfd0
-unsigned int LightEmitter::UnknownFunction49dfd0() {
+unsigned int LightEmitter::PackedColor() {
     return (((((int)(colorRGBA[3] * 255.0f) << 8) | (int)(colorRGBA[0] * 255.0f)) << 8 |
              (int)(colorRGBA[1] * 255.0f)) << 8) | (int)(colorRGBA[2] * 255.0f);
 }
@@ -126,7 +126,7 @@ void LightEmitter::SetDirection(const Vector3* direction) {
 }
 
 // 0x0049e230
-LightEmitter* LightEmitter::UnknownFunction49e230(void* value, int type, unsigned int color,
+LightEmitter* LightEmitter::Create(void* value, int type, unsigned int color,
                                                   const Vector3* position, const Vector3* direction,
                                                   float range, int sphere, int a8, int a9, int a10,
                                                   int index) {
@@ -211,7 +211,7 @@ Vector3 operator-(const Vector3& v) {
 }
 
 // 0x004a0190
-LightEmitter* LightManager::UnknownFunction4a0190(int type) {
+LightEmitter* LightManager::FindLightOfType(int type) {
     int i;
 
     for (i = 0; i < lightCount; i++) {

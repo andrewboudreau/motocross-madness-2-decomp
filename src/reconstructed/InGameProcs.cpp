@@ -251,7 +251,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                    sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
                    sizeof(g_TrackGame->mode.field_0x1a3c));
-            g_TrackGame->eventManager->UnknownFunction45cdc0(2);
+            g_TrackGame->eventManager->CloseRace(2);
             g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             guiManager->ShowCursors(1);
             field_0x7f58 = 1;

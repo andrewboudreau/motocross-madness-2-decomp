@@ -239,7 +239,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButLoadProfile", event->controlName)) {
             g_TrackGame->mode.SaveProfile();
             if (UseSelectedProfile(event))
-                g_TrackGame->UnknownFunction521a30();
+                g_TrackGame->MuteSound();
             RequestHover(FindControl("LstProfiles", 3), 0, 0);
             ShowCurrentProfile();
             userMenuOpen = 0;
@@ -325,7 +325,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             } else if (event->code == 0x32) {
                 COPY_TEXT(name, list->GetRowText(g_UnknownGlobal59adbc), 16);
                 sprintf(path, "%s\\%s", "ui\\profile", name);
-                if (g_TrackGame->profileDirectory->UnknownFunction44a960(path)) {
+                if (g_TrackGame->profileDirectory->DeleteTree(path)) {
                     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
                     list->RemoveRow(g_UnknownGlobal59adbc);
                 }

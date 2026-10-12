@@ -390,7 +390,7 @@ void EventManager::EndRace() {
             (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 || racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c))
             g_TrackGame->network->SetSessionJoinable(1);
         waitingForRacers = 0;
-        UnknownFunction45cdc0(2);
+        CloseRace(2);
         LeaveRaceForMenu(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
     }
 }
@@ -870,7 +870,7 @@ void EventManager::RankRacers() {
 // scene) it only calls slot 4 on the race objects and racers. Otherwise it saves the replay (Record\\<scene>_<racer>_
 // <date>_<time>.vcr, filtered to file-name characters) and, in mode 4, the
 // ghost (.gho), then releases the first race-mode object.
-void EventManager::UnknownFunction45cdc0(int mode) {
+void EventManager::CloseRace(int mode) {
     char date[32];
     char scene[64];
     char name[260];

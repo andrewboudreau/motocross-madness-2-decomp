@@ -348,7 +348,7 @@ int GUIManager::UnknownVirtualSlot15() {
 void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     int visible = dialog->field_0x25_bit0;
 
-    dialog->UnknownFunction46ea60(0);
+    dialog->SetShown(0);
     if (dialog->parentDialog && (dialog->field_0x144 & 1))
         dialog->parentDialog->controlContainer->AppendSibling(dialog, -1);
     else
@@ -361,7 +361,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
         RecreateCursors(cursorImage, paletteChanged == 0);
     if (paletteChanged)
         waitFrames = 3;
-    dialog->UnknownFunction46ea60(visible);
+    dialog->SetShown(visible);
 }
 
 // 0x00485c80: opens `resource` as a plain UIDialog (0x7f58 bytes) with the
@@ -643,7 +643,7 @@ ToolTip::ToolTip(int flags) : GameObject(flags) {
 }
 
 // 0x00486a10
-ToolTip* ToolTip::UnknownFunction486a10(void* target, GUIManager* gui) {
+ToolTip* ToolTip::Create(void* target, GUIManager* gui) {
     GameObject::UnknownVirtualSlot8(target);
     tipGui = gui;
     return this;
@@ -741,8 +741,8 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
     bindingY = UnknownControlBinding(rangeMinY, rangeY, 0.0f,
                                        g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
-        ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingX, 0.01f, 0.01f);
-        ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingY, 0.01f, 0.01f);
+        ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
+        ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingY, 0.01f, 0.01f);
     } else if (inputDevice->deviceKind == 1) {
         ((MouseDevice*)inputDevice)->AttachBinding(&bindingX);
         ((MouseDevice*)inputDevice)->AttachBinding(&bindingY);
@@ -774,8 +774,8 @@ void GUIInputDevice::Rebind() {
     bindingY = UnknownControlBinding(rangeMinY, rangeY, (float)y,
                                        g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
-        ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingX, 0.01f, 0.01f);
-        ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingY, 0.01f, 0.01f);
+        ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
+        ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingY, 0.01f, 0.01f);
     } else if (inputDevice->deviceKind == 1) {
         ((MouseDevice*)inputDevice)->AttachBinding(&bindingX);
         ((MouseDevice*)inputDevice)->AttachBinding(&bindingY);
@@ -881,7 +881,7 @@ GUIUser* GUIUser::UnknownFunction487650(void* target, GUIManager* gui) {
 void GUIUser::CreateToolTip(void* target, GUIManager* gui) {
     ReleaseToolTip();
     userToolTip = (ToolTip*)AppendChild(
-        (new(__FILE__, 1639) ToolTip(1))->UnknownFunction486a10(target, gui), -1);
+        (new(__FILE__, 1639) ToolTip(1))->Create(target, gui), -1);
 }
 
 // 0x00487710
@@ -1201,7 +1201,7 @@ GUIInputDevice* GUIUser::UnknownFunction4882a0(UnknownControlEvent* event) {
 }
 
 // 0x00488310
-GUIInputDevice* GUIUser::UnknownFunction488310(int index) {
+GUIInputDevice* GUIUser::GetAcceptedDevice(int index) {
     return acceptedDevices.Get(index);
 }
 

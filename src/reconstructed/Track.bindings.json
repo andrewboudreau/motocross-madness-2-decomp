@@ -15,8 +15,8 @@
   "?IsAtOrAfter@Track@@QAEHUTrackPos@@0@Z": "0x005179a0",
   "?ShortestPath@Track@@QAEHUTrackPos@@0PAPAUTrackListItem@@PAM@Z": "0x005179f0",
   "?DistanceAlong@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",
-  "?UnknownFunction518080@Track@@QAEHUTrackPos@@PAUTrackVec3@@@Z": "0x00518080",
-  "?UnknownFunction518130@Track@@QAEHPAUTrackSegment@@PAUTrackVec3@@@Z": "0x00518130",
+  "?PointAt@Track@@QAEHUTrackPos@@PAUTrackVec3@@@Z": "0x00518080",
+  "?SegmentDirection@Track@@QAEHPAUTrackSegment@@PAUTrackVec3@@@Z": "0x00518130",
   "?FormatMinutesSeconds@@YAXPADM@Z": "0x00518640",
   "?FormatLapTime@@YAXPADM@Z": "0x00518690",
   "__FILE__:track.cpp": "0x0057508c",
@@ -33,5 +33,5 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?IsInsideStrip@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z": "0x00516ef0",
   "?PlaceNear@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
-  "?UnknownFunction47b800@@YAHMMMMMMMMPAM0@Z": "0x0047b800"
+  "?IntersectLines@@YAHMMMMMMMMPAM0@Z": "0x0047b800"
 }

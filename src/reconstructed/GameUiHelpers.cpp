@@ -32,7 +32,7 @@ int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate,
     p1y = gate->center.z - gate->halfExtents.z;
     d1x = gate->halfExtents.x * 2.0f;
     d1y = gate->halfExtents.z * 2.0f;
-    if (!UnknownFunction47b800(p0x, p0y, d0x, d0y, p1x, p1y, d1x, d1y, &t, &u)) {
+    if (!IntersectLines(p0x, p0y, d0x, d0y, p1x, p1y, d1x, d1y, &t, &u)) {
         return 0;
     }
     if (t < 0.0f || t > 1.0f) {
@@ -57,7 +57,7 @@ int UnknownFunction47b670(Vector3* from, Vector3* to, UnknownBikeRaceNode* gate,
 }
 
 // 0x0047b800
-int UnknownFunction47b800(float p0x, float p0y, float d0x, float d0y,
+int IntersectLines(float p0x, float p0y, float d0x, float d0y,
                           float p1x, float p1y, float d1x, float d1y,
                           float* t, float* u)
 {

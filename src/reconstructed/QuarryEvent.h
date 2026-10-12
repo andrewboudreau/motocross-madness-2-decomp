@@ -121,7 +121,7 @@ public:
     // 0x004e0c30: shows "<string id> <on/off>" (strings 0x1407/0x1408) in
     // the text queue.
     void ShowOnOffMessage(int id, int on);
-    void UnknownFunction4e1f00();             // 0x004e1f00: clears the clock
+    void ResetClock();             // 0x004e1f00: clears the clock
 
     Scene* eventScene;
     void* skyCube;                         // SkyCube

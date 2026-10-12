@@ -42,7 +42,7 @@ public:
     virtual int UnknownVirtualSlot20(int value) = 0;
 
     // 0x00489a20: attaches `binding` to the list for its axis.
-    int UnknownFunction489a20(UnknownControlBinding* binding, float step, float interval);
+    int AttachAxisBinding(UnknownControlBinding* binding, float step, float interval);
     // 0x00489c00: feeds an axis value to every binding on that axis.
     void FeedAxis(int axis, float value, float range);
     // 0x00489c60: state of `control` (negative: an axis direction).

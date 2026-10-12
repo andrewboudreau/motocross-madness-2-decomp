@@ -39,7 +39,7 @@ public:
     CharacterCell* FindCell(int code);              // 0x00467340: the cell for `code`, or 0
     void SetCell(unsigned int index, CharacterCell* cell);               // 0x00467380
     void SetTexture(TextureMap* texture);            // 0x004673a0
-    const char* UnknownFunction4673b0();      // 0x004673b0: the name
+    const char* GetFontName();      // 0x004673b0: the name
     TextureMap* GetTexture();                 // 0x004673c0: the texture
     // 0x004673d0 (cdecl): the font `name`, already loaded or read from the
     // cell file `path` with its texture `textureName` (through 0x0050a590).

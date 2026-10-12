@@ -60,7 +60,7 @@ struct TrackGameViewOwner : public GameObject {
     // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
     void ShowOnOffMessage(int id, int value);
-    void UnknownFunction4e1f00();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
+    void ResetClock();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
     // 0x004a9d20 (dlgprocs.cpp 0x004526b0): the host picks the racer to
     // follow (+0xa8) and tells the players and the recorder (FollowRacer.cpp).
     void PickFollowedRacer();
@@ -654,7 +654,7 @@ public:
     virtual int UnknownVirtualSlot15();       // 0x00521a70: shutdown
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00521cb0
 
-    void UnknownFunction521a30();             // 0x00521a30
+    void MuteSound();             // 0x00521a30
     void UnknownFunction521a40();             // 0x00521a40
     int UnknownFunction521cd0();              // 0x00521cd0
 

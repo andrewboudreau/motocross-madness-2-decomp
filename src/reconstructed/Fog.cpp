@@ -53,12 +53,12 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
             field_0x44 = D3DPRASTERCAPS_FOGTABLE;
         }
     }
-    UnknownFunction4627a0(color, visibility, haziness);
+    SetParameters(color, visibility, haziness);
     return this;
 }
 
 // 0x004627a0
-void Fog::UnknownFunction4627a0(unsigned int color, float visibility, float haziness)
+void Fog::SetParameters(unsigned int color, float visibility, float haziness)
 {
     field_0x2c = color;
     field_0x38 = visibility;
@@ -206,7 +206,7 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
         if (visibility - visibilityOffset < 0.0f) {
             visibilityOffset = visibility = field_0x38;
         }
-        UnknownFunction4627a0(field_0x2c, visibility, field_0x40);
+        SetParameters(field_0x2c, visibility, field_0x40);
         return 1;
     }
     if (TestInputEvent(0x22, 0, event, 0x80)) {
@@ -218,7 +218,7 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
         if (visibility - visibilityOffset > 1.0f) {
             visibilityOffset = 0;
         }
-        UnknownFunction4627a0(field_0x2c, visibility, field_0x40);
+        SetParameters(field_0x2c, visibility, field_0x40);
         return 1;
     }
     return 0;
@@ -232,7 +232,7 @@ void Fog::UnknownFunction462db0(int level)
     if (visibility - visibilityOffset < 0.0f) {
         visibilityOffset = visibility = field_0x38;
     }
-    UnknownFunction4627a0(field_0x2c, visibility, field_0x40);
+    SetParameters(field_0x2c, visibility, field_0x40);
 }
 
 // 0x00462670

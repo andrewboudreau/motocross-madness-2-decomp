@@ -26,7 +26,7 @@
   "?UnknownFunction436500@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction464e80@MorphBastardModifier@@QAEXH@Z": "0x00464e80",
-  "?UnknownFunction4a2350@@YA?AUVector3@@PBUMatrix4@@H@Z": "0x004a2350",
+  "?Matrix4Row@@YA?AUVector3@@PBUMatrix4@@H@Z": "0x004a2350",
   "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVMorphBastardNode@@@Z": "0x004a33b0",
   "?LoadParameterFile@MorphBastardModifier@@QAEPAV1@PAXPBDPAVMorphBastardNode@@@Z$ehhandler": "0x0054c3ee",
   "?CompareTargets@@YAHPBX0@Z": "0x004a3bb0",

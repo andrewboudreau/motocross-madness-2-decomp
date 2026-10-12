@@ -132,7 +132,7 @@ public:
 };
 class LightManager {
 public:
-    UnknownEcoLight* UnknownFunction4a0190(int type); // 0x004a0190: first light of `type`
+    UnknownEcoLight* FindLightOfType(int type); // 0x004a0190: first light of `type`
 };
 
 // RenderTarget.h: the view at GameObject+0x18 and its Camera (+0x08).
@@ -388,7 +388,7 @@ int EvictGeometry(void* object, int context);
 // 0x0045c6a0 / 0x0045c7b0 (cdecl): fwrite / fread through a running
 // one-byte xor key.
 int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key);
-int UnknownFunction45c7b0(unsigned char* data, int size, int count, FILE* file, unsigned char* key);
+int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigned char* key);
 
 // Griddraw.h / VisibilityQuadTree.h: the visibility clipper 0x00575a98.
 class UnknownEcoVisibilityClipper {
@@ -492,7 +492,7 @@ public:
     int ReadEsb(const char* path, UnknownTextureStream* stream);               // 0x00458f70: reads the .esb
     void UnknownFunction4594c0(int level);    // 0x004594c0: detail level
     // 0x004594d0: creates the ecosystem.
-    EcoSystem* UnknownFunction4594d0(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
+    EcoSystem* Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
                                      LightManager* lights, char* path, UnknownTextureStream* stream,
                                      int textureFormat, int collisions, int level);
     int PlaceStoredObjects();                 // 0x004598d0: places the objects read from the .esb

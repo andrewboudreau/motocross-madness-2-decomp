@@ -357,7 +357,7 @@ static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 float FastInvSqrt(float x);                                          // 0x00460c00
 float Vec3Dot(const Vector3* a, const Vector3* b);     // 0x0040ae30: a.b
 Vector3 CrossProduct(const Vector3* a, const Vector3* b);   // 0x00515600: a x b
-Vector3 UnknownFunction4a2350(const Matrix4* m, int row);            // 0x004a2350: row of m
+Vector3 Matrix4Row(const Matrix4* m, int row);            // 0x004a2350: row of m
 void UnknownFunction42de90(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90: axis-angle
 void UnknownFunction436500(Matrix4* out, const Matrix4* a, const Matrix4* b);    // 0x00436500: a * b
 
@@ -477,15 +477,15 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         NormalizeOrZero(axis);
     UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
-    cross = CrossProduct(&UnknownFunction4a2350(&aligned, 2), &UnknownFunction4a2350(&controller, 2));
-    float angleY = AngleBetween(UnknownFunction4a2350(&aligned, 2), UnknownFunction4a2350(&controller, 2)) *
+    cross = CrossProduct(&Matrix4Row(&aligned, 2), &Matrix4Row(&controller, 2));
+    float angleY = AngleBetween(Matrix4Row(&aligned, 2), Matrix4Row(&controller, 2)) *
                    57.2957764f;
     if (Vec3Dot(&to, &cross) < 0.0f)
         angleY = -angleY;
 
     // The z axes.
-    from = UnknownFunction4a2350(&identity, 2);
-    to = UnknownFunction4a2350(&controller, 2);
+    from = Matrix4Row(&identity, 2);
+    to = Matrix4Row(&controller, 2);
     axis = CrossProduct(&from, &to);
     angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
@@ -494,9 +494,9 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         NormalizeOrZero(axis);
     UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
-    cross = CrossProduct(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
-    Vec3Dot(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
-    float angleZ = AngleBetween(UnknownFunction4a2350(&aligned, 0), UnknownFunction4a2350(&controller, 0)) *
+    cross = CrossProduct(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));
+    Vec3Dot(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));
+    float angleZ = AngleBetween(Matrix4Row(&aligned, 0), Matrix4Row(&controller, 0)) *
                    57.2957764f;
     if (Vec3Dot(&to, &cross) < 0.0f)
         angleZ = -angleZ;

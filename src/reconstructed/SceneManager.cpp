@@ -1041,7 +1041,7 @@ int Scene::ReadSounds()
                         int volume;
                         if (!strstr(file, ".wav"))
                             strcat(file, ".wav");
-                        Sound* sound = UnknownFunction4bb890(soundGroup, file, 1, 1, 0, -1);
+                        Sound* sound = LoadEntrySound(soundGroup, file, 1, 1, 0, -1);
                         parameters.GetInt("SoundVolume", 0, &volume);
                         sound->SetVolume(volume, 0);
                         sounds.Add(sound);
@@ -1165,7 +1165,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
             int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->field_0x3c : 0;
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
-                    ->UnknownFunction49e230(field_0x18, sceneLights[i].type, sceneLights[i].color,
+                    ->Create(field_0x18, sceneLights[i].type, sceneLights[i].color,
                                             &sceneLights[i].position, sceneLights[i].field_0x34,
                                             sceneLights[i].range, sceneLights[i].showDebugSphere, 0, camera,
                                             (int)flare, i);

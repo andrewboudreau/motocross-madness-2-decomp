@@ -170,7 +170,7 @@ public:
     // 0x0045e600: starts the end-of-race block (or finishes at once), and
     // once it has run its course clears it and moves to the results.
     void EndRace();
-    void UnknownFunction45cdc0(int mode);          // 0x0045cdc0
+    void CloseRace(int mode);          // 0x0045cdc0
     // 0x0045d480: creates the camera (+0x3d4) and up to three characters
     // (+0x424) from "%s\\Winner.mcf" with "Podium3/4/5_%02d" motions (also
     // "CrowdLoop.wav"); nonzero when slot 10 should run that scene.

@@ -59,7 +59,7 @@ void UnknownOverlayText::SelectFont(const char* font) {
     while (1) {
         if (i >= count)
             return;
-        if (!strcmp(font, (*fonts)[i]->UnknownFunction4673b0()))
+        if (!strcmp(font, (*fonts)[i]->GetFontName()))
             break;
         i++;
     }

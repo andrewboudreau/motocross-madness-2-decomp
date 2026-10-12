@@ -42,7 +42,7 @@ ArcadeObject::~ArcadeObject() {
 }
 
 // 0x00401310
-ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, const char* name,
+ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
                                                   Vector3 position, int pixels, UnknownArcadeView* view,
                                                   float size, float c, float d, unsigned char alpha) {
     Vector3 low;

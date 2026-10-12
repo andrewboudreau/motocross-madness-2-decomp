@@ -68,7 +68,7 @@ RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunway
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (; i < 5; i++) {
         lightModels[i] = (new (__FILE__, 0x40) ArcadeObject(1))
-                            ->UnknownFunction401310(value, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
+                            ->Create(value, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
         if (!AppendChild(lightModels[i], -1)) {
             Release();
             return 0;
@@ -96,8 +96,8 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     Vector3 position;
     Vector3 next;
     if (field_0x30->field_0x740->field_0x48) {
-        field_0x30->field_0x740->field_0x48->UnknownFunction518080(field_0x30->field_0x744->field_0x38, &position);
-        field_0x30->field_0x740->field_0x48->UnknownFunction518080(field_0x30->field_0x744->field_0x44, &next);
+        field_0x30->field_0x740->field_0x48->PointAt(field_0x30->field_0x744->field_0x38, &position);
+        field_0x30->field_0x740->field_0x48->PointAt(field_0x30->field_0x744->field_0x44, &next);
         direction = position - next;
     } else {
         position = field_0x30->trackPoint;
@@ -179,7 +179,7 @@ VisualCue* VisualCue::LoadVisualCue(void* value, int a, int b, UnknownRunwayTerr
 
     if (pixels && camera && c != 0.0f && d != 0.0f) {
         sprintf(name, "%s\\%s", "Res", "viscue.slt");
-        if (ArcadeObject::UnknownFunction401310(value, a, b, name, position, pixels, camera, size, c, d, 0)) {
+        if (ArcadeObject::Create(value, a, b, name, position, pixels, camera, size, c, d, 0)) {
             cueView = view;
             builtFieldOfView = 0;
             field_0xac = terrain;
@@ -295,7 +295,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, Unknow
     for (int i = 0; i < 5; i++) {
         sprintf(name, "%s\\%s", "Res", names[i]);
         field_0x38[i] = (new (__FILE__, 0x240) ArcadeObject(1))
-                            ->UnknownFunction401310(value, 0, b, name, position, pixels,
+                            ->Create(value, 0, b, name, position, pixels,
                                                     (UnknownArcadeView*)camera, size, 0.5f, 0.1f, 0);
         if (!AppendChild(field_0x38[i], -1)) {
             Release();

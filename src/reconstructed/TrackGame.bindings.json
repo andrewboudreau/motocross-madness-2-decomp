@@ -93,7 +93,7 @@
   "?SendDebugMessage@@YAXPBDZZ": "0x00520820",
   "?SetMenuOpen@TrackGame@@QAEXHHH@Z": "0x00521860",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
-  "?UnknownFunction521a30@TrackGame@@QAEXXZ": "0x00521a30",
+  "?MuteSound@TrackGame@@QAEXXZ": "0x00521a30",
   "?ResetNetworkRace@TrackGameMode@@QAEHXZ": "0x00522680",
   "?CreateDirectoryLists@TrackGameMode@@QAEHXZ": "0x00522d00",
   "?LoadProfile@TrackGameMode@@QAEHXZ": "0x005231f0",

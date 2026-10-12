@@ -1052,7 +1052,7 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
             delete stream;
         return 0;
     }
-    if (!sound->UnknownFunction4bc320(name, stream, a, b, 0, -1)) {
+    if (!sound->Load(name, stream, a, b, 0, -1)) {
         if (stream)
             delete stream;
         return 0;

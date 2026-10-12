@@ -51,8 +51,8 @@
   "?Play@Sound@@QAEHXZ": "0x004bbcd0",
   "?ApplyCachedSettings@Sound@@QAEHXZ": "0x004bbdc0",
   "?LoadWave@Sound@@QAEHPAVUnknownTextureStream@@KKHH@Z": "0x004bbef0",
-  "?UnknownFunction4bc320@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
-  "?UnknownFunction4bc320@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z$ehhandler": "0x0054ca47",
+  "?Load@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z": "0x004bc320",
+  "?Load@Sound@@QAEHPBDPAVUnknownTextureStream@@HHHH@Z$ehhandler": "0x0054ca47",
   "?GetBufferControlFlags@Sound@@QAEKK@Z": "0x004bc490",
   "?DuplicateFrom@Sound@@QAEHPAV1@@Z": "0x004bc4c0",
   "?SupportsProperty@Sound@@QAEHPBUUnknownGuid@@KK@Z": "0x004bc5f0",
@@ -140,6 +140,6 @@
   "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf",
   "_strncpy": "0x00534b10",
-  "?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
-  "?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z$ehhandler": "0x0054c9d7"
+  "?LoadEntrySound@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
+  "?LoadEntrySound@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z$ehhandler": "0x0054c9d7"
 }

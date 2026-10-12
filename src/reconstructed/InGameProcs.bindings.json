@@ -42,7 +42,7 @@
   "?UnknownFunction453090@@YAXHPAUUnknownDialogEvent@@@Z": "0x00453090",
   "?SetTextsOrResources@ChoiceDlg@@QAEXHHHHHHHHHH@Z": "0x00455700",
   "?SetTextsOrResources@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
-  "?UnknownFunction45cdc0@EventManager@@QAEXH@Z": "0x0045cdc0",
+  "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
   "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",

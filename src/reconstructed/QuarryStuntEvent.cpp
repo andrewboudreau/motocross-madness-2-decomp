@@ -108,7 +108,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
                 clockSeconds = 0.0f;
         }
     } else if (raceView->field_0x18e) {
-        UnknownFunction4e1f00();
+        ResetClock();
     }
     SoundSystem()->CommitListenerSettings();
     return 1;
@@ -465,7 +465,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
         if (TestInputEvent(0x1c, 0, event, 0x80)) {
-            g_TrackGame->debugOverlay->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 0);
+            g_TrackGame->debugOverlay->SetRowHighlight(s_DebugPage, s_DebugRow + 1, 0);
             s_DebugRow++;
             if (s_DebugRow > 10)
                 s_DebugRow = 0;
@@ -534,7 +534,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
 }
 
 // 0x004e1f00
-void BaseQuarryEvent::UnknownFunction4e1f00() {
+void BaseQuarryEvent::ResetClock() {
     clockMinutes = 0.0f;
     clockSeconds = 0.0f;
 }

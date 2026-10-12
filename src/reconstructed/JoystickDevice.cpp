@@ -42,7 +42,7 @@ int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEn
 
 // 0x00489a20: axis n's binding reports controls -(2n + 2) (low) and
 // -(2n + 3) (high).
-int JoystickDevice::UnknownFunction489a20(UnknownControlBinding* binding, float step,
+int JoystickDevice::AttachAxisBinding(UnknownControlBinding* binding, float step,
                                           float interval) {
     binding->field_0x00 = this;
     binding->field_0x1c = step;

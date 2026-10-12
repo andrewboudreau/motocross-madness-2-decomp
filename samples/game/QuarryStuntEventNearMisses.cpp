@@ -35,8 +35,8 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
             int down = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
             int up = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
             if (up || down) {
-                unsigned int sun = sunLight->UnknownFunction49dfd0();
-                unsigned int ambient = ambientLight->UnknownFunction49dfd0();
+                unsigned int sun = sunLight->PackedColor();
+                unsigned int ambient = ambientLight->PackedColor();
                 Fog* fog = eventFog;
                 float visibility;
                 float haziness;
@@ -175,7 +175,7 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
                     break;
                 }
                 if (fog)
-                    fog->UnknownFunction4627a0(color, visibility, haziness);
+                    fog->SetParameters(color, visibility, haziness);
                 sunLight->UnknownFunction49e020(sun);
                 ambientLight->UnknownFunction49e020(ambient);
                 if (ecoSystem)
@@ -199,13 +199,13 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
                 g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
                 g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
             }
-            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight R %d", (sunLight->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight G %d", (sunLight->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight B %d", sunLight->UnknownFunction49dfd0() & 0xff);
-            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  R %d", (ambientLight->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  G %d", (ambientLight->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  B %d", ambientLight->UnknownFunction49dfd0() & 0xff);
-            g_TrackGame->debugOverlay->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 1);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight R %d", (sunLight->PackedColor() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight G %d", (sunLight->PackedColor() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight B %d", sunLight->PackedColor() & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  R %d", (ambientLight->PackedColor() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  G %d", (ambientLight->PackedColor() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->Print(s_DebugPage, "Ambient  B %d", ambientLight->PackedColor() & 0xff);
+            g_TrackGame->debugOverlay->SetRowHighlight(s_DebugPage, s_DebugRow + 1, 1);
         }
     }
     return 0;

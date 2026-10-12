@@ -204,7 +204,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00486ab0
     virtual int UnknownVirtualSlot15();       // 0x00486db0
 
-    ToolTip* UnknownFunction486a10(void* target, GUIManager* gui); // 0x00486a10
+    ToolTip* Create(void* target, GUIManager* gui); // 0x00486a10
     void UnknownFunction486b10(UnknownGuiControl* control);        // 0x00486b10
     // 0x00486b80: shows `text` near `position` for `time` seconds.
     void ShowText(const char* text, int* position, float time);
@@ -282,7 +282,7 @@ public:
     int UnknownFunction4881d0(UnknownControlEvent* event);
     GUIInputDevice* FindDevice(InputDevice* device); // 0x00488240: its GUIInputDevice
     GUIInputDevice* UnknownFunction4882a0(UnknownControlEvent* event);
-    GUIInputDevice* UnknownFunction488310(int index);
+    GUIInputDevice* GetAcceptedDevice(int index);
 
     GUIInputDevice* pointerDevice;            // +0x2c: pointer device
     GUICursor* userCursor;                    // +0x30

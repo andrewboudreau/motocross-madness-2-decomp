@@ -498,7 +498,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
     }
     case kDialogClose:
         if (parentDialog)
-            parentDialog->UnknownFunction46ea60(1);
+            parentDialog->SetShown(1);
         break;
     }
 }
@@ -1324,9 +1324,9 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->ResetClock();
                 g_TrackGame->eventManager->FindRaceView()->UnknownFunction421050();
                 if (g_TrackGame->field_0x55c)
-                    g_TrackGame->field_0x55c->UnknownFunction4e1f00();
+                    g_TrackGame->field_0x55c->ResetClock();
                 if (g_TrackGame->field_0x568)
-                    g_TrackGame->field_0x568->UnknownFunction4e1f00();
+                    g_TrackGame->field_0x568->ResetClock();
                 g_TrackGame->eventManager->UnknownFunction45d270();
             }
             g_UnknownGlobal59adfc++;
@@ -1375,7 +1375,7 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
                                                                         message.playerId, 0);
                 EndNetworkGame();
             }
-            g_TrackGame->ui->UnknownFunction499b00();
+            g_TrackGame->ui->ShowCursors();
             g_TrackGame->ui->OpenMenu(kMenuMain);
             return 1;
         }
@@ -1451,7 +1451,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
     g_TrackGame->mode.SaveProfile();
     g_TrackGame->field_0x33fc->ApplyDevice(control, -1);
-    g_TrackGame->UnknownFunction521a30();
+    g_TrackGame->MuteSound();
     event->dialog->EndDialog(0x1e);
     event->handled = 1;
 }
@@ -1657,7 +1657,7 @@ void HandleMenuCancel(int menu, UnknownDialogEvent* event) {
                 racer->field_0x4a0 = 1;
             g_TrackGame->field_0x568->PickFollowedRacer();
         }
-        g_TrackGame->eventManager->UnknownFunction45cdc0(2);
+        g_TrackGame->eventManager->CloseRace(2);
         if (g_TrackGame->network) {
             g_TrackGame->network->SetSessionJoinable(1);
             if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
@@ -1703,7 +1703,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     case 0xca:
         event->dialog->UpdateBoundValues(1);
         *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
-        g_TrackGame->UnknownFunction521a30();
+        g_TrackGame->MuteSound();
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
@@ -2594,7 +2594,7 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->field_0x2d5_bit1) {
-            g_TrackGame->eventManager->UnknownFunction45cdc0(2);
+            g_TrackGame->eventManager->CloseRace(2);
             memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
             memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,

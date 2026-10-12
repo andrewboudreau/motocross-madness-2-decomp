@@ -82,8 +82,8 @@ public:
     GameObject* AddControl(GameObject* control, int group, int region); // 0x0046a8a0
 
     // gameui.cpp (provisional names).
-    UIControl* UnknownFunction46a840(UIControl* control, int group, int region); // 0x0046a840
-    void UnknownFunction46ea60(int value);    // 0x0046ea60
+    UIControl* SetupControl(UIControl* control, int group, int region); // 0x0046a840
+    void SetShown(int value);    // 0x0046ea60
     void EndControlDraw(void* dc);            // 0x0046eeb0: restores the font and releases `dc`
     int LoadDialogResource(const char* name); // 0x0046a8e0: the .dtm `name` from the resource manager
     int UnknownFunction46a920(void* stream, int offset); // 0x0046a920

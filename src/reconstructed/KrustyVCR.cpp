@@ -61,7 +61,7 @@ void KrustyVCR::SaveRecording(float duration, char* description, int flag)
 }
 
 // 0x0049c070
-void KrustyVCR::UnknownFunction49c070(int id, char ai, int slot, char* name, char* model,
+void KrustyVCR::SetRacer(int id, char ai, int slot, char* name, char* model,
                                       char* rider, char* riderName, char* bikeName,
                                       int engineSize, int engineKind, int value)
 {

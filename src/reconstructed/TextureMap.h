@@ -12,7 +12,7 @@ struct UnknownTexturePalette {
     // ColorMapper's table getters (Quantize.h): Pixtrans.cpp calls them on
     // its palette argument.
     unsigned char* GetColors();        // 0x004de270: &field_0x010
-    unsigned char* UnknownFunction4de280();        // 0x004de280: &field_0x710 (555 to index)
+    unsigned char* GetIndexFrom555();        // 0x004de280: &field_0x710 (555 to index)
     unsigned char* UnknownFunction4de290();        // 0x004de290: &field_0x8710 (565 to index)
 
     unsigned char field_0x000[0x10];

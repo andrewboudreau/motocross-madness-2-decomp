@@ -11,7 +11,7 @@
   "?SetRotation@SoultreeObject@@QAEXMMMM@Z": "0x004fd090",
   "?Scale@D3DIMSoultreeObject@@QAEXMMM@Z": "0x004fd340",
   "?QueryGround@UnknownRunwayTerrain@@QAEXPAUVector3@@0HH@Z": "0x00507c10",
-  "?UnknownFunction518080@UnknownRunwayTrack@@QAEHUUnknownRunwayTrackPos@@PAUVector3@@@Z": "0x00518080",
+  "?PointAt@UnknownRunwayTrack@@QAEHUUnknownRunwayTrackPos@@PAUVector3@@@Z": "0x00518080",
   "?UnknownVirtualSlot10@ArcadeObject@@UAEHM@Z": "0x00401800",
   "?UnknownVirtualSlot10@BonusObjectManager@@UAEHM@Z": "0x0048ccc0",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",

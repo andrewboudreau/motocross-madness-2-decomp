@@ -106,8 +106,8 @@ public:
     int ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
     float DistanceAlong(TrackPos a, TrackPos b);
     int UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
-    int UnknownFunction518080(TrackPos pos, TrackVec3* out);
-    int UnknownFunction518130(TrackSegment* segment, TrackVec3* out);
+    int PointAt(TrackPos pos, TrackVec3* out);
+    int SegmentDirection(TrackSegment* segment, TrackVec3* out);
     int UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out, int mode);
 
     TrackNode* startNode;                     // +0x00

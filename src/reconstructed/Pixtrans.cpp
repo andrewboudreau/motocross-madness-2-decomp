@@ -653,7 +653,7 @@ int Convert24To8(void* destination, void* source, int width, int height, int des
     } else {
         UnknownPixel24* sourceRow = (UnknownPixel24*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = palette->UnknownFunction4de280();
+        unsigned char* indices = palette->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
             UnknownPixel24* from = sourceRow;
             unsigned char* to = row;
@@ -1010,11 +1010,11 @@ int Convert555To8(void* destination, void* source, int width, int height, int de
                               destination, palette);
     } else if (sourceStride == width && sourceStride % 8 == 0) {
         Convert555To8Fast(source, destination, destinationStride, width, height,
-                              palette->UnknownFunction4de280());
+                              palette->GetIndexFrom555());
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
         unsigned char* row = (unsigned char*)destination;
-        unsigned char* indices = palette->UnknownFunction4de280();
+        unsigned char* indices = palette->GetIndexFrom555();
         for (int y = 0; y < height; y++) {
             unsigned short* from = sourceRow;
             unsigned char* to = row;

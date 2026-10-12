@@ -146,7 +146,7 @@
   "?LeaveMenusForRace@@YAXXZ": "0x004536e0",
   "?SetTextsOrResources@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
   "?ResetEntries@EventManager@@QAEXXZ": "0x0045e520",
-  "?UnknownFunction4673b0@DirectoryList@@QAEHXZ": "0x004673b0",
+  "?GetFontName@DirectoryList@@QAEHXZ": "0x004673b0",
   "?EnableGroup@UIDialog@@QAEXHH@Z": "0x0046ea80",
   "?ShowGroup@UIDialog@@QAEXHH@Z": "0x0046eb30",
   "?FindControl@UIDialog@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",

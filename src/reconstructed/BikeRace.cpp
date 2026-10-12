@@ -687,15 +687,15 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 if ((signed char)field_0x0b0 < 0) {
                     if (g_UnknownGlobal567a88 > 5) {
                         if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
-                            g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
+                            g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                             g_UnknownGlobal567a88 = 2;
                         }
                     } else if ((pass == 0 && g_UnknownGlobal567a88 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
-                        g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
+                        g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                         g_UnknownGlobal567a88 = 9;
                     }
                 } else if (g_UnknownGlobal567a88 > model->detailLevelCount || g_UnknownGlobal567a88 < 2) {
-                    g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
+                    g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                     g_UnknownGlobal567a88 = 2;
                 }
                 if (model->detailLevelCount > 1) {
@@ -765,7 +765,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                         lodDebugPage, "AutoLOD#2 %.2f", model->detailLevelCount > 3 ? model->detailDistances[2] : 0.0f);
                     g_TrackGame->debugOverlay->Print(
                         lodDebugPage, "AutoLOD#3 %.2f", model->detailLevelCount > 4 ? model->detailDistances[3] : 0.0f);
-                    g_TrackGame->debugOverlay->UnknownFunction448000(lodDebugPage, g_UnknownGlobal567a88 + 1, 1);
+                    g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 1);
                 }
                 if ((signed char)field_0x0b0 >= 0) {
                     break;
@@ -1029,13 +1029,13 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                             g_TrackGame->renderTarget, 0, PickerHitCallback,
                             (GameCursor*)g_TrackGame->ui->gui->GetUser(0)->field_0x30);
                         if (AppendChild(objectPicker, -1)) {
-                            g_TrackGame->ui->UnknownFunction499b00();
+                            g_TrackGame->ui->ShowCursors();
                         }
                     } else {
-                        g_TrackGame->ui->UnknownFunction499b00();
+                        g_TrackGame->ui->ShowCursors();
                     }
                 } else {
-                    g_TrackGame->debugOverlay->UnknownFunction448000(
+                    g_TrackGame->debugOverlay->SetRowHighlight(
                         lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
                     g_UnknownGlobal567a88++;
                     if ((signed char)field_0x0b0 < 0) {
@@ -1355,10 +1355,10 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         g_TrackGame->field_0x568->field_0xdc->UnknownFunction4a9d10(replayVcr);
     }
     if (g_TrackGame->field_0x55c != 0) {
-        g_TrackGame->field_0x55c->UnknownFunction4e1f00();
+        g_TrackGame->field_0x55c->ResetClock();
     }
     if (g_TrackGame->field_0x568 != 0) {
-        g_TrackGame->field_0x568->UnknownFunction4e1f00();
+        g_TrackGame->field_0x568->ResetClock();
     }
     if (g_TrackGame->field_0x560 != 0) {
         g_TrackGame->field_0x560->UnknownFunction404df0(0, 1, UnknownFunctionCameraView()->field_0x3b4);
@@ -1436,7 +1436,7 @@ void BikeRace::RestartReplay() {
                                                      riderName, 0x3f);
     g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.field_0x1974.field_0x80,
                                                      bikeName, 0x3f);
-    replayVcr->UnknownFunction49c070(0, 0, 0, g_TrackGame->mode.field_0x00, model, rider,
+    replayVcr->SetRacer(0, 0, 0, g_TrackGame->mode.field_0x00, model, rider,
                                        riderName, bikeName, aiRacers[0]->engineSize,
                                        (unsigned char)aiRacers[0]->engineKind,
                                        g_TrackGame->mode.field_0x1bcc);

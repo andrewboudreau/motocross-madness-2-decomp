@@ -92,7 +92,7 @@ class UnknownKrustyUILight : public GameObject {
 public:
     explicit UnknownKrustyUILight(int flags);                      // 0x0049deb0
     // 0x0049e230: slot 8, then type, colour, range, position, direction.
-    UnknownKrustyUILight* UnknownFunction49e230(void* owner, int type, unsigned int color,
+    UnknownKrustyUILight* Create(void* owner, int type, unsigned int color,
                                                 const Vector3* position, const Vector3* direction,
                                                 float range, int sphere, int a8, int a9, int a10,
                                                 int index);
@@ -284,13 +284,13 @@ void KrustyUI::BuildGarageScene(int value) {
         lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(field_0x18);
         garageScene->AppendChild(lights, -1);
         UnknownKrustyUILight* emitter = new(__FILE__, 0x116) UnknownKrustyUILight(1);
-        light = emitter->UnknownFunction49e230(field_0x18, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
+        light = emitter->Create(field_0x18, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         Vector3 position(-1800.0f, 200.0f, 0.0f);
         Vector3 direction = garageFocus - position;
         emitter = new(__FILE__, 0x121) UnknownKrustyUILight(1);
-        light = emitter->UnknownFunction49e230(field_0x18, 4, 0xffffff, &position, &direction, 0, 0, 0,
+        light = emitter->Create(field_0x18, 4, 0xffffff, &position, &direction, 0, 0, 0,
                                                0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
@@ -302,7 +302,7 @@ void KrustyUI::BuildGarageScene(int value) {
         s448.x -= 24.0f;
         s438 = garageFocus - s448;
         emitter = new(__FILE__, 0x130) UnknownKrustyUILight(1);
-        light = emitter->UnknownFunction49e230(field_0x18, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
+        light = emitter->Create(field_0x18, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->field_0x1c;
@@ -485,7 +485,7 @@ void KrustyUI::HideScene() {
 }
 
 // 0x00499b00
-void KrustyUI::UnknownFunction499b00() {
+void KrustyUI::ShowCursors() {
     if (gui)
         gui->ShowCursors(1);
 }

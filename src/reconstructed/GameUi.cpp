@@ -984,7 +984,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void
         UnknownResourceEntry* entry =
             ((UnknownResourceManager*)id)->FindItem((const char*)module, 1);
         if (!LoadFromStream(entry->field_0x14, entry->field_0x18, palette) && a) {
-            UnknownFunction4bb890((SoundGroup*)a, (const char*)module, 1, 3, c, -1);
+            LoadEntrySound((SoundGroup*)a, (const char*)module, 1, 3, c, -1);
             ownsSound = 1;
             isSound = 1;
             frameWidth = 0;
@@ -1609,12 +1609,12 @@ UIDropDownList::UIDropDownList(int id, CameraRect* area, UIDialog* owner, const 
     AppendChild(staticPart2, -1);
     isOpen = 0;
     SetOpen(0);
-    owner->UnknownFunction46a840(buttonPart, 0, 0);
-    owner->UnknownFunction46a840(listPart, 0, 0);
-    owner->UnknownFunction46a840(scrollBarPart, 0, 0);
-    owner->UnknownFunction46a840(staticPart0, 0, 0);
-    owner->UnknownFunction46a840(staticPart2, 0, 0);
-    owner->UnknownFunction46a840(staticPart1, 0, 0);
+    owner->SetupControl(buttonPart, 0, 0);
+    owner->SetupControl(listPart, 0, 0);
+    owner->SetupControl(scrollBarPart, 0, 0);
+    owner->SetupControl(staticPart0, 0, 0);
+    owner->SetupControl(staticPart2, 0, 0);
+    owner->SetupControl(staticPart1, 0, 0);
 }
 
 // 0x0047a1f0
@@ -1891,7 +1891,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
 }
 
 // 0x0046a840
-UIControl* UIDialog::UnknownFunction46a840(UIControl* control, int group, int region) {
+UIControl* UIDialog::SetupControl(UIControl* control, int group, int region) {
     if (control) {
         control->UnknownInlineSetField18(field_0x18);
         control->post3D = controlsPost3D;
@@ -1908,7 +1908,7 @@ UIControl* UIDialog::UnknownFunction46a840(UIControl* control, int group, int re
 // 0x0046a8a0
 GameObject* UIDialog::AddControl(GameObject* control, int a, int b) {
     if (control) {
-        UnknownFunction46a840((UIControl*)control, a, b);
+        SetupControl((UIControl*)control, a, b);
         controlContainer->AppendChild(control, -1);
         return control;
     }
@@ -1943,7 +1943,7 @@ Sound* UIDialog::FindSectionObject(const char* name) {
 }
 
 // 0x0046ea60
-void UIDialog::UnknownFunction46ea60(int value) {
+void UIDialog::SetShown(int value) {
     isShown = value;
     if (value)
         GameObject::UnknownVirtualSlot5();
@@ -4245,7 +4245,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
 int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
     int range = GetWidth();
     GUIInputDevice* device;
-    for (int i = 0; (device = ownerDialog->guiUser->UnknownFunction488310(i++)) != 0;) {
+    for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
         if (device->inputDevice->deviceKind == 2 && device->inputDevice->UnknownFunction4897e0(4)) {
             POINT position = device->pointerPosition;
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
@@ -4501,7 +4501,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
 // is +0x248.
 int UIListBox::UnknownVirtualSlot10(float frameTime) {
     GUIInputDevice* device;
-    for (int i = 0; (device = ownerDialog->guiUser->UnknownFunction488310(i++)) != 0;) {
+    for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
         if (device->inputDevice->deviceKind == 2 && device->inputDevice->UnknownFunction4897e0(4)) {
             POINT position = device->pointerPosition;
             if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {

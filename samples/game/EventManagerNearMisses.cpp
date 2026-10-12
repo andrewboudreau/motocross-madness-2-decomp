@@ -145,7 +145,7 @@ struct UnknownPodiumContext {
 class UnknownPodiumSound {                          // PCAudio.h's Sound
 public:
     UnknownPodiumSound(GameObject* group, int type);                    // 0x004bba10
-    int UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a,
+    int Load(const char* name, UnknownTextureStream* stream, int flags, int a,
                               int b, int c);                            // 0x004bc320
     int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware); // 0x004bc6b0
     unsigned char field_0x000[0x1f8];
@@ -227,7 +227,7 @@ int EventManager::CreatePodiumScene() {
             results[0].position > 3)
             return 0;
     }
-    UnknownFunction45cdc0(1);
+    CloseRace(1);
     PCCamera* camera = new(__FILE__, 0x276) PCCamera(1);
     podiumCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
     if (!view->AppendChild(podiumCamera, -1))
@@ -369,7 +369,7 @@ int EventManager::CreatePodiumScene() {
             delete audio;
             return 0;
         }
-        sound->UnknownFunction4bc320("CrowdLoop.wav", audio, 1, 0, 0, -1);
+        sound->Load("CrowdLoop.wav", audio, 1, 0, 0, -1);
         delete audio;
         sound->PlayWithOptions(0, 1, 0);
     }

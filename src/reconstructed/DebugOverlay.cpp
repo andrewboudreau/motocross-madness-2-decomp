@@ -90,7 +90,7 @@ void DebugOverlay::Title(int page, const char* format, ...)
     }
 }
 
-void DebugOverlay::UnknownFunction448000(int page, int row, int flag)
+void DebugOverlay::SetRowHighlight(int page, int row, int flag)
 {
     if (field_0x25_bit0 && page == field_0x26c4)
         field_0xb4[row].highlighted = flag;

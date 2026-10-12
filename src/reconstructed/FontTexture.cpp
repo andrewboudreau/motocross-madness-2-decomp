@@ -79,7 +79,7 @@ void FontTexture::SetTexture(TextureMap* texture) {
 }
 
 // 0x004673b0
-const char* FontTexture::UnknownFunction4673b0() {
+const char* FontTexture::GetFontName() {
     return fontName;
 }
 

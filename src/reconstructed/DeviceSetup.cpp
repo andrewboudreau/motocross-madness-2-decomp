@@ -121,7 +121,7 @@ int UnknownTrackGameObject33fc::BindAxis(UnknownControlBinding* binding, int kin
     switch (kind) {
     case 2:
         if (g_TrackGame->controlInterface->activeJoystick)
-            g_TrackGame->controlInterface->activeJoystick->UnknownFunction489a20(binding, 0.018f,
+            g_TrackGame->controlInterface->activeJoystick->AttachAxisBinding(binding, 0.018f,
                                                                                 0.01f);
         break;
     case 1:

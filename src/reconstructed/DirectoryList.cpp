@@ -267,7 +267,7 @@ int DirectoryList::UnknownFunction44a910(const char* name) {
 }
 
 // 0x0044a960
-int DirectoryList::UnknownFunction44a960(const char* path) {
+int DirectoryList::DeleteTree(const char* path) {
     char child[MAX_PATH];
     DirectoryList* list = new (__FILE__, 374) DirectoryList;
     int i;
@@ -280,7 +280,7 @@ int DirectoryList::UnknownFunction44a960(const char* path) {
     for (i = 0; i < list->count; i++) {
         sprintf(child, "%s\\%s", path, list->entries[i].name);
         if (list->entries[i].attributes & FILE_ATTRIBUTE_DIRECTORY) {
-            UnknownFunction44a960(child);
+            DeleteTree(child);
         } else if (!DeleteFileA(child)) {
             delete list;
             return 0;

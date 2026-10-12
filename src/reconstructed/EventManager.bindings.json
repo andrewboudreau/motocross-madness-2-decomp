@@ -44,7 +44,7 @@
   "?CopyFromRacer@UnknownEventEntry@@QAEXPAUUnknownEventRacer@@@Z": "0x0045c8b0",
   "?LoadProgressCallback@@YAXPAH@Z": "0x0045cb20",
   "?UnknownFunction45cb70@EventManager@@QAEHXZ$ehhandler": "0x0054aa94",
-  "?UnknownFunction45cdc0@EventManager@@QAEXH@Z": "0x0045cdc0",
+  "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?FindRaceMode@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
   "?FindTextQueue@EventManager@@QAEPAVTextQueueOverlay@@XZ": "0x0045d340",

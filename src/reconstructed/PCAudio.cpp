@@ -148,7 +148,7 @@ UnknownSoundNotifier::~UnknownSoundNotifier() {
 // three load failures share one delete-and-fail tail, which retail lays
 // out inside the last branch; the two early failures keep their own
 // epilogues.
-Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
+Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     if (!entry)
         return 0;
@@ -382,7 +382,7 @@ failed:
 // 0x004bc320: loads the sound from `stream`, or from the file `name`.
 // Static sounds (flags 1 and 4) are read completely; streamed sounds
 // (flag 2) keep the stream.
-int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c) {
+int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c) {
     UnknownTextureStream* file;
 
     if (!SoundSystem() || !SoundSystem()->audioStarted)

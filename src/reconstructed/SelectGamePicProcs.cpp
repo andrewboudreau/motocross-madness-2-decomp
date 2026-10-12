@@ -204,7 +204,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     ((CombinedDirectoryList*)directories)->UnknownFunction44abb0(first, second);
     directories->SetPattern(pattern, 1);
     directories->UnknownVirtualSlot1();
-    if (!directories->UnknownFunction4673b0())
+    if (!directories->GetFontName())
         return 1;
     if (largePictures) {
         sprintf(path, "%s\\%s", "ui", "unart.tga");

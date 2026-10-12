@@ -380,7 +380,7 @@ int Track::UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** pa
 }
 
 // 0x00518080: the point at pos.
-int Track::UnknownFunction518080(TrackPos pos, TrackVec3* out)
+int Track::PointAt(TrackPos pos, TrackVec3* out)
 {
     TrackSegment* segment = pos.segment;
     if (!segment)
@@ -438,7 +438,7 @@ static inline TrackVec3 TrackNormalized(const TrackVec3& v)
 // (`fld st(0); fmul x`), y and z component-first (`fld y; fmul st(1)`), the
 // scale kept on the x87 stack until a final `fstp st(0)`. Per-component
 // stores into a named local scale all three scalar-first.
-int Track::UnknownFunction518130(TrackSegment* segment, TrackVec3* out)
+int Track::SegmentDirection(TrackSegment* segment, TrackVec3* out)
 {
     if (out && segment && segment->next && segment->horizontalLength > 0.0f) {
         TrackSegment* next = segment->next;
@@ -490,11 +490,11 @@ int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out,
             return 0;
         n.x = d.z;
         n.z = -d.y;
-        UnknownFunction47b800(a.y, a.z, d.y, d.z, p.y, p.z, n.x, n.z, &t, &u);
+        IntersectLines(a.y, a.z, d.y, d.z, p.y, p.z, n.x, n.z, &t, &u);
     } else {
         n.x = d.z;
         n.z = -d.x;
-        UnknownFunction47b800(a.x, a.z, d.x, d.z, p.x, p.z, n.x, n.z, &t, &u);
+        IntersectLines(a.x, a.z, d.x, d.z, p.x, p.z, n.x, n.z, &t, &u);
     }
     if (t < 0.0f)
         t = 0.0f;
@@ -512,11 +512,11 @@ int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out,
                 return 0;
             n.x = d2.z;
             n.z = -d2.y;
-            UnknownFunction47b800(a2.y, a2.z, d2.y, d2.z, p.y, p.z, n.x, n.z, &t, &u);
+            IntersectLines(a2.y, a2.z, d2.y, d2.z, p.y, p.z, n.x, n.z, &t, &u);
         } else {
             n.x = d2.z;
             n.z = -d2.x;
-            UnknownFunction47b800(a2.x, a2.z, d2.x, d2.z, p.x, p.z, n.x, n.z, &t, &u);
+            IntersectLines(a2.x, a2.z, d2.x, d2.z, p.x, p.z, n.x, n.z, &t, &u);
         }
         if (t < 0.0f)
             t = 0.0f;

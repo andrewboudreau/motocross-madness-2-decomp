@@ -71,9 +71,9 @@ public:
     int UnknownFunction44a910(const char* name);           // 0x0044a910: whether `name` is listed
     // 0x004673b0: the entry count (an out-of-line accessor that the linker
     // folded with FontTexture's identical 0x004673b0).
-    int UnknownFunction4673b0();
+    int GetFontName();
     // 0x0044a960: deletes the directory `path` and everything below it.
-    int UnknownFunction44a960(const char* path);
+    int DeleteTree(const char* path);
     void UnknownFunction44aab0();                          // 0x0044aab0: sorts the entries by name
     static int UnknownFunction44aa90(const void* a, const void* b); // 0x0044aa90: qsort order
 

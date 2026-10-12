@@ -790,7 +790,7 @@ void EcoSystem::UnknownFunction4594c0(int level) {
 }
 
 // 0x004594d0
-EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
+EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
                                             LightManager* lights, char* path, UnknownTextureStream* stream,
                                             int textureFormat, int collisions, int level) {
     int i;
@@ -940,7 +940,7 @@ done:
 
 // 0x0045a9a0
 void EcoSystem::UnknownFunction45a9a0() {
-    UnknownEcoLight* light = lightManager->UnknownFunction4a0190(6);
+    UnknownEcoLight* light = lightManager->FindLightOfType(6);
     if (light) {
         ambientLight.x = light->colour[0];
         ambientLight.y = light->colour[1];
@@ -950,9 +950,9 @@ void EcoSystem::UnknownFunction45a9a0() {
         ambientLight.y = 0.0f;
         ambientLight.x = 0.0f;
     }
-    light = lightManager->UnknownFunction4a0190(4);
+    light = lightManager->FindLightOfType(4);
     if (!light) {
-        light = lightManager->UnknownFunction4a0190(2);
+        light = lightManager->FindLightOfType(2);
         if (!light) {
             lightColor.z = 0.0f;
             lightColor.y = 0.0f;
@@ -1285,7 +1285,7 @@ int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* 
 // 0x0045c7b0 (cdecl): fread through the running xor key. A short read is
 // fatal on error, and on EOF only the bytes read are decoded. The decoded
 // byte is computed before the key accumulates the encoded byte.
-int UnknownFunction45c7b0(unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
+int ReadXorDecoded(unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
     int total = size * count;
     int read = fread(data, size, count, file);
     int i;

@@ -100,7 +100,7 @@ public:
     // 0x0049c070: describes a racer of the recording: its network id, AI
     // index (a char), record slot, name, model files, bike and rider names,
     // engine size and kind and plate number. 0x0049c1e0 reads one back.
-    void UnknownFunction49c070(int id, char ai, int slot, char* name, char* model,
+    void SetRacer(int id, char ai, int slot, char* name, char* model,
                                char* rider, char* riderName, char* bikeName, int engineSize,
                                int engineKind, int value);
     void UnknownFunction49c1e0(int* slot, char* ai, int a, char* name, char* model, char* rider,

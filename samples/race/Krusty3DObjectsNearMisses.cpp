@@ -215,7 +215,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         UNKNOWN_PLACE_CUE();
         Vector3 target;
         if (cueView->field_0x48)
-            cueView->field_0x48->UnknownFunction518080(cueView->ownRacer->field_0x744->field_0x44, &target);
+            cueView->field_0x48->PointAt(cueView->ownRacer->field_0x744->field_0x44, &target);
         else
             target = cueView->ownRacer->trackPoint;
         field_0xac->QueryGround(&target, 0, 0, 0);

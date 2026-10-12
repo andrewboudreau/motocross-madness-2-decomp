@@ -409,7 +409,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
     switch (event->kind) {
     case kDialogClose:
         if (parentDialog)
-            parentDialog->UnknownFunction46ea60(1);
+            parentDialog->SetShown(1);
         break;
     case kDialogInit: {
         nextPage = 0;

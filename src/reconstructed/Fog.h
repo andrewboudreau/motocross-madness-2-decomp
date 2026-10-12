@@ -38,7 +38,7 @@ public:
     Fog* UnknownFunction462680(void* target, unsigned int color, float visibility, float haziness,
                                float farScale, float nearScale, float minimum);
     // 0x004627a0: sets the colour, visibility and haziness.
-    void UnknownFunction4627a0(unsigned int color, float visibility, float haziness);
+    void SetParameters(unsigned int color, float visibility, float haziness);
     void UnknownFunction462db0(int level);    // 0x00462db0: detail level
 
     // QuarryStuntEvent.cpp reads +0x2c, +0x38, +0x40 and +0x44 under their
@@ -68,7 +68,7 @@ class FogOn : public GameObject {
 public:
     explicit FogOn(int flags);                // 0x00462e90 (ret 4)
     virtual int UnknownVirtualSlot14();       // 0x00462eb0
-    GameObject* UnknownFunction486a10(void* target, Fog* fog); // 0x00486a10
+    GameObject* Create(void* target, Fog* fog); // 0x00486a10
 
     Fog* fog;                                 // the Fog it redraws
 };

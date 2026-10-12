@@ -115,7 +115,7 @@ public:
     // rider (+0x58) name and they return 0.
     int ResolveBikeFile(const char* name, char* text, int size);
     int ResolveRiderFile(const char* name, char* text, int size);
-    void UnknownFunction499b00();             // 0x00499b00
+    void ShowCursors();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
     void OpenExitDialog();             // 0x0049a4a0: opens the exit dialog
     // 0x0049b020: fills `names` with `count` distinct random short strings.

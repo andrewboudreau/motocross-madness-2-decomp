@@ -99,7 +99,7 @@
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?Title@DebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
-  "?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
+  "?LoadEntrySound@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
   "?PlayWithOptions@Sound@@QAEHHKH@Z": "0x004bc6b0",
   "?Stop@Sound@@QAEHH@Z": "0x004bc940",
   "?IsPlaying@Sound@@QAEHXZ": "0x004bca80",

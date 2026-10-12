@@ -176,7 +176,7 @@
   "?SetTextsOrResources@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
   "?ResetEntries@EventManager@@QAEXXZ": "0x0045e520",
   "?FindSectionObject@UIDialog@@QAEPAVSound@@PBD@Z": "0x0046e9a0",
-  "?UnknownFunction46ea60@UIDialog@@QAEXH@Z": "0x0046ea60",
+  "?SetShown@UIDialog@@QAEXH@Z": "0x0046ea60",
   "?FindControl@UIDialog@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",
   "?HandleEvent@PCNewEventDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004d9fd0",
   "?HandleEvent@PCNewEventDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054d257",

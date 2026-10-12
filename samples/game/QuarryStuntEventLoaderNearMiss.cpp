@@ -235,7 +235,7 @@ public:
 class UnknownQuarryFogLink : public GameObject {
 public:
     explicit UnknownQuarryFogLink(int flags);                  // 0x00462e90
-    GameObject* UnknownFunction486a10(void* target, Fog* fog);  // 0x00486a10
+    GameObject* Create(void* target, Fog* fog);  // 0x00486a10
 
     unsigned char field_0x2c[0x30 - 0x2c];
 };
@@ -261,7 +261,7 @@ public:
 class UnknownQuarryEcoSystem : public GameObject {
 public:
     explicit UnknownQuarryEcoSystem(int flags);                // 0x00457250
-    EcoSystem* UnknownFunction4594d0(void* target, TextureMapManager* manager, UnknownTerrain* terrain,
+    EcoSystem* Create(void* target, TextureMapManager* manager, UnknownTerrain* terrain,
                                      LightManager* lights, UnknownSceneEnvironment* environment,
                                      UnknownTextureStream* stream, int format, int a, int level);
 
@@ -591,8 +591,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                          ->UnknownFunction4fb230(field_0x18, stream, &skyTextures, 1024.0f);
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
-        AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->UnknownFunction486a10(field_0x18, eventFog), -1);
-        eventFog->UnknownFunction4627a0(eventScene->fog->color, eventFog->field_0x38, eventFog->field_0x40);
+        AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(field_0x18, eventFog), -1);
+        eventFog->SetParameters(eventScene->fog->color, eventFog->field_0x38, eventFog->field_0x40);
     }
     if (progress)
         progress(0);
@@ -632,7 +632,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
         ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
-                         ->UnknownFunction4594d0(field_0x18, g_TrackGame->field_0x3c, eventTerrain, lightManager,
+                         ->Create(field_0x18, g_TrackGame->field_0x3c, eventTerrain, lightManager,
                                                  eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.field_0x27f8.field_0x10,
                                                  g_TrackGame->mode.videoSettings[1]);
@@ -771,7 +771,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(path, "%s\\%s", "Res", "truckpodium.slt");
     g_TrackGame->eventManager->podiumObject =
         (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
-            ->UnknownFunction401310(field_0x18, (int)lightManager, (int)&modelTextures, path,
+            ->Create(field_0x18, (int)lightManager, (int)&modelTextures, path,
                                     g_TrackGame->eventManager->podiumPosition, 0, 0, 2.0f, 0.5f, 0.5f, 0);
     if (!raceView->AppendChild((GameObject*)g_TrackGame->eventManager->podiumObject, -1))
         return 0;
@@ -790,7 +790,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dace0(0x80);
         int ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
         if (!ambientLight)
-            ambientLight = lightManager->UnknownFunction4a0190(6);
+            ambientLight = lightManager->FindLightOfType(6);
         if (ambientLight)
             ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
         ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae30(ambient);
