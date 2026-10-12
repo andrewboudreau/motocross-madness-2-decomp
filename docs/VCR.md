@@ -3,7 +3,8 @@
 Two adjacent translation units, both strictly exact under the default VC6
 profile (36 calibration cases). Neither class has a vtable or RTTI, so the
 class names `UnknownVcr` and `UnknownVcrFile` and all member names are
-provisional.
+provisional. The ring members are named after their use by recorder.cpp's
+worker thread (VCR.h).
 
 ## Evidence
 
@@ -47,7 +48,7 @@ index (`+0x1010`) and block number (`+0x1014`), and one plain value
 | VA | Size | Role | Source shape |
 |---|---:|---|---|
 | `0x00524110` | 154 | constructor | local for the allocation, size stored first |
-| `0x005241b0` | 97 | destructor | `if (field_0x100c)` before loading the chain |
+| `0x005241b0` | 97 | destructor | `if (positionBlocks)` before loading the chain |
 | `0x00524220` | 192 | claims the next write slot with a size header | `needed > size \|\| !size`, unsigned |
 | `0x005242e0` | 20 | sets a slot to state 1 | |
 | `0x00524300` | 79 | hands out the next read slot | |
@@ -74,8 +75,8 @@ index (`+0x1010`) and block number (`+0x1014`), and one plain value
 
 Retail details the source keeps:
 
-- The destructor and `0x00524640` free only `field_0x1014` blocks of a chain
-  holding `field_0x1014 + 1`.
+- The destructor and `0x00524640` free only `positionBlock` blocks of a chain
+  holding `positionBlock + 1`.
 - `0x005246c0`: with the null-chain store in an `else` before the final
   `return 0`, that store shares the return used by the empty case; an early
   `if (!block)` return gives a separate exit.

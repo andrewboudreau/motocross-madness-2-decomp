@@ -66,22 +66,22 @@ public:
     int QueueRecord(int a, int b, const void* data, unsigned int size);
     // 0x004e8810: takes the next queued record; 0..4.
     int TakeRecord(int* a, int* b, int* value, void* data, unsigned int* size, int signal);
-    void UnknownFunction4e8990();         // 0x004e8990
-    void UnknownFunction4e89c0();         // 0x004e89c0
-    void UnknownFunction4e8a20(unsigned int milliseconds); // 0x004e8a20
-    void UnknownFunction4e8a70();         // 0x004e8a70
+    void StopReading();                   // 0x004e8990: signals stopReadingEvent
+    void RestartReverseRead();            // 0x004e89c0: empties the ring, signals readReverseEvent
+    void Seek(unsigned int milliseconds); // 0x004e8a20: signals seekEvent, +0xd0 = seconds
+    void Rewind();                        // 0x004e8a70: clears the positions, signals rewindEvent
 
     HANDLE workerThread;                    // worker thread
-    HANDLE field_0x30;                    // events (CreateEventA, auto-reset)
-    HANDLE field_0x34;
-    HANDLE field_0x38;
-    HANDLE field_0x3c;
-    HANDLE field_0x40;
-    HANDLE field_0x44;
-    HANDLE field_0x48;
-    HANDLE field_0x4c;
-    HANDLE field_0x50;
-    HANDLE field_0x54;
+    HANDLE writeEvent;                    // +0x30: worker event 0, writes the filled ring slots (events: CreateEventA, auto-reset)
+    HANDLE createFileEvent;               // +0x34: event 1, creates the file and writes the header
+    HANDLE reopenFileEvent;               // +0x38: event 2, reopens the file to append
+    HANDLE openPlaybackEvent;             // +0x3c: event 4, opens the file for playback
+    HANDLE readForwardEvent;              // +0x40: event 3, reads the next record into the ring
+    HANDLE readReverseEvent;              // +0x44: event 5, reads the record at the previous position
+    HANDLE seekEvent;                     // +0x48: event 6, seeks to the position at the pair cursor
+    HANDLE rewindEvent;                   // +0x4c: event 7, seeks to the first position
+    HANDLE stopReadingEvent;              // +0x50: event 8, resets the read events
+    HANDLE closeFileEvent;                // +0x54: event 9, rewrites the header and closes the file
     HANDLE stopEvent;                    // stops the worker
     unsigned int workerThreadId;              // worker thread id
     CRITICAL_SECTION lock;

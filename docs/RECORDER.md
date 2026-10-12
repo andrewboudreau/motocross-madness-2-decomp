@@ -15,7 +15,8 @@ VCRInterface records and plays back replays on a worker thread
 UnknownVcr ring (VCR.h), eleven auto-reset events and a critical section,
 then starts mode 0, 1 or 2; the game queues and takes records
 (`0x004e8720`, `0x004e8810`), seeks, rewinds and flushes by signalling the
-events, and `0x004e7a00` waits for the worker's acknowledgement.
+events, and `0x004e7a00` waits for the worker's acknowledgement. The event
+and helper names (Recorder.h) follow the worker case each event selects.
 
 Exact: 12 calibration cases (the constructor and destructors and every
 method above). Near misses
