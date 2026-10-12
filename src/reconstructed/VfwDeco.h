@@ -13,5 +13,5 @@ public:
     unsigned char field_0x04[0x10 - 0x04];
     void* field_0x10;                         // debug-allocated buffer
     void* field_0x14;                         // debug-allocated buffer
-    HIC__* field_0x18;                        // HIC (MSVFW32 compressor handle)
+    HIC__* compressor;                        // +0x18 HIC (MSVFW32 compressor handle)
 };
