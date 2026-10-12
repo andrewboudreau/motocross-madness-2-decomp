@@ -161,10 +161,12 @@ public:
 
     virtual void UnknownVirtualSlot27();      // 0x00471070: advances the state's image
     virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00470990: whether `point` is inside
-    virtual void UnknownVirtualSlot29(int state); // 0x00470970: sets the state
+    virtual void SetState(int state); // slot 29, 0x00470970: sets the state
     virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
-    virtual int UnknownVirtualSlot31();       // 0x004725b0: takes the focus
-    virtual void UnknownVirtualSlot32(int value); // 0x00472630: loses the focus
+    // Slot 31 (0x004725b0): the pointer moved over it (guiUser +0x1d8, the
+    // hovered control, is not yet this): state 1, sound 1, the tool tip.
+    virtual int EnterHover();
+    virtual void LeaveHover(int value); // slot 32, 0x00472630: state 0 if enabled, hides the tool tip
     virtual void UnknownVirtualSlot33(int value); // 0x00464e80 (shared empty body)
     virtual int UnknownVirtualSlot34();       // 0x004703c0
     virtual int UnknownVirtualSlot35();       // 0x004703d0
@@ -180,7 +182,7 @@ public:
     virtual int UnknownVirtualSlot45();       // 0x00471c90
     virtual int UnknownVirtualSlot46();       // 0x00471df0
     virtual int UnknownVirtualSlot47();       // 0x00471eb0
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00471fa0: the state's texture
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00471fa0: the state's texture
     virtual void UnknownVirtualSlot49(int enable); // 0x004705d0 (NetProcs.cpp, InGameProcs.cpp)
     virtual void RequestRedraw();         // slot 50, 0x00470640: needsRedraw = 0, redrawFrames = 3
     virtual int UnknownVirtualSlot51(tagPOINT point); // 0x004709f0
@@ -190,7 +192,7 @@ public:
     virtual int UnknownVirtualSlot55(int a, int b); // 0x004721b0
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00472250
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x004722b0
-    virtual void UnknownVirtualSlot58(int index, int a); // 0x00472670: plays sound `index`
+    virtual void PlayControlSound(int index, int a); // slot 58, 0x00472670: plays sound `index`
     virtual void UnknownVirtualSlot59(int value); // 0x00464e80 (SelectGamePicProcs.cpp "ChkRecordRace")
     virtual void UnknownVirtualSlot60(int value); // 0x00464e80
     virtual int GetWidth();               // slot 61, 0x00470410: screenArea width
@@ -346,7 +348,7 @@ public:
     UIStatic(int id, CameraRect* area, UIDialog* owner); // 0x00478f60
     virtual ~UIStatic();                      // 0x00478fb0 (deleting wrapper 0x00478f90)
     virtual int UnknownVirtualSlot30();       // 0x00478fe0
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478fc0
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478fc0
 };
 
 // RTTI: UIEditBox : UIControl (vtable 0x00552de8; 0x230 bytes, `new` at
@@ -472,7 +474,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
     virtual int Draw();                   // slot 40, 0x004761f0: draws the rows
     virtual void UnknownVirtualSlot27();      // 0x00475fa0
-    virtual void UnknownVirtualSlot29(int state); // 0x00479220
+    virtual void SetState(int state); // slot 29, 0x00479220
     virtual void RequestRedraw();         // slot 50, 0x00477ce0
     virtual int UnknownVirtualSlot21(int key); // 0x00478040
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00477e90
@@ -556,13 +558,13 @@ public:
     virtual void UnknownVirtualSlot27();      // 0x004784e0
     virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00478e10: whether `point` is on an opaque pixel
     virtual int Draw();                   // slot 40, 0x00478570: draws
-    virtual void UnknownVirtualSlot29(int state); // 0x00478520
+    virtual void SetState(int state); // slot 29, 0x00478520
     virtual int UnknownVirtualSlot34();       // 0x00478260
     virtual int UnknownVirtualSlot35();       // 0x00478280
     virtual int UnknownVirtualSlot36();       // 0x004782a0
     virtual void* UnknownVirtualSlot37();     // 0x004782c0
     virtual void UnknownVirtualSlot38();      // 0x00478450
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478810
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x00478810
     virtual void UnknownVirtualSlot59(int value); // 0x00478540
 
     int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the current state
@@ -586,7 +588,7 @@ public:
     UIStaticText(int id, CameraRect* area, UIDialog* owner, const char* text,
                  unsigned int color);         // 0x00478ff0
     virtual ~UIStaticText();                  // 0x004790f0 (deleting wrapper 0x004790d0)
-    virtual void UnknownVirtualSlot29(int state); // 0x00479220 (shared with UIListBox)
+    virtual void SetState(int state); // slot 29, 0x00479220 (shared with UIListBox)
     virtual int UnknownVirtualSlot30();       // 0x00478fe0 (shared with UIStatic)
     virtual void UnknownVirtualSlot38();      // 0x00479100
     virtual int Draw();                   // slot 40, 0x00479170
@@ -726,7 +728,7 @@ public:
     UIProgressBar(int flags, CameraRect* area, UIDialog* owner); // 0x0047b020
     virtual ~UIProgressBar();                 // 0x0047b090 (deleting wrapper 0x0047b070)
     virtual int Draw();                   // slot 40, 0x0047b110: draws the bar and its percentage
-    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x0047b100
+    virtual TextureMap* GetStateTexture(int state); // slot 48, 0x0047b100
     void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
     void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 

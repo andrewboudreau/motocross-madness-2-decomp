@@ -1138,7 +1138,7 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
         }
         if (event->key == 0xd) {
-            FindControl("ButChatSend", 0)->UnknownVirtualSlot58(2, 0);
+            FindControl("ButChatSend", 0)->PlayControlSound(2, 0);
             SendChatLine();
         }
         break;

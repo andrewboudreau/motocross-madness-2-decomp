@@ -162,7 +162,7 @@ UIControl* UIControl::FindLastAnchor(UIControl* none) {
 }
 
 // 0x00470970
-void UIControl::UnknownVirtualSlot29(int state) {
+void UIControl::SetState(int state) {
     currentState = state;
     RequestRedraw();
 }
@@ -252,7 +252,7 @@ void UIControl::UnknownVirtualSlot39() {
 }
 
 // 0x00471fa0
-TextureMap* UIControl::UnknownVirtualSlot48(int state) {
+TextureMap* UIControl::GetStateTexture(int state) {
     if (state == -1)
         state = currentState;
     if (stateImages[state])
@@ -399,7 +399,7 @@ UIStatic::~UIStatic() {
 }
 
 // 0x00478fc0
-TextureMap* UIStatic::UnknownVirtualSlot48(int state) {
+TextureMap* UIStatic::GetStateTexture(int state) {
     if (stateImages[0])
         return stateImages[0]->GetCurrentTexture();
     return 0;
@@ -479,8 +479,8 @@ int UIControl::UnknownVirtualSlot13() {
 // 0x00472250
 int UIControl::UnknownVirtualSlot56(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
-        UnknownVirtualSlot29(3);
-        UnknownVirtualSlot58(3, ownerDialog->field_0x180);
+        SetState(3);
+        PlayControlSound(3, ownerDialog->field_0x180);
     }
     field_0x1d4 = -1;
     return 0;
@@ -501,12 +501,12 @@ void UIControl::UnknownVirtualSlot57(int a, int* position) {
 }
 
 // 0x004725b0
-int UIControl::UnknownVirtualSlot31() {
+int UIControl::EnterHover() {
     if (UnknownVirtualSlot30() && ownerDialog->guiUser->field_0x1d8 != (UnknownGuiControl*)this) {
-        UnknownVirtualSlot29(1);
+        SetState(1);
         if (stateImages[currentState])
             stateImages[currentState]->Rewind();
-        UnknownVirtualSlot58(1, ownerDialog->field_0x180);
+        PlayControlSound(1, ownerDialog->field_0x180);
         ToolTip* tip = ownerDialog->guiUser->userToolTip;
         if (tip)
             tip->UnknownFunction486b10((UnknownGuiControl*)this);
@@ -515,16 +515,16 @@ int UIControl::UnknownVirtualSlot31() {
 }
 
 // 0x00472630
-void UIControl::UnknownVirtualSlot32(int value) {
+void UIControl::LeaveHover(int value) {
     if (enabled)
-        UnknownVirtualSlot29(0);
+        SetState(0);
     ToolTip* tip = ownerDialog->guiUser->userToolTip;
     if (tip)
         tip->ShowText(0, 0, 1.0f);
 }
 
 // 0x00472670
-void UIControl::UnknownVirtualSlot58(int index, int a) {
+void UIControl::PlayControlSound(int index, int a) {
     if (sounds[index]) {
         sounds[index]->SetVolume(ownerGui->field_0x34c, 0);
         sounds[index]->PlayWithOptions(1, 0, 0);
@@ -1273,7 +1273,7 @@ void UIListBox::UnknownVirtualSlot57(int a, int* position) {
 }
 
 // 0x00479220
-void UIListBox::UnknownVirtualSlot29(int state) {
+void UIListBox::SetState(int state) {
     needsRedraw = 1;
     currentState = state;
 }
@@ -1365,7 +1365,7 @@ void UIMultiState::UnknownVirtualSlot27() {
 }
 
 // 0x00478520
-void UIMultiState::UnknownVirtualSlot29(int state) {
+void UIMultiState::SetState(int state) {
     redrawFrames = 3;
     currentState = state;
 }
@@ -2434,7 +2434,7 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
             draw = !RunTransition();
     }
     if (draw) {
-        drawnTexture = UnknownVirtualSlot48(-1);
+        drawnTexture = GetStateTexture(-1);
         UnknownVirtualSlot38();
         UnknownVirtualSlot39();
         if (ownerDialog->guiUser->pointerDevice && field_0x1d4 != -1) {
@@ -2500,8 +2500,8 @@ end:
 int UIControl::UnknownVirtualSlot55(int a, int b) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
         if (!a) {
-            UnknownVirtualSlot29(2);
-            UnknownVirtualSlot58(2, ownerDialog->field_0x180);
+            SetState(2);
+            PlayControlSound(2, ownerDialog->field_0x180);
         }
         field_0x1d4 = a;
         if (a == 1 && ownerDialog->dialogBackground)
@@ -2962,7 +2962,7 @@ int UIRadioButton::SelectInGroup(int index) {
                 else
                     control->SetCurrentState(0);
             } else if (control != this) {
-                control->UnknownVirtualSlot29(0);
+                control->SetState(0);
                 control->SetCurrentState(0);
             }
         }
@@ -2996,7 +2996,7 @@ int UIRadioButton::UnknownVirtualSlot55(int a, int b) {
             UIRadioButton* control;
             while ((control = static_cast<UIRadioButton*>(NextAttachedControlOfType(iterator))) != 0) {
                 if (control != this && control->UnknownFunction4755c0() == 1) {
-                    control->UnknownVirtualSlot29(0);
+                    control->SetState(0);
                     control->SetCurrentState(0);
                 }
             }
@@ -4816,9 +4816,9 @@ void UIDropDownList::SetCornerImage(UIAnim* image) {
         buttonPart->screenArea[1] = 0;
         buttonPart->screenArea[0] = staticPart2->screenArea[2];
         buttonPart->screenArea[2] =
-            buttonPart->UnknownVirtualSlot48(-1)->field_0x14 + buttonPart->screenArea[0];
+            buttonPart->GetStateTexture(-1)->field_0x14 + buttonPart->screenArea[0];
         buttonPart->screenArea[3] =
-            buttonPart->UnknownVirtualSlot48(-1)->field_0x18 + buttonPart->screenArea[1];
+            buttonPart->GetStateTexture(-1)->field_0x18 + buttonPart->screenArea[1];
         *(CameraRect*)buttonPart->bounds = *(CameraRect*)buttonPart->screenArea;
     }
     staticPart1->screenArea[0] = staticPart2->screenArea[2];
@@ -4908,7 +4908,7 @@ UIProgressBar::~UIProgressBar() {
 }
 
 // 0x0047b100
-TextureMap* UIProgressBar::UnknownVirtualSlot48(int state) {
+TextureMap* UIProgressBar::GetStateTexture(int state) {
     return barTexture;
 }
 
@@ -5140,7 +5140,7 @@ int UIListBox::UnknownVirtualSlot21(int key) {
 }
 
 // 0x00478810
-TextureMap* UIMultiState::UnknownVirtualSlot48(int state) {
+TextureMap* UIMultiState::GetStateTexture(int state) {
     UIAnim* image;
     if (currentState == 4 && stateTable[selectedState].focusImage)
         image = stateTable[selectedState].focusImage;

@@ -162,12 +162,12 @@ void UIControl::UnknownVirtualSlot49(int enable) {
         return;
     enabled = enable;
     if (enable) {
-        UnknownVirtualSlot29(savedState);
+        SetState(savedState);
         SetFontColor(currentTextColor);
     } else {
         if (stateImages[4]) {
             savedState = currentState;
-            UnknownVirtualSlot29(4);
+            SetState(4);
         }
         currentTextColor = textColor;
         SetFontColor(0x999999);
@@ -180,12 +180,12 @@ void UIButton::UnknownVirtualSlot49(int enable) {
         return;
     enabled = enable;
     if (enable) {
-        UnknownVirtualSlot29(0);
+        SetState(0);
         SetFontColor(currentTextColor);
     } else {
         if (stateImages[4]) {
             savedState = currentState;
-            UnknownVirtualSlot29(4);
+            SetState(4);
         }
         currentTextColor = textColor;
         SetFontColor(0x999999);
@@ -449,7 +449,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
         int y = (int)(point.y / ownerDialog->scaleY);
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
-        PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
+        PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / UnknownFunction511970(format) + x;
             if (format == 8) {
@@ -479,7 +479,7 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
         int y = (int)(point.y / ownerDialog->scaleY);
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
-        PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
+        PCTextureMap* texture = (PCTextureMap*)GetStateTexture(-1);
         if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / UnknownFunction511970(format) + x;
             if (format == 8) {
@@ -1768,7 +1768,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 control->keyBind = keyBind;
                 control->post3D = pre3D == 0;
                 control->permanent = permanent;
-                control->drawnTexture = control->UnknownVirtualSlot48(-1);
+                control->drawnTexture = control->GetStateTexture(-1);
                 control->UnknownVirtualSlot39();
                 sectionTable[i].sectionObject = (Sound*)control;
                 break;
@@ -1787,7 +1787,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             frame->screenArea[2] = width;
             frame->screenArea[3] = imageHeight;
             *(CameraRect*)frame->bounds = *(CameraRect*)frame->screenArea;
-            frame->drawnTexture = frame->UnknownVirtualSlot48(0);
+            frame->drawnTexture = frame->GetStateTexture(0);
             screenArea.right = screenArea.left + width;
             screenArea.bottom = screenArea.top + imageHeight;
             frame->UnknownVirtualSlot39();
