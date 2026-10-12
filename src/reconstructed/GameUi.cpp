@@ -2565,7 +2565,7 @@ int UIControl::UpdateHoverAt(int* position) {
     int result = 0;
     GameObject* next = nextSibling;
     while (next) {
-        if (strstr(next->field_0x28, "UIControl,"))
+        if (strstr(next->classNames, "UIControl,"))
             break;
         next = next->nextSibling;
     }
@@ -2574,7 +2574,7 @@ int UIControl::UpdateHoverAt(int* position) {
         if (result)
             return result;
     }
-    if (firstChild && strstr(firstChild->field_0x28, "UIControl,")) {
+    if (firstChild && strstr(firstChild->classNames, "UIControl,")) {
         result = ((UIControl*)firstChild)->UpdateHoverAt(position);
         if (result)
             return result;

@@ -34,17 +34,17 @@ GameObject::GameObject(int flags) {
     field_0x25_bit1 = flags;
     field_0x25_bit2 = 0;
     field_0x25_bit3 = 0;
-    field_0x1C = 0;
-    field_0x20 = 0;
-    field_0x28 = static_cast<char*>(DebugMalloc(1, __FILE__, 31));
-    field_0x28[0] = 0;
+    ownFlags = 0;
+    childFlags = 0;
+    classNames = static_cast<char*>(DebugMalloc(1, __FILE__, 31));
+    classNames[0] = 0;
     AppendClassName(this);
 }
 
 // 0x00468d60 (scalar deleting wrapper 0x00468d40)
 GameObject::~GameObject() {
-    if (field_0x28)
-        DebugFree(field_0x28, __FILE__, 40);
+    if (classNames)
+        DebugFree(classNames, __FILE__, 40);
 }
 
 // 0x00469050
@@ -92,7 +92,7 @@ GameObject* GameObject::UnknownVirtualSlot8(void* value) {
 
 // 0x00469300
 int GameObject::UnknownVirtualSlot12() {
-    if (field_0x20 & 0x1000) {
+    if (childFlags & 0x1000) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3)
                 child->UnknownVirtualSlot12();
@@ -103,7 +103,7 @@ int GameObject::UnknownVirtualSlot12() {
 
 // 0x00469330
 int GameObject::UnknownVirtualSlot13() {
-    if (field_0x20 & 0x04) {
+    if (childFlags & 0x04) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3)
                 child->UnknownVirtualSlot13();
@@ -114,7 +114,7 @@ int GameObject::UnknownVirtualSlot13() {
 
 // 0x00469360: stops at the first child that returns 0.
 int GameObject::UnknownVirtualSlot14() {
-    if (field_0x20 & 0x08) {
+    if (childFlags & 0x08) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
                 if (!child->UnknownVirtualSlot14())
@@ -127,7 +127,7 @@ int GameObject::UnknownVirtualSlot14() {
 
 // 0x004693a0
 int GameObject::UnknownVirtualSlot15() {
-    if (field_0x20 & 0x10) {
+    if (childFlags & 0x10) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3)
                 child->UnknownVirtualSlot15();
@@ -138,7 +138,7 @@ int GameObject::UnknownVirtualSlot15() {
 
 // 0x004693d0
 int GameObject::UnknownVirtualSlot10(float frameTime) {
-    if (field_0x20 & 0x02) {
+    if (childFlags & 0x02) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit2 && !child->field_0x25_bit3) {
                 child->UnknownVirtualSlot10(frameTime);
@@ -156,7 +156,7 @@ int GameObject::UnknownVirtualSlot10(float frameTime) {
 
 // 0x00469430
 int GameObject::UnknownVirtualSlot9(int value) {
-    if (field_0x20 & 0x01) {
+    if (childFlags & 0x01) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit2 && !child->field_0x25_bit3)
                 child->UnknownVirtualSlot9(value);
@@ -168,7 +168,7 @@ int GameObject::UnknownVirtualSlot9(int value) {
 // 0x00469480: stores the argument's low bit in bit 2, then propagates.
 int GameObject::UnknownVirtualSlot16(int value) {
     field_0x25_bit2 = value;
-    if (field_0x20 & 0x20) {
+    if (childFlags & 0x20) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3)
                 child->UnknownVirtualSlot16(value);
@@ -179,7 +179,7 @@ int GameObject::UnknownVirtualSlot16(int value) {
 
 // 0x004694d0
 int GameObject::UnknownVirtualSlot18() {
-    if (field_0x20 & 0x80) {
+    if (childFlags & 0x80) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (!child->field_0x25_bit3)
                 child->UnknownVirtualSlot18();
@@ -190,7 +190,7 @@ int GameObject::UnknownVirtualSlot18() {
 
 // 0x00469500
 int GameObject::UnknownVirtualSlot17() {
-    if (field_0x20 & 0x40) {
+    if (childFlags & 0x40) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (!child->field_0x25_bit3)
                 child->UnknownVirtualSlot17();
@@ -201,7 +201,7 @@ int GameObject::UnknownVirtualSlot17() {
 
 // 0x00469530: returns 1 at the first child that returns nonzero.
 int GameObject::UnknownVirtualSlot19(int value) {
-    if (field_0x20 & 0x100) {
+    if (childFlags & 0x100) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
                 if (child->UnknownVirtualSlot19(value))
@@ -214,7 +214,7 @@ int GameObject::UnknownVirtualSlot19(int value) {
 
 // 0x00469580
 int GameObject::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (field_0x20 & 0x200) {
+    if (childFlags & 0x200) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
                 if (child->UnknownVirtualSlot22(event, entry))
@@ -227,7 +227,7 @@ int GameObject::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEnt
 
 // 0x004695d0
 int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (field_0x20 & 0x400) {
+    if (childFlags & 0x400) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
                 if (child->UnknownVirtualSlot23(event, entry))
@@ -240,7 +240,7 @@ int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEnt
 
 // 0x00469620: gated by flag 0x800 and child bit 1 (not bit 0).
 int GameObject::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
-    if (field_0x20 & 0x800) {
+    if (childFlags & 0x800) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit1 && !child->field_0x25_bit3) {
                 if (child->UnknownVirtualSlot24(type, data, from, to, flags))
@@ -294,7 +294,7 @@ int GameObject::UnknownVirtualSlot25(void* value) {
     return 1;
 }
 
-// 0x00469c00: unlike slots 19/22/23, not gated by field_0x20.
+// 0x00469c00: unlike slots 19/22/23, not gated by childFlags.
 int GameObject::UnknownVirtualSlot20(int value) {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
@@ -305,7 +305,7 @@ int GameObject::UnknownVirtualSlot20(int value) {
     return 0;
 }
 
-// 0x00469c40: like slot 20, not gated by field_0x20.
+// 0x00469c40: like slot 20, not gated by childFlags.
 int GameObject::UnknownVirtualSlot21(int value) {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
@@ -317,7 +317,7 @@ int GameObject::UnknownVirtualSlot21(int value) {
 }
 
 // 0x00469ce0: appends the RTTI name of `object`, without its "class " prefix,
-// and a comma to field_0x28. The constructor passes `this`, so each
+// and a comma to classNames (+0x28). The constructor passes `this`, so each
 // constructor in a hierarchy contributes its own class name.
 void GameObject::AppendClassName(GameObject* object) {
     const char* name = typeid(*object).name();
@@ -326,11 +326,11 @@ void GameObject::AppendClassName(GameObject* object) {
         length -= 6;
         name += 6;
     }
-    field_0x28 = static_cast<char*>(
-        DebugRealloc(field_0x28, strlen(field_0x28) + length + 2, __FILE__, 1163));
-    if (field_0x28) {
-        strcat(field_0x28, name);
-        strcat(field_0x28, ",");
+    classNames = static_cast<char*>(
+        DebugRealloc(classNames, strlen(classNames) + length + 2, __FILE__, 1163));
+    if (classNames) {
+        strcat(classNames, name);
+        strcat(classNames, ",");
     }
 }
 
@@ -342,11 +342,11 @@ int GameObject::UnknownVirtualSlot11(int) {
 // 0x004690c0
 void GameObject::AddFlags(unsigned int flags) {
     GameObject* object = this;
-    unsigned int combined = object->field_0x20 |= flags;
+    unsigned int combined = object->childFlags |= flags;
     while (object->parent) {
-        unsigned int own = object->field_0x1C;
+        unsigned int own = object->ownFlags;
         object = object->parent;
-        combined = object->field_0x20 |= own | combined;
+        combined = object->childFlags |= own | combined;
     }
 }
 
@@ -355,8 +355,8 @@ unsigned int GameObject::RecomputeFlags() {
     unsigned int flags = 0;
     for (GameObject* child = firstChild; child; child = child->nextSibling)
         flags |= child->RecomputeFlags();
-    field_0x20 = flags;
-    return field_0x1C | flags;
+    childFlags = flags;
+    return ownFlags | flags;
 }
 
 // 0x00469130: appends `object` (and its later siblings) after this object's
@@ -372,8 +372,8 @@ int GameObject::AppendSibling(GameObject* object, int value) {
         object->prevSibling = last;
         for (GameObject* sibling = object; sibling; sibling = sibling->nextSibling)
             sibling->parent = parent;
-        object->field_0x1C = value;
-        object->AddFlags(object->field_0x20);
+        object->ownFlags = value;
+        object->AddFlags(object->childFlags);
     }
     return (int)object;
 }
@@ -396,8 +396,8 @@ int GameObject::AppendChild(GameObject* child, int value) {
         }
         for (GameObject* sibling = child; sibling; sibling = sibling->nextSibling)
             sibling->parent = this;
-        child->field_0x1C = value;
-        child->AddFlags(child->field_0x20);
+        child->ownFlags = value;
+        child->AddFlags(child->childFlags);
     }
     return (int)child;
 }
@@ -434,8 +434,8 @@ int GameObject::InsertBefore(GameObject* next, int value) {
     nextSibling->prevSibling = this;
     if (next->parent && next->parent->firstChild == next)
         next->parent->firstChild = this;
-    field_0x1C = value;
-    AddFlags(field_0x20);
+    ownFlags = value;
+    AddFlags(childFlags);
     return 1;
 }
 
@@ -468,7 +468,7 @@ void GameObject::DisableByClassName(const char* name) {
     for (; child; child = child->nextSibling) {
         if (child->field_0x25_bit3)
             continue;
-        if (strstr(child->field_0x28, pattern)) {
+        if (strstr(child->classNames, pattern)) {
             child->UnknownVirtualSlot4();
         } else {
             strcpy(className, typeid(*child).name());
@@ -492,7 +492,7 @@ void GameObject::EnableByClassName(const char* name) {
     for (; child; child = child->nextSibling) {
         if (child->field_0x25_bit3)
             continue;
-        if (strstr(child->field_0x28, pattern)) {
+        if (strstr(child->classNames, pattern)) {
             child->UnknownVirtualSlot5();
         } else {
             strcpy(className, typeid(*child).name());
@@ -543,7 +543,7 @@ GameObject* GameObject::FindByClassName(int mode, const char* name) {
     while (object) {
         if (!name)
             return object;
-        if (strstr(object->field_0x28, pattern))
+        if (strstr(object->classNames, pattern))
             return object;
         strcpy(className, typeid(*object).name());
         if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
@@ -632,7 +632,7 @@ GameObject* GameObjectIterator::Next() {
     GameObject* found;
     do {
         if (field_0x0c[0]) {
-            if (strstr(field_0x04->field_0x28, field_0x0c)) {
+            if (strstr(field_0x04->classNames, field_0x0c)) {
                 found = field_0x04;
             } else {
                 strcpy(className, typeid(*field_0x04).name());

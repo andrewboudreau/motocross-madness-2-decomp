@@ -62,13 +62,13 @@ public:
     int Unlink();
     // 0x00469680: releases this object and every later sibling, back to front.
     int ReleaseSiblings();
-    // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
+    // 0x00469ce0: appends the RTTI class name of `object` to classNames.
     void AppendClassName(GameObject* object);
-    // 0x004690c0: ORs `flags` into field_0x20 and propagates the result up
-    // through every parent (each adds its own field_0x1C).
+    // 0x004690c0: ORs `flags` into childFlags and propagates the result up
+    // through every parent (each adds its own ownFlags).
     void AddFlags(unsigned int flags);
-    // 0x00469100: recomputes field_0x20 from the children; returns it with
-    // field_0x1C added.
+    // 0x00469100: recomputes childFlags from the children; returns it with
+    // ownFlags added.
     unsigned int RecomputeFlags();
     // 0x00469c80: unlinks and releases every descendant marked with +0x25 bit 3.
     void ReleaseDetached();
@@ -99,15 +99,15 @@ protected:
     friend int RankByScore(int keepRacing); // and +0x25 bit 0 of the view's racers (0x004e62d0)
 
     // Offsets and widths are evidenced by the reconstructed methods; names are
-    // placeholders. Children are reached through field_0x10 and chained through
-    // their field_0x0C (traversal by slots 6, 7, 12-18 and 26).
+    // placeholders. Children are reached through firstChild and chained through
+    // their nextSibling (traversal by slots 6, 7, 12-18 and 26).
     GameObject* prevSibling;                  // +0x08 previous sibling
-    GameObject* nextSibling;                  // +0x0 next sibling
+    GameObject* nextSibling;                  // +0x0c next sibling
     GameObject* firstChild;                   // +0x10 first child
     GameObject* parent;                       // +0x14 parent
     void* field_0x18;          // set by slots 8 and 25; Camera's owner object
-    int field_0x1C;
-    unsigned int field_0x20;   // flag word gating slots 12-18
+    int ownFlags;                             // +0x1c flags this object adds to its parent's childFlags (0x004690c0, 0x00469100)
+    unsigned int childFlags;                  // +0x20 OR of the children's ownFlags and childFlags; gates slots 12-18 (0x00469100)
     unsigned char field_0x24;
     // Byte +0x25 is a bitfield: the constructor's single merged store of all
     // four low bits is VC6's bitfield code shape. Bit 0 enables the gated child
@@ -117,5 +117,5 @@ protected:
     unsigned char field_0x25_bit1 : 1;
     unsigned char field_0x25_bit2 : 1;
     unsigned char field_0x25_bit3 : 1;
-    char* field_0x28;          // DebugMalloc'd string, starts empty; see 0x00469ce0
+    char* classNames;                         // +0x28 DebugMalloc'd string, starts empty; see 0x00469ce0
 };
