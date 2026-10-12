@@ -973,19 +973,19 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         g_TrackGame->proCircuit->racers[0].engineSize = g_UnknownGlobal56cb6c[size];
-        g_TrackGame->proCircuit->racers[0].field_0x13c = size == 2 || size == 4 ? 1 : 0;
+        g_TrackGame->proCircuit->racers[0].fourStroke = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
     } else {
         int row = bikes->GetRowData(-1);
         g_TrackGame->proCircuit->racers[0].engineSize =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
-        g_TrackGame->proCircuit->racers[0].field_0x13c =
+        g_TrackGame->proCircuit->racers[0].fourStroke =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
         int bikeClass = UnknownBikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
     UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->proCircuit->racers[0].engineSize;
-    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->proCircuit->racers[0].field_0x13c;
+    UNKNOWN_GARAGE_SETTINGS->fourStroke = g_TrackGame->proCircuit->racers[0].fourStroke;
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
     _itoa(g_TrackGame->mode.plateNumber, text, 10);
     plate->SetEditText(text);

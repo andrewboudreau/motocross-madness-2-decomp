@@ -195,7 +195,7 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
 
     for (int i = 0; i < racerCount; i++) {
         racers[i].money = startingCapital;
-        racers[i].field_0x34 = 0;
+        racers[i].debts = 0;
         if (i > 0) {
             int n = (int)(UNKNOWN_RANDOM_UNIT() * (racerNameCount - 1));
             while (used[n])
@@ -244,7 +244,7 @@ found:
     UNKNOWN_COPY_TEXT(racers[0].bikeDisplayName,
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].displayName)
     racers[0].engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].engineSize;
-    racers[0].field_0x13c = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].fourStroke;
+    racers[0].fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bike].fourStroke;
     DebugFree(used, __FILE__, 273);
 }
 
@@ -304,7 +304,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
     case 3:
         if (done || (bonus && !placed)) {
             careerFlags |= 8;
-            racers[0].money += (int)(racers[0].field_0x34 * -1.1f);
+            racers[0].money += (int)(racers[0].debts * -1.1f);
             g_TrackGame->LoadResourceString(0x145c, title, 128);
             if (racers[0].totalStats.rank <= 3)
                 *(unsigned char*)&g_TrackGame->mode.bikeUnlockFlags |= 1; // retail ORs the low byte
@@ -442,6 +442,6 @@ void UnknownTrackGameObject3444::PickComputerRacers()
         UNKNOWN_COPY_TEXT(racers[racer].bikeName, bike->texture)
         UNKNOWN_COPY_TEXT(racers[racer].bikeDisplayName, bike->displayName)
         racers[racer].engineSize = bike->engineSize;
-        racers[racer].field_0x13c = bike->fourStroke;
+        racers[racer].fourStroke = bike->fourStroke;
     }
 }

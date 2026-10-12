@@ -31,14 +31,14 @@ struct UnknownProCircuitRacer {
     UnknownProCircuitStats raceStats;         // +0x00 the last race
     UnknownProCircuitStats totalStats;        // +0x18 career totals; rank compared with 1 and 3 when a series ends
     int money;                                // +0x30 money (starts at StartingCapital)
-    int field_0x34;
+    int debts;                                // +0x34 the "Debts" row (string 0x1453) of the advertising offer (0x004d9860); repaid with 10% at the series end
     char bikeModel[0x40];                     // +0x38 bike model name
     char bikeName[0x40];                      // +0x78 bike name
     char riderModel[0x40];                    // +0xb8 rider model name
     char racerName[0x20];                     // +0xf8 racer name
     char bikeDisplayName[0x20];               // +0x118 bike display name
     int engineSize;                           // +0x138 engine size
-    int field_0x13c;
+    int fourStroke;                           // +0x13c the bike's fourStroke ("BikeFourStroke_%02d")
 };
 
 // One PCSched.pb track (12 bytes; strings are DebugMalloc'd).

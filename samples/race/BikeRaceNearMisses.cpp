@@ -985,7 +985,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
         setup = *(UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions;
         setup.engineSize = circuit->racers[0].engineSize;
-        setup.engineKind = circuit->racers[0].field_0x13c;
+        setup.engineKind = circuit->racers[0].fourStroke;
         int bikeClass = UnknownBikeClassOf(setup.engineSize);
         setup.rpmLowerLimit = g_TrackGame->ui->rpmLowerLimit[bikeClass];
         setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];
@@ -1049,7 +1049,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 }
                 setup = *(UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions;
                 setup.engineSize = racer->engineSize;
-                setup.engineKind = racer->field_0x13c;
+                setup.engineKind = racer->fourStroke;
                 bikeClass = UnknownBikeClassOf(setup.engineSize);
                 setup.rpmLowerLimit = g_TrackGame->ui->rpmLowerLimit[bikeClass];
                 setup.rpmUpperLimit = g_TrackGame->ui->rpmUpperLimit[bikeClass];

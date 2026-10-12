@@ -146,7 +146,7 @@ void PCBailoutDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("ButAccept", event->controlName) == 0) {
             circuit->racers[0].money += cashShortfall;
-            circuit->racers[0].field_0x34 += cashShortfall;
+            circuit->racers[0].debts += cashShortfall;
             g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             PCCentralDlg* dialog = new(__FILE__, 1551) PCCentralDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
@@ -168,7 +168,7 @@ void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        int debt = circuit->racers[0].field_0x34;
+        int debt = circuit->racers[0].debts;
         int fee = circuit->entryFees[circuit->series];
         int cash = circuit->racers[0].money;
         playerCash = cash;
@@ -209,8 +209,8 @@ void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("ButAccept", event->controlName) == 0) {
-            circuit->racers[0].money += loanAmount - circuit->racers[0].field_0x34;
-            circuit->racers[0].field_0x34 = 0;
+            circuit->racers[0].money += loanAmount - circuit->racers[0].debts;
+            circuit->racers[0].debts = 0;
             g_TrackGame->proCircuit->Save(g_TrackGame->careerFile);
             PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
