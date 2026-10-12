@@ -26,7 +26,7 @@
     "target_va": "0x00415640",
     "target_size": 6112,
     "expect": "partial",
-    "notes": "obstacle query along a segment (quadtree / GameObjectIterator walk, debug new line 0xb24); control flow, calls, constants, schedule and frame size match (6059/6112); the high one-use temporaries are ordered differently and the start-up zero vectors are stored x-first (retail z-first), see the file header.",
+    "notes": "obstacle query along a segment (quadtree / GameObjectIterator walk, debug new line 0xb24); control flow, calls, constants, schedule and frame size match (6063/6112); the high one-use temporaries are ordered differently, see the file header.",
     "bindings": "BikeAINearMisses.bindings.json"
   },
   {

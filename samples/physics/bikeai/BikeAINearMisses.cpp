@@ -37,16 +37,23 @@
 // likely one inline function used in both places.
 //
 // 0x00415640 (6111 bytes plus one byte of nop padding, obstacle query along a
-// segment): 6059/6112 strict positions.  Control flow, calls, constants, every
+// segment): 6063/6112 strict positions.  Control flow, calls, constants, every
 // instruction's schedule and the 0x1ec frame size match.  Left: the order of the
 // one-use operator temporaries above +0x100 in the frame (offset, the dn * k / dn * 10
 // / dn * push temporaries of both owner branches, the segment-length temporaries, the
-// vegetation position and the outPoint temporary), and the store order of the
-// `Vec3(0, 0, 0)` temporaries at the start (retail z, y, x).  Tried without effect on
-// those: `k * d` / `10.0f * d` / `push * d` in each of the six update statements (64
-// combinations, identical code), and parenthesised, integer, named-local, per-block
-// local and negated zero vectors.
-// 0..17 dead initialised int locals at the top change nothing (6059).
+// vegetation position and the outPoint temporary): retail keeps the vegetation `p`
+// alone and lets the outPoint temporary share the step / normalise slots; here `p`
+// shares the early normalise temporaries.  The start-up zero vectors are a local
+// cleared with a chained `zero.x = zero.y = zero.z = 0.0f` (stores z, y, x like
+// retail; 6059 -> 6063 over `Vec3(0, 0, 0)`, which stores x first).
+// Tried without effect on those: `k * d` / `10.0f * d` / `push * d` in each of the
+// six update statements (64 combinations, identical code), parenthesised, integer,
+// named-local, per-block local and negated zero vectors; `p` and the outPoint
+// temporary at function scope instead of block scope, a named `v` in the segment-
+// length blocks and an inline `*outPush += BikeAIVec3Call(...)` instead of the named
+// step (32-variant sweep: function-scope `p` 6051, function-scope outPoint
+// temporary worse, the others identical).
+// 0..17 dead initialised int locals at the top change nothing.
 // Source forms that mattered: unsigned char type-id statics with an unsigned compare
 // (`mov bl, 0xff`), the max/min helpers with by-value arguments (two spellings,
 // see BikeAIMaxR), the squared distance and k dot product grouped z + ((x) + y)
@@ -632,10 +639,16 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
     g_UnknownGlobal578dac = 0;
     g_UnknownGlobal578df8 = 0;
     g_UnknownGlobal578dd8 = 0;
-    if (outPush)
-        *outPush = Vec3(0.0f, 0.0f, 0.0f);
-    if (outPoint)
-        *outPoint = Vec3(0.0f, 0.0f, 0.0f);
+    if (outPush) {
+        Vec3 zero;
+        zero.x = zero.y = zero.z = 0.0f;
+        *outPush = zero;
+    }
+    if (outPoint) {
+        Vec3 zero;
+        zero.x = zero.y = zero.z = 0.0f;
+        *outPoint = zero;
+    }
 
     Vec3 best;
     Vec3 pt;
