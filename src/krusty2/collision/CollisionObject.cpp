@@ -927,6 +927,31 @@ inline void DebugTransformPointQ(Vec3* out, const Vec3& v, const Matrix4* m)
     out->z = x * m->_13 + (y * m->_23 + z * m->_33) + m->_43;
 }
 
+// The capsule's two end points (0x00434540).  Retail orders the x87 operands of the two
+// transforms differently: the start point's rows load x, y, z products as written (read
+// through reference locals), the far end's y and z rows are bracketed x + (y + z) and its
+// source comes in by pointer (with it by reference the x row's m->_11 loads after p1.x).
+inline void DebugTransformCapsuleStart(Vec3* out, const Vec3& v, const Matrix4* m)
+{
+    const float& x = v.x;
+    const float& y = v.y;
+    const float& z = v.z;
+    out->x = x * m->_11 + y * m->_21 + z * m->_31 + m->_41;
+    out->y = x * m->_12 + y * m->_22 + z * m->_32 + m->_42;
+    out->z = x * m->_13 + y * m->_23 + z * m->_33 + m->_43;
+}
+
+inline void DebugTransformCapsuleEnd(Vec3* out, const Vec3* p, const Matrix4* m)
+{
+    const Vec3& v = *p;
+    const float& x = v.x;
+    const float& y = v.y;
+    const float& z = v.z;
+    out->x = x * m->_11 + y * m->_21 + z * m->_31 + m->_41;
+    out->y = x * m->_12 + (y * m->_22 + z * m->_32) + m->_42;
+    out->z = x * m->_13 + (y * m->_23 + z * m->_33) + m->_43;
+}
+
 // v * M3x3 (no translation), like 0x0042a450.
 inline void DebugRotateVector(Vec3* out, Vec3 v, const Matrix4* m)
 {
@@ -1192,10 +1217,8 @@ struct CollisionCapsuleView {
 // collision debug overlay.  debugDrawMode 0 draws nothing, 5 adds the translucent bounding
 // sphere; hulls and models draw their trees, a polyline its segment tree, a sphere a wire
 // sphere and a capsule its two end spheres joined by ten rings along the axis.
-// Near miss (1054/1068, size and frame exact): only the capsule end-point transforms differ in
-// x87 operand order (retail sums p0's terms y, z, x and loads m->_11 before p1.x).
-// Swapping capsule/shape bases and by-value, pointer, temporary or per-row helpers gave
-// nothing; per-row hand-ordered products reach 1060/1068 only in unreadable forms.
+// The capsule's end points go through DebugTransformCapsuleStart/End (see there); with one
+// shared transform for both ends retail's operand orders are out of reach (1054-1058).
 // The ring step is d / 10.0f: VC6 turns it into a multiply by the reciprocal constant
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
 int CollisionObject::GameObjectVirtualSlot14()
@@ -1235,8 +1258,8 @@ int CollisionObject::GameObjectVirtualSlot14()
             SetDrawColor(0xff, 0xff, 0xff);
             CollisionCapsuleView* capsule = (CollisionCapsuleView*)shape;
             Vec3 ends[2];
-            DebugTransformPointRef(&ends[0], capsule->p0, &capsule->transform);
-            DebugTransformPointRef(&ends[1], capsule->p1, &capsule->transform);
+            DebugTransformCapsuleStart(&ends[0], capsule->p0, &capsule->transform);
+            DebugTransformCapsuleEnd(&ends[1], &capsule->p1, &capsule->transform);
             DrawSphere(&ends[0], capsule->radius, 0x10);
             DrawSphere(&ends[1], ((CollisionCapsuleView*)shape)->radius, 0x10);
             Vec3 d = ends[1] - ends[0];
