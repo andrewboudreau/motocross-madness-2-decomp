@@ -81,7 +81,7 @@ struct UnknownWreckerProbe {
 class UnknownWreckerCollisionObject : public UnknownWreckerQuadTreeObject, public GraphicsTest {
 public:
     // 0x00439410 (thiscall, ret 4): appends `owner` to the ignore list.
-    void UnknownFunction439410(UnknownWreckerCollisionObject* owner);
+    void AddIgnoredOwner(UnknownWreckerCollisionObject* owner);
     void UnknownFunction435fe0();                      // 0x00435fe0
     // The per-step update (GameObject slot 11 with the step length, see
     // UnknownWreckerSteppable) on the GraphicsTest subobject at +0xc.
@@ -161,13 +161,13 @@ struct UnknownWreckerMatrix {
 // body's +0x234 and Wrecker+0xb8 all point at one). Method names provisional;
 // the two field names follow SoultreeObject in src/krusty2/core/SoultreeObject.h.
 struct UnknownWreckerSkeleton {
-    void UnknownFunction4fc690(UnknownWreckerSkeleton* frame, Vector3 delta); // 0x004fc690 (ret 0x10)
+    void TranslateIn(UnknownWreckerSkeleton* frame, Vector3 delta); // 0x004fc690 (ret 0x10)
     void UnknownFunction4fc740(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
     void UnknownFunction4fc9a0(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc9a0 (ret 8)
     void UnknownFunction4fca80(UnknownWreckerSkeleton* frame, UnknownWreckerFrame* out);        // 0x004fca80 (ret 8)
     void UnknownFunction4fca80(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* out);       // the same function, for a matrix local
-    void UnknownFunction4fb8c0(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* matrix);    // 0x004fb8c0 (ret 8): sets this node's matrix in `frame` space
-    void UnknownFunction4fc890(UnknownWreckerSkeleton* frame, const Vector3* offset);           // 0x004fc890 (ret 8): translates by `offset` given in `frame` space
+    void SetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* matrix);    // 0x004fb8c0 (ret 8): sets this node's matrix in `frame` space
+    void SetPositionIn(UnknownWreckerSkeleton* frame, const Vector3* offset);           // 0x004fc890 (ret 8): translates by `offset` given in `frame` space
     void UnknownFunction4fcc70();                                  // 0x004fcc70
     Vector3 UnknownFunction4fd660(const Vector3& point);           // 0x004fd660 (ret 8)
     Vector3 UnknownFunction4fd710(const Vector3& direction);       // 0x004fd710 (ret 8)
@@ -305,11 +305,11 @@ public:
 // same function).
 float UnknownFunction460b50(float value);
 // 0x00460c00 (cdecl): the matching reciprocal square root.
-float UnknownFunction460c00(float value);
+float FastInvSqrt(float value);
 
 // 0x005015b0 (cdecl): the out-of-line copy of a vector scale (see
 // src/krusty2/math/Math3D.h, Vec3ScaleCall).
-Vector3 UnknownFunction5015b0(const Vector3& v, float scale);
+Vector3 Vec3ScaleCall(const Vector3& v, float scale);
 
 
 class Wrecker : public GraphicsTest {

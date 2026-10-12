@@ -12,14 +12,14 @@ public:
     // 0x004fc9a0: writes a position for `index` into *position.
     void UnknownFunction4fc9a0(int index, Vector3* position);
     // 0x004fc970: writes the part's translation into *translation.
-    void UnknownFunction4fc970(Vector3* translation);
+    void GetPosition(Vector3* translation);
     // 0x004fdae0: looks up a named child part (BikeCamera asks for "Head").
     UnknownVehiclePart* UnknownFunction4fdae0(const char* name);
     void UnknownFunction4444e0(); // 0x004444e0 (BikeCamera slot 53)
     void UnknownFunction4fdb50(); // 0x004fdb50 (BikeCamera slot 54)
     // 0x004fc4f0 (src/krusty2's SoultreeObject::GetAxes): writes two axis
     // vectors; VehicleCamera slot 41 uses the first.
-    void UnknownFunction4fc4f0(Vector3* first, Vector3* second);
+    void GetAxes(Vector3* first, Vector3* second);
 };
 
 // An entry of the vehicle's +0x53c list (VehicleCamera slot 35).

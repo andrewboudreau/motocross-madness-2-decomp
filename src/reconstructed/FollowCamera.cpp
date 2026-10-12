@@ -531,9 +531,9 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
 // Out-of-line vector helpers that slot 46's inline normalisation calls (VC6
 // did not expand them there). See src/krusty2/math/Math3D.h, whose call views
 // describe the same addresses; names here are provisional.
-float UnknownFunction460c00(float value);                          // 0x00460c00: 1/sqrt approximation
+float FastInvSqrt(float value);                          // 0x00460c00: 1/sqrt approximation
 float UnknownFunction40ae30(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
-Vector3 UnknownFunction5015b0(const Vector3& v, float scale);      // 0x005015b0: v * scale
+Vector3 Vec3ScaleCall(const Vector3& v, float scale);      // 0x005015b0: v * scale
 Vector3 UnknownFunction515600(const Vector3& a, const Vector3& b); // 0x00515600: cross product
 
 // Inline cross product (expanded by slot 46). The parenthesised first
@@ -548,8 +548,8 @@ inline Vector3 FollowCameraNormalize(const Vector3& v) {
     float lengthSquared = UnknownFunction40ae30(&v, &v);
     if (lengthSquared == 1.0f)
         return v;
-    float scale = UnknownFunction460c00(lengthSquared);
-    return UnknownFunction5015b0(v, scale);
+    float scale = FastInvSqrt(lengthSquared);
+    return Vec3ScaleCall(v, scale);
 }
 
 // 0x004654e0: an orthonormal basis from `forward` and `up` (up is made

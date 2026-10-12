@@ -44,7 +44,7 @@ static inline void Normalize(Vector3& v) {
     if (squared == 0.0f)
         v = kVec3Zero;
     else
-        v *= UnknownFunction460c00(squared);
+        v *= FastInvSqrt(squared);
 }
 
 // ---------------------------------------------------------------- RunwayLights

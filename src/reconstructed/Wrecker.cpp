@@ -69,7 +69,7 @@ Wrecker* Wrecker::UnknownFunction530190(void* owner, UnknownWreckerCharacter* ri
 
 void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* name) {
     character = rider;
-    rider->skeleton->UnknownFunction4fc690(0, Vector3(0.0f, 120.0f, 0.0f));
+    rider->skeleton->TranslateIn(0, Vector3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
     gravityModel->UnknownVirtualSlot8(field_0x18);
     AppendChild(gravityModel, -1);
@@ -135,8 +135,8 @@ void Wrecker::UnknownFunction530680(UnknownWreckerCollisionObject* object) {
     ignoreObjects = (UnknownWreckerCollisionObject**)DebugRealloc(ignoreObjects, ignoreObjectCount * 4 + 4, __FILE__, 0xb4);
     ignoreObjects[ignoreObjectCount] = object;
     ignoreObjectCount++;
-    collisionModel->UnknownFunction439410(object);
-    object->UnknownFunction439410(collisionModel);
+    collisionModel->AddIgnoredOwner(object);
+    object->AddIgnoredOwner(collisionModel);
 }
 
 // Vector helpers in the d3dvec.inl style (MatrixUtil.h's Vector3 has only
@@ -379,11 +379,11 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         character->skeleton->UnknownFunction4fca80(0, &pose);
         WreckerMatrixProduct(&pose, relative, pose);
         WreckerOrthonormalize(&pose);
-        character->skeleton->UnknownFunction4fb8c0(0, &pose);
+        character->skeleton->SetMatrixIn(0, &pose);
         Vector3 position;
         poseNode->UnknownFunction4fc9a0(0, &position);
         Vector3 delta = WreckerSubtractValue(oldPosition, position);
-        character->skeleton->UnknownFunction4fc890(0, &delta);
+        character->skeleton->SetPositionIn(0, &delta);
         field_0xb4 = 0;
     }
     UnknownFunction532150();
@@ -557,14 +557,14 @@ void Wrecker::RebuildPoseSteps() {
     } else {
         angularStep = WreckerCross(Vector3(upX, upY, upZ), pose.up);
     }
-    angularStep = UnknownFunction5015b0(angularStep, 1.0f);
+    angularStep = Vec3ScaleCall(angularStep, 1.0f);
 }
 
 void Wrecker::UnknownFunction5327c0() {
     if (wreckState) {
         for (int i = 0; i < ignoreObjectCount; i++) {
-            collisionModel->UnknownFunction439410(ignoreObjects[i]);
-            ignoreObjects[i]->UnknownFunction439410(collisionModel);
+            collisionModel->AddIgnoredOwner(ignoreObjects[i]);
+            ignoreObjects[i]->AddIgnoredOwner(collisionModel);
         }
         wreckState = 0;
         rigidBody->field_0x25_bit0 = 0;

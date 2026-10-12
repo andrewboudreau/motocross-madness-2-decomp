@@ -124,14 +124,14 @@ static inline Vector3 WreckerNormalizeFirst(const Vector3& v) {
     float squared = WreckerDotCall(&v, &v);
     if (squared == 1.0f)
         return v;
-    return WreckerScaleCtorCall(v, UnknownFunction460c00(squared));
+    return WreckerScaleCtorCall(v, FastInvSqrt(squared));
 }
 static inline Vector3 WreckerNormalizeTail(const Vector3& v) {
     float squared = WreckerDotCall(&v, &v);
     if (squared == 1.0f)
         return v;
-    float inv = UnknownFunction460c00(squared);
-    return UnknownFunction5015b0(v, inv);
+    float inv = FastInvSqrt(squared);
+    return Vec3ScaleCall(v, inv);
 }
 
 static inline Vector3 WreckerAddCtorCall(const Vector3& a, const Vector3& b) {
@@ -170,7 +170,7 @@ void Wrecker::UnknownFunction5329e0(float frameTime) {
     }
     if (hits)
         sum = sum / hits;
-    pushImpulse = UnknownFunction5015b0(WreckerScaleCtorCall(sum, pushScale), frameTime);
+    pushImpulse = Vec3ScaleCall(WreckerScaleCtorCall(sum, pushScale), frameTime);
 }
 
 // The particle the next free entry of the manager's table.

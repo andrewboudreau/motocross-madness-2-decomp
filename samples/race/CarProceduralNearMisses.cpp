@@ -174,7 +174,7 @@ static inline void CarNormalizeInPlace(Vector3& v)
     if (squared == 0.0f) {
         v = kVec3Zero;
     } else {
-        float inv = UnknownFunction460c00(squared);
+        float inv = FastInvSqrt(squared);
         v.x *= inv;
         v.y *= inv;
         v.z *= inv;
@@ -244,7 +244,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         field_0x38->UnknownFunction432ab0(1, box);
         for (unsigned int i = 0; i < field_0x60; i++) {
             Vector3 position;
-            field_0x210[i]->UnknownFunction4fc970(&position);
+            field_0x210[i]->GetPosition(&position);
             if (position.z > 0.0)
                 field_0x198 = position.z;
         }

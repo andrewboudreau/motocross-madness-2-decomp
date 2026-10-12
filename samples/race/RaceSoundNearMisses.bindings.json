@@ -65,7 +65,7 @@
   "?PlayItSound@RaceSound@@QAEXXZ": "0x004e5860",
   "?CompareChannels@RaceSound@@SAHPBX0@Z": "0x004e5880",
   "?UnknownFunction4e9cd0@UnknownTrackGameObject574@@QAEHPAVUnknownTextureStream@@PBD1H@Z": "0x004e9cd0",
-  "?UnknownFunction4fc970@UnknownVehiclePart@@QAEXPAUVector3@@@Z": "0x004fc970",
+  "?GetPosition@UnknownVehiclePart@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?UnknownFunction51b540@TextQueueOverlay@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction524100@TrackGameMode@@QAEHXZ": "0x00524100",

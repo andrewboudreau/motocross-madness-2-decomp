@@ -66,7 +66,7 @@ struct UnknownNumberRacer {
 };
 
 // 0x00460c00 (cdecl): 1/sqrt of `value` (table driven).
-float UnknownFunction460c00(float value);
+float FastInvSqrt(float value);
 
 // A track position (RaceView.h's TrackPos: node, segment, t).
 struct UnknownRunwayTrackPos {
@@ -210,7 +210,7 @@ public:
 // The racer a BonusObjectManager follows (its +0x2c).
 struct UnknownBonusRacerPart {
     // 0x004fc970: writes the part's translation into *translation.
-    void UnknownFunction4fc970(Vector3* translation);
+    void GetPosition(Vector3* translation);
 };
 
 struct UnknownBonusRacerModel {

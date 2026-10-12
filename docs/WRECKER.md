@@ -168,6 +168,20 @@ Function names (tier 3, from behaviour): `0x00531da0` `EmitProbeTrail`
 (the pose's linear and angular steps from the node's frame), and the
 near miss `0x00531740` `SprayContactParticles`.
 
+Calls into code another unit owns now use that unit's canonical name where
+krusty2 already names the address and no other lane's header shares the
+declaration: `AddIgnoredOwner` `0x00439410`, `SoultreeObject`'s
+`SetMatrixIn` `0x004fb8c0`, `SetPositionIn` `0x004fc890`, `TranslateIn`
+`0x004fc690`, `GetPosition` `0x004fc970` and `GetAxes` `0x004fc4f0`,
+`Vec3ScaleCall` `0x005015b0` and `FastInvSqrt` `0x00460c00` (in the Wrecker,
+CarProcedural, BikeRace, Krusty3DObjects, RaceSound, VehicleCamera,
+FollowCamera and D3DIMSoulTree views). `FastSqrt` `0x00460b50`, `FindByName`
+`0x004fdae0`, `GetPositionIn` `0x004fc9a0`, `CountNodes` `0x004fda30`,
+`SetPosition` `0x004fc660`, `QueryGround` `0x00507c10` and `SelectQuality`
+`0x00507960` keep their address names because AuralScape.cpp, BikeCamera.cpp,
+ArcadeObject.cpp, QuarryStuntEvent.cpp or a game sample reach them through
+these headers.
+
 ## Remaining uncertainty
 
 All method and class names are provisional, as are the field names above

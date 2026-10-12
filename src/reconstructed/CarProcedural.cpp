@@ -123,7 +123,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     field_0x50 = a9;
     field_0x18c = 0.0f;
     CarProceduralNode* body = field_0x34->UnknownFunction4fdae0("Body");
-    body->UnknownFunction4fc970(&field_0x1dc);
+    body->GetPosition(&field_0x1dc);
 
     field_0x60 = wheelCount;
     if (field_0x60 > 0) {
@@ -164,7 +164,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
         field_0x3c->UnknownFunction432720(field_0x34, 0, 1, 0, 0);
     field_0x3c->field_0x54->field_0x00 = 1;
     field_0x3c->UnknownFunction435fe0();
-    field_0x38->UnknownFunction439410(field_0x3c);
+    field_0x38->AddIgnoredOwner(field_0x3c);
     g_MemTagStack->Pop(tag);
 
     ReadPath(pathFile, field_0x34->field_0x38);

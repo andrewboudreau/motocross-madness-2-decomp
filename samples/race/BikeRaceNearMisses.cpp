@@ -804,7 +804,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
 
     if (field_0x06c) {
         if (field_0x144) {
-            localRacer->field_0x3bc->UnknownFunction4fc970(&point);
+            localRacer->field_0x3bc->GetPosition(&point);
             point.x += localRacer->heading.x * 15.0f;
             point.z += localRacer->heading.z * 15.0f;
         }
@@ -1526,32 +1526,32 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 if (a == b)
                     continue;
                 if (racerSlots[b]->field_0x735) {
-                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x1418);
-                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x1414);
-                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x5f0);
-                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x5f4);
-                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
-                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x1418);
-                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x1414);
-                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x5f0);
-                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x5f4);
-                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                    racerSlots[a]->field_0x1418->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                    racerSlots[a]->field_0x1414->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
                 }
-                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x1418);
-                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x1414);
-                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x5f0);
-                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x5f4);
-                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
-                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x1418);
-                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x1414);
-                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x5f0);
-                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x5f4);
-                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
-                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x1418);
-                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x1414);
-                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x5f0);
-                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x5f4);
-                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(
+                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
+                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x5f0->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
+                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
+                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x5f4->AddIgnoredOwner(racerSlots[b]->field_0x604->field_0x38);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x1418);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x1414);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x5f0);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x604->field_0x38->AddIgnoredOwner(
                     racerSlots[b]->field_0x604->field_0x38);
             }
         }

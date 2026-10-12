@@ -111,9 +111,9 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             NextKey();
         float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
         Vector3 position;
-        field_0x2c->field_0x38->field_0x3bc->UnknownFunction4fc970(&position);
+        field_0x2c->field_0x38->field_0x3bc->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
-        baseFrame->UnknownFunction4fc690(0, position);
+        baseFrame->TranslateIn(0, position);
         if (field_0x38 != g_UnknownKrustyGame56e26c->field_0x10->field_0x08 || field_0x38->field_0x16c != field_0x1dc ||
             field_0x1f0) {
             field_0x38 = g_UnknownKrustyGame56e26c->field_0x10->field_0x08;
@@ -254,7 +254,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         UNKNOWN_PLACE_CUE();
         if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
             Vector3 target;
-            g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.UnknownFunction4fc970(&target);
+            g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.GetPosition(&target);
             Vector3 direction = target - arcadeView->field_0x170;
             UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
             scale = modelScale;

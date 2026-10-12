@@ -77,11 +77,11 @@ Vector3 VehicleCamera::TargetPoint() {
         return position;
     }
     if (field_0x388) {
-        field_0x388->field_0x34->UnknownFunction4fc970(&position);
+        field_0x388->field_0x34->GetPosition(&position);
         return position;
     }
     if (field_0x38c) {
-        field_0x38c->UnknownFunction4fc970(&position);
+        field_0x38c->GetPosition(&position);
         return position;
     }
     return kVec3Zero;
@@ -255,11 +255,11 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
         if (field_0x384) {
             UnknownVehiclePart* model = field_0x384->field_0x1a0;
             if (model->field_0x140)
-                model->field_0x140->UnknownFunction4fc4f0(&heading, &other);
+                model->field_0x140->GetAxes(&heading, &other);
             else
-                model->UnknownFunction4fc4f0(&heading, &other);
+                model->GetAxes(&heading, &other);
         } else if (field_0x388) {
-            field_0x388->field_0x34->UnknownFunction4fc4f0(&heading, &other);
+            field_0x388->field_0x34->GetAxes(&heading, &other);
         } else {
             heading = kVec3ZAxis;
         }

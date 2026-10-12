@@ -77,7 +77,7 @@ public:
     // by `delta` in `frame`, 0x004fd090 (ret 0x10) sets the rotation about
     // the axis (x, y, z), 0x004fd910 (ret 4) appends `child`, 0x004fd990
     // (ret 4) unlinks `child`.
-    void UnknownFunction4fc690(SoultreeObject* frame, Vector3 delta);
+    void TranslateIn(SoultreeObject* frame, Vector3 delta);
     void UnknownFunction4fd090(float x, float y, float z, float angle);
     void AddChild(SoultreeObject* child);
     void UnknownFunction4fd990(SoultreeObject* child);

@@ -567,12 +567,12 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         SoundSystem()->SetListenerVelocity(listenerCamera->followedBike->field_0x064);
         for (i = 0; i < channelsInUse; i++) {
             if (engineChannels[i].channelSound) {
-                engineChannels[i].channelRacer->field_0x3bc->UnknownFunction4fc970(&position);
+                engineChannels[i].channelRacer->field_0x3bc->GetPosition(&position);
                 engineChannels[i].channelSound->Set3DPosition(position, 0);
                 engineChannels[i].channelSound->Set3DVelocity(engineChannels[i].channelRacer->field_0x064, 0);
             }
         }
-        listenerRacer->field_0x3bc->UnknownFunction4fc970(&position);
+        listenerRacer->field_0x3bc->GetPosition(&position);
         landHardSound->Set3DPosition(position, 0);
         landHardSound->Set3DVelocity(listenerRacer->field_0x064, 0);
         SoundSystem()->CommitListenerSettings();
@@ -911,7 +911,7 @@ int RaceSound::PlayWreckSound(UnknownEventRacer* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->field_0x3bc->UnknownFunction4fc970(&position);
+    racer->field_0x3bc->GetPosition(&position);
     wreckSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(wreckSounds[index], 0, 0, 0, 0);
     return index;
@@ -930,7 +930,7 @@ int RaceSound::PlayFallSound(UnknownEventRacer* racer) {
             return 0;
         index = rand() % 6;
     }
-    racer->field_0x3bc->UnknownFunction4fc970(&position);
+    racer->field_0x3bc->GetPosition(&position);
     fallSounds[index]->Set3DPosition(position, 0);
     PlayIfEnabled(fallSounds[index], 0, 0, 0, 0);
     return index;

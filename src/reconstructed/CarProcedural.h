@@ -41,7 +41,7 @@ public:
     virtual void UnknownNodeVirtualSlot9(void* a0, const char* name, int a3, int a4, int a5);
 
     CarProceduralNode* UnknownFunction4fdae0(const char* name);       // 0x004fdae0 named child
-    void UnknownFunction4fc970(Vector3* position);                   // 0x004fc970
+    void GetPosition(Vector3* position);                   // 0x004fc970
     void UnknownFunction4fe0a0(Vector3* a, Vector3* b);              // 0x004fe0a0 (ret 8)
     // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
     // documents them): position in `frame` space, placement there, the
@@ -106,7 +106,7 @@ public:
     void UnknownFunction432720(CarProceduralModel* model, int a, int b, int c, int d); // 0x00432720
     void UnknownFunction432800(CarProceduralModel* model, const char* path); // 0x00432800
     void UnknownFunction435fe0();                                    // 0x00435fe0
-    void UnknownFunction439410(CarProceduralCollision* other);       // 0x00439410
+    void AddIgnoredOwner(CarProceduralCollision* other);       // 0x00439410
     void UnknownFunction432ab0(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape
     void UnknownFunction435830(const Matrix4* transform);            // 0x00435830 (ret 4): sets the transform
     void UnknownFunction435fb0();                                    // 0x00435fb0: placement update
