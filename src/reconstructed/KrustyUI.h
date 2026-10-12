@@ -12,7 +12,7 @@ class UnknownTrackGameObject56cItem;
 // Object at a GUI layer's +0xc0.
 struct UnknownKrustyUIGuiLayerItem {
     unsigned char field_0x00[0x5c];
-    int field_0x5c;                           // set from TrackGame+0xc4c (EventManager 0x0045e710)
+    int enabled;                              // +0x5c ToolTip::enabled; set from TrackGame+0xc4c, the tool tips option (EventManager 0x0045e710)
 };
 
 // One of the GUI's four layers (+0x330).
@@ -55,11 +55,11 @@ public:
     unsigned char field_0x000[0x3c];
     BackgroundImage* guiBackground;           // +0x03c the background (dlgprocs.cpp 0x004536e0)
     unsigned char field_0x040[0xec - 0x40];
-    int field_0x0ec;                          // from TrackGame+0xc40 (KrustyUI 0x004988a0)
+    int uiAnimations;                         // +0x0ec GUIManager::uiAnimations; from TrackGame+0xc40 (KrustyUI 0x004988a0)
     unsigned char field_0x0f0[0x30c - 0xf0];
     int field_0x30c;
     unsigned char field_0x310[0x34c - 0x310];
-    int field_0x34c;
+    int soundVolume;                          // +0x34c GUIManager::soundVolume
     char toolTipFontFace[0x3d0 - 0x350];      // +0x350 font face (TrackOverlay 0x0051b320)
     float field_0x3d0;                        // string 0xfed's value when nonzero
     int toolTipBold;                          // +0x3d4 string 0x1469's value; bold font

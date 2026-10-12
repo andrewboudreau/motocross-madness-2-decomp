@@ -526,7 +526,7 @@ void UIControl::LeaveHover(int value) {
 // 0x00472670
 void UIControl::PlayControlSound(int index, int a) {
     if (sounds[index]) {
-        sounds[index]->SetVolume(ownerGui->field_0x34c, 0);
+        sounds[index]->SetVolume(ownerGui->soundVolume, 0);
         sounds[index]->PlayWithOptions(1, 0, 0);
     }
 }
@@ -3661,7 +3661,7 @@ int UIControl::AnimInStep() {
         fxAnimIn->Rewind();
         transitionFrame = 1;
         if (fxSoundIn) {
-            fxSoundIn->SetVolume(ownerGui->field_0x34c, 0);
+            fxSoundIn->SetVolume(ownerGui->soundVolume, 0);
             fxSoundIn->PlayWithOptions(1, 0, 0);
         }
     }
@@ -3687,7 +3687,7 @@ int UIControl::AnimOutStep() {
         }
         fxAnimOut->Rewind();
         if (fxSoundOut) {
-            fxSoundOut->SetVolume(ownerGui->field_0x34c, 0);
+            fxSoundOut->SetVolume(ownerGui->soundVolume, 0);
             fxSoundOut->PlayWithOptions(1, 0, 0);
         }
     }
@@ -3714,7 +3714,7 @@ int UIControl::SlideLeftStep() {
         slideX = (float)(left - bounds[2] - 1);
         slideStepX = ((float)left - slideX) / g_UnknownGlobal65b610;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -3755,7 +3755,7 @@ int UIControl::SlideTopStep() {
         slideY = (float)(top - bounds[3]);
         slideStepY = ((float)top - slideY) / g_UnknownGlobal65b614;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -3795,7 +3795,7 @@ int UIControl::SlideRightStep() {
         slideX = (float)ownerDialog->screenWidth;
         slideStepX = ((float)bounds[0] - slideX) / g_UnknownGlobal65b618;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -3835,7 +3835,7 @@ int UIControl::SlideBottomStep() {
         slideY = (float)ownerDialog->screenHeight;
         slideStepY = ((float)bounds[1] - slideY) / g_UnknownGlobal65b61c;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
@@ -4283,7 +4283,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
     if (!UIControl::UnknownVirtualSlot21(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (clickSound) {
-            clickSound->SetVolume(ownerGui->field_0x34c, 0);
+            clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);
         }
         switch (value) {
@@ -5077,7 +5077,7 @@ int UIControl::GrowStep() {
         zoomStepWidth = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
         zoomStepHeight = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
         if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {

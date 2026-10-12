@@ -521,7 +521,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
     if (!UIControl::UnknownVirtualSlot20(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (clickSound) {
-            clickSound->SetVolume(ownerGui->field_0x34c, 0);
+            clickSound->SetVolume(ownerGui->soundVolume, 0);
             clickSound->PlayWithOptions(1, 0, 0);
         }
         switch (c) {
@@ -583,7 +583,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
                 textLength++;
                 controlTextLength++;
             } else if (fullSound) {
-                fullSound->SetVolume(ownerGui->field_0x34c, 0);
+                fullSound->SetVolume(ownerGui->soundVolume, 0);
                 fullSound->PlayWithOptions(1, 0, 0);
             }
             break;

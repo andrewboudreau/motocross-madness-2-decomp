@@ -159,7 +159,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
     case 3:
         if (_stricmp("DisplayResolutionDropDown", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
-            sound->SetVolume(guiManager->field_0x34c, 0);
+            sound->SetVolume(guiManager->soundVolume, 0);
             if (sound)
                 sound->PlayWithOptions(0, 0, 0);
         }
@@ -285,7 +285,7 @@ void OptSoundDlg::HandleEvent(UnknownDialogEvent* event)
         break;
     case 3: {
         Sound* sound = FindSectionObject("Ratchet03");
-        sound->SetVolume(guiManager->field_0x34c, 0);
+        sound->SetVolume(guiManager->soundVolume, 0);
         if (sound)
             sound->PlayWithOptions(0, 0, 0);
         ApplySoundSettings();
@@ -325,7 +325,7 @@ void OptSoundDlg::ApplySoundSettings()
         ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = g_UnknownGlobal688798.eax;
         ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, g_UnknownGlobal688798.sound16Bit ? 16 : 8);
     }
-    guiManager->field_0x34c = (g_UnknownGlobal688798.uiSounds ? (g_UnknownGlobal688798.uiVolume - 100) * 25 : -10000) - 200;
+    guiManager->soundVolume = (g_UnknownGlobal688798.uiSounds ? (g_UnknownGlobal688798.uiVolume - 100) * 25 : -10000) - 200;
 }
 
 
@@ -390,7 +390,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
     case 3:
         if (_stricmp("InputDeviceDDL", event->controlName) != 0 && _stricmp("ListboxScroll", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
-            sound->SetVolume(guiManager->field_0x34c, 0);
+            sound->SetVolume(guiManager->soundVolume, 0);
             if (sound)
                 sound->PlayWithOptions(0, 0, 0);
         }
@@ -829,7 +829,7 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
         *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
         *UnknownControlSettingsOf(g_TrackGame) = g_UnknownGlobal688868;
         memcpy(UnknownMessagesOf(g_TrackGame), g_UnknownGlobal688c10, sizeof(g_UnknownGlobal688c10));
-        guiManager->field_0xec = g_UnknownGlobal688898.uiAnimations;
+        guiManager->uiAnimations = g_UnknownGlobal688898.uiAnimations;
         if (parentDialog)
             parentDialog->animatesControls = g_UnknownGlobal688898.uiAnimations;
         break;
@@ -1072,7 +1072,7 @@ void OptGarageDlg::HandleEvent(UnknownDialogEvent* event)
     case 3:
         if (_stricmp("DDLCurves", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
-            sound->SetVolume(guiManager->field_0x34c, 0);
+            sound->SetVolume(guiManager->soundVolume, 0);
             if (sound)
                 sound->PlayWithOptions(0, 0, 0);
             if (strlen(event->controlName) > 5 && _strnicmp(event->controlName, "SldEQ", 5) == 0)

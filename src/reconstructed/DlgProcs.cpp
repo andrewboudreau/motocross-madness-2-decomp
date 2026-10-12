@@ -1695,7 +1695,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     case 0xc9:
         event->dialog->UpdateBoundValues(1);
         *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
-        g_TrackGame->ui->gui->field_0x0ec = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
+        g_TrackGame->ui->gui->uiAnimations = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;

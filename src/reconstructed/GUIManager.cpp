@@ -140,7 +140,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     screenGrab = 0;
     grabRegion = -1;
     field_0xe8 = 0;
-    field_0xec = 1;
+    uiAnimations = 1;
     dialogDirectory[0] = 0;
     waitFrames = 0;
     setupPalette = 0;
@@ -167,7 +167,7 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
         users[i] = 0;
     dialogContainer = 0;
     modalDialog = 0;
-    field_0x34c = 0;
+    soundVolume = 0;
     strcpy(toolTipFontFace, "");
     field_0x3d0 = 0;
     toolTipBold = 0;
@@ -354,7 +354,7 @@ void GUIManager::AttachDialog(UIDialog* dialog, int a, int wait) {
     else
         dialogContainer->AppendChild(dialog, -1);
     dialog->UnknownVirtualSlot28(a);
-    dialog->animatesControls = field_0xec;
+    dialog->animatesControls = uiAnimations;
     if (guiBackground)
         guiBackground->MarkAllDirty();
     if (wait)

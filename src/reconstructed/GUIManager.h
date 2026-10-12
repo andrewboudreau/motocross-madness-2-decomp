@@ -374,7 +374,7 @@ public:
     int drawGrabFirst;                        // +0xe0: draw the grab before the children
     int grabRegion;                           // +0xe4
     int field_0xe8;
-    int field_0xec;                           // from TrackGame+0xc40 (KrustyUI 0x004988a0)
+    int uiAnimations;                         // +0xec ChkUIAnims (OptionProcs.cpp); from TrackGame+0xc40 (KrustyUI 0x004988a0); handed to each dialog's animatesControls
     char dialogDirectory[0x100];              // +0xf0: dialog directory
     int paletteChanged;                       // +0x1f0: set by 0x00486150; slot 10 clears it
     int waitFrames;                           // +0x1f4: frames to wait
@@ -391,7 +391,7 @@ public:
     int userCount;                            // +0x340: users
     GameObject* dialogContainer;              // +0x344: the UIDlgContainer
     void* languageModule;                     // +0x348: "uilang.dll" module
-    int field_0x34c;
+    int soundVolume;                          // +0x34c the UI sounds' volume: (uiVolume - 100) * 25 - 200, or -10200 with UI sounds off (OptionProcs.cpp)
     char toolTipFontFace[0x80];               // +0x350: tool tip font face
     int field_0x3d0;
     int toolTipBold;                          // +0x3d4: bold
