@@ -161,7 +161,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
 // The owner a VisualCue compares its camera with (its +0x18).
 struct UnknownCueOwner {
     unsigned char field_0x00[0x08];
-    UnknownArcadeView* field_0x08;
+    UnknownArcadeView* currentCamera;          // +0x08
 };
 
 // Places the cue at its screen position in front of the camera, rebuilding
@@ -195,7 +195,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     if (!ArcadeObject::UnknownVirtualSlot10(frameTime))
         return 1;
     if (!field_0xbc) {
-        if (((UnknownCueOwner*)renderContext)->field_0x08 != arcadeView ||
+        if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||
             cueView->field_0x50->field_0x3b0 != cueView->ownRacer || !cueView->ownRacer ||
             cueView->ownRacer->finished) {
             isVisible = 0;

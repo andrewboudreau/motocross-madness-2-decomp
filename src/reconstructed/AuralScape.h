@@ -123,12 +123,12 @@ struct UnknownAuralScapeReverbTable {
 // object whose +0x170 is the position the reverb zone is looked up for.
 struct UnknownAuralScapeViewer {
     unsigned char field_0x000[0x170];
-    Vector3 field_0x170;
+    Vector3 eyePosition;                      // +0x170
 };
 
 struct UnknownAuralScapeTarget {
     unsigned char field_0x00[0x08];
-    UnknownAuralScapeViewer* field_0x08;
+    UnknownAuralScapeViewer* currentCamera;   // +0x08
 };
 
 struct UnknownAuralScapeReverbOwner {

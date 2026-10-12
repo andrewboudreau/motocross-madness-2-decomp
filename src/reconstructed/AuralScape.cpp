@@ -708,7 +708,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
     unsigned long environment = 0;
     unsigned char material = 0;
     if (reverbEnabled && groundSubject && reverbOwner) {
-        Vector3 position = ((UnknownAuralScapeTarget*)renderContext)->field_0x08->field_0x170;
+        Vector3 position = ((UnknownAuralScapeTarget*)renderContext)->currentCamera->eyePosition;
         groundSubject->QueryGround(&position, 0, 0, (int)&material);
         zone = (material >> 4) & 3;
         environment = reverbOwner->field_0xa4->field_0x410[zone];
