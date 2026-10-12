@@ -193,7 +193,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/tire/Tire | `0x005135f0` | 559/1666 | b | UpdateContactPatch: frame 0x18 matches; retail homes the projected axis in the dead `axis` argument slot, normal through ecx, tail-path copies |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
 | physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local (reference counts 3 vs 4, VC6_FRAME_LAYOUT fact 9); rewrites of the boost/minimum conditions and the clamp give no gain |
-| physics/tire/Tire | `0x00514170` | 276/589 | b | `fld st(0); fcomp` where retail uses `fcom`; x87 operand order of the `dir` scaling |
+| physics/tire/Tire | `0x00514170` | 560/607 | b | x87 operand order of the first `dir` component; one stack store and two cross-product pairs scheduled differently |
 | physics/tire/Tire | `0x00514550` | 169/3838 (masked) | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
 | physics/tire/Tire | `0x00515880` | 522/703 | c | row 0 of the frame: retail spills its z through a stack temp and stores x/y last; the keepZ test is scheduled later; c.y loads z.z first |
 | physics/tire/Tire | `0x00515b50` | 305/316 | c | side friction term: VC6 multiplies frictionCoefficient before the stacked sqrt (retail `fmul st(2) ; fmul [ecx + 0x74]`), and one frictionForce copy store is scheduled earlier |

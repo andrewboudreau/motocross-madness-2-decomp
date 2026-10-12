@@ -925,10 +925,13 @@ static inline CollisionVec3 TireNegate(const CollisionVec3& v)
     return r;
 }
 
-// 0x00514170 (near miss, 276 of 589 compared bytes): the set-up matches; VC6 then
-// loads *speed with `fld st(0); fcomp` where retail uses `fcom`, scales `dir` as
-// `fld mem; fmul st(1)` for all three components (retail starts with
-// `fld st(0); fmul mem`) and keeps +0x1d8 in memory for the moment.
+// 0x00514170 (near miss, 560 of 607 bytes): clamping as `*speed < amount` gives
+// retail's `fcom`, and scaling the cross product component-wise through a local
+// copy of +0x1d8 gives its moment. Left: the first `dir` component is scaled as
+// `fld mem; fmul st(1)` where retail has `fld st(0); fmul mem` (tried
+// `dir * k`, a local k, k * dir.x per component, a pre-copied push and
+// `1 / grip * needed`), plus one stack store and two cross-product
+// fsubp/mov pairs scheduled differently.
 void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                       CollisionVec3* torque, CollisionVec3* force)
 {
@@ -940,7 +943,7 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     float amount = share * slipSpeed;
     if (!forward)
         dir = TireNegate(push);
-    amount = amount > *speed ? *speed : amount;
+    amount = *speed < amount ? *speed : amount;
     amount = amount > 0.0f ? amount : 0.0f;
     float rate = mass / stepTime;
     float needed = rate * amount;
@@ -954,7 +957,11 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     force->x += push.x;
     force->y += push.y;
     force->z += push.z;
-    CollisionVec3 moment = TireTimes(field_0x1d8, CollisionCross(CollisionPoint::relativePosition, push));
+    CollisionVec3 moment = CollisionCross(CollisionPoint::relativePosition, push);
+    float s = field_0x1d8;
+    moment.x *= s;
+    moment.y *= s;
+    moment.z *= s;
     torque->x += moment.x;
     torque->y += moment.y;
     torque->z += moment.z;

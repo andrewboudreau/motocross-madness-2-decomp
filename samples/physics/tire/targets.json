@@ -264,7 +264,7 @@
     "target_va": "0x00514170",
     "target_size": 607,
     "expect": "partial",
-    "notes": "276/589 compared: the set-up matches; VC6 then loads *speed with `fld st(0); fcomp` where retail uses `fcom`, and the x87 operand order of the `dir` scaling differs (see Tire.cpp).",
+    "notes": "560/607 strict: the clamp and moment match; the first `dir` component's x87 operand order and three scheduling pairs differ (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   },
   {
