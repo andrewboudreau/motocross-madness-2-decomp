@@ -126,8 +126,8 @@ int GameCursor::UnknownVirtualSlot15() {
 
     int outside = 0;
     if (field_0x3c && field_0x40) {
-        field_0x54 = (int)field_0x3c->field_0x24;
-        field_0x58 = (int)field_0x40->field_0x24;
+        field_0x54 = (int)field_0x3c->currentValue;
+        field_0x58 = (int)field_0x40->currentValue;
     } else {
         RECT window;
         RECT client;
@@ -219,8 +219,8 @@ UnknownCursorPosition GameCursor::CursorPosition() {
     UnknownCursorPosition position;
 
     if (field_0x3c && field_0x40) {
-        point.x = (int)field_0x3c->field_0x24;
-        point.y = (int)field_0x40->field_0x24;
+        point.x = (int)field_0x3c->currentValue;
+        point.y = (int)field_0x40->currentValue;
     } else {
         GetCursorPos(&point);
     }

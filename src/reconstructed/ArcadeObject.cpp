@@ -118,8 +118,8 @@ int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallbac
         collisionObject->SetHullShape(arcadeModel, 1, 0, 0, 0);
     collisionObject->SetOwner(arcadeModel, value);
     collisionObject->UnknownFunction435fe0();
-    collisionObject->field_0x88 = callback;
-    collisionObject->field_0x8c = context;
+    collisionObject->onHitCallback = callback;
+    collisionObject->onHitByCallback = context;
     AppendChild(collisionObject, -1);
     g_MemTagStack->Push(tag);
     collisionBuilt = 1;

@@ -10,24 +10,24 @@ class ManagedTexture;
 struct UnknownTextureRegion {
     // Inlined wherever a block is taken from the pool.
     void Init(UnknownTextureRegion* parent, int level) {
-        field_0x10 = parent;
-        field_0x14 = 0;
-        field_0x18 = level;
-        field_0x1c = field_0x20 = field_0x24 = field_0x28 = 0;
-        field_0x2c = 0;
+        parentRegion = parent;
+        occupant = 0;
+        sizeLevel = level;
+        left = top = right = bottom = 0;
+        reserved = 0;
         for (int i = 0; i < 4; i++)
-            field_0x00[i] = 0;
+            quarters[i] = 0;
     }
 
-    UnknownTextureRegion* field_0x00[4];      // quarters, all 0 for a leaf
-    UnknownTextureRegion* field_0x10;         // parent
-    ManagedTexture* field_0x14;               // occupant
-    int field_0x18;                           // level (side 2 << (level - 1))
-    float field_0x1c;                         // left (u)
-    float field_0x20;                         // top (v)
-    float field_0x24;                         // right (u)
-    float field_0x28;                         // bottom (v)
-    int field_0x2c;                           // reserved (listed in +0xd0)
+    UnknownTextureRegion* quarters[4];        // +0x00 quarters, all 0 for a leaf
+    UnknownTextureRegion* parentRegion;       // +0x10 parent
+    ManagedTexture* occupant;                 // +0x14 occupant
+    int sizeLevel;                            // +0x18 level (side 2 << (level - 1))
+    float left;                               // +0x1c left (u)
+    float top;                                // +0x20 top (v)
+    float right;                              // +0x24 right (u)
+    float bottom;                             // +0x28 bottom (v)
+    int reserved;                             // +0x2c reserved (listed in +0xd0)
 };
 
 // RTTI: CacheTexture : PCTextureMap (vtable 0x005583d8, overriding only the

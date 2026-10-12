@@ -90,39 +90,39 @@ UnknownControlBinding::UnknownControlBinding() {
 UnknownControlBinding::UnknownControlBinding(float minimum, float maximum, float center,
                                              int id, int axis, float deadZone) {
     Reset();
-    field_0x2c = minimum;
-    field_0x30 = maximum;
-    field_0x24 = center;
-    field_0x28 = center;
-    field_0x04 = id;
-    field_0x08 = axis;
-    field_0x34 = center + deadZone;
-    field_0x38 = center - deadZone;
+    minValue = minimum;
+    maxValue = maximum;
+    currentValue = center;
+    centerValue = center;
+    bindingId = id;
+    axisIndex = axis;
+    deadZoneHigh = center + deadZone;
+    deadZoneLow = center - deadZone;
 }
 
 // 0x0043cca0
 void UnknownControlBinding::Reset() {
-    field_0x24 = 0;
-    field_0x28 = 0;
-    field_0x2c = 0;
-    field_0x30 = 0;
-    field_0x34 = 0;
-    field_0x38 = 0;
-    field_0x00 = 0;
-    field_0x04 = 0;
-    field_0x08 = -1;
-    field_0x0c = -1;
-    field_0x10 = -1;
-    field_0x14 = 0;
-    field_0x18 = 0;
-    field_0x1c = 0;
-    field_0x20 = 0;
+    currentValue = 0;
+    centerValue = 0;
+    minValue = 0;
+    maxValue = 0;
+    deadZoneHigh = 0;
+    deadZoneLow = 0;
+    owner = 0;
+    bindingId = 0;
+    axisIndex = -1;
+    firstKey = -1;
+    secondKey = -1;
+    firstKeyTimer = 0;
+    secondKeyTimer = 0;
+    repeatStep = 0;
+    repeatInterval = 0;
 }
 
 // 0x0043cce0
 void UnknownControlBinding::SetKeys(int a, int b) {
-    field_0x0c = a;
-    field_0x10 = b;
+    firstKey = a;
+    secondKey = b;
 }
 
 // 0x0043cd00
@@ -132,28 +132,28 @@ UnknownControlBinding::~UnknownControlBinding() {
 
 // 0x0043cd10
 void UnknownControlBinding::Recenter() {
-    field_0x24 = field_0x28;
+    currentValue = centerValue;
 }
 
 // 0x0043cd20: maps value/range onto [min, max]; inside the dead zone the
 // value snaps to the centre.
 void UnknownControlBinding::SetFromAxis(float value, float range) {
-    float mapped = (field_0x30 - field_0x2c) * (value / range) + field_0x2c;
-    if (mapped < field_0x34 && mapped > field_0x38)
-        mapped = field_0x28;
-    field_0x24 = BindingMin(BindingMax(mapped, field_0x2c), field_0x30);
+    float mapped = (maxValue - minValue) * (value / range) + minValue;
+    if (mapped < deadZoneHigh && mapped > deadZoneLow)
+        mapped = centerValue;
+    currentValue = BindingMin(BindingMax(mapped, minValue), maxValue);
 }
 
 // 0x0043cd90
 void UnknownControlBinding::Adjust(float delta) {
-    field_0x24 += delta;
-    field_0x24 = BindingMin(BindingMax(field_0x24, field_0x2c), field_0x30);
+    currentValue += delta;
+    currentValue = BindingMin(BindingMax(currentValue, minValue), maxValue);
 }
 
 // 0x0043cde0: asks the owning device to drop bindings with this id.
 void UnknownControlBinding::Unbind() {
-    if (g_TrackGame->controlInterface && field_0x00)
-        field_0x00->UnknownVirtualSlot0(field_0x04);
+    if (g_TrackGame->controlInterface && owner)
+        owner->UnknownVirtualSlot0(bindingId);
 }
 
 // 0x0043ce00

@@ -754,14 +754,14 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
 void GUIInputDevice::Rebind() {
     float rangeX;
     float rangeY;
-    int x = (int)bindingX.field_0x24;
-    int y = (int)bindingY.field_0x24;
+    int x = (int)bindingX.currentValue;
+    int y = (int)bindingY.currentValue;
 
     if (!inputDevice)
         return;
     if (inputDevice->deviceKind == 2 || inputDevice->deviceKind == 1) {
-        inputDevice->UnknownVirtualSlot0(bindingX.field_0x04);
-        inputDevice->UnknownVirtualSlot0(bindingY.field_0x04);
+        inputDevice->UnknownVirtualSlot0(bindingX.bindingId);
+        inputDevice->UnknownVirtualSlot0(bindingY.bindingId);
     }
     rangeX = rangeMaxX;
     rangeY = rangeMaxY;
@@ -791,8 +791,8 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
     if (kind) {
         if (g_TrackGame->fullScreen) {
             POINT* position = &pointerPosition;
-            position->x = (int)bindingX.field_0x24;
-            position->y = (int)bindingY.field_0x24;
+            position->x = (int)bindingX.currentValue;
+            position->y = (int)bindingY.currentValue;
             return 1;
         }
         if (kind == 1 && ownerUser && ownerUser->userCursor) {

@@ -22,10 +22,10 @@ KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {
 // gives it the keys that step it down and up.
 int KeyboardDevice::BindKeys(UnknownControlBinding* binding, int key, int key2,
                                           float step, float interval) {
-    binding->field_0x00 = this;
-    binding->field_0x1c = step;
-    binding->field_0x20 = interval;
-    axisBindings[binding->field_0x08].Add(binding);
+    binding->owner = this;
+    binding->repeatStep = step;
+    binding->repeatInterval = interval;
+    axisBindings[binding->axisIndex].Add(binding);
     binding->SetKeys(key, key2);
     return 1;
 }
@@ -35,7 +35,7 @@ void KeyboardDevice::UnknownVirtualSlot0(int id) {
     for (int list = 0; list < 6; list++) {
         for (int i = 0; i < axisBindings[list].m_count; i++) {
             UnknownControlBinding* binding = axisBindings[list].Get(i);
-            if (binding->field_0x04 == id)
+            if (binding->bindingId == id)
                 axisBindings[list].Remove(binding);
         }
     }
@@ -47,30 +47,30 @@ void KeyboardDevice::UnknownVirtualSlot0(int id) {
 void KeyboardDevice::RepeatKeys(int list, int value) {
     for (int i = 0; i < axisBindings[list].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[list].Get(i);
-        binding->field_0x18 += g_TrackGame->frameTime;
-        binding->field_0x14 += g_TrackGame->frameTime;
-        if (UnknownVirtualSlot5(binding->field_0x0c, 0x3f, 0)) {
-            if (binding->field_0x14 - g_TrackGame->frameTime > binding->field_0x20) {
+        binding->secondKeyTimer += g_TrackGame->frameTime;
+        binding->firstKeyTimer += g_TrackGame->frameTime;
+        if (UnknownVirtualSlot5(binding->firstKey, 0x3f, 0)) {
+            if (binding->firstKeyTimer - g_TrackGame->frameTime > binding->repeatInterval) {
                 binding->Recenter();
-                binding->field_0x14 = 0;
+                binding->firstKeyTimer = 0;
             }
-            while (binding->field_0x14 > binding->field_0x20) {
-                binding->Adjust(-binding->field_0x1c);
-                binding->field_0x14 -= binding->field_0x20;
+            while (binding->firstKeyTimer > binding->repeatInterval) {
+                binding->Adjust(-binding->repeatStep);
+                binding->firstKeyTimer -= binding->repeatInterval;
             }
         }
-        if (UnknownVirtualSlot5(binding->field_0x10, 0x3f, 0)) {
-            if (binding->field_0x18 - g_TrackGame->frameTime > binding->field_0x20) {
+        if (UnknownVirtualSlot5(binding->secondKey, 0x3f, 0)) {
+            if (binding->secondKeyTimer - g_TrackGame->frameTime > binding->repeatInterval) {
                 binding->Recenter();
-                binding->field_0x18 = 0;
+                binding->secondKeyTimer = 0;
             }
-            while (binding->field_0x18 > binding->field_0x20) {
-                binding->Adjust(binding->field_0x1c);
-                binding->field_0x18 -= binding->field_0x20;
+            while (binding->secondKeyTimer > binding->repeatInterval) {
+                binding->Adjust(binding->repeatStep);
+                binding->secondKeyTimer -= binding->repeatInterval;
             }
         }
-        if (!UnknownVirtualSlot5(binding->field_0x0c, 0x3f, 0) &&
-            !UnknownVirtualSlot5(binding->field_0x10, 0x3f, 0))
+        if (!UnknownVirtualSlot5(binding->firstKey, 0x3f, 0) &&
+            !UnknownVirtualSlot5(binding->secondKey, 0x3f, 0))
             binding->Recenter();
     }
 }

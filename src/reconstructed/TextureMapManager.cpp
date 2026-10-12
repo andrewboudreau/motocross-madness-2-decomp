@@ -103,17 +103,17 @@ void UnknownTextureMapList::AppendList(UnknownTextureMapList* other) {
 
 // 0x00510bd0
 TextureMapManager::TextureMapManager() : GameObject(1) {
-    field_0x58 = 0;
-    field_0x5c = 0;
-    field_0x64 = 0;
-    field_0x60 = 0;
-    field_0x68 = 0;
+    debugKeyMode = 0;
+    scratchBuffer = 0;
+    scratchBufferSize = 0;
+    secondScratchBuffer = 0;
+    secondScratchBufferSize = 0;
     field_0x78 = 0;
-    field_0x74 = 0;
+    frameCount = 0;
     field_0x44.Init(4, 4);
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x70 = new(__FILE__, 125) BlockAllocator(0x30, 0x1800);
+    debugGroup = 0;
+    debugGroupIndex = 0;
+    regionAllocator = new(__FILE__, 125) BlockAllocator(0x30, 0x1800);
     memset(g_UnknownSharedMipSurfaces68a36c, 0, sizeof(g_UnknownSharedMipSurfaces68a36c));
     memset(g_UnknownSharedSurfaces68a394, 0, sizeof(g_UnknownSharedSurfaces68a394));
 }
@@ -121,12 +121,12 @@ TextureMapManager::TextureMapManager() : GameObject(1) {
 // 0x00510cf0: frees the scratch buffers and the block pool and releases the
 // shared texture surfaces.
 TextureMapManager::~TextureMapManager() {
-    if (field_0x5c)
-        DebugFree(field_0x5c, __FILE__, 143);
-    if (field_0x60)
-        DebugFree(field_0x60, __FILE__, 144);
-    if (field_0x70)
-        delete field_0x70;
+    if (scratchBuffer)
+        DebugFree(scratchBuffer, __FILE__, 143);
+    if (secondScratchBuffer)
+        DebugFree(secondScratchBuffer, __FILE__, 144);
+    if (regionAllocator)
+        delete regionAllocator;
     for (int i = 0; i < 10; i++) {
         if (g_UnknownSharedSurfaces68a394[i])
             g_UnknownSharedSurfaces68a394[i]->Release();
@@ -137,7 +137,7 @@ TextureMapManager::~TextureMapManager() {
 
 // 0x00510dd0
 int TextureMapManager::UnknownVirtualSlot10(float frameTime) {
-    field_0x74++;
+    frameCount++;
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
@@ -183,44 +183,44 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
     int handled = 0;
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
-    if (g_TrackGame->field_0x2d4_bit2 && field_0x3c) {
+    if (g_TrackGame->field_0x2d4_bit2 && debugGroup) {
         handled = 1;
         if (TestInputEvent(0x14, 0, event, 0x80)) {
-            if (++field_0x58 > 2)
-                field_0x58 = 0;
-            if (!field_0x3c->managedTextures.m_count && field_0x58 == 1)
-                field_0x58 = 2;
-            if (!field_0x3c->cachePages.m_count && field_0x58 == 2)
-                field_0x58 = 0;
+            if (++debugKeyMode > 2)
+                debugKeyMode = 0;
+            if (!debugGroup->managedTextures.m_count && debugKeyMode == 1)
+                debugKeyMode = 2;
+            if (!debugGroup->cachePages.m_count && debugKeyMode == 2)
+                debugKeyMode = 0;
         } else if (TestInputEvent(0x21, 0, event, 0x80)) {
-            field_0x3c->noRepacking ^= 1;
+            debugGroup->noRepacking ^= 1;
         } else if (TestInputEvent(0x1b, 0, event, 0x80)) {
-            if (field_0x58 == 1) {
-                if (++field_0x3c->textureCursor >= field_0x3c->managedTextures.m_count)
-                    field_0x3c->textureCursor = 0;
-            } else if (field_0x58 == 2) {
-                if (++field_0x3c->pageCursor >= field_0x3c->cachePages.m_count)
-                    field_0x3c->pageCursor = 0;
-            } else if (field_0x58 == 0) {
-                if (++field_0x40 >= field_0x44.m_count)
-                    field_0x40 = 0;
-                field_0x3c = field_0x44.Get(field_0x40);
+            if (debugKeyMode == 1) {
+                if (++debugGroup->textureCursor >= debugGroup->managedTextures.m_count)
+                    debugGroup->textureCursor = 0;
+            } else if (debugKeyMode == 2) {
+                if (++debugGroup->pageCursor >= debugGroup->cachePages.m_count)
+                    debugGroup->pageCursor = 0;
+            } else if (debugKeyMode == 0) {
+                if (++debugGroupIndex >= field_0x44.m_count)
+                    debugGroupIndex = 0;
+                debugGroup = field_0x44.Get(debugGroupIndex);
             }
         } else if (TestInputEvent(0x1a, 0, event, 0x80)) {
-            if (field_0x58 == 1) {
-                if (--field_0x3c->textureCursor < 0)
-                    field_0x3c->textureCursor = field_0x3c->managedTextures.m_count - 1;
-            } else if (field_0x58 == 2) {
-                if (--field_0x3c->pageCursor < 0)
-                    field_0x3c->pageCursor = field_0x3c->cachePages.m_count - 1;
-            } else if (field_0x58 == 0) {
-                if (--field_0x40 < 0)
-                    field_0x40 = field_0x44.m_count;
-                field_0x3c = field_0x44.Get(field_0x40);
+            if (debugKeyMode == 1) {
+                if (--debugGroup->textureCursor < 0)
+                    debugGroup->textureCursor = debugGroup->managedTextures.m_count - 1;
+            } else if (debugKeyMode == 2) {
+                if (--debugGroup->pageCursor < 0)
+                    debugGroup->pageCursor = debugGroup->cachePages.m_count - 1;
+            } else if (debugKeyMode == 0) {
+                if (--debugGroupIndex < 0)
+                    debugGroupIndex = field_0x44.m_count;
+                debugGroup = field_0x44.Get(debugGroupIndex);
             }
         } else if (TestInputEvent(0x15, 0, event, 0x80)) {
-            if (field_0x3c)
-                field_0x3c->WriteDebugReport();
+            if (debugGroup)
+                debugGroup->WriteDebugReport();
         } else {
             handled = 0;
         }
@@ -233,14 +233,14 @@ ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int a
     ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
     cache->SetPageCount(pages);
     field_0x44.Add(cache);
-    if (!field_0x3c)
-        field_0x3c = cache;
+    if (!debugGroup)
+        debugGroup = cache;
     return cache;
 }
 
 // 0x00511290
 int TextureMapManager::UnknownVirtualSlot18() {
-    for (TextureMap* texture = field_0x2c.First(); texture; texture = field_0x2c.Next())
+    for (TextureMap* texture = allTextures.First(); texture; texture = allTextures.Next())
         texture->UnknownVirtualSlot12();
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
@@ -306,7 +306,7 @@ void TextureMapManager::CountTextureMemory() {
     UnknownSurfaceCaps caps;
     unsigned long totalMemory;
     unsigned long freeMemory;
-    TextureMap* texture = field_0x2c.First();
+    TextureMap* texture = allTextures.First();
     memset(&caps, 0, sizeof(caps));
     caps.caps = 0x1000;
     int count32 = 0;
@@ -316,7 +316,7 @@ void TextureMapManager::CountTextureMemory() {
     int cost = 0;
     g_TrackGame->display->directDraw->GetAvailableVidMem(&caps, &totalMemory, &freeMemory);
     int bytes = 0;
-    for (; texture; texture = field_0x2c.Next()) {
+    for (; texture; texture = allTextures.Next()) {
         int kind = 0;
         if (static_cast<PCTextureMap*>(texture)->textureSurface) {
             if (texture->textureWidth == 32) {
@@ -350,40 +350,40 @@ void TextureMapManager::CountTextureMemory() {
 
 // 0x005112f0
 void TextureMapManager::RegisterTexture(TextureMap* texture) {
-    field_0x2c.Append(texture);
+    allTextures.Append(texture);
 }
 
 // 0x00511300
 void TextureMapManager::UnregisterTexture(TextureMap* texture) {
-    field_0x2c.Remove(texture);
+    allTextures.Remove(texture);
 }
 
 // 0x00511310
 void* TextureMapManager::GrowScratchBuffer(unsigned int bytes) {
-    if (field_0x64 < bytes) {
-        if (field_0x5c) {
-            DebugFree(field_0x5c, __FILE__, 497);
-            field_0x5c = 0;
+    if (scratchBufferSize < bytes) {
+        if (scratchBuffer) {
+            DebugFree(scratchBuffer, __FILE__, 497);
+            scratchBuffer = 0;
         }
-        field_0x5c = DebugMalloc(bytes, __FILE__, 500);
-        if (!field_0x5c)
+        scratchBuffer = DebugMalloc(bytes, __FILE__, 500);
+        if (!scratchBuffer)
             return 0;
-        field_0x64 = bytes;
+        scratchBufferSize = bytes;
     }
-    return field_0x5c;
+    return scratchBuffer;
 }
 
 // 0x00511370
 void* TextureMapManager::GrowSecondScratchBuffer(unsigned int bytes) {
-    if (field_0x68 < bytes) {
-        if (field_0x60) {
-            DebugFree(field_0x60, __FILE__, 512);
-            field_0x60 = 0;
+    if (secondScratchBufferSize < bytes) {
+        if (secondScratchBuffer) {
+            DebugFree(secondScratchBuffer, __FILE__, 512);
+            secondScratchBuffer = 0;
         }
-        field_0x60 = DebugMalloc(bytes, __FILE__, 515);
-        if (!field_0x60)
+        secondScratchBuffer = DebugMalloc(bytes, __FILE__, 515);
+        if (!secondScratchBuffer)
             return 0;
-        field_0x68 = bytes;
+        secondScratchBufferSize = bytes;
     }
-    return field_0x60;
+    return secondScratchBuffer;
 }

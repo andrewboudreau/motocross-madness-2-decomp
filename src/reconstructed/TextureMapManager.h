@@ -145,17 +145,17 @@ public:
     void* GrowScratchBuffer(unsigned int bytes);
     void* GrowSecondScratchBuffer(unsigned int bytes);
 
-    UnknownTextureMapList field_0x2c;         // every registered texture
-    ManagedTextureGroup* field_0x3c;          // cache selected by the debug keys
-    int field_0x40;                           // its index in +0x44
+    UnknownTextureMapList allTextures;        // +0x2c every registered texture
+    ManagedTextureGroup* debugGroup;          // +0x3c cache selected by the debug keys
+    int debugGroupIndex;                      // +0x40 its index in +0x44
     ContainerList<ManagedTextureGroup*> field_0x44;
-    int field_0x58;                           // debug key mode (0-2)
-    void* field_0x5c;                         // scratch buffer (0x00511310)
-    void* field_0x60;                         // scratch buffer (0x00511370)
-    unsigned int field_0x64;                  // +0x5c's size
-    unsigned int field_0x68;                  // +0x60's size
+    int debugKeyMode;                         // +0x58 debug key mode (0-2)
+    void* scratchBuffer;                      // +0x5c scratch buffer (0x00511310)
+    void* secondScratchBuffer;                // +0x60 scratch buffer (0x00511370)
+    unsigned int scratchBufferSize;           // +0x64 +0x5c's size
+    unsigned int secondScratchBufferSize;     // +0x68 +0x60's size
     int field_0x6c;
-    BlockAllocator* field_0x70;                 // 0x30-byte region blocks
-    int field_0x74;                           // frame count (slot 10)
+    BlockAllocator* regionAllocator;          // +0x70 0x30-byte region blocks
+    int frameCount;                           // +0x74 frame count (slot 10)
     int field_0x78;
 };

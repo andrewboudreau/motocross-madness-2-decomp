@@ -157,25 +157,25 @@ int __stdcall PCJoystickDevice::EnumAxisObjectsCallback(const UnknownObjectInsta
 void PCJoystickDevice::UpdateAxisRepeat(int axis, int value) {
     for (int i = 0; i < axisBindings[axis].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[axis].Get(i);
-        binding->field_0x18 += g_TrackGame->frameTime;
-        binding->field_0x14 += g_TrackGame->frameTime;
+        binding->secondKeyTimer += g_TrackGame->frameTime;
+        binding->firstKeyTimer += g_TrackGame->frameTime;
         if (axisValues[axis] < 16384.0f) {
-            if (binding->field_0x14 - g_TrackGame->frameTime > binding->field_0x20) {
+            if (binding->firstKeyTimer - g_TrackGame->frameTime > binding->repeatInterval) {
                 binding->Recenter();
-                binding->field_0x14 = 0;
+                binding->firstKeyTimer = 0;
             }
-            while (binding->field_0x14 > binding->field_0x20) {
-                binding->Adjust(-binding->field_0x1c);
-                binding->field_0x14 -= binding->field_0x20;
+            while (binding->firstKeyTimer > binding->repeatInterval) {
+                binding->Adjust(-binding->repeatStep);
+                binding->firstKeyTimer -= binding->repeatInterval;
             }
         } else if (axisValues[axis] > 49152.0f) {
-            if (binding->field_0x18 - g_TrackGame->frameTime > binding->field_0x20) {
+            if (binding->secondKeyTimer - g_TrackGame->frameTime > binding->repeatInterval) {
                 binding->Recenter();
-                binding->field_0x18 = 0;
+                binding->secondKeyTimer = 0;
             }
-            while (binding->field_0x18 > binding->field_0x20) {
-                binding->Adjust(binding->field_0x1c);
-                binding->field_0x18 -= binding->field_0x20;
+            while (binding->secondKeyTimer > binding->repeatInterval) {
+                binding->Adjust(binding->repeatStep);
+                binding->secondKeyTimer -= binding->repeatInterval;
             }
         } else {
             binding->Recenter();
