@@ -348,13 +348,13 @@ allocated:
         terrain = parent->terrain;
     UnknownVirtualSlot5(stream);
     if (a1 && field_0x2c) {
-        field_0x30 = new (__FILE__, 776) int[256];
+        childOffsets = new (__FILE__, 776) int[256];
         children = new (__FILE__, 777) GridNode*[256];
-        stream->UnknownFunction461340(terrain->field_0xc38 + field_0x2c, 0, 1);
-        stream->UnknownFunction461640(field_0x30, 0x400, 1);
+        stream->UnknownFunction461340(terrain->childTableOffset + field_0x2c, 0, 1);
+        stream->UnknownFunction461640(childOffsets, 0x400, 1);
         for (i = 0; i < 256; i++) {
-            if (field_0x30[i]) {
-                stream->UnknownFunction461340(terrain->field_0xc38 + field_0x30[i], 0, 1);
+            if (childOffsets[i]) {
+                stream->UnknownFunction461340(terrain->childTableOffset + childOffsets[i], 0, 1);
                 children[i] = UnknownVirtualSlot2(stream, a1, this, this->level - 1, this->shift - 4,
                                                   (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i,
                                                   boundsMin, boundsMax);
@@ -464,7 +464,7 @@ int DrawableGridNode::UnknownFunction47f210()
     int z = 0;
     int indexTotal = 0;
     int before = data->field_0x12a;
-    terrain->field_0xa4++;
+    terrain->bufferRebuilds++;
     int b = 0;
     int vertexTotal = 0;
     int bz;
@@ -733,10 +733,10 @@ float DrawableGridNode::UnknownFunction4815e0(int coarse)
     float distance = FastSqrt(dySq + near2);
     if (coarse)
         return distance;
-    terrain->field_0x98++;
+    terrain->detailUpdates++;
     data->field_0x126 = data->field_0x122;
     data->field_0x128 = data->field_0x124;
-    if (terrain->field_0x6c == 0) {
+    if (terrain->appliedDrawDistance == 0) {
         data->field_0x124 = 0;
     } else if (near2 == 0.0f) {
         data->field_0x124 = 0xffff;

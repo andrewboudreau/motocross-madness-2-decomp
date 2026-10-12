@@ -237,6 +237,15 @@ triangles (diagonal chosen by the parity of ix ^ iy) through
 `0x004a1300`; a hit inside the segment's box is written in parent units
 (`gridX << (level * 4)` added) and returns 1.
 
+## Field names
+
+`GridTerrain` takes `appliedDrawDistance` (+0x6c) and `canSinglePassDual`
+(+0xcac, printed as "CanSinglePassDual" by Terrain slot 14) from
+`src/krusty2/broadphase/Terrain.h`; the statistics counters (+0x90, +0x98,
++0xa4, +0xb0), the child-table stream offset (+0xc38), the close-up state
+flag (+0xcb4) and `GridNode::childOffsets` (+0x30) are named from the code
+that writes them (tier 3). The renames changed no calibration bytes.
+
 ## Function names
 
 Names given from each function's behaviour (string literals, D3D/DirectDraw

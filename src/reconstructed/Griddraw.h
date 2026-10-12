@@ -133,22 +133,22 @@ struct GridTerrain {
     float viewerX;                             // +0x60..+0x68 viewer position (0x00481cc0)
     float viewerY;
     float viewerZ;
-    int field_0x6c;
+    int appliedDrawDistance;                  // +0x6c (Terrain.h name)
     int field_0x70;
     float field_0x74;
     float field_0x78;                          // +0x78 distance factor (Terrain.h: ratio squared)
     unsigned char field_0x07c[0x88 - 0x7c];
     int indicesDrawn;                          // +0x88 indices drawn
     int verticesDrawn;                         // +0x8c vertices drawn
-    int field_0x90;                            // +0x90 incremented per vertex error test
+    int vertexErrorTests;                     // +0x90 incremented per vertex error test
     int field_0x94;
-    int field_0x98;                            // +0x98 incremented per detail update (0x004815e0)
+    int detailUpdates;                        // +0x98 incremented per detail update (0x004815e0)
     int field_0x9c;                            // +0x9c incremented by 0x00482dd0
     int field_0xa0;                            // +0xa0 incremented by 0x00482c90
-    int field_0xa4;                            // +0xa4 incremented per buffer rebuild (0x0047f840)
+    int bufferRebuilds;                       // +0xa4 incremented per buffer rebuild (0x0047f840)
     int verticesPinned;                        // +0xa8 vertices pinned by 0x00482760
     int verticesReleased;                      // +0xac vertices released by 0x00482760
-    int field_0xb0;                            // +0xb0 incremented per vertex test (0x00482a40)
+    int vertexTests;                          // +0xb0 incremented per vertex test (0x00482a40)
     int field_0xb4;                            // +0xb4 copied to the draw data's +0x130
     int field_0xb8[17 * 17];                   // +0xb8 cleared by the first node constructor
     int field_0x53c;                           // +0x53c compared with field_0xb8[i] (0x00482f00)
@@ -157,7 +157,7 @@ struct GridTerrain {
     unsigned char field_0xc18[0xc34 - 0xc18];
     unsigned char field_0xc34;                 // +0xc34 bit 0 copied into the node flags
     unsigned char field_0xc35[3];
-    int field_0xc38;                           // +0xc38 stream offset of the child tables
+    int childTableOffset;                     // +0xc38 stream offset of the child tables
     int field_0xc3c;
     GridVertexSink* vertexSink;                // +0xc40
     float transform[16];                       // +0xc44 transform
@@ -175,9 +175,9 @@ struct GridTerrain {
     };
     int qualityParamA;                         // +0xca4 detail limit for the close-up stage state
     int qualityParamB;
-    int field_0xcac;
+    int canSinglePassDual;                    // +0xcac Terrain slot 14 prints it as "CanSinglePassDual"
     int lowestQualityOverride;                 // +0xcb0
-    int field_0xcb4;                           // +0xcb4 close-up stage state set
+    int closeUpStateSet;                      // +0xcb4 close-up stage state set
 };
 
 // Per-node draw data (DebugCalloc'd 0x1c0 or 0x540 bytes by 0x0047e600;
@@ -261,7 +261,7 @@ public:
     unsigned char field_0x2a;
     unsigned char field_0x2b;
     int field_0x2c;
-    int* field_0x30;                           // +0x30 child stream offsets (0x400 bytes)
+    int* childOffsets;                        // +0x30 child stream offsets (0x400 bytes)
 };
 
 // 0x2c-byte records at GridNodeExtra::field_0x38 (one per 4 x 4 block);

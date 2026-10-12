@@ -175,7 +175,7 @@ DrawableGridNode::DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain
         g_gridEdgesBuilt = 1;
     }
     children = 0;
-    field_0x30 = 0;
+    childOffsets = 0;
     block = 0;
     childMask = 0;
     data = 0;
@@ -346,7 +346,7 @@ int DrawableGridNode::UnknownFunction47f840()
     int before = data->field_0x12a;
     int n;
     int m;
-    terrain->field_0xa4++;
+    terrain->bufferRebuilds++;
     g_gridOriginX = 0;
     g_gridOriginZ = 0;
     g_gridVertexCache.Reset(this);
@@ -791,15 +791,15 @@ void DrawableGridNode::UnknownFunction480fb0(int a5, GridVertex* vertices, int v
         }
     }
     if (terrain->qualityParamA < detail) {
-        if (terrain->field_0xcb4 == 0) {
+        if (terrain->closeUpStateSet == 0) {
             terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, D3DTFN_LINEAR);
             terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, D3DTFP_NONE);
-            terrain->field_0xcb4 = 1;
+            terrain->closeUpStateSet = 1;
         }
-    } else if (terrain->field_0xcb4 != 0) {
+    } else if (terrain->closeUpStateSet != 0) {
         terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, g_gridGameSettings->minFilter);
         terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, g_gridGameSettings->mipFilter);
-        terrain->field_0xcb4 = 0;
+        terrain->closeUpStateSet = 0;
     }
     terrain->ageManager->MarkUsed(&data->ageEntry);
     if (terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
@@ -934,12 +934,12 @@ void DrawableGridNode::UnknownFunction4824c0(UnknownTextureStream* stream, void*
         return;
     if (children == 0) {
         children = new (__FILE__, 3383) GridNode*[256];
-        field_0x30 = new (__FILE__, 3384) int[256];
-        stream->UnknownFunction461340(terrain->field_0xc38 + field_0x2c, 0, 1);
-        stream->UnknownFunction461640(field_0x30, 0x400, 1);
+        childOffsets = new (__FILE__, 3384) int[256];
+        stream->UnknownFunction461340(terrain->childTableOffset + field_0x2c, 0, 1);
+        stream->UnknownFunction461640(childOffsets, 0x400, 1);
         for (int i = 0; i < 256; i++) {
-            if (field_0x30[i]) {
-                stream->UnknownFunction461340(terrain->field_0xc38 + field_0x30[i], 0, 1);
+            if (childOffsets[i]) {
+                stream->UnknownFunction461340(terrain->childTableOffset + childOffsets[i], 0, 1);
                 children[i] = UnknownVirtualSlot2(stream, 0, this, level - 1, shift - 4,
                                                   (gridX + i % 16) * 16, (gridZ + i / 16) * 16, i, 0, 0);
             } else {
@@ -1043,7 +1043,7 @@ void DrawableGridNode::UnknownFunction482760()
 // bit 7: in use) and its neighbours when its state changes.
 void DrawableGridNode::UnknownFunction482a40(int x, int z)
 {
-    terrain->field_0xb0++;
+    terrain->vertexTests++;
     int i = g_gridRow17[z] + x;
     if (!UnknownFunction481cc0(x, z)) {
         data->field_0x000[i] |= 0x40;
@@ -1423,7 +1423,7 @@ int DrawableGridNode::UnknownFunction481cc0(int x, int z)
     float horizontal = dx * dx + dz * dz;
     float distance = dy * dy + horizontal;
     float limit = distance * terrain->field_0x78 * distance;
-    terrain->field_0x90++;
+    terrain->vertexErrorTests++;
     if (horizontal * error * error <= limit)
         return 1;
     return 0;
