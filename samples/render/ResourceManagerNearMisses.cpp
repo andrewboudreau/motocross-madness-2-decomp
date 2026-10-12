@@ -48,9 +48,9 @@ UnknownTextureStream* UnknownResourceManager::UnknownFunction4e9030(const char* 
                                             items[itemCount + i]->nameSize, __FILE__, 268);
                     archive->UnknownFunction461640(items[itemCount + i]->name,
                                                    items[itemCount + i]->nameSize, 1);
-                    archive->UnknownFunction461640(&items[itemCount + i]->field_0x18, 4, 1);
+                    archive->UnknownFunction461640(&items[itemCount + i]->offset, 4, 1);
                     archive->UnknownFunction461640(&items[itemCount + i]->field_0x1c, 4, 1);
-                    items[itemCount + i]->field_0x14 = archive;
+                    items[itemCount + i]->archive = archive;
                     if (MergeWithExisting(items[itemCount + i])) {
                         items[itemCount + i]->Release();
                         i--;

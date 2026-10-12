@@ -540,27 +540,27 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("QuadTree");
     UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) UnknownQuarryVisibility(1))
         ->UnknownFunction52d460(field_0x18, 0, 0,
-                                eventScene->field_0xa4->terrainWidth * eventScene->field_0xa4->terrainWidthScale * 256.0f,
-                                eventScene->field_0xa4->terrainBreadth * eventScene->field_0xa4->terrainBreadthScale * 256.0f,
+                                eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
+                                eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
                                 eventScene, 96.0f);
     if (!visibility)
         sprintf(text, "VisibilityQuadTree not created.\n");
     g_MemTagStack->Pop(0);
     UnknownSceneLight* shadowLight = 0;
     UnknownSceneLight* flareLight = 0;
-    for (int i = 0; i < eventScene->field_0xa8; i++) {
-        if (eventScene->field_0xac[i].emitsLight) {
-            if (eventScene->field_0xac[i].field_0x00) {
-                AppendChild(eventScene->field_0xac[i].field_0x00, -1);
-                if (eventScene->field_0xac[i].type == 6)
-                    ambientLight = eventScene->field_0xac[i].field_0x00;
-                else if (eventScene->field_0xac[i].type == 2 || eventScene->field_0xac[i].type == 4)
-                    sunLight = eventScene->field_0xac[i].field_0x00;
+    for (int i = 0; i < eventScene->lightCount; i++) {
+        if (eventScene->sceneLights[i].emitsLight) {
+            if (eventScene->sceneLights[i].emitter) {
+                AppendChild(eventScene->sceneLights[i].emitter, -1);
+                if (eventScene->sceneLights[i].type == 6)
+                    ambientLight = eventScene->sceneLights[i].emitter;
+                else if (eventScene->sceneLights[i].type == 2 || eventScene->sceneLights[i].type == 4)
+                    sunLight = eventScene->sceneLights[i].emitter;
             }
-            if (!shadowLight && eventScene->field_0xac[i].castsShadows)
-                shadowLight = &eventScene->field_0xac[i];
-            if (!flareLight && eventScene->field_0xac[i].hasLensFlare)
-                flareLight = &eventScene->field_0xac[i];
+            if (!shadowLight && eventScene->sceneLights[i].castsShadows)
+                shadowLight = &eventScene->sceneLights[i];
+            if (!flareLight && eventScene->sceneLights[i].hasLensFlare)
+                flareLight = &eventScene->sceneLights[i];
         }
     }
     if (shadowLight) {
@@ -571,17 +571,17 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         stream = new(__FILE__, 713) UnknownTextureStream((int)g_UnknownResourceManager572b44);
 
     g_MemTagStack->Push("Sky");
-    char* cubeFile = eventScene->field_0xa4->cubeFile;
+    char* cubeFile = eventScene->environment->cubeFile;
     if (cubeFile && *cubeFile) {
         eventFog = (new(__FILE__, 720) UnknownQuarryFog(1))
-                         ->UnknownFunction462680(field_0x18, eventScene->field_0xb0->color, eventScene->field_0xb0->visibility,
-                                                 eventScene->field_0xb0->haziness, 768.0f, 256.0f, 128.0f);
+                         ->UnknownFunction462680(field_0x18, eventScene->fog->color, eventScene->fog->visibility,
+                                                 eventScene->fog->haziness, 768.0f, 256.0f, 128.0f);
         if (!AppendChild((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
         if (eventFog)
             eventFog->UnknownFunction462db0(g_TrackGame->mode.videoSettings[4]);
         AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(field_0x18), -1);
-        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->field_0xa4->cubeFile, "rb", 0)) {
+        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->environment->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
             if (stream)
                 delete stream;
@@ -592,13 +592,13 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->UnknownFunction486a10(field_0x18, eventFog), -1);
-        eventFog->UnknownFunction4627a0(eventScene->field_0xb0->color, eventFog->field_0x38, eventFog->field_0x40);
+        eventFog->UnknownFunction4627a0(eventScene->fog->color, eventFog->field_0x38, eventFog->field_0x40);
     }
     if (progress)
         progress(0);
 
     g_MemTagStack->Push("Terrain");
-    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(field_0x44, eventScene->field_0xa4->terrainFile, "rb",
+    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(field_0x44, eventScene->environment->terrainFile, "rb",
                                                                    (int)terrainPath)) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
@@ -606,7 +606,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
                      ->UnknownFunction5059d0(field_0x18, field_0x44, 1, &terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
-                                             eventScene->field_0xa4->detailTexture, 0);
+                                             eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
         sprintf(text, "Terrain not created.\n");
         return 0;
@@ -625,15 +625,15 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("EcoSystem");
     if (!stream)
         stream = new(__FILE__, 848) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (strstr(eventScene->field_0xa4->ecosystemFile, ".est"))
-        strcpy(strstr(eventScene->field_0xa4->ecosystemFile, ".est"), ".esb");
-    if (stream && !g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->field_0xa4->ecosystemFile,
+    if (strstr(eventScene->environment->ecosystemFile, ".est"))
+        strcpy(strstr(eventScene->environment->ecosystemFile, ".est"), ".esb");
+    if (stream && !g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, eventScene->environment->ecosystemFile,
                                                                            "rb", 0)) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
         ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
                          ->UnknownFunction4594d0(field_0x18, g_TrackGame->field_0x3c, eventTerrain, lightManager,
-                                                 eventScene->field_0xa4, stream, 0x115c,
+                                                 eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.field_0x27f8.field_0x10,
                                                  g_TrackGame->mode.videoSettings[1]);
         if (!ecoSystem)
@@ -651,11 +651,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (particleManager)
         particleManager = ((UnknownQuarryParticles*)particleManager)
                          ->UnknownVirtualSlot27(field_0x18, g_TrackGame->field_0x3c,
-                                                eventScene->field_0xa4->particleTexture, lightManager);
+                                                eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!UnknownVirtualSlot27((int)&modelTextures))
         return 0;
-    g_TrackGame->mode.field_0x23a4 = eventScene->field_0xbc;
+    g_TrackGame->mode.field_0x23a4 = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
     raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)raceView)
                      ->UnknownFunction417ed0(field_0x18, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
@@ -668,20 +668,20 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Collision");
-    if (eventScene->field_0xb8) {
-        for (int i = 0; i < eventScene->field_0xb8->field_0x00; i++) {
-            UnknownSceneCaster* caster = &eventScene->field_0xb8->field_0x04[i];
+    if (eventScene->staticModels) {
+        for (int i = 0; i < eventScene->staticModels->casterCount; i++) {
+            UnknownSceneCaster* caster = &eventScene->staticModels->casters[i];
             if (caster->physics) {
                 UnknownTerrain* terrain = eventTerrain;
-                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x1f4 = terrain;
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x1f4 = terrain;
                 if (terrain)
-                    ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
-                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction435fe0();
-                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction432120(1);
-                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction4394d0(caster->field_0x08, 0x68);
-            } else if (caster->field_0x0c && ((D3DIMSoultreeObject*)caster->field_0x04)->CountNodes() == 1) {
-                ((UnknownQuarryCollision*)caster->field_0x0c)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)caster->field_0x0c)->UnknownFunction432120(1);
+                    ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->UnknownFunction435fe0();
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->UnknownFunction432120(1);
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->UnknownFunction4394d0(caster->physicsObject, 0x68);
+            } else if (caster->collisionObject && ((D3DIMSoultreeObject*)caster->model)->CountNodes() == 1) {
+                ((UnknownQuarryCollision*)caster->collisionObject)->UnknownFunction435fe0();
+                ((UnknownQuarryCollision*)caster->collisionObject)->UnknownFunction432120(1);
             }
         }
     }
@@ -694,10 +694,10 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210->Release();
         ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210 = 0;
     }
-    if (eventScene->field_0xb4) {
-        for (int i = 0; i < eventScene->field_0xb4->field_0x00; i++) {
-            if (eventScene->field_0xb4->field_0x04[i].field_0x00_bit3) {
-                UnknownSceneObject* character = eventScene->field_0xb4->field_0x04[i].field_0x04;
+    if (eventScene->animationTable) {
+        for (int i = 0; i < eventScene->animationTable->entryCount; i++) {
+            if (eventScene->animationTable->entries[i].keyFramed) {
+                UnknownSceneObject* character = eventScene->animationTable->entries[i].character;
                 if (character->field_0x210) {
                     ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction435fe0();
                     ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction432120(1);
@@ -721,14 +721,14 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                     }
                 }
             } else {
-                UnknownSceneAnimatedObject* car = eventScene->field_0xb4->field_0x04[i].field_0x08;
+                UnknownSceneAnimatedObject* car = eventScene->animationTable->entries[i].proceduralObject;
                 ((UnknownQuarryCar*)car)->field_0x20c = eventTerrain;
                 ((UnknownQuarryCollision*)car->field_0x38)->UnknownFunction439400(1);
-                for (int j = 0; j < eventScene->field_0xb4->field_0x00; j++) {
-                    UnknownSceneEntry* entry = &eventScene->field_0xb4->field_0x04[j];
+                for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
+                    UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
                     ((UnknownQuarryCollision*)car->field_0x38)
-                        ->UnknownFunction439410(entry->field_0x00_bit3 ? (UnknownQuarryCollision*)entry->field_0x04->field_0x210
-                                                                       : (UnknownQuarryCollision*)entry->field_0x08->field_0x3c);
+                        ->UnknownFunction439410(entry->keyFramed ? (UnknownQuarryCollision*)entry->character->field_0x210
+                                                                       : (UnknownQuarryCollision*)entry->proceduralObject->field_0x3c);
                 }
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction435fe0();
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction432120(1);

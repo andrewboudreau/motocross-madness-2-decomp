@@ -228,7 +228,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
     char colPath[0x104];
 
     models = 0;
-    field_0xb8 = 0;
+    staticModels = 0;
     int found = parameters.UnknownFunction4b78f0("StaticModels");
     if (sceneManager->field_0x38c && found) {
         if (!parameters.UnknownFunction4b7f10("NumberOfStaticModels", -1, &models)) {
@@ -240,10 +240,10 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
         if (models > 0) {
     UnknownTextureStream* stream =
         new(__FILE__, 1749) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    field_0xb8 = new(__FILE__, 1751) UnknownSceneBuffer;
-    field_0xb8->field_0x00 = models;
-    field_0xb8->field_0x04 = new(__FILE__, 1753) UnknownSceneCaster[field_0xb8->field_0x00];
-    for (int i = 0; i < field_0xb8->field_0x00; i = next) {
+    staticModels = new(__FILE__, 1751) UnknownSceneBuffer;
+    staticModels->casterCount = models;
+    staticModels->casters = new(__FILE__, 1753) UnknownSceneCaster[staticModels->casterCount];
+    for (int i = 0; i < staticModels->casterCount; i = next) {
         if (i % interval == interval - 1 && progress)
             progress(0);
         next = i + 1;
@@ -274,7 +274,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             ReadVector(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
             ReadVector(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
         }
-        field_0xb8->field_0x04[i].field_0x0c = 0;
+        staticModels->casters[i].collisionObject = 0;
         parameters.UnknownFunction4b7f10("PhysicsObject", 0, &physics);
         if (physics) {
             parameters.UnknownFunction4b7f10("NumberOfCollisionPoints", 0, &points);
@@ -292,9 +292,9 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, field_0x88, 1),
                                   -1);
-            field_0xb8->field_0x04[i].field_0x08 = object;
-            field_0xb8->field_0x04[i].field_0x04 = (ShadowCaster*)(D3DIMSoultreeObject*)object;
-            field_0xb8->field_0x04[i].physics = 1;
+            staticModels->casters[i].physicsObject = object;
+            staticModels->casters[i].model = (ShadowCaster*)(D3DIMSoultreeObject*)object;
+            staticModels->casters[i].physics = 1;
             if (points > 0) {
                 for (int p = 0; p < points; p++) {
                     sprintf(key, "CollisionPoint%d", p + 1);
@@ -366,42 +366,42 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             }
             }
         } else {
-            field_0xb8->field_0x04[i].field_0x08 = 0;
+            staticModels->casters[i].physicsObject = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
-            field_0xb8->field_0x04[i].field_0x04 = (ShadowCaster*)object;
+            staticModels->casters[i].model = (ShadowCaster*)object;
             AppendChild(object->UnknownVirtualSlot9(field_0x18, sltPath, (int)lights, a4, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
-            strncpy(field_0xb8->field_0x04[i].fileName, sltPath, count);
-            field_0xb8->field_0x04[i].fileName[count] = 0;
-            ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fc630(position);
-            ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->SetAxesPtr(&look, &up, 1, 0);
+            strncpy(staticModels->casters[i].fileName, sltPath, count);
+            staticModels->casters[i].fileName[count] = 0;
+            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->UnknownFunction4fc630(position);
+            ((D3DIMSoultreeObject*)staticModels->casters[i].model)->SetAxesPtr(&look, &up, 1, 0);
             parameters.UnknownFunction4b7f10("Collision", 1, &collision);
-            field_0xb8->field_0x04[i].field_0x0c = 0;
+            staticModels->casters[i].collisionObject = 0;
             if (collision && !stadium
-                && ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->CountNodes() == 1) {
+                && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
                 g_MemTagStack->Push("Collision");
-                field_0xb8->field_0x04[i].field_0x0c = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
-                field_0xb8->field_0x04[i].field_0x0c->UnknownFunction4320f0(field_0x18, 1, 0, 1);
-                field_0xb8->field_0x04[i].field_0x0c->field_0x60 =
-                    (D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04;
+                staticModels->casters[i].collisionObject = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
+                staticModels->casters[i].collisionObject->UnknownFunction4320f0(field_0x18, 1, 0, 1);
+                staticModels->casters[i].collisionObject->field_0x60 =
+                    (D3DIMSoultreeObject*)staticModels->casters[i].model;
                 if (!colPath[0])
-                    field_0xb8->field_0x04[i].field_0x0c->UnknownFunction432720(
-                        (D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04, 0, 0, 0, 0);
+                    staticModels->casters[i].collisionObject->UnknownFunction432720(
+                        (D3DIMSoultreeObject*)staticModels->casters[i].model, 0, 0, 0, 0);
                 else
-                    field_0xb8->field_0x04[i].field_0x0c->UnknownFunction432800(
-                        (D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04, colPath);
-                field_0xb8->field_0x04[i].field_0x0c->UnknownFunction435fe0();
-                ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)
-                    ->AppendChild(field_0xb8->field_0x04[i].field_0x0c, -1);
+                    staticModels->casters[i].collisionObject->UnknownFunction432800(
+                        (D3DIMSoultreeObject*)staticModels->casters[i].model, colPath);
+                staticModels->casters[i].collisionObject->UnknownFunction435fe0();
+                ((D3DIMSoultreeObject*)staticModels->casters[i].model)
+                    ->AppendChild(staticModels->casters[i].collisionObject, -1);
                 g_MemTagStack->Push("Scene");
             }
-            field_0xb8->field_0x04[i].physics = 0;
+            staticModels->casters[i].physics = 0;
         }
         parameters.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
-        field_0xb8->field_0x04[i].useLighting = useLighting;
-        ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)
-            ->UnknownFunction4444c0(field_0xb8->field_0x04[i].useLighting);
+        staticModels->casters[i].useLighting = useLighting;
+        ((D3DIMSoultreeObject*)staticModels->casters[i].model)
+            ->UnknownFunction4444c0(staticModels->casters[i].useLighting);
         if (auralScape) {
             parameters.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
             if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
@@ -411,7 +411,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                     (new(__FILE__, 2015)
                          SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
                         ->UnknownFunction4029f0(field_0x18, sound, "",
-                                                (UnknownVehiclePart*)field_0xb8->field_0x04[i].field_0x04,
+                                                (UnknownVehiclePart*)staticModels->casters[i].model,
                                                 params, flags, oneShotDistance, randomTriggerPercent, 0,
                                                 force2D);
                 AppendChild(emitter, -1);
@@ -491,23 +491,23 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             return 0;
         }
         if (animations > 0) {
-    field_0xb4 = new(__FILE__, 2178) UnknownSceneTable;
-    field_0xb4->field_0x00 = animations;
+    animationTable = new(__FILE__, 2178) UnknownSceneTable;
+    animationTable->entryCount = animations;
     UnknownFunction4de580("Animations", "NumberOfAnimations", animations);
-    field_0xb4->field_0x04 = new(__FILE__, 2181) UnknownSceneEntry[animations];
-    for (i = 0; i < field_0xb4->field_0x00; i = next) {
+    animationTable->entries = new(__FILE__, 2181) UnknownSceneEntry[animations];
+    for (i = 0; i < animationTable->entryCount; i = next) {
         if (i % interval == interval - 1 && progress)
             progress(0);
-        field_0xb4->field_0x04[i].field_0x00_bit0 = 0;
+        animationTable->entries[i].field_0x00_bit0 = 0;
         next = i + 1;
         sprintf(name, "Animation%d", next);
         parameters.UnknownFunction4b78f0(name);
         if (!parameters.UnknownFunction4b7ec0("AnimationType", "", text, 0x40)) {
             sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
             UnknownFunction464e80(message);
-            field_0xb4->field_0x04[i].field_0x00_bit3 = 1;
+            animationTable->entries[i].keyFramed = 1;
         } else if (!_strnicmp(text, "Procedural", 3)) {
-            field_0xb4->field_0x04[i].field_0x00_bit3 = 0;
+            animationTable->entries[i].keyFramed = 0;
             if (!parameters.UnknownFunction4b7ec0("VUE", "", vue, 0x40)) {
                 sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "VUE", name, scenePath);
                 UnknownFunction464e80(message);
@@ -545,26 +545,26 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             else
                 UnknownFunction4de580(name, "NumberOfTires", tires);
         } else {
-            field_0xb4->field_0x04[i].field_0x00_bit3 = 1;
+            animationTable->entries[i].keyFramed = 1;
         }
-        field_0xb4->field_0x04[i].field_0x00_bit5 = 0;
-        if (field_0xb4->field_0x04[i].field_0x00_bit3 && !parameters.UnknownFunction4b7ec0("MCF", "", file, 0x104)) {
+        animationTable->entries[i].field_0x00_bit5 = 0;
+        if (animationTable->entries[i].keyFramed && !parameters.UnknownFunction4b7ec0("MCF", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, scenePath);
             UnknownFunction464e80(message);
             return 0;
         }
-        if (!field_0xb4->field_0x04[i].field_0x00_bit3 && !parameters.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
+        if (!animationTable->entries[i].keyFramed && !parameters.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", name, scenePath);
             UnknownFunction464e80(message);
             return 0;
         }
         sprintf(sltPath, "%s\\%s", "Res", file);
-        if (field_0xb4->field_0x04[i].field_0x00_bit3)
+        if (animationTable->entries[i].keyFramed)
             ResolveSltPath(file);
         int length = strcspn(file, ".");
         int count = length < 0x14 ? length : 0x14;
-        strncpy(field_0xb4->field_0x04[i].fileName, file, count);
-        field_0xb4->field_0x04[i].fileName[count] = 0;
+        strncpy(animationTable->entries[i].fileName, file, count);
+        animationTable->entries[i].fileName[count] = 0;
         length = strlen(file);
         int size = length > 0x103 ? 0x103 : length;
         strncpy(colPath, file, size);
@@ -576,11 +576,11 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)colPath))
             colPath[0] = 0;
         delete stream;
-        if (!ReadVector(&field_0xb4->field_0x04[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
-            ReadVector(&field_0xb4->field_0x04[i].position, name, "Offset", "0.0,0.0,0.0", 0, 0);
-        if (field_0xb4->field_0x04[i].field_0x00_bit3) {
+        if (!ReadVector(&animationTable->entries[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
+            ReadVector(&animationTable->entries[i].position, name, "Offset", "0.0,0.0,0.0", 0, 0);
+        if (animationTable->entries[i].keyFramed) {
             UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
-            field_0xb4->field_0x04[i].field_0x04 = character;
+            animationTable->entries[i].character = character;
             if (!AppendChild(character->UnknownFunction4319c0(field_0x18, sltPath, colPath, lights, a4, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
@@ -588,11 +588,11 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                 return 0;
             }
         }
-        if (!field_0xb4->field_0x04[i].field_0x00_bit3) {
+        if (!animationTable->entries[i].keyFramed) {
             UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
-            field_0xb4->field_0x04[i].field_0x08 = car;
+            animationTable->entries[i].proceduralObject = car;
             if (!AppendChild(car->UnknownVirtualSlot27(field_0x18, sltPath, colPath, lights, a4, 0, vuePath,
-                                                                 &field_0xb4->field_0x04[i].position, fps,
+                                                                 &animationTable->entries[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create procedural model from %s.\n\n", file);
@@ -612,21 +612,21 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             axes = 1;
         }
         parameters.UnknownFunction4b7f10("ExcludeFromCameraIteration", 0, &exclude);
-        field_0xb4->field_0x04[i].field_0x00_bit4 = exclude;
-        if (field_0xb4->field_0x04[i].field_0x00_bit3) {
+        animationTable->entries[i].field_0x00_bit4 = exclude;
+        if (animationTable->entries[i].keyFramed) {
             UnknownFunction4de580(name, "MCF", file);
-            field_0xb4->field_0x04[i].field_0x04->field_0x1a0->SetPosition(&field_0xb4->field_0x04[i].position);
+            animationTable->entries[i].character->field_0x1a0->SetPosition(&animationTable->entries[i].position);
             if (axes)
-                field_0xb4->field_0x04[i].field_0x04->field_0x1a0->SetAxesPtr(&look, &up, 1, 0);
-            field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4444c0(useLighting);
+                animationTable->entries[i].character->field_0x1a0->SetAxesPtr(&look, &up, 1, 0);
+            animationTable->entries[i].character->field_0x1a0->UnknownFunction4444c0(useLighting);
             parameters.UnknownFunction4b7f10("UseBlendedKeys", 1, &automatic);
-            field_0xb4->field_0x04[i].field_0x00_bit1 = automatic;
-            parameters.UnknownFunction4b7f10("NumberOfMotions", 0, &field_0xb4->field_0x04[i].motionCount);
-            field_0xb4->field_0x04[i].motions = 0;
-            field_0xb4->field_0x04[i].motionSequence = 0;
-            if (field_0xb4->field_0x04[i].motionCount > 0) {
-                field_0xb4->field_0x04[i].motions = new(__FILE__, 2357) void*[field_0xb4->field_0x04[i].motionCount];
-                for (int m = 0; m < field_0xb4->field_0x04[i].motionCount; m++) {
+            animationTable->entries[i].field_0x00_bit1 = automatic;
+            parameters.UnknownFunction4b7f10("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
+            animationTable->entries[i].motions = 0;
+            animationTable->entries[i].motionSequence = 0;
+            if (animationTable->entries[i].motionCount > 0) {
+                animationTable->entries[i].motions = new(__FILE__, 2357) void*[animationTable->entries[i].motionCount];
+                for (int m = 0; m < animationTable->entries[i].motionCount; m++) {
                     sprintf(key, "MotionToPlay%d", m + 1);
                     if (!parameters.UnknownFunction4b7ec0(key, "", motion, 0x10)) {
                         sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", key, name, scenePath);
@@ -634,37 +634,37 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                         return 0;
                     }
                     UnknownFunction4de580(name, key, motion);
-                    field_0xb4->field_0x04[i].motions[m] =
-                        field_0xb4->field_0x04[i].field_0x04->FindMotion(motion, 1);
+                    animationTable->entries[i].motions[m] =
+                        animationTable->entries[i].character->FindMotion(motion, 1);
                 }
                 if (parameters.UnknownFunction4b7ec0("MotionSequence", "", sequence, 0x40)) {
                     char* token = strtok(sequence, ",");
                     int j = 0;
                     parameters.UnknownFunction4b7ec0("NumberInSequence", "", number, 0x10);
-                    field_0xb4->field_0x04[i].sequenceLength = atoi(number);
-                    if (field_0xb4->field_0x04[i].sequenceLength) {
-                        field_0xb4->field_0x04[i].motionSequence =
-                            new(__FILE__, 2379) char[field_0xb4->field_0x04[i].sequenceLength];
-                        for (; token && j < field_0xb4->field_0x04[i].sequenceLength; j++) {
-                            field_0xb4->field_0x04[i].motionSequence[j] = atoi(token);
+                    animationTable->entries[i].sequenceLength = atoi(number);
+                    if (animationTable->entries[i].sequenceLength) {
+                        animationTable->entries[i].motionSequence =
+                            new(__FILE__, 2379) char[animationTable->entries[i].sequenceLength];
+                        for (; token && j < animationTable->entries[i].sequenceLength; j++) {
+                            animationTable->entries[i].motionSequence[j] = atoi(token);
                             token = strtok(0, ",");
                         }
                         parameters.UnknownFunction4b7f10("AutomaticSequence", 1, &automatic);
-                        field_0xb4->field_0x04[i].field_0x00_bit2 = automatic;
-                        field_0xb4->field_0x04[i].sequenceIndex = field_0xb4->field_0x04[i].motionSequence[0];
-                        if (field_0xb4->field_0x04[i].sequenceIndex >= field_0xb4->field_0x04[i].sequenceLength)
-                            field_0xb4->field_0x04[i].sequenceIndex = 0;
-                        field_0xb4->field_0x04[i].currentMotion = field_0xb4->field_0x04[i].sequenceIndex;
-                        RestartEntry(i, field_0xb4->field_0x04[i].sequenceIndex, 0, 0);
+                        animationTable->entries[i].field_0x00_bit2 = automatic;
+                        animationTable->entries[i].sequenceIndex = animationTable->entries[i].motionSequence[0];
+                        if (animationTable->entries[i].sequenceIndex >= animationTable->entries[i].sequenceLength)
+                            animationTable->entries[i].sequenceIndex = 0;
+                        animationTable->entries[i].currentMotion = animationTable->entries[i].sequenceIndex;
+                        RestartEntry(i, animationTable->entries[i].sequenceIndex, 0, 0);
                     } else {
-                        field_0xb4->field_0x04[i].sequenceIndex = 0;
+                        animationTable->entries[i].sequenceIndex = 0;
                         sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, scenePath);
                         UnknownFunction464e80(message);
                         return 0;
                     }
                 } else {
-                    field_0xb4->field_0x04[i].currentMotion = 0;
-                    field_0xb4->field_0x04[i].sequenceLength = 0;
+                    animationTable->entries[i].currentMotion = 0;
+                    animationTable->entries[i].sequenceLength = 0;
                     sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "MotionSequence", name, scenePath);
                     UnknownFunction464e80(message);
                     return 0;
@@ -672,12 +672,12 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             }
         } else {
             UnknownFunction4de580(name, "SLT", sltPath);
-            field_0xb4->field_0x04[i].motionCount = 1;
-            field_0xb4->field_0x04[i].field_0x08->field_0x34->UnknownFunction4444c0(useLighting);
+            animationTable->entries[i].motionCount = 1;
+            animationTable->entries[i].proceduralObject->field_0x34->UnknownFunction4444c0(useLighting);
             if (axes)
-                field_0xb4->field_0x04[i].field_0x08->field_0x34->SetAxesPtr(&look, &up, 1, 0);
+                animationTable->entries[i].proceduralObject->field_0x34->SetAxesPtr(&look, &up, 1, 0);
         }
-        if (field_0xb4->field_0x04[i].motionCount > 0) {
+        if (animationTable->entries[i].motionCount > 0) {
             if (auralScape) {
                 parameters.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
                 if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
@@ -685,10 +685,10 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                                           &oneShot, &force2D);
                     parameters.UnknownFunction4b7ec0("SoundAttachToObject", "", attach, 0x40);
                     UnknownSceneLodObject* node;
-                    if (field_0xb4->field_0x04[i].field_0x00_bit3)
-                        node = field_0xb4->field_0x04[i].field_0x04->field_0x1a0;
+                    if (animationTable->entries[i].keyFramed)
+                        node = animationTable->entries[i].character->field_0x1a0;
                     else
-                        node = field_0xb4->field_0x04[i].field_0x08->field_0x34;
+                        node = animationTable->entries[i].proceduralObject->field_0x34;
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
                              SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
@@ -708,12 +708,12 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         }
     }
     parameters.UnknownFunction4b78f0("Animations");
-    parameters.UnknownFunction4b7f10("NumberOfRandomSets", 0, &field_0xb4->randomSetCount);
-    if (field_0xb4->randomSetCount > 0) {
-        field_0xb4->randomSets = new(__FILE__, 2466) UnknownSceneEntry2[field_0xb4->randomSetCount];
-        for (i = 0; i < field_0xb4->randomSetCount; i = next) {
-            field_0xb4->randomSets[i].animationIndices = 0;
-            field_0xb4->randomSets[i].motionIndices = 0;
+    parameters.UnknownFunction4b7f10("NumberOfRandomSets", 0, &animationTable->randomSetCount);
+    if (animationTable->randomSetCount > 0) {
+        animationTable->randomSets = new(__FILE__, 2466) UnknownSceneEntry2[animationTable->randomSetCount];
+        for (i = 0; i < animationTable->randomSetCount; i = next) {
+            animationTable->randomSets[i].animationIndices = 0;
+            animationTable->randomSets[i].motionIndices = 0;
             next = i + 1;
             sprintf(setName, "RandomSet%d", next);
             if (!parameters.UnknownFunction4b78f0(setName)) {
@@ -728,12 +728,12 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             }
             char* token = strtok(list, ",");
             int j = 0;
-            field_0xb4->randomSets[i].entry = 0;
-            parameters.UnknownFunction4b7ec0("NumberInSequence", 0, (char*)&field_0xb4->randomSets[i].count, -1);
-            if (field_0xb4->randomSets[i].count) {
-                field_0xb4->randomSets[i].animationIndices = new(__FILE__, 2491) signed char[field_0xb4->randomSets[i].count];
-                field_0xb4->randomSets[i].motionIndices = new(__FILE__, 2492) signed char[field_0xb4->randomSets[i].count];
-                for (; token && j < field_0xb4->randomSets[i].count; j++) {
+            animationTable->randomSets[i].entry = 0;
+            parameters.UnknownFunction4b7ec0("NumberInSequence", 0, (char*)&animationTable->randomSets[i].count, -1);
+            if (animationTable->randomSets[i].count) {
+                animationTable->randomSets[i].animationIndices = new(__FILE__, 2491) signed char[animationTable->randomSets[i].count];
+                animationTable->randomSets[i].motionIndices = new(__FILE__, 2492) signed char[animationTable->randomSets[i].count];
+                for (; token && j < animationTable->randomSets[i].count; j++) {
                     automatic = strcspn(token, ".");
                     if (!automatic || automatic == (int)strlen(token)) {
                         sprintf(message, "\nInvalid Animation or Motion #%d in [%s] in %s.\n\n", j, setName,
@@ -742,20 +742,20 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                         return 0;
                     }
                     token[automatic] = 0;
-                    field_0xb4->randomSets[i].animationIndices[j] = atoi(token) - 1;
-                    field_0xb4->field_0x04[field_0xb4->randomSets[i].animationIndices[j]].field_0x00_bit0 = 1;
-                    if (field_0xb4->field_0x04[i].field_0x00_bit3)
-                        field_0xb4->field_0x04[field_0xb4->randomSets[i].animationIndices[j]].field_0x04->UnknownVirtualSlot4();
+                    animationTable->randomSets[i].animationIndices[j] = atoi(token) - 1;
+                    animationTable->entries[animationTable->randomSets[i].animationIndices[j]].field_0x00_bit0 = 1;
+                    if (animationTable->entries[i].keyFramed)
+                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].character->UnknownVirtualSlot4();
                     else
-                        field_0xb4->field_0x04[field_0xb4->randomSets[i].animationIndices[j]].field_0x08->UnknownVirtualSlot4();
-                    field_0xb4->randomSets[i].motionIndices[j] = atoi(token + automatic + 1) - 1;
+                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].proceduralObject->UnknownVirtualSlot4();
+                    animationTable->randomSets[i].motionIndices[j] = atoi(token + automatic + 1) - 1;
                     token = strtok(0, ",");
                 }
-                field_0xb4->randomSets[i].entry = field_0xb4->field_0x04;
+                animationTable->randomSets[i].entry = animationTable->entries;
             }
         }
     } else {
-        field_0xb4->randomSets = 0;
+        animationTable->randomSets = 0;
     }
     UnknownFunction464e80("");
     return 1;

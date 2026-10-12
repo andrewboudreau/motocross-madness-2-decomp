@@ -32,8 +32,8 @@ void ResourceItem::UnknownFunction4e8de0()
     name = (char*)DebugMalloc(1, __FILE__, 24);
     name[0] = 0;
     object = 0;
-    field_0x14 = 0;
-    field_0x18 = 0;
+    archive = 0;
+    offset = 0;
     field_0x1c = 0;
 }
 
@@ -87,16 +87,16 @@ int UnknownResourceManager::MergeWithExisting(ResourceItem* item)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(item->name, items[i]->name)) {
-            UnknownTextureStream* archive = items[i]->field_0x14;
+            UnknownTextureStream* archive = items[i]->archive;
             if (archive && archive->UnknownFunction4e9960())
                 return 0;
 
-            items[i]->field_0x18 = item->field_0x18;
+            items[i]->offset = item->offset;
             items[i]->field_0x1c = item->field_0x1c;
             ResourceItem* existing = items[i];
-            UnknownTextureStream* old = existing->field_0x14;
-            existing->field_0x14 = item->field_0x14;
-            if (old != item->field_0x14) {
+            UnknownTextureStream* old = existing->archive;
+            existing->archive = item->archive;
+            if (old != item->archive) {
                 if (!UnknownInlineArchiveUsed(old) && old)
                     delete old;
             }
@@ -112,7 +112,7 @@ void UnknownResourceManager::SetItemObject(void* entry, void* object)
     ResourceItem* item = (ResourceItem*)entry;
 
     item->object = object;
-    if (!object && !item->field_0x14)
+    if (!object && !item->archive)
         ReleaseItem(item);
 }
 
@@ -124,9 +124,9 @@ ResourceItem* UnknownResourceManager::FindItem(const char* name, int a)
 {
     for (int i = 0; i < itemCount; i++) {
         if (!_stricmp(items[i]->name, name)) {
-            UnknownTextureStream* archive = items[i]->field_0x14;
+            UnknownTextureStream* archive = items[i]->archive;
             if (archive && (a || archive->UnknownFunction4e9960()))
-                items[i]->field_0x14->UnknownFunction461340(items[i]->field_0x18, 0, 0);
+                items[i]->archive->UnknownFunction461340(items[i]->offset, 0, 0);
             return items[i];
         }
     }
@@ -176,9 +176,9 @@ int UnknownResourceManager::AddLooseFile(const char* name, const char* path)
                 (char*)DebugRealloc(items[itemCount]->name, items[itemCount]->nameSize,
                                     __FILE__, 420);
             strcpy(items[itemCount]->name, name);
-            items[itemCount]->field_0x18 = 0;
+            items[itemCount]->offset = 0;
             items[itemCount]->field_0x1c = 0;
-            items[itemCount]->field_0x14 = archive;
+            items[itemCount]->archive = archive;
             if (MergeWithExisting(items[itemCount])) {
                 items[itemCount]->Release();
                 return 1;
@@ -209,9 +209,9 @@ int UnknownResourceManager::AddObject(const char* name, void* object)
             (char*)DebugRealloc(items[itemCount]->name, items[itemCount]->nameSize,
                                 __FILE__, 478);
         strcpy(items[itemCount]->name, name);
-        items[itemCount]->field_0x18 = 0;
+        items[itemCount]->offset = 0;
         items[itemCount]->field_0x1c = 0;
-        items[itemCount]->field_0x14 = 0;
+        items[itemCount]->archive = 0;
         items[itemCount]->object = object;
         if (MergeWithExisting(items[itemCount]))
             items[itemCount]->Release();
@@ -229,7 +229,7 @@ int UnknownResourceManager::RemoveArchiveItems(UnknownTextureStream* archive)
     int i;
 
     for (i = 0; i < itemCount; i++) {
-        if (items[i]->field_0x14 == archive) {
+        if (items[i]->archive == archive) {
             used++;
             // Retail compares unsigned (`ja`): held by anyone but the table.
             if ((unsigned int)items[i]->GetRefCount() > 1)
@@ -245,7 +245,7 @@ int UnknownResourceManager::RemoveArchiveItems(UnknownTextureStream* archive)
             }
         }
         for (i = 0; i < itemCount; i++) {
-            if (items[i]->field_0x14 == archive && !items[i]->Release()) {
+            if (items[i]->archive == archive && !items[i]->Release()) {
                 items[i] = items[itemCount - 1];
                 items[itemCount - 1] = 0;
                 itemCount--;

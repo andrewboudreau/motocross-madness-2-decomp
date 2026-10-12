@@ -131,8 +131,8 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                 RegisterNode();
                 return this;
             }
-            ((UnknownTextureStream*)item->field_0x14)->UnknownFunction461340(item->field_0x18, 0, 0);
-            SoultreeVirtualSlot2((UnknownTextureStream*)item->field_0x14);
+            ((UnknownTextureStream*)item->archive)->UnknownFunction461340(item->offset, 0, 0);
+            SoultreeVirtualSlot2((UnknownTextureStream*)item->archive);
         } else {
             fnameLength = strlen(fname);
             length = fnameLength > 0x103 ? 0x103 : fnameLength;

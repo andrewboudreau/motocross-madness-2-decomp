@@ -661,17 +661,17 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 raceScene->ResolveSltPath(name);
                 model = localRacer->field_0x3bc;
             } else if (field_0x0b0 == 0) {
-                strncpy(name, raceScene->field_0xb8->field_0x04[field_0x0ac].fileName, 0x14);
+                strncpy(name, raceScene->staticModels->casters[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
-                model = (UnknownBikeRaceModel*)raceScene->field_0xb8->field_0x04[field_0x0ac].field_0x04;
+                model = (UnknownBikeRaceModel*)raceScene->staticModels->casters[field_0x0ac].model;
             } else {
-                strncpy(name, raceScene->field_0xb4->field_0x04[field_0x0ac].fileName, 0x14);
+                strncpy(name, raceScene->animationTable->entries[field_0x0ac].fileName, 0x14);
                 name[0x14] = 0;
-                UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[field_0x0ac];
-                if (entry->field_0x00_bit3) {
-                    model = ((UnknownBikeRaceRider*)entry->field_0x04)->field_0x1a0;
+                UnknownSceneEntry* entry = &raceScene->animationTable->entries[field_0x0ac];
+                if (entry->keyFramed) {
+                    model = ((UnknownBikeRaceRider*)entry->character)->field_0x1a0;
                 } else {
-                    model = (UnknownBikeRaceModel*)entry->field_0x08->field_0x34;
+                    model = (UnknownBikeRaceModel*)entry->proceduralObject->field_0x34;
                 }
             }
             do {
@@ -1052,10 +1052,10 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             if (UnknownFunction43caa0(0, 1, event, 0x80000000)) {
                 int picked = objectPicker->UnknownFunction4b04c0();
                 if (picked != 0) {
-                    if (raceScene->field_0xb8 != 0) {
-                        for (int i = 0; i < raceScene->field_0xb8->field_0x00; i++) {
+                    if (raceScene->staticModels != 0) {
+                        for (int i = 0; i < raceScene->staticModels->casterCount; i++) {
                             UnknownBikeRacePickCaster* caster =
-                                &((UnknownBikeRacePickCaster*)raceScene->field_0xb8->field_0x04)[i];
+                                &((UnknownBikeRacePickCaster*)raceScene->staticModels->casters)[i];
                             if (caster->field_0x00 & 1) {
                                 if (picked == caster->field_0x08->field_0x128) {
                                     UnknownFunctionCameraView()->field_0x390 = 1;
@@ -1071,17 +1071,17 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                             }
                         }
                     }
-                    if (raceScene->field_0xb4 != 0) {
-                        for (int i = 0; i < raceScene->field_0xb4->field_0x00; i++) {
-                            UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[i];
-                            if (entry->field_0x00_bit3) {
-                                if (picked == ((UnknownBikeRacePickCharacter*)entry->field_0x04)->field_0x210) {
+                    if (raceScene->animationTable != 0) {
+                        for (int i = 0; i < raceScene->animationTable->entryCount; i++) {
+                            UnknownSceneEntry* entry = &raceScene->animationTable->entries[i];
+                            if (entry->keyFramed) {
+                                if (picked == ((UnknownBikeRacePickCharacter*)entry->character)->field_0x210) {
                                     UnknownFunctionCameraView()->field_0x390 = 1;
                                     field_0x150 = i;
                                     NextCameraTarget(1, 0, 1);
                                     return 1;
                                 }
-                            } else if (picked == ((UnknownBikeRacePickObject*)entry->field_0x08)->field_0x3c) {
+                            } else if (picked == ((UnknownBikeRacePickObject*)entry->proceduralObject)->field_0x3c) {
                                 UnknownFunctionCameraView()->field_0x390 = 1;
                                 field_0x150 = i;
                                 NextCameraTarget(1, 0, 1);

@@ -163,33 +163,33 @@ int BikeRace::AimCamera(int caster) {
     if (caster) {
         field_0x0b0 = 0;
         field_0x0ac = field_0x154;
-        if (raceScene->field_0xb8 != 0 && raceScene->field_0xb8->field_0x00 > 0) {
+        if (raceScene->staticModels != 0 && raceScene->staticModels->casterCount > 0) {
             if (field_0x05c != 0) {
                 field_0x05c->ClearCasters();
             }
             UnknownFunctionCameraView()->UnknownFunctionTargetCaster(
-                raceScene->field_0xb8->field_0x04[field_0x154].field_0x04);
+                raceScene->staticModels->casters[field_0x154].model);
         } else {
             UnknownFunctionCameraView()->field_0x390 = 1;
         }
     } else {
         field_0x0b0 = 1;
         field_0x0ac = field_0x150;
-        if (raceScene->field_0xb4 != 0 && raceScene->field_0xb4->field_0x00 != 0) {
+        if (raceScene->animationTable != 0 && raceScene->animationTable->entryCount != 0) {
             if (field_0x05c != 0) {
                 field_0x05c->ClearCasters();
             }
-            UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[field_0x150];
-            if (entry->field_0x00_bit3) {
+            UnknownSceneEntry* entry = &raceScene->animationTable->entries[field_0x150];
+            if (entry->keyFramed) {
                 UnknownBikeRaceSceneCharacter* character =
-                    (UnknownBikeRaceSceneCharacter*)entry->field_0x04;
+                    (UnknownBikeRaceSceneCharacter*)entry->character;
                 if (character->field_0x25_bit0) {
                     UnknownFunctionCameraView()->UnknownFunctionTargetCharacter(character);
                 } else {
                     return 0;
                 }
             } else {
-                GameObject* object = (GameObject*)entry->field_0x08;
+                GameObject* object = (GameObject*)entry->proceduralObject;
                 if (((UnknownBikeRaceObjectFlags*)object)->field_0x25_bit0) {
                     UnknownFunctionCameraView()->UnknownFunctionTargetObject(object);
                 } else {
@@ -272,7 +272,7 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
     } else if (objects) {
         caster = 0;
         Scene* scene = raceScene;
-        if (scene->field_0xb4 == 0 || scene->field_0xb4->field_0x00 <= 0) {
+        if (scene->animationTable == 0 || scene->animationTable->entryCount <= 0) {
             UnknownFunctionCameraView()->field_0x390 = 1;
             return;
         }
@@ -285,19 +285,19 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 field_0x150--;
             }
             if (field_0x150 < 0) {
-                field_0x150 = scene->field_0xb4->field_0x00 - 1;
+                field_0x150 = scene->animationTable->entryCount - 1;
             }
-            if (field_0x150 >= scene->field_0xb4->field_0x00) {
+            if (field_0x150 >= scene->animationTable->entryCount) {
                 field_0x150 = 0;
             }
-            UnknownSceneEntry* entry = &scene->field_0xb4->field_0x04[field_0x150];
-            if (entry->field_0x00_bit3) {
-                if (((UnknownBikeRaceSceneCharacter*)entry->field_0x04)->field_0x25_bit0) {
+            UnknownSceneEntry* entry = &scene->animationTable->entries[field_0x150];
+            if (entry->keyFramed) {
+                if (((UnknownBikeRaceSceneCharacter*)entry->character)->field_0x25_bit0) {
                     hidden = entry->field_0x00_bit4;
                 } else {
                     hidden = 1;
                 }
-            } else if (((UnknownBikeRaceObjectFlags*)entry->field_0x08)->field_0x25_bit0) {
+            } else if (((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->field_0x25_bit0) {
                 hidden = entry->field_0x00_bit4;
             } else {
                 hidden = 1;
@@ -307,13 +307,13 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
                 if (view->field_0x384 != 0 || view->field_0x388 != 0) {
                     return;
                 }
-                entry = &scene->field_0xb4->field_0x04[field_0x150];
-                if (entry->field_0x00_bit3) {
-                    if (!((UnknownBikeRaceSceneCharacter*)entry->field_0x04)->field_0x25_bit0) {
+                entry = &scene->animationTable->entries[field_0x150];
+                if (entry->keyFramed) {
+                    if (!((UnknownBikeRaceSceneCharacter*)entry->character)->field_0x25_bit0) {
                         view->field_0x390 = 1;
                         return;
                     }
-                } else if (!((UnknownBikeRaceObjectFlags*)entry->field_0x08)->field_0x25_bit0) {
+                } else if (!((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->field_0x25_bit0) {
                     view->field_0x390 = 1;
                     return;
                 }
@@ -323,17 +323,17 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         } while (hidden);
     } else {
         caster = 1;
-        UnknownSceneBuffer* casters = raceScene->field_0xb8;
-        if (casters == 0 || casters->field_0x00 <= 0) {
+        UnknownSceneBuffer* casters = raceScene->staticModels;
+        if (casters == 0 || casters->casterCount <= 0) {
             UnknownFunctionCameraView()->field_0x390 = 1;
             return;
         }
         int old = field_0x154;
         field_0x154 = forward ? old + 1 : old - 1;
         if (field_0x154 < 0) {
-            field_0x154 = raceScene->field_0xb8->field_0x00 - 1;
+            field_0x154 = raceScene->staticModels->casterCount - 1;
         }
-        if (field_0x154 >= raceScene->field_0xb8->field_0x00) {
+        if (field_0x154 >= raceScene->staticModels->casterCount) {
             field_0x154 = 0;
         }
         if (old == field_0x154 && UnknownFunctionCameraView()->field_0x38c != 0) {
@@ -561,7 +561,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     switch (mode) {
     case 2:
     case 3: {
-        COPY_TEXT(path, raceScene->field_0xa4->terrainFile, 0x104);
+        COPY_TEXT(path, raceScene->environment->terrainFile, 0x104);
         strcpy(strrchr(path, '.'), ".tdf");
         UnknownTextureStream* stream =
             new(__FILE__, 0x193) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -634,7 +634,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 field_0x06c = (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("30SecMan.slt", &field_0x070);
                 if (field_0x06c) {
                     raceScene->RestartEntry(field_0x070, 0, 0, 0);
-                    raceScene->field_0xb4->field_0x04[field_0x070].field_0x00_bit5 = 1;
+                    raceScene->animationTable->entries[field_0x070].field_0x00_bit5 = 1;
                     if (field_0x06c->field_0x210) {
                         field_0x06c->field_0x210->Release();
                         field_0x06c->field_0x210 = 0;

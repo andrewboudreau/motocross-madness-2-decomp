@@ -56,9 +56,9 @@ struct UnknownCameraVehicle {
     Vector3 field_0x488;                 // 0x0052bc50 in vehicle mode
     Vector3 field_0x494;                 // 0x0052bac0 in vehicle mode
     unsigned char field_0x4a0[0x53c - 0x4a0];
-    UnknownCameraRider** field_0x53c;    // riders (VehicleCamera slot 35)
+    UnknownCameraRider** riders;              // +0x53c riders (VehicleCamera slot 35)
     int field_0x540;
-    int field_0x544;                     // rider count
+    int riderCount;                           // +0x544 rider count
     unsigned char field_0x548[0x56c - 0x548];
     int field_0x56c;                     // nonzero: look for a rider with +0x2a8 set
 
@@ -66,12 +66,12 @@ struct UnknownCameraVehicle {
     // when +0x56c asks for one, else the first rider.
     UnknownCameraRider* UnknownInlineRider() {
         if (field_0x56c) {
-            for (int i = 0; i < field_0x544; i++) {
-                if (field_0x53c[i]->field_0x2a8)
-                    return field_0x53c[i];
+            for (int i = 0; i < riderCount; i++) {
+                if (riders[i]->field_0x2a8)
+                    return riders[i];
             }
         }
-        return field_0x53c[0];
+        return riders[0];
     }
 };
 

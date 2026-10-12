@@ -88,12 +88,12 @@ struct UnknownSceneEntry {
     unsigned char field_0x00_bit0 : 1;
     unsigned char field_0x00_bit1 : 1;
     unsigned char field_0x00_bit2 : 1;
-    unsigned char field_0x00_bit3 : 1;    // key-framed character (else a procedural car)
+    unsigned char keyFramed : 1;              // +0x00 key-framed character (else a procedural car)
     unsigned char field_0x00_bit4 : 1;              // skipped by bikerace.cpp's camera (0x0041f1d0)
     unsigned char field_0x00_bit5 : 1;              // cleared by 0x004edfe0
     unsigned char field_0x01[3];
-    UnknownSceneObject* field_0x04;       // key-framed (bit 3)
-    UnknownSceneAnimatedObject* field_0x08; // procedural
+    UnknownSceneObject* character;            // +0x04 key-framed (bit 3)
+    UnknownSceneAnimatedObject* proceduralObject; // +0x08 procedural
     Vector3 position;                     // "Position" (or "Offset")
     int field_0x18;                       // 0x004eb040: the motion advance result
     int motionCount;                      // "NumberOfMotions" (1 for procedural entries)
@@ -118,8 +118,8 @@ struct UnknownSceneEntry2 {
 
 // Owned by Scene+0xb4; freed with its arrays by the destructor.
 struct UnknownSceneTable {
-    int field_0x00;                       // entry count ("NumberOfAnimations")
-    UnknownSceneEntry* field_0x04;
+    int entryCount;                           // +0x00 entry count ("NumberOfAnimations")
+    UnknownSceneEntry* entries;               // +0x04
     int randomSetCount;
     UnknownSceneEntry2* randomSets;
 };
@@ -138,16 +138,16 @@ struct UnknownSceneCaster {
     unsigned char physics : 1;            // bit 0: has a physics object
     unsigned char useLighting : 1;        // bit 1: "UseLighting"
     unsigned char field_0x01[3];
-    ShadowCaster* field_0x04;             // the model (a D3DIMSoultreeObject)
-    UnknownScenePhysicsObject* field_0x08;
-    UnknownSceneCollisionObject* field_0x0c;
+    ShadowCaster* model;                      // +0x04 the model (a D3DIMSoultreeObject)
+    UnknownScenePhysicsObject* physicsObject; // +0x08
+    UnknownSceneCollisionObject* collisionObject; // +0x0c
     char fileName[0x18];                      // +0x10 the model's file name, at most 0x14 characters
 };
 
 // Owned by Scene+0xb8: the shadow casters.
 struct UnknownSceneBuffer {
-    int field_0x00;                       // caster count
-    UnknownSceneCaster* field_0x04;
+    int casterCount;                          // +0x00 caster count
+    UnknownSceneCaster* casters;              // +0x04
 };
 
 // Minimal view of RTTI class D3DIMSoultreeShadow (0x48 bytes), declared in
@@ -172,7 +172,7 @@ struct UnknownSceneTextureInfo {
 // 0x8c-byte element of Scene::field_0xac, filled by 0x004eb570 from the
 // "Light<n>" sections. Names follow the section keys.
 struct UnknownSceneLight {
-    LightEmitter* field_0x00;             // the emitter 0x004efb20 creates
+    LightEmitter* emitter;                    // +0x00 the emitter 0x004efb20 creates
     int type;                             // "Type" keyword (0x00572c28 table: Undefined..AmbientNoise)
     unsigned long color;                  // "ColorRGB"
     Vector3 position;                     // "Position"
@@ -336,13 +336,13 @@ public:
     Vector3 podiumPosition;                          // "PodiumPosition"
     Vector3 podiumDirection;                         // "PodiumDirection"
     // QuarryStuntEvent.cpp reads +0xa4..+0xbc under their provisional names.
-    UnknownSceneEnvironment* field_0xa4;  // "Environment" section
-    int field_0xa8;                       // light count ("Lights" "NumberOfLights")
-    UnknownSceneLight* field_0xac;        // "Light<n>" sections
-    UnknownSceneFog* field_0xb0;          // "Fog" section
-    UnknownSceneTable* field_0xb4;        // "Animations" section (BikeRace.cpp reads it)
-    UnknownSceneBuffer* field_0xb8;       // "StaticModels" section
-    int field_0xbc;                       // "Sounds" "CrowdPresent"
+    UnknownSceneEnvironment* environment;     // +0xa4 "Environment" section
+    int lightCount;                           // +0xa8 light count ("Lights" "NumberOfLights")
+    UnknownSceneLight* sceneLights;           // +0xac "Light<n>" sections
+    UnknownSceneFog* fog;                     // +0xb0 "Fog" section
+    UnknownSceneTable* animationTable;        // +0xb4 "Animations" section (BikeRace.cpp reads it)
+    UnknownSceneBuffer* staticModels;         // +0xb8 "StaticModels" section
+    int crowdPresent;                         // +0xbc "Sounds" "CrowdPresent"
     int auralScape;                       // the AuralScape the sound emitters use
     SoundGroup* soundGroup;
     ContainerList<Sound*> sounds;

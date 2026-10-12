@@ -26,8 +26,8 @@ public:
     char* name;                           // +0x08 name (DebugMalloc'd)
     int nameSize;                         // +0x0c name size including the NUL
     void* object;                         // +0x10 object loaded from the entry
-    UnknownTextureStream* field_0x14;     // archive holding the file
-    int field_0x18;                       // offset of the file in it
+    UnknownTextureStream* archive;            // +0x14 archive holding the file
+    int offset;                               // +0x18 offset of the file in it
     int field_0x1c;                       // read after the offset (size?)
 };
 
@@ -62,7 +62,7 @@ public:
     int UnknownInlineArchiveUsed(UnknownTextureStream* archive)
     {
         for (int i = 0; i < itemCount; i++) {
-            if (archive == items[i]->field_0x14)
+            if (archive == items[i]->archive)
                 return 1;
         }
         return 0;

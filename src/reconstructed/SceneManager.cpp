@@ -287,16 +287,16 @@ void UnknownTrackGameObject574::UnknownFunction4ea390(char* name, char* scene, i
 Scene::Scene(int flags) : GameObject(flags)
 {
     defaultStartPosition = Vector3(0.0f, 0.0f, 0.0f);
-    field_0xa8 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
-    field_0xa4 = 0;
-    field_0xb4 = 0;
-    field_0xb8 = 0;
+    lightCount = 0;
+    sceneLights = 0;
+    fog = 0;
+    environment = 0;
+    animationTable = 0;
+    staticModels = 0;
     sceneName[0] = 0;
     scenePath[0] = 0;
     defaultStartDirection = Vector3(0.0f, 0.0f, 0.0f);
-    field_0xbc = 0;
+    crowdPresent = 0;
     sounds.Init(4, 4);
     auralScape = 0;
     soundGroup = 0;
@@ -324,41 +324,41 @@ Scene::~Scene()
 {
     if (logFile)
         fclose(logFile);
-    if (field_0xac)
-        delete field_0xac;
-    if (field_0xb0)
-        delete field_0xb0;
-    if (field_0xa4)
-        delete field_0xa4;
-    if (field_0xb4) {
-        if (field_0xb4->field_0x00 > 0) {
-            for (int i = 0; i < field_0xb4->field_0x00; i++) {
-                if (field_0xb4->field_0x04[i].field_0x00_bit3 &&
-                    field_0xb4->field_0x04[i].motionCount > 0) {
-                    if (field_0xb4->field_0x04[i].motions)
-                        delete field_0xb4->field_0x04[i].motions;
-                    if (field_0xb4->field_0x04[i].motionSequence)
-                        delete field_0xb4->field_0x04[i].motionSequence;
+    if (sceneLights)
+        delete sceneLights;
+    if (fog)
+        delete fog;
+    if (environment)
+        delete environment;
+    if (animationTable) {
+        if (animationTable->entryCount > 0) {
+            for (int i = 0; i < animationTable->entryCount; i++) {
+                if (animationTable->entries[i].keyFramed &&
+                    animationTable->entries[i].motionCount > 0) {
+                    if (animationTable->entries[i].motions)
+                        delete animationTable->entries[i].motions;
+                    if (animationTable->entries[i].motionSequence)
+                        delete animationTable->entries[i].motionSequence;
                 }
             }
-            delete field_0xb4->field_0x04;
+            delete animationTable->entries;
         }
-        if (field_0xb4->randomSetCount > 0) {
-            for (int i = 0; i < field_0xb4->randomSetCount; i++) {
-                if (field_0xb4->randomSets[i].count > 0) {
-                    if (field_0xb4->randomSets[i].animationIndices)
-                        delete field_0xb4->randomSets[i].animationIndices;
-                    if (field_0xb4->randomSets[i].motionIndices)
-                        delete field_0xb4->randomSets[i].motionIndices;
+        if (animationTable->randomSetCount > 0) {
+            for (int i = 0; i < animationTable->randomSetCount; i++) {
+                if (animationTable->randomSets[i].count > 0) {
+                    if (animationTable->randomSets[i].animationIndices)
+                        delete animationTable->randomSets[i].animationIndices;
+                    if (animationTable->randomSets[i].motionIndices)
+                        delete animationTable->randomSets[i].motionIndices;
                 }
             }
-            delete field_0xb4->randomSets;
+            delete animationTable->randomSets;
         }
-        delete field_0xb4;
+        delete animationTable;
     }
-    if (field_0xb8) {
-        delete field_0xb8->field_0x04;
-        delete field_0xb8;
+    if (staticModels) {
+        delete staticModels->casters;
+        delete staticModels;
     }
 }
 
@@ -389,19 +389,19 @@ UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
 {
     char name[0x104];
 
-    if (!field_0xb4) {
+    if (!animationTable) {
         if (index)
             *index = 0;
         return 0;
     }
     _splitpath(path, 0, 0, name, 0);
-    for (int i = 0; i < field_0xb4->field_0x00; i++) {
-        if (field_0xb4->field_0x04[i].field_0x00_bit3 &&
-            !_strnicmp(field_0xb4->field_0x04[i].field_0x04->field_0x1a4, name,
-                       strcspn(field_0xb4->field_0x04[i].field_0x04->field_0x1a4, "."))) {
+    for (int i = 0; i < animationTable->entryCount; i++) {
+        if (animationTable->entries[i].keyFramed &&
+            !_strnicmp(animationTable->entries[i].character->field_0x1a4, name,
+                       strcspn(animationTable->entries[i].character->field_0x1a4, "."))) {
             if (index)
                 *index = i;
-            return field_0xb4->field_0x04[i].field_0x04;
+            return animationTable->entries[i].character;
         }
     }
     if (index)
@@ -412,15 +412,15 @@ UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
 // 0x004eafd0
 void Scene::UnknownFunction4eafd0(int index)
 {
-    if (field_0xb4 && index < field_0xb4->field_0x00)
-        field_0xb4->field_0x04[index].field_0x00_bit2 = 1;
+    if (animationTable && index < animationTable->entryCount)
+        animationTable->entries[index].field_0x00_bit2 = 1;
 }
 
 // 0x004eb000
 void Scene::UnknownFunction4eb000(float time)
 {
-    if (field_0xb4) {
-        for (int i = 0; i < field_0xb4->field_0x00; i++)
+    if (animationTable) {
+        for (int i = 0; i < animationTable->entryCount; i++)
             RestartEntry(i, time, 1, 0);
     }
 }
@@ -431,34 +431,34 @@ void Scene::UnknownFunction4eb000(float time)
 // gets the time and, unless the time was clamped, one slot 10 step.
 int Scene::RestartEntry(int index, float time, int force, int motion)
 {
-    if (field_0xb4) {
+    if (animationTable) {
         int running = 1;
         if (time < 0.0001f) {
             running = 0;
             time = 0.0001f;
         }
-        UnknownSceneEntry* entry = &field_0xb4->field_0x04[index];
-        if (entry->field_0x00_bit3) {
-            UnknownSceneObject* object = entry->field_0x04;
+        UnknownSceneEntry* entry = &animationTable->entries[index];
+        if (entry->keyFramed) {
+            UnknownSceneObject* object = entry->character;
             if (object->field_0x0c || force) {
                 if (motion >= entry->sequenceLength)
                     entry->sequenceIndex = 0;
                 else
                     entry->sequenceIndex = motion;
-                field_0xb4->field_0x04[index].currentMotion =
-                    field_0xb4->field_0x04[index].motionSequence[field_0xb4->field_0x04[index].sequenceIndex] - 1;
+                animationTable->entries[index].currentMotion =
+                    animationTable->entries[index].motionSequence[animationTable->entries[index].sequenceIndex] - 1;
                 object->SetMotion(
-                    field_0xb4->field_0x04[index].motions[field_0xb4->field_0x04[index].currentMotion]);
+                    animationTable->entries[index].motions[animationTable->entries[index].currentMotion]);
                 object->field_0x10 = 0;
-                field_0xb4->field_0x04[index].field_0x18 = object->AdvanceMotion(time, 0, 0);
+                animationTable->entries[index].field_0x18 = object->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {
-            UnknownSceneAnimatedObject* object = (UnknownSceneAnimatedObject*)entry->field_0x08;
+            UnknownSceneAnimatedObject* object = (UnknownSceneAnimatedObject*)entry->proceduralObject;
             object->field_0x194 = time;
             object->field_0x5c = running;
             if (running)
-                ((UnknownSceneAnimatedObject*)field_0xb4->field_0x04[index].field_0x08)
+                ((UnknownSceneAnimatedObject*)animationTable->entries[index].proceduralObject)
                     ->UnknownVirtualSlot10(0.0001f);
         }
     }
@@ -612,7 +612,7 @@ int Scene::ReadLight(int index)
     sprintf(section, "Light%d", index + 1);
     int found = parameters.UnknownFunction4b78f0(section);
     if (sceneManager->field_0x38c && found) {
-        UnknownSceneLight* light = &field_0xac[index];
+        UnknownSceneLight* light = &sceneLights[index];
         parameters.UnknownFunction4b7ec0("Type", "BLANK", text, 0x100);
         if (FindKeyword(&light->type, text, s_lightTypes)) {
             UnknownFunction4de580(section, "Type", text);
@@ -693,7 +693,7 @@ int Scene::ReadLight(int index)
         UnknownFunction4de580(section, "Type", text);
         return 0;
     }
-    UnknownSceneLight* light = &field_0xac[index];
+    UnknownSceneLight* light = &sceneLights[index];
     if (index == 0) {
         light->type = 6;
         light->color = 0x5a5a5a;
@@ -733,10 +733,10 @@ int Scene::ReadFog()
     float visibility;
     float haziness;
 
-    field_0xb0 = new(__FILE__, 1392) UnknownSceneFog;
-    field_0xb0->color = 0x8080c0;
-    field_0xb0->visibility = 1.0f;
-    field_0xb0->haziness = 0.5f;
+    fog = new(__FILE__, 1392) UnknownSceneFog;
+    fog->color = 0x8080c0;
+    fog->visibility = 1.0f;
+    fog->haziness = 0.5f;
     int found = parameters.UnknownFunction4b78f0("Fog");
     if (!sceneManager->field_0x38c || !found) {
         UnknownFunction464e80("No Scene File or no fog data:  Using DEFAULT Fog\n");
@@ -750,8 +750,8 @@ int Scene::ReadFog()
                               "Invalid value, must be between 0.0 and 1.0, using default 1.0");
         visibility = 1.0f;
     }
-    field_0xb0->visibility = visibility;
-    UnknownFunction4de580("Fog", "Visibility", field_0xb0->visibility);
+    fog->visibility = visibility;
+    UnknownFunction4de580("Fog", "Visibility", fog->visibility);
     if (!parameters.UnknownFunction4b7f40("Haziness", 0.5f, &haziness)) {
         UnknownFunction4de580("Fog", "Haziness", "NOT FOUND using default 0.5");
     } else if (visibility < 0.0f || visibility > 1.0f) {
@@ -759,15 +759,15 @@ int Scene::ReadFog()
                               "Invalid value, must be between 0.0 and 1.0, using default 0.5");
         haziness = 0.5f;
     }
-    field_0xb0->haziness = haziness;
-    UnknownFunction4de580("Fog", "Haziness", field_0xb0->haziness);
-    if (!ReadColor(&field_0xb0->color, "Fog", "ColorRGB", "", 1, 0))
+    fog->haziness = haziness;
+    UnknownFunction4de580("Fog", "Haziness", fog->haziness);
+    if (!ReadColor(&fog->color, "Fog", "ColorRGB", "", 1, 0))
         return 0;
     UnknownFunction464e80("");
     return 1;
 }
 
-// 0x004ebfc0: allocates field_0xa4 and reads the "Environment" section
+// 0x004ebfc0: allocates environment (+0xa4) and reads the "Environment" section
 // (file names relative to `directory`, the cube file to `cubeDirectory`),
 // the eight terrain zones and the four reverb zones. Retail reports the
 // terrain file as the ecosystem file and the particle texture as the detail
@@ -783,76 +783,76 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         UnknownFunction464e80(text);
         return 0;
     }
-    field_0xa4 = new(__FILE__, 1456) UnknownSceneEnvironment;
-    sprintf(field_0xa4->terrainFile, "%s\\%s", directory, sceneManager->field_0x2cc);
-    sprintf(field_0xa4->ecosystemFile, "%s\\%s", directory, sceneManager->field_0x28c);
+    environment = new(__FILE__, 1456) UnknownSceneEnvironment;
+    sprintf(environment->terrainFile, "%s\\%s", directory, sceneManager->field_0x2cc);
+    sprintf(environment->ecosystemFile, "%s\\%s", directory, sceneManager->field_0x28c);
     if (sceneManager->field_0x30c[0])
-        sprintf(field_0xa4->cubeFile, "%s\\%s", cubeDirectory, sceneManager->field_0x30c);
+        sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, sceneManager->field_0x30c);
     else
-        field_0xa4->cubeFile[0] = 0;
-    strncpy(field_0xa4->particleTexture, "dirtpart.tga", 0x3f);
-    strncpy(field_0xa4->detailTexture, "graynoise.tga", 0x3f);
-    field_0xa4->startGateScale = 1.0f;
+        environment->cubeFile[0] = 0;
+    strncpy(environment->particleTexture, "dirtpart.tga", 0x3f);
+    strncpy(environment->detailTexture, "graynoise.tga", 0x3f);
+    environment->startGateScale = 1.0f;
     if (parameters.UnknownFunction4b7ec0("TerrainFile", "", text, 0x100)) {
-        sprintf(field_0xa4->terrainFile, "%s\\%s", directory, text);
+        sprintf(environment->terrainFile, "%s\\%s", directory, text);
         strncpy(sceneManager->field_0x2cc, text, 0x3f);
         strcpy(strrchr(text, '.'), ".est");
-        sprintf(field_0xa4->ecosystemFile, "%s\\%s", directory, text);
+        sprintf(environment->ecosystemFile, "%s\\%s", directory, text);
         strncpy(sceneManager->field_0x28c, text, 0x3f);
-        UnknownFunction4de580("Environment", "TerrainFile", field_0xa4->terrainFile);
-        UnknownFunction4de580("Environment", "EcosystemFile", field_0xa4->terrainFile);
+        UnknownFunction4de580("Environment", "TerrainFile", environment->terrainFile);
+        UnknownFunction4de580("Environment", "EcosystemFile", environment->terrainFile);
     } else {
-        UnknownFunction4de580("Environment", "TerrainFile(Default)", field_0xa4->terrainFile);
-        UnknownFunction4de580("Environment", "EcosystemFile(Default)", field_0xa4->ecosystemFile);
+        UnknownFunction4de580("Environment", "TerrainFile(Default)", environment->terrainFile);
+        UnknownFunction4de580("Environment", "EcosystemFile(Default)", environment->ecosystemFile);
         if (sceneManager->field_0x38c)
             return 0;
     }
     if (parameters.UnknownFunction4b7ec0("EcosystemFile", "", text, 0x100)) {
-        sprintf(field_0xa4->ecosystemFile, "%s\\%s", directory, text);
+        sprintf(environment->ecosystemFile, "%s\\%s", directory, text);
         strncpy(sceneManager->field_0x28c, text, 0x3f);
-        UnknownFunction4de580("Environment", "EcosystemFile", field_0xa4->terrainFile);
+        UnknownFunction4de580("Environment", "EcosystemFile", environment->terrainFile);
     }
     if (parameters.UnknownFunction4b7ec0("CubeFile", "", text, 0x104)) {
-        sprintf(field_0xa4->cubeFile, "%s\\%s", cubeDirectory, text);
+        sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, text);
         strncpy(sceneManager->field_0x30c, text, 0x3f);
-        UnknownFunction4de580("Environment", "CubeFile", field_0xa4->cubeFile);
+        UnknownFunction4de580("Environment", "CubeFile", environment->cubeFile);
     }
     if (parameters.UnknownFunction4b7ec0("ParticleTextureMapName", "", text, 0x100)) {
-        strncpy(field_0xa4->particleTexture, text, 0x3f);
-        UnknownFunction4de580("Environment", "ParticleTextureMapName", field_0xa4->particleTexture);
+        strncpy(environment->particleTexture, text, 0x3f);
+        UnknownFunction4de580("Environment", "ParticleTextureMapName", environment->particleTexture);
     } else if (sceneManager->field_0x38c) {
         UnknownFolded4de580("Environment", "ParticleTextureMapName", "dirtpart.tga");
     }
     if (parameters.UnknownFunction4b7ec0("DetailTextureMapName", "", text, 0x100)) {
-        strncpy(field_0xa4->detailTexture, text, 0x3f);
-        UnknownFunction4de580("Environment", "DetailTextureMapName", field_0xa4->particleTexture);
+        strncpy(environment->detailTexture, text, 0x3f);
+        UnknownFunction4de580("Environment", "DetailTextureMapName", environment->particleTexture);
     } else if (sceneManager->field_0x38c) {
         UnknownFolded4de580("Environment", "DetailTextureMapName", "graynoise.tga");
     }
-    if (!parameters.UnknownFunction4b7f40("TerrainWidthScale", 3.0f, &field_0xa4->terrainWidthScale))
-        UnknownFunction4de580("Environment", "TerrainWidthScale(Default)", field_0xa4->terrainWidthScale);
+    if (!parameters.UnknownFunction4b7f40("TerrainWidthScale", 3.0f, &environment->terrainWidthScale))
+        UnknownFunction4de580("Environment", "TerrainWidthScale(Default)", environment->terrainWidthScale);
     else
-        UnknownFunction4de580("Environment", "TerrainWidthScale", field_0xa4->terrainWidthScale);
-    if (!parameters.UnknownFunction4b7f40("TerrainBreadthScale", 3.0f, &field_0xa4->terrainBreadthScale))
-        UnknownFunction4de580("Environment", "TerrainBreadthScale(Default)", field_0xa4->terrainBreadthScale);
+        UnknownFunction4de580("Environment", "TerrainWidthScale", environment->terrainWidthScale);
+    if (!parameters.UnknownFunction4b7f40("TerrainBreadthScale", 3.0f, &environment->terrainBreadthScale))
+        UnknownFunction4de580("Environment", "TerrainBreadthScale(Default)", environment->terrainBreadthScale);
     else
-        UnknownFunction4de580("Environment", "TerrainBreadthScale", field_0xa4->terrainBreadthScale);
-    if (!parameters.UnknownFunction4b7f40("TerrainWidth", 5.0f, &field_0xa4->terrainWidth))
-        UnknownFunction4de580("Environment", "TerrainWidth(Default)", field_0xa4->terrainWidth);
+        UnknownFunction4de580("Environment", "TerrainBreadthScale", environment->terrainBreadthScale);
+    if (!parameters.UnknownFunction4b7f40("TerrainWidth", 5.0f, &environment->terrainWidth))
+        UnknownFunction4de580("Environment", "TerrainWidth(Default)", environment->terrainWidth);
     else
-        UnknownFunction4de580("Environment", "TerrainWidth", field_0xa4->terrainWidth);
-    if (!parameters.UnknownFunction4b7f40("TerrainBreadth", 5.0f, &field_0xa4->terrainBreadth))
-        UnknownFunction4de580("Environment", "TerrainBreadth(Default)", field_0xa4->terrainBreadth);
+        UnknownFunction4de580("Environment", "TerrainWidth", environment->terrainWidth);
+    if (!parameters.UnknownFunction4b7f40("TerrainBreadth", 5.0f, &environment->terrainBreadth))
+        UnknownFunction4de580("Environment", "TerrainBreadth(Default)", environment->terrainBreadth);
     else
-        UnknownFunction4de580("Environment", "TerrainBreadth", field_0xa4->terrainBreadth);
-    if (!parameters.UnknownFunction4b7f40("StartGateScale", 1.0f, &field_0xa4->startGateScale))
-        UnknownFunction4de580("Environment", "StartGateScale(Default)", field_0xa4->startGateScale);
+        UnknownFunction4de580("Environment", "TerrainBreadth", environment->terrainBreadth);
+    if (!parameters.UnknownFunction4b7f40("StartGateScale", 1.0f, &environment->startGateScale))
+        UnknownFunction4de580("Environment", "StartGateScale(Default)", environment->startGateScale);
     else
-        UnknownFunction4de580("Environment", "StartGateScale", field_0xa4->startGateScale);
+        UnknownFunction4de580("Environment", "StartGateScale", environment->startGateScale);
     found = parameters.UnknownFunction4b78f0("TerrainZone1");
-    field_0xa4->surfaceFriction[0] = 1.0f;
-    field_0xa4->surfaceDrag[0] = 1.0f;
-    field_0xa4->surfaceTraction[0] = 1.0f;
+    environment->surfaceFriction[0] = 1.0f;
+    environment->surfaceDrag[0] = 1.0f;
+    environment->surfaceTraction[0] = 1.0f;
     if (!found) {
         sprintf(text, "\nCannot find Dust/Dirt data for [%s] in %s.\n\n", "TerrainZone1", scenePath);
         UnknownFunction464e80(text);
@@ -860,9 +860,9 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         int dust;
         int dirt;
         parameters.UnknownFunction4b7f10("GenerateDust", 1, &dust);
-        field_0xa4->generateDust[0] = dust;
+        environment->generateDust[0] = dust;
         parameters.UnknownFunction4b7f10("GenerateDirt", 1, &dirt);
-        field_0xa4->generateDirt[0] = dirt;
+        environment->generateDirt[0] = dirt;
     }
     int i;
     for (i = 2; i < 9; i++) {
@@ -872,54 +872,54 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
         if (!parameters.UnknownFunction4b78f0(zone)) {
             sprintf(text, "\nCannot find data for [%s] in %s.\n\n", zone, scenePath);
             UnknownFunction464e80(text);
-            field_0xa4->surfaceFriction[i - 1] = 1.0f;
-            field_0xa4->surfaceDrag[i - 1] = 1.0f;
-            field_0xa4->surfaceTraction[i - 1] = 1.0f;
-            field_0xa4->generateDust[i - 1] = i != 8;
-            field_0xa4->generateDirt[i - 1] = i != 8;
+            environment->surfaceFriction[i - 1] = 1.0f;
+            environment->surfaceDrag[i - 1] = 1.0f;
+            environment->surfaceTraction[i - 1] = 1.0f;
+            environment->generateDust[i - 1] = i != 8;
+            environment->generateDirt[i - 1] = i != 8;
             continue;
         }
-        if (!parameters.UnknownFunction4b7f40("SurfaceFriction", 1.0f, &field_0xa4->surfaceFriction[i - 1])) {
+        if (!parameters.UnknownFunction4b7f40("SurfaceFriction", 1.0f, &environment->surfaceFriction[i - 1])) {
             UnknownFunction4de580(zone, "SurfaceFriction", "NOT FOUND");
-        } else if (field_0xa4->surfaceFriction[i - 1] > 2.0f) {
-            field_0xa4->surfaceFriction[i - 1] = 2.0f;
-        } else if (field_0xa4->surfaceFriction[i - 1] < 0.05f) {
-            field_0xa4->surfaceFriction[i - 1] = 0.05f;
+        } else if (environment->surfaceFriction[i - 1] > 2.0f) {
+            environment->surfaceFriction[i - 1] = 2.0f;
+        } else if (environment->surfaceFriction[i - 1] < 0.05f) {
+            environment->surfaceFriction[i - 1] = 0.05f;
         }
-        UnknownFunction4de580(zone, "SurfaceFriction", field_0xa4->surfaceFriction[i - 1]);
-        if (!parameters.UnknownFunction4b7f40("SurfaceDrag", 1.0f, &field_0xa4->surfaceDrag[i - 1])) {
+        UnknownFunction4de580(zone, "SurfaceFriction", environment->surfaceFriction[i - 1]);
+        if (!parameters.UnknownFunction4b7f40("SurfaceDrag", 1.0f, &environment->surfaceDrag[i - 1])) {
             UnknownFunction4de580(zone, "SurfaceDrag", "NOT FOUND");
-        } else if (field_0xa4->surfaceDrag[i - 1] > 2.0f) {
-            field_0xa4->surfaceDrag[i - 1] = 2.0f;
-        } else if (field_0xa4->surfaceDrag[i - 1] < 0.05f) {
-            field_0xa4->surfaceDrag[i - 1] = 0.05f;
+        } else if (environment->surfaceDrag[i - 1] > 2.0f) {
+            environment->surfaceDrag[i - 1] = 2.0f;
+        } else if (environment->surfaceDrag[i - 1] < 0.05f) {
+            environment->surfaceDrag[i - 1] = 0.05f;
         }
-        UnknownFunction4de580(zone, "SurfaceDrag", field_0xa4->surfaceDrag[i - 1]);
-        if (!parameters.UnknownFunction4b7f40("SurfaceTraction", 1.0f, &field_0xa4->surfaceTraction[i - 1])) {
+        UnknownFunction4de580(zone, "SurfaceDrag", environment->surfaceDrag[i - 1]);
+        if (!parameters.UnknownFunction4b7f40("SurfaceTraction", 1.0f, &environment->surfaceTraction[i - 1])) {
             UnknownFunction4de580(zone, "SurfaceTraction", "NOT FOUND");
-        } else if (field_0xa4->surfaceTraction[i - 1] > 2.0f) {
-            field_0xa4->surfaceTraction[i - 1] = 2.0f;
-        } else if (field_0xa4->surfaceTraction[i - 1] < 0.05f) {
-            field_0xa4->surfaceTraction[i - 1] = 0.05f;
+        } else if (environment->surfaceTraction[i - 1] > 2.0f) {
+            environment->surfaceTraction[i - 1] = 2.0f;
+        } else if (environment->surfaceTraction[i - 1] < 0.05f) {
+            environment->surfaceTraction[i - 1] = 0.05f;
         }
-        UnknownFunction4de580(zone, "SurfaceTraction", field_0xa4->surfaceTraction[i - 1]);
+        UnknownFunction4de580(zone, "SurfaceTraction", environment->surfaceTraction[i - 1]);
         parameters.UnknownFunction4b7f10("GenerateDust", 1, &dust);
-        field_0xa4->generateDust[i - 1] = dust;
-        UnknownFunction4de580(zone, "GenerateDust", (int)field_0xa4->generateDust[i - 1]);
+        environment->generateDust[i - 1] = dust;
+        UnknownFunction4de580(zone, "GenerateDust", (int)environment->generateDust[i - 1]);
         parameters.UnknownFunction4b7f10("GenerateDirt", 1, &dirt);
-        field_0xa4->generateDirt[i - 1] = dirt;
-        UnknownFunction4de580(zone, "GenerateDirt", (int)field_0xa4->generateDirt[i - 1]);
+        environment->generateDirt[i - 1] = dirt;
+        UnknownFunction4de580(zone, "GenerateDirt", (int)environment->generateDirt[i - 1]);
     }
     UnknownFunction464e80("");
     for (i = 0; i < 4; i++)
-        field_0xa4->enviroID[i] = 0;
+        environment->enviroID[i] = 0;
     for (i = 0; i < 4; i++) {
         sprintf(zone, "ReverbZone%d", i + 1);
         if (!parameters.UnknownFunction4b78f0(zone)) {
             sprintf(text, "\nCannot find ReverbZone data for [%s] in %s.\n\n", zone, scenePath);
             UnknownFunction464e80(text);
         } else {
-            parameters.UnknownFunction4b7b30("EnviroID", 0, field_0xa4->enviroID[i]);
+            parameters.UnknownFunction4b7b30("EnviroID", 0, environment->enviroID[i]);
         }
     }
     return 1;
@@ -977,10 +977,10 @@ void Scene::ReadStadium()
 // adds it as a child.
 void Scene::UnknownFunction4edf20(ProjectedShadow* shadow, int flags)
 {
-    if (shadow && field_0xb8) {
-        for (int i = 0; i < field_0xb8->field_0x00; i++)
+    if (shadow && staticModels) {
+        for (int i = 0; i < staticModels->casterCount; i++)
             AppendChild((new(__FILE__, 2136) D3DIMSoultreeShadow(flags))
-                                      ->Attach((int)field_0x18, field_0xb8->field_0x04[i].field_0x04,
+                                      ->Attach((int)field_0x18, staticModels->casters[i].model,
                                                shadow),
                                   -1);
     }
@@ -1007,8 +1007,8 @@ int Scene::ReadSounds()
     if (!sceneManager->field_0x38c)
         return 0;
     parameters.UnknownFunction4b78f0("Sounds");
-    parameters.UnknownFunction4b7f10("CrowdPresent", 0, &field_0xbc);
-    UnknownFunction4de580("Sounds", "CrowdPresent", field_0xbc);
+    parameters.UnknownFunction4b7f10("CrowdPresent", 0, &crowdPresent);
+    UnknownFunction4de580("Sounds", "CrowdPresent", crowdPresent);
     UnknownFunction464e80("");
     parameters.UnknownFunction4b7f10("NumStaticSounds", 0, &count);
     if (count > 0) {
@@ -1150,28 +1150,28 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
     if (!ReadEnvironment(sceneManager->field_0x44, cubeDirectory))
         return 0;
     parameters.UnknownFunction4b78f0("Lights");
-    parameters.UnknownFunction4b7f10("NumberOfLights", -1, &field_0xa8);
-    UnknownFunction4de580("Lights", "NumberOfLights", field_0xa8);
+    parameters.UnknownFunction4b7f10("NumberOfLights", -1, &lightCount);
+    UnknownFunction4de580("Lights", "NumberOfLights", lightCount);
     UnknownFunction464e80("");
-    if (!sceneManager->field_0x38c || field_0xa8 == -1)
-        field_0xa8 = 2;
-    field_0xac = new(__FILE__, 2784) UnknownSceneLight[field_0xa8];
-    for (int i = 0; i < field_0xa8; i++) {
-        field_0xac[i].field_0x00 = 0;
+    if (!sceneManager->field_0x38c || lightCount == -1)
+        lightCount = 2;
+    sceneLights = new(__FILE__, 2784) UnknownSceneLight[lightCount];
+    for (int i = 0; i < lightCount; i++) {
+        sceneLights[i].emitter = 0;
         if (!ReadLight(i))
             return 0;
-        if (field_0xac[i].emitsLight) {
-            const char* flare = field_0xac[i].hasLensFlare ? field_0xac[i].lensFlareTexture : 0;
-            int camera = field_0xac[i].hasLensFlare ? (int)g_TrackGame->field_0x3c : 0;
-            field_0xac[i].field_0x00 =
+        if (sceneLights[i].emitsLight) {
+            const char* flare = sceneLights[i].hasLensFlare ? sceneLights[i].lensFlareTexture : 0;
+            int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->field_0x3c : 0;
+            sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
-                    ->UnknownFunction49e230(field_0x18, field_0xac[i].type, field_0xac[i].color,
-                                            &field_0xac[i].position, field_0xac[i].field_0x34,
-                                            field_0xac[i].range, field_0xac[i].showDebugSphere, 0, camera,
+                    ->UnknownFunction49e230(field_0x18, sceneLights[i].type, sceneLights[i].color,
+                                            &sceneLights[i].position, sceneLights[i].field_0x34,
+                                            sceneLights[i].range, sceneLights[i].showDebugSphere, 0, camera,
                                             (int)flare, i);
-            if (!field_0xac[i].field_0x00)
+            if (!sceneLights[i].emitter)
                 return 0;
-            lights->UnknownFunction49e470(field_0xac[i].field_0x00);
+            lights->UnknownFunction49e470(sceneLights[i].emitter);
         }
     }
     ReadFog();
@@ -1192,29 +1192,29 @@ void Scene::UnknownFunction4eff30(int level)
 {
     g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8
                                                               : g_UnknownGlobal574428;
-    if (field_0xb4) {
+    if (animationTable) {
         int i;
-        for (i = 0; i < field_0xb4->field_0x00; i++) {
-            if (field_0xb4->field_0x04[i].field_0x00_bit3)
-                field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4451e0(level);
+        for (i = 0; i < animationTable->entryCount; i++) {
+            if (animationTable->entries[i].keyFramed)
+                animationTable->entries[i].character->field_0x1a0->UnknownFunction4451e0(level);
             else
-                ((UnknownSceneAnimatedObject*)field_0xb4->field_0x04[i].field_0x08)
+                ((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)
                     ->field_0x34->UnknownFunction4451e0(level);
         }
-        for (i = 0; i < field_0xb4->randomSetCount; i++) {
-            UnknownSceneEntry* entry = field_0xb4->randomSets[i].entry;
-            if (entry->field_0x00_bit3)
-                entry->field_0x04->field_0x1a0->UnknownFunction4451e0(level);
+        for (i = 0; i < animationTable->randomSetCount; i++) {
+            UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
+            if (entry->keyFramed)
+                entry->character->field_0x1a0->UnknownFunction4451e0(level);
             else
-                ((UnknownSceneAnimatedObject*)entry->field_0x08)->field_0x34->UnknownFunction4451e0(level);
+                ((UnknownSceneAnimatedObject*)entry->proceduralObject)->field_0x34->UnknownFunction4451e0(level);
         }
     }
-    if (field_0xb8) {
-        for (int i = 0; i < field_0xb8->field_0x00; i++) {
-            if (field_0xb8->field_0x04[i].field_0x04) {
-                ((UnknownSceneLodObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4451e0(level);
-                if (!field_0xb8->field_0x04[i].useLighting)
-                    ((UnknownSceneLodObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4444c0(0);
+    if (staticModels) {
+        for (int i = 0; i < staticModels->casterCount; i++) {
+            if (staticModels->casters[i].model) {
+                ((UnknownSceneLodObject*)staticModels->casters[i].model)->UnknownFunction4451e0(level);
+                if (!staticModels->casters[i].useLighting)
+                    ((UnknownSceneLodObject*)staticModels->casters[i].model)->UnknownFunction4444c0(0);
             }
         }
     }
