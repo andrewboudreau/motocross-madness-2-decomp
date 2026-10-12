@@ -21,7 +21,7 @@ class UnknownDriveList {
 public:
     UnknownDriveList();                                   // called at 0x004676a0 (folded)
     ~UnknownDriveList();                                  // 0x0044a000
-    int UnknownFunction449e60();                          // 0x00449e60: rescans
+    int Rescan();                          // 0x00449e60: rescans
     // 0x00449e70: lists the fixed and CD-ROM drives; 0 when out of memory.
     int UnknownFunction449e70();
     // 0x0044a010: the index of the drive whose volume is `volumeName` (and
@@ -59,7 +59,7 @@ public:
     virtual int UnknownVirtualSlot1();
     void SetDirectory(const char* directory);     // 0x0044a1d0
     void SetPattern(const char* pattern, int includeFiles); // 0x0044a220
-    int UnknownFunction44a270(int index, char* path);      // 0x0044a270: entry `index`'s name
+    int GetEntryName(int index, char* path);      // 0x0044a270: entry `index`'s name
     int UnknownFunction44a2f0(int index, char* name);      // 0x0044a2f0: ... without its extension
     int NextEntry(char* path);                 // 0x0044a3b0: advances to the next entry
     int CurrentEntry(char* path);                 // 0x0044a440: the current entry
@@ -68,14 +68,14 @@ public:
     // 0x0044a600: whether a found file is listed: not "", "." or "..", and
     // a directory unless `includeFiles` is set.
     int UnknownFunction44a600(const char* name, unsigned int attributes);
-    int UnknownFunction44a910(const char* name);           // 0x0044a910: whether `name` is listed
+    int Contains(const char* name);           // 0x0044a910: whether `name` is listed
     // 0x004673b0: the entry count (an out-of-line accessor that the linker
     // folded with FontTexture's identical 0x004673b0).
     int GetFontName();
     // 0x0044a960: deletes the directory `path` and everything below it.
     int DeleteTree(const char* path);
-    void UnknownFunction44aab0();                          // 0x0044aab0: sorts the entries by name
-    static int UnknownFunction44aa90(const void* a, const void* b); // 0x0044aa90: qsort order
+    void SortByName();                          // 0x0044aab0: sorts the entries by name
+    static int CompareNames(const void* a, const void* b); // 0x0044aa90: qsort order
 
     int count;
     int current;

@@ -12,12 +12,12 @@ ColorMapper* ColorMapper::UnknownFunction4dddd0(const char* name) {
 
     if (!entry)
         return 0;
-    if (entry->field_0x10) {
-        ((ColorMapper*)entry->field_0x10)->AddRef();
-        return (ColorMapper*)entry->field_0x10;
+    if (entry->object) {
+        ((ColorMapper*)entry->object)->AddRef();
+        return (ColorMapper*)entry->object;
     }
-    entry->field_0x14->Seek(entry->field_0x18, 0, 0);
-    mapper = new(__FILE__, 148) ColorMapper(entry->field_0x14);
+    entry->archive->Seek(entry->offset, 0, 0);
+    mapper = new(__FILE__, 148) ColorMapper(entry->archive);
     g_UnknownResourceManager572b44->SetItemObject(entry, mapper);
     return mapper;
 }

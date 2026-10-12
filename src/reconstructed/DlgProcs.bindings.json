@@ -250,7 +250,7 @@
   "?SetPattern@DirectoryList@@QAEXPBDH@Z": "0x0044a220",
   "?NextName@DirectoryList@@QAEHPAD@Z": "0x0044a4c0",
   "?CurrentName@DirectoryList@@QAEHPAD@Z": "0x0044a550",
-  "?UnknownFunction44a910@DirectoryList@@QAEHPBD@Z": "0x0044a910",
+  "?Contains@DirectoryList@@QAEHPBD@Z": "0x0044a910",
   "?DeleteTree@DirectoryList@@QAEHPBD@Z": "0x0044a960",
   "?CompareRowNumbersAscending@@YAHPBX0@Z": "0x0044b0a0",
   "?CompareRowNumbersDescending@@YAHPBX0@Z": "0x0044b0e0",

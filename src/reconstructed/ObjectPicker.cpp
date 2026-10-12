@@ -27,7 +27,7 @@ ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
 int ObjectPicker::UnknownFunction4b04c0() {
     UnknownCursorPosition position = field_0x34->UnknownFunction43f100();
 
-    return UnknownFunction4b0500(position.x, ((RenderTarget*)field_0x18)->targetHeight - position.y - 1);
+    return PickAt(position.x, ((RenderTarget*)field_0x18)->targetHeight - position.y - 1);
 }
 
 // 0x004b0730
@@ -39,7 +39,7 @@ ObjectPicker::~ObjectPicker() {
 }
 
 // 0x004b0500
-int ObjectPicker::UnknownFunction4b0500(int x, int y) {
+int ObjectPicker::PickAt(int x, int y) {
     UnknownPickCamera* camera;
     Vector3 direction;
     Vector3 position;

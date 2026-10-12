@@ -39,22 +39,22 @@ SoundGroup::SoundGroup(int flags) : GameObject(flags) {
 
 // 0x00401af0
 SoundGroup::~SoundGroup() {
-    UnknownFunction401c30();
+    ReleaseMembers();
 }
 
 // 0x00401b50
-int SoundGroup::UnknownFunction401b50(Sound* sound) {
+int SoundGroup::AddMember(Sound* sound) {
     return field_0x34.Add(sound);
 }
 
 // 0x00401be0
-int SoundGroup::UnknownFunction401be0(Sound* sound) {
+int SoundGroup::RemoveMember(Sound* sound) {
     return field_0x34.Remove(sound);
 }
 
 // 0x00401c30: releases the members through a copy of the list (a release
 // removes the sound from field_0x34).
-void SoundGroup::UnknownFunction401c30() {
+void SoundGroup::ReleaseMembers() {
     ContainerList<Sound*> sounds;
     sounds.Init(field_0x34.m_count, 16);
     int i;

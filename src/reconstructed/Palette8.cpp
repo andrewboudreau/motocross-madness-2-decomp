@@ -16,12 +16,12 @@ Palette8* Palette8::UnknownFunction4b6b30(const char* name) {
 
     if (!entry)
         return 0;
-    if (entry->field_0x10) {
-        ((Palette8*)entry->field_0x10)->AddRef();
-        return (Palette8*)entry->field_0x10;
+    if (entry->object) {
+        ((Palette8*)entry->object)->AddRef();
+        return (Palette8*)entry->object;
     }
-    entry->field_0x14->Seek(entry->field_0x18, 0, 0);
-    palette = new(__FILE__, 46) Palette8(entry->field_0x14);
+    entry->archive->Seek(entry->offset, 0, 0);
+    palette = new(__FILE__, 46) Palette8(entry->archive);
     g_UnknownResourceManager572b44->SetItemObject(entry, palette);
     return palette;
 }

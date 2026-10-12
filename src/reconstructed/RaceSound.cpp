@@ -536,7 +536,7 @@ void RaceSound::AssignChannels() {
     SoundSystem()->SetEAXListenerParameters(&environment);
     SoundSystem()->CommitListenerSettings();
     if (!g_TrackGame->mode.soundOn)
-        g_TrackGame->field_0x34->DisableByClassName("SoundGroup");
+        g_TrackGame->childRoot->DisableByClassName("SoundGroup");
 }
 
 // 0x004e3730: moves the listener and every racer's engine sound to their
@@ -860,7 +860,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 break;
             g_TrackGame->mode.soundOn = !g_TrackGame->mode.soundOn;
             if (g_TrackGame->mode.soundOn) {
-                g_TrackGame->field_0x34->EnableByClassName("SoundGroup");
+                g_TrackGame->childRoot->EnableByClassName("SoundGroup");
                 if (engineGroup)
                     engineGroup->UnknownVirtualSlot16(0);
                 if (field_0x40)
@@ -878,7 +878,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
             } else {
-                g_TrackGame->field_0x34->DisableByClassName("SoundGroup");
+                g_TrackGame->childRoot->DisableByClassName("SoundGroup");
                 if (engineGroup)
                     engineGroup->UnknownVirtualSlot16(1);
                 if (field_0x40)

@@ -71,7 +71,7 @@ unsigned int LightEmitter::PackedColor() {
 }
 
 // 0x0049e020
-void LightEmitter::UnknownFunction49e020(unsigned int color) {
+void LightEmitter::SetColor(unsigned int color) {
     if (color == field_0xa8)
         return;
     colorRGBA[0] = (float)((color >> 16) & 0xff) * (1.0f / 255.0f);
@@ -89,7 +89,7 @@ void LightEmitter::UnknownFunction49e020(unsigned int color) {
     if (field_0x9c)
         field_0x9c->UnknownFunction49de70(color);
     if (manager)
-        manager->UnknownFunction49e490();
+        manager->MarkChanged();
 }
 
 // 0x0049e0f0
@@ -99,7 +99,7 @@ void LightEmitter::SetRange(float range) {
     if (range != lightRange) {
         lightRange = range;
         if (manager)
-            manager->UnknownFunction49e490();
+            manager->MarkChanged();
     }
 }
 
@@ -112,7 +112,7 @@ void LightEmitter::SetPosition(const Vector3* position) {
         if (field_0x9c)
             field_0x9c->UnknownFunction49de90(position);
         if (manager)
-            manager->UnknownFunction49e490();
+            manager->MarkChanged();
     }
 }
 
@@ -121,7 +121,7 @@ void LightEmitter::SetDirection(const Vector3* direction) {
     if (direction->x != lightDirection.x || direction->y != lightDirection.y || direction->z != lightDirection.z) {
         lightDirection = *direction;
         if (manager)
-            manager->UnknownFunction49e490();
+            manager->MarkChanged();
     }
 }
 
@@ -139,7 +139,7 @@ LightEmitter* LightEmitter::Create(void* value, int type, unsigned int color,
         if (debugSphere)
             debugSphere->Scale(0.4f, 0.4f, 0.4f);
     }
-    UnknownFunction49e020(color);
+    SetColor(color);
     SetRange(range);
     if (position)
         SetPosition(position);
@@ -194,14 +194,14 @@ GameObject* LightManager::UnknownVirtualSlot8(void* value) {
 }
 
 // 0x0049e470
-void LightManager::UnknownFunction49e470(LightEmitter* light) {
+void LightManager::AddLight(LightEmitter* light) {
     field_0x30[lightCount] = light;
     light->manager = this;
     lightCount++;
 }
 
 // 0x0049e490
-void LightManager::UnknownFunction49e490() {
+void LightManager::MarkChanged() {
     changeCount++;
 }
 

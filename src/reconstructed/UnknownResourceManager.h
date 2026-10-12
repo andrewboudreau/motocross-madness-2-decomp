@@ -7,9 +7,9 @@ class UnknownTextureStream;
 // Sound there).
 struct UnknownResourceEntry {
     unsigned char field_0x00[0x10];
-    void* field_0x10;                     // object loaded from the entry
-    UnknownTextureStream* field_0x14;     // stream holding the file
-    int field_0x18;                       // offset of the file in it
+    void* object;                             // +0x10 object loaded from the entry
+    UnknownTextureStream* archive;            // +0x14 stream holding the file
+    int offset;                               // +0x18 offset of the file in it
 };
 
 // Global at 0x00572b44; its code is among ResourceManager.cpp's literals.

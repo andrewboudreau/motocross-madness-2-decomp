@@ -44,7 +44,7 @@ void TrackGameMode::UnknownFunction522440() {
     g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
     UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
     UnknownFunction522840(resourceStrings);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0xfd8);
+    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)garageOptions);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)optionsBackup);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1090);
     UnknownFunction522cd0();

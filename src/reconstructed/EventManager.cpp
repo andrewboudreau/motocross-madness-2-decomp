@@ -255,7 +255,7 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
     }
     if (waitingForRacers)
         WaitForRemoteRacers(frameTime);
-    else if (!g_TrackGame->field_0x3428 && !g_TrackGame->uiInteractionBlocked &&
+    else if (!g_TrackGame->playingReplay && !g_TrackGame->uiInteractionBlocked &&
              HasRaceMode())
         CheckRaceOver(frameTime);
     if (g_TrackGame->uiInteractionBlocked) {
@@ -391,7 +391,7 @@ void EventManager::EndRace() {
             g_TrackGame->network->SetSessionJoinable(1);
         waitingForRacers = 0;
         CloseRace(2);
-        LeaveRaceForMenu(g_TrackGame->field_0x18 == 1 ? kMenu88e : kMenuMultiPlayer868);
+        LeaveRaceForMenu(g_TrackGame->playerCount == 1 ? kMenu88e : kMenuMultiPlayer868);
     }
 }
 
@@ -521,12 +521,12 @@ int CompareUnsigned(const void* a, const void* b) {
 // 0x0045fbd0: removes `player`, moving the last entry and record into its
 // place, then re-sorts the entries.
 void EventManager::UnknownFunction45fbd0(int player) {
-    if (g_TrackGame->field_0x18 < 2)
+    if (g_TrackGame->playerCount < 2)
         return;
     for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
         if (results[i].playerId == player) {
             if (!results[i].field_0x30)
-                g_TrackGame->field_0x18--;
+                g_TrackGame->playerCount--;
             else
                 g_TrackGame->field_0x3424--;
             results[i] = results[g_TrackGame->mode.racerCount - 1];
@@ -629,14 +629,14 @@ int EventManager::UnknownFunction45cb70() {
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
         g_TrackGame->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
-        if (!g_TrackGame->field_0x34->AppendChild(g_TrackGame->field_0x55c, -1))
+        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->field_0x55c, -1))
             return 0;
         break;
     case 2:
         g_TrackGame->sceneObject->SelectScene(g_TrackGame->mode.raceSettings.trackName, "scn", 0);
         g_TrackGame->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
             ->Create(g_TrackGame->renderTarget, LoadProgressCallback);
-        if (!g_TrackGame->field_0x34->AppendChild(g_TrackGame->field_0x564, -1))
+        if (!g_TrackGame->childRoot->AppendChild(g_TrackGame->field_0x564, -1))
             return 0;
         break;
     }
@@ -740,7 +740,7 @@ void EventManager::RankRacers() {
     case 2:
     case 3:
     case 5: {
-        if (g_TrackGame->field_0x18 > 1) {
+        if (g_TrackGame->playerCount > 1) {
             UnknownEventRanking rankings[11];
             int ranked = 0;
             int next = 0;
@@ -902,7 +902,7 @@ void EventManager::CloseRace(int mode) {
         return;
     }
     if (view) {
-        if (g_TrackGame->mode.saveReplay && !g_TrackGame->field_0x3428 &&
+        if (g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay &&
             g_TrackGame->mode.raceSettings.raceMode != 4) {
             char description[32];
             char time[32];

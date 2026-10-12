@@ -203,7 +203,7 @@
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
   "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
   "?UnknownFunction4897e0@InputDevice@@QAEHH@Z": "0x004897e0",
-  "?UnknownFunction489e20@JoystickDevice@@QAEMH@Z": "0x00489e20",
+  "?GetAxisValue@JoystickDevice@@QAEMH@Z": "0x00489e20",
   "?ApplySoundSettings@OptSoundDlg@@QAEXXZ": "0x004b2d40",
   "?ListMappedKeys@OptControlsDlg@@QAEXXZ": "0x004b3410",
   "?FillCurveList@OptGarageDlg@@QAEXXZ": "0x004b38f0",

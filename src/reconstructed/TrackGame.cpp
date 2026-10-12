@@ -100,7 +100,7 @@ TrackGame::TrackGame() {
     field_0x568 = 0;
     ui = 0;
     eventManager = 0;
-    field_0x3c = 0;
+    textureManager = 0;
     profileDirectory = 0;
     menuIsOpen = 0;
     uiInteractionBlocked = 0;
@@ -129,8 +129,8 @@ TrackGame::TrackGame() {
         GetRegistryInt("IntervalBetweenShortNetPacketsMS", 67) * 0.001f;
     field_0x3424 = 0;
     field_0x2e0 = 1.0f;
-    field_0x3428 = 0;
-    field_0x342c = 0;
+    playingReplay = 0;
+    useReplayTape = 0;
     proCircuit = 0;
     openLocalizedWebPageOnExit = 0;
     openStorePageOnExit = 0;
@@ -285,10 +285,10 @@ int TrackGame::UnknownVirtualSlot4() {
         return 0;
     g_MemTagStack->Push("UI");
     ui = new(__FILE__, 379) KrustyUI(1);
-    if (!field_0x34->AppendChild(ui->UnknownFunction4988a0(renderTarget, 1), -1))
+    if (!childRoot->AppendChild(ui->UnknownFunction4988a0(renderTarget, 1), -1))
         return 0;
     eventManager = new(__FILE__, 382) EventManager(1);
-    if (!field_0x34->AppendChild(eventManager->UnknownVirtualSlot8(renderTarget), -1))
+    if (!childRoot->AppendChild(eventManager->UnknownVirtualSlot8(renderTarget), -1))
         return 0;
     if (network) {
         char address[32];
@@ -374,9 +374,9 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
             return 0;
         if (field_0x2d4_bit0 && field_0x1c4 != previous) {
             if (field_0x1c4)
-                field_0x34->DisableByClassName("RaceSound");
+                childRoot->DisableByClassName("RaceSound");
             else
-                field_0x34->EnableByClassName("RaceSound");
+                childRoot->EnableByClassName("RaceSound");
         }
     }
     if (!ui)
@@ -419,7 +419,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
             return;
         menu->UnknownVirtualSlot4();
         menuIsOpen = 1;
-        field_0x34->DisableByClassName("RaceSound");
+        childRoot->DisableByClassName("RaceSound");
     } else {
         if (!menuIsOpen)
             return;
@@ -433,7 +433,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
             current->UnknownVirtualSlot5();
         menuIsOpen = 0;
         if (sound)
-            field_0x34->EnableByClassName("RaceSound");
+            childRoot->EnableByClassName("RaceSound");
     }
 }
 

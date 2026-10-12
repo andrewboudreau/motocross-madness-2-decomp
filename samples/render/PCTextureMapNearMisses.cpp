@@ -116,7 +116,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         copy->mapFlags |= 1;
         ((ManagedTexture*)this)->group->AddTexture((ManagedTexture*)copy);
     } else {
-        manager = g_TrackGame->field_0x3c;
+        manager = g_TrackGame->textureManager;
         copy = new(__FILE__, 986) PCTextureMap(manager, 1);
     }
     if (systemSurface) {

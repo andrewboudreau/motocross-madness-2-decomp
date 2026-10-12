@@ -100,7 +100,7 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
     float ratio = field_0x16c / field_0x1dc;
     if (cameraState != 3) {
         if (vehicleMode && !flag &&
-            (!krustyBike->field_0x7a4 || g_TrackGame->field_0x18 > 1))
+            (!krustyBike->field_0x7a4 || g_TrackGame->playerCount > 1))
             field_0x308 = ratio * krustyBike->field_0x43c * 0.42f;
         else
             field_0x308 = 0.0f;

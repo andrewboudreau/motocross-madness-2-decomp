@@ -43,8 +43,8 @@ extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
 // (only with that bit) and the "AllowFreezeCamera" setting.
 int Game::UnknownFunction467b70(char*) {
     rootObject = new(__FILE__, 222) GameObject(1);
-    field_0x34 = new(__FILE__, 227) GameObject(1);
-    rootObject->AppendChild(field_0x34, -1);
+    childRoot = new(__FILE__, 227) GameObject(1);
+    rootObject->AppendChild(childRoot, -1);
     soundInterface = new(__FILE__, 235) PCSoundInterface;
     srand(ReadClock());
     int count = ReadClock() & 0xff;
@@ -63,9 +63,9 @@ int Game::UnknownFunction467b70(char*) {
     RegCloseKey(key);
     if (!UnknownVirtualSlot32())
         return 0;
-    field_0x3c = new(__FILE__, 282) TextureMapManager;
-    field_0x34->AppendChild(field_0x3c->UnknownVirtualSlot8(renderTarget), -1);
-    field_0x1c = field_0x3c;
+    textureManager = new(__FILE__, 282) TextureMapManager;
+    childRoot->AppendChild(textureManager->UnknownVirtualSlot8(renderTarget), -1);
+    field_0x1c = textureManager;
     field_0x20 = 0;
     field_0x24 = 0;
     field_0x28 = renderTarget->surfacePixelFormat;
@@ -73,7 +73,7 @@ int Game::UnknownFunction467b70(char*) {
     field_0x30 = 0;
     if (field_0x2d4_bit2) {
         int category = g_MemTagStack->Push("DebugOverlay");
-        debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, field_0x3c, 8, 3, 3);
+        debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, textureManager, 8, 3, 3);
         if (debugOverlay) {
             rootObject->AppendChild(debugOverlay, -1);
             if (g_UnknownGlobal56c470->field_0x2c) {

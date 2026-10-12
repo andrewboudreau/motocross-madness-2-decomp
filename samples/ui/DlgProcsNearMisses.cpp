@@ -539,8 +539,8 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
                 fclose(file);
                 g_TrackGame->mode.raceSettings = header.field_0x34;
                 g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.eventType);
-                g_TrackGame->field_0x3428 = 1;
-                g_TrackGame->field_0x342c = 1;
+                g_TrackGame->playingReplay = 1;
+                g_TrackGame->useReplayTape = 1;
                 UNKNOWN_GARAGE_SETTINGS->engineSize = header.engineSize;
                 UNKNOWN_GARAGE_SETTINGS->fourStroke = header.fourStroke;
                 COPY_TEXT(g_TrackGame->mode.replayFile, "VCRtape.dat", 0x104);

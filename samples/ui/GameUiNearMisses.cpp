@@ -1118,7 +1118,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         if (buffer[0] && load) {
                             UnknownResourceEntry* resource = g_UnknownResourceManager572b44->FindItem(buffer, 1);
                             if (resource) {
-                                dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->field_0x14);
+                                dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->archive);
                                 ownsPalette = 1;
                             }
                         }

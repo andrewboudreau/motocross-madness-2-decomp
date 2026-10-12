@@ -198,9 +198,9 @@ static inline float RandomUnit() {
 void MultiPlayerDlg::SendStartMessage(short start) {
     int i;
     g_TrackGame->mode.raceSettings.field_0x35 = g_UnknownGlobal689df8 + 1;
-    g_TrackGame->field_0x18 = g_TrackGame->mode.raceSettings.field_0x35;
+    g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.field_0x35;
     g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
-    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
+    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
     int total = g_TrackGame->mode.racerCount;
     g_TrackGame->mode.maxOpponents =
         lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.field_0x28);
@@ -212,7 +212,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         const char** names = (const char**)DebugMalloc(total * 4, __FILE__, 0x1f6);
         g_TrackGame->ui->UnknownFunction49b0d0(bikes, total, riders);
         g_TrackGame->ui->UnknownFunction49b020(names, total);
-        for (i = 0; i < g_TrackGame->field_0x18 - 1; i++) {
+        for (i = 0; i < g_TrackGame->playerCount - 1; i++) {
             g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
             g_TrackGame->mode.racers[i + 1].racerIndex = 0;
         }

@@ -137,7 +137,7 @@ public:
                                              UnknownQuarryCamera* camera, Scene* scene, BaseQuarryEvent* event,
                                              void* shadow);
     UnknownQuarryRacer* NextBike(int* iterator);  // 0x004204e0: the next racer, or 0
-    void UnknownFunction423790(int level);                     // 0x00423790: detail level
+    void SetDetailLevel(int level);                     // 0x00423790: detail level
 
     unsigned char field_0x2c[0x38 - 0x2c];
     UnknownQuarryRacer* field_0x38;                            // the player's racer
@@ -331,7 +331,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, ecosystem, "rb", 0))
             sprintf(text, "No Ecosystem found in env file.  Ecosystem not preloaed.\n");
         else
-            UnknownFunction45c040(g_TrackGame->field_0x3c, ecosystem, stream, 0x115c);
+            UnknownFunction45c040(g_TrackGame->textureManager, ecosystem, stream, 0x115c);
     }
 
     // The texture detail levels: 0 keeps every texture, 1 and 2 halve them.
@@ -480,12 +480,12 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             }
         }
         if (g_TrackGame->field_0x2d5_bit2) {
-            field_0x94 = (GameObject*)g_TrackGame->field_0x3c->CreateGroup(
+            field_0x94 = (GameObject*)g_TrackGame->textureManager->CreateGroup(
                 ((PCRenderTarget*)field_0x18)->surfacePixelFormat, 0, 2, 1);
-            field_0x98 = (GameObject*)g_TrackGame->field_0x3c->CreateGroup(0x115c, 0, 2, 1);
+            field_0x98 = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
         }
     }
-    modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->field_0x3c;
+    modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->textureManager;
     modelTextures.field_0x04 = skyTextures.field_0x04 = terrainTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
     modelTextures.field_0x08 = skyTextures.field_0x08 = terrainTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
     modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->surfacePixelFormat;
@@ -530,7 +530,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(text, "Scene not created.\n");
         return 0;
     }
-    if (!eventScene->Load(field_0x18, lightManager, (int)particleManager, (int)g_TrackGame->field_0x3c,
+    if (!eventScene->Load(field_0x18, lightManager, (int)particleManager, (int)g_TrackGame->textureManager,
                                            (int)&modelTextures, "Teraform\\Skies", (void (*)(int))progress,
                                            (int)ceil(sceneSteps * 0.1f)))
         return 0;
@@ -565,7 +565,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     if (shadowLight) {
         projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_TrackGame->mode.shadowsOn);
-        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4da7b0(field_0x18, g_TrackGame->field_0x3c);
+        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4da7b0(field_0x18, g_TrackGame->textureManager);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -579,7 +579,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (!AppendChild((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
         if (eventFog)
-            eventFog->UnknownFunction462db0(g_TrackGame->mode.videoSettings[4]);
+            eventFog->SetDetailLevel(g_TrackGame->mode.videoSettings[4]);
         AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(field_0x18), -1);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
@@ -632,7 +632,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
         ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
-                         ->Create(field_0x18, g_TrackGame->field_0x3c, eventTerrain, lightManager,
+                         ->Create(field_0x18, g_TrackGame->textureManager, eventTerrain, lightManager,
                                                  eventScene->environment, stream, 0x115c,
                                                  g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
@@ -650,7 +650,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Particles");
     if (particleManager)
         particleManager = ((UnknownQuarryParticles*)particleManager)
-                         ->UnknownVirtualSlot27(field_0x18, g_TrackGame->field_0x3c,
+                         ->UnknownVirtualSlot27(field_0x18, g_TrackGame->textureManager,
                                                 eventScene->environment->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!UnknownVirtualSlot27((int)&modelTextures))
@@ -857,11 +857,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     field_0x50 = (void*)1;
     if (g_TrackGame->field_0x2d5_bit2) {
         g_MemTagStack->Push("TextureCache");
-        g_TrackGame->field_0x3c->ShareCacheLimit();
+        g_TrackGame->textureManager->ShareCacheLimit();
     }
     g_MemTagStack->Pop(0);
     eventScene->SetDetailLevel(g_TrackGame->mode.videoSettings[2]);
-    raceView->UnknownFunction423790(g_TrackGame->mode.videoSettings[2]);
+    raceView->SetDetailLevel(g_TrackGame->mode.videoSettings[2]);
     if (progress)
         progress(0);
     UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);

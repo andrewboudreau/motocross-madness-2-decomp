@@ -29,7 +29,7 @@
   "?GetFontName@FontTexture@@QAEPBDXZ": "0x004673b0",
   "?UnknownFunction4673d0@FontTexture@@SAPAV1@PBD00HPAVTextureMapManager@@H@Z": "0x004673d0",
   "?UnknownFunction4673d0@FontTexture@@SAPAV1@PBD00HPAVTextureMapManager@@H@Z$ehhandler": "0x0054ac4c",
-  "?UnknownFunction4676c0@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x004676c0",
+  "?AddFont@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x004676c0",
   "?UnknownFunction467760@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x00467760",
   "?UnknownFunction4677f0@UnknownStatic65b478@@QAEPAUUnknownFontTextureNode@@PBD@Z": "0x004677f0",
   "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",

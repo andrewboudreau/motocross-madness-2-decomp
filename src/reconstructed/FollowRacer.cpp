@@ -47,7 +47,7 @@ void UnknownBikeRaceGhost::ApplyReplayDelta(const UnknownBikeRaceGhostDelta* del
 }
 
 // 0x004a9d10
-void UnknownTrackGameViewOwnerDc::UnknownFunction4a9d10(KrustyVCR* vcr)
+void UnknownTrackGameViewOwnerDc::SetRecorder(KrustyVCR* vcr)
 {
     field_0x708 = vcr;
 }

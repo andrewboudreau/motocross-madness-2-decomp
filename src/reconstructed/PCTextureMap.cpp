@@ -28,7 +28,7 @@ PCTextureMap::~PCTextureMap() {
         float scale = 1.0f;
         if (mipCount != 1)
             scale = 4.0f / 3.0f;
-        g_MemTagStack->UnknownFunction4a2e00(
+        g_MemTagStack->SubtractDirectXBytes(
             (int)(PixelFormatBytesPerPixel(mapFormat) * textureHeight * textureWidth * scale));
         systemSurface->Release();
         systemSurface = 0;
@@ -242,7 +242,7 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
             float scale = 1.0f;
             if (mipCount != 1)
                 scale = 4.0f / 3.0f;
-            g_MemTagStack->UnknownFunction4a2de0(
+            g_MemTagStack->AddDirectXBytes(
                 (int)(PixelFormatBytesPerPixel(mapFormat) * textureHeight * textureWidth * scale));
             return 1;
         }

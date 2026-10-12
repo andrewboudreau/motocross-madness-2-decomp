@@ -35,7 +35,7 @@ struct UnknownTrackGameViewPart {
 class KrustyVCR;
 class UnknownTrackGameViewOwnerDc {
 public:
-    void UnknownFunction4a9d10(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
+    void SetRecorder(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
 
     unsigned char field_0x000[0x10a];
     unsigned char field_0x10a;                // cleared when the followed racer changes (0x004a9e80)
@@ -184,11 +184,11 @@ struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
 
 // TrackGameMode+0xfd8, +0x1034 and +0x1090 (0x5c bytes each).
 struct UnknownTrackGameModeOptionsFd8 {
-    int field_0x00;
-    int field_0x04;
+    int engineSize;                           // +0x00
+    int fourStroke;                           // +0x04
     int field_0x08;
-    float field_0x0c[6];
-    int field_0x24[11];                       // from KrustyUI's +0xec table
+    float suspension[6];                      // +0x0c
+    int eqBands[11];                          // +0x24 from KrustyUI's +0xec table
     unsigned char field_0x50[0x5c - 0x50];
 };
 
@@ -386,7 +386,7 @@ public:
     unsigned char field_0xa94[0xa98 - 0xa94];
     UnknownTrackGameSessionList sessions; // +0xa98: enumerated sessions (NetProcs.cpp)
     int selectedSession;                  // +0xfd4: selected session (NetProcs.cpp)
-    unsigned char field_0xfd8[0x5c];          // restored from +0x1034 when a replay is left (InGameProcs.cpp)
+    unsigned char garageOptions[0x5c];       // +0xfd8 garage settings (UNKNOWN_GARAGE_SETTINGS); restored from +0x1034 when a replay is left (InGameProcs.cpp)
     unsigned char optionsBackup[0x5c];        // +0x1034: copy of +0xfd8 (DlgProcs.cpp, InGameProcs.cpp)
     unsigned char field_0x1090[0x10ec - 0x1090];
     int championshipInProgress;               // +0x10ec: set when a race-mode 2 series starts (points reset); hides the race count
@@ -692,8 +692,8 @@ public:
     float fullRecordPacketIntervalSeconds;
     float shortRecordPacketIntervalSeconds;
     int field_0x3424;                          // EventManager 0x0045fbd0 decrements it for a leaving player whose entry has racer +0x11c0 set (Game+0x18 otherwise)
-    int field_0x3428;
-    int field_0x342c;
+    int playingReplay;                        // +0x3428
+    int useReplayTape;                        // +0x342c
     int uiInteractionBlocked;
     float field_0x3434;        // seconds UI interaction has been blocked (EventManager slot 10)
     int field_0x3438;

@@ -69,7 +69,7 @@ void MemTagStack::UnknownFunction4a2bc0(const char* tag)
 }
 
 // 0x004a2bf0
-int MemTagStack::UnknownFunction4a2bf0(const char* tag)
+int MemTagStack::FindOrAddTag(const char* tag)
 {
     for (int i = 0; i < count; i++) {
         if (!strcmp(names[i], tag)) {
@@ -91,7 +91,7 @@ int MemTagStack::UnknownFunction4a2bf0(const char* tag)
 int MemTagStack::Push(const char* tag)
 {
     int previous = current;
-    current = UnknownFunction4a2bf0(tag);
+    current = FindOrAddTag(tag);
     return previous;
 }
 
@@ -113,19 +113,19 @@ void MemTagStack::Pop(int previous)
 }
 
 // 0x004a2da0
-void MemTagStack::UnknownFunction4a2da0(char* name)
+void MemTagStack::CopyCurrentName(char* name)
 {
     strcpy(name, names[current]);
 }
 
 // 0x004a2de0
-void MemTagStack::UnknownFunction4a2de0(int bytes)
+void MemTagStack::AddDirectXBytes(int bytes)
 {
     directx[current] += bytes;
 }
 
 // 0x004a2e00
-void MemTagStack::UnknownFunction4a2e00(int bytes)
+void MemTagStack::SubtractDirectXBytes(int bytes)
 {
     directx[current] -= bytes;
 }

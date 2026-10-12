@@ -350,7 +350,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
             status->currentPosition.x = status->previousPosition.x;
             status->currentPosition.y = status->previousPosition.y;
             status->currentPosition.z = status->previousPosition.z;
-            if (g_TrackGame->field_0x18 == 1 && g_ViewRacerFinished) {
+            if (g_TrackGame->playerCount == 1 && g_ViewRacerFinished) {
                 if (racer->hasFinished)
                     goto next;
                 if (racer->field_0x734) {

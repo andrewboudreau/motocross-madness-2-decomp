@@ -139,7 +139,7 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
         strcpy(trackName, g_TrackGame->mode.raceSettings.trackName);
         trackVariant = g_TrackGame->mode.raceSettings.field_0x34;
         raceStatus.laps = g_TrackGame->mode.raceSettings.lapCount;
-        for (; i < g_TrackGame->field_0x18; i++) {
+        for (; i < g_TrackGame->playerCount; i++) {
             raceStatus.records[i].position = g_TrackGame->eventManager->results[i].position;
             raceStatus.records[i].fastestLap = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
             raceStatus.records[i].totalRunningTime = (int)(g_TrackGame->eventManager->results[i].totalRunningTime * 100.0f);
@@ -171,7 +171,7 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
             SendDebugMessage("LargestSingleStuntPoints %d\n", raceStatus.records[i].largestStuntPoints);
         }
         raceStatus.longestRunningTime = longest;
-        return SubmitScores(g_TrackGame->field_0x18, &raceStatus, (void*)sizeof(raceStatus));
+        return SubmitScores(g_TrackGame->playerCount, &raceStatus, (void*)sizeof(raceStatus));
     }
     return 1;
 }

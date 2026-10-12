@@ -120,13 +120,13 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     bytesPerPixel = PixelFormatBytesPerPixel(format);
     if (guiBackground)
         guiBackground->ReleaseDc();
-    g_TrackGame->field_0x34->DisableByClassName("GUICursor");
-    g_TrackGame->field_0x34->DisableByClassName("ToolTip");
+    g_TrackGame->childRoot->DisableByClassName("GUICursor");
+    g_TrackGame->childRoot->DisableByClassName("ToolTip");
     g_TrackGame->UnknownVirtualSlot8();
     g_TrackGame->UnknownVirtualSlot9();
     g_TrackGame->renderTarget->AdvanceFrame();
-    g_TrackGame->field_0x34->EnableByClassName("GUICursor");
-    g_TrackGame->field_0x34->EnableByClassName("ToolTip");
+    g_TrackGame->childRoot->EnableByClassName("GUICursor");
+    g_TrackGame->childRoot->EnableByClassName("ToolTip");
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     display = g_TrackGame->display;

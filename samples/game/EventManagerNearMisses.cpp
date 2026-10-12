@@ -71,7 +71,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     g_TrackGame->ui->gui->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
     layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
-    if (!g_TrackGame->field_0x3428 && !g_TrackGame->ui->field_0x4a8 &&
+    if (!g_TrackGame->playingReplay && !g_TrackGame->ui->field_0x4a8 &&
         g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();
     g_TrackGame->ui->gui->ShowCursors(1);
@@ -296,7 +296,7 @@ int EventManager::CreatePodiumScene() {
         facings[i] = rotated * PodiumLength(facings[i]);
     }
     UnknownPodiumContext context;
-    context.field_0x00 = g_TrackGame->field_0x3c;
+    context.field_0x00 = g_TrackGame->textureManager;
     context.field_0x04 = PODIUM_OWNER(owner)->field_0x94;
     context.field_0x08 = PODIUM_OWNER(owner)->field_0x98;
     context.field_0x0c = ((RenderTarget*)field_0x18)->surfacePixelFormat;

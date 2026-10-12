@@ -102,16 +102,16 @@ public:
     UnknownDisplay* display;                  // video card and modes (slot 8's profile page)
     RenderTarget* renderTarget;               // a PCRenderTarget (PCGame slot 31)
     ControlInterface* controlInterface;       // a PCControlInterface (slot 2)
-    int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
+    int playerCount;                          // +0x18 1 initially; KrustyBikeCamera slot 42 tests > 1
     TextureMapManager* field_0x1c;
     int field_0x20;
     int field_0x24;
     int field_0x28;
     int field_0x2c;                           // 0x115c after initialisation
     int field_0x30;
-    GameObject* field_0x34;                   // second root object (initialiser 0x00467b70)
+    GameObject* childRoot;                    // +0x34 second root object (initialiser 0x00467b70)
     DebugOverlay* debugOverlay;               // created with the "DebugOverlay" registry flag
-    TextureMapManager* field_0x3c;
+    TextureMapManager* textureManager;        // +0x3c
     char field_0x40[0x1c4 - 0x40];            // empty string initially
     int field_0x1c4;
     int field_0x1c8;

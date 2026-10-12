@@ -138,7 +138,7 @@
   "?RecordHighScoreTable@KrustyUI@@QAEXH@Z": "0x0049bc50",
   "?UnknownFunction49bda0@@YAXXZ": "0x0049bda0",
   "?Create@UnknownKrustyUILight@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z": "0x0049e230",
-  "?UnknownFunction49e470@UnknownKrustyUILightManager@@QAEXPAVUnknownKrustyUILight@@@Z": "0x0049e470",
+  "?AddLight@UnknownKrustyUILightManager@@QAEXPAVUnknownKrustyUILight@@@Z": "0x0049e470",
   "?UnknownFunction4a6bb0@UnknownKrustyUICharacter@@QAEHMHH@Z": "0x004a6bb0",
   "?SetMotionByName@UnknownKrustyUICharacter@@QAEXPBD@Z": "0x004a8b10",
   "?Attach@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@HH@Z": "0x004b77a0",

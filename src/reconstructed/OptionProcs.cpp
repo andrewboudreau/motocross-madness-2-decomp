@@ -420,7 +420,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
             EnableGroup(0x12f, 0);
             if (g_TrackGame->controlInterface->activeJoystick) {
                 for (i = 0; i < 6; i++)
-                    axisValuesAtWait[i] = g_TrackGame->controlInterface->activeJoystick->UnknownFunction489e20(i);
+                    axisValuesAtWait[i] = g_TrackGame->controlInterface->activeJoystick->GetAxisValue(i);
             }
             inputWaitPending = 1;
             AddTimer(0, 0xfa, 0);
@@ -548,7 +548,7 @@ void OptControlsDlg::MapMovedInput()
         return;
     if (joystick) {
         for (int i = 0; i < 6; i++) {
-            float delta = joystick->UnknownFunction489e20(i) - axisValuesAtWait[i];
+            float delta = joystick->GetAxisValue(i) - axisValuesAtWait[i];
             if (delta < 0.0f)
                 delta = -delta;
             if (delta > 16384.0f) {
@@ -664,7 +664,7 @@ static inline UnknownOptControlSettings* UnknownControlSettingsOf(TrackGame* gam
 
 static inline UnknownOptGarageSettings* UnknownGarageSettingsOf(TrackGame* game)
 {
-    return (UnknownOptGarageSettings*)game->mode.field_0xfd8;
+    return (UnknownOptGarageSettings*)game->mode.garageOptions;
 }
 
 static inline char (*UnknownMessagesOf(TrackGame* game))[128]

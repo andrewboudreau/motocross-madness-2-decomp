@@ -127,9 +127,9 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00401f30: fades the members
     virtual int UnknownVirtualSlot16(int value);       // 0x00401ee0: pauses the members
     virtual int UnknownVirtualSlot18();                // 0x00401ea0: restores the members
-    int UnknownFunction401b50(Sound* sound);  // 0x00401b50: adds a member
-    int UnknownFunction401be0(Sound* sound);  // 0x00401be0: removes a member
-    void UnknownFunction401c30();             // 0x00401c30: releases every member
+    int AddMember(Sound* sound);  // 0x00401b50: adds a member
+    int RemoveMember(Sound* sound);  // 0x00401be0: removes a member
+    void ReleaseMembers();             // 0x00401c30: releases every member
     void UnknownFunction401dd0(long volume);  // 0x00401dd0 (racesnd.cpp music volume)
 
     unsigned char field_0x2c_bit0 : 1; // members may play

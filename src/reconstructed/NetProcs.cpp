@@ -276,7 +276,7 @@ void EndNetworkGame() {
         delete g_TrackGame->network;
         g_TrackGame->network = 0;
     }
-    g_TrackGame->field_0x18 = 1;
+    g_TrackGame->playerCount = 1;
     g_TrackGame->field_0x3424 = 0;
     g_TrackGame->mode.raceSettings.field_0x35 = 0;
     g_TrackGame->mode.raceSettings.field_0x28 = 0;

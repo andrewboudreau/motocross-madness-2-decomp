@@ -58,7 +58,7 @@ void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, i
     if (groundFog == (UnknownGroundFog*)1)
         return;
     if (!groundFog) {
-        groundFog = (UnknownGroundFog*)g_TrackGame->field_0x34->FindByClassName(1, "GroundFog");
+        groundFog = (UnknownGroundFog*)g_TrackGame->childRoot->FindByClassName(1, "GroundFog");
         if (!groundFog) {
             groundFog = (UnknownGroundFog*)1;
             return;

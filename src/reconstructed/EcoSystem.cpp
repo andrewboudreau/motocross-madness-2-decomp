@@ -707,7 +707,7 @@ int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
                 return 0;
             }
         } else {
-            stream = entry->field_0x14;
+            stream = entry->archive;
             esbStreamInArchive = 1;
         }
     } else {
@@ -785,7 +785,7 @@ int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
 }
 
 // 0x004594c0
-void EcoSystem::UnknownFunction4594c0(int level) {
+void EcoSystem::SetDetailLevel(int level) {
     detailLevel = level;
 }
 
@@ -796,7 +796,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEco
     int i;
     GameObject::UnknownVirtualSlot8(view);
     g_UnknownGlobal59af14 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
-    UnknownFunction4594c0(level);
+    SetDetailLevel(level);
     groundTerrain = terrain;
     textureManager = textures;
     lightManager = lights;
@@ -808,7 +808,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEco
     coordinatesPerUnit = 65536.0f / size;
     unitsPerCoordinate = size * (1.0f / 65536.0f);
     ageManager = new(__FILE__, 0x5ca) AgeManager;
-    UnknownFunction45a9a0();
+    LightingChanged();
     if (!ReadEst(path, stream)) {
         Release();
         return 0;
@@ -939,7 +939,7 @@ done:
 }
 
 // 0x0045a9a0
-void EcoSystem::UnknownFunction45a9a0() {
+void EcoSystem::LightingChanged() {
     UnknownEcoLight* light = lightManager->FindLightOfType(6);
     if (light) {
         ambientLight.x = light->colour[0];
@@ -1178,7 +1178,7 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
                 }
                 ownsStream = 1;
             } else {
-                esb = entry->field_0x14;
+                esb = entry->archive;
             }
         }
         esb->Read(&method, 4, 1);

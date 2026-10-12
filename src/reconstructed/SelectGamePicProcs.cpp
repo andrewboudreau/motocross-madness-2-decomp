@@ -340,10 +340,10 @@ int CompareGridDraws(const void* a, const void* b) {
 // 0x004f20d0
 void MultiPlayerDlg::FillRacerSlots() {
     int player = g_TrackGame->network->localPlayer;
-    g_TrackGame->field_0x18 = g_TrackGame->mode.raceSettings.field_0x35;
+    g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.field_0x35;
     g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
-    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
-    for (int i = 0; i < g_TrackGame->field_0x18 - 1; i++) {
+    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
+    for (int i = 0; i < g_TrackGame->playerCount - 1; i++) {
         g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
         g_TrackGame->mode.racers[i + 1].racerIndex = 0;
         int length = strlen(g_UnknownGlobal689d08[i].name);
@@ -381,8 +381,8 @@ void MultiPlayerDlg::FillRacerSlots() {
     if (g_TrackGame->ui->gui) {
         if (g_TrackGame->mode.saveReplay) {
             if (g_TrackGame->mode.raceSettings.eventType != 4) {
-                g_TrackGame->field_0x342c = 1;
-                g_TrackGame->field_0x3428 = 0;
+                g_TrackGame->useReplayTape = 1;
+                g_TrackGame->playingReplay = 0;
             } else {
                 g_TrackGame->mode.saveReplay = 0;
             }
@@ -419,9 +419,9 @@ void MultiPlayerDlg::SendSettings() {
     }
     if (++s_UnknownStatic573c0c >= 2) {
         g_TrackGame->mode.raceSettings.field_0x35 = g_UnknownGlobal689df8 + 1;
-        g_TrackGame->field_0x18 = g_TrackGame->mode.raceSettings.field_0x35;
+        g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.field_0x35;
         g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
-        g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
+        g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->playerCount;
         if (eventPage)
             eventPage->UpdateBoundValues(1);
         if (optionsPage)
@@ -584,7 +584,7 @@ void MultiPlayerDlg::EnableReadyControls() {
             EnableGroup(0x514, 1);
         EnableGroup(0x3e8, 1);
     } else {
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize) >
+        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
             g_UnknownGlobal689df4)
             ReportReadyCleared(1);
@@ -902,8 +902,8 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         tab->SetTextAlign(0x22);
         memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.field_0x2bd0,
                sizeof(g_TrackGame->mode.raceSettings));
-        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1090,
-               sizeof(g_TrackGame->mode.field_0xfd8));
+        memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.field_0x1090,
+               sizeof(g_TrackGame->mode.garageOptions));
         memcpy(&g_TrackGame->mode.racerChoice, g_TrackGame->mode.field_0x1b04,
                sizeof(g_TrackGame->mode.racerChoice));
         strcpy(builtForTrack, "");
@@ -1032,7 +1032,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             UpdateBoundValues(1);
             memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
                    sizeof(g_TrackGame->mode.field_0x2bd0));
-            memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.field_0xfd8,
+            memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
                    sizeof(g_TrackGame->mode.field_0x1090));
             memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
                    sizeof(g_TrackGame->mode.field_0x1b04));
@@ -1093,7 +1093,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 }
                 memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
                        sizeof(g_TrackGame->mode.field_0x2bd0));
-                memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.field_0xfd8,
+                memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
                        sizeof(g_TrackGame->mode.field_0x1090));
                 memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
                        sizeof(g_TrackGame->mode.field_0x1b04));
@@ -1835,7 +1835,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         list->AddRow("500cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[3]), 0);
         list->AddRow("600cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[4]), 0);
         list->SelectRowByData(
-            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize));
+            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize));
         g_TrackGame->LoadResourceString(0x146a, format, 0x80);
         list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->RemoveAllRows();
@@ -1988,7 +1988,7 @@ void MPBikeRiderDlg::ApplyLargestOpponentClass() {
     if (!g_TrackGame->network->isHost) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.maxBikeClass);
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize) >
+        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
             g_UnknownGlobal689df4)
             static_cast<MultiPlayerDlg*>(parentDialog)->ReportReadyCleared(1);

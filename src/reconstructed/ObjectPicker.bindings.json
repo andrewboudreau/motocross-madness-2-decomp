@@ -27,7 +27,7 @@
   "?UnknownFunction4b0210@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",
   "?UnknownFunction4b0210@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z$ehhandler": "0x0054c6d0",
   "?UnknownFunction4b04c0@ObjectPicker@@QAEHXZ": "0x004b04c0",
-  "?UnknownFunction4b0500@ObjectPicker@@QAEHHH@Z": "0x004b0500",
+  "?PickAt@ObjectPicker@@QAEHHH@Z": "0x004b0500",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_$E1": "0x004b07c0",

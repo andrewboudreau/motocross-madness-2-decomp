@@ -123,7 +123,7 @@ FontTexture* FontTexture::UnknownFunction4673d0(const char* name, const char* pa
         if (texture) {
             texture->UnknownVirtualSlot8(1, 0, 0);
             font->SetTexture(texture);
-            s_UnknownManager65b478.UnknownFunction4676c0(font);
+            s_UnknownManager65b478.AddFont(font);
         } else {
             delete font;
             font = 0;

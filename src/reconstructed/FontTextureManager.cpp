@@ -17,11 +17,11 @@ UnknownStatic65b478::UnknownStatic65b478() {
 
 // 0x004676b0
 UnknownStatic65b478::~UnknownStatic65b478() {
-    UnknownFunction4677c0();
+    DeleteFonts();
 }
 
 // 0x004676c0
-void UnknownStatic65b478::UnknownFunction4676c0(FontTexture* font) {
+void UnknownStatic65b478::AddFont(FontTexture* font) {
     UnknownFontTextureNode* last = 0;
     UnknownFontTextureNode* node;
 
@@ -60,7 +60,7 @@ void UnknownStatic65b478::UnknownFunction467760(FontTexture* font) {
 }
 
 // 0x004677c0
-void UnknownStatic65b478::UnknownFunction4677c0() {
+void UnknownStatic65b478::DeleteFonts() {
     UnknownFontTextureNode* node;
 
     while ((node = firstNode) != 0) {

@@ -174,13 +174,13 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
         if (opponents >= g_TrackGame->proCircuit->racerCount)
             opponents = g_TrackGame->proCircuit->racerCount;
     } else {
-        if (g_TrackGame->field_0x18 == 1) {
+        if (g_TrackGame->playerCount == 1) {
             if (g_TrackGame->mode.raceSettings.raceMode == 4)
                 opponents = 1;
             else
                 opponents = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
         } else {
-            opponents = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->field_0x18;
+            opponents = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
         }
         players = opponents;
     }
@@ -217,7 +217,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     int height;
 
     instrumentOverlay = new(__FILE__, 1412) InstrumentOverlay(g_TrackGame->mode.instrumentOverlayOn);
-    instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->field_0x3c,
+    instrumentOverlay = instrumentOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->textureManager,
                                                    (UnknownInstrumentSource*)raceCamera);
     if (!instrumentOverlay)
         sprintf(message, "Instrument Overlay not created.\n");
@@ -241,19 +241,19 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     cue.right = cue.left - (int)(width * -0.046875f);
 
     chatOverlay = new(__FILE__, 1433) ChatOverlay(1);
-    chatOverlay = chatOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen, cue);
+    chatOverlay = chatOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->textureManager, raceCamera, screen, cue);
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
     if (chatOverlay && g_TrackGame->mode.chatInputLine == 1)
         chatOverlay->ShowInputLine();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
-    radarOverlay = radarOverlay->LoadMap((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, (int)raceCamera, screen);
+    radarOverlay = radarOverlay->LoadMap((RenderTarget*)field_0x18, g_TrackGame->textureManager, (int)raceCamera, screen);
     if (!radarOverlay)
         sprintf(message, "Radar Overlay not created.\n");
 
     statsOverlay = new(__FILE__, 1451) StatsOverlay(1);
-    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen);
+    statsOverlay = statsOverlay->LoadPanel((RenderTarget*)field_0x18, g_TrackGame->textureManager, raceCamera, screen);
     if (!statsOverlay)
         sprintf(message, "Stats Overlay not created.\n");
 
@@ -420,11 +420,11 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         g_TrackGame->mode.videoSettings[4] = level;
         eventTerrain->SelectQuality(level);
         if (ecoSystem)
-            ecoSystem->UnknownFunction4594c0(level);
+            ecoSystem->SetDetailLevel(level);
         if (eventFog)
-            eventFog->UnknownFunction462db0(level);
+            eventFog->SetDetailLevel(level);
         eventScene->SetDetailLevel(level);
-        raceView->UnknownFunction423790(level);
+        raceView->SetDetailLevel(level);
         if (textQueue) {
             char text[0x80];
             char buffer[0x100];
@@ -446,11 +446,11 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         g_TrackGame->mode.videoSettings[4] = level;
         eventTerrain->SelectQuality(level);
         if (ecoSystem)
-            ecoSystem->UnknownFunction4594c0(level);
+            ecoSystem->SetDetailLevel(level);
         if (eventFog)
-            eventFog->UnknownFunction462db0(level);
+            eventFog->SetDetailLevel(level);
         eventScene->SetDetailLevel(level);
-        raceView->UnknownFunction423790(level);
+        raceView->SetDetailLevel(level);
         if (textQueue) {
             char text[0x80];
             char buffer[0x100];

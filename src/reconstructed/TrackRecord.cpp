@@ -130,7 +130,7 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
     field_0xdc->UnknownVirtualSlot1();
     sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, name);
     sprintf(file, "%s%s", name, field_0x04[field_0x00]);
-    if (field_0xdc->UnknownFunction44a910(file))
+    if (field_0xdc->Contains(file))
         Read(path);
 }
 

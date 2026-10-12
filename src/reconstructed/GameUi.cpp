@@ -983,7 +983,7 @@ UIFrame::UIFrame(void* module, int id, void* textures, int a, int b, int c, void
         frameTextures = (int)textures;
         UnknownResourceEntry* entry =
             ((UnknownResourceManager*)id)->FindItem((const char*)module, 1);
-        if (!LoadFromStream(entry->field_0x14, entry->field_0x18, palette) && a) {
+        if (!LoadFromStream(entry->archive, entry->offset, palette) && a) {
             LoadEntrySound((SoundGroup*)a, (const char*)module, 1, 3, c, -1);
             ownsSound = 1;
             isSound = 1;
@@ -3324,7 +3324,7 @@ int UIDialog::LoadDialogResource(const char* name) {
     int result = 0;
     UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 1);
     if (entry)
-        result = UnknownFunction46a920(entry->field_0x14, entry->field_0x18);
+        result = UnknownFunction46a920(entry->archive, entry->offset);
     return result;
 }
 

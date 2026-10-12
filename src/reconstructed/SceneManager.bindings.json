@@ -198,7 +198,7 @@
   "?UnknownFunction464e80@Scene@@QAEXPBD@Z": "0x00464e80",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Create@LightEmitter@@QAEPAV1@PAXHIPBUVector3@@1MHHHHH@Z": "0x0049e230",
-  "?UnknownFunction49e470@LightManager@@QAEXPAVLightEmitter@@@Z": "0x0049e470",
+  "?AddLight@LightManager@@QAEXPAVLightEmitter@@@Z": "0x0049e470",
   "?AdvanceMotion@UnknownSceneObject@@QAEHMHH@Z": "0x004a6bb0",
   "?SetMotion@UnknownSceneObject@@QAEXPAX@Z": "0x004a8b40",
   "?OpenFromArchives@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@PBD1H@Z": "0x004b7220",

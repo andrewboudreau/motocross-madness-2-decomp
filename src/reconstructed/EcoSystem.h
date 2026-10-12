@@ -490,7 +490,7 @@ public:
     int WriteEsb(const char* path);              // 0x004587b0: writes the .esb
     void WriteListing(const char* path);          // 0x00458da0: writes the .txt listing
     int ReadEsb(const char* path, UnknownTextureStream* stream);               // 0x00458f70: reads the .esb
-    void UnknownFunction4594c0(int level);    // 0x004594c0: detail level
+    void SetDetailLevel(int level);    // 0x004594c0: detail level
     // 0x004594d0: creates the ecosystem.
     EcoSystem* Create(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
                                      LightManager* lights, char* path, UnknownTextureStream* stream,
@@ -498,7 +498,7 @@ public:
     int PlaceStoredObjects();                 // 0x004598d0: places the objects read from the .esb
     int PlaceAuthoredObjects();               // 0x00459b40: places the authored objects
     int GenerateObjects(int seed);            // 0x00459ce0: generates the objects
-    void UnknownFunction45a9a0();             // 0x0045a9a0: lighting changed
+    void LightingChanged();             // 0x0045a9a0: lighting changed
     void SetRenderStates(int format);         // 0x0045ade0: render states for a texture format
 
     int method;                               // Method: 1 Authored, 2 Auto

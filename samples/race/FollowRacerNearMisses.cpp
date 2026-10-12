@@ -93,7 +93,7 @@ void TrackGameViewOwner::PickFollowedRacer()
     follow.field_0x04 = 0;
     follow.field_0x08 = followedRacer->networkPlayerId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
-    if (field_0x34->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->field_0x3428)
+    if (field_0x34->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->playingReplay)
         ((VCRInterface*)field_0x34->replayVcr)->QueueRecord(0x87, followedRacer->networkPlayerId, &follow, 1);
 }
 

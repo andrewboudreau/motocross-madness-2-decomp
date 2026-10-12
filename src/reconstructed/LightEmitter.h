@@ -39,7 +39,7 @@ public:
                                         float range, int sphere, int a8, int a9, int a10,
                                         int index);
     unsigned int PackedColor();                  // 0x0049dfd0: packed ARGB colour
-    void UnknownFunction49e020(unsigned int color);        // 0x0049e020: sets the colours
+    void SetColor(unsigned int color);        // 0x0049e020: sets the colours
     void SetRange(float range);                            // 0x0049e0f0
     void SetPosition(const Vector3* position);             // 0x0049e150
     void SetDirection(const Vector3* direction);           // 0x0049e1e0
@@ -72,8 +72,8 @@ public:
     // Slot 8 is the shared base-forwarding body 0x004452e0.
     virtual GameObject* UnknownVirtualSlot8(void* value);
 
-    void UnknownFunction49e470(LightEmitter* light);      // 0x0049e470: adds a light
-    void UnknownFunction49e490();                         // 0x0049e490: counts a change
+    void AddLight(LightEmitter* light);      // 0x0049e470: adds a light
+    void MarkChanged();                         // 0x0049e490: counts a change
     LightEmitter* FindLightOfType(int type);        // 0x004a0190: first light of `type`
     // 0x0049e4a0 lights `count` vertices (Griddraw.h's GridVertexSink is
     // this function seen from the terrain). Not reconstructed: it and its

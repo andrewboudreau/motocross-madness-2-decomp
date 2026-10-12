@@ -84,7 +84,7 @@ class UnknownKrustyUILight;
 class UnknownKrustyUILightManager : public GameObject {
 public:
     explicit UnknownKrustyUILightManager(int flags);               // 0x0049e390
-    void UnknownFunction49e470(UnknownKrustyUILight* light);        // 0x0049e470: adds a light
+    void AddLight(UnknownKrustyUILight* light);        // 0x0049e470: adds a light
     unsigned char field_0x2c[0x11c - 0x2c];
 };
 
@@ -104,7 +104,7 @@ public:
 // [offset + list] instead of retail's [list + offset].
 static inline void KrustyUIAddLight(UnknownKrustyUILightManager* lights, UnknownKrustyUILight* light) {
     if (light)
-        lights->UnknownFunction49e470(light);
+        lights->AddLight(light);
 }
 
 // RTTI ProjectedShadow (0x134 bytes, constructor 0x004da570).
@@ -329,7 +329,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_GARAGE->SetMotionByName("Spin");
         KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
-        shadow = projected->UnknownFunction4da7b0(field_0x18, g_TrackGame->field_0x3c);
+        shadow = projected->UnknownFunction4da7b0(field_0x18, g_TrackGame->textureManager);
         UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
         shadowLink = link->UnknownFunction4468b0(field_0x18, KRUSTYUI_GARAGE->field_0x1a0, shadow);
         garageScene->AppendChild(shadowLink, -1);
@@ -562,7 +562,7 @@ void KrustyUI::OpenMenu(int menu) {
                 dialog = new(__FILE__, 763) PCCentralDlg;
                 gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
             }
-        } else if (g_TrackGame->field_0x18 == 1) {
+        } else if (g_TrackGame->playerCount == 1) {
             dialog = new(__FILE__, 767) SinglePlayerDlg;
             gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
         } else {
@@ -902,12 +902,12 @@ void KrustyUI::RecordHighScoreTable(int table) {
     g_TrackGame->field_0x3400->UnknownFunction51f0b0(
         (short)g_TrackGame->mode.raceSettings.eventType, name);
     int added = 0;
-    if (g_TrackGame->field_0x18 == 1) {
+    if (g_TrackGame->playerCount == 1) {
         if (!g_TrackGame->field_0x3400->AddRacer(
                 (short)g_TrackGame->mode.raceSettings.eventType, 0))
             return;
     } else {
-        for (int i = 0; i < g_TrackGame->field_0x18; i++) {
+        for (int i = 0; i < g_TrackGame->playerCount; i++) {
             if (g_TrackGame->field_0x3400->AddRacer(
                     (short)g_TrackGame->mode.raceSettings.eventType, i))
                 added = 1;
@@ -952,7 +952,7 @@ void KrustyUI::UnknownFunction49b0d0(int* bikeChoices, int count, int* riderChoi
     int* usedBikes = (int*)DebugCalloc(bikeCount, sizeof(int), __FILE__, 1164);
     int* usedRiders = (int*)DebugCalloc(riderCount, sizeof(int), __FILE__, 1165);
     int playerClass = UnknownBikeClassOf(
-        ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.field_0xfd8)->field_0x00);
+        ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.garageOptions)->engineSize);
     srand(ReadClock());
     int i;
     for (i = 0; i < riderCount; i++) {

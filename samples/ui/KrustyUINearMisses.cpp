@@ -67,7 +67,7 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     font[count] = 0;
     gui = new(__FILE__, 121) UnknownKrustyUIGui(1);
     if (!AppendSibling(gui->SetUp(
-            field_0x18, g_TrackGame->display->field_0x64, g_TrackGame->field_0x3c, 0,
+            field_0x18, g_TrackGame->display->field_0x64, g_TrackGame->textureManager, 0,
             0, 0, "Arial", 15, "ui\\cursor.tga", UnknownFunction49bda0, -1))) {
         Release();
         return 0;

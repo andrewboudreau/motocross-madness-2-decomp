@@ -87,7 +87,7 @@ int UnknownTextureStream::UnknownFunction460e70(const char* path)
     }
     if (path) {
         if (*path && (field_0x14 = fopen(path, "rb")) != 0) {
-            if (!UnknownFunction460db0()) {
+            if (!CheckHeader()) {
                 fclose(field_0x14);
                 field_0x14 = 0;
                 return 0;
@@ -164,11 +164,11 @@ int UnknownTextureStream::ReadByte()
 #pragma inline_depth()
 
 // 0x00461a60
-int UnknownTextureStream::UnknownFunction461a60(int c)
+int UnknownTextureStream::WriteByte(int c)
 {
     UnknownTextureStream* stream = InnermostStream(this);
     char byte = (char)c;
-    if (!stream->UnknownFunction4618e0(&byte, 1, 1)) {
+    if (!stream->Write(&byte, 1, 1)) {
         return -1;
     }
     return c;

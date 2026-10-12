@@ -63,7 +63,7 @@
   "?SaveControlFile@UnknownTrackGameObject33fc@@QAEXPBD@Z": "0x004489e0",
   "?ApplyDevice@UnknownTrackGameObject33fc@@QAEXPBDH@Z": "0x00448e90",
   "?ChooseDefaultDevice@UnknownTrackGameObject33fc@@QAEHXZ": "0x00449220",
-  "?UnknownFunction449e60@UnknownDriveList@@QAEHXZ": "0x00449e60",
+  "?Rescan@UnknownDriveList@@QAEHXZ": "0x00449e60",
   "?UnknownFunction449e70@UnknownDriveList@@QAEHXZ": "0x00449e70",
   "?UnknownFunction44a010@UnknownDriveList@@QAEHPBDPAHI@Z": "0x0044a010",
   "?UnknownFunction44a0b0@UnknownDriveList@@QAEHHPAD@Z": "0x0044a0b0",

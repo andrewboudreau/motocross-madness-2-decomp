@@ -24,7 +24,7 @@ inline void UnknownDirectoryEntry::UnknownFunctionSet(const char* fileName, unsi
 }
 
 // 0x00449e60
-int UnknownDriveList::UnknownFunction449e60() {
+int UnknownDriveList::Rescan() {
     return UnknownFunction449e70();
 }
 
@@ -127,7 +127,7 @@ void DirectoryList::SetPattern(const char* pattern, int includeFiles) {
 }
 
 // 0x0044a270
-int DirectoryList::UnknownFunction44a270(int index, char* path) {
+int DirectoryList::GetEntryName(int index, char* path) {
     strcpy(path, "");
     if (!entries || index < 0 || index >= count)
         return 0;
@@ -144,7 +144,7 @@ int DirectoryList::UnknownFunction44a2f0(int index, char* name) {
     char dir[_MAX_DIR];
 
     strcpy(name, "");
-    if (!UnknownFunction44a270(index, path))
+    if (!GetEntryName(index, path))
         return 0;
     _splitpath(path, drive, dir, fileName, extension);
     strcpy(name, fileName);
@@ -256,7 +256,7 @@ int DirectoryList::UnknownVirtualSlot1() {
 }
 
 // 0x0044a910
-int DirectoryList::UnknownFunction44a910(const char* name) {
+int DirectoryList::Contains(const char* name) {
     int i;
 
     for (i = 0; i < count; i++) {
@@ -291,14 +291,14 @@ int DirectoryList::DeleteTree(const char* path) {
 }
 
 // 0x0044aa90
-int DirectoryList::UnknownFunction44aa90(const void* a, const void* b) {
+int DirectoryList::CompareNames(const void* a, const void* b) {
     return _stricmp((const char*)a, (const char*)b);
 }
 
 // 0x0044aab0
-void DirectoryList::UnknownFunction44aab0() {
+void DirectoryList::SortByName() {
     if (count > 0)
-        qsort(entries, count, sizeof(UnknownDirectoryEntry), UnknownFunction44aa90);
+        qsort(entries, count, sizeof(UnknownDirectoryEntry), CompareNames);
 }
 
 // 0x0044aae0
@@ -350,11 +350,11 @@ int CombinedDirectoryList::UnknownVirtualSlot1() {
     first->SetPattern(pattern, 1);
     first->SetDirectory(field_0x21c);
     first->UnknownVirtualSlot1();
-    first->UnknownFunction44aab0();
+    first->SortByName();
     second->SetPattern(pattern, 1);
     second->SetDirectory(field_0x320);
     second->UnknownVirtualSlot1();
-    second->UnknownFunction44aab0();
+    second->SortByName();
 
     total = second->count;
     merged = new (__FILE__, 480) UnknownDirectoryEntry[total + first->count];

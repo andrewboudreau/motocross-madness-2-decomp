@@ -176,10 +176,10 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
                 }
                 if (fog)
                     fog->SetParameters(color, visibility, haziness);
-                sunLight->UnknownFunction49e020(sun);
-                ambientLight->UnknownFunction49e020(ambient);
+                sunLight->SetColor(sun);
+                ambientLight->SetColor(ambient);
                 if (ecoSystem)
-                    ecoSystem->UnknownFunction45a9a0();
+                    ecoSystem->LightingChanged();
             }
             if (eventFog) {
                 if (eventFog->field_0x44 == 0x100)

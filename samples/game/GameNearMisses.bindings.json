@@ -21,7 +21,7 @@
   "?Setup@DebugOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@HHH@Z": "0x00447de0",
   "?ShowNextPage@DebugOverlay@@QAEHXZ": "0x004484f0",
   "?InitFastMath@@YAXXZ": "0x00460ad0",
-  "?UnknownFunction4677c0@UnknownStatic65b478@@QAEXXZ": "0x004677c0",
+  "?DeleteFonts@UnknownStatic65b478@@QAEXXZ": "0x004677c0",
   "?UnknownFunction467b70@Game@@QAEHPAD@Z$ehhandler": "0x0054ad03",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Unlink@UnknownGlobal56c470@@QAEXXZ": "0x004691f0",

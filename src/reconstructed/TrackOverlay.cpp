@@ -513,13 +513,13 @@ int StatsOverlay::DrawViewModePanel()
             finished++;
     }
     int total;
-    if (g_TrackGame->field_0x18 == 1) {
+    if (g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 4)
             total = 1;
         else
             total = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     } else {
-        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->field_0x18;
+        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
     }
     sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);
@@ -553,7 +553,7 @@ int StatsOverlay::DrawViewModePanel()
     FormatLapTime(time, instrumentSource->state->field_0x770);
     sprintf(rowText[4], "%s %s", label, time);
     g_TrackGame->LoadResourceString(0x13b8, label, 0x80);
-    if (g_TrackGame->field_0x3428)
+    if (g_TrackGame->playingReplay)
         FormatLapTime(time, statsSource->field_0x1b8);
     else
         FormatLapTime(time, instrumentSource->state->field_0x754);
@@ -596,7 +596,7 @@ void StatsOverlay::DrawLapTime()
     char text[0x80];
     UnknownOverlayRect rect;
     int count;
-    if (g_TrackGame->field_0x3428)
+    if (g_TrackGame->playingReplay)
         FormatLapTime(text, statsSource->field_0x1b8);
     else
         FormatLapTime(text, instrumentSource->state->field_0x754);
@@ -626,13 +626,13 @@ int StatsOverlay::DrawRacePanel()
     }
     g_TrackGame->LoadResourceString(0x835, label, 0x80);
     int total;
-    if (g_TrackGame->field_0x18 == 1) {
+    if (g_TrackGame->playerCount == 1) {
         if (g_TrackGame->mode.raceSettings.raceMode == 4)
             total = 1;
         else
             total = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
     } else {
-        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->field_0x18;
+        total = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->playerCount;
     }
     sprintf(rowText[0], "%s %d / %d", label, instrumentSource->state->position, total - finished);
     g_TrackGame->LoadResourceString(0x836, label, 0x80);

@@ -225,7 +225,7 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
 }
 
 // 0x00462db0
-void Fog::UnknownFunction462db0(int level)
+void Fog::SetDetailLevel(int level)
 {
     visibilityOffset = (9 - level) * 0.1f;
     float visibility = field_0x38;

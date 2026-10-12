@@ -57,11 +57,11 @@ public:
     // 0x00460d70: the archive holding `name` (its offset and length go to
     // +0x130 and +0x04), or 0 (FileStream.cpp).
     UnknownTextureStream* UnknownFunction460d70(const char* name);
-    int UnknownFunction460db0();              // 0x00460db0: checks the "FAOE" header
+    int CheckHeader();              // 0x00460db0: checks the "FAOE" header
     int SetBufferSize(int unused);    // 0x00461310: binary mode
-    int UnknownFunction4618e0(const void* buffer, int size, int count); // 0x004618e0: writes
-    int UnknownFunction461a60(int c);         // 0x00461a60: writes a byte
-    int UnknownFunction461b90(const char* path); // 0x00461b90: writes the header, keyed by the name
+    int Write(const void* buffer, int size, int count); // 0x004618e0: writes
+    int WriteByte(int c);         // 0x00461a60: writes a byte
+    int WriteHeader(const char* path); // 0x00461b90: writes the header, keyed by the name
     void ResetTextMode();             // 0x00461d20: restarts the key
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
     char GetTextMode()

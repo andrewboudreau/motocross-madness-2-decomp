@@ -612,7 +612,7 @@ GameObjectIterator::GameObjectIterator(GameObject* root, int mode, const char* f
 }
 
 // 0x00469a20
-void GameObjectIterator::UnknownFunction469a20() {
+void GameObjectIterator::Stop() {
     if (!field_0x90)
         g_UnknownGlobal65b548--;
     field_0x04 = 0;
@@ -620,7 +620,7 @@ void GameObjectIterator::UnknownFunction469a20() {
 
 // 0x00469a40
 GameObjectIterator::~GameObjectIterator() {
-    UnknownFunction469a20();
+    Stop();
 }
 
 // 0x00469a50: the next match, or 0 (releasing the global) once the walk

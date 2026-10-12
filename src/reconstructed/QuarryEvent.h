@@ -69,8 +69,8 @@ public:
 // 0x00457250. Only the methods this file calls.
 class EcoSystem {
 public:
-    void UnknownFunction4594c0(int level);    // 0x004594c0: detail level
-    void UnknownFunction45a9a0();             // 0x0045a9a0: lighting changed
+    void SetDetailLevel(int level);    // 0x004594c0: detail level
+    void LightingChanged();             // 0x0045a9a0: lighting changed
 };
 
 // Fog (vtable 0x005526dc, 0x5c bytes; constructed by 0x004de590 with

@@ -99,7 +99,7 @@ TrackGameMode::TrackGameMode() {
     strcpy(cdDriveRoot, "");
     driveList = 0;
     driveList = new(__FILE__, 71) UnknownDriveList;
-    if (!driveList->UnknownFunction449e60()) {
+    if (!driveList->Rescan()) {
         delete driveList;
         driveList = 0;
     }
@@ -263,7 +263,7 @@ void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* option
     int k;
 
     for (i = 0; i < 11; i++)
-        options->field_0x24[i] = g_TrackGame->ui ? g_TrackGame->ui->standardCurves[1][0][i] : 10;
+        options->eqBands[i] = g_TrackGame->ui ? g_TrackGame->ui->standardCurves[1][0][i] : 10;
     for (k = 0; k < 5; k++) {
         for (j = 0; j < 3; j++) {
             for (i = 0; i < 11; i++)
@@ -275,18 +275,18 @@ void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* option
 
 // 0x00522c70
 void TrackGameMode::UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options) {
-    options->field_0x0c[0] = 0.5f;
-    options->field_0x0c[1] = 0.5f;
-    options->field_0x0c[2] = 0.5f;
-    options->field_0x0c[3] = 0.5f;
-    options->field_0x0c[4] = 0.5f;
-    options->field_0x0c[5] = 0.5f;
+    options->suspension[0] = 0.5f;
+    options->suspension[1] = 0.5f;
+    options->suspension[2] = 0.5f;
+    options->suspension[3] = 0.5f;
+    options->suspension[4] = 0.5f;
+    options->suspension[5] = 0.5f;
 }
 
 // 0x00522c90
 void TrackGameMode::UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options) {
-    options->field_0x00 = 250;
-    options->field_0x04 = 0;
+    options->engineSize = 250;
+    options->fourStroke = 0;
     UnknownFunction522bf0(options);
 }
 
@@ -463,7 +463,7 @@ int TrackGameMode::LoadProfile() {
     }
     raceSettings = savedSettings;
     field_0x94 = field_0x98;
-    memcpy(field_0xfd8, optionsBackup, sizeof(field_0xfd8));
+    memcpy(garageOptions, optionsBackup, sizeof(garageOptions));
     memcpy(&racerChoice, &racerChoiceBackup, sizeof(racerChoice));
     return strcmp(field_0x00, "") != 0;
 }

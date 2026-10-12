@@ -155,18 +155,18 @@ Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int a, int
     Sound* sound = new (__FILE__, 186) Sound(group, 1);
     if (!sound)
         return 0;
-    Sound* loaded = (Sound*)entry->field_0x10;
+    Sound* loaded = (Sound*)entry->object;
     if (loaded) {
         if (loaded->soundFlags & 4) {
-            entry->field_0x14->Seek(entry->field_0x18, 0, 0);
-            if (!sound->LoadWave(entry->field_0x14, flags, a, b, c))
+            entry->archive->Seek(entry->offset, 0, 0);
+            if (!sound->LoadWave(entry->archive, flags, a, b, c))
                 goto failed;
         } else if (!sound->DuplicateFrom(loaded)) {
             goto failed;
         }
     } else {
-        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
-        if (!sound->LoadWave(entry->field_0x14, flags, a, b, c)) {
+        entry->archive->Seek(entry->offset, 0, 0);
+        if (!sound->LoadWave(entry->archive, flags, a, b, c)) {
 failed:
             delete sound;
             return 0;
@@ -181,7 +181,7 @@ failed:
 // 0x004bba10: an empty sound of `type` in `group`.
 Sound::Sound(SoundGroup* group, int type) {
     soundGroup = group;
-    group->UnknownFunction401b50(this);
+    group->AddMember(this);
     dsBuffer = 0;
     dsBuffer3D = 0;
     pendingBuffer = 0;
@@ -228,7 +228,7 @@ Sound::~Sound() {
         delete notifier;
     if (sourceStream && !sourceStream->field_0x1c)
         delete sourceStream;
-    soundGroup->UnknownFunction401be0(this);
+    soundGroup->RemoveMember(this);
     if (soundFlags & 4) {
         if (bufferReady)
             SoundSystem()->soundMemoryManager->UnloadSound(this);
@@ -715,7 +715,7 @@ void Sound::ReleaseBuffers() {
         dsBuffer->Release();
         dsBuffer = 0;
     }
-    g_MemTagStack->UnknownFunction4a2e00(bufferBytes);
+    g_MemTagStack->SubtractDirectXBytes(bufferBytes);
     bufferReady = 0;
     field_0x1f4_bit6 = 0;
     LeaveCriticalSection(&bufferLock);
@@ -837,7 +837,7 @@ int Sound::CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsign
     desc.format = (UnknownWaveFormat*)&format;
     if (SoundSystem()->directSound->CreateSoundBuffer(&desc, buffer, 0) < 0)
         return 0;
-    g_MemTagStack->UnknownFunction4a2de0(bytes);
+    g_MemTagStack->AddDirectXBytes(bytes);
     bufferBytes = bytes;
     SoundSystem()->RefreshSoundCaps();
     return 1;

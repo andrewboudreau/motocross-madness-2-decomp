@@ -118,7 +118,7 @@
   "?SetRacer@KrustyVCR@@QAEXHDHPAD0000HHH@Z": "0x0049c070",
   "?SetMotionByName@UnknownBikeRaceCharacter@@QAEXPBD@Z": "0x004a8b10",
   "?ApplyReplayDelta@UnknownBikeRaceGhost@@QAEXPBUUnknownBikeRaceGhostDelta@@PAUUnknownBikeRaceGhostPart@@@Z": "0x004a9aa0",
-  "?UnknownFunction4a9d10@UnknownTrackGameViewOwnerDc@@QAEXPAVKrustyVCR@@@Z": "0x004a9d10",
+  "?SetRecorder@UnknownTrackGameViewOwnerDc@@QAEXPAVKrustyVCR@@@Z": "0x004a9d10",
   "?PickFollowedRacer@TrackGameViewOwner@@QAEXXZ": "0x004a9d20",
   "?GetPlayerName@NetworkInterface@@QAEHHPAD@Z": "0x004ac720",
   "?FindPlayer@NetworkInterface@@QAEPAVNetPlayer@@H@Z": "0x004ac800",

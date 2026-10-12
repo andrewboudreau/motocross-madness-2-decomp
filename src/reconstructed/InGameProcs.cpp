@@ -247,7 +247,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             event->handled = 1;
             memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+            memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.optionsBackup,
                    sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.racerChoice, &g_TrackGame->mode.racerChoiceBackup,
                    sizeof(g_TrackGame->mode.racerChoiceBackup));

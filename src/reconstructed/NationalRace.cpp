@@ -72,7 +72,7 @@ void NationalRace::UnknownVirtualSlot29() {
     BaseQuarryEvent::UnknownVirtualSlot29();
     g_TrackGame->LoadResourceString(0x913, name, sizeof(name));
     finishText = new (__FILE__, 71) DropTextOverlay(1);
-    finishText = finishText->UnknownFunction51af00(field_0x18, g_TrackGame->field_0x3c, 3.0f, 0,
+    finishText = finishText->UnknownFunction51af00(field_0x18, g_TrackGame->textureManager, 3.0f, 0,
                                                    sizeof(name), name);
     if (!finishText)
         sprintf(message, "Drop Text Overlay not created.\n");

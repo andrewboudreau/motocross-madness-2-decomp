@@ -39,7 +39,7 @@ public:
                                float farScale, float nearScale, float minimum);
     // 0x004627a0: sets the colour, visibility and haziness.
     void SetParameters(unsigned int color, float visibility, float haziness);
-    void UnknownFunction462db0(int level);    // 0x00462db0: detail level
+    void SetDetailLevel(int level);    // 0x00462db0: detail level
 
     // QuarryStuntEvent.cpp reads +0x2c, +0x38, +0x40 and +0x44 under their
     // provisional names.

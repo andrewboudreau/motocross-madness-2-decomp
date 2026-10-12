@@ -107,7 +107,7 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 // Also swept (20 forms, best 28): a result local, `!= 0`, `0L`, an extra
 // `&& field_0x14` and an unsigned `> 0` test for the first seek, each with the
 // `encoded`/+0x124/`field_0x08 = 0` statements in three orders and a cast zero.
-int UnknownTextureStream::UnknownFunction460db0()
+int UnknownTextureStream::CheckHeader()
 {
     if (fseek(field_0x14, 0, SEEK_SET)) {
         fclose(field_0x14);
@@ -179,7 +179,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
                         return 0;
                     }
                 } else {
-                    if (!UnknownFunction460db0()) {
+                    if (!CheckHeader()) {
                         fclose(field_0x14);
                         field_0x14 = 0;
                         sprintf(buffer, "%s NOT an encrypted file, but expected to be.\n", path);
@@ -222,7 +222,7 @@ int UnknownTextureStream::Open(const char* path, const char* mode, int encoded)
                     sprintf(buffer, "Fseek failed for %s.\n", path);
                     return 0;
                 }
-                if (encoded && !UnknownFunction461b90(path)) {
+                if (encoded && !WriteHeader(path)) {
                     fclose(field_0x14);
                     field_0x14 = 0;
                     sprintf(buffer, "Write of encrypted file header failed for %s.\n", path);
@@ -420,7 +420,7 @@ int UnknownTextureStream::Read(void* buffer, int size, int count)
 
 // 0x004618e0. Near miss (88%): retail loads every argument into a register before
 // the pushes; VC6 here pushes from memory.
-int UnknownTextureStream::UnknownFunction4618e0(const void* buffer, int size, int count)
+int UnknownTextureStream::Write(const void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
     if (stream->field_0x08) {
@@ -441,10 +441,10 @@ int UnknownTextureStream::UnknownFunction4618e0(const void* buffer, int size, in
 // path falls through, as in retail.
 static inline int PutHeader(UnknownTextureStream* stream)
 {
-    if (stream->UnknownFunction461a60(stream->field_0x02) == -1
-        || stream->UnknownFunction461a60(stream->field_0x00) == -1
-        || stream->UnknownFunction461a60(stream->field_0x20) == -1
-        || stream->UnknownFunction461a60(stream->field_0x18) == -1) {
+    if (stream->WriteByte(stream->field_0x02) == -1
+        || stream->WriteByte(stream->field_0x00) == -1
+        || stream->WriteByte(stream->field_0x20) == -1
+        || stream->WriteByte(stream->field_0x18) == -1) {
         return 0;
     }
     return 1;
@@ -454,7 +454,7 @@ static inline int PutHeader(UnknownTextureStream* stream)
 // extension). Near miss (90%): the loop body matches with the name byte in a
 // temporary; retail stores the 0xfa seed inside the inlined strcat and sets up
 // the name pointer right after strlen, where VC6 here schedules both later.
-int UnknownTextureStream::UnknownFunction461b90(const char* path)
+int UnknownTextureStream::WriteHeader(const char* path)
 {
     char drive[_MAX_DRIVE];
     char directory[_MAX_DIR];

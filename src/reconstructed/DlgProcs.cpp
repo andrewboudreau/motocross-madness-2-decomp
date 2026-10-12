@@ -378,7 +378,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         tab->SetTextAlign(0x12);
         memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.savedSettings,
                sizeof(g_TrackGame->mode.savedSettings));
-        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+        memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.optionsBackup,
                sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.racerChoice, &g_TrackGame->mode.racerChoiceBackup,
                sizeof(g_TrackGame->mode.racerChoiceBackup));
@@ -402,7 +402,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             UpdateBoundValues(1);
             memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.raceSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+            memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.garageOptions,
                    sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.racerChoiceBackup, &g_TrackGame->mode.racerChoice,
                    sizeof(g_TrackGame->mode.racerChoiceBackup));
@@ -437,15 +437,15 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 if (raceInfoPage)
                     raceInfoPage->UpdateBoundValues(1);
                 if (g_TrackGame->mode.saveReplay && g_TrackGame->mode.raceSettings.raceMode != 4) {
-                    g_TrackGame->field_0x342c = 1;
-                    g_TrackGame->field_0x3428 = 0;
+                    g_TrackGame->useReplayTape = 1;
+                    g_TrackGame->playingReplay = 0;
                 } else {
-                    g_TrackGame->field_0x342c = 0;
-                    g_TrackGame->field_0x3428 = 0;
+                    g_TrackGame->useReplayTape = 0;
+                    g_TrackGame->playingReplay = 0;
                 }
                 memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.raceSettings,
                        sizeof(g_TrackGame->mode.savedSettings));
-                memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+                memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.garageOptions,
                        sizeof(g_TrackGame->mode.optionsBackup));
                 memcpy(&g_TrackGame->mode.racerChoiceBackup, &g_TrackGame->mode.racerChoice,
                        sizeof(g_TrackGame->mode.racerChoiceBackup));
@@ -1404,7 +1404,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     edit->GetEditText(name, 16);
     if (!strcmp(name, ""))
         return;
-    if (g_TrackGame->profileDirectory->UnknownFunction44a910(name)) {
+    if (g_TrackGame->profileDirectory->Contains(name)) {
         ProfileExistsDlg* dialog = new(__FILE__, 3416) ProfileExistsDlg;
         g_TrackGame->ui->gui->ShowDialog(dialog, 0, 4, 0, (int)event->dialog,
                                                                      (int)name, 0, 1);
@@ -2015,21 +2015,21 @@ void LeaveMenusForRace() {
     g_TrackGame->ui->gui->ReleaseBackground();
     if (g_TrackGame->display->freezeFrameIndex)
         g_TrackGame->ui->gui->EnableWindowClipper(0);
-    if (g_TrackGame->field_0x18 == 1 && !g_TrackGame->UnknownFunction521cd0() &&
-        !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->field_0x3428) {
+    if (g_TrackGame->playerCount == 1 && !g_TrackGame->UnknownFunction521cd0() &&
+        !g_TrackGame->ui->field_0x4a8 && !g_TrackGame->playingReplay) {
         memcpy(&g_TrackGame->mode.savedSettings, &g_TrackGame->mode.raceSettings,
                sizeof(g_TrackGame->mode.savedSettings));
-        memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.field_0xfd8,
+        memcpy(g_TrackGame->mode.optionsBackup, g_TrackGame->mode.garageOptions,
                sizeof(g_TrackGame->mode.optionsBackup));
         memcpy(&g_TrackGame->mode.racerChoiceBackup, &g_TrackGame->mode.racerChoice,
                sizeof(g_TrackGame->mode.racerChoiceBackup));
         g_TrackGame->mode.field_0x98 = g_TrackGame->mode.field_0x94;
     }
-    if (g_TrackGame->field_0x18 > 1 && !g_TrackGame->ui->field_0x4a8 &&
-        !g_TrackGame->field_0x3428) {
+    if (g_TrackGame->playerCount > 1 && !g_TrackGame->ui->field_0x4a8 &&
+        !g_TrackGame->playingReplay) {
         memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.raceSettings,
                sizeof(g_TrackGame->mode.field_0x2bd0));
-        memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.field_0xfd8,
+        memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.garageOptions,
                sizeof(g_TrackGame->mode.field_0x1090));
         memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.racerChoice,
                sizeof(g_TrackGame->mode.field_0x1b04));
@@ -2478,10 +2478,10 @@ void ReplayFilesDlg::PlaySelectedReplay() {
     UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
     memcpy(&g_TrackGame->mode.raceSettings, &header->raceMode, sizeof(g_TrackGame->mode.savedSettings));
     g_TrackGame->mode.SelectSeries(header->series);
-    g_TrackGame->field_0x3428 = 1;
-    g_TrackGame->field_0x342c = 1;
-    *(int*)&g_TrackGame->mode.field_0xfd8[0] = header->engineSize;
-    *(int*)&g_TrackGame->mode.field_0xfd8[4] = header->fourStroke;
+    g_TrackGame->playingReplay = 1;
+    g_TrackGame->useReplayTape = 1;
+    *(int*)&g_TrackGame->mode.garageOptions[0] = header->engineSize;
+    *(int*)&g_TrackGame->mode.garageOptions[4] = header->fourStroke;
     COPY_TEXT(g_TrackGame->mode.replayFile, filePaths[list->GetRowData(-1)], 0x104);
     parentDialog->UnknownVirtualSlot26();
     LeaveMenusForRace();
@@ -2597,7 +2597,7 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
             g_TrackGame->eventManager->CloseRace(2);
             memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
-            memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
+            memcpy(g_TrackGame->mode.garageOptions, g_TrackGame->mode.optionsBackup,
                    sizeof(g_TrackGame->mode.optionsBackup));
             memcpy(&g_TrackGame->mode.racerChoice, &g_TrackGame->mode.racerChoiceBackup,
                    sizeof(g_TrackGame->mode.racerChoiceBackup));

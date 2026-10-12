@@ -11,7 +11,7 @@ public:
     GameObjectIterator(GameObject* root, int mode, const char* filter); // 0x00469950
     ~GameObjectIterator();                                                // 0x00469a40
     GameObject* Next();                                                   // 0x00469a50
-    void UnknownFunction469a20();                                         // 0x00469a20: stops early
+    void Stop();                                         // 0x00469a20: stops early
 
 private:
     GameObject* field_0x00;    // root

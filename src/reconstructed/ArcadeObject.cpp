@@ -101,7 +101,7 @@ int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallbac
     char found[0x104];
     char path[0x104];
 
-    g_MemTagStack->UnknownFunction4a2da0(tag);
+    g_MemTagStack->CopyCurrentName(tag);
     g_MemTagStack->Push("Collision");
     collisionObject = new (__FILE__, 154) CollisionObject(1);
     collisionObject->Configure(field_0x18, 1, a, b);

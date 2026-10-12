@@ -29,7 +29,7 @@
   "?InsertBefore@GameObject@@QAEHPAV1@H@Z": "0x00469260",
   "?ReleaseSiblings@GameObject@@QAEHXZ": "0x00469680",
   "?FindByClassName@GameObject@@QAEPAV1@HPBD@Z": "0x00469770",
-  "?UnknownFunction469a20@GameObjectIterator@@QAEXXZ": "0x00469a20",
+  "?Stop@GameObjectIterator@@QAEXXZ": "0x00469a20",
   "?ReleaseDetached@GameObject@@QAEXXZ": "0x00469c80",
   "?AppendClassName@GameObject@@QAEXPAV1@@Z": "0x00469ce0",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",

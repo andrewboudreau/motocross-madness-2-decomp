@@ -75,10 +75,10 @@ Game::Game() {
     display = 0;
     renderTarget = 0;
     controlInterface = 0;
-    field_0x34 = 0;
+    childRoot = 0;
     rootObject = 0;
-    field_0x3c = 0;
-    field_0x18 = 1;
+    textureManager = 0;
+    playerCount = 1;
     field_0x2d0 = 0;
     debugOverlay = 0;
     s_UnknownFile65b4ac = 0;
@@ -334,7 +334,7 @@ int Game::UnknownVirtualSlot15() {
     field_0x2d5_bit1 = 1;
     if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
         g_UnknownGlobal56c470->Unlink();
-    g_UnknownStatic65b478.UnknownFunction4677c0();
+    g_UnknownStatic65b478.DeleteFonts();
     if (rootObject) {
         rootObject->Release();
         rootObject = 0;

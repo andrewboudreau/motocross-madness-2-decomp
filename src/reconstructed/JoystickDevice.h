@@ -47,7 +47,7 @@ public:
     void FeedAxis(int axis, float value, float range);
     // 0x00489c60: state of `control` (negative: an axis direction).
     int UnknownFunction489c60(int control, int modifier, UnknownInputEntry* entry);
-    float UnknownFunction489e20(int axis);    // 0x00489e20: axis value (OptionProcs.cpp)
+    float GetAxisValue(int axis);    // 0x00489e20: axis value (OptionProcs.cpp)
 
     friend class ControlInterface; // reads the input entries
 

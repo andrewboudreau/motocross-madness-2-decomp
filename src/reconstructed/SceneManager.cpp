@@ -1162,7 +1162,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
             return 0;
         if (sceneLights[i].emitsLight) {
             const char* flare = sceneLights[i].hasLensFlare ? sceneLights[i].lensFlareTexture : 0;
-            int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->field_0x3c : 0;
+            int camera = sceneLights[i].hasLensFlare ? (int)g_TrackGame->textureManager : 0;
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
                     ->Create(field_0x18, sceneLights[i].type, sceneLights[i].color,
@@ -1171,7 +1171,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
                                             (int)flare, i);
             if (!sceneLights[i].emitter)
                 return 0;
-            lights->UnknownFunction49e470(sceneLights[i].emitter);
+            lights->AddLight(sceneLights[i].emitter);
         }
     }
     ReadFog();
@@ -1233,10 +1233,10 @@ int CountTexture(UnknownSceneTextureInfo* texture, int* counts)
     UnknownResourceEntry* entry =
         g_UnknownResourceManager572b44->FindItem(texture->textureName, 0);
     if (entry) {
-        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
-        if (entry->field_0x14->Read(&header0, 4, 1) != 1
-            || entry->field_0x14->Read(&header1, 4, 1) != 1
-            || entry->field_0x14->Read(&width, 4, 1) != 1)
+        entry->archive->Seek(entry->offset, 0, 0);
+        if (entry->archive->Read(&header0, 4, 1) != 1
+            || entry->archive->Read(&header1, 4, 1) != 1
+            || entry->archive->Read(&width, 4, 1) != 1)
             return 0;
     } else {
         UnknownTgaFile* file = OpenAndReadHeader(texture->textureName, 0,
@@ -1276,7 +1276,7 @@ int AddResource(UnknownResourceManager* manager, const char* name, const char* p
             manager->AddLooseFile(name, path);
         UnknownResourceEntry* entry = manager->FindItem(name, 0);
         if (entry)
-            delete entry->field_0x14;
+            delete entry->archive;
         return 1;
     }
     return 0;
@@ -1326,56 +1326,56 @@ int CountModelTextures(const char* path, UnknownSceneResourceManager* resources,
         entry = g_UnknownResourceManager572b44->FindItem(name, 0);
     }
     if (entry) {
-        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
-        entry->field_0x14->Read(&count, 4, 1);
+        entry->archive->Seek(entry->offset, 0, 0);
+        entry->archive->Read(&count, 4, 1);
         SoultreeObject* node = new(__FILE__, 3447) SoultreeObject(0);
         for (int i = 0; i < count; i++) {
-            entry->field_0x14->Read(node->nodeName, 0x80, 1);
-            entry->field_0x14->Read(&node->localMatrix, 0x40, 1);
-            entry->field_0x14->Read(&node->field_0x14c, 4, 1);
-            entry->field_0x14->Read(&node->localBoundsValid, 4, 1);
-            entry->field_0x14->Read(&node->localBoundsCenter, 0xc, 1);
-            entry->field_0x14->Read(&node->localBoundsHalfExtent, 0xc, 1);
-            entry->field_0x14->Read(&node->field_0x170, 4, 1);
-            entry->field_0x14->Read(&node->subtreeBoundsCenter, 0xc, 1);
-            entry->field_0x14->Read(&node->subtreeBoundsHalfExtent, 0xc, 1);
+            entry->archive->Read(node->nodeName, 0x80, 1);
+            entry->archive->Read(&node->localMatrix, 0x40, 1);
+            entry->archive->Read(&node->field_0x14c, 4, 1);
+            entry->archive->Read(&node->localBoundsValid, 4, 1);
+            entry->archive->Read(&node->localBoundsCenter, 0xc, 1);
+            entry->archive->Read(&node->localBoundsHalfExtent, 0xc, 1);
+            entry->archive->Read(&node->field_0x170, 4, 1);
+            entry->archive->Read(&node->subtreeBoundsCenter, 0xc, 1);
+            entry->archive->Read(&node->subtreeBoundsHalfExtent, 0xc, 1);
         }
         node->Release();
         int* parents = (int*)operator new(count * 4, __FILE__, 3466);
-        entry->field_0x14->Read(parents, 4, count);
+        entry->archive->Read(parents, 4, count);
         operator delete(parents);
-        entry->field_0x14->Read(&materials, 4, 1);
+        entry->archive->Read(&materials, 4, 1);
         if (materials > 0) {
             SoultreeMaterial* material = new(__FILE__, 3472) SoultreeMaterial(0);
             for (int j = 0; j < materials; j++) {
-                entry->field_0x14->Read(material->textureName, 0x40, 1);
-                entry->field_0x14->Read(&material->textureFormat, 4, 1);
-                entry->field_0x14->Read(&material->colorKey, 4, 1);
-                entry->field_0x14->Read(&material->sourceBlend, 4, 1);
-                entry->field_0x14->Read(&material->destBlend, 4, 1);
-                entry->field_0x14->Read(&material->hasTextureName, 4, 1);
-                entry->field_0x14->Read(&material->useVertexColor, 4, 1);
-                entry->field_0x14->Read(&material->mipMapped, 4, 1);
-                entry->field_0x14->Read(&material->hasColorKey, 4, 1);
-                entry->field_0x14->Read(&material->hasSourceBlend, 4, 1);
-                entry->field_0x14->Read(&material->hasDestBlend, 4, 1);
-                entry->field_0x14->Read(&material->field_0xb8, 4, 1);
-                entry->field_0x14->Read(&material->clampTexture, 4, 1);
-                entry->field_0x14->Read(&material->hasAlpha, 4, 1);
-                entry->field_0x14->Read(&material->materialAlpha, 4, 1);
-                entry->field_0x14->Read(&material->textureSpeed, 4, 1);
-                entry->field_0x14->Read(&material->mappingType, 2, 1);
-                entry->field_0x14->Read(&material->field_0xcc, 4, 1);
-                position = entry->field_0x14->Tell();
-                mode = entry->field_0x14->GetTextMode();
+                entry->archive->Read(material->textureName, 0x40, 1);
+                entry->archive->Read(&material->textureFormat, 4, 1);
+                entry->archive->Read(&material->colorKey, 4, 1);
+                entry->archive->Read(&material->sourceBlend, 4, 1);
+                entry->archive->Read(&material->destBlend, 4, 1);
+                entry->archive->Read(&material->hasTextureName, 4, 1);
+                entry->archive->Read(&material->useVertexColor, 4, 1);
+                entry->archive->Read(&material->mipMapped, 4, 1);
+                entry->archive->Read(&material->hasColorKey, 4, 1);
+                entry->archive->Read(&material->hasSourceBlend, 4, 1);
+                entry->archive->Read(&material->hasDestBlend, 4, 1);
+                entry->archive->Read(&material->field_0xb8, 4, 1);
+                entry->archive->Read(&material->clampTexture, 4, 1);
+                entry->archive->Read(&material->hasAlpha, 4, 1);
+                entry->archive->Read(&material->materialAlpha, 4, 1);
+                entry->archive->Read(&material->textureSpeed, 4, 1);
+                entry->archive->Read(&material->mappingType, 2, 1);
+                entry->archive->Read(&material->field_0xcc, 4, 1);
+                position = entry->archive->Tell();
+                mode = entry->archive->GetTextMode();
                 if (material->hasTextureName) {
                     if (!AddResource((UnknownResourceManager*)resources, material->textureName, 0))
                         return 1;
                     if (!CountTexture((UnknownSceneTextureInfo*)material, (int*)counts))
                         return 0;
                 }
-                entry->field_0x14->Seek(position, 0, 0);
-                entry->field_0x14->SetTextMode(mode);
+                entry->archive->Seek(position, 0, 0);
+                entry->archive->SetTextMode(mode);
             }
             material->Release();
         }

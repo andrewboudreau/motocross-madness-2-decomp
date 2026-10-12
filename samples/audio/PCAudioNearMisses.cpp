@@ -96,11 +96,11 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
         UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(soundName, 0);
         if (!entry)
             return 0;
-        entry->field_0x14->Seek(entry->field_0x18, 0, 0);
+        entry->archive->Seek(entry->offset, 0, 0);
         UnknownWaveHeader header;
-        if (entry->field_0x14->Read(&header, 0x2c, 1) != 1)
+        if (entry->archive->Read(&header, 0x2c, 1) != 1)
             return 0;
-        if (!FillBufferFromStream(buffer, entry->field_0x14, 0, bufferBytes))
+        if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
             return 0;
         return 1;
     }
