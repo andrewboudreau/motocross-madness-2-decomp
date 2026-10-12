@@ -1522,6 +1522,11 @@ inline void BikeAIClampUnit(float& v)
 // rows, and the smoother tail (retail spills the target and reloads it; ours keeps it
 // with fxch).  The other lean clamp forms (`lean = pitch;` then an if-chain on lean or
 // on pitch, BikeAIClampUnit(lean = pitch)) score 573..626 with the height copy.
+// Also tried at 2026: `(lean = pitch)` in both tests, the second test without `else`
+// or on pitch, an inner BikeAIClampUnit, a `||` test (2022..2026, or 597..655 with the
+// size changed); the smoother with step read before the time constant, a named target
+// local, `+=`, a copied target or blend * difference (2024..2026); `Vec3 a, b, c` at the
+// top, all three in the hit block, or `dummy` at the top (227..462).
 int KrustyBike::Fn_00413200(float dt)
 {
     Vec3 a, c;
