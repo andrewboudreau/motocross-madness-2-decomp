@@ -160,13 +160,13 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 view->ToggleReplayPause(1);
                 view->ToggleReplayPause(0);
                 view->replayMode = 4;
-                g_TrackGame->field_0x2e0 = 1.0f;
+                g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("TogPause", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 view->ToggleReplayPause(0);
                 view->replayMode = 4;
-                g_TrackGame->field_0x2e0 = 1.0f;
+                g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("TogFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
@@ -174,11 +174,11 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                     if (view->replayPaused)
                         view->ToggleReplayPause(0);
                     view->replayMode = 8;
-                    g_TrackGame->field_0x2e0 = 2.0f;
+                    g_TrackGame->replaySpeed = 2.0f;
                 } else {
                     view->ToggleReplayPause(1);
                     view->replayMode = 4;
-                    g_TrackGame->field_0x2e0 = 1.0f;
+                    g_TrackGame->replaySpeed = 1.0f;
                 }
             }
         } else if (!_stricmp("TogFFF", event->controlName)) {
@@ -187,11 +187,11 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                     if (view->replayPaused)
                         view->ToggleReplayPause(0);
                     view->replayMode = 9;
-                    g_TrackGame->field_0x2e0 = 8.0f;
+                    g_TrackGame->replaySpeed = 8.0f;
                 } else {
                     view->ToggleReplayPause(1);
                     view->replayMode = 4;
-                    g_TrackGame->field_0x2e0 = 1.0f;
+                    g_TrackGame->replaySpeed = 1.0f;
                 }
             }
         } else if (!_stricmp("TogReverse", event->controlName)) {
@@ -200,12 +200,12 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                     if (view->replayPaused)
                         view->ToggleReplayPause(0);
                     view->replayMode = 11;
-                    g_TrackGame->field_0x2e0 = 0.0f;
+                    g_TrackGame->replaySpeed = 0.0f;
                 }
             } else {
                 view->ToggleReplayPause(1);
                 view->replayMode = 4;
-                g_TrackGame->field_0x2e0 = 1.0f;
+                g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("ButFrame", event->controlName)) {
             if (view->field_0x1e4 != -2) {
@@ -223,7 +223,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 if (view->replayPaused)
                     view->ToggleReplayPause(0);
                 view->replayMode = 9;
-                g_TrackGame->field_0x2e0 = 30.0f;
+                g_TrackGame->replaySpeed = 30.0f;
             }
         } else if (!_stricmp("ButCamera", event->controlName)) {
             TrackGameViewOwner* owner = g_TrackGame->eventManager->FindRaceMode();

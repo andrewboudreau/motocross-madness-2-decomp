@@ -128,7 +128,7 @@ TrackGame::TrackGame() {
     shortNetPacketIntervalSeconds =
         GetRegistryInt("IntervalBetweenShortNetPacketsMS", 67) * 0.001f;
     field_0x3424 = 0;
-    field_0x2e0 = 1.0f;
+    replaySpeed = 1.0f;
     playingReplay = 0;
     useReplayTape = 0;
     proCircuit = 0;

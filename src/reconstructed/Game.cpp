@@ -96,7 +96,7 @@ Game::Game() {
     strcpy(field_0x40, "");
     field_0x2dc = 0;
     field_0x2d8 = 0;
-    field_0x2e0 = 1.0f;
+    replaySpeed = 1.0f;
     allowDither = 1;
     allowMipMapping = 1;
     allowBilinear = 1;

@@ -133,7 +133,7 @@ public:
     unsigned char field_0x02d6[2];
     unsigned int field_0x2d8;                 // time stamps (0x00468880)
     unsigned int field_0x2dc;
-    float field_0x2e0;
+    float replaySpeed;                        // +0x2e0: 1.0 normal; the replay dialog sets 2/8 for TogFF/TogFFF, 0 reversing, 30 for ButEnd; scales replay time
     float field_0x2e4;
     float field_0x2e8;
     float field_0x2ec;
