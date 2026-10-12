@@ -206,7 +206,7 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
     if (palette) {
         unsigned char* indices = palette->UnknownFunction4de280();
         if (indices) {
-            UnknownPixel24* entries = (UnknownPixel24*)palette->UnknownFunction4de270();
+            UnknownPixel24* entries = (UnknownPixel24*)palette->GetColors();
             if (entries) {
                 int key = -1;
                 for (int i = 0; i < 256; i++) {
@@ -335,7 +335,7 @@ int DitherConvert(void* source, int format, int width, int height, int sourceStr
     unsigned char* colors;
     if (palette) {
         indices = palette->UnknownFunction4de280();
-        colors = palette->UnknownFunction4de270();
+        colors = palette->GetColors();
     }
     if (g_ditherCapacity < width) {
         if (g_ditherRows[0])

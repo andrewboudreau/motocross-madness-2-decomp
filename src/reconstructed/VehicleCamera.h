@@ -16,7 +16,7 @@ public:
     // 0x004fdae0: looks up a named child part (BikeCamera asks for "Head").
     UnknownVehiclePart* FindByName(const char* name);
     void UnknownFunction4444e0(); // 0x004444e0 (BikeCamera slot 53)
-    void UnknownFunction4fdb50(); // 0x004fdb50 (BikeCamera slot 54)
+    void ClearFlag14c(); // 0x004fdb50 (BikeCamera slot 54)
     // 0x004fc4f0 (src/krusty2's SoultreeObject::GetAxes): writes two axis
     // vectors; VehicleCamera slot 41 uses the first.
     void GetAxes(Vector3* first, Vector3* second);

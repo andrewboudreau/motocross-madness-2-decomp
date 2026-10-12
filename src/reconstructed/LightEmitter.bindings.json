@@ -34,7 +34,7 @@
   "?UnknownFunction49e490@LightManager@@QAEXXZ": "0x0049e490",
   "?UnknownFunction4a0190@LightManager@@QAEPAVLightEmitter@@H@Z": "0x004a0190",
   "?SetPositionVec3@D3DIMSoultreeObject@@QAEXUVector3@@@Z": "0x004fc630",
-  "?UnknownFunction4fd340@D3DIMSoultreeObject@@QAEXMMM@Z": "0x004fd340",
+  "?Scale@D3DIMSoultreeObject@@QAEXMMM@Z": "0x004fd340",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",
   "?UnknownVirtualSlot12@GameObject@@UAEHXZ": "0x00469300",

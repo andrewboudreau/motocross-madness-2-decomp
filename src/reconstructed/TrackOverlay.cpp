@@ -282,7 +282,7 @@ int NameOverlay::IsPointVisible(const Vector3* point)
 {
     Vector3 hit;
     if (frameCounter == testPhase) {
-        int hidden = world->terrain->UnknownFunction506e90(&((RenderTarget*)field_0x18)->field_0x08->eyePosition, point, &hit, 0, 0, 0);
+        int hidden = world->terrain->CastSegment(&((RenderTarget*)field_0x18)->field_0x08->eyePosition, point, &hit, 0, 0, 0);
         lastVisible = !hidden;
     }
     frameCounter++;
@@ -359,7 +359,7 @@ int NameOverlay::UnknownVirtualSlot14()
         Camera* camera = Target()->field_0x08;
         Vector3 screen;
         float depth;
-        if (g_UnknownGlobal575a98->UnknownFunction52f340(camera, camera->field_0xec, &head, &screen, &depth)) {
+        if (g_UnknownGlobal575a98->ProjectPoint(camera, camera->field_0xec, &head, &screen, &depth)) {
             int x = (int)screen.x;
             int y = (int)screen.y;
             screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);

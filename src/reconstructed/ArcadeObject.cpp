@@ -58,7 +58,7 @@ ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, con
     isVisible = 1;
     field_0x44 = size;
     arcadeView = view;
-    arcadeModel->UnknownFunction4fe850(&low, &extent);
+    arcadeModel->GetSubtreeBounds(&low, &extent);
     modelWidth = extent.x + extent.x;
     field_0x54 = extent.y + extent.y;
     if (pixels && arcadeView) {
@@ -71,7 +71,7 @@ ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, con
         field_0x38 = (float)pixels;
         float scale = field_0x38 * field_0x44 / (field_0x3c * arcadeView->field_0x198);
         modelScale = scale;
-        arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+        arcadeModel->Scale(scale, scale, scale);
     }
     if (alpha) {
         field_0x58 = new (__FILE__, 104) TransparencyMod(1);
@@ -104,7 +104,7 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
     g_MemTagStack->UnknownFunction4a2da0(tag);
     g_MemTagStack->Push("Collision");
     field_0x5c = new (__FILE__, 154) CollisionObject(1);
-    field_0x5c->UnknownFunction4320f0(field_0x18, 1, a, b);
+    field_0x5c->Configure(field_0x18, 1, a, b);
     strcpy(path, name);
     strcpy(strrchr(path, '.'), ".col");
     UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -113,10 +113,10 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
     if (stream)
         delete stream;
     if (found[0])
-        field_0x5c->UnknownFunction432800(arcadeModel, found);
+        field_0x5c->LoadShape(arcadeModel, found);
     else
-        field_0x5c->UnknownFunction432720(arcadeModel, 1, 0, 0, 0);
-    field_0x5c->UnknownFunction4394d0(arcadeModel, value);
+        field_0x5c->SetHullShape(arcadeModel, 1, 0, 0, 0);
+    field_0x5c->SetOwner(arcadeModel, value);
     field_0x5c->UnknownFunction435fe0();
     field_0x5c->field_0x88 = callback;
     field_0x5c->field_0x8c = context;
@@ -159,7 +159,7 @@ int ArcadeObject::UnknownVirtualSlot10(float frameTime) {
         field_0xa0 = g_TrackGame->frameTime * field_0xa4;
         while (field_0xa0 > 6.2831855f)
             field_0xa0 -= 6.2831855f;
-        arcadeModel->UnknownFunction4fceb0(field_0x94, field_0xa0);
+        arcadeModel->Rotate(field_0x94, field_0xa0);
     }
     return 1;
 }

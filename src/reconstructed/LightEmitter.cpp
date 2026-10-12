@@ -137,7 +137,7 @@ LightEmitter* LightEmitter::UnknownFunction49e230(void* value, int type, unsigne
         debugSphere = new(__FILE__, 183) D3DIMSoultreeObject(1);
         AppendChild(debugSphere->UnknownVirtualSlot9(field_0x18, "sphere.slt", 0, 0, 1), -1);
         if (debugSphere)
-            debugSphere->UnknownFunction4fd340(0.4f, 0.4f, 0.4f);
+            debugSphere->Scale(0.4f, 0.4f, 0.4f);
     }
     UnknownFunction49e020(color);
     SetRange(range);

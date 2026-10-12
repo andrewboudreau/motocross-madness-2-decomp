@@ -64,11 +64,11 @@ public:
     // soultree.cpp helpers (thiscall).
     int CountNodes();                                   // 0x004fda30: node count of the subtree
     void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
-    void UnknownFunction4fdb40();                                  // 0x004fdb40
-    void UnknownFunction4fdb50();                                  // 0x004fdb50
+    void SetFlag14c();                                  // 0x004fdb40
+    void ClearFlag14c();                                  // 0x004fdb50
     void LoadFromParameters(UnknownTextureStream* stream, int a);    // 0x004fdb60: reads a .slt stream
-    void UnknownFunction4fe0a0(Vector3* a, Vector3* b);            // 0x004fe0a0
-    void UnknownFunction4fe0f0();                                  // 0x004fe0f0
+    void GetLocalBounds(Vector3* a, Vector3* b);            // 0x004fe0a0
+    void UpdateSubtreeBounds();                                  // 0x004fe0f0
     void UpdateWorldMatrix();                                      // 0x004fb4f0: world matrix
     Vector3 LocalToWorldPoint(const Vector3& p);               // 0x004fd660: local -> world point
     void RegisterNode();                                           // 0x004fedb0: registers the node
@@ -78,9 +78,9 @@ public:
     // the axis (x, y, z), 0x004fd910 (ret 4) appends `child`, 0x004fd990
     // (ret 4) unlinks `child`.
     void TranslateIn(SoultreeObject* frame, Vector3 delta);
-    void UnknownFunction4fd090(float x, float y, float z, float angle);
+    void SetRotation(float x, float y, float z, float angle);
     void AddChild(SoultreeObject* child);
-    void UnknownFunction4fd990(SoultreeObject* child);
+    void RemoveChild(SoultreeObject* child);
 
     char nodeName[0x80];                       // +0x038 name (krusty2 SoultreeObject::FindByName compares it)
     Matrix4 localMatrix;                       // local matrix
@@ -221,16 +221,16 @@ public:
     virtual int UnknownVirtualSlot14();            // 0x00444030
 
     void SetPositionVec3(Vector3 position);  // 0x004fc630: sets the local translation
-    void UnknownFunction4fd340(float x, float y, float z); // 0x004fd340
+    void Scale(float x, float y, float z); // 0x004fd340
     // Seen from ArcadeObject.cpp: 0x004fc660 (ret 4) sets the position from
     // a pointer, 0x004fe850 (ret 8) returns two vectors (the second is the
     // half extent ArcadeObject doubles), 0x004fbd70 (ret 0x10) takes four
     // pass-through arguments, 0x004fceb0 (ret 0x10) an axis and an angle,
     // 0x00444d80 (ret 4) attaches a modifier.
     void SetPosition(const Vector3* position);
-    void UnknownFunction4fe850(Vector3* a, Vector3* b);
+    void GetSubtreeBounds(Vector3* a, Vector3* b);
     void SetAxesPtr(const Vector3* a, const Vector3* b, int c, int d); // two axes by pointer
-    void UnknownFunction4fceb0(Vector3 axis, float angle);
+    void Rotate(Vector3 axis, float angle);
     void UnknownFunction444d80(GameObject* modifier);
     // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both
     // ret 4) remove a modifier from the first (+0x264) or second (+0x26c)
@@ -265,7 +265,7 @@ public:
     void UnknownFunction444e80();                  // 0x00444e80
     void UnknownFunction444eb0(GameObject* modifier); // 0x00444eb0
     void UnknownFunction444fb0();                  // 0x00444fb0
-    int UnknownFunction444fe0();                   // 0x00444fe0
+    int GetVertexCount();                   // 0x00444fe0
     int GetSurfaceCount(int lod);         // 0x00445030: surface count
     int NodeMovesVertices(SoultreeObject* node, int lod);     // 0x00445060: node moves vertices
     void UnknownFunction4451e0(int index);         // 0x004451e0

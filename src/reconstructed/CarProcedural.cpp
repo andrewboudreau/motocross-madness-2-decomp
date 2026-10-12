@@ -142,26 +142,26 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
             field_0x210[5] = field_0x34->FindByName("TireMidR");
         Vector3 minimum;
         Vector3 maximum;
-        field_0x210[0]->UnknownFunction4fe0a0(&minimum, &maximum);
+        field_0x210[0]->GetLocalBounds(&minimum, &maximum);
         field_0x184 = 1.0f / maximum.y;
     }
     field_0x20c = a5;
 
     field_0x38 = new (__FILE__, 149) CarProceduralCollision(1);
-    field_0x38->UnknownFunction4320f0(a0, 1, 1, 0);
+    field_0x38->Configure(a0, 1, 1, 0);
     field_0x38->field_0x68 = 1;
     AppendChild(field_0x38, -1);
     field_0x188 = 5.0f;
 
     int tag = g_MemTagStack->Push("Collision");
     field_0x3c = new (__FILE__, 162) CarProceduralCollision(1);
-    field_0x3c->UnknownFunction4320f0(a0, 1, 1, 1);
+    field_0x3c->Configure(a0, 1, 1, 1);
     field_0x3c->field_0x68 = 1;
     AppendChild(field_0x3c, -1);
     if (collisionFile && *collisionFile)
-        field_0x3c->UnknownFunction432800(field_0x34, collisionFile);
+        field_0x3c->LoadShape(field_0x34, collisionFile);
     else
-        field_0x3c->UnknownFunction432720(field_0x34, 0, 1, 0, 0);
+        field_0x3c->SetHullShape(field_0x34, 0, 1, 0, 0);
     field_0x3c->field_0x54->field_0x00 = 1;
     field_0x3c->UnknownFunction435fe0();
     field_0x38->AddIgnoredOwner(field_0x3c);

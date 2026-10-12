@@ -214,7 +214,7 @@ public:
     void UnknownFunction4451e0(int level);    // 0x004451e0
     void UnknownFunction444d00(int value);    // 0x00444d00
     void UnknownFunction444d40(int value);    // 0x00444d40: hidden for the followed racer
-    void UnknownFunction4fdb50();             // 0x004fdb50
+    void ClearFlag14c();             // 0x004fdb50
     void GetPosition(Vector3* position); // 0x004fc970: the translation
     // 0x00444c70 (D3DIMSoulTree.cpp): replaces texture `index` with `name`.
     int UnknownFunction444c70(int index, const char* name, int textures);

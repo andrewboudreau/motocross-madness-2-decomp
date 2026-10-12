@@ -89,7 +89,7 @@ void Wrecker::UnknownFunction5301c0(UnknownWreckerCharacter* rider, const char* 
     collisionModel->damping = 0.99f;
     collisionModel->impulseLoss = 0.95f;
     collisionModel->maxImpulse = 2000.0f;
-    g_UnknownGlobal68aba4->UnknownFunction4dcf20(collisionModel, collisionModel->quadtreeCell);
+    g_UnknownGlobal68aba4->Remove(collisionModel, collisionModel->quadtreeCell);
     rigidBody->UnknownVirtualSlot29(200.0f);
     inertiaFactor = rigidBody->mass * (1.0f / 12);
     rigidBody->inertia = ZeroMatrix();
@@ -292,7 +292,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         poseNode->GetMatrixIn(0, &lastPose);
     } else {
         if (pendingAnimation && !character->field_0x34) {
-            character->UnknownFunction4a8b80(pendingAnimation, 0.5f);
+            character->BlendToMotion(pendingAnimation, 0.5f);
             pendingAnimation = 0;
             if (field_0x538 == 0 && field_0x530 == 0) {
                 field_0x530 = 1;
@@ -325,7 +325,7 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
                 Vector3 position;
                 rigidBody->node->GetPositionIn(0, &position);
                 position += pushImpulse;
-                rigidBody->node->UnknownFunction4fc740(0, &position);
+                rigidBody->node->SetPositionInFrame(0, &position);
             }
             collisionModel->UnknownFunctionStep(step);
             remaining -= step;
@@ -432,7 +432,7 @@ void Wrecker::EmitProbeTrail(Vector3 from, Vector3 to, float frameTime) {
     Vector3 step = delta / (float)count;
     for (int i = 0; i < count; i++) {
         Vector3 position = from + step * (float)i;
-        particles->UnknownFunction4baa50(age, &position, trailFrame, speed, lifetime, speed + speed, 10, 0xffffff);
+        particles->AddParticle(age, &position, trailFrame, speed, lifetime, speed + speed, 10, 0xffffff);
         if (++trailFrame >= 13)
             trailFrame = 0;
     }
@@ -450,7 +450,7 @@ void Wrecker::UnknownFunction532020(float frameTime) {
 
 void Wrecker::UnknownFunction532150() {
     Vector3 size;
-    character->skeleton->UnknownFunction4fe850(&rigidBody->centerOfMass, &size);
+    character->skeleton->GetSubtreeBounds(&rigidBody->centerOfMass, &size);
     rigidBody->inertia(0, 0) = (size.y * size.y + size.z * size.z) * inertiaFactor;
     rigidBody->inertia(1, 1) = (size.x * size.x + size.z * size.z) * inertiaFactor;
     rigidBody->inertia(2, 2) = (size.x * size.x + size.y * size.y) * inertiaFactor;
@@ -483,7 +483,7 @@ void Wrecker::UnknownFunction532310() {
     collisionModel->collidable = 1;
     collisionModel->applyImpulses = 1;
     wreckState = 2;
-    character->UnknownFunction4a8b80(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)], 0.5f);
+    character->BlendToMotion(randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)], 0.5f);
     field_0x530 = 1;
     field_0x534 = 1;
     rigidBody->field_0x25_bit0 = 1;
@@ -501,7 +501,7 @@ void Wrecker::UnknownFunction532490() {
     wreckState = 2;
     pendingAnimation = randomAnimations[(int)(RANDOM_UNIT() * randomAnimationCount)];
     if (!character->field_0x34) {
-        character->UnknownFunction4a8b80(pendingAnimation, 0.5f);
+        character->BlendToMotion(pendingAnimation, 0.5f);
         pendingAnimation = 0;
         if (field_0x530) {
             field_0xb4 = 1;
@@ -573,10 +573,10 @@ void Wrecker::UnknownFunction5327c0() {
         collisionModel->collidable = 0;
         collisionModel->applyImpulses = 0;
         collisionModel->hasContact = 0;
-        g_UnknownGlobal68aba4->UnknownFunction4dcf20(collisionModel, collisionModel->quadtreeCell);
+        g_UnknownGlobal68aba4->Remove(collisionModel, collisionModel->quadtreeCell);
         pendingAnimation = 0;
         field_0x52c = 1;
-        character->skeleton->UnknownFunction4fcc70();
+        character->skeleton->ResetMatrices();
         character->UnknownFunction4a8ac0(&character->field_0x190, 0);
         UnknownFunction532150();
     }

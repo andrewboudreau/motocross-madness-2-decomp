@@ -357,7 +357,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         float c;
         float s;
         if (camera->direction.z != 0.0f) {
-            float inverse = UnknownFunction460c70(camera->direction.x * camera->direction.x
+            float inverse = FastInvSqrtEstimate(camera->direction.x * camera->direction.x
                                                   + camera->direction.z * camera->direction.z) * radiusScale;
             c = inverse * camera->direction.z;
             s = -(inverse * camera->direction.x);

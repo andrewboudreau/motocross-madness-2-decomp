@@ -93,8 +93,8 @@ public:
     // Loads the model file `name`; returns the GameObject to add.
     virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
                                                void* context, int a, int b);
-    Motion* UnknownFunction4a6b30(const char* name, int a); // 0x004a6b30: finds a motion
-    void UnknownFunction4a8b40(Motion* motion);    // 0x004a8b40: plays it
+    Motion* FindMotion(const char* name, int a); // 0x004a6b30: finds a motion
+    void SetMotion(Motion* motion);    // 0x004a8b40: plays it
 
     unsigned char field_0x008[0x10 - 0x8];
     int field_0x10;                                // the motion time

@@ -66,7 +66,7 @@ static inline void DecodeString(char* text) {
 
 // 0x00467990
 Game::Game() {
-    UnknownFunction460ad0();
+    InitFastMath();
     useZBuffer = 1;
     field_0x2d4_bit2 = 0;
     fullScreen = 1;

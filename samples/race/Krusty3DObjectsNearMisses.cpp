@@ -135,11 +135,11 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             baseFrame->SetAxesPtr(&forward, &kVec3YAxis, 1, 1);
         } else {
             Vector3 axis = t * keyAxisChange + keyAxis;
-            baseFrame->UnknownFunction4fd090(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);
+            baseFrame->SetRotation(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);
         }
         Vector3 scale = t * keyScaleChange + keyScale;
         scale *= sizeFactor;
-        baseFrame->UnknownFunction4fd340(scale.x, scale.y, scale.z);
+        baseFrame->Scale(scale.x, scale.y, scale.z);
         digitModels[0][0]->subtreeDirty = !digitModels[0][0]->field_0x14c;
         digitModels[0][1]->subtreeDirty = !digitModels[0][0]->field_0x14c;
         for (digit = 0; digit < 10; digit++)
@@ -222,7 +222,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         Vector3 direction = target - arcadeView->field_0x170;
         UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
-        arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+        arcadeModel->Scale(scale, scale, scale);
         return 1;
     }
     case 1:
@@ -252,7 +252,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         Vector3 direction = target - arcadeView->field_0x170;
         UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
-        arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+        arcadeModel->Scale(scale, scale, scale);
         return 1;
     }
     case 4: {
@@ -280,7 +280,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     default:
         return 1;
     }
-    arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+    arcadeModel->Scale(scale, scale, scale);
     isVisible = 1;
     return 1;
 hide:

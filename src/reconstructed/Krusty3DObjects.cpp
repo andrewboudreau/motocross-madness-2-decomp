@@ -519,20 +519,20 @@ void BonusObjectManager::HideDigits() {
         return;
     for (int i = 0; i < 5; i++) {
         if (shownDigits[i] >= 0) {
-            baseFrame->UnknownFunction4fd990(digitModels[shownDigits[i]][i]);
+            baseFrame->RemoveChild(digitModels[shownDigits[i]][i]);
             digitModels[shownDigits[i]][i]->UnknownFunction4444e0();
             shownDigits[i] = -1;
         }
     }
     if (shownFractionDigits[0] >= 0) {
         for (int i = 0; i < 2; i++) {
-            baseFrame->UnknownFunction4fd990(fractionDigitModels[shownFractionDigits[i]][i]);
+            baseFrame->RemoveChild(fractionDigitModels[shownFractionDigits[i]][i]);
             fractionDigitModels[shownFractionDigits[i]][i]->UnknownFunction4444e0();
             shownFractionDigits[i] = -1;
         }
-        baseFrame->UnknownFunction4fd990(timesModel);
+        baseFrame->RemoveChild(timesModel);
         timesModel->UnknownFunction4444e0();
-        baseFrame->UnknownFunction4fd990(decimalPointModel);
+        baseFrame->RemoveChild(decimalPointModel);
         decimalPointModel->UnknownFunction4444e0();
     }
     elapsed = 0;

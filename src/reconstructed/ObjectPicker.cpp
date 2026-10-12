@@ -78,9 +78,9 @@ int ObjectPicker::UnknownFunction4b0500(int x, int y) {
     direction += position;
     segment[0] = position;
     segment[1] = direction;
-    field_0x30->UnknownFunction432ab0(1, segment);
-    field_0x30->UnknownFunction435fb0();
-    if (field_0x30->UnknownFunction438e70())
+    field_0x30->SetMeshShape(1, segment);
+    field_0x30->UpdatePlacement();
+    if (field_0x30->QueryCollisions())
         return field_0x2c;
     return 0;
 }
@@ -92,10 +92,10 @@ ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManage
 
     GameObject::UnknownVirtualSlot8(target);
     field_0x30 = new(__FILE__, 36) CollisionObject(1);
-    field_0x30->UnknownFunction4320f0(target, 1, 1, 1);
+    field_0x30->Configure(target, 1, 1, 1);
     segment[0] = Vector3(0.0f, 0.0f, 0.0f);
     segment[1] = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x30->UnknownFunction432ab0(1, segment);
+    field_0x30->SetMeshShape(1, segment);
     field_0x30->field_0x88 = callback;
     field_0x30->field_0x68 = 1;
     AppendChild(field_0x30, -1);

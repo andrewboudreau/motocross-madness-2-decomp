@@ -116,8 +116,8 @@ void BikeCamera::UnknownVirtualSlot53() {
 
 // 0x00417310
 void BikeCamera::UnknownVirtualSlot54() {
-    bike->field_0x3bc->UnknownFunction4fdb50();
-    bike->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
+    bike->field_0x3bc->ClearFlag14c();
+    bike->field_0x5c4->field_0x1a0->ClearFlag14c();
 }
 
 // 0x00417340

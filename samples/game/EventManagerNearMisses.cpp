@@ -110,8 +110,8 @@ struct UnknownPodiumTrackObject {                   // the view's +0x4c
     float field_0x40;                               // grid spacing
 };
 struct UnknownPodiumNode {
-    void UnknownFunction4fc970(Vector3* position);              // 0x004fc970
-    void UnknownFunction4fc4f0(Vector3* direction, Vector3* up); // 0x004fc4f0
+    void GetPosition(Vector3* position);              // 0x004fc970
+    void GetAxes(Vector3* direction, Vector3* up); // 0x004fc4f0
 };
 struct UnknownPodiumNodeOwner {                     // the view's +0x64
     unsigned char field_0x000[0x1a0];
@@ -247,8 +247,8 @@ int EventManager::CreatePodiumScene() {
         direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
     } else {
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
-            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc970(&podiumPosition);
-            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc4f0(&direction, &up);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetPosition(&podiumPosition);
+            PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetAxes(&direction, &up);
         } else {
             float spacing = PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->field_0x40;
             podiumPosition = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
@@ -346,11 +346,11 @@ int EventManager::CreatePodiumScene() {
             } else {
                 sprintf(name, "Podium4_%02d", place);
             }
-            podiumMotions[place - 1] = character->UnknownFunction4a6b30(name, 1);
+            podiumMotions[place - 1] = character->FindMotion(name, 1);
             Vector3 position = podiumPosition + offsets[place - 1];
             character->field_0x1a0->SetPosition(&position);
             character->field_0x1a0->SetAxesPtr(&facings[place - 1], &kVec3YAxis, 1, 1);
-            character->UnknownFunction4a8b40(podiumMotions[place - 1]);
+            character->SetMotion(podiumMotions[place - 1]);
             character->field_0x10 = 0;
             if (racer) {
                 UnknownPodiumTextureEntry** texture = ((UnknownPodiumRacer*)racer)->field_0x5c4->field_0x1a0->field_0x290;

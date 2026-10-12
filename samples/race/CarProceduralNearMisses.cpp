@@ -310,7 +310,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     Vector3 target(field_0x1d0.x + field_0x1c4.x, ground.y, field_0x1d0.z + field_0x1c4.z);
     Vector3 offset = field_0x34->LocalToWorldDirection(field_0x1dc);
     Vector3 placement = target - offset;
-    field_0x34->UnknownFunction4fc740(0, &placement);
+    field_0x34->SetPositionInFrame(0, &placement);
     for (unsigned int i = 0; i < field_0x60; i++) {
         Vector3 axisA;
         Vector3 axisB;

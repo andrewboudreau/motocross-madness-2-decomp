@@ -112,7 +112,7 @@ public:
 // returns 0. Names and the meaning of `code` are provisional.
 class UnknownFollowCameraProjector {
 public:
-    int UnknownFunction52f340(Camera* camera, const void* matrix, const Vector3* point,
+    int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
                               Vector3* screen, int* code);
 };
 extern UnknownFollowCameraProjector* g_UnknownFollowCameraProjector575a98;

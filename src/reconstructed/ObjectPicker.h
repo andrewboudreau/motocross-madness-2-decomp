@@ -55,16 +55,16 @@ public:
 class CollisionObject : public UnknownPickQuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);  // 0x00431e70
-    void UnknownFunction4320f0(void* a, int b, int c, int d); // 0x004320f0
-    void UnknownFunction432ab0(int count, void* points);      // 0x00432ab0: sets the segment
-    void UnknownFunction435fb0();         // 0x00435fb0
-    int UnknownFunction438e70();          // 0x00438e70: 1 on a hit
+    void Configure(void* a, int b, int c, int d); // 0x004320f0
+    void SetMeshShape(int count, void* points);      // 0x00432ab0: sets the segment
+    void UpdatePlacement();         // 0x00435fb0
+    int QueryCollisions();          // 0x00438e70: 1 on a hit
     // Seen from ArcadeObject.cpp 0x00401540: 0x00432800 (ret 8) builds the
     // collision from a ".col" file, 0x00432720 (ret 0x14) without one,
     // 0x004394d0 (ret 8) and 0x00435fe0 (ret 0) follow.
-    void UnknownFunction432800(D3DIMSoultreeObject* model, const char* path);
-    void UnknownFunction432720(D3DIMSoultreeObject* model, int a, int b, int c, int d);
-    void UnknownFunction4394d0(D3DIMSoultreeObject* model, int value);
+    void LoadShape(D3DIMSoultreeObject* model, const char* path);
+    void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d);
+    void SetOwner(D3DIMSoultreeObject* model, int value);
     void UnknownFunction435fe0();
 
     unsigned char field_0x38[0x68 - 0x38];

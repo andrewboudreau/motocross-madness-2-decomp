@@ -625,10 +625,10 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
     Vector3 center;
     Vector3 extents;
     if (!parent) {
-        UnknownFunction4fe850(&center, &extents);
+        GetSubtreeBounds(&center, &extents);
         DrawBoxOutline(center, extents, 1);
     }
-    UnknownFunction4fe0a0(&center, &extents);
+    GetLocalBounds(&center, &extents);
     DrawBoxOutline(center, extents, 0);
     if (nextSibling)
         ((D3DIMSoultreeObject*)nextSibling)->ComputeSubtreeBounds();
@@ -788,7 +788,7 @@ void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
     if (!center || !extents) {
         center = &boundsCenter;
         extents = &boundsExtents;
-        UnknownFunction4fe850(center, extents);
+        GetSubtreeBounds(center, extents);
     }
     float distance = Magnitude(LocalToWorldPoint(*center) -
                                ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
@@ -866,7 +866,7 @@ void D3DIMSoultreeObject::UnknownFunction444440()
     for (int i = 0; i < count; i++)
         nodes[i]->SoultreeVirtualSlot5();
     DebugFree(nodes, __FILE__, 0x812);
-    UnknownFunction4fe0f0();
+    UpdateSubtreeBounds();
 }
 
 // 0x004444c0
@@ -887,14 +887,14 @@ void D3DIMSoultreeObject::UnknownFunction4444e0()
     field_0x2a8.field_0x08 = 0;
     field_0x2a8.field_0x04 = 0;
     field_0x2a8.field_0x0c = 0;
-    UnknownFunction4fdb40();
+    SetFlag14c();
 }
 
 // 0x00444520
 void D3DIMSoultreeObject::UnknownVirtualSlot5()
 {
     GameObject::UnknownVirtualSlot5();
-    UnknownFunction4fdb50();
+    ClearFlag14c();
 }
 
 // 0x00444540
@@ -1050,7 +1050,7 @@ void D3DIMSoultreeObject::UnknownFunction444fb0()
 }
 
 // 0x00444fe0
-int D3DIMSoultreeObject::UnknownFunction444fe0()
+int D3DIMSoultreeObject::GetVertexCount()
 {
     int most = 0;
     if (lodTable) {

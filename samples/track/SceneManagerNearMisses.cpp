@@ -144,9 +144,9 @@ public:
 class UnknownSceneCollisionObject : public UnknownSoultreeQuadTreeObject, public GameObject {
 public:
     explicit UnknownSceneCollisionObject(int flags);   // 0x00431e70
-    void UnknownFunction4320f0(void* a, int b, int c, int d);  // 0x004320f0
-    void UnknownFunction432720(D3DIMSoultreeObject* model, int a, int b, int c, int d); // 0x00432720
-    void UnknownFunction432800(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
+    void Configure(void* a, int b, int c, int d);  // 0x004320f0
+    void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d); // 0x00432720
+    void LoadShape(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
     void UnknownFunction435fe0();                      // 0x00435fe0
 
     unsigned char field_0x38[0x60 - 0x38];
@@ -382,14 +382,14 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                 && ((D3DIMSoultreeObject*)staticModels->casters[i].model)->CountNodes() == 1) {
                 g_MemTagStack->Push("Collision");
                 staticModels->casters[i].collisionObject = new(__FILE__, 1974) UnknownSceneCollisionObject(1);
-                staticModels->casters[i].collisionObject->UnknownFunction4320f0(field_0x18, 1, 0, 1);
+                staticModels->casters[i].collisionObject->Configure(field_0x18, 1, 0, 1);
                 staticModels->casters[i].collisionObject->field_0x60 =
                     (D3DIMSoultreeObject*)staticModels->casters[i].model;
                 if (!colPath[0])
-                    staticModels->casters[i].collisionObject->UnknownFunction432720(
+                    staticModels->casters[i].collisionObject->SetHullShape(
                         (D3DIMSoultreeObject*)staticModels->casters[i].model, 0, 0, 0, 0);
                 else
-                    staticModels->casters[i].collisionObject->UnknownFunction432800(
+                    staticModels->casters[i].collisionObject->LoadShape(
                         (D3DIMSoultreeObject*)staticModels->casters[i].model, colPath);
                 staticModels->casters[i].collisionObject->UnknownFunction435fe0();
                 ((D3DIMSoultreeObject*)staticModels->casters[i].model)

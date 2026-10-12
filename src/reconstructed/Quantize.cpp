@@ -108,7 +108,7 @@ ColorMapper::~ColorMapper() {
 }
 
 // 0x004de270
-unsigned char* ColorMapper::UnknownFunction4de270() {
+unsigned char* ColorMapper::GetColors() {
     return entries[0];
 }
 

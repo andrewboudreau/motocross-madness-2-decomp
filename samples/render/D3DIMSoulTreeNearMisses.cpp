@@ -114,7 +114,7 @@ public:
     void GetMatrixIn(SoultreeObject* frame, Matrix4* out); // 0x004fca80: matrix in `frame` (0: world)
     void GetPositionIn(SoultreeObject* frame, Vector3* out); // 0x004fc9a0: position in `frame` (0: world)
     Vector3 WorldToLocalDirection(const Vector3* v);                 // 0x004fd710: world to local direction
-    Vector3 UnknownFunction4fd7f0(const Vector3* v);                 // 0x004fd7f0: world to local point
+    Vector3 WorldToLocalPoint(const Vector3* v);                 // 0x004fd7f0: world to local point
     Vector3 LocalToWorldDirection(const Vector3* v);                 // 0x004fd5c0: local to world direction
 };
 
@@ -339,7 +339,7 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
 // corner count, and a last pointer argument.
 class UnknownSoultreeClipper {
 public:
-    int UnknownFunction52f570(UnknownSoultreeCameraView* camera, Matrix4* matrix, Vector3* center,
+    int TestBox(UnknownSoultreeCameraView* camera, Matrix4* matrix, Vector3* center,
                               Vector3* extents, UnknownSoultreeCounters* rect, int* corners, int* a7);
 };
 extern UnknownSoultreeClipper* g_UnknownSoultreeClipper575a98;
@@ -374,12 +374,12 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
     field_0x2d4 = 0;
     if (!field_0x14c && field_0x190) {
         if (subtreeDirty)
-            UnknownFunction4fe0f0();
+            UpdateSubtreeBounds();
         Matrix4 world;
         ((UnknownSoultreeNodeView*)this)->GetMatrixIn(0, &world);
         Vector3 center;
         Vector3 extents;
-        UnknownFunction4fe850(&center, &extents);
+        GetSubtreeBounds(&center, &extents);
         const Matrix4& projection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->viewMatrix;
         UnknownSoultreeMatrix view;
         view._11 = world.m[0][0] * projection.m[0][0] + world.m[0][1] * projection.m[1][0] + world.m[0][2] * projection.m[2][0] + world.m[0][3] * projection.m[3][0];
@@ -398,7 +398,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         view._42 = world.m[3][0] * projection.m[0][1] + world.m[3][1] * projection.m[1][1] + world.m[3][2] * projection.m[2][1] + world.m[3][3] * projection.m[3][1];
         view._43 = world.m[3][0] * projection.m[0][2] + world.m[3][1] * projection.m[1][2] + world.m[3][2] * projection.m[2][2] + world.m[3][3] * projection.m[3][2];
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
-        if (g_UnknownSoultreeClipper575a98->UnknownFunction52f570((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
+        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
                                                                   &field_0x260)) {
             field_0x2d4 = 1;
             SelectLod(&center, &extents);
@@ -590,7 +590,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     (Vector3&)eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
                 for (int j = 0; j < surface->groupCount; j++) {
                     UnknownSoultreeFaceGroup* group = &surface->groups[j];
-                    Vector3 localEye = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd7f0(&eye);
+                    Vector3 localEye = ((UnknownSoultreeNodeView*)group->node)->WorldToLocalPoint(&eye);
                     if (!count)
                         continue;
                     for (int v = 0; v < group->vertexCount; v++) {

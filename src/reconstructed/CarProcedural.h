@@ -42,12 +42,12 @@ public:
 
     CarProceduralNode* FindByName(const char* name);       // 0x004fdae0 named child
     void GetPosition(Vector3* position);                   // 0x004fc970
-    void UnknownFunction4fe0a0(Vector3* a, Vector3* b);              // 0x004fe0a0 (ret 8)
+    void GetLocalBounds(Vector3* a, Vector3* b);              // 0x004fe0a0 (ret 8)
     // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
     // documents them): position in `frame` space, placement there, the
     // local<->world direction maps and the two-axis orientation setter.
     void GetPositionIn(CarProceduralNode* frame, Vector3* position);   // 0x004fc9a0 (ret 8)
-    void UnknownFunction4fc740(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
+    void SetPositionInFrame(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
     Vector3 WorldToLocalDirection(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
     Vector3 LocalToWorldDirection(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
     void SetAxesPtr(const Vector3* axisA, const Vector3* axisB, int frame, int flag); // 0x004fbd70 (ret 0x10)
@@ -102,9 +102,9 @@ public:
 class CarProceduralCollision : public CarProceduralQuadTreeObject, public GraphicsTest {
 public:
     explicit CarProceduralCollision(int flags);                      // 0x00431e70
-    void UnknownFunction4320f0(void* a0, int a1, int a2, int a3);    // 0x004320f0
-    void UnknownFunction432720(CarProceduralModel* model, int a, int b, int c, int d); // 0x00432720
-    void UnknownFunction432800(CarProceduralModel* model, const char* path); // 0x00432800
+    void Configure(void* a0, int a1, int a2, int a3);    // 0x004320f0
+    void SetHullShape(CarProceduralModel* model, int a, int b, int c, int d); // 0x00432720
+    void LoadShape(CarProceduralModel* model, const char* path); // 0x00432800
     void UnknownFunction435fe0();                                    // 0x00435fe0
     void AddIgnoredOwner(CarProceduralCollision* other);       // 0x00439410
     void SetMeshShape(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape

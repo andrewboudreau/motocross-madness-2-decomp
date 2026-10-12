@@ -203,7 +203,7 @@ left in the unit.
   render states 4 and 9 through the view's slots 9 / 8, and prints its rows
   with the overlay's `0x00447fa0` / `0x00447f40` on the page `0x0056a128`
   takes from the overlay's +0x26c0; the "Memory %d" row is
-  `MemTagStack::UnknownFunction4a2d20("EcoSystem")`.
+  `MemTagStack::GetBytes("EcoSystem")`.
 - The generator weighs slope and altitude with the tabulated bell curve
   `0x0056ece0` (`NormalDistribution::Lookup(value, mean, sigma)`,
   `0x004b0070`; src/krusty2/effects), reads the "EcoGen" registry integer

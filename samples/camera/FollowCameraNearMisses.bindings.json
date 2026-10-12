@@ -30,7 +30,7 @@
   "?QueryGround@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?Vec3Normalize@@YA?AUVector3@@ABU1@@Z": "0x005087b0",
   "?CrossProduct@@YA?AUVector3@@ABU1@0@Z": "0x00515600",
-  "?UnknownFunction52f340@UnknownFollowCameraProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAH@Z": "0x0052f340",
+  "?ProjectPoint@UnknownFollowCameraProjector@@QAEHPAVCamera@@PBXPBUVector3@@PAU3@PAH@Z": "0x0052f340",
   "?UnknownVirtualSlot10@Camera@@UAEHM@Z": "0x0042e690",
   "?UnknownVirtualSlot23@Camera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0042f090",
   "?UnknownVirtualSlot23@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",

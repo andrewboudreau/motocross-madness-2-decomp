@@ -12,7 +12,7 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?UnknownFunction4b5d00@@YAXPAUVector3@@0MMH@Z": "0x004b5d00",
   "?SetAxesPtr@CarProceduralNode@@QAEXPBUVector3@@0HH@Z": "0x004fbd70",
-  "?UnknownFunction4fc740@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc740",
+  "?SetPositionInFrame@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc740",
   "?GetPosition@CarProceduralNode@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?GetPositionIn@CarProceduralNode@@QAEXPAV1@PAUVector3@@@Z": "0x004fc9a0",
   "?LocalToWorldDirection@CarProceduralNode@@QAE?AUVector3@@ABU2@@Z": "0x004fd5c0",

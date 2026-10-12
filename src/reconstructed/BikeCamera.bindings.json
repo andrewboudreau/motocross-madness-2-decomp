@@ -10,7 +10,7 @@
   "?SetTableEntry@FollowCamera@@QAE_NHPBUVector3@@PBM1111@Z": "0x00463450",
   "?GetPositionIn@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?FindByName@UnknownVehiclePart@@QAEPAV1@PBD@Z": "0x004fdae0",
-  "?UnknownFunction4fdb50@UnknownVehiclePart@@QAEXXZ": "0x004fdb50",
+  "?ClearFlag14c@UnknownVehiclePart@@QAEXXZ": "0x004fdb50",
   "?SetupVehicleCamera@VehicleCamera@@QAEPAV1@PAXMMMMMHHPBH@Z": "0x0052b9e0",
   "_$E1": "0x00417360",
   "_$E10": "0x00417450",

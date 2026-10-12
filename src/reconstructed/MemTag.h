@@ -14,7 +14,7 @@ public:
     void UnknownFunction4a2de0(int bytes);        // 0x004a2de0: adds to the current "in DirectX" count
     void UnknownFunction4a2e00(int bytes);        // 0x004a2e00: subtracts from the current "in DirectX" count
     int UnknownFunction4a2bf0(const char* tag);   // 0x004a2bf0: index of `tag`, added when new
-    int UnknownFunction4a2d20(const char* tag);   // 0x004a2d20: bytes of `tag` (0 when unknown)
+    int GetBytes(const char* tag);   // 0x004a2d20: bytes of `tag` (0 when unknown)
 
     int count;                      // categories
     char (*names)[0x80];            // category names

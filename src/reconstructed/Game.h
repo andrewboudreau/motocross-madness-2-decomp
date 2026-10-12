@@ -27,7 +27,7 @@ extern UnknownGlobal56c470* g_UnknownGlobal56c470;
 extern UnknownStatic65b478 g_UnknownStatic65b478;
 
 // cdecl 0x00460ad0: fills math lookup tables (called by the constructor).
-void UnknownFunction460ad0();
+void InitFastMath();
 
 // cdecl 0x004bfa80: the current time stamp.
 unsigned int ReadClock();

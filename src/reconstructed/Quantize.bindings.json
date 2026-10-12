@@ -21,7 +21,7 @@
   "?UnknownFunction4dddd0@ColorMapper@@SAPAV1@PBD@Z": "0x004dddd0",
   "?UnknownFunction4dddd0@ColorMapper@@SAPAV1@PBD@Z$ehhandler": "0x0054d377",
   "?Build16BitTables@ColorMapper@@QAEXXZ": "0x004ddec0",
-  "?UnknownFunction4de270@ColorMapper@@QAEPAEXZ": "0x004de270",
+  "?GetColors@ColorMapper@@QAEPAEXZ": "0x004de270",
   "?UnknownFunction4de280@ColorMapper@@QAEPAEXZ": "0x004de280",
   "?UnknownFunction4de290@ColorMapper@@QAEPAEXZ": "0x004de290",
   "?SetItemObject@UnknownResourceManager@@QAEXPAX0@Z": "0x004e9010",

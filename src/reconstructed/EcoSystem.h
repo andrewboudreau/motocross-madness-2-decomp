@@ -106,12 +106,12 @@ struct UnknownEcoSphereShape {              // type 4
 class CollisionObject : public UnknownEcoQuadTreeObject, public GameObject {
 public:
     explicit CollisionObject(int flags);      // 0x00431e70
-    void UnknownFunction4320f0(void* a, int b, int c, int d);          // 0x004320f0
+    void Configure(void* a, int b, int c, int d);          // 0x004320f0
     void UnknownFunction4328b0(const Vector3* vertices, const int* indices, int triangleCount,
                                int vertexCount);                       // 0x004328b0: hull
     void UnknownFunction4329a0(Vector3 center, float radius);          // 0x004329a0: sphere
     void UnknownFunction432a20(Vector3 p0, Vector3 p1, float radius);  // 0x00432a20: capsule
-    void UnknownFunction435830(const Matrix4* m);                      // 0x00435830: SetTransform
+    void SetTransform(const Matrix4* m);                      // 0x00435830: SetTransform
 
     unsigned char field_0x38[0x50 - 0x38];
     int shapeType;                            // +0x50: 0 hull, 3 capsule, 4 sphere
@@ -253,7 +253,7 @@ UnknownEcoTexture* UnknownFunction50a590(TextureMapManager* manager, const char*
 // 0x00460b50 / 0x00460c00 / 0x00460c70 (src/krusty2/math/FastMath.h).
 float FastSqrt(float x);
 float FastInvSqrt(float x);
-float UnknownFunction460c70(float x);        // table estimate of 1 / sqrt(x), no Newton step
+float FastInvSqrtEstimate(float x);        // table estimate of 1 / sqrt(x), no Newton step
 
 // A definition's model vertex as the .slt loader stores it (8 floats).
 struct UnknownEcoModelVertex {

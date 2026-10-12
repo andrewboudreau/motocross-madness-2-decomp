@@ -116,8 +116,8 @@ int BikeRace::AimCamera(int caster) {
         field_0x0b0 = 0xff;
         field_0x0ac = 0;
         if (g_TrackGame->field_0x18 > 1) {
-            UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->UnknownFunction4fdb50();
-            UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
+            UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->ClearFlag14c();
+            UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->ClearFlag14c();
             UnknownFunctionCameraView()->UnknownFunctionFollow(racerSlots[field_0x14c]);
             if (field_0x05c != 0) {
                 field_0x05c->ClearCasters();
@@ -130,8 +130,8 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->field_0x7bc, racer);
             }
         } else if (field_0x14c == 0) {
-            UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->UnknownFunction4fdb50();
-            UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
+            UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->ClearFlag14c();
+            UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->ClearFlag14c();
             UnknownFunctionCameraView()->UnknownFunctionFollow(localRacer);
             if (field_0x05c != 0) {
                 field_0x05c->ClearCasters();
@@ -144,8 +144,8 @@ int BikeRace::AimCamera(int caster) {
                                                                           racer->field_0x7bc, racer);
             }
         } else {
-            UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->UnknownFunction4fdb50();
-            UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
+            UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->ClearFlag14c();
+            UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->ClearFlag14c();
             int index = field_0x14c - 1;
             UnknownFunctionCameraView()->UnknownFunctionFollow(aiRacers[index]);
             if (field_0x05c != 0) {
@@ -693,7 +693,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             AppendChild(arch, -1);
             arch->arcadeModel->UnknownFunction4444c0(1);
             float scale = finishProbe.field_0x24 / arch->modelWidth * 1.111f;
-            arch->arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+            arch->arcadeModel->Scale(scale, scale, scale);
             arch->arcadeModel->SoultreeVirtualSlot6();
             arch->UnknownFunction4014f0(&point);
             arch->UnknownFunction401520(&direction, &kVec3YAxis, 1, 0);
@@ -774,7 +774,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         AppendChild(field_0x060, -1);
         Vector3 axis(0.0f, 1.0f, 0.0f);
         ((ArcadeObject*)field_0x060)->UnknownFunction4017a0(axis, 75.0f);
-        ((ArcadeObject*)field_0x060)->arcadeModel->UnknownFunction4fd340(0.6f, 0.6f, 0.6f);
+        ((ArcadeObject*)field_0x060)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
         field_0x1a8 = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);

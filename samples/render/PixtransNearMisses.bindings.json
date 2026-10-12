@@ -54,7 +54,7 @@
   "?UnknownFunction4d11c0@@YAHPAX0HHHHPAUUnknownTexturePalette@@@Z": "0x004d11c0",
   "?Downsample@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?ConvertPixels@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
-  "?UnknownFunction4de270@UnknownTexturePalette@@QAEPAEXZ": "0x004de270",
+  "?GetColors@UnknownTexturePalette@@QAEPAEXZ": "0x004de270",
   "?UnknownFunction4de280@UnknownTexturePalette@@QAEPAEXZ": "0x004de280",
   "?UnknownFunction4de290@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",

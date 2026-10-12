@@ -48,7 +48,7 @@ void UnknownFunction5053b0(int value);
 struct UnknownKrustyUISoultree {
     void UnknownFunction4444c0(int value);                 // 0x004444c0
     void SetPosition(const Vector3* position);   // 0x004fc660
-    void UnknownFunction4fbd10(float a, float b, float c, float d, float e, float f, float g,
+    void SetAxes(float a, float b, float c, float d, float e, float f, float g,
                                int h);                     // 0x004fbd10
 };
 
@@ -325,7 +325,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(field_0x18, "UIgarage.mcf", lights, &context, 1, 1), -1);
         KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
         KRUSTYUI_GARAGE->field_0x1a0->SetPosition(&garageFocus);
-        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        KRUSTYUI_GARAGE->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->SetMotionByName("Spin");
         KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
         UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
@@ -341,7 +341,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
                                                    &g_TrackGame->field_0x1c, 1, 1), -1);
         KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
         KRUSTYUI_RIDER->field_0x1a0->SetPosition(&KRUSTYUI_RIDER_POSITION);
-        KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        KRUSTYUI_RIDER->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->SetMotionByName("WaitR");
         KRUSTYUI_RIDER->UnknownFunction4a6bb0(0.03f, 0, 0);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
@@ -360,7 +360,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
             bike->field_0x1a0->UnknownFunction4444c0(1);
             bike->field_0x1a0->SetPosition(&garageFocus);
-            bike->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+            bike->field_0x1a0->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->SetMotionByName("WaitB");
             bike->UnknownFunction4a6bb0(0.03f, 0, 0);
             painter.UnknownFunction417670(bike->field_0x1a0, g_TrackGame->mode.field_0x1bcc);

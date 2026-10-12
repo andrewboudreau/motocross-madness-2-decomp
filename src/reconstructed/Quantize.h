@@ -19,7 +19,7 @@ public:
     static ColorMapper* UnknownFunction4dddd0(const char* name);
 
     void Build16BitTables();                             // 0x004ddec0: builds the 16-bit tables
-    unsigned char* UnknownFunction4de270();              // 0x004de270: &field_0x10
+    unsigned char* GetColors();              // 0x004de270: &field_0x10
     unsigned char* UnknownFunction4de280();              // 0x004de280: &field_0x710
     unsigned char* UnknownFunction4de290();              // 0x004de290: &field_0x8710
 

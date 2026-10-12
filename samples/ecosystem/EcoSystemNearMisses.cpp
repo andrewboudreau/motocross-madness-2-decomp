@@ -194,7 +194,7 @@ CollisionObject* Vegetation::GetCollisionObject(int index) {
         m(3, 2) = z;
         ECO_HULL->transform(3, 1) = y;
         ECO_HULL->transform(3, 2) = z;
-        object->UnknownFunction435830(&m);
+        object->SetTransform(&m);
     }
     return object;
 }
@@ -337,7 +337,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
     for (i = 0; i < definition->collisionCount; i++) {
         UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
-        definition->collisionObjects[i]->UnknownFunction4320f0(g_TrackGame->field_0x10, 0, 0, 1);
+        definition->collisionObjects[i]->Configure(g_TrackGame->field_0x10, 0, 0, 1);
         AppendChild(definition->collisionObjects[i], -1);
         definition->collisionObjects[i]->field_0x64 = 0x3e8;
         if (shape->type == 0) {
@@ -763,7 +763,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     unsigned int backColor = UnknownEcoLitColor(this, intensity.z);
     unsigned int rightColor = UnknownEcoLitColor(this, intensity.x);
     unsigned int leftColor = UnknownEcoLitColor(this, intensity.y);
-    float inverse = UnknownFunction460c70(camera->direction.x * camera->direction.x
+    float inverse = FastInvSqrtEstimate(camera->direction.x * camera->direction.x
                                           + camera->direction.z * camera->direction.z);
     float sine = inverse * camera->direction.x;
     float cosine = inverse * camera->direction.z;
@@ -922,7 +922,7 @@ int EcoSystem::UnknownVirtualSlot14() {
         g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
                                                        g_UnknownGlobal59af08, g_UnknownGlobal59af04);
         g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Memory %d",
-                                                       g_MemTagStack->UnknownFunction4a2d20("EcoSystem"));
+                                                       g_MemTagStack->GetBytes("EcoSystem"));
         g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
                                                        g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.Peak());
         g_TrackGame->field_0x38->Print(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",

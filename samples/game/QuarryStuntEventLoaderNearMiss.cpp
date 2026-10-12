@@ -62,11 +62,11 @@ public:
 };
 class UnknownQuarryCollision : public UnknownQuarryQuadTreeNode, public GameObject {
 public:
-    void UnknownFunction432120(int value);                     // 0x00432120
+    void SetUseBroadphase(int value);                     // 0x00432120
     void UnknownFunction435fe0();                              // 0x00435fe0
-    void UnknownFunction439400(int value);                     // 0x00439400
-    void UnknownFunction439410(UnknownQuarryCollision* other); // 0x00439410: also collides with `other`
-    void UnknownFunction4394d0(void* model, int kind);         // 0x004394d0
+    void SetIgnoreListMode(int value);                     // 0x00439400
+    void AddIgnoredOwner(UnknownQuarryCollision* other); // 0x00439410: also collides with `other`
+    void SetOwner(void* model, int kind);         // 0x004394d0
 };
 
 // A physics static model (Scene caster +0x08).
@@ -272,7 +272,7 @@ public:
 class UnknownQuarryRaceObject : public GameObject {
 public:
     explicit UnknownQuarryRaceObject(int flags);               // 0x00504490
-    void UnknownFunction5046e0();                              // 0x005046e0
+    void InsertNodesInQuadtree();                              // 0x005046e0
 
     unsigned char field_0x2c[0x48 - 0x2c];
 };
@@ -677,11 +677,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 if (terrain)
                     ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
                 ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->UnknownFunction435fe0();
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->UnknownFunction432120(1);
-                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->UnknownFunction4394d0(caster->physicsObject, 0x68);
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SetUseBroadphase(1);
+                ((UnknownQuarryPhysicsObject*)caster->physicsObject)->field_0x128->SetOwner(caster->physicsObject, 0x68);
             } else if (caster->collisionObject && ((D3DIMSoultreeObject*)caster->model)->CountNodes() == 1) {
                 ((UnknownQuarryCollision*)caster->collisionObject)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)caster->collisionObject)->UnknownFunction432120(1);
+                ((UnknownQuarryCollision*)caster->collisionObject)->SetUseBroadphase(1);
             }
         }
     }
@@ -700,19 +700,19 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 UnknownSceneObject* character = eventScene->animationTable->entries[i].character;
                 if (character->collisionObject) {
                     ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction435fe0();
-                    ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction432120(1);
-                    ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439400(0);
+                    ((UnknownQuarryCollision*)character->collisionObject)->SetUseBroadphase(1);
+                    ((UnknownQuarryCollision*)character->collisionObject)->SetIgnoreListMode(0);
                     if (i != ((UnknownQuarryRace*)raceView)->field_0x70 && i != ((UnknownQuarryRace*)raceView)->field_0x68) {
                         int iterator = 0;
                         for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator);
                              racer; racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                             if (!racer->field_0x735) {
-                                ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439410(racer->field_0x1418);
-                                ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439410(racer->field_0x1414);
-                                ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439410(racer->field_0x5f0);
-                                ((UnknownQuarryCollision*)character->collisionObject)->UnknownFunction439410(racer->field_0x5f4);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x1418);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x1414);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x5f0);
+                                ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x5f4);
                                 ((UnknownQuarryCollision*)character->collisionObject)
-                                    ->UnknownFunction439410(racer->field_0x604->field_0x38);
+                                    ->AddIgnoredOwner(racer->field_0x604->field_0x38);
                             }
                         }
                     } else if (character->collisionObject) {
@@ -723,26 +723,26 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             } else {
                 UnknownSceneAnimatedObject* car = eventScene->animationTable->entries[i].proceduralObject;
                 ((UnknownQuarryCar*)car)->field_0x20c = eventTerrain;
-                ((UnknownQuarryCollision*)car->field_0x38)->UnknownFunction439400(1);
+                ((UnknownQuarryCollision*)car->field_0x38)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
                     ((UnknownQuarryCollision*)car->field_0x38)
-                        ->UnknownFunction439410(entry->keyFramed ? (UnknownQuarryCollision*)entry->character->collisionObject
+                        ->AddIgnoredOwner(entry->keyFramed ? (UnknownQuarryCollision*)entry->character->collisionObject
                                                                        : (UnknownQuarryCollision*)entry->proceduralObject->field_0x3c);
                 }
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction432120(1);
-                ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction4394d0(car, 0x69);
-                ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439400(0);
+                ((UnknownQuarryCollision*)car->field_0x3c)->SetUseBroadphase(1);
+                ((UnknownQuarryCollision*)car->field_0x3c)->SetOwner(car, 0x69);
+                ((UnknownQuarryCollision*)car->field_0x3c)->SetIgnoreListMode(0);
                 int iterator = 0;
                 for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
                      racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->field_0x735) {
-                        ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x1418);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x1414);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x5f0);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x5f4);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x604->field_0x38);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1418);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1414);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x5f0);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x5f4);
+                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x604->field_0x38);
                     }
                 }
             }
@@ -867,6 +867,6 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);
     last->UnknownVirtualSlot8(field_0x18);
     AppendChild(last, -1);
-    last->UnknownFunction5046e0();
+    last->InsertNodesInQuadtree();
     return 1;
 }

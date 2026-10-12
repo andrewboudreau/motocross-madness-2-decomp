@@ -96,7 +96,7 @@ int MemTagStack::Push(const char* tag)
 }
 
 // 0x004a2d20
-int MemTagStack::UnknownFunction4a2d20(const char* tag)
+int MemTagStack::GetBytes(const char* tag)
 {
     for (int i = 0; i < count; i++) {
         if (!strcmp(names[i], tag)) {

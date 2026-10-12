@@ -127,7 +127,7 @@ public:
 // installs it). 0x004dcf20 (thiscall, ret 8) removes an object from a cell.
 class UnknownWreckerQuadTree {
 public:
-    void UnknownFunction4dcf20(UnknownWreckerCollisionObject* object, int cell);
+    void Remove(UnknownWreckerCollisionObject* object, int cell);
 };
 extern UnknownWreckerQuadTree* g_UnknownGlobal68aba4;
 
@@ -162,17 +162,17 @@ struct UnknownWreckerMatrix {
 // the two field names follow SoultreeObject in src/krusty2/core/SoultreeObject.h.
 struct UnknownWreckerSkeleton {
     void TranslateIn(UnknownWreckerSkeleton* frame, Vector3 delta); // 0x004fc690 (ret 0x10)
-    void UnknownFunction4fc740(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
+    void SetPositionInFrame(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
     void GetPositionIn(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc9a0 (ret 8)
     void GetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerFrame* out);        // 0x004fca80 (ret 8)
     void GetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* out);       // the same function, for a matrix local
     void SetMatrixIn(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* matrix);    // 0x004fb8c0 (ret 8): sets this node's matrix in `frame` space
     void SetPositionIn(UnknownWreckerSkeleton* frame, const Vector3* offset);           // 0x004fc890 (ret 8): translates by `offset` given in `frame` space
-    void UnknownFunction4fcc70();                                  // 0x004fcc70
+    void ResetMatrices();                                  // 0x004fcc70
     Vector3 LocalToWorldPoint(const Vector3& point);           // 0x004fd660 (ret 8)
     Vector3 WorldToLocalDirection(const Vector3& direction);       // 0x004fd710 (ret 8)
-    Vector3 UnknownFunction4fd7f0(const Vector3& point);           // 0x004fd7f0 (ret 8)
-    void UnknownFunction4fe850(Vector3* a, Vector3* b);            // 0x004fe850 (ret 8)
+    Vector3 WorldToLocalPoint(const Vector3& point);           // 0x004fd7f0 (ret 8)
+    void GetSubtreeBounds(Vector3* a, Vector3* b);            // 0x004fe850 (ret 8)
     unsigned char field_0x000[0x140];
     UnknownWreckerSkeleton* firstChild; // +0x140
     unsigned char field_0x144[0x18c - 0x144];
@@ -202,7 +202,7 @@ public:
     void UnknownFunction4a8ac0(Vector3* position, int value);      // 0x004a8ac0 (ret 8)
     void SetMotionByName(const char* animation);             // 0x004a8b10 (ret 4)
     void SetMotion(int value);                         // 0x004a8b40 (ret 4)
-    void UnknownFunction4a8b80(int value, float blend);            // 0x004a8b80 (ret 8)
+    void BlendToMotion(int value, float blend);            // 0x004a8b80 (ret 8)
 
     unsigned char field_0x004[0x18 - 0x4];
     UnknownWreckerRaceState* field_0x18;
@@ -290,7 +290,7 @@ struct UnknownWreckerParticle {
 // 0x00531740 takes the next free entry of particles itself.
 class UnknownWreckerParticles : public GameObject {
 public:
-    int UnknownFunction4baa50(float age, const Vector3* position, int frame, float size,
+    int AddParticle(float age, const Vector3* position, int frame, float size,
                               float lifetime, float growth, unsigned int flags, int color);
 
     int activeCount;           // +0x2c live particle count (the next free index)

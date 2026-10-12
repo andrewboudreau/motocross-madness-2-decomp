@@ -181,7 +181,7 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
     Vector3 second;
     for (int i = 0; i < pointCount; i++) {
         int code;
-        if (!g_UnknownFollowCameraProjector575a98->UnknownFunction52f340(
+        if (!g_UnknownFollowCameraProjector575a98->ProjectPoint(
                 this, field_0xec, &points[i].position, &points[i].field_0x20, &code)) {
             field_0x220 += dt * points[i].field_0x0c;
             field_0x220 = field_0x298->Update(field_0x220, dt);

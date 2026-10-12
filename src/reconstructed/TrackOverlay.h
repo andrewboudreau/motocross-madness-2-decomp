@@ -87,7 +87,7 @@ public:
 // Terrain) is not reconstructed under src/reconstructed.
 class UnknownTerrain {
 public:
-    int UnknownFunction506e90(const Vector3* from, const Vector3* to, Vector3* out, int a4, int a5, int a6);
+    int CastSegment(const Vector3* from, const Vector3* to, Vector3* out, int a4, int a5, int a6);
     // 0x00507960 (ret 4): selects the detail level (QuarryStuntEvent.cpp;
     // Terrain::SelectQuality in src/krusty2/broadphase/Terrain.h).
     void SelectQuality(int level);
@@ -99,7 +99,7 @@ class Camera;
 // camera and its matrix (+0xec); nonzero when it is on screen.
 class UnknownProjector {
 public:
-    int UnknownFunction52f340(Camera* camera, const void* matrix, const Vector3* point,
+    int ProjectPoint(Camera* camera, const void* matrix, const Vector3* point,
                               Vector3* screen, float* depth);
 };
 extern UnknownProjector* g_UnknownGlobal575a98;
