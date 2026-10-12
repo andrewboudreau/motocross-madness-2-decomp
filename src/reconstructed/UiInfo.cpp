@@ -42,17 +42,17 @@ UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
     int length;
     int count;
 
-    field_0xd4 = 0;
+    networkPlayerId = 0;
     length = strlen("");
     count = length > 0xf ? 0xf : length;
-    strncpy(field_0xdc, "", count);
-    field_0xdc[count] = 0;
+    strncpy(playerName, "", count);
+    playerName[count] = 0;
     field_0xc8 = 0;
-    field_0xcc = 0;
+    isReady = 0;
     field_0x80[0] = 0;
     field_0x40[0] = 0;
     field_0x00[0] = 0;
-    field_0xd0 = FLT_MAX;
+    lowestMessageDelay = FLT_MAX;
     field_0xf4 = 1;
 }
 
@@ -90,8 +90,8 @@ TrackGameMode::TrackGameMode() {
     int count;
 
     UnknownFunction522440();
-    field_0x23a4 = 0;
-    field_0x6a8 = 1;
+    networkGame = 0;
+    visualCuesOn = 1;
     memset(&displayAdapterGuid, 0, sizeof(displayAdapterGuid));
     installType = 2;
     strcpy(installDirectory, "");
@@ -108,9 +108,9 @@ TrackGameMode::TrackGameMode() {
     field_0x25e8 = 0;
     showNewbieDialog = 1;
     ghostFile[0] = 0;
-    field_0x26f0 = 0;
+    saveGhost = 0;
     replayFile[0] = 0;
-    field_0x1974.field_0xc0 = -1;
+    racerChoice.field_0xc0 = -1;
     field_0x1bcc = (int)((rand() * (1.0f / 32768.0f)) * 999.0f);
     if (field_0x1bcc <= 99)
         field_0x1bcc += 100;
@@ -121,7 +121,7 @@ TrackGameMode::TrackGameMode() {
     lobbyRank = -1;
     lobbyPresetFlags = -1;
     maxOpponents = 0;
-    field_0x1be0 = 0;
+    racerCount = 0;
     championshipInProgress = 0;
     UNKNOWN_SET_DIRECTORY(0, "Teraform\\Quarries")
     UNKNOWN_SET_DIRECTORY(1, "Teraform\\Baja")
@@ -149,14 +149,14 @@ int TrackGameMode::ResetNetworkRace() {
 
     field_0x6a4 = 0;
     selectedSession = 0;
-    field_0x1be0 = 0;
-    if (field_0x27f8.field_0x00 != 2) {
+    racerCount = 0;
+    if (raceSettings.raceMode != 2) {
         for (i = 0; i < 8; i++)
-            field_0x1be4[i] = UnknownTrackGameRacerSlot();
+            racers[i] = UnknownTrackGameRacerSlot();
     }
     for (i = 0; i < 8; i++)
-        field_0x27f8.field_0x14c[i] = UnknownTrackGameModeEntry();
-    field_0x27f8.field_0x35 = 0;
+        raceSettings.field_0x14c[i] = UnknownTrackGameModeEntry();
+    raceSettings.field_0x35 = 0;
     return 1;
 }
 
@@ -234,8 +234,8 @@ void TrackGameMode::UnknownFunction522800(UnknownTrackGameModeOptionsA68* option
     g_TrackGame->LoadResourceString(id, text, 0x80);                 \
     length = strlen(text);                                                        \
     count = length > 0x7f ? 0x7f : length;                                        \
-    strncpy(g_TrackGame->mode.field_0x145c[index], text, count);             \
-    g_TrackGame->mode.field_0x145c[index][count] = 0;
+    strncpy(g_TrackGame->mode.resourceStrings[index], text, count);             \
+    g_TrackGame->mode.resourceStrings[index][count] = 0;
 
 void TrackGameMode::UnknownFunction522840(char (*names)[0x80]) {
     char text[0x100];
@@ -304,7 +304,7 @@ void TrackGameMode::UnknownFunction522cd0() {
         UnknownTrackGameModeEntry entry;
         entry.field_0x00 = 0;
         entry.field_0x04 = 0;
-        field_0x27f8.field_0x14c[i] = entry;
+        raceSettings.field_0x14c[i] = entry;
     }
 }
 
@@ -431,11 +431,11 @@ int TrackGameMode::LoadProfile() {
     fread(&field_0xa20, 0x2c, 1, file);
     fread(&displayModeIndex, 0x1c, 1, file);
     fread(field_0xa68, 0x30, 1, file);
-    fread(field_0x145c, 0x500, 1, file);
+    fread(resourceStrings, 0x500, 1, file);
     fread(videoSettings, 0x18, 1, file);
     fread(optionsBackup, 0x5c, 1, file);
     fread(field_0x1090, 0x5c, 1, file);
-    fread(&field_0x1a3c, 0xc8, 1, file);
+    fread(&racerChoiceBackup, 0xc8, 1, file);
     fread(field_0x1b04, 0xc8, 1, file);
     fread(&displayAdapterGuid, 0x10, 1, file);
     fread(&field_0x23b8, 4, 1, file);
@@ -453,18 +453,18 @@ int TrackGameMode::LoadProfile() {
     fread(customGarageCurves, 0x294, 1, file);
     fread(&field_0x1bcc, 4, 1, file);
     fclose(file);
-    field_0x27f8.field_0x35 = 0;
+    raceSettings.field_0x35 = 0;
     ChooseDisplayMode(&displayAdapterGuid, &displayModeIndex);
     g_TrackGame->ui->field_0x48c = 1;
     LoadControllerChoice();
     if (g_TrackGame->soundInterface) {
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = field_0xa34;
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, field_0xa48 ? 16 : 8);
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = eaxEnabled;
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, use16BitSound ? 16 : 8);
     }
-    field_0x27f8 = savedSettings;
+    raceSettings = savedSettings;
     field_0x94 = field_0x98;
     memcpy(field_0xfd8, optionsBackup, sizeof(field_0xfd8));
-    memcpy(&field_0x1974, &field_0x1a3c, sizeof(field_0x1974));
+    memcpy(&racerChoice, &racerChoiceBackup, sizeof(racerChoice));
     return strcmp(field_0x00, "") != 0;
 }
 
@@ -485,11 +485,11 @@ void TrackGameMode::SaveProfile() {
     fwrite(&field_0xa20, 0x2c, 1, file);
     fwrite(&displayModeIndex, 0x1c, 1, file);
     fwrite(field_0xa68, 0x30, 1, file);
-    fwrite(field_0x145c, 0x500, 1, file);
+    fwrite(resourceStrings, 0x500, 1, file);
     fwrite(videoSettings, 0x18, 1, file);
     fwrite(optionsBackup, 0x5c, 1, file);
     fwrite(field_0x1090, 0x5c, 1, file);
-    fwrite(&field_0x1a3c, 0xc8, 1, file);
+    fwrite(&racerChoiceBackup, 0xc8, 1, file);
     fwrite(field_0x1b04, 0xc8, 1, file);
     fwrite(&displayAdapterGuid, 0x10, 1, file);
     fwrite(&field_0x23b8, 4, 1, file);
@@ -557,12 +557,12 @@ int TrackGameMode::FindFileDirectory(int value, char* name, const char* kind, ch
 
 // 0x00523b70
 void TrackGameMode::CopyCurrentSeriesDirectory(char* name) {
-    CopySeriesDirectory((short)field_0x27f8.field_0x04, (short)field_0x27f8.field_0x00, name);
+    CopySeriesDirectory((short)raceSettings.cameraView, (short)raceSettings.raceMode, name);
 }
 
 // 0x00523bb0
 int TrackGameMode::CopySeriesDirectory(short a, short b, char* name) {
-    strcpy(name, seriesDirectories[field_0x27f8.field_0x08]);
+    strcpy(name, seriesDirectories[raceSettings.series]);
     return 1;
 }
 
@@ -657,11 +657,11 @@ void TrackGameMode::LoadBonusTrackNames() {
 
 // 0x005240e0
 void TrackGameMode::SelectSeries(int series) {
-    field_0x27f8.field_0x08 = series;
+    raceSettings.series = series;
     currentSeriesDirectory = (int)seriesDirectories[series];
 }
 
 // 0x00524100
 int TrackGameMode::GetSelectedSeries() {
-    return field_0x27f8.field_0x08;
+    return raceSettings.series;
 }

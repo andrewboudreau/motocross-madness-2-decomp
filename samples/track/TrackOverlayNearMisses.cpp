@@ -200,7 +200,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
             (UnknownNameOverlayWorld*)chatView, i);
         AppendChild(nameTags[i], -1);
     }
-    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
+    if (g_TrackGame->mode.raceSettings.cameraView == 0) {
         nameTags[racerCount] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
             Target(), overlayTexture, &nameTagRects[racerCount], 0, &nameTagRects[racerCount], 0,
             (UnknownNameOverlayWorld*)chatView, i);
@@ -231,10 +231,10 @@ int StatsOverlay::DrawStandings()
     int i;
     int count = 0;
     UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
+    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4) {
         g_TrackGame->LoadResourceString(0x943, label, 0x80);
         TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
-        float limit = g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f;
+        float limit = g_TrackGame->mode.raceSettings.field_0x140 * 60.0f;
         FormatMinutesSeconds(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s", label);
     }
@@ -255,7 +255,7 @@ int StatsOverlay::DrawStandings()
         }
     }
     int first = 1;
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
+    if (g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         count++;
     else
         first = 0;
@@ -319,7 +319,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
     rect.top = 0;
     rect.right = 128;
     rect.bottom = 128;
-    switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
+    switch (g_TrackGame->mode.raceSettings.cameraView) {
     case 0:
         strcpy(name, "BajaScore.tga");
         break;
@@ -708,8 +708,8 @@ void RadarOverlay::DrawRacers(int mode)
                     float distance = dz * dz + dx * dx;
                     radarView->chatOverlay->UnknownFunction51d9c0(distance, racers[i]->racerName);
                 }
-                if (outside && (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
-                                g_TrackGame->mode.field_0x27f8.field_0x04 == 2)) {
+                if (outside && (g_TrackGame->mode.raceSettings.cameraView == 3 ||
+                                g_TrackGame->mode.raceSettings.cameraView == 2)) {
                     point.x = -1.0f;
                     point.y = -1.0f;
                 } else {
@@ -728,8 +728,8 @@ void RadarOverlay::DrawRacers(int mode)
                     radarView->chatOverlay->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
             }
             if (outside) {
-                if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
-                    g_TrackGame->mode.field_0x27f8.field_0x04 == 2)
+                if (g_TrackGame->mode.raceSettings.cameraView == 3 ||
+                    g_TrackGame->mode.raceSettings.cameraView == 2)
                     continue;
                 lineStart.color = 0x28aa28;
                 lineEnd.color = 0x28aa28;

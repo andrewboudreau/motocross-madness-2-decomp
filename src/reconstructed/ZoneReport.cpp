@@ -55,31 +55,31 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
         if (bikeIndex == -1) {
             *flags &= ~0xc;
         } else {
-            g_TrackGame->mode.field_0x1974.field_0xc0 = bikeManufacturer;
-            g_TrackGame->mode.field_0x1974.field_0xc4 = bikeIndex;
+            g_TrackGame->mode.racerChoice.field_0xc0 = bikeManufacturer;
+            g_TrackGame->mode.racerChoice.field_0xc4 = bikeIndex;
         }
         if (eventTypeIndex == -1)
             *flags &= ~3;
         else
-            g_TrackGame->mode.field_0x27f8.field_0x04 = eventTypeIndex;
-        g_TrackGame->mode.field_0x27f8.field_0x34 = trackVariant;
+            g_TrackGame->mode.raceSettings.cameraView = eventTypeIndex;
+        g_TrackGame->mode.raceSettings.field_0x34 = trackVariant;
         if (eventTypeLocation != -1)
-            strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, trackName);
+            strcpy(g_TrackGame->mode.raceSettings.trackName, trackName);
         if (g_TrackGame->network->isHost)
-            g_TrackGame->sceneObject->ReadSceneName(name, g_TrackGame->mode.field_0x27f8.field_0x36, 0, "scn",
-                                                             &g_TrackGame->mode.field_0x27f8.field_0x138,
-                                                             &g_TrackGame->mode.field_0x27f8.field_0x13c);
-        g_TrackGame->mode.field_0x27f8.field_0x10 = 1;
-        g_TrackGame->mode.field_0x27f8.field_0x14 = 1;
-        g_TrackGame->mode.field_0x27f8.field_0x24 = 0;
-        g_TrackGame->mode.field_0x27f8.field_0x00 = 1;
-        g_TrackGame->mode.field_0x27f8.field_0x0c = 0;
-        g_TrackGame->mode.field_0x27f8.field_0x18 = 0;
-        g_TrackGame->mode.field_0x27f8.field_0x20 = 5;
-        g_TrackGame->mode.field_0x27f8.field_0x140 = 5.0f;
-        g_TrackGame->mode.field_0x27f8.field_0x148 = 0;
-        g_TrackGame->mode.field_0x27f8.field_0x2d = 0;
-        g_TrackGame->mode.field_0x27f8.field_0x144 = 0;
+            g_TrackGame->sceneObject->ReadSceneName(name, g_TrackGame->mode.raceSettings.trackName, 0, "scn",
+                                                             &g_TrackGame->mode.raceSettings.field_0x138,
+                                                             &g_TrackGame->mode.raceSettings.field_0x13c);
+        g_TrackGame->mode.raceSettings.treeCollision = 1;
+        g_TrackGame->mode.raceSettings.riderCollision = 1;
+        g_TrackGame->mode.raceSettings.aiRacerCount = 0;
+        g_TrackGame->mode.raceSettings.raceMode = 1;
+        g_TrackGame->mode.raceSettings.field_0x0c = 0;
+        g_TrackGame->mode.raceSettings.shortTimeLimit = 0;
+        g_TrackGame->mode.raceSettings.lapCount = 5;
+        g_TrackGame->mode.raceSettings.field_0x140 = 5.0f;
+        g_TrackGame->mode.raceSettings.field_0x148 = 0;
+        g_TrackGame->mode.raceSettings.field_0x2d = 0;
+        g_TrackGame->mode.raceSettings.tagBall = 0;
         g_TrackGame->mode.field_0x98 = 3;
         g_TrackGame->mode.field_0x94 = 3;
         return 1;
@@ -132,13 +132,13 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
     int i;
     int j;
     if (g_TrackGame->network->lobbyConnected) {
-        raceStatus.eventType = g_TrackGame->mode.field_0x27f8.field_0x04 + 1;
+        raceStatus.eventType = g_TrackGame->mode.raceSettings.cameraView + 1;
         longest = 0;
         i = 0;
-        eventTypeIndex = g_TrackGame->mode.field_0x27f8.field_0x04;
-        strcpy(trackName, g_TrackGame->mode.field_0x27f8.field_0x36);
-        trackVariant = g_TrackGame->mode.field_0x27f8.field_0x34;
-        raceStatus.laps = g_TrackGame->mode.field_0x27f8.field_0x20;
+        eventTypeIndex = g_TrackGame->mode.raceSettings.cameraView;
+        strcpy(trackName, g_TrackGame->mode.raceSettings.trackName);
+        trackVariant = g_TrackGame->mode.raceSettings.field_0x34;
+        raceStatus.laps = g_TrackGame->mode.raceSettings.lapCount;
         for (; i < g_TrackGame->field_0x18; i++) {
             raceStatus.records[i].position = g_TrackGame->eventManager->results[i].position;
             raceStatus.records[i].fastestLap = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
@@ -149,14 +149,14 @@ int UnknownTrackGameObject3410::ReportRaceToZone()
             players[i].position = raceStatus.records[i].position;
             strcpy(players[i].name, g_TrackGame->eventManager->results[i].name);
             if (g_TrackGame->eventManager->results[i].finished) {
-                if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4)
+                if (g_TrackGame->mode.raceSettings.cameraView != 0 && g_TrackGame->mode.raceSettings.cameraView != 4)
                     players[i].score = (int)(g_TrackGame->eventManager->results[i].fastestLap * 100.0f);
                 else
                     players[i].score = (int)g_TrackGame->eventManager->results[i].score;
             }
-            for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
-                if (g_TrackGame->eventManager->results[i].playerId == g_TrackGame->mode.field_0x1be4[j].field_0xd4) {
-                    bikeIndex = g_TrackGame->mode.field_0x1be4[j].field_0xc4;
+            for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
+                if (g_TrackGame->eventManager->results[i].playerId == g_TrackGame->mode.racers[j].networkPlayerId) {
+                    bikeIndex = g_TrackGame->mode.racers[j].field_0xc4;
                     break;
                 }
             }

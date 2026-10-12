@@ -193,7 +193,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     sampleDivisor[0] = 1;
     sampleDivisor[1] = 1;
     sampleDivisor[2] = 1;
-    if (!g_TrackGame->mode.field_0xa48) {
+    if (!g_TrackGame->mode.use16BitSound) {
         if (racers <= 2) {
             if (engineCount == 2) {
                 sampleDivisor[0] = 2;
@@ -241,7 +241,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
 
     for (i = 0; i < 4; i++) {
         engineVoices[i] = new (__FILE__, 310) Sound(engineGroup, 1);
-        if (g_TrackGame->mode.field_0xa48)
+        if (g_TrackGame->mode.use16BitSound)
             LoadSound(engineVoices[i], "silence_16.wav", 41, 3);
         else
             LoadSound(engineVoices[i], "silence_08.wav", 41, 3);
@@ -249,12 +249,12 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     }
     landHardSound = new (__FILE__, 321) Sound(engineGroup, 1);
     LoadSound(landHardSound, "LandHard01.wav", 41, 3);
-    if (g_TrackGame->mode.field_0x27f8.field_0x04 != 3) {
+    if (g_TrackGame->mode.raceSettings.cameraView != 3) {
         launchSound = new (__FILE__, 326) Sound(effectsGroup, 1);
         LoadSound(launchSound, "launch.wav", 1, 3);
     }
 
-    if (g_TrackGame->mode.field_0xa48) {
+    if (g_TrackGame->mode.use16BitSound) {
         bytesPerSample = 2;
         strcpy(file, "audio_16.ini");
     } else {
@@ -407,7 +407,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     if (stream)
         delete stream;
 
-    if (g_TrackGame->mode.field_0x23a4) {
+    if (g_TrackGame->mode.networkGame) {
         crowdLoop = new (__FILE__, 545) Sound(crowdSounds, 1);
         LoadSound(crowdLoop, "CrowdLoop.wav", 1, 3);
         applause1 = new (__FILE__, 548) Sound(crowdSounds, 1);
@@ -498,7 +498,7 @@ void RaceSound::AssignChannels() {
     SoundSystem()->SetListenerRolloffFactor(1.0f);
     landHardSound->Set3DDistanceRange(10.0f, 500.0f, 0);
 
-    volume = (g_TrackGame->mode.field_0xa40 * 0.01f) * 2500.0f - 2500.0f;
+    volume = (g_TrackGame->mode.soundVolume * 0.01f) * 2500.0f - 2500.0f;
     if (volume > 0.0f)
         volume = 0.0f;
     else if (volume == -2500.0f)
@@ -516,7 +516,7 @@ void RaceSound::AssignChannels() {
         wreckSounds[i]->Set3DDistanceRange(50.0f, 500.0f, 0);
     for (i = 0; i < 6; i++)
         fallSounds[i]->Set3DDistanceRange(50.0f, 500.0f, 0);
-    if (g_TrackGame->mode.field_0x23a4)
+    if (g_TrackGame->mode.networkGame)
         PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
 
     if (g_TrackGame->mode.GetSelectedSeries() == 3 ||
@@ -535,7 +535,7 @@ void RaceSound::AssignChannels() {
     }
     SoundSystem()->SetEAXListenerParameters(&environment);
     SoundSystem()->CommitListenerSettings();
-    if (!g_TrackGame->mode.field_0xa28)
+    if (!g_TrackGame->mode.soundOn)
         g_TrackGame->field_0x34->DisableByClassName("SoundGroup");
 }
 
@@ -550,7 +550,7 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         AssignChannels();
         field_0x1208 = 0;
     }
-    if (SoundSystem()->audioStarted && g_TrackGame->mode.field_0xa28 && !raceView->field_0x3f8) {
+    if (SoundSystem()->audioStarted && g_TrackGame->mode.soundOn && !raceView->field_0x3f8) {
         ohClock += frameTime;
         applauseClock += frameTime;
         stuntApplauseClock += frameTime;
@@ -737,7 +737,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
         RefillStream();
     }
 
-    if (g_TrackGame->mode.field_0xa38 &&
+    if (g_TrackGame->mode.positionSounds &&
         (listenerRacer->field_0x7b8 > field_0x1294 || listenerRacer->lapCount > field_0x1290))
         PlayIfEnabled(waypointSound, 0, 0, 0, 0);
 
@@ -753,7 +753,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     launchSound->Stop(1);
                     PlayIfEnabled(launchSound, 0, 0, 0, 0);
                 }
-                if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
+                if (g_TrackGame->mode.raceSettings.cameraView == 3) {
                     if (currentRacer == listenerRacer && currentRacer->finishPosition == 1)
                         PlayIfEnabled(booSound, 0, 0, 0, 0);
                     if (currentRacer == listenerRacer && currentRacer->finishPosition > 1 && ohClock > 30.0f) {
@@ -831,7 +831,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         case 0x2e:
             if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
                 break;
-            if (g_TrackGame->mode.field_0x27f8.field_0x04 != 3)
+            if (g_TrackGame->mode.raceSettings.cameraView != 3)
                 break;
             switch (musicVolume) {
             case 0:
@@ -852,14 +852,14 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (owner)
                     owner->field_0x6c->ReplaceHeadMessage(&message);
             }
-            if (g_TrackGame->mode.field_0x23a4)
+            if (g_TrackGame->mode.networkGame)
                 crowdSounds->UnknownFunction401dd0(musicVolume);
             return 1;
         case 0x1f:
             if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))
                 break;
-            g_TrackGame->mode.field_0xa28 = !g_TrackGame->mode.field_0xa28;
-            if (g_TrackGame->mode.field_0xa28) {
+            g_TrackGame->mode.soundOn = !g_TrackGame->mode.soundOn;
+            if (g_TrackGame->mode.soundOn) {
                 g_TrackGame->field_0x34->EnableByClassName("SoundGroup");
                 if (engineGroup)
                     engineGroup->UnknownVirtualSlot16(0);
@@ -869,7 +869,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     effectsGroup->UnknownVirtualSlot16(0);
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4)
                     g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4->UnknownVirtualSlot16(0);
-                if (g_TrackGame->mode.field_0x23a4)
+                if (g_TrackGame->mode.networkGame)
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
                     field_0x1294 = listenerRacer->field_0x7b8;
@@ -891,7 +891,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot4();
             }
             if (owner)
-                owner->ShowOnOffMessage(0x1429, g_TrackGame->mode.field_0xa28);
+                owner->ShowOnOffMessage(0x1429, g_TrackGame->mode.soundOn);
             return 1;
         }
     }
@@ -1064,7 +1064,7 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
 
 // 0x004e5780
 void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused) {
-    if (g_TrackGame->mode.field_0xa28 && (g_TrackGame->mode.field_0x23a4 || !network) && sound) {
+    if (g_TrackGame->mode.soundOn && (g_TrackGame->mode.networkGame || !network) && sound) {
         if (stop)
             sound->Stop(1);
         sound->PlayWithOptions(0, loop, 1);
@@ -1075,9 +1075,9 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
 // (modes 0 and 4); applause01 in mode 3 at most every 15 seconds.
 void RaceSound::PlayScoreSounds(UnknownEventRacer* racer, float value) {
     if (listenerRacer == racer && value >= 10000.0f &&
-        (!g_TrackGame->mode.field_0x27f8.field_0x04 || g_TrackGame->mode.field_0x27f8.field_0x04 == 4))
+        (!g_TrackGame->mode.raceSettings.cameraView || g_TrackGame->mode.raceSettings.cameraView == 4))
         PlayIfEnabled(bonusSound, 0, 0, 0, 0);
-    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && stuntApplauseClock > 15.0f) {
+    if (g_TrackGame->mode.raceSettings.cameraView == 3 && stuntApplauseClock > 15.0f) {
         PlayIfEnabled(applause1, 0, 0, 0, 0);
         stuntApplauseClock = 0;
     }

@@ -243,10 +243,10 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
         int others;
         if (g_TrackGame->field_0x18 > 1) {
             others = g_TrackGame->field_0x3424;
-        } else if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
+        } else if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             others = 1;
         } else {
-            others = g_TrackGame->mode.field_0x27f8.field_0x24;
+            others = g_TrackGame->mode.raceSettings.aiRacerCount;
         }
         if (g_TrackGame->field_0x18 == 1 && others == 0) {
             return;
@@ -390,7 +390,7 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
         *b = gridDirection;
         return;
     }
-    switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
+    switch (g_TrackGame->mode.raceSettings.cameraView) {
     case 2:
     case 3: {
         if (field_0x144) {
@@ -557,7 +557,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     field_0x1d8 = 0;
     g_TrackGame->ui->StepProgressBar();
 
-    int mode = g_TrackGame->mode.field_0x27f8.field_0x04;
+    int mode = g_TrackGame->mode.raceSettings.cameraView;
     switch (mode) {
     case 2:
     case 3: {
@@ -587,10 +587,10 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     }
     case 1:
     case 5:
-        if (mode != 1 || !g_TrackGame->mode.field_0x27f8.field_0x2c) {
+        if (mode != 1 || !g_TrackGame->mode.raceSettings.field_0x2c) {
             sprintf(path, "%s\\%s%02d.tdf", g_TrackGame->sceneObject->sceneDirectory,
-                    g_TrackGame->mode.field_0x27f8.field_0x36,
-                    g_TrackGame->mode.field_0x27f8.field_0x34);
+                    g_TrackGame->mode.raceSettings.trackName,
+                    g_TrackGame->mode.raceSettings.field_0x34);
             UnknownTextureStream* stream =
                 new(__FILE__, 0x1be) UnknownTextureStream((int)g_UnknownResourceManager572b44);
             if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)modelName)) {
@@ -618,7 +618,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     g_TrackGame->ui->StepProgressBar();
 
     WriteRelativePositions(&position, &direction, event, 0);
-    mode = g_TrackGame->mode.field_0x27f8.field_0x04;
+    mode = g_TrackGame->mode.raceSettings.cameraView;
     if (mode == 3 || mode == 2) {
         if (raceTrack) {
             if (!g_TrackGame->field_0x3428) {
@@ -640,8 +640,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                         field_0x06c->field_0x210 = 0;
                     }
                 }
-                if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 &&
-                    g_TrackGame->mode.field_0x27f8.field_0x00 != 4 && field_0x06c) {
+                if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
+                    g_TrackGame->mode.raceSettings.raceMode != 4 && field_0x06c) {
                     field_0x06c->model->SetPositionVec3(point);
                     field_0x06c->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 }
@@ -656,7 +656,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                     point = position;
                 }
                 terrain->QueryGround(&point, &normal, 0, 0);
-                if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
+                if (g_TrackGame->mode.raceSettings.cameraView == 3) {
                     field_0x064 =
                         (UnknownBikeRaceView6c*)raceScene->FindEntryByFileName("StartGate.slb", &field_0x068);
                     if (field_0x064) {
@@ -666,8 +666,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                             field_0x064->field_0x210 = 0;
                         }
                     }
-                    if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 &&
-                        g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
+                    if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
+                        g_TrackGame->mode.raceSettings.raceMode != 4) {
                         if (field_0x064) {
                             field_0x064->model->SetPositionVec3(point);
                             field_0x064->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
@@ -720,8 +720,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             girlPosition.y += height;
             boxPosition.y += height;
 
-            if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 &&
-                g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
+            if (g_TrackGame->mode.raceSettings.raceMode != 0 &&
+                g_TrackGame->mode.raceSettings.raceMode != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
                 flagGirl = (UnknownBikeRaceCharacter*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
                 AppendChild(flagGirl->UnknownVirtualSlot11(field_0x18, modelName, lights, textures, 1, 1),
@@ -746,7 +746,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             g_TrackGame->eventManager->RemoveVegetationInRect(girlPosition.x - 4.0f, girlPosition.z - 4.0f,
                                                                        girlPosition.x + 4.0f, girlPosition.z + 4.0f);
         }
-    } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.field_0x27f8.field_0x148)) {
+    } else if (mode == 0 || (mode == 4 && g_TrackGame->mode.raceSettings.field_0x148)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
         field_0x0bc = (int)bonus->SetupCounter(field_0x18, (int)lights, (int)textures,
                                                (UnknownBonusRacer*)this, (UnknownBonusCamera*)raceCamera);
@@ -757,16 +757,16 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
 
     SetSceneTime(0.0f);
     raceScene->field_0x7c0 = 1;
-    if (g_TrackGame->mode.field_0x27f8.field_0x00) {
+    if (g_TrackGame->mode.raceSettings.raceMode) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
         field_0x0c0 = (int)numbers->SetupDigits(field_0x18, (int)textures, (UnknownNumberRacer*)this, 0x1e,
                                                 (UnknownNumberCamera*)raceCamera, 3.0f);
         if (!AppendChild((GameObject*)field_0x0c0, -1))
             return 0;
     }
-    if (g_TrackGame->mode.field_0x27f8.field_0x04 != 4 &&
-        g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
-        (g_TrackGame->field_0x18 > 1 || g_TrackGame->mode.field_0x27f8.field_0x24 > 0)) {
+    if (g_TrackGame->mode.raceSettings.cameraView != 4 &&
+        g_TrackGame->mode.raceSettings.raceMode != 4 &&
+        (g_TrackGame->field_0x18 > 1 || g_TrackGame->mode.raceSettings.aiRacerCount > 0)) {
         sprintf(name, "%s\\%s", "Res", "youind.slt");
         ArcadeObject* marker = new(__FILE__, 0x2a9) ArcadeObject(*(int*)g_TrackGame->mode.field_0x6d0);
         field_0x060 = marker->Create(field_0x18, (int)lights, (int)textures, name, position, 0, 0,
@@ -776,7 +776,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         ((ArcadeObject*)field_0x060)->StartSpin(axis, 75.0f);
         ((ArcadeObject*)field_0x060)->arcadeModel->Scale(0.6f, 0.6f, 0.6f);
     }
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
+    if (g_TrackGame->mode.raceSettings.raceMode == 4) {
         field_0x1a8 = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
         if (g_TrackGame->mode.ghostFile[0]) {
             field_0x1a8->Load(g_TrackGame->mode.ghostFile, "VCRgtemp.dat");
@@ -815,7 +815,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         terrain->QueryGround(&point, 0, 0, 0);
         field_0x06c->model->SetPositionVec3(point);
     }
-    if (g_TrackGame->field_0x3428 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
+    if (g_TrackGame->field_0x3428 && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         g_TrackGame->field_0x342c) {
         if (g_TrackGame->ui->field_0x4a8) {
             UnknownBikeRaceDemoDlg* dialog = new(__FILE__, 0x2fb) UnknownBikeRaceDemoDlg(1, "credits.dtm");
@@ -828,7 +828,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     }
     if (replayVcr && !g_TrackGame->field_0x3428) {
         g_TrackGame->ui->StepProgressBar();
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
+        if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             COPY_TEXT(ghostFileRecorded, "VCRghost.dat", 0x104);
             replayVcr->OpenRecording(RecorderCallback, 0, ghostFileRecorded, field_0x1a8);
             if (ghostVcr) {
@@ -848,8 +848,8 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         AppendChild(replayVcr, -1);
         isRecording = 1;
     }
-    if (g_TrackGame->field_0x18 == 1 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
-        int count = g_TrackGame->mode.field_0x27f8.field_0x24;
+    if (g_TrackGame->field_0x18 == 1 && g_TrackGame->mode.raceSettings.raceMode != 4) {
+        int count = g_TrackGame->mode.raceSettings.aiRacerCount;
         localRacer->UnknownRacerVirtualSlot50(1, localRacer->UnknownRacerVirtualSlot45(), 0);
         for (int i = 0; i < count; i++)
             aiRacers[i]->UnknownRacerVirtualSlot50(1, aiRacers[i]->UnknownRacerVirtualSlot45(), 0);
@@ -862,13 +862,13 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                                                                       (UnknownRaceSoundCamera*)raceCamera, 6);
     AppendChild((GameObject*)field_0x044, -1);
     g_MemTagStack->Push("BikeRace");
-    if (g_TrackGame->mode.field_0xa88) {
+    if (g_TrackGame->mode.joystickOn) {
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(0);
-        g_TrackGame->controlInterface->activeJoystick->UnknownVirtualSlot5(g_TrackGame->mode.field_0xa88);
+        g_TrackGame->controlInterface->activeJoystick->UnknownVirtualSlot5(g_TrackGame->mode.joystickOn);
         localRacer->UnknownRacerVirtualSlot93();
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(1);
     }
-    if (g_TrackGame->mode.field_0x27f8.field_0x04)
+    if (g_TrackGame->mode.raceSettings.cameraView)
         BuildStatusList(&field_0x0c4, (UnknownKrustyBikeView*)this);
     if (ghostVcr)
         localRacer->field_0x750 = field_0x1c8;
@@ -883,17 +883,17 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         for (int i = 0; i < UnknownFunctionRacerCount(); i++) {
             for (int j = 0; j < UnknownFunctionRacerCount(); j++) {
                 UnknownBikeRaceRacer* racer = racerSlots[i];
-                UnknownTrackGameRacerSlot* slot = &g_TrackGame->mode.field_0x1be4[j];
-                if (racer->recorderId == slot->field_0xd4 && racer->aiMessageIndex == slot->field_0xd8)
+                UnknownTrackGameRacerSlot* slot = &g_TrackGame->mode.racers[j];
+                if (racer->recorderId == slot->networkPlayerId && racer->aiMessageIndex == slot->racerIndex)
                     painter->PaintNumber(racer->field_0x3bc, slot->field_0xc0);
             }
         }
     } else {
         painter->PaintNumber(localRacer->field_0x3bc, g_TrackGame->mode.field_0x1bcc);
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
+        if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             painter->PaintNumber(aiRacers[0]->field_0x3bc, g_TrackGame->mode.field_0x1bcc);
         } else {
-            for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++)
+            for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++)
                 painter->PaintNumber(aiRacers[i]->field_0x3bc, aiRacers[i]->plateNumber);
         }
     }
@@ -944,16 +944,16 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     }
 
     if (g_TrackGame->field_0x3428) {
-        if (g_TrackGame->mode.field_0x27f8.field_0x35) {
-            racerCount = g_TrackGame->mode.field_0x27f8.field_0x35 +
-                          g_TrackGame->mode.field_0x27f8.field_0x28;
-            g_TrackGame->mode.field_0x27f8.field_0x24 = racerCount - 1;
-            g_TrackGame->mode.field_0x27f8.field_0x35 = 0;
+        if (g_TrackGame->mode.raceSettings.field_0x35) {
+            racerCount = g_TrackGame->mode.raceSettings.field_0x35 +
+                          g_TrackGame->mode.raceSettings.field_0x28;
+            g_TrackGame->mode.raceSettings.aiRacerCount = racerCount - 1;
+            g_TrackGame->mode.raceSettings.field_0x35 = 0;
         } else {
-            racerCount = g_TrackGame->mode.field_0x27f8.field_0x24 + g_TrackGame->field_0x18;
+            racerCount = g_TrackGame->mode.raceSettings.aiRacerCount + g_TrackGame->field_0x18;
         }
     } else {
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
+        if (g_TrackGame->mode.raceSettings.raceMode == 4)
             racerCount = 1;
         else
             racerCount = UnknownFunctionRacerCount();
@@ -962,7 +962,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             replayVcr->racerCount = racerCount;
     }
     if (g_TrackGame->field_0x3428 || g_TrackGame->field_0x18 == 1) {
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2) {
+        if (g_TrackGame->mode.raceSettings.raceMode == 2) {
             int ranking[11];
             RankByPoints(ranking);
             for (int i = 0; i < racerCount; i++) {
@@ -1030,7 +1030,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                              0x3f);
             localRacer->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
         }
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 1) {
+        if (g_TrackGame->mode.raceSettings.raceMode == 1) {
             id = 1;
             aiRacers = (UnknownBikeRaceRacer**)DebugMalloc(
                 (g_TrackGame->field_0x3444->field_0x460 - 1) * sizeof(UnknownBikeRaceRacer*), __FILE__,
@@ -1098,18 +1098,18 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         g_TrackGame->ui->ResolveBikeFile(recordedBike, bikeTexture, 0x3f);
         g_TrackGame->ui->ResolveRiderFile(recordedRider, riderTexture, 0x3f);
     } else {
-        sprintf(path, "%s\\%s", "Res", g_TrackGame->mode.field_0x1974.field_0x00);
+        sprintf(path, "%s\\%s", "Res", g_TrackGame->mode.racerChoice.bikeModel);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)bikeFile)) {
             sprintf(message, "No Rider MCF found in resources.  Aborting.\n");
             delete stream;
             Release();
             return 0;
         }
-        g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.field_0x1974.field_0x40,
+        g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.racerChoice.bikeName,
                                                          bikeTexture, 0x3f);
-        g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.field_0x1974.field_0x80,
+        g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racerChoice.riderName,
                                                          riderTexture, 0x3f);
-        if (!g_TrackGame->mode.field_0x27f8.field_0x28) {
+        if (!g_TrackGame->mode.raceSettings.field_0x28) {
             g_TrackGame->ui->UnknownFunction49b0d0(bikes, racerCount, riders);
             g_TrackGame->ui->UnknownFunction49b020(names, racerCount);
         }
@@ -1117,8 +1117,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         plate = g_TrackGame->mode.field_0x1bcc;
     }
 
-    UnknownBikeRaceNetPlayer* players = (UnknownBikeRaceNetPlayer*)g_TrackGame->mode.field_0x27f8.field_0x14c;
-    UnknownTrackGameRacerSlot* slots = g_TrackGame->mode.field_0x1be4;
+    UnknownBikeRaceNetPlayer* players = (UnknownBikeRaceNetPlayer*)g_TrackGame->mode.raceSettings.field_0x14c;
+    UnknownTrackGameRacerSlot* slots = g_TrackGame->mode.racers;
     if (!g_TrackGame->field_0x3428 && g_TrackGame->field_0x18 != 1) {
         // A network race: this player's racer, the other players' and the
         // AI racers of other hosts.
@@ -1130,8 +1130,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         }
         if (i < racerCount) {
             int j;
-            for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
-                if (players[i].field_0x00 == slots[j].field_0xd4 && slots[j].field_0xd8 == 0) {
+            for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
+                if (players[i].field_0x00 == slots[j].networkPlayerId && slots[j].racerIndex == 0) {
                     used[j] = 1;
                     break;
                 }
@@ -1157,11 +1157,11 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 Release();
                 return 0;
             }
-            g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.field_0x1974.field_0x40,
+            g_TrackGame->ui->ResolveBikeFile(g_TrackGame->mode.racerChoice.bikeName,
                                                              ownBikeTexture, 0x3f);
-            g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.field_0x1974.field_0x80,
+            g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racerChoice.riderName,
                                                              ownRiderTexture, 0x3f);
-            if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
+            if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
                 racerSlots[j]->field_0x5f0->field_0x68 = 1;
                 racerSlots[j]->field_0x5f4->field_0x68 = 1;
@@ -1182,8 +1182,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             if (players[i].field_0x00 == playerId || players[i].field_0x05)
                 continue;
             int j;
-            for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
-                if (players[i].field_0x00 == slots[j].field_0xd4 && slots[j].field_0xd8 == 0) {
+            for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
+                if (players[i].field_0x00 == slots[j].networkPlayerId && slots[j].racerIndex == 0) {
                     used[j] = 1;
                     break;
                 }
@@ -1203,7 +1203,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             racerSlots[j] = new(__FILE__, 0x5a3) UnknownBikeRaceRacer(1);
             if (!AppendChild(racerSlots[j]->UnknownFunction48fc80(
                                            owner, empty, path, riderFile, lights, textures, position, direction,
-                                           up, terrain, 0, 0, 1, this, slots[j].field_0xdc, 0, slots[j].field_0xd4,
+                                           up, terrain, 0, 0, 1, this, slots[j].playerName, 0, slots[j].networkPlayerId,
                                            &setup, 0, 1, field_0x054, raceScene, replayVcr, 0, 1),
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
@@ -1216,15 +1216,15 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 g_TrackGame->ui->ResolveRiderFile(slots[j].field_0x80, riderTexture, 0x3f);
                 racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
             }
-            if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
+            if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
                 racerSlots[j]->field_0x5f0->field_0x68 = 1;
                 racerSlots[j]->field_0x5f4->field_0x68 = 1;
             }
             racerSlots[j]->UnknownVirtualSlot4();
-            racerSlots[j]->messageDelay = slots[j].field_0xd0;
+            racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
             if (replayVcr && g_TrackGame->field_0x342c && !g_TrackGame->field_0x3428) {
-                replayVcr->SetRacer(slots[j].field_0xd4, 0, recordIndex++, slots[j].field_0xdc, path,
+                replayVcr->SetRacer(slots[j].networkPlayerId, 0, recordIndex++, slots[j].playerName, path,
                                                    riderFile, bikeTexture, riderTexture, racerSlots[j]->engineSize,
                                                    (unsigned char)racerSlots[j]->engineKind, slots[j].field_0xc0);
             }
@@ -1235,7 +1235,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 continue;
             int j;
             for (j = 0; j < racerCount; j++) {
-                if (other == slots[j].field_0xd4 && slots[j].field_0xd8 != 0 && !used[j]) {
+                if (other == slots[j].networkPlayerId && slots[j].racerIndex != 0 && !used[j]) {
                     used[j] = 1;
                     break;
                 }
@@ -1254,24 +1254,24 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             racerSlots[j] = new(__FILE__, 0x61f) UnknownBikeRaceRacer(1);
             if (!AppendChild(racerSlots[j]->UnknownFunction48fc80(
                                            owner, empty, slots[j].field_0x00, riderFile, lights, textures, position,
-                                           direction, up, terrain, 0, (char)slots[j].field_0xd8, 1, this,
-                                           slots[j].field_0xdc, 0, slots[j].field_0xd4, &setup, 0, 1, field_0x054,
+                                           direction, up, terrain, 0, (char)slots[j].racerIndex, 1, this,
+                                           slots[j].playerName, 0, slots[j].networkPlayerId, &setup, 0, 1, field_0x054,
                                            raceScene, replayVcr, 0, 1),
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
             racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, slots[j].field_0x40, (int)textures);
             racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, slots[j].field_0x80, (int)textures);
-            if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
+            if (!g_TrackGame->mode.raceSettings.treeCollision) {
                 racerSlots[j]->field_0x128->field_0x68 = 1;
                 racerSlots[j]->field_0x5f0->field_0x68 = 1;
                 racerSlots[j]->field_0x5f4->field_0x68 = 1;
             }
             racerSlots[j]->UnknownVirtualSlot4();
-            racerSlots[j]->messageDelay = slots[j].field_0xd0;
+            racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
             if (replayVcr && g_TrackGame->field_0x342c && !g_TrackGame->field_0x3428) {
-                replayVcr->SetRacer(slots[j].field_0xd4, (char)slots[j].field_0xd8, recordIndex++,
-                                                   slots[j].field_0xdc, slots[j].field_0x00, riderFile,
+                replayVcr->SetRacer(slots[j].networkPlayerId, (char)slots[j].racerIndex, recordIndex++,
+                                                   slots[j].playerName, slots[j].field_0x00, riderFile,
                                                    slots[j].field_0x40, slots[j].field_0x80,
                                                    racerSlots[j]->engineSize,
                                                    (unsigned char)racerSlots[j]->engineKind, slots[j].field_0xc0);
@@ -1302,7 +1302,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         }
         localRacer->field_0x3bc->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
         localRacer->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
-        if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
+        if (!g_TrackGame->mode.raceSettings.treeCollision) {
             localRacer->field_0x128->field_0x68 = 1;
             localRacer->field_0x5f0->field_0x68 = 1;
             localRacer->field_0x5f4->field_0x68 = 1;
@@ -1311,7 +1311,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         localRacer->engineKind = (char)((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.field_0xfd8)->engineKind;
         localRacer->plateNumber = plate;
         if ((replayVcr && g_TrackGame->field_0x342c && !g_TrackGame->field_0x3428) ||
-            g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
+            g_TrackGame->mode.raceSettings.raceMode == 4) {
             replayVcr->SetRacer(0, 0, recordIndex++, g_TrackGame->mode.field_0x00, bikeFile,
                                                riderFile, bikeTexture, riderTexture, localRacer->engineSize,
                                                (unsigned char)localRacer->engineKind, plate);
@@ -1323,7 +1323,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
 
     int fromEvent = 0;
     if ((g_TrackGame->field_0x3428 && replayVcr->racerCount > 1) || g_TrackGame->field_0x18 == 1) {
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4) {
+        if (g_TrackGame->mode.raceSettings.raceMode == 4) {
             // The ghost.
             aiRacers = new(__FILE__, 0x674) UnknownBikeRaceRacer*[1];
             WriteRelativePositions(&position, &direction, event, order[0]);
@@ -1345,14 +1345,14 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                g_TrackGame->mode.field_0x1bcc);
             aiRacers[0]->UnknownRacerVirtualSlot50(1, 0, 1);
             aiRacers[0]->UnknownVirtualSlot4();
-        } else if (g_TrackGame->mode.field_0x27f8.field_0x24 > 0) {
+        } else if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             // The AI racers.
             id = 1;
-            aiRacers = new(__FILE__, 0x6a5) UnknownBikeRaceRacer*[g_TrackGame->mode.field_0x27f8.field_0x24];
-            for (int i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++)
+            aiRacers = new(__FILE__, 0x6a5) UnknownBikeRaceRacer*[g_TrackGame->mode.raceSettings.aiRacerCount];
+            for (int i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++)
                 aiRacers[i] = 0;
             UnknownBikeRaceEventAi* eventAi = (UnknownBikeRaceEventAi*)g_TrackGame->eventManager->field_0x444;
-            for (int n = 0; n < g_TrackGame->mode.field_0x27f8.field_0x24; n++) {
+            for (int n = 0; n < g_TrackGame->mode.raceSettings.aiRacerCount; n++) {
                 char aiName[0x10];
                 if (g_TrackGame->field_0x3428) {
                     char recordedBike[0x40];
@@ -1364,7 +1364,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     g_TrackGame->ui->ResolveBikeFile(recordedBike, bikeTexture, 0x3f);
                     g_TrackGame->ui->ResolveRiderFile(recordedRider, riderTexture, 0x3f);
                 } else {
-                    if (g_TrackGame->mode.field_0x27f8.field_0x0c > 0 &&
+                    if (g_TrackGame->mode.raceSettings.field_0x0c > 0 &&
                         g_TrackGame->eventManager->racesRun > 0) {
                         fromEvent = 1;
                         COPY_TEXT(aiName, g_TrackGame->eventManager->results[n + 1].name, 0x10);
@@ -1392,7 +1392,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                         UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_TrackGame->ui->bikes;
                         engineSize = choices[bikes[n]].engineSize;
                         engineKind = choices[bikes[n]].engineKind;
-                        if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0)
+                        if (g_TrackGame->mode.raceSettings.cameraView == 0)
                             skill = UnknownRandomSkill(field_0x07c[5], field_0x07c[6]);
                         else
                             skill = UnknownRandomSkill(field_0x07c[0], field_0x07c[1]);
@@ -1444,7 +1444,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     aiRacers[n]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, riderTexture, (int)textures);
                     aiRacers[n]->plateNumber = plate;
                 }
-                if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
+                if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     aiRacers[n]->field_0x128->field_0x68 = 1;
                     aiRacers[n]->field_0x5f0->field_0x68 = 1;
                     aiRacers[n]->field_0x5f4->field_0x68 = 1;
@@ -1455,8 +1455,8 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                        (unsigned char)aiRacers[n]->engineKind, plate);
                 }
                 id++;
-                if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 &&
-                    g_TrackGame->mode.field_0x27f8.field_0x0c > 0 &&
+                if (g_TrackGame->mode.raceSettings.raceMode == 2 &&
+                    g_TrackGame->mode.raceSettings.field_0x0c > 0 &&
                     !g_TrackGame->eventManager->racesRun) {
                     strcpy(eventAi[n].bikeTexture, bikeTexture);
                     strcpy(eventAi[n].riderTexture, riderTexture);
@@ -1470,15 +1470,15 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
     } else {
         // A network race: the AI racers this host runs.
         id = 1;
-        if (g_TrackGame->mode.field_0x27f8.field_0x24 > 0) {
-            aiRacers = new(__FILE__, 0x770) UnknownBikeRaceRacer*[g_TrackGame->mode.field_0x27f8.field_0x24];
+        if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
+            aiRacers = new(__FILE__, 0x770) UnknownBikeRaceRacer*[g_TrackGame->mode.raceSettings.aiRacerCount];
             for (int i = 0; i < racerCount; i++) {
                 int other = players[i].field_0x00;
                 if (other != playerId || !players[i].field_0x05)
                     continue;
                 int j;
-                for (j = 0; j < g_TrackGame->mode.field_0x1be0; j++) {
-                    if (other == slots[j].field_0xd4 && slots[j].field_0xd8 != 0 && !used[j]) {
+                for (j = 0; j < g_TrackGame->mode.racerCount; j++) {
+                    if (other == slots[j].networkPlayerId && slots[j].racerIndex != 0 && !used[j]) {
                         used[j] = 1;
                         break;
                     }
@@ -1497,22 +1497,22 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j] = new(__FILE__, 0x78f) UnknownBikeRaceRacer(1);
                 if (!AppendChild(racerSlots[j]->UnknownFunction48fc80(
                                                owner, empty, slots[j].field_0x00, riderFile, lights, textures,
-                                               position, direction, up, terrain, 0, (char)slots[j].field_0xd8, 0,
-                                               this, slots[j].field_0xdc, 0, slots[j].field_0xd4, &setup, 0, 1,
+                                               position, direction, up, terrain, 0, (char)slots[j].racerIndex, 0,
+                                               this, slots[j].playerName, 0, slots[j].networkPlayerId, &setup, 0, 1,
                                                field_0x054, raceScene, replayVcr, 0, 1),
                                            -1)) {
                     sprintf(message, "Net Bike%d not loaded\n", j);
                 }
                 racerSlots[j]->field_0x3bc->ReplaceMaterialTexture(0, slots[j].field_0x40, (int)textures);
                 racerSlots[j]->field_0x5c4->field_0x1a0->ReplaceMaterialTexture(0, slots[j].field_0x80, (int)textures);
-                if (!g_TrackGame->mode.field_0x27f8.field_0x10) {
+                if (!g_TrackGame->mode.raceSettings.treeCollision) {
                     racerSlots[j]->field_0x128->field_0x68 = 1;
                     racerSlots[j]->field_0x5f0->field_0x68 = 1;
                     racerSlots[j]->field_0x5f4->field_0x68 = 1;
                 }
                 if (replayVcr && g_TrackGame->field_0x342c && !g_TrackGame->field_0x3428) {
-                    replayVcr->SetRacer(slots[j].field_0xd4, (char)slots[j].field_0xd8, recordIndex++,
-                                                       slots[j].field_0xdc, slots[j].field_0x00, riderFile,
+                    replayVcr->SetRacer(slots[j].networkPlayerId, (char)slots[j].racerIndex, recordIndex++,
+                                                       slots[j].playerName, slots[j].field_0x00, riderFile,
                                                        slots[j].field_0x40, slots[j].field_0x80,
                                                        racerSlots[j]->engineSize,
                                                        (unsigned char)racerSlots[j]->engineKind,

@@ -55,7 +55,7 @@ int NationalRace::UnknownVirtualSlot27(int value) {
 
     if (!BaseQuarryEvent::UnknownVirtualSlot27(value))
         return 0;
-    runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.field_0x6a8))
+    runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.visualCuesOn))
                      ->UnknownFunction48a600(field_0x18, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
     if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
@@ -87,9 +87,9 @@ void NationalRace::UnknownVirtualSlot30() {
 // 0x004aaa70
 int NationalRace::UnknownVirtualSlot10(float frameTime) {
     BaseQuarryEvent::UnknownVirtualSlot10(frameTime);
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
+    if (g_TrackGame->mode.raceSettings.raceMode && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         !g_TrackGame->uiInteractionBlocked && !finishTextShown) {
-        if (raceView->localRacer->lapCount + 1 == g_TrackGame->mode.field_0x27f8.field_0x20 &&
+        if (raceView->localRacer->lapCount + 1 == g_TrackGame->mode.raceSettings.lapCount &&
             raceView->isRacing) {
             if (finishText)
                 finishText->ReshowText();

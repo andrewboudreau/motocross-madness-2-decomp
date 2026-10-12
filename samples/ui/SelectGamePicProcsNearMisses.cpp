@@ -77,7 +77,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i];
         if (!entry->field_0x88) {
             int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model].modelKind;
-            if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.field_0x1970 & 1)))
+            if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.bikeUnlockFlags & 1)))
                 continue;
         }
         int flags = g_TrackGame->mode.lobbyPresetFlags;
@@ -95,7 +95,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
                 if ((model == entry->model || (!model && entry->model == 7)) &&
                     UnknownBikeClassOf(entry->engineSize) <= 2) {
                     allowed = 1;
-                    if ((flags & 8) && i != g_TrackGame->mode.field_0x1974.field_0xc4)
+                    if ((flags & 8) && i != g_TrackGame->mode.racerChoice.field_0xc4)
                         allowed = 0;
                 }
             }
@@ -107,7 +107,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
                     entry->displayName);
             list->AddRow(text, i, 0);
         }
-        if (g_TrackGame->mode.field_0x1974.field_0xc4 == i)
+        if (g_TrackGame->mode.racerChoice.field_0xc4 == i)
             bike = i;
     }
     if (bike)
@@ -122,7 +122,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
         if (entry->modelKind == 2 || entry->modelKind == 3 || entry->field_0xc0) {
             list->AddRow(entry->displayName, j, 0);
             if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[j].modelName,
-                        g_TrackGame->mode.field_0x1974.field_0x80))
+                        g_TrackGame->mode.racerChoice.riderName))
                 rider = j;
         }
     }
@@ -197,15 +197,15 @@ static inline float RandomUnit() {
 // the AI racers and the starting grid.
 void MultiPlayerDlg::SendStartMessage(short start) {
     int i;
-    g_TrackGame->mode.field_0x27f8.field_0x35 = g_UnknownGlobal689df8 + 1;
-    g_TrackGame->field_0x18 = g_TrackGame->mode.field_0x27f8.field_0x35;
-    g_TrackGame->field_0x3424 = g_TrackGame->mode.field_0x27f8.field_0x28;
-    g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
-    int total = g_TrackGame->mode.field_0x1be0;
+    g_TrackGame->mode.raceSettings.field_0x35 = g_UnknownGlobal689df8 + 1;
+    g_TrackGame->field_0x18 = g_TrackGame->mode.raceSettings.field_0x35;
+    g_TrackGame->field_0x3424 = g_TrackGame->mode.raceSettings.field_0x28;
+    g_TrackGame->mode.racerCount = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
+    int total = g_TrackGame->mode.racerCount;
     g_TrackGame->mode.maxOpponents =
-        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
-    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.field_0x27f8.field_0x28)
-        g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.maxOpponents;
+        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.field_0x28);
+    if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.field_0x28)
+        g_TrackGame->mode.raceSettings.field_0x28 = g_TrackGame->mode.maxOpponents;
     if (start) {
         int* bikes = (int*)DebugCalloc(total, 4, __FILE__, 0x1f4);
         int* riders = (int*)DebugCalloc(total, 4, __FILE__, 0x1f5);
@@ -213,54 +213,54 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         g_TrackGame->ui->UnknownFunction49b0d0(bikes, total, riders);
         g_TrackGame->ui->UnknownFunction49b020(names, total);
         for (i = 0; i < g_TrackGame->field_0x18 - 1; i++) {
-            g_TrackGame->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].id;
-            g_TrackGame->mode.field_0x1be4[i + 1].field_0xd8 = 0;
+            g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
+            g_TrackGame->mode.racers[i + 1].racerIndex = 0;
         }
-        g_TrackGame->mode.field_0x1be4[0].field_0xd4 = g_TrackGame->network->localPlayer;
-        g_TrackGame->mode.field_0x1be4[0].field_0xd8 = 0;
+        g_TrackGame->mode.racers[0].networkPlayerId = g_TrackGame->network->localPlayer;
+        g_TrackGame->mode.racers[0].racerIndex = 0;
         int racer = g_UnknownGlobal689df8 + 1;
         for (int j = 0; j < 8; j++) {
             for (int k = 0; k < lobbySlots.slots[j].grantedRacers; k++) {
-                g_TrackGame->mode.field_0x1be4[racer].field_0xd4 = lobbySlots.slots[j].playerId;
-                g_TrackGame->mode.field_0x1be4[racer].field_0xd8 = racer;
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0xdc, names[racer], 0x10);
-                g_TrackGame->mode.field_0x1be4[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0x00,
+                g_TrackGame->mode.racers[racer].networkPlayerId = lobbySlots.slots[j].playerId;
+                g_TrackGame->mode.racers[racer].racerIndex = racer;
+                COPY_TEXT(g_TrackGame->mode.racers[racer].playerName, names[racer], 0x10);
+                g_TrackGame->mode.racers[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
+                COPY_TEXT(g_TrackGame->mode.racers[racer].field_0x00,
                           ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)
                               [((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].model]
                                   .modelName,
                           0x40);
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0x40,
+                COPY_TEXT(g_TrackGame->mode.racers[racer].field_0x40,
                           ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x48, 0x40);
-                COPY_TEXT(g_TrackGame->mode.field_0x1be4[racer].field_0x80,
+                COPY_TEXT(g_TrackGame->mode.racers[racer].field_0x80,
                           ((UnknownKrustyUIModel*)g_TrackGame->ui->riders)[riders[racer]].modelName, 0x40);
-                g_TrackGame->mode.field_0x1be4[racer].field_0xec =
+                g_TrackGame->mode.racers[racer].field_0xec =
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].engineSize;
-                g_TrackGame->mode.field_0x1be4[racer].field_0xf0 =
+                g_TrackGame->mode.racers[racer].field_0xf0 =
                     ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[bikes[racer]].field_0x90;
                 racer++;
             }
         }
         g_TrackGame->mode.UnknownFunction522cd0();
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && g_TrackGame->eventManager->racesRun > 0) {
+        if (g_TrackGame->mode.raceSettings.raceMode == 2 && g_TrackGame->eventManager->racesRun > 0) {
             // By the championship points.
             for (i = 0; i < racer; i++) {
                 UnknownGridEntry entry;
-                entry.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
+                entry.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 entry.points = g_TrackGame->eventManager->results[i].points;
-                entry.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
-                ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
+                entry.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
+                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.field_0x14c)[i] = entry;
             }
-            qsort(g_TrackGame->mode.field_0x27f8.field_0x14c, racer, sizeof(UnknownGridEntry),
+            qsort(g_TrackGame->mode.raceSettings.field_0x14c, racer, sizeof(UnknownGridEntry),
                   CompareGridEntries);
         } else {
             // At random.
             UnknownGridDraw draws[8];
             for (i = 0; i < racer; i++) {
                 UnknownGridDraw draw;
-                draw.playerId = g_TrackGame->mode.field_0x1be4[i].field_0xd4;
+                draw.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 draw.key = RandomUnit() * 10.0f;
-                draw.racerIndex = g_TrackGame->mode.field_0x1be4[i].field_0xd8;
+                draw.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
                 draws[i] = draw;
             }
             qsort(draws, racer, sizeof(UnknownGridDraw), CompareGridDraws);
@@ -268,7 +268,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 UnknownGridEntry entry;
                 entry.playerId = draws[i].playerId;
                 entry.racerIndex = draws[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.field_0x27f8.field_0x14c)[i] = entry;
+                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.field_0x14c)[i] = entry;
             }
         }
         if (names)
@@ -276,7 +276,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
     }
     UnknownLobbyStartMessage message;
     message.start = start;
-    message.raceSettings = g_TrackGame->mode.field_0x27f8;
+    message.raceSettings = g_TrackGame->mode.raceSettings;
     message.field_0x1f4 = g_TrackGame->mode.field_0x94;
     memcpy(message.raceSettings.field_0x18c, lobbySlots.slots, sizeof(lobbySlots.slots));
     if (start) {
@@ -286,17 +286,17 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         strcpy(message.playerNames[0], name);
         int humans = g_UnknownGlobal689df8 + 1;
         for (i = 1; i < humans; i++) {
-            message.field_0x1f8[i] = g_TrackGame->mode.field_0x1be4[i].field_0xc0;
-            strcpy(message.playerNames[i], g_TrackGame->mode.field_0x1be4[i].field_0xdc);
+            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].field_0xc0;
+            strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
         }
         for (i = humans; i < total; i++) {
-            message.field_0x1f8[i] = g_TrackGame->mode.field_0x1be4[i].field_0xc0;
-            strcpy(message.playerNames[i], g_TrackGame->mode.field_0x1be4[i].field_0xdc);
-            strcpy(message.bikeModelNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x00);
-            strcpy(message.bikeNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x40);
-            strcpy(message.riderNames[i], g_TrackGame->mode.field_0x1be4[i].field_0x80);
-            message.engineSizes[i] = g_TrackGame->mode.field_0x1be4[i].field_0xec;
-            message.fourStrokes[i] = g_TrackGame->mode.field_0x1be4[i].field_0xf0;
+            message.field_0x1f8[i] = g_TrackGame->mode.racers[i].field_0xc0;
+            strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
+            strcpy(message.bikeModelNames[i], g_TrackGame->mode.racers[i].field_0x00);
+            strcpy(message.bikeNames[i], g_TrackGame->mode.racers[i].field_0x40);
+            strcpy(message.riderNames[i], g_TrackGame->mode.racers[i].field_0x80);
+            message.engineSizes[i] = g_TrackGame->mode.racers[i].field_0xec;
+            message.fourStrokes[i] = g_TrackGame->mode.racers[i].field_0xf0;
         }
     }
     g_TrackGame->network->Send(0x83, &message, sizeof(message), g_TrackGame->network->localPlayer, 0);

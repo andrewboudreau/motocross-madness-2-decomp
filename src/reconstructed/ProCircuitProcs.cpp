@@ -443,7 +443,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
             UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
             g_TrackGame->ui->HideScene();
             g_TrackGame->mode.ghostFile[0] = 0;
-            g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
+            g_TrackGame->mode.raceSettings.field_0x28 = 0;
             if (nextPage)
                 nextPage->UpdateBoundValues(1);
             if (bikeRiderPage)
@@ -452,27 +452,27 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
                 standingsPage->UpdateBoundValues(1);
             g_TrackGame->eventManager->ResetEntries();
             if (_stricmp("Start", event->controlName) == 0) {
-                g_TrackGame->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
-                g_TrackGame->mode.field_0x27f8.field_0x00 = 1;
-                g_TrackGame->mode.field_0x27f8.field_0x20 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
-                g_TrackGame->mode.field_0x27f8.field_0x24 = circuit->field_0x460 - 1;
+                g_TrackGame->mode.raceSettings.cameraView = circuit->field_0x40;
+                g_TrackGame->mode.raceSettings.raceMode = 1;
+                g_TrackGame->mode.raceSettings.lapCount = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
+                g_TrackGame->mode.raceSettings.aiRacerCount = circuit->field_0x460 - 1;
             } else {
-                g_TrackGame->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
-                g_TrackGame->mode.field_0x27f8.field_0x00 = 0;
-                g_TrackGame->mode.field_0x27f8.field_0x24 = 0;
+                g_TrackGame->mode.raceSettings.cameraView = circuit->field_0x40;
+                g_TrackGame->mode.raceSettings.raceMode = 0;
+                g_TrackGame->mode.raceSettings.aiRacerCount = 0;
             }
-            g_TrackGame->mode.SelectSeries(g_TrackGame->mode.field_0x27f8.field_0x04);
+            g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.cameraView);
             char name[128];
             strcpy(name, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
             char* extension = strrchr(name, '.');
             if (extension)
                 *extension = 0;
-            strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, name);
+            strcpy(g_TrackGame->mode.raceSettings.trackName, name);
             if (circuit->field_0x40 == 1 || circuit->field_0x40 == 5)
-                g_TrackGame->mode.field_0x27f8.field_0x34 = 1;
+                g_TrackGame->mode.raceSettings.field_0x34 = 1;
             else
-                g_TrackGame->mode.field_0x27f8.field_0x34 = 0;
-            g_TrackGame->mode.field_0x27f8.field_0x10 = 1;
+                g_TrackGame->mode.raceSettings.field_0x34 = 0;
+            g_TrackGame->mode.raceSettings.treeCollision = 1;
             g_TrackGame->mode.field_0x94 = circuit->field_0x50;
             LeaveMenusForRace();
             UnknownVirtualSlot26();

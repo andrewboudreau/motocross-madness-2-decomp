@@ -175,12 +175,12 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
             opponents = g_TrackGame->field_0x3444->field_0x460;
     } else {
         if (g_TrackGame->field_0x18 == 1) {
-            if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
+            if (g_TrackGame->mode.raceSettings.raceMode == 4)
                 opponents = 1;
             else
-                opponents = g_TrackGame->mode.field_0x27f8.field_0x24 + 1;
+                opponents = g_TrackGame->mode.raceSettings.aiRacerCount + 1;
         } else {
-            opponents = g_TrackGame->mode.field_0x27f8.field_0x28 + g_TrackGame->field_0x18;
+            opponents = g_TrackGame->mode.raceSettings.field_0x28 + g_TrackGame->field_0x18;
         }
         players = opponents;
     }
@@ -196,7 +196,7 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
 // 0x004e06a0
 int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
     char message[388];
-    visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.field_0x6a8))
+    visualCue = (new(__FILE__, 1369) VisualCue(g_TrackGame->mode.visualCuesOn))
                      ->UnknownFunction48adf0(field_0x18, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
                                              raceView, 45, raceCamera, 3.0f, 0.1f, 0.85f);
     if (!AppendChild(visualCue, -1)) {
@@ -244,7 +244,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     chatOverlay = chatOverlay->Setup((RenderTarget*)field_0x18, g_TrackGame->field_0x3c, raceCamera, screen, cue);
     if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
-    if (chatOverlay && g_TrackGame->mode.field_0x6b4 == 1)
+    if (chatOverlay && g_TrackGame->mode.chatInputLine == 1)
         chatOverlay->ShowInputLine();
 
     radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
@@ -269,9 +269,9 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
         sprintf(message, "TextQueueOverlay not created.\n");
 
     if (textQueue) {
-        if (g_TrackGame->mode.field_0x27f8.field_0x04 == 1 || g_TrackGame->mode.field_0x27f8.field_0x04 == 5)
+        if (g_TrackGame->mode.raceSettings.cameraView == 1 || g_TrackGame->mode.raceSettings.cameraView == 5)
             g_TrackGame->sceneObject->ReadCurrentSceneName(
-                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.field_0x27f8.field_0x34);
+                name, g_TrackGame->sceneObject->sceneFile, g_TrackGame->mode.raceSettings.field_0x34);
         else
             g_TrackGame->sceneObject->ReadCurrentSceneName(
                 name, g_TrackGame->sceneObject->sceneFile, 0);
@@ -333,29 +333,29 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         return 1;
     }
     if (TestInputEvent(0x3e, 0, event, 0x80000000)) {
-        if (g_TrackGame->mode.field_0x6a8) {
+        if (g_TrackGame->mode.visualCuesOn) {
             DisableByClassName("RunwayLights");
             DisableByClassName("VisualCue");
         } else {
             EnableByClassName("RunwayLights");
             EnableByClassName("VisualCue");
         }
-        g_TrackGame->mode.field_0x6a8 = 1 - g_TrackGame->mode.field_0x6a8;
-        ShowOnOffMessage(0x13b6, g_TrackGame->mode.field_0x6a8);
+        g_TrackGame->mode.visualCuesOn = 1 - g_TrackGame->mode.visualCuesOn;
+        ShowOnOffMessage(0x13b6, g_TrackGame->mode.visualCuesOn);
         return 1;
     }
     if (TestInputEvent(0x3f, 0, event, 0x80000000)) {
-        g_TrackGame->mode.field_0x6b0 = 1 - g_TrackGame->mode.field_0x6b0;
-        ShowOnOffMessage(0x1415, g_TrackGame->mode.field_0x6b0);
+        g_TrackGame->mode.showRaceStatistics = 1 - g_TrackGame->mode.showRaceStatistics;
+        ShowOnOffMessage(0x1415, g_TrackGame->mode.showRaceStatistics);
         return 1;
     }
     if (TestInputEvent(0x40, 0, event, 0x80000000)) {
-        if (g_TrackGame->mode.field_0x6b8)
+        if (g_TrackGame->mode.showNameTags)
             DisableByClassName("RadarOverlay");
         else
             EnableByClassName("RadarOverlay");
-        g_TrackGame->mode.field_0x6b8 = 1 - g_TrackGame->mode.field_0x6b8;
-        ShowOnOffMessage(0x1441, g_TrackGame->mode.field_0x6b8);
+        g_TrackGame->mode.showNameTags = 1 - g_TrackGame->mode.showNameTags;
+        ShowOnOffMessage(0x1441, g_TrackGame->mode.showNameTags);
         return 1;
     }
     if (TestInputEvent(0x41, 0, event, 0x80000000)) {
@@ -378,7 +378,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         return 1;
     }
     if (TestInputEvent(0x43, 0, event, 0x80000000)) {
-        if (g_TrackGame->mode.field_0xa54) {
+        if (g_TrackGame->mode.particlesOn) {
             DisableByClassName("ParticleManager");
             DisableByClassName("DirtParticleEmitter");
             DisableByClassName("DustParticleEmitter");
@@ -391,12 +391,12 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             EnableByClassName("DirtChunkParticleEmitter");
             EnableByClassName("SteamParticleEmitter");
         }
-        g_TrackGame->mode.field_0xa54 = 1 - g_TrackGame->mode.field_0xa54;
-        ShowOnOffMessage(0x140f, g_TrackGame->mode.field_0xa54);
+        g_TrackGame->mode.particlesOn = 1 - g_TrackGame->mode.particlesOn;
+        ShowOnOffMessage(0x140f, g_TrackGame->mode.particlesOn);
         return 1;
     }
     if (TestInputEvent(0x44, 0, event, 0x80000000)) {
-        if (g_TrackGame->mode.field_0xa50) {
+        if (g_TrackGame->mode.shadowsOn) {
             DisableByClassName("ProjectedShadow");
             DisableByClassName("TerrainShadow");
             DisableByClassName("D3DIMSoultreeShadow");
@@ -405,8 +405,8 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             EnableByClassName("TerrainShadow");
             EnableByClassName("D3DIMSoultreeShadow");
         }
-        g_TrackGame->mode.field_0xa50 = 1 - g_TrackGame->mode.field_0xa50;
-        ShowOnOffMessage(0x1410, g_TrackGame->mode.field_0xa50);
+        g_TrackGame->mode.shadowsOn = 1 - g_TrackGame->mode.shadowsOn;
+        ShowOnOffMessage(0x1410, g_TrackGame->mode.shadowsOn);
         return 1;
     }
     if (TestInputEvent(0x57, 0, event, 0x80000000)) {
@@ -503,11 +503,11 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         char text[0x80];
         char buffer[0x80];
         strcpy(name, "");
-        for (int i = 0; i < g_TrackGame->mode.field_0x1be0; i++) {
-            if (g_TrackGame->mode.field_0x1be4[i].field_0xd4 == leave->field_0x08) {
-                int n = strlen(g_TrackGame->mode.field_0x1be4[i].field_0xdc);
+        for (int i = 0; i < g_TrackGame->mode.racerCount; i++) {
+            if (g_TrackGame->mode.racers[i].networkPlayerId == leave->field_0x08) {
+                int n = strlen(g_TrackGame->mode.racers[i].playerName);
                 int length = n > 0x7f ? 0x7f : n;
-                strncpy(name, g_TrackGame->mode.field_0x1be4[i].field_0xdc, length);
+                strncpy(name, g_TrackGame->mode.racers[i].playerName, length);
                 name[length] = 0;
                 break;
             }
@@ -517,7 +517,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(leave->field_0x08);
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
+        if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->UnknownFunction45fbd0(leave->field_0x08);
     } else if (from && type == 0x89) {
         char text[0x80];
@@ -527,7 +527,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         UnknownMessage message(buffer, 3.25f);
         textQueue->AppendMessage(&message);
         raceView->UnknownFunction420590(from);
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
+        if (g_TrackGame->mode.raceSettings.raceMode == 2)
             g_TrackGame->eventManager->UnknownFunction45fbd0(from);
     }
     return 0;

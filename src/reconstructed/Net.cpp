@@ -1066,14 +1066,14 @@ int g_EnumPlayerCount;
 // 0x0068a48c). Placement between Net.cpp functions is the ownership evidence.
 DebugSocket::DebugSocket()
 {
-    field_0x00 = 0;
+    socketHandle = 0;
     field_0x08 = 1000;
-    field_0x0c = 0;
+    isConnected = 0;
 }
 
 DebugSocket::~DebugSocket()
 {
-    closesocket(field_0x00);
+    closesocket(socketHandle);
 }
 
 // 0x004ad3e0: connects to `address`:`port`, retrying for two seconds.
@@ -1083,49 +1083,49 @@ int DebugSocket::Connect(const char* address, int port)
     unsigned long nonBlocking;
     WSADATA data;
 
-    field_0x10 = port;
+    socketPort = port;
     WSAStartup(0x101, &data);
-    field_0x00 = socket(AF_INET, SOCK_STREAM, 0);
+    socketHandle = socket(AF_INET, SOCK_STREAM, 0);
     hostent* host = gethostbyname(address);
     if (!host) {
         socketAddress.sin_family = AF_INET;
-        socketAddress.sin_port = htons((unsigned short)field_0x10);
+        socketAddress.sin_port = htons((unsigned short)socketPort);
         socketAddress.sin_addr.s_addr = inet_addr(address);
     } else {
         socketAddress.sin_family = AF_INET;
-        socketAddress.sin_port = htons((unsigned short)field_0x10);
+        socketAddress.sin_port = htons((unsigned short)socketPort);
         socketAddress.sin_addr.S_un.S_un_b.s_b1 = host->h_addr_list[0][0];
         socketAddress.sin_addr.S_un.S_un_b.s_b2 = host->h_addr_list[0][1];
         socketAddress.sin_addr.S_un.S_un_b.s_b3 = host->h_addr_list[0][2];
         socketAddress.sin_addr.S_un.S_un_b.s_b4 = host->h_addr_list[0][3];
     }
-    field_0x0c = 0;
-    field_0x04 = -1;
+    isConnected = 0;
+    lastResult = -1;
     int now = ReadClock();
     int start = now;
-    while (field_0x04 == -1) {
-        field_0x04 = connect(field_0x00, (sockaddr*)&socketAddress, sizeof(socketAddress));
-        if (field_0x04 == -1)
+    while (lastResult == -1) {
+        lastResult = connect(socketHandle, (sockaddr*)&socketAddress, sizeof(socketAddress));
+        if (lastResult == -1)
             now = ReadClock();
         if (now - start > 2000)
             return 1;
     }
-    field_0x0c = 1;
-    field_0x04 = ioctlsocket(field_0x00, FIONBIO, 0);
+    isConnected = 1;
+    lastResult = ioctlsocket(socketHandle, FIONBIO, 0);
     nonBlocking = 1;
-    field_0x04 = ioctlsocket(field_0x00, FIONBIO, &nonBlocking);
-    return field_0x04 == -1;
+    lastResult = ioctlsocket(socketHandle, FIONBIO, &nonBlocking);
+    return lastResult == -1;
 }
 
 // 0x004ad530: sends `length` bytes; 0 when all were sent.
 int DebugSocket::SendData(const char* data, int length)
 {
-    field_0x04 = send(field_0x00, data, length, 0);
-    if (field_0x04 == -1) {
-        field_0x04 = WSAGetLastError();
-        return field_0x04;
+    lastResult = send(socketHandle, data, length, 0);
+    if (lastResult == -1) {
+        lastResult = WSAGetLastError();
+        return lastResult;
     }
-    return field_0x04 == length ? 0 : -1;
+    return lastResult == length ? 0 : -1;
 }
 
 // 0x004ad570: sends a string.

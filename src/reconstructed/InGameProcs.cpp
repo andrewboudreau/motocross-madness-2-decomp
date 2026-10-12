@@ -34,7 +34,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("ButLeft", event->controlName)) {
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
-            if (view && g_TrackGame->mode.field_0x27f8.field_0x00 == 4 && view->field_0x1e8 > 0) {
+            if (view && g_TrackGame->mode.raceSettings.raceMode == 4 && view->field_0x1e8 > 0) {
                 ChoiceDlg* dialog = new(__FILE__, 66) ChoiceDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
                                                   (UIDialog*)this, 0, 0, 1);
@@ -71,7 +71,7 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13da);
         UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
         if (g_TrackGame->network || view->localRacer->hasFinished ||
-            g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
+            g_TrackGame->mode.raceSettings.raceMode == 4)
             control->Show(0, 1);
         control = FindControl("ButLeft", 1);
         control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13db);
@@ -82,11 +82,11 @@ void ExitDlg::HandleEvent(UnknownDialogEvent* event) {
     }
     case 9:
         if (event->code == 0x65) {
-            g_TrackGame->mode.field_0x26f0 = 1;
+            g_TrackGame->mode.saveGhost = 1;
             guiManager->ShowCursors(0);
             HandleMenuCancel(0x191, event);
         } else if (event->code == 0x67) {
-            g_TrackGame->mode.field_0x26f0 = 0;
+            g_TrackGame->mode.saveGhost = 0;
             guiManager->ShowCursors(0);
             HandleMenuCancel(0x191, event);
         }
@@ -227,12 +227,12 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("ButCamera", event->controlName)) {
             TrackGameViewOwner* owner = g_TrackGame->eventManager->FindRaceMode();
-            if (owner->field_0x3c->cameraState == 5) {
-                owner->field_0x3c->cameraState = owner->field_0x3c->savedCameraState;
-                owner->field_0x3c->field_0x258 = owner->field_0x3c->savedParameter;
-                owner->field_0x3c->UnknownVirtualSlot58();
+            if (owner->raceCamera->cameraState == 5) {
+                owner->raceCamera->cameraState = owner->raceCamera->savedCameraState;
+                owner->raceCamera->field_0x258 = owner->raceCamera->savedParameter;
+                owner->raceCamera->UnknownVirtualSlot58();
             } else {
-                owner->field_0x3c->UnknownVirtualSlot72();
+                owner->raceCamera->UnknownVirtualSlot72();
             }
         } else if (!_stricmp("ButPrevRider", event->controlName) ||
                    !_stricmp("ButNextRider", event->controlName)) {
@@ -245,12 +245,12 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButExit", event->controlName)) {
             event->dialog->EndDialog(0);
             event->handled = 1;
-            memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.savedSettings,
+            memcpy(&g_TrackGame->mode.raceSettings, &g_TrackGame->mode.savedSettings,
                    sizeof(g_TrackGame->mode.savedSettings));
             memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.optionsBackup,
                    sizeof(g_TrackGame->mode.optionsBackup));
-            memcpy(&g_TrackGame->mode.field_0x1974, &g_TrackGame->mode.field_0x1a3c,
-                   sizeof(g_TrackGame->mode.field_0x1a3c));
+            memcpy(&g_TrackGame->mode.racerChoice, &g_TrackGame->mode.racerChoiceBackup,
+                   sizeof(g_TrackGame->mode.racerChoiceBackup));
             g_TrackGame->eventManager->CloseRace(2);
             g_TrackGame->eventManager->LeaveRaceForMenu(kMenuMain);
             guiManager->ShowCursors(1);

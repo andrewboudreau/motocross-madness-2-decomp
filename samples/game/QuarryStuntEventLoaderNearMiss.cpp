@@ -494,9 +494,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Audio");
-    auralScape = (new(__FILE__, 576) AuralScape(g_TrackGame->mode.field_0xa28))
+    auralScape = (new(__FILE__, 576) AuralScape(g_TrackGame->mode.soundOn))
                      ->UnknownFunction402f00(field_0x18, 16);
-    auralScape->field_0xa0_bit0 = g_TrackGame->mode.field_0xa34;
+    auralScape->field_0xa0_bit0 = g_TrackGame->mode.eaxEnabled;
     auralScapeListener = auralScape->UnknownFunction403000();
     auralScape->UnknownFunction403010(auralScapeListener, 1.0f, 1.0f);
     g_MemTagStack->Pop(0);
@@ -522,7 +522,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     UnknownVirtualSlot29();
 
     g_MemTagStack->Push("Particles");
-    particleManager = new(__FILE__, 613) UnknownQuarryParticles(g_TrackGame->mode.field_0xa54);
+    particleManager = new(__FILE__, 613) UnknownQuarryParticles(g_TrackGame->mode.particlesOn);
     g_MemTagStack->Push("Scene");
     eventScene = (new(__FILE__, 624) Scene(field_0x25_bit0))
                      ->UnknownFunction4ea7e0(g_TrackGame->sceneObject, (int)auralScape, (int)&modelTextures, 8);
@@ -564,7 +564,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         }
     }
     if (shadowLight) {
-        projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_TrackGame->mode.field_0xa50);
+        projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_TrackGame->mode.shadowsOn);
         projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4da7b0(field_0x18, g_TrackGame->field_0x3c);
     }
     if (!preloaded)
@@ -616,7 +616,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
-        terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.field_0xa50))
+        terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.shadowsOn))
                          ->UnknownFunction508b80(field_0x18, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
@@ -634,7 +634,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
                          ->Create(field_0x18, g_TrackGame->field_0x3c, eventTerrain, lightManager,
                                                  eventScene->environment, stream, 0x115c,
-                                                 g_TrackGame->mode.field_0x27f8.field_0x10,
+                                                 g_TrackGame->mode.raceSettings.treeCollision,
                                                  g_TrackGame->mode.videoSettings[1]);
         if (!ecoSystem)
             sprintf(text, "EcoSystem not created.\n");
@@ -655,7 +655,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("3DObjects");
     if (!UnknownVirtualSlot27((int)&modelTextures))
         return 0;
-    g_TrackGame->mode.field_0x23a4 = eventScene->crowdPresent;
+    g_TrackGame->mode.networkGame = eventScene->crowdPresent;
     g_MemTagStack->Push("BikeRace");
     raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)raceView)
                      ->UnknownFunction417ed0(field_0x18, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
@@ -753,7 +753,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     AppendChild(eventScene, -1);
 
     g_MemTagStack->Push("Shadow");
-    eventScene->AttachCasterShadows((ProjectedShadow*)projectedShadow, g_TrackGame->mode.field_0xa50);
+    eventScene->AttachCasterShadows((ProjectedShadow*)projectedShadow, g_TrackGame->mode.shadowsOn);
     g_MemTagStack->Pop(0);
     if (ecoSystem)
         AppendChild((GameObject*)ecoSystem, -1);
@@ -844,11 +844,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         DisableByClassName("InstrumentOverlay");
     if (!g_TrackGame->mode.skyCubeOn)
         DisableByClassName("SkyCube");
-    if (!g_TrackGame->mode.field_0xa54) {
+    if (!g_TrackGame->mode.particlesOn) {
         DisableByClassName("ParticleManager");
         DisableByClassName("DirtParticleEmitter");
     }
-    if (!g_TrackGame->mode.field_0xa50) {
+    if (!g_TrackGame->mode.shadowsOn) {
         DisableByClassName("ProjectedShadow");
         DisableByClassName("TerrainShadow");
         DisableByClassName("D3DIMSoultreeShadow");

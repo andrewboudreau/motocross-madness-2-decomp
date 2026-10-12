@@ -555,7 +555,7 @@ void KrustyUI::OpenMenu(int menu) {
                 OpenCareerDialog();
                 return;
             }
-            if (g_TrackGame->mode.field_0x27f8.field_0x00 == 1) {
+            if (g_TrackGame->mode.raceSettings.raceMode == 1) {
                 dialog = new(__FILE__, 760) PCLastRaceDlg;
                 gui->ShowDialog(dialog, kMenu88e, 2, 0, 0, 0, 0, 1);
             } else {
@@ -860,20 +860,20 @@ int KrustyUI::UnknownFunction49ba70(int a, int scene, int series, const char* na
 
 // 0x0049bbb0
 void KrustyUI::RecordRaceResults() {
-    UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.field_0x27f8;
-    if (settings->field_0x04 == 1 && settings->field_0x2c)
+    UnknownTrackGameModeSettings* settings = &g_TrackGame->mode.raceSettings;
+    if (settings->cameraView == 1 && settings->field_0x2c)
         return;
     RecordHighScoreTable(0);
-    int mode = g_TrackGame->mode.field_0x27f8.field_0x04;
+    int mode = g_TrackGame->mode.raceSettings.cameraView;
     if (mode != 0 && mode != 4) {
-        if (g_TrackGame->mode.field_0x27f8.field_0x20 == 5)
+        if (g_TrackGame->mode.raceSettings.lapCount == 5)
             RecordHighScoreTable(1);
-        if (g_TrackGame->mode.field_0x27f8.field_0x20 == 10)
+        if (g_TrackGame->mode.raceSettings.lapCount == 10)
             RecordHighScoreTable(2);
     } else {
-        if (g_TrackGame->mode.field_0x27f8.field_0x140 == 5.0f)
+        if (g_TrackGame->mode.raceSettings.field_0x140 == 5.0f)
             RecordHighScoreTable(1);
-        if (g_TrackGame->mode.field_0x27f8.field_0x140 == 10.0f)
+        if (g_TrackGame->mode.raceSettings.field_0x140 == 10.0f)
             RecordHighScoreTable(2);
     }
 }
@@ -882,41 +882,41 @@ void KrustyUI::RecordRaceResults() {
 // and adds the racers' results; saves it when one of them made the table.
 void KrustyUI::RecordHighScoreTable(int table) {
     char name[128];
-    if (!g_TrackGame->mode.field_0x27f8.field_0x10)
+    if (!g_TrackGame->mode.raceSettings.treeCollision)
         return;
     g_TrackGame->field_0x3400->field_0x00 = table;
-    switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
+    switch (g_TrackGame->mode.raceSettings.cameraView) {
     case 1:
     case 5:
-        sprintf(name, "%s%d", g_TrackGame->mode.field_0x27f8.field_0x36,
-                g_TrackGame->mode.field_0x27f8.field_0x34);
+        sprintf(name, "%s%d", g_TrackGame->mode.raceSettings.trackName,
+                g_TrackGame->mode.raceSettings.field_0x34);
         break;
     default: {
-        int length = strlen(g_TrackGame->mode.field_0x27f8.field_0x36);
+        int length = strlen(g_TrackGame->mode.raceSettings.trackName);
         int count = length > 127 ? 127 : length;
-        strncpy(name, g_TrackGame->mode.field_0x27f8.field_0x36, count);
+        strncpy(name, g_TrackGame->mode.raceSettings.trackName, count);
         name[count] = 0;
         break;
     }
     }
     g_TrackGame->field_0x3400->UnknownFunction51f0b0(
-        (short)g_TrackGame->mode.field_0x27f8.field_0x04, name);
+        (short)g_TrackGame->mode.raceSettings.cameraView, name);
     int added = 0;
     if (g_TrackGame->field_0x18 == 1) {
         if (!g_TrackGame->field_0x3400->AddRacer(
-                (short)g_TrackGame->mode.field_0x27f8.field_0x04, 0))
+                (short)g_TrackGame->mode.raceSettings.cameraView, 0))
             return;
     } else {
         for (int i = 0; i < g_TrackGame->field_0x18; i++) {
             if (g_TrackGame->field_0x3400->AddRacer(
-                    (short)g_TrackGame->mode.field_0x27f8.field_0x04, i))
+                    (short)g_TrackGame->mode.raceSettings.cameraView, i))
                 added = 1;
         }
         if (!added)
             return;
     }
     g_TrackGame->field_0x3400->UnknownFunction51f260(
-        (short)g_TrackGame->mode.field_0x27f8.field_0x04, name,
+        (short)g_TrackGame->mode.raceSettings.cameraView, name,
         g_TrackGame->mode.GetSelectedSeries());
 }
 

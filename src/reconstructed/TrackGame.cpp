@@ -262,8 +262,8 @@ int TrackGame::UnknownVirtualSlot4() {
     mode.CreateDirectoryLists();
     mode.ResetNetworkRace();
     g_MemTagStack->Push("Audio");
-    if (((PCSoundInterface*)soundInterface)->InitializeSound(22050, 1, mode.field_0xa48 ? 16 : 8,
-                                                              4000000, mode.field_0xa34) ==
+    if (((PCSoundInterface*)soundInterface)->InitializeSound(22050, 1, mode.use16BitSound ? 16 : 8,
+                                                              4000000, mode.eaxEnabled) ==
         (long)kSoundDeviceAlreadyAllocated) {
         char text[256];
         SendMessageA(windowHandle, kSendSystemCommand, kScreenSaverCommand, 0);

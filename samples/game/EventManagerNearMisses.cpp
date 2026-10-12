@@ -72,7 +72,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
     layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
     if (!g_TrackGame->field_0x3428 && !g_TrackGame->ui->field_0x4a8 &&
-        g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
+        g_TrackGame->mode.raceSettings.raceMode != 0 && g_TrackGame->mode.raceSettings.raceMode != 4)
         g_TrackGame->ui->RecordRaceResults();
     g_TrackGame->ui->gui->ShowCursors(1);
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;
@@ -212,8 +212,8 @@ int EventManager::CreatePodiumScene() {
     UnknownKrustyBikeView* view = FindRaceView();
     int iterator = 0;
     int ok;
-    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
-        ok = racesRun > g_TrackGame->mode.field_0x27f8.field_0x0c;
+    if (g_TrackGame->mode.raceSettings.raceMode == 2)
+        ok = racesRun > g_TrackGame->mode.raceSettings.field_0x0c;
     else
         ok = 1;
     if (circuit) {
@@ -223,7 +223,7 @@ int EventManager::CreatePodiumScene() {
     } else {
         if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
             return 0;
-        if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 && !g_TrackGame->network &&
+        if (g_TrackGame->mode.raceSettings.raceMode != 2 && !g_TrackGame->network &&
             results[0].position > 3)
             return 0;
     }
@@ -246,7 +246,7 @@ int EventManager::CreatePodiumScene() {
         podiumPosition = grid->field_0x8c;
         direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
     } else {
-        if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
+        if (g_TrackGame->mode.raceSettings.cameraView == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetPosition(&podiumPosition);
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->GetAxes(&direction, &up);
         } else {
@@ -360,7 +360,7 @@ int EventManager::CreatePodiumScene() {
         }
     }
     delete stream;
-    if (g_TrackGame->mode.field_0xa28 && g_TrackGame->mode.field_0x23a4) {
+    if (g_TrackGame->mode.soundOn && g_TrackGame->mode.networkGame) {
         UnknownPodiumSound* sound = new(__FILE__, 0x34e) UnknownPodiumSound(PODIUM_OWNER(owner)->field_0x2c->field_0xc4, 1);
         UnknownTextureStream* audio = new(__FILE__, 0x34f) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(audio, "CrowdLoop.wav", "rb", 0)) {

@@ -307,7 +307,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
             field_0x465[0].field_0x30 += (int)(field_0x465[0].field_0x34 * -1.1f);
             g_TrackGame->LoadResourceString(0x145c, title, 128);
             if (field_0x465[0].field_0x18.field_0x10 <= 3)
-                *(unsigned char*)&g_TrackGame->mode.field_0x1970 |= 1; // retail ORs the low byte
+                *(unsigned char*)&g_TrackGame->mode.bikeUnlockFlags |= 1; // retail ORs the low byte
         }
         break;
     default:

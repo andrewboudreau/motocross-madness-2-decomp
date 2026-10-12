@@ -78,7 +78,7 @@ struct TrackGameViewOwner : public GameObject {
     unsigned char field_0x30[0x34 - 0x30];
     UnknownKrustyBikeView* field_0x34;
     unsigned char field_0x38[0x3c - 0x38];
-    FollowCamera* field_0x3c;                 // the race camera (InGameProcs.cpp VCRDlg)
+    FollowCamera* raceCamera;                 // +0x3c the race camera (InGameProcs.cpp VCRDlg)
     unsigned char field_0x40[0x5c - 0x40];
     GameObject* field_0x5c;                   // EventManager 0x0045cdc0 calls slot 4 on 0x5c..0x68
     GameObject* field_0x60;
@@ -90,7 +90,7 @@ struct TrackGameViewOwner : public GameObject {
     unsigned char field_0x78[0x9c - 0x78];
     GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
     unsigned char field_0xa0[0xa8 - 0xa0];
-    UnknownEventRacer* field_0xa8;            // the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
+    UnknownEventRacer* followedRacer;         // +0xa8 the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
     // One struct stands in for the three owners at TrackGame +0x55c/+0x560/
     // +0x568; +0xac is a gate count in the quarry/course owners and a float
     // (stored through a cast: a float member here moves TrackGame slot 1 and
@@ -209,16 +209,16 @@ struct UnknownTrackGameModeEntry {
 // settings (+0x27f8) and two saved copies (+0x29e4, +0x2bd0). 0x005231f0 reads
 // the copies whole and assigns +0x29e4 to +0x27f8 (rep movsd, 0x7b dwords).
 struct UnknownTrackGameModeSettings {
-    int field_0x00;                           // EventManager 0x0045e600 compares it with 2
-    int field_0x04;                           // selects KrustyBikeCamera's view (slot 10)
-    int field_0x08;                           // series (SelectGamePicProcs.cpp; uiinfo.cpp 0x005240e0)
+    int raceMode;                             // +0x00 EventManager 0x0045e600 compares it with 2
+    int cameraView;                           // +0x04 selects KrustyBikeCamera's view (slot 10)
+    int series;                               // +0x08 series (SelectGamePicProcs.cpp; uiinfo.cpp 0x005240e0)
     int field_0x0c;                           // cleared by EventManager 0x0045e520
-    int field_0x10;                           // tree collision (SelectGamePicProcs.cpp)
-    int field_0x14;                           // rider collision (SelectGamePicProcs.cpp)
-    int field_0x18;                           // selects a 30 (else 120) second limit (EventManager 0x0045eef0)
-    int field_0x1c;                           // largest bike class allowed (SelectGamePicProcs.cpp)
-    int field_0x20;                           // laps (SelectGamePicProcs.cpp)
-    int field_0x24;                           // AI racer count (EventManager 0x0045f9a0)
+    int treeCollision;                        // +0x10 tree collision (SelectGamePicProcs.cpp)
+    int riderCollision;                       // +0x14 rider collision (SelectGamePicProcs.cpp)
+    int shortTimeLimit;                       // +0x18 selects a 30 (else 120) second limit (EventManager 0x0045eef0)
+    int maxBikeClass;                         // +0x1c largest bike class allowed (SelectGamePicProcs.cpp)
+    int lapCount;                             // +0x20 laps (SelectGamePicProcs.cpp)
+    int aiRacerCount;                         // +0x24 AI racer count (EventManager 0x0045f9a0)
     int field_0x28;                           // cleared by NetProcs.cpp 0x004aef40
     unsigned char field_0x2c;                 // cleared by TrackGameMode 0x00522440
     unsigned char field_0x2d;                 // 30 (TrackGameMode 0x00522440)
@@ -226,12 +226,12 @@ struct UnknownTrackGameModeSettings {
     int field_0x30;                           // 1 (TrackGameMode 0x00522440)
     unsigned char field_0x34;                 // SelectGamePicProcs.cpp
     unsigned char field_0x35;                 // decremented when a player leaves (EventManager 0x0045fbd0)
-    char field_0x36[0x20];                    // track name (length not established)
+    char trackName[0x20];                     // +0x36 track name (length not established)
     unsigned char field_0x56[0x138 - 0x56];
     int field_0x138;                          // SelectGamePicProcs.cpp
     int field_0x13c;                          // SelectGamePicProcs.cpp
     float field_0x140;
-    int field_0x144;                          // tag ball (SelectGamePicProcs.cpp)
+    int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
     int field_0x148;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
     UnknownTrackGameModeEntry field_0x14c[8]; // reset by TrackGameMode 0x00522cd0
     unsigned char field_0x18c[0x1ec - 0x18c];
@@ -253,9 +253,9 @@ struct UnknownTrackGameSessionList {
 // passes its three names to 0x00521fb0 and copies +0xc4 into a racer slot,
 // and the constructor sets +0xc0 (strong inference).
 struct UnknownTrackGameRacerChoice {
-    char field_0x00[0x40];                    // bike model name (dlgprocs.cpp SPBikeRiderDlg)
-    char field_0x40[0x40];                    // bike name
-    char field_0x80[0x40];                    // rider name
+    char bikeModel[0x40];                     // +0x00 bike model name (dlgprocs.cpp SPBikeRiderDlg)
+    char bikeName[0x40];                      // +0x40 bike name
+    char riderName[0x40];                     // +0x80 rider name
     int field_0xc0;                           // -1 (constructor)
     int field_0xc4;                           // SelectGamePicProcs.cpp
 };
@@ -275,11 +275,11 @@ struct UnknownTrackGameRacerSlot {
     int field_0xc0;                           // SelectGamePicProcs.cpp
     int field_0xc4;                           // SelectGamePicProcs.cpp
     int field_0xc8;                           // set when the player leaves (EventManager slot 24)
-    int field_0xcc;                           // ready
-    float field_0xd0;                         // lowest message delay (bikerace.cpp slot 24); FLT_MAX initially
-    int field_0xd4;                           // network player id
-    int field_0xd8;                           // player's racer index (EventManager slot 24)
-    char field_0xdc[0x10];                    // player name (SelectGamePicProcs.cpp)
+    int isReady;                              // +0xcc ready
+    float lowestMessageDelay;                 // +0xd0 lowest message delay (bikerace.cpp slot 24); FLT_MAX initially
+    int networkPlayerId;                      // +0xd4 network player id
+    int racerIndex;                           // +0xd8 player's racer index (EventManager slot 24)
+    char playerName[0x10];                    // +0xdc player name (SelectGamePicProcs.cpp)
     int field_0xec;                           // bike record +0x8c (SelectGamePicProcs.cpp 0x004f2340)
     int field_0xf0;                           // bike record +0x90
     unsigned char field_0xf4;                 // 1 (constructor)
@@ -315,7 +315,7 @@ public:
     void ResetSoundOptions(UnknownTrackGameModeOptionsA20* options);
     void ResetGraphicsOptions(UnknownTrackGameModeOptionsA4c* options);
     void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
-    void UnknownFunction522840(char (*names)[0x80]);   // reloads field_0x145c's strings
+    void UnknownFunction522840(char (*names)[0x80]);   // reloads resourceStrings
     void UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
     void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
@@ -344,11 +344,11 @@ public:
     char seriesDirectories[6][0x100];     // +0xa0: directories (TrackRecord.cpp 0x0051f0b0)
     int currentSeriesDirectory;           // +0x6a0: a directory name pointer for TrackRecord.cpp 0x0051f2c0; EventManager 0x0045cb70 passes it to 0x00523a60
     int field_0x6a4;                          // cleared when a network race fails to load (dlgprocs.cpp LoadingDlg)
-    int field_0x6a8;                          // visual cue and runway lights on (QuarryStuntEvent.cpp)
+    int visualCuesOn;                         // +0x6a8 visual cue and runway lights on (QuarryStuntEvent.cpp)
     int instrumentOverlayOn;                  // +0x6ac: instrument overlay on (QuarryStuntEvent.cpp)
-    int field_0x6b0;                          // shows the race statistics (TrackOverlay 0x00519980)
-    int field_0x6b4;                          // 1 shows the chat input line (QuarryStuntEvent.cpp)
-    int field_0x6b8;                          // shows the racers' name tags (TrackOverlay 0x005190e0)
+    int showRaceStatistics;                   // +0x6b0 shows the race statistics (TrackOverlay 0x00519980)
+    int chatInputLine;                        // +0x6b4 1 shows the chat input line (QuarryStuntEvent.cpp)
+    int showNameTags;                         // +0x6b8 shows the racers' name tags (TrackOverlay 0x005190e0)
     int field_0x6bc;                          // TrackOverlay 0x0051e390
     int field_0x6c0;                          // TrackOverlay 0x0051e390
     unsigned char field_0x6c4[0x6c8 - 0x6c4];
@@ -364,23 +364,23 @@ public:
     int garageCurveChoice[5];             // +0xa0c: the garage curve chosen per bike class (OptionProcs.cpp's +0x360)
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
     int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
-    int field_0xa28;                          // sound on (racesnd.cpp)
+    int soundOn;                              // +0xa28 sound on (racesnd.cpp)
     unsigned char field_0xa2c[0xa34 - 0xa2c];
-    int field_0xa34;                          // TrackGame slot 4 audio argument
-    int field_0xa38;                          // position sounds on (racesnd.cpp 0x004e39b0)
+    int eaxEnabled;                           // +0xa34 TrackGame slot 4 audio argument
+    int positionSounds;                       // +0xa38 position sounds on (racesnd.cpp 0x004e39b0)
     int field_0xa3c;
-    int field_0xa40;                          // sound volume (racesnd.cpp 0x004e3430)
+    int soundVolume;                          // +0xa40 sound volume (racesnd.cpp 0x004e3430)
     unsigned char field_0xa44[0xa48 - 0xa44];
-    int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
+    int use16BitSound;                        // +0xa48 selects 16 (else 8) in TrackGame slot 4
     int displayModeIndex;                     // +0xa4c: display mode index (EventManager 0x0045e710)
-    int field_0xa50;                          // shadows on (QuarryStuntEvent.cpp)
-    int field_0xa54;                          // particles on (QuarryStuntEvent.cpp)
+    int shadowsOn;                            // +0xa50 shadows on (QuarryStuntEvent.cpp)
+    int particlesOn;                          // +0xa54 particles on (QuarryStuntEvent.cpp)
     unsigned char field_0xa58[0xa5c - 0xa58];
     int skyCubeOn;                            // +0xa5c: sky cube on (QuarryStuntEvent.cpp)
     unsigned char field_0xa60[0xa64 - 0xa60];
     int detailLevel;                          // +0xa64: detail level 0..9 (QuarryStuntEvent.cpp)
     unsigned char field_0xa68[0xa88 - 0xa68];
-    int field_0xa88;                          // joystick input on (bikerace.cpp slot 16)
+    int joystickOn;                           // +0xa88 joystick input on (bikerace.cpp slot 16)
     int field_0xa8c;                          // toggled by bikerace.cpp slot 23 (key 0x22)
     int field_0xa90;                          // toggled by bikerace.cpp slot 23 (key 0x30)
     unsigned char field_0xa94[0xa98 - 0xa94];
@@ -393,20 +393,20 @@ public:
     int customGarageCurves[5][3][11];     // +0x10f0: custom garage curves per bike class (OptionProcs.cpp)
     int bonusTrackUnlocked[6];            // +0x1384: a bonus track is listed only when set (SelectGamePicProcs.cpp)
     char bonusTrackNames[6][0x20];        // +0x139c: each series' BonusTrack from PCSched.pb (LoadBonusTrackNames)
-    char field_0x145c[10][0x80];              // string resources 0x1420, 0x1417..0x141f (uiinfo.cpp 0x00522840)
+    char resourceStrings[10][0x80];           // +0x145c string resources 0x1420, 0x1417..0x141f (uiinfo.cpp 0x00522840)
     int videoSettings[5];                 // +0x195c: video settings: forced video memory, then four detail levels (OptionProcs.cpp)
-    int field_0x1970;                         // bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
-    UnknownTrackGameRacerChoice field_0x1974; // the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
-    UnknownTrackGameRacerChoice field_0x1a3c;
+    int bikeUnlockFlags;                      // +0x1970 bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
+    UnknownTrackGameRacerChoice racerChoice;  // +0x1974 the player's bike and rider; restored from +0x1a3c when a replay is left (InGameProcs.cpp)
+    UnknownTrackGameRacerChoice racerChoiceBackup; // +0x1a3c
     unsigned char field_0x1b04[0x1bcc - 0x1b04];
     int field_0x1bcc;                         // SelectGamePicProcs.cpp
     int lobbyRank;                            // +0x1bd0: 0x0049c600 WaitForLobbyRank; 1..100 is copied to +0x1bcc
     int lobbyPresetFlags;                     // +0x1bd4: 0x0049c2f0 ReadLobbyPreset (-1 until read)
     int maxOpponents;                         // +0x1bd8: largest opponent count (SelectGamePicProcs.cpp)
     int field_0x1bdc;                         // cleared by TrackGameMode 0x00522440
-    int field_0x1be0;                         // racer count (EventManager 0x0045e550)
-    UnknownTrackGameRacerSlot field_0x1be4[8];
-    int field_0x23a4;                         // network game (racesnd.cpp 0x004e5780)
+    int racerCount;                           // +0x1be0 racer count (EventManager 0x0045e550)
+    UnknownTrackGameRacerSlot racers[8];      // +0x1be4 the race's racer slots
+    int networkGame;                          // +0x23a4 network game (racesnd.cpp 0x004e5780)
     UnknownGuid displayAdapterGuid;       // +0x23a8: display adapter GUID (TrackGameMode 0x00522e20)
     int field_0x23b8;                         // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x23bc;                       // saved KrustyBikeCamera presets (slots 59, 60)
@@ -422,12 +422,12 @@ public:
     DirectoryList* trackDirectoryList;    // +0x25e4: track directories (SelectGamePicProcs.cpp)
     CombinedDirectoryList* field_0x25e8;      // created by 0x00522d00
     char ghostFile[0x104];                // +0x25ec: the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
-    int field_0x26f0;                         // mode 4 saves a ghost (EventManager 0x0045cdc0)
+    int saveGhost;                            // +0x26f0 mode 4 saves a ghost (EventManager 0x0045cdc0)
     char replayFile[0x104];               // +0x26f4: the replay file played (dlgprocs.cpp ReplayFilesDlg)
-    UnknownTrackGameModeSettings field_0x27f8; // current race settings
+    UnknownTrackGameModeSettings raceSettings; // +0x27f8 current race settings
     UnknownTrackGameModeSettings savedSettings; // +0x29e4: saved copy, restored when a replay is left (InGameProcs.cpp)
     UnknownTrackGameModeSettings field_0x2bd0;
-    int field_0x2dbc;                         // saves a replay (EventManager 0x0045cdc0)
+    int saveReplay;                           // +0x2dbc saves a replay (EventManager 0x0045cdc0)
 };
 
 // Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
@@ -631,11 +631,11 @@ public:
     int SendData(const char* data, int length);  // 0x004ad530
     int SendText(const char* text);              // 0x004ad570
 
-    unsigned int field_0x00;                  // WinSock socket
-    int field_0x04;                           // last WinSock result
+    unsigned int socketHandle;                // +0x00 WinSock socket
+    int lastResult;                           // +0x04 last WinSock result
     int field_0x08;
-    int field_0x0c;                           // connected
-    int field_0x10;                           // port
+    int isConnected;                          // +0x0c connected
+    int socketPort;                           // +0x10 port
 };
 extern DebugSocket* g_DebugSocket;
 

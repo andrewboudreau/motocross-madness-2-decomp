@@ -267,7 +267,7 @@ int RankByScore(int keepRacing) {
     int count;
     int i;
 
-    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
+    if (g_TrackGame->mode.raceSettings.cameraView == 0) {
         count = 0;
         UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
         UnknownEventRacer* racer;
@@ -285,7 +285,7 @@ int RankByScore(int keepRacing) {
         if (!keepRacing) {
             TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
             if (owner->field_0x70 * 60.0f + owner->field_0x74 >=
-                g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f - 1.0f) {
+                g_TrackGame->mode.raceSettings.field_0x140 * 60.0f - 1.0f) {
                 for (i = 0; i < count; i++)
                     scores[i].racer->hasFinished = 1;
             }

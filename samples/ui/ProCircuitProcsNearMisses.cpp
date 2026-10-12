@@ -260,21 +260,21 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("ButAccept", event->controlName) == 0) {
             g_TrackGame->eventManager->ResetEntries();
-            g_TrackGame->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
-            g_TrackGame->mode.field_0x27f8.field_0x00 = 1;
-            g_TrackGame->mode.field_0x27f8.field_0x20 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
-            g_TrackGame->mode.field_0x27f8.field_0x24 = circuit->field_0x460 - 1;
-            g_TrackGame->mode.field_0x27f8.field_0x10 = 1;
+            g_TrackGame->mode.raceSettings.cameraView = circuit->field_0x40;
+            g_TrackGame->mode.raceSettings.raceMode = 1;
+            g_TrackGame->mode.raceSettings.lapCount = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
+            g_TrackGame->mode.raceSettings.aiRacerCount = circuit->field_0x460 - 1;
+            g_TrackGame->mode.raceSettings.treeCollision = 1;
             g_TrackGame->mode.SelectSeries(circuit->field_0x40);
             strcpy(text, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
             char* extension = strrchr(text, '.');
             if (extension)
                 *extension = 0;
-            strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, text);
+            strcpy(g_TrackGame->mode.raceSettings.trackName, text);
             if (circuit->field_0x40 == 1 || circuit->field_0x40 == 5)
-                g_TrackGame->mode.field_0x27f8.field_0x34 = 1;
+                g_TrackGame->mode.raceSettings.field_0x34 = 1;
             else
-                g_TrackGame->mode.field_0x27f8.field_0x34 = 0;
+                g_TrackGame->mode.raceSettings.field_0x34 = 0;
             g_TrackGame->mode.field_0x94 = circuit->field_0x50;
             LeaveMenusForRace();
             UnknownVirtualSlot26();

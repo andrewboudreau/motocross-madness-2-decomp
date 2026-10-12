@@ -75,9 +75,9 @@ void TrackGameViewOwner::PickFollowedRacer()
         racer = field_0x34->NextBike(&iterator);
     }
     if (racing == 0) {
-        field_0xa8 = field_0x34->localRacer;
+        followedRacer = field_0x34->localRacer;
     } else if (racing == 1) {
-        field_0xa8 = last;
+        followedRacer = last;
     } else {
         int count = field_0x34->racerCount;
         int index = (int)(UNKNOWN_RANDOM_UNIT() * count);
@@ -87,14 +87,14 @@ void TrackGameViewOwner::PickFollowedRacer()
                 index = 0;
             tries++;
         }
-        field_0xa8 = field_0x34->racerSlots[index];
+        followedRacer = field_0x34->racerSlots[index];
     }
     UnknownBikeRaceVcrFollow follow;
     follow.field_0x04 = 0;
-    follow.field_0x08 = field_0xa8->networkPlayerId;
+    follow.field_0x08 = followedRacer->networkPlayerId;
     g_TrackGame->network->Send(0x87, &follow, sizeof(follow), g_TrackGame->network->localPlayer, 0);
-    if (field_0x34->replayVcr && g_TrackGame->mode.field_0x2dbc && !g_TrackGame->field_0x3428)
-        ((VCRInterface*)field_0x34->replayVcr)->QueueRecord(0x87, field_0xa8->networkPlayerId, &follow, 1);
+    if (field_0x34->replayVcr && g_TrackGame->mode.saveReplay && !g_TrackGame->field_0x3428)
+        ((VCRInterface*)field_0x34->replayVcr)->QueueRecord(0x87, followedRacer->networkPlayerId, &follow, 1);
 }
 
 // 0x004a9e80: switches the followed racer from `previous` to `racer`. The
@@ -127,5 +127,5 @@ void TrackGameViewOwner::SetFollowedRacer(UnknownEventRacer* racer, UnknownEvent
         if (field_0x34->scoreBoard)
             field_0x34->scoreBoard->UnknownFunction48d1e0(2500.0f, 1.0f);
     }
-    field_0xa8 = racer;
+    followedRacer = racer;
 }

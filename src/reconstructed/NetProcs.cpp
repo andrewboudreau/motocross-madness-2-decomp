@@ -278,8 +278,8 @@ void EndNetworkGame() {
     }
     g_TrackGame->field_0x18 = 1;
     g_TrackGame->field_0x3424 = 0;
-    g_TrackGame->mode.field_0x27f8.field_0x35 = 0;
-    g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
+    g_TrackGame->mode.raceSettings.field_0x35 = 0;
+    g_TrackGame->mode.raceSettings.field_0x28 = 0;
 }
 
 // 0x004aefa0

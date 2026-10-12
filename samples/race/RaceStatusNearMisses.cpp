@@ -81,8 +81,8 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     status->currentPosition = view->localRacer->position;
     *list = status;
     tail = &status->next;
-    if (g_TrackGame->field_0x18 == 1 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
-        for (i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
+    if (g_TrackGame->field_0x18 == 1 && g_TrackGame->mode.raceSettings.raceMode != 4) {
+        for (i = 0; i < g_TrackGame->mode.raceSettings.aiRacerCount; i++) {
             if (!HasStatusNode(*list, view->aiRacers[i])) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 235);
                 if (!status)
