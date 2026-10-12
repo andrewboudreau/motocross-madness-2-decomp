@@ -166,7 +166,7 @@ int OrderByLapDistance(UnknownEventRacerPart** list, Track* track, UnknownBikeRa
         if (status->gateDistance < 0.0f)
             return 0;
         float distance = track->DistanceAlong(status->placedPos, status->progressPos);
-        if (distance > 0.0f && (distance < status->field_0x10 || status->field_0x10 < 0.0f) &&
+        if (distance > 0.0f && (distance < status->progressStep || status->progressStep < 0.0f) &&
             distance > status->gateDistance)
             status->lapOffset = -1;
         else
@@ -338,10 +338,10 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 }
                 if (racer->hasFinished && racer == racer->bikeView->localRacer)
                     g_ViewRacerFinished = 1;
-                status->field_0x10 = track->DistanceAlong(status->progressPos, status->placedPos);
-                if (status->field_0x10 > 0.0f && status->field_0x10 < g_UnknownGlobal572988 &&
-                    status->field_0x10 < status->field_0x08) {
-                    status->field_0x14 += status->field_0x10;
+                status->progressStep = track->DistanceAlong(status->progressPos, status->placedPos);
+                if (status->progressStep > 0.0f && status->progressStep < g_UnknownGlobal572988 &&
+                    status->progressStep < status->field_0x08) {
+                    status->progressTotal += status->progressStep;
                     COPY_TRACK_POS(status->progressPos, status->placedPos);
                 }
             } else {
@@ -451,7 +451,7 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
         status->currentPosition.x = status->previousPosition.x;
         status->currentPosition.y = status->previousPosition.y;
         status->currentPosition.z = status->previousPosition.z;
-        status->field_0x14 += before - after;
+        status->progressTotal += before - after;
         status->field_0x08 = after;
         if (g_TrackGame->playerCount == 1 && g_ViewRacerFinished) {
             if (racer->hasFinished)

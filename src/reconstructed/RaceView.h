@@ -70,8 +70,8 @@ struct UnknownEventRacerPart {
     UnknownEventRacer* racer;                 // +0x04 racer
     float field_0x08;
     float gateDistance;                       // +0x0c distance to the next gate (sort key)
-    float field_0x10;
-    float field_0x14;
+    float progressStep;                       // +0x10 progressPos..placedPos distance this frame (0x004e6a50)
+    float progressTotal;                      // +0x14 sum of accepted progress steps (gate races: of gate approach)
     int lapOffset;                            // +0x18 added to the lap count when ordering (0x004e5f40): -1 when the placedPos..progressPos distance passes the probe gate
     Vector3 previousPosition;                 // +0x1c previous position
     Vector3 currentPosition;                  // +0x28 current position
