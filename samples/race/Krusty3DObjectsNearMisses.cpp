@@ -9,21 +9,21 @@
 // denominator multiplies `fld [camera+0x198]; fmul [this+0x1e4]` as in
 // retail once the camera's value is read through a by-value accessor
 // (CameraZoom below; written plainly VC6 loads this+0x1e4 first, 1295/1308,
-// whichever operand order). Left: retail loads field_0x38 before storing the
+// whichever operand order). Left: retail loads camera before storing the
 // length to field_0x1ec, VC6 here after. A separate length local, a
 // chained assignment, the length stored in its own statement, a
 // reference parameter for the camera, a camera local or by-value camera
 // struct, BonusZoom/denominator/size helpers, ten parenthesisations of the
-// size expression, `field_0x1f0 = 0` moved, field_0x38 re-read, `this->`
+// size expression, `field_0x1f0 = 0` moved, camera re-read, `this->`
 // spellings and Length helper forms (result local, ?:, != tests) leave
 // that order (at best 1299; parentheses around field_0x1e4 or a plain
-// field_0x38->field_0x198 give 1295). Storing the length after the size
+// camera->field_0x198 give 1295). Storing the length after the size
 // statement gives retail's `mov edx` first but keeps the length on the x87
 // stack (`fld st(0)`, store at the end; 544). Size helpers taking the length
 // by value, or the camera, `this` and the chained store in any argument
 // order, give 600 or the same 1299.
-// Cycle 3 sweep (156 forms): a `UnknownBonusCamera& camera = *field_0x38`
-// alias (1164), a `UnknownBonusCamera* const&` alias of field_0x38 (1299),
+// Cycle 3 sweep (156 forms): a `UnknownBonusCamera& view = *camera`
+// alias (1164), a `UnknownBonusCamera* const&` alias of camera (1299),
 // a `const float&` alias of the camera's +0x198 (1152), a `float&` alias of
 // field_0x1ec for the chained store, and all 24 orders of the alias, the
 // field_0x1dc store, the delta and `field_0x1f0 = 0`: at best the same 1299.
@@ -106,7 +106,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
 
     if (currentKey == -1 || g_UnknownKrustyGame56e26c->uiInteractionBlocked)
         return 1;
-    if (field_0x2c->field_0x38->crashState && elapsed > 2.0f) {
+    if (raceView->localRacer->crashState && elapsed > 2.0f) {
         HideDigits();
         return 1;
     }
@@ -116,20 +116,20 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             NextKey();
         float t = (elapsed - g_UnknownBonusKeys[currentKey].time) / keyDuration;
         Vector3 position;
-        field_0x2c->field_0x38->modelNode->GetPosition(&position);
+        raceView->localRacer->modelNode->GetPosition(&position);
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
-        if (field_0x38 != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || field_0x38->fieldOfView != field_0x1dc ||
+        if (camera != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || camera->fieldOfView != field_0x1dc ||
             field_0x1f0) {
-            field_0x38 = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
-            field_0x1dc = field_0x38->fieldOfView;
-            Vector3 delta = position - field_0x38->eyePosition;
+            camera = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
+            field_0x1dc = camera->fieldOfView;
+            Vector3 delta = position - camera->eyePosition;
             field_0x1f0 = 0;
-            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(field_0x38) * field_0x1e4);
+            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(camera) * field_0x1e4);
         }
-        position += field_0x2c->field_0x38->rearWheel->field_0x230 * 5.0f;
+        position += raceView->localRacer->rearWheel->field_0x230 * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
-            field_0x188 = position - field_0x38->eyePosition;
+            field_0x188 = position - camera->eyePosition;
             Vector3 forward = field_0x188;
             forward.y = 0.0f;
             baseFrame->SetAxesPtr(&forward, &kVec3YAxis, 1, 1);

@@ -230,7 +230,7 @@ struct UnknownBonusRacerState {
 
 struct UnknownBonusRacer {
     unsigned char field_0x000[0x38];
-    UnknownBonusRacerState* field_0x38;
+    UnknownBonusRacerState* localRacer;       // +0x38 BikeRace.h's localRacer
 };
 
 // The camera a BonusObjectManager faces (its +0x38).
@@ -345,10 +345,10 @@ public:
     void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
     void HideDigits();              // 0x0048d540: hides the shown digits
 
-    UnknownBonusRacer* field_0x2c;
+    UnknownBonusRacer* raceView;              // +0x2c the race (BikeRace passes this)
     int currentKey;                            // current key, -1 when idle
     float elapsed;                          // time since the start
-    UnknownBonusCamera* field_0x38;
+    UnknownBonusCamera* camera;               // +0x38 the race camera, then the current camera
     D3DIMSoultreeObject* baseFrame;           // "Base Bonus Frame"
     D3DIMSoultreeObject* digitModels[10][5];    // digit models by digit and place
     int shownDigits[5];                        // shown digit per place, -1 when none

@@ -381,7 +381,7 @@ static const UnknownBonusKey g_UnknownBonusKeys[7] = {
 // 0x0048c2b0
 BonusObjectManager::BonusObjectManager(int flags) : GameObject(flags) {
     elapsed = 0;
-    field_0x38 = 0;
+    camera = 0;
     field_0x1dc = 0;
     field_0x1ec = 0;
     field_0x1f0 = 0;
@@ -483,8 +483,8 @@ int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
 BonusObjectManager* BonusObjectManager::SetupCounter(void* value, int a, int b, UnknownBonusRacer* racer,
                                                      UnknownBonusCamera* camera) {
     GameObject::UnknownVirtualSlot8(value);
-    field_0x2c = racer;
-    field_0x38 = camera;
+    raceView = racer;
+    this->camera = camera;
     if (!CreateFrameNode(value, a, b)) {
         Release();
         return 0;
