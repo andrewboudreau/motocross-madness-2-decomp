@@ -32,6 +32,8 @@ Details: [runtime/README.md](runtime/README.md).
 | `mcm2tool/`, `tools/` | Binary analysis, compiler invocation and matching |
 | `config/` | Reviewed ranges, hashes and compiler profiles |
 | `tests/` | Parsing, matching and candidate-behavior regressions |
+| `runtime/` | New DLLs that let the retail demo run on Windows 11 |
+| `port/` | Planning for Windows rebuilds and Linux/Steam Deck ports |
 | `docs/` | Current findings and usage |
 | `analysis/`, `generated/`, `work/` | Ignored evidence, filename skeletons and build output |
 
