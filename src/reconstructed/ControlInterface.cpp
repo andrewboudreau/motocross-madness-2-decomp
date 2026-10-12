@@ -26,11 +26,11 @@ int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* even
 
 // 0x0043cae0
 UnknownControlMapping::UnknownControlMapping() {
-    UnknownFunction43caf0();
+    Clear();
 }
 
 // 0x0043caf0
-void UnknownControlMapping::UnknownFunction43caf0() {
+void UnknownControlMapping::Clear() {
     for (int i = 0; i < 50; i++) {
         keys[i] = -1;
         for (int j = 0; j < 8; j++)
@@ -40,25 +40,25 @@ void UnknownControlMapping::UnknownFunction43caf0() {
 }
 
 // 0x0043cb30
-void UnknownControlMapping::UnknownFunction43cb30(int control, int key) {
+void UnknownControlMapping::SetKey(int control, int key) {
     if (control >= 0 && control < 50)
         keys[control] = key;
 }
 
 // 0x0043cb50
-void UnknownControlMapping::UnknownFunction43cb50(int control, int button, int device) {
+void UnknownControlMapping::SetJoystickButton(int control, int button, int device) {
     if (control >= 0 && control < 50 && device < 8)
         joystickButtons[device][control] = button;
 }
 
 // 0x0043cb80
-void UnknownControlMapping::UnknownFunction43cb80(int control, int button) {
+void UnknownControlMapping::SetMouseButton(int control, int button) {
     if (control >= 0 && control < 50)
         mouseButtons[control] = button;
 }
 
 // 0x0043cba0
-void UnknownControlMapping::UnknownFunction43cba0(int control, int* result) {
+void UnknownControlMapping::GetKey(int control, int* result) {
     if (control >= 0 && control < 50)
         *result = keys[control];
     else
@@ -66,7 +66,7 @@ void UnknownControlMapping::UnknownFunction43cba0(int control, int* result) {
 }
 
 // 0x0043cbd0
-void UnknownControlMapping::UnknownFunction43cbd0(int control, int* result, int device) {
+void UnknownControlMapping::GetJoystickButton(int control, int* result, int device) {
     if (control >= 0 && control < 50 && device < 8)
         *result = joystickButtons[device][control];
     else
@@ -74,7 +74,7 @@ void UnknownControlMapping::UnknownFunction43cbd0(int control, int* result, int 
 }
 
 // 0x0043cc10
-void UnknownControlMapping::UnknownFunction43cc10(int control, int* result) {
+void UnknownControlMapping::GetMouseButton(int control, int* result) {
     if (control >= 0 && control < 50)
         *result = mouseButtons[control];
     else
@@ -173,7 +173,7 @@ ControlInterface::ControlInterface() {
 ControlInterface::~ControlInterface() {}
 
 // 0x0043ce70
-int ControlInterface::UnknownFunction43ce70(UnknownControlMapping* newMapping) {
+int ControlInterface::SetMapping(UnknownControlMapping* newMapping) {
     if (!newMapping)
         return 0;
     mapping = newMapping;
@@ -181,7 +181,7 @@ int ControlInterface::UnknownFunction43ce70(UnknownControlMapping* newMapping) {
 }
 
 // 0x0043cea0
-void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed, int device) {
+void ControlInterface::QueueEvent(int control, int kind, int pressed, int device) {
     events[queuedEventCount].control = control;
     events[queuedEventCount].device = device;
     events[queuedEventCount].kind = kind;
@@ -194,7 +194,7 @@ void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed,
 // passes each queued event, stamped with the keyboard's modifier state, to
 // the global object (slot 13 for releases, 14 for presses) with the
 // device's entry for that control.
-int ControlInterface::UnknownFunction43cf00(int value) {
+int ControlInterface::DispatchInput(int value) {
     queuedEventCount = 0;
     if (keyboard)
         keyboard->UnknownVirtualSlot6(value);

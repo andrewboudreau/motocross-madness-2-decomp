@@ -72,13 +72,13 @@ struct UnknownControlEvent {
 class UnknownControlMapping {
 public:
     UnknownControlMapping();                                       // 0x0043cae0
-    void UnknownFunction43caf0();                                  // 0x0043caf0: clear
-    void UnknownFunction43cb30(int control, int key);              // 0x0043cb30
-    void UnknownFunction43cb50(int control, int button, int device); // 0x0043cb50
-    void UnknownFunction43cb80(int control, int button);           // 0x0043cb80
-    void UnknownFunction43cba0(int control, int* result);          // 0x0043cba0
-    void UnknownFunction43cbd0(int control, int* result, int device); // 0x0043cbd0
-    void UnknownFunction43cc10(int control, int* result);          // 0x0043cc10
+    void Clear();                                             // 0x0043caf0: unmaps every control
+    void SetKey(int control, int key);                        // 0x0043cb30
+    void SetJoystickButton(int control, int button, int device); // 0x0043cb50
+    void SetMouseButton(int control, int button);             // 0x0043cb80
+    void GetKey(int control, int* result);                    // 0x0043cba0: -1 when out of range
+    void GetJoystickButton(int control, int* result, int device); // 0x0043cbd0
+    void GetMouseButton(int control, int* result);            // 0x0043cc10
 
     int keys[50];
     int joystickButtons[8][50];
@@ -107,9 +107,9 @@ public:
     virtual int UnknownVirtualSlot3(int control, int kind, int modifier, int device) = 0;
     virtual int UnknownVirtualSlot4(int modifier) = 0;           // modifier test
 
-    int UnknownFunction43ce70(UnknownControlMapping* newMapping);           // 0x0043ce70
-    void UnknownFunction43cea0(int control, int kind, int pressed, int device); // 0x0043cea0
-    int UnknownFunction43cf00(int value);   // 0x0043cf00: reads the devices, dispatches the events
+    int SetMapping(UnknownControlMapping* newMapping);        // 0x0043ce70: 0 for a null mapping
+    void QueueEvent(int control, int kind, int pressed, int device); // 0x0043cea0: the device readers call it
+    int DispatchInput(int value);                             // 0x0043cf00: reads the devices, dispatches the events
     int UnknownFunction43ce90();            // 0x0043ce90: next binding id (GUIManager.cpp)
 
     int joystickCount;                        // joystick count

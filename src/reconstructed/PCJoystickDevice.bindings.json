@@ -21,7 +21,7 @@
   "?EnumAxisObjectsCallback@PCJoystickDevice@@SGHPBUUnknownObjectInstance@@PAX@Z": "0x004c2cb0",
   "?UnknownFunction43cd10@UnknownControlBinding@@QAEXXZ": "0x0043cd10",
   "?UnknownFunction43cd90@UnknownControlBinding@@QAEXM@Z": "0x0043cd90",
-  "?UnknownFunction43cea0@ControlInterface@@QAEXHHHH@Z": "0x0043cea0",
+  "?QueueEvent@ControlInterface@@QAEXHHHH@Z": "0x0043cea0",
   "?UnknownFunction489c00@JoystickDevice@@QAEXHMM@Z": "0x00489c00",
   "?GetForceFeedbackEffectName@@YAHUUnknownGuid@@PAD@Z": "0x004beef0",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",

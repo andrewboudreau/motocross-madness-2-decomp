@@ -37,7 +37,7 @@ int PCKeyboardDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInpu
     UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
-    mapping->UnknownFunction43cba0(control, &control);
+    mapping->GetKey(control, &control);
     if (control == -1)
         return 0;
     return UnknownVirtualSlot5(control, modifier, entry);
@@ -104,12 +104,12 @@ int PCKeyboardDevice::UnknownVirtualSlot6(int value) {
             keyStates[key].state = 1;
             keyStates[key].previousPressTime = keyStates[key].pressTime;
             keyStates[key].pressTime = events[i].timeStamp;
-            g_TrackGame->controlInterface->UnknownFunction43cea0(key, deviceKind, 1, 0);
+            g_TrackGame->controlInterface->QueueEvent(key, deviceKind, 1, 0);
         } else if (key != DIK_NUMLOCK) {
             keyStates[key].state = 0;
             keyStates[key].previousReleaseTime = keyStates[key].releaseTime;
             keyStates[key].releaseTime = events[i].timeStamp;
-            g_TrackGame->controlInterface->UnknownFunction43cea0(key, deviceKind, 0, 0);
+            g_TrackGame->controlInterface->QueueEvent(key, deviceKind, 0, 0);
         }
     }
     for (int list = 0; list < 6; list++)

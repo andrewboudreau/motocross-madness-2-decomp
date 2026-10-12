@@ -154,16 +154,16 @@ int UnknownTrackGameObject33fc::UnknownFunction448df0(int control, int code, int
     case 2: {
         ControlInterface* controls = g_TrackGame->controlInterface;
         if (controls->activeJoystick)
-            g_TrackGame->controlMapping->UnknownFunction43cb50(control, code,
+            g_TrackGame->controlMapping->SetJoystickButton(control, code,
                                                                controls->activeJoystickIndex);
         break;
     }
     case 1:
         if (g_TrackGame->controlInterface->mouse)
-            g_TrackGame->controlMapping->UnknownFunction43cb80(control, code);
+            g_TrackGame->controlMapping->SetMouseButton(control, code);
         break;
     case 0:
-        g_TrackGame->controlMapping->UnknownFunction43cb30(control, code);
+        g_TrackGame->controlMapping->SetKey(control, code);
         break;
     }
     return 0;
@@ -195,7 +195,7 @@ static inline int AxisOfCode(int code)
 void UnknownTrackGameObject33fc::UnknownFunction448e90(const char* path, int device)
 {
     if (g_TrackGame->controlMapping)
-        g_TrackGame->controlMapping->UnknownFunction43caf0();
+        g_TrackGame->controlMapping->Clear();
     if (device != -1)
         field_0x00 = device;
     g_TrackGame->field_0x3344.UnknownFunction43cde0();

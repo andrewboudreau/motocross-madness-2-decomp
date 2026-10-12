@@ -278,7 +278,7 @@ int TrackGame::UnknownVirtualSlot4() {
     controlMapping = new(__FILE__, 350) UnknownControlMapping;
     if (!controlMapping)
         return 0;
-    controlInterface->UnknownFunction43ce70(controlMapping);
+    controlInterface->SetMapping(controlMapping);
     field_0x33fc = new(__FILE__, 360) UnknownTrackGameObject33fc;
     if (!field_0x33fc)
         return 0;

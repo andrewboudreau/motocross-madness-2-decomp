@@ -147,7 +147,7 @@ int JoystickDevice::UnknownFunction489c60(int control, int modifier, UnknownInpu
     UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
-    mapping->UnknownFunction43cbd0(control, &control, joystickIndex);
+    mapping->GetJoystickButton(control, &control, joystickIndex);
     if (control == -1)
         return 0;
     return UnknownVirtualSlot2(control, modifier, entry);
