@@ -116,17 +116,17 @@ struct UnknownRaceSettings {
     unsigned char field_0x14[0x20 - 0x14];
     int laps;                                 // +0x20: laps (+0x2d90)
     int opponents;                            // +0x24: opponents (+0x2d94)
-    int field_0x28;
+    int multiplayerAiRacerCount;  // +0x28  TrackGame.h UnknownTrackGameModeSettings+0x28 (the same 0x1ec block)
     unsigned char randomGates;                // +0x2c: random gates (+0x2d9c)
     unsigned char gateCount;                  // +0x2d: gate count (+0x2d9d)
     unsigned char field_0x2e[0x30 - 0x2e];
     int gateSeed;                             // +0x30: gate seed (+0x2da0)
     unsigned char trackNumber;                // +0x34: track number (+0x2da4)
-    unsigned char field_0x35;
+    unsigned char networkPlayerCount;  // +0x35  TrackGame.h UnknownTrackGameModeSettings+0x35
     char trackName[0x100];                    // +0x36: track name (+0x2da6)
     unsigned char field_0x136[0x138 - 0x136];
-    int field_0x138;
-    int field_0x13c;
+    int trackFileTime;  // +0x138  TrackGame.h UnknownTrackGameModeSettings+0x138 (st_mtime of the track scene)
+    int trackFileSize;  // +0x13C  TrackGame.h UnknownTrackGameModeSettings+0x13c (st_size of the track scene)
     float minutes;                            // +0x140: minutes (+0x2eb0)
     int tagBall;                              // +0x144: tag ball (+0x2eb4)
     int stuntMode;                            // +0x148: stunt mode (+0x2eb8)

@@ -1539,8 +1539,8 @@ void MPEventDlg::HandleEvent(UnknownDialogEvent* event) {
                 settings->trackName[count] = 0;
             }
             settings->trackNumber = g_TrackGame->ui->entries[index].scene;
-            settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
-            settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
+            settings->trackFileTime = g_TrackGame->ui->entries[index].field_0x0c;
+            settings->trackFileSize = g_TrackGame->ui->entries[index].field_0x10;
             strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType],
                    static_cast<UIListBox*>(event->control)->GetRowText(-1));
         }
@@ -1732,8 +1732,8 @@ void MPEventDlg::SyncValues(int apply) {
         }
         g_TrackGame->mode.SelectSeries(g_TrackGame->ui->entries[index].series);
         settings->trackNumber = g_TrackGame->ui->entries[index].scene;
-        settings->field_0x138 = g_TrackGame->ui->entries[index].field_0x0c;
-        settings->field_0x13c = g_TrackGame->ui->entries[index].field_0x10;
+        settings->trackFileTime = g_TrackGame->ui->entries[index].field_0x0c;
+        settings->trackFileSize = g_TrackGame->ui->entries[index].field_0x10;
         strcpy(g_TrackGame->mode.trackNames[g_TrackGame->mode.raceSettings.eventType], list->GetRowText(-1));
         g_TrackGame->mode.trackIndices[g_TrackGame->mode.raceSettings.eventType] = g_TrackGame->mode.raceSettings.trackNumber;
         list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;

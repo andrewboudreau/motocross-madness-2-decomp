@@ -631,7 +631,7 @@ struct UnknownBikeRaceCameraView {
     unsigned char field_0x248[0x268 - 0x248];
     int overrideActive;                       // +0x268 override active
     unsigned char field_0x26c[0x274 - 0x26c];
-    unsigned char field_0x274;
+    unsigned char isSettled;  // +0x274  FollowCamera isSettled (the comment above names FollowCamera's +0x274)
     unsigned char field_0x275[0x384 - 0x275];
     UnknownBikeRaceSceneCharacter* targetCharacter;  // +0x384  VehicleCamera+0x384 target; UnknownFunctionTargetCharacter stores its scene character
     GameObject* targetCar;  // +0x388  VehicleCamera+0x388 targetCar; UnknownFunctionTargetObject stores its scene procedural object
@@ -665,18 +665,18 @@ struct UnknownBikeRaceCameraView {
         targetCharacter = 0;
         targetCar = 0;
         followedBike = racer;
-        field_0x274 = 0;
+        isSettled = 0;
         followedRacer = racer;
         if (!racer->bikeView->forceHighLod) {
             racer->modelNode->SetLowestLod(0);
             followedBike->riderCharacter->modelNode->SetLowestLod(0);
         }
-        field_0x274 = 0;
+        isSettled = 0;
     }
 
     // Inline (0x0041eb20): the camera targets one scene object instead.
     void UnknownFunctionTargetCaster(void* caster) {
-        field_0x274 = 0;
+        isSettled = 0;
         shadowCaster = caster;
         targetPointCached = 0;
         targetHeadingCached = 0;
@@ -686,7 +686,7 @@ struct UnknownBikeRaceCameraView {
     }
     void UnknownFunctionTargetCharacter(UnknownBikeRaceSceneCharacter* character) {
         targetCharacter = character;
-        field_0x274 = 0;
+        isSettled = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;
@@ -695,7 +695,7 @@ struct UnknownBikeRaceCameraView {
     }
     void UnknownFunctionTargetObject(GameObject* object) {
         targetCar = object;
-        field_0x274 = 0;
+        isSettled = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;
