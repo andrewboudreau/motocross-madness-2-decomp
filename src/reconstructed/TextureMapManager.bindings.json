@@ -36,7 +36,7 @@
   "?WriteDebugReport@ManagedTextureGroup@@QAEXXZ": "0x0050c7e0",
   "?RepackPages@ManagedTextureGroup@@QAEXXZ": "0x0050c8c0",
   "?DrawSelection@ManagedTextureGroup@@QAEHPAVPCRenderTarget@@@Z": "0x0050ef70",
-  "?UnknownFunction510760@ManagedTexture@@QAEHHHH@Z": "0x00510760",
+  "?CreateOwnSurface@ManagedTexture@@QAEHHHH@Z": "0x00510760",
   "?CreateGroup@TextureMapManager@@QAEPAVManagedTextureGroup@@HHHH@Z": "0x00511180",
   "?CreateGroup@TextureMapManager@@QAEPAVManagedTextureGroup@@HHHH@Z$ehhandler": "0x0054eb27",
   "?RegisterTexture@TextureMapManager@@QAEXPAVTextureMap@@@Z": "0x005112f0",

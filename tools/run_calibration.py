@@ -3949,7 +3949,7 @@ CASES = [
         'name': 'ManagedTexture direct slot8 0x510760',
         'bindings': 'src/reconstructed/ManagedTexture.bindings.json',
         'source': 'src/reconstructed/ManagedTexture.cpp',
-        'symbol': '?UnknownFunction510760@ManagedTexture@@QAEHHHH@Z',
+        'symbol': '?CreateOwnSurface@ManagedTexture@@QAEHHHH@Z',
         'target_va': '0x00510760',
         'target_size': 23,
         'reason': 'qualified base call',

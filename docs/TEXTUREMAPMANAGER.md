@@ -43,7 +43,7 @@ Exact (25 calibration cases, every function in the file's range):
   among TextureCache.cpp's literals) and adds it through ContainerList's
   inline Add;
 - `0x005113d0`, which on AGP displays restores every grouped
-  ManagedTexture (`0x00510760`, a direct PCTextureMap slot 8 call) and
+  ManagedTexture (`CreateOwnSurface`, `0x00510760`, a direct PCTextureMap slot 8 call) and
   otherwise hands the display's "TextureCacheLimit" (+0x60) out in
   0x2aaaa-byte steps, each to the group with the fewest steps per texture;
 - `0x00511580`, which counts the 32–256 pixel textures, their bytes with
@@ -65,8 +65,8 @@ on a CacheTexture page (+0x80, RTTI `CacheTexture : PCTextureMap`, vtable
 `0x005583d8`), it records its region (+0x94), its scale and u/v offset
 within the page (+0x84..+0x8c), binds the page instead of itself (slots 11
 and 19) and maps texture coordinates into the page (`0x00510780`,
-`0x00510910`). Slot 8 (create the surface) does nothing; `0x00510760` calls
-PCTextureMap's slot 8 directly.
+`0x00510910`). Slot 8 (create the surface) does nothing; `CreateOwnSurface` (`0x00510760`)
+calls PCTextureMap's slot 8 directly.
 
 Exact (16 calibration cases, every function in that range): the constructor,
 scalar deleting destructor and destructor, slots 7, 8, 11 and 19, and

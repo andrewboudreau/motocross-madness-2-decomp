@@ -269,7 +269,7 @@ int TextureMapManager::ShareCacheLimit() {
         for (i = 0; i < count; i++) {
             UnknownTextureMapList* textures = &field_0x44.Get(i)->managedTextures;
             for (TextureMap* texture = textures->First(); texture; texture = textures->Next())
-                static_cast<ManagedTexture*>(texture)->UnknownFunction510760(1, 0, 0);
+                static_cast<ManagedTexture*>(texture)->CreateOwnSurface(1, 0, 0);
         }
     } else {
         int total = 0;
