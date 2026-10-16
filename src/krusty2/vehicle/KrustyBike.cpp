@@ -559,11 +559,11 @@ int KrustyBike::UnknownVirtualSlot28(int a)
     int r = Vehicle::UnknownVirtualSlot28(a);
     if (crashState && !prevCrashState) {
         if (aiKind) {
-            field_0x7ac += KbRandUnit() * 0.15f;
-            field_0x7b0 += KbRandUnit() * 0.15f;
+            repairDamage += KbRandUnit() * 0.15f;
+            injuryDamage += KbRandUnit() * 0.15f;
         } else {
-            field_0x7ac += KbRandUnit() * 0.667f;
-            field_0x7b0 += KbRandUnit() * 0.667f;
+            repairDamage += KbRandUnit() * 0.667f;
+            injuryDamage += KbRandUnit() * 0.667f;
         }
     }
     return r;
@@ -982,12 +982,12 @@ float KrustyBike::Fn_00495FF0()
         int points = (int)(base * rules->baseScale);
         float gain = 0.0f;
         float limit = points * rules->limitScale;
-        if (field_0x7b4 * 400.0f < limit) {
-            float total = step + field_0x7b4;
+        if (stuntEarnings * 400.0f < limit) {
+            float total = step + stuntEarnings;
             if (total * 400.0f > limit) {
-                field_0x7b4 = limit * 0.0025f;
+                stuntEarnings = limit * 0.0025f;
             } else {
-                field_0x7b4 = total;
+                stuntEarnings = total;
                 gain = step * 400.0f;
             }
         }

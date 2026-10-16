@@ -52,9 +52,9 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     field_0x15e6 = 0;
     field_0x7a5 = 0;
     isGhost = 0;
-    field_0x7ac = 0;
-    field_0x7b0 = 0;
-    field_0x7b4 = 0;
+    repairDamage = 0;
+    injuryDamage = 0;
+    stuntEarnings = 0;
     deltaBaseVelocity = kVec3Zero;
     deltaBasePosition = kVec3Zero;
     deltaBaseAngularVelocity = kVec3Zero;

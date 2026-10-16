@@ -149,9 +149,9 @@ public:
     char field_0x7a5; // 0x7A5
     char pad_0x07A6[0x2];
     float field_0x7a8; // 0x7A8
-    float field_0x7ac; // 0x7AC
-    float field_0x7b0; // 0x7B0
-    float field_0x7b4; // 0x7B4  bonus accumulated by 0x00495ff0
+    float repairDamage;                       // +0x7AC  slot 28 adds rand x 0.667 (AI 0.15) per new crash; PayOutRace reads it via the result +0x34 as repairs x 500 (tier 3)
+    float injuryDamage;                       // +0x7B0  slot 28 adds rand x 0.667 (AI 0.15) per new crash; result +0x38, medical x 250 (tier 3)
+    float stuntEarnings;                      // +0x7B4  0x00495ff0 adds the pro-circuit trick step, capped at purse x StuntCapPct / 400; result +0x3c, stunts x 400 (tier 3)
     int lapGate;  // +0x7B8  RaceView/BikeRace +0x7b8 gate of the lap (AdvanceGate's gateIndex)
     int nextLapGate;  // +0x7BC  RaceView/BikeRace +0x7bc lapGate + 1 wrapped by the gate count
     int forceGatePass;  // +0x7C0  RaceStatus passes it as CountLap/AdvanceGate `forced`: with isRemote the gate/lap counts only when set
