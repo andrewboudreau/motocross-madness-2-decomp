@@ -437,7 +437,8 @@ register assignment. Functions that call Vector3 helpers out of line are
 limited by VC6's per-function inline budget, not by flags; see
 [VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md) before attempting them. A missing
 or extra `xor reg, reg` zero register follows the number of zero stores; see
-[VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md). Defer
+[VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md). Callee-saved pushes ahead of an
+early guard follow the number of exits; see [VC6_SHRINK_WRAP](VC6_SHRINK_WRAP.md). Defer
 large routines until their callees, member layouts and smaller
 surrounding methods are represented. This keeps a
 failed large match from conflating ABI, register allocation, control flow and
