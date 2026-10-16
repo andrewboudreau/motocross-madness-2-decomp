@@ -266,7 +266,7 @@ public:
     void SetLowestLod(int lod);           // 0x00444d40
     void SetLodThreshold(float value);             // 0x00444d60
     void RemoveAllModifiers();                     // 0x00444e80
-    void UnknownFunction444eb0(GameObject* modifier); // 0x00444eb0
+    void AddSecondModifier(GameObject* modifier); // 0x00444eb0
     void RemoveAllSecondModifiers();               // 0x00444fb0
     int GetVertexCount();                   // 0x00444fe0
     int GetSurfaceCount(int lod);         // 0x00445030: surface count

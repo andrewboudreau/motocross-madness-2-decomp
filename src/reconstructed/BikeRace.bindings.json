@@ -65,7 +65,7 @@
   "?Release@UIDialog@@UAEHXZ": "0x0046a010",
   "?SetDrawColor@GraphicsTest@@QAEXHHH@Z": "0x0047c690",
   "?SetPosition@ArcadeObject@@QAEXPBUVector3@@@Z": "0x004014f0",
-  "?UnknownFunction404df0@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
+  "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
   "?PickerHitCallback@@YAXPAVCollisionObject@@0@Z": "0x00417b00",
   "?SortDescending@@YAXPAH0H@Z": "0x00417b30",
   "?RankByPoints@BikeRace@@QAEXPAH@Z": "0x00417bc0",

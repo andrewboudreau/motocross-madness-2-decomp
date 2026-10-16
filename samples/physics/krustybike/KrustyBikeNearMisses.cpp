@@ -285,7 +285,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                             if (KB_DELTA_FITS(a, 6.28318548f)) {
                                 message.pitch = (signed char)(a * 20.371832f);
                                 state->pitchError = a - message.pitch * 0.049087387f;
-                                unsigned int now = UnknownFunction4bfa80();
+                                unsigned int now = ReadClock();
                                 unsigned int elapsed = now - state->time;
                                 if (elapsed < 1000) {
                                     if (elapsed < 0x80) {
@@ -503,7 +503,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
         }
         if (!g_kbInterpolate) {
-            unsigned int now = UnknownFunction4bfa80();
+            unsigned int now = ReadClock();
             if (!g_kbUseTimeReceived)
                 stateIntervalElapsed = ((float)now - (float)states[0]->time - clockOffset) * 0.001f;
             else
@@ -587,13 +587,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // orientation
         if (!g_kbInterpolate) {
-            UnknownFunction4b5d00(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
             s = states[1];
         } else {
-            UnknownFunction4b5d00(&bodyForward, &bodyUp, interpTarget->roll, interpTarget->pitch, interpTarget->yaw);
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->roll, interpTarget->pitch, interpTarget->yaw);
             s = interpSource;
         }
-        UnknownFunction4b5d00(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
+        OrientationAxesFromAngles(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
                 if (g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold) {
@@ -809,7 +809,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->UnknownFunction404df0(lapGate, nextLapGate, this);
+                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {
@@ -904,7 +904,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->UnknownFunction404df0(lapGate, nextLapGate, this);
+                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {

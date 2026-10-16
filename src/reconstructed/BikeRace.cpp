@@ -1361,7 +1361,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         g_TrackGame->tagEvent->ResetClock();
     }
     if (g_TrackGame->bajaEnduroEvent != 0) {
-        g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(0, 1, UnknownFunctionCameraView()->followedRacer);
+        g_TrackGame->bajaEnduroEvent->SelectLapGates(0, 1, UnknownFunctionCameraView()->followedRacer);
     }
 }
 

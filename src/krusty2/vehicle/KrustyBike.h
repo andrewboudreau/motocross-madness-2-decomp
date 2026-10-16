@@ -122,16 +122,16 @@ public:
     KbRace* race;  // +0x740  loader race argument
     KbGhost* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its +0x44 track position is seeded from the start probe
     int finishTimeStamp;  // +0x748  RaceView +0x748 time stamp; 0x7ffffffe until finished
-    int lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time (float there)
-    int fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap" (float there)
+    float lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time; FormatLapTime (0x00518690) takes it as a float
+    float fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap"; FormatLapTime float
     float totalRunningTime;  // +0x754  RaceView +0x754: FLT_MAX until finished; ZoneReport "TotalrunningTime"
     float field_0x758; // 0x758
-    int tagRun;  // +0x75C  RaceView +0x75c: current run as the followed racer in tag (mode 4)
-    int bestTagRun;  // +0x760  RaceView +0x760 best banked tag run
-    int totalTagRun;  // +0x764  RaceView +0x764 sum of the banked tag runs
+    float tagRun;  // +0x75C  RaceView +0x75c: current run as the followed racer in tag (mode 4)
+    float bestTagRun;  // +0x760  RaceView +0x760 best banked tag run
+    float totalTagRun;  // +0x764  RaceView +0x764 sum of the banked tag runs
     float score;  // +0x768  RaceView/BikeRace +0x768 score; message 10 (KbBikePing+0x04) carries it
     float offTrackTime;  // +0x76C  RaceStatus time off the track (RaceView +0x76c); slot 39 respawns past 6 s when raceMode is set
-    int timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
+    float timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
     int lapStartTime;  // +0x774  RaceView +0x774 lap start time
     float field_0x778; // 0x778  100.0f from the loader
     void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)

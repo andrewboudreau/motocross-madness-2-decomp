@@ -552,7 +552,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     UnknownVirtualSlot1(loadWeight);
 
     riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::statusFlags & 1);
-    if (!GameObject::Method_0x00469190(
+    if (!GameObject::AppendChild(
             ((D3DIMSoultreeCharacter*)riderCharacter)->D3DIMVirtualSlot11(
                 (int)GameObject::field_0x18, riderModel, desc, (int)info, 1, 1), -1))
         riderCharacter = 0;
@@ -630,7 +630,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                                                                 roll[i], 255.0f, grip[i], a12, a13, 0.5f, trackObject);
         BikeTireObject* tire = (BikeTireObject*)wheel;
         tire->GameObjectVirtualSlot8((int)GameObject::field_0x18);
-        GameObject::Method_0x00469190((GameObject*)tire, -1);
+        GameObject::AppendChild((GameObject*)tire, -1);
         if (rotating[i]) {
             AddWheel(wheel, 0, 0, (int)rotShock, driven[i] ? (VehicleWheelAux*)engineState : 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
@@ -666,11 +666,11 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
 
     if (field_0x124) {
         dustEmitter = new(__FILE__, 0x70f) BikeDustEmitter(1);
-        GameObject::Method_0x00469190(dustEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        GameObject::AppendChild(dustEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
         dirtChunkEmitter = new(__FILE__, 0x710) BikeDirtChunkEmitter(1);
-        GameObject::Method_0x00469190(dirtChunkEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        GameObject::AppendChild(dirtChunkEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
         steamEmitter = new(__FILE__, 0x711) BikeSteamEmitter(1);
-        GameObject::Method_0x00469190(steamEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        GameObject::AppendChild(steamEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
         steamEmitter->emitting = 1;
     }
 
@@ -1282,7 +1282,7 @@ void Bike::UnknownVirtualSlot97()
 {
     wrecker = new(__FILE__, 2023) BikeA604(1);
     if (wrecker->SetupWrecker(GameObject::field_0x18, riderCharacter, "rider.col")) {
-        GameObject::Method_0x00469190(wrecker, -1);
+        GameObject::AppendChild(wrecker, -1);
         wrecker->a_0x38->n_0xe4 = ((BikeA1F4*)terrain);
         wrecker->a_0x38->n_0x64 = 0x65;
         BikeAttachBone(this, "Pelvis", 0.0f, 0.0f, -0.35f);
@@ -1862,7 +1862,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
-            sparkEmitter->field_0x60 = 1;
+            sparkEmitter->burstPending = 1;
         }
         break;
     }
@@ -1888,7 +1888,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
-            sparkEmitter->field_0x60 = 1;
+            sparkEmitter->burstPending = 1;
         }
         break;
     case 0x69: {

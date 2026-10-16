@@ -1017,8 +1017,8 @@ void D3DIMSoultreeObject::RemoveAllModifiers()
         RemoveModifier(modifierList[0]);
 }
 
-// 0x00444eb0
-void D3DIMSoultreeObject::UnknownFunction444eb0(GameObject* modifier)
+// 0x00444eb0: appends to the second list (+0x270, count +0x26c; D3DIMSoulTree.CPP line 0x97f)
+void D3DIMSoultreeObject::AddSecondModifier(GameObject* modifier)
 {
     secondModifierList = (GameObject**)DebugRealloc(secondModifierList, secondModifierCount * 4 + 4, __FILE__, 0x97f);
     secondModifierList[secondModifierCount] = modifier;

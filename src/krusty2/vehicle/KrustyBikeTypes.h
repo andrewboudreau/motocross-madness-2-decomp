@@ -133,10 +133,10 @@ struct KbBikeMessage {
     short gatesPassed;  // +0x6  KrustyBike+0x790 gatesPassed (0x00492700)
     Vec3 position;                       // +0x08
     float roll, pitch, yaw;              // +0x14
-    int lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
+    float lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
     int field_0x24;
-    int fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
-    int timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
+    float fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
+    float timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
     Vec3 angularVelocity;                // +0x30 (y plus the turn rate)
     Vec3 velocity;                       // +0x3c
     unsigned char poseIndex : 4;         // +0x48
@@ -317,9 +317,9 @@ struct KbGame {
 };
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
-unsigned int UnknownFunction4bfa80();
+unsigned int ReadClock();
 // 0x004B5D00 (cdecl): forward/up axes from roll, pitch and yaw (tier 3 names).
-void UnknownFunction4b5d00(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
+void OrientationAxesFromAngles(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
 // 0x00460C70: 1/sqrt estimate (name from samples/physics/helpers/FastMath.bindings.json).
 float FastInvSqrtEstimate(float v);
 // Network smoothing settings 0x00493660 reads; 0x0048fc80 loads them from the game config.
@@ -340,7 +340,7 @@ extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
 struct KbTrack {
     char pad_0x00[0xac];
     int field_0xac;
-    void UnknownFunction404df0(int a, int b, KrustyBike* bike);   // 0x00404DF0
+    void SelectLapGates(int a, int b, KrustyBike* bike);   // 0x00404DF0 (TrackGameViewOwner: makes gates a and b the current pair)
 };
 // BikeWheel view for 0x00513560 (tier 3 name).
 struct KbWheel { void SetRollDistance(float d); };
@@ -414,11 +414,11 @@ struct KbRaceSub {
     int FreeWorkList(KbTrackItem** list, int all);
     int ShortestPath(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
     float DistanceAlong(KbRaw3 a, KbRaw3 b);
-    int UnknownFunction517ea0(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
-                              unsigned char flags);
+    int MoveAlongPath(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
+                      unsigned char flags);
     int PointAt(KbRaw3 pos, Vec3* out);
     int SegmentDirection(int segment, Vec3* out);
-    int UnknownFunction518230(Vec3 p, int segment, float* out, int mode);
+    int DistanceToStripEdge(Vec3 p, int segment, float* out, int mode);
 };
 struct KbRace {
     KrustyBike* NextBike(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
@@ -499,7 +499,7 @@ struct KbXform {
     // the first two with 0 or 1 on the bike and rider nodes and the third with the rider morph.
     void SetLod(int value);         // 0x00444D00
     void SetLowestLod(int value);         // 0x00444D40
-    void UnknownFunction444eb0(KbMorphMod* mod);   // 0x00444EB0
+    void AddSecondModifier(KbMorphMod* mod);   // 0x00444EB0 (D3DIMSoultreeObject; D3DIMSoulTree.CPP line 0x97f)
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {

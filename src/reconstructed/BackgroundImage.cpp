@@ -427,7 +427,7 @@ int BackgroundImage::UnknownVirtualSlot18() {
 // Vec3 constructor copy (0x00404e60); ownership by position only. Flags
 // the +0x58 objects of the two entries the owner currently picks, then
 // picks `a` and `b` and clears theirs.
-void TrackGameViewOwner::UnknownFunction404df0(int a, int b, void* racer) {
+void TrackGameViewOwner::SelectLapGates(int a, int b, void* racer) {
     if (gates[lapGate]->field_0x58) {
         gates[lapGate]->field_0x58->field_0x44 = 1;
         gates[nextLapGate]->field_0x58->field_0x44 = 1;

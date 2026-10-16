@@ -117,25 +117,25 @@ public:
 
     int firstUpdate;          // +0x2c ctor 1
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor)
-    float field_0x34;         // +0x34 ctor 500.0
+    float particleLifetime;  // +0x34  ctor 500.0; slot 10 stores it as each new particle's lifetime
     float field_0x38;         // +0x38 ctor 0
     float field_0x3c;         // +0x3c ctor 1.0
-    float field_0x40;         // +0x40 ctor 2400.0
+    float emitRate;  // +0x40  ctor 2400.0; slot 10 emits dt * it particles per tick
     ParticleVec3 position;    // +0x44 ctor 0; SetPosition's arguments
     ParticleVec3 previousPosition; // +0x50 SetPosition copies position here first
     float field_0x5c;         // +0x5c ctor 0
-    int field_0x60;           // +0x60 ctor 0
-    float field_0x64;         // +0x64 ctor 0; a timer: slot 10 adds dt while idle and emits while it is positive
-    float field_0x68;         // +0x68 ctor 0; fractional particle remainder carried between ticks
+    int burstPending;  // +0x60  ctor 0; slot 10 idles while it is clear and clears it after emitting one burst; Vehicle/Bike impact handlers set it after SetPosition
+    float idleTime;  // +0x64  ctor 0; slot 10 adds dt while no burst is pending and clears it after a burst; above 0.25 the burst restarts from the current position
+    float emitRemainder;  // +0x68  ctor 0; fractional particle remainder carried between ticks
     int field_0x6c;           // +0x6c ctor 0
-    int field_0x70;           // +0x70 ctor 0x2d
-    int field_0x74;           // +0x74 ctor 0x14
+    int nextFrame;  // +0x70  ctor 0x2d; each new particle's frame, cycling 0x2d..0x3c
+    int particleFlags;  // +0x74  ctor 0x14; stored in each new particle's flags
     ParticleVec3 launchVelocity; // +0x78 ctor (0, 2, 0); slot 10 adds it to each new particle velocity
     float randomTable[256];   // +0x84 ctor fills rand()/32768*0.075
-    int field_0x484;          // +0x484 ctor 0
+    int randomTableIndex;  // +0x484  ctor 0; index into randomTable for the next particle's size and growth
     ParticleVec3 randomVectors[8]; // +0x488 ctor fills each component rand()/32768*10-5
     char field_0x4e8[0x608 - 0x4e8]; // +0x4e8 not touched by the ctor
-    int field_0x608;          // +0x608 ctor 0
+    int randomVectorIndex;  // +0x608  ctor 0; index into randomVectors for the next particle's velocity
 };
 
 // SteamParticleEmitter: vtable 0x00555c9c.  Ctor 0x004b9f40, deleting dtor 0x004ba010, dtor 0x004ba030,

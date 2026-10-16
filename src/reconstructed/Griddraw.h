@@ -329,8 +329,8 @@ public:
     void EmitLeafEdgeFan(int x, int z, int dx, int dz, int n); // 0x0047fe70 (ret 0x14)
     int EmitEdgeTriangles(int level, int n, int x, int z, int dx, int dz, int* closed); // 0x00480200 (ret 0x1c)
     int AppendCornerTriangle(int n, int x, int z, int dx, int dz); // 0x00480700 (ret 0x14)
-    int UnknownFunction480900(void* target);                    // 0x00480900 (ret 4)
-    int UnknownFunction480920(void* target, int a5);            // 0x00480920 (ret 8)
+    int DrawVisible(void* target);                    // 0x00480900 (ret 4)
+    int DrawVisibleWithDetail(void* target, int a5);            // 0x00480920 (ret 8)
     int DrawVisibleQuadrants(void* target, int x, int z, int size, int quad, int a5); // 0x00480940 (ret 0x18)
     int DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5); // 0x00480ad0 (ret 0x18)
     void SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,

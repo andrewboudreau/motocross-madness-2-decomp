@@ -440,7 +440,7 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
                 racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;
                 if (racer == ((UnknownRaceStatusCamera*)racer->bikeView->raceCamera)->followedRacer)
-                    g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->lapGate, racer->nextLapGate,
+                    g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate, racer->nextLapGate,
                                                                               racer);
             }
         }

@@ -159,7 +159,7 @@ public:
 void* AddCollisionPoint(int capacity, void** points, const Vector3* position, void* owner, float a4,
                         int* count, float friction, int a7);
 // 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch.
-void UnknownFunction4b5d00(Vector3* look, Vector3* up, float heading, float pitch, int a);
+void OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, int a);
 
 // An "ObjectShape" (0x24 bytes) or "EmitterType<n>" (0x1c bytes) keyword.
 struct UnknownSceneShapeKeyword {
@@ -269,7 +269,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
         ReadVector(&position, model, "Position", "0.0,0.0,0.0", 0, 0);
         if (parameters.GetFloat("Heading", -999.0f, &heading)) {
             parameters.GetFloat("Pitch", 0, &pitch);
-            UnknownFunction4b5d00(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
+            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
         } else {
             ReadVector(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
             ReadVector(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
@@ -605,7 +605,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         int axes = 0;
         if (parameters.GetFloat("Heading", -999.0f, &heading)) {
             parameters.GetFloat("Pitch", 0, &pitch);
-            UnknownFunction4b5d00(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
+            OrientationAxesFromAngles(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
             axes = 1;
         } else if (ReadVector(&look, name, "LookVector", "0.0,0.0,1.0", 0, 0)) {
             ReadVector(&up, name, "UpVector", "0.0,1.0,0.0", 0, 0);

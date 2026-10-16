@@ -105,10 +105,10 @@ public:
     int IsAtOrAfter(TrackPos a, TrackPos b);
     int ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
     float DistanceAlong(TrackPos a, TrackPos b);
-    int UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
+    int MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
     int PointAt(TrackPos pos, TrackVec3* out);
     int SegmentDirection(TrackSegment* segment, TrackVec3* out);
-    int UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out, int mode);
+    int DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, int mode);
 
     TrackNode* startNode;                     // +0x00
     float lapLength;                          // +0x04

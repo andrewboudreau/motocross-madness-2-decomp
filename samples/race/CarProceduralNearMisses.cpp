@@ -139,7 +139,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x004b5d00 (cdecl): the look and up vectors of a heading and pitch
 // (samples/track/SceneManagerNearMisses.cpp declares the same function).
-void UnknownFunction4b5d00(Vector3* look, Vector3* up, float heading, float pitch, int a);
+void OrientationAxesFromAngles(Vector3* look, Vector3* up, float heading, float pitch, int a);
 
 // Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the orthonormalisation
 // of the collider frame calls the COMDAT cross product and normalisation.
@@ -315,7 +315,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         Vector3 axisA;
         Vector3 axisB;
         if (steersFrontWheels && i < 2) {
-            UnknownFunction4b5d00(&axisA, &axisB, steeringAngle, -wheelSpinAngle, 0);
+            OrientationAxesFromAngles(&axisA, &axisB, steeringAngle, -wheelSpinAngle, 0);
         } else {
             axisA.x = 0.0f;
             axisA.y = (float)sin(-wheelSpinAngle);

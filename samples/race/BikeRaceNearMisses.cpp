@@ -127,7 +127,7 @@ int BikeRace::AimCamera(int caster) {
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 UnknownBikeRaceRacer* racer = racerSlots[targetRacer];
-                g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->lapGate,
+                g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
         } else if (targetRacer == 0) {
@@ -141,7 +141,7 @@ int BikeRace::AimCamera(int caster) {
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 UnknownBikeRaceRacer* racer = localRacer;
-                g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->lapGate,
+                g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
         } else {
@@ -156,7 +156,7 @@ int BikeRace::AimCamera(int caster) {
             }
             if (g_TrackGame->bajaEnduroEvent != 0) {
                 UnknownBikeRaceRacer* racer = aiRacers[index];
-                g_TrackGame->bajaEnduroEvent->UnknownFunction404df0(racer->lapGate,
+                g_TrackGame->bajaEnduroEvent->SelectLapGates(racer->lapGate,
                                                                           racer->nextLapGate, racer);
             }
         }

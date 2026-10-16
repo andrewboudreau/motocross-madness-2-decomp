@@ -28,7 +28,7 @@
   "_sprintf": "0x00534aaf",
   "_strchr": "0x00535f10",
   "_strpbrk": "0x00537ff0",
-  "?UnknownFunction517ea0@Track@@QAEHUTrackPos@@PAU2@PAPAUTrackListItem@@ME@Z": "0x00517ea0",
+  "?MoveAlongPath@Track@@QAEHUTrackPos@@PAU2@PAPAUTrackListItem@@ME@Z": "0x00517ea0",
   "?ClosestPointOnNode@Track@@QAEHUTrackVec3@@PAUTrackNode@@PAUTrackPos@@PAM@Z": "0x00516ca0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?IsInsideStrip@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z": "0x00516ef0",

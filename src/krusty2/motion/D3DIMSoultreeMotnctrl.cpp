@@ -327,7 +327,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int a)
     modelNode = (SoultreeObject*)model;
     ((ModelObject*)modelNode)->CopyFrom((ModelObject*)source);
     GameObject* child = (ModelObject*)modelNode;
-    Method_0x00469190(child, -1);
+    AppendChild(child, -1);
     nodeCount = modelNode->CountNodes();
     nodeNames = (NodeNameEntry*)operator new(nodeCount << 6, __FILE__, 0x11b);
     FillNodeNames(0, nodeNames, modelNode);
@@ -352,7 +352,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     modelNode = (SoultreeObject*)frame;
     frame->Load(field_0x18, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
     GameObject* frameChild = (ModelObject*)modelNode;
-    Method_0x00469190(frameChild, -1);
+    AppendChild(frameChild, -1);
     modelNode->RegisterNode();
     len = strlen("Base Character Frame");
     n = len > 0x7f ? 0x7f : len;
@@ -374,7 +374,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
         ((ModelObject*)modelNode)->items[i]->Init(field_0x18, ((ModelObject*)modelNode)->field_0x248,
                                                   ((ModelObject*)modelNode)->field_0x240,
                                                   ((ModelObject*)modelNode)->field_0x244);
-        Method_0x00469190(((ModelObject*)modelNode)->items[i], -1);
+        AppendChild(((ModelObject*)modelNode)->items[i], -1);
         ((ModelObject*)modelNode)->items[i]->CopyFrom(loaded->items[i]);
         loaded->items[i]->BaseObjectVirtualSlot2();
     }
@@ -393,7 +393,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 }
 
 // Helpers of slot 11 (all names tier 3).
-void BusyCursor();                                       // 0x004bfa80, cdecl: two cursor calls through function pointers
+unsigned int ReadClock();                                // 0x004bfa80: timeBeginPeriod(1), timeGetTime, timeEndPeriod(1); result unused here
 class ArchiveFile {                                      // 0x134 bytes, ctor takes the registry (0x00460d10, ret 4)
 public:
     explicit ArchiveFile(OwnerRegistry* registry);
@@ -426,7 +426,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     char fname[0x100];
     char ext[0x100];
     char dir[0x100];
-    BusyCursor();
+    ReadClock();
     Method_0x004a6910(a1, a6);
     *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = a3;
     *(int*)(d3d_field_0x1a4 + 0x68) = a5;
@@ -451,7 +451,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     if (entry->owner) {
         entry->BaseObjectVirtualSlot1();
         CharacterVirtualSlot8((int)entry->owner);
-        BusyCursor();
+        ReadClock();
         delete file;
         return this;
     }
@@ -469,6 +469,6 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     delete sltFile;
     g_pOwnerRegistry->SetOwner(entry, this);
     delete file;
-    BusyCursor();
+    ReadClock();
     return this;
 }

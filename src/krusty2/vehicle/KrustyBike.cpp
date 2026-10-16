@@ -1557,7 +1557,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
         message.lapGate = (unsigned char)lapCount;
     else
         message.lapGate = lapGate;
-    message.time = UnknownFunction4bfa80();
+    message.time = ReadClock();
     message.field_0x02 = (short)message.time - (short)state->time;
     if (!record) {
         if (g_kbGame->network)
@@ -1681,7 +1681,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     }
     if (isGhost) {
         ghostMod = (KbObj128*)new(__FILE__, 0x690) KbGhostMod(1);
-        GameObject::Method_0x00469190(ghostMod, -1);
+        GameObject::AppendChild(ghostMod, -1);
     }
     statusNode = 0;
     ((KbBikeLoader*)this)->Fn_004079C0(a1, a2, name, desc, a5, a6, a7, a8, a9, a10, map, a15, a16,
@@ -1829,11 +1829,11 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     altBodyA = (KbObj128*)new(__FILE__, 0x77e) CollisionObject(1);
     ((CollisionObject*)altBodyA)->Configure(a1, 1, 1, 1);
     ((CollisionObject*)altBodyA)->LoadShape(modelNode->firstChild, "BikeAndRider.col");
-    GameObject::Method_0x00469190((GraphicsTest*)(CollisionObject*)altBodyA, -1);
+    GameObject::AppendChild((GraphicsTest*)(CollisionObject*)altBodyA, -1);
     altBodyB = (KbObj128*)new(__FILE__, 0x784) CollisionObject(1);
     ((CollisionObject*)altBodyB)->Configure(a1, 1, 1, 1);
     ((CollisionObject*)altBodyB)->LoadShape(modelNode->firstChild, "Bike.col");
-    GameObject::Method_0x00469190((GraphicsTest*)(CollisionObject*)altBodyB, -1);
+    GameObject::AppendChild((GraphicsTest*)(CollisionObject*)altBodyB, -1);
     altBodyB->field_0xc.UnknownVirtualSlot4();
     ((CollisionObject*)altBodyA)->ownerType = 100;
     ((CollisionObject*)altBodyB)->ownerType = 100;
@@ -1925,7 +1925,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         probeSegment = new(__FILE__, 0x82f) CollisionObject(1);
         probeSegment->Configure((int)field_0x18, 1, 1, 0);
         probeSegment->ignoreVegetation = 1;
-        GameObject::Method_0x00469190((GraphicsTest*)probeSegment, -1);
+        GameObject::AppendChild((GraphicsTest*)probeSegment, -1);
         memset(&points[0], 0, sizeof(Vec3));
         memset(&points[1], 0, sizeof(Vec3));
         points[0].y = 4.0f;
@@ -1999,8 +1999,8 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesIn(0, &axisZ, &axisY, 0, 1);
         KbMorphMod* morph = new(__FILE__, 0x891) KbMorphMod(1);
         morph->LoadParameterFile((void*)a1, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
-        GameObject::Method_0x00469190(morph, -1);
-        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444eb0(morph);
+        GameObject::AppendChild(morph, -1);
+        ((KbXform*)riderCharacter->c_0x1a0)->AddSecondModifier(morph);
     }
     UnknownVirtualSlot102(0.001f);
     return this;
