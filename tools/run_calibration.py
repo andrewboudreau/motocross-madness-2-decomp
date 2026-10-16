@@ -25608,10 +25608,10 @@ CASES = [
         'reason': 'varargs _vsnprintf into 0x200 bytes sent through the debug socket (right before trkgame.cpp\'s first function; ownership by position)',
     },
     {
-        'name': 'OrientationAxes.cpp 0x4b5d00 UnknownFunction4b5d00',
+        'name': 'OrientationAxes.cpp 0x4b5d00 OrientationAxesFromAngles',
         'bindings': 'samples/physics/helpers/OrientationAxes.bindings.json',
         'source': 'samples/physics/helpers/OrientationAxes.cpp',
-        'symbol': '?UnknownFunction4b5d00@@YAHPAUVector3@@0MMM@Z',
+        'symbol': '?OrientationAxesFromAngles@@YAHPAUVector3@@0MMM@Z',
         'target_va': '0x004b5d00',
         'target_size': 274,
         'reason': 'near miss (96.7%): forward/up axes from roll, pitch and yaw; VC6 schedules the `mov eax, 1` between the closing fstps instead of before the last faddp',

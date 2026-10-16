@@ -587,13 +587,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
         // orientation
         if (!g_kbInterpolate) {
-            UnknownFunction4b5d00(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
             s = states[1];
         } else {
-            UnknownFunction4b5d00(&bodyForward, &bodyUp, interpTarget->roll, interpTarget->pitch, interpTarget->yaw);
+            OrientationAxesFromAngles(&bodyForward, &bodyUp, interpTarget->roll, interpTarget->pitch, interpTarget->yaw);
             s = interpSource;
         }
-        UnknownFunction4b5d00(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
+        OrientationAxesFromAngles(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
                 if (g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold) {

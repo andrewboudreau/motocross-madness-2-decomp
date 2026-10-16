@@ -21,7 +21,7 @@
 // rolled about z (up only: forward is the axis), pitched about x and yawed
 // about y. SceneManager passes (heading, pitch, 0); KrustyBike passes a
 // racer's (roll, pitch, yaw). Returns 0 when either pointer is null.
-int UnknownFunction4b5d00(Vector3* forward, Vector3* up, float yaw, float pitch, float roll)
+int OrientationAxesFromAngles(Vector3* forward, Vector3* up, float yaw, float pitch, float roll)
 {
     if (!up || !forward) {
         return 0;
