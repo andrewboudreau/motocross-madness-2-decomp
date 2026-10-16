@@ -36,7 +36,7 @@
     "target_va": "0x004060c0",
     "target_size": 1678,
     "expect": "partial",
-    "notes": "slot 7: frame is 0x214 in retail vs 0x204; first divergence at insn 0 and the field_0x4a8 + field_0x1cc sum (0x570) load order; body 1580/1678 bytes [8.4% match under vc6_o2_ml]",
+    "notes": "slot 7: 1677/1678 strict; the only difference is the second contact loop's load, which addresses [eax + ecx] where retail has [ecx + eax] (Vehicle slot 7 gets retail's order from the same loop)",
     "bindings": "Bike.bindings.json"
   },
   {

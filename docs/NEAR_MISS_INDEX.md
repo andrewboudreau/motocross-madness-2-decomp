@@ -99,7 +99,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/soultree/SoulTreePhysics | `0x00501e90` | 164/483 | b | 20 code diffs: `jne @56` vs `jne @55 ; mov [esp + N], 0 ; mov edx, [~`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00502f60` | 1804/1930 | c | 0 code diffs: stack-slot packing of the integration temporary and merge outputs; 9 bytes longer |
 | krusty2/vehicle/Bike | `0x00405190` | 211/2874 | b | ratio 0.87: frame 0xa0 vs 0xac (0x3ea factor shares the l10 slot, f23c copied twice); other/ctx in ebp/edi swapped |
-| krusty2/vehicle/Bike | `0x004060c0` | 121/1436 (masked) | b | 63 code diffs: `mov edx, [esi + 0x4a8] ; mov eax, [esi ~` vs `mov eax, [esi + 0x4a8] ; mov ecx, [esi ~`; retail lacks `xor ecx, ecx`; frame 0x204 vs 0x214 |
+| krusty2/vehicle/Bike | `0x004060c0` | 1677/1678 | c | second contact loop loads `[eax + ecx]` where retail has `[ecx + eax]` |
 | krusty2/vehicle/Bike | `0x00406ae0` | 104/2396 | b | 118 code diffs: `push ecx` vs `push ebp ; mov ebp, esp ; sub esp, 8`; `jne @16 ; mov [esp + N], 0 ; jmp @20` vs `jne @18 ; mov [ebp - N], 0 ; jmp @22`; frame 0x0 vs 0x8 |
 | krusty2/vehicle/Bike | `0x004079c0` | 2080/6718 | b | spill homes of the loop values, the matched wheel kind kept in esi by retail, store scheduling of the local string tables and Vec3 constants (see PHYSICS_VALIDATION.md); 40/32-degree constants now 40*0.01745329f / 32*0.01745329f |
 | krusty2/vehicle/Bike | `0x00407440` | 188/485 | c | clamps are BikeMin(BikeMaxF(t,.25),.75) and BikeMaxF(BikeMin(a,32.2),-32.2), constants bound; left: retail's dead `cnt+=2` store, idx/next/step/cnt register roles swapped, 0.0310559 read from the 0x550790 copy (binding gives 0x550ad0) |

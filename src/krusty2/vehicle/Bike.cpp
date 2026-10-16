@@ -1438,82 +1438,86 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
 // Slot 7: distributes an applied force/direction over the tyre contacts.
 // Mode field_0x1d0: weights the active contact elements by distance.
 // Otherwise splits the force between front and rear wheel.
+static inline void BikeSteerToward(BikeA640* p, float target, float dt)
+{
+    float f = BikeMin(dt, p->l_0x4);
+    float r = f / p->l_0x4;
+    p->l_0x8 = r;
+    p->steerValue = (target - p->steerValue) * r + p->steerValue;
+}
+static inline float BikeWheelDistance(const Vec3& a, const Vec3& b)
+{
+    Vec3 d(a.x - b.x, a.y - b.y, a.z - b.z);
+    return BikeLength(BikeDot(&d, &d));
+}
+static inline float BikeContactDistance(const Vec3& a, const Vec3& b)
+{
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    return BikeLength((dy * dy + dx * dx) + dz * dz);
+}
+
 void Bike::UnknownVirtualSlot7(const Vec3* dir)
 {
+    float total;
+    float dist[128];
+    int i;
+    int active;
+
     contactTotal = touchingPointCount + wheelsInContact;
     if (pointsTouching) {
-        float dist[124];
-        float sum = 0.0f;
-        int active = 0;
-        int last = 0;
-        int i;
+        total = 0.0f;
+        active = 0;
+        int last;
         for (i = 0; i < collisionPointCount; i++) {
-            BikeElem* e = ((BikeElem**)collisionPoints)[i];
-            if (e->h_0xa4) {
-                Vec3 dv(centerOfMass.x - e->h_0x14.x, centerOfMass.y - e->h_0x14.y, centerOfMass.z - e->h_0x14.z);
-                float len = BikeLength(BikeDot(&dv, &dv));
-                dist[i] = len;
-                sum += len;
+            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
+            if (c->contactActive) {
+                dist[i] = BikeContactDistance(centerOfMass, c->contactPosition);
+                total += dist[i];
                 active++;
                 last = i;
             } else {
-                e->h_0xa0 = 0.0f;
-                e->h_0x44 = g_BikeVec3_005778a8;
+                c->blendWeight = 0.0f;
+                c->appliedShare = g_BikeVec3_005778a8;
             }
         }
         if (active == 1) {
-            ((BikeElem**)collisionPoints)[last]->h_0xa0 = 1.0f;
-            ((BikeElem**)collisionPoints)[last]->h_0x44 = *dir;
+            ((VehicleContact**)collisionPoints)[last]->blendWeight = 1.0f;
+            ((VehicleContact**)collisionPoints)[last]->appliedShare = *dir;
             return;
         }
         for (i = 0; active > 0; i++) {
-            BikeElem* e = ((BikeElem**)collisionPoints)[i];
-            if (e->h_0xa4) {
-                float w = 1.0f - dist[i] / sum;
-                e->h_0xa0 = w;
-                e->h_0x44 = Vec3(w * dir->x, w * dir->y, w * dir->z);
+            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
+            if (c->contactActive) {
+                float w = 1.0f - dist[i] / total;
+                c->blendWeight = w;
+                c->appliedShare = *dir * w;
                 active--;
             }
         }
         return;
     }
-    BikeA640* p = steerAxis;
     if (field_0x430) {
-        float f = stepTime;
-        if (!(f < p->l_0x4))
-            f = p->l_0x4;
-        float r = f / p->l_0x4;
-        p->l_0x8 = r;
-        p->steerValue = (0.5f - p->steerValue) * r + p->steerValue;
+        BikeSteerToward(steerAxis, 0.5f, stepTime);
         rearWheel->loadWeight = rearWheel->w_0x294;
-        rearWheel->appliedShare = Vec3(rearWheel->loadWeight * dir->x, rearWheel->loadWeight * dir->y, rearWheel->loadWeight * dir->z);
+        rearWheel->appliedShare = *dir * rearWheel->loadWeight;
         frontWheel->loadWeight = frontWheel->w_0x294;
-        frontWheel->appliedShare = Vec3(frontWheel->loadWeight * dir->x, frontWheel->loadWeight * dir->y, frontWheel->loadWeight * dir->z);
+        frontWheel->appliedShare = *dir * frontWheel->loadWeight;
         return;
     }
-    float target = controlInput.y * 0.25f + 0.5f;
     int mode = wheelsInContact;
-    {
-        float f = stepTime;
-        if (!(f < p->l_0x4))
-            f = p->l_0x4;
-        float r = f / p->l_0x4;
-        p->l_0x8 = r;
-        p->steerValue = (target - p->steerValue) * r + p->steerValue;
-    }
     if (mode > 1) {
-        // weight rear/front by distance from the centre position
-        Vec3 df(centerOfMass.x - frontWheel->wheelPosition.x, centerOfMass.y - frontWheel->wheelPosition.y, centerOfMass.z - frontWheel->wheelPosition.z);
-        float dfSq = BikeDot(&df, &df);
-        float lf = BikeLength(dfSq);
-        Vec3 dr(centerOfMass.x - rearWheel->wheelPosition.x, centerOfMass.y - rearWheel->wheelPosition.y, centerOfMass.z - rearWheel->wheelPosition.z);
-        float drSq = BikeDot(&dr, &dr);
-        float lr = BikeLength(drSq);
-        rearWheel->loadWeight = drSq / (lr + lf);
-        rearWheel->appliedShare = Vec3(rearWheel->loadWeight * dir->x, rearWheel->loadWeight * dir->y, rearWheel->loadWeight * dir->z);
+        BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
+        // weight rear/front by the opposite wheel's distance from the centre of mass
+        float lf = BikeWheelDistance(centerOfMass, frontWheel->wheelPosition);
+        float lr = BikeWheelDistance(centerOfMass, rearWheel->wheelPosition);
+        rearWheel->loadWeight = lf / (lr + lf);
+        rearWheel->appliedShare = *dir * rearWheel->loadWeight;
         frontWheel->loadWeight = 1.0f - rearWheel->loadWeight;
-        frontWheel->appliedShare = Vec3(frontWheel->loadWeight * dir->x, frontWheel->loadWeight * dir->y, frontWheel->loadWeight * dir->z);
+        frontWheel->appliedShare = *dir * frontWheel->loadWeight;
     } else if (mode == 1) {
+        BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
         if (frontWheel->inContact) {
             frontWheel->loadWeight = 1.0f;
             frontWheel->appliedShare = *dir;
@@ -1526,6 +1530,7 @@ void Bike::UnknownVirtualSlot7(const Vec3* dir)
             rearWheel->appliedShare = *dir;
         }
     } else {
+        BikeSteerToward(steerAxis, controlInput.y * 0.25f + 0.5f, stepTime);
         rearWheel->loadWeight = 0.0f;
         rearWheel->appliedShare = g_BikeVec3_005778a8;
         frontWheel->loadWeight = 0.0f;
