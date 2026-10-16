@@ -93,7 +93,7 @@
 //   Unlock and folds the Lock-failure return into `xor eax, eax`: retail
 //   never treats `opaque` as a known constant. Not kept (a goto for a
 //   partial gain).
-// 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
+// 0x004738a0 UIEditBox slot 40 (440/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
 //   the cursor into locals after the lead-byte test (retail loads both before

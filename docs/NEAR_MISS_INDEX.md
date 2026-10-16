@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 146, c 104, total 251. The three class (a) functions of the
+Counts: a 1, b 143, c 107, total 251. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -120,13 +120,13 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |
 | net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
-| net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
+| net/NetThread | `0x004afa90` | 740/1251 | b | two blocks: the 0x80 acknowledgement swaps edx and ax/dx, the 0x4b keep-alive caches data in esi across EnterCriticalSection in retail |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
 | physics/bikeai/BikeAI | `0x00415640` | 6063/6112 | b | schedule and frame size match (squared distance and k dot grouped `z + ((x) + y)`, start-up zero vectors cleared with a chained assignment so they store z-first like retail); the one-use temporaries above +0x100 sit in other slots; the retail extent includes one nop of padding (candidate 6111 bytes) |
 | physics/bikeai/BikeAI | `0x0040eca0` | 1288/17345 | b | both 0x40d200 calls now pass 0.05f as the sixth argument (retail 0x3d4ccccd); 3751/3966 normalised insns align; register/stack layout left |
 | physics/bikeai/BikeAI | `0x00413200` | 2026/4112 | b | KrustyBike member: frame 0x74 and most slots exact; first three locals at other offsets (`a` needs disp32); operand order of the second lever cross product; ground-branch lean clamp keeps the value on the FPU stack; smoother target kept in a register |
 | physics/bikeai/BikeAI | `0x00414370` | 394/4678 | b | KrustyBike member: frame 0x74 vs 0x78 (retail spills the difficulty, candidate keeps it in edi); kind 1/5 gate-distance test placed after the single-point and no-track paths |
-| physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 447/1627 | b | 1 code diffs: retail lacks `mov edx, [eax + 0x27c] ; mov eax, [eax ~`; slots differ |
+| physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 1622/1627 | c | retail reloads numCorners before remap; the remap pass reads `keep[corners[k]]` as `[offset + keep]` where retail has `[keep + offset]` |
 | physics/bvh/BoundingBoxTreeQuery | `0x00425900` | 718/4237 | b | first draft: inline budget differs from the fifth normalisation on; radius sums accumulated in another x87 order |
 | physics/bvh/BoundingBoxTreeQuery | `0x00426be0` | 1673/2572 | b | cross products match; min/max of the projections (retail keeps p2 on the x87 stack and stores p1 twice), one operand pair of a vertex transform and the frame (0x160 vs 0x164) |
 | physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 349/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
@@ -184,8 +184,8 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | race/CarProcedural | `0x0042fd80` | 221/2844 | b | slot 10: frame 0xd0 vs 0xdc (retail shares the wheel loop's axisA with the orientation's `flat`, axisB with nothing), the steering clamp's memory local, component/scalar load order in the `back` normalisation and blend; masked, 781 instructions like retail's |
 | race/CarProcedural | `0x00430b10` | 299/843 | b | 45 code diffs: retail adds `mov esi, ecx`; `mov edi, ecx ; mov esi, [edi + 0x6c] ; ~` vs `mov edi, [esi + 0x6c] ; mov ebp, [esi +~`; slots differ |
 | race/Krusty3DObjects | `0x0048b100` | 166/2808 | b | the field-of-view conversion keeps retail's two multiplies (0.5 then 0.01745329) through a parenthesised macro; third camera column copied by integer moves in retail (two components kept on the x87 stack here); retail keeps 0 in edi and gives early returns their own epilogues |
-| race/Krusty3DObjects | `0x0048ccc0` | 47/1308 | b | 3 code diffs: `je @349` vs `je A`; `jne @349` vs `jne A`; slots differ |
-| race/RaceSound | `0x004e4d10` | 563/2038 | c | 10 code diffs: `je @599` vs `je A`; `jne @280` vs `jne A` |
+| race/Krusty3DObjects | `0x0048ccc0` | 1299/1308 | c | retail loads the camera (`mov edx, [esi + 0x38]`) before storing the length to field_0x1ec |
+| race/RaceSound | `0x004e4d10` | 806/2038 | c | two blocks: retail reloads the remainder for the first half's `field_0x18 = rest` (cross-jumped); the second half's looping path keeps half in ebp and the remainder in edx |
 | race/RaceStatus | `0x004e5d00` | 168/519 | c | 29 code diffs: retail adds `mov ebp, [esp + N]`; retail adds `test ebp, ebp` |
 | race/Recorder | `0x004e6f80` | 652/2180 | c | case 1 `goto opened` reproduces retail's jmp into case 2's tail; left: case 2's `[0xc8]=1; Leave` suffix still cross-jumps into case 4 (retail keeps it), and `name`/`headerSize` slots swap (0x08/0x10); real extent 2148 |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
@@ -225,13 +225,13 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/MatrixUtil | `0x004a1a50` | 171/175 | c | 1 code diffs: `fld [ecx + 4] ; fmul [eax + 0x28]` vs `fld [eax + 0x28] ; fmul [ecx + 4]` ; operator()/operator[] accessors give no gain either |
 | render/MorphBastardModifier | `0x004a33b0` | 1938/2046 | b | spill homes of the loop scalars and the two inverse temporaries; operand order inside the channel inverse's products |
 | render/MorphBastardModifier | `0x004a3c80` | 74/3663 | b | 4 code diffs: `push ebp` vs `mov ebx, [esp + N]`; `mov ecx, [esp + N]` vs `mov ecx, [ebx + 0x44]`; frame 0x1b4 vs 0x1fc |
-| render/MorphBastardModifier | `0x004a4c60` | 107/1570 | c | 19 code diffs: retail lacks `xor edi, edi ; test eax, eax ; mov [esp~`; retail adds `cmp eax, esi` |
+| render/MorphBastardModifier | `0x004a4c60` | 185/1570 | c | object/channel loop registers: retail keeps the object offset in esi, reloads the index from +0x28 and keeps the channel in ebp |
 | render/Overlay | `0x004b6710` | 53/365 | b | 23 code diffs: retail adds `mov eax, [esp + N]`; `mov esi, [esp + N]` vs `mov ebx, [eax] ; mov edx, [eax + 4]`; slots differ |
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
 | render/PCTextureMap | `0x004c7b40` | 247/767 | b | 35 code diffs: retail lacks `mov edi, [eax]`; slots differ |
 | render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
-| render/PCVideoCard | `0x004ca5a0` | 50/490 | c | 15 code diffs: retail adds `push ebp ; mov ebp, [esp + N]`; retail lacks `mov [eax], ebx ; mov eax, [esp + N]` |
+| render/PCVideoCard | `0x004ca5a0` | 66/490 | c | retail keeps `target` in ebp outside the mode loop and 480 in ebp inside it; VC6 here never pushes ebp |
 | render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
 | render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
@@ -243,10 +243,10 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/TextService | `0x0050b080` | 477/890 | b | 34 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
 | render/TextService | `0x0050b400` | 354/758 | b | 33 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
 | render/TextService | `0x0050b700` | 354/758 | b | 33 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
-| render/TextService | `0x0050ba00` | 671/802 | b | 10 code diffs: `jbe @192` vs `jbe A`; `je @185` vs `je A`; slots differ |
+| render/TextService | `0x0050ba00` | 770/802 | b | scheduling of the v3.sx and v5.sx stores |
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
-| track/SceneManager | `0x004ecd60` | 2047/4536 | b | 11 code diffs: `je @1189` vs `je A`; `je @1189` vs `je A`; slots differ |
-| track/SceneManager | `0x004edfe0` | 3468/5346 | b | 34 code diffs: `je @1459` vs `je A`; `je @1459` vs `je A`; slot order differs |
+| track/SceneManager | `0x004ecd60` | 4534/4536 | c | the name terminator adds the count before the element offset (`add edx, esi`; retail `add edx, ebx`) |
+| track/SceneManager | `0x004edfe0` | 4372/5346 | b | scalar frame slots, the NumberOfMotions count kept in a register, one shared `Cannot find %s` sprintf tail where retail keeps two, random-set loop-end load order |
 | track/Track | `0x00515ed0` | 117/2400 (masked) | b | draft: frame 0x64 vs retail 0x48 and retail keeps `this` in ebp, so every frame offset differs; dispatch, calls and arithmetic follow retail |
 | track/Track | `0x00516ef0` | 1032/1042 | c | edge 6 of the crossing test computes `b.z - a.z` before `p.x - a.x` in retail; edge 2 matches with the helper's first factor written `((b->x - a->x))` ; retail orders edges 2, 5, 6 one way and 1, 3, 4 the other; ~5,500 parenthesis/cast/struct/local forms give 1032 at best |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
@@ -271,7 +271,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | ui/GameUi | `0x004705d0` | 91/101 | c | 5 code diffs: `mov edx, [esi + 0xcc]` vs `mov ecx, [esi + 0xcc] ; push ecx`; retail lacks `push edx` |
 | ui/GameUi | `0x004733a0` | 85/99 | c | 4 code diffs: `mov ecx, [esi + 0xcc] ; push ecx` vs `mov eax, [esi + 0xcc]`; retail adds `push eax` |
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
-| ui/GameUi | `0x004738a0` | 206/975 | b | 53 code diffs: `mov edi, [esi + 0x1bc] ; mov ebx, eax` vs `mov ecx, [esi + 0x1bc] ; lea ebx, [esi ~`; retail lacks `lea ebp, [esi + 0x1bc]`; frame 0x38 vs 0x40 |
+| ui/GameUi | `0x004738a0` | 440/975 | b | retail keeps the width and the redraw count in memory |
 | ui/GameUi | `0x00474150` | 1018/1044 | c | Backspace: retail gives the cursor eax, VC6 here edx; one local (1004 length / 351 cursor), no locals (339), call as condition and swapped decrements (1002) are worse |
 | ui/GameUi | `0x00477e90` | 322/342 | c | register choice after the row-height call: `mov edx, [esp + N] ; mov ecx, [ebx]` vs `mov ecx, [esp + N] ; mov edx, [ebx + 4]` (rect.top/point register choice) ; without the height local (as in the exact slot 10 at 0x476020) only ebx/ebp are swapped (155/344) |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
