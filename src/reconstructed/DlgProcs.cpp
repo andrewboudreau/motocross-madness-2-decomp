@@ -90,10 +90,10 @@ static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* g
 
 // 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
 int g_UnknownGlobal59adbc;
-int g_UnknownGlobal59adfc;
-int g_UnknownGlobal59ae84;
+int g_LoadingTimerTicks;
+int g_LoadingEventLoaded;
 int g_UnknownGlobal59ae88;
-int g_UnknownGlobal59ae00;
+int g_IntroSkipped;
 
 // 0x00569e14: the characters a profile name may use.
 static const char kProfileNameCharacters[] =
@@ -1309,15 +1309,15 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogTimer:
         if (g_TrackGame->network) {
-            if (g_UnknownGlobal59adfc >= 10) {
+            if (g_LoadingTimerTicks >= 10) {
                 g_TrackGame->mode.field_0x6a4 = 0;
                 event->dialog->EndDialog(0);
                 event->handled = 1;
-                g_TrackGame->eventManager->UnknownFunction45d270();
+                g_TrackGame->eventManager->EnableRaceObjects();
             }
-            g_UnknownGlobal59adfc++;
+            g_LoadingTimerTicks++;
         } else {
-            if (g_UnknownGlobal59adfc >= 10) {
+            if (g_LoadingTimerTicks >= 10) {
                 event->dialog->EndDialog(0);
                 event->handled = 1;
                 g_TrackGame->StopCDAudio();
@@ -1327,9 +1327,9 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                     g_TrackGame->quarryEvent->ResetClock();
                 if (g_TrackGame->tagEvent)
                     g_TrackGame->tagEvent->ResetClock();
-                g_TrackGame->eventManager->UnknownFunction45d270();
+                g_TrackGame->eventManager->EnableRaceObjects();
             }
-            g_UnknownGlobal59adfc++;
+            g_LoadingTimerTicks++;
         }
         break;
     case kDialogClose:
@@ -1349,13 +1349,13 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
         area->Show(0, 1);
         g_TrackGame->ui->progressDialog = (UnknownGameUiPage*)this;
         g_TrackGame->ui->HideCursors();
-        g_UnknownGlobal59ae84 = 0;
+        g_LoadingEventLoaded = 0;
         g_TrackGame->mode.SaveProfile();
         if (g_TrackGame->network)
             g_TrackGame->network->StartKeepAlive(
                 g_TrackGame->eventManager->keepAliveTimeout,
                 g_TrackGame->eventManager->keepAliveInterval);
-        g_UnknownGlobal59adfc = 0;
+        g_LoadingTimerTicks = 0;
         g_UnknownGlobal59ae88 = 0;
         framesShown = 0;
         break;
@@ -1365,7 +1365,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
 
 // 0x00451270
 int LoadingDlg::Tick(float frameTime) {
-    if (framesShown == 2 && !g_UnknownGlobal59ae84) {
+    if (framesShown == 2 && !g_LoadingEventLoaded) {
         if (!g_TrackGame->eventManager->LoadEvent()) {
             EndDialog(0);
             if (g_TrackGame->network) {
@@ -1383,7 +1383,7 @@ int LoadingDlg::Tick(float frameTime) {
             for (int i = 0; i < g_TrackGame->mode.racerCount; i++)
                 g_TrackGame->mode.racers[i].ClearLeft();
         }
-        g_UnknownGlobal59ae84 = 1;
+        g_LoadingEventLoaded = 1;
         AddTimer(0, 100, 0);
     }
     framesShown++;
@@ -1694,7 +1694,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     switch (menu) {
     case 0xc9:
         event->dialog->UpdateBoundValues(1);
-        *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
+        *UnknownGameSettingsOf(g_TrackGame) = g_EditedGameSettings;
         g_TrackGame->ui->gui->uiAnimations = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
@@ -1702,7 +1702,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
         break;
     case 0xca:
         event->dialog->UpdateBoundValues(1);
-        *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
+        *UnknownSoundSettingsOf(g_TrackGame) = g_EditedSoundSettings;
         g_TrackGame->MuteSound();
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
@@ -1711,8 +1711,8 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     case 0xcb: {
         event->dialog->UpdateBoundValues(1);
         UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
-        g_UnknownGlobal6887d8.resolutionRow = modes->GetRowData(-1);
-        *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
+        g_EditedGraphicsSettings.resolutionRow = modes->GetRowData(-1);
+        *UnknownGraphicsSettingsOf(g_TrackGame) = g_EditedGraphicsSettings;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;
@@ -1733,7 +1733,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     case kMenuSerialPopup: {
         UnknownComPortAddress serial;
         memset(&serial, 0, sizeof(serial));
-        UnknownFunction4ae410(&g_SerialSettings, &serial);
+        BuildComPortAddress(&g_SerialSettings, &serial);
         if (g_TrackGame->network->CreateAddress(DPSPGUID_SERIAL, "", "", &serial, &address,
                                                                     &size)) {
             if (g_TrackGame->network->InitializeConnection(address, size, 8)) {
@@ -1912,7 +1912,7 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         g_TrackGame->ui->gui->ShowCursors(0);
         framesShown = 0;
-        g_UnknownGlobal59ae00 = !g_TrackGame->mode.introMovieOn;
+        g_IntroSkipped = !g_TrackGame->mode.introMovieOn;
         break;
     }
 }
@@ -1928,7 +1928,7 @@ int Intro1Dlg::Tick(float frameTime) {
 
 // 0x00453420
 int Intro1Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    return g_UnknownGlobal59ae00 = 1;
+    return g_IntroSkipped = 1;
 }
 
 // 0x00453430
@@ -1936,7 +1936,7 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
-            if (!g_UnknownGlobal59ae00) {
+            if (!g_IntroSkipped) {
                 Intro3Dlg* dialog = new(__FILE__, 4256) Intro3Dlg;
                 g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
             } else {
@@ -1960,7 +1960,7 @@ int Intro2Dlg::Tick(float frameTime) {
         g_TrackGame->ui->BuildGarageScene(2);
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
-    if ((g_UnknownGlobal59ae00 || secondsShown > 3.0f) && framesShown >= 3)
+    if ((g_IntroSkipped || secondsShown > 3.0f) && framesShown >= 3)
         EndDialog(0);
     return UIDialog::Tick(frameTime);
 }
@@ -1968,7 +1968,7 @@ int Intro2Dlg::Tick(float frameTime) {
 // 0x004535f0
 int Intro2Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1)
-        g_UnknownGlobal59ae00 = 1;
+        g_IntroSkipped = 1;
     return 1;
 }
 
@@ -1993,7 +1993,7 @@ void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
 int Intro3Dlg::Tick(float frameTime) {
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
-    if (g_UnknownGlobal59ae00 || secondsShown > 3.0f)
+    if (g_IntroSkipped || secondsShown > 3.0f)
         EndDialog(0);
     return UIDialog::Tick(frameTime);
 }
@@ -2001,7 +2001,7 @@ int Intro3Dlg::Tick(float frameTime) {
 // 0x004536c0
 int Intro3Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1)
-        g_UnknownGlobal59ae00 = 1;
+        g_IntroSkipped = 1;
     return 1;
 }
 

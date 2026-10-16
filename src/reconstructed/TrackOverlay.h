@@ -181,7 +181,7 @@ public:
     // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
     // 0x004de4a3 passes the visual cue index).
     void UnknownFunction464e80(int index);
-    int UnknownFunction519880(int value);     // 0x00519880
+    int SetStatsSource(int value);     // 0x00519880
     int Redraw();                             // 0x005198a0
     int DrawStandings();              // 0x00519a20
     void DrawTimeLeft();                      // 0x00519e10
@@ -192,7 +192,7 @@ public:
 
     void* largeFont;                          // +0x11c 16-high font, rows 0-1 (0x005194b0; DeleteObject)
     void* smallFont;                          // +0x120 12-high font, the other rows (DeleteObject)
-    UnknownStatsSource* statsSource;          // set by 0x00519880; read when TrackGame+0x3428 is set
+    UnknownStatsSource* statsSource;          // SetStatsSource (0x00519880); read when TrackGame+0x3428 is set
     UnknownInstrumentSource* instrumentSource;
     float timeSinceRedraw;                    // seconds since the last redraw
     UnknownTrackOverlayRect rowRects[8];

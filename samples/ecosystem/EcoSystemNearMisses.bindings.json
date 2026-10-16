@@ -191,7 +191,7 @@
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TypeRegistry@@3PAVTypeRegistry@@A": "0x00575744",
   "?g_TrackGame@@3PAVUnknownEcoTrackGame@@A": "0x0056e26c",
-  "?g_UnknownGlobal59aebc@@3PAVEcoSystem@@A": "0x0059aebc",
+  "?g_EcoSystem@@3PAVEcoSystem@@A": "0x0059aebc",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?g_collisionQuadTree@@3PAVUnknownEcoQuadTree@@A": "0x0068aba4",
   "?g_visibilityClipper@@3PAVUnknownEcoVisibilityClipper@@A": "0x00575a98",

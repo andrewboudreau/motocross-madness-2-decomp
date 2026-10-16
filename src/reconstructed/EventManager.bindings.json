@@ -64,7 +64,7 @@
   "?CompareUnsigned@@YAHPBX0@Z": "0x0045fbb0",
   "?RemovePlayer@EventManager@@QAEXH@Z": "0x0045fbd0",
   "?RemoveVegetationInRect@EventManager@@QAEXMMMM@Z": "0x0045fce0",
-  "?UnknownFunction45fdc0@EventManager@@QAEXMMMM@Z": "0x0045fdc0",
+  "?DisableCollisionObjectsInRect@EventManager@@QAEXMMMM@Z": "0x0045fdc0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Unlink@GameObject@@QAEHXZ": "0x004691f0",
   "?FindControl@UnknownGameUiPage@@QAEPAVUIControl@@PBDH@Z": "0x0046ebf0",

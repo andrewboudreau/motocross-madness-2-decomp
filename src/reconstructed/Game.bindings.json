@@ -69,7 +69,7 @@
   "?ReadClock@@YAIXZ": "0x004bfa80",
   "?Peak@UnknownPeakHold@@QAEHXZ": "0x004cb690",
   "?Record@UnknownPeakHold@@QAEXH@Z": "0x004cb6b0",
-  "?UnknownFunction52d0d0@@YAXXZ": "0x0052d0d0",
+  "?DeleteDisplays@@YAXXZ": "0x0052d0d0",
   "?CreateNetworkInterface@Game@@UAEHH@Z$ehhandler": "0x0054ad27",
   "?Initialize@Game@@UAEHXZ$ehhandler": "0x0054ac77",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",

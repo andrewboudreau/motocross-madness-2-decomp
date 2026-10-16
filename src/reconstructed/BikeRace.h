@@ -99,11 +99,12 @@ public:
     void SaveRecording(float length, char* description, int flag);
     // 0x0049c070: describes a racer of the recording: its network id, AI
     // index (a char), record slot, name, model files, bike and rider names,
-    // engine size and kind and plate number. 0x0049c1e0 reads one back.
+    // engine size and kind and plate number. GetRacer (0x0049c1e0) copies
+    // record `index`'s fields back out.
     void SetRacer(int id, char ai, int slot, char* name, char* model,
                                char* rider, char* bikeName, char* riderName, int engineSize,
                                int engineKind, int value);
-    void UnknownFunction49c1e0(int* slot, char* ai, int a, char* name, char* model, char* rider,
+    void GetRacer(int* id, char* ai, int index, char* name, char* model, char* rider,
                                char* bikeName, char* riderName, int* engineSize, int* engineKind,
                                int* value);
 
@@ -1009,12 +1010,6 @@ public:
     unsigned char isRecording;                // recording (0x00420650)
     unsigned char drawChildren;               // +0x3fd 1 by the constructor, toggled by control 6 (slot 22): slot 14 runs GameObject's draw only when set
 };
-
-// The global at 0x00689f18 (D3DIMSoultreeModifier.cpp's code reads it):
-// 0x00423790 points it at one of two tables, by Game+0x2d0.
-extern unsigned char* g_UnknownGlobal689f18;
-extern unsigned char g_UnknownGlobal5744c8[];
-extern unsigned char g_UnknownGlobal574428[];
 
 // 0x00417b00: the debug picker's hit callback (slot 23 passes it to
 // 0x004b0210); stores what was hit in the current race's picker.

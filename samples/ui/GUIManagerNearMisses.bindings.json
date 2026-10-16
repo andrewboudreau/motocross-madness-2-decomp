@@ -125,7 +125,7 @@
   "?MarkRegionPending@BackgroundImage@@QAEXH@Z": "0x00404cb0",
   "?MarkAllDirty@BackgroundImage@@QAEXXZ": "0x00404da0",
   "?Unbind@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
-  "?UnknownFunction43ce90@ControlInterface@@QAEHXZ": "0x0043ce90",
+  "?NextBindingId@ControlInterface@@QAEHXZ": "0x0043ce90",
   "?CreateBound@GameCursor@@QAEPAVGameObject@@PAXPAUUnknownControlBinding@@1PBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043ea70",
   "?Create@GameCursor@@QAEPAVGameObject@@PAXPBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043eaf0",
   "?Print@DebugOverlay@@QAAXHPBDZZ": "0x00447f40",

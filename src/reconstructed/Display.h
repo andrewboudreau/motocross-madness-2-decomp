@@ -90,7 +90,8 @@ struct UnknownDisplay : public VideoCard {
     unsigned char field_0xb74_bits : 4;
 };
 
-// 0x0068a754 / 0x0068a764: the enumerated displays (PCGame 0x004c16b0
-// profiles each one).
-extern UnknownDisplay* g_UnknownDisplays68a754[4];
-extern int g_UnknownDisplayCount68a764;
+// 0x0068a754 / 0x0068a764: the displays EnumerateDisplays (0x004c9600)
+// collects, at most 4 (PCGame 0x004c16b0 profiles each one; DeleteDisplays
+// 0x0052d0d0 frees them).
+extern UnknownDisplay* g_Displays[4];
+extern int g_DisplayCount;

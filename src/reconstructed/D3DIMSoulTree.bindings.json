@@ -135,7 +135,7 @@
   "?UnknownVirtualSlot9@D3DIMSoultreeObject@@UAEPAVGameObject@@PAXPBDHHH@Z$ehhandler": "0x0054a07a",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
-  "?g_UnknownSoultreeLodSettings689f18@@3PAUUnknownSoultreeLodSetting@@A": "0x00689f18",
+  "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18",
   "_$E1": "0x00442e10",
   "_$E10": "0x00442f00",
   "_$E11": "0x00442ef0",

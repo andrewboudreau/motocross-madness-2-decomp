@@ -160,7 +160,9 @@ public:
     TrackGameViewOwner* FindRaceMode();            // 0x0045d2b0
     UnknownKrustyBikeView* FindRaceView();         // 0x0045d2f0
     TextQueueOverlay* FindTextQueue();             // 0x0045d340
-    void UnknownFunction45d270();                  // 0x0045d270: slot 5 on all three
+    // 0x0045d270: Enable() on all three; LoadingDlg's timer (0x00451020)
+    // calls it as it ends the loading dialog.
+    void EnableRaceObjects();
     int HasRaceMode();                   // 0x0045d390: whether any mode is present
     void ResetEntries();                  // 0x0045e520: resets the entries
     // 0x0045e550: once every remote racer is ready, ends the network wait.
@@ -184,9 +186,9 @@ public:
     // 0x0045fce0: removes every Vegetation in the rectangle from the
     // collision quadtree (up to 1000).
     void RemoveVegetationInRect(float x0, float z0, float x1, float z1);  // 0x0045fce0
-    // 0x0045fdc0: calls GameObject slot 4 on every CollisionObject in the
-    // rectangle.
-    void UnknownFunction45fdc0(float x0, float z0, float x1, float z1);
+    // 0x0045fdc0: Disable() (GameObject slot 4) on every CollisionObject in
+    // the rectangle of the collision quadtree.
+    void DisableCollisionObjectsInRect(float x0, float z0, float x1, float z1);
 
     // Passed to NetworkInterface 0x004ac8d0 (+0x7c, +0x80). Its keep-alive
     // thread 0x004af6a0 drops a player not heard from for +0x7c seconds and

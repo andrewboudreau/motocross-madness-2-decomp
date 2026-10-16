@@ -185,8 +185,8 @@ int PCGame::StartUp(char* message) {
     }
     if (!EnumerateDisplays(windowHandle))
         return 0;
-    for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
-        g_UnknownDisplays68a754[i]->SetWindowedCooperativeLevel(0, 0, 0, 0);
+    for (int i = 0; i < g_DisplayCount; i++)
+        g_Displays[i]->SetWindowedCooperativeLevel(0, 0, 0, 0);
     displayProfilesStale = IsAnyProfileStale();
     if (displayProfilesStale) {
         if (LoadStringA(resourceInstance, 0x13d8, text, sizeof(text))) {
@@ -200,7 +200,7 @@ int PCGame::StartUp(char* message) {
         ProfileEveryDisplay();
     }
     ProfileDisplays();
-    display = g_UnknownDisplays68a754[0];
+    display = g_Displays[0];
     int flag = useZBuffer && !field_0x544;
     int useLast = GetRegistryFlag("UseLastVideoCard", 0);
     display = ChooseDisplay(flag, useLast, &bladeRenderer);
@@ -549,26 +549,26 @@ int PCGame::SaveDisplayProfile(UnknownDisplay* display) {
 // 0x004c1410: whether any display lacks a current profile (version 7 with
 // an identical saved identifier).
 int PCGame::IsAnyProfileStale() {
-    for (int i = 0; i < g_UnknownDisplayCount68a764; i++) {
+    for (int i = 0; i < g_DisplayCount; i++) {
         char name[256];
         UnknownDeviceIdentifier saved;
         unsigned long size = sizeof(saved);
-        sprintf(name, "DriverInfo\\%s\\ProfileVersion", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\ProfileVersion", g_Displays[i]->driverGuidText);
         if (GetRegistryInt(name, 0) != 7)
             return 1;
-        sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", g_Displays[i]->driverGuidText);
         if (!GetRegistryBinary(name, &saved, &size) || size != sizeof(saved) ||
-            strcmp(g_UnknownDisplays68a754[i]->deviceIdentifier.driver, saved.driver) ||
-            strcmp(g_UnknownDisplays68a754[i]->deviceIdentifier.description, saved.description) ||
-            memcmp(g_UnknownDisplays68a754[i]->deviceIdentifier.driverVersion, saved.driverVersion,
+            strcmp(g_Displays[i]->deviceIdentifier.driver, saved.driver) ||
+            strcmp(g_Displays[i]->deviceIdentifier.description, saved.description) ||
+            memcmp(g_Displays[i]->deviceIdentifier.driverVersion, saved.driverVersion,
                    sizeof(saved.driverVersion)) ||
-            g_UnknownDisplays68a754[i]->deviceIdentifier.vendorId != saved.vendorId ||
-            g_UnknownDisplays68a754[i]->deviceIdentifier.deviceId != saved.deviceId ||
-            g_UnknownDisplays68a754[i]->deviceIdentifier.subSysId != saved.subSysId ||
-            g_UnknownDisplays68a754[i]->deviceIdentifier.revision != saved.revision ||
-            memcmp(g_UnknownDisplays68a754[i]->deviceIdentifier.deviceGuid, saved.deviceGuid,
+            g_Displays[i]->deviceIdentifier.vendorId != saved.vendorId ||
+            g_Displays[i]->deviceIdentifier.deviceId != saved.deviceId ||
+            g_Displays[i]->deviceIdentifier.subSysId != saved.subSysId ||
+            g_Displays[i]->deviceIdentifier.revision != saved.revision ||
+            memcmp(g_Displays[i]->deviceIdentifier.deviceGuid, saved.deviceGuid,
                    sizeof(saved.deviceGuid)) ||
-            g_UnknownDisplays68a754[i]->deviceIdentifier.whqlLevel != saved.whqlLevel)
+            g_Displays[i]->deviceIdentifier.whqlLevel != saved.whqlLevel)
             return 1;
     }
     return 0;
@@ -576,8 +576,8 @@ int PCGame::IsAnyProfileStale() {
 
 // 0x004c16b0
 int PCGame::ProfileEveryDisplay() {
-    for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
-        SaveDisplayProfile(g_UnknownDisplays68a754[i]);
+    for (int i = 0; i < g_DisplayCount; i++)
+        SaveDisplayProfile(g_Displays[i]);
     return 1;
 }
 

@@ -46,7 +46,7 @@ void SaveImeStatus();
 void RestoreImeStatus();
 
 // 0x004c9600: enumerates the DirectDraw devices for `window` into
-// g_UnknownDisplays68a754; returns their count.
+// g_Displays; returns their count.
 int EnumerateDisplays(void* window);
 
 // 0x004ca9f0: copies the target's surface into the texture; 0 on failure.

@@ -389,7 +389,7 @@ int EventManager::CreatePodiumScene() {
     float z0 = podiumPosition.z - 16.0f;
     float z1 = z0 + 32.0f;
     RemoveVegetationInRect(x0, z0, x1, z1);
-    UnknownFunction45fdc0(x0, z0, x1, z1);
+    DisableCollisionObjectsInRect(x0, z0, x1, z1);
     resumeArmed = 0;
     g_TrackGame->ResetClock();
     return 1;

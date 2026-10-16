@@ -6,6 +6,7 @@
 #include "GameObject.h"
 #include "MatrixUtil.h"
 #include "Parameterblocks.h"
+#include "SoultreeLodSettings.h"
 #include "TrackGame.h"
 
 class LightEmitter;
@@ -360,11 +361,6 @@ public:
     char scenePath[0x104];
 };
 
-// The detail-level table 0x004eff30 selects by Game+0x2d0 (declared alike
-// in BikeRace.h).
-extern unsigned char* g_UnknownGlobal689f18;
-extern unsigned char g_UnknownGlobal5744c8[];
-extern unsigned char g_UnknownGlobal574428[];
 
 // 0x004f0310: registers texture `name` with `manager` (see the definition).
 int AddResource(UnknownResourceManager* manager, const char* name, const char* path);

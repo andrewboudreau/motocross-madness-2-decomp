@@ -81,15 +81,19 @@ struct UnknownOptGarageSettings {             // 0x5c bytes (TrackGame+0x1550)
     int bandStep;                             // +0x58: band step
 };
 
-// 0x00688898, 0x00688798, 0x006887d8, 0x00688868, 0x00688808 and
-// 0x00688c10. The first is also read at 0x00452980, the second and third
-// from dlgprocs.cpp's code.
-extern UnknownOptGameSettings g_UnknownGlobal688898;
-extern UnknownOptSoundSettings g_UnknownGlobal688798;
-extern UnknownOptGraphicsSettings g_UnknownGlobal6887d8;
-extern UnknownOptControlSettings g_UnknownGlobal688868;
-extern UnknownOptGarageSettings g_UnknownGlobal688808;
-extern char g_UnknownGlobal688c10[10][128]; // Message0..9 (TrackGame+0x19d4)
+// The copies the options dialogs edit: OptionsDlg's init (0x004b4280)
+// copies TrackGame's garage, game, sound, graphics and control settings and
+// its Message0..9 texts into them, its close copies them back, and the pages
+// bind their controls to them. 0x00688898 (game), 0x00688798 (sound),
+// 0x006887d8 (graphics), 0x00688868 (controls), 0x00688808 (garage) and
+// 0x00688c10 (messages). HandleMenuOk (0x00452930) also commits the game,
+// sound and graphics copies when their page's OK is pressed.
+extern UnknownOptGameSettings g_EditedGameSettings;
+extern UnknownOptSoundSettings g_EditedSoundSettings;
+extern UnknownOptGraphicsSettings g_EditedGraphicsSettings;
+extern UnknownOptControlSettings g_EditedControlSettings;
+extern UnknownOptGarageSettings g_EditedGarageSettings;
+extern char g_EditedMessages[10][128]; // Message0..9 (TrackGame+0x19d4)
 
 // 0x0056cb6c: the engine sizes (cc) of the five bike classes (initialised
 // data shared with other files; read by the inline class lookup below).

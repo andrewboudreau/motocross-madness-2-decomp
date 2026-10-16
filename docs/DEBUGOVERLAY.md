@@ -26,7 +26,7 @@ overridden slots 0, 14 and 25 lie in this range. The overlay holds pages of
 (+0x26d0) that `0x00447a00` builds with GDI. Exact: 12 functions,
 including the 748-byte text drawer `0x00448200` and slot 14.
 
-`0x00447910` stores the window handle (the CreateWindowExA result, caller
+`StoreMainWindow` (`0x00447910`) stores the window handle (the CreateWindowExA result, caller
 `0x004a0d30`) in `0x0059ada4`. It is placed here by adjacency only (tier
 3): Shadow's `$E` pairs end the previous unit, and its global follows
 Shadow's data.

@@ -943,11 +943,11 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                             align = _stricmp(buffer, "BOTTOM") ? 0x10 : 0x20;
                         parameters.GetString("DlgAlignH", "CENTER", buffer, -1);
                         if (!_stricmp(buffer, "RIGHT"))
-                            UnknownFunction46ffc0(align | 4);
+                            SetPopupAlignment(align | 4);
                         else if (!_stricmp(buffer, "LEFT"))
-                            UnknownFunction46ffc0(align | 1);
+                            SetPopupAlignment(align | 1);
                         else
-                            UnknownFunction46ffc0(align | 2);
+                            SetPopupAlignment(align | 2);
                     } else {
                         popupAlignment = 9;
                     }

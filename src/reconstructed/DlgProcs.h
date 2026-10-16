@@ -166,9 +166,11 @@ public:
     UIVideoStatic* movieControl;              // +0x7f58: the credits movie
 };
 
-// 0x0059ae00: set when the player skips the intro (or the intro movie is
-// turned off).
-extern int g_UnknownGlobal59ae00;
+// 0x0059ae00: set when the player skips the intro (any control press in
+// Intro1Dlg, or in Intro2Dlg/Intro3Dlg once they ran a frame); Intro1Dlg's
+// init sets it when the intro movie is turned off. Intro2Dlg then goes to the
+// main menu instead of Intro3Dlg, and both end before their 3 seconds.
+extern int g_IntroSkipped;
 
 // RTTI: Intro2Dlg : UIDialog (vtable 0x00552260; 0x7f64 bytes).
 class Intro2Dlg : public UIDialog {
@@ -224,10 +226,13 @@ public:
     int GetCurrentTexture();              // 0x00472f90: the current frame's texture
 };
 
-// 0x0059adfc: frames the loading dialog has waited; 0x0059ae84: set once
-// the race is loaded; 0x0059ae88: cleared with them.
-extern int g_UnknownGlobal59adfc;
-extern int g_UnknownGlobal59ae84;
+// 0x0059adfc: the loading dialog's timer events since EventManager::LoadEvent
+// succeeded (Tick then adds the timer, AddTimer(0, 100, 0); the dialog
+// ends at 10);
+// 0x0059ae84: set once LoadEvent succeeded (Tick loads on its third frame
+// while clear); 0x0059ae88: only cleared with them (no other reference).
+extern int g_LoadingTimerTicks;
+extern int g_LoadingEventLoaded;
 extern int g_UnknownGlobal59ae88;
 
 // The 8-byte message 0xcc a network player sends when its race fails to
@@ -275,8 +280,8 @@ public:
 };
 
 // The DirectPlay serial connection (DPCOMPORTADDRESS's layout) that
-// 0x004ae410 (between Net.cpp and NetProcs.cpp) fills from SerialPopupDlg's
-// selections.
+// BuildComPortAddress (0x004ae410, between Net.cpp and NetProcs.cpp) fills
+// from SerialPopupDlg's selections before CreateAddress(DPSPGUID_SERIAL).
 struct UnknownComPortAddress {
     int port;                                 // +0x00: port
     int baudRate;                             // +0x04: baud rate
@@ -284,7 +289,7 @@ struct UnknownComPortAddress {
     int parity;                               // +0x0c: parity
     int flowControl;                          // +0x10: flow control
 };
-void UnknownFunction4ae410(struct UnknownSerialSettings* settings, UnknownComPortAddress* address);
+void BuildComPortAddress(struct UnknownSerialSettings* settings, UnknownComPortAddress* address);
 
 // 0x00451b80: creates the profile named in "EditBox" (or reports that it
 // exists).

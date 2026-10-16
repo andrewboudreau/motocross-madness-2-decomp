@@ -26,6 +26,7 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "SoultreeLodSettings.h"
 
 class LightManager;
 class RenderTarget;
@@ -183,15 +184,6 @@ struct UnknownSoultreeCameraView {
     unsigned int viewportY;                    // viewport y
 };
 
-// The 16-byte rows of the global table at 0x00689f18, one per detail level;
-// ApplyLodSettings (0x004451e0) copies a row into the object's setters.
-struct UnknownSoultreeLodSetting {
-    float lodThreshold;                        // +0x00 SetLodThreshold
-    int texturePerspective;                    // +0x04 copied to texturePerspective (+0x1b4)
-    int gouraudShading;                        // +0x08 copied to gouraudShading (+0x1b8)
-    int useLighting;                           // +0x0c SetUseLighting
-};
-extern UnknownSoultreeLodSetting* g_UnknownSoultreeLodSettings689f18;
 
 // 0x004a1b00 (cdecl): transforms `count` points by `matrix`.
 void TransformPoints(const void* source, void* target, const Matrix4* matrix, int count,

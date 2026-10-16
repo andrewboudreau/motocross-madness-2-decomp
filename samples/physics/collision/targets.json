@@ -112,11 +112,11 @@
   {
     "class": "CollisionObject",
     "source": "CollisionVectorHelpers.cpp",
-    "candidate_symbol_contains": "NextCollisionCounter",
+    "candidate_symbol_contains": "NextBindingId",
     "target_va": "0x0043ce90",
     "target_size": 12,
     "expect": "exact",
-    "notes": "return ++g gives mov/inc/mov; owner: bracket only",
+    "notes": "return ++g gives mov/inc/mov; ControlInterface::NextBindingId; owner: bracket only",
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {

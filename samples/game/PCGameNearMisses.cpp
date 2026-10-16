@@ -36,85 +36,85 @@ void FillPixelFormat(int format, void* pixelFormat);
 int PCGame::ProfileDisplays() {
     int loaded = 0;
     int i;
-    for (i = 0; i < g_UnknownDisplayCount68a764; i++)
-        if (LoadDisplayProfile(g_UnknownDisplays68a754[i]))
+    for (i = 0; i < g_DisplayCount; i++)
+        if (LoadDisplayProfile(g_Displays[i]))
             loaded++;
-    if (loaded == g_UnknownDisplayCount68a764)
+    if (loaded == g_DisplayCount)
         return 1;
-    for (i = 0; i < g_UnknownDisplayCount68a764; i++) {
+    for (i = 0; i < g_DisplayCount; i++) {
         char name[128];
-        sprintf(name, "DriverInfo\\%s\\ProfiledCard", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\ProfiledCard", g_Displays[i]->driverGuidText);
         SetRegistryFlag(name, 1);
-        sprintf(name, "DriverInfo\\%s\\TextureCacheLimit", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\TextureCacheLimit", g_Displays[i]->driverGuidText);
         SetRegistryInt(name, 0);
-        sprintf(name, "DriverInfo\\%s\\NumberOfModes", g_UnknownDisplays68a754[i]->driverGuidText);
-        SetRegistryInt(name, g_UnknownDisplays68a754[i]->displayModeCount);
-        sprintf(name, "DriverInfo\\%s\\Modes", g_UnknownDisplays68a754[i]->driverGuidText);
-        SetRegistryBinary(name, g_UnknownDisplays68a754[i]->displayModes,
-                             g_UnknownDisplays68a754[i]->displayModeCount * sizeof(UnknownDisplayMode));
-        sprintf(name, "DriverInfo\\%s\\IsAGP", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\NumberOfModes", g_Displays[i]->driverGuidText);
+        SetRegistryInt(name, g_Displays[i]->displayModeCount);
+        sprintf(name, "DriverInfo\\%s\\Modes", g_Displays[i]->driverGuidText);
+        SetRegistryBinary(name, g_Displays[i]->displayModes,
+                             g_Displays[i]->displayModeCount * sizeof(UnknownDisplayMode));
+        sprintf(name, "DriverInfo\\%s\\IsAGP", g_Displays[i]->driverGuidText);
         SetRegistryFlag(name, 0);
-        sprintf(name, "DriverInfo\\%s\\DisabledWindowed", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\DisabledWindowed", g_Displays[i]->driverGuidText);
         if (!GetRegistryFlag(name, 0)) {
             SetRegistryFlag(name, 1);
-            if (g_UnknownDisplays68a754[i]->SetWindowedCooperativeLevel(0, 0, 640, 480))
+            if (g_Displays[i]->SetWindowedCooperativeLevel(0, 0, 640, 480))
                 SetRegistryFlag(name, 0);
         }
-        sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_Displays[i]->driverGuidText);
         if (GetRegistryFlag(name, 0))
             continue;
         SetRegistryFlag(name, 1);
-        if (g_UnknownDisplays68a754[i]->SetFullscreenCooperativeLevel() &&
-            g_UnknownDisplays68a754[i]->directDraw->SetDisplayMode(640, 480, 16, 0, 0) == 0) {
+        if (g_Displays[i]->SetFullscreenCooperativeLevel() &&
+            g_Displays[i]->directDraw->SetDisplayMode(640, 480, 16, 0, 0) == 0) {
             UnknownSurfaceCaps caps;
             unsigned long total;
             unsigned long free;
             memset(&caps, 0, sizeof(caps));
             caps.caps = 0x10000000;
-            g_UnknownDisplays68a754[i]->directDraw->GetAvailableVidMem(&caps, &total, &free);
-            g_UnknownDisplays68a754[i]->totalVideoMemory = total;
-            sprintf(name, "DriverInfo\\%s\\TotalVideoMemory", g_UnknownDisplays68a754[i]->driverGuidText);
+            g_Displays[i]->directDraw->GetAvailableVidMem(&caps, &total, &free);
+            g_Displays[i]->totalVideoMemory = total;
+            sprintf(name, "DriverInfo\\%s\\TotalVideoMemory", g_Displays[i]->driverGuidText);
             SetRegistryInt(name, total);
-            sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->driverGuidText);
+            sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_Displays[i]->driverGuidText);
             SetRegistryFlag(name, 0);
-            FilterDisplayModes(g_UnknownDisplays68a754[i]);
-            sprintf(name, "DriverInfo\\%s\\Modes", g_UnknownDisplays68a754[i]->driverGuidText);
-            SetRegistryBinary(name, g_UnknownDisplays68a754[i]->displayModes,
-                                 g_UnknownDisplays68a754[i]->displayModeCount * sizeof(UnknownDisplayMode));
-            sprintf(name, "DriverInfo\\%s\\DisabledSoftware", g_UnknownDisplays68a754[i]->driverGuidText);
+            FilterDisplayModes(g_Displays[i]);
+            sprintf(name, "DriverInfo\\%s\\Modes", g_Displays[i]->driverGuidText);
+            SetRegistryBinary(name, g_Displays[i]->displayModes,
+                                 g_Displays[i]->displayModeCount * sizeof(UnknownDisplayMode));
+            sprintf(name, "DriverInfo\\%s\\DisabledSoftware", g_Displays[i]->driverGuidText);
             if (!GetRegistryFlag(name, 0)) {
                 SetRegistryFlag(name, 1);
-                if (g_UnknownDisplays68a754[i]->SetDisplayMode(640, 480, 16, 2, 0, 0, 0))
+                if (g_Displays[i]->SetDisplayMode(640, 480, 16, 2, 0, 0, 0))
                     SetRegistryFlag(name, 0);
             }
-            sprintf(name, "DriverInfo\\%s\\DisabledHardware", g_UnknownDisplays68a754[i]->driverGuidText);
+            sprintf(name, "DriverInfo\\%s\\DisabledHardware", g_Displays[i]->driverGuidText);
             if (!GetRegistryFlag(name, 0)) {
                 SetRegistryFlag(name, 1);
-                if (g_UnknownDisplays68a754[i]->SetDisplayMode(640, 480, 16, 2, 0, 1, 0)) {
-                    g_UnknownDisplays68a754[i]->RefreshDriverCaps();
-                    if (g_UnknownDisplays68a754[i]->driverCaps & 1) {
+                if (g_Displays[i]->SetDisplayMode(640, 480, 16, 2, 0, 1, 0)) {
+                    g_Displays[i]->RefreshDriverCaps();
+                    if (g_Displays[i]->driverCaps & 1) {
                         RenderTarget* target = (new(__FILE__, 1423) PCRenderTarget)
-                            ->InitializeRenderTarget(g_UnknownDisplays68a754[i], &IID_IDirect3DHALDevice,
-                                                    g_UnknownDisplays68a754[i]->backBuffer, 1,
-                                                    g_UnknownDisplays68a754[i]->frameBufferCount);
+                            ->InitializeRenderTarget(g_Displays[i], &IID_IDirect3DHALDevice,
+                                                    g_Displays[i]->backBuffer, 1,
+                                                    g_Displays[i]->frameBufferCount);
                         if (target) {
                             if (osVersion.platformId != 2 &&
-                                !(g_UnknownDisplays68a754[i]->driverCaps & 0x400)) {
+                                !(g_Displays[i]->driverCaps & 0x400)) {
                                 if (((PCRenderTarget*)target)->deviceCaps & 0x4000)
-                                    LimitDisplayModes(g_UnknownDisplays68a754[i], 800, 600);
+                                    LimitDisplayModes(g_Displays[i], 800, 600);
                                 else
-                                    LimitDisplayModes(g_UnknownDisplays68a754[i], 640, 480);
+                                    LimitDisplayModes(g_Displays[i], 640, 480);
                                 sprintf(name, "DriverInfo\\%s\\Modes",
-                                        g_UnknownDisplays68a754[i]->driverGuidText);
-                                SetRegistryBinary(name, g_UnknownDisplays68a754[i]->displayModes,
-                                                     g_UnknownDisplays68a754[i]->displayModeCount *
+                                        g_Displays[i]->driverGuidText);
+                                SetRegistryBinary(name, g_Displays[i]->displayModes,
+                                                     g_Displays[i]->displayModeCount *
                                                          sizeof(UnknownDisplayMode));
                             }
                             int value;
-                            g_UnknownDisplays68a754[i]->isAGP =
-                                g_UnknownDisplays68a754[i]->ProbeNonLocalTextureMemory(&value, target);
-                            sprintf(name, "DriverInfo\\%s\\IsAGP", g_UnknownDisplays68a754[i]->driverGuidText);
-                            SetRegistryFlag(name, g_UnknownDisplays68a754[i]->isAGP);
+                            g_Displays[i]->isAGP =
+                                g_Displays[i]->ProbeNonLocalTextureMemory(&value, target);
+                            sprintf(name, "DriverInfo\\%s\\IsAGP", g_Displays[i]->driverGuidText);
+                            SetRegistryFlag(name, g_Displays[i]->isAGP);
                             UnknownSurfaceInterface* surfaces[10];
                             int count;
                             for (count = 0; count < 10; count++) {
@@ -125,7 +125,7 @@ int PCGame::ProfileDisplays() {
                                 desc.height = desc.width = 256;
                                 desc.flags = 0x1007;
                                 desc.caps[0] = 0x10005000;
-                                if (g_UnknownDisplays68a754[i]->directDraw->CreateSurface(
+                                if (g_Displays[i]->directDraw->CreateSurface(
                                         &desc, &surfaces[count], 0) != 0)
                                     break;
                             }
@@ -133,19 +133,19 @@ int PCGame::ProfileDisplays() {
                                 surfaces[j]->Release();
                             if (count == 10) {
                                 sprintf(name, "DriverInfo\\%s\\DisabledHardware",
-                                        g_UnknownDisplays68a754[i]->driverGuidText);
+                                        g_Displays[i]->driverGuidText);
                                 SetRegistryFlag(name, 0);
                                 sprintf(name, "DriverInfo\\%s\\PartialTextureBlt",
-                                        g_UnknownDisplays68a754[i]->driverGuidText);
+                                        g_Displays[i]->driverGuidText);
                                 if (GetRegistryInt(name, 1) > 0) {
-                                    g_UnknownDisplays68a754[i]->partialTextureUploadResult = 0;
-                                    SetRegistryInt(name, g_UnknownDisplays68a754[i]->partialTextureUploadResult);
-                                    display = g_UnknownDisplays68a754[i];
+                                    g_Displays[i]->partialTextureUploadResult = 0;
+                                    SetRegistryInt(name, g_Displays[i]->partialTextureUploadResult);
+                                    display = g_Displays[i];
                                     renderTarget = target;
-                                    g_UnknownDisplays68a754[i]->ProbePartialTextureUploads(target);
+                                    g_Displays[i]->ProbePartialTextureUploads(target);
                                     display = 0;
                                     renderTarget = 0;
-                                    SetRegistryInt(name, g_UnknownDisplays68a754[i]->partialTextureUploadResult);
+                                    SetRegistryInt(name, g_Displays[i]->partialTextureUploadResult);
                                 }
                                 delete target;
                             } else {
@@ -156,7 +156,7 @@ int PCGame::ProfileDisplays() {
                 }
             }
         }
-        g_UnknownDisplays68a754[i]->SetWindowedCooperativeLevel(0, 0, 0, 0);
+        g_Displays[i]->SetWindowedCooperativeLevel(0, 0, 0, 0);
     }
     return 1;
 }

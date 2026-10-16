@@ -1115,8 +1115,8 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot6()
 // 0x004451e0
 void D3DIMSoultreeObject::ApplyLodSettings(int index)
 {
-    SetLodThreshold(g_UnknownSoultreeLodSettings689f18[index].lodThreshold);
-    texturePerspective = g_UnknownSoultreeLodSettings689f18[index].texturePerspective;
-    gouraudShading = g_UnknownSoultreeLodSettings689f18[index].gouraudShading;
-    SetUseLighting(g_UnknownSoultreeLodSettings689f18[index].useLighting);
+    SetLodThreshold(g_ActiveLodSettings[index].lodThreshold);
+    texturePerspective = g_ActiveLodSettings[index].texturePerspective;
+    gouraudShading = g_ActiveLodSettings[index].gouraudShading;
+    SetUseLighting(g_ActiveLodSettings[index].useLighting);
 }

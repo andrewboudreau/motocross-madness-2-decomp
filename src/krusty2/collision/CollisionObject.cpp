@@ -1442,7 +1442,7 @@ public:
     unsigned short field_0x0e;
     unsigned short cellZ;                     // +0x10
 };
-struct CollisionVegetationGrid {   // object at *0x0059aebc (tier 3)
+struct CollisionVegetationGrid {   // object at *0x0059aebc (tier 3): a view of EcoSystem (g_EcoSystem)
     char field_0x00[0x5a8];
     float cellSize;                // +0x5a8 world size of one vegetation cell
 };
