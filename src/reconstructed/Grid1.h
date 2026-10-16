@@ -43,7 +43,7 @@ struct Grid1NodeExtra {
     ManagedTexture* texture;                   // +0x08
     unsigned int own : 1;                      // +0x0c packed like Grid1BlockTexture
     int index : 15;
-    BaseObject* field_0x10;                    // +0x10 handed back to Terrain by 0x0047ca00
+    BaseObject* builtTexture;                 // +0x10  the node's own texture from Terrain's pool, built by BuildNodeTexture; EvictNodeTexture 0x0047ca00 hands it back
     GridAgeEntry ageEntry;                     // +0x14
     float field_0x28;
     float field_0x2c;
