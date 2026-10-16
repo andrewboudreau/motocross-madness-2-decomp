@@ -592,7 +592,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (!AppendChild((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
         AppendChild((new(__FILE__, 750) UnknownQuarryFogLink(1))->Create(renderContext, eventFog), -1);
-        eventFog->SetParameters(eventScene->fog->color, eventFog->field_0x38, eventFog->field_0x40);
+        eventFog->SetParameters(eventScene->fog->color, eventFog->fogVisibility, eventFog->fogHaziness);
     }
     if (progress)
         progress(0);

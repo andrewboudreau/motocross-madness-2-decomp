@@ -19,7 +19,7 @@
 Fog::Fog(int flags)
     : GameObject(flags)
 {
-    field_0x44 = 0;
+    fogKind = 0;
     drawnByFogOn = 0;
     renderFog = 1;
 }
@@ -41,16 +41,16 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
         sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->targetDisplay->driverGuidText);
         renderFog = g_TrackGame->GetRegistryFlag(name, 1);
         if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGVERTEX) {
-            field_0x44 = D3DPRASTERCAPS_FOGVERTEX;
+            fogKind = D3DPRASTERCAPS_FOGVERTEX;
         } else if (TARGET()->targetDisplay->isPowerVR || (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
-            field_0x44 = D3DPRASTERCAPS_FOGTABLE;
+            fogKind = D3DPRASTERCAPS_FOGTABLE;
         } else if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGRANGE) {
-            field_0x44 = D3DPRASTERCAPS_FOGRANGE;
+            fogKind = D3DPRASTERCAPS_FOGRANGE;
         }
         // Not Windows NT (VER_PLATFORM_WIN32_NT is 2).
         if (g_TrackGame->osVersion.platformId != 2 && !(TARGET()->targetDisplay->driverCaps & 0x400)
             && (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
-            field_0x44 = D3DPRASTERCAPS_FOGTABLE;
+            fogKind = D3DPRASTERCAPS_FOGTABLE;
         }
     }
     SetParameters(color, visibility, haziness);
@@ -60,9 +60,9 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
 // 0x004627a0
 void Fog::SetParameters(unsigned int color, float visibility, float haziness)
 {
-    field_0x2c = color;
-    field_0x38 = visibility;
-    field_0x40 = haziness;
+    fogColor = color;
+    fogVisibility = visibility;
+    fogHaziness = haziness;
     fogEnd = (visibility - visibilityOffset) * (farScale - nearScale) + nearScale;
     fogStart = (fogEnd - minimumDistance) * (1.0f - haziness);
     TARGET()->clearColor = color; // the clear colour
@@ -116,25 +116,25 @@ int Fog::UnknownVirtualSlot14()
             vertices[0].x = (float)VIEWPORT(0);
             vertices[0].y = (float)VIEWPORT(1);
             vertices[0].z = 0.999999f;
-            vertices[0].color = field_0x2c;
+            vertices[0].color = fogColor;
             vertices[0].specular = 0;
             vertices[0].rhw = 1.0f;
             vertices[1].x = (float)VIEWPORT(2) + (float)VIEWPORT(0);
             vertices[1].y = (float)VIEWPORT(1);
             vertices[1].z = 0.999999f;
-            vertices[1].color = field_0x2c;
+            vertices[1].color = fogColor;
             vertices[1].specular = 0;
             vertices[1].rhw = 1.0f;
             vertices[2].x = (float)VIEWPORT(2) + (float)VIEWPORT(0);
             vertices[2].y = (float)VIEWPORT(3) + (float)VIEWPORT(1);
             vertices[2].z = 0.999999f;
-            vertices[2].color = field_0x2c;
+            vertices[2].color = fogColor;
             vertices[2].specular = 0;
             vertices[2].rhw = 1.0f;
             vertices[3].x = (float)VIEWPORT(0);
             vertices[3].y = (float)VIEWPORT(3) + (float)VIEWPORT(1);
             vertices[3].z = 0.999999f;
-            vertices[3].color = field_0x2c;
+            vertices[3].color = fogColor;
             vertices[3].specular = 0;
             vertices[3].rhw = 1.0f;
             TARGET()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
@@ -152,10 +152,10 @@ int Fog::UnknownVirtualSlot14()
         if (renderFog) {
             float density = 1.0f;
             TARGET()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 1, 0);
-            TARGET()->SetRenderState(D3DRENDERSTATE_FOGCOLOR, field_0x2c, 0);
+            TARGET()->SetRenderState(D3DRENDERSTATE_FOGCOLOR, fogColor, 0);
             float start = fogStart;
             float end = fogEnd;
-            if (field_0x44 == D3DPRASTERCAPS_FOGTABLE) {
+            if (fogKind == D3DPRASTERCAPS_FOGTABLE) {
                 TARGET()->SetRenderState(D3DRENDERSTATE_FOGSTART, *(int*)&start, 0);
                 TARGET()->SetRenderState(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
                 TARGET()->SetRenderState(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
@@ -170,7 +170,7 @@ int Fog::UnknownVirtualSlot14()
                 }
                 return 1;
             }
-            if (field_0x44 == D3DPRASTERCAPS_FOGVERTEX) {
+            if (fogKind == D3DPRASTERCAPS_FOGVERTEX) {
                 TARGET()->SetRenderState(D3DRENDERSTATE_FOGSTART, *(int*)&fogStart, 0);
                 TARGET()->SetRenderState(D3DRENDERSTATE_FOGEND, *(int*)&fogEnd, 0);
                 TARGET()->SetRenderState(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
@@ -202,11 +202,11 @@ int Fog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
         if (visibilityOffset > 1.0f) {
             visibilityOffset = 1.0f;
         }
-        float visibility = field_0x38;
+        float visibility = fogVisibility;
         if (visibility - visibilityOffset < 0.0f) {
-            visibilityOffset = visibility = field_0x38;
+            visibilityOffset = visibility = fogVisibility;
         }
-        SetParameters(field_0x2c, visibility, field_0x40);
+        SetParameters(fogColor, visibility, fogHaziness);
         return 1;
     }
     if (TestInputEvent(0x22, 0, event, 0x80)) {
@@ -214,11 +214,11 @@ int Fog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
         if (visibilityOffset < 0.0f) {
             visibilityOffset = 0;
         }
-        float visibility = field_0x38;
+        float visibility = fogVisibility;
         if (visibility - visibilityOffset > 1.0f) {
             visibilityOffset = 0;
         }
-        SetParameters(field_0x2c, visibility, field_0x40);
+        SetParameters(fogColor, visibility, fogHaziness);
         return 1;
     }
     return 0;
@@ -228,11 +228,11 @@ int Fog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
 void Fog::SetDetailLevel(int level)
 {
     visibilityOffset = (9 - level) * 0.1f;
-    float visibility = field_0x38;
+    float visibility = fogVisibility;
     if (visibility - visibilityOffset < 0.0f) {
-        visibilityOffset = visibility = field_0x38;
+        visibilityOffset = visibility = fogVisibility;
     }
-    SetParameters(field_0x2c, visibility, field_0x40);
+    SetParameters(fogColor, visibility, fogHaziness);
 }
 
 // 0x00462670
