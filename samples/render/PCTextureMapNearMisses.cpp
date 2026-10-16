@@ -209,8 +209,8 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                     !(g_TrackGame->texturesCached) &&
                     (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
-                    if (g_UnknownSharedSurfaces68a394[mipCount]) {
-                        systemSurface = g_UnknownSharedSurfaces68a394[mipCount];
+                    if (g_SharedTextureSurfaces[mipCount]) {
+                        systemSurface = g_SharedTextureSurfaces[mipCount];
                         systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x1800;
@@ -259,7 +259,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                 }
             }
             if (shared) {
-                g_UnknownSharedSurfaces68a394[mipCount] = systemSurface;
+                g_SharedTextureSurfaces[mipCount] = systemSurface;
                 systemSurface->AddRef();
             }
             if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
@@ -296,8 +296,8 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                     !(g_TrackGame->texturesCached) &&
                     (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
-                    if (g_UnknownSharedMipSurfaces68a36c[mipCount]) {
-                        systemSurface = g_UnknownSharedMipSurfaces68a36c[mipCount];
+                    if (g_SharedMipTextureSurfaces[mipCount]) {
+                        systemSurface = g_SharedMipTextureSurfaces[mipCount];
                         systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x401808;
@@ -344,7 +344,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                 }
             }
             if (shared) {
-                g_UnknownSharedMipSurfaces68a36c[mipCount] = systemSurface;
+                g_SharedMipTextureSurfaces[mipCount] = systemSurface;
                 systemSurface->AddRef();
             }
             if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))

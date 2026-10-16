@@ -57,7 +57,7 @@ ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format,
 
 // 0x0050c2e0: leaves the manager and releases the textures and pages.
 ManagedTextureGroup::~ManagedTextureGroup() {
-    groupManager->field_0x44.Remove(this);
+    groupManager->groups.Remove(this);
     TextureMap* texture;
     while ((texture = managedTextures.Last()) != 0) {
         managedTextures.Remove(texture);
