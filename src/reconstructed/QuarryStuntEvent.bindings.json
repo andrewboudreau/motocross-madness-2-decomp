@@ -66,7 +66,7 @@
   "?ReportTotals@MemTagStack@@QAEXPBD@Z": "0x004a2bc0",
   "?CommitListenerSettings@PCSoundInterface@@QAEHXZ": "0x004beb80",
   "?Create@BaseQuarryEvent@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004de3b0",
-  "?UnknownFunction4de590@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z": "0x004de590",
+  "?LoadEventObjects@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z": "0x004de590",
   "?EstimateTerrainBytes@BaseQuarryEvent@@QAEHH@Z": "0x004e04a0",
   "?EstimateCubeBytes@BaseQuarryEvent@@QAEHXZ": "0x004e04e0",
   "?EstimateModelTextureBytes@BaseQuarryEvent@@QAEHPAH@Z": "0x004e04f0",

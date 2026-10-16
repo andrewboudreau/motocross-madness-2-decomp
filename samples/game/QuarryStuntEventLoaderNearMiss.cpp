@@ -1,4 +1,4 @@
-// Near-miss candidate for BaseQuarryEvent::UnknownFunction4de590 (0x004de590,
+// Near-miss candidate for BaseQuarryEvent::LoadEventObjects (0x004de590,
 // 7952 bytes; QuarryStuntEvent.cpp, docs/QUARRYSTUNTEVENT.md): the event
 // loader. It picks texture detail levels from the video and system memory,
 // then creates the audio, lights, camera, particles, scene, visibility
@@ -292,7 +292,7 @@ static inline int FrameBufferBytes(RenderTarget* target) {
 }
 
 // 0x004de590
-int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
+int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     int terrainBytes;
     int textureBytes;
     int forced;

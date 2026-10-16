@@ -68,7 +68,7 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
 BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCallback progress) {
     GameObject::SetRenderContext(target);
     g_MemTagStack->ReportTotals("entering BaseQuarryEvent::Create");
-    if (!UnknownFunction4de590(progress)) {
+    if (!LoadEventObjects(progress)) {
         Release();
         return 0;
     }
