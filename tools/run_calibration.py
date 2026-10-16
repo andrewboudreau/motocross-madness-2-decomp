@@ -5866,7 +5866,7 @@ CASES = [
         'name': 'Griddraw edge table build',
         'bindings': 'src/reconstructed/Griddraw.bindings.json',
         'source': 'src/reconstructed/Griddraw.cpp',
-        'symbol': '?UnknownFunction47e4d0@@YAXXZ',
+        'symbol': '?BuildEdgeTable@@YAXXZ',
         'target_va': '0x0047e4d0',
         'target_size': 97,
         'reason': 'three counters doubled with <<= 1',
