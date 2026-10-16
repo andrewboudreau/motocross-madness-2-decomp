@@ -205,7 +205,8 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x0051eb40` `AddHistory`
 - `0x00519a20` `DrawStandings` (near-miss sample)
 - `0x0051baf0` `TakeRacers` and `0x0051d730` `CollectRacers` (the loader
-  sample keeps its own address-named declarations)
+  sample's view uses `TakeRacers`; its `0x0051d730` stays address-named
+  because VisualCue's `CollectRacers` has the same view signature)
 - `0x0051da30` `ChatOverlay::HandleChatKey` (BikeRace.h's view of +0x19c uses the same name)
 - `0x0051dd40` `ChatOverlay::HideInputLine` (also in BikeRace.h's view); its
   neighbour `0x0051dd10` (shows the line) stays address-named because

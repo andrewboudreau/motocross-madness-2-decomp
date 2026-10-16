@@ -195,8 +195,9 @@ public:
 class UnknownQuarryVisibility : public UnknownQuarryQuadTreeHead, public GameObject {
 public:
     explicit UnknownQuarryVisibility(int flags);               // 0x0052d340
-    GameObject* UnknownFunction52d460(void* target, int a, int b, float width, float breadth, Scene* scene,
-                                      float height);
+    // 0x0052d460: VisibilityQuadTree::Setup (src/krusty2/visibility).
+    GameObject* Setup(void* target, int a, int b, float width, float breadth, Scene* scene,
+                      float height);
 };
 
 // ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
@@ -214,7 +215,8 @@ public:
 class UnknownQuarryTerrainShadow : public GameObject {
 public:
     explicit UnknownQuarryTerrainShadow(int flags);            // 0x00508ae0
-    GameObject* UnknownFunction508b80(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow);
+    // 0x00508b80: TerrainShadow::Attach (samples/physics/shadow).
+    GameObject* Attach(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow);
 
     unsigned char field_0x2c[0x6780 - 0x2c];
 };
@@ -252,9 +254,10 @@ public:
 class UnknownQuarryTerrainObject : public GameObject {
 public:
     explicit UnknownQuarryTerrainObject(int flags);            // 0x00505830
-    UnknownTerrain* UnknownFunction5059d0(void* target, UnknownTextureStream* stream, int a,
-                                          UnknownTextureFormatChoice* textures, int level, int b,
-                                          const char* detailTexture, int c);
+    // 0x005059d0: Terrain::Load (src/krusty2/broadphase/Terrain.h).
+    UnknownTerrain* Load(void* target, UnknownTextureStream* stream, int a,
+                         UnknownTextureFormatChoice* textures, int level, int b,
+                         const char* detailTexture, int c);
 
     unsigned char field_0x2c[0xcc4 - 0x2c];
 };
@@ -280,8 +283,10 @@ public:
 // The overlays' race hooks.
 struct UnknownQuarryOverlayHooks {
     void SetStatsSource(UnknownQuarryRace* race);       // 0x00519880 (StatsOverlay)
+    // 0x0051d730 is ChatOverlay::CollectRacers; VisualCue's CollectRacers
+    // below has the same view signature, so this one keeps its address name.
     void UnknownFunction51d730(UnknownQuarryRace* race);       // 0x0051d730 (ChatOverlay)
-    void UnknownFunction51baf0(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay)
+    void TakeRacers(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay::TakeRacers)
     void CollectRacers(UnknownQuarryRace* race);       // 0x0048af20 (VisualCue)
 };
 
@@ -539,7 +544,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("QuadTree");
     UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) UnknownQuarryVisibility(1))
-        ->UnknownFunction52d460(renderContext, 0, 0,
+        ->Setup(renderContext, 0, 0,
                                 eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
                                 eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
                                 eventScene, 96.0f);
@@ -604,7 +609,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         return 0;
     }
     eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
-                     ->UnknownFunction5059d0(renderContext, field_0x44, 1, &terrainTextures,
+                     ->Load(renderContext, field_0x44, 1, &terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
@@ -617,7 +622,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->UnknownFunction508b80(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
+                         ->Attach(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);
@@ -835,7 +840,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (chatOverlay)
         ((UnknownQuarryOverlayHooks*)chatOverlay)->UnknownFunction51d730((UnknownQuarryRace*)raceView);
     if (radarOverlay)
-        ((UnknownQuarryOverlayHooks*)radarOverlay)->UnknownFunction51baf0((UnknownQuarryRace*)raceView, chatOverlay);
+        ((UnknownQuarryOverlayHooks*)radarOverlay)->TakeRacers((UnknownQuarryRace*)raceView, chatOverlay);
     if (visualCue)
         ((UnknownQuarryOverlayHooks*)visualCue)->CollectRacers((UnknownQuarryRace*)raceView);
     g_MemTagStack->Pop(0);

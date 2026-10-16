@@ -410,8 +410,9 @@ public:
 };
 class TerrainShadowClipper {
 public:
-    void UnknownFunction52f190(const void* camera, const void* matrix, int count,
-                               const TerrainShadowVec* vertices, TerrainShadowVec* screen, int* codes); // 0x0052f190
+    // 0x0052f190: VisibilityClipper::ProjectVertices (src/krusty2/visibility).
+    void ProjectVertices(const void* camera, const void* matrix, int count,
+                         const TerrainShadowVec* vertices, TerrainShadowVec* screen, int* codes);
 };
 extern TerrainShadowClipper* g_terrainShadowClipper;                               // 0x00575a98
 
@@ -472,7 +473,7 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
     maxX = TERRAIN_SHADOW_MAX(maxX, (cell)->gridX);                                                   \
     minZ = TERRAIN_SHADOW_MIN(minZ, (cell)->gridZ);                                                   \
     maxZ = TERRAIN_SHADOW_MAX(maxZ, (cell)->gridZ);                                                   \
-    g_terrainShadowClipper->UnknownFunction52f190(TERRAIN_SHADOW_VIEWER()->camera,                   \
+    g_terrainShadowClipper->ProjectVertices(TERRAIN_SHADOW_VIEWER()->camera,                   \
                                                   (char*)TERRAIN_SHADOW_VIEWER()->camera + 0xec, 1,  \
                                                   &(hit), &screen, &code);                           \
     field_0x6668 = TERRAIN_SHADOW_MIN(field_0x6668, screen.x);                                       \

@@ -581,7 +581,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (animationTable->entries[i].keyFramed) {
             UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
             animationTable->entries[i].character = character;
-            if (!AppendChild(character->UnknownFunction4319c0(renderContext, sltPath, colPath, lights, a4, 1, 1),
+            if (!AppendChild(character->Load(renderContext, sltPath, colPath, lights, a4, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
                 UnknownFunction464e80(message);

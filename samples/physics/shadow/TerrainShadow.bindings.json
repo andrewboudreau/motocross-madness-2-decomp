@@ -47,7 +47,7 @@
   "?TerrainShadowAddCall@@YAPAUTerrainShadowVec@@PAU1@PBU1@1@Z": "0x00421cb0",
   "?TerrainShadowSubtractCall@@YAPAUTerrainShadowVec@@PAU1@PBU1@1@Z": "0x00421d00",
   "?CastSegment@TerrainShadowCaster@@QAEHPBUTerrainShadowVec@@0PAU2@PAPAUTerrainCell@@HH@Z": "0x00506e90",
-  "?UnknownFunction52f190@TerrainShadowClipper@@QAEXPBX0HPBUTerrainShadowVec@@PAU2@PAH@Z": "0x0052f190",
+  "?ProjectVertices@TerrainShadowClipper@@QAEXPBX0HPBUTerrainShadowVec@@PAU2@PAH@Z": "0x0052f190",
   "?UnknownVirtualSlot27@TerrainShadow@@UAEHXZ": "0x00508bc0",
   "?g_clipRectangle@@3PAVClipRectangle@@A": "0x0056852c",
   "?g_terrainShadowClipper@@3PAVTerrainShadowClipper@@A": "0x00575a98",
