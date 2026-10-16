@@ -910,27 +910,26 @@ static inline void TireScale(CollisionVec3& v, float s)
     v.z *= s;
 }
 
-// 0x00513f90 (near miss, 470 of 479 bytes): only the stack slots differ; retail
-// keeps `boost` in the dead argument slot and the squared length/`minimum` in the
-// local, VC6 the other way round (declaration order does not change it).
-// 0..15 dead initialised int locals at the top of the function change nothing either.
-// A tools/sweep_variants.py sweep (768 combinations, best 470) crossed 8 boost forms
-// (as here, `!(boost > 1)` nested if, empty-if, `||`/`&&` embedded assignments, two
-// ternaries, inverted if/else), 4 length forms (TireLength, an inline FromSq
-// expression, by-value and pointer helpers), 4 minimum forms (if/else, helper with
-// returns or a local, ternary initialiser), 3 clamp forms and a `vehicle` copy.
-// Only the nested-if boost puts boost in the argument slot, and it reorders the
-// stores (98/479).
+// 0x00513f90: exact. Retail keeps `boost` in the dead argument slot. With a
+// single `&&` condition boost has one IR store fewer than `minimum` and loses the
+// slot; the nested if (outer test on field_0xa4, inner test on the product, a
+// `boost = 1.0f` store in each else) gives boost four references like minimum,
+// the tie goes to the earlier last reference, and VC6 tail-merges the duplicate
+// stores, so only the frame moves.
 void Tire::UpdateDriveShare(TireVehicle* vehicle)
 {
     if (!field_0x2a8)
         return;
     if (slipSpeed < field_0x2b4 && !vehicle->field_0x444) {
         float boost;
-        if (vehicle->field_0xa4 > 0.0f && vehicle->field_0x60 * 1.25f > 1.0f)
-            boost = vehicle->field_0x60 * 1.25f;
-        else
+        if (vehicle->field_0xa4 > 0.0f) {
+            if (vehicle->field_0x60 * 1.25f > 1.0f)
+                boost = vehicle->field_0x60 * 1.25f;
+            else
+                boost = 1.0f;
+        } else {
             boost = 1.0f;
+        }
         float grip = vehicle->UnknownVirtualSlot47(this);
         float excess = field_0x280 * vehicle->field_0x24 - TireLength(vehicle->field_0x70);
         float share;

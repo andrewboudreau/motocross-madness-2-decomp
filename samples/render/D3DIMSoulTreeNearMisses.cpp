@@ -69,10 +69,14 @@
 // function-local statics, as are the three vectors 0x0057eef8,
 // 0x0057ef38 and 0x0057eee8 (guard 0x0057ef24 bits 1, 2, 4) whose type has
 // an empty destructor: their atexit entries are the `ret` stubs
-// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (normalised
-// ratio 0.87, 1882 of 1893 instructions); retail's frame is 0x9e8 (ours
-// 0x940), it calls the out-of-line Vector3 constructor 0x00404e60 in the
-// mode 2 and 8 normalisations, and register allocation differs.
+// 0x00442f60, 0x00442f50 and 0x00442f40. Same structure (1894 of 1893
+// instructions, 525 differing, 7860 bytes): the three mode 8 and mode 2
+// normalisations return through the out-of-line Vector3 constructor
+// 0x00404e60 as retail does (Vector3Call; the inline budget, with the
+// constructor expanded in the mode 5 and 6 normalisations). Left: retail's
+// frame is 0x9e8 (ours 0x940) with temporaries the source does not have yet
+// (mode 2 reads the vertex's y and z through a stack copy; a named copy
+// also copies x, 542 differing), and register allocation differs.
 // The mode 5 source keeps two retail bugs: `circle[i + 1]` reads past the
 // 16 points, and the group loop indexes with the restore loop's `k`.
 //
@@ -337,6 +341,22 @@ static inline Vector3 NormalizedByCall(const Vector3& v)
     return Vector3(v.x * scale, v.y * scale, v.z * scale);
 }
 
+// Vector3::Vector3(float, float, float), 0x00404e60: the out-of-line copy
+// retail calls in the mode 8 and mode 2 normalisations (VC6's inline budget,
+// docs/VC6_INLINE_BUDGET.md). Declared only; the bindings map it.
+struct Vector3Call : Vector3 {
+    Vector3Call(float x_, float y_, float z_);
+};
+
+static inline Vector3 NormalizedCallingConstructor(const Vector3& v)
+{
+    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
+    if (squared == 1.0f)
+        return v;
+    float scale = FastInvSqrt(squared);
+    return Vector3Call(v.x * scale, v.y * scale, v.z * scale);
+}
+
 static inline Vector3 Normalized(const Vector3& v)
 {
     float squared = v.x * v.x + v.y * v.y + v.z * v.z;
@@ -502,7 +522,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         direction.x = group->transformedVertices[v].position.x - localEye.x;
                         direction.y = group->transformedVertices[v].position.y - localEye.y;
                         direction.z = group->transformedVertices[v].position.z - localEye.z;
-                        direction = Normalized(direction);
+                        direction = NormalizedCallingConstructor(direction);
                         Vector3 reflected;
                         ReflectAndNormalize(&direction, &group->normals[v], &reflected);
                         if (drawReflections) {
@@ -519,7 +539,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                         group->sourceVertices[v].tv = -((reflected.y + 1.0f) * 0.5f);
                         group->sourceVertices[v].tv = 0.25f;
                         reflected.y = 0.0f;
-                        reflected = Normalized(reflected);
+                        reflected = NormalizedCallingConstructor(reflected);
                         group->sourceVertices[v].tu =
                             ((float)atan(reflected.x / reflected.z) + 1.5707964f) * 0.31830987f;
                     }
@@ -545,7 +565,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                     group->node->UpdateWorldMatrix();
                     Matrix4* world = &group->node->worldMatrix;
                     for (int v = 0; v < count; v++) {
-                        Vector3 direction = Normalized(group->sourceVertices[v].position - eye);
+                        Vector3 direction = NormalizedCallingConstructor(group->sourceVertices[v].position - eye);
                         Vector3 normal = group->normals[v];
                         Vector3 n(normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0],
                                   normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],

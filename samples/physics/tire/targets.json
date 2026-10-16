@@ -254,8 +254,8 @@
     "candidate_symbol_contains": "UpdateDriveShare@Tire",
     "target_va": "0x00513f90",
     "target_size": 479,
-    "expect": "partial",
-    "notes": "470/479 (406/415 bytes): only the stack slots differ; retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local, VC6 the other way round (frame-layout fact 9: minimum has 4 references, boost 3). Tried without gain: embedded assignment in the boost condition (much worse), boost = 1 default with a nested if (worse), `?:` forms of minimum and of the clamp, `share <= minimum`, minimum = 1 default (worse), a temp b for the boost product (worse).",
+    "expect": "exact",
+    "notes": "exact: boost is set by a nested if, so it has four IR references (the duplicate else-stores are tail-merged later) and takes the dead argument slot as in retail (VC6_FRAME_LAYOUT fact 9).",
     "bindings": "Tire.bindings.json"
   },
   {
