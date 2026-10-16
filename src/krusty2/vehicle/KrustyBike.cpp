@@ -1483,13 +1483,13 @@ int KrustyBike::Tick(float dt)
         }
     }
     if (g_kbGame->debugOverlay && race->localRacer == this) {
-        if (field_0x1410 < 0) {
+        if (debugPage < 0) {
             int line = g_kbGame->debugOverlay->lineCount++;
-            field_0x1410 = line;
+            debugPage = line;
         }
-        g_kbGame->debugOverlay->Title(field_0x1410, "KrustyBike");
-        g_kbGame->debugOverlay->Print(field_0x1410, "Position/Heading=");
-        g_kbGame->debugOverlay->Print(field_0x1410, "%.2f, %.2f, %.2f / (%.0f)", position.x, position.y,
+        g_kbGame->debugOverlay->Title(debugPage, "KrustyBike");
+        g_kbGame->debugOverlay->Print(debugPage, "Position/Heading=");
+        g_kbGame->debugOverlay->Print(debugPage, "%.2f, %.2f, %.2f / (%.0f)", position.x, position.y,
                                     position.z, bodyYaw * 57.29578f);
         if (s_kbTimeTo60Armed) {
             if (forwardSpeed > 0.2f) {
@@ -1504,8 +1504,8 @@ int KrustyBike::Tick(float dt)
             s_kbTimeTo60 = 0;
             s_kbTimeTo60Armed = 1;
         }
-        g_kbGame->debugOverlay->Print(field_0x1410, "Last TimeTo60 = %.2f  seconds", s_kbLastTimeTo60);
-        g_kbGame->debugOverlay->Print(field_0x1410, "TimeTo60 = %.2f  seconds", s_kbTimeTo60);
+        g_kbGame->debugOverlay->Print(debugPage, "Last TimeTo60 = %.2f  seconds", s_kbLastTimeTo60);
+        g_kbGame->debugOverlay->Print(debugPage, "TimeTo60 = %.2f  seconds", s_kbTimeTo60);
     }
     return 1;
 }

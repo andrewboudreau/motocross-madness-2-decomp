@@ -204,7 +204,7 @@ public:
     int field_0x1404; // 0x1404
     int field_0x1408; // 0x1408
     int field_0x140c; // 0x140C
-    int field_0x1410; // 0x1410  -1 from the constructor
+    int debugPage; // 0x1410  -1 from the constructor; the "KrustyBike" debug-overlay page (Tick 0x004977a0 takes the next line)
     KbObj128* altBodyA; // 0x1414
     KbObj128* altBodyB; // 0x1418
     float field_0x141c; // 0x141C

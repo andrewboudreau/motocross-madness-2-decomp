@@ -48,7 +48,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     tagRun = 0;
     totalTagRun = 0;
     ghostMod = 0;
-    field_0x1410 = -1;
+    debugPage = -1;
     field_0x15e6 = 0;
     field_0x7a5 = 0;
     isGhost = 0;
