@@ -23,9 +23,9 @@ TerrainPeakHold g_terrainPeak9(5000);   // 0x0068a078
 BaseObject* Terrain::AcquireOwnedObject()
 {
     if (ownedObjectArrayCount > 0x3c) {
-        field_0xc84->age--;
-        field_0xc84->Purge(0);
-        field_0xc84->age++;
+        textureAgeManager->age--;
+        textureAgeManager->Purge(0);
+        textureAgeManager->age++;
     }
     BaseObject* object = ownedObjectArray[ownedObjectArrayCount];
     if (object) {
@@ -33,18 +33,18 @@ BaseObject* Terrain::AcquireOwnedObject()
         return object;
     }
     TerrainSurfaceBase* surface;
-    if (field_0x38) {
-        TerrainSurface* s = new(__FILE__, 0x67) TerrainSurface(field_0xc18.manager);
+    if (surfaceRegistry) {
+        TerrainSurface* s = new(__FILE__, 0x67) TerrainSurface(surfaceDesc.manager);
         surface = s;
-        surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, field_0x30, 2, field_0x34, 0, 0, 2, 1,
-                               &field_0xc18, 0x80, 0xff00ff);
-        field_0x38->Register(s);
+        surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, colorMapper, 2, directDrawPalette, 0, 0, 2, 1,
+                               &surfaceDesc, 0x80, 0xff00ff);
+        surfaceRegistry->Register(s);
     } else {
-        surface = new(__FILE__, 0x78) TerrainSurfaceBase(field_0xc18.manager, 1);
-        surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, field_0x30, 2, field_0x34, 0, 0, 2, 1,
-                               &field_0xc18, 0x80, 0xff00ff);
+        surface = new(__FILE__, 0x78) TerrainSurfaceBase(surfaceDesc.manager, 1);
+        surface->CreateSurface(0, 0x100, 0x100, 0x100, 1, 0, 0, colorMapper, 2, directDrawPalette, 0, 0, 2, 1,
+                               &surfaceDesc, 0x80, 0xff00ff);
     }
-    field_0xcc0++;
+    createdSurfaceCount++;
     ownedObjectArray[ownedObjectArrayCount] = surface;
     ownedObjectArrayCount++;
     return surface;

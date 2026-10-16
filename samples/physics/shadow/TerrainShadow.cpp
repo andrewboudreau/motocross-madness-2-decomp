@@ -361,7 +361,7 @@ void TerrainShadow::UnknownVirtualSlot30()
         }
 full:
         if (used)
-            caster->field_0xc88->MarkUsed(mesh->ageEntry);
+            caster->meshAgeManager->MarkUsed(mesh->ageEntry);
         if (vertexCount == 0x300)
             break;
     }

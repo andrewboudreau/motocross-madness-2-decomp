@@ -166,7 +166,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
     currentRacer = 0;
     reportedRacer = -1;
     cueRacerCount = 0;
-    field_0xac = 0;
+    groundTerrain = 0;
     for (int i = 0; i < 11; i++)
         cueRacers[i] = 0;
 }
@@ -182,7 +182,7 @@ VisualCue* VisualCue::LoadVisualCue(void* value, int a, int b, UnknownRunwayTerr
         if (ArcadeObject::Create(value, a, b, name, position, pixels, camera, size, c, d, 0)) {
             cueView = view;
             builtFieldOfView = 0;
-            field_0xac = terrain;
+            groundTerrain = terrain;
             return this;
         }
     }
@@ -383,10 +383,10 @@ BonusObjectManager::BonusObjectManager(int flags) : GameObject(flags) {
     elapsed = 0;
     camera = 0;
     placedFieldOfView = 0;
-    field_0x1ec = 0;
-    field_0x1f0 = 0;
+    cameraDistance = 0;
+    isResizePending = 0;
     currentKey = -1;
-    field_0x1e0 = 60.0f;
+    targetScreenWidth = 60.0f;
     sizeFactor = 1.0f;
 }
 
@@ -475,7 +475,7 @@ int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
     baseFrame->localBoundsCenter = kVec3Zero;
     baseFrame->localBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->localBoundsValid = 1;
-    field_0x1e4 = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
+    frameWidth = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
     return 1;
 }
 
@@ -502,14 +502,14 @@ void BonusObjectManager::NextKey() {
     keyDuration = g_UnknownBonusKeys[i + 1].time - g_UnknownBonusKeys[i].time;
     keyAngle = g_UnknownBonusKeys[i].rotationAngle;
     keyAngleChange = g_UnknownBonusKeys[i + 1].rotationAngle - keyAngle;
-    Vector3 next = KEY_VECTOR(i + 1, field_0x14);
-    keyPosition = KEY_VECTOR(i, field_0x14);
+    Vector3 next = KEY_VECTOR(i + 1, position);
+    keyPosition = KEY_VECTOR(i, position);
     keyPositionChange = next - keyPosition;
-    next = KEY_VECTOR(i + 1, field_0x08);
-    keyScale = KEY_VECTOR(i, field_0x08);
+    next = KEY_VECTOR(i + 1, scale);
+    keyScale = KEY_VECTOR(i, scale);
     keyScaleChange = next - keyScale;
-    next = KEY_VECTOR(i + 1, field_0x20);
-    keyAxis = KEY_VECTOR(i, field_0x20);
+    next = KEY_VECTOR(i + 1, rotationAxis);
+    keyAxis = KEY_VECTOR(i, rotationAxis);
     keyAxisChange = next - keyAxis;
 }
 

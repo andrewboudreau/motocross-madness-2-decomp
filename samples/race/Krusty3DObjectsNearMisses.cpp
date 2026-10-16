@@ -120,17 +120,17 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
         position += t * keyPositionChange + keyPosition;
         baseFrame->TranslateIn(0, position);
         if (camera != g_UnknownKrustyGame56e26c->renderTarget->currentCamera || camera->fieldOfView != placedFieldOfView ||
-            field_0x1f0) {
+            isResizePending) {
             camera = g_UnknownKrustyGame56e26c->renderTarget->currentCamera;
             placedFieldOfView = camera->fieldOfView;
             Vector3 delta = position - camera->eyePosition;
-            field_0x1f0 = 0;
-            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(camera) * field_0x1e4);
+            isResizePending = 0;
+            sizeFactor = (cameraDistance = Length(delta)) * targetScreenWidth / (CameraZoom(camera) * frameWidth);
         }
         position += raceView->localRacer->rearWheel->field_0x230 * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
-            field_0x188 = position - camera->eyePosition;
-            Vector3 forward = field_0x188;
+            eyeToFrame = position - camera->eyePosition;
+            Vector3 forward = eyeToFrame;
             forward.y = 0.0f;
             baseFrame->SetAxesPtr(&forward, &kVec3YAxis, 1, 1);
         } else {
@@ -218,7 +218,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             cueView->raceTrack->PointAt(cueView->ownRacer->statusNode->progressPos, &target);
         else
             target = cueView->ownRacer->trackPoint;
-        field_0xac->QueryGround(&target, 0, 0, 0);
+        groundTerrain->QueryGround(&target, 0, 0, 0);
         Vector3 direction = target - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
@@ -232,7 +232,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         if (!ref)
             return 1;
         Vector3 direction =
-            g_UnknownKrustyGame56e26c->bajaEnduroEvent->field_0xd8[ref->gateIndex].field_0x00 - arcadeView->cameraPosition;
+            g_UnknownKrustyGame56e26c->bajaEnduroEvent->gates[ref->gateIndex].position - arcadeView->cameraPosition;
         SetAxes(&direction, &kVec3YAxis, 1, 1);
         scale = modelScale;
         break;
