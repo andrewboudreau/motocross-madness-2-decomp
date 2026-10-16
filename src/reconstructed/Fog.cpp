@@ -79,8 +79,8 @@ int Fog::UnknownVirtualSlot12()
 {
     if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
-        TARGET()->currentCamera->UnknownVirtualSlot28();
-        TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
+        TARGET()->currentCamera->UpdateMatrices();
+        TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix);
     }
     return 1;
 }
@@ -106,8 +106,8 @@ int Fog::UnknownVirtualSlot14()
 {
     if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
-        TARGET()->currentCamera->UnknownVirtualSlot28();
-        if (!TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix)) {
+        TARGET()->currentCamera->UpdateMatrices();
+        if (!TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix)) {
             goto failed;
         }
         if (!drawnByFogOn && TARGET()->targetDisplay->isPowerVR
@@ -257,7 +257,7 @@ GameObject* FogOff::UnknownVirtualSlot8(void* value)
 int FogOff::UnknownVirtualSlot14()
 {
     TARGET()->currentCamera->ReapplyDefaultLimits();
-    TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
+    TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix);
     TARGET()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
     return 1;
 }

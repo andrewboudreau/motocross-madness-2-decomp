@@ -1866,7 +1866,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         *target = g_TrackGame->ui->garageFocus;
         viewTarget.y += 3.0f;
         g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(*target);
+        g_TrackGame->ui->garageCamera->LookAt(*target);
         g_TrackGame->ui->garageCamera->SetViewport(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);

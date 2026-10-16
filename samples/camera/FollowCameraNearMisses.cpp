@@ -487,7 +487,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         target = followHeading * lookAheadDistance;
         target += targetPoint;
         subject->QueryGround(&target, 0, 0, 0);
-        UnknownVirtualSlot29(target);
+        LookAt(target);
         wasWide = FollowCameraAbs(followYaw) > 2.0f;
     }
     if (cameraState != 6 && isCrashView && !UnknownVirtualSlot74()) {
@@ -601,7 +601,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             UnknownVirtualSlot54();
         }
         SetFrame(&smoothed, 0, 0, &roll, 0);
-        UnknownVirtualSlot29(cachedTarget);
+        LookAt(cachedTarget);
         if (UnknownVirtualSlot56()) {
             if (cameraState != 7 && !isCrashView) {
                 resumeState = cameraState;

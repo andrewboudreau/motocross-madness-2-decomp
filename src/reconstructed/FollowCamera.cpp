@@ -395,7 +395,7 @@ void FollowCamera::UnknownVirtualSlot68() {
     targetFieldOfView = ((200.0f - FastSqrt(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
     if (targetFieldOfView < 10.0f) targetFieldOfView = 10.0f;
     if (targetFieldOfView > 70.0f) targetFieldOfView = 70.0f;
-    UnknownVirtualSlot29(target);
+    LookAt(target);
 }
 
 // State dispatcher reconstructed from retail 0x00466E50.

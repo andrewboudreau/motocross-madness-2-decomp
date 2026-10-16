@@ -163,7 +163,7 @@ int DrawableCube::UnknownVirtualSlot14()
     s_world.m[3][0] = cubeObject->center.x;
     s_world.m[3][1] = cubeObject->center.y;
     s_world.m[3][2] = cubeObject->center.z;
-    Target()->currentCamera->UnknownVirtualSlot30(&s_world);
+    Target()->currentCamera->SetWorldMatrix(&s_world);
     Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     Target()->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     Target()->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);

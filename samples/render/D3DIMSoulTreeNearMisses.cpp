@@ -482,7 +482,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
     identity.m[1][1] = 1.0f;
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
-    ((RenderTarget*)renderContext)->currentCamera->UnknownVirtualSlot30(&identity);
+    ((RenderTarget*)renderContext)->currentCamera->SetWorldMatrix(&identity);
     int savedCull;
     int savedShade;
     ((RenderTarget*)renderContext)->GetRenderState(4, &savedCull);

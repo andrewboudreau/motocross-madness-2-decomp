@@ -383,7 +383,7 @@ int EventManager::CreatePodiumScene() {
     podiumCameraTarget = rotated * PodiumLength(lookOffset) + podiumPosition;
     podiumPanSpeed = podiumCameraTarget - podiumCameraPosition;
     podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
-    podiumCamera->UnknownVirtualSlot29(podiumFocus);
+    podiumCamera->LookAt(podiumFocus);
     float x0 = podiumPosition.x - 16.0f;
     float x1 = x0 + 32.0f;
     float z0 = podiumPosition.z - 16.0f;

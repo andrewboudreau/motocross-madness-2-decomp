@@ -43,7 +43,7 @@
 //   `camera + 0`, inline helpers taking the KrustyUI and the vector (by
 //   value or const reference), an inline camera getter with or without a
 //   redundant test, a `*(Vector3*)&` argument and a qualified
-//   `Camera::UnknownVirtualSlot29` call.
+//   `Camera::LookAt` call.
 //   Mechanism (Fable probe, 2026-10-16): the difference is VC6's Pentium
 //   scheduler, whose region is the whole basic block (calls are not
 //   barriers). A label (or `goto l; l:`) between the SetFrame call and the
@@ -396,7 +396,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         turned *= distance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
         previewDragged = 1;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
     } else if (!previewDragged) {
@@ -405,7 +405,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         turned *= viewDistance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
     }
     g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
     g_TrackGame->ui->garageCharacter->ModelVirtualSlot7(frameTime, 0, 0);

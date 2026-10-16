@@ -264,7 +264,7 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
             podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
         podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
         podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
-        podiumCamera->UnknownVirtualSlot29(podiumFocus);
+        podiumCamera->LookAt(podiumFocus);
         if (!g_TrackGame->podiumFinished && g_TrackGame->uiBlockedSeconds > 7.0f) {
             g_TrackGame->uiInteractionBlocked = 0;
             g_TrackGame->podiumFinished = 1;

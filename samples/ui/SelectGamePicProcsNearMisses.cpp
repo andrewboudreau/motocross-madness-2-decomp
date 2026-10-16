@@ -150,7 +150,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         turned *= distance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
         previewDragged = 1;
     } else if (!previewDragged) {
         offset = UnknownVectorDifference(viewEye, g_TrackGame->ui->garageFocus);
@@ -158,7 +158,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         turned *= viewDistance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
     }
     g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
     g_TrackGame->ui->garageCharacter->ModelVirtualSlot7(frameTime, 0, 0);

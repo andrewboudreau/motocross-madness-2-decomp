@@ -308,7 +308,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         turned *= distance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
         previewDragged = 1;
         static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
     } else if (!previewDragged) {
@@ -317,7 +317,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         turned *= viewDistance;
         viewEye = UnknownVectorSum(turned, g_TrackGame->ui->garageFocus);
         g_TrackGame->ui->garageCamera->SetFrame(&viewEye, 0, 0, 0, 0);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(viewTarget);
+        g_TrackGame->ui->garageCamera->LookAt(viewTarget);
     }
     g_TrackGame->ui->riderPreview->ModelVirtualSlot7(frameTime, 0, 0);
     g_TrackGame->ui->garageCharacter->ModelVirtualSlot7(frameTime, 0, 0);

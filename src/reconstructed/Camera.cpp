@@ -61,7 +61,7 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
         Release();
         return 0;
     }
-    UnknownVirtualSlot28();
+    UpdateMatrices();
     if (isEnabled)
         Owner()->SetCamera(this);
     return this;
@@ -163,7 +163,7 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
                 (unsigned int)viewport[2] > 0x20)
                 SetViewportWidth(1, -2, 0);
         }
-        UnknownVirtualSlot28();
+        UpdateMatrices();
     }
     return 1;
 }
@@ -204,7 +204,7 @@ void Camera::SetFrame(const Vector3* position, const Vector3* forward, const Vec
 int Camera::ReapplyDefaultLimits() {
     if (farPlane != g_UnknownFloat550f70 || nearPlane != g_UnknownFloat550f6c) {
         ClampLimits(g_UnknownFloat550f6c, g_UnknownFloat550f70);
-        UnknownVirtualSlot28();
+        UpdateMatrices();
     }
     return 1;
 }
@@ -269,7 +269,7 @@ static inline Vector3 NormalizeInline(const Vector3& v) {
 // (but not the z store) is what puts the cross product's fld/fmul operands
 // in retail order; with plain member access four pairs swap (659/690), with
 // the reference for all three stores 675/690.
-int Camera::UnknownVirtualSlot29(Vector3 target) {
+int Camera::LookAt(Vector3 target) {
     if (target.x == eyePosition.x && target.y == eyePosition.y && target.z == eyePosition.z)
         return 0;
     Vector3& up = upDirection;
@@ -290,17 +290,17 @@ int Camera::UnknownVirtualSlot29(Vector3 target) {
     return 1;
 }
 
-int Camera::UnknownVirtualSlot30(const Matrix4* value) {
+int Camera::SetWorldMatrix(const Matrix4* value) {
     worldMatrix = *value;
     return 1;
 }
 
-int Camera::UnknownVirtualSlot31(const Matrix4* value) {
+int Camera::SetViewMatrix(const Matrix4* value) {
     viewMatrix = *value;
     return 1;
 }
 
-int Camera::UnknownVirtualSlot32(const Matrix4* value) {
+int Camera::SetProjectionMatrix(const Matrix4* value) {
     projectionMatrix = *value;
     return 1;
 }
@@ -324,7 +324,7 @@ int Camera::UnknownVirtualSlot18() {
 int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (!GameObject::UnknownVirtualSlot23(event, entry)) {
         if (TestInputEvent(0xB7, 0, event, 0x80000000)) {
-            UnknownVirtualSlot27();
+            TakeScreenshot();
             return 1;
         }
     }
