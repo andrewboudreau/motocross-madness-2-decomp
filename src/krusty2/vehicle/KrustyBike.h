@@ -207,22 +207,22 @@ public:
     int debugPage; // 0x1410  -1 from the constructor; the "KrustyBike" debug-overlay page (Tick 0x004977a0 takes the next line)
     KbObj128* altBodyA; // 0x1414
     KbObj128* altBodyB; // 0x1418
-    float field_0x141c; // 0x141C
+    float trickLandTimer;                     // +0x141C  slot 71 sets 0.3 on landing with a trick pending; slot 29 scores via 0x00495ff0 when it runs out (tier 3)
     int animSetA[16]; // 0x1420  Fn_0048D910 indexes it with the argument (rider handle for riderCharacter); tier 3 name
     int animSetB[16]; // 0x1460  Fn_0048D910: same index, handle for the D3DIMSoultreeCharacter base
     int animSetC[16]; // 0x14A0  Fn_0048D990: handle for riderCharacter
     int animSetD[16]; // 0x14E0  Fn_0048D990: handle for the base character
-    float field_0x1520; // 0x1520
-    float field_0x1524; // 0x1524
-    float field_0x1528; // 0x1528
+    float trickClipTime;                      // +0x1520  seconds into the trick clip; slot 102 adds dt up to s_kbTrickLength[trick]; summed by slot 42 (tier 3)
+    float chainedTrickTime;                   // +0x1524  clip time banked by the chain start 0x0048d990; summed by slot 42 (tier 3)
+    float trickHoldTime;                      // +0x1528  seconds the player holds the pose in the s_kbTrickFrame window; summed by slot 42 (tier 3)
     float field_0x152c; // 0x152C
-    float field_0x1530; // 0x1530
+    float trickPoints;                        // +0x1530  slot 42 adds 2500 per trick second; 0x00495ff0 rounds it to 100 and shows it with the multiplier (tier 3)
     float field_0x1534; // 0x1534
-    float field_0x1538; // 0x1538
-    char field_0x153c; // 0x153C
-    unsigned char field_0x153d; // 0x153D
-    char field_0x153e; // 0x153E
-    char field_0x153f; // 0x153F
+    float trickMultiplier;                    // +0x1538  slot 42 sets it to trickCount, +0.5 when chained; multiplies trickPoints (tier 3)
+    char trickPoseHeld;                       // +0x153C  set while the trick pose is held in the s_kbTrickFrame window; sent as message flag9 (tier 3)
+    unsigned char trickCount;                 // +0x153D  tricks finished since the last score (slot 42 increments it) (tier 3)
+    char trickPoseHeldPrev;                   // +0x153E  trickPoseHeld of the previous frame (slot 49) (tier 3)
+    char trickChained;                        // +0x153F  set by the chain start 0x0048d990; +0.5 multiplier in 0x00495ff0 (tier 3)
     Vec3 field_0x1540; // 0x1540
     char field_0x154c; // 0x154C
     char field_0x154d; // 0x154D

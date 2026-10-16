@@ -381,7 +381,7 @@ struct KbRaceHandler {
     void ReportTrickScore(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
 };
 // Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
-struct KbScoreBoard { void ShowValue(float angle, float multiplier); };
+struct KbScoreBoard { void ShowValue(float points, float multiplier); };
 // Object at KbGame+0x3444 (bonus rules; packed: its ints sit at odd offsets).
 #pragma pack(push, 1)
 struct KbBonusTable {

@@ -40,7 +40,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     nextLapGate = 1;
     finishTimeStamp = 0;
     netId = 0;
-    field_0x141c = 0;
+    trickLandTimer = 0;
     field_0x4a4 = 1.0f;
     largestStuntPoints = 0;
     field_0x758 = 0;
@@ -303,7 +303,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     }
                                     message.flag7 = throttleOn;
                                     message.flag8 = field_0x479;
-                                    message.flag9 = field_0x153c;
+                                    message.flag9 = trickPoseHeld;
                                     message.crashDirection = crashDirection;
                                     message.crashed = crashState;
                                     message.flag4 = UnknownVirtualSlot51();
@@ -838,7 +838,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             crashState = states[0]->crashed;
             throttleOn = states[0]->flag7;
             field_0x479 = states[0]->flag8;
-            field_0x153c = states[0]->flag9;
+            trickPoseHeld = states[0]->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 crashedUpsideDown = bodyUp.y < 0.0f;
@@ -868,7 +868,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     else if (m == 0x11)
                         Fn_0048E280();
                 }
-            } else if (!field_0x153f) {
+            } else if (!trickChained) {
                 char m = interpSource->motion;
                 if (m > 0x11 && m - 0x11 == field_0x433)
                     Fn_0048D990(field_0x433);
@@ -936,7 +936,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             else
                 throttleOn = 0;
             field_0x479 = interpSource->flag8;
-            field_0x153c = interpSource->flag9;
+            trickPoseHeld = interpSource->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 crashedUpsideDown = bodyUp.y < 0.0f;
@@ -966,7 +966,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     else if (m == 0x11)
                         Fn_0048E280();
                 }
-            } else if (!field_0x153f) {
+            } else if (!trickChained) {
                 char m = interpSource->motion;
                 if (m > 0x11 && m - 0x11 == field_0x433)
                     Fn_0048D990(field_0x433);
@@ -1090,25 +1090,25 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                     held = 1;
                 else
                     held = 0;
-                field_0x1520 += dt;
-                if (field_0x433 < 16 && field_0x1520 > s_kbTrickLength[field_0x433])
-                    field_0x1520 = s_kbTrickLength[field_0x433];
+                trickClipTime += dt;
+                if (field_0x433 < 16 && trickClipTime > s_kbTrickLength[field_0x433])
+                    trickClipTime = s_kbTrickLength[field_0x433];
                 if (!held && field_0x152c == 0.0f) {
                     if (remote) {
-                        if (!field_0x153c) {
-                            if (field_0x153e && field_0x433 > 15)
+                        if (!trickPoseHeld) {
+                            if (trickPoseHeldPrev && field_0x433 > 15)
                                 Fn_0048D990(field_0x433 - 16);
                             ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
                             CharacterVirtualSlot7(dt, 0, 0);
                         }
                     } else {
-                        if (field_0x153c && field_0x433 < 16 && animSetC[field_0x433]) {
-                            field_0x153c = 0;
+                        if (trickPoseHeld && field_0x433 < 16 && animSetC[field_0x433]) {
+                            trickPoseHeld = 0;
                             int input = UnknownVirtualSlot88();
                             if (input != -1 && KbTrickChains(field_0x433, input))
                                 Fn_0048D990(field_0x433);
                         } else {
-                            field_0x153c = 0;
+                            trickPoseHeld = 0;
                         }
                         ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
                         CharacterVirtualSlot7(dt, 0, 0);
@@ -1116,16 +1116,16 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 } else {
                     int frame = D3DIMSoultreeCharacter::currentFrame->field_0x00;
                     if (frame > s_kbTrickFrame[field_0x433] && frame < s_kbTrickFrame[field_0x433] + 3) {
-                        field_0x153c = 1;
+                        trickPoseHeld = 1;
                         if (aiKind) {
                             field_0x152c -= dt;
                             if (field_0x152c < 0.0) {
                                 field_0x152c = 0;
-                                field_0x153c = 0;
+                                trickPoseHeld = 0;
                             }
                         } else {
-                            field_0x1528 += dt;
-                            field_0x1520 -= dt;
+                            trickHoldTime += dt;
+                            trickClipTime -= dt;
                         }
                     } else {
                         ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);

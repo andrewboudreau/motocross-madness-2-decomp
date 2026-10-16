@@ -71,9 +71,9 @@ void KrustyBike::UnknownVirtualSlot1(float a)
     field_0x154d = 0;
     field_0x154e = 0;
     nearestRival = 0;
-    field_0x141c = 0;
+    trickLandTimer = 0;
     offTrackTime = 0;
-    field_0x153e = 0;
+    trickPoseHeldPrev = 0;
     contactTime = 0;
 }
 
@@ -182,14 +182,14 @@ int KrustyBike::UnknownVirtualSlot39(float a)
 int KrustyBike::UnknownVirtualSlot42()
 {
     if (!crashState && field_0x433 >= 0 && field_0x430 && riderCharacter->c_0xc) {
-        float sum = field_0x1528 + field_0x1520;
-        field_0x1520 = 0;
-        field_0x153d++;
-        field_0x1528 = 0;
-        sum += field_0x1524;
-        field_0x1524 = 0;
-        field_0x1530 += sum * 2500.0f;
-        field_0x1538 = (float)field_0x153d;
+        float sum = trickHoldTime + trickClipTime;
+        trickClipTime = 0;
+        trickCount++;
+        trickHoldTime = 0;
+        sum += chainedTrickTime;
+        chainedTrickTime = 0;
+        trickPoints += sum * 2500.0f;
+        trickMultiplier = (float)trickCount;
         field_0x758 += sum;
         return 1;
     }
@@ -266,9 +266,9 @@ void KrustyBike::UnknownVirtualSlot69()
 void KrustyBike::UnknownVirtualSlot71(int a)
 {
     if (crashState) {
-        field_0x141c = 0;
-    } else if (airborne && !a && !landingLatched && field_0x431 && field_0x141c <= 0.0f) {
-        field_0x141c = 0.3f;
+        trickLandTimer = 0;
+    } else if (airborne && !a && !landingLatched && field_0x431 && trickLandTimer <= 0.0f) {
+        trickLandTimer = 0.3f;
     }
     Bike::UnknownVirtualSlot71(a);
 }
@@ -370,18 +370,18 @@ void KrustyBike::Fn_00496E20(KbRecorder* a)
 // ---- non-virtual state reset (0x0048D8B0) ----
 void KrustyBike::Fn_0048D8B0()
 {
-    field_0x1538 = 1.0f;
-    field_0x1530 = 0;
-    field_0x1520 = 0;
-    field_0x1528 = 0;
-    field_0x1524 = 0;
+    trickMultiplier = 1.0f;
+    trickPoints = 0;
+    trickClipTime = 0;
+    trickHoldTime = 0;
+    chainedTrickTime = 0;
     landingLatched = 0;
     field_0x431 = 0;
-    field_0x141c = 0;
-    field_0x153d = 0;
+    trickLandTimer = 0;
+    trickCount = 0;
     field_0x1534 = 0;
-    field_0x153c = 0;
-    field_0x153f = 0;
+    trickPoseHeld = 0;
+    trickChained = 0;
     field_0x15e5 = 0;
 }
 
@@ -685,11 +685,11 @@ void KrustyBike::UnknownVirtualSlot29(int a)
         riderCharacter->c_0x1a0->SetMatrixIn(0, &m);
     }
     if (field_0x431 && !hasFinished && landingLatched) {
-        if (field_0x141c < 0.0f) {
+        if (trickLandTimer < 0.0f) {
             score += Fn_00495FF0();
             return;
         }
-        field_0x141c -= stepTime;
+        trickLandTimer -= stepTime;
     }
 }
 
@@ -940,12 +940,12 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
         field_0x154c = 0;
     }
     field_0x1540 = position;
-    field_0x153e = field_0x153c;
+    trickPoseHeldPrev = trickPoseHeld;
     field_0x7a2 = lapCount;
 }
 
-// 0x00495ff0: ends a trick. The angle (+0x1530) drops its part below 100, the
-// score is angle x multiplier (+0x1538, +0.5 for a +0x153f landing); the race
+// 0x00495ff0: ends a trick. trickPoints (+0x1530) drops its part below 100, the
+// score is points x trickMultiplier (+0x1538, +0.5 when trickChained); the race
 // handler hears of it. In game mode 0 (or 4 with +0x2eb8 for the +0x568 racer's
 // bike) the score is kept in +0x788 and returned; otherwise the bonus rules
 // (+0x3444) turn it into a capped bonus, shown to the +0x50 racer's bike.
@@ -954,17 +954,17 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
 // (docs/VC6_OPERAND_ORDER.md section 3); without them the load follows it.
 float KrustyBike::Fn_00495FF0()
 {
-    field_0x1530 -= ((float)fmod(field_0x1530, 100.0));
-    if (field_0x153f)
-        field_0x1538 += 0.5f;
-    float score = field_0x1530 * field_0x1538;
+    trickPoints -= ((float)fmod(trickPoints, 100.0));
+    if (trickChained)
+        trickMultiplier += 0.5f;
+    float score = trickPoints * trickMultiplier;
     if (race->localRacer == this && race->handler)
         race->handler->ReportTrickScore(this, score);
     if (!g_kbGame->eventType ||
         (g_kbGame->eventType == 4 && g_kbGame->stuntMode && g_kbGame->tagEvent->field_0xa8 == this)) {
         if (race->localRacer == this) {
             if (race->scoreBoard)
-                race->scoreBoard->ShowValue(field_0x1530, field_0x1538);
+                race->scoreBoard->ShowValue(trickPoints, trickMultiplier);
             int points = (int)score;
             if (largestStuntPoints > points)
                 points = largestStuntPoints;
@@ -975,7 +975,7 @@ float KrustyBike::Fn_00495FF0()
     }
     KbBonusTable* rules = g_kbGame->proCircuit;
     if (rules) {
-        float step = field_0x1530 * 0.000016f;
+        float step = trickPoints * 0.000016f;
         if (!(step < 1.0f))
             step = 1.0f;
         int base = rules->base[rules->index];
@@ -1234,9 +1234,9 @@ void KrustyBike::Fn_0048D910(int idx)
     field_0x430 = 1;
     field_0x431 = 0;
     field_0x432 = 1;
-    field_0x1520 = 0;
-    field_0x1524 = 0;
-    field_0x1528 = 0;
+    trickClipTime = 0;
+    chainedTrickTime = 0;
+    trickHoldTime = 0;
     field_0x433 = (char)idx;
     ((KbA5C4*)riderCharacter)->SetMotion(animSetA[idx]);
     ((KbA5C4*)riderCharacter)->field_0x10 = 0;
@@ -1245,16 +1245,16 @@ void KrustyBike::Fn_0048D910(int idx)
 }
 
 // owner: bracket only (0x48d990; callers 0x48eff2, 0x48f115, 0x49562c are KrustyBike methods)
-// Variant of Fn_0048D910 that keeps the pending score in field_0x1524 and uses animSetC/animSetD.
+// Variant of Fn_0048D910 that banks trickClipTime in chainedTrickTime and uses animSetC/animSetD.
 void KrustyBike::Fn_0048D990(int idx)
 {
     field_0x430 = 1;
-    field_0x1524 = field_0x1520;
-    field_0x1520 = 0;
+    chainedTrickTime = trickClipTime;
+    trickClipTime = 0;
     field_0x433 = (char)(idx + 0x10);
     ((KbA5C4*)riderCharacter)->SetMotion(animSetC[idx]);
     D3DIMSoultreeCharacter::SetMotion((Motion*)animSetD[idx]);
-    field_0x153f = 1;
+    trickChained = 1;
 }
 
 // owner: bracket only (0x48dcd0; referenced by pointer from the collision setup, not called)
@@ -1553,7 +1553,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     }
     message.flag7 = throttleOn;
     message.flag8 = field_0x479;
-    message.flag9 = field_0x153c;
+    message.flag9 = trickPoseHeld;
     message.crashDirection = crashDirection;
     message.crashed = crashState;
     message.flag4 = UnknownVirtualSlot51();
@@ -1716,9 +1716,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         brakeGyro = 0;
     }
     field_0x7a8 = 3.5f;
-    field_0x1520 = 0;
-    field_0x1524 = 0;
-    field_0x1528 = 0;
+    trickClipTime = 0;
+    chainedTrickTime = 0;
+    trickHoldTime = 0;
     rivalBearingScaled = 0;
     headTurnAngle = 0;
     crashTimer = 0;
