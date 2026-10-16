@@ -17,7 +17,7 @@
   "?SetRacer@RunwayLights@@QAEXPAUUnknownRunwayRacer@@@Z": "0x0048ad50",
   "?Create@NationalRace@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004aa850",
   "?Create@BaseQuarryEvent@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004de3b0",
-  "?UnknownFunction51af00@DropTextOverlay@@QAEPAV1@PAXPAVTextureMapManager@@MHHPBD@Z": "0x0051af00",
+  "?Setup@DropTextOverlay@@QAEPAV1@PAXPAVTextureMapManager@@MHHPBD@Z": "0x0051af00",
   "?ReshowText@DropTextOverlay@@QAEXXZ": "0x0051b1f0",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?Tick@BaseQuarryEvent@@UAEHM@Z": "0x004de410",

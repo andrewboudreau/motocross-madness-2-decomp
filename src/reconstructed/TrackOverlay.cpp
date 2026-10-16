@@ -896,7 +896,7 @@ DropTextOverlay::DropTextOverlay(int flags) : GameObject(flags)
 {
     textFont = 0;
     visible = 0;
-    field_0x38 = 0;
+    dropSeconds = 0;
     textX = 0;
     textYOffset = 0;
     textY = 0;
