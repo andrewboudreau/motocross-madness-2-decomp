@@ -97,7 +97,7 @@ struct UnknownFilterKeys {
     unsigned int repeatMSec;
     unsigned int bounceMSec;
 };
-UnknownFilterKeys g_UnknownFilterKeys689940;
+UnknownFilterKeys g_FilterKeys;
 
 // 0x004bfa80: the current time in milliseconds, read at 1 ms timer
 // resolution. It sits just before PCGame's constructor; its TU is inferred
@@ -133,8 +133,8 @@ PCGame::PCGame() {
         inputContext = 0;
         imeLibrary = 0;
     }
-    memset(&g_UnknownFilterKeys689940, 0, sizeof(g_UnknownFilterKeys689940));
-    g_UnknownFilterKeys689940.size = sizeof(g_UnknownFilterKeys689940);
+    memset(&g_FilterKeys, 0, sizeof(g_FilterKeys));
+    g_FilterKeys.size = sizeof(g_FilterKeys);
 }
 
 // 0x004bfc20

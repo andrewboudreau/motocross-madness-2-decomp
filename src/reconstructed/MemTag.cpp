@@ -24,7 +24,8 @@
 void* DebugMemcpy(void* destination, const void* source, unsigned int size, const char* file, int line);
 
 static MemTagStack s_memTagStack;             // 0x006850c0, .CRT$XCU 183
-int g_UnknownUnclaimedBytes6850dc;            // 0x006850dc: bytes counted without a tracker
+int g_UnclaimedBytes;                       // 0x006850dc: bytes the debug allocators count while
+                                            // g_MemTagStack or its arrays are absent
 MemTagStack* g_MemTagStack = &s_memTagStack;  // 0x0056df04
 
 // 0x004a2b00
@@ -138,7 +139,7 @@ void* DebugMalloc(unsigned int size, const char* file, int line)
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += size;
         } else {
-            g_UnknownUnclaimedBytes6850dc += size;
+            g_UnclaimedBytes += size;
         }
     }
     return p;
@@ -152,7 +153,7 @@ void DebugFree(void* p, const char* file, int line)
             int size = _msize(p);
             g_MemTagStack->ours[g_MemTagStack->current] -= size;
         } else {
-            g_UnknownUnclaimedBytes6850dc -= _msize(p);
+            g_UnclaimedBytes -= _msize(p);
         }
     }
     free(p);
@@ -168,7 +169,7 @@ void* DebugRealloc(void* p, unsigned int size, const char* file, int line)
             g_MemTagStack->ours[g_MemTagStack->current] -= oldSize;
         } else {
             oldSize = _msize(p);
-            g_UnknownUnclaimedBytes6850dc -= oldSize;
+            g_UnclaimedBytes -= oldSize;
         }
         if (!size) {
             free(p);
@@ -180,7 +181,7 @@ void* DebugRealloc(void* p, unsigned int size, const char* file, int line)
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += size;
         } else {
-            g_UnknownUnclaimedBytes6850dc += size;
+            g_UnclaimedBytes += size;
         }
         if (p) {
             if (oldSize >= (int)size) {
@@ -195,7 +196,7 @@ void* DebugRealloc(void* p, unsigned int size, const char* file, int line)
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += oldSize;
         } else {
-            g_UnknownUnclaimedBytes6850dc += oldSize;
+            g_UnclaimedBytes += oldSize;
         }
     }
     return p;
@@ -210,7 +211,7 @@ void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int l
         if (g_MemTagStack && g_MemTagStack->ours) {
             g_MemTagStack->ours[g_MemTagStack->current] += bytes;
         } else {
-            g_UnknownUnclaimedBytes6850dc += bytes;
+            g_UnclaimedBytes += bytes;
         }
     }
     return p;
@@ -222,7 +223,7 @@ void* operator new(unsigned int size, const char* file, int line)
     if (g_MemTagStack && g_MemTagStack->ours) {
         g_MemTagStack->ours[g_MemTagStack->current] += size;
     } else {
-        g_UnknownUnclaimedBytes6850dc += size;
+        g_UnclaimedBytes += size;
     }
     return malloc(size);
 }
@@ -235,7 +236,7 @@ void operator delete(void* p, const char* file, int line)
             int size = _msize(p);
             g_MemTagStack->ours[g_MemTagStack->current] -= size;
         } else {
-            g_UnknownUnclaimedBytes6850dc -= _msize(p);
+            g_UnclaimedBytes -= _msize(p);
         }
     }
     free(p);
@@ -249,7 +250,7 @@ void operator delete(void* p)
             int size = _msize(p);
             g_MemTagStack->ours[g_MemTagStack->current] -= size;
         } else {
-            g_UnknownUnclaimedBytes6850dc -= _msize(p);
+            g_UnclaimedBytes -= _msize(p);
         }
     }
     free(p);

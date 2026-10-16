@@ -38,7 +38,7 @@ struct UnknownBltFx {
 
 // 0x00570570: the gamma ramp set when the card supports one (zero
 // initialised .data, only referenced by 0x004c9f30).
-extern unsigned short g_UnknownGammaRamp570570[3][256];
+extern unsigned short g_GammaRamp[3][256];
 
 // cdecl helpers after wrecker.cpp's code, called around cooperative level
 // changes when PCGame+0x538 (IMM32.DLL) is loaded.
