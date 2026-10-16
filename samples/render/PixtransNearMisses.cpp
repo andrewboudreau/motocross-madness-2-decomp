@@ -30,11 +30,16 @@
 // Halve8 (0x004cee30, 1133 bytes; candidate 1093): the palette-index
 // halver. The search for the magenta entry, both block loops, the key test
 // and the >= 2 rule match, and nested ifs reproduce retail's single
-// `return 0` block. Retail pushes ebp only after the three checks,
-// holds 0xff in bl for the search and keeps the found index in the dead
-// `source` slot with both row pointers in locals. VC6 here pushes ebp in
-// the prologue and homes `sourceRow` in `source`'s slot, which shifts every
-// slot. `key` as the loop variable (with or without `== 256` -> -1) and a
+// `return 0` block. The keyed and plain loops are an if/else with one
+// `return 1` after it: with a `return 1` after the keyed loop VC6 pushes ebp
+// in the prologue, as an if/else it pushes ebp after the three checks as
+// retail does (docs/VC6_SHRINK_WRAP.md; `key == -1` first scores higher but
+// inverts retail's branch). Still differs: retail holds 0xff in bl for the
+// search (`!green`, `255`, casts, a pointer walk and nested ifs keep the
+// immediates) and keeps the found index in the dead `source` slot with both
+// row pointers in locals (frame 0x48); VC6 here homes `sourceRow` in
+// `source`'s slot (frame 0x44), which shifts every slot. Initialising the
+// row pointers after the search is worse. `key` as the loop variable (with or without `== 256` -> -1) and a
 // combined `key < 256 && key != -1` test are worse. The fast loop's red/blue/green
 // sum order also differs (retail sums blue before green).
 //
@@ -270,22 +275,22 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
                         sourceRow += sourceStride * 2;
                         row += destinationStride;
                     }
-                    return 1;
-                }
-                for (int y = 0; y < height; y++) {
-                    unsigned char* from = sourceRow;
-                    unsigned char* to = row;
-                    for (int x = 0; x < width; x++, from += 2) {
-                        UnknownPixel24 a = entries[from[0]];
-                        UnknownPixel24 b = entries[from[1]];
-                        UnknownPixel24 c = entries[from[sourceStride]];
-                        UnknownPixel24 d = entries[from[sourceStride + 1]];
-                        *to++ = indices[((a.red + b.red + c.red + d.red + 16) >> 5) << 10
-                                        | ((a.green + b.green + c.green + d.green + 16) >> 5) << 5
-                                        | (a.blue + b.blue + c.blue + d.blue + 16) >> 5];
+                } else {
+                    for (int y = 0; y < height; y++) {
+                        unsigned char* from = sourceRow;
+                        unsigned char* to = row;
+                        for (int x = 0; x < width; x++, from += 2) {
+                            UnknownPixel24 a = entries[from[0]];
+                            UnknownPixel24 b = entries[from[1]];
+                            UnknownPixel24 c = entries[from[sourceStride]];
+                            UnknownPixel24 d = entries[from[sourceStride + 1]];
+                            *to++ = indices[((a.red + b.red + c.red + d.red + 16) >> 5) << 10
+                                            | ((a.green + b.green + c.green + d.green + 16) >> 5) << 5
+                                            | (a.blue + b.blue + c.blue + d.blue + 16) >> 5];
+                        }
+                        sourceRow += sourceStride * 2;
+                        row += destinationStride;
                     }
-                    sourceRow += sourceStride * 2;
-                    row += destinationStride;
                 }
                 return 1;
             }

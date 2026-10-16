@@ -53,7 +53,9 @@ repository's COFF tools).
 - If retail delays its pushes past a guard and the reconstruction does not,
   look for an early `return` (or a `return` inside a loop or branch) that
   the original wrote as `if`/`else` or as a `break` to a shared exit.
-  CollisionPoint `0x0043ad80` went from 47 to 597 of 615 bytes this way.
+  CollisionPoint `0x0043ad80` went from 47 to 597 of 615 bytes this way;
+  Pixtrans `0x004cee30` gets retail's `push ebp` after its palette checks
+  once its two loops share one `return 1`.
 - If retail pushes before the guard and the reconstruction delays the pushes,
   the original probably had more exits that the reconstruction folded into
   the final one. Parser `0x004b87f0` (33 of 408 bytes) became exact by
