@@ -14,8 +14,8 @@ racer points back at its node from +0x744. Freeing tests the racer's
 GameObject +0x25 bit 0 through the virtual-base pointer.
 
 Extent: `0x004e58a0..0x004e6f7f` (strong inference). It opens with one
-empty `$E` pair (`0x004e58a0`), for the two arrow arrays at
-`0x00689c30`/`0x00689c48` that `0x004e59c0` writes. Its kVec3 `$E` set at
+empty `$E` pair (`0x004e58a0`), for the two debug line arrays
+`g_GateDebugBoxLine`/`g_GateDebugDirectionLine` (`0x00689c30`/`0x00689c48`) that `0x004e59c0` writes. Its kVec3 `$E` set at
 `0x004e6e40..0x004e6f7b` ends it. Those vectors share this unit's bss
 block, and the `.CRT$XCU` order is racesnd.cpp's set, this unit's
 vectors, then `0x004e58a0`. A unit's entries are contiguous; this follows

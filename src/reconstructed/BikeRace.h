@@ -1029,8 +1029,8 @@ extern Vector3 g_UnknownGlobal577a30[2];
 extern Vector3 g_UnknownGlobal577a48[2];
 extern Vector3 g_UnknownGlobal5779d8[2];
 extern Vector3 g_UnknownGlobal577a18[2];
-extern Vector3 g_UnknownGlobal689c30[2];
-extern Vector3 g_UnknownGlobal689c48[2];
+extern Vector3 g_GateDebugBoxLine[2];
+extern Vector3 g_GateDebugDirectionLine[2];
 extern Vector3 g_UnknownGlobal578dc0[2];
 
 // 0x004230e0 (cdecl; an UnknownRecorderCallback, its address is passed at

@@ -2011,9 +2011,9 @@ int BikeRace::UnknownVirtualSlot14() {
             }
             DrawLine(&g_UnknownGlobal577a18[0], &g_UnknownGlobal577a18[1]);
             SetDrawColor(0, 0, 0xff);
-            DrawLine(&g_UnknownGlobal689c30[0], &g_UnknownGlobal689c30[1]);
+            DrawLine(&g_GateDebugBoxLine[0], &g_GateDebugBoxLine[1]);
             SetDrawColor(0xff, 0, 0xff);
-            DrawLine(&g_UnknownGlobal689c48[0], &g_UnknownGlobal689c48[1]);
+            DrawLine(&g_GateDebugDirectionLine[0], &g_GateDebugDirectionLine[1]);
             SetDrawColor(0xff, 0, 0);
             DrawLine(&g_UnknownGlobal578dc0[0], &g_UnknownGlobal578dc0[1]);
         }

@@ -25,7 +25,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 }
 
 // One declaration: retail has a single empty initializer for both arrays.
-Vector3 g_UnknownGlobal689c30[2], g_UnknownGlobal689c48[2];
+Vector3 g_GateDebugBoxLine[2], g_GateDebugDirectionLine[2];
 int g_ViewRacerFinished;
 
 // 0x00572988 and 0x0057298c (.data, before this file's __FILE__): the
@@ -108,12 +108,12 @@ int AdvanceGate(Vector3* from, Vector3* to, UnknownBikeRaceNode** current, Unkno
         }
         times[++*count % 600] = now;
     }
-    g_UnknownGlobal689c30[0] = (*current)->center - (*current)->halfExtents;
-    g_UnknownGlobal689c30[0].y += 3.0f;
-    g_UnknownGlobal689c30[1] = (*current)->halfExtents * 2.0f + g_UnknownGlobal689c30[0];
-    g_UnknownGlobal689c48[0] = (*current)->center;
-    g_UnknownGlobal689c48[0].y += 3.0f;
-    g_UnknownGlobal689c48[1] = (*current)->direction * 10.0f + g_UnknownGlobal689c48[0];
+    g_GateDebugBoxLine[0] = (*current)->center - (*current)->halfExtents;
+    g_GateDebugBoxLine[0].y += 3.0f;
+    g_GateDebugBoxLine[1] = (*current)->halfExtents * 2.0f + g_GateDebugBoxLine[0];
+    g_GateDebugDirectionLine[0] = (*current)->center;
+    g_GateDebugDirectionLine[0].y += 3.0f;
+    g_GateDebugDirectionLine[1] = (*current)->direction * 10.0f + g_GateDebugDirectionLine[0];
     return 1;
 }
 
