@@ -254,7 +254,7 @@ int GameObject::OnNetworkMessage(int type, void* data, int from, int to, int fla
 // 0x00469680: recurses to the last sibling first, detaches each object from
 // its predecessor, then releases it.
 int GameObject::ReleaseSiblings() {
-    if (g_UnknownGlobal65b548)
+    if (g_ActiveGameObjectIterators)
         return 0;
     if (nextSibling)
         nextSibling->ReleaseSiblings();
@@ -268,7 +268,7 @@ int GameObject::ReleaseSiblings() {
 // run 0x00469680, unlinks this object from its siblings and parent, then
 // releases the reference.
 int GameObject::Release() {
-    if (g_UnknownGlobal65b548)
+    if (g_ActiveGameObjectIterators)
         return 0;
     if (firstChild)
         firstChild->ReleaseSiblings();
@@ -362,7 +362,7 @@ unsigned int GameObject::RecomputeFlags() {
 // 0x00469130: appends `object` (and its later siblings) after this object's
 // last sibling, under the same parent; returns `object`.
 int GameObject::AppendSibling(GameObject* object, int value) {
-    if (g_UnknownGlobal65b548)
+    if (g_ActiveGameObjectIterators)
         return 0;
     if (object) {
         GameObject* last = this;
@@ -381,7 +381,7 @@ int GameObject::AppendSibling(GameObject* object, int value) {
 // 0x00469190: appends `child` (and its later siblings) to the children;
 // returns `child`.
 int GameObject::AppendChild(GameObject* child, int value) {
-    if (g_UnknownGlobal65b548)
+    if (g_ActiveGameObjectIterators)
         return 0;
     if (child) {
         if (!firstChild) {
@@ -404,7 +404,7 @@ int GameObject::AppendChild(GameObject* child, int value) {
 
 // 0x004691f0
 int GameObject::Unlink() {
-    if (g_UnknownGlobal65b548)
+    if (g_ActiveGameObjectIterators)
         return 0;
     if (prevSibling)
         prevSibling->nextSibling = nextSibling;
@@ -424,7 +424,7 @@ int GameObject::Unlink() {
 
 // 0x00469260: unlinks this object and inserts it before `next`.
 int GameObject::InsertBefore(GameObject* next, int value) {
-    if (g_UnknownGlobal65b548)
+    if (g_ActiveGameObjectIterators)
         return 0;
     Unlink();
     prevSibling = next->prevSibling;
@@ -607,14 +607,14 @@ GameObjectIterator::GameObjectIterator(GameObject* root, int mode, const char* f
         currentObject = rootObject->parent;
         break;
     }
-    g_UnknownGlobal65b548++;
+    g_ActiveGameObjectIterators++;
     exhausted = 0;
 }
 
 // 0x00469a20
 void GameObjectIterator::Stop() {
     if (!exhausted)
-        g_UnknownGlobal65b548--;
+        g_ActiveGameObjectIterators--;
     currentObject = 0;
 }
 
@@ -685,7 +685,7 @@ GameObject* GameObjectIterator::Next() {
         }
     } while (!found && currentObject);
     if (!currentObject) {
-        g_UnknownGlobal65b548--;
+        g_ActiveGameObjectIterators--;
         exhausted = 1;
     }
     return found;

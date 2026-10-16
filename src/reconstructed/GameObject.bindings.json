@@ -33,7 +33,7 @@
   "?ReleaseDetached@GameObject@@QAEXXZ": "0x00469c80",
   "?AppendClassName@GameObject@@QAEXPAV1@@Z": "0x00469ce0",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
-  "?g_UnknownGlobal65b548@@3HA": "0x0065b548",
+  "?g_ActiveGameObjectIterators@@3HA": "0x0065b548",
   "?name@type_info@@QBEPBDXZ": "0x00536c83",
   "__FILE__": "0x0056b6c8",
   "___RTtypeid": "0x005354df",

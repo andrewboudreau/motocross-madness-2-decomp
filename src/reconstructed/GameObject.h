@@ -5,8 +5,10 @@ struct UnknownInputEntry;
 
 #include "BaseObject.h"
 
-// Global read by GameObject::Release (0x0065b548); nonzero blocks release.
-extern int g_UnknownGlobal65b548;
+// 0x0065b548: the number of running GameObjectIterators (each start adds
+// one, Stop or running out subtracts it); while nonzero, Release, the
+// sibling release and the relinking calls return 0.
+extern int g_ActiveGameObjectIterators;
 
 // RTTI: GameObject : BaseObject. GameObject introduces primary slots 4-26.
 // Only signatures needed by reconstructed derived classes are refined; the rest
