@@ -28,7 +28,7 @@ Terrain::Terrain(int a)
     verticesReleased = 0;
     vertexTests = 0;
     directDrawPalette = 0;
-    field_0xb4 = 0;
+    frameCount = 0;
     ownedObjectCount = 0;
     retestStamp = 0;
     heightField = 0;

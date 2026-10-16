@@ -367,7 +367,7 @@ public:
     int verticesPinned;  // +0xA8  GridTerrain: vertices pinned by RetestChangedVertices (0x00482760)
     int verticesReleased;  // +0xAC  GridTerrain: vertices released by RetestChangedVertices (0x00482760)
     int vertexTests;  // +0xB0  GridTerrain: incremented by DrawableGridNode::TestVertex (0x00482a40)
-    int field_0xb4;
+    int frameCount;                           // +0xB4  incremented by PrepareGeometry 0x00507610 (0x00507861); Griddraw stamps nodes with it
     char vertexRetestStamps[0x53c - 0xb8];  // +0xB8  GridTerrain: 17x17 ints; RetestChangedVertices stores retestStamp per vertex, 0x00482f00 compares
     int retestStamp;  // +0x53C  GridTerrain: incremented per RetestChangedVertices call, stored in vertexRetestStamps[]
     int ownedObjectCount;                                            // +0x540 count of ownedObjects[]
