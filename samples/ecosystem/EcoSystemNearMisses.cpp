@@ -624,12 +624,12 @@ int EcoSystem::GenerateObjects(int checkCodes) {
         if (slope < 0.0f)
             slope = 0.0f;
         slope *= (float)(2.0 / 3.14159265358979);
-        probability *= g_UnknownGlobal56ece0->Lookup(slope, definitionTable[selected]->meanSlope,
+        probability *= g_SharedNormalDistribution->Lookup(slope, definitionTable[selected]->meanSlope,
                                                       definitionTable[selected]->standardDeviationSlope);
         if (probability <= threshold)
             continue;
         altitude = (altitude - minHeight) / (maxHeight - minHeight);
-        probability *= g_UnknownGlobal56ece0->Lookup(altitude, definitionTable[selected]->meanAltitude,
+        probability *= g_SharedNormalDistribution->Lookup(altitude, definitionTable[selected]->meanAltitude,
                                                       definitionTable[selected]->standardDeviationAltitude);
         if (probability <= threshold)
             continue;

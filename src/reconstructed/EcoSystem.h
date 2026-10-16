@@ -542,12 +542,14 @@ public:
 extern EcoSystem* g_EcoSystem;
 
 // NormalDistribution.cpp (src/krusty2/effects): the tabulated bell curve
-// the generator weighs the slope and altitude with (0x0056ece0).
-class UnknownEcoNormalDistribution {
+// the generator weighs the slope and altitude with. The pointer at
+// 0x0056ece0 holds 0x006886e8, that file's static object, and 0x004b0070
+// is its Lookup; only the method EcoSystem calls is declared here.
+class NormalDistribution {
 public:
     float Lookup(float value, float mean, float sigma); // 0x004b0070
 };
-extern UnknownEcoNormalDistribution* g_UnknownGlobal56ece0;
+extern NormalDistribution* g_SharedNormalDistribution;
 
 // 0x0045c040 (cdecl): loads every texture a .esb names ahead of the
 // ecosystem itself.
