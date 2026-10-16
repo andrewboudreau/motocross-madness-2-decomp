@@ -51,11 +51,12 @@ static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
 // cdecl 0x0047b570: resizes a DebugMalloc'd block (KrustyUI.cpp).
 void* ResizeDebugBlock(void* block, unsigned int size);
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
-int g_UnknownGlobal65b5c8;
+int g_AnimStepTime;
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
 UIDialog* g_SortingDialog;
-// 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
-int g_UnknownGlobal65b60c;
+// 0x0065b60c: the frames of the grow (zoom) transition (UIControl slot 41,
+// GrowStep 0x004715d0).
+int g_GrowFrameCount;
 
 // cdecl 0x00477b60: the list rows' default order (by text).
 int CompareRowText(const void* a, const void* b);
@@ -315,7 +316,7 @@ int UIAnim::AddFrame(UIFrame* frame) {
 // once past a sound frame), bouncing or looping as the pass count says.
 UIFrame* UIAnim::Advance() {
     int now = ReadClock();
-    g_UnknownGlobal65b5c8 = now;
+    g_AnimStepTime = now;
     if (abs(now - lastStepTime) > frameDelay || frameList[currentFrame]->isSound == 1) {
         lastStepTime = now;
         if (playBackwards) {
@@ -3706,15 +3707,15 @@ int UIControl::AnimOutStep() {
     return 1;
 }
 
-int g_UnknownGlobal65b610;                       // frames of the slide
+int g_SlideLeftFrameCount;                    // 0x0065b610: frames of the slide
 
 // 0x00471850
 int UIControl::SlideLeftStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b610 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideLeftFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         int left = bounds[0];
         slideX = (float)(left - bounds[2] - 1);
-        slideStepX = ((float)left - slideX) / g_UnknownGlobal65b610;
+        slideStepX = ((float)left - slideX) / g_SlideLeftFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3722,7 +3723,7 @@ int UIControl::SlideLeftStep() {
     } else {
         slideX += slideStepX;
     }
-    if (transitionFrame == g_UnknownGlobal65b610)
+    if (transitionFrame == g_SlideLeftFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3747,15 +3748,15 @@ int UIControl::SlideLeftStep() {
     return 0;
 }
 
-int g_UnknownGlobal65b614;                       // frames of the slide
+int g_SlideTopFrameCount;                     // 0x0065b614: frames of the slide
 
 // 0x004719c0
 int UIControl::SlideTopStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b614 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideTopFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         int top = bounds[1];
         slideY = (float)(top - bounds[3]);
-        slideStepY = ((float)top - slideY) / g_UnknownGlobal65b614;
+        slideStepY = ((float)top - slideY) / g_SlideTopFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3763,7 +3764,7 @@ int UIControl::SlideTopStep() {
     } else {
         slideY += slideStepY;
     }
-    if (transitionFrame == g_UnknownGlobal65b614)
+    if (transitionFrame == g_SlideTopFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3788,14 +3789,14 @@ int UIControl::SlideTopStep() {
     return 0;
 }
 
-int g_UnknownGlobal65b618;                       // frames of the slide
+int g_SlideRightFrameCount;                   // 0x0065b618: frames of the slide
 
 // 0x00471b30
 int UIControl::SlideRightStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b618 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideRightFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         slideX = (float)ownerDialog->screenWidth;
-        slideStepX = ((float)bounds[0] - slideX) / g_UnknownGlobal65b618;
+        slideStepX = ((float)bounds[0] - slideX) / g_SlideRightFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3803,7 +3804,7 @@ int UIControl::SlideRightStep() {
     } else {
         slideX += slideStepX;
     }
-    if (transitionFrame == g_UnknownGlobal65b618)
+    if (transitionFrame == g_SlideRightFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3828,14 +3829,14 @@ int UIControl::SlideRightStep() {
     return 0;
 }
 
-int g_UnknownGlobal65b61c;                       // frames of the slide
+int g_SlideBottomFrameCount;                  // 0x0065b61c: frames of the slide
 
 // 0x00471c90
 int UIControl::SlideBottomStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b61c = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideBottomFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         slideY = (float)ownerDialog->screenHeight;
-        slideStepY = ((float)bounds[1] - slideY) / g_UnknownGlobal65b61c;
+        slideStepY = ((float)bounds[1] - slideY) / g_SlideBottomFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3843,7 +3844,7 @@ int UIControl::SlideBottomStep() {
     } else {
         slideY += slideStepY;
     }
-    if (transitionFrame == g_UnknownGlobal65b61c)
+    if (transitionFrame == g_SlideBottomFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3902,7 +3903,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
 // ---------------------------------------------------------------------------
 // UIListBox: rows
 
-unsigned int g_UnknownGlobal65b59c;           // time of the last list box click
+unsigned int g_ListBoxClickTime;              // 0x0065b59c: time of the last list box click
 
 // 0x00477d30
 void UIListBox::ReportClick(int* handled) {
@@ -3919,8 +3920,8 @@ void UIListBox::ReportClick(int* handled) {
         *handled = 0;
     if (!event.handled) {
         static unsigned int s_doubleClickTime = GetDoubleClickTime();
-        g_UnknownGlobal65b59c = ReadClock();
-        if (selectedRow == lastClickRow && g_UnknownGlobal65b59c - lastClickTime <= s_doubleClickTime) {
+        g_ListBoxClickTime = ReadClock();
+        if (selectedRow == lastClickRow && g_ListBoxClickTime - lastClickTime <= s_doubleClickTime) {
             event.kind = kDialogListDoubleClick;
             event.code = eventCode;
             event.controlName = controlName;
@@ -3936,7 +3937,7 @@ void UIListBox::ReportClick(int* handled) {
             lastClickTime = 0;
             return;
         } else {
-            lastClickTime = g_UnknownGlobal65b59c;
+            lastClickTime = g_ListBoxClickTime;
             lastClickRow = selectedRow;
             return;
         }
@@ -5065,7 +5066,7 @@ void UIProgressBar::SetBarTexture(int texture, int owned) {
 // 0x004715d0
 int UIControl::GrowStep() {
     if (transitionFrame == 0 && transitionFrameCount && !isPaused) {
-        g_UnknownGlobal65b60c = transitionFrameCount < 0 ? 7 : transitionFrameCount;
+        g_GrowFrameCount = transitionFrameCount < 0 ? 7 : transitionFrameCount;
         zoomWidth = 21.0f;
         zoomHeight = 11.0f;
         int left = bounds[0];
@@ -5074,10 +5075,10 @@ int UIControl::GrowStep() {
         int top = bounds[1];
         int height = bounds[3] - top;
         slideY = max(0.0f, (float)(height / 2 + top) - 5.5f);
-        slideStepX = ((float)left - slideX) / g_UnknownGlobal65b60c;
-        slideStepY = ((float)top - slideY) / g_UnknownGlobal65b60c;
-        zoomStepWidth = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
-        zoomStepHeight = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
+        slideStepX = ((float)left - slideX) / g_GrowFrameCount;
+        slideStepY = ((float)top - slideY) / g_GrowFrameCount;
+        zoomStepWidth = ((float)width - 21.0f) / g_GrowFrameCount;
+        zoomStepHeight = ((float)height - 11.0f) / g_GrowFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -5088,7 +5089,7 @@ int UIControl::GrowStep() {
         zoomWidth += zoomStepWidth;
         zoomHeight += zoomStepHeight;
     }
-    if (transitionFrame == g_UnknownGlobal65b60c)
+    if (transitionFrame == g_GrowFrameCount)
         return 1;
     RequestRedraw();
     if (!isPaused || transitionFrame) {
