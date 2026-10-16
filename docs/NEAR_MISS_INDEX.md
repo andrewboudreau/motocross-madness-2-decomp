@@ -81,7 +81,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
 | krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
-| krusty2/collision/CollisionObject | `0x00436100` | 31/804 | c | 35 code diffs: `sub esp, 0x4c` vs `sub esp, 0xac`; `mov eax, [ecx + 0x54]` vs `mov ecx, [ecx + 0x54] ; lea edi, [esp +~` |
+| krusty2/collision/CollisionObject | `0x00436100` | 671/804 | c | 9 operand diffs: retail sums each center dot product as `z*M[2][i] + y*M[1][i] + x*M[0][i]`, ours starts with x; source term order does not move it |
 | krusty2/collision/CollisionObject | `0x00436720` | 66/790 (masked) | c | 52 code diffs: `sub esp, 0x18` vs `sub esp, 0xc`; `add esp, 0x18` vs `add esp, 0xc` |
 | krusty2/collision/CollisionObject | `0x00436af0` | 33/852 | c | 16 code diffs: retail lacks `mov eax, [esp + N]`; `lea esi, [eax + 0x48] ; jle @48` vs `mov edi, [esp + N] ; jle @47` |
 | krusty2/collision/CollisionObject | `0x00436e50` | 335/2099 | b | HullVsModel: frame 0x108 vs 0x120; retail inlines the first offset rotation and calls 0x42a4b0/0x42a450/0x42a510 for the rest (inline budget), a in ebx, b in ebp |

@@ -2115,12 +2115,23 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
     return 0;
 }
 
+inline void CollisionDiagonal(float d[3][3], float x, float y, float z)
+{
+    d[0][0] = x; d[0][1] = 0.0f; d[0][2] = 0.0f;
+    d[1][0] = 0.0f; d[1][1] = y; d[1][2] = 0.0f;
+    d[2][0] = 0.0f; d[2][1] = 0.0f; d[2][2] = z;
+}
+
 // 0x00436100: world-space axis-aligned bounds of this object's local box (Arvo transformed
 // AABB): center' = center * M + T, extent_j = sum_i |M[i][j]| * half_i, output min = center'
 // - extent and max = center' + extent.  The box and matrix come from the shape payload:
 // hull (0): +0x48 and bounds object +0x188; model (1): +0x88 with center/half at +0x18/+0x24;
 // mesh (2): +0x08 with bounds object +0x04.  For any other shape type retail falls through
 // with uninitialised locals; that is reproduced (locals left unset).
+// Retail forms diag(half) as a 3x3 with its zeros as stack temporaries and multiplies it
+// by M fully unrolled; same size and frame as retail (671/804).  Remaining: the center dot
+// products pair c.z, c.y, c.x with M rows 2, 1, 0 (ours x, y, z); term order, alias names,
+// array indexing, loops and statement placement do not move the canonical order.
 void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMax)
 {
     Matrix4 m;
@@ -2129,30 +2140,42 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
     switch (shapeType) {
     case 0: {
         CollisionHullBody* hull = (CollisionHullBody*)shape;
-        m = hull->worldTransform;
         c = &hull->triangleTree->center;
         h = &hull->triangleTree->halfExtents;
+        m = hull->worldTransform;
         break;
     }
     case 1: {
         CollisionModelBody* model = (CollisionModelBody*)shape;
-        m = model->field_0x88;
         c = &model->center;
         h = &model->halfExtents;
+        m = model->field_0x88;
         break;
     }
     case 2: {
         CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
-        m = mesh->field_0x08;
         c = &mesh->field_0x04->center;
         h = &mesh->field_0x04->halfExtents;
+        m = mesh->field_0x08;
         break;
     }
     }
+    float hm[3][3];
+    CollisionDiagonal(hm, h->x, h->y, h->z);
     CollisionVec3 center = CollisionTransformPoint(*c, &m);
-    float ex = CollisionAbs(h->x * m.m[0][0]) + CollisionAbs(h->y * m.m[1][0]) + CollisionAbs(h->z * m.m[2][0]);
-    float ey = CollisionAbs(h->x * m.m[0][1]) + CollisionAbs(h->y * m.m[1][1]) + CollisionAbs(h->z * m.m[2][1]);
-    float ez = CollisionAbs(h->x * m.m[0][2]) + CollisionAbs(h->y * m.m[1][2]) + CollisionAbs(h->z * m.m[2][2]);
+    float r[3][3];
+    r[0][0] = hm[0][0] * m.m[0][0] + hm[0][1] * m.m[1][0] + hm[0][2] * m.m[2][0];
+    r[0][1] = hm[0][0] * m.m[0][1] + hm[0][1] * m.m[1][1] + hm[0][2] * m.m[2][1];
+    r[0][2] = hm[0][0] * m.m[0][2] + hm[0][1] * m.m[1][2] + hm[0][2] * m.m[2][2];
+    r[1][0] = hm[1][0] * m.m[0][0] + hm[1][1] * m.m[1][0] + hm[1][2] * m.m[2][0];
+    r[1][1] = hm[1][0] * m.m[0][1] + hm[1][1] * m.m[1][1] + hm[1][2] * m.m[2][1];
+    r[1][2] = hm[1][0] * m.m[0][2] + hm[1][1] * m.m[1][2] + hm[1][2] * m.m[2][2];
+    r[2][0] = hm[2][0] * m.m[0][0] + hm[2][1] * m.m[1][0] + hm[2][2] * m.m[2][0];
+    r[2][1] = hm[2][0] * m.m[0][1] + hm[2][1] * m.m[1][1] + hm[2][2] * m.m[2][1];
+    r[2][2] = hm[2][0] * m.m[0][2] + hm[2][1] * m.m[1][2] + hm[2][2] * m.m[2][2];
+    float ex = CollisionAbs(r[0][0]) + CollisionAbs(r[1][0]) + CollisionAbs(r[2][0]);
+    float ey = CollisionAbs(r[0][1]) + CollisionAbs(r[1][1]) + CollisionAbs(r[2][1]);
+    float ez = CollisionAbs(r[0][2]) + CollisionAbs(r[1][2]) + CollisionAbs(r[2][2]);
     outMin->x = center.x - ex;
     outMin->y = center.y - ey;
     outMin->z = center.z - ez;

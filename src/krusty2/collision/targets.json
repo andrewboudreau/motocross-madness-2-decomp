@@ -366,7 +366,7 @@
     "target_va": "0x00436100",
     "target_size": 804,
     "expect": "partial",
-    "notes": "6.3%: Arvo transformed AABB (hull +0x48 [0x188], model +0x88, mesh +8); retail unrolls with fabs as v<0?-v:v and no locals (483 vs 804)",
+    "notes": "671/804: Arvo transformed AABB via diag(half) x M unrolled, same size/frame; only the center dot-product leaf order differs (retail z,y,x)",
     "bindings": "CollisionObject.bindings.json"
   },
   {
