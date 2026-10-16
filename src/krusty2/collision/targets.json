@@ -766,7 +766,7 @@
     "target_va": "0x00434eb0",
     "target_size": 1885,
     "expect": "partial",
-    "notes": "model bounds refit: inverse of field_0x88 inline, per enabled element the three axis half extents rotated twice (element matrix, then the inverse) and summed as |x|+|y|+|z|, the tree root centre through two out-of-line 0x42a510 calls, Min/Max out of line; the Min argument is the explicit constructor-call difference (retail calls 0x404e60 there, the Max argument goes through 0x421cb0); same call/inline pattern as retail, differs in frame slots (0x12c vs 0x134), the loop counter register (ebp vs esi) and the rotated x component retail keeps on the x87 stack",
+    "notes": "model bounds refit: inverse of field_0x88 inline, per enabled element the three axis half extents rotated twice (element matrix, then the inverse) and summed as |x|+|y|+|z|, the tree root centre through two out-of-line 0x42a510 calls, Min/Max out of line; retail expands the Min argument center - extent with its constructor called (0x404e60) and calls operator+ 0x421cb0 for Max; this source exhausts the inline budget one site earlier (operator- called, frame 0x128 vs 0x134). Two dead if statements (calibration only) reproduce every byte except the loop entry test (cmp [ebx],0 vs mov eax,[ebx]; test eax,eax)",
     "bindings": "CollisionObject.bindings.json"
   },
   {
