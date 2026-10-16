@@ -411,10 +411,10 @@ UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
 }
 
 // 0x004eafd0
-void Scene::UnknownFunction4eafd0(int index)
+void Scene::EnableAutomaticSequence(int index)
 {
     if (animationTable && index < animationTable->entryCount)
-        animationTable->entries[index].field_0x00_bit2 = 1;
+        animationTable->entries[index].automaticSequence = 1;
 }
 
 // 0x004eb000

@@ -509,7 +509,7 @@ int BikeRace::Tick(float frameTime) {
                         isRacing = true;
                         raceScene->field_0x7c0 = 0;
                         if (startGate != 0) {
-                            raceScene->UnknownFunction4eafd0(startGateEntry);
+                            raceScene->EnableAutomaticSequence(startGateEntry);
                             startGateTimer = 5.0f;
                         }
                         if (g_TrackGame->playerCount > 1) {
@@ -1476,7 +1476,7 @@ void BikeRace::ResetStartCountdown() {
                 thirtySecondMan->collisionObject->Release();
                 thirtySecondMan->collisionObject = 0;
             }
-            raceScene->UnknownFunction4eafd0(thirtySecondManEntry);
+            raceScene->EnableAutomaticSequence(thirtySecondManEntry);
         } else {
             startCountdown = 5.2f;
         }

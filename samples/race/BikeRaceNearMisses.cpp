@@ -294,12 +294,12 @@ void BikeRace::NextCameraTarget(int forward, int racers, int objects) {
             UnknownSceneEntry* entry = &scene->animationTable->entries[targetEntry];
             if (entry->keyFramed) {
                 if (((UnknownBikeRaceSceneCharacter*)entry->character)->isEnabled) {
-                    hidden = entry->field_0x00_bit4;
+                    hidden = entry->excludeFromCameraIteration;
                 } else {
                     hidden = 1;
                 }
             } else if (((UnknownBikeRaceObjectFlags*)entry->proceduralObject)->isEnabled) {
-                hidden = entry->field_0x00_bit4;
+                hidden = entry->excludeFromCameraIteration;
             } else {
                 hidden = 1;
             }

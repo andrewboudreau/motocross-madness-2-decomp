@@ -498,7 +498,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
     for (i = 0; i < animationTable->entryCount; i = next) {
         if (i % interval == interval - 1 && progress)
             progress(0);
-        animationTable->entries[i].field_0x00_bit0 = 0;
+        animationTable->entries[i].inRandomSet = 0;
         next = i + 1;
         sprintf(name, "Animation%d", next);
         parameters.SelectSection(name);
@@ -612,7 +612,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             axes = 1;
         }
         parameters.GetInt("ExcludeFromCameraIteration", 0, &exclude);
-        animationTable->entries[i].field_0x00_bit4 = exclude;
+        animationTable->entries[i].excludeFromCameraIteration = exclude;
         if (animationTable->entries[i].keyFramed) {
             UnknownFunction4de580(name, "MCF", file);
             animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
@@ -620,7 +620,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                 animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
             animationTable->entries[i].character->modelNode->SetUseLighting(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
-            animationTable->entries[i].field_0x00_bit1 = automatic;
+            animationTable->entries[i].useBlendedKeys = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
             animationTable->entries[i].motions = 0;
             animationTable->entries[i].motionSequence = 0;
@@ -650,7 +650,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                             token = strtok(0, ",");
                         }
                         parameters.GetInt("AutomaticSequence", 1, &automatic);
-                        animationTable->entries[i].field_0x00_bit2 = automatic;
+                        animationTable->entries[i].automaticSequence = automatic;
                         animationTable->entries[i].sequenceIndex = animationTable->entries[i].motionSequence[0];
                         if (animationTable->entries[i].sequenceIndex >= animationTable->entries[i].sequenceLength)
                             animationTable->entries[i].sequenceIndex = 0;
@@ -743,7 +743,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     }
                     token[automatic] = 0;
                     animationTable->randomSets[i].animationIndices[j] = atoi(token) - 1;
-                    animationTable->entries[animationTable->randomSets[i].animationIndices[j]].field_0x00_bit0 = 1;
+                    animationTable->entries[animationTable->randomSets[i].animationIndices[j]].inRandomSet = 1;
                     if (animationTable->entries[i].keyFramed)
                         animationTable->entries[animationTable->randomSets[i].animationIndices[j]].character->Disable();
                     else

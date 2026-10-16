@@ -24598,10 +24598,10 @@ CASES = [
         'target_size': 259,
     },
     {
-        'name': 'SceneManager.cpp 0x4eafd0 Scene::UnknownFunction4eafd0',
+        'name': 'SceneManager.cpp 0x4eafd0 Scene::EnableAutomaticSequence',
         'bindings': 'src/reconstructed/SceneManager.bindings.json',
         'source': 'src/reconstructed/SceneManager.cpp',
-        'symbol': '?UnknownFunction4eafd0@Scene@@QAEXH@Z',
+        'symbol': '?EnableAutomaticSequence@Scene@@QAEXH@Z',
         'target_va': '0x004eafd0',
         'target_size': 44,
     },
