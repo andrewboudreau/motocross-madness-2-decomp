@@ -36,7 +36,7 @@ PCTextureMap::~PCTextureMap() {
     if (textureSurface) {
         textureSurface->Release();
         textureSurface = 0;
-        if (g_UnknownGlobal689964)
+        if (g_DebugCountTextureMemory)
             ownerManager->CountTextureMemory();
     }
 }
@@ -255,7 +255,7 @@ void PCTextureMap::RecreateIfLost() {
     if (textureSurface && textureSurface->IsLost()) {
         ReleaseTextureSurface();
         CreateTextureSurface(1, 0, 0);
-        if (g_UnknownGlobal689964)
+        if (g_DebugCountTextureMemory)
             ownerManager->CountTextureMemory();
     }
 }
@@ -270,7 +270,7 @@ void PCTextureMap::ReleaseTextureSurface() {
     if (textureSurface) {
         textureSurface->Release();
         textureSurface = 0;
-        if (g_UnknownGlobal689964)
+        if (g_DebugCountTextureMemory)
             ownerManager->CountTextureMemory();
     }
 }
@@ -475,7 +475,7 @@ int PCTextureMap::CreateTextureSurface(int a, int b, int c) {
                 goto failed;
             if (texturePalette && mapFormat == 8 && textureSurface->SetPalette(texturePalette))
                 goto failed;
-            if (g_UnknownGlobal689964)
+            if (g_DebugCountTextureMemory)
                 ownerManager->CountTextureMemory();
         }
     }
