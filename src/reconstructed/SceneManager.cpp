@@ -1214,7 +1214,7 @@ void Scene::SetDetailLevel(int level)
             if (staticModels->casters[i].model) {
                 ((UnknownSceneLodObject*)staticModels->casters[i].model)->ApplyLodSettings(level);
                 if (!staticModels->casters[i].useLighting)
-                    ((UnknownSceneLodObject*)staticModels->casters[i].model)->UnknownFunction4444c0(0);
+                    ((UnknownSceneLodObject*)staticModels->casters[i].model)->SetUseLighting(0);
             }
         }
     }

@@ -39,7 +39,7 @@
   "?SetAxes@UnknownPodiumArcade@@QAEXPBUVector3@@0HH@Z": "0x00401520",
   "?NextBike@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
   "?SetFrame@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
-  "?UnknownFunction4444c0@UnknownPodiumSoultree@@QAEXH@Z": "0x004444c0",
+  "?SetUseLighting@UnknownPodiumSoultree@@QAEXH@Z": "0x004444c0",
   "?ReplaceMaterialTexture@UnknownPodiumSoultree@@QAEXHPBDPAX@Z": "0x00444c70",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",

@@ -118,7 +118,7 @@
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
   "?Shutdown@KrustyUI@@QAEXXZ": "0x004999b0",
   "?PaintNumber@UnknownKrustyUIPlatePainter@@QAEXPAUUnknownKrustyUISoultree@@H@Z": "0x00417670",
-  "?UnknownFunction4444c0@UnknownKrustyUISoultree@@QAEXH@Z": "0x004444c0",
+  "?SetUseLighting@UnknownKrustyUISoultree@@QAEXH@Z": "0x004444c0",
   "?Attach@UnknownKrustyUIShadowLink@@QAEPAVGameObject@@PAXPAUUnknownKrustyUISoultree@@PAVUnknownKrustyUIShadow@@@Z": "0x004468b0",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",

@@ -401,7 +401,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
         parameters.GetInt("UseLighting", 1, &useLighting);
         staticModels->casters[i].useLighting = useLighting;
         ((D3DIMSoultreeObject*)staticModels->casters[i].model)
-            ->UnknownFunction4444c0(staticModels->casters[i].useLighting);
+            ->SetUseLighting(staticModels->casters[i].useLighting);
         if (auralScape) {
             parameters.GetString("SoundResourceFile", "", sound, 0x103);
             if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
@@ -618,7 +618,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             animationTable->entries[i].character->modelNode->SetPosition(&animationTable->entries[i].position);
             if (axes)
                 animationTable->entries[i].character->modelNode->SetAxesPtr(&look, &up, 1, 0);
-            animationTable->entries[i].character->modelNode->UnknownFunction4444c0(useLighting);
+            animationTable->entries[i].character->modelNode->SetUseLighting(useLighting);
             parameters.GetInt("UseBlendedKeys", 1, &automatic);
             animationTable->entries[i].field_0x00_bit1 = automatic;
             parameters.GetInt("NumberOfMotions", 0, &animationTable->entries[i].motionCount);
@@ -673,7 +673,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         } else {
             UnknownFunction4de580(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
-            animationTable->entries[i].proceduralObject->field_0x34->UnknownFunction4444c0(useLighting);
+            animationTable->entries[i].proceduralObject->field_0x34->SetUseLighting(useLighting);
             if (axes)
                 animationTable->entries[i].proceduralObject->field_0x34->SetAxesPtr(&look, &up, 1, 0);
         }

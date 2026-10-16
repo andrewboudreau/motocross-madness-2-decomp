@@ -407,13 +407,13 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     digitModels[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][0]->SetPosition(&position);
     baseFrame->AppendChild(digitModels[0][0], -1);
-    digitModels[0][0]->UnknownFunction4444e0();
+    digitModels[0][0]->ClearScreenRects();
     position.x = 0.37f;
     digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(isEnabled);
     digitModels[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][1]->SetPosition(&position);
     baseFrame->AppendChild(digitModels[0][1], -1);
-    digitModels[0][1]->UnknownFunction4444e0();
+    digitModels[0][1]->ClearScreenRects();
     for (digit = 1; digit < 10; digit++) {
         digitModels[digit][0] = 0;
         digitModels[digit][1] = 0;
@@ -426,7 +426,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
             digitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             digitModels[digit][place]->SetPosition(&position);
             baseFrame->AppendChild(digitModels[digit][place], -1);
-            digitModels[digit][place]->UnknownFunction4444e0();
+            digitModels[digit][place]->ClearScreenRects();
             position.x -= 0.37f;
         }
     }
@@ -438,14 +438,14 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     timesModel->UnknownVirtualSlot9(value, name, a, b, 1);
     timesModel->SetPosition(&position);
     baseFrame->AppendChild(timesModel, -1);
-    timesModel->UnknownFunction4444e0();
+    timesModel->ClearScreenRects();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
     decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(isEnabled);
     decimalPointModel->UnknownVirtualSlot9(value, name, a, b, 1);
     decimalPointModel->SetPosition(&position);
     baseFrame->AppendChild(decimalPointModel, -1);
-    decimalPointModel->UnknownFunction4444e0();
+    decimalPointModel->ClearScreenRects();
     for (digit = 0; digit < 10; digit++) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
         position.x = 1.87f;
@@ -454,7 +454,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
             fractionDigitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             fractionDigitModels[digit][place]->SetPosition(&position);
             baseFrame->AppendChild(fractionDigitModels[digit][place], -1);
-            fractionDigitModels[digit][place]->UnknownFunction4444e0();
+            fractionDigitModels[digit][place]->ClearScreenRects();
             position.x -= 0.41f;
         }
     }
@@ -520,20 +520,20 @@ void BonusObjectManager::HideDigits() {
     for (int i = 0; i < 5; i++) {
         if (shownDigits[i] >= 0) {
             baseFrame->RemoveChild(digitModels[shownDigits[i]][i]);
-            digitModels[shownDigits[i]][i]->UnknownFunction4444e0();
+            digitModels[shownDigits[i]][i]->ClearScreenRects();
             shownDigits[i] = -1;
         }
     }
     if (shownFractionDigits[0] >= 0) {
         for (int i = 0; i < 2; i++) {
             baseFrame->RemoveChild(fractionDigitModels[shownFractionDigits[i]][i]);
-            fractionDigitModels[shownFractionDigits[i]][i]->UnknownFunction4444e0();
+            fractionDigitModels[shownFractionDigits[i]][i]->ClearScreenRects();
             shownFractionDigits[i] = -1;
         }
         baseFrame->RemoveChild(timesModel);
-        timesModel->UnknownFunction4444e0();
+        timesModel->ClearScreenRects();
         baseFrame->RemoveChild(decimalPointModel);
-        decimalPointModel->UnknownFunction4444e0();
+        decimalPointModel->ClearScreenRects();
     }
     elapsed = 0;
     currentKey = -1;

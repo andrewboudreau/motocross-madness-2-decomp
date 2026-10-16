@@ -248,7 +248,7 @@ void Bike::UnknownVirtualSlot49(float arg)
 void Bike::UnknownVirtualSlot44()
 {
     Vehicle::UnknownVirtualSlot44();
-    riderCharacter->c_0x1a0->Method_0x004444e0();
+    riderCharacter->c_0x1a0->ClearScreenRects();
 }
 
 void Bike::UnknownVirtualSlot71(int arg)
@@ -557,7 +557,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                 (int)GameObject::field_0x18, riderModel, desc, (int)info, 1, 1), -1))
         riderCharacter = 0;
     if (desc && (desc->field_0x25 & 1))
-        riderCharacter->c_0x1a0->Fn_4444c0(1);
+        riderCharacter->c_0x1a0->SetUseLighting(1);
     if (info)
         field_0x5c8 = *info;
     bodyForward = kVec3ZAxis;

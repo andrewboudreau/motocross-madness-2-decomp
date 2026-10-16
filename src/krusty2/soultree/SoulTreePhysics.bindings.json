@@ -110,7 +110,7 @@
   "??_C@_04MMEI@?4col?$AA@": "0x00566670",
   "?D3DIMObjectVirtualSlot9@D3DIMSoultreeObject@@UAEXHPBDPBUSoultreeLoadDesc@@HH@Z": "0x0043f4b0",
   "?D3DIMVirtualSlot11@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z": "0x00445680",
-  "?Fn_4444c0@SoultreeD3DNode@@QAEXH@Z": "0x004444c0",
+  "?SetUseLighting@SoultreeD3DNode@@QAEXH@Z": "0x004444c0",
   "?Fn_4e9cd0@SoultreeFileFinder@@QAEHPAVSoultreeFile@@PBD1PAD@Z": "0x004e9cd0",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
   "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",

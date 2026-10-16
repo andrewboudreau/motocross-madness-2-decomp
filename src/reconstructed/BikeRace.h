@@ -129,7 +129,7 @@ public:
 struct UnknownBikeRaceMesh {
     // D3DIMSoultreeObject's methods (D3DIMSoulTree.h), as bikerace.cpp's
     // setup places the flag girl and the scene's start objects.
-    void UnknownFunction4444c0(int value);    // 0x004444c0
+    void SetUseLighting(int value);    // 0x004444c0
     void SetPositionVec3(Vector3 position); // 0x004fc630: sets the translation
     void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
 

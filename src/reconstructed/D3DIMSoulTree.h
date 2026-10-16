@@ -258,8 +258,8 @@ public:
                                unsigned short** indices, int* indexCount, int a6, int lod); // 0x004433f0
     int ReadLods();                                // 0x00440060: reads the levels of detail
     void ComputeAllBounds();                       // 0x00444440: slot 5 (local bounds) on every node, then subtree bounds
-    void UnknownFunction4444c0(int value);         // 0x004444c0: sets useLighting and the dirty flag
-    void UnknownFunction4444e0();                  // 0x004444e0
+    void SetUseLighting(int value);         // 0x004444c0: sets useLighting and the dirty flag
+    void ClearScreenRects();                  // 0x004444e0: zeroes screenRect and +0x2a8, then SetFlag14c
     void CopyMaterials(D3DIMSoultreeObject* source); // 0x00444a40: new materials copied from source
     int ReplaceMaterialTexture(int index, const char* name, int a); // 0x00444c70
     void SetLod(int lod);           // 0x00444d00

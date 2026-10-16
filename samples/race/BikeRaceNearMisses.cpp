@@ -692,7 +692,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             arch = arch->Create(renderContext, (int)lights, (int)textures, name, kVec3Zero, 0, 0,
                                                2.0f, 0.5f, 0.5f, 0);
             AppendChild(arch, -1);
-            arch->arcadeModel->UnknownFunction4444c0(1);
+            arch->arcadeModel->SetUseLighting(1);
             float scale = finishProbe.field_0x24 / arch->modelWidth * 1.111f;
             arch->arcadeModel->Scale(scale, scale, scale);
             arch->arcadeModel->SoultreeVirtualSlot6();
@@ -728,7 +728,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 AppendChild(flagGirl->UnknownVirtualSlot11(renderContext, modelName, lights, textures, 1, 1),
                                       -1);
                 ReplaceMeshId(flagGirl, 1, 2);
-                flagGirl->modelNode->UnknownFunction4444c0(1);
+                flagGirl->modelNode->SetUseLighting(1);
                 flagGirl->modelNode->SetPositionVec3(girlPosition);
                 flagGirl->modelNode->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 flagGirl->SetMotionByName("Stand");
@@ -740,7 +740,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
             box = box->Create(renderContext, (int)lights, (int)textures, name, kVec3Zero, 0, 0, 2.0f,
                                              0.5f, 0.5f, 0);
             AppendChild(box, -1);
-            box->arcadeModel->UnknownFunction4444c0(1);
+            box->arcadeModel->SetUseLighting(1);
             box->SetPosition(&boxPosition);
             box->SetAxes(&direction, &kVec3YAxis, 1, 0);
             box->BuildCollision(name, 0x6a, 0, 0, 0, 1);

@@ -210,8 +210,8 @@ struct BikeA1A0 {
     char pad_0x000[320];
     SoultreeObject* d_0x140;           // SoultreeObject::firstChild
     int FindByName(const char* name);     // 0x004fdae0, SoultreeObject::FindByName (soultree.cpp)
-    void Method_0x004444e0();
-    void Fn_4444c0(int a);                // 0x004444c0 (SoultreeD3DNode::Fn_4444c0)
+    void ClearScreenRects();
+    void SetUseLighting(int a);                // 0x004444c0 (SoultreeD3DNode::SetUseLighting)
     void GetSubtreeBounds(Vec3* center, Vec3* extents);   // 0x004fe850 (SoultreeObject::GetSubtreeBounds)
     void Method_0x004fb8c0(int a, Matrix4* b);
 };

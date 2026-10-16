@@ -110,8 +110,8 @@ Vector3 BikeCamera::UnknownVirtualSlot50() {
 
 // 0x004172e0
 void BikeCamera::UnknownVirtualSlot53() {
-    bike->modelNode->UnknownFunction4444e0();
-    bike->riderCharacter->modelNode->UnknownFunction4444e0();
+    bike->modelNode->ClearScreenRects();
+    bike->riderCharacter->modelNode->ClearScreenRects();
 }
 
 // 0x00417310

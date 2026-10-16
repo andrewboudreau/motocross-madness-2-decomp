@@ -44,7 +44,7 @@
   "?SetAxes@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
   "?NextBike@UnknownVisualCueView@@QAEPAUUnknownVisualCueRacer@@PAH@Z": "0x004204e0",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?UnknownFunction4444e0@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
+  "?ClearScreenRects@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?SetupLights@RunwayLights@@QAEPAV1@PAXHHPAUUnknownRunwayTerrain@@@Z": "0x0048a600",
