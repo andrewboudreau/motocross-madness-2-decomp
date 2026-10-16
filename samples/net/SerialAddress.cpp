@@ -4,7 +4,7 @@
 // RTTI, so either file may own them (docs/NET.md, docs/DIALOGPROCS.md);
 // they stay here until something decides it. Names are ours.
 //
-// UnknownFunction4ae410 converts SerialPopupDlg's selection indices
+// BuildComPortAddress converts SerialPopupDlg's selection indices
 // (UnknownSerialSettings, NetProcs.h) into the DirectPlay DPCOMPORTADDRESS
 // values (UnknownComPortAddress, DlgProcs.h): CBR_* baud rates, ONESTOPBIT..
 // TWOSTOPBITS, NOPARITY/EVENPARITY/ODDPARITY/MARKPARITY (the dialog lists
@@ -65,7 +65,7 @@ static int SerialFlowControl(int index) {
 }
 
 // 0x004ae410
-void UnknownFunction4ae410(UnknownSerialSettings* settings, UnknownComPortAddress* address) {
+void BuildComPortAddress(UnknownSerialSettings* settings, UnknownComPortAddress* address) {
     address->port = settings->port + 1;              // "ButPort" index to COM number
     address->baudRate = SerialBaudRate(settings->baudRate);
     address->stopBits = SerialStopBits(settings->stopBits);

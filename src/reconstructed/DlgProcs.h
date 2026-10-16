@@ -275,8 +275,8 @@ public:
 };
 
 // The DirectPlay serial connection (DPCOMPORTADDRESS's layout) that
-// 0x004ae410 (between Net.cpp and NetProcs.cpp) fills from SerialPopupDlg's
-// selections.
+// BuildComPortAddress (0x004ae410, between Net.cpp and NetProcs.cpp) fills
+// from SerialPopupDlg's selections before CreateAddress(DPSPGUID_SERIAL).
 struct UnknownComPortAddress {
     int port;                                 // +0x00: port
     int baudRate;                             // +0x04: baud rate
@@ -284,7 +284,7 @@ struct UnknownComPortAddress {
     int parity;                               // +0x0c: parity
     int flowControl;                          // +0x10: flow control
 };
-void UnknownFunction4ae410(struct UnknownSerialSettings* settings, UnknownComPortAddress* address);
+void BuildComPortAddress(struct UnknownSerialSettings* settings, UnknownComPortAddress* address);
 
 // 0x00451b80: creates the profile named in "EditBox" (or reports that it
 // exists).

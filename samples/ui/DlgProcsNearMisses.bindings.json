@@ -375,7 +375,7 @@
   "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?StartKeepAlive@NetworkInterface@@QAEHMM@Z": "0x004ac8d0",
   "?EnumConnections@NetworkInterface@@QAEJPAVConnectionInfoType@@PAH@Z": "0x004add50",
-  "?UnknownFunction4ae410@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410",
+  "?BuildComPortAddress@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410",
   "?EndNetworkGame@@YAXXZ": "0x004aef40",
   "?EnsureNetworkInterface@@YAHXZ": "0x004aefa0",
   "?ResetClock@TrackGameViewOwner@@QAEXXZ": "0x004e1f00",

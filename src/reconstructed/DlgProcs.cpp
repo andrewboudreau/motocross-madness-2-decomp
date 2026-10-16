@@ -1733,7 +1733,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     case kMenuSerialPopup: {
         UnknownComPortAddress serial;
         memset(&serial, 0, sizeof(serial));
-        UnknownFunction4ae410(&g_SerialSettings, &serial);
+        BuildComPortAddress(&g_SerialSettings, &serial);
         if (g_TrackGame->network->CreateAddress(DPSPGUID_SERIAL, "", "", &serial, &address,
                                                                     &size)) {
             if (g_TrackGame->network->InitializeConnection(address, size, 8)) {

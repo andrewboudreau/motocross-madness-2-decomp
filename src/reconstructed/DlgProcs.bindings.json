@@ -535,6 +535,6 @@
   "??_C@_07HJAH@ModeDDL?$AA@": "0x00569f10",
   "?g_UnknownGlobal6887d8@@3UUnknownOptGraphicsSettings@@A": "0x006887d8",
   "?g_SerialSettings@@3UUnknownSerialSettings@@A": "0x006886b8",
-  "?UnknownFunction4ae410@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410",
+  "?BuildComPortAddress@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410",
   "__imp__GetComputerNameA@8": "0x0055020c"
 }
