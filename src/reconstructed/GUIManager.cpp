@@ -28,7 +28,7 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // Milliseconds of the previous game tick (0x0065b534; HiResMeter prints it).
-extern int g_UnknownGlobal65b534;
+extern int g_TickTime;
 
 // cdecl 0x00460b50: table-driven square root (FollowCamera.h).
 float FastSqrt(float value);
@@ -1357,7 +1357,7 @@ int HiResMeter::Tick(float frameTime) {
         g_TrackGame->debugOverlay->Title(
             overlayPage, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
         g_TrackGame->debugOverlay->Print(overlayPage, "Previous Game Tick: % 3d  MS",
-                                                                g_UnknownGlobal65b534);
+                                                                g_TickTime);
         for (i = 0; i < timerCount; i++) {
             entry = &timers[i];
             if (entry->calls != 0.0f) {

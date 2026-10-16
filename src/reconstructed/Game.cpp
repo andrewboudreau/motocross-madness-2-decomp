@@ -62,12 +62,14 @@ static UnknownPeakHold s_Render3DPeak(5000);         // 0x0065b4d8
 static UnknownPeakHold s_RenderPost3DPeak(5000);     // 0x0065b4a0
 static UnknownPeakHold s_ElapsedPeak(5000);          // 0x0065b508
 
-// 0x0065b534..0x0065b540: phase times measured by slot 10; 0x0065b544 is
-// the time of the previous frame.
-int g_UnknownTickTime;                               // 0x0065b534
-int g_UnknownPrepFrameTime;                          // 0x0065b538
-int g_UnknownUpdateScreenTime;                       // 0x0065b53c
-int g_UnknownNetTime;                                // 0x0065b540
+// 0x0065b534..0x0065b540: phase times measured by slot 10, printed on the
+// profile page as "Tick", "PrepFrameTime:", "UpdateScrnTime:" and "Net"
+// (GUIManager's timer page prints the first as "Previous Game Tick");
+// 0x0065b544 is the time of the previous frame.
+int g_TickTime;                                      // 0x0065b534
+int g_PrepFrameTime;                                 // 0x0065b538
+int g_UpdateScreenTime;                              // 0x0065b53c
+int g_NetTime;                                       // 0x0065b540
 static unsigned int s_LastFrameTime;                 // 0x0065b544
 
 static inline void DecodeString(char* text) {
@@ -239,10 +241,10 @@ int Game::RenderFrame() {
             static int profilePage = -1;
             if (profilePage < 0)
                 profilePage = debugOverlay->NewPage();
-            s_NetPeak.Record(g_UnknownNetTime);
-            s_TickPeak.Record(g_UnknownTickTime);
-            s_PrepFramePeak.Record(g_UnknownPrepFrameTime);
-            s_UpdateScreenPeak.Record(g_UnknownUpdateScreenTime);
+            s_NetPeak.Record(g_NetTime);
+            s_TickPeak.Record(g_TickTime);
+            s_PrepFramePeak.Record(g_PrepFrameTime);
+            s_UpdateScreenPeak.Record(g_UpdateScreenTime);
             s_PrepareGeometryPeak.Record(prepareGeometry);
             s_WaitForFlipPeak.Record(waitForFlip);
             s_RenderPre3DPeak.Record(renderPre3D);
@@ -258,15 +260,15 @@ int Game::RenderFrame() {
                 debugOverlay->Print(profilePage, "ElapsedTime:   % 3d (%d)",
                                                   elapsed, s_ElapsedPeak.Peak());
                 debugOverlay->Print(profilePage, "PrepFrameTime: % 3d (%d)",
-                                                  g_UnknownPrepFrameTime,
+                                                  g_PrepFrameTime,
                                                   s_PrepFramePeak.Peak());
                 debugOverlay->Print(profilePage, "UpdateScrnTime:% 3d (%d)",
-                                                  g_UnknownUpdateScreenTime,
+                                                  g_UpdateScreenTime,
                                                   s_UpdateScreenPeak.Peak());
                 debugOverlay->Print(profilePage, "Net            % 3d (%d)",
-                                                  g_UnknownNetTime, s_NetPeak.Peak());
+                                                  g_NetTime, s_NetPeak.Peak());
                 debugOverlay->Print(profilePage, "Tick           % 3d (%d)",
-                                                  g_UnknownTickTime, s_TickPeak.Peak());
+                                                  g_TickTime, s_TickPeak.Peak());
                 debugOverlay->Print(profilePage, "PrepareGeometry% 3d (%d)",
                                                   prepareGeometry,
                                                   s_PrepareGeometryPeak.Peak());
