@@ -764,10 +764,10 @@ void KrustyBike::UnknownVirtualSlot43()
     field_0x794 = 0;
     field_0x798 = 0;
     score = 0;
-    field_0x1400 = 0;
-    field_0x1404 = 0;
-    field_0x1408 = 0;
-    field_0x140c = 0;
+    poseParamLatched = 0;
+    poseLeanBlendLatched = 0;
+    latchedPoseParam = 0;
+    latchedPoseLeanBlend = 0;
     field_0x804 = 0;
     field_0x808 = 0;
     lapGate = 0;
@@ -798,7 +798,7 @@ void KrustyBike::UnknownVirtualSlot43()
     }
     netState.timer = g_kbGame->fullNetPacketIntervalSec;
     shortMessageTimer = g_kbGame->shortNetPacketIntervalSec;
-    field_0x138c = 0;
+    stallHoldTimer = 0;
     recordState.timer = 1.7014117e38f;
 }
 

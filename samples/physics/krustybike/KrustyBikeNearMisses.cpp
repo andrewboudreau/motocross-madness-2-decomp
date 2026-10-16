@@ -680,15 +680,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
             unsigned char c = interpTarget->poseParam;
             int d = c - b;
             if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
-                if (!field_0x1400) {
-                    field_0x1400 = 1;
-                    field_0x1408 = interpSource->poseParam;
+                if (!poseParamLatched) {
+                    poseParamLatched = 1;
+                    latchedPoseParam = interpSource->poseParam;
                 }
-                poseParam = (float)field_0x1408 * KB_BYTE_SCALE;
-            } else if (field_0x1400) {
+                poseParam = (float)latchedPoseParam * KB_BYTE_SCALE;
+            } else if (poseParamLatched) {
                 if (c <= 3 || (c >= 0x7e && c <= 0x82))
-                    field_0x1400 = 0;
-                poseParam = (float)field_0x1408 * KB_BYTE_SCALE;
+                    poseParamLatched = 0;
+                poseParam = (float)latchedPoseParam * KB_BYTE_SCALE;
             } else if (KB_ABS(d) <= 0x18) {
                 poseParam = (float)((int)((float)(c - b) * ratio) + b) * KB_BYTE_SCALE;
             } else {
@@ -719,15 +719,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
             unsigned char c = interpTarget->poseLeanBlend;
             int d = c - b;
             if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
-                if (!field_0x1404) {
-                    field_0x1404 = 1;
-                    field_0x1408 = interpSource->poseLeanBlend;   // retail stores +0x1408 but reads +0x140c
+                if (!poseLeanBlendLatched) {
+                    poseLeanBlendLatched = 1;
+                    latchedPoseParam = interpSource->poseLeanBlend;   // retail stores +0x1408 but reads +0x140c
                 }
-                poseLeanBlend = (float)field_0x140c * KB_BYTE_SCALE;
-            } else if (field_0x1404) {
+                poseLeanBlend = (float)latchedPoseLeanBlend * KB_BYTE_SCALE;
+            } else if (poseLeanBlendLatched) {
                 if (c <= 2 || (c >= 0x7f && c <= 0x81))
-                    field_0x1404 = 0;
-                poseLeanBlend = (float)field_0x140c * KB_BYTE_SCALE;
+                    poseLeanBlendLatched = 0;
+                poseLeanBlend = (float)latchedPoseLeanBlend * KB_BYTE_SCALE;
             } else if (KB_ABS(d) <= 0x20) {
                 poseLeanBlend = (float)((int)((float)(c - b) * ratio) + b) * KB_BYTE_SCALE;
             } else {
@@ -987,12 +987,12 @@ void KrustyBike::Fn_00493660(float dt, int a)
         stateIntervalElapsed = g_kbGame->frameTime + stateIntervalElapsed;
     if (!a && !hasFinished) {
         if (stateIntervalElapsed >= g_kbStallThreshold) {
-            field_0x138c = g_kbStallHoldSec;
+            stallHoldTimer = g_kbStallHoldSec;
             UnknownVirtualSlot50(1, 0.0f, 0);
-        } else if (field_0x138c > 0.0f) {
-            field_0x138c -= g_kbGame->frameTime;
-            if (field_0x138c < 0.0f)
-                field_0x138c = 0.0f;
+        } else if (stallHoldTimer > 0.0f) {
+            stallHoldTimer -= g_kbGame->frameTime;
+            if (stallHoldTimer < 0.0f)
+                stallHoldTimer = 0.0f;
         } else if (!isGhost) {
             UnknownVirtualSlot50(0, 0.0f, 0);
         }

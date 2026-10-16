@@ -197,13 +197,13 @@ public:
     float deltaBasePitch;  // +0x1380  message 13 delta base, set from message 1 pitch
     float deltaBaseYaw;  // +0x1384  message 13 delta base, set from message 1 yaw
     int deltaBaseTime;  // +0x1388  message 13 delta base ms time (message 1 +0x4c)
-    float field_0x138c; // 0x138C  seconds left of the slot-50 hold 0x00493660 starts
+    float stallHoldTimer;                     // +0x138C  set to g_kbStallHoldSec with slot 50(1) when stateIntervalElapsed reaches g_kbStallThreshold; counts down by frameTime (tier 3)
     KbBikeState recordState; // 0x1390  last state recorded (0x00492ad0 with record set)
     KbRecorder* netRecorder; // 0x13FC
-    int field_0x1400; // 0x1400
-    int field_0x1404; // 0x1404
-    int field_0x1408; // 0x1408
-    int field_0x140c; // 0x140C
+    int poseParamLatched;                     // +0x1400  set when the received poseParam jumps by 0x40..0x7c; holds poseParam at latchedPoseParam until the target is near 0 or the centre (tier 3)
+    int poseLeanBlendLatched;                 // +0x1404  the same latch for poseLeanBlend (tier 3)
+    int latchedPoseParam;                     // +0x1408  poseParam byte frozen by poseParamLatched; retail also stores the lean byte here (tier 3)
+    int latchedPoseLeanBlend;                 // +0x140C  read as the frozen poseLeanBlend byte; retail stores that byte at +0x1408, so only the reset writes it (tier 3)
     int debugPage; // 0x1410  -1 from the constructor; the "KrustyBike" debug-overlay page (Tick 0x004977a0 takes the next line)
     KbObj128* altBodyA; // 0x1414
     KbObj128* altBodyB; // 0x1418
