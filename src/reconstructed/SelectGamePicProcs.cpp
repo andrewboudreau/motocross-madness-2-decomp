@@ -584,7 +584,7 @@ void MultiPlayerDlg::EnableReadyControls() {
             EnableGroup(0x514, 1);
         EnableGroup(0x3e8, 1);
     } else {
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
+        if (BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
             g_UnknownGlobal689df4)
             ReportReadyCleared(1);
@@ -1047,9 +1047,9 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             event->handled = 1;
             g_TrackGame->ui->OpenMenu(100);
         } else if (!_stricmp("ButRdyUser", event->controlName)) {
-            int tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > g_TrackGame->mode.raceSettings.maxBikeClass;
+            int tooBig = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > g_TrackGame->mode.raceSettings.maxBikeClass;
             if (g_TrackGame->mode.lobbyPresetFlags)
-                tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > 2;
+                tooBig = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > 2;
             if (!tooBig) {
                 if (!g_UnknownGlobal689dfc)
                     g_UnknownGlobal689df4 = !g_UnknownGlobal689df4;
@@ -1228,9 +1228,9 @@ void MultiPlayerDlg::ReportReadyCleared(int reason) {
     switch (reason) {
     case 1:
         g_TrackGame->LoadResourceString(0x146a, text, 0x80);
-        sprintf(value, text, g_UnknownGlobal56cb6c[g_TrackGame->mode.raceSettings.maxBikeClass]);
+        sprintf(value, text, g_BikeClassEngineSizes[g_TrackGame->mode.raceSettings.maxBikeClass]);
         if (g_TrackGame->mode.lobbyPresetFlags)
-            sprintf(value, text, g_UnknownGlobal56cb6c[2]);
+            sprintf(value, text, g_BikeClassEngineSizes[2]);
         g_TrackGame->LoadResourceString(0x14d1, text, 0x80);
         sprintf(message, text, value);
         break;
@@ -1830,24 +1830,24 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
         list->AddRow("125cc 2-stroke", 0, 0);
-        list->AddRow("250cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[1]), 0);
-        list->AddRow("400cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[2]), 0);
-        list->AddRow("500cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[3]), 0);
-        list->AddRow("600cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[4]), 0);
+        list->AddRow("250cc 2-stroke", BikeClassOf(g_BikeClassEngineSizes[1]), 0);
+        list->AddRow("400cc 4-stroke", BikeClassOf(g_BikeClassEngineSizes[2]), 0);
+        list->AddRow("500cc 2-stroke", BikeClassOf(g_BikeClassEngineSizes[3]), 0);
+        list->AddRow("600cc 4-stroke", BikeClassOf(g_BikeClassEngineSizes[4]), 0);
         list->SelectRowByData(
-            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize));
+            BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize));
         g_TrackGame->LoadResourceString(0x146a, format, 0x80);
         list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->RemoveAllRows();
-        sprintf(text, format, g_UnknownGlobal56cb6c[0]);
+        sprintf(text, format, g_BikeClassEngineSizes[0]);
         list->AddRow(text, 0, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[1]);
+        sprintf(text, format, g_BikeClassEngineSizes[1]);
         list->AddRow(text, 1, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[2]);
+        sprintf(text, format, g_BikeClassEngineSizes[2]);
         list->AddRow(text, 2, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[3]);
+        sprintf(text, format, g_BikeClassEngineSizes[3]);
         list->AddRow(text, 3, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[4]);
+        sprintf(text, format, g_BikeClassEngineSizes[4]);
         list->AddRow(text, 4, 0);
         list->SelectRow(g_TrackGame->mode.raceSettings.maxBikeClass);
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
@@ -1988,7 +1988,7 @@ void MPBikeRiderDlg::ApplyLargestOpponentClass() {
     if (!g_TrackGame->network->isHost) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.maxBikeClass);
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
+        if (BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
             g_UnknownGlobal689df4)
             static_cast<MultiPlayerDlg*>(parentDialog)->ReportReadyCleared(1);
@@ -2061,7 +2061,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
-        UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56cb6c[size];
+        UNKNOWN_GARAGE_SETTINGS->engineSize = g_BikeClassEngineSizes[size];
         UNKNOWN_GARAGE_SETTINGS->fourStroke = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
         ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[g_TrackGame->mode.racerChoice.bikeIndex]
@@ -2072,7 +2072,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         int row = bikes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
-        int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
+        int bikeClass = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));

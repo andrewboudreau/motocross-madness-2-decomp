@@ -965,12 +965,12 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         FillBikeRiderLists();
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
-        list->AddRow("125cc 2-stroke", UnknownBikeClassOf(125), 0);
-        list->AddRow("250cc 2-stroke", UnknownBikeClassOf(250), 0);
-        list->AddRow("400cc 4-stroke", UnknownBikeClassOf(400), 0);
-        list->AddRow("500cc 2-stroke", UnknownBikeClassOf(500), 0);
-        list->AddRow("600cc 4-stroke", UnknownBikeClassOf(600), 0);
-        list->SelectRowByData(UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize));
+        list->AddRow("125cc 2-stroke", BikeClassOf(125), 0);
+        list->AddRow("250cc 2-stroke", BikeClassOf(250), 0);
+        list->AddRow("400cc 4-stroke", BikeClassOf(400), 0);
+        list->AddRow("500cc 2-stroke", BikeClassOf(500), 0);
+        list->AddRow("600cc 4-stroke", BikeClassOf(600), 0);
+        list->SelectRowByData(BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize));
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
         edit->SetAcceptedCharacters("0123456789");
         g_TrackGame->ui->ShowScene(this);
@@ -1212,20 +1212,20 @@ void SPBikeRiderDlg::ApplyChosenBike() {
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
-        int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
-        UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56cb6c[size];
+        int previous = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
+        UNKNOWN_GARAGE_SETTINGS->engineSize = g_BikeClassEngineSizes[size];
         UNKNOWN_GARAGE_SETTINGS->fourStroke = size == 2 || size == 4 ? 1 : 0;
-        int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
+        int current = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         if (current != previous)
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
     } else {
         int row = bikes->GetRowData(-1);
-        int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
+        int previous = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_GARAGE_SETTINGS->engineSize =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         UNKNOWN_GARAGE_SETTINGS->fourStroke =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
-        int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
+        int current = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         if (current != previous)
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
     }

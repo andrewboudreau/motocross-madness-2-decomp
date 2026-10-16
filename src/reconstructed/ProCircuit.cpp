@@ -221,7 +221,7 @@ void UnknownTrackGameObject3444::StartCareer(const char* name, int a, int b, int
     int bike;
     for (bike = 0; bike < ui->bikeCount; bike++) {
         if (((UnknownKrustyUIModel*)ui->manufacturers)[((UnknownKrustyUIBike*)ui->bikes)[bike].model].modelKind == 1) {
-            int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)ui->bikes)[bike].engineSize);
+            int bikeClass = BikeClassOf(((UnknownKrustyUIBike*)ui->bikes)[bike].engineSize);
             switch (bikeClassRule) {
             case 1:
                 if (bikeClass == 0)
@@ -414,7 +414,7 @@ void UnknownTrackGameObject3444::PickComputerRacers()
                 continue;
             if (((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].modelKind != bikeKind)
                 continue;
-            int bikeClass = UnknownBikeClassOf(bike->engineSize);
+            int bikeClass = BikeClassOf(bike->engineSize);
             float roll = UNKNOWN_RANDOM_UNIT();
             switch (bikeClassRule) {
             case 1:

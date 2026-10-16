@@ -469,7 +469,7 @@
   "?OnEnable@GameObject@@UAEXXZ": "0x00469070",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownGlobal56cb6c@@3PAHA": "0x0056cb6c",
+  "?g_BikeClassEngineSizes@@3PAHA": "0x0056cb6c",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal59adbc@@3HA": "0x0059adbc",
   "?g_LoadingTimerTicks@@3HA": "0x0059adfc",

@@ -952,7 +952,7 @@ void KrustyUI::MakeRandomNames(const char** names, int count) {
 void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) {
     int* usedBikes = (int*)DebugCalloc(bikeCount, sizeof(int), __FILE__, 1164);
     int* usedRiders = (int*)DebugCalloc(riderCount, sizeof(int), __FILE__, 1165);
-    int playerClass = UnknownBikeClassOf(
+    int playerClass = BikeClassOf(
         ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.garageOptions)->engineSize);
     srand(ReadClock());
     int i;
@@ -967,7 +967,7 @@ void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) 
             usedBikes[i] = -1;
             continue;
         }
-        int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)bikes)[i].engineSize);
+        int bikeClass = BikeClassOf(((UnknownKrustyUIBikeEntry*)bikes)[i].engineSize);
         if (playerClass == bikeClass || (playerClass == 1 && bikeClass == 2)
             || (playerClass == 2 && bikeClass == 1) || (playerClass == 3 && bikeClass == 4)
             || (playerClass == 4 && bikeClass == 3))
@@ -984,7 +984,7 @@ void KrustyUI::PickRandomRacers(int* bikeChoices, int count, int* riderChoices) 
         int start = index;
         if (!usedBikes[index]) {
             chance = RandomUnit();
-            bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)bikes)[index].engineSize);
+            bikeClass = BikeClassOf(((UnknownKrustyUIBikeEntry*)bikes)[index].engineSize);
             switch (bikeClass) {
             case 1:
             case 2:

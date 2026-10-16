@@ -77,7 +77,8 @@ procedures, five slot-31 handlers, OptControlsDlg's slots 22 and 23 and
 eleven helpers. Source forms needed:
 - Name compares use `_stricmp` and `_strnicmp`.
 - An inline drop-down accessor reads control +0x1fc, and an inline lookup
-  walks the bike-class table at `0x0056cb6c`.
+  (`BikeClassOf`) walks the bike-class table `g_BikeClassEngineSizes`
+  (`0x0056cb6c`: 125, 250, 400, 500, 600).
 - `0x004b3aa0` nests `__min(__min(...))`.
 - OptControlsDlg slot 22 `0x004b5600` ends each branch with its own
   `EndInputWait(); return 1;`; one shared tail swaps `this` and the list

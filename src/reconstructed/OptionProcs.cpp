@@ -1056,15 +1056,15 @@ void OptGarageDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogListSelect:
         if (_stricmp("DDLCurves", event->controlName) == 0) {
             int curve = static_cast<UIListBox*>(event->control)->GetRowData(-1);
-            g_EditedGameSettings.curveRows[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)] = curve;
+            g_EditedGameSettings.curveRows[BikeClassOf(g_EditedGarageSettings.engineSize)] = curve;
             TrackGame* game = g_TrackGame;
             for (int band = 0; band < 11; band++) {
                 if (curve < 3)
                     g_EditedGarageSettings.eqBands[band] =
-                        game->ui->standardCurves[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)][curve][band];
+                        game->ui->standardCurves[BikeClassOf(g_EditedGarageSettings.engineSize)][curve][band];
                 else
                     g_EditedGarageSettings.eqBands[band] =
-                        game->mode.customGarageCurves[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)][curve - 3][band];
+                        game->mode.customGarageCurves[BikeClassOf(g_EditedGarageSettings.engineSize)][curve - 3][band];
             }
             ShowCurve();
         }
@@ -1101,7 +1101,7 @@ void OptGarageDlg::FillCurveList()
     char standard[128];
     char custom[128];
     g_TrackGame->LoadResourceString(0x146a, format, 127);
-    sprintf(engine, format, g_UnknownGlobal56cb6c[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)]);
+    sprintf(engine, format, g_BikeClassEngineSizes[BikeClassOf(g_EditedGarageSettings.engineSize)]);
     g_TrackGame->LoadResourceString(0x146b, standard, 127);
     g_TrackGame->LoadResourceString(0x146c, custom, 127);
     UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
@@ -1113,13 +1113,13 @@ void OptGarageDlg::FillCurveList()
             sprintf(text, "%dcc (%s) %s #%d", g_EditedGarageSettings.engineSize, engine, custom, i - 2);
         curves->AddRow(text, i, 0);
     }
-    curves->SelectRowByData(g_EditedGameSettings.curveRows[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)]);
+    curves->SelectRowByData(g_EditedGameSettings.curveRows[BikeClassOf(g_EditedGarageSettings.engineSize)]);
 }
 
 // 0x004b3aa0
 void OptGarageDlg::EqSliderMoved(UIControl* slider)
 {
-    int bikeClass = UnknownBikeClassOf(g_EditedGarageSettings.engineSize);
+    int bikeClass = BikeClassOf(g_EditedGarageSettings.engineSize);
     int band = slider->attachId;
     int value = static_cast<UIScrollBar*>(slider)->ScaleThumbPosition(g_TrackGame->ui->maxRange[bikeClass] - g_TrackGame->ui->minRange[bikeClass]);
     value += g_TrackGame->ui->minRange[bikeClass];
@@ -1136,7 +1136,7 @@ void OptGarageDlg::ShowCurve()
 {
     char name[128];
     char text[128];
-    int bikeClass = UnknownBikeClassOf(g_EditedGarageSettings.engineSize);
+    int bikeClass = BikeClassOf(g_EditedGarageSettings.engineSize);
     curveSum = 0;
     int curve = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1);
     if (curve < 3) {
