@@ -3,5 +3,5 @@
   "?SerialFlowControl@@YAHH@Z": "0x004ae3d0",
   "?SerialParity@@YAHH@Z": "0x004ae390",
   "?SerialStopBits@@YAHH@Z": "0x004ae370",
-  "?BuildComPortAddress@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410"
+  "?BuildComPortAddress@@YAXPAUSerialSettings@@PAUNetComPortAddress@@@Z": "0x004ae410"
 }

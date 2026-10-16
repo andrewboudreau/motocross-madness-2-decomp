@@ -5,8 +5,8 @@
 // they stay here until something decides it. Names are ours.
 //
 // BuildComPortAddress converts SerialPopupDlg's selection indices
-// (UnknownSerialSettings, NetProcs.h) into the DirectPlay DPCOMPORTADDRESS
-// values (UnknownComPortAddress, DlgProcs.h): CBR_* baud rates, ONESTOPBIT..
+// (SerialSettings, NetProcs.h) into the DirectPlay DPCOMPORTADDRESS
+// values (NetComPortAddress, DlgProcs.h): CBR_* baud rates, ONESTOPBIT..
 // TWOSTOPBITS, NOPARITY/EVENPARITY/ODDPARITY/MARKPARITY (the dialog lists
 // even before odd) and DPCPA_NOFLOW..DPCPA_RTSDTRFLOW.
 
@@ -65,7 +65,7 @@ static int SerialFlowControl(int index) {
 }
 
 // 0x004ae410
-void BuildComPortAddress(UnknownSerialSettings* settings, UnknownComPortAddress* address) {
+void BuildComPortAddress(SerialSettings* settings, NetComPortAddress* address) {
     address->port = settings->port + 1;              // "ButPort" index to COM number
     address->baudRate = SerialBaudRate(settings->baudRate);
     address->stopBits = SerialStopBits(settings->stopBits);

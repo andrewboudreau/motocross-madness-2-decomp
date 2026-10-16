@@ -11599,7 +11599,7 @@ CASES = [
         'name': 'SerialAddress 0x4ae410 DPCOMPORTADDRESS builder',
         'bindings': 'samples/net/SerialAddress.bindings.json',
         'source': 'samples/net/SerialAddress.cpp',
-        'symbol': '?BuildComPortAddress@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z',
+        'symbol': '?BuildComPortAddress@@YAXPAUSerialSettings@@PAUNetComPortAddress@@@Z',
         'target_va': '0x004ae410',
         'target_size': 69,
         'reason': "called from dlgprocs.cpp 0x452af9 with NetProcs' 0x6886b8 record",
