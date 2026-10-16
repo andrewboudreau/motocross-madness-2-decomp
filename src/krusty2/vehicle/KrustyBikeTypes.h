@@ -136,7 +136,7 @@ struct KbBikeMessage {
     float lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
     int field_0x24;
     float fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
-    int timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
+    float timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
     Vec3 angularVelocity;                // +0x30 (y plus the turn rate)
     Vec3 velocity;                       // +0x3c
     unsigned char poseIndex : 4;         // +0x48
