@@ -340,7 +340,7 @@ extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
 struct KbTrack {
     char pad_0x00[0xac];
     int field_0xac;
-    void UnknownFunction404df0(int a, int b, KrustyBike* bike);   // 0x00404DF0
+    void SelectLapGates(int a, int b, KrustyBike* bike);   // 0x00404DF0 (TrackGameViewOwner: makes gates a and b the current pair)
 };
 // BikeWheel view for 0x00513560 (tier 3 name).
 struct KbWheel { void SetRollDistance(float d); };

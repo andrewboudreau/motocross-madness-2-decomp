@@ -72,7 +72,7 @@ struct TrackGameViewOwner : public GameObject {
     // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer
     // (0x00420650 passes 0, 1): picks entries `a` and `b` at +0x420 after
     // flagging the two it leaves; `racer` is unused.
-    void UnknownFunction404df0(int a, int b, void* racer);
+    void SelectLapGates(int a, int b, void* racer);
 
     UnknownTrackGameViewPart* field_0x2c;
     unsigned char field_0x30[0x34 - 0x30];

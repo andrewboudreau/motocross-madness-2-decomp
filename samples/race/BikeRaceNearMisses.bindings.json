@@ -119,7 +119,7 @@
   "?SetAxes@ArcadeObject@@QAEXPBUVector3@@0HH@Z": "0x00401520",
   "?BuildCollision@ArcadeObject@@QAEHPBDHP6AXPAVCollisionObject@@1@ZPAXEE@Z": "0x00401540",
   "?StartSpin@ArcadeObject@@QAEXUVector3@@M@Z": "0x004017a0",
-  "?UnknownFunction404df0@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
+  "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
   "?Vec3Dot@@YAMPBUVector3@@0@Z": "0x0040ae30",
   "?PaintNumber@UnknownBikeNumberPainter@@QAEXPAXH@Z": "0x00417670",
   "?PickerHitCallback@@YAXPAVCollisionObject@@0@Z": "0x00417b00",

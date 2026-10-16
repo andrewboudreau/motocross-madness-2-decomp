@@ -25590,10 +25590,10 @@ CASES = [
         'reason': 'near miss (90%): leaf lookup; VC6 swaps the gridX/gridZ compare registers',
     },
     {
-        'name': 'BackgroundImage.cpp 0x404df0 TrackGameViewOwner::UnknownFunction404df0',
+        'name': 'BackgroundImage.cpp 0x404df0 TrackGameViewOwner::SelectLapGates',
         'bindings': 'src/reconstructed/BackgroundImage.bindings.json',
         'source': 'src/reconstructed/BackgroundImage.cpp',
-        'symbol': '?UnknownFunction404df0@TrackGameViewOwner@@QAEXHHPAX@Z',
+        'symbol': '?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z',
         'target_va': '0x00404df0',
         'target_size': 110,
         'reason': 'picks two +0x420 entries after flagging the two it leaves (after the file\'s last method, before its Vec3 constructor copy; ownership by position)',

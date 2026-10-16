@@ -809,7 +809,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->UnknownFunction404df0(lapGate, nextLapGate, this);
+                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {
@@ -904,7 +904,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                             lapCount++;
                         nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->UnknownFunction404df0(lapGate, nextLapGate, this);
+                            ((KbTrack*)g_kbGame->bajaEnduroEvent)->SelectLapGates(lapGate, nextLapGate, this);
                     }
                 }
             } else {

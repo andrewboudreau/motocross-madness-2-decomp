@@ -52,6 +52,6 @@
   "_qsort": "0x00534426",
   "_rand": "0x00534c1b",
   "?UpdateGateRace@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownBikeRaceNode@@MHH@Z": "0x004e6a50",
-  "?UnknownFunction404df0@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
+  "?SelectLapGates@TrackGameViewOwner@@QAEXHHPAX@Z": "0x00404df0",
   "?FastSqrt@@YAMM@Z": "0x00460b50"
 }

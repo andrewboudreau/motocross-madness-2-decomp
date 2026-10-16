@@ -187,7 +187,7 @@
   "?Title@KbOverlay@@QAAXHPBDZZ": "0x00447fa0",
   "?TranslateIn@SoultreeObject@@QAEXPAV1@UVec3@@@Z": "0x004fc690",
   "?UnknownAxisSettle_4cb6e0@@YAXPAM0PBMME@Z": "0x004cb6e0",
-  "?UnknownFunction404df0@KbTrack@@QAEXHHPAVKrustyBike@@@Z": "0x00404df0",
+  "?SelectLapGates@KbTrack@@QAEXHHPAVKrustyBike@@@Z": "0x00404df0",
   "?SetLod@KbXform@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@KbXform@@QAEXH@Z": "0x00444d40",
   "?AddSecondModifier@KbXform@@QAEXPAUKbMorphMod@@@Z": "0x00444eb0",
