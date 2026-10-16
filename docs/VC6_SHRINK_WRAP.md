@@ -56,6 +56,10 @@ repository's COFF tools).
   CollisionPoint `0x0043ad80` went from 47 to 597 of 615 bytes this way;
   Pixtrans `0x004cee30` gets retail's `push ebp` after its palette checks
   once its two loops share one `return 1`.
+  ManagedTextureGroup `0x0050ef70` returned 1 early when TestKey was off
+  and again when no page was selected; nesting the body under
+  `if (testKey)` and `if (page)` with one trailing `return 1;` moved its
+  masked score from 93 to 951 of 1678 bytes.
 - If retail pushes before the guard and the reconstruction delays the pushes,
   the original probably had more exits that the reconstruction folded into
   the final one. Parser `0x004b87f0` (33 of 408 bytes) became exact by
