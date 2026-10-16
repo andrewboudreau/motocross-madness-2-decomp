@@ -120,7 +120,11 @@ with `tools/frame_layout.py OBJ --dump`. "Nearest esp" is the lowest address
      last use comes first takes the first slot; q2/z7: more uses win
      whatever the order; the count is the compiler's, so a compare that
      consumes a value kept on the x87 stack counts although it loads
-     nothing).
+     nothing). The count is taken before the backend merges code: Tire
+     `0x00513f90` is exact only when `boost` is set by a nested if whose
+     two `boost = 1.0f` else-stores VC6 later tail-merges. The single `&&`
+     condition emits the same instructions, but boost then has three
+     references instead of four and loses the argument slot to `minimum`.
    - **Slot order**: the slots are handed out in the order of the
      arguments' *first use in the source* (the IR order), not of the
      prologue loads or the emitted instructions. Cube `0x0043d230` stores
