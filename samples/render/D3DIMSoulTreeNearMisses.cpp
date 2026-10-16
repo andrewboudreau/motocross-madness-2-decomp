@@ -342,7 +342,7 @@ public:
     int TestBox(UnknownSoultreeCameraView* camera, Matrix4* matrix, Vector3* center,
                               Vector3* extents, UnknownSoultreeScreenRect* rect, int* corners, int* a7);
 };
-extern UnknownSoultreeClipper* g_UnknownSoultreeClipper575a98;
+extern UnknownSoultreeClipper* g_visibilityClipper;   // 0x00575a98 (VisibilityClipper, src/krusty2/visibility)
 
 struct UnknownSoultreeMatrix {
     union {
@@ -398,7 +398,7 @@ int D3DIMSoultreeObject::PrepareGeometry()
         view._42 = world.m[3][0] * projection.m[0][1] + world.m[3][1] * projection.m[1][1] + world.m[3][2] * projection.m[2][1] + world.m[3][3] * projection.m[3][1];
         view._43 = world.m[3][0] * projection.m[0][2] + world.m[3][1] * projection.m[1][2] + world.m[3][2] * projection.m[2][2] + world.m[3][3] * projection.m[3][2];
         view._44 = world.m[3][0] * projection.m[0][3] + world.m[3][1] * projection.m[1][3] + world.m[3][2] * projection.m[2][3] + world.m[3][3] * projection.m[3][3];
-        if (g_UnknownSoultreeClipper575a98->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera, (Matrix4*)&view, &center, &extents, &screenRect, 0,
+        if (g_visibilityClipper->TestBox((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera, (Matrix4*)&view, &center, &extents, &screenRect, 0,
                                                                   &field_0x260)) {
             visible = 1;
             SelectLod(&center, &extents);
