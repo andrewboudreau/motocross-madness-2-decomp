@@ -932,6 +932,16 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
+    "candidate_symbol_contains": "?AccumulateBounds@SoultreeObject@@QAEXPAHPAUVec3@@1PBUMatrix4@@@Z",
+    "target_va": "0x004fe2e0",
+    "target_size": 1390,
+    "expect": "exact",
+    "notes": "in-place by-value frame transforms; float Min/Max helpers for the clamps; hi through the out-of-line Vec3 ctor 0x00404e60",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
     "candidate_symbol_contains": "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z",
     "target_va": "0x004fe850",
     "target_size": 74,

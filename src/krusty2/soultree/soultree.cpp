@@ -16,8 +16,8 @@
 // Every function below is strict exact. Near misses of the same unit (WorldToLocalDirection
 // 0x004fd710, SetMatrixIn 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050,
 // RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
-// Scale 0x004fd340 (inline 4x4 product), AccumulateBounds 0x004fe2e0 and GetWorldBounds
-// 0x004fe8a0 are near misses in samples/physics/helpers/SoultreeBounds.cpp.
+// Scale 0x004fd340 (inline 4x4 product) and GetWorldBounds 0x004fe8a0 are near misses in
+// samples/physics/helpers/SoultreeBounds.cpp.
 #define SOULTREE_OBJECT_WITH_BASES
 #include <math.h>
 #include <string.h>
@@ -867,6 +867,80 @@ void SoultreeObject::UpdateSubtreeBounds()
         c->AccumulateBounds(&have, &lo, &hi, &worldMatrix);
     subtreeBoundsA = (hi + lo) * 0.5f;
     subtreeBoundsB = (hi - lo) * 0.5f;
+}
+
+// Vec3 whose (x, y, z) constructor is out of line in retail (0x00404e60, thiscall, ret 0xc);
+// declared only, so VC6 emits the call. AccumulateBounds builds its upper corner through it.
+struct SoultreeOolVec3 : public Vec3 {
+    SoultreeOolVec3(float x_, float y_, float z_);
+};
+
+static inline float AbsValue(float v)
+{
+    return v < 0.0f ? -v : v;
+}
+static inline float MinValue(float a, float b)
+{
+    return a < b ? a : b;
+}
+static inline float MaxValue(float a, float b)
+{
+    return a > b ? a : b;
+}
+
+// p in m's space into *r: (p - translation) rotated by the transpose of m's upper 3x3. p is
+// taken by value (AccumulateBounds passes its own centre as both).
+static inline void FramePointTo(Vec3* r, Vec3 p, const Matrix4& m)
+{
+    p.x -= m._41;
+    p.y -= m._42;
+    p.z -= m._43;
+    r->x = p.x * m._11 + p.y * m._12 + p.z * m._13;
+    r->y = p.x * m._21 + p.y * m._22 + p.z * m._23;
+    r->z = p.x * m._31 + p.y * m._32 + p.z * m._33;
+}
+
+// 0x004fe2e0. Grows (*lo, *hi) by this node's local box expressed in frame's space (the box's
+// world centre and half-axes moved into frame, the half extents as the sum of |axis|), then
+// recurses into the children. *have says whether the box already holds a point. The in-place
+// transforms (x row from the original, y and z rows from the by-value copy), the out-of-line
+// constructor for hi and the Min/Max helpers (the loaded corner stays on the x87 stack and is
+// stored unconditionally) are all needed for the exact bytes.
+void SoultreeObject::AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matrix4* frame)
+{
+    if (field_0x150) {
+        Vec3 ax = Vec3(localBoundsB.x, 0.0f, 0.0f);
+        Vec3 ay = Vec3(0.0f, localBoundsB.y, 0.0f);
+        Vec3 az = Vec3(0.0f, 0.0f, localBoundsB.z);
+        Vec3 c = LocalToWorldPoint(localBoundsA);
+        ax = LocalToWorldDirection(ax);
+        ay = LocalToWorldDirection(ay);
+        az = LocalToWorldDirection(az);
+        FramePointTo(&c, c, *frame);
+        RotateByRowsTo(&ax, ax, *frame);
+        RotateByRowsTo(&ay, ay, *frame);
+        RotateByRowsTo(&az, az, *frame);
+        Vec3 ext;
+        ext.x = AbsValue(ax.x) + AbsValue(ay.x) + AbsValue(az.x);
+        ext.y = AbsValue(ax.y) + AbsValue(ay.y) + AbsValue(az.y);
+        ext.z = AbsValue(ax.z) + AbsValue(ay.z) + AbsValue(az.z);
+        if (*have) {
+            Vec3 l = c - ext;
+            Vec3 h = SoultreeOolVec3(c.x + ext.x, c.y + ext.y, c.z + ext.z);
+            lo->x = MinValue(lo->x, l.x);
+            lo->y = MinValue(lo->y, l.y);
+            lo->z = MinValue(lo->z, l.z);
+            hi->x = MaxValue(hi->x, h.x);
+            hi->y = MaxValue(hi->y, h.y);
+            hi->z = MaxValue(hi->z, h.z);
+        } else {
+            *lo = c - ext;
+            *hi = c + ext;
+            *have = 1;
+        }
+    }
+    for (SoultreeObject* child = firstChild; child; child = child->nextSibling)
+        child->AccumulateBounds(have, lo, hi, frame);
 }
 
 // 0x004fe850.

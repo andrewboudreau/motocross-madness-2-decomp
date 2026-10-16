@@ -141,7 +141,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/contact/ObjectPlacement | `0x004b0df0` | 451/3321 (masked) | b | 123 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x1c4 vs 0x1ac, slot order differs |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
 | physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
-| physics/helpers/SoultreeBounds | `0x004fe2e0` | 82/1325 | b | frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx); *have clamps are unconditional selects; retail spends one more inline Vec3 site before h |
 | physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 262/1096 | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
 | physics/helpers/SoultreeMatrix | `0x004fc050` | 1121/1171 | b | same instructions and length; three 12-byte slots ordered temporaries, pos, r where retail has r (shared with the delta copy), temporaries, pos |

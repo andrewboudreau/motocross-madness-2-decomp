@@ -1,5 +1,5 @@
-// SoultreeBounds.cpp -- near misses of three SoultreeObject (soultree.cpp) methods that had no
-// source: Scale 0x004fd340, AccumulateBounds 0x004fe2e0 and GetWorldBounds 0x004fe8a0. The
+// SoultreeBounds.cpp -- near misses of two SoultreeObject (soultree.cpp) methods that had no
+// source: Scale 0x004fd340 and GetWorldBounds 0x004fe8a0. The
 // exact members of the unit are in src/krusty2/soultree/soultree.cpp. Class attribution tier 2
 // (thiscall on SoultreeObject fields, inside the unit's extent); names tier 3.
 //
@@ -34,16 +34,6 @@
 //   small-frame size rule), but VC6 then adds an fxch pair to the ext.x sum (394-396).
 //   Tail forms that change nothing: w + ext operand order, `+=` from a copy, Vec3
 //   operators, inline Set helpers by reference/pointer/value, six ext sum orders.
-// AccumulateBounds (0x004fe2e0, 1390 bytes; 80/1297): first draft. Same flow, calls and
-//   arithmetic; retail's frame is 0x48 (here 0x3c): it copies each direction into a by-value
-//   temporary at esp+0x40 and keeps the world centre in ebx/ebp/edx, and loads the three
-//   pointer arguments only where they are used; in the `*have` branch retail builds hi through
-//   the out-of-line Vec3 constructor 0x00404e60 (inline budget). The *have clamps store
-//   unconditionally (retail `fld lo.x; fcom l.x; test ah,1; jne keep; fstp st0; fld l.x;
-//   keep: fstp lo.x`, `test ah,0x41` for hi), i.e. lo = lo < l ? lo : l, hi = hi > h ? hi : h;
-//   the earlier `if (!(lo < l)) lo = l` form skipped the store. Float Min/Max helpers for
-//   them push both l and h through the out-of-line ctor (frame 0x60); ternaries keep both
-//   inline (frame 0x3c), so retail spends one more inline site before h than this source.
 #include <string.h>
 #include "math/Math3D.h"
 
@@ -79,28 +69,6 @@ void SoultreeObject::Scale(float x, float y, float z)
 static inline float AbsValue(float v)
 {
     return v < 0.0f ? -v : v;
-}
-
-// p in the frame's space: (p - translation) * transpose(R(frame)).
-static inline Vec3 FramePoint(Vec3 p, const Matrix4* frame)
-{
-    p.x -= frame->_41;
-    p.y -= frame->_42;
-    p.z -= frame->_43;
-    Vec3 r;
-    r.x = p.x * frame->_11 + p.y * frame->_12 + p.z * frame->_13;
-    r.y = p.x * frame->_21 + p.y * frame->_22 + p.z * frame->_23;
-    r.z = p.x * frame->_31 + p.y * frame->_32 + p.z * frame->_33;
-    return r;
-}
-
-static inline Vec3 FrameDirection(Vec3 v, const Matrix4* frame)
-{
-    Vec3 r;
-    r.x = v.x * frame->_11 + v.y * frame->_12 + v.z * frame->_13;
-    r.y = v.x * frame->_21 + v.y * frame->_22 + v.z * frame->_23;
-    r.z = v.x * frame->_31 + v.y * frame->_32 + v.z * frame->_33;
-    return r;
 }
 
 static inline void DiagonalMatrix(float m[3][3], float x, float y, float z)
@@ -157,41 +125,4 @@ void SoultreeObject::GetWorldBounds(Vec3* lo, Vec3* hi)
     hi->x = ext.x + w.x;
     hi->y = ext.y + w.y;
     hi->z = ext.z + w.z;
-}
-
-void SoultreeObject::AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matrix4* frame)
-{
-    if (field_0x150) {
-        Vec3 ax = Vec3(localBoundsB.x, 0.0f, 0.0f);
-        Vec3 ay = Vec3(0.0f, localBoundsB.y, 0.0f);
-        Vec3 az = Vec3(0.0f, 0.0f, localBoundsB.z);
-        Vec3 c = LocalToWorldPoint(localBoundsA);
-        ax = LocalToWorldDirection(ax);
-        ay = LocalToWorldDirection(ay);
-        az = LocalToWorldDirection(az);
-        c = FramePoint(c, frame);
-        ax = FrameDirection(ax, frame);
-        ay = FrameDirection(ay, frame);
-        az = FrameDirection(az, frame);
-        Vec3 ext;
-        ext.x = AbsValue(ax.x) + AbsValue(ay.x) + AbsValue(az.x);
-        ext.y = AbsValue(ax.y) + AbsValue(ay.y) + AbsValue(az.y);
-        ext.z = AbsValue(ax.z) + AbsValue(ay.z) + AbsValue(az.z);
-        if (*have) {
-            Vec3 l = c - ext;
-            Vec3 h = c + ext;
-            lo->x = lo->x < l.x ? lo->x : l.x;
-            lo->y = lo->y < l.y ? lo->y : l.y;
-            lo->z = lo->z < l.z ? lo->z : l.z;
-            hi->x = hi->x > h.x ? hi->x : h.x;
-            hi->y = hi->y > h.y ? hi->y : h.y;
-            hi->z = hi->z > h.z ? hi->z : h.z;
-        } else {
-            *lo = c - ext;
-            *hi = c + ext;
-            *have = 1;
-        }
-    }
-    for (SoultreeObject* child = firstChild; child; child = child->nextSibling)
-        child->AccumulateBounds(have, lo, hi, frame);
 }

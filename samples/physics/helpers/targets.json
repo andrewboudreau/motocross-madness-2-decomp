@@ -300,15 +300,5 @@
     "expect": "partial",
     "notes": "541/610: frame slot order (retail c, e, w, a) and the hi = w + ext tail (retail keeps ext on the x87 stack). See SoultreeBounds.cpp.",
     "bindings": "SoultreeBounds.bindings.json"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeBounds.cpp",
-    "candidate_symbol_contains": "?AccumulateBounds@SoultreeObject",
-    "target_va": "0x004fe2e0",
-    "target_size": 1390,
-    "expect": "partial",
-    "notes": "same flow, calls and arithmetic; have-branch clamps are unconditional selects (fld/fcom/jne keep/fstp st0/fld new). Retail frame 0x48 vs 0x3c (by-value direction temporaries, centre in ebx/ebp/edx, out-of-line Vec3 ctor 0x00404e60 for hi). See SoultreeBounds.cpp.",
-    "bindings": "SoultreeBounds.bindings.json"
   }
 ]
