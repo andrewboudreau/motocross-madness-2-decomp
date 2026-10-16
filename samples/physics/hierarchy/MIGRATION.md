@@ -83,7 +83,7 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
 2. **Reach GameObject members through the virtual base.** Code in derived classes names GameObject members directly, for example `field_0x18`. VC6 then emits `mov r,[this+4]; mov r,[r+4]; ... [r+this+4+disp]`.
    - The displacement in that retail code is **GameObject offset + 4**, because it is relative to the vbptr at +4.
    - So retail `[ecx+esi+0x1c]` is `GameObject::field_0x18`, not `field_0x1c`.
-   - **Bike slot 97 fix:** this is the Bike "+4" problem. `BikeGameObject::go_0x1c` is really `GameObject+0x18`. `field_0x4.Method_0x00469190` is really `GameObject::Method_0x00469190`, with `this` equal to the GameObject itself (`lea ecx,[edx+esi+4]`).
+   - **Bike slot 97 fix:** this is the Bike "+4" problem. `BikeGameObject::go_0x1c` is really `GameObject+0x18`. `field_0x4.AppendChild` is really `GameObject::AppendChild`, with `this` equal to the GameObject itself (`lea ecx,[edx+esi+4]`).
    - The vtordisp does **not** cause the Bike problem. VC6 puts the stand-in Bike's GameObject at 0x738 too (`sizeof` 0x758 − 0x20).
 3. **Override signatures must match the base declaration exactly.** VC6 does not report a parameter-list mismatch. The function silently becomes a new virtual and the vtable grows.
    - After migrating, run `PYTHONPATH=. python samples/physics/hierarchy/vtable_counts.py <area obj>`. It must print `ok` for every real class.
@@ -105,7 +105,7 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
    - `virtual int GameObjectVirtualSlot11(float dt);` (0x004da540: `mov eax,1; ret 4`).
    - After this change, update the SoultreePhysicsBaseObject slot-10 override, and the SoultreePhysicsCharacter one in `hierarchy/SoultreePhysicsCharacter.h`, to `int GameObjectVirtualSlot10(float dt)`. Both are currently `void()` to match the shared header.
 2. **GameObject fields.** Replace `char field_0x08[0x24]` with `char field_0x08[0x10]; void* field_0x18; char field_0x1c[0x10];`.
-   - Add the non-virtual `void Method_0x00469190(void* a, int b);` (bike slot 97).
+   - Add the non-virtual `void AppendChild(void* a, int b);` (bike slot 97).
 3. **Reconcile slot signatures.** SoultreePhysicsBaseObject uses `int` placeholders where areas have typed evidence.
    - Pick one signature per slot. Ideally the area with a byte-exact body wins.
    - Conflicts:
@@ -172,7 +172,7 @@ A trial migration compiled against the canonical header and reproduced the same 
 - **Include** `"../vehicle/Vehicle.h"` once it is migrated. Until then, include `"../hierarchy/SoultreePhysicsCharacter.h"` and keep a Vehicle stand-in with `char pad_0x434[0x188]` for 0x434..0x5bc, plus Vehicle's slot list.
 - **Code:**
   - `D3IMSoultreeCharacter::ApplyRestPose/8bf0/8c50` becomes `D3DIMSoultreeCharacter::` (declared on `Character`, reachable through D3DIM).
-  - `go_0x1c` becomes `field_0x18`, and `BikeGameObject::field_0x4.Method_0x00469190(...)` becomes `GameObject::Method_0x00469190(...)`.
+  - `go_0x1c` becomes `field_0x18`, and `BikeGameObject::field_0x4.AppendChild(...)` becomes `GameObject::AppendChild(...)`.
 - **Offset fixes:**
   - The stand-in Vehicle's `int field_0x5bc` is Bike's own first field, since Vehicle's data ends at 0x5bc. Move it into Bike.
   - Bike's `char pad_0x728[16]` becomes `char pad_0x728[12]`. The vtordisp occupies 0x734..0x738, and the compiler places it.

@@ -111,7 +111,7 @@
   "?Method_0x0040a520@Bike@@QAEMXZ": "0x0040a520",
   "?Method_0x00435fe0@BikeA38@@QAEXXZ": "0x00435fe0",
   "?ClearScreenRects@BikeA1A0@@QAEXXZ": "0x004444e0",
-  "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAXH@Z": "0x00469190",
   "?Method_0x004a8bf0@BikeA5C4@@QAEXHM@Z": "0x004a8bf0",
   "?Method_0x004a8bf0@Character@@QAEXHM@Z": "0x004a8bf0",
   "?Method_0x004a8c50@BikeA5C4@@QAEXHHMM@Z": "0x004a8c50",

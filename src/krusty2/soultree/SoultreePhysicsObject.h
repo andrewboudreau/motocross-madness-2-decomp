@@ -73,7 +73,7 @@ public:
     //  * a5..a7 are three Vec3 by value (struct-copy shape) and a8..a22 are forwarded
     //    unchanged to slot 2 as its a6..a20, so their types are slot 2's.  Slot 2 gets
     //    (a1, 1, a5, a6, a7, a8..a22).
-    //  * The SceneManager caller 0x004ed3bf passes the result to GameObject::Method_0x00469190.
+    //  * The SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
     //  * Returns the D3DIMSoultreeObject GameObject (+0x228), not the virtual one: the tail
     //    0x00503c16 null-checks `this`, then this+0x21c, then adds 12.
     virtual GameObject* UnknownVirtualSlot40(int a1, const char* a2, const SoultreeLoadDesc* a3,

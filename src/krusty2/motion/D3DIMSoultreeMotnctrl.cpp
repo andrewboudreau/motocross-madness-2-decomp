@@ -327,7 +327,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int a)
     modelNode = (SoultreeObject*)model;
     ((ModelObject*)modelNode)->CopyFrom((ModelObject*)source);
     GameObject* child = (ModelObject*)modelNode;
-    Method_0x00469190(child, -1);
+    AppendChild(child, -1);
     nodeCount = modelNode->CountNodes();
     nodeNames = (NodeNameEntry*)operator new(nodeCount << 6, __FILE__, 0x11b);
     FillNodeNames(0, nodeNames, modelNode);
@@ -352,7 +352,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     modelNode = (SoultreeObject*)frame;
     frame->Load(field_0x18, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
     GameObject* frameChild = (ModelObject*)modelNode;
-    Method_0x00469190(frameChild, -1);
+    AppendChild(frameChild, -1);
     modelNode->RegisterNode();
     len = strlen("Base Character Frame");
     n = len > 0x7f ? 0x7f : len;
@@ -374,7 +374,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
         ((ModelObject*)modelNode)->items[i]->Init(field_0x18, ((ModelObject*)modelNode)->field_0x248,
                                                   ((ModelObject*)modelNode)->field_0x240,
                                                   ((ModelObject*)modelNode)->field_0x244);
-        Method_0x00469190(((ModelObject*)modelNode)->items[i], -1);
+        AppendChild(((ModelObject*)modelNode)->items[i], -1);
         ((ModelObject*)modelNode)->items[i]->CopyFrom(loaded->items[i]);
         loaded->items[i]->BaseObjectVirtualSlot2();
     }

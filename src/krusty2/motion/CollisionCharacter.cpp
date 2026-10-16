@@ -90,7 +90,7 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
     collisionObject->ignoreVegetation = 1;
     // node + 0x140 is the scene node whose position slot 10 tracks (tier 3)
     sceneNode = *(SoultreeObject**)((char*)modelNode + 0x140);
-    GameObject::Method_0x00469190((GraphicsTest*)collisionObject, -1);
+    GameObject::AppendChild((GraphicsTest*)collisionObject, -1);
     if (colPath && *colPath)
         collisionObject->LoadShape(modelNode, colPath);
     else

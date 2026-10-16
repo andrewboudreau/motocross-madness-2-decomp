@@ -59,7 +59,7 @@ public:
     //  * a10, a11, a14, a20 take the types of the slot 2 parameters they are forwarded to.
     //  * Returns the GameObject virtual base (`this ? this+vbase : 0` at 0x0050408e).  The
     //    sibling SoultreePhysicsObject slot 40 (0x00503970, ret 0x70) has the same shape; its
-    //    SceneManager caller 0x004ed3bf passes the result to GameObject::Method_0x00469190.
+    //    SceneManager caller 0x004ed3bf passes the result to GameObject::AppendChild.
     virtual GameObject* UnknownVirtualSlot40(int a1, int a2, const char* a3,
                                              const SoultreeLoadDesc* a4, int a5,
                                              Vec3 a6, Vec3 a7, Vec3 a8,

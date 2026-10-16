@@ -378,7 +378,7 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   the 0x1e4-byte gearbox `0x004d2940` with the caller's tables or zeros (EH states 0/1),
   runs `SoultreePhysicsCharacter` slot 40 with `(0.02f, 100, 0.001f, 0.1f, 3)` and the track
   byte, builds the spark emitter `0x004b9830` (state 2, child via its slot 27 and
-  `GameObject::Method_0x00469190`) and the steering control `0x00504b60` (state 3, axis
+  `GameObject::AppendChild`) and the steering control `0x00504b60` (state 3, axis
   `a8 * -1.0f`), then installs `VehicleHit`/`VehicleHitBy`.  Exact: the gearbox's name
   argument is the second parameter (`[esp+0x48]` at `0x005260d3` is the a2 argument slot
   after seven pushes, not the `new` temporary); read as an uninitialised local instead, VC6
@@ -407,7 +407,7 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   `field_0x724 = 32`, `sideLieThreshold = cos(5 * 0.01745329)`, the pose bounds 0.85/0.55/
   0.8/1.8 and `field_0x28 = 32.2 / loadWeight`, builds the rider (`new(__FILE__, 0x583)
   D3DIMSoultreeCharacter(statusFlags & 1)`, loaded through its slot 11 and dropped when
-  `GameObject::Method_0x00469190` answers 0, which is why that method now returns int), the
+  `GameObject::AppendChild` answers 0, which is why that method now returns int), the
   handlebar part `BikeA60C("Handlebars", modelNode, steerState)` (line 0x660) and the two
   wheels: per wheel a local name table (`"Inline"`/`"InlineRear"`), a `{name[20], kind}`
   table of four kinds matched with the library `strcmp` (`#pragma function(strcmp)`), a

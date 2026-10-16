@@ -49,7 +49,7 @@
   "?Load@OwnerRegistry@@QAEXPBD0@Z": "0x004e9430",
   "?LoadMir@Character@@QAEXXZ": "0x004a6500",
   "?LoadVut@Character@@QAEXXZ": "0x004a62d0",
-  "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAXH@Z": "0x00469190",
   "?Method_0x004a6910@Character@@QAEXHH@Z": "0x004a6910",
   "?Open@ArchiveFile@@QAEXPBD0H@Z": "0x00460f50",
   "?ReadString@SltFile@@QAEXPBDPADH@Z": "0x004b7b30",

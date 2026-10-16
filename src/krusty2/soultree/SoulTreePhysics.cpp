@@ -1152,7 +1152,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
         collisionObject->ownerObject = this;
         collisionObject->Fn_00435fe0();
         GameObject* child = collisionObject;
-        D3DIMSoultreeObject::Method_0x00469190(child, -1);
+        D3DIMSoultreeObject::AppendChild(child, -1);
     }
     return static_cast<D3DIMSoultreeObject*>(this);
 }
@@ -1203,7 +1203,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
         collisionObject->ownerObject = this;
         collisionObject->Fn_00435fe0();
         GameObject* child = collisionObject;
-        GameObject::Method_0x00469190(child, -1);
+        GameObject::AppendChild(child, -1);
     }
     return this;
 }

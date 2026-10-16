@@ -212,7 +212,7 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
 };
 // Object at Vehicle+0x5ac: the SparkParticleEmitter (vtable 0x00555c1c, ctor 0x004b9830,
 // 0x60c bytes; samples/physics/effects/ParticleEmitters.h).  LoadVehicle builds it and hands the
-// result of its virtual slot 27 to GameObject::Method_0x00469190; the impact handlers view
+// result of its virtual slot 27 to GameObject::AppendChild; the impact handlers view
 // it as VehicleImpactSink.  Provisional view; Vehicle and Bike slot 38 store (0, 12, 0) at +0x78 and
 // set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / field_0x60.
 struct VehicleSparkEmitter {
