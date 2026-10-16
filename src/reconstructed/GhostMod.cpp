@@ -23,8 +23,8 @@ void GhostMod1::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultre
     if (timeRemaining > 0.0f) {
         unsigned int alpha = (unsigned char)(int)(200.0f - timeRemaining / totalDuration * 100.0f) << 24;
         for (int i = 0; i < mesh->vertexCount; i++) {
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse |= alpha;
+            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
+            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= alpha;
         }
     }
 }

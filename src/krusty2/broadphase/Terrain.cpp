@@ -223,13 +223,13 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
                                      0x80, 0xff00ff, 1, 1);
     if (detailTexture) {
         detailTexture->CreateTextureSurface(1, 0, 1);
-        colorKey = detailTexture->averageColor;
+        detailAverageColor = detailTexture->averageColor;
     } else {
-        colorKey = 0xffffffff;
+        detailAverageColor = 0xffffffff;
     }
 
     {
-        unsigned int key = colorKey;
+        unsigned int key = detailAverageColor;
         unsigned int alpha = 0xff - (key >> 24);
         unsigned int keep = 0xff - alpha;
         unsigned int red = RGBA_GETRED(key) * keep / 0xff;
@@ -508,7 +508,7 @@ int Terrain::GameObjectVirtualSlot14()
     indicesDrawn = 0;
     verticesDrawn = 0;
     {
-        unsigned int key = colorKey;
+        unsigned int key = detailAverageColor;
         unsigned int alpha = 0x109 - (key >> 24);
         unsigned int keep = 0xff - alpha;
         unsigned int red = RGBA_GETRED(key) * keep / 0xff;

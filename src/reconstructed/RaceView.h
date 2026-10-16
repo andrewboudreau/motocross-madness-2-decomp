@@ -134,7 +134,7 @@ struct UnknownEventRacer : virtual public GameObject {
     UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
     unsigned char field_0x608[0x734 - 0x608];
     char aiKind;  // +0x734  KrustyBike +0x734 aiKind; RaceStatus estimates finish times only for racers with it set
-    unsigned char skipGateTest;  // +0x735  passed as CountLap/AdvanceGate skipTest; selects ClosestPointOnTrack over PlaceNear (RaceStatus.cpp)
+    unsigned char isRemote;  // +0x735  KrustyBike isRemote; passed as CountLap/AdvanceGate skipTest; selects ClosestPointOnTrack over PlaceNear
     unsigned char isGhost;  // +0x736  KrustyBike +0x736 isGhost (loader kind 0xff)
     char engineKind;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
@@ -238,7 +238,7 @@ struct UnknownKrustyBikeView : public GameObject {
     unsigned char field_0x1c8[0x1dc - 0x1c8];
     int replayMode;                           // +0x1dc replay mode (4 play ... 14)
     unsigned char field_0x1e0[0x1e4 - 0x1e0];
-    int field_0x1e4;                     // -2: no replay
+    int lastRecordKind;  // +0x1E4  BikeRace +0x1e4 lastRecordKind: RecordFrame's last record kind (-2: no replay / tape end)
     int ghostLap;                             // +0x1e8 lap count when the ghost lap restarted
     unsigned char field_0x1ec[0x3f8 - 0x1ec];
     bool replayPaused;                       // +0x3f8

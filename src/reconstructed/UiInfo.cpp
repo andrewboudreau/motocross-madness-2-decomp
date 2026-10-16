@@ -182,7 +182,7 @@ void TrackGameMode::ResetInterfaceOptions(UnknownTrackGameModeOptions6ac* option
     options->playerIndicator = 1;
     options->toolTips = 1;
     options->wreckResetOnTrack = 1;
-    memset(&options->field_0x360, 0, sizeof(options->field_0x360));
+    memset(&options->garageCurveChoice, 0, sizeof(options->garageCurveChoice));
 }
 
 // 0x00522780: the defaults of +0xa20..+0xa4b, mostly sound settings (sound

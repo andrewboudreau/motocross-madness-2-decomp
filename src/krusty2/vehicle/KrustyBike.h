@@ -114,54 +114,54 @@ public:
 
 public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
-    char field_0x735; // 0x735
+    char isRemote;  // +0x735  Load's a13: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
     char isGhost;  // +0x736  set for loader kind 0xff (a ghost); the loader then creates the KbGhostMod at +0x15e8
-    char field_0x737; // 0x737  KbBikeSetup+4 (0 without a setup)
-    int field_0x738; // 0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500)
-    int field_0x73c; // 0x73C  0x65 from the constructor
+    char engineKind;  // +0x737  KbBikeSetup+4; racesnd.cpp selects engine 2 over 1 by it (RaceView +0x737)
+    int engineSize;  // +0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500); racesnd below 250 uses engine 0
+    int plateNumber;  // +0x73C  0x65 from the constructor; BikeRace racer +0x73c plate number (the setup paints it)
     KbRace* race;  // +0x740  loader race argument
-    KbGhost* field_0x744; // 0x744
-    int field_0x748; // 0x748
-    int field_0x74c; // 0x74C
-    int field_0x750; // 0x750
-    float field_0x754; // 0x754
+    KbGhost* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its +0x44 track position is seeded from the start probe
+    int finishTimeStamp;  // +0x748  RaceView +0x748 time stamp; 0x7ffffffe until finished
+    int lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time (float there)
+    int fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap" (float there)
+    float totalRunningTime;  // +0x754  RaceView +0x754: FLT_MAX until finished; ZoneReport "TotalrunningTime"
     float field_0x758; // 0x758
-    int field_0x75c; // 0x75C
-    int field_0x760; // 0x760
-    int field_0x764; // 0x764
-    float field_0x768; // 0x768
-    float field_0x76c; // 0x76C
-    int field_0x770; // 0x770
-    int field_0x774; // 0x774
+    int tagRun;  // +0x75C  RaceView +0x75c: current run as the followed racer in tag (mode 4)
+    int bestTagRun;  // +0x760  RaceView +0x760 best banked tag run
+    int totalTagRun;  // +0x764  RaceView +0x764 sum of the banked tag runs
+    float score;  // +0x768  RaceView/BikeRace +0x768 score; message 10 (KbBikePing+0x04) carries it
+    float offTrackTime;  // +0x76C  RaceStatus time off the track (RaceView +0x76c); slot 39 respawns past 6 s when raceMode is set
+    int timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
+    int lapStartTime;  // +0x774  RaceView +0x774 lap start time
     float field_0x778; // 0x778  100.0f from the loader
     void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
     void* heapBufferB; // 0x780  heap buffer released in the destructor
-    int field_0x784; // 0x784
-    int field_0x788; // 0x788
-    int field_0x78c; // 0x78C
-    int field_0x790; // 0x790
+    int finishPosition;  // +0x784  RaceView +0x784 finishing position (1-based)
+    int largestStuntPoints;  // +0x788  RaceView +0x788 ZoneReport "LargestSingleStuntPoints"
+    int onTrack;  // +0x78C  RaceView +0x78c: Track::PlaceNear placed the racer (RaceStatus); BikeAI follows the track only when set
+    int gatesPassed;  // +0x790  RaceView +0x790 gates passed
     int field_0x794; // 0x794
     int field_0x798; // 0x798
-    int field_0x79c; // 0x79C  0, 1 or 2 from +0x738 (loader)
-    short field_0x7a0; // 0x7A0
+    int engineClass;  // +0x79C loader: 0 for engineSize <= 125, 1 below 500, else 2; BikeAI indexes its speed table (0x00566f74) with it
+    short lapCount;  // +0x7A0  RaceView/BikeRace +0x7a0 laps
     short field_0x7a2; // 0x7A2
-    char field_0x7a4; // 0x7A4
+    char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
     char field_0x7a5; // 0x7A5
     char pad_0x07A6[0x2];
     float field_0x7a8; // 0x7A8
     float field_0x7ac; // 0x7AC
     float field_0x7b0; // 0x7B0
     float field_0x7b4; // 0x7B4  bonus accumulated by 0x00495ff0
-    int field_0x7b8; // 0x7B8
-    int field_0x7bc; // 0x7BC
-    int field_0x7c0; // 0x7C0
+    int lapGate;  // +0x7B8  RaceView/BikeRace +0x7b8 gate of the lap (AdvanceGate's gateIndex)
+    int nextLapGate;  // +0x7BC  RaceView/BikeRace +0x7bc lapGate + 1 wrapped by the gate count
+    int forceGatePass;  // +0x7C0  RaceStatus passes it as CountLap/AdvanceGate `forced`: with isRemote the gate/lap counts only when set
     float field_0x7c4; // 0x7C4  loader constants 1.1, 1.3, 1.5, 25, 15, 5, 0 (tier 3 purpose)
     float field_0x7c8; // 0x7C8
     float field_0x7cc; // 0x7CC
-    float field_0x7d0; // 0x7D0
-    float field_0x7d4; // 0x7D4
-    float field_0x7d8; // 0x7D8
-    float field_0x7dc; // 0x7DC
+    float trickDelay1;  // +0x7D0 loader 25.0; BikeAI's delay between AI tricks at difficulty 1
+    float trickDelay2;  // +0x7D4 loader 15.0; BikeAI's delay between AI tricks at difficulty 2
+    float trickDelay3;  // +0x7D8 loader 5.0; BikeAI's delay between AI tricks at difficulty 3
+    float trickTimer;  // +0x7DC time since the last AI trick: BikeAI adds dt, clears it on a trick, and rolls for one once it reaches the delay
     Vec3 field_0x7e0; // 0x7E0
     Vec3 field_0x7ec; // 0x7EC
     float lookAheadFrontTravel;  // +0x7F8  front suspension travel of the look-ahead model (0x00413200)
@@ -170,19 +170,19 @@ public:
     float field_0x804; // 0x804
     float field_0x808; // 0x808
     float startRunUpTime;  // +0x80C  seconds of the start-gate run-up (0x00414370)
-    char field_0x810; // 0x810  set with +0x15e4 for a local (+0x734) bike
+    char field_0x810; // 0x810  set with aiTricksEnabled for an AI (aiKind) bike, cleared otherwise
     char pad_0x0811[0x3];
     float contactTime;  // +0x814  seconds with the collision object in contact (0x00413200)
-    float field_0x818; // 0x818  3000.0f (local bike)
-    float field_0x81c; // 0x81C
-    float field_0x820; // 0x820  3000.0f (local bike)
+    float roamTargetX;  // +0x818 BikeAI's free-ride target (x); 3000.0 from the loader for an AI bike, re-picked at random within 50 units
+    float roamTargetY;  // +0x81C BikeAI's free-ride target (y, 0 when re-picked)
+    float roamTargetZ;  // +0x820 BikeAI's free-ride target (z); 3000.0 from the loader for an AI bike
     float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
     Vec3 predictedLandingNormal;  // +0x828  ground normal under the predicted landing (0x00413200)
     float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)
     UnknownBikeAIPath aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
     int field_0x11b0;  // 0x11B0  last argument of the look-ahead simulation 0x0040eca0
-    float offTrackTime;  // +0x11B4  seconds off the track before 0x00414370 respawns the bike
-    char field_0x11b8; // 0x11B8
+    float aiOffTrackTime;  // +0x11B4  BikeAI: seconds the AI bike is off the track (onTrack clear) while raceMode is 0; at 5 it is put back
+    char hasFullState;  // +0x11B8  BikeRace racer +0x11b8: set when a message 1 state arrives; message 13 deltas wait for it
     char pad_0x11B9[0x3];
     int netId;  // +0x11BC  loader netId; the id passed with every Send/recorder message
     unsigned char loaderKind;  // +0x11C0  raw loader kind (0xff for a ghost), sent in messages 1 and 10
@@ -190,13 +190,13 @@ public:
     float clockOffset;  // +0x11C4  clock offset subtracted by 0x00493660 (not UseTimeReceived)
     KbBikeNetState* states[4]; // 0x11C8  received states, newest first (buffers at 0x11d8..)
     KbBikeNetState stateBuffers[4]; // 0x11D8  the four 0x60-byte buffers states[] points at
-    Vec3 field_0x1358; // 0x1358
-    Vec3 field_0x1364; // 0x1364
-    Vec3 field_0x1370; // 0x1370
-    float field_0x137c; // 0x137C
-    float field_0x1380; // 0x1380
-    float field_0x1384; // 0x1384
-    int field_0x1388; // 0x1388
+    Vec3 deltaBaseVelocity;  // +0x1358  message 13 delta base, set from message 1 velocity (BikeRace racer +0x1358)
+    Vec3 deltaBasePosition;  // +0x1364  message 13 delta base, set from message 1 position
+    Vec3 deltaBaseAngularVelocity;  // +0x1370  message 13 delta base, set from message 1 angular velocity
+    float deltaBaseRoll;  // +0x137C  message 13 delta base, set from message 1 roll
+    float deltaBasePitch;  // +0x1380  message 13 delta base, set from message 1 pitch
+    float deltaBaseYaw;  // +0x1384  message 13 delta base, set from message 1 yaw
+    int deltaBaseTime;  // +0x1388  message 13 delta base ms time (message 1 +0x4c)
     float field_0x138c; // 0x138C  seconds left of the slot-50 hold 0x00493660 starts
     KbBikeState recordState; // 0x1390  last state recorded (0x00492ad0 with record set)
     KbRecorder* netRecorder; // 0x13FC
@@ -237,9 +237,9 @@ public:
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
     int field_0x15d4; // 0x15D4
     void* field_0x15d8; // 0x15D8  loader argument 30
-    float field_0x15dc; // 0x15DC  KbRace +0x9c/+0xa0/+0xa4 by game type, else 2.0 (local bike)
+    float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
-    char field_0x15e4; // 0x15E4  set for a local bike
+    char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll
     char field_0x15e5; // 0x15E5
     char field_0x15e6; // 0x15E6
     char pad_0x15E7[0x1];

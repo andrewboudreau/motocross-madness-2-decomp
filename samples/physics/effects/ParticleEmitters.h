@@ -161,7 +161,7 @@ public:
     float field_0x44;         // +0x44 ctor 0; Restart copies +0x40 here, Burst stores 0.0001
     ParticleVec3 position;    // +0x48 ctor 0; SetPosition's arguments
     ParticleVec3 previousPosition; // +0x54 SetPosition copies position here first
-    int field_0x60;           // +0x60 ctor 0; Restart sets 1, StopEmitting clears it
+    int emitting;  // +0x60  ctor 0; Restart (0x004ba300) sets 1, StopEmitting (0x004ba340) clears it
     int field_0x64;           // +0x64 ctor 14
     int field_0x68;           // +0x68 ctor 0x80a
     int field_0x6c;           // +0x6c ctor 0; Restart and Burst set 1

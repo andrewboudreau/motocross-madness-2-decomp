@@ -156,20 +156,20 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
         break;
     case kDialogCommand:
         if (!_stricmp("TogPlay", event->controlName)) {
-            if (view->field_0x1e4 != -2) {
+            if (view->lastRecordKind != -2) {
                 view->ToggleReplayPause(1);
                 view->ToggleReplayPause(0);
                 view->replayMode = 4;
                 g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("TogPause", event->controlName)) {
-            if (view->field_0x1e4 != -2) {
+            if (view->lastRecordKind != -2) {
                 view->ToggleReplayPause(0);
                 view->replayMode = 4;
                 g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("TogFF", event->controlName)) {
-            if (view->field_0x1e4 != -2) {
+            if (view->lastRecordKind != -2) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->replayPaused)
                         view->ToggleReplayPause(0);
@@ -182,7 +182,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 }
             }
         } else if (!_stricmp("TogFFF", event->controlName)) {
-            if (view->field_0x1e4 != -2) {
+            if (view->lastRecordKind != -2) {
                 if (static_cast<UIMultiState*>(event->control)->GetSelectedState() == 1) {
                     if (view->replayPaused)
                         view->ToggleReplayPause(0);
@@ -208,7 +208,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->replaySpeed = 1.0f;
             }
         } else if (!_stricmp("ButFrame", event->controlName)) {
-            if (view->field_0x1e4 != -2) {
+            if (view->lastRecordKind != -2) {
                 if (view->replayPaused)
                     view->ToggleReplayPause(0);
                 view->replayStepFrame = 1;
@@ -219,7 +219,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
                 view->ToggleReplayPause(0);
             view->replayMode = 12;
         } else if (!_stricmp("ButEnd", event->controlName)) {
-            if (view->field_0x1e4 != -2) {
+            if (view->lastRecordKind != -2) {
                 if (view->replayPaused)
                     view->ToggleReplayPause(0);
                 view->replayMode = 9;

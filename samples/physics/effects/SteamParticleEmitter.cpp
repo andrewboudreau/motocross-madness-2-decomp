@@ -16,7 +16,7 @@ SteamParticleEmitter::SteamParticleEmitter(int flags) : GameObject(flags)
     position.y = 0;
     position.z = 0;
     previousPosition = position;
-    field_0x60 = 0;
+    emitting = 0;
     field_0x64 = 14;
     manager = 0;
     field_0x6c = 0;
@@ -59,7 +59,7 @@ void SteamParticleEmitter::Restart()
 {
     field_0x6c = 1;
     field_0x44 = field_0x40;
-    field_0x60 = 1;
+    emitting = 1;
 }
 
 void SteamParticleEmitter::Burst()
@@ -71,7 +71,7 @@ void SteamParticleEmitter::Burst()
 
 void SteamParticleEmitter::StopEmitting()
 {
-    field_0x60 = 0;
+    emitting = 0;
     previousPosition = position;
 }
 
@@ -83,7 +83,7 @@ void SteamParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 // 0x004ba070.  Emits a trail of puffs between the previous and the current position each tick.
 int SteamParticleEmitter::GameObjectVirtualSlot10(float dt)
 {
-    if (g_gameContext->frozen == 0 && field_0x60 != 0 && field_0x6c != 0) {
+    if (g_gameContext->frozen == 0 && emitting != 0 && field_0x6c != 0) {
         if (field_0x44 <= 0.0f) {
             field_0x44 = 0;
             field_0x6c = 0;

@@ -80,7 +80,7 @@ struct BikeDirtChunkEmitter : BikeParticleEmitterView {
 struct BikeSteamEmitter : BikeParticleEmitterView {
     explicit BikeSteamEmitter(int flags);       // 0x004b9f40
     char pad_0x04[0x5c];
-    int field_0x60;                             // the loader sets it to 1
+    int emitting;  // +0x60  SteamParticleEmitter +0x60 emitting; the loader sets it to 1
     char pad_0x64[0x418];                       // 0x47c bytes (`new(__FILE__, 0x711)`)
 };
 
@@ -106,55 +106,55 @@ struct BikeWheel {
     char pad_0x000[184];
     char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)
     Vec3 wheelPosition;
-    Vec3 w_0x0d8;             // KrustyBike 0x00413200 moves it with the body's step displacement
+    Vec3 groundPoint;  // +0xd8 VehicleWheel groundPoint (CollisionPoint+0x20 surfacePosition); KrustyBike 0x00413200 moves it with the body's step displacement
     Vec3 groundNormal;
     char pad_0x0f0[12];
     Vec3 appliedShare;
-    Vec3 w_0x108;
+    Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (VehicleWheel name)
     char pad_0x114[12];
     Vec3 w_0x120;             // Method_0x0040a520 crosses the wheel offset with it while in contact
     char pad_0x12c[24];
     float contactLoad;
-    float w_0x148;
-    float w_0x14c;            // KrustyBike 0x00413200 clears it
-    float w_0x150;
+    float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (VehicleWheel name)
+    float spinSpeed;  // +0x14c CollisionPoint+0x94 spinSpeed (VehicleWheel name); KrustyBike 0x00413200 clears it
+    float penetration;  // +0x150 CollisionPoint+0x98 penetration (VehicleWheel name)
     char pad_0x154[4];
     float loadWeight;
     char pad_0x15c[16];
     int w_0x16c;              // Method_0x0040a520 sets it to 2 while the wheel is in contact
     char pad_0x170[76];
     SoultreeObject* sceneNode;  // +0x1bc wheel scene node (VehicleWheel name)
-    BikeWheelFrame* w_0x1c0;  // frame whose +0xc axis Method_0x0040a520 projects on
+    BikeWheelFrame* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40); Method_0x0040a520 projects on its +0xc axis
     char pad_0x1c4[60];
     Vec3 nodePosition;        // +0x200 (VehicleWheel name)
-    Vec3 w_0x20c;             // scaled by w_0x274 while airborne (Method_0x0040a520)
+    Vec3 wheelUpAxis;  // +0x20c Tire.h wheelUpAxis; scaled by wheelRadius while airborne (Method_0x0040a520)
     char pad_0x218[24];
-    Vec3 w_0x230;
-    Vec3 w_0x23c;
+    Vec3 rollDirection;  // +0x230 Tire.h/VehicleWheel rollDirection
+    Vec3 sideAxis;  // +0x23c Tire.h/VehicleWheel sideAxis (wheel axle direction)
     Vec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
     char pad_0x254[12];
     int inContact;
     char pad_0x264[4];
     int w_0x268;
     char pad_0x26c[8];
-    float w_0x274;
+    float wheelRadius;  // +0x274 Tire.h wheelRadius (ctor: y extent of the node)
     char pad_0x278[4];
-    float w_0x27c;
+    float slipSpeed;  // +0x27c Tire.h slipSpeed (written by UpdateContactPatch)
     float w_0x280;
     char pad_0x284[4];
-    float w_0x288;
+    float tangentSin;  // +0x288 Tire.h tangentSin
     char pad_0x28c[8];
     float w_0x294;
     char pad_0x298[4];
-    float w_0x29c;
+    float rampLevel;  // +0x29c Tire.h/VehicleWheel rampLevel
     char pad_0x2a0[4];
     float w_0x2a4;
-    BikeWheelQ* w_0x2a8;
-    BikeQ* w_0x2ac;
-    BikeQ* w_0x2b0;
+    BikeWheelQ* aux;  // +0x2a8 VehicleWheel aux (Tire.h TireAux)
+    BikeQ* secondaryAux;  // +0x2ac VehicleWheel secondaryAux (the fallback when primaryAux is null)
+    BikeQ* primaryAux;  // +0x2b0 VehicleWheel primaryAux (attachment AddWheel stores)
     char pad_0x2b4[4];
-    float w_0x2b8;
-    float w_0x2bc;
+    float driveShare;  // +0x2b8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
+    float driveShareComplement;  // +0x2bc UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
     void UpdateDriveShare(void* owner);   // 0x00513f90 (Tire.h name: drive share from the vehicle speed)
 };
 
@@ -378,8 +378,8 @@ public:
     // functions were tried and cost the exact match of slot 8 (0x00406750): VC6 then
     // loads field_0x42c before the float arguments instead of after them.
 
-    int field_0x5bc;              // first Bike field (Vehicle's own data ends at 0x5bc)
-    int field_0x5c0;
+    int gasGyro;  // +0x5BC  0 from the constructor, Load's a31: TrackGameMode gasGyro (key 0x22, reset 0)
+    int brakeGyro;  // +0x5C0  1 from the constructor, Load's a32: TrackGameMode brakeGyro (key 0x30, reset 1)
     BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     BikeA5C8 field_0x5c8;         // +0x5c8 copy of the loader's info block (when given)
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
@@ -388,11 +388,11 @@ public:
     BikeA5F8* field_0x5f8;         // +0x5f8 cleared in the ctor (0x00407700); Method_0x0040a520 reads it
     BikeA5F8* field_0x5fc;         // +0x5fc cleared in the ctor
     int field_0x600;               // +0x600 cleared in the ctor
-    BikeA604* field_0x604;
+    BikeA604* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* field_0x60c;         // +0x60c cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
-    Vec3 field_0x610;              // per-axis gains of the steering torque integrator (Method_0x0040a520)
-    Vec3 field_0x61c;              // integrated steering torque; decays by 0.99 (or -0.02/-0.1 at the limit) per step
+    Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (Method_0x0040a520)
+    Vec3 steerTorque;  // +0x61C  integrated steering torque (Method_0x0040a520); decays by 0.99 (or -0.02/-0.1 at the limit) per step
     float field_0x628;
     float field_0x62c;
     int field_0x630;
@@ -423,9 +423,9 @@ public:
     float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float field_0x724;
-    BikeDustEmitter* field_0x728;        // +0x728 cleared in the ctor; the loader's dust emitter (attachment type 1 on the rear wheel)
-    BikeDirtChunkEmitter* field_0x72c;   // +0x72c cleared in the ctor; dirt chunks (attachment type 2 on the rear wheel)
-    BikeSteamEmitter* field_0x730;       // +0x730 cleared in the ctor; steam (attachment type 4 at (0, 2.5, -2.75)); own data ends at 0x734, the compiler places the vtordisp there
+    BikeDustEmitter* dustEmitter;  // +0x728  BikeDustEmitter built by the loader (Bike.cpp new line 0x70f), attached as type 1 on the rear wheel
+    BikeDirtChunkEmitter* dirtChunkEmitter;  // +0x72C  BikeDirtChunkEmitter built by the loader (line 0x710), attached as type 2 on the rear wheel
+    BikeSteamEmitter* steamEmitter;  // +0x730  BikeSteamEmitter built by the loader (line 0x711), attached as type 4 at (0, 2.5, -2.75); own data ends at 0x734, the compiler places the vtordisp there
 };
 
 typedef char bike_assert_sizeof[(sizeof(Bike) == 0x738 + 0x2c) ? 1 : -1];

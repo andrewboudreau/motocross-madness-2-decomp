@@ -449,7 +449,7 @@ public:
     unsigned char field_0x754[0x768 - 0x754];
     float score;                              // +0x768 score (network message 10)
     unsigned char field_0x76c[0x770 - 0x76c];
-    int field_0x770;                          // replayed from message 1's +0x2c
+    int timeBehindLeader;  // +0x770  KrustyBike +0x770 timeBehindLeader; replayed from message 1's +0x2c
     unsigned char field_0x774[0x7a0 - 0x774];
     unsigned short lapCount;                  // +0x7a0 laps (UnknownEventRacer)
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
@@ -493,7 +493,7 @@ struct UnknownBikeRaceNetState {
     int yaw;  // +0x1C  KbBikeMessage+0x1c yaw; copied raw to racer +0x1384
     unsigned char field_0x20[0x28 - 0x20];
     float fastestLap;  // +0x28  RecordFrame copies it to racer fastestLap (+0x750, as KbBikeMessage+0x28)
-    int field_0x2c;
+    int timeBehindLeader;  // +0x2C  KbBikeMessage+0x2c timeBehindLeader; replayed into racer timeBehindLeader (+0x770)
     Vector3 angularVelocity;  // +0x30  KbBikeMessage+0x30 angularVelocity; copied to racer +0x1370
     Vector3 velocity;  // +0x3C  KbBikeMessage+0x3c velocity; copied to racer +0x1358
     unsigned char field_0x48[0x4c - 0x48];
@@ -631,7 +631,7 @@ struct UnknownBikeRaceCameraView {
     unsigned char field_0x248[0x268 - 0x248];
     int overrideActive;                       // +0x268 override active
     unsigned char field_0x26c[0x274 - 0x26c];
-    unsigned char field_0x274;
+    unsigned char isSettled;  // +0x274  FollowCamera isSettled (the comment above names FollowCamera's +0x274)
     unsigned char field_0x275[0x384 - 0x275];
     UnknownBikeRaceSceneCharacter* targetCharacter;  // +0x384  VehicleCamera+0x384 target; UnknownFunctionTargetCharacter stores its scene character
     GameObject* targetCar;  // +0x388  VehicleCamera+0x388 targetCar; UnknownFunctionTargetObject stores its scene procedural object
@@ -665,18 +665,18 @@ struct UnknownBikeRaceCameraView {
         targetCharacter = 0;
         targetCar = 0;
         followedBike = racer;
-        field_0x274 = 0;
+        isSettled = 0;
         followedRacer = racer;
         if (!racer->bikeView->forceHighLod) {
             racer->modelNode->SetLowestLod(0);
             followedBike->riderCharacter->modelNode->SetLowestLod(0);
         }
-        field_0x274 = 0;
+        isSettled = 0;
     }
 
     // Inline (0x0041eb20): the camera targets one scene object instead.
     void UnknownFunctionTargetCaster(void* caster) {
-        field_0x274 = 0;
+        isSettled = 0;
         shadowCaster = caster;
         targetPointCached = 0;
         targetHeadingCached = 0;
@@ -686,7 +686,7 @@ struct UnknownBikeRaceCameraView {
     }
     void UnknownFunctionTargetCharacter(UnknownBikeRaceSceneCharacter* character) {
         targetCharacter = character;
-        field_0x274 = 0;
+        isSettled = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;
@@ -695,7 +695,7 @@ struct UnknownBikeRaceCameraView {
     }
     void UnknownFunctionTargetObject(GameObject* object) {
         targetCar = object;
-        field_0x274 = 0;
+        isSettled = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;

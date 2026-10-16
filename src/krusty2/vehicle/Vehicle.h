@@ -283,8 +283,8 @@ struct VehicleRotatingShock : VehicleShock {
                          float a6, float a7, float a8, float a9, int axisId, const Vec3* axisOverride);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fab60
     char pad_0x98[0x28];
-    float swingAngle;                // +0xc0 Bike's loader: sin(swingAngle * 0.5) * 2 * armLength -> field_0xc4
-    float field_0xc4;
+    float swingAngle;                // +0xc0 Bike's loader: sin(swingAngle * 0.5) * 2 * armLength -> chord
+    float chord;  // +0xC4  = sin(swingAngle * 0.5) * 2 * armLength (Bike's loader); Suspension.h RotatingShock +0xc4 chord
     float armLength;                 // +0xc8 Bike's loader: distance from the wheel node to the shock node
     float armLengthSq;               // +0xcc armLength squared
     char pad_0xd0[0x14];             // 0xe4 bytes (the loader's allocation)
@@ -315,22 +315,22 @@ struct VehicleWheel {
     Vec3 wheelPosition;              // +0xcc wheel contact position (slot 7 distance source)
     Vec3 groundPoint;              // +0xd8 (y at +0xdc is read as a height by slot 58)
     Vec3 groundNormal;              // +0xe4 contact normal (averaged by GetAverageGroundNormal)
-    Vec3 field_0xf0;
+    Vec3 relativePosition;  // +0xF0 CollisionPoint+0x38 relativePosition (base at +0xb8); crossed with the friction force for the torque
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
-    Vec3 field_0x108;
+    Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (base at +0xb8)
     Vec3 field_0x114;
     Vec3 field_0x120;
     float field_0x12c;  // Method_00527A20: -(appliedShare . groundNormal) when that is negative, else 0
-    Vec3 field_0x130;
+    Vec3 frictionForce;  // +0x130 CollisionPoint+0x78 frictionForce (base at +0xb8)
     float field_0x13c;  // Method_00527A20: contact time scale (the impulse is limited by it)
     char pad_0x140[4];
     float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
-    float field_0x148;  // Method_00527A20 adds it to field_0x14c for the available load
-    float field_0x14c;
-    float field_0x150;
+    float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (base at +0xb8); Method_00527A20 adds it to spinSpeed for the available load
+    float spinSpeed;  // +0x14C CollisionPoint+0x94 spinSpeed (base at +0xb8)
+    float penetration;  // +0x150 CollisionPoint+0x98 penetration (base at +0xb8); reset to -999
     char pad_0x154[4];
     float loadWeight;               // +0x158 blend weight
-    int field_0x15c;
+    int pointInContact;  // +0x15C CollisionPoint+0xa4 inContact (base at +0xb8); Tire's own inContact is +0x260
     int impactPosted;                 // +0x160 impact-handled flag (slot 18)
     int slidePosted;                 // +0x164 impact-handled flag (slot 19)
     int scrapePosted;                 // +0x168 impact-handled flag (slot 20)
@@ -339,7 +339,7 @@ struct VehicleWheel {
     unsigned char surfaceMaterial;       // +0x174 surface material id
     char pad_0x175[0x47];
     SoultreeObject* sceneNode;     // +0x1bc wheel scene node (slot 33 reads its position)
-    int field_0x1c0;
+    int ownerRef;  // +0x1C0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40)
     char pad_0x1C4[0x18];
     float levelRiseRate;               // +0x1dc +0x29c ramp-up rate (UpdateWheelRampLevels)
     float levelFallRate;               // +0x1e0 +0x29c ramp-down rate
@@ -359,8 +359,8 @@ struct VehicleWheel {
     int field_0x268;
     int field_0x26c;
     char pad_0x270[8];
-    int field_0x278;
-    int field_0x27c;
+    int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
+    int slipSpeed;  // +0x27C Tire.h slipSpeed (float there; only cleared here)
     Vec3 field_0x280;
     float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
     float field_0x290;
@@ -373,8 +373,8 @@ struct VehicleWheel {
     int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, Method_005293E0)
     int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90
     char pad_0x2B4[0x4];
-    float field_0x2b8;
-    float field_0x2bc;
+    float driveShare;  // +0x2B8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
+    float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
     void UpdateRoll(float a, float b, int c, int d, int e, float f);   // 0x005143d0
     void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
     void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70
@@ -531,7 +531,7 @@ public:
     // were tried; VC6 schedules their loads differently (slots 4, 19, 35 and 49 lost
     // bytes, Bike slot 8 lost its exact match), so the casts are written out.
 
-    float field_0x434;
+    float forwardSpeed;  // +0x434  velocity along bodyForward (BikeAI dot; UpdateContactPatch out); KrustyBike compares it with 60 mph in ft/s
     float field_0x438;        // read by Bike slot 59 (0x0040a330) as a float divisor
     float turnRate;  // +0x43c = turnAngle * field_0x140 (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
     int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
@@ -543,14 +543,14 @@ public:
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).
     float crashTimer;  // +0x454 Bike slot 39 decrements it by the frame time while crashed and compares with 0/-0.1/-2.0; slots 1/67 clear it
     float crashTimerReload;  // +0x458 slot 69 copies it into crashTimer
-    float field_0x45c;        // Bike slot 100 (0x0040a090) stores field_0x50 here
+    float crashYaw;  // +0x45C  CheckCrash stores savedYaw here on a crash; VehicleCamera slot 39 returns it
     int crashReason;  // +0x460 Bike slot 99 stores reason codes (2,4,6,7,8,10,11,13) beside crashDirection
-    int field_0x464;
+    int crashedUpsideDown;  // +0x464  CheckCrash stores savedUp.y < 0 on a crash; VehicleCamera slot 39 turns the camera by pi
     VehicleInputMap* inputMap;  // +0x468 object whose virtual slots 2/3 are queried with action ids 0x0e/0x1d/0x1f/0x2d/0xc8/0xd0 (slots 77-84); slot 39 also uses its key table
     void* inputDevice;  // +0x46c tested non-null together with throttleAxis before the throttle axis is latched in slot 63 (-1 when absent)
     float throttleInput;  // +0x470 slot 63 latches axis 0x500 value (dead zone 0.2, else -1 when no device); slot 80 tests it > 0.33
     float steerInput;  // +0x474 slot 63: = -axis(0x4f8).value; slot 88 classifies it with 0x504.y into 8 stick sectors; slot 64 zeroes it when crashed
-    bool field_0x478;
+    bool throttleOn;  // +0x478  racesnd.cpp throttle-on flag (RaceView +0x478); Bike's gas gyro acts only while set
     bool field_0x479;
     bool field_0x47a;
     char pad_0x47B[0x1];
@@ -559,7 +559,7 @@ public:
     int justLanded;  // +0x484 slot 49 clears it per frame; slot 71 sets it to 1 when the airborne flag 0x108 drops (landing)
     Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
     Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground
-    int field_0x4a0;          // set to 1 by slot 44
+    int outOfRace;  // +0x4A0  set to 1 by slot 44; EventManager counts the racer done, KrustyBike's nearest-bike search skips it
     float field_0x4a4;
     int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
     float leanAngle;  // +0x4ac slot 56 stores asin(...) of the ground normal against the forward axis; slot 57 returns it; Bike rotates the body by it
@@ -608,16 +608,16 @@ public:
     float prevLocalForwardVelocity;  // +0x594 slot 49: stores local velocity z after smoothing (previous-step value for the next difference)
     VehicleSmoother* forwardAccelSmoother;  // +0x598 VehicleSmoother fed with (local vel z - prevLocalForwardVelocity)/dt
     int landingLatched;  // +0x59c slot 71: set when landing while not yet latched, cleared in slot 49 while airborne
-    int field_0x5a0;
+    int wheelPointInContact;  // +0x5A0 UpdateWheelsInContact (0x00529a20) sets it when any in-contact wheel's pointInContact (+0x15c) is set
     int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
     int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
-    VehicleSparkEmitter* field_0x5ac;  // spark emitter built by LoadVehicle (impact handlers cast it to VehicleImpactSink)
+    VehicleSparkEmitter* sparkEmitter;  // +0x5AC  VehicleSparkEmitter built by LoadVehicle (Vehicle.cpp line 0x1dc); impact handlers cast it to VehicleImpactSink
     float field_0x5b0;
     int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there
 };
 
-VEH_CHECK_OFFSET(Vehicle, field_0x434, 0x434);
+VEH_CHECK_OFFSET(Vehicle, forwardSpeed, 0x434);
 VEH_CHECK_OFFSET(Vehicle, turnRate, 0x43C);
 VEH_CHECK_OFFSET(Vehicle, movingForward, 0x440);
 VEH_CHECK_OFFSET(Vehicle, crashState, 0x444);
@@ -628,7 +628,7 @@ VEH_CHECK_OFFSET(Vehicle, inputMap, 0x468);
 VEH_CHECK_OFFSET(Vehicle, inputDevice, 0x46C);
 VEH_CHECK_OFFSET(Vehicle, throttleInput, 0x470);
 VEH_CHECK_OFFSET(Vehicle, steerInput, 0x474);
-VEH_CHECK_OFFSET(Vehicle, field_0x478, 0x478);
+VEH_CHECK_OFFSET(Vehicle, throttleOn, 0x478);
 VEH_CHECK_OFFSET(Vehicle, field_0x479, 0x479);
 VEH_CHECK_OFFSET(Vehicle, field_0x47a, 0x47A);
 VEH_CHECK_OFFSET(Vehicle, steerState, 0x47C);
@@ -672,10 +672,10 @@ VEH_CHECK_OFFSET(Vehicle, smoothedForwardAccel, 0x590);
 VEH_CHECK_OFFSET(Vehicle, prevLocalForwardVelocity, 0x594);
 VEH_CHECK_OFFSET(Vehicle, forwardAccelSmoother, 0x598);
 VEH_CHECK_OFFSET(Vehicle, landingLatched, 0x59C);
-VEH_CHECK_OFFSET(Vehicle, field_0x5a0, 0x5A0);
+VEH_CHECK_OFFSET(Vehicle, wheelPointInContact, 0x5A0);
 VEH_CHECK_OFFSET(Vehicle, anyWheelInContact, 0x5A4);
 VEH_CHECK_OFFSET(Vehicle, allWheelsInContact, 0x5A8);
-VEH_CHECK_OFFSET(Vehicle, field_0x5ac, 0x5AC);
+VEH_CHECK_OFFSET(Vehicle, sparkEmitter, 0x5AC);
 VEH_CHECK_OFFSET(Vehicle, field_0x5b0, 0x5B0);
 VEH_CHECK_OFFSET(Vehicle, prevCrashState, 0x5B4);
 typedef char veh_assert_sizeof[(sizeof(Vehicle) == 0x5ec) ? 1 : -1];

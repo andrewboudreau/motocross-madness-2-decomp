@@ -19,7 +19,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 MorphBastardModifier::MorphBastardModifier(int flags)
     : D3DIMSoultreeModifier(flags)
 {
-    field_0x40 = 0;
+    meshCopy = 0;
     objectCount = 0;
     morphObjects = 0;
     deltaSums = 0;
@@ -49,12 +49,12 @@ MorphBastardModifier::~MorphBastardModifier()
     DebugFree(deltaSums, __FILE__, 40);
     DebugFree(deltaMinimums, __FILE__, 41);
     DebugFree(deltaMaximums, __FILE__, 42);
-    if (field_0x40) {
-        delete field_0x40->field_0x10;
-        delete field_0x40->field_0x14;
-        delete field_0x40->field_0x18;
-        delete field_0x40->field_0x1c;
-        delete field_0x40->field_0x28;
+    if (meshCopy) {
+        delete meshCopy->vertices;
+        delete meshCopy->drawnVertices;
+        delete meshCopy->normals;
+        delete meshCopy->indices;
+        delete meshCopy->uvs;
     }
 }
 
@@ -97,29 +97,29 @@ void MorphBastardModifier::UpdateChannels(MorphBastardObject* object)
 // 0x004a5290
 void MorphBastardModifier::CopyMesh(UnknownSoultreeMesh* mesh)
 {
-    field_0x40 = new (__FILE__, 854) UnknownSoultreeMesh;
-    field_0x40->groupCount = mesh->groupCount;
-    field_0x40->vertexCount = mesh->vertexCount;
-    field_0x40->faceCount = mesh->faceCount;
-    field_0x40->field_0x10 = new (__FILE__, 858) MorphBastardVertex[field_0x40->vertexCount];
-    field_0x40->field_0x14 = new (__FILE__, 859) MorphBastardVertex[field_0x40->vertexCount];
-    field_0x40->field_0x18 = new (__FILE__, 860) Vector3[field_0x40->vertexCount];
-    field_0x40->field_0x1c = new (__FILE__, 861) MorphBastardFace[field_0x40->faceCount];
-    field_0x40->field_0x20 = mesh->field_0x20;
-    field_0x40->field_0x28 = new (__FILE__, 863) int[field_0x40->vertexCount * 2];
-    memcpy(field_0x40->field_0x10, mesh->field_0x10, field_0x40->vertexCount * sizeof(MorphBastardVertex));
-    memcpy(field_0x40->field_0x14, mesh->field_0x14, field_0x40->vertexCount * sizeof(MorphBastardVertex));
-    memcpy(field_0x40->field_0x18, mesh->field_0x18, field_0x40->vertexCount * sizeof(Vector3));
-    memcpy(field_0x40->field_0x1c, mesh->field_0x1c, field_0x40->faceCount * sizeof(MorphBastardFace));
-    memcpy(field_0x40->field_0x28, mesh->field_0x28, field_0x40->vertexCount * sizeof(int));
-    field_0x40->field_0x04 = new (__FILE__, 871) MorphBastardMeshGroup[field_0x40->groupCount];
+    meshCopy = new (__FILE__, 854) UnknownSoultreeMesh;
+    meshCopy->groupCount = mesh->groupCount;
+    meshCopy->vertexCount = mesh->vertexCount;
+    meshCopy->faceCount = mesh->faceCount;
+    meshCopy->vertices = new (__FILE__, 858) MorphBastardVertex[meshCopy->vertexCount];
+    meshCopy->drawnVertices = new (__FILE__, 859) MorphBastardVertex[meshCopy->vertexCount];
+    meshCopy->normals = new (__FILE__, 860) Vector3[meshCopy->vertexCount];
+    meshCopy->indices = new (__FILE__, 861) MorphBastardFace[meshCopy->faceCount];
+    meshCopy->field_0x20 = mesh->field_0x20;
+    meshCopy->uvs = new (__FILE__, 863) int[meshCopy->vertexCount * 2];
+    memcpy(meshCopy->vertices, mesh->vertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
+    memcpy(meshCopy->drawnVertices, mesh->drawnVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
+    memcpy(meshCopy->normals, mesh->normals, meshCopy->vertexCount * sizeof(Vector3));
+    memcpy(meshCopy->indices, mesh->indices, meshCopy->faceCount * sizeof(MorphBastardFace));
+    memcpy(meshCopy->uvs, mesh->uvs, meshCopy->vertexCount * sizeof(int));
+    meshCopy->groups = new (__FILE__, 871) MorphBastardMeshGroup[meshCopy->groupCount];
     int offset = 0;
-    for (int i = 0; i < field_0x40->groupCount; i++) {
-        field_0x40->field_0x04[i].node = mesh->field_0x04[i].node;
-        field_0x40->field_0x04[i].vertexCount = mesh->field_0x04[i].vertexCount;
-        field_0x40->field_0x04[i].field_0x08 = field_0x40->field_0x10 + offset;
-        field_0x40->field_0x04[i].field_0x0c = field_0x40->field_0x14 + offset;
-        field_0x40->field_0x04[i].field_0x10 = field_0x40->field_0x18 + offset;
-        offset += field_0x40->field_0x04[i].vertexCount;
+    for (int i = 0; i < meshCopy->groupCount; i++) {
+        meshCopy->groups[i].node = mesh->groups[i].node;
+        meshCopy->groups[i].vertexCount = mesh->groups[i].vertexCount;
+        meshCopy->groups[i].field_0x08 = meshCopy->vertices + offset;
+        meshCopy->groups[i].field_0x0c = meshCopy->drawnVertices + offset;
+        meshCopy->groups[i].field_0x10 = meshCopy->normals + offset;
+        offset += meshCopy->groups[i].vertexCount;
     }
 }

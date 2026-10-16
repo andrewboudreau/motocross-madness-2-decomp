@@ -234,9 +234,9 @@ void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, Unk
         *out = mesh;
         return;
     }
-    if (!field_0x40)
+    if (!meshCopy)
         CopyMesh(mesh);
-    memcpy(field_0x40->field_0x14, mesh->field_0x14, field_0x40->vertexCount * sizeof(MorphBastardVertex));
+    memcpy(meshCopy->drawnVertices, mesh->drawnVertices, meshCopy->vertexCount * sizeof(MorphBastardVertex));
 
     float value;
     for (int i = 0; i < objectCount; i++) {
@@ -244,15 +244,15 @@ void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, Unk
         UnknownFunction464e80(i);
         MorphBastardMeshGroup* group;
         for (int g = 0; g < mesh->groupCount; g++) {
-            if (mesh->field_0x04[g].node == morphObjects[i].node)
-                group = &mesh->field_0x04[g];
+            if (mesh->groups[g].node == morphObjects[i].node)
+                group = &mesh->groups[g];
         }
         if (!deltaSums) {
             deltaSums = new (__FILE__, 541) Vector3[mesh->vertexCount];
             deltaMinimums = new (__FILE__, 542) Vector3[mesh->vertexCount];
             deltaMaximums = new (__FILE__, 543) Vector3[mesh->vertexCount];
         }
-        int base = ((int)group->field_0x08 - (int)mesh->field_0x10) / 32;
+        int base = ((int)group->field_0x08 - (int)mesh->vertices) / 32;
         memset(deltaSums, 0, group->vertexCount * sizeof(Vector3));
         memset(deltaMinimums, 0, group->vertexCount * sizeof(Vector3));
         memset(deltaMaximums, 0, group->vertexCount * sizeof(Vector3));
@@ -337,12 +337,12 @@ void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, Unk
 
         for (int v = 0; v < group->vertexCount; v++) {
             Vector3 offset = deltaSums[v];
-            field_0x40->field_0x14[base + v].x = offset.x + mesh->field_0x14[base + v].x;
-            field_0x40->field_0x14[base + v].y = offset.y + mesh->field_0x14[base + v].y;
-            field_0x40->field_0x14[base + v].z = offset.z + mesh->field_0x14[base + v].z;
+            meshCopy->drawnVertices[base + v].x = offset.x + mesh->drawnVertices[base + v].x;
+            meshCopy->drawnVertices[base + v].y = offset.y + mesh->drawnVertices[base + v].y;
+            meshCopy->drawnVertices[base + v].z = offset.z + mesh->drawnVertices[base + v].z;
         }
     }
-    *out = field_0x40;
+    *out = meshCopy;
 }
 
 // ---------------------------------------------------------------------------

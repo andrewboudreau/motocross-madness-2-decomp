@@ -127,16 +127,16 @@ struct KbNetState {
 // pose and flags (tier 2 layout from the stores, tier 3 names).
 struct KbBikeMessage {
     char field_0x00;
-    unsigned char field_0x01;            // KrustyBike+0x784
+    unsigned char finishPosition;  // +0x1  KrustyBike+0x784 finishPosition (0x0049276c)
     short field_0x02;                    // ms since the state's last send
-    short field_0x04;                    // +0x7a0
-    short field_0x06;                    // +0x790
+    short lapCount;  // +0x4  KrustyBike+0x7a0 lapCount (0x004926f5)
+    short gatesPassed;  // +0x6  KrustyBike+0x790 gatesPassed (0x00492700)
     Vec3 position;                       // +0x08
     float roll, pitch, yaw;              // +0x14
-    int field_0x20;                      // +0x74c
+    int lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
     int field_0x24;
-    int field_0x28;                      // +0x750
-    int field_0x2c;                      // +0x770
+    int fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
+    int timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
     Vec3 angularVelocity;                // +0x30 (y plus the turn rate)
     Vec3 velocity;                       // +0x3c
     unsigned char poseIndex : 4;         // +0x48
@@ -155,8 +155,8 @@ struct KbBikeMessage {
     unsigned char flag7 : 1;             // +0x478
     unsigned char flag8 : 1;             // +0x52 +0x479
     unsigned char flag9 : 1;             //       +0x153c
-    unsigned char field_0x53;            // +0x7b8 (+0x7a0 in modes 2 and 3)
-    unsigned char field_0x54;            // +0x11c0
+    unsigned char lapGate;  // +0x53  KrustyBike+0x7b8 lapGate (0x00492892; +0x7a0 in modes 2 and 3)
+    unsigned char loaderKind;  // +0x54  KrustyBike+0x11c0 loaderKind (0x00492723)
 };
 // Received copy of message 1 (0x60 bytes, four at KrustyBike+0x11d8) that 0x00493660 reads.
 struct KbBikeNetState : KbBikeMessage {
@@ -264,22 +264,22 @@ struct KbGame {
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue);
     void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
     char pad_0x0004[0x4];
-    KbGameCfg* field_0x8; // 0x8
+    KbGameCfg* network;  // +0x8  Game +0x8 network (NetworkInterface); set in network games, KrustyBike sends its packets through it
     char pad_0x000C[0xC];
-    int field_0x18; // 0x18
+    int playerCount;  // +0x18  Game +0x18 playerCount
     char pad_0x001C[0x1c];
-    KbOverlay* field_0x38; // 0x38: debug overlay (0 when off)
+    KbOverlay* debugOverlay;  // +0x38  Game +0x38 debugOverlay (0 when off)
     char pad_0x003C[0x2f0 - 0x3c];
-    float field_0x2f0; // 0x2F0: frame time (seconds)
+    float frameTime;  // +0x2F0  Game +0x2f0 frameTime (seconds)
     char pad_0x02F4[0x560 - 0x2f4];
-    KbTrackRec* field_0x560; // 0x560: array of 24-byte records (first member is a Vec3)
+    KbTrackRec* bajaEnduroEvent;  // +0x560  TrackGame +0x560 bajaEnduroEvent (TrackGameViewOwner): [lapGate + 9] is gates[lapGate] at +0xd8, +0xac the gate count
     char pad_0x0564[0x4];
-    KbRacer* field_0x568; // 0x568
+    KbRacer* tagEvent;  // +0x568  TrackGame +0x568 tagEvent (event type 4); its +0xa8 is compared with the bike
     char pad_0x056C[0x4];
-    KbSession* field_0x570; // 0x570
+    KbSession* eventManager;  // +0x570  TrackGame +0x570 eventManager (FindRaceMode/FindTextQueue)
     char pad_0x0574[0x4];
-    KbMode field_0x578; // 0x578: game-mode state object (0x00524100 returns the mode number)
-    int field_0x60c; // 0x60C
+    KbMode mode;  // +0x578  TrackGame +0x578 mode (TrackGameMode; only the first 0x94 bytes are modelled here)
+    int difficulty;  // +0x60C  TrackGame mode.difficulty (+0x578 + 0x94)
     char pad_0x0610[0x640];
     int field_0xc50; // 0xC50
     char pad_0x0C54[0x38C];
@@ -292,28 +292,28 @@ struct KbGame {
     int field_0xff8; // 0xFF8
     int field_0xffc; // 0xFFC
     char pad_0x1000[0x1D70];
-    int field_0x2d70; // 0x2D70
-    int field_0x2d74; // 0x2D74
+    int raceMode;  // +0x2D70  TrackGame mode.raceSettings.raceMode (+0x578 + 0x27f8)
+    int eventType;  // +0x2D74  TrackGame mode.raceSettings.eventType: 3 SX, 4 Tag
     char pad_0x2D78[0xC];
-    int field_0x2d84; // 0x2D84
+    int riderCollision;  // +0x2D84  TrackGame mode.raceSettings.riderCollision
     char pad_0x2D88[0x2eb8 - 0x2d88];
-    int field_0x2eb8; // 0x2EB8
+    int stuntMode;  // +0x2EB8  TrackGame mode.raceSettings.stuntMode (ChkStuntMode)
     char pad_0x2EBC[0x3334 - 0x2ebc];
-    int field_0x3334; // 0x3334
+    int saveReplay;  // +0x3334  TrackGame mode.saveReplay
     char pad_0x3338[0xC];
-    char field_0x3344[0x3c]; // 0x3344  three 0x3c-byte blocks whose addresses 0x0048fc80 hands to the Bike loader
-    char field_0x3380[0x3c]; // 0x3380
-    char field_0x33bc[0x3c]; // 0x33BC
+    char steerBinding[0x3c];  // +0x3344  TrackGame +0x3344 steerBinding (LoadBike's steer)
+    char leanBinding[0x3c];  // +0x3380  TrackGame +0x3380 leanBinding (LoadBike's lean)
+    char throttleBinding[0x3c];  // +0x33BC  TrackGame +0x33bc throttleBinding (LoadBike's throttle)
     char pad_0x33F8[0x4];
-    KbTrackEntry* field_0x33fc; // 0x33FC
+    KbTrackEntry* controlSetup;  // +0x33FC  TrackGame +0x33fc controlSetup
     char pad_0x3400[0x14];
     float fullNetPacketIntervalSec; // 0x3414
     float shortNetPacketIntervalSec; // 0x3418
     float fullRecordPacketIntervalSec; // 0x341C
     char pad_0x3420[0x8];
-    int field_0x3428; // 0x3428
+    int playingReplay;  // +0x3428  TrackGame +0x3428 playingReplay
     char pad_0x342C[0x3444 - 0x342c];
-    KbBonusTable* field_0x3444; // 0x3444
+    KbBonusTable* proCircuit;  // +0x3444  TrackGame +0x3444 proCircuit (ProCircuit.h)
 };
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
@@ -363,17 +363,17 @@ struct KbTrackB {
 };
 struct KbSensor {
     char pad_0x0000[0x3DC];
-    int field_0x3dc; // 0x3DC
+    int typing;  // +0x3DC  BikeRace chatOverlay +0x3dc typing (BikeRace.h); blocks the bike's input (slot 84)
 };
 
 struct KbRacer {
     char pad_0x0000[0xA8];
     void* field_0xa8; // 0xA8
     char pad_0x00AC[0x198];
-    int field_0x244; // 0x244
+    int cameraState;  // +0x244  BikeRace raceCamera +0x244 cameraState (BikeRace.h)
     char pad_0x0248[0x168];
-    void* field_0x3b0; // 0x3B0
-    void* field_0x3b4; // 0x3B4
+    void* followedBike;  // +0x3B0  BikeRace raceCamera +0x3b0 followedBike (BikeCamera's bike)
+    void* followedRacer;  // +0x3B4  BikeRace raceCamera +0x3b4 followedRacer (KrustyBikeCamera's racer)
 };
 
 struct KbRaceHandler {

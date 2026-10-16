@@ -19,7 +19,7 @@ struct UnknownKrustyBike {
     unsigned char field_0x440[0x5f4 - 0x440];
     UnknownKrustyBikeAxis* field_0x5f4;
     unsigned char field_0x5f8[0x735 - 0x5f8];
-    bool field_0x735;
+    bool isRemote;  // +0x735  KrustyBike +0x735 isRemote
     unsigned char field_0x736[0x7a4 - 0x736];
     bool field_0x7a4;
 };
