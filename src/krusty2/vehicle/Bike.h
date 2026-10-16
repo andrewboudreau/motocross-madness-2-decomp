@@ -391,8 +391,8 @@ public:
     BikeA604* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* field_0x60c;         // +0x60c cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
-    Vec3 field_0x610;              // per-axis gains of the steering torque integrator (Method_0x0040a520)
-    Vec3 field_0x61c;              // integrated steering torque; decays by 0.99 (or -0.02/-0.1 at the limit) per step
+    Vec3 steerTorqueGains;  // +0x610  per-axis gains of the steering torque integrator (Method_0x0040a520)
+    Vec3 steerTorque;  // +0x61C  integrated steering torque (Method_0x0040a520); decays by 0.99 (or -0.02/-0.1 at the limit) per step
     float field_0x628;
     float field_0x62c;
     int field_0x630;
@@ -423,9 +423,9 @@ public:
     float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float field_0x724;
-    BikeDustEmitter* field_0x728;        // +0x728 cleared in the ctor; the loader's dust emitter (attachment type 1 on the rear wheel)
-    BikeDirtChunkEmitter* field_0x72c;   // +0x72c cleared in the ctor; dirt chunks (attachment type 2 on the rear wheel)
-    BikeSteamEmitter* field_0x730;       // +0x730 cleared in the ctor; steam (attachment type 4 at (0, 2.5, -2.75)); own data ends at 0x734, the compiler places the vtordisp there
+    BikeDustEmitter* dustEmitter;  // +0x728  BikeDustEmitter built by the loader (Bike.cpp new line 0x70f), attached as type 1 on the rear wheel
+    BikeDirtChunkEmitter* dirtChunkEmitter;  // +0x72C  BikeDirtChunkEmitter built by the loader (line 0x710), attached as type 2 on the rear wheel
+    BikeSteamEmitter* steamEmitter;  // +0x730  BikeSteamEmitter built by the loader (line 0x711), attached as type 4 at (0, 2.5, -2.75); own data ends at 0x734, the compiler places the vtordisp there
 };
 
 typedef char bike_assert_sizeof[(sizeof(Bike) == 0x738 + 0x2c) ? 1 : -1];

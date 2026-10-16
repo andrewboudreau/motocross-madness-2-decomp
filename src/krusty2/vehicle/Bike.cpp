@@ -86,7 +86,7 @@ float BikeVec3Dot(const Vec3& a, const Vec3& b);
 // active +0x5f8/+0x5fc contact (offset x the contact's axis scaled by the negative
 // projection), or by w_0x274 * w_0x20c while airborne.  Its body-space direction
 // (projected on the wheel frame's axis, normalised) scales the per-axis gains into the
-// integrator field_0x61c; the integrator's length, signed by that axis, is the angle fed to
+// integrator steerTorque; the integrator's length, signed by that axis, is the angle fed to
 // the steer state unless the limit (0.785 rad) is reached, in which case the angle is
 // clamped and the integrator reversed.  Returns the normalised projection.
 float Bike::Method_0x0040a520()
@@ -172,14 +172,14 @@ float Bike::Method_0x0040a520()
             d = -d;
         result = d / len;
         float k = result * stepTime;
-        field_0x61c += BikeVec3Call(offset.x * field_0x610.x * k, offset.y * field_0x610.y * k,
-                                    offset.z * field_0x610.z * k);
+        steerTorque += BikeVec3Call(offset.x * steerTorqueGains.x * k, offset.y * steerTorqueGains.y * k,
+                                    offset.z * steerTorqueGains.z * k);
     }
 integrate:
     float sign = -1.0f;
-    if (BikeDotZ(field_0x61c, frontWheel->w_0x1c0->axis) >= 0.0f)
+    if (BikeDotZ(steerTorque, frontWheel->w_0x1c0->axis) >= 0.0f)
         sign = 1.0f;
-    float lenSq = BikeVec3Dot(field_0x61c, field_0x61c);
+    float lenSq = BikeVec3Dot(steerTorque, steerTorque);
     if (lenSq == 1.0f)
         len = 1.0f;
     else
@@ -187,7 +187,7 @@ integrate:
     float angle = len * stepTime * sign;
     if (BikeAbs(angle + steerState->steerAngle) < 0.785f) {
         steerState->AddAngle(angle, poseNode);
-        *(BikeVec3ScaleAssign*)&field_0x61c *= 0.99f;
+        *(BikeVec3ScaleAssign*)&steerTorque *= 0.99f;
         return result;
     }
     if (BikeAbs(steerState->steerAngle) < 0.785f) {
@@ -195,11 +195,11 @@ integrate:
         float decay = -0.02f;
         if (!driven)
             decay = -0.1f;
-        *(BikeVec3ScaleAssign*)&field_0x61c *= decay;
+        *(BikeVec3ScaleAssign*)&steerTorque *= decay;
         return result;
     }
     steerState->AddAngle(angle, poseNode);
-    *(BikeVec3ScaleAssign*)&field_0x61c *= 0.99f;
+    *(BikeVec3ScaleAssign*)&steerTorque *= 0.99f;
     return 0.0f;
 }
 
@@ -320,7 +320,7 @@ void Bike::UnknownVirtualSlot67()
     crashTimer = 0.0f;
     prevCrashState = 0;
     linkedVehicle = 0;
-    field_0x61c = g_BikeVec3_005778a8;
+    steerTorque = g_BikeVec3_005778a8;
 }
 
 float Bike::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
@@ -432,10 +432,10 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
     field_0x5f8 = 0;
     field_0x5fc = 0;
     field_0x724 = 32.0f;
-    field_0x728 = 0;
-    field_0x72c = 0;
-    field_0x730 = 0;
-    field_0x61c = g_BikeVec3_005778a8;
+    dustEmitter = 0;
+    dirtChunkEmitter = 0;
+    steamEmitter = 0;
+    steerTorque = g_BikeVec3_005778a8;
     field_0x700 = 0;
 }
 
@@ -665,13 +665,13 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     centerNode = modelNode->FindByName("NullFrame");
 
     if (field_0x124) {
-        field_0x728 = new(__FILE__, 0x70f) BikeDustEmitter(1);
-        GameObject::Method_0x00469190(field_0x728->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
-        field_0x72c = new(__FILE__, 0x710) BikeDirtChunkEmitter(1);
-        GameObject::Method_0x00469190(field_0x72c->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
-        field_0x730 = new(__FILE__, 0x711) BikeSteamEmitter(1);
-        GameObject::Method_0x00469190(field_0x730->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
-        field_0x730->field_0x60 = 1;
+        dustEmitter = new(__FILE__, 0x70f) BikeDustEmitter(1);
+        GameObject::Method_0x00469190(dustEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        dirtChunkEmitter = new(__FILE__, 0x710) BikeDirtChunkEmitter(1);
+        GameObject::Method_0x00469190(dirtChunkEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        steamEmitter = new(__FILE__, 0x711) BikeSteamEmitter(1);
+        GameObject::Method_0x00469190(steamEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        steamEmitter->field_0x60 = 1;
     }
 
     Vec3 leftPeg = Vec3(-1.305f, 0.225f, -0.228f);
@@ -683,10 +683,10 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                                       0.0f, &collisionPointCount, 0.6f, track);
     field_0x600 = (int)BikeAddContactPoint(collisionPointCapacity, collisionPoints, &tailPoint, modelNode,
                                            -0.3f, &collisionPointCount, 0.6f, track);
-    UnknownVirtualSlot37(1, field_0x728, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
-    UnknownVirtualSlot37(2, field_0x72c, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    UnknownVirtualSlot37(1, dustEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    UnknownVirtualSlot37(2, dirtChunkEmitter, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
     Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);
-    UnknownVirtualSlot37(4, field_0x730, 0, &steamOffset);
+    UnknownVirtualSlot37(4, steamEmitter, 0, &steamOffset);
     if (centerNode == 0) {
         BaseObjectVirtualSlot2();
         return 0;
@@ -739,9 +739,9 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     float r = frontWheel->w_0x274 * 2.0f;
     float r2 = r * r;
     float wheelMk = wheelMass * (1.0f / 12.0f);
-    field_0x610.x = 1.0f / ((r2 + h2) * wheelMk);
-    field_0x610.y = 1.0f / ((w2 + r2) * wheelMk);
-    field_0x610.z = 1.0f / (wheelMk * wh2);
+    steerTorqueGains.x = 1.0f / ((r2 + h2) * wheelMk);
+    steerTorqueGains.y = 1.0f / ((w2 + r2) * wheelMk);
+    steerTorqueGains.z = 1.0f / (wheelMk * wh2);
     UnknownVirtualSlot43();
 
     bodyForward = forward;
@@ -1851,11 +1851,11 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         }
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             Vec3 pos = ((BikeContactSet*)collisionObject)->field_0xa0;
-            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
+            ((VehicleImpactSink*)sparkEmitter)->SetPosition(pos);
             Vec3 p;
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
-            ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
-            ((VehicleImpactSink*)field_0x5ac)->updatePending = 1;
+            ((VehicleImpactSink*)sparkEmitter)->scrapeVector = p;
+            ((VehicleImpactSink*)sparkEmitter)->updatePending = 1;
         }
         break;
     }
@@ -1885,11 +1885,11 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             Vec3 pos = ((BikeContactSet*)collisionObject)->field_0xa0;
-            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
+            ((VehicleImpactSink*)sparkEmitter)->SetPosition(pos);
             Vec3 p;
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
-            ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
-            ((VehicleImpactSink*)field_0x5ac)->updatePending = 1;
+            ((VehicleImpactSink*)sparkEmitter)->scrapeVector = p;
+            ((VehicleImpactSink*)sparkEmitter)->updatePending = 1;
         }
         break;
     case 0x69: {

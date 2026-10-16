@@ -398,7 +398,7 @@ void KrustyBike::UnknownVirtualSlot67()
     prevCrashState = 0;
     linkedVehicle = 0;
     wrecker->EndWreck();
-    field_0x61c = g_kbZeroVec;
+    steerTorque = g_kbZeroVec;
 }
 
 // ---- physics ----

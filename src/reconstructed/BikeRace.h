@@ -449,7 +449,7 @@ public:
     unsigned char field_0x754[0x768 - 0x754];
     float score;                              // +0x768 score (network message 10)
     unsigned char field_0x76c[0x770 - 0x76c];
-    int field_0x770;                          // replayed from message 1's +0x2c
+    int timeBehindLeader;  // +0x770  KrustyBike +0x770 timeBehindLeader; replayed from message 1's +0x2c
     unsigned char field_0x774[0x7a0 - 0x774];
     unsigned short lapCount;                  // +0x7a0 laps (UnknownEventRacer)
     unsigned char field_0x7a2[0x7a4 - 0x7a2];

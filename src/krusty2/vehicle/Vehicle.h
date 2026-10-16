@@ -309,22 +309,22 @@ struct VehicleWheel {
     Vec3 wheelPosition;              // +0xcc wheel contact position (slot 7 distance source)
     Vec3 groundPoint;              // +0xd8 (y at +0xdc is read as a height by slot 58)
     Vec3 groundNormal;              // +0xe4 contact normal (averaged by GetAverageGroundNormal)
-    Vec3 field_0xf0;
+    Vec3 relativePosition;  // +0xF0 CollisionPoint+0x38 relativePosition (base at +0xb8); crossed with the friction force for the torque
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
-    Vec3 field_0x108;
+    Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (base at +0xb8)
     Vec3 field_0x114;
     Vec3 field_0x120;
     float field_0x12c;  // Method_00527A20: -(appliedShare . groundNormal) when that is negative, else 0
-    Vec3 field_0x130;
+    Vec3 frictionForce;  // +0x130 CollisionPoint+0x78 frictionForce (base at +0xb8)
     float field_0x13c;  // Method_00527A20: contact time scale (the impulse is limited by it)
     char pad_0x140[4];
     float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
-    float field_0x148;  // Method_00527A20 adds it to field_0x14c for the available load
-    float field_0x14c;
-    float field_0x150;
+    float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (base at +0xb8); Method_00527A20 adds it to spinSpeed for the available load
+    float spinSpeed;  // +0x14C CollisionPoint+0x94 spinSpeed (base at +0xb8)
+    float penetration;  // +0x150 CollisionPoint+0x98 penetration (base at +0xb8); reset to -999
     char pad_0x154[4];
     float loadWeight;               // +0x158 blend weight
-    int field_0x15c;
+    int pointInContact;  // +0x15C CollisionPoint+0xa4 inContact (base at +0xb8); Tire's own inContact is +0x260
     int impactPosted;                 // +0x160 impact-handled flag (slot 18)
     int slidePosted;                 // +0x164 impact-handled flag (slot 19)
     int scrapePosted;                 // +0x168 impact-handled flag (slot 20)
@@ -353,8 +353,8 @@ struct VehicleWheel {
     int field_0x268;
     int field_0x26c;
     char pad_0x270[8];
-    int field_0x278;
-    int field_0x27c;
+    int rollAngle;  // +0x278 Tire.h rollAngle (float there; only cleared here)
+    int slipSpeed;  // +0x27C Tire.h slipSpeed (float there; only cleared here)
     Vec3 field_0x280;
     float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
     float field_0x290;
@@ -602,10 +602,10 @@ public:
     float prevLocalForwardVelocity;  // +0x594 slot 49: stores local velocity z after smoothing (previous-step value for the next difference)
     VehicleSmoother* forwardAccelSmoother;  // +0x598 VehicleSmoother fed with (local vel z - prevLocalForwardVelocity)/dt
     int landingLatched;  // +0x59c slot 71: set when landing while not yet latched, cleared in slot 49 while airborne
-    int field_0x5a0;
+    int wheelPointInContact;  // +0x5A0 UpdateWheelsInContact (0x00529a20) sets it when any in-contact wheel's pointInContact (+0x15c) is set
     int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
     int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
-    VehicleSparkEmitter* field_0x5ac;  // spark emitter built by LoadVehicle (impact handlers cast it to VehicleImpactSink)
+    VehicleSparkEmitter* sparkEmitter;  // +0x5AC  VehicleSparkEmitter built by LoadVehicle (Vehicle.cpp line 0x1dc); impact handlers cast it to VehicleImpactSink
     float field_0x5b0;
     int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there
@@ -666,10 +666,10 @@ VEH_CHECK_OFFSET(Vehicle, smoothedForwardAccel, 0x590);
 VEH_CHECK_OFFSET(Vehicle, prevLocalForwardVelocity, 0x594);
 VEH_CHECK_OFFSET(Vehicle, forwardAccelSmoother, 0x598);
 VEH_CHECK_OFFSET(Vehicle, landingLatched, 0x59C);
-VEH_CHECK_OFFSET(Vehicle, field_0x5a0, 0x5A0);
+VEH_CHECK_OFFSET(Vehicle, wheelPointInContact, 0x5A0);
 VEH_CHECK_OFFSET(Vehicle, anyWheelInContact, 0x5A4);
 VEH_CHECK_OFFSET(Vehicle, allWheelsInContact, 0x5A8);
-VEH_CHECK_OFFSET(Vehicle, field_0x5ac, 0x5AC);
+VEH_CHECK_OFFSET(Vehicle, sparkEmitter, 0x5AC);
 VEH_CHECK_OFFSET(Vehicle, field_0x5b0, 0x5B0);
 VEH_CHECK_OFFSET(Vehicle, prevCrashState, 0x5B4);
 typedef char veh_assert_sizeof[(sizeof(Vehicle) == 0x5ec) ? 1 : -1];
