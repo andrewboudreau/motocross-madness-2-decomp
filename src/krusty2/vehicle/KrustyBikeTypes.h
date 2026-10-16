@@ -84,7 +84,7 @@ struct KbRecorder { int Fn_004E8720(int type, int id, void* data, int flag); };
 struct KbCell { char pad_0x00[8]; float field_0x8; char pad_0xc[4]; float field_0x10; };
 struct KbNetBike {
     char pad_0x0000[0x11bc];
-    int field_0x11bc;
+    int netId;  // +0x11BC  KrustyBike::netId seen through the entity view
     char pad_0x11c0[8];
     KbCell* field_0x11c8;
     KbCell* field_0x11cc;

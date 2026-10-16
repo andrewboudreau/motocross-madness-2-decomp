@@ -113,13 +113,13 @@ public:
                      KbRecorder* recorder, void* a24, int withRider);
 
 public:
-    char field_0x734; // 0x734  first KrustyBike field (Bike's own data ends at 0x734)
+    char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
     char field_0x735; // 0x735
-    char field_0x736; // 0x736
+    char isGhost;  // +0x736  set for loader kind 0xff (a ghost); the loader then creates the KbGhostMod at +0x15e8
     char field_0x737; // 0x737  KbBikeSetup+4 (0 without a setup)
     int field_0x738; // 0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500)
     int field_0x73c; // 0x73C  0x65 from the constructor
-    KbRace* field_0x740; // 0x740
+    KbRace* race;  // +0x740  loader race argument
     KbGhost* field_0x744; // 0x744
     int field_0x748; // 0x748
     int field_0x74c; // 0x74C
@@ -164,30 +164,30 @@ public:
     float field_0x7dc; // 0x7DC
     Vec3 field_0x7e0; // 0x7E0
     Vec3 field_0x7ec; // 0x7EC
-    float field_0x7f8; // 0x7F8  front suspension travel of the look-ahead model (0x00413200)
-    float field_0x7fc; // 0x7FC  rear suspension travel
+    float lookAheadFrontTravel;  // +0x7F8  front suspension travel of the look-ahead model (0x00413200)
+    float lookAheadRearTravel;  // +0x7FC  rear suspension travel of the look-ahead model
     char pad_0x0800[0x4];
     float field_0x804; // 0x804
     float field_0x808; // 0x808
-    float field_0x80c; // 0x80C  seconds of the start-gate run-up (0x00414370)
+    float startRunUpTime;  // +0x80C  seconds of the start-gate run-up (0x00414370)
     char field_0x810; // 0x810  set with +0x15e4 for a local (+0x734) bike
     char pad_0x0811[0x3];
-    float field_0x814; // 0x814  seconds with the collision object in contact (0x00413200)
+    float contactTime;  // +0x814  seconds with the collision object in contact (0x00413200)
     float field_0x818; // 0x818  3000.0f (local bike)
     float field_0x81c; // 0x81C
     float field_0x820; // 0x820  3000.0f (local bike)
     float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
-    Vec3 field_0x828;  // 0x828  ground normal under the predicted landing (0x00413200)
-    float field_0x834; // 0x834  predicted time to landing (PredictLanding 0x0040e370)
+    Vec3 predictedLandingNormal;  // +0x828  ground normal under the predicted landing (0x00413200)
+    float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)
     UnknownBikeAIPath aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
     int field_0x11b0;  // 0x11B0  last argument of the look-ahead simulation 0x0040eca0
-    float field_0x11b4; // 0x11B4  seconds off the track before 0x00414370 respawns the bike
+    float offTrackTime;  // +0x11B4  seconds off the track before 0x00414370 respawns the bike
     char field_0x11b8; // 0x11B8
     char pad_0x11B9[0x3];
-    int field_0x11bc; // 0x11BC  network id (KbNetBike)
-    unsigned char field_0x11c0; // 0x11C0
+    int netId;  // +0x11BC  loader netId; the id passed with every Send/recorder message
+    unsigned char loaderKind;  // +0x11C0  raw loader kind (0xff for a ghost), sent in messages 1 and 10
     char pad_0x11C1[0x3];
-    float field_0x11c4; // 0x11C4  clock offset subtracted by 0x00493660 (not UseTimeReceived)
+    float clockOffset;  // +0x11C4  clock offset subtracted by 0x00493660 (not UseTimeReceived)
     KbBikeNetState* states[4]; // 0x11C8  received states, newest first (buffers at 0x11d8..)
     KbBikeNetState stateBuffers[4]; // 0x11D8  the four 0x60-byte buffers states[] points at
     Vec3 field_0x1358; // 0x1358
@@ -228,29 +228,29 @@ public:
     char field_0x154d; // 0x154D
     char field_0x154e; // 0x154E
     char pad_0x154F[0x1];
-    float field_0x1550; // 0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
-    float field_0x1554; // 0x1554  head angle of the turn towards the rival (slot 102); Fn_0048E280 clears it
-    float field_0x1558; // 0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
+    float rivalBearingScaled;  // +0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
+    float headTurnAngle;  // +0x1554  head angle of the turn towards the rival (slot 102); Fn_0048E280 clears it
+    float rivalBearing;  // +0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
     KrustyBike* nearestRival; // 0x155C  FindNearestRival result (closest other bike of the race; tier 3 name)
     KbBikeState netState; // 0x1560  last state sent to the peers (0x00492ad0)
     int field_0x15cc; // 0x15CC
-    float field_0x15d0; // 0x15D0  seconds since the last short message (0x00492ad0)
+    float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
     int field_0x15d4; // 0x15D4
     void* field_0x15d8; // 0x15D8  loader argument 30
     float field_0x15dc; // 0x15DC  KbRace +0x9c/+0xa0/+0xa4 by game type, else 2.0 (local bike)
-    CollisionObject* field_0x15e0; // 0x15E0  local bike's vertical probe segment (0,4,0)-(0,-1,0)
+    CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
     char field_0x15e4; // 0x15E4  set for a local bike
     char field_0x15e5; // 0x15E5
     char field_0x15e6; // 0x15E6
     char pad_0x15E7[0x1];
-    KbObj128* field_0x15e8; // 0x15E8
-    float field_0x15ec; // 0x15EC  seconds into the current state interval (0x00493660)
-    float field_0x15f0; // 0x15F0  length of the current state interval in seconds
-    int field_0x15f4; // 0x15F4  first-packet latch
-    unsigned int field_0x15f8; // 0x15F8  timeReceived of the last newest state seen
-    KbBikeNetState* field_0x15fc; // 0x15FC  interpolation target state
-    KbBikeNetState* field_0x1600; // 0x1600  interpolation source state
-    float field_0x1604; // 0x1604  seconds to the next message 10 (0x00492670)
+    KbObj128* ghostMod;  // +0x15E8  KbGhostMod the loader creates for a ghost (isGhost)
+    float stateIntervalElapsed;  // +0x15EC  seconds into the current state interval (0x00493660)
+    float stateIntervalLength;  // +0x15F0  length of the current state interval in seconds
+    int firstPacketLatch;  // +0x15F4  first-packet latch (1 from the loader)
+    unsigned int lastTimeReceived;  // +0x15F8  timeReceived of the last newest state seen
+    KbBikeNetState* interpTarget;  // +0x15FC  interpolation target state
+    KbBikeNetState* interpSource;  // +0x1600  interpolation source state
+    float pingTimer;  // +0x1604  seconds to the next message 10 (KbBikePing, every 2 s) (0x00492670)
     // own data ends at 0x1608; the compiler places the vtordisp there
 };
 
