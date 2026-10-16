@@ -1857,7 +1857,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
-            sparkEmitter->field_0x60 = 1;
+            sparkEmitter->burstPending = 1;
         }
         break;
     }
@@ -1883,7 +1883,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             sparkEmitter->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
             sparkEmitter->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
-            sparkEmitter->field_0x60 = 1;
+            sparkEmitter->burstPending = 1;
         }
         break;
     case 0x69: {
