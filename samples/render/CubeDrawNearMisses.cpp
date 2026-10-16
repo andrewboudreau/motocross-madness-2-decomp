@@ -185,7 +185,7 @@ int DrawableCube::LoadTexturesAndCoords(Cube* cube, UnknownCubeTextureContext* c
         for (int row = 0; row < 4; row++) {
             UnknownCubeVertex* v = s_cellVertices[face][row * 4];
             for (int column = 0; column < 4; column++, v += 6) {
-                int size = UnknownFunction43d080(cubeObject->faces[face].sizeCodes, column, row);
+                int size = DecodeTextureSize(cubeObject->faces[face].sizeCodes, column, row);
                 float low = 1.0f / (float)size;
                 v[0].tu = low;
                 v[0].tv = low;

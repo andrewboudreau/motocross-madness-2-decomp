@@ -8,7 +8,7 @@ RTTI gives them.
 `0x0043d1f0` and `0x0043d6c0`. The `__FILE__` literal at `0x0056888c` is
 used in `0x0043d460` (lines 0x2c3 and 0x2c8). The four vector initializers
 `0x0043d750..0x0043d88b` build `0x00579870` and the next three vectors;
-`0x0043d110` reads the first. `0x0043d080` is called only from cube.cpp
+`0x0043d110` reads the first. `DecodeTextureSize` (`0x0043d080`) is called only from cube.cpp
 (`0x0043d4aa`) and cubedraw.cpp (`0x0043e179`), so it probably belongs
 here. It stays registered under ControlInterface.cpp for now.
 

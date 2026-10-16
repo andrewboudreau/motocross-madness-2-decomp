@@ -2113,7 +2113,7 @@ CASES = [
         'name': 'ControlInterface 0x43d080 field mode',
         'bindings': 'src/reconstructed/ControlInterface.bindings.json',
         'source': 'src/reconstructed/ControlInterface.cpp',
-        'symbol': '?UnknownFunction43d080@@YAHHHH@Z',
+        'symbol': '?DecodeTextureSize@@YAHHHH@Z',
         'target_va': '0x0043d080',
         'target_size': 80,
         'reason': 'four-case switch with jump table',

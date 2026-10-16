@@ -138,7 +138,7 @@ int Cube::SetVectors(const Vector3* a, const Vector3* b, const Vector3* c)
 int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
                                 UnknownCubeTextureContext* context)
 {
-    int size = UnknownFunction43d080(faces[face].sizeCodes, index % 4, index / 4);
+    int size = DecodeTextureSize(faces[face].sizeCodes, index % 4, index / 4);
     int dataSize;
     if (IsCompressedFormat(fileFormat))
         textureStream->Read(&dataSize, 4, 1);
