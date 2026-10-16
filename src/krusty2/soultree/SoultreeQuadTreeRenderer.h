@@ -48,8 +48,8 @@ public:
     int field_0x28c;                  // nonzero gates the work in 0x5046e0
     char pad_0x290[0x2d4 - 0x290];
     int field_0x2d4;                  // set to 1 by slot 12
-    void SelectLod(int a);            // thiscall, ret 4
-    void Fn_443de0(int a, int b);     // thiscall, ret 8
+    void TransformVertexGroups(int lod);  // 0x00440d40, ret 4 (src/reconstructed D3DIMSoulTree.h)
+    void SelectLod(int center, int extents);  // 0x00443de0, ret 8: null bounds pick the node's own
 };
 
 // Debug allocator iterator over a GameObject tree: heap allocated, 0x94 bytes

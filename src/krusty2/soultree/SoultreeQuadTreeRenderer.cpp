@@ -65,7 +65,7 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot12()
             D3DIMSoultreeObject* node = (D3DIMSoultreeObject*)obj;
             if (node->field_0x14c == 0) {
                 node->field_0x2d4 = 1;
-                node->Fn_443de0(0, 0);
+                node->SelectLod(0, 0);
                 visibleCount++;
             }
         }
@@ -99,7 +99,7 @@ void SoultreeQuadTreeRenderer::InsertNodesInQuadtree()
             node->subtreeDirty = 1;
             node->inQuadtree = 1;
             node->UpdateQuadtreeCell();
-            node->SelectLod(-1);
+            node->TransformVertexGroups(-1);
         }
     }
     delete it;
