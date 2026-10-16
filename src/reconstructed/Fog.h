@@ -35,8 +35,8 @@ public:
     // 0x00462680 (ret 0x1c): slot 8 with `target`, the device fog mode, then the
     // colour, visibility and haziness. `farScale`, `nearScale` and `minimum` scale the
     // visibility into the fog range (QuarryStuntEvent passes 768, 256, 128).
-    Fog* UnknownFunction462680(void* target, unsigned int color, float visibility, float haziness,
-                               float farScale, float nearScale, float minimum);
+    Fog* Create(void* target, unsigned int color, float visibility, float haziness,
+                float farScale, float nearScale, float minimum);
     // 0x004627a0: sets the colour, visibility and haziness.
     void SetParameters(unsigned int color, float visibility, float haziness);
     void SetDetailLevel(int level);    // 0x00462db0: detail level

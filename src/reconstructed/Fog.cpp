@@ -25,8 +25,8 @@ Fog::Fog(int flags)
 }
 
 // 0x00462680
-Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibility, float haziness,
-                                float farScale, float nearScale, float minimum)
+Fog* Fog::Create(void* target, unsigned int color, float visibility, float haziness,
+                 float farScale, float nearScale, float minimum)
 {
     char name[256];
 

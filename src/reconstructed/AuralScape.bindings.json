@@ -89,7 +89,7 @@
   "?GetPosition@AuralScapeListener@@QAEHPAUVector3@@@Z": "0x00402cb0",
   "?SetPosition@AuralScapeListener@@QAEHUVector3@@@Z": "0x00402ce0",
   "?SetVelocity@AuralScapeListener@@QAEHUVector3@@@Z": "0x00402d10",
-  "?UnknownFunction402f00@AuralScape@@QAEPAV1@PAXH@Z": "0x00402f00",
+  "?Create@AuralScape@@QAEPAV1@PAXH@Z": "0x00402f00",
   "?NextListenerNumber@AuralScape@@QAEHXZ": "0x00403000",
   "?AddListener@AuralScape@@QAEHHMM@Z": "0x00403010",
   "?SetListener@AuralScape@@QAEXHPAUVector3@@000@Z": "0x004030a0",

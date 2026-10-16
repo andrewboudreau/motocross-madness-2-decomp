@@ -147,7 +147,7 @@ public:
     // fills the "Audio" debug page.
     virtual int Tick(float frameTime);
 
-    AuralScape* UnknownFunction402f00(void* target, int sounds); // 0x00402f00
+    AuralScape* Create(void* target, int sounds); // 0x00402f00
     int NextListenerNumber();                  // 0x00403000: next number
     int AddListener(int index, float doppler, float rolloff); // 0x00403010
     void SetListener(int index, Vector3* position, Vector3* front, Vector3* top,

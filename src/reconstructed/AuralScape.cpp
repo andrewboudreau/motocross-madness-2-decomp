@@ -532,7 +532,7 @@ AuralScape::AuralScape(int flags) : GameObject(flags) {
 }
 
 // 0x00402f00
-AuralScape* AuralScape::UnknownFunction402f00(void* target, int sounds) {
+AuralScape* AuralScape::Create(void* target, int sounds) {
     if (!GameObject::SetRenderContext(target))
         return 0;
     soundBudget = sounds;

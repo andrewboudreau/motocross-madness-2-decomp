@@ -20,7 +20,7 @@
   "?ReapplyDefaultLimits@Camera@@QAEHXZ": "0x0042e8e0",
   "?ClampLimits@Camera@@QAEXMM@Z": "0x0042e960",
   "?TestInputEvent@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?UnknownFunction462680@Fog@@QAEPAV1@PAXIMMMMM@Z": "0x00462680",
+  "?Create@Fog@@QAEPAV1@PAXIMMMMM@Z": "0x00462680",
   "?SetParameters@Fog@@QAEXIMM@Z": "0x004627a0",
   "?SetDetailLevel@Fog@@QAEXH@Z": "0x00462db0",
   "?Tick@Fog@@UAEHM@Z": "0x004627f0",

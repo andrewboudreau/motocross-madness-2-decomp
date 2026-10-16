@@ -223,8 +223,8 @@ public:
 class UnknownQuarryFog : public GameObject {
 public:
     explicit UnknownQuarryFog(int flags);                      // 0x00462620
-    Fog* UnknownFunction462680(void* target, unsigned int color, float visibility, float haziness,
-                               float a, float b, float c);
+    Fog* Create(void* target, unsigned int color, float visibility, float haziness,
+                float a, float b, float c);
 
     unsigned char field_0x2c[0x5c - 0x2c];
 };
@@ -495,7 +495,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("Audio");
     auralScape = (new(__FILE__, 576) AuralScape(g_TrackGame->mode.soundOn))
-                     ->UnknownFunction402f00(renderContext, 16);
+                     ->Create(renderContext, 16);
     auralScape->reverbEnabled = g_TrackGame->mode.eaxEnabled;
     auralScapeListener = auralScape->NextListenerNumber();
     auralScape->AddListener(auralScapeListener, 1.0f, 1.0f);
@@ -574,8 +574,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     char* cubeFile = eventScene->environment->cubeFile;
     if (cubeFile && *cubeFile) {
         eventFog = (new(__FILE__, 720) UnknownQuarryFog(1))
-                         ->UnknownFunction462680(renderContext, eventScene->fog->color, eventScene->fog->visibility,
-                                                 eventScene->fog->haziness, 768.0f, 256.0f, 128.0f);
+                         ->Create(renderContext, eventScene->fog->color, eventScene->fog->visibility,
+                                  eventScene->fog->haziness, 768.0f, 256.0f, 128.0f);
         if (!AppendChild((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
         if (eventFog)
