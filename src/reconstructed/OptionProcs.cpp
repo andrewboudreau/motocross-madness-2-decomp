@@ -21,12 +21,12 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-UnknownOptGameSettings g_UnknownGlobal688898;
-UnknownOptSoundSettings g_UnknownGlobal688798;
-UnknownOptGraphicsSettings g_UnknownGlobal6887d8;
-UnknownOptControlSettings g_UnknownGlobal688868;
-UnknownOptGarageSettings g_UnknownGlobal688808;
-char g_UnknownGlobal688c10[10][128];
+UnknownOptGameSettings g_EditedGameSettings;
+UnknownOptSoundSettings g_EditedSoundSettings;
+UnknownOptGraphicsSettings g_EditedGraphicsSettings;
+UnknownOptControlSettings g_EditedControlSettings;
+UnknownOptGarageSettings g_EditedGarageSettings;
+char g_EditedMessages[10][128];
 
 // The list box of a drop-down list control.
 static inline UIListBox* UnknownDropDownList(UIControl* dropDown)
@@ -40,17 +40,17 @@ void OptGameSettingsDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit: {
-        FindControl("RiderPositionCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showRiderPositions);
-        FindControl("RaceStatsCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showRaceStats);
-        FindControl("GuagesCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showGauges);
-        FindControl("ChkUIAnims", 0)->BindValue(&g_UnknownGlobal688898.uiAnimations);
-        FindControl("OverviewCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showOverview);
-        FindControl("RiderNamesCheckBox", 0)->BindValue(&g_UnknownGlobal688898.showRiderNames);
-        FindControl("ChkPodiums", 0)->BindValue(&g_UnknownGlobal688898.showPodiums);
-        FindControl("ChkIntroMovie", 0)->BindValue(&g_UnknownGlobal688898.introMovie);
-        FindControl("ChkPlayerIndicator", 0)->BindValue(&g_UnknownGlobal688898.playerIndicator);
-        FindControl("ChkToolTips", 0)->BindValue(&g_UnknownGlobal688898.toolTips);
-        FindControl("ChkWreckResetOnTrack", 0)->BindValue(&g_UnknownGlobal688898.wreckResetOnTrack);
+        FindControl("RiderPositionCheckBox", 0)->BindValue(&g_EditedGameSettings.showRiderPositions);
+        FindControl("RaceStatsCheckBox", 0)->BindValue(&g_EditedGameSettings.showRaceStats);
+        FindControl("GuagesCheckBox", 0)->BindValue(&g_EditedGameSettings.showGauges);
+        FindControl("ChkUIAnims", 0)->BindValue(&g_EditedGameSettings.uiAnimations);
+        FindControl("OverviewCheckBox", 0)->BindValue(&g_EditedGameSettings.showOverview);
+        FindControl("RiderNamesCheckBox", 0)->BindValue(&g_EditedGameSettings.showRiderNames);
+        FindControl("ChkPodiums", 0)->BindValue(&g_EditedGameSettings.showPodiums);
+        FindControl("ChkIntroMovie", 0)->BindValue(&g_EditedGameSettings.introMovie);
+        FindControl("ChkPlayerIndicator", 0)->BindValue(&g_EditedGameSettings.playerIndicator);
+        FindControl("ChkToolTips", 0)->BindValue(&g_EditedGameSettings.toolTips);
+        FindControl("ChkWreckResetOnTrack", 0)->BindValue(&g_EditedGameSettings.wreckResetOnTrack);
         UIMultiState* chat = static_cast<UIMultiState*>(FindControl("MultChatMode", 2));
         chat->SetStateCount(3);
         chat->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x140b);
@@ -86,13 +86,13 @@ void OptGameSettingsDlg::SyncValues(int save)
     if (save) {
         switch (static_cast<UIMultiState*>(FindControl("MultChatMode", 2))->GetSelectedState()) {
         case 1:
-            g_UnknownGlobal688898.chatMode = 1;
+            g_EditedGameSettings.chatMode = 1;
             break;
         case 2:
-            g_UnknownGlobal688898.chatMode = 2;
+            g_EditedGameSettings.chatMode = 2;
             break;
         default:
-            g_UnknownGlobal688898.chatMode = 0;
+            g_EditedGameSettings.chatMode = 0;
             break;
         }
         if (!g_TrackGame->shuttingDown) {
@@ -103,7 +103,7 @@ void OptGameSettingsDlg::SyncValues(int save)
         }
     } else {
         UIMultiState* chat = static_cast<UIMultiState*>(FindControl("MultChatMode", 2));
-        switch (g_UnknownGlobal688898.chatMode) {
+        switch (g_EditedGameSettings.chatMode) {
         case 1:
             chat->SetCurrentState(1);
             break;
@@ -123,10 +123,10 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
     char text[128];
     switch (event->kind) {
     case kDialogInit: {
-        FindControl("ShadowsCheckBox", 0)->BindValue(&g_UnknownGlobal6887d8.shadows);
-        FindControl("ParticlesCheckBox", 0)->BindValue(&g_UnknownGlobal6887d8.particles);
-        FindControl("SkyCheckBox", 0)->BindValue(&g_UnknownGlobal6887d8.sky);
-        FindControl("TerrainQualitySliderBar", 0)->BindValue(&g_UnknownGlobal6887d8.terrainQuality);
+        FindControl("ShadowsCheckBox", 0)->BindValue(&g_EditedGraphicsSettings.shadows);
+        FindControl("ParticlesCheckBox", 0)->BindValue(&g_EditedGraphicsSettings.particles);
+        FindControl("SkyCheckBox", 0)->BindValue(&g_EditedGraphicsSettings.sky);
+        FindControl("TerrainQualitySliderBar", 0)->BindValue(&g_EditedGraphicsSettings.terrainQuality);
         UIDropDownList* dropDown = static_cast<UIDropDownList*>(FindControl("DisplayResolutionDropDown", 0));
         dropDown->SetFontColor(0xffffff);
         dropDown->SetTextAlign(0x12);
@@ -152,7 +152,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
                 }
             }
         }
-        list->SelectRowByData(g_UnknownGlobal6887d8.resolutionRow);
+        list->SelectRowByData(g_EditedGraphicsSettings.resolutionRow);
         UpdateBoundValues(0);
         break;
     }
@@ -165,7 +165,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
         }
         if (_stricmp("TerrainQualitySliderBar", event->controlName) == 0) {
             int value = static_cast<UIScrollBar*>(event->control)->GetScrollValue();
-            g_UnknownGlobal6887d8.terrainQuality = value;
+            g_EditedGraphicsSettings.terrainQuality = value;
             g_TrackGame->mode.videoSettings[1] = value;
             g_TrackGame->mode.videoSettings[3] = value;
             g_TrackGame->mode.videoSettings[2] = value;
@@ -187,9 +187,9 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
 void OptGraphicsDlg::SyncValues(int save)
 {
     if (save)
-        g_UnknownGlobal6887d8.resolutionRow = UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->GetRowData(-1);
+        g_EditedGraphicsSettings.resolutionRow = UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->GetRowData(-1);
     else
-        UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->SelectRowByData(g_UnknownGlobal6887d8.resolutionRow);
+        UnknownDropDownList(FindControl("DisplayResolutionDropDown", 6))->SelectRowByData(g_EditedGraphicsSettings.resolutionRow);
 }
 
 // 0x004b26c0
@@ -208,7 +208,7 @@ void OptAdvancedGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
             method = static_cast<UIRadioButton*>(FindControl("RadTerrDual", 4))->GetSelectedState() != 0;
         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_TrackGame->display->driverGuidText);
         g_TrackGame->SetRegistryInt(key, method);
-        g_UnknownGlobal6887d8.terrainQuality = (settings[4] + settings[3] + settings[2] + settings[1]) / 4;
+        g_EditedGraphicsSettings.terrainQuality = (settings[4] + settings[3] + settings[2] + settings[1]) / 4;
         break;
     }
     case kDialogInit: {
@@ -272,13 +272,13 @@ void OptSoundDlg::HandleEvent(UnknownDialogEvent* event)
 {
     switch (event->kind) {
     case kDialogInit:
-        FindControl("InGameSoundEffectsCheck", 0)->BindValue(&g_UnknownGlobal688798.inGameSoundEffects);
-        FindControl("SoundHardwareCheckBox", 0)->BindValue(&g_UnknownGlobal688798.soundHardware);
-        FindControl("UserInterfaceSoundsCheckBox", 0)->BindValue(&g_UnknownGlobal688798.uiSounds);
-        FindControl("ChkEAX", 0)->BindValue(&g_UnknownGlobal688798.eax);
-        FindControl("ChkWaypointChime", 0)->BindValue(&g_UnknownGlobal688798.waypointChime);
-        FindControl("UserInterfaceVolumeSlider", 0)->BindValue(&g_UnknownGlobal688798.uiVolume);
-        FindControl("InGameVolumeSlider", 0)->BindValue(&g_UnknownGlobal688798.inGameVolume);
+        FindControl("InGameSoundEffectsCheck", 0)->BindValue(&g_EditedSoundSettings.inGameSoundEffects);
+        FindControl("SoundHardwareCheckBox", 0)->BindValue(&g_EditedSoundSettings.soundHardware);
+        FindControl("UserInterfaceSoundsCheckBox", 0)->BindValue(&g_EditedSoundSettings.uiSounds);
+        FindControl("ChkEAX", 0)->BindValue(&g_EditedSoundSettings.eax);
+        FindControl("ChkWaypointChime", 0)->BindValue(&g_EditedSoundSettings.waypointChime);
+        FindControl("UserInterfaceVolumeSlider", 0)->BindValue(&g_EditedSoundSettings.uiVolume);
+        FindControl("InGameVolumeSlider", 0)->BindValue(&g_EditedSoundSettings.inGameVolume);
         FindControl("Rad16Bit", 4)->SetEnabled(0);
         static_cast<UIRadioButton*>(FindControl("Rad8Bit", 4))->SelectInGroup(0);
         UpdateBoundValues(0);
@@ -308,8 +308,8 @@ void OptSoundDlg::HandleEvent(UnknownDialogEvent* event)
 void OptSoundDlg::SyncValues(int save)
 {
     if (save) {
-        g_UnknownGlobal688798.sound16Bit = static_cast<UIRadioButton*>(FindControl("Rad16Bit", 4))->GetGroupSelection() - 1;
-    } else if (g_UnknownGlobal688798.sound16Bit) {
+        g_EditedSoundSettings.sound16Bit = static_cast<UIRadioButton*>(FindControl("Rad16Bit", 4))->GetGroupSelection() - 1;
+    } else if (g_EditedSoundSettings.sound16Bit) {
         static_cast<UIRadioButton*>(FindControl("Rad16Bit", 4))->SelectInGroup(0);
     } else {
         static_cast<UIRadioButton*>(FindControl("Rad8Bit", 4))->SelectInGroup(0);
@@ -321,11 +321,11 @@ void OptSoundDlg::ApplySoundSettings()
 {
     UpdateBoundValues(1);
     if (g_TrackGame->soundInterface) {
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowSoundHardware = g_UnknownGlobal688798.soundHardware;
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = g_UnknownGlobal688798.eax;
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, g_UnknownGlobal688798.sound16Bit ? 16 : 8);
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowSoundHardware = g_EditedSoundSettings.soundHardware;
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = g_EditedSoundSettings.eax;
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, g_EditedSoundSettings.sound16Bit ? 16 : 8);
     }
-    guiManager->soundVolume = (g_UnknownGlobal688798.uiSounds ? (g_UnknownGlobal688798.uiVolume - 100) * 25 : -10000) - 200;
+    guiManager->soundVolume = (g_EditedSoundSettings.uiSounds ? (g_EditedSoundSettings.uiVolume - 100) * 25 : -10000) - 200;
 }
 
 
@@ -340,17 +340,17 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         waitingForInput = 0;
         inputWaitPending = 0;
         joystickIsKind3 = 0;
-        FindControl("ForceFeedCheck", 0)->BindValue(&g_UnknownGlobal688868.forceFeedback);
-        FindControl("SteeringSlider", 0)->BindValue(&g_UnknownGlobal688868.steering);
-        FindControl("CrossupSlider", 0)->BindValue(&g_UnknownGlobal688868.crossup);
-        FindControl("PitchSlider", 0)->BindValue(&g_UnknownGlobal688868.pitch);
-        FindControl("PressThrottleSlider", 0)->BindValue(&g_UnknownGlobal688868.pressThrottle);
-        FindControl("PressBrakesSlider", 0)->BindValue(&g_UnknownGlobal688868.pressBrakes);
-        FindControl("ReleaseThrottleSlider", 0)->BindValue(&g_UnknownGlobal688868.releaseThrottle);
-        FindControl("ReleaseBrakesSlider", 0)->BindValue(&g_UnknownGlobal688868.releaseBrakes);
-        FindControl("FeedbackSlider", 0)->BindValue(&g_UnknownGlobal688868.feedback);
-        FindControl("ChkGasGyro", 0)->BindValue(&g_UnknownGlobal688868.gasGyro);
-        FindControl("ChkBrakeGyro", 0)->BindValue(&g_UnknownGlobal688868.brakeGyro);
+        FindControl("ForceFeedCheck", 0)->BindValue(&g_EditedControlSettings.forceFeedback);
+        FindControl("SteeringSlider", 0)->BindValue(&g_EditedControlSettings.steering);
+        FindControl("CrossupSlider", 0)->BindValue(&g_EditedControlSettings.crossup);
+        FindControl("PitchSlider", 0)->BindValue(&g_EditedControlSettings.pitch);
+        FindControl("PressThrottleSlider", 0)->BindValue(&g_EditedControlSettings.pressThrottle);
+        FindControl("PressBrakesSlider", 0)->BindValue(&g_EditedControlSettings.pressBrakes);
+        FindControl("ReleaseThrottleSlider", 0)->BindValue(&g_EditedControlSettings.releaseThrottle);
+        FindControl("ReleaseBrakesSlider", 0)->BindValue(&g_EditedControlSettings.releaseBrakes);
+        FindControl("FeedbackSlider", 0)->BindValue(&g_EditedControlSettings.feedback);
+        FindControl("ChkGasGyro", 0)->BindValue(&g_EditedControlSettings.gasGyro);
+        FindControl("ChkBrakeGyro", 0)->BindValue(&g_EditedControlSettings.brakeGyro);
         UIListBox* actions = static_cast<UIListBox*>(FindControl("ActionListBox", 0));
         for (i = 0; i < 14; i++) {
             g_TrackGame->LoadResourceString(0x192 + i, text, 128);
@@ -370,7 +370,7 @@ void OptControlsDlg::HandleEvent(UnknownDialogEvent* event)
         }
         ColorListRows();
         UIControl* analog = FindControl("ChkAnalogAxes", 0);
-        analog->BindValue(&g_UnknownGlobal688868.analogAxes);
+        analog->BindValue(&g_EditedControlSettings.analogAxes);
         if (g_TrackGame->controlInterface->activeJoystick)
             g_TrackGame->controlInterface->activeJoystick->IsDeviceSubtype(4);
         analog->Show(0, 1);
@@ -623,16 +623,16 @@ void OptControlsDlg::EndInputWait()
 void OptMessagesDlg::HandleEvent(UnknownDialogEvent* event)
 {
     if (event->kind == kDialogInit) {
-        static_cast<UIEditBox*>(FindControl("Message1", 11))->BindTextBuffer(g_UnknownGlobal688c10[1], 128);
-        static_cast<UIEditBox*>(FindControl("Message2", 11))->BindTextBuffer(g_UnknownGlobal688c10[2], 128);
-        static_cast<UIEditBox*>(FindControl("Message3", 11))->BindTextBuffer(g_UnknownGlobal688c10[3], 128);
-        static_cast<UIEditBox*>(FindControl("Message4", 11))->BindTextBuffer(g_UnknownGlobal688c10[4], 128);
-        static_cast<UIEditBox*>(FindControl("Message5", 11))->BindTextBuffer(g_UnknownGlobal688c10[5], 128);
-        static_cast<UIEditBox*>(FindControl("Message6", 11))->BindTextBuffer(g_UnknownGlobal688c10[6], 128);
-        static_cast<UIEditBox*>(FindControl("Message7", 11))->BindTextBuffer(g_UnknownGlobal688c10[7], 128);
-        static_cast<UIEditBox*>(FindControl("Message8", 11))->BindTextBuffer(g_UnknownGlobal688c10[8], 128);
-        static_cast<UIEditBox*>(FindControl("Message9", 11))->BindTextBuffer(g_UnknownGlobal688c10[9], 128);
-        static_cast<UIEditBox*>(FindControl("Message0", 11))->BindTextBuffer(g_UnknownGlobal688c10[0], 128);
+        static_cast<UIEditBox*>(FindControl("Message1", 11))->BindTextBuffer(g_EditedMessages[1], 128);
+        static_cast<UIEditBox*>(FindControl("Message2", 11))->BindTextBuffer(g_EditedMessages[2], 128);
+        static_cast<UIEditBox*>(FindControl("Message3", 11))->BindTextBuffer(g_EditedMessages[3], 128);
+        static_cast<UIEditBox*>(FindControl("Message4", 11))->BindTextBuffer(g_EditedMessages[4], 128);
+        static_cast<UIEditBox*>(FindControl("Message5", 11))->BindTextBuffer(g_EditedMessages[5], 128);
+        static_cast<UIEditBox*>(FindControl("Message6", 11))->BindTextBuffer(g_EditedMessages[6], 128);
+        static_cast<UIEditBox*>(FindControl("Message7", 11))->BindTextBuffer(g_EditedMessages[7], 128);
+        static_cast<UIEditBox*>(FindControl("Message8", 11))->BindTextBuffer(g_EditedMessages[8], 128);
+        static_cast<UIEditBox*>(FindControl("Message9", 11))->BindTextBuffer(g_EditedMessages[9], 128);
+        static_cast<UIEditBox*>(FindControl("Message0", 11))->BindTextBuffer(g_EditedMessages[0], 128);
         UpdateBoundValues(0);
         GameObjectIterator controls(controlContainer, 1, "UIControl");
         GameObject* control;
@@ -678,12 +678,12 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
     switch (event->kind) {
     case kDialogInit: {
         TrackGame* game = g_TrackGame;
-        g_UnknownGlobal688808 = *UnknownGarageSettingsOf(game);
-        g_UnknownGlobal688898 = *UnknownGameSettingsOf(game);
-        g_UnknownGlobal688798 = *UnknownSoundSettingsOf(game);
-        g_UnknownGlobal6887d8 = *UnknownGraphicsSettingsOf(game);
-        g_UnknownGlobal688868 = *UnknownControlSettingsOf(game);
-        memcpy(g_UnknownGlobal688c10, UnknownMessagesOf(game), sizeof(g_UnknownGlobal688c10));
+        g_EditedGarageSettings = *UnknownGarageSettingsOf(game);
+        g_EditedGameSettings = *UnknownGameSettingsOf(game);
+        g_EditedSoundSettings = *UnknownSoundSettingsOf(game);
+        g_EditedGraphicsSettings = *UnknownGraphicsSettingsOf(game);
+        g_EditedControlSettings = *UnknownControlSettingsOf(game);
+        memcpy(g_EditedMessages, UnknownMessagesOf(game), sizeof(g_EditedMessages));
         gameSettingsPage = 0;
         graphicsPage = 0;
         soundPage = 0;
@@ -785,12 +785,12 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
     case 9:
         if (event->code == 0x51) {
             TrackGame* game = g_TrackGame;
-            g_UnknownGlobal688808 = *UnknownGarageSettingsOf(game);
-            g_UnknownGlobal688898 = *UnknownGameSettingsOf(game);
-            g_UnknownGlobal688798 = *UnknownSoundSettingsOf(game);
-            g_UnknownGlobal6887d8 = *UnknownGraphicsSettingsOf(game);
-            g_UnknownGlobal688868 = *UnknownControlSettingsOf(game);
-            memcpy(g_UnknownGlobal688c10, UnknownMessagesOf(game), sizeof(g_UnknownGlobal688c10));
+            g_EditedGarageSettings = *UnknownGarageSettingsOf(game);
+            g_EditedGameSettings = *UnknownGameSettingsOf(game);
+            g_EditedSoundSettings = *UnknownSoundSettingsOf(game);
+            g_EditedGraphicsSettings = *UnknownGraphicsSettingsOf(game);
+            g_EditedControlSettings = *UnknownControlSettingsOf(game);
+            memcpy(g_EditedMessages, UnknownMessagesOf(game), sizeof(g_EditedMessages));
             if (gameSettingsPage)
                 gameSettingsPage->UpdateBoundValues(0);
             if (graphicsPage)
@@ -823,15 +823,15 @@ void OptionsDlg::HandleEvent(UnknownDialogEvent* event)
         }
         break;
     case kDialogClose:
-        *UnknownGarageSettingsOf(g_TrackGame) = g_UnknownGlobal688808;
-        *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
-        *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
-        *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
-        *UnknownControlSettingsOf(g_TrackGame) = g_UnknownGlobal688868;
-        memcpy(UnknownMessagesOf(g_TrackGame), g_UnknownGlobal688c10, sizeof(g_UnknownGlobal688c10));
-        guiManager->uiAnimations = g_UnknownGlobal688898.uiAnimations;
+        *UnknownGarageSettingsOf(g_TrackGame) = g_EditedGarageSettings;
+        *UnknownGameSettingsOf(g_TrackGame) = g_EditedGameSettings;
+        *UnknownSoundSettingsOf(g_TrackGame) = g_EditedSoundSettings;
+        *UnknownGraphicsSettingsOf(g_TrackGame) = g_EditedGraphicsSettings;
+        *UnknownControlSettingsOf(g_TrackGame) = g_EditedControlSettings;
+        memcpy(UnknownMessagesOf(g_TrackGame), g_EditedMessages, sizeof(g_EditedMessages));
+        guiManager->uiAnimations = g_EditedGameSettings.uiAnimations;
         if (parentDialog)
-            parentDialog->animatesControls = g_UnknownGlobal688898.uiAnimations;
+            parentDialog->animatesControls = g_EditedGameSettings.uiAnimations;
         break;
     }
 }
@@ -1056,15 +1056,15 @@ void OptGarageDlg::HandleEvent(UnknownDialogEvent* event)
     case kDialogListSelect:
         if (_stricmp("DDLCurves", event->controlName) == 0) {
             int curve = static_cast<UIListBox*>(event->control)->GetRowData(-1);
-            g_UnknownGlobal688898.curveRows[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)] = curve;
+            g_EditedGameSettings.curveRows[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)] = curve;
             TrackGame* game = g_TrackGame;
             for (int band = 0; band < 11; band++) {
                 if (curve < 3)
-                    g_UnknownGlobal688808.eqBands[band] =
-                        game->ui->standardCurves[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve][band];
+                    g_EditedGarageSettings.eqBands[band] =
+                        game->ui->standardCurves[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)][curve][band];
                 else
-                    g_UnknownGlobal688808.eqBands[band] =
-                        game->mode.customGarageCurves[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)][curve - 3][band];
+                    g_EditedGarageSettings.eqBands[band] =
+                        game->mode.customGarageCurves[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)][curve - 3][band];
             }
             ShowCurve();
         }
@@ -1101,31 +1101,31 @@ void OptGarageDlg::FillCurveList()
     char standard[128];
     char custom[128];
     g_TrackGame->LoadResourceString(0x146a, format, 127);
-    sprintf(engine, format, g_UnknownGlobal56cb6c[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)]);
+    sprintf(engine, format, g_UnknownGlobal56cb6c[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)]);
     g_TrackGame->LoadResourceString(0x146b, standard, 127);
     g_TrackGame->LoadResourceString(0x146c, custom, 127);
     UIListBox* curves = UnknownDropDownList(FindControl("DDLCurves", 6));
     curves->RemoveAllRows();
     for (int i = 0; i < 6; i++) {
         if (i < 3)
-            sprintf(text, "%dcc (%s) %s #%d", g_UnknownGlobal688808.engineSize, engine, standard, i + 1);
+            sprintf(text, "%dcc (%s) %s #%d", g_EditedGarageSettings.engineSize, engine, standard, i + 1);
         else
-            sprintf(text, "%dcc (%s) %s #%d", g_UnknownGlobal688808.engineSize, engine, custom, i - 2);
+            sprintf(text, "%dcc (%s) %s #%d", g_EditedGarageSettings.engineSize, engine, custom, i - 2);
         curves->AddRow(text, i, 0);
     }
-    curves->SelectRowByData(g_UnknownGlobal688898.curveRows[UnknownBikeClassOf(g_UnknownGlobal688808.engineSize)]);
+    curves->SelectRowByData(g_EditedGameSettings.curveRows[UnknownBikeClassOf(g_EditedGarageSettings.engineSize)]);
 }
 
 // 0x004b3aa0
 void OptGarageDlg::EqSliderMoved(UIControl* slider)
 {
-    int bikeClass = UnknownBikeClassOf(g_UnknownGlobal688808.engineSize);
+    int bikeClass = UnknownBikeClassOf(g_EditedGarageSettings.engineSize);
     int band = slider->attachId;
     int value = static_cast<UIScrollBar*>(slider)->ScaleThumbPosition(g_TrackGame->ui->maxRange[bikeClass] - g_TrackGame->ui->minRange[bikeClass]);
     value += g_TrackGame->ui->minRange[bikeClass];
-    int level = __min(g_UnknownGlobal688808.eqBands[band] + (g_TrackGame->ui->hpSum[bikeClass] - curveSum),
+    int level = __min(g_EditedGarageSettings.eqBands[band] + (g_TrackGame->ui->hpSum[bikeClass] - curveSum),
                       __min(value, g_TrackGame->ui->bandMaxima[bikeClass][band]));
-    g_UnknownGlobal688808.eqBands[band] = level;
+    g_EditedGarageSettings.eqBands[band] = level;
     int custom = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1) - 3;
     g_TrackGame->mode.customGarageCurves[bikeClass][custom][band] = level;
     ShowCurve();
@@ -1136,7 +1136,7 @@ void OptGarageDlg::ShowCurve()
 {
     char name[128];
     char text[128];
-    int bikeClass = UnknownBikeClassOf(g_UnknownGlobal688808.engineSize);
+    int bikeClass = UnknownBikeClassOf(g_EditedGarageSettings.engineSize);
     curveSum = 0;
     int curve = UnknownDropDownList(FindControl("DDLCurves", 6))->GetRowData(-1);
     if (curve < 3) {
@@ -1148,9 +1148,9 @@ void OptGarageDlg::ShowCurve()
     }
     int* level;
     int i;
-    for (i = 1, level = g_UnknownGlobal688808.eqBands; i - 1 < 11; i++, level++) {
+    for (i = 1, level = g_EditedGarageSettings.eqBands; i - 1 < 11; i++, level++) {
         sprintf(name, "Txt%d", i);
-        sprintf(text, "%2.1fk", ((i - 1) * g_UnknownGlobal688808.bandStep + g_UnknownGlobal688808.firstBand) * 0.001f);
+        sprintf(text, "%2.1fk", ((i - 1) * g_EditedGarageSettings.bandStep + g_EditedGarageSettings.firstBand) * 0.001f);
         FindControl(name, 0)->SetText(text);
         sprintf(name, "SldEQ%d", i);
         UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl(name, 8));
@@ -1175,18 +1175,18 @@ void OptGarageDlg::ShowCurve()
 void OptGarageDlg::SyncValues(int save)
 {
     if (save) {
-        g_UnknownGlobal688808.suspension[0] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontComp", 8))->GetScrollValue() * 0.01f;
-        g_UnknownGlobal688808.suspension[1] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontDecomp", 8))->GetScrollValue() * 0.01f;
-        g_UnknownGlobal688808.suspension[2] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldRearComp", 8))->GetScrollValue() * 0.01f;
-        g_UnknownGlobal688808.suspension[3] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldRearDecomp", 8))->GetScrollValue() * 0.01f;
-        g_UnknownGlobal688808.suspension[4] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontDamp", 8))->GetScrollValue() * 0.01f;
-        g_UnknownGlobal688808.suspension[5] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldRearDamp", 8))->GetScrollValue() * 0.01f;
+        g_EditedGarageSettings.suspension[0] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontComp", 8))->GetScrollValue() * 0.01f;
+        g_EditedGarageSettings.suspension[1] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontDecomp", 8))->GetScrollValue() * 0.01f;
+        g_EditedGarageSettings.suspension[2] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldRearComp", 8))->GetScrollValue() * 0.01f;
+        g_EditedGarageSettings.suspension[3] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldRearDecomp", 8))->GetScrollValue() * 0.01f;
+        g_EditedGarageSettings.suspension[4] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldFrontDamp", 8))->GetScrollValue() * 0.01f;
+        g_EditedGarageSettings.suspension[5] = (unsigned int)static_cast<UIScrollBar*>(FindControl("SldRearDamp", 8))->GetScrollValue() * 0.01f;
     } else {
-        static_cast<UIScrollBar*>(FindControl("SldFrontComp", 8))->SetThumbPosition((int)(g_UnknownGlobal688808.suspension[0] * 100.0f), 100);
-        static_cast<UIScrollBar*>(FindControl("SldFrontDecomp", 8))->SetThumbPosition((int)(g_UnknownGlobal688808.suspension[1] * 100.0f), 100);
-        static_cast<UIScrollBar*>(FindControl("SldRearComp", 8))->SetThumbPosition((int)(g_UnknownGlobal688808.suspension[2] * 100.0f), 100);
-        static_cast<UIScrollBar*>(FindControl("SldRearDecomp", 8))->SetThumbPosition((int)(g_UnknownGlobal688808.suspension[3] * 100.0f), 100);
-        static_cast<UIScrollBar*>(FindControl("SldFrontDamp", 8))->SetThumbPosition((int)(g_UnknownGlobal688808.suspension[4] * 100.0f), 100);
-        static_cast<UIScrollBar*>(FindControl("SldRearDamp", 8))->SetThumbPosition((int)(g_UnknownGlobal688808.suspension[5] * 100.0f), 100);
+        static_cast<UIScrollBar*>(FindControl("SldFrontComp", 8))->SetThumbPosition((int)(g_EditedGarageSettings.suspension[0] * 100.0f), 100);
+        static_cast<UIScrollBar*>(FindControl("SldFrontDecomp", 8))->SetThumbPosition((int)(g_EditedGarageSettings.suspension[1] * 100.0f), 100);
+        static_cast<UIScrollBar*>(FindControl("SldRearComp", 8))->SetThumbPosition((int)(g_EditedGarageSettings.suspension[2] * 100.0f), 100);
+        static_cast<UIScrollBar*>(FindControl("SldRearDecomp", 8))->SetThumbPosition((int)(g_EditedGarageSettings.suspension[3] * 100.0f), 100);
+        static_cast<UIScrollBar*>(FindControl("SldFrontDamp", 8))->SetThumbPosition((int)(g_EditedGarageSettings.suspension[4] * 100.0f), 100);
+        static_cast<UIScrollBar*>(FindControl("SldRearDamp", 8))->SetThumbPosition((int)(g_EditedGarageSettings.suspension[5] * 100.0f), 100);
     }
 }

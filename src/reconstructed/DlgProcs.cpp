@@ -1694,7 +1694,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     switch (menu) {
     case 0xc9:
         event->dialog->UpdateBoundValues(1);
-        *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
+        *UnknownGameSettingsOf(g_TrackGame) = g_EditedGameSettings;
         g_TrackGame->ui->gui->uiAnimations = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
@@ -1702,7 +1702,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
         break;
     case 0xca:
         event->dialog->UpdateBoundValues(1);
-        *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
+        *UnknownSoundSettingsOf(g_TrackGame) = g_EditedSoundSettings;
         g_TrackGame->MuteSound();
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
@@ -1711,8 +1711,8 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
     case 0xcb: {
         event->dialog->UpdateBoundValues(1);
         UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
-        g_UnknownGlobal6887d8.resolutionRow = modes->GetRowData(-1);
-        *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
+        g_EditedGraphicsSettings.resolutionRow = modes->GetRowData(-1);
+        *UnknownGraphicsSettingsOf(g_TrackGame) = g_EditedGraphicsSettings;
         g_TrackGame->ui->OpenMenu(kMenuOptions);
         event->dialog->EndDialog(0);
         event->handled = 1;

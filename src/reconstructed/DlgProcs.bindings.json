@@ -530,10 +530,10 @@
   "_srand": "0x00534c0e",
   "_strncpy": "0x00534b10",
   "__imp__PtInRect@12": "0x005502d4",
-  "?g_UnknownGlobal688898@@3UUnknownOptGameSettings@@A": "0x00688898",
-  "?g_UnknownGlobal688798@@3UUnknownOptSoundSettings@@A": "0x00688798",
+  "?g_EditedGameSettings@@3UUnknownOptGameSettings@@A": "0x00688898",
+  "?g_EditedSoundSettings@@3UUnknownOptSoundSettings@@A": "0x00688798",
   "??_C@_07HJAH@ModeDDL?$AA@": "0x00569f10",
-  "?g_UnknownGlobal6887d8@@3UUnknownOptGraphicsSettings@@A": "0x006887d8",
+  "?g_EditedGraphicsSettings@@3UUnknownOptGraphicsSettings@@A": "0x006887d8",
   "?g_SerialSettings@@3UUnknownSerialSettings@@A": "0x006886b8",
   "?BuildComPortAddress@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410",
   "__imp__GetComputerNameA@8": "0x0055020c"
