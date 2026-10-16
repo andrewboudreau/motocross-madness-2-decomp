@@ -135,13 +135,13 @@ static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
 // 0x00456890: whether the object is beyond the detail band's 3D distance
 // (then `fade` is 255), else the fade between the band's two distances.
 void Vegetation::TestDistance(int* billboard, int* fade) {
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->renderContext)->camera;
-    float dx = camera->position.x - quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-    float dz = camera->position.z - quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_EcoSystem->renderContext)->camera;
+    float dx = camera->position.x - quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+    float dz = camera->position.z - quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
     *billboard = 0;
-    float outer = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->detailLevel].geometryDistance;
-    float inner = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->detailLevel].fadeStartDistance;
+    float outer = (float)g_UnknownGlobal59af14[g_EcoSystem->detailLevel].geometryDistance;
+    float inner = (float)g_UnknownGlobal59af14[g_EcoSystem->detailLevel].fadeStartDistance;
     if (dx > outer || dz > outer) {
         *billboard = 1;
         *fade = 0xff;
@@ -172,14 +172,14 @@ void Vegetation::TestDistance(int* billboard, int* fade) {
 
 CollisionObject* Vegetation::GetCollisionObject(int index) {
     int table = definitionIndex;
-    CollisionObject* object = g_UnknownGlobal59aebc->definitionTable[table]->collisionObjects[index];
-    float x = quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-    float y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
-    float z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
+    CollisionObject* object = g_EcoSystem->definitionTable[table]->collisionObjects[index];
+    float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+    float y = quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
+    float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
+    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     float radius = definition->RadiusForParameter(radiusParam) / definition->meanRadius;
     float height = definition->HeightForParameter(heightParam)
-                   / g_UnknownGlobal59aebc->definitionTable[definitionIndex]->meanHeight;
+                   / g_EcoSystem->definitionTable[definitionIndex]->meanHeight;
     if (object->shapeType == 4) {
         ECO_SPHERE->radiusScale = radius;
         ECO_SPHERE->centreScale = height;
@@ -412,9 +412,9 @@ void EcoSystem::WriteListing(const char* path) {
         UnknownEcoDefinition* definition = definitionTable[vegetation[i].definitionIndex];
         float radius = definition->RadiusForParameter(vegetation[i].radiusParam);
         float height = definition->HeightForParameter(vegetation[i].heightParam);
-        float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float z = vegetation[i].quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
+        float y = vegetation[i].quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
+        float x = vegetation[i].quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
         FilePrintf(file, "%i,%f,%f,%f,%f,%f\n", vegetation[i].definitionIndex, x, y, z,
                               definition->RadiusForParameter(vegetation[i].radiusParam),
                               definition->HeightForParameter(vegetation[i].heightParam));
@@ -815,9 +815,9 @@ int EcoSystem::UnknownVirtualSlot14() {
                     float uScale = (definition->uRight - definition->uLeft) / (radius + radius);
                     float uLeftWidth = (definition->vTop - definition->uLeft) * uScale;
                     float uRightWidth = (definition->uRight - definition->vTop) * uScale;
-                    float x = object->quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-                    float y = object->quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
-                    float z = object->quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+                    float x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+                    float y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
+                    float z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
 #define VERTEX(o) (*(UnknownEcoVertex*)((char*)billboardVertices + (o)))
                     VERTEX(offset0).position.x = uRightWidth * cosine + x;
                     VERTEX(offset3).position.x = VERTEX(offset0).position.x;

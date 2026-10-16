@@ -537,7 +537,9 @@ public:
     int detailLevel;                          // detail level
 };
 
-extern EcoSystem* g_UnknownGlobal59aebc;      // the one instance
+// 0x0059aebc: the EcoSystem instance; the constructor 0x00457250
+// stores `this` and the destructor 0x00457330 clears it.
+extern EcoSystem* g_EcoSystem;
 
 // NormalDistribution.cpp (src/krusty2/effects): the tabulated bell curve
 // the generator weighs the slope and altitude with (0x0056ece0).

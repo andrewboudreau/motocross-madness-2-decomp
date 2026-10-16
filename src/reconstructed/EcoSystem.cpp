@@ -25,7 +25,7 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-EcoSystem* g_UnknownGlobal59aebc;             // 0x0059aebc
+EcoSystem* g_EcoSystem;             // 0x0059aebc
 static int s_geometryRenderTicks;            // 0x0059aec0: slot 14 geometry draw ticks ("Render %d(3d:%d)")
 static UnknownPeakHold s_prepareGeometryPeak(5000); // 0x0059aef0 ($E 0x00455db0, XCU 103): "PrepareGeometry %d %d" peak
 static UnknownPeakHold s_renderPeak(5000);   // 0x0059aec8 ($E 0x00455dd0, XCU 104): "Render" peak
@@ -260,14 +260,14 @@ Vegetation::Vegetation() {
     radiusParam = 0;
     definitionIndex = 0;
     geometryBlock = 0;
-    typeId = g_UnknownGlobal59aebc->vegetationTypeId;
+    typeId = g_EcoSystem->vegetationTypeId;
 }
 
 // 0x00456690
 unsigned short Vegetation::UnknownVirtualSlot0() {
     Matrix4* m = g_UnknownGlobal59af00;
-    float depth = ((quantizedPosition.z * (*m)(2, 2) + quantizedPosition.x * (*m)(0, 2)) * g_UnknownGlobal59aebc->unitsPerCoordinate
-                   + (*m)(3, 2)) * g_UnknownGlobal59aebc->depthScale;
+    float depth = ((quantizedPosition.z * (*m)(2, 2) + quantizedPosition.x * (*m)(0, 2)) * g_EcoSystem->unitsPerCoordinate
+                   + (*m)(3, 2)) * g_EcoSystem->depthScale;
     if (depth < 0.0)
         sortKey = 0;
     else if ((int)depth >= 0xffff)
@@ -279,9 +279,9 @@ unsigned short Vegetation::UnknownVirtualSlot0() {
 
 // 0x00456720
 unsigned int Vegetation::UnknownVirtualSlot1(UnknownEcoQuadTree* tree) {
-    float radius = g_UnknownGlobal59aebc->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
-    float x = quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-    float z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    float radius = g_EcoSystem->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
+    float x = quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+    float z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
     return tree->ComputeCode(x - radius, z - radius, x + radius, z + radius);
 }
 
@@ -310,9 +310,9 @@ void Vegetation::Place(TextureMapManager* textures, unsigned char definition,
                                        const Vector3* position, unsigned char heightParameter,
                                        unsigned char radiusParameter) {
     definitionIndex = definition;
-    quantizedPosition.x = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * VectorX(*position));
-    quantizedPosition.y = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * VectorY(*position));
-    quantizedPosition.z = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * VectorZ(*position));
+    quantizedPosition.x = (unsigned short)(int)(g_EcoSystem->coordinatesPerUnit * VectorX(*position));
+    quantizedPosition.y = (unsigned short)(int)(g_EcoSystem->coordinatesPerUnit * VectorY(*position));
+    quantizedPosition.z = (unsigned short)(int)(g_EcoSystem->coordinatesPerUnit * VectorZ(*position));
     radiusParam = radiusParameter;
     heightParam = heightParameter;
     isBillboard = 1;
@@ -333,8 +333,8 @@ int EvictGeometry(void* owner, int context) {
 // 4-byte-padded indices, then the AgeEntry) is registered with the
 // AgeManager for eviction. The min/max of x are computed but unused.
 void Vegetation::SetBillboard(int billboard, int fade) {
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
-    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->renderContext)->camera;
+    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_EcoSystem->renderContext)->camera;
     fadeLevel = (unsigned char)fade;
     if (billboard == isBillboard)
         return;
@@ -348,7 +348,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         int dwords = vertexCount * 8 + (indexCount + 1) / 2;
         geometryBlock = DebugMalloc(dwords * 4 + sizeof(AgeEntry), __FILE__, 0x1fb);
         AgeEntry* entry = (AgeEntry*)((int*)geometryBlock + dwords);
-        g_UnknownGlobal59aebc->ageManager->Register(entry, EvictGeometry, this, 0,
+        g_EcoSystem->ageManager->Register(entry, EvictGeometry, this, 0,
                                                                   dwords * 4 + sizeof(AgeEntry));
         g_UnknownGlobal59af0c++;
         memcpy((UnknownEcoVertex*)geometryBlock + vertexCount, definition->modelIndices[billboard], indexCount * 2);
@@ -367,12 +367,12 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         }
         // Six scalars, not two Vector3s: retail interleaves the colour and
         // ambient components with the other scalar slots of the frame.
-        float colorR = g_UnknownGlobal59aebc->lightColor.x;
-        float colorG = g_UnknownGlobal59aebc->lightColor.y;
-        float colorB = g_UnknownGlobal59aebc->lightColor.z;
-        float ambientR = g_UnknownGlobal59aebc->ambientLight.x;
-        float ambientG = g_UnknownGlobal59aebc->ambientLight.y;
-        float ambientB = g_UnknownGlobal59aebc->ambientLight.z;
+        float colorR = g_EcoSystem->lightColor.x;
+        float colorG = g_EcoSystem->lightColor.y;
+        float colorB = g_EcoSystem->lightColor.z;
+        float ambientR = g_EcoSystem->ambientLight.x;
+        float ambientG = g_EcoSystem->ambientLight.y;
+        float ambientB = g_EcoSystem->ambientLight.z;
         unsigned int ambientColor = ECO_RGBA((int)(ambientR * 255.0f), (int)(ambientG * 255.0f),
                                              (int)(ambientB * 255.0f), 255);
         UnknownEcoModelVertex* source = definition->modelVertices[billboard];
@@ -386,9 +386,9 @@ void Vegetation::SetBillboard(int billboard, int fade) {
             int unlit = 0;
             Vector3 normal;
             float x = quantizedPosition.x;
-            VERTEX.position.x = c * source->position.x - s * source->position.z + x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-            VERTEX.position.y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + heightScale * source->position.y;
-            VERTEX.position.z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate + c * source->position.z
+            VERTEX.position.x = c * source->position.x - s * source->position.z + x * g_EcoSystem->unitsPerCoordinate;
+            VERTEX.position.y = quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + heightScale * source->position.y;
+            VERTEX.position.z = quantizedPosition.z * g_EcoSystem->unitsPerCoordinate + c * source->position.z
                                 + s * source->position.x;
             if (definition->usePlanarLighting) {
                 if (source->normal.y < 0.0f) {
@@ -431,9 +431,9 @@ void Vegetation::SetBillboard(int billboard, int fade) {
                 maxX = VERTEX.position.x;
             if (VERTEX.position.x < minX)
                 minX = VERTEX.position.x;
-            float intensity = -(normal.z * g_UnknownGlobal59aebc->lightDirection.z
-                                + (normal.x * g_UnknownGlobal59aebc->lightDirection.x
-                                   + normal.y * g_UnknownGlobal59aebc->lightDirection.y));
+            float intensity = -(normal.z * g_EcoSystem->lightDirection.z
+                                + (normal.x * g_EcoSystem->lightDirection.x
+                                   + normal.y * g_EcoSystem->lightDirection.y));
             if (!unlit && source->normal.y > -0.95f && intensity > 0.0f) {
                 float r = intensity * colorR + ambientR;
                 float g = intensity * colorG + ambientG;
@@ -461,24 +461,24 @@ void Vegetation::SetBillboard(int billboard, int fade) {
 
 // 0x00457000
 void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
+    UnknownEcoDefinition* definition = g_EcoSystem->definitionTable[definitionIndex];
     definition->modelTexture->UnknownVirtualSlot19();
     int vertexCount = definition->modelVertexCount[isBillboard];
     int indexCount = definition->modelIndexCount[isBillboard];
     target->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
                                  indexCount, 0);
-    g_UnknownGlobal59aebc->ageManager->MarkUsed(
+    g_EcoSystem->ageManager->MarkUsed(
         (AgeEntry*)((int*)geometryBlock + vertexCount * 8 + (indexCount + 1) / 2));
 }
 
 // 0x00457080
 int Vegetation::GetCollisionCount() {
-    return g_UnknownGlobal59aebc->definitionTable[definitionIndex]->collisionCount;
+    return g_EcoSystem->definitionTable[definitionIndex]->collisionCount;
 }
 
 // 0x00457230
 float Vegetation::GetRadius() {
-    return g_UnknownGlobal59aebc->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
+    return g_EcoSystem->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
 }
 
 // 0x00457250
@@ -498,7 +498,7 @@ EcoSystem::EcoSystem(int flags) : GameObject(flags) {
     memset(definitionTable, 0, sizeof(definitionTable));
     esbStream = 0;
     field_0x598 = 0xcd;
-    g_UnknownGlobal59aebc = this;
+    g_EcoSystem = this;
     unitsPerCoordinate = 1.0f;
     coordinatesPerUnit = 1.0f;
 }
@@ -527,7 +527,7 @@ EcoSystem::~EcoSystem() {
         DebugFree(geometryList, __FILE__, 0x2d5);
     if (ageManager)
         delete ageManager;
-    g_UnknownGlobal59aebc = 0;
+    g_EcoSystem = 0;
     g_UnknownGlobal59aefc = 0;
 }
 
@@ -880,9 +880,9 @@ int EcoSystem::PlaceStoredObjects() {
         vegetation[i].PlaceQuantized(textureManager, definition, &coordinates, heightParameter, radiusParameter);
         float radius = definitionTable[definition]->RadiusForParameter(radiusParameter);
         float height = definitionTable[definition]->HeightForParameter(heightParameter);
-        float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
-        float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float x = vegetation[i].quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+        float y = vegetation[i].quantizedPosition.y * g_EcoSystem->unitsPerCoordinate;
+        float z = vegetation[i].quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
         unsigned int code = g_collisionQuadTree->ComputeCode((x - radius), (z - radius), (x + radius), (z + radius));
         g_MemTagStack->Push("QuadTree");
         g_collisionQuadTree->Insert(&vegetation[i], code, y, y + height);
@@ -1012,9 +1012,9 @@ int EcoSystem::PrepareGeometry() {
                 Vector3 center;
                 if (radius <= height)
                     radius = height;
-                center.x = object->quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-                center.y = object->quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + height;
-                center.z = object->quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+                center.x = object->quantizedPosition.x * g_EcoSystem->unitsPerCoordinate;
+                center.y = object->quantizedPosition.y * g_EcoSystem->unitsPerCoordinate + height;
+                center.z = object->quantizedPosition.z * g_EcoSystem->unitsPerCoordinate;
                 visible = g_visibilityClipper->SphereInFrustum(ECO_VIEW->camera, &ECO_VIEW->camera->field_0xec,
                                                                &center, radius, 0);
             }
