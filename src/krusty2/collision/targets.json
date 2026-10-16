@@ -416,7 +416,7 @@
     "target_va": "0x00436e50",
     "target_size": 2205,
     "expect": "partial",
-    "notes": "335/2099: the product is the inline by-value MatrixMultiplyInline (retail copies the aliased inverse and b+0x88), frame 0x108 vs retail 0x120. Retail inlines the first contact-offset rotation and calls 0x0042a4b0/0x0042a450/0x0042a510 for the rest (inline budget of one inline helper), keeps a in ebx and b in ebp.",
+    "notes": "2109/2205: same instructions, registers and call sequence as retail (the out-of-line 0x0042a4b0/0x0042a450/0x0042a510/0x00428060 COMDATs, a in ebx, b in ebp). The x87 tail of the inlined product (rel._43/_44) is scheduled after the first SweptBoxOverlap pushes instead of before them.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

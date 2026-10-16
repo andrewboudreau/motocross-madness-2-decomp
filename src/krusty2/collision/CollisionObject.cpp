@@ -2136,41 +2136,43 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
 
     int hit = 0;
     Matrix4 rel;
-    CollisionInvertRigid(&rel, &a->bodyTransform);
+    CollisionInvertRigidRelFrame(&rel, &a->bodyTransform);
     MatrixMultiplyInline(&rel, rel, b->field_0x88);
-    if (SweptBoxOverlap(a->triangleTree->center, a->triangleTree->halfExtents, &b->center,
+    CollisionBoxBounds* tree = a->triangleTree;
+    if (SweptBoxOverlap(tree->center, tree->halfExtents, &b->center,
                     &b->halfExtents, &rel, &a->motionTransform)) {
-        CollisionContactSum sum;
-        CollisionVec3 nodePos(0.0f, 0.0f, 0.0f);
+        Vec3 sum = Vec3(0.0f, 0.0f, 0.0f);
+        CollisionVec3 nodePos;
         int count = 0;
         // Retail makes this call (0x004fc9a0); nodePos is never read.
         ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
-            CollisionHullBody* e = &b->elements[i];
             // Retail makes this call too, for each element; the result is not read.
-            ((CollisionSceneNode*)e->sceneNode)->GetPositionRelativeTo(0, &nodePos);
+            CollisionVec3 elementPos;
+            ((CollisionSceneNode*)b->elements[i].sceneNode)->GetPositionRelativeTo(0, &elementPos);
             if (!b->elementEnabled[i])
                 continue;
+            CollisionHullBody* e = &b->elements[i];
             const Matrix4* xf = &e->worldTransform;
-            Vec3TransformNormalTranspose(&q->contactOffset, q->contactOffset, xf);
-            Vec3TransformNormalTranspose(&q->contactNormal, q->contactNormal, xf);
+            CollisionRotateRowsTo(&q->contactOffset, q->contactOffset, xf);
+            CollisionRotateRowsTo(&q->contactNormal, q->contactNormal, xf);
             q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
             q->contactCount = 0;
             for (int j = 0; j < g_CollisionScratchCount; j++)
-                Vec3TransformNormalTranspose(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
+                CollisionRotateRowsTo(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
             if (TreeTreeQuery(a->pointTree, e->triangleTree, &a->worldTransform, xf, 2, e->vertices,
                             &a->motionTransform)) {
                 CollisionVec3 mean;
                 q->contact = *CollisionDivide(&mean, &q->contact, (float)q->contactCount);
-                Vec3TransformPoint(&q->contact, q->contact, xf);
-                sum.Accumulate(&q->contact);
+                CollisionTransformPointTo(&q->contact, q->contact, xf);
+                sum += *(Vec3*)&q->contact;
                 hit = 1;
                 count++;
             }
-            Vec3TransformNormal(&q->contactOffset, q->contactOffset, xf);
-            Vec3TransformNormal(&q->contactNormal, q->contactNormal, xf);
+            CollisionRotateColsTo(&q->contactOffset, q->contactOffset, xf);
+            CollisionRotateColsTo(&q->contactNormal, q->contactNormal, xf);
             for (int k = 0; k < g_CollisionScratchCount; k++)
-                Vec3TransformNormal(&g_CollisionScratchPoints[k], g_CollisionScratchPoints[k], xf);
+                CollisionRotateColsTo(&g_CollisionScratchPoints[k], g_CollisionScratchPoints[k], xf);
         }
         if (hit) {
             CollisionVec3 mean;
