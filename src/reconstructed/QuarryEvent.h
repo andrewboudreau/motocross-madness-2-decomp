@@ -113,11 +113,13 @@ public:
     // and race objects; not reconstructed.
     int UnknownFunction4de590(UnknownProgressCallback progress);
     // 0x004e04a0, 0x004e04e0, 0x004e04f0, 0x004e0560: memory estimates
-    // (bytes) 0x004de590 sums.
-    int UnknownFunction4e04a0(int value);
-    int UnknownFunction4e04e0();
-    int UnknownFunction4e04f0(int* counts);
-    int UnknownFunction4e0560();
+    // (bytes) 0x004de590 sums and compares against the free video memory:
+    // the terrain by its width, the cube, the model textures by the
+    // per-width counts from Scene::CountTextures, and the race's bikes.
+    int EstimateTerrainBytes(int width);
+    int EstimateCubeBytes();
+    int EstimateModelTextureBytes(int* counts);
+    int EstimateRaceBytes();
     // 0x004e0c30: shows "<string id> <on/off>" (strings 0x1407/0x1408) in
     // the text queue.
     void ShowOnOffMessage(int id, int on);

@@ -368,10 +368,10 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             if (!(target->deviceCaps & 0x4000))
                 available = videoMemory - 0x200000;
         }
-        terrainBytes = UnknownFunction4e04a0((int)terrainWidth);
-        int cubeBytes = hasCube ? UnknownFunction4e04e0() : 0;
-        textureBytes = UnknownFunction4e04f0((int*)modelCounts);
-        int raceBytes = UnknownFunction4e0560();
+        terrainBytes = EstimateTerrainBytes((int)terrainWidth);
+        int cubeBytes = hasCube ? EstimateCubeBytes() : 0;
+        textureBytes = EstimateModelTextureBytes((int*)modelCounts);
+        int raceBytes = EstimateRaceBytes();
         needed = g_UnknownGlobal59af10 * 0x2aaaa + raceBytes + textureBytes + cubeBytes + terrainBytes + 0xa0000;
         terrainTextures.field_0x14 = 0;
         skyTextures.field_0x14 = 0;

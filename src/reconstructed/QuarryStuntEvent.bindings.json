@@ -67,9 +67,9 @@
   "?CommitListenerSettings@PCSoundInterface@@QAEHXZ": "0x004beb80",
   "?Create@BaseQuarryEvent@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004de3b0",
   "?UnknownFunction4de590@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z": "0x004de590",
-  "?UnknownFunction4e04a0@BaseQuarryEvent@@QAEHH@Z": "0x004e04a0",
-  "?UnknownFunction4e04e0@BaseQuarryEvent@@QAEHXZ": "0x004e04e0",
-  "?UnknownFunction4e04f0@BaseQuarryEvent@@QAEHPAH@Z": "0x004e04f0",
+  "?EstimateTerrainBytes@BaseQuarryEvent@@QAEHH@Z": "0x004e04a0",
+  "?EstimateCubeBytes@BaseQuarryEvent@@QAEHXZ": "0x004e04e0",
+  "?EstimateModelTextureBytes@BaseQuarryEvent@@QAEHPAH@Z": "0x004e04f0",
   "?ShowOnOffMessage@BaseQuarryEvent@@QAEXHH@Z": "0x004e0c30",
   "?ResetClock@BaseQuarryEvent@@QAEXXZ": "0x004e1f00",
   "?ReadCurrentSceneName@UnknownTrackGameObject574@@QAEXPAD0H@Z": "0x004ea390",
@@ -155,6 +155,6 @@
   "_s_DebugRow": "0x00689bbc",
   "_sprintf": "0x00534aaf",
   "_strncpy": "0x00534b10",
-  "?UnknownFunction4e0560@BaseQuarryEvent@@QAEHXZ": "0x004e0560",
+  "?EstimateRaceBytes@BaseQuarryEvent@@QAEHXZ": "0x004e0560",
   "?InProCircuitCareer@TrackGame@@QAEHXZ": "0x00521cd0"
 }

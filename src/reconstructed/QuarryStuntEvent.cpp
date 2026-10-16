@@ -119,22 +119,22 @@ void BaseQuarryEvent::UnknownVirtualSlot34(int a, int b, int c) {
 }
 
 // 0x004e04a0
-int BaseQuarryEvent::UnknownFunction4e04a0(int value) {
+int BaseQuarryEvent::EstimateTerrainBytes(int width) {
     int size;
-    if (value == 3)
+    if (width == 3)
         size = 35;
     else
-        size = value == 5 ? 55 : 106;
+        size = width == 5 ? 55 : 106;
     return size * 0x80000 / 3;
 }
 
 // 0x004e04e0
-int BaseQuarryEvent::UnknownFunction4e04e0() {
+int BaseQuarryEvent::EstimateCubeBytes() {
     return 0x200000;
 }
 
 // 0x004e04f0
-int BaseQuarryEvent::UnknownFunction4e04f0(int* counts) {
+int BaseQuarryEvent::EstimateModelTextureBytes(int* counts) {
     return counts[0] * 0x80000 / 3 + counts[1] * 0x20000 / 3 + counts[2] * 0x8000 / 3 + counts[3] * 0x2000 / 3;
 }
 
@@ -156,7 +156,7 @@ struct UnknownQuarryBikeChoice {
 // field_0x560 constant an if/else assignment: VC6 still emits the branchless
 // neg/sbb/and/add last, and with the ternary inside the return it keeps
 // g_TrackGame in a register across the first loop and spills a count (22/331).
-int BaseQuarryEvent::UnknownFunction4e0560() {
+int BaseQuarryEvent::EstimateRaceBytes() {
     int players = 0;
     int opponents = 0;
     if (g_TrackGame->InProCircuitCareer()) {
