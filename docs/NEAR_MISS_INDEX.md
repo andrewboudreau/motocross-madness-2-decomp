@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 143, c 106, total 250. The three class (a) functions of the
+Counts: a 1, b 143, c 105, total 249. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -90,7 +90,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/collision/CollisionObject | `0x00437ef0` | 857/906 | c | ModelVsHullSwept: frame 0x7c matches; mean and nested enabled test as ModelVsHull. Left: scheduling of the two box copies and one push; assignment after declaration, component-wise copies and the reversed declaration order do not move it |
 | krusty2/collision/CollisionObject | `0x00438280` | 705/710 | c | ModelVsModel: as ModelVsHull, with the same per-component mean; an element-pointer local before the call fixes the mean copy registers. Left: one by-value copy schedule (`sub esp, 0xc` placement) |
 | krusty2/collision/CollisionObject | `0x00438550` | 734/783 | c | ModelVsModelSwept keeps the last contact (no averaging); an element-pointer local before the call fixes the loop registers. Left: scheduling of the two box copies (as 0x00437ef0); assignment after declaration, component-wise copies and the reversed declaration order do not move it |
-| krusty2/collision/CollisionObject | `0x004392c0` | 303/311 | c | 6 code diffs: `mov eax, [esp + N] ; mov ecx, [eax + 0x~` vs `mov ecx, [esp + N] ; mov eax, [ecx + 0x~`; `dec ecx` vs `dec eax` |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 390/1885 | b | UpdateModelBounds: natural `center - extent` Min argument; this source exhausts the inline budget one site before retail (operator- called, frame 0x128 vs 0x134). Two dead `if`s (calibration) reproduce all but the loop entry test, see VC6_INLINE_BUDGET |
 | krusty2/collision/CollisionObject | `0x00435830` | 163/1688 | b | SetTransform: per-element term order of the hull case's inline 4x4 product (retail 3,2,1,4 / 1,3,4,2 / ...; arena ordering, see VC6_OPERAND_ORDER.md 3.2); frame 0x30 both |
 | krusty2/collision/CollisionObject | `0x00439820` | 1309/1493 | b | SegmentTouchesObject: same instructions as retail; some temporaries in other frame slots, one `add esp` scheduled late |

@@ -545,8 +545,8 @@
     "candidate_symbol_contains": "TestMeshBounds@CollisionObject",
     "target_va": "0x004392c0",
     "target_size": 311,
-    "expect": "partial",
-    "notes": "303/311, same size; only an ecx/eax swap for other remains.",
+    "expect": "exact",
+    "notes": "Exact once the second model case sets boundsB before reading other->shape.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
