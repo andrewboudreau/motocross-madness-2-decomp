@@ -12964,6 +12964,15 @@ CASES = [
         'reason': 'RTTI vtable 0x557014 slot 29',
     },
     {
+        'name': 'ProCircuitProcs.cpp PCBonusTrackDlg slot29',
+        'bindings': 'src/reconstructed/ProCircuitProcs.bindings.json',
+        'source': 'src/reconstructed/ProCircuitProcs.cpp',
+        'symbol': '?HandleEvent@PCBonusTrackDlg@@UAEXPAUUnknownDialogEvent@@@Z',
+        'target_va': '0x004d9cd0',
+        'target_size': 755,
+        'reason': 'RTTI vtable 0x557434 slot 29',
+    },
+    {
         'name': 'ProCircuitProcs.cpp PCNewEventDlg slot 29',
         'bindings': 'src/reconstructed/ProCircuitProcs.bindings.json',
         'source': 'src/reconstructed/ProCircuitProcs.cpp',

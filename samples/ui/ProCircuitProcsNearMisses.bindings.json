@@ -287,7 +287,6 @@
   "?HandleEvent@OptionsDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004b4280",
   "?HandleEvent@PCBailoutDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004d8fc0",
   "?HandleEvent@PCBailoutDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054d194",
-  "?HandleEvent@PCBonusTrackDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004d9cd0",
   "?HandleEvent@PCBunnyDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004d9860",
   "?HandleEvent@PCBunnyDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054d234",
   "?HandleEvent@PCCentralBikeRiderDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004d6770",

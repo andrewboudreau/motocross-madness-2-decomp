@@ -830,6 +830,76 @@ void PCFinishedDlg::HandleEvent(UnknownDialogEvent* event)
     }
 }
 
+// 0x004d9cd0: the bonus-track offer. Init pays the $3000 bonus and marks the
+// series' bonus track offered; accepting sets up the race on the circuit's
+// next track. The text buffer is declared in each case where it is used;
+// declared at the top of the function VC6 gives it another slot and picks
+// other registers (48 of 755 bytes).
+void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
+{
+    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
+    switch (event->kind) {
+    case kDialogInit: {
+        UnknownTrackGameObject3444* current = g_TrackGame->proCircuit;
+        // TrackGame+0x18fc: an int per series (the bonus track was offered).
+        ((int*)g_TrackGame->mode.bonusTrackUnlocked)[current->series] = 1;
+        int title;
+        int description;
+        switch (current->series) {
+        case 2:
+            title = 0x1457;
+            description = 0x1459;
+            break;
+        case 3:
+            title = 0x1458;
+            description = 0x145a;
+            break;
+        }
+        UnknownSetText(FindControl("TitleText", 12), title);
+        UIControl* control = FindControl("TxtDescription", 12);
+        control->wordWrap = 1;
+        UnknownSetText(control, description);
+        UnknownSetText(FindControl("TxtItem1", 12), 0x145b);
+        UIControl* item = FindControl("Item1", 12);
+        char text[128];
+        sprintf(text, "$%d", 3000);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        FindControl("Back", 1)->Show(0, 1);
+        current->racers[0].money += 3000;
+        break;
+    }
+    case kDialogCommand:
+        if (_stricmp("ButAccept", event->controlName) == 0) {
+            g_TrackGame->eventManager->ResetEntries();
+            g_TrackGame->mode.raceSettings.eventType = circuit->series;
+            g_TrackGame->mode.raceSettings.raceMode = 1;
+            g_TrackGame->mode.raceSettings.lapCount = circuit->schedules[circuit->series].laps;
+            g_TrackGame->mode.raceSettings.aiRacerCount = circuit->racerCount - 1;
+            g_TrackGame->mode.raceSettings.treeCollision = 1;
+            g_TrackGame->mode.SelectSeries(circuit->series);
+            char text[128];
+            strcpy(text, circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].trackKey);
+            char* extension = strrchr(text, '.');
+            if (extension)
+                *extension = 0;
+            strcpy(g_TrackGame->mode.raceSettings.trackName, text);
+            if (circuit->series == 1 || circuit->series == 5)
+                g_TrackGame->mode.raceSettings.trackNumber = 1;
+            else
+                g_TrackGame->mode.raceSettings.trackNumber = 0;
+            g_TrackGame->mode.difficulty = circuit->difficulty;
+            LeaveMenusForRace();
+            MarkPendingRelease();
+        } else if (_stricmp("ButDecline", event->controlName) == 0) {
+            circuit->AdvanceAfterRace();
+            OpenCareerDialog();
+            EndDialog(0);
+        }
+        break;
+    }
+}
+
 // 0x004d9fd0
 void PCNewEventDlg::HandleEvent(UnknownDialogEvent* event)
 {

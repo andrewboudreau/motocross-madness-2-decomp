@@ -337,5 +337,9 @@
   "??_C@_06IOLI@Status?$AA@": "0x00571bb0",
   "??_C@_06PKIA@Points?$AA@": "0x00571bc4",
   "??_C@_07DEMH@?$CFd?5?1?5?$CFd?$AA@": "0x00571be4",
-  "??_C@_07LOJD@LstDone?$AA@": "0x00571bf4"
+  "??_C@_07LOJD@LstDone?$AA@": "0x00571bf4",
+  "??_C@_08PDA@TxtItem1?$AA@": "0x00571ed8",
+  "??_C@_05JMGC@Item1?$AA@": "0x00571ed0",
+  "?SetFontColor@UIControl@@QAEXI@Z": "0x00470d40",
+  "?HandleEvent@PCBonusTrackDlg@@UAEXPAUUnknownDialogEvent@@@Z": "0x004d9cd0"
 }
