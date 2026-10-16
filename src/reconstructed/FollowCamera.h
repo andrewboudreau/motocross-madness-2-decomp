@@ -259,7 +259,7 @@ protected:
     Vector3 followHeading;  // +0x29C  slot 10 stores slot 41's result ('the heading the camera follows', VehicleCamera.cpp)
     Vector3 cachedTarget;             // +0x2a8, cached slot 57 result (slot 69)
     Vector3 targetPoint;              // +0x2b4, target point (slots 34, 37, 68)
-    float field_0x2c0;          // height-like value: slot 45 needs it above 0 or 6.5 to descend
+    float targetDistance;                     // +0x2C0  state 5 sets FastSqrt(dz*dz + dx*dx + dy) from eye to targetPoint (dy unsquared as in retail); slot 45 needs it above 0 or 6.5 to move closer; maps to the FOV
     float savedDistance;                      // +0x2c4 snapshot of followDistance (slots 49 and 71)
     float savedPitch;                         // +0x2c8 snapshot of followPitch
     float savedYaw;                           // +0x2cc snapshot of followYaw
@@ -272,7 +272,8 @@ protected:
     float yawOffset;                 // +0x2e8, yaw offset (0x00463140, slot 49)
     float field_0x2ec;          // 3.0f
     float state4FieldOfView;         // +0x2f0 state-4 saved targetFieldOfView (slot 71)
-    // State 5 maps +0x2c0 linearly from +0x300 .. +0x2f8 onto +0x2fc .. +0x2f4.
+    // State 5 maps targetDistance (+0x2c0) linearly from +0x300 .. +0x2f8 onto
+    // +0x2fc .. +0x2f4 (the "height" names below predate that decode).
     float heightFovMinimum;          // +0x2f4 10.0f
     float heightForMinimumFov;       // +0x2f8 280.0f
     float heightFovMaximum;          // +0x2fc 70.0f
