@@ -366,8 +366,8 @@ NetworkInterface::NetworkInterface()
     keepAliveEvent = 0;
     players = 0;
     messages = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
+    ringFull = 0;
+    wrappedMessages = 0;
     nextMessage = 0;
     nextSequence = 0;
     InitializeCriticalSection(NET_LOCK(lock));
@@ -918,13 +918,13 @@ void NetworkInterface::QueueMessage(void* data, unsigned int size, int from, int
     while (messages[nextMessage].type & 0x80) {
         nextMessage++;
         if (++tries >= 0x100) {
-            field_0x38 = 1;
+            ringFull = 1;
             return;
         }
         if (nextMessage >= 0x100) {
             nextMessage = 0;
-            field_0x3c = 0x100;
-            field_0x38 = 1;
+            wrappedMessages = 0x100;
+            ringFull = 1;
         }
     }
     if (!from)
@@ -934,8 +934,8 @@ void NetworkInterface::QueueMessage(void* data, unsigned int size, int from, int
     nextMessage++;
     if (nextMessage >= 0x100) {
         nextMessage = 0;
-        field_0x3c = 0x100;
-        field_0x38 = 1;
+        wrappedMessages = 0x100;
+        ringFull = 1;
     }
 }
 

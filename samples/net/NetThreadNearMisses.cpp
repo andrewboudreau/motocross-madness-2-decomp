@@ -85,7 +85,7 @@ void HandleReceivedMessage(unsigned char* data, unsigned int size, int from, int
     int last = -1;
     NetworkInterface* net = g_TrackGame->network;
     if (net->nextMessage == 0) {
-        if (net->field_0x38 != 0)
+        if (net->ringFull != 0)
             last = 0xff;
         s_DuplicateToggle = 0;
     } else {

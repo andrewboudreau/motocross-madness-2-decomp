@@ -413,8 +413,8 @@ public:
     void* keepAliveEvent;
     NetPlayer* players;
     NetMessage* messages;                             // 0x100 received messages
-    int field_0x38;
-    int field_0x3c;
+    int ringFull;                             // +0x38  QueueMessage sets it when the ring wraps or has no free slot; DispatchMessages clears it; the receive thread then takes slot 0xff as the last
+    int wrappedMessages;                      // +0x3C  0x100 once QueueMessage's index wraps (DispatchMessages then starts at nextMessage); 0 after dispatch
     int nextMessage;
     unsigned short nextSequence;                          // guaranteed-message sequence
     NetCriticalSection lock;

@@ -178,8 +178,8 @@ void NetworkInterface::DispatchMessages(int value)
     int more;
 
     ResendPending(value);
-    if (nextMessage || field_0x3c) {
-        if (!field_0x3c) {
+    if (nextMessage || wrappedMessages) {
+        if (!wrappedMessages) {
             index = 0;
             last = nextMessage - 1;
         } else {
@@ -223,7 +223,7 @@ void NetworkInterface::DispatchMessages(int value)
                 index = 0;
         } while (more);
         nextMessage = 0;
-        field_0x3c = 0;
+        wrappedMessages = 0;
     }
-    field_0x38 = 0;
+    ringFull = 0;
 }
