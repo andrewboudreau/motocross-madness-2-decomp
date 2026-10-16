@@ -776,7 +776,7 @@
     "target_va": "0x00435830",
     "target_size": 1676,
     "expect": "partial",
-    "notes": "shape placement by type (jump table 0x435ea8): hull inlines the 4x4 product local*m and the point transform, model calls 0x436500/0x42a510 and UpdateModelBounds, mesh calls CollisionLength, sphere uses its own transform, capsule nothing; the hull product's term order (3,2,1,4 with the local matrix loaded first) is not reproduced by the CollisionMatrixMultiply source form in the inline context",
+    "notes": "shape placement by type (jump table 0x435ea8): 163/1688: hull inlines the 4x4 product local*m and the point transform, model, mesh and sphere call 0x42a510 (Vec3TransformPoint), model calls 0x436500 and UpdateModelBounds, mesh calls CollisionLength, sphere uses its own transform, capsule nothing; the hull product's term order (3,2,1,4 with the local matrix loaded first) is not reproduced by the CollisionMatrixMultiply source form in the inline context",
     "bindings": "CollisionObject.bindings.json"
   },
   {

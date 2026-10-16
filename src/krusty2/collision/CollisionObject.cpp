@@ -2565,6 +2565,7 @@ static inline float CollisionLengthInline(const Vec3& v)
 //   mesh:   the matrix is stored; the sphere is the tree root box.
 //   sphere: the sphere is the shape's own centre and radius through its transform.
 //   capsule: nothing.
+// Only the hull case expands the point transform; the other cases call 0x0042a510 (inline budget).
 void CollisionObject::SetTransform(const Matrix4* m)
 {
     switch (shapeType) {
@@ -2601,7 +2602,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
         Vec3 half = *(Vec3*)&model->halfExtents;
         MoveBox((Vec3*)boundCenter, &half, &model->field_0xc8);
         boundRadius = CollisionLengthInline(half);
-        DebugTransformPoint((Vec3*)boundCenter, *(Vec3*)boundCenter, &model->field_0x88);
+        Vec3TransformPoint(boundCenter, *boundCenter, &model->field_0x88);
         break;
     }
     case 2: {
@@ -2611,7 +2612,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
         *boundCenter = mesh->field_0x04->center;
         CollisionVec3 half = mesh->field_0x04->halfExtents;
         boundRadius = CollisionLength(&half);
-        DebugTransformPoint((Vec3*)boundCenter, *(Vec3*)boundCenter, &mesh->field_0x08);
+        Vec3TransformPoint(boundCenter, *boundCenter, &mesh->field_0x08);
         break;
     }
     case 3:
@@ -2621,7 +2622,7 @@ void CollisionObject::SetTransform(const Matrix4* m)
         CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
         *boundCenter = sphere->center;
         boundRadius = sphere->radius;
-        DebugTransformPoint((Vec3*)boundCenter, *(Vec3*)boundCenter, (const Matrix4*)&sphere->transform);
+        Vec3TransformPoint(boundCenter, *boundCenter, (const Matrix4*)&sphere->transform);
         break;
     }
     }
