@@ -114,7 +114,9 @@ public:
     explicit UnknownKrustyUIShadow(int flags);
     UnknownKrustyUIShadow* Init(void* owner, TextureMapManager* textures); // 0x004da7b0
     void AddCaster(UnknownKrustyUISoultree* caster);     // 0x004dab00: adds a caster
-    void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
+    // 0x004dae50: ProjectedShadow::SetLight (src/krusty2/shadow); mode 3
+    // sets only the light direction.
+    void SetLight(const Vector3* position, const Vector3* direction, int mode);
     void SetShadowStrength(int value);                           // 0x004dace0
     void SetShadowGrey(int value);                           // 0x004dae30
     unsigned char field_0x2c[0x134 - 0x2c];
@@ -374,7 +376,7 @@ void KrustyUI::BuildGarageScene(int value) {
             s468.x += 15.0f;
             s478 = garageFocus - s468;
             // Retail passes the key light's vectors here, not the two just set.
-            shadow->UnknownFunction4dae50(&s488, &s408, 3);
+            shadow->SetLight(&s488, &s408, 3);
             shadow->SetShadowStrength(0x20);
             shadow->SetShadowGrey(0x20);
             pending = 0;

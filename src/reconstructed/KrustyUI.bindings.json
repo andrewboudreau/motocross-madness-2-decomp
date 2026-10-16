@@ -150,7 +150,7 @@
   "?AddCaster@UnknownKrustyUIShadow@@QAEXPAUUnknownKrustyUISoultree@@@Z": "0x004dab00",
   "?SetShadowStrength@UnknownKrustyUIShadow@@QAEXH@Z": "0x004dace0",
   "?SetShadowGrey@UnknownKrustyUIShadow@@QAEXH@Z": "0x004dae30",
-  "?UnknownFunction4dae50@UnknownKrustyUIShadow@@QAEXPBUVector3@@0H@Z": "0x004dae50",
+  "?SetLight@UnknownKrustyUIShadow@@QAEXPBUVector3@@0H@Z": "0x004dae50",
   "?SetCamera@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
   "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?SetAxes@UnknownKrustyUISoultree@@QAEXMMMMMMMH@Z": "0x004fbd10",

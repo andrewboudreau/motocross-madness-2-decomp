@@ -95,7 +95,7 @@
   "?AddCaster@UnknownQuarryShadow@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x004dab00",
   "?SetShadowStrength@UnknownQuarryShadow@@QAEXH@Z": "0x004dace0",
   "?SetShadowGrey@UnknownQuarryShadow@@QAEXH@Z": "0x004dae30",
-  "?UnknownFunction4dae50@UnknownQuarryShadow@@QAEXPBUVector3@@0H@Z": "0x004dae50",
+  "?SetLight@UnknownQuarryShadow@@QAEXPBUVector3@@0H@Z": "0x004dae50",
   "?UnknownFunction4de590@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z": "0x004de590",
   "?UnknownFunction4de590@BaseQuarryEvent@@QAEHP6AXPAH@Z@Z$ehhandler": "0x0054d608",
   "?EstimateTerrainBytes@BaseQuarryEvent@@QAEHH@Z": "0x004e04a0",

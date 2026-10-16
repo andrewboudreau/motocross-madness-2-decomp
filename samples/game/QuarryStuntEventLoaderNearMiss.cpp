@@ -207,7 +207,7 @@ public:
     void AddCaster(D3DIMSoultreeObject* model);    // 0x004dab00: casts a shadow
     void SetShadowStrength(int value);                     // 0x004dace0
     void SetShadowGrey(int value);                     // 0x004dae30
-    void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
+    void SetLight(const Vector3* position, const Vector3* direction, int mode); // 0x004dae50 (ProjectedShadow::SetLight)
 
     unsigned char field_0x2c[0x134 - 0x2c];
 };
@@ -786,7 +786,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)
             ->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->riderCharacter->modelNode);
-        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae50(&shadowLight->position, &shadowLight->look, 3);
+        ((UnknownQuarryShadow*)projectedShadow)->SetLight(&shadowLight->position, &shadowLight->look, 3);
         ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
         int ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
         if (!ambientLight)
