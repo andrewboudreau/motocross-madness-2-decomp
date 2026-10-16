@@ -1016,22 +1016,26 @@ public:
 // 0x00417b00: the debug picker's hit callback (slot 23 passes it to
 // 0x004b0210); stores what was hit in the current race's picker.
 void PickerHitCallback(CollisionObject* self, CollisionObject* other);
-// Debug line end points and their flags, drawn by slot 14; BikeAI.cpp
-// (0x00415ac5..0x00416686), RaceStatus.cpp (0x004e5b38..) and 0x0040e30e
-// write them.
-extern int g_UnknownGlobal577a00;
-extern int g_UnknownGlobal578da8;
-extern int g_UnknownGlobal578dac;
-extern int g_UnknownGlobal578df8;
-extern int g_UnknownGlobal578dd8;
-extern Vector3 g_UnknownGlobal578de0[2];
-extern Vector3 g_UnknownGlobal577a30[2];
-extern Vector3 g_UnknownGlobal577a48[2];
-extern Vector3 g_UnknownGlobal5779d8[2];
-extern Vector3 g_UnknownGlobal577a18[2];
+// Debug line end points and their flags, drawn by slot 14 (red 0xff when
+// the flag is set, else green 0xff). BikeAI.cpp's obstacle query 0x00415640 stores
+// its segment and four copies of it (0x00415ac5..0x00415bdb), clears the
+// five flags and sets each one when that segment touches an object
+// (0x004161e8..0x00416659); RaceStatus.cpp (0x004e5b38..) writes the gate
+// lines and BikeAI's path look-ahead 0x0040d200 (0x0040e30c..0x0040e347)
+// the target line.
+extern int g_ObstacleDebugUpperHit;         // 0x00577a00
+extern int g_ObstacleDebugHit;              // 0x00578da8
+extern int g_ObstacleDebugLowerHit;         // 0x00578dac
+extern int g_ObstacleDebugLeftHit;          // 0x00578df8
+extern int g_ObstacleDebugRightHit;         // 0x00578dd8
+extern Vector3 g_ObstacleDebugUpperLine[2]; // 0x00578de0 the segment raised by 3
+extern Vector3 g_ObstacleDebugLine[2];      // 0x00577a30 the segment
+extern Vector3 g_ObstacleDebugLowerLine[2]; // 0x00577a48 the segment lowered by 1.5
+extern Vector3 g_ObstacleDebugLeftLine[2];  // 0x005779d8 the segment moved 3 against its side vector
+extern Vector3 g_ObstacleDebugRightLine[2]; // 0x00577a18 the segment moved 3 along it
 extern Vector3 g_GateDebugBoxLine[2];
 extern Vector3 g_GateDebugDirectionLine[2];
-extern Vector3 g_UnknownGlobal578dc0[2];
+extern Vector3 g_PathTargetDebugLine[2];    // 0x00578dc0 position to path target, both raised by 3
 
 // 0x004230e0 (cdecl; an UnknownRecorderCallback, its address is passed at
 // 0x0041918a and later): the replay time in milliseconds, then 0x00421d50.
