@@ -108,7 +108,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Bike | `0x0040aec0` | 671/1353 | b | 35 code diffs; slots differ |
 | krusty2/vehicle/Bike | `0x0040c000` | 162/1015 | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
-| krusty2/vehicle/Vehicle | `0x005265d0` | 51/555 | b | 35 code diffs: retail lacks `fld [eax + 8]`; retail adds `mov ebx, [esp + N] ; mov ecx, [esp + N]`; slots differ |
+| krusty2/vehicle/Vehicle | `0x005265d0` | 381/555 | b | same size, 0.82 ratio: two products per cross load a before b; the crashState ?: argument is hoisted above the pushes |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 258/1578 | b | 87 code diffs: retail adds `xor ebx, ebx`; retail lacks `xor ebp, ebp`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x00526fa0` | 1134/1161 | c | frame and slots match; `total = 0` stored from ebp (active) not ebx, `dec ebp` one instruction early, share.y copied before the share.z `fstp` in the blend loops |
 | krusty2/vehicle/Vehicle | `0x005276d0` | 496/523 | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |

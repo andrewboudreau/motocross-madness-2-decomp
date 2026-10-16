@@ -827,45 +827,26 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
     }
 }
 
-static inline Vec3 VehCrossA(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = b.z * a.y - b.y * a.z;
-    r.y = b.x * a.z - b.z * a.x;
-    r.z = b.y * a.x - b.x * a.y;
-    return r;
-}
-static inline Vec3 VehCrossB(const Vec3& a, const Vec3& b)
-{
-    Vec3 r;
-    r.x = a.y * b.z - a.z * b.y;
-    r.y = a.z * b.x - a.x * b.z;
-    r.z = a.x * b.y - a.y * b.x;
-    return r;
-}
 // ---- slot 4 / slot 46 ----
 // Slot 4: builds two lever-arm offsets (a1 + a2 x a3, a7 + a8 x a9), each scaled by a14, and hands
 // them with the frame data to helper 0x5004a0. Afterwards it caches |*a1| in field_0xbc and
-// field_0xcc = the frame transform of field_0xd8 (tier 3).
+// field_0xcc = the frame transform of field_0xd8 (tier 3).  The offsets are Math3D operator
+// expressions (retail stores each sum and product through its own temporary).  Left: two
+// products of each cross load a before b, and VC6 evaluates the inertia ?: argument ahead of
+// the pushes where retail branches between them (spellings of the ?: measured identical).
 void Vehicle::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
                                   const Vec3* a3, int a4, float a5, int a6, const Vec3* a7,
                                   const Vec3* a8, const Vec3* a9, Vec3* a10, Vec3* a11,
                                   int a12, float* a13, float a14)
 {
-    scratchVector = VehCrossA(*a2, *a3);
-    Vec3 p;
-    p.x = (a1->x + scratchVector.x) * a14;
-    p.y = (scratchVector.y + a1->y) * a14;
-    p.z = (scratchVector.z + a1->z) * a14;
-    scratchVector = VehCrossB(*a8, *a9);
-    Vec3 q;
-    q.x = (scratchVector.x + a7->x) * a14;
-    q.y = (scratchVector.y + a7->y) * a14;
-    q.z = (scratchVector.z + a7->z) * a14;
+    scratchVector = CrossProduct(*a2, *a3);
+    Vec3 p = (*a1 + scratchVector) * a14;
+    scratchVector = CrossProduct(*a8, *a9);
+    Vec3 q = (scratchVector + *a7) * a14;
     ContactSolveImpulse(restitution, a0, invMass, modelNode, &p, a3,
                         crashState ? &shapeInvInertia : &invInertia, &angularVelocity, a1, a5,
                         (SoultreeObject*)a6, &q, a9, a10, a11, (Vec3*)a12, a13);
-    float len2 = a1->x * a1->x + a1->y * a1->y + a1->z * a1->z;
+    float len2 = a1->z * a1->z + (a1->x * a1->x + a1->y * a1->y);
     linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
     worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
 }
