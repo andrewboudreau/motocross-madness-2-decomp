@@ -83,10 +83,10 @@ class SoultreeQuadTreeRenderer : public GraphicsTest {
 public:
     explicit SoultreeQuadTreeRenderer(int flags);                    // 0x00504490
     virtual ~SoultreeQuadTreeRenderer();                              // slot 0: deleting 0x00504500, core 0x00504520
-    virtual int GameObjectVirtualSlot10(float dt);                    // 0x00504690
-    virtual int GameObjectVirtualSlot12();                            // 0x00504620
+    virtual int Tick(float dt);                                       // 0x00504690
+    virtual int PrepareGeometry();                                    // 0x00504620
     virtual int GameObjectVirtualSlot14();                            // 0x00504570
-    virtual int GameObjectVirtualSlot23(int a, int b);                // 0x005048d0
+    virtual int OnControlPress(int a, int b);                         // 0x005048d0
 
     void InsertNodesInQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
     void RemoveNodesFromQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)

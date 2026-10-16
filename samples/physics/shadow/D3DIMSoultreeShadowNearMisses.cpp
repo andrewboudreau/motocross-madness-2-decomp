@@ -91,7 +91,7 @@ public:
     char pad_0x00[0xec];
     D3DIMShadowMatrix4 matrix_0xec; // +0xec
 };
-// The render target at GameObject::field_0x18 (slot 29 tests against its camera at +8).
+// The render target at GameObject::renderContext (slot 29 tests against its camera at +8).
 class D3DIMShadowHostView {
 public:
     void* vtable;                   // +0x00
@@ -143,10 +143,10 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot29()
         D3DIMShadowMatrix4 m;
         c->GetMatrixIn(0, &local);
         ((D3DIMShadowCasterView*)caster)->GetBounds(&center, &extent);
-        D3DIMShadowCameraView* camera = ((D3DIMShadowHostView*)field_0x18)->camera;
+        D3DIMShadowCameraView* camera = ((D3DIMShadowHostView*)renderContext)->camera;
         const D3DIMShadowMatrix4& view = camera->matrix_0xec;
         D3DIMShadowMatrixProduct(&m, local, view);
-        if (g_visibilityClipper->TestBox(((D3DIMShadowHostView*)field_0x18)->camera, &m._11, &center.x,
+        if (g_visibilityClipper->TestBox(((D3DIMShadowHostView*)renderContext)->camera, &m._11, &center.x,
                                          &extent.x, 0, 0, 0))
             field_0x38 = 1;
     }

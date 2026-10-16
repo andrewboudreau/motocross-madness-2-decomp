@@ -794,7 +794,7 @@ EcoSystem* EcoSystem::Create(void* view, TextureMapManager* textures, UnknownEco
                                             LightManager* lights, char* path, UnknownTextureStream* stream,
                                             int textureFormat, int collisions, int level) {
     int i;
-    GameObject::UnknownVirtualSlot8(view);
+    GameObject::SetRenderContext(view);
     g_UnknownGlobal59af14 = g_TrackGame->bladeRenderer ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     SetDetailLevel(level);
     groundTerrain = terrain;
@@ -978,7 +978,7 @@ void EcoSystem::LightingChanged() {
 }
 
 // 0x0045aad0
-int EcoSystem::UnknownVirtualSlot12() {
+int EcoSystem::PrepareGeometry() {
     if (!g_UnknownGlobal56a12c)
         return 1;
     int category = g_MemTagStack->Push("EcoSystem");
@@ -1119,8 +1119,8 @@ void EcoSystem::SetRenderStates(int format) {
 }
 
 // 0x0045bfe0: the key toggling the drawing.
-int EcoSystem::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (GameObject::UnknownVirtualSlot23(event, entry))
+int EcoSystem::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (GameObject::OnControlPress(event, entry))
         return 1;
     if (TestInputEvent(4, 0, event, 0x80)) {
         g_UnknownGlobal56a12c = 1 - g_UnknownGlobal56a12c;

@@ -986,11 +986,11 @@ void SoultreeObject::UnknownVirtualSlot8(SoultreeObject* src, SoultreeObject* ds
 }
 
 // 0x004fec30. GameObject slot 25: forwards to the children first.
-int SoultreeObject::GameObjectVirtualSlot25(int a)
+int SoultreeObject::AttachRenderContext(int a)
 {
     for (SoultreeObject* c = firstChild; c; c = c->nextSibling)
-        c->GameObjectVirtualSlot25(a);
-    return GameObject::GameObjectVirtualSlot25(a);
+        c->AttachRenderContext(a);
+    return GameObject::AttachRenderContext(a);
 }
 
 // 0x004fec70. Slot 6: identity local matrices for this node, its later siblings and its

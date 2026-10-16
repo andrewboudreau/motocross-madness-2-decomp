@@ -200,7 +200,7 @@ public:
     Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float a8,
          float a9, float a10, float a11, float a12, float a13, float a14, int a15);
     virtual ~Tire();                            // slot 0 @12 (0x005133a0), core 0x005133d0
-    virtual GameObject* GameObjectVirtualSlot8(int a);  // 0x00513490
+    virtual GameObject* SetRenderContext(int a);        // 0x00513490
     virtual void CollisionPointVirtualSlot1();  // CollisionPoint slot 1 @184, 0x00515b50
 
     // Non-virtual members (this == complete object).

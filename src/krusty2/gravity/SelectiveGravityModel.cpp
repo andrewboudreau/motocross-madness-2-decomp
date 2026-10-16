@@ -39,9 +39,9 @@ void SelectiveGravityModel::AddBody(GravityBody* body)
 }
 
 // slot 10, 0x004f9860
-int SelectiveGravityModel::GameObjectVirtualSlot10(float dt)
+int SelectiveGravityModel::Tick(float dt)
 {
-    GameObject::GameObjectVirtualSlot10(dt);
+    GameObject::Tick(dt);
     if (!field_0x38)
         GameObjectVirtualSlot11(dt);
     return 1;

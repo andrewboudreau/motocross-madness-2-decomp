@@ -48,7 +48,7 @@ public:
                                               ParticleVertexBuffer** buffer, unsigned long flags);
 };
 
-// GameObject::field_0x18 as slot 27 walks it: (+0x04)->(+0x194) is the Direct3D object.
+// GameObject::renderContext as slot 27 walks it: (+0x04)->(+0x194) is the Direct3D object.
 struct ParticleDeviceHolder {
     char field_0x00[0x194];
     ParticleDirect3D* direct3D;    // +0x194
@@ -145,7 +145,7 @@ class ParticleManager : public GameObject {
 public:
     explicit ParticleManager(int flags);
     virtual ~ParticleManager();
-    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int Tick(float dt);
     virtual int GameObjectVirtualSlot14();
     // 0x004ba4d0 (ret 0x10): returns this, or 0 (after BaseObject slot 2) when a vertex buffer
     // or the index array is missing.

@@ -217,10 +217,10 @@ public:
     virtual GameObject* UnknownVirtualSlot9(void* owner, const char* name, int a, int b, int c);
 
     // GameObject slots (`this` is the GameObject subobject).
-    virtual void UnknownVirtualSlot4();            // 0x00444540
-    virtual void UnknownVirtualSlot5();            // 0x00444520
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00443490
-    virtual int UnknownVirtualSlot12();            // 0x00443aa0
+    virtual void Disable();                        // 0x00444540
+    virtual void Enable();                         // 0x00444520
+    virtual int Tick(float frameTime);                 // 0x00443490
+    virtual int PrepareGeometry();                 // 0x00443aa0
     virtual int UnknownVirtualSlot14();            // 0x00444030
 
     void SetPositionVec3(Vector3 position);  // 0x004fc630: sets the local translation

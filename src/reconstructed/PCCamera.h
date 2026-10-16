@@ -17,7 +17,7 @@ public:
     // one (a tail jump to ~Camera with no PCCamera vptr store).
     explicit PCCamera(int flags); // 0x004bed80
 
-    virtual int UnknownVirtualSlot13();
+    virtual int RenderPre3D();
     virtual void TakeScreenshot();
     virtual int SetWorldMatrix(const Matrix4* world);       // world matrix
     virtual int SetViewMatrix(const Matrix4* view);        // view matrix

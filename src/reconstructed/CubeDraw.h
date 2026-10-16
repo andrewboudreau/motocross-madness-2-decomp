@@ -80,8 +80,8 @@ class DrawableCube : public GameObject {
 public:
     explicit DrawableCube(int flags);         // 0x0043d910
     virtual ~DrawableCube();                  // 0x0043e290 (deleting wrapper 0x0043d960)
-    virtual int UnknownVirtualSlot12();       // 0x0043e850: visibility, then texture use
-    virtual int UnknownVirtualSlot13();       // 0x00467ae0 (shared `return 1` body)
+    virtual int PrepareGeometry();            // 0x0043e850: visibility, then texture use
+    virtual int RenderPre3D();                // 0x00467ae0 (shared `return 1` body)
     virtual int UnknownVirtualSlot14();       // 0x0043e4c0: draws the visible cells
 
     // 0x0043d980: reads the palettes and cubes listed in `stream`.

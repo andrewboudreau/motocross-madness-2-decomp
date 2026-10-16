@@ -90,7 +90,7 @@ ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
                                                   UnknownPickCallback callback, GameCursor* cursor) {
     Vector3 segment[2];
 
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     pickRay = new(__FILE__, 36) CollisionObject(1);
     pickRay->Configure(target, 1, 1, 1);
     segment[0] = Vector3(0.0f, 0.0f, 0.0f);

@@ -28,8 +28,8 @@ void UnknownFunction447910(void* window);
 // One text row, 0x98 bytes from +0xb4 (stride and fields from 0x00447de0,
 // 0x00447e90 and slot 14).
 struct DebugOverlayRow {
-    int x;                                    // left, relative to field_0x26b8
-    int y;                                    // top, relative to field_0x26bc
+    int x;                                    // left, relative to rowsLeft
+    int y;                                    // top, relative to rowsTop
     int right;                                // 0x100
     int bottom;                               // y + line height
     char text[0x80];
@@ -51,13 +51,13 @@ public:
     explicit DebugOverlay(int flags);                                   // 0x00447920
     virtual ~DebugOverlay();                  // 0x00447990 (deleting wrapper 0x00447970)
     virtual int UnknownVirtualSlot14();       // 0x00448030
-    virtual int UnknownVirtualSlot25(void* value); // 0x00448520
+    virtual int AttachRenderContext(void* value);  // 0x00448520
 
     // 0x00447de0: sets the overlay up; returns it, or 0.
     DebugOverlay* Setup(RenderTarget* a, TextureMapManager* b,
                                         int c, int d, int e);
     // 0x00447a00: loads "DebugOverlayText.tga", or renders the font
-    // ("Courier", height field_0x36d0) into a new 256x256 texture through GDI.
+    // ("Courier", height fontHeight) into a new 256x256 texture through GDI.
     int LoadFont();
     // 0x00447e90 (ret 0xc): sets the text of row `row` when it changed.
     void SetRowText(int row, const char* text, int flag);
@@ -66,7 +66,7 @@ public:
     // is shown (+0x25 bit 0 and +0x26c4); cdecl, `this` on the stack.
     void Print(int page, const char* format, ...);
     void Title(int page, const char* format, ...);
-    // 0x00448000 (ret 0xc): sets field_0x90 of row `row` on a shown page.
+    // 0x00448000 (ret 0xc): sets `highlighted` (+0x90) of row `row` on a shown page.
     void SetRowHighlight(int page, int row, int flag);
     // 0x00448200 (ret 0x14): draws `length` characters of `text` at (x, y).
     void DrawString(int x, int y, const char* text, int length, unsigned int color);
@@ -75,17 +75,17 @@ public:
     char rowText[0x80];                       // formatted row
     int pageRowCount;                         // rows on the shown page
     int field_0xb0;
-    DebugOverlayRow field_0xb4[64];
+    DebugOverlayRow rows[64];                 // +0xb4 SetRowText / Print rows, drawn by slot 14
     int lineHeight;                           // line height
     int rowsLeft;                             // left of the rows
     int rowsTop;                              // top of the rows
     int nextPage;                             // next page number
-    int field_0x26c4;                         // page shown
+    int shownPage;                            // +0x26c4 page shown; Print/Title only format onto it, 0x004484f0 advances it
     int rowLimit;                             // row limit
     float vertexZ;                            // vertex z, 0.001
-    DebugOverlayGlyph field_0x26d0[256];
+    DebugOverlayGlyph glyphs[256];            // +0x26d0 font cells, filled by LoadFont
     int fontHeight;                           // font height
-    TextureMapManager* field_0x36d4;
+    TextureMapManager* textureManager;        // +0x36d4 Setup's manager; LoadFont creates the font PCTextureMap with it
     PCTextureMap* fontTexture;                // font texture
     int drawTime;                             // +0x36dc ReadClock() ticks slot 14 took; Game slot 8: "[this overlay %d]"
 };

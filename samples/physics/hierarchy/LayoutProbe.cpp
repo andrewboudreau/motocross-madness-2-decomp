@@ -28,7 +28,7 @@ class Vehicle : public SoultreePhysicsCharacter {
 public:
     Vehicle();
     virtual ~Vehicle();                         // core 0x00526380
-    virtual int GameObjectVirtualSlot10(float dt);  // 0x0052a830
+    virtual int Tick(float dt);                     // 0x0052a830
     char veh_block_0x434[0x5bc - 0x434];        // 392 bytes; vtordisp at 0x5bc, GameObject at 0x5c0
 };
 
@@ -49,7 +49,7 @@ class KrustyBike : public Bike {
 public:
     KrustyBike();
     virtual ~KrustyBike();                      // core 0x00491540
-    virtual int GameObjectVirtualSlot10(float dt);  // 0x004977a0
+    virtual int Tick(float dt);                     // 0x004977a0
     char kb_block_0x734[0x1608 - 0x734];        // 3796 bytes; vtordisp at 0x1608, GameObject at 0x160c
 };
 
@@ -113,12 +113,12 @@ SoultreePhysicsCharacter::~SoultreePhysicsCharacter()
 // When slot 42 reports true, field_0x430 is cleared and field_0x431 set (both are cleared by
 // slot 1); then the physics update (SoultreePhysicsBaseObject, 0x005036f0) and the plain
 // GameObject update (0x004693d0) run with the same frame time.  Tier 1 control flow.
-int SoultreePhysicsCharacter::GameObjectVirtualSlot10(float dt)
+int SoultreePhysicsCharacter::Tick(float dt)
 {
     if (UnknownVirtualSlot42()) {
         field_0x430 = 0;
         field_0x431 = 1;
     }
-    SoultreePhysicsBaseObject::GameObjectVirtualSlot10(dt);
-    return GameObject::GameObjectVirtualSlot10(dt);
+    SoultreePhysicsBaseObject::Tick(dt);
+    return GameObject::Tick(dt);
 }

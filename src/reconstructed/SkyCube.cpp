@@ -35,7 +35,7 @@ SkyCube* SkyCube::Create(void* value, UnknownTextureStream* stream, UnknownCubeT
 }
 
 // 0x004fb260
-int SkyCube::UnknownVirtualSlot10(float frameTime) {
+int SkyCube::Tick(float frameTime) {
     Vector3 center;
     center.x = CAMERA()->eyePosition.x;
     center.y = CAMERA()->eyePosition.y + centerHeight;

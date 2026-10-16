@@ -181,7 +181,7 @@ struct UnknownLobbySettingsMessage {
 class MPEventDlg : public UIDialog {
 public:
     MPEventDlg() : UIDialog(1, "MPEvent.dtm") {}
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f5f30
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x004f5f30
     void HandleEvent(UnknownDialogEvent* event); // 0x004f6370
     void ShowHostSettings();             // 0x004f6070: shows the host's settings
     void EnableChangeableControls();             // 0x004f69d0: enables the controls the player may change
@@ -197,9 +197,9 @@ public:
 class MPBikeRiderDlg : public UIDialog {
 public:
     MPBikeRiderDlg() : UIDialog(1, "MPBikeR.dtm") {}
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004f8820: turns the bike view
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004f8780
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f8620
+    virtual int Tick(float frameTime);                 // 0x004f8820: turns the bike view
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004f8780
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x004f8620
     void SyncValues(int apply);     // 0x004f91e0: stores the chosen bike and rider
     void ApplyLargestOpponentClass();             // 0x004f8650: client: selects the host's largest opponent class
     void EnableLargestOpponent();             // 0x004f8700: enables "LargestOpponentDropDown" for the host only
@@ -233,7 +233,7 @@ public:
 class MPOptionsDlg : public UIDialog {
 public:
     MPOptionsDlg() : UIDialog(1, "MPOpt.dtm") {}
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f9570
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x004f9570
     void HandleEvent(UnknownDialogEvent* event); // 0x004f93c0
     void RefreshValues();             // 0x004f95a0: UpdateBoundValues(0)
     void EnableHostOptions();             // 0x004f95b0: enables the host options and "ChkRecordRace"
@@ -244,7 +244,7 @@ public:
 class MultiPlayerDlg : public UIDialog {
 public:
     MultiPlayerDlg() : UIDialog(1, "MPBase.dtm") {} // inline (KrustyUI 0x00499b20)
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f3a70
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x004f3a70
     void HandleEvent(UnknownDialogEvent* event); // 0x004f4520
     void FillRacerSlots();             // 0x004f20d0: fills the racer slots for the race
     void SendStartMessage(short start);  // 0x004f2340: sends the lobby start message (type 0x83)

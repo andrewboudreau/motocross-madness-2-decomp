@@ -390,7 +390,7 @@
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@UAEHM@Z",
+    "candidate_symbol_contains": "?Tick@SoultreePhysicsBaseObject@@UAEHM@Z",
     "target_va": "0x005036f0",
     "target_size": 202,
     "notes": "Strict exact once SoultreeRefreshContacts 0x43ad80 is bound.",
@@ -420,7 +420,7 @@
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@$4PPPPPPPM@A@AEHM@Z",
+    "candidate_symbol_contains": "?Tick@SoultreePhysicsBaseObject@@$4PPPPPPPM@A@AEHM@Z",
     "target_va": "0x005042d0",
     "target_size": 8,
     "notes": "Exact. vtordisp thunk for the GameObject slot 10 override.",
@@ -472,7 +472,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot12@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "PrepareGeometry@SoultreeQuadTreeRenderer",
     "target_va": "0x00504620",
     "target_size": 104,
     "expect": "exact",
@@ -482,7 +482,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot10@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "Tick@SoultreeQuadTreeRenderer",
     "target_va": "0x00504690",
     "target_size": 75,
     "expect": "exact",
@@ -972,7 +972,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot25@SoultreeObject@@UAEHH@Z",
+    "candidate_symbol_contains": "?AttachRenderContext@SoultreeObject@@UAEHH@Z",
     "target_va": "0x004fec30",
     "target_size": 53,
     "expect": "exact",
@@ -1112,7 +1112,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot23@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "?OnControlPress@SoultreeQuadTreeRenderer",
     "target_va": "0x005048d0",
     "target_size": 101,
     "expect": "exact",
@@ -1152,7 +1152,7 @@
   {
     "class": "SoultreePhysicsObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsObject@@UAEHM@Z",
+    "candidate_symbol_contains": "?Tick@SoultreePhysicsObject@@UAEHM@Z",
     "target_va": "0x00503c50",
     "target_size": 30,
     "expect": "exact",
@@ -1172,7 +1172,7 @@
   {
     "class": "SoultreePhysicsObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsObject@@$4PPPPPPPM@CNA@AEHM@Z",
+    "candidate_symbol_contains": "?Tick@SoultreePhysicsObject@@$4PPPPPPPM@CNA@AEHM@Z",
     "target_va": "0x00504270",
     "target_size": 14,
     "expect": "exact",

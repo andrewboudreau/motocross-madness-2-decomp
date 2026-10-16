@@ -103,18 +103,18 @@ public:
     int pageCursor;                           // +0x1c4 debug key cursor (pages)
     int textureCursor;                        // +0x1c8 debug key cursor (textures)
     int field_0x1cc;
-    int field_0x1d0;
-    UnknownTimer field_0x1d4;
-    UnknownTimer field_0x1e0;
-    UnknownTimer field_0x1ec;
+    int texelsBlitted;                        // +0x1d0 "TexMem Blted" (x bytes/pixel); CacheTexture adds each blit rect's area
+    UnknownTimer texelsBlittedHistory;        // +0x1d4 samples of +0x1d0; its largest is "TexMem Blted"'s peak
+    UnknownTimer blitTimeHistory;             // +0x1e0 samples of now - +0x250; its largest is "BltTime"'s (%d)
+    UnknownTimer texturesBlittedHistory;      // +0x1ec samples of the blitted count; "Textures Blted %d (%d)"
     void* gdiObject;                          // +0x1f8 GDI object (DeleteObject)
-    int field_0x1fc[9];
-    int field_0x220[9];
-    int field_0x244;
-    int field_0x248;
-    int field_0x24c;
-    int field_0x250;
-    int field_0x254;
+    int requestedBySize[9];                   // +0x1fc per size level; "Size Requested Granted" column 1
+    int grantedBySize[9];                     // +0x220 per planned level; "Size Requested Granted" column 2
+    int texelsRequested;                      // +0x244 "TexMemRequested"; sum of the requested levels' areas
+    int texelsGranted;                        // +0x248 "TexMemGranted"; sum of the planned levels' areas
+    int texelsManaged;                        // +0x24c "TexMemManaged"; sum of the textures' full-size areas
+    int blitStartTime;                        // +0x250 clock before the blits; "BltTime" prints now minus it
+    int debugPage;                            // +0x254 debug overlay page (-1 until NewPage), titled "TextureManager ..."
 };
 
 // RTTI: TextureMapManager : GameObject (vtable 0x0055848c; 0x7c bytes, the
@@ -124,13 +124,13 @@ class TextureMapManager : public GameObject {
 public:
     TextureMapManager();                      // 0x00510bd0
     virtual ~TextureMapManager();             // 0x00510cf0 (deleting wrapper 0x00510cd0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00510dd0: counts frames
-    virtual int UnknownVirtualSlot12();       // 0x00510df0
-    virtual int UnknownVirtualSlot13();       // 0x00510e30
-    virtual int UnknownVirtualSlot15();       // 0x00510e90
-    virtual int UnknownVirtualSlot18();       // 0x00511290: restores every texture
+    virtual int Tick(float frameTime);                 // 0x00510dd0: counts frames
+    virtual int PrepareGeometry();            // 0x00510df0
+    virtual int RenderPre3D();                // 0x00510e30
+    virtual int RenderPost3D();               // 0x00510e90
+    virtual int OnActivate();                 // 0x00511290: restores every texture
     // 0x00510ee0: debug keys stepping through the texture caches.
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x00511180: creates and registers a texture group with `pages` pages.
     ManagedTextureGroup* CreateGroup(int format, int pages, int addressU, int addressV);

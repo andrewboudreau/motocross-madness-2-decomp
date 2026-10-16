@@ -255,12 +255,12 @@ public:
     explicit Scene(int flags);                       // 0x004ea660
     virtual ~Scene();                                // 0x004ea880 (deleting 0x004ea7c0)
 
-    virtual void UnknownVirtualSlot5();              // 0x004eaa60
-    virtual void UnknownVirtualSlot7();              // 0x004eaab0
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004eab00, not reconstructed
+    virtual void Enable();                           // 0x004eaa60
+    virtual void OnEnable();                         // 0x004eaab0
+    virtual int Tick(float frameTime);                 // 0x004eab00, not reconstructed
     virtual int UnknownVirtualSlot14();              // 0x004f0040
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x004ea7e0: stores the owner and settings, adds the sound group child.
     Scene* UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int value, int unused,

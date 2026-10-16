@@ -160,7 +160,7 @@ int PCGame::StartUp(char* message) {
         resourceInstance = instanceHandle;
     size = sizeof(renderer);
     GetRegistryString("Renderer", "HAL", renderer, &size);
-    field_0x2d0 = 0;
+    bladeRenderer = 0;
     if (!_stricmp(renderer, "RGB")) {
         deviceGuid = IID_IDirect3DRGBDevice;
     } else if (!_stricmp(renderer, "MMX")) {
@@ -173,7 +173,7 @@ int PCGame::StartUp(char* message) {
         deviceGuid = IID_IDirect3DRefDevice;
     } else if (!_stricmp(renderer, "Blade")) {
         deviceGuid = g_UnknownBladeDevice556040;
-        field_0x2d0 = 1;
+        bladeRenderer = 1;
     } else {
         deviceGuid = IID_IDirect3DHALDevice;
     }
@@ -203,12 +203,12 @@ int PCGame::StartUp(char* message) {
     display = g_UnknownDisplays68a754[0];
     int flag = useZBuffer && !field_0x544;
     int useLast = GetRegistryFlag("UseLastVideoCard", 0);
-    display = ChooseDisplay(flag, useLast, &field_0x2d0);
+    display = ChooseDisplay(flag, useLast, &bladeRenderer);
     if (!display) {
         *message = 0;
         return 0;
     }
-    if (field_0x2d0)
+    if (bladeRenderer)
         deviceGuid = g_UnknownBladeDevice556040;
     sprintf(name, "DriverInfo\\%s\\AllowDither", display->driverGuidText);
     allowDither = GetRegistryFlag(name, allowDither);
@@ -253,7 +253,7 @@ int PCGame::OnActivate() {
              PCTarget()->zbuffer->Restore()))
             return 0;
         if (rootObject)
-            rootObject->UnknownVirtualSlot18();
+            rootObject->OnActivate();
     }
     return 1;
 }
@@ -261,7 +261,7 @@ int PCGame::OnActivate() {
 // 0x004c0310
 int PCGame::OnDeactivate() {
     if (rootObject)
-        rootObject->UnknownVirtualSlot17();
+        rootObject->OnDeactivate();
     if (fullScreen)
         ShowCursor(1);
     return 1;
@@ -271,14 +271,14 @@ int PCGame::OnDeactivate() {
 int PCGame::OnChar(int value) {
     if (inputSuspended)
         return 1;
-    return rootObject->UnknownVirtualSlot20(value);
+    return rootObject->OnChar(value);
 }
 
 // 0x004c0370
 int PCGame::OnKeyDown(int value) {
     if (inputSuspended)
         return 1;
-    return rootObject->UnknownVirtualSlot21(value);
+    return rootObject->OnKeyDown(value);
 }
 
 // 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.
@@ -318,7 +318,7 @@ int PCGame::SwitchDisplayMode(int mode) {
                 delete renderTarget;
                 renderTarget = 0;
             }
-            display->SetFullscreenDisplayMode(mode, field_0x2d0 == 0);
+            display->SetFullscreenDisplayMode(mode, bladeRenderer == 0);
             if (!AttachRenderTarget())
                 return 0;
         }
@@ -327,7 +327,7 @@ int PCGame::SwitchDisplayMode(int mode) {
             delete renderTarget;
             renderTarget = 0;
         }
-        display->CreateWindowedSurfaces(640, 480, field_0x2d0 == 0);
+        display->CreateWindowedSurfaces(640, 480, bladeRenderer == 0);
         if (!AttachRenderTarget())
             return 0;
     }
@@ -409,7 +409,7 @@ int PCGame::SetRenderStates() {
     renderTarget->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, useZBuffer, 1);
     renderTarget->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
     renderTarget->SetTextureBlend(7, 0);
-    if (field_0x2d0) {
+    if (bladeRenderer) {
         renderTarget->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 1);
         renderTarget->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 1);
     } else {
@@ -516,7 +516,7 @@ int PCGame::InitializeDisplay() {
         if (!display->SetWindowedCooperativeLevel(0, 0, 640, 480))
             return 0;
     }
-    if (!display->SetDisplayMode(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
+    if (!display->SetDisplayMode(640, 480, 16, 2, 0, bladeRenderer == 0, 1))
         return 0;
     return AttachRenderTarget() != 0;
 }

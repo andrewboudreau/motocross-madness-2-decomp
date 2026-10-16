@@ -34,7 +34,7 @@ GameCursor::GameCursor(int flags) : GameObject(flags) {
 GameObject* GameCursor::CreateBound(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
                                               const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     hotSpotX = 1;
     hotSpotY = 1;
     cursorTexture = 0;
@@ -52,7 +52,7 @@ GameObject* GameCursor::CreateBound(void* target, UnknownControlBinding* x, Unkn
 // 0x0043eaf0
 GameObject* GameCursor::Create(void* target, const char* image, TextureMapManager* textures,
                                               BackgroundImage* background, void* palette, Palette8* palette8) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     bindingX = 0;
     bindingY = 0;
     hotSpotX = 1;
@@ -121,8 +121,8 @@ static int s_right;                           // 0x0057eec8
 static POINT s_mouse;                         // 0x0057eed0
 
 // 0x0043ed40
-int GameCursor::UnknownVirtualSlot15() {
-    GameObject::UnknownVirtualSlot15();
+int GameCursor::RenderPost3D() {
+    GameObject::RenderPost3D();
 
     int outside = 0;
     if (bindingX && bindingY) {

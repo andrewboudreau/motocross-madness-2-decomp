@@ -89,7 +89,7 @@ The physics runner adds `src/krusty2` to the include path.
 - Slot 14 0x506220 (3173 bytes, vtable 0x0055825c) is strict exact: the dual-texture probe
   (`DriverInfo\%s\CanRenderDualTextureInSinglePass` / `TerrainDetailTextureMethod`
   registry values, else a ValidateDevice probe), the height-field passes through
-  DrawableGridNode 0x480900 / 0x480920, and the profile page. It needs `field_0x18`
+  DrawableGridNode 0x480900 / 0x480920, and the profile page. It needs `renderContext`
   cast at every use: a cached local or an inline accessor stops VC6 sharing the tail
   of the single-pass branch with the detail pass.
 - `QueryGround` 0x507c10 contains inline fistp instructions not reproduced by the

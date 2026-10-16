@@ -246,9 +246,9 @@ D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
 
 // GameObject slot 4 override (0x00446640, reached through vtordisp thunk 0x004466c0): runs GameObject's
 // slot 4, then clears the four dwords at +0x1f4..+0x200 (ctor 0x004455b0 also zeroes them).
-void D3DIMSoultreeCharacter::GameObjectVirtualSlot4()
+void D3DIMSoultreeCharacter::Disable()
 {
-    GameObject::GameObjectVirtualSlot4();
+    GameObject::Disable();
     *(int*)(d3d_field_0x1a4 + 0x50) = 0;
     *(int*)(d3d_field_0x1a4 + 0x54) = 0;
     *(int*)(d3d_field_0x1a4 + 0x58) = 0;
@@ -256,9 +256,9 @@ void D3DIMSoultreeCharacter::GameObjectVirtualSlot4()
 }
 
 // GameObject slot 5 override (0x00446620, thunk 0x004466d0): forwards to GameObject's slot 5.
-void D3DIMSoultreeCharacter::GameObjectVirtualSlot5()
+void D3DIMSoultreeCharacter::Enable()
 {
-    GameObject::GameObjectVirtualSlot5();
+    GameObject::Enable();
 }
 
 // Constructor 0x004455b0 (ret 8: one argument plus the hidden most-derived flag).  Builds the GameObject
@@ -350,7 +350,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 
     ModelObject* frame = new(__FILE__, 0xd6) ModelObject(statusFlags & 1);
     modelNode = (SoultreeObject*)frame;
-    frame->Load(field_0x18, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
+    frame->Load(renderContext, "", *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64), 1);
     GameObject* frameChild = (ModelObject*)modelNode;
     AppendChild(frameChild, -1);
     modelNode->RegisterNode();
@@ -360,7 +360,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     modelNode->name[n] = 0;
 
     ModelObject* loaded = new(__FILE__, 0xdf) ModelObject(statusFlags & 1);
-    loaded->Load(field_0x18, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
+    loaded->Load(renderContext, name, *(int*)(d3d_field_0x1a4 + 0x60), *(int*)(d3d_field_0x1a4 + 0x64),
                  *(int*)(d3d_field_0x1a4 + 0x68));
     ((SoultreeObject*)loaded)->UnregisterNode();
     OwnerEntry* owner = g_pOwnerRegistry->FindByOwner(loaded);
@@ -371,7 +371,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
         (SceneItem**)DebugMalloc(((ModelObject*)modelNode)->itemCount << 2, __FILE__, 0xeb);
     for (int i = 0; i < ((ModelObject*)modelNode)->itemCount; i++) {
         ((ModelObject*)modelNode)->items[i] = new(__FILE__, 0xed) SceneItem(1);
-        ((ModelObject*)modelNode)->items[i]->Init(field_0x18, ((ModelObject*)modelNode)->field_0x248,
+        ((ModelObject*)modelNode)->items[i]->Init(renderContext, ((ModelObject*)modelNode)->field_0x248,
                                                   ((ModelObject*)modelNode)->field_0x240,
                                                   ((ModelObject*)modelNode)->field_0x244);
         AppendChild(((ModelObject*)modelNode)->items[i], -1);

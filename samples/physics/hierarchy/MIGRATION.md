@@ -54,10 +54,10 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
   - `GraphicsTest` no longer declares a slot 10 override: its vtable inherits 0x004693d0.
   - `sizeof(GraphicsTest) == 0x44` and `sizeof(CollisionObject) == 0xb8` are asserted.
   - The five non-virtual CollisionObject methods that constraint used (0x004324b0, 0x00432800, 0x00435fb0, 0x00435fe0, 0x00438e70) moved into the canonical header.
-  - Overrides are `GameObjectVirtualSlot10(float)`, `GameObjectVirtualSlot14()` and `GameObjectVirtualSlot23(int,int)`. Constraint's overrides are `GameObjectVirtualSlot8/10/11/14`, and `constraint/targets.json` names them `GameObjectVirtualSlotN@ConstraintMethodCollisionModel`. No collision target named a renamed slot.
+  - Overrides are `Tick(float)`, `GameObjectVirtualSlot14()` and `OnControlPress(int,int)`. Constraint's overrides are `SetRenderContext/10/11/14`, and `constraint/targets.json` names them `GameObjectVirtualSlotN@ConstraintMethodCollisionModel`. No collision target named a renamed slot.
   - `QuadTreeObject::field_0x04/0x08` now share names with `BaseObject::field_0x04` and `GameObject::field_0x08`, so the CollisionObject ctor writes `QuadTreeObject::field_0x08`.
 - **Why `GameObject.h` exists.** `SoultreePhysicsBaseObject.h` pulls in `common/Math3D.h`, and Math3D's four `static const Vec3` constants add dynamic initializers to every TU that includes it. Including it from CollisionObject.h renumbered constraint's TU initializer (`$E1`, 0x0043c8e0) and broke that target. The retail TU has exactly one initializer.
-- **`GameObjectVirtualSlot23(int a, int b)`.** Retail 0x004695d0 is `ret 8`, and CollisionObject overrides it (0x00434970). This is the only placeholder signature changed.
+- **`OnControlPress(int a, int b)`.** Retail 0x004695d0 is `ret 8`, and CollisionObject overrides it (0x00434970). This is the only placeholder signature changed.
 - **vtable_counts all print `ok`:** CollisionObject 2/27, QuadTreeObject 2, ConstraintMethodCollisionModel 3/27, GameObject 27, SoultreePhysicsBaseObject 40/27, SoultreePhysicsCharacter 43/12/27, KrustyBike 103/12/27.
 - **SoultreePhysicsCharacter slot 40 (0x00503de0) is resolved.** It is `GameObject* (int, int, const char*, void*, int, Vec3, Vec3, Vec3, void*, int, int, int, int, void*, float, int, float, float, int, char, int)`, which is 27 dwords. A compiled definition emits `ret 0x6c` and the retail `this ? vbase : 0` tail. The per-argument evidence is in the header comment.
 
@@ -89,7 +89,7 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
    - After migrating, run `PYTHONPATH=. python samples/physics/hierarchy/vtable_counts.py <area obj>`. It must print `ok` for every real class.
    - In the LayoutProbe object, `DIFF` is expected for the Vehicle, Bike and KrustyBike stubs.
 4. **Slot names in the canonical hierarchy:**
-   - GameObject slots use `BaseObjectVirtualSlot1..3` and `GameObjectVirtualSlot4..26`, plus `~GameObject` for slot 0.
+   - GameObject slots use `BaseObjectVirtualSlot1..3` and `Disable..26`, plus `~GameObject` for slot 0.
    - The primary slots of SoultreePhysicsBaseObject and its descendants are `UnknownVirtualSlot0..`.
    - Character and D3DIM slots use `CharacterVirtualSlot0..10` and `D3DIMVirtualSlot11`. The distinct prefix avoids ambiguous lookups and accidental overrides between the two bases of SoultreePhysicsCharacter.
 5. **D3DIM fields have a class prefix.** Character and D3DIM fields are named `chr_field_0xNN` and `d3d_field_0xNN`, relative to their own class start. Plain `field_0x1a0` exists in both SoultreePhysicsBaseObject and D3DIM, so an unprefixed name would be ambiguous.
@@ -100,10 +100,10 @@ No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_
 ## Required edits to `soultree_base/SoultreePhysicsBaseObject.h` first (Agent A)
 
 1. **GameObject slot signatures.** These come from the constraint area's retail evidence and from `ret N`:
-   - `virtual GameObject* GameObjectVirtualSlot8(int a);` (0x004692f0: `field_0x18 = a; return this`).
-   - `virtual int GameObjectVirtualSlot10(float dt);` (0x004693d0 and every override use `ret 4`: 0x005036f0, 0x00504210, 0x0052a830, 0x004977a0).
+   - `virtual GameObject* SetRenderContext(int a);` (0x004692f0: `field_0x18 = a; return this`).
+   - `virtual int Tick(float dt);` (0x004693d0 and every override use `ret 4`: 0x005036f0, 0x00504210, 0x0052a830, 0x004977a0).
    - `virtual int GameObjectVirtualSlot11(float dt);` (0x004da540: `mov eax,1; ret 4`).
-   - After this change, update the SoultreePhysicsBaseObject slot-10 override, and the SoultreePhysicsCharacter one in `hierarchy/SoultreePhysicsCharacter.h`, to `int GameObjectVirtualSlot10(float dt)`. Both are currently `void()` to match the shared header.
+   - After this change, update the SoultreePhysicsBaseObject slot-10 override, and the SoultreePhysicsCharacter one in `hierarchy/SoultreePhysicsCharacter.h`, to `int Tick(float dt)`. Both are currently `void()` to match the shared header.
 2. **GameObject fields.** Replace `char field_0x08[0x24]` with `char field_0x08[0x10]; void* field_0x18; char field_0x1c[0x10];`.
    - Add the non-virtual `void AppendChild(void* a, int b);` (bike slot 97).
 3. **Reconcile slot signatures.** SoultreePhysicsBaseObject uses `int` placeholders where areas have typed evidence.
@@ -148,7 +148,7 @@ A trial migration compiled against the canonical header and reproduced the same 
 - **Include** `"../hierarchy/SoultreePhysicsCharacter.h"`.
   - `VehVec3` can become `typedef Vec3 VehVec3;` because both are Math3D Vec3.
   - Keep `VehicleXform` only as a cast target (general rule 6).
-- **Declare** `class Vehicle : public SoultreePhysicsCharacter`, with a `Vehicle(); virtual ~Vehicle();` pair and `int GameObjectVirtualSlot10(float dt);` (0x0052a830).
+- **Declare** `class Vehicle : public SoultreePhysicsCharacter`, with a `Vehicle(); virtual ~Vehicle();` pair and `int Tick(float dt);` (0x0052a830).
   - Vehicle overrides GameObject slots 0 and 10 only.
   - Slots 4 and 5 are adjustor thunks to D3DIM, generated automatically.
 - **Offset fixes:**
@@ -186,7 +186,7 @@ A trial migration compiled against the canonical header and reproduced the same 
 - **Offset fixes:**
   - The stand-in Bike ends at 0x740. The real Bike's data ends at **0x734**, so `field_0x734`, `field_0x735` and `field_0x736` (and `pad_0x0737`) belong to **KrustyBike**. Move them in.
   - KrustyBike's own block is 0x734..0x1608. The stand-in stops at `field_0x15e5` (`sizeof` 0x15e8). Add trailing padding to 0x1608 so that the vbase lands at 0x160c.
-  - Add `KrustyBike(); virtual ~KrustyBike(); int GameObjectVirtualSlot10(float dt);` (0x004977a0).
+  - Add `KrustyBike(); virtual ~KrustyBike(); int Tick(float dt);` (0x004977a0).
   - Expect vtable counts of 103 / 12 / 27.
 
 ## CollisionObject chain: `collision/CollisionObject.h` vs `constraint/ConstraintBase.h`
@@ -214,9 +214,9 @@ Fixes in CollisionObject.h:
    - slot 11 `int (float dt)`
    - The stub currently has `void(int)`, `void(int)` and `int(int)`.
 3. **Rename** GameObject-slot overrides to the canonical names:
-   - `UnknownVirtualSlot10` → `GameObjectVirtualSlot10(float dt)` (CollisionObject 0x00499ae0, GraphicsTest)
+   - `UnknownVirtualSlot10` → `Tick(float dt)` (CollisionObject 0x00499ae0, GraphicsTest)
    - `UnknownVirtualSlot14` → `GameObjectVirtualSlot14`
-   - `UnknownVirtualSlot23` → `GameObjectVirtualSlot23`
-   - Constraint's `UnknownVirtualSlot8/10/11` → `GameObjectVirtualSlot8/10/11`
+   - `UnknownVirtualSlot23` → `OnControlPress`
+   - Constraint's `UnknownVirtualSlot8/10/11` → `SetRenderContext/10/11`
    - Slots 1–3 are `BaseObjectVirtualSlot1..3`.
-   - Mangled names change, so update the `candidate_symbol_contains` values in collision and constraint `targets.json` (for example `GameObjectVirtualSlot10@CollisionObject`).
+   - Mangled names change, so update the `candidate_symbol_contains` values in collision and constraint `targets.json` (for example `Tick@CollisionObject`).

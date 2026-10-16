@@ -51,7 +51,7 @@ class VCRInterface : public GameObject {
 public:
     VCRInterface();                       // 0x004e77f0
     virtual ~VCRInterface();              // 0x004e78b0 (deleting wrapper 0x004e7890)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004e7d60
+    virtual int Tick(float frameTime);                 // 0x004e7d60
 
     // 0x004e7a00: signals `event` and polls every `interval` ms until the
     // worker acknowledges (+0xc8).

@@ -183,7 +183,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot5()
 void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
 {
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
-    GameObject::UnknownVirtualSlot8(source->renderContext);
+    GameObject::SetRenderContext(source->renderContext);
     textureFormat = source->textureFormat;
     textureManager = source->textureManager;
     lightManager = source->lightManager;
@@ -369,7 +369,7 @@ struct UnknownSoultreeMatrix {
 };
 
 // 0x00443aa0
-int D3DIMSoultreeObject::UnknownVirtualSlot12()
+int D3DIMSoultreeObject::PrepareGeometry()
 {
     visible = 0;
     if (!field_0x14c && field_0x190) {
@@ -404,7 +404,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
             SelectLod(&center, &extents);
         }
     }
-    return GameObject::UnknownVirtualSlot12();
+    return GameObject::PrepareGeometry();
 }
 
 

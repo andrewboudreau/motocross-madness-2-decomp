@@ -102,7 +102,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot23",
+    "candidate_symbol_contains": "OnControlPress",
     "target_va": "0x0052eec0",
     "target_size": 135,
     "expect": "exact",
@@ -112,7 +112,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot12",
+    "candidate_symbol_contains": "?PrepareGeometry@VisibilityQuadTree",
     "target_va": "0x0052ef50",
     "target_size": 252,
     "expect": "exact",
@@ -122,7 +122,7 @@
   {
     "class": "VisibilityQuadTree",
     "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot15",
+    "candidate_symbol_contains": "RenderPost3D",
     "target_va": "0x0052f050",
     "target_size": 17,
     "expect": "exact",

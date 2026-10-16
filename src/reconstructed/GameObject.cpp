@@ -48,65 +48,65 @@ GameObject::~GameObject() {
 }
 
 // 0x00469050
-void GameObject::UnknownVirtualSlot6() {
+void GameObject::OnDisable() {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (!child->pendingRelease)
-            child->UnknownVirtualSlot6();
+            child->OnDisable();
     }
 }
 
 // 0x00469070
-void GameObject::UnknownVirtualSlot7() {
+void GameObject::OnEnable() {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->isEnabled && !child->pendingRelease)
-            child->UnknownVirtualSlot7();
+            child->OnEnable();
     }
 }
 
 // 0x004690a0: clears bits 0 and 1, then slot 6.
-void GameObject::UnknownVirtualSlot4() {
+void GameObject::Disable() {
     isEnabled = 0;
     field_0x25_bit1 = 0;
-    UnknownVirtualSlot6();
+    OnDisable();
 }
 
 // 0x004690b0: sets bits 0 and 1, then slot 7.
-void GameObject::UnknownVirtualSlot5() {
+void GameObject::Enable() {
     isEnabled = 1;
     field_0x25_bit1 = 1;
-    UnknownVirtualSlot7();
+    OnEnable();
 }
 
 // 0x004692c0: visits every child, then sets bit 3 on itself.
-void GameObject::UnknownVirtualSlot26() {
+void GameObject::MarkPendingRelease() {
     for (GameObject* child = firstChild; child; child = child->nextSibling)
-        child->UnknownVirtualSlot26();
+        child->MarkPendingRelease();
     pendingRelease = 1;
 }
 
 // 0x004692f0
-GameObject* GameObject::UnknownVirtualSlot8(void* value) {
+GameObject* GameObject::SetRenderContext(void* value) {
     renderContext = value;
     return this;
 }
 
 // 0x00469300
-int GameObject::UnknownVirtualSlot12() {
+int GameObject::PrepareGeometry() {
     if (childFlags & 0x1000) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease)
-                child->UnknownVirtualSlot12();
+                child->PrepareGeometry();
         }
     }
     return 1;
 }
 
 // 0x00469330
-int GameObject::UnknownVirtualSlot13() {
+int GameObject::RenderPre3D() {
     if (childFlags & 0x04) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease)
-                child->UnknownVirtualSlot13();
+                child->RenderPre3D();
         }
     }
     return 1;
@@ -126,22 +126,22 @@ int GameObject::UnknownVirtualSlot14() {
 }
 
 // 0x004693a0
-int GameObject::UnknownVirtualSlot15() {
+int GameObject::RenderPost3D() {
     if (childFlags & 0x10) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease)
-                child->UnknownVirtualSlot15();
+                child->RenderPost3D();
         }
     }
     return 1;
 }
 
 // 0x004693d0
-int GameObject::UnknownVirtualSlot10(float frameTime) {
+int GameObject::Tick(float frameTime) {
     if (childFlags & 0x02) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->isPaused && !child->pendingRelease) {
-                child->UnknownVirtualSlot10(frameTime);
+                child->Tick(frameTime);
                 char* owner = static_cast<char*>(renderContext);
                 if (owner) {
                     UnknownGameObjectOwnerPart* part = *reinterpret_cast<UnknownGameObjectOwnerPart**>(owner + 0x04);
@@ -166,34 +166,34 @@ int GameObject::UnknownVirtualSlot9(int value) {
 }
 
 // 0x00469480: stores the argument's low bit in bit 2, then propagates.
-int GameObject::UnknownVirtualSlot16(int value) {
+int GameObject::SetPaused(int value) {
     isPaused = value;
     if (childFlags & 0x20) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease)
-                child->UnknownVirtualSlot16(value);
+                child->SetPaused(value);
         }
     }
     return 1;
 }
 
 // 0x004694d0
-int GameObject::UnknownVirtualSlot18() {
+int GameObject::OnActivate() {
     if (childFlags & 0x80) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (!child->pendingRelease)
-                child->UnknownVirtualSlot18();
+                child->OnActivate();
         }
     }
     return 1;
 }
 
 // 0x00469500
-int GameObject::UnknownVirtualSlot17() {
+int GameObject::OnDeactivate() {
     if (childFlags & 0x40) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (!child->pendingRelease)
-                child->UnknownVirtualSlot17();
+                child->OnDeactivate();
         }
     }
     return 1;
@@ -213,11 +213,11 @@ int GameObject::UnknownVirtualSlot19(int value) {
 }
 
 // 0x00469580
-int GameObject::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GameObject::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (childFlags & 0x200) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease) {
-                if (child->UnknownVirtualSlot22(event, entry))
+                if (child->OnControlRelease(event, entry))
                     return 1;
             }
         }
@@ -226,11 +226,11 @@ int GameObject::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEnt
 }
 
 // 0x004695d0
-int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GameObject::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (childFlags & 0x400) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->isEnabled && !child->pendingRelease) {
-                if (child->UnknownVirtualSlot23(event, entry))
+                if (child->OnControlPress(event, entry))
                     return 1;
             }
         }
@@ -239,11 +239,11 @@ int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEnt
 }
 
 // 0x00469620: gated by flag 0x800 and child bit 1 (not bit 0).
-int GameObject::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+int GameObject::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     if (childFlags & 0x800) {
         for (GameObject* child = firstChild; child; child = child->nextSibling) {
             if (child->field_0x25_bit1 && !child->pendingRelease) {
-                if (child->UnknownVirtualSlot24(type, data, from, to, flags))
+                if (child->OnNetworkMessage(type, data, from, to, flags))
                     return 1;
             }
         }
@@ -282,12 +282,12 @@ int GameObject::Release() {
 }
 
 // 0x00469720: hands the value to every child, then stores it in field_0x18.
-int GameObject::UnknownVirtualSlot25(void* value) {
+int GameObject::AttachRenderContext(void* value) {
     GameObject* child = firstChild;
     while (child) {
         GameObject* next = child->nextSibling;
         if (!child->pendingRelease)
-            child->UnknownVirtualSlot25(value);
+            child->AttachRenderContext(value);
         child = next;
     }
     renderContext = value;
@@ -295,10 +295,10 @@ int GameObject::UnknownVirtualSlot25(void* value) {
 }
 
 // 0x00469c00: unlike slots 19/22/23, not gated by childFlags.
-int GameObject::UnknownVirtualSlot20(int value) {
+int GameObject::OnChar(int value) {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->isEnabled && !child->pendingRelease) {
-            if (child->UnknownVirtualSlot20(value))
+            if (child->OnChar(value))
                 return 1;
         }
     }
@@ -306,10 +306,10 @@ int GameObject::UnknownVirtualSlot20(int value) {
 }
 
 // 0x00469c40: like slot 20, not gated by childFlags.
-int GameObject::UnknownVirtualSlot21(int value) {
+int GameObject::OnKeyDown(int value) {
     for (GameObject* child = firstChild; child; child = child->nextSibling) {
         if (child->isEnabled && !child->pendingRelease) {
-            if (child->UnknownVirtualSlot21(value))
+            if (child->OnKeyDown(value))
                 return 1;
         }
     }
@@ -469,14 +469,14 @@ void GameObject::DisableByClassName(const char* name) {
         if (child->pendingRelease)
             continue;
         if (strstr(child->classNames, pattern)) {
-            child->UnknownVirtualSlot4();
+            child->Disable();
         } else {
             strcpy(className, typeid(*child).name());
             if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
                 strstr(className, "class ") == className)
-                child->UnknownVirtualSlot4();
+                child->Disable();
             if (!strncmp(className, pattern, length))
-                child->UnknownVirtualSlot4();
+                child->Disable();
         }
         child->DisableByClassName(name);
     }
@@ -493,14 +493,14 @@ void GameObject::EnableByClassName(const char* name) {
         if (child->pendingRelease)
             continue;
         if (strstr(child->classNames, pattern)) {
-            child->UnknownVirtualSlot5();
+            child->Enable();
         } else {
             strcpy(className, typeid(*child).name());
             if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
                 strstr(className, "class ") == className)
-                child->UnknownVirtualSlot5();
+                child->Enable();
             if (!strncmp(className, pattern, length))
-                child->UnknownVirtualSlot5();
+                child->Enable();
         }
         child->EnableByClassName(name);
     }

@@ -5,7 +5,7 @@
   "??1PhysicsRigidBody@@UAE@XZ": "0x004cc1e0",
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7PhysicsRigidBody@@6B@": "0x00556ec0",
-  "?GameObjectVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
+  "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?GameObjectVirtualSlot11@PhysicsRigidBody@@UAEHM@Z": "0x004cc630",
   "?GameObjectVirtualSlot14@PhysicsBody@@UAEHXZ": "0x004cbf10",
   "?GetMatrixIn@SoultreeObject@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",

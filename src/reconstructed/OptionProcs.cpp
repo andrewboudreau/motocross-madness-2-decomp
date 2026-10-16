@@ -133,7 +133,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
         UIListBox* list = dropDown->listPart;
         int i = 0;
         if (g_TrackGame->fullScreen) {
-            if (g_TrackGame->field_0x2d0) {
+            if (g_TrackGame->bladeRenderer) {
                 for (; i < g_TrackGame->display->displayModeCount; i++) {
                     UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];
                     if (mode->field_0x18 == 1) {
@@ -217,7 +217,7 @@ void OptAdvancedGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
         FindControl("SldObjects", 0)->BindValue(&settings[2]);
         FindControl("SldTerrain", 0)->BindValue(&settings[3]);
         FindControl("SldVisibility", 0)->BindValue(&settings[4]);
-        if (g_TrackGame->field_0x2d0)
+        if (g_TrackGame->bladeRenderer)
             FindControl("Txt3DCard", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x1463);
         else
             FindControl("Txt3DCard", 12)->SetText(g_TrackGame->display->deviceIdentifier.description);
@@ -496,20 +496,20 @@ int GetInputText(int row, int kind, int code, char* text)
 }
 
 // 0x004b55d0
-int OptControlsDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
+int OptControlsDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     if (!waitingForInput)
-        return GameObject::UnknownVirtualSlot23(event, entry);
+        return GameObject::OnControlPress(event, entry);
     return 1;
 }
 
 // 0x004b5600
-int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry)
+int OptControlsDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     int other;
     char text[128];
     if (!waitingForInput)
-        return GameObject::UnknownVirtualSlot22(event, entry);
+        return GameObject::OnControlRelease(event, entry);
     if (event->kind == 0 && event->control == 1) {
         UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
         int row = keys->GetSelectedRow();

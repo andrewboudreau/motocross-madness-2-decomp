@@ -70,7 +70,7 @@ VisibilityQuadTree::~VisibilityQuadTree()
 
 GameObject* VisibilityQuadTree::Setup(int parentArg, float x0, float z0, float x1, float z1, float minCell)
 {
-    GameObject::GameObjectVirtualSlot8(parentArg);
+    GameObject::SetRenderContext(parentArg);
     Reset();
     Init(x0, z0, x1, z1, minCell);
     return this;
@@ -97,13 +97,13 @@ int VisibilityQuadTree::Query(float x, float z, VisibilityCamera* camera)
     return 1;
 }
 
-int VisibilityQuadTree::GameObjectVirtualSlot15()
+int VisibilityQuadTree::RenderPost3D()
 {
     EndQuery();
     return 1;
 }
 
-int VisibilityQuadTree::GameObjectVirtualSlot23(int a, int b)
+int VisibilityQuadTree::OnControlPress(int a, int b)
 {
     if (CheckKey(0x44, 0, a, 0x80)) {
         g_visibilityDebugDraw = 1 - g_visibilityDebugDraw;
@@ -118,7 +118,7 @@ int VisibilityQuadTree::GameObjectVirtualSlot23(int a, int b)
     return 0;
 }
 
-int VisibilityQuadTree::GameObjectVirtualSlot12()
+int VisibilityQuadTree::PrepareGeometry()
 {
     int start = ReadClock();
     VisibilityCamera* cam;

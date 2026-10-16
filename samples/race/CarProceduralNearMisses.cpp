@@ -21,7 +21,7 @@
 // and match retail's first 0x19b bytes; the tangent temporaries' slots
 // then differ. No padded source is kept.
 //
-// CarProcedural::UnknownVirtualSlot10 (0x0042fd80, 2909 bytes): the
+// CarProcedural::Tick (0x0042fd80, 2909 bytes): the
 // per-frame update along the path (wheel spin and steering, the collision
 // objects' transform and the body velocity). With relocations and frame
 // offsets masked the instruction stream is 781 instructions like retail's
@@ -228,9 +228,9 @@ static inline float CarClamp(float v, float lo, float hi)
     return v > lo ? (v < hi ? v : hi) : lo;
 }
 
-int CarProcedural::UnknownVirtualSlot10(float frameTime)
+int CarProcedural::Tick(float frameTime)
 {
-    int result = GameObject::UnknownVirtualSlot10(frameTime);
+    int result = GameObject::Tick(frameTime);
     if (frameTime <= 0.0)
         return result;
     if (!started) {

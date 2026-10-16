@@ -15,7 +15,7 @@ class KrustyBike : public Bike {
 public:
     explicit KrustyBike(int flags);   // 0x0048fa60, ret 8 = flags + hidden most-derived flag
     virtual ~KrustyBike();
-    virtual int GameObjectVirtualSlot10(float dt);   // 0x004977a0 (vbase vtable slot 10)
+    virtual int Tick(float dt);                      // 0x004977a0 (vbase vtable slot 10)
 
     virtual void UnknownVirtualSlot1(float a);
     virtual void UnknownVirtualSlot3(const Vec3* a0, const Vec3* a1, const Vec3* a2,

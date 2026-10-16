@@ -42,7 +42,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot8@ConstraintMethodCollisionModel",
+    "candidate_symbol_contains": "SetRenderContext@ConstraintMethodCollisionModel",
     "target_va": "0x43b9a0",
     "target_size": 59,
     "expect": "exact",
@@ -62,7 +62,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot10@ConstraintMethodCollisionModel",
+    "candidate_symbol_contains": "Tick@ConstraintMethodCollisionModel",
     "target_va": "0x43ba40",
     "target_size": 37,
     "expect": "exact",

@@ -841,20 +841,20 @@ public:
     virtual ~BikeRace();                      // 0x0041cf30 (deleting wrapper 0x00417eb0)
     // 0x0041d2b0: per frame: the replay recorder, the race start, the
     // flag girl and the debug page.
-    virtual int UnknownVirtualSlot10(float frameTime);
+    virtual int Tick(float frameTime);
     // 0x00423410: debug drawing (the track, the probes and the debug lines
     // other files leave in globals) while +0x34 is set.
     virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot16(int value); // 0x0041d260
-    virtual int UnknownVirtualSlot20(int value); // 0x0041f590
+    virtual int SetPaused(int value);            // 0x0041d260
+    virtual int OnChar(int value);               // 0x0041f590
     // 0x00420040: network messages 1 (racer state), 13, 10 (score), 0x85
     // (chat text) and 0x84 (time stamps).
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags);
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
     // 0x0041f5e0: keys: chat, camera targets, debug toggles and the debug
     // object picker.
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     // 0x00423880: control 6 (modifier 0x80) toggles drawChildren (+0x3fd).
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     UnknownBikeRaceCameraView* UnknownFunctionCameraView() {
         return (UnknownBikeRaceCameraView*)raceCamera;

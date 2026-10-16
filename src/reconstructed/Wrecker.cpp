@@ -62,7 +62,7 @@ Wrecker::~Wrecker() {
 }
 
 Wrecker* Wrecker::SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name) {
-    GameObject::UnknownVirtualSlot8(owner);
+    GameObject::SetRenderContext(owner);
     CreateBodies(rider, name);
     return this;
 }
@@ -71,15 +71,15 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     character = rider;
     rider->skeleton->TranslateIn(0, Vector3(0.0f, 120.0f, 0.0f));
     gravityModel = new (__FILE__, 0x5b) UnknownWreckerGravityModel(1);
-    gravityModel->UnknownVirtualSlot8(renderContext);
+    gravityModel->SetRenderContext(renderContext);
     AppendChild(gravityModel, -1);
     rigidBody = new (__FILE__, 0x5f) UnknownWreckerRigidBody(1);
-    rigidBody->UnknownVirtualSlot8(renderContext);
+    rigidBody->SetRenderContext(renderContext);
     AppendChild(rigidBody, -1);
     rigidBody->UnknownVirtualSlot28(character->skeleton);
     gravityModel->UnknownVirtualSlot27(rigidBody);
     collisionModel = new (__FILE__, 0x68) UnknownWreckerCollisionModel(1);
-    collisionModel->UnknownVirtualSlot8(renderContext);
+    collisionModel->SetRenderContext(renderContext);
     collisionModel->SetBody(rigidBody, 1, name);
     AppendChild(collisionModel, -1);
     collisionModel->shapeCollisionEnabled = 0;
@@ -262,8 +262,8 @@ static inline void WreckerMatrixProduct(UnknownWreckerMatrix* out, UnknownWrecke
 // at frame 0, the y/z loads through the rep movsd source); the subtract is
 // called by value (its result a temporary). Retail rebuilds up as
 // forward x right. See WreckerStep for the last term order.
-int Wrecker::UnknownVirtualSlot10(float frameTime) {
-    GameObject::UnknownVirtualSlot10(frameTime);
+int Wrecker::Tick(float frameTime) {
+    GameObject::Tick(frameTime);
     if (wreckState == 0) {
         collisionModel->UnknownFunctionStep(frameTime);
         if (skipProbeEffects)
@@ -462,7 +462,7 @@ void Wrecker::UpdateInertia() {
 void Wrecker::StartAnimatedWreck(int index) {
     collisionModel->shapeCollisionEnabled = 1;
     collisionModel->UnknownFunction435fe0();
-    collisionModel->UnknownVirtualSlot5();
+    collisionModel->Enable();
     collisionModel->collisionEnabled = 1;
     collisionModel->collidable = 1;
     collisionModel->applyImpulses = 1;
@@ -478,7 +478,7 @@ void Wrecker::StartAnimatedWreck(int index) {
 void Wrecker::StartTumble() {
     collisionModel->shapeCollisionEnabled = 1;
     collisionModel->UnknownFunction435fe0();
-    collisionModel->UnknownVirtualSlot5();
+    collisionModel->Enable();
     collisionModel->collisionEnabled = 1;
     collisionModel->collidable = 1;
     collisionModel->applyImpulses = 1;
@@ -586,8 +586,8 @@ int Wrecker::UnknownVirtualSlot14() {
     return GameObject::UnknownVirtualSlot14();
 }
 
-int Wrecker::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    return GameObject::UnknownVirtualSlot23(event, entry);
+int Wrecker::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    return GameObject::OnControlPress(event, entry);
 }
 
 void Wrecker::SetPushBox(UnknownWreckerSkeleton* frame, Vector3 center, Vector3 halfExtents) {

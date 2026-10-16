@@ -68,7 +68,7 @@ DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
     char mode;
     int i;
 
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     textureGroup = context->textureGroup;
     if (!stream)
         goto fail;
@@ -225,7 +225,7 @@ int DrawableCube::UnknownVirtualSlot14()
 }
 
 // 0x0043e850
-int DrawableCube::UnknownVirtualSlot12()
+int DrawableCube::PrepareGeometry()
 {
     MarkVisibleCells();
     RecordTextureUse();
@@ -233,7 +233,7 @@ int DrawableCube::UnknownVirtualSlot12()
 }
 
 // 0x00467ae0 (shared `return 1` body)
-int DrawableCube::UnknownVirtualSlot13()
+int DrawableCube::RenderPre3D()
 {
     return 1;
 }

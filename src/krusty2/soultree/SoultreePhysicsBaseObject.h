@@ -46,7 +46,7 @@ public:
     // GameObject(int) virtual-base ctor 0x00468ca0 (tier 1 decoded).  Body not reconstructed.
     explicit SoultreePhysicsBaseObject(int flags);
     virtual ~SoultreePhysicsBaseObject();       // deleting dtor 0x00504290 via vbase vtable slot 0
-    virtual int GameObjectVirtualSlot10(float dt); // override, thunk 0x005042d0 -> 0x005036f0
+    virtual int Tick(float dt);                    // override, thunk 0x005042d0 -> 0x005036f0
     // --- vtable 0x00557d90 (offset 0), slots 0..39, all introduced here ---
     virtual void UnknownVirtualSlot0(float value);
     virtual void UnknownVirtualSlot1(float value);

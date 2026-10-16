@@ -1,7 +1,7 @@
 {
   "?IsDirectShowInstalled@MediaControl@@SAHXZ": "0x004a23d0",
   "?Open@MediaControl@@QAEPAV1@PAXPBDP6AXPAVUIDialog@@@Z2@Z": "0x004a2560",
-  "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "_CLSID_AMMultiMediaStream": "0x00558ec0",
   "_IID_IAMMultiMediaStream": "0x00558ed0",
   "_IID_IDirectDraw": "0x00556080",

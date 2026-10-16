@@ -125,8 +125,8 @@ class UICtlContainer : public GameObject {
 public:
     UICtlContainer() : GameObject(1) {}
     virtual ~UICtlContainer();                // 0x0046e860 (deleting wrapper 0x0046e840)
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0047b440
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0047b3f0
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x0047b440
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0047b3f0
 };
 
 // One state of a UIMultiState (32 bytes; the slots 34-37 overrides read
@@ -151,13 +151,13 @@ public:
     // 0x00470170: `type` is the control kind (5 a static, 12 a static text).
     UIControl(int type, int id, CameraRect* area, UIDialog* owner);
     virtual ~UIControl();          // 0x00470450 (deleting wrapper 0x00470430)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00470e00
-    virtual int UnknownVirtualSlot13();       // 0x00471140
-    virtual int UnknownVirtualSlot15();       // 0x004711a0
-    virtual int UnknownVirtualSlot20(int value); // 0x00472320
-    virtual int UnknownVirtualSlot21(int value); // 0x004723d0
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00472130
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00471fd0
+    virtual int Tick(float frameTime);                 // 0x00470e00
+    virtual int RenderPre3D();                // 0x00471140
+    virtual int RenderPost3D();               // 0x004711a0
+    virtual int OnChar(int value);               // 0x00472320
+    virtual int OnKeyDown(int value);            // 0x004723d0
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00472130
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00471fd0
 
     virtual void AdvanceImages(); // slot 27, 0x00471070: advances the state image and the FX animation
     virtual int ContainsPoint(tagPOINT point, int state); // slot 28, 0x00470990: whether `point` is inside
@@ -373,8 +373,8 @@ public:
     // 0x00473630: `size` is the text's capacity.
     UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a, int b);
     virtual ~UIEditBox();                     // 0x00473770 (deleting wrapper 0x00473750)
-    virtual int UnknownVirtualSlot20(int value); // 0x00474150
-    virtual int UnknownVirtualSlot21(int value); // 0x00474570
+    virtual int OnChar(int value);               // 0x00474150
+    virtual int OnKeyDown(int value);            // 0x00474570
     virtual void KillFocus(int value); // slot 33, 0x004740b0
     virtual void UpdateNeedsRedraw(); // slot 38, 0x00479100 (shared with UIStaticText)
     virtual int Draw();                   // slot 40, 0x004738a0
@@ -432,7 +432,7 @@ class UIScrollBar : public UIControl {
 public:
     UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474ba0
     virtual ~UIScrollBar();                   // 0x00474c50 (deleting wrapper 0x00474c30)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00474cf0
+    virtual int Tick(float frameTime);                 // 0x00474cf0
     virtual int Draw();                   // slot 40, 0x00474ed0
     virtual int ButtonDown(int a, int b); // slot 55, 0x004755d0
     virtual int ButtonUp(int a, int* position); // slot 56, 0x00475880
@@ -483,12 +483,12 @@ public:
     // to UIControl from its first, third and fourth arguments).
     UIListBox(int id, int rows, CameraRect* area, UIDialog* owner);
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
+    virtual int Tick(float frameTime);                 // 0x00476020: joystick selection and the row under the cursor
     virtual int Draw();                   // slot 40, 0x004761f0: draws the rows
     virtual void AdvanceImages(); // slot 27, 0x00475fa0
     virtual void SetState(int state); // slot 29, 0x00479220
     virtual void RequestRedraw();         // slot 50, 0x00477ce0
-    virtual int UnknownVirtualSlot21(int key); // 0x00478040
+    virtual int OnKeyDown(int key);            // 0x00478040
     virtual int ButtonDown(int a, int b); // slot 55, 0x00477e90
     virtual int ButtonUp(int a, int* position); // slot 56, 0x00477ff0
     virtual void ButtonHeld(int a, int* position); // slot 57, 0x00478190
@@ -722,7 +722,7 @@ inline UIDDLButton* UIDropDownList::UnknownInlineButton() { return buttonPart; }
 class UIVideoStatic : public UIStatic {
 public:
     UIVideoStatic(int flags, CameraRect* area, UIDialog* owner); // 0x0047ae30
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0047af90
+    virtual int Tick(float frameTime);                 // 0x0047af90
     virtual int Draw();                   // slot 40, 0x0047afa0: copies the movie's frame
     // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
     int PlayMovie(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);

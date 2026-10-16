@@ -92,7 +92,7 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
 // 0x0043f4b0
 GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* path, int a, int b, int c)
 {
-    GameObject::UnknownVirtualSlot8(owner);
+    GameObject::SetRenderContext(owner);
     if (c) {
         memcpy(textureOptions, (const int*)b, sizeof(textureOptions));
         textureManager = *(TextureMapManager**)b;
@@ -610,10 +610,10 @@ void D3DIMSoultreeObject::GetPart(int surface, UnknownSoultreeVertex** vertices,
 }
 
 // 0x00443490
-int D3DIMSoultreeObject::UnknownVirtualSlot10(float frameTime)
+int D3DIMSoultreeObject::Tick(float frameTime)
 {
     lastFrameTime = frameTime;
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x004434b0
@@ -891,16 +891,16 @@ void D3DIMSoultreeObject::ClearScreenRects()
 }
 
 // 0x00444520
-void D3DIMSoultreeObject::UnknownVirtualSlot5()
+void D3DIMSoultreeObject::Enable()
 {
-    GameObject::UnknownVirtualSlot5();
+    GameObject::Enable();
     ClearFlag14c();
 }
 
 // 0x00444540
-void D3DIMSoultreeObject::UnknownVirtualSlot4()
+void D3DIMSoultreeObject::Disable()
 {
-    GameObject::UnknownVirtualSlot4();
+    GameObject::Disable();
     ClearScreenRects();
 }
 

@@ -233,7 +233,7 @@ int EventManager::CreatePodiumScene() {
     }
     CloseRace(1);
     PCCamera* camera = new(__FILE__, 0x276) PCCamera(1);
-    podiumCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
+    podiumCamera = (Camera*)camera->SetRenderContext(renderContext);
     if (!view->AppendChild(podiumCamera, -1))
         return 0;
     ((RenderTarget*)renderContext)->SetCamera(podiumCamera);

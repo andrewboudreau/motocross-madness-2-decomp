@@ -202,7 +202,7 @@ int ChatOverlay::CollectRacers(UnknownChatView* view)
         AppendChild(nameTags[racerCount], -1);
         if (nameTags[racerCount]) {
             nameTags[racerCount]->SetFixedPosition(Vector3(cueRect.left, cueRect.top, 0));
-            nameTags[racerCount]->UnknownVirtualSlot4();
+            nameTags[racerCount]->Disable();
             nameLineRight = nameTagRects[racerCount].right;
             nameTags[racerCount]->drawWidth = 0;
         }

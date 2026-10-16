@@ -29,7 +29,7 @@ public:
     explicit LightEmitter(int flags);               // 0x0049deb0
     virtual ~LightEmitter();                        // 0x0049dfc0 (deleting wrapper 0x0049dfa0)
     // Slot 12 is the shared `return 1` body 0x00467ae0.
-    virtual int UnknownVirtualSlot12();
+    virtual int PrepareGeometry();
 
     // 0x0049e230 (ret 0x2c): slot 8 of the base, then the type, colour,
     // range, optional position/direction and sphere model; arguments 8-10
@@ -74,7 +74,7 @@ public:
     explicit LightManager(int flags);               // 0x0049e390
     virtual ~LightManager();                        // 0x0049e400 (deleting wrapper 0x0049e3e0)
     // Slot 8 is the shared base-forwarding body 0x004452e0.
-    virtual GameObject* UnknownVirtualSlot8(void* value);
+    virtual GameObject* SetRenderContext(void* value);
 
     void AddLight(LightEmitter* light);      // 0x0049e470: adds a light
     void MarkChanged();                         // 0x0049e490: counts a change

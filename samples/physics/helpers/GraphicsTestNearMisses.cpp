@@ -37,7 +37,7 @@ public:
     virtual int DrawPrimitive(int type, int fvf, void* vertices, int vertexCount, int flags);
 };
 
-#define RENDERER() ((GraphicsTestRenderer*)field_0x18)
+#define RENDERER() ((GraphicsTestRenderer*)renderContext)
 
 // Row-vector transform with translation (row 3).
 inline void GraphicsTestTransform(Vec3* out, Vec3 v, const Matrix4* m)

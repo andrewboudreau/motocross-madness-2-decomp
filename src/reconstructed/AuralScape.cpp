@@ -73,49 +73,49 @@ void SoundGroup::SetMemberVolume(long volume) {
 }
 
 // 0x00401e20
-void SoundGroup::UnknownVirtualSlot4() {
-    GameObject::UnknownVirtualSlot4();
-    UnknownVirtualSlot16(1);
+void SoundGroup::Disable() {
+    GameObject::Disable();
+    SetPaused(1);
 }
 
 // 0x00401e40
-void SoundGroup::UnknownVirtualSlot5() {
-    GameObject::UnknownVirtualSlot5();
-    UnknownVirtualSlot16(0);
+void SoundGroup::Enable() {
+    GameObject::Enable();
+    SetPaused(0);
 }
 
 // 0x00401e60
-void SoundGroup::UnknownVirtualSlot6() {
-    GameObject::UnknownVirtualSlot6();
-    UnknownVirtualSlot16(1);
+void SoundGroup::OnDisable() {
+    GameObject::OnDisable();
+    SetPaused(1);
 }
 
 // 0x00401e80
-void SoundGroup::UnknownVirtualSlot7() {
-    GameObject::UnknownVirtualSlot7();
-    UnknownVirtualSlot16(0);
+void SoundGroup::OnEnable() {
+    GameObject::OnEnable();
+    SetPaused(0);
 }
 
 // 0x00401ea0
-int SoundGroup::UnknownVirtualSlot18() {
+int SoundGroup::OnActivate() {
     for (int i = 0; i < members.m_count; i++)
         members.Get(i)->RestoreBuffer();
     return 1;
 }
 
 // 0x00401ee0
-int SoundGroup::UnknownVirtualSlot16(int value) {
-    GameObject::UnknownVirtualSlot16(value);
+int SoundGroup::SetPaused(int value) {
+    GameObject::SetPaused(value);
     for (int i = 0; i < members.m_count; i++)
         members.Get(i)->SetPaused(value);
     return 1;
 }
 
 // 0x00401f30
-int SoundGroup::UnknownVirtualSlot10(float frameTime) {
+int SoundGroup::Tick(float frameTime) {
     for (int i = 0; i < members.m_count; i++)
         members.Get(i)->UpdateFade(frameTime);
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x00401f80
@@ -190,7 +190,7 @@ SoundEmitter* SoundEmitter::Create(void* target, const char* name, UnknownSound3
     UnknownTextureStream* stream = new (__FILE__, 130) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     int found = 0;
 
-    if (GameObject::UnknownVirtualSlot8(target) && ownerScape) {
+    if (GameObject::SetRenderContext(target) && ownerScape) {
         ownerScape->AddRef();
         if (!(flags & 2) || (flags & 4) || is2D)
             field_0x1a0_bit2 = 1;
@@ -362,7 +362,7 @@ int SoundEmitter::Play() {
 }
 
 // 0x004028d0
-int SoundEmitter::UnknownVirtualSlot10(float frameTime) {
+int SoundEmitter::Tick(float frameTime) {
     if (loadedSound && !(emitterFlags & 2)) {
         Vector3 move;
         move.x = soundParameters.position.x - previousPosition.x;
@@ -371,7 +371,7 @@ int SoundEmitter::UnknownVirtualSlot10(float frameTime) {
         soundParameters.velocity = move * frameTime;
         loadedSound->Set3DVelocity(soundParameters.velocity, 0);
     }
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x00402980
@@ -400,7 +400,7 @@ SoultreeSoundEmitter* SoultreeSoundEmitter::CreateFollowing(void* target, const 
 }
 
 // 0x00402a70
-int SoultreeSoundEmitter::UnknownVirtualSlot10(float frameTime) {
+int SoultreeSoundEmitter::Tick(float frameTime) {
     Vector3 position = kVec3Zero;
     if (childPart)
         childPart->GetPositionIn(0, &position);
@@ -410,7 +410,7 @@ int SoultreeSoundEmitter::UnknownVirtualSlot10(float frameTime) {
     soundParameters.position = position;
     if (loadedSound)
         loadedSound->Set3DPosition(position, 1);
-    return SoundEmitter::UnknownVirtualSlot10(frameTime);
+    return SoundEmitter::Tick(frameTime);
 }
 
 AuralScapeListener::AuralScapeListener() {
@@ -533,7 +533,7 @@ AuralScape::AuralScape(int flags) : GameObject(flags) {
 
 // 0x00402f00
 AuralScape* AuralScape::UnknownFunction402f00(void* target, int sounds) {
-    if (!GameObject::UnknownVirtualSlot8(target))
+    if (!GameObject::SetRenderContext(target))
         return 0;
     soundBudget = sounds;
     int ok = allEmitters.Init(8, 16) && audibleEmitters.Init(8, 16) && playingEmitters.Init(8, 16) && waitingEmitters.Init(8, 16);
@@ -701,7 +701,7 @@ void AuralScape::PickEmittersToPlay() {
 }
 
 // 0x00403710
-int AuralScape::UnknownVirtualSlot10(float frameTime) {
+int AuralScape::Tick(float frameTime) {
     PickEmittersToPlay();
 
     int zone = 0;
@@ -770,7 +770,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
             g_TrackGame->debugOverlay->Print(debugPage, "SoundCacheBytes %d",
                                                                      SoundSystem()->soundMemoryManager->loadedBytes);
     }
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x00403b20

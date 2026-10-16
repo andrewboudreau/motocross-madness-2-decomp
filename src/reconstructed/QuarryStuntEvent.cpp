@@ -66,7 +66,7 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
 
 // 0x004de3b0
 BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCallback progress) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     g_MemTagStack->ReportTotals("entering BaseQuarryEvent::Create");
     if (!UnknownFunction4de590(progress)) {
         Release();
@@ -82,8 +82,8 @@ int BaseQuarryEvent::UnknownVirtualSlot14() {
 }
 
 // 0x004de410
-int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
-    GameObject::UnknownVirtualSlot10(frameTime);
+int BaseQuarryEvent::Tick(float frameTime) {
+    GameObject::Tick(frameTime);
     if (auralScape)
         auralScape->SetListener(auralScapeListener, &raceCamera->eyePosition, &raceCamera->viewDirection,
                                           &raceCamera->upDirection, &raceCamera->followedBike->velocity);
@@ -306,8 +306,8 @@ void BaseQuarryEvent::ShowOnOffMessage(int id, int on) {
 }
 
 // 0x004e0ce0
-int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (GameObject::UnknownVirtualSlot23(event, entry))
+int BaseQuarryEvent::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (GameObject::OnControlPress(event, entry))
         return 1;
     if (TestInputEvent(0x31, 0, event, 0xc)) {
         if (g_TrackGame->mode.showRiderNames && g_TrackGame->mode.showRiderPositions) {
@@ -492,8 +492,8 @@ struct UnknownQuarryLeaveMessage {
 };
 
 // 0x004e1cc0
-int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
-    if (GameObject::UnknownVirtualSlot24(type, data, from, to, flags))
+int BaseQuarryEvent::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
+    if (GameObject::OnNetworkMessage(type, data, from, to, flags))
         return 1;
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
@@ -543,7 +543,7 @@ void BaseQuarryEvent::ResetClock() {
 BaseQuarryEvent::~BaseQuarryEvent() {
     delete field_0x44;
     Release();
-    if (g_TrackGame->field_0x2d5_bit2) {
+    if (g_TrackGame->texturesCached) {
         field_0x94->Release();
         field_0x98->Release();
     }
@@ -554,8 +554,8 @@ BaseQuarryEvent::~BaseQuarryEvent() {
 // elsewhere; the retail vtable 0x0055766c points at the surviving copies.
 
 // 0x00499af0 (KrustyUI's slot 18 is the same body)
-int BaseQuarryEvent::UnknownVirtualSlot18() {
-    GameObject::UnknownVirtualSlot18();
+int BaseQuarryEvent::OnActivate() {
+    GameObject::OnActivate();
     return 1;
 }
 

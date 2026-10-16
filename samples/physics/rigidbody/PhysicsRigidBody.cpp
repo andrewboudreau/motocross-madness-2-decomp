@@ -145,11 +145,11 @@ void PhysicsRigidBody::ResetState()
 }
 
 // slot 10, 0x004cc600.
-int PhysicsRigidBody::GameObjectVirtualSlot10(float dt)
+int PhysicsRigidBody::Tick(float dt)
 {
     if (!stepDisabled)
         GameObjectVirtualSlot11(dt);
-    return GraphicsTest::GameObjectVirtualSlot10(dt);
+    return GraphicsTest::Tick(dt);
 }
 
 // slot 11, 0x004cc630: one rigid-body integration step of length dt.
@@ -171,7 +171,7 @@ int PhysicsRigidBody::GameObjectVirtualSlot10(float dt)
 //    Quat adds 16 bytes of frame (0xcc instead of 0xbc).
 int PhysicsRigidBody::GameObjectVirtualSlot11(float dt)
 {
-    GraphicsTest::GameObjectVirtualSlot10(dt);
+    GraphicsTest::Tick(dt);
     if (node && active) {
         prevVelocity = velocity;
 

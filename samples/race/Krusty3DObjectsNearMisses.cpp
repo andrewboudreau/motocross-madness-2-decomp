@@ -4,7 +4,7 @@
 // and compare the symbol against retail with
 // samples/race/Krusty3DObjectsNearMisses.bindings.json.
 //
-// BonusObjectManager::UnknownVirtualSlot10 (0x0048ccc0, 1308 bytes): steps
+// BonusObjectManager::Tick (0x0048ccc0, 1308 bytes): steps
 // and places the bonus frame. 1299 of 1308 bytes match. The size factor's
 // denominator multiplies `fld [camera+0x198]; fmul [this+0x1e4]` as in
 // retail once the camera's value is read through a by-value accessor
@@ -28,7 +28,7 @@
 // field_0x1ec for the chained store, and all 24 orders of the alias, the
 // placedFieldOfView store, the delta and `field_0x1f0 = 0`: at best the same 1299.
 //
-// VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
+// VisualCue::Tick (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
 // (TrackGame +0x2d74) and turns it toward the followed racer, the next
 // gate, the selected racer or the free camera's target. Retail expands the
@@ -100,7 +100,7 @@ static const UnknownBonusKey g_UnknownBonusKeys[7] = {
 
 
 // 0x0048ccc0
-int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
+int BonusObjectManager::Tick(float frameTime) {
     int digit;
     int place;
 
@@ -153,7 +153,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
     } else {
         HideDigits();
     }
-    GameObject::UnknownVirtualSlot10(frameTime);
+    GameObject::Tick(frameTime);
     return 1;
 }
 
@@ -189,10 +189,10 @@ struct UnknownCueOwner {
     }
 
 // 0x0048b100
-int VisualCue::UnknownVirtualSlot10(float frameTime) {
+int VisualCue::Tick(float frameTime) {
     float scale;
 
-    if (!ArcadeObject::UnknownVirtualSlot10(frameTime))
+    if (!ArcadeObject::Tick(frameTime))
         return 1;
     if (!cycleCues) {
         if (((UnknownCueOwner*)renderContext)->currentCamera != arcadeView ||

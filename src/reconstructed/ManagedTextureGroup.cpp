@@ -26,7 +26,7 @@ static inline int LevelArea(int level) {
 
 // 0x0050bed0
 ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV)
-    : field_0x1d4(5000), field_0x1e0(5000), field_0x1ec(5000) {
+    : texelsBlittedHistory(5000), blitTimeHistory(5000), texturesBlittedHistory(5000) {
     groupAddressU = addressU;
     groupAddressV = addressV;
     groupManager = manager;
@@ -45,13 +45,13 @@ ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format,
     pageCursor = 0;
     textureCursor = 0;
     field_0x1cc = 0;
-    field_0x1d0 = 0;
+    texelsBlitted = 0;
     field_0x74 = 0x10000;
     field_0x78 = 6 / PixelFormatBytesPerPixel(groupFormat);
     gdiObject = 0;
     groupPalette = 0;
     noRepacking = 0;
-    field_0x254 = -1;
+    debugPage = -1;
     surfaceTexture = 0;
 }
 
@@ -169,7 +169,7 @@ void ManagedTextureGroup::WriteDebugReport() {
             FilePrintf(file, "%03d: %03d x %03d, Max Req'd=%.2f", index++, managed->textureWidth,
                                   managed->textureHeight, managed->largestUse);
             if (managed->largestUse > 0.0f)
-                FilePrintf(file, ", Allocd=%d unhappy=%.2f", managed->field_0xa8,
+                FilePrintf(file, ", Allocd=%d unhappy=%.2f", managed->allocatedLevel,
                                       managed->UnknownFunction5109b0());
             FilePrintf(file, "\n");
         }
@@ -206,7 +206,7 @@ int UnknownCompare50ee70(const void* first, const void* second) {
 int UnknownCompare50eeb0(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
-    int difference = b->field_0xa8 - b->plannedLevel - a->field_0xa8 + a->plannedLevel;
+    int difference = b->allocatedLevel - b->plannedLevel - a->allocatedLevel + a->plannedLevel;
     if (difference)
         return difference;
     return a - b;

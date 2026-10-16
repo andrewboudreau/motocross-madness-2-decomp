@@ -146,8 +146,8 @@ EventManager::EventManager(int flags) : GameObject(flags) {
 EventManager::~EventManager() {}
 
 // 0x0045caf0
-GameObject* EventManager::UnknownVirtualSlot8(void* value) {
-    GameObject::UnknownVirtualSlot8(value);
+GameObject* EventManager::SetRenderContext(void* value) {
+    GameObject::SetRenderContext(value);
     keepAliveTimeout = (float)g_TrackGame->GetRegistryInt("KeepAliveTimeout", 20);
     return this;
 }
@@ -157,13 +157,13 @@ void EventManager::UnknownFunction45d270() {
     TrackGameViewOwner* owner = FindRaceMode();
     if (!owner)
         return;
-    owner->UnknownVirtualSlot5();
+    owner->Enable();
     UnknownKrustyBikeView* view = FindRaceView();
     if (view)
-        view->UnknownVirtualSlot5();
+        view->Enable();
     TextQueueOverlay* target = FindTextQueue();
     if (target)
-        target->UnknownVirtualSlot5();
+        target->Enable();
 }
 
 // 0x0045d2b0
@@ -219,8 +219,8 @@ int EventManager::HasRaceMode() {
 }
 
 // 0x0045f3a0
-int EventManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (GameObject::UnknownVirtualSlot22(event, entry))
+int EventManager::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (GameObject::OnControlRelease(event, entry))
         return 1;
     if (g_TrackGame->uiInteractionBlocked && !g_TrackGame->network &&
         (event->kind == 2 || event->kind == 0 && event->control == 1 ||
@@ -236,8 +236,8 @@ int EventManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputE
 }
 
 // 0x0045f440
-int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (GameObject::UnknownVirtualSlot23(event, entry))
+int EventManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (GameObject::OnControlPress(event, entry))
         return 1;
     if (g_TrackGame->uiInteractionBlocked)
         resumeArmed = 1;
@@ -247,8 +247,8 @@ int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
 // 0x0045f200: per-frame update. While UI interaction is blocked it advances
 // the block timer, ticks the podium characters and pans the camera; after 7
 // seconds it lifts the block.
-int EventManager::UnknownVirtualSlot10(float frameTime) {
-    GameObject::UnknownVirtualSlot10(frameTime);
+int EventManager::Tick(float frameTime) {
+    GameObject::Tick(frameTime);
     if (endNetworkGamePending) {
         EndNetworkGame();
         endNetworkGamePending = 0;
@@ -372,7 +372,7 @@ void EventManager::EndRace() {
         RankRacers();
         UnknownKrustyBikeView* view = FindRaceView();
         if (view)
-            view->UnknownVirtualSlot5();
+            view->Enable();
         if (CreatePodiumScene()) {
             g_TrackGame->uiInteractionBlocked = 1;
             g_TrackGame->uiBlockedSeconds = 0;
@@ -399,8 +399,8 @@ void EventManager::EndRace() {
 // player done (and in mode 2 without a race-mode object remove it), 0x86
 // updates a remote racer, 0xcc reports a player leaving (NetProcs sends it
 // for a keep-alive timeout) and 0x8e the host ending the event.
-int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
-    if (GameObject::UnknownVirtualSlot24(type, data, from, to, flags))
+int EventManager::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
+    if (GameObject::OnNetworkMessage(type, data, from, to, flags))
         return 1;
     UnknownEventPlayerMessage* message = (UnknownEventPlayerMessage*)data;
     char name[16];
@@ -581,7 +581,7 @@ void EventManager::SendRacerResults() {
     }
     keepAliveStarted = 1;
     g_TrackGame->network->StartKeepAlive(keepAliveTimeout, keepAliveInterval);
-    view->UnknownVirtualSlot4();
+    view->Disable();
     waitingForRacers = 1;
 }
 
@@ -882,23 +882,23 @@ void EventManager::CloseRace(int mode) {
     if (mode == 1) {
         if (owner) {
             if (owner->field_0x60)
-                owner->field_0x60->UnknownVirtualSlot4();
+                owner->field_0x60->Disable();
             if (owner->field_0x5c)
-                owner->field_0x5c->UnknownVirtualSlot4();
+                owner->field_0x5c->Disable();
             if (owner->field_0x68)
-                owner->field_0x68->UnknownVirtualSlot4();
+                owner->field_0x68->Disable();
             if (owner->field_0x64)
-                owner->field_0x64->UnknownVirtualSlot4();
+                owner->field_0x64->Disable();
         }
-        view->raceCamera->UnknownVirtualSlot4();
+        view->raceCamera->Disable();
         if (view->raceSound)
-            view->raceSound->UnknownVirtualSlot4();
+            view->raceSound->Disable();
         if (view->youIndicator)
-            view->youIndicator->UnknownVirtualSlot4();
+            view->youIndicator->Disable();
         int iterator = 0;
         UnknownEventRacer* racer;
         while ((racer = view->NextBike(&iterator)) != 0)
-            racer->UnknownVirtualSlot4();
+            racer->Disable();
         return;
     }
     if (view) {
@@ -1027,7 +1027,7 @@ void EventManager::UnknownFunction45fdc0(float x0, float z0, float x1, float z1)
         while ((object = g_collisionQuadTree->NextObject()) != 0) {
             GameObject* graphics = dynamic_cast<CollisionObject*>(object);
             if (graphics)
-                graphics->UnknownVirtualSlot4();
+                graphics->Disable();
         }
         g_collisionQuadTree->EndQuery();
     }

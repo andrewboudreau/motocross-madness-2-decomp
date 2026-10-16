@@ -15,7 +15,7 @@
 //   (sibling blocks, else-if chains, switch cases, sequential blocks, try,
 //   same name, inline virtual InfoType destructor), so the source shape
 //   that lets retail share them is still unknown.
-// SPBikeRiderDlg::UnknownVirtualSlot10 (0x0044fae0, 1235 bytes, 1181
+// SPBikeRiderDlg::Tick (0x0044fae0, 1235 bytes, 1181
 //   match): the same flow and x87 code; only the scheduling of the by-value
 //   Vector3 copies passed to the camera's slot 29 differs (retail takes
 //   `edi = esp` after the camera and vtable loads and loads z before storing
@@ -122,11 +122,11 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
             if (singleMenuOpen) {
                 movieRestartTime = 0.0f;
                 if (movieControl) {
-                    movieControl->moviePlayer->UnknownVirtualSlot16(1);
+                    movieControl->moviePlayer->SetPaused(1);
                     movieControl->Show(0, 1);
                 }
             } else if (movieControl) {
-                movieControl->moviePlayer->UnknownVirtualSlot16(1);
+                movieControl->moviePlayer->SetPaused(1);
                 movieControl->Show(0, 1);
             }
             if (multiMenuOpen) {
@@ -380,7 +380,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
 
 // 0x0044fae0: turns the bike view (dragged with the pointer, else slowly by
 // itself), animates the previews and now and then plays a rider idle motion.
-int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
+int SPBikeRiderDlg::Tick(float frameTime) {
     if (dialogBackground)
         dialogBackground->MarkAllDirty();
     Vector3 offset;
@@ -433,7 +433,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     }
     if (dialogBackground)
         dialogBackground->SetRegionRect(previewRegion, &previewArea);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // The replay tape's header ("VCRtape.dat", 0xeb0 bytes): the race settings
@@ -561,7 +561,7 @@ void SPRaceInfoDlg::HandleEvent(UnknownDialogEvent* event) {
                 UNKNOWN_GARAGE_SETTINGS->fourStroke = header.fourStroke;
                 COPY_TEXT(g_TrackGame->mode.replayFile, "VCRtape.dat", 0x104);
                 LeaveMenusForRace();
-                parentDialog->UnknownVirtualSlot26();
+                parentDialog->MarkPendingRelease();
             } else {
                 event->control->Show(0, 1);
             }

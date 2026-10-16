@@ -147,7 +147,7 @@ void CloseDialogCallback(UIDialog* dialog) {
 }
 
 // 0x0044c6b0
-int MainDlg::UnknownVirtualSlot10(float frameTime) {
+int MainDlg::Tick(float frameTime) {
     if (singleMenuOpen) {
         FindControl("ScreenOverCtl", 0)->RequestRedraw();
         if (singleMenuOpen && !menuSingleAnimation->transitionState && movieRestartPending) {
@@ -157,13 +157,13 @@ int MainDlg::UnknownVirtualSlot10(float frameTime) {
                 movieRestartPending = 0;
                 if (movieControl) {
                     movieControl->moviePlayer->Restart();
-                    movieControl->moviePlayer->UnknownVirtualSlot16(movieRestartPending);
+                    movieControl->moviePlayer->SetPaused(movieRestartPending);
                     movieControl->Show(1, 1);
                 }
             }
         }
     }
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x0044c7a0
@@ -458,7 +458,7 @@ void SinglePlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                     g_TrackGame->mode.ghostFile[0] = 0;
                 }
                 LeaveMenusForRace();
-                UnknownVirtualSlot26();
+                MarkPendingRelease();
             }
         } else if (!_stricmp("EventTab", event->controlName)) {
             OpenPage(0);
@@ -1124,7 +1124,7 @@ void SPBikeRiderDlg::PaintPlateNumber(int number) {
 
 // 0x0044fa00: a click inside the bike preview (inset by 50 and 30 pixels)
 // starts dragging it and turns automatic rotation off.
-int SPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int SPBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind == 1 && event->control == 0) {
         CameraRect area = previewArea;
         area.left += 50;
@@ -1137,19 +1137,19 @@ int SPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
             static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
         }
     }
-    return UIDialog::UnknownVirtualSlot23(event, entry);
+    return UIDialog::OnControlPress(event, entry);
 }
 
 // 0x0044fab0
-int SPBikeRiderDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int SPBikeRiderDlg::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind == 1 && event->control == 0)
         previewDragging = 0;
-    return UIDialog::UnknownVirtualSlot22(event, entry);
+    return UIDialog::OnControlRelease(event, entry);
 }
 
 // 0x0044ffc0
-int SPBikeRiderDlg::UnknownVirtualSlot13() {
-    int result = UIDialog::UnknownVirtualSlot13();
+int SPBikeRiderDlg::RenderPre3D() {
+    int result = UIDialog::RenderPre3D();
     if (dialogBackground)
         dialogBackground->ReleaseDc();
     if (bikeChanged) {
@@ -1186,10 +1186,10 @@ void SPBikeRiderDlg::ApplyChosenBike() {
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->UnknownVirtualSlot4();
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->Disable();
         ui = g_TrackGame->ui;
     }
-    model->uiModel->UnknownVirtualSlot5();
+    model->uiModel->Enable();
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -1364,7 +1364,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00451270
-int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
+int LoadingDlg::Tick(float frameTime) {
     if (framesShown == 2 && !g_UnknownGlobal59ae84) {
         if (!g_TrackGame->eventManager->LoadEvent()) {
             EndDialog(0);
@@ -1387,7 +1387,7 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
         AddTimer(0, 100, 0);
     }
     framesShown++;
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x00451380
@@ -1918,16 +1918,16 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004533d0
-int Intro1Dlg::UnknownVirtualSlot10(float frameTime) {
+int Intro1Dlg::Tick(float frameTime) {
     if (++framesShown == 3) {
         g_TrackGame->ui->BuildGarageScene(1);
         EndDialog(0);
     }
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x00453420
-int Intro1Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Intro1Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     return g_UnknownGlobal59ae00 = 1;
 }
 
@@ -1955,18 +1955,18 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00453570
-int Intro2Dlg::UnknownVirtualSlot10(float frameTime) {
+int Intro2Dlg::Tick(float frameTime) {
     if (++framesShown == 3)
         g_TrackGame->ui->BuildGarageScene(2);
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
     if ((g_UnknownGlobal59ae00 || secondsShown > 3.0f) && framesShown >= 3)
         EndDialog(0);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x004535f0
-int Intro2Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Intro2Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1)
         g_UnknownGlobal59ae00 = 1;
     return 1;
@@ -1990,16 +1990,16 @@ void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00453670
-int Intro3Dlg::UnknownVirtualSlot10(float frameTime) {
+int Intro3Dlg::Tick(float frameTime) {
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
     if (g_UnknownGlobal59ae00 || secondsShown > 3.0f)
         EndDialog(0);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x004536c0
-int Intro3Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Intro3Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1)
         g_UnknownGlobal59ae00 = 1;
     return 1;
@@ -2301,7 +2301,7 @@ void GhostFilesDlg::RaceSelectedGhost() {
     UnknownRecordFileHeader* header = &fileHeaders[list->GetRowData(-1)];
     memcpy(&g_TrackGame->mode.raceSettings, &header->raceMode, sizeof(g_TrackGame->mode.savedSettings));
     COPY_TEXT(g_TrackGame->mode.ghostFile, filePaths[list->GetRowData(-1)], 0x104);
-    parentDialog->UnknownVirtualSlot26();
+    parentDialog->MarkPendingRelease();
     g_TrackGame->mode.SelectSeries(header->series);
     LeaveMenusForRace();
 }
@@ -2483,7 +2483,7 @@ void ReplayFilesDlg::PlaySelectedReplay() {
     *(int*)&g_TrackGame->mode.garageOptions[0] = header->engineSize;
     *(int*)&g_TrackGame->mode.garageOptions[4] = header->fourStroke;
     COPY_TEXT(g_TrackGame->mode.replayFile, filePaths[list->GetRowData(-1)], 0x104);
-    parentDialog->UnknownVirtualSlot26();
+    parentDialog->MarkPendingRelease();
     LeaveMenusForRace();
 }
 
@@ -2613,7 +2613,7 @@ void DemoDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00455ae0
-int DemoDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int DemoDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
     if (view && view->isRacing)
         EndDialog(0);
@@ -2621,14 +2621,14 @@ int DemoDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry*
 }
 
 // 0x00455b20
-int DemoDlg::UnknownVirtualSlot10(float frameTime) {
+int DemoDlg::Tick(float frameTime) {
     KrustyUI* ui = g_TrackGame->ui;
     if (ui->demoEnded) {
         ui->demoEnded = 0;
         EndDialog(0);
         return 0;
     }
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x00455b60
@@ -2650,14 +2650,14 @@ void TransDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00455bd0
-int TransDlg::UnknownVirtualSlot10(float frameTime) {
+int TransDlg::Tick(float frameTime) {
     secondsShown = frameTime + secondsShown;
     framesShown++;
     if (secondsShown > 5.0f && framesShown >= 3)
         EndDialog(0);
     if (framesShown >= 3)
         g_TrackGame->ui->BuildGarageScene(-1);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x00455c40
@@ -2690,18 +2690,18 @@ void Exit1Dlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x00455d00
-int Exit1Dlg::UnknownVirtualSlot10(float frameTime) {
+int Exit1Dlg::Tick(float frameTime) {
     secondsShown = frameTime + secondsShown;
     framesShown++;
     frameRan = 1;
     if ((closeRequested || secondsShown > 15.0f) && framesShown >= 3)
         EndDialog(0);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x00455d70
-int Exit1Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Exit1Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1 && !event->kind)
         closeRequested = 1;
-    return UIDialog::UnknownVirtualSlot23(event, entry);
+    return UIDialog::OnControlPress(event, entry);
 }

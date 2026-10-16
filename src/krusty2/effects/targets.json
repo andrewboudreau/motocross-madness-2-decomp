@@ -162,7 +162,7 @@
   {
     "class": "ParticleManager",
     "source": "Particles.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@ParticleManager",
+    "candidate_symbol_contains": "?Tick@ParticleManager",
     "target_va": "0x004baaf0",
     "target_size": 296,
     "expect": "exact",
@@ -192,7 +192,7 @@
   {
     "class": "NullManager",
     "source": "Nulls.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot8@NullManager",
+    "candidate_symbol_contains": "SetRenderContext@NullManager",
     "target_va": "0x00462e30",
     "target_size": 19,
     "expect": "exact",

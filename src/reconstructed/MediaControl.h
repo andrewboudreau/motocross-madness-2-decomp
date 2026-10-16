@@ -94,10 +94,10 @@ class MediaControl : public GameObject {
 public:
     MediaControl(int a);                      // 0x004a2410
     virtual ~MediaControl();                  // 0x004a2490 (deleting wrapper 0x004a2470)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004a27f0: next frame, end of movie
-    virtual int UnknownVirtualSlot16(int value); // 0x004a2970: pauses (value != 0) or resumes
-    virtual int UnknownVirtualSlot17();       // 0x004a28c0
-    virtual int UnknownVirtualSlot18();       // 0x004a28e0
+    virtual int Tick(float frameTime);                 // 0x004a27f0: next frame, end of movie
+    virtual int SetPaused(int value);            // 0x004a2970: pauses (value != 0) or resumes
+    virtual int OnDeactivate();               // 0x004a28c0
+    virtual int OnActivate();                 // 0x004a28e0
 
     // 0x004a23d0: 1 when DirectShow's filter graph can be created.
     static int IsDirectShowInstalled();

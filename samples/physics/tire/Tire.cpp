@@ -178,7 +178,7 @@ Tire::~Tire()
 // Each element is 24 bytes: a zero vector followed by the point.  The shape is installed
 // with CollisionObject 0x00432ab0 (type 2), the owner pointer (field_0x60) is this tire
 // and field_0x88/field_0x8c get the contact callback and no second callback.
-GameObject* Tire::GameObjectVirtualSlot8(int a)
+GameObject* Tire::SetRenderContext(int a)
 {
     struct TirePoint {
         CollisionVec3 origin;

@@ -48,15 +48,15 @@ Camera::~Camera() {
 
 // 0x00499ad0 (an identical forwarding body in another class shares the
 // address).
-void Camera::UnknownVirtualSlot4() {
-    GameObject::UnknownVirtualSlot4();
+void Camera::Disable() {
+    GameObject::Disable();
 }
 
 // 0x0042e500: after the GameObject version, 0x0042e550 must succeed or the
 // camera releases itself and returns 0; otherwise slot 28 runs and, when
 // bit 0 is set, the owner is handed the camera.
-GameObject* Camera::UnknownVirtualSlot8(void* value) {
-    GameObject::UnknownVirtualSlot8(value);
+GameObject* Camera::SetRenderContext(void* value) {
+    GameObject::SetRenderContext(value);
     if (!UpdateViewport()) {
         Release();
         return 0;
@@ -69,7 +69,7 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
 
 // If +0x1cc is set, passes the rectangle at +0x1a0 (x, y, width, height) to
 // the owner's slot 12, then calls the non-virtual 0x0042e8e0.
-int Camera::UnknownVirtualSlot13() {
+int Camera::RenderPre3D() {
     if (viewportClearFrames) {
         CameraRect rect;
         int x = viewport[0];
@@ -128,7 +128,7 @@ static inline float Dot(const Vector3& a, const Vector3& b) {
 // +0x1d0/+0x1cc, applies the field-of-view keys (0xc7/0xcf, when +0x1d4 is
 // set) and the viewport width keys (0xd2/0xd3, when +0x1d8 is set) and
 // rebuilds the projection through slot 28.
-int Camera::UnknownVirtualSlot10(float frameTime) {
+int Camera::Tick(float frameTime) {
     Vector3 delta(eyePosition.x - previousEyePosition.x, eyePosition.y - previousEyePosition.y, eyePosition.z - previousEyePosition.z);
     lastMoveDistance = FastSqrt(Dot(delta, delta));
     previousEyePosition = eyePosition;
@@ -307,22 +307,22 @@ int Camera::SetProjectionMatrix(const Matrix4* value) {
 
 // Both call the GameObject version, then store owner(+0x18)->+0x14 plus one at
 // +0x1d0. Slot 5 first hands the camera to the owner's non-virtual 0x004e8cf0.
-void Camera::UnknownVirtualSlot5() {
-    GameObject::UnknownVirtualSlot5();
+void Camera::Enable() {
+    GameObject::Enable();
     Owner()->SetCamera(this);
     projectionChangeFrames = Owner()->frameModulus + 1;
 }
 
-int Camera::UnknownVirtualSlot18() {
-    GameObject::UnknownVirtualSlot18();
+int Camera::OnActivate() {
+    GameObject::OnActivate();
     projectionChangeFrames = Owner()->frameModulus + 1;
     return 1;
 }
 
 // 0x0042f090: only when no child handled the GameObject search does it
 // consult 0x0043caa0; a nonzero answer runs slot 27.
-int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (!GameObject::UnknownVirtualSlot23(event, entry)) {
+int Camera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (!GameObject::OnControlPress(event, entry)) {
         if (TestInputEvent(0xB7, 0, event, 0x80000000)) {
             TakeScreenshot();
             return 1;

@@ -29,7 +29,7 @@
   "?DebugDraw@VisibilityQuadTreeNode@@QAEXHHHHHPAUVisibilityCamera@@@Z": "0x52e450",
   "?DrawBox@VisibilityQuadTreeNode@@QAEXPAVVisibilityRenderer@@PBM1@Z": "0x52e1f0",
   "?EndQuery@QuadTree@@QAEXXZ": "0x4dd770",
-  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x4692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x4692f0",
   "?GetBytes@VisibilityMemoryStats@@QAEHPBD@Z": "0x4a2d20",
   "?GetValue@VisibilityStat@@QAEHXZ": "0x4cb690",
   "?Init@QuadTree@@QAEXMMMMM@Z": "0x4dc670",

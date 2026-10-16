@@ -90,7 +90,7 @@ Game::Game() {
     rootObject = 0;
     textureManager = 0;
     playerCount = 1;
-    field_0x2d0 = 0;
+    bladeRenderer = 0;
     debugOverlay = 0;
     s_UnknownFile65b4ac = 0;
     strcpy(field_0x40, "");
@@ -106,7 +106,7 @@ Game::Game() {
     stepOneFrame = 0;
     inputSuspended = 0;
     shuttingDown = 0;
-    field_0x2d5_bit2 = 1;
+    texturesCached = 1;
     field_0x2e4 = 1.0f;
     field_0x2e8 = 0;
     field_0x2ec = 0.05f;
@@ -162,7 +162,7 @@ int Game::CreateObjects(char*) {
     if (!InitializeDisplay())
         return 0;
     textureManager = new(__FILE__, 282) TextureMapManager;
-    childRoot->AppendChild(textureManager->UnknownVirtualSlot8(renderTarget), -1);
+    childRoot->AppendChild(textureManager->SetRenderContext(renderTarget), -1);
     textureContext = textureManager;
     field_0x20 = 0;
     field_0x24 = 0;
@@ -176,7 +176,7 @@ int Game::CreateObjects(char*) {
             rootObject->AppendChild(debugOverlay, -1);
             if (g_UnknownGlobal56c470->field_0x2c) {
                 rootObject->AppendChild(g_UnknownGlobal56c470, -1);
-                g_UnknownGlobal56c470->UnknownVirtualSlot5();
+                g_UnknownGlobal56c470->Enable();
             }
         }
         g_MemTagStack->Pop(category);
@@ -193,7 +193,7 @@ int Game::AttachRenderTarget() {
     if (!renderTarget)
         return 0;
     if (rootObject)
-        rootObject->UnknownVirtualSlot25(renderTarget);
+        rootObject->AttachRenderContext(renderTarget);
     return 1;
 }
 
@@ -203,7 +203,7 @@ int Game::RenderFrame() {
     if (display->lastFlipFailed)
         display->RetryFlip(0);
     unsigned int last = ReadClock();
-    rootObject->UnknownVirtualSlot12();
+    rootObject->PrepareGeometry();
     unsigned int now = ReadClock();
     int prepareGeometry = now - last;
     last = now;
@@ -212,7 +212,7 @@ int Game::RenderFrame() {
     now = ReadClock();
     int waitForFlip = now - last;
     last = now;
-    rootObject->UnknownVirtualSlot13();
+    rootObject->RenderPre3D();
     now = ReadClock();
     int renderPre3D = now - last;
     int render3D = 0;
@@ -230,7 +230,7 @@ int Game::RenderFrame() {
         }
     }
     last = ReadClock();
-    rootObject->UnknownVirtualSlot15();
+    rootObject->RenderPost3D();
     now = ReadClock();
     int renderPost3D = now - last;
     int elapsed = now - s_LastFrameTime;
@@ -249,7 +249,7 @@ int Game::RenderFrame() {
             s_Render3DPeak.Record(render3D);
             s_RenderPost3DPeak.Record(renderPost3D);
             s_ElapsedPeak.Record(elapsed);
-            if (debugOverlay->isEnabled && debugOverlay->field_0x26c4 == profilePage) {
+            if (debugOverlay->isEnabled && debugOverlay->shownPage == profilePage) {
                 UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
                 debugOverlay->Title(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
@@ -288,7 +288,7 @@ int Game::RenderFrame() {
             static int memoryPage = -1;
             if (memoryPage < 0)
                 memoryPage = debugOverlay->NewPage();
-            if (debugOverlay->isEnabled && debugOverlay->field_0x26c4 == memoryPage) {
+            if (debugOverlay->isEnabled && debugOverlay->shownPage == memoryPage) {
                 UnknownMemoryStatus status;
                 GlobalMemoryStatus(&status);
                 debugOverlay->Title(memoryPage, "Memory");
@@ -320,7 +320,7 @@ int Game::RenderFrame() {
                 debugOverlay->Print(memoryPage, "PartialTexBlt   %s",
                                                   g_TrackGame->display->partialTextureUploadResult ? "Yes" : "No");
                 debugOverlay->Print(memoryPage, "TexturesCached  %s",
-                                                  g_TrackGame->field_0x2d5_bit2 ? "Yes" : "No");
+                                                  g_TrackGame->texturesCached ? "Yes" : "No");
             }
         }
         s_LastFrameTime = now;
@@ -344,7 +344,7 @@ int Game::SetInputSuspended(int value) {
     if (network)
         return 0;
     inputSuspended = value;
-    rootObject->UnknownVirtualSlot16(value);
+    rootObject->SetPaused(value);
     return 1;
 }
 
@@ -357,7 +357,7 @@ int Game::UnknownVirtualSlot12(int value) {
 int Game::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (inputSuspended)
         return 1;
-    return rootObject->UnknownVirtualSlot22(event, entry) != 0;
+    return rootObject->OnControlRelease(event, entry) != 0;
 }
 
 // 0x00468930: presses go to the interface unless inputSuspended is set.
@@ -370,9 +370,9 @@ int Game::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (testKey && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
         if (debugOverlay->isEnabled) {
             if (debugOverlay->ShowNextPage())
-                debugOverlay->UnknownVirtualSlot4();
+                debugOverlay->Disable();
         } else {
-            debugOverlay->UnknownVirtualSlot5();
+            debugOverlay->Enable();
         }
     }
     if (allowFreezeCamera) {
@@ -383,7 +383,7 @@ int Game::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
             paused = 0;
         }
     }
-    return rootObject->UnknownVirtualSlot23(event, entry) != 0;
+    return rootObject->OnControlPress(event, entry) != 0;
 }
 
 // 0x00468a10
@@ -437,7 +437,7 @@ int Game::CreateNetworkInterface(int value) {
 
 // 0x00468ba0: hands a network message to the +0x2f4 object.
 int Game::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
-    return rootObject->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
+    return rootObject->OnNetworkMessage(type, data, from, to, flags) != 0;
 }
 
 // 0x00468bd0: `path` = workingDirectory (+0x1cc), "\\" and `name`.

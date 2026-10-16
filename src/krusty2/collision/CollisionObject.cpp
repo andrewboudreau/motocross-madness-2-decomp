@@ -657,7 +657,7 @@ void CollisionObject::SyncTransformFromNode()
 int CheckKey(int code, int sub, void* event, int mask);
 
 // 0x00434970: debug-key handling for the collision-tree overlay, then the GameObject base.
-int CollisionObject::GameObjectVirtualSlot23(int a, int b)
+int CollisionObject::OnControlPress(int a, int b)
 {
     if (CheckKey(10, 0, (void*)a, 0x80)) {
         debugTreeDepth--;
@@ -671,7 +671,7 @@ int CollisionObject::GameObjectVirtualSlot23(int a, int b)
         if (debugDrawMode > 7)
             debugDrawMode = 0;
     }
-    return GameObject::GameObjectVirtualSlot23(a, b);
+    return GameObject::OnControlPress(a, b);
 }
 
 // 0x00434a10: clears the hit state and (re)initialises the per-object query record that the
@@ -1176,7 +1176,7 @@ inline CollisionVec3 DebugNormalized(const CollisionVec3& v)
     return CollisionVec3(v.x * inverseLength, v.y * inverseLength, v.z * inverseLength);
 }
 
-// Device behind GameObject::field_0x18 as slot 14 drives it (render-state style calls with
+// Device behind GameObject::renderContext as slot 14 drives it (render-state style calls with
 // small enum arguments); tier 3 stand-in, only the slots used here.
 class CollisionDebugDevice {
 public:
@@ -1223,9 +1223,9 @@ struct CollisionCapsuleView {
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
 int CollisionObject::GameObjectVirtualSlot14()
 {
-    ((CollisionDebugDevice*)field_0x18)->UnknownVirtualSlot8(0x1b, 0, 0);
-    ((CollisionDebugDevice*)field_0x18)->UnknownVirtualSlot10(7, 0);
-    ((CollisionDebugDevice*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
+    ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot8(0x1b, 0, 0);
+    ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot10(7, 0);
+    ((CollisionDebugDevice*)renderContext)->UnknownVirtualSlot7(0, 1, 1);
     Vec3 center;
     if (shape && debugDrawMode) {
         if (debugDrawMode == 5) {

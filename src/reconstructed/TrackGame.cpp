@@ -288,7 +288,7 @@ int TrackGame::CreateGameObjects() {
     if (!childRoot->AppendChild(ui->Create(renderTarget, 1), -1))
         return 0;
     eventManager = new(__FILE__, 382) EventManager(1);
-    if (!childRoot->AppendChild(eventManager->UnknownVirtualSlot8(renderTarget), -1))
+    if (!childRoot->AppendChild(eventManager->SetRenderContext(renderTarget), -1))
         return 0;
     if (network) {
         char address[32];
@@ -417,7 +417,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
         ui->OpenMenu(id);
         if (!menu->isEnabled)
             return;
-        menu->UnknownVirtualSlot4();
+        menu->Disable();
         menuIsOpen = 1;
         childRoot->DisableByClassName("RaceSound");
     } else {
@@ -430,7 +430,7 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
         ui->gui->FindInputDialog()->UnknownVirtualSlot26();
         GameObject* current = eventManager->FindRaceMode();
         if (current)
-            current->UnknownVirtualSlot5();
+            current->Enable();
         menuIsOpen = 0;
         if (sound)
             childRoot->EnableByClassName("RaceSound");

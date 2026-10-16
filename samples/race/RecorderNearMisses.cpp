@@ -328,7 +328,7 @@ done:
 // 0x004e7d60: per-frame playback step (mode 1); KrustyVCR shares it. Takes
 // queued records from the ring and hands them to the callback at +0x80.
 // Always returns 1.
-int VCRInterface::UnknownVirtualSlot10(float frameTime) {
+int VCRInterface::Tick(float frameTime) {
     int keep;
     int milliseconds;
     int value;

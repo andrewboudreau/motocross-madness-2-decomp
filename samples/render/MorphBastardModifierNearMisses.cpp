@@ -100,7 +100,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
     int targetCount;
     float probe;
 
-    D3DIMSoultreeModifier::UnknownVirtualSlot8(value);
+    D3DIMSoultreeModifier::SetRenderContext(value);
     UnknownTextureStream* stream =
         new (__FILE__, 73) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     stream->Open(path, "r", 0);

@@ -122,10 +122,10 @@ void GUICursor::SetAnimation(UnknownCursorAnimation* animation) {
 }
 
 // 0x00485170
-int GUICursor::UnknownVirtualSlot15() {
+int GUICursor::RenderPost3D() {
     if (cursorAnimation)
         currentFrame = cursorAnimation->AdvancePastSounds();
-    return GameCursor::UnknownVirtualSlot15();
+    return GameCursor::RenderPost3D();
 }
 
 // 0x00485190
@@ -186,7 +186,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     ControlInterface* controls;
     int i;
 
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     guiTextures = textures;
     guiSoundGroup = sound;
     if (startSound && SoundSystem()->InitializeSound(22050, 1, 16, 4000000, 0) == 0)
@@ -204,7 +204,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     dialogFontSize = fontSize;
     if (cursor)
         strcpy(cursorImage, cursor);
-    UnknownVirtualSlot18();
+    OnActivate();
     setupCallback = callback;
     toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
     controls = g_TrackGame->controlInterface;
@@ -264,25 +264,25 @@ GUIManager::~GUIManager() {
 }
 
 // 0x004857f0
-int GUIManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GUIManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int previous = g_MemTagStack->Push("UI");
-    int result = GameObject::UnknownVirtualSlot23(event, entry);
+    int result = GameObject::OnControlPress(event, entry);
     g_MemTagStack->Pop(previous);
     return result;
 }
 
 // 0x00485830
-int GUIManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int GUIManager::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int previous = g_MemTagStack->Push("UI");
-    int result = GameObject::UnknownVirtualSlot22(event, entry);
+    int result = GameObject::OnControlRelease(event, entry);
     g_MemTagStack->Pop(previous);
     return result;
 }
 
 // 0x00485870
-int GUIManager::UnknownVirtualSlot10(float frameTime) {
+int GUIManager::Tick(float frameTime) {
     int previous = g_MemTagStack->Push("UI");
-    GameObject::UnknownVirtualSlot10(frameTime);
+    GameObject::Tick(frameTime);
     if (paletteChanged) {
         paletteChanged = 0;
         UnknownFunction464e90();
@@ -292,7 +292,7 @@ int GUIManager::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x004858d0
-int GUIManager::UnknownVirtualSlot13() {
+int GUIManager::RenderPre3D() {
     CameraRect rect;
 
     if (waitFrames)
@@ -305,16 +305,16 @@ int GUIManager::UnknownVirtualSlot13() {
         if (guiBackground) {
             guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
         } else if (!((RenderTarget*)renderContext)->Blit(&rect, screenGrab, 0, 0x1000000)) {
-            GameObject::UnknownVirtualSlot13();
+            GameObject::RenderPre3D();
             return 0;
         }
     }
-    GameObject::UnknownVirtualSlot13();
+    GameObject::RenderPre3D();
     return 1;
 }
 
 // 0x00485970
-int GUIManager::UnknownVirtualSlot15() {
+int GUIManager::RenderPost3D() {
     CameraRect rect;
 
     if (!waitFrames) {
@@ -326,11 +326,11 @@ int GUIManager::UnknownVirtualSlot15() {
             if (guiBackground) {
                 guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
             } else if (!((RenderTarget*)renderContext)->Blit(&rect, screenGrab, 0, 0x1000000)) {
-                GameObject::UnknownVirtualSlot15();
+                GameObject::RenderPost3D();
                 return 0;
             }
         }
-        GameObject::UnknownVirtualSlot15();
+        GameObject::RenderPost3D();
     } else {
         waitFrames = waitFrames - 1 < 0 ? 0 : waitFrames - 1;
         g_TrackGame->renderTarget->Clear(0, 0);
@@ -432,7 +432,7 @@ void GUIManager::CreateBackground() {
     if (guiBackground)
         return;
     guiBackground = (BackgroundImage*)AppendChild(
-        (new(__FILE__, 672) BackgroundImage(1))->UnknownVirtualSlot8(renderContext), -1);
+        (new(__FILE__, 672) BackgroundImage(1))->SetRenderContext(renderContext), -1);
     guiBackground->InsertBefore(dialogContainer, -1);
     ownsBackground = 1;
     RecreateCursors(0, 1);
@@ -547,9 +547,9 @@ void GUIManager::ShowCursors(int show) {
         user = GetUser(i);
         if (user && user->userCursor) {
             if (show)
-                user->userCursor->UnknownVirtualSlot5();
+                user->userCursor->Enable();
             else
-                user->userCursor->UnknownVirtualSlot4();
+                user->userCursor->Disable();
         }
     }
 }
@@ -644,7 +644,7 @@ ToolTip::ToolTip(int flags) : GameObject(flags) {
 
 // 0x00486a10
 ToolTip* ToolTip::Create(void* target, GUIManager* gui) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     tipGui = gui;
     return this;
 }
@@ -658,7 +658,7 @@ ToolTip::~ToolTip() {
 }
 
 // 0x00486ab0
-int ToolTip::UnknownVirtualSlot10(float frameTime) {
+int ToolTip::Tick(float frameTime) {
     if (enabled && showDelay > 0.0f) {
         showDelay -= frameTime;
         if (showDelay > 0.0f)
@@ -745,7 +745,7 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
 }
 
 // 0x00486db0
-int ToolTip::UnknownVirtualSlot15() {
+int ToolTip::RenderPost3D() {
     CameraRect rect;
 
     if (shown) {
@@ -794,7 +794,7 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
     float rangeX;
     float rangeY;
 
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     inputDevice = device;
     rangeMinX = minX;
     rangeMaxX = maxX;
@@ -853,10 +853,10 @@ void GUIInputDevice::Rebind() {
 }
 
 // 0x00487320
-int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
+int GUIInputDevice::Tick(float frameTime) {
     int kind;
 
-    GameObject::UnknownVirtualSlot10(frameTime);
+    GameObject::Tick(frameTime);
     kind = inputDevice->deviceKind;
     if (kind) {
         if (g_TrackGame->fullScreen) {
@@ -874,8 +874,8 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
 }
 
 // 0x004873b0
-int GUIInputDevice::UnknownVirtualSlot25(void* value) {
-    GameObject::UnknownVirtualSlot25(value);
+int GUIInputDevice::AttachRenderContext(void* value) {
+    GameObject::AttachRenderContext(value);
     Rebind();
     return 1;
 }
@@ -910,9 +910,9 @@ GUIUser::~GUIUser() {
 }
 
 // 0x004875a0
-int GUIUser::UnknownVirtualSlot10(float frameTime) {
+int GUIUser::Tick(float frameTime) {
     UpdateFocus(0);
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x004875c0
@@ -930,8 +930,8 @@ void GUIUser::UpdateFocus(int force) {
 }
 
 // 0x00487620
-int GUIUser::UnknownVirtualSlot15() {
-    GameObject::UnknownVirtualSlot15();
+int GUIUser::RenderPost3D() {
+    GameObject::RenderPost3D();
     if (pointerDevice) {
         pointerX = pointerDevice->pointerPosition.x;
         pointerY = pointerDevice->pointerPosition.y;
@@ -941,7 +941,7 @@ int GUIUser::UnknownVirtualSlot15() {
 
 // 0x00487650
 GUIUser* GUIUser::Create(void* target, GUIManager* gui) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     userGui = gui;
     CreateToolTip(target, gui);
     return this;
@@ -1284,7 +1284,7 @@ HiResMeter::HiResMeter(int flags) : GameObject(flags) {
     overlayPage = -1;
     countsPerMs = 0;
     ClearTimers();
-    if (UnknownVirtualSlot8(0))
+    if (SetRenderContext(0))
         counterUsable = 1;
     else
         counterUsable = 0;
@@ -1343,14 +1343,14 @@ void HiResMeter::ClearTimers() {
 }
 
 // 0x004885c0
-int HiResMeter::UnknownVirtualSlot10(float frameTime) {
+int HiResMeter::Tick(float frameTime) {
     UnknownHiResMeterEntry* entry;
     int i;
 
     if (g_TrackGame->debugOverlay) {
         if (overlayPage < 0)
             overlayPage = g_TrackGame->debugOverlay->NewPage();
-        if (g_TrackGame->debugOverlay->field_0x26c4 != overlayPage) {
+        if (g_TrackGame->debugOverlay->shownPage != overlayPage) {
             ResetTimerStats();
             return 1;
         }

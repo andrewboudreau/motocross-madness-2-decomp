@@ -48,7 +48,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
     Vector3 low;
     Vector3 extent;
 
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     arcadeModel = new (__FILE__, 78) D3DIMSoultreeObject(1);
     if (!AppendChild(arcadeModel->UnknownVirtualSlot9(renderContext, name, a, b, 1), -1)) {
         Release();
@@ -137,8 +137,8 @@ void ArcadeObject::StartSpin(Vector3 axis, float speed) {
 }
 
 // 0x00401800
-int ArcadeObject::UnknownVirtualSlot10(float frameTime) {
-    GameObject::UnknownVirtualSlot10(frameTime);
+int ArcadeObject::Tick(float frameTime) {
+    GameObject::Tick(frameTime);
     if (lifetimeEnabled) {
         if (elapsedLifetime > lifetime)
             isVisible = 0;

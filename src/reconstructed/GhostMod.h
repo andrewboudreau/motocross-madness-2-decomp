@@ -27,7 +27,7 @@ public:
                                       UnknownSoultreeMesh** out); // 0x0047bb70
     // 0x0047bbf0 (ret 4)
     void StartFade(float duration);
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0047bc20
+    virtual int Tick(float frameTime);                 // 0x0047bc20
 
     float timeRemaining;                       // time remaining
     float totalDuration;                       // duration

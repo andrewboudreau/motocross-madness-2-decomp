@@ -61,7 +61,7 @@ RunwayLights::RunwayLights(int flags) : GameObject(flags) {
 RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain) {
     char name[0x104];
 
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     groundTerrain = terrain;
     sprintf(name, "%s\\%s", "Res", "pointer.slt");
     int i = 0;
@@ -79,8 +79,8 @@ RunwayLights* RunwayLights::SetupLights(void* value, int a, int b, UnknownRunway
 }
 
 // 0x0048a760
-int RunwayLights::UnknownVirtualSlot10(float frameTime) {
-    GameObject::UnknownVirtualSlot10(frameTime);
+int RunwayLights::Tick(float frameTime) {
+    GameObject::Tick(frameTime);
     if (!trackedRacer)
         return 1;
     for (int i = 0; i < 5; i++)
@@ -207,7 +207,7 @@ void VisualCue::CollectRacers(UnknownVisualCueView* view) {
 }
 
 // 0x0048afa0
-int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int VisualCue::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int active = 0;
     for (int i = 0; i < cueRacerCount; i++)
         if (cueRacers[i]->UnknownIsEnabled())
@@ -282,7 +282,7 @@ NumberObjectManager* NumberObjectManager::SetupDigits(void* value, int b, Unknow
                                                       float size) {
     char name[0x104];
 
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     countdownRacer = racer;
     char names[5][16] = {"one.slt", "two.slt", "three.slt", "four.slt", "five.slt"};
     if (!pixels || !camera) {
@@ -314,8 +314,8 @@ struct UnknownNumberOwner {
 };
 
 // 0x0048bfc0
-int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
-    GameObject::UnknownVirtualSlot10(frameTime);
+int NumberObjectManager::Tick(float frameTime) {
+    GameObject::Tick(frameTime);
     for (int i = 0; i < 5; i++)
         if (digitModels[i])
             digitModels[i]->isVisible = 0;
@@ -482,7 +482,7 @@ int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
 // 0x0048ca60
 BonusObjectManager* BonusObjectManager::SetupCounter(void* value, int a, int b, UnknownBonusRacer* racer,
                                                      UnknownBonusCamera* camera) {
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     raceView = racer;
     this->camera = camera;
     if (!CreateFrameNode(value, a, b)) {

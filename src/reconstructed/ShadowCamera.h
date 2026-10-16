@@ -11,5 +11,5 @@ public:
     explicit ShadowCamera(int flags); // 0x004da520
 
     virtual int UnknownVirtualSlot19(int value);
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
 };

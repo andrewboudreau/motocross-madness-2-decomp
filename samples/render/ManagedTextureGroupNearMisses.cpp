@@ -18,7 +18,7 @@
 // register choice. Tried without effect: block scopes around the emptying
 // section, the first pass (`requested`), the levels loop and the
 // refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
-// registers rotate); an `elapsed` local for `now - field_0x250` (worse).
+// registers rotate); an `elapsed` local for `now - blitStartTime` (worse).
 //
 // ManagedTextureGroup::RepackWithPartialBlits (0x0050dad0, 5020 bytes): the
 // repack with partial texture blits, chosen by 0x0050c8c0. Control flow,
@@ -98,14 +98,14 @@ static inline float PageMegabytes(ManagedTextureGroup* group, const int& pages) 
 // textures are emptied until the textures that need a place fit, and are
 // refilled largest level first; the figures go to the debug overlay.
 void ManagedTextureGroup::RepackWholePages() {
-    field_0x1d0 = 0;
+    texelsBlitted = 0;
     ReadClock();
     field_0x1cc = 0;
-    memset(field_0x1fc, 0, sizeof(field_0x1fc));
-    memset(field_0x220, 0, sizeof(field_0x220));
-    field_0x244 = 0;
-    field_0x248 = 0;
-    field_0x24c = 0;
+    memset(requestedBySize, 0, sizeof(requestedBySize));
+    memset(grantedBySize, 0, sizeof(grantedBySize));
+    texelsRequested = 0;
+    texelsGranted = 0;
+    texelsManaged = 0;
     UnknownTextureMapList emptied;
     int unused[9];
     memset(unused, 0, sizeof(unused));
@@ -114,10 +114,10 @@ void ManagedTextureGroup::RepackWholePages() {
     texture = managedTextures.First();
     while (texture) {
         ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
-        field_0x24c += LevelArea(managed->SizeLevel());
+        texelsManaged += LevelArea(managed->SizeLevel());
         if (!managed->useCount) {
             managed->plannedLevel = -1;
-            int placed = managed->field_0xa8;
+            int placed = managed->allocatedLevel;
             if (placed >= 0) {
                 unused[placed]++;
                 field_0x90[placed].Add(managed);
@@ -132,10 +132,10 @@ void ManagedTextureGroup::RepackWholePages() {
             level = 5;
         managed->plannedLevel = level;
         managed->wantedLevel = level;
-        field_0x1fc[level]++;
-        field_0x244 += LevelArea(level);
-        if (managed->field_0xa8 > level)
-            level = managed->field_0xa8;
+        requestedBySize[level]++;
+        texelsRequested += LevelArea(level);
+        if (managed->allocatedLevel > level)
+            level = managed->allocatedLevel;
         managed->plannedLevel = level;
         managed->lastUseFrame = groupManager->frameCount;
         field_0x7c.Add(managed);
@@ -147,10 +147,10 @@ void ManagedTextureGroup::RepackWholePages() {
     int i;
     for (i = field_0x7c.m_count - 1; i >= 0; i--) {
         ManagedTexture* managed = field_0x7c.Get(i);
-        if (managed->field_0xa8 <= 0) {
+        if (managed->allocatedLevel <= 0) {
             field_0x7c.RemoveOrdered(managed);
             field_0x158.Add(managed);
-        } else if (managed->field_0xa8 < managed->plannedLevel) {
+        } else if (managed->allocatedLevel < managed->plannedLevel) {
             field_0x7c.RemoveOrdered(managed);
             field_0x16c.Add(managed);
         }
@@ -216,7 +216,7 @@ void ManagedTextureGroup::RepackWholePages() {
     memset(levels, 0, sizeof(levels));
     for (i = 0; i < field_0x158.m_count; i++)
         levels[field_0x158.Get(i)->plannedLevel]++;
-    field_0x250 = ReadClock();
+    blitStartTime = ReadClock();
     int filled = 0;
     for (texture = emptied.First(); texture; texture = emptied.Next()) {
         if (field_0x158.m_count <= 0)
@@ -231,8 +231,8 @@ void ManagedTextureGroup::RepackWholePages() {
 
     if (g_TrackGame->debugOverlay) {
         int now = ReadClock();
-        field_0x1d4.RecordSample(field_0x1d0);
-        field_0x1e0.RecordSample(now - field_0x250);
+        texelsBlittedHistory.RecordSample(texelsBlitted);
+        blitTimeHistory.RecordSample(now - blitStartTime);
         char format[12];
         strcpy(format, "Unknown");
         texture = managedTextures.First();
@@ -241,44 +241,44 @@ void ManagedTextureGroup::RepackWholePages() {
             do {
                 ManagedTexture* managed = static_cast<ManagedTexture*>(texture);
                 if (managed->plannedLevel > 0) {
-                    field_0x220[managed->plannedLevel]++;
-                    field_0x248 += LevelArea(managed->plannedLevel);
+                    grantedBySize[managed->plannedLevel]++;
+                    texelsGranted += LevelArea(managed->plannedLevel);
                 }
             } while ((texture = managedTextures.Next()) != 0);
         }
-        if (field_0x254 < 0)
-            field_0x254 = g_TrackGame->debugOverlay->NewPage();
-        field_0x1ec.RecordSample(filled);
-        g_TrackGame->debugOverlay->Title(field_0x254, "TextureManager no partial");
-        g_TrackGame->debugOverlay->Print(field_0x254, "PixelFormat:%s", format);
+        if (debugPage < 0)
+            debugPage = g_TrackGame->debugOverlay->NewPage();
+        texturesBlittedHistory.RecordSample(filled);
+        g_TrackGame->debugOverlay->Title(debugPage, "TextureManager no partial");
+        g_TrackGame->debugOverlay->Print(debugPage, "PixelFormat:%s", format);
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "CacheTextures:%d %.2fM", cachePages.m_count,
+            debugPage, "CacheTextures:%d %.2fM", cachePages.m_count,
             PageMegabytes(this, cachePages.m_count));
-        g_TrackGame->debugOverlay->Print(field_0x254, "ManagedTextures:%d", managedTextures.m_count);
-        float peak = (float)field_0x1d4.LargestRecentSample();
+        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedTextures.m_count);
+        float peak = (float)texelsBlittedHistory.LargestRecentSample();
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMem Blted: %.2fM, Peak: %.2fM",
-            (float)PixelFormatBytesPerPixel(groupFormat) * field_0x1d0 * 9.536743e-07f,
+            debugPage, "TexMem Blted: %.2fM, Peak: %.2fM",
+            (float)PixelFormatBytesPerPixel(groupFormat) * texelsBlitted * 9.536743e-07f,
             PixelFormatBytesPerPixel(groupFormat) * peak * 9.536743e-07f);
-        g_TrackGame->debugOverlay->Print(field_0x254, "BltTime %d (%d)", now - field_0x250,
-                                                                field_0x1e0.LargestRecentSample());
-        g_TrackGame->debugOverlay->Print(field_0x254, "Size Requested Granted");
-        g_TrackGame->debugOverlay->Print(field_0x254, "256:    %02d        %02d",
-                                                                field_0x1fc[8], field_0x220[8]);
-        g_TrackGame->debugOverlay->Print(field_0x254, "128:    %02d        %02d",
-                                                                field_0x1fc[7], field_0x220[7]);
-        g_TrackGame->debugOverlay->Print(field_0x254, " 64:    %02d        %02d",
-                                                                field_0x1fc[6], field_0x220[6]);
-        g_TrackGame->debugOverlay->Print(field_0x254, " 32:    %02d        %02d",
-                                                                field_0x1fc[5], field_0x220[5]);
+        g_TrackGame->debugOverlay->Print(debugPage, "BltTime %d (%d)", now - blitStartTime,
+                                                                blitTimeHistory.LargestRecentSample());
+        g_TrackGame->debugOverlay->Print(debugPage, "Size Requested Granted");
+        g_TrackGame->debugOverlay->Print(debugPage, "256:    %02d        %02d",
+                                                                requestedBySize[8], grantedBySize[8]);
+        g_TrackGame->debugOverlay->Print(debugPage, "128:    %02d        %02d",
+                                                                requestedBySize[7], grantedBySize[7]);
+        g_TrackGame->debugOverlay->Print(debugPage, " 64:    %02d        %02d",
+                                                                requestedBySize[6], grantedBySize[6]);
+        g_TrackGame->debugOverlay->Print(debugPage, " 32:    %02d        %02d",
+                                                                requestedBySize[5], grantedBySize[5]);
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMemRequested:%.2fM", TexelMegabytes(this, field_0x244));
+            debugPage, "TexMemRequested:%.2fM", TexelMegabytes(this, texelsRequested));
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMemGranted:%.2fM", TexelMegabytes(this, field_0x248));
+            debugPage, "TexMemGranted:%.2fM", TexelMegabytes(this, texelsGranted));
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMemManaged:%.2fM", TexelMegabytes(this, field_0x24c));
-        g_TrackGame->debugOverlay->Print(field_0x254, "Textures Blted %d (%d)", filled,
-                                                                field_0x1ec.LargestRecentSample());
+            debugPage, "TexMemManaged:%.2fM", TexelMegabytes(this, texelsManaged));
+        g_TrackGame->debugOverlay->Print(debugPage, "Textures Blted %d (%d)", filled,
+                                                                texturesBlittedHistory.LargestRecentSample());
     }
     field_0x158.Clear();
     field_0x16c.Clear();
@@ -315,14 +315,14 @@ static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedText
 // in +0x144. Their blits are spread over up to two passes within +0x74
 // texels; the figures go to the debug overlay.
 void ManagedTextureGroup::RepackWithPartialBlits() {
-    field_0x1d0 = 0;
+    texelsBlitted = 0;
     ReadClock();
     field_0x1cc = 0;
-    memset(field_0x1fc, 0, sizeof(field_0x1fc));
-    memset(field_0x220, 0, sizeof(field_0x220));
-    field_0x244 = 0;
-    field_0x248 = 0;
-    field_0x24c = 0;
+    memset(requestedBySize, 0, sizeof(requestedBySize));
+    memset(grantedBySize, 0, sizeof(grantedBySize));
+    texelsRequested = 0;
+    texelsGranted = 0;
+    texelsManaged = 0;
     field_0x144.Clear();
     int unused[9];
     int pages[9];
@@ -335,10 +335,10 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     if (!managed)
         return;
     while (managed) {
-        field_0x24c += LevelArea(managed->SizeLevel());
+        texelsManaged += LevelArea(managed->SizeLevel());
         if (!managed->useCount) {
             managed->plannedLevel = -1;
-            int placed = managed->field_0xa8;
+            int placed = managed->allocatedLevel;
             if (placed >= 0) {
                 unused[placed]++;
                 field_0x90[placed].Add(managed);
@@ -352,10 +352,10 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         if (level < 5)
             level = 5;
         managed->wantedLevel = level;
-        field_0x1fc[level]++;
-        field_0x244 += LevelArea(level);
-        if (managed->field_0xa8 > level)
-            level = managed->field_0xa8;
+        requestedBySize[level]++;
+        texelsRequested += LevelArea(level);
+        if (managed->allocatedLevel > level)
+            level = managed->allocatedLevel;
         managed->lastUseFrame = groupManager->frameCount;
         managed->plannedLevel = level;
         field_0x7c.Add(managed);
@@ -402,7 +402,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
 
     for (i = 0; i < field_0x7c.m_count; i++) {
         managed = field_0x7c.Get(i);
-        if (managed->IsResident() && managed->plannedLevel != managed->field_0xa8)
+        if (managed->IsResident() && managed->plannedLevel != managed->allocatedLevel)
             managed->ReleasePage();
     }
     memset(levels, 0, sizeof(levels));
@@ -529,7 +529,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         }
     }
 
-    field_0x250 = ReadClock();
+    blitStartTime = ReadClock();
     if (field_0x144.m_count > 0) {
         int blitted = 0;
         for (i = 0; i < field_0x144.m_count; i++) {
@@ -541,7 +541,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         int pass = 1;
         while (pass < 3 && field_0x144.m_count > 0 && blitted > field_0x74) {
             managed = field_0x144.Get(j);
-            if (managed->field_0xa8 - pass >= 5) {
+            if (managed->allocatedLevel - pass >= 5) {
                 blitted -= LevelArea(managed->plannedLevel - managed->field_0x9c);
                 managed->field_0x9c = pass;
                 if (pass == managed->field_0x98 && managed->IsResident()) {
@@ -567,8 +567,8 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
 
     if (g_TrackGame->debugOverlay) {
         int now = ReadClock();
-        field_0x1d4.RecordSample(field_0x1d0);
-        field_0x1e0.RecordSample(now - field_0x250);
+        texelsBlittedHistory.RecordSample(texelsBlitted);
+        blitTimeHistory.RecordSample(now - blitStartTime);
         int managedTexels = managedTextures.m_count << 16;
         char format[8];
         int wantedTexels = 0;
@@ -581,48 +581,48 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             do {
                 managed = static_cast<ManagedTexture*>(texture);
                 if (managed->plannedLevel > 0) {
-                    field_0x220[managed->plannedLevel]++;
-                    field_0x248 += LevelArea(managed->plannedLevel);
+                    grantedBySize[managed->plannedLevel]++;
+                    texelsGranted += LevelArea(managed->plannedLevel);
                 }
                 if (managed->wantedLevel > 0)
                     wantedTexels += LevelArea(managed->wantedLevel);
             } while ((texture = managedTextures.Next()) != 0);
         }
-        if (field_0x254 < 0)
-            field_0x254 = g_TrackGame->debugOverlay->NewPage();
-        g_TrackGame->debugOverlay->Title(field_0x254, "TextureManager partial blts");
-        g_TrackGame->debugOverlay->Print(field_0x254, "PixelFormat:%s", format);
+        if (debugPage < 0)
+            debugPage = g_TrackGame->debugOverlay->NewPage();
+        g_TrackGame->debugOverlay->Title(debugPage, "TextureManager partial blts");
+        g_TrackGame->debugOverlay->Print(debugPage, "PixelFormat:%s", format);
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "CacheTextures:%d %.2fM", cachePages.m_count,
+            debugPage, "CacheTextures:%d %.2fM", cachePages.m_count,
             (PixelFormatBytesPerPixel(groupFormat) * cachePages.m_count << 18) * 3.1789145e-07f);
-        g_TrackGame->debugOverlay->Print(field_0x254, "ManagedTextures:%d", managedTextures.m_count);
-        g_TrackGame->debugOverlay->Print(field_0x254, "Managed %0.2fM",
+        g_TrackGame->debugOverlay->Print(debugPage, "ManagedTextures:%d", managedTextures.m_count);
+        g_TrackGame->debugOverlay->Print(debugPage, "Managed %0.2fM",
                                                                 (managedF = (float)managedTexels) * 9.536743e-07f);
-        g_TrackGame->debugOverlay->Print(field_0x254, "Ideal   %0.2fM",
+        g_TrackGame->debugOverlay->Print(debugPage, "Ideal   %0.2fM",
                                                                 (wantedF = (float)wantedTexels) * 9.536743e-07f);
-        g_TrackGame->debugOverlay->Print(field_0x254, "  ratio %0.2fM", wantedF / managedF);
-        float peak = (float)field_0x1d4.LargestRecentSample();
+        g_TrackGame->debugOverlay->Print(debugPage, "  ratio %0.2fM", wantedF / managedF);
+        float peak = (float)texelsBlittedHistory.LargestRecentSample();
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMem Blted: %.2fM, (%.2fM)",
-            (float)PixelFormatBytesPerPixel(groupFormat) * field_0x1d0 * 9.536743e-07f,
+            debugPage, "TexMem Blted: %.2fM, (%.2fM)",
+            (float)PixelFormatBytesPerPixel(groupFormat) * texelsBlitted * 9.536743e-07f,
             PixelFormatBytesPerPixel(groupFormat) * peak * 9.536743e-07f);
-        g_TrackGame->debugOverlay->Print(field_0x254, "BltTime %d (%d)", now - field_0x250,
-                                                                field_0x1e0.LargestRecentSample());
-        g_TrackGame->debugOverlay->Print(field_0x254, "256:    %02d        %02d",
-                                                                field_0x1fc[8], field_0x220[8]);
-        g_TrackGame->debugOverlay->Print(field_0x254, "128:    %02d        %02d",
-                                                                field_0x1fc[7], field_0x220[7]);
-        g_TrackGame->debugOverlay->Print(field_0x254, " 64:    %02d        %02d",
-                                                                field_0x1fc[6], field_0x220[6]);
-        g_TrackGame->debugOverlay->Print(field_0x254, " 32:    %02d        %02d",
-                                                                field_0x1fc[5], field_0x220[5]);
+        g_TrackGame->debugOverlay->Print(debugPage, "BltTime %d (%d)", now - blitStartTime,
+                                                                blitTimeHistory.LargestRecentSample());
+        g_TrackGame->debugOverlay->Print(debugPage, "256:    %02d        %02d",
+                                                                requestedBySize[8], grantedBySize[8]);
+        g_TrackGame->debugOverlay->Print(debugPage, "128:    %02d        %02d",
+                                                                requestedBySize[7], grantedBySize[7]);
+        g_TrackGame->debugOverlay->Print(debugPage, " 64:    %02d        %02d",
+                                                                requestedBySize[6], grantedBySize[6]);
+        g_TrackGame->debugOverlay->Print(debugPage, " 32:    %02d        %02d",
+                                                                requestedBySize[5], grantedBySize[5]);
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMemRequested:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * field_0x244 * 1.2715658e-06f);
+            debugPage, "TexMemRequested:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * texelsRequested * 1.2715658e-06f);
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMemGranted:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * field_0x248 * 1.2715658e-06f);
+            debugPage, "TexMemGranted:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * texelsGranted * 1.2715658e-06f);
         g_TrackGame->debugOverlay->Print(
-            field_0x254, "TexMemManaged:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * field_0x24c * 1.2715658e-06f);
-        g_TrackGame->debugOverlay->Print(field_0x254, "Textures Blted %d", field_0x144.m_count);
+            debugPage, "TexMemManaged:%.2fM", (float)PixelFormatBytesPerPixel(groupFormat) * texelsManaged * 1.2715658e-06f);
+        g_TrackGame->debugOverlay->Print(debugPage, "Textures Blted %d", field_0x144.m_count);
     }
 }
 
@@ -672,9 +672,9 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             if (!selected->useCount && selected->page)
                 state = "Un";
             else if (selected->largestUse > 0.0f) {
-                if (selected->field_0xa8 > selected->wantedLevel)
+                if (selected->allocatedLevel > selected->wantedLevel)
                     state = "Hi";
-                else if (selected->field_0xa8 < selected->wantedLevel && selected->field_0xa8 != 8)
+                else if (selected->allocatedLevel < selected->wantedLevel && selected->allocatedLevel != 8)
                     state = "Lo";
             }
             int x = target->targetWidth - selected->textureWidth;
@@ -694,7 +694,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                 target->UnlockSurface(0);
             }
             _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", textureCursor + 1, selected->largestUse,
-                      selected->field_0xa8, state);
+                      selected->allocatedLevel, state);
             void* textDc;
             if (!target->renderSurface->GetDC(&textDc)) {
                 TextOutA(textDc, x, 20, text, strlen(text));

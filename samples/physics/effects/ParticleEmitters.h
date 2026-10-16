@@ -20,7 +20,7 @@ class DustParticleEmitter : public GameObject {
 public:
     explicit DustParticleEmitter(int flags);
     virtual ~DustParticleEmitter();
-    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int Tick(float dt);
     virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
     void SetPosition(ParticleVec3 p, float intensity);   // 0x004b8d90
     void SetColor(unsigned char r, unsigned char g, int b);          // 0x004b8dd0
@@ -51,7 +51,7 @@ class DirtChunkParticleEmitter : public GameObject {
 public:
     explicit DirtChunkParticleEmitter(int flags);
     virtual ~DirtChunkParticleEmitter();
-    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int Tick(float dt);
     virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
 
     int firstUpdate;          // +0x2c ctor 1
@@ -81,7 +81,7 @@ class DirtSprayParticleEmitter : public GameObject {
 public:
     explicit DirtSprayParticleEmitter(int flags);
     virtual ~DirtSprayParticleEmitter();
-    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int Tick(float dt);
     virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
 
     int firstUpdate;          // +0x2c ctor 1
@@ -111,7 +111,7 @@ class SparkParticleEmitter : public GameObject {
 public:
     explicit SparkParticleEmitter(int flags);
     virtual ~SparkParticleEmitter();
-    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int Tick(float dt);
     virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
     void SetPosition(ParticleVec3 p);   // 0x004b9dc0
 
@@ -144,7 +144,7 @@ class SteamParticleEmitter : public GameObject {
 public:
     explicit SteamParticleEmitter(int flags);
     virtual ~SteamParticleEmitter();
-    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int Tick(float dt);
     virtual int UnknownVirtualSlot27(void* a, ParticleManager* manager);
     void SetPosition(ParticleVec3 p);   // 0x004ba2c0
     void Restart();                                   // 0x004ba300

@@ -33,7 +33,7 @@ emitter classes and the vector-constant initialisers, whose ownership is not pro
 * `ParticleManager`: RTTI COL 0x0055e0b0, vtable 0x00555d10 (28 slots), base GameObject at offset 0. Overrides slot 0, slot 10
   (0x004baaf0), slot 14 (0x004bac60) and adds slot 27 (0x004ba4d0). Size at least 0x2058; each `Particle` is 0x48 bytes
   (`new(0x48, __FILE__, 0x48a)` x 1000).
-* Slot 27 (0x004ba4d0, exact) fills the rest of the object: `field_0x18`(+4)(+0x194) is an IDirect3D7-shaped object whose slot 5
+* Slot 27 (0x004ba4d0, exact) fills the rest of the object: `renderContext`(+4)(+0x194) is an IDirect3D7-shaped object whose slot 5
   (CreateVertexBuffer) gets a {0x10, caps 0x800, FVF, count} block three times: +0x1f84 (FVF 0x1c4, 1500), +0x1f88 (0x1e2, 1500),
   +0x1f8c (0x1c4, 4000; locked with flags 1, 0x1f400 bytes zeroed, unlocked). +0x1f94 is `new unsigned short[6000]` (line 0x4a8) of quad
   indices (4i, 4i+1, 4i+2, 4i, 4i+2, 4i+3). +0x1f80 is the 0x0050a590 texture (format 0x115c, key 0xff00ff), slot 8 called with (1, 0, 0).
@@ -46,7 +46,7 @@ emitter classes and the vector-constant initialisers, whose ownership is not pro
 
 ## Proposed slot names (tier 3)
 
-* ParticleManager slot 10 `GameObjectVirtualSlot10(float dt)`: the per-frame update; returns 1 at once when the game context
+* ParticleManager slot 10 `Tick(float dt)`: the per-frame update; returns 1 at once when the game context
   (global 0x0056e26c) `+0x1c4` is nonzero. Ages particles by dt*1000, recycles dead ones, integrates size (flag 8), position (flag 4) and
   velocity with gravity (flag 0x10).
 * ParticleManager slot 14: the render pass (sorts the visible particles with `CompareParticleDepth`), not reconstructed.

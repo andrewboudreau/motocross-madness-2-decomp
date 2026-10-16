@@ -120,13 +120,13 @@ public:
     explicit SoundGroup(int flags);           // 0x00401a30
     virtual ~SoundGroup();                    // 0x00401af0 (deleting wrapper 0x00401ad0)
     // Slots 4-7 call the GameObject slot, then slot 16 with 1, 0, 1, 0.
-    virtual void UnknownVirtualSlot4();       // 0x00401e20
-    virtual void UnknownVirtualSlot5();       // 0x00401e40
-    virtual void UnknownVirtualSlot6();       // 0x00401e60
-    virtual void UnknownVirtualSlot7();       // 0x00401e80
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00401f30: fades the members
-    virtual int UnknownVirtualSlot16(int value);       // 0x00401ee0: pauses the members
-    virtual int UnknownVirtualSlot18();                // 0x00401ea0: restores the members
+    virtual void Disable();                   // 0x00401e20
+    virtual void Enable();                    // 0x00401e40
+    virtual void OnDisable();                 // 0x00401e60
+    virtual void OnEnable();                  // 0x00401e80
+    virtual int Tick(float frameTime);                 // 0x00401f30: fades the members
+    virtual int SetPaused(int value);                  // 0x00401ee0: pauses the members
+    virtual int OnActivate();                          // 0x00401ea0: restores the members
     int AddMember(Sound* sound);  // 0x00401b50: adds a member
     int RemoveMember(Sound* sound);  // 0x00401be0: removes a member
     void ReleaseMembers();             // 0x00401c30: releases every member

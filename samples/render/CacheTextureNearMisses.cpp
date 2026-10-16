@@ -62,7 +62,7 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
         while (sourceSide > 0) {
             if (destination->Blt(&rect, source, 0, 0x1000000, 0))
                 return 0;
-            ownerGroup->field_0x1d0 += (rect.bottom - rect.top) * (rect.right - rect.left);
+            ownerGroup->texelsBlitted += (rect.bottom - rect.top) * (rect.right - rect.left);
             long sourceResult = source->GetAttachedSurface(&caps, &nextSource);
             long destinationResult = destination->GetAttachedSurface(&caps, &nextDestination);
             if (sourceResult || destinationResult)

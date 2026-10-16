@@ -11,7 +11,7 @@
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
-  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x004692f0",
   "?GetBounds@ShadowCaster@@QAEXPAUShadowVec3@@0@Z": "0x004fe850",
   "?GetPart@ShadowCaster@@QAEXHPAPAXPAHPAPAG1HH@Z": "0x004433f0",
   "?GetVertexCount@ShadowCaster@@QAEHXZ": "0x00444fe0",

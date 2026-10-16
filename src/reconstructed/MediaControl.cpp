@@ -84,12 +84,12 @@ MediaControl::~MediaControl()
 }
 
 // 0x004a27f0
-int MediaControl::UnknownVirtualSlot10(float frameTime)
+int MediaControl::Tick(float frameTime)
 {
     __int64 time;
     __int64 duration;
 
-    GameObject::UnknownVirtualSlot10(frameTime);
+    GameObject::Tick(frameTime);
     if (!videoSample) {
         return 0;
     }
@@ -112,17 +112,17 @@ int MediaControl::UnknownVirtualSlot10(float frameTime)
 }
 
 // 0x004a28c0
-int MediaControl::UnknownVirtualSlot17()
+int MediaControl::OnDeactivate()
 {
-    UnknownVirtualSlot16(1);
-    return GameObject::UnknownVirtualSlot17();
+    SetPaused(1);
+    return GameObject::OnDeactivate();
 }
 
 // 0x004a28e0
-int MediaControl::UnknownVirtualSlot18()
+int MediaControl::OnActivate()
 {
-    UnknownVirtualSlot16(0);
-    return GameObject::UnknownVirtualSlot18();
+    SetPaused(0);
+    return GameObject::OnActivate();
 }
 
 // 0x004a2900. The break-out-of-do form places the shared `return 0` before
@@ -151,7 +151,7 @@ void MediaControl::Stop()
 }
 
 // 0x004a2970
-int MediaControl::UnknownVirtualSlot16(int value)
+int MediaControl::SetPaused(int value)
 {
     if (value) {
         if (!isPaused) {
@@ -163,7 +163,7 @@ int MediaControl::UnknownVirtualSlot16(int value)
         Seek(pausedTime);
         multiMediaStream->SetState(1);
     }
-    return GameObject::UnknownVirtualSlot16(value);
+    return GameObject::SetPaused(value);
 }
 
 // 0x004a29f0

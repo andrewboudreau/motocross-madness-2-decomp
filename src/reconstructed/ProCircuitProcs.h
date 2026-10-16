@@ -148,9 +148,9 @@ public:
 class PCCentralBikeRiderDlg : public UIDialog {
 public:
     PCCentralBikeRiderDlg() : UIDialog(1, "PCCBikeR.dtm") {}
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004d72c0: turns the bike view
-    virtual int UnknownVirtualSlot13();       // 0x004d77d0: applies the chosen bike and rider skins
-    virtual void UnknownVirtualSlot26();      // 0x004d72a0: hides the bike view
+    virtual int Tick(float frameTime);                 // 0x004d72c0: turns the bike view
+    virtual int RenderPre3D();                // 0x004d77d0: applies the chosen bike and rider skins
+    virtual void MarkPendingRelease();        // 0x004d72a0: hides the bike view
     void HandleEvent(UnknownDialogEvent* event); // 0x004d6770
     void SyncValues(int apply);     // 0x004d7d70: stores the chosen bike and rider
     void FillBikeRiderLists();             // 0x004d6fc0: fills the bike and rider lists

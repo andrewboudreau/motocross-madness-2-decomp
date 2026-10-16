@@ -128,8 +128,8 @@ public:
     explicit FollowCamera(int flags); // 0x00462ee0 (near miss: samples/camera)
     virtual ~FollowCamera();          // destructor core 0x00463350
 
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00465c20 (near miss: samples/camera)
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00466ad0, not reconstructed
+    virtual int Tick(float frameTime);                 // 0x00465c20 (near miss: samples/camera)
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00466ad0, not reconstructed
 
     virtual Vector3 UnknownVirtualSlot33() = 0;
     // Slots 34, 35 and 48 take the frame time as a float: slot 10 pushes its

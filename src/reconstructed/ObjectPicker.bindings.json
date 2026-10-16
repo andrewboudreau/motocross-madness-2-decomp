@@ -28,7 +28,7 @@
   "?Create@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z$ehhandler": "0x0054c6d0",
   "?PickAtCursor@ObjectPicker@@QAEHXZ": "0x004b04c0",
   "?PickAt@ObjectPicker@@QAEHHH@Z": "0x004b0500",
-  "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_$E1": "0x004b07c0",
   "_$E10": "0x004b08b0",

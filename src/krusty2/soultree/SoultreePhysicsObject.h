@@ -39,9 +39,9 @@ class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
 public:
     explicit D3DIMSoultreeObject(int a);          // 0x0043f160 (thiscall, ret 4)
     virtual ~D3DIMSoultreeObject();               // core 0x0043f2b0, deleting 0x0043f280
-    virtual void GameObjectVirtualSlot4();        // 0x00444540
-    virtual void GameObjectVirtualSlot5();        // 0x00444520
-    virtual int GameObjectVirtualSlot10(float dt); // 0x00443490
+    virtual void Disable();                       // 0x00444540
+    virtual void Enable();                        // 0x00444520
+    virtual int Tick(float dt);                    // 0x00443490
     virtual void D3DIMObjectVirtualSlot2();       // 0x0043f950
     virtual void D3DIMObjectVirtualSlot3();       // 0x0043fe40
     virtual void D3DIMObjectVirtualSlot4();       // 0x004440a0
@@ -66,7 +66,7 @@ public:
     // sceneNode = this (the D3DIMSoultreeObject subobject at +0x21c).
     explicit SoultreePhysicsObject(int flags);
     virtual ~SoultreePhysicsObject();             // core 0x005038d0, deleting 0x00503890
-    virtual int GameObjectVirtualSlot10(float dt); // 0x00503c50 (vbase thunk 0x00504270)
+    virtual int Tick(float dt);                    // 0x00503c50 (vbase thunk 0x00504270)
     // Slot 40 (0x00503970, `ret 0x70` = 28 argument dwords, tier 1).  Grouping (tier 2):
     //  * a1..a4 go to D3DIMObjectVirtualSlot9 as (a1, a2, a3, a4, 1); a2 is also the name the
     //    ".col" path is built from, a3 is tested at +0x25.

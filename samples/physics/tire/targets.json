@@ -32,7 +32,7 @@
   {
     "class": "Tire",
     "source": "Tire.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot8@Tire",
+    "candidate_symbol_contains": "SetRenderContext@Tire",
     "target_va": "0x00513490",
     "target_size": 201,
     "expect": "partial",

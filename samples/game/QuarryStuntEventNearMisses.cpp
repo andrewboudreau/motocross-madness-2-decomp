@@ -1,7 +1,7 @@
 // Near-miss QuarryStuntEvent.cpp candidates (BaseQuarryEvent), kept out of
 // src/reconstructed/QuarryStuntEvent.cpp until they match.
 //
-// BaseQuarryEvent::UnknownVirtualSlot12 (0x004e14a0, 1756 bytes): the
+// BaseQuarryEvent::PrepareGeometry (0x004e14a0, 1756 bytes): the
 // "Atmosphere" debug page (fog and light colours with the up/down keys). The
 // switch, its jump table, the fog-kind strcpy chain and all prints match;
 // the prologue differs: retail loads s_DebugPage into ecx and reloads
@@ -25,12 +25,12 @@ static int s_DebugPage = -1;
 static int s_DebugRow;
 
 // 0x004e14a0
-int BaseQuarryEvent::UnknownVirtualSlot12() {
-    GameObject::UnknownVirtualSlot12();
+int BaseQuarryEvent::PrepareGeometry() {
+    GameObject::PrepareGeometry();
     if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
-        if (g_TrackGame->debugOverlay->field_0x26c4 == s_DebugPage) {
+        if (g_TrackGame->debugOverlay->shownPage == s_DebugPage) {
             char atmosphere[0x40];
             int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
             int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);
@@ -43,9 +43,9 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
                 unsigned int color;
                 int value;
                 if (fog) {
-                    visibility = fog->field_0x38;
-                    haziness = fog->field_0x40;
-                    color = fog->field_0x2c;
+                    visibility = fog->fogVisibility;
+                    haziness = fog->fogHaziness;
+                    color = fog->fogColor;
                 } else {
                     visibility = 0.0f;
                     haziness = 0.0f;
@@ -182,22 +182,22 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
                     ecoSystem->LightingChanged();
             }
             if (eventFog) {
-                if (eventFog->field_0x44 == 0x100)
+                if (eventFog->fogKind == 0x100)
                     strcpy(atmosphere, "(Table Fog)");
-                else if (eventFog->field_0x44 == 0x80)
+                else if (eventFog->fogKind == 0x80)
                     strcpy(atmosphere, "(Vertex Fog)");
-                else if (eventFog->field_0x44 == 0x10000)
+                else if (eventFog->fogKind == 0x10000)
                     strcpy(atmosphere, "(Range Fog)");
             } else {
                 strcpy(atmosphere, "(No Fog)");
             }
             g_TrackGame->debugOverlay->Title(s_DebugPage, "Atmosphere %s", atmosphere);
             if (eventFog) {
-                g_TrackGame->debugOverlay->Print(s_DebugPage, "Visibility %f", eventFog->field_0x38);
-                g_TrackGame->debugOverlay->Print(s_DebugPage, "Haziness %f", eventFog->field_0x40);
-                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog R      %d", (eventFog->field_0x2c >> 16) & 0xff);
-                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
-                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Visibility %f", eventFog->fogVisibility);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Haziness %f", eventFog->fogHaziness);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog R      %d", (eventFog->fogColor >> 16) & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog G      %d", (eventFog->fogColor >> 8) & 0xff);
+                g_TrackGame->debugOverlay->Print(s_DebugPage, "Fog B      %d", eventFog->fogColor & 0xff);
             }
             g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight R %d", (sunLight->PackedColor() >> 16) & 0xff);
             g_TrackGame->debugOverlay->Print(s_DebugPage, "SunLight G %d", (sunLight->PackedColor() >> 8) & 0xff);

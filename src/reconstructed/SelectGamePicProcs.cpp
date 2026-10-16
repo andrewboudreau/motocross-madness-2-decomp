@@ -388,7 +388,7 @@ void MultiPlayerDlg::FillRacerSlots() {
             }
         }
         LeaveMenusForRace();
-        UnknownVirtualSlot26();
+        MarkPendingRelease();
     }
 }
 
@@ -699,7 +699,7 @@ void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
 // eight records (end pointer 0x00689dd0), one past g_UnknownGlobal689d08;
 // the arrival delay is one parenthesised expression (without the outer
 // parentheses VC6 loads TrackGame before the fild).
-int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     int i;
     if (from && type == 2) {
         UnknownPlayerStateMessage* state = (UnknownPlayerStateMessage*)data;
@@ -864,7 +864,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
             }
         }
     }
-    return GameObject::UnknownVirtualSlot24(type, data, from, to, flags);
+    return GameObject::OnNetworkMessage(type, data, from, to, flags);
 }
 
 // 0x00689e04: only written (0x004f4520).
@@ -1367,7 +1367,7 @@ void MultiPlayerDlg::FollowTrackChange() {
 }
 
 // 0x004f5f30
-int MPEventDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+int MPEventDlg::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     char text[0x80];
     if (type == 0x101) {
         int count = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
@@ -1973,7 +1973,7 @@ void MPBikeRiderDlg::PaintPlateNumber(int number) {
 }
 
 // 0x004f8620
-int MPBikeRiderDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+int MPBikeRiderDlg::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     if (type == 0x101) {
         EnableLargestOpponent();
     } else if (from && type == 0xf) {
@@ -2007,7 +2007,7 @@ void MPBikeRiderDlg::EnableLargestOpponent() {
 }
 
 // 0x004f8780
-int MPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int MPBikeRiderDlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind == 1 && event->control == 0) {
         RECT area = previewArea;
         area.left += 0x32;
@@ -2019,7 +2019,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
             previewDragging = 1;
         }
     }
-    return UIDialog::UnknownVirtualSlot23(event, entry);
+    return UIDialog::OnControlPress(event, entry);
 }
 
 
@@ -2033,10 +2033,10 @@ void MPBikeRiderDlg::ApplyChosenBike() {
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->UnknownVirtualSlot4();
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->Disable();
         ui = g_TrackGame->ui;
     }
-    model->uiModel->UnknownVirtualSlot5();
+    model->uiModel->Enable();
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -2160,7 +2160,7 @@ void MPOptionsDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004f9570
-int MPOptionsDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+int MPOptionsDlg::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     if (from && type == 0xf) {
         RefreshValues();
         EnableHostOptions();

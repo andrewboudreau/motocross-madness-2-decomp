@@ -46,7 +46,7 @@
 //   (19 instruction diffs) but reload `current` (766 bytes); references,
 //   casts, inline getters, helper parameters and declaration orders for
 //   `current`/`circuit` all give 48.
-// PCCentralBikeRiderDlg::UnknownVirtualSlot10 (0x004d72c0, 1291 bytes, 1233
+// PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1233
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
 
@@ -280,7 +280,7 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
                 g_TrackGame->mode.raceSettings.trackNumber = 0;
             g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
-            UnknownVirtualSlot26();
+            MarkPendingRelease();
         } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->AdvanceAfterRace();
             OpenCareerDialog();
@@ -291,7 +291,7 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
 }
 
 // 0x004d72c0: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0).
-int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
+int PCCentralBikeRiderDlg::Tick(float frameTime)
 {
     if (dialogBackground)
         dialogBackground->MarkAllDirty();
@@ -348,5 +348,5 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
     }
     if (dialogBackground)
         dialogBackground->SetRegionRect(previewRegion, (CameraRect*)&previewArea);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }

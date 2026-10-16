@@ -25,12 +25,12 @@ class Fog : public GameObject {
 public:
     explicit Fog(int flags);                  // 0x00462620 (ret 4)
     virtual ~Fog();                           // 0x00462670 (deleting wrapper 0x00462650)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004627f0 (folded with BackgroundImage slot 27)
-    virtual int UnknownVirtualSlot12();       // 0x00462800: camera range to the fog end
+    virtual int Tick(float frameTime);                 // 0x004627f0 (folded with BackgroundImage slot 27)
+    virtual int PrepareGeometry();            // 0x00462800: camera range to the fog end
     virtual int UnknownVirtualSlot14();       // 0x00462850: backdrop and device fog
     // 0x00462c20: key 0x57 toggles "DriverInfo\<driver>\RenderFog", keys 0x21 / 0x22
     // move the fog in and out.
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x00462680 (ret 0x1c): slot 8 with `target`, the device fog mode, then the
     // colour, visibility and haziness. `farScale`, `nearScale` and `minimum` scale the
@@ -41,15 +41,15 @@ public:
     void SetParameters(unsigned int color, float visibility, float haziness);
     void SetDetailLevel(int level);    // 0x00462db0: detail level
 
-    // QuarryStuntEvent.cpp reads +0x2c, +0x38, +0x40 and +0x44 under their
-    // provisional names.
-    unsigned int field_0x2c;                  // colour, 0x00RRGGBB
+    // QuarryStuntEvent's debug page prints +0x2c, +0x38, +0x40 and +0x44 under the
+    // labels "Fog R/G/B", "Visibility", "Haziness" and "(Table/Vertex/Range Fog)".
+    unsigned int fogColor;                    // +0x2c 0x00RRGGBB; D3DRENDERSTATE_FOGCOLOR and the backdrop's vertex colour
     float fogStart;
     float fogEnd;
-    float field_0x38;                         // visibility
+    float fogVisibility;                      // +0x38 SetParameters' visibility; "Visibility %f"
     float visibilityOffset;                   // keys 0x21 / 0x22 and the detail level move it
-    float field_0x40;                         // haziness
-    int field_0x44;                           // fog kind: the D3DPRASTERCAPS_FOGVERTEX, FOGTABLE or FOGRANGE bit
+    float fogHaziness;                        // +0x40 SetParameters' haziness; "Haziness %f"
+    int fogKind;                              // +0x44 fog kind: the D3DPRASTERCAPS_FOGVERTEX, FOGTABLE or FOGRANGE bit
     int renderFog;                            // "DriverInfo\<driver>\RenderFog" setting
     int drawnByFogOn;                         // set while FogOn draws it (skips the backdrop)
     float farScale;                           // scale the visibility into the fog range
@@ -60,7 +60,7 @@ public:
 class FogOff : public GameObject {
 public:
     explicit FogOff(int flags);               // 0x00462e10 (ret 4)
-    virtual GameObject* UnknownVirtualSlot8(void* value); // 0x00462e30 (folded)
+    virtual GameObject* SetRenderContext(void* value);    // 0x00462e30 (folded)
     virtual int UnknownVirtualSlot14();       // 0x00462e50
 };
 

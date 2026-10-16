@@ -107,7 +107,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
                                                    int a11, unsigned int wheelCount, float a13,
                                                    float a14, float a15)
 {
-    GameObject::UnknownVirtualSlot8(a0);
+    GameObject::SetRenderContext(a0);
     int n = strlen(name);
     int length = n > 0xff ? 0xff : n;
     strncpy(carName, name, length);

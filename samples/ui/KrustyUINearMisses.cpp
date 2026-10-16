@@ -43,7 +43,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     unsigned long size;
     int length;
     int count;
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     size = 16;
     for (int i = 0; i < 36; i++) {
         g_TrackGame->LoadResourceString(5000 + i, text, 128);

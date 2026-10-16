@@ -4,7 +4,7 @@
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7DirtSprayParticleEmitter@@6B@": "0x00555ba8",
-  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x004692f0",
   "?g_gameContext@@3PAUParticleGameContext@@A": "0x0056e26c",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3fef8000000000000000": "0x00552578",

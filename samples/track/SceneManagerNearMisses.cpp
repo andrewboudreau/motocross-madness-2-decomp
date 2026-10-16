@@ -745,9 +745,9 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     animationTable->randomSets[i].animationIndices[j] = atoi(token) - 1;
                     animationTable->entries[animationTable->randomSets[i].animationIndices[j]].field_0x00_bit0 = 1;
                     if (animationTable->entries[i].keyFramed)
-                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].character->UnknownVirtualSlot4();
+                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].character->Disable();
                     else
-                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].proceduralObject->UnknownVirtualSlot4();
+                        animationTable->entries[animationTable->randomSets[i].animationIndices[j]].proceduralObject->Disable();
                     animationTable->randomSets[i].motionIndices[j] = atoi(token + automatic + 1) - 1;
                     token = strtok(0, ",");
                 }

@@ -56,7 +56,7 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot14()
 
 // slot 12, 0x00504620: flags every quadtree object of the renderer's type that has no
 // +0x14c yet and counts them.
-int SoultreeQuadTreeRenderer::GameObjectVirtualSlot12()
+int SoultreeQuadTreeRenderer::PrepareGeometry()
 {
     g_quadTree->RestartQuery();
     visibleCount = 0;
@@ -70,18 +70,18 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot12()
             }
         }
     }
-    return GraphicsTest::GameObjectVirtualSlot12();
+    return GraphicsTest::PrepareGeometry();
 }
 
 // slot 10, 0x00504690.
-int SoultreeQuadTreeRenderer::GameObjectVirtualSlot10(float dt)
+int SoultreeQuadTreeRenderer::Tick(float dt)
 {
     for (int i = 0; i < g_soultreeNodeCount; i++) {
         SoultreeObject* node = g_soultreeNodes[i];
         if (node->subtreeDirty && node->inQuadtree)
             node->UpdateQuadtreeCell();
     }
-    return GraphicsTest::GameObjectVirtualSlot10(dt);
+    return GraphicsTest::Tick(dt);
 }
 
 // 0x005046e0: walks every D3DIMSoultreeObject below the tree root and switches it on.
@@ -125,7 +125,7 @@ void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 
 // slot 23, 0x005048d0: with the debug keys enabled, key 0x2d switches every
 // node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
-int SoultreeQuadTreeRenderer::GameObjectVirtualSlot23(int a, int b)
+int SoultreeQuadTreeRenderer::OnControlPress(int a, int b)
 {
     if ((g_soultreeStats->debugFlags & 4) && CheckKey(0x2d, 0, a, 0x80)) {
         if (!field_0x34)
@@ -133,5 +133,5 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot23(int a, int b)
         else
             RemoveNodesFromQuadtree();
     }
-    return GraphicsTest::GameObjectVirtualSlot23(a, b);
+    return GraphicsTest::OnControlPress(a, b);
 }

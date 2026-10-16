@@ -363,25 +363,25 @@ Scene::~Scene()
 }
 
 // 0x004eaa60: plays every listed sound, then the GameObject slot.
-void Scene::UnknownVirtualSlot5()
+void Scene::Enable()
 {
     for (int i = 0; i < sounds.m_count; i++) {
         Sound* sound = sounds.Get(i);
         if (sound)
             sound->PlayWithOptions(0, 1, 0);
     }
-    GameObject::UnknownVirtualSlot5();
+    GameObject::Enable();
 }
 
 // 0x004eaab0: as slot 5, before the GameObject slot 7.
-void Scene::UnknownVirtualSlot7()
+void Scene::OnEnable()
 {
     for (int i = 0; i < sounds.m_count; i++) {
         Sound* sound = sounds.Get(i);
         if (sound)
             sound->PlayWithOptions(0, 1, 0);
     }
-    GameObject::UnknownVirtualSlot7();
+    GameObject::OnEnable();
 }
 
 // 0x004eaec0
@@ -459,7 +459,7 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
             object->field_0x5c = running;
             if (running)
                 ((UnknownSceneAnimatedObject*)animationTable->entries[index].proceduralObject)
-                    ->UnknownVirtualSlot10(0.0001f);
+                    ->Tick(0.0001f);
         }
     }
     return 0;
@@ -1096,19 +1096,19 @@ int Scene::UnknownVirtualSlot14()
 }
 
 // 0x004f0060: control 5 toggles field_0x7bc; other events go to GameObject.
-int Scene::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry)
+int Scene::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     if (TestInputEvent(5, 0, event, 0x80)) {
         visible = 1 - visible;
         return 1;
     }
-    return GameObject::UnknownVirtualSlot22(event, entry) != 0;
+    return GameObject::OnControlRelease(event, entry) != 0;
 }
 
 // 0x004f00c0
-int Scene::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
+int Scene::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
-    return GameObject::UnknownVirtualSlot23(event, entry) != 0;
+    return GameObject::OnControlPress(event, entry) != 0;
 }
 
 // 0x004efb20: loads the scene file into field_0xdc and reads the
@@ -1180,7 +1180,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
     {
         int objects = ReadStaticModels(lights, a3, a4, a5, progress, interval);
         if (!ReadAnimations(lights, a4, a5, progress, interval) && !objects)
-            UnknownVirtualSlot4();
+            Disable();
     }
     ReadSounds();
     return 1;
@@ -1190,7 +1190,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
 // object and to the shadow casters, re-enabling those without flag 2.
 void Scene::SetDetailLevel(int level)
 {
-    g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8
+    g_UnknownGlobal689f18 = g_TrackGame->bladeRenderer ? g_UnknownGlobal5744c8
                                                               : g_UnknownGlobal574428;
     if (animationTable) {
         int i;
