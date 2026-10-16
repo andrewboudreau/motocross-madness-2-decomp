@@ -28,11 +28,11 @@ D3DIMSoultreeShadow::D3DIMSoultreeShadow(int flags)
 {
     caster = 0;
     shadow = 0;
-    field_0x34 = 0;
-    field_0x38 = 0;
+    inShadowView = 0;
+    inCameraView = 0;
     field_0x3c = 0;
     field_0x40 = 0;
-    field_0x44 = 0;
+    vertexCount = 0;
     for (int i = 0; i < 3000; i++)
         g_d3dimShadowIndexTable[i] = (short)i;
 }
@@ -114,15 +114,15 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
     out->_44 = a._41 * b._14 + a._42 * b._24 + a._43 * b._34 + a._44 * b._44;
 }
 
-// 0x004468f0 (slot 27): clears field_0x38 and field_0x34, then sets field_0x34 when the caster's
-// bounds pass the shadow camera's box test; returns field_0x34.  Slot 29
+// 0x004468f0 (slot 27): clears inCameraView and inShadowView, then sets inShadowView when the caster's
+// bounds pass the shadow camera's box test; returns inShadowView.  Slot 29
 // (0x00446c30, the same test with the render target's camera) is a near miss in
 // samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp.
 int D3DIMSoultreeShadow::UnknownVirtualSlot27()
 {
     D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
-    field_0x38 = 0;
-    field_0x34 = 0;
+    inCameraView = 0;
+    inShadowView = 0;
     if (!c->field_0x14c) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
@@ -133,9 +133,9 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot27()
         D3DIMShadowMatrixProduct(&m, local, view);
         if (g_visibilityClipper->TestBox((D3DIMShadowCameraView*)shadow->camera, &m._11, &center.x,
                                          &extent.x, 0, 0, 0))
-            field_0x34 = 1;
+            inShadowView = 1;
     }
-    return field_0x34;
+    return inShadowView;
 }
 
 // 0x00446bf0: texel size of the shadow texture (0.5 / size when the +0x98 flag is set, else
@@ -217,13 +217,13 @@ public:
     unsigned char field_0x1c8;                   // bit 2 tested by slot 14
 };
 
-// Slot 14 (0x00447540): draws the receiver's shadow triangles (field_0x44 vertices and indices)
+// Slot 14 (0x00447540): draws the receiver's shadow triangles (vertexCount vertices and indices)
 // with the shadow texture, an identity world matrix and modulating texture stages; the address
 // mode and render state 4 are restored afterwards.  Format 0x613 textures also switch render
 // state 0x21 on around the draw.
 int D3DIMSoultreeShadow::GameObjectVirtualSlot14()
 {
-    if (field_0x38 && field_0x34 && field_0x44) {
+    if (inCameraView && inShadowView && vertexCount) {
         ShadowMatrix world;
         memset(&world, 0, sizeof(world));
         world.m[3][3] = 1.0f;
@@ -261,8 +261,8 @@ int D3DIMSoultreeShadow::GameObjectVirtualSlot14()
         ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(4, 1, 0);
         ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0xe, 0, 0);
         ((D3DIMShadowRenderTarget*)renderContext)->Slot18(0);
-        ((D3DIMShadowRenderTarget*)renderContext)->DrawIndexed(4, 0x1e2, g_d3dimShadowVertices, field_0x44,
-                                                            g_d3dimShadowIndexTable, field_0x44, 0);
+        ((D3DIMShadowRenderTarget*)renderContext)->DrawIndexed(4, 0x1e2, g_d3dimShadowVertices, vertexCount,
+                                                            g_d3dimShadowIndexTable, vertexCount, 0);
         ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0xe, 1, 0);
         ((D3DIMShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 0, 0);
         if (address != 3)

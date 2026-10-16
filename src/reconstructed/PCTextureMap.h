@@ -18,10 +18,11 @@ void ExpandLzw(void* destination, void* source, int size);
 // writes it (the level dump).
 #include "bmpfile.h"
 
-// Shared texture surfaces reused across textures: 0x0068a36c by mip level
-// count, 0x0068a394 for single-level textures.
-extern UnknownSurfaceInterface* g_UnknownSharedMipSurfaces68a36c[10];
-extern UnknownSurfaceInterface* g_UnknownSharedSurfaces68a394[10];
+// Shared texture surfaces reused across textures, indexed by mip count: 0x0068a36c
+// for mipmapped, 0x0068a394 for single-level 555/565 textures (CreateSurface reuses
+// and AddRefs them; TextureMapManager clears and releases them).
+extern UnknownSurfaceInterface* g_SharedMipTextureSurfaces[10];
+extern UnknownSurfaceInterface* g_SharedTextureSurfaces[10];
 
 // 0x00689968 (.bss, read once at 0x004c7097, never written): when set,
 // CreateSurface dumps the first level with DumpLevel (0x004c84e0).

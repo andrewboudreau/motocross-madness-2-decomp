@@ -148,7 +148,7 @@ public:
     UnknownTextureMapList allTextures;        // +0x2c every registered texture
     ManagedTextureGroup* debugGroup;          // +0x3c cache selected by the debug keys
     int debugGroupIndex;                      // +0x40 its index in +0x44
-    ContainerList<ManagedTextureGroup*> field_0x44;
+    ContainerList<ManagedTextureGroup*> groups; // +0x44  ManagedTextureGroups: CreateGroup adds, the group destructor removes, ShareCacheLimit and the debug keys walk them
     int debugKeyMode;                         // +0x58 debug key mode (0-2)
     void* scratchBuffer;                      // +0x5c scratch buffer (0x00511310)
     void* secondScratchBuffer;                // +0x60 scratch buffer (0x00511370)

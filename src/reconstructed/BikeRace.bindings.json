@@ -131,7 +131,7 @@
   "?UpdateLapRace@@YAHPAPAUUnknownEventRacerPart@@PAVTrack@@MPAUUnknownBikeRaceNode@@2HH@Z": "0x004e63e0",
   "?UpdateGateRace@@YAHPAPAUUnknownEventRacerPart@@PAUUnknownBikeRaceNode@@MHH@Z": "0x004e6a50",
   "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
-  "?UnknownFunction4eafd0@Scene@@QAEXH@Z": "0x004eafd0",
+  "?EnableAutomaticSequence@Scene@@QAEXH@Z": "0x004eafd0",
   "?RestartAllEntries@Scene@@QAEXM@Z": "0x004eb000",
   "?RestartEntry@Scene@@QAEHHMHH@Z": "0x004eb040",
   "?ResolveSltPath@Scene@@QAEHPAD@Z": "0x004f0ec0",

@@ -63,11 +63,12 @@ public:
     // 0x004e86d0: stores the header for worker event 9 (rewrite it, close
     // the file) and signals it, waiting for the worker with `wait`.
     void CloseFile(int header, int headerSize, int wait);
-    // 0x004e8720: queues `size` bytes of `data` with two header values; 0 when
-    // full or stopped.
-    int QueueRecord(int a, int b, const void* data, unsigned int size);
-    // 0x004e8810: takes the next queued record; 0..4.
-    int TakeRecord(int* a, int* b, int* value, void* data, unsigned int* size, int signal);
+    // 0x004e8720: queues `size` bytes of `data` behind a (type, id, size) header;
+    // 0 when full or stopped. Types: 1, 10, 13 and 0x87 bike/net messages, -1 the
+    // tick record; id: the sender's network id.
+    int QueueRecord(int type, int id, const void* data, unsigned int size);
+    // 0x004e8810: takes the next queued record and its ring position; 0..4.
+    int TakeRecord(int* type, int* id, int* position, void* data, unsigned int* size, int signal);
     void StopReading();                   // 0x004e8990: signals stopReadingEvent
     void RestartReverseRead();            // 0x004e89c0: empties the ring, signals readReverseEvent
     void Seek(unsigned int milliseconds); // 0x004e8a20: signals seekEvent, +0xd0 = seconds
@@ -90,13 +91,13 @@ public:
     int recordMode;                       // mode
     void* recordBuffer;                     // 0x400-byte buffer (mode 1)
     UnknownRecorderCallback recordCallback;
-    int field_0x84;
-    int field_0x88;
+    int recordPending;                        // +0x84  slot 10 hands the last taken record to the callback again while set (set on its answers 3 and 5)
+    int readingReverse;                       // +0x88  set when the callback answers 11 at a record end; slot 10 then reads backwards until it stops
     unsigned char field_0x8c[0x90 - 0x8c];
     UnknownRecorderThreadParameters threadParameters;
-    int field_0xa0;
-    int field_0xa4;
-    int field_0xa8;
+    int recordType;                           // +0xA0  type of the last taken record (QueueRecord's first header word; -1 marks a tick record)
+    int recordId;                             // +0xA4  the last taken record's second header word (the sender's network id)
+    int recordPosition;                       // +0xA8  ring position of the last taken tick record (AppendPosition)
     UnknownRecorderOwner* vcrFile;
     UnknownVcr* frameRing;
     int isStopped;                       // stopped

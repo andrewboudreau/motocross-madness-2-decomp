@@ -28,8 +28,8 @@
 // 0x004e7d60 (2412 bytes with its jump table, VCRInterface slot 10; KrustyVCR
 // shares it): control flow, call arguments and the callback switch order
 // (5, 3, 11, 12, 2, 1, 7) are reconstructed, but many blocks differ: retail
-// keeps the constant 0 in eax from the field_0x88 test on (cmp ecx, eax;
-// push eax for the flag; field_0x84 = eax) and 1 in ebp in the loops, assigns
+// keeps the constant 0 in eax from the readingReverse test on (cmp ecx, eax;
+// push eax for the flag; recordPending = eax) and 1 in ebp in the loops, assigns
 // the stack slots value 0x18, queued 0x1c, size 0x20 and the readsReset
 // flag/loop count 0x24, keeps loop counts in ebp/edx, and cross-jumps fewer
 // `Rewind(); return 1;` exits.
@@ -346,7 +346,7 @@ int VCRInterface::Tick(float frameTime) {
     LeaveCriticalSection(&lock);
     if (recordMode != 1)
         return 1;
-    if (field_0x88) {
+    if (readingReverse) {
         int flag;
 
         EnterCriticalSection(&lock);
@@ -366,10 +366,10 @@ int VCRInterface::Tick(float frameTime) {
         if (!flag)
             return 1;
         for (;;) {
-            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 0);
+            result = TakeRecord(&recordType, &recordId, &value, recordBuffer, &size, 0);
             if (result == 0) {
-                if (recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds) != 11) {
-                    field_0x88 = 0;
+                if (recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds) != 11) {
+                    readingReverse = 0;
                     StopReading();
                     frameRing->SeekPosition(value);
                     Seek(milliseconds);
@@ -378,11 +378,11 @@ int VCRInterface::Tick(float frameTime) {
                 }
             } else if (result == 2) {
                 recordCallback(-3, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
-                field_0x88 = 0;
+                readingReverse = 0;
                 EnterCriticalSection(&lock);
                 reverseReadRestarted = 0;
                 LeaveCriticalSection(&lock);
-                field_0x84 = 0;
+                recordPending = 0;
                 Rewind();
                 return 1;
             } else if (result == 3) {
@@ -394,27 +394,27 @@ int VCRInterface::Tick(float frameTime) {
         }
     }
     queued = 0;
-    if (field_0x84) {
-        result = recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
+    if (recordPending) {
+        result = recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
         if (result == 3)
             return 1;
         if (result == 5) {
-            field_0x84 = 1;
+            recordPending = 1;
             return 1;
         }
         if (result == 12) {
-            field_0x84 = 0;
+            recordPending = 0;
             Rewind();
             return 1;
         }
         record = (UnknownRecorderRecord*)recordBuffer;
         recordTimeMs = (int)(record->time * 1000.0f);
         count = record->count;
-        field_0x84 = 0;
+        recordPending = 0;
         while (count--) {
-            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
+            result = TakeRecord(&recordType, &recordId, &value, recordBuffer, &size, 1);
             if (result == 0) {
-                recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
+                recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
                     frameRing->AppendPosition(value, recordTimeMs);
                     queued = 1;
@@ -422,7 +422,7 @@ int VCRInterface::Tick(float frameTime) {
             } else {
                 if (result == 1 &&
                     recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
-                    field_0x84 = 0;
+                    recordPending = 0;
                     Rewind();
                     return 1;
                 }
@@ -433,12 +433,12 @@ int VCRInterface::Tick(float frameTime) {
             frameRing->AppendPosition(-1, recordTimeMs);
         return 1;
     }
-    field_0x84 = 0;
-    result = TakeRecord(&field_0xa0, &field_0xa4, &field_0xa8, recordBuffer, &size, 1);
+    recordPending = 0;
+    result = TakeRecord(&recordType, &recordId, &recordPosition, recordBuffer, &size, 1);
     if (result == 1) {
         result = recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
         if (result == 11) {
-            field_0x88 = 1;
+            readingReverse = 1;
             StopReading();
             return 1;
         }
@@ -448,21 +448,21 @@ int VCRInterface::Tick(float frameTime) {
     }
     if (result == 4)
         return 1;
-    if (field_0xa0 != -1)
+    if (recordType != -1)
         return 1;
-    frameRing->AppendPosition(field_0xa8, recordTimeMs);
+    frameRing->AppendPosition(recordPosition, recordTimeMs);
     record = (UnknownRecorderRecord*)recordBuffer;
     recordTimeMs = (int)(record->time * 1000.0f);
     count = record->count;
-    switch (recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds)) {
+    switch (recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds)) {
     case 5:
-        field_0x84 = 1;
+        recordPending = 1;
         return 1;
     case 3:
-        field_0x84 = 1;
+        recordPending = 1;
         return 1;
     case 11:
-        field_0x88 = 1;
+        readingReverse = 1;
         StopReading();
         return 1;
     case 12:
@@ -471,16 +471,16 @@ int VCRInterface::Tick(float frameTime) {
     case 2:
         for (;;) {
             while (count--) {
-                result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
+                result = TakeRecord(&recordType, &recordId, &value, recordBuffer, &size, 1);
                 if (result == 0) {
-                    recordCallback(field_0xa0, recordBuffer, 1, field_0xa4, &keep, recordTimeMs, &milliseconds);
+                    recordCallback(recordType, recordBuffer, 1, recordId, &keep, recordTimeMs, &milliseconds);
                     if (keep) {
                         frameRing->AppendPosition(value, recordTimeMs);
                         queued = 1;
                     }
                 } else if (result == 1) {
                     if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
-                        field_0x84 = 1;
+                        recordPending = 1;
                         Rewind();
                     }
                     return 1;
@@ -491,11 +491,11 @@ int VCRInterface::Tick(float frameTime) {
             if (queued)
                 frameRing->AppendPosition(-1, recordTimeMs);
             queued = 0;
-            result = TakeRecord(&field_0xa0, &field_0xa4, &field_0xa8, recordBuffer, &size, 1);
+            result = TakeRecord(&recordType, &recordId, &recordPosition, recordBuffer, &size, 1);
             if (result == 1) {
                 result = recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
                 if (result == 11) {
-                    field_0x88 = 1;
+                    readingReverse = 1;
                     StopReading();
                     return 1;
                 }
@@ -505,22 +505,22 @@ int VCRInterface::Tick(float frameTime) {
             }
             if (result == 4)
                 return 1;
-            result = recordCallback(field_0xa0, recordBuffer, 1, field_0xa4, &keep, recordTimeMs, &milliseconds);
+            result = recordCallback(recordType, recordBuffer, 1, recordId, &keep, recordTimeMs, &milliseconds);
             if (result == 1) {
                 record = (UnknownRecorderRecord*)recordBuffer;
                 recordTimeMs = (int)(record->time * 1000.0f);
                 count = record->count;
                 while (count--) {
-                    result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
+                    result = TakeRecord(&recordType, &recordId, &value, recordBuffer, &size, 1);
                     if (result == 0) {
-                        recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
+                        recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                         if (keep) {
                             frameRing->AppendPosition(value, recordTimeMs);
                             queued = 1;
                         }
                     } else if (result == 1) {
                         if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
-                            field_0x84 = 1;
+                            recordPending = 1;
                             Rewind();
                         }
                         return 1;
@@ -531,11 +531,11 @@ int VCRInterface::Tick(float frameTime) {
                 break;
             }
             if (result == 3) {
-                field_0x84 = 1;
+                recordPending = 1;
                 return 1;
             }
             if (result == 11) {
-                field_0x88 = 1;
+                readingReverse = 1;
                 StopReading();
                 return 1;
             }
@@ -550,16 +550,16 @@ int VCRInterface::Tick(float frameTime) {
         break;
     case 1:
         while (count--) {
-            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
+            result = TakeRecord(&recordType, &recordId, &value, recordBuffer, &size, 1);
             if (result == 0) {
-                recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
+                recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
                     frameRing->AppendPosition(value, recordTimeMs);
                     queued = 1;
                 }
             } else if (result == 1) {
                 if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
-                    field_0x84 = 1;
+                    recordPending = 1;
                     Rewind();
                 }
                 return 1;
@@ -570,16 +570,16 @@ int VCRInterface::Tick(float frameTime) {
         break;
     case 7:
         while (count--) {
-            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
+            result = TakeRecord(&recordType, &recordId, &value, recordBuffer, &size, 1);
             if (result == 0) {
-                recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
+                recordCallback(recordType, recordBuffer, 0, recordId, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
                     frameRing->AppendPosition(value, recordTimeMs);
                     queued = 1;
                 }
             } else if (result == 1) {
                 if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
-                    field_0x84 = 1;
+                    recordPending = 1;
                     Rewind();
                 }
                 return 1;
@@ -587,7 +587,7 @@ int VCRInterface::Tick(float frameTime) {
                 return 1;
             }
         }
-        field_0x84 = 1;
+        recordPending = 1;
         break;
     default:
         return 1;

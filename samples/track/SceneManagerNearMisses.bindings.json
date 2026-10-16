@@ -100,7 +100,7 @@
   "??_C@_0P@OKLM@UseBlendedKeys?$AA@": "0x005737f0",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?CreateFollowing@SoultreeSoundEmitter@@QAEPAV1@PAXPBD1PAVUnknownVehiclePart@@UUnknownSound3DParameters@@KMMHH@Z": "0x004029f0",
-  "?UnknownFunction4319c0@UnknownSceneObject@@QAEPAVGameObject@@PAXPBD1PAVLightManager@@HHH@Z": "0x004319c0",
+  "?Load@UnknownSceneObject@@QAEPAVGameObject@@PAXPBD1PAVLightManager@@HHH@Z": "0x004319c0",
   "?Configure@UnknownSceneCollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?SetHullShape@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@HHHH@Z": "0x00432720",
   "?LoadShape@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@PBD@Z": "0x00432800",

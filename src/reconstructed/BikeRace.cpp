@@ -509,7 +509,7 @@ int BikeRace::Tick(float frameTime) {
                         isRacing = true;
                         raceScene->field_0x7c0 = 0;
                         if (startGate != 0) {
-                            raceScene->UnknownFunction4eafd0(startGateEntry);
+                            raceScene->EnableAutomaticSequence(startGateEntry);
                             startGateTimer = 5.0f;
                         }
                         if (g_TrackGame->playerCount > 1) {
@@ -1476,7 +1476,7 @@ void BikeRace::ResetStartCountdown() {
                 thirtySecondMan->collisionObject->Release();
                 thirtySecondMan->collisionObject = 0;
             }
-            raceScene->UnknownFunction4eafd0(thirtySecondManEntry);
+            raceScene->EnableAutomaticSequence(thirtySecondManEntry);
         } else {
             startCountdown = 5.2f;
         }
@@ -1894,12 +1894,12 @@ void BikeRace::DrawTrack(Track* track) {
         return;
     }
     item->node = track->startNode;
-    item->field_0x0c = list;
+    item->next = list;
     list = item;
     while (list != 0) {
         if (list->node->flags & 4) {
             item = list;
-            list = list->field_0x0c;
+            list = list->next;
             item->node->flags &= ~4;
             DebugFree(item, __FILE__, 0x13a8);
         } else {
@@ -1944,7 +1944,7 @@ void BikeRace::DrawTrack(Track* track) {
                         return;
                     }
                     next->node = item->node->links[i];
-                    next->field_0x0c = list;
+                    next->next = list;
                     list = next;
                 }
             }

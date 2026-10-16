@@ -110,12 +110,12 @@ TextureMapManager::TextureMapManager() : GameObject(1) {
     secondScratchBufferSize = 0;
     field_0x78 = 0;
     frameCount = 0;
-    field_0x44.Init(4, 4);
+    groups.Init(4, 4);
     debugGroup = 0;
     debugGroupIndex = 0;
     regionAllocator = new(__FILE__, 125) BlockAllocator(0x30, 0x1800);
-    memset(g_UnknownSharedMipSurfaces68a36c, 0, sizeof(g_UnknownSharedMipSurfaces68a36c));
-    memset(g_UnknownSharedSurfaces68a394, 0, sizeof(g_UnknownSharedSurfaces68a394));
+    memset(g_SharedMipTextureSurfaces, 0, sizeof(g_SharedMipTextureSurfaces));
+    memset(g_SharedTextureSurfaces, 0, sizeof(g_SharedTextureSurfaces));
 }
 
 // 0x00510cf0: frees the scratch buffers and the block pool and releases the
@@ -128,10 +128,10 @@ TextureMapManager::~TextureMapManager() {
     if (regionAllocator)
         delete regionAllocator;
     for (int i = 0; i < 10; i++) {
-        if (g_UnknownSharedSurfaces68a394[i])
-            g_UnknownSharedSurfaces68a394[i]->Release();
-        if (g_UnknownSharedMipSurfaces68a36c[i])
-            g_UnknownSharedMipSurfaces68a36c[i]->Release();
+        if (g_SharedTextureSurfaces[i])
+            g_SharedTextureSurfaces[i]->Release();
+        if (g_SharedMipTextureSurfaces[i])
+            g_SharedMipTextureSurfaces[i]->Release();
     }
 }
 
@@ -143,8 +143,8 @@ int TextureMapManager::Tick(float frameTime) {
 
 // 0x00510df0
 int TextureMapManager::PrepareGeometry() {
-    for (int i = 0; i < field_0x44.m_count; i++) {
-        ManagedTextureGroup* cache = field_0x44.Get(i);
+    for (int i = 0; i < groups.m_count; i++) {
+        ManagedTextureGroup* cache = groups.Get(i);
         if (cache)
             cache->ClearUseRecords();
     }
@@ -155,8 +155,8 @@ int TextureMapManager::PrepareGeometry() {
 int TextureMapManager::RenderPre3D() {
     if (g_TrackGame->display->isAGP)
         return 1;
-    for (int i = 0; i < field_0x44.m_count; i++) {
-        ManagedTextureGroup* cache = field_0x44.Get(i);
+    for (int i = 0; i < groups.m_count; i++) {
+        ManagedTextureGroup* cache = groups.Get(i);
         if (cache)
             cache->RepackPages();
     }
@@ -166,8 +166,8 @@ int TextureMapManager::RenderPre3D() {
 // 0x00510e90
 int TextureMapManager::RenderPost3D() {
     if (g_TrackGame->testKey) {
-        for (int i = 0; i < field_0x44.m_count; i++) {
-            ManagedTextureGroup* cache = field_0x44.Get(i);
+        for (int i = 0; i < groups.m_count; i++) {
+            ManagedTextureGroup* cache = groups.Get(i);
             if (cache)
                 cache->DrawSelection(static_cast<PCRenderTarget*>(renderContext));
         }
@@ -202,9 +202,9 @@ int TextureMapManager::OnControlPress(UnknownControlEvent* event, UnknownInputEn
                 if (++debugGroup->pageCursor >= debugGroup->cachePages.m_count)
                     debugGroup->pageCursor = 0;
             } else if (debugKeyMode == 0) {
-                if (++debugGroupIndex >= field_0x44.m_count)
+                if (++debugGroupIndex >= groups.m_count)
                     debugGroupIndex = 0;
-                debugGroup = field_0x44.Get(debugGroupIndex);
+                debugGroup = groups.Get(debugGroupIndex);
             }
         } else if (TestInputEvent(0x1a, 0, event, 0x80)) {
             if (debugKeyMode == 1) {
@@ -215,8 +215,8 @@ int TextureMapManager::OnControlPress(UnknownControlEvent* event, UnknownInputEn
                     debugGroup->pageCursor = debugGroup->cachePages.m_count - 1;
             } else if (debugKeyMode == 0) {
                 if (--debugGroupIndex < 0)
-                    debugGroupIndex = field_0x44.m_count;
-                debugGroup = field_0x44.Get(debugGroupIndex);
+                    debugGroupIndex = groups.m_count;
+                debugGroup = groups.Get(debugGroupIndex);
             }
         } else if (TestInputEvent(0x15, 0, event, 0x80)) {
             if (debugGroup)
@@ -232,7 +232,7 @@ int TextureMapManager::OnControlPress(UnknownControlEvent* event, UnknownInputEn
 ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int addressU, int addressV) {
     ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
     cache->SetPageCount(pages);
-    field_0x44.Add(cache);
+    groups.Add(cache);
     if (!debugGroup)
         debugGroup = cache;
     return cache;
@@ -242,8 +242,8 @@ ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int a
 int TextureMapManager::OnActivate() {
     for (TextureMap* texture = allTextures.First(); texture; texture = allTextures.Next())
         texture->RecreateIfLost();
-    for (int i = 0; i < field_0x44.m_count; i++) {
-        ManagedTextureGroup* cache = field_0x44.Get(i);
+    for (int i = 0; i < groups.m_count; i++) {
+        ManagedTextureGroup* cache = groups.Get(i);
         if (cache)
             cache->RestoreLostPages();
     }
@@ -254,12 +254,12 @@ int TextureMapManager::OnActivate() {
 // hands out the "TextureCacheLimit" in 0x2aaaa-byte steps, each to the group
 // with the fewest steps for its texture count.
 int TextureMapManager::ShareCacheLimit() {
-    int count = field_0x44.m_count;
+    int count = groups.m_count;
     int* steps = new(__FILE__, 531) int[count];
     int* sizes = new(__FILE__, 532) int[count];
     int i;
     for (i = 0; i < count; i++) {
-        ManagedTextureGroup* group = field_0x44.Get(i);
+        ManagedTextureGroup* group = groups.Get(i);
         steps[i] = 0;
         sizes[i] = group->managedTextures.m_count;
         if (!sizes[i])
@@ -267,7 +267,7 @@ int TextureMapManager::ShareCacheLimit() {
     }
     if (g_TrackGame->display->isAGP) {
         for (i = 0; i < count; i++) {
-            UnknownTextureMapList* textures = &field_0x44.Get(i)->managedTextures;
+            UnknownTextureMapList* textures = &groups.Get(i)->managedTextures;
             for (TextureMap* texture = textures->First(); texture; texture = textures->Next())
                 static_cast<ManagedTexture*>(texture)->CreateOwnSurface(1, 0, 0);
         }
@@ -288,7 +288,7 @@ int TextureMapManager::ShareCacheLimit() {
             total += 0x2aaaa;
             if (total > g_TrackGame->display->textureCacheLimit)
                 break;
-            if (!field_0x44.Get(best)->SetPageCount(steps[best] + 1))
+            if (!groups.Get(best)->SetPageCount(steps[best] + 1))
                 break;
             steps[best]++;
         }
@@ -333,10 +333,10 @@ void TextureMapManager::CountTextureMemory() {
             }
             if (texture->textureWidth == 256)
                 count256++;
-            kind |= texture->textureWidth > texture->field_0x1c;
+            kind |= texture->textureWidth > texture->minimumMipSize;
             kind |= PixelFormatBytesPerPixel(texture->mapFormat) == 1 ? 8 : 0;
             int pixels = 0;
-            for (int width = texture->textureWidth, height = texture->textureHeight; width >= texture->field_0x1c;
+            for (int width = texture->textureWidth, height = texture->textureHeight; width >= texture->minimumMipSize;
                  width /= 2, height /= 2)
                 pixels += height * width;
             bytes += PixelFormatBytesPerPixel(texture->mapFormat) * pixels;

@@ -57,7 +57,7 @@ ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format,
 
 // 0x0050c2e0: leaves the manager and releases the textures and pages.
 ManagedTextureGroup::~ManagedTextureGroup() {
-    groupManager->field_0x44.Remove(this);
+    groupManager->groups.Remove(this);
     TextureMap* texture;
     while ((texture = managedTextures.Last()) != 0) {
         managedTextures.Remove(texture);
@@ -170,7 +170,7 @@ void ManagedTextureGroup::WriteDebugReport() {
                                   managed->textureHeight, managed->largestUse);
             if (managed->largestUse > 0.0f)
                 FilePrintf(file, ", Allocd=%d unhappy=%.2f", managed->allocatedLevel,
-                                      managed->UnknownFunction5109b0());
+                                      managed->Unhappiness());
             FilePrintf(file, "\n");
         }
         fclose(file);
@@ -216,7 +216,7 @@ int UnknownCompare50eeb0(const void* first, const void* second) {
 int UnknownCompare50ef00(const void* first, const void* second) {
     ManagedTexture* a = *(ManagedTexture**)first;
     ManagedTexture* b = *(ManagedTexture**)second;
-    float difference = -(a->UnknownFunction5109b0() - b->UnknownFunction5109b0());
+    float difference = -(a->Unhappiness() - b->Unhappiness());
     if (difference == 0.0f)
         return b - a;
     if (difference > 0.0f)
@@ -229,7 +229,7 @@ int UnknownCompare50ef00(const void* first, const void* second) {
 static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
     int position = 0;
     for (int j = list->m_count - 1; j >= 0; j--) {
-        if (texture->UnknownFunction5109b0() < list->Get(j)->UnknownFunction5109b0()) {
+        if (texture->Unhappiness() < list->Get(j)->Unhappiness()) {
             position = j + 1;
             break;
         }
@@ -260,7 +260,7 @@ int FitTexturesToBudget(ContainerList<ManagedTexture*>* list, int budget) {
             texture = list->Get(index);
         }
         int level = texture->plannedLevel;
-        if (texture->UnknownFunction5109b0() < 0.0f)
+        if (texture->Unhappiness() < 0.0f)
             texture->plannedLevel = texture->wantedLevel;
         else
             texture->plannedLevel--;

@@ -195,8 +195,9 @@ public:
 class UnknownQuarryVisibility : public UnknownQuarryQuadTreeHead, public GameObject {
 public:
     explicit UnknownQuarryVisibility(int flags);               // 0x0052d340
-    GameObject* UnknownFunction52d460(void* target, int a, int b, float width, float breadth, Scene* scene,
-                                      float height);
+    // 0x0052d460: VisibilityQuadTree::Setup (src/krusty2/visibility).
+    GameObject* Setup(void* target, int a, int b, float width, float breadth, Scene* scene,
+                      float height);
 };
 
 // ProjectedShadow (0x134 bytes) and TerrainShadow (0x6780 bytes).
@@ -214,7 +215,8 @@ public:
 class UnknownQuarryTerrainShadow : public GameObject {
 public:
     explicit UnknownQuarryTerrainShadow(int flags);            // 0x00508ae0
-    GameObject* UnknownFunction508b80(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow);
+    // 0x00508b80: TerrainShadow::Attach (samples/physics/shadow).
+    GameObject* Attach(void* target, UnknownTerrain* terrain, UnknownQuarryShadow* shadow);
 
     unsigned char field_0x2c[0x6780 - 0x2c];
 };
@@ -252,9 +254,10 @@ public:
 class UnknownQuarryTerrainObject : public GameObject {
 public:
     explicit UnknownQuarryTerrainObject(int flags);            // 0x00505830
-    UnknownTerrain* UnknownFunction5059d0(void* target, UnknownTextureStream* stream, int a,
-                                          UnknownTextureFormatChoice* textures, int level, int b,
-                                          const char* detailTexture, int c);
+    // 0x005059d0: Terrain::Load (src/krusty2/broadphase/Terrain.h).
+    UnknownTerrain* Load(void* target, UnknownTextureStream* stream, int a,
+                         UnknownTextureFormatChoice* textures, int level, int b,
+                         const char* detailTexture, int c);
 
     unsigned char field_0x2c[0xcc4 - 0x2c];
 };
@@ -280,8 +283,10 @@ public:
 // The overlays' race hooks.
 struct UnknownQuarryOverlayHooks {
     void SetStatsSource(UnknownQuarryRace* race);       // 0x00519880 (StatsOverlay)
+    // 0x0051d730 is ChatOverlay::CollectRacers; VisualCue's CollectRacers
+    // below has the same view signature, so this one keeps its address name.
     void UnknownFunction51d730(UnknownQuarryRace* race);       // 0x0051d730 (ChatOverlay)
-    void UnknownFunction51baf0(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay)
+    void TakeRacers(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay::TakeRacers)
     void CollectRacers(UnknownQuarryRace* race);       // 0x0048af20 (VisualCue)
 };
 
@@ -338,21 +343,21 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (g_TrackGame->bladeRenderer) {
         g_TrackGame->texturesCached = 0;
         if (memory.dwTotalPhys > 0x5a00000) {
-            terrainTextures.field_0x14 = 0;
-            skyTextures.field_0x14 = 0;
-            modelTextures.field_0x14 = 0;
+            terrainTextures.halvings = 0;
+            skyTextures.halvings = 0;
+            modelTextures.halvings = 0;
         } else if (memory.dwTotalPhys > 0x3c00000) {
-            terrainTextures.field_0x14 = 1;
-            skyTextures.field_0x14 = 0;
-            modelTextures.field_0x14 = 0;
+            terrainTextures.halvings = 1;
+            skyTextures.halvings = 0;
+            modelTextures.halvings = 0;
         } else if (memory.dwTotalPhys <= 0x2000000) {
-            terrainTextures.field_0x14 = 2;
-            skyTextures.field_0x14 = 2;
-            modelTextures.field_0x14 = 2;
+            terrainTextures.halvings = 2;
+            skyTextures.halvings = 2;
+            modelTextures.halvings = 2;
         } else {
-            terrainTextures.field_0x14 = 1;
-            skyTextures.field_0x14 = 1;
-            modelTextures.field_0x14 = 1;
+            terrainTextures.halvings = 1;
+            skyTextures.halvings = 1;
+            modelTextures.halvings = 1;
         }
     } else {
         int videoMemory = ((PCRenderTarget*)renderContext)->targetDisplay->totalVideoMemory;
@@ -373,54 +378,54 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         textureBytes = EstimateModelTextureBytes((int*)modelCounts);
         int raceBytes = EstimateRaceBytes();
         needed = g_UnknownGlobal59af10 * 0x2aaaa + raceBytes + textureBytes + cubeBytes + terrainBytes + 0xa0000;
-        terrainTextures.field_0x14 = 0;
-        skyTextures.field_0x14 = 0;
-        modelTextures.field_0x14 = 0;
+        terrainTextures.halvings = 0;
+        skyTextures.halvings = 0;
+        modelTextures.halvings = 0;
         if (((UnknownDisplay*)g_TrackGame->display)->isAGP) {
             g_TrackGame->texturesCached = 0;
             if (available - needed <= 0) {
                 if (forced) {
                     if (needed - terrainBytes + terrainBytes / 4 < available) {
-                        terrainTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
                     } else if (needed - cubeBytes - terrainBytes + (cubeBytes + terrainBytes) / 4 < available) {
-                        terrainTextures.field_0x14 = 1;
-                        skyTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
                     } else if (needed - textureBytes - cubeBytes - terrainBytes +
                                    (textureBytes + cubeBytes + terrainBytes) / 4 < available) {
-                        terrainTextures.field_0x14 = 1;
-                        skyTextures.field_0x14 = 1;
-                        modelTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
+                        modelTextures.halvings = 1;
                     } else {
-                        terrainTextures.field_0x14 = 2;
-                        skyTextures.field_0x14 = 2;
-                        modelTextures.field_0x14 = 2;
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 2;
+                        modelTextures.halvings = 2;
                     }
                 } else if (available - needed + memory.dwTotalPhys <= 0x2800000 && memory.dwTotalPhys <= 0x5000000) {
                     if (memory.dwTotalPhys > 0x3c00000) {
-                        terrainTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
                     } else if (needed - terrainBytes + terrainBytes / 4 < available) {
-                        terrainTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
                     } else if (needed - cubeBytes - terrainBytes + (cubeBytes + terrainBytes) / 4 < available) {
-                        terrainTextures.field_0x14 = 1;
-                        skyTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
                     } else if (needed - textureBytes - cubeBytes - terrainBytes +
                                    (textureBytes + cubeBytes + terrainBytes) / 4 < available) {
-                        terrainTextures.field_0x14 = 1;
-                        skyTextures.field_0x14 = 1;
-                        modelTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 1;
+                        skyTextures.halvings = 1;
+                        modelTextures.halvings = 1;
                     } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
                                    terrainBytes / 16 < available) {
-                        terrainTextures.field_0x14 = 2;
-                        skyTextures.field_0x14 = 1;
-                        modelTextures.field_0x14 = 1;
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 1;
+                        modelTextures.halvings = 1;
                     } else {
-                        terrainTextures.field_0x14 = 2;
-                        skyTextures.field_0x14 = 2;
+                        terrainTextures.halvings = 2;
+                        skyTextures.halvings = 2;
                         if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
                                 (cubeBytes + terrainBytes) / 16 < available)
-                            modelTextures.field_0x14 = 1;
+                            modelTextures.halvings = 1;
                         else
-                            modelTextures.field_0x14 = 2;
+                            modelTextures.halvings = 2;
                     }
                 }
             }
@@ -434,48 +439,48 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             if (available < 0)
                 available = 0;
             if (available > needed) {
-                terrainTextures.field_0x14 = 0;
-                skyTextures.field_0x14 = 0;
-                modelTextures.field_0x14 = 0;
+                terrainTextures.halvings = 0;
+                skyTextures.halvings = 0;
+                modelTextures.halvings = 0;
                 g_TrackGame->texturesCached = 0;
             } else if (!forced && memory.dwTotalPhys > 0x5a00000) {
-                terrainTextures.field_0x14 = 0;
-                skyTextures.field_0x14 = 0;
-                modelTextures.field_0x14 = 0;
+                terrainTextures.halvings = 0;
+                skyTextures.halvings = 0;
+                modelTextures.halvings = 0;
                 g_TrackGame->texturesCached = 1;
             } else if (needed - terrainBytes + terrainBytes / 4 < available) {
                 g_TrackGame->texturesCached = 0;
-                terrainTextures.field_0x14 = 1;
+                terrainTextures.halvings = 1;
             } else if (!forced && memory.dwTotalPhys > 0x3c00000) {
                 g_TrackGame->texturesCached = 1;
-                terrainTextures.field_0x14 = 1;
+                terrainTextures.halvings = 1;
             } else {
                 int all = textureBytes + cubeBytes + terrainBytes;
                 if (needed - textureBytes - cubeBytes - terrainBytes + all / 4 < available) {
                     g_TrackGame->texturesCached = 0;
-                    terrainTextures.field_0x14 = 1;
-                    skyTextures.field_0x14 = 1;
-                    modelTextures.field_0x14 = 1;
+                    terrainTextures.halvings = 1;
+                    skyTextures.halvings = 1;
+                    modelTextures.halvings = 1;
                 } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
                                terrainBytes / 16 < available) {
                     g_TrackGame->texturesCached = 0;
-                    terrainTextures.field_0x14 = 2;
-                    skyTextures.field_0x14 = 1;
-                    modelTextures.field_0x14 = 1;
+                    terrainTextures.halvings = 2;
+                    skyTextures.halvings = 1;
+                    modelTextures.halvings = 1;
                 } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
                                (cubeBytes + terrainBytes) / 16 < available) {
                     g_TrackGame->texturesCached = 0;
-                    terrainTextures.field_0x14 = 2;
-                    skyTextures.field_0x14 = 2;
-                    modelTextures.field_0x14 = 1;
+                    terrainTextures.halvings = 2;
+                    skyTextures.halvings = 2;
+                    modelTextures.halvings = 1;
                 } else {
                     if (needed - textureBytes - cubeBytes - terrainBytes + all / 16 < available)
                         g_TrackGame->texturesCached = 0;
                     else
                         g_TrackGame->texturesCached = !forced;
-                    terrainTextures.field_0x14 = 2;
-                    skyTextures.field_0x14 = 2;
-                    modelTextures.field_0x14 = 2;
+                    terrainTextures.halvings = 2;
+                    skyTextures.halvings = 2;
+                    modelTextures.halvings = 2;
                 }
             }
         }
@@ -485,11 +490,11 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
             field_0x98 = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
         }
     }
-    modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->textureManager;
-    modelTextures.field_0x04 = skyTextures.field_0x04 = terrainTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
-    modelTextures.field_0x08 = skyTextures.field_0x08 = terrainTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
-    modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)renderContext)->surfacePixelFormat;
-    modelTextures.field_0x10 = skyTextures.field_0x10 = terrainTextures.field_0x10 = 0x115c;
+    modelTextures.manager = skyTextures.manager = terrainTextures.manager = g_TrackGame->textureManager;
+    modelTextures.opaqueGroup = skyTextures.opaqueGroup = terrainTextures.opaqueGroup = (ManagedTextureGroup*)field_0x94;
+    modelTextures.alphaGroup = skyTextures.alphaGroup = terrainTextures.alphaGroup = (ManagedTextureGroup*)field_0x98;
+    modelTextures.opaqueFormat = skyTextures.opaqueFormat = terrainTextures.opaqueFormat = ((PCRenderTarget*)renderContext)->surfacePixelFormat;
+    modelTextures.alphaFormat = skyTextures.alphaFormat = terrainTextures.alphaFormat = 0x115c;
     if (progress)
         progress(0);
 
@@ -539,7 +544,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("QuadTree");
     UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) UnknownQuarryVisibility(1))
-        ->UnknownFunction52d460(renderContext, 0, 0,
+        ->Setup(renderContext, 0, 0,
                                 eventScene->environment->terrainWidth * eventScene->environment->terrainWidthScale * 256.0f,
                                 eventScene->environment->terrainBreadth * eventScene->environment->terrainBreadthScale * 256.0f,
                                 eventScene, 96.0f);
@@ -604,7 +609,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
         return 0;
     }
     eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
-                     ->UnknownFunction5059d0(renderContext, field_0x44, 1, &terrainTextures,
+                     ->Load(renderContext, field_0x44, 1, &terrainTextures,
                                              g_TrackGame->mode.videoSettings[3], 0,
                                              eventScene->environment->detailTexture, 0);
     if (!AppendChild((GameObject*)eventTerrain, -1)) {
@@ -617,7 +622,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Shadow");
     if (projectedShadow) {
         terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_TrackGame->mode.shadowsOn))
-                         ->UnknownFunction508b80(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
+                         ->Attach(renderContext, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
         AppendChild((GameObject*)terrainShadow, -1);
     }
     AppendChild(visibility, -1);
@@ -835,7 +840,7 @@ int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     if (chatOverlay)
         ((UnknownQuarryOverlayHooks*)chatOverlay)->UnknownFunction51d730((UnknownQuarryRace*)raceView);
     if (radarOverlay)
-        ((UnknownQuarryOverlayHooks*)radarOverlay)->UnknownFunction51baf0((UnknownQuarryRace*)raceView, chatOverlay);
+        ((UnknownQuarryOverlayHooks*)radarOverlay)->TakeRacers((UnknownQuarryRace*)raceView, chatOverlay);
     if (visualCue)
         ((UnknownQuarryOverlayHooks*)visualCue)->CollectRacers((UnknownQuarryRace*)raceView);
     g_MemTagStack->Pop(0);

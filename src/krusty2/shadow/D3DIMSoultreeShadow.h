@@ -27,11 +27,11 @@ public:
 
     ShadowCaster* caster;          // +0x2c ctor 0; Attach stores its second argument (slot 27 reads +0x14c / calls 0x004fe850 on it)
     ProjectedShadow* shadow;       // +0x30 ctor 0; Attach stores its third argument and registers this with it
-    int field_0x34;                // +0x34 ctor 0; slot 27 result flag (also its return value)
-    int field_0x38;                // +0x38 ctor 0; slot 27 clears it, slot 14 tests it
+    int inShadowView;              // +0x34 ctor 0; slot 27: the caster's bounds pass the shadow camera's box test (its return value); slot 30 does nothing without it
+    int inCameraView;              // +0x38 ctor 0; slot 29: the same test against the render target's camera; slot 30 emits and slot 14 draws only with it
     int field_0x3c;                // +0x3c ctor 0
     int field_0x40;                // +0x40 ctor 0
-    int field_0x44;                // +0x44 ctor 0; slot 14 tests it
+    int vertexCount;               // +0x44 ctor 0; receiver vertices slot 30 writes to g_d3dimShadowVertices (at most 3000); slot 14's draw count
 };
 
 #endif

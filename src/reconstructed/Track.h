@@ -55,14 +55,14 @@ struct TrackVec3 {
     float z;
 };
 
-// Work-list entry of the graph walks (calloc(1, 0x10)); only +0x04 and
+// Work-list entry of the graph walks (calloc(1, 0x10)); only +0x00, +0x04 and
 // +0x0c are used.
 struct TrackListItem {
     unsigned char flags;                      // +0x00 bit 1: walked in reverse (0x00517ea0)
     unsigned char field_0x01[3];
     TrackNode* node;                          // +0x04
     TrackListItem* field_0x08;
-    TrackListItem* field_0x0c;
+    TrackListItem* next;                      // +0xC  next item: the walks push items on the list head and step through it
 };
 
 

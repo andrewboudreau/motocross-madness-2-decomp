@@ -171,7 +171,7 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
-  "?g_UnknownStrings68a498@@3PAY0BA@DA": "0x0068a498",
+  "?g_ResourceNames@@3PAY0BA@DA": "0x0068a498",
   "_$E1": "0x0049bde0",
   "_$E10": "0x0049bed0",
   "_$E11": "0x0049bec0",

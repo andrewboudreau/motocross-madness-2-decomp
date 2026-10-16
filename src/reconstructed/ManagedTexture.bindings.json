@@ -21,7 +21,7 @@
   "?RecordUse@ManagedTexture@@QAEXM@Z": "0x00510820",
   "?RemapTexCoordsIfMoved@ManagedTexture@@QAEHPAM0000HI@Z": "0x00510910",
   "?SizeLevel@ManagedTexture@@QAEHXZ": "0x00510990",
-  "?UnknownFunction5109b0@ManagedTexture@@QAEMXZ": "0x005109b0",
+  "?Unhappiness@ManagedTexture@@QAEMXZ": "0x005109b0",
   "?ReleaseTextureSurface@PCTextureMap@@UAEXXZ": "0x004c7610",
   "?SetAsTexture@ManagedTexture@@UAEHXZ": "0x005108f0",
   "?SetAsTexture@PCTextureMap@@UAEHXZ": "0x004c7970",

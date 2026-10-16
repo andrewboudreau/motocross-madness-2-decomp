@@ -28,7 +28,7 @@ void GuiProgressCallback();
 void* ResizeDebugBlock(void* block, unsigned int size);
 
 // Global at 0x0068a498 (defined in KrustyUI.cpp).
-extern char g_UnknownStrings68a498[36][16];
+extern char g_ResourceNames[36][16];
 
 // 0x004988a0: GameObject's slot 8, then loads the short strings and the GUI
 // settings, creates and sets up the GUI, restores the last profile and the
@@ -46,8 +46,8 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
         g_TrackGame->LoadResourceString(5000 + i, text, 128);
         length = strlen(text);
         count = length > 15 ? 15 : length;
-        strncpy(g_UnknownStrings68a498[i], text, count);
-        g_UnknownStrings68a498[i][count] = 0;
+        strncpy(g_ResourceNames[i], text, count);
+        g_ResourceNames[i][count] = 0;
     }
     scale = 0;
     if (g_TrackGame->LoadResourceString(0xfed, text, 128))

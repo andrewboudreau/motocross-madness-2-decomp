@@ -173,7 +173,7 @@ int DrawableGridNodeSharedTextures::UnknownVirtualSlot8(int block)
         else
             texture = Terrain()->textures[index];
         if (texture)
-            return texture->textureWidth << texture->field_0x6c;
+            return texture->textureWidth << texture->halvings;
     }
     return 0;
 }

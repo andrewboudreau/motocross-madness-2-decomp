@@ -131,7 +131,7 @@ TextureMap* PCTextureMap::Clone() {
             if (!(desc.caps[0] & 0x1000))
                 noAlpha = 4;
             int created = copy->CreateSurface(desc.surface, textureWidth, textureHeight,
-                                              desc.pitch / PixelFormatBytesPerPixel(mapFormat), field_0x1c,
+                                              desc.pitch / PixelFormatBytesPerPixel(mapFormat), minimumMipSize,
                                               mapFormat, mapFormat, colorMapper, noAlpha | systemMemory,
                                               texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (!systemSurface->Unlock(0) && created) {
@@ -182,17 +182,17 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
     int shared;
     textureWidth = width;
     textureHeight = height;
-    field_0x1c = minimumSize;
+    minimumMipSize = minimumSize;
     colorMapper = palette;
     texturePalette = surfacePalette;
     if (choice)
-        format = IsFormat4444Or8888(format) ? choice->field_0x10 : choice->field_0x0c;
+        format = IsFormat4444Or8888(format) ? choice->alphaFormat : choice->opaqueFormat;
     mapFormat = format;
     FillPixelFormat(format, pixelFormat);
     mipmapped = flags & 2;
     mipCount = 1;
     if (!mipmapped) {
-        field_0x1c = width;
+        minimumMipSize = width;
         if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);
@@ -209,8 +209,8 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                     !(g_TrackGame->texturesCached) &&
                     (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
-                    if (g_UnknownSharedSurfaces68a394[mipCount]) {
-                        systemSurface = g_UnknownSharedSurfaces68a394[mipCount];
+                    if (g_SharedTextureSurfaces[mipCount]) {
+                        systemSurface = g_SharedTextureSurfaces[mipCount];
                         systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x1800;
@@ -259,7 +259,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                 }
             }
             if (shared) {
-                g_UnknownSharedSurfaces68a394[mipCount] = systemSurface;
+                g_SharedTextureSurfaces[mipCount] = systemSurface;
                 systemSurface->AddRef();
             }
             if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
@@ -296,8 +296,8 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                     !(g_TrackGame->texturesCached) &&
                     (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
-                    if (g_UnknownSharedMipSurfaces68a36c[mipCount]) {
-                        systemSurface = g_UnknownSharedMipSurfaces68a36c[mipCount];
+                    if (g_SharedMipTextureSurfaces[mipCount]) {
+                        systemSurface = g_SharedMipTextureSurfaces[mipCount];
                         systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x401808;
@@ -344,7 +344,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
                 }
             }
             if (shared) {
-                g_UnknownSharedMipSurfaces68a36c[mipCount] = systemSurface;
+                g_SharedMipTextureSurfaces[mipCount] = systemSurface;
                 systemSurface->AddRef();
             }
             if (texturePalette && mapFormat == 8 && systemSurface->SetPalette(texturePalette))
@@ -363,7 +363,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
         ConvertPixels(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, mapFormat,
                               sourceFormat, 0, palette, alphaThreshold, key);
         if (!(flags & 4))
-            field_0x3c = AverageColor(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
+            averageColor = AverageColor(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
                                                mapFormat, palette);
         if (systemSurface->Unlock(0))
             goto failed;

@@ -26,7 +26,7 @@ CameraRect g_DrawImageRectDrawnRect;
 BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
     imageVisible = 1;
     copyValid = 0;
-    field_0x2c = 0;
+    currentImage = 0;
     regionTable = 0;
     regionCapacity = 0;
     regionCount = 0;
@@ -35,9 +35,9 @@ BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
     heldDc = 0;
     field_0x5c = 0;
     imageRegion = -1;
-    field_0x64 = -1;
-    field_0x60 = 1;
-    field_0x68 = 1;
+    lastDcRegion = -1;
+    copyDcNext = 1;
+    lastDcRegionCopied = 1;
 }
 
 // The current display mode's size. Read through these helpers, each test
@@ -94,9 +94,9 @@ BackgroundImage::~BackgroundImage() {
         offscreenCopy->Release();
         offscreenCopy = 0;
     }
-    if (field_0x2c) {
-        field_0x2c->Release();
-        field_0x2c = 0;
+    if (currentImage) {
+        currentImage->Release();
+        currentImage = 0;
     }
     if (regionTable)
         DebugFree(regionTable, __FILE__, 230);
@@ -104,12 +104,12 @@ BackgroundImage::~BackgroundImage() {
 
 // 0x00403ec0
 int BackgroundImage::RenderPost3D() {
-    if (field_0x2c && imageVisible) {
+    if (currentImage && imageVisible) {
         g_BackgroundImageRect.left = 0;
         g_BackgroundImageRect.top = 0;
-        g_BackgroundImageRect.right = field_0x2c->textureWidth;
-        g_BackgroundImageRect.bottom = field_0x2c->textureHeight;
-        DrawImage(field_0x2c, &g_BackgroundImageRect, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
+        g_BackgroundImageRect.right = currentImage->textureWidth;
+        g_BackgroundImageRect.bottom = currentImage->textureHeight;
+        DrawImage(currentImage, &g_BackgroundImageRect, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
                               0);
         field_0x5c = 1;
     }
@@ -147,12 +147,12 @@ failed:
 // 0x004040b0
 void BackgroundImage::SetImage(PCTextureMap* image) {
     if (image) {
-        if (!field_0x2c)
+        if (!currentImage)
             imageRegion = AllocRegion(0);
-        field_0x2c = image;
+        currentImage = image;
     } else {
         ReleaseRegion(imageRegion);
-        field_0x2c = 0;
+        currentImage = 0;
     }
 }
 

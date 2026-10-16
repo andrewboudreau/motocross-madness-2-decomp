@@ -110,8 +110,9 @@ struct UnknownWaveHeader {
 extern "C" const UnknownGuid IID_IDirectSound3DBuffer; // 0x00556ca0
 extern "C" const UnknownGuid IID_IDirectSoundNotify;   // 0x00556cd0
 extern "C" const UnknownGuid IID_IKsPropertySet;       // 0x00556ce0
-// 0x00556cf0: the 3D algorithm GUID new 3D buffers request.
-extern "C" const UnknownGuid g_UnknownSound3DAlgorithm;
+// 0x00556cf0: the 3D algorithm GUID new 3D buffers request; its value
+// {C241333F-1C1B-11D2-94F5-00C04FC28ACA} is dsound.h's DS3DALG_NO_VIRTUALIZATION.
+extern "C" const UnknownGuid DS3DALG_NO_VIRTUALIZATION;
 
 // RTTI: SoundGroup : GameObject (vtable 0x00550500, 27 slots). Its code is
 // at 0x00401a30..0x00401f74, reconstructed in AuralScape.cpp.

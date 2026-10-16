@@ -26,10 +26,10 @@
 #define UNKNOWN_SWAP_BYTES(x) (((x) >> 24) | (((x) >> 8) & 0xff00) | (((x) << 8) & 0xff0000) | ((x) << 24))
 
 // 0x00567f90: byte masks of the top 1..8 bits (no reference found).
-unsigned char g_UnknownByteMasks567f90[8] = {0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff};
+unsigned char g_ByteHighBitMasks[8] = {0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff};
 
 // 0x00567f98: each byte with its bit order reversed.
-unsigned char g_UnknownBitReverse567f98[256] = {
+unsigned char g_BitReverseTable[256] = {
     0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
     0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8, 0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8,
     0x04, 0x84, 0x44, 0xc4, 0x24, 0xa4, 0x64, 0xe4, 0x14, 0x94, 0x54, 0xd4, 0x34, 0xb4, 0x74, 0xf4,
@@ -49,7 +49,7 @@ unsigned char g_UnknownBitReverse567f98[256] = {
 };
 
 // 0x00568098: the top 0..32 bits of a big-endian word, as stored in memory.
-unsigned int g_UnknownHighMasks568098[33] = {
+unsigned int g_WordHighBitMasks[33] = {
     0x00000000, 0x00000080, 0x000000c0, 0x000000e0, 0x000000f0, 0x000000f8, 0x000000fc, 0x000000fe,
     0x000000ff, 0x000080ff, 0x0000c0ff, 0x0000e0ff, 0x0000f0ff, 0x0000f8ff, 0x0000fcff, 0x0000feff,
     0x0000ffff, 0x0080ffff, 0x00c0ffff, 0x00e0ffff, 0x00f0ffff, 0x00f8ffff, 0x00fcffff, 0x00feffff,
@@ -59,7 +59,7 @@ unsigned int g_UnknownHighMasks568098[33] = {
 
 // 0x0056811c: bit 0..31 of a big-endian word, as stored in memory, then 0
 // (no reference found).
-unsigned int g_UnknownBitMasks56811c[33] = {
+unsigned int g_WordBitMasks[33] = {
     0x00000080, 0x00000040, 0x00000020, 0x00000010, 0x00000008, 0x00000004, 0x00000002, 0x00000001,
     0x00008000, 0x00004000, 0x00002000, 0x00001000, 0x00000800, 0x00000400, 0x00000200, 0x00000100,
     0x00800000, 0x00400000, 0x00200000, 0x00100000, 0x00080000, 0x00040000, 0x00020000, 0x00010000,
@@ -68,7 +68,7 @@ unsigned int g_UnknownBitMasks56811c[33] = {
 };
 
 // 0x005681a0: the low 0..32 bits of a host-order word.
-unsigned int g_UnknownLowMasks5681a0[33] = {
+unsigned int g_LowBitMasks[33] = {
     0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f, 0x0000003f, 0x0000007f,
     0x000000ff, 0x000001ff, 0x000003ff, 0x000007ff, 0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff,
     0x0000ffff, 0x0001ffff, 0x0003ffff, 0x0007ffff, 0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
@@ -77,13 +77,13 @@ unsigned int g_UnknownLowMasks5681a0[33] = {
 };
 
 // 0x00568224: the table ReadBits reads its masks through.
-unsigned int* g_UnknownLowMaskTable568224 = g_UnknownLowMasks5681a0;
+unsigned int* g_LowBitMaskTable = g_LowBitMasks;
 
 // The sequential reader's state (0x00578e90..0x00578e9b): the current word in
 // host order, the bits of it consumed, and the word's address.
-unsigned int g_UnknownReadWord578e90;
-int g_UnknownReadBits578e94;
-unsigned int* g_UnknownReadCursor578e98;
+unsigned int g_BitReaderWord;
+int g_BitReaderBitsUsed;
+unsigned int* g_BitReaderCursor;
 
 // 0x004238c0
 void GR_BitString::ShiftTowardFront(int count) {
@@ -161,9 +161,9 @@ GR_BitString::GR_BitString(const void* buffer, int bits, int flag) {
     field_0x0c = (void*)buffer;
     field_0x10 = 0x80;
     field_0x14 = 0;
-    g_UnknownReadCursor578e98 = (unsigned int*)buffer;
-    g_UnknownReadBits578e94 = 0;
-    g_UnknownReadWord578e90 = UNKNOWN_SWAP_BYTES(*g_UnknownReadCursor578e98);
+    g_BitReaderCursor = (unsigned int*)buffer;
+    g_BitReaderBitsUsed = 0;
+    g_BitReaderWord = UNKNOWN_SWAP_BYTES(*g_BitReaderCursor);
 }
 
 // 0x00423dd0
@@ -186,8 +186,8 @@ void GR_BitString::UnknownVirtualSlot1(int* value) {
         pairs = bytes / 2;
         back = (unsigned char*)data + bytes;
         do {
-            c = g_UnknownBitReverse567f98[*front];
-            *front++ = g_UnknownBitReverse567f98[*--back];
+            c = g_BitReverseTable[*front];
+            *front++ = g_BitReverseTable[*--back];
             *back = c;
         } while (--pairs);
         *value = -((8 - bitCount % 8) % 8);

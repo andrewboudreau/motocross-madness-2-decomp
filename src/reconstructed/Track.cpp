@@ -109,14 +109,14 @@ int Track::FreeReachableNodes(TrackNode** start)
     if (!item)
         return 0;
     item->node = *start;
-    item->field_0x0c = list;
+    item->next = list;
     list = item;
     while (list) {
         TrackNode* node = list->node;
         if (node->flags & 4) {
             FreeNode(node);
             item = list;
-            list = list->field_0x0c;
+            list = list->next;
             DebugFree(item, __FILE__, 400);
         } else {
             node->flags |= 4;
@@ -130,7 +130,7 @@ int Track::FreeReachableNodes(TrackNode** start)
                         return 0;
                     }
                     item->node = links[i];
-                    item->field_0x0c = list;
+                    item->next = list;
                     list = item;
                 }
             }
@@ -160,7 +160,7 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
         if (node->flags & 4) {
             node->flags &= ~4;
             item = list;
-            list = list->field_0x0c;
+            list = list->next;
             DebugFree(item, __FILE__, 530);
         } else {
             node->flags |= 4;
@@ -222,7 +222,7 @@ int Track::ClosestPointOnTrack(Vector3 p, TrackPos* out, float* outDistance)
                     if (!item)
                         return 0;
                     item->node = links[i];
-                    item->field_0x0c = list;
+                    item->next = list;
                     list = item;
                 }
             }
@@ -326,7 +326,7 @@ int Track::FreeWorkList(TrackListItem** list, int all)
     while ((item = *list) != 0) {
         if (item->node && (!(item->node->flags & 1) || all))
             FreeNode(item->node);
-        *list = (*list)->field_0x0c;
+        *list = (*list)->next;
         DebugFree(item, __FILE__, 1021);
     }
     return 1;
@@ -388,7 +388,7 @@ int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* dis
         return 0;
     }
     item->node = a.node;
-    item->field_0x0c = list;
+    item->next = list;
     list = item;
     length = toEnd;
     while (list) {
@@ -396,7 +396,7 @@ int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* dis
         if (node->flags & 4) {
             length -= node->pathLength;
             item = list;
-            list = list->field_0x0c;
+            list = list->next;
             item->node->flags &= ~4;
             DebugFree(item, __FILE__, 1212);
         } else {
@@ -414,7 +414,7 @@ int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* dis
                         return 0;
                     }
                     item->node = links[i];
-                    item->field_0x0c = list;
+                    item->next = list;
                     list = item;
                 } else if (links[i] == b.node) {
                     length = fromStart + length;
@@ -429,9 +429,9 @@ int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* dis
                                 return 0;
                             }
                             item->node = b.node;
-                            item->field_0x0c = *path;
+                            item->next = *path;
                             *path = item;
-                            for (TrackListItem* s = list; s; s = s->field_0x0c) {
+                            for (TrackListItem* s = list; s; s = s->next) {
                                 if (s->node->flags & 4) {
                                     item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1258);
                                     if (!item) {
@@ -440,7 +440,7 @@ int Track::ShortestPath(TrackPos a, TrackPos b, TrackListItem** path, float* dis
                                         return 0;
                                     }
                                     item->node = s->node;
-                                    item->field_0x0c = *path;
+                                    item->next = *path;
                                     *path = item;
                                 }
                             }
@@ -498,7 +498,7 @@ int Track::MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, floa
                     if (flags & 2)
                         item = item->field_0x08;
                     else
-                        item = item->field_0x0c;
+                        item = item->next;
                     if (!item)
                         break;
                     cur.node = item->node;
@@ -522,7 +522,7 @@ int Track::MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, floa
                     if (flags & 2)
                         item = item->field_0x08;
                     else
-                        item = item->field_0x0c;
+                        item = item->next;
                     if (!item)
                         break;
                     cur.node = item->node;

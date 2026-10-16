@@ -9,7 +9,7 @@
   "??_7ArrowManager@@6B@": "0x00550490",
   "??_GArrowManager@@UAEPAXI@Z": "0x00401a00",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?g_UnknownArrowManager5776d0@@3PAVArrowManager@@A": "0x005776d0",
+  "?g_ArrowManager@@3PAVArrowManager@@A": "0x005776d0",
   "_$E1": "0x00401960",
   "_$E1$ehhandler": "0x00549664",
   "_$E2": "0x00401950",

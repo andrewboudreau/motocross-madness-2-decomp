@@ -19,7 +19,7 @@
   "?AddDirectXBytes@MemTagStack@@QAEXH@Z": "0x004a2de0",
   "?SubtractDirectXBytes@MemTagStack@@QAEXH@Z": "0x004a2e00",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
-  "?g_UnknownUnclaimedBytes6850dc@@3HA": "0x006850dc",
+  "?g_UnclaimedBytes@@3HA": "0x006850dc",
   "_$E1": "0x004a2ad0",
   "_$E2": "0x004a2af0",
   "_$E3": "0x004a2ae0",

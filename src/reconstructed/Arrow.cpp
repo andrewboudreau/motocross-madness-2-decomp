@@ -1,7 +1,7 @@
 #include "Arrow.h"
 #include "DebugAlloc.h"
 
-ArrowManager* g_UnknownArrowManager5776d0 = new (__FILE__, 4) ArrowManager(1);
+ArrowManager* g_ArrowManager = new (__FILE__, 4) ArrowManager(1);
 
 // 0x004019d0
 ArrowManager::ArrowManager(int flags) : GameObject(flags) {

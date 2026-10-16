@@ -882,7 +882,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot2@SoultreeObject@@UAEXPAVSoultreeFileStream@@@Z",
+    "candidate_symbol_contains": "?LoadHierarchy@SoultreeObject@@UAEXPAVSoultreeFileStream@@@Z",
     "target_va": "0x004fdc00",
     "target_size": 433,
     "expect": "exact",
@@ -892,7 +892,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot3@SoultreeObject@@UAEXXZ",
+    "candidate_symbol_contains": "?LoadHierarchyFromParameters@SoultreeObject@@UAEXXZ",
     "target_va": "0x004fddc0",
     "target_size": 605,
     "expect": "exact",
@@ -902,7 +902,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot4@SoultreeObject@@UAEXPAPAV1@@Z",
+    "candidate_symbol_contains": "?CreateNode@SoultreeObject@@UAEXPAPAV1@@Z",
     "target_va": "0x004fe020",
     "target_size": 118,
     "expect": "exact",
@@ -952,7 +952,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot7@SoultreeObject@@UAEXPAV1@@Z",
+    "candidate_symbol_contains": "?CloneFrom@SoultreeObject@@UAEXPAV1@@Z",
     "target_va": "0x004feb10",
     "target_size": 24,
     "expect": "exact",
@@ -962,7 +962,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot8@SoultreeObject@@UAEXPAV1@0@Z",
+    "candidate_symbol_contains": "?CopySubtree@SoultreeObject@@UAEXPAV1@0@Z",
     "target_va": "0x004feb30",
     "target_size": 252,
     "expect": "exact",
@@ -982,7 +982,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot6@SoultreeObject@@UAEXXZ",
+    "candidate_symbol_contains": "?ResetLocalMatrices@SoultreeObject@@UAEXXZ",
     "target_va": "0x004fec70",
     "target_size": 83,
     "expect": "exact",

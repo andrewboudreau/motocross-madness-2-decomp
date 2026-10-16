@@ -99,7 +99,7 @@
   "?CopyMipLevels@CacheTexture@@QAEXPAUUnknownTextureRegion@@H@Z": "0x005102d0",
   "?ReleasePage@ManagedTexture@@QAEXXZ": "0x00510700",
   "?SizeLevel@ManagedTexture@@QAEHXZ": "0x00510990",
-  "?UnknownFunction5109b0@ManagedTexture@@QAEMXZ": "0x005109b0",
+  "?Unhappiness@ManagedTexture@@QAEMXZ": "0x005109b0",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__": "0x00574b84",

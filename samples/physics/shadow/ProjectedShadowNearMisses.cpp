@@ -237,7 +237,7 @@ void ProjectedShadow::ComputeBounds()
 // depth to FLT_MAX, then for every part of every caster transforms its vertices into
 // vertexBuffer (ortho for mode 3, projective otherwise), culls back-facing triangles by the
 // signed screen area, requires all three projected points to lie inside (1, size-1), grows
-// clipRect and minDepth, and rasterises the triangle with the height word field_0x94.
+// clipRect and minDepth, and rasterises the triangle with the height word shadowPixel.
 // PARTIAL: retail's 16-bit clear is an unrolled dword fill through a 15-entry jump table and
 // the vertex helpers are inlined differently.  Verified exclusion: retail 0x004dbb5c and
 // 0x004dbb8b are bare `fistp dword ptr [eax]` in an ebp frame (inline-asm rounding).
@@ -310,7 +310,7 @@ void ProjectedShadow::RenderShadow()
                     clipRect.bottom = clipRect.bottom > y ? clipRect.bottom : y;
                     minDepth = v->z > minDepth ? minDepth : v->z;
                 }
-                ShadowFillTriangle(sizeShift, heightMap, field_0x94, points, 1);
+                ShadowFillTriangle(sizeShift, heightMap, shadowPixel, points, 1);
             }
             vertexBase += count;
         }
@@ -323,13 +323,13 @@ void ProjectedShadow::RenderShadow()
 // 0x004dbd30 (1218 B plus three 15-entry jump tables): after rendering, halves the dirty
 // rectangle and box-filters the 2x2 height blocks of the locked texture into it.  For
 // formatA == 9 the four-sample sum is matched against the exact sums of colorKeyLow /
-// field_0x94 combinations and mapped to a blended 4-bit-per-channel value (n*0x111 - ...),
+// shadowPixel combinations and mapped to a blended 4-bit-per-channel value (n*0x111 - ...),
 // otherwise the average (sum >> 2) is stored; retail has one row loop per case.  Each row's
 // tail and the rows the halved rectangle no longer covers are cleared to colorKeyLow with
 // the Duff's-device fill (its three expansions are the three jump tables).
 // Near miss: block structure, the fill expansions and the counted inner loops match; left:
 // register assignment of the clip fields and of the format-9 constants (retail computes the
-// nibble masks with byte operations on the low byte of field_0x94).
+// nibble masks with byte operations on the low byte of shadowPixel).
 // Fills count shorts at p with value: one short to reach dword alignment, then dword pairs
 // (pair = value in both halves) unrolled 16 per pass with a Duff's device, then the last
 // odd short.
@@ -400,13 +400,13 @@ void ProjectedShadow::Present()
     int y;
     if (formatA == 9) {
         unsigned int key = colorKeyLow;
-        unsigned int alpha = (unsigned short)field_0x94;
+        unsigned int alpha = (unsigned short)shadowPixel;
         unsigned int n = key & 0xf;
         unsigned int sumMixA = (alpha + key) * 2;
         unsigned int sumMixB = key + alpha * 2 + alpha;
         unsigned int sumAlpha = alpha * 4;
-        unsigned int m = (unsigned char)((unsigned char)field_0x94 >> 1) & 7;
-        unsigned int pp = (unsigned char)((unsigned char)field_0x94 >> 2) & 3;
+        unsigned int m = (unsigned char)((unsigned char)shadowPixel >> 1) & 7;
+        unsigned int pp = (unsigned char)((unsigned char)shadowPixel >> 2) & 3;
         unsigned short outMixA = (unsigned short)(n * 0x111 - m * 0x111);
         unsigned short outMixB = (unsigned short)(n * 0x111 - (pp + m) * 0x111);
         unsigned short outMixC = (unsigned short)(n * 0x111 - pp * 0x111);
@@ -421,7 +421,7 @@ void ProjectedShadow::Present()
                 if (sum == key * 4)
                     out = colorKeyLow;
                 else if (sum == sumAlpha)
-                    out = field_0x94;
+                    out = shadowPixel;
                 else if (sum == sumMixA)
                     out = outMixA;
                 else

@@ -1831,7 +1831,7 @@ void HandleMenuOk(int menu, UnknownDialogEvent* event) {
 }
 
 // 0x00453090
-void UnknownFunction453090(int menu, UnknownDialogEvent* event) {
+void HandleMenuMiddle(int menu, UnknownDialogEvent* event) {
     switch (menu) {
     case kMenuWaitOrCall:
         event->dialog->EndDialog(0xe);

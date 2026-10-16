@@ -301,7 +301,7 @@ int UnknownDisplay::CreateFlipChain(int backBuffers) {
     frameBufferCount = backBuffers + 1;
     primarySurface->QueryInterface(&IID_IDirectDrawGammaControl, (void**)&gammaControl);
     if (gammaControl && useGammaRamp) {
-        if (gammaControl->SetGammaRamp(DDSGR_CALIBRATE, g_UnknownGammaRamp570570))
+        if (gammaControl->SetGammaRamp(DDSGR_CALIBRATE, g_GammaRamp))
             goto failed;
     }
     memset(&fx, 0, sizeof(fx));

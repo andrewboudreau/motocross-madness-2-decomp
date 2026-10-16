@@ -28,12 +28,12 @@ struct UnknownTexturePalette {
 // 0x0050a590 also takes the manager (+0x00) and the ManagedTextureGroups
 // for textures without (+0x04) and with (+0x08) alpha from it.
 struct UnknownTextureFormatChoice {
-    TextureMapManager* field_0x00;
-    ManagedTextureGroup* field_0x04;
-    ManagedTextureGroup* field_0x08;
-    int field_0x0c;
-    int field_0x10;
-    int field_0x14;
+    TextureMapManager* manager;               // +0x0  the TextureMapManager 0x0050a590 loads with
+    ManagedTextureGroup* opaqueGroup;         // +0x4  group taking ManagedTextures without alpha (0x0050a590)
+    ManagedTextureGroup* alphaGroup;          // +0x8  group taking 4444/8888 ManagedTextures (0x0050a590)
+    int opaqueFormat;                         // +0xC  format picked for a non-alpha request (PCTextureMap slots 4/5)
+    int alphaFormat;                          // +0x10  format picked for a 4444/8888 request (PCTextureMap slots 4/5)
+    int halvings;                             // +0x14  times a texture wider than 32 is halved; the loader sets 0..2 from memory
 };
 
 // The stream textures load from: 0x00461600 returns the read position,
@@ -171,7 +171,7 @@ public:
     TextureMapManager* ownerManager;          // +0x10 manager (constructor argument)
     int textureWidth;                         // +0x14 width
     int textureHeight;                        // +0x18 height
-    int field_0x1c;
+    int minimumMipSize;                       // +0x1C  CreateSurface's minimum size: the load argument, or the width without mips
     int mapFormat;                            // +0x20 pixel format
     int mipCount;                             // +0x24 mip level count
     BaseObject* sourcePalette;                // +0x28 released by the destructor
@@ -179,12 +179,12 @@ public:
     int usesColorKey;                         // +0x30 has a colour key
     int colorKeyValue;                        // +0x34 colour key (also +0x38)
     int field_0x38;
-    int field_0x3c;                           // from Pixtrans 0x004d24d0 (slot 4)
+    int averageColor;                         // +0x3C  Pixtrans AverageColor 0x004d24d0 (slot 4); Terrain.h's name
     int field_0x40;
     int statePairCount;                       // +0x44 render-state pair count
     UnknownRenderStatePair statePairs[4];     // +0x48 applied by slot 19 (length not established)
     int mapFlags;                             // +0x68 bit 0: a ManagedTexture
-    int field_0x6c;                           // format choice +0x14 (slot 5)
+    int halvings;                             // +0x6C  the format choice's halvings (slot 5)
 };
 
 class Palette8;

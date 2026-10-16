@@ -70,7 +70,7 @@ public:
     void ClearRegionRect(int index);              // 0x00404d30
     void MarkAllDirty();                       // 0x00404da0: marks everything dirty
 
-    PCTextureMap* field_0x2c;              // image (UIDialog's resource parser near miss uses it)
+    PCTextureMap* currentImage;               // +0x2C  SetImage's image (released by the destructor); RenderPost3D draws it full size
     int imageVisible;                      // +0x30 visible
     int imageRegion;                       // the image's region
     int fullRedrawsOwed;                   // full redraws the image still owes
@@ -83,9 +83,9 @@ public:
     int field_0x54;
     int fullRestoreFrames;                 // frames left to restore fully
     int field_0x5c;
-    int field_0x60;
-    int field_0x64;
-    int field_0x68;
+    int copyDcNext;                           // +0x60  GetDc with the copy current alternates: set, the next DC is the off-screen copy's, else the back buffer's
+    int lastDcRegion;                         // +0x64  GetDc's last dirty region handed out (-1 after the last)
+    int lastDcRegionCopied;                   // +0x68  GetDc: lastDcRegion's copy DC was handed out after its back-buffer DC
     UnknownSurfaceInterface* heldDcSurface; // surface whose DC is held
     void* heldDc;                          // the DC
 };

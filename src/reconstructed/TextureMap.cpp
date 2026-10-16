@@ -32,7 +32,7 @@ TextureMap::TextureMap(TextureMapManager* manager, int registered) {
     sourcePalette = 0;
     field_0x40 = 0;
     mapFlags = 0;
-    field_0x6c = 0;
+    halvings = 0;
 }
 
 // 0x0050a590: see TextureMap.h.
@@ -51,7 +51,7 @@ TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int
     int fileFormat;
     int dataSize;
     if (choice)
-        manager = choice->field_0x00;
+        manager = choice->manager;
     UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     if (entry) {
         if (entry->object) {
@@ -101,17 +101,17 @@ failed:
 
     int alpha = IsFormat4444Or8888(format);
     TextureMap* map;
-    if (choice && (alpha && choice->field_0x08 || !alpha && choice->field_0x04))
+    if (choice && (alpha && choice->alphaGroup || !alpha && choice->opaqueGroup))
         map = new(__FILE__, 207) ManagedTexture(manager);
     else
         map = new(__FILE__, 213) PCTextureMap(manager, 1);
     int minimumSize = (flags & 2) ? 1 : width;
     if (choice) {
         if (alpha) {
-            if (choice->field_0x08)
-                choice->field_0x08->AddTexture((ManagedTexture*)map);
-        } else if (choice->field_0x04) {
-            choice->field_0x04->AddTexture((ManagedTexture*)map);
+            if (choice->alphaGroup)
+                choice->alphaGroup->AddTexture((ManagedTexture*)map);
+        } else if (choice->opaqueGroup) {
+            choice->opaqueGroup->AddTexture((ManagedTexture*)map);
         }
     }
     if (palette) {
@@ -122,7 +122,7 @@ failed:
             palette->AddRef();
     }
     if (file && choice) {
-        int halvings = choice->field_0x14;
+        int halvings = choice->halvings;
         while (width > 32 && halvings--) {
             int sourceFormat = file->bitsPerPixel == 16 ? 0x22b : (file->bitsPerPixel == 24 ? 0x378 : 0x22b8);
             if (Downsample(file->bits, file->bits, width / 2, height / 2, width / 2, width, 1,

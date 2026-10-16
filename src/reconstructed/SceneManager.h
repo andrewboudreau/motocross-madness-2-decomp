@@ -37,9 +37,10 @@ public:
     explicit UnknownSceneObject(int flags);            // 0x004318d0
     virtual void UnknownVirtualSlot0();
 
-    // 0x004319c0: loads the character and returns the GameObject to add.
-    GameObject* UnknownFunction4319c0(void* owner, const char* name, const char* colPath,
-                                      LightManager* lights, int a4, int a5, int a6);
+    // 0x004319c0: loads the character and returns the GameObject to add
+    // (CollisionCharacter::Load, src/krusty2/motion).
+    GameObject* Load(void* owner, const char* name, const char* colPath,
+                     LightManager* lights, int a4, int a5, int a6);
     void* FindMotion(const char* name, int a); // 0x004a6b30 (FindMotion)
     void SetMotion(void* motion);          // 0x004a8b40 (SetMotion)
     int AdvanceMotion(float time, int a, int b); // 0x004a6bb0: advances the motion
@@ -86,12 +87,12 @@ public:
 // (0x004ea880 tests bit 3, 0x004eafd0 sets bit 2). BikeRace.cpp reads
 // +0x04, +0x08 and +0x2c under their provisional names.
 struct UnknownSceneEntry {
-    unsigned char field_0x00_bit0 : 1;
-    unsigned char field_0x00_bit1 : 1;
-    unsigned char field_0x00_bit2 : 1;
+    unsigned char inRandomSet : 1;            // +0x00 bit 0: cleared for every entry, set for each entry a RandomSet lists
+    unsigned char useBlendedKeys : 1;         // +0x00 bit 1: the "UseBlendedKeys" parameter
+    unsigned char automaticSequence : 1;      // +0x00 bit 2: the "AutomaticSequence" parameter; EnableAutomaticSequence sets it
     unsigned char keyFramed : 1;              // +0x00 key-framed character (else a procedural car)
-    unsigned char field_0x00_bit4 : 1;              // skipped by bikerace.cpp's camera (0x0041f1d0)
-    unsigned char field_0x00_bit5 : 1;              // cleared by 0x004edfe0
+    unsigned char excludeFromCameraIteration : 1; // +0x00 bit 4: the "ExcludeFromCameraIteration" parameter; bikerace.cpp's camera (0x0041f1d0) skips it
+    unsigned char field_0x00_bit5 : 1;        // +0x00 bit 5: cleared by 0x004edfe0
     unsigned char field_0x01[3];
     UnknownSceneObject* character;            // +0x04 key-framed (bit 3)
     UnknownSceneAnimatedObject* proceduralObject; // +0x08 procedural
@@ -268,7 +269,7 @@ public:
                                  char flag);
     // 0x004eaec0: the entry object named like `path`'s file name.
     UnknownSceneObject* FindEntryByFileName(const char* path, int* index);
-    void UnknownFunction4eafd0(int index);
+    void EnableAutomaticSequence(int index);  // 0x004eafd0: sets entry `index`'s automaticSequence
     void SetDetailLevel(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void RestartAllEntries(float time);       // 0x004eb000: RestartEntry(i, time, 1, 0) for every entry
     int RestartEntry(int index, float time, int force, int motion);

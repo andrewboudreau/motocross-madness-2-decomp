@@ -76,8 +76,8 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownSharedMipSurfaces68a36c@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a36c",
-  "?g_UnknownSharedSurfaces68a394@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a394",
+  "?g_SharedMipTextureSurfaces@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a36c",
+  "?g_SharedTextureSurfaces@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a394",
   "__FILE__": "0x00574f00",
   "__FILE__:containerlist.h": "0x005666e4",
   "_sprintf": "0x00534aaf"

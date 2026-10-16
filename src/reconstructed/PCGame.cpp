@@ -77,7 +77,7 @@ extern "C" const UnknownGuid IID_IDirect3DHALDevice;    // 0x005561b0
 extern "C" const UnknownGuid IID_IDirect3DMMXDevice;    // 0x005561c0
 extern "C" const UnknownGuid IID_IDirect3DRefDevice;    // 0x005561d0
 extern "C" const UnknownGuid IID_IDirect3DNullDevice;   // 0x005561e0
-extern const UnknownGuid g_UnknownBladeDevice556040;
+extern const UnknownGuid g_BladeDeviceGuid;   // 0x00556040: the "Blade" renderer's device
 
 // Display set-up outside PCGame (cdecl; names provisional).
 int EnumerateDisplays(void* window);                // 0x004c9600: enumerates the displays
@@ -97,7 +97,7 @@ struct UnknownFilterKeys {
     unsigned int repeatMSec;
     unsigned int bounceMSec;
 };
-UnknownFilterKeys g_UnknownFilterKeys689940;
+UnknownFilterKeys g_FilterKeys;
 
 // 0x004bfa80: the current time in milliseconds, read at 1 ms timer
 // resolution. It sits just before PCGame's constructor; its TU is inferred
@@ -133,8 +133,8 @@ PCGame::PCGame() {
         inputContext = 0;
         imeLibrary = 0;
     }
-    memset(&g_UnknownFilterKeys689940, 0, sizeof(g_UnknownFilterKeys689940));
-    g_UnknownFilterKeys689940.size = sizeof(g_UnknownFilterKeys689940);
+    memset(&g_FilterKeys, 0, sizeof(g_FilterKeys));
+    g_FilterKeys.size = sizeof(g_FilterKeys);
 }
 
 // 0x004bfc20
@@ -172,7 +172,7 @@ int PCGame::StartUp(char* message) {
     } else if (!_stricmp(renderer, "Ref")) {
         deviceGuid = IID_IDirect3DRefDevice;
     } else if (!_stricmp(renderer, "Blade")) {
-        deviceGuid = g_UnknownBladeDevice556040;
+        deviceGuid = g_BladeDeviceGuid;
         bladeRenderer = 1;
     } else {
         deviceGuid = IID_IDirect3DHALDevice;
@@ -209,7 +209,7 @@ int PCGame::StartUp(char* message) {
         return 0;
     }
     if (bladeRenderer)
-        deviceGuid = g_UnknownBladeDevice556040;
+        deviceGuid = g_BladeDeviceGuid;
     sprintf(name, "DriverInfo\\%s\\AllowDither", display->driverGuidText);
     allowDither = GetRegistryFlag(name, allowDither);
     sprintf(name, "DriverInfo\\%s\\AllowMipMapping", display->driverGuidText);

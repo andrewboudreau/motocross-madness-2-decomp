@@ -300,13 +300,15 @@ public:
     // body 0x004fb430. 'this' is the GameObject subobject (+12).
     virtual ~SoultreeObject();
     // Primary vtable 0x00557c18 (QuadTreeObject's): slots 0/1 inherited, 2..8 introduced.
-    virtual void UnknownVirtualSlot2(SoultreeFileStream* stream);      // 0x004fdc00, ret 4: loads a hierarchy
-    virtual void UnknownVirtualSlot3();                                // 0x004fddc0: loads from parameterBlock
-    virtual void UnknownVirtualSlot4(SoultreeObject** out);            // 0x004fe020, ret 4: *out = new node
-    virtual void UnknownVirtualSlot5();                                // 0x00464e90 (shared empty body)
-    virtual void UnknownVirtualSlot6();                                // 0x004fec70: identity local matrices
-    virtual void UnknownVirtualSlot7(SoultreeObject* src);             // 0x004feb10, ret 4: clone src's tree into this
-    virtual void UnknownVirtualSlot8(SoultreeObject* src, SoultreeObject* dst); // 0x004feb30, ret 8
+    // Names tier 3 from the decoded bodies below; D3DIMSoultreeObject's overrides are its
+    // SoultreeVirtualSlot2..8.
+    virtual void LoadHierarchy(SoultreeFileStream* stream);   // slot 2, 0x004fdc00, ret 4: node count, names, matrices, parent indices
+    virtual void LoadHierarchyFromParameters();               // slot 3, 0x004fddc0: the "Object Hierarchy" rows of parameterBlock
+    virtual void CreateNode(SoultreeObject** out);            // slot 4, 0x004fe020, ret 4: *out = new node (the loaders' and clone's factory)
+    virtual void UpdateLocalBounds();                         // slot 5, 0x00464e90 (shared empty body); GetLocalBounds calls it while localBoundsValid is 0
+    virtual void ResetLocalMatrices();                        // slot 6, 0x004fec70: identity local matrices
+    virtual void CloneFrom(SoultreeObject* src);              // slot 7, 0x004feb10, ret 4: clone src's tree into this
+    virtual void CopySubtree(SoultreeObject* src, SoultreeObject* dst); // slot 8, 0x004feb30, ret 8
     // GameObject slot 25 override 0x004fec30: forwards to every node of the sibling chain at
     // +0x140 (GameObject view +0x134) before GameObject's own slot 25 (0x00469720).
     virtual int AttachRenderContext(int a);
