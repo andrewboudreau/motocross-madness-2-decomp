@@ -1,6 +1,13 @@
 // ContactImpulse.cpp -- physics contact/impulse core (SoulTreePhysics.cpp neighbourhood).
 #include "ContactTypes.h"
 
+// Dot product with the z term added last; VC6 then sums y, x, z as retail does.
+inline float ContactDot(const Vec3& a, const Vec3& b) { return a.z * b.z + (a.x * b.x + a.y * b.y); }
+// Out-of-line Vec3 * float (0x005015b0) at the sites where retail calls it.
+ContactVec3 ContactScaleCall(const Vec3& v, float s);
+inline ContactVec3 ContactScaled(const Vec3& v, float s) { return ContactVec3(v.x * s, v.y * s, v.z * s); }
+inline ContactVec3 ContactSum(const Vec3& a, const Vec3& b) { return ContactVec3(a.x + b.x, a.y + b.y, a.z + b.z); }
+
 // 0x005004a0 (1062 bytes).  Impulse between two bodies A and B at a contact.
 //   restitution  first argument (SoultreePhysicsBaseObject::field_0x14c)
 //   n            contact normal
@@ -14,15 +21,15 @@
 //   outJ         receives the impulse magnitude j.
 // j = -(1 + e) * (dispA - dispB).n / (n.S + invMassA + invMassB) with
 // S = ((I^-1 (rA x n)) x rA) + ((I^-1 (rB x n)) x rB).  Names are tier 3.
-// Retail tail (decoded): J = *outJ * *n through Vec3(x,y,z) 0x404e60 into a named
-// copy, *velA += J * invMassA inline, then out-of-line operator*(Vec3,float)
-// 0x5015b0 and Vec3::operator+= 0x428060 for angVelA (and the B branch with
-// J = *n * -*outJ), so retail had spent its inline budget by then.  Tried
-// (strict 102 kept): the natural Math3D tail with named copies (aligned 277/328
-// insns but strict 74, frame 0x48 vs retail 0x60, VC6 inlines the operators
-// retail called); a declared-only ContactScale bound to 0x5015b0 (strict 93,
-// frame 0x54: the freed budget inlines J/velA/uA+uB); ContactScaleEach for angA
-// (39); ContactVec3-returning ContactSum/ContactTimes/ContactScaled helpers (96).
+// Retail tail (decoded): J = *n * j through Vec3(x,y,z) 0x404e60 into a named copy,
+// *velA += J * invMassA inline, then the out-of-line operator*(Vec3,float) 0x5015b0 and
+// Vec3::operator+= 0x428060 for angVelA and the whole B branch (J = *n * -j), so retail had
+// spent its inline budget by then.  ContactScaleCall models those 0x5015b0 sites (bound in
+// the bindings, docs/VC6_INLINE_BUDGET.md); this tail lines up call for call (0.94 ratio).
+// Remaining: frame 0x54 vs 0x60, and the torque cross products load r before n in three
+// products where retail loads n first.  The product order follows leaf age, so neither
+// operand order nor parentheses in the cross move it (all 2^6 forms measured), nor does
+// placing the closing dot before or after the first cross, or naming the tail temporaries.
 void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeObject* nodeA,
                          const Vec3* dispA, const Vec3* rA, const Vec3* invInertiaA,
                          Vec3* angVelA, Vec3* velA, float invMassB, SoultreeObject* nodeB,
@@ -33,10 +40,10 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
     float closingZ = rel.z * n->z;
     float closingXY = rel.y * n->y + rel.x * n->x;
 
-    float sumN;
+    ContactVec3 sum;
     Vec3 angA, angB, uA;
     {
-        Vec3 torque = ContactCross(*n, *rA);
+        Vec3 torque = CrossProduct(*rA, *n);
         Vec3 local = nodeA->WorldToLocalDirection(torque);
         angA.x = local.x * invInertiaA->x;
         angA.y = local.y * invInertiaA->y;
@@ -45,24 +52,27 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
         uA = CrossProduct(world, *rA);
     }
     {
-        Vec3 torque = ContactCross(*n, *rB);
+        Vec3 torque = CrossProduct(*rB, *n);
         Vec3 local = nodeB->WorldToLocalDirection(torque);
         angB.x = local.x * invInertiaB->x;
         angB.y = local.y * invInertiaB->y;
         angB.z = local.z * invInertiaB->z;
         Vec3 world = nodeB->LocalToWorldDirection(angB);
         Vec3 uB = CrossProduct(world, *rB);
-        sumN = DotProduct(ContactVec3(uA.x + uB.x, uA.y + uB.y, uA.z + uB.z), *n);
+        sum = ContactSum(uA, uB);
     }
-    *outJ = -((closingXY + closingZ) * (restitution + 1.0f)) / (sumN + invMassA + invMassB);
-
-    ContactVec3 J(*outJ * n->x, *outJ * n->y, *outJ * n->z);
-    ContactVec3 dvA(J.x * invMassA, J.y * invMassA, J.z * invMassA);
+    float num = -((closingXY + closingZ) * (restitution + 1.0f));
+    float j = num / (ContactDot(sum, *n) + invMassA + invMassB);
+    *outJ = j;
+    ContactVec3 J = ContactScaled(*n, j);
+    ContactVec3 dvA = ContactScaled(J, invMassA);
     *velA += dvA;
-    ((ContactVec3*)angVelA)->operator+=(ContactVec3(angA.x * *outJ, angA.y * *outJ, angA.z * *outJ));
+    ContactVec3 dA = ContactScaleCall(angA, *outJ);
+    ((ContactVec3*)angVelA)->operator+=(dA);
     if (velB) {
-        ContactVec3 dvB(-J.x * invMassB, -J.y * invMassB, -J.z * invMassB);
-        *(ContactVec3*)velB += dvB;
-        ((ContactVec3*)angVelB)->operator+=(ContactVec3(angB.x * *outJ, angB.y * *outJ, angB.z * *outJ));
+        ContactVec3 Jb = ContactScaleCall(*n, -*outJ);
+        ((ContactVec3*)velB)->operator+=(ContactScaleCall(Jb, invMassB));
+        ContactVec3 dB = ContactScaleCall(angB, *outJ);
+        ((ContactVec3*)angVelB)->operator+=(dB);
     }
 }

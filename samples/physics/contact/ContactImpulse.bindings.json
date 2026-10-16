@@ -1,6 +1,7 @@
 {
   "??0ContactVec3@@QAE@MMM@Z": "0x00404e60",
   "??YContactVec3@@QAEAAU0@ABU0@@Z": "0x00428060",
+  "?ContactScaleCall@@YA?AUContactVec3@@ABUVec3@@M@Z": "0x005015b0",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
   "__real@4@3fff8000000000000000": "0x00550748"
