@@ -41,7 +41,7 @@ public:
     int field_0x9c;
     int useCount;                             // +0xa0 uses (0x00510820)
     float largestUse;                         // +0xa4 largest recorded value (0x00510820)
-    int field_0xa8;                           // region +0x18
+    int allocatedLevel;                       // +0xa8 size level of its page region (+0x18), -1 when unplaced; WriteDebugReport's "Allocd=%d"
     int plannedLevel;                         // +0xac planned level (repacking)
     int wantedLevel;                          // +0xb0 wanted level
     int field_0xb4;

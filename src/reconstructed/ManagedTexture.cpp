@@ -7,7 +7,7 @@
 ManagedTexture::ManagedTexture(TextureMapManager* manager) : PCTextureMap(manager, 0) {
     page = 0;
     plannedLevel = -1;
-    field_0xa8 = -1;
+    allocatedLevel = -1;
     region = 0;
     pageOffsetV = 0;
     pageOffsetU = 0;
@@ -36,7 +36,7 @@ void ManagedTexture::UpdatePageCoords(int level) {
         pageScale = (placed->right - placed->left) / (1 << level);
         pageOffsetU = placed->left;
         pageOffsetV = placed->top;
-        field_0xa8 = placed->sizeLevel;
+        allocatedLevel = placed->sizeLevel;
     }
 }
 
@@ -55,7 +55,7 @@ void ManagedTexture::Reregister() {
     largestUse = 0;
     lastUseFrame = 0;
     plannedLevel = -1;
-    field_0xa8 = -1;
+    allocatedLevel = -1;
     field_0x98 = 0;
     field_0x9c = 0;
     group->AddTexture(this);
@@ -70,7 +70,7 @@ void ManagedTexture::ReleasePage() {
         pageOffsetV = 0;
         pageOffsetU = 0;
         pageScale = 0;
-        field_0xa8 = -1;
+        allocatedLevel = -1;
     }
 }
 

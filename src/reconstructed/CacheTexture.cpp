@@ -172,7 +172,7 @@ void CacheTexture::EvictRegion(UnknownTextureRegion* region) {
     if (region->occupant) {
         region->occupant->page = 0;
         region->occupant->region = 0;
-        region->occupant->field_0xa8 = -1;
+        region->occupant->allocatedLevel = -1;
         region->occupant = 0;
     }
     if (region->reserved) {
@@ -270,7 +270,7 @@ int CacheTexture::PlaceTexture(ManagedTexture* texture, UnknownTextureRegion* re
     region->occupant->page = this;
     region->reserved = 1;
     freeLeafCounts[texture->plannedLevel]--;
-    texture->field_0xa8 = region->sizeLevel;
+    texture->allocatedLevel = region->sizeLevel;
     texture->region = region;
     texture->page = this;
     return 1;

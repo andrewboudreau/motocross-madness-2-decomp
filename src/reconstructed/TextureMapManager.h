@@ -103,18 +103,18 @@ public:
     int pageCursor;                           // +0x1c4 debug key cursor (pages)
     int textureCursor;                        // +0x1c8 debug key cursor (textures)
     int field_0x1cc;
-    int field_0x1d0;
-    UnknownTimer field_0x1d4;
-    UnknownTimer field_0x1e0;
-    UnknownTimer field_0x1ec;
+    int texelsBlitted;                        // +0x1d0 "TexMem Blted" (x bytes/pixel); CacheTexture adds each blit rect's area
+    UnknownTimer texelsBlittedHistory;        // +0x1d4 samples of +0x1d0; its largest is "TexMem Blted"'s peak
+    UnknownTimer blitTimeHistory;             // +0x1e0 samples of now - +0x250; its largest is "BltTime"'s (%d)
+    UnknownTimer texturesBlittedHistory;      // +0x1ec samples of the blitted count; "Textures Blted %d (%d)"
     void* gdiObject;                          // +0x1f8 GDI object (DeleteObject)
-    int field_0x1fc[9];
-    int field_0x220[9];
-    int field_0x244;
-    int field_0x248;
-    int field_0x24c;
-    int field_0x250;
-    int field_0x254;
+    int requestedBySize[9];                   // +0x1fc per size level; "Size Requested Granted" column 1
+    int grantedBySize[9];                     // +0x220 per planned level; "Size Requested Granted" column 2
+    int texelsRequested;                      // +0x244 "TexMemRequested"; sum of the requested levels' areas
+    int texelsGranted;                        // +0x248 "TexMemGranted"; sum of the planned levels' areas
+    int texelsManaged;                        // +0x24c "TexMemManaged"; sum of the textures' full-size areas
+    int blitStartTime;                        // +0x250 clock before the blits; "BltTime" prints now minus it
+    int debugPage;                            // +0x254 debug overlay page (-1 until NewPage), titled "TextureManager ..."
 };
 
 // RTTI: TextureMapManager : GameObject (vtable 0x0055848c; 0x7c bytes, the
