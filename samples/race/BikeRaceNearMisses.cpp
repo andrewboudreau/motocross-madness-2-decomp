@@ -1015,7 +1015,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             return 0;
         }
         localRacer = new(__FILE__, 0x42a) UnknownBikeRaceRacer(1);
-        localRacer->UnknownFunction48fc80(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
+        localRacer->Load(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
                                            direction, up, terrain, g_TrackGame->controlInterface, 0, 0, this,
                                            g_TrackGame->mode.profileName, 0, 0, &setup,
                                            g_TrackGame->mode.gasGyro,
@@ -1060,7 +1060,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 skill = UnknownRandomSkill(aiSettings[0], aiSettings[1]);
                 aiRacers[n - 1] = new(__FILE__, 0x47c) UnknownBikeRaceRacer(1);
-                aiRacers[n - 1]->UnknownFunction48fc80(owner, empty, bikeFile, riderFile, lights, textures,
+                aiRacers[n - 1]->Load(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
                                                           racer->racerName, 0, id, &setup, 1, 1, particleManager,
                                                           raceScene, replayVcr, skill, 1);
@@ -1140,7 +1140,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             WriteRelativePositions(&position, &direction, event, i + 1);
             racerSlots[j] = new(__FILE__, 0x53b) UnknownBikeRaceRacer(1);
             if (!AppendChild(
-                    racerSlots[j]->UnknownFunction48fc80(
+                    racerSlots[j]->Load(
                         owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                         g_TrackGame->controlInterface, 0, 0, this, g_TrackGame->mode.profileName, 0,
                         playerId, (UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions,
@@ -1202,7 +1202,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             sprintf(path, "%s\\%s", "Res", slots[j].bikeModelName);
             setup.weight = g_TrackGame->ui->weight[bikeClass];
             racerSlots[j] = new(__FILE__, 0x5a3) UnknownBikeRaceRacer(1);
-            if (!AppendChild(racerSlots[j]->UnknownFunction48fc80(
+            if (!AppendChild(racerSlots[j]->Load(
                                            owner, empty, path, riderFile, lights, textures, position, direction,
                                            up, terrain, 0, 0, 1, this, slots[j].playerName, 0, slots[j].networkPlayerId,
                                            &setup, 0, 1, particleManager, raceScene, replayVcr, 0, 1),
@@ -1253,7 +1253,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
             setup.weight = g_TrackGame->ui->weight[bikeClass];
             racerSlots[j] = new(__FILE__, 0x61f) UnknownBikeRaceRacer(1);
-            if (!AppendChild(racerSlots[j]->UnknownFunction48fc80(
+            if (!AppendChild(racerSlots[j]->Load(
                                            owner, empty, slots[j].bikeModelName, riderFile, lights, textures, position,
                                            direction, up, terrain, 0, (char)slots[j].racerIndex, 1, this,
                                            slots[j].playerName, 0, slots[j].networkPlayerId, &setup, 0, 1, particleManager,
@@ -1283,7 +1283,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         WriteRelativePositions(&position, &direction, event, order[0]);
         localRacer = new(__FILE__, 0x4ea) UnknownBikeRaceRacer(1);
         if (!AppendChild(
-                localRacer->UnknownFunction48fc80(
+                localRacer->Load(
                     owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                     g_TrackGame->controlInterface, 0, 0, this, name, 0, id,
                     (UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions,
@@ -1332,7 +1332,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             sprintf(riderFile, "%s\\GhostRider.mcf", "Res");
             aiRacers[0] = new(__FILE__, 0x67c) UnknownBikeRaceRacer(1);
             if (!AppendChild(
-                    aiRacers[0]->UnknownFunction48fc80(
+                    aiRacers[0]->Load(
                         owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain, 0, -1,
                         0, this, "Ghost", 0, 0, (UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions,
                         g_TrackGame->mode.gasGyro, g_TrackGame->mode.brakeGyro,
@@ -1412,7 +1412,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 aiRacers[n] = new(__FILE__, 0x718) UnknownBikeRaceRacer(1);
-                if (!AppendChild(aiRacers[n]->UnknownFunction48fc80(
+                if (!AppendChild(aiRacers[n]->Load(
                                                owner, empty, bikeFile, riderFile, lights, textures, position,
                                                direction, up, terrain, 0, ai, 0, this, aiName, 0, id, &setup, 1, 1,
                                                particleManager, raceScene, replayVcr, skill, 1),
@@ -1496,7 +1496,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 setup.rpmStep = (setup.rpmUpperLimit - setup.rpmLowerLimit) / 10;
                 setup.weight = g_TrackGame->ui->weight[bikeClass];
                 racerSlots[j] = new(__FILE__, 0x78f) UnknownBikeRaceRacer(1);
-                if (!AppendChild(racerSlots[j]->UnknownFunction48fc80(
+                if (!AppendChild(racerSlots[j]->Load(
                                                owner, empty, slots[j].bikeModelName, riderFile, lights, textures,
                                                position, direction, up, terrain, 0, (char)slots[j].racerIndex, 0,
                                                this, slots[j].playerName, 0, slots[j].networkPlayerId, &setup, 0, 1,

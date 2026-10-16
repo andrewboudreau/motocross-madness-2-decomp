@@ -180,7 +180,7 @@
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?SetupDigits@NumberObjectManager@@QAEPAV1@PAXHPAUUnknownNumberRacer@@HPAUUnknownNumberCamera@@M@Z": "0x0048bd00",
   "?SetupCounter@BonusObjectManager@@QAEPAV1@PAXHHPAUUnknownBonusRacer@@PAUUnknownBonusCamera@@@Z": "0x0048ca60",
-  "?UnknownFunction48fc80@UnknownBikeRaceRacer@@QAEPAVGameObject@@PAXPBD11PAVLightManager@@PAUUnknownTextureFormatChoice@@UVector3@@44PAVUnknownBikeRaceProjector@@PAVControlInterface@@DHPAVBikeRace@@1HHPAUUnknownBikeRaceBikeSetup@@HHHPAVScene@@PAVKrustyVCR@@MH@Z": "0x0048fc80",
+  "?Load@UnknownBikeRaceRacer@@QAEPAVGameObject@@PAXPBD11PAVLightManager@@PAUUnknownTextureFormatChoice@@UVector3@@44PAVUnknownBikeRaceProjector@@PAVControlInterface@@DHPAVBikeRace@@1HHPAUUnknownBikeRaceBikeSetup@@HHHPAVScene@@PAVKrustyVCR@@MH@Z": "0x0048fc80",
   "?UnknownFunction4933e0@UnknownBikeRaceRacer@@QAEXPAUUnknownBikeRaceNetMessage13@@PAUUnknownBikeRaceRacerPart@@@Z": "0x004933e0",
   "?UnknownFunction495c00@UnknownBikeRaceRacer@@QAEHXZ": "0x00495c00",
   "?UnknownFunction496e20@UnknownBikeRaceRacer@@QAEXPAVKrustyVCR@@@Z": "0x00496e20",
