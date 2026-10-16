@@ -90,8 +90,8 @@ static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* g
 
 // 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
 int g_UnknownGlobal59adbc;
-int g_UnknownGlobal59adfc;
-int g_UnknownGlobal59ae84;
+int g_LoadingTimerTicks;
+int g_LoadingEventLoaded;
 int g_UnknownGlobal59ae88;
 int g_UnknownGlobal59ae00;
 
@@ -1309,15 +1309,15 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogTimer:
         if (g_TrackGame->network) {
-            if (g_UnknownGlobal59adfc >= 10) {
+            if (g_LoadingTimerTicks >= 10) {
                 g_TrackGame->mode.field_0x6a4 = 0;
                 event->dialog->EndDialog(0);
                 event->handled = 1;
                 g_TrackGame->eventManager->EnableRaceObjects();
             }
-            g_UnknownGlobal59adfc++;
+            g_LoadingTimerTicks++;
         } else {
-            if (g_UnknownGlobal59adfc >= 10) {
+            if (g_LoadingTimerTicks >= 10) {
                 event->dialog->EndDialog(0);
                 event->handled = 1;
                 g_TrackGame->StopCDAudio();
@@ -1329,7 +1329,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                     g_TrackGame->tagEvent->ResetClock();
                 g_TrackGame->eventManager->EnableRaceObjects();
             }
-            g_UnknownGlobal59adfc++;
+            g_LoadingTimerTicks++;
         }
         break;
     case kDialogClose:
@@ -1349,13 +1349,13 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
         area->Show(0, 1);
         g_TrackGame->ui->progressDialog = (UnknownGameUiPage*)this;
         g_TrackGame->ui->HideCursors();
-        g_UnknownGlobal59ae84 = 0;
+        g_LoadingEventLoaded = 0;
         g_TrackGame->mode.SaveProfile();
         if (g_TrackGame->network)
             g_TrackGame->network->StartKeepAlive(
                 g_TrackGame->eventManager->keepAliveTimeout,
                 g_TrackGame->eventManager->keepAliveInterval);
-        g_UnknownGlobal59adfc = 0;
+        g_LoadingTimerTicks = 0;
         g_UnknownGlobal59ae88 = 0;
         framesShown = 0;
         break;
@@ -1365,7 +1365,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
 
 // 0x00451270
 int LoadingDlg::Tick(float frameTime) {
-    if (framesShown == 2 && !g_UnknownGlobal59ae84) {
+    if (framesShown == 2 && !g_LoadingEventLoaded) {
         if (!g_TrackGame->eventManager->LoadEvent()) {
             EndDialog(0);
             if (g_TrackGame->network) {
@@ -1383,7 +1383,7 @@ int LoadingDlg::Tick(float frameTime) {
             for (int i = 0; i < g_TrackGame->mode.racerCount; i++)
                 g_TrackGame->mode.racers[i].ClearLeft();
         }
-        g_UnknownGlobal59ae84 = 1;
+        g_LoadingEventLoaded = 1;
         AddTimer(0, 100, 0);
     }
     framesShown++;

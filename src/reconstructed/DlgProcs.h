@@ -224,10 +224,13 @@ public:
     int GetCurrentTexture();              // 0x00472f90: the current frame's texture
 };
 
-// 0x0059adfc: frames the loading dialog has waited; 0x0059ae84: set once
-// the race is loaded; 0x0059ae88: cleared with them.
-extern int g_UnknownGlobal59adfc;
-extern int g_UnknownGlobal59ae84;
+// 0x0059adfc: the loading dialog's timer events since EventManager::LoadEvent
+// succeeded (Tick then adds the timer, AddTimer(0, 100, 0); the dialog
+// ends at 10);
+// 0x0059ae84: set once LoadEvent succeeded (Tick loads on its third frame
+// while clear); 0x0059ae88: only cleared with them (no other reference).
+extern int g_LoadingTimerTicks;
+extern int g_LoadingEventLoaded;
 extern int g_UnknownGlobal59ae88;
 
 // The 8-byte message 0xcc a network player sends when its race fails to
