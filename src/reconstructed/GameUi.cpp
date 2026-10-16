@@ -3490,38 +3490,40 @@ struct UnknownGameUiTextRun {
     int position;                             // +0x14: "|x" picks the tab-stop table entry x
 };
 
-int g_UnknownGlobal65b604;                    // the run being drawn
-int g_UnknownGlobal65b564;                    // its position
-unsigned int g_UnknownGlobal65b574;           // its color
-SIZE g_UnknownGlobal65b5e0;                   // the text's size
-int g_UnknownGlobal65b5a8;                    // the text's position
-int g_UnknownGlobal65b584;
+// File-scope scratch of the text drawing functions below (.bss
+// 0x0065b564..0x0065b604; each has one writer).
+int g_TextRunIndex;                           // 0x0065b604: the run being drawn
+int g_TextRunX;                               // 0x0065b564: its position
+unsigned int g_TextRunColor;                  // 0x0065b574: its color
+SIZE g_AlignedTextSize;                       // 0x0065b5e0: the text's size
+int g_AlignedTextX;                           // 0x0065b5a8: the text's position
+int g_AlignedTextY;                           // 0x0065b584
 
 // 0x0046f420
 void UIDialog::DrawTextRuns(void* dc, int x, int y, const char* text, int length,
                             UnknownGameUiTextRun* runs, unsigned int color, int shadow,
                             unsigned int shadowColor) {
-    g_UnknownGlobal65b604 = 0;
-    g_UnknownGlobal65b564 = x;
+    g_TextRunIndex = 0;
+    g_TextRunX = x;
     SetTextColor((HDC)dc, color);
-    g_UnknownGlobal65b574 = color;
-    while (runs[g_UnknownGlobal65b604].text) {
-        if (runs[g_UnknownGlobal65b604].kind == 2)
-            g_UnknownGlobal65b564 = runs[g_UnknownGlobal65b604].position + x;
+    g_TextRunColor = color;
+    while (runs[g_TextRunIndex].text) {
+        if (runs[g_TextRunIndex].kind == 2)
+            g_TextRunX = runs[g_TextRunIndex].position + x;
         if (shadow) {
             SetTextColor((HDC)dc, shadowColor);
-            TextOutA((HDC)dc, g_UnknownGlobal65b564 + 1, y + 1, runs[g_UnknownGlobal65b604].text,
-                     runs[g_UnknownGlobal65b604].length);
-            SetTextColor((HDC)dc, g_UnknownGlobal65b574);
+            TextOutA((HDC)dc, g_TextRunX + 1, y + 1, runs[g_TextRunIndex].text,
+                     runs[g_TextRunIndex].length);
+            SetTextColor((HDC)dc, g_TextRunColor);
         }
-        if (runs[g_UnknownGlobal65b604].kind == 1) {
-            g_UnknownGlobal65b574 = runs[g_UnknownGlobal65b604].color;
-            SetTextColor((HDC)dc, g_UnknownGlobal65b574);
+        if (runs[g_TextRunIndex].kind == 1) {
+            g_TextRunColor = runs[g_TextRunIndex].color;
+            SetTextColor((HDC)dc, g_TextRunColor);
         }
-        TextOutA((HDC)dc, g_UnknownGlobal65b564, y, runs[g_UnknownGlobal65b604].text,
-                 runs[g_UnknownGlobal65b604].length);
-        g_UnknownGlobal65b564 += runs[g_UnknownGlobal65b604].width;
-        g_UnknownGlobal65b604++;
+        TextOutA((HDC)dc, g_TextRunX, y, runs[g_TextRunIndex].text,
+                 runs[g_TextRunIndex].length);
+        g_TextRunX += runs[g_TextRunIndex].width;
+        g_TextRunIndex++;
     }
 }
 
@@ -3536,37 +3538,37 @@ void UIDialog::DrawAlignedText(void* dc, CameraRect* rect, const char* text, int
         SetBkMode((HDC)dc, OPAQUE);
     if (flags != 9) {
         if (control) {
-            g_UnknownGlobal65b5e0.cx = ((int*)control->GetTextExtent())[1];
-            g_UnknownGlobal65b5e0.cy = control->fontHeight;
+            g_AlignedTextSize.cx = ((int*)control->GetTextExtent())[1];
+            g_AlignedTextSize.cy = control->fontHeight;
         } else {
-            GetTextExtentPoint32A((HDC)dc, text, length, &g_UnknownGlobal65b5e0);
+            GetTextExtentPoint32A((HDC)dc, text, length, &g_AlignedTextSize);
         }
     }
     if (flags & 2)
-        g_UnknownGlobal65b5a8 = (rect->right - rect->left) / 2 - g_UnknownGlobal65b5e0.cx / 2 + rect->left;
+        g_AlignedTextX = (rect->right - rect->left) / 2 - g_AlignedTextSize.cx / 2 + rect->left;
     else if (flags & 4)
-        g_UnknownGlobal65b5a8 = rect->right - g_UnknownGlobal65b5e0.cx;
+        g_AlignedTextX = rect->right - g_AlignedTextSize.cx;
     else
-        g_UnknownGlobal65b5a8 = rect->left;
+        g_AlignedTextX = rect->left;
     if (!height)
         height = dialogFontHeight;
     if (flags & 0x10)
-        g_UnknownGlobal65b584 = (rect->bottom - rect->top) / 2 - height / 2 + rect->top;
+        g_AlignedTextY = (rect->bottom - rect->top) / 2 - height / 2 + rect->top;
     else if (flags & 0x20)
-        g_UnknownGlobal65b584 = rect->bottom - height;
+        g_AlignedTextY = rect->bottom - height;
     else
-        g_UnknownGlobal65b584 = rect->top;
+        g_AlignedTextY = rect->top;
     if (runs)
-        DrawTextRuns(dc, g_UnknownGlobal65b5a8, g_UnknownGlobal65b584, text, length, runs, color, shadow,
+        DrawTextRuns(dc, g_AlignedTextX, g_AlignedTextY, text, length, runs, color, shadow,
                      shadowColor);
     else
-        DrawShadowText(dc, g_UnknownGlobal65b5a8, g_UnknownGlobal65b584, text, length, color, shadow,
+        DrawShadowText(dc, g_AlignedTextX, g_AlignedTextY, text, length, color, shadow,
                        shadowColor);
 }
 
-SIZE g_UnknownGlobal65b5a0;                   // the control text's size
-int g_UnknownGlobal65b5e8;                    // its position
-int g_UnknownGlobal65b5c0;
+SIZE g_ControlTextSize;                       // 0x0065b5a0: the control text's size
+int g_ControlTextX;                           // 0x0065b5e8: its position
+int g_ControlTextY;                           // 0x0065b5c0
 
 // 0x0046f6c0
 void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
@@ -3580,68 +3582,68 @@ void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
     else
         SetBkMode((HDC)dc, OPAQUE);
     if (control->textAlign != 9) {
-        g_UnknownGlobal65b5a0.cx = ((int*)control->GetTextExtent())[1];
-        g_UnknownGlobal65b5a0.cy = control->fontHeight;
+        g_ControlTextSize.cx = ((int*)control->GetTextExtent())[1];
+        g_ControlTextSize.cy = control->fontHeight;
     }
     if (control->textAlign & 2)
-        g_UnknownGlobal65b5e8 = (rect.right - rect.left) / 2 - g_UnknownGlobal65b5a0.cx / 2 + rect.left;
+        g_ControlTextX = (rect.right - rect.left) / 2 - g_ControlTextSize.cx / 2 + rect.left;
     else if (control->textAlign & 4)
-        g_UnknownGlobal65b5e8 = rect.right - g_UnknownGlobal65b5a0.cx;
+        g_ControlTextX = rect.right - g_ControlTextSize.cx;
     else
-        g_UnknownGlobal65b5e8 = rect.left;
+        g_ControlTextX = rect.left;
     if (control->textAlign & 0x10)
-        g_UnknownGlobal65b5c0 =
+        g_ControlTextY =
             (rect.bottom - rect.top) / 2 - dialogFontHeight / 2 + rect.top;
     else if (control->textAlign & 0x20)
-        g_UnknownGlobal65b5c0 = rect.bottom - dialogFontHeight;
+        g_ControlTextY = rect.bottom - dialogFontHeight;
     else
-        g_UnknownGlobal65b5c0 = rect.top;
+        g_ControlTextY = rect.top;
     if (control->GetTextLines())
-        DrawTextRuns(dc, g_UnknownGlobal65b5e8, g_UnknownGlobal65b5c0,
+        DrawTextRuns(dc, g_ControlTextX, g_ControlTextY,
                      (const char*)control->GetControlText(), control->GetTextLength(),
                      (UnknownGameUiTextRun*)control->GetTextLines(), control->textColor,
                      control->textColor, control->dropColor);
     else
-        DrawShadowText(dc, g_UnknownGlobal65b5e8, g_UnknownGlobal65b5c0,
+        DrawShadowText(dc, g_ControlTextX, g_ControlTextY,
                        (const char*)control->GetControlText(), control->GetTextLength(),
                        control->textColor, control->textDrop, control->dropColor);
 }
 
-CameraRect* g_UnknownGlobal65b588;            // the clip rectangle
-CameraRect g_UnknownGlobal65b5f0;
-int g_UnknownGlobal65b5ec;
+CameraRect* g_ControlDrawClipRect;            // 0x0065b588: the clip rectangle
+CameraRect g_ControlDrawRect;                 // 0x0065b5f0: the background's copy of it
+int g_ControlDrawResult;                      // 0x0065b5ec: GetDc's result, returned
 
 // 0x0046ed70
 int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control) {
-    g_UnknownGlobal65b588 = rect;
+    g_ControlDrawClipRect = rect;
     *a = 0;
     previousFont = 0;
     if (dialogBackground) {
-        g_UnknownGlobal65b588 = &g_UnknownGlobal65b5f0;
-        g_UnknownGlobal65b5f0 = *rect;
+        g_ControlDrawClipRect = &g_ControlDrawRect;
+        g_ControlDrawRect = *rect;
         if (control) {
-            g_UnknownGlobal65b5ec = dialogBackground->GetDc(
+            g_ControlDrawResult = dialogBackground->GetDc(
                 dc, rect, control->backgroundRegion, control->needsRedraw, &control->redrawFrames, a,
-                &g_UnknownGlobal65b5f0);
+                &g_ControlDrawRect);
         } else {
             int frames = 1;
-            g_UnknownGlobal65b5ec =
-                dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
+            g_ControlDrawResult =
+                dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_ControlDrawRect);
         }
     } else {
         ((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(dc);
-        g_UnknownGlobal65b5ec = 1;
+        g_ControlDrawResult = 1;
     }
     if (*dc && control) {
         previousFont =
             SelectObject((HDC)*dc, (HGDIOBJ)(control->fontHandle ? control->fontHandle : (int)dialogFont));
-        drawClipRegion = CreateRectRgn(g_UnknownGlobal65b588->left, g_UnknownGlobal65b588->top,
-                                             g_UnknownGlobal65b588->right, g_UnknownGlobal65b588->bottom);
+        drawClipRegion = CreateRectRgn(g_ControlDrawClipRect->left, g_ControlDrawClipRect->top,
+                                             g_ControlDrawClipRect->right, g_ControlDrawClipRect->bottom);
         SelectClipRgn((HDC)*dc, (HRGN)drawClipRegion);
     } else {
         drawClipRegion = 0;
     }
-    return g_UnknownGlobal65b5ec;
+    return g_ControlDrawResult;
 }
 
 // 0x0046fce0
