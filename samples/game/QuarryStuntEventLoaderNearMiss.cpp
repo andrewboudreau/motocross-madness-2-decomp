@@ -279,7 +279,7 @@ public:
 
 // The overlays' race hooks.
 struct UnknownQuarryOverlayHooks {
-    void UnknownFunction519880(UnknownQuarryRace* race);       // 0x00519880 (StatsOverlay)
+    void SetStatsSource(UnknownQuarryRace* race);       // 0x00519880 (StatsOverlay)
     void UnknownFunction51d730(UnknownQuarryRace* race);       // 0x0051d730 (ChatOverlay)
     void UnknownFunction51baf0(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay)
     void CollectRacers(UnknownQuarryRace* race);       // 0x0048af20 (VisualCue)
@@ -831,7 +831,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     camera->isSettled = 0;
     if (statsOverlay)
-        ((UnknownQuarryOverlayHooks*)statsOverlay)->UnknownFunction519880((UnknownQuarryRace*)raceView);
+        ((UnknownQuarryOverlayHooks*)statsOverlay)->SetStatsSource((UnknownQuarryRace*)raceView);
     if (chatOverlay)
         ((UnknownQuarryOverlayHooks*)chatOverlay)->UnknownFunction51d730((UnknownQuarryRace*)raceView);
     if (radarOverlay)

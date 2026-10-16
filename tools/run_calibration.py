@@ -23299,7 +23299,7 @@ CASES = [
         'name': 'TrackOverlay.cpp 0x519880 StatsOverlay sets +0x124',
         'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
         'source': 'src/reconstructed/TrackOverlay.cpp',
-        'symbol': '?UnknownFunction519880@StatsOverlay@@QAEHH@Z',
+        'symbol': '?SetStatsSource@StatsOverlay@@QAEHH@Z',
         'target_va': '0x00519880',
         'target_size': 18,
     },

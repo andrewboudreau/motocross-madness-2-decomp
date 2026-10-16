@@ -117,7 +117,7 @@
   "?CreateGroup@TextureMapManager@@QAEPAVManagedTextureGroup@@HHHH@Z": "0x00511180",
   "?ShareCacheLimit@TextureMapManager@@QAEHXZ": "0x005113d0",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
-  "?UnknownFunction519880@UnknownQuarryOverlayHooks@@QAEXPAVUnknownQuarryRace@@@Z": "0x00519880",
+  "?SetStatsSource@UnknownQuarryOverlayHooks@@QAEXPAVUnknownQuarryRace@@@Z": "0x00519880",
   "?UnknownFunction51baf0@UnknownQuarryOverlayHooks@@QAEXPAVUnknownQuarryRace@@PAX@Z": "0x0051baf0",
   "?UnknownFunction51d730@UnknownQuarryOverlayHooks@@QAEXPAVUnknownQuarryRace@@@Z": "0x0051d730",
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",

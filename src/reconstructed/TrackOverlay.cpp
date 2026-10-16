@@ -495,7 +495,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
 }
 
 // 0x00519880
-int StatsOverlay::UnknownFunction519880(int value)
+int StatsOverlay::SetStatsSource(int value)
 {
     statsSource = (UnknownStatsSource*)value;
     return 1;
