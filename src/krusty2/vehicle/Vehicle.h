@@ -156,6 +156,16 @@ struct VehicleSpeedState {
                       int rpmStep, float a6, float riseRate, float fallRate);
     void Method_004D2F50(float dt, int a, bool b);  // 0x004d2f50, purpose unknown (b: one byte pushed)
     void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
+    // Inline in Vehicle slot 49: counts the timer down to zero (retail loads dt before the
+    // timer, the inline-parameter order).
+    void TickGearTimer(float dt)
+    {
+        if (gearTimer != 0.0f) {
+            gearTimer -= dt;
+            if (gearTimer < 0.0f)
+                gearTimer = 0.0f;
+        }
+    }
 };
 // Exponential smoother objects at Vehicle+0x58c / +0x598 (provisional): f0 is the smoothed value.
 // 0x14 bytes: LoadVehicle allocates two with `new(__FILE__, 0x19d/0x1a0)` and fills all five

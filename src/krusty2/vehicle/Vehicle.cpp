@@ -952,12 +952,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     }
     justLanded = 0;
     while (steps > 0) {
-        VehicleSpeedState* ss = engineState;
-        if (ss->gearTimer != 0.0f) {
-            ss->gearTimer -= stepTime;
-            if (ss->gearTimer < 0.0f)
-                ss->gearTimer = 0.0f;
-        }
+        engineState->TickGearTimer(stepTime);
         Vec3 zero = kVec3Zero;
         if (crashState == 0) {
             if (UpdateWheelRampLevels())
