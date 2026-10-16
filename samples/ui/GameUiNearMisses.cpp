@@ -1549,7 +1549,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                 control->SetAnchor((UIControl*)FindSectionObject(anchor), relAnchor);
                 control->SetName(sectionTable[i].sectionName);
                 control->moveable = moveable;
-                if (control->bounds[2] == control->bounds[0]) {
+                if (control->bounds[0] == control->bounds[2]) {
                     UIAnim* image;
                     if (!_stricmp(type, "MULTISTATE") || !_stricmp(type, "RADIOBUTTON"))
                         image = ((UIMultiState*)control)->stateTable[((UIMultiState*)control)->selectedState].image;
