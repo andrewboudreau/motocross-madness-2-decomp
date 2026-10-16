@@ -34,8 +34,8 @@ void GR_BitString::ShiftBitsTowardFront(int count) {
         if (*src == 0) {
             dst++;
         } else if (*src == 0xffffffff) {
-            *dst++ |= ~g_UnknownHighMasks568098[carryShift];
-            *src = g_UnknownHighMasks568098[carryShift];
+            *dst++ |= ~g_WordHighBitMasks[carryShift];
+            *src = g_WordHighBitMasks[carryShift];
         } else {
             *src = UNKNOWN_BIG_ENDIAN_WORD(*src);
             value = *src >> carryShift;
@@ -49,9 +49,9 @@ void GR_BitString::ShiftBitsTowardFront(int count) {
         src++;
     }
     if (!fillWord)
-        *dst &= g_UnknownHighMasks568098[carryShift];
+        *dst &= g_WordHighBitMasks[carryShift];
     else
-        *dst |= ~g_UnknownHighMasks568098[carryShift];
+        *dst |= ~g_WordHighBitMasks[carryShift];
 }
 
 // 0x00423b70
@@ -70,8 +70,8 @@ void GR_BitString::ShiftBitsTowardBack(int count) {
         if (*src == 0) {
             dst--;
         } else if (*src == 0xffffffff) {
-            *--dst |= g_UnknownHighMasks568098[count];
-            *src = ~g_UnknownHighMasks568098[count];
+            *--dst |= g_WordHighBitMasks[count];
+            *src = ~g_WordHighBitMasks[count];
         } else {
             *src = UNKNOWN_BIG_ENDIAN_WORD(*src);
             value = *src << carryShift;
@@ -86,7 +86,7 @@ void GR_BitString::ShiftBitsTowardBack(int count) {
         src--;
     }
     if (!fillWord)
-        *--dst &= ~g_UnknownHighMasks568098[count];
+        *--dst &= ~g_WordHighBitMasks[count];
     else
-        *--dst |= g_UnknownHighMasks568098[count];
+        *--dst |= g_WordHighBitMasks[count];
 }

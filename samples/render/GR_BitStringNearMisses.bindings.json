@@ -6,10 +6,10 @@
   "?ShiftTowardBack@GR_BitString@@QAEXH@Z": "0x00423940",
   "?ShiftBitsTowardFront@GR_BitString@@QAEXH@Z": "0x004239c0",
   "?ShiftBitsTowardBack@GR_BitString@@QAEXH@Z": "0x00423b70",
-  "?g_UnknownBitReverse567f98@@3PAEA": "0x00567f98",
-  "?g_UnknownHighMasks568098@@3PAIA": "0x00568098",
-  "?g_UnknownLowMaskTable568224@@3PAIA": "0x00568224",
-  "?g_UnknownReadBits578e94@@3HA": "0x00578e94",
-  "?g_UnknownReadCursor578e98@@3PAIA": "0x00578e98",
-  "?g_UnknownReadWord578e90@@3IA": "0x00578e90"
+  "?g_BitReverseTable@@3PAEA": "0x00567f98",
+  "?g_WordHighBitMasks@@3PAIA": "0x00568098",
+  "?g_LowBitMaskTable@@3PAIA": "0x00568224",
+  "?g_BitReaderBitsUsed@@3HA": "0x00578e94",
+  "?g_BitReaderCursor@@3PAIA": "0x00578e98",
+  "?g_BitReaderWord@@3IA": "0x00578e90"
 }
