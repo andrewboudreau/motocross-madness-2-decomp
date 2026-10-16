@@ -744,7 +744,7 @@ void SoultreeObject::LoadFromParameters(UnknownParameterStream* stream, int offs
 {
     parameterBlock = new(__FILE__, 0x346) UnknownParameterBlock;
     parameterBlock->Attach(stream, offset, 1);
-    UnknownVirtualSlot3();
+    LoadHierarchyFromParameters();
     if (parameterBlock)
         delete parameterBlock;
 }
@@ -752,7 +752,7 @@ void SoultreeObject::LoadFromParameters(UnknownParameterStream* stream, int offs
 // 0x004fdc00. Slot 2: reads a whole hierarchy from a binary stream: the node count, then per
 // node its name, local matrix and bounds fields (new nodes come from slot 4; node 0 is this
 // one), then one parent index per node (-1 = none, __FILE__ line 0x370).
-void SoultreeObject::UnknownVirtualSlot2(SoultreeFileStream* stream)
+void SoultreeObject::LoadHierarchy(SoultreeFileStream* stream)
 {
     SoultreeObject* nodes[256];
     int i;
@@ -760,7 +760,7 @@ void SoultreeObject::UnknownVirtualSlot2(SoultreeFileStream* stream)
     nodes[0] = this;
     for (i = 0; i < loadedNodeCount; i++) {
         if (i != 0)
-            UnknownVirtualSlot4(&nodes[i]);
+            CreateNode(&nodes[i]);
         stream->Read(nodes[i]->name, 0x80, 1);
         stream->Read(&nodes[i]->localMatrix, 0x40, 1);
         stream->Read(&nodes[i]->field_0x14c, 4, 1);
@@ -788,7 +788,7 @@ void SoultreeObject::UnknownVirtualSlot2(SoultreeFileStream* stream)
 // 0x004fddc0. Slot 3: reads the "Object Hierarchy" section of the parameter block
 // parameterBlock: one row per node with its name, its parent's name and the 3x4 local matrix.
 // Rows whose parent is not "NONE" are attached to the node of that name.
-void SoultreeObject::UnknownVirtualSlot3()
+void SoultreeObject::LoadHierarchyFromParameters()
 {
     SoultreeObject* nodes[256];
     char parentNames[256][256];
@@ -800,7 +800,7 @@ void SoultreeObject::UnknownVirtualSlot3()
     loadedNodeCount = count;
     nodes[0] = this;
     for (i = 1; i < count; i++)
-        UnknownVirtualSlot4(&nodes[i]);
+        CreateNode(&nodes[i]);
     for (i = 0; i < count; i++) {
         parameterBlock->ReadRow(0);
         parameterBlock->GetRowString(0, nodes[i]->name);
@@ -830,7 +830,7 @@ void SoultreeObject::UnknownVirtualSlot3()
 }
 
 // 0x004fe020. Slot 4: the node factory used by the clone.
-void SoultreeObject::UnknownVirtualSlot4(SoultreeObject** out)
+void SoultreeObject::CreateNode(SoultreeObject** out)
 {
     *out = new(__FILE__, 0x3aa) SoultreeObject(1);
 }
@@ -839,7 +839,7 @@ void SoultreeObject::UnknownVirtualSlot4(SoultreeObject** out)
 void SoultreeObject::GetLocalBounds(Vec3* a, Vec3* b)
 {
     if (!localBoundsValid)
-        UnknownVirtualSlot5();
+        UpdateLocalBounds();
     *a = localBoundsA;
     *b = localBoundsB;
 }
@@ -953,15 +953,15 @@ void SoultreeObject::GetSubtreeBounds(Vec3* center, Vec3* extents)
 }
 
 // 0x004feb10. Slot 7: makes this node a parentless copy of src's subtree.
-void SoultreeObject::UnknownVirtualSlot7(SoultreeObject* src)
+void SoultreeObject::CloneFrom(SoultreeObject* src)
 {
     parent = 0;
-    UnknownVirtualSlot8(src, this);
+    CopySubtree(src, this);
 }
 
 // 0x004feb30. Slot 8: copies src into dst, then clones src's later siblings and children
 // through the factory (slot 4).
-void SoultreeObject::UnknownVirtualSlot8(SoultreeObject* src, SoultreeObject* dst)
+void SoultreeObject::CopySubtree(SoultreeObject* src, SoultreeObject* dst)
 {
     strcpy(dst->name, src->name);
     dst->localMatrix = src->localMatrix;
@@ -969,17 +969,17 @@ void SoultreeObject::UnknownVirtualSlot8(SoultreeObject* src, SoultreeObject* ds
     dst->field_0x14c = src->field_0x14c;
     dst->localBoundsValid = 0;
     if (src->nextSibling) {
-        UnknownVirtualSlot4(&dst->nextSibling);
+        CreateNode(&dst->nextSibling);
         dst->nextSibling->parent = dst->parent;
         dst->nextSibling->prevSibling = dst;
-        UnknownVirtualSlot8(src->nextSibling, dst->nextSibling);
+        CopySubtree(src->nextSibling, dst->nextSibling);
     } else {
         dst->nextSibling = 0;
     }
     if (src->firstChild) {
-        UnknownVirtualSlot4(&dst->firstChild);
+        CreateNode(&dst->firstChild);
         dst->firstChild->parent = dst;
-        UnknownVirtualSlot8(src->firstChild, dst->firstChild);
+        CopySubtree(src->firstChild, dst->firstChild);
     } else {
         dst->firstChild = 0;
     }
@@ -995,14 +995,14 @@ int SoultreeObject::AttachRenderContext(int a)
 
 // 0x004fec70. Slot 6: identity local matrices for this node, its later siblings and its
 // descendants.
-void SoultreeObject::UnknownVirtualSlot6()
+void SoultreeObject::ResetLocalMatrices()
 {
     worldValid = 0;
     localMatrix = IdentityMatrix();
     if (nextSibling)
-        nextSibling->UnknownVirtualSlot6();
+        nextSibling->ResetLocalMatrices();
     if (firstChild)
-        firstChild->UnknownVirtualSlot6();
+        firstChild->ResetLocalMatrices();
 }
 
 // 0x004fecd0.
