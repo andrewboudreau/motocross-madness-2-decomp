@@ -1163,9 +1163,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             g_TrackGame->ui->ResolveRiderFile(g_TrackGame->mode.racerChoice.riderName,
                                                              ownRiderTexture, 0x3f);
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
-                racerSlots[j]->collisionObject->field_0x68 = 1;
-                racerSlots[j]->frontWheel->field_0x68 = 1;
-                racerSlots[j]->rearWheel->field_0x68 = 1;
+                racerSlots[j]->collisionObject->ignoreVegetation = 1;
+                racerSlots[j]->frontWheel->ignoreVegetation = 1;
+                racerSlots[j]->rearWheel->ignoreVegetation = 1;
             }
             racerSlots[j]->modelNode->ReplaceMaterialTexture(0, ownBikeTexture, (int)textures);
             racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, ownRiderTexture, (int)textures);
@@ -1218,9 +1218,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
             }
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
-                racerSlots[j]->collisionObject->field_0x68 = 1;
-                racerSlots[j]->frontWheel->field_0x68 = 1;
-                racerSlots[j]->rearWheel->field_0x68 = 1;
+                racerSlots[j]->collisionObject->ignoreVegetation = 1;
+                racerSlots[j]->frontWheel->ignoreVegetation = 1;
+                racerSlots[j]->rearWheel->ignoreVegetation = 1;
             }
             racerSlots[j]->Disable();
             racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
@@ -1264,9 +1264,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             racerSlots[j]->modelNode->ReplaceMaterialTexture(0, slots[j].bikeName, (int)textures);
             racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, slots[j].riderName, (int)textures);
             if (!g_TrackGame->mode.raceSettings.treeCollision) {
-                racerSlots[j]->collisionObject->field_0x68 = 1;
-                racerSlots[j]->frontWheel->field_0x68 = 1;
-                racerSlots[j]->rearWheel->field_0x68 = 1;
+                racerSlots[j]->collisionObject->ignoreVegetation = 1;
+                racerSlots[j]->frontWheel->ignoreVegetation = 1;
+                racerSlots[j]->rearWheel->ignoreVegetation = 1;
             }
             racerSlots[j]->Disable();
             racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
@@ -1304,9 +1304,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         localRacer->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
         localRacer->riderCharacter->modelNode->ReplaceMaterialTexture(0, riderTexture, (int)textures);
         if (!g_TrackGame->mode.raceSettings.treeCollision) {
-            localRacer->collisionObject->field_0x68 = 1;
-            localRacer->frontWheel->field_0x68 = 1;
-            localRacer->rearWheel->field_0x68 = 1;
+            localRacer->collisionObject->ignoreVegetation = 1;
+            localRacer->frontWheel->ignoreVegetation = 1;
+            localRacer->rearWheel->ignoreVegetation = 1;
         }
         localRacer->engineSize = ((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->engineSize;
         localRacer->engineKind = (char)((UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions)->engineKind;
@@ -1446,9 +1446,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                     aiRacers[n]->plateNumber = plate;
                 }
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
-                    aiRacers[n]->collisionObject->field_0x68 = 1;
-                    aiRacers[n]->frontWheel->field_0x68 = 1;
-                    aiRacers[n]->rearWheel->field_0x68 = 1;
+                    aiRacers[n]->collisionObject->ignoreVegetation = 1;
+                    aiRacers[n]->frontWheel->ignoreVegetation = 1;
+                    aiRacers[n]->rearWheel->ignoreVegetation = 1;
                 }
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(id, 1, recordIndex++, aiName, path, riderFile, bikeTexture,
@@ -1507,9 +1507,9 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j]->modelNode->ReplaceMaterialTexture(0, slots[j].bikeName, (int)textures);
                 racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, slots[j].riderName, (int)textures);
                 if (!g_TrackGame->mode.raceSettings.treeCollision) {
-                    racerSlots[j]->collisionObject->field_0x68 = 1;
-                    racerSlots[j]->frontWheel->field_0x68 = 1;
-                    racerSlots[j]->rearWheel->field_0x68 = 1;
+                    racerSlots[j]->collisionObject->ignoreVegetation = 1;
+                    racerSlots[j]->frontWheel->ignoreVegetation = 1;
+                    racerSlots[j]->rearWheel->ignoreVegetation = 1;
                 }
                 if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                     replayVcr->SetRacer(slots[j].networkPlayerId, (char)slots[j].racerIndex, recordIndex++,
