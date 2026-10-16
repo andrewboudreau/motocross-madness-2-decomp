@@ -80,7 +80,7 @@
   "?g_terrainPrepareGeometryTicks@@3HA": "0x0068a318",
   "?g_terrainRender3DTicks@@3HA": "0x0068a31c",
   "?g_terrainTotalTicks@@3HA": "0x0068a320",
-  "?g_UnknownGlobal68a328@@3HA": "0x0068a328",
+  "?g_terrainDualTextureProbed@@3HA": "0x0068a328",
   "?g_gridDrawMemory@@3HA": "0x0068a300",
   "?g_gridDrawMemoryPeak@@3HA": "0x0068a2fc",
   "?g_pTerrainQualityTable@@3PAUTerrainQualityEntry@@A": "0x0068a32c",

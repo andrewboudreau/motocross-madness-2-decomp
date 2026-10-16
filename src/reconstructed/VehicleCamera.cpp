@@ -164,7 +164,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
 void VehicleCamera::UnknownVirtualSlot67() {
     followPitch = 0.75f;
     followYaw = 3.1415927f;
-    followDistance = vehicleMode ? g_UnknownFloat558d60 : 60.0f;
+    followDistance = vehicleMode ? 17.0f : 60.0f;
     targetFieldOfView = 85.0f;
 }
 

@@ -359,7 +359,7 @@ UnknownTgaFile* ReadWholeFile(UnknownTextureStream* stream, UnknownTgaFile* file
     } else if (!ReadTgaPixels16(file, stream)) {
         goto failed;
     }
-    strcpy(file->name, g_UnknownGlobal577738);
+    strcpy(file->name, g_EmptyString);
     return file;
 failed:
     if (file->bits)

@@ -181,7 +181,7 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
     Vector3 second;
     for (int i = 0; i < pointCount; i++) {
         int code;
-        if (!g_UnknownFollowCameraProjector575a98->ProjectPoint(
+        if (!g_visibilityClipper->ProjectPoint(
                 this, screenMatrix, &points[i].position, &points[i].screenPoint, &code)) {
             followDistance += dt * points[i].distanceRate;
             followDistance = distanceEase->Update(followDistance, dt);

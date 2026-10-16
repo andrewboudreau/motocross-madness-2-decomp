@@ -89,7 +89,7 @@ void Wrecker::CreateBodies(UnknownWreckerCharacter* rider, const char* name) {
     collisionModel->damping = 0.99f;
     collisionModel->impulseLoss = 0.95f;
     collisionModel->maxImpulse = 2000.0f;
-    g_UnknownGlobal68aba4->Remove(collisionModel, collisionModel->quadtreeCell);
+    g_collisionQuadTree->Remove(collisionModel, collisionModel->quadtreeCell);
     rigidBody->UnknownVirtualSlot29(200.0f);
     inertiaFactor = rigidBody->mass * (1.0f / 12);
     rigidBody->inertia = ZeroMatrix();
@@ -573,7 +573,7 @@ void Wrecker::EndWreck() {
         collisionModel->collidable = 0;
         collisionModel->applyImpulses = 0;
         collisionModel->hasContact = 0;
-        g_UnknownGlobal68aba4->Remove(collisionModel, collisionModel->quadtreeCell);
+        g_collisionQuadTree->Remove(collisionModel, collisionModel->quadtreeCell);
         pendingAnimation = 0;
         skipProbeEffects = 1;
         character->skeleton->ResetMatrices();

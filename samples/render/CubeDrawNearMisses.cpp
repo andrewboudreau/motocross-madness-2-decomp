@@ -218,7 +218,7 @@ void DrawableCube::MarkVisibleCells()
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
         cubeObject->faces[face].visibleCells = 0;
-        if (!g_UnknownCubeClipper575a98->CanFaceCamera(Target()->currentCamera, &forward,
+        if (!g_visibilityClipper->CanFaceCamera(Target()->currentCamera, &forward,
                                                                 &s_faceNormals[face]))
             continue;
         for (int k = 0; k < 25; k++)
@@ -226,11 +226,11 @@ void DrawableCube::MarkVisibleCells()
             const Vector3& point = s_facePoints[face][k];
             s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
         }
-        g_UnknownCubeClipper575a98->TransformPoints(
+        g_visibilityClipper->TransformPoints(
             s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->currentCamera)->viewMatrix, 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
-            if (g_UnknownCubeClipper575a98->IsQuadOnScreen(Target()->currentCamera, s_viewPoints, corner,
+            if (g_visibilityClipper->IsQuadOnScreen(Target()->currentCamera, s_viewPoints, corner,
                                                                   corner + 1, corner + 6, corner + 5))
                 cubeObject->faces[face].visibleCells |= 1 << i;
         }
