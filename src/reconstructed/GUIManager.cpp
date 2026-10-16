@@ -304,7 +304,7 @@ int GUIManager::UnknownVirtualSlot13() {
         rect.bottom = screenGrab->textureHeight;
         if (guiBackground) {
             guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
+        } else if (!((RenderTarget*)renderContext)->Blit(&rect, screenGrab, 0, 0x1000000)) {
             GameObject::UnknownVirtualSlot13();
             return 0;
         }
@@ -325,7 +325,7 @@ int GUIManager::UnknownVirtualSlot15() {
             rect.bottom = screenGrab->textureHeight;
             if (guiBackground) {
                 guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
-            } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
+            } else if (!((RenderTarget*)renderContext)->Blit(&rect, screenGrab, 0, 0x1000000)) {
                 GameObject::UnknownVirtualSlot15();
                 return 0;
             }
@@ -333,7 +333,7 @@ int GUIManager::UnknownVirtualSlot15() {
         GameObject::UnknownVirtualSlot15();
     } else {
         waitFrames = waitFrames - 1 < 0 ? 0 : waitFrames - 1;
-        g_TrackGame->renderTarget->UnknownVirtualSlot12(0, 0);
+        g_TrackGame->renderTarget->Clear(0, 0);
         if (!waitFrames && redrawBackground) {
             redrawBackground->MarkAllDirty();
             redrawBackground = 0;
@@ -758,7 +758,7 @@ int ToolTip::UnknownVirtualSlot15() {
         rect.top = screenArea.top;
         rect.right = screenArea.left + textArea.right;
         rect.bottom = screenArea.top + textArea.bottom;
-        if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, textTexture, &textArea, 0x1008000))
+        if (!((RenderTarget*)renderContext)->Blit(&rect, textTexture, &textArea, 0x1008000))
             return 0;
     } else if (tipGui && tipGui->guiBackground && backgroundRegion > -1) {
         if (restoreFrames > 0) {

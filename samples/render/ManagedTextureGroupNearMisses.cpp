@@ -679,7 +679,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             }
             int x = target->targetWidth - selected->textureWidth;
             long pitch;
-            unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
+            unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
             if (bits) {
                 long sourcePitch;
                 void* source = selected->UnknownVirtualSlot13(0, &sourcePitch, 0x811);
@@ -691,7 +691,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                                           target->surfacePixelFormat, selected->mapFormat, 0, selected->field_0x2c, 0, 0);
                     selected->systemSurface->Unlock(0);
                 }
-                target->UnknownVirtualSlot5(0);
+                target->UnlockSurface(0);
             }
             _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", textureCursor + 1, selected->largestUse,
                       selected->field_0xa8, state);
@@ -731,7 +731,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
         surface->Blt(&rect, 0, 0, 0x400, &effects);
         static_cast<CacheTexture*>(page)->ListTextures(&field_0x1a8);
         long pitch;
-        unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
+        unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
         if (bits) {
             for (int j = 0; j < field_0x1a8.m_count; j++) {
                 ManagedTexture* managed = field_0x1a8.Get(j);

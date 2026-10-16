@@ -156,7 +156,7 @@ int DrawableCube::UnknownVirtualSlot14()
 {
     static Matrix4 s_world = IdentityMatrix();
     int fog;
-    Target()->UnknownVirtualSlot9(9, &fog);
+    Target()->GetRenderState(9, &fog);
     s_world.m[0][0] = 2.0f;
     s_world.m[1][1] = 2.0f;
     s_world.m[2][2] = 2.0f;
@@ -164,14 +164,14 @@ int DrawableCube::UnknownVirtualSlot14()
     s_world.m[3][1] = cubeObject->center.y;
     s_world.m[3][2] = cubeObject->center.z;
     Target()->currentCamera->UnknownVirtualSlot30(&s_world);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZENABLE, 0, 0);
+    Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+    Target()->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     int face;
     int i;
     for (face = 0; face < 6; face++) {
@@ -191,14 +191,14 @@ int DrawableCube::UnknownVirtualSlot14()
                                             &CELL_VERTEX(first).tv, 6, 0x20);
             }
             cubeObject->faces[face].textures[i]->UnknownVirtualSlot19();
-            if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)&CELL_VERTEX(first), 6, 0))
+            if (!Target()->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)&CELL_VERTEX(first), 6, 0))
                 return 0;
         }
     }
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    Target()->UnknownVirtualSlot11(0);
+    Target()->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
+    Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    Target()->ClearTexture(0);
     for (face = 0; face < 6; face++) {
         for (i = 0; i < 16; i++) {
             if (!(cubeObject->faces[face].visibleCells & (1 << i)))
@@ -214,13 +214,13 @@ int DrawableCube::UnknownVirtualSlot14()
             CELL_VERTEX(first + 3).diffuse = Target()->clearColor;
             CELL_VERTEX(first + 4).diffuse = Target()->clearColor;
             CELL_VERTEX(first + 5).diffuse = Target()->clearColor;
-            if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)s_cellVertices[face][i], 6, 0))
+            if (!Target()->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)s_cellVertices[face][i], 6, 0))
                 return 0;
         }
     }
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 1, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, fog, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZENABLE, 1, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_SHADEMODE, fog, 0);
     return 1;
 }
 

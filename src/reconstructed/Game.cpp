@@ -217,14 +217,14 @@ int Game::UnknownVirtualSlot8() {
     int renderPre3D = now - last;
     int render3D = 0;
     if (useZBuffer) {
-        if (!renderTarget->UnknownVirtualSlot1())
+        if (!renderTarget->BeginScene())
             goto failed;
-        renderTarget->UnknownVirtualSlot12(0, 0);
+        renderTarget->Clear(0, 0);
         UnknownVirtualSlot7();
         last = ReadClock();
         rootObject->UnknownVirtualSlot14();
         render3D = ReadClock() - last;
-        if (!renderTarget->UnknownVirtualSlot2()) {
+        if (!renderTarget->EndScene()) {
         failed:
             return 0;
         }

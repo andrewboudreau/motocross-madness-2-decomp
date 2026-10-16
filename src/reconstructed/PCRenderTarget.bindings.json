@@ -20,13 +20,13 @@
   "?WriteTga24@@YAHPAXHHIPBDH@Z": "0x00512720",
   "?WriteTga32@@YAHPAXHHIPBDH@Z": "0x005127f0",
   "?WriteTga16@@YAHPAXHHIHPBDH@Z": "0x005128c0",
-  "?UnknownVirtualSlot10@PCRenderTarget@@UAEXHH@Z": "0x004c5740",
-  "?UnknownVirtualSlot13@PCRenderTarget@@UAEHH@Z": "0x004c5640",
-  "?UnknownVirtualSlot15@PCRenderTarget@@UAEHHHHHHHH@Z": "0x004c5b20",
-  "?UnknownVirtualSlot16@PCRenderTarget@@UAEHHHHHH@Z": "0x004c5bd0",
-  "?UnknownVirtualSlot17@PCRenderTarget@@UAEHHHHHHHH@Z": "0x004c5c70",
-  "?UnknownVirtualSlot18@PCRenderTarget@@UAEXH@Z": "0x004c5e60",
-  "?UnknownVirtualSlot4@PCRenderTarget@@UAEPAXPAXPAJH@Z": "0x004c5420",
+  "?SetTextureBlend@PCRenderTarget@@UAEXHH@Z": "0x004c5740",
+  "?SupportsTextureFormat@PCRenderTarget@@UAEHH@Z": "0x004c5640",
+  "?DrawIndexedPrimitive@PCRenderTarget@@UAEHHHHHHHH@Z": "0x004c5b20",
+  "?DrawPrimitive@PCRenderTarget@@UAEHHHHHH@Z": "0x004c5bd0",
+  "?DrawIndexedPrimitiveVB@PCRenderTarget@@UAEHHHHHHHH@Z": "0x004c5c70",
+  "?SetAlphaTest@PCRenderTarget@@UAEXH@Z": "0x004c5e60",
+  "?LockSurface@PCRenderTarget@@UAEPAXPAXPAJH@Z": "0x004c5420",
   "__FILE__": "0x005704b0",
   "__chkstk": "0x00535ed0",
   "__imp__GetComputerNameA@8": "0x0055020c",
@@ -34,5 +34,5 @@
   "_fopen": "0x00534ceb",
   "_s_screenshotIndex": "0x0068995c",
   "_sprintf": "0x00534aaf",
-  "?UnknownVirtualSlot12@PCRenderTarget@@UAEHPBUCameraRect@@H@Z": "0x004c5510"
+  "?Clear@PCRenderTarget@@UAEHPBUCameraRect@@H@Z": "0x004c5510"
 }

@@ -71,66 +71,66 @@ void SoultreeMaterial::ApplyRenderStates()
         surfaceMap->Select();
         int format = surfaceMap->texture->mapFormat;
         if (format != 1555 && format != 4444 && format != 8888) {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+            ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
         } else if (hasColorKey) {
             if (hasAlpha)
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot18(0);
+                ((RenderTarget*)renderContext)->SetAlphaTest(0);
             else
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot18(0x80);
+                ((RenderTarget*)renderContext)->SetAlphaTest(0x80);
         } else {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot18(0);
+            ((RenderTarget*)renderContext)->SetAlphaTest(0);
         }
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         if (format == 4444 || format == 8888 || (format == 1555 && hasAlpha)) {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
             if (!hasAlpha && mappingType != 6) {
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+                ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+                ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
             } else {
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+                ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+                ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+                ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+                ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
             }
         } else if (hasAlpha) {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+            ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         } else {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     } else {
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot11(0);
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        ((RenderTarget*)renderContext)->ClearTexture(0);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         if (hasAlpha) {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+            ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
         } else {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
         }
     }
     if (clampTexture) {
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot6(0, 0xc, &g_UnknownInt689ed0);
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
+        ((RenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &g_UnknownInt689ed0);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
     }
     switch (mappingType) {
     case 3:
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 4:
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 6:
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 8:
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 1, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_WRAP0, 1, 0);
         break;
     }
 }
@@ -139,9 +139,9 @@ void SoultreeMaterial::ApplyRenderStates()
 void SoultreeMaterial::RestoreRenderStates()
 {
     if (mappingType == 8)
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 0, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_WRAP0, 0, 0);
     if (clampTexture)
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, g_UnknownInt689ed0);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ADDRESS, g_UnknownInt689ed0);
 }
 
 // 0x004ff450

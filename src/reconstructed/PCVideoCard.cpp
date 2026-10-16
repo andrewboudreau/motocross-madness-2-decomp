@@ -609,9 +609,9 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     viewport.height = target->targetHeight;
     viewport.minZ = 0.0f;
     viewport.maxZ = 1.0f;
-    int failed = target->UnknownVirtualSlot14(&viewport) != 1;
+    int failed = target->SetViewport(&viewport) != 1;
     if (!failed) {
-        failed = target->UnknownVirtualSlot1() != 1;
+        failed = target->BeginScene() != 1;
         clear.left = 0;
         clear.right = viewport.x + viewport.width;
         clear.top = 0;
@@ -619,20 +619,20 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
         failed |= target->device->Clear(1, &clear, D3DCLEAR_ZBUFFER, 0, target->zClearValue, 0) != 0; // Clear z
         g_TrackGame->UnknownVirtualSlot7();
         rendered->UnknownVirtualSlot19();
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-        target->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        target->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        target->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        target->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-        failed |= target->UnknownVirtualSlot16(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
+        target->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_ZENABLE, 0, 0);
+        target->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        target->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        target->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        target->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+        target->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        target->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        failed |= target->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
                                               (int)vertices, 4, 0) != 1;
-        target->UnknownVirtualSlot2();
+        target->EndScene();
     }
     failed |= CopyRenderSurfaceToTexture(target, rendered) != 1;
     if (present)

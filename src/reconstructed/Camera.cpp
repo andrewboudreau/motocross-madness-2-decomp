@@ -78,7 +78,7 @@ int Camera::UnknownVirtualSlot13() {
         rect.top = y;
         rect.right = x + viewport[2];
         rect.bottom = y + viewport[3];
-        Owner()->UnknownVirtualSlot12(&rect, 0);
+        Owner()->Clear(&rect, 0);
     }
     ReapplyDefaultLimits();
     return 1;
@@ -106,7 +106,7 @@ int Camera::UpdateViewport() {
     viewport[3] = targetHeight;
     ((float*)viewport)[4] = 0.0f;
     ((float*)viewport)[5] = 1.0f;
-    if (!owner->UnknownVirtualSlot14(viewport))
+    if (!owner->SetViewport(viewport))
         return 0;
     heightWidthRatio = (float)(unsigned int)viewport[3] / (float)(unsigned int)viewport[2];
     projectionChangeFrames = Owner()->frameModulus + 1;
@@ -346,7 +346,7 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
         viewport[3] = targetHeight;
     viewport[1] = (unsigned int)(targetHeight - viewport[3]) >> 1;
     viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
-    return Owner()->UnknownVirtualSlot14(viewport) != 0;
+    return Owner()->SetViewport(viewport) != 0;
 }
 
 // 0x0042f190. Retail stores the width before y.
@@ -360,7 +360,7 @@ int Camera::SetViewport(int x, int y, int width, int height) {
     if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
         viewport[3] = targetHeight;
     viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
-    return Owner()->UnknownVirtualSlot14(viewport) != 0;
+    return Owner()->SetViewport(viewport) != 0;
 }
 
 // 0x0042f210

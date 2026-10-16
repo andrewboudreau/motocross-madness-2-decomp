@@ -334,7 +334,7 @@ int PCGame::UnknownVirtualSlot19(int mode) {
     if (renderTarget && camera) {
         camera->renderContext = renderTarget;
         renderTarget->SetCamera(camera);
-        renderTarget->UnknownVirtualSlot14(camera->viewport);
+        renderTarget->SetViewport(camera->viewport);
     }
     return 1;
 }
@@ -396,35 +396,35 @@ int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
 // filters from the "DriverInfo\<driver>\Allow..." bits (+0x2d4) and the
 // device capabilities.
 int PCGame::UnknownVirtualSlot7() {
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_DITHERENABLE,
+    renderTarget->SetRenderState(D3DRENDERSTATE_DITHERENABLE,
                                     allowDither && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_DITHER), 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ANTIALIAS, 0, 1);
     if (allowSortIndependentAntialiasing && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT))
-        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, useZBuffer, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, useZBuffer, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
-    renderTarget->UnknownVirtualSlot10(7, 0);
+        renderTarget->SetRenderState(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
+    renderTarget->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ZENABLE, useZBuffer, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, useZBuffer, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
+    renderTarget->SetTextureBlend(7, 0);
     if (field_0x2d0) {
-        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 1);
-        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 1);
+        renderTarget->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 1);
+        renderTarget->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 1);
     } else {
-        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 1);
-        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 1);
+        renderTarget->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 1);
+        renderTarget->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 1);
     }
     PCTarget()->device->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_SPECULARENABLE, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZVISIBLE, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_LASTPIXEL, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_STIPPLEDALPHA, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ZVISIBLE, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_LASTPIXEL, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_STIPPLEDALPHA, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 1, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ALPHAREF, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 1);
     magFilter = allowBilinear && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFG_LINEAR
                                                                                                : D3DTFG_POINT;
     minFilter = allowBilinear && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFN_LINEAR
@@ -441,8 +441,8 @@ int PCGame::UnknownVirtualSlot7() {
     PCTarget()->device->SetTextureStageState(0, D3DTSS_MIPFILTER, mipFilter);
     PCTarget()->device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     PCTarget()->device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_LIGHTING, 0, 1);
-    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_LIGHTING, 0, 1);
+    renderTarget->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
     return 1;
 }
 

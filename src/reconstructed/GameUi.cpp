@@ -2062,7 +2062,7 @@ int UIDialog::UnknownVirtualSlot13() {
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &grabCopyFrames, 0);
         else
-            ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
+            ((RenderTarget*)UnknownInlineField18())->Blit(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
     return 1;
@@ -2084,7 +2084,7 @@ int UIDialog::UnknownVirtualSlot15() {
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &grabCopyFrames, 0);
         else
-            ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
+            ((RenderTarget*)UnknownInlineField18())->Blit(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
     if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->frameCount)
@@ -4230,7 +4230,7 @@ int UIControl::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->Blit(
                        &rect, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -4413,7 +4413,7 @@ int UIScrollBar::Draw() {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)track, &rect, 0,
                                                            track->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
-        else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, track, 0,
+        else if (!((RenderTarget*)renderContext)->Blit(&rect, track, 0,
                                                                    track->usesColorKey ? 0x1008000 : 0x1000000))
             goto failed;
         redrawFrames = redraw;
@@ -4439,7 +4439,7 @@ int UIScrollBar::Draw() {
                 needsRedraw = 1;
             else
                 RequestRedraw();
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, thumb, 0,
+        } else if (!((RenderTarget*)renderContext)->Blit(&rect, thumb, 0,
                                                                      thumb->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4653,7 +4653,7 @@ int UIListBox::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             redrawFrames = redraw;
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->Blit(
                        screenArea, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4732,7 +4732,7 @@ int UIListBox::Draw() {
                                 done = 0;
                                 frames = redrawFrames;
                             }
-                        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+                        } else if (!((RenderTarget*)renderContext)->Blit(
                                        &rect, texture, 0, texture->usesColorKey ? 0x1008000 : 0x1000000)) {
                             goto failed;
                         }
@@ -5029,7 +5029,7 @@ int UIProgressBar::Draw() {
             owner->dialogBackground->DrawImage((PCTextureMap*)barTexture, &rect, &source,
                                                       barTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                       backgroundRegion, needsRedraw, &redraw, 0);
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->Blit(
                        &rect, barTexture, &source, barTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }

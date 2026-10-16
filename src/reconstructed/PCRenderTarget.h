@@ -26,27 +26,27 @@ public:
     PCRenderTarget();                    // 0x004c4ee0
     virtual ~PCRenderTarget();           // 0x004c5320 (deleting wrapper 0x004c4f60)
 
-    virtual int UnknownVirtualSlot1();
-    virtual int UnknownVirtualSlot2();
-    virtual int UnknownVirtualSlot3(void* destination, void* source, void* sourceRect, int flags);
-    virtual void* UnknownVirtualSlot4(void* rect, long* pitch, int flags);
-    virtual int UnknownVirtualSlot5(void* rect);
-    virtual long UnknownVirtualSlot6(int stage, int type, int* value);
-    virtual long UnknownVirtualSlot7(int stage, int type, int value);
-    virtual void UnknownVirtualSlot8(int state, int value, int force);
-    virtual long UnknownVirtualSlot9(int state, int* value);
-    virtual void UnknownVirtualSlot10(int mode, int textureAlpha);
-    virtual long UnknownVirtualSlot11(int stage);
-    virtual int UnknownVirtualSlot12(const CameraRect* rect, int flags); // 0x004c5510
-    virtual int UnknownVirtualSlot13(int format);
-    virtual int UnknownVirtualSlot14(void* viewport);
-    virtual int UnknownVirtualSlot15(int type, int vertexFormat, int vertices, int vertexCount,
-                                     int indices, int indexCount, int flags);
-    virtual int UnknownVirtualSlot16(int type, int vertexFormat, int vertices, int count, int flags);
-    virtual int UnknownVirtualSlot17(int type, int vertexBuffer, int start, int vertexCount,
-                                     int indices, int indexCount, int flags);
-    virtual void UnknownVirtualSlot18(int reference); // enables the alpha test
-    virtual void UnknownVirtualSlot19();
+    virtual int BeginScene();
+    virtual int EndScene();
+    virtual int Blit(void* destination, void* source, void* sourceRect, int flags);
+    virtual void* LockSurface(void* rect, long* pitch, int flags);
+    virtual int UnlockSurface(void* rect);
+    virtual long GetTextureStageState(int stage, int type, int* value);
+    virtual long SetTextureStageState(int stage, int type, int value);
+    virtual void SetRenderState(int state, int value, int force);
+    virtual long GetRenderState(int state, int* value);
+    virtual void SetTextureBlend(int mode, int textureAlpha);
+    virtual long ClearTexture(int stage);
+    virtual int Clear(const CameraRect* rect, int flags); // 0x004c5510
+    virtual int SupportsTextureFormat(int format);
+    virtual int SetViewport(void* viewport);
+    virtual int DrawIndexedPrimitive(int type, int vertexFormat, int vertices, int vertexCount,
+                                      int indices, int indexCount, int flags);
+    virtual int DrawPrimitive(int type, int vertexFormat, int vertices, int count, int flags);
+    virtual int DrawIndexedPrimitiveVB(int type, int vertexBuffer, int start, int vertexCount,
+                                       int indices, int indexCount, int flags);
+    virtual void SetAlphaTest(int reference); // enables the alpha test
+    virtual void DisableAlphaTest();
 
     // 0x004c5d00 (PCCamera slot 27): saves the surface as the next free
     // "<computer name><5 digits>.TGA".

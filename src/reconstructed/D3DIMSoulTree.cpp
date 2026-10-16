@@ -482,12 +482,12 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // 0x00442f70
 void D3DIMSoultreeObject::DrawWireframe(UnknownSoultreeSurface* surface)
 {
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME, 1);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME, 1);
     for (int i = 0; i < surface->vertexCount; i++)
         surface->vertices[i].diffuse = 0;
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)surface->vertices, surface->vertexCount,
+    ((RenderTarget*)renderContext)->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)surface->vertices, surface->vertexCount,
                                                 (int)surface->indices, surface->faceCount * 3, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 1);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 1);
 }
 
 // MatrixUtil.h's Vector3 has no binary + and -; these are the D3D_OVERLOADS
@@ -512,9 +512,9 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
 {
     static float length = 0.5f;                    // 0x00568944
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
     Vector3 from;
     UnknownSoultreeVertex line[2];
     for (int i = 0; i < surface->groupCount; i++) {
@@ -539,10 +539,10 @@ void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
             line[1].tv = 0;
             line[1].diffuse = 0;
             line[1].specular = 0xffffff;
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
+            ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
         }
     }
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(7, 0);
+    ((RenderTarget*)renderContext)->SetTextureBlend(7, 0);
 }
 
 // 0x004431f0: a six-point cross (+-size on each axis, red lines) at every
@@ -554,9 +554,9 @@ void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
 void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
 {
     static float size = 0.025f;                    // 0x00568948
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
     Vector3 offsets[6];
     UnknownSoultreeVertex cross[6];
     int k;
@@ -588,10 +588,10 @@ void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
                 cross[k].position.y = point.y;
                 cross[k].position.z = point.z;
             }
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)cross, 6, 0);
+            ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)cross, 6, 0);
         }
     }
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(7, 0);
+    ((RenderTarget*)renderContext)->SetTextureBlend(7, 0);
 }
 
 // 0x004433f0
@@ -619,9 +619,9 @@ int D3DIMSoultreeObject::UnknownVirtualSlot10(float frameTime)
 // 0x004434b0
 void D3DIMSoultreeObject::ComputeSubtreeBounds()
 {
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(7, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->SetTextureBlend(7, 0);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     Vector3 center;
     Vector3 extents;
     if (!parent) {
@@ -642,12 +642,12 @@ void D3DIMSoultreeObject::ComputeSubtreeBounds()
 // schedule the index and point stores in another order.
 void D3DIMSoultreeObject::DrawAxisGizmo()
 {
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(7, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->SetTextureBlend(7, 0);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
     unsigned short indices[6] = { 0, 1, 0, 2, 0, 3 };
     Vector3 points[4];
     points[0].x = 0.0f;
@@ -676,8 +676,8 @@ void D3DIMSoultreeObject::DrawAxisGizmo()
     vertices[1].diffuse = 0xff0000;
     vertices[2].diffuse = 0xff;
     vertices[3].diffuse = 0xff00;
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 4, (int)indices, 6, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(7, 0);
+    ((RenderTarget*)renderContext)->DrawIndexedPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 4, (int)indices, 6, 0);
+    ((RenderTarget*)renderContext)->SetTextureBlend(7, 0);
     if (nextSibling)
         ((D3DIMSoultreeObject*)nextSibling)->DrawAxisGizmo();
     if (firstChild)
@@ -690,9 +690,9 @@ void D3DIMSoultreeObject::DrawAxisGizmo()
 // (retail's fchs/fst chains); Vector3 temporaries evaluate each corner apart.
 void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int flag)
 {
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
     unsigned short indices[24] = {
         0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7,
     };
@@ -738,8 +738,8 @@ void D3DIMSoultreeObject::DrawBoxOutline(Vector3 center, Vector3 extents, int fl
             vertices[i].specular = 0xff0000;
         vertices[i].diffuse = 0;
     }
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 8, (int)indices, 24, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot10(7, 0);
+    ((RenderTarget*)renderContext)->DrawIndexedPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 8, (int)indices, 24, 0);
+    ((RenderTarget*)renderContext)->SetTextureBlend(7, 0);
 }
 
 // 0x004439c0

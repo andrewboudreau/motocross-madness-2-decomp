@@ -44,38 +44,38 @@ PCRenderTarget::~PCRenderTarget() {
 }
 
 // 0x004c53d0
-int PCRenderTarget::UnknownVirtualSlot1() {
+int PCRenderTarget::BeginScene() {
     return device->BeginScene() == 0;
 }
 
 // 0x004c53e0
-int PCRenderTarget::UnknownVirtualSlot2() {
+int PCRenderTarget::EndScene() {
     return device->EndScene() == 0;
 }
 
 // 0x004c53f0
-int PCRenderTarget::UnknownVirtualSlot3(void* destination, void* source, void* sourceRect, int flags) {
+int PCRenderTarget::Blit(void* destination, void* source, void* sourceRect, int flags) {
     return renderSurface->Blt(destination, static_cast<UnknownBlitSource*>(source)->field_0x70,
                                       sourceRect, flags, 0) == 0;
 }
 
 // 0x004c5490
-int PCRenderTarget::UnknownVirtualSlot5(void* rect) {
+int PCRenderTarget::UnlockSurface(void* rect) {
     return renderSurface->Unlock(rect) == 0;
 }
 
 // 0x004c54b0
-long PCRenderTarget::UnknownVirtualSlot6(int stage, int type, int* value) {
+long PCRenderTarget::GetTextureStageState(int stage, int type, int* value) {
     return device->GetTextureStageState(stage, type, value);
 }
 
 // 0x004c54d0
-long PCRenderTarget::UnknownVirtualSlot7(int stage, int type, int value) {
+long PCRenderTarget::SetTextureStageState(int stage, int type, int value) {
     return device->SetTextureStageState(stage, type, value);
 }
 
 // 0x004c54f0
-int PCRenderTarget::UnknownVirtualSlot14(void* viewport) {
+int PCRenderTarget::SetViewport(void* viewport) {
     return device->SetViewport(viewport) == 0;
 }
 
@@ -84,7 +84,7 @@ int PCRenderTarget::UnknownVirtualSlot14(void* viewport) {
 // buffer, plus the target in wireframe or when clearTarget is set. The shared
 // `failed` exit and the left/right/top/bottom store order give retail's
 // layout (three Clear calls, two of them sharing one result test).
-int PCRenderTarget::UnknownVirtualSlot12(const CameraRect* rect, int flags) {
+int PCRenderTarget::Clear(const CameraRect* rect, int flags) {
     verticesDrawn = 0;
     pointsDrawn = 0;
     linesDrawn = 0;
@@ -127,7 +127,7 @@ failed:
 }
 
 // 0x004c56e0: skips states whose cached value already matches unless forced.
-void PCRenderTarget::UnknownVirtualSlot8(int state, int value, int force) {
+void PCRenderTarget::SetRenderState(int state, int value, int force) {
     if (force || renderStates[state].value != value) {
         device->SetRenderState(state, value);
         renderStates[state].value = value;
@@ -135,20 +135,20 @@ void PCRenderTarget::UnknownVirtualSlot8(int state, int value, int force) {
 }
 
 // 0x004c5720
-long PCRenderTarget::UnknownVirtualSlot9(int state, int* value) {
+long PCRenderTarget::GetRenderState(int state, int* value) {
     return device->GetRenderState(state, value);
 }
 
 // 0x004c5930
-long PCRenderTarget::UnknownVirtualSlot11(int stage) {
+long PCRenderTarget::ClearTexture(int stage) {
     return device->SetTexture(stage, 0);
 }
 
 // 0x004c5ed0: resets the alpha test (GREATER than 0, disabled), unforced.
-void PCRenderTarget::UnknownVirtualSlot19() {
-    UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 0);
-    UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 0);
-    UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+void PCRenderTarget::DisableAlphaTest() {
+    SetRenderState(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 0);
+    SetRenderState(D3DRENDERSTATE_ALPHAREF, 0, 0);
+    SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
 }
 
 // 0x004c5230: appends a texture format the device enumerates.
@@ -180,7 +180,7 @@ long __stdcall PCRenderTarget::EnumZBufferFormatCallback(UnknownPixelFormat* for
 }
 
 // 0x004c5420: locks the surface; returns the bits (0 on failure) and the pitch.
-void* PCRenderTarget::UnknownVirtualSlot4(void* rect, long* pitch, int flags) {
+void* PCRenderTarget::LockSurface(void* rect, long* pitch, int flags) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
@@ -192,7 +192,7 @@ void* PCRenderTarget::UnknownVirtualSlot4(void* rect, long* pitch, int flags) {
 }
 
 // 0x004c5640: whether the device enumerated a texture format matching `format`.
-int PCRenderTarget::UnknownVirtualSlot13(int format) {
+int PCRenderTarget::SupportsTextureFormat(int format) {
     UnknownPixelFormat wanted;
     FillPixelFormat(format, &wanted);
     for (int i = 0; i < textureFormatCount; i++) {
@@ -206,8 +206,8 @@ int PCRenderTarget::UnknownVirtualSlot13(int format) {
 
 // 0x004c5b20: DrawIndexedPrimitive, counting vertices of the two lit formats
 // (+0x38) and points (+0x3c), lines (+0x40) and triangles (+0x44) by type.
-int PCRenderTarget::UnknownVirtualSlot15(int type, int vertexFormat, int vertices, int vertexCount,
-                                         int indices, int indexCount, int flags) {
+int PCRenderTarget::DrawIndexedPrimitive(int type, int vertexFormat, int vertices, int vertexCount,
+                                          int indices, int indexCount, int flags) {
     if (vertexFormat == D3DFVF_VERTEX || vertexFormat == D3DFVF_LVERTEX)
         verticesDrawn += vertexCount;
     switch (type) {
@@ -223,7 +223,7 @@ int PCRenderTarget::UnknownVirtualSlot15(int type, int vertexFormat, int vertice
 }
 
 // 0x004c5bd0: DrawPrimitive with the same counters.
-int PCRenderTarget::UnknownVirtualSlot16(int type, int vertexFormat, int vertices, int count, int flags) {
+int PCRenderTarget::DrawPrimitive(int type, int vertexFormat, int vertices, int count, int flags) {
     if (vertexFormat == D3DFVF_VERTEX || vertexFormat == D3DFVF_LVERTEX)
         verticesDrawn += count;
     switch (type) {
@@ -238,8 +238,8 @@ int PCRenderTarget::UnknownVirtualSlot16(int type, int vertexFormat, int vertice
 }
 
 // 0x004c5c70: DrawIndexedPrimitiveVB with the primitive counters.
-int PCRenderTarget::UnknownVirtualSlot17(int type, int vertexBuffer, int start, int vertexCount,
-                                         int indices, int indexCount, int flags) {
+int PCRenderTarget::DrawIndexedPrimitiveVB(int type, int vertexBuffer, int start, int vertexCount,
+                                           int indices, int indexCount, int flags) {
     switch (type) {
     case D3DPT_POINTLIST: pointsDrawn += indexCount; break;
     case D3DPT_LINELIST:
@@ -254,22 +254,22 @@ int PCRenderTarget::UnknownVirtualSlot17(int type, int vertexBuffer, int start, 
 
 // 0x004c5e60: enables the alpha test: alpha GREATER than the low byte of
 // `reference` when the device supports it, else alpha NOTEQUAL to 0.
-void PCRenderTarget::UnknownVirtualSlot18(int reference) {
+void PCRenderTarget::SetAlphaTest(int reference) {
     if (triAlphaCmpCaps & D3DPCMPCAPS_GREATER) {
-        UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, reference & 0xff, 0);
-        UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 0);
-        UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 0);
+        SetRenderState(D3DRENDERSTATE_ALPHAREF, reference & 0xff, 0);
+        SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 1, 0);
+        SetRenderState(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 0);
     } else if (triAlphaCmpCaps & D3DPCMPCAPS_NOTEQUAL) {
-        UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 0);
-        UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 0);
-        UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_NOTEQUAL, 0);
+        SetRenderState(D3DRENDERSTATE_ALPHAREF, 0, 0);
+        SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 1, 0);
+        SetRenderState(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_NOTEQUAL, 0);
     }
 }
 
 // 0x004c5740: texture stage 0 colour and alpha operations for a blend mode
 // (SetTextureStageState). Mode 2 takes the alpha from the texture only when
 // `textureAlpha` is set.
-void PCRenderTarget::UnknownVirtualSlot10(int mode, int textureAlpha) {
+void PCRenderTarget::SetTextureBlend(int mode, int textureAlpha) {
     switch (mode) {
     case 1:
     case 7:

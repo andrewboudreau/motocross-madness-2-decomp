@@ -237,7 +237,7 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
         mapFormat = *formats;
         if (desc->flags & 0x1000)
             FillPixelFormat(mapFormat, &desc->pixelFormat);
-        if ((flags & 4 || g_TrackGame->renderTarget->UnknownVirtualSlot13(mapFormat)) &&
+        if ((flags & 4 || g_TrackGame->renderTarget->SupportsTextureFormat(mapFormat)) &&
             !g_TrackGame->display->directDraw->CreateSurface(desc, &systemSurface, 0)) {
             float scale = 1.0f;
             if (mipCount != 1)
@@ -287,7 +287,7 @@ int PCTextureMap::UnknownVirtualSlot11() {
 void PCTextureMap::UnknownVirtualSlot19() {
     UnknownVirtualSlot11();
     for (int i = 0; i < statePairCount; i++)
-        g_TrackGame->renderTarget->UnknownVirtualSlot8(statePairs[i].state, statePairs[i].value, 0);
+        g_TrackGame->renderTarget->SetRenderState(statePairs[i].state, statePairs[i].value, 0);
 }
 
 // 0x004c79e0

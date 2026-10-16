@@ -431,7 +431,7 @@ void RadarOverlay::DrawTrackOutline(int mode)
                     if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
                         lineEnd.sx = hit[0];
                         lineEnd.sy = hit[1];
-                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                        Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                         lineStart = lineEnd;
                     }
                 }
@@ -449,13 +449,13 @@ void RadarOverlay::DrawTrackOutline(int mode)
                     lineEnd.sy = (float)y;
                     lineEnd.sx = (float)x;
                     lineStart.sx = hit[0];
-                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                    Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                     lineStart = lineEnd;
                 }
             } else {
                 lineEnd.sx = (float)x;
                 lineEnd.sy = (float)y;
-                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                 lineStart = lineEnd;
             }
             segment = segment->next;
@@ -650,13 +650,13 @@ void RadarOverlay::DrawRacers(int mode)
             }
             lineEnd = lineStart;
             lineEnd.sx += 3.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
             lineStart.sy += 1.0f;
             lineEnd.sy += 1.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
             lineStart.sy -= 2.0f;
             lineEnd.sy -= 2.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
         } else {
             point.x = -1.0f;
             point.y = -1.0f;

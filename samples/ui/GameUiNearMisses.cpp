@@ -421,7 +421,7 @@ int UIEditBox::Draw() {
             frames = redrawFrames;
             redrawFrames = redraw;
         } else {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
+            ((RenderTarget*)renderContext)->Blit(screenArea, drawnTexture, visibleArea,
                                                             drawnTexture->usesColorKey ? 0x1008000 : 0x1000000);
             redrawFrames = redraw;
         }
@@ -632,7 +632,7 @@ int UIMultiState::Draw() {
                                                            texture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, texture, 0,
+        } else if (!((RenderTarget*)renderContext)->Blit(&rect, texture, 0,
                                                                      texture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }

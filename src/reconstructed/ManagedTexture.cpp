@@ -117,7 +117,7 @@ void ManagedTexture::RecordUse(float value) {
 void ManagedTexture::UnknownVirtualSlot19() {
     if (page) {
         for (int i = 0; i < statePairCount; i++)
-            g_TrackGame->renderTarget->UnknownVirtualSlot8(statePairs[i].state, statePairs[i].value, 0);
+            g_TrackGame->renderTarget->SetRenderState(statePairs[i].state, statePairs[i].value, 0);
         if (usesColorKey && page->textureSurface && page->textureSurface->SetColorKey(8, &colorKeyValue))
             return;
         page->UnknownVirtualSlot11();

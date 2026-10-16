@@ -99,20 +99,20 @@ void DebugOverlay::SetRowHighlight(int page, int row, int flag)
 int DebugOverlay::UnknownVirtualSlot14()
 {
     fontTexture->UnknownVirtualSlot19();
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_ZENABLE, 0, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
     unsigned int start = ReadClock();
     int i;
     for (i = 0; i <= pageRowCount; i++) {
@@ -149,7 +149,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
             float right = (field_0x26d0[ch].u1 - field_0x26d0[ch].u0) * 256.0f + left;
             if (!(right < ((RenderTarget*)renderContext)->targetWidth)) {
                 if (count)
-                    ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
+                    ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
                 return;
             }
             vertices[count].x = left;
@@ -204,7 +204,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
             count += 6;
             index++;
         }
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
+        ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
         ((RenderTarget*)renderContext)->trianglesDrawn -= count / 3;
         length -= count / 6;
     }

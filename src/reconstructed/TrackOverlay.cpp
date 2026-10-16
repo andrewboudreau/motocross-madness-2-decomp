@@ -117,17 +117,17 @@ InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapMana
 int InstrumentOverlay::UnknownVirtualSlot14()
 {
     if (g_TrackGame->uiInteractionBlocked) {
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        Target()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
+        Target()->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     } else {
         Overlay::UnknownVirtualSlot14();
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        Target()->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
         if (owner->currentCamera->viewportClearFrames) {
             dial.originX = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
@@ -155,7 +155,7 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         }
         s_UnknownGlobal575140 = instrumentSource->state->airborne;
         PlaceNeedleTip(&dial, dialNeedle);
-        if (!Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)dialNeedle, 2, 0))
+        if (!Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)dialNeedle, 2, 0))
             return 0;
     }
     return 1;
@@ -313,8 +313,8 @@ int NameOverlay::UnknownVirtualSlot14()
         int x = (int)fixedPosition.x;
         int y = (int)fixedPosition.y;
         screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x - 1, sourceHeight + y);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
         return 1;
     }
@@ -334,8 +334,8 @@ int NameOverlay::UnknownVirtualSlot14()
         }
         int top = (int)radarAnchor.y;
         screenRect = UnknownMakeOverlayRect(left, top, right, sourceHeight + top);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         int alpha = overlayAlpha;
         overlayAlpha = anchorOutsideMap ? 0xb4 : 0xff;
         Overlay::UnknownVirtualSlot14();
@@ -363,8 +363,8 @@ int NameOverlay::UnknownVirtualSlot14()
             int x = (int)screen.x;
             int y = (int)screen.y;
             screenRect = UnknownMakeOverlayRect(x, y, drawWidth + x, sourceHeight + y);
-            Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-            Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+            Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+            Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
             Overlay::UnknownVirtualSlot14();
         }
     }
@@ -552,8 +552,8 @@ int StatsOverlay::UnknownVirtualSlot13()
 int StatsOverlay::UnknownVirtualSlot14()
 {
     if (g_TrackGame->mode.showRaceStatistics) {
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
         switch (g_TrackGame->mode.raceSettings.eventType) {
         case 0:
@@ -1267,13 +1267,13 @@ int RadarOverlay::UnknownVirtualSlot10(float frameTime)
 int RadarOverlay::UnknownVirtualSlot14()
 {
     if (g_TrackGame->mode.showNameTags) {
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        Target()->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         if (g_TrackGame->mode.showNameTags) {
             DrawForViewMode();
             DrawFrameRate();
@@ -1388,7 +1388,7 @@ void RadarOverlay::DrawGates()
         WorldToMap(right, &x, &y, &rim.x, &rim.y);
         lineEnd.sx = (float)x;
         lineEnd.sy = (float)y;
-        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+        Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
     }
 }
 
@@ -1586,8 +1586,8 @@ int ChatOverlay::UnknownVirtualSlot13()
 int ChatOverlay::UnknownVirtualSlot14()
 {
     if (inputShown) {
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        Target()->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         Overlay::UnknownVirtualSlot14();
     }
     if (g_TrackGame->mode.showRiderNames || g_TrackGame->mode.showRiderPositions)
