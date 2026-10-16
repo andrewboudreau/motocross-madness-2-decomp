@@ -183,12 +183,13 @@ struct UnknownSoultreeCameraView {
     unsigned int viewportY;                    // viewport y
 };
 
-// The 16-byte rows of the global table at 0x00689f18 (0x004451e0).
+// The 16-byte rows of the global table at 0x00689f18, one per detail level;
+// ApplyLodSettings (0x004451e0) copies a row into the object's setters.
 struct UnknownSoultreeLodSetting {
-    float field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
+    float lodThreshold;                        // +0x00 SetLodThreshold
+    int texturePerspective;                    // +0x04 copied to texturePerspective (+0x1b4)
+    int gouraudShading;                        // +0x08 copied to gouraudShading (+0x1b8)
+    int useLighting;                           // +0x0c SetUseLighting
 };
 extern UnknownSoultreeLodSetting* g_UnknownSoultreeLodSettings689f18;
 
