@@ -155,7 +155,7 @@
   "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?SetAxes@UnknownKrustyUISoultree@@QAEXMMMMMMMH@Z": "0x004fbd10",
   "?SetPosition@UnknownKrustyUISoultree@@QAEXPBUVector3@@@Z": "0x004fc660",
-  "?UnknownFunction5053b0@@YAXH@Z": "0x005053b0",
+  "?SetTaskSwitchAllowed@@YAXH@Z": "0x005053b0",
   "?PixelFormatBytesPerPixel@@YAHH@Z": "0x00511970",
   "?ReadRecord@UnknownTrackGameObject3400@@QAEHFPBD@Z": "0x0051f0b0",
   "?WriteRecord@UnknownTrackGameObject3400@@QAEHFPBDH@Z": "0x0051f260",

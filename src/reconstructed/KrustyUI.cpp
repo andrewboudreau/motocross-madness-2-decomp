@@ -37,8 +37,9 @@ void* ResizeDebugBlock(void* block, unsigned int size);
 // 5000-5035 (KrustyUI 0x004988a0).
 char g_UnknownStrings68a498[36][16];
 
-// cdecl 0x005053b0, called first on shutdown with 0.
-void UnknownFunction5053b0(int value);
+// cdecl 0x005053b0 (KeyboardHook.cpp): 0 installs the Alt-Tab/Alt-Esc
+// keyboard hook, nonzero removes it. Called first on shutdown with 0.
+void SetTaskSwitchAllowed(int value);
 
 // Views for 0x00498cf0 (the garage scene). Only what it calls is declared;
 // the classes' full declarations (LightEmitter.h, the D3DIMSoultree and
@@ -263,7 +264,7 @@ void KrustyUI::BuildGarageScene(int value) {
     ((RenderTarget*)renderContext)->clearTarget = 0;
     g_TrackGame->texturesCached = 1;
     if (!garageScene && (value == 1 || value == -1)) {
-        UnknownFunction5053b0(1);
+        SetTaskSwitchAllowed(1);
         allowIme = 0;
         if (g_TrackGame->LoadResourceString(0x1438, text, 0x80))
             allowIme = atoi(text) != 0;
@@ -397,7 +398,7 @@ KrustyUI::~KrustyUI() {
 
 // 0x004999b0
 void KrustyUI::Shutdown() {
-    UnknownFunction5053b0(0);
+    SetTaskSwitchAllowed(0);
     if (!g_TrackGame->shuttingDown)
         gui->CloseDialogResource();
     if (garageScene) {
