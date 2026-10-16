@@ -9097,7 +9097,7 @@ CASES = [
         'name': 'TextService.cpp sample CharacterCell rect copy 0x50beb0',
         'bindings': 'samples/render/TextServiceNearMisses.bindings.json',
         'source': 'samples/render/TextServiceNearMisses.cpp',
-        'symbol': '?UnknownFunction50beb0@CharacterCell@@QAE?AVRectangle2D@@XZ',
+        'symbol': '?GetRect@CharacterCell@@QAE?AVRectangle2D@@XZ',
         'target_va': '0x0050beb0',
         'target_size': 32,
         'reason': 'out-of-line inline after TextService code; copy ctor 0x4e8b60',

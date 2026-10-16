@@ -13,15 +13,16 @@ class TextureMapManager;
 // inlined; the destructor 0x00467680 is emitted in FontTexture.cpp.
 class CharacterCell {
 public:
-    CharacterCell(int code, const Rectangle2D& rect) : code(code), field_0x08(rect) {}
+    CharacterCell(int code, const Rectangle2D& cellRect) : code(code), rect(cellRect) {}
     virtual ~CharacterCell() {}
 
-    // 0x0050beb0 (out-of-line copy after TextService.cpp's code): the cell
-    // rectangle, in texture coordinates.
-    Rectangle2D UnknownFunction50beb0() { return field_0x08; }
+    // 0x0050beb0 (out-of-line copy after TextService.cpp's code): returns a
+    // copy of rect (the TextService blitters scale it by the font texture's
+    // width and height).
+    Rectangle2D GetRect() { return rect; }
 
     int code;                                 // character code
-    Rectangle2D field_0x08;
+    Rectangle2D rect;                         // +0x08 the cell in texture coordinates (0..1)
 };
 
 // FontTexture.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\FontTexture.cpp"
