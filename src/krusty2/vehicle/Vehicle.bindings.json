@@ -62,6 +62,7 @@
   "?SetAxisFromDirection@VehicleSteerState@@QAEHPBUVec3@@PAVSoultreeObject@@@Z": "0x00504c70",
   "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
   "?SetPosition@SoultreeObject@@QAEXMMM@Z": "0x004fc630",
+  "?SetPosition@VehicleSparkEmitter@@QAEXUVec3@@@Z": "0x004b9dc0",
   "?SetPosition@VehicleImpactSink@@QAEXUVec3@@@Z": "0x004b9dc0",
   "?SetPosition@VehicleImpactSink@@QAEXUVec3@@M@Z": "0x004b8d90",
   "?UnknownVirtualSlot0@SoultreePhysicsBaseObject@@UAEXM@Z": "0x005008d0",

@@ -213,7 +213,8 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
 // Object at Vehicle+0x5ac: the SparkParticleEmitter (vtable 0x00555c1c, ctor 0x004b9830,
 // 0x60c bytes; samples/physics/effects/ParticleEmitters.h).  LoadVehicle builds it and hands the
 // result of its virtual slot 27 to GameObject::Method_0x00469190; the impact handlers view
-// it as VehicleImpactSink.  Provisional view.
+// it as VehicleImpactSink.  Provisional view; Vehicle and Bike slot 38 store (0, 12, 0) at +0x78 and
+// set +0x60 after SetPosition, matching SparkParticleEmitter::launchVelocity / field_0x60.
 struct VehicleSparkEmitter {
     explicit VehicleSparkEmitter(int flags);
     virtual void UnknownVirtualSlot0(); virtual void UnknownVirtualSlot1(); virtual void UnknownVirtualSlot2();
@@ -226,7 +227,12 @@ struct VehicleSparkEmitter {
     virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
     virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
     virtual void* UnknownVirtualSlot27(void* a, GameObject* manager);
-    char pad_0x04[0x608];            // 0x60c bytes (LoadVehicle's allocation)
+    void SetPosition(Vec3 p);        // 0x004b9dc0 (SparkParticleEmitter::SetPosition)
+    char pad_0x04[0x5c];
+    int field_0x60;                  // +0x60 Bike slot 38 sets it to 1 after SetPosition
+    char pad_0x64[0x14];
+    Vec3 launchVelocity;             // +0x78 SparkParticleEmitter::launchVelocity; Bike slot 38 stores (0, 12, 0)
+    char pad_0x84[0x588];            // 0x60c bytes (LoadVehicle's allocation)
 };
 // The track object (SoultreeSlot1f0) as LoadVehicle reads it: only the byte at +0x88, forwarded
 // to the base loader's a20.

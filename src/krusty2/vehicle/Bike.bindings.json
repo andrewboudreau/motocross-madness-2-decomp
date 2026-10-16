@@ -126,7 +126,7 @@
   "?SetAngle@VehicleSteerState@@QAEXMPAVSoultreeObject@@@Z": "0x00504e20",
   "?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z": "0x004fc050",
   "?SetAxisFromPoints@VehicleSteerState@@QAEHPAVSoultreeObject@@00@Z": "0x00504d30",
-  "?SetPosition@VehicleImpactSink@@QAEXUVec3@@@Z": "0x004b9dc0",
+  "?SetPosition@VehicleSparkEmitter@@QAEXUVec3@@@Z": "0x004b9dc0",
   "?UnknownVirtualSlot1@Bike@@UAEXM@Z": "0x00407630",
   "?UnknownVirtualSlot1@Vehicle@@UAEXM@Z": "0x00525550",
   "?UnknownVirtualSlot33@Vehicle@@UAEHPBUVec3@@000HM@Z": "0x00527430",

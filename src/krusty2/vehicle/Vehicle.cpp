@@ -1199,11 +1199,9 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         s = VehOnes();
         hasBody = 0;
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
-            Vec3 pos = ((VehicleContactSet*)collisionObject)->contactPoint;
-            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
-            p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
-            ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
-            ((VehicleImpactSink*)field_0x5ac)->updatePending = 1;
+            field_0x5ac->SetPosition(((VehicleContactSet*)collisionObject)->contactPoint);
+            field_0x5ac->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
+            field_0x5ac->field_0x60 = 1;
         }
         break;
     case 0x3e9:

@@ -1778,21 +1778,29 @@ struct BikeBodyObj {
     Vec3 f154;                  // current point
     char pad_0x160[0x0c];
     Vec3 f16c;
+    float f178;
     float f17c;
     char pad_0x180[0x50];
     float f1d0;
     char pad_0x1d4[0x10];
     float f1e4;
-    char pad_0x1e8[0x0c];
+    char pad_0x1e8[0x10];
     float f1f8;
     char pad_0x1fc[0x2c];
     Vec3 f228;
     SoultreeObject* f234;
+    char pad_0x238[4];
     Vec3 f23c;                  // previous point
 };
 struct BikeKindInfo {           // reached through the other party's +0x5c
     char pad_0x00[0x24];
     float field_0x24;
+};
+struct BikeKindParty {          // other party of kind 0x3ea
+    char pad_0x00[0x5c];
+    BikeKindInfo* kind;         // +0x5c
+    char pad_0x60[0x64];
+    BikeBodyObj* body;          // +0xc4
 };
 
 void Bike::UnknownVirtualSlot38(int a, int b, void* c)
@@ -1805,14 +1813,14 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     Vec3 rel;                   // contact point relative to us
     Vec3 blend;                 // kind 0x3ea: other point interpolated by its kind info
     Vec3 tmp;
-    float k = 1.0f;             // angle-based response scale (kind 100)
-    float l10 = 0.0f;           // other party's field_0x24
+    float l10;                  // other party's field_0x24
     int hasBody = 0;
     int notifyOther = 0;
+    float k = 1.0f;             // angle-based response scale (kind 100)
     Vehicle* other = 0;
-    int ctx = 0;
+    int ctx;
     Vec3* otherVel = 0;
-    Vec3* velPtr = 0;
+    Vec3* velPtr;
 
     switch (b) {
     case 100: {
@@ -1824,19 +1832,16 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         hasBody = 1;
         otherVel = &other->velocity;
         ctx = *(int*)((char*)other + 0x3bc);
-        Vec3 cp = ((BikeContactSet*)collisionObject)->field_0xa0;
-        leverC.x = cp.x - other->position.x;
-        leverC.y = cp.y - other->position.y;
-        leverC.z = cp.z - other->position.z;
+        leverC = ((BikeContactSet*)collisionObject)->field_0xa0 - other->position;
         velPtr = &other->angularVelocity;
         if (other->position.y - position.y > 1.5f)
             linkedVehicle = other;
         else if (position.y - other->position.y > 1.5f)
             ((Bike*)other)->linkedVehicle = this;
         {
-            Vec3 w = ((BikeContactSet*)collisionObject)->field_0xa0;
-            float ang = (float)atan2(w.x - position.x, w.z - position.z) - savedYaw;
-            if (ang < 0.0f)
+            float ang = (float)atan2(((BikeContactSet*)collisionObject)->field_0xa0.x - position.x,
+                                     ((BikeContactSet*)collisionObject)->field_0xa0.z - position.z) - savedYaw;
+            if (ang < 0.0)
                 ang = -ang;
             if (ang > 3.1415927f)
                 ang -= 6.2831853f;
@@ -1850,28 +1855,19 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
                 k = 1.0f;
         }
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
-            Vec3 pos = ((BikeContactSet*)collisionObject)->field_0xa0;
-            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
-            Vec3 p;
-            p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
-            ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
-            ((VehicleImpactSink*)field_0x5ac)->updatePending = 1;
+            field_0x5ac->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
+            field_0x5ac->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
+            field_0x5ac->field_0x60 = 1;
         }
         break;
     }
     case 0x68:
-        notifyOther = 1;
         other = ((BikeCollisionEvent*)c)->field_0x60;
         hasBody = 1;
         l10 = other->invMass;
         ctx = (int)other->sceneNode;
         otherVel = &other->velocity;
-        {
-            Vec3 cp = ((BikeContactSet*)collisionObject)->field_0xa0;
-            leverC.x = cp.x - other->centerOfMass.x;
-            leverC.y = cp.y - other->centerOfMass.y;
-            leverC.z = cp.z - other->centerOfMass.z;
-        }
+        leverC = ((BikeContactSet*)collisionObject)->field_0xa0 - other->centerOfMass;
         velA = other->worldAngularVelocity;
         velPtr = &other->angularVelocity;
         velB = other->invInertia;
@@ -1882,74 +1878,60 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
     case 1:
     case 0x66:
     case 0x6a:
-        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        s = Vec3(1.0f, 1.0f, 1.0f);
+        hasBody = 0;
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
-            Vec3 pos = ((BikeContactSet*)collisionObject)->field_0xa0;
-            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
-            Vec3 p;
-            p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
-            ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
-            ((VehicleImpactSink*)field_0x5ac)->updatePending = 1;
+            field_0x5ac->SetPosition(((BikeContactSet*)collisionObject)->field_0xa0);
+            field_0x5ac->launchVelocity = Vec3(0.0f, 12.0f, 0.0f);
+            field_0x5ac->field_0x60 = 1;
         }
         break;
     case 0x69: {
         char* obj = (char*)((BikeCollisionEvent*)c)->field_0x60;
         ctx = *(int*)(obj + 0x34);
         velA = g_BikeVec3_005778a8; velB = g_BikeVec3_005778a8; leverC = g_BikeVec3_005778a8;
-        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        s = Vec3(1.0f, 1.0f, 1.0f);
         l10 = 0.0f;
-        velPtr = 0;
         otherVel = (Vec3*)(obj + 0x40);
+        velPtr = 0;
         hasBody = 1;
         break;
     }
     case 0x3e8: {
-        Vec3 r;
-        r.x = ((BikeContactSet*)collisionObject)->field_0xa0.x - centerOfMass.x;
-        r.y = ((BikeContactSet*)collisionObject)->field_0xa0.y - centerOfMass.y;
-        r.z = ((BikeContactSet*)collisionObject)->field_0xa0.z - centerOfMass.z;
+        Vec3 r = ((BikeContactSet*)collisionObject)->field_0xa0 - centerOfMass;
         UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &velocity, &r, &s, 0x3e8, 0, &out);
         return;
     }
     case 0x3e9:
-        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        s = Vec3(1.0f, 1.0f, 1.0f);
+        hasBody = 0;
         break;
     case 0x3ea: {
-        Vehicle* o = ((BikeCollisionEvent*)c)->field_0x60;
-        BikeKindInfo* kind = *(BikeKindInfo**)((char*)o + 0x5c);
-        BikeBodyObj* body = *(BikeBodyObj**)((char*)o + 0xc4);
-        velA = *body->UnknownVirtualSlot43(&tmp);
-        // other point: interpolate body->f23c toward body->f154 by kind->field_0x24
-        float t = kind->field_0x24;
-        float dx = body->f154.x - body->f23c.x;
-        float dy = body->f154.y - body->f23c.y;
-        float dz = body->f154.z - body->f23c.z;
-        blend.x = dx * t + body->f23c.x;
-        blend.y = dy * t + body->f23c.y;
-        blend.z = dz * t + body->f23c.z;
+        BikeKindParty* o = (BikeKindParty*)((BikeCollisionEvent*)c)->field_0x60;
+        BikeKindInfo* kind = o->kind;
+        velA = *o->body->UnknownVirtualSlot43(&tmp);
         otherVel = &blend;
-        velB.x = body->f1d0;
-        velB.y = body->f1e4;
-        velB.z = body->f1f8;
-        l10 = body->f17c;
-        velPtr = &body->f16c;
-        Vec3 wp = body->f234->LocalToWorldPoint(body->f228);
-        Vec3 cp = ((BikeContactSet*)collisionObject)->field_0xa0;
-        leverC.x = cp.x - wp.x;
-        leverC.y = cp.y - wp.y;
-        leverC.z = cp.z - wp.z;
-        ctx = (int)body->f234;
+        velPtr = &o->body->f16c;
+        // other point: interpolate body->f23c toward body->f154 by kind->field_0x24
+        blend = (o->body->f154 - o->body->f23c) * kind->field_0x24 + o->body->f23c;
+        l10 = o->body->f17c;
+        velB.x = o->body->f1d0;
+        velB.y = o->body->f1e4;
+        velB.z = o->body->f1f8;
+        Vec3 wp = o->body->f234->LocalToWorldPoint(o->body->f228);
         hasBody = 1;
+        leverC = ((BikeContactSet*)collisionObject)->field_0xa0 - wp;
+        ctx = (int)o->body->f234;
         break;
     }
     case 0x2711: {
         char* obj = (char*)((BikeCollisionEvent*)c)->field_0x60;
         ctx = *(int*)(obj + 0x1a0);
         velA = g_BikeVec3_005778a8; velB = g_BikeVec3_005778a8; leverC = g_BikeVec3_005778a8;
-        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        s = Vec3(1.0f, 1.0f, 1.0f);
         l10 = 0.0f;
-        velPtr = 0;
         otherVel = (Vec3*)(obj + 0x224);
+        velPtr = 0;
         hasBody = 1;
         break;
     }
@@ -1957,9 +1939,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         return;
     }
 
-    rel.x = ((BikeContactSet*)collisionObject)->field_0xa0.x - centerOfMass.x;
-    rel.y = ((BikeContactSet*)collisionObject)->field_0xa0.y - centerOfMass.y;
-    rel.z = ((BikeContactSet*)collisionObject)->field_0xa0.z - centerOfMass.z;
+    rel = ((BikeContactSet*)collisionObject)->field_0xa0 - centerOfMass;
     if (hasBody) {
         int l14 = (b == 0x2711 || b == 0x69 || b == 0x3ea) ? 0 : (int)otherVel;
         UnknownVirtualSlot4(&((BikeContactSet*)collisionObject)->field_0xac, &velocity, &worldAngularVelocity, &rel, b, l10,
@@ -1971,14 +1951,8 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
             other->worldAngularVelocity = other->sceneNode->LocalToWorldDirection(*velPtr);
         }
     } else {
-        Vec3 t = worldAngularVelocity;
-        scratchVector.x = t.y * rel.z - t.z * rel.y;
-        scratchVector.y = t.z * rel.x - rel.z * t.x;
-        scratchVector.z = rel.y * t.x - t.y * rel.x;
-        Vec3 p;
-        p.x = scratchVector.x + velocity.x;
-        p.y = velocity.y + scratchVector.y;
-        p.z = velocity.z + scratchVector.z;
+        scratchVector = CrossProduct(worldAngularVelocity, rel);
+        Vec3 p = scratchVector + velocity;
         UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &p, &rel, &s, b, 0, &out);
         if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
             velocity = g_BikeVec3_005778a8;
