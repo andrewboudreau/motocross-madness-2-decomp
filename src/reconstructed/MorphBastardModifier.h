@@ -128,15 +128,15 @@ struct MorphBastardMeshPair {
 // The mesh slot 27 receives and returns (0x38 bytes).
 struct UnknownSoultreeMesh {
     int groupCount;                   // group count
-    MorphBastardMeshGroup* field_0x04;
+    MorphBastardMeshGroup* groups;  // +0x4  UnknownSoultreeSurface+0x04 groups (D3DIMSoulTree.h)
     int vertexCount;                  // vertex count
     int faceCount;                    // face count
-    MorphBastardVertex* field_0x10;
-    MorphBastardVertex* field_0x14;
-    Vector3* field_0x18;
-    MorphBastardFace* field_0x1c;
+    MorphBastardVertex* vertices;  // +0x10  UnknownSoultreeSurface+0x10 vertices
+    MorphBastardVertex* drawnVertices;  // +0x14  UnknownSoultreeSurface+0x14 drawn vertices
+    Vector3* normals;  // +0x18  UnknownSoultreeSurface+0x18 normals
+    MorphBastardFace* indices;  // +0x1C  UnknownSoultreeSurface+0x1c indices, three per face
     MorphBastardMeshPair field_0x20;  // copied as one 8-byte value
-    int* field_0x28;
+    int* uvs;  // +0x28  UnknownSoultreeSurface+0x28 texture coordinates
     int field_0x2c;
     int field_0x30;
     int field_0x34;
@@ -166,10 +166,10 @@ public:
     void UpdateChannels(MorphBastardObject* object);
     // 0x00464e80 (ret 4): the shared empty stub, called with the object index.
     void UnknownFunction464e80(int index);
-    // 0x004a5290 (ret 4): makes field_0x40 a copy of `mesh`.
+    // 0x004a5290 (ret 4): makes meshCopy a copy of `mesh`.
     void CopyMesh(UnknownSoultreeMesh* mesh);
 
-    UnknownSoultreeMesh* field_0x40;
+    UnknownSoultreeMesh* meshCopy;  // +0x40  CopyMesh (0x004a5290) allocates it as a copy of the mesh slot 27 receives
     int objectCount;                  // morph object count
     MorphBastardObject* morphObjects; // line 0x57
     Vector3* deltaSums;               // summed deltas per vertex (lines 0x21d..0x21f)

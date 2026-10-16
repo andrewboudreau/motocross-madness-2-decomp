@@ -37,15 +37,15 @@ void TransparencyMod::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownS
             object->materialTable[i]->hasAlpha = 1;
         }
         for (i = 0; i < mesh->vertexCount; i++) {
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse |= alpha;
+            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse &= 0xffffff;
+            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= alpha;
         }
     } else {
         for (i = 0; i < object->materialCount; i++) {
             object->materialTable[i]->hasAlpha = 0;
         }
         for (i = 0; i < mesh->vertexCount; i++) {
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse |= 0xff000000;
+            ((UnknownSoultreeVertex*)mesh->vertices)[i].diffuse |= 0xff000000;
         }
     }
 }
