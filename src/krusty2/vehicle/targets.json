@@ -1156,7 +1156,7 @@
     "target_va": "0x52a940",
     "target_size": 3254,
     "expect": "partial",
-    "notes": "9.5% (3248/3254). Per-frame step. All 72 calls (vtable slots and direct) match retail in order. First divergence +0x0: frame sub esp,0x104 vs ours 0xb8 (76 bytes of extra retail temps); retail also CSEs constant 0 into ebx (xor ebx,ebx at +0x94), so hit/res sit in ebp and every 0 compare/store uses ebx.",
+    "notes": "296/3254 strict. Per-frame step. All 72 calls (vtable slots and direct) match retail in order and each pointer argument names the retail stack object (hit-branch outputs, slot 55 pivot reused by slot 92, slot 3 float out, scale built from per-branch Vec3 temporaries); frame is 0x104 like retail. Remaining: retail CSEs constant 0 into ebx (xor ebx,ebx at +0x94) with hit in ebp, and several locals (up, zeroB, lift/pivot, o1..o3) sit in different slots.",
     "bindings": "Vehicle.bindings.json"
   },
   {
