@@ -144,9 +144,9 @@ public:
     int field_0x798; // 0x798
     int engineClass;  // +0x79C loader: 0 for engineSize <= 125, 1 below 500, else 2; BikeAI indexes its speed table (0x00566f74) with it
     short lapCount;  // +0x7A0  RaceView/BikeRace +0x7a0 laps
-    short field_0x7a2; // 0x7A2
+    short prevLapCount;                       // +0x7A2  lapCount of the previous frame (slot 49); compared for the first-lap check (tier 3)
     char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
-    char field_0x7a5; // 0x7A5
+    char spawnProtectEndPending;              // +0x7A5  slot 50 sets it on an off request while spawnProtected; cleared with Fn_00496E30(0) once the bike is clear (tier 3)
     char pad_0x07A6[0x2];
     float field_0x7a8; // 0x7A8
     float repairDamage;                       // +0x7AC  slot 28 adds rand x 0.667 (AI 0.15) per new crash; PayOutRace reads it via the result +0x34 as repairs x 500 (tier 3)
@@ -223,10 +223,10 @@ public:
     unsigned char trickCount;                 // +0x153D  tricks finished since the last score (slot 42 increments it) (tier 3)
     char trickPoseHeldPrev;                   // +0x153E  trickPoseHeld of the previous frame (slot 49) (tier 3)
     char trickChained;                        // +0x153F  set by the chain start 0x0048d990; +0.5 multiplier in 0x00495ff0 (tier 3)
-    Vec3 field_0x1540; // 0x1540
-    char field_0x154c; // 0x154C
-    char field_0x154d; // 0x154D
-    char field_0x154e; // 0x154E
+    Vec3 lastFramePosition;                   // +0x1540  position copied at the end of slot 49; the followed bike is drawn there in camera state 3 (tier 3)
+    char drawnAtLastPosition;                 // +0x154C  slot 49 sets it when the model was moved to lastFramePosition (tier 3)
+    char headTurningToRival;                  // +0x154D  set by 0x0048e280; slot 102 turns headTurnAngle towards the rival and clears it on arrival (tier 3)
+    char headTurningBack;                     // +0x154E  set when the head-turn hold runs out; cleared back at 0 (tier 3)
     char pad_0x154F[0x1];
     float rivalBearingScaled;  // +0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
     float headTurnAngle;  // +0x1554  head angle of the turn towards the rival (slot 102); Fn_0048E280 clears it

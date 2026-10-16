@@ -68,8 +68,8 @@ void KrustyBike::UnknownVirtualSlot1(float a)
     Bike::UnknownVirtualSlot1(a);
     Fn_0048D8B0();
     field_0x152c = 0;
-    field_0x154d = 0;
-    field_0x154e = 0;
+    headTurningToRival = 0;
+    headTurningBack = 0;
     nearestRival = 0;
     trickLandTimer = 0;
     offTrackTime = 0;
@@ -164,7 +164,7 @@ int KrustyBike::UnknownVirtualSlot33(const Vec3* a0, const Vec3* a1, const Vec3*
                                      const Vec3* a3, int a4, float a5)
 {
     int result = Bike::UnknownVirtualSlot33(a0, a1, a2, a3, a4, a5);
-    field_0x1540 = position;
+    lastFramePosition = position;
     wrecker->a_0x52c = 1;
     return result;
 }
@@ -716,7 +716,7 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
         } else {
             field_0x15e6 = 0;
             if (spawnProtected)
-                field_0x7a5 = 1;
+                spawnProtectEndPending = 1;
         }
         Vehicle::UnknownVirtualSlot50(a, 0, 0);
         return;
@@ -735,7 +735,7 @@ void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
         spawnProtected = 1;
         spawnProtectTimer = b;
     } else if (spawnProtected) {
-        field_0x7a5 = 1;
+        spawnProtectEndPending = 1;
     }
 }
 
@@ -748,7 +748,7 @@ void KrustyBike::UnknownVirtualSlot43()
     onTrack = 1;
     offTrackTime = 0;
     lapCount = 0;
-    field_0x7a2 = 0;
+    prevLapCount = 0;
     gatesPassed = 0;
     lastLapTime = 0;
     lapStartTime = 0;
@@ -843,7 +843,7 @@ void KrustyBike::UnknownVirtualSlot97()
 // takes over.
 void KrustyBike::UnknownVirtualSlot49(float dt)
 {
-    if (field_0x154c) {
+    if (drawnAtLastPosition) {
         modelNode->SetPosition(position);
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(position);
     }
@@ -862,7 +862,7 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
                     sink->ReplaceHeadMessage(msg);
                     delete msg;
                 }
-            } else if (lapCount != field_0x7a2 && lapCount == 1 && race->startBeforeFinish) {
+            } else if (lapCount != prevLapCount && lapCount == 1 && race->startBeforeFinish) {
                 g_kbGame->GetStringText(0x14d7, text, 0x80);
                 msg = new(__FILE__, 0x11d0) KbMessage(text, 3.25f);
                 if (msg) {
@@ -933,15 +933,15 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
         Bike::UnknownVirtualSlot49(dt);
     }
     if (race->raceCamera->cameraState == 3 && race->raceCamera->followedBike == this) {
-        modelNode->SetPosition(field_0x1540);
-        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(field_0x1540);
-        field_0x154c = 1;
+        modelNode->SetPosition(lastFramePosition);
+        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(lastFramePosition);
+        drawnAtLastPosition = 1;
     } else {
-        field_0x154c = 0;
+        drawnAtLastPosition = 0;
     }
-    field_0x1540 = position;
+    lastFramePosition = position;
     trickPoseHeldPrev = trickPoseHeld;
-    field_0x7a2 = lapCount;
+    prevLapCount = lapCount;
 }
 
 // 0x00495ff0: ends a trick. trickPoints (+0x1530) drops its part below 100, the
@@ -1371,7 +1371,7 @@ void KrustyBike::Fn_0048E280()
     field_0x431 = 0;
     field_0x430 = 1;
     field_0x432 = 1;
-    field_0x154d = 1;
+    headTurningToRival = 1;
     field_0x433 = (char)0xff;
     if (rivalBearing > 2.7f) {
         rivalBearing = 2.7f;
@@ -1467,7 +1467,7 @@ int KrustyBike::Tick(float dt)
                 Fn_004925A0(0, 1);
         }
     }
-    if (field_0x7a5 && !isRemote && race->isRacing) {
+    if (spawnProtectEndPending && !isRemote && race->isRacing) {
         int cursor = 0;
         int overlap = 0;
         KrustyBike* bike;
@@ -1480,7 +1480,7 @@ int KrustyBike::Tick(float dt)
         }
         if (!overlap) {
             spawnProtected = 0;
-            field_0x7a5 = 0;
+            spawnProtectEndPending = 0;
             if (isGhost) {
                 ((KbXform*)modelNode)->RemoveModifier(ghostMod);
                 ((KbXform*)riderCharacter->c_0x1a0)->RemoveModifier(ghostMod);
@@ -1875,14 +1875,14 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         ((CollisionObject*)altBodyA)->onHitByCallback = KrustyCollisionCallbackB;
     }
     wrecker->EndWreck();
-    field_0x1540 = position;
+    lastFramePosition = position;
     if (isRemote) {
         BikeA640* axis = steerAxis;
         axis->steerValue = 0.5f;
         axis->l_0x4 = 0.42210004f;
         axis->l_0x8 = 1.0f;
     }
-    field_0x154c = 0;
+    drawnAtLastPosition = 0;
     field_0x15cc = 0;
     clockOffset = 0;
 

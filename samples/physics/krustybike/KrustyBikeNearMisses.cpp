@@ -27,7 +27,7 @@
 KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 {
     plateNumber = 0x65;
-    field_0x1540 = kVec3Zero;
+    lastFramePosition = kVec3Zero;
     hasFullState = 0;
     wrecker = 0;
     aiKind = 0;
@@ -50,7 +50,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     ghostMod = 0;
     debugPage = -1;
     field_0x15e6 = 0;
-    field_0x7a5 = 0;
+    spawnProtectEndPending = 0;
     isGhost = 0;
     repairDamage = 0;
     injuryDamage = 0;
@@ -825,9 +825,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
             if (!isGhost) {
                 UnknownVirtualSlot50(states[0]->flag4, 5.0f, 0);
-                if (field_0x7a5) {
+                if (spawnProtectEndPending) {
                     Fn_00496E30(0);
-                    field_0x7a5 = 0;
+                    spawnProtectEndPending = 0;
                 }
             }
             if (states[0]->flag6)
@@ -920,9 +920,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
             if (!isGhost) {
                 UnknownVirtualSlot50(interpSource->flag4, 5.0f, 0);
-                if (field_0x7a5) {
+                if (spawnProtectEndPending) {
                     Fn_00496E30(0);
-                    field_0x7a5 = 0;
+                    spawnProtectEndPending = 0;
                 }
             }
             if (interpSource->flag6)
@@ -1138,7 +1138,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             // its target (bearing +0x1558 scaled into the pose range), +0x154d the turn phase,
             // +0x154e the return to straight ahead.
             float look;
-            if (field_0x154e) {
+            if (headTurningBack) {
                 // Turning back to straight ahead.
                 if (rivalBearingScaled < 0.0f) {
                     headTurnAngle += dt;
@@ -1146,7 +1146,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         headTurnAngle = 0;
                         field_0x430 = 0;
                         field_0x433 = 0;
-                        field_0x154e = 0;
+                        headTurningBack = 0;
                     }
                 } else {
                     headTurnAngle -= dt;
@@ -1154,17 +1154,17 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         headTurnAngle = 0;
                         field_0x430 = 0;
                         field_0x433 = 0;
-                        field_0x154e = 0;
+                        headTurningBack = 0;
                     }
                 }
                 look = headTurnAngle * 0.71f;
-            } else if (field_0x154d) {
+            } else if (headTurningToRival) {
                 // Turning towards the target; near it, the rival's bearing is taken again.
                 if (rivalBearingScaled > 0.0f) {
                     float head = headTurnAngle + dt;
                     headTurnAngle = head;
                     if (head > rivalBearingScaled) {
-                        field_0x154d = 0;
+                        headTurningToRival = 0;
                         headTurnAngle = 0.24f;
                         look = rivalBearing * 0.1837f;
                     } else if (rivalBearingScaled - 0.1f < head) {
@@ -1179,7 +1179,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                             if (head > target) {
                                 // Passed the new target: hold the head where it is.
                                 headTurnAngle = 0.24f;
-                                field_0x154d = 0;
+                                headTurningToRival = 0;
                                 rivalBearing = head * 3.864687f;
                             } else {
                                 rivalBearing = angle;
@@ -1200,7 +1200,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                     float head = headTurnAngle - dt;
                     headTurnAngle = head;
                     if (head < rivalBearingScaled) {
-                        field_0x154d = 0;
+                        headTurningToRival = 0;
                         headTurnAngle = 0.24f;
                         look = rivalBearing * 0.1837f;
                     } else if (rivalBearingScaled + 0.1f > head) {
@@ -1215,7 +1215,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                             if (head < target) {
                                 // Passed the new target: hold the head where it is.
                                 headTurnAngle = 0.24f;
-                                field_0x154d = 0;
+                                headTurningToRival = 0;
                                 rivalBearing = head * 3.864687f;
                             } else {
                                 rivalBearing = angle;
@@ -1233,7 +1233,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         look = head * 0.71f;
                     }
                 } else {
-                    field_0x154d = 0;
+                    headTurningToRival = 0;
                     headTurnAngle = 0.24f;
                     look = rivalBearing * 0.1837f;
                 }
@@ -1241,7 +1241,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 // Holding: once the hold time runs out, turn back from the current bearing.
                 headTurnAngle -= dt;
                 if (headTurnAngle < 0.0f) {
-                    field_0x154e = 1;
+                    headTurningBack = 1;
                     rivalBearingScaled = headTurnAngle = (rivalBearing * 0.36963f) * 0.7f;
                     look = headTurnAngle * 0.71f;
                 } else {
