@@ -236,7 +236,7 @@
     "target_va": "0x004dcac0",
     "target_size": 627,
     "expect": "partial",
-    "notes": "3.6% match. Same control flow. Register allocation differs: retail has a 0x34 frame, spills `this` to esp+8, keeps depth in ebp, x in edx and z in ebx, and moves the Grow path out of line. The candidate has a 0x30 frame with `this` in ebx. Loop-form variants (count-down, 0..depth, if/else order) stay between 2% and 4%.",
+    "notes": "620/627, same size. Only the x/z spill-slot order differs; see the comment above Insert in Quadtree.cpp.",
     "bindings": "Quadtree.bindings.json"
   },
   {
@@ -246,7 +246,7 @@
     "target_va": "0x004dcf20",
     "target_size": 331,
     "expect": "partial",
-    "notes": "11.3% match. Same control flow. Retail keeps `this` in ebp and code, i and bit in memory; the candidate holds code in esi and i in ebp. Tried without success: a goto/flag-free form, an if-body without continue, `0x10 << i`, recomputing x/z/cell in the loop, and moving cell inside the loop.",
+    "notes": "182/331. Retail keeps i and cell in memory; VC6 here caches them in edi/edx. See the comment above Remove in Quadtree.cpp.",
     "bindings": "Quadtree.bindings.json"
   },
   {

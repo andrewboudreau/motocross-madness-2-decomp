@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 142, c 105, total 248. The three class (a) functions of the
+Counts: a 2, b 141, c 105, total 248. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -75,8 +75,8 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | io/FileStream | `0x00461640` | 389/671 | c | a separate `out` pointer gives retail's homed buffer copy; left: file pointer in edx (retail eax/ebx), a third 45c7b0 call retail cross-jumps, and the two `(done + read) / size` returns merged |
 | io/FileStream | `0x004618e0` | 136/152 | c | 7 code diffs: retail loads buffer/size/count into registers before the pushes |
 | io/FileStream | `0x00461b90` | 257/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
-| krusty2/broadphase/Quadtree | `0x004dcac0` | 20/627 | b | 37 code diffs: retail adds `sub esp, N`; `sub esp, 0x30` vs `mov [esp + N], ecx`; frame 0x0 vs 0x34, slot order differs |
-| krusty2/broadphase/Quadtree | `0x004dcf20` | 35/331 | b | 20 code diffs: `push esi ; mov esi, [esp + N] ; cmp esi~` vs `push ebp ; mov ebp, ecx ; mov ecx, [esp~`; `dec eax ; mov ebx, esi ; mov [ecx + 0x8~` vs `mov ebx, [ebp + N] ; dec ebx ; mov eax,~`; slot order differs |
+| krusty2/broadphase/Quadtree | `0x004dcac0` | 620/627 | a | x and z spill slots swapped (0x2c/0x30) |
+| krusty2/broadphase/Quadtree | `0x004dcf20` | 182/331 | b | i and cell cached in edi/edx where retail reads their slots; z in esi; slot order differs |
 | krusty2/broadphase/Terrain | `0x00506e90` | 920/1654 | b | 44 code diffs: `je @308` vs `je @282 ; fld [esp + N] ; push ecx`; retail adds `mov ecx, [esp + N]`; slots differ |
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
 | krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |

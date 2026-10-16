@@ -222,6 +222,11 @@ inline void QuadTree::ExtendRootY(float y0, float y1)
 // Tier 3 name.  Inserts obj into every leaf cell selected by the code's flag bits
 // (0x10/0x20/0x40/0x80 = the (x,z), (x,z+cell), (x+cell,z), (x+cell,z+cell) cells at the
 // code's depth), creating nodes on the way down and widening their Y interval.
+// 620/627: only the x/z spill slots differ (retail homes z at frame 0x2c and x at 0x30,
+// VC6 here the reverse; definition, declaration, use, type and name orders do not move
+// them).  The children-present branch first, `child = 0` after Grow with one shared
+// factory block, cell after x/z, `node = child` before `parentIndex = index`, i before
+// bit in the for-init and a `kids` local each move it closer.
 void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1)
 {
     if (code == 0xf)
@@ -232,12 +237,13 @@ void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1
     obj->queryStamp = 0;
 
     int depth = code & 0xf;
-    int cell = cellSizes[depth];
     int x = (code >> 17) & 0x7ff8;
     int z = (code >> 5) & 0x7ff8;
+    int cell = cellSizes[depth];
 
-    unsigned int bit = 0x10;
-    for (int i = 0; i < 4; i++, bit <<= 1) {
+    unsigned int bit;
+    int i;
+    for (i = 0, bit = 0x10; i < 4; i++, bit <<= 1) {
         if (!(code & bit))
             continue;
 
@@ -249,32 +255,32 @@ void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1
         int cz = z + ((i & 1) ? cell : 0);
         int mask = 0x4000;
         int parentIndex;
-        for (int level = depth + 1; level > 0; level--) {
+        QuadTreeNode* child;
+        for (int level = 0; level <= depth; level++, mask >>= 1) {
             int index = ((cx & mask) ? 1 : 0) * 2 + ((cz & mask) ? 1 : 0);
-            QuadTreeNode* child;
-            if (!node->children) {
+            QuadTreeNode** kids = node->children;
+            if (kids) {
+                child = kids[index];
+            } else {
                 if (node == rootNode)
                     rootNode = node = node->Grow();
                 else
                     node = node->Grow();
                 if (parent)
                     parent->children[parentIndex] = node;
-                child = UnknownVirtualSlot1();
-                node->children[index] = child;
-            } else {
-                child = node->children[index];
-                if (!child) {
-                    child = UnknownVirtualSlot1();
-                    node->children[index] = child;
-                }
+                child = 0;
+            }
+            if (!child) {
+                QuadTreeNode* fresh = UnknownVirtualSlot1();
+                node->children[index] = fresh;
+                child = fresh;
             }
             child->ExtendY(y0, y1);
             parent = node;
-            parentIndex = index;
             node = child;
-            mask >>= 1;
+            parentIndex = index;
         }
-        node->AddObject(obj);
+        child->AddObject(obj);
     }
 }
 
@@ -317,6 +323,11 @@ void QuadTree::UpdateRange(QuadTreeObject* obj, unsigned int code, float y0, flo
 
 // Tier 3 name.  Removes obj from every cell selected by `code`; a leaf whose object
 // list becomes empty (RemoveObject returns 0) is deleted and unlinked from its parent.
+// 182/331: `node = rootNode` after cx/cz and `level = 0, parent = 0` in the inner
+// for-init give retail's `this` in ebp, code in ecx and its rotated outer loop (with
+// `parent = 0` as a statement or first in the for-init: 36-46).  Left: VC6 here keeps i
+// in edi and cell in edx where retail reads both from their slots, z lands in esi, and
+// the slot order differs.
 void QuadTree::Remove(QuadTreeObject* obj, unsigned int code)
 {
     if (code == 0xf)
@@ -335,14 +346,16 @@ void QuadTree::Remove(QuadTreeObject* obj, unsigned int code)
         if (!(code & bit))
             continue;
 
-        QuadTreeNode* node = rootNode;
-        QuadTreeNode* parent = 0;
+        QuadTreeNode* node;
+        QuadTreeNode* parent;
         int cx = x + ((i & 2) ? cell : 0);
         int cz = z + ((i & 1) ? cell : 0);
+        node = rootNode;
         int mask = 0x4000;
         int index;
         bool found = true;
-        for (int level = 0; level <= depth; level++, mask >>= 1) {
+        int level;
+        for (level = 0, parent = 0; level <= depth; level++, mask >>= 1) {
             index = ((cx & mask) ? 1 : 0) * 2 + ((cz & mask) ? 1 : 0);
             parent = node;
             QuadTreeNode** kids = node->children;
