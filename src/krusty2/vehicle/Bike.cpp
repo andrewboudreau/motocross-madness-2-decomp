@@ -25,7 +25,7 @@ float Bike::UnknownVirtualSlot47(float)
 
 int Bike::UnknownVirtualSlot98()
 {
-    if (crashState && field_0x604->a_0x44)
+    if (crashState && wrecker->a_0x44)
         return 1;
     return 0;
 }
@@ -422,9 +422,9 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
     steerAxis = 0;
     poseSmoother = 0;
     Bike::UnknownVirtualSlot1(165.0f);
-    field_0x5bc = 0;
-    field_0x5c0 = 1;
-    field_0x604 = 0;
+    gasGyro = 0;
+    brakeGyro = 1;
+    wrecker = 0;
     riderCharacter = 0;
     strcpy(riderName, g_BikeString_00577738);
     field_0x704 = 0.55f;
@@ -531,8 +531,8 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     LoadVehicle(a1, engineName, a3, desc, (int)info, startPosition, forward, up, a9, map, a10, a11,
                 0.9f, 40.0f * 0.01745329f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
                 rpmStep, 0.18f, steer, lean, throttle, trackObject, a21);
-    field_0x5bc = a31;
-    field_0x5c0 = a32;
+    gasGyro = a31;
+    brakeGyro = a32;
     BIKE_COPY_TEXT(riderName, name, 16);
     loadWeight = 165.0f;
     field_0x724 = 32.0f;
@@ -795,7 +795,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         collisionObject->onHitCallback = BikeCollisionCallback;
         collisionObject->onHitByCallback = BikeStaticCollisionCallback;
     }
-    field_0x604->EndWreck();
+    wrecker->EndWreck();
     D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], 0.5f);
     riderCharacter->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
@@ -811,12 +811,12 @@ int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
     Matrix4 tmp;
     RunTickers();
     int r = Vehicle::UnknownVirtualSlot33(a, b, c, d, e, f);
-    int mode = field_0x604->a_0x44;
+    int mode = wrecker->a_0x44;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);
         riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
-    field_0x604->a_0x38->Method_0x00435fe0();
+    wrecker->a_0x38->Method_0x00435fe0();
     return r;
 }
 
@@ -901,10 +901,10 @@ int Bike::UnknownVirtualSlot39(float arg)
     if (r)
         return r;
     if (crashState) {
-        if (crashTimer != 0.0f && field_0x604->a_0xac) {
+        if (crashTimer != 0.0f && wrecker->a_0xac) {
             crashTimer -= g_Bike_0056e26c->g_0x2f0;
             if (crashTimer > field_0x710) {
-                field_0x604->a_0xac = 0;
+                wrecker->a_0xac = 0;
             } else if (crashTimer <= 0.0f) {
                 if (crashTimer == 0.0f)
                     crashTimer = -0.1f;
@@ -1006,7 +1006,7 @@ void Bike::UnknownVirtualSlot29(int)
         OrientationAnglesFromVectors(savedForward, savedUp, &savedYaw, &savedPitch, &savedRoll,
                             &savedSinRoll, &savedCosRoll, &savedCosPitch, &savedSinPitch);
     }
-    int mode = field_0x604->a_0x44;
+    int mode = wrecker->a_0x44;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
@@ -1090,7 +1090,7 @@ void Bike::UnknownVirtualSlot102(float)
     float w = 1.0f - poseBlend;
     riderCharacter->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
     D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
-    int mode = field_0x604->a_0x44;
+    int mode = wrecker->a_0x44;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
@@ -1274,17 +1274,17 @@ static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, 
     offset.x = x;
     offset.y = y;
     offset.z = z;
-    int bone = self->field_0x604->a_0x34->r_0x1a0->FindByName(name);
-    self->field_0x604->AddProbe(offset, bone);
+    int bone = self->wrecker->a_0x34->r_0x1a0->FindByName(name);
+    self->wrecker->AddProbe(offset, bone);
 }
 
 void Bike::UnknownVirtualSlot97()
 {
-    field_0x604 = new(__FILE__, 2023) BikeA604(1);
-    if (field_0x604->SetupWrecker(GameObject::field_0x18, riderCharacter, "rider.col")) {
-        GameObject::Method_0x00469190(field_0x604, -1);
-        field_0x604->a_0x38->n_0xe4 = ((BikeA1F4*)terrain);
-        field_0x604->a_0x38->n_0x64 = 0x65;
+    wrecker = new(__FILE__, 2023) BikeA604(1);
+    if (wrecker->SetupWrecker(GameObject::field_0x18, riderCharacter, "rider.col")) {
+        GameObject::Method_0x00469190(wrecker, -1);
+        wrecker->a_0x38->n_0xe4 = ((BikeA1F4*)terrain);
+        wrecker->a_0x38->n_0x64 = 0x65;
         BikeAttachBone(this, "Pelvis", 0.0f, 0.0f, -0.35f);
         BikeAttachBone(this, "UprTorso", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "Head", 0.0f, 0.75f, 0.0f);
@@ -1300,7 +1300,7 @@ void Bike::UnknownVirtualSlot97()
         BikeAttachBone(this, "LwrLegR", 0.0f, 0.0f, 0.0f);
         BikeAttachBone(this, "FootR", 0.0f, -0.5f, 0.75f);
         BikeAttachBone(this, "FootR", 0.0f, -1.0f, 0.0f);
-        field_0x604->a_0x11c = field_0x124;
+        wrecker->a_0x11c = field_0x124;
     }
 }
 
@@ -1311,7 +1311,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
 {
     if (crashState != 0)
         return 0;
-    BikeA604* rider = field_0x604;
+    BikeA604* rider = wrecker;
     if (rider->a_0xd8) {
         scratchVector = rider->a_0x34->r_0x1a0->d_0x140->WorldToLocalPoint(rider->a_0xdc);
         if (scratchVector.y > 1.0f) {
@@ -1546,9 +1546,9 @@ void Bike::UnknownVirtualSlot91()
     else
         force = Vec3(f, controlInput.x * stepTime * -0.2f, 0.0f);
     if (field_0x6fc && rearWheel->w_0x150 < -2.0f) {
-        if (field_0x5c0 && rearWheel->w_0x29c > 0.0f)
+        if (brakeGyro && rearWheel->w_0x29c > 0.0f)
             force.x += dt * rearWheel->w_0x29c;
-        if (field_0x5bc && field_0x478 && engineState->field_0x00 > 0.0f && !field_0x479)
+        if (gasGyro && throttleOn && engineState->field_0x00 > 0.0f && !field_0x479)
             force.x -= dt * engineState->field_0x00;
         float speed = linearSpeed;
         float inv = 1.0f / speed;

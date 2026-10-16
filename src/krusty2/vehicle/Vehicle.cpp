@@ -996,9 +996,9 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         }
         field_0x47a = UnknownVirtualSlot82() != 0;
         field_0x479 = crashState == 0 && (field_0x47a || UnknownVirtualSlot81());
-        field_0x478 = crashState == 0 && UnknownVirtualSlot80();
-        engineState->Method_004D2F50(stepTime, field_0x478, field_0x479);
-        engineState->Method_004D3030(field_0x478, linearSpeed);
+        throttleOn = crashState == 0 && UnknownVirtualSlot80();
+        engineState->Method_004D2F50(stepTime, throttleOn, field_0x479);
+        engineState->Method_004D3030(throttleOn, linearSpeed);
         if (hit) {
             int dummy = 0;
             UnknownVirtualSlot11(hit, &up, &zero, &tmp, &dummy);
@@ -1300,7 +1300,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
 
 void Vehicle::UnknownVirtualSlot44()
 {
-    field_0x4a0 = 1;
+    outOfRace = 1;
     GameObjectVirtualSlot4();
     ((VehSceneNodeView*)modelNode)->Method_004444E0();
 }
@@ -1560,7 +1560,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     field_0x520 = 1;
     throttleInput = 0.0f;
     prevControlInput = kVec3Zero;
-    field_0x478 = false;
+    throttleOn = false;
     field_0x479 = false;
     field_0x47a = false;
     VehicleSpeedState* s = engineState;
@@ -2107,7 +2107,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     crashYaw = 0;
     crashedUpsideDown = 0;
     pointsTouching = 0;
-    field_0x4a0 = 0;
+    outOfRace = 0;
     wheelList = 0;
     wheelCapacity = 0;
     wheelCount = 0;

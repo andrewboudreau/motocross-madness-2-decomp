@@ -378,8 +378,8 @@ public:
     // functions were tried and cost the exact match of slot 8 (0x00406750): VC6 then
     // loads field_0x42c before the float arguments instead of after them.
 
-    int field_0x5bc;              // first Bike field (Vehicle's own data ends at 0x5bc)
-    int field_0x5c0;
+    int gasGyro;  // +0x5BC  0 from the constructor, Load's a31: TrackGameMode gasGyro (key 0x22, reset 0)
+    int brakeGyro;  // +0x5C0  1 from the constructor, Load's a32: TrackGameMode brakeGyro (key 0x30, reset 1)
     BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     BikeA5C8 field_0x5c8;         // +0x5c8 copy of the loader's info block (when given)
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
@@ -388,7 +388,7 @@ public:
     BikeA5F8* field_0x5f8;         // +0x5f8 cleared in the ctor (0x00407700); Method_0x0040a520 reads it
     BikeA5F8* field_0x5fc;         // +0x5fc cleared in the ctor
     int field_0x600;               // +0x600 cleared in the ctor
-    BikeA604* field_0x604;
+    BikeA604* wrecker;  // +0x604  Wrecker (SetupWrecker with rider.col, StartAnimatedWreck); RaceView/BikeRace +0x604 wrecker
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* field_0x60c;         // +0x60c cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
     Vec3 field_0x610;              // per-axis gains of the steering torque integrator (Method_0x0040a520)

@@ -544,7 +544,7 @@ public:
     void* inputDevice;  // +0x46c tested non-null together with throttleAxis before the throttle axis is latched in slot 63 (-1 when absent)
     float throttleInput;  // +0x470 slot 63 latches axis 0x500 value (dead zone 0.2, else -1 when no device); slot 80 tests it > 0.33
     float steerInput;  // +0x474 slot 63: = -axis(0x4f8).value; slot 88 classifies it with 0x504.y into 8 stick sectors; slot 64 zeroes it when crashed
-    bool field_0x478;
+    bool throttleOn;  // +0x478  racesnd.cpp throttle-on flag (RaceView +0x478); Bike's gas gyro acts only while set
     bool field_0x479;
     bool field_0x47a;
     char pad_0x47B[0x1];
@@ -553,7 +553,7 @@ public:
     int justLanded;  // +0x484 slot 49 clears it per frame; slot 71 sets it to 1 when the airborne flag 0x108 drops (landing)
     Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
     Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground
-    int field_0x4a0;          // set to 1 by slot 44
+    int outOfRace;  // +0x4A0  set to 1 by slot 44; EventManager counts the racer done, KrustyBike's nearest-bike search skips it
     float field_0x4a4;
     int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
     float leanAngle;  // +0x4ac slot 56 stores asin(...) of the ground normal against the forward axis; slot 57 returns it; Bike rotates the body by it
@@ -622,7 +622,7 @@ VEH_CHECK_OFFSET(Vehicle, inputMap, 0x468);
 VEH_CHECK_OFFSET(Vehicle, inputDevice, 0x46C);
 VEH_CHECK_OFFSET(Vehicle, throttleInput, 0x470);
 VEH_CHECK_OFFSET(Vehicle, steerInput, 0x474);
-VEH_CHECK_OFFSET(Vehicle, field_0x478, 0x478);
+VEH_CHECK_OFFSET(Vehicle, throttleOn, 0x478);
 VEH_CHECK_OFFSET(Vehicle, field_0x479, 0x479);
 VEH_CHECK_OFFSET(Vehicle, field_0x47a, 0x47A);
 VEH_CHECK_OFFSET(Vehicle, steerState, 0x47C);

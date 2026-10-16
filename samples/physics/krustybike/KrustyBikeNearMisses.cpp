@@ -26,27 +26,27 @@
 // 0..15 dead initialised int locals at the top of the function do not move the pick either.
 KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 {
-    field_0x73c = 0x65;
+    plateNumber = 0x65;
     field_0x1540 = kVec3Zero;
-    field_0x11b8 = 0;
-    field_0x604 = 0;
+    hasFullState = 0;
+    wrecker = 0;
     aiKind = 0;
     isRemote = 0;
-    field_0x768 = 0;
+    score = 0;
     pingTimer = 0;
     race = 0;
-    field_0x7b8 = 0;
+    lapGate = 0;
     forceGatePass = 0;
-    field_0x7bc = 1;
-    field_0x748 = 0;
+    nextLapGate = 1;
+    finishTimeStamp = 0;
     netId = 0;
     field_0x141c = 0;
     field_0x4a4 = 1.0f;
-    field_0x788 = 0;
+    largestStuntPoints = 0;
     field_0x758 = 0;
-    field_0x760 = 0;
-    field_0x75c = 0;
-    field_0x764 = 0;
+    bestTagRun = 0;
+    tagRun = 0;
+    totalTagRun = 0;
     ghostMod = 0;
     field_0x1410 = -1;
     field_0x15e6 = 0;
@@ -55,13 +55,13 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     field_0x7ac = 0;
     field_0x7b0 = 0;
     field_0x7b4 = 0;
-    field_0x1358 = kVec3Zero;
-    field_0x1364 = kVec3Zero;
-    field_0x1370 = kVec3Zero;
-    field_0x137c = 0;
-    field_0x1380 = 0;
-    field_0x1384 = 0;
-    field_0x1388 = 0;
+    deltaBaseVelocity = kVec3Zero;
+    deltaBasePosition = kVec3Zero;
+    deltaBaseAngularVelocity = kVec3Zero;
+    deltaBaseRoll = 0;
+    deltaBasePitch = 0;
+    deltaBaseYaw = 0;
+    deltaBaseTime = 0;
     rivalBearing = 0;
     field_0x15d4 = 0;
     lastCollisionType = 0;
@@ -126,7 +126,7 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
     switch (g->field_0x2d74) {
     case 2:
     case 3:
-        if (g->field_0x2d70 || field_0x78c || aiKind || isGhost || a1 == 2 ||
+        if (g->field_0x2d70 || onTrack || aiKind || isGhost || a1 == 2 ||
             g->field_0xc50) {
             *a2 = respawnPosition;
             *a3 = respawnHeading;
@@ -164,7 +164,7 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
     case 1:
     case 5: {
         if (respawnPending) scratchVector = respawnHeading + respawnPosition;
-        else scratchVector = g->field_0x560[field_0x7b8 + 9].field_0x00;
+        else scratchVector = g->field_0x560[lapGate + 9].field_0x00;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim,
                            respawnPending ? 0x64 : 0x7fffffff, respawnPending ? 0x65 : 0x7fffffff,
                            3.0f, 8, 0, &scratchVector, !respawnPending, a2, a3, a4, a5);
@@ -308,18 +308,18 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     } else {
                                         message.motion = 0;
                                     }
-                                    message.flag7 = field_0x478;
+                                    message.flag7 = throttleOn;
                                     message.flag8 = field_0x479;
                                     message.flag9 = field_0x153c;
                                     message.crashDirection = crashDirection;
                                     message.crashed = crashState;
                                     message.flag4 = UnknownVirtualSlot51();
-                                    message.flag5 = field_0x7a4 != 0;
-                                    message.flag6 = field_0x78c;
+                                    message.flag5 = hasFinished != 0;
+                                    message.flag6 = onTrack;
                                     if (g_kbGame->field_0x2d74 == 2 || g_kbGame->field_0x2d74 == 3)
-                                        message.field_0x11 = (unsigned char)field_0x7a0;
+                                        message.field_0x11 = (unsigned char)lapCount;
                                     else
-                                        message.field_0x11 = field_0x7b8;
+                                        message.field_0x11 = lapGate;
                                     if (!record) {
                                         if (g_kbGame->field_0x8)
                                             g_kbGame->field_0x8->Send(13, &message, sizeof(message), netId, record);
@@ -339,14 +339,14 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                             (!g_kbGame->field_0x2d74 || (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8))) {
                                             pingTimer -= g_kbGame->field_0x2f0;
                                             if (pingTimer < 0.0f) {
-                                                ping.field_0x04 = field_0x768;
+                                                ping.field_0x04 = score;
                                                 ping.field_0x01 = loaderKind;
                                                 g_kbGame->field_0x8->Send(10, &ping, sizeof(ping), netId, 0);
                                                 pingTimer = 2.0f;
                                             }
                                         }
                                     } else if (netRecorder && race->scoreRecordDue) {
-                                        ping.field_0x04 = field_0x768;
+                                        ping.field_0x04 = score;
                                         ping.field_0x01 = loaderKind;
                                         netRecorder->QueueRecord(10, netId, &ping, sizeof(ping));
                                     }
@@ -797,37 +797,37 @@ void KrustyBike::Fn_00493660(float dt, int a)
             field_0x6fc = lean;
             poseState = states[0]->poseState;
             if (g_kbGame->field_0x560) {
-                if (field_0x7b8 == states[0]->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && states[0]->field_0x53 == 0))
+                if (lapGate == states[0]->field_0x53 - 1 || (lapGate == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && states[0]->field_0x53 == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a) {
-                    int prev = field_0x7b8;
-                    field_0x7b8 = states[0]->field_0x53;
-                    if (prev != field_0x7b8) {
-                        if (field_0x7b8 == 0)
-                            field_0x7a0++;
-                        field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
+                    int prev = lapGate;
+                    lapGate = states[0]->field_0x53;
+                    if (prev != lapGate) {
+                        if (lapGate == 0)
+                            lapCount++;
+                        nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
+                            ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(lapGate, nextLapGate, this);
                     }
                 }
             } else {
                 if (!states[0]->field_0x5c)
-                    states[0]->field_0x04 = (short)((field_0x7a0 & 0xff00) | states[0]->field_0x53);
-                if ((unsigned short)field_0x7a0 == (unsigned short)states[0]->field_0x04 - 1)
+                    states[0]->field_0x04 = (short)((lapCount & 0xff00) | states[0]->field_0x53);
+                if ((unsigned short)lapCount == (unsigned short)states[0]->field_0x04 - 1)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a)
-                    field_0x7a0 = states[0]->field_0x04;
+                    lapCount = states[0]->field_0x04;
             }
             if (states[0]->field_0x5c) {
-                field_0x74c = states[0]->field_0x20;
-                field_0x750 = states[0]->field_0x28;
+                lastLapTime = states[0]->field_0x20;
+                fastestLap = states[0]->field_0x28;
                 if (a) {
-                    field_0x770 = states[0]->field_0x2c;
-                    field_0x784 = states[0]->field_0x01;
+                    timeBehindLeader = states[0]->field_0x2c;
+                    finishPosition = states[0]->field_0x01;
                 }
             }
             if (!isGhost) {
@@ -838,12 +838,12 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 }
             }
             if (states[0]->flag6)
-                field_0x78c = 1;
+                onTrack = 1;
             else
-                field_0x78c = 0;
+                onTrack = 0;
             prevCrash = crashState;
             crashState = states[0]->crashed;
-            field_0x478 = states[0]->flag7;
+            throttleOn = states[0]->flag7;
             field_0x479 = states[0]->flag8;
             field_0x153c = states[0]->flag9;
             if (crashState && !prevCrash) {
@@ -851,15 +851,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 crashedUpsideDown = bodyUp.y < 0.0f;
                 crashYaw = savedYaw;
                 if (field_0x430)
-                    field_0x604->StartTumble();
+                    wrecker->StartTumble();
                 else
-                    field_0x604->StartAnimatedWreck(states[0]->crashDirection);
+                    wrecker->StartAnimatedWreck(states[0]->crashDirection);
                 field_0x433 = 0;
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
-                field_0x604->EndWreck();
+                wrecker->EndWreck();
                 Fn_00496DA0();
                 field_0x430 = 0;
                 field_0x433 = 0;
@@ -892,37 +892,37 @@ void KrustyBike::Fn_00493660(float dt, int a)
             field_0x6fc = lean;
             poseState = interpSource->poseState;
             if (g_kbGame->field_0x560) {
-                if (field_0x7b8 == interpSource->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && interpSource->field_0x53 == 0))
+                if (lapGate == interpSource->field_0x53 - 1 || (lapGate == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && interpSource->field_0x53 == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a) {
-                    int prev = field_0x7b8;
-                    field_0x7b8 = interpSource->field_0x53;
-                    if (prev != field_0x7b8) {
-                        if (field_0x7b8 == 0)
-                            field_0x7a0++;
-                        field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
+                    int prev = lapGate;
+                    lapGate = interpSource->field_0x53;
+                    if (prev != lapGate) {
+                        if (lapGate == 0)
+                            lapCount++;
+                        nextLapGate = (lapGate + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
                         if (this == this->race->raceCamera->followedRacer)
-                            ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
+                            ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(lapGate, nextLapGate, this);
                     }
                 }
             } else {
                 if (!interpSource->field_0x5c)
-                    interpSource->field_0x04 = (short)((field_0x7a0 & 0xff00) | interpSource->field_0x53);
-                if ((unsigned short)field_0x7a0 == (unsigned short)interpSource->field_0x04 - 1)
+                    interpSource->field_0x04 = (short)((lapCount & 0xff00) | interpSource->field_0x53);
+                if ((unsigned short)lapCount == (unsigned short)interpSource->field_0x04 - 1)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a)
-                    field_0x7a0 = interpSource->field_0x04;
+                    lapCount = interpSource->field_0x04;
             }
             if (interpSource->field_0x5c) {
-                field_0x74c = interpSource->field_0x20;
-                field_0x750 = interpSource->field_0x28;
+                lastLapTime = interpSource->field_0x20;
+                fastestLap = interpSource->field_0x28;
                 if (a) {
-                    field_0x770 = interpSource->field_0x2c;
-                    field_0x784 = interpSource->field_0x01;
+                    timeBehindLeader = interpSource->field_0x2c;
+                    finishPosition = interpSource->field_0x01;
                 }
             }
             if (!isGhost) {
@@ -933,15 +933,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 }
             }
             if (interpSource->flag6)
-                field_0x78c = 1;
+                onTrack = 1;
             else
-                field_0x78c = 0;
+                onTrack = 0;
             prevCrash = crashState;
             crashState = interpSource->crashed;
             if (!this->race->replayPaused && this->race->lastRecordKind != -2)
-                field_0x478 = interpSource->flag7;
+                throttleOn = interpSource->flag7;
             else
-                field_0x478 = 0;
+                throttleOn = 0;
             field_0x479 = interpSource->flag8;
             field_0x153c = interpSource->flag9;
             if (crashState && !prevCrash) {
@@ -949,15 +949,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 crashedUpsideDown = bodyUp.y < 0.0f;
                 crashYaw = savedYaw;
                 if (field_0x430)
-                    field_0x604->StartTumble();
+                    wrecker->StartTumble();
                 else
-                    field_0x604->StartAnimatedWreck(interpSource->crashDirection);
+                    wrecker->StartAnimatedWreck(interpSource->crashDirection);
                 field_0x433 = 0;
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
-                field_0x604->EndWreck();
+                wrecker->EndWreck();
                 Fn_00496DA0();
                 field_0x430 = 0;
                 field_0x433 = 0;
@@ -992,7 +992,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
 
     if (g_kbInterpolate)
         stateIntervalElapsed = g_kbGame->field_0x2f0 + stateIntervalElapsed;
-    if (!a && !field_0x7a4) {
+    if (!a && !hasFinished) {
         if (stateIntervalElapsed >= g_kbStallThreshold) {
             field_0x138c = g_kbStallHoldSec;
             UnknownVirtualSlot50(1, 0.0f, 0);
@@ -1259,16 +1259,16 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], pose);
             D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], pose);
         }
-    } else if (field_0x7a4 == 2) {
+    } else if (hasFinished == 2) {
         // The end pose (riderPoseHandles[15]) once the rider character is ready.
         if (riderCharacter->c_0xc) {
             ((KbA5C4*)riderCharacter)->SetMotion(riderPoseHandles[15]);
             ((KbA5C4*)riderCharacter)->field_0x10 = 0;
-            field_0x7a4++;
+            hasFinished++;
         } else {
             ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
         }
-        if (field_0x7a4 > 2) {
+        if (hasFinished > 2) {
             if (field_0x6fc)
                 UnknownVirtualSlot41();
             field_0x431 = 0;
@@ -1336,7 +1336,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
         }
     }
-    int mode = field_0x604->a_0x44;
+    int mode = wrecker->a_0x44;
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
