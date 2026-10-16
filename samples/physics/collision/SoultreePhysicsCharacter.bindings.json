@@ -1,6 +1,6 @@
 {
   "?ApplyRestPose@Character@@QAEXXZ": "0x004a8b00",
-  "?Fn_00435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z": "0x004fc540",
   "?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z": "0x004fc970",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",

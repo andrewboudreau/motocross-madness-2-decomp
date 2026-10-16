@@ -1846,7 +1846,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     ((CollisionObject*)altBodyA)->ownerObject = this;
     ((CollisionObject*)altBodyB)->ownerObject = this;
     collisionObject = (CollisionObject*)altBodyA;
-    collisionObject->Fn_00435fe0();
+    collisionObject->SnapPlacement();
     ((KbA604*)wrecker)->AddIgnoredObject(altBodyA);
     ((KbA604*)wrecker)->AddIgnoredObject(altBodyB);
     ((CollisionHullShape*)collisionObject->shape)->sceneNode = (int)modelNode->firstChild;

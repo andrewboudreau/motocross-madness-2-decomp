@@ -1602,7 +1602,7 @@ int Vehicle::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c, c
     centerNode->GetPositionIn(0, &centerOfMass);
     ApplyRestPose();
     if (collisionObject)
-        collisionObject->Fn_00435fe0();
+        collisionObject->SnapPlacement();
     justReset = 1;
     attachmentResetPending = 1;
     respawnPending = 0;

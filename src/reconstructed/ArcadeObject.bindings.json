@@ -27,7 +27,7 @@
   "?Configure@CollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?SetHullShape@CollisionObject@@QAEXPAVD3DIMSoultreeObject@@HHHH@Z": "0x00432720",
   "?LoadShape@CollisionObject@@QAEXPAVD3DIMSoultreeObject@@PBD@Z": "0x00432800",
-  "?UnknownFunction435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?SetOwner@CollisionObject@@QAEXPAVD3DIMSoultreeObject@@H@Z": "0x004394d0",
   "?AddModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",

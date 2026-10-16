@@ -86,7 +86,7 @@ ArcadeObject* ArcadeObject::Create(void* value, int a, int b, const char* name,
 void ArcadeObject::SetPosition(const Vector3* position) {
     arcadeModel->SetPosition(position);
     if (collisionBuilt)
-        collisionObject->UnknownFunction435fe0();
+        collisionObject->SnapPlacement();
 }
 
 // 0x00401520
@@ -117,7 +117,7 @@ int ArcadeObject::BuildCollision(const char* name, int value, UnknownPickCallbac
     else
         collisionObject->SetHullShape(arcadeModel, 1, 0, 0, 0);
     collisionObject->SetOwner(arcadeModel, value);
-    collisionObject->UnknownFunction435fe0();
+    collisionObject->SnapPlacement();
     collisionObject->onHitCallback = callback;
     collisionObject->onHitByCallback = context;
     AppendChild(collisionObject, -1);

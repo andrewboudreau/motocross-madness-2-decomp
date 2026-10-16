@@ -340,7 +340,7 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const Vec3* a1, const Vec3* 
     else
         sceneNode->GetPositionIn(0, &centerOfMass);
     if (collisionObject)
-        collisionObject->Fn_00435fe0();
+        collisionObject->SnapPlacement();
     respawnPending = 0;
     justReset = 1;
     attachmentResetPending = 1;
@@ -1150,7 +1150,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
         }
         collisionObject->ownerType = 0;
         collisionObject->ownerObject = this;
-        collisionObject->Fn_00435fe0();
+        collisionObject->SnapPlacement();
         GameObject* child = collisionObject;
         D3DIMSoultreeObject::AppendChild(child, -1);
     }
@@ -1201,7 +1201,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
         }
         collisionObject->ownerType = 0;
         collisionObject->ownerObject = this;
-        collisionObject->Fn_00435fe0();
+        collisionObject->SnapPlacement();
         GameObject* child = collisionObject;
         GameObject::AppendChild(child, -1);
     }

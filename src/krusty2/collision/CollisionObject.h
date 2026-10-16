@@ -120,7 +120,7 @@ public:
     void SyncTransformFromNode();
     void UpdatePlacement();          // 0x00435fb0, SyncTransformFromNode, then UpdateQuadtreeCell when in the broadphase
     void UpdateQuadtreeCell();       // 0x00436080, refreshes the quadtree cell from the world bounds
-    void Fn_00435fe0();                                       // 0x00435fe0
+    void SnapPlacement();                                       // 0x00435fe0
     // 0x00438e70: broad-phase candidates -> TestAgainst -> hit callbacks; returns hasContact.
     int QueryCollisions();
     inline void ReportHit();                                  // inlined three times in 0x00438e70

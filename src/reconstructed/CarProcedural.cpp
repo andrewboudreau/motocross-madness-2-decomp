@@ -163,7 +163,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     else
         bodyCollider->SetHullShape(carModel, 0, 1, 0, 0);
     bodyCollider->field_0x54->field_0x00 = 1;
-    bodyCollider->UnknownFunction435fe0();
+    bodyCollider->SnapPlacement();
     sensorCollider->AddIgnoredOwner(bodyCollider);
     g_MemTagStack->Pop(tag);
 

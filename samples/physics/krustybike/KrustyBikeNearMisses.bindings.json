@@ -111,7 +111,7 @@
   "?Fn_004079C0@KbBikeLoader@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@HHHPAXHHHMMMMMMHHHH444HMH@Z": "0x004079c0",
   "?Fn_00413200@KrustyBike@@QAEHM@Z": "0x00413200",
   "?Fn_00414370@KrustyBike@@QAEHM@Z": "0x00414370",
-  "?Fn_00435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?AddModifier@KbXform@@QAEXPAUKbObj128@@@Z": "0x00444d80",
   "?RemoveModifier@KbXform@@QAEXPAUKbObj128@@@Z": "0x00444de0",
   "?FindRaceMode@KbSession@@QAEPAUKbPlayer@@XZ": "0x0045d2b0",

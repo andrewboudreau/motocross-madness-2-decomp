@@ -461,7 +461,7 @@ void Wrecker::UpdateInertia() {
 
 void Wrecker::StartAnimatedWreck(int index) {
     collisionModel->shapeCollisionEnabled = 1;
-    collisionModel->UnknownFunction435fe0();
+    collisionModel->SnapPlacement();
     collisionModel->Enable();
     collisionModel->collisionEnabled = 1;
     collisionModel->collidable = 1;
@@ -477,7 +477,7 @@ void Wrecker::StartAnimatedWreck(int index) {
 
 void Wrecker::StartTumble() {
     collisionModel->shapeCollisionEnabled = 1;
-    collisionModel->UnknownFunction435fe0();
+    collisionModel->SnapPlacement();
     collisionModel->Enable();
     collisionModel->collisionEnabled = 1;
     collisionModel->collidable = 1;

@@ -104,7 +104,7 @@
   "?Configure@UnknownSceneCollisionObject@@QAEXPAXHHH@Z": "0x004320f0",
   "?SetHullShape@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@HHHH@Z": "0x00432720",
   "?LoadShape@UnknownSceneCollisionObject@@QAEXPAVD3DIMSoultreeObject@@PBD@Z": "0x00432800",
-  "?UnknownFunction435fe0@UnknownSceneCollisionObject@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@UnknownSceneCollisionObject@@QAEXXZ": "0x00435fe0",
   "?AddCollisionPoint@@YAPAXHPAPAXPBUVector3@@PAXMPAHMH@Z": "0x0043a330",
   "?SetUseLighting@D3DIMSoultreeObject@@QAEXH@Z": "0x004444c0",
   "?SetUseLighting@UnknownSceneLodObject@@QAEXH@Z": "0x004444c0",

@@ -105,7 +105,7 @@ public:
     void Configure(void* a0, int a1, int a2, int a3);    // 0x004320f0
     void SetHullShape(CarProceduralModel* model, int a, int b, int c, int d); // 0x00432720
     void LoadShape(CarProceduralModel* model, const char* path); // 0x00432800
-    void UnknownFunction435fe0();                                    // 0x00435fe0
+    void SnapPlacement();                                    // 0x00435fe0
     void AddIgnoredOwner(CarProceduralCollision* other);       // 0x00439410
     void SetMeshShape(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape
     void SetTransform(const Matrix4* transform);            // 0x00435830 (ret 4): sets the transform

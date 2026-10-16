@@ -95,7 +95,7 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
         collisionObject->LoadShape(modelNode, colPath);
     else
         collisionObject->SetModelShape(modelNode, 1, 1, 0, 0);
-    collisionObject->Fn_00435fe0();
+    collisionObject->SnapPlacement();
     collisionObject->SetOwner(this, 0x2711);
     g_MemTagStack->Pop(prevTag);
     return GameObject::SetRenderContext(a1);

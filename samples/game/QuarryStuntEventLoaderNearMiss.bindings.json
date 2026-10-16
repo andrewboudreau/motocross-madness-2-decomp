@@ -73,7 +73,7 @@
   "?NextBike@UnknownQuarryRace@@QAEPAUUnknownQuarryRacer@@PAH@Z": "0x004204e0",
   "?SetDetailLevel@UnknownKrustyBikeView@@QAEXH@Z": "0x00423790",
   "?SetUseBroadphase@UnknownQuarryCollision@@QAEXH@Z": "0x00432120",
-  "?UnknownFunction435fe0@UnknownQuarryCollision@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@UnknownQuarryCollision@@QAEXXZ": "0x00435fe0",
   "?SetIgnoreListMode@UnknownQuarryCollision@@QAEXH@Z": "0x00439400",
   "?AddIgnoredOwner@UnknownQuarryCollision@@QAEXPAV1@@Z": "0x00439410",
   "?SetOwner@UnknownQuarryCollision@@QAEXPAXH@Z": "0x004394d0",

@@ -65,7 +65,7 @@ public:
     void LoadShape(D3DIMSoultreeObject* model, const char* path);
     void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d);
     void SetOwner(D3DIMSoultreeObject* model, int value);
-    void UnknownFunction435fe0();
+    void SnapPlacement();
 
     unsigned char field_0x38[0x68 - 0x38];
     int ignoreVegetation;                     // +0x68 ignore vegetation
