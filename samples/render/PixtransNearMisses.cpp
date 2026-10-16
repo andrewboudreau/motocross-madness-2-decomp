@@ -27,21 +27,25 @@
 // AddPixel1555 helper for all four pixels compiles as the form here, and
 // with the upper pair read in place it is further off (28).
 //
-// Halve8 (0x004cee30, 1133 bytes; candidate 1093): the palette-index
-// halver. The search for the magenta entry, both block loops, the key test
-// and the >= 2 rule match, and nested ifs reproduce retail's single
-// `return 0` block. The keyed and plain loops are an if/else with one
-// `return 1` after it: with a `return 1` after the keyed loop VC6 pushes ebp
-// in the prologue, as an if/else it pushes ebp after the three checks as
-// retail does (docs/VC6_SHRINK_WRAP.md; `key == -1` first scores higher but
-// inverts retail's branch). Still differs: retail holds 0xff in bl for the
-// search (`!green`, `255`, casts, a pointer walk and nested ifs keep the
-// immediates) and keeps the found index in the dead `source` slot with both
-// row pointers in locals (frame 0x48); VC6 here homes `sourceRow` in
-// `source`'s slot (frame 0x44), which shifts every slot. Initialising the
-// row pointers after the search is worse. `key` as the loop variable (with or without `== 256` -> -1) and a
-// combined `key < 256 && key != -1` test are worse. The fast loop's red/blue/green
-// sum order also differs (retail sums blue before green).
+// Halve8 (0x004cee30, 1133 bytes; candidate 1133, 1079 of 1125 masked
+// bytes): the palette-index halver. The search for the magenta entry, both
+// block loops, the key test and the >= 2 rule match, and nested ifs
+// reproduce retail's single `return 0` block. The keyed and plain loops are
+// an if/else with one `return 1` after it: with a `return 1` after the keyed
+// loop VC6 pushes ebp in the prologue, as an if/else it pushes ebp after the
+// three checks as retail does (docs/VC6_SHRINK_WRAP.md). Declaring the keyed
+// block's accumulators first in the x loop body gives retail's frame (0x48)
+// and registers; declared after the four entry copies, VC6 homed
+// `sourceRow` in `source`'s slot (frame 0x44) and every slot moved. The
+// plain loop ORs the blue term before the green one as retail does. Still
+// differs: the 3-byte entry copies take their slots in another order
+// (retail keeps d, c, b, a nearest esp in the keyed loop and b, a, c, d in
+// the plain one; declaring them in other orders, or apart from their
+// initialisers, does not move them), the two zero stores at the top of the
+// keyed x loop come in the other order, and after the keyed x loop retail
+// reloads the source stride before the width. Updating `row` before
+// `sourceRow`, the row steps or `to++` in the for increments and declaring
+// `to` before `from` are worse.
 //
 // DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
 // Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error
@@ -230,6 +234,7 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
                         unsigned char* from = sourceRow;
                         unsigned char* to = row;
                         for (int x = 0; x < width; x++, from += 2) {
+                            int count = 0, red = 0, green = 0, blue = 0;
                             int ia = from[0];
                             UnknownPixel24 a = entries[ia];
                             int ib = from[1];
@@ -238,7 +243,6 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
                             UnknownPixel24 c = entries[ic];
                             int id = from[sourceStride + 1];
                             UnknownPixel24 d = entries[id];
-                            int count = 0, red = 0, green = 0, blue = 0;
                             if (ia != key) {
                                 red = a.red;
                                 green = a.green;
@@ -285,8 +289,8 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
                             UnknownPixel24 c = entries[from[sourceStride]];
                             UnknownPixel24 d = entries[from[sourceStride + 1]];
                             *to++ = indices[((a.red + b.red + c.red + d.red + 16) >> 5) << 10
-                                            | ((a.green + b.green + c.green + d.green + 16) >> 5) << 5
-                                            | (a.blue + b.blue + c.blue + d.blue + 16) >> 5];
+                                            | (a.blue + b.blue + c.blue + d.blue + 16) >> 5
+                                            | ((a.green + b.green + c.green + d.green + 16) >> 5) << 5];
                         }
                         sourceRow += sourceStride * 2;
                         row += destinationStride;

@@ -143,9 +143,9 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
         surface = display->primarySurface;
     if (!surface->Lock(0, &desc, 0x811, 0)) {
         if (rect) {
+            right = rect->right;
             left = rect->left;
             top = rect->top;
-            right = rect->right;
             bottom = rect->bottom;
         } else {
             left = 0;

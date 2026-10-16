@@ -989,10 +989,10 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             if (spawnProtectTimer <= 0.0f)
                 UnknownVirtualSlot50(0, 0, 0);
         }
-        allWheelsInContact = wheelsInContact == wheelCount;
         anyWheelInContact = wheelsInContact != 0;
         speed = prevSpeed;
         up = weightForce;
+        allWheelsInContact = wheelsInContact == wheelCount;
         Vec3 savedOut;
         Vec3 basis = *UnknownVirtualSlot55(&savedOut, &pivot);
         UnknownVirtualSlot56(&basis, 1, 0);
@@ -1204,9 +1204,9 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         otherVel = &other->velocity;
         ctx = (int)other->modelNode;
         v3c = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, other->centerOfMass);
+        v30 = other->invInertia;
         v48 = other->worldAngularVelocity;
         c = &other->angularVelocity;
-        v30 = other->invInertia;
         break;
     case 0x69:
         hasBody = 1;

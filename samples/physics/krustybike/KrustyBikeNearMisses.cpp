@@ -156,7 +156,7 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
     }
     case 1:
     case 5: {
-        if (respawnPending) scratchVector = respawnHeading + respawnPosition;
+        if (respawnPending) scratchVector = respawnPosition + respawnHeading;
         else scratchVector = g->bajaEnduroEvent[lapGate + 9].field_0x00;
         return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, flag, lim,
                            respawnPending ? 0x64 : 0x7fffffff, respawnPending ? 0x65 : 0x7fffffff,

@@ -341,9 +341,9 @@ void TerrainShadow::UnknownVirtualSlot30()
                     }
                 } else if (cell->field_0x40) {
                     for (int k = 0; k < 3; k++) {
+                        TerrainShadowVertex* out = &vertices[vertexCount];
                         int idx = (unsigned short)corner[k] + vertexBase;
                         const float* src = (const float*)((char*)mesh->vertices + idx * 0x20);
-                        TerrainShadowVertex* out = &vertices[vertexCount];
                         out->x = src[0];
                         out->y = src[1];
                         out->z = src[2];
@@ -500,9 +500,9 @@ int TerrainShadow::UnknownVirtualSlot27()
     maxX = 0x80000000;
     maxZ = 0x80000000;
     field_0x6668 = 3.4028235e38f;
-    field_0x6670 = 3.4028235e38f;
     field_0x666c = -3.4028235e38f;
     field_0x6674 = -3.4028235e38f;
+    field_0x6670 = 3.4028235e38f;
     TerrainShadowVec eye = TERRAIN_SHADOW_CAMERA()->eye;
     TerrainShadowVec screen;
     int code;

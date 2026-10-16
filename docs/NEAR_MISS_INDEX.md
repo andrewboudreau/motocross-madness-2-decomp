@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 2, b 141, c 105, total 248. The three class (a) functions of the
+Counts: a 2, b 141, c 104, total 247. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -160,14 +160,14 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/shadow/ProjectedShadow | `0x004da7b0` | 130/778 (masked) | b | tail and clip rectangle match (844/842 B, 18 aligned diffs); register choice in the sprintf/QueryFlag set-up and the saved render-target fields, and retail keeps a second release-and-return block for the surface-format failures |
 | physics/shadow/ProjectedShadow | `0x004db0d0` | 123/2020 | b | magnitude/normalise/transform helpers as retail (1851/2020 B); frame and slot assignment differ (retail locals 0x14..0x3c higher), mode-1 fov block |
 | physics/shadow/ProjectedShadow | `0x004db8c0` | 21/1136 | b | 51 code diffs: retail adds `push ebp ; mov ebp, esp`; `mov [esp + N], ebx` vs `mov [ebp - N], ebx`; slot order differs; inline-asm `fistp` exclusion |
-| physics/shadow/ProjectedShadow | `0x004dbd30` | 156/1244 (masked) | b | per-format row loops and the three Duff's-device fills as retail; register assignment of the clip fields and the format-9 constants (retail uses byte ops on field_0x94's low byte) |
+| physics/shadow/ProjectedShadow | `0x004dbd30` | 164/1244 (masked) | b | per-format row loops and the three Duff's-device fills as retail; register assignment of the clip fields and the format-9 constants (retail uses byte ops on field_0x94's low byte) |
 | physics/shadow/ProjectedShadow | `0x004dc2b0` | 29/352 | b | 29 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x24 vs 0x34, slot order differs; inline-asm `fistp` exclusion |
 | physics/shadow/TerrainShadow | `0x005097d0` | 121/486 | b | 6 code diffs: retail copies extent onto its own slot through edx on the `extentX <= extentZ` path (`mov edx, [esp + 0xc] ; mov [esp + 0xc], edx`) and reloads `shadow->texture` in eax/edx where the candidate keeps edx; frame and both matrix branches match |
 | physics/shadow/TerrainShadow | `0x00508bc0` | 353/3031 | b | slot 27 footprint: frame 0xdc vs 0xd0, slot order, the cross product's operand order and the corner loops' form; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 287/432 | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts give no gain |
-| physics/tire/Tire | `0x005135f0` | 1582/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; second TireDot push earlier; one dot-term operand order |
+| physics/tire/Tire | `0x005135f0` | 1584/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; second TireDot push earlier |
 | physics/tire/Tire | `0x00513c70` | 769/797 | c | per-attachment failure clears give retail's zero register and length ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)); left: rotating path's first world-position add operand order, z sum staged in the x slot |
 | physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local (reference counts 3 vs 4, VC6_FRAME_LAYOUT fact 9); rewrites of the boost/minimum conditions and the clamp give no gain |
 | physics/tire/Tire | `0x00514170` | 565/607 | b | the push.y copy and two cross-product fsubp/mov pairs scheduled differently |
@@ -233,7 +233,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
-| render/Pixtrans | `0x004cee30` | 101/1133 | b | if/else keyed/plain loops give retail's late `push ebp` ([VC6_SHRINK_WRAP](VC6_SHRINK_WRAP.md)); `sourceRow` homed in `source`'s slot (frame 0x44 vs 0x48) shifts every slot; retail holds 0xff in bl for the search; fast-loop channel sum order |
+| render/Pixtrans | `0x004cee30` | 1079/1125 masked | b | slots of the 3-byte entry copies (retail d c b a nearest esp in the keyed loop, b a c d in the plain one); two zero stores and one post-loop reload in the other order |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
@@ -280,7 +280,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
 | ui/ProCircuitProcs | `0x004d8fc0` | 836/882 | c | 12 instruction diffs: retail loads the message kind into ecx before the circuit (VC6 here: circuit first, kind in eax) and stores the fee member first with other registers |
 | ui/ProCircuitProcs | `0x004d9860` | 1068/1122 | c | 13 instruction diffs: the prologue and init-store differences of `0x004d8fc0` |
-| ui/ProCircuitProcs | `0x004d9cd0` | 48/755 | c | 37 code diffs: retail adds `mov eax, [A]`; retail adds `mov ebp, [eax + 0x3444]` |
 | ui/SelectGamePicProcs | `0x004f2340` | 933/2148 | b | 62 code diffs: `mov [esp + N], ecx` vs `push esi`; `push esi` vs `mov [esp + N], ecx`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f3720` | 92/380 | b | 10 code diffs: retail lacks `jmp @44 ; lea ecx, [esp + N] ; push 0x80`; slots differ |
 | ui/SelectGamePicProcs | `0x004f8220` | 110/840 | b | 57 code diffs: `xor ebp, ebp` vs `xor edi, edi`; `mov [esp + N], ebp ; mov [esp + N], ebp` vs `mov [esp + N], edi ; mov [esp + N], edi`; slot order differs |

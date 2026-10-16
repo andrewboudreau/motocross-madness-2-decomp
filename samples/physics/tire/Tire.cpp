@@ -323,14 +323,15 @@ static inline CollisionVec3 TireScaleCopy(const CollisionVec3& v, float s)
 // also zeroes field_0x90) field_0x1e8 = field_0x218.
 // field_0x50 is field_0x1e8 normalised, field_0x94 its length, and the outputs report
 // |field_0x50 . field_0x230| scaled by that length in field_0x27c plus its sign.
-// Near miss, 1582 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
+// Near miss, 1584 of 1664 bytes. `tangent` is a local so VC6 homes it (and the
 // projection) in the dead `axis` argument slot like retail; `(-c) * x` keeps retail's
 // fchs-then-fmul where `-c * x` lets VC6 hoist c * x above the branch. The slip
 // vector is scaled through TireScaleCopy (retail's `fld mem; fmul st(1)`) and summed
 // and normalised through TireSum/TireScaled (retail's copy-store schedule). Left:
 // the lever's `lea edi` and store are scheduled later, the second TireDot push comes
-// before the y product instead of after it, and one x term of the d-path dot swaps
-// its operands. No gain from a products-first cross or projection for the lever
+// before the y product instead of after it (the d-path dot's x term is written
+// `ref.x * tangent.x`, which loads retail's operand first).
+// No gain from a products-first cross or projection for the lever
 // (1571), a named lever or projection local (1575), a pointer or reference alias of
 // the lever member (767), a TireScaleCopy that copies all three components or none (1548..1555),
 // or the d-path dot written out in any order (1133..1137) or through a helper with
@@ -355,7 +356,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             CollisionVec3 n;
             tangent = *Vec3Normalize(&n, &tangent);
         }
-        float d = tangent.y * ref.y + tangent.x * ref.x + tangent.z * ref.z;
+        float d = tangent.y * ref.y + ref.x * tangent.x + tangent.z * ref.z;
         this->CollisionPoint::tangentSpeed = d;
         if (d > 0.001f) {
             if (reportContactOutputs)

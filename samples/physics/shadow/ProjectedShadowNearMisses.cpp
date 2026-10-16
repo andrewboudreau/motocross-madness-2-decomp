@@ -402,7 +402,6 @@ void ProjectedShadow::Present()
         unsigned int key = colorKeyLow;
         unsigned int alpha = (unsigned short)shadowPixel;
         unsigned int n = key & 0xf;
-        unsigned int sumKey = key * 4;
         unsigned int sumMixA = (alpha + key) * 2;
         unsigned int sumMixB = key + alpha * 2 + alpha;
         unsigned int sumAlpha = alpha * 4;
@@ -419,7 +418,7 @@ void ProjectedShadow::Present()
             for (int x = 0; x <= w; x++) {
                 unsigned int sum = s[0] + s[1] + s2[0] + s2[1];
                 short out;
-                if (sum == sumKey)
+                if (sum == key * 4)
                     out = colorKeyLow;
                 else if (sum == sumAlpha)
                     out = shadowPixel;

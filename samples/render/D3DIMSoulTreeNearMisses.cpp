@@ -197,9 +197,9 @@ void D3DIMSoultreeObject::UpdateMaterialTexelRatios()
             Vector3 p2 = surface->vertices[face[2]].position;
 
             Vector3 delta = zero;
+            Vector3 edge = p0 - p1;
             delta.x = surface->vertices[face[0]].tu - surface->vertices[face[1]].tu;
             delta.y = surface->vertices[face[0]].tv - surface->vertices[face[1]].tv;
-            Vector3 edge = p0 - p1;
             float uvLength = Length(delta);
             if (uvLength <= 0.01f)
                 uvLength = 10000.0f;

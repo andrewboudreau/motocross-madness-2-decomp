@@ -1957,7 +1957,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         }
     } else {
         scratchVector = CrossProduct(worldAngularVelocity, rel);
-        Vec3 p = scratchVector + velocity;
+        Vec3 p = velocity + scratchVector;
         UnknownVirtualSlot3(&((BikeContactSet*)collisionObject)->field_0xac, &p, &rel, &s, b, 0, &out);
         if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
             velocity = g_BikeVec3_005778a8;

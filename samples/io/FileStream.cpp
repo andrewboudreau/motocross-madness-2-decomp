@@ -158,9 +158,9 @@ static inline void RestartKey(UnknownTextureStream* stream)
 // 208) and a goto past the decoded read (206) are worse.
 int UnknownTextureStream::Seek(int offset, int origin, int flag)
 {
+    UnknownTextureStream* stream = this;
     unsigned char buffer[0x418];
     int result = 0;
-    UnknownTextureStream* stream = this;
     while (stream->innerStream) {
         result = 0;
         flag = flag && offset != stream->sliceOffset;

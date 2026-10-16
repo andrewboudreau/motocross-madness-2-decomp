@@ -33,14 +33,15 @@ closes with its own `$E` set `0x004da3e0..0x004da51b`, whose vectors
 `0x00689b08` and `0x00689b28` are read at `0x004d6aba` and `0x004d73df`. The slot-29 procedures belong to the
 RTTI PC*Dlg vtables.
 
-Exact (34):
+Exact (35):
 - The eight `$E`.
 - Three qsort comparators.
 - The state-dialog opener `0x004d4ba0`.
 - The slot 29 of PCStartupDlg, PCNewDlg, PCCentralDlg, PCCentralNextDlg,
   PCCentralStandingsDlg, PCLastRaceDlg, PCFailedDlg, PCFinishedDlg,
-  PCNewEventDlg and PCCompleteDlg. PCNewEventDlg's (`0x004d9fd0`) /GX
-  prologue loads `mov edx,[esp+4]` between the fs:[0] load and `push -1`;
+  PCBonusTrackDlg, PCNewEventDlg and PCCompleteDlg. PCBonusTrackDlg's
+  (`0x004d9cd0`) declares its text buffer in each case that uses it.
+  PCNewEventDlg's (`0x004d9fd0`) /GX prologue loads `mov edx,[esp+4]` between the fs:[0] load and `push -1`;
   `mcm2tool/resolved_match.py` recognises that shape so its handler
   `0x0054d257` binds.
 - Their helpers.
@@ -57,8 +58,7 @@ Near misses (`samples/ui/ProCircuitProcsNearMisses.cpp`):
 - `0x004d59a0`: exact in the sample TU, but its reload order flips with
   unrelated declarations, so it is not registered.
 - The race payout `0x004d8c40`.
-- The slot 29 of PCBailoutDlg, PCBunnyDlg and PCBonusTrackDlg: prologue
-  scheduling differs.
+- The slot 29 of PCBailoutDlg and PCBunnyDlg: prologue scheduling differs.
 - `0x004d6fc0`: one register differs.
 
 - PCCentralBikeRiderDlg slot 10 `0x004d72c0`, 1233 of 1291 bytes: only

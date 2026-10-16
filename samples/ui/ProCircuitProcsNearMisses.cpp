@@ -36,16 +36,8 @@
 //   (exact PCNewEventDlg slot 29 has the same source shape and retail's
 //   order). g_TrackGame->proCircuit read in every case, a leading `kind`
 //   local and `self = this` are worse or the same, and no typedef count
-//   (0..63) ahead of the TU makes 0x004d8c40, 0x004d8fc0, 0x004d9860 or
-//   0x004d9cd0 exact, so it is not a symbol-arena tie-break.
-// PCBonusTrackDlg::HandleEvent (0x004d9cd0, 752 bytes): the same
-//   prologue difference, and retail copies the circuit pointer from ebp to
-//   edi for the init case (VC6 here keeps one register; `current = circuit`
-//   and using `circuit` directly compile the same). The init stores placed
-//   before `current = g_TrackGame->proCircuit` match everything after them
-//   (19 instruction diffs) but reload `current` (766 bytes); references,
-//   casts, inline getters, helper parameters and declaration orders for
-//   `current`/`circuit` all give 48.
+//   (0..63) ahead of the TU makes 0x004d8c40, 0x004d8fc0 or 0x004d9860
+//   exact, so it is not a symbol-arena tie-break.
 // PCCentralBikeRiderDlg::Tick (0x004d72c0, 1291 bytes, 1233
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
@@ -219,71 +211,6 @@ void PCBunnyDlg::HandleEvent(UnknownDialogEvent* event)
             circuit->careerFlags |= 4;
             PCFailedDlg* dialog = new(__FILE__, 1749) PCFailedDlg;
             guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            EndDialog(0);
-        }
-        break;
-    }
-}
-
-// 0x004d9cd0
-void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
-{
-    UnknownTrackGameObject3444* circuit = g_TrackGame->proCircuit;
-    char text[128];
-    switch (event->kind) {
-    case kDialogInit: {
-        UnknownTrackGameObject3444* current = g_TrackGame->proCircuit;
-        // TrackGame+0x18fc: an int per series (the bonus track was offered).
-        ((int*)g_TrackGame->mode.bonusTrackUnlocked)[current->series] = 1;
-        int title;
-        int description;
-        switch (current->series) {
-        case 2:
-            title = 0x1457;
-            description = 0x1459;
-            break;
-        case 3:
-            title = 0x1458;
-            description = 0x145a;
-            break;
-        }
-        UnknownSetText(FindControl("TitleText", 12), title);
-        UIControl* control = FindControl("TxtDescription", 12);
-        control->wordWrap = 1;
-        UnknownSetText(control, description);
-        UnknownSetText(FindControl("TxtItem1", 12), 0x145b);
-        UIControl* item = FindControl("Item1", 12);
-        sprintf(text, "$%d", 3000);
-        item->SetText(text);
-        item->SetFontColor(0xff00);
-        FindControl("Back", 1)->Show(0, 1);
-        current->racers[0].money += 3000;
-        break;
-    }
-    case kDialogCommand:
-        if (_stricmp("ButAccept", event->controlName) == 0) {
-            g_TrackGame->eventManager->ResetEntries();
-            g_TrackGame->mode.raceSettings.eventType = circuit->series;
-            g_TrackGame->mode.raceSettings.raceMode = 1;
-            g_TrackGame->mode.raceSettings.lapCount = circuit->schedules[circuit->series].laps;
-            g_TrackGame->mode.raceSettings.aiRacerCount = circuit->racerCount - 1;
-            g_TrackGame->mode.raceSettings.treeCollision = 1;
-            g_TrackGame->mode.SelectSeries(circuit->series);
-            strcpy(text, circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].trackKey);
-            char* extension = strrchr(text, '.');
-            if (extension)
-                *extension = 0;
-            strcpy(g_TrackGame->mode.raceSettings.trackName, text);
-            if (circuit->series == 1 || circuit->series == 5)
-                g_TrackGame->mode.raceSettings.trackNumber = 1;
-            else
-                g_TrackGame->mode.raceSettings.trackNumber = 0;
-            g_TrackGame->mode.difficulty = circuit->difficulty;
-            LeaveMenusForRace();
-            MarkPendingRelease();
-        } else if (_stricmp("ButDecline", event->controlName) == 0) {
-            circuit->AdvanceAfterRace();
-            OpenCareerDialog();
             EndDialog(0);
         }
         break;
