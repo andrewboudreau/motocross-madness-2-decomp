@@ -1040,10 +1040,16 @@ void KrustyBike::UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c)
     linearSpeed = KbLength(velocity);
 }
 
-// owner: bracket only (0x496d20 sits between slot 101's stub and Fn_00496DA0)
+// 0x00496d10 (exact): slot 101 forwards to the body below; VC6 compiles the call as a tail
+// `jmp 0x496d20`, followed by the usual nop alignment padding.
+void KrustyBike::UnknownVirtualSlot101()
+{
+    Fn_00496D20();
+}
+
+// owner: bracket only (0x496d20 sits between slot 101 and Fn_00496DA0)
 // 0x00496d20 (exact): the real body of slot 101, switching the active scene object from
-// altBodyA to altBodyB.  Retail's slot 101 entry (0x496d10) is a 16-byte stub, `jmp 0x496d20`
-// plus 11 nops, in front of it.  The mode test is a nested if with the 0x2d84 test written
+// altBodyA to altBodyB.  The mode test is a nested if with the 0x2d84 test written
 // positively: VC6 then computes &obj->field_0xc in the second test block, calls through ecx
 // and cross-jumps the outer else into the inner slot-5 tail as retail does (the flat
 // `x18 > 1 && !x2d84` form and the nested `!x2d84` form do not).

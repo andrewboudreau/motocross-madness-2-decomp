@@ -69,13 +69,6 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     altBodyA = 0;
 }
 
-// The 5-byte `jmp` plus 11 nops of retail's stub cannot be reproduced from C++ (no inline asm
-// or padding tricks), so this stays partial.
-void KrustyBike::UnknownVirtualSlot101()
-{
-    Fn_00496D20();
-}
-
 // Slot 70: threshold test against a per-mode table; a[] and b[][] are static-init'd locals.
 // Same bytes (151/230): level/row int locals, a flat
 // (&b[0][0])[row * 3 + level - 1] index, swapped products, an else arm. A KbGame*

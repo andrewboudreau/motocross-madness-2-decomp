@@ -12,16 +12,6 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot101@KrustyBike",
-    "target_va": "0x00496d10",
-    "target_size": 135,
-    "expect": "partial",
-    "notes": "The whole function cannot match: retail starts with jmp +11 and 11 nops (patch-point padding, not expressible in C++); its body 0x496d20 (Fn_00496D20) is exact in src/krusty2/vehicle/KrustyBike.cpp.",
-    "bindings": "KrustyBikeNearMisses.bindings.json"
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBikeNearMisses.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot11@KrustyBike",
     "target_va": "0x00491d10",
     "target_size": 1296,

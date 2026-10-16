@@ -2056,7 +2056,7 @@
     "target_va": "0x00496d20",
     "target_size": 119,
     "expect": "exact",
-    "notes": "real body of slot 101 (behind the 16-byte jmp stub at 0x496d10): swap the active scene object to altBodyB. Exact with the mode test as a nested if testing 0x2d84 positively (VC6 computes &obj->field_0xc in the second test block and cross-jumps the outer else into the slot-5 tail).",
+    "notes": "real body of slot 101 (whose entry at 0x496d10 tail-jumps here): swap the active scene object to altBodyB. Exact with the mode test as a nested if testing 0x2d84 positively (VC6 computes &obj->field_0xc in the second test block and cross-jumps the outer else into the slot-5 tail).",
     "bindings": "KrustyBike.bindings.json"
   },
   {
@@ -2387,6 +2387,16 @@
     "target_size": 339,
     "expect": "exact",
     "notes": "Bearing to the nearest rival, head-turn start. Exact with `(float)(atan2(d.x, d.z)) - savedYaw`: the parenthesised cast operand keeps the dead fpatan duplicate and pops it before the yaw fsub; `(x * 0.36963f) * 0.7f` keeps the two multiplies.",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot101@KrustyBike@@",
+    "target_va": "0x00496d10",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 101: a tail call compiled as jmp 0x496d20 (Fn_00496D20); the 11 nops after it are alignment padding",
     "bindings": "KrustyBike.bindings.json"
   }
 ]
