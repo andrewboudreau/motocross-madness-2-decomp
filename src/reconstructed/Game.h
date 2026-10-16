@@ -13,14 +13,16 @@ class TextureMapManager;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
 
-// Global at 0x0056c470: a GameObject (Game's initialiser adds it as a child
-// of the root and calls its slot 5), with a flag byte at +0x2c.
-class UnknownGlobal56c470 : public GameObject {
+// Global at 0x0056c470: initialised .data pointing at the HiResMeter
+// 0x0067b468 (GUIManager.h; g_HiResMeterInstance). Game's initialiser adds
+// it as a child of the root and calls its slot 5 when +0x2c is set. A view
+// rather than HiResMeter itself, so Game.cpp keeps its own declarations.
+class GameHiResMeterView : public GameObject {
 public:
 
-    unsigned char field_0x2c;
+    unsigned char counterUsable;              // +0x2c: HiResMeter::counterUsable
 };
-extern UnknownGlobal56c470* g_UnknownGlobal56c470;
+extern GameHiResMeterView* g_HiResMeter;
 
 // Static object at 0x0065b478: the font list (FontTextureManager.h;
 // FontTexture.cpp defines it as FontTexture::s_UnknownManager65b478).
