@@ -868,7 +868,7 @@ int Sound::CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsign
         desc.flags = flags | 0x50000;
     if (is3D) {
         desc.flags |= 0x20010;
-        desc.algorithm3D = g_UnknownSound3DAlgorithm;
+        desc.algorithm3D = DS3DALG_NO_VIRTUALIZATION;
     }
     if (isStatic)
         desc.flags |= 2;

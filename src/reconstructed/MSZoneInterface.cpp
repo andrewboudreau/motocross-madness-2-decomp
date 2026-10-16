@@ -19,15 +19,16 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-// The GUIDs at 0x00556d80..0x00556def (not defined here): the score
-// object's interface and class, the player GUID sent with both queries, the
+// The GUIDs at 0x00556d80..0x00556def (not defined here; names follow their
+// use below; the Windows SDK headers lack the values): the score object's interface
+// and class (CoCreateInstance), the player GUID sent with both queries, the
 // application GUID (also used by Net.cpp) and the two property tags.
-extern const GUID g_UnknownGuid556d80;
-extern const GUID g_UnknownGuid556da0;
-extern const GUID g_UnknownGuid556db0;
+extern const GUID g_ZoneScoreInterfaceGuid;   // 0x00556d80
+extern const GUID g_ZoneScoreClassGuid;       // 0x00556da0
+extern const GUID g_LobbyQueryPlayerGuid;     // 0x00556db0
 extern const GUID g_NetApplicationGuid;
-extern const GUID g_UnknownGuid556dd0;
-extern const GUID g_UnknownGuid556de0;
+extern const GUID g_LobbyPresetPropertyGuid;  // 0x00556dd0 GetLobbyPreset
+extern const GUID g_LobbyRankPropertyGuid;    // 0x00556de0 GetLobbyRank
 
 // DirectX 6 lobby system messages (dplobby.h layout; VC6's headers predate
 // them): DPLMSG_GETPROPERTY (type 7) and DPLMSG_GETPROPERTYRESPONSE (type 8).
@@ -93,8 +94,8 @@ int UnknownTrackGameObject3410::GetLobbyPreset(char* buffer, unsigned int size) 
     responseSize = 4;
     request.type = 7;
     request.requestId = 1;
-    request.player = g_UnknownGuid556db0;
-    request.property = g_UnknownGuid556dd0;
+    request.player = g_LobbyQueryPlayerGuid;
+    request.property = g_LobbyPresetPropertyGuid;
     result = lobby->SendLobbyMessage(2, 0, &request, sizeof(request));
     start = ReadClock();
     while (ReadClock() - start < 15000) {
@@ -110,7 +111,7 @@ int UnknownTrackGameObject3410::GetLobbyPreset(char* buffer, unsigned int size) 
             goto failed;
         if (response->requestId != 1)
             goto failed;
-        if (memcmp(&response->property, &g_UnknownGuid556dd0, sizeof(GUID)) != 0)
+        if (memcmp(&response->property, &g_LobbyPresetPropertyGuid, sizeof(GUID)) != 0)
             goto failed;
         if (response->dataSize > size) {
 failed:
@@ -137,8 +138,8 @@ int UnknownTrackGameObject3410::GetLobbyRank(char* buffer, unsigned int size) {
     responseSize = 4;
     request.type = 7;
     request.requestId = 2;
-    request.player = g_UnknownGuid556db0;
-    request.property = g_UnknownGuid556de0;
+    request.player = g_LobbyQueryPlayerGuid;
+    request.property = g_LobbyRankPropertyGuid;
     result = lobby->SendLobbyMessage(2, 0, &request, sizeof(request));
     start = ReadClock();
     while (ReadClock() - start < 15000) {
@@ -154,7 +155,7 @@ int UnknownTrackGameObject3410::GetLobbyRank(char* buffer, unsigned int size) {
             goto failed;
         if (response->requestId != 2)
             goto failed;
-        if (memcmp(&response->property, &g_UnknownGuid556de0, sizeof(GUID)) != 0)
+        if (memcmp(&response->property, &g_LobbyRankPropertyGuid, sizeof(GUID)) != 0)
             goto failed;
         if (response->dataSize > size) {
 failed:
@@ -175,7 +176,7 @@ int UnknownTrackGameObject3410::SubmitScores(unsigned int count, void* a, void* 
     unsigned int i;
     int flags;
 
-    if (CoCreateInstance(g_UnknownGuid556da0, 0, CLSCTX_INPROC_SERVER, g_UnknownGuid556d80, (void**)&score) < 0)
+    if (CoCreateInstance(g_ZoneScoreClassGuid, 0, CLSCTX_INPROC_SERVER, g_ZoneScoreInterfaceGuid, (void**)&score) < 0)
         return 0;
     if (score->UnknownMethod3(&g_NetApplicationGuid, count, 0, 0, 0x1000) < 0)
         goto failed;
