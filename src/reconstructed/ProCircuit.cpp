@@ -410,7 +410,7 @@ void UnknownTrackGameObject3444::PickComputerRacers()
         for (;;) {
             ui = g_TrackGame->ui;
             bike = &((UnknownKrustyUIBike*)ui->bikes)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->bikeCount - 1))];
-            if (bike->field_0x88)
+            if (bike->engineSizeSelectable)
                 continue;
             if (((UnknownKrustyUIModel*)ui->manufacturers)[bike->model].modelKind != bikeKind)
                 continue;

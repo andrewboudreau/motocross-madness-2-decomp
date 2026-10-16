@@ -188,7 +188,7 @@ struct UnknownKrustyUIBikeEntry {
     int manufacturer;                         // +0x00: index into +0x48
     char name[0x44];                          // +0x04: "BikeName_%02d"
     char texture[0x40];                       // +0x48: "BikeTexture_%02d"
-    int field_0x88;
+    int engineSizeSelectable;                 // +0x88: the engine size is picked in DDLEngineSize
     int engineSize;                           // +0x8c: "BikeEngineSize_%02d" (cc)
     int fourStroke;                           // +0x90: "BikeFourStroke_%02d"
 };
@@ -736,7 +736,7 @@ void KrustyUI::LoadBikesAndRiders() {
                 block.GetString(key, "", texture, -1);
                 bikes = ResizeDebugBlock(bikes, (bikeCount + 1) * sizeof(UnknownKrustyUIBikeEntry));
                 ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].manufacturer = manufacturerCount;
-                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].field_0x88 = 0;
+                ((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].engineSizeSelectable = 0;
                 length = strlen(bikeName);
                 n = length > 63 ? 63 : length;
                 strncpy(((UnknownKrustyUIBikeEntry*)bikes)[bikeCount].name, bikeName, n);
@@ -811,7 +811,7 @@ int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
     int index;
     do {
         index = (int)(RandomUnit() * (bikeCount - 1));
-    } while (((UnknownKrustyUIBikeEntry*)bikes)[index].field_0x88
+    } while (((UnknownKrustyUIBikeEntry*)bikes)[index].engineSizeSelectable
              || ((UnknownKrustyUIModelEntry*)manufacturers)[((UnknownKrustyUIBikeEntry*)bikes)[index].manufacturer].availability != 3);
     UNKNOWN_COPY_SIZED(text, ((UnknownKrustyUIBikeEntry*)bikes)[index].texture, size);
     return 0;

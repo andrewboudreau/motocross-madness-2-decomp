@@ -1021,7 +1021,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     }
     model->uiModel->Enable();
     bikeChanged = 1;
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->shown) {
             engine->Show(1, 1);
@@ -1039,7 +1039,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
         }
     }
     g_TrackGame->proCircuit->bikeRow = bikes->GetRowData(-1);
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         g_TrackGame->proCircuit->racers[0].engineSize = g_BikeClassEngineSizes[size];
@@ -1223,7 +1223,7 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     list->RemoveAllRows();
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
         int rule = g_TrackGame->proCircuit->bikeClassRule;
-        if (rule != 3 && !((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x88) {
+        if (rule != 3 && !((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSizeSelectable) {
             int bikeClass = BikeClassOf(((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize);
             if (bikeClass != 0) {
                 if (bikeClass <= 0 || bikeClass > 2)

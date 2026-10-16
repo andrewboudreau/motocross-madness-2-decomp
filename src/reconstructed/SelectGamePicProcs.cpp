@@ -2038,7 +2038,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
     }
     model->uiModel->Enable();
     bikeChanged = 1;
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->shown) {
             engine->Show(1, 1);
@@ -2058,7 +2058,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         }
     }
     g_TrackGame->mode.racerChoice.bikeIndex = bikes->GetRowData(-1);
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = g_BikeClassEngineSizes[size];

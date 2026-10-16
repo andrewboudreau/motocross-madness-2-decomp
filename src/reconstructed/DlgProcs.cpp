@@ -1083,7 +1083,7 @@ void SPBikeRiderDlg::FillBikeRiderLists() {
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     list->RemoveAllRows();
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
-        if (!((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x88) {
+        if (!((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSizeSelectable) {
             int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].model].modelKind;
             if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.bikeUnlockFlags & 1)))
                 continue;
@@ -1192,7 +1192,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
     }
     model->uiModel->Enable();
     bikeChanged = 1;
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->shown) {
             engine->Show(1, 1);
@@ -1210,7 +1210,7 @@ void SPBikeRiderDlg::ApplyChosenBike() {
         }
     }
     g_TrackGame->mode.racerChoice.bikeIndex = bikes->GetRowData(-1);
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         int previous = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
