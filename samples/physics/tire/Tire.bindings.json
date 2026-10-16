@@ -42,6 +42,7 @@
   "?SolveContact@TireAttachB@@QAEXMPBUCollisionVec3@@00000MPAMPAH@Z": "0x004fac60",
   "?TireBuildFrame@@YAXPAUCollisionMatrix4@@PBUCollisionVec3@@11HH@Z": "0x00515880",
   "?TireCollisionCallback@@YAXPAVCollisionObject@@0@Z": "0x00512e30",
+  "?TireCross@@YA?AUCollisionVec3@@ABU1@0@Z": "0x00515600",
   "?TireDot@@YAMPBUCollisionVec3@@0@Z": "0x0040ae30",
   "?TireTransformDirection@@YAXPAUCollisionVec3@@PBU1@PBUCollisionMatrix4@@@Z": "0x0042a580",
   "?TireTransformPoint@@YAXPAUCollisionVec3@@U1@PBUCollisionMatrix4@@@Z": "0x0042a510",
