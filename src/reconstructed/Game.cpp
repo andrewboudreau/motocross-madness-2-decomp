@@ -166,11 +166,11 @@ int Game::CreateObjects(char*) {
     textureManager = new(__FILE__, 282) TextureMapManager;
     childRoot->AppendChild(textureManager->SetRenderContext(renderTarget), -1);
     textureContext = textureManager;
-    field_0x20 = 0;
-    field_0x24 = 0;
-    field_0x28 = renderTarget->surfacePixelFormat;
-    field_0x2c = 0x115c;
-    field_0x30 = 0;
+    textureOpaqueGroup = 0;
+    textureAlphaGroup = 0;
+    textureOpaqueFormat = renderTarget->surfacePixelFormat;
+    textureAlphaFormat = 0x115c;
+    textureHalvings = 0;
     if (testKey) {
         int category = g_MemTagStack->Push("DebugOverlay");
         debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, textureManager, 8, 3, 3);

@@ -141,14 +141,15 @@ public:
 };
 
 // Game+0x1c..+0x33, copied as the garage model's resource context; 0x00498cf0
-// sets +0x14 when little video memory is free.
+// sets +0x14 when little video memory is free. The layout is
+// UnknownTextureFormatChoice's (TextureMap.h).
 struct UnknownKrustyUIContext {
-    TextureMapManager* field_0x00;
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
-    int field_0x10;
-    int field_0x14;
+    TextureMapManager* manager;               // +0x00
+    int opaqueGroup;                          // +0x04
+    int alphaGroup;                           // +0x08
+    int opaqueFormat;                         // +0x0c
+    int alphaFormat;                          // +0x10
+    int halvings;                             // +0x14 halve wide textures once when video memory is short
 };
 
 // The GUI's 0x00485c80 (GUIManager.h) opens a dialog resource.
@@ -309,7 +310,7 @@ void KrustyUI::BuildGarageScene(int value) {
         garageScene->AppendChild(light, -1);
         KrustyUIAddLight(lights, light);
         UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->textureContext;
-        context.field_0x14 = 0;
+        context.halvings = 0;
         if (!g_TrackGame->bladeRenderer) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
             // (2 MB below 800x600) off the total outside NT without the 0x400 cap.
@@ -321,7 +322,7 @@ void KrustyUI::BuildGarageScene(int value) {
                 !(KRUSTYUI_TARGET->targetDisplay->driverCaps & 0x400))
                 free = (KRUSTYUI_TARGET->deviceCaps & 0x4000) ? memory - 0x400000 : memory - 0x200000;
             if (!g_TrackGame->display->isAGP && free < 0x500000)
-                context.field_0x14 = 1;
+                context.halvings = 1;
         }
         KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
