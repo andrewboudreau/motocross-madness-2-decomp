@@ -28,10 +28,12 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 Vector3 g_GateDebugBoxLine[2], g_GateDebugDirectionLine[2];
 int g_ViewRacerFinished;
 
-// 0x00572988 and 0x0057298c (.data, before this file's __FILE__): the
-// track-search distance and range of 0x004e63e0.
-float g_UnknownGlobal572988 = 100.0f;
-float g_UnknownGlobal57298c = 50.0f;
+// 0x00572988 and 0x0057298c (.data, before this file's __FILE__): how far
+// ahead of and behind a racer's progress Track::PlaceNear accepts a
+// position (0x004e63e0). The ahead distance also bounds the lap-line test
+// and each progress step; BikeAI (0x00415091) scales it.
+float g_TrackSearchAhead = 100.0f;
+float g_TrackSearchBehind = 50.0f;
 
 // Field-by-field TrackPos copy (retail loads all three before storing).
 #define COPY_TRACK_POS(to, from)          \
@@ -315,7 +317,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
             }
             if (!racer->isRemote)
                 racer->onTrack = track->PlaceNear(status->previousPosition, status->progressPos,
-                                                                  g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
+                                                                  g_TrackSearchAhead, g_TrackSearchBehind, 0,
                                                                   &status->placedPos);
             else
                 track->ClosestPointOnTrack(status->previousPosition, &status->placedPos, 0);
@@ -323,10 +325,10 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 racer->offTrackTime = 0;
                 status->goalDistance = track->DistanceAlong(status->progressPos, finish->trackPos);
                 status->gateDistance = track->DistanceAlong(status->placedPos, finish->trackPos);
-                if (status->goalDistance < g_UnknownGlobal572988 && status->goalDistance < status->gateDistance)
+                if (status->goalDistance < g_TrackSearchAhead && status->goalDistance < status->gateDistance)
                     COPY_TRACK_POS(status->placedPos, status->progressPos);
-                if ((racer->isRemote && racer->forceGatePass) || g_UnknownGlobal572988 < 0.0f ||
-                    (!racer->isRemote && status->goalDistance >= 0.0f && status->goalDistance < g_UnknownGlobal572988)) {
+                if ((racer->isRemote && racer->forceGatePass) || g_TrackSearchAhead < 0.0f ||
+                    (!racer->isRemote && status->goalDistance >= 0.0f && status->goalDistance < g_TrackSearchAhead)) {
                     if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
                                               &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
                                               racer->totalRunningTime, &racer->lapStartTime, &racer->fastestLap, 1,
@@ -339,7 +341,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 if (racer->hasFinished && racer == racer->bikeView->localRacer)
                     g_ViewRacerFinished = 1;
                 status->progressStep = track->DistanceAlong(status->progressPos, status->placedPos);
-                if (status->progressStep > 0.0f && status->progressStep < g_UnknownGlobal572988 &&
+                if (status->progressStep > 0.0f && status->progressStep < g_TrackSearchAhead &&
                     status->progressStep < status->goalDistance) {
                     status->progressTotal += status->progressStep;
                     COPY_TRACK_POS(status->progressPos, status->placedPos);
