@@ -14,7 +14,7 @@ Extent: `0x004f1740..0x004f975b`. Evidence:
 - **End:** the unit ends with its four kVec3 `$E` pairs, whose vectors only
   this unit reads. SelectiveGravityModel.cpp starts at `0x004f9760`.
 
-- **Start:** the player-record array at `0x00689d08` and its initializers
+- **Start:** the player-record array `g_LobbyRemotePlayers` (`0x00689d08`) and its initializers
   `0x004f1740..0x004f1793` open the unit. `.CRT$XCU` lists `0x004f1740`
   right after this unit's vector initializers, and not next to
   SceneManager.cpp's. The array lies inside this unit's vector `.bss`

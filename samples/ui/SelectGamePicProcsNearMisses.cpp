@@ -57,7 +57,7 @@ void MultiPlayerDlg::AddChatLine(int player, const char* text) {
             sprintf(line, "~1%s: ~0%s", name, text);
         } else {
             for (int i = 0; i < 7; i++) {
-                if (g_UnknownGlobal689d08[i].id == player)
+                if (g_LobbyRemotePlayers[i].id == player)
                     sprintf(line, "~%1d%s: ~0%s", i + 2, name, text);
             }
         }
@@ -201,13 +201,13 @@ static inline float RandomUnit() {
 // the AI racers and the starting grid.
 void MultiPlayerDlg::SendStartMessage(short start) {
     int i;
-    g_TrackGame->mode.raceSettings.networkPlayerCount = g_UnknownGlobal689df8 + 1;
+    g_TrackGame->mode.raceSettings.networkPlayerCount = g_LobbyRemotePlayerCount + 1;
     g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
     g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
     g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
     int total = g_TrackGame->mode.racerCount;
     g_TrackGame->mode.maxOpponents =
-        lobbySlots.GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
+        lobbySlots.GrantRacers(g_LobbyRemotePlayerCount + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
     if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.multiplayerAiRacerCount)
         g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = g_TrackGame->mode.maxOpponents;
     if (start) {
@@ -217,12 +217,12 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         g_TrackGame->ui->PickRandomRacers(bikes, total, riders);
         g_TrackGame->ui->MakeRandomNames(names, total);
         for (i = 0; i < g_TrackGame->playerCount - 1; i++) {
-            g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
+            g_TrackGame->mode.racers[i + 1].networkPlayerId = g_LobbyRemotePlayers[i].id;
             g_TrackGame->mode.racers[i + 1].racerIndex = 0;
         }
         g_TrackGame->mode.racers[0].networkPlayerId = g_TrackGame->network->localPlayer;
         g_TrackGame->mode.racers[0].racerIndex = 0;
-        int racer = g_UnknownGlobal689df8 + 1;
+        int racer = g_LobbyRemotePlayerCount + 1;
         for (int j = 0; j < 8; j++) {
             for (int k = 0; k < lobbySlots.slots[j].grantedRacers; k++) {
                 g_TrackGame->mode.racers[racer].networkPlayerId = lobbySlots.slots[j].playerId;
@@ -288,7 +288,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
         message.field_0x1f8[0] = g_TrackGame->mode.plateNumber;
         g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer, name);
         strcpy(message.playerNames[0], name);
-        int humans = g_UnknownGlobal689df8 + 1;
+        int humans = g_LobbyRemotePlayerCount + 1;
         for (i = 1; i < humans; i++) {
             message.field_0x1f8[i] = g_TrackGame->mode.racers[i].plateNumber;
             strcpy(message.playerNames[i], g_TrackGame->mode.racers[i].playerName);
