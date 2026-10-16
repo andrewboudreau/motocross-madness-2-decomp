@@ -58,7 +58,7 @@ void QuadTree::Reset()
 {
     g_pQuadTree = this;
     liveNodeCount = 0;
-    field_0x858 = -1;
+    statsId = -1;
     stateFlags &= ~2;
     objectCount = 0;
     field_0x860 = 0;

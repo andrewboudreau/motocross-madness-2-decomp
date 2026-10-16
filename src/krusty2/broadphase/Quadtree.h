@@ -110,7 +110,8 @@ public:
     int sortedCount;  // +0x80 number of entries in the sorted stack sortedStack; popped with --
     QuadTreeObject* sortedStack[500]; // +0x84 sorted-query object stack (0x1f4 entries max)
     int liveNodeCount;                 // +0x854 live node count (QuadTreeNode ctor++/dtor--)
-    int field_0x858;
+    int statsId;                     // +0x858 -1 from Reset; VisibilityQuadTree::PrepareGeometry takes a
+                                     // profiler log line into it for its "QuadTree" Memory/PrepareGeometry lines
     int objectCount;  // +0x85c Insert ++ / Remove -- (once per call, not per cell)
     int field_0x860;
     QuadTreeObject** resultArray;    // +0x864 result array, freed with debug delete (line 0x85) by the dtor

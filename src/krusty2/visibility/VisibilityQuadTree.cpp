@@ -129,15 +129,15 @@ int VisibilityQuadTree::PrepareGeometry()
     Query(cam->worldX, cam->worldZ, cam);
     g_visibilityQueryTicks = ReadClock() - start;
     if (g_profiler->log) {
-        if (field_0x858 < 0) {
+        if (statsId < 0) {
             VisibilityLog* log = g_profiler->log;
             int line = log->nextLineIndex++;
-            field_0x858 = line;
+            statsId = line;
         }
         g_visibilityTickStat.AddSample(g_visibilityQueryTicks);
-        SetLineName(g_profiler->log, field_0x858, "QuadTree");
-        LogLine(g_profiler->log, field_0x858, "Memory %d", g_memoryStats->GetBytes("QuadTree"));
-        LogLine(g_profiler->log, field_0x858, "PrepareGeometry %d %d", g_visibilityQueryTicks,
+        SetLineName(g_profiler->log, statsId, "QuadTree");
+        LogLine(g_profiler->log, statsId, "Memory %d", g_memoryStats->GetBytes("QuadTree"));
+        LogLine(g_profiler->log, statsId, "PrepareGeometry %d %d", g_visibilityQueryTicks,
                 g_visibilityTickStat.GetValue());
     }
     return 1;
