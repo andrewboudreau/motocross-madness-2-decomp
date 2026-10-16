@@ -292,8 +292,8 @@ int Convert8To24(void* destination, void* source, int width, int height, int des
     return 1;
 }
 
-// 0x004d1150: converts palette indices through the +0x510 table.
-int UnknownFunction4d1150(void* destination, void* source, int width, int height, int destinationStride,
+// 0x004d1150: converts palette indices to 565 through entries565 (+0x510).
+int Convert8To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -308,8 +308,8 @@ int UnknownFunction4d1150(void* destination, void* source, int width, int height
     return 1;
 }
 
-// 0x004d11c0: converts palette indices through the +0x310 table.
-int UnknownFunction4d11c0(void* destination, void* source, int width, int height, int destinationStride,
+// 0x004d11c0: converts palette indices to 555 through entries555 (+0x310).
+int Convert8To555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -1071,12 +1071,12 @@ int ConvertPixels(void* destination, void* source, int width, int height, int de
     case 8:
         switch (format) {
         case 555:
-            return UnknownFunction4d11c0(destination, source, width, height, destinationStride, sourceStride, palette);
+            return Convert8To555(destination, source, width, height, destinationStride, sourceStride, palette);
         case 8:
             return Downsample8(destination, source, width, height, destinationStride, sourceStride, 0,
                                          palette);
         case 565:
-            return UnknownFunction4d1150(destination, source, width, height, destinationStride, sourceStride, palette);
+            return Convert8To565(destination, source, width, height, destinationStride, sourceStride, palette);
         case 888:
             return Convert8To24(destination, source, width, height, destinationStride, sourceStride, palette);
         }

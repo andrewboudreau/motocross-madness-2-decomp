@@ -81,11 +81,11 @@ int Convert565To555(void* destination, void* source, int width, int height, int 
 // 0x004d10b0: palette indices to 24-bit RGB.
 int Convert8To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette);
-// 0x004d1150, 0x004d11c0: palette indices through the palette's 16-bit
-// tables (+0x510, +0x310).
-int UnknownFunction4d1150(void* destination, void* source, int width, int height, int destinationStride,
+// 0x004d1150, 0x004d11c0: palette indices to 565 / 555 through the
+// palette's 16-bit tables (entries565 at +0x510, entries555 at +0x310).
+int Convert8To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette);
-int UnknownFunction4d11c0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert8To555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette);
 
 // 0x004d1230: 8888 to 4444.

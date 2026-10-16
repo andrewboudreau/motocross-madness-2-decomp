@@ -38,8 +38,8 @@ Earlier cases:
 | `0x004d0fb0` | 114 | 555 to 565 |
 | `0x004d1030` | 114 | 565 to 555 |
 | `0x004d10b0` | 150 | palette indices to 24-bit RGB (+0x10 entries) |
-| `0x004d1150` | 109 | palette indices through the 16-bit table at +0x510 |
-| `0x004d11c0` | 109 | palette indices through the 16-bit table at +0x310 |
+| `0x004d1150` | 109 | palette indices to 565 through `entries565` (+0x510); the dispatch's 8 to 565 case |
+| `0x004d11c0` | 109 | palette indices to 555 through `entries555` (+0x310); the dispatch's 8 to 555 case |
 | `0x004d1230` | 152 | 8888 to 4444 |
 | `0x004d12d0` | 157 | 8888 to 1555, opaque at or above an alpha threshold |
 | `0x004d1370` | 208 | 24-bit to 1555; the 0xRRGGBB key becomes 0 |
