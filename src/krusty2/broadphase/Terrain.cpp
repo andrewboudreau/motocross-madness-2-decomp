@@ -388,8 +388,8 @@ public:
 // The profile page (DebugOverlay in src/reconstructed; cdecl member printers).
 class TerrainDebugOverlay {
 public:
-    void UnknownFunction447f40(int row, const char* format, ...);   // 0x00447f40: one line
-    void UnknownFunction447fa0(int row, const char* format, ...);   // 0x00447fa0: the page title
+    void Print(int row, const char* format, ...);   // 0x00447f40: one line (DebugOverlay::Print)
+    void Title(int row, const char* format, ...);   // 0x00447fa0: the page title (DebugOverlay::Title)
     char pad_0x0000[0x26c0];
     int pageCount;                                             // +0x26c0 next free page
 };
@@ -608,46 +608,46 @@ int Terrain::GameObjectVirtualSlot14()
         g_terrainPeak8.Record(g_UnknownGlobal68a31c);
         g_UnknownGlobal68a320 = g_UnknownGlobal68a318 + g_UnknownGlobal68a31c;
         g_terrainPeak9.Record(g_UnknownGlobal68a320);
-        g_terrainGame->overlay->UnknownFunction447fa0(g_UnknownGlobal574714, "Terrain Tolerance:%d",
+        g_terrainGame->overlay->Title(g_UnknownGlobal574714, "Terrain Tolerance:%d",
                                                       drawDistance);
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Memory %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Memory %d",
                                                       g_MemTagStack->GetBytes("Terrain"));
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
                                                       g_UnknownGlobal68a308, g_UnknownGlobal68a30c,
                                                       g_terrainPeak0.Peak(),
                                                       g_terrainPeak1.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Setup   %d %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Setup   %d %d",
                                                       profileSetup, g_terrainPeak2.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Eval    %d[%d] %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Eval    %d[%d] %d",
                                                       profileEval, vertexErrorTests,
                                                       g_terrainPeak3.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Mesh    %d[%d] %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Mesh    %d[%d] %d",
                                                       profileMesh, bufferRebuilds,
                                                       g_terrainPeak4.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Cache   %d[%f] %d[%f]",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Cache   %d[%f] %d[%f]",
                                                       g_UnknownGlobal68a310,
                                                       g_UnknownGlobal689ff4 * (1.0f / 1048576.0f),
                                                       g_terrainPeak5.Peak(),
                                                       g_terrainPeak6.Peak() * (1.0f / 1048576.0f));
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "  [%f]",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "  [%f]",
                                                       (ownedObjectArrayCount << 17) * (1.0f / 786432.0f));
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total   %d %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total   %d %d",
                                                       g_UnknownGlobal68a320, g_terrainPeak9.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Vertex Buffers %d (%d)",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Vertex Buffers %d (%d)",
                                                       g_gridDrawMemory, g_gridDrawMemoryPeak);
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "PrepareGeometry% 3d (%d)",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "PrepareGeometry% 3d (%d)",
                                                       g_UnknownGlobal68a318, g_terrainPeak7.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Render3D%        3d (%d)",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Render3D%        3d (%d)",
                                                       g_UnknownGlobal68a31c, g_terrainPeak8.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total%           3d (%d)",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total%           3d (%d)",
                                                       g_UnknownGlobal68a320, g_terrainPeak9.Peak());
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Transforms %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total Transforms %d",
                                                       ((TerrainRenderTarget*)field_0x18)->transformCount - transforms);
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Triangles  %d",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total Triangles  %d",
                                                       ((TerrainRenderTarget*)field_0x18)->triangleCount - triangles);
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "CanSinglePassDual %s",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "CanSinglePassDual %s",
                                                       canSinglePassDual ? "TRUE" : "FALSE");
-        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "SinglePassDual    %s",
+        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "SinglePassDual    %s",
                                                       lowestQualityOverride ? "TRUE" : "FALSE");
     }
     g_MemTagStack->Pop(previousTag);
