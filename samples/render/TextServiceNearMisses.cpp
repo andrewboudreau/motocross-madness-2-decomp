@@ -28,13 +28,14 @@
 // DrawText4444 (0x0050b400, 758 bytes; 4444 texels),
 // DrawText1555 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit
 // body of DrawTextInto (0x0050b080, 890 bytes; its format dispatch
-// matches): same instructions, different register/stack assignment. Retail
-// keeps fontStride in ebp (stride at [esp+0x34]), w in esi and v in the slot
-// later reused for the row count; VC6 here gives ebp to stride and esi to v,
-// and computes the row offsets after the `h == 0` test instead of before.
+// matches): same instructions, different register/stack assignment.
+// fontStride declared after `end` gives retail's ebp for it (stride at
+// [esp+0x34]); differing instructions 54 -> 30 (DrawTextInto) and 55 -> 31
+// (the 16-bit pair). Left: retail keeps w in esi and v in the slot later
+// reused for the row count, VC6 here the reverse (w before v or u is worse:
+// 39, 51), and the row offsets are formed in other registers.
 // Pointer-walking rows, fully indexed rows, top-of-function declarations,
-// signed coordinates, swapped declarations and inline pitch expressions are
-// all further off.
+// signed coordinates and inline pitch expressions are all further off.
 //
 // LayoutText (0x0050ba00, 802 bytes): 770 of 802; only the
 // scheduling of two stores (v3.sx and v5.sx) differs. Writing through a
@@ -84,8 +85,8 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
     Rectangle2D cell(0, 0, 0, 0);
     unsigned int length = strlen(text);
     unsigned int stride = (unsigned long)pitch >> 2;
-    unsigned int fontStride = (unsigned long)fontPitch >> 2;
     int end = 0;
+    unsigned int fontStride = (unsigned long)fontPitch >> 2;
     unsigned int px = x;
     unsigned int py = y;
     unsigned int i;
@@ -135,8 +136,8 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
     Rectangle2D cell(0, 0, 0, 0);
     unsigned int length = strlen(text);
     unsigned int stride = (unsigned long)pitch >> 1;
-    unsigned int fontStride = (unsigned long)fontPitch >> 1;
     int end = 0;
+    unsigned int fontStride = (unsigned long)fontPitch >> 1;
     unsigned int px = x;
     unsigned int py = y;
     unsigned int i;
@@ -186,8 +187,8 @@ int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const ch
     Rectangle2D cell(0, 0, 0, 0);
     unsigned int length = strlen(text);
     unsigned int stride = (unsigned long)pitch >> 1;
-    unsigned int fontStride = (unsigned long)fontPitch >> 1;
     int end = 0;
+    unsigned int fontStride = (unsigned long)fontPitch >> 1;
     unsigned int px = x;
     unsigned int py = y;
     unsigned int i;

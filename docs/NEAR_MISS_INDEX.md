@@ -237,9 +237,9 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
-| render/TextService | `0x0050b080` | 477/890 | b | 34 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
-| render/TextService | `0x0050b400` | 354/758 | b | 33 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
-| render/TextService | `0x0050b700` | 354/758 | b | 33 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
+| render/TextService | `0x0050b080` | 530/890 | b | 30 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
+| render/TextService | `0x0050b400` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
+| render/TextService | `0x0050b700` | 398/758 | b | 31 differing instructions: w and v trade esi and a stack slot; row offsets in other registers |
 | render/TextService | `0x0050ba00` | 770/802 | b | scheduling of the v3.sx and v5.sx stores |
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
 | track/SceneManager | `0x004ecd60` | 4534/4536 | c | the name terminator adds the count before the element offset (`add edx, esi`; retail `add edx, ebx`) |
