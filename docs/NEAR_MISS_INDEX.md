@@ -233,7 +233,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
-| render/Pixtrans | `0x004cee30` | 101/1133 | b | if/else keyed/plain loops give retail's late `push ebp` ([VC6_SHRINK_WRAP](VC6_SHRINK_WRAP.md)); `sourceRow` homed in `source`'s slot (frame 0x44 vs 0x48) shifts every slot; retail holds 0xff in bl for the search; fast-loop channel sum order |
+| render/Pixtrans | `0x004cee30` | 1079/1125 masked | b | slots of the 3-byte entry copies (retail d c b a nearest esp in the keyed loop, b a c d in the plain one); two zero stores and one post-loop reload in the other order |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
