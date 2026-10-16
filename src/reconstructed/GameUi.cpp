@@ -1879,7 +1879,7 @@ UIDialog::~UIDialog() {
         (dialogPalette && parentDialog && parentDialog->dialogPalette != dialogPalette))
         ((Palette8*)dialogPalette)->Release();
     if (!g_TrackGame->shuttingDown && ownsBackground && parentBackground) {
-        dialogBackground->field_0x2c->Release();
+        dialogBackground->currentImage->Release();
         dialogBackground->SetImage(parentBackground);
     }
     if (!g_TrackGame->shuttingDown && parentDialog && parentDialog->dialogBackground)

@@ -2,7 +2,7 @@
 // until they match. See docs/BACKGROUNDIMAGE.md.
 //
 // 0x004049d0 (678 bytes): retail stores the three leading zeros (and
-// `field_0x60 = 0`) as immediates; VC6 here caches 0 in edi, which shifts
+// `copyDcNext = 0`) as immediates; VC6 here caches 0 in edi, which shifts
 // the register choice of the region loop. Statement orders and a helper
 // for the DC tail do not change that. The DC tail as `if (surface) { ... }
 // return 0;` with the release branch returning on its own gives retail's
@@ -11,7 +11,7 @@
 // diffs, candidate 678 bytes like retail. Then `*a = 0` before `surface = 0`
 // and `surface` before `*a = 1` in the copy branch align the rest. All six
 // orders of the three leading stores, `surface` initialised at its
-// declaration and `field_0x60 = 0` first in its branch keep the edi zero.
+// declaration and `copyDcNext = 0` first in its branch keep the edi zero.
 
 #include <string.h>
 
@@ -44,17 +44,17 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
     if (dirty) {
         if (copyValid) {
             if (*frames) {
-                if (field_0x60) {
+                if (copyDcNext) {
                     surface = offscreenCopy;
                     *a = 1;
-                    field_0x60 = 0;
+                    copyDcNext = 0;
                 } else {
                     surface = Target()->renderSurface;
-                    field_0x60 = 1;
+                    copyDcNext = 1;
                     (*frames)--;
                 }
             } else {
-                field_0x60 = 1;
+                copyDcNext = 1;
                 for (g_GetDcRegionIndex = 0; g_GetDcRegionIndex < regionCapacity; g_GetDcRegionIndex++) {
                     if (regionTable[g_GetDcRegionIndex].lastFrameCount != Target()->frameCount)
                         continue;
@@ -64,24 +64,24 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
                     g_GetDcClipRect.bottom = CurrentRegionRect(g_GetDcRegionIndex).bottom < rect->bottom ? CurrentRegionRect(g_GetDcRegionIndex).bottom : rect->bottom;
                     if (g_GetDcClipRect.left < g_GetDcClipRect.right &&
                         g_GetDcClipRect.top < g_GetDcClipRect.bottom) {
-                        if (field_0x68 && g_GetDcRegionIndex > field_0x64) {
+                        if (lastDcRegionCopied && g_GetDcRegionIndex > lastDcRegion) {
                             surface = Target()->renderSurface;
-                            field_0x68 = 0;
-                        } else if (!field_0x68 && g_GetDcRegionIndex == field_0x64) {
+                            lastDcRegionCopied = 0;
+                        } else if (!lastDcRegionCopied && g_GetDcRegionIndex == lastDcRegion) {
                             surface = offscreenCopy;
-                            field_0x68 = 1;
+                            lastDcRegionCopied = 1;
                         } else {
                             continue;
                         }
                         *a = 1;
                         *clip = g_GetDcClipRect;
-                        field_0x64 = g_GetDcRegionIndex;
+                        lastDcRegion = g_GetDcRegionIndex;
                         break;
                     }
                 }
                 if (g_GetDcRegionIndex == regionCapacity) {
-                    field_0x68 = 1;
-                    field_0x64 = -1;
+                    lastDcRegionCopied = 1;
+                    lastDcRegion = -1;
                 }
             }
         } else {

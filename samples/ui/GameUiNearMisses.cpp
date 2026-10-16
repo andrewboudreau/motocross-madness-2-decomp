@@ -966,10 +966,10 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                         if (file) {
                             ownsBackground = 1;
                             if (parentDialog)
-                                parentBackground = dialogBackground->field_0x2c;
-                            dialogBackground->field_0x2c =
+                                parentBackground = dialogBackground->currentImage;
+                            dialogBackground->currentImage =
                                 new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialogTextures, 1);
-                            dialogBackground->field_0x2c->CreateSurface(
+                            dialogBackground->currentImage->CreateSurface(
                                 file->bits, file->width, file->height, file->width, file->width, 0x22b, depth,
                                 dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialogPalette)->colorMapper : 0,
                                 4, dialogPalette ? ((Palette8*)dialogPalette)->ddPalette : 0, 0, 0, 2, 1, 0,
