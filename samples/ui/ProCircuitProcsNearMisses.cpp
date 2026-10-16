@@ -264,9 +264,9 @@ void PCBonusTrackDlg::HandleEvent(UnknownDialogEvent* event)
         if (_stricmp("ButAccept", event->controlName) == 0) {
             g_TrackGame->eventManager->ResetEntries();
             g_TrackGame->mode.raceSettings.eventType = circuit->series;
-            g_TrackGame->mode.raceSettings.raceMode = 1;
             g_TrackGame->mode.raceSettings.lapCount = circuit->schedules[circuit->series].laps;
             g_TrackGame->mode.raceSettings.aiRacerCount = circuit->racerCount - 1;
+            g_TrackGame->mode.raceSettings.raceMode = 1;
             g_TrackGame->mode.raceSettings.treeCollision = 1;
             g_TrackGame->mode.SelectSeries(circuit->series);
             strcpy(text, circuit->schedules[circuit->series].tracks[circuit->raceIndex - 1].trackKey);
