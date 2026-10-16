@@ -2142,7 +2142,7 @@ void UIDialog::AbortWithoutNotify() {
 }
 
 // 0x0046ffc0
-void UIDialog::UnknownFunction46ffc0(int value) {
+void UIDialog::SetPopupAlignment(int value) {
     popupAlignment = value;
 }
 

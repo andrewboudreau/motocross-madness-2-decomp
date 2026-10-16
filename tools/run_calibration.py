@@ -14731,7 +14731,7 @@ CASES = [
         'name': 'gameui.cpp UIDialog::fn46ffc0',
         'bindings': 'src/reconstructed/GameUi.bindings.json',
         'source': 'src/reconstructed/GameUi.cpp',
-        'symbol': '?UnknownFunction46ffc0@UIDialog@@QAEXH@Z',
+        'symbol': '?SetPopupAlignment@UIDialog@@QAEXH@Z',
         'target_va': '0x0046ffc0',
         'target_size': 13,
         'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',

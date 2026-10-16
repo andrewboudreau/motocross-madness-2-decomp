@@ -270,7 +270,7 @@
   "?SetShown@UIDialog@@QAEXH@Z": "0x0046ea60",
   "?UpdatePointerHover@UIDialog@@QAEXXZ": "0x0046f120",
   "?AbortWithoutNotify@UIDialog@@QAEXXZ": "0x0046ff60",
-  "?UnknownFunction46ffc0@UIDialog@@QAEXH@Z": "0x0046ffc0",
+  "?SetPopupAlignment@UIDialog@@QAEXH@Z": "0x0046ffc0",
   "?SetBackground@UIDialog@@QAEXPAX@Z": "0x0046ffd0",
   "?RequestHover@UIDialog@@QAEHPAVUIControl@@HH@Z": "0x00470000",
   "?SetModalPause@UIDialog@@QAEXHHPAUCameraRect@@@Z": "0x00470070",
