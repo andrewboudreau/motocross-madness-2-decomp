@@ -128,7 +128,7 @@ inline float BikeAILength(const Vec3& v)
 // kinds 2 and 3) along the path, and returns in *outDir the flat unit direction from
 // 'pos' to that point shifted sideways by 'side'.  Stores the reached segment/parameter
 // in the path.  Callers: 0x0040f1ef and 0x0041256c.  Names tier 3.
-int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float speed,
+int PathSteeringDirection(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float speed,
                           float side)
 {
     if (!path || !outDir || path->count < 1)
@@ -279,7 +279,7 @@ inline Vec3 BikeAINormalize(const Vec3& v)
 // sets the debug line 0x00578dc0 (pos and target raised by 3).  Returns 0 for a
 // missing path/terrain, an index outside the path or dt <= 0, else 1.
 // Callers: 0x0040f2c9 and 0x00412654.  Arithmetic tier 1, names tier 3.
-int UnknownFunction40d200(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
+int PredictPathMotion(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* outDir,
                           float maxTime, float dt, Terrain* terrain, float side,
                           float* outTakeoffTime, Vec3* outVel)
 {
@@ -587,7 +587,7 @@ extern Vec3 g_ObstacleDebugRightLine[2];
 // quadtree it only runs the capsule test over all CollisionObjects.  Outputs: *outDist
 // (nearest hit, 1000 when none), *outPush normalised (zero when flat), *outPoint = acc -
 // dir * push.  Returns whether anything was hit.  Caller: 0x00410a43.  Names tier 3.
-int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignoreCount,
+int QuerySegmentObstacles(Vec3* seg, float radius, int skipVegetation, int ignoreCount,
                           CollisionObject** ignoreList, float push, Vec3* outPush,
                           Vec3* outPoint, float* outDist, int nearOnly)
 {
@@ -850,7 +850,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
 // 1.  Caller: KrustyBike 0x00413a0c.  Arithmetic tier 1 (decoded), names tier 3.
 // Both 0x0040d200 calls pass 0.05f as the sixth argument (retail pushes 0x3d4ccccd at
 // +0x5cd and +0x3951; an earlier 0.1f was a semantic slip).
-int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, float* outSpeed,
+int SimulateLookAhead(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, float* outSpeed,
                           Vec3* center, Vec3* forward, Vec3* side, float maxTime, float dt,
                           Terrain* terrain, unsigned char* outAirborne, float* outImpact, CollisionObject* probe,
                           float* frontSusp, float* rearSusp, int* outFrontContact, int* outRearContact,
@@ -917,13 +917,13 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
     float cosA;
     if (path) {
         float speed = BikeAILengthCall(vF);
-        if (!UnknownFunction40e510(&aim, front, path, speed, sideOffset)) {
+        if (!PathSteeringDirection(&aim, front, path, speed, sideOffset)) {
             aim = vF;
             aim.y = 0.0f;
             aim = SafeNormalize(aim);
         }
         takeoffVel = vF;
-        if (!UnknownFunction40d200(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
+        if (!PredictPathMotion(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
                                    &takeoffVel))
             return 0;
         if (DotProduct(aim, fwd) < 0.70755f) {
@@ -1132,7 +1132,7 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
                 Vec3 push;
                 Vec3 avoidPoint;
                 float avoidDist;
-                if (UnknownFunction415640(seg, 2.0f, g_BikeAIGame_0056e26c->field_0x2d80 == 0, probe->ignoreCount,
+                if (QuerySegmentObstacles(seg, 2.0f, g_BikeAIGame_0056e26c->field_0x2d80 == 0, probe->ignoreCount,
                                           (CollisionObject**)probe->ignoreList, speedF, &push, &avoidPoint,
                                           &avoidDist, nearOnly)
                     && !(push.x == 0.0f && push.z == 0.0f)) {
@@ -1273,13 +1273,13 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
             right.z = -fwd.x;
             right = SafeNormalize(right);
             if (path) {
-                if (!UnknownFunction40e510(&aim, front, path, speedF, sideOffset)) {
+                if (!PathSteeringDirection(&aim, front, path, speedF, sideOffset)) {
                     aim = fwd;
                     aim.y = 0.0f;
                     aim = SafeNormalize(aim);
                 }
                 takeoffVel = vF;
-                if (!UnknownFunction40d200(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
+                if (!PredictPathMotion(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
                                            &takeoffVel))
                     return 0;
                 if (DotProduct(aim, fwd) < 0.70755f) {
@@ -1640,7 +1640,7 @@ int KrustyBike::Fn_00413200(float dt)
     field_0x7e0 = CrossProduct(*w, bodyForward) * 3.5f + velocity;
     field_0x7ec = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
     unsigned char airborneOut = airborne;
-    UnknownFunction40eca0(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
+    SimulateLookAhead(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
                           &bodyForward, &bodyUp, dt, dt, race->raceTerrain, &airborneOut,
                           &impact, probeSegment, &lookAheadFrontTravel, &lookAheadRearTravel,
                           &frontWheel->inContact, &rearWheel->inContact, &aiPath,
