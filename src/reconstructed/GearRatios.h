@@ -46,7 +46,7 @@ public:
 
     float throttleFraction;                   // +0x00 throttle fraction, clamped to [0, 1]
     float currentRpm;                         // +0x04 current rpm
-    int field_0x08;
+    int driveCut;                             // +0x8  set off the throttle and on a shift; else UpdateThrottle's third argument (Vehicle passes its braking state); DriveForce gives no engine torque while set
     float shiftTimer;                         // +0x0c shift timer
     unsigned char currentGear;                // +0x10 current gear
     char pad_0x11[3];
