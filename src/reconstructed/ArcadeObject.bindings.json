@@ -45,7 +45,7 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__:arcadeobject.cpp": "0x00566644",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ff98efa340000000000": "0x00550480",

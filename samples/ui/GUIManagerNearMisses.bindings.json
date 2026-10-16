@@ -214,7 +214,7 @@
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownGlobal65b534@@3HA": "0x0065b534",
+  "?g_TickTime@@3HA": "0x0065b534",
   "?g_HiResMeterInstance@@3VHiResMeter@@A": "0x0067b468",
   "_$E1": "0x00484de0",
   "_$E10": "0x00484ed0",

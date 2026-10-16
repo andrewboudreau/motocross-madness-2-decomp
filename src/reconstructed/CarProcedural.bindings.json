@@ -53,7 +53,7 @@
   "?UnknownVirtualSlot27@CarProcedural@@UAEPAV1@PAXPBD1HH01PBUVector3@@MHMHIMMM@Z$ehhandler": "0x00549de2",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x00430ec0",
   "_$E10": "0x00430fb0",
   "_$E11": "0x00430fa0",

@@ -84,9 +84,9 @@ D3DIMSoultreeObject::~D3DIMSoultreeObject()
     }
     RemoveAllModifiers();
     RemoveAllSecondModifiers();
-    void* item = g_UnknownResourceManager572b44->FindItemByObject(this);
+    void* item = g_ResourceManager->FindItemByObject(this);
     if (item)
-        g_UnknownResourceManager572b44->SetItemObject(item, 0);
+        g_ResourceManager->SetItemObject(item, 0);
 }
 
 // 0x0043f4b0
@@ -119,10 +119,10 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
         strcat(fullPath, dir);
         strcat(fullPath, fname);
         strcat(fullPath, ".slb");
-        ResourceItem* item = g_UnknownResourceManager572b44->FindItem(name, 0);
+        ResourceItem* item = g_ResourceManager->FindItem(name, 0);
         if (!item) {
-            g_UnknownResourceManager572b44->AddLooseFile(name, fullPath);
-            item = g_UnknownResourceManager572b44->FindItem(name, 0);
+            g_ResourceManager->AddLooseFile(name, fullPath);
+            item = g_ResourceManager->FindItem(name, 0);
         }
         if (item) {
             if (item->object) {
@@ -146,10 +146,10 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
             strcat(fullPath, dir);
             strcat(fullPath, fname);
             strcat(fullPath, ".slt");
-            item = g_UnknownResourceManager572b44->FindItem(name, 0);
+            item = g_ResourceManager->FindItem(name, 0);
             if (!item) {
-                g_UnknownResourceManager572b44->AddLooseFile(name, fullPath);
-                item = g_UnknownResourceManager572b44->FindItem(name, 0);
+                g_ResourceManager->AddLooseFile(name, fullPath);
+                item = g_ResourceManager->FindItem(name, 0);
                 if (!item) {
                     RegisterNode();
                     return this;
@@ -161,13 +161,13 @@ GameObject* D3DIMSoultreeObject::UnknownVirtualSlot9(void* owner, const char* pa
                 RegisterNode();
                 return this;
             }
-            UnknownTextureStream* stream = new (__FILE__, 0xe1) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+            UnknownTextureStream* stream = new (__FILE__, 0xe1) UnknownTextureStream((int)g_ResourceManager);
             stream->Open(name, "rb", 0);
             LoadFromParameters(stream, 0);
             delete stream;
         }
         if (item)
-            g_UnknownResourceManager572b44->SetItemObject(item, this);
+            g_ResourceManager->SetItemObject(item, this);
         RegisterNode();
     }
     return this;

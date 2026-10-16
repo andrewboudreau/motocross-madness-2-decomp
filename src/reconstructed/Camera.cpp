@@ -16,8 +16,8 @@ Camera::Camera(int flags) : GameObject(flags) {
     file = 0;
     field_0x1e8 = 0;
     field_0x1ec = 0;
-    nearPlane = g_UnknownFloat550f6c;
-    farPlane = g_UnknownFloat550f70;
+    nearPlane = g_DefaultNearPlane;
+    farPlane = g_DefaultFarPlane;
     viewportClearFrames = 0;
     projectionChangeFrames = 0;
     memset(viewport, 0, sizeof(viewport));
@@ -202,8 +202,8 @@ void Camera::SetFrame(const Vector3* position, const Vector3* forward, const Vec
 
 // 0x0042e8e0
 int Camera::ReapplyDefaultLimits() {
-    if (farPlane != g_UnknownFloat550f70 || nearPlane != g_UnknownFloat550f6c) {
-        ClampLimits(g_UnknownFloat550f6c, g_UnknownFloat550f70);
+    if (farPlane != g_DefaultFarPlane || nearPlane != g_DefaultNearPlane) {
+        ClampLimits(g_DefaultNearPlane, g_DefaultFarPlane);
         UpdateMatrices();
     }
     return 1;
@@ -211,9 +211,9 @@ int Camera::ReapplyDefaultLimits() {
 
 // 0x0042e960
 void Camera::ClampLimits(float minimum, float maximum) {
-    nearPlane = (g_UnknownFloat550f6c > minimum) ? g_UnknownFloat550f6c : minimum;
-    if (g_UnknownFloat550f70 < maximum)
-        farPlane = g_UnknownFloat550f70;
+    nearPlane = (g_DefaultNearPlane > minimum) ? g_DefaultNearPlane : minimum;
+    if (g_DefaultFarPlane < maximum)
+        farPlane = g_DefaultFarPlane;
     else
         farPlane = maximum;
 }

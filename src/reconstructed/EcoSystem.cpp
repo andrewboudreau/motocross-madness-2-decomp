@@ -163,7 +163,7 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
         strncpy(path, name, length);
         path[length] = 0;
         strcat(path, ".slt");
-        UnknownTextureStream* stream = new(__FILE__, 0xc0) UnknownTextureStream(g_UnknownResourceManager572b44);
+        UnknownTextureStream* stream = new(__FILE__, 0xc0) UnknownTextureStream(g_ResourceManager);
         if (stream->Open(path, "r", 0)) {
             int lod;
             UnknownParameterBlock* block = new(__FILE__, 0xc2) UnknownParameterBlock;
@@ -698,9 +698,9 @@ int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
     int i;
     esbStreamInArchive = 0;
     if (!stream) {
-        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(path, 1);
+        UnknownResourceEntry* entry = g_ResourceManager->FindItem(path, 1);
         if (!entry) {
-            stream = new(__FILE__, 0x520) UnknownTextureStream(g_UnknownResourceManager572b44);
+            stream = new(__FILE__, 0x520) UnknownTextureStream(g_ResourceManager);
             if (!stream->Open(path, "rb", 0)) {
                 if (stream)
                     delete stream;
@@ -1156,7 +1156,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
         strncpy(esbName, path, count);
         esbName[count] = 0;
         strcpy(strstr(esbName, ".est"), ".esb");
-        UnknownTextureStream* probe = new(__FILE__, 0xad7) UnknownTextureStream(g_UnknownResourceManager572b44);
+        UnknownTextureStream* probe = new(__FILE__, 0xad7) UnknownTextureStream(g_ResourceManager);
         if (probe->Open(esbName, "rb", 0))
             strcpy(strstr(path, ".est"), ".esb");
         if (probe)
@@ -1168,9 +1168,9 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
         int collisionCount;
         UnknownTextureStream* esb = stream;
         if (!esb) {
-            UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(path, 1);
+            UnknownResourceEntry* entry = g_ResourceManager->FindItem(path, 1);
             if (!entry) {
-                esb = new(__FILE__, 0xaf8) UnknownTextureStream(g_UnknownResourceManager572b44);
+                esb = new(__FILE__, 0xaf8) UnknownTextureStream(g_ResourceManager);
                 if (!esb->Open(path, "rb", 0)) {
                     if (esb)
                         delete esb;
@@ -1219,7 +1219,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
             if (names[i][0]) {
                 strcpy(sltName, names[i]);
                 strcat(sltName, ".slt");
-                UnknownTextureStream* sltStream = new(__FILE__, 0xb50) UnknownTextureStream(g_UnknownResourceManager572b44);
+                UnknownTextureStream* sltStream = new(__FILE__, 0xb50) UnknownTextureStream(g_ResourceManager);
                 if (sltStream->Open(sltName, "r", 0)) {
                     UnknownParameterBlock* block = new(__FILE__, 0xb52) UnknownParameterBlock;
                     block->Attach((UnknownParameterStream*)sltStream, 0, 1);

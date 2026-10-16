@@ -109,9 +109,13 @@ public:
     // 0x004de3b0: GameObject's slot 8, then loads the event; on failure it
     // releases itself (slot 2) and returns 0, else returns this.
     BaseQuarryEvent* Create(RenderTarget* target, UnknownProgressCallback progress);
-    // 0x004de590 (about 7.9 KB): loads the scene, terrain, lights, sounds
-    // and race objects; not reconstructed.
-    int UnknownFunction4de590(UnknownProgressCallback progress);
+    // 0x004de590 (about 7.9 KB, Create's only callee that can fail): picks
+    // texture detail from the video memory, then creates the audio, camera,
+    // scene, quadtree, fog and sky, terrain, shadows, ecosystem, race and
+    // collision links (MemTagStack tags "Audio" .. "Collision"), calling
+    // `progress` between stages; a near miss in
+    // samples/game/QuarryStuntEventLoaderNearMiss.cpp.
+    int LoadEventObjects(UnknownProgressCallback progress);
     // 0x004e04a0, 0x004e04e0, 0x004e04f0, 0x004e0560: memory estimates
     // (bytes) 0x004de590 sums and compares against the free video memory:
     // the terrain by its width, the cube, the model textures by the

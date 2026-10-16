@@ -5,7 +5,7 @@
 // gameobj.cpp's iterator over the objects GameObject::FindByClassName
 // searches (0x94 bytes; the same modes): those whose name list or RTTI class
 // name matches "<filter>,", or every one for a null filter. While it runs it
-// holds g_UnknownGlobal65b548, which blocks releases and relinking.
+// counts in g_ActiveGameObjectIterators, which blocks releases and relinking.
 class GameObjectIterator {
 public:
     GameObjectIterator(GameObject* root, int mode, const char* filter); // 0x00469950

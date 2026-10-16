@@ -349,8 +349,11 @@ public:
     float ComputeViewerDetail(int coarse);                    // 0x004815e0 (ret 4): from the viewer's distance to the bounds
     int CanDropVertex(int x, int z);                    // 0x00481cc0 (ret 8)
     int TestVisibility(void* a0, void* a1);              // 0x00481db0 (ret 8)
-    int UnknownFunction481de0(void* a0, void* a1, float* center, float* extent, int a4, int a5,
-                              int size, int a7, int a8, int a9); // 0x00481de0 (ret 0x28)
+    // 0x00481de0 (ret 0x28): tests the box against the clipper and recurses
+    // into the four quadrant boxes (x, z, size; level and quadrant path)
+    // down to the child blocks, updating childMask; returns the visible count.
+    int WalkVisibilityQuadrants(void* a0, void* a1, float* center, float* extent, int x, int z,
+                                int size, int level, int path, int a9);
     void UpdateLevelOfDetail(UnknownTextureStream* stream, void* a1, int recurse,
                                int coarse);                     // 0x004824c0 (ret 0x10)
     void PropagateFullMask();                               // 0x004826d0

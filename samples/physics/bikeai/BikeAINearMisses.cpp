@@ -221,8 +221,8 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
 }
 
 // Debug line endpoints at 0x00578dc0 drawn by BikeRace (BikeRace.h declares the same
-// array as Vector3 g_UnknownGlobal578dc0[2]).
-extern Vec3 g_UnknownGlobal578dc0[2];
+// array as Vector3 g_PathTargetDebugLine[2]).
+extern Vec3 g_PathTargetDebugLine[2];
 
 // Length of a path segment in 0x0040d200 (seg.y is 0 there, so VC6 folds the y*y
 // term).  Same result as BikeAILength; the redundant parentheses around x*x are a
@@ -436,10 +436,10 @@ int UnknownFunction40d200(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* out
         *outTakeoffTime = takeoffTime;
     if (outVel && takeoffTime < 0.5f)
         *outVel = takeoffVel;
-    g_UnknownGlobal578dc0[0] = pos;
-    g_UnknownGlobal578dc0[0].y = pos.y + 3.0f;
-    g_UnknownGlobal578dc0[1] = target;
-    g_UnknownGlobal578dc0[1].y = target.y + 3.0f;
+    g_PathTargetDebugLine[0] = pos;
+    g_PathTargetDebugLine[0].y = pos.y + 3.0f;
+    g_PathTargetDebugLine[1] = target;
+    g_PathTargetDebugLine[1].y = target.y + 3.0f;
     return 1;
 }
 
@@ -564,16 +564,16 @@ static unsigned char s_BikeAICollisionObjectTypeId = 0xff;   // 0x00566f70
 static unsigned char s_BikeAIVegetationTypeId = 0xff;        // 0x00566f71
 
 // Debug segments and hit flags drawn by BikeRace slot 14 (BikeRace.h declares them).
-extern int g_UnknownGlobal577a00;
-extern int g_UnknownGlobal578da8;
-extern int g_UnknownGlobal578dac;
-extern int g_UnknownGlobal578df8;
-extern int g_UnknownGlobal578dd8;
-extern Vec3 g_UnknownGlobal578de0[2];
-extern Vec3 g_UnknownGlobal577a30[2];
-extern Vec3 g_UnknownGlobal577a48[2];
-extern Vec3 g_UnknownGlobal5779d8[2];
-extern Vec3 g_UnknownGlobal577a18[2];
+extern int g_ObstacleDebugUpperHit;
+extern int g_ObstacleDebugHit;
+extern int g_ObstacleDebugLowerHit;
+extern int g_ObstacleDebugLeftHit;
+extern int g_ObstacleDebugRightHit;
+extern Vec3 g_ObstacleDebugUpperLine[2];
+extern Vec3 g_ObstacleDebugLine[2];
+extern Vec3 g_ObstacleDebugLowerLine[2];
+extern Vec3 g_ObstacleDebugLeftLine[2];
+extern Vec3 g_ObstacleDebugRightLine[2];
 
 // 0x00415640, 6112 bytes, cdecl, EH frame (debug new of the iterator, line 0xb24):
 // obstacle query along the segment seg[0]..seg[1] with the given radius.  Records the
@@ -624,21 +624,21 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
     Vec3 right[2];
     right[0] = seg[0] + side * 3.0f;
     right[1] = seg[1] + side * 3.0f;
-    g_UnknownGlobal578de0[0] = up[0];
-    g_UnknownGlobal578de0[1] = up[1];
-    g_UnknownGlobal577a30[0] = seg[0];
-    g_UnknownGlobal577a30[1] = seg[1];
-    g_UnknownGlobal577a48[0] = low[0];
-    g_UnknownGlobal577a48[1] = low[1];
-    g_UnknownGlobal5779d8[0] = left[0];
-    g_UnknownGlobal5779d8[1] = left[1];
-    g_UnknownGlobal577a18[0] = right[0];
-    g_UnknownGlobal577a18[1] = right[1];
-    g_UnknownGlobal577a00 = 0;
-    g_UnknownGlobal578da8 = 0;
-    g_UnknownGlobal578dac = 0;
-    g_UnknownGlobal578df8 = 0;
-    g_UnknownGlobal578dd8 = 0;
+    g_ObstacleDebugUpperLine[0] = up[0];
+    g_ObstacleDebugUpperLine[1] = up[1];
+    g_ObstacleDebugLine[0] = seg[0];
+    g_ObstacleDebugLine[1] = seg[1];
+    g_ObstacleDebugLowerLine[0] = low[0];
+    g_ObstacleDebugLowerLine[1] = low[1];
+    g_ObstacleDebugLeftLine[0] = left[0];
+    g_ObstacleDebugLeftLine[1] = left[1];
+    g_ObstacleDebugRightLine[0] = right[0];
+    g_ObstacleDebugRightLine[1] = right[1];
+    g_ObstacleDebugUpperHit = 0;
+    g_ObstacleDebugHit = 0;
+    g_ObstacleDebugLowerHit = 0;
+    g_ObstacleDebugLeftHit = 0;
+    g_ObstacleDebugRightHit = 0;
     if (outPush) {
         Vec3 zero;
         zero.x = zero.y = zero.z = 0.0f;
@@ -719,7 +719,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                                 best = pt;
                                 minDist = len;
                             }
-                            g_UnknownGlobal577a00 = 1;
+                            g_ObstacleDebugUpperHit = 1;
                         }
                     }
                     if (SegmentTouchesObject((CollisionVec3*)seg, obj, (CollisionVec3*)&pt, (CollisionVec3*)&normal)
@@ -730,7 +730,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                                 best = pt;
                                 minDist = len;
                             }
-                            g_UnknownGlobal578da8 = 1;
+                            g_ObstacleDebugHit = 1;
                         }
                     }
                     if (SegmentTouchesObject((CollisionVec3*)low, obj, (CollisionVec3*)&pt, (CollisionVec3*)&normal)
@@ -741,7 +741,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                                 best = pt;
                                 minDist = len;
                             }
-                            g_UnknownGlobal578dac = 1;
+                            g_ObstacleDebugLowerHit = 1;
                         }
                     }
                     if (SegmentTouchesObject((CollisionVec3*)left, obj, (CollisionVec3*)&pt, (CollisionVec3*)&normal)
@@ -753,7 +753,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                                 best = pt;
                                 minDist = len;
                             }
-                            g_UnknownGlobal578df8 = 1;
+                            g_ObstacleDebugLeftHit = 1;
                         }
                     }
                     if (SegmentTouchesObject((CollisionVec3*)right, obj, (CollisionVec3*)&pt, (CollisionVec3*)&normal)
@@ -765,11 +765,11 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                                 best = pt;
                                 minDist = len;
                             }
-                            g_UnknownGlobal578dd8 = 1;
+                            g_ObstacleDebugRightHit = 1;
                         }
                     }
-                    if (g_UnknownGlobal577a00 || g_UnknownGlobal578da8 || g_UnknownGlobal578dac
-                        || g_UnknownGlobal578df8 || g_UnknownGlobal578dd8) {
+                    if (g_ObstacleDebugUpperHit || g_ObstacleDebugHit || g_ObstacleDebugLowerHit
+                        || g_ObstacleDebugLeftHit || g_ObstacleDebugRightHit) {
                         hit = 1;
                         if (outPush && (minDist < 10.0f || !nearOnly)) {
                             pt = best - seg[0];

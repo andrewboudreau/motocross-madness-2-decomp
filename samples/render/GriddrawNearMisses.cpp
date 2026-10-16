@@ -780,7 +780,7 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
 }
 
 // 0x00481de0: the visibility walk (see the note at the top).
-int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, float* extent, int a4, int a5,
+int DrawableGridNode::WalkVisibilityQuadrants(void* a0, void* a1, float* center, float* extent, int a4, int a5,
                                             int size, int a7, int a8, int a9)
 {
     int count = 0;
@@ -826,10 +826,10 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
                 GridVec3 c2 = GridVec3(childExtent.x + c.x, c.y, c.z - childExtent.z);
                 GridVec3 c3 = GridVec3(c.x - childExtent.x, c.y, childExtent.z + c.z);
                 GridVec3 c4 = GridVec3(childExtent.x + c.x, c.y, childExtent.z + c.z);
-                count += UnknownFunction481de0(a0, a1, &c1.x, &childExtent.x, a4, a5, size, a7 + 1, a8 * 4, a9);
-                count += UnknownFunction481de0(a0, a1, &c2.x, &childExtent.x, a4 + size, a5, size, a7 + 1, a8 * 4 + 1, a9);
-                count += UnknownFunction481de0(a0, a1, &c3.x, &childExtent.x, a4, a5 + size, size, a7 + 1, a8 * 4 + 2, a9);
-                count += UnknownFunction481de0(a0, a1, &c4.x, &childExtent.x, a4 + size, a5 + size, size, a7 + 1, a8 * 4 + 3, a9);
+                count += WalkVisibilityQuadrants(a0, a1, &c1.x, &childExtent.x, a4, a5, size, a7 + 1, a8 * 4, a9);
+                count += WalkVisibilityQuadrants(a0, a1, &c2.x, &childExtent.x, a4 + size, a5, size, a7 + 1, a8 * 4 + 1, a9);
+                count += WalkVisibilityQuadrants(a0, a1, &c3.x, &childExtent.x, a4, a5 + size, size, a7 + 1, a8 * 4 + 2, a9);
+                count += WalkVisibilityQuadrants(a0, a1, &c4.x, &childExtent.x, a4 + size, a5 + size, size, a7 + 1, a8 * 4 + 3, a9);
                 if (a7 + 1 == 8 || size == 16) {
                     if (count == 0)
                         childMask = 0;
@@ -840,7 +840,7 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
                 DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5] + a4];
                 if (child) {
                     if (child->children) {
-                        count += child->UnknownFunction481de0(a0, a1, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, a9);
+                        count += child->WalkVisibilityQuadrants(a0, a1, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, a9);
                         child->data->b1 = 1;
                     } else {
                         int dummy;

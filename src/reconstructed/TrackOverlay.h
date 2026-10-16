@@ -215,16 +215,19 @@ public:
     virtual int RenderPost3D();               // 0x0051b0f0
 
     void ReshowText();             // 0x0051b1f0: shows the text again
-    // 0x0051af00 (ret 0x18): slot 8 on `value`, then sets up the text (size
-    // characters) with the game's texture manager; returns this or 0
-    // (NationalRace.cpp is the caller).
-    DropTextOverlay* UnknownFunction51af00(void* value, TextureMapManager* textures, float scale, int a, int size,
-                                           const char* text);
+    // 0x0051af00 (ret 0x18): GameObject slot 8 (SetRenderContext) on
+    // `value`, stores dropSeconds, places the text at (x, y) given on a
+    // 640x480 screen (* width/640 and height/480, - 0.5), copies it, and
+    // creates its 28-high font (CreateFontIndirectA; the localized face or
+    // "Arial"). `textures` is not read. Returns this, or 0 after slot 2 when
+    // the font fails (NationalRace.cpp is the caller).
+    DropTextOverlay* Setup(void* value, TextureMapManager* textures, float dropSeconds, int x, int y,
+                           const char* text);
 
     void* textFont;                           // font (DeleteObject)
     float elapsedTime;                        // +0x30 1.0; slot 10 adds the frame time while visible
     int visible;                              // shown
-    int field_0x38;
+    float dropSeconds;                        // +0x38 Setup; Tick drops the text elapsedTime/dropSeconds screen heights and hides it below the bottom
     int textX;                                // text x
     int textYOffset;                          // +0x40 slot 10 adds it to the dropped y
     int textY;                                // text y

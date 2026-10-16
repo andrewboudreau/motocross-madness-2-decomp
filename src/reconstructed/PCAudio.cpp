@@ -149,7 +149,7 @@ UnknownSoundNotifier::~UnknownSoundNotifier() {
 // out inside the last branch; the two early failures keep their own
 // epilogues.
 Sound* LoadEntrySound(SoundGroup* group, const char* name, int flags, int a, int b, int c) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
+    UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     if (!entry)
         return 0;
     Sound* sound = new (__FILE__, 186) Sound(group, 1);
@@ -171,7 +171,7 @@ failed:
             delete sound;
             return 0;
         }
-        g_UnknownResourceManager572b44->SetItemObject(entry, sound);
+        g_ResourceManager->SetItemObject(entry, sound);
     }
     strncpy(sound->soundName, name, 0x103);
     sound->isPacked = 1;
@@ -240,9 +240,9 @@ Sound::~Sound() {
         duplicateSource->Release();
         duplicateSource = 0;
     }
-    void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
+    void* entry = g_ResourceManager->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
+        g_ResourceManager->SetItemObject(entry, 0);
     if (dsBuffer3D)
         SoundSystem()->field_0x18.Remove(this);
     SoundSystem()->field_0x04.Remove(this);
@@ -388,7 +388,7 @@ int Sound::Load(const char* name, UnknownTextureStream* stream, int flags, int a
     if (!SoundSystem() || !SoundSystem()->audioStarted)
         return 0;
     if (!stream) {
-        file = new (__FILE__, 544) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        file = new (__FILE__, 544) UnknownTextureStream((int)g_ResourceManager);
         if (!file->Open(name, "rb", 0)) {
             delete file;
             return 0;
@@ -748,7 +748,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
     if (!buffer)
         return 0;
     if (isPacked) {
-        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(soundName, 0);
+        UnknownResourceEntry* entry = g_ResourceManager->FindItem(soundName, 0);
         if (!entry)
             return 0;
         entry->archive->Seek(entry->offset, 0, 0);
@@ -758,7 +758,7 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
         if (!FillBufferFromStream(buffer, entry->archive, 0, bufferBytes))
             return 0;
     } else {
-        UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        UnknownTextureStream* file = new (__FILE__, 1368) UnknownTextureStream((int)g_ResourceManager);
         if (!file->Open(soundName, "rb", 0)) {
             delete file;
             return 0;

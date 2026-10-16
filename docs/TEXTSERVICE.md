@@ -20,7 +20,7 @@ RenderTarget; `0x0050b080`, `0x0050b400` and `0x0050b700` blit text into
 `operator=` (`0x004e8c20`).
 
 Exact: 6 calibration cases (constructor, destructor, set font, factory,
-draw, and the out-of-line `CharacterCell::UnknownFunction50beb0` checked
+draw, and the out-of-line `CharacterCell::GetRect` checked
 from the sample). Near misses
 (`samples/render/TextServiceNearMisses.cpp`, notes there): select font
 `0x0050ade0` (117/125: the `while (1)` form keeps the loop test at the top;

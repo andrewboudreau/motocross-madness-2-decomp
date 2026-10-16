@@ -42,7 +42,7 @@
 // setter are further off (all 720 orders of the six vertex blocks swept
 // with tools/sweep_variants.py: 652..718 against 770 for the kept order).
 //
-// CharacterCell::UnknownFunction50beb0 (0x0050beb0, the out-of-line copy of
+// CharacterCell::GetRect (0x0050beb0, the out-of-line copy of
 // FontTexture.h's inline) is emitted only in a TU that calls it, so it is
 // compiled (and matches exactly) in this file.
 
@@ -93,7 +93,7 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
     for (i = 0; i < length; i++) {
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
-            cell = character->UnknownFunction50beb0();
+            cell = character->GetRect();
             unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
             unsigned int v = (unsigned int)(fontHeight * cell.field_0x04.y);
             unsigned int w = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
@@ -144,7 +144,7 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
     for (i = 0; i < length; i++) {
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
-            cell = character->UnknownFunction50beb0();
+            cell = character->GetRect();
             unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
             unsigned int v = (unsigned int)(fontHeight * cell.field_0x04.y);
             unsigned int w = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
@@ -195,7 +195,7 @@ int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const ch
     for (i = 0; i < length; i++) {
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
-            cell = character->UnknownFunction50beb0();
+            cell = character->GetRect();
             unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
             unsigned int v = (unsigned int)(fontHeight * cell.field_0x04.y);
             unsigned int w = (unsigned int)((cell.field_0x10.x - cell.field_0x04.x) * fontWidth);
@@ -239,7 +239,7 @@ void* UnknownOverlayText::LayoutText(const UnknownOverlayRect* rect, const char*
     for (i = 0; i < length; i++) {
         CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
-            cell = character->UnknownFunction50beb0();
+            cell = character->GetRect();
             float height = (cell.field_0x10.y - cell.field_0x04.y) * 255.0f;
             float width = (cell.field_0x10.x - cell.field_0x04.x) * 255.0f;
             float top = cell.field_0x04.y * 255.0f;

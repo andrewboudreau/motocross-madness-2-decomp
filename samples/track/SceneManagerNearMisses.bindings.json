@@ -135,7 +135,7 @@
   "?CountNodes@SoultreeObject@@QAEHXZ": "0x004fda30",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__:scenemanagernearmisses.cpp": "0x00572ccc",
   "__except_list": "0x00000000",
   "__real@4@00000000000000000000": "0x00550484",

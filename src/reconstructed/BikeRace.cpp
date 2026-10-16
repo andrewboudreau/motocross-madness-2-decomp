@@ -1980,42 +1980,42 @@ int BikeRace::UnknownVirtualSlot14() {
             }
         }
         if (debugDraw) {
-            if (g_UnknownGlobal577a00) {
+            if (g_ObstacleDebugUpperHit) {
                 SetDrawColor(0xff, 0, 0);
             } else {
                 SetDrawColor(0, 0xff, 0);
             }
-            DrawLine(&g_UnknownGlobal578de0[0], &g_UnknownGlobal578de0[1]);
-            if (g_UnknownGlobal578da8) {
+            DrawLine(&g_ObstacleDebugUpperLine[0], &g_ObstacleDebugUpperLine[1]);
+            if (g_ObstacleDebugHit) {
                 SetDrawColor(0xff, 0, 0x80);
             } else {
                 SetDrawColor(0, 0xff, 0x80);
             }
-            DrawLine(&g_UnknownGlobal577a30[0], &g_UnknownGlobal577a30[1]);
-            if (g_UnknownGlobal578dac) {
+            DrawLine(&g_ObstacleDebugLine[0], &g_ObstacleDebugLine[1]);
+            if (g_ObstacleDebugLowerHit) {
                 SetDrawColor(0xff, 0, 0xff);
             } else {
                 SetDrawColor(0, 0xff, 0xff);
             }
-            DrawLine(&g_UnknownGlobal577a48[0], &g_UnknownGlobal577a48[1]);
-            if (g_UnknownGlobal578df8) {
+            DrawLine(&g_ObstacleDebugLowerLine[0], &g_ObstacleDebugLowerLine[1]);
+            if (g_ObstacleDebugLeftHit) {
                 SetDrawColor(0xff, 0, 0xff);
             } else {
                 SetDrawColor(0, 0xff, 0xff);
             }
-            DrawLine(&g_UnknownGlobal5779d8[0], &g_UnknownGlobal5779d8[1]);
-            if (g_UnknownGlobal578dd8) {
+            DrawLine(&g_ObstacleDebugLeftLine[0], &g_ObstacleDebugLeftLine[1]);
+            if (g_ObstacleDebugRightHit) {
                 SetDrawColor(0xff, 0, 0xff);
             } else {
                 SetDrawColor(0, 0xff, 0xff);
             }
-            DrawLine(&g_UnknownGlobal577a18[0], &g_UnknownGlobal577a18[1]);
+            DrawLine(&g_ObstacleDebugRightLine[0], &g_ObstacleDebugRightLine[1]);
             SetDrawColor(0, 0, 0xff);
             DrawLine(&g_GateDebugBoxLine[0], &g_GateDebugBoxLine[1]);
             SetDrawColor(0xff, 0, 0xff);
             DrawLine(&g_GateDebugDirectionLine[0], &g_GateDebugDirectionLine[1]);
             SetDrawColor(0xff, 0, 0);
-            DrawLine(&g_UnknownGlobal578dc0[0], &g_UnknownGlobal578dc0[1]);
+            DrawLine(&g_PathTargetDebugLine[0], &g_PathTargetDebugLine[1]);
         }
     }
     return 1;

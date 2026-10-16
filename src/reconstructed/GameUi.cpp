@@ -987,7 +987,7 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
         isSound = 0;
         frameSound = 0;
         frameTextures = (int)textures;
-        image = LoadFile(file, 0, (int)g_UnknownResourceManager572b44);
+        image = LoadFile(file, 0, (int)g_ResourceManager);
         if (image) {
             frameWidth = image->width;
             frameHeight = image->height;
@@ -1873,8 +1873,8 @@ UIDialog::~UIDialog() {
                 imageTable[i]->Release();
         }
     }
-    if (!g_TrackGame->shuttingDown && g_UnknownResourceManager572b44 && resourceArchive)
-        g_UnknownResourceManager572b44->RemoveArchiveItems(resourceArchive);
+    if (!g_TrackGame->shuttingDown && g_ResourceManager && resourceArchive)
+        g_ResourceManager->RemoveArchiveItems(resourceArchive);
     if ((ownsPalette && dialogPalette && !parentDialog) ||
         (dialogPalette && parentDialog && parentDialog->dialogPalette != dialogPalette))
         ((Palette8*)dialogPalette)->Release();
@@ -2863,7 +2863,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     UnknownGameUiListRow row;
     if (a) {
         UnknownTextureStream* stream =
-            new(__FILE__, 0x1e20) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+            new(__FILE__, 0x1e20) UnknownTextureStream((int)g_ResourceManager);
         if (stream->Open(file, "r", 0)) {
             row.kind = 2;
             row.text = 0;
@@ -2892,7 +2892,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
         strcpy(name, file);
         row.textLines = 0;
         row.field_0x30 = 0;
-        UnknownTgaFile* header = OpenAndReadHeader(file, 0, (int)g_UnknownResourceManager572b44);
+        UnknownTgaFile* header = OpenAndReadHeader(file, 0, (int)g_ResourceManager);
         if (header) {
             row.width = header->width;
             row.height = header->height;
@@ -3423,7 +3423,7 @@ char UIEditBox::FilterCharacter(char c) {
 // 0x0046a8e0
 int UIDialog::LoadDialogResource(const char* name) {
     int result = 0;
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 1);
+    UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 1);
     if (entry)
         result = ReadDialogResource(entry->archive, entry->offset);
     return result;
@@ -4076,9 +4076,9 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
         } else {
             sprintf(path, "%s%s", directory ? directory : "", name);
         }
-        resourceArchive = g_UnknownResourceManager572b44->AddArchive(path, 0);
+        resourceArchive = g_ResourceManager->AddArchive(path, 0);
         sprintf(path, "%s%s", directory ? directory : "", resourceName);
-        UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_ResourceManager);
         if (stream->Open(path, "r", 0)) {
             if (!ReadDialogResource(stream, 0)) {
                 delete stream;

@@ -31,8 +31,9 @@ public:
     int size;                                 // +0x1c size of the file (FileStream copies it to the stream's end limit)
 };
 
-// The 0x18-byte object at 0x00689c78 (g_UnknownResourceManager572b44 points
-// at it); SceneManager 0x004f0d20 also keeps one on its stack. Two grown
+// The 0x18-byte object at 0x00689c78 (g_GlobalResourceManager; the pointer
+// g_ResourceManager at 0x00572b44, which every other TU reads, is
+// initialised to it in .data); SceneManager 0x004f0d20 also keeps one on its stack. Two grown
 // arrays: the items and the archives they come from.
 class UnknownResourceManager {
 public:
@@ -76,5 +77,5 @@ public:
     ResourceItem** items;                 // +0x14 items
 };
 
-extern UnknownResourceManager g_UnknownResourceManager689c78;
-extern UnknownResourceManager* g_UnknownResourceManager572b44;
+extern UnknownResourceManager g_GlobalResourceManager;  // 0x00689c78
+extern UnknownResourceManager* g_ResourceManager;       // 0x00572b44

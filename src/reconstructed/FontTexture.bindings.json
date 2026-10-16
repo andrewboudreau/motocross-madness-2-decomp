@@ -37,7 +37,7 @@
   "?g_UnknownGlobal56846c@@3HA": "0x0056846c",
   "?g_UnknownGlobal568470@@3HA": "0x00568470",
   "?g_UnknownGlobal57972c@@3HA": "0x0057972c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?s_UnknownManager65b478@FontTexture@@2VUnknownFontTextureManager@@A": "0x0065b478",
   "_$E2": "0x00467110",
   "_$E3": "0x00467130",

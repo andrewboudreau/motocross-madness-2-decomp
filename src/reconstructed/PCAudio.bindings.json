@@ -112,7 +112,7 @@
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_EnumeratedSoundDeviceCount@@3HA": "0x00689938",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_DSPROPSETID_EAX_ListenerProperties": "0x00556d20",
   "_DirectSoundCreate@12": "0x005330a0",
   "_DirectSoundEnumerateA@8": "0x005330a6",

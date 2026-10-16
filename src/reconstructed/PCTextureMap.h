@@ -6,9 +6,10 @@
 #include "TextureMap.h"
 #include "VfwDeco.h"   // UnknownVideoDecoder at PCTextureMap+0x7c
 
-// Global at 0x00689964; when set, PCTextureMap tells the manager
-// (0x00511580) about lost or released surfaces.
-extern int g_UnknownGlobal689964;
+// 0x00689964 (.bss, read 4 times, never written): when set, PCTextureMap
+// has the manager recount texture memory (0x00511580) after it releases or
+// recreates a surface.
+extern int g_DebugCountTextureMemory;
 
 // Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
 void ExpandLzw(void* destination, void* source, int size);
@@ -22,8 +23,9 @@ void ExpandLzw(void* destination, void* source, int size);
 extern UnknownSurfaceInterface* g_UnknownSharedMipSurfaces68a36c[10];
 extern UnknownSurfaceInterface* g_UnknownSharedSurfaces68a394[10];
 
-// Global at 0x00689968: when set, slot 4 refills the first level.
-extern int g_UnknownGlobal689968;
+// 0x00689968 (.bss, read once at 0x004c7097, never written): when set,
+// CreateSurface dumps the first level with DumpLevel (0x004c84e0).
+extern int g_DebugDumpTextureLevels;
 
 // cdecl 0x004c86e0: formats a DirectDraw result with the caller's __FILE__
 // and __LINE__.

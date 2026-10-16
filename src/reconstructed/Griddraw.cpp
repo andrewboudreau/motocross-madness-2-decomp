@@ -141,8 +141,9 @@ void BuildEdgeLevel(int half, int start, int step, int rowStep)
     }
 }
 
-// 0x0047e4d0
-static void UnknownFunction47e4d0()
+// 0x0047e4d0: builds every subdivision level of the edge table, then
+// stores each entry's own grid x and z (once, from the first constructor).
+static void BuildEdgeTable()
 {
     int half = 1;
     int step = 2;
@@ -169,7 +170,7 @@ DrawableGridNode::DrawableGridNode(int a0, int a1, GridNode* parent, GridTerrain
     this->terrain = terrain;
     if (g_gridEdgesBuilt == 0) {
         BuildCurveTables();
-        UnknownFunction47e4d0();
+        BuildEdgeTable();
         for (int i = 0; i < 17 * 17; i++)
             this->terrain->vertexRetestStamps[i] = 0;
         g_gridEdgesBuilt = 1;
@@ -1408,7 +1409,7 @@ float DrawableGridNode::BlockDistance(int block)
 // node's bounding box (+0x44 centre, +0x50 half extents).
 int DrawableGridNode::TestVisibility(void* a0, void* a1)
 {
-    return UnknownFunction481de0(a0, a1, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
+    return WalkVisibilityQuadrants(a0, a1, &center.x, &extent.x, 0, 0, 16, 0, 0, 0);
 }
 
 // 0x00481cc0: screen-space error test of vertex (x, z): returns 1 when the

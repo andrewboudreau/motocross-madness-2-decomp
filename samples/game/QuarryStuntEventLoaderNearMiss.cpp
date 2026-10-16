@@ -1,4 +1,4 @@
-// Near-miss candidate for BaseQuarryEvent::UnknownFunction4de590 (0x004de590,
+// Near-miss candidate for BaseQuarryEvent::LoadEventObjects (0x004de590,
 // 7952 bytes; QuarryStuntEvent.cpp, docs/QUARRYSTUNTEVENT.md): the event
 // loader. It picks texture detail levels from the video and system memory,
 // then creates the audio, lights, camera, particles, scene, visibility
@@ -207,7 +207,7 @@ public:
     void AddCaster(D3DIMSoultreeObject* model);    // 0x004dab00: casts a shadow
     void SetShadowStrength(int value);                     // 0x004dace0
     void SetShadowGrey(int value);                     // 0x004dae30
-    void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
+    void SetLight(const Vector3* position, const Vector3* direction, int mode); // 0x004dae50 (ProjectedShadow::SetLight)
 
     unsigned char field_0x2c[0x134 - 0x2c];
 };
@@ -292,7 +292,7 @@ static inline int FrameBufferBytes(RenderTarget* target) {
 }
 
 // 0x004de590
-int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
+int BaseQuarryEvent::LoadEventObjects(UnknownProgressCallback progress) {
     int terrainBytes;
     int textureBytes;
     int forced;
@@ -323,7 +323,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         if (progress)
             progress(&step);
     }
-    UnknownTextureStream* stream = new(__FILE__, 252) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new(__FILE__, 252) UnknownTextureStream((int)g_ResourceManager);
     UnknownTextureStream* preloaded = stream;
     if (ecosystem[0]) {
         if (strstr(ecosystem, ".est"))
@@ -568,7 +568,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->Init(renderContext, g_TrackGame->textureManager);
     }
     if (!preloaded)
-        stream = new(__FILE__, 713) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        stream = new(__FILE__, 713) UnknownTextureStream((int)g_ResourceManager);
 
     g_MemTagStack->Push("Sky");
     char* cubeFile = eventScene->environment->cubeFile;
@@ -624,7 +624,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
 
     g_MemTagStack->Push("EcoSystem");
     if (!stream)
-        stream = new(__FILE__, 848) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        stream = new(__FILE__, 848) UnknownTextureStream((int)g_ResourceManager);
     if (strstr(eventScene->environment->ecosystemFile, ".est"))
         strcpy(strstr(eventScene->environment->ecosystemFile, ".est"), ".esb");
     if (stream && !g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->ecosystemFile,
@@ -786,7 +786,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         ((UnknownQuarryShadow*)projectedShadow)->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->modelNode);
         ((UnknownQuarryShadow*)projectedShadow)
             ->AddCaster(((UnknownQuarryRace*)raceView)->field_0x38->riderCharacter->modelNode);
-        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae50(&shadowLight->position, &shadowLight->look, 3);
+        ((UnknownQuarryShadow*)projectedShadow)->SetLight(&shadowLight->position, &shadowLight->look, 3);
         ((UnknownQuarryShadow*)projectedShadow)->SetShadowStrength(0x80);
         int ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
         if (!ambientLight)

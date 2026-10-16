@@ -237,7 +237,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
 // direction as rows 0-2 and the position as row 3.
 void FollowCamera::LoadCameraFile(const char* path) {
     UnknownTextureStream* stream =
-        new(__FILE__, 0x3c7) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        new(__FILE__, 0x3c7) UnknownTextureStream((int)g_ResourceManager);
     if (!stream->Open(path, "rt", 0)) {
         delete stream;
         return;

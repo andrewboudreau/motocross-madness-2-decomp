@@ -370,7 +370,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
         if (mipmapped && !BuildMipLevels(2))
             goto failed;
     }
-    if (g_UnknownGlobal689968)
+    if (g_DebugDumpTextureLevels)
         DumpLevel(systemSurface, 0);
     if (IsFormat4444Or8888(format) & !IsFormat4444Or8888(mapFormat)) {
         ApplyColorKey(0xff00ff);

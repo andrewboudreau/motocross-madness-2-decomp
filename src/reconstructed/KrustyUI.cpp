@@ -114,7 +114,9 @@ public:
     explicit UnknownKrustyUIShadow(int flags);
     UnknownKrustyUIShadow* Init(void* owner, TextureMapManager* textures); // 0x004da7b0
     void AddCaster(UnknownKrustyUISoultree* caster);     // 0x004dab00: adds a caster
-    void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
+    // 0x004dae50: ProjectedShadow::SetLight (src/krusty2/shadow); mode 3
+    // sets only the light direction.
+    void SetLight(const Vector3* position, const Vector3* direction, int mode);
     void SetShadowStrength(int value);                           // 0x004dace0
     void SetShadowGrey(int value);                           // 0x004dae30
     unsigned char field_0x2c[0x134 - 0x2c];
@@ -374,7 +376,7 @@ void KrustyUI::BuildGarageScene(int value) {
             s468.x += 15.0f;
             s478 = garageFocus - s468;
             // Retail passes the key light's vectors here, not the two just set.
-            shadow->UnknownFunction4dae50(&s488, &s408, 3);
+            shadow->SetLight(&s488, &s408, 3);
             shadow->SetShadowStrength(0x20);
             shadow->SetShadowGrey(0x20);
             pending = 0;
@@ -621,7 +623,7 @@ void KrustyUI::OpenExitDialog() {
 void KrustyUI::LoadGarageTables() {
     char key[128];
     UnknownParameterBlock block;
-    UnknownTextureStream* stream = new(__FILE__, 851) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new(__FILE__, 851) UnknownTextureStream((int)g_ResourceManager);
     if (stream->Open("presets.pb", "r", 0)) {
         block.Attach((UnknownParameterStream*)stream, 0, 1);
         for (int i = 0; i < 5; i++) {
@@ -676,7 +678,7 @@ void KrustyUI::LoadGarageTables() {
 void KrustyUI::LoadBikesAndRiders() {
     char key[256];
     UnknownParameterBlock block;
-    UnknownTextureStream* stream = new(__FILE__, 913) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new(__FILE__, 913) UnknownTextureStream((int)g_ResourceManager);
     if (manufacturers)
         DebugFree(manufacturers, __FILE__, 918);
     if (bikes)
@@ -788,7 +790,7 @@ void KrustyUI::LoadBikesAndRiders() {
 int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
     char path[128];
     UNKNOWN_COPY_SIZED(text, name, size);
-    if (g_UnknownResourceManager572b44->FindItem(name, 1))
+    if (g_ResourceManager->FindItem(name, 1))
         return 1;
     if (!strchr(name, '\\')) {
         sprintf(path, "%s\\%s", "Res", name);
@@ -798,7 +800,7 @@ int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
         strncpy(path, name, count);
         path[count] = 0;
     }
-    UnknownTextureStream* stream = new(__FILE__, 1369) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new(__FILE__, 1369) UnknownTextureStream((int)g_ResourceManager);
     if (stream->Open(path, "r", 0)) {
         delete stream;
         UNKNOWN_COPY_SIZED(text, path, size);
@@ -818,7 +820,7 @@ int KrustyUI::ResolveBikeFile(const char* name, char* text, int size) {
 int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
     char path[128];
     UNKNOWN_COPY_SIZED(text, name, size);
-    if (g_UnknownResourceManager572b44->FindItem(name, 1))
+    if (g_ResourceManager->FindItem(name, 1))
         return 1;
     if (!strchr(name, '\\')) {
         sprintf(path, "%s\\%s", "Res", name);
@@ -828,7 +830,7 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
         strncpy(path, name, count);
         path[count] = 0;
     }
-    UnknownTextureStream* stream = new(__FILE__, 1411) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new(__FILE__, 1411) UnknownTextureStream((int)g_ResourceManager);
     if (stream->Open(path, "r", 0)) {
         delete stream;
         UNKNOWN_COPY_SIZED(text, path, size);

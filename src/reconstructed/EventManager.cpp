@@ -601,15 +601,16 @@ void LoadProgressCallback(int* step) {
     }
 }
 
-// Global at 0x0059af54; 0x0045cb70 clears it first.
-float g_UnknownGlobal59af54;
+// 0x0059af54: seconds the event has run with no input dialog open;
+// LoadEvent (0x0045cb70) clears it and CheckRaceOver ends the race at 315.
+float g_EventTimeoutClock;
 
 // 0x0045cb70: resets the event, loads the track's environment and scene
 // and, for mode 0 (BaseQuarryEvent) or 2 (NationalRace), creates the race
 // object and adds it to the second root; 1 when a race-mode object exists.
 int EventManager::LoadEvent() {
     char path[260];
-    g_UnknownGlobal59af54 = 0;
+    g_EventTimeoutClock = 0;
     endTimer = 0;
     keepAliveStarted = 0;
     waitingForRacers = 0;
@@ -648,8 +649,8 @@ int EventManager::LoadEvent() {
 // menu item it always ends; otherwise by mode (TrackGame+0x2d74).
 void EventManager::CheckRaceOver(float frameTime) {
     if (!g_TrackGame->ui->gui->FindInputDialog())
-        g_UnknownGlobal59af54 += g_TrackGame->frameTime;
-    if (g_UnknownGlobal59af54 >= 315.0f) {
+        g_EventTimeoutClock += g_TrackGame->frameTime;
+    if (g_EventTimeoutClock >= 315.0f) {
         SendRacerResults();
         EndRace();
     }

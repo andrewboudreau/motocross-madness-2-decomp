@@ -88,8 +88,9 @@ static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* g
     return (UnknownOptGraphicsSettings*)&game->mode.displayModeIndex;
 }
 
-// 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
-int g_UnknownGlobal59adbc;
+// 0x0059adbc: the profile row "ButRemoveProfile" asked to remove; a type 9
+// event with code 0x32 then deletes that profile's directory and list row.
+int g_RemoveProfileRow;
 int g_LoadingTimerTicks;
 int g_LoadingEventLoaded;
 int g_UnknownGlobal59ae88;

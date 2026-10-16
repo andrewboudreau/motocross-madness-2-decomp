@@ -275,7 +275,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 NoDelCurProfileDlg* dialog = new(__FILE__, 423) NoDelCurProfileDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             } else if (row != -1) {
-                g_UnknownGlobal59adbc = row;
+                g_RemoveProfileRow = row;
                 RemoveProfileDlg* dialog = new(__FILE__, 426) RemoveProfileDlg;
                 guiManager->ShowDialog((UIDialog*)dialog, 0x12f, 4, 0, (UIDialog*)this,
                                                   (int)list->GetRowText(-1), 0, 1);
@@ -339,11 +339,11 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 list->Sort(1);
                 list->SelectRowByText(g_TrackGame->mode.profileName);
             } else if (event->code == 0x32) {
-                COPY_TEXT(name, list->GetRowText(g_UnknownGlobal59adbc), 16);
+                COPY_TEXT(name, list->GetRowText(g_RemoveProfileRow), 16);
                 sprintf(path, "%s\\%s", "ui\\profile", name);
                 if (g_TrackGame->profileDirectory->DeleteTree(path)) {
                     g_TrackGame->profileDirectory->UnknownVirtualSlot1();
-                    list->RemoveRow(g_UnknownGlobal59adbc);
+                    list->RemoveRow(g_RemoveProfileRow);
                 }
             }
             FillProfileList();

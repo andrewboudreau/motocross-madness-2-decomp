@@ -161,7 +161,7 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@D3DIMSoultreeObject@@UAEPAVGameObject@@PAXPBDHHH@Z": "0x0043f4b0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?g_UnknownSoultreeClipper575a98@@3PAVUnknownSoultreeClipper@@A": "0x00575a98",
   "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18",
   "_$E1": "0x004807d0",

@@ -11,7 +11,7 @@
 
 // 0x004b6b30
 Palette8* Palette8::LoadShared(const char* name) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
+    UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     Palette8* palette;
 
     if (!entry)
@@ -22,7 +22,7 @@ Palette8* Palette8::LoadShared(const char* name) {
     }
     entry->archive->Seek(entry->offset, 0, 0);
     palette = new(__FILE__, 46) Palette8(entry->archive);
-    g_UnknownResourceManager572b44->SetItemObject(entry, palette);
+    g_ResourceManager->SetItemObject(entry, palette);
     return palette;
 }
 
@@ -94,7 +94,7 @@ Palette8::~Palette8() {
         ddPalette->Release();
     if (colorMapper)
         colorMapper->Release();
-    entry = g_UnknownResourceManager572b44->FindItemByObject(this);
+    entry = g_ResourceManager->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
+        g_ResourceManager->SetItemObject(entry, 0);
 }
