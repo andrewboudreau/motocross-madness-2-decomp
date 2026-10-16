@@ -90,7 +90,7 @@ Game::Game() {
     rootObject = 0;
     textureManager = 0;
     playerCount = 1;
-    field_0x2d0 = 0;
+    bladeRenderer = 0;
     debugOverlay = 0;
     s_UnknownFile65b4ac = 0;
     strcpy(field_0x40, "");

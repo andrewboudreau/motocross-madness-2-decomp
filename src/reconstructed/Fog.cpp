@@ -35,7 +35,7 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
     this->nearScale = nearScale;
     visibilityOffset = 0;
     minimumDistance = minimum;
-    if (g_TrackGame->field_0x2d0) {
+    if (g_TrackGame->bladeRenderer) {
         renderFog = 0;
     } else {
         sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->targetDisplay->driverGuidText);
@@ -191,7 +191,7 @@ int Fog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     char name[256];
 
-    if (TestInputEvent(0x57, 0, event, 3) && !g_TrackGame->field_0x2d0) {
+    if (TestInputEvent(0x57, 0, event, 3) && !g_TrackGame->bladeRenderer) {
         renderFog = 1 - renderFog;
         sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->targetDisplay->driverGuidText);
         g_TrackGame->SetRegistryFlag(name, renderFog);

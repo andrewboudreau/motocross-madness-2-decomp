@@ -456,7 +456,7 @@ int PCTextureMap::CreateTextureSurface(int a, int b, int c) {
         UnknownSurfaceCaps caps;
         if (systemSurface->GetCaps(&caps))
             goto failed;
-        if (caps.caps & DDSCAPS_NONLOCALVIDMEM && !c || g_TrackGame->field_0x2d0) {
+        if (caps.caps & DDSCAPS_NONLOCALVIDMEM && !c || g_TrackGame->bladeRenderer) {
             textureSurface = systemSurface;
             systemSurface->AddRef();
         } else {

@@ -1190,7 +1190,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
 // object and to the shadow casters, re-enabling those without flag 2.
 void Scene::SetDetailLevel(int level)
 {
-    g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8
+    g_UnknownGlobal689f18 = g_TrackGame->bladeRenderer ? g_UnknownGlobal5744c8
                                                               : g_UnknownGlobal574428;
     if (animationTable) {
         int i;

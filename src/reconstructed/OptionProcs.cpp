@@ -133,7 +133,7 @@ void OptGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
         UIListBox* list = dropDown->listPart;
         int i = 0;
         if (g_TrackGame->fullScreen) {
-            if (g_TrackGame->field_0x2d0) {
+            if (g_TrackGame->bladeRenderer) {
                 for (; i < g_TrackGame->display->displayModeCount; i++) {
                     UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];
                     if (mode->field_0x18 == 1) {
@@ -217,7 +217,7 @@ void OptAdvancedGraphicsDlg::HandleEvent(UnknownDialogEvent* event)
         FindControl("SldObjects", 0)->BindValue(&settings[2]);
         FindControl("SldTerrain", 0)->BindValue(&settings[3]);
         FindControl("SldVisibility", 0)->BindValue(&settings[4]);
-        if (g_TrackGame->field_0x2d0)
+        if (g_TrackGame->bladeRenderer)
             FindControl("Txt3DCard", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x1463);
         else
             FindControl("Txt3DCard", 12)->SetText(g_TrackGame->display->deviceIdentifier.description);

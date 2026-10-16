@@ -307,7 +307,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KrustyUIAddLight(lights, light);
         UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_TrackGame->textureContext;
         context.field_0x14 = 0;
-        if (!g_TrackGame->field_0x2d0) {
+        if (!g_TrackGame->bladeRenderer) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
             // (2 MB below 800x600) off the total outside NT without the 0x400 cap.
             int memory = KRUSTYUI_TARGET->targetDisplay->totalVideoMemory;

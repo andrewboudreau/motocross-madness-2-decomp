@@ -2023,7 +2023,7 @@ int BikeRace::UnknownVirtualSlot14() {
 
 // 0x00423790
 void BikeRace::SetDetailLevel(int level) {
-    g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
+    g_UnknownGlobal689f18 = g_TrackGame->bladeRenderer ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
     localRacer->modelNode->ApplyLodSettings(level);
     localRacer->riderCharacter->modelNode->ApplyLodSettings(level);
     if (g_TrackGame->mode.raceSettings.raceMode != 4) {

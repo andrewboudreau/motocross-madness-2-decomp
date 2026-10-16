@@ -335,7 +335,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
 
     // The texture detail levels: 0 keeps every texture, 1 and 2 halve them.
-    if (g_TrackGame->field_0x2d0) {
+    if (g_TrackGame->bladeRenderer) {
         g_TrackGame->texturesCached = 0;
         if (memory.dwTotalPhys > 0x5a00000) {
             terrainTextures.field_0x14 = 0;
