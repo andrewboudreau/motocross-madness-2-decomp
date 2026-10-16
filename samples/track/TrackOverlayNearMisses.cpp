@@ -295,7 +295,7 @@ fail:
         return 0;
     }
     TintRows(0, 0x80, 0xffff);
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -431,7 +431,7 @@ void RadarOverlay::DrawTrackOutline(int mode)
                     if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
                         lineEnd.sx = hit[0];
                         lineEnd.sy = hit[1];
-                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                        Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                         lineStart = lineEnd;
                     }
                 }
@@ -449,13 +449,13 @@ void RadarOverlay::DrawTrackOutline(int mode)
                     lineEnd.sy = (float)y;
                     lineEnd.sx = (float)x;
                     lineStart.sx = hit[0];
-                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                    Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                     lineStart = lineEnd;
                 }
             } else {
                 lineEnd.sx = (float)x;
                 lineEnd.sy = (float)y;
-                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+                Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
                 lineStart = lineEnd;
             }
             segment = segment->next;
@@ -505,10 +505,10 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
         Release();
         return 0;
     }
-    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
         overlayTexture->SetAddressModes(5, 6);
-    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
+    overlayTexture->CreateTextureSurface(1, 0, 0);
     source.left = 0;
     source.right = largeLayout ? 256 : 128;
     source.top = 0;
@@ -650,13 +650,13 @@ void RadarOverlay::DrawRacers(int mode)
             }
             lineEnd = lineStart;
             lineEnd.sx += 3.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
             lineStart.sy += 1.0f;
             lineEnd.sy += 1.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
             lineStart.sy -= 2.0f;
             lineEnd.sy -= 2.0f;
-            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
+            Target()->DrawPrimitive(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&lineStart, 2, 0);
         } else {
             point.x = -1.0f;
             point.y = -1.0f;

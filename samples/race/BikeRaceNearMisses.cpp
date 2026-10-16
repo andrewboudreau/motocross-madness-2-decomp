@@ -865,7 +865,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.joystickOn) {
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(0);
-        g_TrackGame->controlInterface->activeJoystick->UnknownVirtualSlot5(g_TrackGame->mode.joystickOn);
+        g_TrackGame->controlInterface->activeJoystick->SetAutoCenter(g_TrackGame->mode.joystickOn);
         localRacer->UnknownRacerVirtualSlot93();
         g_TrackGame->controlInterface->activeJoystick->SetAcquired(1);
     }

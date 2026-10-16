@@ -75,13 +75,13 @@ void ManagedTexture::ReleasePage() {
 }
 
 // 0x00510750
-int ManagedTexture::UnknownVirtualSlot8(int a, int b, int c) {
+int ManagedTexture::CreateTextureSurface(int a, int b, int c) {
     return 0;
 }
 
 // 0x00510760
 int ManagedTexture::UnknownFunction510760(int a, int b, int c) {
-    return PCTextureMap::UnknownVirtualSlot8(a, b, c);
+    return PCTextureMap::CreateTextureSurface(a, b, c);
 }
 
 // 0x00510780
@@ -114,24 +114,24 @@ void ManagedTexture::RecordUse(float value) {
 
 // 0x00510870: with a page, applies the render states, the colour key and
 // the page; otherwise the PCTextureMap behaviour.
-void ManagedTexture::UnknownVirtualSlot19() {
+void ManagedTexture::Bind() {
     if (page) {
         for (int i = 0; i < statePairCount; i++)
-            g_TrackGame->renderTarget->UnknownVirtualSlot8(statePairs[i].state, statePairs[i].value, 0);
+            g_TrackGame->renderTarget->SetRenderState(statePairs[i].state, statePairs[i].value, 0);
         if (usesColorKey && page->textureSurface && page->textureSurface->SetColorKey(8, &colorKeyValue))
             return;
-        page->UnknownVirtualSlot11();
+        page->SetAsTexture();
     } else if (textureSurface) {
-        PCTextureMap::UnknownVirtualSlot19();
+        PCTextureMap::Bind();
     }
 }
 
 // 0x005108f0
-int ManagedTexture::UnknownVirtualSlot11() {
+int ManagedTexture::SetAsTexture() {
     if (page)
-        return page->UnknownVirtualSlot11();
+        return page->SetAsTexture();
     if (textureSurface)
-        return PCTextureMap::UnknownVirtualSlot11();
+        return PCTextureMap::SetAsTexture();
     return 0;
 }
 
@@ -145,7 +145,7 @@ int ManagedTexture::RemapTexCoordsIfMoved(float* scale, float* offsetU, float* o
 }
 
 // 0x00510980
-int ManagedTexture::UnknownVirtualSlot7() {
+int ManagedTexture::IsResident() {
     return region != 0;
 }
 

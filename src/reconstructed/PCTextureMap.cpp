@@ -59,10 +59,10 @@ static inline int ReadRows(UnknownTextureStream* stream, void* bits, int rowSize
 // surfaces slot 4 creates, larger levels than the choice allows are
 // skipped. Other files hold one image, which is halved as the choice asks
 // and handed to slot 4.
-int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, int height, int minimumSize,
-                                      int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
-                                      int flags, void* surfacePalette, int addressU, int addressV,
-                                      UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) {
+int PCTextureMap::LoadSurface(UnknownTextureStream* stream, int width, int height, int minimumSize,
+                              int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                              int flags, void* surfacePalette, int addressU, int addressV,
+                              UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) {
     int offsets[12];
     UnknownSurfaceCaps caps;
     UnknownSurfaceDesc desc;
@@ -87,8 +87,8 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                 height >>= 1;
             }
         }
-        if (!UnknownVirtualSlot4(0, levelWidth, height, levelWidth, minimumSize, sourceFormat, format, palette,
-                                 flags, surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key))
+        if (!CreateSurface(0, levelWidth, height, levelWidth, minimumSize, sourceFormat, format, palette,
+                           flags, surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key))
             return 0;
 
         int side = 1;
@@ -224,8 +224,8 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
             }
         }
     }
-    return UnknownVirtualSlot4(bits, width, height, width, minimumSize, sourceFormat, format, palette, flags,
-                               surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key);
+    return CreateSurface(bits, width, height, width, minimumSize, sourceFormat, format, palette, flags,
+                         surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key);
 }
 
 // 0x004c68e0: tries `formats` in turn (0-terminated) until the display
@@ -237,7 +237,7 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
         mapFormat = *formats;
         if (desc->flags & 0x1000)
             FillPixelFormat(mapFormat, &desc->pixelFormat);
-        if ((flags & 4 || g_TrackGame->renderTarget->UnknownVirtualSlot13(mapFormat)) &&
+        if ((flags & 4 || g_TrackGame->renderTarget->SupportsTextureFormat(mapFormat)) &&
             !g_TrackGame->display->directDraw->CreateSurface(desc, &systemSurface, 0)) {
             float scale = 1.0f;
             if (mipCount != 1)
@@ -251,22 +251,22 @@ int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* 
 }
 
 // 0x004c6040
-void PCTextureMap::UnknownVirtualSlot12() {
+void PCTextureMap::RecreateIfLost() {
     if (textureSurface && textureSurface->IsLost()) {
-        UnknownVirtualSlot10();
-        UnknownVirtualSlot8(1, 0, 0);
+        ReleaseTextureSurface();
+        CreateTextureSurface(1, 0, 0);
         if (g_UnknownGlobal689964)
             ownerManager->CountTextureMemory();
     }
 }
 
 // 0x004c7470
-int PCTextureMap::UnknownVirtualSlot7() {
+int PCTextureMap::IsResident() {
     return textureSurface != 0;
 }
 
 // 0x004c7610
-void PCTextureMap::UnknownVirtualSlot10() {
+void PCTextureMap::ReleaseTextureSurface() {
     if (textureSurface) {
         textureSurface->Release();
         textureSurface = 0;
@@ -276,7 +276,7 @@ void PCTextureMap::UnknownVirtualSlot10() {
 }
 
 // 0x004c7970
-int PCTextureMap::UnknownVirtualSlot11() {
+int PCTextureMap::SetAsTexture() {
     if (textureSurface &&
         !((PCRenderTarget*)g_TrackGame->renderTarget)->device->SetTexture(0, textureSurface))
         return 1;
@@ -284,14 +284,14 @@ int PCTextureMap::UnknownVirtualSlot11() {
 }
 
 // 0x004c79a0
-void PCTextureMap::UnknownVirtualSlot19() {
-    UnknownVirtualSlot11();
+void PCTextureMap::Bind() {
+    SetAsTexture();
     for (int i = 0; i < statePairCount; i++)
-        g_TrackGame->renderTarget->UnknownVirtualSlot8(statePairs[i].state, statePairs[i].value, 0);
+        g_TrackGame->renderTarget->SetRenderState(statePairs[i].state, statePairs[i].value, 0);
 }
 
 // 0x004c79e0
-void* PCTextureMap::UnknownVirtualSlot13(void* rect, long* pitch, int flags) {
+void* PCTextureMap::LockSurface(void* rect, long* pitch, int flags) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
@@ -303,12 +303,12 @@ void* PCTextureMap::UnknownVirtualSlot13(void* rect, long* pitch, int flags) {
 }
 
 // 0x004c7a50
-int PCTextureMap::UnknownVirtualSlot14(void* rect) {
+int PCTextureMap::UnlockSurface(void* rect) {
     return !systemSurface->Unlock(rect);
 }
 
 // 0x004c7a70
-void* PCTextureMap::UnknownVirtualSlot16(int level) {
+void* PCTextureMap::LockLevel(int level) {
     UnknownSurfaceInterface* surface = FindMipLevel(level);
     if (surface) {
         UnknownSurfaceDesc desc;
@@ -321,7 +321,7 @@ void* PCTextureMap::UnknownVirtualSlot16(int level) {
 }
 
 // 0x004c7ad0
-int PCTextureMap::UnknownVirtualSlot17(int level) {
+int PCTextureMap::UnlockLevel(int level) {
     UnknownSurfaceInterface* surface = FindMipLevel(level);
     if (surface && !surface->Unlock(0))
         return 1;
@@ -335,7 +335,7 @@ int PCTextureMap::RestoreTextureSurface() {
         if (systemSurface == textureSurface)
             systemSurface = 0;
         textureSurface = 0;
-        return UnknownVirtualSlot8(1, 0, 0);
+        return CreateTextureSurface(1, 0, 0);
     }
     return 1;
 }
@@ -374,7 +374,7 @@ UnknownSurfaceInterface* PCTextureMap::FindMipLevel(int width) {
 }
 
 // 0x004c8430: dumps every mip level (0x004c84e0).
-int PCTextureMap::UnknownVirtualSlot20() {
+int PCTextureMap::DumpAllLevels() {
     if (systemSurface) {
         DumpLevel(systemSurface, 0);
         if (mipCount > 1) {
@@ -449,7 +449,7 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
 // 0x004c7480: creates the texture surface from +0x70 (or shares +0x70 when
 // it is already in video memory and `c` is clear, or when Game+0x2d0 is
 // set); `a` then asks slot 9 to upload it.
-int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
+int PCTextureMap::CreateTextureSurface(int a, int b, int c) {
     if (textureSurface)
         goto done;
     if (systemSurface) {
@@ -480,7 +480,7 @@ int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
         }
     }
     if (a && textureSurface != systemSurface)
-        UnknownVirtualSlot9(0, -1);
+        Upload(0, -1);
     if (!textureSurface)
         goto failed;
 done:
@@ -495,7 +495,7 @@ failed:
 // applies the colour key. The level loop tests its two sizes in separate
 // `break`s: a `while (a && b)` condition is rotated to the bottom, retail
 // re-runs the test at the top of every pass.
-int PCTextureMap::UnknownVirtualSlot9(UnknownRect* rect, int mode) {
+int PCTextureMap::Upload(UnknownRect* rect, int mode) {
     if (!systemSurface || !textureSurface)
         return 0;
     UnknownSurfaceInterface* source = systemSurface;
@@ -545,7 +545,7 @@ int PCTextureMap::UnknownVirtualSlot9(UnknownRect* rect, int mode) {
 }
 
 // 0x004c77d0: fills each mip level by downsampling the level above it.
-int PCTextureMap::UnknownVirtualSlot15(int filter) {
+int PCTextureMap::BuildMipLevels(int filter) {
     UnknownSurfaceInterface* level;
     void* sourceBits;
     int bytesPerPixel;
@@ -687,7 +687,7 @@ failed:
 // 0x004c81d0: for 555, 565, 24-bit and 1555 formats, applies colour `color` as the
 // key on every level (0x004c7ef0), re-uploads, sets the surfaces' colour key
 // and records render states 0x29 = 1 and 0x1b = 0.
-int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {
+int PCTextureMap::ApplyColorKey(unsigned int color) {
     if (mapFormat != 555 && mapFormat != 565 && mapFormat != 888 && mapFormat != 1555)
         return 0;
     if (systemSurface) {
@@ -710,7 +710,7 @@ int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {
         }
     }
     if ((color != 0xff00ff || mapFormat == 8888) && textureSurface)
-        UnknownVirtualSlot9(0, -1);
+        Upload(0, -1);
     if (mapFormat == 1555)
         return 1;
     if (systemSurface && systemSurface->SetColorKey(8, &colorKeyValue) ||

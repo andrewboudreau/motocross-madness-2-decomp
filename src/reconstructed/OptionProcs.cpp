@@ -579,10 +579,10 @@ void OptControlsDlg::MapMovedInput()
     }
     if (!mouse)
         return;
-    if (mouse->UnknownVirtualSlot4(-3, 0x3f, 0) || mouse->UnknownVirtualSlot4(-2, 0x3f, 0)) {
+    if (mouse->IsControlDown(-3, 0x3f, 0) || mouse->IsControlDown(-2, 0x3f, 0)) {
         code = -3;
         kind = 1;
-    } else if (mouse->UnknownVirtualSlot4(-5, 0x3f, 0) || mouse->UnknownVirtualSlot4(-4, 0x3f, 0)) {
+    } else if (mouse->IsControlDown(-5, 0x3f, 0) || mouse->IsControlDown(-4, 0x3f, 0)) {
         code = -5;
         kind = 1;
     } else {

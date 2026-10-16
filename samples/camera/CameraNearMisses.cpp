@@ -1,7 +1,7 @@
 // Near-miss Camera candidates (src/reconstructed/Camera.cpp's class), kept out
 // of src/reconstructed until they match. See docs/OVERLAY.md.
 //
-// Camera::UnknownVirtualSlot28 (0x0042ee30, 492 bytes, 487/492): one
+// Camera::UpdateMatrices (0x0042ee30, 492 bytes, 487/492): one
 // scheduling difference: retail emits `sub esp, 0x40` before the `rep movsd`
 // that copies the projection matrix (MatrixMult's second argument), VC6 after.
 // Assigning through a named product, a nested assignment, m[][] stores, the
@@ -24,7 +24,7 @@
 // frame, the field of view (degrees) and the viewport, the viewport-scaled
 // projection (+0x12c), its product with the view (+0xec) and the projection
 // scale +0x198.
-void Camera::UnknownVirtualSlot28() {
+void Camera::UpdateMatrices() {
     viewMatrix = ViewMatrix(eyePosition, viewDirection, upDirection, roll);
     projectionMatrix = ProjectionMatrix(nearPlane, farPlane, fieldOfView * 0.017453290f,
                                         (float)(unsigned int)viewport[2] / (unsigned int)viewport[3]);

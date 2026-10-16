@@ -36,33 +36,33 @@ public:
     PCTextureMap(TextureMapManager* manager, int value); // 0x004c5f00
     virtual ~PCTextureMap();                  // 0x004c5f50 (deleting wrapper 0x004c5f30)
     // 0x004c69c0: creates the surfaces from `bits`.
-    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int minimumSize,
-                                    int sourceFormat, int format, UnknownTexturePalette* palette,
-                                    int flags, void* surfacePalette, int checkMemory, int unused,
-                                    int addressU, int addressV, UnknownTextureFormatChoice* choice,
-                                    int alphaThreshold, unsigned int key);
+    virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
+                              int sourceFormat, int format, UnknownTexturePalette* palette,
+                              int flags, void* surfacePalette, int checkMemory, int unused,
+                              int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                              int alphaThreshold, unsigned int key);
     // 0x004c6080: reads the texture from `stream`, then creates it through slot 4.
-    virtual int UnknownVirtualSlot5(UnknownTextureStream* stream, int width, int height, int minimumSize,
-                                    int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
-                                    int flags, void* surfacePalette, int addressU, int addressV,
-                                    UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key);
-    virtual TextureMap* UnknownVirtualSlot6(); // 0x004c71c0: a copy of the texture
-    virtual int UnknownVirtualSlot7();        // 0x004c7470: whether +0x74 exists
+    virtual int LoadSurface(UnknownTextureStream* stream, int width, int height, int minimumSize,
+                            int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                            int flags, void* surfacePalette, int addressU, int addressV,
+                            UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key);
+    virtual TextureMap* Clone();               // 0x004c71c0: a copy of the texture
+    virtual int IsResident();                 // 0x004c7470: whether +0x74 exists
     // 0x004c7480: creates the texture surface from +0x70 (or shares it).
-    virtual int UnknownVirtualSlot8(int a, int b, int c);
+    virtual int CreateTextureSurface(int a, int b, int c);
     // 0x004c7640: uploads +0x70 into +0x74, level by level.
-    virtual int UnknownVirtualSlot9(struct UnknownRect* rect, int mode);
-    virtual void UnknownVirtualSlot10();      // 0x004c7610: releases the texture surface
-    virtual int UnknownVirtualSlot11();       // 0x004c7970: sets it as texture stage 0
-    virtual void UnknownVirtualSlot12();      // 0x004c6040: restores a lost surface
-    virtual void* UnknownVirtualSlot13(void* rect, long* pitch, int flags); // 0x004c79e0: locks +0x70
-    virtual int UnknownVirtualSlot14(void* rect); // 0x004c7a50: unlocks +0x70
-    virtual int UnknownVirtualSlot15(int filter); // 0x004c77d0: builds the mip levels
-    virtual void* UnknownVirtualSlot16(int level); // 0x004c7a70: locks a mip level
-    virtual int UnknownVirtualSlot17(int level); // 0x004c7ad0: unlocks it
-    virtual int UnknownVirtualSlot18(unsigned int color); // 0x004c81d0: colour-keys every level
-    virtual void UnknownVirtualSlot19();      // 0x004c79a0: binds and applies the render states
-    virtual int UnknownVirtualSlot20();       // 0x004c8430: dumps every mip level
+    virtual int Upload(struct UnknownRect* rect, int mode);
+    virtual void ReleaseTextureSurface();     // 0x004c7610: releases the texture surface
+    virtual int SetAsTexture();               // 0x004c7970: sets it as texture stage 0
+    virtual void RecreateIfLost();            // 0x004c6040: restores a lost surface
+    virtual void* LockSurface(void* rect, long* pitch, int flags);          // 0x004c79e0: locks +0x70
+    virtual int UnlockSurface(void* rect);        // 0x004c7a50: unlocks +0x70
+    virtual int BuildMipLevels(int filter);       // 0x004c77d0: builds the mip levels
+    virtual void* LockLevel(int level);            // 0x004c7a70: locks a mip level
+    virtual int UnlockLevel(int level);          // 0x004c7ad0: unlocks it
+    virtual int ApplyColorKey(unsigned int color);        // 0x004c81d0: colour-keys every level
+    virtual void Bind();                      // 0x004c79a0: binds and applies the render states
+    virtual int DumpAllLevels();              // 0x004c8430: dumps every mip level
 
     int RestoreTextureSurface();              // 0x004c7420: recreates a lost texture surface
     // 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`,

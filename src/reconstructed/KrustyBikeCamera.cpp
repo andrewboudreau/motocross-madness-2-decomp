@@ -71,7 +71,7 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
 
 // 0x00498080
 unsigned char KrustyBikeCamera::UnknownVirtualSlot55() {
-    return g_TrackGame->controlInterface->UnknownVirtualSlot2(0x0B, 0x3F);
+    return g_TrackGame->controlInterface->IsControlDown(0x0B, 0x3F);
 }
 
 // 0x004980a0: input 0x0a (unless +0x38c) clears +0x391/+0x392 when absent;
@@ -79,7 +79,7 @@ unsigned char KrustyBikeCamera::UnknownVirtualSlot55() {
 // +0x735 in vehicle mode.
 bool KrustyBikeCamera::UnknownVirtualSlot56() {
     bool pressed;
-    if (!targetCaster && g_TrackGame->controlInterface->UnknownVirtualSlot2(0x0A, 0x3F)) {
+    if (!targetCaster && g_TrackGame->controlInterface->IsControlDown(0x0A, 0x3F)) {
         pressed = true;
     } else {
         pressed = false;

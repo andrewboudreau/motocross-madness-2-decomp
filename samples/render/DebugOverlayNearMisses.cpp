@@ -43,12 +43,12 @@ int DebugOverlay::LoadFont()
                                                         0, 0x80, 0xff00ff, 1, 1);
     if (fontTexture == 0) {
         fontTexture = new(__FILE__, 59) PCTextureMap(field_0x36d4, 1);
-        fontTexture->UnknownVirtualSlot4(0, 0x100, 0x100, 0x100, 0x100, 0,
+        fontTexture->CreateSurface(0, 0x100, 0x100, 0x100, 0x100, 0,
                                           ((RenderTarget*)renderContext)->surfacePixelFormat, 0, 8, 0, 1, 0,
                                           5, 6, 0, 0x80, 0xff00ff);
-        void* bits = fontTexture->UnknownVirtualSlot13(0, 0, 0);
+        void* bits = fontTexture->LockSurface(0, 0, 0);
         memset(bits, 0, PixelFormatBytesPerPixel(fontTexture->mapFormat) << 16);
-        fontTexture->UnknownVirtualSlot14(0);
+        fontTexture->UnlockSurface(0);
 
         LOGFONT font;
         font.lfHeight = fontHeight;
@@ -121,7 +121,7 @@ int DebugOverlay::LoadFont()
         if (fontTexture->systemSurface->ReleaseDC(dc))
             goto failed;
     }
-    if (!fontTexture->UnknownVirtualSlot8(1, 0, 0))
+    if (!fontTexture->CreateTextureSurface(1, 0, 0))
         goto failed;
     return 1;
 failed:

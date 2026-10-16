@@ -992,12 +992,12 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
-            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+            frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
-                frameTexture->UnknownVirtualSlot18(0xff00ff);
+                frameTexture->ApplyColorKey(0xff00ff);
         } else {
             char message[100];
             frameTexture = 0;
@@ -2062,7 +2062,7 @@ int UIDialog::UnknownVirtualSlot13() {
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &grabCopyFrames, 0);
         else
-            ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
+            ((RenderTarget*)UnknownInlineField18())->Blit(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
     return 1;
@@ -2084,7 +2084,7 @@ int UIDialog::UnknownVirtualSlot15() {
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
                                                        grabRegion, 1, &grabCopyFrames, 0);
         else
-            ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
+            ((RenderTarget*)UnknownInlineField18())->Blit(&screenArea,
                                                                                  screenGrab, 0, 0x1000000);
     }
     if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->frameCount)
@@ -4230,7 +4230,7 @@ int UIControl::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->Blit(
                        &rect, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -4413,7 +4413,7 @@ int UIScrollBar::Draw() {
             ownerDialog->dialogBackground->DrawImage((PCTextureMap*)track, &rect, 0,
                                                            track->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
-        else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, track, 0,
+        else if (!((RenderTarget*)renderContext)->Blit(&rect, track, 0,
                                                                    track->usesColorKey ? 0x1008000 : 0x1000000))
             goto failed;
         redrawFrames = redraw;
@@ -4439,7 +4439,7 @@ int UIScrollBar::Draw() {
                 needsRedraw = 1;
             else
                 RequestRedraw();
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, thumb, 0,
+        } else if (!((RenderTarget*)renderContext)->Blit(&rect, thumb, 0,
                                                                      thumb->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4653,7 +4653,7 @@ int UIListBox::Draw() {
                                                            drawnTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             redrawFrames = redraw;
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->Blit(
                        screenArea, drawnTexture, visibleArea, drawnTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             goto failed;
         }
@@ -4732,7 +4732,7 @@ int UIListBox::Draw() {
                                 done = 0;
                                 frames = redrawFrames;
                             }
-                        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+                        } else if (!((RenderTarget*)renderContext)->Blit(
                                        &rect, texture, 0, texture->usesColorKey ? 0x1008000 : 0x1000000)) {
                             goto failed;
                         }
@@ -5029,7 +5029,7 @@ int UIProgressBar::Draw() {
             owner->dialogBackground->DrawImage((PCTextureMap*)barTexture, &rect, &source,
                                                       barTexture->usesColorKey ? 0x1008000 : 0x1000000,
                                                       backgroundRegion, needsRedraw, &redraw, 0);
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(
+        } else if (!((RenderTarget*)renderContext)->Blit(
                        &rect, barTexture, &source, barTexture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -5276,12 +5276,12 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
-            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+            frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
-                frameTexture->UnknownVirtualSlot18(0xff00ff);
+                frameTexture->ApplyColorKey(0xff00ff);
             FreeFile(image);
             return 1;
         }
@@ -5297,8 +5297,8 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     if (ownerDialog->guiUser->UsesEventDevice(event)) {
         if (event->kind == 0) {
             if (keyBind && keyBind == event->control &&
-                !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
-                !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0) &&
+                !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x2a, 0x3f, 0) &&
+                !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x36, 0x3f, 0) &&
                 IsEnabled() && shown) {
                 ownerDialog->guiUser->RequestHover((UnknownGuiControl*)this, 0, 1);
                 ButtonDown(0, 0);

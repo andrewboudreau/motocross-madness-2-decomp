@@ -65,11 +65,11 @@ VideoCard::VideoCard() {
 
 // 0x0052d240
 VideoCard::~VideoCard() {
-    UnknownVirtualSlot1();
+    ReleaseResources();
 }
 
 // 0x0052d220
-void VideoCard::UnknownVirtualSlot1() {
+void VideoCard::ReleaseResources() {
     if (displayModes)
         DebugFree(displayModes, __FILE__, 63);
 }

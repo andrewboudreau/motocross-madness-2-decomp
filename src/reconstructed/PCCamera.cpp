@@ -10,8 +10,8 @@ PCCamera::PCCamera(int flags) : Camera(flags) {}
 
 
 // 0x004bedc0: stores and submits the world transform.
-int PCCamera::UnknownVirtualSlot30(const Matrix4* world) {
-    Camera::UnknownVirtualSlot30(world);
+int PCCamera::SetWorldMatrix(const Matrix4* world) {
+    Camera::SetWorldMatrix(world);
     UnknownRenderInterface* device = PCOwner()->device;
     if (device && device->SetTransform(D3DTRANSFORMSTATE_WORLD, world))
         return 0;
@@ -19,8 +19,8 @@ int PCCamera::UnknownVirtualSlot30(const Matrix4* world) {
 }
 
 // 0x004bee00: stores and submits the view transform.
-int PCCamera::UnknownVirtualSlot31(const Matrix4* view) {
-    Camera::UnknownVirtualSlot31(view);
+int PCCamera::SetViewMatrix(const Matrix4* view) {
+    Camera::SetViewMatrix(view);
     UnknownRenderInterface* device = PCOwner()->device;
     if (device && device->SetTransform(D3DTRANSFORMSTATE_VIEW, view))
         return 0;
@@ -28,8 +28,8 @@ int PCCamera::UnknownVirtualSlot31(const Matrix4* view) {
 }
 
 // 0x004bee40: stores and submits the projection transform.
-int PCCamera::UnknownVirtualSlot32(const Matrix4* projection) {
-    Camera::UnknownVirtualSlot32(projection);
+int PCCamera::SetProjectionMatrix(const Matrix4* projection) {
+    Camera::SetProjectionMatrix(projection);
     UnknownRenderInterface* device = PCOwner()->device;
     if (device && device->SetTransform(D3DTRANSFORMSTATE_PROJECTION, projection))
         return 0;
@@ -50,7 +50,7 @@ int PCCamera::UnknownVirtualSlot13() {
 
 // 0x004beed0: saves a screenshot of the owner (0x004c5d00), then a tail call
 // to 0x00468880 on the object at 0x0056e26c.
-void PCCamera::UnknownVirtualSlot27() {
+void PCCamera::TakeScreenshot() {
     PCOwner()->SaveScreenshot();
     g_TrackGame->ResetClock();
 }

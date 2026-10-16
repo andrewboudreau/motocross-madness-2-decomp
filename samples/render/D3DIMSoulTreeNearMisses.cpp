@@ -482,16 +482,16 @@ void D3DIMSoultreeObject::DrawCurrentLod()
     identity.m[1][1] = 1.0f;
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
-    ((RenderTarget*)renderContext)->currentCamera->UnknownVirtualSlot30(&identity);
+    ((RenderTarget*)renderContext)->currentCamera->SetWorldMatrix(&identity);
     int savedCull;
     int savedShade;
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot9(4, &savedCull);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot9(9, &savedShade);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, texturePerspective, 0);
+    ((RenderTarget*)renderContext)->GetRenderState(4, &savedCull);
+    ((RenderTarget*)renderContext)->GetRenderState(9, &savedShade);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, texturePerspective, 0);
     if (gouraudShading)
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
     else
-        ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
+        ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
     int k;
     for (int s = 0; s < lodTable[currentLod].surfaceCount; s++) {
         UnknownSoultreeSurface* surface = &lodTable[currentLod].surfaces[s];
@@ -501,7 +501,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
         for (int m = 0; m < surface->materialCount; m++) {
             SoultreeMaterial* material = materialTable[surface->materialIndices[m]];
             if (useLighting)
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot10(2, 0);
+                ((RenderTarget*)renderContext)->SetTextureBlend(2, 0);
             material->ApplyRenderStates();
             switch (material->mappingType) {
             case 0:
@@ -582,7 +582,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 static int updateEye = 1;                  // 0x00568930
                 static int drawReflections = 1;            // 0x00568934
                 if (drawReflections)
-                    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+                    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
                 UnknownSoultreeVertex line[2];
                 line[0].diffuse = 0xffff0000;
                 line[1].diffuse = 0xffffffff;
@@ -609,7 +609,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                             line[1].position.x = world.x + group->sourceVertices[v].position.x;
                             line[1].position.y = world.y + group->sourceVertices[v].position.y;
                             line[1].position.z = world.z + group->sourceVertices[v].position.z;
-                            ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
+                            ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
                         }
                         group->sourceVertices[v].tv = ((float)asin(reflected.y) + 1.5707964f) * -0.31830987f;
                         group->sourceVertices[v].tv = -((reflected.y + 1.0f) * 0.5f);
@@ -622,7 +622,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 }
                 restore = 1;
                 if (drawReflections)
-                    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+                    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
                 break;
             }
             case 2: {
@@ -684,8 +684,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                 static int updateView = 1;                         // 0x00568938
                 static int drawSphere = 1;                         // 0x0056893c
                 if (drawSphere) {
-                    ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-                    ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)ring, 32, 0);
+                    ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+                    ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)ring, 32, 0);
                 }
                 if (updateView) {
                     (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)renderContext)->currentCamera)->viewDirection;
@@ -757,8 +757,8 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                             lines[i * 2 + 1].position = segment[i + 1];
                         }
                         if (drawSphere) {
-                            ((RenderTarget*)renderContext)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-                            ((RenderTarget*)renderContext)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)lines, 2, 0);
+                            ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+                            ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)lines, 2, 0);
                         }
                     }
                 }
@@ -812,7 +812,7 @@ void D3DIMSoultreeObject::DrawCurrentLod()
                                                        (float*)&drawn->field_0x34, &drawn->vertices->tu,
                                                        &drawn->vertices->tv, drawn->vertexCount, 0x20);
                 }
-                ((RenderTarget*)renderContext)->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)drawn->vertices, drawn->vertexCount,
+                ((RenderTarget*)renderContext)->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)drawn->vertices, drawn->vertexCount,
                                                                   (int)drawn->indices, drawn->faceCount * 3, 0);
                 if (showWireframe)
                     DrawWireframe(drawn);
@@ -833,6 +833,6 @@ void D3DIMSoultreeObject::DrawCurrentLod()
             material->RestoreRenderStates();
         }
     }
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedCull, 0);
-    ((RenderTarget*)renderContext)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, savedShade, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedCull, 0);
+    ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_SHADEMODE, savedShade, 0);
 }

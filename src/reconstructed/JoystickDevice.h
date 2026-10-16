@@ -12,34 +12,34 @@ class JoystickDevice : public PCInputDevice {
 public:
     explicit JoystickDevice(int index); // 0x00489800
 
-    virtual void UnknownVirtualSlot0(int id); // 0x00489b70
+    virtual void RemoveBindings(int id); // 0x00489b70
     virtual ~JoystickDevice();          // 0x00489920 (deleting wrapper 0x00489900)
     // 0x00489980: copies the state of a pressed button into `entry`.
-    virtual int UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot3(int index, float* angle) = 0;
-    virtual int UnknownVirtualSlot4(int index, float* x, float* y) = 0;
-    virtual int UnknownVirtualSlot5(int enable) = 0;
-    virtual int UnknownVirtualSlot6(int effect, long magnitude, unsigned long duration) = 0;
-    virtual int UnknownVirtualSlot7(int effect, long* direction, long magnitude) = 0;
-    virtual int UnknownVirtualSlot8(int effect, long* direction) = 0;
-    virtual int UnknownVirtualSlot9(int effect, unsigned long duration, long direction,
-                                    long magnitude, unsigned long attackTime,
-                                    unsigned long attackLevel, unsigned long fadeTime,
-                                    unsigned long fadeLevel, int button) = 0;
-    virtual int UnknownVirtualSlot10(int effect, unsigned long duration, unsigned long period,
-                                     unsigned long magnitude, unsigned long attackTime,
+    virtual int IsButtonDown(int button, int modifier, UnknownInputEntry* entry);
+    virtual int GetPovAngle(int index, float* angle) = 0;
+    virtual int GetPovDirection(int index, float* x, float* y) = 0;
+    virtual int SetAutoCenter(int enable) = 0;
+    virtual int CreateConstantForce(int effect, long magnitude, unsigned long duration) = 0;
+    virtual int SetConstantForce(int effect, long* direction, long magnitude) = 0;
+    virtual int SetDirection(int effect, long* direction) = 0;
+    virtual int CreateEnvelopedForce(int effect, unsigned long duration, long direction,
+                                     long magnitude, unsigned long attackTime,
                                      unsigned long attackLevel, unsigned long fadeTime,
                                      unsigned long fadeLevel, int button) = 0;
-    virtual int UnknownVirtualSlot11(int effect) = 0;
-    virtual int UnknownVirtualSlot12(int effect, unsigned long iterations, unsigned long flags) = 0;
-    virtual int UnknownVirtualSlot13(int effect) = 0;
-    virtual int UnknownVirtualSlot14(UnknownEffectInfo* effects, int* count) = 0;
-    virtual void UnknownVirtualSlot15() = 0;
-    virtual int UnknownVirtualSlot16() = 0;
-    virtual int UnknownVirtualSlot17(int command) = 0;
-    virtual int UnknownVirtualSlot18(int paused) = 0;
-    virtual void UnknownVirtualSlot19() = 0;
-    virtual int UnknownVirtualSlot20(int value) = 0;
+    virtual int CreateSquareWave(int effect, unsigned long duration, unsigned long period,
+                                 unsigned long magnitude, unsigned long attackTime,
+                                 unsigned long attackLevel, unsigned long fadeTime,
+                                 unsigned long fadeLevel, int button) = 0;
+    virtual int StopEffect(int effect) = 0;
+    virtual int StartEffect(int effect, unsigned long iterations, unsigned long flags) = 0;
+    virtual int IsEffectPlaying(int effect) = 0;
+    virtual int EnumEffects(UnknownEffectInfo* effects, int* count) = 0;
+    virtual void ReleaseEffects() = 0;
+    virtual int ResetForceFeedback() = 0;
+    virtual int SendForceFeedbackCommand(int command) = 0;
+    virtual int PauseForceFeedback(int paused) = 0;
+    virtual void DetectSubtype() = 0;
+    virtual int Update(int value) = 0;
 
     // 0x00489a20: attaches `binding` to the list for its axis.
     int AttachAxisBinding(UnknownControlBinding* binding, float step, float interval);

@@ -518,7 +518,7 @@ void KrustyUI::OpenMenu(int menu) {
         break;
     case kMenuLoading:
         if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
-            g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
+            g_TrackGame->SwitchDisplayMode(g_TrackGame->mode.displayModeIndex);
         dialog = new(__FILE__, 695) LoadingDlg(1);
         gui->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;

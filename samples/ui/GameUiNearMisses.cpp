@@ -225,7 +225,7 @@ int UIListBox::ButtonDown(int a, int b) {
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`.
 int TextureHasColor(TextureMap* texture, int key) {
     int found = 0;
-    unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, 0, 0x11);
+    unsigned short* bits = (unsigned short*)texture->LockSurface(0, 0, 0x11);
     if (bits) {
         int pixel;
         int green;
@@ -252,7 +252,7 @@ int TextureHasColor(TextureMap* texture, int key) {
             }
         }
 unlock:
-        if (!texture->UnknownVirtualSlot14(0))
+        if (!texture->UnlockSurface(0))
             return 0;
         return found;
     }
@@ -421,7 +421,7 @@ int UIEditBox::Draw() {
             frames = redrawFrames;
             redrawFrames = redraw;
         } else {
-            ((RenderTarget*)renderContext)->UnknownVirtualSlot3(screenArea, drawnTexture, visibleArea,
+            ((RenderTarget*)renderContext)->Blit(screenArea, drawnTexture, visibleArea,
                                                             drawnTexture->usesColorKey ? 0x1008000 : 0x1000000);
             redrawFrames = redraw;
         }
@@ -632,7 +632,7 @@ int UIMultiState::Draw() {
                                                            texture->usesColorKey ? 0x1008000 : 0x1000000,
                                                            backgroundRegion, needsRedraw, &redrawFrames, 0);
             frames = redrawFrames;
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, texture, 0,
+        } else if (!((RenderTarget*)renderContext)->Blit(&rect, texture, 0,
                                                                      texture->usesColorKey ? 0x1008000 : 0x1000000)) {
             return 0;
         }
@@ -968,7 +968,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                                 parentBackground = dialogBackground->field_0x2c;
                             dialogBackground->field_0x2c =
                                 new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialogTextures, 1);
-                            dialogBackground->field_0x2c->UnknownVirtualSlot4(
+                            dialogBackground->field_0x2c->CreateSurface(
                                 file->bits, file->width, file->height, file->width, file->width, 0x22b, depth,
                                 dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialogPalette)->colorMapper : 0,
                                 4, dialogPalette ? ((Palette8*)dialogPalette)->ddPalette : 0, 0, 0, 2, 1, 0,

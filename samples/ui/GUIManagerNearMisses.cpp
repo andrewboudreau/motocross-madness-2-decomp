@@ -129,8 +129,8 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
         guiBackground->ReleaseDc();
     g_TrackGame->childRoot->DisableByClassName("GUICursor");
     g_TrackGame->childRoot->DisableByClassName("ToolTip");
-    g_TrackGame->UnknownVirtualSlot8();
-    g_TrackGame->UnknownVirtualSlot9();
+    g_TrackGame->RenderFrame();
+    g_TrackGame->PresentFrame();
     g_TrackGame->renderTarget->AdvanceFrame();
     g_TrackGame->childRoot->EnableByClassName("GUICursor");
     g_TrackGame->childRoot->EnableByClassName("ToolTip");
@@ -190,8 +190,8 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
             }
         }
         texture = new(__FILE__, 916) PCTextureMap(guiTextures, 1);
-        texture->UnknownVirtualSlot4(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
-                                     0xff00ff);
+        texture->CreateSurface(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
+                               0xff00ff);
         DebugFree(bits, __FILE__, 921);
     }
     return texture;

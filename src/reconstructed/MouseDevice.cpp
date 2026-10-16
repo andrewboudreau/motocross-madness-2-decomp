@@ -22,7 +22,7 @@ int MouseDevice::AttachBinding(UnknownControlBinding* binding) {
 }
 
 // 0x0048a4c0: drops every binding with id `id`.
-void MouseDevice::UnknownVirtualSlot0(int id) {
+void MouseDevice::RemoveBindings(int id) {
     for (int list = 0; list < 2; list++) {
         for (int i = 0; i < axisBindings[list].m_count; i++) {
             UnknownControlBinding* binding = axisBindings[list].Get(i);

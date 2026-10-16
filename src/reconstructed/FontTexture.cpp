@@ -121,7 +121,7 @@ FontTexture* FontTexture::Load(const char* name, const char* path, const char* t
         }
         texture = TerrainLoadTexture(manager, textureName, format, 0, 0, 5, 6, a5, 0x80, 0xff00ff, 1, 0);
         if (texture) {
-            texture->UnknownVirtualSlot8(1, 0, 0);
+            texture->CreateTextureSurface(1, 0, 0);
             font->SetTexture(texture);
             s_UnknownManager65b478.AddFont(font);
         } else {

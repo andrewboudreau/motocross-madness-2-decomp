@@ -8,7 +8,7 @@ PCKeyboardDevice::PCKeyboardDevice() {}
 // 0x004c4460: creates the system keyboard device with the keyboard data
 // format, cooperative level 6 and a 16-entry buffer, then acquires it; on
 // any failure the device is released.
-int PCKeyboardDevice::UnknownVirtualSlot2() {
+int PCKeyboardDevice::CreateDevice() {
     if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             GUID_SysKeyboard, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
@@ -18,7 +18,7 @@ int PCKeyboardDevice::UnknownVirtualSlot2() {
         goto failed;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
-    UnknownVirtualSlot3();
+    DetectSubtype();
     if (!SetDwordProperty(DIPROP_BUFFERSIZE, 0, DIPH_DEVICE, 16))
         goto failed;
     if (device->Acquire() < 0)
@@ -33,18 +33,18 @@ failed:
 }
 
 // 0x004c4520: `control` through the mapping table, then slot 5.
-int PCKeyboardDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry) {
+int PCKeyboardDevice::IsControlDown(int control, int modifier, UnknownInputEntry* entry) {
     UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->GetKey(control, &control);
     if (control == -1)
         return 0;
-    return UnknownVirtualSlot5(control, modifier, entry);
+    return IsButtonDown(control, modifier, entry);
 }
 
 // 0x004c4570: whether `key` is down with `modifier` held; copies its entry.
-int PCKeyboardDevice::UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry) {
+int PCKeyboardDevice::IsButtonDown(int key, int modifier, UnknownInputEntry* entry) {
     if (ModifierHolds(modifier) && keyStates[key].state == 1) {
         if (entry) {
             entry->state = 1;
@@ -62,7 +62,7 @@ int PCKeyboardDevice::UnknownVirtualSlot5(int key, int modifier, UnknownInputEnt
 // (0x45) is taken from the immediate state, every other key from the
 // buffered events, which are queued on the ControlInterface. Then the key
 // repeat runs for the six lists and the modifiers are refreshed.
-int PCKeyboardDevice::UnknownVirtualSlot6(int value) {
+int PCKeyboardDevice::Update(int value) {
     unsigned char keys[256];
     UnknownDeviceObjectData events[16];
     long count;

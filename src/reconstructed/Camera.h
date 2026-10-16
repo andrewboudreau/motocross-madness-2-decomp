@@ -34,12 +34,12 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
-    virtual void UnknownVirtualSlot27() = 0;
-    virtual void UnknownVirtualSlot28();
-    virtual int UnknownVirtualSlot29(Vector3 value);
-    virtual int UnknownVirtualSlot30(const Matrix4* value);
-    virtual int UnknownVirtualSlot31(const Matrix4* value);
-    virtual int UnknownVirtualSlot32(const Matrix4* value);
+    virtual void TakeScreenshot() = 0;
+    virtual void UpdateMatrices();
+    virtual int LookAt(Vector3 value);
+    virtual int SetWorldMatrix(const Matrix4* value);
+    virtual int SetViewMatrix(const Matrix4* value);
+    virtual int SetProjectionMatrix(const Matrix4* value);
 
     // 0x0042e8e0, called by slot 13: re-applies the default limits through
     // 0x0042e960 and slot 28 when +0x1bc/+0x1c0 differ from them.

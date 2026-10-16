@@ -241,7 +241,7 @@ ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int a
 // 0x00511290
 int TextureMapManager::UnknownVirtualSlot18() {
     for (TextureMap* texture = allTextures.First(); texture; texture = allTextures.Next())
-        texture->UnknownVirtualSlot12();
+        texture->RecreateIfLost();
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)

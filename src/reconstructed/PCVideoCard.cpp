@@ -183,7 +183,7 @@ void UnknownDisplay::RefreshDriverCaps() {
 }
 
 // 0x004c9ba0
-void UnknownDisplay::UnknownVirtualSlot1() {
+void UnknownDisplay::ReleaseResources() {
     ReleasePrimarySurface();
     if (renderSurface != backBuffer && renderSurface) {
         renderSurface->Release();
@@ -198,7 +198,7 @@ void UnknownDisplay::UnknownVirtualSlot1() {
         directDraw->Release();
         directDraw = 0;
     }
-    VideoCard::UnknownVirtualSlot1();
+    VideoCard::ReleaseResources();
 }
 
 // 0x004c9c10: waits for the primary's blits, then releases it and the
@@ -265,8 +265,8 @@ int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int hei
 }
 
 // 0x004c9ec0
-int UnknownDisplay::UnknownVirtualSlot2(int width, int height, int bitDepth, int a, int b, int windowed,
-                                        int c) {
+int UnknownDisplay::SetDisplayMode(int width, int height, int bitDepth, int a, int b, int windowed,
+                                   int c) {
     if (cooperativeLevel & DDSCL_NORMAL)
         return CreateWindowedSurfaces(width, height, windowed);
     int mode = FindDisplayMode(width, height, bitDepth, a, b);
@@ -375,7 +375,7 @@ failed:
 
 // 0x004ca270: flips (full screen) or blits the render surface to the
 // primary, and records the frame time.
-int UnknownDisplay::UnknownVirtualSlot3() {
+int UnknownDisplay::Present() {
     RECT rect;
     UnknownSurfaceInterface* source;
     unsigned int now;
@@ -423,7 +423,7 @@ failed:
 }
 
 // 0x004ca4a0
-void UnknownDisplay::UnknownVirtualSlot4(int value) {
+void UnknownDisplay::RetryFlip(int value) {
     if (value)
         primarySurface->Flip(0, DDFLIP_WAIT);
     else
@@ -509,7 +509,7 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
     desc.size = sizeof(desc);
     if (target->renderSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0))
         return 0;
-    char* bits = (char*)texture->UnknownVirtualSlot13(0, &pitch, DDLOCK_WAIT | DDLOCK_NOSYSLOCK);
+    char* bits = (char*)texture->LockSurface(0, &pitch, DDLOCK_WAIT | DDLOCK_NOSYSLOCK);
     if (!bits) {
         target->renderSurface->Unlock(0);
         return 0;
@@ -523,7 +523,7 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
         bits += pitch;
     }
     target->renderSurface->Unlock(0);
-    texture->UnknownVirtualSlot14(0);
+    texture->UnlockSurface(0);
     return 1;
 }
 
@@ -566,10 +566,10 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     fx.size = sizeof(fx);
     fx.fillColor = 0;
     rendered->systemSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
-    rendered->UnknownVirtualSlot9(0, 1);
+    rendered->Upload(0, 1);
     expected->systemSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
     rendered->systemSurface->Blt(0, image->systemSurface, 0, DDBLT_WAIT, 0);
-    rendered->UnknownVirtualSlot9(area, 1);
+    rendered->Upload(area, 1);
     expected->systemSurface->Blt(area, image->systemSurface, area, DDBLT_WAIT, 0);
     rendered->systemSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
     target->renderSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
@@ -609,34 +609,34 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     viewport.height = target->targetHeight;
     viewport.minZ = 0.0f;
     viewport.maxZ = 1.0f;
-    int failed = target->UnknownVirtualSlot14(&viewport) != 1;
+    int failed = target->SetViewport(&viewport) != 1;
     if (!failed) {
-        failed = target->UnknownVirtualSlot1() != 1;
+        failed = target->BeginScene() != 1;
         clear.left = 0;
         clear.right = viewport.x + viewport.width;
         clear.top = 0;
         clear.bottom = viewport.y + viewport.height;
         failed |= target->device->Clear(1, &clear, D3DCLEAR_ZBUFFER, 0, target->zClearValue, 0) != 0; // Clear z
-        g_TrackGame->UnknownVirtualSlot7();
-        rendered->UnknownVirtualSlot19();
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-        target->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        target->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
-        target->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        target->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-        failed |= target->UnknownVirtualSlot16(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
+        g_TrackGame->SetRenderStates();
+        rendered->Bind();
+        target->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+        target->SetRenderState(D3DRENDERSTATE_ZENABLE, 0, 0);
+        target->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        target->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+        target->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+        target->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+        target->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        target->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        failed |= target->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
                                               (int)vertices, 4, 0) != 1;
-        target->UnknownVirtualSlot2();
+        target->EndScene();
     }
     failed |= CopyRenderSurfaceToTexture(target, rendered) != 1;
     if (present)
-        display->UnknownVirtualSlot4(1);
+        display->RetryFlip(1);
     if (failed)
         return 2;
     float difference = MeanTextureChannelDifference(rendered, expected);

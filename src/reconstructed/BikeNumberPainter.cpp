@@ -108,11 +108,11 @@ void UnknownBikeNumberPainter::PaintNumber(D3DIMSoultreeObject* model, int numbe
             number -= digit * 10;
         }
         PaintDigit(number, x, texture);
-        texture->UnknownVirtualSlot15(2);
+        texture->BuildMipLevels(2);
         if (texture->mapFlags & 1)
             ((ManagedTexture*)texture)->Reregister();
         else
-            texture->UnknownVirtualSlot9(0, -1);
+            texture->Upload(0, -1);
     }
     if (digits >= 4)
         return;

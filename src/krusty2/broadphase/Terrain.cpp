@@ -570,7 +570,7 @@ int Terrain::GameObjectVirtualSlot14()
             heightField->DrawVisible(((TerrainRenderTarget*)field_0x18));
         }
         if (!g_terrainGame->softwareRendering && detailTexture && g_terrainQualityValue) {
-            detailTexture->UnknownVirtualSlot11();
+            detailTexture->SetAsTexture();
             ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);

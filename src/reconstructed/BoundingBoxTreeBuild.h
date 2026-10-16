@@ -178,9 +178,9 @@ struct TreeModelLod {
 // Render model (D3DIMSoulTree.CPP; derives from the scene node, see 0x00440d40's this).  Stand-in.
 class TreeModelSource : public TreeSceneNode {
 public:
-    void SelectLod(int lod);    // 0x00440d40: -1 keeps currentLod, then walks the LOD's meshes
+    void TransformVertexGroups(int lod);  // 0x00440d40 (D3DIMSoulTree.h): -1 keeps currentLod, then walks the LOD's meshes
     char pad_0x000[0x1a4];
-    int field_0x1a4;            // +0x1a4 saved, cleared around SelectLod(-1) and restored by
+    int field_0x1a4;            // +0x1a4 saved, cleared around TransformVertexGroups(-1) and restored by
                                 // 0x0042c260
     char pad_0x1a8[0x27c - 0x1a8];
     int currentLod;             // +0x27c index into lods (0x00440d40 stores its argument here)

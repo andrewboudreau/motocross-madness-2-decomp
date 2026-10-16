@@ -132,7 +132,7 @@ public:
     float score;  // +0x768  RaceView/BikeRace +0x768 score; message 10 (KbBikePing+0x04) carries it
     float offTrackTime;  // +0x76C  RaceStatus time off the track (RaceView +0x76c); slot 39 respawns past 6 s when raceMode is set
     float timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
-    int lapStartTime;  // +0x774  RaceView +0x774 lap start time
+    float lapStartTime;  // +0x774  RaceView +0x774 lap start time; CountLap (0x004e58c0) subtracts it with fsub dword
     float field_0x778; // 0x778  100.0f from the loader
     void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
     void* heapBufferB; // 0x780  heap buffer released in the destructor

@@ -987,7 +987,7 @@ void SPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         *target = g_TrackGame->ui->garageFocus;
         viewTarget.y += 3.0f;
         g_TrackGame->ui->garageCamera->SetFrame(eye, 0, 0, 0, &fov);
-        g_TrackGame->ui->garageCamera->UnknownVirtualSlot29(*target);
+        g_TrackGame->ui->garageCamera->LookAt(*target);
         g_TrackGame->ui->garageCamera->SetViewport(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,
             previewArea.bottom - previewArea.top);
@@ -2044,7 +2044,7 @@ void LeaveMenusForRace() {
     if (g_TrackGame->ui->gui->guiBackground)
         g_TrackGame->ui->gui->guiBackground->ReleaseDc();
     if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
-        g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
+        g_TrackGame->SwitchDisplayMode(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {
         g_TrackGame->mode.saveGhost = 0;
         g_TrackGame->mode.saveReplay = 0;

@@ -1,7 +1,7 @@
 // Near-miss ControlInterface candidates, kept out of src/reconstructed until
 // they match. See docs/INPUT_DEVICES.md.
 //
-// PCControlInterface::UnknownVirtualSlot3 (0x004bf4f0, 88 bytes + jump
+// PCControlInterface::IsDeviceButtonDown (0x004bf4f0, 88 bytes + jump
 // table; 76/104 compiled inside ControlInterface.cpp, included below): the
 // keyboard and mouse cases call the same slot, so their tails merge. Inside
 // the unit the plain switch below shares the tail as retail does; the one
@@ -37,20 +37,20 @@
 
 // 0x004bf4f0: `control` on one device: kind 0 the keyboard, 1 the mouse,
 // 2 and 3 joystick `device`.
-int PCControlInterface::UnknownVirtualSlot3(int control, int kind, int modifier, int device) {
+int PCControlInterface::IsDeviceButtonDown(int control, int kind, int modifier, int device) {
     switch (kind) {
     case 0:
         if (keyboard)
-            return keyboard->UnknownVirtualSlot5(control, modifier, 0);
+            return keyboard->IsButtonDown(control, modifier, 0);
         break;
     case 1:
         if (mouse)
-            return mouse->UnknownVirtualSlot5(control, modifier, 0);
+            return mouse->IsButtonDown(control, modifier, 0);
         break;
     case 2:
     case 3:
         if (joysticks[device])
-            return joysticks[device]->UnknownVirtualSlot2(control, modifier, 0);
+            return joysticks[device]->IsButtonDown(control, modifier, 0);
         break;
     }
     return 0;

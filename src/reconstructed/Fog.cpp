@@ -79,8 +79,8 @@ int Fog::UnknownVirtualSlot12()
 {
     if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
-        TARGET()->currentCamera->UnknownVirtualSlot28();
-        TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
+        TARGET()->currentCamera->UpdateMatrices();
+        TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix);
     }
     return 1;
 }
@@ -106,8 +106,8 @@ int Fog::UnknownVirtualSlot14()
 {
     if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
-        TARGET()->currentCamera->UnknownVirtualSlot28();
-        if (!TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix)) {
+        TARGET()->currentCamera->UpdateMatrices();
+        if (!TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix)) {
             goto failed;
         }
         if (!drawnByFogOn && TARGET()->targetDisplay->isPowerVR
@@ -137,48 +137,48 @@ int Fog::UnknownVirtualSlot14()
             vertices[3].color = field_0x2c;
             vertices[3].specular = 0;
             vertices[3].rhw = 1.0f;
-            TARGET()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-            TARGET()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            TARGET()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+            TARGET()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
             if (TARGET()->fillMode != D3DFILL_SOLID) {
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
             }
-            if (!TARGET()->UnknownVirtualSlot16(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, (int)vertices, 4, 0)) {
+            if (!TARGET()->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, (int)vertices, 4, 0)) {
                 goto failed;
             }
             if (TARGET()->fillMode != D3DFILL_SOLID) {
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, TARGET()->fillMode, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FILLMODE, TARGET()->fillMode, 0);
             }
         }
         if (renderFog) {
             float density = 1.0f;
-            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 1, 0);
-            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGCOLOR, field_0x2c, 0);
+            TARGET()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 1, 0);
+            TARGET()->SetRenderState(D3DRENDERSTATE_FOGCOLOR, field_0x2c, 0);
             float start = fogStart;
             float end = fogEnd;
             if (field_0x44 == D3DPRASTERCAPS_FOGTABLE) {
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGSTART, *(int*)&start, 0);
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGSTART, *(int*)&start, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
                 density = 0.22f;
                 if (TARGET()->targetDisplay->isPowerVR) {
-                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
-                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_EXP, 0);
-                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                    TARGET()->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
+                    TARGET()->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_EXP, 0);
+                    TARGET()->SetRenderState(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
                 } else {
-                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
-                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_LINEAR, 0);
+                    TARGET()->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
+                    TARGET()->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_LINEAR, 0);
                 }
                 return 1;
             }
             if (field_0x44 == D3DPRASTERCAPS_FOGVERTEX) {
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGSTART, *(int*)&fogStart, 0);
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&fogEnd, 0);
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
-                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_LINEAR, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGSTART, *(int*)&fogStart, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGEND, *(int*)&fogEnd, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
+                TARGET()->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_LINEAR, 0);
                 return 1;
             }
-            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
+            TARGET()->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
         }
     }
     return 1;
@@ -257,8 +257,8 @@ GameObject* FogOff::UnknownVirtualSlot8(void* value)
 int FogOff::UnknownVirtualSlot14()
 {
     TARGET()->currentCamera->ReapplyDefaultLimits();
-    TARGET()->currentCamera->UnknownVirtualSlot32(&TARGET()->currentCamera->projectionMatrix);
-    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
+    TARGET()->currentCamera->SetProjectionMatrix(&TARGET()->currentCamera->projectionMatrix);
+    TARGET()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
     return 1;
 }
 

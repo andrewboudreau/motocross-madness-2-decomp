@@ -18,10 +18,10 @@ public:
     explicit PCCamera(int flags); // 0x004bed80
 
     virtual int UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot27();
-    virtual int UnknownVirtualSlot30(const Matrix4* world); // world matrix
-    virtual int UnknownVirtualSlot31(const Matrix4* view); // view matrix
-    virtual int UnknownVirtualSlot32(const Matrix4* projection); // projection matrix
+    virtual void TakeScreenshot();
+    virtual int SetWorldMatrix(const Matrix4* world);       // world matrix
+    virtual int SetViewMatrix(const Matrix4* view);        // view matrix
+    virtual int SetProjectionMatrix(const Matrix4* projection);  // projection matrix
 
     // The owner of a PCCamera is a PCRenderTarget.
     PCRenderTarget* PCOwner() const { return static_cast<PCRenderTarget*>(Owner()); }

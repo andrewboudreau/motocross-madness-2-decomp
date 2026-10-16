@@ -3,14 +3,14 @@
 // These are useful for deciding whether a VC6 profile reproduces the retail code.
 class UIControl {
 public:
-    virtual int UnknownVirtualSlot61();
-    virtual int UnknownVirtualSlot62();
+    virtual int GetWidth();
+    virtual int GetHeight();
 };
-int UIControl::UnknownVirtualSlot61() {
+int UIControl::GetWidth() {
     char* p = reinterpret_cast<char*>(this);
     return *reinterpret_cast<int*>(p + 0x34) - *reinterpret_cast<int*>(p + 0x2C);
 }
-int UIControl::UnknownVirtualSlot62() {
+int UIControl::GetHeight() {
     char* p = reinterpret_cast<char*>(this);
     return *reinterpret_cast<int*>(p + 0x38) - *reinterpret_cast<int*>(p + 0x30);
 }

@@ -61,7 +61,7 @@ GameObject* Camera::UnknownVirtualSlot8(void* value) {
         Release();
         return 0;
     }
-    UnknownVirtualSlot28();
+    UpdateMatrices();
     if (isEnabled)
         Owner()->SetCamera(this);
     return this;
@@ -78,7 +78,7 @@ int Camera::UnknownVirtualSlot13() {
         rect.top = y;
         rect.right = x + viewport[2];
         rect.bottom = y + viewport[3];
-        Owner()->UnknownVirtualSlot12(&rect, 0);
+        Owner()->Clear(&rect, 0);
     }
     ReapplyDefaultLimits();
     return 1;
@@ -106,7 +106,7 @@ int Camera::UpdateViewport() {
     viewport[3] = targetHeight;
     ((float*)viewport)[4] = 0.0f;
     ((float*)viewport)[5] = 1.0f;
-    if (!owner->UnknownVirtualSlot14(viewport))
+    if (!owner->SetViewport(viewport))
         return 0;
     heightWidthRatio = (float)(unsigned int)viewport[3] / (float)(unsigned int)viewport[2];
     projectionChangeFrames = Owner()->frameModulus + 1;
@@ -142,13 +142,13 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
         if (viewportClearFrames)
             viewportClearFrames--;
         if (fovKeysEnabled) {
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x3f, 0)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xc7, 0, 0x3f, 0)) {
                 fieldOfView -= 1.0f;
                 if (fieldOfView < minFieldOfView)
                     fieldOfView = minFieldOfView;
                 SetFieldOfView(fieldOfView);
             }
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x3f, 0)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xcf, 0, 0x3f, 0)) {
                 fieldOfView += 1.0f;
                 if (fieldOfView > maxFieldOfView)
                     fieldOfView = maxFieldOfView;
@@ -156,14 +156,14 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
             }
         }
         if (widthKeysEnabled) {
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xd2, 0, 0x3f, 0) &&
                 (unsigned int)viewport[2] < (unsigned int)targetWidth)
                 SetViewportWidth(-1, 2, 0);
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xd3, 0, 0x3f, 0) &&
                 (unsigned int)viewport[2] > 0x20)
                 SetViewportWidth(1, -2, 0);
         }
-        UnknownVirtualSlot28();
+        UpdateMatrices();
     }
     return 1;
 }
@@ -204,7 +204,7 @@ void Camera::SetFrame(const Vector3* position, const Vector3* forward, const Vec
 int Camera::ReapplyDefaultLimits() {
     if (farPlane != g_UnknownFloat550f70 || nearPlane != g_UnknownFloat550f6c) {
         ClampLimits(g_UnknownFloat550f6c, g_UnknownFloat550f70);
-        UnknownVirtualSlot28();
+        UpdateMatrices();
     }
     return 1;
 }
@@ -269,7 +269,7 @@ static inline Vector3 NormalizeInline(const Vector3& v) {
 // (but not the z store) is what puts the cross product's fld/fmul operands
 // in retail order; with plain member access four pairs swap (659/690), with
 // the reference for all three stores 675/690.
-int Camera::UnknownVirtualSlot29(Vector3 target) {
+int Camera::LookAt(Vector3 target) {
     if (target.x == eyePosition.x && target.y == eyePosition.y && target.z == eyePosition.z)
         return 0;
     Vector3& up = upDirection;
@@ -290,17 +290,17 @@ int Camera::UnknownVirtualSlot29(Vector3 target) {
     return 1;
 }
 
-int Camera::UnknownVirtualSlot30(const Matrix4* value) {
+int Camera::SetWorldMatrix(const Matrix4* value) {
     worldMatrix = *value;
     return 1;
 }
 
-int Camera::UnknownVirtualSlot31(const Matrix4* value) {
+int Camera::SetViewMatrix(const Matrix4* value) {
     viewMatrix = *value;
     return 1;
 }
 
-int Camera::UnknownVirtualSlot32(const Matrix4* value) {
+int Camera::SetProjectionMatrix(const Matrix4* value) {
     projectionMatrix = *value;
     return 1;
 }
@@ -324,7 +324,7 @@ int Camera::UnknownVirtualSlot18() {
 int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (!GameObject::UnknownVirtualSlot23(event, entry)) {
         if (TestInputEvent(0xB7, 0, event, 0x80000000)) {
-            UnknownVirtualSlot27();
+            TakeScreenshot();
             return 1;
         }
     }
@@ -346,7 +346,7 @@ int Camera::SetViewportWidth(int x, int width, int absolute) {
         viewport[3] = targetHeight;
     viewport[1] = (unsigned int)(targetHeight - viewport[3]) >> 1;
     viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
-    return Owner()->UnknownVirtualSlot14(viewport) != 0;
+    return Owner()->SetViewport(viewport) != 0;
 }
 
 // 0x0042f190. Retail stores the width before y.
@@ -360,7 +360,7 @@ int Camera::SetViewport(int x, int y, int width, int height) {
     if ((unsigned int)viewport[3] > (unsigned int)targetHeight)
         viewport[3] = targetHeight;
     viewportClearFrames = projectionChangeFrames = Owner()->frameModulus + 1;
-    return Owner()->UnknownVirtualSlot14(viewport) != 0;
+    return Owner()->SetViewport(viewport) != 0;
 }
 
 // 0x0042f210

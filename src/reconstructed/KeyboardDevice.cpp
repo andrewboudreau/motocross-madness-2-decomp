@@ -31,7 +31,7 @@ int KeyboardDevice::BindKeys(UnknownControlBinding* binding, int key, int key2,
 }
 
 // 0x0048a030: drops every binding with id `id`.
-void KeyboardDevice::UnknownVirtualSlot0(int id) {
+void KeyboardDevice::RemoveBindings(int id) {
     for (int list = 0; list < 6; list++) {
         for (int i = 0; i < axisBindings[list].m_count; i++) {
             UnknownControlBinding* binding = axisBindings[list].Get(i);
@@ -49,7 +49,7 @@ void KeyboardDevice::RepeatKeys(int list, int value) {
         UnknownControlBinding* binding = axisBindings[list].Get(i);
         binding->secondKeyTimer += g_TrackGame->frameTime;
         binding->firstKeyTimer += g_TrackGame->frameTime;
-        if (UnknownVirtualSlot5(binding->firstKey, 0x3f, 0)) {
+        if (IsButtonDown(binding->firstKey, 0x3f, 0)) {
             if (binding->firstKeyTimer - g_TrackGame->frameTime > binding->repeatInterval) {
                 binding->Recenter();
                 binding->firstKeyTimer = 0;
@@ -59,7 +59,7 @@ void KeyboardDevice::RepeatKeys(int list, int value) {
                 binding->firstKeyTimer -= binding->repeatInterval;
             }
         }
-        if (UnknownVirtualSlot5(binding->secondKey, 0x3f, 0)) {
+        if (IsButtonDown(binding->secondKey, 0x3f, 0)) {
             if (binding->secondKeyTimer - g_TrackGame->frameTime > binding->repeatInterval) {
                 binding->Recenter();
                 binding->secondKeyTimer = 0;
@@ -69,8 +69,8 @@ void KeyboardDevice::RepeatKeys(int list, int value) {
                 binding->secondKeyTimer -= binding->repeatInterval;
             }
         }
-        if (!UnknownVirtualSlot5(binding->firstKey, 0x3f, 0) &&
-            !UnknownVirtualSlot5(binding->secondKey, 0x3f, 0))
+        if (!IsButtonDown(binding->firstKey, 0x3f, 0) &&
+            !IsButtonDown(binding->secondKey, 0x3f, 0))
             binding->Recenter();
     }
 }

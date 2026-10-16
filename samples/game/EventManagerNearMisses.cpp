@@ -70,7 +70,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
         g_TrackGame->StopCDAudio();
     UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.displayModeIndex];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
-        g_TrackGame->UnknownVirtualSlot19(
+        g_TrackGame->SwitchDisplayMode(
             g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
     g_TrackGame->ui->gui->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->gui->GetUser(0);
@@ -383,7 +383,7 @@ int EventManager::CreatePodiumScene() {
     podiumCameraTarget = rotated * PodiumLength(lookOffset) + podiumPosition;
     podiumPanSpeed = podiumCameraTarget - podiumCameraPosition;
     podiumCamera->SetFrame(&podiumCameraPosition, 0, 0, 0, 0);
-    podiumCamera->UnknownVirtualSlot29(podiumFocus);
+    podiumCamera->LookAt(podiumFocus);
     float x0 = podiumPosition.x - 16.0f;
     float x1 = x0 + 32.0f;
     float z0 = podiumPosition.z - 16.0f;

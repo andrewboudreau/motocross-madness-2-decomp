@@ -29,8 +29,8 @@ int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
     }
 
     long sourcePitch, pitch;
-    unsigned char* source = (unsigned char*)backingTexture->UnknownVirtualSlot13(0, &sourcePitch, 0x811);
-    unsigned char* bits = (unsigned char*)overlayTexture->UnknownVirtualSlot13(0, &pitch, 0x801);
+    unsigned char* source = (unsigned char*)backingTexture->LockSurface(0, &sourcePitch, 0x811);
+    unsigned char* bits = (unsigned char*)overlayTexture->LockSurface(0, &pitch, 0x801);
     if (!source || !bits)
         return 0;
 
@@ -47,7 +47,7 @@ int Overlay::RestoreRect(const UnknownOverlayRect* rect) {
             bits += pitch;
         }
     }
-    backingTexture->UnknownVirtualSlot14(0);
-    overlayTexture->UnknownVirtualSlot14(0);
+    backingTexture->UnlockSurface(0);
+    overlayTexture->UnlockSurface(0);
     return 1;
 }

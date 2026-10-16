@@ -89,33 +89,33 @@ void UnknownOverlayText::DrawVertices(RenderTarget* target, void* vertices, int 
         return;
 
     TextureMap* texture = currentFont->GetTexture();
-    texture->UnknownVirtualSlot8(1, 0, 0);
-    texture->UnknownVirtualSlot19();
+    texture->CreateTextureSurface(1, 0, 0);
+    texture->Bind();
     int saved;
-    target->UnknownVirtualSlot6(0, 0xc, &saved);
-    target->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
+    target->GetTextureStageState(0, 0xc, &saved);
+    target->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
+    target->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
     int format = texture->mapFormat;
     if (format == 4444 || format == 8888) {
-        target->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        target->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-        target->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-        target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        target->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        target->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        target->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        target->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+        target->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+        target->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
     } else {
-        target->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        target->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        target->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        target->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        target->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        target->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        target->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
-    target->UnknownVirtualSlot18(0);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
-    target->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
-    target->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 1, 0);
-    target->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, saved);
+    target->SetAlphaTest(0);
+    target->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    target->SetRenderState(D3DRENDERSTATE_ZENABLE, 0, 0);
+    target->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+    target->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
+    target->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    target->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
+    target->SetRenderState(D3DRENDERSTATE_ZENABLE, 1, 0);
+    target->SetTextureStageState(0, D3DTSS_ADDRESS, saved);
 }

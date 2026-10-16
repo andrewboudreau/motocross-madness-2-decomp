@@ -102,10 +102,10 @@ class ControlInterface {
 public:
     ControlInterface();                    // 0x0043ce00
     virtual ~ControlInterface();           // 0x0043ce60 (deleting wrapper 0x0043ce40)
-    virtual int UnknownVirtualSlot1() = 0;                       // set up the devices
-    virtual int UnknownVirtualSlot2(int control, int modifier) = 0; // control state
-    virtual int UnknownVirtualSlot3(int control, int kind, int modifier, int device) = 0;
-    virtual int UnknownVirtualSlot4(int modifier) = 0;           // modifier test
+    virtual int CreateDevices() = 0;                             // set up the devices
+    virtual int IsControlDown(int control, int modifier) = 0;       // control state
+    virtual int IsDeviceButtonDown(int control, int kind, int modifier, int device) = 0;
+    virtual int ModifierHolds(int modifier) = 0;                 // modifier test
 
     int SetMapping(UnknownControlMapping* newMapping);        // 0x0043ce70: 0 for a null mapping
     void QueueEvent(int control, int kind, int pressed, int device); // 0x0043cea0: the device readers call it

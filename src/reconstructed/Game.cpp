@@ -116,22 +116,22 @@ Game::Game() {
 }
 
 // 0x00467ae0 (identical code for slots 5 and 6)
-int Game::UnknownVirtualSlot1() {
+int Game::Startup() {
     return 1;
 }
 
-int Game::UnknownVirtualSlot5() {
+int Game::OnActivate() {
     return 1;
 }
 
-int Game::UnknownVirtualSlot6() {
+int Game::OnDeactivate() {
     return 1;
 }
 
 // 0x00467af0: creates the PC control interface and sets it up (slot 1).
-int Game::UnknownVirtualSlot2() {
+int Game::Initialize() {
     controlInterface = new(__FILE__, 187) PCControlInterface;
-    return controlInterface->UnknownVirtualSlot1() != 0;
+    return controlInterface->CreateDevices() != 0;
 }
 
 // 0x00467b70: builds the two root objects (the second a child of the
@@ -159,7 +159,7 @@ int Game::CreateObjects(char*) {
         type == 4)                            // REG_DWORD
         testKey = value;
     RegCloseKey(key);
-    if (!UnknownVirtualSlot32())
+    if (!InitializeDisplay())
         return 0;
     textureManager = new(__FILE__, 282) TextureMapManager;
     childRoot->AppendChild(textureManager->UnknownVirtualSlot8(renderTarget), -1);
@@ -182,14 +182,14 @@ int Game::CreateObjects(char*) {
         g_MemTagStack->Pop(category);
     }
     allowFreezeCamera = GetRegistryFlag("AllowFreezeCamera", 0);
-    if (!UnknownVirtualSlot3())
+    if (!OpenResources())
         return 0;
-    return UnknownVirtualSlot4() != 0;
+    return CreateGameObjects() != 0;
 }
 
 // 0x00467e80: slot 31's result is kept at +0x10 and handed to the interface.
-int Game::UnknownVirtualSlot33() {
-    renderTarget = UnknownVirtualSlot31();
+int Game::AttachRenderTarget() {
+    renderTarget = CreateRenderTarget();
     if (!renderTarget)
         return 0;
     if (rootObject)
@@ -199,16 +199,16 @@ int Game::UnknownVirtualSlot33() {
 
 // 0x00467eb0: renders a frame, timing each phase, and with bit 2 of +0x2d4
 // fills the debug overlay's profile and memory pages.
-int Game::UnknownVirtualSlot8() {
+int Game::RenderFrame() {
     if (display->lastFlipFailed)
-        display->UnknownVirtualSlot4(0);
+        display->RetryFlip(0);
     unsigned int last = ReadClock();
     rootObject->UnknownVirtualSlot12();
     unsigned int now = ReadClock();
     int prepareGeometry = now - last;
     last = now;
     if (display->lastFlipFailed)
-        display->UnknownVirtualSlot4(1);
+        display->RetryFlip(1);
     now = ReadClock();
     int waitForFlip = now - last;
     last = now;
@@ -217,14 +217,14 @@ int Game::UnknownVirtualSlot8() {
     int renderPre3D = now - last;
     int render3D = 0;
     if (useZBuffer) {
-        if (!renderTarget->UnknownVirtualSlot1())
+        if (!renderTarget->BeginScene())
             goto failed;
-        renderTarget->UnknownVirtualSlot12(0, 0);
-        UnknownVirtualSlot7();
+        renderTarget->Clear(0, 0);
+        SetRenderStates();
         last = ReadClock();
         rootObject->UnknownVirtualSlot14();
         render3D = ReadClock() - last;
-        if (!renderTarget->UnknownVirtualSlot2()) {
+        if (!renderTarget->EndScene()) {
         failed:
             return 0;
         }
@@ -329,8 +329,8 @@ int Game::UnknownVirtualSlot8() {
 }
 
 // 0x004685c0
-int Game::UnknownVirtualSlot9() {
-    display->UnknownVirtualSlot3();
+int Game::PresentFrame() {
+    display->Present();
     return 1;
 }
 
@@ -340,7 +340,7 @@ void Game::ResetClock() {
 }
 
 // 0x004688a0
-int Game::UnknownVirtualSlot11(int value) {
+int Game::SetInputSuspended(int value) {
     if (network)
         return 0;
     inputSuspended = value;
@@ -354,7 +354,7 @@ int Game::UnknownVirtualSlot12(int value) {
 }
 
 // 0x00468900: releases go to the interface unless inputSuspended is set.
-int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Game::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (inputSuspended)
         return 1;
     return rootObject->UnknownVirtualSlot22(event, entry) != 0;
@@ -364,7 +364,7 @@ int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* en
 // Control 0x20 also drives the +0x38 object; with bit 0 of +0x2d4, Ctrl+F
 // (key 0x21 with modifier 0xc) toggles +0x1c4 and E (0x12) clears it,
 // setting +0x1c8.
-int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int Game::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (inputSuspended)
         return 1;
     if (testKey && debugOverlay && TestInputEvent(0x20, 0, event, 0x80)) {
@@ -376,9 +376,9 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
         }
     }
     if (allowFreezeCamera) {
-        if (controlInterface->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
+        if (controlInterface->IsDeviceButtonDown(0x21, 0, 0xc, 0)) {
             paused = 1 - paused;
-        } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && paused) {
+        } else if (controlInterface->IsDeviceButtonDown(0x12, 0, 0x3f, 0) && paused) {
             stepOneFrame = 1;
             paused = 0;
         }
@@ -394,7 +394,7 @@ Game::~Game() {
 
 // 0x00468a30: tears down the interface, the network object, the owners and
 // the ControlInterface.
-int Game::UnknownVirtualSlot15() {
+int Game::Shutdown() {
     shuttingDown = 1;
     if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
         g_UnknownGlobal56c470->Unlink();
@@ -436,12 +436,12 @@ int Game::CreateNetworkInterface(int value) {
 }
 
 // 0x00468ba0: hands a network message to the +0x2f4 object.
-int Game::UnknownVirtualSlot17(int type, void* data, int from, int to, int flags) {
+int Game::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
     return rootObject->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
 }
 
 // 0x00468bd0: `path` = workingDirectory (+0x1cc), "\\" and `name`.
-int Game::UnknownVirtualSlot18(const char* name, char* path) {
+int Game::FindDataFile(const char* name, char* path) {
     strcpy(path, workingDirectory);
     strcat(path, "\\");
     strcat(path, name);
@@ -449,16 +449,16 @@ int Game::UnknownVirtualSlot18(const char* name, char* path) {
 }
 
 // 0x00468c60
-int Game::UnknownVirtualSlot30(int, char* text) {
+int Game::GetStringResource(int, char* text) {
     strcpy(text, "No Strings Available");
     return 0;
 }
 
 // 0x00468c90 (identical code for slot 4)
-int Game::UnknownVirtualSlot3() {
+int Game::OpenResources() {
     return 1;
 }
 
-int Game::UnknownVirtualSlot4() {
+int Game::CreateGameObjects() {
     return 1;
 }

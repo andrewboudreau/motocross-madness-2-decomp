@@ -225,7 +225,7 @@ void ManagedTextureGroup::RepackWholePages() {
         filled++;
         page->ReserveRegions(levels, 8);
         page->PlaceTextures(&field_0x158, 0);
-        page->UnknownVirtualSlot9(0, -1);
+        page->Upload(0, -1);
     }
     cachePages.AppendList(&emptied);
 
@@ -402,7 +402,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
 
     for (i = 0; i < field_0x7c.m_count; i++) {
         managed = field_0x7c.Get(i);
-        if (managed->UnknownVirtualSlot7() && managed->plannedLevel != managed->field_0xa8)
+        if (managed->IsResident() && managed->plannedLevel != managed->field_0xa8)
             managed->ReleasePage();
     }
     memset(levels, 0, sizeof(levels));
@@ -500,7 +500,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
     i = 0;
     while (i < field_0x7c.m_count) {
         managed = field_0x7c.Get(i);
-        if (managed->UnknownVirtualSlot7()) {
+        if (managed->IsResident()) {
             if (managed->field_0x98)
                 field_0x144.Add(managed);
             field_0x7c.Remove(managed);
@@ -544,7 +544,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
             if (managed->field_0xa8 - pass >= 5) {
                 blitted -= LevelArea(managed->plannedLevel - managed->field_0x9c);
                 managed->field_0x9c = pass;
-                if (pass == managed->field_0x98 && managed->UnknownVirtualSlot7()) {
+                if (pass == managed->field_0x98 && managed->IsResident()) {
                     field_0x144.RemoveOrdered(managed);
                 } else {
                     blitted += LevelArea(managed->plannedLevel - managed->field_0x9c);
@@ -679,10 +679,10 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
             }
             int x = target->targetWidth - selected->textureWidth;
             long pitch;
-            unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
+            unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
             if (bits) {
                 long sourcePitch;
-                void* source = selected->UnknownVirtualSlot13(0, &sourcePitch, 0x811);
+                void* source = selected->LockSurface(0, &sourcePitch, 0x811);
                 if (source) {
                     int sourceSize = PixelFormatBytesPerPixel(selected->mapFormat);
                     int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
@@ -691,7 +691,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                                           target->surfacePixelFormat, selected->mapFormat, 0, selected->field_0x2c, 0, 0);
                     selected->systemSurface->Unlock(0);
                 }
-                target->UnknownVirtualSlot5(0);
+                target->UnlockSurface(0);
             }
             _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", textureCursor + 1, selected->largestUse,
                       selected->field_0xa8, state);
@@ -731,7 +731,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
         surface->Blt(&rect, 0, 0, 0x400, &effects);
         static_cast<CacheTexture*>(page)->ListTextures(&field_0x1a8);
         long pitch;
-        unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
+        unsigned char* bits = (unsigned char*)target->LockSurface(0, &pitch, 0x821);
         if (bits) {
             for (int j = 0; j < field_0x1a8.m_count; j++) {
                 ManagedTexture* managed = field_0x1a8.Get(j);

@@ -206,7 +206,7 @@ int BikeRace::UnknownVirtualSlot16(int value) {
     GameObject::UnknownVirtualSlot16(value);
     JoystickDevice* joystick = g_TrackGame->controlInterface->activeJoystick;
     if (joystick != 0 && g_TrackGame->mode.joystickOn) {
-        joystick->UnknownVirtualSlot18(value);
+        joystick->PauseForceFeedback(value);
     }
     return 1;
 }
@@ -699,8 +699,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     g_UnknownGlobal567a88 = 2;
                 }
                 if (model->detailLevelCount > 1) {
-                    int up = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
-                    int down = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
+                    int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
+                    int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);
                     int row = g_UnknownGlobal567a88 - 1;
                     if (down || up) {
                         if ((signed char)targetKind < 0) {
@@ -855,8 +855,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         case 0x35:
             if (g_TrackGame->playerCount > 1) {
                 KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
-                if (!keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
-                    !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0)) {
+                if (!keyboard->IsButtonDown(0x2a, 0x3f, 0) &&
+                    !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x36, 0x3f, 0)) {
                     if (g_TrackGame->mode.chatInputLine == 2) {
                         break;
                     }

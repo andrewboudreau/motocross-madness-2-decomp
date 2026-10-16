@@ -10,12 +10,12 @@ public:
     // (wrapper 0x004c43e0).
     PCKeyboardDevice();           // 0x004c43c0
 
-    virtual int UnknownVirtualSlot2();
+    virtual int CreateDevice();
     // Slot 3 is the shared empty body at 0x00464e90 (see samples/pccontrol).
-    virtual void UnknownVirtualSlot3() {}
-    virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot6(int value);
+    virtual void DetectSubtype() {}
+    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry);
+    virtual int IsButtonDown(int key, int modifier, UnknownInputEntry* entry);
+    virtual int Update(int value);
 
     // 0x004c4830: rebuilds the modifier state at +0x16d8 from the keys.
     void RefreshModifierState();

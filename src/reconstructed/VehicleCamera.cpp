@@ -139,7 +139,7 @@ void VehicleCamera::UnknownVirtualSlot68() {
         targetFieldOfView = 10.0f;
     if (targetFieldOfView > 70.0f)
         targetFieldOfView = 70.0f;
-    UnknownVirtualSlot29(target);
+    LookAt(target);
 }
 
 // 0x0052ca10: 0x0052bb60's position, led by the tracked point (slot 33)

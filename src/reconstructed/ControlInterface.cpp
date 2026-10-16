@@ -153,7 +153,7 @@ void UnknownControlBinding::Adjust(float delta) {
 // 0x0043cde0: asks the owning device to drop bindings with this id.
 void UnknownControlBinding::Unbind() {
     if (g_TrackGame->controlInterface && owner)
-        owner->UnknownVirtualSlot0(bindingId);
+        owner->RemoveBindings(bindingId);
 }
 
 // 0x0043ce00
@@ -197,12 +197,12 @@ void ControlInterface::QueueEvent(int control, int kind, int pressed, int device
 int ControlInterface::DispatchInput(int value) {
     queuedEventCount = 0;
     if (keyboard)
-        keyboard->UnknownVirtualSlot6(value);
+        keyboard->Update(value);
     if (mouse)
-        mouse->UnknownVirtualSlot6(value);
+        mouse->Update(value);
     for (int i = 0; i < 8; i++) {
         if (joysticks[i])
-            joysticks[i]->UnknownVirtualSlot20(value);
+            joysticks[i]->Update(value);
     }
     for (int j = 0; j < queuedEventCount; j++) {
         UnknownControlEvent* event = &events[j];
@@ -217,27 +217,27 @@ int ControlInterface::DispatchInput(int value) {
         switch (event->kind) {
         case 0:
             if (event->pressed == 0)
-                g_TrackGame->UnknownVirtualSlot13(
+                g_TrackGame->OnControlRelease(
                     event, &keyboard->keyStates[event->control]);
             if (event->pressed == 1)
-                g_TrackGame->UnknownVirtualSlot14(
+                g_TrackGame->OnControlPress(
                     event, &keyboard->keyStates[event->control]);
             break;
         case 1:
             if (event->pressed == 0)
-                g_TrackGame->UnknownVirtualSlot13(
+                g_TrackGame->OnControlRelease(
                     event, &mouse->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_TrackGame->UnknownVirtualSlot14(
+                g_TrackGame->OnControlPress(
                     event, &mouse->buttonStates[event->control]);
             break;
         case 2:
         case 3:
             if (event->pressed == 0)
-                g_TrackGame->UnknownVirtualSlot13(
+                g_TrackGame->OnControlRelease(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_TrackGame->UnknownVirtualSlot14(
+                g_TrackGame->OnControlPress(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             break;
         }

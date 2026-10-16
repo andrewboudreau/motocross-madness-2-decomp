@@ -12,12 +12,12 @@ public:
     // (wrapper 0x0048a3a0).
     MouseDevice();                // 0x0048a2d0
 
-    virtual void UnknownVirtualSlot0(int id);  // 0x0048a4c0
-    virtual int UnknownVirtualSlot2() = 0;
-    virtual void UnknownVirtualSlot3() = 0;
-    virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry) = 0;
-    virtual int UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) = 0;
-    virtual int UnknownVirtualSlot6(int value) = 0;
+    virtual void RemoveBindings(int id); // 0x0048a4c0
+    virtual int CreateDevice() = 0;
+    virtual void DetectSubtype() = 0;
+    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int IsButtonDown(int button, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int Update(int value) = 0;
 
     // 0x0048a550: moves every binding on `axis` by `amount` scaled to its
     // maximum.

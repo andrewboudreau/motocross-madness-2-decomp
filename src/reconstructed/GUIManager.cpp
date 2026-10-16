@@ -304,7 +304,7 @@ int GUIManager::UnknownVirtualSlot13() {
         rect.bottom = screenGrab->textureHeight;
         if (guiBackground) {
             guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
-        } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
+        } else if (!((RenderTarget*)renderContext)->Blit(&rect, screenGrab, 0, 0x1000000)) {
             GameObject::UnknownVirtualSlot13();
             return 0;
         }
@@ -325,7 +325,7 @@ int GUIManager::UnknownVirtualSlot15() {
             rect.bottom = screenGrab->textureHeight;
             if (guiBackground) {
                 guiBackground->DrawImage(screenGrab, &rect, 0, 0x1000000, grabRegion, 1, &grabCopyFrames, 0);
-            } else if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, screenGrab, 0, 0x1000000)) {
+            } else if (!((RenderTarget*)renderContext)->Blit(&rect, screenGrab, 0, 0x1000000)) {
                 GameObject::UnknownVirtualSlot15();
                 return 0;
             }
@@ -333,7 +333,7 @@ int GUIManager::UnknownVirtualSlot15() {
         GameObject::UnknownVirtualSlot15();
     } else {
         waitFrames = waitFrames - 1 < 0 ? 0 : waitFrames - 1;
-        g_TrackGame->renderTarget->UnknownVirtualSlot12(0, 0);
+        g_TrackGame->renderTarget->Clear(0, 0);
         if (!waitFrames && redrawBackground) {
             redrawBackground->MarkAllDirty();
             redrawBackground = 0;
@@ -500,8 +500,8 @@ void GUIManager::RedrawFrame() {
         guiBackground->ReleaseDc();
         guiBackground->MarkAllDirty();
     }
-    g_TrackGame->UnknownVirtualSlot8();
-    g_TrackGame->UnknownVirtualSlot9();
+    g_TrackGame->RenderFrame();
+    g_TrackGame->PresentFrame();
     g_TrackGame->renderTarget->AdvanceFrame();
 }
 
@@ -593,11 +593,11 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
         fill.field_0x02 = (unsigned char)color;
         for (pixel = bits; pixel < bits + width * height; pixel++)
             *pixel = fill;
-        if (texture->UnknownVirtualSlot4(bits, width, height, width, width, 0x378,
-                                         g_TrackGame->renderTarget->surfacePixelFormat,
-                                         (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
-                                         guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
-            texture->UnknownVirtualSlot18(0xff00ff);
+        if (texture->CreateSurface(bits, width, height, width, width, 0x378,
+                                   g_TrackGame->renderTarget->surfacePixelFormat,
+                                   (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
+                                   guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
+            texture->ApplyColorKey(0xff00ff);
         delete bits;
     }
     return texture;
@@ -758,7 +758,7 @@ int ToolTip::UnknownVirtualSlot15() {
         rect.top = screenArea.top;
         rect.right = screenArea.left + textArea.right;
         rect.bottom = screenArea.top + textArea.bottom;
-        if (!((RenderTarget*)renderContext)->UnknownVirtualSlot3(&rect, textTexture, &textArea, 0x1008000))
+        if (!((RenderTarget*)renderContext)->Blit(&rect, textTexture, &textArea, 0x1008000))
             return 0;
     } else if (tipGui && tipGui->guiBackground && backgroundRegion > -1) {
         if (restoreFrames > 0) {
@@ -830,8 +830,8 @@ void GUIInputDevice::Rebind() {
     if (!inputDevice)
         return;
     if (inputDevice->deviceKind == 2 || inputDevice->deviceKind == 1) {
-        inputDevice->UnknownVirtualSlot0(bindingX.bindingId);
-        inputDevice->UnknownVirtualSlot0(bindingY.bindingId);
+        inputDevice->RemoveBindings(bindingX.bindingId);
+        inputDevice->RemoveBindings(bindingY.bindingId);
     }
     rangeX = rangeMaxX;
     rangeY = rangeMaxY;

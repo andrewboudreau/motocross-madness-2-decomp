@@ -153,11 +153,11 @@ int Cube::LoadTexture(int face, int index, UnknownTexturePalette* palette,
         faces[face].textures[index] = new (__FILE__, 0x2c8) PCTextureMap(context->manager, 1);
     }
     if (faces[face].textures[index]) {
-        faces[face].textures[index]->UnknownVirtualSlot5(
+        faces[face].textures[index]->LoadSurface(
             textureStream, size, size, 1, fileFormat, dataSize, 0, palette, 2, 0, 2, 1,
             (UnknownTextureFormatChoice*)context, 0x80, 0xff00ff);
         if (!textureGroup)
-            faces[face].textures[index]->UnknownVirtualSlot8(1, 0, 0);
+            faces[face].textures[index]->CreateTextureSurface(1, 0, 0);
     }
     if (field_0x10 & 2)
         SkipToSector(textureStream, alignmentBase);

@@ -77,20 +77,20 @@ int PCGame::ProfileDisplays() {
             SetRegistryInt(name, total);
             sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->driverGuidText);
             SetRegistryFlag(name, 0);
-            UnknownVirtualSlot34(g_UnknownDisplays68a754[i]);
+            FilterDisplayModes(g_UnknownDisplays68a754[i]);
             sprintf(name, "DriverInfo\\%s\\Modes", g_UnknownDisplays68a754[i]->driverGuidText);
             SetRegistryBinary(name, g_UnknownDisplays68a754[i]->displayModes,
                                  g_UnknownDisplays68a754[i]->displayModeCount * sizeof(UnknownDisplayMode));
             sprintf(name, "DriverInfo\\%s\\DisabledSoftware", g_UnknownDisplays68a754[i]->driverGuidText);
             if (!GetRegistryFlag(name, 0)) {
                 SetRegistryFlag(name, 1);
-                if (g_UnknownDisplays68a754[i]->UnknownVirtualSlot2(640, 480, 16, 2, 0, 0, 0))
+                if (g_UnknownDisplays68a754[i]->SetDisplayMode(640, 480, 16, 2, 0, 0, 0))
                     SetRegistryFlag(name, 0);
             }
             sprintf(name, "DriverInfo\\%s\\DisabledHardware", g_UnknownDisplays68a754[i]->driverGuidText);
             if (!GetRegistryFlag(name, 0)) {
                 SetRegistryFlag(name, 1);
-                if (g_UnknownDisplays68a754[i]->UnknownVirtualSlot2(640, 480, 16, 2, 0, 1, 0)) {
+                if (g_UnknownDisplays68a754[i]->SetDisplayMode(640, 480, 16, 2, 0, 1, 0)) {
                     g_UnknownDisplays68a754[i]->RefreshDriverCaps();
                     if (g_UnknownDisplays68a754[i]->driverCaps & 1) {
                         RenderTarget* target = (new(__FILE__, 1423) PCRenderTarget)

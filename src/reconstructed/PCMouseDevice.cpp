@@ -12,7 +12,7 @@ PCMouseDevice::PCMouseDevice() {
 // 0x004c4970: creates the system mouse device, records its axis and button
 // counts, sets the mouse data format, cooperative level 5 and a 16-entry
 // buffer, then acquires it.
-int PCMouseDevice::UnknownVirtualSlot2() {
+int PCMouseDevice::CreateDevice() {
     UnknownDeviceCaps caps;
     if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             GUID_SysMouse, IID_IDirectInputDevice7A, &device, 0) < 0)
@@ -28,7 +28,7 @@ int PCMouseDevice::UnknownVirtualSlot2() {
         goto failed;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
-    UnknownVirtualSlot3();
+    DetectSubtype();
     if (!SetDwordProperty(DIPROP_BUFFERSIZE, 0, DIPH_DEVICE, 16))
         goto failed;
     if (device->Acquire() < 0)
@@ -39,7 +39,7 @@ failed:
 }
 
 // 0x004c4a50: mouse subtypes 3-5 select modes 0-2 in +0x10.
-void PCMouseDevice::UnknownVirtualSlot3() {
+void PCMouseDevice::DetectSubtype() {
     int subtype = DEVICE_SUBTYPE(deviceInfo.deviceType);
     if (subtype == 3)
         deviceSubtype = 0;
@@ -51,7 +51,7 @@ void PCMouseDevice::UnknownVirtualSlot3() {
 
 // 0x004c4a90: whether `button` is down (with `modifier` held, when there is
 // a keyboard); copies its entry.
-int PCMouseDevice::UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) {
+int PCMouseDevice::IsButtonDown(int button, int modifier, UnknownInputEntry* entry) {
     KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
     if ((!keyboard || keyboard->ModifierHolds(modifier)) &&
         buttonStates[button].state == 1) {
@@ -71,7 +71,7 @@ int PCMouseDevice::UnknownVirtualSlot5(int button, int modifier, UnknownInputEnt
 // -14 and -15 a double click of buttons 0 and 1 (presses under 175 apart),
 // and -16 to -19 a direction while button 0 is down; others go through the
 // mapping table to slot 5.
-int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry) {
+int PCMouseDevice::IsControlDown(int control, int modifier, UnknownInputEntry* entry) {
     if (control < 0) {
         switch (control) {
         case -2:
@@ -103,19 +103,19 @@ int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEn
                 return 1;
             break;
         case -16:
-            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-2, 0x3f, 0))
+            if (buttonStates[0].state == 1 && IsControlDown(-2, 0x3f, 0))
                 return 1;
             break;
         case -17:
-            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-3, 0x3f, 0))
+            if (buttonStates[0].state == 1 && IsControlDown(-3, 0x3f, 0))
                 return 1;
             break;
         case -18:
-            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-4, 0x3f, 0))
+            if (buttonStates[0].state == 1 && IsControlDown(-4, 0x3f, 0))
                 return 1;
             break;
         case -19:
-            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-5, 0x3f, 0))
+            if (buttonStates[0].state == 1 && IsControlDown(-5, 0x3f, 0))
                 return 1;
             break;
         }
@@ -127,13 +127,13 @@ int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEn
     mapping->GetMouseButton(control, &control);
     if (control == -1)
         return 0;
-    return UnknownVirtualSlot5(control, modifier, entry);
+    return IsButtonDown(control, modifier, entry);
 }
 
 // 0x004c4cf0: reads the buffered button events (offsets 12-15, re-acquiring
 // a lost device) and queues them on the ControlInterface, then reads the
 // movement into +0x2d8 and feeds x and y to the bindings.
-int PCMouseDevice::UnknownVirtualSlot6(int value) {
+int PCMouseDevice::Update(int value) {
     UnknownDeviceObjectData events[16];
     long count;
     int i;

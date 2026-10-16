@@ -656,7 +656,7 @@ void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* mod
     int j;
     int k;
 
-    model->SelectLod(-1);
+    model->TransformVertexGroups(-1);
     total = 0;
     for (i = 0; i < model->lods[model->currentLod].meshCount; i++)
         total += model->lods[model->currentLod].meshes[i].vertexCount;

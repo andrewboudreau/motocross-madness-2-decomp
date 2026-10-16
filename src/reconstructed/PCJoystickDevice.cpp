@@ -32,8 +32,8 @@ PCJoystickDevice::PCJoystickDevice(int index) : JoystickDevice(index) {
 // 0x004c28d0: releases the effects and resets the device (calls bind
 // statically in a destructor).
 PCJoystickDevice::~PCJoystickDevice() {
-    UnknownVirtualSlot15();
-    UnknownVirtualSlot16();
+    ReleaseEffects();
+    ResetForceFeedback();
 }
 
 // 0x004c2930: creates the device, takes its description and capabilities
@@ -50,7 +50,7 @@ int PCJoystickDevice::OpenDevice(const UnknownDeviceInstance* instance) {
     deviceInfo = *instance;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
-    UnknownVirtualSlot19();
+    DetectSubtype();
     if (g_TrackGame->controlInterface->directInput->GetDeviceStatus(guid) < 0)
         goto failed;
     if (device->SetDataFormat(&c_dfDIJoystick) < 0)
@@ -118,7 +118,7 @@ int PCJoystickDevice::OpenDevice(const UnknownDeviceInstance* instance) {
         deadZoneScales[5] = half / (half - half * 0.05f);
     }
     if (deviceKind == 3)
-        UnknownVirtualSlot5(0);
+        SetAutoCenter(0);
     SetBufferedInput(g_TrackGame->GetRegistryFlag("BufferedJoystick", 1));
     return 1;
 failed:
@@ -272,7 +272,7 @@ int PCJoystickDevice::ApplyAxisDeadZone(int axis, int value) {
 
 // 0x004c3b20: POV index in hundredths of a degree, as radians; -1 when
 // centred (-1 or 0xffff) or out of range.
-int PCJoystickDevice::UnknownVirtualSlot3(int index, float* angle) {
+int PCJoystickDevice::GetPovAngle(int index, float* angle) {
     if (povCount > index) {             // +0x5e8: POV count
         unsigned long value = povValues[index];
         if (value != (unsigned long)-1 && value != 0xffff) {
@@ -287,9 +287,9 @@ int PCJoystickDevice::UnknownVirtualSlot3(int index, float* angle) {
 }
 
 // 0x004c3ba0: the slot 3 angle as a direction (0, 0 when centred).
-int PCJoystickDevice::UnknownVirtualSlot4(int index, float* x, float* y) {
+int PCJoystickDevice::GetPovDirection(int index, float* x, float* y) {
     float angle;
-    if (UnknownVirtualSlot3(index, &angle)) {
+    if (GetPovAngle(index, &angle)) {
         if (angle == -1.0f) {
             *y = 0.0f;
             *x = 0.0f;
@@ -304,7 +304,7 @@ int PCJoystickDevice::UnknownVirtualSlot4(int index, float* x, float* y) {
 }
 
 // 0x004c3c10: property 9 (consistent with DIPROP_AUTOCENTER) for device type 3.
-int PCJoystickDevice::UnknownVirtualSlot5(int enable) {
+int PCJoystickDevice::SetAutoCenter(int enable) {
     if (deviceKind == 3)
         return SetDwordProperty(DIPROP_AUTOCENTER, 0, DIPH_DEVICE, enable != 0);
     return 0;
@@ -312,7 +312,7 @@ int PCJoystickDevice::UnknownVirtualSlot5(int enable) {
 
 // 0x004c3c40: creates effect `effect` as a constant force on the X and Y
 // axes (gain 9000, no trigger).
-int PCJoystickDevice::UnknownVirtualSlot6(int effect, long magnitude, unsigned long duration) {
+int PCJoystickDevice::CreateConstantForce(int effect, long magnitude, unsigned long duration) {
     if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long direction[2];
@@ -341,10 +341,10 @@ int PCJoystickDevice::UnknownVirtualSlot6(int effect, long magnitude, unsigned l
 }
 
 // 0x004c3d20: sets the direction (slot 8), then the magnitude.
-int PCJoystickDevice::UnknownVirtualSlot7(int effect, long* direction, long magnitude) {
+int PCJoystickDevice::SetConstantForce(int effect, long* direction, long magnitude) {
     if (device && deviceKind == 3 && effect < 5) {
         long force = magnitude;
-        UnknownVirtualSlot8(effect, direction);
+        SetDirection(effect, direction);
         UnknownEffectParams params = { sizeof(params) };
         params.typeSpecificSize = sizeof(force);
         params.typeSpecific = &force;
@@ -354,7 +354,7 @@ int PCJoystickDevice::UnknownVirtualSlot7(int effect, long* direction, long magn
 }
 
 // 0x004c3db0: sets a two-value direction.
-int PCJoystickDevice::UnknownVirtualSlot8(int effect, long* direction) {
+int PCJoystickDevice::SetDirection(int effect, long* direction) {
     if (device && deviceKind == 3 && effect < 5) {
         long value[2];
         value[0] = direction[0];
@@ -371,10 +371,10 @@ int PCJoystickDevice::UnknownVirtualSlot8(int effect, long* direction) {
 
 // 0x004c3e40: creates a constant force with an envelope; `button` (or -1)
 // triggers it.
-int PCJoystickDevice::UnknownVirtualSlot9(int effect, unsigned long duration, long direction,
-                                          long magnitude, unsigned long attackTime,
-                                          unsigned long attackLevel, unsigned long fadeTime,
-                                          unsigned long fadeLevel, int button) {
+int PCJoystickDevice::CreateEnvelopedForce(int effect, unsigned long duration, long direction,
+                                           long magnitude, unsigned long attackTime,
+                                           unsigned long attackLevel, unsigned long fadeTime,
+                                           unsigned long fadeLevel, int button) {
     if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long directions[2];
@@ -410,10 +410,10 @@ int PCJoystickDevice::UnknownVirtualSlot9(int effect, unsigned long duration, lo
 
 // 0x004c3f70: creates a square wave with an envelope; `button` (or -1)
 // triggers it.
-int PCJoystickDevice::UnknownVirtualSlot10(int effect, unsigned long duration, unsigned long period,
-                                           unsigned long magnitude, unsigned long attackTime,
-                                           unsigned long attackLevel, unsigned long fadeTime,
-                                           unsigned long fadeLevel, int button) {
+int PCJoystickDevice::CreateSquareWave(int effect, unsigned long duration, unsigned long period,
+                                       unsigned long magnitude, unsigned long attackTime,
+                                       unsigned long attackLevel, unsigned long fadeTime,
+                                       unsigned long fadeLevel, int button) {
     if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long direction[2];
@@ -452,22 +452,22 @@ int PCJoystickDevice::UnknownVirtualSlot10(int effect, unsigned long duration, u
 }
 
 // 0x004c40b0: stops effect `effect`.
-int PCJoystickDevice::UnknownVirtualSlot11(int effect) {
+int PCJoystickDevice::StopEffect(int effect) {
     if (device && effect < 5 && effects[effect] && deviceKind == 3)
         return effects[effect]->Stop() >= 0;
     return 0;
 }
 
 // 0x004c40f0: starts effect `effect`.
-int PCJoystickDevice::UnknownVirtualSlot12(int effect, unsigned long iterations,
-                                           unsigned long flags) {
+int PCJoystickDevice::StartEffect(int effect, unsigned long iterations,
+                                  unsigned long flags) {
     if (device && effect < 5 && effects[effect] && deviceKind == 3)
         return effects[effect]->Start(iterations, flags) >= 0;
     return 0;
 }
 
 // 0x004c4140: nonzero while effect `effect` reports status 1 (playing).
-int PCJoystickDevice::UnknownVirtualSlot13(int effect) {
+int PCJoystickDevice::IsEffectPlaying(int effect) {
     if (device && effect < 5 && effects[effect] && deviceKind == 3) {
         unsigned long status;
         effects[effect]->GetEffectStatus(&status);
@@ -477,7 +477,7 @@ int PCJoystickDevice::UnknownVirtualSlot13(int effect) {
 }
 
 // 0x004c3af0: joystick subtypes 4-7 are recorded in +0x10.
-void PCJoystickDevice::UnknownVirtualSlot19() {
+void PCJoystickDevice::DetectSubtype() {
     int subtype = DEVICE_SUBTYPE(deviceInfo.deviceType);
     if (subtype == 4)
         deviceSubtype = subtype;
@@ -509,7 +509,7 @@ static int __stdcall UnknownEnumEffectsCallback(const UnknownEffectInfo* info, v
 
 // 0x004c4190: clears five entries, then enumerates the device's effects into
 // `effects` and stores how many were found.
-int PCJoystickDevice::UnknownVirtualSlot14(UnknownEffectInfo* effects, int* count) {
+int PCJoystickDevice::EnumEffects(UnknownEffectInfo* effects, int* count) {
     if (deviceKind != 3)
         return 0;
     for (int i = 0; i < 5; i++) {
@@ -549,7 +549,7 @@ inline int PCJoystickDevice::CheckPollResult(long result) {
 // 0x004c3960: polls the device (see CheckPollResult), then reads it with
 // the buffered (bit 0 of +0x5d4) or immediate reader. Gamepads with bit 1 also run
 // 0x004c2d90 for each of the six lists.
-int PCJoystickDevice::UnknownVirtualSlot20(int value) {
+int PCJoystickDevice::Update(int value) {
     if (!device)
         return 0;
     if (!CheckPollResult(device->Poll()))
@@ -597,7 +597,7 @@ void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value) {
 }
 
 // 0x004c4320
-void PCJoystickDevice::UnknownVirtualSlot15() {
+void PCJoystickDevice::ReleaseEffects() {
     for (int i = 0; i < 5; i++) {
         if (effects[i]) {
             effects[i]->Release();
@@ -607,25 +607,25 @@ void PCJoystickDevice::UnknownVirtualSlot15() {
 }
 
 // 0x004c4350: command 1.
-int PCJoystickDevice::UnknownVirtualSlot16() {
+int PCJoystickDevice::ResetForceFeedback() {
     if (device && deviceKind == 3)
-        return UnknownVirtualSlot17(1);
+        return SendForceFeedbackCommand(1);
     return 0;
 }
 
 // 0x004c4370
-int PCJoystickDevice::UnknownVirtualSlot17(int command) {
+int PCJoystickDevice::SendForceFeedbackCommand(int command) {
     if (device && deviceKind == 3)
         device->SendForceFeedbackCommand(command);
     return 0;
 }
 
 // 0x004c4390: command 4 when paused, 8 when resumed.
-int PCJoystickDevice::UnknownVirtualSlot18(int paused) {
+int PCJoystickDevice::PauseForceFeedback(int paused) {
     if (deviceKind == 3) {
         if (paused)
-            return UnknownVirtualSlot17(4);
-        return UnknownVirtualSlot17(8);
+            return SendForceFeedbackCommand(4);
+        return SendForceFeedbackCommand(8);
     }
     return 1;
 }

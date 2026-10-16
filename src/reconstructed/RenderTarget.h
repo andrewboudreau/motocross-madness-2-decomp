@@ -15,25 +15,28 @@ public:
     RenderTarget();                      // 0x004e8c50
     virtual ~RenderTarget();             // 0x004e8cb0 (deleting wrapper 0x004e8c80)
 
-    virtual int UnknownVirtualSlot1() = 0;
-    virtual int UnknownVirtualSlot2() = 0;
-    virtual int UnknownVirtualSlot3(void* a, void* b, void* c, int d) = 0;
-    virtual void* UnknownVirtualSlot4(void* rect, long* pitch, int flags) = 0; // locks the surface
-    virtual int UnknownVirtualSlot5(void* rect) = 0;
-    virtual long UnknownVirtualSlot6(int stage, int type, int* value) = 0;
-    virtual long UnknownVirtualSlot7(int stage, int type, int value) = 0;
-    virtual void UnknownVirtualSlot8(int state, int value, int force) = 0;
-    virtual long UnknownVirtualSlot9(int state, int* value) = 0;
-    virtual void UnknownVirtualSlot10(int mode, int flag) = 0;
-    virtual long UnknownVirtualSlot11(int stage) = 0;
-    virtual int UnknownVirtualSlot12(const CameraRect* rect, int flags) = 0;
-    virtual int UnknownVirtualSlot13(int a) = 0;
-    virtual int UnknownVirtualSlot14(void* viewport) = 0;
-    virtual int UnknownVirtualSlot15(int a, int b, int c, int d, int e, int f, int g) = 0;
-    virtual int UnknownVirtualSlot16(int a, int b, int c, int d, int e) = 0;
-    virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e, int f, int g) = 0;
-    virtual void UnknownVirtualSlot18(int value); // 0x004806f0 (shared empty body)
-    virtual void UnknownVirtualSlot19();          // 0x0044d710 (shared empty body)
+    // Slots 1-19 are named after PCRenderTarget's strict-exact overrides, each of
+    // which forwards to the IDirect3DDevice3/IDirectDrawSurface4 method of the same
+    // name (slots 18/19 program ALPHAREF/ALPHATESTENABLE/ALPHAFUNC).
+    virtual int BeginScene() = 0;
+    virtual int EndScene() = 0;
+    virtual int Blit(void* a, void* b, void* c, int d) = 0;
+    virtual void* LockSurface(void* rect, long* pitch, int flags) = 0; // locks the surface
+    virtual int UnlockSurface(void* rect) = 0;
+    virtual long GetTextureStageState(int stage, int type, int* value) = 0;
+    virtual long SetTextureStageState(int stage, int type, int value) = 0;
+    virtual void SetRenderState(int state, int value, int force) = 0;
+    virtual long GetRenderState(int state, int* value) = 0;
+    virtual void SetTextureBlend(int mode, int flag) = 0;
+    virtual long ClearTexture(int stage) = 0;
+    virtual int Clear(const CameraRect* rect, int flags) = 0;
+    virtual int SupportsTextureFormat(int a) = 0;
+    virtual int SetViewport(void* viewport) = 0;
+    virtual int DrawIndexedPrimitive(int a, int b, int c, int d, int e, int f, int g) = 0;
+    virtual int DrawPrimitive(int a, int b, int c, int d, int e) = 0;
+    virtual int DrawIndexedPrimitiveVB(int a, int b, int c, int d, int e, int f, int g) = 0;
+    virtual void SetAlphaTest(int value); // 0x004806f0 (shared empty body)
+    virtual void DisableAlphaTest();      // 0x0044d710 (shared empty body)
 
     void SetDisplay(UnknownDisplay* display); // 0x004e8ca0: sets +0x04
     void AdvanceFrame();                        // 0x004e8cc0: advances the frame counters

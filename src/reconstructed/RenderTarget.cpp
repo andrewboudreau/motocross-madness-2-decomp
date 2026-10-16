@@ -45,6 +45,6 @@ void RenderTarget::SetCamera(Camera* camera) {
 }
 
 // 0x004806f0 and 0x0044d710: empty bodies shared with other classes.
-void RenderTarget::UnknownVirtualSlot18(int) {}
+void RenderTarget::SetAlphaTest(int) {}
 
-void RenderTarget::UnknownVirtualSlot19() {}
+void RenderTarget::DisableAlphaTest() {}

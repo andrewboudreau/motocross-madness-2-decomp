@@ -83,12 +83,12 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
     if (!g_UnknownOverlayTexture689110) {
         g_UnknownOverlayTexture689110 =
             new(__FILE__, 107) PCTextureMap(g_TrackGame->textureManager, 1);
-        g_UnknownOverlayTexture689110->UnknownVirtualSlot4(0, 0x100, 0x100, 0x100, 0x100,
-                                                           Target()->surfacePixelFormat, Target()->surfacePixelFormat,
-                                                           0, 8, 0, 1, 0, 5, 6, 0, 0x80, 0xff00ff);
-        void* bits = g_UnknownOverlayTexture689110->UnknownVirtualSlot13(0, 0, 0);
+        g_UnknownOverlayTexture689110->CreateSurface(0, 0x100, 0x100, 0x100, 0x100,
+                                                     Target()->surfacePixelFormat, Target()->surfacePixelFormat,
+                                                     0, 8, 0, 1, 0, 5, 6, 0, 0x80, 0xff00ff);
+        void* bits = g_UnknownOverlayTexture689110->LockSurface(0, 0, 0);
         memset(bits, 0, PixelFormatBytesPerPixel(g_UnknownOverlayTexture689110->mapFormat) << 16);
-        g_UnknownOverlayTexture689110->UnknownVirtualSlot14(0);
+        g_UnknownOverlayTexture689110->UnlockSurface(0);
         sharedTexture = g_UnknownOverlayTexture689110;
     } else {
         sharedTexture = g_UnknownOverlayTexture689110;
@@ -102,49 +102,49 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
 int Overlay::UnknownVirtualSlot14() {
     int saved;
 
-    overlayTexture->UnknownVirtualSlot19();
-    Target()->UnknownVirtualSlot6(0, 0xc, &saved);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
+    overlayTexture->Bind();
+    Target()->GetTextureStageState(0, 0xc, &saved);
+    Target()->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
+    Target()->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
     if (field_0x118)
         LayOutQuad();
 
     int format = overlayTexture->mapFormat;
     if (format != 4444 && format != 8888) {
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        Target()->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        Target()->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         if (alphaBlended) {
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         } else {
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
         }
     } else {
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        Target()->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        Target()->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        Target()->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         if (alphaBlended) {
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         } else {
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            Target()->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
-        Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        Target()->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
     }
 
-    Target()->UnknownVirtualSlot18(0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
-    if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, (int)quadVertices, 4, 0))
+    Target()->SetAlphaTest(0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZENABLE, 0, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+    if (!Target()->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, (int)quadVertices, 4, 0))
         return 0;
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 1, 0);
-    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
-    Target()->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, saved);
+    Target()->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ZENABLE, 1, 0);
+    Target()->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    Target()->SetTextureStageState(0, D3DTSS_ADDRESS, saved);
     return 1;
 }
 
@@ -264,8 +264,8 @@ void Overlay::LayOutQuad() {
 // 0x004b6880
 int Overlay::TintRows(int row, int count, unsigned short color) {
     long sourcePitch, pitch;
-    void* source = sharedTexture->UnknownVirtualSlot13(0, &sourcePitch, 0x801);
-    void* bits = overlayTexture->UnknownVirtualSlot13(0, &pitch, 0x801);
+    void* source = sharedTexture->LockSurface(0, &sourcePitch, 0x801);
+    void* bits = overlayTexture->LockSurface(0, &pitch, 0x801);
     if (!source || !bits)
         return 0;
 
@@ -306,7 +306,7 @@ int Overlay::TintRows(int row, int count, unsigned short color) {
             from += sourcePitch / 2;
         }
     }
-    if (overlayTexture->UnknownVirtualSlot14(0) && sharedTexture->UnknownVirtualSlot14(0))
+    if (overlayTexture->UnlockSurface(0) && sharedTexture->UnlockSurface(0))
         return 1;
     return 0;
 }

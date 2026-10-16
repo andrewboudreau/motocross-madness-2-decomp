@@ -371,7 +371,7 @@ TrackGame slot 1 window (needs `$VC6_ROOT`, `$MCM2_EXE`):
 ```bash
 python3 tools/decl_shift_scan.py src/reconstructed/TrackGame.cpp \
     src/reconstructed/TrackGame.bindings.json --include src/reconstructed \
-    --fn 0x520ab0:UnknownVirtualSlot1@TrackGame --kmax 63
+    --fn 0x520ab0:Startup@TrackGame --kmax 63
 # 0x520ab0 ...: exact only at some k (scheduling tie-break); scores [245, 584]; exact windows [(0, 4), (13, 63)]
 ```
 
