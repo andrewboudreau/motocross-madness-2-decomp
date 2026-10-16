@@ -62,8 +62,10 @@ int WriteTga(UnknownTgaFile* file, unsigned int stride, int greenMask, int descr
 
 class UnknownTextureStream;
 
-// Global buffer at 0x00577738 copied into a loaded file's name.
-extern char g_UnknownGlobal577738[];
+// 0x00577738, the shared "" literal (??_C@_00A@?$AA@ elsewhere); a loaded
+// file's name is cleared by copying it.  Writing strcpy(name, "") changes
+// VC6's inline copy, so the array view stays.
+extern char g_EmptyString[];
 
 // 0x00511b40: reads a header from `stream` (after seeking by `offset`) into
 // `file`, or a new UnknownTgaFile when it is 0; frees the file on failure.
