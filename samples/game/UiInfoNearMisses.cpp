@@ -44,7 +44,7 @@ void TrackGameMode::ResetDefaults() {
     ResetSoundOptions((UnknownTrackGameModeOptionsA20*)&field_0xa20);
     ResetGraphicsOptions((UnknownTrackGameModeOptionsA4c*)&displayModeIndex);
     g_TrackGame->mode.ChooseDisplayMode(0, &displayModeIndex);
-    ResetControlOptions((UnknownTrackGameModeOptionsA68*)field_0xa68);
+    ResetControlOptions((UnknownTrackGameModeOptionsA68*)responseSliders);
     ReloadResourceStrings(resourceStrings);
     ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)garageOptions);
     ResetGarageOptions((UnknownTrackGameModeOptionsFd8*)optionsBackup);

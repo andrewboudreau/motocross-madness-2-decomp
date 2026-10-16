@@ -430,7 +430,7 @@ int TrackGameMode::LoadProfile() {
     fread(&instrumentOverlayOn, 0x374, 1, file);
     fread(&field_0xa20, 0x2c, 1, file);
     fread(&displayModeIndex, 0x1c, 1, file);
-    fread(field_0xa68, 0x30, 1, file);
+    fread(responseSliders, 0x30, 1, file);
     fread(resourceStrings, 0x500, 1, file);
     fread(videoSettings, 0x18, 1, file);
     fread(optionsBackup, 0x5c, 1, file);
@@ -484,7 +484,7 @@ void TrackGameMode::SaveProfile() {
     fwrite(&instrumentOverlayOn, 0x374, 1, file);
     fwrite(&field_0xa20, 0x2c, 1, file);
     fwrite(&displayModeIndex, 0x1c, 1, file);
-    fwrite(field_0xa68, 0x30, 1, file);
+    fwrite(responseSliders, 0x30, 1, file);
     fwrite(resourceStrings, 0x500, 1, file);
     fwrite(videoSettings, 0x18, 1, file);
     fwrite(optionsBackup, 0x5c, 1, file);

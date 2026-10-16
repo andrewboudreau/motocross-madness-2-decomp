@@ -225,7 +225,7 @@ int EventManager::CreatePodiumScene() {
         if (!ok)
             return 0;
     } else {
-        if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
+        if (!ok || !g_TrackGame->mode.showPodiums)
             return 0;
         if (g_TrackGame->mode.raceSettings.raceMode != 2 && !g_TrackGame->network &&
             results[0].position > 3)

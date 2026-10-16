@@ -769,7 +769,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         g_TrackGame->mode.raceSettings.raceMode != 4 &&
         (g_TrackGame->playerCount > 1 || g_TrackGame->mode.raceSettings.aiRacerCount > 0)) {
         sprintf(name, "%s\\%s", "Res", "youind.slt");
-        ArcadeObject* marker = new(__FILE__, 0x2a9) ArcadeObject(*(int*)g_TrackGame->mode.field_0x6d0);
+        ArcadeObject* marker = new(__FILE__, 0x2a9) ArcadeObject(g_TrackGame->mode.playerIndicator);
         youIndicator = marker->Create(renderContext, (int)lights, (int)textures, name, position, 0, 0,
                                                     2.0f, 0.5f, 0.5f, 0);
         AppendChild(youIndicator, -1);
