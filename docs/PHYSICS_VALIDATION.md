@@ -419,8 +419,8 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   `"NullFrame"` node becomes `centerNode`; the dust/dirt/steam emitters (lines 0x70f..0x711)
   are attached through slot 37 (types 1, 2 and 4 at (0, 2.5, -2.75)); three contact points
   (`AddCollisionPoint` 0x0043a330 at (+-1.305, 0.225, -0.228) on the handlebar node and
-  (0, 3.345, -3.206) on the model) feed `field_0x5f8/0x5fc/0x600`; the wheel base and the
-  rear/front load shares, the box inertia of the bike (length from the model, width and
+  (0, 3.345, -3.206) on the model) feed `leftBarContact`, `rightBarContact` and
+  `field_0x600`; the wheel base and the rear/front load shares, the box inertia of the bike (length from the model, width and
   height from the rider), of the rider and of the steering integrator gains, the start
   orientation, 29 pose-handle lookups, the collision callbacks and the four smoothers end
   it.  What still differs: the register spill homes (retail keeps the wheel-position array,
