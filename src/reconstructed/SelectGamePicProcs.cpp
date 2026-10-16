@@ -99,7 +99,7 @@ int g_LobbyReadyBlockReason;
 
 // The chat message (types 0x85 and 0x92): 0x4e bytes are sent.
 struct UnknownChatMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     char text[0x4a];                          // +0x04: the chat text
 };
 
@@ -121,7 +121,7 @@ struct UnknownPlayerStateMessage {
 
 // The player removal message (type 0x8e).
 struct UnknownKickMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     int playerId;                             // +0x04: player id
 };
 
@@ -134,14 +134,14 @@ struct UnknownGridDraw {
 
 // The player left message (type 5).
 struct UnknownPlayerLeftMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     int field_0x04;
     int playerId;                             // +0x08: player id
 };
 
 // The lobby start message (type 0x83, 0x8d8 bytes).
 struct UnknownLobbyStartMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     short start;                              // +0x04: start
     UnknownTrackGameModeSettings raceSettings; // +0x08: TrackGame+0x2d70
     int field_0x1f4;                          // TrackGame+0x60c
