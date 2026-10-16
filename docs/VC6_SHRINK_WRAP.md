@@ -54,6 +54,9 @@ repository's COFF tools).
   look for an early `return` (or a `return` inside a loop or branch) that
   the original wrote as `if`/`else` or as a `break` to a shared exit.
   CollisionPoint `0x0043ad80` went from 47 to 597 of 615 bytes this way.
-- If retail pushes before the guard and the reconstruction delays the pushes
-  (Parser `0x004b87f0`), the original probably had a second exit that the
-  reconstruction folded into the final one.
+- If retail pushes before the guard and the reconstruction delays the pushes,
+  the original probably had more exits that the reconstruction folded into
+  the final one. Parser `0x004b87f0` (33 of 408 bytes) became exact by
+  writing each `break` out of its search loop as `return S_OK;`. Retail still
+  has one exit block, because VC6 merges the identical returns after deciding
+  where to push.

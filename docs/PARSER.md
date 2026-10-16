@@ -2,9 +2,8 @@
 
 `src/reconstructed/Parser.h` / `Parser.cpp` reconstruct
 `D:\aardvark\VC\krusty2\Parser.cpp`, `0x004b8470..0x004b89f5`. Under
-`vc6_o2_mt`, 13 of the 14 functions match exactly with every relocation bound
-(13 calibration cases). `0x004b87f0` is a near miss in
-`samples/parser/ParserNearMisses.cpp`.
+`vc6_o2_mt`, all 14 functions match exactly with every relocation bound
+(14 calibration cases).
 
 The TU reads `<Tag>value</Tag>` pairs from a text buffer into a singly linked
 list. Lookups by tag are case-insensitive. Blank runs and lines starting
@@ -29,7 +28,7 @@ Class names stay provisional (`UnknownParserNode`, `UnknownParserList`,
 | `0x004b86e0` | 53 | list destructor |
 | `0x004b8720` | 143 | skips blanks and `;` comment lines (recursive) |
 | `0x004b87b0` | 61 | finds a character |
-| `0x004b87f0` | 408 | parses the buffer (**near miss**; body identical, prologue differs) |
+| `0x004b87f0` | 408 | parses the buffer |
 | `0x004b8990`, `0x004b89d0` | 49, 37 | parser text and decimal lookups |
 
 ## Evidence
@@ -59,13 +58,13 @@ Class names stay provisional (`UnknownParserNode`, `UnknownParserList`,
   registers.
 - The append stores `new` into the head or tail link and the result local in
   one expression, then returns `node ? S_OK : E_OUTOFMEMORY`.
-- `0x004b87f0` needs `while (1)` with a `break` on every failed search.
+- `0x004b87f0` needs `while (1)` with `return S_OK` on every failed search.
+  - With `break` to one `return S_OK` after the loop, VC6 pushes `ebx` and
+    `ebp` only after the `E_FAIL` early return; retail saves all four
+    registers first (docs/VC6_SHRINK_WRAP.md).
   - `for (;;)` hoists differently: `lstrcpynA` loads late and `lstrlenA` is
     cached in `ebx`.
   - `while (text)` adds an exit test.
-  - Even with `while (1)`, VC6 pushes `ebx` and `ebp` after the `E_FAIL`
-    early return, while retail saves all four registers first. No tried form
-    changes this; the sample lists them.
 
 ## Remaining uncertainty
 

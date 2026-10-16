@@ -126,8 +126,53 @@ char* UnknownParser::FindChar(char* text, char c, char* end)
     return text;
 }
 
-// 0x004b87f0 (parses the buffer) is a near miss; see
-// samples/parser/ParserNearMisses.cpp.
+// Each failed search returns S_OK from inside the loop. With `break` to one exit
+// after the loop, VC6 pushes ebx/ebp only after the E_FAIL return; retail saves
+// all four registers first (docs/VC6_SHRINK_WRAP.md).
+HRESULT UnknownParser::Parse(char* text, int length)
+{
+    char tag[0x200];
+    char endTag[0x200];
+    char value[0x200];
+
+    if (!text)
+        return E_FAIL;
+    pairCount = 0;
+    while (1) {
+        char* p = SkipBlanks(text, 0);
+        if (!p)
+            return S_OK;
+        char* open = FindChar(p, '<', 0);
+        if (!open)
+            return S_OK;
+        char* close = FindChar(open, '>', 0);
+        if (!close)
+            return S_OK;
+        lstrcpyn(tag, open + 1, close - open);
+        p = SkipBlanks(close + 1, 0);
+        if (!p)
+            return S_OK;
+        open = FindChar(p, '<', 0);
+        if (!open)
+            return S_OK;
+        lstrcpyn(value, p, open - p + 1);
+        p = SkipBlanks(open, 0);
+        if (!p)
+            return S_OK;
+        open = FindChar(p, '<', 0);
+        if (!open)
+            return S_OK;
+        close = FindChar(open, '>', 0);
+        if (!close)
+            return S_OK;
+        lstrcpyn(endTag, open + 2, close - open - 1);
+        text = close + 1;
+        if (lstrlen(tag) && lstrlen(endTag) && lstrlen(value) && lstrcmp(tag, endTag) == 0) {
+            pairCount++;
+            pairs.Append(tag, value);
+        }
+    }
+}
 
 HRESULT UnknownParser::GetText(const char* key, char* out, unsigned int size)
 {

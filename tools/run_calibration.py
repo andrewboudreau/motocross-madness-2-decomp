@@ -22849,6 +22849,15 @@ CASES = [
         'reason': 'end defaults to lstrlenA',
     },
     {
+        'name': 'Parser parse buffer',
+        'bindings': 'src/reconstructed/Parser.bindings.json',
+        'source': 'src/reconstructed/Parser.cpp',
+        'symbol': '?Parse@UnknownParser@@QAEJPADH@Z',
+        'target_va': '0x004b87f0',
+        'target_size': 408,
+        'reason': 'returns S_OK from each failed search inside the loop, so all four registers are saved before the null test',
+    },
+    {
         'name': 'Parser text lookup',
         'bindings': 'src/reconstructed/Parser.bindings.json',
         'source': 'src/reconstructed/Parser.cpp',
