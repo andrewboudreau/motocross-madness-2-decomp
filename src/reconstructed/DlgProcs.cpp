@@ -2044,7 +2044,7 @@ void LeaveMenusForRace() {
     if (g_TrackGame->ui->gui->guiBackground)
         g_TrackGame->ui->gui->guiBackground->ReleaseDc();
     if (g_TrackGame->mode.displayModeIndex != g_TrackGame->display->currentDisplayMode)
-        g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.displayModeIndex);
+        g_TrackGame->SwitchDisplayMode(g_TrackGame->mode.displayModeIndex);
     if (g_TrackGame->mode.raceSettings.raceMode == 4) {
         g_TrackGame->mode.saveGhost = 0;
         g_TrackGame->mode.saveReplay = 0;

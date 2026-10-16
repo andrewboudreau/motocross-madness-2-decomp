@@ -77,7 +77,7 @@ int PCGame::ProfileDisplays() {
             SetRegistryInt(name, total);
             sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->driverGuidText);
             SetRegistryFlag(name, 0);
-            UnknownVirtualSlot34(g_UnknownDisplays68a754[i]);
+            FilterDisplayModes(g_UnknownDisplays68a754[i]);
             sprintf(name, "DriverInfo\\%s\\Modes", g_UnknownDisplays68a754[i]->driverGuidText);
             SetRegistryBinary(name, g_UnknownDisplays68a754[i]->displayModes,
                                  g_UnknownDisplays68a754[i]->displayModeCount * sizeof(UnknownDisplayMode));

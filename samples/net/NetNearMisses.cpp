@@ -197,7 +197,7 @@ void NetworkInterface::DispatchMessages(int value)
             if (MessageAt(messages, offset).type == 0x40) {
                 AcknowledgeMessage(*(short*)(MessageAt(messages, offset).data + 2));
             } else {
-                g_TrackGame->UnknownVirtualSlot17(
+                g_TrackGame->OnNetworkMessage(
                     MessageAt(messages, offset).type, MessageAt(messages, offset).data,
                     MessageAt(messages, offset).from, MessageAt(messages, offset).to,
                     MessageAt(messages, offset).flags);

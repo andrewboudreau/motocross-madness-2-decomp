@@ -643,16 +643,16 @@ class TrackGame : public PCGame {
 public:
     TrackGame();                              // 0x00520870
     virtual ~TrackGame();                     // 0x00521ae0 (deleting wrapper 0x00520a90)
-    virtual int UnknownVirtualSlot1();        // 0x00520ab0: start-up checks and the EULA
-    virtual int UnknownVirtualSlot2();        // 0x00520d00: PCGame's slot 2
-    virtual int UnknownVirtualSlot3();        // 0x00520d10: opens the resource archives
-    virtual int UnknownVirtualSlot4();        // 0x00521050: creates the game objects
-    virtual int UnknownVirtualSlot5();        // 0x00521a50
-    virtual int UnknownVirtualSlot10();       // 0x00521660: Game's slot 10 as a flag
-    virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00521840
-    virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00521670
-    virtual int UnknownVirtualSlot15();       // 0x00521a70: shutdown
-    virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00521cb0
+    virtual int Startup();                    // 0x00520ab0: start-up checks and the EULA
+    virtual int Initialize();                 // 0x00520d00: PCGame's slot 2
+    virtual int OpenResources();              // 0x00520d10: opens the resource archives
+    virtual int CreateGameObjects();          // 0x00521050: creates the game objects
+    virtual int OnActivate();                 // 0x00521a50
+    virtual int Tick();                       // 0x00521660: Game's slot 10 as a flag
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00521840
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00521670
+    virtual int Shutdown();                   // 0x00521a70: shutdown
+    virtual int FindDataFile(const char* name, char* path);         // 0x00521cb0
 
     void MuteSound();             // 0x00521a30
     void StopCDAudio();             // 0x00521a40

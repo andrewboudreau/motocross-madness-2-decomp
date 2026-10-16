@@ -46,27 +46,27 @@ class Game {
 public:
     Game();                                   // 0x00467990
     virtual ~Game();                          // 0x00468a10 (deleting wrapper 0x00467ac0)
-    virtual int UnknownVirtualSlot1();        // 0x00467ae0 (shared "return 1" body)
-    virtual int UnknownVirtualSlot2();        // 0x00467af0: creates the controls
-    virtual int UnknownVirtualSlot3();        // 0x00468c90 (shared "return 1" body)
-    virtual int UnknownVirtualSlot4();        // 0x00468c90
-    virtual int UnknownVirtualSlot5();        // 0x00467ae0
-    virtual int UnknownVirtualSlot6();        // 0x00467ae0
-    virtual int UnknownVirtualSlot7() = 0;   // render state setup (PCGame)
-    virtual int UnknownVirtualSlot8();        // 0x00467eb0: renders a frame
-    virtual int UnknownVirtualSlot9();        // 0x004685c0
-    virtual int UnknownVirtualSlot10();       // 0x004685d0, not reconstructed (rdtsc)
-    virtual int UnknownVirtualSlot11(int value);                                          // 0x004688a0
+    virtual int Startup();                    // 0x00467ae0 (shared "return 1" body)
+    virtual int Initialize();                 // 0x00467af0: creates the controls
+    virtual int OpenResources();              // 0x00468c90 (shared "return 1" body)
+    virtual int CreateGameObjects();          // 0x00468c90
+    virtual int OnActivate();                 // 0x00467ae0
+    virtual int OnDeactivate();               // 0x00467ae0
+    virtual int SetRenderStates() = 0;       // render state setup (PCGame)
+    virtual int RenderFrame();                // 0x00467eb0: renders a frame
+    virtual int PresentFrame();               // 0x004685c0
+    virtual int Tick();                       // 0x004685d0, not reconstructed (rdtsc)
+    virtual int SetInputSuspended(int value);                                             // 0x004688a0
     virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
-    virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468900
-    virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468930
-    virtual int UnknownVirtualSlot15();       // 0x00468a30: shutdown
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00468900
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00468930
+    virtual int Shutdown();                   // 0x00468a30: shutdown
     virtual int CreateNetworkInterface(int value); // 0x00468ae0: news the NetworkInterface into +0x08
     // 0x00468ba0: network messages; NetworkInterface 0x004aced0 passes a
     // NetMessage's type, data, from, to and flags.
-    virtual int UnknownVirtualSlot17(int type, void* data, int from, int to, int flags);
-    virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
-    virtual int UnknownVirtualSlot19(int mode) = 0;
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
+    virtual int FindDataFile(const char* name, char* path);         // 0x00468bd0
+    virtual int SwitchDisplayMode(int mode) = 0;
     // Slots 20-29 are PCGame's registry accessors under its key
     // (RegQueryValueExA / RegSetValueExA, PCGame.cpp): 20 reads a DWORD, 21
     // a float, 22 a DWORD as a flag, 23 a string, 24 binary data; 25-27
@@ -86,11 +86,11 @@ public:
     virtual int SetRegistryFlag(const char* name, int value) = 0;
     virtual int SetRegistryString(const char* name, const char* value) = 0;
     virtual int SetRegistryBinary(const char* name, const void* data, unsigned long size) = 0;
-    virtual int UnknownVirtualSlot30(int id, char* text);                                 // 0x00468c60
-    virtual RenderTarget* UnknownVirtualSlot31() = 0;
-    virtual int UnknownVirtualSlot32() = 0;
-    virtual int UnknownVirtualSlot33();       // 0x00467e80
-    virtual int UnknownVirtualSlot34(UnknownDisplay* display) = 0; // filters display modes
+    virtual int GetStringResource(int id, char* text);                                    // 0x00468c60
+    virtual RenderTarget* CreateRenderTarget() = 0;
+    virtual int InitializeDisplay() = 0;
+    virtual int AttachRenderTarget();         // 0x00467e80
+    virtual int FilterDisplayModes(UnknownDisplay* display) = 0;   // filters display modes
 
     // 0x00467b70: creates the root objects, sound, textures and (with the
     // "DebugOverlay" registry flag) the debug overlay.

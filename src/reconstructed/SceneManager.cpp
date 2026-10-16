@@ -940,7 +940,7 @@ int Scene::OpenResourceFiles()
         sprintf(key, "ResourceFile%d", i);
         while (parameters.GetString(key, "", file, 0x7f)) {
             sprintf(name, "%s\\%s", "Res", file);
-            if (!g_TrackGame->UnknownVirtualSlot18(name, path))
+            if (!g_TrackGame->FindDataFile(name, path))
                 return 0;
             g_UnknownResourceManager572b44->AddArchive(path, 0);
             sprintf(key, "ResourceFile%d", ++i);

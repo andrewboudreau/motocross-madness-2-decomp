@@ -169,7 +169,7 @@ TrackGame::~TrackGame() {
 // second, retried until it passes or is cancelled (0x13b5), a warning below
 // 64 MB of available memory (0x14bb), then the EULA through EBUEula.dll.
 // On NT it also turns the screen saver off, remembering the setting.
-int TrackGame::UnknownVirtualSlot1() {
+int TrackGame::Startup() {
     UnknownMemoryStatus status;
     char text[128];
     if (!mode.FindDataDirectory() &&
@@ -212,25 +212,25 @@ int TrackGame::UnknownVirtualSlot1() {
     int length = count > 0x103 ? 0x103 : count;
     strncpy(name, "EULA.rtf", length);
     name[length] = 0;
-    if (!UnknownVirtualSlot18(name, path))
+    if (!FindDataFile(name, path))
         return 0;
     int accepted = eula(registryKey, path, 0, 1);
     FreeLibrary(library);
     if (!accepted)
         return 0;
-    return Game::UnknownVirtualSlot1();
+    return Game::Startup();
 }
 
-// Resolves Res\\<file> through slot 18 and adds it to the resource manager;
+// Resolves Res\\<file> through FindDataFile (slot 18) and adds it to the resource manager;
 // fails the caller when the path cannot be resolved.
 #define ADD_RESOURCE_ARCHIVE(file)                                    \
     sprintf(name, "%s\\%s", "Res", file);                          \
-    if (!UnknownVirtualSlot18(name, path))                           \
+    if (!FindDataFile(name, path))                                  \
         return 0;                                                    \
     g_UnknownResourceManager572b44->AddArchive(path, 0);
 
 // 0x00520d10
-int TrackGame::UnknownVirtualSlot3() {
+int TrackGame::OpenResources() {
     char name[260];
     char path[260];
     ADD_RESOURCE_ARCHIVE("Bike.res")
@@ -250,7 +250,7 @@ int TrackGame::UnknownVirtualSlot3() {
 // with a message when the sound device is unavailable), collision, input
 // mapping, KrustyUI and EventManager objects, and for network games the
 // debug connection and the race set-up.
-int TrackGame::UnknownVirtualSlot4() {
+int TrackGame::CreateGameObjects() {
     int category = g_MemTagStack->Push("Scene");
     sceneObject = new(__FILE__, 305) UnknownTrackGameObject574;
     g_MemTagStack->Push("UI");
@@ -331,24 +331,24 @@ int TrackGame::UnknownVirtualSlot4() {
 }
 
 // 0x00520d00
-int TrackGame::UnknownVirtualSlot2() {
-    return PCGame::UnknownVirtualSlot2();
+int TrackGame::Initialize() {
+    return PCGame::Initialize();
 }
 
 // 0x00521660
-int TrackGame::UnknownVirtualSlot10() {
-    return Game::UnknownVirtualSlot10() != 0;
+int TrackGame::Tick() {
+    return Game::Tick() != 0;
 }
 
 // 0x00521840
-int TrackGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    return PCGame::UnknownVirtualSlot13(event, entry);
+int TrackGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    return PCGame::OnControlRelease(event, entry);
 }
 
 // 0x00521670: input presses. With an IME open nothing happens. Control 0x1d
 // with modifier 0x45 or control 0x3d/0xc5 toggles menu 0x190, and control 1
 // opens menu 0x191 (in-game).
-int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int TrackGame::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind == 0) {
         void* context = ImmGetContext(windowHandle);
         if (context) {
@@ -370,7 +370,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
     }
     {
         int previous = paused;
-        if (PCGame::UnknownVirtualSlot14(event, entry))
+        if (PCGame::OnControlPress(event, entry))
             return 0;
         if (allowFreezeCamera && paused != previous) {
             if (paused)
@@ -464,8 +464,8 @@ void TrackGame::StopCDAudio() {
 }
 
 // 0x00521a50
-int TrackGame::UnknownVirtualSlot5() {
-    PCGame::UnknownVirtualSlot5();
+int TrackGame::OnActivate() {
+    PCGame::OnActivate();
     if (quarryEvent)
         ResetClock();
     return 1;
@@ -473,12 +473,12 @@ int TrackGame::UnknownVirtualSlot5() {
 
 // 0x00521a70: deletes the +0x574 object, shuts down, then restores the
 // decimal separator saved at +0x3404.
-int TrackGame::UnknownVirtualSlot15() {
+int TrackGame::Shutdown() {
     if (sceneObject) {
         delete sceneObject;
         sceneObject = 0;
     }
-    if (!PCGame::UnknownVirtualSlot15())
+    if (!PCGame::Shutdown())
         return 0;
     ui = 0;
     SetLocaleInfoA(kLocaleUserDefault, kLocaleDecimalSeparator, savedDecimalSeparator);
@@ -487,7 +487,7 @@ int TrackGame::UnknownVirtualSlot15() {
 }
 
 // 0x00521cb0
-int TrackGame::UnknownVirtualSlot18(const char* name, char* path) {
+int TrackGame::FindDataFile(const char* name, char* path) {
     return mode.FindDataFile(name, path);
 }
 

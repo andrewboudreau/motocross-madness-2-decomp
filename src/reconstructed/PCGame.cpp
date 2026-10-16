@@ -143,8 +143,8 @@ PCGame::~PCGame() {
 }
 
 // 0x004bfc40
-int PCGame::UnknownVirtualSlot2() {
-    return Game::UnknownVirtualSlot2();
+int PCGame::Initialize() {
+    return Game::Initialize();
 }
 
 // 0x004bfc50: PCGame's start-up. Chooses the Direct3D device from the
@@ -178,7 +178,7 @@ int PCGame::StartUp(char* message) {
         deviceGuid = IID_IDirect3DHALDevice;
     }
     fullScreen = GetRegistryFlag("FullScreen", fullScreen);
-    if (!UnknownVirtualSlot37()) {
+    if (!CheckLobbyLaunch()) {
         if (message)
             LoadStringA(resourceInstance, 0x13d6, message, 0x100);
         return 0;
@@ -232,15 +232,15 @@ int PCGame::StartUp(char* message) {
 }
 
 // 0x004c0230
-int PCGame::UnknownVirtualSlot15() {
-    int result = Game::UnknownVirtualSlot15();
+int PCGame::Shutdown() {
+    int result = Game::Shutdown();
     ShowCursor(1);
     return result;
 }
 
 // 0x004c0250: while the window is active, hides the cursor (full screen),
 // restores lost surfaces and runs the root object's slot 18.
-int PCGame::UnknownVirtualSlot5() {
+int PCGame::OnActivate() {
     if (display && GetActiveWindow() == windowHandle) {
         if (fullScreen)
             while (ShowCursor(0) >= 0)
@@ -259,7 +259,7 @@ int PCGame::UnknownVirtualSlot5() {
 }
 
 // 0x004c0310
-int PCGame::UnknownVirtualSlot6() {
+int PCGame::OnDeactivate() {
     if (rootObject)
         rootObject->UnknownVirtualSlot17();
     if (fullScreen)
@@ -268,22 +268,22 @@ int PCGame::UnknownVirtualSlot6() {
 }
 
 // 0x004c0340
-int PCGame::UnknownVirtualSlot35(int value) {
+int PCGame::OnChar(int value) {
     if (inputSuspended)
         return 1;
     return rootObject->UnknownVirtualSlot20(value);
 }
 
 // 0x004c0370
-int PCGame::UnknownVirtualSlot36(int value) {
+int PCGame::OnKeyDown(int value) {
     if (inputSuspended)
         return 1;
     return rootObject->UnknownVirtualSlot21(value);
 }
 
 // 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.
-int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (Game::UnknownVirtualSlot13(event, entry))
+int PCGame::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (Game::OnControlRelease(event, entry))
         return 1;
     if (event->kind == 0 && event->control == 0xb7) {
         if (renderTarget && !renderTarget->currentCamera)
@@ -295,8 +295,8 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
 
 // 0x004c0400: with the debug bit, control 0x41 toggles the render target's
 // fill mode between solid and wireframe.
-int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (Game::UnknownVirtualSlot14(event, entry))
+int PCGame::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (Game::OnControlPress(event, entry))
         return 1;
     if (testKey && TestInputEvent(0x41, 0, event, 3)) {
         PCTarget()->fillMode = PCTarget()->fillMode == D3DFILL_SOLID ? D3DFILL_WIREFRAME : D3DFILL_SOLID;
@@ -308,7 +308,7 @@ int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* 
 // 0x004c04a0: switches to display mode `mode` (full screen) or back to
 // 640x480 (windowed), recreating the render target through slot 33, then
 // reattaches the camera.
-int PCGame::UnknownVirtualSlot19(int mode) {
+int PCGame::SwitchDisplayMode(int mode) {
     Camera* camera = 0;
     if (renderTarget)
         camera = renderTarget->currentCamera;
@@ -319,7 +319,7 @@ int PCGame::UnknownVirtualSlot19(int mode) {
                 renderTarget = 0;
             }
             display->SetFullscreenDisplayMode(mode, field_0x2d0 == 0);
-            if (!UnknownVirtualSlot33())
+            if (!AttachRenderTarget())
                 return 0;
         }
     } else if (windowRect.bottom - windowRect.top != 480) {
@@ -328,7 +328,7 @@ int PCGame::UnknownVirtualSlot19(int mode) {
             renderTarget = 0;
         }
         display->CreateWindowedSurfaces(640, 480, field_0x2d0 == 0);
-        if (!UnknownVirtualSlot33())
+        if (!AttachRenderTarget())
             return 0;
     }
     if (renderTarget && camera) {
@@ -347,7 +347,7 @@ void PCGame::SetWindowRect(const UnknownRect* rect) {
 // 0x004c05a0: in full screen, drops duplicate modes ("HighestRefreshOnly"
 // keeps the last of each), modes other than 16-bit, and modes the video
 // memory cannot hold with "MinimumTextureMB" left over.
-int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
+int PCGame::FilterDisplayModes(UnknownDisplay* display) {
     int reserve = g_TrackGame->GetRegistryInt("MinimumTextureMB", 2) << 20;
     if (fullScreen && !display->keepAllDisplayModes) {
         int i;
@@ -395,7 +395,7 @@ int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
 // device's texture stage 0 states, choosing dithering, antialiasing and the
 // filters from the "DriverInfo\<driver>\Allow..." bits (+0x2d4) and the
 // device capabilities.
-int PCGame::UnknownVirtualSlot7() {
+int PCGame::SetRenderStates() {
     renderTarget->SetRenderState(D3DRENDERSTATE_DITHERENABLE,
                                     allowDither && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_DITHER), 1);
     renderTarget->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
@@ -460,7 +460,7 @@ int PCGame::LimitDisplayModes(UnknownDisplay* display, int width, int height) {
 
 // 0x004c0a90: creates the PCRenderTarget on the display's surface and
 // records the display's two mode values (+0x58, +0x5c).
-RenderTarget* PCGame::UnknownVirtualSlot31() {
+RenderTarget* PCGame::CreateRenderTarget() {
     int frames = display->renderSurface ? 1 : display->frameBufferCount;
     UnknownSurfaceInterface* surface =
         display->renderSurface ? display->renderSurface : display->backBuffer;
@@ -488,7 +488,7 @@ RenderTarget* PCGame::UnknownVirtualSlot31() {
 
 // 0x004c0c10: "lobby" on the command line (last match wins) starts the
 // network object in mode 4.
-int PCGame::UnknownVirtualSlot37() {
+int PCGame::CheckLobbyLaunch() {
     if (__argc >= 2) {
         int i = __argc;
         while (i > 0) {
@@ -505,7 +505,7 @@ int PCGame::UnknownVirtualSlot37() {
 
 // 0x004c0c60: records the window rectangle, then sets 640x480x16 (hiding
 // the cursor in full screen) and runs slot 33.
-int PCGame::UnknownVirtualSlot32() {
+int PCGame::InitializeDisplay() {
     GetWindowRect(windowHandle, &windowRect);
     if (fullScreen) {
         if (!display->SetFullscreenCooperativeLevel())
@@ -518,7 +518,7 @@ int PCGame::UnknownVirtualSlot32() {
     }
     if (!display->UnknownVirtualSlot2(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
         return 0;
-    return UnknownVirtualSlot33() != 0;
+    return AttachRenderTarget() != 0;
 }
 
 // Builds the registry key path for a setting: the game's key, plus the

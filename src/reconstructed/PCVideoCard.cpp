@@ -617,7 +617,7 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
         clear.top = 0;
         clear.bottom = viewport.y + viewport.height;
         failed |= target->device->Clear(1, &clear, D3DCLEAR_ZBUFFER, 0, target->zClearValue, 0) != 0; // Clear z
-        g_TrackGame->UnknownVirtualSlot7();
+        g_TrackGame->SetRenderStates();
         rendered->Bind();
         target->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         target->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);

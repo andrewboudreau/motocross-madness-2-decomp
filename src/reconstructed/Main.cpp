@@ -72,7 +72,7 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
 
     setlocale(LC_ALL, "");
     GetCurrentDirectory(MAX_PATH, g_TrackGame->workingDirectory);
-    if (!g_TrackGame->UnknownVirtualSlot1())
+    if (!g_TrackGame->Startup())
         exit(0);
 
     if (!CreateMainWindow(instance, showCommand))
@@ -82,7 +82,7 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
     UpdateWindow(g_MainWindow);
     g_TrackGame->windowHandle = g_MainWindow;
     g_TrackGame->instanceHandle = instance;
-    if (!g_TrackGame->UnknownVirtualSlot2())
+    if (!g_TrackGame->Initialize())
         exit(0);
 
     GetDXVersion(&dxVersion, &platform, (unsigned long*)&g_TrackGame->field_0x544);
@@ -136,8 +136,8 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        if (g_AppActive && !g_TrackGame->UnknownVirtualSlot10()) {
-            g_TrackGame->UnknownVirtualSlot15();
+        if (g_AppActive && !g_TrackGame->Tick()) {
+            g_TrackGame->Shutdown();
             DestroyWindow(g_MainWindow);
             PostQuitMessage(0);
             return TRUE;
@@ -203,7 +203,7 @@ LRESULT CALLBACK UnknownWindowProc4a0d50(HWND window, UINT message, WPARAM wPara
     case WM_MOVE:
     case WM_SIZE:
         if (g_MainWindowShown && IsIconic(g_MainWindow)) {
-            g_TrackGame->UnknownVirtualSlot6();
+            g_TrackGame->OnDeactivate();
         } else {
             GetClientRect(window, &rect);
             ClientToScreen(window, (POINT*)&rect.left);
@@ -212,27 +212,27 @@ LRESULT CALLBACK UnknownWindowProc4a0d50(HWND window, UINT message, WPARAM wPara
         }
         break;
     case WM_CLOSE:
-        g_TrackGame->UnknownVirtualSlot15();
+        g_TrackGame->Shutdown();
         DestroyWindow(g_MainWindow);
         PostQuitMessage(0);
         return 0;
     case WM_ACTIVATEAPP:
         g_AppActive = wParam;
         if (wParam) {
-            g_TrackGame->UnknownVirtualSlot5();
+            g_TrackGame->OnActivate();
             if (g_TrackGame->controlInterface)
                 ((PCControlInterface*)g_TrackGame->controlInterface)->SetDevicesAcquired(1);
             if (g_TrackGame->imeLibrary)
                 RestoreImeStatus();
         } else {
-            g_TrackGame->UnknownVirtualSlot6();
+            g_TrackGame->OnDeactivate();
         }
         break;
     case WM_CHAR:
-        g_TrackGame->UnknownVirtualSlot35(wParam);
+        g_TrackGame->OnChar(wParam);
         break;
     case WM_KEYDOWN:
-        g_TrackGame->UnknownVirtualSlot36(wParam);
+        g_TrackGame->OnKeyDown(wParam);
         break;
     case WM_SYSCOMMAND:
         // No menu, screen saver or power saving while the game is active.

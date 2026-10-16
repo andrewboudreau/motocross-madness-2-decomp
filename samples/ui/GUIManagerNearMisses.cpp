@@ -129,8 +129,8 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
         guiBackground->ReleaseDc();
     g_TrackGame->childRoot->DisableByClassName("GUICursor");
     g_TrackGame->childRoot->DisableByClassName("ToolTip");
-    g_TrackGame->UnknownVirtualSlot8();
-    g_TrackGame->UnknownVirtualSlot9();
+    g_TrackGame->RenderFrame();
+    g_TrackGame->PresentFrame();
     g_TrackGame->renderTarget->AdvanceFrame();
     g_TrackGame->childRoot->EnableByClassName("GUICursor");
     g_TrackGame->childRoot->EnableByClassName("ToolTip");

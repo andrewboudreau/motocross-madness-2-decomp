@@ -500,8 +500,8 @@ void GUIManager::RedrawFrame() {
         guiBackground->ReleaseDc();
         guiBackground->MarkAllDirty();
     }
-    g_TrackGame->UnknownVirtualSlot8();
-    g_TrackGame->UnknownVirtualSlot9();
+    g_TrackGame->RenderFrame();
+    g_TrackGame->PresentFrame();
     g_TrackGame->renderTarget->AdvanceFrame();
 }
 

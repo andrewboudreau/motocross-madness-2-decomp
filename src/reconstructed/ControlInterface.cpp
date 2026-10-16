@@ -217,27 +217,27 @@ int ControlInterface::DispatchInput(int value) {
         switch (event->kind) {
         case 0:
             if (event->pressed == 0)
-                g_TrackGame->UnknownVirtualSlot13(
+                g_TrackGame->OnControlRelease(
                     event, &keyboard->keyStates[event->control]);
             if (event->pressed == 1)
-                g_TrackGame->UnknownVirtualSlot14(
+                g_TrackGame->OnControlPress(
                     event, &keyboard->keyStates[event->control]);
             break;
         case 1:
             if (event->pressed == 0)
-                g_TrackGame->UnknownVirtualSlot13(
+                g_TrackGame->OnControlRelease(
                     event, &mouse->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_TrackGame->UnknownVirtualSlot14(
+                g_TrackGame->OnControlPress(
                     event, &mouse->buttonStates[event->control]);
             break;
         case 2:
         case 3:
             if (event->pressed == 0)
-                g_TrackGame->UnknownVirtualSlot13(
+                g_TrackGame->OnControlRelease(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_TrackGame->UnknownVirtualSlot14(
+                g_TrackGame->OnControlPress(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             break;
         }

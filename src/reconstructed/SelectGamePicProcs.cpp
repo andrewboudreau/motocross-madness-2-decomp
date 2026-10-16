@@ -208,10 +208,10 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
         return 1;
     if (largePictures) {
         sprintf(path, "%s\\%s", "ui", "unart.tga");
-        g_TrackGame->UnknownVirtualSlot18(path, fallback);
+        g_TrackGame->FindDataFile(path, fallback);
     } else {
         sprintf(path, "%s\\%s", "ui", "unarts.tga");
-        g_TrackGame->UnknownVirtualSlot18(path, fallback);
+        g_TrackGame->FindDataFile(path, fallback);
     }
     int more = directories->CurrentName(entry);
     UnknownTextureStream* stream = new(__FILE__, 180) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -256,7 +256,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                 sprintf(path, "%s\\%s", directory, file);
                 if (g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)file))
                     pictures->AddImageFileRow(file, row, 1, 0);
-                else if (g_TrackGame->UnknownVirtualSlot18(path, found))
+                else if (g_TrackGame->FindDataFile(path, found))
                     pictures->AddImageFileRow(found, row, 0, 0);
                 else
                     pictures->AddImageFileRow(fallback, row, 0, 0);
@@ -280,7 +280,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
                     sprintf(path, "%s\\%s", directory, file);
                     if (g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)file))
                         pictures->AddImageFileRow(file, row, 1, 0);
-                    else if (g_TrackGame->UnknownVirtualSlot18(path, found))
+                    else if (g_TrackGame->FindDataFile(path, found))
                         pictures->AddImageFileRow(found, row, 0, 0);
                     else
                         pictures->AddImageFileRow(fallback, row, 0, 0);
@@ -1789,7 +1789,7 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
         return;
     if (!*directory) {
         sprintf(path, "%s\\unarts.tga", "ui");
-        g_TrackGame->UnknownVirtualSlot18(path, file);
+        g_TrackGame->FindDataFile(path, file);
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
         return;
     }
@@ -1803,11 +1803,11 @@ void MPEventDlg::LoadTrackPicture(UIControl* picture, const char* directory, con
     sprintf(path, "%s\\%s", directory, file);
     if (g_TrackGame->sceneObject->OpenArchiveFile(stream, path, "rb", (int)file)) {
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
-    } else if (g_TrackGame->UnknownVirtualSlot18(path, found)) {
+    } else if (g_TrackGame->FindDataFile(path, found)) {
         static_cast<UIListBox*>(picture)->AddImageFileRow(found, 0, 1, 0);
     } else {
         sprintf(path, "%s\\unarts.tga", "ui");
-        g_TrackGame->UnknownVirtualSlot18(path, file);
+        g_TrackGame->FindDataFile(path, file);
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
     }
     if (stream)
