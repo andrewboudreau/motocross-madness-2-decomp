@@ -315,10 +315,10 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
 
     GlobalMemoryStatus(&memory);
     ecosystem[0] = 0;
-    g_TrackGame->sceneObject->UnknownFunction4e9ac0(modelCounts, (char*)&terrainWidth, (char*)&hasCube,
-                                                              (int)ecosystem);
+    g_TrackGame->sceneObject->CountSceneTextures(modelCounts, (char*)&terrainWidth, (char*)&hasCube,
+                                                (int)ecosystem);
     sceneSteps = 1;
-    if (g_TrackGame->sceneObject->UnknownFunction4e9a10(&sceneSteps)) {
+    if (g_TrackGame->sceneObject->CountSceneObjects(&sceneSteps)) {
         step = (int)(sceneSteps / (sceneSteps * 0.1f));
         if (progress)
             progress(&step);

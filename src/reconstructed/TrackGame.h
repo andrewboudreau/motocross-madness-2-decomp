@@ -471,9 +471,10 @@ class UnknownTrackGameObject574 {
 public:
     UnknownTrackGameObject574();              // 0x004e99d0 (defined in SceneManager.cpp)
     ~UnknownTrackGameObject574();             // 0x00464e90
-    // 0x004e9a10 / 0x004e9ac0 (SceneManager.cpp): run a temporary Scene.
-    int UnknownFunction4e9a10(int* flag);
-    int UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c);
+    // 0x004e9a10 / 0x004e9ac0 (SceneManager.cpp): run a temporary Scene's
+    // CountObjects / CountTextures (the quarry loader's estimates).
+    int CountSceneObjects(int* count);
+    int CountSceneTextures(unsigned long* counts, char* width, char* hasCube, int ecosystem);
     // 0x004e9ba0: opens the scene archive `name` (default sceneFile).
     UnknownTextureStream* OpenSceneArchive(const char* name);
     // 0x004e9cd0: opens `name` from the archive in `stream` (racesnd.cpp

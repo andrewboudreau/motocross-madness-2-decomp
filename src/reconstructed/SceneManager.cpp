@@ -47,27 +47,28 @@ UnknownTrackGameObject574::UnknownTrackGameObject574()
 }
 
 // 0x004e9a10
-int UnknownTrackGameObject574::UnknownFunction4e9a10(int* flag)
+int UnknownTrackGameObject574::CountSceneObjects(int* count)
 {
     Scene* scene = (new(__FILE__, 115) Scene(0))->UnknownFunction4ea7e0(this, 0, 0, 0);
     if (!scene)
         return 0;
-    scene->CountObjects(flag);
+    scene->CountObjects(count);
     scene->Release();
     return 1;
 }
 
 // 0x004e9ac0
-int UnknownTrackGameObject574::UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c)
+int UnknownTrackGameObject574::CountSceneTextures(unsigned long* counts, char* width, char* hasCube,
+                                                  int ecosystem)
 {
-    info[0] = 0;
-    info[1] = 0;
-    info[2] = 0;
-    info[3] = 0;
+    counts[0] = 0;
+    counts[1] = 0;
+    counts[2] = 0;
+    counts[3] = 0;
     Scene* scene = (new(__FILE__, 151) Scene(0))->UnknownFunction4ea7e0(this, 0, 0, 0);
     if (!scene)
         return 0;
-    int result = scene->CountTextures(info, (float*)a, (int*)b, (char*)c);
+    int result = scene->CountTextures(counts, (float*)width, (int*)hasCube, (char*)ecosystem);
     scene->Release();
     return result;
 }
