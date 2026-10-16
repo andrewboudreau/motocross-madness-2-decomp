@@ -393,7 +393,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 }
 
 // Helpers of slot 11 (all names tier 3).
-void BusyCursor();                                       // 0x004bfa80, cdecl: two cursor calls through function pointers
+unsigned int ReadClock();                                // 0x004bfa80: timeBeginPeriod(1), timeGetTime, timeEndPeriod(1); result unused here
 class ArchiveFile {                                      // 0x134 bytes, ctor takes the registry (0x00460d10, ret 4)
 public:
     explicit ArchiveFile(OwnerRegistry* registry);
@@ -426,7 +426,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     char fname[0x100];
     char ext[0x100];
     char dir[0x100];
-    BusyCursor();
+    ReadClock();
     Method_0x004a6910(a1, a6);
     *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = a3;
     *(int*)(d3d_field_0x1a4 + 0x68) = a5;
@@ -451,7 +451,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     if (entry->owner) {
         entry->BaseObjectVirtualSlot1();
         CharacterVirtualSlot8((int)entry->owner);
-        BusyCursor();
+        ReadClock();
         delete file;
         return this;
     }
@@ -469,6 +469,6 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     delete sltFile;
     g_pOwnerRegistry->SetOwner(entry, this);
     delete file;
-    BusyCursor();
+    ReadClock();
     return this;
 }

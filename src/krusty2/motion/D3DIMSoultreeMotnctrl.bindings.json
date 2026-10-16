@@ -25,7 +25,7 @@
   "??_ED3DIMSoultreeCharacter@@UAEPAXI@Z": "0x00446680",
   "?AddChild@SoultreeObject@@QAEXPAV1@@Z": "0x004fd910",
   "?Attach@SltFile@@QAEXPAVArchiveFile@@HH@Z": "0x004b77a0",
-  "?BusyCursor@@YAXXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?CharacterVirtualSlot0@D3DIMSoultreeCharacter@@UAEXXZ$ehhandler": "0x0054a25e",
   "?CharacterVirtualSlot8@Character@@UAEXH@Z": "0x004a98b0",
   "?CharacterVirtualSlot9@D3DIMSoultreeCharacter@@UAEXH@Z$ehhandler": "0x0054a287",

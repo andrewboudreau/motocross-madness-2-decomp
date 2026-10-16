@@ -285,7 +285,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                             if (KB_DELTA_FITS(a, 6.28318548f)) {
                                 message.pitch = (signed char)(a * 20.371832f);
                                 state->pitchError = a - message.pitch * 0.049087387f;
-                                unsigned int now = UnknownFunction4bfa80();
+                                unsigned int now = ReadClock();
                                 unsigned int elapsed = now - state->time;
                                 if (elapsed < 1000) {
                                     if (elapsed < 0x80) {
@@ -503,7 +503,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
         }
         if (!g_kbInterpolate) {
-            unsigned int now = UnknownFunction4bfa80();
+            unsigned int now = ReadClock();
             if (!g_kbUseTimeReceived)
                 stateIntervalElapsed = ((float)now - (float)states[0]->time - clockOffset) * 0.001f;
             else

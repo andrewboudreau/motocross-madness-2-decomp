@@ -317,7 +317,7 @@ struct KbGame {
 };
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
-unsigned int UnknownFunction4bfa80();
+unsigned int ReadClock();
 // 0x004B5D00 (cdecl): forward/up axes from roll, pitch and yaw (tier 3 names).
 void UnknownFunction4b5d00(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
 // 0x00460C70: 1/sqrt estimate (name from samples/physics/helpers/FastMath.bindings.json).

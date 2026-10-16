@@ -200,7 +200,7 @@
   "?UnknownFunction444eb0@KbXform@@QAEXPAUKbMorphMod@@@Z": "0x00444eb0",
   "?LoadParameterFile@KbMorphMod@@QAEPAU1@PAXPBDPAVSoultreeObject@@@Z": "0x004a33b0",
   "?UnknownFunction4b5d00@@YAXPAUVec3@@0MMM@Z": "0x004b5d00",
-  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?ReadClock@@YAIXZ": "0x004bfa80",
   "?UnknownVirtualSlot102@KrustyBike@@UAEXM@Z": "0x0048eea0",
   "?UnknownVirtualSlot12@KrustyBike@@UAEHH@Z": "0x0048de20",
   "?UnknownVirtualSlot15@KrustyBike@@UAEXPBUVec3@@PAU2@@Z": "0x00495cb0",

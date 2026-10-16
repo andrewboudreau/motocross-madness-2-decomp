@@ -1557,7 +1557,7 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
         message.lapGate = (unsigned char)lapCount;
     else
         message.lapGate = lapGate;
-    message.time = UnknownFunction4bfa80();
+    message.time = ReadClock();
     message.field_0x02 = (short)message.time - (short)state->time;
     if (!record) {
         if (g_kbGame->network)
