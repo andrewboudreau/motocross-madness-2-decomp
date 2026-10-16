@@ -142,13 +142,13 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
         if (viewportClearFrames)
             viewportClearFrames--;
         if (fovKeysEnabled) {
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x3f, 0)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xc7, 0, 0x3f, 0)) {
                 fieldOfView -= 1.0f;
                 if (fieldOfView < minFieldOfView)
                     fieldOfView = minFieldOfView;
                 SetFieldOfView(fieldOfView);
             }
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x3f, 0)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xcf, 0, 0x3f, 0)) {
                 fieldOfView += 1.0f;
                 if (fieldOfView > maxFieldOfView)
                     fieldOfView = maxFieldOfView;
@@ -156,10 +156,10 @@ int Camera::UnknownVirtualSlot10(float frameTime) {
             }
         }
         if (widthKeysEnabled) {
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xd2, 0, 0x3f, 0) &&
                 (unsigned int)viewport[2] < (unsigned int)targetWidth)
                 SetViewportWidth(-1, 2, 0);
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xd3, 0, 0x3f, 0) &&
                 (unsigned int)viewport[2] > 0x20)
                 SetViewportWidth(1, -2, 0);
         }

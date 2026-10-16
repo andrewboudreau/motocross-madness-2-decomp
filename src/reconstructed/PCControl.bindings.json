@@ -28,7 +28,7 @@
   "?ModifierHolds@KeyboardDevice@@QAEHH@Z": "0x0048a240",
   "?OpenDevice@PCJoystickDevice@@QAEHPBUUnknownDeviceInstance@@@Z": "0x004c2930",
   "?SetAcquired@PCInputDevice@@QAEHH@Z": "0x004c26d0",
-  "?UnknownVirtualSlot1@PCControlInterface@@UAEHXZ$ehhandler": "0x0054cb6c",
+  "?CreateDevices@PCControlInterface@@UAEHXZ$ehhandler": "0x0054cb6c",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_DirectInputCreateEx@20": "0x005330e8",
   "_GUID_ConstantForce": "0x00556b90",

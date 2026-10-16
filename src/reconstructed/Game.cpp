@@ -131,7 +131,7 @@ int Game::OnDeactivate() {
 // 0x00467af0: creates the PC control interface and sets it up (slot 1).
 int Game::Initialize() {
     controlInterface = new(__FILE__, 187) PCControlInterface;
-    return controlInterface->UnknownVirtualSlot1() != 0;
+    return controlInterface->CreateDevices() != 0;
 }
 
 // 0x00467b70: builds the two root objects (the second a child of the
@@ -376,9 +376,9 @@ int Game::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
         }
     }
     if (allowFreezeCamera) {
-        if (controlInterface->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
+        if (controlInterface->IsDeviceButtonDown(0x21, 0, 0xc, 0)) {
             paused = 1 - paused;
-        } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && paused) {
+        } else if (controlInterface->IsDeviceButtonDown(0x12, 0, 0x3f, 0) && paused) {
             stepOneFrame = 1;
             paused = 0;
         }

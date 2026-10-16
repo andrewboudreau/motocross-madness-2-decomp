@@ -72,7 +72,7 @@ PCControlInterface::PCControlInterface() {
 // 0x004bf240: creates DirectInput (version 0x700), the keyboard and the
 // mouse, then the attached joysticks; without any joystick, one is created
 // anyway. The first joystick becomes the active one.
-int PCControlInterface::UnknownVirtualSlot1() {
+int PCControlInterface::CreateDevices() {
     if (DirectInputCreateEx(g_TrackGame->instanceHandle, 0x700, IID_IDirectInput7A,
                             (void**)&directInput, 0) < 0)
         return 0;
@@ -124,7 +124,7 @@ void PCControlInterface::SetDevicesAcquired(int acquire) {
 }
 
 // 0x004bf560: `control` on the keyboard, the active joystick or the mouse.
-int PCControlInterface::UnknownVirtualSlot2(int control, int modifier) {
+int PCControlInterface::IsControlDown(int control, int modifier) {
     if (keyboard && keyboard->IsControlDown(control, modifier, 0))
         return 1;
     if (joysticks[activeJoystickIndex] && joysticks[activeJoystickIndex]->GetControlState(control, modifier, 0))
@@ -135,7 +135,7 @@ int PCControlInterface::UnknownVirtualSlot2(int control, int modifier) {
 }
 
 // 0x004bf5e0
-int PCControlInterface::UnknownVirtualSlot4(int modifier) {
+int PCControlInterface::ModifierHolds(int modifier) {
     if (keyboard)
         return keyboard->ModifierHolds(modifier);
     return 0;

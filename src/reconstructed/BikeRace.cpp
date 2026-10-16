@@ -699,8 +699,8 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     g_UnknownGlobal567a88 = 2;
                 }
                 if (model->detailLevelCount > 1) {
-                    int up = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
-                    int down = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
+                    int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
+                    int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);
                     int row = g_UnknownGlobal567a88 - 1;
                     if (down || up) {
                         if ((signed char)targetKind < 0) {

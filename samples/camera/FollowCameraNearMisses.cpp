@@ -110,7 +110,7 @@ static inline Vector3& operator-=(Vector3& v, const Vector3& other) {
 static inline UnknownJoystickBoolView* FollowCameraJoystick(ControlInterface* controls) {
     return (UnknownJoystickBoolView*)controls->activeJoystick;
 }
-#define FOLLOWCAMERA_KEY(control) (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3((control), 0, 0x3f, 0))
+#define FOLLOWCAMERA_KEY(control) (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown((control), 0, 0x3f, 0))
 
 // Inlined by slot 38: the yaw turns and wraps to [-pi, pi]; the pitch tilts
 // and is clamped to +-1.55. Retail negates the step before adding it, which
@@ -325,9 +325,9 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
                 if (x != 0.0f || y != 0.0f)
                     return moved;
             }
-            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0))
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0))
                 cachedTarget += speed * viewDirection;
-            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 0.0)
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && field_0x2c0 > 0.0)
                 cachedTarget -= speed * viewDirection;
         }
     } else if (cameraState != 3 && cameraState != 6 && cameraState != 7) {
@@ -371,11 +371,11 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
                 if (x != 0.0f || y != 0.0f)
                     return moved;
             }
-            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0)) {
                 eyePosition -= speed * viewDirection;
                 moved = true;
             }
-            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 6.5f) {
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && field_0x2c0 > 6.5f) {
                 eyePosition += speed * viewDirection;
                 moved = true;
             }
@@ -438,13 +438,13 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             if (x != 0.0f || y != 0.0f)
                 return moved;
         }
-        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
+        if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0)) {
             followDistance += turn;
             if (followDistance < 7.0f)
                 followDistance = 7.0f;
             moved = true;
         }
-        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0)) {
+        if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0)) {
             followDistance -= turn;
             if (followDistance < 7.0f)
                 followDistance = 7.0f;
@@ -648,12 +648,12 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             }
         }
         if (g_TrackGame->paused || (cameraState != 5 && cameraState != 7)) {
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xc7, 0, 0x80000000, 0)) {
                 targetFieldOfView -= 3.0f;
                 if (targetFieldOfView < minFieldOfView)
                     targetFieldOfView = minFieldOfView;
             }
-            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x80000000, 0)) {
+            if (g_TrackGame->controlInterface->IsDeviceButtonDown(0xcf, 0, 0x80000000, 0)) {
                 targetFieldOfView += 3.0f;
                 if (targetFieldOfView > maxFieldOfView)
                     targetFieldOfView = maxFieldOfView;
