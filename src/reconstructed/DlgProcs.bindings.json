@@ -297,7 +297,7 @@
   "?SetNextMenu@TransDlg@@QAEXH@Z": "0x00455c40",
   "?LoadEvent@EventManager@@QAEHXZ": "0x0045cb70",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",
-  "?UnknownFunction45d270@EventManager@@QAEXXZ": "0x0045d270",
+  "?EnableRaceObjects@EventManager@@QAEXXZ": "0x0045d270",
   "?FindRaceView@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
   "?ResetEntries@EventManager@@QAEXXZ": "0x0045e520",
   "?LeaveRaceForMenu@EventManager@@QAEXH@Z": "0x0045e710",

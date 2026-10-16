@@ -1313,7 +1313,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                 g_TrackGame->mode.field_0x6a4 = 0;
                 event->dialog->EndDialog(0);
                 event->handled = 1;
-                g_TrackGame->eventManager->UnknownFunction45d270();
+                g_TrackGame->eventManager->EnableRaceObjects();
             }
             g_UnknownGlobal59adfc++;
         } else {
@@ -1327,7 +1327,7 @@ void LoadingDlg::HandleEvent(UnknownDialogEvent* event) {
                     g_TrackGame->quarryEvent->ResetClock();
                 if (g_TrackGame->tagEvent)
                     g_TrackGame->tagEvent->ResetClock();
-                g_TrackGame->eventManager->UnknownFunction45d270();
+                g_TrackGame->eventManager->EnableRaceObjects();
             }
             g_UnknownGlobal59adfc++;
         }

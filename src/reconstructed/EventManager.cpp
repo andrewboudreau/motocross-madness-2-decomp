@@ -153,7 +153,7 @@ GameObject* EventManager::SetRenderContext(void* value) {
 }
 
 // 0x0045d270
-void EventManager::UnknownFunction45d270() {
+void EventManager::EnableRaceObjects() {
     TrackGameViewOwner* owner = FindRaceMode();
     if (!owner)
         return;
@@ -1021,7 +1021,7 @@ void EventManager::RemoveVegetationInRect(float x0, float z0, float x1, float z1
 }
 
 // 0x0045fdc0
-void EventManager::UnknownFunction45fdc0(float x0, float z0, float x1, float z1) {
+void EventManager::DisableCollisionObjectsInRect(float x0, float z0, float x1, float z1) {
     if (g_collisionQuadTree && g_collisionQuadTree->BeginQuery(x0, z0, x1, z1)) {
         QuadTreeObject* object;
         while ((object = g_collisionQuadTree->NextObject()) != 0) {
