@@ -20,10 +20,10 @@
   "??_8SoultreePhysicsCharacter@@7BSoultreePhysicsBaseObject@@@": "0x0055815c",
   "??_ESoultreePhysicsCharacter@@UAEPAXI@Z": "0x005042f0",
   "??_EVehicle@@UAEPAXI@Z": "0x0052b630",
-  "?GameObjectVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
-  "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@UAEHM@Z": "0x005036f0",
-  "?GameObjectVirtualSlot10@SoultreePhysicsCharacter@@UAEHM@Z": "0x00504210",
-  "?GameObjectVirtualSlot10@Vehicle@@UAEHM@Z": "0x0052a830",
-  "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@UAEXXZ": "0x00446640",
-  "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@UAEXXZ": "0x00446620"
+  "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
+  "?Tick@SoultreePhysicsBaseObject@@UAEHM@Z": "0x005036f0",
+  "?Tick@SoultreePhysicsCharacter@@UAEHM@Z": "0x00504210",
+  "?Tick@Vehicle@@UAEHM@Z": "0x0052a830",
+  "?Disable@D3DIMSoultreeCharacter@@UAEXXZ": "0x00446640",
+  "?Enable@D3DIMSoultreeCharacter@@UAEXXZ": "0x00446620"
 }

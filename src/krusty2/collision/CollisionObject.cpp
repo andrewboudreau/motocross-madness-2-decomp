@@ -657,7 +657,7 @@ void CollisionObject::SyncTransformFromNode()
 int CheckKey(int code, int sub, void* event, int mask);
 
 // 0x00434970: debug-key handling for the collision-tree overlay, then the GameObject base.
-int CollisionObject::GameObjectVirtualSlot23(int a, int b)
+int CollisionObject::OnControlPress(int a, int b)
 {
     if (CheckKey(10, 0, (void*)a, 0x80)) {
         debugTreeDepth--;
@@ -671,7 +671,7 @@ int CollisionObject::GameObjectVirtualSlot23(int a, int b)
         if (debugDrawMode > 7)
             debugDrawMode = 0;
     }
-    return GameObject::GameObjectVirtualSlot23(a, b);
+    return GameObject::OnControlPress(a, b);
 }
 
 // 0x00434a10: clears the hit state and (re)initialises the per-object query record that the

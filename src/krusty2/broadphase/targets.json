@@ -322,7 +322,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot22@Terrain",
+    "candidate_symbol_contains": "OnControlRelease@Terrain",
     "target_va": "0x004dc4c0",
     "target_size": 5,
     "expect": "exact",
@@ -352,7 +352,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot23@Terrain",
+    "candidate_symbol_contains": "OnControlPress@Terrain",
     "target_va": "0x00508850",
     "target_size": 276,
     "expect": "exact",

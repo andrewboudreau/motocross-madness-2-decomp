@@ -186,7 +186,7 @@ static inline void ScaleTerrainVec3(TerrainVec3& v, float s)
 Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc* desc,
                        int quality, int field0xc40, const char* textureName, int halfFormat)
 {
-    GameObject::GameObjectVirtualSlot8(host);
+    GameObject::SetRenderContext(host);
     surfaceDesc = *desc;
     int surfaceFlags = halfFormat ? 8 : 0;
     g_pTerrainQualityTable = g_terrainQualityHardware;
@@ -679,7 +679,7 @@ int Terrain::GameObjectVirtualSlot19(int)
     return 0;
 }
 
-int Terrain::GameObjectVirtualSlot22(int, int)
+int Terrain::OnControlRelease(int, int)
 {
     return 0;
 }
@@ -714,7 +714,7 @@ int g_terrainToggle718;
 
 // Slot 23 (0x00508850): debug key handler.  The three TestInputEvent kinds 0x43, 2 and 3
 // each flip one toggle and return 1 (tier 3 semantics).
-int Terrain::GameObjectVirtualSlot23(int event, int)
+int Terrain::OnControlPress(int event, int)
 {
     if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;

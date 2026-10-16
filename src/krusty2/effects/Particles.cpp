@@ -72,7 +72,7 @@ int ParticleManager::AddParticle(float age, const ParticleVec3* position, int fr
     return 0;
 }
 
-int ParticleManager::GameObjectVirtualSlot10(float dt)
+int ParticleManager::Tick(float dt)
 {
     if (g_gameContext->frozen)
         return 1;
@@ -104,7 +104,7 @@ int ParticleManager::GameObjectVirtualSlot10(float dt)
 ParticleManager* ParticleManager::UnknownVirtualSlot27(int parentArg, TextureMapManager* textures,
                                                        const char* textureName, int field)
 {
-    GameObject::GameObjectVirtualSlot8(parentArg);
+    GameObject::SetRenderContext(parentArg);
     for (int i = 0; i < 1000; i++)
         particles[i] = new(__FILE__, 0x48a) Particle;
 

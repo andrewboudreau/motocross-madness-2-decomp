@@ -62,7 +62,7 @@
   {
     "class": "ShadowReceiver",
     "source": "D3DIMSoultreeShadow.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot8@ShadowReceiver",
+    "candidate_symbol_contains": "?SetRenderContext@ShadowReceiver",
     "target_va": "0x447780",
     "target_size": 19,
     "expect": "exact",
@@ -292,7 +292,7 @@
   {
     "class": "ProjectedShadow",
     "source": "ProjectedShadow.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot10",
+    "candidate_symbol_contains": "Tick",
     "target_va": "0x004dafc0",
     "target_size": 62,
     "expect": "exact",
@@ -302,7 +302,7 @@
   {
     "class": "ProjectedShadow",
     "source": "ProjectedShadow.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot12",
+    "candidate_symbol_contains": "PrepareGeometry",
     "target_va": "0x004db000",
     "target_size": 193,
     "expect": "exact",
@@ -312,7 +312,7 @@
   {
     "class": "ProjectedShadow",
     "source": "ProjectedShadow.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot13",
+    "candidate_symbol_contains": "RenderPre3D",
     "target_va": "0x004dc410",
     "target_size": 165,
     "expect": "exact",

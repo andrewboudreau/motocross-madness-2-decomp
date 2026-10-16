@@ -6,7 +6,7 @@
   "??_7DustParticleEmitter@@6B@": "0x00555ab8",
   "?AddParticle@ParticleManager@@QAEHMPBUParticleVec3@@HMMMIH@Z": "0x004baa50",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
-  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
+  "?SetRenderContext@GameObject@@UAEPAV1@H@Z": "0x004692f0",
   "?g_gameContext@@3PAUParticleGameContext@@A": "0x0056e26c",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ff8da72a80000000000": "0x00555b2c",

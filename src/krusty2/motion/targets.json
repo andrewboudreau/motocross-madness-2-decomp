@@ -132,7 +132,7 @@
   {
     "class": "SphereManager",
     "source": "Spheres.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot8@SphereManager",
+    "candidate_symbol_contains": "SetRenderContext@SphereManager",
     "target_va": "0x00462e30",
     "target_size": 19,
     "expect": "exact",
@@ -852,7 +852,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@UAEXXZ",
+    "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@UAEXXZ",
     "target_va": "0x00446640",
     "target_size": 40,
     "expect": "exact",
@@ -862,7 +862,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@UAEXXZ",
+    "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@UAEXXZ",
     "target_va": "0x00446620",
     "target_size": 21,
     "expect": "exact",
@@ -872,7 +872,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
+    "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
     "target_va": "0x004466c0",
     "target_size": 8,
     "expect": "exact",
@@ -882,7 +882,7 @@
   {
     "class": "D3DIMSoultreeCharacter",
     "source": "D3DIMSoultreeMotnctrl.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
+    "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
     "target_va": "0x004466d0",
     "target_size": 8,
     "expect": "exact",
@@ -1052,7 +1052,7 @@
   {
     "class": "CollisionCharacter",
     "source": "CollisionCharacter.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
+    "candidate_symbol_contains": "Disable@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
     "target_va": "0x00431d60",
     "target_size": 11,
     "expect": "exact",
@@ -1062,7 +1062,7 @@
   {
     "class": "CollisionCharacter",
     "source": "CollisionCharacter.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
+    "candidate_symbol_contains": "Enable@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
     "target_va": "0x00431d70",
     "target_size": 11,
     "expect": "exact",
@@ -1072,7 +1072,7 @@
   {
     "class": "CollisionCharacter",
     "source": "CollisionCharacter.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@$4PPPPPPPM@A@AEHM@Z",
+    "candidate_symbol_contains": "Tick@CollisionCharacter@@$4PPPPPPPM@A@AEHM@Z",
     "target_va": "0x00431d80",
     "target_size": 8,
     "expect": "exact",
@@ -1112,7 +1112,7 @@
   {
     "class": "CollisionCharacter",
     "source": "CollisionCharacter.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@UAEHM@Z",
+    "candidate_symbol_contains": "Tick@CollisionCharacter@@UAEHM@Z",
     "target_va": "0x00431b30",
     "target_size": 438,
     "expect": "exact",

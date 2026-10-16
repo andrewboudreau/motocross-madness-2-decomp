@@ -140,13 +140,13 @@ void ProjectedShadow::ResizeVertexBuffer()
 
 // 0x004dafc0 (slot 10): counts frames and flags every updatePeriod-th one, then forwards the
 // time step to the camera.
-int ProjectedShadow::GameObjectVirtualSlot10(float dt)
+int ProjectedShadow::Tick(float dt)
 {
     frameCounter++;
     updateThisFrame = 0;
     if (frameCounter % updatePeriod == 0)
         updateThisFrame = 1;
-    return camera->GameObjectVirtualSlot10(dt);
+    return camera->Tick(dt);
 }
 
 // 0x004dace0: converts an 8 bit shadow strength into the 4 bit alpha of the surface format
@@ -229,7 +229,7 @@ int ProjectedShadow::SetLight(const ShadowVec3* pos, const ShadowVec3* dir, int 
 // 0x004db000 (slot 12): per-frame update.  Recomputes the caster bounds, then on update frames
 // asks every receiver to prepare and report dirtiness; when any is dirty it renders the
 // shadow, finishes the receivers and presents.
-int ProjectedShadow::GameObjectVirtualSlot12()
+int ProjectedShadow::PrepareGeometry()
 {
     ComputeBounds();
     dirtyFlags = 0;
@@ -255,7 +255,7 @@ int ProjectedShadow::GameObjectVirtualSlot12()
 // 0x004dc410 (slot 13): after a dirty update, uploads the union of the previous and current
 // dirty rectangles (previous 0x78..0x84, current clipRect) to the texture, then makes the
 // current one the previous one.
-int ProjectedShadow::GameObjectVirtualSlot13()
+int ProjectedShadow::RenderPre3D()
 {
     if (updateThisFrame && dirtyFlags) {
         int rect[4];

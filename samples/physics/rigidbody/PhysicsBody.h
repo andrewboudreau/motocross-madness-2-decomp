@@ -103,7 +103,7 @@ public:
     explicit PhysicsRigidBody(int flags);               // 0x004cc120, forwards flags
     virtual ~PhysicsRigidBody();                        // 0x004cc1e0 (scalar deleting 0x004cc1c0)
 
-    virtual int GameObjectVirtualSlot10(float dt);      // 0x004cc600
+    virtual int Tick(float dt);                         // 0x004cc600
     virtual int GameObjectVirtualSlot11(float dt);      // 0x004cc630, the integration step
     virtual int GameObjectVirtualSlot14();              // 0x004cca80
 

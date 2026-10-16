@@ -31,7 +31,7 @@ DustParticleEmitter::~DustParticleEmitter() {}
 
 int DustParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 {
-    GameObject::GameObjectVirtualSlot8((int)a);
+    GameObject::SetRenderContext((int)a);
     if (m) {
         manager = m;
         return (int)this;
@@ -54,7 +54,7 @@ void DustParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 
 // 0x004b8ab0.  Spawns dust along the segment the emitter moved this tick; the spacing and the
 // emission rate follow the speed (distance / dt, scaled by intensity when it is nonzero).
-int DustParticleEmitter::GameObjectVirtualSlot10(float dt)
+int DustParticleEmitter::Tick(float dt)
 {
     if (g_gameContext->frozen == 0) {
         if (field_0x60 == 0) {

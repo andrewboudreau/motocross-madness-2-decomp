@@ -10,5 +10,5 @@ void CollisionObject::Configure(int a, int b, int c, int d)
     useBroadphase = b;
     collisionEnabled = c;
     collidable = d;
-    GameObject::GameObjectVirtualSlot8(a);
+    GameObject::SetRenderContext(a);
 }

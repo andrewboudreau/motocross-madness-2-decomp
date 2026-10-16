@@ -41,7 +41,7 @@ DirtChunkParticleEmitter::~DirtChunkParticleEmitter() {}
 
 int DirtChunkParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 {
-    GameObject::GameObjectVirtualSlot8((int)a);
+    GameObject::SetRenderContext((int)a);
     if (m) {
         manager = m;
         return (int)this;
@@ -52,7 +52,7 @@ int DirtChunkParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 
 // 0x004b8f40.  Writes the particles straight into the manager's table: dt (plus the carried
 // remainder) times the rate is the number of particles, spread along the segment moved this tick.
-int DirtChunkParticleEmitter::GameObjectVirtualSlot10(float dt)
+int DirtChunkParticleEmitter::Tick(float dt)
 {
     if (g_gameContext->frozen == 0) {
         if (firstUpdate) {

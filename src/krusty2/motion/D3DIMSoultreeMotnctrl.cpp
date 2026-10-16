@@ -246,9 +246,9 @@ D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
 
 // GameObject slot 4 override (0x00446640, reached through vtordisp thunk 0x004466c0): runs GameObject's
 // slot 4, then clears the four dwords at +0x1f4..+0x200 (ctor 0x004455b0 also zeroes them).
-void D3DIMSoultreeCharacter::GameObjectVirtualSlot4()
+void D3DIMSoultreeCharacter::Disable()
 {
-    GameObject::GameObjectVirtualSlot4();
+    GameObject::Disable();
     *(int*)(d3d_field_0x1a4 + 0x50) = 0;
     *(int*)(d3d_field_0x1a4 + 0x54) = 0;
     *(int*)(d3d_field_0x1a4 + 0x58) = 0;
@@ -256,9 +256,9 @@ void D3DIMSoultreeCharacter::GameObjectVirtualSlot4()
 }
 
 // GameObject slot 5 override (0x00446620, thunk 0x004466d0): forwards to GameObject's slot 5.
-void D3DIMSoultreeCharacter::GameObjectVirtualSlot5()
+void D3DIMSoultreeCharacter::Enable()
 {
-    GameObject::GameObjectVirtualSlot5();
+    GameObject::Enable();
 }
 
 // Constructor 0x004455b0 (ret 8: one argument plus the hidden most-derived flag).  Builds the GameObject

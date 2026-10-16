@@ -1019,7 +1019,7 @@ int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeCo
 // fixed steps, slot 30 clears the contact flags, slot 39 handles a pending reset, the
 // contacts are refreshed (field_0x1d0 = any contact active), RunSteps runs the steps and
 // slot 21 refreshes the attachments.  Tier 2 for the call structure.
-int SoultreePhysicsBaseObject::GameObjectVirtualSlot10(float dt)
+int SoultreePhysicsBaseObject::Tick(float dt)
 {
     int steps;
     int refreshed = 0;
@@ -1060,10 +1060,10 @@ SoultreePhysicsObject::~SoultreePhysicsObject()
 
 // GameObject slot 10: the physics update (0x005036f0), then the model node's own update
 // (D3DIMSoultreeObject's override 0x00443490) with the same frame time.
-int SoultreePhysicsObject::GameObjectVirtualSlot10(float dt)
+int SoultreePhysicsObject::Tick(float dt)
 {
-    SoultreePhysicsBaseObject::GameObjectVirtualSlot10(dt);
-    return D3DIMSoultreeObject::GameObjectVirtualSlot10(dt);
+    SoultreePhysicsBaseObject::Tick(dt);
+    return D3DIMSoultreeObject::Tick(dt);
 }
 
 // ---- slot 40 loaders (0x00503970 SoultreePhysicsObject, 0x00503de0 SoultreePhysicsCharacter) --

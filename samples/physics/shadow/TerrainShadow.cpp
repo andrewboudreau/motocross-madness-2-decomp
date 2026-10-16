@@ -36,7 +36,7 @@ TerrainShadow::TerrainShadow(int flags)
 TerrainShadow* TerrainShadow::Attach(int host, Terrain* c, ProjectedShadow* s)
 {
     if (s) {
-        GameObject::GameObjectVirtualSlot8(host);
+        GameObject::SetRenderContext(host);
         if (this) {
             caster = c;
             shadow = s;

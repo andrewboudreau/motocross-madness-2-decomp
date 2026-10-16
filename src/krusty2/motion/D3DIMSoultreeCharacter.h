@@ -151,8 +151,8 @@ public:
     // `a, 1` or `a, 0` before the call, e.g. 0x00418b52, 0x00503cec).  Type is tier 3.
     D3DIMSoultreeCharacter(int a);
     virtual ~D3DIMSoultreeCharacter();          // core 0x004459a0, deleting 0x00446680
-    virtual void GameObjectVirtualSlot4();      // 0x00446640 via vtordisp thunk 0x004466c0
-    virtual void GameObjectVirtualSlot5();      // 0x00446620 via vtordisp thunk 0x004466d0
+    virtual void Disable();                     // 0x00446640 via vtordisp thunk 0x004466c0
+    virtual void Enable();                      // 0x00446620 via vtordisp thunk 0x004466d0
     // --- vtable 0x00551530 (offset 0): overrides of Character slots ---
     virtual void CharacterVirtualSlot0();         // 0x00445a70
     virtual void CharacterVirtualSlot2();         // 0x00445fc0

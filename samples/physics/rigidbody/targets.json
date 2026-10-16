@@ -412,7 +412,7 @@
   {
     "class": "PhysicsRigidBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@PhysicsRigidBody@@",
+    "candidate_symbol_contains": "?Tick@PhysicsRigidBody@@",
     "target_va": "0x004cc600",
     "target_size": 37,
     "expect": "exact",

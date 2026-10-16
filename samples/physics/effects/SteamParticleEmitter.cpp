@@ -40,7 +40,7 @@ SteamParticleEmitter::~SteamParticleEmitter() {}
 
 int SteamParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 {
-    GameObject::GameObjectVirtualSlot8((int)a);
+    GameObject::SetRenderContext((int)a);
     if (m) {
         manager = m;
         return (int)this;
@@ -81,7 +81,7 @@ void SteamParticleEmitter::SetColor(unsigned char r, unsigned char g, int b)
 }
 
 // 0x004ba070.  Emits a trail of puffs between the previous and the current position each tick.
-int SteamParticleEmitter::GameObjectVirtualSlot10(float dt)
+int SteamParticleEmitter::Tick(float dt)
 {
     if (g_gameContext->frozen == 0 && emitting != 0 && field_0x6c != 0) {
         if (field_0x44 <= 0.0f) {

@@ -71,7 +71,7 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 {
 }
 
-GameObject* ConstraintMethodCollisionModel::GameObjectVirtualSlot8(int a)
+GameObject* ConstraintMethodCollisionModel::SetRenderContext(int a)
 {
     Configure(a, 1, 1, 1);
     onHitCallback = ConstraintContactCallback;
@@ -80,11 +80,11 @@ GameObject* ConstraintMethodCollisionModel::GameObjectVirtualSlot8(int a)
     return this;
 }
 
-int ConstraintMethodCollisionModel::GameObjectVirtualSlot10(float t)
+int ConstraintMethodCollisionModel::Tick(float t)
 {
     if (!manualStep)
         GameObjectVirtualSlot11(t);
-    return CollisionObject::GameObjectVirtualSlot10(t);
+    return CollisionObject::Tick(t);
 }
 
 int ConstraintMethodCollisionModel::GameObjectVirtualSlot14()

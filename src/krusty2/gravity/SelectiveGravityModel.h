@@ -34,7 +34,7 @@ class SelectiveGravityModel : public GameObject {
 public:
     explicit SelectiveGravityModel(int flags);                 // 0x004f9760
     virtual ~SelectiveGravityModel();                          // slot 0, deleting 0x004f9790, core 0x004f97b0
-    virtual int GameObjectVirtualSlot10(float dt);             // 0x004f9860
+    virtual int Tick(float dt);                                // 0x004f9860
     virtual int GameObjectVirtualSlot11(float dt);             // 0x004f9890
     virtual void AddBody(GravityBody* body);                   // slot 27, 0x004f9820
     // slot 28, 0x004f9a50.  Emitted after the TU's $E initializers, at the end of the

@@ -83,7 +83,7 @@
   "?FreeBoxTree@@YAXPAX@Z": "0x0042a160",
   "?FreeShape@CollisionObject@@QAEXXZ": "0x00432430",
   "?GameObjectVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",
-  "?GameObjectVirtualSlot23@GameObject@@UAEHHH@Z": "0x004695d0",
+  "?OnControlPress@GameObject@@UAEHHH@Z": "0x004695d0",
   "?GetIdentityMatrix@@YAPAUMatrix4@@PAU1@@Z": "0x004a1410",
   "?GetMatrixIn@CollisionSceneNode@@QAEXPAV1@PAUMatrix4@@@Z": "0x004fca80",
   "?GetObject@CollisionVegetation@@QAEPAVCollisionObject@@H@Z": "0x004570a0",

@@ -308,7 +308,7 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   deleting destructor; frees the smoothers, the engine/steer states through their
   out-of-line destructors `0x00464e90`/`0x00504c50`, the three arrays, then detaches
   the input map's value source via its slots 15/16), the GameObject slot 10 override
-  `0x0052a830` (vtordisp thunk `0x0052b690`; calls `GameObject::GameObjectVirtualSlot10`
+  `0x0052a830` (vtordisp thunk `0x0052b690`; calls `GameObject::Tick`
   directly, not SoultreePhysicsCharacter's) and the wheel placement pass
   `PlaceWheels` `0x00528eb0` (shock retract 0.25/0.75 of the last step via
   `0x004fa310`/`0x004fab60`, probe `0x00514550`, `ClearForces` `0x004f9c70` called
@@ -452,8 +452,8 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
   header): ctor `0x005037c0` (`GameObject(1)`, `SoultreePhysicsBaseObject(flags)`,
   `D3DIMSoultreeObject(flags)`, then `sceneNode = this` converted to the D3DIM subobject),
   dtor core `0x005038d0` (empty body), GameObject slot 10 `0x00503c50`
-  (`SoultreePhysicsBaseObject::GameObjectVirtualSlot10(dt)` then
-  `D3DIMSoultreeObject::GameObjectVirtualSlot10(dt)`, 0x00443490), and the compiler-emitted
+  (`SoultreePhysicsBaseObject::Tick(dt)` then
+  `D3DIMSoultreeObject::Tick(dt)`, 0x00443490), and the compiler-emitted
   deleting destructor `0x00503890` and vbase-vtable thunks `0x00504260`/`0x00504270`.
   The class has two GameObject bases (the virtual one and D3DIMSoultreeObject's plain one at
   +0x228); VC6 compiles the destructor and the slot 10 override against the plain one, which

@@ -15,7 +15,7 @@
 // the release-and-return-0 block for the surface-format failures where VC6 merges them all.
 ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* textureOwner)
 {
-    GameObject::GameObjectVirtualSlot8((int)target);
+    GameObject::SetRenderContext((int)target);
     field_0x5c = (int)target;
 
     char name[0x100];
@@ -74,7 +74,7 @@ ProjectedShadow* ProjectedShadow::Init(ShadowRenderTarget* target, void* texture
     ShadowOwner* owner = Host()->owner;
 
     camera = new(__FILE__, 0xcd) ShadowCameraProxy(1);
-    if (!camera || !camera->GameObjectVirtualSlot8((int)Host())) {
+    if (!camera || !camera->SetRenderContext((int)Host())) {
         BaseObjectVirtualSlot2();
         return 0;
     }

@@ -46,7 +46,7 @@ emitter classes and the vector-constant initialisers, whose ownership is not pro
 
 ## Proposed slot names (tier 3)
 
-* ParticleManager slot 10 `GameObjectVirtualSlot10(float dt)`: the per-frame update; returns 1 at once when the game context
+* ParticleManager slot 10 `Tick(float dt)`: the per-frame update; returns 1 at once when the game context
   (global 0x0056e26c) `+0x1c4` is nonzero. Ages particles by dt*1000, recycles dead ones, integrates size (flag 8), position (flag 4) and
   velocity with gravity (flag 0x10).
 * ParticleManager slot 14: the render pass (sorts the visible particles with `CompareParticleDepth`), not reconstructed.

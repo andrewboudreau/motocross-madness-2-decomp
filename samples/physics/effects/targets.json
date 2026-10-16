@@ -42,7 +42,7 @@
   {
     "class": "DustParticleEmitter",
     "source": "DustParticleEmitter.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@DustParticleEmitter",
+    "candidate_symbol_contains": "?Tick@DustParticleEmitter",
     "target_va": "0x004b8ab0",
     "target_size": 732,
     "expect": "exact",
@@ -82,7 +82,7 @@
   {
     "class": "DirtChunkParticleEmitter",
     "source": "DirtChunkParticleEmitter.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@DirtChunkParticleEmitter",
+    "candidate_symbol_contains": "?Tick@DirtChunkParticleEmitter",
     "target_va": "0x004b8f40",
     "target_size": 970,
     "expect": "exact",
@@ -122,7 +122,7 @@
   {
     "class": "DirtSprayParticleEmitter",
     "source": "DirtSprayParticleEmitter.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@DirtSprayParticleEmitter",
+    "candidate_symbol_contains": "?Tick@DirtSprayParticleEmitter",
     "target_va": "0x004b9460",
     "target_size": 970,
     "expect": "exact",
@@ -182,7 +182,7 @@
   {
     "class": "SparkParticleEmitter",
     "source": "SparkParticleEmitter.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SparkParticleEmitter",
+    "candidate_symbol_contains": "?Tick@SparkParticleEmitter",
     "target_va": "0x004b99a0",
     "target_size": 1055,
     "expect": "exact",
@@ -232,7 +232,7 @@
   {
     "class": "SteamParticleEmitter",
     "source": "SteamParticleEmitter.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SteamParticleEmitter",
+    "candidate_symbol_contains": "?Tick@SteamParticleEmitter",
     "target_va": "0x004ba070",
     "target_size": 590,
     "expect": "exact",

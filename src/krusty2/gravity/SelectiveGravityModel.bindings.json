@@ -7,7 +7,7 @@
   "??_7SelectiveGravityModel@@6B@": "0x00557b0c",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
-  "?GameObjectVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
+  "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "_$E1": "0x004f9920",
   "_$E10": "0x004f9a10",
   "_$E4": "0x004f9970",

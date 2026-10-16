@@ -256,9 +256,9 @@ class ShadowReceiver : public GameObject {
 public:
     explicit ShadowReceiver(int flags) : GameObject(flags) {}
     virtual ~ShadowReceiver() {}
-    virtual GameObject* GameObjectVirtualSlot8(int a)
+    virtual GameObject* SetRenderContext(int a)
     {
-        GameObject::GameObjectVirtualSlot8(a);
+        GameObject::SetRenderContext(a);
         return this;
     }
     virtual int GameObjectVirtualSlot14() { return 1; }
@@ -272,9 +272,9 @@ class ProjectedShadow : public GameObject {
 public:
     explicit ProjectedShadow(int flags);            // 0x004da570
     virtual ~ProjectedShadow();                     // deleting wrapper 0x004da6c0, core 0x004da6e0
-    virtual int GameObjectVirtualSlot10(float dt);  // 0x004dafc0
-    virtual int GameObjectVirtualSlot12();          // 0x004db000
-    virtual int GameObjectVirtualSlot13();          // 0x004dc410
+    virtual int Tick(float dt);                     // 0x004dafc0
+    virtual int PrepareGeometry();                  // 0x004db000
+    virtual int RenderPre3D();                      // 0x004dc410
 
     ProjectedShadow* Init(ShadowRenderTarget* target, void* textureOwner);  // 0x004da7b0
     ShadowRenderTarget* Host() const { return (ShadowRenderTarget*)field_0x18; }  // GameObject::field_0x18 set by Init

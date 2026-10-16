@@ -217,10 +217,10 @@ public:
 
     VisibilityView* View() const { return (VisibilityView*)field_0x18; }
 
-    virtual int GameObjectVirtualSlot12();    // 0x0052ef50 (secondary vtable)
+    virtual int PrepareGeometry();            // 0x0052ef50 (secondary vtable)
     virtual int GameObjectVirtualSlot14();    // 0x0052e3b0
-    virtual int GameObjectVirtualSlot15();    // 0x0052f050
-    virtual int GameObjectVirtualSlot23(int a, int b);   // 0x0052eec0
+    virtual int RenderPost3D();               // 0x0052f050
+    virtual int OnControlPress(int a, int b);            // 0x0052eec0
 };
 
 #endif

@@ -41,7 +41,7 @@ D3DIMSoultreeShadow::D3DIMSoultreeShadow(int flags)
 D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(int host, ShadowCaster* c, ProjectedShadow* s)
 {
     if (s) {
-        GameObject::GameObjectVirtualSlot8(host);
+        GameObject::SetRenderContext(host);
         if (this) {
             shadow = s;
             s->AddReceiver(this);

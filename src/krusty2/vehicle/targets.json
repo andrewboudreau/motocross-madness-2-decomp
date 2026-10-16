@@ -1572,11 +1572,11 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@UAEHM@Z",
+    "candidate_symbol_contains": "?Tick@Vehicle@@UAEHM@Z",
     "target_va": "0x0052a830",
     "target_size": 86,
     "expect": "exact",
-    "notes": "GameObject slot 10 override via vtordisp thunk 0x52b690: slot 42 test, slot 49(dt), then GameObject::GameObjectVirtualSlot10 directly.",
+    "notes": "GameObject slot 10 override via vtordisp thunk 0x52b690: slot 42 test, slot 49(dt), then GameObject::Tick directly.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -2252,7 +2252,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@KrustyBike@@$4PPPPPPPM@A@AEHM@Z",
+    "candidate_symbol_contains": "?Tick@KrustyBike@@$4PPPPPPPM@A@AEHM@Z",
     "target_va": "0x00497ca0",
     "target_size": 8,
     "expect": "exact",
@@ -2352,7 +2352,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "?GameObjectVirtualSlot10@KrustyBike@@UAEHM@Z",
+    "candidate_symbol_contains": "?Tick@KrustyBike@@UAEHM@Z",
     "target_va": "0x004977a0",
     "target_size": 1153,
     "expect": "exact",

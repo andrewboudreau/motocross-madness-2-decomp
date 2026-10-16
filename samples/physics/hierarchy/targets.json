@@ -62,7 +62,7 @@
  {
   "class": "SoultreePhysicsCharacter",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@W7AEXXZ",
+  "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@W7AEXXZ",
   "target_va": "0x00504330",
   "target_size": 8,
   "expect": "exact",
@@ -72,7 +72,7 @@
  {
   "class": "SoultreePhysicsCharacter",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@W7AEXXZ",
+  "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@W7AEXXZ",
   "target_va": "0x00504340",
   "target_size": 8,
   "expect": "exact",
@@ -82,7 +82,7 @@
  {
   "class": "Vehicle",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@WBJA@AEXXZ",
+  "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@WBJA@AEXXZ",
   "target_va": "0x0052b670",
   "target_size": 11,
   "expect": "exact",
@@ -92,7 +92,7 @@
  {
   "class": "Vehicle",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@WBJA@AEXXZ",
+  "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@WBJA@AEXXZ",
   "target_va": "0x0052b680",
   "target_size": 11,
   "expect": "exact",
@@ -102,7 +102,7 @@
  {
   "class": "Bike",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@WDAI@AEXXZ",
+  "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@WDAI@AEXXZ",
   "target_va": "0x0040ca90",
   "target_size": 11,
   "expect": "exact",
@@ -112,7 +112,7 @@
  {
   "class": "Bike",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@WDAI@AEXXZ",
+  "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@WDAI@AEXXZ",
   "target_va": "0x0040caa0",
   "target_size": 11,
   "expect": "exact",
@@ -122,7 +122,7 @@
  {
   "class": "KrustyBike",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@WBBNM@AEXXZ",
+  "candidate_symbol_contains": "?Disable@D3DIMSoultreeCharacter@@WBBNM@AEXXZ",
   "target_va": "0x00497c80",
   "target_size": 11,
   "expect": "exact",
@@ -132,7 +132,7 @@
  {
   "class": "KrustyBike",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@WBBNM@AEXXZ",
+  "candidate_symbol_contains": "?Enable@D3DIMSoultreeCharacter@@WBBNM@AEXXZ",
   "target_va": "0x00497c90",
   "target_size": 11,
   "expect": "exact",
@@ -142,7 +142,7 @@
  {
   "class": "Bike",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@$4PPPPPPPM@BHI@AEHM@Z",
+  "candidate_symbol_contains": "?Tick@Vehicle@@$4PPPPPPPM@BHI@AEHM@Z",
   "target_va": "0x0040cab0",
   "target_size": 14,
   "expect": "exact",
@@ -172,17 +172,17 @@
  {
   "class": "SoultreePhysicsCharacter",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsCharacter@@UAEHM@Z",
+  "candidate_symbol_contains": "?Tick@SoultreePhysicsCharacter@@UAEHM@Z",
   "target_va": "0x00504210",
   "target_size": 77,
   "expect": "exact",
-  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then field_0x430 = 0, field_0x431 = 1; then SoultreePhysicsBaseObject::GameObjectVirtualSlot10 (0x005036f0) and GameObject::GameObjectVirtualSlot10 (0x004693d0, result returned). 77 bytes + 3 padding.",
+  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then field_0x430 = 0, field_0x431 = 1; then SoultreePhysicsBaseObject::Tick (0x005036f0) and GameObject::Tick (0x004693d0, result returned). 77 bytes + 3 padding.",
   "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsCharacter@@$4PPPPPPPM@A@AEHM@Z",
+  "candidate_symbol_contains": "?Tick@SoultreePhysicsCharacter@@$4PPPPPPPM@A@AEHM@Z",
   "target_va": "0x00504350",
   "target_size": 8,
   "expect": "exact",

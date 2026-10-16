@@ -42,7 +42,7 @@ SparkParticleEmitter::~SparkParticleEmitter() {}
 
 int SparkParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 {
-    GameObject::GameObjectVirtualSlot8((int)a);
+    GameObject::SetRenderContext((int)a);
     if (m) {
         manager = m;
         return (int)this;
@@ -58,7 +58,7 @@ void SparkParticleEmitter::SetPosition(ParticleVec3 p)
 }
 
 // 0x004b99a0.  Like DirtChunk, but fires once while burstPending is set and then switches itself off.
-int SparkParticleEmitter::GameObjectVirtualSlot10(float dt)
+int SparkParticleEmitter::Tick(float dt)
 {
     if (g_gameContext->frozen == 0) {
         if (firstUpdate) {

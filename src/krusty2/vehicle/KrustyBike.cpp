@@ -1420,7 +1420,7 @@ static int s_kbTimeTo60Armed = 1;   // 0x0056d0a0
 static float s_kbTimeTo60;          // 0x0067c3b0
 static float s_kbLastTimeTo60;      // 0x0067c3b4
 
-int KrustyBike::GameObjectVirtualSlot10(float dt)
+int KrustyBike::Tick(float dt)
 {
     if (g_kbGame->playerCount == 1 && !race->isRacing)
         return 1;
@@ -1428,25 +1428,25 @@ int KrustyBike::GameObjectVirtualSlot10(float dt)
         if (race->isRacing) {
             Fn_00493660(dt, 1);
             if (race->replayMode == 4 && race->appliedReplayMode == 4)
-                GameObject::GameObjectVirtualSlot10(dt);
+                GameObject::Tick(dt);
         }
     } else if (isRemote) {
         Fn_00493660(dt, 0);
         if (race->recorderTickDue)
             Fn_00492AD0(dt, 1);
-        GameObject::GameObjectVirtualSlot10(dt);
+        GameObject::Tick(dt);
     } else if (g_kbGame->raceMode == 4) {
         if (isGhost) {
             Fn_00493660(dt, 1);
             if (Fn_00495C00())
-                GameObject::GameObjectVirtualSlot10(dt);
+                GameObject::Tick(dt);
         } else {
-            Vehicle::GameObjectVirtualSlot10(dt);
+            Vehicle::Tick(dt);
             if (race->recorderTickDue)
                 Fn_00492AD0(dt, 1);
         }
     } else {
-        Vehicle::GameObjectVirtualSlot10(dt);
+        Vehicle::Tick(dt);
         if (race->recorderTickDue)
             Fn_00492AD0(dt, 1);
         if (g_kbGame->playerCount > 1)

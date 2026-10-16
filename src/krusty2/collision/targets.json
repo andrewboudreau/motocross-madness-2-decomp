@@ -242,7 +242,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "GameObjectVirtualSlot23@CollisionObject",
+    "candidate_symbol_contains": "OnControlPress@CollisionObject",
     "target_va": "0x00434970",
     "target_size": 153,
     "expect": "exact",

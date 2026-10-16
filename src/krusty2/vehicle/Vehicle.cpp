@@ -1266,7 +1266,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
 void Vehicle::UnknownVirtualSlot44()
 {
     outOfRace = 1;
-    GameObjectVirtualSlot4();
+    Disable();
     ((VehSceneNodeView*)modelNode)->Method_004444E0();
 }
 
@@ -2163,14 +2163,14 @@ Vehicle::~Vehicle()
 // controllable (slot 42) the character flags 0x430/0x431 are reset, then the per-frame step
 // (slot 49) runs and GameObject's own slot 10 is called directly, bypassing
 // SoultreePhysicsCharacter's version (0x00504210).
-int Vehicle::GameObjectVirtualSlot10(float dt)
+int Vehicle::Tick(float dt)
 {
     if (UnknownVirtualSlot42()) {
         field_0x430 = 0;
         field_0x431 = 1;
     }
     UnknownVirtualSlot49(dt);
-    return GameObject::GameObjectVirtualSlot10(dt);
+    return GameObject::Tick(dt);
 }
 
 // 0x00528eb0: wheel placement pass.  Each wheel's shock is retracted by a quarter of the last

@@ -42,7 +42,7 @@ int CollisionCharacter::GameObjectVirtualSlot14()
 //    scaled by 1.005 is subtracted from the translation row (+0xf8..+0x100) of the shape's
 //    matrix history (the hull's field_0xc8 matrix), for every hull of a model shape (type 1)
 //    or for the single payload otherwise.
-int CollisionCharacter::GameObjectVirtualSlot10(float dt)
+int CollisionCharacter::Tick(float dt)
 {
     if (collisionObject)
         collisionObject->UpdatePlacement();
@@ -71,7 +71,7 @@ int CollisionCharacter::GameObjectVirtualSlot10(float dt)
             hull->bodyTransform._43 -= rec->z * 1.005f;
         }
     }
-    return GameObject::GameObjectVirtualSlot10(dt);
+    return GameObject::Tick(dt);
 }
 
 // 0x004319c0 (ret 0x1c).  Loads the character through the D3DIM base (slot 11 with a1, name,
@@ -98,5 +98,5 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
     collisionObject->Fn_00435fe0();
     collisionObject->SetOwner(this, 0x2711);
     g_MemTagStack->Pop(prevTag);
-    return GameObject::GameObjectVirtualSlot8(a1);
+    return GameObject::SetRenderContext(a1);
 }

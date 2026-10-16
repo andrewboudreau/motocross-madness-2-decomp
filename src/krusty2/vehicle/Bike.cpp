@@ -629,7 +629,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                                                                 steered[i] ? steerState : 0, 45.0f, 1.0f,
                                                                 roll[i], 255.0f, grip[i], a12, a13, 0.5f, trackObject);
         BikeTireObject* tire = (BikeTireObject*)wheel;
-        tire->GameObjectVirtualSlot8((int)GameObject::field_0x18);
+        tire->SetRenderContext((int)GameObject::field_0x18);
         GameObject::AppendChild((GameObject*)tire, -1);
         if (rotating[i]) {
             AddWheel(wheel, 0, 0, (int)rotShock, driven[i] ? (VehicleWheelAux*)engineState : 0);

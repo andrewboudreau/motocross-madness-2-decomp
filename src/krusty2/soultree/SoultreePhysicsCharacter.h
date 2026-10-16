@@ -35,7 +35,7 @@ public:
     // Vehicle's ctor 0x005257a0 calls it as (arg, 0), i.e. SoultreePhysicsCharacter(arg).
     explicit SoultreePhysicsCharacter(int flags);
     virtual ~SoultreePhysicsCharacter();        // core 0x00503d40, deleting 0x005042f0
-    virtual int GameObjectVirtualSlot10(float dt);  // 0x00504210 via vtordisp thunk 0x00504350 (ret 4)
+    virtual int Tick(float dt);                     // 0x00504210 via vtordisp thunk 0x00504350 (ret 4)
     // --- vtable 0x005580a8 (offset 0) ---
     virtual void UnknownVirtualSlot1(float value);                // 0x005040c0
     virtual void UnknownVirtualSlot8();                           // 0x005041c0

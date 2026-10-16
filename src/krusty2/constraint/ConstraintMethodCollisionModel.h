@@ -26,8 +26,8 @@ public:
 
     // Secondary vtable (this == subobject at +12) overrides.
     virtual ~ConstraintMethodCollisionModel();               // 0x0043b950 -> core 0x0043b980
-    virtual GameObject* GameObjectVirtualSlot8(int a);       // 0x0043b9a0
-    virtual int GameObjectVirtualSlot10(float dt);           // 0x0043ba40
+    virtual GameObject* SetRenderContext(int a);             // 0x0043b9a0
+    virtual int Tick(float dt);                              // 0x0043ba40
     virtual int GameObjectVirtualSlot11(float dt);           // 0x0043ba70
     virtual int GameObjectVirtualSlot14();                   // 0x0043c880 (tail jump)
 

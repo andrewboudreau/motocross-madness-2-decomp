@@ -152,7 +152,7 @@
  {
   "class": "Vehicle",
   "source": "../hierarchy/LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@$4PPPPPPPM@A@AEHM@Z",
+  "candidate_symbol_contains": "?Tick@Vehicle@@$4PPPPPPPM@A@AEHM@Z",
   "target_va": "0x0052b690",
   "target_size": 8,
   "expect": "exact",
