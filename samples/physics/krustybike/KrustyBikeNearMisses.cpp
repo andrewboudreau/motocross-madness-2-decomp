@@ -797,13 +797,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
             field_0x6fc = lean;
             poseState = states[0]->poseState;
             if (g_kbGame->bajaEnduroEvent) {
-                if (lapGate == states[0]->field_0x53 - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && states[0]->field_0x53 == 0))
+                if (lapGate == states[0]->lapGate - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && states[0]->lapGate == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a) {
                     int prev = lapGate;
-                    lapGate = states[0]->field_0x53;
+                    lapGate = states[0]->lapGate;
                     if (prev != lapGate) {
                         if (lapGate == 0)
                             lapCount++;
@@ -814,20 +814,20 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 }
             } else {
                 if (!states[0]->field_0x5c)
-                    states[0]->field_0x04 = (short)((lapCount & 0xff00) | states[0]->field_0x53);
-                if ((unsigned short)lapCount == (unsigned short)states[0]->field_0x04 - 1)
+                    states[0]->lapCount = (short)((lapCount & 0xff00) | states[0]->lapGate);
+                if ((unsigned short)lapCount == (unsigned short)states[0]->lapCount - 1)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a)
-                    lapCount = states[0]->field_0x04;
+                    lapCount = states[0]->lapCount;
             }
             if (states[0]->field_0x5c) {
-                lastLapTime = states[0]->field_0x20;
-                fastestLap = states[0]->field_0x28;
+                lastLapTime = states[0]->lastLapTime;
+                fastestLap = states[0]->fastestLap;
                 if (a) {
-                    timeBehindLeader = states[0]->field_0x2c;
-                    finishPosition = states[0]->field_0x01;
+                    timeBehindLeader = states[0]->timeBehindLeader;
+                    finishPosition = states[0]->finishPosition;
                 }
             }
             if (!isGhost) {
@@ -892,13 +892,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
             field_0x6fc = lean;
             poseState = interpSource->poseState;
             if (g_kbGame->bajaEnduroEvent) {
-                if (lapGate == interpSource->field_0x53 - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && interpSource->field_0x53 == 0))
+                if (lapGate == interpSource->lapGate - 1 || (lapGate == ((KbTrack*)g_kbGame->bajaEnduroEvent)->field_0xac - 1 && interpSource->lapGate == 0))
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a) {
                     int prev = lapGate;
-                    lapGate = interpSource->field_0x53;
+                    lapGate = interpSource->lapGate;
                     if (prev != lapGate) {
                         if (lapGate == 0)
                             lapCount++;
@@ -909,20 +909,20 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 }
             } else {
                 if (!interpSource->field_0x5c)
-                    interpSource->field_0x04 = (short)((lapCount & 0xff00) | interpSource->field_0x53);
-                if ((unsigned short)lapCount == (unsigned short)interpSource->field_0x04 - 1)
+                    interpSource->lapCount = (short)((lapCount & 0xff00) | interpSource->lapGate);
+                if ((unsigned short)lapCount == (unsigned short)interpSource->lapCount - 1)
                     forceGatePass = 1;
                 else
                     forceGatePass = 0;
                 if (a)
-                    lapCount = interpSource->field_0x04;
+                    lapCount = interpSource->lapCount;
             }
             if (interpSource->field_0x5c) {
-                lastLapTime = interpSource->field_0x20;
-                fastestLap = interpSource->field_0x28;
+                lastLapTime = interpSource->lastLapTime;
+                fastestLap = interpSource->fastestLap;
                 if (a) {
-                    timeBehindLeader = interpSource->field_0x2c;
-                    finishPosition = interpSource->field_0x01;
+                    timeBehindLeader = interpSource->timeBehindLeader;
+                    finishPosition = interpSource->finishPosition;
                 }
             }
             if (!isGhost) {

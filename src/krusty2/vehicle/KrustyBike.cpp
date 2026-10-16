@@ -1525,13 +1525,13 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     message.velocity = velocity;
     message.angularVelocity = angularVelocity;
     message.angularVelocity.y += turnRate;
-    message.field_0x04 = lapCount;
-    message.field_0x06 = gatesPassed;
-    message.field_0x54 = loaderKind;
-    message.field_0x20 = lastLapTime;
-    message.field_0x28 = fastestLap;
-    message.field_0x2c = timeBehindLeader;
-    message.field_0x01 = finishPosition;
+    message.lapCount = lapCount;
+    message.gatesPassed = gatesPassed;
+    message.loaderKind = loaderKind;
+    message.lastLapTime = lastLapTime;
+    message.fastestLap = fastestLap;
+    message.timeBehindLeader = timeBehindLeader;
+    message.finishPosition = finishPosition;
     message.poseIndex = poseIndex;
     message.poseState = poseState;
     message.poseParam = poseParam * 255.0f;
@@ -1554,9 +1554,9 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     message.flag5 = hasFinished != 0;
     message.flag6 = onTrack;
     if (g_kbGame->eventType == 2 || g_kbGame->eventType == 3)
-        message.field_0x53 = (unsigned char)lapCount;
+        message.lapGate = (unsigned char)lapCount;
     else
-        message.field_0x53 = lapGate;
+        message.lapGate = lapGate;
     message.time = UnknownFunction4bfa80();
     message.field_0x02 = (short)message.time - (short)state->time;
     if (!record) {

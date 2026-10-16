@@ -493,7 +493,7 @@ struct UnknownBikeRaceNetState {
     int yaw;  // +0x1C  KbBikeMessage+0x1c yaw; copied raw to racer +0x1384
     unsigned char field_0x20[0x28 - 0x20];
     float fastestLap;  // +0x28  RecordFrame copies it to racer fastestLap (+0x750, as KbBikeMessage+0x28)
-    int field_0x2c;
+    int timeBehindLeader;  // +0x2C  KbBikeMessage+0x2c timeBehindLeader; replayed into racer timeBehindLeader (+0x770)
     Vector3 angularVelocity;  // +0x30  KbBikeMessage+0x30 angularVelocity; copied to racer +0x1370
     Vector3 velocity;  // +0x3C  KbBikeMessage+0x3c velocity; copied to racer +0x1358
     unsigned char field_0x48[0x4c - 0x48];

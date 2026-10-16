@@ -127,16 +127,16 @@ struct KbNetState {
 // pose and flags (tier 2 layout from the stores, tier 3 names).
 struct KbBikeMessage {
     char field_0x00;
-    unsigned char field_0x01;            // KrustyBike+0x784
+    unsigned char finishPosition;  // +0x1  KrustyBike+0x784 finishPosition (0x0049276c)
     short field_0x02;                    // ms since the state's last send
-    short field_0x04;                    // +0x7a0
-    short field_0x06;                    // +0x790
+    short lapCount;  // +0x4  KrustyBike+0x7a0 lapCount (0x004926f5)
+    short gatesPassed;  // +0x6  KrustyBike+0x790 gatesPassed (0x00492700)
     Vec3 position;                       // +0x08
     float roll, pitch, yaw;              // +0x14
-    int field_0x20;                      // +0x74c
+    int lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
     int field_0x24;
-    int field_0x28;                      // +0x750
-    int field_0x2c;                      // +0x770
+    int fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
+    int timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
     Vec3 angularVelocity;                // +0x30 (y plus the turn rate)
     Vec3 velocity;                       // +0x3c
     unsigned char poseIndex : 4;         // +0x48
@@ -155,8 +155,8 @@ struct KbBikeMessage {
     unsigned char flag7 : 1;             // +0x478
     unsigned char flag8 : 1;             // +0x52 +0x479
     unsigned char flag9 : 1;             //       +0x153c
-    unsigned char field_0x53;            // +0x7b8 (+0x7a0 in modes 2 and 3)
-    unsigned char field_0x54;            // +0x11c0
+    unsigned char lapGate;  // +0x53  KrustyBike+0x7b8 lapGate (0x00492892; +0x7a0 in modes 2 and 3)
+    unsigned char loaderKind;  // +0x54  KrustyBike+0x11c0 loaderKind (0x00492723)
 };
 // Received copy of message 1 (0x60 bytes, four at KrustyBike+0x11d8) that 0x00493660 reads.
 struct KbBikeNetState : KbBikeMessage {

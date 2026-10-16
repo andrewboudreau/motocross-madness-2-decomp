@@ -1644,7 +1644,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             racer->deltaBaseTime = replayMode == 11 ? time : state->time;
             if (ghostVcr == 0) {
                 racer->fastestLap = state->fastestLap;
-                racer->timeBehindLeader = state->field_0x2c;
+                racer->timeBehindLeader = state->timeBehindLeader;
             }
             *keep = 1;
             if (replayMode == 11) {
@@ -1688,7 +1688,7 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
                 aiRacers[i]->deltaBaseTime = replayMode == 11 ? time : state->time;
                 if (ghostVcr == 0) {
                     aiRacers[i]->fastestLap = state->fastestLap;
-                    aiRacers[i]->timeBehindLeader = state->field_0x2c;
+                    aiRacers[i]->timeBehindLeader = state->timeBehindLeader;
                 }
                 *keep = 1;
                 if (replayMode == 11) {
