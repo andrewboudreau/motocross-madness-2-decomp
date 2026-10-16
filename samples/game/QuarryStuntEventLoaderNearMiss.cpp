@@ -159,19 +159,19 @@ public:
     void SetSubject(UnknownTerrain* terrain);       // 0x00463600
 
     unsigned char field_0x02c[0x274 - 0x2c];
-    unsigned char field_0x274;
+    unsigned char isSettled;  // +0x274 FollowCamera isSettled
     unsigned char field_0x275[0x384 - 0x275];
-    int field_0x384;
-    int field_0x388;
-    int field_0x38c;
-    unsigned char field_0x390;
-    unsigned char field_0x391;
-    unsigned char field_0x392;
+    int targetCharacter;  // +0x384 VehicleCamera targetCharacter
+    int targetCar;  // +0x388 VehicleCamera targetCar
+    int targetCaster;  // +0x38C VehicleCamera targetCaster
+    unsigned char vehicleMode;  // +0x390 VehicleCamera vehicleMode
+    unsigned char targetPointCached;  // +0x391 VehicleCamera targetPointCached
+    unsigned char targetHeadingCached;  // +0x392 VehicleCamera targetHeadingCached
     unsigned char field_0x393;
-    UnknownQuarryRacer* field_0x394;
+    UnknownQuarryRacer* vehicle;  // +0x394 VehicleCamera vehicle
     unsigned char field_0x398[0x3b0 - 0x398];
-    UnknownQuarryRacer* field_0x3b0;
-    UnknownQuarryRacer* field_0x3b4;
+    UnknownQuarryRacer* bike;  // +0x3B0 BikeCamera bike
+    UnknownQuarryRacer* krustyBike;  // +0x3B4 KrustyBikeCamera krustyBike
     unsigned char field_0x3b8[0x3bc - 0x3b8];
 };
 
@@ -807,29 +807,29 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
     UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
-    if (camera->field_0x3b0 && !bike->race->field_0x18c) {
-        camera->field_0x3b0->modelNode->SetLowestLod(1);
-        camera->field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
-        if (!camera->field_0x3b0->modelNode->currentLod)
-            camera->field_0x3b0->modelNode->SetLod(1);
-        if (!camera->field_0x3b0->riderCharacter->modelNode->currentLod)
-            camera->field_0x3b0->riderCharacter->modelNode->SetLod(1);
+    if (camera->bike && !bike->race->field_0x18c) {
+        camera->bike->modelNode->SetLowestLod(1);
+        camera->bike->riderCharacter->modelNode->SetLowestLod(1);
+        if (!camera->bike->modelNode->currentLod)
+            camera->bike->modelNode->SetLod(1);
+        if (!camera->bike->riderCharacter->modelNode->currentLod)
+            camera->bike->riderCharacter->modelNode->SetLod(1);
     }
-    camera->field_0x394 = bike;
-    camera->field_0x391 = 0;
-    camera->field_0x392 = 0;
-    camera->field_0x390 = 1;
-    camera->field_0x38c = 0;
-    camera->field_0x384 = 0;
-    camera->field_0x388 = 0;
-    camera->field_0x3b0 = bike;
-    camera->field_0x274 = 0;
-    camera->field_0x3b4 = bike;
+    camera->vehicle = bike;
+    camera->targetPointCached = 0;
+    camera->targetHeadingCached = 0;
+    camera->vehicleMode = 1;
+    camera->targetCaster = 0;
+    camera->targetCharacter = 0;
+    camera->targetCar = 0;
+    camera->bike = bike;
+    camera->isSettled = 0;
+    camera->krustyBike = bike;
     if (!bike->race->field_0x18c) {
         bike->modelNode->SetLowestLod(0);
-        camera->field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
+        camera->bike->riderCharacter->modelNode->SetLowestLod(0);
     }
-    camera->field_0x274 = 0;
+    camera->isSettled = 0;
     if (statsOverlay)
         ((UnknownQuarryOverlayHooks*)statsOverlay)->UnknownFunction519880((UnknownQuarryRace*)raceView);
     if (chatOverlay)
