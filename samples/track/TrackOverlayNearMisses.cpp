@@ -295,7 +295,7 @@ fail:
         return 0;
     }
     TintRows(0, 0x80, 0xffff);
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -505,10 +505,10 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
         Release();
         return 0;
     }
-    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
         overlayTexture->SetAddressModes(5, 6);
-    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
+    overlayTexture->CreateTextureSurface(1, 0, 0);
     source.left = 0;
     source.right = largeLayout ? 256 : 128;
     source.top = 0;

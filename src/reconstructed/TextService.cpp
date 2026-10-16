@@ -89,8 +89,8 @@ void UnknownOverlayText::DrawVertices(RenderTarget* target, void* vertices, int 
         return;
 
     TextureMap* texture = currentFont->GetTexture();
-    texture->UnknownVirtualSlot8(1, 0, 0);
-    texture->UnknownVirtualSlot19();
+    texture->CreateTextureSurface(1, 0, 0);
+    texture->Bind();
     int saved;
     target->GetTextureStageState(0, 0xc, &saved);
     target->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);

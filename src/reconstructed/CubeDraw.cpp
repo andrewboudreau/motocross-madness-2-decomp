@@ -182,7 +182,7 @@ int DrawableCube::UnknownVirtualSlot14()
                 continue;
             int cell = face * 16 + i;
             int first = cell * 6;
-            if (!cubeObject->faces[face].textures[i]->UnknownVirtualSlot7())
+            if (!cubeObject->faces[face].textures[i]->IsResident())
                 continue;
             if (textureGroup && (cubeObject->faces[face].textures[i]->mapFlags & 1)) {
                 ((ManagedTexture*)cubeObject->faces[face].textures[i])
@@ -190,7 +190,7 @@ int DrawableCube::UnknownVirtualSlot14()
                                             &CELL_MAPPING(cell).offsetV, &CELL_VERTEX(first).tu,
                                             &CELL_VERTEX(first).tv, 6, 0x20);
             }
-            cubeObject->faces[face].textures[i]->UnknownVirtualSlot19();
+            cubeObject->faces[face].textures[i]->Bind();
             if (!Target()->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)&CELL_VERTEX(first), 6, 0))
                 return 0;
         }

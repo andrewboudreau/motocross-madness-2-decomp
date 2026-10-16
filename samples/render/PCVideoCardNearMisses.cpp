@@ -127,12 +127,12 @@ failed:
 float MeanTextureChannelDifference(TextureMap* first, TextureMap* second) {
     long firstPitch;
     long secondPitch;
-    unsigned short* a = (unsigned short*)first->UnknownVirtualSlot13(0, &firstPitch, 0x811);
+    unsigned short* a = (unsigned short*)first->LockSurface(0, &firstPitch, 0x811);
     if (!a)
         return -1.0f;
-    unsigned short* b = (unsigned short*)second->UnknownVirtualSlot13(0, &secondPitch, 0x811);
+    unsigned short* b = (unsigned short*)second->LockSurface(0, &secondPitch, 0x811);
     if (!b) {
-        second->UnknownVirtualSlot14(0);
+        second->UnlockSurface(0);
         return -1.0f;
     }
     int width = first->textureWidth;
@@ -165,8 +165,8 @@ float MeanTextureChannelDifference(TextureMap* first, TextureMap* second) {
         a += firstSkip;
         b += secondSkip;
     }
-    first->UnknownVirtualSlot14(0);
-    second->UnknownVirtualSlot14(0);
+    first->UnlockSurface(0);
+    second->UnlockSurface(0);
     return total / (count * 3);
 }
 
@@ -214,21 +214,21 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
     if (render) {
         if (file) {
             image = new (__FILE__, 2078) PCTextureMap(0, 0);
-            if (!image->UnknownVirtualSlot4(file->bits, file->width, file->height, file->width, file->width,
-                                            file->bitsPerPixel == 16 ? 0x22b : 0x378, render->surfacePixelFormat, 0, 0,
-                                            render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
+            if (!image->CreateSurface(file->bits, file->width, file->height, file->width, file->width,
+                                      file->bitsPerPixel == 16 ? 0x22b : 0x378, render->surfacePixelFormat, 0, 0,
+                                      render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff)) {
                 FreeFile(file);
                 result = -2;
             } else {
                 expected = new (__FILE__, 2097) PCTextureMap(0, 0);
-                expected->UnknownVirtualSlot4(0, file->width, file->height, file->width, file->width,
-                                              render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
-                                              render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                expected->CreateSurface(0, file->width, file->height, file->width, file->width,
+                                        render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
+                                        render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
                 rendered = new (__FILE__, 2110) PCTextureMap(0, 0);
-                rendered->UnknownVirtualSlot4(0, file->width, file->height, file->width, file->width,
-                                              render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
-                                              render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-                if (!rendered->UnknownVirtualSlot8(1, 0, 1)) {
+                rendered->CreateSurface(0, file->width, file->height, file->width, file->width,
+                                        render->surfacePixelFormat, render->surfacePixelFormat, 0, 0,
+                                        render->targetDisplay->field_0x198, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                if (!rendered->CreateTextureSurface(1, 0, 1)) {
                     FreeFile(file);
                     result = -4;
                 } else {

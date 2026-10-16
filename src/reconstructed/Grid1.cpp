@@ -128,7 +128,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot4(int block)
 void DrawableGridNodeSharedTextures::UnknownVirtualSlot6()
 {
     if (Extra()->texture) {
-        Extra()->texture->UnknownVirtualSlot19();
+        Extra()->texture->Bind();
         if (Extra()->ageEntry.size)
             Terrain()->textureAgeManager->MarkUsed(&Extra()->ageEntry);
     } else {
@@ -154,7 +154,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
         x->texture = Terrain()->textures[index];
     }
     if (Extra()->texture) {
-        Extra()->texture->UnknownVirtualSlot19();
+        Extra()->texture->Bind();
     } else {
         Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);

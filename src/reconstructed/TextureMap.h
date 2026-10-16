@@ -128,37 +128,38 @@ struct UnknownRenderStatePair {
 };
 
 // RTTI: TextureMap : BaseObject (vtable 0x00558354; its code sits among
-// Texmap.cpp's literals). Slots 4-20 are pure (`_purecall`). Names are
-// provisional.
+// Texmap.cpp's literals). Slots 4-20 are pure (`_purecall`); they are named after
+// PCTextureMap's overrides (DirectDraw/Direct3D calls in PCTexMap.cpp), and
+// slots 4/5/8/19 agree with the krusty2 TerrainSurfaceBase and shadow views.
 class TextureMap : public BaseObject {
 public:
     // 0x0050a4e0: registers with `manager` (0x005112f0) when `registered`.
     TextureMap(TextureMapManager* manager, int registered);
     virtual ~TextureMap();                            // 0x0050ab40 (deleting wrapper 0x0050a570)
-    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int minimumSize,
-                                    int sourceFormat, int format, UnknownTexturePalette* palette,
-                                    int flags, void* surfacePalette, int checkMemory, int unused,
-                                    int addressU, int addressV, UnknownTextureFormatChoice* choice,
-                                    int alphaThreshold, unsigned int key) = 0;
-    virtual int UnknownVirtualSlot5(UnknownTextureStream* stream, int width, int height, int minimumSize,
-                                    int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
-                                    int flags, void* surfacePalette, int addressU, int addressV,
-                                    UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) = 0;
-    virtual TextureMap* UnknownVirtualSlot6() = 0;
-    virtual int UnknownVirtualSlot7() = 0;
-    virtual int UnknownVirtualSlot8(int a, int b, int c) = 0;
-    virtual int UnknownVirtualSlot9(struct UnknownRect* rect, int mode) = 0;
-    virtual void UnknownVirtualSlot10() = 0;
-    virtual int UnknownVirtualSlot11() = 0;
-    virtual void UnknownVirtualSlot12() = 0;
-    virtual void* UnknownVirtualSlot13(void* rect, long* pitch, int flags) = 0;
-    virtual int UnknownVirtualSlot14(void* rect) = 0;
-    virtual int UnknownVirtualSlot15(int filter) = 0;
-    virtual void* UnknownVirtualSlot16(int level) = 0;
-    virtual int UnknownVirtualSlot17(int level) = 0;
-    virtual int UnknownVirtualSlot18(unsigned int color) = 0;
-    virtual void UnknownVirtualSlot19() = 0;
-    virtual int UnknownVirtualSlot20() = 0;
+    virtual int CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
+                              int sourceFormat, int format, UnknownTexturePalette* palette,
+                              int flags, void* surfacePalette, int checkMemory, int unused,
+                              int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                              int alphaThreshold, unsigned int key) = 0;
+    virtual int LoadSurface(UnknownTextureStream* stream, int width, int height, int minimumSize,
+                            int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                            int flags, void* surfacePalette, int addressU, int addressV,
+                            UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) = 0;
+    virtual TextureMap* Clone() = 0;
+    virtual int IsResident() = 0;
+    virtual int CreateTextureSurface(int a, int b, int c) = 0;
+    virtual int Upload(struct UnknownRect* rect, int mode) = 0;
+    virtual void ReleaseTextureSurface() = 0;
+    virtual int SetAsTexture() = 0;
+    virtual void RecreateIfLost() = 0;
+    virtual void* LockSurface(void* rect, long* pitch, int flags) = 0;
+    virtual int UnlockSurface(void* rect) = 0;
+    virtual int BuildMipLevels(int filter) = 0;
+    virtual void* LockLevel(int level) = 0;
+    virtual int UnlockLevel(int level) = 0;
+    virtual int ApplyColorKey(unsigned int color) = 0;
+    virtual void Bind() = 0;
+    virtual int DumpAllLevels() = 0;
 
     // 0x0050abd0: sets the address-mode render states (0x13, 0x14) of an
     // alpha texture; 0 for other formats.

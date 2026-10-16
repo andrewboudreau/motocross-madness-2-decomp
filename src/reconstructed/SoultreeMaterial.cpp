@@ -207,9 +207,9 @@ void SoultreeMaterial::LoadTexture()
     if (procedural) {
         if (textureOptions.opaqueTextures && textureOptions.alphaTextures) {
             texture = new(__FILE__, 0x165) ManagedTexture(textureOptions.textureManager);
-            texture->UnknownVirtualSlot4(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
-                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
-                                         0x80, 0xff00ff);
+            texture->CreateSurface(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
+                                   hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
+                                   0x80, 0xff00ff);
             if (alpha) {
                 if (textureOptions.alphaTextures)
                     textureOptions.alphaTextures->AddTexture((ManagedTexture*)texture);
@@ -218,9 +218,9 @@ void SoultreeMaterial::LoadTexture()
             }
         } else {
             texture = new(__FILE__, 0x17a) PCTextureMap(textureOptions.textureManager, 1);
-            texture->UnknownVirtualSlot4(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
-                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
-                                         0x80, 0xff00ff);
+            texture->CreateSurface(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
+                                   hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
+                                   0x80, 0xff00ff);
         }
     } else {
         texture = TerrainLoadTexture(textureManager, textureName, format, 0, mipMapped ? 2 : 0,
@@ -234,10 +234,10 @@ void SoultreeMaterial::LoadTexture()
     surfaceMap->SetTexture(texture);
     if (texture) {
         texture->Release();
-        if (!surfaceMap->texture->UnknownVirtualSlot7() && surfaceMap->texture->GetRefCount() == 1) {
+        if (!surfaceMap->texture->IsResident() && surfaceMap->texture->GetRefCount() == 1) {
             if (hasColorKey)
-                surfaceMap->texture->UnknownVirtualSlot18(colorKey);
-            surfaceMap->texture->UnknownVirtualSlot8(1, 0, 0);
+                surfaceMap->texture->ApplyColorKey(colorKey);
+            surfaceMap->texture->CreateTextureSurface(1, 0, 0);
         }
     }
 }

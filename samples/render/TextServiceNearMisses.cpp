@@ -79,8 +79,8 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
     long fontPitch = 0;
     unsigned int fontWidth = fontTexture->textureWidth;
     unsigned int fontHeight = fontTexture->textureHeight;
-    unsigned int* bits = (unsigned int*)texture->UnknownVirtualSlot13(0, &pitch, 0);
-    unsigned int* fontBits = (unsigned int*)fontTexture->UnknownVirtualSlot13(0, &fontPitch, 0);
+    unsigned int* bits = (unsigned int*)texture->LockSurface(0, &pitch, 0);
+    unsigned int* fontBits = (unsigned int*)fontTexture->LockSurface(0, &fontPitch, 0);
     Rectangle2D cell(0, 0, 0, 0);
     unsigned int length = strlen(text);
     unsigned int stride = (unsigned long)pitch >> 2;
@@ -116,9 +116,9 @@ int UnknownOverlayText::DrawTextInto(TextureMap* texture, int x, int y, const ch
             px += w;
         }
     }
-    texture->UnknownVirtualSlot14(0);
-    fontTexture->UnknownVirtualSlot14(0);
-    texture->UnknownVirtualSlot9(0, 1);
+    texture->UnlockSurface(0);
+    fontTexture->UnlockSurface(0);
+    texture->Upload(0, 1);
     return end;
 }
 
@@ -130,8 +130,8 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
     long fontPitch = 0;
     unsigned int fontWidth = fontTexture->textureWidth;
     unsigned int fontHeight = fontTexture->textureHeight;
-    unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, &pitch, 0);
-    unsigned short* fontBits = (unsigned short*)fontTexture->UnknownVirtualSlot13(0, &fontPitch, 0);
+    unsigned short* bits = (unsigned short*)texture->LockSurface(0, &pitch, 0);
+    unsigned short* fontBits = (unsigned short*)fontTexture->LockSurface(0, &fontPitch, 0);
     Rectangle2D cell(0, 0, 0, 0);
     unsigned int length = strlen(text);
     unsigned int stride = (unsigned long)pitch >> 1;
@@ -167,9 +167,9 @@ int UnknownOverlayText::DrawText4444(TextureMap* texture, int x, int y, const ch
             px += w;
         }
     }
-    texture->UnknownVirtualSlot14(0);
-    fontTexture->UnknownVirtualSlot14(0);
-    texture->UnknownVirtualSlot9(0, 1);
+    texture->UnlockSurface(0);
+    fontTexture->UnlockSurface(0);
+    texture->Upload(0, 1);
     return end;
 }
 
@@ -181,8 +181,8 @@ int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const ch
     long fontPitch = 0;
     unsigned int fontWidth = fontTexture->textureWidth;
     unsigned int fontHeight = fontTexture->textureHeight;
-    unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, &pitch, 0);
-    unsigned short* fontBits = (unsigned short*)fontTexture->UnknownVirtualSlot13(0, &fontPitch, 0);
+    unsigned short* bits = (unsigned short*)texture->LockSurface(0, &pitch, 0);
+    unsigned short* fontBits = (unsigned short*)fontTexture->LockSurface(0, &fontPitch, 0);
     Rectangle2D cell(0, 0, 0, 0);
     unsigned int length = strlen(text);
     unsigned int stride = (unsigned long)pitch >> 1;
@@ -218,9 +218,9 @@ int UnknownOverlayText::DrawText1555(TextureMap* texture, int x, int y, const ch
             px += w;
         }
     }
-    texture->UnknownVirtualSlot14(0);
-    fontTexture->UnknownVirtualSlot14(0);
-    texture->UnknownVirtualSlot9(0, 1);
+    texture->UnlockSurface(0);
+    fontTexture->UnlockSurface(0);
+    texture->Upload(0, 1);
     return end;
 }
 

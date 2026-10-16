@@ -992,12 +992,12 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
-            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+            frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
-                frameTexture->UnknownVirtualSlot18(0xff00ff);
+                frameTexture->ApplyColorKey(0xff00ff);
         } else {
             char message[100];
             frameTexture = 0;
@@ -5276,12 +5276,12 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)frameTextures, 1);
             Palette8* pal = (Palette8*)palette;
-            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+            frameTexture->CreateSurface(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format,
                                             (UnknownTexturePalette*)(pal ? pal->colorMapper : 0), 4,
                                             pal ? pal->ddPalette : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (TextureHasColor(frameTexture, 0xff00ff))
-                frameTexture->UnknownVirtualSlot18(0xff00ff);
+                frameTexture->ApplyColorKey(0xff00ff);
             FreeFile(image);
             return 1;
         }

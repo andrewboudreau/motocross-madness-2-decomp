@@ -10,7 +10,7 @@
 // VC6 here swaps left/bottom and the row pointers. Declaration order of the
 // rect locals, row pointers, operand order and indexed loops do not help.
 //
-// PCTextureMap::UnknownVirtualSlot6 (0x004c71c0, 600 bytes): the copy.
+// PCTextureMap::Clone (0x004c71c0, 600 bytes): the copy.
 // Everything lines up except that VC6 here keeps the constant 1 in ebp and
 // the copy in ebx (retail: ebx and ebp), which also moves the 8-bit key
 // expansion's scratch registers. The shape that gets this close: the
@@ -23,7 +23,7 @@
 // store but not the constant register; `if (field_0x68 & 1)` keeps the
 // register but tests the byte in place.
 //
-// PCTextureMap::UnknownVirtualSlot4 (0x004c69c0, 2031 bytes): the setup.
+// PCTextureMap::CreateSurface (0x004c69c0, 2031 bytes): the setup.
 // Everything but the non-mip format fallback chain lines up, including
 // the mip chain (same source shape). VC6 cross-jumps the identical
 // CreateSystemSurface call tails of that chain into the first case
@@ -106,7 +106,7 @@ failed:
 // 0x004c71c0: a copy of the texture (a ManagedTexture registered with this
 // one's cache, or a PCTextureMap of the game's manager), filled from +0x70
 // through its slot 4 and given the same colour key; 0 on failure.
-TextureMap* PCTextureMap::UnknownVirtualSlot6() {
+TextureMap* PCTextureMap::Clone() {
     TextureMap* copy;
     TextureMapManager* manager;
     int cached = (mapFlags & 1) != 0;
@@ -130,15 +130,15 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
                 systemMemory = 8;
             if (!(desc.caps[0] & 0x1000))
                 noAlpha = 4;
-            int created = copy->UnknownVirtualSlot4(desc.surface, textureWidth, textureHeight,
-                                                    desc.pitch / PixelFormatBytesPerPixel(mapFormat), field_0x1c,
-                                                    mapFormat, mapFormat, field_0x2c, noAlpha | systemMemory,
-                                                    texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            int created = copy->CreateSurface(desc.surface, textureWidth, textureHeight,
+                                              desc.pitch / PixelFormatBytesPerPixel(mapFormat), field_0x1c,
+                                              mapFormat, mapFormat, field_0x2c, noAlpha | systemMemory,
+                                              texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (!systemSurface->Unlock(0) && created) {
                 if (usesColorKey) {
                     if (mapFormat == 8) {
-                        copy->UnknownVirtualSlot18((field_0x2c->field_0x010[colorKeyValue][0] << 8 |
-                                                    field_0x2c->field_0x010[colorKeyValue][1]) << 8 |
+                        copy->ApplyColorKey((field_0x2c->field_0x010[colorKeyValue][0] << 8 |
+                                             field_0x2c->field_0x010[colorKeyValue][1]) << 8 |
                                                    field_0x2c->field_0x010[colorKeyValue][2]);
                     } else {
                         unsigned int key = colorKeyValue;
@@ -147,7 +147,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
                             color = (key & 0x7c00) << 9 | (key & 0x3e0) << 6 | (key & 0x1f) << 3;
                         else
                             color = (key & 0xf800) << 8 | (key & 0x7e0) << 5 | (key & 0x1f) << 3;
-                        copy->UnknownVirtualSlot18(color);
+                        copy->ApplyColorKey(color);
                     }
                 }
                 return copy;
@@ -169,11 +169,11 @@ static inline void AppendRenderStatePair(TextureMap* map, int state, int value) 
 // counts the mip levels down to `minimumSize`, reuses a shared surface or
 // creates one (trying formats in order), converts the bits into it, builds
 // the mip levels and records the alpha or colour-key render states.
-int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int stride, int minimumSize,
-                                      int sourceFormat, int format, UnknownTexturePalette* palette,
-                                      int flags, void* surfacePalette, int checkMemory, int unused,
-                                      int addressU, int addressV, UnknownTextureFormatChoice* choice,
-                                      int alphaThreshold, unsigned int key) {
+int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, int minimumSize,
+                                int sourceFormat, int format, UnknownTexturePalette* palette,
+                                int flags, void* surfacePalette, int checkMemory, int unused,
+                                int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                                int alphaThreshold, unsigned int key) {
     int formats[5];
     int mipmapped;
     UnknownSurfaceDesc desc;
@@ -367,13 +367,13 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                                                mapFormat, palette);
         if (systemSurface->Unlock(0))
             goto failed;
-        if (mipmapped && !UnknownVirtualSlot15(2))
+        if (mipmapped && !BuildMipLevels(2))
             goto failed;
     }
     if (g_UnknownGlobal689968)
         DumpLevel(systemSurface, 0);
     if (IsFormat4444Or8888(format) & !IsFormat4444Or8888(mapFormat)) {
-        UnknownVirtualSlot18(0xff00ff);
+        ApplyColorKey(0xff00ff);
         return 1;
     }
     if (IsFormat4444Or8888(mapFormat)) {

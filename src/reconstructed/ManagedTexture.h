@@ -11,10 +11,10 @@ class ManagedTexture : public PCTextureMap {
 public:
     explicit ManagedTexture(TextureMapManager* manager); // 0x00510500: sets TextureMap+0x68 bit 0
     virtual ~ManagedTexture();                // 0x005105a0 (deleting wrapper 0x00510580)
-    virtual int UnknownVirtualSlot7();        // 0x00510980: whether it is placed (+0x94)
-    virtual int UnknownVirtualSlot8(int a, int b, int c); // 0x00510750: 0
-    virtual int UnknownVirtualSlot11();       // 0x005108f0: binds the page or itself
-    virtual void UnknownVirtualSlot19();      // 0x00510870
+    virtual int IsResident();        // 0x00510980: whether it is placed (+0x94)
+    virtual int CreateTextureSurface(int a, int b, int c); // 0x00510750: 0
+    virtual int SetAsTexture();       // 0x005108f0: binds the page or itself
+    virtual void Bind();      // 0x00510870
 
     void UpdatePageCoords(int level);    // 0x00510610: takes the scale and offset of its region
     void Reregister();             // 0x00510670: resets and re-adds itself to its group

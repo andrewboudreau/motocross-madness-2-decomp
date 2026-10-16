@@ -509,7 +509,7 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
     desc.size = sizeof(desc);
     if (target->renderSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0))
         return 0;
-    char* bits = (char*)texture->UnknownVirtualSlot13(0, &pitch, DDLOCK_WAIT | DDLOCK_NOSYSLOCK);
+    char* bits = (char*)texture->LockSurface(0, &pitch, DDLOCK_WAIT | DDLOCK_NOSYSLOCK);
     if (!bits) {
         target->renderSurface->Unlock(0);
         return 0;
@@ -523,7 +523,7 @@ int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture) {
         bits += pitch;
     }
     target->renderSurface->Unlock(0);
-    texture->UnknownVirtualSlot14(0);
+    texture->UnlockSurface(0);
     return 1;
 }
 
@@ -566,10 +566,10 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     fx.size = sizeof(fx);
     fx.fillColor = 0;
     rendered->systemSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
-    rendered->UnknownVirtualSlot9(0, 1);
+    rendered->Upload(0, 1);
     expected->systemSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
     rendered->systemSurface->Blt(0, image->systemSurface, 0, DDBLT_WAIT, 0);
-    rendered->UnknownVirtualSlot9(area, 1);
+    rendered->Upload(area, 1);
     expected->systemSurface->Blt(area, image->systemSurface, area, DDBLT_WAIT, 0);
     rendered->systemSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
     target->renderSurface->Blt(0, 0, 0, DDBLT_COLORFILL, &fx);
@@ -618,7 +618,7 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
         clear.bottom = viewport.y + viewport.height;
         failed |= target->device->Clear(1, &clear, D3DCLEAR_ZBUFFER, 0, target->zClearValue, 0) != 0; // Clear z
         g_TrackGame->UnknownVirtualSlot7();
-        rendered->UnknownVirtualSlot19();
+        rendered->Bind();
         target->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         target->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
         target->SetRenderState(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);

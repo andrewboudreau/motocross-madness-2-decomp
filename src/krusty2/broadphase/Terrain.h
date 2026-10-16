@@ -77,17 +77,17 @@ public:
                               int a9, TerrainComObject* a10, int a11, int a12, int a13, int a14,
                               void* a15, int a16, int a17);     // slot 4, +0x10
     // Slot 5 (+0x14, 15 stack arguments): loads the texture from a stream (TextureMap.h's
-    // UnknownVirtualSlot5; argument roles from there, tier 3).
+    // LoadSurface; argument roles from there, tier 3).
     virtual int LoadSurface(TerrainStream* stream, int width, int height, int minimumSize,
                             int fileFormat, int dataSize, int format, BaseObject* palette,
                             int flags, TerrainComObject* surfacePalette, int addressU,
                             int addressV, void* choice, int alphaThreshold, unsigned int key);
-    virtual TerrainSurfaceBase* UnknownVirtualSlot6();
-    virtual int UnknownVirtualSlot7();
+    virtual TerrainSurfaceBase* Clone();
+    virtual int IsResident();
     virtual int CreateTextureSurface(int a, int b, int c);      // slot 8, +0x20
-    virtual int UnknownVirtualSlot9(void* rect, int mode);     // PCTextureMap.h slot names
-    virtual void UnknownVirtualSlot10();                        // 0x004c7610: releases the texture surface
-    virtual int UnknownVirtualSlot11();                         // 0x004c7970: sets it as texture stage 0 (Terrain slot 14, detail pass)
+    virtual int Upload(void* rect, int mode);                   // PCTextureMap.h slot names
+    virtual void ReleaseTextureSurface();                       // 0x004c7610: releases the texture surface
+    virtual int SetAsTexture();                                 // 0x004c7970: sets it as texture stage 0 (Terrain slot 14, detail pass)
     char pad_0x08[0x3c - 0x08];
     unsigned int averageColor;  // +0x3C  PCTextureMap stores Pixtrans AverageColor (0x004d24d0) here; Terrain::Load derives its unlit colours from it
     char pad_0x40[0x74 - 0x40];

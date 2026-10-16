@@ -190,8 +190,8 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
             }
         }
         texture = new(__FILE__, 916) PCTextureMap(guiTextures, 1);
-        texture->UnknownVirtualSlot4(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
-                                     0xff00ff);
+        texture->CreateSurface(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
+                               0xff00ff);
         DebugFree(bits, __FILE__, 921);
     }
     return texture;

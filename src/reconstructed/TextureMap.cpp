@@ -134,15 +134,15 @@ failed:
     }
     if (fromFile) {
         int sourceFormat = file->bitsPerPixel == 16 ? 0x22b : (file->bitsPerPixel == 24 ? 0x378 : 0x22b8);
-        map->UnknownVirtualSlot4(file->bits, width, height, width, minimumSize, sourceFormat, format,
-                                 texturePalette, flags, surfacePalette, 1, 0, addressU, addressV, choice,
-                                 alphaThreshold, key);
+        map->CreateSurface(file->bits, width, height, width, minimumSize, sourceFormat, format,
+                           texturePalette, flags, surfacePalette, 1, 0, addressU, addressV, choice,
+                           alphaThreshold, key);
         FreeFile(file);
         if (!entry)
             g_UnknownResourceManager572b44->AddObject(name, (int)map);
-    } else if (map->UnknownVirtualSlot5(entry->archive, width, height, minimumSize, fileFormat, dataSize,
-                                        format, texturePalette, flags, surfacePalette, addressU, addressV,
-                                        choice, alphaThreshold, key)) {
+    } else if (map->LoadSurface(entry->archive, width, height, minimumSize, fileFormat, dataSize,
+                                format, texturePalette, flags, surfacePalette, addressU, addressV,
+                                choice, alphaThreshold, key)) {
         g_UnknownResourceManager572b44->SetItemObject(entry, map);
     }
     if (paletteName)

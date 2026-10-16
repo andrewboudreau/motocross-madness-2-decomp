@@ -81,7 +81,7 @@ int CacheTexture::CopyMipLevels(UnknownTextureRegion* region, int level) {
         return 0;
     }
     if (g_TrackGame->display->partialTextureUploadResult > 0)
-        UnknownVirtualSlot9(&whole, -1);
+        Upload(&whole, -1);
     else
         field_0x188 = 1;
     return 1;

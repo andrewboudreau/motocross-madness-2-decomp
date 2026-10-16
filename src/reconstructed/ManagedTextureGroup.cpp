@@ -82,7 +82,7 @@ int ManagedTextureGroup::SetPageCount(int count) {
     int change = count - pages;
     if (count > 0 && !surfaceTexture) {
         surfaceTexture = new(__FILE__, 107) PCTextureMap(groupManager, 1);
-        if (!surfaceTexture->UnknownVirtualSlot4(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
+        if (!surfaceTexture->CreateSurface(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
                                               groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
             delete surfaceTexture;
             return 0;
@@ -93,12 +93,12 @@ int ManagedTextureGroup::SetPageCount(int count) {
             CacheTexture* page = new(__FILE__, 121) CacheTexture(groupManager, this, 8);
             page->systemSurface = surfaceTexture->systemSurface;
             page->systemSurface->AddRef();
-            if (!page->UnknownVirtualSlot4(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
-                                           groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
+            if (!page->CreateSurface(0, 256, 256, 0, 1, groupFormat, groupFormat, 0, 2, groupPalette, 1, 0,
+                                     groupAddressU, groupAddressV, 0, 0x80, 0xff00ff)) {
                 delete page;
                 return 0;
             }
-            if (!page->UnknownVirtualSlot8(1, 0, 1)) {
+            if (!page->CreateTextureSurface(1, 0, 1)) {
                 page->Release();
                 return 0;
             }
@@ -149,8 +149,8 @@ void ManagedTextureGroup::RestoreLostPages() {
     for (TextureMap* page = cachePages.First(); page; page = cachePages.Next()) {
         CacheTexture* cache = static_cast<CacheTexture*>(page);
         if (cache->textureSurface && cache->textureSurface->IsLost()) {
-            cache->UnknownVirtualSlot10();
-            cache->UnknownVirtualSlot8(1, 0, 0);
+            cache->ReleaseTextureSurface();
+            cache->CreateTextureSurface(1, 0, 0);
             cache->EmptyPage();
         }
     }

@@ -98,7 +98,7 @@ void DebugOverlay::SetRowHighlight(int page, int row, int flag)
 
 int DebugOverlay::UnknownVirtualSlot14()
 {
-    fontTexture->UnknownVirtualSlot19();
+    fontTexture->Bind();
     ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 0);
     ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
     ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);

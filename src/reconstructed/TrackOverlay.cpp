@@ -96,7 +96,7 @@ InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapMana
         Release();
         return 0;
     }
-    texture->UnknownVirtualSlot8(1, 0, 0);
+    texture->CreateTextureSurface(1, 0, 0);
     Attach(target, texture, &rect, 1, 0, 0.00001f, 0, 0, 0, 0, 1555, 0);
     RenderTarget* owner = Target();
     dial.originX = (int)(rect.left * owner->targetWidth / 640.0f);
@@ -449,10 +449,10 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
         Release();
         return 0;
     }
-    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
         overlayTexture->SetAddressModes(5, 6);
-    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
+    overlayTexture->CreateTextureSurface(1, 0, 0);
     source.top = 0;
     source.bottom = 128;
     source.left = 0;
@@ -680,7 +680,7 @@ fail:
         return 0;
     }
     TintRows(0, 0x80, 0xffff);
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -782,7 +782,7 @@ fail:
         return 0;
     }
     TintRows(0, 0x80, 0xffff);
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -875,7 +875,7 @@ fail:
         return 0;
     }
     TintRows(0, 0x80, 0xffff);
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -1170,10 +1170,10 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         Release();
         return 0;
     }
-    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    overlayTexture = backingTexture->Clone();
     if (overlayTexture->mapFormat == 4444)
         overlayTexture->SetAddressModes(5, 6);
-    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
+    overlayTexture->CreateTextureSurface(1, 0, 0);
     source.left = 0;
     source.right = largeMap ? 256 : 128;
     source.top = 0;
@@ -1665,7 +1665,7 @@ fail:
         return 0;
     }
     TintRows(0, rows, 0xf0ff);
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
     return 1;
 }
 
@@ -1836,5 +1836,5 @@ void ChatOverlay::RedrawNameTags(int index)
         texture->systemSurface->ReleaseDC(dc);
     }
     TintRows(0x89, 0x46, 0xf000 | ((level & ~0xf) << 4) | (level & ~0xf) | (level >> 4));
-    overlayTexture->UnknownVirtualSlot9(0, -1);
+    overlayTexture->Upload(0, -1);
 }

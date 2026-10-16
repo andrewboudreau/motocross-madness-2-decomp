@@ -278,7 +278,7 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
     if (index == -1 || !Extra()->own)
         return 0;
 
-    unsigned char* bits = (unsigned char*)texture->UnknownVirtualSlot13(0, 0, 0);
+    unsigned char* bits = (unsigned char*)texture->LockSurface(0, 0, 0);
     unsigned char* out = texture->textureWidth == 0x100 ? bits : g_grid1TextureBuffer;
     int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
     int tileStride = bpp << 4;
@@ -295,7 +295,7 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
         }
         if (i == count) {
             tiles[count] = id;
-            tile = (unsigned char*)Terrain()->textures[id]->UnknownVirtualSlot16(16);
+            tile = (unsigned char*)Terrain()->textures[id]->LockLevel(16);
             tileBits[count] = tile;
             count++;
         }
@@ -330,13 +330,13 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
     } while (y < 0x100);
 
     for (int i = 0; i < count; i++)
-        Terrain()->textures[tiles[i]]->UnknownVirtualSlot17(16);
+        Terrain()->textures[tiles[i]]->UnlockLevel(16);
     if (texture->textureWidth != 0x100)
         Downsample(bits, g_grid1TextureBuffer, texture->textureWidth, texture->textureWidth,
                               texture->textureWidth, texture->textureWidth * 2, 1, texture->mapFormat,
                               texture->field_0x2c, 2);
-    texture->UnknownVirtualSlot14(0);
-    texture->UnknownVirtualSlot15(1);
+    texture->UnlockSurface(0);
+    texture->BuildMipLevels(1);
     return 1;
 }
 
@@ -358,7 +358,7 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
     if (index == -1 || !blocks[block].own)
         return 0;
 
-    unsigned char* out = (unsigned char*)texture->UnknownVirtualSlot13(0, 0, 0);
+    unsigned char* out = (unsigned char*)texture->LockSurface(0, 0, 0);
     int width = texture->textureWidth;
     int tileSize = width / 4;
     int bpp = PixelFormatBytesPerPixel(texture->mapFormat);
@@ -379,7 +379,7 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
         }
         if (i == count) {
             tiles[count] = id;
-            tile = (unsigned char*)Terrain()->textures[id]->UnknownVirtualSlot16(tileSize);
+            tile = (unsigned char*)Terrain()->textures[id]->LockLevel(tileSize);
             tileBits[count] = tile;
             count++;
         }
@@ -440,8 +440,8 @@ int DrawableGridNodeSharedTextures::BuildBlockTexture(int block, ManagedTexture*
     }
 
     for (int j = 0; j < count; j++)
-        Terrain()->textures[tiles[j]]->UnknownVirtualSlot17(tileSize);
-    texture->UnknownVirtualSlot14(0);
-    texture->UnknownVirtualSlot15(1);
+        Terrain()->textures[tiles[j]]->UnlockLevel(tileSize);
+    texture->UnlockSurface(0);
+    texture->BuildMipLevels(1);
     return 1;
 }

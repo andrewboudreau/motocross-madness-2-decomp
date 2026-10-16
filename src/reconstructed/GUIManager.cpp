@@ -593,11 +593,11 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
         fill.field_0x02 = (unsigned char)color;
         for (pixel = bits; pixel < bits + width * height; pixel++)
             *pixel = fill;
-        if (texture->UnknownVirtualSlot4(bits, width, height, width, width, 0x378,
-                                         g_TrackGame->renderTarget->surfacePixelFormat,
-                                         (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
-                                         guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
-            texture->UnknownVirtualSlot18(0xff00ff);
+        if (texture->CreateSurface(bits, width, height, width, width, 0x378,
+                                   g_TrackGame->renderTarget->surfacePixelFormat,
+                                   (UnknownTexturePalette*)(guiPalette ? guiPalette->colorMapper : 0), 4,
+                                   guiPalette ? guiPalette->ddPalette : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
+            texture->ApplyColorKey(0xff00ff);
         delete bits;
     }
     return texture;
