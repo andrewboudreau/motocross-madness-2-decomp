@@ -182,7 +182,7 @@ int CreateMainWindow(HINSTANCE instance, int showCommand)
         GetLastError();
         return 0;
     }
-    UnknownFunction447910(g_MainWindow);
+    StoreMainWindow(g_MainWindow);
     return 1;
 }
 

@@ -8,7 +8,7 @@ class TextureMapManager;
 
 // DebugOverlay.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\DebugOverlay.cpp"
 // at 0x00568d04, one xref 0x00447a67: the debug `new` at line 59).
-// Code 0x00447910 (provisional, see UnknownFunction447910) or 0x00447920
+// Code 0x00447910 (provisional, see StoreMainWindow) or 0x00447920
 // ..0x00448559, after D3DIMSoultreeShadow.cpp's initialisers and before the unattributed code from 0x00448560 (callers outside this
 // file only, no source literal) that runs up to dirlist.cpp at 0x00449e60.
 //
@@ -20,10 +20,11 @@ class TextureMapManager;
 // 0x36e0 bytes (the size Game's initialiser allocates). Member and method
 // names are provisional (tier 3).
 
-// 0x00447910 (cdecl): sets the window handle global 0x0059ada4; see
-// DebugOverlay.cpp for the (provisional) ownership.
-extern void* g_UnknownGlobal59ada4;
-void UnknownFunction447910(void* window);
+// 0x00447910 (cdecl): stores the main window handle in 0x0059ada4, which no
+// retail code reads back; see DebugOverlay.cpp for the (provisional)
+// ownership.
+extern void* g_StoredMainWindow;
+void StoreMainWindow(void* window);
 
 // One text row, 0x98 bytes from +0xb4 (stride and fields from 0x00447de0,
 // 0x00447e90 and slot 14).

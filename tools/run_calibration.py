@@ -10879,7 +10879,7 @@ CASES = [
         'name': 'DebugOverlay.cpp window handle setter 0x447910 (ownership tier 3)',
         'bindings': 'src/reconstructed/DebugOverlay.bindings.json',
         'source': 'src/reconstructed/DebugOverlay.cpp',
-        'symbol': '?UnknownFunction447910@@YAXPAX@Z',
+        'symbol': '?StoreMainWindow@@YAXPAX@Z',
         'target_va': '0x00447910',
         'target_size': 10,
         'reason': 'stores CreateWindowExA result (caller 0x4a0d30) to 0x59ada4; placed before DebugOverlay by adjacency only',

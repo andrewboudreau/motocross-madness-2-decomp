@@ -73,7 +73,7 @@ Its parameters:
 - class name TrackGame+0x320;
 - window `WS_EX_APPWINDOW`, `WS_POPUP | WS_VISIBLE`, at screen size.
 
-It hands the window to `0x00447910` (DebugOverlay.h).
+It hands the window to `StoreMainWindow` `0x00447910` (DebugOverlay.h).
 
 ### Window procedure (`0x004a0d50`)
 

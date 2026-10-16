@@ -31,11 +31,11 @@ struct DebugOverlayVertex {
 // initialisers, which end that file as they end D3DIMSoultreeMotnctrl.cpp,
 // and its global sits after D3DIMSoultreeShadow.cpp's data and before the
 // keyboard-layout globals that precede dirlist.cpp's.
-void* g_UnknownGlobal59ada4;
+void* g_StoredMainWindow;
 
-void UnknownFunction447910(void* window)
+void StoreMainWindow(void* window)
 {
-    g_UnknownGlobal59ada4 = window;
+    g_StoredMainWindow = window;
 }
 
 DebugOverlay::DebugOverlay(int flags)

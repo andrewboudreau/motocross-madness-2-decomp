@@ -26,7 +26,7 @@
   "?RecordExceptionInfo@@YAHPAU_EXCEPTION_POINTERS@@PBD@Z": "0x0045ff80",
   "?SetWindowRect@PCGame@@QAEXPBUUnknownRect@@@Z": "0x004c0470",
   "?StartUp@PCGame@@QAEHPAD@Z": "0x004bfc50",
-  "?UnknownFunction447910@@YAXPAX@Z": "0x00447910",
+  "?StoreMainWindow@@YAXPAX@Z": "0x00447910",
   "?SetDevicesAcquired@PCControlInterface@@QAEXH@Z": "0x004bf490",
   "?RestoreImeStatus@@YAXXZ": "0x0052ff20",
   "__except_handler3": "0x00536444",
