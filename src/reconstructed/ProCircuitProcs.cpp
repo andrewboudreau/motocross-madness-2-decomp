@@ -972,7 +972,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
-        g_TrackGame->proCircuit->racers[0].engineSize = g_UnknownGlobal56cb6c[size];
+        g_TrackGame->proCircuit->racers[0].engineSize = g_BikeClassEngineSizes[size];
         g_TrackGame->proCircuit->racers[0].fourStroke = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
     } else {
@@ -981,7 +981,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         g_TrackGame->proCircuit->racers[0].fourStroke =
             ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
-        int bikeClass = UnknownBikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
+        int bikeClass = BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
     UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->proCircuit->racers[0].engineSize;
@@ -1029,16 +1029,16 @@ void PCCentralBikeRiderDlg::HandleEvent(UnknownDialogEvent* event)
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
         if (g_TrackGame->proCircuit->bikeClassRule == 1 || g_TrackGame->proCircuit->bikeClassRule == 3)
-            list->AddRow("125cc 2-stroke", UnknownBikeClassOf(125), 0);
+            list->AddRow("125cc 2-stroke", BikeClassOf(125), 0);
         if (g_TrackGame->proCircuit->bikeClassRule == 2 || g_TrackGame->proCircuit->bikeClassRule == 3) {
-            list->AddRow("250cc 2-stroke", UnknownBikeClassOf(250), 0);
-            list->AddRow("400cc 4-stroke", UnknownBikeClassOf(400), 0);
+            list->AddRow("250cc 2-stroke", BikeClassOf(250), 0);
+            list->AddRow("400cc 4-stroke", BikeClassOf(400), 0);
         }
         if (g_TrackGame->proCircuit->bikeClassRule == 3) {
-            list->AddRow("500cc 2-stroke", UnknownBikeClassOf(500), 0);
-            list->AddRow("600cc 4-stroke", UnknownBikeClassOf(600), 0);
+            list->AddRow("500cc 2-stroke", BikeClassOf(500), 0);
+            list->AddRow("600cc 4-stroke", BikeClassOf(600), 0);
         }
-        list->SelectRowByData(UnknownBikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize));
+        list->SelectRowByData(BikeClassOf(g_TrackGame->proCircuit->racers[0].engineSize));
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
         edit->SetAcceptedCharacters("0123456789");
         g_TrackGame->ui->ShowScene(this);
@@ -1154,7 +1154,7 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
         int rule = g_TrackGame->proCircuit->bikeClassRule;
         if (rule != 3 && !((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].field_0x88) {
-            int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize);
+            int bikeClass = BikeClassOf(((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i].engineSize);
             if (bikeClass != 0) {
                 if (bikeClass <= 0 || bikeClass > 2)
                     continue;

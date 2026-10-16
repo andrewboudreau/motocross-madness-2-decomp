@@ -177,6 +177,6 @@
   "?GetRowInt@UnknownParameterBlock@@QAEHHPAH@Z": "0x004b8180",
   "??_C@_0CK@LMJJ@LOD?5?$CFi?5?9?5Surface?5?$CFi?5?9?5Object?5Poi@": "0x00568a00",
   "?UpdateWorldMatrix@SoultreeObject@@QAEXXZ": "0x004fb4f0",
-  "?UnknownFunction49e4a0@LightManager@@QAEXPAXH00H0@Z": "0x0049e4a0",
+  "?LightVertices@LightManager@@QAEXPAXH00H0@Z": "0x0049e4a0",
   "?TransformPoints@@YAXPBXPAXPBUMatrix4@@HHH@Z": "0x004a1b00"
 }

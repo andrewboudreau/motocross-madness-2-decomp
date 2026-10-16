@@ -279,17 +279,19 @@ public:
     explicit LoadBajaDlg(int flags);          // 0x00450fd0 (vtable 0x00552158)
 };
 
-// The DirectPlay serial connection (DPCOMPORTADDRESS's layout) that
+// dplobby.h's DPCOMPORTADDRESS (VC6's DPLOBBY.H predates it, so it is
+// declared here like Net.h's other DirectPlay records): CreateAddress
+// (0x004abf10) passes it as the DPAID_ComPort element with size 0x14.
 // BuildComPortAddress (0x004ae410, between Net.cpp and NetProcs.cpp) fills
-// from SerialPopupDlg's selections before CreateAddress(DPSPGUID_SERIAL).
-struct UnknownComPortAddress {
+// it from SerialPopupDlg's selections before CreateAddress(DPSPGUID_SERIAL).
+struct NetComPortAddress {
     int port;                                 // +0x00: port
     int baudRate;                             // +0x04: baud rate
     int stopBits;                             // +0x08: stop bits
     int parity;                               // +0x0c: parity
     int flowControl;                          // +0x10: flow control
 };
-void BuildComPortAddress(struct UnknownSerialSettings* settings, UnknownComPortAddress* address);
+void BuildComPortAddress(struct SerialSettings* settings, NetComPortAddress* address);
 
 // 0x00451b80: creates the profile named in "EditBox" (or reports that it
 // exists).

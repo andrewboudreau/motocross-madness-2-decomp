@@ -1,5 +1,5 @@
 {
-  "?UnknownFunction43d080@@YAHHHH@Z": "0x0043d080",
+  "?DecodeTextureSize@@YAHHHH@Z": "0x0043d080",
   "?LoadMissingTextures@Cube@@QAEHPAUUnknownTexturePalette@@PAUUnknownCubeTextureContext@@@Z": "0x0043d630",
   "?BuildFaceGeometry@DrawableCube@@QAEHXZ": "0x0043dc60",
   "?LoadTexturesAndCoords@DrawableCube@@QAEHPAVCube@@PAUUnknownCubeTextureContext@@@Z": "0x0043e0b0",

@@ -38,7 +38,7 @@
   "?Configure@CarProceduralCollision@@QAEXPAXHHH@Z": "0x004320f0",
   "?SetHullShape@CarProceduralCollision@@QAEXPAVCarProceduralModel@@HHHH@Z": "0x00432720",
   "?LoadShape@CarProceduralCollision@@QAEXPAVCarProceduralModel@@PBD@Z": "0x00432800",
-  "?UnknownFunction435fe0@CarProceduralCollision@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CarProceduralCollision@@QAEXXZ": "0x00435fe0",
   "?AddIgnoredOwner@CarProceduralCollision@@QAEXPAV1@@Z": "0x00439410",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",

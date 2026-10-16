@@ -1275,9 +1275,9 @@ GUIInputDevice* GUIUser::GetAcceptedDevice(int index) {
     return acceptedDevices.Get(index);
 }
 
-// 0x0067b468 (initializer 0x00488340; Game.h's g_UnknownGlobal56c470 points
+// 0x0067b468 (initializer 0x00488340; Game.h's g_HiResMeter points
 // at it).
-HiResMeter g_UnknownHiResMeter67b468(0);
+HiResMeter g_HiResMeterInstance(0);
 
 // 0x00488380
 HiResMeter::HiResMeter(int flags) : GameObject(flags) {

@@ -114,7 +114,7 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
     dt = t;
     if (shapeCollisionEnabled) {
         if (refreshPending) {
-            Fn_00435fe0();
+            SnapPlacement();
             refreshPending = 0;
         } else {
             UpdatePlacement();

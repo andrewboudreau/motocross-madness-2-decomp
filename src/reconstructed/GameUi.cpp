@@ -51,11 +51,12 @@ static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
 // cdecl 0x0047b570: resizes a DebugMalloc'd block (KrustyUI.cpp).
 void* ResizeDebugBlock(void* block, unsigned int size);
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
-int g_UnknownGlobal65b5c8;
+int g_AnimStepTime;
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
 UIDialog* g_SortingDialog;
-// 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
-int g_UnknownGlobal65b60c;
+// 0x0065b60c: the frames of the grow (zoom) transition (UIControl slot 41,
+// GrowStep 0x004715d0).
+int g_GrowFrameCount;
 
 // cdecl 0x00477b60: the list rows' default order (by text).
 int CompareRowText(const void* a, const void* b);
@@ -315,7 +316,7 @@ int UIAnim::AddFrame(UIFrame* frame) {
 // once past a sound frame), bouncing or looping as the pass count says.
 UIFrame* UIAnim::Advance() {
     int now = ReadClock();
-    g_UnknownGlobal65b5c8 = now;
+    g_AnimStepTime = now;
     if (abs(now - lastStepTime) > frameDelay || frameList[currentFrame]->isSound == 1) {
         lastStepTime = now;
         if (playBackwards) {
@@ -3490,38 +3491,40 @@ struct UnknownGameUiTextRun {
     int position;                             // +0x14: "|x" picks the tab-stop table entry x
 };
 
-int g_UnknownGlobal65b604;                    // the run being drawn
-int g_UnknownGlobal65b564;                    // its position
-unsigned int g_UnknownGlobal65b574;           // its color
-SIZE g_UnknownGlobal65b5e0;                   // the text's size
-int g_UnknownGlobal65b5a8;                    // the text's position
-int g_UnknownGlobal65b584;
+// File-scope scratch of the text drawing functions below (.bss
+// 0x0065b564..0x0065b604; each has one writer).
+int g_TextRunIndex;                           // 0x0065b604: the run being drawn
+int g_TextRunX;                               // 0x0065b564: its position
+unsigned int g_TextRunColor;                  // 0x0065b574: its color
+SIZE g_AlignedTextSize;                       // 0x0065b5e0: the text's size
+int g_AlignedTextX;                           // 0x0065b5a8: the text's position
+int g_AlignedTextY;                           // 0x0065b584
 
 // 0x0046f420
 void UIDialog::DrawTextRuns(void* dc, int x, int y, const char* text, int length,
                             UnknownGameUiTextRun* runs, unsigned int color, int shadow,
                             unsigned int shadowColor) {
-    g_UnknownGlobal65b604 = 0;
-    g_UnknownGlobal65b564 = x;
+    g_TextRunIndex = 0;
+    g_TextRunX = x;
     SetTextColor((HDC)dc, color);
-    g_UnknownGlobal65b574 = color;
-    while (runs[g_UnknownGlobal65b604].text) {
-        if (runs[g_UnknownGlobal65b604].kind == 2)
-            g_UnknownGlobal65b564 = runs[g_UnknownGlobal65b604].position + x;
+    g_TextRunColor = color;
+    while (runs[g_TextRunIndex].text) {
+        if (runs[g_TextRunIndex].kind == 2)
+            g_TextRunX = runs[g_TextRunIndex].position + x;
         if (shadow) {
             SetTextColor((HDC)dc, shadowColor);
-            TextOutA((HDC)dc, g_UnknownGlobal65b564 + 1, y + 1, runs[g_UnknownGlobal65b604].text,
-                     runs[g_UnknownGlobal65b604].length);
-            SetTextColor((HDC)dc, g_UnknownGlobal65b574);
+            TextOutA((HDC)dc, g_TextRunX + 1, y + 1, runs[g_TextRunIndex].text,
+                     runs[g_TextRunIndex].length);
+            SetTextColor((HDC)dc, g_TextRunColor);
         }
-        if (runs[g_UnknownGlobal65b604].kind == 1) {
-            g_UnknownGlobal65b574 = runs[g_UnknownGlobal65b604].color;
-            SetTextColor((HDC)dc, g_UnknownGlobal65b574);
+        if (runs[g_TextRunIndex].kind == 1) {
+            g_TextRunColor = runs[g_TextRunIndex].color;
+            SetTextColor((HDC)dc, g_TextRunColor);
         }
-        TextOutA((HDC)dc, g_UnknownGlobal65b564, y, runs[g_UnknownGlobal65b604].text,
-                 runs[g_UnknownGlobal65b604].length);
-        g_UnknownGlobal65b564 += runs[g_UnknownGlobal65b604].width;
-        g_UnknownGlobal65b604++;
+        TextOutA((HDC)dc, g_TextRunX, y, runs[g_TextRunIndex].text,
+                 runs[g_TextRunIndex].length);
+        g_TextRunX += runs[g_TextRunIndex].width;
+        g_TextRunIndex++;
     }
 }
 
@@ -3536,37 +3539,37 @@ void UIDialog::DrawAlignedText(void* dc, CameraRect* rect, const char* text, int
         SetBkMode((HDC)dc, OPAQUE);
     if (flags != 9) {
         if (control) {
-            g_UnknownGlobal65b5e0.cx = ((int*)control->GetTextExtent())[1];
-            g_UnknownGlobal65b5e0.cy = control->fontHeight;
+            g_AlignedTextSize.cx = ((int*)control->GetTextExtent())[1];
+            g_AlignedTextSize.cy = control->fontHeight;
         } else {
-            GetTextExtentPoint32A((HDC)dc, text, length, &g_UnknownGlobal65b5e0);
+            GetTextExtentPoint32A((HDC)dc, text, length, &g_AlignedTextSize);
         }
     }
     if (flags & 2)
-        g_UnknownGlobal65b5a8 = (rect->right - rect->left) / 2 - g_UnknownGlobal65b5e0.cx / 2 + rect->left;
+        g_AlignedTextX = (rect->right - rect->left) / 2 - g_AlignedTextSize.cx / 2 + rect->left;
     else if (flags & 4)
-        g_UnknownGlobal65b5a8 = rect->right - g_UnknownGlobal65b5e0.cx;
+        g_AlignedTextX = rect->right - g_AlignedTextSize.cx;
     else
-        g_UnknownGlobal65b5a8 = rect->left;
+        g_AlignedTextX = rect->left;
     if (!height)
         height = dialogFontHeight;
     if (flags & 0x10)
-        g_UnknownGlobal65b584 = (rect->bottom - rect->top) / 2 - height / 2 + rect->top;
+        g_AlignedTextY = (rect->bottom - rect->top) / 2 - height / 2 + rect->top;
     else if (flags & 0x20)
-        g_UnknownGlobal65b584 = rect->bottom - height;
+        g_AlignedTextY = rect->bottom - height;
     else
-        g_UnknownGlobal65b584 = rect->top;
+        g_AlignedTextY = rect->top;
     if (runs)
-        DrawTextRuns(dc, g_UnknownGlobal65b5a8, g_UnknownGlobal65b584, text, length, runs, color, shadow,
+        DrawTextRuns(dc, g_AlignedTextX, g_AlignedTextY, text, length, runs, color, shadow,
                      shadowColor);
     else
-        DrawShadowText(dc, g_UnknownGlobal65b5a8, g_UnknownGlobal65b584, text, length, color, shadow,
+        DrawShadowText(dc, g_AlignedTextX, g_AlignedTextY, text, length, color, shadow,
                        shadowColor);
 }
 
-SIZE g_UnknownGlobal65b5a0;                   // the control text's size
-int g_UnknownGlobal65b5e8;                    // its position
-int g_UnknownGlobal65b5c0;
+SIZE g_ControlTextSize;                       // 0x0065b5a0: the control text's size
+int g_ControlTextX;                           // 0x0065b5e8: its position
+int g_ControlTextY;                           // 0x0065b5c0
 
 // 0x0046f6c0
 void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
@@ -3580,68 +3583,68 @@ void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
     else
         SetBkMode((HDC)dc, OPAQUE);
     if (control->textAlign != 9) {
-        g_UnknownGlobal65b5a0.cx = ((int*)control->GetTextExtent())[1];
-        g_UnknownGlobal65b5a0.cy = control->fontHeight;
+        g_ControlTextSize.cx = ((int*)control->GetTextExtent())[1];
+        g_ControlTextSize.cy = control->fontHeight;
     }
     if (control->textAlign & 2)
-        g_UnknownGlobal65b5e8 = (rect.right - rect.left) / 2 - g_UnknownGlobal65b5a0.cx / 2 + rect.left;
+        g_ControlTextX = (rect.right - rect.left) / 2 - g_ControlTextSize.cx / 2 + rect.left;
     else if (control->textAlign & 4)
-        g_UnknownGlobal65b5e8 = rect.right - g_UnknownGlobal65b5a0.cx;
+        g_ControlTextX = rect.right - g_ControlTextSize.cx;
     else
-        g_UnknownGlobal65b5e8 = rect.left;
+        g_ControlTextX = rect.left;
     if (control->textAlign & 0x10)
-        g_UnknownGlobal65b5c0 =
+        g_ControlTextY =
             (rect.bottom - rect.top) / 2 - dialogFontHeight / 2 + rect.top;
     else if (control->textAlign & 0x20)
-        g_UnknownGlobal65b5c0 = rect.bottom - dialogFontHeight;
+        g_ControlTextY = rect.bottom - dialogFontHeight;
     else
-        g_UnknownGlobal65b5c0 = rect.top;
+        g_ControlTextY = rect.top;
     if (control->GetTextLines())
-        DrawTextRuns(dc, g_UnknownGlobal65b5e8, g_UnknownGlobal65b5c0,
+        DrawTextRuns(dc, g_ControlTextX, g_ControlTextY,
                      (const char*)control->GetControlText(), control->GetTextLength(),
                      (UnknownGameUiTextRun*)control->GetTextLines(), control->textColor,
                      control->textColor, control->dropColor);
     else
-        DrawShadowText(dc, g_UnknownGlobal65b5e8, g_UnknownGlobal65b5c0,
+        DrawShadowText(dc, g_ControlTextX, g_ControlTextY,
                        (const char*)control->GetControlText(), control->GetTextLength(),
                        control->textColor, control->textDrop, control->dropColor);
 }
 
-CameraRect* g_UnknownGlobal65b588;            // the clip rectangle
-CameraRect g_UnknownGlobal65b5f0;
-int g_UnknownGlobal65b5ec;
+CameraRect* g_ControlDrawClipRect;            // 0x0065b588: the clip rectangle
+CameraRect g_ControlDrawRect;                 // 0x0065b5f0: the background's copy of it
+int g_ControlDrawResult;                      // 0x0065b5ec: GetDc's result, returned
 
 // 0x0046ed70
 int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control) {
-    g_UnknownGlobal65b588 = rect;
+    g_ControlDrawClipRect = rect;
     *a = 0;
     previousFont = 0;
     if (dialogBackground) {
-        g_UnknownGlobal65b588 = &g_UnknownGlobal65b5f0;
-        g_UnknownGlobal65b5f0 = *rect;
+        g_ControlDrawClipRect = &g_ControlDrawRect;
+        g_ControlDrawRect = *rect;
         if (control) {
-            g_UnknownGlobal65b5ec = dialogBackground->GetDc(
+            g_ControlDrawResult = dialogBackground->GetDc(
                 dc, rect, control->backgroundRegion, control->needsRedraw, &control->redrawFrames, a,
-                &g_UnknownGlobal65b5f0);
+                &g_ControlDrawRect);
         } else {
             int frames = 1;
-            g_UnknownGlobal65b5ec =
-                dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
+            g_ControlDrawResult =
+                dialogBackground->GetDc(dc, rect, -1, 0, &frames, a, &g_ControlDrawRect);
         }
     } else {
         ((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(dc);
-        g_UnknownGlobal65b5ec = 1;
+        g_ControlDrawResult = 1;
     }
     if (*dc && control) {
         previousFont =
             SelectObject((HDC)*dc, (HGDIOBJ)(control->fontHandle ? control->fontHandle : (int)dialogFont));
-        drawClipRegion = CreateRectRgn(g_UnknownGlobal65b588->left, g_UnknownGlobal65b588->top,
-                                             g_UnknownGlobal65b588->right, g_UnknownGlobal65b588->bottom);
+        drawClipRegion = CreateRectRgn(g_ControlDrawClipRect->left, g_ControlDrawClipRect->top,
+                                             g_ControlDrawClipRect->right, g_ControlDrawClipRect->bottom);
         SelectClipRgn((HDC)*dc, (HRGN)drawClipRegion);
     } else {
         drawClipRegion = 0;
     }
-    return g_UnknownGlobal65b5ec;
+    return g_ControlDrawResult;
 }
 
 // 0x0046fce0
@@ -3704,15 +3707,15 @@ int UIControl::AnimOutStep() {
     return 1;
 }
 
-int g_UnknownGlobal65b610;                       // frames of the slide
+int g_SlideLeftFrameCount;                    // 0x0065b610: frames of the slide
 
 // 0x00471850
 int UIControl::SlideLeftStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b610 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideLeftFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         int left = bounds[0];
         slideX = (float)(left - bounds[2] - 1);
-        slideStepX = ((float)left - slideX) / g_UnknownGlobal65b610;
+        slideStepX = ((float)left - slideX) / g_SlideLeftFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3720,7 +3723,7 @@ int UIControl::SlideLeftStep() {
     } else {
         slideX += slideStepX;
     }
-    if (transitionFrame == g_UnknownGlobal65b610)
+    if (transitionFrame == g_SlideLeftFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3745,15 +3748,15 @@ int UIControl::SlideLeftStep() {
     return 0;
 }
 
-int g_UnknownGlobal65b614;                       // frames of the slide
+int g_SlideTopFrameCount;                     // 0x0065b614: frames of the slide
 
 // 0x004719c0
 int UIControl::SlideTopStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b614 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideTopFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         int top = bounds[1];
         slideY = (float)(top - bounds[3]);
-        slideStepY = ((float)top - slideY) / g_UnknownGlobal65b614;
+        slideStepY = ((float)top - slideY) / g_SlideTopFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3761,7 +3764,7 @@ int UIControl::SlideTopStep() {
     } else {
         slideY += slideStepY;
     }
-    if (transitionFrame == g_UnknownGlobal65b614)
+    if (transitionFrame == g_SlideTopFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3786,14 +3789,14 @@ int UIControl::SlideTopStep() {
     return 0;
 }
 
-int g_UnknownGlobal65b618;                       // frames of the slide
+int g_SlideRightFrameCount;                   // 0x0065b618: frames of the slide
 
 // 0x00471b30
 int UIControl::SlideRightStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b618 = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideRightFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         slideX = (float)ownerDialog->screenWidth;
-        slideStepX = ((float)bounds[0] - slideX) / g_UnknownGlobal65b618;
+        slideStepX = ((float)bounds[0] - slideX) / g_SlideRightFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3801,7 +3804,7 @@ int UIControl::SlideRightStep() {
     } else {
         slideX += slideStepX;
     }
-    if (transitionFrame == g_UnknownGlobal65b618)
+    if (transitionFrame == g_SlideRightFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3826,14 +3829,14 @@ int UIControl::SlideRightStep() {
     return 0;
 }
 
-int g_UnknownGlobal65b61c;                       // frames of the slide
+int g_SlideBottomFrameCount;                  // 0x0065b61c: frames of the slide
 
 // 0x00471c90
 int UIControl::SlideBottomStep() {
     if (transitionFrame == 0 && transitionFrameCount) {
-        g_UnknownGlobal65b61c = transitionFrameCount < 0 ? 25 : transitionFrameCount;
+        g_SlideBottomFrameCount = transitionFrameCount < 0 ? 25 : transitionFrameCount;
         slideY = (float)ownerDialog->screenHeight;
-        slideStepY = ((float)bounds[1] - slideY) / g_UnknownGlobal65b61c;
+        slideStepY = ((float)bounds[1] - slideY) / g_SlideBottomFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -3841,7 +3844,7 @@ int UIControl::SlideBottomStep() {
     } else {
         slideY += slideStepY;
     }
-    if (transitionFrame == g_UnknownGlobal65b61c)
+    if (transitionFrame == g_SlideBottomFrameCount)
         return 1;
     RequestRedraw();
     *(CameraRect*)screenArea = *(CameraRect*)bounds;
@@ -3900,7 +3903,7 @@ int UIScrollBar::ButtonUp(int a, int* position) {
 // ---------------------------------------------------------------------------
 // UIListBox: rows
 
-unsigned int g_UnknownGlobal65b59c;           // time of the last list box click
+unsigned int g_ListBoxClickTime;              // 0x0065b59c: time of the last list box click
 
 // 0x00477d30
 void UIListBox::ReportClick(int* handled) {
@@ -3917,8 +3920,8 @@ void UIListBox::ReportClick(int* handled) {
         *handled = 0;
     if (!event.handled) {
         static unsigned int s_doubleClickTime = GetDoubleClickTime();
-        g_UnknownGlobal65b59c = ReadClock();
-        if (selectedRow == lastClickRow && g_UnknownGlobal65b59c - lastClickTime <= s_doubleClickTime) {
+        g_ListBoxClickTime = ReadClock();
+        if (selectedRow == lastClickRow && g_ListBoxClickTime - lastClickTime <= s_doubleClickTime) {
             event.kind = kDialogListDoubleClick;
             event.code = eventCode;
             event.controlName = controlName;
@@ -3934,7 +3937,7 @@ void UIListBox::ReportClick(int* handled) {
             lastClickTime = 0;
             return;
         } else {
-            lastClickTime = g_UnknownGlobal65b59c;
+            lastClickTime = g_ListBoxClickTime;
             lastClickRow = selectedRow;
             return;
         }
@@ -5063,7 +5066,7 @@ void UIProgressBar::SetBarTexture(int texture, int owned) {
 // 0x004715d0
 int UIControl::GrowStep() {
     if (transitionFrame == 0 && transitionFrameCount && !isPaused) {
-        g_UnknownGlobal65b60c = transitionFrameCount < 0 ? 7 : transitionFrameCount;
+        g_GrowFrameCount = transitionFrameCount < 0 ? 7 : transitionFrameCount;
         zoomWidth = 21.0f;
         zoomHeight = 11.0f;
         int left = bounds[0];
@@ -5072,10 +5075,10 @@ int UIControl::GrowStep() {
         int top = bounds[1];
         int height = bounds[3] - top;
         slideY = max(0.0f, (float)(height / 2 + top) - 5.5f);
-        slideStepX = ((float)left - slideX) / g_UnknownGlobal65b60c;
-        slideStepY = ((float)top - slideY) / g_UnknownGlobal65b60c;
-        zoomStepWidth = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
-        zoomStepHeight = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
+        slideStepX = ((float)left - slideX) / g_GrowFrameCount;
+        slideStepY = ((float)top - slideY) / g_GrowFrameCount;
+        zoomStepWidth = ((float)width - 21.0f) / g_GrowFrameCount;
+        zoomStepHeight = ((float)height - 11.0f) / g_GrowFrameCount;
         if (slideSound) {
             slideSound->SetVolume(ownerGui->soundVolume, 0);
             slideSound->PlayWithOptions(1, 0, 0);
@@ -5086,7 +5089,7 @@ int UIControl::GrowStep() {
         zoomWidth += zoomStepWidth;
         zoomHeight += zoomStepHeight;
     }
-    if (transitionFrame == g_UnknownGlobal65b60c)
+    if (transitionFrame == g_GrowFrameCount)
         return 1;
     RequestRedraw();
     if (!isPaused || transitionFrame) {

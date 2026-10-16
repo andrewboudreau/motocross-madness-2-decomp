@@ -56,7 +56,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // this file's vector initializers 0x004f9620..0x004f9710 and apart from
 // SceneManager.cpp's, the array lies inside this file's .bss block, and
 // only this file's code reads it.
-PlayerInfoType g_UnknownGlobal689d08[7];
+PlayerInfoType g_LobbyRemotePlayers[7];
 
 // d3drm.dll's D3DRMVectorRotate (declared as in FollowCamera.h): rotates
 // `vector` about `axis` by `theta`.
@@ -91,11 +91,11 @@ static inline Vector3& operator*=(Vector3& v, float scale) {
     return v;
 }
 
-int g_UnknownGlobal689dbc[7];
-int g_UnknownGlobal689dd8[7];
-int g_UnknownGlobal689df4;
-int g_UnknownGlobal689df8;
-int g_UnknownGlobal689dfc;
+int g_LobbyRemoteReady[7];
+int g_LobbyRemoteReadyAnnounced[7];
+int g_LobbyLocalReady;
+int g_LobbyRemotePlayerCount;
+int g_LobbyReadyBlockReason;
 
 // The chat message (types 0x85 and 0x92): 0x4e bytes are sent.
 struct UnknownChatMessage {
@@ -344,11 +344,11 @@ void MultiPlayerDlg::FillRacerSlots() {
     g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
     g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
     for (int i = 0; i < g_TrackGame->playerCount - 1; i++) {
-        g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
+        g_TrackGame->mode.racers[i + 1].networkPlayerId = g_LobbyRemotePlayers[i].id;
         g_TrackGame->mode.racers[i + 1].racerIndex = 0;
-        int length = strlen(g_UnknownGlobal689d08[i].name);
+        int length = strlen(g_LobbyRemotePlayers[i].name);
         int count = length > 0xf ? 0xf : length;
-        strncpy(g_TrackGame->mode.racers[i + 1].playerName, g_UnknownGlobal689d08[i].name, count);
+        strncpy(g_TrackGame->mode.racers[i + 1].playerName, g_LobbyRemotePlayers[i].name, count);
         g_TrackGame->mode.racers[i + 1].playerName[count] = 0;
     }
     g_TrackGame->mode.racers[0].networkPlayerId = player;
@@ -367,7 +367,7 @@ void MultiPlayerDlg::FillRacerSlots() {
     if (g_TrackGame->mode.lobbyRank > 0 && g_TrackGame->mode.lobbyRank < 0x65)
         g_TrackGame->mode.plateNumber = g_TrackGame->mode.lobbyRank;
     g_TrackGame->mode.racers[0].plateNumber = g_TrackGame->mode.plateNumber;
-    int racer = g_UnknownGlobal689df8 + 1;
+    int racer = g_LobbyRemotePlayerCount + 1;
     for (int j = 0; j < 8; j++) {
         for (int k = 0; k < lobbySlots.slots[j].grantedRacers; k++) {
             g_TrackGame->mode.racers[racer].networkPlayerId = lobbySlots.slots[j].playerId;
@@ -398,7 +398,7 @@ static int s_UnknownStatic573c0c = 2;
 // 0x004f2b90
 void MultiPlayerDlg::SendSettings() {
     UnknownLobbySlotTable* slots = &lobbySlots;
-    g_TrackGame->mode.maxOpponents = slots->GrantRacers(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
+    g_TrackGame->mode.maxOpponents = slots->GrantRacers(g_LobbyRemotePlayerCount + 1, g_TrackGame->mode.raceSettings.multiplayerAiRacerCount);
     if (g_TrackGame->mode.maxOpponents < g_TrackGame->mode.raceSettings.multiplayerAiRacerCount)
         g_TrackGame->mode.raceSettings.multiplayerAiRacerCount = g_TrackGame->mode.maxOpponents;
     if (eventPage) {
@@ -418,7 +418,7 @@ void MultiPlayerDlg::SendSettings() {
         }
     }
     if (++s_UnknownStatic573c0c >= 2) {
-        g_TrackGame->mode.raceSettings.networkPlayerCount = g_UnknownGlobal689df8 + 1;
+        g_TrackGame->mode.raceSettings.networkPlayerCount = g_LobbyRemotePlayerCount + 1;
         g_TrackGame->playerCount = g_TrackGame->mode.raceSettings.networkPlayerCount;
         g_TrackGame->networkAiRacerCount = g_TrackGame->mode.raceSettings.multiplayerAiRacerCount;
         g_TrackGame->mode.racerCount = g_TrackGame->networkAiRacerCount + g_TrackGame->playerCount;
@@ -584,14 +584,14 @@ void MultiPlayerDlg::EnableReadyControls() {
             EnableGroup(0x514, 1);
         EnableGroup(0x3e8, 1);
     } else {
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
+        if (BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
-            g_UnknownGlobal689df4)
+            g_LobbyLocalReady)
             ReportReadyCleared(1);
         EnableGroup(0x514, 0);
         EnableGroup(0x3e8, 0);
     }
-    if (g_UnknownGlobal689df4) {
+    if (g_LobbyLocalReady) {
         FindControl("Options", 1)->SetEnabled(0);
         FindControl("Joystick", 1)->SetEnabled(0);
         FindControl("Help", 1)->SetEnabled(0);
@@ -685,7 +685,7 @@ void MultiPlayerDlg::SendSystemChatLine(const char* text) {
 
 // 0x004f3a10
 void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
-    int player = g_UnknownGlobal689d08[index].id;
+    int player = g_LobbyRemotePlayers[index].id;
     if (player && player != g_TrackGame->network->localPlayer) {
         UnknownKickMessage message;
         NetworkInterface* network = g_TrackGame->network;
@@ -696,7 +696,7 @@ void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
 }
 
 // 0x004f3a70: the lobby's network messages. The player-state loop walks
-// eight records (end pointer 0x00689dd0), one past g_UnknownGlobal689d08;
+// eight records (end pointer 0x00689dd0), one past g_LobbyRemotePlayers;
 // the arrival delay is one parenthesised expression (without the outer
 // parentheses VC6 loads TrackGame before the fild).
 int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
@@ -704,7 +704,7 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
     if (from && type == 2) {
         UnknownPlayerStateMessage* state = (UnknownPlayerStateMessage*)data;
         for (i = 0; i < 8; i++) {
-            if (g_UnknownGlobal689d08[i].id != from)
+            if (g_LobbyRemotePlayers[i].id != from)
                 continue;
             char name[0x80];
             sprintf(name, "ButRdyPlayer%d", i + 2);
@@ -712,26 +712,26 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
             if (button) {
                 if (state->ready) {
                     button->SetFontColor(0xffffff);
-                    g_UnknownGlobal689dbc[i] = 1;
+                    g_LobbyRemoteReady[i] = 1;
                     lobbySlots.SetSlot(from, state->requestedRacers);
-                    if (!g_UnknownGlobal689dd8[i]) {
+                    if (!g_LobbyRemoteReadyAnnounced[i]) {
                         char text[0x80];
                         char line[0x80];
                         g_TrackGame->LoadResourceString(0x14d5, text, 0x80);
-                        sprintf(line, text, g_UnknownGlobal689d08[i].name, state->engineSize);
+                        sprintf(line, text, g_LobbyRemotePlayers[i].name, state->engineSize);
                         AddChatLine(-1, line);
-                        g_UnknownGlobal689dd8[i] = 1;
+                        g_LobbyRemoteReadyAnnounced[i] = 1;
                     }
                 } else {
                     button->SetFontColor(0x808080);
-                    g_UnknownGlobal689dbc[i] = 0;
-                    g_UnknownGlobal689dd8[i] = 0;
+                    g_LobbyRemoteReady[i] = 0;
+                    g_LobbyRemoteReadyAnnounced[i] = 0;
                     lobbySlots.FreeSlot(from);
                 }
             }
-            g_TrackGame->mode.racers[i + 1].networkPlayerId = g_UnknownGlobal689d08[i].id;
+            g_TrackGame->mode.racers[i + 1].networkPlayerId = g_LobbyRemotePlayers[i].id;
             g_TrackGame->mode.racers[i + 1].racerIndex = 0;
-            COPY_TEXT(g_TrackGame->mode.racers[i + 1].playerName, g_UnknownGlobal689d08[i].name, 0x10);
+            COPY_TEXT(g_TrackGame->mode.racers[i + 1].playerName, g_LobbyRemotePlayers[i].name, 0x10);
             g_TrackGame->mode.racers[i + 1].SetBikeAndRiderNames(state->bikeModelName, state->bikeName,
                                                                                  state->riderName);
             g_TrackGame->mode.racers[i + 1].engineSize = state->engineSize;
@@ -936,7 +936,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         if (openingMenu != 0x868)
             g_TrackGame->eventManager->ResetEntries();
         g_TrackGame->mode.raceSettings.randomGates = 0;
-        g_UnknownGlobal689dfc = g_TrackGame->network->isHost == 0;
+        g_LobbyReadyBlockReason = g_TrackGame->network->isHost == 0;
         g_UnknownGlobal689e04 = 2;
         if (g_TrackGame->mode.raceSettings.eventType == 4) {
             g_UnknownGlobal689e04 = 0;
@@ -953,7 +953,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         edit->SetBackgroundColor(0xffffff);
         if (g_TrackGame->ui->currentMenu == 0x866 && !g_TrackGame->network->lobbyConnected)
             CreateLobbyPlayer();
-        g_UnknownGlobal689df4 = 0;
+        g_LobbyLocalReady = 0;
         UIControl* user = FindControl("UserName", 0xc);
         g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer, name);
         user->SetText(name);
@@ -973,8 +973,8 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             UIControl* label = FindControl(text, 0);
             label->SetTextDrop(0);
             label->SetTextAlign(0x12);
-            g_UnknownGlobal689dbc[i] = 0;
-            g_UnknownGlobal689dd8[i] = 0;
+            g_LobbyRemoteReady[i] = 0;
+            g_LobbyRemoteReadyAnnounced[i] = 0;
         }
         ResetReadyButtons();
         chat = static_cast<UIListBox*>(FindControl("ListChat", 0));
@@ -1047,19 +1047,19 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
             event->handled = 1;
             g_TrackGame->ui->OpenMenu(100);
         } else if (!_stricmp("ButRdyUser", event->controlName)) {
-            int tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > g_TrackGame->mode.raceSettings.maxBikeClass;
+            int tooBig = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > g_TrackGame->mode.raceSettings.maxBikeClass;
             if (g_TrackGame->mode.lobbyPresetFlags)
-                tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > 2;
+                tooBig = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > 2;
             if (!tooBig) {
-                if (!g_UnknownGlobal689dfc)
-                    g_UnknownGlobal689df4 = !g_UnknownGlobal689df4;
+                if (!g_LobbyReadyBlockReason)
+                    g_LobbyLocalReady = !g_LobbyLocalReady;
             } else {
                 ReportReadyCleared(1);
             }
-            if (g_UnknownGlobal689dfc == 2 || g_UnknownGlobal689dfc == 3)
-                ReportReadyCleared(g_UnknownGlobal689dfc);
+            if (g_LobbyReadyBlockReason == 2 || g_LobbyReadyBlockReason == 3)
+                ReportReadyCleared(g_LobbyReadyBlockReason);
             UIControl* button = FindControl("ButRdyUser", 0);
-            if (g_UnknownGlobal689df4) {
+            if (g_LobbyLocalReady) {
                 char format[0x80];
                 char line[0x80];
                 EnableReadyControls();
@@ -1071,7 +1071,7 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
                 button->SetFontColor(0x808080);
             }
         } else if (!_stricmp("Start", event->controlName)) {
-            if (g_UnknownGlobal689df4) {
+            if (g_LobbyLocalReady) {
                 UpdateBoundValues(1);
                 if (eventPage)
                     eventPage->UpdateBoundValues(1);
@@ -1144,28 +1144,28 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         break;
     case kDialogTimer: {
         for (i = 0; i < 7; i++)
-            g_UnknownGlobal689d08[i].UnknownVirtualSlot1();
+            g_LobbyRemotePlayers[i].UnknownVirtualSlot1();
         int index = 0;
-        g_UnknownGlobal689df8 = 0;
+        g_LobbyRemotePlayerCount = 0;
         int me = g_TrackGame->network->localPlayer;
         NetPlayer* player;
         while ((player = g_TrackGame->network->NextPlayer(&index)) != 0) {
             if (player->id != me) {
-                g_UnknownGlobal689d08[g_UnknownGlobal689df8].id = player->id;
-                COPY_TEXT(g_UnknownGlobal689d08[g_UnknownGlobal689df8].name, player->name, 0x10);
+                g_LobbyRemotePlayers[g_LobbyRemotePlayerCount].id = player->id;
+                COPY_TEXT(g_LobbyRemotePlayers[g_LobbyRemotePlayerCount].name, player->name, 0x10);
                 lobbySlots.SetSlot(player->id, -1);
-                g_UnknownGlobal689df8++;
+                g_LobbyRemotePlayerCount++;
             }
         }
         for (i = 0; i < 7; i++) {
             sprintf(text, "NamePlayer%d", i + 2);
             UIControl* label = FindControl(text, 0);
-            label->SetText(g_UnknownGlobal689d08[i].name);
+            label->SetText(g_LobbyRemotePlayers[i].name);
         }
         for (i = 0; i < 7; i++) {
             sprintf(text, "ButRdyPlayer%d", i + 2);
             UIControl* button = FindControl(text, 0);
-            if (!g_UnknownGlobal689d08[i].name[0])
+            if (!g_LobbyRemotePlayers[i].name[0])
                 button->SetFontColor(0x808080);
         }
         if (bikeRiderPage)
@@ -1174,18 +1174,18 @@ void MultiPlayerDlg::HandleEvent(UnknownDialogEvent* event) {
         if (g_TrackGame->network->isHost) {
             int allReady = 1;
             UIControl* start = FindControl("Start", 0);
-            for (i = 0; i < g_UnknownGlobal689df8; i++) {
-                if (!g_UnknownGlobal689dbc[i])
+            for (i = 0; i < g_LobbyRemotePlayerCount; i++) {
+                if (!g_LobbyRemoteReady[i])
                     allReady = 0;
             }
-            if (g_UnknownGlobal689df4 && allReady && g_UnknownGlobal689df8 >= 1)
+            if (g_LobbyLocalReady && allReady && g_LobbyRemotePlayerCount >= 1)
                 start->SetEnabled(1);
             else
                 start->SetEnabled(0);
             lobbySlots.SetSlot(me, g_TrackGame->mode.maxAIBikes);
             SendSettings();
         }
-        state.ready = g_UnknownGlobal689df4;
+        state.ready = g_LobbyLocalReady;
         COPY_TEXT(state.bikeModelName, g_TrackGame->mode.racerChoice.bikeModel, 0x40);
         COPY_TEXT(state.bikeName, g_TrackGame->mode.racerChoice.bikeName, 0x40);
         COPY_TEXT(state.riderName, g_TrackGame->mode.racerChoice.riderName, 0x40);
@@ -1228,9 +1228,9 @@ void MultiPlayerDlg::ReportReadyCleared(int reason) {
     switch (reason) {
     case 1:
         g_TrackGame->LoadResourceString(0x146a, text, 0x80);
-        sprintf(value, text, g_UnknownGlobal56cb6c[g_TrackGame->mode.raceSettings.maxBikeClass]);
+        sprintf(value, text, g_BikeClassEngineSizes[g_TrackGame->mode.raceSettings.maxBikeClass]);
         if (g_TrackGame->mode.lobbyPresetFlags)
-            sprintf(value, text, g_UnknownGlobal56cb6c[2]);
+            sprintf(value, text, g_BikeClassEngineSizes[2]);
         g_TrackGame->LoadResourceString(0x14d1, text, 0x80);
         sprintf(message, text, value);
         break;
@@ -1252,7 +1252,7 @@ void MultiPlayerDlg::ReportReadyCleared(int reason) {
     }
     }
     AddChatLine(-1, message);
-    g_UnknownGlobal689df4 = 0;
+    g_LobbyLocalReady = 0;
     if (reason == 2) {
         g_TrackGame->LoadResourceString(0x14d4, text, 0x80);
         sprintf(value, text, g_TrackGame->mode.profileName);
@@ -1338,16 +1338,16 @@ void MultiPlayerDlg::FollowTrackChange() {
         g_TrackGame->sceneObject->ReadSceneName(sceneName, g_TrackGame->mode.raceSettings.trackName, 0,
                                                                   "scn", &index, &value);
     if (!_stricmp("no name", sceneName)) {
-        g_UnknownGlobal689dfc = 2;
-        if (g_UnknownGlobal689df4)
+        g_LobbyReadyBlockReason = 2;
+        if (g_LobbyLocalReady)
             ReportReadyCleared(2);
         g_TrackGame->LoadResourceString(0x143b, sceneName, 0x80);
     } else if (value != g_TrackGame->mode.raceSettings.trackFileSize) {
-        g_UnknownGlobal689dfc = 3;
-        if (g_UnknownGlobal689df4)
+        g_LobbyReadyBlockReason = 3;
+        if (g_LobbyLocalReady)
             ReportReadyCleared(3);
     } else {
-        g_UnknownGlobal689dfc = 0;
+        g_LobbyReadyBlockReason = 0;
     }
     if (eventPage)
         eventPage->ShowTrackPicture();
@@ -1642,7 +1642,7 @@ void MPEventDlg::EnableChangeableControls() {
 void MPEventDlg::ApplyEventType() {
     char text[0x100];
     if (g_TrackGame->network->isHost)
-        g_UnknownGlobal689dfc = 0;
+        g_LobbyReadyBlockReason = 0;
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
     int type = list->GetRowData(-1);
     int& eventType = g_TrackGame->mode.raceSettings.eventType;
@@ -1830,24 +1830,24 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
         list->AddRow("125cc 2-stroke", 0, 0);
-        list->AddRow("250cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[1]), 0);
-        list->AddRow("400cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[2]), 0);
-        list->AddRow("500cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[3]), 0);
-        list->AddRow("600cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[4]), 0);
+        list->AddRow("250cc 2-stroke", BikeClassOf(g_BikeClassEngineSizes[1]), 0);
+        list->AddRow("400cc 4-stroke", BikeClassOf(g_BikeClassEngineSizes[2]), 0);
+        list->AddRow("500cc 2-stroke", BikeClassOf(g_BikeClassEngineSizes[3]), 0);
+        list->AddRow("600cc 4-stroke", BikeClassOf(g_BikeClassEngineSizes[4]), 0);
         list->SelectRowByData(
-            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize));
+            BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize));
         g_TrackGame->LoadResourceString(0x146a, format, 0x80);
         list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->RemoveAllRows();
-        sprintf(text, format, g_UnknownGlobal56cb6c[0]);
+        sprintf(text, format, g_BikeClassEngineSizes[0]);
         list->AddRow(text, 0, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[1]);
+        sprintf(text, format, g_BikeClassEngineSizes[1]);
         list->AddRow(text, 1, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[2]);
+        sprintf(text, format, g_BikeClassEngineSizes[2]);
         list->AddRow(text, 2, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[3]);
+        sprintf(text, format, g_BikeClassEngineSizes[3]);
         list->AddRow(text, 3, 0);
-        sprintf(text, format, g_UnknownGlobal56cb6c[4]);
+        sprintf(text, format, g_BikeClassEngineSizes[4]);
         list->AddRow(text, 4, 0);
         list->SelectRow(g_TrackGame->mode.raceSettings.maxBikeClass);
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
@@ -1877,7 +1877,7 @@ void MPBikeRiderDlg::HandleEvent(UnknownDialogEvent* event) {
         srand(ReadClock());
         if (dialogBackground)
             previewRegion = dialogBackground->AllocRegion(1);
-        if ((g_TrackGame->mode.lobbyPresetFlags & 4) || g_UnknownGlobal689df4) {
+        if ((g_TrackGame->mode.lobbyPresetFlags & 4) || g_LobbyLocalReady) {
             FindControl("ButWrench", 0)->SetEnabled(0);
             FindControl("DDLBikes", 6)->SetEnabled(0);
             FindControl("BikeLeft", 0)->Show(0, 1);
@@ -1988,9 +1988,9 @@ void MPBikeRiderDlg::ApplyLargestOpponentClass() {
     if (!g_TrackGame->network->isHost) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
         list->SelectRowByData(g_TrackGame->mode.raceSettings.maxBikeClass);
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
+        if (BikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.garageOptions)->engineSize) >
                 g_TrackGame->mode.raceSettings.maxBikeClass &&
-            g_UnknownGlobal689df4)
+            g_LobbyLocalReady)
             static_cast<MultiPlayerDlg*>(parentDialog)->ReportReadyCleared(1);
     }
 }
@@ -2045,7 +2045,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
             FindControl("TxtEngineSize", 0)->Show(1, 1);
             if (dialogBackground)
                 dialogBackground->MarkAllDirty();
-            if (g_UnknownGlobal689df4)
+            if (g_LobbyLocalReady)
                 engine->SetEnabled(0);
         }
     } else {
@@ -2061,7 +2061,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
-        UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56cb6c[size];
+        UNKNOWN_GARAGE_SETTINGS->engineSize = g_BikeClassEngineSizes[size];
         UNKNOWN_GARAGE_SETTINGS->fourStroke = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
         ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[g_TrackGame->mode.racerChoice.bikeIndex]
@@ -2072,7 +2072,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         int row = bikes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].engineSize;
         UNKNOWN_GARAGE_SETTINGS->fourStroke = ((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[row].fourStroke;
-        int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
+        int bikeClass = BikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));

@@ -15,7 +15,7 @@
   "??_ECollisionCharacter@@UAEPAXI@Z": "0x00431d20",
   "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
   "?D3DIMVirtualSlot11@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z": "0x00445680",
-  "?Fn_00435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?Tick@CollisionCharacter@@UAEHM@Z": "0x00431b30",
   "?Tick@GameObject@@UAEHM@Z": "0x004693d0",
   "?GameObjectVirtualSlot14@CollisionCharacter@@UAEHXZ": "0x00431cf0",

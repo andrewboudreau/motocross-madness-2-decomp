@@ -246,7 +246,7 @@ int ControlInterface::DispatchInput(int value) {
 }
 
 // 0x0043d080
-int UnknownFunction43d080(int bits, int index, int byteIndex) {
+int DecodeTextureSize(int bits, int index, int byteIndex) {
     switch (bits >> (index * 2) >> (byteIndex * 8) & 3) {
     case 0:
         return 0x200;

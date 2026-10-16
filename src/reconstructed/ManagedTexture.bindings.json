@@ -16,7 +16,7 @@
   "?UpdatePageCoords@ManagedTexture@@QAEXH@Z": "0x00510610",
   "?Reregister@ManagedTexture@@QAEXXZ": "0x00510670",
   "?ReleasePage@ManagedTexture@@QAEXXZ": "0x00510700",
-  "?UnknownFunction510760@ManagedTexture@@QAEHHHH@Z": "0x00510760",
+  "?CreateOwnSurface@ManagedTexture@@QAEHHHH@Z": "0x00510760",
   "?RemapTexCoords@ManagedTexture@@QAEXPAM0000HI@Z": "0x00510780",
   "?RecordUse@ManagedTexture@@QAEXM@Z": "0x00510820",
   "?RemapTexCoordsIfMoved@ManagedTexture@@QAEHPAM0000HI@Z": "0x00510910",

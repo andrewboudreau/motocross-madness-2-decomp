@@ -82,7 +82,7 @@ class UnknownWreckerCollisionObject : public UnknownWreckerQuadTreeObject, publi
 public:
     // 0x00439410 (thiscall, ret 4): appends `owner` to the ignore list.
     void AddIgnoredOwner(UnknownWreckerCollisionObject* owner);
-    void UnknownFunction435fe0();                      // 0x00435fe0
+    void SnapPlacement();                      // 0x00435fe0
     // The per-step update (GameObject slot 11 with the step length, see
     // UnknownWreckerSteppable) on the GraphicsTest subobject at +0xc.
     // Spelled with the explicit offset: a pointer conversion to the base

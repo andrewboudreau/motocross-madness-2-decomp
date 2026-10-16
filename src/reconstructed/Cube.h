@@ -34,7 +34,7 @@ struct UnknownTexturePalette;
 // cdecl 0x0043d080 (ControlInterface.h declares the same function): maps
 // the 2-bit field `index` of byte `byteIndex` of `bits` to 0x200, 0x40,
 // 0x80 or 0x100. Cube uses it as a face texture's size.
-int UnknownFunction43d080(int bits, int index, int byteIndex);
+int DecodeTextureSize(int bits, int index, int byteIndex);
 
 // The texture context 0x0043d460 receives: the manager the textures belong
 // to and, when set, the group that takes ManagedTextures. The same pointer

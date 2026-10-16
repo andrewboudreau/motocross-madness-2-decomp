@@ -147,7 +147,7 @@ public:
     void Configure(void* a, int b, int c, int d);  // 0x004320f0
     void SetHullShape(D3DIMSoultreeObject* model, int a, int b, int c, int d); // 0x00432720
     void LoadShape(D3DIMSoultreeObject* model, const char* path); // 0x00432800: from a ".col" file
-    void UnknownFunction435fe0();                      // 0x00435fe0
+    void SnapPlacement();                      // 0x00435fe0
 
     unsigned char field_0x38[0x60 - 0x38];
     D3DIMSoultreeObject* field_0x60;
@@ -391,7 +391,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                 else
                     staticModels->casters[i].collisionObject->LoadShape(
                         (D3DIMSoultreeObject*)staticModels->casters[i].model, colPath);
-                staticModels->casters[i].collisionObject->UnknownFunction435fe0();
+                staticModels->casters[i].collisionObject->SnapPlacement();
                 ((D3DIMSoultreeObject*)staticModels->casters[i].model)
                     ->AppendChild(staticModels->casters[i].collisionObject, -1);
                 g_MemTagStack->Push("Scene");

@@ -24,9 +24,9 @@
 
 #define Target() ((PCRenderTarget*)renderContext)
 
-extern CameraRect g_UnknownGlobal5777b8;
-extern CameraRect g_UnknownGlobal577790;
-extern CameraRect g_UnknownGlobal577808;
+extern CameraRect g_BackgroundImageRect;
+extern CameraRect g_DrawImageClipRect;
+extern CameraRect g_DrawImageSourceRect;
 // 0x005777a0 / 0x005777a8: 0x004049d0's region index and clipped rectangle.
 int g_UnknownGlobal5777a0;
 CameraRect g_UnknownGlobal5777a8;

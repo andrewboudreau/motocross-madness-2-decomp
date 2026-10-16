@@ -12,7 +12,7 @@
 
 extern "C" const GUID DPSPGUID_TCPIP;         // 0x005567e0
 
-UnknownSerialSettings g_SerialSettings;
+SerialSettings g_SerialSettings;
 int g_SessionListCount;
 
 // 0x0056eadc: the baud rates SerialPopupDlg offers ("ButBaud").

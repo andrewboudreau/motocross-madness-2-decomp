@@ -9,7 +9,7 @@ Names are provisional.
   initialiser `0x0049e230` ("sphere.slt", jump table in the extent), the
   manager constructor/destructors, add, change counter, find-by-type
   `0x004a0190` and the cdecl vector negation `0x0049f180`. 26 cases.
-  The lighting routine `0x0049e4a0` and its three workers (`0x0049e6b0`
+  The lighting routine `0x0049e4a0` (`LightManager::LightVertices`) and its three workers (`0x0049e6b0`
   to `0x0049f1be`, `0x0049f1c0` to `0x0049f8b5`, `0x0049f8d0` to
   `0x004a0150`) are out of scope: each has an ebp frame and rounds nine
   times with an inlined `__asm` helper (`fstp [tmp]; mov [p], eax; fld

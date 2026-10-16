@@ -51,7 +51,7 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* a1, const Vec3* a
         sceneNode->GetPositionIn(0, &centerOfMass);
     }
     ApplyRestPose();
-    collisionObject->Fn_00435fe0();
+    collisionObject->SnapPlacement();
     respawnPending = 0;
     justReset = 1;
     attachmentResetPending = 1;

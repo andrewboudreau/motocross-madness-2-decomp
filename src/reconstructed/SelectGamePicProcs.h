@@ -16,21 +16,26 @@ class MultiPlayerDlg;
 class PlayerInfoType;
 
 // The seven remote player records at 0x00689d08 (+0x04 the DirectPlay id,
-// +0x08 the name). Defined in SelectGamePicProcs.cpp with its initializers
+// +0x08 the name): MultiPlayerDlg's timer refills them from the session's
+// players other than the local one and shows them as "NamePlayer2".. .
+// Defined in SelectGamePicProcs.cpp with its initializers
 // 0x004f1740..0x004f1793 (see docs/INITIALIZERS.md).
-extern PlayerInfoType g_UnknownGlobal689d08[7];
+extern PlayerInfoType g_LobbyRemotePlayers[7];
 
-// 0x00689dbc and 0x00689dd8: per remote player, ready and whether the
-// ready line was shown.
-extern int g_UnknownGlobal689dbc[7];
-extern int g_UnknownGlobal689dd8[7];
+// 0x00689dbc and 0x00689dd8: per remote player, ready ("ButRdyPlayer%d"
+// turns white) and whether the ready chat line (string 0x14d5) was shown.
+extern int g_LobbyRemoteReady[7];
+extern int g_LobbyRemoteReadyAnnounced[7];
 
 // 0x00689df4: set while the local player is ready.
-extern int g_UnknownGlobal689df4;
+extern int g_LobbyLocalReady;
 
-// 0x00689df8 and 0x00689dfc (SelectGamePicProcs.cpp's .bss).
-extern int g_UnknownGlobal689df8;
-extern int g_UnknownGlobal689dfc;
+// 0x00689df8: how many remote players the timer stored in
+// g_LobbyRemotePlayers. 0x00689dfc: 0 while the local player may toggle
+// "ButRdyUser"; 2 (no such track) and 3 (track file size differs) are the
+// track check's ReportReadyCleared reasons, and a client starts at 1.
+extern int g_LobbyRemotePlayerCount;
+extern int g_LobbyReadyBlockReason;
 
 // 0x004bfa80: the millisecond clock.
 unsigned int ReadClock();

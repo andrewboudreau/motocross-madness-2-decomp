@@ -10,17 +10,17 @@
 #define Target() ((PCRenderTarget*)renderContext)
 
 // 0x005777b8: the image's own rectangle (slot 15).
-CameraRect g_UnknownGlobal5777b8;
+CameraRect g_BackgroundImageRect;
 // 0x00577790 / 0x00577808: a dirty region clipped to the image and the
 // matching source rectangle (0x00404480).
-CameraRect g_UnknownGlobal577790;
-CameraRect g_UnknownGlobal577808;
+CameraRect g_DrawImageClipRect;
+CameraRect g_DrawImageSourceRect;
 // 0x005777d8 / 0x005777c8: the same for 0x00404700, whose source rectangle
 // goes to PCTextureMap 0x004c7b40.
-CameraRect g_UnknownGlobal5777d8;
-UnknownRect g_UnknownGlobal5777c8;
+CameraRect g_DrawImageRectClipRect;
+UnknownRect g_DrawImageRectSourceRect;
 // 0x005777e8: the drawn rectangle 0x00404700 records for its region.
-CameraRect g_UnknownGlobal5777e8;
+CameraRect g_DrawImageRectDrawnRect;
 
 // 0x00403d50
 BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
@@ -105,11 +105,11 @@ BackgroundImage::~BackgroundImage() {
 // 0x00403ec0
 int BackgroundImage::RenderPost3D() {
     if (field_0x2c && imageVisible) {
-        g_UnknownGlobal5777b8.left = 0;
-        g_UnknownGlobal5777b8.top = 0;
-        g_UnknownGlobal5777b8.right = field_0x2c->textureWidth;
-        g_UnknownGlobal5777b8.bottom = field_0x2c->textureHeight;
-        DrawImage(field_0x2c, &g_UnknownGlobal5777b8, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
+        g_BackgroundImageRect.left = 0;
+        g_BackgroundImageRect.top = 0;
+        g_BackgroundImageRect.right = field_0x2c->textureWidth;
+        g_BackgroundImageRect.bottom = field_0x2c->textureHeight;
+        DrawImage(field_0x2c, &g_BackgroundImageRect, 0, 0x1000000, imageRegion, field_0x5c, &fullRedrawsOwed,
                               0);
         field_0x5c = 1;
     }
@@ -272,24 +272,24 @@ int BackgroundImage::DrawImage(PCTextureMap* image, CameraRect* rect, void* sour
                 for (int i = 0; i < regionCapacity; i++) {
                     if (regionTable[i].lastFrameCount != Target()->frameCount)
                         continue;
-                    g_UnknownGlobal577790.left =
+                    g_DrawImageClipRect.left =
                         CurrentRegionRect(i).left > rect->left ? CurrentRegionRect(i).left : rect->left;
-                    g_UnknownGlobal577790.right =
+                    g_DrawImageClipRect.right =
                         CurrentRegionRect(i).right < rect->right ? CurrentRegionRect(i).right : rect->right;
-                    g_UnknownGlobal577790.top =
+                    g_DrawImageClipRect.top =
                         CurrentRegionRect(i).top > rect->top ? CurrentRegionRect(i).top : rect->top;
-                    g_UnknownGlobal577790.bottom =
+                    g_DrawImageClipRect.bottom =
                         CurrentRegionRect(i).bottom < rect->bottom ? CurrentRegionRect(i).bottom : rect->bottom;
-                    if (g_UnknownGlobal577790.left < g_UnknownGlobal577790.right &&
-                        g_UnknownGlobal577790.top < g_UnknownGlobal577790.bottom) {
+                    if (g_DrawImageClipRect.left < g_DrawImageClipRect.right &&
+                        g_DrawImageClipRect.top < g_DrawImageClipRect.bottom) {
                         ReleaseDc();
-                        g_UnknownGlobal577808.left = g_UnknownGlobal577790.left - rect->left;
-                        g_UnknownGlobal577808.right = g_UnknownGlobal577790.right - rect->left;
-                        g_UnknownGlobal577808.top = g_UnknownGlobal577790.top - rect->top;
-                        g_UnknownGlobal577808.bottom = g_UnknownGlobal577790.bottom - rect->top;
-                        image->BlitTo(&g_UnknownGlobal577790, Target()->renderSurface,
-                                                     &g_UnknownGlobal577808, flags, skip);
-                        image->BlitTo(&g_UnknownGlobal577790, offscreenCopy, &g_UnknownGlobal577808,
+                        g_DrawImageSourceRect.left = g_DrawImageClipRect.left - rect->left;
+                        g_DrawImageSourceRect.right = g_DrawImageClipRect.right - rect->left;
+                        g_DrawImageSourceRect.top = g_DrawImageClipRect.top - rect->top;
+                        g_DrawImageSourceRect.bottom = g_DrawImageClipRect.bottom - rect->top;
+                        image->BlitTo(&g_DrawImageClipRect, Target()->renderSurface,
+                                                     &g_DrawImageSourceRect, flags, skip);
+                        image->BlitTo(&g_DrawImageClipRect, offscreenCopy, &g_DrawImageSourceRect,
                                                      flags, skip);
                     }
                 }
@@ -326,23 +326,23 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
                 for (int i = 0; i < regionCapacity; i++) {
                     if (regionTable[i].lastFrameCount != Target()->frameCount)
                         continue;
-                    g_UnknownGlobal5777d8.left =
+                    g_DrawImageRectClipRect.left =
                         CurrentRegionRect(i).left > rect->left ? CurrentRegionRect(i).left : rect->left;
-                    g_UnknownGlobal5777d8.right =
+                    g_DrawImageRectClipRect.right =
                         CurrentRegionRect(i).right < rect->right ? CurrentRegionRect(i).right : rect->right;
-                    g_UnknownGlobal5777d8.top =
+                    g_DrawImageRectClipRect.top =
                         CurrentRegionRect(i).top > rect->top ? CurrentRegionRect(i).top : rect->top;
-                    g_UnknownGlobal5777d8.bottom =
+                    g_DrawImageRectClipRect.bottom =
                         CurrentRegionRect(i).bottom < rect->bottom ? CurrentRegionRect(i).bottom : rect->bottom;
-                    if (g_UnknownGlobal5777d8.left < g_UnknownGlobal5777d8.right &&
-                        g_UnknownGlobal5777d8.top < g_UnknownGlobal5777d8.bottom) {
+                    if (g_DrawImageRectClipRect.left < g_DrawImageRectClipRect.right &&
+                        g_DrawImageRectClipRect.top < g_DrawImageRectClipRect.bottom) {
                         ReleaseDc();
-                        g_UnknownGlobal5777c8.left = g_UnknownGlobal5777d8.left - rect->left;
-                        g_UnknownGlobal5777c8.right = g_UnknownGlobal5777d8.right - rect->left;
-                        g_UnknownGlobal5777c8.top = g_UnknownGlobal5777d8.top - rect->top;
-                        g_UnknownGlobal5777c8.bottom = g_UnknownGlobal5777d8.bottom - rect->top;
-                        image->CopyRectTo(x, y, Target()->renderSurface, &g_UnknownGlobal5777c8, flags, table);
-                        image->CopyRectTo(x, y, offscreenCopy, &g_UnknownGlobal5777c8, flags, table);
+                        g_DrawImageRectSourceRect.left = g_DrawImageRectClipRect.left - rect->left;
+                        g_DrawImageRectSourceRect.right = g_DrawImageRectClipRect.right - rect->left;
+                        g_DrawImageRectSourceRect.top = g_DrawImageRectClipRect.top - rect->top;
+                        g_DrawImageRectSourceRect.bottom = g_DrawImageRectClipRect.bottom - rect->top;
+                        image->CopyRectTo(x, y, Target()->renderSurface, &g_DrawImageRectSourceRect, flags, table);
+                        image->CopyRectTo(x, y, offscreenCopy, &g_DrawImageRectSourceRect, flags, table);
                     }
                 }
             }
@@ -358,11 +358,11 @@ int BackgroundImage::DrawImageRect(PCTextureMap* image, int x, int y, CameraRect
     ReleaseDc();
     image->CopyRectTo(x, y, Target()->renderSurface, (UnknownRect*)rect, flags, table);
     if (index >= 0) {
-        g_UnknownGlobal5777e8.left = x;
-        g_UnknownGlobal5777e8.right = rect->right - rect->left + x;
-        g_UnknownGlobal5777e8.top = y;
-        g_UnknownGlobal5777e8.bottom = rect->bottom - rect->top + y;
-        SetRegionRect(index, &g_UnknownGlobal5777e8);
+        g_DrawImageRectDrawnRect.left = x;
+        g_DrawImageRectDrawnRect.right = rect->right - rect->left + x;
+        g_DrawImageRectDrawnRect.top = y;
+        g_DrawImageRectDrawnRect.bottom = rect->bottom - rect->top + y;
+        SetRegionRect(index, &g_DrawImageRectDrawnRect);
     }
     *frames = Target()->frameModulus;
     return 1;

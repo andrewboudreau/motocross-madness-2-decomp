@@ -79,13 +79,16 @@ public:
     void AddLight(LightEmitter* light);      // 0x0049e470: adds a light
     void MarkChanged();                         // 0x0049e490: counts a change
     LightEmitter* FindLightOfType(int type);        // 0x004a0190: first light of `type`
-    // 0x0049e4a0 lights `count` vertices (Griddraw.h's GridVertexSink is
-    // this function seen from the terrain). Not reconstructed: it and its
+    // 0x0049e4a0 lights `count` vertices: it grows the per-vertex
+    // red/green/blue arrays, picks a worker by light count and type, then
+    // scales the optional colour array by the results (Griddraw.h's
+    // GridVertexSink is this function seen from the terrain). Not
+    // reconstructed: it and its
     // three workers 0x0049e6b0, 0x0049f1c0 and 0x0049f8d0 (ebp frames) round
     // with an inlined `fld [tmp]; mov eax, [p]; fistp [eax]` helper that VC6
     // only emits for inline assembly.
-    void UnknownFunction49e4a0(void* matrix, int count, void* vertices, void* buffer,
-                               int stride, void* colors);
+    void LightVertices(void* matrix, int count, void* vertices, void* buffer,
+                       int stride, void* colors);
 
     int lightCount;                         // light count
     LightEmitter* lights[50];               // +0x30

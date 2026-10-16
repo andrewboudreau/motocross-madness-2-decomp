@@ -174,9 +174,9 @@ int Game::CreateObjects(char*) {
         debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->Setup(renderTarget, textureManager, 8, 3, 3);
         if (debugOverlay) {
             rootObject->AppendChild(debugOverlay, -1);
-            if (g_UnknownGlobal56c470->field_0x2c) {
-                rootObject->AppendChild(g_UnknownGlobal56c470, -1);
-                g_UnknownGlobal56c470->Enable();
+            if (g_HiResMeter->counterUsable) {
+                rootObject->AppendChild(g_HiResMeter, -1);
+                g_HiResMeter->Enable();
             }
         }
         g_MemTagStack->Pop(category);
@@ -396,8 +396,8 @@ Game::~Game() {
 // the ControlInterface.
 int Game::Shutdown() {
     shuttingDown = 1;
-    if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
-        g_UnknownGlobal56c470->Unlink();
+    if (g_HiResMeter && debugOverlay && g_HiResMeter->counterUsable)
+        g_HiResMeter->Unlink();
     g_UnknownStatic65b478.DeleteFonts();
     if (rootObject) {
         rootObject->Release();

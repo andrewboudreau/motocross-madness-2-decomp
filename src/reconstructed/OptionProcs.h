@@ -95,20 +95,22 @@ extern UnknownOptControlSettings g_EditedControlSettings;
 extern UnknownOptGarageSettings g_EditedGarageSettings;
 extern char g_EditedMessages[10][128]; // Message0..9 (TrackGame+0x19d4)
 
-// 0x0056cb6c: the engine sizes (cc) of the five bike classes (initialised
-// data shared with other files; read by the inline class lookup below).
-extern int g_UnknownGlobal56cb6c[5];
+// 0x0056cb6c: the engine sizes (cc) of the five bike classes, 125, 250,
+// 400, 500 and 600 in retail .data (the "125cc 2-stroke" .. "600cc
+// 4-stroke" rows); initialised data shared with other files and read by
+// the inline class lookup below.
+extern int g_BikeClassEngineSizes[5];
 
 // The bike class of an engine size. Inline: the same loop over
 // 0x0056cb6c appears in many files (0x00419bfe, 0x0044f00c, ...).
-inline int UnknownBikeClassOf(int cc)
+inline int BikeClassOf(int cc)
 {
-    if (cc <= g_UnknownGlobal56cb6c[0])
+    if (cc <= g_BikeClassEngineSizes[0])
         return 0;
-    if (cc >= g_UnknownGlobal56cb6c[4])
+    if (cc >= g_BikeClassEngineSizes[4])
         return 4;
     for (int i = 1; i < 4; i++) {
-        if (cc > g_UnknownGlobal56cb6c[i - 1] && cc < g_UnknownGlobal56cb6c[i + 1])
+        if (cc > g_BikeClassEngineSizes[i - 1] && cc < g_BikeClassEngineSizes[i + 1])
             return i;
     }
     return 1;

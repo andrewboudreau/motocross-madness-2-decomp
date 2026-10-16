@@ -217,7 +217,8 @@ controls, a keyboard key, a button for each of 8 joysticks and a mouse
 button (-1 when unmapped). It is cleared by the constructor, with
 range-checked setters and getters. `0x0043caa0` matches an event against a
 control and device kind (with a keyboard modifier test), and `0x0043d080`
-maps a 2-bit field to 0x200/0x40/0x80/0x100. All of these are strict exact.
+(`DecodeTextureSize`, used by cube.cpp and cubedraw.cpp) maps a 2-bit field
+to a texture size of 0x200/0x40/0x80/0x100. All of these are strict exact.
 
 The 0x3c-byte, non-polymorphic `UnknownControlBinding` helpers sit just
 before it (`0x0043cc40`–`0x0043cde0`). They cover the default and full

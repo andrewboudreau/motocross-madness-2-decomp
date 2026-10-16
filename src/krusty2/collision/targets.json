@@ -332,7 +332,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00435fe0@CollisionObject",
+    "candidate_symbol_contains": "SnapPlacement@CollisionObject",
     "target_va": "0x00435fe0",
     "target_size": 17,
     "expect": "exact",

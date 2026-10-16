@@ -9,9 +9,11 @@
 
 class Track;
 
-// 0x00689c30 and 0x00689c48: debug arrows of the next gate (BikeRace.h
-// declares them for its slot 14), set by 0x004e59c0.
-extern Vector3 g_UnknownGlobal689c30[2], g_UnknownGlobal689c48[2];
+// 0x00689c30 and 0x00689c48: debug lines of the next gate (BikeRace.h
+// declares them for its slot 14), set by 0x004e59c0: the diagonal of its
+// box (center - halfExtents to + 2 * halfExtents) and its direction
+// (center to + 10 * direction), both raised by 3.
+extern Vector3 g_GateDebugBoxLine[2], g_GateDebugDirectionLine[2];
 // 0x00689c6c: cleared when the list is built; set once the view's own racer
 // has finished.
 extern int g_ViewRacerFinished;

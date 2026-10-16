@@ -685,28 +685,28 @@ int BikeRace::Tick(float frameTime) {
                                                                         model->currentDetailLevel + 1, model->detailLevelCount);
                 g_TrackGame->debugOverlay->Print(lodDebugPage, "Number of Faces = %d", faces);
                 if ((signed char)targetKind < 0) {
-                    if (g_UnknownGlobal567a88 > 5) {
-                        if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
-                            g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
-                            g_UnknownGlobal567a88 = 2;
+                    if (g_LodDebugSelectedRow > 5) {
+                        if ((pass == 1 && g_LodDebugSelectedRow - 7 > model->detailLevelCount) || g_LodDebugSelectedRow < 2) {
+                            g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 0);
+                            g_LodDebugSelectedRow = 2;
                         }
-                    } else if ((pass == 0 && g_UnknownGlobal567a88 > model->detailLevelCount) || g_UnknownGlobal567a88 < 2) {
-                        g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
-                        g_UnknownGlobal567a88 = 9;
+                    } else if ((pass == 0 && g_LodDebugSelectedRow > model->detailLevelCount) || g_LodDebugSelectedRow < 2) {
+                        g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 0);
+                        g_LodDebugSelectedRow = 9;
                     }
-                } else if (g_UnknownGlobal567a88 > model->detailLevelCount || g_UnknownGlobal567a88 < 2) {
-                    g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
-                    g_UnknownGlobal567a88 = 2;
+                } else if (g_LodDebugSelectedRow > model->detailLevelCount || g_LodDebugSelectedRow < 2) {
+                    g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 0);
+                    g_LodDebugSelectedRow = 2;
                 }
                 if (model->detailLevelCount > 1) {
                     int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
                     int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);
-                    int row = g_UnknownGlobal567a88 - 1;
+                    int row = g_LodDebugSelectedRow - 1;
                     if (down || up) {
                         if ((signed char)targetKind < 0) {
-                            if (g_UnknownGlobal567a88 > 5) {
+                            if (g_LodDebugSelectedRow > 5) {
                                 if (pass == 1) {
-                                    row = g_UnknownGlobal567a88 - 8;
+                                    row = g_LodDebugSelectedRow - 8;
                                 } else {
                                     row = 99;
                                 }
@@ -765,7 +765,7 @@ int BikeRace::Tick(float frameTime) {
                         lodDebugPage, "AutoLOD#2 %.2f", model->detailLevelCount > 3 ? model->detailDistances[2] : 0.0f);
                     g_TrackGame->debugOverlay->Print(
                         lodDebugPage, "AutoLOD#3 %.2f", model->detailLevelCount > 4 ? model->detailDistances[3] : 0.0f);
-                    g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_UnknownGlobal567a88 + 1, 1);
+                    g_TrackGame->debugOverlay->SetRowHighlight(lodDebugPage, g_LodDebugSelectedRow + 1, 1);
                 }
                 if ((signed char)targetKind >= 0) {
                     break;
@@ -1036,16 +1036,16 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
                     }
                 } else {
                     g_TrackGame->debugOverlay->SetRowHighlight(
-                        lodDebugPage, g_UnknownGlobal567a88 + 1, 0);
-                    g_UnknownGlobal567a88++;
+                        lodDebugPage, g_LodDebugSelectedRow + 1, 0);
+                    g_LodDebugSelectedRow++;
                     if ((signed char)targetKind < 0) {
-                        if (g_UnknownGlobal567a88 > 12) {
-                            g_UnknownGlobal567a88 = 2;
-                        } else if (g_UnknownGlobal567a88 > 5 && g_UnknownGlobal567a88 < 9) {
-                            g_UnknownGlobal567a88 = 9;
+                        if (g_LodDebugSelectedRow > 12) {
+                            g_LodDebugSelectedRow = 2;
+                        } else if (g_LodDebugSelectedRow > 5 && g_LodDebugSelectedRow < 9) {
+                            g_LodDebugSelectedRow = 9;
                         }
-                    } else if (g_UnknownGlobal567a88 > 5) {
-                        g_UnknownGlobal567a88 = 2;
+                    } else if (g_LodDebugSelectedRow > 5) {
+                        g_LodDebugSelectedRow = 2;
                     }
                 }
             }
@@ -2011,9 +2011,9 @@ int BikeRace::UnknownVirtualSlot14() {
             }
             DrawLine(&g_UnknownGlobal577a18[0], &g_UnknownGlobal577a18[1]);
             SetDrawColor(0, 0, 0xff);
-            DrawLine(&g_UnknownGlobal689c30[0], &g_UnknownGlobal689c30[1]);
+            DrawLine(&g_GateDebugBoxLine[0], &g_GateDebugBoxLine[1]);
             SetDrawColor(0xff, 0, 0xff);
-            DrawLine(&g_UnknownGlobal689c48[0], &g_UnknownGlobal689c48[1]);
+            DrawLine(&g_GateDebugDirectionLine[0], &g_GateDebugDirectionLine[1]);
             SetDrawColor(0xff, 0, 0);
             DrawLine(&g_UnknownGlobal578dc0[0], &g_UnknownGlobal578dc0[1]);
         }

@@ -90,8 +90,9 @@ public:
 int TestInputEvent(int control, int kind, const UnknownControlEvent* event, int modifier);
 
 // cdecl 0x0043d080: maps the 2-bit field `index` of byte `byteIndex` of
-// `bits` to 0x200, 0x40, 0x80 or 0x100.
-int UnknownFunction43d080(int bits, int index, int byteIndex);
+// `bits` to 0x200, 0x40, 0x80 or 0x100, a texture size: Cube 0x0043d460
+// reads that many pixels squared and cubedraw 0x0043e179 takes 1/size.
+int DecodeTextureSize(int bits, int index, int byteIndex);
 
 // RTTI: ControlInterface (root; PCControlInterface derives from it). Slot 0
 // is the deleting destructor and slots 1-4 are _purecall. The global object

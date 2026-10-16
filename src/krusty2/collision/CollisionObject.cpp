@@ -524,8 +524,10 @@ void CollisionObject::UpdatePlacement()
         UpdateQuadtreeCell();
 }
 
-// 0x00435fe0: UpdatePlacement twice (callers use it after teleporting a body).
-void CollisionObject::Fn_00435fe0()
+// 0x00435fe0: UpdatePlacement twice. SetTransform moves the current body
+// transform into the previous one, so the second pass leaves no motion
+// between them (callers use it after teleporting a body).
+void CollisionObject::SnapPlacement()
 {
     UpdatePlacement();
     UpdatePlacement();

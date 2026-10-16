@@ -32,7 +32,7 @@
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
-  "?Fn_00435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
+  "?SnapPlacement@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",
   "?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z": "0x004fbd10",
   "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",

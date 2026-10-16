@@ -80,7 +80,7 @@ int ManagedTexture::CreateTextureSurface(int a, int b, int c) {
 }
 
 // 0x00510760
-int ManagedTexture::UnknownFunction510760(int a, int b, int c) {
+int ManagedTexture::CreateOwnSurface(int a, int b, int c) {
     return PCTextureMap::CreateTextureSurface(a, b, c);
 }
 

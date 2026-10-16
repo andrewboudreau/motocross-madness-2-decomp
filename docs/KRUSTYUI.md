@@ -70,7 +70,8 @@ Exact (43 functions, including the open-menu routine `OpenMenu` `0x00499b20`):
   `0x0049b470`. The destructor runs `0x004999b0`, then frees the
   DebugMalloc'd buffers at +0x48, +0x50, +0x58 and +0x60 (retail lines
   1306–1309);
-- `0x004999b0`: the shutdown step. It calls the cdecl `0x005053b0(0)`,
+- `0x004999b0`: the shutdown step. It calls the cdecl `SetTaskSwitchAllowed(0)` (`0x005053b0`,
+  KeyboardHook.cpp),
   calls the GUI's `0x00485d50` unless Game+0x2d5 bit 1 (shutdown) is set,
   and releases +0x464;
 - `0x0049b530`: tells the "ProgressBar" control of the +0x490 page 1;

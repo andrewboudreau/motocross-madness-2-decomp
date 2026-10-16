@@ -11,14 +11,14 @@
 // 0x006886d0). Each field is the selected state index of the control the
 // procedure binds to it; dlgprocs.cpp 0x00452af9 passes the record to
 // 0x004ae410, which converts it to DirectPlay serial values.
-struct UnknownSerialSettings {
+struct SerialSettings {
     int port;                                 // "ButPort"
     int baudRate;                             // "ButBaud"
     int stopBits;                             // "ButStop"
     int parity;                               // "ButParity"
     int flowControl;                          // "ButFlow"
 };
-extern UnknownSerialSettings g_SerialSettings;
+extern SerialSettings g_SerialSettings;
 
 // 0x006886cc: session count filled by NetworkInterface 0x004adff0.
 extern int g_SessionListCount;

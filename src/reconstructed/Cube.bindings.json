@@ -14,7 +14,7 @@
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@BaseObject@@UAEHXZ": "0x00405170",
-  "?UnknownFunction43d080@@YAHHHH@Z": "0x0043d080",
+  "?DecodeTextureSize@@YAHHHH@Z": "0x0043d080",
   "?SkipToSector@@YAXPAVUnknownTextureStream@@H@Z": "0x0043d0d0",
   "?Reset@Cube@@QAEXXZ": "0x0043d110",
   "?SetVectors@Cube@@QAEHPBUVector3@@00@Z": "0x0043d400",

@@ -833,8 +833,10 @@ public:
     void EnableByClassName(const char* name);
 };
 
-// The debug lines' row counter (0x00567a88).
-extern int g_UnknownGlobal567a88;
+// The highlighted row of the "Soultree LOD (%s)" debug page (0x00567a88):
+// SetRowHighlight marks row + 1, the arrow keys act on it and Enter (0x1c)
+// advances it, wrapping back to 2.
+extern int g_LodDebugSelectedRow;
 
 class BikeRace : public GraphicsTest {
 public:
@@ -1027,8 +1029,8 @@ extern Vector3 g_UnknownGlobal577a30[2];
 extern Vector3 g_UnknownGlobal577a48[2];
 extern Vector3 g_UnknownGlobal5779d8[2];
 extern Vector3 g_UnknownGlobal577a18[2];
-extern Vector3 g_UnknownGlobal689c30[2];
-extern Vector3 g_UnknownGlobal689c48[2];
+extern Vector3 g_GateDebugBoxLine[2];
+extern Vector3 g_GateDebugDirectionLine[2];
 extern Vector3 g_UnknownGlobal578dc0[2];
 
 // 0x004230e0 (cdecl; an UnknownRecorderCallback, its address is passed at
