@@ -251,7 +251,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
             entries[i].blue = colors[i * 3 + 2];
             entries[i].flags = 0;
         }
-        TerrainDirectDraw* directDraw = ((TerrainHost*)field_0x18)->display->directDraw;
+        TerrainDirectDraw* directDraw = ((TerrainHost*)renderContext)->display->directDraw;
         if (directDraw->CreatePalette(0x44, entries, &directDrawPalette, 0) != 0)
             goto fail;
     } else {
@@ -366,7 +366,7 @@ public:
     virtual void Slot28(); virtual void Slot29();
     virtual void SetWorldMatrix(const TerrainMatrix* m);                              // slot 30 (+0x78)
 };
-// The render target at GameObject::field_0x18 (PCRenderTarget; slot names as in
+// The render target at GameObject::renderContext (PCRenderTarget; slot names as in
 // D3DIMSoultreeShadow.cpp).
 class TerrainRenderTarget {
 public:
@@ -424,15 +424,15 @@ unsigned int ReadClock();                // 0x004bfa80
 // ValidateDevice probe with both textures bound when the first is unknown).  Then draws the
 // height field with the base texture and, depending on that choice, the detail texture in a
 // second stage or a second blended pass, restores the render states and prints the profile
-// page when the game's debug flag 4 is set.  Retail re-reads field_0x18 for every call
+// page when the game's debug flag 4 is set.  Retail re-reads renderContext for every call
 // (tier 1); with a cached local, or an inline accessor, VC6 does not share the tail of the
 // single-pass branch with the detail pass.
 int Terrain::GameObjectVirtualSlot14()
 {
     if (!g_terrainToggle718)
         return 1;
-    int transforms = ((TerrainRenderTarget*)field_0x18)->transformCount;
-    int triangles = ((TerrainRenderTarget*)field_0x18)->triangleCount;
+    int transforms = ((TerrainRenderTarget*)renderContext)->transformCount;
+    int triangles = ((TerrainRenderTarget*)renderContext)->triangleCount;
     int previousTag = g_MemTagStack->Push("Terrain");
     unsigned int start = ReadClock();
 
@@ -466,25 +466,25 @@ int Terrain::GameObjectVirtualSlot14()
                 canSinglePassDual = 0;
                 lowestQualityOverride = 0;
                 if (detailTexture) {
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 1);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 0);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 2, 2);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 3, 1);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 5, 2);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 2);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
-                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(0, ((TerrainSurfaceBase*)ownedObjects[0])->textureSurface);
-                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, detailTexture->textureSurface);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 1);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0xb, 0);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 2);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 2, 2);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 3, 1);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 5, 2);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 4, 2);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 0xd);
+                    ((TerrainRenderTarget*)renderContext)->device->SetTexture(0, ((TerrainSurfaceBase*)ownedObjects[0])->textureSurface);
+                    ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, detailTexture->textureSurface);
                     unsigned long passes = 0;
-                    ((TerrainRenderTarget*)field_0x18)->device->ValidateDevice(&passes);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 1);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 1);
-                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 1);
-                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, 0);
+                    ((TerrainRenderTarget*)renderContext)->device->ValidateDevice(&passes);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 0);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0xb, 1);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 1);
+                    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 4, 1);
+                    ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, 0);
                     g_terrainGame->SetRegistryInt(key, passes == 1);
                     if (passes == 1) {
                         canSinglePassDual = 1;
@@ -501,10 +501,10 @@ int Terrain::GameObjectVirtualSlot14()
     }
 
     int savedPerspective;
-    ((TerrainRenderTarget*)field_0x18)->GetRenderState(4, &savedPerspective);
+    ((TerrainRenderTarget*)renderContext)->GetRenderState(4, &savedPerspective);
     int savedShade;
-    ((TerrainRenderTarget*)field_0x18)->GetRenderState(9, &savedShade);
-    ((TerrainRenderTarget*)field_0x18)->camera->SetWorldMatrix(&transform);
+    ((TerrainRenderTarget*)renderContext)->GetRenderState(9, &savedShade);
+    ((TerrainRenderTarget*)renderContext)->camera->SetWorldMatrix(&transform);
     indicesDrawn = 0;
     verticesDrawn = 0;
     {
@@ -517,78 +517,78 @@ int Terrain::GameObjectVirtualSlot14()
     }
 
     if (!hasLightManager && !g_terrainQualityValue) {
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
     } else {
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
         if (g_terrainGame->softwareRendering)
-            ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, 1, 0);
+            ((TerrainRenderTarget*)renderContext)->SetRenderState(9, 1, 0);
         else
-            ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, 2, 0);
+            ((TerrainRenderTarget*)renderContext)->SetRenderState(9, 2, 0);
     }
-    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
+    ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
 
     if (lowestQualityOverride && detailTexture) {
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x10, g_terrainGame->magFilter);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x11, g_terrainGame->minFilter);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x12, g_terrainGame->mipFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x10, g_terrainGame->magFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x11, g_terrainGame->minFilter);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0x12, g_terrainGame->mipFilter);
         closeUpStateSet = 0;
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 1);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 0);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 2, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 3, 1);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 5, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 2);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
-        ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
-        ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, detailTexture->textureSurface);
-        if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)field_0x18), detailTexture))
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 1);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 0xb, 0);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 2, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 3, 1);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 5, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 4, 2);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 0xd);
+        ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
+        ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, detailTexture->textureSurface);
+        if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)renderContext), detailTexture))
             return 0;
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0xb, 0);
     } else {
         if (!g_terrainGame->softwareRendering && detailTexture && g_terrainQualityValue) {
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
-            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 1, 0);
-            heightField->DrawVisible(((TerrainRenderTarget*)field_0x18));
-            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
+            ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 1, 0);
+            heightField->DrawVisible(((TerrainRenderTarget*)renderContext));
+            ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
         } else {
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
-            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
-            heightField->DrawVisible(((TerrainRenderTarget*)field_0x18));
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 1);
+            ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1d, 0, 0);
+            heightField->DrawVisible(((TerrainRenderTarget*)renderContext));
         }
         if (!g_terrainGame->softwareRendering && detailTexture && g_terrainQualityValue) {
             detailTexture->SetAsTexture();
-            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, 2);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, 1);
-            if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)field_0x18), detailTexture))
+            ((TerrainRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 4, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, 2);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, 1);
+            if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)renderContext), detailTexture))
                 return 0;
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
-            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
+            ((TerrainRenderTarget*)renderContext)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
         }
     }
-    ((TerrainRenderTarget*)field_0x18)->SetRenderState(4, savedPerspective, 0);
-    ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, savedShade, 0);
+    ((TerrainRenderTarget*)renderContext)->SetRenderState(4, savedPerspective, 0);
+    ((TerrainRenderTarget*)renderContext)->SetRenderState(9, savedShade, 0);
     indicesDrawn /= 3;
     GameObject::GameObjectVirtualSlot14();
     g_UnknownGlobal68a31c = ReadClock() - start;
@@ -642,9 +642,9 @@ int Terrain::GameObjectVirtualSlot14()
         g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total%           3d (%d)",
                                                       g_UnknownGlobal68a320, g_terrainPeak9.Peak());
         g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total Transforms %d",
-                                                      ((TerrainRenderTarget*)field_0x18)->transformCount - transforms);
+                                                      ((TerrainRenderTarget*)renderContext)->transformCount - transforms);
         g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total Triangles  %d",
-                                                      ((TerrainRenderTarget*)field_0x18)->triangleCount - triangles);
+                                                      ((TerrainRenderTarget*)renderContext)->triangleCount - triangles);
         g_terrainGame->overlay->Print(g_UnknownGlobal574714, "CanSinglePassDual %s",
                                                       canSinglePassDual ? "TRUE" : "FALSE");
         g_terrainGame->overlay->Print(g_UnknownGlobal574714, "SinglePassDual    %s",
@@ -652,9 +652,9 @@ int Terrain::GameObjectVirtualSlot14()
     }
     g_MemTagStack->Pop(previousTag);
     if (lowestQualityOverride) {
-        ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, 0);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 1);
-        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 1);
+        ((TerrainRenderTarget*)renderContext)->device->SetTexture(1, 0);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 1, 1);
+        ((TerrainRenderTarget*)renderContext)->SetTextureStageState(1, 4, 1);
     }
     return 1;
 }
@@ -719,7 +719,7 @@ int Terrain::OnControlPress(int event, int)
     if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;
         if (g_terrainToggle314)
-            g_terrainSharedState = *((TerrainHost*)field_0x18)->sharedState;
+            g_terrainSharedState = *((TerrainHost*)renderContext)->sharedState;
         return 1;
     }
     if (TestInputEvent(2, 0, event, 0x80)) {

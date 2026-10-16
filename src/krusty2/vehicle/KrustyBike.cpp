@@ -1923,7 +1923,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         }
         int prevTag = g_MemTagStack->Push("Collision");
         probeSegment = new(__FILE__, 0x82f) CollisionObject(1);
-        probeSegment->Configure((int)field_0x18, 1, 1, 0);
+        probeSegment->Configure((int)renderContext, 1, 1, 0);
         probeSegment->ignoreVegetation = 1;
         GameObject::AppendChild((GraphicsTest*)probeSegment, -1);
         memset(&points[0], 0, sizeof(Vec3));

@@ -48,7 +48,7 @@ public:
                                               ParticleVertexBuffer** buffer, unsigned long flags);
 };
 
-// GameObject::field_0x18 as slot 27 walks it: (+0x04)->(+0x194) is the Direct3D object.
+// GameObject::renderContext as slot 27 walks it: (+0x04)->(+0x194) is the Direct3D object.
 struct ParticleDeviceHolder {
     char field_0x00[0x194];
     ParticleDirect3D* direct3D;    // +0x194

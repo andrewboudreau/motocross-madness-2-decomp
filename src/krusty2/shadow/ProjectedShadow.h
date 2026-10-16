@@ -187,7 +187,7 @@ struct ShadowOwner {
     char block_0x1a0[1];          // +0x1a0 address handed to the device slot 13
 };
 
-// The render target ProjectedShadow renders into (GameObject::field_0x18, set by slot 8 in Init;
+// The render target ProjectedShadow renders into (GameObject::renderContext, set by slot 8 in Init;
 // RTTI says PCRenderTarget, see src/reconstructed/PCRenderTarget.h).  PROVISIONAL stand-in.
 class ShadowRenderTarget {
 public:
@@ -277,7 +277,7 @@ public:
     virtual int RenderPre3D();                      // 0x004dc410
 
     ProjectedShadow* Init(ShadowRenderTarget* target, void* textureOwner);  // 0x004da7b0
-    ShadowRenderTarget* Host() const { return (ShadowRenderTarget*)field_0x18; }  // GameObject::field_0x18 set by Init
+    ShadowRenderTarget* Host() const { return (ShadowRenderTarget*)renderContext; }  // GameObject::renderContext set by Init
     void AddCaster(ShadowCaster* caster);           // 0x004dab00
     void ClearCasters();                            // 0x004dab90
     void AddReceiver(ShadowReceiver* receiver);       // 0x004daba0

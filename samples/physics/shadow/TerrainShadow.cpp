@@ -126,7 +126,7 @@ int TerrainShadow::UnknownVirtualSlot28()
     return 0;
 }
 
-// The render target at GameObject::field_0x18 as slot 14 uses it (RTTI PCRenderTarget; the
+// The render target at GameObject::renderContext as slot 14 uses it (RTTI PCRenderTarget; the
 // same local view D3DIMSoultreeShadow.cpp keeps).  Tier 3.
 class TerrainShadowRenderTarget {
 public:
@@ -167,43 +167,43 @@ int TerrainShadow::GameObjectVirtualSlot14()
     if (vertexCount) {
         ((TerrainShadowTextureView*)shadow->texture)->Bind();
         int address;
-        ((TerrainShadowRenderTarget*)field_0x18)->GetTextureStageState(0, 0xc, &address);
+        ((TerrainShadowRenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &address);
         if (address != 3)
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 0xc, 3);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, 3);
         if (shadow->surfaceFormat == 0x613) {
-            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x21, 1, 0);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
-            if (((TerrainShadowRenderTarget*)field_0x18)->field_0x1c8 & 4) {
-                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
-                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
-                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 4);
-                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
-                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 6, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x21, 1, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            if (((TerrainShadowRenderTarget*)renderContext)->field_0x1c8 & 4) {
+                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
+                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+                ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
             }
         } else {
-            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 4);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 6, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 1, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 1, 4);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 2, 2);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 3, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 4, 4);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 5, 2);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 6, 0);
         }
         int blend;
-        ((TerrainShadowRenderTarget*)field_0x18)->GetRenderState(4, &blend);
-        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(4, 1, 0);
-        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0xe, 0, 0);
-        ((TerrainShadowRenderTarget*)field_0x18)->Slot18(0);
-        ((TerrainShadowRenderTarget*)field_0x18)->DrawIndexed(4, 0x1e2, vertices, vertexCount, indexTable,
+        ((TerrainShadowRenderTarget*)renderContext)->GetRenderState(4, &blend);
+        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(4, 1, 0);
+        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0xe, 0, 0);
+        ((TerrainShadowRenderTarget*)renderContext)->Slot18(0);
+        ((TerrainShadowRenderTarget*)renderContext)->DrawIndexed(4, 0x1e2, vertices, vertexCount, indexTable,
                                                               vertexCount, 0);
-        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0xe, 1, 0);
-        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 0, 0);
+        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0xe, 1, 0);
+        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x1b, 0, 0);
         if (address != 3)
-            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 0xc, address);
-        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(4, blend, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetTextureStageState(0, 0xc, address);
+        ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(4, blend, 0);
         if (shadow->surfaceFormat == 0x613)
-            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x21, 0, 0);
+            ((TerrainShadowRenderTarget*)renderContext)->SetRenderState(0x21, 0, 0);
     }
     return 1;
 }
@@ -397,7 +397,7 @@ struct TerrainShadowCamera {
     float pad_0x194;
     float field_0x198;             // +0x198 look distance in mode 1 (tier 3)
 };
-struct TerrainShadowViewer {       // GameObject::field_0x18 of the receiver
+struct TerrainShadowViewer {       // GameObject::renderContext of the receiver
     char pad_0x00[8];
     void* camera;                  // +0x08 the visibility camera (matrix at +0xec)
     int width;                     // +0x0c
@@ -479,7 +479,7 @@ static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& 
     field_0x666c = TERRAIN_SHADOW_MAX(field_0x666c, screen.x);                                       \
     field_0x6670 = TERRAIN_SHADOW_MIN(field_0x6670, screen.y);                                       \
     field_0x6674 = TERRAIN_SHADOW_MAX(field_0x6674, screen.y)
-#define TERRAIN_SHADOW_VIEWER() ((TerrainShadowViewer*)field_0x18)
+#define TERRAIN_SHADOW_VIEWER() ((TerrainShadowViewer*)renderContext)
 
 // The footprint is usable when its screen rectangle overlaps the viewport and is at least
 // 10 x 5 pixels; otherwise the cell list and the vertices are dropped.

@@ -48,7 +48,7 @@ public:
     virtual void OnDisable();                    // 0x00469050: calls slot 6 on each child, ret
     virtual void OnEnable();                     // 0x00469070: calls slot 7 on each enabled child, ret
     // Slot 8: 0x004692f0 `mov eax,ecx; mov ecx,[esp+4]; mov [eax+0x18],ecx; ret 4` ->
-    // stores its argument in field_0x18 and returns this (tier 1 decoded body).
+    // stores its argument in renderContext and returns this (tier 1 decoded body).
     virtual GameObject* SetRenderContext(int a);
     virtual int GameObjectVirtualSlot9(int a);   // 0x00469430: ret 4, returns 1
     // Slots 10/11 take one dword (`ret 4` in 0x004693d0, 0x004da540 and every override:
@@ -86,7 +86,7 @@ public:
     GameObject* nextSibling;   // +0x0c
     GameObject* firstChild;    // +0x10
     GameObject* parent;        // +0x14
-    void* field_0x18;                   // written by slot 8 (0x004692f0)
+    void* renderContext;                // +0x18 written by SetRenderContext (slot 8, 0x004692f0); src/reconstructed/GameObject.h name
     char field_0x1c[9];
     unsigned char statusFlags;           // +0x25 bit 0 tested by SoultreePhysicsBaseObject slot 21 and Vehicle
                                         // slot 38 through field_0x124 (tier 3: "enabled" flag)

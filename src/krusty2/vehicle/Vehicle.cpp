@@ -2035,7 +2035,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
                                                    a21);
     if (field_0x124) {
         sparkEmitter = new(__FILE__, 0x1dc) VehicleSparkEmitter(1);
-        GameObject::AppendChild(sparkEmitter->UnknownVirtualSlot27(field_0x18, field_0x124), -1);
+        GameObject::AppendChild(sparkEmitter->UnknownVirtualSlot27(renderContext, field_0x124), -1);
     }
     steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, field_0x524[0], &a7, &a8);
     Vec3 down = a8 * -1.0f;

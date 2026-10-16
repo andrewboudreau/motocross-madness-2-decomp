@@ -14,7 +14,7 @@
 #include "broadphase/Quadtree.h"
 #include "core/GameObject.h"
 
-// The view/camera object stored at GameObject::field_0x18 (set by GameObject slot 8, which
+// The view/camera object stored at GameObject::renderContext (set by GameObject slot 8, which
 // Setup() calls with its first argument).  Tier 3 stand-in: only the pieces the slots below
 // touch are declared.  Slot 7 (+0x1c) is called with (0, 1, 1) and (0, 4, 1) by slot 14 and
 // field +0x08 is read as the camera record.
@@ -215,7 +215,7 @@ public:
     // camera ground position (x, z) with the frustum camera record.
     int Query(float x, float z, VisibilityCamera* camera);
 
-    VisibilityView* View() const { return (VisibilityView*)field_0x18; }
+    VisibilityView* View() const { return (VisibilityView*)renderContext; }
 
     virtual int PrepareGeometry();            // 0x0052ef50 (secondary vtable)
     virtual int GameObjectVirtualSlot14();    // 0x0052e3b0

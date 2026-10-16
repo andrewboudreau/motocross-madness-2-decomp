@@ -113,12 +113,12 @@ ParticleManager* ParticleManager::UnknownVirtualSlot27(int parentArg, TextureMap
     desc.caps = 0x800;
     desc.fvf = 0x1c4;
     desc.vertexCount = 1500;
-    ((ParticleRenderContext*)field_0x18)->device->direct3D->CreateVertexBuffer(&desc, &vertexBuffer, 0);
+    ((ParticleRenderContext*)renderContext)->device->direct3D->CreateVertexBuffer(&desc, &vertexBuffer, 0);
     desc.fvf = 0x1e2;
-    ((ParticleRenderContext*)field_0x18)->device->direct3D->CreateVertexBuffer(&desc, &indexBufferObject, 0);
+    ((ParticleRenderContext*)renderContext)->device->direct3D->CreateVertexBuffer(&desc, &indexBufferObject, 0);
     desc.fvf = 0x1c4;
     desc.vertexCount = 4000;
-    ((ParticleRenderContext*)field_0x18)->device->direct3D->CreateVertexBuffer(&desc, &field_0x1f8c, 0);
+    ((ParticleRenderContext*)renderContext)->device->direct3D->CreateVertexBuffer(&desc, &field_0x1f8c, 0);
 
     void* data;
     field_0x1f8c->Lock(1, &data, 0);

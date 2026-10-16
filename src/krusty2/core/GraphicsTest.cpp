@@ -22,7 +22,7 @@ struct GraphicsTestVertex {
     float tv;
 };
 
-// The render target at GameObject::field_0x18 (RTTI PCRenderTarget; the
+// The render target at GameObject::renderContext (RTTI PCRenderTarget; the
 // src/reconstructed RenderTarget.h slot numbers).  Local view, tier 3.
 class GraphicsTestRenderer {
 public:
@@ -37,7 +37,7 @@ public:
     virtual int DrawPrimitive(int type, int fvf, void* vertices, int vertexCount, int flags);
 };
 
-#define RENDERER() ((GraphicsTestRenderer*)field_0x18)
+#define RENDERER() ((GraphicsTestRenderer*)renderContext)
 #define RGBA_MAKE(r, g, b, a) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
 
 // Row-vector transform with translation (row 3).
