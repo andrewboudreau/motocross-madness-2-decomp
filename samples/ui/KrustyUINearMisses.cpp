@@ -30,9 +30,6 @@ void* ResizeDebugBlock(void* block, unsigned int size);
 // Global at 0x0068a498 (defined in KrustyUI.cpp).
 extern char g_UnknownStrings68a498[36][16];
 
-// Zero-filled global at 0x00577738, the "MRUProfile" default.
-extern char g_UnknownString577738[];
-
 // 0x004988a0: GameObject's slot 8, then loads the short strings and the GUI
 // settings, creates and sets up the GUI, restores the last profile and the
 // joystick filter, and (offline, when asked) opens the intro dialog.
@@ -87,7 +84,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     gui->ShowCursors(0);
     g_ResourceManager->AddArchive("ui\\uires.res", 0);
     g_TrackGame->mode.LoadBonusTrackNames();
-    g_TrackGame->GetRegistryString("MRUProfile", g_UnknownString577738,
+    g_TrackGame->GetRegistryString("MRUProfile", "",
                                                  g_TrackGame->mode.profileName, &size);
     g_TrackGame->mode.LoadProfile();
     gui->uiAnimations = g_TrackGame->mode.uiAnimations;
