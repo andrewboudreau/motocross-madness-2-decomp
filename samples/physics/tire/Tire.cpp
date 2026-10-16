@@ -1040,27 +1040,20 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     torque->z += moment.z;
 }
 
-// In-place add through a reference (the sum keeps the added vector on the left).
-static inline void TireAddTo(CollisionVec3& v, const CollisionVec3& d)
-{
-    v.x = d.x + v.x;
-    v.y = d.y + v.y;
-    v.z = d.z + v.z;
-}
-
-// 0x00513c70 (near miss, 805 of 797 bytes): runs the attached shock against the
-// contact. The inline (+0x2b0) and rotating (+0x2ac) shocks are solved with the
-// same follow-up, written out twice as retail keeps two copies; the solve's load
-// and active flag become the contact's penetration and inContact. The outputs
-// live in the dead `dt` and `velocity` argument slots, as in retail. Retail also
-// keeps a zero register (ebx) for its null/flag compares and the final clears;
-// VC6 here uses `test` and immediates, which shifts the argument offsets by the
-// missing push, and so schedules the A path's first world-position add the
-// other way round. The shared `depth` local keeps it out of the `axisB` slot.
-// Swapping or chaining the final clears, a `solved` flag instead of the early
-// returns, explicit `!= 0` compares with the block-scoped pointers, a
-// zero-initialised `active` and the A path add written as three `+=` stores
-// (97/805) do not give VC6 the zero register.
+// 0x00513c70 (near miss, 769 of 797 bytes, same length): runs the attached
+// shock against the contact. The inline (+0x2b0) and rotating (+0x2ac) shocks
+// are solved with the same follow-up, written out twice as retail keeps two
+// copies; the solve's load and active flag become the contact's penetration and
+// inContact. The outputs live in the dead `dt` and `velocity` argument slots,
+// as in retail. Each attachment clears field_0x26c and inContact on its own
+// failure path (VC6 merges the two tails into retail's single block); with
+// the clears written once after the if/else chain VC6 has too few zero stores
+// to keep retail's zero register (ebx) across the solve call and compiles
+// every null test as `test` (96 of 805 bytes). Left: the rotating path's
+// first world-position add loads the attachment's x first where retail loads
+// the contact's, and the surface position's z sum is staged in the x slot
+// (retail reuses the y slot); TireAddTo-style `d + v` sums swap the inline
+// path's first add as well.
 void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
                        const CollisionVec3* velocity, const CollisionVec3* axisB)
 {
@@ -1077,7 +1070,9 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
                 CollisionPoint::penetration = load;
-                TireAddTo(CollisionPoint::worldPosition, field_0x2b0->field_0x80);
+                CollisionPoint::worldPosition.x += field_0x2b0->field_0x80.x;
+                CollisionPoint::worldPosition.y += field_0x2b0->field_0x80.y;
+                CollisionPoint::worldPosition.z += field_0x2b0->field_0x80.z;
                 if (active)
                     CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
                 else
@@ -1086,6 +1081,9 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 return;
             }
         }
+        field_0x26c = 0;
+        CollisionPoint::inContact = 0;
+        return;
     } else if (TireAttachB* hinge = field_0x2ac) {
         if (inContact) {
             depth = CollisionPoint::penetration;
@@ -1096,7 +1094,9 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 if (active || crashed)
                     CollisionPoint::inContact = 1;
                 CollisionPoint::penetration = load;
-                TireAddTo(CollisionPoint::worldPosition, field_0x2ac->field_0x80);
+                CollisionPoint::worldPosition.x += field_0x2ac->field_0x80.x;
+                CollisionPoint::worldPosition.y += field_0x2ac->field_0x80.y;
+                CollisionPoint::worldPosition.z += field_0x2ac->field_0x80.z;
                 if (active)
                     CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
                 else
@@ -1105,10 +1105,10 @@ void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offse
                 return;
             }
         }
+        field_0x26c = 0;
+        CollisionPoint::inContact = 0;
+        return;
     } else {
         CollisionPoint::inContact = 1;
-        return;
     }
-    field_0x26c = 0;
-    CollisionPoint::inContact = 0;
 }

@@ -171,7 +171,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 287/432 | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
 | physics/tire/Tire | `0x00513490` | 199/201 | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` in the pts[i].origin stores; store/declaration order, chained/comma assignment, member-wise copy, pointer/reference and typedef shifts give no gain |
 | physics/tire/Tire | `0x005135f0` | 1582/1664 | b | UpdateContactPatch: lever `lea edi`/store scheduled later; second TireDot push earlier; one dot-term operand order |
-| physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
+| physics/tire/Tire | `0x00513c70` | 769/797 | c | per-attachment failure clears give retail's zero register and length ([VC6_ZERO_REGISTER](VC6_ZERO_REGISTER.md)); left: rotating path's first world-position add operand order, z sum staged in the x slot |
 | physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local (reference counts 3 vs 4, VC6_FRAME_LAYOUT fact 9); rewrites of the boost/minimum conditions and the clamp give no gain |
 | physics/tire/Tire | `0x00514170` | 565/607 | b | the push.y copy and two cross-product fsubp/mov pairs scheduled differently |
 | physics/tire/Tire | `0x00514550` | 175/4438 | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
