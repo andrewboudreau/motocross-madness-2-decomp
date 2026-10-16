@@ -27,9 +27,10 @@
 extern CameraRect g_BackgroundImageRect;
 extern CameraRect g_DrawImageClipRect;
 extern CameraRect g_DrawImageSourceRect;
-// 0x005777a0 / 0x005777a8: 0x004049d0's region index and clipped rectangle.
-int g_UnknownGlobal5777a0;
-CameraRect g_UnknownGlobal5777a8;
+// 0x005777a0 / 0x005777a8: GetDc's dirty-region index and clipped rectangle;
+// retail references them only inside GetDc (0x00404a56..0x00404ba8).
+int g_GetDcRegionIndex;
+CameraRect g_GetDcClipRect;
 
 // 0x004049d0: a DC for drawing `rect`: the back buffer, or with the copy
 // current the surfaces in turn (`a` set when the copy is returned), clipped
@@ -54,31 +55,31 @@ int BackgroundImage::GetDc(void** dc, CameraRect* rect, int index, int dirty, in
                 }
             } else {
                 field_0x60 = 1;
-                for (g_UnknownGlobal5777a0 = 0; g_UnknownGlobal5777a0 < regionCapacity; g_UnknownGlobal5777a0++) {
-                    if (regionTable[g_UnknownGlobal5777a0].lastFrameCount != Target()->frameCount)
+                for (g_GetDcRegionIndex = 0; g_GetDcRegionIndex < regionCapacity; g_GetDcRegionIndex++) {
+                    if (regionTable[g_GetDcRegionIndex].lastFrameCount != Target()->frameCount)
                         continue;
-                    g_UnknownGlobal5777a8.left = CurrentRegionRect(g_UnknownGlobal5777a0).left > rect->left ? CurrentRegionRect(g_UnknownGlobal5777a0).left : rect->left;
-                    g_UnknownGlobal5777a8.right = CurrentRegionRect(g_UnknownGlobal5777a0).right < rect->right ? CurrentRegionRect(g_UnknownGlobal5777a0).right : rect->right;
-                    g_UnknownGlobal5777a8.top = CurrentRegionRect(g_UnknownGlobal5777a0).top > rect->top ? CurrentRegionRect(g_UnknownGlobal5777a0).top : rect->top;
-                    g_UnknownGlobal5777a8.bottom = CurrentRegionRect(g_UnknownGlobal5777a0).bottom < rect->bottom ? CurrentRegionRect(g_UnknownGlobal5777a0).bottom : rect->bottom;
-                    if (g_UnknownGlobal5777a8.left < g_UnknownGlobal5777a8.right &&
-                        g_UnknownGlobal5777a8.top < g_UnknownGlobal5777a8.bottom) {
-                        if (field_0x68 && g_UnknownGlobal5777a0 > field_0x64) {
+                    g_GetDcClipRect.left = CurrentRegionRect(g_GetDcRegionIndex).left > rect->left ? CurrentRegionRect(g_GetDcRegionIndex).left : rect->left;
+                    g_GetDcClipRect.right = CurrentRegionRect(g_GetDcRegionIndex).right < rect->right ? CurrentRegionRect(g_GetDcRegionIndex).right : rect->right;
+                    g_GetDcClipRect.top = CurrentRegionRect(g_GetDcRegionIndex).top > rect->top ? CurrentRegionRect(g_GetDcRegionIndex).top : rect->top;
+                    g_GetDcClipRect.bottom = CurrentRegionRect(g_GetDcRegionIndex).bottom < rect->bottom ? CurrentRegionRect(g_GetDcRegionIndex).bottom : rect->bottom;
+                    if (g_GetDcClipRect.left < g_GetDcClipRect.right &&
+                        g_GetDcClipRect.top < g_GetDcClipRect.bottom) {
+                        if (field_0x68 && g_GetDcRegionIndex > field_0x64) {
                             surface = Target()->renderSurface;
                             field_0x68 = 0;
-                        } else if (!field_0x68 && g_UnknownGlobal5777a0 == field_0x64) {
+                        } else if (!field_0x68 && g_GetDcRegionIndex == field_0x64) {
                             surface = offscreenCopy;
                             field_0x68 = 1;
                         } else {
                             continue;
                         }
                         *a = 1;
-                        *clip = g_UnknownGlobal5777a8;
-                        field_0x64 = g_UnknownGlobal5777a0;
+                        *clip = g_GetDcClipRect;
+                        field_0x64 = g_GetDcRegionIndex;
                         break;
                     }
                 }
-                if (g_UnknownGlobal5777a0 == regionCapacity) {
+                if (g_GetDcRegionIndex == regionCapacity) {
                     field_0x68 = 1;
                     field_0x64 = -1;
                 }
