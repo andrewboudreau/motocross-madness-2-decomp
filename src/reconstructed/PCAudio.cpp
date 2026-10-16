@@ -20,7 +20,7 @@
 // global rather than a class static: declaring a static data member in
 // SoundInterface.h shifts the compiler-generated `$E` names in every file
 // that includes it, which breaks Game.cpp's initializer matches.
-int g_UnknownGlobal689938;
+int g_EnumeratedSoundDeviceCount;
 
 // The started sound interface (Game+0x04). A macro: as an inline function
 // VC6 allocates the two loads to different registers than retail.
@@ -1214,18 +1214,18 @@ long PCSoundInterface::InitializeSound(int rate, int stereo, int bits, int value
     allowSoundEnumeration = 0;
     allowEAXExtension = allowEax;
     if (allowSoundEnumeration) {
-        g_UnknownGlobal689938 = 0;
+        g_EnumeratedSoundDeviceCount = 0;
         DirectSoundEnumerateA(EnumSoundDeviceCallback, this);
-        soundDeviceCount = g_UnknownGlobal689938;
+        soundDeviceCount = g_EnumeratedSoundDeviceCount;
         unsigned long best = soundDevices[0].caps.maxHwMixingAllBuffers;
         selectedSoundDevice = soundDevices;
-        for (int i = 0; i < g_UnknownGlobal689938; i++) {
+        for (int i = 0; i < g_EnumeratedSoundDeviceCount; i++) {
             if (soundDevices[i].caps.maxHwMixingAllBuffers > best) {
                 best = soundDevices[i].caps.maxHwMixingAllBuffers;
                 selectedSoundDevice = &soundDevices[i];
             }
         }
-        g_UnknownGlobal689938 = 0;
+        g_EnumeratedSoundDeviceCount = 0;
         if ((result = DirectSoundCreate(&selectedSoundDevice->guid, &directSound, 0)) != 0)
             goto done;
     } else if ((result = DirectSoundCreate(0, &directSound, 0)) != 0) {
@@ -1255,11 +1255,11 @@ done:
 // 0x004be7b0: DirectSoundEnumerate callback; `context` is the interface.
 int __stdcall PCSoundInterface::EnumSoundDeviceCallback(UnknownGuid* guid, const char* description,
     const char* module, void* context) {
-    if (g_UnknownGlobal689938 >= 4)
+    if (g_EnumeratedSoundDeviceCount >= 4)
         return 0;
     PCSoundInterface* sound = (PCSoundInterface*)context;
-    if (sound->soundDevices[g_UnknownGlobal689938].ProbeSoundDevice(guid, description))
-        g_UnknownGlobal689938++;
+    if (sound->soundDevices[g_EnumeratedSoundDeviceCount].ProbeSoundDevice(guid, description))
+        g_EnumeratedSoundDeviceCount++;
     return 1;
 }
 
