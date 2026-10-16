@@ -277,8 +277,8 @@ struct VehicleRotatingShock : VehicleShock {
                          float a6, float a7, float a8, float a9, int axisId, const Vec3* axisOverride);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fab60
     char pad_0x98[0x28];
-    float swingAngle;                // +0xc0 Bike's loader: sin(swingAngle * 0.5) * 2 * armLength -> field_0xc4
-    float field_0xc4;
+    float swingAngle;                // +0xc0 Bike's loader: sin(swingAngle * 0.5) * 2 * armLength -> chord
+    float chord;  // +0xC4  = sin(swingAngle * 0.5) * 2 * armLength (Bike's loader); Suspension.h RotatingShock +0xc4 chord
     float armLength;                 // +0xc8 Bike's loader: distance from the wheel node to the shock node
     float armLengthSq;               // +0xcc armLength squared
     char pad_0xd0[0x14];             // 0xe4 bytes (the loader's allocation)

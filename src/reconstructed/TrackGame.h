@@ -146,7 +146,7 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
     int field_0x40;
     int field_0x44;
     unsigned char field_0x48[0x360 - 0x48];
-    UnknownTrackGameModeOptions6ac360 field_0x360;
+    UnknownTrackGameModeOptions6ac360 garageCurveChoice;  // +0x360  TrackGameMode+0xa0c garageCurveChoice[5] (0x6ac + 0x360); OptionProcs.h curveRows
 };
 
 struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes

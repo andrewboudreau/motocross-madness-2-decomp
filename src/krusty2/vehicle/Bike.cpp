@@ -640,7 +640,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
             float len = BikeDistance(wheelPoint, shockPoint);
             rotShock->armLength = len;
             rotShock->armLengthSq = len * len;
-            rotShock->field_0xc4 = (float)sin(rotShock->swingAngle * 0.5f) * len * 2.0f;
+            rotShock->chord = (float)sin(rotShock->swingAngle * 0.5f) * len * 2.0f;
         } else {
             AddWheel(wheel, 0, (int)lineShock, 0, driven[i] ? (VehicleWheelAux*)engineState : 0);
             wheel->sceneNode->GetPositionIn(0, &wheelPoint);
