@@ -127,7 +127,7 @@ void UnknownTrackGameObject3400::ReadListedRecord(int unused, const char* name)
     directoryList->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(path, "*%s", extensions[extensionIndex]);
     directoryList->SetPattern(path, 1);
-    directoryList->UnknownVirtualSlot1();
+    directoryList->Scan();
     sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, name);
     sprintf(file, "%s%s", name, extensions[extensionIndex]);
     if (directoryList->Contains(file))

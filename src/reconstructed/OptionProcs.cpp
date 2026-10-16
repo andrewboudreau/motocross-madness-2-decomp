@@ -970,7 +970,7 @@ void GlobalSettingsDlg::ListOtherProfiles()
     profiles->RemoveAllRows();
     g_TrackGame->profileDirectory->SetDirectory("ui\\profile");
     g_TrackGame->profileDirectory->SetPattern("*", 0);
-    g_TrackGame->profileDirectory->UnknownVirtualSlot1();
+    g_TrackGame->profileDirectory->Scan();
     g_TrackGame->profileDirectory->CurrentName(name);
     if (name[0] && strcmp(g_TrackGame->mode.profileName, name) != 0) {
         profiles->AddRow(name, 0, 0);

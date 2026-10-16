@@ -203,7 +203,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     sprintf(second, "%s\\%s", g_TrackGame->mode.cdDataDirectory, directory);
     ((CombinedDirectoryList*)directories)->SetDirectories(first, second);
     directories->SetPattern(pattern, 1);
-    directories->UnknownVirtualSlot1();
+    directories->Scan();
     if (!directories->GetFontName())
         return 1;
     if (largePictures) {
@@ -310,7 +310,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
         }
     }
     int row = list->GetRowData(-1);
-    directories->UnknownVirtualSlot1();
+    directories->Scan();
     directories->GetEntryStem(g_TrackGame->ui->entries[row].field_0x00, name);
     delete stream;
     return 1;

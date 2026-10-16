@@ -112,7 +112,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
     directory->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(pattern, "*%s", g_TrackGame->highScores->extensions[g_TrackGame->highScores->extensionIndex]);
     directory->SetPattern(pattern, 1);
-    directory->UnknownVirtualSlot1();
+    directory->Scan();
     if (directory->CurrentName(found)) {
         if (prefixed) {
             n = strlen(found) - 1;

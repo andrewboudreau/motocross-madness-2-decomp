@@ -342,7 +342,7 @@ void MainDlg::HandleEvent(UnknownDialogEvent* event) {
                 COPY_TEXT(name, list->GetRowText(g_RemoveProfileRow), 16);
                 sprintf(path, "%s\\%s", "ui\\profile", name);
                 if (g_TrackGame->profileDirectory->DeleteTree(path)) {
-                    g_TrackGame->profileDirectory->UnknownVirtualSlot1();
+                    g_TrackGame->profileDirectory->Scan();
                     list->RemoveRow(g_RemoveProfileRow);
                 }
             }

@@ -18,7 +18,7 @@
     }
 
 // Inline; sets the entry's name (truncated) and attributes.
-inline void UnknownDirectoryEntry::UnknownFunctionSet(const char* fileName, unsigned int fileAttributes) {
+inline void UnknownDirectoryEntry::Set(const char* fileName, unsigned int fileAttributes) {
     COPY_NAME(name, fileName);
     attributes = fileAttributes;
 }
@@ -112,7 +112,7 @@ DirectoryList::DirectoryList() {
     count = 0;
     current = 0;
     includeFiles = 1;
-    DirectoryList::UnknownVirtualSlot1();
+    DirectoryList::Scan();
 }
 
 // 0x0044a1d0
@@ -204,7 +204,7 @@ int DirectoryList::CurrentName(char* name) {
 }
 
 // 0x0044a670
-int DirectoryList::UnknownVirtualSlot1() {
+int DirectoryList::Scan() {
     char search[MAX_PATH];
     WIN32_FIND_DATAA data;
     HANDLE find;
@@ -241,12 +241,12 @@ int DirectoryList::UnknownVirtualSlot1() {
         if (find == INVALID_HANDLE_VALUE)
             return 0;
         if (IsListed(data.cFileName, data.dwFileAttributes)) {
-            entries[0].UnknownFunctionSet(data.cFileName, data.dwFileAttributes);
+            entries[0].Set(data.cFileName, data.dwFileAttributes);
             found = 1;
         }
         while (FindNextFileA(find, &data)) {
             if (IsListed(data.cFileName, data.dwFileAttributes)) {
-                entries[found].UnknownFunctionSet(data.cFileName, data.dwFileAttributes);
+                entries[found].Set(data.cFileName, data.dwFileAttributes);
                 found++;
             }
         }
@@ -276,7 +276,7 @@ int DirectoryList::DeleteTree(const char* path) {
         return 0;
     list->SetDirectory(path);
     list->SetPattern("*", 1);
-    list->UnknownVirtualSlot1();
+    list->Scan();
     for (i = 0; i < list->count; i++) {
         sprintf(child, "%s\\%s", path, list->entries[i].name);
         if (list->entries[i].attributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -328,7 +328,7 @@ void CombinedDirectoryList::SetDirectories(const char* first, const char* second
 // 0x0044ac30: lists both directories, then merges them: the second
 // directory's entries tagged 5, each first-directory name found there
 // retagged 3 and the others appended with 3.
-int CombinedDirectoryList::UnknownVirtualSlot1() {
+int CombinedDirectoryList::Scan() {
     DirectoryList* first;
     DirectoryList* second;
     UnknownDirectoryEntry* merged;
@@ -349,17 +349,17 @@ int CombinedDirectoryList::UnknownVirtualSlot1() {
         return 0;
     first->SetPattern(pattern, 1);
     first->SetDirectory(firstDirectory);
-    first->UnknownVirtualSlot1();
+    first->Scan();
     first->SortByName();
     second->SetPattern(pattern, 1);
     second->SetDirectory(secondDirectory);
-    second->UnknownVirtualSlot1();
+    second->Scan();
     second->SortByName();
 
     total = second->count;
     merged = new (__FILE__, 480) UnknownDirectoryEntry[total + first->count];
     for (i = 0; i < second->count; i++) {
-        merged[i].UnknownFunctionSet(second->entries[i].name, 5);
+        merged[i].Set(second->entries[i].name, 5);
     }
     for (i = 0; i < first->count; i++) {
         for (j = 0, found = 0; j < total; j++) {
@@ -370,7 +370,7 @@ int CombinedDirectoryList::UnknownVirtualSlot1() {
             }
         }
         if (!found) {
-            merged[total].UnknownFunctionSet(first->entries[i].name, 3);
+            merged[total].Set(first->entries[i].name, 3);
             total++;
         }
     }
@@ -384,7 +384,7 @@ int CombinedDirectoryList::UnknownVirtualSlot1() {
         return 0;
     }
     for (i = 0; i < count; i++) {
-        entries[i].UnknownFunctionSet(merged[i].name, merged[i].field_0x108);
+        entries[i].Set(merged[i].name, merged[i].field_0x108);
     }
     delete first;
     delete second;

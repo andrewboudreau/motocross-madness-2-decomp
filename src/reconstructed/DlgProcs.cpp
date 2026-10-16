@@ -174,7 +174,7 @@ void MainDlg::FillProfileList() {
     list->RemoveAllRows();
     g_TrackGame->profileDirectory->SetDirectory("ui\\profile");
     g_TrackGame->profileDirectory->SetPattern("*", 0);
-    g_TrackGame->profileDirectory->UnknownVirtualSlot1();
+    g_TrackGame->profileDirectory->Scan();
     g_TrackGame->profileDirectory->CurrentName(name);
     if (name[0])
         list->AddRow(name, 0, 0);
@@ -1449,7 +1449,7 @@ void CreateProfile(UnknownDialogEvent* event) {
     sprintf(control, "%s\\%s\\%s", "ui\\profile", name, "control.ctl");
     CopyFileA(preset, control, 0);
     g_TrackGame->mode.LoadControllerChoice();
-    g_TrackGame->profileDirectory->UnknownVirtualSlot1();
+    g_TrackGame->profileDirectory->Scan();
     g_TrackGame->mode.SaveProfile();
     g_TrackGame->controlSetup->ApplyDevice(control, -1);
     g_TrackGame->MuteSound();
