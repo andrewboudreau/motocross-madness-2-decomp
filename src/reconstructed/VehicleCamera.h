@@ -90,12 +90,6 @@ struct UnknownCameraTargetB {
     Vector3 pathVelocity;  // +0x40  CarProcedural +0x40 pathVelocity; slot 33 returns it as the tracked velocity (like vehicle velocity)
 };
 
-// .rdata floats next to VehicleCamera's vtable: 17.0f (slot 67) and the
-// 0.18f/0.82f blend weights of slots 35 and 41.
-extern const float g_UnknownFloat558d60;
-extern const float g_UnknownFloat558d64;
-extern const float g_UnknownFloat558d68;
-
 // RTTI: VehicleCamera : FollowCamera. Vehicle.cpp is a name-overlap candidate
 // for its translation unit, not established. Implements FollowCamera's pure
 // slots 33, 35, 39, 41, 42, 50, 51, 57 and 74; names are provisional.

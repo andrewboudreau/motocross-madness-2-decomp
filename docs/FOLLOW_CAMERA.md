@@ -237,7 +237,7 @@ references. All bodies below are strict exact under the default profile.
 | VehicleCamera 39 | `0x0052cbd0` | 41 | Returns vehicle +0x45c; +0x23c += π when vehicle +0x464 is set |
 | VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
 | VehicleCamera 51 | `0x0052cec0` | 10 | Vehicle +0x48 |
-| VehicleCamera 67 | `0x0052bfa0` | 76 | Preset: distance 17 (`.rdata` `0x00558d60`) in vehicle mode, else 60 |
+| VehicleCamera 67 | `0x0052bfa0` | 76 | Preset: distance 17 (`__real` literal `0x00558d60`) in vehicle mode, else 60 |
 | VehicleCamera 68 | `0x0052bcf0` | 684 | Fixed view: base (`0x0052bc50`) + heading (`0x0052bac0`) × y/32.2 × 1.5 − 0.2 × heading + 0.45 × (z, 0, −x), adjusted by subject `0x00507c10`; y at least base y − 1 and position y + 7 (21 outside vehicle mode); +0x258 = (200 − horizontal distance to the target + 3 up) / 180 × 60 + 10, clamped to 10..70; then Camera slot 29 at that target |
 | VehicleCamera 72 | `0x0052bff0` | 62 | Hold while vehicle +0x444; else FollowCamera slot 72 or reset to state 0 |
 | VehicleCamera 74 | `0x00417490` | 31 | Inline in the header; vehicle mode and vehicle +0x444 |
