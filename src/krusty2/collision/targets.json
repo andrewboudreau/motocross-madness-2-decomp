@@ -786,7 +786,7 @@
     "target_va": "0x00439820",
     "target_size": 1493,
     "expect": "partial",
-    "notes": "149/1476: the pre-test calls the out-of-line operators as by-value views (SegmentSubtract/Add/Dot/Length; Add takes the scaled vector first, as retail pushes it). Retail gives each operator result its own frame slot (frame 0xa8; here the temporaries share) and keeps the segment pointer in ebx.",
+    "notes": "1309/1493 strict, same size and instructions as retail: the closest-point pre-test is an inline helper (SegmentPointDistance), which gives retail's 0xa8 frame; the empty case 2 leaves retail's lone dec eax; case 0 rotates the normal in place, case 1 adds through the by-value 0x421cb0. Remaining: several temporaries (the helper's constructor/add/subtract results, case 1's loop locals, case 0's inversion temps) sit in other frame slots, and add esp,0x14 is scheduled after mov esi,eax.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

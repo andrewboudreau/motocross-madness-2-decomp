@@ -2637,27 +2637,32 @@ Vec3 SegmentSubtract(const Vec3& a, const Vec3& b);
 Vec3 SegmentAdd(const Vec3& a, const Vec3& b);
 float SegmentDot(const Vec3& a, const Vec3& b);
 float SegmentLength(const Vec3& v);
+// Distance from center to the closest point of the segment p[0]..p[1].  Retail's frame
+// (0xa8, each operator result in its own slot) comes from this helper being inlined.
+static inline float SegmentPointDistance(const Vec3* p, const Vec3& center)
+{
+    Vec3 d = SegmentSubtract(p[1], p[0]);
+    float t = SegmentDot(d, SegmentSubtract(center, p[0])) / SegmentDot(d, d);
+    if (t >= 1.0f)
+        t = 1.0f;
+    else if (t <= 0.0f)
+        t = 0.0f;
+    Vec3 scaled = CollisionVec3Call(d.x * t, d.y * t, d.z * t);
+    return SegmentLength(SegmentSubtract(center, SegmentAdd(scaled, p[0])));
+}
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal)
 {
     if (object->statusFlags & 1) {
         const Vec3* p = (const Vec3*)ends;
-        const Vec3* center = (const Vec3*)&object->field_0x34;   // +0x40
-        Vec3 d = SegmentSubtract(p[1], p[0]);
-        float t = SegmentDot(d, SegmentSubtract(*center, p[0])) / SegmentDot(d, d);
-        if (t >= 1.0f)
-            t = 1.0f;
-        else if (t <= 0.0f)
-            t = 0.0f;
-        Vec3 scaled = CollisionVec3Call(d.x * t, d.y * t, d.z * t);
-        if (SegmentLength(SegmentSubtract(*center, SegmentAdd(scaled, p[0]))) < object->boundRadius) {
+        if (SegmentPointDistance(p, *(const Vec3*)&object->field_0x34) < object->boundRadius) {
             switch (object->shapeType) {
             case 0: {
                 CollisionHullBody* hull = (CollisionHullBody*)object->shape;
                 CollisionBoxResult hit;
-                hit.fraction = 1.0f;
                 hit.point = 0;
                 *(Vec3*)&hit.field_0x08 = Vec3(0.0f, 0.0f, 0.0f);
+                hit.fraction = 1.0f;
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = hull->worldTransform;
                 CollisionInvertRigidInPlace(&inv);
@@ -2667,16 +2672,16 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                     Vec3 d = SubtractCtorCall(p[1], p[0]);
                     Vec3 scaled = ScaleCtorCall(d, hit.fraction);
                     *(Vec3*)outPoint = AddCtorCall(scaled, p[0]);
-                    *outNormal = CollisionRotateCols(hit.field_0x08, &hull->worldTransform);
+                    CollisionRotateColsTo(outNormal, hit.field_0x08, &hull->worldTransform);
                 }
                 return result;
             }
             case 1: {
                 CollisionModelBody* model = (CollisionModelBody*)object->shape;
                 CollisionBoxResult hit;
-                hit.fraction = 1.0f;
                 hit.point = 0;
                 *(Vec3*)&hit.field_0x08 = Vec3(0.0f, 0.0f, 0.0f);
+                hit.fraction = 1.0f;
                 SetCollisionBoxResult(&hit);
                 Matrix4 inv = model->field_0x88;
                 CollisionInvertRigidCall(&inv);
@@ -2688,7 +2693,7 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                         if (SegmentTreeQueryWithVertices(p, e->triangleTree, &inv, (Vec3*)e->vertices)) {
                             Vec3 d = SubtractCtorCall(p[1], p[0]);
                             Vec3 scaled = ScaleCtorCall(d, hit.fraction);
-                            Vec3AddCall((Vec3*)outPoint, &scaled, &p[0]);
+                            *(Vec3*)outPoint = SegmentAdd(scaled, p[0]);
                             Vec3TransformNormal(outNormal, hit.field_0x08, &e->worldTransform);
                             return 1;
                         }
@@ -2696,6 +2701,8 @@ int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, Col
                 }
                 return 0;
             }
+            case 2:   // retail tests it (the lone dec eax) and falls into the return 0
+                return 0;
             }
         }
     }

@@ -93,7 +93,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/collision/CollisionObject | `0x004392c0` | 303/311 | c | 6 code diffs: `mov eax, [esp + N] ; mov ecx, [eax + 0x~` vs `mov ecx, [esp + N] ; mov eax, [ecx + 0x~`; `dec ecx` vs `dec eax` |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 254/1885 | b | UpdateModelBounds: the Min argument now uses the out-of-line Vec3 ctor 0x404e60 as retail; 445/479 normalised insns align (was 438), 1902 vs 1885 bytes; byte score fell because stack slots shifted |
 | krusty2/collision/CollisionObject | `0x00435830` | 157/1776 | b | SetTransform: the hull case's inline 4x4 product emits its terms as 1,3,2,4 (retail 3,2,1,4 with the local matrix loaded first); frame 0x30 both |
-| krusty2/collision/CollisionObject | `0x00439820` | 149/1476 | b | SegmentTouchesObject: pre-test calls match; retail gives each operator result its own slot (frame 0xa8 vs 0x9c), segment pointer in ebx |
+| krusty2/collision/CollisionObject | `0x00439820` | 1309/1493 | b | SegmentTouchesObject: same instructions as retail; some temporaries in other frame slots, one `add esp` scheduled late |
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 286/639 | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501e90` | 164/483 | b | 20 code diffs: `jne @56` vs `jne @55 ; mov [esp + N], 0 ; mov edx, [~`; slots differ |
