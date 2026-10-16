@@ -38,5 +38,5 @@ public:
     UnknownTrackRecord records[10];           // +0x14
     DirectoryList* directoryList;             // +0xdc
     int recordCount;                          // +0xe0 record count
-    int field_0xe4;                           // stored with the records
+    int series;                               // +0xE4  the file's first word; RecordHighScoreTable's Write passes GetSelectedSeries()
 };
