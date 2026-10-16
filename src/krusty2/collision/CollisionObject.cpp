@@ -2188,6 +2188,20 @@ inline void CollisionDiagonal(float d[3][3], float x, float y, float z)
     d[2][0] = 0.0f; d[2][1] = 0.0f; d[2][2] = z;
 }
 
+// r = d * M (upper 3x3), fully unrolled.
+inline void CollisionMul3x3(float r[3][3], const float d[3][3], const Matrix4& m)
+{
+    r[0][0] = d[0][0] * m.m[0][0] + d[0][1] * m.m[1][0] + d[0][2] * m.m[2][0];
+    r[0][1] = d[0][0] * m.m[0][1] + d[0][1] * m.m[1][1] + d[0][2] * m.m[2][1];
+    r[0][2] = d[0][0] * m.m[0][2] + d[0][1] * m.m[1][2] + d[0][2] * m.m[2][2];
+    r[1][0] = d[1][0] * m.m[0][0] + d[1][1] * m.m[1][0] + d[1][2] * m.m[2][0];
+    r[1][1] = d[1][0] * m.m[0][1] + d[1][1] * m.m[1][1] + d[1][2] * m.m[2][1];
+    r[1][2] = d[1][0] * m.m[0][2] + d[1][1] * m.m[1][2] + d[1][2] * m.m[2][2];
+    r[2][0] = d[2][0] * m.m[0][0] + d[2][1] * m.m[1][0] + d[2][2] * m.m[2][0];
+    r[2][1] = d[2][0] * m.m[0][1] + d[2][1] * m.m[1][1] + d[2][2] * m.m[2][1];
+    r[2][2] = d[2][0] * m.m[0][2] + d[2][1] * m.m[1][2] + d[2][2] * m.m[2][2];
+}
+
 // 0x00436100: world-space axis-aligned bounds of this object's local box (Arvo transformed
 // AABB): center' = center * M + T, extent_j = sum_i |M[i][j]| * half_i, output min = center'
 // - extent and max = center' + extent.  The box and matrix come from the shape payload:
@@ -2195,9 +2209,10 @@ inline void CollisionDiagonal(float d[3][3], float x, float y, float z)
 // mesh (2): +0x08 with bounds object +0x04.  For any other shape type retail falls through
 // with uninitialised locals; that is reproduced (locals left unset).
 // Retail forms diag(half) as a 3x3 with its zeros as stack temporaries and multiplies it
-// by M fully unrolled; same size and frame as retail (671/804).  Remaining: the center dot
-// products pair c.z, c.y, c.x with M rows 2, 1, 0 (ours x, y, z); term order, alias names,
-// array indexing, loops and statement placement do not move the canonical order.
+// by M fully unrolled; the center is accumulated one term per statement (z, y, x, then the
+// translation), which keeps VC6 from reassociating the sums.  727/804: two of the diagonal's
+// zero stores are scheduled after the first products instead of with the others, and the
+// pop edi/esi pair lands before the third extent row instead of after it.
 void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMax)
 {
     Matrix4 m;
@@ -2230,15 +2245,7 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
     CollisionDiagonal(hm, h->x, h->y, h->z);
     CollisionVec3 center = CollisionTransformPoint(*c, &m);
     float r[3][3];
-    r[0][0] = hm[0][0] * m.m[0][0] + hm[0][1] * m.m[1][0] + hm[0][2] * m.m[2][0];
-    r[0][1] = hm[0][0] * m.m[0][1] + hm[0][1] * m.m[1][1] + hm[0][2] * m.m[2][1];
-    r[0][2] = hm[0][0] * m.m[0][2] + hm[0][1] * m.m[1][2] + hm[0][2] * m.m[2][2];
-    r[1][0] = hm[1][0] * m.m[0][0] + hm[1][1] * m.m[1][0] + hm[1][2] * m.m[2][0];
-    r[1][1] = hm[1][0] * m.m[0][1] + hm[1][1] * m.m[1][1] + hm[1][2] * m.m[2][1];
-    r[1][2] = hm[1][0] * m.m[0][2] + hm[1][1] * m.m[1][2] + hm[1][2] * m.m[2][2];
-    r[2][0] = hm[2][0] * m.m[0][0] + hm[2][1] * m.m[1][0] + hm[2][2] * m.m[2][0];
-    r[2][1] = hm[2][0] * m.m[0][1] + hm[2][1] * m.m[1][1] + hm[2][2] * m.m[2][1];
-    r[2][2] = hm[2][0] * m.m[0][2] + hm[2][1] * m.m[1][2] + hm[2][2] * m.m[2][2];
+    CollisionMul3x3(r, hm, m);
     float ex = CollisionAbs(r[0][0]) + CollisionAbs(r[1][0]) + CollisionAbs(r[2][0]);
     float ey = CollisionAbs(r[0][1]) + CollisionAbs(r[1][1]) + CollisionAbs(r[2][1]);
     float ez = CollisionAbs(r[0][2]) + CollisionAbs(r[1][2]) + CollisionAbs(r[2][2]);

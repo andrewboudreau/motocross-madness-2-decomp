@@ -366,7 +366,7 @@
     "target_va": "0x00436100",
     "target_size": 804,
     "expect": "partial",
-    "notes": "671/804: Arvo transformed AABB via diag(half) x M unrolled, same size/frame; only the center dot-product leaf order differs (retail z,y,x)",
+    "notes": "727/804: Arvo transformed AABB via diag(half) x M unrolled, same size/frame; two diagonal zero stores and the pop edi/esi pair are scheduled differently",
     "bindings": "CollisionObject.bindings.json"
   },
   {

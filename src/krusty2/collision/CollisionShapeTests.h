@@ -204,9 +204,18 @@ inline CollisionVec3 CollisionRotateCols(const CollisionVec3& v, const Matrix4* 
 inline CollisionVec3 CollisionTransformPoint(const CollisionVec3& v, const Matrix4* m)
 {
     CollisionVec3 r;
-    r.x = v.z * m->m[2][0] + v.y * m->m[1][0] + v.x * m->m[0][0] + m->m[3][0];
-    r.y = v.z * m->m[2][1] + v.y * m->m[1][1] + v.x * m->m[0][1] + m->m[3][1];
-    r.z = v.z * m->m[2][2] + v.y * m->m[1][2] + v.x * m->m[0][2] + m->m[3][2];
+    r.x = v.z * m->m[2][0];
+    r.x += v.y * m->m[1][0];
+    r.x += v.x * m->m[0][0];
+    r.x += m->m[3][0];
+    r.y = v.z * m->m[2][1];
+    r.y += v.y * m->m[1][1];
+    r.y += v.x * m->m[0][1];
+    r.y += m->m[3][1];
+    r.z = v.z * m->m[2][2];
+    r.z += v.y * m->m[1][2];
+    r.z += v.x * m->m[0][2];
+    r.z += m->m[3][2];
     return r;
 }
 
