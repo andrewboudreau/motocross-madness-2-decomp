@@ -402,7 +402,7 @@ extern int g_terrainCacheBytes;     // 0x00689ff4 "Cache" bytes
 extern int g_terrainPrepareGeometryTicks;     // 0x0068a318 "PrepareGeometry" time
 extern int g_terrainRender3DTicks;     // 0x0068a31c "Render3D" time (written here)
 extern int g_terrainTotalTicks;     // 0x0068a320 "Total" time (written here)
-extern int g_UnknownGlobal68a328;     // 0x0068a328 nonzero once the dual-texture probe has run
+extern int g_terrainDualTextureProbed;     // 0x0068a328 set once slot 14 has decided single-pass dual texturing (its only reader and writer)
 extern int g_gridDrawMemory;          // 0x0068a300 (Griddraw.cpp)
 extern int g_gridDrawMemoryPeak;      // 0x0068a2fc (Griddraw.cpp)
 extern int g_terrainDebugPage;     // 0x00574714 profile page row, -1 until allocated
@@ -436,7 +436,7 @@ int Terrain::GameObjectVirtualSlot14()
     int previousTag = g_MemTagStack->Push("Terrain");
     unsigned int start = ReadClock();
 
-    if (!g_UnknownGlobal68a328) {
+    if (!g_terrainDualTextureProbed) {
         if (g_terrainGame->softwareRendering) {
             canSinglePassDual = 0;
             lowestQualityOverride = 0;
@@ -496,7 +496,7 @@ int Terrain::GameObjectVirtualSlot14()
                     g_terrainQualityValue = g_pTerrainQualityTable[qualityIndex].hasDetailPass;
                 }
             }
-            g_UnknownGlobal68a328 = 1;
+            g_terrainDualTextureProbed = 1;
         }
     }
 
