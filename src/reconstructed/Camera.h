@@ -11,9 +11,11 @@
 // and methods, and the class ends at +0x220 where FollowCamera's fields begin.
 
 
-// .rdata floats just before Camera's vtable, loaded by the constructor.
-extern const float g_UnknownFloat550f6c; // 1.0f
-extern const float g_UnknownFloat550f70; // 100000.0f
+// .rdata floats just before Camera's vtable: the constructor's near and far
+// planes, which ClampLimits also keeps as the closest near and farthest far
+// plane.
+extern const float g_DefaultNearPlane; // 0x00550f6c 1.0f
+extern const float g_DefaultFarPlane;  // 0x00550f70 100000.0f
 
 struct _iobuf; // FILE
 
@@ -44,8 +46,8 @@ public:
     // 0x0042e8e0, called by slot 13: re-applies the default limits through
     // 0x0042e960 and slot 28 when +0x1bc/+0x1c0 differ from them.
     int ReapplyDefaultLimits();
-    // 0x0042e960: +0x1bc = max(minimum, g_UnknownFloat550f6c),
-    // +0x1c0 = min(maximum, g_UnknownFloat550f70).
+    // 0x0042e960: +0x1bc = max(minimum, g_DefaultNearPlane),
+    // +0x1c0 = min(maximum, g_DefaultFarPlane).
     void ClampLimits(float minimum, float maximum);
     int UpdateViewport(); // 0x0042e550, called by slot 8
     // 0x0042e930: stores a nonzero value in +0x16c and refreshes +0x1d0
@@ -93,8 +95,8 @@ protected:
     float displayAspect;                      // +0x19c display-mode width/height (0x0042e550)
     int viewport[6];                          // +0x1a0 x, y, width, height, then min/max depth as floats (owner slot 14)
     float heightWidthRatio;                   // +0x1b8 height/width ratio (0x0042f0e0)
-    float nearPlane;                          // +0x1bc g_UnknownFloat550f6c (1.0f); slot 28 passes it to 0x004a1460
-    float farPlane;                           // +0x1c0 g_UnknownFloat550f70 (100000.0f); likewise
+    float nearPlane;                          // +0x1bc g_DefaultNearPlane (1.0f); slot 28 passes it to 0x004a1460
+    float farPlane;                           // +0x1c0 g_DefaultFarPlane (100000.0f); likewise
     int targetWidth;                          // +0x1c4 owner width (0x0042e550)
     int targetHeight;                         // +0x1c8 owner height (0x0042e550)
     int viewportClearFrames;                  // +0x1cc frames left in which slot 13 clears the viewport (owner slot 12)
