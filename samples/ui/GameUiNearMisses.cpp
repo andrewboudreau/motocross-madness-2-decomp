@@ -739,8 +739,9 @@ void UIDropDownList::LayoutParts() {
 // ---------------------------------------------------------------------------
 // The dialog resource parser
 
-// 0x0065b600: the last multi-state text the parser passed on.
-char* g_UnknownGlobal65b600;
+// 0x0065b600: the last multi-state text the parser passed on (its only
+// retail reference is the store at 0x0046c43f; nothing reads it).
+char* g_LastMultiStateText;
 
 // 0x0046a920: reads the dialog resource at `offset` of `stream`. Its sections
 // are listed between markers ("Set_Anim", "Set_Sound", "Set_Control") into
@@ -1186,9 +1187,9 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                                                                    isDefault ? defaultStateTexts[0] : textBuffer, -1);
                     while (gotState | gotText) {
                         if (!isDefault) {
-                            g_UnknownGlobal65b600 = textBuffer[0] ? textBuffer : 0;
+                            g_LastMultiStateText = textBuffer[0] ? textBuffer : 0;
                             multiState->SetStateEntry(state, (UIAnim*)FindSectionObject(stateBuffer),
-                                                              g_UnknownGlobal65b600);
+                                                              g_LastMultiStateText);
                         }
                         state++;
                         // Retail tests the list items' counter here.
