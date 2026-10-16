@@ -455,11 +455,11 @@ void D3DIMSoultreeObject::TransformVertexGroups(int lod)
                 void* vertices = source->sourceVertices;
                 if (useLighting) {
                     if (colored)
-                        lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
-                                                           group->normals, vertices, 0xc, target);
+                        lightManager->LightVertices(&group->node->worldMatrix, count,
+                                                   group->normals, vertices, 0xc, target);
                     else
-                        lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
-                                                           group->normals, vertices, 0xc, 0);
+                        lightManager->LightVertices(&group->node->worldMatrix, count,
+                                                   group->normals, vertices, 0xc, 0);
                 }
                 TransformPoints(vertices, target, &group->node->worldMatrix, count, 0x20, 0x20);
             }

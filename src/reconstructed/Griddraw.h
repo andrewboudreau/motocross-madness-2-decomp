@@ -99,8 +99,8 @@ extern GridGameSettings* g_gridGameSettings;          // 0x0056e26c
 // buffer + 0xc, buffer, 0x20, 0) after a node rebuilds its vertex buffer.
 class GridVertexSink {
 public:
-    void UnknownFunction49e4a0(void* matrix, int count, void* vertices, void* buffer,
-                               int stride, int flags);  // 0x0049e4a0
+    void LightVertices(void* matrix, int count, void* vertices, void* buffer,
+                       int stride, int flags);  // 0x0049e4a0
 };
 
 // Boundary view of the camera at Terrain+0xc8c: its matrix at +0xec is

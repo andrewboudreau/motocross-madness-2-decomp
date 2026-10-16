@@ -327,7 +327,7 @@ int DrawableGridNode::WalkVisibleQuadrants(int x, int z, int size, int quad)
         }
         data->b1 = 0;
         if (data->b2)
-            terrain->vertexSink->UnknownFunction49e4a0(terrain->transform, data->vertexCount,
+            terrain->vertexSink->LightVertices(terrain->transform, data->vertexCount,
                 (char*)data->vertexBuffer + 0xc, data->vertexBuffer, 0x20, 0);
     }
     if (parent)
