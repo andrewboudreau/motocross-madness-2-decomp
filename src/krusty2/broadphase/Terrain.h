@@ -394,11 +394,11 @@ public:
     TerrainOwned* textureAgeManager;  // +0xC84  Load: AgeManager; AcquireOwnedObject purges it past 60 pooled surfaces (Grid1Terrain textureAgeManager)
     TerrainOwned* meshAgeManager;  // +0xC88  Load: AgeManager; Griddraw registers node buffers (EvictNodeBuffers), TerrainShadow marks cell meshes used
     int visibilityCamera;  // +0xC8C  GridTerrain camera: Griddraw passes it and its +0xec matrix to VisibilityClipper::TestBox
-    unsigned int colorKey;                                      // +0xc90 Load: field_0xc3c->field_0x3c, or -1 without the texture
+    unsigned int detailAverageColor;  // +0xc90  Load: detailTexture->averageColor (Pixtrans AverageColor), or -1 without it; source of unlitColor/unlitSpecular
     int field_0xc94;                                            // +0xc94 Load: 5 (the texture's fifth-argument value)
     int field_0xc98;                                            // +0xc98 Load: 6
-    unsigned int unlitColor;  // +0xC9C  Load/slot 14: grey from colorKey's alpha; Griddraw copies it into far unlit vertices' colour
-    unsigned int unlitSpecular;  // +0xCA0  Load/slot 14: colorKey RGB scaled by alpha; Griddraw copies it into far unlit vertices' specular
+    unsigned int unlitColor;  // +0xC9C  Load/slot 14: grey from detailAverageColor's alpha; Griddraw copies it into far unlit vertices' colour
+    unsigned int unlitSpecular;  // +0xCA0  Load/slot 14: detailAverageColor RGB scaled by alpha; Griddraw copies it into far unlit vertices' specular
     int qualityParamA;  // +0xca4 SelectQuality: table[index].field_0x04 (or table[9] when lowestQualityOverride)
     int qualityParamB;  // +0xca8 SelectQuality: table[index].field_0x08
     int canSinglePassDual;  // +0xCAC  slot 14: registry CanRenderDualTextureInSinglePass / ValidateDevice probe; printed "CanSinglePassDual"

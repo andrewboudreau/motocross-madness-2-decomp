@@ -525,7 +525,7 @@ public:
     // were tried; VC6 schedules their loads differently (slots 4, 19, 35 and 49 lost
     // bytes, Bike slot 8 lost its exact match), so the casts are written out.
 
-    float field_0x434;
+    float forwardSpeed;  // +0x434  velocity along bodyForward (BikeAI dot; UpdateContactPatch out); KrustyBike compares it with 60 mph in ft/s
     float field_0x438;        // read by Bike slot 59 (0x0040a330) as a float divisor
     float turnRate;  // +0x43c = turnAngle * field_0x140 (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
     int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
@@ -537,9 +537,9 @@ public:
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).
     float crashTimer;  // +0x454 Bike slot 39 decrements it by the frame time while crashed and compares with 0/-0.1/-2.0; slots 1/67 clear it
     float crashTimerReload;  // +0x458 slot 69 copies it into crashTimer
-    float field_0x45c;        // Bike slot 100 (0x0040a090) stores field_0x50 here
+    float crashYaw;  // +0x45C  CheckCrash stores savedYaw here on a crash; VehicleCamera slot 39 returns it
     int crashReason;  // +0x460 Bike slot 99 stores reason codes (2,4,6,7,8,10,11,13) beside crashDirection
-    int field_0x464;
+    int crashedUpsideDown;  // +0x464  CheckCrash stores savedUp.y < 0 on a crash; VehicleCamera slot 39 turns the camera by pi
     VehicleInputMap* inputMap;  // +0x468 object whose virtual slots 2/3 are queried with action ids 0x0e/0x1d/0x1f/0x2d/0xc8/0xd0 (slots 77-84); slot 39 also uses its key table
     void* inputDevice;  // +0x46c tested non-null together with throttleAxis before the throttle axis is latched in slot 63 (-1 when absent)
     float throttleInput;  // +0x470 slot 63 latches axis 0x500 value (dead zone 0.2, else -1 when no device); slot 80 tests it > 0.33
@@ -611,7 +611,7 @@ public:
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there
 };
 
-VEH_CHECK_OFFSET(Vehicle, field_0x434, 0x434);
+VEH_CHECK_OFFSET(Vehicle, forwardSpeed, 0x434);
 VEH_CHECK_OFFSET(Vehicle, turnRate, 0x43C);
 VEH_CHECK_OFFSET(Vehicle, movingForward, 0x440);
 VEH_CHECK_OFFSET(Vehicle, crashState, 0x444);

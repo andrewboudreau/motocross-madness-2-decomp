@@ -31,12 +31,12 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     field_0x11b8 = 0;
     field_0x604 = 0;
     aiKind = 0;
-    field_0x735 = 0;
+    isRemote = 0;
     field_0x768 = 0;
     pingTimer = 0;
     race = 0;
     field_0x7b8 = 0;
-    field_0x7c0 = 0;
+    forceGatePass = 0;
     field_0x7bc = 1;
     field_0x748 = 0;
     netId = 0;
@@ -798,9 +798,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
             poseState = states[0]->poseState;
             if (g_kbGame->field_0x560) {
                 if (field_0x7b8 == states[0]->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && states[0]->field_0x53 == 0))
-                    field_0x7c0 = 1;
+                    forceGatePass = 1;
                 else
-                    field_0x7c0 = 0;
+                    forceGatePass = 0;
                 if (a) {
                     int prev = field_0x7b8;
                     field_0x7b8 = states[0]->field_0x53;
@@ -808,7 +808,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         if (field_0x7b8 == 0)
                             field_0x7a0++;
                         field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
-                        if (this == this->race->raceCamera->field_0x3b4)
+                        if (this == this->race->raceCamera->followedRacer)
                             ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
                     }
                 }
@@ -816,9 +816,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 if (!states[0]->field_0x5c)
                     states[0]->field_0x04 = (short)((field_0x7a0 & 0xff00) | states[0]->field_0x53);
                 if ((unsigned short)field_0x7a0 == (unsigned short)states[0]->field_0x04 - 1)
-                    field_0x7c0 = 1;
+                    forceGatePass = 1;
                 else
-                    field_0x7c0 = 0;
+                    forceGatePass = 0;
                 if (a)
                     field_0x7a0 = states[0]->field_0x04;
             }
@@ -848,8 +848,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
             field_0x153c = states[0]->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
-                field_0x464 = bodyUp.y < 0.0f;
-                field_0x45c = savedYaw;
+                crashedUpsideDown = bodyUp.y < 0.0f;
+                crashYaw = savedYaw;
                 if (field_0x430)
                     field_0x604->StartTumble();
                 else
@@ -893,9 +893,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
             poseState = interpSource->poseState;
             if (g_kbGame->field_0x560) {
                 if (field_0x7b8 == interpSource->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && interpSource->field_0x53 == 0))
-                    field_0x7c0 = 1;
+                    forceGatePass = 1;
                 else
-                    field_0x7c0 = 0;
+                    forceGatePass = 0;
                 if (a) {
                     int prev = field_0x7b8;
                     field_0x7b8 = interpSource->field_0x53;
@@ -903,7 +903,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         if (field_0x7b8 == 0)
                             field_0x7a0++;
                         field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
-                        if (this == this->race->raceCamera->field_0x3b4)
+                        if (this == this->race->raceCamera->followedRacer)
                             ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
                     }
                 }
@@ -911,9 +911,9 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 if (!interpSource->field_0x5c)
                     interpSource->field_0x04 = (short)((field_0x7a0 & 0xff00) | interpSource->field_0x53);
                 if ((unsigned short)field_0x7a0 == (unsigned short)interpSource->field_0x04 - 1)
-                    field_0x7c0 = 1;
+                    forceGatePass = 1;
                 else
-                    field_0x7c0 = 0;
+                    forceGatePass = 0;
                 if (a)
                     field_0x7a0 = interpSource->field_0x04;
             }
@@ -946,8 +946,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
             field_0x153c = interpSource->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
-                field_0x464 = bodyUp.y < 0.0f;
-                field_0x45c = savedYaw;
+                crashedUpsideDown = bodyUp.y < 0.0f;
+                crashYaw = savedYaw;
                 if (field_0x430)
                     field_0x604->StartTumble();
                 else
@@ -1074,7 +1074,7 @@ static inline float KbMinF(float a, float b) { return a < b ? a : b; }
 void KrustyBike::UnknownVirtualSlot102(float dt)
 {
     if (crashState || *(int*)pad_0x5B8) {
-        if (!field_0x735 && !g_kbGame->field_0x3428) {
+        if (!isRemote && !g_kbGame->field_0x3428) {
             float t = -(steerState->steerAngle / steerState->field_0x08);
             t = (t + 1.0f) * 0.25f;
             t += 0.25f;
@@ -1091,7 +1091,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                 ((Character*)riderCharacter)->CharacterVirtualSlot7(0, 0, 0);
                 CharacterVirtualSlot7(0, 0, 0);
             } else {
-                int remote = field_0x735 || g_kbGame->field_0x3428;
+                int remote = isRemote || g_kbGame->field_0x3428;
                 int held;
                 if (!aiKind && !remote && (UnknownVirtualSlot84(6, 0x3f) || UnknownVirtualSlot84(7, 0x3f)))
                     held = 1;
@@ -1307,7 +1307,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             blend = 0;
         if (poseIndex == 16) {
             if (field_0x664 < 0.45f) {
-                float lean = field_0x434;
+                float lean = forwardSpeed;
                 if (lean < 0.0f)
                     lean = -lean;
                 float minimum = dt * 0.55371f;

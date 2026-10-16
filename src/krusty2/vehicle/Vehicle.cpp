@@ -576,7 +576,7 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
     float k = UnknownVirtualSlot73(point, dir) * d;
     field_0x4e8 = k;
     if (!(VehAbsT(k) <= 0.0f)) {
-        float m = field_0x434;
+        float m = forwardSpeed;
         float nk = -k;
         float r = m * m / nk * stepTime;
         Vec3 t = VehScale(*dir, r);
@@ -1533,7 +1533,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot1(value);
     field_0x4e8 = 0.0f;
-    field_0x434 = 0.0f;
+    forwardSpeed = 0.0f;
     movingForward = 1;
     for (int i = 0; i < collisionPointCount; i++) {
         VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
@@ -1699,8 +1699,8 @@ int Vehicle::CheckCrash()
         field_0x431 = 0;
         field_0x433 = 0;
         field_0x574 = heading;
-        field_0x464 = savedUp.y < 0.0f;
-        field_0x45c = savedYaw;
+        crashedUpsideDown = savedUp.y < 0.0f;
+        crashYaw = savedYaw;
         field_0x138 = 1;
     }
     return crashed;
@@ -1900,7 +1900,7 @@ void Vehicle::UpdateWheelsInContact()
     for (; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
         if (wheel->inContact) {
-            wheel->UpdateContactPatch(&centerOfMass, worldAngularVelocity, velocity, linearSpeed, &field_0x434, &movingForward);
+            wheel->UpdateContactPatch(&centerOfMass, worldAngularVelocity, velocity, linearSpeed, &forwardSpeed, &movingForward);
             wheel->Method_00513C70(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
             if (wheel->field_0x15c)
                 field_0x5a0 = 1;
@@ -2104,8 +2104,8 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     inShadow = 0;
     shadowLight = 0;
     attachmentResetPending = 0;
-    field_0x45c = 0;
-    field_0x464 = 0;
+    crashYaw = 0;
+    crashedUpsideDown = 0;
     pointsTouching = 0;
     field_0x4a0 = 0;
     wheelList = 0;

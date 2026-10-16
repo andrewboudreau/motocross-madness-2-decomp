@@ -1691,25 +1691,25 @@ int KrustyBike::Fn_00413200(float dt)
     if (aiKind && airborne)
         controlInput.x = 0.0f;
 
-    field_0x434 = BikeAIDot(velocity, bodyForward);
-    rearWheel->w_0x148 = field_0x434;
-    frontWheel->w_0x148 = field_0x434;
-    rearWheel->w_0x27c = field_0x434;
-    frontWheel->w_0x27c = field_0x434;
+    forwardSpeed = BikeAIDot(velocity, bodyForward);
+    rearWheel->w_0x148 = forwardSpeed;
+    frontWheel->w_0x148 = forwardSpeed;
+    rearWheel->w_0x27c = forwardSpeed;
+    frontWheel->w_0x27c = forwardSpeed;
     rearWheel->w_0x14c = 0.0f;
     frontWheel->w_0x14c = 0.0f;
-    if (field_0x434 > 0.0f)
+    if (forwardSpeed > 0.0f)
         movingForward = 1;
     else
         movingForward = 0;
     if (frontWheel->inContact)
-        ((KbWheel*)frontWheel)->SetRollDistance(field_0x434 / frontWheel->w_0x274 * dt);
+        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->w_0x274 * dt);
     else
-        ((KbWheel*)frontWheel)->SetRollDistance(field_0x434 / frontWheel->w_0x274 * dt);
+        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->w_0x274 * dt);
     if (rearWheel->inContact)
-        ((KbWheel*)rearWheel)->SetRollDistance(field_0x434 / rearWheel->w_0x274 * dt);
+        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->w_0x274 * dt);
     else
-        ((KbWheel*)rearWheel)->SetRollDistance(field_0x434 / rearWheel->w_0x274 * dt);
+        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->w_0x274 * dt);
     modelNode->SetPosition(position);
     UnknownVirtualSlot71(airborneOut);
     airborne = airborneOut;
@@ -1738,8 +1738,8 @@ int KrustyBike::Fn_00413200(float dt)
         field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
         field_0x431 = 0;
         field_0x433 = 0;
-        field_0x464 = savedUp.y < 0.0f ? 1 : 0;
-        field_0x45c = savedYaw;
+        crashedUpsideDown = savedUp.y < 0.0f ? 1 : 0;
+        crashYaw = savedYaw;
         field_0x604->StartAnimatedWreck(crashDirection);
         UnknownVirtualSlot69();
     }

@@ -114,7 +114,7 @@ public:
 
 public:
     char aiKind;  // +0x734  loader kind (0 for a ghost); nonzero bikes take the BikeAI step 0x00413200 and racing line 0x00414370
-    char field_0x735; // 0x735
+    char isRemote;  // +0x735  Load's a13: BikeRace's loader passes 1 for network/remote racers, 0 for the local player; RaceStatus skips the gate test
     char isGhost;  // +0x736  set for loader kind 0xff (a ghost); the loader then creates the KbGhostMod at +0x15e8
     char field_0x737; // 0x737  KbBikeSetup+4 (0 without a setup)
     int field_0x738; // 0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500)
@@ -154,7 +154,7 @@ public:
     float field_0x7b4; // 0x7B4  bonus accumulated by 0x00495ff0
     int field_0x7b8; // 0x7B8
     int field_0x7bc; // 0x7BC
-    int field_0x7c0; // 0x7C0
+    int forceGatePass;  // +0x7C0  RaceStatus passes it as CountLap/AdvanceGate `forced`: with isRemote the gate/lap counts only when set
     float field_0x7c4; // 0x7C4  loader constants 1.1, 1.3, 1.5, 25, 15, 5, 0 (tier 3 purpose)
     float field_0x7c8; // 0x7C8
     float field_0x7cc; // 0x7CC

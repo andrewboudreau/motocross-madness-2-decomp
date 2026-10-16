@@ -671,9 +671,10 @@ int DrawableGridNode::DrawVisibleQuadrants(void* target, int x, int z, int size,
 }
 
 // 0x00480c90: submits a node's or one block's vertex range on the unlit
-// path. With lighting off (Terrain+0xc3c) the vertices get flat colours (white
-// close up, the terrain's unlit colours further away); with it on and `a5`
-// set, close-up ranges get texture coordinates from the packed offsets.
+// path. With a detail texture (Terrain+0xc3c detailTexture) and `a5` clear the
+// base pass gets flat colours (white close up, the terrain's unlit colours
+// further away); with `a5` set, close-up ranges get detail texture coordinates
+// from the packed offsets. Without a detail texture only the base pass runs.
 void DrawableGridNode::SubmitUnlitRange(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {

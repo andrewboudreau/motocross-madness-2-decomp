@@ -848,8 +848,8 @@ int Bike::UnknownVirtualSlot100(float a, int b, float c)
         field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
         field_0x433 = 0;
         int neg = savedUp.y < 0.0f;
-        field_0x45c = savedYaw;
-        field_0x464 = neg;
+        crashYaw = savedYaw;
+        crashedUpsideDown = neg;
         field_0x138 = 1;
         UnknownVirtualSlot69();
         UnknownVirtualSlot41();

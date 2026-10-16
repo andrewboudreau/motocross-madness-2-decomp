@@ -76,7 +76,7 @@ void Vehicle::UnknownVirtualSlot69() { crashTimer = crashTimerReload; }
 
 int Vehicle::UnknownVirtualSlot23()
 {
-    return !airborne && field_0x434 >= 0.2f;
+    return !airborne && forwardSpeed >= 0.2f;
 }
 
 int Vehicle::UnknownVirtualSlot24()

@@ -363,17 +363,17 @@ struct KbTrackB {
 };
 struct KbSensor {
     char pad_0x0000[0x3DC];
-    int field_0x3dc; // 0x3DC
+    int typing;  // +0x3DC  BikeRace chatOverlay +0x3dc typing (BikeRace.h); blocks the bike's input (slot 84)
 };
 
 struct KbRacer {
     char pad_0x0000[0xA8];
     void* field_0xa8; // 0xA8
     char pad_0x00AC[0x198];
-    int field_0x244; // 0x244
+    int cameraState;  // +0x244  BikeRace raceCamera +0x244 cameraState (BikeRace.h)
     char pad_0x0248[0x168];
-    void* field_0x3b0; // 0x3B0
-    void* field_0x3b4; // 0x3B4
+    void* followedBike;  // +0x3B0  BikeRace raceCamera +0x3b0 followedBike (BikeCamera's bike)
+    void* followedRacer;  // +0x3B4  BikeRace raceCamera +0x3b4 followedRacer (KrustyBikeCamera's racer)
 };
 
 struct KbRaceHandler {

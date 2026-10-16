@@ -90,7 +90,7 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
         return pressed;
     if (pressed && (!vehicleMode || (krustyBike->field_0x108 &&
                                      krustyBike->field_0x5f4->field_0x150 < -2.0f &&
-                                     !krustyBike->field_0x735)))
+                                     !krustyBike->isRemote)))
         return true;
     return false;
 }

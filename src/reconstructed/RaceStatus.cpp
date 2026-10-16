@@ -313,7 +313,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 status->progressPos.segment = start->trackPos.segment;
                 status->progressPos.t = start->trackPos.t + 0.1f;
             }
-            if (!racer->skipGateTest)
+            if (!racer->isRemote)
                 racer->onTrack = track->PlaceNear(status->previousPosition, status->progressPos,
                                                                   g_UnknownGlobal572988, g_UnknownGlobal57298c, 0,
                                                                   &status->placedPos);
@@ -325,12 +325,12 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
                 status->gateDistance = track->DistanceAlong(status->placedPos, finish->trackPos);
                 if (status->goalDistance < g_UnknownGlobal572988 && status->goalDistance < status->gateDistance)
                     COPY_TRACK_POS(status->placedPos, status->progressPos);
-                if ((racer->skipGateTest && racer->forceGatePass) || g_UnknownGlobal572988 < 0.0f ||
-                    (!racer->skipGateTest && status->goalDistance >= 0.0f && status->goalDistance < g_UnknownGlobal572988)) {
+                if ((racer->isRemote && racer->forceGatePass) || g_UnknownGlobal572988 < 0.0f ||
+                    (!racer->isRemote && status->goalDistance >= 0.0f && status->goalDistance < g_UnknownGlobal572988)) {
                     if (CountLap(&status->previousPosition, &status->currentPosition, &racer->lapCount, finish,
                                               &racer->hasFinished, lapLimit, &racer->lastLapTime, racer->lapStartTimes,
                                               racer->totalRunningTime, &racer->lapStartTime, &racer->fastestLap, 1,
-                                              unlimited, racer->skipGateTest, racer->forceGatePass)) {
+                                              unlimited, racer->isRemote, racer->forceGatePass)) {
                         status->progressPos.node = finish->trackPos.node;
                         status->progressPos.segment = finish->trackPos.segment;
                         status->progressPos.t = finish->trackPos.t + 1e-5f;
@@ -435,7 +435,7 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
                                        &racer->gatesPassed, &racer->lapGate, racer->gateTimes, racer->totalRunningTime,
                                        0, &racer->lapCount, &racer->lastLapTime, &racer->fastestLap,
                                        &racer->lapStartTime, &racer->hasFinished, lapLimit, unlimited,
-                                       racer->skipGateTest, racer->forceGatePass))
+                                       racer->isRemote, racer->forceGatePass))
                 return 0;
             if (g_TrackGame->bajaEnduroEvent && gate != racer->lapGate) {
                 racer->nextLapGate = (racer->lapGate + 1) % g_TrackGame->bajaEnduroEvent->field_0xac;

@@ -113,11 +113,11 @@ struct UnknownQuarryRacer {
     UnknownQuarryCollision* frontWheel;           // +0x5f0
     UnknownQuarryCollision* rearWheel;            // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
-    UnknownQuarryRacerState* field_0x604;
+    UnknownQuarryRacerState* wrecker;  // +0x604  Bike +0x604 wrecker (its +0x38 collisionModel gets the car's ignore list)
     unsigned char field_0x608[0x735 - 0x608];
-    unsigned char field_0x735;
+    unsigned char isRemote;  // +0x735  KrustyBike +0x735 isRemote
     unsigned char field_0x736[0x740 - 0x736];
-    UnknownQuarryRaceView* field_0x740;
+    UnknownQuarryRaceView* race;  // +0x740  KrustyBike +0x740 race
     unsigned char field_0x744[0x1414 - 0x744];
     UnknownQuarryCollision* field_0x1414;
     UnknownQuarryCollision* field_0x1418;
@@ -706,13 +706,13 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                         int iterator = 0;
                         for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator);
                              racer; racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
-                            if (!racer->field_0x735) {
+                            if (!racer->isRemote) {
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x1418);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->field_0x1414);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->frontWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)->AddIgnoredOwner(racer->rearWheel);
                                 ((UnknownQuarryCollision*)character->collisionObject)
-                                    ->AddIgnoredOwner(racer->field_0x604->field_0x38);
+                                    ->AddIgnoredOwner(racer->wrecker->field_0x38);
                             }
                         }
                     } else if (character->collisionObject) {
@@ -737,12 +737,12 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 int iterator = 0;
                 for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
                      racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
-                    if (!racer->field_0x735) {
+                    if (!racer->isRemote) {
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x1418);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x1414);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
                         ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
-                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x604->field_0x38);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->wrecker->field_0x38);
                     }
                 }
             }
@@ -807,7 +807,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
     UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
-    if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {
+    if (camera->field_0x3b0 && !bike->race->field_0x18c) {
         camera->field_0x3b0->modelNode->SetLowestLod(1);
         camera->field_0x3b0->riderCharacter->modelNode->SetLowestLod(1);
         if (!camera->field_0x3b0->modelNode->currentLod)
@@ -825,7 +825,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     camera->field_0x3b0 = bike;
     camera->field_0x274 = 0;
     camera->field_0x3b4 = bike;
-    if (!bike->field_0x740->field_0x18c) {
+    if (!bike->race->field_0x18c) {
         bike->modelNode->SetLowestLod(0);
         camera->field_0x3b0->riderCharacter->modelNode->SetLowestLod(0);
     }
