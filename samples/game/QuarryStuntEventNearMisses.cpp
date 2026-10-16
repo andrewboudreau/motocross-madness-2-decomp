@@ -30,7 +30,7 @@ int BaseQuarryEvent::PrepareGeometry() {
     if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();
-        if (g_TrackGame->debugOverlay->field_0x26c4 == s_DebugPage) {
+        if (g_TrackGame->debugOverlay->shownPage == s_DebugPage) {
             char atmosphere[0x40];
             int down = g_TrackGame->controlInterface->IsDeviceButtonDown(0xd0, 0, 0x80, 0);
             int up = g_TrackGame->controlInterface->IsDeviceButtonDown(0xc8, 0, 0x80, 0);

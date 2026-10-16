@@ -42,7 +42,7 @@ int DebugOverlay::LoadFont()
                                                         "DebugOverlayText.tga", 1555, 0, 0, 5, 6,
                                                         0, 0x80, 0xff00ff, 1, 1);
     if (fontTexture == 0) {
-        fontTexture = new(__FILE__, 59) PCTextureMap(field_0x36d4, 1);
+        fontTexture = new(__FILE__, 59) PCTextureMap(textureManager, 1);
         fontTexture->CreateSurface(0, 0x100, 0x100, 0x100, 0x100, 0,
                                           ((RenderTarget*)renderContext)->surfacePixelFormat, 0, 8, 0, 1, 0,
                                           5, 6, 0, 0x80, 0xff00ff);
@@ -98,9 +98,9 @@ int DebugOverlay::LoadFont()
             float v0 = (top + 1) * (1.0f / 256.0f);
             float v1 = bottom * (1.0f / 256.0f);
             while (c < 256) {
-                field_0x26d0[c].u0 = x * (1.0f / 256.0f);
-                field_0x26d0[c].v0 = v0;
-                field_0x26d0[c].v1 = v1;
+                glyphs[c].u0 = x * (1.0f / 256.0f);
+                glyphs[c].v0 = v0;
+                glyphs[c].v1 = v1;
                 GetTextExtentPoint32A(dc, row, count, &size);
                 x = size.cx;
                 if (x >= 256) {
@@ -110,7 +110,7 @@ int DebugOverlay::LoadFont()
                     TextOutA(dc, 0, top, row, count - 1);
                     break;
                 }
-                field_0x26d0[c].u1 = size.cx * (1.0f / 256.0f);
+                glyphs[c].u1 = size.cx * (1.0f / 256.0f);
                 count++;
                 c++;
             }
@@ -136,17 +136,17 @@ DebugOverlay* DebugOverlay::Setup(RenderTarget* a, TextureMapManager* b,
     fontHeight = c;
     rowsTop = e;
     rowsLeft = d;
-    field_0x36d4 = b;
+    textureManager = b;
     if (LoadFont()) {
         int y = e;
         int i = 0;
         do {
-            field_0xb4[i].y = y;
-            field_0xb4[i].bottom = lineHeight + y;
-            field_0xb4[i].x = d;
-            field_0xb4[i].right = 0x100;
-            field_0xb4[i].text[0] = 0;
-            field_0xb4[i].color = 0xffffff;
+            rows[i].y = y;
+            rows[i].bottom = lineHeight + y;
+            rows[i].x = d;
+            rows[i].right = 0x100;
+            rows[i].text[0] = 0;
+            rows[i].color = 0xffffff;
             i++;
             y += lineHeight;
         } while (lineHeight + y <= 0x280 && i < 64);

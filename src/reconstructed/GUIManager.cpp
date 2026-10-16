@@ -1350,7 +1350,7 @@ int HiResMeter::Tick(float frameTime) {
     if (g_TrackGame->debugOverlay) {
         if (overlayPage < 0)
             overlayPage = g_TrackGame->debugOverlay->NewPage();
-        if (g_TrackGame->debugOverlay->field_0x26c4 != overlayPage) {
+        if (g_TrackGame->debugOverlay->shownPage != overlayPage) {
             ResetTimerStats();
             return 1;
         }

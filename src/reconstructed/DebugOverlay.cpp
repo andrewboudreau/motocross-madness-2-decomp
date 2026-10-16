@@ -42,7 +42,7 @@ DebugOverlay::DebugOverlay(int flags)
     : GameObject(flags)
 {
     nextPage = 0;
-    field_0x26c4 = 0;
+    shownPage = 0;
     drawTime = 0;
     rowLimit = 0;
     fontHeight = 0;
@@ -60,19 +60,19 @@ DebugOverlay::~DebugOverlay()
 
 void DebugOverlay::SetRowText(int row, const char* text, int flag)
 {
-    if (row < rowLimit && strcmp(field_0xb4[row].text, text) != 0) {
+    if (row < rowLimit && strcmp(rows[row].text, text) != 0) {
         int length = strlen(text);
         int n = length > 0x7f ? 0x7f : length;
-        strncpy(field_0xb4[row].text, text, n);
-        field_0xb4[row].text[n] = 0;
-        field_0xb4[row].color = 0xffffff;
-        field_0xb4[row].highlighted = flag;
+        strncpy(rows[row].text, text, n);
+        rows[row].text[n] = 0;
+        rows[row].color = 0xffffff;
+        rows[row].highlighted = flag;
     }
 }
 
 void DebugOverlay::Print(int page, const char* format, ...)
 {
-    if (isEnabled && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
+    if (isEnabled && page == shownPage && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
         vsprintf(rowText, format, args);
@@ -82,7 +82,7 @@ void DebugOverlay::Print(int page, const char* format, ...)
 
 void DebugOverlay::Title(int page, const char* format, ...)
 {
-    if (isEnabled && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
+    if (isEnabled && page == shownPage && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
         vsprintf(rowText, format, args);
@@ -92,8 +92,8 @@ void DebugOverlay::Title(int page, const char* format, ...)
 
 void DebugOverlay::SetRowHighlight(int page, int row, int flag)
 {
-    if (isEnabled && page == field_0x26c4)
-        field_0xb4[row].highlighted = flag;
+    if (isEnabled && page == shownPage)
+        rows[row].highlighted = flag;
 }
 
 int DebugOverlay::UnknownVirtualSlot14()
@@ -116,14 +116,14 @@ int DebugOverlay::UnknownVirtualSlot14()
     unsigned int start = ReadClock();
     int i;
     for (i = 0; i <= pageRowCount; i++) {
-        if (!field_0xb4[i].highlighted)
-            DrawString(field_0xb4[i].x + rowsLeft, field_0xb4[i].y + rowsTop,
-                                  field_0xb4[i].text, strlen(field_0xb4[i].text), 0xa0ffffff);
+        if (!rows[i].highlighted)
+            DrawString(rows[i].x + rowsLeft, rows[i].y + rowsTop,
+                                  rows[i].text, strlen(rows[i].text), 0xa0ffffff);
     }
     for (i = 0; i <= pageRowCount; i++) {
-        if (field_0xb4[i].highlighted)
-            DrawString(field_0xb4[i].x + rowsLeft, field_0xb4[i].y + rowsTop,
-                                  field_0xb4[i].text, strlen(field_0xb4[i].text), 0xc0ff0000);
+        if (rows[i].highlighted)
+            DrawString(rows[i].x + rowsLeft, rows[i].y + rowsTop,
+                                  rows[i].text, strlen(rows[i].text), 0xc0ff0000);
     }
     pageRowCount = -1;
     drawTime = ReadClock() - start;
@@ -146,7 +146,7 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
             if (count >= length * 6)
                 break;
             int ch = text[index];
-            float right = (field_0x26d0[ch].u1 - field_0x26d0[ch].u0) * 256.0f + left;
+            float right = (glyphs[ch].u1 - glyphs[ch].u0) * 256.0f + left;
             if (!(right < ((RenderTarget*)renderContext)->targetWidth)) {
                 if (count)
                     ((RenderTarget*)renderContext)->DrawPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
@@ -158,48 +158,48 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
             vertices[count].rhw = 1.0f;
             vertices[count].diffuse = color;
             vertices[count].specular = 0;
-            vertices[count].tu = field_0x26d0[ch].u0;
-            vertices[count].tv = field_0x26d0[ch].v0;
+            vertices[count].tu = glyphs[ch].u0;
+            vertices[count].tv = glyphs[ch].v0;
             vertices[count + 2].x = left;
             vertices[count + 2].y = bottom;
             vertices[count + 2].z = vertexZ;
             vertices[count + 2].rhw = 1.0f;
             vertices[count + 2].diffuse = color;
             vertices[count + 2].specular = 0;
-            vertices[count + 2].tu = field_0x26d0[ch].u0;
-            vertices[count + 2].tv = field_0x26d0[ch].v1;
+            vertices[count + 2].tu = glyphs[ch].u0;
+            vertices[count + 2].tv = glyphs[ch].v1;
             vertices[count + 1].x = right;
             vertices[count + 1].y = bottom;
             vertices[count + 1].z = vertexZ;
             vertices[count + 1].rhw = 1.0f;
             vertices[count + 1].diffuse = color;
             vertices[count + 1].specular = 0;
-            vertices[count + 1].tu = field_0x26d0[ch].u1;
-            vertices[count + 1].tv = field_0x26d0[ch].v1;
+            vertices[count + 1].tu = glyphs[ch].u1;
+            vertices[count + 1].tv = glyphs[ch].v1;
             vertices[count + 3].x = left;
             vertices[count + 3].y = top;
             vertices[count + 3].z = vertexZ;
             vertices[count + 3].rhw = 1.0f;
             vertices[count + 3].diffuse = color;
             vertices[count + 3].specular = 0;
-            vertices[count + 3].tu = field_0x26d0[ch].u0;
-            vertices[count + 3].tv = field_0x26d0[ch].v0;
+            vertices[count + 3].tu = glyphs[ch].u0;
+            vertices[count + 3].tv = glyphs[ch].v0;
             vertices[count + 5].x = right;
             vertices[count + 5].y = bottom;
             vertices[count + 5].z = vertexZ;
             vertices[count + 5].rhw = 1.0f;
             vertices[count + 5].diffuse = color;
             vertices[count + 5].specular = 0;
-            vertices[count + 5].tu = field_0x26d0[ch].u1;
-            vertices[count + 5].tv = field_0x26d0[ch].v1;
+            vertices[count + 5].tu = glyphs[ch].u1;
+            vertices[count + 5].tv = glyphs[ch].v1;
             vertices[count + 4].x = right;
             vertices[count + 4].y = top;
             vertices[count + 4].z = vertexZ;
             vertices[count + 4].rhw = 1.0f;
             vertices[count + 4].diffuse = color;
             vertices[count + 4].specular = 0;
-            vertices[count + 4].tu = field_0x26d0[ch].u1;
-            vertices[count + 4].tv = field_0x26d0[ch].v0;
+            vertices[count + 4].tu = glyphs[ch].u1;
+            vertices[count + 4].tv = glyphs[ch].v0;
             left = right;
             count += 6;
             index++;
@@ -212,8 +212,8 @@ void DebugOverlay::DrawString(int x, int y, const char* text, int length,
 
 int DebugOverlay::ShowNextPage()
 {
-    if (++field_0x26c4 >= nextPage) {
-        field_0x26c4 = 0;
+    if (++shownPage >= nextPage) {
+        shownPage = 0;
         return 1;
     }
     return 0;

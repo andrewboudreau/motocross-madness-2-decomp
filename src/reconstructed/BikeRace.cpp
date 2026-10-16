@@ -647,7 +647,7 @@ int BikeRace::Tick(float frameTime) {
         if (lodDebugPage < 0) {
             lodDebugPage = g_TrackGame->debugOverlay->NewPage();
         }
-        if (g_TrackGame->debugOverlay->field_0x26c4 == lodDebugPage) {
+        if (g_TrackGame->debugOverlay->shownPage == lodDebugPage) {
             char name[0x20];
             UnknownBikeRaceModel* model;
             int pass = 0;
@@ -1013,7 +1013,7 @@ int BikeRace::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entr
         if (lodDebugPage < 0) {
             lodDebugPage = g_TrackGame->debugOverlay->NewPage();
         }
-        int shown = g_TrackGame->debugOverlay->field_0x26c4;
+        int shown = g_TrackGame->debugOverlay->shownPage;
         if (shown == lodDebugPage) {
 
             if (TestInputEvent(0x1c, 0, event, 0x80)) {

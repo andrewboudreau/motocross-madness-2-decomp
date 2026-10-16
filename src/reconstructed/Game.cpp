@@ -249,7 +249,7 @@ int Game::RenderFrame() {
             s_Render3DPeak.Record(render3D);
             s_RenderPost3DPeak.Record(renderPost3D);
             s_ElapsedPeak.Record(elapsed);
-            if (debugOverlay->isEnabled && debugOverlay->field_0x26c4 == profilePage) {
+            if (debugOverlay->isEnabled && debugOverlay->shownPage == profilePage) {
                 UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
                 debugOverlay->Title(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
@@ -288,7 +288,7 @@ int Game::RenderFrame() {
             static int memoryPage = -1;
             if (memoryPage < 0)
                 memoryPage = debugOverlay->NewPage();
-            if (debugOverlay->isEnabled && debugOverlay->field_0x26c4 == memoryPage) {
+            if (debugOverlay->isEnabled && debugOverlay->shownPage == memoryPage) {
                 UnknownMemoryStatus status;
                 GlobalMemoryStatus(&status);
                 debugOverlay->Title(memoryPage, "Memory");
