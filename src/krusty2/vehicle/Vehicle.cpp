@@ -1006,10 +1006,12 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         UnknownVirtualSlot6(&up, &speed);
         UnknownVirtualSlot7(&up);
         field_0x4b4 = UnknownVirtualSlot75();
-        bool settled = !anyWheelInContact && !pointsTouching;
+        int settled = 0;
+        if (!anyWheelInContact && !pointsTouching)
+            settled = 1;
         UnknownVirtualSlot71(settled);
         airborne = settled;
-        if (settled)
+        if (airborne)
             landingLatched = 0;
         Vec3 lift;
         if (contactTotal > 0) {

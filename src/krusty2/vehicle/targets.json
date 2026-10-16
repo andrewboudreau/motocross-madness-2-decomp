@@ -1156,7 +1156,7 @@
     "target_va": "0x52a940",
     "target_size": 3254,
     "expect": "partial",
-    "notes": "296/3254 strict. Per-frame step. All 72 calls (vtable slots and direct) match retail in order and each pointer argument names the retail stack object (hit-branch outputs, slot 55 pivot reused by slot 92, slot 3 float out, scale built from per-branch Vec3 temporaries); frame is 0x104 like retail. Remaining: retail CSEs constant 0 into ebx (xor ebx,ebx at +0x94) with hit in ebp, and several locals (up, zeroB, lift/pivot, o1..o3) sit in different slots.",
+    "notes": "302/3254 strict (candidate 3303 B). Per-frame step. All 72 calls (vtable slots and direct) match retail in order and each pointer argument names the retail stack object (hit-branch outputs, slot 55 pivot reused by slot 92, slot 3 float out, scale built from per-branch Vec3 temporaries); frame is 0x104 like retail. settled is an int that starts at 0 and is set to 1 (retail: mov ebx,1; push ebx; test bl,bl on the airborne byte). Remaining: retail keeps a function-level zero in ebx (xor ebx,ebx at +0x94, re-materialised after settled and at the back edge) and hit in ebp with home [esp+0x24], reloaded at the back edge; ours keeps hit in memory and only creates loop-local zero registers. Declaration order and while/for spelling do not move it. Several locals (up, zeroB, lift/pivot, o1..o3) sit in different slots.",
     "bindings": "Vehicle.bindings.json"
   },
   {
