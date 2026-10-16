@@ -26,15 +26,15 @@ static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 EcoSystem* g_UnknownGlobal59aebc;             // 0x0059aebc
-static int g_UnknownGlobal59aec0;             // 0x0059aec0: billboard draw time
-static UnknownPeakHold g_UnknownGlobal59aef0(5000); // 0x0059aef0 ($E 0x00455db0, XCU 103)
-static UnknownPeakHold g_UnknownGlobal59aec8(5000); // 0x0059aec8 ($E 0x00455dd0, XCU 104)
-static int g_UnknownGlobal59aee4;             // 0x0059aee4: geometry draw time
-static int g_UnknownGlobal59aee8;             // 0x0059aee8: classification time
+static int s_geometryRenderTicks;            // 0x0059aec0: slot 14 geometry draw ticks ("Render %d(3d:%d)")
+static UnknownPeakHold s_prepareGeometryPeak(5000); // 0x0059aef0 ($E 0x00455db0, XCU 103): "PrepareGeometry %d %d" peak
+static UnknownPeakHold s_renderPeak(5000);   // 0x0059aec8 ($E 0x00455dd0, XCU 104): "Render" peak
+static int s_renderTicks;                    // 0x0059aee4: slot 14 draw ticks ("Render %d")
+static int s_prepareGeometryTicks;           // 0x0059aee8: classification ticks ("PrepareGeometry %d")
 static int g_UnknownGlobal59aefc;             // 0x0059aefc: textures were preloaded
 static Matrix4* g_UnknownGlobal59af00;        // 0x0059af00: the view matrix
-static int g_UnknownGlobal59af04;             // 0x0059af04: geometry objects drawn
-static int g_UnknownGlobal59af08;             // 0x0059af08: billboards drawn
+static int s_geometryDrawn;                  // 0x0059af04: geometry objects drawn ("Rendered ... 3D %d")
+static int s_billboardsDrawn;                // 0x0059af08: billboards drawn ("Rendered 2D %d")
 static int g_UnknownGlobal59af0c;             // 0x0059af0c: geometry blocks alive
 static int g_UnknownGlobal59af10;             // 0x0059af10: textures preloaded
 static UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14: the detail band table
@@ -54,8 +54,8 @@ static UnknownEcoDetailBand g_UnknownGlobal56a740[10] = {
     {150, 75, 4444, 768, 1, 1, 1, 1},
 };
 
-static int g_UnknownGlobal56a128 = -1;        // 0x0056a128
-static int g_UnknownGlobal56a12c = 1;         // 0x0056a12c: drawing enabled (slot 23 toggles it)
+static int s_debugPage = -1;                 // 0x0056a128: the "Ecosystem:%d objects" debug-overlay page
+static int s_drawEnabled = 1;                // 0x0056a12c: drawing enabled (slot 23 toggles it)
 
 // Inline helper (shape only; the retail header is not attested): the
 // squared length, summed as z + (x + y) (the only order VC6 compiles to
@@ -979,7 +979,7 @@ void EcoSystem::LightingChanged() {
 
 // 0x0045aad0
 int EcoSystem::PrepareGeometry() {
-    if (!g_UnknownGlobal56a12c)
+    if (!s_drawEnabled)
         return 1;
     int category = g_MemTagStack->Push("EcoSystem");
     unsigned int start = ReadClock();
@@ -1046,7 +1046,7 @@ int EcoSystem::PrepareGeometry() {
         }
         object = (Vegetation*)g_collisionQuadTree->NextObjectSorted();
     }
-    g_UnknownGlobal59aee8 = ReadClock() - start;
+    s_prepareGeometryTicks = ReadClock() - start;
     g_MemTagStack->Pop(category);
     return 1;
 }
@@ -1123,7 +1123,7 @@ int EcoSystem::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* ent
     if (GameObject::OnControlPress(event, entry))
         return 1;
     if (TestInputEvent(4, 0, event, 0x80)) {
-        g_UnknownGlobal56a12c = 1 - g_UnknownGlobal56a12c;
+        s_drawEnabled = 1 - s_drawEnabled;
         return 1;
     }
     return 0;

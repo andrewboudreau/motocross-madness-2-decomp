@@ -89,15 +89,15 @@
 // The unit's file statics these candidates read (same addresses as the src
 // unit; see its definitions).
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
-static int g_UnknownGlobal56a128 = -1;        // 0x0056a128: the overlay page
-static int g_UnknownGlobal56a12c = 1;         // 0x0056a12c: drawing enabled
-static int g_UnknownGlobal59aec0;             // 0x0059aec0: geometry draw time
-static UnknownPeakHold g_UnknownGlobal59aef0(5000); // 0x0059aef0
-static UnknownPeakHold g_UnknownGlobal59aec8(5000); // 0x0059aec8
-static int g_UnknownGlobal59aee4;             // 0x0059aee4: draw time
-static int g_UnknownGlobal59aee8;             // 0x0059aee8: classification time
-static int g_UnknownGlobal59af04;             // 0x0059af04: geometry objects drawn
-static int g_UnknownGlobal59af08;             // 0x0059af08: billboards drawn
+static int s_debugPage = -1;                 // 0x0056a128: the "Ecosystem:%d objects" debug-overlay page
+static int s_drawEnabled = 1;                // 0x0056a12c: drawing enabled (slot 23 toggles it)
+static int s_geometryRenderTicks;            // 0x0059aec0: slot 14 geometry draw ticks ("Render %d(3d:%d)")
+static UnknownPeakHold s_prepareGeometryPeak(5000); // 0x0059aef0: "PrepareGeometry %d %d" peak
+static UnknownPeakHold s_renderPeak(5000);   // 0x0059aec8: "Render" peak
+static int s_renderTicks;                    // 0x0059aee4: slot 14 draw ticks ("Render %d")
+static int s_prepareGeometryTicks;           // 0x0059aee8: classification ticks ("PrepareGeometry %d")
+static int s_geometryDrawn;                  // 0x0059af04: geometry objects drawn ("Rendered ... 3D %d")
+static int s_billboardsDrawn;                // 0x0059af08: billboards drawn ("Rendered 2D %d")
 static int g_UnknownGlobal59aefc;             // 0x0059aefc: textures were preloaded
 static int g_UnknownGlobal59af0c;             // 0x0059af0c
 static int g_UnknownGlobal59af10;             // 0x0059af10: textures preloaded
@@ -712,7 +712,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     Vector3 left;
     Vector3 back;
     int i;
-    if (!g_UnknownGlobal56a12c)
+    if (!s_drawEnabled)
         return 1;
     unsigned int start = ReadClock();
     int category = g_MemTagStack->Push("EcoSystem");
@@ -772,19 +772,19 @@ int EcoSystem::UnknownVirtualSlot14() {
                                           + camera->direction.z * camera->direction.z);
     float sine = inverse * camera->direction.x;
     float cosine = inverse * camera->direction.z;
-    g_UnknownGlobal59af08 = 0;
-    g_UnknownGlobal59af04 = 0;
+    s_billboardsDrawn = 0;
+    s_geometryDrawn = 0;
     if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
     if (geometryCount) {
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->pixelFormat);
         for (i = 0; i < geometryCount; i++) {
-            if (g_UnknownGlobal56a12c)
+            if (s_drawEnabled)
                 geometryList[i]->DrawGeometry(ECO_VIEW);
-            g_UnknownGlobal59af04++;
+            s_geometryDrawn++;
         }
     }
-    g_UnknownGlobal59aec0 = ReadClock() - start;
+    s_geometryRenderTicks = ReadClock() - start;
     if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
@@ -904,38 +904,38 @@ int EcoSystem::UnknownVirtualSlot14() {
                     offset2 += stride;
                     offset5 += stride;
                     offset0 += stride;
-                    g_UnknownGlobal59af08++;
+                    s_billboardsDrawn++;
                 }
                 next++;
             }
-            if (g_UnknownGlobal56a12c && vertexCount)
+            if (s_drawEnabled && vertexCount)
                 ECO_VIEW->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
                                                billboardIndices, indexCount, 0);
             remaining -= i;
         }
     }
-    g_UnknownGlobal59aee4 = ReadClock() - start;
+    s_renderTicks = ReadClock() - start;
     UnknownEcoDebugOverlay* overlay = g_TrackGame->debugOverlay;
     if (overlay) {
-        if (g_UnknownGlobal56a128 < 0)
-            g_UnknownGlobal56a128 = overlay->nextPage++;
-        g_UnknownGlobal59aef0.Record(g_UnknownGlobal59aee8);
-        g_UnknownGlobal59aec8.Record(g_UnknownGlobal59aee4);
-        g_TrackGame->debugOverlay->Title(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
+        if (s_debugPage < 0)
+            s_debugPage = overlay->nextPage++;
+        s_prepareGeometryPeak.Record(s_prepareGeometryTicks);
+        s_renderPeak.Record(s_renderTicks);
+        g_TrackGame->debugOverlay->Title(s_debugPage, "Ecosystem:%d objects", totalObjects);
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Visible  2D %d 3D %d", billboardCount,
                                                        geometryCount);
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
-                                                       g_UnknownGlobal59af08, g_UnknownGlobal59af04);
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Memory %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Rendered 2D %d 3D %d",
+                                                       s_billboardsDrawn, s_geometryDrawn);
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Memory %d",
                                                        g_MemTagStack->GetBytes("EcoSystem"));
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
-                                                       g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.Peak());
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
-                                                       g_UnknownGlobal59aee4, g_UnknownGlobal59aec0,
-                                                       g_UnknownGlobal59aec8.Peak());
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Total Transforms %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "PrepareGeometry %d %d",
+                                                       s_prepareGeometryTicks, s_prepareGeometryPeak.Peak());
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Render %d(3d:%d) %d",
+                                                       s_renderTicks, s_geometryRenderTicks,
+                                                       s_renderPeak.Peak());
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Total Transforms %d",
                                                        ECO_VIEW->verticesDrawn - verticesBefore);
-        g_TrackGame->debugOverlay->Print(g_UnknownGlobal56a128, "Total Triangles  %d",
+        g_TrackGame->debugOverlay->Print(s_debugPage, "Total Triangles  %d",
                                                        ECO_VIEW->trianglesDrawn - trianglesBefore);
     }
     g_MemTagStack->Pop(category);
