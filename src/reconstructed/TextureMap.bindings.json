@@ -38,7 +38,7 @@
   "?IsFormat4444Or8888@@YAHH@Z": "0x00511ad0",
   "?LoadFile@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
   "?FreeFile@@YAXPAUUnknownTgaFile@@@Z": "0x00512dd0",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x0050a3b0",
   "_$E10": "0x0050a4a0",
   "_$E11": "0x0050a490",

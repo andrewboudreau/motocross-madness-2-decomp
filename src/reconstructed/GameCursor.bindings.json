@@ -48,7 +48,7 @@
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__:gamecursor.cpp": "0x0056890c",
   "__except_list": "0x00000000",
   "__ftol": "0x00534a88",

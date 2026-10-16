@@ -186,7 +186,7 @@ void CarProcedural::ReadPath(const char* pathFile, const char* name)
     char line[0x400];
 
     sprintf(quoted, "\"%s\"", name);
-    UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new (__FILE__, 217) UnknownTextureStream((int)g_ResourceManager);
     if (stream->Open(pathFile, "r", 0)) {
         pathKeyCount = 0;
         while (!stream->AtEnd()) {

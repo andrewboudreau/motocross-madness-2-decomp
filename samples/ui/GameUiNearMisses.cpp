@@ -961,7 +961,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                         cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
                     parameters.GetString("BackgroundFile", "", buffer, -1);
                     if (buffer[0] && dialogBackground) {
-                        UnknownTgaFile* file = LoadFile(buffer, 0, (int)g_UnknownResourceManager572b44);
+                        UnknownTgaFile* file = LoadFile(buffer, 0, (int)g_ResourceManager);
                         if (file) {
                             ownsBackground = 1;
                             if (parentDialog)
@@ -1023,7 +1023,7 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                         }
                         parameters.GetString("PaletteFile", "", buffer, -1);
                         if (buffer[0] && load) {
-                            UnknownResourceEntry* resource = g_UnknownResourceManager572b44->FindItem(buffer, 1);
+                            UnknownResourceEntry* resource = g_ResourceManager->FindItem(buffer, 1);
                             if (resource) {
                                 dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->archive);
                                 ownsPalette = 1;
@@ -1059,13 +1059,13 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     parameters.GetString("Files1", "", buffer, -1);
                     UnknownTokenizer files(buffer);
                     for (char* file = files.NextToken(","); file; file = files.NextToken(",")) {
-                        if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1))
+                        if (g_ResourceManager->FindItem(sectionTable[i].sectionName, 1))
                             imageTable[imageCount]->LoadFromModule(
-                                sectionTable[i].sectionName, (int)g_UnknownResourceManager572b44, (int)soundGroup,
+                                sectionTable[i].sectionName, (int)g_ResourceManager, (int)soundGroup,
                                 dialogPalette);
-                        else if (g_UnknownResourceManager572b44->FindItem(file, 1))
+                        else if (g_ResourceManager->FindItem(file, 1))
                             imageTable[imageCount]->LoadFromModule(
-                                file, (int)g_UnknownResourceManager572b44, (int)soundGroup, dialogPalette);
+                                file, (int)g_ResourceManager, (int)soundGroup, dialogPalette);
                         else
                             imageTable[imageCount]->LoadFile(file, dialogPalette);
                     }
@@ -1081,10 +1081,10 @@ int UIDialog::ReadDialogResource(void* stream, int offset) {
                     parameters.GetInt("Copies", 0, &copies);
                     parameters.GetString("File", "", buffer, -1);
                     int flags = isStatic ? 1 : 2;
-                    if (g_UnknownResourceManager572b44->FindItem(sectionTable[i].sectionName, 1)) {
+                    if (g_ResourceManager->FindItem(sectionTable[i].sectionName, 1)) {
                         soundTable[soundCount] =
                             LoadEntrySound(soundGroup, sectionTable[i].sectionName, flags, 3, copies, -1);
-                    } else if (g_UnknownResourceManager572b44->FindItem(buffer, 1)) {
+                    } else if (g_ResourceManager->FindItem(buffer, 1)) {
                         soundTable[soundCount] =
                             LoadEntrySound(soundGroup, buffer, flags, 3, copies, -1);
                     } else {

@@ -102,7 +102,7 @@ MorphBastardModifier* MorphBastardModifier::LoadParameterFile(void* value, const
 
     D3DIMSoultreeModifier::SetRenderContext(value);
     UnknownTextureStream* stream =
-        new (__FILE__, 73) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        new (__FILE__, 73) UnknownTextureStream((int)g_ResourceManager);
     stream->Open(path, "r", 0);
     UnknownParameterBlock* block = new (__FILE__, 77) UnknownParameterBlock;
     block->Attach((UnknownParameterStream*)stream, 0, 1);

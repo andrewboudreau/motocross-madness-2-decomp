@@ -66,7 +66,7 @@ UnknownOverlayText* UnknownOverlayText::Create(const char* archive, const char**
     int i;
 
     text = new(__FILE__, 113) UnknownOverlayText(count, x, y, width, height);
-    g_UnknownResourceManager572b44->AddArchive(archive, 0);
+    g_ResourceManager->AddArchive(archive, 0);
     path[0] = 0;
     textureName[0] = 0;
     for (i = 0; i < count; i++) {

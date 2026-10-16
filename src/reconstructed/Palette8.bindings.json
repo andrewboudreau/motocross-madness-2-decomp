@@ -25,7 +25,7 @@
   "?FindItem@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?FindItemByObject@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__": "0x0056f7cc",
   "__except_list": "0x00000000",
   "__imp__GetDC@4": "0x0055037c",

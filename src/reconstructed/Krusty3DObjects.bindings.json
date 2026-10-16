@@ -79,7 +79,7 @@
   "?UnknownVirtualSlot14@VisualCue@@UAEHXZ": "0x0048bc10",
   "?OnControlPress@VisualCue@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x0048afa0",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x0048d650",
   "_$E10": "0x0048d740",
   "_$E11": "0x0048d730",

@@ -115,7 +115,7 @@
   "?SendText@DebugSocket@@QAEHPBD@Z": "0x004ad570",
   "?g_DebugSocket@@3PAVDebugSocket@@A": "0x0068a48c",
   "__vsnprintf": "0x00538055",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_ImmGetContext@4": "0x00533076",
   "_ImmGetOpenStatus@4": "0x00533070",
   "_ImmReleaseContext@8": "0x00533064",

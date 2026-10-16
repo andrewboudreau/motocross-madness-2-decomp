@@ -295,7 +295,7 @@
   "?g_LobbyRemotePlayerCount@@3HA": "0x00689df8",
   "?g_LobbyReadyBlockReason@@3HA": "0x00689dfc",
   "?g_UnknownGlobal689e04@@3HA": "0x00689e04",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?s_UnknownStatic573c0c@@3HA": "0x00573c0c",
   "_$E1": "0x004f9630",
   "_$E10": "0x004f9720",

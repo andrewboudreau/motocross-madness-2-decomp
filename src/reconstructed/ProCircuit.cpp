@@ -37,7 +37,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // 0x004d3480
 UnknownTrackGameObject3444::UnknownTrackGameObject3444()
 {
-    UnknownTextureStream* stream = new(__FILE__, 19) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    UnknownTextureStream* stream = new(__FILE__, 19) UnknownTextureStream((int)g_ResourceManager);
     UnknownParameterBlock block;
     char key[128];
     char line[64];

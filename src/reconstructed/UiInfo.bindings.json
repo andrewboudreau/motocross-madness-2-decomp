@@ -108,7 +108,7 @@
   "?SelectSeries@TrackGameMode@@QAEXH@Z": "0x005240e0",
   "?GetSelectedSeries@TrackGameMode@@QAEHXZ": "0x00524100",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__:uiinfo.cpp": "0x00575780",
   "__chkstk": "0x00535ed0",
   "__except_list": "0x00000000",

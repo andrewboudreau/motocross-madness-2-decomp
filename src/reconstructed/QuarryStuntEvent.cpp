@@ -59,7 +59,7 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     instrumentOverlay = 0;
     textQueue = 0;
     eventFog = 0;
-    field_0x44 = new(__FILE__, 92) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    field_0x44 = new(__FILE__, 92) UnknownTextureStream((int)g_ResourceManager);
     if (!field_0x44)
         return;
 }

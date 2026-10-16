@@ -36,7 +36,7 @@
   "?LayoutText@UnknownOverlayText@@QAEPAXPBUUnknownOverlayRect@@PBDIPAH@Z$ehhandler": "0x0054e838",
   "?DrawVertices@UnknownOverlayText@@QAEXPAVRenderTarget@@PAXH@Z": "0x0050bd30",
   "?GetRect@CharacterCell@@QAE?AVRectangle2D@@XZ": "0x0050beb0",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?s_UnknownManager65b478@FontTexture@@2VUnknownFontTextureManager@@A": "0x0065b478",
   "__FILE__": "0x00574b30",
   "__FILE__:earray.h": "0x0056b294",

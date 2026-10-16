@@ -65,7 +65,7 @@
   "?OnNetworkMessage@GameObject@@UAEHHPAXHHH@Z": "0x00469620",
   "?SetRenderContext@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x0045fe50",
   "_$E2": "0x0045fe40",
   "_$E4": "0x0045fea0",

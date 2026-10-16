@@ -506,7 +506,7 @@
   "?g_SlideTopFrameCount@@3HA": "0x0065b614",
   "?g_SlideRightFrameCount@@3HA": "0x0065b618",
   "?g_SlideBottomFrameCount@@3HA": "0x0065b61c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x0046e880",
   "_$E10": "0x0046ea20",
   "_$E11": "0x0046ea10",

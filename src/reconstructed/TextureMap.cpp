@@ -52,7 +52,7 @@ TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int
     int dataSize;
     if (choice)
         manager = choice->field_0x00;
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
+    UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     if (entry) {
         if (entry->object) {
             if (addRef)
@@ -92,7 +92,7 @@ failed:
             return 0;
         }
     } else {
-        file = LoadFile(name, 0, (int)g_UnknownResourceManager572b44);
+        file = LoadFile(name, 0, (int)g_ResourceManager);
         if (!file)
             return 0;
         width = file->width;
@@ -139,11 +139,11 @@ failed:
                            alphaThreshold, key);
         FreeFile(file);
         if (!entry)
-            g_UnknownResourceManager572b44->AddObject(name, (int)map);
+            g_ResourceManager->AddObject(name, (int)map);
     } else if (map->LoadSurface(entry->archive, width, height, minimumSize, fileFormat, dataSize,
                                 format, texturePalette, flags, surfacePalette, addressU, addressV,
                                 choice, alphaThreshold, key)) {
-        g_UnknownResourceManager572b44->SetItemObject(entry, map);
+        g_ResourceManager->SetItemObject(entry, map);
     }
     if (paletteName)
         DebugFree(paletteName, __FILE__, 320);
@@ -157,9 +157,9 @@ TextureMap::~TextureMap() {
         sourcePalette->Release();
     if (ownerManager)
         ownerManager->UnregisterTexture(this);
-    void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
+    void* entry = g_ResourceManager->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
+        g_ResourceManager->SetItemObject(entry, 0);
 }
 
 // 0x0050abd0

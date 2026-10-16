@@ -16,8 +16,8 @@
 #include "TextureMap.h"
 
 // 0x00689c78; constructed by 0x004e8d40, destroyed by 0x004e8d60.
-UnknownResourceManager g_UnknownResourceManager689c78;
-UnknownResourceManager* g_UnknownResourceManager572b44 = &g_UnknownResourceManager689c78;
+UnknownResourceManager g_GlobalResourceManager;
+UnknownResourceManager* g_ResourceManager = &g_GlobalResourceManager;
 
 // 0x004e8d70
 ResourceItem::ResourceItem()

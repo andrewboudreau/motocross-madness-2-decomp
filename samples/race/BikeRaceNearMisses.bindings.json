@@ -304,7 +304,7 @@
   "?g_GateDebugBoxLine@@3PAUVector3@@A": "0x00689c30",
   "?g_GateDebugDirectionLine@@3PAUVector3@@A": "0x00689c48",
   "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x0041ce00",
   "_$E10": "0x0041cef0",
   "_$E11": "0x0041cee0",

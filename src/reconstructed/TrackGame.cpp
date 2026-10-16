@@ -227,7 +227,7 @@ int TrackGame::Startup() {
     sprintf(name, "%s\\%s", "Res", file);                          \
     if (!FindDataFile(name, path))                                  \
         return 0;                                                    \
-    g_UnknownResourceManager572b44->AddArchive(path, 0);
+    g_ResourceManager->AddArchive(path, 0);
 
 // 0x00520d10
 int TrackGame::OpenResources() {

@@ -34,4 +34,4 @@ public:
     // retail function; declared twice to keep TextureMap's call unchanged).
     void SetItemObject(void* entry, void* object);
 };
-extern UnknownResourceManager* g_UnknownResourceManager572b44;
+extern UnknownResourceManager* g_ResourceManager;   // 0x00572b44 (= &g_GlobalResourceManager)

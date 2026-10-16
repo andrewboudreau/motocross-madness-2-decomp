@@ -47,7 +47,7 @@
   "?CrossProduct@@YA?AUVector3@@PBU1@0@Z": "0x00515600",
   "?UnknownVirtualSlot27@MorphBastardModifier@@UAEXPAVD3DIMSoultreeObject@@PAUUnknownSoultreeMesh@@PAPAU3@@Z": "0x004a4c60",
   "?SetRenderContext@D3DIMSoultreeModifier@@UAEPAVGameObject@@PAX@Z": "0x004452e0",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__:morphbastardmodifiernearmisses.cpp": "0x0056df3c",
   "__except_list": "0x00000000",
   "__real@4@00000000000000000000": "0x00550484",

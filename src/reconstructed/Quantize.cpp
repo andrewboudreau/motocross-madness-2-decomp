@@ -7,7 +7,7 @@
 
 // 0x004dddd0
 ColorMapper* ColorMapper::LoadShared(const char* name) {
-    UnknownResourceEntry* entry = g_UnknownResourceManager572b44->FindItem(name, 0);
+    UnknownResourceEntry* entry = g_ResourceManager->FindItem(name, 0);
     ColorMapper* mapper;
 
     if (!entry)
@@ -18,7 +18,7 @@ ColorMapper* ColorMapper::LoadShared(const char* name) {
     }
     entry->archive->Seek(entry->offset, 0, 0);
     mapper = new(__FILE__, 148) ColorMapper(entry->archive);
-    g_UnknownResourceManager572b44->SetItemObject(entry, mapper);
+    g_ResourceManager->SetItemObject(entry, mapper);
     return mapper;
 }
 
@@ -102,9 +102,9 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
 
 // 0x004de200
 ColorMapper::~ColorMapper() {
-    void* entry = g_UnknownResourceManager572b44->FindItemByObject(this);
+    void* entry = g_ResourceManager->FindItemByObject(this);
     if (entry)
-        g_UnknownResourceManager572b44->SetItemObject(entry, 0);
+        g_ResourceManager->SetItemObject(entry, 0);
 }
 
 // 0x004de270

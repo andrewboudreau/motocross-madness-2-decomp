@@ -85,7 +85,7 @@ GameObject* KrustyUI::Create(RenderTarget* target, int showIntro) {
     gui->GetUser(0)->ForgetDevices();
     gui->GetUser(0)->AcceptDevice(gui->keyboardDevice);
     gui->ShowCursors(0);
-    g_UnknownResourceManager572b44->AddArchive("ui\\uires.res", 0);
+    g_ResourceManager->AddArchive("ui\\uires.res", 0);
     g_TrackGame->mode.LoadBonusTrackNames();
     g_TrackGame->GetRegistryString("MRUProfile", g_UnknownString577738,
                                                  g_TrackGame->mode.profileName, &size);

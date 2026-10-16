@@ -134,7 +134,7 @@
   "?UnknownVirtualSlot9@D3DIMSoultreeObject@@UAEPAVGameObject@@PAXPBDHHH@Z": "0x0043f4b0",
   "?UnknownVirtualSlot9@D3DIMSoultreeObject@@UAEPAVGameObject@@PAXPBDHHH@Z$ehhandler": "0x0054a07a",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18",
   "_$E1": "0x00442e10",
   "_$E10": "0x00442f00",

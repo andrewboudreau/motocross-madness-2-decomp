@@ -216,7 +216,7 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
         strncpy(name, path, length);
         name[length] = 0;
         strcpy(strstr(name, ".est"), ".esb");
-        UnknownTextureStream* probe = new(__FILE__, 0x2eb) UnknownTextureStream(g_UnknownResourceManager572b44);
+        UnknownTextureStream* probe = new(__FILE__, 0x2eb) UnknownTextureStream(g_ResourceManager);
         if (probe->Open(name, "rb", 0))
             strcpy(strstr(path, ".est"), ".esb");
         delete probe;
@@ -495,10 +495,10 @@ int EcoSystem::GenerateObjects(int checkCodes) {
     UnknownTgaFile* tga = 0;
     memset(tgas, 0, sizeof(tgas));
     if (probabilityTga[0])
-        tga = LoadFile(probabilityTga, 0, (int)g_UnknownResourceManager572b44);
+        tga = LoadFile(probabilityTga, 0, (int)g_ResourceManager);
     for (i = 0; i < 256; i++) {
         if (definitionTable[i] && definitionTable[i]->probabilityTga[0])
-            tgas[i] = LoadFile(definitionTable[i]->probabilityTga, 0, (int)g_UnknownResourceManager572b44);
+            tgas[i] = LoadFile(definitionTable[i]->probabilityTga, 0, (int)g_ResourceManager);
     }
     groundTerrain->GetHeightRange(&minHeight, &maxHeight);
     unsigned int attempt = 0;

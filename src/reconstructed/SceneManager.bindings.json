@@ -304,7 +304,7 @@
   "?g_NonBladeLodSettings@@3PAUSoultreeLodSetting@@A": "0x00574428",
   "?g_BladeLodSettings@@3PAUSoultreeLodSetting@@A": "0x005744c8",
   "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x004ecb80",
   "_$E10": "0x004ecd20",
   "_$E11": "0x004808b0",

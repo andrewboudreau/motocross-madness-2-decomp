@@ -68,7 +68,7 @@
   "?FindFileDirectory@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
   "?g_BikeClassEngineSizes@@3PAHA": "0x0056cb6c",
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
-  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
+  "?g_ResourceManager@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_$E1": "0x004d49f0",
   "_$E10": "0x004d4ae0",
   "_$E11": "0x004d4ad0",
