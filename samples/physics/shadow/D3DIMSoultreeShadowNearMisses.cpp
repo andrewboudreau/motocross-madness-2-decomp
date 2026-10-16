@@ -131,13 +131,13 @@ static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIM
     out->_44 = a._41 * b._14 + a._42 * b._24 + a._43 * b._34 + a._44 * b._44;
 }
 
-// 0x00446c30 (slot 29): with field_0x34 set, the same test against the render target's camera
-// decides field_0x38 (the flag slot 14 draws with); returns field_0x38.
+// 0x00446c30 (slot 29): with inShadowView set, the same test against the render target's camera
+// decides inCameraView (the flag slot 14 draws with); returns inCameraView.
 int D3DIMSoultreeShadow::UnknownVirtualSlot29()
 {
     D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
-    field_0x38 = 0;
-    if (!c->field_0x14c && field_0x34) {
+    inCameraView = 0;
+    if (!c->field_0x14c && inShadowView) {
         D3DIMShadowMatrix4 local;
         ShadowVec3 center, extent;
         D3DIMShadowMatrix4 m;
@@ -148,9 +148,9 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot29()
         D3DIMShadowMatrixProduct(&m, local, view);
         if (g_visibilityClipper->TestBox(((D3DIMShadowHostView*)renderContext)->camera, &m._11, &center.x,
                                          &extent.x, 0, 0, 0))
-            field_0x38 = 1;
+            inCameraView = 1;
     }
-    return field_0x38;
+    return inCameraView;
 }
 
 // Slot 30 scratch (tier 2 from the code): the light-space positions of the current mesh, grown
@@ -171,13 +171,13 @@ struct D3DIMShadowVertexView {
 };
 extern D3DIMShadowVertexView g_d3dimShadowVertexArray[3000];   // 0x00581eb8
 
-// 0x00446f40 (slot 30): when the shadow is visible (field_0x34), rasterises the caster's
+// 0x00446f40 (slot 30): when the shadow is visible (inShadowView), rasterises the caster's
 // triangles that lie in front of the shadow's depth into the shadow texture (update frames
-// only) and turns the others, when field_0x38 is set, into textured vertices of the receiver
-// (field_0x44 of at most 3000).
+// only) and turns the others, when inCameraView is set, into textured vertices of the receiver
+// (vertexCount of at most 3000).
 void D3DIMSoultreeShadow::UnknownVirtualSlot30()
 {
-    if (!field_0x34)
+    if (!inShadowView)
         return;
     ProjectedShadow* s = shadow;
     g_clipRectangle->Set((float)s->clipRect.left, (float)s->clipRect.top, (float)s->clipRect.right,
@@ -189,7 +189,7 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
         color = 0x7fffffff;
     else
         color = ((0xff - (shadow->shadowColor & 0xff)) << 24) | 0xffffff;
-    field_0x44 = 0;
+    vertexCount = 0;
     D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
     if (c->field_0x18c)
         c->TransformVertexGroups(-1);
@@ -269,19 +269,19 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
                     points[5] = (int)(clipped[k + 2].y - 0.5f);
                     ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
                 }
-            } else if (field_0x38) {
+            } else if (inCameraView) {
                 for (int k = 0; k < 3; k++) {
                     int idx = (unsigned short)corner[k];
                     const float* src = mesh->vertices + idx * 8;
-                    g_d3dimShadowVertexArray[field_0x44].x = src[0];
-                    g_d3dimShadowVertexArray[field_0x44].y = src[1];
-                    g_d3dimShadowVertexArray[field_0x44].z = src[2];
-                    g_d3dimShadowVertexArray[field_0x44].diffuse = color;
-                    g_d3dimShadowVertexArray[field_0x44].reserved = 0;
-                    g_d3dimShadowVertexArray[field_0x44].specular = 0;
-                    g_d3dimShadowVertexArray[field_0x44].tu = s_shadowPoints[idx].x * g_d3dimShadowTexel;
-                    g_d3dimShadowVertexArray[field_0x44].tv = s_shadowPoints[idx].y * g_d3dimShadowTexel;
-                    if (++field_0x44 == 3000)
+                    g_d3dimShadowVertexArray[vertexCount].x = src[0];
+                    g_d3dimShadowVertexArray[vertexCount].y = src[1];
+                    g_d3dimShadowVertexArray[vertexCount].z = src[2];
+                    g_d3dimShadowVertexArray[vertexCount].diffuse = color;
+                    g_d3dimShadowVertexArray[vertexCount].reserved = 0;
+                    g_d3dimShadowVertexArray[vertexCount].specular = 0;
+                    g_d3dimShadowVertexArray[vertexCount].tu = s_shadowPoints[idx].x * g_d3dimShadowTexel;
+                    g_d3dimShadowVertexArray[vertexCount].tv = s_shadowPoints[idx].y * g_d3dimShadowTexel;
+                    if (++vertexCount == 3000)
                         goto done;
                 }
             }
