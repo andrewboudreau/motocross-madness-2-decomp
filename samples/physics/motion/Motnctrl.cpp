@@ -223,18 +223,16 @@ void PoseRotation(CharacterPose* a, CharacterPose* b, Vec3* axis, float* angle)
 // clamped to [0, 1]: the axes and the position are interpolated linearly (the axes renormalised),
 // then axisY is made orthogonal to axisZ again.  The three weighted sums at the end are
 // computed into a temporary and never used (retail calls operator* and operator+ for them).
-// Near miss (245/1205): VC6 inlines the first CrossProduct where retail calls 0x00515600 twice.
-// CrossProductCall for both gives retail's structure up to the unused sums (aligned 336/394
-// instructions, strict 114, frame 0x54 vs 0x58): VC6 then inlines the whole first unused sum,
-// where retail inlines only `b->axisZ * t` and calls operator* and operator+, and retail keeps
-// &a->axisZ in ebp (spilled) with a in esi and b in ebx.  A PoseLerp inline for the three
-// interpolations (84..115) and a PoseBlend inline for the unused sums (left out of line) are worse.
+// Retail also constructs two poses that are never used (two calls of CharacterPose's generated
+// constructor, 0x004a8930, and their 0x58 bytes of frame); with them VC6 calls both
+// CrossProducts and the unused sums' operators out of line as retail does (inline budget).
 void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     ClampFloat(0.0f, 1.0f, &t);
     float s = 1.0f - t;
     out->nodeIndex = a->nodeIndex;
     out->hasPose = a->hasPose;
+    CharacterPose unused1, unused2;
     out->axisZ = UnitVector(a->axisZ + (b->axisZ - a->axisZ) * t);
     out->axisY = UnitVector(a->axisY + (b->axisY - a->axisY) * t);
     out->position = a->position + (b->position - a->position) * t;
