@@ -53,7 +53,7 @@ struct UnknownDialogEvent {
 // 0x00452b8e; 0x00453090 near 0x004531dc).
 void HandleMenuCancel(int menu, UnknownDialogEvent* event); // 0x004526b0: Cancel button / Esc for `menu`
 void HandleMenuOk(int menu, UnknownDialogEvent* event);     // 0x00452930: OK button / Enter for `menu`
-void UnknownFunction453090(int menu, UnknownDialogEvent* event);
+void HandleMenuMiddle(int menu, UnknownDialogEvent* event); // 0x00453090: ContinueDlg's "ButMiddle" for `menu` (its only caller)
 
 // RTTI: ChoiceDlg : UIDialog (vtable 0x00551cb0; slot 29 is 0x004555b0 in
 // dlgprocs.cpp). ExitDlg's procedure allocates 0x7f58 bytes for it and

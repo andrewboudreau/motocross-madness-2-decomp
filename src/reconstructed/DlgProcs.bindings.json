@@ -279,7 +279,7 @@
   "?CreateProfile@@YAXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054a67a",
   "?HandleMenuCancel@@YAXHPAUUnknownDialogEvent@@@Z": "0x004526b0",
   "?HandleMenuOk@@YAXHPAUUnknownDialogEvent@@@Z": "0x00452930",
-  "?UnknownFunction453090@@YAXHPAUUnknownDialogEvent@@@Z": "0x00453090",
+  "?HandleMenuMiddle@@YAXHPAUUnknownDialogEvent@@@Z": "0x00453090",
   "?LeaveMenusForRace@@YAXXZ": "0x004536e0",
   "?LeaveMenusForRace@@YAXXZ$ehhandler": "0x0054a7aa",
   "?OpenPage@GhostReplayDlg@@QAEXH@Z": "0x00453e90",

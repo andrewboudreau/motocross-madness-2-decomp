@@ -13363,7 +13363,7 @@ CASES = [
         'name': 'dlgprocs.cpp dlgprocs back menu',
         'bindings': 'src/reconstructed/DlgProcs.bindings.json',
         'source': 'src/reconstructed/DlgProcs.cpp',
-        'symbol': '?UnknownFunction453090@@YAXHPAUUnknownDialogEvent@@@Z',
+        'symbol': '?HandleMenuMiddle@@YAXHPAUUnknownDialogEvent@@@Z',
         'target_va': '0x00453090',
         'target_size': 217,
         'reason': 'declared in DialogProc.h',

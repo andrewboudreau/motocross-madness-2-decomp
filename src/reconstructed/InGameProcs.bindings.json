@@ -39,7 +39,7 @@
   "?RestartRace@UnknownKrustyBikeView@@QAEXHHH@Z": "0x00420650",
   "?HandleMenuCancel@@YAXHPAUUnknownDialogEvent@@@Z": "0x004526b0",
   "?HandleMenuOk@@YAXHPAUUnknownDialogEvent@@@Z": "0x00452930",
-  "?UnknownFunction453090@@YAXHPAUUnknownDialogEvent@@@Z": "0x00453090",
+  "?HandleMenuMiddle@@YAXHPAUUnknownDialogEvent@@@Z": "0x00453090",
   "?SetTextsOrResources@ChoiceDlg@@QAEXHHHHHHHHHH@Z": "0x00455700",
   "?SetTextsOrResources@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
   "?CloseRace@EventManager@@QAEXH@Z": "0x0045cdc0",

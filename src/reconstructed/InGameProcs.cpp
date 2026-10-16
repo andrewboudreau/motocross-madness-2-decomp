@@ -100,7 +100,7 @@ void ContinueDlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogCommand:
         if (!_stricmp("ButMiddle", event->controlName)) {
             guiManager->ShowCursors(0);
-            UnknownFunction453090(0x190, event);
+            HandleMenuMiddle(0x190, event);
             g_TrackGame->ResetClock();
         }
         break;
