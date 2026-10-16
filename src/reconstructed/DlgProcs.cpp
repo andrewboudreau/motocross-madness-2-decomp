@@ -93,7 +93,7 @@ int g_UnknownGlobal59adbc;
 int g_LoadingTimerTicks;
 int g_LoadingEventLoaded;
 int g_UnknownGlobal59ae88;
-int g_UnknownGlobal59ae00;
+int g_IntroSkipped;
 
 // 0x00569e14: the characters a profile name may use.
 static const char kProfileNameCharacters[] =
@@ -1912,7 +1912,7 @@ void Intro1Dlg::HandleEvent(UnknownDialogEvent* event) {
     case kDialogInit:
         g_TrackGame->ui->gui->ShowCursors(0);
         framesShown = 0;
-        g_UnknownGlobal59ae00 = !g_TrackGame->mode.introMovieOn;
+        g_IntroSkipped = !g_TrackGame->mode.introMovieOn;
         break;
     }
 }
@@ -1928,7 +1928,7 @@ int Intro1Dlg::Tick(float frameTime) {
 
 // 0x00453420
 int Intro1Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    return g_UnknownGlobal59ae00 = 1;
+    return g_IntroSkipped = 1;
 }
 
 // 0x00453430
@@ -1936,7 +1936,7 @@ void Intro2Dlg::HandleEvent(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogClose:
         if (!g_TrackGame->shuttingDown) {
-            if (!g_UnknownGlobal59ae00) {
+            if (!g_IntroSkipped) {
                 Intro3Dlg* dialog = new(__FILE__, 4256) Intro3Dlg;
                 g_TrackGame->ui->gui->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 0);
             } else {
@@ -1960,7 +1960,7 @@ int Intro2Dlg::Tick(float frameTime) {
         g_TrackGame->ui->BuildGarageScene(2);
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
-    if ((g_UnknownGlobal59ae00 || secondsShown > 3.0f) && framesShown >= 3)
+    if ((g_IntroSkipped || secondsShown > 3.0f) && framesShown >= 3)
         EndDialog(0);
     return UIDialog::Tick(frameTime);
 }
@@ -1968,7 +1968,7 @@ int Intro2Dlg::Tick(float frameTime) {
 // 0x004535f0
 int Intro2Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1)
-        g_UnknownGlobal59ae00 = 1;
+        g_IntroSkipped = 1;
     return 1;
 }
 
@@ -1993,7 +1993,7 @@ void Intro3Dlg::HandleEvent(UnknownDialogEvent* event) {
 int Intro3Dlg::Tick(float frameTime) {
     secondsShown = frameTime + secondsShown;
     frameRan = 1;
-    if (g_UnknownGlobal59ae00 || secondsShown > 3.0f)
+    if (g_IntroSkipped || secondsShown > 3.0f)
         EndDialog(0);
     return UIDialog::Tick(frameTime);
 }
@@ -2001,7 +2001,7 @@ int Intro3Dlg::Tick(float frameTime) {
 // 0x004536c0
 int Intro3Dlg::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (frameRan == 1)
-        g_UnknownGlobal59ae00 = 1;
+        g_IntroSkipped = 1;
     return 1;
 }
 

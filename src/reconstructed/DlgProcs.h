@@ -166,9 +166,11 @@ public:
     UIVideoStatic* movieControl;              // +0x7f58: the credits movie
 };
 
-// 0x0059ae00: set when the player skips the intro (or the intro movie is
-// turned off).
-extern int g_UnknownGlobal59ae00;
+// 0x0059ae00: set when the player skips the intro (any control press in
+// Intro1Dlg, or in Intro2Dlg/Intro3Dlg once they ran a frame); Intro1Dlg's
+// init sets it when the intro movie is turned off. Intro2Dlg then goes to the
+// main menu instead of Intro3Dlg, and both end before their 3 seconds.
+extern int g_IntroSkipped;
 
 // RTTI: Intro2Dlg : UIDialog (vtable 0x00552260; 0x7f64 bytes).
 class Intro2Dlg : public UIDialog {

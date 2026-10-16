@@ -474,7 +474,7 @@
   "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal59adbc@@3HA": "0x0059adbc",
   "?g_LoadingTimerTicks@@3HA": "0x0059adfc",
-  "?g_UnknownGlobal59ae00@@3HA": "0x0059ae00",
+  "?g_IntroSkipped@@3HA": "0x0059ae00",
   "?g_LoadingEventLoaded@@3HA": "0x0059ae84",
   "?g_UnknownGlobal59ae88@@3HA": "0x0059ae88",
   "_$E1": "0x00453d60",
