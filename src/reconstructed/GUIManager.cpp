@@ -807,9 +807,9 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
         rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, 0.0f,
-                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
+                                       g_TrackGame->controlInterface->NextBindingId(), 0, 0.0f);
     bindingY = UnknownControlBinding(rangeMinY, rangeY, 0.0f,
-                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.0f);
+                                       g_TrackGame->controlInterface->NextBindingId(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingY, 0.01f, 0.01f);
@@ -840,9 +840,9 @@ void GUIInputDevice::Rebind() {
         rangeY = (float)(((RenderTarget*)renderContext)->targetHeight - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)x,
-                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
+                                       g_TrackGame->controlInterface->NextBindingId(), 0, 0.0f);
     bindingY = UnknownControlBinding(rangeMinY, rangeY, (float)y,
-                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.0f);
+                                       g_TrackGame->controlInterface->NextBindingId(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingX, 0.01f, 0.01f);
         ((JoystickDevice*)inputDevice)->AttachAxisBinding(&bindingY, 0.01f, 0.01f);

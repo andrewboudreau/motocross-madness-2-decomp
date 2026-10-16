@@ -24,11 +24,13 @@ CollisionVec3* CollisionRotateVector(CollisionVec3* out, const CollisionVec3* v,
     return out;
 }
 
-// 0x0043ce90 (cdecl): pre-increments a global counter at 0x0057985c and returns the new value
-// (an id generator; callers unknown).
-// owner: bracket only.
-int g_CollisionCounter;
-int NextCollisionCounter()
+// 0x0043ce90: pre-increments the global at 0x0057985c and returns the new value. It is
+// ControlInterface::NextBindingId (ControlInterface.h): GUIManager, DeviceSetup and
+// ObjectPicker call it through g_TrackGame->controlInterface (this unused) for the id of
+// each UnknownControlBinding they build. Defined here as a free function, which emits
+// the same body; owner: bracket only (it lies in ControlInterface's 0x0043cb30.. run).
+int g_LastBindingId;
+int NextBindingId()
 {
-    return ++g_CollisionCounter;
+    return ++g_LastBindingId;
 }

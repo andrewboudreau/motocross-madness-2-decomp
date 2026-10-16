@@ -203,10 +203,10 @@ void UnknownTrackGameObject33fc::ApplyDevice(const char* path, int device)
     g_TrackGame->throttleBinding.Unbind();
 
     g_TrackGame->steerBinding =
-        UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),
+        UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->NextBindingId(),
                               AxisOfCode(assignments[currentDevice][0].code), 0.04f);
     g_TrackGame->leanBinding =
-        UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),
+        UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->NextBindingId(),
                               AxisOfCode(assignments[currentDevice][2].code), 0.0f);
     BindAxis(&g_TrackGame->steerBinding, assignments[currentDevice][0].kind,
                           assignments[currentDevice][0].code, assignments[currentDevice][1].code);
@@ -216,12 +216,12 @@ void UnknownTrackGameObject33fc::ApplyDevice(const char* path, int device)
     if (assignments[currentDevice][4].kind == 2 && assignments[currentDevice][4].code < 0) {
         if (assignments[currentDevice][4].code == -6 || assignments[currentDevice][4].code == -7) {
             g_TrackGame->throttleBinding = UnknownControlBinding(
-                0.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 2, 0.0f);
+                0.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->NextBindingId(), 2, 0.0f);
             BindAxis(&g_TrackGame->throttleBinding, assignments[currentDevice][4].kind, -7, -6);
         }
         if (assignments[currentDevice][4].code == -12 || assignments[currentDevice][4].code == -13) {
             g_TrackGame->throttleBinding = UnknownControlBinding(
-                1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 5, 0.0f);
+                1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->NextBindingId(), 5, 0.0f);
             BindAxis(&g_TrackGame->throttleBinding, assignments[currentDevice][4].kind, -13,
                                   -12);
         }

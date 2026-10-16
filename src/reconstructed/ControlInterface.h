@@ -110,7 +110,9 @@ public:
     int SetMapping(UnknownControlMapping* newMapping);        // 0x0043ce70: 0 for a null mapping
     void QueueEvent(int control, int kind, int pressed, int device); // 0x0043cea0: the device readers call it
     int DispatchInput(int value);                             // 0x0043cf00: reads the devices, dispatches the events
-    int UnknownFunction43ce90();            // 0x0043ce90: next binding id (GUIManager.cpp)
+    // 0x0043ce90: ++0x0057985c (g_LastBindingId); the id each new
+    // UnknownControlBinding gets (GUIManager, DeviceSetup, ObjectPicker).
+    int NextBindingId();
 
     int joystickCount;                        // joystick count
     int activeJoystickIndex;                        // active joystick index

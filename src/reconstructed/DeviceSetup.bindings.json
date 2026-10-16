@@ -20,7 +20,7 @@
   "?SetJoystickButton@UnknownControlMapping@@QAEXHHH@Z": "0x0043cb50",
   "?SetMouseButton@UnknownControlMapping@@QAEXHH@Z": "0x0043cb80",
   "?Unbind@UnknownControlBinding@@QAEXXZ": "0x0043cde0",
-  "?UnknownFunction43ce90@ControlInterface@@QAEHXZ": "0x0043ce90",
+  "?NextBindingId@ControlInterface@@QAEHXZ": "0x0043ce90",
   "?LoadControlFile@UnknownTrackGameObject33fc@@QAEXPBD@Z": "0x00448990",
   "?SaveControlFile@UnknownTrackGameObject33fc@@QAEXPBD@Z": "0x004489e0",
   "?LoadAssignment@UnknownTrackGameObject33fc@@QAEXHHPBD@Z": "0x00448a50",

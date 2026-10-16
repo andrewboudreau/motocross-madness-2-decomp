@@ -19,7 +19,7 @@
   "?SetMeshShape@CollisionObject@@QAEXHPAX@Z": "0x00432ab0",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",
-  "?UnknownFunction43ce90@ControlInterface@@QAEHXZ": "0x0043ce90",
+  "?NextBindingId@ControlInterface@@QAEHXZ": "0x0043ce90",
   "?CreateBound@GameCursor@@QAEPAVGameObject@@PAXPAUUnknownControlBinding@@1PBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043ea70",
   "?CursorPosition@GameCursor@@QAE?AUUnknownCursorPosition@@XZ": "0x0043f100",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
