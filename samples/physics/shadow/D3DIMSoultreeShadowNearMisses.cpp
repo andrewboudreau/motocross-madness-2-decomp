@@ -76,11 +76,11 @@ class D3DIMShadowCasterView {
 public:
     void GetMatrixIn(void* frame, D3DIMShadowMatrix4* out);           // 0x004fca80
     void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);      // 0x004fe850
-    void SelectLod(int lod);                                          // 0x00440d40
+    void TransformVertexGroups(int lod);                              // 0x00440d40 (D3DIMSoulTree.h)
     char pad_0x00[0x14c];
     int field_0x14c;                // +0x14c nonzero skips the visibility test
     char pad_0x150[0x18c - 0x150];
-    int field_0x18c;                // +0x18c nonzero: slot 30 calls SelectLod(-1) first
+    int field_0x18c;                // +0x18c nonzero: slot 30 calls TransformVertexGroups(-1) first
     char pad_0x190[0x27c - 0x190];
     int currentLod;                 // +0x27c
     char pad_0x280[0x28c - 0x280];
@@ -192,7 +192,7 @@ void D3DIMSoultreeShadow::UnknownVirtualSlot30()
     field_0x44 = 0;
     D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
     if (c->field_0x18c)
-        c->SelectLod(-1);
+        c->TransformVertexGroups(-1);
     for (int i = 0; i < ((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshCount; i++) {
         D3DIMShadowMesh* mesh = &((D3DIMShadowCasterView*)caster)->lods[((D3DIMShadowCasterView*)caster)->currentLod].meshes[i];
         if (mesh->vertexCount > s_shadowPointCapacity) {

@@ -47,7 +47,7 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
     savedField = model->field_0x1a4;
     model->field_0x1a4 = 0;
     model->MarkSubtreeDirty();
-    model->SelectLod(-1);
+    model->TransformVertexGroups(-1);
     model->field_0x1a4 = savedField;
     model->MarkSubtreeDirty();
 

@@ -4,7 +4,7 @@
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?GetBounds@D3DIMShadowCasterView@@QAEXPAUShadowVec3@@0@Z": "0x004fe850",
   "?GetMatrixIn@D3DIMShadowCasterView@@QAEXPAXPAUD3DIMShadowMatrix4@@@Z": "0x004fca80",
-  "?SelectLod@D3DIMShadowCasterView@@QAEXH@Z": "0x00440d40",
+  "?TransformVertexGroups@D3DIMShadowCasterView@@QAEXH@Z": "0x00440d40",
   "?Set@ClipRectangle@@QAEXMMMM@Z": "0x00431350",
   "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",
   "?ShadowTransformPointsOrtho@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1b00",
