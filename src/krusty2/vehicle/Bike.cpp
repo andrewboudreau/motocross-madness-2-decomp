@@ -1553,8 +1553,8 @@ void Bike::UnknownVirtualSlot91()
     if (field_0x6fc && rearWheel->penetration < -2.0f) {
         if (brakeGyro && rearWheel->rampLevel > 0.0f)
             force.x += dt * rearWheel->rampLevel;
-        if (gasGyro && throttleOn && engineState->field_0x00 > 0.0f && !field_0x479)
-            force.x -= dt * engineState->field_0x00;
+        if (gasGyro && throttleOn && engineState->throttleFraction > 0.0f && !field_0x479)
+            force.x -= dt * engineState->throttleFraction;
         float speed = linearSpeed;
         float inv = 1.0f / speed;
         Vec3* heading = &scratchVector;

@@ -134,28 +134,29 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char pad_0x10[0x14];
     char field_0x24;
 };
-// Object at Vehicle+0x480 (provisional): lean/speed state; field_0x00 is read by slots 42/57 as a float.
+// Object at Vehicle+0x480: the engine gearbox (ctor 0x004d2940, 0x1e4 bytes), the same object as
+// src/reconstructed/GearRatios.h's UnknownEngineGearbox; slots 42/57 read throttleFraction.
 struct VehicleSpeedEntry { float a; float b; };   // 8-byte table entry (slot 1 reads .a)
 struct VehicleSpeedState {
-    float field_0x00;
-    int field_0x04;
-    int field_0x08;
+    float throttleFraction;                   // +0x0  UnknownEngineGearbox +0x00 (GearRatios.h); UpdateThrottle ramps it in [0, 1]
+    int currentRpm;                           // +0x4  UnknownEngineGearbox +0x04 current rpm (an int view of the float)
+    int driveCut;                             // +0x8  UnknownEngineGearbox +0x08; DriveForce gives no engine torque while set
     float gearTimer;                // +0x0c countdown timer
     unsigned char gear;        // +0x10 table index (slot 1)
     char pad_0x11[0x1F];
-    VehicleSpeedEntry field_0x30[6];
-    float field_0x60[6];
+    VehicleSpeedEntry shiftRanges[6];         // +0x30  UnknownEngineGearbox +0x30 shift ranges (.a = lower rpm)
+    float shiftWindowWidths[6];               // +0x60  UnknownEngineGearbox +0x60 shift window widths
     float randomStart;                // +0x78 randomised start value (slot 1)
     char pad_0x7C[0x8];
-    int field_0x84;
+    int lastUpdateRpm;                        // +0x84  UnknownEngineGearbox +0x84 rpm at the last update
     char pad_0x88[0x15c];           // the object is 0x1e4 bytes (LoadVehicle's allocation)
     ~VehicleSpeedState();                           // 0x00464e90, the shared empty out-of-line destructor (~Vehicle)
     // 0x004d2940 (ret 0x24): the gearbox constructor (src/reconstructed/GearRatios.h names the
     // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and field_0x524[2..3].
     VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
                       int rpmStep, float a6, float riseRate, float fallRate);
-    void Method_004D2F50(float dt, int a, bool b);  // 0x004d2f50, purpose unknown (b: one byte pushed)
-    void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
+    void UpdateThrottle(float dt, int throttleOn, bool cutDrive);  // 0x004d2f50, GearRatios.h UnknownEngineGearbox::UpdateThrottle (cutDrive: one byte pushed)
+    void AutoShift(int throttleOn, float speed);   // 0x004d3030, GearRatios.h UnknownEngineGearbox::AutoShift
     // Inline in Vehicle slot 49: counts the timer down to zero (retail loads dt before the
     // timer, the inline-parameter order).
     void TickGearTimer(float dt)
@@ -565,7 +566,7 @@ public:
     bool field_0x47a;
     char pad_0x47B[0x1];
     VehicleSteerState* steerState;  // +0x47c VehicleSteerState*: node plus steer angle; slots 53/60/73/36 use it
-    VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by Method_004D2F50/004D3030 with throttle/brake flags and speed in slot 49 (provisional)
+    VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by UpdateThrottle/AutoShift with throttle/brake flags and speed in slot 49 (provisional)
     int justLanded;  // +0x484 slot 49 clears it per frame; slot 71 sets it to 1 when the airborne flag 0x108 drops (landing)
     Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
     Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground

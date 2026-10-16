@@ -143,7 +143,7 @@ int KrustyBike::UnknownVirtualSlot24()
             return 1;
         return 0;
     }
-    if (field_0x5b0 < engineState->field_0x00 && !crashState && linearSpeed < 22.0f)
+    if (field_0x5b0 < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
         return 1;
     return 0;
 }
@@ -154,7 +154,7 @@ int KrustyBike::UnknownVirtualSlot25()
         if (prevSpeed > linearSpeed && !crashState && linearSpeed < 22.0f)
             return 1;
     } else {
-        if (field_0x5b0 < engineState->field_0x00 && !crashState && linearSpeed < 22.0f)
+        if (field_0x5b0 < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
             return 1;
     }
     return 0;
@@ -285,7 +285,7 @@ int KrustyBike::UnknownVirtualSlot80()
     if (!race->isRacing && !field_0x479)
         return 0;
     if (field_0x804 > 0.0f || (inputDevice && throttleInput > 0.33f) ||
-        (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->field_0x00 == 0.0f)))
+        (UnknownVirtualSlot84(4, 0x3f) && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
     return 0;
 }
@@ -303,7 +303,7 @@ int KrustyBike::UnknownVirtualSlot82()
 {
     if (!aiKind && !isRemote && !isGhost) {
         if (forwardSpeed < 6.0f && UnknownVirtualSlot84(13, 0x3f)) {
-            if (!UnknownVirtualSlot77(engineState->field_0x00 == 0.0f))
+            if (!UnknownVirtualSlot77(engineState->throttleFraction == 0.0f))
                 return 1;
         }
         field_0x664 = 0;

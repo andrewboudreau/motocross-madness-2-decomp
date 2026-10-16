@@ -66,7 +66,7 @@ void Vehicle::UnknownVirtualSlot96()
 void Vehicle::UnknownVirtualSlot21()
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot21();
-    field_0x5b0 = engineState->field_0x00;
+    field_0x5b0 = engineState->throttleFraction;
 }
 
 int Vehicle::UnknownVirtualSlot82()
@@ -956,7 +956,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         Vec3 zero = kVec3Zero;
         if (crashState == 0) {
             if (UpdateWheelRampLevels())
-                engineState->field_0x08 = 1;
+                engineState->driveCut = 1;
         } else if (totalWeight != baseWeight) {
             if (UnknownVirtualSlot10())
                 UnknownVirtualSlot0(0.0f);
@@ -964,8 +964,8 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         field_0x47a = UnknownVirtualSlot82() != 0;
         field_0x479 = crashState == 0 && (field_0x47a || UnknownVirtualSlot81());
         throttleOn = crashState == 0 && UnknownVirtualSlot80();
-        engineState->Method_004D2F50(stepTime, throttleOn, field_0x479);
-        engineState->Method_004D3030(throttleOn, linearSpeed);
+        engineState->UpdateThrottle(stepTime, throttleOn, field_0x479);
+        engineState->AutoShift(throttleOn, linearSpeed);
         if (hit) {
             Vec3 hitA, hitB, hitC;
             int dummy = 0;
@@ -1277,7 +1277,7 @@ int Vehicle::UnknownVirtualSlot80()
 {
     if ((inputDevice && throttleInput > 0.33f)
         || (inputMap->UnknownVirtualSlot3(0, 2, 0x3f, 0)
-            && !UnknownVirtualSlot77(engineState->field_0x00 == 0.0f)))
+            && !UnknownVirtualSlot77(engineState->throttleFraction == 0.0f)))
         return 1;
     return inputMap->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
 }
@@ -1533,13 +1533,13 @@ void Vehicle::UnknownVirtualSlot1(float value)
     VehicleSpeedState* s = engineState;
     if (s) {
         s->gear = 0;
-        s->field_0x04 = 0;
-        s->field_0x84 = 0;
-        s->field_0x00 = 0.0f;
+        s->currentRpm = 0;
+        s->lastUpdateRpm = 0;
+        s->throttleFraction = 0.0f;
         s->gearTimer = 0.0f;
-        s->field_0x08 = 1;
+        s->driveCut = 1;
         float unit = (float)rand() * 3.05175781e-05f;
-        s->randomStart = unit * s->field_0x60[s->gear] + s->field_0x30[s->gear].a;
+        s->randomStart = unit * s->shiftWindowWidths[s->gear] + s->shiftRanges[s->gear].a;
     }
     RunTickers();
     ResetWheelContacts();
