@@ -64,7 +64,7 @@ Display profiles live under `DriverInfo\<driver name>`. They hold a
 display's saved device identifier, its mode list and per-mode flags, video
 memory, and the disabled/partial-blit settings. The following are exact:
 - `0x004c1610` saves a profile and `0x004c16b0` saves one for every display
-  in the global array `0x0068a754` (count `0x0068a764`);
+  in `g_Displays` `0x0068a754` (count `g_DisplayCount` `0x0068a764`);
 - `0x004c1410` reports whether any profile is stale;
 - `0x004c1a00` deletes them all.
 

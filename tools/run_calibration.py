@@ -9106,10 +9106,10 @@ CASES = [
         'name': 'VideoCard.cpp VideoCard delete-all 0x52d0d0',
         'bindings': 'src/reconstructed/VideoCard.bindings.json',
         'source': 'src/reconstructed/VideoCard.cpp',
-        'symbol': '?UnknownFunction52d0d0@@YAXXZ',
+        'symbol': '?DeleteDisplays@@YAXXZ',
         'target_va': '0x0052d0d0',
         'target_size': 74,
-        'reason': 'VideoCard.cpp; deletes g_UnknownDisplays68a754 entries, count=0',
+        'reason': 'VideoCard.cpp; deletes g_Displays entries, count=0',
     },
     {
         'name': 'VideoCard.cpp VideoCard mode comparator 0x52d120',

@@ -12,14 +12,14 @@
 // next TU's initializers (0x0052d2e0..) after it. Names are provisional.
 
 // 0x0052d0d0
-void UnknownFunction52d0d0() {
-    for (int i = 0; i < g_UnknownDisplayCount68a764; i++) {
-        if (g_UnknownDisplays68a754[i]) {
-            delete g_UnknownDisplays68a754[i];
-            g_UnknownDisplays68a754[i] = 0;
+void DeleteDisplays() {
+    for (int i = 0; i < g_DisplayCount; i++) {
+        if (g_Displays[i]) {
+            delete g_Displays[i];
+            g_Displays[i] = 0;
         }
     }
-    g_UnknownDisplayCount68a764 = 0;
+    g_DisplayCount = 0;
 }
 
 // 0x0052d120

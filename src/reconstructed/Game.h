@@ -32,8 +32,10 @@ void InitFastMath();
 // cdecl 0x004bfa80: the current time stamp.
 unsigned int ReadClock();
 
-// cdecl 0x0052d0d0, called last on shutdown.
-void UnknownFunction52d0d0();
+// cdecl 0x0052d0d0 (VideoCard.cpp): deletes the displays EnumerateDisplays
+// collected into g_Displays and zeroes g_DisplayCount; Game's shutdown
+// calls it last.
+void DeleteDisplays();
 
 // RTTI: Game (root; PCGame : Game and TrackGame : PCGame derive from it).
 // Its functions pass the literal __FILE__ "D:\\aardvark\\VC\\krusty2\\Game.cpp".

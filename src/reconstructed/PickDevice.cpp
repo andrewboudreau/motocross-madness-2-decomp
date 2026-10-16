@@ -113,12 +113,12 @@ UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
     int lastIndex = g_TrackGame->GetRegistryInt("UseVideoCardIdx", -1);
     int usableIndex;
     int i;
-    for (i = 0; i < g_UnknownDisplayCount68a764; i++) {
-        UnknownDisplay* display = g_UnknownDisplays68a754[i];
+    for (i = 0; i < g_DisplayCount; i++) {
+        UnknownDisplay* display = g_Displays[i];
         if (display->driverCaps & 1) {
             sprintf(key, "DriverInfo\\%s\\DisabledFullScreen", display->driverGuidText);
             int fullScreenDisabled = g_TrackGame->GetRegistryFlag(key, 0);
-            sprintf(key, "DriverInfo\\%s\\DisabledHardware", g_UnknownDisplays68a754[i]->driverGuidText);
+            sprintf(key, "DriverInfo\\%s\\DisabledHardware", g_Displays[i]->driverGuidText);
             int hardwareDisabled = g_TrackGame->GetRegistryFlag(key, 0);
             if (!fullScreenDisabled && !hardwareDisabled) {
                 usable++;
@@ -126,10 +126,10 @@ UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
             }
         }
         if (useLast && lastIndex == i)
-            return g_UnknownDisplays68a754[i];
+            return g_Displays[i];
     }
     if (usable == 1 && !g_TrackGame->field_0x544)
-        return g_UnknownDisplays68a754[usableIndex];
+        return g_Displays[usableIndex];
 
     WNDCLASS windowClass;
     windowClass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
@@ -178,9 +178,9 @@ UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
     SetFocus(g_DisplayOkButton);
 
     int entries = 0;
-    sprintf(key, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[0]->driverGuidText);
+    sprintf(key, "DriverInfo\\%s\\DisabledFullScreen", g_Displays[0]->driverGuidText);
     int fullScreenDisabled = g_TrackGame->GetRegistryFlag(key, 0);
-    sprintf(key, "DriverInfo\\%s\\DisabledSoftware", g_UnknownDisplays68a754[0]->driverGuidText);
+    sprintf(key, "DriverInfo\\%s\\DisabledSoftware", g_Displays[0]->driverGuidText);
     int softwareDisabled = g_TrackGame->GetRegistryFlag(key, 0);
     if (g_TrackGame->field_0x544 && !fullScreenDisabled && !softwareDisabled) {
         char text[0x80];
@@ -189,14 +189,14 @@ UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
         SendMessage(g_DisplayList, LB_SETITEMDATA, 0, -1);
         entries = 1;
     }
-    for (i = 0; i < g_UnknownDisplayCount68a764; i++) {
-        sprintf(key, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->driverGuidText);
+    for (i = 0; i < g_DisplayCount; i++) {
+        sprintf(key, "DriverInfo\\%s\\DisabledFullScreen", g_Displays[i]->driverGuidText);
         int fullScreenDisabled = g_TrackGame->GetRegistryFlag(key, 0);
-        sprintf(key, "DriverInfo\\%s\\DisabledHardware", g_UnknownDisplays68a754[i]->driverGuidText);
+        sprintf(key, "DriverInfo\\%s\\DisabledHardware", g_Displays[i]->driverGuidText);
         int hardwareDisabled = g_TrackGame->GetRegistryFlag(key, 0);
-        if (!fullScreenDisabled && !hardwareDisabled && (g_UnknownDisplays68a754[i]->driverCaps & 1)) {
+        if (!fullScreenDisabled && !hardwareDisabled && (g_Displays[i]->driverCaps & 1)) {
             SendMessage(g_DisplayList, LB_ADDSTRING, 0,
-                        (LPARAM)g_UnknownDisplays68a754[i]->deviceIdentifier.description);
+                        (LPARAM)g_Displays[i]->deviceIdentifier.description);
             SendMessage(g_DisplayList, LB_SETITEMDATA, entries, i);
             entries++;
         }
@@ -236,9 +236,9 @@ UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade)
     } else {
         *blade = 0;
     }
-    if (g_DisplayChoice >= 0 && g_DisplayChoice < g_UnknownDisplayCount68a764) {
+    if (g_DisplayChoice >= 0 && g_DisplayChoice < g_DisplayCount) {
         g_TrackGame->SetRegistryInt("UseVideoCardIdx", g_DisplayChoice);
-        return g_UnknownDisplays68a754[g_DisplayChoice];
+        return g_Displays[g_DisplayChoice];
     }
     return 0;
 }

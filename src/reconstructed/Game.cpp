@@ -420,7 +420,7 @@ int Game::Shutdown() {
         renderTarget = 0;
     }
     display = 0;
-    UnknownFunction52d0d0();
+    DeleteDisplays();
     return 1;
 }
 

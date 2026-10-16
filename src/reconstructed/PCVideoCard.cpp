@@ -17,12 +17,12 @@
 // 0x004c94a0: DirectDrawEnumerateA callback; `context` points at the window.
 static int __stdcall EnumDisplayCallback(UnknownGuid* guid, char* description, char* name,
     void* context) {
-    if (g_UnknownDisplayCount68a764 < 4) {
+    if (g_DisplayCount < 4) {
         UnknownDisplay* display = new (__FILE__, 280) UnknownDisplay;
         display = display->InitializeDisplay(guid, description, name, *(void**)context);
-        g_UnknownDisplays68a754[g_UnknownDisplayCount68a764] = display;
+        g_Displays[g_DisplayCount] = display;
         if (display)
-            g_UnknownDisplayCount68a764++;
+            g_DisplayCount++;
     }
     return 1;
 }
@@ -30,12 +30,12 @@ static int __stdcall EnumDisplayCallback(UnknownGuid* guid, char* description, c
 // 0x004c9550: DirectDrawEnumerateExA callback (the monitor is not used).
 static int __stdcall EnumDisplayExCallback(UnknownGuid* guid, char* description, char* name,
     void* context, void* monitor) {
-    if (g_UnknownDisplayCount68a764 < 4) {
+    if (g_DisplayCount < 4) {
         UnknownDisplay* display = new (__FILE__, 307) UnknownDisplay;
         display = display->InitializeDisplay(guid, description, name, *(void**)context);
-        g_UnknownDisplays68a754[g_UnknownDisplayCount68a764] = display;
+        g_Displays[g_DisplayCount] = display;
         if (display)
-            g_UnknownDisplayCount68a764++;
+            g_DisplayCount++;
     }
     return 1;
 }
@@ -54,11 +54,11 @@ int EnumerateDisplays(void* window) {
         enumerate(EnumDisplayExCallback, &window,
                   DDENUM_ATTACHEDSECONDARYDEVICES | DDENUM_NONDISPLAYDEVICES);
         FreeLibrary(library);
-        return g_UnknownDisplayCount68a764;
+        return g_DisplayCount;
     }
     DirectDrawEnumerateA(EnumDisplayCallback, &window);
     FreeLibrary(library);
-    return g_UnknownDisplayCount68a764;
+    return g_DisplayCount;
 }
 
 // 0x004c9660: EnumDisplayModes callback; appends the mode, growing the
