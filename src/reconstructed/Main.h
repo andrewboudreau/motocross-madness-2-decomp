@@ -8,14 +8,14 @@
 
 // 0x004a05e0: EnumWindows callback; restores a window titled like the game
 // and sets *(int*)lParam (another instance runs).
-BOOL CALLBACK UnknownEnumWindowsProc4a05e0(HWND window, LPARAM found);
+BOOL CALLBACK RestoreRunningInstanceProc(HWND window, LPARAM found);
 // 0x004a0680: start-up checks, the main window and the message loop.
-int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine,
+int WINAPI WinMainBody(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine,
                                  int showCommand);
 // 0x004a0c50: registers the window class and creates the full-screen window.
 int CreateMainWindow(HINSTANCE instance, int showCommand);
 // 0x004a0d50: the main window's window procedure.
-LRESULT CALLBACK UnknownWindowProc4a0d50(HWND window, UINT message, WPARAM wParam,
+LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wParam,
                                          LPARAM lParam);
 
 extern HWND g_MainWindow;            // 0x00685024

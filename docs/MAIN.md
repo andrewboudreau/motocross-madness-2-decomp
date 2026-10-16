@@ -24,11 +24,11 @@ literals plus the `.bss` pair `0x00685024`/`0x00685028`.
 
 | VA | Size | Function |
 |---|---:|---|
-| `0x004a05e0` | 151 | EnumWindows callback (inline `strcmp`) |
-| `0x004a0680` | 1344 | start-up and message loop |
+| `0x004a05e0` | 151 | `RestoreRunningInstanceProc`, the EnumWindows callback (inline `strcmp`) |
+| `0x004a0680` | 1344 | `WinMainBody`, start-up and message loop |
 | `0x004a0bc0` | 130 | `WinMain` (`__try`, scope table `0x005551b0`) |
 | `0x004a0c50` | 242 | window class and window |
-| `0x004a0d50` | 901 | window procedure, with its two jump tables and two byte index tables |
+| `0x004a0d50` | 901 | `MainWindowProc`, the window procedure, with its two jump tables and two byte index tables |
 
 ### EnumWindows callback (`0x004a05e0`)
 

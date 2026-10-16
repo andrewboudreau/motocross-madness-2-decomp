@@ -28,7 +28,7 @@ int g_MainWindowShown;
     }
 
 // 0x004a05e0
-BOOL CALLBACK UnknownEnumWindowsProc4a05e0(HWND window, LPARAM found)
+BOOL CALLBACK RestoreRunningInstanceProc(HWND window, LPARAM found)
 {
     char title[0x80];
     GetWindowText(window, title, 0x80);
@@ -41,8 +41,8 @@ BOOL CALLBACK UnknownEnumWindowsProc4a05e0(HWND window, LPARAM found)
 }
 
 // 0x004a0680
-int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine,
-                                 int showCommand)
+int WINAPI WinMainBody(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine,
+                       int showCommand)
 {
     char tempName[MAX_PATH];
     char message[0x100];
@@ -66,7 +66,7 @@ int WINAPI UnknownFunction4a0680(HINSTANCE instance, HINSTANCE previous, LPSTR c
         COPY_NAME(g_TrackGame->applicationName, text);
 
     // A window with the game's title belongs to another instance.
-    EnumWindows(UnknownEnumWindowsProc4a05e0, (LPARAM)&found);
+    EnumWindows(RestoreRunningInstanceProc, (LPARAM)&found);
     if (found)
         exit(0);
 
@@ -150,7 +150,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, LPSTR commandLine, in
 {
     int result = -1;
     __try {
-        result = UnknownFunction4a0680(instance, previous, commandLine, showCommand);
+        result = WinMainBody(instance, previous, commandLine, showCommand);
     } __except (RecordExceptionInfo(GetExceptionInformation(), "main thread")) {
     }
     return result;
@@ -164,7 +164,7 @@ int CreateMainWindow(HINSTANCE instance, int showCommand)
     windowClass.hIcon = (HICON)LoadImage(instance, IDI_APPLICATION, IMAGE_ICON, 0, 0,
                                          LR_DEFAULTSIZE);
     windowClass.hCursor = LoadCursorFromFile("blank.cur");
-    windowClass.lpfnWndProc = UnknownWindowProc4a0d50;
+    windowClass.lpfnWndProc = MainWindowProc;
     windowClass.cbClsExtra = 0;
     windowClass.cbWndExtra = 0;
     windowClass.hInstance = instance;
@@ -187,8 +187,8 @@ int CreateMainWindow(HINSTANCE instance, int showCommand)
 }
 
 // 0x004a0d50
-LRESULT CALLBACK UnknownWindowProc4a0d50(HWND window, UINT message, WPARAM wParam,
-                                         LPARAM lParam)
+LRESULT CALLBACK MainWindowProc(HWND window, UINT message, WPARAM wParam,
+                                LPARAM lParam)
 {
     RECT rect;
     switch (message) {
