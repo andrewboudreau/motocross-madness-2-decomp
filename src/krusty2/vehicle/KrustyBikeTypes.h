@@ -407,7 +407,7 @@ struct KbTrackItem {
 // The race's Track (src/reconstructed/Track.h; tier 3 view): field_0x0 is the start node.
 // Positions on the track are KbRaw3 {node, segment, t} passed by value.
 struct KbRaceSub {
-    int* field_0x0;
+    int* startNode;  // +0x0  Track+0x00 startNode (KbRaceSub is the Track at BikeRace+0x48); slot 43 seeds the ghost block from it
     int ClosestPointOnNode(Vec3 p, int* node, KbRaw3* out, float* outDistance);
     int PlaceNear(Vec3 p, KbRaw3 from, float distance, float range, int path,
                               KbRaw3* out);
@@ -423,49 +423,49 @@ struct KbRaceSub {
 struct KbRace {
     KrustyBike* NextBike(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
     char pad_0x0000[0x38];
-    void* field_0x38; // 0x38
+    void* localRacer;  // +0x38  BikeRace+0x38 localRacer; KrustyBike compares it with this
     char pad_0x003C[0x8];
     KbRaceHandler* handler; // 0x44
-    KbRaceSub* field_0x48; // 0x48
-    Terrain* field_0x4c; // 0x4C  terrain passed to the look-ahead simulation 0x0040eca0
-    KbRacer* field_0x50; // 0x50
+    KbRaceSub* raceTrack;  // +0x48  BikeRace+0x48 raceTrack (Track methods 0x00516ca0.. are called on it)
+    Terrain* raceTerrain;  // +0x4C  BikeRace+0x4c raceTerrain; terrain passed to the look-ahead simulation 0x0040eca0
+    KbRacer* raceCamera;  // +0x50  BikeRace+0x50 raceCamera (+0x244 cameraState, +0x3b0/+0x3b4 followed bike/racer)
     char pad_0x0054[0x48];
-    float field_0x9c; // 0x9C   0x0048fc80 copies one of the three into KrustyBike+0x15dc by game type
-    float field_0xa0; // 0xA0
-    float field_0xa4; // 0xA4
+    float aiStuntChance1;  // +0x9C  BikeRace aiSettings[8] (10): AI KrustyBike+0x15dc at difficulty 1; BikeAI rolls rand*100 <= it
+    float aiStuntChance2;  // +0xA0  BikeRace aiSettings[9] (50): AI KrustyBike+0x15dc at difficulty 2
+    float aiStuntChance3;  // +0xA4  BikeRace aiSettings[10] (100): AI KrustyBike+0x15dc at difficulty 3 and 4
     char pad_0x00A8[0x10];
-    int field_0xb8; // 0xB8
-    KbScoreBoard* field_0xbc; // 0xBC
+    int forceAiStep;  // +0xB8  BikeRace+0xb8; slot 49 takes the BikeAI step 0x00413200 when aiKind or this is set
+    KbScoreBoard* scoreBoard;  // +0xBC  BikeRace+0xbc scoreBoard (BonusObjectManager counter)
     char pad_0x00C0[0x8];
-    KbGate* field_0xc8; // 0xC8
+    KbGate* gateList;  // +0xC8  BikeRace+0xc8 gateList; slot 43 points the ghost block at the first gate
     char pad_0x00CC[0x2C];
-    int field_0xf8; // 0xF8
-    int field_0xfc; // 0xFC
-    int field_0x100; // 0x100
+    int startProbeNode;  // +0xF8  BikeRace startProbe.trackPos.node (+0xcc+0x2c); slot 43 copies it when hasStartProbe
+    int startProbeSegment;  // +0xFC  BikeRace startProbe.trackPos.segment
+    int startProbeT;  // +0x100  BikeRace startProbe.trackPos.t
     char pad_0x0104[0x30];
-    KbRaw3 field_0x134; // 0x134  track position the race-kind 2/3 path search runs to (0x00414370)
+    KbRaw3 finishProbePos;  // +0x134  BikeRace finishProbe.trackPos (+0x108+0x2c); the race-kind 2/3 path search runs to it (0x00414370)
     char pad_0x0140[0x4];
-    int field_0x144; // 0x144
+    int hasStartProbe;  // +0x144  BikeRace+0x144 hasStartProbe; gates the copy of the start probe position
     char pad_0x0148[0x41];
-    char field_0x189; // 0x189
-    char field_0x18a; // 0x18A
+    char startBeforeFinish;  // +0x189  BikeRace+0x189; picks string 0x14d6/0x14d7 at lap 1
+    char isRacing;  // +0x18A  BikeRace+0x18a isRacing
     char pad_0x018B[0x1];
-    char field_0x18c; // 0x18C  0x0048fc80: scene-node flag passed as 0 when set, 1 otherwise
+    char forceHighLod;  // +0x18C  BikeRace+0x18c "ForceHighLOD"; 0x0048fc80 keeps full detail when set
     char pad_0x018D[0x1];
-    char field_0x18e; // 0x18E
+    char networkStartPending;  // +0x18E  BikeRace+0x18e networkStartPending
     char pad_0x018F[0xD];
-    KbSensor* field_0x19c; // 0x19C
+    KbSensor* chatOverlay;  // +0x19C  BikeRace+0x19c chatOverlay; its +0x3dc typing blocks the bike's input (slot 84)
     char pad_0x01A0[0x1b8 - 0x1a0];
-    float field_0x1b8; // 0x1B8  race clock in seconds (0x00493660 replays against it)
+    float replayTime;  // +0x1B8  BikeRace+0x1b8 replayTime (seconds); 0x00493660 replays against it
     char pad_0x01BC[0x1dc - 0x1bc];
-    int field_0x1dc; // 0x1DC  GameObject slot 10 runs the base update when both are 4
-    int field_0x1e0; // 0x1E0
-    int field_0x1e4; // 0x1E4  -2 while the race has not started (0x00493660)
+    int replayMode;  // +0x1DC  BikeRace+0x1dc replayMode; slot 10 runs the base update when it and +0x1e0 are 4
+    int appliedReplayMode;  // +0x1E0  BikeRace+0x1e0 appliedReplayMode
+    int lastRecordKind;  // +0x1E4  BikeRace+0x1e4: RecordFrame's last record kind (-2 after the tape end)
     char pad_0x01E8[0x3f8 - 0x1e8];
-    char field_0x3f8; // 0x3F8  0x00493660: skips the wheel roll and the +0x478 flag
+    char replayPaused;  // +0x3F8  BikeRace+0x3f8 replayPaused; 0x00493660 skips the wheel roll and the +0x478 flag
     char pad_0x03F9[0x1];
-    char field_0x3fa; // 0x3FA  GameObject slot 10 calls 0x00492ad0 when set
-    char field_0x3fb; // 0x3FB  0x00492670 records message 10 when set
+    char recorderTickDue;  // +0x3FA  BikeRace+0x3fa recorderTickDue; slot 10 calls 0x00492ad0 when set
+    char scoreRecordDue;  // +0x3FB  BikeRace+0x3fb; 0x00492670 records message 10 (score) when set
 };
 // Record at KrustyBike+0x744 (tier 3): per-bike state block reset by slot 43.
 struct KbGhost {

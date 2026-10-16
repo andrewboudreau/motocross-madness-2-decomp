@@ -345,7 +345,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                                 pingTimer = 2.0f;
                                             }
                                         }
-                                    } else if (netRecorder && race->field_0x3fb) {
+                                    } else if (netRecorder && race->scoreRecordDue) {
                                         ping.field_0x04 = field_0x768;
                                         ping.field_0x01 = loaderKind;
                                         netRecorder->QueueRecord(10, netId, &ping, sizeof(ping));
@@ -458,12 +458,12 @@ void KrustyBike::Fn_00493660(float dt, int a)
             }
         } else {
             // replay: the race clock, less a fixed lag, picks the state interval
-            float clock = this->race->field_0x1b8;
+            float clock = this->race->replayTime;
             if (g_kbGame->field_0x2d70 == 4) {
                 float adj;
                 stateIntervalElapsed = (clock - 0.17f) - (float)states[2]->time * 0.001f;
-                adj = this->race->field_0x1b8 - 0.17f;
-                if (adj > (float)states[0]->time * 0.001f && this->race->field_0x1e4 == -2) {
+                adj = this->race->replayTime - 0.17f;
+                if (adj > (float)states[0]->time * 0.001f && this->race->lastRecordKind == -2) {
                     stateIntervalElapsed = stateIntervalLength;
                 } else if (adj > (float)states[1]->time * 0.001f) {
                     stateIntervalLength = (float)(states[0]->time - states[1]->time) * 0.001f;
@@ -478,8 +478,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
             } else {
                 float adj;
                 stateIntervalElapsed = (clock - 0.27f) - (float)states[3]->time * 0.001f;
-                adj = this->race->field_0x1b8 - 0.27f;
-                if (adj > (float)states[0]->time * 0.001f && this->race->field_0x1e4 == -2) {
+                adj = this->race->replayTime - 0.27f;
+                if (adj > (float)states[0]->time * 0.001f && this->race->lastRecordKind == -2) {
                     stateIntervalElapsed = stateIntervalLength;
                 } else if (adj < (float)states[2]->time * 0.001f) {
                     stateIntervalLength = (float)(states[2]->time - states[3]->time) * 0.001f;
@@ -653,7 +653,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         movingForward = 1;
 
         // wheel roll from the horizontal speed
-        if (!(this->race->field_0x3f8 && this->race->field_0x1e4 != -2)) {
+        if (!(this->race->replayPaused && this->race->lastRecordKind != -2)) {
             float d;
             float roll;
             scratchVector = velocity;
@@ -808,7 +808,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         if (field_0x7b8 == 0)
                             field_0x7a0++;
                         field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
-                        if (this == this->race->field_0x50->field_0x3b4)
+                        if (this == this->race->raceCamera->field_0x3b4)
                             ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
                     }
                 }
@@ -903,7 +903,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         if (field_0x7b8 == 0)
                             field_0x7a0++;
                         field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
-                        if (this == this->race->field_0x50->field_0x3b4)
+                        if (this == this->race->raceCamera->field_0x3b4)
                             ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
                     }
                 }
@@ -938,7 +938,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 field_0x78c = 0;
             prevCrash = crashState;
             crashState = interpSource->crashed;
-            if (!this->race->field_0x3f8 && this->race->field_0x1e4 != -2)
+            if (!this->race->replayPaused && this->race->lastRecordKind != -2)
                 field_0x478 = interpSource->flag7;
             else
                 field_0x478 = 0;

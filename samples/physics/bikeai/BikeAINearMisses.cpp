@@ -1545,7 +1545,7 @@ int KrustyBike::Fn_00413200(float dt)
     justLanded = 0;
     BikeAITickGearTimer(engineState, stepTime);
     if (!field_0x7a4)
-        field_0x478 = crashState == 0 && UnknownVirtualSlot80() && race->field_0x18a;
+        field_0x478 = crashState == 0 && UnknownVirtualSlot80() && race->isRacing;
     else
         field_0x478 = 0;
     field_0x479 = crashState == 0 && UnknownVirtualSlot81();
@@ -1641,7 +1641,7 @@ int KrustyBike::Fn_00413200(float dt)
     field_0x7ec = velocity - CrossProduct(worldAngularVelocity, *fwd) * 3.5f;
     unsigned char airborneOut = airborne;
     UnknownFunction40eca0(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
-                          &bodyForward, &bodyUp, dt, dt, race->field_0x4c, &airborneOut,
+                          &bodyForward, &bodyUp, dt, dt, race->raceTerrain, &airborneOut,
                           &impact, probeSegment, &lookAheadFrontTravel, &lookAheadRearTravel,
                           &frontWheel->inContact, &rearWheel->inContact, &aiPath,
                           g_BikeAISpeedTable_00566f74[field_0x79c], field_0x824, field_0x11b0);
@@ -1836,7 +1836,7 @@ int KrustyBike::Fn_00414370(float dt)
             aiPath.field_0x96c = 1000.0f;
             aiPath.field_0x970 = field_0x7cc;
             aiPath.lookAhead = linearSpeed * 0.25f;
-            field_0x15dc = race->field_0xa4;
+            field_0x15dc = race->aiStuntChance3;
             if (difficulty == 3)
                 trickDelay = field_0x7d8;
             else if (difficulty == 2)
@@ -1858,8 +1858,8 @@ int KrustyBike::Fn_00414370(float dt)
                 return 1;
             }
             speed = linearSpeed;
-            if (race->field_0x48) {
-                if (!race->field_0x48->ClosestPointOnNode(position, race->field_0x48->field_0x0,
+            if (race->raceTrack) {
+                if (!race->raceTrack->ClosestPointOnNode(position, race->raceTrack->startNode,
                                                                     &field_0x744->field_0x38, 0))
                     return 0;
                 if (!field_0x744->field_0x44.a) {
@@ -1869,11 +1869,11 @@ int KrustyBike::Fn_00414370(float dt)
                 }
                 gate = field_0x744->field_0x34;
                 if (!gate->trackPos.a)
-                    race->field_0x48->ClosestPointOnNode(gate->position, race->field_0x48->field_0x0,
+                    race->raceTrack->ClosestPointOnNode(gate->position, race->raceTrack->startNode,
                                                                   &gate->trackPos, 0);
-                gateAhead = race->field_0x48->DistanceAlong(field_0x744->field_0x44,
+                gateAhead = race->raceTrack->DistanceAlong(field_0x744->field_0x44,
                                                                           field_0x744->field_0x34->trackPos);
-                bikeAhead = race->field_0x48->DistanceAlong(field_0x744->field_0x38,
+                bikeAhead = race->raceTrack->DistanceAlong(field_0x744->field_0x38,
                                                                           field_0x744->field_0x34->trackPos);
                 if (bikeAhead > 0.0f && gateAhead > 0.0f && bikeAhead < gateAhead) {
                     field_0x744->field_0x44.a = field_0x744->field_0x38.a;
@@ -1883,19 +1883,19 @@ int KrustyBike::Fn_00414370(float dt)
                 list = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x99f);
                 if (!list)
                     return 0;
-                list->field_0x04 = race->field_0x48->field_0x0;
+                list->field_0x04 = race->raceTrack->startNode;
                 list->field_0x0c = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x9a3);
                 if (!list->field_0x0c)
                     return 0;
-                list->field_0x0c->field_0x04 = race->field_0x48->field_0x0;
+                list->field_0x0c->field_0x04 = race->raceTrack->startNode;
                 if (list && bikeAhead < gateAhead) {
                     aiPath.count = 100;
                     t = 0.0f;
                     for (i = 0; i < aiPath.count; i++) {
-                        if (!race->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
+                        if (!race->raceTrack->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
                                                                            t * linearSpeed, 0))
                             return 0;
-                        if (!race->field_0x48->PointAt(p, &aiPath.points[i]))
+                        if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
                         t += 0.1f;
@@ -1948,27 +1948,27 @@ int KrustyBike::Fn_00414370(float dt)
     } else {
         if (!field_0x744->field_0x44.a || !field_0x744->field_0x44.b)
             return 0;
-        if (!race->field_0x134.a || !race->field_0x134.b)
+        if (!race->finishProbePos.a || !race->finishProbePos.b)
             return 0;
-        if (!race->field_0x48->ShortestPath(field_0x744->field_0x44, race->field_0x134,
+        if (!race->raceTrack->ShortestPath(field_0x744->field_0x44, race->finishProbePos,
                                                              &list, &distance))
             return 0;
         tail = &list;
         while (*tail)
             tail = &(*tail)->field_0x0c;
-        from = race->field_0x134;
+        from = race->finishProbePos;
         from.t += 0.01f;
-        if (!race->field_0x48->ShortestPath(from, race->field_0x134, tail, &distance))
+        if (!race->raceTrack->ShortestPath(from, race->finishProbePos, tail, &distance))
             return 0;
         if (field_0x78c) {
             if (list) {
                 aiPath.count = 100;
                 t = 0.0f;
                 for (i = 0; i < aiPath.count; i++) {
-                    if (!race->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
+                    if (!race->raceTrack->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
                                                                        t * linearSpeed, 0))
                         return 0;
-                    if (!race->field_0x48->PointAt(p, &aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     t += 0.1f;
@@ -1995,10 +1995,10 @@ int KrustyBike::Fn_00414370(float dt)
             if (list) {
                 t = 1.0f;
                 for (i = 0; i < aiPath.count; i++) {
-                    if (!race->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
+                    if (!race->raceTrack->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
                                                                        g_BikeAILookAhead_00572988 * t, 0))
                         return 0;
-                    if (!race->field_0x48->PointAt(p, &aiPath.points[i]))
+                    if (!race->raceTrack->PointAt(p, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     lenSq = SquareMagnitude(aiPath.points[i] - position);
@@ -2010,7 +2010,7 @@ int KrustyBike::Fn_00414370(float dt)
                 }
             } else {
                 p = field_0x744->field_0x44;
-                if (!race->field_0x48->PointAt(field_0x744->field_0x44, &aiPath.points[0]))
+                if (!race->raceTrack->PointAt(field_0x744->field_0x44, &aiPath.points[0]))
                     return 0;
             }
         }
@@ -2024,7 +2024,7 @@ int KrustyBike::Fn_00414370(float dt)
         else if (difficulty == 1)
             aiPath.field_0x970 = field_0x7c4;
         if (field_0x7a4) {
-            field_0x78c = race->field_0x48->PlaceNear(position, field_0x744->field_0x44,
+            field_0x78c = race->raceTrack->PlaceNear(position, field_0x744->field_0x44,
                                                                         -1.0f, -1.0f, 0, 0);
             if (!field_0x78c) {
                 aiPath.field_0x96c = 0.0f;
@@ -2032,10 +2032,10 @@ int KrustyBike::Fn_00414370(float dt)
             }
             aiPath.field_0x96c = 40.0f;
             Vec3 dir;
-            if (!race->field_0x48->SegmentDirection(field_0x744->field_0x44.b, &dir))
+            if (!race->raceTrack->SegmentDirection(field_0x744->field_0x44.b, &dir))
                 return 0;
-            race->field_0x48->UnknownFunction518230(position, field_0x744->field_0x44.b, &right, 10);
-            race->field_0x48->UnknownFunction518230(position, field_0x744->field_0x44.b, &left, 11);
+            race->raceTrack->UnknownFunction518230(position, field_0x744->field_0x44.b, &right, 10);
+            race->raceTrack->UnknownFunction518230(position, field_0x744->field_0x44.b, &left, 11);
             if (BikeAIDot(dir, bodyForward) < 0.0f)
                 dir = -dir;
             if (left < right) {
@@ -2074,6 +2074,6 @@ int KrustyBike::Fn_00414370(float dt)
     }
 done:
     if (list)
-        race->field_0x48->FreeWorkList(&list, 0);
+        race->raceTrack->FreeWorkList(&list, 0);
     return 1;
 }
