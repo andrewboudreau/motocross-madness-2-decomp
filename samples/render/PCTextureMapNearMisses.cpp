@@ -206,7 +206,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
             } else {
                 desc.caps[0] = 0x1000;
                 if (!(flags & 8) && !g_TrackGame->field_0x2d0 &&
-                    !(g_TrackGame->field_0x2d5_bit2) &&
+                    !(g_TrackGame->texturesCached) &&
                     (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
                     if (g_UnknownSharedSurfaces68a394[mipCount]) {
@@ -293,7 +293,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
             } else {
                 desc.caps[0] = 0x401008;
                 if (!(flags & 8) && !g_TrackGame->field_0x2d0 &&
-                    !(g_TrackGame->field_0x2d5_bit2) &&
+                    !(g_TrackGame->texturesCached) &&
                     (mapFormat == 555 || mapFormat == 565)) {
                     shared = 1;
                     if (g_UnknownSharedMipSurfaces68a36c[mipCount]) {

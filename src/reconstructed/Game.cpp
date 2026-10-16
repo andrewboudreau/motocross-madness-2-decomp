@@ -106,7 +106,7 @@ Game::Game() {
     stepOneFrame = 0;
     inputSuspended = 0;
     shuttingDown = 0;
-    field_0x2d5_bit2 = 1;
+    texturesCached = 1;
     field_0x2e4 = 1.0f;
     field_0x2e8 = 0;
     field_0x2ec = 0.05f;
@@ -320,7 +320,7 @@ int Game::RenderFrame() {
                 debugOverlay->Print(memoryPage, "PartialTexBlt   %s",
                                                   g_TrackGame->display->partialTextureUploadResult ? "Yes" : "No");
                 debugOverlay->Print(memoryPage, "TexturesCached  %s",
-                                                  g_TrackGame->field_0x2d5_bit2 ? "Yes" : "No");
+                                                  g_TrackGame->texturesCached ? "Yes" : "No");
             }
         }
         s_LastFrameTime = now;

@@ -336,7 +336,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
 
     // The texture detail levels: 0 keeps every texture, 1 and 2 halve them.
     if (g_TrackGame->field_0x2d0) {
-        g_TrackGame->field_0x2d5_bit2 = 0;
+        g_TrackGame->texturesCached = 0;
         if (memory.dwTotalPhys > 0x5a00000) {
             terrainTextures.field_0x14 = 0;
             skyTextures.field_0x14 = 0;
@@ -377,7 +377,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         skyTextures.field_0x14 = 0;
         modelTextures.field_0x14 = 0;
         if (((UnknownDisplay*)g_TrackGame->display)->isAGP) {
-            g_TrackGame->field_0x2d5_bit2 = 0;
+            g_TrackGame->texturesCached = 0;
             if (available - needed <= 0) {
                 if (forced) {
                     if (needed - terrainBytes + terrainBytes / 4 < available) {
@@ -437,49 +437,49 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 terrainTextures.field_0x14 = 0;
                 skyTextures.field_0x14 = 0;
                 modelTextures.field_0x14 = 0;
-                g_TrackGame->field_0x2d5_bit2 = 0;
+                g_TrackGame->texturesCached = 0;
             } else if (!forced && memory.dwTotalPhys > 0x5a00000) {
                 terrainTextures.field_0x14 = 0;
                 skyTextures.field_0x14 = 0;
                 modelTextures.field_0x14 = 0;
-                g_TrackGame->field_0x2d5_bit2 = 1;
+                g_TrackGame->texturesCached = 1;
             } else if (needed - terrainBytes + terrainBytes / 4 < available) {
-                g_TrackGame->field_0x2d5_bit2 = 0;
+                g_TrackGame->texturesCached = 0;
                 terrainTextures.field_0x14 = 1;
             } else if (!forced && memory.dwTotalPhys > 0x3c00000) {
-                g_TrackGame->field_0x2d5_bit2 = 1;
+                g_TrackGame->texturesCached = 1;
                 terrainTextures.field_0x14 = 1;
             } else {
                 int all = textureBytes + cubeBytes + terrainBytes;
                 if (needed - textureBytes - cubeBytes - terrainBytes + all / 4 < available) {
-                    g_TrackGame->field_0x2d5_bit2 = 0;
+                    g_TrackGame->texturesCached = 0;
                     terrainTextures.field_0x14 = 1;
                     skyTextures.field_0x14 = 1;
                     modelTextures.field_0x14 = 1;
                 } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
                                terrainBytes / 16 < available) {
-                    g_TrackGame->field_0x2d5_bit2 = 0;
+                    g_TrackGame->texturesCached = 0;
                     terrainTextures.field_0x14 = 2;
                     skyTextures.field_0x14 = 1;
                     modelTextures.field_0x14 = 1;
                 } else if (needed - textureBytes - cubeBytes - terrainBytes + (textureBytes + cubeBytes) / 4 +
                                (cubeBytes + terrainBytes) / 16 < available) {
-                    g_TrackGame->field_0x2d5_bit2 = 0;
+                    g_TrackGame->texturesCached = 0;
                     terrainTextures.field_0x14 = 2;
                     skyTextures.field_0x14 = 2;
                     modelTextures.field_0x14 = 1;
                 } else {
                     if (needed - textureBytes - cubeBytes - terrainBytes + all / 16 < available)
-                        g_TrackGame->field_0x2d5_bit2 = 0;
+                        g_TrackGame->texturesCached = 0;
                     else
-                        g_TrackGame->field_0x2d5_bit2 = !forced;
+                        g_TrackGame->texturesCached = !forced;
                     terrainTextures.field_0x14 = 2;
                     skyTextures.field_0x14 = 2;
                     modelTextures.field_0x14 = 2;
                 }
             }
         }
-        if (g_TrackGame->field_0x2d5_bit2) {
+        if (g_TrackGame->texturesCached) {
             field_0x94 = (GameObject*)g_TrackGame->textureManager->CreateGroup(
                 ((PCRenderTarget*)renderContext)->surfacePixelFormat, 0, 2, 1);
             field_0x98 = (GameObject*)g_TrackGame->textureManager->CreateGroup(0x115c, 0, 2, 1);
@@ -855,7 +855,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     ((RenderTarget*)renderContext)->clearTarget = !(skyCube && g_TrackGame->mode.skyCubeOn);
     field_0x50 = (void*)1;
-    if (g_TrackGame->field_0x2d5_bit2) {
+    if (g_TrackGame->texturesCached) {
         g_MemTagStack->Push("TextureCache");
         g_TrackGame->textureManager->ShareCacheLimit();
     }

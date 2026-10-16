@@ -543,7 +543,7 @@ void BaseQuarryEvent::ResetClock() {
 BaseQuarryEvent::~BaseQuarryEvent() {
     delete field_0x44;
     Release();
-    if (g_TrackGame->field_0x2d5_bit2) {
+    if (g_TrackGame->texturesCached) {
         field_0x94->Release();
         field_0x98->Release();
     }

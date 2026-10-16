@@ -261,7 +261,7 @@ void KrustyUI::BuildGarageScene(int value) {
     field_0x4ac = 0;
     playingDemo = 0;
     ((RenderTarget*)renderContext)->clearTarget = 0;
-    g_TrackGame->field_0x2d5_bit2 = 1;
+    g_TrackGame->texturesCached = 1;
     if (!garageScene && (value == 1 || value == -1)) {
         UnknownFunction5053b0(1);
         allowIme = 0;

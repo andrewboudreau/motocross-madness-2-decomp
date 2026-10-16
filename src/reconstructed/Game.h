@@ -130,7 +130,7 @@ public:
     unsigned char allowTrilinear : 1;         // +0x2d4 bit 7: "AllowTriLinear" (linear mip filter)
     unsigned char inputSuspended : 1;         // +0x2d5 bit 0: set by slot 11; slots 13/14 and PCGame 35/36 then ignore input
     unsigned char shuttingDown : 1;           // +0x2d5 bit 1: set by the teardown (slot 15, 0x00468a30); dialogs then skip releasing their resources
-    unsigned char field_0x2d5_bit2 : 1;       // set by the constructor; the debug overlay prints it as "TexturesCached"
+    unsigned char texturesCached : 1;         // +0x2d5 bit 2: debug overlay label "TexturesCached"; set by the constructor, cleared by the quarry loader when texture memory suffices
     unsigned char useZBuffer : 1;             // +0x2d5 bit 3: set by the constructor; Z enable/write and the render target's z-buffer
     unsigned char field_0x2d5_bits : 4;
     unsigned char field_0x02d6[2];
