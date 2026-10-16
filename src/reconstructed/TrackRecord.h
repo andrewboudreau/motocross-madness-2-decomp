@@ -16,8 +16,8 @@ struct UnknownTrackRecord {
 
 // qsort orders for the records: 0x0051eed0 puts the lower value first,
 // 0x0051ef00 the higher one.
-int UnknownFunction51eed0(const void* a, const void* b);
-int UnknownFunction51ef00(const void* a, const void* b);
+int CompareRecordsAscending(const void* a, const void* b);
+int CompareRecordsDescending(const void* a, const void* b);
 
 // The high-score table at TrackGame+0x3400 (0xe8 bytes, the size TrackGame
 // slot 4 allocates); its constructor references TrackRecord.cpp's __FILE__.

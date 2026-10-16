@@ -61,8 +61,8 @@ relocation bound:
 | VA | Bytes | Body |
 |---|---:|---|
 | `0x0051ee90` | 62 | record constructor |
-| `0x0051eed0` | 47 | qsort order, lower value first |
-| `0x0051ef00` | 47 | qsort order, higher value first |
+| `0x0051eed0` | 47 | `CompareRecordsAscending`: qsort order, lower value first |
+| `0x0051ef00` | 47 | `CompareRecordsDescending`: qsort order, higher value first |
 | `0x0051ef30` | 142 | table constructor |
 | `0x0051efc0` | 31 | table destructor |
 | `0x0051efe0` | 193 | clears the table |

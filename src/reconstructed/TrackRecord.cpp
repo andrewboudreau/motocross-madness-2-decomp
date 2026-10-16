@@ -20,7 +20,7 @@ UnknownTrackRecord::UnknownTrackRecord()
 }
 
 // 0x0051eed0
-int UnknownFunction51eed0(const void* a, const void* b)
+int CompareRecordsAscending(const void* a, const void* b)
 {
     if (((UnknownTrackRecord*)a)->score < ((UnknownTrackRecord*)b)->score)
         return -1;
@@ -30,7 +30,7 @@ int UnknownFunction51eed0(const void* a, const void* b)
 }
 
 // 0x0051ef00
-int UnknownFunction51ef00(const void* a, const void* b)
+int CompareRecordsDescending(const void* a, const void* b)
 {
     if (((UnknownTrackRecord*)a)->score < ((UnknownTrackRecord*)b)->score)
         return 1;
@@ -189,9 +189,9 @@ int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
             if (records[i].score == 0.0f)
                 records[i].score = FLT_MAX;
         }
-        qsort(records, 10, sizeof(UnknownTrackRecord), UnknownFunction51eed0);
+        qsort(records, 10, sizeof(UnknownTrackRecord), CompareRecordsAscending);
     } else {
-        qsort(records, 10, sizeof(UnknownTrackRecord), UnknownFunction51ef00);
+        qsort(records, 10, sizeof(UnknownTrackRecord), CompareRecordsDescending);
     }
     return 1;
 }
