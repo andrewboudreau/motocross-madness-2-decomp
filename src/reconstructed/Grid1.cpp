@@ -48,8 +48,8 @@ GridNode* DrawableGridNodeSharedTextures::UnknownVirtualSlot2(UnknownTextureStre
 int EvictNodeTexture(void* owner)
 {
     DrawableGridNodeSharedTextures* node = (DrawableGridNodeSharedTextures*)owner;
-    node->Terrain()->RetireOwnedObject(node->Extra()->field_0x10);
-    node->Extra()->field_0x10 = 0;
+    node->Terrain()->RetireOwnedObject(node->Extra()->builtTexture);
+    node->Extra()->builtTexture = 0;
     node->Extra()->textureFlags &= ~0x10000;
     node->Extra()->ageEntry.size = 0;
     return 1;

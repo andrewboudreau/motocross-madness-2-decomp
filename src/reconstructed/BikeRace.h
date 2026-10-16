@@ -392,9 +392,9 @@ public:
     virtual void UnknownRacerVirtualSlot94(); // slot 10 calls it while TrackGameMode+0xa88 is set
 
     int UnknownFunction495c00();              // 0x00495c00 (KrustyBike.cpp's code)
-    // 0x0048fc80 (KrustyBike.cpp's code, ret 0x7c): loads the bike and
+    // 0x0048fc80 (KrustyBike::Load in src/krusty2/vehicle, ret 0x7c): loads the bike and
     // rider models and sets the racer up; returns the GameObject to add.
-    GameObject* UnknownFunction48fc80(void* owner, const char* a, const char* bikeFile, const char* riderFile,
+    GameObject* Load(void* owner, const char* a, const char* bikeFile, const char* riderFile,
                                       LightManager* lights, UnknownTextureFormatChoice* textures,
                                       Vector3 position, Vector3 direction, Vector3 up,
                                       UnknownBikeRaceProjector* terrain, ControlInterface* control, char ai,

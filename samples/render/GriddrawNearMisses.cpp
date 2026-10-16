@@ -308,7 +308,7 @@ allocated:
     data->indexCount = 0;
     data->indexBuffer = 0;
     data->b1 = 1;
-    data->field_0x130 = 0;
+    data->testFrame = 0;
     data->lowerErrorLimit = 0xffff;
     data->previousLowerErrorLimit = 0xffff;
     data->upperErrorLimit = 0;

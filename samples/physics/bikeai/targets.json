@@ -2,7 +2,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAINearMisses.cpp",
-    "candidate_symbol_contains": "UnknownFunction40d200",
+    "candidate_symbol_contains": "PredictPathMotion",
     "target_va": "0x0040d200",
     "target_size": 4464,
     "expect": "exact",
@@ -12,7 +12,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAINearMisses.cpp",
-    "candidate_symbol_contains": "UnknownFunction40e510",
+    "candidate_symbol_contains": "PathSteeringDirection",
     "target_va": "0x0040e510",
     "target_size": 1936,
     "expect": "partial",
@@ -22,7 +22,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAINearMisses.cpp",
-    "candidate_symbol_contains": "UnknownFunction415640",
+    "candidate_symbol_contains": "QuerySegmentObstacles",
     "target_va": "0x00415640",
     "target_size": 6112,
     "expect": "partial",
@@ -32,7 +32,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAINearMisses.cpp",
-    "candidate_symbol_contains": "UnknownFunction40eca0",
+    "candidate_symbol_contains": "SimulateLookAhead",
     "target_va": "0x0040eca0",
     "target_size": 17585,
     "expect": "partial",

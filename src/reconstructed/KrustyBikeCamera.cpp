@@ -155,9 +155,9 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
     if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, &result);
-        if (field_0x2c0 < 500.0f) {
+        if (targetDistance < 500.0f) {
             Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
-            lead = lead * (4.0f - field_0x2c0 * 0.006f);
+            lead = lead * (4.0f - targetDistance * 0.006f);
             result += lead;
         } else {
             result += bike->wrecker->rigidBody->velocity * dt;
@@ -166,10 +166,10 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
         result = targetPoint;
     } else {
         float dot = KrustyCameraDot(UnknownVirtualSlot33(), followHeading);
-        float height = field_0x2c0 * 0.009f + 1.0f;
+        float height = targetDistance * 0.009f + 1.0f;
         float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
-        float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
+        float lag = (1.0f - targetDistance * 0.00052631577f) * ratio;
         float distance = lag * (height * height * dot / speed) * 35.0f;
         Vector3 offset = followHeading * distance;
         result = Vector3(offset.x + targetPoint.x, offset.y + targetPoint.y, offset.z + targetPoint.z);

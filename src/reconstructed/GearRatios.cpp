@@ -59,7 +59,7 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
     }
 
     field_0x74 = 0;
-    field_0x08 = 1;
+    driveCut = 1;
     if (rpmHigh <= 0) {
         field_0x14c = 10000.0f;
     } else {
@@ -177,7 +177,7 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
     lastUpdateRpm = 0;
     throttleFraction = 0;
     shiftTimer = 0;
-    field_0x08 = 1;
+    driveCut = 1;
     float random = UNKNOWN_RANDOM_UNIT();
     upShiftRpm = random * shiftWindowWidths[currentGear] + shiftRanges[currentGear].lowerRpm;
 }
@@ -186,13 +186,13 @@ UnknownEngineGearbox::UnknownEngineGearbox(const char* name, float unused, int* 
 void UnknownEngineGearbox::UpdateThrottle(float dt, int engaged, unsigned char arg2)
 {
     if (engaged && shiftTimer == 0.0f) {
-        field_0x08 = arg2;
+        driveCut = arg2;
         if (throttleFraction < 1.0f) {
             throttleFraction += dt / field_0x8c * field_0x1dc;
             throttleFraction = UnknownMin(throttleFraction, 1.0f);
         }
     } else {
-        field_0x08 = 1;
+        driveCut = 1;
         if (throttleFraction > 0.0f) {
             throttleFraction -= (shiftTimer != 0.0f ? dt * field_0x1e0 * 0.2f : dt * field_0x1e0 * 0.6f);
             throttleFraction = UnknownMax(throttleFraction, 0.0f);
@@ -236,7 +236,7 @@ void UnknownEngineGearbox::DriveForce(float speedRatio, const Vector3* direction
                                                  bool braking, float brakeValue, Vector3* force,
                                                  float* magnitude)
 {
-    if (field_0x08) {
+    if (driveCut) {
         if (braking) {
             *magnitude = brakeValue;
             *force = -brakeValue * *direction;

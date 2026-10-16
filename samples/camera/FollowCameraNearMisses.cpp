@@ -181,7 +181,7 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     targetPoint = kVec3Zero;
     cachedTarget = kVec3Zero;
     worldYaw = 0;
-    field_0x2c0 = 0;
+    targetDistance = 0;
     followHeading = kVec3ZAxis;
     points = 0;
     isCrashView = 0;
@@ -306,7 +306,7 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
         isSettled = 0;
         if (FOLLOWCAMERA_KEY(0x48))
             cachedTarget.y += speed;
-        if (FOLLOWCAMERA_KEY(0x50) && field_0x2c0 > 0.0f)
+        if (FOLLOWCAMERA_KEY(0x50) && targetDistance > 0.0f)
             cachedTarget.y -= speed;
         if (FOLLOWCAMERA_KEY(0x4b))
             cachedTarget -= Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
@@ -314,12 +314,12 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * speed;
         if (FOLLOWCAMERA_KEY(0x4a) || FOLLOWCAMERA_KEY(0x0c))
             cachedTarget += speed * viewDirection;
-        if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && field_0x2c0 > 0.0)
+        if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && targetDistance > 0.0)
             cachedTarget -= speed * viewDirection;
         if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
             if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
                     ->UnknownVirtualSlot4(0, &x, &y)) {
-                if (field_0x2c0 > 0.0f)
+                if (targetDistance > 0.0f)
                     cachedTarget.y += y * speed;
                 cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
                 if (x != 0.0f || y != 0.0f)
@@ -327,7 +327,7 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             }
             if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(2, 2, 0xc, 0))
                 cachedTarget += speed * viewDirection;
-            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && field_0x2c0 > 0.0)
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && targetDistance > 0.0)
                 cachedTarget -= speed * viewDirection;
         }
     } else if (cameraState != 3 && cameraState != 6 && cameraState != 7) {
@@ -340,7 +340,7 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             eyePosition.y += speed;
             moved = true;
         }
-        if (FOLLOWCAMERA_KEY(0x50) && field_0x2c0 > 6.5f) {
+        if (FOLLOWCAMERA_KEY(0x50) && targetDistance > 6.5f) {
             eyePosition.y -= speed;
             moved = true;
         }
@@ -356,14 +356,14 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             eyePosition -= speed * viewDirection;
             moved = true;
         }
-        if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && field_0x2c0 > 6.5f) {
+        if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && targetDistance > 6.5f) {
             eyePosition += speed * viewDirection;
             moved = true;
         }
         if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
             if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
                     ->UnknownVirtualSlot4(0, &x, &y)) {
-                if (field_0x2c0 > 6.5f)
+                if (targetDistance > 6.5f)
                     eyePosition.y += y * speed;
                 eyePosition += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
                 if (x != 0.0 || y != 0.0f)
@@ -375,7 +375,7 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
                 eyePosition -= speed * viewDirection;
                 moved = true;
             }
-            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && field_0x2c0 > 6.5f) {
+            if (FOLLOWCAMERA_CONTROLS()->IsDeviceButtonDown(3, 2, 0xc, 0) && targetDistance > 6.5f) {
                 eyePosition += speed * viewDirection;
                 moved = true;
             }
@@ -507,7 +507,7 @@ int FollowCamera::Tick(float dt) {
         float dx = eyePosition.x - targetPoint.x;
         float dy = eyePosition.y - targetPoint.y;
         float dz = eyePosition.z - targetPoint.z;
-        field_0x2c0 = FastSqrt(dz * dz + dx * dx + dy);
+        targetDistance = FastSqrt(dz * dz + dx * dx + dy);
     }
     bool moved = UnknownVirtualSlot45(current, dt);
     UnknownVirtualSlot42(wide);
@@ -526,7 +526,7 @@ int FollowCamera::Tick(float dt) {
     }
     if (cameraState == 5) {
         if (!overrideActive) {
-            targetFieldOfView = (heightForMinimumFov - field_0x2c0) / (heightForMinimumFov - heightForMaximumFov) *
+            targetFieldOfView = (heightForMinimumFov - targetDistance) / (heightForMinimumFov - heightForMaximumFov) *
                               (heightFovMaximum - heightFovMinimum) + heightFovMinimum;
             if (targetFieldOfView < heightFovMinimum)
                 targetFieldOfView = heightFovMinimum;

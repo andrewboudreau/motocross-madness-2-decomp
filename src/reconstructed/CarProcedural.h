@@ -66,7 +66,7 @@ public:
 
 // Rigid body reached through CarProceduralCollision::field_0x54.
 struct CarProceduralBody {
-    int field_0x00;
+    int swept;                                // +0x0  hull payload +0x00; HullVsHull forwards to HullVsHullSwept when nonzero
     unsigned char field_0x04[0xf8 - 0x04];
     Vector3 field_0xf8;
 };
@@ -77,7 +77,7 @@ struct CarProceduralBody {
 // into the body's velocity), and from the sensor collider the float at +0
 // and the normal at +0x08 (tier 3 roles).
 struct CarProceduralContact {
-    Vector3 field_0x00;
+    Vector3 contactOffset;                    // +0x0  CollisionSweepQuery +0x00, the push-out the body collider subtracts
     Vector3 field_0x0c;
     Vector3 field_0x18;
 };
@@ -113,11 +113,11 @@ public:
     int QueryCollisions();                                     // 0x00438e70: runs the collision query
 
     unsigned char field_0x40[0x54 - 0x40];   // the GraphicsTest base ends at +0x40
-    CarProceduralBody* field_0x54;
+    CarProceduralBody* shape;                 // +0x54  CollisionObject +0x54 shape payload
     int hasContact;                           // +0x58 has contact
-    CarProceduralContact* field_0x5c;
+    CarProceduralContact* contactRecord;      // +0x5C  CollisionObject +0x5c contact record
     unsigned char field_0x60[0x68 - 0x60];
-    int field_0x68;
+    int ignoreVegetation;                     // +0x68  CollisionObject +0x68; set on both car colliders
     unsigned char field_0x6c[0xb8 - 0x6c];
 };
 

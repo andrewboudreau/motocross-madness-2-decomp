@@ -91,7 +91,7 @@ public:
 
     int field_0x2c;
     CollisionObject* pickRay;                 // +0x30 pick ray
-    GameCursor* field_0x34;
+    GameCursor* pickCursor;                   // +0x34  the caller's cursor or the bound cursor.tga GameCursor; PickAtCursor reads its CursorPosition
     int lastPickX;                            // +0x38 last picked x
     int lastPickY;                            // +0x3c last picked y
     UnknownControlBinding* cursorBindingX;    // +0x40 cursor x binding

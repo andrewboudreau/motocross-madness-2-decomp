@@ -149,7 +149,7 @@ struct GridTerrain {
     int verticesPinned;                        // +0xa8 vertices pinned by 0x00482760
     int verticesReleased;                      // +0xac vertices released by 0x00482760
     int vertexTests;                          // +0xb0 incremented per vertex test (0x00482a40)
-    int field_0xb4;                            // +0xb4 copied to the draw data's +0x130
+    int frameCount;                           // +0xB4  Terrain +0xb4, incremented by PrepareGeometry 0x00507610 (0x00507861) after the visibility walk
     int vertexRetestStamps[17 * 17];  // +0xB8  per vertex: set to retestStamp by 0x00482760, compared by 0x00482f00; cleared by the first node
     int retestStamp;  // +0x53C  incremented per RetestChangedVertices (0x00482760); stamps vertexRetestStamps
     unsigned char field_0x540[0xc14 - 0x540];
@@ -195,7 +195,7 @@ struct GridNodeDrawData {
     short triangleCount;                       // +0x12a triangles in this node's index list
     short childTriangleCount;                  // +0x12c children's +0x12a/+0x12c summed into the parent
     short field_0x12e;
-    int field_0x130;
+    int testFrame;                            // +0x130  GridTerrain::frameCount when 0x004826d0/0x00482760 last tested the node; 0x00482f00 then runs the full drop test
     void* vertexBuffer;                        // +0x134 32-byte vertices (DebugFree'd, line 0x330/0x35a)
     void* indexBuffer;                         // +0x138 16-bit indices (line 0x337/0x361)
     short vertexCount;                         // +0x13c

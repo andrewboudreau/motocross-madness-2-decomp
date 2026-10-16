@@ -65,7 +65,7 @@ void UnknownTrackGameObject3400::Clear()
     strcpy(extensions[0], ".hs1");
     strcpy(extensions[1], ".hs2");
     strcpy(extensions[2], ".hs3");
-    field_0xe4 = 0;
+    series = 0;
 }
 
 // 0x0051f0b0: reads `name` from one of TrackGameMode's directories.
@@ -85,7 +85,7 @@ int UnknownTrackGameObject3400::Read(const char* path)
     FILE* file = fopen(name, "rb");
     if (!file)
         return 0;
-    fread(&field_0xe4, 4, 1, file);
+    fread(&series, 4, 1, file);
     fread(&recordCount, 4, 1, file);
     fread(records, sizeof(UnknownTrackRecord), 10, file);
     fclose(file);
@@ -96,12 +96,12 @@ int UnknownTrackGameObject3400::Read(const char* path)
 int UnknownTrackGameObject3400::Write(const char* path, int value)
 {
     char name[260];
-    field_0xe4 = value;
+    series = value;
     sprintf(name, "%s%s", path, extensions[extensionIndex]);
     FILE* file = fopen(name, "wb");
     if (!file)
         return 0;
-    fwrite(&field_0xe4, 4, 1, file);
+    fwrite(&series, 4, 1, file);
     fwrite(&recordCount, 4, 1, file);
     fwrite(records, sizeof(UnknownTrackRecord), 10, file);
     fclose(file);
@@ -127,7 +127,7 @@ void UnknownTrackGameObject3400::ReadListedRecord(int unused, const char* name)
     directoryList->SetDirectory((const char*)g_TrackGame->mode.currentSeriesDirectory);
     sprintf(path, "*%s", extensions[extensionIndex]);
     directoryList->SetPattern(path, 1);
-    directoryList->UnknownVirtualSlot1();
+    directoryList->Scan();
     sprintf(path, "%s\\%s", (const char*)g_TrackGame->mode.currentSeriesDirectory, name);
     sprintf(file, "%s%s", name, extensions[extensionIndex]);
     if (directoryList->Contains(file))

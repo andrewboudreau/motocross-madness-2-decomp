@@ -149,20 +149,20 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
 
     sensorCollider = new (__FILE__, 149) CarProceduralCollision(1);
     sensorCollider->Configure(a0, 1, 1, 0);
-    sensorCollider->field_0x68 = 1;
+    sensorCollider->ignoreVegetation = 1;
     AppendChild(sensorCollider, -1);
     sensorHalfHeight = 5.0f;
 
     int tag = g_MemTagStack->Push("Collision");
     bodyCollider = new (__FILE__, 162) CarProceduralCollision(1);
     bodyCollider->Configure(a0, 1, 1, 1);
-    bodyCollider->field_0x68 = 1;
+    bodyCollider->ignoreVegetation = 1;
     AppendChild(bodyCollider, -1);
     if (collisionFile && *collisionFile)
         bodyCollider->LoadShape(carModel, collisionFile);
     else
         bodyCollider->SetHullShape(carModel, 0, 1, 0, 0);
-    bodyCollider->field_0x54->field_0x00 = 1;
+    bodyCollider->shape->swept = 1;
     bodyCollider->SnapPlacement();
     sensorCollider->AddIgnoredOwner(bodyCollider);
     g_MemTagStack->Pop(tag);

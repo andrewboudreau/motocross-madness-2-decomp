@@ -16,7 +16,7 @@ float FastInvSqrt(float x); // 0x00460c00
 
 // 0x004b01c0
 ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
-    field_0x34 = 0;
+    pickCursor = 0;
     lastPickX = 0;
     lastPickY = 0;
     cursorBindingX = 0;
@@ -25,7 +25,7 @@ ObjectPicker::ObjectPicker(int flags) : GameObject(flags) {
 
 // 0x004b04c0
 int ObjectPicker::PickAtCursor() {
-    UnknownCursorPosition position = field_0x34->CursorPosition();
+    UnknownCursorPosition position = pickCursor->CursorPosition();
 
     return PickAt(position.x, ((RenderTarget*)renderContext)->targetHeight - position.y - 1);
 }
@@ -100,7 +100,7 @@ ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
     pickRay->ignoreVegetation = 1;
     AppendChild(pickRay, -1);
     if (cursor) {
-        field_0x34 = cursor;
+        pickCursor = cursor;
     } else {
         cursorBindingX = new(__FILE__, 59)
             UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)renderContext)->currentCamera)->cursorRangeX,
@@ -112,11 +112,11 @@ ObjectPicker* ObjectPicker::Create(void* target, TextureMapManager* textures,
             g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingX);
             g_TrackGame->controlInterface->mouse->AttachBinding(cursorBindingY);
         }
-        field_0x34 = (GameCursor*)(new(__FILE__, 66) GameCursor(1))
+        pickCursor = (GameCursor*)(new(__FILE__, 66) GameCursor(1))
                          ->CreateBound(renderContext, cursorBindingX, cursorBindingY, "cursor.tga", textures, 0, 0, 0);
-        AppendChild(field_0x34, -1);
+        AppendChild(pickCursor, -1);
     }
-    if (!field_0x34) {
+    if (!pickCursor) {
         delete this;
         return 0;
     }

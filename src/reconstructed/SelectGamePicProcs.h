@@ -104,7 +104,7 @@ struct UnknownKrustyUIBike {
     int model;                                // +0x00: model (KrustyUI+0x48)
     char displayName[0x44];                   // +0x04: display name
     char texture[0x40];                       // +0x48: texture ("BikeTexture_%02d")
-    int field_0x88;
+    int engineSizeSelectable;                 // +0x88  when set the DDLEngineSize/TxtEngineSize controls pick the engine size; skipped by the random picks
     int engineSize;                           // +0x8c: engine size
     int fourStroke;                           // +0x90: four-stroke ("BikeFourStroke_%02d")
 };
@@ -159,7 +159,7 @@ public:
 
 // The lobby settings message (type 0xf, 0xb4 bytes) the host sends.
 struct UnknownLobbySettingsMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     unsigned char minutes : 5;                // TrackGame+0x2eb0
     unsigned char eventType : 3;              // +0x2d74
     unsigned char raceMode : 3;               // +0x2d70
@@ -176,8 +176,8 @@ struct UnknownLobbySettingsMessage {
     unsigned char stuntMode : 1;              // +0x2eb8
     unsigned char difficulty : 2;             // +0x60c
     unsigned char trackNumber;                // +0x09: track number (+0x2da4)
-    int field_0x0c;                           // +0x2ea8
-    int field_0x10;                           // +0x2eac
+    int trackFileTime;                        // +0xC  the track scene's st_mtime (TrackGame+0x2ea8 raceSettings.trackFileTime) the host sends
+    int trackFileSize;                        // +0x10  the track scene's st_size (TrackGame+0x2eac raceSettings.trackFileSize)
     char trackName[0x40];                     // +0x14: track name (+0x2da6)
     UnknownLobbySlot slots[8];                // +0x54: MultiPlayerDlg+0x7f68
 };

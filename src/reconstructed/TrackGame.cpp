@@ -257,7 +257,7 @@ int TrackGame::CreateGameObjects() {
     profileDirectory = new(__FILE__, 309) DirectoryList;
     profileDirectory->SetDirectory("ui\\profile");
     profileDirectory->SetPattern("*.*", 1);
-    profileDirectory->UnknownVirtualSlot1();
+    profileDirectory->Scan();
     highScores = new(__FILE__, 313) UnknownTrackGameObject3400;
     mode.CreateDirectoryLists();
     mode.ResetNetworkRace();

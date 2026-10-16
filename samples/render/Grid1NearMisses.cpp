@@ -221,16 +221,16 @@ sharedTexture:
     goto done;
 
 createTexture:
-    Extra()->field_0x10 = Terrain()->AcquireOwnedObject();
-    BuildNodeTexture((ManagedTexture*)Extra()->field_0x10);
-    if (((ManagedTexture*)Extra()->field_0x10)->mapFlags & 1)
-        ((ManagedTexture*)Extra()->field_0x10)->Reregister();
+    Extra()->builtTexture = Terrain()->AcquireOwnedObject();
+    BuildNodeTexture((ManagedTexture*)Extra()->builtTexture);
+    if (((ManagedTexture*)Extra()->builtTexture)->mapFlags & 1)
+        ((ManagedTexture*)Extra()->builtTexture)->Reregister();
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
     Terrain()->textureAgeManager->Register(&Extra()->ageEntry, EvictNodeTexture, this, 0,
                                                   PixelFormatBytesPerPixel(Terrain()->nodeTextureFormat) * 0x40000 / 3);
 ownTexture:
-    Extra()->texture = (ManagedTexture*)Extra()->field_0x10;
+    Extra()->texture = (ManagedTexture*)Extra()->builtTexture;
     ReleaseBlockCentres();
     scale = 1.0f;
     data->texOriginU = 0.0f;

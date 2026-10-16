@@ -79,7 +79,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
     list->RemoveAllRows();
     for (int i = 0; i < g_TrackGame->ui->bikeCount; i++) {
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->bikes)[i];
-        if (!entry->field_0x88) {
+        if (!entry->engineSizeSelectable) {
             int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->manufacturers)[entry->model].modelKind;
             if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.bikeUnlockFlags & 1)))
                 continue;
@@ -90,7 +90,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
                     entry->displayName);
             list->AddRow(text, i, flags);
         } else {
-            if (entry->field_0x88)
+            if (entry->engineSizeSelectable)
                 continue;
             int allowed = 0;
             int byModel = flags & 4;

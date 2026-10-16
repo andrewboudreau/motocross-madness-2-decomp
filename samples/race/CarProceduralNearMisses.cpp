@@ -294,8 +294,8 @@ int CarProcedural::Tick(float frameTime)
     sensorCollider->SetTransform(&transform);
     sensorCollider->QueryCollisions();
     if (sensorCollider->hasContact) {
-        CarProceduralContact* contact = sensorCollider->field_0x5c;
-        Vector3 lifted = kVec3YAxis * ((1.0f - contact->field_0x00.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
+        CarProceduralContact* contact = sensorCollider->contactRecord;
+        Vector3 lifted = kVec3YAxis * ((1.0f - contact->contactOffset.x) * sensorHalfHeight * 2.0f - sensorHalfHeight) + position;
         if (lifted.y > ground.y) {
             ground = lifted;
             normal = ((CarProceduralSensorContact*)contact)->field_0x08;
@@ -328,13 +328,13 @@ int CarProcedural::Tick(float frameTime)
     }
     bodyCollider->UpdatePlacement();
     if (bodyCollider->QueryCollisions()) {
-        CarProceduralContact* contact = bodyCollider->field_0x5c;
+        CarProceduralContact* contact = bodyCollider->contactRecord;
         field_0x214 = contact->field_0x18;
         field_0x220 = contact->field_0x0c;
-        Vector3& velocity = bodyCollider->field_0x54->field_0xf8;
-        velocity.x -= contact->field_0x00.x * 1.005f;
-        velocity.y -= contact->field_0x00.y * 1.005f;
-        velocity.z -= contact->field_0x00.z * 1.005f;
+        Vector3& velocity = bodyCollider->shape->field_0xf8;
+        velocity.x -= contact->contactOffset.x * 1.005f;
+        velocity.y -= contact->contactOffset.y * 1.005f;
+        velocity.z -= contact->contactOffset.z * 1.005f;
     }
     return result;
 }

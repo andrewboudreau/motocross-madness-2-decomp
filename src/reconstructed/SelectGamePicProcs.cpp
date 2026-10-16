@@ -99,7 +99,7 @@ int g_LobbyReadyBlockReason;
 
 // The chat message (types 0x85 and 0x92): 0x4e bytes are sent.
 struct UnknownChatMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     char text[0x4a];                          // +0x04: the chat text
 };
 
@@ -121,7 +121,7 @@ struct UnknownPlayerStateMessage {
 
 // The player removal message (type 0x8e).
 struct UnknownKickMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     int playerId;                             // +0x04: player id
 };
 
@@ -134,14 +134,14 @@ struct UnknownGridDraw {
 
 // The player left message (type 5).
 struct UnknownPlayerLeftMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     int field_0x04;
     int playerId;                             // +0x08: player id
 };
 
 // The lobby start message (type 0x83, 0x8d8 bytes).
 struct UnknownLobbyStartMessage {
-    int field_0x00;
+    int header;                               // +0x00 SendRaw (0x004ad280) writes the type byte here and the sequence at +0x02
     short start;                              // +0x04: start
     UnknownTrackGameModeSettings raceSettings; // +0x08: TrackGame+0x2d70
     int field_0x1f4;                          // TrackGame+0x60c
@@ -203,7 +203,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
     sprintf(second, "%s\\%s", g_TrackGame->mode.cdDataDirectory, directory);
     ((CombinedDirectoryList*)directories)->SetDirectories(first, second);
     directories->SetPattern(pattern, 1);
-    directories->UnknownVirtualSlot1();
+    directories->Scan();
     if (!directories->GetFontName())
         return 1;
     if (largePictures) {
@@ -310,7 +310,7 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
         }
     }
     int row = list->GetRowData(-1);
-    directories->UnknownVirtualSlot1();
+    directories->Scan();
     directories->GetEntryStem(g_TrackGame->ui->entries[row].field_0x00, name);
     delete stream;
     return 1;
@@ -442,8 +442,8 @@ void MultiPlayerDlg::SendSettings() {
         message.riderCollision = game->mode.raceSettings.riderCollision;
         message.fastFinishes = game->mode.raceSettings.shortTimeLimit;
         message.bikeClass = game->mode.raceSettings.maxBikeClass;
-        message.field_0x0c = game->mode.raceSettings.trackFileTime;
-        message.field_0x10 = game->mode.raceSettings.trackFileSize;
+        message.trackFileTime = game->mode.raceSettings.trackFileTime;
+        message.trackFileSize = game->mode.raceSettings.trackFileSize;
         message.difficulty = game->mode.difficulty;
         message.trackNumber = game->mode.raceSettings.trackNumber;
         memcpy(message.slots, slots->slots, sizeof(message.slots));
@@ -798,8 +798,8 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
         g_TrackGame->mode.raceSettings.shortTimeLimit = settings->fastFinishes;
         g_TrackGame->mode.raceSettings.maxBikeClass = settings->bikeClass;
         g_TrackGame->mode.raceSettings.trackNumber = settings->trackNumber;
-        g_TrackGame->mode.raceSettings.trackFileTime = settings->field_0x0c;
-        g_TrackGame->mode.raceSettings.trackFileSize = settings->field_0x10;
+        g_TrackGame->mode.raceSettings.trackFileTime = settings->trackFileTime;
+        g_TrackGame->mode.raceSettings.trackFileSize = settings->trackFileSize;
         g_TrackGame->mode.difficulty = settings->difficulty;
         g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.series);
         g_TrackGame->mode.raceSettings.trackName[0] = 0;
@@ -2038,7 +2038,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
     }
     model->uiModel->Enable();
     bikeChanged = 1;
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->shown) {
             engine->Show(1, 1);
@@ -2058,7 +2058,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
         }
     }
     g_TrackGame->mode.racerChoice.bikeIndex = bikes->GetRowData(-1);
-    if (bike->field_0x88) {
+    if (bike->engineSizeSelectable) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = g_BikeClassEngineSizes[size];

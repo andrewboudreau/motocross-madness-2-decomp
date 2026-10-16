@@ -41,7 +41,7 @@ struct UnknownDirectoryEntry {
         field_0x108 = 3;
         attributes = 0x80;                                 // FILE_ATTRIBUTE_NORMAL
     }
-    void UnknownFunctionSet(const char* fileName, unsigned int fileAttributes);
+    void Set(const char* fileName, unsigned int fileAttributes);
 
     char name[0x104];
     unsigned int attributes;
@@ -55,8 +55,8 @@ public:
     DirectoryList();                                       // 0x0044a130
     virtual ~DirectoryList();                              // 0x0044aae0 (deleting wrapper 0x0044a1b0)
     // 0x0044a670: lists `pattern` in `directory` (FindFirstFileA/FindNextFileA)
-    // into `entries`; 0 when nothing matches.
-    virtual int UnknownVirtualSlot1();
+    // into `entries`; 0 when nothing matches. Name tier 3 (decoded behaviour).
+    virtual int Scan();
     void SetDirectory(const char* directory);     // 0x0044a1d0
     void SetPattern(const char* pattern, int includeFiles); // 0x0044a220
     int GetEntryName(int index, char* path);      // 0x0044a270: entry `index`'s name
@@ -91,7 +91,7 @@ class CombinedDirectoryList : public DirectoryList {
 public:
     CombinedDirectoryList();                               // 0x0044ab10
     virtual ~CombinedDirectoryList();                      // 0x0044aba0 (deleting wrapper 0x0044ab80)
-    virtual int UnknownVirtualSlot1();                     // 0x0044ac30
+    virtual int Scan();                     // 0x0044ac30
     void SetDirectories(const char* first, const char* second); // 0x0044abb0
 
     char firstDirectory[0x104];                            // +0x21c listed first

@@ -971,7 +971,7 @@ void DrawableGridNode::PropagateFullMask()
         }
     }
     TestNodeVertices();
-    data->field_0x130 = terrain->field_0xb4;
+    data->testFrame = terrain->frameCount;
     data->previousLowerErrorLimit = 0;
     data->lowerErrorLimit = 0;
     data->previousUpperErrorLimit = 0xffff;
@@ -1038,7 +1038,7 @@ void DrawableGridNode::RetestChangedVertices()
         else
             TestVertex(g_gridEdges[i].x, g_gridEdges[i].z);
     }
-    data->field_0x130 = terrain->field_0xb4;
+    data->testFrame = terrain->frameCount;
 }
 
 // 0x00482a40: re-tests one vertex and flags it (bit 6: failed the test,
@@ -1191,7 +1191,7 @@ int DrawableGridNode::RetestUnpinnedVertex(int x, int z)
     int i = g_gridRow17[z] + x;
     GridBaseCell* cell = &block->cells[i];
     int result = 0;
-    if (childMask && (data->field_0x130 == terrain->field_0xb4 ||
+    if (childMask && (data->testFrame == terrain->frameCount ||
                       terrain->vertexRetestStamps[i] == terrain->retestStamp)) {
         if (CanDropVertex(x, z)) {
             data->vertexFlags[i] &= ~0x40;
