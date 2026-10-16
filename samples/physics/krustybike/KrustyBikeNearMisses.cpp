@@ -110,17 +110,17 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag;
-    if (g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4)
+    if (g_kbGame->field_0x578.GetSelectedSeries() == 3 || g_kbGame->field_0x578.GetSelectedSeries() == 4)
         flag = 1;
     else
         flag = 0;
     int lim;
-    if (g_kbGame->field_0x578.Fn_00524100() == 5 || g_kbGame->field_0x578.Fn_00524100() == 4)
+    if (g_kbGame->field_0x578.GetSelectedSeries() == 5 || g_kbGame->field_0x578.GetSelectedSeries() == 4)
         lim = 0x7fffffff;
     else
         lim = 0x66;
     unsigned char hit = 0;
-    if (g_kbGame->field_0x578.Fn_00524100() == 5)
+    if (g_kbGame->field_0x578.GetSelectedSeries() == 5)
         hit = Kb_004B0AC0(&position, 2.0f, 2.0f, 2.0f, terrainScale, 0, 0, 0, 0);
     KbGame* g = g_kbGame;
     switch (g->field_0x2d74) {
@@ -324,7 +324,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                         if (g_kbGame->field_0x8)
                                             g_kbGame->field_0x8->Send(13, &message, sizeof(message), netId, record);
                                     } else if (netRecorder) {
-                                        netRecorder->Fn_004E8720(13, netId, &message, sizeof(message));
+                                        netRecorder->QueueRecord(13, netId, &message, sizeof(message));
                                     }
                                     state->position = position;
                                     state->roll = bodyRoll;
@@ -348,7 +348,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     } else if (netRecorder && race->field_0x3fb) {
                                         ping.field_0x04 = field_0x768;
                                         ping.field_0x01 = loaderKind;
-                                        netRecorder->Fn_004E8720(10, netId, &ping, sizeof(ping));
+                                        netRecorder->QueueRecord(10, netId, &ping, sizeof(ping));
                                     }
                                     return;
                                 }
@@ -851,15 +851,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 field_0x464 = bodyUp.y < 0.0f;
                 field_0x45c = savedYaw;
                 if (field_0x430)
-                    field_0x604->Method_0x00532310();
+                    field_0x604->StartTumble();
                 else
-                    field_0x604->Method_0x00532220(states[0]->crashDirection);
+                    field_0x604->StartAnimatedWreck(states[0]->crashDirection);
                 field_0x433 = 0;
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
-                field_0x604->Method_0x005327c0();
+                field_0x604->EndWreck();
                 Fn_00496DA0();
                 field_0x430 = 0;
                 field_0x433 = 0;
@@ -949,15 +949,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 field_0x464 = bodyUp.y < 0.0f;
                 field_0x45c = savedYaw;
                 if (field_0x430)
-                    field_0x604->Method_0x00532310();
+                    field_0x604->StartTumble();
                 else
-                    field_0x604->Method_0x00532220(interpSource->crashDirection);
+                    field_0x604->StartAnimatedWreck(interpSource->crashDirection);
                 field_0x433 = 0;
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
-                field_0x604->Method_0x005327c0();
+                field_0x604->EndWreck();
                 Fn_00496DA0();
                 field_0x430 = 0;
                 field_0x433 = 0;
@@ -1340,6 +1340,6 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &tmp);
+        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
 }

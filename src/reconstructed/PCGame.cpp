@@ -85,7 +85,7 @@ int EnumerateDisplays(void* window);                // 0x004c9600: enumerates th
 UnknownDisplay* ChooseDisplay(int flag, int useLast, int* blade);
 int ChooseJoystick(int useLast);                 // 0x004cd610: chooses the joystick
 // 0x005119c0: fills a pixel format for texture format `format`.
-void UnknownFunction5119c0(int format, void* pixelFormat);
+void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x00689940: a FILTERKEYS-sized structure (24 bytes) cleared by the
 // constructor.

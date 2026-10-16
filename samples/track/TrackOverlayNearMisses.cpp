@@ -500,7 +500,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     chatCamera = (UnknownChatCamera*)camera;
     cueRect = cue;
     timeSum = 0.08f;
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
         return 0;

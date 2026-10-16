@@ -409,7 +409,7 @@ void KrustyUI::Shutdown() {
 // 0x0049b530: tells the "ProgressBar" control 1 (0x0047b370).
 void KrustyUI::StepProgressBar() {
     if (progressDialog) {
-        UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->UnknownFunction46ebf0("ProgressBar", 0));
+        UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->FindControl("ProgressBar", 0));
         if (bar)
             bar->StepProgress(1);
     }

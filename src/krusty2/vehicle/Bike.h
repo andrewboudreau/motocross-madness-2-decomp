@@ -182,11 +182,11 @@ struct BikeA604 {
     int a_0x52c;                  // KrustyBike slot 33 (0x0048e130) sets it to 1
     char pad_0x530[0xc];          // allocation size 0x53c (Bike slot 97)
     // Called through Bike+0x604 by KrustyBike slots 27 and 67 (purpose unknown).
-    void Method_0x00532220(int a);
-    void Method_0x00532310();
-    void Method_0x005327c0();
-    int Method_0x00530190(void* a, BikeA5C4* b, const char* name);
-    void Method_0x00532900(Vec3 offset, int bone);
+    void StartAnimatedWreck(int a);
+    void StartTumble();
+    void EndWreck();
+    int SetupWrecker(void* a, BikeA5C4* b, const char* name);
+    void AddProbe(Vec3 offset, int bone);
 };
 
 struct BikeA34 {
@@ -213,7 +213,7 @@ struct BikeA1A0 {
     void ClearScreenRects();
     void SetUseLighting(int a);                // 0x004444c0 (SoultreeD3DNode::SetUseLighting)
     void GetSubtreeBounds(Vec3* center, Vec3* extents);   // 0x004fe850 (SoultreeObject::GetSubtreeBounds)
-    void Method_0x004fb8c0(int a, Matrix4* b);
+    void SetMatrixIn(int a, Matrix4* b);
 };
 
 struct BikeA128 {

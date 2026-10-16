@@ -611,7 +611,7 @@ int Terrain::GameObjectVirtualSlot14()
         g_terrainGame->overlay->UnknownFunction447fa0(g_UnknownGlobal574714, "Terrain Tolerance:%d",
                                                       drawDistance);
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Memory %d",
-                                                      g_MemTagStack->UnknownFunction4a2d20("Terrain"));
+                                                      g_MemTagStack->GetBytes("Terrain"));
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
                                                       g_UnknownGlobal68a308, g_UnknownGlobal68a30c,
                                                       g_terrainPeak0.Peak(),

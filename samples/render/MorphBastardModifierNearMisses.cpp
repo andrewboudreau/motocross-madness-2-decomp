@@ -358,7 +358,7 @@ float FastInvSqrt(float x);                                          // 0x00460c
 float Vec3Dot(const Vector3* a, const Vector3* b);     // 0x0040ae30: a.b
 Vector3 CrossProduct(const Vector3* a, const Vector3* b);   // 0x00515600: a x b
 Vector3 Matrix4Row(const Matrix4* m, int row);            // 0x004a2350: row of m
-void UnknownFunction42de90(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90: axis-angle
+void AxisAngleMatrix(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90: axis-angle
 void UnknownFunction436500(Matrix4* out, const Matrix4* a, const Matrix4* b);    // 0x00436500: a * b
 
 static inline void NormalizeOrZero(Vector3& v)
@@ -475,7 +475,7 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         axis = Vector3(0.0f, 1.0f, 0.0f);
     else
         NormalizeOrZero(axis);
-    UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
+    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
     cross = CrossProduct(&Matrix4Row(&aligned, 2), &Matrix4Row(&controller, 2));
     float angleY = AngleBetween(Matrix4Row(&aligned, 2), Matrix4Row(&controller, 2)) *
@@ -492,7 +492,7 @@ void MorphBastardModifier::ControllerAngles(MorphBastardChannel* channel, Matrix
         axis = Vector3(0.0f, 0.0f, 1.0f);
     else
         NormalizeOrZero(axis);
-    UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
+    AxisAngleMatrix(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
     cross = CrossProduct(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));
     Vec3Dot(&Matrix4Row(&aligned, 0), &Matrix4Row(&controller, 0));

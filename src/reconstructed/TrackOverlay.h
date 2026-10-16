@@ -11,7 +11,7 @@
 class TextureMapManager;
 
 // 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.
-TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
                                   int a4, int a5, int a6, int a7, int a8, int a9,
                                   unsigned int key, int a11, int a12);
 

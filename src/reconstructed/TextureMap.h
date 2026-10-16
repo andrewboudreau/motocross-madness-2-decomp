@@ -195,7 +195,7 @@ class Palette8;
 // while wider than 32 up to choice+0x14 times and loads it through slot 4.
 // A ManagedTexture when `choice` has a group for the format, else a
 // PCTextureMap; 0 on failure.
-TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
                                   Palette8* palette, int flags, int addressU, int addressV,
                                   UnknownTextureFormatChoice* choice, int alphaThreshold,
                                   unsigned int key, int addRef, int fromArchive);

@@ -45,11 +45,11 @@ class UnknownParameterBlock {
 public:
     UnknownParameterBlock();                                                     // 0x004b7130
     ~UnknownParameterBlock();                                                    // 0x004b7190
-    void UnknownFunction4b77a0(UnknownParameterStream* stream, int offset, int index); // 0x004b77a0
-    int UnknownFunction4b7f70(const char* name);                                 // 0x004b7f70
-    int UnknownFunction4b8010(char* raw);                                        // 0x004b8010
-    int UnknownFunction4b81c0(int index, float* out);                            // 0x004b81c0
-    int UnknownFunction4b8200(int index, char* out);                             // 0x004b8200
+    void Attach(UnknownParameterStream* stream, int offset, int index); // 0x004b77a0
+    int BeginRows(const char* name);                                 // 0x004b7f70
+    int ReadRow(char* raw);                                        // 0x004b8010
+    int GetRowFloat(int index, float* out);                            // 0x004b81c0
+    int GetRowString(int index, char* out);                             // 0x004b8200
     char field_0x00[0x5c4];        // operator new(0x5c4) at 0x004fdb83 (tier 1)
 };
 #endif

@@ -32,7 +32,7 @@
   "?AddFont@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x004676c0",
   "?DeleteFont@UnknownStatic65b478@@QAEXPAVFontTexture@@@Z": "0x00467760",
   "?FindFont@UnknownStatic65b478@@QAEPAUUnknownFontTextureNode@@PBD@Z": "0x004677f0",
-  "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",
   "?g_UnknownGlobal568468@@3HA": "0x00568468",
   "?g_UnknownGlobal56846c@@3HA": "0x0056846c",
   "?g_UnknownGlobal568470@@3HA": "0x00568470",

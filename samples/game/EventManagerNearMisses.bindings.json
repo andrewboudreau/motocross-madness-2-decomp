@@ -47,7 +47,7 @@
   "?UnknownFunction45fdc0@EventManager@@QAEXMMMM@Z": "0x0045fdc0",
   "?ResetClock@Game@@QAEXXZ": "0x00468880",
   "?InsertBefore@GameObject@@QAEHPAV1@H@Z": "0x00469260",
-  "?UnknownFunction46ff30@UnknownTrackGameObject56cItem@@QAEXH@Z": "0x0046ff30",
+  "?EndDialog@UnknownTrackGameObject56cItem@@QAEXH@Z": "0x0046ff30",
   "?RecordRaceResults@KrustyUI@@QAEXXZ": "0x0049bbb0",
   "?FindMotion@D3DIMSoultreeCharacter@@QAEPAUMotion@@PBDH@Z": "0x004a6b30",
   "?SetMotion@D3DIMSoultreeCharacter@@QAEXPAUMotion@@@Z": "0x004a8b40",

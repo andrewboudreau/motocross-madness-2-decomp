@@ -106,7 +106,7 @@ extern UnknownBikeAIGameView* g_BikeAIGame_0056e26c;
 // 0x0047b800 (cdecl, after gameui.cpp): 2D (x, z) intersection of the line a + s*da
 // with the line b + u*db; writes s and u, returns 0 when they do not intersect
 // (tier 2 from the callers; name tier 3).
-int UnknownFunction47b800(float ax, float az, float dax, float daz, float bx, float bz,
+int IntersectLines(float ax, float az, float dax, float daz, float bx, float bz,
                           float dbx, float dbz, float* s, float* u);
 
 // Inline length helper: same body as the out-of-line 0x00413190 (inlined in 0x0040e510
@@ -152,7 +152,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
             Vec3 n = SafeNormalize(Vec3(seg.z, 0.0f, -seg.x));
-            if (!UnknownFunction47b800(path->points[nearest - 1].x, path->points[nearest - 1].z, seg.x, seg.z,
+            if (!IntersectLines(path->points[nearest - 1].x, path->points[nearest - 1].z, seg.x, seg.z,
                                        pos.x, pos.z, n.x, n.z, &t, &offset))
                 return 0;
             if (t >= 0.0f && t <= 1.0f && offset < bestDist) {
@@ -164,7 +164,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
             Vec3 n = SafeNormalize(Vec3(seg.z, 0.0f, -seg.x));
-            if (!UnknownFunction47b800(path->points[nearest].x, path->points[nearest].z, seg.x, seg.z,
+            if (!IntersectLines(path->points[nearest].x, path->points[nearest].z, seg.x, seg.z,
                                        pos.x, pos.z, n.x, n.z, &t, &offset))
                 return 0;
             if (t >= 0.0f && t <= 1.0f && offset < bestDist) {
@@ -677,7 +677,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                     d = owner->start - seg[0];
                     distSq = BikeAISquareMagnitude(d);
                     d = BikeAINormalizeVS(d);
-                    UnknownFunction47b800(seg[0].x, seg[0].z, delta.x, delta.z, owner->start.x, owner->start.z,
+                    IntersectLines(seg[0].x, seg[0].z, delta.x, delta.z, owner->start.x, owner->start.z,
                                           owner->dir.x, owner->dir.z, &s, &u);
                     if (s >= 0.0f && s <= 1.0f && u >= 0.0f && u <= 1.0f) {
                         hit = 1;
@@ -697,7 +697,7 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                     d = *center - seg[0];
                     distSq = BikeAISquareMagnitude(d);
                     d = BikeAINormalizeVS(d);
-                    UnknownFunction47b800(seg[0].x, seg[0].z, delta.x, delta.z, center->x, center->z,
+                    IntersectLines(seg[0].x, seg[0].z, delta.x, delta.z, center->x, center->z,
                                           owner->dir.x, owner->dir.z, &s, &u);
                     if (s >= 0.0f && s <= 1.0f && u >= 0.0f && u <= 1.0f) {
                         hit = 1;
@@ -1740,7 +1740,7 @@ int KrustyBike::Fn_00413200(float dt)
         field_0x433 = 0;
         field_0x464 = savedUp.y < 0.0f ? 1 : 0;
         field_0x45c = savedYaw;
-        field_0x604->Method_0x00532220(crashDirection);
+        field_0x604->StartAnimatedWreck(crashDirection);
         UnknownVirtualSlot69();
     }
     savedForward = bodyForward;
@@ -1859,7 +1859,7 @@ int KrustyBike::Fn_00414370(float dt)
             }
             speed = linearSpeed;
             if (race->field_0x48) {
-                if (!race->field_0x48->UnknownFunction516ca0(position, race->field_0x48->field_0x0,
+                if (!race->field_0x48->ClosestPointOnNode(position, race->field_0x48->field_0x0,
                                                                     &field_0x744->field_0x38, 0))
                     return 0;
                 if (!field_0x744->field_0x44.a) {
@@ -1869,11 +1869,11 @@ int KrustyBike::Fn_00414370(float dt)
                 }
                 gate = field_0x744->field_0x34;
                 if (!gate->trackPos.a)
-                    race->field_0x48->UnknownFunction516ca0(gate->position, race->field_0x48->field_0x0,
+                    race->field_0x48->ClosestPointOnNode(gate->position, race->field_0x48->field_0x0,
                                                                   &gate->trackPos, 0);
-                gateAhead = race->field_0x48->UnknownFunction517da0(field_0x744->field_0x44,
+                gateAhead = race->field_0x48->DistanceAlong(field_0x744->field_0x44,
                                                                           field_0x744->field_0x34->trackPos);
-                bikeAhead = race->field_0x48->UnknownFunction517da0(field_0x744->field_0x38,
+                bikeAhead = race->field_0x48->DistanceAlong(field_0x744->field_0x38,
                                                                           field_0x744->field_0x34->trackPos);
                 if (bikeAhead > 0.0f && gateAhead > 0.0f && bikeAhead < gateAhead) {
                     field_0x744->field_0x44.a = field_0x744->field_0x38.a;
@@ -1895,7 +1895,7 @@ int KrustyBike::Fn_00414370(float dt)
                         if (!race->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
                                                                            t * linearSpeed, 0))
                             return 0;
-                        if (!race->field_0x48->UnknownFunction518080(p, &aiPath.points[i]))
+                        if (!race->field_0x48->PointAt(p, &aiPath.points[i]))
                             return 0;
                         aiPath.points[i].y = position.y + 2.0f;
                         t += 0.1f;
@@ -1950,7 +1950,7 @@ int KrustyBike::Fn_00414370(float dt)
             return 0;
         if (!race->field_0x134.a || !race->field_0x134.b)
             return 0;
-        if (!race->field_0x48->UnknownFunction5179f0(field_0x744->field_0x44, race->field_0x134,
+        if (!race->field_0x48->ShortestPath(field_0x744->field_0x44, race->field_0x134,
                                                              &list, &distance))
             return 0;
         tail = &list;
@@ -1958,7 +1958,7 @@ int KrustyBike::Fn_00414370(float dt)
             tail = &(*tail)->field_0x0c;
         from = race->field_0x134;
         from.t += 0.01f;
-        if (!race->field_0x48->UnknownFunction5179f0(from, race->field_0x134, tail, &distance))
+        if (!race->field_0x48->ShortestPath(from, race->field_0x134, tail, &distance))
             return 0;
         if (field_0x78c) {
             if (list) {
@@ -1968,7 +1968,7 @@ int KrustyBike::Fn_00414370(float dt)
                     if (!race->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
                                                                        t * linearSpeed, 0))
                         return 0;
-                    if (!race->field_0x48->UnknownFunction518080(p, &aiPath.points[i]))
+                    if (!race->field_0x48->PointAt(p, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     t += 0.1f;
@@ -1998,7 +1998,7 @@ int KrustyBike::Fn_00414370(float dt)
                     if (!race->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
                                                                        g_BikeAILookAhead_00572988 * t, 0))
                         return 0;
-                    if (!race->field_0x48->UnknownFunction518080(p, &aiPath.points[i]))
+                    if (!race->field_0x48->PointAt(p, &aiPath.points[i]))
                         return 0;
                     aiPath.points[i].y = position.y + 2.0f;
                     lenSq = SquareMagnitude(aiPath.points[i] - position);
@@ -2010,7 +2010,7 @@ int KrustyBike::Fn_00414370(float dt)
                 }
             } else {
                 p = field_0x744->field_0x44;
-                if (!race->field_0x48->UnknownFunction518080(field_0x744->field_0x44, &aiPath.points[0]))
+                if (!race->field_0x48->PointAt(field_0x744->field_0x44, &aiPath.points[0]))
                     return 0;
             }
         }
@@ -2024,7 +2024,7 @@ int KrustyBike::Fn_00414370(float dt)
         else if (difficulty == 1)
             aiPath.field_0x970 = field_0x7c4;
         if (field_0x7a4) {
-            field_0x78c = race->field_0x48->UnknownFunction517340(position, field_0x744->field_0x44,
+            field_0x78c = race->field_0x48->PlaceNear(position, field_0x744->field_0x44,
                                                                         -1.0f, -1.0f, 0, 0);
             if (!field_0x78c) {
                 aiPath.field_0x96c = 0.0f;
@@ -2032,7 +2032,7 @@ int KrustyBike::Fn_00414370(float dt)
             }
             aiPath.field_0x96c = 40.0f;
             Vec3 dir;
-            if (!race->field_0x48->UnknownFunction518130(field_0x744->field_0x44.b, &dir))
+            if (!race->field_0x48->SegmentDirection(field_0x744->field_0x44.b, &dir))
                 return 0;
             race->field_0x48->UnknownFunction518230(position, field_0x744->field_0x44.b, &right, 10);
             race->field_0x48->UnknownFunction518230(position, field_0x744->field_0x44.b, &left, 11);
@@ -2074,6 +2074,6 @@ int KrustyBike::Fn_00414370(float dt)
     }
 done:
     if (list)
-        race->field_0x48->UnknownFunction517930(&list, 0);
+        race->field_0x48->FreeWorkList(&list, 0);
     return 1;
 }

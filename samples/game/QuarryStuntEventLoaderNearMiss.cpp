@@ -156,7 +156,7 @@ public:
     // 0x00497d90: sets the camera up; returns it.
     UnknownQuarryBikeCamera* Create(void* target, float a, float b, float c, float d, float e,
                                                    int f, int count, int* presets);
-    void UnknownFunction463600(UnknownTerrain* terrain);       // 0x00463600
+    void SetSubject(UnknownTerrain* terrain);       // 0x00463600
 
     unsigned char field_0x02c[0x274 - 0x2c];
     unsigned char field_0x274;
@@ -804,7 +804,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("3DObjects");
     UnknownVirtualSlot33((int)((UnknownQuarryRace*)raceView)->field_0x38);
     g_MemTagStack->Push("BikeRace");
-    ((UnknownQuarryBikeCamera*)raceCamera)->UnknownFunction463600(eventTerrain);
+    ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
     UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
     if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {

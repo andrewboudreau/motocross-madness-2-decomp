@@ -87,7 +87,7 @@
   "?GetPositionIn@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?FindByName@UnknownVehiclePart@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?CastSegment@UnknownTerrain@@QAEHPBUVector3@@0PAU2@HHH@Z": "0x00506e90",
-  "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",
+  "?TerrainLoadTexture@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHHHIHH@Z": "0x0050a590",
   "?SetAddressModes@TextureMap@@QAEHHH@Z": "0x0050abd0",
   "?SelectFont@UnknownOverlayText@@QAEXPBD@Z": "0x0050ade0",
   "?DrawTextInto@UnknownOverlayText@@QAEHPAVTextureMap@@HHPBDH@Z": "0x0050b080",

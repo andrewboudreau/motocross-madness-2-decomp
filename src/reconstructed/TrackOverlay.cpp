@@ -90,7 +90,7 @@ InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapMana
     rect.right = 639;
     rect.top = 351;
     rect.bottom = 479;
-    TextureMap* texture = UnknownFunction50a590(manager, name, 4444, 0, 0, 5, 6, 0, 0x80,
+    TextureMap* texture = TerrainLoadTexture(manager, name, 4444, 0, 0, 5, 6, 0, 0x80,
                                                 0xff00ff, 1, 1);
     if (!texture) {
         Release();
@@ -444,7 +444,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
         Release();
         return 0;
     }
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
         return 0;
@@ -1165,7 +1165,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         frameRateRect.bottom = mapRect.top + 124;
     }
     radarCamera = (UnknownRadarCamera*)a3;
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
         return 0;

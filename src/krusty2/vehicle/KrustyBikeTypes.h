@@ -72,14 +72,14 @@ extern Vec3 g_kbZeroVec;
 
 // Object reached through the global at 0x0056E26C (game/session singleton).
 struct KbTrackRec { Vec3 field_0x00; char pad_0x0C[0xC]; };
-struct KbMode { char pad_0x00[0x94]; int Fn_00524100(); };
+struct KbMode { char pad_0x00[0x94]; int GetSelectedSeries(); };
 struct KbGameCfg {
     char pad_0x0000[0x10]; int field_0x10;
     // 0x004AC830 (Net.cpp): send a message (type, data, size, destination id, flags); returns 1 on success.
     int Send(int type, void* data, int size, int dest, int flags);
 };
 // Object behind KrustyBike+0x13fc (tier 3); 0x004E8720 appends a record (type, id, data, flag).
-struct KbRecorder { int Fn_004E8720(int type, int id, void* data, int flag); };
+struct KbRecorder { int QueueRecord(int type, int id, void* data, int flag); };
 // Entity-level view used for the id at +0x11bc of any bike (tier 3, offset confirmed by decoded loads).
 struct KbCell { char pad_0x00[8]; float field_0x8; char pad_0xc[4]; float field_0x10; };
 struct KbNetBike {
@@ -381,7 +381,7 @@ struct KbRaceHandler {
     void ReportTrickScore(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
 };
 // Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
-struct KbScoreBoard { void Fn_0048D1E0(float angle, float multiplier); };
+struct KbScoreBoard { void ShowValue(float angle, float multiplier); };
 // Object at KbGame+0x3444 (bonus rules; packed: its ints sit at odd offsets).
 #pragma pack(push, 1)
 struct KbBonusTable {
@@ -408,16 +408,16 @@ struct KbTrackItem {
 // Positions on the track are KbRaw3 {node, segment, t} passed by value.
 struct KbRaceSub {
     int* field_0x0;
-    int UnknownFunction516ca0(Vec3 p, int* node, KbRaw3* out, float* outDistance);
-    int UnknownFunction517340(Vec3 p, KbRaw3 from, float distance, float range, int path,
+    int ClosestPointOnNode(Vec3 p, int* node, KbRaw3* out, float* outDistance);
+    int PlaceNear(Vec3 p, KbRaw3 from, float distance, float range, int path,
                               KbRaw3* out);
-    int UnknownFunction517930(KbTrackItem** list, int all);
-    int UnknownFunction5179f0(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
-    float UnknownFunction517da0(KbRaw3 a, KbRaw3 b);
+    int FreeWorkList(KbTrackItem** list, int all);
+    int ShortestPath(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
+    float DistanceAlong(KbRaw3 a, KbRaw3 b);
     int UnknownFunction517ea0(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
                               unsigned char flags);
-    int UnknownFunction518080(KbRaw3 pos, Vec3* out);
-    int UnknownFunction518130(int segment, Vec3* out);
+    int PointAt(KbRaw3 pos, Vec3* out);
+    int SegmentDirection(int segment, Vec3* out);
     int UnknownFunction518230(Vec3 p, int segment, float* out, int mode);
 };
 struct KbRace {
@@ -492,13 +492,13 @@ struct KbSink {
 // transforms a vector.
 struct KbMorphMod;
 struct KbXform {
-    void Fn_00444D80(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
-    void Fn_00444DE0(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
+    void AddModifier(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
+    void RemoveModifier(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
     Vec3 WorldToLocalDirection(const Vec3* v);
     // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
     // the first two with 0 or 1 on the bike and rider nodes and the third with the rider morph.
-    void UnknownFunction444d00(int value);         // 0x00444D00
-    void UnknownFunction444d40(int value);         // 0x00444D40
+    void SetLod(int value);         // 0x00444D00
+    void SetLowestLod(int value);         // 0x00444D40
     void UnknownFunction444eb0(KbMorphMod* mod);   // 0x00444EB0
 };
 // Element of the array at Bike+0x12c (count at +0x130).
@@ -521,7 +521,7 @@ struct KbObj128 {
     char pad_10[0x74];
     int field_0x84;
     void Fn_00435FE0();
-    void Fn_0047BBF0(float a);   // 0x0047BBF0 (tier 3)
+    void StartFade(float a);   // 0x0047BBF0 (tier 3)
 };
 struct KbDirector {
     void Remove(KbObj128* who, int a);
@@ -562,18 +562,18 @@ struct KbA5C4 {
     void ApplyRestPose();               // 0x004A8B00 (Character::ApplyRestPose)
 };
 struct KbA604 {
-    void Fn_005305B0(KbAnim* a);
-    void Fn_005305F0(KbAnim* a);
-    void Fn_00530630(KbAnim* a);
-    void Fn_00530680(BikeWheel* w);
-    void Fn_00530680(KbObj128* body);   // same 0x00530680 with one of the two collision bodies
-    void Fn_005328B0(SoultreeObject* node, Vec3 a, Vec3 b);
+    void AddContactAnimation(KbAnim* a);
+    void AddRandomAnimation(KbAnim* a);
+    void AddIndexedAnimation(KbAnim* a);
+    void AddIgnoredObject(BikeWheel* w);
+    void AddIgnoredObject(KbObj128* body);   // same 0x00530680 with one of the two collision bodies
+    void SetPushBox(SoultreeObject* node, Vec3 a, Vec3 b);
 };
 
 // Session object at KbGame+0x570; 0x0045D2B0 returns the local player record (tier 3 names).
 struct KbMessage;
-struct KbMsgSink { void Fn_0051B540(KbMessage* m); };
-struct KbSession { KbPlayer* Fn_0045D2B0(); KbMsgSink* Fn_0045D340(); };
+struct KbMsgSink { void ReplaceHeadMessage(KbMessage* m); };
+struct KbSession { KbPlayer* FindRaceMode(); KbMsgSink* FindTextQueue(); };
 class Vehicle;
 struct KbPlayer {
     char pad_0x0000[0xA8];
@@ -613,7 +613,7 @@ struct KbGhostMod { char pad_0x00[0x48]; KbGhostMod(int flags); };
 struct KbMorphMod {
     char pad_0x00[0x58];
     KbMorphMod(int flags);
-    KbMorphMod* UnknownFunction4a33b0(void* a, const char* path, SoultreeObject* node);
+    KbMorphMod* LoadParameterFile(void* a, const char* path, SoultreeObject* node);
 };
 // Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
 // Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.

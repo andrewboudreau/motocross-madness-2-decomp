@@ -595,7 +595,7 @@ void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
 }
 
 // 0x004433f0
-void D3DIMSoultreeObject::UnknownFunction4433f0(int surface, UnknownSoultreeVertex** vertices,
+void D3DIMSoultreeObject::GetPart(int surface, UnknownSoultreeVertex** vertices,
                                                 int* vertexCount, unsigned short** indices, int* indexCount,
                                                 int a6, int lod)
 {

@@ -58,7 +58,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
         return;
     UnknownTrackGameObject56cItem* item = g_TrackGame->ui->gui->FindInputDialog();
     if (item)
-        item->UnknownFunction46ff30(0);
+        item->EndDialog(0);
     if (g_TrackGame->ui->savedInputContext)
         ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->savedInputContext);
     if (g_TrackGame->ui->allowIme)

@@ -433,7 +433,7 @@ public:
 // Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
 class UnknownTrackGameObject56cItem {
 public:
-    void UnknownFunction46ff30(int value);    // 0x0046ff30 (EventManager 0x0045e710)
+    void EndDialog(int value);    // 0x0046ff30 (EventManager 0x0045e710)
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();

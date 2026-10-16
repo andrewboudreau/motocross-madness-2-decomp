@@ -223,7 +223,7 @@ void SoultreeMaterial::LoadTexture()
                                          0x80, 0xff00ff);
         }
     } else {
-        texture = UnknownFunction50a590(textureManager, textureName, format, 0, mipMapped ? 2 : 0,
+        texture = TerrainLoadTexture(textureManager, textureName, format, 0, mipMapped ? 2 : 0,
                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6,
                                         &textureOptions, 0x80, 0xff00ff, 1, 1);
     }

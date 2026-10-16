@@ -84,7 +84,7 @@
   "?UnknownFunction462680@UnknownQuarryFog@@QAEPAVFog@@PAXIMMMMM@Z": "0x00462680",
   "?SetParameters@Fog@@QAEXIMM@Z": "0x004627a0",
   "?SetDetailLevel@Fog@@QAEXH@Z": "0x00462db0",
-  "?UnknownFunction463600@UnknownQuarryBikeCamera@@QAEXPAVUnknownTerrain@@@Z": "0x00463600",
+  "?SetSubject@UnknownQuarryBikeCamera@@QAEXPAVUnknownTerrain@@@Z": "0x00463600",
   "?DisableByClassName@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?Create@UnknownQuarryFogLink@@QAEPAVGameObject@@PAXPAVFog@@@Z": "0x00486a10",
