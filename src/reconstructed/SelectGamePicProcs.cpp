@@ -442,8 +442,8 @@ void MultiPlayerDlg::SendSettings() {
         message.riderCollision = game->mode.raceSettings.riderCollision;
         message.fastFinishes = game->mode.raceSettings.shortTimeLimit;
         message.bikeClass = game->mode.raceSettings.maxBikeClass;
-        message.field_0x0c = game->mode.raceSettings.trackFileTime;
-        message.field_0x10 = game->mode.raceSettings.trackFileSize;
+        message.trackFileTime = game->mode.raceSettings.trackFileTime;
+        message.trackFileSize = game->mode.raceSettings.trackFileSize;
         message.difficulty = game->mode.difficulty;
         message.trackNumber = game->mode.raceSettings.trackNumber;
         memcpy(message.slots, slots->slots, sizeof(message.slots));
@@ -798,8 +798,8 @@ int MultiPlayerDlg::OnNetworkMessage(int type, void* data, int from, int to, int
         g_TrackGame->mode.raceSettings.shortTimeLimit = settings->fastFinishes;
         g_TrackGame->mode.raceSettings.maxBikeClass = settings->bikeClass;
         g_TrackGame->mode.raceSettings.trackNumber = settings->trackNumber;
-        g_TrackGame->mode.raceSettings.trackFileTime = settings->field_0x0c;
-        g_TrackGame->mode.raceSettings.trackFileSize = settings->field_0x10;
+        g_TrackGame->mode.raceSettings.trackFileTime = settings->trackFileTime;
+        g_TrackGame->mode.raceSettings.trackFileSize = settings->trackFileSize;
         g_TrackGame->mode.difficulty = settings->difficulty;
         g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.series);
         g_TrackGame->mode.raceSettings.trackName[0] = 0;

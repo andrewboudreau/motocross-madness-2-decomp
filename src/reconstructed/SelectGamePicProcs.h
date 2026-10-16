@@ -176,8 +176,8 @@ struct UnknownLobbySettingsMessage {
     unsigned char stuntMode : 1;              // +0x2eb8
     unsigned char difficulty : 2;             // +0x60c
     unsigned char trackNumber;                // +0x09: track number (+0x2da4)
-    int field_0x0c;                           // +0x2ea8
-    int field_0x10;                           // +0x2eac
+    int trackFileTime;                        // +0xC  the track scene's st_mtime (TrackGame+0x2ea8 raceSettings.trackFileTime) the host sends
+    int trackFileSize;                        // +0x10  the track scene's st_size (TrackGame+0x2eac raceSettings.trackFileSize)
     char trackName[0x40];                     // +0x14: track name (+0x2da6)
     UnknownLobbySlot slots[8];                // +0x54: MultiPlayerDlg+0x7f68
 };
