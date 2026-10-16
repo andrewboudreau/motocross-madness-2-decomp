@@ -15,12 +15,12 @@ class VideoCard {
 public:
     VideoCard();                                  // 0x0052d180
     virtual ~VideoCard();                         // 0x0052d240 (deleting wrapper 0x0052d200)
-    virtual void UnknownVirtualSlot1();           // 0x0052d220: frees the mode table
+    virtual void ReleaseResources();              // 0x0052d220: frees the mode table
     // PCGame slot 32: width, height, depth, 2, 0, windowed, 1.
-    virtual int UnknownVirtualSlot2(int width, int height, int bitDepth, int a, int b,
-                                    int windowed, int c) = 0;
-    virtual int UnknownVirtualSlot3() = 0;        // presents a frame
-    virtual void UnknownVirtualSlot4(int value) = 0; // called with 0 and 1 around a frame
+    virtual int SetDisplayMode(int width, int height, int bitDepth, int a, int b,
+                               int windowed, int c) = 0;
+    virtual int Present() = 0;                    // presents a frame
+    virtual void RetryFlip(int value) = 0;           // called with 0 and 1 around a frame
 
     // 0x0052d250: sorts the modes and returns the index of the matching one
     // (a zero `a`/`b` matches any mode field_0x10/refresh rate), or -1.

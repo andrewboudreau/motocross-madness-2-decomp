@@ -27,17 +27,17 @@ struct UnknownDeviceIdentifier {
 // src/reconstructed/PCVideoCard.cpp). The stand-in name is kept for the
 // existing bindings. Game+0x0c, also kept at RenderTarget+0x04 (PCGame
 // slot 31 hands it to PCRenderTarget 0x004c4f80, which stores it through
-// 0x004e8ca0). Game slot 9 calls its slot 3; RenderTarget 0x004e8cc0 reads
+// 0x004e8ca0). Game::PresentFrame calls Present; RenderTarget 0x004e8cc0 reads
 // +0x6c; Camera 0x0042e550 reads the current mode's size; Game slot 8
 // prints its mode and memory members.
 struct UnknownDisplay : public VideoCard {
     UnknownDisplay();                             // 0x004c9760
     // Implicit destructor 0x004c9820 (jumps to VideoCard's; deleting wrapper 0x004c9800).
-    virtual void UnknownVirtualSlot1();           // 0x004c9ba0: releases everything
-    virtual int UnknownVirtualSlot2(int width, int height, int bitDepth, int a, int b,
-                                    int windowed, int c); // 0x004c9ec0
-    virtual int UnknownVirtualSlot3();            // 0x004ca270: presents a frame
-    virtual void UnknownVirtualSlot4(int value);  // 0x004ca4a0
+    virtual void ReleaseResources();              // 0x004c9ba0: releases everything
+    virtual int SetDisplayMode(int width, int height, int bitDepth, int a, int b,
+                               int windowed, int c);      // 0x004c9ec0
+    virtual int Present();                        // 0x004ca270: presents a frame
+    virtual void RetryFlip(int value);            // 0x004ca4a0
     // 0x004c9830: creates the DirectDraw object for `guid` (0: the primary
     // display) and reads its identity, caps and modes; deletes itself and
     // returns 0 on failure.

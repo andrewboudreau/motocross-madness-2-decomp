@@ -516,7 +516,7 @@ int PCGame::InitializeDisplay() {
         if (!display->SetWindowedCooperativeLevel(0, 0, 640, 480))
             return 0;
     }
-    if (!display->UnknownVirtualSlot2(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
+    if (!display->SetDisplayMode(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
         return 0;
     return AttachRenderTarget() != 0;
 }

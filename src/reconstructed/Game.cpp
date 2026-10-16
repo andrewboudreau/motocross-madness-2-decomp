@@ -201,14 +201,14 @@ int Game::AttachRenderTarget() {
 // fills the debug overlay's profile and memory pages.
 int Game::RenderFrame() {
     if (display->lastFlipFailed)
-        display->UnknownVirtualSlot4(0);
+        display->RetryFlip(0);
     unsigned int last = ReadClock();
     rootObject->UnknownVirtualSlot12();
     unsigned int now = ReadClock();
     int prepareGeometry = now - last;
     last = now;
     if (display->lastFlipFailed)
-        display->UnknownVirtualSlot4(1);
+        display->RetryFlip(1);
     now = ReadClock();
     int waitForFlip = now - last;
     last = now;
@@ -330,7 +330,7 @@ int Game::RenderFrame() {
 
 // 0x004685c0
 int Game::PresentFrame() {
-    display->UnknownVirtualSlot3();
+    display->Present();
     return 1;
 }
 

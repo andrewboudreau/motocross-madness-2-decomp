@@ -183,7 +183,7 @@ void UnknownDisplay::RefreshDriverCaps() {
 }
 
 // 0x004c9ba0
-void UnknownDisplay::UnknownVirtualSlot1() {
+void UnknownDisplay::ReleaseResources() {
     ReleasePrimarySurface();
     if (renderSurface != backBuffer && renderSurface) {
         renderSurface->Release();
@@ -198,7 +198,7 @@ void UnknownDisplay::UnknownVirtualSlot1() {
         directDraw->Release();
         directDraw = 0;
     }
-    VideoCard::UnknownVirtualSlot1();
+    VideoCard::ReleaseResources();
 }
 
 // 0x004c9c10: waits for the primary's blits, then releases it and the
@@ -265,8 +265,8 @@ int UnknownDisplay::SetWindowedCooperativeLevel(int x, int y, int width, int hei
 }
 
 // 0x004c9ec0
-int UnknownDisplay::UnknownVirtualSlot2(int width, int height, int bitDepth, int a, int b, int windowed,
-                                        int c) {
+int UnknownDisplay::SetDisplayMode(int width, int height, int bitDepth, int a, int b, int windowed,
+                                   int c) {
     if (cooperativeLevel & DDSCL_NORMAL)
         return CreateWindowedSurfaces(width, height, windowed);
     int mode = FindDisplayMode(width, height, bitDepth, a, b);
@@ -375,7 +375,7 @@ failed:
 
 // 0x004ca270: flips (full screen) or blits the render surface to the
 // primary, and records the frame time.
-int UnknownDisplay::UnknownVirtualSlot3() {
+int UnknownDisplay::Present() {
     RECT rect;
     UnknownSurfaceInterface* source;
     unsigned int now;
@@ -423,7 +423,7 @@ failed:
 }
 
 // 0x004ca4a0
-void UnknownDisplay::UnknownVirtualSlot4(int value) {
+void UnknownDisplay::RetryFlip(int value) {
     if (value)
         primarySurface->Flip(0, DDFLIP_WAIT);
     else
@@ -636,7 +636,7 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
     }
     failed |= CopyRenderSurfaceToTexture(target, rendered) != 1;
     if (present)
-        display->UnknownVirtualSlot4(1);
+        display->RetryFlip(1);
     if (failed)
         return 2;
     float difference = MeanTextureChannelDifference(rendered, expected);
