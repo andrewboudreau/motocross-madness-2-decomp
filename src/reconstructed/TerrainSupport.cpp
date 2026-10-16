@@ -6,16 +6,16 @@
 // (0x00505490.. : the camera ctor + atexit, then ten 5000-tick PeakHolds in 0x20-byte
 // thunk/body pairs).  owner: Terrain.cpp bracket start.
 TerrainSharedState g_terrainSharedState(1);   // 0x0068a090 (PCCamera, tier 2)
-TerrainPeakHold g_terrainPeak0(5000);   // 0x0068a008
-TerrainPeakHold g_terrainPeak1(5000);   // 0x0068a038
-TerrainPeakHold g_terrainPeak2(5000);   // 0x0068a2e0
-TerrainPeakHold g_terrainPeak3(5000);   // 0x0068a2c0
-TerrainPeakHold g_terrainPeak4(5000);   // 0x0068a048
-TerrainPeakHold g_terrainPeak5(5000);   // 0x0068a2b0
-TerrainPeakHold g_terrainPeak6(5000);   // 0x0068a018
-TerrainPeakHold g_terrainPeak7(5000);   // 0x0068a2d0
-TerrainPeakHold g_terrainPeak8(5000);   // 0x0068a068
-TerrainPeakHold g_terrainPeak9(5000);   // 0x0068a078
+TerrainPeakHold g_terrainAgeTime0Peak(5000);   // 0x0068a008
+TerrainPeakHold g_terrainAgeTime1Peak(5000);   // 0x0068a038
+TerrainPeakHold g_terrainSetupPeak(5000);   // 0x0068a2e0
+TerrainPeakHold g_terrainEvalPeak(5000);   // 0x0068a2c0
+TerrainPeakHold g_terrainMeshPeak(5000);   // 0x0068a048
+TerrainPeakHold g_terrainCacheCountPeak(5000);   // 0x0068a2b0
+TerrainPeakHold g_terrainCacheBytesPeak(5000);   // 0x0068a018
+TerrainPeakHold g_terrainPrepareGeometryPeak(5000);   // 0x0068a2d0
+TerrainPeakHold g_terrainRender3DPeak(5000);   // 0x0068a068
+TerrainPeakHold g_terrainTotalPeak(5000);   // 0x0068a078
 
 // 0x00505600: takes the next pooled object (ownedObjectArray[ownedObjectArrayCount], parked behind
 // the live prefix by RetireOwnedObject) or, when the slot is empty, creates a new surface and

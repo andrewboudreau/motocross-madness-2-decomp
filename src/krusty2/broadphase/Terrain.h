@@ -377,9 +377,9 @@ public:
     int qualityIndex;  // +0xbf0 SelectQuality arg; indexes g_pTerrainQualityTable
     int drawDistanceDirty;  // +0xbf4 set to 1 when SetField0xbec changes the value
     int field_0xbf8;
-    int profileEval;  // +0xBFC  slot 14 profile page "Eval    %d[%d] %d" value (peak-held by g_terrainPeak3)
-    int profileMesh;  // +0xC00  slot 14 profile page "Mesh    %d[%d] %d" value (peak-held by g_terrainPeak4)
-    int profileSetup;  // +0xC04  slot 14 profile page "Setup   %d %d" value (peak-held by g_terrainPeak2)
+    int profileEval;  // +0xBFC  slot 14 profile page "Eval    %d[%d] %d" value (peak-held by g_terrainEvalPeak)
+    int profileMesh;  // +0xC00  slot 14 profile page "Mesh    %d[%d] %d" value (peak-held by g_terrainMeshPeak)
+    int profileSetup;  // +0xC04  slot 14 profile page "Setup   %d %d" value (peak-held by g_terrainSetupPeak)
     int field_0xc08;
     int field_0xc0c;
     int blockCount;                                            // +0xc10 count of blocks[]

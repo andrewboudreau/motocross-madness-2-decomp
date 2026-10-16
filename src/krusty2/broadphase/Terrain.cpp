@@ -395,27 +395,27 @@ public:
 };
 
 // Terrain timing / memory counters (tier 3 names, tier 1 addresses; defined outside this file).
-extern int g_UnknownGlobal68a308;     // 0x0068a308 "AgeTime" first value
-extern int g_UnknownGlobal68a30c;     // 0x0068a30c "AgeTime" second value
-extern int g_UnknownGlobal68a310;     // 0x0068a310 "Cache" count
-extern int g_UnknownGlobal689ff4;     // 0x00689ff4 "Cache" bytes
-extern int g_UnknownGlobal68a318;     // 0x0068a318 "PrepareGeometry" time
-extern int g_UnknownGlobal68a31c;     // 0x0068a31c "Render3D" time (written here)
-extern int g_UnknownGlobal68a320;     // 0x0068a320 "Total" time (written here)
+extern int g_terrainAgeTime0;     // 0x0068a308 "AgeTime" first value
+extern int g_terrainAgeTime1;     // 0x0068a30c "AgeTime" second value
+extern int g_terrainCacheCount;     // 0x0068a310 "Cache" count
+extern int g_terrainCacheBytes;     // 0x00689ff4 "Cache" bytes
+extern int g_terrainPrepareGeometryTicks;     // 0x0068a318 "PrepareGeometry" time
+extern int g_terrainRender3DTicks;     // 0x0068a31c "Render3D" time (written here)
+extern int g_terrainTotalTicks;     // 0x0068a320 "Total" time (written here)
 extern int g_UnknownGlobal68a328;     // 0x0068a328 nonzero once the dual-texture probe has run
 extern int g_gridDrawMemory;          // 0x0068a300 (Griddraw.cpp)
 extern int g_gridDrawMemoryPeak;      // 0x0068a2fc (Griddraw.cpp)
-extern int g_UnknownGlobal574714;     // 0x00574714 profile page row, -1 until allocated
-extern TerrainPeakHold g_terrainPeak0;   // 0x0068a008 (TerrainSupport.cpp)
-extern TerrainPeakHold g_terrainPeak1;   // 0x0068a038
-extern TerrainPeakHold g_terrainPeak2;   // 0x0068a2e0
-extern TerrainPeakHold g_terrainPeak3;   // 0x0068a2c0
-extern TerrainPeakHold g_terrainPeak4;   // 0x0068a048
-extern TerrainPeakHold g_terrainPeak5;   // 0x0068a2b0
-extern TerrainPeakHold g_terrainPeak6;   // 0x0068a018
-extern TerrainPeakHold g_terrainPeak7;   // 0x0068a2d0
-extern TerrainPeakHold g_terrainPeak8;   // 0x0068a068
-extern TerrainPeakHold g_terrainPeak9;   // 0x0068a078
+extern int g_terrainDebugPage;     // 0x00574714 profile page row, -1 until allocated
+extern TerrainPeakHold g_terrainAgeTime0Peak;   // 0x0068a008 (TerrainSupport.cpp)
+extern TerrainPeakHold g_terrainAgeTime1Peak;   // 0x0068a038
+extern TerrainPeakHold g_terrainSetupPeak;   // 0x0068a2e0
+extern TerrainPeakHold g_terrainEvalPeak;   // 0x0068a2c0
+extern TerrainPeakHold g_terrainMeshPeak;   // 0x0068a048
+extern TerrainPeakHold g_terrainCacheCountPeak;   // 0x0068a2b0
+extern TerrainPeakHold g_terrainCacheBytesPeak;   // 0x0068a018
+extern TerrainPeakHold g_terrainPrepareGeometryPeak;   // 0x0068a2d0
+extern TerrainPeakHold g_terrainRender3DPeak;   // 0x0068a068
+extern TerrainPeakHold g_terrainTotalPeak;   // 0x0068a078
 unsigned int ReadClock();                // 0x004bfa80
 
 // 0x00506220 (slot 14; tier 3 names).  Once per run, unless software rendering, decides
@@ -591,63 +591,63 @@ int Terrain::GameObjectVirtualSlot14()
     ((TerrainRenderTarget*)renderContext)->SetRenderState(9, savedShade, 0);
     indicesDrawn /= 3;
     GameObject::GameObjectVirtualSlot14();
-    g_UnknownGlobal68a31c = ReadClock() - start;
+    g_terrainRender3DTicks = ReadClock() - start;
 
     if ((g_terrainGame->debugFlags & 4) && g_terrainGame->overlay) {
-        if (g_UnknownGlobal574714 < 0) {
+        if (g_terrainDebugPage < 0) {
             int page = g_terrainGame->overlay->pageCount++;
-            g_UnknownGlobal574714 = page;
+            g_terrainDebugPage = page;
         }
-        g_terrainPeak0.Record(g_UnknownGlobal68a308);
-        g_terrainPeak1.Record(g_UnknownGlobal68a30c);
-        g_terrainPeak2.Record(profileSetup);
-        g_terrainPeak3.Record(profileEval);
-        g_terrainPeak4.Record(profileMesh);
-        g_terrainPeak5.Record(g_UnknownGlobal68a310);
-        g_terrainPeak7.Record(g_UnknownGlobal68a318);
-        g_terrainPeak8.Record(g_UnknownGlobal68a31c);
-        g_UnknownGlobal68a320 = g_UnknownGlobal68a318 + g_UnknownGlobal68a31c;
-        g_terrainPeak9.Record(g_UnknownGlobal68a320);
-        g_terrainGame->overlay->Title(g_UnknownGlobal574714, "Terrain Tolerance:%d",
+        g_terrainAgeTime0Peak.Record(g_terrainAgeTime0);
+        g_terrainAgeTime1Peak.Record(g_terrainAgeTime1);
+        g_terrainSetupPeak.Record(profileSetup);
+        g_terrainEvalPeak.Record(profileEval);
+        g_terrainMeshPeak.Record(profileMesh);
+        g_terrainCacheCountPeak.Record(g_terrainCacheCount);
+        g_terrainPrepareGeometryPeak.Record(g_terrainPrepareGeometryTicks);
+        g_terrainRender3DPeak.Record(g_terrainRender3DTicks);
+        g_terrainTotalTicks = g_terrainPrepareGeometryTicks + g_terrainRender3DTicks;
+        g_terrainTotalPeak.Record(g_terrainTotalTicks);
+        g_terrainGame->overlay->Title(g_terrainDebugPage, "Terrain Tolerance:%d",
                                                       drawDistance);
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Memory %d",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Memory %d",
                                                       g_MemTagStack->GetBytes("Terrain"));
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
-                                                      g_UnknownGlobal68a308, g_UnknownGlobal68a30c,
-                                                      g_terrainPeak0.Peak(),
-                                                      g_terrainPeak1.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Setup   %d %d",
-                                                      profileSetup, g_terrainPeak2.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Eval    %d[%d] %d",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "AgeTime %d(%d) %d(%d)",
+                                                      g_terrainAgeTime0, g_terrainAgeTime1,
+                                                      g_terrainAgeTime0Peak.Peak(),
+                                                      g_terrainAgeTime1Peak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Setup   %d %d",
+                                                      profileSetup, g_terrainSetupPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Eval    %d[%d] %d",
                                                       profileEval, vertexErrorTests,
-                                                      g_terrainPeak3.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Mesh    %d[%d] %d",
+                                                      g_terrainEvalPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Mesh    %d[%d] %d",
                                                       profileMesh, bufferRebuilds,
-                                                      g_terrainPeak4.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Cache   %d[%f] %d[%f]",
-                                                      g_UnknownGlobal68a310,
-                                                      g_UnknownGlobal689ff4 * (1.0f / 1048576.0f),
-                                                      g_terrainPeak5.Peak(),
-                                                      g_terrainPeak6.Peak() * (1.0f / 1048576.0f));
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "  [%f]",
+                                                      g_terrainMeshPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Cache   %d[%f] %d[%f]",
+                                                      g_terrainCacheCount,
+                                                      g_terrainCacheBytes * (1.0f / 1048576.0f),
+                                                      g_terrainCacheCountPeak.Peak(),
+                                                      g_terrainCacheBytesPeak.Peak() * (1.0f / 1048576.0f));
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "  [%f]",
                                                       (ownedObjectArrayCount << 17) * (1.0f / 786432.0f));
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total   %d %d",
-                                                      g_UnknownGlobal68a320, g_terrainPeak9.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Vertex Buffers %d (%d)",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Total   %d %d",
+                                                      g_terrainTotalTicks, g_terrainTotalPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Vertex Buffers %d (%d)",
                                                       g_gridDrawMemory, g_gridDrawMemoryPeak);
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "PrepareGeometry% 3d (%d)",
-                                                      g_UnknownGlobal68a318, g_terrainPeak7.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Render3D%        3d (%d)",
-                                                      g_UnknownGlobal68a31c, g_terrainPeak8.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total%           3d (%d)",
-                                                      g_UnknownGlobal68a320, g_terrainPeak9.Peak());
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total Transforms %d",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "PrepareGeometry% 3d (%d)",
+                                                      g_terrainPrepareGeometryTicks, g_terrainPrepareGeometryPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Render3D%        3d (%d)",
+                                                      g_terrainRender3DTicks, g_terrainRender3DPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Total%           3d (%d)",
+                                                      g_terrainTotalTicks, g_terrainTotalPeak.Peak());
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Total Transforms %d",
                                                       ((TerrainRenderTarget*)renderContext)->transformCount - transforms);
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "Total Triangles  %d",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "Total Triangles  %d",
                                                       ((TerrainRenderTarget*)renderContext)->triangleCount - triangles);
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "CanSinglePassDual %s",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "CanSinglePassDual %s",
                                                       canSinglePassDual ? "TRUE" : "FALSE");
-        g_terrainGame->overlay->Print(g_UnknownGlobal574714, "SinglePassDual    %s",
+        g_terrainGame->overlay->Print(g_terrainDebugPage, "SinglePassDual    %s",
                                                       lowestQualityOverride ? "TRUE" : "FALSE");
     }
     g_MemTagStack->Pop(previousTag);
