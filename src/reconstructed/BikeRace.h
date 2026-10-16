@@ -833,8 +833,10 @@ public:
     void EnableByClassName(const char* name);
 };
 
-// The debug lines' row counter (0x00567a88).
-extern int g_UnknownGlobal567a88;
+// The highlighted row of the "Soultree LOD (%s)" debug page (0x00567a88):
+// SetRowHighlight marks row + 1, the arrow keys act on it and Enter (0x1c)
+// advances it, wrapping back to 2.
+extern int g_LodDebugSelectedRow;
 
 class BikeRace : public GraphicsTest {
 public:
