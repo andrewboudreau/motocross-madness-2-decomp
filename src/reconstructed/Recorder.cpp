@@ -33,11 +33,11 @@ VCRInterface::VCRInterface() : GameObject(1) {
     workerThreadId = 0;
     frameRing = 0;
     recordBuffer = 0;
-    field_0x88 = 0;
-    field_0x84 = 0;
-    field_0xa0 = 0;
-    field_0xa4 = 0;
-    field_0xa8 = 0;
+    readingReverse = 0;
+    recordPending = 0;
+    recordType = 0;
+    recordId = 0;
+    recordPosition = 0;
     isBusy = 0;
     fileReady = 0;
     readsReset = 0;
@@ -159,7 +159,7 @@ void VCRInterface::CloseFile(int header, int headerSize, int wait) {
 }
 
 // 0x004e8720
-int VCRInterface::QueueRecord(int a, int b, const void* data, unsigned int size) {
+int VCRInterface::QueueRecord(int type, int id, const void* data, unsigned int size) {
     void* block;
     int* record;
     int index;
@@ -178,8 +178,8 @@ int VCRInterface::QueueRecord(int a, int b, const void* data, unsigned int size)
     }
     LeaveCriticalSection(&lock);
     record = (int*)block;
-    *record++ = a;
-    *record++ = b;
+    *record++ = type;
+    *record++ = id;
     *record++ = size;
     block = record;
     memcpy(block, data, size);
@@ -191,7 +191,7 @@ int VCRInterface::QueueRecord(int a, int b, const void* data, unsigned int size)
 }
 
 // 0x004e8810
-int VCRInterface::TakeRecord(int* a, int* b, int* value, void* data, unsigned int* size, int signal) {
+int VCRInterface::TakeRecord(int* type, int* id, int* position, void* data, unsigned int* size, int signal) {
     void* block;
     int* record;
     int index;
@@ -213,12 +213,12 @@ int VCRInterface::TakeRecord(int* a, int* b, int* value, void* data, unsigned in
             return 3;
         }
         record = (int*)block;
-        *a = *record++;
-        *b = *record++;
+        *type = *record++;
+        *id = *record++;
         *size = *record++;
         block = record;
         memcpy(data, block, *size);
-        *value = extra;
+        *position = extra;
         EnterCriticalSection(&lock);
         frameRing->ReleaseSlot(index);
         LeaveCriticalSection(&lock);
