@@ -164,6 +164,6 @@ int ManagedTexture::SizeLevel() {
 }
 
 // 0x005109b0
-float ManagedTexture::UnknownFunction5109b0() {
+float ManagedTexture::Unhappiness() {
     return largestUse - plannedLevel;
 }

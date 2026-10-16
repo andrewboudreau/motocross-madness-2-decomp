@@ -29,7 +29,7 @@ public:
     int RemapTexCoordsIfMoved(float* scale, float* offsetU, float* offsetV, float* u, float* v, int count,
                               unsigned int stride);
     int SizeLevel();              // 0x00510990: log2 of the width
-    float UnknownFunction5109b0();            // 0x005109b0: +0xa4 less +0xac
+    float Unhappiness();                      // 0x005109b0: +0xa4 less +0xac; WriteDebugReport's "unhappy=%.2f"
 
     CacheTexture* page;                       // +0x80 page it is placed on
     float pageScale;                          // +0x84 scale within the page

@@ -4021,7 +4021,7 @@ CASES = [
         'name': 'ManagedTexture use spread 0x5109b0',
         'bindings': 'src/reconstructed/ManagedTexture.bindings.json',
         'source': 'src/reconstructed/ManagedTexture.cpp',
-        'symbol': '?UnknownFunction5109b0@ManagedTexture@@QAEMXZ',
+        'symbol': '?Unhappiness@ManagedTexture@@QAEMXZ',
         'target_va': '0x005109b0',
         'target_size': 13,
         'reason': 'float less int',

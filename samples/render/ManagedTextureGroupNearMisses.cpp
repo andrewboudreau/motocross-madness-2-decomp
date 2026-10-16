@@ -304,7 +304,7 @@ static inline ManagedTexture* LastOf(ContainerList<ManagedTexture*>* list) {
 static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
     int position = 0;
     for (int j = list->m_count - 1; j >= 0; j--) {
-        if (texture->UnknownFunction5109b0() < list->Get(j)->UnknownFunction5109b0()) {
+        if (texture->Unhappiness() < list->Get(j)->Unhappiness()) {
             position = j + 1;
             break;
         }
@@ -392,7 +392,7 @@ void ManagedTextureGroup::RepackWithPartialBlits() {
         while (managed->plannedLevel == 5)
             managed = field_0x7c.Get(--index);
         int level = managed->plannedLevel;
-        if (managed->UnknownFunction5109b0() < 0.0f) {
+        if (managed->Unhappiness() < 0.0f) {
             managed->ReleasePage();
             managed->plannedLevel = managed->wantedLevel;
         } else {
