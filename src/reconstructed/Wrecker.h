@@ -129,7 +129,7 @@ class UnknownWreckerQuadTree {
 public:
     void Remove(UnknownWreckerCollisionObject* object, int cell);
 };
-extern UnknownWreckerQuadTree* g_UnknownGlobal68aba4;
+extern UnknownWreckerQuadTree* g_collisionQuadTree;
 
 // A 4x4 transform read as four Vector3 rows (right, up, forward,
 // position). Retail copies these rows with integer moves, which is how VC6
