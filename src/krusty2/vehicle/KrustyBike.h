@@ -130,7 +130,7 @@ public:
     int bestTagRun;  // +0x760  RaceView +0x760 best banked tag run
     int totalTagRun;  // +0x764  RaceView +0x764 sum of the banked tag runs
     float score;  // +0x768  RaceView/BikeRace +0x768 score; message 10 (KbBikePing+0x04) carries it
-    float offTrackTime;  // +0x76C  RaceStatus time off the track (RaceView +0x76c); slot 39 respawns past 6 s with auto-respawn on
+    float offTrackTime;  // +0x76C  RaceStatus time off the track (RaceView +0x76c); slot 39 respawns past 6 s when raceMode is set
     int timeBehindLeader;  // +0x770  RaceView +0x770 time behind the leader (RaceStatus 0x004e6210)
     int lapStartTime;  // +0x774  RaceView +0x774 lap start time
     float field_0x778; // 0x778  100.0f from the loader
@@ -181,7 +181,7 @@ public:
     float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)
     UnknownBikeAIPath aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
     int field_0x11b0;  // 0x11B0  last argument of the look-ahead simulation 0x0040eca0
-    float aiOffTrackTime;  // +0x11B4  BikeAI: seconds the AI bike is off the track (onTrack clear) without auto-respawn; at 5 it is put back
+    float aiOffTrackTime;  // +0x11B4  BikeAI: seconds the AI bike is off the track (onTrack clear) while raceMode is 0; at 5 it is put back
     char hasFullState;  // +0x11B8  BikeRace racer +0x11b8: set when a message 1 state arrives; message 13 deltas wait for it
     char pad_0x11B9[0x3];
     int netId;  // +0x11BC  loader netId; the id passed with every Send/recorder message

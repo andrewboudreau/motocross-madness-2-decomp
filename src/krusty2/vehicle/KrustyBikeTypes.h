@@ -264,22 +264,22 @@ struct KbGame {
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue);
     void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
     char pad_0x0004[0x4];
-    KbGameCfg* field_0x8; // 0x8
+    KbGameCfg* network;  // +0x8  Game +0x8 network (NetworkInterface); set in network games, KrustyBike sends its packets through it
     char pad_0x000C[0xC];
-    int field_0x18; // 0x18
+    int playerCount;  // +0x18  Game +0x18 playerCount
     char pad_0x001C[0x1c];
-    KbOverlay* field_0x38; // 0x38: debug overlay (0 when off)
+    KbOverlay* debugOverlay;  // +0x38  Game +0x38 debugOverlay (0 when off)
     char pad_0x003C[0x2f0 - 0x3c];
-    float field_0x2f0; // 0x2F0: frame time (seconds)
+    float frameTime;  // +0x2F0  Game +0x2f0 frameTime (seconds)
     char pad_0x02F4[0x560 - 0x2f4];
-    KbTrackRec* field_0x560; // 0x560: array of 24-byte records (first member is a Vec3)
+    KbTrackRec* bajaEnduroEvent;  // +0x560  TrackGame +0x560 bajaEnduroEvent (TrackGameViewOwner): [lapGate + 9] is gates[lapGate] at +0xd8, +0xac the gate count
     char pad_0x0564[0x4];
-    KbRacer* field_0x568; // 0x568
+    KbRacer* tagEvent;  // +0x568  TrackGame +0x568 tagEvent (event type 4); its +0xa8 is compared with the bike
     char pad_0x056C[0x4];
-    KbSession* field_0x570; // 0x570
+    KbSession* eventManager;  // +0x570  TrackGame +0x570 eventManager (FindRaceMode/FindTextQueue)
     char pad_0x0574[0x4];
-    KbMode field_0x578; // 0x578: game-mode state object (0x00524100 returns the mode number)
-    int field_0x60c; // 0x60C
+    KbMode mode;  // +0x578  TrackGame +0x578 mode (TrackGameMode; only the first 0x94 bytes are modelled here)
+    int difficulty;  // +0x60C  TrackGame mode.difficulty (+0x578 + 0x94)
     char pad_0x0610[0x640];
     int field_0xc50; // 0xC50
     char pad_0x0C54[0x38C];
@@ -292,28 +292,28 @@ struct KbGame {
     int field_0xff8; // 0xFF8
     int field_0xffc; // 0xFFC
     char pad_0x1000[0x1D70];
-    int field_0x2d70; // 0x2D70
-    int field_0x2d74; // 0x2D74
+    int raceMode;  // +0x2D70  TrackGame mode.raceSettings.raceMode (+0x578 + 0x27f8)
+    int eventType;  // +0x2D74  TrackGame mode.raceSettings.eventType: 3 SX, 4 Tag
     char pad_0x2D78[0xC];
-    int field_0x2d84; // 0x2D84
+    int riderCollision;  // +0x2D84  TrackGame mode.raceSettings.riderCollision
     char pad_0x2D88[0x2eb8 - 0x2d88];
-    int field_0x2eb8; // 0x2EB8
+    int stuntMode;  // +0x2EB8  TrackGame mode.raceSettings.stuntMode (ChkStuntMode)
     char pad_0x2EBC[0x3334 - 0x2ebc];
-    int field_0x3334; // 0x3334
+    int saveReplay;  // +0x3334  TrackGame mode.saveReplay
     char pad_0x3338[0xC];
-    char field_0x3344[0x3c]; // 0x3344  three 0x3c-byte blocks whose addresses 0x0048fc80 hands to the Bike loader
-    char field_0x3380[0x3c]; // 0x3380
-    char field_0x33bc[0x3c]; // 0x33BC
+    char steerBinding[0x3c];  // +0x3344  TrackGame +0x3344 steerBinding (LoadBike's steer)
+    char leanBinding[0x3c];  // +0x3380  TrackGame +0x3380 leanBinding (LoadBike's lean)
+    char throttleBinding[0x3c];  // +0x33BC  TrackGame +0x33bc throttleBinding (LoadBike's throttle)
     char pad_0x33F8[0x4];
-    KbTrackEntry* field_0x33fc; // 0x33FC
+    KbTrackEntry* controlSetup;  // +0x33FC  TrackGame +0x33fc controlSetup
     char pad_0x3400[0x14];
     float fullNetPacketIntervalSec; // 0x3414
     float shortNetPacketIntervalSec; // 0x3418
     float fullRecordPacketIntervalSec; // 0x341C
     char pad_0x3420[0x8];
-    int field_0x3428; // 0x3428
+    int playingReplay;  // +0x3428  TrackGame +0x3428 playingReplay
     char pad_0x342C[0x3444 - 0x342c];
-    KbBonusTable* field_0x3444; // 0x3444
+    KbBonusTable* proCircuit;  // +0x3444  TrackGame +0x3444 proCircuit (ProCircuit.h)
 };
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).

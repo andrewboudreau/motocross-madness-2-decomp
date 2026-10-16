@@ -1812,8 +1812,8 @@ int KrustyBike::Fn_00414370(float dt)
     memset(&aiPath, 0, sizeof(aiPath));
     list = 0;
     dummy = 0;
-    int difficulty = g_kbGame->field_0x60c;
-    int kind = g_kbGame->field_0x2d74;
+    int difficulty = g_kbGame->difficulty;
+    int kind = g_kbGame->eventType;
     if (kind != 3 && kind != 2) {
         if (kind != 1 && kind != 5) {
             aiPath.count = 1;
@@ -1979,11 +1979,11 @@ int KrustyBike::Fn_00414370(float dt)
                 aiPath.count = 1;
                 aiPath.points[0] = linearSpeed * bodyForward + position;
             }
-            if (!g_kbGame->field_0x2d70)
+            if (!g_kbGame->raceMode)
                 aiOffTrackTime = 0.0f;
         } else {
             count = 1;
-            if (!g_kbGame->field_0x2d70) {
+            if (!g_kbGame->raceMode) {
                 aiOffTrackTime += dt;
                 if (aiOffTrackTime >= 5.0f) {
                     UnknownVirtualSlot11(count, &a, &b, &c, &dummy);
