@@ -377,14 +377,14 @@ void RadarOverlay::DrawTrackOutline(int mode)
     TrackListItem* list = 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
     item->node = ((UnknownRadarView*)radarView)->field_0x48->startNode;
-    item->field_0x0c = list;
+    item->next = list;
     list = item;
     while (list) {
         TrackNode*& node = list->node;
         if (node->flags & 4) {
             node->flags &= ~4;
             item = list;
-            list = list->field_0x0c;
+            list = list->next;
             DebugFree(item, __FILE__, 2001);
         } else {
         node->flags |= 4;
@@ -469,7 +469,7 @@ void RadarOverlay::DrawTrackOutline(int mode)
             if (!(node->links[i]->flags & 4)) {
                 item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 2094);
                 item->node = node->links[i];
-                item->field_0x0c = list;
+                item->next = list;
                 list = item;
             }
         }

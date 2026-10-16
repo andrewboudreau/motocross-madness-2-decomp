@@ -189,7 +189,7 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
         if (node->flags & 4) {
             node->flags &= ~4;
             item = list;
-            list = list->field_0x0c;
+            list = list->next;
             DebugFree(item, __FILE__, 865);
         } else {
             node->flags |= 4;
@@ -228,7 +228,7 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
                         return 0;
                     }
                     item->node = links[i];
-                    item->field_0x0c = list;
+                    item->next = list;
                     list = item;
                 }
             }
@@ -253,7 +253,7 @@ int Track::PlaceNear(Vector3 p, TrackPos from, float distance, float range, int 
                         best = -behind;
                 }
             }
-            for (TrackListItem* step = (TrackListItem*)path; !found && step; step = step->field_0x0c) {
+            for (TrackListItem* step = (TrackListItem*)path; !found && step; step = step->next) {
                 TrackPos start;
                 start.node = step->node;
                 start.segment = start.node->firstSegment;
