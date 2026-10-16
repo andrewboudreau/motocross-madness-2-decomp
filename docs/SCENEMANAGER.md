@@ -63,7 +63,7 @@ type, member and function names are provisional.
   - `0x004ef4c0` (1274): reads "Sounds" (emitters and plain sounds);
   - `0x004efb20` (1040): the scene loader that calls the readers and
     creates a `LightEmitter` per emitting light (lines 2784/2798);
-  - `0x004eff30` (271): applies a detail level (table `0x00689f18`);
+  - `0x004eff30` (271): applies a detail level (points `g_ActiveLodSettings` `0x00689f18` at `g_BladeLodSettings` or `g_NonBladeLodSettings`);
   - `0x004f0390` (2442, cdecl): counts a model's textures from its `.slb`
     or `.slt` file (SoultreeObject line 3447, SoultreeMaterial 3472);
   - `0x004f1130` (1541): the texture count pass over models and animations

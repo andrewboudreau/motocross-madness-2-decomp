@@ -163,7 +163,7 @@
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "?g_UnknownSoultreeClipper575a98@@3PAVUnknownSoultreeClipper@@A": "0x00575a98",
-  "?g_UnknownSoultreeLodSettings689f18@@3PAUUnknownSoultreeLodSetting@@A": "0x00689f18",
+  "?g_ActiveLodSettings@@3PAUSoultreeLodSetting@@A": "0x00689f18",
   "_$E1": "0x004807d0",
   "_$E10": "0x004808c0",
   "_$E11": "0x004808b0",

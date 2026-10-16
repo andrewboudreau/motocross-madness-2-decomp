@@ -1010,12 +1010,6 @@ public:
     unsigned char drawChildren;               // +0x3fd 1 by the constructor, toggled by control 6 (slot 22): slot 14 runs GameObject's draw only when set
 };
 
-// The global at 0x00689f18 (D3DIMSoultreeModifier.cpp's code reads it):
-// 0x00423790 points it at one of two tables, by Game+0x2d0.
-extern unsigned char* g_UnknownGlobal689f18;
-extern unsigned char g_UnknownGlobal5744c8[];
-extern unsigned char g_UnknownGlobal574428[];
-
 // 0x00417b00: the debug picker's hit callback (slot 23 passes it to
 // 0x004b0210); stores what was hit in the current race's picker.
 void PickerHitCallback(CollisionObject* self, CollisionObject* other);
