@@ -128,7 +128,7 @@ void ManagedTextureGroup::AddTexture(ManagedTexture* texture) {
             cache->texturePalette = groupPalette;
             cache->systemSurface->SetPalette(groupPalette);
             cache->textureSurface->SetPalette(groupPalette);
-            cache->field_0x2c = texture->field_0x2c;
+            cache->colorMapper = texture->colorMapper;
         }
     }
     managedTextures.Append(texture);

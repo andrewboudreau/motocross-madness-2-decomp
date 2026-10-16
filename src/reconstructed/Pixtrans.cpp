@@ -282,9 +282,9 @@ int Convert8To24(void* destination, void* source, int width, int height, int des
         unsigned char* from = sourceRow;
         UnknownPixel24* to = row;
         for (int x = 0; x < width; x++, to++, from++) {
-            to->red = palette->field_0x010[*from][0];
-            to->green = palette->field_0x010[*from][1];
-            to->blue = palette->field_0x010[*from][2];
+            to->red = palette->entries[*from][0];
+            to->green = palette->entries[*from][1];
+            to->blue = palette->entries[*from][2];
         }
         sourceRow += sourceStride;
         row += destinationStride;
@@ -301,7 +301,7 @@ int UnknownFunction4d1150(void* destination, void* source, int width, int height
         unsigned char* from = sourceRow;
         unsigned short* to = row;
         for (int x = 0; x < width; x++)
-            *to++ = palette->field_0x510[*from++];
+            *to++ = palette->entries565[*from++];
         sourceRow += sourceStride;
         row += destinationStride;
     }
@@ -317,7 +317,7 @@ int UnknownFunction4d11c0(void* destination, void* source, int width, int height
         unsigned char* from = sourceRow;
         unsigned short* to = row;
         for (int x = 0; x < width; x++)
-            *to++ = palette->field_0x310[*from++];
+            *to++ = palette->entries555[*from++];
         sourceRow += sourceStride;
         row += destinationStride;
     }
@@ -1196,9 +1196,9 @@ int AverageColor(void* bits, int width, int height, int stride, int format,
         for (y = 0; y < height; y++) {
             unsigned char* pixel = row;
             for (x = 0; x < width; x++, pixel++) {
-                red += palette->field_0x010[*pixel][0];
-                green += palette->field_0x010[*pixel][1];
-                blue += palette->field_0x010[*pixel][2];
+                red += palette->entries[*pixel][0];
+                green += palette->entries[*pixel][1];
+                blue += palette->entries[*pixel][2];
             }
             row += width;
         }

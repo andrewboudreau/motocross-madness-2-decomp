@@ -132,14 +132,14 @@ TextureMap* PCTextureMap::Clone() {
                 noAlpha = 4;
             int created = copy->CreateSurface(desc.surface, textureWidth, textureHeight,
                                               desc.pitch / PixelFormatBytesPerPixel(mapFormat), field_0x1c,
-                                              mapFormat, mapFormat, field_0x2c, noAlpha | systemMemory,
+                                              mapFormat, mapFormat, colorMapper, noAlpha | systemMemory,
                                               texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (!systemSurface->Unlock(0) && created) {
                 if (usesColorKey) {
                     if (mapFormat == 8) {
-                        copy->ApplyColorKey((field_0x2c->field_0x010[colorKeyValue][0] << 8 |
-                                             field_0x2c->field_0x010[colorKeyValue][1]) << 8 |
-                                                   field_0x2c->field_0x010[colorKeyValue][2]);
+                        copy->ApplyColorKey((colorMapper->entries[colorKeyValue][0] << 8 |
+                                             colorMapper->entries[colorKeyValue][1]) << 8 |
+                                                   colorMapper->entries[colorKeyValue][2]);
                     } else {
                         unsigned int key = colorKeyValue;
                         unsigned int color;
@@ -183,7 +183,7 @@ int PCTextureMap::CreateSurface(void* bits, int width, int height, int stride, i
     textureWidth = width;
     textureHeight = height;
     field_0x1c = minimumSize;
-    field_0x2c = palette;
+    colorMapper = palette;
     texturePalette = surfacePalette;
     if (choice)
         format = IsFormat4444Or8888(format) ? choice->field_0x10 : choice->field_0x0c;

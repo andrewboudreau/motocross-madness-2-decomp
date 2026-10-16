@@ -11,15 +11,16 @@
 struct UnknownTexturePalette {
     // ColorMapper's table getters (Quantize.h): Pixtrans.cpp calls them on
     // its palette argument.
-    unsigned char* GetColors();        // 0x004de270: &field_0x010
-    unsigned char* GetIndexFrom555();        // 0x004de280: &field_0x710 (555 to index)
+    unsigned char* GetColors();        // 0x004de270: &entries
+    unsigned char* GetIndexFrom555();        // 0x004de280: &indexFrom555
     unsigned char* GetIndexFrom565();        // 0x004de290: &field_0x8710 (565 to index)
 
     unsigned char field_0x000[0x10];
-    unsigned char field_0x010[256][3];             // RGB entries
-    unsigned short field_0x310[256];               // 16-bit entries (Pixtrans 0x004d11c0)
-    unsigned short field_0x510[256];               // 16-bit entries (Pixtrans 0x004d1150)
-    unsigned char field_0x710[0x8000];
+    // Named like ColorMapper's members at the same offsets (Quantize.h).
+    unsigned char entries[256][3];                 // +0x010 RGB entries
+    unsigned short entries555[256];                // +0x310 entries as 555 (Pixtrans 0x004d11c0, 8 to 555)
+    unsigned short entries565[256];                // +0x510 entries as 565 (Pixtrans 0x004d1150, 8 to 565)
+    unsigned char indexFrom555[0x8000];            // +0x710 555 colour -> palette index
 };
 
 // Formats slots 4 and 5 pick between: +0x0c without alpha, +0x10 with
@@ -174,7 +175,7 @@ public:
     int mapFormat;                            // +0x20 pixel format
     int mipCount;                             // +0x24 mip level count
     BaseObject* sourcePalette;                // +0x28 released by the destructor
-    UnknownTexturePalette* field_0x2c;
+    UnknownTexturePalette* colorMapper;       // +0x2c CreateSurface's palette; handed to the Pixtrans converters
     int usesColorKey;                         // +0x30 has a colour key
     int colorKeyValue;                        // +0x34 colour key (also +0x38)
     int field_0x38;

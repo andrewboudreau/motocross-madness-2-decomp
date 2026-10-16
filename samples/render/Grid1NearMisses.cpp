@@ -334,7 +334,7 @@ int DrawableGridNodeSharedTextures::BuildNodeTexture(ManagedTexture* texture)
     if (texture->textureWidth != 0x100)
         Downsample(bits, g_grid1TextureBuffer, texture->textureWidth, texture->textureWidth,
                               texture->textureWidth, texture->textureWidth * 2, 1, texture->mapFormat,
-                              texture->field_0x2c, 2);
+                              texture->colorMapper, 2);
     texture->UnlockSurface(0);
     texture->BuildMipLevels(1);
     return 1;

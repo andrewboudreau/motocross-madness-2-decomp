@@ -688,7 +688,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                     int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
                     ConvertPixels(bits + x * size + 20 * pitch, source, selected->textureWidth,
                                           selected->textureHeight, pitch / size, sourcePitch / sourceSize,
-                                          target->surfacePixelFormat, selected->mapFormat, 0, selected->field_0x2c, 0, 0);
+                                          target->surfacePixelFormat, selected->mapFormat, 0, selected->colorMapper, 0, 0);
                     selected->systemSurface->Unlock(0);
                 }
                 target->UnlockSurface(0);
@@ -759,7 +759,7 @@ int ManagedTextureGroup::DrawSelection(PCRenderTarget* target) {
                         int size = PixelFormatBytesPerPixel(target->surfacePixelFormat);
                         ConvertPixels(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
                                               pitch / size, locked.pitch / sourceSize, target->surfacePixelFormat,
-                                              managed->mapFormat, 0, managed->field_0x2c, 0, 0);
+                                              managed->mapFormat, 0, managed->colorMapper, 0, 0);
                         level->Unlock(0);
                     }
                 }

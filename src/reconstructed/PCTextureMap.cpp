@@ -430,7 +430,7 @@ void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
         // Reading the description through a second name here makes VC6 load the height before
         // the width in the .tga branch's buffer size, as retail does.
         const UnknownSurfaceDesc& level = *desc;
-        DescribeBitmap8(&bitmap, level.surface, field_0x2c->field_0x010, level.width, level.height);
+        DescribeBitmap8(&bitmap, level.surface, colorMapper->entries, level.width, level.height);
         int length = strlen(path);
         int count = length > 0x7f ? 0x7f : length;
         strncpy(bitmap.name, path, count);
@@ -572,7 +572,7 @@ int PCTextureMap::BuildMipLevels(int filter) {
         int sourceStride = stride;
         stride = desc.pitch / bytesPerPixel;
         Downsample(desc.surface, sourceBits, desc.width, desc.height, stride, sourceStride, 1,
-                              mapFormat, field_0x2c, filter);
+                              mapFormat, colorMapper, filter);
         if (parent->Unlock(0))
             goto failed;
         sourceBits = desc.surface;
@@ -616,7 +616,7 @@ void PCTextureMap::SetColorKey(unsigned int color) {
     else if (mapFormat == 565)
         key = Pack565(color);
     else if (mapFormat == 8)
-        key = field_0x2c->field_0x710[Pack555(color)];
+        key = colorMapper->indexFrom555[Pack555(color)];
     else
         key = color;
     colorKeyValue = field_0x38 = key;
@@ -673,9 +673,9 @@ int PCTextureMap::ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int c
         ReplaceColor16(desc.surface, 0xf81f, Pack565(color), desc.width, desc.height,
                               desc.pitch / PixelFormatBytesPerPixel(565));
     } else if (mapFormat == 8) {
-        colorKeyValue = field_0x38 = field_0x2c->field_0x710[Pack555(color)];
-        ReplaceColor8(desc.surface, field_0x2c->field_0x710[0x7c1f],
-                              field_0x2c->field_0x710[Pack555(color)], desc.width, desc.height, desc.pitch);
+        colorKeyValue = field_0x38 = colorMapper->indexFrom555[Pack555(color)];
+        ReplaceColor8(desc.surface, colorMapper->indexFrom555[0x7c1f],
+                              colorMapper->indexFrom555[Pack555(color)], desc.width, desc.height, desc.pitch);
     }
     if (surface->Unlock(0))
         goto failed;
