@@ -311,7 +311,7 @@ public:
     int sizeShift;                // +0x88 Init adds 6 (log2 of 0x40) to it
     int mode;                     // +0x8c ctor 1; 0x004dae50 stores its first argument
     float minDepth;               // +0x90 0x004db8c0 resets it to FLT_MAX, then keeps the smallest projected z
-    short field_0x94;             // +0x94 quantised shadow alpha / colour key word (SetShadowStrength)
+    short shadowPixel;            // +0x94 texel value RenderShadow rasterises the casters with: SetShadowStrength's quantised alpha (0x8000 outside 4444)
     char pad_0x96[2];
     int field_0x98;               // +0x98 ctor 1
     int formatA;                  // +0x9c Init selects 9/5/1/0xc from the device caps

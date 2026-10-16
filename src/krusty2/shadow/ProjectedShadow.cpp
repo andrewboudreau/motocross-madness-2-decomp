@@ -51,7 +51,7 @@ ProjectedShadow::ProjectedShadow(int flags)
     updateThisFrame = 1;
     updatePeriod = 1;
     sizeShift = 0;
-    field_0x94 = 0;
+    shadowPixel = 0;
     vertexCapacity = 0;
     vertexBuffer = 0;
     shadowColor = 0xff000000;
@@ -156,32 +156,32 @@ void ProjectedShadow::SetShadowStrength(int strength)
 {
     if (surfaceFormat == 0x115c) {
         if (formatA == 9) {
-            field_0x94 = ((strength & 0xff) + 8) / 16;
-            if (field_0x94 == 16)
-                field_0x94 = 15;
+            shadowPixel = ((strength & 0xff) + 8) / 16;
+            if (shadowPixel == 16)
+                shadowPixel = 15;
             colorKeyLow = 0xfff;
             colorKeyPair = 0xfff0fff;
             shadowColor = 0xff404040;
-            field_0x94 = (((field_0x94 << 4) | field_0x94) << 4) | field_0x94;
+            shadowPixel = (((shadowPixel << 4) | shadowPixel) << 4) | shadowPixel;
         } else if (formatB == 5) {
-            field_0x94 = ((strength & 0xff) + 8) / 16;
-            if (field_0x94 == 16)
-                field_0x94 = 15;
-            field_0x94 <<= 12;
+            shadowPixel = ((strength & 0xff) + 8) / 16;
+            if (shadowPixel == 16)
+                shadowPixel = 15;
+            shadowPixel <<= 12;
             colorKeyLow = (short)0xffff;
             colorKeyPair = 0xffffffff;
             shadowColor = 0xff404040;
         } else {
-            field_0x94 = ((strength & 0xff) + 8) / 16;
-            if (field_0x94 == 16)
-                field_0x94 = 15;
-            field_0x94 <<= 12;
+            shadowPixel = ((strength & 0xff) + 8) / 16;
+            if (shadowPixel == 16)
+                shadowPixel = 15;
+            shadowPixel <<= 12;
             shadowColor = 0xff404040;
             colorKeyLow = 0;
             colorKeyPair = 0;
         }
     } else {
-        field_0x94 = (short)0x8000;
+        shadowPixel = (short)0x8000;
         colorKeyLow = 0x7fff;
         colorKeyPair = 0x7fff7fff;
         shadowColor = 0xff404040;
