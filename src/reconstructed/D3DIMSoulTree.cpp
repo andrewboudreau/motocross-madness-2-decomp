@@ -904,6 +904,92 @@ void D3DIMSoultreeObject::Disable()
     ClearScreenRects();
 }
 
+// 0x00444560: copies the source node. The node search reuses the
+// CollectDescendants counter `index`; `to` is declared before `from`, and
+// `d` before `s`, which gives retail's register rotation (source ebx,
+// `from` edi, `to` ebp).
+void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
+{
+    D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
+    GameObject::SetRenderContext(source->renderContext);
+    textureFormat = source->textureFormat;
+    textureManager = source->textureManager;
+    lightManager = source->lightManager;
+    SoultreeObject::SoultreeVirtualSlot7(source);
+    CopyMaterials(source);
+    lodCount = source->lodCount;
+    currentLod = source->currentLod;
+    lowestLod = source->lowestLod;
+    useAutoLod = source->useAutoLod;
+    if (useAutoLod) {
+        autoLodDistances = (float*)DebugMalloc(lodCount * 4, __FILE__, 0x88e);
+        for (int i = 0; i < lodCount; i++)
+            autoLodDistances[i] = source->autoLodDistances[i];
+    }
+    if (source->lodTable) {
+        int count = CountNodes();
+        SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x897);
+        int index = 1;
+        nodes[0] = this;
+        CollectDescendants(&index, nodes);
+        SoultreeObject** sourceNodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x89d);
+        index = 1;
+        sourceNodes[0] = source;
+        source->CollectDescendants(&index, sourceNodes);
+        lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x8a2);
+        for (int lod = 0; lod < lodCount; lod++) {
+            UnknownSoultreeLod* to = &lodTable[lod];
+            UnknownSoultreeLod* from = &source->lodTable[lod];
+            to->surfaceCount = from->surfaceCount;
+            to->surfaces = (UnknownSoultreeSurface*)DebugMalloc(to->surfaceCount * 0x38, __FILE__, 0x8aa);
+            for (int i = 0; i < to->surfaceCount; i++) {
+                UnknownSoultreeSurface* d = &to->surfaces[i];
+                UnknownSoultreeSurface* s = &from->surfaces[i];
+                d->vertexCount = s->vertexCount;
+                d->faceCount = s->faceCount;
+                d->materialCount = s->materialCount;
+                d->materialIndices = (int*)DebugMalloc(d->materialCount * 4, __FILE__, 0x8b3);
+                int k;
+                for (k = 0; k < d->materialCount; k++)
+                    d->materialIndices[k] = s->materialIndices[k];
+                d->field_0x2c = s->field_0x2c;
+                d->field_0x30 = s->field_0x30;
+                d->field_0x34 = s->field_0x34;
+                d->vertices = (UnknownSoultreeVertex*)DebugMalloc(d->vertexCount * 0x20, __FILE__, 0x8bd);
+                d->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(d->vertexCount * 0x20, __FILE__, 0x8be);
+                d->normals = (Vector3*)DebugMalloc(d->vertexCount * 0xc, __FILE__, 0x8bf);
+                d->indices = (unsigned short*)DebugMalloc(d->faceCount * 6, __FILE__, 0x8c0);
+                d->uvs = (UnknownSoultreeUV*)DebugMalloc(d->vertexCount * 8, __FILE__, 0x8c1);
+                memcpy(d->vertices, s->vertices, d->vertexCount * 0x20);
+                memcpy(d->drawnVertices, s->drawnVertices, d->vertexCount * 0x20);
+                memcpy(d->normals, s->normals, d->vertexCount * 0xc);
+                memcpy(d->indices, s->indices, d->faceCount * 6);
+                memcpy(d->uvs, s->uvs, d->vertexCount * 8);
+                d->groupCount = s->groupCount;
+                d->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(d->groupCount * 0x14, __FILE__, 0x8cb);
+                int first = 0;
+                for (int j = 0; j < d->groupCount; j++) {
+                    d->groups[j].node = 0;
+                    for (index = 0; !d->groups[j].node; index++) {
+                        if (sourceNodes[index] == s->groups[j].node)
+                            d->groups[j].node = nodes[index];
+                    }
+                    d->groups[j].vertexCount = s->groups[j].vertexCount;
+                    d->groups[j].sourceVertices = &d->vertices[first];
+                    d->groups[j].transformedVertices = &d->drawnVertices[first];
+                    d->groups[j].normals = &d->normals[first];
+                    first += d->groups[j].vertexCount;
+                }
+            }
+        }
+        DebugFree(nodes, __FILE__, 0x8e1);
+        DebugFree(sourceNodes, __FILE__, 0x8e2);
+    } else {
+        lodTable = 0;
+    }
+    ComputeAllBounds();
+}
+
 // 0x00444a40
 void D3DIMSoultreeObject::CopyMaterials(D3DIMSoultreeObject* source)
 {

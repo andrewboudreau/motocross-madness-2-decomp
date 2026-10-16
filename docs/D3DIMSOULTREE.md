@@ -54,8 +54,8 @@ header):
 - Slot 5 bounds `0x00444140` (610 of 764): the y/z sums of the centre.
 - The texture-density pass `0x00440810` (same instruction count; one
   extra frame slot: retail keeps the face offset in the register that
-  holds zero) and slot 7 `0x00444560` (a register rotation of the source,
-  `from` and `to` pointers).
+  holds zero). Slot 7 `0x00444560` matches once the surface pointer `d`
+  is declared before `s`.
 - The drawing function `0x00440f30..0x00442dd8`: a nine-way switch on the
   material mapping type, then modifiers, draw and debug overlays. Its
   function-local statics are the .data ints `0x00568930..0x0056893c`, the

@@ -18256,6 +18256,15 @@ CASES = [
         'reason': 'vtable 0x55137c slot 4',
     },
     {
+        'name': 'D3DIMSoulTree.CPP D3DIMSoulTree slot 7 copy',
+        'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
+        'source': 'src/reconstructed/D3DIMSoulTree.cpp',
+        'symbol': '?SoultreeVirtualSlot7@D3DIMSoultreeObject@@UAEXPAVSoultreeObject@@@Z',
+        'target_va': '0x00444560',
+        'target_size': 1234,
+        'reason': 'copies LODs, surfaces and face groups from the source; __FILE__ 0x568994 lines 0x88e-0x8e2',
+    },
+    {
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree material copy 0x444a40',
         'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
         'source': 'src/reconstructed/D3DIMSoulTree.cpp',
