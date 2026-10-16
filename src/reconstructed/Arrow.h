@@ -27,4 +27,4 @@ public:
 };
 
 // 0x005776d0: written by the initializer only (0 when the allocation fails).
-extern ArrowManager* g_UnknownArrowManager5776d0;
+extern ArrowManager* g_ArrowManager;

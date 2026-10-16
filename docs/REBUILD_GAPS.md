@@ -692,7 +692,7 @@ which need an `INITGUID` unit.
 The worst alias is 0x0056e26c, bound under 9 names with different types:
 `g_TrackGame`, `g_gameContext`, `g_terrainGame`, `g_soultreeStats`,
 `g_profiler`, ... `MSZoneInterface.cpp` defines it as
-`TrackGame* g_TrackGame = &g_UnknownTrackGame6851a0;`, and the others are
+`TrackGame* g_TrackGame = &g_TrackGameInstance;`, and the others are
 `extern` aliases. A link resolves each of the 14 aliased addresses only if
 there is one name and one definition. The lists are in `globals.json`.
 

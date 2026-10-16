@@ -206,5 +206,5 @@ failed:
 // 0x006851a0 and the pointer to it at 0x0056e26c (in .data right after
 // this file's strings); the dynamic initializer 0x004aa7b0..0x004aa7e9
 // follows the functions above.
-TrackGame g_UnknownTrackGame6851a0;
-TrackGame* g_TrackGame = &g_UnknownTrackGame6851a0;
+TrackGame g_TrackGameInstance;
+TrackGame* g_TrackGame = &g_TrackGameInstance;

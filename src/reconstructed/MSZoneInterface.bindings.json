@@ -21,7 +21,7 @@
   "?g_UnknownGuid556db0@@3U_GUID@@B": "0x00556db0",
   "?g_UnknownGuid556dd0@@3U_GUID@@B": "0x00556dd0",
   "?g_UnknownGuid556de0@@3U_GUID@@B": "0x00556de0",
-  "?g_UnknownTrackGame6851a0@@3VTrackGame@@A": "0x006851a0",
+  "?g_TrackGameInstance@@3VTrackGame@@A": "0x006851a0",
   "_$E1": "0x004aa020",
   "_$E10": "0x004aa110",
   "_$E11": "0x004aa100",

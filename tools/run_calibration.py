@@ -7471,7 +7471,7 @@ CASES = [
         'symbol': '_$E16',
         'target_va': '0x004aa7b0',
         'target_size': 10,
-        'reason': 'constructs g_UnknownTrackGame6851a0',
+        'reason': 'constructs g_TrackGameInstance',
     },
     {
         'name': 'MSZoneInterface.cpp TrackGame global ctor 0x4aa7c0',
