@@ -99,11 +99,12 @@ public:
     void SaveRecording(float length, char* description, int flag);
     // 0x0049c070: describes a racer of the recording: its network id, AI
     // index (a char), record slot, name, model files, bike and rider names,
-    // engine size and kind and plate number. 0x0049c1e0 reads one back.
+    // engine size and kind and plate number. GetRacer (0x0049c1e0) copies
+    // record `index`'s fields back out.
     void SetRacer(int id, char ai, int slot, char* name, char* model,
                                char* rider, char* bikeName, char* riderName, int engineSize,
                                int engineKind, int value);
-    void UnknownFunction49c1e0(int* slot, char* ai, int a, char* name, char* model, char* rider,
+    void GetRacer(int* id, char* ai, int index, char* name, char* model, char* rider,
                                char* bikeName, char* riderName, int* engineSize, int* engineKind,
                                int* value);
 

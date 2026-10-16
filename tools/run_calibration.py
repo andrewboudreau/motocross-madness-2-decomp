@@ -21406,10 +21406,10 @@ CASES = [
         'reason': 'KrustyVCR methods after krustyui.cpp, called by bikerace.cpp recorders (tier 3)',
     },
     {
-        'name': 'KrustyVCR ?UnknownFunction49c1e0@',
+        'name': 'KrustyVCR ?GetRacer@',
         'bindings': 'src/reconstructed/KrustyVCR.bindings.json',
         'source': 'src/reconstructed/KrustyVCR.cpp',
-        'symbol': '?UnknownFunction49c1e0@KrustyVCR@@QAEXPAHPADH11111000@Z',
+        'symbol': '?GetRacer@KrustyVCR@@QAEXPAHPADH11111000@Z',
         'target_va': '0x0049c1e0',
         'target_size': 265,
         'reason': 'KrustyVCR methods after krustyui.cpp, called by bikerace.cpp recorders (tier 3)',

@@ -78,18 +78,18 @@ void KrustyVCR::SetRacer(int id, char ai, int slot, char* name, char* model,
 }
 
 // 0x0049c1e0
-void KrustyVCR::UnknownFunction49c1e0(int* slot, char* ai, int a, char* name, char* model,
+void KrustyVCR::GetRacer(int* id, char* ai, int index, char* name, char* model,
                                       char* rider, char* bikeName, char* riderName,
                                       int* engineSize, int* engineKind, int* value)
 {
-    *slot = racers[a].networkId;
-    *ai = racers[a].aiIndex;
-    strcpy(name, racers[a].name);
-    strcpy(model, racers[a].bikeFile);
-    strcpy(rider, racers[a].riderFile);
-    strcpy(bikeName, racers[a].bikeName);
-    strcpy(riderName, racers[a].riderName);
-    *engineSize = racers[a].engineSize;
-    *engineKind = racers[a].engineKind;
-    *value = racers[a].plateNumber;
+    *id = racers[index].networkId;
+    *ai = racers[index].aiIndex;
+    strcpy(name, racers[index].name);
+    strcpy(model, racers[index].bikeFile);
+    strcpy(rider, racers[index].riderFile);
+    strcpy(bikeName, racers[index].bikeName);
+    strcpy(riderName, racers[index].riderName);
+    *engineSize = racers[index].engineSize;
+    *engineKind = racers[index].engineKind;
+    *value = racers[index].plateNumber;
 }

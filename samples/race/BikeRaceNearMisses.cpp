@@ -1094,7 +1094,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         char recordedBike[0x40];
         char recordedRider[0x40];
         recordIndex = 1;
-        replayVcr->UnknownFunction49c1e0(&id, &ai, 0, name, bikeFile, riderFile, recordedBike, recordedRider,
+        replayVcr->GetRacer(&id, &ai, 0, name, bikeFile, riderFile, recordedBike, recordedRider,
                                            &engineSize, &engineKind, &plate);
         g_TrackGame->ui->ResolveBikeFile(recordedBike, bikeTexture, 0x3f);
         g_TrackGame->ui->ResolveRiderFile(recordedRider, riderTexture, 0x3f);
@@ -1358,7 +1358,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 if (g_TrackGame->playingReplay) {
                     char recordedBike[0x40];
                     char recordedRider[0x40];
-                    replayVcr->UnknownFunction49c1e0(&id, &ai, recordIndex, aiName, bikeFile, riderFile,
+                    replayVcr->GetRacer(&id, &ai, recordIndex, aiName, bikeFile, riderFile,
                                                        recordedBike, recordedRider, &engineSize, &engineKind,
                                                        &plate);
                     setup = *(UnknownBikeRaceBikeSetup*)g_TrackGame->mode.garageOptions;

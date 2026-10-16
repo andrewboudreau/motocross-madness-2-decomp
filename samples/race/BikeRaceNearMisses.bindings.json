@@ -195,7 +195,7 @@
   "?RecordedLength@KrustyVCR@@QAEMXZ": "0x0049c000",
   "?SaveRecording@KrustyVCR@@QAEXMPADH@Z": "0x0049c010",
   "?SetRacer@KrustyVCR@@QAEXHDHPAD0000HHH@Z": "0x0049c070",
-  "?UnknownFunction49c1e0@KrustyVCR@@QAEXPAHPADH11111000@Z": "0x0049c1e0",
+  "?GetRacer@KrustyVCR@@QAEXPAHPADH11111000@Z": "0x0049c1e0",
   "?SetMotionByName@UnknownBikeRaceCharacter@@QAEXPBD@Z": "0x004a8b10",
   "?ApplyReplayDelta@UnknownBikeRaceGhost@@QAEXPBUUnknownBikeRaceGhostDelta@@PAUUnknownBikeRaceGhostPart@@@Z": "0x004a9aa0",
   "?SetRecorder@UnknownTrackGameViewOwnerDc@@QAEXPAVKrustyVCR@@@Z": "0x004a9d10",
