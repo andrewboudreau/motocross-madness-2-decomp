@@ -723,26 +723,26 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             } else {
                 UnknownSceneAnimatedObject* car = eventScene->animationTable->entries[i].proceduralObject;
                 ((UnknownQuarryCar*)car)->field_0x20c = eventTerrain;
-                ((UnknownQuarryCollision*)car->field_0x38)->SetIgnoreListMode(1);
+                ((UnknownQuarryCollision*)car->sensorCollider)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
-                    ((UnknownQuarryCollision*)car->field_0x38)
+                    ((UnknownQuarryCollision*)car->sensorCollider)
                         ->AddIgnoredOwner(entry->keyFramed ? (UnknownQuarryCollision*)entry->character->collisionObject
-                                                                       : (UnknownQuarryCollision*)entry->proceduralObject->field_0x3c);
+                                                                       : (UnknownQuarryCollision*)entry->proceduralObject->bodyCollider);
                 }
-                ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)car->field_0x3c)->SetUseBroadphase(1);
-                ((UnknownQuarryCollision*)car->field_0x3c)->SetOwner(car, 0x69);
-                ((UnknownQuarryCollision*)car->field_0x3c)->SetIgnoreListMode(0);
+                ((UnknownQuarryCollision*)car->bodyCollider)->UnknownFunction435fe0();
+                ((UnknownQuarryCollision*)car->bodyCollider)->SetUseBroadphase(1);
+                ((UnknownQuarryCollision*)car->bodyCollider)->SetOwner(car, 0x69);
+                ((UnknownQuarryCollision*)car->bodyCollider)->SetIgnoreListMode(0);
                 int iterator = 0;
                 for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
                      racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->field_0x735) {
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1418);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1414);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->frontWheel);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->rearWheel);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x604->field_0x38);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x1418);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x1414);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x604->field_0x38);
                     }
                 }
             }

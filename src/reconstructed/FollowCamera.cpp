@@ -70,15 +70,15 @@ bool FollowCamera::SetTableEntry(int index, const Vector3* position, const float
         if (position)
             points[index].position = *position;
         if (a)
-            points[index].field_0x0c = *a;
+            points[index].distanceRate = *a;
         if (b)
-            points[index].field_0x10 = *b;
+            points[index].raiseRate = *b;
         if (c)
-            points[index].field_0x14 = *c;
+            points[index].lowerRate = *c;
         if (d)
-            points[index].field_0x18 = *d;
+            points[index].tiltRate = *d;
         if (e)
-            points[index].field_0x1c = *e;
+            points[index].yawRate = *e;
         return true;
     }
     return false;
@@ -89,11 +89,11 @@ bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, f
                                     float d, float e) {
     if (pointCount < pointCapacity) {
         points[pointCount].position = position;
-        points[pointCount].field_0x0c = a;
-        points[pointCount].field_0x10 = b;
-        points[pointCount].field_0x14 = c;
-        points[pointCount].field_0x18 = d;
-        points[pointCount].field_0x1c = e;
+        points[pointCount].distanceRate = a;
+        points[pointCount].raiseRate = b;
+        points[pointCount].lowerRate = c;
+        points[pointCount].tiltRate = d;
+        points[pointCount].yawRate = e;
         pointCount++;
         return true;
     }
@@ -110,7 +110,7 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float 
         return 0;
     fieldOfViewEase = new(__FILE__, 0x78) UnknownFollowCameraValue(fieldOfView, rate294);
     distanceEase = new(__FILE__, 0x79) UnknownFollowCameraValue(followDistance, rate298);
-    field_0x228 = value228;
+    lookAheadDistance = value228;
     defaultFollowHeight = value2d0;
     followHeight = value2d0;
     pointCapacity = capacity;
@@ -118,12 +118,12 @@ FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float 
         points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
         for (int i = 0; i < pointCapacity; i++) {
             points[i].position = kVec3Zero;
-            points[i].field_0x0c = 0.0f;
-            points[i].field_0x10 = 0.0f;
-            points[i].field_0x14 = 0.0f;
-            points[i].field_0x18 = 0.0f;
-            points[i].field_0x1c = 0.0f;
-            points[i].field_0x20 = kVec3Zero;
+            points[i].distanceRate = 0.0f;
+            points[i].raiseRate = 0.0f;
+            points[i].lowerRate = 0.0f;
+            points[i].tiltRate = 0.0f;
+            points[i].yawRate = 0.0f;
+            points[i].screenPoint = kVec3Zero;
         }
     }
     yawOffset = value2e8;
@@ -182,33 +182,33 @@ void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
     for (int i = 0; i < pointCount; i++) {
         int code;
         if (!g_UnknownFollowCameraProjector575a98->ProjectPoint(
-                this, screenMatrix, &points[i].position, &points[i].field_0x20, &code)) {
-            followDistance += dt * points[i].field_0x0c;
+                this, screenMatrix, &points[i].position, &points[i].screenPoint, &code)) {
+            followDistance += dt * points[i].distanceRate;
             followDistance = distanceEase->Update(followDistance, dt);
             switch (code) {
                 case 1:
-                    FollowCameraTurn(followYaw, -(dt * points[i].field_0x1c));
+                    FollowCameraTurn(followYaw, -(dt * points[i].yawRate));
                     break;
                 case 2:
-                    FollowCameraTurn(followYaw, dt * points[i].field_0x1c);
+                    FollowCameraTurn(followYaw, dt * points[i].yawRate);
                     break;
                 case 4:
-                    followHeight += dt * points[i].field_0x10;
+                    followHeight += dt * points[i].raiseRate;
                     if (pitch) {
-                        FollowCameraTilt(followPitch, -(dt * points[i].field_0x18));
+                        FollowCameraTilt(followPitch, -(dt * points[i].tiltRate));
                     }
                     break;
                 case 8:
-                    followHeight -= dt * points[i].field_0x14;
+                    followHeight -= dt * points[i].lowerRate;
                     break;
             }
             return;
         }
-        if (points[i].field_0x20.z <= nearest.z) {
+        if (points[i].screenPoint.z <= nearest.z) {
             second = nearest;
-            nearest = points[i].field_0x20;
-        } else if (points[i].field_0x20.z < second.z) {
-            second = points[i].field_0x20;
+            nearest = points[i].screenPoint;
+        } else if (points[i].screenPoint.z < second.z) {
+            second = points[i].screenPoint;
         }
     }
     if (pointCount > 1 && blend)
@@ -255,23 +255,23 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
     if (cameraState == 5 || cameraState == 7) {
         result = eyePosition;
     } else if (orbit) {
-        float yaw = field_0x308 + followYaw;
+        float yaw = turnYaw + followYaw;
         if (cameraState != 3) {
             Vector3 axis;
-            axis.x = field_0x29c.z;
+            axis.x = followHeading.z;
             axis.y = 0.0f;
-            axis.z = -field_0x29c.x;
+            axis.z = -followHeading.x;
             float pitch;
-            if (field_0x29c.y == 0.0f) {
+            if (followHeading.y == 0.0f) {
                 pitch = followPitch;
             } else {
-                float scaled = followPitch * field_0x29c.y;
+                float scaled = followPitch * followHeading.y;
                 if (scaled > 0.8f)
                     pitch = scaled;
                 else
                     pitch = 0.8f;
             }
-            D3DRMVectorRotate(&result, &field_0x29c, &axis, pitch);
+            D3DRMVectorRotate(&result, &followHeading, &axis, pitch);
             Vector3 turned;
             D3DRMVectorRotate(&turned, &result, &kVec3YAxis, yaw);
             turned *= -followDistance;
@@ -279,37 +279,37 @@ Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, floa
         } else {
             result = UnknownVirtualSlot50();
         }
-        if (!field_0x276 && cameraState != 6) {
+        if (!isCrashView && cameraState != 6) {
             savedDistance = followDistance;
             savedPitch = followPitch;
             savedYaw = followYaw;
-            field_0x23c = yaw - 16.0f;
+            worldYaw = yaw - 16.0f;
         }
     } else {
-        if (field_0x23c < -8.0f) {
+        if (worldYaw < -8.0f) {
             followHeight = defaultFollowHeight;
-            field_0x23c = field_0x23c + 16.0f;
-            if (field_0x23c < 0.0f) {
+            worldYaw = worldYaw + 16.0f;
+            if (worldYaw < 0.0f) {
                 followPitch = 0.0f;
                 followYaw = 0.0f;
-                if (field_0x23c < -1.5707964f)
-                    field_0x23c = yawOffset - 3.1415927f;
+                if (worldYaw < -1.5707964f)
+                    worldYaw = yawOffset - 3.1415927f;
                 else
-                    field_0x23c = -yawOffset;
-            } else if (field_0x23c > 1.5707964f) {
-                field_0x23c = 3.1415927f - yawOffset;
+                    worldYaw = -yawOffset;
+            } else if (worldYaw > 1.5707964f) {
+                worldYaw = 3.1415927f - yawOffset;
             } else {
-                field_0x23c = yawOffset;
+                worldYaw = yawOffset;
             }
-            field_0x23c += UnknownVirtualSlot39();
-            if (field_0x23c >= 6.2831855f)
-                field_0x23c -= 6.2831855f;
+            worldYaw += UnknownVirtualSlot39();
+            if (worldYaw >= 6.2831855f)
+                worldYaw -= 6.2831855f;
             distanceEase->Set(followDistance, FLT_MAX);
         }
         UnknownVirtualSlot40(dt);
         Vector3 direction;
         D3DRMVectorRotate(&direction, &kVec3ZAxis, &kVec3YAxis,
-                          followYaw + field_0x23c);
+                          followYaw + worldYaw);
         direction *= -followDistance;
         Vector3 position = direction + base;
         result = position;
@@ -459,7 +459,7 @@ void FollowCamera::UnknownVirtualSlot70(unsigned char value) {
             cameraState = 5;
         }
 
-        field_0x26c = 0;
+        isMovingTarget = 0;
     } else {
         cameraState = savedCameraState;
         targetFieldOfView = savedFieldOfView;
@@ -510,20 +510,20 @@ bool FollowCamera::UnknownVirtualSlot56() {
 bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
     bool result;
     if (enable) {
-        if (!force && !field_0x274 &&
+        if (!force && !isSettled &&
             FollowCameraAbs(positionEaseX->value - point.x) < 0.01f &&
             FollowCameraAbs(positionEaseZ->value - point.z) < 0.01f &&
             FollowCameraAbs(positionEaseY->value - point.y) < 0.01f) {
             UnknownVirtualSlot44(point);
             result = true;
-            field_0x277 = result;
+            settleChecked = result;
         } else {
-            field_0x277 = true;
+            settleChecked = true;
             result = false;
         }
     } else {
         result = false;
-        field_0x277 = result;
+        settleChecked = result;
     }
     return result;
 }
@@ -592,10 +592,10 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
     if (Owner()->currentCamera == this) {
         frameTime += dt;
         unsigned int count = frameCount;
-        float period = count * field_0x270;
+        float period = count * recordsPerSecond;
         while (frameTime > period)
             frameTime -= period;
-        unsigned int index = (unsigned int)(frameTime * field_0x270);
+        unsigned int index = (unsigned int)(frameTime * recordsPerSecond);
         while (index >= count)
             index -= count;
         Matrix4 a = frames[index];
@@ -671,8 +671,8 @@ int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
         if (overrideActive) {
             if (!TestInputEvent(0x10, 0, event, 0xc))
                 return 0;
-            field_0x26c = 1 - field_0x26c;
-            if (!field_0x26c)
+            isMovingTarget = 1 - isMovingTarget;
+            if (!isMovingTarget)
                 return 0;
             UnknownVirtualSlot69();
             return 1;

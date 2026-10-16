@@ -27,7 +27,7 @@ struct UnknownCameraRider {
     unsigned char field_0x000[0x150];
     float field_0x150;                   // slot 35 lifts the camera above -0.5
     unsigned char field_0x154[0x2a8 - 0x154];
-    int field_0x2a8;
+    int aux;  // +0x2A8  element of Vehicle+0x53c wheelList = VehicleWheel, whose +0x2a8 is aux (counted by auxWheelCount)
 };
 
 struct UnknownCameraVehicle {
@@ -43,15 +43,15 @@ struct UnknownCameraVehicle {
     unsigned char field_0x0c0[0x3bc - 0xc0];
     UnknownVehiclePart* modelNode;            // +0x3bc VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
-    float field_0x434;                   // VehicleCamera slot 36 tests > 0.1
+    float forwardSpeed;  // +0x434  Vehicle +0x434 = dot(velocity, bodyForward) (BikeAI); KrustyBike compares it with 60 mph in ft/s
     float field_0x438;                   // KrustyBikeCamera slot 34 divisor
     float turnRate;                           // +0x43c VehicleCamera slot 42 scale
     int movingForward;                        // +0x440
     int crashState;                           // +0x444 VehicleCamera slots 72, 74, 75
     unsigned char field_0x448[0x45c - 0x448];
-    float field_0x45c;                   // VehicleCamera slot 39
+    float crashYaw;  // +0x45C  Vehicle::CheckCrash stores savedYaw here on a crash; VehicleCamera slot 39 returns it
     int crashReason;                          // +0x460 BikeCamera slot 75 tests 6
-    int field_0x464;                     // VehicleCamera slot 39
+    int crashedUpsideDown;  // +0x464  Vehicle::CheckCrash stores savedUp.y < 0 on a crash; VehicleCamera slot 39 turns the camera by pi
     unsigned char field_0x468[0x488 - 0x468];
     Vector3 takeoffPosition;                  // +0x488 0x0052bc50 in vehicle mode
     Vector3 takeoffVelocity;                  // +0x494 0x0052bac0 in vehicle mode
@@ -67,7 +67,7 @@ struct UnknownCameraVehicle {
     UnknownCameraRider* UnknownInlineRider() {
         if (auxWheelCount) {
             for (int i = 0; i < riderCount; i++) {
-                if (riders[i]->field_0x2a8)
+                if (riders[i]->aux)
                     return riders[i];
             }
         }
@@ -85,9 +85,9 @@ struct UnknownCameraTargetA {
 
 struct UnknownCameraTargetB {
     unsigned char field_0x00[0x34];
-    UnknownVehiclePart* field_0x34;      // 0x0052bb60
+    UnknownVehiclePart* carModel;  // +0x34  camera +0x388 is a scene procedural entry (CarProcedural, BikeRace TargetObject); CarProcedural +0x34 carModel
     unsigned char field_0x38[0x40 - 0x38];
-    Vector3 field_0x40;
+    Vector3 pathVelocity;  // +0x40  CarProcedural +0x40 pathVelocity; slot 33 returns it as the tracked velocity (like vehicle velocity)
 };
 
 // .rdata floats next to VehicleCamera's vtable: 17.0f (slot 67) and the
@@ -149,9 +149,9 @@ public:
     }
 
 protected:
-    UnknownCameraTargetA* field_0x384;
-    UnknownCameraTargetB* field_0x388;
-    UnknownVehiclePart* field_0x38c;     // 0x0052bb60
+    UnknownCameraTargetA* targetCharacter;  // +0x384  BikeRace TargetCharacter stores a key-framed scene character; slots 33/41/TargetPoint read its node
+    UnknownCameraTargetB* targetCar;  // +0x388  BikeRace TargetObject stores a scene procedural object (CarProcedural)
+    UnknownVehiclePart* targetCaster;  // +0x38C  BikeRace view +0x38c shadowCaster (TargetCaster); TargetPoint takes its translation
     bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char targetPointCached;     // +0x391 cachedTargetPoint is valid (cleared on a new target)
     unsigned char targetHeadingCached;   // +0x392 cachedTargetHeading is valid

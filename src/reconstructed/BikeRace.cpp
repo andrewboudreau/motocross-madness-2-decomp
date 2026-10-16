@@ -671,7 +671,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                 if (entry->keyFramed) {
                     model = ((UnknownBikeRaceRider*)entry->character)->modelNode;
                 } else {
-                    model = (UnknownBikeRaceModel*)entry->proceduralObject->field_0x34;
+                    model = (UnknownBikeRaceModel*)entry->proceduralObject->carModel;
                 }
             }
             do {

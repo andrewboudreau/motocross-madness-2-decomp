@@ -71,7 +71,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
     float offset;
     if (cameraState != 3) {
         Vector3 velocity = UnknownVirtualSlot33();
-        float along = velocity.z * field_0x29c.z + (velocity.x * field_0x29c.x + velocity.y * field_0x29c.y);
+        float along = velocity.z * followHeading.z + (velocity.x * followHeading.x + velocity.y * followHeading.y);
         distance = AngleWeight(followYaw) * AngleWeight(followPitch);
         float zoom = fieldOfView / maxFieldOfView;
         float scale = (float)(followDistance * 0.0111f) * zoom + 1.0f;
@@ -88,24 +88,24 @@ Vector3 VehicleCamera::UnknownVirtualSlot35(unsigned char a, float dt) {
         distance = 1.0f;
         offset = 0.0f;
     }
-    if (field_0x276)
+    if (isCrashView)
         distance *= 0.8f;
     Vector3 direction;
     if (cameraState == 3) {
         Vector3 side;
-        side.x = field_0x29c.z;
+        side.x = followHeading.z;
         side.y = 0.0f;
-        side.z = -field_0x29c.x;
+        side.z = -followHeading.x;
         Vector3 pitched;
-        D3DRMVectorRotate(&pitched, &field_0x29c, &side, -vehicle->savedPitch);
-        D3DRMVectorRotate(&direction, &pitched, (Vector3*)&kVec3YAxis, field_0x308 * 0.7f);
+        D3DRMVectorRotate(&pitched, &followHeading, &side, -vehicle->savedPitch);
+        D3DRMVectorRotate(&direction, &pitched, (Vector3*)&kVec3YAxis, turnYaw * 0.7f);
     } else {
-        D3DRMVectorRotate(&direction, &field_0x29c, (Vector3*)&kVec3YAxis, field_0x308 * 0.7f);
+        D3DRMVectorRotate(&direction, &followHeading, (Vector3*)&kVec3YAxis, turnYaw * 0.7f);
     }
     if (cameraState != 6) {
-        ScaleInPlace(&direction, distance * field_0x228);
+        ScaleInPlace(&direction, distance * lookAheadDistance);
     } else {
-        float range = -field_0x228;
+        float range = -lookAheadDistance;
         range *= 0.25f;
         ScaleInPlace(&direction, range);
     }

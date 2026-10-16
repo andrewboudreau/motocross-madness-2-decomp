@@ -79,7 +79,7 @@ unsigned char KrustyBikeCamera::UnknownVirtualSlot55() {
 // +0x735 in vehicle mode.
 bool KrustyBikeCamera::UnknownVirtualSlot56() {
     bool pressed;
-    if (!field_0x38c && g_TrackGame->controlInterface->UnknownVirtualSlot2(0x0A, 0x3F)) {
+    if (!targetCaster && g_TrackGame->controlInterface->UnknownVirtualSlot2(0x0A, 0x3F)) {
         pressed = true;
     } else {
         pressed = false;
@@ -101,11 +101,11 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
     if (cameraState != 3) {
         if (vehicleMode && !flag &&
             (!krustyBike->field_0x7a4 || g_TrackGame->playerCount > 1))
-            field_0x308 = ratio * krustyBike->field_0x43c * 0.42f;
+            turnYaw = ratio * krustyBike->field_0x43c * 0.42f;
         else
-            field_0x308 = 0.0f;
+            turnYaw = 0.0f;
     } else {
-        field_0x308 = ratio * krustyBike->field_0x43c * 0.55f;
+        turnYaw = ratio * krustyBike->field_0x43c * 0.55f;
     }
 }
 
@@ -153,7 +153,7 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
 // the +0x3b8 view's +0x3f8 flag is set.
 Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
-    if (field_0x276) {
+    if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
             Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
@@ -165,13 +165,13 @@ Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
     } else if (raceView->replayPaused) {
         result = targetPoint;
     } else {
-        float dot = KrustyCameraDot(UnknownVirtualSlot33(), field_0x29c);
+        float dot = KrustyCameraDot(UnknownVirtualSlot33(), followHeading);
         float height = field_0x2c0 * 0.009f + 1.0f;
         float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
         float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
         float distance = lag * (height * height * dot / speed) * 35.0f;
-        Vector3 offset = field_0x29c * distance;
+        Vector3 offset = followHeading * distance;
         result = Vector3(offset.x + targetPoint.x, offset.y + targetPoint.y, offset.z + targetPoint.z);
     }
     result.y += 3.0f;

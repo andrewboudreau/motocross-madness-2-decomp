@@ -673,9 +673,9 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         } else {
             UnknownFunction4de580(name, "SLT", sltPath);
             animationTable->entries[i].motionCount = 1;
-            animationTable->entries[i].proceduralObject->field_0x34->SetUseLighting(useLighting);
+            animationTable->entries[i].proceduralObject->carModel->SetUseLighting(useLighting);
             if (axes)
-                animationTable->entries[i].proceduralObject->field_0x34->SetAxesPtr(&look, &up, 1, 0);
+                animationTable->entries[i].proceduralObject->carModel->SetAxesPtr(&look, &up, 1, 0);
         }
         if (animationTable->entries[i].motionCount > 0) {
             if (auralScape) {
@@ -688,7 +688,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                     if (animationTable->entries[i].keyFramed)
                         node = animationTable->entries[i].character->modelNode;
                     else
-                        node = animationTable->entries[i].proceduralObject->field_0x34;
+                        node = animationTable->entries[i].proceduralObject->carModel;
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
                              SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, isEnabled))

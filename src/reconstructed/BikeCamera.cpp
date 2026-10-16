@@ -77,7 +77,7 @@ Vector3 BikeCamera::UnknownVirtualSlot37() {
 // 33, the fov/zoom ratio and vehicle +0x438. Raised by 3.
 Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
     Vector3 result;
-    if (field_0x276) {
+    if (isCrashView) {
         bike->riderCharacter->modelNode->GetPositionIn(0, &result);
         if (field_0x2c0 < 500.0f) {
             Vector3 lead = bike->wrecker->rigidBody->velocity * dt;
@@ -87,13 +87,13 @@ Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
             result += bike->wrecker->rigidBody->velocity * dt;
         }
     } else {
-        float dot = BikeCameraDot(UnknownVirtualSlot33(), field_0x29c);
+        float dot = BikeCameraDot(UnknownVirtualSlot33(), followHeading);
         float height = field_0x2c0 * 0.009f + 1.0f;
         float ratio = fieldOfView / maxFieldOfView;
         float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
         float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
         float distance = lag * (height * height * dot / speed) * 35.0f;
-        Vector3 offset = field_0x29c * distance;
+        Vector3 offset = followHeading * distance;
         result = Vector3(offset.x + targetPoint.x, offset.y + targetPoint.y, offset.z + targetPoint.z);
     }
     result.y += 3.0f;

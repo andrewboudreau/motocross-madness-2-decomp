@@ -607,7 +607,7 @@ void RadarOverlay::DrawRacers(int mode)
     for (i = 0; i < racerCount; i++) {
         if (i != followedIndex && racers[i]->isEnabled) {
             outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
-            if (field_0x174 && field_0x16c == i) {
+            if (cueShown && cueIndex == i) {
                 if (radarView->chatOverlay) {
                     Vector3& own = racers[followedIndex]->position;
                     float dx = racers[i]->position.x - own.x;

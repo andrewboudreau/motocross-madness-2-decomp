@@ -397,8 +397,8 @@ UnknownSceneObject* Scene::FindEntryByFileName(const char* path, int* index)
     _splitpath(path, 0, 0, name, 0);
     for (int i = 0; i < animationTable->entryCount; i++) {
         if (animationTable->entries[i].keyFramed &&
-            !_strnicmp(animationTable->entries[i].character->field_0x1a4, name,
-                       strcspn(animationTable->entries[i].character->field_0x1a4, "."))) {
+            !_strnicmp(animationTable->entries[i].character->fileName, name,
+                       strcspn(animationTable->entries[i].character->fileName, "."))) {
             if (index)
                 *index = i;
             return animationTable->entries[i].character;
@@ -449,13 +449,13 @@ int Scene::RestartEntry(int index, float time, int force, int motion)
                     animationTable->entries[index].motionSequence[animationTable->entries[index].sequenceIndex] - 1;
                 object->SetMotion(
                     animationTable->entries[index].motions[animationTable->entries[index].currentMotion]);
-                object->field_0x10 = 0;
+                object->motionTime = 0;
                 animationTable->entries[index].field_0x18 = object->AdvanceMotion(time, 0, 0);
                 return 1;
             }
         } else {
             UnknownSceneAnimatedObject* object = (UnknownSceneAnimatedObject*)entry->proceduralObject;
-            object->field_0x194 = time;
+            object->pathTime = time;
             object->field_0x5c = running;
             if (running)
                 ((UnknownSceneAnimatedObject*)animationTable->entries[index].proceduralObject)
@@ -618,29 +618,29 @@ int Scene::ReadLight(int index)
             UnknownFunction4de580(section, "Type", text);
             if (!ReadColor(&light->color, section, "ColorRGB", "", 1, 0))
                 return 0;
-            light->field_0x18 = &light->position;
+            light->effectivePosition = &light->position;
             if (!ReadVector(&light->position, section, "Position", "", 0, 0)) {
                 light->position = Vector3(-2000.0f, 4000.0f, 1252.0f);
                 if (light->type != 6 && light->type != 7)
-                    UnknownFunction4de580(section, "Position(Default)", light->field_0x18);
+                    UnknownFunction4de580(section, "Position(Default)", light->effectivePosition);
                 else
-                    light->field_0x18 = 0;
+                    light->effectivePosition = 0;
             }
             parameters.GetInt("PlaceLightAtInfinity", 0, &atInfinity);
             light->atInfinity = atInfinity;
             UnknownFunction4de580(section, "PlaceLightAtInfinity", (int)light->atInfinity);
             if (light->atInfinity) {
                 light->direction = light->position * (80000.0f / Length(light->position));
-                light->field_0x18 = &light->direction;
+                light->effectivePosition = &light->direction;
             }
-            light->field_0x34 = &light->look;
+            light->emitterDirection = &light->look;
             if (ReadVector(&vector, section, "LookVector", "", 0, 0)) {
                 light->look = vector;
             } else if (ReadVector(&vector, section, "TargetPosition", "", 0, 0)) {
                 light->look = Normalize(vector - light->position);
             } else {
                 light->look = Vector3(0.0f, 0.0f, 0.0f);
-                light->field_0x34 = 0;
+                light->emitterDirection = 0;
             }
             parameters.GetFloat("Range", -1.0f, &light->range);
             float range = light->range;
@@ -697,9 +697,9 @@ int Scene::ReadLight(int index)
     if (index == 0) {
         light->type = 6;
         light->color = 0x5a5a5a;
-        light->field_0x18 = 0;
+        light->effectivePosition = 0;
         light->look = Vector3(0.0f, 0.0f, 0.0f);
-        light->field_0x34 = 0;
+        light->emitterDirection = 0;
         light->range = 0;
         light->showDebugSphere = 0;
         light->atInfinity = 0;
@@ -712,9 +712,9 @@ int Scene::ReadLight(int index)
         light->color = 0xc8c8c8;
         light->atInfinity = 0;
         light->direction = light->position * (80000.0f / Length(light->position));
-        light->field_0x34 = 0;
+        light->emitterDirection = 0;
         light->look = Vector3(0.0f, 0.0f, 0.0f);
-        light->field_0x18 = &light->position;
+        light->effectivePosition = &light->position;
         light->range = 0;
         light->showDebugSphere = 0;
         light->emitsLight = 1;
@@ -1166,7 +1166,7 @@ int Scene::Load(void* owner, LightManager* lights, int a3, int a4, int a5,
             sceneLights[i].emitter =
                 (new(__FILE__, 2798) LightEmitter(1))
                     ->Create(renderContext, sceneLights[i].type, sceneLights[i].color,
-                                            &sceneLights[i].position, sceneLights[i].field_0x34,
+                                            &sceneLights[i].position, sceneLights[i].emitterDirection,
                                             sceneLights[i].range, sceneLights[i].showDebugSphere, 0, camera,
                                             (int)flare, i);
             if (!sceneLights[i].emitter)
@@ -1199,14 +1199,14 @@ void Scene::SetDetailLevel(int level)
                 animationTable->entries[i].character->modelNode->ApplyLodSettings(level);
             else
                 ((UnknownSceneAnimatedObject*)animationTable->entries[i].proceduralObject)
-                    ->field_0x34->ApplyLodSettings(level);
+                    ->carModel->ApplyLodSettings(level);
         }
         for (i = 0; i < animationTable->randomSetCount; i++) {
             UnknownSceneEntry* entry = animationTable->randomSets[i].entry;
             if (entry->keyFramed)
                 entry->character->modelNode->ApplyLodSettings(level);
             else
-                ((UnknownSceneAnimatedObject*)entry->proceduralObject)->field_0x34->ApplyLodSettings(level);
+                ((UnknownSceneAnimatedObject*)entry->proceduralObject)->carModel->ApplyLodSettings(level);
         }
     }
     if (staticModels) {
