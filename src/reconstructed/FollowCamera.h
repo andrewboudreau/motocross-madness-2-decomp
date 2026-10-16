@@ -273,11 +273,12 @@ protected:
     float field_0x2ec;          // 3.0f
     float state4FieldOfView;         // +0x2f0 state-4 saved targetFieldOfView (slot 71)
     // State 5 maps targetDistance (+0x2c0) linearly from +0x300 .. +0x2f8 onto
-    // +0x2fc .. +0x2f4 (the "height" names below predate that decode).
-    float heightFovMinimum;          // +0x2f4 10.0f
-    float heightForMinimumFov;       // +0x2f8 280.0f
-    float heightFovMaximum;          // +0x2fc 70.0f
-    float heightForMaximumFov;       // +0x300 20.0f
+    // +0x2fc .. +0x2f4: the FOV narrows to 10 at distance 280 and widens to 70
+    // at distance 20, clamped to that range.
+    float distanceFovMinimum;          // +0x2f4 10.0f
+    float distanceForMinimumFov;       // +0x2f8 280.0f
+    float distanceFovMaximum;          // +0x2fc 70.0f
+    float distanceForMaximumFov;       // +0x300 20.0f
     float blendClock;                // +0x304, blend clock, advanced by slot 10 up to 1
     float turnYaw;  // +0x308  slot 42 = fov ratio * vehicle turnRate * k; slot 49 adds it to followYaw
     int stateIndex;                  // +0x30c, cyclic index into states (slot 72)
