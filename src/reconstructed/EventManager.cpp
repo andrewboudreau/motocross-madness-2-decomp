@@ -349,9 +349,9 @@ void EventManager::AddChampionshipPoints(UnknownEventRacer* racer, int* points) 
 int CompareStandings(const void* a, const void* b) {
     const UnknownEventStanding* first = (const UnknownEventStanding*)a;
     const UnknownEventStanding* second = (const UnknownEventStanding*)b;
-    if (first->field_0x00 > second->field_0x00)
+    if (first->points > second->points)
         return -1;
-    if (first->field_0x00 == second->field_0x00) {
+    if (first->points == second->points) {
         if (first->field_0x04 < second->field_0x04)
             return -1;
         if (first->field_0x04 == second->field_0x04) {
@@ -842,7 +842,7 @@ void EventManager::RankRacers() {
         int standing = 0;
         while ((racer = view->NextBike(&next)) != 0) {
             if (!racer->outOfRace) {
-                standings[standing].field_0x00 = results[standing].points;
+                standings[standing].points = results[standing].points;
                 standings[standing].racer = racer;
                 standing++;
             }

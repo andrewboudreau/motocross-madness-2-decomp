@@ -27,13 +27,13 @@ int CompareScoresDescending(const void* a, const void* b); // cdecl 0x005199f0
 
 // 16-byte record sorted with 0x0045d3d0.
 struct UnknownEventStanding {
-    int field_0x00;
+    int points;                                    // the result's points (EventManager.cpp)
     float field_0x04;
     float field_0x08;
     UnknownEventRacer* racer;                      // its +0x5e0 name breaks ties
 };
 
-// cdecl 0x0045d3d0: qsort order for standings (higher +0x00 first, then
+// cdecl 0x0045d3d0: qsort order for standings (more points first, then
 // lower +0x04 and +0x08, then the racer's name).
 int CompareStandings(const void* a, const void* b);  // 0x0045d3d0
 
