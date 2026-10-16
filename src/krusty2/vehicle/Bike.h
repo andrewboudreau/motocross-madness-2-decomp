@@ -106,55 +106,55 @@ struct BikeWheel {
     char pad_0x000[184];
     char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)
     Vec3 wheelPosition;
-    Vec3 w_0x0d8;             // KrustyBike 0x00413200 moves it with the body's step displacement
+    Vec3 groundPoint;  // +0xd8 VehicleWheel groundPoint (CollisionPoint+0x20 surfacePosition); KrustyBike 0x00413200 moves it with the body's step displacement
     Vec3 groundNormal;
     char pad_0x0f0[12];
     Vec3 appliedShare;
-    Vec3 w_0x108;
+    Vec3 frictionDirection;  // +0x108 CollisionPoint+0x50 frictionDirection (VehicleWheel name)
     char pad_0x114[12];
     Vec3 w_0x120;             // Method_0x0040a520 crosses the wheel offset with it while in contact
     char pad_0x12c[24];
     float contactLoad;
-    float w_0x148;
-    float w_0x14c;            // KrustyBike 0x00413200 clears it
-    float w_0x150;
+    float tangentSpeed;  // +0x148 CollisionPoint+0x90 tangentSpeed (VehicleWheel name)
+    float spinSpeed;  // +0x14c CollisionPoint+0x94 spinSpeed (VehicleWheel name); KrustyBike 0x00413200 clears it
+    float penetration;  // +0x150 CollisionPoint+0x98 penetration (VehicleWheel name)
     char pad_0x154[4];
     float loadWeight;
     char pad_0x15c[16];
     int w_0x16c;              // Method_0x0040a520 sets it to 2 while the wheel is in contact
     char pad_0x170[76];
     SoultreeObject* sceneNode;  // +0x1bc wheel scene node (VehicleWheel name)
-    BikeWheelFrame* w_0x1c0;  // frame whose +0xc axis Method_0x0040a520 projects on
+    BikeWheelFrame* ownerRef;  // +0x1c0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40); Method_0x0040a520 projects on its +0xc axis
     char pad_0x1c4[60];
     Vec3 nodePosition;        // +0x200 (VehicleWheel name)
-    Vec3 w_0x20c;             // scaled by w_0x274 while airborne (Method_0x0040a520)
+    Vec3 wheelUpAxis;  // +0x20c Tire.h wheelUpAxis; scaled by wheelRadius while airborne (Method_0x0040a520)
     char pad_0x218[24];
-    Vec3 w_0x230;
-    Vec3 w_0x23c;
+    Vec3 rollDirection;  // +0x230 Tire.h/VehicleWheel rollDirection
+    Vec3 sideAxis;  // +0x23c Tire.h/VehicleWheel sideAxis (wheel axle direction)
     Vec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
     char pad_0x254[12];
     int inContact;
     char pad_0x264[4];
     int w_0x268;
     char pad_0x26c[8];
-    float w_0x274;
+    float wheelRadius;  // +0x274 Tire.h wheelRadius (ctor: y extent of the node)
     char pad_0x278[4];
-    float w_0x27c;
+    float slipSpeed;  // +0x27c Tire.h slipSpeed (written by UpdateContactPatch)
     float w_0x280;
     char pad_0x284[4];
-    float w_0x288;
+    float tangentSin;  // +0x288 Tire.h tangentSin
     char pad_0x28c[8];
     float w_0x294;
     char pad_0x298[4];
-    float w_0x29c;
+    float rampLevel;  // +0x29c Tire.h/VehicleWheel rampLevel
     char pad_0x2a0[4];
     float w_0x2a4;
-    BikeWheelQ* w_0x2a8;
-    BikeQ* w_0x2ac;
-    BikeQ* w_0x2b0;
+    BikeWheelQ* aux;  // +0x2a8 VehicleWheel aux (Tire.h TireAux)
+    BikeQ* secondaryAux;  // +0x2ac VehicleWheel secondaryAux (the fallback when primaryAux is null)
+    BikeQ* primaryAux;  // +0x2b0 VehicleWheel primaryAux (attachment AddWheel stores)
     char pad_0x2b4[4];
-    float w_0x2b8;
-    float w_0x2bc;
+    float driveShare;  // +0x2b8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
+    float driveShareComplement;  // +0x2bc UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
     void UpdateDriveShare(void* owner);   // 0x00513f90 (Tire.h name: drive share from the vehicle speed)
 };
 

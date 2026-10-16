@@ -315,7 +315,7 @@ int KrustyBike::UnknownVirtualSlot83(VehicleWheel* wheel)
 {
     BikeWheel* input = (BikeWheel*)wheel;
     if (field_0x808 > 0.0f ||
-        (UnknownVirtualSlot84(5, 0x3f) && !UnknownVirtualSlot77(input->w_0x29c == 0.0f)))
+        (UnknownVirtualSlot84(5, 0x3f) && !UnknownVirtualSlot77(input->rampLevel == 0.0f)))
         return 1;
     return 0;
 }
@@ -467,8 +467,8 @@ void KrustyBike::UnknownVirtualSlot86()
             ramp = (0.4762f - field_0x664) * (360.0f / 0.3562f);
         else
             ramp = 0;
-        if (w->w_0x2a8)
-            w->w_0x2a8->Fn_004D31B0(KbFloat(linearSpeed), &w->w_0x230, KbFloat(field_0x4a4), field_0x47a, ramp,
+        if (w->aux)
+            w->aux->Fn_004D31B0(KbFloat(linearSpeed), &w->rollDirection, KbFloat(field_0x4a4), field_0x47a, ramp,
                                     &w->w_0x248, &w->w_0x280);
         if (g_kbGame->raceMode && !onTrack) {
             rearWheel->w_0x248 *= 0.5f;
@@ -593,7 +593,7 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
         return 1;
     }
     if (!field_0x430 && inputMap && inputMap->UnknownVirtualSlot2(8, 0x3f)) {
-        if (airborne && !crashState && frontWheel->w_0x150 < -3.5f && rearWheel->w_0x150 < -3.5f) {
+        if (airborne && !crashState && frontWheel->penetration < -3.5f && rearWheel->penetration < -3.5f) {
             crashDirection = 2;
             crashReason = 1;
             return 1;

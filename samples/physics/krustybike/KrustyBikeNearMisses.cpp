@@ -637,8 +637,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
         ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
         centerNode->GetPositionIn(0, &centerOfMass);
         worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
-        ((KbSink*)frontWheel->w_0x2b0)->UnknownVirtualSlot0();
-        ((KbSink*)rearWheel->w_0x2ac)->UnknownVirtualSlot0();
+        ((KbSink*)frontWheel->primaryAux)->UnknownVirtualSlot0();
+        ((KbSink*)rearWheel->secondaryAux)->UnknownVirtualSlot0();
         PlaceWheels();
         allWheelsInContact = wheelsInContact == wheelCount;
         anyWheelInContact = wheelsInContact != 0;

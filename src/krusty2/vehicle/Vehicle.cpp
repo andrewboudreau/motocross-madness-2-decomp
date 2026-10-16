@@ -621,7 +621,7 @@ static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
 // Tier 3 reading: accumulates per-wheel ground normals and suspension loads into one
 // support normal and a lean/steer response (via slot 74).  Wheels are averaged, so more than
 // one contact normalises the sum.
-// Sums the contact normals (and, for wheels with field_0x1c0 set, their +0x230 vectors) of the
+// Sums the contact normals (and, for wheels with ownerRef set, their rollDirection vectors) of the
 // wheels and pushes the vehicle along the resulting cross direction (tier 3). *out receives the
 // summed normal (normalised when more than one contact); field_0x4b8/0x43c receive the result
 // of slot 74 (deflection angle and angle*dt) using the last flagged wheel's point (+0x23c).
@@ -644,7 +644,7 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
         if (w->inContact || wheel) {
-            if (w->field_0x1c0) {
+            if (w->ownerRef) {
                 last = wheelList[i];
                 flagged++;
                 sum.x += last->rollDirection.x;
@@ -716,7 +716,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
         if (w->aux && w->inContact && !w->impactPosted &&
             (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
             w->impactPosted = 1;
-            float v = w->field_0x2bc * 20.0f;
+            float v = w->driveShareComplement * 20.0f;
             ev->impactSink->SetPosition(w->groundPoint, (v > 1.0f) ? v : 1.0f);
             VehCommitImpact(ev, &ev->impactSink);
             return;
@@ -756,7 +756,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
         VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->slidePosted &&
             (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
-            if (!(w->field_0x2b8 < 0.95f))
+            if (!(w->driveShare < 0.95f))
                 return;
             w->slidePosted = 1;
             ev->slideSink->SetPosition(w->groundPoint);
@@ -765,7 +765,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
             scratchVector2.y = 0.0f;
             scratchVector2.z = -w->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
-            scratchVector.y = w->field_0x2bc * 3.0f;
+            scratchVector.y = w->driveShareComplement * 3.0f;
             scratchVector *= w->field_0x290 * invStepTime;
             scratchVector.x = VehMinF(scratchVector.x, 15.0f);
             scratchVector.y = VehMinF(scratchVector.y, 18.0f);
@@ -797,7 +797,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
     for (i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->scrapePosted) {
-            if (!(w->field_0x2b8 < 0.95f))
+            if (!(w->driveShare < 0.95f))
                 return;
             w->scrapePosted = 1;
             ev->scrapeSink->SetPosition(w->groundPoint);
@@ -806,7 +806,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
             scratchVector2.y = 0.0f;
             scratchVector2.z = -w->tangentCos;
             scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
-            scratchVector.y = w->field_0x2bc * 3.0f;
+            scratchVector.y = w->driveShareComplement * 3.0f;
             scratchVector *= w->field_0x290 * invStepTime;
             scratchVector.x = VehMinF(scratchVector.x, 15.0f);
             scratchVector.y = VehMinF(scratchVector.y, 18.0f);
@@ -904,7 +904,7 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
                     return out;
                 }
             }
-            if (a->field_0x2b8 < 0.9f) {
+            if (a->driveShare < 0.9f) {
                 scratchVector = VehOffset(b->wheelPosition, position);
                 *out = modelNode->WorldToLocalDirection(scratchVector);
             } else {
@@ -1441,7 +1441,7 @@ float Vehicle::UnknownVirtualSlot75()
     int n = 0;
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
-        if (!w->field_0x1c0) {
+        if (!w->ownerRef) {
             sum += w->rollDirection;
             n++;
         }
@@ -1949,9 +1949,9 @@ void Vehicle::ResetWheelContacts()
         wheel->field_0x248 = kVec3Zero;
         wheel->field_0x280.x = 0.0f;
         wheel->field_0x254 = kVec3Zero;
-        wheel->field_0x2b8 = 1.0f;
+        wheel->driveShare = 1.0f;
         wheel->field_0x280.z = 1.0f;
-        wheel->field_0x2bc = 0.0f;
+        wheel->driveShareComplement = 0.0f;
         wheel->rampLevel = 0.0f;
         wheel->field_0x290 = 0.0f;
         wheel->rollAngle = 0;
@@ -2212,7 +2212,7 @@ int Vehicle::GameObjectVirtualSlot10(float dt)
 // step and the wheel is probed against the ground; a wheel that is not in contact is retracted
 // by three quarters and probed again, one in contact has its shock forces cleared.  The second
 // loop counts the wheels in contact (primary/secondary wheel = first/second), counts those with
-// field_0x1c0 into field_0x550 and flags (field_0x264) the first in-contact wheel without it,
+// ownerRef into field_0x550 and flags (field_0x264) the first in-contact wheel without it,
 // else wheel 0.
 void Vehicle::PlaceWheels()
 {
@@ -2247,7 +2247,7 @@ void Vehicle::PlaceWheels()
     for (i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
         if (wheel->inContact) {
-            if (wheel->field_0x1c0) {
+            if (wheel->ownerRef) {
                 field_0x550++;
             } else if (unflagged) {
                 wheel->reportContactOutputs = 1;

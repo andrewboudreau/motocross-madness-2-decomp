@@ -333,7 +333,7 @@ struct VehicleWheel {
     unsigned char surfaceMaterial;       // +0x174 surface material id
     char pad_0x175[0x47];
     SoultreeObject* sceneNode;     // +0x1bc wheel scene node (slot 33 reads its position)
-    int field_0x1c0;
+    int ownerRef;  // +0x1C0 MovingPart+0x44 ownerRef (Tire ctor arg c; sceneNode +0x1bc is MovingPart+0x40)
     char pad_0x1C4[0x18];
     float levelRiseRate;               // +0x1dc +0x29c ramp-up rate (UpdateWheelRampLevels)
     float levelFallRate;               // +0x1e0 +0x29c ramp-down rate
@@ -367,8 +367,8 @@ struct VehicleWheel {
     int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, Method_005293E0)
     int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90
     char pad_0x2B4[0x4];
-    float field_0x2b8;
-    float field_0x2bc;
+    float driveShare;  // +0x2B8 UpdateDriveShare (0x00513f90) stores the drive share here (fst [esi+0x2b8]; 1.0 on the other path)
+    float driveShareComplement;  // +0x2BC UpdateDriveShare (0x00513f90) stores 1 - driveShare here (0 on the other path)
     void UpdateRoll(float a, float b, int c, int d, int e, float f);   // 0x005143d0
     void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
     void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70

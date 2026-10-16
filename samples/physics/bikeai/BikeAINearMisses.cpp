@@ -1650,9 +1650,9 @@ int KrustyBike::Fn_00413200(float dt)
     linearSpeed = BikeAILength(velocity);
     turnRate = 0.0f;
 
-    frontWheel->w_0x2b0->ClampAndStepAlong(-lookAheadFrontTravel, 0, frontWheel->w_0x2b0->q_0xc0 * -lookAheadFrontTravel);
-    rearWheel->w_0x2ac->q_0x98 = lookAheadRearTravel;
-    rearWheel->w_0x2ac->ClampAndStep(lookAheadRearTravel, 0);
+    frontWheel->primaryAux->ClampAndStepAlong(-lookAheadFrontTravel, 0, frontWheel->primaryAux->q_0xc0 * -lookAheadFrontTravel);
+    rearWheel->secondaryAux->q_0x98 = lookAheadRearTravel;
+    rearWheel->secondaryAux->ClampAndStep(lookAheadRearTravel, 0);
     if (!airborne)
         anyWheelInContact = 1;
     else
@@ -1692,24 +1692,24 @@ int KrustyBike::Fn_00413200(float dt)
         controlInput.x = 0.0f;
 
     forwardSpeed = BikeAIDot(velocity, bodyForward);
-    rearWheel->w_0x148 = forwardSpeed;
-    frontWheel->w_0x148 = forwardSpeed;
-    rearWheel->w_0x27c = forwardSpeed;
-    frontWheel->w_0x27c = forwardSpeed;
-    rearWheel->w_0x14c = 0.0f;
-    frontWheel->w_0x14c = 0.0f;
+    rearWheel->tangentSpeed = forwardSpeed;
+    frontWheel->tangentSpeed = forwardSpeed;
+    rearWheel->slipSpeed = forwardSpeed;
+    frontWheel->slipSpeed = forwardSpeed;
+    rearWheel->spinSpeed = 0.0f;
+    frontWheel->spinSpeed = 0.0f;
     if (forwardSpeed > 0.0f)
         movingForward = 1;
     else
         movingForward = 0;
     if (frontWheel->inContact)
-        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->w_0x274 * dt);
+        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
     else
-        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->w_0x274 * dt);
+        ((KbWheel*)frontWheel)->SetRollDistance(forwardSpeed / frontWheel->wheelRadius * dt);
     if (rearWheel->inContact)
-        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->w_0x274 * dt);
+        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     else
-        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->w_0x274 * dt);
+        ((KbWheel*)rearWheel)->SetRollDistance(forwardSpeed / rearWheel->wheelRadius * dt);
     modelNode->SetPosition(position);
     UnknownVirtualSlot71(airborneOut);
     airborne = airborneOut;
@@ -1752,8 +1752,8 @@ int KrustyBike::Fn_00413200(float dt)
     UnknownVirtualSlot29(1);
     prevSpeed = linearSpeed;
     Vec3 moved = position - start;
-    frontWheel->w_0x0d8 += moved;
-    rearWheel->w_0x0d8 += moved;
+    frontWheel->groundPoint += moved;
+    rearWheel->groundPoint += moved;
     UnknownVirtualSlot21();
     scratchVector = modelNode->WorldToLocalDirection(velocity);
     smoothedForwardAccel = BikeAISmoothValue(forwardAccelSmoother, frameTime,
