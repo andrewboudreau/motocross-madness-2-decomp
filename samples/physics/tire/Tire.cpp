@@ -807,16 +807,6 @@ void Tire::UpdateAttachment()
     }
 }
 
-// Inline form of the cross product (the inline dot is TireDotInline above).
-static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec3& b)
-{
-    CollisionVec3 r;
-    r.x = b.z * a.y - b.y * a.z;
-    r.y = b.x * a.z - b.z * a.x;
-    r.z = b.y * a.x - b.x * a.y;
-    return r;
-}
-
 // 0x00515c90 (exact, 292 bytes): the normalised cross product a x b; the
 // fallback when it is exactly zero (this is unused). Source shapes that give
 // retail's leaf ages (docs/VC6_OPERAND_ORDER.md section 1.2): the reference

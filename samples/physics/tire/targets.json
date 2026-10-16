@@ -95,7 +95,7 @@
     "target_va": "0x00514550",
     "target_size": 4258,
     "expect": "partial",
-    "notes": "175/4438 strict (tier 3 name): wheel ground probe; all 3 world probes (0x00507c10), owner/non-owner/angle==pi/2 branches, surface-record lookup, bounds record path, TireBuildFrame + 0x435830/0x438e70 calls and final stores present; candidate 4438 B vs 4258. First divergence is in the prologue: retail frame 0xc0 (ours 0xbc) and different local-vector placement/temps; retail re-derives owner-node loads and the normalise fall-back in separate inlined copies (TireNormalizeOr is a single shared helper here). Scores strictly with the documented retail call targets bound (0x4fd5c0 direction transform, 0x53304c blend, 0x42a510/0x42a580 matrix transforms)",
+    "notes": "5.16% strict, 3977/4258 B (tier 3 name): wheel ground probe; all 3 world probes (0x00507c10), owner/non-owner/angle==pi/2 branches, surface-record lookup, bounds record path, TireBuildFrame + 0x435830/0x438e70 calls and final stores present; the cross products call the out-of-line copy 0x00515600 as retail does (seven calls, VC6_INLINE_BUDGET). First divergence is in the prologue: retail frame 0xc0 (ours 0xbc) and different local-vector placement/temps; retail re-derives owner-node loads and the normalise fall-back in separate inlined copies (TireNormalizeOr is a single shared helper here). Scores strictly with the documented retail call targets bound (0x4fd5c0 direction transform, 0x515600 cross product, 0x53304c blend, 0x42a510/0x42a580 matrix transforms)",
     "bindings": "Tire.bindings.json"
   },
   {
