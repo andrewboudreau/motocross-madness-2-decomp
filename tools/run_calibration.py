@@ -18331,7 +18331,7 @@ CASES = [
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree add modifier2 0x444eb0',
         'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
         'source': 'src/reconstructed/D3DIMSoulTree.cpp',
-        'symbol': '?UnknownFunction444eb0@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z',
+        'symbol': '?AddSecondModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z',
         'target_va': '0x00444eb0',
         'target_size': 84,
         'reason': 'line 0x97f',

@@ -2000,7 +2000,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         KbMorphMod* morph = new(__FILE__, 0x891) KbMorphMod(1);
         morph->LoadParameterFile((void*)a1, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
         GameObject::Method_0x00469190(morph, -1);
-        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444eb0(morph);
+        ((KbXform*)riderCharacter->c_0x1a0)->AddSecondModifier(morph);
     }
     UnknownVirtualSlot102(0.001f);
     return this;

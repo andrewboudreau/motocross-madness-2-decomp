@@ -78,7 +78,7 @@
   "?AddModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444d80",
   "?RemoveModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444de0",
   "?RemoveAllModifiers@D3DIMSoultreeObject@@QAEXXZ": "0x00444e80",
-  "?UnknownFunction444eb0@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444eb0",
+  "?AddSecondModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444eb0",
   "?RemoveSecondModifier@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444f10",
   "?RemoveAllSecondModifiers@D3DIMSoultreeObject@@QAEXXZ": "0x00444fb0",
   "?GetVertexCount@D3DIMSoultreeObject@@QAEHXZ": "0x00444fe0",

@@ -197,7 +197,7 @@
   "?UnknownFunction404df0@KbTrack@@QAEXHHPAVKrustyBike@@@Z": "0x00404df0",
   "?SetLod@KbXform@@QAEXH@Z": "0x00444d00",
   "?SetLowestLod@KbXform@@QAEXH@Z": "0x00444d40",
-  "?UnknownFunction444eb0@KbXform@@QAEXPAUKbMorphMod@@@Z": "0x00444eb0",
+  "?AddSecondModifier@KbXform@@QAEXPAUKbMorphMod@@@Z": "0x00444eb0",
   "?LoadParameterFile@KbMorphMod@@QAEPAU1@PAXPBDPAVSoultreeObject@@@Z": "0x004a33b0",
   "?UnknownFunction4b5d00@@YAXPAUVec3@@0MMM@Z": "0x004b5d00",
   "?ReadClock@@YAIXZ": "0x004bfa80",

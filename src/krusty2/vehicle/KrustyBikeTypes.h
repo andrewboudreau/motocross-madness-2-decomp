@@ -499,7 +499,7 @@ struct KbXform {
     // the first two with 0 or 1 on the bike and rider nodes and the third with the rider morph.
     void SetLod(int value);         // 0x00444D00
     void SetLowestLod(int value);         // 0x00444D40
-    void UnknownFunction444eb0(KbMorphMod* mod);   // 0x00444EB0
+    void AddSecondModifier(KbMorphMod* mod);   // 0x00444EB0 (D3DIMSoultreeObject; D3DIMSoulTree.CPP line 0x97f)
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
