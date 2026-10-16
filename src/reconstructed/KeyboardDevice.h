@@ -12,7 +12,7 @@ public:
     // (member and base destructors, no vptr store; wrapper 0x00489f00).
     KeyboardDevice();             // 0x00489e30
 
-    virtual void RemoveBindings(int id);  // 0x0048a030
+    virtual void RemoveBindings(int id); // 0x0048a030
     virtual int CreateDevice() = 0;
     virtual void DetectSubtype() = 0;
     virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry) = 0;

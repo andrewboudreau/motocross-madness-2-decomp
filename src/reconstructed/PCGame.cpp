@@ -401,7 +401,7 @@ int PCGame::SetRenderStates() {
     renderTarget->SetRenderState(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
     renderTarget->SetRenderState(D3DRENDERSTATE_ANTIALIAS, 0, 1);
     if (allowSortIndependentAntialiasing && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT))
-        renderTarget->SetRenderState(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
+        renderTarget->SetRenderState(D3DRENDERSTATE_ANTIALIAS, 2, 1);      // D3DANTIALIAS_SORTINDEPENDENT
     renderTarget->SetRenderState(D3DRENDERSTATE_FOGENABLE, 0, 1);
     renderTarget->SetRenderState(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
     renderTarget->SetRenderState(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);

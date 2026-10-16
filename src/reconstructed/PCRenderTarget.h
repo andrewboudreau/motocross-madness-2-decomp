@@ -37,7 +37,7 @@ public:
     virtual long GetRenderState(int state, int* value);
     virtual void SetTextureBlend(int mode, int textureAlpha);
     virtual long ClearTexture(int stage);
-    virtual int Clear(const CameraRect* rect, int flags); // 0x004c5510
+    virtual int Clear(const CameraRect* rect, int flags);                // 0x004c5510
     virtual int SupportsTextureFormat(int format);
     virtual int SetViewport(void* viewport);
     virtual int DrawIndexedPrimitive(int type, int vertexFormat, int vertices, int vertexCount,
@@ -45,7 +45,7 @@ public:
     virtual int DrawPrimitive(int type, int vertexFormat, int vertices, int count, int flags);
     virtual int DrawIndexedPrimitiveVB(int type, int vertexBuffer, int start, int vertexCount,
                                        int indices, int indexCount, int flags);
-    virtual void SetAlphaTest(int reference); // enables the alpha test
+    virtual void SetAlphaTest(int reference);         // enables the alpha test
     virtual void DisableAlphaTest();
 
     // 0x004c5d00 (PCCamera slot 27): saves the surface as the next free
