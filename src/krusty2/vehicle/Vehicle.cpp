@@ -327,12 +327,9 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
             VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
             if (c->contactActive) {
                 float w = 1.0f - dist[i] / total;
-                active--;
                 c->blendWeight = w;
-                share.x = arg->x * w;
-                share.y = arg->y * w;
-                share.z = arg->z * w;
-                c->appliedShare = share;
+                c->appliedShare = *arg * w;
+                active--;
             }
         }
         return;
@@ -341,10 +338,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = wheelList[i]->field_0x294;
             float w = wheelList[i]->loadWeight;
-            share.x = arg->x * w;
-            share.y = arg->y * w;
-            share.z = arg->z * w;
-            wheelList[i]->appliedShare = share;
+            wheelList[i]->appliedShare = *arg * w;
         }
         return;
     }
@@ -365,10 +359,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
             if (w->inContact) {
                 float k = 1.0f - dist[i] / total;
                 w->loadWeight = k;
-                share.x = arg->x * k;
-                share.y = arg->y * k;
-                share.z = arg->z * k;
-                w->appliedShare = share;
+                w->appliedShare = *arg * k;
             }
         }
     } else if (wheelsInContact == 1) {

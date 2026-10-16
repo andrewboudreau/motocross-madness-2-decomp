@@ -110,7 +110,7 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | krusty2/vehicle/Vehicle | `0x005257a0` | 693/745 | b | best of all 720 orders of the terrainScale..throttleAxis stores x 6 orders of the weightForce/leanCos/0x4b4 stores; retail still stores 0x4b0/0x4b4 before the leanAxis/throttleAxis pair |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 381/555 | b | same size, 0.82 ratio: two products per cross load a before b; the crashState ?: argument is hoisted above the pushes |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 223/1578 | b | ratio 0.59: retail adds `xor ebx, ebx`; hasBody/otherVel registers swapped (ebp/ebx); slot order differs |
-| krusty2/vehicle/Vehicle | `0x00526fa0` | 1134/1161 | c | frame and slots match; `total = 0` stored from ebp (active) not ebx, `dec ebp` one instruction early, share.y copied before the share.z `fstp` in the blend loops |
+| krusty2/vehicle/Vehicle | `0x00526fa0` | 1159/1161 | c | single-wheel branch: the hoisted zero share copies x from edi and z from edx (retail x edx, z edi) |
 | krusty2/vehicle/Vehicle | `0x005276d0` | 496/523 | b | 3 code diffs: `mov [edx + 4], esi` scheduled before `fstp [esp + 0x14]` (midpoint branch); return-pointer `lea eax, [esp + 0x20] ; push eax` earlier in the lead-wheel branch |
 | krusty2/vehicle/Vehicle | `0x00527a20` | 349/870 | b | 25 code diffs: `jne @99` vs `jne @98 ; mov [esp + N], 0 ; mov edx, [~`; `lea edx, [esi + 0x120]` vs `mov [esi + 0x12c], 0`; slots differ |
 | krusty2/vehicle/Vehicle | `0x00527e30` | 770/831 | c | frame and slots match; the prologue's kVec3Zero copies use edx and load `out` into esi first (retail: esi as the copy temp, then esi = `out`, edi = its copy) |
