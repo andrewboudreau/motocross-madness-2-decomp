@@ -44,6 +44,15 @@
 //   value or const reference), an inline camera getter with or without a
 //   redundant test, a `*(Vector3*)&` argument and a qualified
 //   `Camera::UnknownVirtualSlot29` call.
+//   Mechanism (Fable probe, 2026-10-16): the difference is VC6's Pentium
+//   scheduler, whose region is the whole basic block (calls are not
+//   barriers). A label (or `goto l; l:`) between the SetFrame call and the
+//   slot-29 call in both branches makes all three dialogs' copies exact
+//   (0x0044fae0 1235/1235). No label-free construct split the block ({},
+//   if (1), do/while (0), switch, empty inline call, (void)x, dead copies),
+//   so the original had some code-free block boundary there; a bare label
+//   is a matching-only form and is not applied. Untested: a label or goto
+//   inside an inline helper wrapping both calls.
 // SPRaceInfoDlg::HandleEvent (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::HandleEvent (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

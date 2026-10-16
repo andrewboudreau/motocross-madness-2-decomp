@@ -396,7 +396,7 @@
     "target_va": "0x00436720",
     "target_size": 962,
     "expect": "partial",
-    "notes": "8.4%: forwards to swept if a->flag else rotates query into B frame, box test 0x428950, averages contacts, transforms back; retail inlines M*v and v*M+T with different temporaries (834 vs 962)",
+    "notes": "932/962: inline 0x42a4b0/0x42a450/0x42a510 forms, matrix read directly or through xf per retail leaf order, products-first scale; same size, frame and registers; two rotation rows sum in another order",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -406,7 +406,7 @@
     "target_va": "0x00436af0",
     "target_size": 852,
     "expect": "partial",
-    "notes": "4.1%: swept hull pair using CollisionRelativeFrame(0x432260) then 0x428950; retail inlines and elides my out-of-line ctor calls (1074 vs 852)",
+    "notes": "809/852: inline 0x42a4b0/0x42a510 forms, ctor-based negate/scale, hit=0 branch first, matrix read directly or through xf per retail leaf order; same size, frame and registers; zero/contactCount store schedule differs",
     "bindings": "CollisionObject.bindings.json"
   },
   {

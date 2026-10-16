@@ -708,3 +708,22 @@ try on similar code. None is a rule.
   `else if (flag && !changed) return;` test placed after it; gotos into a shared
   block, or the block written in both branches, place that return test inline.
   Griddraw `0x00482dd0`.
+- **The scheduler region is the basic block.** Calls do not end it: in
+  SPBikeRiderDlg slot 10 (`0x0044fae0`) the by-value Vector3 copy for the
+  camera's slot 29 is scheduled together with code before the preceding
+  SetFrame call. Adding or removing an instruction anywhere earlier in the same
+  block changes the copy's schedule; changes in other blocks do not. A label
+  between the two calls (no code) gives retail's schedule exactly; `{}`,
+  `if (1)`, `do {} while (0)`, `switch`, an empty inline call and dead copies
+  do not split the block. The label is not used in source (it is a
+  matching-only form); see samples/ui/DlgProcsNearMisses.cpp.
+- **The matrix operand's spelling sets an inlined rotation's sum order.**
+  CollisionObject HullVsHull (`0x00436720`, 66 to 932) and HullVsHullSwept
+  (`0x00436af0`, 715 to 809) inline the same `out->x = v.x*m[0][0] + ...` helper
+  several times. Passing the matrix as `&b->worldTransform` or through a
+  `const Matrix4* xf` local (same register, same code otherwise) changes the
+  order the three products are summed in, per call: the first use of `xf`
+  sums row x x-first, later uses sum every row x-first, and direct uses keep
+  the reverse source order. Term order inside the helper does not move it. A
+  sweep over the 2^n direct/`xf` choices per call (n = 8) found both
+  functions' best forms.

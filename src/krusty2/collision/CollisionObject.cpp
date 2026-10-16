@@ -1916,45 +1916,104 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
 // count in query->contactCount, then bring the results back into world space.
 // ---------------------------------------------------------------------------
 
-// 0x00436720: hull A vs hull B, non-swept.  Forwards to HullVsHullSwept when a->field_0x00
-// is set.  The query vectors and the scratch points are first rotated into B's frame, the
+// Inline forms of the out-of-line helpers 0x0042a4b0 (M3x3 * v), 0x0042a450 (v * M3x3) and
+// 0x0042a510 (v * M + T),
+// written as BoundingBoxTreeQuery.cpp writes them; the hull tests expand them in place.
+inline void CollisionRotateRowsTo(CollisionVec3* out, CollisionVec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->m[0][0] + v.y * m->m[0][1] + v.z * m->m[0][2];
+    out->y = v.x * m->m[1][0] + v.y * m->m[1][1] + v.z * m->m[1][2];
+    out->z = v.x * m->m[2][0] + v.y * m->m[2][1] + v.z * m->m[2][2];
+}
+
+inline void CollisionRotateColsTo(CollisionVec3* out, CollisionVec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->m[0][0] + v.y * m->m[1][0] + v.z * m->m[2][0];
+    out->y = v.x * m->m[0][1] + v.y * m->m[1][1] + v.z * m->m[2][1];
+    out->z = v.x * m->m[0][2] + v.y * m->m[1][2] + v.z * m->m[2][2];
+}
+
+inline void CollisionTransformPointTo(CollisionVec3* out, CollisionVec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->m[0][0] + v.y * m->m[1][0] + v.z * m->m[2][0] + m->m[3][0];
+    out->y = v.x * m->m[0][1] + v.y * m->m[1][1] + v.z * m->m[2][1] + m->m[3][1];
+    out->z = v.x * m->m[0][2] + v.y * m->m[1][2] + v.z * m->m[2][2] + m->m[3][2];
+}
+
+// Negation and scaling through the out-of-line constructor 0x00404e60, as retail calls it.
+inline CollisionVec3 operator-(const CollisionVec3& v)
+{
+    return CollisionVec3(-v.x, -v.y, -v.z);
+}
+
+inline CollisionVec3 CollisionScaled(const CollisionVec3& v, float s)
+{
+    return CollisionVec3(v.x * s, v.y * s, v.z * s);
+}
+
+// M3x3 * -v in place; the negated components stay on the x87 stack (no constructor call).
+inline void CollisionRotateRowsNegated(CollisionVec3* v, const Matrix4* m)
+{
+    float x = -v->x;
+    float y = -v->y;
+    float z = -v->z;
+    v->x = z * m->m[0][2] + y * m->m[0][1] + x * m->m[0][0];
+    v->y = z * m->m[1][2] + y * m->m[1][1] + x * m->m[1][0];
+    v->z = z * m->m[2][2] + y * m->m[2][1] + x * m->m[2][0];
+}
+
+// v * s with the three products computed before the result is filled; VC6 then spills the
+// z product and stores x and y after it, as retail does (docs/VC6_OPERAND_ORDER.md 1.3).
+inline CollisionVec3 CollisionScaledProducts(const CollisionVec3& v, float s)
+{
+    float x = v.x * s;
+    float y = v.y * s;
+    float z = v.z * s;
+    CollisionVec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+
+// 0x00436720: hull A vs hull B, non-swept.  Forwards to HullVsHullSwept when a->swept is
+// set.  The query vectors and the scratch points are first rotated into B's frame, the
 // box test runs with mode 2, and on a hit the contact point is averaged over contactCount
 // and transformed back; the vectors/points are always rotated back afterwards.
-// Near miss.  Retail rotates each query vector in place from a by-value copy in one 12-byte
-// slot (frame 0xc), as TestMeshAgainst (0x00438c90) does; with in-place helpers of the form
-// `out->x = (v.y * m->m[0][1] + v.z * m->m[0][2]) + v.x * m->m[0][0]`, a `&q->contact` pointer
-// local and the scratch rows written (x + z) + y, the candidate reaches 779/962 (18 insn
-// diffs).  Left: the x row of the column/point helpers loads v.y before v.z, the loop's z row
-// x/z order and two copy schedules.  These pair orders follow unrelated declaration counts
-// (dead locals reach 801/962), and the column helper's form that suits HullVsHull breaks
-// TestMeshAgainst, so the in-place forms are not applied here.
+// Near miss (932/962, same size, frame and registers as retail).  The product order of each
+// inlined rotation follows the leaf age of its matrix operand: the first rotation reads
+// &b->worldTransform directly (retail z, y, x), the scratch loop reads it through xf after
+// xf's first use (retail x, z, y).  Left: the second forward rotation's x row sums x first
+// (retail z, y, x) and the loop's y and z rows z first; every xf/direct combination (256)
+// and term order trades one of them for the other.
 int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
     if (a->swept)
         return HullVsHullSwept(a, b, q);
 
+    CollisionRotateRowsTo(&q->contactOffset, q->contactOffset, &b->worldTransform);
     const Matrix4* xf = &b->worldTransform;
-    q->contactOffset = CollisionRotateRows(q->contactOffset, xf);
-    q->contactNormal = CollisionRotateRows(q->contactNormal, xf);
-    q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
+    CollisionRotateRowsTo(&q->contactNormal, q->contactNormal, xf);
+    CollisionVec3 zero;
+    zero.x = 0.0f;
+    zero.y = 0.0f;
+    zero.z = 0.0f;
+    q->contact = zero;
     q->contactCount = 0;
     for (int i = 0; i < g_CollisionScratchCount; i++)
-        g_CollisionScratchPoints[i] = CollisionRotateRows(g_CollisionScratchPoints[i], xf);
+        CollisionRotateRowsTo(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], xf);
 
-    int hit = TreeTreeQuery(a->pointTree, b->triangleTree, &a->worldTransform, xf, 2, b->vertices,
+    int hit = TreeTreeQuery(a->pointTree, b->triangleTree, &a->worldTransform, &b->worldTransform, 2, b->vertices,
                           &a->motionTransform);
     if (hit) {
         float s = 1.0f / q->contactCount;
-        CollisionVec3 c = q->contact;
-        c.x *= s;
-        c.y *= s;
-        c.z *= s;
-        q->contact = CollisionTransformPoint(c, xf);
+        q->contact = CollisionScaledProducts(q->contact, s);
+        CollisionTransformPointTo(&q->contact, q->contact, &b->worldTransform);
     }
-    q->contactOffset = CollisionRotateCols(q->contactOffset, xf);
-    q->contactNormal = CollisionRotateCols(q->contactNormal, xf);
+    CollisionRotateColsTo(&q->contactOffset, q->contactOffset, &b->worldTransform);
+    CollisionRotateColsTo(&q->contactNormal, q->contactNormal, &b->worldTransform);
     for (int j = 0; j < g_CollisionScratchCount; j++)
-        Vec3TransformNormal(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
+        Vec3TransformNormal(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], &b->worldTransform);
     return hit;
 }
 
@@ -1963,33 +2022,40 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
 // frame of b over a's two history matrices is built with 0x00432260 into b+0x148, and the
 // box test runs with b as the first shape.  On a hit the contact is averaged and moved by
 // a's matrix; the query vectors and scratch points are always rotated back.
+// Near miss (809/852, same size, frame 0x18 and registers as retail).  As in HullVsHull the
+// rotations' product orders follow whether they read the matrix through xf or directly, and
+// contactCount is cleared after the relative frame is built.  Left: the zero-vector stores
+// and the contactCount store are scheduled into the neighbouring code in another order
+// (statement placement sweeps do not move them).
 int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
+    for (int i = 0; i < g_CollisionScratchCount; i++)
+        CollisionRotateRowsTo(&g_CollisionScratchPoints[i], g_CollisionScratchPoints[i], &a->worldTransform);
     const Matrix4* xf = &a->worldTransform;
-    for (int i = 0; i < g_CollisionScratchCount; i++) {
-        CollisionVec3 p = g_CollisionScratchPoints[i];
-        g_CollisionScratchPoints[i].x = p.x * xf->m[0][0] + p.z * xf->m[0][2] + p.y * xf->m[0][1];
-        g_CollisionScratchPoints[i].y = p.z * xf->m[1][2] + p.y * xf->m[1][1] + p.x * xf->m[1][0];
-        g_CollisionScratchPoints[i].z = p.z * xf->m[2][2] + p.y * xf->m[2][1] + p.x * xf->m[2][0];
-    }
-    q->contactOffset = CollisionRotateRows(CollisionVec3(-q->contactOffset.x, -q->contactOffset.y, -q->contactOffset.z), xf);
-    q->contactNormal = CollisionRotateRows(CollisionVec3(-q->contactNormal.x, -q->contactNormal.y, -q->contactNormal.z), xf);
-    q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
-    q->contactCount = 0;
+    CollisionRotateRowsNegated(&q->contactOffset, xf);
+    CollisionRotateRowsNegated(&q->contactNormal, &a->worldTransform);
+    CollisionVec3 zero;
+    zero.x = 0.0f;
+    zero.y = 0.0f;
+    zero.z = 0.0f;
+    q->contact = zero;
     CollisionRelativeFrame(&b->relativeFrame, &b->worldTransform, &a->bodyTransform, &a->prevBodyTransform);
 
-    int hit = 0;
-    if (TreeTreeQuery(b->pointTree, a->triangleTree, &b->worldTransform, xf, 2, a->vertices,
-                    &b->relativeFrame)) {
+    q->contactCount = 0;
+    int hit;
+    if (!TreeTreeQuery(b->pointTree, a->triangleTree, &b->worldTransform, xf, 2, a->vertices,
+                    &b->relativeFrame))
+        hit = 0;
+    else {
         hit = 1;
         float s = 1.0f / q->contactCount;
-        q->contact = CollisionVec3(q->contact.x * s, q->contact.y * s, q->contact.z * s);
-        q->contact = CollisionTransformPoint(q->contact, xf);
+        q->contact = CollisionScaled(q->contact, s);
+        CollisionTransformPointTo(&q->contact, q->contact, &a->worldTransform);
     }
-    q->contactOffset = CollisionRotateCols(CollisionVec3(-q->contactOffset.x, -q->contactOffset.y, -q->contactOffset.z), xf);
-    q->contactNormal = CollisionRotateCols(CollisionVec3(-q->contactNormal.x, -q->contactNormal.y, -q->contactNormal.z), xf);
+    Vec3TransformNormal(&q->contactOffset, -q->contactOffset, &a->worldTransform);
+    Vec3TransformNormal(&q->contactNormal, -q->contactNormal, &a->worldTransform);
     for (int j = 0; j < g_CollisionScratchCount; j++)
-        Vec3TransformNormal(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
+        Vec3TransformNormal(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], &a->worldTransform);
     return hit;
 }
 
