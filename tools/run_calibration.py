@@ -10912,6 +10912,15 @@ CASES = [
         'reason': 'writes vtable 0x55166c, releases texture +0x36d8',
     },
     {
+        'name': 'DebugOverlay.cpp DebugOverlay setup',
+        'bindings': 'src/reconstructed/DebugOverlay.bindings.json',
+        'source': 'src/reconstructed/DebugOverlay.cpp',
+        'symbol': '?Setup@DebugOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@HHH@Z',
+        'target_va': '0x00447de0',
+        'target_size': 174,
+        'reason': 'SetRenderContext, font metrics, LoadFont, then up to 64 0x98-byte rows; Release on failure',
+    },
+    {
         'name': 'DebugOverlay.cpp DebugOverlay set row',
         'bindings': 'src/reconstructed/DebugOverlay.bindings.json',
         'source': 'src/reconstructed/DebugOverlay.cpp',

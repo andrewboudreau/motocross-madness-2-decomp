@@ -1,5 +1,5 @@
 // DebugOverlay.cpp -- see DebugOverlay.h for the evidence. The font
-// builder 0x00447a00 and the set-up 0x00447de0 are near misses in
+// builder 0x00447a00 is a near miss in
 // samples/render/DebugOverlayNearMisses.cpp.
 
 #include <stdarg.h>
@@ -56,6 +56,37 @@ DebugOverlay::~DebugOverlay()
         fontTexture->Release();
         fontTexture = 0;
     }
+}
+
+// 0x00447de0. `i` is set before `y` takes `e`, so the two cannot share
+// a register: `e` stays in ebx until the loop, which then holds the row
+// colour there, and edi is saved only on the success path.
+DebugOverlay* DebugOverlay::Setup(RenderTarget* a, TextureMapManager* b,
+                                                  int c, int d, int e)
+{
+    GameObject::SetRenderContext(a);
+    fontHeight = c;
+    rowsTop = e;
+    rowsLeft = d;
+    textureManager = b;
+    if (LoadFont()) {
+        int i = 0;
+        int y = e;
+        do {
+            rows[i].y = y;
+            rows[i].bottom = lineHeight + y;
+            rows[i].x = d;
+            rows[i].right = 0x100;
+            rows[i].text[0] = 0;
+            rows[i].color = 0xffffff;
+            i++;
+            y += lineHeight;
+        } while (lineHeight + y <= 0x280 && i < 64);
+        rowLimit = i;
+        return this;
+    }
+    Release();
+    return 0;
 }
 
 void DebugOverlay::SetRowText(int row, const char* text, int flag)

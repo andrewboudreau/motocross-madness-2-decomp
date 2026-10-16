@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 1, b 143, c 107, total 251. The three class (a) functions of the
+Counts: a 1, b 143, c 106, total 250. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -202,7 +202,6 @@ scan calls "differs" can come from a reference VC6 duplicates into branches.
 | render/D3DIMSoulTree | `0x00444140` | 610/764 | b | retail sums low+high low-first in all components and forms +0x164 in edx after the +0x158 stores; VC6 sums y/z high-first and keeps `add ebp, 0x164`; zero-reset, declaration and Raise/Lower orders are worse |
 | render/D3DIMSoulTree | `0x00444560` | 355/1231 | b | frame 0x2c matches; instruction stream equals retail up to a register rotation (source ebx/ebp, `from` edi/ebx, `to` ebp/edi), 2 bytes shorter from the [ebp] disp8 |
 | render/DebugOverlay | `0x00447a00` | 79/989 | b | frame 0x26c matches; VC6 pushes ebp in the prologue and keeps `c` in ebp at the row head (retail: eax from its slot, ebp pushed only around the GDI section) |
-| render/DebugOverlay | `0x00447de0` | 66/174 | c | 13 code diffs: retail adds `push ebx`; retail lacks `push edi` |
 | render/DirectoryList | `0x0044a600` | 74/109 | c | 6 code diffs: `jne @31 ; mov al, byte ptr [esp + N]` vs `jne @32 ; mov eax, [esp + N]` |
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |

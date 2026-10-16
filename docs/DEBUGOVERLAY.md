@@ -31,9 +31,9 @@ including the 748-byte text drawer `0x00448200` and slot 14.
 3): Shadow's `$E` pairs end the previous unit, and its global follows
 Shadow's data.
 
-Near misses (`samples/render/DebugOverlayNearMisses.cpp`): the GDI glyph
-builder `0x00447a00` (`LoadFont`) and the set-up `0x00447de0`. Both differ in register
-assignment.
+Near miss (`samples/render/DebugOverlayNearMisses.cpp`): the GDI glyph
+builder `0x00447a00` (`LoadFont`), which differs in register assignment. The
+set-up `0x00447de0` matches once `i` is initialised before `y = e`.
 
 Not attributed: `0x00448560..0x00449e5f` has no source literal and no RTTI.
 It includes the TrackGame+0x33fc constructor `0x00448960` and the

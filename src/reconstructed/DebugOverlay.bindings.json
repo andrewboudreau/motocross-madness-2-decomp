@@ -26,5 +26,6 @@
   "__chkstk": "0x00535ed0",
   "__real@4@40078000000000000000": "0x00550760",
   "_strncpy": "0x00534b10",
-  "_vsprintf": "0x00535e71"
+  "_vsprintf": "0x00535e71",
+  "?Setup@DebugOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@HHH@Z": "0x00447de0"
 }

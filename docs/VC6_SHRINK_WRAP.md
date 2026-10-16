@@ -66,3 +66,10 @@ repository's COFF tools).
   writing each `break` out of its search loop as `return S_OK;`. Retail still
   has one exit block, because VC6 merges the identical returns after deciding
   where to push.
+- If retail saves a different register at entry than the reconstruction
+  (ebx at entry and edi late, against edi at entry), look for two locals
+  that VC6 put in one register because their lifetimes meet but do not
+  overlap. DebugOverlay `0x00447de0` copied a parameter into the row `y`
+  and then set the counter `i = 0`; VC6 gave both edi. Setting `i` first
+  keeps the parameter in ebx (which then holds the loop's constant colour)
+  and delays `push edi`, making the function exact.

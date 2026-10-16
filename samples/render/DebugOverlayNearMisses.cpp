@@ -10,21 +10,6 @@
 // head (retail reads it into eax once from its stack slot), which shifts the
 // frame by 4; retail shares the row pointer's slot with the v0 temporary.
 //
-// DebugOverlay::Setup (0x00447de0, 174 bytes): 66/171 by
-// position. Retail keeps the row colour 0xffffff in ebx inside the row loop
-// (and `e` in ebx before it, pushing edi late); VC6 here stores the
-// immediate and keeps `e` in edi. do/while, for, while(1), pointer rows,
-// a named colour local, an unsigned literal and an inline packer were
-// tried, and the colour spelled as RGB(255, 255, 255), shifted-byte ORs,
-// a DWORD cast, ~0xff000000 or 0xffffffff >> 8 (all fold to the immediate).
-// Also tried (tools/match.py scores; the form here scores 58), none
-// moving the colour into ebx: an inline row setter taking the colour as a
-// parameter (62), the colour in a local set before the 447a00 call (58),
-// returning 0 early on failure with the loop after it (61), and `e` itself
-// advanced as the row y (49).
-// Retail's late `push edi` should follow from that allocation: VC6 saves a
-// register only on the path that uses it (the PCVideoCard 0x004ca520
-// candidate pushes ebp inside its full-screen block).
 #include <windows.h>
 #include <string.h>
 
@@ -128,32 +113,4 @@ failed:
     return 0;
 }
 
-
-DebugOverlay* DebugOverlay::Setup(RenderTarget* a, TextureMapManager* b,
-                                                  int c, int d, int e)
-{
-    GameObject::SetRenderContext(a);
-    fontHeight = c;
-    rowsTop = e;
-    rowsLeft = d;
-    textureManager = b;
-    if (LoadFont()) {
-        int y = e;
-        int i = 0;
-        do {
-            rows[i].y = y;
-            rows[i].bottom = lineHeight + y;
-            rows[i].x = d;
-            rows[i].right = 0x100;
-            rows[i].text[0] = 0;
-            rows[i].color = 0xffffff;
-            i++;
-            y += lineHeight;
-        } while (lineHeight + y <= 0x280 && i < 64);
-        rowLimit = i;
-        return this;
-    }
-    Release();
-    return 0;
-}
 
