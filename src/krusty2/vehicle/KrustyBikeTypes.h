@@ -133,9 +133,9 @@ struct KbBikeMessage {
     short gatesPassed;  // +0x6  KrustyBike+0x790 gatesPassed (0x00492700)
     Vec3 position;                       // +0x08
     float roll, pitch, yaw;              // +0x14
-    int lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
+    float lastLapTime;  // +0x20  KrustyBike+0x74c lastLapTime (0x00492746)
     int field_0x24;
-    int fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
+    float fastestLap;  // +0x28  KrustyBike+0x750 fastestLap (0x00492719)
     int timeBehindLeader;  // +0x2C  KrustyBike+0x770 timeBehindLeader (0x00492737)
     Vec3 angularVelocity;                // +0x30 (y plus the turn rate)
     Vec3 velocity;                       // +0x3c

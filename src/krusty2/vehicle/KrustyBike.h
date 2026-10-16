@@ -122,8 +122,8 @@ public:
     KbRace* race;  // +0x740  loader race argument
     KbGhost* statusNode;  // +0x744  race status node (RaceView/BikeRace +0x744); its +0x44 track position is seeded from the start probe
     int finishTimeStamp;  // +0x748  RaceView +0x748 time stamp; 0x7ffffffe until finished
-    int lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time (float there)
-    int fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap" (float there)
+    float lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time; FormatLapTime (0x00518690) takes it as a float
+    float fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap"; FormatLapTime float
     float totalRunningTime;  // +0x754  RaceView +0x754: FLT_MAX until finished; ZoneReport "TotalrunningTime"
     float field_0x758; // 0x758
     int tagRun;  // +0x75C  RaceView +0x75c: current run as the followed racer in tag (mode 4)
