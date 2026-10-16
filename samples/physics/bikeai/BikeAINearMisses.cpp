@@ -1644,7 +1644,7 @@ int KrustyBike::Fn_00413200(float dt)
                           &bodyForward, &bodyUp, dt, dt, race->raceTerrain, &airborneOut,
                           &impact, probeSegment, &lookAheadFrontTravel, &lookAheadRearTravel,
                           &frontWheel->inContact, &rearWheel->inContact, &aiPath,
-                          g_BikeAISpeedTable_00566f74[field_0x79c], field_0x824, field_0x11b0);
+                          g_BikeAISpeedTable_00566f74[engineClass], field_0x824, field_0x11b0);
     worldAngularVelocity = -CrossProduct(field_0x7e0 - velocity, bodyForward) * 0.2857f;
     angularVelocity = modelNode->WorldToLocalDirection(worldAngularVelocity);
     linearSpeed = BikeAILength(velocity);
@@ -1818,31 +1818,31 @@ int KrustyBike::Fn_00414370(float dt)
         if (kind != 1 && kind != 5) {
             aiPath.count = 1;
             Vec3 d;
-            d = Vec3(field_0x818 - position.x, field_0x81c - position.y, field_0x820 - position.z);
+            d = Vec3(roamTargetX - position.x, roamTargetY - position.y, roamTargetZ - position.z);
             d.y = 0.0f;
             if (d.x * d.x + d.z * d.z < 2500.0f) {
                 d.x = rand() * (1.0f / 32768.0f);
                 d.y = 0.0f;
                 d.z = rand() * (1.0f / 32768.0f);
                 d = BikeAINormalizeInline(d) * 444.0f * terrain->worldScale;
-                field_0x818 = terrain->worldScale * 666.66f + d.x;
-                field_0x81c = 0.0f;
-                field_0x820 = terrain->worldScale * 666.66f + d.z;
+                roamTargetX = terrain->worldScale * 666.66f + d.x;
+                roamTargetY = 0.0f;
+                roamTargetZ = terrain->worldScale * 666.66f + d.z;
             } else {
-                aiPath.points[0].x = field_0x818;
-                aiPath.points[0].y = field_0x81c;
-                aiPath.points[0].z = field_0x820;
+                aiPath.points[0].x = roamTargetX;
+                aiPath.points[0].y = roamTargetY;
+                aiPath.points[0].z = roamTargetZ;
             }
             aiPath.field_0x96c = 1000.0f;
             aiPath.field_0x970 = field_0x7cc;
             aiPath.lookAhead = linearSpeed * 0.25f;
-            field_0x15dc = race->aiStuntChance3;
+            aiStuntChance = race->aiStuntChance3;
             if (difficulty == 3)
-                trickDelay = field_0x7d8;
+                trickDelay = trickDelay3;
             else if (difficulty == 2)
-                trickDelay = field_0x7d4;
+                trickDelay = trickDelay2;
             else if (difficulty == 1)
-                trickDelay = field_0x7d0;
+                trickDelay = trickDelay1;
         } else {
             if (hasFinished) {
                 startRunUpTime += dt;
@@ -2055,22 +2055,22 @@ int KrustyBike::Fn_00414370(float dt)
         else
             field_0x11b0 = 0;
     }
-    if (field_0x15e4 && !(trickDelay > field_0x7dc)) {
+    if (aiTricksEnabled && !(trickDelay > trickTimer)) {
         if (!field_0x430 && airborne) {
             PredictLanding(position, velocity, &predictedLandingTime, 0, 0, (Terrain*)terrain);
-            if (BikeAIRandUnit() * 100.0f <= field_0x15dc) {
+            if (BikeAIRandUnit() * 100.0f <= aiStuntChance) {
                 for (n = 5.0f; n >= 1.0f; n -= 1.0f) {
                     if (Fn_0048D780(&field_0x15d4, predictedLandingTime / n - 0.5f, 0))
                         break;
                 }
                 if (n > 0.0f) {
                     Fn_0048D910(field_0x15d4);
-                    field_0x7dc = 0;
+                    trickTimer = 0;
                 }
             }
         }
     } else {
-        field_0x7dc += dt;
+        trickTimer += dt;
     }
 done:
     if (list)

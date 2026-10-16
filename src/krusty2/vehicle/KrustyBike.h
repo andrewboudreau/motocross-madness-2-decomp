@@ -142,7 +142,7 @@ public:
     int gatesPassed;  // +0x790  RaceView +0x790 gates passed
     int field_0x794; // 0x794
     int field_0x798; // 0x798
-    int field_0x79c; // 0x79C  0, 1 or 2 from +0x738 (loader)
+    int engineClass;  // +0x79C loader: 0 for engineSize <= 125, 1 below 500, else 2; BikeAI indexes its speed table (0x00566f74) with it
     short lapCount;  // +0x7A0  RaceView/BikeRace +0x7a0 laps
     short field_0x7a2; // 0x7A2
     char hasFinished;  // +0x7A4  RaceView +0x7a4 finished (BikeRace racer +0x7a4 finished)
@@ -158,10 +158,10 @@ public:
     float field_0x7c4; // 0x7C4  loader constants 1.1, 1.3, 1.5, 25, 15, 5, 0 (tier 3 purpose)
     float field_0x7c8; // 0x7C8
     float field_0x7cc; // 0x7CC
-    float field_0x7d0; // 0x7D0
-    float field_0x7d4; // 0x7D4
-    float field_0x7d8; // 0x7D8
-    float field_0x7dc; // 0x7DC
+    float trickDelay1;  // +0x7D0 loader 25.0; BikeAI's delay between AI tricks at difficulty 1
+    float trickDelay2;  // +0x7D4 loader 15.0; BikeAI's delay between AI tricks at difficulty 2
+    float trickDelay3;  // +0x7D8 loader 5.0; BikeAI's delay between AI tricks at difficulty 3
+    float trickTimer;  // +0x7DC time since the last AI trick: BikeAI adds dt, clears it on a trick, and rolls for one once it reaches the delay
     Vec3 field_0x7e0; // 0x7E0
     Vec3 field_0x7ec; // 0x7EC
     float lookAheadFrontTravel;  // +0x7F8  front suspension travel of the look-ahead model (0x00413200)
@@ -170,12 +170,12 @@ public:
     float field_0x804; // 0x804
     float field_0x808; // 0x808
     float startRunUpTime;  // +0x80C  seconds of the start-gate run-up (0x00414370)
-    char field_0x810; // 0x810  set with +0x15e4 for a local (+0x734) bike
+    char field_0x810; // 0x810  set with aiTricksEnabled for an AI (aiKind) bike, cleared otherwise
     char pad_0x0811[0x3];
     float contactTime;  // +0x814  seconds with the collision object in contact (0x00413200)
-    float field_0x818; // 0x818  3000.0f (local bike)
-    float field_0x81c; // 0x81C
-    float field_0x820; // 0x820  3000.0f (local bike)
+    float roamTargetX;  // +0x818 BikeAI's free-ride target (x); 3000.0 from the loader for an AI bike, re-picked at random within 50 units
+    float roamTargetY;  // +0x81C BikeAI's free-ride target (y, 0 when re-picked)
+    float roamTargetZ;  // +0x820 BikeAI's free-ride target (z); 3000.0 from the loader for an AI bike
     float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
     Vec3 predictedLandingNormal;  // +0x828  ground normal under the predicted landing (0x00413200)
     float predictedLandingTime;  // +0x834  predicted time to landing (PredictLanding 0x0040e370)
@@ -237,9 +237,9 @@ public:
     float shortMessageTimer;  // +0x15D0  seconds since the last short message (0x00492ad0); starts at shortNetPacketIntervalSec
     int field_0x15d4; // 0x15D4
     void* field_0x15d8; // 0x15D8  loader argument 30
-    float field_0x15dc; // 0x15DC  KbRace +0x9c/+0xa0/+0xa4 by game type, else 2.0 (local bike)
+    float aiStuntChance;  // +0x15DC KbRace aiStuntChance1/2/3 by difficulty (2.0 outside event type 0) for an AI bike; BikeAI tricks when rand*100 <= it
     CollisionObject* probeSegment;  // +0x15E0  AI bike's vertical probe segment (0,4,0)-(0,-1,0)
-    char field_0x15e4; // 0x15E4  set for a local bike
+    char aiTricksEnabled;  // +0x15E4 the loader sets it for an AI bike (aiKind) and clears it otherwise; gates BikeAI's trick roll
     char field_0x15e5; // 0x15E5
     char field_0x15e6; // 0x15E6
     char pad_0x15E7[0x1];

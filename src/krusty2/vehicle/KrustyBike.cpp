@@ -535,7 +535,7 @@ void KrustyBike::UnknownVirtualSlot96()
 // Slot 28 (0x0048da50): per-frame hook.  In mode 4 (tier 3: a spectator/replay mode) it
 // re-targets the session's player record onto this bike, then runs the base update and,
 // while airborne (field_0x444 set, field_0x5b4 clear), jitters the two 0x7ac/0x7b0
-// accumulators with random noise (0.15 scale for the field_0x734 variant, 0.667 otherwise).
+// accumulators with random noise (0.15 scale for an aiKind bike, 0.667 otherwise).
 int KrustyBike::UnknownVirtualSlot28(int a)
 {
     lastCollisionType = 0;
@@ -1634,10 +1634,10 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     field_0x7c4 = 1.1f;
     field_0x7c8 = 1.3f;
     field_0x7cc = 1.5f;
-    field_0x7d0 = 25.0f;
-    field_0x7d4 = 15.0f;
-    field_0x7d8 = 5.0f;
-    field_0x7dc = 0;
+    trickDelay1 = 25.0f;
+    trickDelay2 = 15.0f;
+    trickDelay3 = 5.0f;
+    trickTimer = 0;
     inputMap = map;
     this->netId = netId;
     if (kind == 0xff) {
@@ -1896,30 +1896,30 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     firstPacketLatch = 1;
     lastTimeReceived = 0;
     if (engineSize <= 125)
-        field_0x79c = 0;
+        engineClass = 0;
     else if (engineSize < 500)
-        field_0x79c = 1;
+        engineClass = 1;
     else
-        field_0x79c = 2;
+        engineClass = 2;
 
     if (aiKind) {
-        field_0x15e4 = 1;
+        aiTricksEnabled = 1;
         field_0x810 = 1;
         if (g_kbGame->eventType == 0) {
             switch (g_kbGame->difficulty) {
             case 3:
             case 4:
-                field_0x15dc = this->race->aiStuntChance3;
+                aiStuntChance = this->race->aiStuntChance3;
                 break;
             case 1:
-                field_0x15dc = this->race->aiStuntChance1;
+                aiStuntChance = this->race->aiStuntChance1;
                 break;
             case 2:
-                field_0x15dc = this->race->aiStuntChance2;
+                aiStuntChance = this->race->aiStuntChance2;
                 break;
             }
         } else {
-            field_0x15dc = 2.0f;
+            aiStuntChance = 2.0f;
         }
         int prevTag = g_MemTagStack->Push("Collision");
         probeSegment = new(__FILE__, 0x82f) CollisionObject(1);
@@ -1939,9 +1939,9 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
         g_MemTagStack->Pop(prevTag);
         startRunUpTime = 0;
         contactTime = 0;
-        field_0x818 = 3000.0f;
-        field_0x820 = 3000.0f;
-        field_0x81c = 0;
+        roamTargetX = 3000.0f;
+        roamTargetZ = 3000.0f;
+        roamTargetY = 0;
         if (g_kbGame->eventType != 5 && g_kbGame->eventType != 1)
             field_0x824 = KbRandUnit() * 14.0f - 7.0f;
         else
@@ -1949,7 +1949,7 @@ GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoa
     } else {
         probeSegment = 0;
         field_0x810 = 0;
-        field_0x15e4 = 0;
+        aiTricksEnabled = 0;
     }
 
     // Retail keeps a dead `cmp g_kbGame->field_0x2d74, 0` here: two arms that store the
