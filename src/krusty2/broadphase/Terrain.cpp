@@ -550,7 +550,7 @@ int Terrain::GameObjectVirtualSlot14()
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
         ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
         ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, detailTexture->textureSurface);
-        if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), detailTexture))
+        if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)field_0x18), detailTexture))
             return 0;
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
     } else {
@@ -560,14 +560,14 @@ int Terrain::GameObjectVirtualSlot14()
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
             ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 1, 0);
-            heightField->UnknownFunction480900(((TerrainRenderTarget*)field_0x18));
+            heightField->DrawVisible(((TerrainRenderTarget*)field_0x18));
             ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
         } else {
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
             ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
-            heightField->UnknownFunction480900(((TerrainRenderTarget*)field_0x18));
+            heightField->DrawVisible(((TerrainRenderTarget*)field_0x18));
         }
         if (!g_terrainGame->softwareRendering && detailTexture && g_terrainQualityValue) {
             detailTexture->UnknownVirtualSlot11();
@@ -580,7 +580,7 @@ int Terrain::GameObjectVirtualSlot14()
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, 2);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, 1);
-            if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), detailTexture))
+            if (!heightField->DrawVisibleWithDetail(((TerrainRenderTarget*)field_0x18), detailTexture))
                 return 0;
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);

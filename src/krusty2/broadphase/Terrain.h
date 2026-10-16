@@ -173,8 +173,8 @@ public:
     // 0x00480900 (ret 4) / 0x00480920 (ret 8): DrawableGridNode draw entry points
     // (src/reconstructed/Griddraw.h).  Terrain slot 14 passes the render target and, for the
     // detail passes, the detail texture; a zero result makes slot 14 return 0 (tier 3 roles).
-    int UnknownFunction480900(void* target);
-    int UnknownFunction480920(void* target, TerrainSurfaceBase* texture);
+    int DrawVisible(void* target);
+    int DrawVisibleWithDetail(void* target, TerrainSurfaceBase* texture);
 
     // Members read by Terrain::CastSegment (tier 2 offsets, tier 3 names).
     void* cellTable;                                           // +0x04 cell table read by 0x00483910

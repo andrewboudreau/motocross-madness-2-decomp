@@ -629,14 +629,14 @@ int DrawableGridNode::AppendCornerTriangle(int n, int x, int z, int dx, int dz)
     return n + 1;
 }
 
-// 0x00480900
-int DrawableGridNode::UnknownFunction480900(void* target)
+// 0x00480900: draws the whole grid, DrawVisibleQuadrants(target, 0, 0, 16, 0, 0)
+int DrawableGridNode::DrawVisible(void* target)
 {
     return DrawVisibleQuadrants(target, 0, 0, 16, 0, 0);
 }
 
-// 0x00480920
-int DrawableGridNode::UnknownFunction480920(void* target, int a5)
+// 0x00480920: the same walk with the detail-pass argument (Terrain slot 14 passes its detail texture)
+int DrawableGridNode::DrawVisibleWithDetail(void* target, int a5)
 {
     return DrawVisibleQuadrants(target, 0, 0, 16, 0, a5);
 }
