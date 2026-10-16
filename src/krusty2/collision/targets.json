@@ -948,5 +948,15 @@
     "expect": "exact",
     "notes": "Exact with header-shaped inline helpers: a dot grouped z + (x + (y)) at both expanded sites, the cross product with parenthesised products, operators returning through the out-of-line constructor 0x00404e60 (inline budget), c + t*f with c first, the branch-2 normalisation as v * (1/len) inside a division helper, and tangentSpeed = 0 stored before the w = c copies (otherwise VC6 caches 0 in edi).",
     "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "QuadTreeObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTreeObject@@",
+    "target_va": "0x00434ce0",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "slot 1 inline in CollisionObject.h (ret 4, returns 15); its COMDAT lies among CollisionObject.cpp's functions, where the QuadTreeObject vtable is emitted too",
+    "bindings": "CollisionObject.bindings.json"
   }
 ]

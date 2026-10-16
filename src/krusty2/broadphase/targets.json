@@ -768,5 +768,15 @@
     "expect": "exact",
     "notes": "slot 14 (vtable 0x0055825c): dual-texture probe (DriverInfo registry keys / ValidateDevice), height-field draw passes, render-state restore, profile page. Exact with field_0x18 cast at every use (a cached local or inline accessor breaks VC6's tail merge of the single-pass branch).",
     "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "QuadTreeObject",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot0@QuadTreeObject@@",
+    "target_va": "0x004dc610",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 0 of QuadTreeObject and the six vtables that inherit it: returns short -1 (or ax, 0xffff); placed just before Quadtree.cpp's first function",
+    "bindings": "Quadtree.bindings.json"
   }
 ]

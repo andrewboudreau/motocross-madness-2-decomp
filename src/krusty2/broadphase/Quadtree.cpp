@@ -9,6 +9,11 @@ extern "C" void qsort(void* base, unsigned int num, unsigned int width,
 QuadTree* g_pQuadTree;
 float g_quadTreeInvScale;
 
+short QuadTreeObject::UnknownVirtualSlot0()
+{
+    return -1;
+}
+
 QuadTreeNode* QuadTree::UnknownVirtualSlot1()
 {
     return new(__FILE__, 0x7a) QuadTreeNode;
