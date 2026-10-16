@@ -68,10 +68,10 @@ int PCTextureMap::LoadSurface(UnknownTextureStream* stream, int width, int heigh
     UnknownSurfaceDesc desc;
     int sourceFormat = DecodedFormat(fileFormat);
     if (choice) {
-        format = IsFormat4444Or8888(format) ? choice->field_0x10 : choice->field_0x0c;
-        field_0x6c = choice->field_0x14;
+        format = IsFormat4444Or8888(format) ? choice->alphaFormat : choice->opaqueFormat;
+        halvings = choice->halvings;
     } else {
-        field_0x6c = 0;
+        halvings = 0;
     }
     void* buffer = ownerManager->GrowScratchBuffer(LargerPixelSize(sourceFormat, format) * width * height);
     if (!buffer)
@@ -82,7 +82,7 @@ int PCTextureMap::LoadSurface(UnknownTextureStream* stream, int width, int heigh
     if (HasMipLevels(fileFormat)) {
         int levelWidth = width;
         if (choice) {
-            for (int i = 0; i < choice->field_0x14 && levelWidth > 32; i++) {
+            for (int i = 0; i < choice->halvings && levelWidth > 32; i++) {
                 levelWidth >>= 1;
                 height >>= 1;
             }
@@ -214,7 +214,7 @@ int PCTextureMap::LoadSurface(UnknownTextureStream* stream, int width, int heigh
             return 0;
     }
     if (choice) {
-        int count = choice->field_0x14;
+        int count = choice->halvings;
         while (width > 32 && count--) {
             if (Downsample(buffer, bits, width / 2, height / 2, width / 2, width, 1, sourceFormat,
                                       palette, 2)) {

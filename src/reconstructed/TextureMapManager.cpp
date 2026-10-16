@@ -333,10 +333,10 @@ void TextureMapManager::CountTextureMemory() {
             }
             if (texture->textureWidth == 256)
                 count256++;
-            kind |= texture->textureWidth > texture->field_0x1c;
+            kind |= texture->textureWidth > texture->minimumMipSize;
             kind |= PixelFormatBytesPerPixel(texture->mapFormat) == 1 ? 8 : 0;
             int pixels = 0;
-            for (int width = texture->textureWidth, height = texture->textureHeight; width >= texture->field_0x1c;
+            for (int width = texture->textureWidth, height = texture->textureHeight; width >= texture->minimumMipSize;
                  width /= 2, height /= 2)
                 pixels += height * width;
             bytes += PixelFormatBytesPerPixel(texture->mapFormat) * pixels;

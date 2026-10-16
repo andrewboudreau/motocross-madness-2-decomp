@@ -875,7 +875,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
         localRacer->fastestLap = bestGhostLength;
     g_TrackGame->ui->StepProgressBar();
 
-    UnknownBikeNumberPainter* painter = new(__FILE__, 0x367) UnknownBikeNumberPainter(textures->field_0x00);
+    UnknownBikeNumberPainter* painter = new(__FILE__, 0x367) UnknownBikeNumberPainter(textures->manager);
     if (g_TrackGame->playingReplay) {
         painter->PaintNumber(localRacer->modelNode, localRacer->plateNumber);
         for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++)
