@@ -153,7 +153,7 @@ void UnknownControlBinding::Adjust(float delta) {
 // 0x0043cde0: asks the owning device to drop bindings with this id.
 void UnknownControlBinding::Unbind() {
     if (g_TrackGame->controlInterface && owner)
-        owner->UnknownVirtualSlot0(bindingId);
+        owner->RemoveBindings(bindingId);
 }
 
 // 0x0043ce00
@@ -197,12 +197,12 @@ void ControlInterface::QueueEvent(int control, int kind, int pressed, int device
 int ControlInterface::DispatchInput(int value) {
     queuedEventCount = 0;
     if (keyboard)
-        keyboard->UnknownVirtualSlot6(value);
+        keyboard->Update(value);
     if (mouse)
-        mouse->UnknownVirtualSlot6(value);
+        mouse->Update(value);
     for (int i = 0; i < 8; i++) {
         if (joysticks[i])
-            joysticks[i]->UnknownVirtualSlot20(value);
+            joysticks[i]->Update(value);
     }
     for (int j = 0; j < queuedEventCount; j++) {
         UnknownControlEvent* event = &events[j];

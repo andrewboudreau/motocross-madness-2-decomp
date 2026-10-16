@@ -75,30 +75,30 @@ public:
     explicit PCJoystickDevice(int index); // 0x004c2770
     virtual ~PCJoystickDevice();          // 0x004c28d0 (deleting wrapper 0x004c28b0)
 
-    virtual int UnknownVirtualSlot3(int index, float* angle);
-    virtual int UnknownVirtualSlot4(int index, float* x, float* y);
-    virtual int UnknownVirtualSlot5(int enable);
-    virtual int UnknownVirtualSlot6(int effect, long magnitude, unsigned long duration);
-    virtual int UnknownVirtualSlot7(int effect, long* direction, long magnitude);
-    virtual int UnknownVirtualSlot8(int effect, long* direction);
-    virtual int UnknownVirtualSlot9(int effect, unsigned long duration, long direction,
-                                    long magnitude, unsigned long attackTime,
-                                    unsigned long attackLevel, unsigned long fadeTime,
-                                    unsigned long fadeLevel, int button);
-    virtual int UnknownVirtualSlot10(int effect, unsigned long duration, unsigned long period,
-                                     unsigned long magnitude, unsigned long attackTime,
+    virtual int GetPovAngle(int index, float* angle);
+    virtual int GetPovDirection(int index, float* x, float* y);
+    virtual int SetAutoCenter(int enable);
+    virtual int CreateConstantForce(int effect, long magnitude, unsigned long duration);
+    virtual int SetConstantForce(int effect, long* direction, long magnitude);
+    virtual int SetDirection(int effect, long* direction);
+    virtual int CreateEnvelopedForce(int effect, unsigned long duration, long direction,
+                                     long magnitude, unsigned long attackTime,
                                      unsigned long attackLevel, unsigned long fadeTime,
                                      unsigned long fadeLevel, int button);
-    virtual int UnknownVirtualSlot11(int effect);
-    virtual int UnknownVirtualSlot12(int effect, unsigned long iterations, unsigned long flags);
-    virtual int UnknownVirtualSlot13(int effect);
-    virtual int UnknownVirtualSlot14(UnknownEffectInfo* effects, int* count);
-    virtual void UnknownVirtualSlot15();
-    virtual int UnknownVirtualSlot16();
-    virtual int UnknownVirtualSlot17(int command);
-    virtual int UnknownVirtualSlot18(int paused);
-    virtual void UnknownVirtualSlot19();
-    virtual int UnknownVirtualSlot20(int value);
+    virtual int CreateSquareWave(int effect, unsigned long duration, unsigned long period,
+                                 unsigned long magnitude, unsigned long attackTime,
+                                 unsigned long attackLevel, unsigned long fadeTime,
+                                 unsigned long fadeLevel, int button);
+    virtual int StopEffect(int effect);
+    virtual int StartEffect(int effect, unsigned long iterations, unsigned long flags);
+    virtual int IsEffectPlaying(int effect);
+    virtual int EnumEffects(UnknownEffectInfo* effects, int* count);
+    virtual void ReleaseEffects();
+    virtual int ResetForceFeedback();
+    virtual int SendForceFeedbackCommand(int command);
+    virtual int PauseForceFeedback(int paused);
+    virtual void DetectSubtype();
+    virtual int Update(int value);
 
     // 0x004c2930: opens the device described by `instance`.
     int OpenDevice(const UnknownDeviceInstance* instance);

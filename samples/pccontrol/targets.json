@@ -2,7 +2,7 @@
   {
     "class": "PCKeyboardDevice",
     "vtable_slot": 3,
-    "candidate_symbol_contains": "UnknownVirtualSlot3@PCKeyboardDevice",
+    "candidate_symbol_contains": "DetectSubtype@PCKeyboardDevice",
     "target_va": "0x00464e90",
     "target_size": 1,
     "confidence": "high-body-low-name",

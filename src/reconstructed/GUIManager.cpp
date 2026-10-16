@@ -830,8 +830,8 @@ void GUIInputDevice::Rebind() {
     if (!inputDevice)
         return;
     if (inputDevice->deviceKind == 2 || inputDevice->deviceKind == 1) {
-        inputDevice->UnknownVirtualSlot0(bindingX.bindingId);
-        inputDevice->UnknownVirtualSlot0(bindingY.bindingId);
+        inputDevice->RemoveBindings(bindingX.bindingId);
+        inputDevice->RemoveBindings(bindingY.bindingId);
     }
     rangeX = rangeMaxX;
     rangeY = rangeMaxY;

@@ -79,11 +79,11 @@ int PCControlInterface::UnknownVirtualSlot1() {
     keyboard = new(__FILE__, 107) PCKeyboardDevice;
     if (!keyboard)
         return 0;
-    keyboard->UnknownVirtualSlot2();
+    keyboard->CreateDevice();
     mouse = new(__FILE__, 114) PCMouseDevice;
     if (!mouse)
         return 0;
-    mouse->UnknownVirtualSlot2();
+    mouse->CreateDevice();
     joystickCount = 0;
     directInput->EnumDevices(DIDEVTYPE_JOYSTICK, EnumJoystickCallback, this, DIEDFL_ATTACHEDONLY);
     if (!joystickCount)
@@ -125,11 +125,11 @@ void PCControlInterface::SetDevicesAcquired(int acquire) {
 
 // 0x004bf560: `control` on the keyboard, the active joystick or the mouse.
 int PCControlInterface::UnknownVirtualSlot2(int control, int modifier) {
-    if (keyboard && keyboard->UnknownVirtualSlot4(control, modifier, 0))
+    if (keyboard && keyboard->IsControlDown(control, modifier, 0))
         return 1;
     if (joysticks[activeJoystickIndex] && joysticks[activeJoystickIndex]->GetControlState(control, modifier, 0))
         return 1;
-    if (mouse && mouse->UnknownVirtualSlot4(control, modifier, 0))
+    if (mouse && mouse->IsControlDown(control, modifier, 0))
         return 1;
     return 0;
 }

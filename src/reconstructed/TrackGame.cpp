@@ -362,7 +362,7 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
                 return 0;
         }
         if (event->kind == 0 && event->control == 0x1d &&
-            controlInterface->keyboard->UnknownVirtualSlot5(0x45, 0x3f, 0) && ui) {
+            controlInterface->keyboard->IsButtonDown(0x45, 0x3f, 0) && ui) {
             if (network)
                 goto handled;
             goto toggle;

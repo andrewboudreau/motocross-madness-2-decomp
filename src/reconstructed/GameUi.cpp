@@ -5297,8 +5297,8 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     if (ownerDialog->guiUser->UsesEventDevice(event)) {
         if (event->kind == 0) {
             if (keyBind && keyBind == event->control &&
-                !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
-                !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0) &&
+                !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x2a, 0x3f, 0) &&
+                !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x36, 0x3f, 0) &&
                 IsEnabled() && shown) {
                 ownerDialog->guiUser->RequestHover((UnknownGuiControl*)this, 0, 1);
                 ButtonDown(0, 0);

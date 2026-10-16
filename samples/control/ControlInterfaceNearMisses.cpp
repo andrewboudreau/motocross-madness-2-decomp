@@ -41,16 +41,16 @@ int PCControlInterface::UnknownVirtualSlot3(int control, int kind, int modifier,
     switch (kind) {
     case 0:
         if (keyboard)
-            return keyboard->UnknownVirtualSlot5(control, modifier, 0);
+            return keyboard->IsButtonDown(control, modifier, 0);
         break;
     case 1:
         if (mouse)
-            return mouse->UnknownVirtualSlot5(control, modifier, 0);
+            return mouse->IsButtonDown(control, modifier, 0);
         break;
     case 2:
     case 3:
         if (joysticks[device])
-            return joysticks[device]->UnknownVirtualSlot2(control, modifier, 0);
+            return joysticks[device]->IsButtonDown(control, modifier, 0);
         break;
     }
     return 0;

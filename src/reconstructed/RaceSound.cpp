@@ -809,7 +809,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     if (!event->kind) {
         switch (event->control) {
         case 0x2f:
-            if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2f, 12, 0))
+            if (!g_TrackGame->controlInterface->keyboard->IsButtonDown(0x2f, 12, 0))
                 break;
             if (!eaxEnabled) {
                 environment.environment = 9;
@@ -829,7 +829,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             SoundSystem()->SetEAXListenerParameters(&environment);
             break;
         case 0x2e:
-            if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
+            if (!g_TrackGame->controlInterface->keyboard->IsButtonDown(0x2e, 12, 0))
                 break;
             if (g_TrackGame->mode.raceSettings.eventType != 3)
                 break;
@@ -856,7 +856,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 crowdSounds->SetMemberVolume(musicVolume);
             return 1;
         case 0x1f:
-            if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))
+            if (!g_TrackGame->controlInterface->keyboard->IsButtonDown(0x1f, 12, 0))
                 break;
             g_TrackGame->mode.soundOn = !g_TrackGame->mode.soundOn;
             if (g_TrackGame->mode.soundOn) {

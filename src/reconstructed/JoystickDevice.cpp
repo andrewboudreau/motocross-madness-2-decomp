@@ -23,7 +23,7 @@ JoystickDevice::~JoystickDevice() {}
 // has no retail body of its own.
 // 0x00489980: with a keyboard, `modifier` must hold on it; without one,
 // only "none" (0, 0x80000000 or 0x3f) is accepted.
-int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry) {
+int JoystickDevice::IsButtonDown(int button, int modifier, UnknownInputEntry* entry) {
     KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
     if (((keyboard && keyboard->ModifierHolds(modifier)) ||
          (!keyboard && (modifier == 0 || modifier == (int)0x80000000 || modifier == 0x3f))) &&
@@ -72,7 +72,7 @@ int JoystickDevice::AttachAxisBinding(UnknownControlBinding* binding, float step
 }
 
 // 0x00489b70: drops every binding with id `id`.
-void JoystickDevice::UnknownVirtualSlot0(int id) {
+void JoystickDevice::RemoveBindings(int id) {
     for (int axis = 0; axis < 6; axis++) {
         for (int i = 0; i < axisBindings[axis].m_count; i++) {
             UnknownControlBinding* binding = axisBindings[axis].Get(i);
@@ -150,7 +150,7 @@ int JoystickDevice::GetControlState(int control, int modifier, UnknownInputEntry
     mapping->GetJoystickButton(control, &control, joystickIndex);
     if (control == -1)
         return 0;
-    return UnknownVirtualSlot2(control, modifier, entry);
+    return IsButtonDown(control, modifier, entry);
 }
 
 // 0x00489e20: the current value of `axis`. Only OptionProcs.cpp's controls

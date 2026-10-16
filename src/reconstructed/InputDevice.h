@@ -9,7 +9,7 @@ class InputDevice {
 public:
     explicit InputDevice(int id); // 0x00489780
 
-    virtual void UnknownVirtualSlot0(int id) = 0; // drops bindings by id
+    virtual void RemoveBindings(int id) = 0; // drops bindings by id
     virtual ~InputDevice();       // 0x004897d0 (deleting wrapper 0x004897b0)
 
     int IsDeviceSubtype(int value); // 0x004897e0

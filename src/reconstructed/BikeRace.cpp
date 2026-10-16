@@ -206,7 +206,7 @@ int BikeRace::UnknownVirtualSlot16(int value) {
     GameObject::UnknownVirtualSlot16(value);
     JoystickDevice* joystick = g_TrackGame->controlInterface->activeJoystick;
     if (joystick != 0 && g_TrackGame->mode.joystickOn) {
-        joystick->UnknownVirtualSlot18(value);
+        joystick->PauseForceFeedback(value);
     }
     return 1;
 }
@@ -855,8 +855,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         case 0x35:
             if (g_TrackGame->playerCount > 1) {
                 KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
-                if (!keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
-                    !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0)) {
+                if (!keyboard->IsButtonDown(0x2a, 0x3f, 0) &&
+                    !g_TrackGame->controlInterface->keyboard->IsButtonDown(0x36, 0x3f, 0)) {
                     if (g_TrackGame->mode.chatInputLine == 2) {
                         break;
                     }

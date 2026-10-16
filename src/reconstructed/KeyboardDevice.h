@@ -12,12 +12,12 @@ public:
     // (member and base destructors, no vptr store; wrapper 0x00489f00).
     KeyboardDevice();             // 0x00489e30
 
-    virtual void UnknownVirtualSlot0(int id);  // 0x0048a030
-    virtual int UnknownVirtualSlot2() = 0;
-    virtual void UnknownVirtualSlot3() = 0;
-    virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry) = 0;
-    virtual int UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry) = 0;
-    virtual int UnknownVirtualSlot6(int value) = 0;
+    virtual void RemoveBindings(int id);  // 0x0048a030
+    virtual int CreateDevice() = 0;
+    virtual void DetectSubtype() = 0;
+    virtual int IsControlDown(int control, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int IsButtonDown(int key, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int Update(int value) = 0;
 
     // 0x00489f80: attaches `binding` to the keys `key` and `key2` with a
     // repeat step and interval (DeviceSetup.cpp 0x00448d30).
