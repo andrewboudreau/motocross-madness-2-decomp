@@ -72,19 +72,19 @@ extern Vec3 g_kbZeroVec;
 
 // Object reached through the global at 0x0056E26C (game/session singleton).
 struct KbTrackRec { Vec3 field_0x00; char pad_0x0C[0xC]; };
-struct KbMode { char pad_0x00[0x94]; int Fn_00524100(); };
+struct KbMode { char pad_0x00[0x94]; int GetSelectedSeries(); };
 struct KbGameCfg {
     char pad_0x0000[0x10]; int field_0x10;
     // 0x004AC830 (Net.cpp): send a message (type, data, size, destination id, flags); returns 1 on success.
     int Send(int type, void* data, int size, int dest, int flags);
 };
 // Object behind KrustyBike+0x13fc (tier 3); 0x004E8720 appends a record (type, id, data, flag).
-struct KbRecorder { int Fn_004E8720(int type, int id, void* data, int flag); };
+struct KbRecorder { int QueueRecord(int type, int id, void* data, int flag); };
 // Entity-level view used for the id at +0x11bc of any bike (tier 3, offset confirmed by decoded loads).
 struct KbCell { char pad_0x00[8]; float field_0x8; char pad_0xc[4]; float field_0x10; };
 struct KbNetBike {
     char pad_0x0000[0x11bc];
-    int field_0x11bc;
+    int netId;  // +0x11BC  KrustyBike::netId seen through the entity view
     char pad_0x11c0[8];
     KbCell* field_0x11c8;
     KbCell* field_0x11cc;
@@ -381,7 +381,7 @@ struct KbRaceHandler {
     void ReportTrickScore(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
 };
 // Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
-struct KbScoreBoard { void Fn_0048D1E0(float angle, float multiplier); };
+struct KbScoreBoard { void ShowValue(float angle, float multiplier); };
 // Object at KbGame+0x3444 (bonus rules; packed: its ints sit at odd offsets).
 #pragma pack(push, 1)
 struct KbBonusTable {
@@ -407,65 +407,65 @@ struct KbTrackItem {
 // The race's Track (src/reconstructed/Track.h; tier 3 view): field_0x0 is the start node.
 // Positions on the track are KbRaw3 {node, segment, t} passed by value.
 struct KbRaceSub {
-    int* field_0x0;
-    int UnknownFunction516ca0(Vec3 p, int* node, KbRaw3* out, float* outDistance);
-    int UnknownFunction517340(Vec3 p, KbRaw3 from, float distance, float range, int path,
+    int* startNode;  // +0x0  Track+0x00 startNode (KbRaceSub is the Track at BikeRace+0x48); slot 43 seeds the ghost block from it
+    int ClosestPointOnNode(Vec3 p, int* node, KbRaw3* out, float* outDistance);
+    int PlaceNear(Vec3 p, KbRaw3 from, float distance, float range, int path,
                               KbRaw3* out);
-    int UnknownFunction517930(KbTrackItem** list, int all);
-    int UnknownFunction5179f0(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
-    float UnknownFunction517da0(KbRaw3 a, KbRaw3 b);
+    int FreeWorkList(KbTrackItem** list, int all);
+    int ShortestPath(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
+    float DistanceAlong(KbRaw3 a, KbRaw3 b);
     int UnknownFunction517ea0(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
                               unsigned char flags);
-    int UnknownFunction518080(KbRaw3 pos, Vec3* out);
-    int UnknownFunction518130(int segment, Vec3* out);
+    int PointAt(KbRaw3 pos, Vec3* out);
+    int SegmentDirection(int segment, Vec3* out);
     int UnknownFunction518230(Vec3 p, int segment, float* out, int mode);
 };
 struct KbRace {
     KrustyBike* NextBike(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
     char pad_0x0000[0x38];
-    void* field_0x38; // 0x38
+    void* localRacer;  // +0x38  BikeRace+0x38 localRacer; KrustyBike compares it with this
     char pad_0x003C[0x8];
     KbRaceHandler* handler; // 0x44
-    KbRaceSub* field_0x48; // 0x48
-    Terrain* field_0x4c; // 0x4C  terrain passed to the look-ahead simulation 0x0040eca0
-    KbRacer* field_0x50; // 0x50
+    KbRaceSub* raceTrack;  // +0x48  BikeRace+0x48 raceTrack (Track methods 0x00516ca0.. are called on it)
+    Terrain* raceTerrain;  // +0x4C  BikeRace+0x4c raceTerrain; terrain passed to the look-ahead simulation 0x0040eca0
+    KbRacer* raceCamera;  // +0x50  BikeRace+0x50 raceCamera (+0x244 cameraState, +0x3b0/+0x3b4 followed bike/racer)
     char pad_0x0054[0x48];
-    float field_0x9c; // 0x9C   0x0048fc80 copies one of the three into KrustyBike+0x15dc by game type
-    float field_0xa0; // 0xA0
-    float field_0xa4; // 0xA4
+    float aiStuntChance1;  // +0x9C  BikeRace aiSettings[8] (10): AI KrustyBike+0x15dc at difficulty 1; BikeAI rolls rand*100 <= it
+    float aiStuntChance2;  // +0xA0  BikeRace aiSettings[9] (50): AI KrustyBike+0x15dc at difficulty 2
+    float aiStuntChance3;  // +0xA4  BikeRace aiSettings[10] (100): AI KrustyBike+0x15dc at difficulty 3 and 4
     char pad_0x00A8[0x10];
-    int field_0xb8; // 0xB8
-    KbScoreBoard* field_0xbc; // 0xBC
+    int forceAiStep;  // +0xB8  BikeRace+0xb8; slot 49 takes the BikeAI step 0x00413200 when aiKind or this is set
+    KbScoreBoard* scoreBoard;  // +0xBC  BikeRace+0xbc scoreBoard (BonusObjectManager counter)
     char pad_0x00C0[0x8];
-    KbGate* field_0xc8; // 0xC8
+    KbGate* gateList;  // +0xC8  BikeRace+0xc8 gateList; slot 43 points the ghost block at the first gate
     char pad_0x00CC[0x2C];
-    int field_0xf8; // 0xF8
-    int field_0xfc; // 0xFC
-    int field_0x100; // 0x100
+    int startProbeNode;  // +0xF8  BikeRace startProbe.trackPos.node (+0xcc+0x2c); slot 43 copies it when hasStartProbe
+    int startProbeSegment;  // +0xFC  BikeRace startProbe.trackPos.segment
+    int startProbeT;  // +0x100  BikeRace startProbe.trackPos.t
     char pad_0x0104[0x30];
-    KbRaw3 field_0x134; // 0x134  track position the race-kind 2/3 path search runs to (0x00414370)
+    KbRaw3 finishProbePos;  // +0x134  BikeRace finishProbe.trackPos (+0x108+0x2c); the race-kind 2/3 path search runs to it (0x00414370)
     char pad_0x0140[0x4];
-    int field_0x144; // 0x144
+    int hasStartProbe;  // +0x144  BikeRace+0x144 hasStartProbe; gates the copy of the start probe position
     char pad_0x0148[0x41];
-    char field_0x189; // 0x189
-    char field_0x18a; // 0x18A
+    char startBeforeFinish;  // +0x189  BikeRace+0x189; picks string 0x14d6/0x14d7 at lap 1
+    char isRacing;  // +0x18A  BikeRace+0x18a isRacing
     char pad_0x018B[0x1];
-    char field_0x18c; // 0x18C  0x0048fc80: scene-node flag passed as 0 when set, 1 otherwise
+    char forceHighLod;  // +0x18C  BikeRace+0x18c "ForceHighLOD"; 0x0048fc80 keeps full detail when set
     char pad_0x018D[0x1];
-    char field_0x18e; // 0x18E
+    char networkStartPending;  // +0x18E  BikeRace+0x18e networkStartPending
     char pad_0x018F[0xD];
-    KbSensor* field_0x19c; // 0x19C
+    KbSensor* chatOverlay;  // +0x19C  BikeRace+0x19c chatOverlay; its +0x3dc typing blocks the bike's input (slot 84)
     char pad_0x01A0[0x1b8 - 0x1a0];
-    float field_0x1b8; // 0x1B8  race clock in seconds (0x00493660 replays against it)
+    float replayTime;  // +0x1B8  BikeRace+0x1b8 replayTime (seconds); 0x00493660 replays against it
     char pad_0x01BC[0x1dc - 0x1bc];
-    int field_0x1dc; // 0x1DC  GameObject slot 10 runs the base update when both are 4
-    int field_0x1e0; // 0x1E0
-    int field_0x1e4; // 0x1E4  -2 while the race has not started (0x00493660)
+    int replayMode;  // +0x1DC  BikeRace+0x1dc replayMode; slot 10 runs the base update when it and +0x1e0 are 4
+    int appliedReplayMode;  // +0x1E0  BikeRace+0x1e0 appliedReplayMode
+    int lastRecordKind;  // +0x1E4  BikeRace+0x1e4: RecordFrame's last record kind (-2 after the tape end)
     char pad_0x01E8[0x3f8 - 0x1e8];
-    char field_0x3f8; // 0x3F8  0x00493660: skips the wheel roll and the +0x478 flag
+    char replayPaused;  // +0x3F8  BikeRace+0x3f8 replayPaused; 0x00493660 skips the wheel roll and the +0x478 flag
     char pad_0x03F9[0x1];
-    char field_0x3fa; // 0x3FA  GameObject slot 10 calls 0x00492ad0 when set
-    char field_0x3fb; // 0x3FB  0x00492670 records message 10 when set
+    char recorderTickDue;  // +0x3FA  BikeRace+0x3fa recorderTickDue; slot 10 calls 0x00492ad0 when set
+    char scoreRecordDue;  // +0x3FB  BikeRace+0x3fb; 0x00492670 records message 10 (score) when set
 };
 // Record at KrustyBike+0x744 (tier 3): per-bike state block reset by slot 43.
 struct KbGhost {
@@ -492,13 +492,13 @@ struct KbSink {
 // transforms a vector.
 struct KbMorphMod;
 struct KbXform {
-    void Fn_00444D80(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
-    void Fn_00444DE0(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
+    void AddModifier(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
+    void RemoveModifier(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
     Vec3 WorldToLocalDirection(const Vec3* v);
     // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
     // the first two with 0 or 1 on the bike and rider nodes and the third with the rider morph.
-    void UnknownFunction444d00(int value);         // 0x00444D00
-    void UnknownFunction444d40(int value);         // 0x00444D40
+    void SetLod(int value);         // 0x00444D00
+    void SetLowestLod(int value);         // 0x00444D40
     void UnknownFunction444eb0(KbMorphMod* mod);   // 0x00444EB0
 };
 // Element of the array at Bike+0x12c (count at +0x130).
@@ -521,7 +521,7 @@ struct KbObj128 {
     char pad_10[0x74];
     int field_0x84;
     void Fn_00435FE0();
-    void Fn_0047BBF0(float a);   // 0x0047BBF0 (tier 3)
+    void StartFade(float a);   // 0x0047BBF0 (tier 3)
 };
 struct KbDirector {
     void Remove(KbObj128* who, int a);
@@ -562,18 +562,18 @@ struct KbA5C4 {
     void ApplyRestPose();               // 0x004A8B00 (Character::ApplyRestPose)
 };
 struct KbA604 {
-    void Fn_005305B0(KbAnim* a);
-    void Fn_005305F0(KbAnim* a);
-    void Fn_00530630(KbAnim* a);
-    void Fn_00530680(BikeWheel* w);
-    void Fn_00530680(KbObj128* body);   // same 0x00530680 with one of the two collision bodies
-    void Fn_005328B0(SoultreeObject* node, Vec3 a, Vec3 b);
+    void AddContactAnimation(KbAnim* a);
+    void AddRandomAnimation(KbAnim* a);
+    void AddIndexedAnimation(KbAnim* a);
+    void AddIgnoredObject(BikeWheel* w);
+    void AddIgnoredObject(KbObj128* body);   // same 0x00530680 with one of the two collision bodies
+    void SetPushBox(SoultreeObject* node, Vec3 a, Vec3 b);
 };
 
 // Session object at KbGame+0x570; 0x0045D2B0 returns the local player record (tier 3 names).
 struct KbMessage;
-struct KbMsgSink { void Fn_0051B540(KbMessage* m); };
-struct KbSession { KbPlayer* Fn_0045D2B0(); KbMsgSink* Fn_0045D340(); };
+struct KbMsgSink { void ReplaceHeadMessage(KbMessage* m); };
+struct KbSession { KbPlayer* FindRaceMode(); KbMsgSink* FindTextQueue(); };
 class Vehicle;
 struct KbPlayer {
     char pad_0x0000[0xA8];
@@ -613,7 +613,7 @@ struct KbGhostMod { char pad_0x00[0x48]; KbGhostMod(int flags); };
 struct KbMorphMod {
     char pad_0x00[0x58];
     KbMorphMod(int flags);
-    KbMorphMod* UnknownFunction4a33b0(void* a, const char* path, SoultreeObject* node);
+    KbMorphMod* LoadParameterFile(void* a, const char* path, SoultreeObject* node);
 };
 // Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
 // Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.

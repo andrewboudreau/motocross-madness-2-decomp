@@ -166,7 +166,7 @@ VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
     currentRacer = 0;
     reportedRacer = -1;
     cueRacerCount = 0;
-    field_0xac = 0;
+    groundTerrain = 0;
     for (int i = 0; i < 11; i++)
         cueRacers[i] = 0;
 }
@@ -182,7 +182,7 @@ VisualCue* VisualCue::LoadVisualCue(void* value, int a, int b, UnknownRunwayTerr
         if (ArcadeObject::Create(value, a, b, name, position, pixels, camera, size, c, d, 0)) {
             cueView = view;
             builtFieldOfView = 0;
-            field_0xac = terrain;
+            groundTerrain = terrain;
             return this;
         }
     }
@@ -383,10 +383,10 @@ BonusObjectManager::BonusObjectManager(int flags) : GameObject(flags) {
     elapsed = 0;
     camera = 0;
     placedFieldOfView = 0;
-    field_0x1ec = 0;
-    field_0x1f0 = 0;
+    cameraDistance = 0;
+    isResizePending = 0;
     currentKey = -1;
-    field_0x1e0 = 60.0f;
+    targetScreenWidth = 60.0f;
     sizeFactor = 1.0f;
 }
 
@@ -407,13 +407,13 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     digitModels[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][0]->SetPosition(&position);
     baseFrame->AppendChild(digitModels[0][0], -1);
-    digitModels[0][0]->UnknownFunction4444e0();
+    digitModels[0][0]->ClearScreenRects();
     position.x = 0.37f;
     digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(isEnabled);
     digitModels[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][1]->SetPosition(&position);
     baseFrame->AppendChild(digitModels[0][1], -1);
-    digitModels[0][1]->UnknownFunction4444e0();
+    digitModels[0][1]->ClearScreenRects();
     for (digit = 1; digit < 10; digit++) {
         digitModels[digit][0] = 0;
         digitModels[digit][1] = 0;
@@ -426,7 +426,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
             digitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             digitModels[digit][place]->SetPosition(&position);
             baseFrame->AppendChild(digitModels[digit][place], -1);
-            digitModels[digit][place]->UnknownFunction4444e0();
+            digitModels[digit][place]->ClearScreenRects();
             position.x -= 0.37f;
         }
     }
@@ -438,14 +438,14 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
     timesModel->UnknownVirtualSlot9(value, name, a, b, 1);
     timesModel->SetPosition(&position);
     baseFrame->AppendChild(timesModel, -1);
-    timesModel->UnknownFunction4444e0();
+    timesModel->ClearScreenRects();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
     decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(isEnabled);
     decimalPointModel->UnknownVirtualSlot9(value, name, a, b, 1);
     decimalPointModel->SetPosition(&position);
     baseFrame->AppendChild(decimalPointModel, -1);
-    decimalPointModel->UnknownFunction4444e0();
+    decimalPointModel->ClearScreenRects();
     for (digit = 0; digit < 10; digit++) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
         position.x = 1.87f;
@@ -454,7 +454,7 @@ int BonusObjectManager::LoadDigitModels(void* value, int a, int b) {
             fractionDigitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             fractionDigitModels[digit][place]->SetPosition(&position);
             baseFrame->AppendChild(fractionDigitModels[digit][place], -1);
-            fractionDigitModels[digit][place]->UnknownFunction4444e0();
+            fractionDigitModels[digit][place]->ClearScreenRects();
             position.x -= 0.41f;
         }
     }
@@ -475,7 +475,7 @@ int BonusObjectManager::CreateFrameNode(void* value, int a, int b) {
     baseFrame->localBoundsCenter = kVec3Zero;
     baseFrame->localBoundsHalfExtent = Vector3(0.9f, 0.22f, 0.09f);
     baseFrame->localBoundsValid = 1;
-    field_0x1e4 = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
+    frameWidth = baseFrame->localBoundsHalfExtent.x + baseFrame->localBoundsHalfExtent.x;
     return 1;
 }
 
@@ -502,14 +502,14 @@ void BonusObjectManager::NextKey() {
     keyDuration = g_UnknownBonusKeys[i + 1].time - g_UnknownBonusKeys[i].time;
     keyAngle = g_UnknownBonusKeys[i].rotationAngle;
     keyAngleChange = g_UnknownBonusKeys[i + 1].rotationAngle - keyAngle;
-    Vector3 next = KEY_VECTOR(i + 1, field_0x14);
-    keyPosition = KEY_VECTOR(i, field_0x14);
+    Vector3 next = KEY_VECTOR(i + 1, position);
+    keyPosition = KEY_VECTOR(i, position);
     keyPositionChange = next - keyPosition;
-    next = KEY_VECTOR(i + 1, field_0x08);
-    keyScale = KEY_VECTOR(i, field_0x08);
+    next = KEY_VECTOR(i + 1, scale);
+    keyScale = KEY_VECTOR(i, scale);
     keyScaleChange = next - keyScale;
-    next = KEY_VECTOR(i + 1, field_0x20);
-    keyAxis = KEY_VECTOR(i, field_0x20);
+    next = KEY_VECTOR(i + 1, rotationAxis);
+    keyAxis = KEY_VECTOR(i, rotationAxis);
     keyAxisChange = next - keyAxis;
 }
 
@@ -520,20 +520,20 @@ void BonusObjectManager::HideDigits() {
     for (int i = 0; i < 5; i++) {
         if (shownDigits[i] >= 0) {
             baseFrame->RemoveChild(digitModels[shownDigits[i]][i]);
-            digitModels[shownDigits[i]][i]->UnknownFunction4444e0();
+            digitModels[shownDigits[i]][i]->ClearScreenRects();
             shownDigits[i] = -1;
         }
     }
     if (shownFractionDigits[0] >= 0) {
         for (int i = 0; i < 2; i++) {
             baseFrame->RemoveChild(fractionDigitModels[shownFractionDigits[i]][i]);
-            fractionDigitModels[shownFractionDigits[i]][i]->UnknownFunction4444e0();
+            fractionDigitModels[shownFractionDigits[i]][i]->ClearScreenRects();
             shownFractionDigits[i] = -1;
         }
         baseFrame->RemoveChild(timesModel);
-        timesModel->UnknownFunction4444e0();
+        timesModel->ClearScreenRects();
         baseFrame->RemoveChild(decimalPointModel);
-        decimalPointModel->UnknownFunction4444e0();
+        decimalPointModel->ClearScreenRects();
     }
     elapsed = 0;
     currentKey = -1;

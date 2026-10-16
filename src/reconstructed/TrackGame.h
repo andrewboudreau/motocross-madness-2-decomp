@@ -26,7 +26,7 @@ class FollowCamera;
 // bits); their classes are not established.
 struct UnknownTrackGameViewPart {
     unsigned char field_0x00[0xc4];
-    GameObject* field_0xc4;                   // racesnd.cpp switches it with slot 16
+    GameObject* soundGroup;  // +0xC4  racesnd.cpp mutes it with slot 16 beside the engine/effects groups; the podium's sound group
 };
 
 // The object at TrackGameViewOwner+0xdc: bikerace.cpp 0x00420650 passes it
@@ -96,12 +96,12 @@ struct TrackGameViewOwner : public GameObject {
     // (stored through a cast: a float member here moves TrackGame slot 1 and
     // TrackOverlay 0x0051a560) in the bike race owner.
     int field_0xac;                           // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
-    int field_0xb0;                           // the two picked entries (0x00404df0)
-    int field_0xb4;
+    int lapGate;  // +0xB0  picked gate: bikerace/KrustyBike pass the racer's lapGate (0x00404df0)
+    int nextLapGate;  // +0xB4  picked gate: the racer's nextLapGate = (lapGate + 1) % count (0x00404df0)
     unsigned char field_0xb8[0xdc - 0xb8];
     UnknownTrackGameViewOwnerDc* ball;        // +0xdc string 0x14b7 "FREE BALL!" while set and no racer "is IT!" (StatsOverlay 0x0051aa40); BikeRace.cpp reads it as a ghost bike
     unsigned char field_0xe0[0x420 - 0xe0];
-    UnknownTrackGameViewEntry* field_0x420[1];  // +0xac counts them (BikeRace.h)
+    UnknownTrackGameViewEntry* gates[1];  // +0x420  BikeRace 0x0041d170 builds gateList from the first +0xac entries
 };
 
 // Settings blocks of TrackGameMode, passed to its reset helpers (0x00522720,
@@ -197,12 +197,12 @@ struct UnknownTrackGameModeOptionsFd8 {
 // gives this record an inline constructor.
 struct UnknownTrackGameModeEntry {
     UnknownTrackGameModeEntry() {
-        field_0x00 = 0;
-        field_0x04 = 0;
+        playerId = 0;
+        points = 0;
     }
 
-    int field_0x00;
-    char field_0x04;
+    int playerId;  // +0x0  SelectGamePicProcs' UnknownGridEntry view: network player id (BikeRace compares it)
+    char points;  // +0x4  UnknownGridEntry view: championship points, the start grid sort key
 };
 
 // The 0x1ec-byte race settings block. TrackGameMode holds three: the current
@@ -228,12 +228,12 @@ struct UnknownTrackGameModeSettings {
     unsigned char networkPlayerCount;         // +0x35 lobby message players; decremented when a player leaves (EventManager 0x0045fbd0)
     char trackName[0x20];                     // +0x36 track name (length not established)
     unsigned char field_0x56[0x138 - 0x56];
-    int field_0x138;                          // SelectGamePicProcs.cpp
-    int field_0x13c;                          // SelectGamePicProcs.cpp
+    int trackFileTime;  // +0x138  ReadSceneName's GetFileTimes: st_mtime of the track scene (ZoneReport, lobby message)
+    int trackFileSize;  // +0x13C  GetFileTimes st_size of the scene; a client with another size reports status 3
     float timeLimitMinutes;                   // +0x140 "%dm" rows 2..5 (DlgProcs 0x0044e3e0), SelectGamePicProcs.cpp's minutes
     int tagBall;                              // +0x144 tag ball (SelectGamePicProcs.cpp)
     int stuntMode;                            // +0x148 ChkStuntMode (MPEventDlg 0x004f6370); mode 4 ranks by score, else by tag run (EventManager 0x0045e9d0)
-    UnknownTrackGameModeEntry field_0x14c[8]; // reset by TrackGameMode 0x00522cd0
+    UnknownTrackGameModeEntry gridOrder[8];  // +0x14C  start grid entries, qsorted by championship points (SelectGamePicProcs); reset by 0x00522cd0
     unsigned char field_0x18c[0x1ec - 0x18c];
 };
 
@@ -244,7 +244,7 @@ struct UnknownTrackGameModeSettings {
 // inlines, which is the shape of an implicit destructor of an enclosing
 // class (strong inference).
 struct UnknownTrackGameSessionList {
-    SessionInfoType field_0x00[5];
+    SessionInfoType entries[5];  // +0x0  NetProcs.cpp enumerates sessions into it and indexes it by selectedSession
 };
 
 // The player's bike and rider choice at TrackGameMode+0x1974 and its saved
@@ -282,7 +282,7 @@ struct UnknownTrackGameRacerSlot {
     char playerName[0x10];                    // +0xdc player name (SelectGamePicProcs.cpp)
     int engineSize;                           // +0xec bike record +0x8c (SelectGamePicProcs.cpp 0x004f2340)
     int fourStroke;                           // +0xf0 bike record +0x90
-    unsigned char field_0xf4;                 // 1 (constructor)
+    unsigned char hasMprSkin;  // +0xF4  with registry MPR == 123 BikeRace gives the rider "MPR.tga"; 1 (constructor)
     unsigned char field_0xf5[0xf8 - 0xf5];
 };
 
@@ -433,7 +433,7 @@ public:
 // Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
 class UnknownTrackGameObject56cItem {
 public:
-    void UnknownFunction46ff30(int value);    // 0x0046ff30 (EventManager 0x0045e710)
+    void EndDialog(int value);    // 0x0046ff30 (EventManager 0x0045e710)
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();
@@ -495,7 +495,7 @@ public:
     char sceneFile[0x40];                     // +0x24c scene file name
     char estFile[0x40];                       // +0x28c "%s.est"
     char trnFile[0x40];                       // +0x2cc "%s.trn"
-    char field_0x30c[0x40];                   // +0x30c emptied by SetSceneFileNames
+    char cubeFile[0x40];  // +0x30C  the scene's "CubeFile" (SceneManager 0x004ebfc0); emptied by SetSceneFileNames
     char waypointFile[0x40];                  // +0x34c "%s01.wpt"
     int sceneNamed;                           // +0x38c 0 when SelectScene read "NO NAME"
     int waypointRaceCount;                    // +0x390 SceneInfo "NumberOfWaypointRaces"
@@ -680,9 +680,9 @@ public:
     DirectoryList* profileDirectory;
     int menuIsOpen;
     CDAudio* cdAudio;                         // +0x3340
-    UnknownControlBinding field_0x3344;
-    UnknownControlBinding field_0x3380;
-    UnknownControlBinding field_0x33bc;
+    UnknownControlBinding steerBinding;  // +0x3344  axis of control rows 0/1 (dead zone 0.04); LoadBike's steer -> Vehicle steerAxis
+    UnknownControlBinding leanBinding;  // +0x3380  axis of control rows 2/3; LoadBike's lean -> Vehicle leanAxis (controlInput.y)
+    UnknownControlBinding throttleBinding;  // +0x33BC  optional 0..1 axis of row 4; LoadBike's throttle -> Vehicle throttleAxis
     UnknownControlMapping* controlMapping;
     UnknownTrackGameObject33fc* controlSetup; // +0x33fc control assignments: the profile's "control.ctl", OptControlsDlg InputDeviceDDL
     UnknownTrackGameObject3400* highScores;   // +0x3400 the high-score table (TrackRecord.cpp)

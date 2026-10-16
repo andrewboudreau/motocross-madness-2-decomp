@@ -139,7 +139,7 @@ public:
 
 // Descriptor passed to the D3DIM loaders (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
 // slot 9) and tested by both slot 40 loaders: `test byte [p+0x25],1` selects a
-// field_0x08->Fn_4444c0(1) call (tier 1 offset; the type and its meaning are tier 3).
+// field_0x08->SetUseLighting(1) call (tier 1 offset; the type and its meaning are tier 3).
 struct SoultreeLoadDesc {
     char field_0x00[0x25];
     unsigned char field_0x25;

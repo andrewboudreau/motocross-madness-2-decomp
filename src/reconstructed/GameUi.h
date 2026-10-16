@@ -753,5 +753,5 @@ public:
 // Page object at KrustyUI+0x490.
 class UnknownGameUiPage {
 public:
-    UIControl* UnknownFunction46ebf0(const char* name, int flags); // 0x0046ebf0
+    UIControl* FindControl(const char* name, int flags); // 0x0046ebf0
 };

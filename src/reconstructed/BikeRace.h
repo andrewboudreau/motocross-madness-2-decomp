@@ -56,10 +56,10 @@ struct UnknownBikeRaceView6c;
 // constructor).
 struct UnknownKrustyVcrRecord {
     UnknownKrustyVcrRecord() {
-        field_0x00 = 0;
+        networkPlayerId = 0;
         field_0x04 = 0;
     }
-    int field_0x00;
+    int networkPlayerId;  // +0x0  same 8-byte grid entry as UnknownBikeRaceNetPlayer (+0 compared with racers' networkPlayerId)
     char field_0x04;
 };
 
@@ -70,13 +70,13 @@ struct UnknownKrustyVcrRacer {
     int networkId;                            // +0x000 network id
     char aiIndex;                             // +0x004 AI index
     char name[0x10];                          // +0x005 name
-    char field_0x015[0x40];
-    char field_0x055[0x40];
-    char field_0x095[0x40];
-    char field_0x0d5[0x40];
+    char bikeFile[0x40];  // +0x15  SetRacer model argument (Res\Ghost.mcf); the loader reads it back into bikeFile
+    char riderFile[0x40];  // +0x55  SetRacer rider argument (Res\GhostRider.mcf); the loader reads it back into riderFile
+    char bikeName[0x40];  // +0x95  bike name; the loader passes it back to KrustyUI::ResolveBikeFile
+    char riderName[0x40];  // +0xD5  rider name; the loader passes it back to KrustyUI::ResolveRiderFile
     int engineSize;                           // +0x118 engine size
     int engineKind;                           // +0x11c engine kind
-    int field_0x120;
+    int plateNumber;  // +0x120  SetRacer's last argument is TrackGameMode plateNumber / slots[j].plateNumber; read back into plate
 };
 
 // RTTI: KrustyVCR : VCRInterface (vtable 0x00550e9c, 0xf8c bytes). Its
@@ -101,7 +101,7 @@ public:
     // index (a char), record slot, name, model files, bike and rider names,
     // engine size and kind and plate number. 0x0049c1e0 reads one back.
     void SetRacer(int id, char ai, int slot, char* name, char* model,
-                               char* rider, char* riderName, char* bikeName, int engineSize,
+                               char* rider, char* bikeName, char* riderName, int engineSize,
                                int engineKind, int value);
     void UnknownFunction49c1e0(int* slot, char* ai, int a, char* name, char* model, char* rider,
                                char* bikeName, char* riderName, int* engineSize, int* engineKind,
@@ -117,7 +117,7 @@ public:
     // +0x110 TrackGame+0x2d70's 0x1ec bytes, the race settings from
     // raceMode on (copied by 0x0049bf10, mode 0).
     unsigned char raceSettings[0x25c - 0x110];
-    UnknownKrustyVcrRecord field_0x25c[8];
+    UnknownKrustyVcrRecord gridEntries[8];  // +0x25C  raceSettings+0x14c (TrackGame+0x2ebc) copied with the settings: per grid slot player id (UnknownBikeRaceNetPlayer)
     unsigned char field_0x29c[0x2fc - 0x29c];
     int racerCount;                           // +0x2fc racers recorded (the loader)
     UnknownKrustyVcrRacer racers[11];         // +0x300 0x0049c070 / 0x0049c1e0
@@ -129,14 +129,14 @@ public:
 struct UnknownBikeRaceMesh {
     // D3DIMSoultreeObject's methods (D3DIMSoulTree.h), as bikerace.cpp's
     // setup places the flag girl and the scene's start objects.
-    void UnknownFunction4444c0(int value);    // 0x004444c0
+    void SetUseLighting(int value);    // 0x004444c0
     void SetPositionVec3(Vector3 position); // 0x004fc630: sets the translation
     void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
 
     unsigned char field_0x000[0x274];
     int groupCount;                           // +0x274 group count
     unsigned char field_0x278[0x28c - 0x278];
-    UnknownBikeRaceMeshGroup* field_0x28c;
+    UnknownBikeRaceMeshGroup* levelGroups;  // +0x28C  per-level groups (+0x274 of them), as UnknownBikeRaceModel::levelGroups / D3DIMSoulTree lodTable
 };
 
 class UnknownBikeRaceCharacter {
@@ -171,15 +171,15 @@ public:
 // restart turns on (slot 16 with 0).
 struct UnknownBikeRaceViews {
     unsigned char field_0x00[0x3c];
-    GameObject* field_0x3c;
+    GameObject* engineGroup;  // +0x3C  RaceSound+0x3c engineGroup (RaceSound.h); a restart re-enables it
     GameObject* field_0x40;
-    GameObject* field_0x44;
+    GameObject* effectsGroup;  // +0x44  RaceSound+0x44 effectsGroup (RaceSound.h); a restart re-enables it
 };
 
 // An entry of the mesh's +0x28c table (8 bytes).
 struct UnknownBikeRaceMeshGroup {
     int itemCount;                            // +0x00 item count
-    UnknownBikeRaceMeshItem* field_0x04;
+    UnknownBikeRaceMeshItem* surfaces;  // +0x4  itemCount surfaces (D3DIMSoulTree UnknownSoultreeLod::surfaces); ReplaceMeshId walks their ids
 };
 
 // An item of a mesh group (0x38 bytes).
@@ -241,7 +241,7 @@ class UnknownBikeRaceProjector;
 // other racers' (the loader 0x00419970).
 struct UnknownBikeRaceRacerPart604 {
     unsigned char field_0x00[0x38];
-    CarProceduralCollision* field_0x38;
+    CarProceduralCollision* collisionModel;  // +0x38  Wrecker+0x38 collisionModel (Wrecker.h); the loader pairs it with other racers' collisions
 };
 
 // A bike's engine setup (0x5c bytes): the loader copies TrackGameMode
@@ -272,9 +272,9 @@ struct UnknownBikeRaceEventAi {
 // TrackGame+0x2ebc (race settings +0x14c): a network player's id and its
 // +5 byte, set for the AI racers a host runs.
 struct UnknownBikeRaceNetPlayer {
-    int field_0x00;
+    int networkPlayerId;  // +0x0  compared with localPlayer and slots[j].networkPlayerId (loader, grid order)
     char field_0x04;
-    char field_0x05;
+    char isAi;  // +0x5  set for a grid slot holding an AI racer of that player's host (racerIndex != 0)
     unsigned char field_0x06[2];
 };
 
@@ -413,14 +413,14 @@ public:
     unsigned char field_0x070[0x88 - 0x70];
     Vector3 heading;                          // +0x088 heading (the setup puts the scene's 30SecMan ahead of it)
     unsigned char field_0x094[0xbc - 0x94];
-    int field_0x0bc;
+    int linearSpeed;  // +0xBC  SoultreePhysicsBaseObject+0xbc linearSpeed; zeroed with velocity at a network start
     unsigned char field_0x0c0[0x109 - 0xc0];
     bool restarted;                           // +0x109 set on a restart
     unsigned char field_0x10a[0x10c - 0x10a];
     Vector3 startPosition;                    // +0x10c start position (0x004210f0)
     Vector3 startDirection;                   // +0x118 start direction
     unsigned char field_0x124[0x128 - 0x124];
-    CarProceduralCollision* field_0x128;      // its +0x68 is set without tree collision (the loader)
+    CarProceduralCollision* collisionObject;  // +0x128  SoultreePhysicsBaseObject+0x128 collisionObject; its +0x68 is set without tree collision (the loader)
     unsigned char field_0x12c[0x3bc - 0x12c];
     UnknownBikeRaceModel* modelNode;          // +0x3bc
     unsigned char field_0x3c0[0x4a0 - 0x3c0];
@@ -433,11 +433,11 @@ public:
     CarProceduralCollision* frontWheel;       // +0x5f0 paired with the other racers' (the loader)
     CarProceduralCollision* rearWheel;        // +0x5f4
     unsigned char field_0x5f8[0x604 - 0x5f8];
-    UnknownBikeRaceRacerPart604* field_0x604;
+    UnknownBikeRaceRacerPart604* wrecker;  // +0x604  Bike+0x604 object (SetupWrecker with rider.col, StartAnimatedWreck: Wrecker); its collision model is paired
     unsigned char field_0x608[0x734 - 0x608];
     unsigned char netIndex;                   // +0x734 racer index in network messages
-    char field_0x735;                         // has the +0x1414/+0x1418 collisions (the loader)
-    unsigned char field_0x736;
+    char isRemote;  // +0x735  KrustyBike loader's remote argument (1 for other players' bikes); gates the +0x1414/+0x1418 pairing
+    unsigned char isGhost;  // +0x736  KrustyBike+0x736 isGhost (KrustyBike.h: set for loader kind 0xff)
     char engineKind;                          // +0x737 engine kind
     int engineSize;                           // +0x738 engine size
     int plateNumber;                          // +0x73c plate number (the setup paints it)
@@ -458,7 +458,7 @@ public:
     int lapGate;                              // +0x7b8 RaceView.h's racer lapGate
     int nextLapGate;                          // +0x7bc
     unsigned char field_0x7c0[0x11b8 - 0x7c0];
-    unsigned char field_0x11b8;
+    unsigned char hasFullState;  // +0x11B8  set when a message 1 state arrives; message 13 deltas are ignored until it is set
     unsigned char field_0x11b9[0x11bc - 0x11b9];
     int recorderId;                           // +0x11bc recorder id (0x00421d50 matches records by it)
     char aiMessageIndex;                      // +0x11c0 AI racer's index in its messages (RaceView.h)
@@ -466,18 +466,18 @@ public:
     float messageDelay;                       // +0x11c4 the player's message delay (racer slot +0xd0)
     UnknownBikeRaceRacerPart* receivedStates[4]; // +0x11c8 received network states, newest first
     unsigned char field_0x11d8[0x1358 - 0x11d8];
-    Vector3 field_0x1358;
-    Vector3 field_0x1364;
-    Vector3 field_0x1370;
-    int field_0x137c;
-    int field_0x1380;
-    int field_0x1384;
-    int field_0x1388;
+    Vector3 deltaBaseVelocity;  // +0x1358  base state message 13 deltas accumulate into (0x004933e0); set from message 1 velocity (+0x3c)
+    Vector3 deltaBasePosition;  // +0x1364  message 13 delta base; set from message 1 position (+0x08)
+    Vector3 deltaBaseAngularVelocity;  // +0x1370  message 13 delta base; set from message 1 angular velocity (+0x30)
+    int deltaBaseRoll;  // +0x137C  message 13 delta base; set from message 1 roll (+0x14)
+    int deltaBasePitch;  // +0x1380  message 13 delta base; set from message 1 pitch (+0x18)
+    int deltaBaseYaw;  // +0x1384  message 13 delta base; set from message 1 yaw (+0x1c)
+    int deltaBaseTime;  // +0x1388  message 13 delta base ms time (message 1 +0x4c); 0x004933e0 adds each delta's step
     unsigned char field_0x138c[0x13f8 - 0x138c];
-    float field_0x13f8;                       // reset to FLT_MAX / 2 on a new lap (slot 10)
+    float recordStateTimer;  // +0x13F8  KrustyBike recordState(+0x1390).timer: s since the last full record; FLT_MAX/2 forces one
     unsigned char field_0x13fc[0x1414 - 0x13fc];
-    CarProceduralCollision* field_0x1414;
-    CarProceduralCollision* field_0x1418;
+    CarProceduralCollision* altBodyA;  // +0x1414  KrustyBike+0x1414 altBodyA (KrustyBike.h); paired between remote racers by the loader
+    CarProceduralCollision* altBodyB;  // +0x1418  KrustyBike+0x1418 altBodyB (KrustyBike.h); paired between remote racers by the loader
     unsigned char field_0x141c[0x160c - 0x141c]; // the GameObject virtual base follows (0x1638 bytes)
 };
 
@@ -487,17 +487,17 @@ struct UnknownBikeRaceNetState {
     char field_0x01;
     unsigned char field_0x02[0x04 - 0x02];
     int field_0x04;
-    Vector3 field_0x08;
-    int field_0x14;
-    int field_0x18;
-    int field_0x1c;
+    Vector3 position;  // +0x8  KbBikeMessage+0x08 position; copied to racer deltaBasePosition (+0x1364)
+    int roll;  // +0x14  KbBikeMessage+0x14 roll; copied raw to racer +0x137c
+    int pitch;  // +0x18  KbBikeMessage+0x18 pitch; copied raw to racer +0x1380
+    int yaw;  // +0x1C  KbBikeMessage+0x1c yaw; copied raw to racer +0x1384
     unsigned char field_0x20[0x28 - 0x20];
-    float field_0x28;
+    float fastestLap;  // +0x28  RecordFrame copies it to racer fastestLap (+0x750, as KbBikeMessage+0x28)
     int field_0x2c;
-    Vector3 field_0x30;
-    Vector3 field_0x3c;
+    Vector3 angularVelocity;  // +0x30  KbBikeMessage+0x30 angularVelocity; copied to racer +0x1370
+    Vector3 velocity;  // +0x3C  KbBikeMessage+0x3c velocity; copied to racer +0x1358
     unsigned char field_0x48[0x4c - 0x48];
-    int field_0x4c;
+    int time;  // +0x4C  KbBikeMessage+0x4c time (ms); RecordFrame overwrites it with replay seconds * 1000
     unsigned char field_0x50[0x54 - 0x50];
     char racerIndex;                          // +0x54 racer index
     unsigned char field_0x55[0x58 - 0x55];
@@ -514,7 +514,7 @@ struct UnknownBikeRaceNetScore {
     char field_0x00;
     char racerIndex;                          // +0x01 racer index
     unsigned char field_0x02[0x04 - 0x02];
-    float field_0x04;
+    float racerScore;  // +0x4  message 10 (KbBikePing+0x04 = KrustyBike+0x768 score); copied to racer score
 };
 
 // Network messages 0x84 (a time stamp at +4) and 0x85 (text at +4).
@@ -544,7 +544,7 @@ struct UnknownBikeRaceNode {
     Vector3 center;                           // +0x00 centre
     Vector3 direction;                        // +0x0c direction
     Vector3 halfExtents;                      // +0x18 half extents (across the direction for gates)
-    float field_0x24;
+    float width;  // +0x24  AppendNode's scale; halfExtents = scale*dir*0.5; Create scales the finish arch by it / modelWidth
     int field_0x28;
     TrackPos trackPos;                        // +0x2c position along the track (DistanceAlong/PlaceNear operand, 0x004e6a50)
     UnknownBikeRaceNode* nextGate;            // +0x38 next gate
@@ -552,25 +552,25 @@ struct UnknownBikeRaceNode {
 
 // The 0x18-byte source records 0x0041d0d0 copies.
 struct UnknownBikeRaceNodeSource {
-    Vector3 field_0x00;
-    Vector3 field_0x0c;
+    Vector3 center;  // +0x0  AppendNode copies it into the node's center
+    Vector3 direction;  // +0xC  AppendNode copies it into the node's direction
 };
 
 // The object 0x0041d170 walks: +0xac counts the entries at +0x420, and
 // +0xd8 holds the records.
 struct UnknownBikeRaceNodeEntry {
     unsigned char field_0x00[0x50];
-    float field_0x50;
+    float width;  // +0x50  BuildNodeList passes it as AppendNode's scale (the node's width)
     int field_0x54;
 };
 
 struct UnknownBikeRaceNodeOwner {
     unsigned char field_0x000[0xac];
-    int field_0x0ac;
+    int gateCount;  // +0xAC  BuildNodeList's loop bound (one gate node per entry)
     unsigned char field_0x0b0[0xd8 - 0xb0];
-    UnknownBikeRaceNodeSource field_0x0d8[1];
+    UnknownBikeRaceNodeSource gateSources[1];  // +0xD8  BuildNodeList hands the records to AppendNode (center/direction per gate)
     unsigned char field_0x0f0[0x420 - 0xf0];
-    UnknownBikeRaceNodeEntry* field_0x420[1];
+    UnknownBikeRaceNodeEntry* gateEntries[1];  // +0x420  BuildNodeList reads entry i's width and value
 };
 
 // The object at +0x210 of BikeRace+0x6c's object (the 30SecMan): a second base at +0xc
@@ -604,7 +604,7 @@ public:
     void QueryGround(Vector3* point, Vector3* normal, int a, unsigned char* b);
 
     unsigned char field_0x00[0x40];
-    float field_0x40;                         // scales the start grid (0x004210f0)
+    float gridCellSize;  // +0x40  Terrain+0x40 gridCellSize (Terrain.h); scales the start grid (0x004210f0)
 };
 
 // A GameObject's +0x25 flags, which GameObject.h keeps protected
@@ -633,8 +633,8 @@ struct UnknownBikeRaceCameraView {
     unsigned char field_0x26c[0x274 - 0x26c];
     unsigned char field_0x274;
     unsigned char field_0x275[0x384 - 0x275];
-    UnknownBikeRaceSceneCharacter* field_0x384;
-    GameObject* field_0x388;
+    UnknownBikeRaceSceneCharacter* targetCharacter;  // +0x384  VehicleCamera+0x384 target; UnknownFunctionTargetCharacter stores its scene character
+    GameObject* targetCar;  // +0x388  VehicleCamera+0x388 targetCar; UnknownFunctionTargetObject stores its scene procedural object
     void* shadowCaster;                       // +0x38c a scene shadow caster
     unsigned char followingRacer;             // +0x390 following a racer
     unsigned char targetPointCached;          // +0x391 VehicleCamera 0x0052bc50; cleared on a new target
@@ -662,8 +662,8 @@ struct UnknownBikeRaceCameraView {
         targetHeadingCached = 0;
         followingRacer = true;
         shadowCaster = 0;
-        field_0x384 = 0;
-        field_0x388 = 0;
+        targetCharacter = 0;
+        targetCar = 0;
         followedBike = racer;
         field_0x274 = 0;
         followedRacer = racer;
@@ -681,25 +681,25 @@ struct UnknownBikeRaceCameraView {
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;
-        field_0x384 = 0;
-        field_0x388 = 0;
+        targetCharacter = 0;
+        targetCar = 0;
     }
     void UnknownFunctionTargetCharacter(UnknownBikeRaceSceneCharacter* character) {
-        field_0x384 = character;
+        targetCharacter = character;
         field_0x274 = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;
-        field_0x388 = 0;
+        targetCar = 0;
         shadowCaster = 0;
     }
     void UnknownFunctionTargetObject(GameObject* object) {
-        field_0x388 = object;
+        targetCar = object;
         field_0x274 = 0;
         targetPointCached = 0;
         targetHeadingCached = 0;
         followingRacer = false;
-        field_0x384 = 0;
+        targetCharacter = 0;
         shadowCaster = 0;
     }
 };
@@ -716,14 +716,14 @@ public:
 // character (+0x210) or object (+0x3c).
 struct UnknownBikeRacePickModel {
     unsigned char field_0x000[0x128];
-    int field_0x128;
+    int collisionObject;  // +0x128  physics object's collision object (SoultreePhysicsBaseObject+0x128); compared with the pick
 };
 
 struct UnknownBikeRacePickCaster {
-    unsigned char field_0x00;                 // bit 0: a model at +0x08
+    unsigned char flags;  // +0x0  UnknownSceneCaster+0 bits; bit 0 physics: a physics object at +0x08
     unsigned char field_0x01[0x08 - 0x01];
-    UnknownBikeRacePickModel* field_0x08;
-    int field_0x0c;
+    UnknownBikeRacePickModel* physicsObject;  // +0x8  UnknownSceneCaster+0x08 physicsObject
+    int collisionObject;  // +0xC  UnknownSceneCaster+0x0c collisionObject; compared with the pick
     unsigned char field_0x10[0x28 - 0x10];
 };
 
@@ -734,7 +734,7 @@ struct UnknownBikeRacePickCharacter {
 
 struct UnknownBikeRacePickObject {
     unsigned char field_0x00[0x3c];
-    int field_0x3c;
+    int collisionObject;  // +0x3C  procedural scene object's collision; slot 23 compares it with ObjectPicker::PickAtCursor
 };
 
 // The replay recorder's record kinds -1 (a tick) carry the time played and
@@ -783,7 +783,7 @@ struct UnknownBikeRaceVcrFollow {
     int field_0x00;                           // not written by 0x004a9d20
     char field_0x04;                          // 0x004a9d20 clears the byte
     unsigned char field_0x05[0x08 - 0x05];
-    int field_0x08;
+    int followedRacerId;  // +0x8  FollowRacer sends followedRacer->networkPlayerId; RecordFrame matches it to racer recorderId
 };
 
 // TrackGame+0x568's +0xdc object as the replay recorder callback reaches it
@@ -812,11 +812,11 @@ public:
 // bytes) whose +0 indexes them.
 struct UnknownBikeRaceUiModel {
     unsigned char field_0x00[0x40];
-    char field_0x40[0xc8 - 0x40];
+    char modelFile[0xc8 - 0x40];  // +0x40  KrustyUI entry "ModelFile"/"File" (UnknownKrustyUIModelEntry::modelFile)
 };
 
 struct UnknownBikeRaceUiChoice {
-    int field_0x00;
+    int manufacturer;  // +0x0  KrustyUI bike entry +0: index into the manufacturers (+0x48)
     unsigned char field_0x04[0x48 - 0x04];
     char bikeName[0x44];                      // +0x48 bike name (the loader's AI racers)
     int engineSize;                           // +0x8c engine size
@@ -931,28 +931,28 @@ public:
     UnknownBikeRaceRacer** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
     UnknownBikeRaceViews* raceSound;          // +0x44 the RaceSound object (RaceSound::Create in the setup)
     Track* raceTrack;
-    UnknownBikeRaceProjector* field_0x04c;
+    UnknownBikeRaceProjector* raceTerrain;  // +0x4C  Create's terrain argument; QueryGround (Terrain 0x00507c10) puts probes/debug lines on the ground; grid scale
     KrustyBikeCamera* raceCamera;            // the race camera
-    int field_0x054;
+    int particleManager;  // +0x54  Create's particles argument (QuarryStuntEvent passes its particleManager); forwarded to every racer loader
     Scene* raceScene;
-    UnknownBikeRaceShadow* field_0x05c;
+    UnknownBikeRaceShadow* raceShadow;  // +0x5C  Create's shadow argument (ProjectedShadow); camera targeting clears it and adds the target's casters
     GameObject* youIndicator;                 // +0x60 the spinning "youind.slt" marker over the local racer
     UnknownBikeRaceView6c* startGate;         // +0x64 the scene's "StartGate.slb" entry; reset by a restart (slot 5)
     int startGateEntry;                       // +0x68 its scene animation entry index
     UnknownBikeRaceView6c* thirtySecondMan;   // +0x6c the scene's "30SecMan.slt" entry
     int thirtySecondManEntry;                 // +0x70 its scene animation entry index
     UnknownBikeRaceCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
-    int field_0x078;
-    float field_0x07c[11];
+    int flagGirlState;  // +0x78  flag girl motion state: 0 Stand, 1 first FlagStart, 3 second FlagStart, 4 FlagLoop (slot 10)
+    float aiSettings[11];  // +0x7C  Create's 11 constants: [0..1]/[5..6] AI skill ranges, [8..10] AI stunt chance % by difficulty
     int lodDebugPage;                         // +0x0a8
     int targetIndex;                          // +0xac caster or scene entry index the camera targets
     unsigned char targetKind;                 // +0xb0 camera target: 0xff a racer, 0 a static caster, 1 a scene entry
     unsigned char field_0x0b1[0xb4 - 0xb1];
     ObjectPicker* objectPicker;                // debug object picker
-    int field_0x0b8;
+    int forceAiStep;  // +0xB8  KrustyBike slot 49 takes the BikeAI step 0x00413200 when aiKind or this is set; Create clears it
     int scoreBoard;                           // +0xbc score board: BonusObjectManager::SetupCounter's object
     int digitCounter;                         // +0xc0 NumberObjectManager::SetupDigits's object
-    UnknownEventRacerPart* field_0x0c4;
+    UnknownEventRacerPart* statusList;  // +0xC4  race status list: BuildStatusList/FreeStatusList/UpdateLapRace/UpdateGateRace operand
     UnknownBikeRaceNode* gateList;            // +0xc8 gate nodes linked through nextGate
     UnknownBikeRaceNode startProbe;          // start probe
     UnknownBikeRaceNode finishProbe;          // finish probe
@@ -968,7 +968,7 @@ public:
     Vector3 gridSlotStep;                      // start grid: step between slots
     Vector3 gridDirection;                      // start grid: direction
     bool gridReady;                           // +0x188 WriteRelativePositions computed the start grid (cleared by a restart)
-    unsigned char field_0x189;
+    unsigned char startBeforeFinish;  // +0x189  UpdateTrackSeparation: set unless finish->start track distance > 0; lap 1 is then a lead-in
     bool isRacing;                         // racing
     bool restartPending;                      // +0x18b set by RestartRace; stops the race update and clears isRacing next frame
     unsigned char forceHighLod;                // "ForceHighLOD"
@@ -978,14 +978,14 @@ public:
     bool chatOpen;                            // +0x190 the chat input line is open and takes keys
     unsigned char field_0x191[0x194 - 0x191];
     float chatHideTimer;                      // +0x194 seconds until the chat input line hides (10 after a message)
-    int field_0x198;
+    int chatInputLineSetting;  // +0x198  the constructor copies TrackGameMode chatInputLine
     UnknownBikeRaceOverlay19c* chatOverlay;   // +0x19c
     KrustyVCR* replayVcr;                   // replay being recorded or played
     KrustyVCR* ghostVcr;                   // ghost
     UnknownVcrFile* vcrFile;                  // +0x1a8 VCR file the replay and ghost recordings open
     float recordTickTime;                     // +0x1ac the tick record slot 10 queues (+0x1ac..+0x1b7): replay length
     int recordTickCount;                      // +0x1b0 ticks queued since the replay restarted
-    int field_0x1b4;
+    int recordTickRecordCount;  // +0x1B4  tick record's 3rd dword: records per tick (racers, +1 tag ball, x2 with score records)
     float replayTime;                        // replay time
     float replayLength;                        // replay length
     float recorderTickElapsed;                        // seconds since the last recorder tick (slot 10)
@@ -997,7 +997,7 @@ public:
     int replayLengthFrames;                  // +0x1d8 frames recorded into replayLength
     int replayMode;                          // replay mode
     int appliedReplayMode;                   // +0x1e0 replay mode whose sound state was last applied
-    int field_0x1e4;
+    int lastRecordKind;  // +0x1E4  RecordFrame stores its record kind (-1 tick, -2 tape end, -3, 1, 13, 0x87...)
     int ghostLap;                            // +0x1e8 lap count when the ghost lap restarted (raceMode 4); ButLeft asks to save the ghost lap when > 0
     int savedCameraState;                    // +0x1ec camera state saved while a replay plays
     char ghostFilePlayed[0x104];                  // ghost file played
@@ -1005,7 +1005,7 @@ public:
     bool replayPaused;                         // +0x3f8: ToggleReplayPause
     bool replayStepFrame;                      // +0x3f9: ButFrame: advance one frame
     bool recorderTickDue;                     // +0x3fa a short record packet is due this frame
-    bool field_0x3fb;
+    bool scoreRecordDue;  // +0x3FB  set every 20th recorder tick (event 0/stunt); KrustyBike 0x00492670 then records message 10 (score)
     unsigned char isRecording;                // recording (0x00420650)
     unsigned char drawChildren;               // +0x3fd 1 by the constructor, toggled by control 6 (slot 22): slot 14 runs GameObject's draw only when set
 };

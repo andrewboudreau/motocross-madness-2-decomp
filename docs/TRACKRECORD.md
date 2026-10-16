@@ -46,7 +46,7 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
   the kind (+0x08: 5 set-up, 1 button or tab, 2 list selection, 6 close),
   the dialog (+0x0c), the control (+0x14) and the handled flag (+0x20).
 - `UIDialog::FindControl` (`0x0046ebf0`) looks a control up by name. GameUi.h
-  also declares the address as `UnknownGameUiPage::UnknownFunction46ebf0`.
+  also declares the address as `UnknownGameUiPage::FindControl`.
   The new declaration was added because TrackRecordDlg derives from
   UIDialog, so the two names are one function, not proven types.
 - `0x00520390` calls control slot 66 (`+0x108`) on the track list. Vtable

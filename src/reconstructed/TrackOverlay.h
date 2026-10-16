@@ -11,7 +11,7 @@
 class TextureMapManager;
 
 // 0x0050a590 (Texmap.cpp, cdecl): loads the texture file `name`; 0 on failure.
-TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
                                   int a4, int a5, int a6, int a7, int a8, int a9,
                                   unsigned int key, int a11, int a12);
 
@@ -30,7 +30,7 @@ struct UnknownInstrumentState {
     unsigned char field_0x0c0[0x108 - 0xc0];
     bool airborne;                            // +0x108 RaceView.h's racer airborne flag; the gauge winds down while set
     unsigned char field_0x109[0x736 - 0x109];
-    unsigned char field_0x736;
+    unsigned char isGhost;  // +0x736  the followed racer (camera +0x3b4); KrustyBike +0x736 isGhost (RaceView.h racer view)
     unsigned char field_0x737[0x74c - 0x737];
     float lastLapTime;                        // last lap time (StatsOverlay 0x0051a560)
     float fastestLap;                         // +0x750 string 0x838 "Best Lap:" row (StatsOverlay 0x00519ef0, 0x0051a560)
@@ -54,8 +54,8 @@ struct UnknownInstrumentSource {
 
 // A dial needle (InstrumentOverlay+0x11c), 0x28 bytes.
 struct UnknownGauge {
-    int field_0x00;
-    int field_0x04;
+    int originX;  // +0x0  InstrumentOverlay: rect.left scaled to the target; centerX = origin + 64 scaled
+    int originY;  // +0x4  InstrumentOverlay: rect.top scaled to the target; centerY = origin + 85 scaled
     int centerX;                              // centre x
     int centerY;                              // centre y
     float length;                             // needle length
@@ -289,9 +289,9 @@ public:
     int racerCount;                           // racer count
     int showFrameRate;                        // shows the frame rate
     int readoutCount;                         // readouts so far
-    int field_0x16c;
+    int cueIndex;  // +0x16C  QuarryStuntEvent stores VisualCue::NextCueIndex(); DrawRacers names that racer via SetCueRacer
     int followedIndex;                        // +0x170: index of the followed racer (DrawRacers)
-    int field_0x174;
+    int cueShown;  // +0x174  QuarryStuntEvent stores VisualCue::CanCycleCues() (as ChatOverlay::ShowCueTag); gates the cue racer
     int largeMap;                             // uses the 256-pixel map
     Vector3 mapOrigin;                        // +0x17c
     float mapAngle;                           // +0x188

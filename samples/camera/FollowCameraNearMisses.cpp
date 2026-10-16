@@ -177,16 +177,16 @@ inline Vector3 FollowCameraNormalize(const Vector3& v) {
 // 0x00462ee0. Virtual calls in a constructor bind statically, so slot 71 is a
 // direct call here.
 FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
-    field_0x275 = 0;
+    isPlaced = 0;
     targetPoint = kVec3Zero;
     cachedTarget = kVec3Zero;
-    field_0x23c = 0;
+    worldYaw = 0;
     field_0x2c0 = 0;
-    field_0x29c = kVec3ZAxis;
+    followHeading = kVec3ZAxis;
     points = 0;
-    field_0x276 = 0;
+    isCrashView = 0;
     lift = 0;
-    field_0x228 = 27.0f;
+    lookAheadDistance = 27.0f;
     targetFieldOfView = fieldOfView;
     state4FieldOfView = fieldOfView;
     fieldOfViewEase = 0;
@@ -200,8 +200,8 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     distanceEase = 0;
     fovKeysEnabled = 0;
     overrideActive = 0;
-    field_0x26c = 0;
-    field_0x274 = 0;
+    isMovingTarget = 0;
+    isSettled = 0;
     pointCapacity = 0;
     pointCount = 0;
     followHeight = 7.0f;
@@ -216,14 +216,14 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     initialPitch = followPitch;
     initialYaw = followYaw;
     resumeFieldOfView = fieldOfView;
-    field_0x277 = 0;
-    field_0x278 = 0;
+    settleChecked = 0;
+    wasWide = 0;
     stateCount = 0;
     stateIndex = 0;
     blendClock = 0;
-    field_0x308 = 0;
-    field_0x279 = 0;
-    field_0x270 = 15.0f;
+    turnYaw = 0;
+    isBlending = 0;
+    recordsPerSecond = 15.0f;
     frameTime = 0;
     heightFovMinimum = 10.0f;
     heightForMinimumFov = 280.0f;
@@ -299,11 +299,11 @@ void FollowCamera::LoadCameraFile(const char* path) {
 bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
     bool moved = false;
     if (active) {
-    if (overrideActive && field_0x26c) {
+    if (overrideActive && isMovingTarget) {
         float x;
         float y;
         float speed = dt * 300.0f;
-        field_0x274 = 0;
+        isSettled = 0;
         if (FOLLOWCAMERA_KEY(0x48))
             cachedTarget.y += speed;
         if (FOLLOWCAMERA_KEY(0x50) && field_0x2c0 > 0.0f)
@@ -453,10 +453,10 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
     }
     return moved;
     } else {
-        field_0x274 = 1;
+        isSettled = 1;
     }
     } else {
-        field_0x274 = 0;
+        isSettled = 0;
     }
     return moved;
 }
@@ -471,11 +471,11 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     Vector3 target;
     Vector3 smoothed;
     bool current = ((RenderTarget*)renderContext)->currentCamera == this;
-    field_0x29c = UnknownVirtualSlot41();
-    if (!field_0x275) {
-        field_0x275 = 1;
+    followHeading = UnknownVirtualSlot41();
+    if (!isPlaced) {
+        isPlaced = 1;
         targetPoint = UnknownVirtualSlot57(0);
-        position = field_0x29c * -followDistance;
+        position = followHeading * -followDistance;
         position += targetPoint;
         subject->QueryGround(&position, 0, 0, 0);
         Vector3 direction = position - targetPoint;
@@ -484,21 +484,21 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         direction *= followDistance;
         position = direction + targetPoint;
         SetFrame(&position, 0, 0, 0, 0);
-        target = field_0x29c * field_0x228;
+        target = followHeading * lookAheadDistance;
         target += targetPoint;
         subject->QueryGround(&target, 0, 0, 0);
         UnknownVirtualSlot29(target);
-        field_0x278 = FollowCameraAbs(followYaw) > 2.0f;
+        wasWide = FollowCameraAbs(followYaw) > 2.0f;
     }
-    if (cameraState != 6 && field_0x276 && !UnknownVirtualSlot74()) {
-        field_0x276 = 0;
+    if (cameraState != 6 && isCrashView && !UnknownVirtualSlot74()) {
+        isCrashView = 0;
         followDistance = savedDistance;
         followPitch = savedPitch;
         followYaw = savedYaw;
     }
     bool wide = FollowCameraAbs(followYaw) > 2.0f;
-    if (cameraState != 6 && !field_0x278 && wide)
-        field_0x279 = 1;
+    if (cameraState != 6 && !wasWide && wide)
+        isBlending = 1;
     if (overrideActive)
         targetPoint = cachedTarget;
     else
@@ -512,7 +512,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     bool moved = UnknownVirtualSlot45(current, dt);
     UnknownVirtualSlot42(wide);
     bool following = UnknownVirtualSlot75();
-    target = UnknownVirtualSlot48(wide || field_0x274, following, dt);
+    target = UnknownVirtualSlot48(wide || isSettled, following, dt);
     position = UnknownVirtualSlot49(following, target, dt);
     if (!positionEaseX) {
         targetEaseZ = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
@@ -548,10 +548,10 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         if (cameraState != 3) {
             if (cameraState == 4)
                 UnknownVirtualSlot59();
-            field_0x274 = UnknownVirtualSlot36(position, wide, moved);
+            isSettled = UnknownVirtualSlot36(position, wide, moved);
         }
     } else if (UnknownVirtualSlot74()) {
-        field_0x276 = 1;
+        isCrashView = 1;
     }
     cachedTarget.x = targetEaseX->Update(target.x, dt);
     cachedTarget.y = targetEaseY->Update(target.y, dt);
@@ -559,12 +559,12 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     smoothed.x = positionEaseX->Update(position.x, dt);
     smoothed.y = positionEaseY->Update(position.y, dt);
     smoothed.z = positionEaseZ->Update(position.z, dt);
-    if (field_0x279) {
+    if (isBlending) {
         UnknownVirtualSlot33();
         blendClock += dt;
         blendClock = FollowCameraMin(blendClock, 1.0f);
         float blend = blendClock;
-        field_0x274 = 0;
+        isSettled = 0;
         smoothed.x = (position.x - smoothed.x) * blend + smoothed.x;
         smoothed.y = (position.y - smoothed.y) * blend + smoothed.y;
         smoothed.z = (position.z - smoothed.z) * blend + smoothed.z;
@@ -572,11 +572,11 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             UnknownVirtualSlot44(position);
             UnknownVirtualSlot43(cachedTarget);
             blendClock = 0.0f;
-            field_0x279 = moved;
+            isBlending = moved;
         }
     }
     if (savedCameraState == 6 || resumeState == 7) {
-        field_0x274 = 1;
+        isSettled = 1;
         if (resumeState == 7)
             resumeState = cameraState;
         else
@@ -585,7 +585,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         UnknownVirtualSlot43(target);
         smoothed = position;
         cachedTarget = target;
-    } else if (field_0x274) {
+    } else if (isSettled) {
         smoothed = position;
         if (!overrideActive)
             cachedTarget = target;
@@ -603,7 +603,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         SetFrame(&smoothed, 0, 0, &roll, 0);
         UnknownVirtualSlot29(cachedTarget);
         if (UnknownVirtualSlot56()) {
-            if (cameraState != 7 && !field_0x276) {
+            if (cameraState != 7 && !isCrashView) {
                 resumeState = cameraState;
                 resumeFieldOfView = targetFieldOfView;
                 initialPitch = followPitch;
@@ -626,7 +626,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         }
         if (cameraState != 5 && cameraState != 7) {
             if (UnknownVirtualSlot55()) {
-                if (cameraState != 6 && !field_0x276) {
+                if (cameraState != 6 && !isCrashView) {
                     savedCameraState = cameraState;
                     initialPitch = followPitch;
                     initialYaw = followYaw;
@@ -661,10 +661,10 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
         }
         SetFieldOfView(fieldOfViewEase->Update(targetFieldOfView, dt));
         Camera::UnknownVirtualSlot10(dt);
-        field_0x278 = wide;
+        wasWide = wide;
         return 1;
     }
     UnknownVirtualSlot54();
-    field_0x278 = wide;
+    wasWide = wide;
     return 1;
 }

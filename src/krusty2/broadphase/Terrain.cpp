@@ -17,51 +17,51 @@ Terrain::Terrain(int a)
     gridCellSize = 1.0f;
     stream = 0;
     field_0x84 = 0;
-    field_0x88 = 0;
-    field_0x90 = 0;
+    indicesDrawn = 0;
+    vertexErrorTests = 0;
     field_0x94 = 0;
-    field_0x98 = 0;
-    field_0x9c = 0;
-    field_0xa0 = 0;
-    field_0xa4 = 0;
-    field_0xa8 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
-    field_0x34 = 0;
+    detailUpdates = 0;
+    vertexDirectionSets = 0;
+    vertexChangePropagations = 0;
+    bufferRebuilds = 0;
+    verticesPinned = 0;
+    verticesReleased = 0;
+    vertexTests = 0;
+    directDrawPalette = 0;
     field_0xb4 = 0;
     ownedObjectCount = 0;
-    field_0x53c = 0;
+    retestStamp = 0;
     heightField = 0;
     drawDistance = 1000;
     drawDistanceDirty = 0;
-    field_0x30 = 0;
+    colorMapper = 0;
     field_0xbf8 = 0;
-    field_0x8c = 0;
-    field_0xbfc = 0;
-    field_0xc00 = 0;
-    field_0xc04 = 0;
+    verticesDrawn = 0;
+    profileEval = 0;
+    profileMesh = 0;
+    profileSetup = 0;
     field_0xc08 = 0;
     field_0xc0c = 0;
     appliedDrawDistance = 0;
     field_0x70 = 0;
-    field_0x78 = 0;
-    field_0x74 = 0;
-    field_0x7c = 0;
-    field_0x80 = 0;
+    distanceRatioSq = 0;
+    distanceRatio = 0;
+    invDistanceRatioSq = 0;
+    invDistanceRatio = 0;
     blockCount = 0;
     blocks = 0;
     invGridCellSize = 1.0f;
-    field_0xc34 = 0;
-    field_0xc38 = 0;
-    field_0xc3c = 0;
+    hasLightManager = 0;
+    fileStartOffset = 0;
+    detailTexture = 0;
     TerrainMatrix tmp;
     transform = *GetIdentityMatrix(&tmp);
     ownedObjectArray = 0;
     ownedObjectArrayCount = 0;
-    field_0xcc0 = 0;
-    field_0xcac = 0;
+    createdSurfaceCount = 0;
+    canSinglePassDual = 0;
     lowestQualityOverride = 0;
-    field_0xcb4 = 0;
+    closeUpStateSet = 0;
 }
 
 Terrain::~Terrain()
@@ -72,10 +72,10 @@ Terrain::~Terrain()
             ownedObjectArray[i]->BaseObjectVirtualSlot2();
         DebugFree(ownedObjectArray, __FILE__, 0x4b3);
     }
-    if (field_0xc3c)
-        field_0xc3c->BaseObjectVirtualSlot2();
-    if (field_0x30)
-        field_0x30->BaseObjectVirtualSlot2();
+    if (detailTexture)
+        detailTexture->BaseObjectVirtualSlot2();
+    if (colorMapper)
+        colorMapper->BaseObjectVirtualSlot2();
     if (ownedObjectCount) {
         for (int i = 0; i < ownedObjectCount; i++) {
             if (ownedObjects[i])
@@ -87,9 +87,9 @@ Terrain::~Terrain()
         if (heightField)
             delete heightField;
     }
-    if (field_0x34) {
-        field_0x34->Release();
-        field_0x34 = 0;
+    if (directDrawPalette) {
+        directDrawPalette->Release();
+        directDrawPalette = 0;
     }
     if (blocks) {
         for (int i = 0; i < blockCount; i++) {
@@ -98,10 +98,10 @@ Terrain::~Terrain()
         }
         DebugFree(blocks, __FILE__, 0x4d0);
     }
-    if (field_0xc84)
-        delete field_0xc84;
-    if (field_0xc88)
-        delete field_0xc88;
+    if (textureAgeManager)
+        delete textureAgeManager;
+    if (meshAgeManager)
+        delete meshAgeManager;
     g_MemTagStack->Pop(scope);
 }
 
@@ -187,14 +187,14 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
                        int quality, int field0xc40, const char* textureName, int halfFormat)
 {
     GameObject::GameObjectVirtualSlot8(host);
-    field_0xc18 = *desc;
+    surfaceDesc = *desc;
     int surfaceFlags = halfFormat ? 8 : 0;
     g_pTerrainQualityTable = g_terrainQualityHardware;
     if (!g_terrainGame->softwareRendering)
         g_pTerrainQualityTable = g_terrainQualitySoftware;
     SelectQuality(quality);
     if (field0xc40)
-        field_0xc34 = 1;
+        hasLightManager = 1;
     if (!stream) {
         BaseObjectVirtualSlot2();
         return 0;
@@ -202,11 +202,11 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     this->stream = stream;
     if (stream->inner)
         stream->Seek(stream->innerStart, 0, 0);
-    field_0xc38 = this->stream->Tell();
-    field_0x38 = field_0xc18.registry;
-    field_0xc40 = field0xc40;
-    field_0xc84 = new(__FILE__, 0x11c) TerrainOwned;
-    field_0xc88 = new(__FILE__, 0x122) TerrainOwned;
+    fileStartOffset = this->stream->Tell();
+    surfaceRegistry = surfaceDesc.registry;
+    lightManager = field0xc40;
+    textureAgeManager = new(__FILE__, 0x11c) TerrainOwned;
+    meshAgeManager = new(__FILE__, 0x122) TerrainOwned;
     ownedObjectArray = (BaseObject**)DebugCalloc(200, 4, __FILE__, 0x127);
 
     char tag[4];
@@ -219,11 +219,11 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     field_0xc98 = 6;
     if (!textureName)
         textureName = "testnoise.tga";
-    field_0xc3c = TerrainLoadTexture(field_0xc18.manager, textureName, 0x115c, 0, 2, 5, 6, 0,
+    detailTexture = TerrainLoadTexture(surfaceDesc.manager, textureName, 0x115c, 0, 2, 5, 6, 0,
                                      0x80, 0xff00ff, 1, 1);
-    if (field_0xc3c) {
-        field_0xc3c->CreateTextureSurface(1, 0, 1);
-        colorKey = field_0xc3c->field_0x3c;
+    if (detailTexture) {
+        detailTexture->CreateTextureSurface(1, 0, 1);
+        colorKey = detailTexture->averageColor;
     } else {
         colorKey = 0xffffffff;
     }
@@ -233,8 +233,8 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
         unsigned int alpha = 0xff - (key >> 24);
         unsigned int keep = 0xff - alpha;
         unsigned int red = RGBA_GETRED(key) * keep / 0xff;
-        field_0xc9c = RGBA_MAKE(alpha, alpha, alpha, 0xff);
-        field_0xca0 = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
+        unlitColor = RGBA_MAKE(alpha, alpha, alpha, 0xff);
+        unlitSpecular = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
     }
     qualityParamA = 0x100;
 
@@ -242,7 +242,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     this->stream->Read(&hasPalette, 4, 1);
     if (hasPalette) {
         TerrainColorMapper* mapper = new(__FILE__, 0x167) TerrainColorMapper(this->stream);
-        field_0x30 = mapper;
+        colorMapper = mapper;
         unsigned char* colors = mapper->GetColors();
         TerrainPaletteEntry entries[256];
         for (int i = 0; i < 256; i++) {
@@ -252,10 +252,10 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
             entries[i].flags = 0;
         }
         TerrainDirectDraw* directDraw = ((TerrainHost*)field_0x18)->display->directDraw;
-        if (directDraw->CreatePalette(0x44, entries, &field_0x34, 0) != 0)
+        if (directDraw->CreatePalette(0x44, entries, &directDrawPalette, 0) != 0)
             goto fail;
     } else {
-        field_0x34 = 0;
+        directDrawPalette = 0;
     }
 
     int gridSize;
@@ -286,16 +286,16 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
             this->stream->Read(&height, 4, 1);
             this->stream->Read(&format, 4, 1);
             TerrainSurfaceBase* surface;
-            if (field_0x38 && width == 0x100) {
-                TerrainSurface* managed = new(__FILE__, 0x1bb) TerrainSurface(field_0xc18.manager);
+            if (surfaceRegistry && width == 0x100) {
+                TerrainSurface* managed = new(__FILE__, 0x1bb) TerrainSurface(surfaceDesc.manager);
                 surface = managed;
-                surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, field_0x30,
-                                     surfaceFlags | 2, field_0x34, 2, 1, &field_0xc18, 0x80, 0xff00ff);
-                field_0x38->Register(managed);
+                surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, colorMapper,
+                                     surfaceFlags | 2, directDrawPalette, 2, 1, &surfaceDesc, 0x80, 0xff00ff);
+                surfaceRegistry->Register(managed);
             } else {
-                surface = new(__FILE__, 0x1c8) TerrainSurfaceBase(field_0xc18.manager, 1);
-                surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, field_0x30,
-                                     surfaceFlags | 2, field_0x34, 2, 1, &field_0xc18, 0x80, 0xff00ff);
+                surface = new(__FILE__, 0x1c8) TerrainSurfaceBase(surfaceDesc.manager, 1);
+                surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, colorMapper,
+                                     surfaceFlags | 2, directDrawPalette, 2, 1, &surfaceDesc, 0x80, 0xff00ff);
                 if (statusFlags & 1)
                     surface->CreateTextureSurface(1, 0, 0);
             }
@@ -317,7 +317,7 @@ Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc*
     ScaleTerrainVec3(boundsMax, gridCellSize);
     ScaleTerrainVec3(boundsMin, gridCellSize);
     if (heightField) {
-        int levels = heightField->field_0x28;
+        int levels = heightField->level;
         int shift = heightField->gridShift;
         if (levels > 0)
             shift -= levels * 4;
@@ -438,7 +438,7 @@ int Terrain::GameObjectVirtualSlot14()
 
     if (!g_UnknownGlobal68a328) {
         if (g_terrainGame->softwareRendering) {
-            field_0xcac = 0;
+            canSinglePassDual = 0;
             lowestQualityOverride = 0;
         } else {
             char key[256];
@@ -446,7 +446,7 @@ int Terrain::GameObjectVirtualSlot14()
                     g_terrainGame->display->driverName);
             int canDual = g_terrainGame->GetRegistryInt(key, -1);
             if (canDual == 0 || canDual == 1) {
-                field_0xcac = canDual;
+                canSinglePassDual = canDual;
                 sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
                         g_terrainGame->display->driverName);
                 int method = g_terrainGame->GetRegistryInt(key, 1);
@@ -458,14 +458,14 @@ int Terrain::GameObjectVirtualSlot14()
                 } else {
                     lowestQualityOverride = 0;
                 }
-                if (g_pTerrainQualityTable[qualityIndex].field_0x0c && method >= 1)
+                if (g_pTerrainQualityTable[qualityIndex].hasDetailPass && method >= 1)
                     g_terrainQualityValue = 1;
                 else
                     g_terrainQualityValue = 0;
             } else {
-                field_0xcac = 0;
+                canSinglePassDual = 0;
                 lowestQualityOverride = 0;
-                if (field_0xc3c) {
+                if (detailTexture) {
                     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 1);
                     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 0);
                     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
@@ -477,7 +477,7 @@ int Terrain::GameObjectVirtualSlot14()
                     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 2);
                     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
                     ((TerrainRenderTarget*)field_0x18)->device->SetTexture(0, ((TerrainSurfaceBase*)ownedObjects[0])->textureSurface);
-                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, field_0xc3c->textureSurface);
+                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, detailTexture->textureSurface);
                     unsigned long passes = 0;
                     ((TerrainRenderTarget*)field_0x18)->device->ValidateDevice(&passes);
                     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
@@ -487,13 +487,13 @@ int Terrain::GameObjectVirtualSlot14()
                     ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, 0);
                     g_terrainGame->SetRegistryInt(key, passes == 1);
                     if (passes == 1) {
-                        field_0xcac = 1;
+                        canSinglePassDual = 1;
                         lowestQualityOverride = 0;
                         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
                                 g_terrainGame->display->driverName);
                         g_terrainGame->SetRegistryInt(key, 1);
                     }
-                    g_terrainQualityValue = g_pTerrainQualityTable[qualityIndex].field_0x0c;
+                    g_terrainQualityValue = g_pTerrainQualityTable[qualityIndex].hasDetailPass;
                 }
             }
             g_UnknownGlobal68a328 = 1;
@@ -505,18 +505,18 @@ int Terrain::GameObjectVirtualSlot14()
     int savedShade;
     ((TerrainRenderTarget*)field_0x18)->GetRenderState(9, &savedShade);
     ((TerrainRenderTarget*)field_0x18)->camera->SetWorldMatrix(&transform);
-    field_0x88 = 0;
-    field_0x8c = 0;
+    indicesDrawn = 0;
+    verticesDrawn = 0;
     {
         unsigned int key = colorKey;
         unsigned int alpha = 0x109 - (key >> 24);
         unsigned int keep = 0xff - alpha;
         unsigned int red = RGBA_GETRED(key) * keep / 0xff;
-        field_0xc9c = RGBA_MAKE(alpha, alpha, alpha, 0xff);
-        field_0xca0 = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
+        unlitColor = RGBA_MAKE(alpha, alpha, alpha, 0xff);
+        unlitSpecular = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
     }
 
-    if (!field_0xc34 && !g_terrainQualityValue) {
+    if (!hasLightManager && !g_terrainQualityValue) {
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
     } else {
@@ -530,14 +530,14 @@ int Terrain::GameObjectVirtualSlot14()
     }
     ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
 
-    if (lowestQualityOverride && field_0xc3c) {
+    if (lowestQualityOverride && detailTexture) {
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x10, g_terrainGame->magFilter);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x11, g_terrainGame->minFilter);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x12, g_terrainGame->mipFilter);
-        field_0xcb4 = 0;
+        closeUpStateSet = 0;
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 1);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 0);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
@@ -549,12 +549,12 @@ int Terrain::GameObjectVirtualSlot14()
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 2);
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
         ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
-        ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, field_0xc3c->textureSurface);
-        if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), field_0xc3c))
+        ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, detailTexture->textureSurface);
+        if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), detailTexture))
             return 0;
         ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
     } else {
-        if (!g_terrainGame->softwareRendering && field_0xc3c && g_terrainQualityValue) {
+        if (!g_terrainGame->softwareRendering && detailTexture && g_terrainQualityValue) {
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
@@ -569,8 +569,8 @@ int Terrain::GameObjectVirtualSlot14()
             ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
             heightField->UnknownFunction480900(((TerrainRenderTarget*)field_0x18));
         }
-        if (!g_terrainGame->softwareRendering && field_0xc3c && g_terrainQualityValue) {
-            field_0xc3c->UnknownVirtualSlot11();
+        if (!g_terrainGame->softwareRendering && detailTexture && g_terrainQualityValue) {
+            detailTexture->UnknownVirtualSlot11();
             ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
@@ -580,7 +580,7 @@ int Terrain::GameObjectVirtualSlot14()
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, 2);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, 1);
-            if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), field_0xc3c))
+            if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), detailTexture))
                 return 0;
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
             ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
@@ -589,7 +589,7 @@ int Terrain::GameObjectVirtualSlot14()
     }
     ((TerrainRenderTarget*)field_0x18)->SetRenderState(4, savedPerspective, 0);
     ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, savedShade, 0);
-    field_0x88 /= 3;
+    indicesDrawn /= 3;
     GameObject::GameObjectVirtualSlot14();
     g_UnknownGlobal68a31c = ReadClock() - start;
 
@@ -600,9 +600,9 @@ int Terrain::GameObjectVirtualSlot14()
         }
         g_terrainPeak0.Record(g_UnknownGlobal68a308);
         g_terrainPeak1.Record(g_UnknownGlobal68a30c);
-        g_terrainPeak2.Record(field_0xc04);
-        g_terrainPeak3.Record(field_0xbfc);
-        g_terrainPeak4.Record(field_0xc00);
+        g_terrainPeak2.Record(profileSetup);
+        g_terrainPeak3.Record(profileEval);
+        g_terrainPeak4.Record(profileMesh);
         g_terrainPeak5.Record(g_UnknownGlobal68a310);
         g_terrainPeak7.Record(g_UnknownGlobal68a318);
         g_terrainPeak8.Record(g_UnknownGlobal68a31c);
@@ -611,18 +611,18 @@ int Terrain::GameObjectVirtualSlot14()
         g_terrainGame->overlay->UnknownFunction447fa0(g_UnknownGlobal574714, "Terrain Tolerance:%d",
                                                       drawDistance);
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Memory %d",
-                                                      g_MemTagStack->UnknownFunction4a2d20("Terrain"));
+                                                      g_MemTagStack->GetBytes("Terrain"));
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
                                                       g_UnknownGlobal68a308, g_UnknownGlobal68a30c,
                                                       g_terrainPeak0.Peak(),
                                                       g_terrainPeak1.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Setup   %d %d",
-                                                      field_0xc04, g_terrainPeak2.Peak());
+                                                      profileSetup, g_terrainPeak2.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Eval    %d[%d] %d",
-                                                      field_0xbfc, field_0x90,
+                                                      profileEval, vertexErrorTests,
                                                       g_terrainPeak3.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Mesh    %d[%d] %d",
-                                                      field_0xc00, field_0xa4,
+                                                      profileMesh, bufferRebuilds,
                                                       g_terrainPeak4.Peak());
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Cache   %d[%f] %d[%f]",
                                                       g_UnknownGlobal68a310,
@@ -646,7 +646,7 @@ int Terrain::GameObjectVirtualSlot14()
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Triangles  %d",
                                                       ((TerrainRenderTarget*)field_0x18)->triangleCount - triangles);
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "CanSinglePassDual %s",
-                                                      field_0xcac ? "TRUE" : "FALSE");
+                                                      canSinglePassDual ? "TRUE" : "FALSE");
         g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "SinglePassDual    %s",
                                                       lowestQualityOverride ? "TRUE" : "FALSE");
     }
@@ -664,10 +664,10 @@ void Terrain::ComputeRatios()
 {
     int a = appliedDrawDistance;
     int b = field_0x70;
-    field_0x78 = (float)(a * a) / (b * b);
-    field_0x74 = (float)a / b;
-    field_0x7c = 1.0f / field_0x78;
-    field_0x80 = 1.0f / field_0x74;
+    distanceRatioSq = (float)(a * a) / (b * b);
+    distanceRatio = (float)a / b;
+    invDistanceRatioSq = 1.0f / distanceRatioSq;
+    invDistanceRatio = 1.0f / distanceRatio;
 }
 
 TerrainQualityEntry* g_pTerrainQualityTable;
@@ -698,15 +698,15 @@ void Terrain::SetField0xbec(int value)
 void Terrain::SelectQuality(int index)
 {
     qualityIndex = index;
-    g_terrainQualityValue = g_pTerrainQualityTable[index].field_0x0c;
+    g_terrainQualityValue = g_pTerrainQualityTable[index].hasDetailPass;
     SetField0xbec(g_pTerrainQualityTable[qualityIndex].drawDistanceSetting);
     // if/else, not a ?: expression: VC6 merges the two stores but allocates the joined value
     // to edx only in this form (retail 0x5079a3).
     if (lowestQualityOverride)
-        qualityParamA = g_pTerrainQualityTable[9].field_0x04;
+        qualityParamA = g_pTerrainQualityTable[9].closeUpDetailLimit;
     else
-        qualityParamA = g_pTerrainQualityTable[qualityIndex].field_0x04;
-    qualityParamB = g_pTerrainQualityTable[qualityIndex].field_0x08;
+        qualityParamA = g_pTerrainQualityTable[qualityIndex].closeUpDetailLimit;
+    qualityParamB = g_pTerrainQualityTable[qualityIndex].perspectiveLimit;
 }
 
 int g_terrainToggle314;
@@ -723,13 +723,13 @@ int Terrain::GameObjectVirtualSlot23(int event, int)
         return 1;
     }
     if (TestInputEvent(2, 0, event, 0x80)) {
-        if (g_terrainQualityValue && field_0xcac) {
+        if (g_terrainQualityValue && canSinglePassDual) {
             lowestQualityOverride = 1 - lowestQualityOverride;
             if (lowestQualityOverride) {
-                qualityParamA = g_pTerrainQualityTable[9].field_0x04;
+                qualityParamA = g_pTerrainQualityTable[9].closeUpDetailLimit;
                 return 1;
             }
-            qualityParamA = g_pTerrainQualityTable[qualityIndex].field_0x04;
+            qualityParamA = g_pTerrainQualityTable[qualityIndex].closeUpDetailLimit;
         }
         g_terrainQualityValue = 1 - g_terrainQualityValue;
         return 1;

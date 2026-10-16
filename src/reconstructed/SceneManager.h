@@ -18,7 +18,7 @@ struct UnknownSound3DParameters;
 // D3DIMSoultreeObject methods of D3DIMSoulTree.h). A view: the scene reaches
 // it through character +0x1a0, object +0x34 and each shadow caster.
 struct UnknownSceneLodObject {
-    void UnknownFunction4444c0(int value);           // 0x004444c0
+    void SetUseLighting(int value);           // 0x004444c0
     void ApplyLodSettings(int level);           // 0x004451e0
     void SetAxesPtr(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
     void SetPosition(const Vector3* position); // 0x004fc660
@@ -45,10 +45,10 @@ public:
 
     unsigned char field_0x008[0x0c - 0x08];
     int field_0x0c;                       // cleared by 0x004a8b40
-    int field_0x10;                       // the motion time (Character +0x10)
+    int motionTime;  // +0x10  Character +0x10: motion time (slot 7 adds time to it); RestartEntry zeroes it before AdvanceMotion
     unsigned char field_0x014[0x1a0 - 0x14];
     UnknownSceneLodObject* modelNode;         // +0x1a0
-    char field_0x1a4[0x6c];
+    char fileName[0x6c];  // +0x1A4  FindEntryByFileName (0x004eaec0) compares it, up to its '.', with the path's file name
     void* collisionObject;                // +0x210 CollisionCharacter's CollisionObject (QuarryStuntEvent.cpp)
     unsigned char field_0x214[0x268 - 0x214];
 };
@@ -68,13 +68,13 @@ public:
                                              float a14, float a15);
 
     unsigned char field_0x2c[0x34 - 0x2c];
-    UnknownSceneLodObject* field_0x34;
-    void* field_0x38;                     // CarProcedural's two CollisionObjects (QuarryStuntEvent.cpp)
-    void* field_0x3c;
+    UnknownSceneLodObject* carModel;  // +0x34  CarProcedural +0x34 carModel; SetDetailLevel/BikeRace use it as the model node
+    void* sensorCollider;  // +0x38  CarProcedural +0x38 sensorCollider (QuarryStuntEvent sets collision ignore lists)
+    void* bodyCollider;  // +0x3C  CarProcedural +0x3c bodyCollider
     unsigned char field_0x40[0x5c - 0x40];
     int field_0x5c;
     unsigned char field_0x60[0x194 - 0x60];
-    float field_0x194;
+    float pathTime;  // +0x194  CarProcedural +0x194 pathTime; RestartEntry (0x004eb040) sets it to the restart time
     // +0x20c (the terrain) stays unnamed here: naming it together with
     // +0x38/+0x3c changes VC6's code for 0x004eb570.
     unsigned char field_0x198[0x22c - 0x198];
@@ -176,10 +176,10 @@ struct UnknownSceneLight {
     int type;                             // "Type" keyword (0x00572c28 table: Undefined..AmbientNoise)
     unsigned long color;                  // "ColorRGB"
     Vector3 position;                     // "Position"
-    Vector3* field_0x18;                  // &position, &direction or 0
+    Vector3* effectivePosition;  // +0x18  ReadLight points it at position, at direction (PlaceLightAtInfinity) or 0
     Vector3 direction;                    // position scaled to 80000 units (at infinity)
     Vector3 look;                         // "LookVector" or towards "TargetPosition"
-    Vector3* field_0x34;                  // &look or 0
+    Vector3* emitterDirection;  // +0x34  &look or 0; Load passes it as LightEmitter::Create's direction
     float range;                          // "Range"
     unsigned char showDebugSphere : 1;    // +0x3c bit 0
     unsigned char atInfinity : 1;         // bit 1 "PlaceLightAtInfinity"
@@ -233,12 +233,12 @@ public:
     UnknownSceneResourceManager();       // 0x004e8e80
     ~UnknownSceneResourceManager();      // 0x004e8ea0
 
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;                       // field_0x14 count
-    int field_0x0c;                       // field_0x10 count
-    void** field_0x10;
-    void** field_0x14;
+    int itemCapacity;  // +0x0  same class as UnknownResourceManager (ResourceManager.h +0x00 itemCapacity)
+    int archiveCapacity;  // +0x4  UnknownResourceManager +0x04 archiveCapacity
+    int itemCount;  // +0x8  UnknownResourceManager +0x08 itemCount
+    int archiveCount;  // +0xC  UnknownResourceManager +0x0c archiveCount
+    void** archives;  // +0x10  UnknownResourceManager +0x10 archives
+    void** items;  // +0x14  UnknownResourceManager +0x14 items
 };
 
 // Name/value pair scanned by 0x004e9980.

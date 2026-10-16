@@ -248,7 +248,7 @@ void Bike::UnknownVirtualSlot49(float arg)
 void Bike::UnknownVirtualSlot44()
 {
     Vehicle::UnknownVirtualSlot44();
-    riderCharacter->c_0x1a0->Method_0x004444e0();
+    riderCharacter->c_0x1a0->ClearScreenRects();
 }
 
 void Bike::UnknownVirtualSlot71(int arg)
@@ -557,7 +557,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
                 (int)GameObject::field_0x18, riderModel, desc, (int)info, 1, 1), -1))
         riderCharacter = 0;
     if (desc && (desc->field_0x25 & 1))
-        riderCharacter->c_0x1a0->Fn_4444c0(1);
+        riderCharacter->c_0x1a0->SetUseLighting(1);
     if (info)
         field_0x5c8 = *info;
     bodyForward = kVec3ZAxis;
@@ -693,7 +693,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     }
 
     modelNode->GetMatrixIn(0, &riderMatrix);
-    riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &riderMatrix);
+    riderCharacter->c_0x1a0->SetMatrixIn(0, &riderMatrix);
     UnknownVirtualSlot97();
     steerState->SetAxisFromPoints(frontWheel->sceneNode, field_0x60c->node, poseNode);
     steerState->SetAngle(0.0f, poseNode);
@@ -795,7 +795,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         collisionObject->onHitCallback = BikeCollisionCallback;
         collisionObject->onHitByCallback = BikeStaticCollisionCallback;
     }
-    field_0x604->Method_0x005327c0();
+    field_0x604->EndWreck();
     D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], 0.5f);
     riderCharacter->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
     verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
@@ -814,7 +814,7 @@ int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
     int mode = field_0x604->a_0x44;
     if (mode == 0 || mode == 1) {
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &tmp);
+        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
     field_0x604->a_0x38->Method_0x00435fe0();
     return r;
@@ -1010,7 +1010,7 @@ void Bike::UnknownVirtualSlot29(int)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &tmp);
+        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
 }
 
@@ -1094,7 +1094,7 @@ void Bike::UnknownVirtualSlot102(float)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &tmp);
+        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
 }
 
@@ -1275,13 +1275,13 @@ static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, 
     offset.y = y;
     offset.z = z;
     int bone = self->field_0x604->a_0x34->r_0x1a0->FindByName(name);
-    self->field_0x604->Method_0x00532900(offset, bone);
+    self->field_0x604->AddProbe(offset, bone);
 }
 
 void Bike::UnknownVirtualSlot97()
 {
     field_0x604 = new(__FILE__, 2023) BikeA604(1);
-    if (field_0x604->Method_0x00530190(GameObject::field_0x18, riderCharacter, "rider.col")) {
+    if (field_0x604->SetupWrecker(GameObject::field_0x18, riderCharacter, "rider.col")) {
         GameObject::Method_0x00469190(field_0x604, -1);
         field_0x604->a_0x38->n_0xe4 = ((BikeA1F4*)terrain);
         field_0x604->a_0x38->n_0x64 = 0x65;

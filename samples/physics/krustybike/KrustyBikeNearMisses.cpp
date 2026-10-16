@@ -30,16 +30,16 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     field_0x1540 = kVec3Zero;
     field_0x11b8 = 0;
     field_0x604 = 0;
-    field_0x734 = 0;
+    aiKind = 0;
     field_0x735 = 0;
     field_0x768 = 0;
-    field_0x1604 = 0;
-    field_0x740 = 0;
+    pingTimer = 0;
+    race = 0;
     field_0x7b8 = 0;
     field_0x7c0 = 0;
     field_0x7bc = 1;
     field_0x748 = 0;
-    field_0x11bc = 0;
+    netId = 0;
     field_0x141c = 0;
     field_0x4a4 = 1.0f;
     field_0x788 = 0;
@@ -47,11 +47,11 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     field_0x760 = 0;
     field_0x75c = 0;
     field_0x764 = 0;
-    field_0x15e8 = 0;
+    ghostMod = 0;
     field_0x1410 = -1;
     field_0x15e6 = 0;
     field_0x7a5 = 0;
-    field_0x736 = 0;
+    isGhost = 0;
     field_0x7ac = 0;
     field_0x7b0 = 0;
     field_0x7b4 = 0;
@@ -62,7 +62,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     field_0x1380 = 0;
     field_0x1384 = 0;
     field_0x1388 = 0;
-    field_0x1558 = 0;
+    rivalBearing = 0;
     field_0x15d4 = 0;
     lastCollisionType = 0;
     altBodyB = 0;
@@ -84,7 +84,7 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 {
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
     float a[3] = { 1.15f, 1.05f, 1.0f };
-    if (field_0x734) {
+    if (aiKind) {
         float speedGain = linearSpeed - prevSpeed;
         if (speedGain * b[g_kbGame->field_0x2d74 != 3][g_kbGame->field_0x60c - 1] < arg * speedGainLimit)
             return 1;
@@ -110,23 +110,23 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag;
-    if (g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4)
+    if (g_kbGame->field_0x578.GetSelectedSeries() == 3 || g_kbGame->field_0x578.GetSelectedSeries() == 4)
         flag = 1;
     else
         flag = 0;
     int lim;
-    if (g_kbGame->field_0x578.Fn_00524100() == 5 || g_kbGame->field_0x578.Fn_00524100() == 4)
+    if (g_kbGame->field_0x578.GetSelectedSeries() == 5 || g_kbGame->field_0x578.GetSelectedSeries() == 4)
         lim = 0x7fffffff;
     else
         lim = 0x66;
     unsigned char hit = 0;
-    if (g_kbGame->field_0x578.Fn_00524100() == 5)
+    if (g_kbGame->field_0x578.GetSelectedSeries() == 5)
         hit = Kb_004B0AC0(&position, 2.0f, 2.0f, 2.0f, terrainScale, 0, 0, 0, 0);
     KbGame* g = g_kbGame;
     switch (g->field_0x2d74) {
     case 2:
     case 3:
-        if (g->field_0x2d70 || field_0x78c || field_0x734 || field_0x736 || a1 == 2 ||
+        if (g->field_0x2d70 || field_0x78c || aiKind || isGhost || a1 == 2 ||
             g->field_0xc50) {
             *a2 = respawnPosition;
             *a3 = respawnHeading;
@@ -231,10 +231,10 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
     } else {
         state = &netState;
         state->timer += g_kbGame->field_0x2f0;
-        field_0x15d0 += g_kbGame->field_0x2f0;
-        if (field_0x15d0 < g_kbGame->shortNetPacketIntervalSec)
+        shortMessageTimer += g_kbGame->field_0x2f0;
+        if (shortMessageTimer < g_kbGame->shortNetPacketIntervalSec)
             return;
-        field_0x15d0 = 0;
+        shortMessageTimer = 0;
         if (state->timer > g_kbGame->fullNetPacketIntervalSec)
             goto sendFull;
     }
@@ -243,7 +243,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
         KbBikePing ping;
         Vec3 d;
         Vec3 diff;
-        message.field_0x16 = field_0x11c0;
+        message.field_0x16 = loaderKind;
         KbSub(&diff, velocity, state->velocity);
         d = diff + state->velocityError;
         if (KB_DELTA_FITS(d.x, 30.0f) && KB_DELTA_FITS(d.y, 30.0f) && KB_DELTA_FITS(d.z, 30.0f)) {
@@ -322,9 +322,9 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                         message.field_0x11 = field_0x7b8;
                                     if (!record) {
                                         if (g_kbGame->field_0x8)
-                                            g_kbGame->field_0x8->Send(13, &message, sizeof(message), field_0x11bc, record);
+                                            g_kbGame->field_0x8->Send(13, &message, sizeof(message), netId, record);
                                     } else if (netRecorder) {
-                                        netRecorder->Fn_004E8720(13, field_0x11bc, &message, sizeof(message));
+                                        netRecorder->QueueRecord(13, netId, &message, sizeof(message));
                                     }
                                     state->position = position;
                                     state->roll = bodyRoll;
@@ -337,18 +337,18 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     if (!record) {
                                         if (g_kbGame->field_0x8 &&
                                             (!g_kbGame->field_0x2d74 || (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8))) {
-                                            field_0x1604 -= g_kbGame->field_0x2f0;
-                                            if (field_0x1604 < 0.0f) {
+                                            pingTimer -= g_kbGame->field_0x2f0;
+                                            if (pingTimer < 0.0f) {
                                                 ping.field_0x04 = field_0x768;
-                                                ping.field_0x01 = field_0x11c0;
-                                                g_kbGame->field_0x8->Send(10, &ping, sizeof(ping), field_0x11bc, 0);
-                                                field_0x1604 = 2.0f;
+                                                ping.field_0x01 = loaderKind;
+                                                g_kbGame->field_0x8->Send(10, &ping, sizeof(ping), netId, 0);
+                                                pingTimer = 2.0f;
                                             }
                                         }
-                                    } else if (netRecorder && field_0x740->field_0x3fb) {
+                                    } else if (netRecorder && race->scoreRecordDue) {
                                         ping.field_0x04 = field_0x768;
-                                        ping.field_0x01 = field_0x11c0;
-                                        netRecorder->Fn_004E8720(10, field_0x11bc, &ping, sizeof(ping));
+                                        ping.field_0x01 = loaderKind;
+                                        netRecorder->QueueRecord(10, netId, &ping, sizeof(ping));
                                     }
                                     return;
                                 }
@@ -430,99 +430,99 @@ void KrustyBike::Fn_00493660(float dt, int a)
     cur = states[g_kbGame->field_0x3428 ? 3 : 2];
     if (cur->position.x != 0.0f && cur->position.y != 0.0f && cur->position.z != 0.0f) {
         if (g_kbGame->field_0x3428 == 0 && g_kbGame->field_0x2d70 != 4) {
-            if (field_0x15f8 != states[0]->timeReceived) {
-                field_0x15f8 = states[0]->timeReceived;
-                if (field_0x15f4 == 0) {
-                    field_0x15f4 = 1;
+            if (lastTimeReceived != states[0]->timeReceived) {
+                lastTimeReceived = states[0]->timeReceived;
+                if (firstPacketLatch == 0) {
+                    firstPacketLatch = 1;
                 } else {
-                    field_0x15f0 = (float)(states[1]->time - states[2]->time) * 0.001f;
-                    field_0x15fc = states[1];
-                    field_0x1600 = states[2];
-                    while (field_0x15ec > field_0x15f0 && field_0x15f0 > 0.0f)
-                        field_0x15ec -= field_0x15f0;
-                    if (field_0x15ec < 0.0f)
-                        field_0x15ec = 0.0f;
+                    stateIntervalLength = (float)(states[1]->time - states[2]->time) * 0.001f;
+                    interpTarget = states[1];
+                    interpSource = states[2];
+                    while (stateIntervalElapsed > stateIntervalLength && stateIntervalLength > 0.0f)
+                        stateIntervalElapsed -= stateIntervalLength;
+                    if (stateIntervalElapsed < 0.0f)
+                        stateIntervalElapsed = 0.0f;
                 }
             }
-            if (field_0x15ec > field_0x15f0) {
-                if (field_0x15f4 == 1) {
-                    field_0x15f4 = 0;
-                    while (field_0x15ec > field_0x15f0 && field_0x15f0 > 0.0f)
-                        field_0x15ec -= field_0x15f0;
-                    field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
-                    field_0x15fc = states[0];
-                    field_0x1600 = states[1];
+            if (stateIntervalElapsed > stateIntervalLength) {
+                if (firstPacketLatch == 1) {
+                    firstPacketLatch = 0;
+                    while (stateIntervalElapsed > stateIntervalLength && stateIntervalLength > 0.0f)
+                        stateIntervalElapsed -= stateIntervalLength;
+                    stateIntervalLength = (float)(states[0]->time - states[1]->time) * 0.001f;
+                    interpTarget = states[0];
+                    interpSource = states[1];
                 } else {
-                    field_0x15ec = field_0x15f0;
+                    stateIntervalElapsed = stateIntervalLength;
                 }
             }
         } else {
             // replay: the race clock, less a fixed lag, picks the state interval
-            float clock = field_0x740->field_0x1b8;
+            float clock = this->race->replayTime;
             if (g_kbGame->field_0x2d70 == 4) {
                 float adj;
-                field_0x15ec = (clock - 0.17f) - (float)states[2]->time * 0.001f;
-                adj = field_0x740->field_0x1b8 - 0.17f;
-                if (adj > (float)states[0]->time * 0.001f && field_0x740->field_0x1e4 == -2) {
-                    field_0x15ec = field_0x15f0;
+                stateIntervalElapsed = (clock - 0.17f) - (float)states[2]->time * 0.001f;
+                adj = this->race->replayTime - 0.17f;
+                if (adj > (float)states[0]->time * 0.001f && this->race->lastRecordKind == -2) {
+                    stateIntervalElapsed = stateIntervalLength;
                 } else if (adj > (float)states[1]->time * 0.001f) {
-                    field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
-                    field_0x15ec -= (float)(states[1]->time - states[2]->time) * 0.001f;
-                    field_0x15fc = states[0];
-                    field_0x1600 = states[1];
+                    stateIntervalLength = (float)(states[0]->time - states[1]->time) * 0.001f;
+                    stateIntervalElapsed -= (float)(states[1]->time - states[2]->time) * 0.001f;
+                    interpTarget = states[0];
+                    interpSource = states[1];
                 } else {
-                    field_0x15f0 = (float)(states[1]->time - states[2]->time) * 0.001f;
-                    field_0x15fc = states[1];
-                    field_0x1600 = states[2];
+                    stateIntervalLength = (float)(states[1]->time - states[2]->time) * 0.001f;
+                    interpTarget = states[1];
+                    interpSource = states[2];
                 }
             } else {
                 float adj;
-                field_0x15ec = (clock - 0.27f) - (float)states[3]->time * 0.001f;
-                adj = field_0x740->field_0x1b8 - 0.27f;
-                if (adj > (float)states[0]->time * 0.001f && field_0x740->field_0x1e4 == -2) {
-                    field_0x15ec = field_0x15f0;
+                stateIntervalElapsed = (clock - 0.27f) - (float)states[3]->time * 0.001f;
+                adj = this->race->replayTime - 0.27f;
+                if (adj > (float)states[0]->time * 0.001f && this->race->lastRecordKind == -2) {
+                    stateIntervalElapsed = stateIntervalLength;
                 } else if (adj < (float)states[2]->time * 0.001f) {
-                    field_0x15f0 = (float)(states[2]->time - states[3]->time) * 0.001f;
-                    field_0x15fc = states[2];
-                    field_0x1600 = states[3];
+                    stateIntervalLength = (float)(states[2]->time - states[3]->time) * 0.001f;
+                    interpTarget = states[2];
+                    interpSource = states[3];
                 } else if (adj < (float)states[1]->time * 0.001f) {
-                    field_0x15f0 = (float)(states[1]->time - states[2]->time) * 0.001f;
-                    field_0x15ec -= (float)(states[2]->time - states[3]->time) * 0.001f;
-                    field_0x15fc = states[1];
-                    field_0x1600 = states[2];
+                    stateIntervalLength = (float)(states[1]->time - states[2]->time) * 0.001f;
+                    stateIntervalElapsed -= (float)(states[2]->time - states[3]->time) * 0.001f;
+                    interpTarget = states[1];
+                    interpSource = states[2];
                 } else {
-                    field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
-                    field_0x15ec -= (float)(states[1]->time - states[3]->time) * 0.001f;
-                    if (field_0x15ec > field_0x15f0)
-                        field_0x15ec = field_0x15f0;
-                    field_0x15fc = states[0];
-                    field_0x1600 = states[1];
+                    stateIntervalLength = (float)(states[0]->time - states[1]->time) * 0.001f;
+                    stateIntervalElapsed -= (float)(states[1]->time - states[3]->time) * 0.001f;
+                    if (stateIntervalElapsed > stateIntervalLength)
+                        stateIntervalElapsed = stateIntervalLength;
+                    interpTarget = states[0];
+                    interpSource = states[1];
                 }
-                if (field_0x15ec < 0.0f)
-                    field_0x15ec = 0.0f;
+                if (stateIntervalElapsed < 0.0f)
+                    stateIntervalElapsed = 0.0f;
             }
         }
         if (!g_kbInterpolate) {
             unsigned int now = UnknownFunction4bfa80();
             if (!g_kbUseTimeReceived)
-                field_0x15ec = ((float)now - (float)states[0]->time - field_0x11c4) * 0.001f;
+                stateIntervalElapsed = ((float)now - (float)states[0]->time - clockOffset) * 0.001f;
             else
-                field_0x15ec = ((float)now - (float)states[0]->timeReceived) * 0.001f;
-            if (!g_kbAllowNegative && field_0x15ec < 0.0f)
-                field_0x15ec = 0.0f;
-            if (g_kbUseExtrapLimit && field_0x15ec > g_kbExtrapLimit)
-                field_0x15ec = g_kbExtrapLimit;
-            field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
+                stateIntervalElapsed = ((float)now - (float)states[0]->timeReceived) * 0.001f;
+            if (!g_kbAllowNegative && stateIntervalElapsed < 0.0f)
+                stateIntervalElapsed = 0.0f;
+            if (g_kbUseExtrapLimit && stateIntervalElapsed > g_kbExtrapLimit)
+                stateIntervalElapsed = g_kbExtrapLimit;
+            stateIntervalLength = (float)(states[0]->time - states[1]->time) * 0.001f;
         }
-        if (field_0x15f0 > 0.0f)
-            ratio = field_0x15ec / field_0x15f0;
+        if (stateIntervalLength > 0.0f)
+            ratio = stateIntervalElapsed / stateIntervalLength;
         else
             ratio = 0.0f;
 
         // velocity
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
-                if (g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold)
+                if (g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold)
                     delta = states[0]->velocity - velocity;
                 else
                     delta = (states[0]->velocity - states[1]->velocity) * ratio + states[0]->velocity - velocity;
@@ -544,7 +544,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 velocity = states[0]->velocity;
             }
         } else {
-            velocity = (field_0x15fc->velocity - field_0x1600->velocity) * ratio + field_0x1600->velocity;
+            velocity = (interpTarget->velocity - interpSource->velocity) * ratio + interpSource->velocity;
         }
         smoothedVerticalAccel = (velocity.y - prevVelocity.y) / g_kbGame->field_0x2f0;
         prevSpeed = linearSpeed;
@@ -554,10 +554,10 @@ void KrustyBike::Fn_00493660(float dt, int a)
         // position
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
-                if (g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold)
+                if (g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold)
                     delta = states[0]->position - position;
                 else
-                    delta = states[0]->velocity * field_0x15ec + states[0]->position - position;
+                    delta = states[0]->velocity * stateIntervalElapsed + states[0]->position - position;
                 if (g_kbRateLimiting) {
                     dist2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
                     // the position may move at speed + 50 per second; retail stores limitSq
@@ -582,7 +582,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 position = states[0]->position;
             }
         } else {
-            position = (field_0x15fc->position - field_0x1600->position) * ratio + field_0x1600->position;
+            position = (interpTarget->position - interpSource->position) * ratio + interpSource->position;
         }
 
         // orientation
@@ -590,13 +590,13 @@ void KrustyBike::Fn_00493660(float dt, int a)
             UnknownFunction4b5d00(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
             s = states[1];
         } else {
-            UnknownFunction4b5d00(&bodyForward, &bodyUp, field_0x15fc->roll, field_0x15fc->pitch, field_0x15fc->yaw);
-            s = field_0x1600;
+            UnknownFunction4b5d00(&bodyForward, &bodyUp, interpTarget->roll, interpTarget->pitch, interpTarget->yaw);
+            s = interpSource;
         }
         UnknownFunction4b5d00(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
         if (!g_kbInterpolate) {
             if (g_kbLatencyHiding) {
-                if (g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold) {
+                if (g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold) {
                     angularVelocity = states[0]->angularVelocity;
                 } else {
                     bodyForward = (bodyForward - localFwd) * ratio + localFwd;
@@ -609,7 +609,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         } else {
             bodyForward = (bodyForward - localFwd) * ratio + localFwd;
             bodyUp = (bodyUp - localUp) * ratio + localUp;
-            angularVelocity = (field_0x15fc->angularVelocity - field_0x1600->angularVelocity) * ratio + field_0x1600->angularVelocity;
+            angularVelocity = (interpTarget->angularVelocity - interpSource->angularVelocity) * ratio + interpSource->angularVelocity;
         }
 
         savedPos = position;
@@ -653,7 +653,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
         movingForward = 1;
 
         // wheel roll from the horizontal speed
-        if (!(field_0x740->field_0x3f8 && field_0x740->field_0x1e4 != -2)) {
+        if (!(this->race->replayPaused && this->race->lastRecordKind != -2)) {
             float d;
             float roll;
             scratchVector = velocity;
@@ -669,27 +669,27 @@ void KrustyBike::Fn_00493660(float dt, int a)
         if (!g_kbInterpolate)
             turnRate = states[0]->angularVelocity.y;
         else
-            turnRate = (field_0x15fc->angularVelocity.y - field_0x1600->angularVelocity.y) * ratio + field_0x1600->angularVelocity.y;
+            turnRate = (interpTarget->angularVelocity.y - interpSource->angularVelocity.y) * ratio + interpSource->angularVelocity.y;
 
         // pose parameter; the clamp follows both modes
         if (!g_kbInterpolate) {
-            int d = field_0x15fc->poseParam - field_0x1600->poseParam;
+            int d = interpTarget->poseParam - interpSource->poseParam;
             if (KB_ABS(d) >= 0x40) {
                 poseParam = (float)states[0]->poseParam * KB_BYTE_SCALE;
             } else {
                 float p = (float)states[0]->poseParam * KB_BYTE_SCALE;
                 poseParam = p;
-                if (!(g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold))
+                if (!(g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold))
                     poseParam = (p - (float)states[1]->poseParam * KB_BYTE_SCALE) * ratio + p;
             }
         } else {
-            int b = field_0x1600->poseParam;
-            unsigned char c = field_0x15fc->poseParam;
+            int b = interpSource->poseParam;
+            unsigned char c = interpTarget->poseParam;
             int d = c - b;
             if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
                 if (!field_0x1400) {
                     field_0x1400 = 1;
-                    field_0x1408 = field_0x1600->poseParam;
+                    field_0x1408 = interpSource->poseParam;
                 }
                 poseParam = (float)field_0x1408 * KB_BYTE_SCALE;
             } else if (field_0x1400) {
@@ -718,17 +718,17 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 poseLeanBlend = v;
             } else {
                 poseLeanBlend = v;
-                if (!(g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold))
+                if (!(g_kbUseLatencyThreshold && stateIntervalElapsed > g_kbLatencyThreshold))
                     poseLeanBlend = (v - (float)states[1]->poseLeanBlend * KB_BYTE_SCALE) * ratio + v;
             }
         } else {
-            int b = field_0x1600->poseLeanBlend;
-            unsigned char c = field_0x15fc->poseLeanBlend;
+            int b = interpSource->poseLeanBlend;
+            unsigned char c = interpTarget->poseLeanBlend;
             int d = c - b;
             if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
                 if (!field_0x1404) {
                     field_0x1404 = 1;
-                    field_0x1408 = field_0x1600->poseLeanBlend;   // retail stores +0x1408 but reads +0x140c
+                    field_0x1408 = interpSource->poseLeanBlend;   // retail stores +0x1408 but reads +0x140c
                 }
                 poseLeanBlend = (float)field_0x140c * KB_BYTE_SCALE;
             } else if (field_0x1404) {
@@ -756,8 +756,8 @@ void KrustyBike::Fn_00493660(float dt, int a)
             else
                 poseBlend = (float)b0 * KB_BYTE_SCALE;
         } else {
-            int b = field_0x1600->poseBlend;
-            int c = field_0x15fc->poseBlend;
+            int b = interpSource->poseBlend;
+            int c = interpTarget->poseBlend;
             int d = c - b;
             float v;
             float lim;
@@ -808,7 +808,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         if (field_0x7b8 == 0)
                             field_0x7a0++;
                         field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
-                        if (this == field_0x740->field_0x50->field_0x3b4)
+                        if (this == this->race->raceCamera->field_0x3b4)
                             ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
                     }
                 }
@@ -830,7 +830,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     field_0x784 = states[0]->field_0x01;
                 }
             }
-            if (!field_0x736) {
+            if (!isGhost) {
                 UnknownVirtualSlot50(states[0]->flag4, 5.0f, 0);
                 if (field_0x7a5) {
                     Fn_00496E30(0);
@@ -851,15 +851,15 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 field_0x464 = bodyUp.y < 0.0f;
                 field_0x45c = savedYaw;
                 if (field_0x430)
-                    field_0x604->Method_0x00532310();
+                    field_0x604->StartTumble();
                 else
-                    field_0x604->Method_0x00532220(states[0]->crashDirection);
+                    field_0x604->StartAnimatedWreck(states[0]->crashDirection);
                 field_0x433 = 0;
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
-                field_0x604->Method_0x005327c0();
+                field_0x604->EndWreck();
                 Fn_00496DA0();
                 field_0x430 = 0;
                 field_0x433 = 0;
@@ -876,88 +876,88 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         Fn_0048E280();
                 }
             } else if (!field_0x153f) {
-                char m = field_0x1600->motion;
+                char m = interpSource->motion;
                 if (m > 0x11 && m - 0x11 == field_0x433)
                     Fn_0048D990(field_0x433);
             }
         } else {
             int lean;
             int prevCrash;
-            poseIndex = field_0x1600->poseIndex;
+            poseIndex = interpSource->poseIndex;
             lean = poseIndex == 11 || poseIndex == 12;
             if (field_0x6fc && !lean) {
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
             }
             field_0x6fc = lean;
-            poseState = field_0x1600->poseState;
+            poseState = interpSource->poseState;
             if (g_kbGame->field_0x560) {
-                if (field_0x7b8 == field_0x1600->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && field_0x1600->field_0x53 == 0))
+                if (field_0x7b8 == interpSource->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && interpSource->field_0x53 == 0))
                     field_0x7c0 = 1;
                 else
                     field_0x7c0 = 0;
                 if (a) {
                     int prev = field_0x7b8;
-                    field_0x7b8 = field_0x1600->field_0x53;
+                    field_0x7b8 = interpSource->field_0x53;
                     if (prev != field_0x7b8) {
                         if (field_0x7b8 == 0)
                             field_0x7a0++;
                         field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
-                        if (this == field_0x740->field_0x50->field_0x3b4)
+                        if (this == this->race->raceCamera->field_0x3b4)
                             ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
                     }
                 }
             } else {
-                if (!field_0x1600->field_0x5c)
-                    field_0x1600->field_0x04 = (short)((field_0x7a0 & 0xff00) | field_0x1600->field_0x53);
-                if ((unsigned short)field_0x7a0 == (unsigned short)field_0x1600->field_0x04 - 1)
+                if (!interpSource->field_0x5c)
+                    interpSource->field_0x04 = (short)((field_0x7a0 & 0xff00) | interpSource->field_0x53);
+                if ((unsigned short)field_0x7a0 == (unsigned short)interpSource->field_0x04 - 1)
                     field_0x7c0 = 1;
                 else
                     field_0x7c0 = 0;
                 if (a)
-                    field_0x7a0 = field_0x1600->field_0x04;
+                    field_0x7a0 = interpSource->field_0x04;
             }
-            if (field_0x1600->field_0x5c) {
-                field_0x74c = field_0x1600->field_0x20;
-                field_0x750 = field_0x1600->field_0x28;
+            if (interpSource->field_0x5c) {
+                field_0x74c = interpSource->field_0x20;
+                field_0x750 = interpSource->field_0x28;
                 if (a) {
-                    field_0x770 = field_0x1600->field_0x2c;
-                    field_0x784 = field_0x1600->field_0x01;
+                    field_0x770 = interpSource->field_0x2c;
+                    field_0x784 = interpSource->field_0x01;
                 }
             }
-            if (!field_0x736) {
-                UnknownVirtualSlot50(field_0x1600->flag4, 5.0f, 0);
+            if (!isGhost) {
+                UnknownVirtualSlot50(interpSource->flag4, 5.0f, 0);
                 if (field_0x7a5) {
                     Fn_00496E30(0);
                     field_0x7a5 = 0;
                 }
             }
-            if (field_0x1600->flag6)
+            if (interpSource->flag6)
                 field_0x78c = 1;
             else
                 field_0x78c = 0;
             prevCrash = crashState;
-            crashState = field_0x1600->crashed;
-            if (!field_0x740->field_0x3f8 && field_0x740->field_0x1e4 != -2)
-                field_0x478 = field_0x1600->flag7;
+            crashState = interpSource->crashed;
+            if (!this->race->replayPaused && this->race->lastRecordKind != -2)
+                field_0x478 = interpSource->flag7;
             else
                 field_0x478 = 0;
-            field_0x479 = field_0x1600->flag8;
-            field_0x153c = field_0x1600->flag9;
+            field_0x479 = interpSource->flag8;
+            field_0x153c = interpSource->flag9;
             if (crashState && !prevCrash) {
                 field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
                 field_0x464 = bodyUp.y < 0.0f;
                 field_0x45c = savedYaw;
                 if (field_0x430)
-                    field_0x604->Method_0x00532310();
+                    field_0x604->StartTumble();
                 else
-                    field_0x604->Method_0x00532220(field_0x1600->crashDirection);
+                    field_0x604->StartAnimatedWreck(interpSource->crashDirection);
                 field_0x433 = 0;
                 UnknownVirtualSlot41();
                 field_0x431 = 0;
                 Fn_00496D20();
             } else if (!crashState && prevCrash) {
-                field_0x604->Method_0x005327c0();
+                field_0x604->EndWreck();
                 Fn_00496DA0();
                 field_0x430 = 0;
                 field_0x433 = 0;
@@ -966,7 +966,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                 field_0x430 = 0;
                 field_0x433 = 0;
             } else if (!field_0x430) {
-                char m = field_0x1600->motion;
+                char m = interpSource->motion;
                 if (m) {
                     if (m < 0x11)
                         Fn_0048D910(m - 1);
@@ -974,7 +974,7 @@ void KrustyBike::Fn_00493660(float dt, int a)
                         Fn_0048E280();
                 }
             } else if (!field_0x153f) {
-                char m = field_0x1600->motion;
+                char m = interpSource->motion;
                 if (m > 0x11 && m - 0x11 == field_0x433)
                     Fn_0048D990(field_0x433);
             }
@@ -991,16 +991,16 @@ void KrustyBike::Fn_00493660(float dt, int a)
     }
 
     if (g_kbInterpolate)
-        field_0x15ec = g_kbGame->field_0x2f0 + field_0x15ec;
+        stateIntervalElapsed = g_kbGame->field_0x2f0 + stateIntervalElapsed;
     if (!a && !field_0x7a4) {
-        if (field_0x15ec >= g_kbStallThreshold) {
+        if (stateIntervalElapsed >= g_kbStallThreshold) {
             field_0x138c = g_kbStallHoldSec;
             UnknownVirtualSlot50(1, 0.0f, 0);
         } else if (field_0x138c > 0.0f) {
             field_0x138c -= g_kbGame->field_0x2f0;
             if (field_0x138c < 0.0f)
                 field_0x138c = 0.0f;
-        } else if (!field_0x736) {
+        } else if (!isGhost) {
             UnknownVirtualSlot50(0, 0.0f, 0);
         }
     }
@@ -1093,7 +1093,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             } else {
                 int remote = field_0x735 || g_kbGame->field_0x3428;
                 int held;
-                if (!field_0x734 && !remote && (UnknownVirtualSlot84(6, 0x3f) || UnknownVirtualSlot84(7, 0x3f)))
+                if (!aiKind && !remote && (UnknownVirtualSlot84(6, 0x3f) || UnknownVirtualSlot84(7, 0x3f)))
                     held = 1;
                 else
                     held = 0;
@@ -1124,7 +1124,7 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                     int frame = D3DIMSoultreeCharacter::currentFrame->field_0x00;
                     if (frame > s_kbTrickFrame[field_0x433] && frame < s_kbTrickFrame[field_0x433] + 3) {
                         field_0x153c = 1;
-                        if (field_0x734) {
+                        if (aiKind) {
                             field_0x152c -= dt;
                             if (field_0x152c < 0.0) {
                                 field_0x152c = 0;
@@ -1147,34 +1147,34 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
             float look;
             if (field_0x154e) {
                 // Turning back to straight ahead.
-                if (field_0x1550 < 0.0f) {
-                    field_0x1554 += dt;
-                    if (field_0x1554 > 0.0f) {
-                        field_0x1554 = 0;
+                if (rivalBearingScaled < 0.0f) {
+                    headTurnAngle += dt;
+                    if (headTurnAngle > 0.0f) {
+                        headTurnAngle = 0;
                         field_0x430 = 0;
                         field_0x433 = 0;
                         field_0x154e = 0;
                     }
                 } else {
-                    field_0x1554 -= dt;
-                    if (field_0x1554 < 0.0f) {
-                        field_0x1554 = 0;
+                    headTurnAngle -= dt;
+                    if (headTurnAngle < 0.0f) {
+                        headTurnAngle = 0;
                         field_0x430 = 0;
                         field_0x433 = 0;
                         field_0x154e = 0;
                     }
                 }
-                look = field_0x1554 * 0.71f;
+                look = headTurnAngle * 0.71f;
             } else if (field_0x154d) {
                 // Turning towards the target; near it, the rival's bearing is taken again.
-                if (field_0x1550 > 0.0f) {
-                    float head = field_0x1554 + dt;
-                    field_0x1554 = head;
-                    if (head > field_0x1550) {
+                if (rivalBearingScaled > 0.0f) {
+                    float head = headTurnAngle + dt;
+                    headTurnAngle = head;
+                    if (head > rivalBearingScaled) {
                         field_0x154d = 0;
-                        field_0x1554 = 0.24f;
-                        look = field_0x1558 * 0.1837f;
-                    } else if (field_0x1550 - 0.1f < head) {
+                        headTurnAngle = 0.24f;
+                        look = rivalBearing * 0.1837f;
+                    } else if (rivalBearingScaled - 0.1f < head) {
                         Vec3 d = nearestRival->position - position;
                         float angle = (float)(atan2(d.x, d.z)) - savedYaw;
                         if (angle < -3.14159274f)
@@ -1182,35 +1182,35 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         else if (angle > 3.14159274f)
                             angle -= 6.28318548f;
                         float target = (angle * 0.36963f) * 0.7f;
-                        if (angle < field_0x1558) {
+                        if (angle < rivalBearing) {
                             if (head > target) {
                                 // Passed the new target: hold the head where it is.
-                                field_0x1554 = 0.24f;
+                                headTurnAngle = 0.24f;
                                 field_0x154d = 0;
-                                field_0x1558 = head * 3.864687f;
+                                rivalBearing = head * 3.864687f;
                             } else {
-                                field_0x1558 = angle;
-                                field_0x1550 = target;
+                                rivalBearing = angle;
+                                rivalBearingScaled = target;
                             }
                         } else if (angle > 2.7f) {
-                            field_0x1558 = 2.7f;
-                            field_0x1550 = 0.7f;
+                            rivalBearing = 2.7f;
+                            rivalBearingScaled = 0.7f;
                         } else {
-                            field_0x1558 = angle;
-                            field_0x1550 = target;
+                            rivalBearing = angle;
+                            rivalBearingScaled = target;
                         }
-                        look = field_0x1554 * 0.71f;
+                        look = headTurnAngle * 0.71f;
                     } else {
                         look = head * 0.71f;
                     }
-                } else if (field_0x1550 < 0.0f) {
-                    float head = field_0x1554 - dt;
-                    field_0x1554 = head;
-                    if (head < field_0x1550) {
+                } else if (rivalBearingScaled < 0.0f) {
+                    float head = headTurnAngle - dt;
+                    headTurnAngle = head;
+                    if (head < rivalBearingScaled) {
                         field_0x154d = 0;
-                        field_0x1554 = 0.24f;
-                        look = field_0x1558 * 0.1837f;
-                    } else if (field_0x1550 + 0.1f > head) {
+                        headTurnAngle = 0.24f;
+                        look = rivalBearing * 0.1837f;
+                    } else if (rivalBearingScaled + 0.1f > head) {
                         Vec3 d = nearestRival->position - position;
                         float angle = (float)(atan2(d.x, d.z)) - savedYaw;
                         if (angle < -3.14159274f)
@@ -1218,41 +1218,41 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
                         else if (angle > 3.14159274f)
                             angle -= 6.28318548f;
                         float target = (angle * 0.36963f) * 0.7f;
-                        if (angle > field_0x1558) {
+                        if (angle > rivalBearing) {
                             if (head < target) {
                                 // Passed the new target: hold the head where it is.
-                                field_0x1554 = 0.24f;
+                                headTurnAngle = 0.24f;
                                 field_0x154d = 0;
-                                field_0x1558 = head * 3.864687f;
+                                rivalBearing = head * 3.864687f;
                             } else {
-                                field_0x1558 = angle;
-                                field_0x1550 = target;
+                                rivalBearing = angle;
+                                rivalBearingScaled = target;
                             }
                         } else if (angle < -2.7f) {
-                            field_0x1558 = -2.7f;
-                            field_0x1550 = -0.7f;
+                            rivalBearing = -2.7f;
+                            rivalBearingScaled = -0.7f;
                         } else {
-                            field_0x1558 = angle;
-                            field_0x1550 = target;
+                            rivalBearing = angle;
+                            rivalBearingScaled = target;
                         }
-                        look = field_0x1554 * 0.71f;
+                        look = headTurnAngle * 0.71f;
                     } else {
                         look = head * 0.71f;
                     }
                 } else {
                     field_0x154d = 0;
-                    field_0x1554 = 0.24f;
-                    look = field_0x1558 * 0.1837f;
+                    headTurnAngle = 0.24f;
+                    look = rivalBearing * 0.1837f;
                 }
             } else {
                 // Holding: once the hold time runs out, turn back from the current bearing.
-                field_0x1554 -= dt;
-                if (field_0x1554 < 0.0f) {
+                headTurnAngle -= dt;
+                if (headTurnAngle < 0.0f) {
                     field_0x154e = 1;
-                    field_0x1550 = field_0x1554 = (field_0x1558 * 0.36963f) * 0.7f;
-                    look = field_0x1554 * 0.71f;
+                    rivalBearingScaled = headTurnAngle = (rivalBearing * 0.36963f) * 0.7f;
+                    look = headTurnAngle * 0.71f;
                 } else {
-                    look = field_0x1558 * 0.1837f;
+                    look = rivalBearing * 0.1837f;
                 }
             }
             float pose = look + 0.5f;
@@ -1340,6 +1340,6 @@ void KrustyBike::UnknownVirtualSlot102(float dt)
     if (mode == 0 || mode == 1) {
         Matrix4 tmp;
         modelNode->GetMatrixIn(0, &tmp);
-        riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &tmp);
+        riderCharacter->c_0x1a0->SetMatrixIn(0, &tmp);
     }
 }

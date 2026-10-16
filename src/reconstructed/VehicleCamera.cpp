@@ -15,9 +15,9 @@ VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
     vehicleMode = true;
     targetPointCached = 0;
     targetHeadingCached = 0;
-    field_0x388 = 0;
-    field_0x38c = 0;
-    field_0x384 = 0;
+    targetCar = 0;
+    targetCaster = 0;
+    targetCharacter = 0;
     cachedTargetPoint = kVec3Zero;
     cachedTargetHeading = kVec3Zero;
 }
@@ -39,10 +39,10 @@ VehicleCamera* VehicleCamera::SetupVehicleCamera(void* value, float rate294, flo
 Vector3 VehicleCamera::UnknownVirtualSlot33() {
     if (vehicleMode)
         return vehicle->velocity;
-    if (field_0x384)
-        return field_0x384->nodeVelocity;
-    if (field_0x388)
-        return field_0x388->field_0x40;
+    if (targetCharacter)
+        return targetCharacter->nodeVelocity;
+    if (targetCar)
+        return targetCar->pathVelocity;
     return kVec3Zero;
 }
 
@@ -68,20 +68,20 @@ Vector3 VehicleCamera::TargetPoint() {
         vehicle->modelNode->GetPositionIn(0, &position);
         return position;
     }
-    if (field_0x384) {
-        UnknownVehiclePart* model = field_0x384->modelNode;
+    if (targetCharacter) {
+        UnknownVehiclePart* model = targetCharacter->modelNode;
         if (model->firstChild)
             model->firstChild->GetPositionIn(0, &position);
         else
             model->GetPositionIn(0, &position);
         return position;
     }
-    if (field_0x388) {
-        field_0x388->field_0x34->GetPosition(&position);
+    if (targetCar) {
+        targetCar->carModel->GetPosition(&position);
         return position;
     }
-    if (field_0x38c) {
-        field_0x38c->GetPosition(&position);
+    if (targetCaster) {
+        targetCaster->GetPosition(&position);
         return position;
     }
     return kVec3Zero;
@@ -201,7 +201,7 @@ static inline float LengthSquared(const Vector3& v) {
 Vector3 VehicleCamera::UnknownVirtualSlot41() {
     Vector3 heading;
     if (vehicleMode) {
-        if (FollowCameraAbs(vehicle->field_0x434) < 10.0f) {
+        if (FollowCameraAbs(vehicle->forwardSpeed) < 10.0f) {
             Vector3 velocity = UnknownVirtualSlot33();
             if (!vehicle->movingForward)
                 velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
@@ -215,7 +215,7 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
             facing.y = 0.0f;
             if (facing.x == 0.0f && facing.z == 0.0f)
                 facing = velocity;
-            heading = Add(Sub(velocity, facing) * (FollowCameraAbs(vehicle->field_0x434) / 10.0f), facing);
+            heading = Add(Sub(velocity, facing) * (FollowCameraAbs(vehicle->forwardSpeed) / 10.0f), facing);
             if (!vehicle->movingForward)
                 heading.y = heading.y * 0.5f;
             else
@@ -229,14 +229,14 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
                 heading.y *= inverseLength;
                 heading.z *= inverseLength;
             }
-            heading.x = field_0x29c.x * 0.82f + heading.x * 0.18f;
-            heading.y = field_0x29c.y * 0.82f + heading.y * 0.18f;
-            heading.z = field_0x29c.z * 0.82f + heading.z * 0.18f;
+            heading.x = followHeading.x * 0.82f + heading.x * 0.18f;
+            heading.y = followHeading.y * 0.82f + heading.y * 0.18f;
+            heading.z = followHeading.z * 0.82f + heading.z * 0.18f;
         } else {
             heading = UnknownVirtualSlot33();
             if (!vehicle->movingForward) {
                 heading = Vector3(-heading.x, -heading.y, -heading.z);
-                heading.y = (float)(heading.y * 0.5f) * 0.18f + field_0x29c.y * 0.82f;
+                heading.y = (float)(heading.y * 0.5f) * 0.18f + followHeading.y * 0.82f;
             } else {
                 heading.y = 0.0f;
             }
@@ -252,14 +252,14 @@ Vector3 VehicleCamera::UnknownVirtualSlot41() {
         }
     } else {
         Vector3 other;
-        if (field_0x384) {
-            UnknownVehiclePart* model = field_0x384->modelNode;
+        if (targetCharacter) {
+            UnknownVehiclePart* model = targetCharacter->modelNode;
             if (model->firstChild)
                 model->firstChild->GetAxes(&heading, &other);
             else
                 model->GetAxes(&heading, &other);
-        } else if (field_0x388) {
-            field_0x388->field_0x34->GetAxes(&heading, &other);
+        } else if (targetCar) {
+            targetCar->carModel->GetAxes(&heading, &other);
         } else {
             heading = kVec3ZAxis;
         }
@@ -288,9 +288,9 @@ Vector3 VehicleCamera::UnknownVirtualSlot50() {
 // 0x0052cbd0: the vehicle's +0x45c; also turns +0x23c by pi when the vehicle
 // flags +0x464.
 float VehicleCamera::UnknownVirtualSlot39() {
-    float value = vehicle->field_0x45c;
-    if (vehicle->field_0x464)
-        field_0x23c += 3.1415927f;
+    float value = vehicle->crashYaw;
+    if (vehicle->crashedUpsideDown)
+        worldYaw += 3.1415927f;
     return value;
 }
 
@@ -299,11 +299,11 @@ void VehicleCamera::UnknownVirtualSlot42(bool flag) {
     float ratio = fieldOfView / maxFieldOfView;
     if (cameraState != 3) {
         if (!flag && vehicleMode)
-            field_0x308 = ratio * vehicle->turnRate * 0.3f;
+            turnYaw = ratio * vehicle->turnRate * 0.3f;
         else
-            field_0x308 = 0.0f;
+            turnYaw = 0.0f;
     } else {
-        field_0x308 = ratio * vehicle->turnRate * 0.4f;
+        turnYaw = ratio * vehicle->turnRate * 0.4f;
     }
 }
 
@@ -318,8 +318,8 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
         return true;
     if (enable) {
         if (vehicleMode) {
-            if (vehicle->field_0x434 > 0.1f) {
-                if (!force && field_0x274 &&
+            if (vehicle->forwardSpeed > 0.1f) {
+                if (!force && isSettled &&
                     FollowCameraAbs(positionEaseX->value - point.x) < 10.0f &&
                     FollowCameraAbs(positionEaseZ->value - point.z) < 10.0f &&
                     FollowCameraAbs(positionEaseY->value - point.y) < 10.0f) {
@@ -331,33 +331,33 @@ bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool
                 if (force)
                     result = false;
                 else {
-                    if (!field_0x274 &&
+                    if (!isSettled &&
                         FollowCameraAbs(positionEaseX->value - point.x) < 0.01f &&
                         FollowCameraAbs(positionEaseZ->value - point.z) < 0.01f &&
                         FollowCameraAbs(positionEaseY->value - point.y) < 0.01f) {
                         UnknownVirtualSlot44(point);
                         UnknownVirtualSlot43(cachedTarget);
-                        field_0x277 = true;
+                        settleChecked = true;
                         return true;
                     }
-                    result = field_0x274;
+                    result = isSettled;
                 }
-                field_0x277 = true;
+                settleChecked = true;
                 return result;
             }
         } else {
             UnknownVirtualSlot44(point);
         }
-        field_0x277 = true;
+        settleChecked = true;
         return true;
     }
-    if (vehicleMode && vehicle->field_0x434 > 0.1f && field_0x277) {
+    if (vehicleMode && vehicle->forwardSpeed > 0.1f && settleChecked) {
         bool result;
         if (force)
             result = true;
         else {
             result = false;
-            field_0x277 = result;
+            settleChecked = result;
         }
         return result;
     }

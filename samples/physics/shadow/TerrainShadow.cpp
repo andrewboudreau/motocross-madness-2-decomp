@@ -361,7 +361,7 @@ void TerrainShadow::UnknownVirtualSlot30()
         }
 full:
         if (used)
-            caster->field_0xc88->MarkUsed(mesh->ageEntry);
+            caster->meshAgeManager->MarkUsed(mesh->ageEntry);
         if (vertexCount == 0x300)
             break;
     }
@@ -405,7 +405,7 @@ struct TerrainShadowViewer {       // GameObject::field_0x18 of the receiver
 };
 class TerrainShadowCaster {
 public:
-    int UnknownFunction506e90(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
+    int CastSegment(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
                               TerrainCell** cell, int a, int b);              // 0x00506e90 (ret 0x18)
 };
 class TerrainShadowClipper {
@@ -518,7 +518,7 @@ int TerrainShadow::UnknownVirtualSlot27()
         for (int i = 0; i < 4; i++) {
             TerrainShadowVec hit;
             TerrainCell* cell;
-            if (((TerrainShadowCaster*)caster)->UnknownFunction506e90(&TERRAIN_SHADOW_CAMERA()->eye, &corners[i], &hit, &cell, 0, 0))
+            if (((TerrainShadowCaster*)caster)->CastSegment(&TERRAIN_SHADOW_CAMERA()->eye, &corners[i], &hit, &cell, 0, 0))
                 TERRAIN_SHADOW_ACCUMULATE(cell, hit);
         }
         TERRAIN_SHADOW_FINISH();
@@ -541,7 +541,7 @@ int TerrainShadow::UnknownVirtualSlot27()
         for (int i = 0; i < 4; i++) {
             TerrainShadowVec hit;
             TerrainCell* cell;
-            while (((TerrainShadowCaster*)caster)->UnknownFunction506e90(&nearCorners[i], &farCorners[i], &hit, &cell, 0, 0)) {
+            while (((TerrainShadowCaster*)caster)->CastSegment(&nearCorners[i], &farCorners[i], &hit, &cell, 0, 0)) {
                 TERRAIN_SHADOW_ACCUMULATE(cell, hit);
                 TerrainShadowVec step = TerrainShadowVecCall(TERRAIN_SHADOW_CAMERA()->look.x * 3.0f, TERRAIN_SHADOW_CAMERA()->look.y * 3.0f, TERRAIN_SHADOW_CAMERA()->look.z * 3.0f);
                 nearCorners[i] = *TerrainShadowAddCall(&sum, &hit, &step);

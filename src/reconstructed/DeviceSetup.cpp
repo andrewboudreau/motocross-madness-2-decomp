@@ -198,31 +198,31 @@ void UnknownTrackGameObject33fc::ApplyDevice(const char* path, int device)
         g_TrackGame->controlMapping->Clear();
     if (device != -1)
         currentDevice = device;
-    g_TrackGame->field_0x3344.Unbind();
-    g_TrackGame->field_0x3380.Unbind();
-    g_TrackGame->field_0x33bc.Unbind();
+    g_TrackGame->steerBinding.Unbind();
+    g_TrackGame->leanBinding.Unbind();
+    g_TrackGame->throttleBinding.Unbind();
 
-    g_TrackGame->field_0x3344 =
+    g_TrackGame->steerBinding =
         UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),
                               AxisOfCode(assignments[currentDevice][0].code), 0.04f);
-    g_TrackGame->field_0x3380 =
+    g_TrackGame->leanBinding =
         UnknownControlBinding(-1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(),
                               AxisOfCode(assignments[currentDevice][2].code), 0.0f);
-    BindAxis(&g_TrackGame->field_0x3344, assignments[currentDevice][0].kind,
+    BindAxis(&g_TrackGame->steerBinding, assignments[currentDevice][0].kind,
                           assignments[currentDevice][0].code, assignments[currentDevice][1].code);
-    BindAxis(&g_TrackGame->field_0x3380, assignments[currentDevice][2].kind,
+    BindAxis(&g_TrackGame->leanBinding, assignments[currentDevice][2].kind,
                           assignments[currentDevice][2].code, assignments[currentDevice][3].code);
 
     if (assignments[currentDevice][4].kind == 2 && assignments[currentDevice][4].code < 0) {
         if (assignments[currentDevice][4].code == -6 || assignments[currentDevice][4].code == -7) {
-            g_TrackGame->field_0x33bc = UnknownControlBinding(
+            g_TrackGame->throttleBinding = UnknownControlBinding(
                 0.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 2, 0.0f);
-            BindAxis(&g_TrackGame->field_0x33bc, assignments[currentDevice][4].kind, -7, -6);
+            BindAxis(&g_TrackGame->throttleBinding, assignments[currentDevice][4].kind, -7, -6);
         }
         if (assignments[currentDevice][4].code == -12 || assignments[currentDevice][4].code == -13) {
-            g_TrackGame->field_0x33bc = UnknownControlBinding(
+            g_TrackGame->throttleBinding = UnknownControlBinding(
                 1.0f, 1.0f, 0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 5, 0.0f);
-            BindAxis(&g_TrackGame->field_0x33bc, assignments[currentDevice][4].kind, -13,
+            BindAxis(&g_TrackGame->throttleBinding, assignments[currentDevice][4].kind, -13,
                                   -12);
         }
     }

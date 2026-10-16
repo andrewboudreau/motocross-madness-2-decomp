@@ -75,12 +75,12 @@ struct UnknownFollowCameraValue {
 // leaves a dead loop counter in 0x00463140's `new[]`.
 struct UnknownFollowCameraPoint {
     Vector3 position;
-    float field_0x0c;
-    float field_0x10;
-    float field_0x14;
-    float field_0x18;
-    float field_0x1c;
-    Vector3 field_0x20;
+    float distanceRate;  // +0xC  slot 38: followDistance += dt * it for an off-screen point
+    float raiseRate;  // +0x10  slot 38 code 4: followHeight += dt * it
+    float lowerRate;  // +0x14  slot 38 code 8: followHeight -= dt * it
+    float tiltRate;  // +0x18  slot 38 code 4: followPitch tilted by dt * it
+    float yawRate;  // +0x1C  slot 38 codes 1/2: followYaw turned by -/+ dt * it
+    Vector3 screenPoint;  // +0x20  slot 38: ProjectPoint writes the screen point; nearest two by z go to slot 73
 };
 
 // Object at FollowCamera+0x240; slots 43/44 test its +0xbe8.
@@ -224,12 +224,12 @@ protected:
     // Layout from the constructor (0x00462ee0) and destructor (0x00463350).
     float followDistance;                     // +0x220 distance behind the target (slot 49 scales the direction by -it); presets in slots 63-67
     float initialDistance;                    // +0x224 copy of followDistance (constructor)
-    float field_0x228;          // 27.0f
+    float lookAheadDistance;  // +0x228  27.0 / SetupFollowCamera value228; slot 10 aims at followHeading * it + targetPoint
     float followPitch;                        // +0x22c pitch slot 49 rotates the view direction by; presets in slots 63-67
     float initialPitch;                       // +0x230 copy of followPitch
     float followYaw;                          // +0x234 yaw slot 49 adds to +0x308 / +0x23c; presets in slots 63-67
     float initialYaw;                         // +0x238 copy of followYaw
-    float field_0x23c;          // advanced by pi in VehicleCamera slot 39
+    float worldYaw;  // +0x23C  slot 49 non-orbit: rotates world Z by followYaw + it; re-based from the orbit yaw, slot 39 added
     UnknownFollowCameraSubject* subject;      // +0x240 (0x00463600 SetSubject)
     int cameraState;                 // +0x244, current state (slots 70-72, 75)
     int savedCameraState;            // +0x248, saved state (slot 70)
@@ -239,14 +239,14 @@ protected:
     float targetFieldOfView;         // +0x258 eased into fieldOfView through +0x294 (slot 10); clamped to [10, 70] by slot 68
     Vector3 resumeEyePosition;       // +0x25c eyePosition on entering state 7
     int overrideActive;              // +0x268, slot 70 input byte
-    int field_0x26c;            // reset by slot 70
-    float field_0x270;          // 15.0f
-    bool field_0x274;           // VehicleCamera slot 36 returns it as its bool result
-    unsigned char field_0x275;
-    unsigned char field_0x276;
-    bool field_0x277;           // set when slot 36 ran with enable
-    unsigned char field_0x278;
-    unsigned char field_0x279;
+    int isMovingTarget;  // +0x26C  slot 23 toggles it (control 0x10) in override; slot 45 then moves cachedTarget with the keys
+    float recordsPerSecond;  // +0x270  15.0; slot 47 playback: record index = frameTime * it, period = frameCount * it
+    bool isSettled;  // +0x274  slot 10 stores slot 36's settled result; when set the eased position is skipped (smoothed = position)
+    unsigned char isPlaced;  // +0x275  slot 10 places the camera once (SetFrame from the target) while clear, then sets it
+    unsigned char isCrashView;  // +0x276  set by slot 10 when slot 74 (vehicle crashState) holds; Bike/KrustyBike slot 34 follow the wrecker then
+    bool settleChecked;  // +0x277  slot 36 sets it when it ran with enable (the existing 'records that the check ran')
+    unsigned char wasWide;  // +0x278  slot 10 stores `wide` (
+    unsigned char isBlending;  // +0x279  set when the yaw turns wide; slot 10 blends position by blendClock until done, then clears it
     // Owned easing values (allocated by 0x00463140 and slot 10, deleted by the destructor).
     UnknownFollowCameraValue* targetEaseX;    // +0x27c target x
     UnknownFollowCameraValue* targetEaseY;    // +0x280 target y
@@ -256,7 +256,7 @@ protected:
     UnknownFollowCameraValue* positionEaseZ;  // +0x290 position z
     UnknownFollowCameraValue* fieldOfViewEase; // +0x294 targetFieldOfView
     UnknownFollowCameraValue* distanceEase;   // +0x298 followDistance
-    Vector3 field_0x29c;        // g_UnknownVector65b438
+    Vector3 followHeading;  // +0x29C  slot 10 stores slot 41's result ('the heading the camera follows', VehicleCamera.cpp)
     Vector3 cachedTarget;             // +0x2a8, cached slot 57 result (slot 69)
     Vector3 targetPoint;              // +0x2b4, target point (slots 34, 37, 68)
     float field_0x2c0;          // height-like value: slot 45 needs it above 0 or 6.5 to descend
@@ -278,7 +278,7 @@ protected:
     float heightFovMaximum;          // +0x2fc 70.0f
     float heightForMaximumFov;       // +0x300 20.0f
     float blendClock;                // +0x304, blend clock, advanced by slot 10 up to 1
-    float field_0x308;          // set by KrustyBikeCamera slot 42
+    float turnYaw;  // +0x308  slot 42 = fov ratio * vehicle turnRate * k; slot 49 adds it to followYaw
     int stateIndex;                  // +0x30c, cyclic index into states (slot 72)
     int stateCount;                  // +0x310, number of entries in states
     int states[8];                   // +0x314, state table (slot 72); only 0-4 are kept

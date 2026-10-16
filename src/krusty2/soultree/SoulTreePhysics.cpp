@@ -1077,7 +1077,7 @@ int SoultreePhysicsObject::GameObjectVirtualSlot10(float dt)
 // view (tier 3 name).
 class SoultreeD3DNode {
 public:
-    void Fn_4444c0(int a);
+    void SetUseLighting(int a);
 };
 
 // 0x134-byte file object: ctor 0x00460d10 takes one global, the destructor 0x00460d60
@@ -1095,7 +1095,7 @@ public:
 // clears the output path (tier 2 data flow, tier 3 names).
 class SoultreeFileFinder {
 public:
-    int Fn_4e9cd0(SoultreeFile* file, const char* name, const char* mode, char* outPath);
+    int OpenArchiveFile(SoultreeFile* file, const char* name, const char* mode, char* outPath);
 };
 struct SoultreeGlobals {
     char field_0x000[0x574];
@@ -1127,7 +1127,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
                                                    a13, a14, a15, a16, a17, a18, a19, a20,
                                                    a21, a22);
     if (a3 && (a3->field_0x25 & 1)) {
-        ((SoultreeD3DNode*)SoultreePhysicsBaseObject::sceneNode)->Fn_4444c0(1);
+        ((SoultreeD3DNode*)SoultreePhysicsBaseObject::sceneNode)->SetUseLighting(1);
     }
 
     int len = strlen(a2);
@@ -1137,7 +1137,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
     strcpy(strrchr(name, '.'), ".col");
 
     SoultreeFile* file = new(SP_FILE, 0x84e) SoultreeFile(g_00572b44);
-    if (!g_0056e26c->field_0x574->Fn_4e9cd0(file, name, "rb", colPath)) {
+    if (!g_0056e26c->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
         colPath[0] = 0;
     }
     delete file;
@@ -1178,7 +1178,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
                                                    a14, a15, a16, a17, a18, 0.0f, 0, a19, a20,
                                                    a21);
     if (a4 && (a4->field_0x25 & 1)) {
-        ((SoultreeD3DNode*)sceneNode)->Fn_4444c0(1);
+        ((SoultreeD3DNode*)sceneNode)->SetUseLighting(1);
     }
 
     int len = strlen(a3);
@@ -1188,7 +1188,7 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
     strcpy(strrchr(name, '.'), ".col");
 
     SoultreeFile* file = new(SP_FILE, 0x8cd) SoultreeFile(g_00572b44);
-    if (!g_0056e26c->field_0x574->Fn_4e9cd0(file, name, "rb", colPath)) {
+    if (!g_0056e26c->field_0x574->OpenArchiveFile(file, name, "rb", colPath)) {
         colPath[0] = 0;
     }
     delete file;

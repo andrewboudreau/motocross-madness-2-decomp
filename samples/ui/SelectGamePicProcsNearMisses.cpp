@@ -253,9 +253,9 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 entry.playerId = g_TrackGame->mode.racers[i].networkPlayerId;
                 entry.points = g_TrackGame->eventManager->results[i].points;
                 entry.racerIndex = g_TrackGame->mode.racers[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.field_0x14c)[i] = entry;
+                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
             }
-            qsort(g_TrackGame->mode.raceSettings.field_0x14c, racer, sizeof(UnknownGridEntry),
+            qsort(g_TrackGame->mode.raceSettings.gridOrder, racer, sizeof(UnknownGridEntry),
                   CompareGridEntries);
         } else {
             // At random.
@@ -272,7 +272,7 @@ void MultiPlayerDlg::SendStartMessage(short start) {
                 UnknownGridEntry entry;
                 entry.playerId = draws[i].playerId;
                 entry.racerIndex = draws[i].racerIndex;
-                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.field_0x14c)[i] = entry;
+                ((UnknownGridEntry*)g_TrackGame->mode.raceSettings.gridOrder)[i] = entry;
             }
         }
         if (names)

@@ -8,7 +8,7 @@
 
 // 0x00417500. Retail stores the widths in this order (+0x08 last).
 UnknownBikeNumberPainter::UnknownBikeNumberPainter(TextureMapManager* textures) {
-    sheet = (PCTextureMap*)UnknownFunction50a590(textures, "BikeNumbers128.tga", 0x115c, 0, 0, 5, 6,
+    sheet = (PCTextureMap*)TerrainLoadTexture(textures, "BikeNumbers128.tga", 0x115c, 0, 0, 5, 6,
                                                  0, 0x80, 0xff00ff, 1, 1);
     digitWidths[0] = 19;
     digitWidths[2] = 19;

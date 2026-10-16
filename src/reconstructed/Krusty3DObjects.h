@@ -71,9 +71,9 @@ float FastInvSqrt(float value);
 
 // A track position (RaceView.h's TrackPos: node, segment, t).
 struct UnknownRunwayTrackPos {
-    void* field_0x00;
-    void* field_0x04;
-    float field_0x08;
+    void* node;  // +0x0  RaceView.h/Track.h TrackPos: node
+    void* segment;  // +0x4  Track.h TrackPos: segment
+    float t;  // +0x8  Track.h TrackPos: t, 0..1 along the segment
 };
 
 // The track a racer's view holds at +0x48 (Track.h's Track).
@@ -179,7 +179,7 @@ public:
     void UnknownPlace();
 
     UnknownVisualCueView* cueView;
-    UnknownRunwayTerrain* field_0xac;
+    UnknownRunwayTerrain* groundTerrain;  // +0xAC  LoadVisualCue's terrain argument; slot 10 drops the cue target onto it with QueryGround
     float builtFieldOfView;                          // field of view the offsets were built for
     float screenOffsetX;                          // screen offset along the camera's x axis
     float screenOffsetY;                          // screen offset along the camera's y axis
@@ -267,7 +267,7 @@ struct UnknownKrustyCameraHolder {
 
 // One 24-byte gate record of the course at the global's +0x560.
 struct UnknownKrustyGate {
-    Vector3 field_0x00;
+    Vector3 position;  // +0x0  gate point VisualCue slot 10 (camera modes 1/5) turns the cue toward
     unsigned char field_0x0c[0x18 - 0x0c];
 };
 
@@ -275,7 +275,7 @@ struct UnknownKrustyCourse {
     unsigned char field_0x00[0x34];
     UnknownKrustyCameraHolder* raceView;      // +0x34
     unsigned char field_0x38[0xd8 - 0x38];
-    UnknownKrustyGate field_0xd8[1];
+    UnknownKrustyGate gates[1];  // +0xD8  24-byte gate records indexed by the followed racer's gateIndex
 };
 
 struct UnknownKrustyFollowed {
@@ -320,9 +320,9 @@ extern UnknownKrustyGame* g_UnknownKrustyGame56e26c;
 struct UnknownBonusKey {
     int frame;                                // +0x00
     float time;                               // +0x04
-    float field_0x08[3];               // scale
-    float field_0x14[3];               // position
-    float field_0x20[3];               // rotation axis
+    float scale[3];  // +0x8  NextKey interpolates keyScale from it (table: uniform 2.09, 1.99, ...)
+    float position[3];  // +0x14  NextKey interpolates keyPosition from it
+    float rotationAxis[3];  // +0x20  NextKey interpolates keyAxis from it; paired with rotationAngle
     float rotationAngle;                      // +0x2c
 };
 
@@ -359,7 +359,7 @@ public:
     float keyDuration;                         // key duration
     float keyAngle;                         // angle
     float keyAngleChange;                         // angle change over the key
-    Vector3 field_0x188;
+    Vector3 eyeToFrame;  // +0x188  slot 10: frame position minus the camera eyePosition; its xz direction orients the frame
     Vector3 keyPosition;                       // position
     Vector3 keyPositionChange;                       // position change
     Vector3 keyScale;                       // scale
@@ -367,9 +367,9 @@ public:
     Vector3 keyAxis;                       // axis
     Vector3 keyAxisChange;                       // axis change
     float placedFieldOfView;                   // +0x1dc the camera's fieldOfView (+0x16c) when last placed
-    float field_0x1e0;
-    float field_0x1e4;                         // twice the frame's half height
+    float targetScreenWidth;  // +0x1E0  ctor 60.0f; sizeFactor = cameraDistance * it / (focalLength * frameWidth)
+    float frameWidth;  // +0x1E4  CreateFrameNode: twice the base frame's local half extent x
     float sizeFactor;                         // size factor
-    float field_0x1ec;
-    int field_0x1f0;
+    float cameraDistance;  // +0x1EC  slot 10: Length(position - camera eyePosition) when the frame is re-sized
+    int isResizePending;  // +0x1F0  slot 10 recomputes sizeFactor when set (then clears it); ctor 0
 };

@@ -743,7 +743,7 @@ void SoultreeObject::ClearFlag14c()
 void SoultreeObject::LoadFromParameters(UnknownParameterStream* stream, int offset)
 {
     parameterBlock = new(__FILE__, 0x346) UnknownParameterBlock;
-    parameterBlock->UnknownFunction4b77a0(stream, offset, 1);
+    parameterBlock->Attach(stream, offset, 1);
     UnknownVirtualSlot3();
     if (parameterBlock)
         delete parameterBlock;
@@ -796,27 +796,27 @@ void SoultreeObject::UnknownVirtualSlot3()
     int count;
     int i, j;
     parent = 0;
-    count = parameterBlock->UnknownFunction4b7f70("Object Hierarchy");
+    count = parameterBlock->BeginRows("Object Hierarchy");
     loadedNodeCount = count;
     nodes[0] = this;
     for (i = 1; i < count; i++)
         UnknownVirtualSlot4(&nodes[i]);
     for (i = 0; i < count; i++) {
-        parameterBlock->UnknownFunction4b8010(0);
-        parameterBlock->UnknownFunction4b8200(0, nodes[i]->name);
-        parameterBlock->UnknownFunction4b8200(1, parentNames[i]);
-        parameterBlock->UnknownFunction4b81c0(2, &nodes[i]->localMatrix._11);
-        parameterBlock->UnknownFunction4b81c0(3, &nodes[i]->localMatrix._12);
-        parameterBlock->UnknownFunction4b81c0(4, &nodes[i]->localMatrix._13);
-        parameterBlock->UnknownFunction4b81c0(5, &nodes[i]->localMatrix._21);
-        parameterBlock->UnknownFunction4b81c0(6, &nodes[i]->localMatrix._22);
-        parameterBlock->UnknownFunction4b81c0(7, &nodes[i]->localMatrix._23);
-        parameterBlock->UnknownFunction4b81c0(8, &nodes[i]->localMatrix._31);
-        parameterBlock->UnknownFunction4b81c0(9, &nodes[i]->localMatrix._32);
-        parameterBlock->UnknownFunction4b81c0(10, &nodes[i]->localMatrix._33);
-        parameterBlock->UnknownFunction4b81c0(11, &nodes[i]->localMatrix._41);
-        parameterBlock->UnknownFunction4b81c0(12, &nodes[i]->localMatrix._42);
-        parameterBlock->UnknownFunction4b81c0(13, &nodes[i]->localMatrix._43);
+        parameterBlock->ReadRow(0);
+        parameterBlock->GetRowString(0, nodes[i]->name);
+        parameterBlock->GetRowString(1, parentNames[i]);
+        parameterBlock->GetRowFloat(2, &nodes[i]->localMatrix._11);
+        parameterBlock->GetRowFloat(3, &nodes[i]->localMatrix._12);
+        parameterBlock->GetRowFloat(4, &nodes[i]->localMatrix._13);
+        parameterBlock->GetRowFloat(5, &nodes[i]->localMatrix._21);
+        parameterBlock->GetRowFloat(6, &nodes[i]->localMatrix._22);
+        parameterBlock->GetRowFloat(7, &nodes[i]->localMatrix._23);
+        parameterBlock->GetRowFloat(8, &nodes[i]->localMatrix._31);
+        parameterBlock->GetRowFloat(9, &nodes[i]->localMatrix._32);
+        parameterBlock->GetRowFloat(10, &nodes[i]->localMatrix._33);
+        parameterBlock->GetRowFloat(11, &nodes[i]->localMatrix._41);
+        parameterBlock->GetRowFloat(12, &nodes[i]->localMatrix._42);
+        parameterBlock->GetRowFloat(13, &nodes[i]->localMatrix._43);
     }
     for (i = 0; i < count; i++) {
         if (_stricmp(parentNames[i], "NONE")) {

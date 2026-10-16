@@ -90,7 +90,7 @@ InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapMana
     rect.right = 639;
     rect.top = 351;
     rect.bottom = 479;
-    TextureMap* texture = UnknownFunction50a590(manager, name, 4444, 0, 0, 5, 6, 0, 0x80,
+    TextureMap* texture = TerrainLoadTexture(manager, name, 4444, 0, 0, 5, 6, 0, 0x80,
                                                 0xff00ff, 1, 1);
     if (!texture) {
         Release();
@@ -99,10 +99,10 @@ InstrumentOverlay* InstrumentOverlay::Setup(RenderTarget* target, TextureMapMana
     texture->UnknownVirtualSlot8(1, 0, 0);
     Attach(target, texture, &rect, 1, 0, 0.00001f, 0, 0, 0, 0, 1555, 0);
     RenderTarget* owner = Target();
-    dial.field_0x00 = (int)(rect.left * owner->targetWidth / 640.0f);
-    dial.field_0x04 = (int)(rect.top * owner->targetHeight / 480.0f);
-    dial.centerX = (int)((owner->targetWidth / 640.0f) * 64.0f + dial.field_0x00);
-    dial.centerY = (int)((owner->targetHeight / 480.0f) * 85.0f + dial.field_0x04);
+    dial.originX = (int)(rect.left * owner->targetWidth / 640.0f);
+    dial.originY = (int)(rect.top * owner->targetHeight / 480.0f);
+    dial.centerX = (int)((owner->targetWidth / 640.0f) * 64.0f + dial.originX);
+    dial.centerY = (int)((owner->targetHeight / 480.0f) * 85.0f + dial.originY);
     dial.length = (owner->targetWidth / 640.0f) * 35.0f;
     dial.value = 0.0f;
     dial.maximum = 100.0f;
@@ -130,12 +130,12 @@ int InstrumentOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         RenderTarget* owner = Target();
         if (owner->currentCamera->viewportClearFrames) {
-            dial.field_0x00 = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
+            dial.originX = (int)((unsigned int)owner->currentCamera->viewport[2] * screenRect.left / 640.0f
                                            + (unsigned int)owner->currentCamera->viewport[0]);
-            dial.field_0x04 = (int)((unsigned int)owner->currentCamera->viewport[3] * screenRect.top / 480.0f
+            dial.originY = (int)((unsigned int)owner->currentCamera->viewport[3] * screenRect.top / 480.0f
                                            + (unsigned int)owner->currentCamera->viewport[1]);
-            dial.centerX = (int)(((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 64.0f + dial.field_0x00);
-            dial.centerY = (int)(((unsigned int)owner->currentCamera->viewport[3] / 480.0f) * 85.0f + dial.field_0x04);
+            dial.centerX = (int)(((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 64.0f + dial.originX);
+            dial.centerY = (int)(((unsigned int)owner->currentCamera->viewport[3] / 480.0f) * 85.0f + dial.originY);
             dial.length = ((unsigned int)owner->currentCamera->viewport[2] / 640.0f) * 45.0f;
             dial.value = 0.0f;
             dial.maximum = 100.0f;
@@ -444,7 +444,7 @@ StatsOverlay* StatsOverlay::LoadPanel(RenderTarget* target, TextureMapManager* m
         Release();
         return 0;
     }
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
         return 0;
@@ -631,7 +631,7 @@ int StatsOverlay::DrawViewModePanel()
         sprintf(rowText[2], "%s %s %d", "End Timer", time, instrumentSource->state->finished);
     } else {
         g_TrackGame->LoadResourceString(0x837, label, 0x80);
-        if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->field_0x736)
+        if (g_TrackGame->mode.raceSettings.raceMode == 4 && instrumentSource->state->isGhost)
             FormatLapTime(time, statsSource->ownRacer->fastestLap);
         else
             FormatLapTime(time, instrumentSource->state->lastLapTime);
@@ -1093,8 +1093,8 @@ RadarOverlay::RadarOverlay(int flags) : Overlay(flags, 1)
     followedIndex = 0;
     showFrameRate = 0;
     readoutCount = 1;
-    field_0x16c = 0;
-    field_0x174 = 0;
+    cueIndex = 0;
+    cueShown = 0;
     largeMap = 0;
     mapOrigin = s_UnknownVector68a410;
     lineStart.sz = 0.00001f;
@@ -1165,7 +1165,7 @@ RadarOverlay* RadarOverlay::LoadMap(RenderTarget* target, TextureMapManager* man
         frameRateRect.bottom = mapRect.top + 124;
     }
     radarCamera = (UnknownRadarCamera*)a3;
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
         return 0;

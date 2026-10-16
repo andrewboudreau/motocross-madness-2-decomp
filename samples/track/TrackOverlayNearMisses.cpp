@@ -500,7 +500,7 @@ ChatOverlay* ChatOverlay::Setup(RenderTarget* target, TextureMapManager* manager
     chatCamera = (UnknownChatCamera*)camera;
     cueRect = cue;
     timeSum = 0.08f;
-    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    backingTexture = TerrainLoadTexture(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!backingTexture) {
         Release();
         return 0;
@@ -607,7 +607,7 @@ void RadarOverlay::DrawRacers(int mode)
     for (i = 0; i < racerCount; i++) {
         if (i != followedIndex && racers[i]->isEnabled) {
             outside = WorldToMap(racers[i]->position, &x, &y, &rim.x, &rim.y);
-            if (field_0x174 && field_0x16c == i) {
+            if (cueShown && cueIndex == i) {
                 if (radarView->chatOverlay) {
                     Vector3& own = racers[followedIndex]->position;
                     float dx = racers[i]->position.x - own.x;

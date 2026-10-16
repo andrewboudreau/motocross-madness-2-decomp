@@ -119,7 +119,7 @@ FontTexture* FontTexture::Load(const char* name, const char* path, const char* t
                 Rectangle2D(rect[g_UnknownGlobal57972c], rect[g_UnknownGlobal568468], rect[g_UnknownGlobal56846c],
                             rect[g_UnknownGlobal568470])));
         }
-        texture = UnknownFunction50a590(manager, textureName, format, 0, 0, 5, 6, a5, 0x80, 0xff00ff, 1, 0);
+        texture = TerrainLoadTexture(manager, textureName, format, 0, 0, 5, 6, a5, 0x80, 0xff00ff, 1, 0);
         if (texture) {
             texture->UnknownVirtualSlot8(1, 0, 0);
             font->SetTexture(texture);

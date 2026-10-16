@@ -58,7 +58,7 @@ void EventManager::LeaveRaceForMenu(int menu) {
         return;
     UnknownTrackGameObject56cItem* item = g_TrackGame->ui->gui->FindInputDialog();
     if (item)
-        item->UnknownFunction46ff30(0);
+        item->EndDialog(0);
     if (g_TrackGame->ui->savedInputContext)
         ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->savedInputContext);
     if (g_TrackGame->ui->allowIme)
@@ -310,7 +310,7 @@ int EventManager::CreatePodiumScene() {
     PODIUM_ARCADE->SetPosition(&podiumPosition);
     PODIUM_ARCADE->SetAxes(&direction, &up, 0, 1);
     if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
-        PODIUM_ARCADE->field_0x2c->UnknownFunction4444c0(1);
+        PODIUM_ARCADE->field_0x2c->SetUseLighting(1);
     UnknownTextureStream* stream = new(__FILE__, 0x2f5) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     podiumCharacterCount = resultCount < 3 ? resultCount : 3;
     float chance = rand() * (1.0f / 32768);
@@ -340,7 +340,7 @@ int EventManager::CreatePodiumScene() {
         view->AppendChild(character, -1);
         if (character) {
             if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->isEnabled)
-                character->modelNode->UnknownFunction4444c0(1);
+                character->modelNode->SetUseLighting(1);
             int mode = g_TrackGame->mode.GetSelectedSeries();
             if (mode == 3 || mode == 2 || mode == 4) {
                 if (chance < 0.5f && podiumCharacterCount != 1)

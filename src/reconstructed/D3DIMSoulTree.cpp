@@ -595,7 +595,7 @@ void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
 }
 
 // 0x004433f0
-void D3DIMSoultreeObject::UnknownFunction4433f0(int surface, UnknownSoultreeVertex** vertices,
+void D3DIMSoultreeObject::GetPart(int surface, UnknownSoultreeVertex** vertices,
                                                 int* vertexCount, unsigned short** indices, int* indexCount,
                                                 int a6, int lod)
 {
@@ -870,14 +870,14 @@ void D3DIMSoultreeObject::ComputeAllBounds()
 }
 
 // 0x004444c0
-void D3DIMSoultreeObject::UnknownFunction4444c0(int value)
+void D3DIMSoultreeObject::SetUseLighting(int value)
 {
     subtreeDirty = 1;
     useLighting = value;
 }
 
 // 0x004444e0
-void D3DIMSoultreeObject::UnknownFunction4444e0()
+void D3DIMSoultreeObject::ClearScreenRects()
 {
     screenRect.left = 0;
     screenRect.right = 0;
@@ -901,7 +901,7 @@ void D3DIMSoultreeObject::UnknownVirtualSlot5()
 void D3DIMSoultreeObject::UnknownVirtualSlot4()
 {
     GameObject::UnknownVirtualSlot4();
-    UnknownFunction4444e0();
+    ClearScreenRects();
 }
 
 // 0x00444a40
@@ -1118,5 +1118,5 @@ void D3DIMSoultreeObject::ApplyLodSettings(int index)
     SetLodThreshold(g_UnknownSoultreeLodSettings689f18[index].field_0x00);
     texturePerspective = g_UnknownSoultreeLodSettings689f18[index].field_0x04;
     gouraudShading = g_UnknownSoultreeLodSettings689f18[index].field_0x08;
-    UnknownFunction4444c0(g_UnknownSoultreeLodSettings689f18[index].field_0x0c);
+    SetUseLighting(g_UnknownSoultreeLodSettings689f18[index].field_0x0c);
 }

@@ -69,10 +69,10 @@ public:
     virtual int UnknownVirtualSlot8(int a, int b, int c);
 };
 class TextureMapManager;
-// 0x0050a590 (cdecl; src/reconstructed/TextureMap.h UnknownFunction50a590): the texture
+// 0x0050a590 (cdecl; src/reconstructed/TextureMap.h TerrainLoadTexture): the texture
 // `name` through the manager; 0 on failure.  Pointer parameters other than the first two are
 // passed as 0 here.
-ParticleTexture* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+ParticleTexture* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
                                        void* palette, int flags, int addressU, int addressV,
                                        void* choice, int alphaThreshold, unsigned int key,
                                        int addRef, int fromArchive);

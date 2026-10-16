@@ -36,7 +36,7 @@ TextureMap::TextureMap(TextureMapManager* manager, int registered) {
 }
 
 // 0x0050a590: see TextureMap.h.
-TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+TextureMap* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
                                   Palette8* palette, int flags, int addressU, int addressV,
                                   UnknownTextureFormatChoice* choice, int alphaThreshold,
                                   unsigned int key, int addRef, int fromArchive)

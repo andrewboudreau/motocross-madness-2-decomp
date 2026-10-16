@@ -319,8 +319,8 @@ int FillFileList(DirectoryList* directories, const char* directory, const char* 
 // 0x004f2080: qsort order of the grid entries, by +0x04, largest first
 // (0x004f2340, in the near-miss sample, sorts with it and 0x004f20a0).
 int CompareGridEntries(const void* a, const void* b) {
-    unsigned char x = ((const UnknownTrackGameModeEntry*)a)->field_0x04;
-    unsigned char y = ((const UnknownTrackGameModeEntry*)b)->field_0x04;
+    unsigned char x = ((const UnknownTrackGameModeEntry*)a)->points;
+    unsigned char y = ((const UnknownTrackGameModeEntry*)b)->points;
     if (x > y)
         return -1;
     return x != y;
@@ -442,8 +442,8 @@ void MultiPlayerDlg::SendSettings() {
         message.riderCollision = game->mode.raceSettings.riderCollision;
         message.fastFinishes = game->mode.raceSettings.shortTimeLimit;
         message.bikeClass = game->mode.raceSettings.maxBikeClass;
-        message.field_0x0c = game->mode.raceSettings.field_0x138;
-        message.field_0x10 = game->mode.raceSettings.field_0x13c;
+        message.field_0x0c = game->mode.raceSettings.trackFileTime;
+        message.field_0x10 = game->mode.raceSettings.trackFileSize;
         message.difficulty = game->mode.difficulty;
         message.trackNumber = game->mode.raceSettings.trackNumber;
         memcpy(message.slots, slots->slots, sizeof(message.slots));
@@ -736,7 +736,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
                                                                                  state->riderName);
             g_TrackGame->mode.racers[i + 1].engineSize = state->engineSize;
             g_TrackGame->mode.racers[i + 1].fourStroke = state->fourStroke;
-            g_TrackGame->mode.racers[i + 1].field_0xf4 = state->field_0xcd;
+            g_TrackGame->mode.racers[i + 1].hasMprSkin = state->field_0xcd;
             g_TrackGame->mode.racers[i + 1].plateNumber = state->field_0xd0;
             g_TrackGame->mode.racers[i + 1].bikeIndex = state->field_0xc2;
             float delay = ((float)(unsigned int)flags - (float)(unsigned int)state->sendTime);
@@ -798,8 +798,8 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         g_TrackGame->mode.raceSettings.shortTimeLimit = settings->fastFinishes;
         g_TrackGame->mode.raceSettings.maxBikeClass = settings->bikeClass;
         g_TrackGame->mode.raceSettings.trackNumber = settings->trackNumber;
-        g_TrackGame->mode.raceSettings.field_0x138 = settings->field_0x0c;
-        g_TrackGame->mode.raceSettings.field_0x13c = settings->field_0x10;
+        g_TrackGame->mode.raceSettings.trackFileTime = settings->field_0x0c;
+        g_TrackGame->mode.raceSettings.trackFileSize = settings->field_0x10;
         g_TrackGame->mode.difficulty = settings->difficulty;
         g_TrackGame->mode.SelectSeries(g_TrackGame->mode.raceSettings.series);
         g_TrackGame->mode.raceSettings.trackName[0] = 0;
@@ -1342,7 +1342,7 @@ void MultiPlayerDlg::FollowTrackChange() {
         if (g_UnknownGlobal689df4)
             ReportReadyCleared(2);
         g_TrackGame->LoadResourceString(0x143b, sceneName, 0x80);
-    } else if (value != g_TrackGame->mode.raceSettings.field_0x13c) {
+    } else if (value != g_TrackGame->mode.raceSettings.trackFileSize) {
         g_UnknownGlobal689dfc = 3;
         if (g_UnknownGlobal689df4)
             ReportReadyCleared(3);

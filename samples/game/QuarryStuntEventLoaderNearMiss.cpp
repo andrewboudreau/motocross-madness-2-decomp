@@ -156,7 +156,7 @@ public:
     // 0x00497d90: sets the camera up; returns it.
     UnknownQuarryBikeCamera* Create(void* target, float a, float b, float c, float d, float e,
                                                    int f, int count, int* presets);
-    void UnknownFunction463600(UnknownTerrain* terrain);       // 0x00463600
+    void SetSubject(UnknownTerrain* terrain);       // 0x00463600
 
     unsigned char field_0x02c[0x274 - 0x2c];
     unsigned char field_0x274;
@@ -723,26 +723,26 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             } else {
                 UnknownSceneAnimatedObject* car = eventScene->animationTable->entries[i].proceduralObject;
                 ((UnknownQuarryCar*)car)->field_0x20c = eventTerrain;
-                ((UnknownQuarryCollision*)car->field_0x38)->SetIgnoreListMode(1);
+                ((UnknownQuarryCollision*)car->sensorCollider)->SetIgnoreListMode(1);
                 for (int j = 0; j < eventScene->animationTable->entryCount; j++) {
                     UnknownSceneEntry* entry = &eventScene->animationTable->entries[j];
-                    ((UnknownQuarryCollision*)car->field_0x38)
+                    ((UnknownQuarryCollision*)car->sensorCollider)
                         ->AddIgnoredOwner(entry->keyFramed ? (UnknownQuarryCollision*)entry->character->collisionObject
-                                                                       : (UnknownQuarryCollision*)entry->proceduralObject->field_0x3c);
+                                                                       : (UnknownQuarryCollision*)entry->proceduralObject->bodyCollider);
                 }
-                ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)car->field_0x3c)->SetUseBroadphase(1);
-                ((UnknownQuarryCollision*)car->field_0x3c)->SetOwner(car, 0x69);
-                ((UnknownQuarryCollision*)car->field_0x3c)->SetIgnoreListMode(0);
+                ((UnknownQuarryCollision*)car->bodyCollider)->UnknownFunction435fe0();
+                ((UnknownQuarryCollision*)car->bodyCollider)->SetUseBroadphase(1);
+                ((UnknownQuarryCollision*)car->bodyCollider)->SetOwner(car, 0x69);
+                ((UnknownQuarryCollision*)car->bodyCollider)->SetIgnoreListMode(0);
                 int iterator = 0;
                 for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator); racer;
                      racer = ((UnknownQuarryRace*)raceView)->NextBike(&iterator)) {
                     if (!racer->field_0x735) {
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1418);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x1414);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->frontWheel);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->rearWheel);
-                        ((UnknownQuarryCollision*)car->field_0x3c)->AddIgnoredOwner(racer->field_0x604->field_0x38);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x1418);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x1414);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->frontWheel);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->rearWheel);
+                        ((UnknownQuarryCollision*)car->bodyCollider)->AddIgnoredOwner(racer->field_0x604->field_0x38);
                     }
                 }
             }
@@ -804,7 +804,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("3DObjects");
     UnknownVirtualSlot33((int)((UnknownQuarryRace*)raceView)->field_0x38);
     g_MemTagStack->Push("BikeRace");
-    ((UnknownQuarryBikeCamera*)raceCamera)->UnknownFunction463600(eventTerrain);
+    ((UnknownQuarryBikeCamera*)raceCamera)->SetSubject(eventTerrain);
     UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
     UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
     if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {

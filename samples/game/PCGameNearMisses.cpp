@@ -27,7 +27,7 @@
 #include "../../src/reconstructed/PCGame.h"
 
 extern "C" const UnknownGuid IID_IDirect3DHALDevice;
-void UnknownFunction5119c0(int format, void* pixelFormat);
+void FillPixelFormat(int format, void* pixelFormat);
 
 // 0x004c0d10: profiles each display that has no current profile: its mode
 // list, whether windowed, full-screen, software and hardware rendering work,
@@ -121,7 +121,7 @@ int PCGame::ProfileDisplays() {
                                 UnknownSurfaceDesc desc;
                                 memset(&desc, 0, sizeof(desc));
                                 desc.size = sizeof(desc);
-                                UnknownFunction5119c0(target->surfacePixelFormat, &desc.pixelFormat);
+                                FillPixelFormat(target->surfacePixelFormat, &desc.pixelFormat);
                                 desc.height = desc.width = 256;
                                 desc.flags = 0x1007;
                                 desc.caps[0] = 0x10005000;

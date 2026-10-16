@@ -38,7 +38,7 @@
 int DebugOverlay::LoadFont()
 {
     int c = 0;
-    fontTexture = (PCTextureMap*)UnknownFunction50a590(g_TrackGame->textureManager,
+    fontTexture = (PCTextureMap*)TerrainLoadTexture(g_TrackGame->textureManager,
                                                         "DebugOverlayText.tga", 1555, 0, 0, 5, 6,
                                                         0, 0x80, 0xff00ff, 1, 1);
     if (fontTexture == 0) {

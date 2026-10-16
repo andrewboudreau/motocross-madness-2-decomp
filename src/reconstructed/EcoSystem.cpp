@@ -153,7 +153,7 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
     char path[0x104];
     char section[0x80];
     if (billboardName[0]) {
-        billboardTexture = UnknownFunction50a590(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+        billboardTexture = TerrainLoadTexture(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
         if (!billboardTexture->UnknownVirtualSlot7())
             billboardTexture->UnknownVirtualSlot8(1, 0, 0);
     }
@@ -174,7 +174,7 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             if (!g_TrackGame->bladeRenderer && (g_TrackGame->display->capabilityBits & 8)
                 && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
                 format = g_TrackGame->display->colorKeyFormat;
-            modelTexture = UnknownFunction50a590(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+            modelTexture = TerrainLoadTexture(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->UnknownVirtualSlot7()) {
                 int loaded = modelTexture->pixelFormat;
                 if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
@@ -904,7 +904,7 @@ int EcoSystem::PlaceStoredObjects() {
 int EcoSystem::PlaceAuthoredObjects() {
     if (!placementBmp[0])
         return 0;
-    UnknownBitmapFile* bitmap = UnknownFunction424140(placementBmp, 0);
+    UnknownBitmapFile* bitmap = ReadBitmap(placementBmp, 0);
     if (!bitmap)
         return 0;
     int row;
@@ -934,7 +934,7 @@ int EcoSystem::PlaceAuthoredObjects() {
         }
     }
 done:
-    UnknownFunction4245b0(bitmap);
+    FreeBitmap(bitmap);
     return 1;
 }
 
@@ -1209,7 +1209,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
         }
         for (i = 0; i < 256; i++) {
             if (billboardNames[i][0]) {
-                UnknownEcoTexture* texture = UnknownFunction50a590(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
+                UnknownEcoTexture* texture = TerrainLoadTexture(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
                                                                    0xff00ff, 1, 1);
                 if (!texture->UnknownVirtualSlot7()) {
                     texture->UnknownVirtualSlot8(1, 0, 0);
@@ -1229,7 +1229,7 @@ int PreloadEcosystem(TextureMapManager* textures, char* path, UnknownTextureStre
                     if (!g_TrackGame->bladeRenderer && (g_TrackGame->display->capabilityBits & 8)
                         && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
                         format = g_TrackGame->display->colorKeyFormat;
-                    UnknownEcoTexture* texture = UnknownFunction50a590(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+                    UnknownEcoTexture* texture = TerrainLoadTexture(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
                     if (!texture->UnknownVirtualSlot7()) {
                         g_UnknownGlobal59af10++;
                         int loaded = texture->pixelFormat;

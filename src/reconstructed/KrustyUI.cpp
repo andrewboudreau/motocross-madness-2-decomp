@@ -46,7 +46,7 @@ void UnknownFunction5053b0(int value);
 
 // The Soultree object at a character's +0x1a0.
 struct UnknownKrustyUISoultree {
-    void UnknownFunction4444c0(int value);                 // 0x004444c0
+    void SetUseLighting(int value);                 // 0x004444c0
     void SetPosition(const Vector3* position);   // 0x004fc660
     void SetAxes(float a, float b, float c, float d, float e, float f, float g,
                                int h);                     // 0x004fbd10
@@ -323,7 +323,7 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
         garageScene->AppendChild(
             KRUSTYUI_GARAGE->CharacterVirtualSlot11(renderContext, "UIgarage.mcf", lights, &context, 1, 1), -1);
-        KRUSTYUI_GARAGE->modelNode->UnknownFunction4444c0(0);
+        KRUSTYUI_GARAGE->modelNode->SetUseLighting(0);
         KRUSTYUI_GARAGE->modelNode->SetPosition(&garageFocus);
         KRUSTYUI_GARAGE->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_GARAGE->SetMotionByName("Spin");
@@ -339,7 +339,7 @@ void KrustyUI::BuildGarageScene(int value) {
         garageScene->AppendChild(
             KRUSTYUI_RIDER->CharacterVirtualSlot11(renderContext, "UIRider.mcf", lights,
                                                    &g_TrackGame->textureContext, 1, 1), -1);
-        KRUSTYUI_RIDER->modelNode->UnknownFunction4444c0(1);
+        KRUSTYUI_RIDER->modelNode->SetUseLighting(1);
         KRUSTYUI_RIDER->modelNode->SetPosition(&KRUSTYUI_RIDER_POSITION);
         KRUSTYUI_RIDER->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
         KRUSTYUI_RIDER->SetMotionByName("WaitR");
@@ -358,7 +358,7 @@ void KrustyUI::BuildGarageScene(int value) {
                                                                       &g_TrackGame->textureContext,
                                                                       1, 1), -1);
             UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].uiModel;
-            bike->modelNode->UnknownFunction4444c0(1);
+            bike->modelNode->SetUseLighting(1);
             bike->modelNode->SetPosition(&garageFocus);
             bike->modelNode->SetAxes(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
             bike->SetMotionByName("WaitB");
@@ -409,7 +409,7 @@ void KrustyUI::Shutdown() {
 // 0x0049b530: tells the "ProgressBar" control 1 (0x0047b370).
 void KrustyUI::StepProgressBar() {
     if (progressDialog) {
-        UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->UnknownFunction46ebf0("ProgressBar", 0));
+        UIProgressBar* bar = static_cast<UIProgressBar*>(progressDialog->FindControl("ProgressBar", 0));
         if (bar)
             bar->StepProgress(1);
     }

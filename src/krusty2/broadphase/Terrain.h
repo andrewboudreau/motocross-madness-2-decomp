@@ -89,7 +89,7 @@ public:
     virtual void UnknownVirtualSlot10();                        // 0x004c7610: releases the texture surface
     virtual int UnknownVirtualSlot11();                         // 0x004c7970: sets it as texture stage 0 (Terrain slot 14, detail pass)
     char pad_0x08[0x3c - 0x08];
-    unsigned int field_0x3c;                                    // +0x3c read as Terrain's colour key by Terrain::Load
+    unsigned int averageColor;  // +0x3C  PCTextureMap stores Pixtrans AverageColor (0x004d24d0) here; Terrain::Load derives its unlit colours from it
     char pad_0x40[0x74 - 0x40];
     void* textureSurface;                                       // +0x74 PCTextureMap's texture surface (Terrain slot 14 binds it with the device's SetTexture)
     char pad_0x78[0x80 - 0x78];
@@ -182,7 +182,7 @@ public:
     float heightMin;                                           // +0x18 lower height bound of the grid (compared with segment y)
     float heightMax;                                           // +0x1c upper height bound
     char pad_0x20[0x28 - 0x20];
-    unsigned char field_0x28;
+    unsigned char level;  // +0x28  GridNode +0x28 level (Griddraw.h); Load subtracts level*4 from gridShift for invGridCellSize
     unsigned char gridShift;                                   // +0x29 log2 shift: grid edge = 16 << gridShift cells
     char pad_0x2a[0x5c - 0x2a];
 };
@@ -201,9 +201,9 @@ TerrainMatrix* GetIdentityMatrix(TerrainMatrix* out);           // 0x004a1410 (f
 // (`shl eax,4`, fields at +0, +4, +8, +0xc read by 0x00507960; tier 2 layout, tier 3 use).
 struct TerrainQualityEntry {
     int drawDistanceSetting;  // +0x00 SelectQuality passes it to SetField0xbec (the >=0 clamped value stored in Terrain::field_0xbec, ctor 1000)
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
+    int closeUpDetailLimit;  // +0x4  copied to Terrain::qualityParamA; Griddraw draws close-up (detail texcoords, white) when node detail exceeds it
+    int perspectiveLimit;  // +0x8  copied to qualityParamB; Griddraw enables TEXTUREPERSPECTIVE (software) when node detail exceeds it
+    int hasDetailPass;  // +0xC  copied to g_terrainQualityValue, which gates slot 14's detail-texture pass
 };
 extern TerrainQualityEntry* g_pTerrainQualityTable;             // 0x0068a32c
 extern int g_terrainQualityValue;                               // 0x0057471c (Terrain.cpp .data)
@@ -340,36 +340,36 @@ public:
                   int quality, int field0xc40, const char* textureName, int halfFormat);
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 
-    BaseObject* field_0x30;                                     // slot 2 called (0x005079f0)
-    TerrainComObject* field_0x34;                               // Release()d, then zeroed
-    TerrainSurfaceRegistry* field_0x38;                         // +0x38 tested by 0x00505600 (registers new surfaces)
+    BaseObject* colorMapper;  // +0x30  Load: the TerrainColorMapper (palette source); passed as palette to LoadSurface/CreateSurface
+    TerrainComObject* directDrawPalette;  // +0x34  Load: IDirectDraw CreatePalette(0x44, 256 entries) out pointer; Release()d by the dtor
+    TerrainSurfaceRegistry* surfaceRegistry;  // +0x38  Load: desc->registry; when set, surfaces are ManagedTextures Register()ed with it
     TerrainStream* stream;                                      // +0x3c Load's stream argument
     float gridCellSize;                                           // +0x40 ctor 1.0f
     TerrainShutdownObject* heightField;  // +0x44 object with CastSegment slot and GetCellCorners; QueryGround returns early when null; dtor Shutdown(1) then deletes
     TerrainVec3 boundsMin;                                      // +0x48 Load: FLT_MAX, filled by the height field, scaled by gridCellSize
     TerrainVec3 boundsMax;                                      // +0x54 Load: -FLT_MAX, filled, x/z + 16, scaled
-    char field_0x60[0x6c - 0x60];
+    char viewerPosition[0x6c - 0x60];  // +0x60  GridTerrain viewerX/Y/Z: viewer position Griddraw measures node/vertex distances from
     int appliedDrawDistance;  // +0x6c slot 12 (0x507610) compares drawDistance with it, sets a dirty flag when different, then stores drawDistance into it; appliedDrawDistance is also the int a of ComputeRatios
     int field_0x70;
-    float field_0x74;                                           // ratio of the two ints (0x507bb0)
-    float field_0x78;                                           // ratio squared
-    float field_0x7c;                                           // 1 / ratio squared
-    float field_0x80;                                           // 1 / ratio
+    float distanceRatio;  // +0x74  ComputeRatios: appliedDrawDistance / field_0x70; scales Griddraw's detail values
+    float distanceRatioSq;  // +0x78  ComputeRatios: square of distanceRatio; Griddraw's vertex error limit factor
+    float invDistanceRatioSq;  // +0x7C  ComputeRatios: 1 / distanceRatioSq
+    float invDistanceRatio;  // +0x80  ComputeRatios: 1 / distanceRatio
     int field_0x84;
-    int field_0x88;
-    int field_0x8c;
-    int field_0x90;
+    int indicesDrawn;  // +0x88  GridTerrain: Griddraw adds each draw's index count; slot 14 zeroes it, then divides by 3
+    int verticesDrawn;  // +0x8C  GridTerrain: Griddraw adds each draw's vertex count; zeroed by slot 14
+    int vertexErrorTests;  // +0x90  GridTerrain: incremented per vertex error test; slot 14 prints it in "Eval %d[%d]"
     int field_0x94;
-    int field_0x98;
-    int field_0x9c;
-    int field_0xa0;
-    int field_0xa4;
-    int field_0xa8;
-    int field_0xac;
-    int field_0xb0;
+    int detailUpdates;  // +0x98  GridTerrain: incremented per node detail update (0x004815e0)
+    int vertexDirectionSets;  // +0x9C  GridTerrain: incremented by DrawableGridNode::SetVertexDirection (0x00482dd0)
+    int vertexChangePropagations;  // +0xA0  GridTerrain: incremented by DrawableGridNode::PropagateVertexChange (0x00482c90)
+    int bufferRebuilds;  // +0xA4  GridTerrain: incremented per node buffer rebuild; slot 14 prints it in "Mesh %d[%d]"
+    int verticesPinned;  // +0xA8  GridTerrain: vertices pinned by RetestChangedVertices (0x00482760)
+    int verticesReleased;  // +0xAC  GridTerrain: vertices released by RetestChangedVertices (0x00482760)
+    int vertexTests;  // +0xB0  GridTerrain: incremented by DrawableGridNode::TestVertex (0x00482a40)
     int field_0xb4;
-    char field_0xb8[0x53c - 0xb8];
-    int field_0x53c;
+    char vertexRetestStamps[0x53c - 0xb8];  // +0xB8  GridTerrain: 17x17 ints; RetestChangedVertices stores retestStamp per vertex, 0x00482f00 compares
+    int retestStamp;  // +0x53C  GridTerrain: incremented per RetestChangedVertices call, stored in vertexRetestStamps[]
     int ownedObjectCount;                                            // +0x540 count of ownedObjects[]
     BaseObject* ownedObjects[(0xbe8 - 0x544) / 4];               // +0x544 Load: one surface per file record
     int field_0xbe8;                                            // +0xbe8 read by Load (fourth header dword after the palette)
@@ -377,36 +377,36 @@ public:
     int qualityIndex;  // +0xbf0 SelectQuality arg; indexes g_pTerrainQualityTable
     int drawDistanceDirty;  // +0xbf4 set to 1 when SetField0xbec changes the value
     int field_0xbf8;
-    int field_0xbfc;
-    int field_0xc00;
-    int field_0xc04;
+    int profileEval;  // +0xBFC  slot 14 profile page "Eval    %d[%d] %d" value (peak-held by g_terrainPeak3)
+    int profileMesh;  // +0xC00  slot 14 profile page "Mesh    %d[%d] %d" value (peak-held by g_terrainPeak4)
+    int profileSetup;  // +0xC04  slot 14 profile page "Setup   %d %d" value (peak-held by g_terrainPeak2)
     int field_0xc08;
     int field_0xc0c;
     int blockCount;                                            // +0xc10 count of blocks[]
     void** blocks;                                         // +0xc14 array of plain-new pointers
-    TerrainSurfaceDesc field_0xc18;                             // +0xc18 surface description (pointer passed to CreateSurface)
+    TerrainSurfaceDesc surfaceDesc;  // +0xC18  Load: copy of *desc; its manager/registry create surfaces, its address goes to LoadSurface
     float invGridCellSize;                                          // +0xc30 ctor 1.0f
-    int field_0xc34;
-    int field_0xc38;
-    TerrainSurfaceBase* field_0xc3c;                            // slot 2 called; Load: the 0x0050a590 texture (testnoise.tga by default)
-    int field_0xc40;
+    int hasLightManager;  // +0xC34  Load: 1 when the lightManager argument is set; Griddraw copies bit 0 to the node flag gating lighting
+    int fileStartOffset;  // +0xC38  Load: stream Tell() before the "TRN" tag; Griddraw seeks to it plus child table offsets
+    TerrainSurfaceBase* detailTexture;  // +0xC3C  Load: texture named by textureName (testnoise.tga; QuarryStuntEvent passes detailTexture); slot 14 detail pass
+    int lightManager;  // +0xC40  Load argument; Griddraw calls 0x0049e4a0 (LightManager lighting routine) on it with transform
     TerrainMatrix transform;                                  // +0xc44 copy of the matrix from 0x004a1410
-    TerrainOwned* field_0xc84;
-    TerrainOwned* field_0xc88;
-    int field_0xc8c;
+    TerrainOwned* textureAgeManager;  // +0xC84  Load: AgeManager; AcquireOwnedObject purges it past 60 pooled surfaces (Grid1Terrain textureAgeManager)
+    TerrainOwned* meshAgeManager;  // +0xC88  Load: AgeManager; Griddraw registers node buffers (EvictNodeBuffers), TerrainShadow marks cell meshes used
+    int visibilityCamera;  // +0xC8C  GridTerrain camera: Griddraw passes it and its +0xec matrix to VisibilityClipper::TestBox
     unsigned int colorKey;                                      // +0xc90 Load: field_0xc3c->field_0x3c, or -1 without the texture
     int field_0xc94;                                            // +0xc94 Load: 5 (the texture's fifth-argument value)
     int field_0xc98;                                            // +0xc98 Load: 6
-    unsigned int field_0xc9c;                                   // +0xc9c Load: opaque grey of the key's inverted alpha
-    unsigned int field_0xca0;                                   // +0xca0 Load: key colour scaled by its alpha
+    unsigned int unlitColor;  // +0xC9C  Load/slot 14: grey from colorKey's alpha; Griddraw copies it into far unlit vertices' colour
+    unsigned int unlitSpecular;  // +0xCA0  Load/slot 14: colorKey RGB scaled by alpha; Griddraw copies it into far unlit vertices' specular
     int qualityParamA;  // +0xca4 SelectQuality: table[index].field_0x04 (or table[9] when lowestQualityOverride)
     int qualityParamB;  // +0xca8 SelectQuality: table[index].field_0x08
-    int field_0xcac;                                            // +0xcac slot 14 prints it as "CanSinglePassDual"
+    int canSinglePassDual;  // +0xCAC  slot 14: registry CanRenderDualTextureInSinglePass / ValidateDevice probe; printed "CanSinglePassDual"
     int lowestQualityOverride;  // +0xcb0 slot 23 key 2 toggles it; when set qualityParamA comes from table[9]; slot 14 prints it as "SinglePassDual" and then draws the detail texture in stage 1
-    int field_0xcb4;
+    int closeUpStateSet;  // +0xCB4  GridTerrain: set when Griddraw applies the close-up stage-1 filters; slot 14 clears it
     BaseObject** ownedObjectArray;                                   // +0xcb8 array; each element slot 2 called
     int ownedObjectArrayCount;                                            // +0xcbc count of ownedObjectArray[]
-    int field_0xcc0;
+    int createdSurfaceCount;  // +0xCC0  incremented by AcquireOwnedObject each time it creates a new surface
 };
 
 #endif

@@ -93,10 +93,10 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
         visualCue->field_0xc8 = radarOverlay->followedIndex;
         int index = visualCue->NextCueIndex();
         if (index != -1) {
-            radarOverlay->field_0x16c = index;
+            radarOverlay->cueIndex = index;
             statsOverlay->UnknownFunction464e80(index);
         }
-        radarOverlay->field_0x174 = visualCue->CanCycleCues();
+        radarOverlay->cueShown = visualCue->CanCycleCues();
         chatOverlay->ShowCueTag(visualCue->CanCycleCues());
     }
     if (!g_TrackGame->eventManager->waitingForRacers && !raceView->networkStartPending && raceView->isRacing) {

@@ -22,7 +22,7 @@
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?Vec3Dot@@YAMPBUVector3@@0@Z": "0x0040ae30",
-  "?UnknownFunction42de90@@YAXPAUMatrix4@@MMMM@Z": "0x0042de90",
+  "?AxisAngleMatrix@@YAXPAUMatrix4@@MMMM@Z": "0x0042de90",
   "?UnknownFunction436500@@YAXPAUMatrix4@@PBU1@1@Z": "0x00436500",
   "?Open@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction464e80@MorphBastardModifier@@QAEXH@Z": "0x00464e80",

@@ -54,7 +54,7 @@ class ChatOverlay;
 // position at +0x200 for gate races.
 struct UnknownEventRacerModel {
     unsigned char field_0x000[0x200];
-    Vector3 field_0x200;
+    Vector3 nodePosition;  // +0x200  racer +0x5f0 is Bike::frontWheel (BikeWheel); VehicleWheel +0x200 nodePosition; RaceStatus 0x004e6a50 reads it
 };
 struct UnknownCameraBikeRider;
 struct UnknownCameraBikeState;
@@ -104,7 +104,7 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x054[0x64 - 0x54];
     Vector3 velocity;                         // +0x064 velocity (racesnd.cpp 0x004e3730)
     unsigned char field_0x070[0x88 - 0x70];
-    Vector3 field_0x088;                           // RaceStatus.cpp 0x004e63e0 leads the position by 3.5 times it
+    Vector3 bodyForward;  // +0x88  SoultreePhysicsBaseObject +0x88 bodyForward; RaceStatus leads position by 3.5x it, falls back to it for trackDirection
     unsigned char field_0x094[0xb8 - 0x94];
     float previousSpeed;                      // +0x0b8 racesnd.cpp scales it to an engine speed
     unsigned char field_0x0bc[0x108 - 0xbc];
@@ -133,9 +133,9 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x5f4[0x604 - 0x5f4];
     UnknownCameraBikeState* wrecker;          // +0x604 the racer's Wrecker; racesnd.cpp 0x004e39b0 reads its contactThisFrame
     unsigned char field_0x608[0x734 - 0x608];
-    char field_0x734;                              // RaceStatus.cpp 0x004e6a50 finishes the race on its lap count
-    unsigned char field_0x735;                     // RaceStatus.cpp: gates are passed without the crossing test
-    unsigned char field_0x736;
+    char aiKind;  // +0x734  KrustyBike +0x734 aiKind; RaceStatus estimates finish times only for racers with it set
+    unsigned char skipGateTest;  // +0x735  passed as CountLap/AdvanceGate skipTest; selects ClosestPointOnTrack over PlaceNear (RaceStatus.cpp)
+    unsigned char isGhost;  // +0x736  KrustyBike +0x736 isGhost (loader kind 0xff)
     char engineKind;                          // +0x737 selects engine 2 over 1 (racesnd.cpp 0x004e3430)
     int engineSize;                           // +0x738 engine size; below 250 uses engine 0
     unsigned char field_0x73c[0x740 - 0x73c];
@@ -169,7 +169,7 @@ struct UnknownEventRacer : virtual public GameObject {
     int field_0x7ac[3];                            // copied by EventManager 0x0045c8b0
     int lapGate;                              // +0x7b8 gate of the lap (AdvanceGate's gateIndex); racesnd.cpp keeps a copy at +0x1294
     int nextLapGate;                          // +0x7bc lapGate + 1 wrapped by the owner's gate count (RaceStatus.cpp 0x004e6a50)
-    int field_0x7c0;                               // RaceStatus.cpp: passes the current gate without the test
+    int forceGatePass;  // +0x7C0  passed as CountLap/AdvanceGate `forced`: with skipTest the gate/lap counts only when set
     unsigned char field_0x7c4[0x11bc - 0x7c4];
     int networkPlayerId;                      // +0x11bc network player id
     char aiIndex;                             // +0x11c0 AI racer's index in its messages

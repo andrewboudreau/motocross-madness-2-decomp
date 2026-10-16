@@ -62,19 +62,19 @@ void KrustyVCR::SaveRecording(float duration, char* description, int flag)
 
 // 0x0049c070
 void KrustyVCR::SetRacer(int id, char ai, int slot, char* name, char* model,
-                                      char* rider, char* riderName, char* bikeName,
+                                      char* rider, char* bikeName, char* riderName,
                                       int engineSize, int engineKind, int value)
 {
     racers[slot].networkId = id;
     racers[slot].aiIndex = ai;
     COPY_TRUNCATED(racers[slot].name, name)
-    COPY_TRUNCATED(racers[slot].field_0x015, model)
-    COPY_TRUNCATED(racers[slot].field_0x055, rider)
-    COPY_TRUNCATED(racers[slot].field_0x095, riderName)
-    COPY_TRUNCATED(racers[slot].field_0x0d5, bikeName)
+    COPY_TRUNCATED(racers[slot].bikeFile, model)
+    COPY_TRUNCATED(racers[slot].riderFile, rider)
+    COPY_TRUNCATED(racers[slot].bikeName, bikeName)
+    COPY_TRUNCATED(racers[slot].riderName, riderName)
     racers[slot].engineSize = engineSize;
     racers[slot].engineKind = engineKind;
-    racers[slot].field_0x120 = value;
+    racers[slot].plateNumber = value;
 }
 
 // 0x0049c1e0
@@ -85,11 +85,11 @@ void KrustyVCR::UnknownFunction49c1e0(int* slot, char* ai, int a, char* name, ch
     *slot = racers[a].networkId;
     *ai = racers[a].aiIndex;
     strcpy(name, racers[a].name);
-    strcpy(model, racers[a].field_0x015);
-    strcpy(rider, racers[a].field_0x055);
-    strcpy(bikeName, racers[a].field_0x095);
-    strcpy(riderName, racers[a].field_0x0d5);
+    strcpy(model, racers[a].bikeFile);
+    strcpy(rider, racers[a].riderFile);
+    strcpy(bikeName, racers[a].bikeName);
+    strcpy(riderName, racers[a].riderName);
     *engineSize = racers[a].engineSize;
     *engineKind = racers[a].engineKind;
-    *value = racers[a].field_0x120;
+    *value = racers[a].plateNumber;
 }
