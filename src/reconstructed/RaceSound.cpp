@@ -149,7 +149,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     int k;
 
     stream = new (__FILE__, 203) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    GameObject::UnknownVirtualSlot8(owner);
+    GameObject::SetRenderContext(owner);
     raceView = view;
     listenerCamera = camera;
     engineGroup = new (__FILE__, 213) SoundGroup(1);
@@ -541,11 +541,11 @@ void RaceSound::AssignChannels() {
 
 // 0x004e3730: moves the listener and every racer's engine sound to their
 // bikes while sound is on and the race view is not paused.
-int RaceSound::UnknownVirtualSlot10(float frameTime) {
+int RaceSound::Tick(float frameTime) {
     Vector3 position;
     int i;
 
-    GameObject::UnknownVirtualSlot10(frameTime);
+    GameObject::Tick(frameTime);
     if (assignChannelsPending) {
         AssignChannels();
         assignChannelsPending = 0;
@@ -798,12 +798,12 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
 
 // 0x004e44e0: Ctrl+V toggles the EAX environment, Ctrl+C cycles the music
 // volume (race mode 3 only) and Ctrl+S turns all sound on or off.
-int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int RaceSound::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     UnknownEaxListenerParameters environment;
     char text[0x80];
     TrackGameViewOwner* owner;
 
-    if (GameObject::UnknownVirtualSlot23(event, entry))
+    if (GameObject::OnControlPress(event, entry))
         return 1;
     owner = g_TrackGame->eventManager->FindRaceMode();
     if (!event->kind) {
@@ -862,13 +862,13 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             if (g_TrackGame->mode.soundOn) {
                 g_TrackGame->childRoot->EnableByClassName("SoundGroup");
                 if (engineGroup)
-                    engineGroup->UnknownVirtualSlot16(0);
+                    engineGroup->SetPaused(0);
                 if (field_0x40)
-                    field_0x40->UnknownVirtualSlot16(0);
+                    field_0x40->SetPaused(0);
                 if (effectsGroup)
-                    effectsGroup->UnknownVirtualSlot16(0);
+                    effectsGroup->SetPaused(0);
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->UnknownVirtualSlot16(0);
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->SetPaused(0);
                 if (g_TrackGame->mode.networkGame)
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
@@ -876,19 +876,19 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     lastListenerLap = listenerRacer->lapCount;
                 }
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Enable();
             } else {
                 g_TrackGame->childRoot->DisableByClassName("SoundGroup");
                 if (engineGroup)
-                    engineGroup->UnknownVirtualSlot16(1);
+                    engineGroup->SetPaused(1);
                 if (field_0x40)
-                    field_0x40->UnknownVirtualSlot16(1);
+                    field_0x40->SetPaused(1);
                 if (effectsGroup)
-                    effectsGroup->UnknownVirtualSlot16(1);
+                    effectsGroup->SetPaused(1);
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->UnknownVirtualSlot16(1);
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->SetPaused(1);
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot4();
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Disable();
             }
             if (owner)
                 owner->ShowOnOffMessage(0x1429, g_TrackGame->mode.soundOn);

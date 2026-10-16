@@ -40,9 +40,9 @@ public:
                                             float value2d0, float value2e8, int capacity, int count,
                                             const int* list);
 
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00497e20 (near miss: samples/camera)
+    virtual int Tick(float frameTime);                 // 0x00497e20 (near miss: samples/camera)
 
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual Vector3 UnknownVirtualSlot34(float dt);
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot48(int a, bool flag, float dt);

@@ -170,8 +170,8 @@ class StatsOverlay : public Overlay {
 public:
     explicit StatsOverlay(int flags);         // 0x00519370
     virtual ~StatsOverlay();                  // 0x00519420 (deleting wrapper 0x00519400)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00519900
-    virtual int UnknownVirtualSlot13();       // 0x00519940
+    virtual int Tick(float frameTime);                 // 0x00519900
+    virtual int RenderPre3D();                // 0x00519940
     virtual int UnknownVirtualSlot14();       // 0x00519980
 
     // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
@@ -211,8 +211,8 @@ class DropTextOverlay : public GameObject {
 public:
     explicit DropTextOverlay(int flags);      // 0x0051ae80
     virtual ~DropTextOverlay();               // 0x0051aee0 (deleting wrapper 0x0051aec0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051b070 (not reconstructed)
-    virtual int UnknownVirtualSlot15();       // 0x0051b0f0
+    virtual int Tick(float frameTime);                 // 0x0051b070 (not reconstructed)
+    virtual int RenderPost3D();               // 0x0051b0f0
 
     void ReshowText();             // 0x0051b1f0: shows the text again
     // 0x0051af00 (ret 0x18): slot 8 on `value`, then sets up the text (size
@@ -245,9 +245,9 @@ class RadarOverlay : public Overlay {
 public:
     explicit RadarOverlay(int flags);         // 0x0051b690
     virtual ~RadarOverlay();                  // 0x0051b7d0 (deleting wrapper 0x0051b7b0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051bcd0
+    virtual int Tick(float frameTime);                 // 0x0051bcd0
     virtual int UnknownVirtualSlot14();       // 0x0051bd20
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0051bb60
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0051bb60
 
     // 0x0051b840: loads the map for the screen rectangle `screen` (only its
     // top and right edges are read).
@@ -408,8 +408,8 @@ class ChatOverlay : public Overlay {
 public:
     explicit ChatOverlay(int flags);          // 0x0051cda0
     virtual ~ChatOverlay();                   // 0x0051cee0 (deleting wrapper 0x0051cec0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051e200
-    virtual int UnknownVirtualSlot13();       // 0x0051e240
+    virtual int Tick(float frameTime);                 // 0x0051e200
+    virtual int RenderPre3D();                // 0x0051e240
     virtual int UnknownVirtualSlot14();       // 0x0051e390
 
     // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for

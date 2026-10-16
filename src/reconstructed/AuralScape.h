@@ -53,7 +53,7 @@ public:
     SoundEmitter(AuralScape* scape, SoundGroup* group, int type, int flags); // 0x004020e0
     virtual ~SoundEmitter(); // 0x00402200 (deleting wrapper 0x004021e0)
     // 0x004028d0: derives the velocity from the last move.
-    virtual int UnknownVirtualSlot10(float frameTime);
+    virtual int Tick(float frameTime);
 
     // 0x00402260: records the settings, checks `name` exists in the Res
     // archive and joins the scape; releases itself and returns 0 on failure.
@@ -99,7 +99,7 @@ public:
     SoultreeSoundEmitter(AuralScape* scape, SoundGroup* group, int type, int flags); // 0x00402980
     // Implicit destructor 0x004029e0 (deleting wrapper 0x004029c0): a tail
     // jump to ~SoundEmitter without a vptr store.
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00402a70
+    virtual int Tick(float frameTime);                 // 0x00402a70
 
     // 0x004029f0: SoundEmitter's loader, then the part (and its child
     // `partName`) to follow.
@@ -145,7 +145,7 @@ public:
     // store, then the four lists and ~GameObject.
     // 0x00403710: updates the emitters, the reverb and the listeners, and
     // fills the "Audio" debug page.
-    virtual int UnknownVirtualSlot10(float frameTime);
+    virtual int Tick(float frameTime);
 
     AuralScape* UnknownFunction402f00(void* target, int sounds); // 0x00402f00
     int NextListenerNumber();                  // 0x00403000: next number

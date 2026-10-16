@@ -37,7 +37,7 @@ class MainDlg : public UIDialog {
 public:
     MainDlg() : UIDialog(1, "mainmenu.dtm") {} // inline (KrustyUI 0x00499b20)
     void HandleEvent(UnknownDialogEvent* event); // 0x0044b200
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0044c6b0
+    virtual int Tick(float frameTime);                 // 0x0044c6b0
     void FillProfileList();             // 0x0044c7a0: fills "LstProfiles"
     void ShowCurrentProfile();             // 0x0044c8c0: shows the current profile
 
@@ -127,10 +127,10 @@ public:
     // 0x0044fab0 / 0x0044fa00 (a near miss): MPBikeRiderDlg's and
     // PCCentralBikeRiderDlg's slot 22 and PCCentralBikeRiderDlg's slot 23
     // share these bodies.
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0044fae0: turns the bike view
-    virtual int UnknownVirtualSlot13();       // 0x0044ffc0: names the chosen bike's and rider's textures
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int Tick(float frameTime);                 // 0x0044fae0: turns the bike view
+    virtual int RenderPre3D();                // 0x0044ffc0: names the chosen bike's and rider's textures
     void SyncValues(int apply);     // 0x004505d0: stores the chosen bike and rider
     void FillBikeRiderLists();             // 0x0044f750: fills the bike and rider lists (a near miss)
     void PaintPlateNumber(int number);   // 0x0044f950: paints the plate number on every bike
@@ -175,8 +175,8 @@ class Intro2Dlg : public UIDialog {
 public:
     Intro2Dlg() : UIDialog(1, "intro2.dtm") {}
     void HandleEvent(UnknownDialogEvent* event); // 0x00453430
-    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00453570
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004535f0
+    virtual int Tick(float frameTime);                    // 0x00453570
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004535f0
 
     int framesShown;                          // +0x7f58: frames shown
     float secondsShown;                       // +0x7f5c: seconds shown
@@ -188,8 +188,8 @@ class Intro3Dlg : public UIDialog {
 public:
     Intro3Dlg() : UIDialog(1, "intro3.dtm") {}
     void HandleEvent(UnknownDialogEvent* event); // 0x00453610
-    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00453670
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004536c0
+    virtual int Tick(float frameTime);                    // 0x00453670
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004536c0
 
     float secondsShown;                       // +0x7f58: seconds shown
     int frameRan;                             // +0x7f5c: set once a frame has run
@@ -214,8 +214,8 @@ public:
 class DemoDlg : public UIDialog {
 public:
     void HandleEvent(UnknownDialogEvent* event); // 0x00455a10
-    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455b20
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455ae0
+    virtual int Tick(float frameTime);                    // 0x00455b20
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455ae0
 };
 
 // The image a dialog resource names (UIDialog 0x0046e9a0 returns its entry).
@@ -243,7 +243,7 @@ class LoadingDlg : public UIDialog {
 public:
     explicit LoadingDlg(int flags) : UIDialog(flags, "loading.dtm") {}
     void HandleEvent(UnknownDialogEvent* event); // 0x00451020
-    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00451270
+    virtual int Tick(float frameTime);                    // 0x00451270
 
     int framesShown;                          // +0x7f58: frames shown
 };

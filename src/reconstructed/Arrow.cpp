@@ -14,7 +14,7 @@ ArrowManager::~ArrowManager() {
 }
 
 // Folded with the identical overrides of other managers into 0x00462e30.
-GameObject* ArrowManager::UnknownVirtualSlot8(void* value) {
-    GameObject::UnknownVirtualSlot8(value);
+GameObject* ArrowManager::SetRenderContext(void* value) {
+    GameObject::SetRenderContext(value);
     return this;
 }

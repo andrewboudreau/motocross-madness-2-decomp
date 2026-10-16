@@ -12,7 +12,7 @@
 class SkyCube : public DrawableCube {
 public:
     explicit SkyCube(int flags);              // 0x004fb1e0
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004fb260: recentres the cube
+    virtual int Tick(float frameTime);                 // 0x004fb260: recentres the cube
     // 0x004fb230: DrawableCube's loader, then the height above the camera.
     SkyCube* Create(void* value, UnknownTextureStream* stream, UnknownCubeTextureContext* context,
                                    float height);

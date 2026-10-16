@@ -31,7 +31,7 @@ public:
     virtual ~GameCursor();                    // 0x0043eb60 (deleting wrapper 0x0043ea50)
     // 0x0043ed40: moves the cursor to the bindings' (or the mouse's)
     // position and draws it.
-    virtual int UnknownVirtualSlot15();
+    virtual int RenderPost3D();
     // 0x0043ea70: an input-driven cursor following the two bindings.
     GameObject* CreateBound(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
                                       const char* image, TextureMapManager* textures,

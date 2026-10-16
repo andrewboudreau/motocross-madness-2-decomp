@@ -56,7 +56,7 @@ static inline int ModeWidth(UnknownDisplay* display)
 // 0x00403dc0: while the camera covers the whole screen the background is
 // restored from the off-screen copy region by region; otherwise (or while
 // frames are left to restore) the whole copy is restored.
-int BackgroundImage::UnknownVirtualSlot13() {
+int BackgroundImage::RenderPre3D() {
     if (!fullRestoreFrames) {
         UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->currentCamera;
         if (!camera || !camera->isEnabled || !camera->redrawFrames ||
@@ -103,7 +103,7 @@ BackgroundImage::~BackgroundImage() {
 }
 
 // 0x00403ec0
-int BackgroundImage::UnknownVirtualSlot15() {
+int BackgroundImage::RenderPost3D() {
     if (field_0x2c && imageVisible) {
         g_UnknownGlobal5777b8.left = 0;
         g_UnknownGlobal5777b8.top = 0;
@@ -118,11 +118,11 @@ int BackgroundImage::UnknownVirtualSlot15() {
 
 // 0x00403f30: creates the off-screen copy with the back buffer's size and
 // format and four regions; releases the object on failure.
-GameObject* BackgroundImage::UnknownVirtualSlot8(void* value) {
+GameObject* BackgroundImage::SetRenderContext(void* value) {
     UnknownSurfaceDesc desc;
     int i;
 
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     desc.flags = 0x1006;
@@ -418,7 +418,7 @@ void BackgroundImage::MarkAllDirty() {
 }
 
 // 0x00404de0
-int BackgroundImage::UnknownVirtualSlot18() {
+int BackgroundImage::OnActivate() {
     MarkAllDirty();
     return 1;
 }

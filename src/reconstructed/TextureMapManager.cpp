@@ -136,23 +136,23 @@ TextureMapManager::~TextureMapManager() {
 }
 
 // 0x00510dd0
-int TextureMapManager::UnknownVirtualSlot10(float frameTime) {
+int TextureMapManager::Tick(float frameTime) {
     frameCount++;
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x00510df0
-int TextureMapManager::UnknownVirtualSlot12() {
+int TextureMapManager::PrepareGeometry() {
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
         if (cache)
             cache->ClearUseRecords();
     }
-    return GameObject::UnknownVirtualSlot12();
+    return GameObject::PrepareGeometry();
 }
 
 // 0x00510e30: nothing to do with AGP textures.
-int TextureMapManager::UnknownVirtualSlot13() {
+int TextureMapManager::RenderPre3D() {
     if (g_TrackGame->display->isAGP)
         return 1;
     for (int i = 0; i < field_0x44.m_count; i++) {
@@ -160,11 +160,11 @@ int TextureMapManager::UnknownVirtualSlot13() {
         if (cache)
             cache->RepackPages();
     }
-    return GameObject::UnknownVirtualSlot13();
+    return GameObject::RenderPre3D();
 }
 
 // 0x00510e90
-int TextureMapManager::UnknownVirtualSlot15() {
+int TextureMapManager::RenderPost3D() {
     if (g_TrackGame->testKey) {
         for (int i = 0; i < field_0x44.m_count; i++) {
             ManagedTextureGroup* cache = field_0x44.Get(i);
@@ -172,16 +172,16 @@ int TextureMapManager::UnknownVirtualSlot15() {
                 cache->DrawSelection(static_cast<PCRenderTarget*>(renderContext));
         }
     }
-    return GameObject::UnknownVirtualSlot15();
+    return GameObject::RenderPost3D();
 }
 
 // 0x00510ee0: with the "TestKey" debug input, key 0x14 cycles the mode,
 // 0x21 toggles the selected cache's +0x08, 0x1b / 0x1a step forwards /
 // backwards (through the cache's +0x1c8 or +0x1c4 entries, or through the
 // caches) and 0x15 runs the cache's 0x0050c7e0.
-int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int TextureMapManager::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
-    if (GameObject::UnknownVirtualSlot23(event, entry))
+    if (GameObject::OnControlPress(event, entry))
         return 1;
     if (g_TrackGame->testKey && debugGroup) {
         handled = 1;
@@ -239,7 +239,7 @@ ManagedTextureGroup* TextureMapManager::CreateGroup(int format, int pages, int a
 }
 
 // 0x00511290
-int TextureMapManager::UnknownVirtualSlot18() {
+int TextureMapManager::OnActivate() {
     for (TextureMap* texture = allTextures.First(); texture; texture = allTextures.Next())
         texture->RecreateIfLost();
     for (int i = 0; i < field_0x44.m_count; i++) {
@@ -247,7 +247,7 @@ int TextureMapManager::UnknownVirtualSlot18() {
         if (cache)
             cache->RestoreLostPages();
     }
-    return GameObject::UnknownVirtualSlot18();
+    return GameObject::OnActivate();
 }
 
 // 0x005113d0: on AGP displays, restores every grouped texture; otherwise

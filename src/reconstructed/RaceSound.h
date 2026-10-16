@@ -72,8 +72,8 @@ class RaceSound : public GameObject {
 public:
     explicit RaceSound(int flags);        // 0x004e1fb0
     virtual ~RaceSound();                 // 0x004e21b0 (deleting wrapper 0x004e2190)
-    virtual int UnknownVirtualSlot10(float frameTime);                                    // 0x004e3730
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004e44e0
+    virtual int Tick(float frameTime);                                                    // 0x004e3730
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004e44e0
 
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
     // +0x18, itself, its +0x50 camera and 6): creates the sound groups and

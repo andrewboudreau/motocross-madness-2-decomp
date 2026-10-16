@@ -475,7 +475,7 @@ void PCCentralDlg::HandleEvent(UnknownDialogEvent* event)
             g_TrackGame->mode.raceSettings.treeCollision = 1;
             g_TrackGame->mode.difficulty = circuit->difficulty;
             LeaveMenusForRace();
-            UnknownVirtualSlot26();
+            MarkPendingRelease();
         } else if (_stricmp("TabNext", event->controlName) == 0) {
             OpenPage(0);
         } else if (_stricmp("TabBikeRider", event->controlName) == 0) {
@@ -921,10 +921,10 @@ void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
 }
 
 // 0x004d72a0
-void PCCentralBikeRiderDlg::UnknownVirtualSlot26()
+void PCCentralBikeRiderDlg::MarkPendingRelease()
 {
     g_TrackGame->ui->HideScene();
-    UIDialog::UnknownVirtualSlot26();
+    UIDialog::MarkPendingRelease();
 }
 
 // 0x004d78c0
@@ -946,10 +946,10 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->manufacturerCount; i++) {
-        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->UnknownVirtualSlot4();
+        ((UnknownKrustyUIModel*)ui->manufacturers)[i].uiModel->Disable();
         ui = g_TrackGame->ui;
     }
-    model->uiModel->UnknownVirtualSlot5();
+    model->uiModel->Enable();
     bikeChanged = 1;
     if (bike->field_0x88) {
         UIControl* engine = FindControl("DDLEngineSize", 0);
@@ -1195,7 +1195,7 @@ void PCCentralBikeRiderDlg::FillBikeRiderLists()
 
 
 // 0x004d77d0
-int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
+int PCCentralBikeRiderDlg::RenderPre3D()
 {
     if (bikeChanged) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
@@ -1214,5 +1214,5 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
             ->ReplaceMaterialTexture(0, rider->modelName, &g_TrackGame->textureContext);
         riderChanged = 0;
     }
-    return UIDialog::UnknownVirtualSlot13();
+    return UIDialog::RenderPre3D();
 }

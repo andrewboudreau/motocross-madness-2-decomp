@@ -51,7 +51,7 @@ public:
     explicit DebugOverlay(int flags);                                   // 0x00447920
     virtual ~DebugOverlay();                  // 0x00447990 (deleting wrapper 0x00447970)
     virtual int UnknownVirtualSlot14();       // 0x00448030
-    virtual int UnknownVirtualSlot25(void* value); // 0x00448520
+    virtual int AttachRenderContext(void* value);  // 0x00448520
 
     // 0x00447de0: sets the overlay up; returns it, or 0.
     DebugOverlay* Setup(RenderTarget* a, TextureMapManager* b,

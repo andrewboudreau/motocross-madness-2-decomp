@@ -494,8 +494,8 @@ void BikeRace::WriteRelativePositions(Vector3* a, Vector3* b, void* reference, i
 class UnknownBikeRaceDemoDlg : public UIDialog {
 public:
     UnknownBikeRaceDemoDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
-    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455b20
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455ae0
+    virtual int Tick(float frameTime);                    // 0x00455b20
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00455ae0
 };
 
 // The length of `v` (1 without a square root for unit vectors); the setup
@@ -526,7 +526,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
     Vector3 normal;
     Vector3 point;
 
-    GameObject::UnknownVirtualSlot8(owner);
+    GameObject::SetRenderContext(owner);
     field_0x25_bit1 = 1;
     statusList = 0;
     aiSettings[0] = 50.0f;
@@ -647,7 +647,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                     thirtySecondMan->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                 }
                 if (thirtySecondMan)
-                    thirtySecondMan->UnknownVirtualSlot4();
+                    thirtySecondMan->Disable();
                 if (hasStartProbe) {
                     point.x = startProbe.center.x;
                     point.z = startProbe.center.z;
@@ -674,7 +674,7 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                             startGate->model->SetAxesPtr(&direction, &kVec3YAxis, 1, 0);
                         }
                     } else if (startGate) {
-                        startGate->UnknownVirtualSlot4();
+                        startGate->Disable();
                     }
                 }
             }
@@ -838,9 +838,9 @@ BikeRace* BikeRace::Create(void* owner, void* particles, LightManager* lights,
                 bestGhostLength = ghostVcr->RecordedLength();
                 aiRacers[0]->UnknownFunction496e20(ghostVcr);
                 if (startBeforeFinish)
-                    aiRacers[0]->UnknownVirtualSlot4();
+                    aiRacers[0]->Disable();
                 else
-                    aiRacers[0]->UnknownVirtualSlot5();
+                    aiRacers[0]->Enable();
                 AppendChild(ghostVcr, -1);
             }
         } else {
@@ -1222,7 +1222,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j]->frontWheel->field_0x68 = 1;
                 racerSlots[j]->rearWheel->field_0x68 = 1;
             }
-            racerSlots[j]->UnknownVirtualSlot4();
+            racerSlots[j]->Disable();
             racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
             if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                 replayVcr->SetRacer(slots[j].networkPlayerId, 0, recordIndex++, slots[j].playerName, path,
@@ -1268,7 +1268,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 racerSlots[j]->frontWheel->field_0x68 = 1;
                 racerSlots[j]->rearWheel->field_0x68 = 1;
             }
-            racerSlots[j]->UnknownVirtualSlot4();
+            racerSlots[j]->Disable();
             racerSlots[j]->messageDelay = slots[j].lowestMessageDelay;
             if (replayVcr && g_TrackGame->useReplayTape && !g_TrackGame->playingReplay) {
                 replayVcr->SetRacer(slots[j].networkPlayerId, (char)slots[j].racerIndex, recordIndex++,
@@ -1345,7 +1345,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                                                (unsigned char)aiRacers[0]->engineKind,
                                                g_TrackGame->mode.plateNumber);
             aiRacers[0]->UnknownRacerVirtualSlot50(1, 0, 1);
-            aiRacers[0]->UnknownVirtualSlot4();
+            aiRacers[0]->Disable();
         } else if (g_TrackGame->mode.raceSettings.aiRacerCount > 0) {
             // The AI racers.
             id = 1;

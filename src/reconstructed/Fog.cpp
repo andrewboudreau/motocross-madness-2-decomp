@@ -30,7 +30,7 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
 {
     char name[256];
 
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     this->farScale = farScale;
     this->nearScale = nearScale;
     visibilityOffset = 0;
@@ -69,13 +69,13 @@ void Fog::SetParameters(unsigned int color, float visibility, float haziness)
 }
 
 // 0x004627f0
-int Fog::UnknownVirtualSlot10(float frameTime)
+int Fog::Tick(float frameTime)
 {
     return 1;
 }
 
 // 0x00462800
-int Fog::UnknownVirtualSlot12()
+int Fog::PrepareGeometry()
 {
     if (isEnabled) {
         TARGET()->currentCamera->ClampLimits(1.0f, fogEnd);
@@ -187,7 +187,7 @@ failed:
 }
 
 // 0x00462c20
-int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry)
+int Fog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     char name[256];
 
@@ -247,9 +247,9 @@ FogOff::FogOff(int flags)
 }
 
 // 0x00462e30 (the linker keeps one copy of this body for several classes)
-GameObject* FogOff::UnknownVirtualSlot8(void* value)
+GameObject* FogOff::SetRenderContext(void* value)
 {
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     return this;
 }
 

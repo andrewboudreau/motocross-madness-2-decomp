@@ -42,13 +42,13 @@ void GhostMod1::StartFade(float duration)
 }
 
 // 0x0047bc20
-int GhostMod1::UnknownVirtualSlot10(float frameTime)
+int GhostMod1::Tick(float frameTime)
 {
     if (timeRemaining != GHOST_MOD_NONE) {
         float remaining = timeRemaining - g_TrackGame->frameTime;
         timeRemaining = remaining > 0.0f ? remaining : 0.0f;
     }
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x0047bc60

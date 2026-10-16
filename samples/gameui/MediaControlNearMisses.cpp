@@ -49,7 +49,7 @@ MediaControl* MediaControl::Open(void* target, const char* file,
     unsigned short path[MAX_PATH];
     long result;
 
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     if (!IsDirectShowInstalled()) {
         goto failed;
     }

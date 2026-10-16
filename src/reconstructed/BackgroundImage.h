@@ -37,10 +37,10 @@ public:
     explicit BackgroundImage(int flags);  // 0x00403d50
     virtual ~BackgroundImage();           // 0x00404010 (deleting wrapper 0x00403da0)
 
-    virtual GameObject* UnknownVirtualSlot8(void* value); // 0x00403f30: creates the off-screen copy
-    virtual int UnknownVirtualSlot13();   // 0x00403dc0: restores the background
-    virtual int UnknownVirtualSlot15();   // 0x00403ec0: draws the image
-    virtual int UnknownVirtualSlot18();   // 0x00404de0
+    virtual GameObject* SetRenderContext(void* value);    // 0x00403f30: creates the off-screen copy
+    virtual int RenderPre3D();            // 0x00403dc0: restores the background
+    virtual int RenderPost3D();           // 0x00403ec0: draws the image
+    virtual int OnActivate();             // 0x00404de0
     // Slot 27 (shared `return 1` body 0x004627f0): called with the surface
     // the background is restored into.
     virtual int UnknownVirtualSlot27(UnknownSurfaceInterface* surface);

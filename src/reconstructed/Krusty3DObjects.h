@@ -118,7 +118,7 @@ struct UnknownRunwayTerrain {
 class RunwayLights : public GameObject {
 public:
     explicit RunwayLights(int flags);          // 0x0048a5b0
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0048a760
+    virtual int Tick(float frameTime);                 // 0x0048a760
 
     // 0x0048a600 (ret 0x10): slot 8, then loads the five lights (line 0x40).
     RunwayLights* SetupLights(void* value, int a, int b, UnknownRunwayTerrain* terrain);
@@ -158,9 +158,9 @@ struct UnknownVisualCueView {
 class VisualCue : public ArcadeObject {
 public:
     explicit VisualCue(int flags);             // 0x0048ad60
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0048b100
+    virtual int Tick(float frameTime);                 // 0x0048b100
     virtual int UnknownVirtualSlot14();        // 0x0048bc10
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0048afa0
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0048afa0
 
     // 0x0048adf0 (ret 0x34): loads "viscue.slt"; returns this, or 0.
     VisualCue* LoadVisualCue(void* value, int a, int b, UnknownRunwayTerrain* terrain, Vector3 position,
@@ -195,7 +195,7 @@ public:
 class NumberObjectManager : public GameObject {
 public:
     explicit NumberObjectManager(int flags);   // 0x0048bca0
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0048bfc0
+    virtual int Tick(float frameTime);                 // 0x0048bfc0
     virtual int UnknownVirtualSlot14();        // 0x0048c290
 
     // 0x0048bd00 (ret 0x18): loads the five digits (lines 0x23d, 0x240).
@@ -331,7 +331,7 @@ class BonusObjectManager : public GameObject {
 public:
     explicit BonusObjectManager(int flags);    // 0x0048c2b0
     virtual ~BonusObjectManager();             // 0x0048c320 (deleting wrapper 0x0048c300)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0048ccc0
+    virtual int Tick(float frameTime);                 // 0x0048ccc0
     virtual int UnknownVirtualSlot14();        // 0x0048d620
 
     // 0x0048c330 (ret 0xc): loads the digit, "x" and decimal point models.

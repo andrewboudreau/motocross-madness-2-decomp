@@ -9,6 +9,6 @@ int ShadowCamera::UnknownVirtualSlot19(int) {
 }
 
 // 0x004da560
-int ShadowCamera::UnknownVirtualSlot22(UnknownControlEvent*, UnknownInputEntry*) {
+int ShadowCamera::OnControlRelease(UnknownControlEvent*, UnknownInputEntry*) {
     return 0;
 }

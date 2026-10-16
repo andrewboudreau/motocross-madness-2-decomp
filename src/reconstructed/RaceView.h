@@ -28,8 +28,8 @@ class TextQueueOverlay : public GameObject {
 public:
     explicit TextQueueOverlay(int flags);     // 0x0051b2a0
     virtual ~TextQueueOverlay();              // 0x0051b300 (deleting wrapper 0x0051b2e0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051b3f0
-    virtual int UnknownVirtualSlot15();       // 0x0051b450
+    virtual int Tick(float frameTime);                 // 0x0051b3f0
+    virtual int RenderPost3D();               // 0x0051b450
 
     // 0x0051b320: binds the render target and the text rectangle and creates
     // the font from the GUI's face name (Arial when it has none).

@@ -124,13 +124,13 @@ class TextureMapManager : public GameObject {
 public:
     TextureMapManager();                      // 0x00510bd0
     virtual ~TextureMapManager();             // 0x00510cf0 (deleting wrapper 0x00510cd0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00510dd0: counts frames
-    virtual int UnknownVirtualSlot12();       // 0x00510df0
-    virtual int UnknownVirtualSlot13();       // 0x00510e30
-    virtual int UnknownVirtualSlot15();       // 0x00510e90
-    virtual int UnknownVirtualSlot18();       // 0x00511290: restores every texture
+    virtual int Tick(float frameTime);                 // 0x00510dd0: counts frames
+    virtual int PrepareGeometry();            // 0x00510df0
+    virtual int RenderPre3D();                // 0x00510e30
+    virtual int RenderPost3D();               // 0x00510e90
+    virtual int OnActivate();                 // 0x00511290: restores every texture
     // 0x00510ee0: debug keys stepping through the texture caches.
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x00511180: creates and registers a texture group with `pages` pages.
     ManagedTextureGroup* CreateGroup(int format, int pages, int addressU, int addressV);

@@ -159,8 +159,8 @@ int GetInputText(int row, int kind, int code, char* text);
 class OptControlsDlg : public UIDialog {
 public:
     OptControlsDlg() : UIDialog(1, "OptCont.dtm") {}
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b5600
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b55d0
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x004b5600
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004b55d0
     virtual void HandleEvent(UnknownDialogEvent* event);   // 0x004b2e00
     virtual void SyncValues(int save);                    // 0x004b3470
     void ListMappedKeys();             // 0x004b3410: lists the mapped keys

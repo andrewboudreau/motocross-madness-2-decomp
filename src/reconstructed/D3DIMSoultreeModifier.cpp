@@ -16,9 +16,9 @@ D3DIMSoultreeModifier::~D3DIMSoultreeModifier()
     DetachFromAll();
 }
 
-GameObject* D3DIMSoultreeModifier::UnknownVirtualSlot8(void* value)
+GameObject* D3DIMSoultreeModifier::SetRenderContext(void* value)
 {
-    return GameObject::UnknownVirtualSlot8(value);
+    return GameObject::SetRenderContext(value);
 }
 
 void D3DIMSoultreeModifier::AddObject(D3DIMSoultreeObject* object)

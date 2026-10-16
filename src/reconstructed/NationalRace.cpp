@@ -85,8 +85,8 @@ void NationalRace::UnknownVirtualSlot30() {
 }
 
 // 0x004aaa70
-int NationalRace::UnknownVirtualSlot10(float frameTime) {
-    BaseQuarryEvent::UnknownVirtualSlot10(frameTime);
+int NationalRace::Tick(float frameTime) {
+    BaseQuarryEvent::Tick(frameTime);
     if (g_TrackGame->mode.raceSettings.raceMode && g_TrackGame->mode.raceSettings.raceMode != 4 &&
         !g_TrackGame->uiInteractionBlocked && !finishTextShown) {
         if (raceView->localRacer->lapCount + 1 == g_TrackGame->mode.raceSettings.lapCount &&

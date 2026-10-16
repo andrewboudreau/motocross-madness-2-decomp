@@ -58,7 +58,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
                                         const UnknownOverlayRect* source, float depth,
                                         char a7, const char* a8, const char** a9, int a10,
                                         int a11, int a12) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     overlayDepth = depth;
     overlayTexture = texture;
     field_0xe4 = a4;

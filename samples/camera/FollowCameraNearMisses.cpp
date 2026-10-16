@@ -2,7 +2,7 @@
 // match. See docs/FOLLOW_CAMERA.md. Bindings:
 // FollowCameraNearMisses.bindings.json.
 //
-// FollowCamera::UnknownVirtualSlot10 (0x00465c20, 3672 bytes): the per-frame
+// FollowCamera::Tick (0x00465c20, 3672 bytes): the per-frame
 // update. Slots 75 (bool) and 55 (unsigned char) return one byte, as retail
 // uses their al. The body matches except 13 bytes: retail computes the second
 // D3DRMVectorRotate call's `&direction` before pushing `&position`, and in
@@ -466,7 +466,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 }
 
 // 0x00465c20 (3672 bytes; near miss, see the header comment).
-int FollowCamera::UnknownVirtualSlot10(float dt) {
+int FollowCamera::Tick(float dt) {
     Vector3 position;
     Vector3 target;
     Vector3 smoothed;
@@ -660,7 +660,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             }
         }
         SetFieldOfView(fieldOfViewEase->Update(targetFieldOfView, dt));
-        Camera::UnknownVirtualSlot10(dt);
+        Camera::Tick(dt);
         wasWide = wide;
         return 1;
     }

@@ -502,7 +502,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Pop(0);
 
     lightManager = new(__FILE__, 582) LightManager(1);
-    AppendChild(lightManager->UnknownVirtualSlot8(renderContext), -1);
+    AppendChild(lightManager->SetRenderContext(renderContext), -1);
     presets[0] = 0;
     presets[1] = 1;
     presets[2] = 2;
@@ -580,7 +580,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             sprintf(text, "Fog not created.\n");
         if (eventFog)
             eventFog->SetDetailLevel(g_TrackGame->mode.videoSettings[4]);
-        AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(renderContext), -1);
+        AppendChild((new(__FILE__, 729) UnknownQuarryFogObject(1))->SetRenderContext(renderContext), -1);
         if (!g_TrackGame->sceneObject->OpenArchiveFile(stream, eventScene->environment->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
             if (stream)
@@ -865,7 +865,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (progress)
         progress(0);
     UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);
-    last->UnknownVirtualSlot8(renderContext);
+    last->SetRenderContext(renderContext);
     AppendChild(last, -1);
     last->InsertNodesInQuadtree();
     return 1;

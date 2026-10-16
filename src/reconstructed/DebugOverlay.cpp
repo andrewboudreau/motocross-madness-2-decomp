@@ -219,9 +219,9 @@ int DebugOverlay::ShowNextPage()
     return 0;
 }
 
-int DebugOverlay::UnknownVirtualSlot25(void* value)
+int DebugOverlay::AttachRenderContext(void* value)
 {
-    GameObject::UnknownVirtualSlot25(value);
+    GameObject::AttachRenderContext(value);
     if (!fontTexture->RestoreTextureSurface()) {
         fontTexture->Release();
         return LoadFont();

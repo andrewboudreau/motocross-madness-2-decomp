@@ -46,10 +46,10 @@ KrustyBikeCamera* KrustyBikeCamera::SetupFlyby(void* value, float rate294, float
 }
 
 // 0x00497df0: the FollowCamera search, unless the global +0x3430 blocks it.
-int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int KrustyBikeCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (g_TrackGame->uiInteractionBlocked)
         return 0;
-    return BikeCamera::UnknownVirtualSlot23(event, entry);
+    return BikeCamera::OnControlPress(event, entry);
 }
 
 // 0x00497fa0: keeps the point at least 3.5 above the subject's ground height

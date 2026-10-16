@@ -131,7 +131,7 @@ class CarProcedural : public GraphicsTest {
 public:
     explicit CarProcedural(int flags);                               // 0x0042f390 (ret 4)
     virtual ~CarProcedural();                                        // 0x0042f590 (slot 0 0x0042f570)
-    virtual int UnknownVirtualSlot10(float frameTime);               // 0x0042fd80
+    virtual int Tick(float frameTime);                               // 0x0042fd80
     // Slot 27 (0x0042f600, ret 0x40): sets the car up; returns this.
     virtual CarProcedural* UnknownVirtualSlot27(void* a0, const char* name, const char* collisionFile,
                                                 int a3, int a4, void* a5, const char* pathFile,

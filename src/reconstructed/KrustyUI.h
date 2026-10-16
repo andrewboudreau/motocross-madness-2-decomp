@@ -99,13 +99,13 @@ class KrustyUI : public GameObject {
 public:
     explicit KrustyUI(int flags);                                  // 0x004987f0
     virtual ~KrustyUI();                      // 0x0049b470 (deleting wrapper 0x00498880)
-    virtual void UnknownVirtualSlot4();       // 0x00499ad0
-    virtual void UnknownVirtualSlot5();       // 0x00499ac0
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00499ae0
-    virtual int UnknownVirtualSlot18();       // 0x00499af0
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00499a40
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x00499a70
-    virtual int UnknownVirtualSlot25(void* value); // 0x00499980
+    virtual void Disable();                   // 0x00499ad0
+    virtual void Enable();                    // 0x00499ac0
+    virtual int Tick(float frameTime);                 // 0x00499ae0
+    virtual int OnActivate();                 // 0x00499af0
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00499a40
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);     // 0x00499a70
+    virtual int AttachRenderContext(void* value);  // 0x00499980
     void ShowScene(GameObject* parent); // 0x004999f0: shows the +0x464 scene
     void HideScene();             // 0x00499a20: hides it
     // 0x0049b560 / 0x0049b7f0 (bikerace.cpp passes TrackGame+0x1f2c and

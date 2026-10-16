@@ -1,7 +1,7 @@
 // Near-miss KrustyBikeCamera candidates, kept out of src/reconstructed until
 // they match. See docs/FOLLOW_CAMERA.md.
 //
-// KrustyBikeCamera::UnknownVirtualSlot10 (0x00497e20, 352 bytes + 6-entry jump
+// KrustyBikeCamera::Tick (0x00497e20, 352 bytes + 6-entry jump
 // table): everything up to the second 0x004210f0 call matches. From there
 // to the end (that call, the slot 47 block and the restore tail) VC6 rotates
 // the scratch registers: retail loads the global into edx and builds the
@@ -29,7 +29,7 @@ static Vector3 s_UnknownVector67c3e8;
 // has its network start pending it drives FollowCamera slots 46 (once) and 47 from it;
 // otherwise it leaves that mode, restoring the state, and runs FollowCamera
 // slot 10.
-int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
+int KrustyBikeCamera::Tick(float frameTime) {
     if (!raceView) {
         switch (g_TrackGame->mode.raceSettings.eventType) {
             case 2:
@@ -68,6 +68,6 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
         UnknownVirtualSlot62();
         UnknownVirtualSlot71(cameraState);
     }
-    FollowCamera::UnknownVirtualSlot10(frameTime);
+    FollowCamera::Tick(frameTime);
     return 1;
 }

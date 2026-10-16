@@ -153,7 +153,7 @@ class GUICursor : public GameCursor {
 public:
     explicit GUICursor(int flags);            // 0x00485100
     virtual ~GUICursor();                     // 0x00485140 (deleting wrapper 0x00485120)
-    virtual int UnknownVirtualSlot15();       // 0x00485170
+    virtual int RenderPost3D();               // 0x00485170
     void SetAnimation(UnknownCursorAnimation* animation); // 0x00485150
 
     UnknownCursorAnimation* cursorAnimation;  // +0x5c: SetAnimation; advanced by slot 15
@@ -203,8 +203,8 @@ class ToolTip : public GameObject {
 public:
     explicit ToolTip(int flags);              // 0x00486990
     virtual ~ToolTip();                       // 0x00486a30 (deleting wrapper 0x004869f0)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00486ab0
-    virtual int UnknownVirtualSlot15();       // 0x00486db0
+    virtual int Tick(float frameTime);                 // 0x00486ab0
+    virtual int RenderPost3D();               // 0x00486db0
 
     ToolTip* Create(void* target, GUIManager* gui); // 0x00486a10
     void ShowControlToolTip(UnknownGuiControl* control); // 0x00486b10: control's text at the pointer or below it
@@ -229,8 +229,8 @@ class GUIInputDevice : public GameObject {
 public:
     GUIInputDevice();                         // 0x00486e80
     virtual ~GUIInputDevice();                // 0x00486f20 (deleting wrapper 0x00486f00)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00487320
-    virtual int UnknownVirtualSlot25(void* value);     // 0x004873b0
+    virtual int Tick(float frameTime);                 // 0x00487320
+    virtual int AttachRenderContext(void* value);      // 0x004873b0
 
     // 0x00486fb0: binds to `device` within [minX, maxX] x [minY, maxY]
     // (all 0: the target's size).
@@ -256,8 +256,8 @@ class GUIUser : public GameObject {
 public:
     GUIUser();                                // 0x004873d0
     virtual ~GUIUser();                       // 0x00487540 (deleting wrapper 0x00487520)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004875a0
-    virtual int UnknownVirtualSlot15();       // 0x00487620
+    virtual int Tick(float frameTime);                 // 0x004875a0
+    virtual int RenderPost3D();               // 0x00487620
 
     void UpdateFocus(int force);              // 0x004875c0: applies the pending focus (+0x1d0) or hover (+0x1cc)
     GUIUser* Create(void* target, GUIManager* gui); // 0x00487650: base create, GUI and tool tip
@@ -312,11 +312,11 @@ class GUIManager : public GameObject {
 public:
     explicit GUIManager(int flags);           // 0x00485190
     virtual ~GUIManager();                    // 0x00485320 (deleting wrapper 0x00485300)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00485870
-    virtual int UnknownVirtualSlot13();       // 0x004858d0
-    virtual int UnknownVirtualSlot15();       // 0x00485970
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00485830
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004857f0
+    virtual int Tick(float frameTime);                 // 0x00485870
+    virtual int RenderPre3D();                // 0x004858d0
+    virtual int RenderPost3D();               // 0x00485970
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);     // 0x00485830
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004857f0
 
     // 0x004853b0: sets the GUI up (KrustyUI 0x004988a0 passes its target,
     // Display+0x64 palette, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"
@@ -425,8 +425,8 @@ public:
     virtual ~HiResMeter();                    // 0x00488430 (deleting wrapper 0x00488410)
     // 0x00488440: calibrates the time stamp counter (rdtsc; not
     // reconstructed).
-    virtual GameObject* UnknownVirtualSlot8(void* value);
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004885c0
+    virtual GameObject* SetRenderContext(void* value);
+    virtual int Tick(float frameTime);                 // 0x004885c0
 
     void ClearTickTimes();                    // 0x00488510: per-tick counts (each game tick, 0x00468807)
     void ResetTimerStats();                   // 0x00488540: all counts of the used timers (page not shown)

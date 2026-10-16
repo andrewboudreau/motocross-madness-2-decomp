@@ -23,7 +23,7 @@
 //   and lays the locals out differently (VC6 here swaps the registers).
 //   Dropping the `this` copy, hoisting the index and caching KrustyUI do
 //   not move it.
-// MPBikeRiderDlg::UnknownVirtualSlot10 (0x004f8820, 1268 bytes, 1214
+// MPBikeRiderDlg::Tick (0x004f8820, 1268 bytes, 1214
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
 // MultiPlayerDlg::SendStartMessage (0x004f2340, 2120 bytes): the
@@ -134,7 +134,7 @@ void MPBikeRiderDlg::FillBikeRiderLists() {
 }
 
 // 0x004f8820: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0).
-int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
+int MPBikeRiderDlg::Tick(float frameTime) {
     if (dialogBackground)
         dialogBackground->MarkAllDirty();
     Vector3 offset;
@@ -189,7 +189,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     }
     if (dialogBackground)
         dialogBackground->SetRegionRect(previewRegion, (CameraRect*)&previewArea);
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // A random value in [0, 1) (as in KrustyUI.cpp).

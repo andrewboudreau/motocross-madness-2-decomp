@@ -465,8 +465,8 @@ void UIControl::UpdateNeedsRedraw() {
 }
 
 // 0x00471140
-int UIControl::UnknownVirtualSlot13() {
-    int result = GameObject::UnknownVirtualSlot13();
+int UIControl::RenderPre3D() {
+    int result = GameObject::RenderPre3D();
     UIControl* last = FindLastAnchor(0);
     if ((!last || (last->shown && !last->transitionState)) && !post3D) {
         if (shown)
@@ -1733,13 +1733,13 @@ int UIDropDownList::ButtonDown(int a, int b) {
 // UIProgressBar's slot 48 and UICtlContainer's input slots
 
 // 0x0047b3f0
-int UICtlContainer::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UICtlContainer::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     GameObject* child = firstChild;
     if (child) {
         while (child->nextSibling)
             child = child->nextSibling;
         for (; child; child = child->prevSibling) {
-            if (child->UnknownVirtualSlot23(event, entry))
+            if (child->OnControlPress(event, entry))
                 return 1;
         }
     }
@@ -1747,13 +1747,13 @@ int UICtlContainer::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
 }
 
 // 0x0047b440
-int UICtlContainer::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UICtlContainer::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     GameObject* child = firstChild;
     if (child) {
         while (child->nextSibling)
             child = child->nextSibling;
         for (; child; child = child->prevSibling) {
-            if (child->UnknownVirtualSlot22(event, entry))
+            if (child->OnControlRelease(event, entry))
                 return 1;
         }
     }
@@ -1906,19 +1906,19 @@ int UIDialog::Release() {
 }
 
 // 0x0046a780
-int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIDialog::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 1;
     if (!isPaused) {
         if (event->kind == 1)
             UpdatePointerHover();
-        return GameObject::UnknownVirtualSlot23(event, entry);
+        return GameObject::OnControlPress(event, entry);
     }
     return 0;
 }
 
 // 0x0046a7d0
-int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIDialog::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind && (unsigned int)event->control < 0x20)
         guiUser->controlDown[event->control] = 0;
     if (!isPaused) {
@@ -1928,7 +1928,7 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
             RemoveTimers(0x101);
             RemoveTimers(0x102);
         }
-        return GameObject::UnknownVirtualSlot22(event, entry);
+        return GameObject::OnControlRelease(event, entry);
     }
     return 0;
 }
@@ -1989,9 +1989,9 @@ Sound* UIDialog::FindSectionObject(const char* name) {
 void UIDialog::SetShown(int value) {
     isShown = value;
     if (value)
-        GameObject::UnknownVirtualSlot5();
+        GameObject::Enable();
     else
-        GameObject::UnknownVirtualSlot4();
+        GameObject::Disable();
 }
 
 // 0x0046ea80
@@ -2045,7 +2045,7 @@ void UIDialog::UpdateBoundValues(int value) {
 }
 
 // 0x0046f1c0
-int UIDialog::UnknownVirtualSlot13() {
+int UIDialog::RenderPre3D() {
     if (!isPaused) {
         GameObjectIterator iterator(controlContainer, 1, "UIControl");
         if (dialogBackground) {
@@ -2056,7 +2056,7 @@ int UIDialog::UnknownVirtualSlot13() {
                                                                (CameraRect*)&control->screenArea);
             }
         }
-        GameObject::UnknownVirtualSlot13();
+        GameObject::RenderPre3D();
     } else if (screenGrab && !controlsPost3D) {
         if (dialogBackground)
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
@@ -2076,9 +2076,9 @@ int UIDialog::UnknownVirtualSlot14() {
 }
 
 // 0x0046f320
-int UIDialog::UnknownVirtualSlot15() {
+int UIDialog::RenderPost3D() {
     if (!isPaused) {
-        GameObject::UnknownVirtualSlot15();
+        GameObject::RenderPost3D();
     } else if (screenGrab && controlsPost3D) {
         if (dialogBackground)
             dialogBackground->DrawImage(screenGrab, &screenArea, 0, 0x1000000,
@@ -2088,7 +2088,7 @@ int UIDialog::UnknownVirtualSlot15() {
                                                                                  screenGrab, 0, 0x1000000);
     }
     if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->frameCount)
-        UnknownVirtualSlot26();
+        MarkPendingRelease();
     return 1;
 }
 
@@ -2138,7 +2138,7 @@ void UIDialog::EndDialog(int result) {
 // 0x0046ff60
 void UIDialog::AbortWithoutNotify() {
     notifyParentOnClose = 0;
-    UnknownVirtualSlot26();
+    MarkPendingRelease();
 }
 
 // 0x0046ffc0
@@ -2186,7 +2186,7 @@ void UIDialog::SetModalPause(int a, int b, CameraRect* rect) {
         GrabBackground(b, rect);
     else
         ReleaseBackgroundGrab();
-    GameObject::UnknownVirtualSlot16(a);
+    GameObject::SetPaused(a);
 }
 
 // 0x004700b0
@@ -2468,7 +2468,7 @@ void UIControl::SetText(const char* text) {
 }
 
 // 0x00470e00
-int UIControl::UnknownVirtualSlot10(float frameTime) {
+int UIControl::Tick(float frameTime) {
     AdvanceImages();
     int draw = 1;
     if (shown) {
@@ -2491,12 +2491,12 @@ int UIControl::UnknownVirtualSlot10(float frameTime) {
     screenArea[2] = g_TrackGame->renderTarget->targetWidth < right ? g_TrackGame->renderTarget->targetWidth : right;
     int bottom = screenArea[3];
     screenArea[3] = g_TrackGame->renderTarget->targetHeight < bottom ? g_TrackGame->renderTarget->targetHeight : bottom;
-    return GameObject::UnknownVirtualSlot10(frameTime);
+    return GameObject::Tick(frameTime);
 }
 
 // 0x004711a0
-int UIControl::UnknownVirtualSlot15() {
-    int result = GameObject::UnknownVirtualSlot15();
+int UIControl::RenderPost3D() {
+    int result = GameObject::RenderPost3D();
     UIControl* last = FindLastAnchor(0);
     if ((!last || (last->shown && !last->transitionState)) && post3D) {
         if (shown)
@@ -2560,7 +2560,7 @@ int UIControl::ButtonDown(int a, int b) {
 }
 
 // 0x00472320
-int UIControl::UnknownVirtualSlot20(int value) {
+int UIControl::OnChar(int value) {
     UnknownDialogEvent event;
     event.handled = 0;
     if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
@@ -2578,11 +2578,11 @@ int UIControl::UnknownVirtualSlot20(int value) {
         if (!event.field_0x18)
             return 1;
     }
-    return GameObject::UnknownVirtualSlot20(value);
+    return GameObject::OnChar(value);
 }
 
 // 0x004723d0
-int UIControl::UnknownVirtualSlot21(int value) {
+int UIControl::OnKeyDown(int value) {
     UnknownDialogEvent event;
     event.handled = 0;
     if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
@@ -2600,7 +2600,7 @@ int UIControl::UnknownVirtualSlot21(int value) {
         if (!event.field_0x18)
             return 1;
     }
-    return GameObject::UnknownVirtualSlot21(value);
+    return GameObject::OnKeyDown(value);
 }
 
 // 0x00472480
@@ -4017,7 +4017,7 @@ UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, 
                                                                BackgroundImage* background, const char* font,
                                                                int fontSize, GUIManager* gui, GUIUser* user,
                                                                const char* name) {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     if (area) {
         screenArea = *area;
     } else {
@@ -4279,8 +4279,8 @@ int UIControl::Draw() {
 
 // 0x00474570: the caret keys (Home, End, Left, Right, Delete); measures the
 // text and the caret's offset.
-int UIEditBox::UnknownVirtualSlot21(int value) {
-    if (!UIControl::UnknownVirtualSlot21(value) &&
+int UIEditBox::OnKeyDown(int value) {
+    if (!UIControl::OnKeyDown(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (clickSound) {
             clickSound->SetVolume(ownerGui->soundVolume, 0);
@@ -4342,7 +4342,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
 
 // 0x00474cf0: the joystick moves the focused scroll bar; then hides the
 // thumb while every list it follows shows all its rows.
-int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
+int UIScrollBar::Tick(float frameTime) {
     int range = GetWidth();
     GUIInputDevice* device;
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
@@ -4377,7 +4377,7 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
             }
         }
     }
-    int result = UIControl::UnknownVirtualSlot10(frameTime);
+    int result = UIControl::Tick(frameTime);
     if (result) {
         GameObjectIterator* iterator = (GameObjectIterator*)CreateControlIterator();
         int full = 0;
@@ -4599,7 +4599,7 @@ void UIScrollBar::ButtonHeld(int a, int* position) {
 
 // 0x00476020: the joystick moves the selection; the row under the cursor
 // is +0x248.
-int UIListBox::UnknownVirtualSlot10(float frameTime) {
+int UIListBox::Tick(float frameTime) {
     GUIInputDevice* device;
     for (int i = 0; (device = ownerDialog->guiUser->GetAcceptedDevice(i++)) != 0;) {
         if (device->inputDevice->deviceKind == 2 && device->inputDevice->IsDeviceSubtype(4)) {
@@ -4631,7 +4631,7 @@ int UIListBox::UnknownVirtualSlot10(float frameTime) {
             }
         }
     }
-    return UIControl::UnknownVirtualSlot10(frameTime);
+    return UIControl::Tick(frameTime);
 }
 
 // 0x004761f0: draws the background, then the rows: the text rows on a DC
@@ -4970,8 +4970,8 @@ int UIVideoStatic::PlayMovie(const char* file, int a, void (*done)(UIDialog* dia
 }
 
 // 0x0047af90
-int UIVideoStatic::UnknownVirtualSlot10(float frameTime) {
-    return UIControl::UnknownVirtualSlot10(frameTime);
+int UIVideoStatic::Tick(float frameTime) {
+    return UIControl::Tick(frameTime);
 }
 
 // 0x0047afa0
@@ -5113,7 +5113,7 @@ int UIControl::GrowStep() {
 }
 
 // 0x00472130
-int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIControl::OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
     GUIInputDevice* device = ownerDialog->guiUser->FindEventDevice(event);
     if (device) {
@@ -5122,7 +5122,7 @@ int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntr
             handled = ButtonUp(event->control, (int*)&position);
     }
     if (!handled)
-        return GameObject::UnknownVirtualSlot22(event, entry);
+        return GameObject::OnControlRelease(event, entry);
     return 1;
 }
 
@@ -5186,8 +5186,8 @@ int UIListBox::ButtonUp(int a, int* position) {
 }
 
 // 0x00478040
-int UIListBox::UnknownVirtualSlot21(int key) {
-    if (!UIControl::UnknownVirtualSlot21(key) &&
+int UIListBox::OnKeyDown(int key) {
+    if (!UIControl::OnKeyDown(key) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this && selectable) {
         int row;
         switch (key) {
@@ -5292,7 +5292,7 @@ int UIFrame::LoadFromStream(void* stream, int offset, void* palette) {
 // 0x00471fd0: a key or button press. A keyboard press of this control's
 // "KeyBind" without Shift focuses it and presses it (slots 55 and 56);
 // other presses go to slot 55 with the pointer position.
-int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIControl::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int handled = 0;
     if (ownerDialog->guiUser->UsesEventDevice(event)) {
         if (event->kind == 0) {
@@ -5318,6 +5318,6 @@ int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         }
     }
     if (!handled)
-        return GameObject::UnknownVirtualSlot23(event, entry);
+        return GameObject::OnControlPress(event, entry);
     return 1;
 }

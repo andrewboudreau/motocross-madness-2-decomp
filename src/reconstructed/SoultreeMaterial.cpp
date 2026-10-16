@@ -42,7 +42,7 @@ SoultreeMaterial::SoultreeMaterial(int flags)
 SoultreeMaterial* SoultreeMaterial::Attach(RenderTarget* target, const SoultreeTextureOptions* options,
                                              TextureMapManager* manager, int format)
 {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     strcpy(textureName, "");
     textureManager = manager;
     renderContext = target;

@@ -261,7 +261,7 @@ unlock:
 
 
 // 0x0046ef00: runs the timers and the joystick focus moves.
-int UIDialog::UnknownVirtualSlot10(float frameTime) {
+int UIDialog::Tick(float frameTime) {
     if (lastFrameTime != 0.0f)
         lastFrameTime = frameTime;
     else
@@ -339,7 +339,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
             }
         }
         UpdatePointerHover();
-        GameObject::UnknownVirtualSlot10(lastFrameTime);
+        GameObject::Tick(lastFrameTime);
     }
     return 1;
 }
@@ -513,12 +513,12 @@ int UIEditBox::Draw() {
 // 0x00474150: typed characters: Backspace, Enter (kind 10) and inserted
 // characters, double-byte ones in two steps; then measures the text and
 // sends kind 0x13.
-int UIEditBox::UnknownVirtualSlot20(int value) {
+int UIEditBox::OnChar(int value) {
     UnknownDialogEvent event;
     char c = (char)value;
     int result = 0;
     event.handled = 0;
-    if (!UIControl::UnknownVirtualSlot20(value) &&
+    if (!UIControl::OnChar(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (clickSound) {
             clickSound->SetVolume(ownerGui->soundVolume, 0);
@@ -707,7 +707,7 @@ void UIDropDownList::LayoutParts() {
     *(CameraRect*)buttonPart->screenArea = button;
     *(CameraRect*)buttonPart->bounds = *(CameraRect*)buttonPart->screenArea;
     if (!button.left)
-        buttonPart->UnknownVirtualSlot4();
+        buttonPart->Disable();
     sprintf(name, "%s_LB", GetName());
     listPart->SetName(name);
     *(CameraRect*)listPart->screenArea = list;

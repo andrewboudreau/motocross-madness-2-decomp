@@ -19,31 +19,52 @@ public:
     virtual ~GameObject(); // destructor core 0x00468d60
     virtual int Release(); // slot 2 override, 0x004696c0
 
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual GameObject* UnknownVirtualSlot8(void* value);
+    // Slot names come from the callers (tier 2), slot numbers and bodies are
+    // retail (vtable 0x00552a2c):
+    //  4/5   Disable/Enable: DisableByClassName and EnableByClassName call
+    //        them; they clear/set the +0x25 bits 0-1, then call slot 6/7.
+    //  6/7   OnDisable/OnEnable: the walks slots 4 and 5 end in.
+    //  8     SetRenderContext: stores renderContext and returns this; callers
+    //        pass the render target and append the result (Game::CreateObjects).
+    //  10    Tick: Game::Tick (0x004685d0) calls the root's slot 10 with the
+    //        clamped frame time and times it as "Tick" on the profile page.
+    //  12/13/15 PrepareGeometry/RenderPre3D/RenderPost3D: Game::RenderFrame
+    //        times the root's slots 12, 13 and 15 under those profile labels.
+    //  16    SetPaused: Game::SetInputSuspended passes its flag; the body
+    //        stores isPaused, and SoundGroup pauses its members.
+    //  17/18 OnDeactivate/OnActivate: PCGame::OnDeactivate/OnActivate.
+    //  20/21 OnChar/OnKeyDown: PCGame::OnChar/OnKeyDown.
+    //  22/23 OnControlRelease/OnControlPress: Game slots 13/14.
+    //  24    OnNetworkMessage: Game::OnNetworkMessage.
+    //  25    AttachRenderContext: Game::AttachRenderTarget hands the root the
+    //        render target; every child gets it, then renderContext is set.
+    //  26    MarkPendingRelease: sets pendingRelease on the subtree.
+    // Slots 9, 11, 14 and 19 keep placeholder names.
+    virtual void Disable();
+    virtual void Enable();
+    virtual void OnDisable();
+    virtual void OnEnable();
+    virtual GameObject* SetRenderContext(void* value);
     virtual int UnknownVirtualSlot9(int value);
-    virtual int UnknownVirtualSlot10(float frameTime);
+    virtual int Tick(float frameTime);
     virtual int UnknownVirtualSlot11(int value);
-    virtual int UnknownVirtualSlot12();
-    virtual int UnknownVirtualSlot13();
+    virtual int PrepareGeometry();
+    virtual int RenderPre3D();
     virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot15();
-    virtual int UnknownVirtualSlot16(int value);
-    virtual int UnknownVirtualSlot17();
-    virtual int UnknownVirtualSlot18();
+    virtual int RenderPost3D();
+    virtual int SetPaused(int value);
+    virtual int OnDeactivate();
+    virtual int OnActivate();
     virtual int UnknownVirtualSlot19(int value);
-    virtual int UnknownVirtualSlot20(int value);
-    virtual int UnknownVirtualSlot21(int value);
+    virtual int OnChar(int value);
+    virtual int OnKeyDown(int value);
     // Input events from Game slots 13 and 14, passed down the children.
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
     // Network messages (Game slot 17 forwards NetworkInterface 0x004aced0's).
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags);
-    virtual int UnknownVirtualSlot25(void* value);
-    virtual void UnknownVirtualSlot26();
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);
+    virtual int AttachRenderContext(void* value);
+    virtual void MarkPendingRelease();
 
     // 0x00469190: appends `child` (and its later siblings) to the children,
     // sets their parent and `child`'s +0x1c; returns `child`.
@@ -105,7 +126,7 @@ protected:
     GameObject* nextSibling;                  // +0x0c next sibling
     GameObject* firstChild;                   // +0x10 first child
     GameObject* parent;                       // +0x14 parent
-    void* renderContext;                      // +0x18 set by slots 8 and 25; the render target the object draws with (cast to RenderTarget/PCRenderTarget by its users)
+    void* renderContext;                      // +0x18 set by SetRenderContext and AttachRenderContext (slots 8, 25); the render target the object draws with (cast to RenderTarget/PCRenderTarget by its users)
     int ownFlags;                             // +0x1c flags this object adds to its parent's childFlags (0x004690c0, 0x00469100)
     unsigned int childFlags;                  // +0x20 OR of the children's ownFlags and childFlags; gates slots 12-18 (0x00469100)
     unsigned char field_0x24;
@@ -113,9 +134,9 @@ protected:
     // four low bits is VC6's bitfield code shape. Bit 0 enables the gated child
     // walks, bit 3 excludes a child from every walk; bit 2 is set by slot 16
     // and also excludes a child from slots 9 and 10.
-    unsigned char isEnabled : 1;              // +0x25 bit 0: cleared by slot 4 (DisableByClassName), set by slot 5
-    unsigned char field_0x25_bit1 : 1;        // +0x25 bit 1: set and cleared with bit 0; gates slot 24 (network messages)
-    unsigned char isPaused : 1;               // +0x25 bit 2: stored by slot 16, which SoundGroup forwards to SetPaused
-    unsigned char pendingRelease : 1;         // +0x25 bit 3: set by slot 26; ReleaseDetached releases the marked children
+    unsigned char isEnabled : 1;              // +0x25 bit 0: cleared by Disable (slot 4), set by Enable (slot 5)
+    unsigned char field_0x25_bit1 : 1;        // +0x25 bit 1: set and cleared with bit 0; gates OnNetworkMessage (slot 24)
+    unsigned char isPaused : 1;               // +0x25 bit 2: stored by SetPaused (slot 16)
+    unsigned char pendingRelease : 1;         // +0x25 bit 3: set by MarkPendingRelease (slot 26); ReleaseDetached releases the marked children
     char* classNames;                         // +0x28 DebugMalloc'd string, starts empty; see 0x00469ce0
 };

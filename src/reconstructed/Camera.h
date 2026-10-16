@@ -22,16 +22,16 @@ public:
     explicit Camera(int flags); // 0x0042e340
     virtual ~Camera();
 
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual GameObject* UnknownVirtualSlot8(void* value);
+    virtual void Disable();
+    virtual void Enable();
+    virtual GameObject* SetRenderContext(void* value);
     // 0x0042e690: per-frame update from the +0x170/+0x17c vectors (FollowCamera
     // slots 10 and 47 call it directly).
-    virtual int UnknownVirtualSlot10(float frameTime);
-    virtual int UnknownVirtualSlot13();
+    virtual int Tick(float frameTime);
+    virtual int RenderPre3D();
     virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot18();
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnActivate();
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
     virtual void TakeScreenshot() = 0;

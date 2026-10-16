@@ -25,12 +25,12 @@ class Fog : public GameObject {
 public:
     explicit Fog(int flags);                  // 0x00462620 (ret 4)
     virtual ~Fog();                           // 0x00462670 (deleting wrapper 0x00462650)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004627f0 (folded with BackgroundImage slot 27)
-    virtual int UnknownVirtualSlot12();       // 0x00462800: camera range to the fog end
+    virtual int Tick(float frameTime);                 // 0x004627f0 (folded with BackgroundImage slot 27)
+    virtual int PrepareGeometry();            // 0x00462800: camera range to the fog end
     virtual int UnknownVirtualSlot14();       // 0x00462850: backdrop and device fog
     // 0x00462c20: key 0x57 toggles "DriverInfo\<driver>\RenderFog", keys 0x21 / 0x22
     // move the fog in and out.
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int OnControlRelease(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x00462680 (ret 0x1c): slot 8 with `target`, the device fog mode, then the
     // colour, visibility and haziness. `farScale`, `nearScale` and `minimum` scale the
@@ -60,7 +60,7 @@ public:
 class FogOff : public GameObject {
 public:
     explicit FogOff(int flags);               // 0x00462e10 (ret 4)
-    virtual GameObject* UnknownVirtualSlot8(void* value); // 0x00462e30 (folded)
+    virtual GameObject* SetRenderContext(void* value);    // 0x00462e30 (folded)
     virtual int UnknownVirtualSlot14();       // 0x00462e50
 };
 

@@ -106,7 +106,7 @@ bool FollowCamera::AppendTableEntry(const Vector3& position, float a, float b, f
 FollowCamera* FollowCamera::SetupFollowCamera(void* value, float rate294, float rate298,
                                                   float value228, float value2d0, float value2e8,
                                                   int capacity, int count, const int* list) {
-    if (!Camera::UnknownVirtualSlot8(value))
+    if (!Camera::SetRenderContext(value))
         return 0;
     fieldOfViewEase = new(__FILE__, 0x78) UnknownFollowCameraValue(fieldOfView, rate294);
     distanceEase = new(__FILE__, 0x79) UnknownFollowCameraValue(followDistance, rate298);
@@ -648,7 +648,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         if (height > eyePosition.y)
             eyePosition.y = height;
         SetFieldOfView(66.0f);
-        Camera::UnknownVirtualSlot10(dt);
+        Camera::Tick(dt);
         return true;
     }
     UnknownVirtualSlot54();
@@ -660,8 +660,8 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
 // 0x10 flips +0x26c and calls slot 69. Outside states 6 and 7 the raw keys
 // 0x52 and 0x4c leave or enter state 5 (0x4c otherwise advances, slot 72) and
 // 0x37 calls slot 59 below state 5.
-int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (Camera::UnknownVirtualSlot23(event, entry) || event->kind)
+int FollowCamera::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (Camera::OnControlPress(event, entry) || event->kind)
         return 0;
     if (g_TrackGame->allowFreezeCamera) {
         if (TestInputEvent(0x21, 0, event, 0xc) && cameraState != 6) {

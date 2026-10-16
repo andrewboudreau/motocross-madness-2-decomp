@@ -60,7 +60,7 @@ LightEmitter::~LightEmitter() {
 }
 
 // 0x00467ae0 (shared `return 1` body)
-int LightEmitter::UnknownVirtualSlot12() {
+int LightEmitter::PrepareGeometry() {
     return 1;
 }
 
@@ -130,7 +130,7 @@ LightEmitter* LightEmitter::Create(void* value, int type, unsigned int color,
                                                   const Vector3* position, const Vector3* direction,
                                                   float range, int sphere, int a8, int a9, int a10,
                                                   int index) {
-    GameObject::UnknownVirtualSlot8(value);
+    GameObject::SetRenderContext(value);
     lightType = type;
     lightIndex = index;
     if (sphere) {
@@ -189,8 +189,8 @@ LightManager::~LightManager() {
 }
 
 // 0x004452e0 (shared body)
-GameObject* LightManager::UnknownVirtualSlot8(void* value) {
-    return GameObject::UnknownVirtualSlot8(value);
+GameObject* LightManager::SetRenderContext(void* value) {
+    return GameObject::SetRenderContext(value);
 }
 
 // 0x0049e470

@@ -253,7 +253,7 @@ int PCGame::OnActivate() {
              PCTarget()->zbuffer->Restore()))
             return 0;
         if (rootObject)
-            rootObject->UnknownVirtualSlot18();
+            rootObject->OnActivate();
     }
     return 1;
 }
@@ -261,7 +261,7 @@ int PCGame::OnActivate() {
 // 0x004c0310
 int PCGame::OnDeactivate() {
     if (rootObject)
-        rootObject->UnknownVirtualSlot17();
+        rootObject->OnDeactivate();
     if (fullScreen)
         ShowCursor(1);
     return 1;
@@ -271,14 +271,14 @@ int PCGame::OnDeactivate() {
 int PCGame::OnChar(int value) {
     if (inputSuspended)
         return 1;
-    return rootObject->UnknownVirtualSlot20(value);
+    return rootObject->OnChar(value);
 }
 
 // 0x004c0370
 int PCGame::OnKeyDown(int value) {
     if (inputSuspended)
         return 1;
-    return rootObject->UnknownVirtualSlot21(value);
+    return rootObject->OnKeyDown(value);
 }
 
 // 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.

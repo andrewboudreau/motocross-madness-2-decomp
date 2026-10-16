@@ -87,14 +87,14 @@ class BaseQuarryEvent : public GameObject {
 public:
     explicit BaseQuarryEvent(int flags);      // 0x004de2a0
     virtual ~BaseQuarryEvent();               // 0x004e1f10 (deleting wrapper 0x004de390)
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004de410
-    virtual int UnknownVirtualSlot12();       // 0x004e14a0: the "Atmosphere" debug page
+    virtual int Tick(float frameTime);                 // 0x004de410
+    virtual int PrepareGeometry();            // 0x004e14a0: the "Atmosphere" debug page
     // Slot 14, 0x004de400: `jmp GameObject slot 14` (folded with the same
     // body of other classes).
     virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot18();       // 0x00499af0 (folded with KrustyUI's)
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004e0ce0
-    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags);   // 0x004e1cc0
+    virtual int OnActivate();                 // 0x00499af0 (folded with KrustyUI's)
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x004e0ce0
+    virtual int OnNetworkMessage(int type, void* data, int from, int to, int flags);       // 0x004e1cc0
     // Slots 27-35 are introduced here (NationalRace overrides 27, 29 and 30).
     virtual int UnknownVirtualSlot27(int value); // 0x004e06a0: creates the visual cue
     virtual void UnknownVirtualSlot28();      // 0x00464e90 (shared empty body)
@@ -164,7 +164,7 @@ class DropTextOverlay;
 class NationalRace : public BaseQuarryEvent {
 public:
     explicit NationalRace(int flags);         // 0x004aa7f0
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x004aaa70: shows the finish text once
+    virtual int Tick(float frameTime);                 // 0x004aaa70: shows the finish text once
     virtual int UnknownVirtualSlot27(int value); // 0x004aa890: the visual cue, then the runway lights
     virtual void UnknownVirtualSlot29();      // 0x004aa970: the overlays, then the drop text
     virtual void UnknownVirtualSlot30();      // 0x004aaa50: adds the drop text as a child

@@ -38,8 +38,8 @@ int PCCamera::SetProjectionMatrix(const Matrix4* projection) {
 
 // After the Camera version succeeds, re-sends the view and projection
 // matrices when the owner's +0x08 is this camera. No null check here.
-int PCCamera::UnknownVirtualSlot13() {
-    if (!Camera::UnknownVirtualSlot13())
+int PCCamera::RenderPre3D() {
+    if (!Camera::RenderPre3D())
         return 0;
     if (Owner()->currentCamera == this) {
         PCOwner()->device->SetTransform(D3DTRANSFORMSTATE_VIEW, &viewMatrix);

@@ -1,7 +1,7 @@
 // Near-miss QuarryStuntEvent.cpp candidates (BaseQuarryEvent), kept out of
 // src/reconstructed/QuarryStuntEvent.cpp until they match.
 //
-// BaseQuarryEvent::UnknownVirtualSlot12 (0x004e14a0, 1756 bytes): the
+// BaseQuarryEvent::PrepareGeometry (0x004e14a0, 1756 bytes): the
 // "Atmosphere" debug page (fog and light colours with the up/down keys). The
 // switch, its jump table, the fog-kind strcpy chain and all prints match;
 // the prologue differs: retail loads s_DebugPage into ecx and reloads
@@ -25,8 +25,8 @@ static int s_DebugPage = -1;
 static int s_DebugRow;
 
 // 0x004e14a0
-int BaseQuarryEvent::UnknownVirtualSlot12() {
-    GameObject::UnknownVirtualSlot12();
+int BaseQuarryEvent::PrepareGeometry() {
+    GameObject::PrepareGeometry();
     if (g_TrackGame->testKey && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
             s_DebugPage = g_TrackGame->debugOverlay->NewPage();

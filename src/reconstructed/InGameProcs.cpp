@@ -274,7 +274,7 @@ void VCRDlg::HandleEvent(UnknownDialogEvent* event) {
 }
 
 // 0x004893c0
-int VCRDlg::UnknownVirtualSlot10(float frameTime) {
+int VCRDlg::Tick(float frameTime) {
     char text[32];
     guiManager->ShowCursors(1);
     UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl("SliderTime", 8));
@@ -289,7 +289,7 @@ int VCRDlg::UnknownVirtualSlot10(float frameTime) {
         slider->SetThumbPosition((int)(view->replayTime * 1000.0f),
                                       (int)(view->replayVcr->replayLength * 1000.0f));
     ShowReplayMode();
-    return UIDialog::UnknownVirtualSlot10(frameTime);
+    return UIDialog::Tick(frameTime);
 }
 
 // 0x004894c0

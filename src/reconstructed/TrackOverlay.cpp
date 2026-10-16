@@ -530,15 +530,15 @@ fail:
 }
 
 // 0x00519900
-int StatsOverlay::UnknownVirtualSlot10(float frameTime)
+int StatsOverlay::Tick(float frameTime)
 {
-    Overlay::UnknownVirtualSlot10(g_TrackGame->frameTime);
+    Overlay::Tick(g_TrackGame->frameTime);
     timeSinceRedraw += g_TrackGame->frameTime;
     return 1;
 }
 
 // 0x00519940
-int StatsOverlay::UnknownVirtualSlot13()
+int StatsOverlay::RenderPre3D()
 {
     if (timeSinceRedraw >= 1.0f) {
         if (g_TrackGame->mode.showRaceStatistics)
@@ -912,10 +912,10 @@ DropTextOverlay::~DropTextOverlay()
 
 // 0x0051b0f0: draws the text twice through the surface's device context,
 // black one pixel down and right, then green on top.
-int DropTextOverlay::UnknownVirtualSlot15()
+int DropTextOverlay::RenderPost3D()
 {
     if (visible) {
-        GameObject::UnknownVirtualSlot15();
+        GameObject::RenderPost3D();
         void* dc;
         if (((PCRenderTarget*)renderContext)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
@@ -982,7 +982,7 @@ TextQueueOverlay::~TextQueueOverlay()
 // 0x0051b320
 TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
 {
-    GameObject::UnknownVirtualSlot8(target);
+    GameObject::SetRenderContext(target);
     UnknownKrustyUIGui* gui = g_TrackGame->ui->gui;
     const char* face = gui ? gui->toolTipFontFace : "";
     int weight = 700;
@@ -1003,9 +1003,9 @@ TextQueueOverlay* TextQueueOverlay::Setup(void* target, UnknownOverlayRect rect)
 }
 
 // 0x0051b3f0: ages the head line and drops it once its time is up.
-int TextQueueOverlay::UnknownVirtualSlot10(float frameTime)
+int TextQueueOverlay::Tick(float frameTime)
 {
-    GameObject::UnknownVirtualSlot10(g_TrackGame->frameTime);
+    GameObject::Tick(g_TrackGame->frameTime);
     if (queueHead) {
         if (queueHead->shownSeconds > queueHead->showSeconds)
             DropHeadMessage();
@@ -1017,9 +1017,9 @@ int TextQueueOverlay::UnknownVirtualSlot10(float frameTime)
 
 // 0x0051b450: draws the head line, black in the shadow rectangle, then in
 // the text colour one pixel up and left.
-int TextQueueOverlay::UnknownVirtualSlot15()
+int TextQueueOverlay::RenderPost3D()
 {
-    GameObject::UnknownVirtualSlot15();
+    GameObject::RenderPost3D();
     if (queueHead) {
         void* dc;
         if (((PCRenderTarget*)renderContext)->renderSurface->GetDC(&dc) == 0) {
@@ -1205,7 +1205,7 @@ int RadarOverlay::TakeRacers(UnknownKrustyBikeView* view, int a2)
 // the same value; the identical if/else keeps that test. The parenthesised
 // first quotient schedules fld/fmul/fidiv before that dead test, as retail
 // does (docs/VC6_OPERAND_ORDER.md section 3).
-int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
+int RadarOverlay::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     if (TestInputEvent(0x21, 0, event, 0x80000000)) {
         showFrameRate = 1 - showFrameRate;
@@ -1255,9 +1255,9 @@ int RadarOverlay::DrawForViewMode()
 }
 
 // 0x0051bcd0
-int RadarOverlay::UnknownVirtualSlot10(float frameTime)
+int RadarOverlay::Tick(float frameTime)
 {
-    Overlay::UnknownVirtualSlot10(g_TrackGame->frameTime);
+    Overlay::Tick(g_TrackGame->frameTime);
     frameTimeSum += g_TrackGame->frameTime;
     frameCount += 1.0f;
     return 1;
@@ -1442,9 +1442,9 @@ void ChatOverlay::ShowCueTag(int show)
         NameOverlay* tag = nameTags[racerCount];
         if (tag) {
             if (show)
-                tag->UnknownVirtualSlot5();
+                tag->Enable();
             else
-                tag->UnknownVirtualSlot4();
+                tag->Disable();
         }
     }
 }
@@ -1510,8 +1510,8 @@ void ChatOverlay::ShowInputLine()
 {
     inputShown = 1;
     if (leftPanel) {
-        leftPanel->UnknownVirtualSlot5();
-        rightPanel->UnknownVirtualSlot5();
+        leftPanel->Enable();
+        rightPanel->Enable();
     }
 }
 
@@ -1520,8 +1520,8 @@ void ChatOverlay::HideInputLine()
 {
     inputShown = 0;
     if (leftPanel) {
-        leftPanel->UnknownVirtualSlot4();
-        rightPanel->UnknownVirtualSlot4();
+        leftPanel->Disable();
+        rightPanel->Disable();
     }
 }
 
@@ -1540,15 +1540,15 @@ void ChatOverlay::AddMessage(const char* name, int a2, int a3)
 }
 
 // 0x0051e200
-int ChatOverlay::UnknownVirtualSlot10(float frameTime)
+int ChatOverlay::Tick(float frameTime)
 {
-    Overlay::UnknownVirtualSlot10(g_TrackGame->frameTime);
+    Overlay::Tick(g_TrackGame->frameTime);
     timeSum += g_TrackGame->frameTime;
     return 1;
 }
 
 // 0x0051e240
-int ChatOverlay::UnknownVirtualSlot13()
+int ChatOverlay::RenderPre3D()
 {
     UnknownOverlayRect rect;
     if (timeSum >= 0.1f) {
@@ -1570,11 +1570,11 @@ int ChatOverlay::UnknownVirtualSlot13()
                 lastRacerValues[i] = racers[i]->position;
             }
             if (racers[i]->racerState->hideNameTag)
-                nameTags[i]->UnknownVirtualSlot4();
+                nameTags[i]->Disable();
             else if (racers[i] == chatView->ownRacer && chatCamera->followedRacer == chatView->ownRacer)
-                nameTags[i]->UnknownVirtualSlot4();
+                nameTags[i]->Disable();
             else
-                nameTags[i]->UnknownVirtualSlot5();
+                nameTags[i]->Enable();
         }
     }
     if (g_TrackGame->mode.raceSettings.eventType == 0)

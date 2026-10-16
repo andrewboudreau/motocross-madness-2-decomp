@@ -276,12 +276,12 @@ void KrustyUI::BuildGarageScene(int value) {
         KRUSTYUI_RIDER_POSITION.y += 0.1f;
         garageScene = new(__FILE__, 0x105) GameObject(1);
         PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
-        garageCamera = (Camera*)camera->UnknownVirtualSlot8(renderContext);
+        garageCamera = (Camera*)camera->SetRenderContext(renderContext);
         garageScene->AppendChild(garageCamera, -1);
         garageCamera->widthKeysEnabled = 0;
         garageCamera->fovKeysEnabled = 0;
         UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
-        lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(renderContext);
+        lights = (UnknownKrustyUILightManager*)manager->SetRenderContext(renderContext);
         garageScene->AppendChild(lights, -1);
         UnknownKrustyUILight* emitter = new(__FILE__, 0x116) UnknownKrustyUILight(1);
         light = emitter->Create(renderContext, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -424,36 +424,36 @@ void KrustyUI::ClearEntries() {
 }
 
 // 0x00499ad0
-void KrustyUI::UnknownVirtualSlot4() {
-    GameObject::UnknownVirtualSlot4();
+void KrustyUI::Disable() {
+    GameObject::Disable();
 }
 
 // 0x00499ac0
-void KrustyUI::UnknownVirtualSlot5() {
-    GameObject::UnknownVirtualSlot5();
+void KrustyUI::Enable() {
+    GameObject::Enable();
 }
 
 // 0x00499ae0
-int KrustyUI::UnknownVirtualSlot10(float frameTime) {
-    return GameObject::UnknownVirtualSlot10(frameTime);
+int KrustyUI::Tick(float frameTime) {
+    return GameObject::Tick(frameTime);
 }
 
 // 0x00499af0
-int KrustyUI::UnknownVirtualSlot18() {
-    GameObject::UnknownVirtualSlot18();
+int KrustyUI::OnActivate() {
+    GameObject::OnActivate();
     return 1;
 }
 
 // 0x00499a40
-int KrustyUI::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int KrustyUI::OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry) {
     field_0x4a4 = 0;
-    return GameObject::UnknownVirtualSlot23(event, entry) != 0;
+    return GameObject::OnControlPress(event, entry) != 0;
 }
 
 // 0x00499a70: DPSYS_HOST (this player became the session host) sets the
 // network object's +0x10.
-int KrustyUI::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
-    if (GameObject::UnknownVirtualSlot24(type, data, from, to, flags))
+int KrustyUI::OnNetworkMessage(int type, void* data, int from, int to, int flags) {
+    if (GameObject::OnNetworkMessage(type, data, from, to, flags))
         return 1;
     if (type == DPSYS_HOST)
         g_TrackGame->network->isHost = 1;
@@ -461,10 +461,10 @@ int KrustyUI::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
 }
 
 // 0x00499980: also hands the value to the +0x464 scene.
-int KrustyUI::UnknownVirtualSlot25(void* value) {
-    GameObject::UnknownVirtualSlot25(value);
+int KrustyUI::AttachRenderContext(void* value) {
+    GameObject::AttachRenderContext(value);
     if (garageScene)
-        garageScene->UnknownVirtualSlot25(value);
+        garageScene->AttachRenderContext(value);
     return 1;
 }
 

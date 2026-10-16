@@ -328,12 +328,12 @@ public:
     virtual ~Wrecker();                                // 0x005300a0 / 0x005300c0
     // Slot 10, 0x005306e0 (4178 bytes): the per-frame wreck update
     // (Wrecker.cpp).
-    virtual int UnknownVirtualSlot10(float frameTime);
+    virtual int Tick(float frameTime);
     // Slot 14, 0x004de400: `jmp GameObject slot 14`. The linker folded
     // this body with identical ones of other classes, so the copy that
     // survives lies outside wrecker.cpp's code.
     virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00532890
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x00532890
 
     // 0x00530190: slot 8 on the owner, then 0x005301c0; returns this.
     Wrecker* SetupWrecker(void* owner, UnknownWreckerCharacter* rider, const char* name);

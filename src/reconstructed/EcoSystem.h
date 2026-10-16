@@ -474,11 +474,11 @@ public:
     friend class Vegetation;
     explicit EcoSystem(int flags);            // 0x00457250
     virtual ~EcoSystem();                     // 0x00457330 (deleting wrapper 0x00457310)
-    virtual int UnknownVirtualSlot12();       // 0x0045aad0: classifies the visible objects
+    virtual int PrepareGeometry();            // 0x0045aad0: classifies the visible objects
     // 0x0045b060 (3967 bytes, one function; 0x0045b136 is not a start):
     // draws the geometry list, then the billboards 120 at a time.
     virtual int UnknownVirtualSlot14();
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0045bfe0
+    virtual int OnControlPress(UnknownControlEvent* event, UnknownInputEntry* entry);       // 0x0045bfe0
 
     // 0x00457480: reads the .est file (or a .esb through 0x00458f70);
     // `path` is rewritten to the .esb name when one exists.

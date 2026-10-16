@@ -132,7 +132,7 @@ failed:
 DebugOverlay* DebugOverlay::Setup(RenderTarget* a, TextureMapManager* b,
                                                   int c, int d, int e)
 {
-    GameObject::UnknownVirtualSlot8(a);
+    GameObject::SetRenderContext(a);
     fontHeight = c;
     rowsTop = e;
     rowsLeft = d;

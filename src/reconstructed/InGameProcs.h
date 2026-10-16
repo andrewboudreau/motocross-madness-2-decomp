@@ -29,7 +29,7 @@ class VCRDlg : public UIDialog {
 public:
     // Inline at bikerace.cpp's `new` (0x00420650, line 0x1073).
     VCRDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
-    virtual int UnknownVirtualSlot10(float frameTime);    // 0x004893c0
+    virtual int Tick(float frameTime);                    // 0x004893c0
     void HandleEvent(UnknownDialogEvent* event); // 0x00488c90
     void ShowReplayMode();             // 0x004894c0: shows the replay mode on the toggles
 
