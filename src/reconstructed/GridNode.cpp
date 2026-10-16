@@ -54,57 +54,57 @@ int GridNode::GetCellCorners(int x, int z, float* heights, GridVec3* normals, un
     if (lv == 0) {
         GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
         if (normals) {
-            float scale = field_0x10 * (1.0f / 127.0f);
+            float scale = reliefScale * (1.0f / 127.0f);
             normals[0].x = cell->normal[0] * scale;
             normals[0].y = cell->normal[1] * (1.0f / 127.0f);
             normals[0].z = cell->normal[2] * scale;
-            heights[0] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[0] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[0] = cell->field_0x0;
+                bytes[0] = cell->surface;
             }
             cell++;
             normals[1].x = cell->normal[0] * scale;
             normals[1].y = cell->normal[1] * (1.0f / 127.0f);
             normals[1].z = cell->normal[2] * scale;
-            heights[1] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[1] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[1] = cell->field_0x0;
+                bytes[1] = cell->surface;
             }
             cell += 17;
             normals[3].x = cell->normal[0] * scale;
             normals[3].y = cell->normal[1] * (1.0f / 127.0f);
             normals[3].z = cell->normal[2] * scale;
-            heights[3] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[3] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[3] = cell->field_0x0;
+                bytes[3] = cell->surface;
             }
             cell--;
             normals[2].x = cell->normal[0] * scale;
             normals[2].y = cell->normal[1] * (1.0f / 127.0f);
             normals[2].z = cell->normal[2] * scale;
-            heights[2] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[2] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[2] = cell->field_0x0;
+                bytes[2] = cell->surface;
             }
         } else {
-            heights[0] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[0] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[0] = cell->field_0x0;
+                bytes[0] = cell->surface;
             }
             cell++;
-            heights[1] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[1] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[1] = cell->field_0x0;
+                bytes[1] = cell->surface;
             }
             cell += 17;
-            heights[3] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[3] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[3] = cell->field_0x0;
+                bytes[3] = cell->surface;
             }
             cell--;
-            heights[2] = ((cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
+            heights[2] = ((cell->height - block->baseHeight) * reliefScale + block->baseHeight) * heightScale;
             if (bytes) {
-                bytes[2] = cell->field_0x0;
+                bytes[2] = cell->surface;
             }
         }
         return 1;

@@ -23,7 +23,7 @@ struct GridAgeEntry {
     int age;                                   // +0x00 set from the manager
     int (*callback)(void* owner);              // +0x04
     void* owner;                               // +0x08
-    int field_0x0c;                            // +0x0c
+    int context;  // +0xC  AgeManager.h AgeEntry::context (second callback argument)
     int size;                                  // +0x10 (nonzero while registered)
 };
 class GridAgeManager {
@@ -70,7 +70,7 @@ public:
     int RemapTexCoordsIfMoved(float* a, float* b, float* c, float* u, float* v, int count,
                               unsigned int stride);  // 0x00510910 (ret 0x1c)
     unsigned char field_0x00[0x68];
-    unsigned char field_0x68;
+    unsigned char mapFlags;  // +0x68  TextureMap.h mapFlags; bit 0 (ManagedTexture) enables the texture coordinate remap
 };
 
 // Object embedded at Terrain+0x2c; 0x00484f10 (the next TU) prepares a
@@ -135,33 +135,33 @@ struct GridTerrain {
     float viewerZ;
     int appliedDrawDistance;                  // +0x6c (Terrain.h name)
     int field_0x70;
-    float field_0x74;
-    float field_0x78;                          // +0x78 distance factor (Terrain.h: ratio squared)
+    float drawDistanceRatio;  // +0x74  Terrain 0x00507bb0: appliedDrawDistance / +0x70; scales the error limits (0x004815e0)
+    float drawDistanceRatioSquared;  // +0x78  Terrain 0x00507bb0: square of +0x74; CanDropVertex's limit factor (0x00481cc0)
     unsigned char field_0x07c[0x88 - 0x7c];
     int indicesDrawn;                          // +0x88 indices drawn
     int verticesDrawn;                         // +0x8c vertices drawn
     int vertexErrorTests;                     // +0x90 incremented per vertex error test
     int field_0x94;
     int detailUpdates;                        // +0x98 incremented per detail update (0x004815e0)
-    int field_0x9c;                            // +0x9c incremented by 0x00482dd0
-    int field_0xa0;                            // +0xa0 incremented by 0x00482c90
+    int vertexDirectionSets;  // +0x9C  incremented per SetVertexDirection call (0x00482dd0)
+    int vertexChangePropagations;  // +0xA0  incremented per PropagateVertexChange call (0x00482c90)
     int bufferRebuilds;                       // +0xa4 incremented per buffer rebuild (0x0047f840)
     int verticesPinned;                        // +0xa8 vertices pinned by 0x00482760
     int verticesReleased;                      // +0xac vertices released by 0x00482760
     int vertexTests;                          // +0xb0 incremented per vertex test (0x00482a40)
     int field_0xb4;                            // +0xb4 copied to the draw data's +0x130
-    int field_0xb8[17 * 17];                   // +0xb8 cleared by the first node constructor
-    int field_0x53c;                           // +0x53c compared with field_0xb8[i] (0x00482f00)
+    int vertexRetestStamps[17 * 17];  // +0xB8  per vertex: set to retestStamp by 0x00482760, compared by 0x00482f00; cleared by the first node
+    int retestStamp;  // +0x53C  incremented per RetestChangedVertices (0x00482760); stamps vertexRetestStamps
     unsigned char field_0x540[0xc14 - 0x540];
     GridBaseBlock** blocks;                    // +0xc14
     unsigned char field_0xc18[0xc34 - 0xc18];
-    unsigned char field_0xc34;                 // +0xc34 bit 0 copied into the node flags
+    unsigned char useVertexNormals;  // +0xC34  Terrain::Load sets it with the +0xc40 sink; bit 0 -> node b2 (normals written, sink called)
     unsigned char field_0xc35[3];
     int childTableOffset;                     // +0xc38 stream offset of the child tables
-    int field_0xc3c;
+    int detailTexture;  // +0xC3C  Terrain::Load's 0x0050a590 texture (testnoise.tga); set -> 0x00480c90 writes detail coordinates
     GridVertexSink* vertexSink;                // +0xc40
     float transform[16];                       // +0xc44 transform
-    int field_0xc84;
+    int textureAgeManager;  // +0xC84  Grid1.h's Grid1Terrain view: the node texture AgeManager
     GridAgeManager* ageManager;                // +0xc88
     GridCamera* camera;                        // +0xc8c
     unsigned char field_0xc90[0xc9c - 0xc90];
@@ -188,10 +188,10 @@ struct GridNodeDrawData {
     unsigned char b1 : 1;                      // +0x121 bit 1
     unsigned char b2 : 1;                      // +0x121 bit 2
     unsigned char b3 : 1;                      // +0x121 bit 3
-    unsigned short field_0x122;
-    unsigned short field_0x124;
-    unsigned short field_0x126;
-    unsigned short field_0x128;
+    unsigned short lowerErrorLimit;  // +0x122  0x004815e0 from the nearest distance; vertices with curve error below it drop (0x00482f00)
+    unsigned short upperErrorLimit;  // +0x124  0x004815e0 from the farthest distance; vertices with curve error above it stay (0x00482f00)
+    unsigned short previousLowerErrorLimit;  // +0x126  copy of +0x122 before 0x004815e0 recomputes it (0x00482760 retests the band)
+    unsigned short previousUpperErrorLimit;  // +0x128  copy of +0x124 before 0x004815e0 recomputes it (0x00482760 retests the band)
     short triangleCount;                       // +0x12a triangles in this node's index list
     short childTriangleCount;                  // +0x12c children's +0x12a/+0x12c summed into the parent
     short field_0x12e;
@@ -203,17 +203,17 @@ struct GridNodeDrawData {
     short vertexBufferBytes;                   // +0x140 size charged to g_gridDrawMemory for +0x134
     short indexBufferBytes;                    // +0x142 size charged for +0x138
     GridAgeEntry ageEntry;                     // +0x144
-    float field_0x158;
-    float field_0x15c;
-    float field_0x160;
-    float field_0x164;
-    float field_0x168;
-    float field_0x16c;
-    float field_0x170;
-    float field_0x174;
-    short field_0x178;
+    float texOriginU;  // +0x158  vertex cache u = ((x - origin) * texStep + texOriginU) * 0.9375 + 1/32 (0x0047de90)
+    float texOriginV;  // +0x15C  vertex cache v origin (0x0047de90), as texOriginU
+    float texStep;  // +0x160  texture coordinate step per grid sample (0x0047de90); x4 per 4x4 block build
+    float gridMinX;  // +0x164  gridX << shift (0x0047e600); box and distance bounds in grid units
+    float gridMinZ;  // +0x168  gridZ << shift (0x0047e600)
+    float gridMaxX;  // +0x16C  gridMinX + (16 << shift) (0x0047e600)
+    float gridMaxZ;  // +0x170  gridMinZ + (16 << shift) (0x0047e600)
+    float inverseErrorScale;  // +0x174  abs(1 / (heightScale * reliefScale)) (0x0047e600); scales the error limits
+    short visibleBlockMask;  // +0x178  bit n set when 4x4 block n passes the frustum test (0x00481a20)
     short field_0x17a;
-    void* field_0x17c;
+    void* blockRanges;  // +0x17C  sixteen GridBlockRange records (data + 0x180) or null (0x0047e600)
 };
 
 // Three floats; the constructor builds a temporary that is then copied
@@ -248,11 +248,11 @@ public:
     GridNode** children;                       // +0x04 256 entries (0x400 bytes)
     GridNode* parent;                          // +0x08
     GridBaseBlock* block;                      // +0x0c
-    float field_0x10;
-    float field_0x14;
-    float field_0x18;
-    float field_0x1c;
-    unsigned short field_0x20;                 // +0x20 compared with the draw data's +0x122
+    float reliefScale;  // +0x10  from the stream; scales height - baseHeight (and flips normals when negative)
+    float heightScale;  // +0x14  from the stream; scales the whole cell height (0x00483910, 0x00481cc0)
+    float minHeight;  // +0x18  from the stream; widens boundsMin.y, box bottom; segment test skips children below
+    float maxHeight;  // +0x1C  from the stream; widens boundsMax.y, box top; segment test skips children above
+    unsigned short maxError;  // +0x20  from the stream; <= lowerErrorLimit makes the node coarse, releasing children (0x004824c0)
     unsigned short blockIndex;                 // +0x22 index into Terrain::blocks
     unsigned short gridX;                      // +0x24 position in units of 16 << shift
     unsigned short gridZ;                      // +0x26
@@ -260,19 +260,19 @@ public:
     unsigned char shift;                       // +0x29
     unsigned char childIndex;                  // +0x2a slot in the parent's children: x low nibble, z high nibble
     unsigned char field_0x2b;
-    int field_0x2c;
+    int childListOffset;  // +0x2C  from the stream; childOffsets read at terrain childTableOffset + it; 0: no children
     int* childOffsets;                        // +0x30 child stream offsets (0x400 bytes)
 };
 
 // 0x2c-byte records at GridNodeExtra::field_0x38 (one per 4 x 4 block);
 // +0 comes from the node's stream header, +4 starts at 0.
 struct GridBlockRecord {
-    int field_0x00;
+    int textureReference;  // +0x0  stream header word; Grid1BlockTexture packs own bit and table index (0xfffe/0xffff: none)
     int field_0x04;
     unsigned char field_0x08[0x1c - 0x08];
-    float field_0x1c;                          // +0x1c set to 1.0 after a rebuild (0x0047f210)
-    float field_0x20;
-    float field_0x24;
+    float mappingScale;  // +0x1C  RemapTexCoordsIfMoved scale; 1.0 after a rebuild (0x0047f210)
+    float mappingOffsetU;  // +0x20  RemapTexCoordsIfMoved offsetU; 0 after a rebuild
+    float mappingOffsetV;  // +0x24  RemapTexCoordsIfMoved offsetV; 0 after a rebuild
     float detail;                              // +0x28 detail of the block
 };
 
@@ -280,20 +280,20 @@ struct GridBlockRecord {
 // for nodes with per-block ranges). Offsets tier 2.
 struct GridNodeExtra {
     int byteCount;                             // +0x00 byte count read from the stream
-    void* data;                                // +0x04 DebugMalloc'd, field_0x00 bytes
+    void* data;                                // +0x04 DebugMalloc'd, byteCount bytes
     GridManagedTexture* texture;               // +0x08 tested before slot 4(-1)
-    int field_0x0c;
+    int textureReference;  // +0xC  stream header; Grid1NodeExtra packs own bit and texture table index
     int field_0x10;
     unsigned char field_0x14[0x28 - 0x14];
-    float field_0x28;                          // +0x28 set to 1.0 after a rebuild
-    float field_0x2c;
-    float field_0x30;
+    float mappingScale;  // +0x28  RemapTexCoordsIfMoved scale; 1.0 after a rebuild
+    float mappingOffsetU;  // +0x2C  RemapTexCoordsIfMoved offsetU; 0 after a rebuild
+    float mappingOffsetV;  // +0x30  RemapTexCoordsIfMoved offsetV; 0 after a rebuild
     float detail;                              // +0x34 detail of the whole node
     GridBlockRecord* blockRecords;             // +0x38 sixteen records or null
     unsigned char field_0x3c[4];
 };
 
-// Twelve-byte entries at GridNodeDrawData::field_0x17c, one per 4 x 4 block
+// Twelve-byte entries at GridNodeDrawData::blockRanges, one per 4 x 4 block
 // in Z order; +0 is the running end of the block's index range.
 struct GridBlockRange {
     short end;                                 // +0x00 running end of the vertex range
@@ -410,11 +410,11 @@ struct GridVertex {
         int packed;                            // otherwise 0 or (dx << 16) + dz
     };
     union {
-        float field_0x10;                      // normal y or a second coordinate pair
+        float ny;  // +0x10  normal y (data b2 set) or a second coordinate pair (0x0047de90)
         int color;                             // diffuse colour for unlit draws (0x00480c90)
     };
     union {
-        float field_0x14;
+        float nz;  // +0x14  normal z (data b2 set) or a second coordinate pair (0x0047de90)
         int specular;                          // specular colour for unlit draws
     };
     float u;
@@ -445,16 +445,16 @@ public:
     int originZ;                               // +0x2d38
     int shift;                                 // +0x2d3c
     GridBaseCell* cells;                       // +0x2d40
-    float field_0x2d44;
-    float field_0x2d48;
-    float field_0x2d4c;
-    float field_0x2d50;
+    float reliefScale;  // +0x2D44  the node's reliefScale, latched by the first vertex (0x0047de90)
+    float texOriginV;  // +0x2D48  the draw data's texOriginV (0x0047de90)
+    float texOriginU;  // +0x2D4C  the draw data's texOriginU (0x0047de90)
+    float texStep;  // +0x2D50  the draw data's texStep (0x0047de90)
     int field_0x2d54;
     float scale;                               // +0x2d58
     float minY;                                // +0x2d5c
     float maxY;                                // +0x2d60
-    int field_0x2d64;
-    float field_0x2d68;
-    float field_0x2d6c;
-    float field_0x2d70;
+    int lowestQualityOverride;  // +0x2D64  the terrain's lowestQualityOverride; selects the detail coordinate pair (0x0047de90)
+    float unlitColor;  // +0x2D68  the terrain's unlitColor bits, copied into unlit vertices (0x0047de90)
+    float unlitSpecular;  // +0x2D6C  the terrain's unlitSpecular bits, copied into unlit vertices (0x0047de90)
+    float detailTexScale;  // +0x2D70  g_gridDrawNormalScale (x16 at level 1): step of the detail coordinate pair
 };

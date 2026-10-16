@@ -428,12 +428,12 @@ int BackgroundImage::UnknownVirtualSlot18() {
 // the +0x58 objects of the two entries the owner currently picks, then
 // picks `a` and `b` and clears theirs.
 void TrackGameViewOwner::UnknownFunction404df0(int a, int b, void* racer) {
-    if (field_0x420[field_0xb0]->field_0x58) {
-        field_0x420[field_0xb0]->field_0x58->field_0x44 = 1;
-        field_0x420[field_0xb4]->field_0x58->field_0x44 = 1;
-        field_0xb0 = a;
-        field_0xb4 = b;
-        field_0x420[field_0xb0]->field_0x58->field_0x44 = 0;
-        field_0x420[field_0xb4]->field_0x58->field_0x44 = 0;
+    if (gates[lapGate]->field_0x58) {
+        gates[lapGate]->field_0x58->field_0x44 = 1;
+        gates[nextLapGate]->field_0x58->field_0x44 = 1;
+        lapGate = a;
+        nextLapGate = b;
+        gates[lapGate]->field_0x58->field_0x44 = 0;
+        gates[nextLapGate]->field_0x58->field_0x44 = 0;
     }
 }

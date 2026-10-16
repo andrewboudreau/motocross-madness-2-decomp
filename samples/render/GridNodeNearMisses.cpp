@@ -62,7 +62,7 @@ GridNode* GridNode::FindLeaf(int x, int z)
 // Height of a cell corner in world units (the formula of 0x00483910).
 static inline float GridCornerHeight(const GridNode* node, const GridBaseCell* cell)
 {
-    return ((cell->height - node->block->field_0xd4c) * node->field_0x10 + node->block->field_0xd4c) * node->field_0x14;
+    return ((cell->height - node->block->baseHeight) * node->reliefScale + node->block->baseHeight) * node->heightScale;
 }
 
 // Cell index of a coordinate midway between two crossings: retail converts
@@ -224,10 +224,10 @@ int GridNode::UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVe
             if (child == 0) {
                 continue;
             }
-            if (cross[k].z < child->field_0x18 && cross[k + 1].z < child->field_0x18) {
+            if (cross[k].z < child->minHeight && cross[k + 1].z < child->minHeight) {
                 continue;
             }
-            if (cross[k].z > child->field_0x1c && cross[k + 1].z > child->field_0x1c) {
+            if (cross[k].z > child->maxHeight && cross[k + 1].z > child->maxHeight) {
                 continue;
             }
             float ox = ix * cellSize;

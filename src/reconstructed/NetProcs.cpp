@@ -38,9 +38,9 @@ void JoinSelectedSession(UnknownDialogEvent* event) {
     g_TrackGame->mode.selectedSession = selection;
     if (selection != -1 && event->dialog &&
         static_cast<HostJoinDlg*>(event->dialog)->openingMenu != 0x85d &&
-        g_TrackGame->mode.sessions.field_0x00[g_TrackGame->mode.selectedSession].instance &&
+        g_TrackGame->mode.sessions.entries[g_TrackGame->mode.selectedSession].instance &&
         g_TrackGame->network->JoinSession(
-            (const GUID*)g_TrackGame->mode.sessions.field_0x00[g_TrackGame->mode.selectedSession].instance,
+            (const GUID*)g_TrackGame->mode.sessions.entries[g_TrackGame->mode.selectedSession].instance,
             0x80)) {
         g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
         event->dialog->EndDialog(0x63);
@@ -98,14 +98,14 @@ void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
         list->RemoveAllRows();
         g_SessionListCount = 0;
         if (g_TrackGame->network->EnumSessions(
-                (SessionInfoType*)g_TrackGame->mode.sessions.field_0x00, &g_SessionListCount, 0x91) < 0) {
+                (SessionInfoType*)g_TrackGame->mode.sessions.entries, &g_SessionListCount, 0x91) < 0) {
             EndNetworkGame();
             event->dialog->EndDialog(0xd);
             event->handled = 1;
             break;
         }
         for (int i = 0; i < g_SessionListCount; i++) {
-            char* name = g_TrackGame->mode.sessions.field_0x00[i].name;
+            char* name = g_TrackGame->mode.sessions.entries[i].name;
             list->AddRow(name, (int)name, 0);
         }
         list->SelectRowByData(selection);
@@ -142,10 +142,10 @@ void HostJoinDlg::HandleEvent(UnknownDialogEvent* event) {
             guiManager->RecreateCursors(guiManager->waitCursorImage, 1);
             g_SessionListCount = 0;
             long result = g_TrackGame->network->EnumSessions(
-                (SessionInfoType*)g_TrackGame->mode.sessions.field_0x00, &g_SessionListCount, 0x81);
+                (SessionInfoType*)g_TrackGame->mode.sessions.entries, &g_SessionListCount, 0x81);
             if (g_SessionListCount > 0 && result >= 0 &&
                 g_TrackGame->network->JoinSession(
-                    (const GUID*)g_TrackGame->mode.sessions.field_0x00[0].instance, 0)) {
+                    (const GUID*)g_TrackGame->mode.sessions.entries[0].instance, 0)) {
                 guiManager->RecreateCursors(guiManager->cursorImage, 1);
                 g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);
@@ -335,11 +335,11 @@ void WaitOrCallDlg::HandleEvent(UnknownDialogEvent* event) {
             SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             g_SessionListCount = 0;
             g_TrackGame->network->EnumSessions(
-                (SessionInfoType*)g_TrackGame->mode.sessions.field_0x00, &g_SessionListCount, 1);
+                (SessionInfoType*)g_TrackGame->mode.sessions.entries, &g_SessionListCount, 1);
             SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (g_SessionListCount >= 1 &&
                 g_TrackGame->network->JoinSession(
-                    (const GUID*)g_TrackGame->mode.sessions.field_0x00[g_TrackGame->mode.selectedSession].instance,
+                    (const GUID*)g_TrackGame->mode.sessions.entries[g_TrackGame->mode.selectedSession].instance,
                     0)) {
                 g_TrackGame->ui->OpenMenu(kMenuMultiPlayer866);
                 event->dialog->EndDialog(0x63);

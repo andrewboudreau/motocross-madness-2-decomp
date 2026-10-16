@@ -67,8 +67,8 @@ int UnknownTrackGameObject3410::ReadLobbyPreset(int* flags)
             strcpy(g_TrackGame->mode.raceSettings.trackName, trackName);
         if (g_TrackGame->network->isHost)
             g_TrackGame->sceneObject->ReadSceneName(name, g_TrackGame->mode.raceSettings.trackName, 0, "scn",
-                                                             &g_TrackGame->mode.raceSettings.field_0x138,
-                                                             &g_TrackGame->mode.raceSettings.field_0x13c);
+                                                             &g_TrackGame->mode.raceSettings.trackFileTime,
+                                                             &g_TrackGame->mode.raceSettings.trackFileSize);
         g_TrackGame->mode.raceSettings.treeCollision = 1;
         g_TrackGame->mode.raceSettings.riderCollision = 1;
         g_TrackGame->mode.raceSettings.aiRacerCount = 0;

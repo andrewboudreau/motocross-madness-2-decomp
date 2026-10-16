@@ -867,8 +867,8 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     field_0x40->UnknownVirtualSlot16(0);
                 if (effectsGroup)
                     effectsGroup->UnknownVirtualSlot16(0);
-                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4->UnknownVirtualSlot16(0);
+                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup)
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->UnknownVirtualSlot16(0);
                 if (g_TrackGame->mode.networkGame)
                     PlayIfEnabled(crowdLoop, 1, 1, 1, 0);
                 if (listenerRacer) {
@@ -885,8 +885,8 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     field_0x40->UnknownVirtualSlot16(1);
                 if (effectsGroup)
                     effectsGroup->UnknownVirtualSlot16(1);
-                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4)
-                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4->UnknownVirtualSlot16(1);
+                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup)
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->soundGroup->UnknownVirtualSlot16(1);
                 if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
                     g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot4();
             }

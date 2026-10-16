@@ -1118,7 +1118,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
         plate = g_TrackGame->mode.plateNumber;
     }
 
-    UnknownBikeRaceNetPlayer* players = (UnknownBikeRaceNetPlayer*)g_TrackGame->mode.raceSettings.field_0x14c;
+    UnknownBikeRaceNetPlayer* players = (UnknownBikeRaceNetPlayer*)g_TrackGame->mode.raceSettings.gridOrder;
     UnknownTrackGameRacerSlot* slots = g_TrackGame->mode.racers;
     if (!g_TrackGame->playingReplay && g_TrackGame->playerCount != 1) {
         // A network race: this player's racer, the other players' and the
@@ -1211,7 +1211,7 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
             }
             g_TrackGame->ui->ResolveBikeFile(slots[j].bikeName, bikeTexture, 0x3f);
             racerSlots[j]->modelNode->ReplaceMaterialTexture(0, bikeTexture, (int)textures);
-            if (g_TrackGame->GetRegistryInt("MPR", 0) == 123 && slots[j].field_0xf4) {
+            if (g_TrackGame->GetRegistryInt("MPR", 0) == 123 && slots[j].hasMprSkin) {
                 racerSlots[j]->riderCharacter->modelNode->ReplaceMaterialTexture(0, "MPR.tga", (int)textures);
             } else {
                 g_TrackGame->ui->ResolveRiderFile(slots[j].riderName, riderTexture, 0x3f);

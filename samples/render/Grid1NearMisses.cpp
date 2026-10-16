@@ -125,9 +125,9 @@ retry:
         if (Extra()->blocks) {
             keep = data->b3;
             ForceBlockCentres();
-            data->field_0x158 = 0.0f;
-            data->field_0x15c = 0.0f;
-            data->field_0x160 = 1.0f;
+            data->texOriginU = 0.0f;
+            data->texOriginV = 0.0f;
+            data->texStep = 1.0f;
             Extra()->texture = Terrain()->textures[0];
             for (block = 0; block < 16; block++) {
                 Grid1BlockTexture* record = &Extra()->blocks[block];
@@ -162,18 +162,18 @@ retry:
             }
             Extra()->texture = Terrain()->textures[0];
             scale = 4.0f;
-            data->field_0x158 = 0.0f;
-            data->field_0x15c = 0.0f;
-            data->field_0x160 = 0.25f;
+            data->texOriginU = 0.0f;
+            data->texOriginV = 0.0f;
+            data->texStep = 0.25f;
             goto done;
         }
     default:
         if (stage == 0) {
             Extra()->texture = 0;
             scale = 16.0f;
-            data->field_0x158 = 0.0f;
-            data->field_0x15c = 0.0f;
-            data->field_0x160 = 0.0f;
+            data->texOriginU = 0.0f;
+            data->texOriginV = 0.0f;
+            data->texStep = 0.0f;
             Extra()->texture = 0;
             goto done;
         }
@@ -187,11 +187,11 @@ parentTexture:
     {
         int z = childIndex >> 4;
         int x = childIndex % 16;
-        data->field_0x158 = x * 0.0625f;
-        data->field_0x15c = z * 0.0625f;
+        data->texOriginU = x * 0.0625f;
+        data->texOriginV = z * 0.0625f;
     }
     scale = 0.0625f;
-    data->field_0x160 = 1.0f / 256.0f;
+    data->texStep = 1.0f / 256.0f;
     goto done;
 
 parentBlockTexture:
@@ -200,23 +200,23 @@ parentBlockTexture:
     {
         int z = childIndex >> 4;
         int x = childIndex % 16;
-        data->field_0x158 = x % 4 * 0.25f;
-        data->field_0x15c = z % 4 * 0.25f;
+        data->texOriginU = x % 4 * 0.25f;
+        data->texOriginV = z % 4 * 0.25f;
     }
     scale = 0.25f;
-    data->field_0x160 = 1.0f / 64.0f;
+    data->texStep = 1.0f / 64.0f;
     goto done;
 
 sharedTexture:
     Extra()->texture = Terrain()->textures[Extra()->index];
     ReleaseBlockCentres();
     scale = 1.0f;
-    data->field_0x158 = 0.0f;
-    data->field_0x15c = 0.0f;
-    data->field_0x160 = 1.0f / 16.0f;
+    data->texOriginU = 0.0f;
+    data->texOriginV = 0.0f;
+    data->texStep = 1.0f / 16.0f;
     if (Extra()->texture->textureWidth == 0x40) {
         scale = 0.25f;
-        data->field_0x160 = 1.0f;
+        data->texStep = 1.0f;
     }
     goto done;
 
@@ -233,15 +233,15 @@ ownTexture:
     Extra()->texture = (ManagedTexture*)Extra()->field_0x10;
     ReleaseBlockCentres();
     scale = 1.0f;
-    data->field_0x158 = 0.0f;
-    data->field_0x15c = 0.0f;
-    data->field_0x160 = 1.0f / 16.0f;
+    data->texOriginU = 0.0f;
+    data->texOriginV = 0.0f;
+    data->texStep = 1.0f / 16.0f;
     if (Extra()->texture->textureWidth == 0x40) {
         scale = 0.25f;
-        data->field_0x160 = 1.0f;
+        data->texStep = 1.0f;
     } else if (Extra()->texture->textureWidth == 0x80) {
         scale = 0.5f;
-        data->field_0x160 = 1.0f / 16.0f;
+        data->texStep = 1.0f / 16.0f;
     }
 
 done:

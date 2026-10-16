@@ -175,50 +175,50 @@ int GridVertexCache::GetVertex(int x, int z)
             originZ = node->gridZ;
             shift = node->shift;
             cells = node->block->cells;
-            field_0x2d44 = node->field_0x10;
-            field_0x2d48 = node->data->field_0x15c;
-            field_0x2d4c = node->data->field_0x158;
-            field_0x2d50 = node->data->field_0x160;
+            reliefScale = node->reliefScale;
+            texOriginV = node->data->texOriginV;
+            texOriginU = node->data->texOriginU;
+            texStep = node->data->texStep;
             field_0x2d54 = count;
             scale = node->terrain->gridCellSize;
             minY = FLT_MAX;
             maxY = -FLT_MAX;
-            field_0x2d64 = node->terrain->lowestQualityOverride;
-            field_0x2d68 = node->terrain->field_0xc9c;
-            field_0x2d6c = node->terrain->field_0xca0;
-            field_0x2d70 = g_gridDrawNormalScale;
+            lowestQualityOverride = node->terrain->lowestQualityOverride;
+            unlitColor = node->terrain->field_0xc9c;
+            unlitSpecular = node->terrain->field_0xca0;
+            detailTexScale = g_gridDrawNormalScale;
             if (node->level == 1)
-                field_0x2d70 = g_gridDrawNormalScale * 16.0f;
+                detailTexScale = g_gridDrawNormalScale * 16.0f;
         }
         vertices[count].x = (float)((originX + x) << shift) * scale;
         vertices[count].z = (float)((originZ + z) << shift) * scale;
-        int base = node->block->field_0xd4c;
-        vertices[count].y = ((float)(cells[i].height - base) * node->field_0x10 + base) * node->field_0x14 * scale;
+        int base = node->block->baseHeight;
+        vertices[count].y = ((float)(cells[i].height - base) * node->reliefScale + base) * node->heightScale * scale;
         if (vertices[count].y < minY)
             minY = vertices[count].y;
         if (vertices[count].y > maxY)
             maxY = vertices[count].y;
         if (node->data->b2) {
-            if (node->field_0x10 < 0.0) {
+            if (node->reliefScale < 0.0) {
                 vertices[count].nx = -cells[i].normal[0] * (1.0f / 127.0f);
-                vertices[count].field_0x10 = cells[i].normal[1] * (1.0f / 127.0f);
-                vertices[count].field_0x14 = -cells[i].normal[2] * (1.0f / 127.0f);
+                vertices[count].ny = cells[i].normal[1] * (1.0f / 127.0f);
+                vertices[count].nz = -cells[i].normal[2] * (1.0f / 127.0f);
             } else {
                 vertices[count].nx = cells[i].normal[0] * (1.0f / 127.0f);
-                vertices[count].field_0x10 = cells[i].normal[1] * (1.0f / 127.0f);
-                vertices[count].field_0x14 = cells[i].normal[2] * (1.0f / 127.0f);
+                vertices[count].ny = cells[i].normal[1] * (1.0f / 127.0f);
+                vertices[count].nz = cells[i].normal[2] * (1.0f / 127.0f);
             }
-        } else if (field_0x2d64) {
+        } else if (lowestQualityOverride) {
             vertices[count].packed = 0;
-            vertices[count].u = ((x - g_gridOriginX) * field_0x2d50 + field_0x2d4c) * 0.9375f + 0.03125f;
-            vertices[count].v = ((z - g_gridOriginZ) * field_0x2d50 + field_0x2d48) * 0.9375f + 0.03125f;
-            vertices[count].field_0x10 = (x - g_gridOriginX) * field_0x2d70;
-            vertices[count].field_0x14 = (z - g_gridOriginZ) * field_0x2d70;
+            vertices[count].u = ((x - g_gridOriginX) * texStep + texOriginU) * 0.9375f + 0.03125f;
+            vertices[count].v = ((z - g_gridOriginZ) * texStep + texOriginV) * 0.9375f + 0.03125f;
+            vertices[count].ny = (x - g_gridOriginX) * detailTexScale;
+            vertices[count].nz = (z - g_gridOriginZ) * detailTexScale;
         } else {
-            vertices[count].field_0x10 = field_0x2d68;
-            vertices[count].field_0x14 = field_0x2d6c;
-            vertices[count].u = ((x - g_gridOriginX) * field_0x2d50 + field_0x2d4c) * 0.9375f + 0.03125f;
-            vertices[count].v = ((z - g_gridOriginZ) * field_0x2d50 + field_0x2d48) * 0.9375f + 0.03125f;
+            vertices[count].ny = unlitColor;
+            vertices[count].nz = unlitSpecular;
+            vertices[count].u = ((x - g_gridOriginX) * texStep + texOriginU) * 0.9375f + 0.03125f;
+            vertices[count].v = ((z - g_gridOriginZ) * texStep + texOriginV) * 0.9375f + 0.03125f;
             vertices[count].packed = ((x - g_gridOriginX) << 16) + (z - g_gridOriginZ);
         }
         slots[i].index = count;
@@ -251,11 +251,11 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
     int words[16];
     int i;
 
-    stream->Read(&field_0x10, 4, 1);
-    stream->Read(&field_0x14, 4, 1);
-    stream->Read(&field_0x18, 4, 1);
-    stream->Read(&field_0x1c, 4, 1);
-    stream->Read(&field_0x20, 2, 1);
+    stream->Read(&reliefScale, 4, 1);
+    stream->Read(&heightScale, 4, 1);
+    stream->Read(&minHeight, 4, 1);
+    stream->Read(&maxHeight, 4, 1);
+    stream->Read(&maxError, 2, 1);
     this->level = level;
     this->shift = shift;
     gridX = x;
@@ -272,10 +272,10 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
             boundsMax[0] = fx;
         if (fz > boundsMax[2])
             boundsMax[2] = fz;
-        if (field_0x18 < boundsMin[1])
-            boundsMin[1] = field_0x18;
-        if (field_0x1c > boundsMax[1])
-            boundsMax[1] = field_0x1c;
+        if (minHeight < boundsMin[1])
+            boundsMin[1] = minHeight;
+        if (maxHeight > boundsMax[1])
+            boundsMax[1] = maxHeight;
     }
     stream->Read(&blockIndex, 2, 1);
     block = terrain->blocks[blockIndex];
@@ -284,22 +284,22 @@ DrawableGridNode* DrawableGridNode::ReadNode(UnknownTextureStream* stream, int a
     for (i = 0; i < 16; i++) {
         if ((words[i] & 0xfffe) != 0xfffe) {
             data = (GridNodeDrawData*)DebugCalloc(1, 0x540, __FILE__, 687);
-            data->field_0x17c = (char*)data + 0x180;
-            extra = (GridNodeExtra*)((char*)data->field_0x17c + 0xc0);
+            data->blockRanges = (char*)data + 0x180;
+            extra = (GridNodeExtra*)((char*)data->blockRanges + 0xc0);
             extra->blockRecords = (GridBlockRecord*)((char*)extra + 0x40);
             for (int j = 0; j < 16; j++) {
-                extra->blockRecords[j].field_0x00 = words[j];
+                extra->blockRecords[j].textureReference = words[j];
                 extra->blockRecords[j].field_0x04 = 0;
             }
             goto allocated;
         }
     }
     data = (GridNodeDrawData*)DebugCalloc(1, 0x1c0, __FILE__, 698);
-    data->field_0x17c = 0;
+    data->blockRanges = 0;
     extra = (GridNodeExtra*)((char*)data + 0x180);
     extra->blockRecords = 0;
 allocated:
-    extra->field_0x0c = header;
+    extra->textureReference = header;
     extra->field_0x10 = 0;
     data->vertexBuffer = 0;
     data->vertexBufferBytes = 0;
@@ -309,16 +309,16 @@ allocated:
     data->indexBuffer = 0;
     data->b1 = 1;
     data->field_0x130 = 0;
-    data->field_0x122 = 0xffff;
-    data->field_0x126 = 0xffff;
-    data->field_0x124 = 0;
-    data->field_0x128 = 0;
+    data->lowerErrorLimit = 0xffff;
+    data->previousLowerErrorLimit = 0xffff;
+    data->upperErrorLimit = 0;
+    data->previousUpperErrorLimit = 0;
     data->b0 = 0;
     data->triangleCount = 0;
     data->childTriangleCount = 0;
-    data->field_0x174 = 1.0f;
+    data->inverseErrorScale = 1.0f;
     data->b3 = 0;
-    data->b2 = terrain->field_0xc34 & 1;
+    data->b2 = terrain->useVertexNormals & 1;
     stream->Read(extra, 4, 1);
     if (extra->byteCount) {
         extra->data = DebugMalloc(extra->byteCount, __FILE__, 732);
@@ -326,31 +326,31 @@ allocated:
         stream->Read(extra->data, extra->byteCount, 1);
     }
     stream->Read(&field_0x2b, 1, 1);
-    stream->Read(&field_0x2c, 4, 1);
-    data->field_0x174 = 1.0f / (field_0x14 * field_0x10);
-    if (data->field_0x174 < 0.0f)
-        data->field_0x174 = -data->field_0x174;
+    stream->Read(&childListOffset, 4, 1);
+    data->inverseErrorScale = 1.0f / (heightScale * reliefScale);
+    if (data->inverseErrorScale < 0.0f)
+        data->inverseErrorScale = -data->inverseErrorScale;
     memset(data, 0, sizeof(data->vertexFlags));
-    data->field_0x178 = 0;
-    data->field_0x164 = (float)(gridX << this->shift);
-    data->field_0x168 = (float)(gridZ << this->shift);
-    data->field_0x16c = (float)(16 << this->shift) + data->field_0x164;
-    data->field_0x170 = (float)(16 << this->shift) + data->field_0x168;
-    center.x = (data->field_0x16c + data->field_0x164) * terrain->gridCellSize * 0.5f;
-    center.y = (field_0x1c + field_0x18) * terrain->gridCellSize * 0.5f;
-    center.z = (data->field_0x170 + data->field_0x168) * terrain->gridCellSize * 0.5f;
-    extent.x = center.x - terrain->gridCellSize * data->field_0x164;
-    extent.y = center.y - terrain->gridCellSize * field_0x18;
+    data->visibleBlockMask = 0;
+    data->gridMinX = (float)(gridX << this->shift);
+    data->gridMinZ = (float)(gridZ << this->shift);
+    data->gridMaxX = (float)(16 << this->shift) + data->gridMinX;
+    data->gridMaxZ = (float)(16 << this->shift) + data->gridMinZ;
+    center.x = (data->gridMaxX + data->gridMinX) * terrain->gridCellSize * 0.5f;
+    center.y = (maxHeight + minHeight) * terrain->gridCellSize * 0.5f;
+    center.z = (data->gridMaxZ + data->gridMinZ) * terrain->gridCellSize * 0.5f;
+    extent.x = center.x - terrain->gridCellSize * data->gridMinX;
+    extent.y = center.y - terrain->gridCellSize * minHeight;
     if (GridExtentBelow(extent, 0.1f))
         extent = GridVec3(0.1f, 0.1f, 0.1f);
-    extent.z = center.z - data->field_0x168 * terrain->gridCellSize;
+    extent.z = center.z - data->gridMinZ * terrain->gridCellSize;
     if (parent)
         terrain = parent->terrain;
     UnknownVirtualSlot5(stream);
-    if (a1 && field_0x2c) {
+    if (a1 && childListOffset) {
         childOffsets = new (__FILE__, 776) int[256];
         children = new (__FILE__, 777) GridNode*[256];
-        stream->Seek(terrain->childTableOffset + field_0x2c, 0, 1);
+        stream->Seek(terrain->childTableOffset + childListOffset, 0, 1);
         stream->Read(childOffsets, 0x400, 1);
         for (i = 0; i < 256; i++) {
             if (childOffsets[i]) {
@@ -372,7 +372,7 @@ allocated:
 int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int quad, int a5)
 {
     int vertexStart = 0;
-    GridBlockRange* ranges = (GridBlockRange*)data->field_0x17c;
+    GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
     if (ranges) {
         int block = g_gridQuadOrder[quad];
         int vertexCount;
@@ -388,7 +388,7 @@ int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int
             vertexCount = ranges[block].end - vertexStart;
             indexCount = ranges[block].indexEnd - indexStart;
         }
-        if (vertexCount != 0 && (data->field_0x178 & (1 << block))) {
+        if (vertexCount != 0 && (data->visibleBlockMask & (1 << block))) {
             if (terrain->lowestQualityOverride)
                 SubmitLitRange(a5, (GridVertex*)data->vertexBuffer + vertexStart, vertexCount,
                                       (unsigned short*)data->indexBuffer + indexStart, indexCount,
@@ -430,7 +430,7 @@ int DrawableGridNode::DrawVisibleBlock(void* target, int x, int z, int size, int
 // buffers stand in for them.
 int DrawableGridNode::WalkSlot4Block(int x, int z, int size, int quad)
 {
-    GridBlockRange* ranges = (GridBlockRange*)data->field_0x17c;
+    GridBlockRange* ranges = (GridBlockRange*)data->blockRanges;
     if (ranges) {
         int block = g_gridQuadOrder[quad];
         int count;
@@ -468,7 +468,7 @@ int DrawableGridNode::RebuildBlockBuffers()
     int b = 0;
     int vertexTotal = 0;
     int bz;
-    float saved = data->field_0x160;
+    float saved = data->texStep;
     for (bz = 0; bz < 16; bz += 4) {
         x = 0;
         for (int bx = 0; bx < 16; bx += 4) {
@@ -476,9 +476,9 @@ int DrawableGridNode::RebuildBlockBuffers()
             int n;
             int m;
             int size = UnknownVirtualSlot8(b);
-            data->field_0x160 = saved;
+            data->texStep = saved;
             if (size == 0x40)
-                data->field_0x160 *= 4.0f;
+                data->texStep *= 4.0f;
             g_gridVertexCache.Reset(this);
             g_gridOriginX = bx;
             g_gridOriginZ = bz;
@@ -498,14 +498,14 @@ int DrawableGridNode::RebuildBlockBuffers()
                 n = AppendCornerTriangle(n, x, z, -4, 4);
             vertexTotal += g_gridVertexCache.count;
             indexTotal += n * 3;
-            ((GridBlockRange*)data->field_0x17c)[b].centerY = (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
-            ((GridBlockRange*)data->field_0x17c)[b].extentY =
+            ((GridBlockRange*)data->blockRanges)[b].centerY = (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
+            ((GridBlockRange*)data->blockRanges)[b].extentY =
                 (g_gridVertexCache.maxY - g_gridVertexCache.minY) * terrain->gridCellSize * 0.5f;
-            ((GridBlockRange*)data->field_0x17c)[b].end = vertexTotal;
-            ((GridBlockRange*)data->field_0x17c)[b].indexEnd = indexTotal;
-            extra->blockRecords[b].field_0x1c = 1.0f;
-            extra->blockRecords[b].field_0x20 = 0;
-            extra->blockRecords[b].field_0x24 = 0;
+            ((GridBlockRange*)data->blockRanges)[b].end = vertexTotal;
+            ((GridBlockRange*)data->blockRanges)[b].indexEnd = indexTotal;
+            extra->blockRecords[b].mappingScale = 1.0f;
+            extra->blockRecords[b].mappingOffsetU = 0;
+            extra->blockRecords[b].mappingOffsetV = 0;
             if (n != 0) {
                 int vertexBytes = vertexTotal * 32;
                 int indexBytes = (indexTotal + vertexTotal) * 2;
@@ -575,7 +575,7 @@ int DrawableGridNode::RebuildBlockBuffers()
         data->vertexCount = 0;
         data->indexCount = 0;
     }
-    data->field_0x160 = saved;
+    data->texStep = saved;
     return 1;
 }
 
@@ -688,8 +688,8 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
     float farZ;
     GridTerrain* t = terrain;
     GridNodeDrawData* d = data;
-    float ax = t->viewerX - d->field_0x164;
-    float bx = t->viewerX - d->field_0x16c;
+    float ax = t->viewerX - d->gridMinX;
+    float bx = t->viewerX - d->gridMaxX;
     if (ax < 0.0f) {
         nearX = ax * ax;
         farX = bx * bx;
@@ -698,11 +698,11 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
         farX = ax * ax;
     } else {
         nearX = 0.0f;
-        float f = ((t->viewerX + t->viewerX < d->field_0x164 + d->field_0x16c) ? d->field_0x16c : d->field_0x164) - t->viewerX;
+        float f = ((t->viewerX + t->viewerX < d->gridMinX + d->gridMaxX) ? d->gridMaxX : d->gridMinX) - t->viewerX;
         farX = f * f;
     }
-    float az = t->viewerZ - d->field_0x168;
-    float bz = t->viewerZ - d->field_0x170;
+    float az = t->viewerZ - d->gridMinZ;
+    float bz = t->viewerZ - d->gridMaxZ;
     if (az < 0.0f) {
         nearZ = az * az;
         farZ = bz * bz;
@@ -711,13 +711,13 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
         farZ = az * az;
     } else {
         nearZ = 0.0f;
-        float f = ((t->viewerZ + t->viewerZ < d->field_0x170 + d->field_0x168) ? d->field_0x170 : d->field_0x168) - t->viewerZ;
+        float f = ((t->viewerZ + t->viewerZ < d->gridMaxZ + d->gridMinZ) ? d->gridMaxZ : d->gridMinZ) - t->viewerZ;
         farZ = f * f;
     }
     float near2 = nearZ + nearX;
     float far2 = farZ + farX;
-    float dyLo = t->viewerY - field_0x18;
-    float dyHi = t->viewerY - field_0x1c;
+    float dyLo = t->viewerY - minHeight;
+    float dyHi = t->viewerY - maxHeight;
     float dy;
     float dySq;
     if (dyLo < 0.0f) {
@@ -734,14 +734,14 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
     if (coarse)
         return distance;
     terrain->detailUpdates++;
-    data->field_0x126 = data->field_0x122;
-    data->field_0x128 = data->field_0x124;
+    data->previousLowerErrorLimit = data->lowerErrorLimit;
+    data->previousUpperErrorLimit = data->upperErrorLimit;
     if (terrain->appliedDrawDistance == 0) {
-        data->field_0x124 = 0;
+        data->upperErrorLimit = 0;
     } else if (near2 == 0.0f) {
-        data->field_0x124 = 0xffff;
+        data->upperErrorLimit = 0xffff;
     } else if (far2 == 0.0f) {
-        data->field_0x124 = 0xffff;
+        data->upperErrorLimit = 0xffff;
     } else {
         float nearDist = FastSqrt(near2);
         float farDist = FastSqrt(far2);
@@ -752,8 +752,8 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
             q = farDist;
         else
             q = dy;
-        float v = (dySq / q + q) * data->field_0x174 * terrain->field_0x74;
-        data->field_0x122 = (v >= 65535.0f) ? 0xffff : (unsigned short)(int)v;
+        float v = (dySq / q + q) * data->inverseErrorScale * terrain->drawDistanceRatio;
+        data->lowerErrorLimit = (v >= 65535.0f) ? 0xffff : (unsigned short)(int)v;
         if (dyLo < 0.0f)
             dyLo = -dyLo;
         if (dyHi < 0.0f)
@@ -762,8 +762,8 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
         m = m * m;
         float ratioNear = (m + near2) / nearDist;
         float ratioFar = (m + far2) / farDist;
-        float w = ((ratioNear > ratioFar) ? ratioNear : ratioFar) * (data->field_0x174 * terrain->field_0x74);
-        data->field_0x124 = (w >= 65535.0f) ? 0xffff : (unsigned short)(int)w;
+        float w = ((ratioNear > ratioFar) ? ratioNear : ratioFar) * (data->inverseErrorScale * terrain->drawDistanceRatio);
+        data->upperErrorLimit = (w >= 65535.0f) ? 0xffff : (unsigned short)(int)w;
         return distance;
     }
     float q;
@@ -773,9 +773,9 @@ float DrawableGridNode::ComputeViewerDetail(int coarse)
         q = FastSqrt(far2);
     else
         q = dy;
-    data->field_0x122 = (unsigned short)(int)((dySq / q + q) * data->field_0x174 * terrain->field_0x74);
-    if (data->field_0x122 > 0xffff)
-        data->field_0x122 = 0xffff;
+    data->lowerErrorLimit = (unsigned short)(int)((dySq / q + q) * data->inverseErrorScale * terrain->drawDistanceRatio);
+    if (data->lowerErrorLimit > 0xffff)
+        data->lowerErrorLimit = 0xffff;
     return distance;
 }
 

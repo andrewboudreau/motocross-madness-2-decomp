@@ -37,7 +37,7 @@ UnknownTrackGameObject574::UnknownTrackGameObject574()
     sceneDirectory[0] = 0;
     sceneFile[0] = 0;
     trnFile[0] = 0;
-    field_0x30c[0] = 0;
+    cubeFile[0] = 0;
     waypointFile[0] = 0;
     waypointPath[0] = 0;
     sceneNamed = 0;
@@ -171,7 +171,7 @@ void UnknownTrackGameObject574::SetSceneFileNames(const char* name)
 
     sprintf(buffer, "%s.trn", name);
     strncpy(trnFile, buffer, 0x1f);
-    strncpy(field_0x30c, "", 0x1f);
+    strncpy(cubeFile, "", 0x1f);
     sprintf(buffer, "%s01.wpt", name);
     strncpy(waypointFile, buffer, 0x1f);
     sprintf(buffer, "%s.est", name);
@@ -786,8 +786,8 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
     environment = new(__FILE__, 1456) UnknownSceneEnvironment;
     sprintf(environment->terrainFile, "%s\\%s", directory, sceneManager->trnFile);
     sprintf(environment->ecosystemFile, "%s\\%s", directory, sceneManager->estFile);
-    if (sceneManager->field_0x30c[0])
-        sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, sceneManager->field_0x30c);
+    if (sceneManager->cubeFile[0])
+        sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, sceneManager->cubeFile);
     else
         environment->cubeFile[0] = 0;
     strncpy(environment->particleTexture, "dirtpart.tga", 0x3f);
@@ -814,7 +814,7 @@ int Scene::ReadEnvironment(const char* directory, const char* cubeDirectory)
     }
     if (parameters.GetString("CubeFile", "", text, 0x104)) {
         sprintf(environment->cubeFile, "%s\\%s", cubeDirectory, text);
-        strncpy(sceneManager->field_0x30c, text, 0x3f);
+        strncpy(sceneManager->cubeFile, text, 0x3f);
         UnknownFunction4de580("Environment", "CubeFile", environment->cubeFile);
     }
     if (parameters.GetString("ParticleTextureMapName", "", text, 0x100)) {

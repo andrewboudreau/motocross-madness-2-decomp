@@ -53,7 +53,7 @@ UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
     bikeName[0] = 0;
     bikeModelName[0] = 0;
     lowestMessageDelay = FLT_MAX;
-    field_0xf4 = 1;
+    hasMprSkin = 1;
 }
 
 // 0x00521fb0
@@ -155,7 +155,7 @@ int TrackGameMode::ResetNetworkRace() {
             racers[i] = UnknownTrackGameRacerSlot();
     }
     for (i = 0; i < 8; i++)
-        raceSettings.field_0x14c[i] = UnknownTrackGameModeEntry();
+        raceSettings.gridOrder[i] = UnknownTrackGameModeEntry();
     raceSettings.networkPlayerCount = 0;
     return 1;
 }
@@ -302,9 +302,9 @@ void TrackGameMode::ResetSettingsEntries() {
 
     for (i = 0; i < 8; i++) {
         UnknownTrackGameModeEntry entry;
-        entry.field_0x00 = 0;
-        entry.field_0x04 = 0;
-        raceSettings.field_0x14c[i] = entry;
+        entry.playerId = 0;
+        entry.points = 0;
+        raceSettings.gridOrder[i] = entry;
     }
 }
 
