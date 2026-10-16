@@ -484,7 +484,7 @@ float Track::DistanceAlong(TrackPos a, TrackPos b)
 // 0x00517ea0: moves pos `distance` along a node path (*path, linked through
 // +0x08/+0x0c). Bit 1 of `flags`, combined with each entry's bit 1, picks
 // the direction.
-int Track::UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags)
+int Track::MoveAlongPath(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags)
 {
     TrackListItem* item;
     if (!path || (item = *path) == 0 || pos.node != item->node)
@@ -623,7 +623,7 @@ int Track::SegmentDirection(TrackSegment* segment, TrackVec3* out)
 // the x/z plane (the y/z plane for an edge with no x/z extent) and the cut is
 // clamped to the edge's ends. BikeAI.cpp calls it with modes 10 and 11
 // (0x00415326, 0x0041535c).
-int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out, int mode)
+int Track::DistanceToStripEdge(TrackVec3 p, TrackSegment* segment, float* out, int mode)
 {
     TrackVec3 a;
     TrackVec3 d;

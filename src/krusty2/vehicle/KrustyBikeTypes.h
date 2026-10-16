@@ -414,11 +414,11 @@ struct KbRaceSub {
     int FreeWorkList(KbTrackItem** list, int all);
     int ShortestPath(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
     float DistanceAlong(KbRaw3 a, KbRaw3 b);
-    int UnknownFunction517ea0(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
-                              unsigned char flags);
+    int MoveAlongPath(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
+                      unsigned char flags);
     int PointAt(KbRaw3 pos, Vec3* out);
     int SegmentDirection(int segment, Vec3* out);
-    int UnknownFunction518230(Vec3 p, int segment, float* out, int mode);
+    int DistanceToStripEdge(Vec3 p, int segment, float* out, int mode);
 };
 struct KbRace {
     KrustyBike* NextBike(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
