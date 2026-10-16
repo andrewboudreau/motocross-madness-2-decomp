@@ -125,7 +125,7 @@ public:
     float lastLapTime;  // +0x74C  RaceView/BikeRace +0x74c last lap time; FormatLapTime (0x00518690) takes it as a float
     float fastestLap;  // +0x750  RaceView/BikeRace +0x750; EventManager copies it to ZoneReport "FastestLap"; FormatLapTime float
     float totalRunningTime;  // +0x754  RaceView +0x754: FLT_MAX until finished; ZoneReport "TotalrunningTime"
-    float field_0x758; // 0x758
+    float totalTrickTime;                     // +0x758  slot 42 adds each finished trick's seconds; slot 43 clears it per race; sent in message 0x86 (tier 3)
     float tagRun;  // +0x75C  RaceView +0x75c: current run as the followed racer in tag (mode 4)
     float bestTagRun;  // +0x760  RaceView +0x760 best banked tag run
     float totalTagRun;  // +0x764  RaceView +0x764 sum of the banked tag runs

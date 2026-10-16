@@ -123,7 +123,7 @@ struct UnknownEventEntry {
     int position;                                  // +0x04: finishing position (99 when racer +0x4a0 is set)
     float fastestLap;                              // +0x08: racer +0x750 (ZoneReport "FastestLap"); TrackRecord.cpp 0x0051f3c0 loads it as a float
     int largestStuntPoints;                        // +0x0c: racer +0x788 (ZoneReport "LargestSingleStuntPoints")
-    int field_0x10;                                // racer +0x758
+    int totalTrickTime;                       // +0x10  racer +0x758 totalTrickTime
     float totalRunningTime;                        // +0x14: racer +0x754 (ZoneReport "TotalrunningTime")
     float bestTagRun;                              // +0x18: racer +0x760 bestTagRun
     float totalTagRun;                             // +0x1c: racer +0x764 totalTagRun

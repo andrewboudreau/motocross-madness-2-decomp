@@ -190,7 +190,7 @@ int KrustyBike::UnknownVirtualSlot42()
         chainedTrickTime = 0;
         trickPoints += sum * 2500.0f;
         trickMultiplier = (float)trickCount;
-        field_0x758 += sum;
+        totalTrickTime += sum;
         return 1;
     }
     return 0;
@@ -758,7 +758,7 @@ void KrustyBike::UnknownVirtualSlot43()
     fastestLap = 0;
     totalRunningTime = 0;
     largestStuntPoints = 0;
-    field_0x758 = 0;
+    totalTrickTime = 0;
     bestTagRun = 0;
     totalTagRun = 0;
     field_0x794 = 0;

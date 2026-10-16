@@ -43,7 +43,7 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     trickLandTimer = 0;
     field_0x4a4 = 1.0f;
     largestStuntPoints = 0;
-    field_0x758 = 0;
+    totalTrickTime = 0;
     bestTagRun = 0;
     tagRun = 0;
     totalTagRun = 0;

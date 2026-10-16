@@ -145,7 +145,7 @@ struct UnknownEventRacer : virtual public GameObject {
     float lastLapTime;                        // +0x74c last lap time (RaceStatus.cpp)
     float fastestLap;                         // +0x750 EventManager 0x0045c8b0 copies it to ZoneReport's "FastestLap" (TrackRecord reads it)
     float totalRunningTime;                   // +0x754 FLT_MAX until finished; ZoneReport "TotalrunningTime" (0x0045c8b0)
-    int field_0x758;                          // +0x758
+    int totalTrickTime;                       // +0x758  KrustyBike::totalTrickTime (an int view of the float)
     float tagRun;                             // +0x75c the current run as the followed racer in tag (mode 4); banked by
                                               // TrackGameViewOwner 0x004a9e80 and EventManager 0x0045eef0
     float bestTagRun;                         // +0x760 best banked run
