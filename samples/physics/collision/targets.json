@@ -96,7 +96,7 @@
     "target_va": "0x0043ad80",
     "target_size": 615,
     "expect": "partial",
-    "notes": "Near miss (CollisionPoint.cpp extent). Body, both paths and the owner reload match; left: retail returns for a null a1 before pushing ebx/ebp/esi (VC6 pushes all four first) and homes the loop counter in the dead points argument slot (VC6 uses a1's).",
+    "notes": "Near miss (CollisionPoint.cpp extent). Body, both paths and the owner reload match; The if/else with one trailing return lets VC6 delay the callee-saved pushes past the null-a1 return as retail does; left: one vector-copy store and the points/frame loads before the loop are swapped.",
     "bindings": "../../../src/krusty2/collision/CollisionPoint.bindings.json"
   },
   {
