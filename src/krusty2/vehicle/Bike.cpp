@@ -671,7 +671,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         GameObject::Method_0x00469190(dirtChunkEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
         steamEmitter = new(__FILE__, 0x711) BikeSteamEmitter(1);
         GameObject::Method_0x00469190(steamEmitter->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
-        steamEmitter->field_0x60 = 1;
+        steamEmitter->emitting = 1;
     }
 
     Vec3 leftPeg = Vec3(-1.305f, 0.225f, -0.228f);

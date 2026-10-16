@@ -80,7 +80,7 @@ struct BikeDirtChunkEmitter : BikeParticleEmitterView {
 struct BikeSteamEmitter : BikeParticleEmitterView {
     explicit BikeSteamEmitter(int flags);       // 0x004b9f40
     char pad_0x04[0x5c];
-    int field_0x60;                             // the loader sets it to 1
+    int emitting;  // +0x60  SteamParticleEmitter +0x60 emitting; the loader sets it to 1
     char pad_0x64[0x418];                       // 0x47c bytes (`new(__FILE__, 0x711)`)
 };
 
