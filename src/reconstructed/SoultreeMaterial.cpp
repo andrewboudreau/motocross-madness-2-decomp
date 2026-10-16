@@ -7,13 +7,15 @@
 #include "D3DConstants.h"
 
 // 0x00574060..0x00574068: the colour key used when the render target can key
-// its own format (initialised data of this TU).
-int g_UnknownInt574060 = 0x80;
-int g_UnknownInt574064 = 0x80;
-int g_UnknownInt574068 = 0x80;
+// its own format (initialised data of this TU): red, green and blue, as they
+// form colorKey 0x00RRGGBB.
+int g_ColorKeyRed = 0x80;
+int g_ColorKeyGreen = 0x80;
+int g_ColorKeyBlue = 0x80;
 
-// 0x00689ed0: texture stage 0 state 0xc, saved while a material clamps.
-int g_UnknownInt689ed0;
+// 0x00689ed0: texture stage 0 state 0xc (D3DTSS_ADDRESS), saved while a material
+// clamps and restored by RestoreRenderStates.
+int g_SavedTextureAddressMode;
 
 // 0x004fefe0
 SoultreeMaterial::SoultreeMaterial(int flags)
@@ -116,7 +118,7 @@ void SoultreeMaterial::ApplyRenderStates()
         }
     }
     if (clampTexture) {
-        ((RenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &g_UnknownInt689ed0);
+        ((RenderTarget*)renderContext)->GetTextureStageState(0, 0xc, &g_SavedTextureAddressMode);
         ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
     }
     switch (mappingType) {
@@ -141,7 +143,7 @@ void SoultreeMaterial::RestoreRenderStates()
     if (mappingType == 8)
         ((RenderTarget*)renderContext)->SetRenderState(D3DRENDERSTATE_WRAP0, 0, 0);
     if (clampTexture)
-        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ADDRESS, g_UnknownInt689ed0);
+        ((RenderTarget*)renderContext)->SetTextureStageState(0, D3DTSS_ADDRESS, g_SavedTextureAddressMode);
 }
 
 // 0x004ff450
@@ -189,7 +191,7 @@ void SoultreeMaterial::LoadTexture()
         PCRenderTarget* target = (PCRenderTarget*)renderContext;
         if ((target->triTextureCaps & 8) && textureOptions.opaqueTextures) {
             format = target->surfacePixelFormat;
-            colorKey = (g_UnknownInt574060 << 8 | g_UnknownInt574064) << 8 | g_UnknownInt574068;
+            colorKey = (g_ColorKeyRed << 8 | g_ColorKeyGreen) << 8 | g_ColorKeyBlue;
         } else {
             format = 1555;
         }

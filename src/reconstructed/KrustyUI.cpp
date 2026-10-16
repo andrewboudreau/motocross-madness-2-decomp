@@ -34,8 +34,8 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 void* ResizeDebugBlock(void* block, unsigned int size);
 
 // Global at 0x0068a498: 36 short strings loaded from string resources
-// 5000-5035 (KrustyUI 0x004988a0).
-char g_UnknownStrings68a498[36][16];
+// 5000-5035 (KrustyUI 0x004988a0); MakeRandomNames picks from them.
+char g_ResourceNames[36][16];
 
 // cdecl 0x005053b0 (KeyboardHook.cpp): 0 installs the Alt-Tab/Alt-Esc
 // keyboard hook, nonzero removes it. Called first on shutdown with 0.
@@ -939,7 +939,7 @@ void KrustyUI::MakeRandomNames(const char** names, int count) {
                 break;
         }
         used[index] = 1;
-        *names++ = g_UnknownStrings68a498[index];
+        *names++ = g_ResourceNames[index];
     }
     DebugFree(used, __FILE__, 1157);
 }
