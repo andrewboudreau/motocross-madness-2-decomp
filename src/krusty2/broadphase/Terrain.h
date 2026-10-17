@@ -322,7 +322,7 @@ public:
     // so the override has the base's name.  First argument is the input event.
     virtual int OnControlPress(int event, int unused);
     // 0x00507bb0 (plain thiscall, no args): derives four floats from the ints at 0x6c / 0x70
-    // (tier 3: a = appliedDrawDistance, b = field_0x70): 0x74 = a/b, 0x78 = (a*a)/(b*b), 0x7c = 1/0x78,
+    // (tier 3: a = appliedDrawDistance, b = cameraFocalLength): 0x74 = a/b, 0x78 = (a*a)/(b*b), 0x7c = 1/0x78,
     // 0x80 = 1/0x74.
     void ComputeRatios();
     // 0x005057d0 (ret 4, tier 3 name): when `object` is in the ownedObjectArray[] array, swaps the last
@@ -350,8 +350,8 @@ public:
     TerrainVec3 boundsMax;                                      // +0x54 Load: -FLT_MAX, filled, x/z + 16, scaled
     char viewerPosition[0x6c - 0x60];  // +0x60  GridTerrain viewerX/Y/Z: viewer position Griddraw measures node/vertex distances from
     int appliedDrawDistance;  // +0x6c slot 12 (0x507610) compares drawDistance with it, sets a dirty flag when different, then stores drawDistance into it; appliedDrawDistance is also the int a of ComputeRatios
-    int field_0x70;
-    float distanceRatio;  // +0x74  ComputeRatios: appliedDrawDistance / field_0x70; scales Griddraw's detail values
+    int cameraFocalLength;                    // +0x70  (int) visibilityCamera focalLength, stored by PrepareGeometry 0x00507836 each frame; ComputeRatios divides appliedDrawDistance by it
+    float distanceRatio;  // +0x74  ComputeRatios: appliedDrawDistance / cameraFocalLength; scales Griddraw's detail values
     float distanceRatioSq;  // +0x78  ComputeRatios: square of distanceRatio; Griddraw's vertex error limit factor
     float invDistanceRatioSq;  // +0x7C  ComputeRatios: 1 / distanceRatioSq
     float invDistanceRatio;  // +0x80  ComputeRatios: 1 / distanceRatio
