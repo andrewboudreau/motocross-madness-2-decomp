@@ -96,7 +96,7 @@
     "target_va": "0x004db0d0",
     "target_size": 2020,
     "expect": "partial",
-    "notes": "Near miss: lengths through a Vec3Normalize-shaped magnitude helper, the mode-1 normalisation through ShadowNormalize and the centre and extents through by-value transform helpers (results written back) as retail; frame size/slot assignment and the mode-1 fov block differ.",
+    "notes": "Near miss (opcode ratio 0.9874, 1924/2020 B): int return (every exit returns 1), out-pointer extent/centre transforms, by-value centre/halfExtents/eye/direction temporaries, the multiply through its hidden result pointer (shared mode tail) and the inline normalisation calling the 0x00404e60 constructor. Left: retail copies the GetBounds extents into three slots before the products; VC6 elides that copy, shifting every frame slot.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   },
   {

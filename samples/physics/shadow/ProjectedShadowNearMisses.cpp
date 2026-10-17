@@ -134,34 +134,39 @@ static inline float ShadowMagnitude(const ShadowVec3& v)
         return 1.0f;
     return 1.0f / FastInvSqrt(sq);
 }
-static inline ShadowVec3 ShadowTransformCoord(ShadowVec3 v, const ShadowMatrix& m)
+static inline void ShadowTransformCoord(ShadowVec3* r, ShadowVec3 v, const ShadowMatrix& m)
 {
-    ShadowVec3 r;
-    r.x = v.z * m.m[2][0] + v.y * m.m[1][0] + v.x * m.m[0][0] + m.m[3][0];
-    r.y = v.z * m.m[2][1] + v.y * m.m[1][1] + v.x * m.m[0][1] + m.m[3][1];
-    r.z = v.z * m.m[2][2] + v.y * m.m[1][2] + v.x * m.m[0][2] + m.m[3][2];
-    return r;
+    r->x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + m.m[3][0];
+    r->y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + m.m[3][1];
+    r->z = v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] + m.m[3][2];
 }
 static inline ShadowVec3 ShadowDifference(const ShadowVec3& a, const ShadowVec3& b) { return ShadowConstVec3(a.x - b.x, a.y - b.y, a.z - b.z); }
 static inline ShadowVec3 ShadowSum(const ShadowVec3& a, const ShadowVec3& b) { return ShadowConstVec3(a.x + b.x, a.y + b.y, a.z + b.z); }
+static inline ShadowVec3 ShadowScale(const ShadowVec3& a, float s) { return ShadowConstVec3(a.x * s, a.y * s, a.z * s); }
+// Out-of-line call views, declared only and bound to the retail copies: ShadowMatrixMultiply
+// 0x004a1860 with its hidden result pointer spelt out (ComputeBounds copies straight from the
+// returned pointer, so both modes share one tail), and the Vec3(float, float, float) COMDAT
+// constructor 0x00404e60 (thiscall, ret 0xc) that ComputeBounds calls instead of inlining.
+ShadowMatrix* ShadowMatrixMultiplyInto(ShadowMatrix* out, ShadowMatrix a, ShadowMatrix b);
+struct ShadowVec3Call : ShadowVec3 {
+    ShadowVec3Call(float x_, float y_, float z_);
+};
 static inline float AbsF(float v) { return v < 0.0f ? -v : v; }
 
-static inline ShadowVec3 ShadowTransformExtents(ShadowVec3 h, const ShadowMatrix& m)
+static inline void ShadowTransformExtents(ShadowVec3* out, ShadowVec3 h, const ShadowCaster* k)
 {
-    float a00 = h.x * m.m[0][0];
-    float a01 = h.x * m.m[0][1];
-    float a02 = h.x * m.m[0][2];
-    float a10 = h.y * m.m[1][0];
-    float a11 = h.y * m.m[1][1];
-    float a12 = h.y * m.m[1][2];
-    float a20 = h.z * m.m[2][0];
-    float a21 = h.z * m.m[2][1];
-    float a22 = h.z * m.m[2][2];
-    ShadowVec3 r;
-    r.x = AbsF(a00) + AbsF(a10) + AbsF(a20);
-    r.y = AbsF(a01) + AbsF(a11) + AbsF(a21);
-    r.z = AbsF(a02) + AbsF(a12) + AbsF(a22);
-    return r;
+    float a00 = h.x * k->world.m[0][0];
+    float a01 = h.x * k->world.m[0][1];
+    float a02 = h.x * k->world.m[0][2];
+    float a10 = h.y * k->world.m[1][0];
+    float a11 = h.y * k->world.m[1][1];
+    float a12 = h.y * k->world.m[1][2];
+    float a20 = h.z * k->world.m[2][0];
+    float a21 = h.z * k->world.m[2][1];
+    float a22 = h.z * k->world.m[2][2];
+    out->x = AbsF(a00) + AbsF(a10) + AbsF(a20);
+    out->y = AbsF(a01) + AbsF(a11) + AbsF(a21);
+    out->z = AbsF(a02) + AbsF(a12) + AbsF(a22);
 }
 
 // 0x004db0d0 (2020 B): recomputes the light-space bounds of all casters and derives the shadow
@@ -171,25 +176,24 @@ static inline ShadowVec3 ShadowTransformExtents(ShadowVec3 h, const ShadowMatrix
 // length of halfExtents.  Mode 3 (directional) builds an orthographic matrix and looks along
 // -lightDir*1000; mode 1 (point light) derives lightDir from the centre, a field of view from
 // atan2(lensScale, distance) and normalises the direction.  The result, camera matrix times a
-// local scale/translate matrix, goes to lightMatrix (+0xd8).  PARTIAL: the FPU scheduling of the
-// inlined vector helpers differs from retail.  The lengths go through a Vec3Normalize-shaped
-// magnitude helper and the normalisation through ShadowNormalize; the centre is transformed by
-// a by-value helper whose argument copy (the result is written back to c) matches retail's,
-// and the extents likewise go through ShadowTransformExtents with the result written back.
-// Left: frame size and slot assignment (retail's locals sit 0x14..0x3c higher), and the
-// fov/look-at block of mode 1.
-void ProjectedShadow::ComputeBounds()
+// local scale/translate matrix, goes to lightMatrix (+0xd8).  Every exit returns 1 (retail's
+// shared epilogue sets eax = 1).  The extents and centre are transformed through out-pointer
+// helpers with by-value inputs, centre/halfExtents, the mode-3 eye and the mode-1 direction are
+// built through by-value temporaries, and the mode-1 normalisation is written out with the
+// out-of-line constructor.  PARTIAL: retail copies the GetBounds extents into three separate
+// slots before the products (VC6 elides that copy here), which shifts every frame slot.
+int ProjectedShadow::ComputeBounds()
 {
     if (!casters)
-        return;
+        return 1;
     ShadowVec3 mn, mx;
     mn.x = mn.y = mn.z = 3.4028235e38f;
     mx.x = mx.y = mx.z = -3.4028235e38f;
     for (int i = 0; i < casterCount; i++) {
         ShadowVec3 c, ext;
         casters[i]->GetBounds(&c, &ext);
-        ext = ShadowTransformExtents(ext, casters[i]->world);
-        c = ShadowTransformCoord(c, casters[i]->world);
+        ShadowTransformExtents(&ext, ext, casters[i]);
+        ShadowTransformCoord(&c, c, casters[i]->world);
         ShadowVec3 lo = ShadowDifference(c, ext);
         ShadowVec3 hi = ShadowSum(c, ext);
         if (lo.x < mn.x) mn.x = lo.x;
@@ -199,12 +203,8 @@ void ProjectedShadow::ComputeBounds()
         if (hi.y > mx.y) mx.y = hi.y;
         if (hi.z > mx.z) mx.z = hi.z;
     }
-    center.x = (mx.x + mn.x) * 0.5f;
-    center.y = (mx.y + mn.y) * 0.5f;
-    center.z = (mx.z + mn.z) * 0.5f;
-    halfExtents.x = (mx.x - mn.x) * 0.5f;
-    halfExtents.y = (mx.y - mn.y) * 0.5f;
-    halfExtents.z = (mx.z - mn.z) * 0.5f;
+    center = ShadowScale(ShadowSum(mx, mn), 0.5f);
+    halfExtents = ShadowScale(ShadowDifference(mx, mn), 0.5f);
     lensScale = ShadowMagnitude(halfExtents);
 
     if (mode == 3) {
@@ -214,29 +214,38 @@ void ProjectedShadow::ComputeBounds()
         m.m[1][1] = -(half / lensScale);
         m.m[3][0] = half;
         m.m[3][1] = half;
-        ShadowVec3 eye;
-        eye.x = center.x - lightDir.x * 1000.0f;
-        eye.y = center.y - lightDir.y * 1000.0f;
-        eye.z = center.z - lightDir.z * 1000.0f;
+        ShadowVec3 eye = ShadowDifference(center, ShadowScale(lightDir, 1000.0f));
         camera->SetLookAt(&eye, 0, 0, 0, 0);
         camera->UnknownVirtualSlot29(center);
         camera->UnknownVirtualSlot28();
-        lightMatrix = ShadowMatrixMultiply(m, camera->matrix_0xac);
+        ShadowMatrix t;
+        lightMatrix = *ShadowMatrixMultiplyInto(&t, m, camera->matrix_0xac);
+        return 1;
     } else if (mode == 1) {
-        lightDir.x = center.x - lightVec2.x;
-        lightDir.y = center.y - lightVec2.y;
-        lightDir.z = center.z - lightVec2.z;
+        lightDir = ShadowDifference(center, lightVec2);
         float dist = ShadowMagnitude(lightDir);
         float fov = (float)atan2(lensScale, dist) * 114.59156f;
         camera->SetLookAt(&lightVec2, 0, 0, 0, &fov);
-        lightDir = ShadowNormalize(lightDir);
+        ShadowVec3& d = lightDir;
+        float y = d.y, x = d.x, z = d.z;
+        float sq = z * z + (x * x + y * y);
+        ShadowVec3 n;
+        if (sq == 1.0f) {
+            n = d;
+        } else {
+            float inv = FastInvSqrt(sq);
+            n = ShadowVec3Call(d.x * inv, d.y * inv, d.z * inv);
+        }
+        d = n;
         camera->UnknownVirtualSlot29(center);
         camera->UnknownVirtualSlot28();
         ShadowMatrix m = ShadowMatrixIdentity();
         m.m[0][0] = (float)texture->size;
         m.m[1][1] = (float)texture->size;
-        lightMatrix = ShadowMatrixMultiply(m, camera->matrix_0xec);
+        ShadowMatrix t;
+        lightMatrix = *ShadowMatrixMultiplyInto(&t, m, camera->matrix_0xec);
     }
+    return 1;
 }
 
 // 0x004db8c0 (1074 B): renders the casters into the 16-bit height texture.  Locks the texture,
