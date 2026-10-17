@@ -293,7 +293,7 @@ int AdvanceClamped(Motion* motion, MotionPoseList** cursor, MotionPoseList** fro
 // (mirror == 0) or slot 5.  While a blend is active the blend-from motion is advanced the same way and
 // the two poses are interpolated with a smoothstep weight over blendDuration; nodes flagged in the
 // name table keep the blend-from pose.  Past the last frame a looping motion is restarted through
-// BlendToMotion, a non-looping one sets chr_field_0x0c.  Returns the frame number, or 0.
+// BlendToMotion, a non-looping one sets motionStopped.  Returns the frame number, or 0.
 // Near miss, 3330 vs 3327 bytes: the call sequence and the clamp/ease shape are retail's, but the
 // inline budget is spent differently (see BlendPose7; in the first extrapolation loop retail inlines
 // only operator- for the frame delta, calling Vec3::Vec3 0x404e60 for its result, and calls the
@@ -306,7 +306,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
     int finished;
     int ok;
 
-    if (chr_field_0x0c)
+    if (motionStopped)
         return 0;
     chr_field_0x10 += time;
     finished = 0;
@@ -429,7 +429,7 @@ int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
             BlendToMotion(currentMotion);
             return 0;
         }
-        chr_field_0x0c = 1;
+        motionStopped = 1;
         chr_field_0x10 = 0.0f;
         lastFrameTime = 0.0f;
         return 0;

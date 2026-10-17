@@ -46,7 +46,7 @@ public:
     int AdvanceMotion(float time, int a, int b); // 0x004a6bb0: advances the motion
 
     unsigned char field_0x008[0x0c - 0x08];
-    int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h chr_field_0x0c): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set
+    int motionStopped;                        // +0xC  Character +0x0c (D3DIMSoultreeCharacter.h motionStopped): set when a non-looping motion ends, cleared by SetMotion 0x004a8b40; AdvanceMotion returns 0 while set
     int motionTime;  // +0x10  Character +0x10: motion time (slot 7 adds time to it); RestartEntry zeroes it before AdvanceMotion
     unsigned char field_0x014[0x1a0 - 0x14];
     UnknownSceneLodObject* modelNode;         // +0x1a0

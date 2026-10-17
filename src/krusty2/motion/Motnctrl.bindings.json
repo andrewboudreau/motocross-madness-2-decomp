@@ -99,7 +99,7 @@
   "?LoadVut@Character@@QAEXXZ$ehhandler": "0x0054c49a",
   "?LoadMir@Character@@QAEXXZ": "0x004a6500",
   "?LoadMir@Character@@QAEXXZ$ehhandler": "0x0054c4ca",
-  "?Method_0x004a6910@Character@@QAEXHH@Z": "0x004a6910",
+  "?SetCharacterRenderContext@Character@@QAEXHH@Z": "0x004a6910",
   "?SortPoseList@Character@@QAEXPAX@Z": "0x004a6b10",
   "?ApplyRestPose@Character@@QAEXXZ": "0x004a8b00",
   "?Open@ArchiveFile@@QAEHPBD0H@Z": "0x00460f50",

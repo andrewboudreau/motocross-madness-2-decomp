@@ -427,7 +427,7 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     char ext[0x100];
     char dir[0x100];
     ReadClock();
-    Method_0x004a6910(a1, a6);
+    SetCharacterRenderContext(a1, a6);
     *(const SoultreeLoadDesc**)(d3d_field_0x1a4 + 0x60) = a3;
     *(int*)(d3d_field_0x1a4 + 0x68) = a5;
     if (a4) {

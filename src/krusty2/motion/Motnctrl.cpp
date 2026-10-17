@@ -321,7 +321,7 @@ int Character::LoadMotions()
 Character::Character(int a)
     : GameObject(a)
 {
-    chr_field_0x0c = 1;
+    motionStopped = 1;
     motionCount = 0;
     currentMotion = 0;
     currentFrame = 0;
@@ -348,9 +348,9 @@ Character::Character(int a)
 
 // owner: bracket only
 // 0x004a6910: GameObject slot 8's body on the virtual base; the second argument is unused.
-void Character::Method_0x004a6910(int a, int b)
+void Character::SetCharacterRenderContext(int renderContext, int unused)
 {
-    GameObject::SetRenderContext(a);
+    GameObject::SetRenderContext(renderContext);
 }
 
 // owner: bracket only (Character slot 1, contiguous with the Motnctrl.cpp methods)
@@ -498,17 +498,17 @@ inline void BlendPose(CharacterPose* a, CharacterPose* b, CharacterPose* out, fl
 // owner: bracket only (Character method contiguous with its Motnctrl.cpp methods)
 // 0x004a6bb0 (ret 0xc; callers 0x49945f, 0x499627, 0x4997b1, 0x4ead18, 0x4eae78, 0x4eb108):
 // per-frame playback.  Advances the current motion by dt (a finished non-looping motion sets
-// chr_field_0x0c and returns 0), then applies every pose of the current frame through slot 4
+// motionStopped and returns 0), then applies every pose of the current frame through slot 4
 // (mirror == 0) or slot 5.  While a blend is active each pose is interpolated from the frame
 // applied last with a smoothstep weight over blendDuration.  Returns the frame number.
 int Character::AdvanceMotion(float dt, int mirror, int mask)
 {
-    if (chr_field_0x0c)
+    if (motionStopped)
         return 0;
     chr_field_0x10 += dt;
     if (!AdvanceLooping(currentMotion, &currentFrame, &chr_field_0x10) && currentMotion->looping == 0) {
         chr_field_0x10 = 0.0f;
-        chr_field_0x0c = 1;
+        motionStopped = 1;
         return 0;
     }
     if (blendActive == 0) {
@@ -577,7 +577,7 @@ void Character::SetMotionByName(const char* name)
 // 0x004a8b40: switches to 'motion' at its first frame without blending.
 void Character::SetMotion(Motion* motion)
 {
-    chr_field_0x0c = 0;
+    motionStopped = 0;
     currentMotion = motion;
     currentFrame = motion->frames;
     blendActive = 0;
@@ -614,7 +614,7 @@ void Character::BlendToMotion(Motion* motion, float time)
 void Character::CharacterVirtualSlot8(int a)
 {
     Character* source = (Character*)a;
-    chr_field_0x0c = source->chr_field_0x0c;
+    motionStopped = source->motionStopped;
     chr_field_0x10 = source->chr_field_0x10;
     motionCount = source->motionCount;
     currentMotion = source->currentMotion;
