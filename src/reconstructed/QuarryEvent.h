@@ -58,10 +58,10 @@ public:
     int CanCycleCues();
 
     unsigned char field_0x2c[0x48 - 0x2c];
-    float field_0x48;                         // screen x, fraction of the width
-    float field_0x4c;                         // screen y, fraction of the height
+    float screenX;                            // +0x48 ArcadeObject::Create's c: screen x, fraction of the width
+    float screenY;                            // +0x4c ArcadeObject::Create's d: screen y, fraction of the height
     unsigned char field_0x50[0xc8 - 0x50];
-    int field_0xc8;
+    int skippedRacer;                         // +0xc8 Tick copies RadarOverlay::followedIndex; NextCueIndex steps past it (Krusty3DObjects.h)
     unsigned char field_0xcc[0xfc - 0xcc];
 };
 
@@ -98,8 +98,11 @@ public:
     // Slots 27-35 are introduced here (NationalRace overrides 27, 29 and 30).
     virtual int UnknownVirtualSlot27(int value); // 0x004e06a0: creates the visual cue
     virtual void UnknownVirtualSlot28();      // 0x00464e90 (shared empty body)
-    virtual void UnknownVirtualSlot29();      // 0x004e07c0: creates the overlays
-    virtual void UnknownVirtualSlot30();      // 0x004e0be0: adds the overlays as children
+    // Slot 29 (0x004e07c0): creates the instrument, chat, radar, stats and
+    // text-queue overlays; LoadEventObjects calls it (0x004df036).
+    virtual void CreateOverlays();
+    // Slot 30 (0x004e0be0): appends those overlays as children.
+    virtual void AttachOverlays();
     virtual int UnknownVirtualSlot31();       // 0x00467ae0 (shared `return 1` body)
     virtual void UnknownVirtualSlot32(int value); // 0x00464e80 (shared empty body)
     virtual void UnknownVirtualSlot33(int value); // 0x00464e80
@@ -135,10 +138,10 @@ public:
     VisualCue* visualCue;
     UnknownQuarryCamera* raceCamera;
     UnknownTerrain* eventTerrain;               // Terrain (src/krusty2/broadphase/Terrain.h)
-    UnknownTextureStream* field_0x44;
+    UnknownTextureStream* terrainStream;        // +0x44 opened on the env's terrain file and handed to the terrain loader; the destructor deletes it
     EcoSystem* ecoSystem;
     void* field_0x4c;
-    void* field_0x50;
+    int loaded;                                 // +0x50 0 in the constructor, 1 when LoadEventObjects completes (no reader found here)
     void* terrainShadow;                         // TerrainShadow
     void* projectedShadow;                         // ProjectedShadow
     StatsOverlay* statsOverlay;
@@ -154,8 +157,8 @@ public:
     LightEmitter* ambientLight;                 // ambient
     Fog* eventFog;
     unsigned char field_0x8c[0x94 - 0x8c];
-    GameObject* field_0x94;
-    GameObject* field_0x98;
+    GameObject* opaqueTextureGroup;             // +0x94 textureManager CreateGroup(surface format) when texturesCached; the texture contexts' opaqueGroup
+    GameObject* alphaTextureGroup;              // +0x98 CreateGroup(0x115c); the texture contexts' alphaGroup
     AuralScape* auralScape;
     int auralScapeListener;                           // AuralScape listener
 };
@@ -172,8 +175,8 @@ public:
     explicit NationalRace(int flags);         // 0x004aa7f0
     virtual int Tick(float frameTime);                 // 0x004aaa70: shows the finish text once
     virtual int UnknownVirtualSlot27(int value); // 0x004aa890: the visual cue, then the runway lights
-    virtual void UnknownVirtualSlot29();      // 0x004aa970: the overlays, then the drop text
-    virtual void UnknownVirtualSlot30();      // 0x004aaa50: adds the drop text as a child
+    virtual void CreateOverlays();            // 0x004aa970: the overlays, then the drop text
+    virtual void AttachOverlays();            // 0x004aaa50: the overlays, then the drop text as a child
     // 0x004aa850: the base initialiser, then 0x0048ad50 on +0xa4.
     NationalRace* Create(RenderTarget* target, UnknownProgressCallback progress);
 

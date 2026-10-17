@@ -41,7 +41,7 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     eventTerrain = 0;
     ecoSystem = 0;
     field_0x4c = 0;
-    field_0x50 = 0;
+    loaded = 0;
     terrainShadow = 0;
     projectedShadow = 0;
     clockMinutes = 0;
@@ -49,8 +49,8 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     particleManager = 0;
     lightManager = 0;
     visualCue = 0;
-    field_0x94 = 0;
-    field_0x98 = 0;
+    opaqueTextureGroup = 0;
+    alphaTextureGroup = 0;
     auralScape = 0;
     auralScapeListener = 0;
     radarOverlay = 0;
@@ -59,8 +59,8 @@ BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
     instrumentOverlay = 0;
     textQueue = 0;
     eventFog = 0;
-    field_0x44 = new(__FILE__, 92) UnknownTextureStream((int)g_ResourceManager);
-    if (!field_0x44)
+    terrainStream = new(__FILE__, 92) UnknownTextureStream((int)g_ResourceManager);
+    if (!terrainStream)
         return;
 }
 
@@ -90,7 +90,7 @@ int BaseQuarryEvent::Tick(float frameTime) {
     if (g_TrackGame->uiInteractionBlocked)
         return 1;
     if (radarOverlay && visualCue && statsOverlay) {
-        visualCue->field_0xc8 = radarOverlay->followedIndex;
+        visualCue->skippedRacer = radarOverlay->followedIndex;
         int index = visualCue->NextCueIndex();
         if (index != -1) {
             radarOverlay->cueIndex = index;
@@ -207,7 +207,7 @@ int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
 }
 
 // 0x004e07c0
-void BaseQuarryEvent::UnknownVirtualSlot29() {
+void BaseQuarryEvent::CreateOverlays() {
     char message[388];
     char name[0x40];
     UnknownOverlayRect screen;
@@ -231,8 +231,8 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     screen.top = 0;
     screen.left = 0;
     if (visualCue) {
-        cue.top = (int)((visualCue->field_0x4c + 0.06f) * screen.bottom);
-        cue.left = (int)((visualCue->field_0x48 - 0.04f) * screen.right);
+        cue.top = (int)((visualCue->screenY + 0.06f) * screen.bottom);
+        cue.left = (int)((visualCue->screenX - 0.04f) * screen.right);
     } else {
         cue.top = 0;
         cue.left = 0;
@@ -281,7 +281,7 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
 }
 
 // 0x004e0be0
-void BaseQuarryEvent::UnknownVirtualSlot30() {
+void BaseQuarryEvent::AttachOverlays() {
     AppendChild(instrumentOverlay, -1);
     AppendChild(chatOverlay, -1);
     AppendChild(radarOverlay, -1);
@@ -541,11 +541,11 @@ void BaseQuarryEvent::ResetClock() {
 
 // 0x004e1f10
 BaseQuarryEvent::~BaseQuarryEvent() {
-    delete field_0x44;
+    delete terrainStream;
     Release();
     if (g_TrackGame->texturesCached) {
-        field_0x94->Release();
-        field_0x98->Release();
+        opaqueTextureGroup->Release();
+        alphaTextureGroup->Release();
     }
     ((RenderTarget*)renderContext)->currentCamera = 0;
 }
