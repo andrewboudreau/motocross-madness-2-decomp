@@ -36,7 +36,7 @@ struct VisibilityCamera {
     float matrixC[4][4];          // +0x12c third 4x4 (0x0052fbb0)
     float fieldOfView;  // +0x16c degrees (Camera.h: 77.0f; tested <= 90 in 0x0052fac0); compared with a dot product after (field - 10.0f) * 0.00461538f in 0x0052f140
     float worldX;       // +0x170 passed first to VisibilityQuadTree::Query (made tree-relative there)
-    float field_0x174;
+    float worldY;       // +0x174 Camera eyePosition.y (eyePosition is +0x170..+0x178); not read here
     float worldZ;       // +0x178 passed second to Query (multiplied by the tree's quantScale)
     char field_0x17c[0x2c];
     unsigned int viewportWidth;   // +0x1a8 converted as an unsigned value (fild qword) in 0x0052f340 / 0x0052f190
@@ -57,7 +57,8 @@ public:
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
     virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7(int a, int b, int c);   // +0x1c
+    // +0x1c: RenderTarget slot 7; the debug draw (0x0052e3b0) passes (0, D3DTSS_COLOROP/ALPHAOP, D3DTOP_DISABLE).
+    virtual void SetTextureStageState(int stage, int type, int value);
     char field_0x04[4];
     VisibilityCamera* camera;   // +0x08
 };

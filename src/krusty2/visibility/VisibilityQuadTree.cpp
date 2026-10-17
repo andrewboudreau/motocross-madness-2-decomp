@@ -151,8 +151,8 @@ int VisibilityQuadTree::GameObjectVirtualSlot14()
     VisibilityCamera* cam = view->camera;
     int x = (int)((cam->worldX - worldMinX - worldMinX) * quantScale);
     int z = (int)(cam->worldZ * quantScale);
-    View()->UnknownVirtualSlot7(0, 1, 1);
-    View()->UnknownVirtualSlot7(0, 4, 1);
+    View()->SetTextureStageState(0, 1, 1);
+    View()->SetTextureStageState(0, 4, 1);
     if (rootNode)
         ((VisibilityQuadTreeNode*)rootNode)->DebugDraw(x, z, 0, 0, 0x4000, View()->camera);
     return 1;
