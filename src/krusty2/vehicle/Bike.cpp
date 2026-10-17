@@ -371,7 +371,7 @@ void Bike::UnknownVirtualSlot1(float arg)
         p->maxFall = -1.0f;
     }
     field_0x6fc = 0;
-    field_0x520 = 1;
+    steerPoseState = 1;
     field_0x634 = 0;
     field_0x638 = 0;
     field_0x628 = 0;
@@ -1037,18 +1037,18 @@ void Bike::UnknownVirtualSlot41()
     field_0x6fc = 0;
     if (controlInput.x <= 0.0f) {
         if (controlInput.x < -0.9f)
-            field_0x520 = 2;
+            steerPoseState = 2;
         else if (controlInput.x > -0.032f)
-            field_0x520 = 1;
+            steerPoseState = 1;
         else
-            field_0x520 = 3;
+            steerPoseState = 3;
     } else {
         if (controlInput.x > 0.9f)
-            field_0x520 = 4;
+            steerPoseState = 4;
         else if (controlInput.x < 0.032f)
-            field_0x520 = 1;
+            steerPoseState = 1;
         else
-            field_0x520 = 5;
+            steerPoseState = 5;
     }
     for (int i = 0; i < wheelCount; i++)
         wheelList[i]->UpdateAttachment();
@@ -1977,7 +1977,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
 // value from the wheel state, picks a pose pair (field_0x650/field_0x658) with a blend weight
 // (field_0x654/field_0x660) from the animation parameter at field_0x640, then advances a
 // smoothed value (field_0x644) toward field_0x504 and maps it through a small 5-state machine
-// (field_0x520) to field_0x65c.  Retail converts the pose index with an inlined fistp helper
+// (steerPoseState) to field_0x65c.  Retail converts the pose index with an inlined fistp helper
 // (round-to-nearest after the -0.5); plain (int) is used here.
 static inline float BikeRange(float x, float lo, float hi)
 {
@@ -2014,7 +2014,7 @@ int Bike::UnknownVirtualSlot89(float t)
             }
             p->maxRise = 1.0f;
             p->maxFall = -1.0f;
-            field_0x520 = 1;
+            steerPoseState = 1;
         }
         field_0x6fc = 1;
     } else {
@@ -2066,15 +2066,15 @@ int Bike::UnknownVirtualSlot89(float t)
         q->smoothRatio = step / q->smoothTime;
         *(float*)&q->smoothedValue = d * q->smoothRatio + *(float*)&q->smoothedValue;
         t = *(float*)&q->smoothedValue;
-        switch (field_0x520) {
+        switch (steerPoseState) {
         case 1:
             x = t * -0.25f;
             poseParam = x;
             if (x < 0.0f) {
-                field_0x520 = 3;
+                steerPoseState = 3;
                 poseParam = 0.5f - x;
             } else if (x > 0.225f) {
-                field_0x520 = 2;
+                steerPoseState = 2;
                 poseParam = 0.5f - x;
             }
             break;
@@ -2082,17 +2082,17 @@ int Bike::UnknownVirtualSlot89(float t)
             x = t * 0.25f + 0.5f;
             poseParam = x;
             if (x > 0.5f)
-                field_0x520 = 3;
+                steerPoseState = 3;
             break;
         case 3:
             x = t * 0.25f + 0.5f;
             poseParam = x;
             if (x < 0.5f) {
                 poseParam = 0.5f - x;
-                field_0x520 = 1;
+                steerPoseState = 1;
             } else if (x > 0.725f) {
                 poseParam = 1.5f - x;
-                field_0x520 = 4;
+                steerPoseState = 4;
             }
             break;
         case 4:
@@ -2100,28 +2100,28 @@ int Bike::UnknownVirtualSlot89(float t)
             poseParam = x;
             if (x > 1.0f) {
                 poseParam = x - 1.0f;
-                field_0x520 = 1;
+                steerPoseState = 1;
             }
             break;
         }
     } else {
-        switch (field_0x520) {
+        switch (steerPoseState) {
         case 1:
             if (p < 0.0f) {
                 if (p < -0.9f)
-                    field_0x520 = 2;
+                    steerPoseState = 2;
                 x = p * -0.25f;
                 poseParam = BikeRange(x, 0.0f, 0.25f);
             } else {
                 if (p > 0.9f)
-                    field_0x520 = 4;
+                    steerPoseState = 4;
                 x = p * 0.25f + 0.5f;
                 poseParam = BikeRange(x, 0.5f, 0.75f);
             }
             break;
         case 2:
             if (p > prevControlInput.x) {
-                field_0x520 = 3;
+                steerPoseState = 3;
                 x = p * 0.25f + 0.5f;
                 poseParam = BikeRange(x, 0.25f, 0.5f);
             } else {
@@ -2131,7 +2131,7 @@ int Bike::UnknownVirtualSlot89(float t)
             break;
         case 3:
             if (p > -0.032f) {
-                field_0x520 = 1;
+                steerPoseState = 1;
                 if (p < 0.0f) {
                     x = p * -0.25f;
                     poseParam = BikeRange(x, 0.0f, 0.25f);
@@ -2146,7 +2146,7 @@ int Bike::UnknownVirtualSlot89(float t)
             break;
         case 4:
             if (p < prevControlInput.x) {
-                field_0x520 = 5;
+                steerPoseState = 5;
                 x = p * -0.25f + 1.0f;
                 poseParam = BikeRange(x, 0.75f, 1.0f);
             } else {
@@ -2156,7 +2156,7 @@ int Bike::UnknownVirtualSlot89(float t)
             break;
         case 5:
             if (p < 0.032f) {
-                field_0x520 = 1;
+                steerPoseState = 1;
                 if (p < 0.0f) {
                     x = p * 0.25f + 0.5f;
                     poseParam = BikeRange(x, 0.5f, 0.75f);

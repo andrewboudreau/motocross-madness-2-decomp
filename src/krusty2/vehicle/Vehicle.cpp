@@ -66,7 +66,7 @@ void Vehicle::UnknownVirtualSlot96()
 void Vehicle::UnknownVirtualSlot21()
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot21();
-    field_0x5b0 = engineState->throttleFraction;
+    prevThrottleFraction = engineState->throttleFraction;
 }
 
 int Vehicle::UnknownVirtualSlot82()
@@ -1524,7 +1524,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     wheelForwardAlignment = 1.0f;
     targetLeanAngle = 0.0f;
     contactTotal = 0;
-    field_0x520 = 1;
+    steerPoseState = 1;
     throttleInput = 0.0f;
     prevControlInput = kVec3Zero;
     throttleOn = false;
@@ -2111,7 +2111,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     lastStepTime = 0.025f;
     allWheelsInContact = 0;
     prevCrashState = 0;
-    field_0x5b0 = 0;
+    prevThrottleFraction = 0;
     controlInput = kVec3Zero;
     prevControlInput = kVec3Zero;
     steerInput = 0;
@@ -2120,7 +2120,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     track = 0;
     inputDevice = 0;
     throttleInput = 0;
-    field_0x520 = 1;
+    steerPoseState = 1;
     *(int*)&pad_0x5B8 = 0;
     Vehicle::UnknownVirtualSlot1(165.0f);
     spawnProtected = 0;

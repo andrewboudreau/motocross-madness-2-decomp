@@ -143,7 +143,7 @@ int KrustyBike::UnknownVirtualSlot24()
             return 1;
         return 0;
     }
-    if (field_0x5b0 < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
+    if (prevThrottleFraction < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
         return 1;
     return 0;
 }
@@ -154,7 +154,7 @@ int KrustyBike::UnknownVirtualSlot25()
         if (prevSpeed > linearSpeed && !crashState && linearSpeed < 22.0f)
             return 1;
     } else {
-        if (field_0x5b0 < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
+        if (prevThrottleFraction < engineState->throttleFraction && !crashState && linearSpeed < 22.0f)
             return 1;
     }
     return 0;

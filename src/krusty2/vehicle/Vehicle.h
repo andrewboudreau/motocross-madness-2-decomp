@@ -597,7 +597,7 @@ public:
     Vec3 controlInput;  // +0x504 slot 63 writes x = steer (cubed for axis kinds 2/3), y = -lean axis; slot 64 zeroes it when crashed
     Vec3 prevControlInput;  // +0x510 slot 49 copies controlInput here before slot 64 refreshes it
     float forceFeedbackGain;                  // +0x51C  slot 93 sets 0.5; KrustyBike slot 93 sets FeedbackSlider (TrackGame+0xffc) * 0.04; KrustyBike slot 94 scales the pad force smoothedForwardAccel * it * 180
-    int field_0x520;
+    int steerPoseState;                       // +0x520  Bike sets 1..5 from controlInput.x (|x| > 0.9 hard, < 0.032 centre, else partial, by side); Bike slot 89 runs its 5-state pose machine on it (provisional)
     float controlResponse[6];                 // +0x524  KrustyBike slot 96 maps the response sliders (pct * 0.4 + 0.8; [0] steering pct * 0.2 + 0.575): [0] Steering, [1] Pitch, [2] PressThrottle, [3] ReleaseThrottle, [4] PressBrakes, [5] ReleaseBrakes; [2..3] are the gearbox rise/fall rates
     VehicleWheel** wheelList;  // +0x53c array of VehicleWheel*, iterated up to wheelCount in slots 7/54/72/75/85/86
     int wheelCapacity;               // +0x540 wheel capacity (AddWheel)
@@ -626,7 +626,7 @@ public:
     int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
     int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
     VehicleSparkEmitter* sparkEmitter;  // +0x5AC  VehicleSparkEmitter built by LoadVehicle (Vehicle.cpp line 0x1dc); impact handlers cast it to VehicleImpactSink
-    float field_0x5b0;
+    float prevThrottleFraction;               // +0x5B0  slot 21 copies engineState->throttleFraction here; KrustyBike's tests compare it with the current throttle fraction (rising/falling)
     int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there
 };
@@ -673,7 +673,7 @@ VEH_CHECK_OFFSET(Vehicle, throttleAxis, 0x500);
 VEH_CHECK_OFFSET(Vehicle, controlInput, 0x504);
 VEH_CHECK_OFFSET(Vehicle, prevControlInput, 0x510);
 VEH_CHECK_OFFSET(Vehicle, forceFeedbackGain, 0x51C);
-VEH_CHECK_OFFSET(Vehicle, field_0x520, 0x520);
+VEH_CHECK_OFFSET(Vehicle, steerPoseState, 0x520);
 VEH_CHECK_OFFSET(Vehicle, controlResponse, 0x524);
 VEH_CHECK_OFFSET(Vehicle, wheelList, 0x53C);
 VEH_CHECK_OFFSET(Vehicle, wheelCount, 0x544);
@@ -690,7 +690,7 @@ VEH_CHECK_OFFSET(Vehicle, wheelPointInContact, 0x5A0);
 VEH_CHECK_OFFSET(Vehicle, anyWheelInContact, 0x5A4);
 VEH_CHECK_OFFSET(Vehicle, allWheelsInContact, 0x5A8);
 VEH_CHECK_OFFSET(Vehicle, sparkEmitter, 0x5AC);
-VEH_CHECK_OFFSET(Vehicle, field_0x5b0, 0x5B0);
+VEH_CHECK_OFFSET(Vehicle, prevThrottleFraction, 0x5B0);
 VEH_CHECK_OFFSET(Vehicle, prevCrashState, 0x5B4);
 typedef char veh_assert_sizeof[(sizeof(Vehicle) == 0x5ec) ? 1 : -1];
 
