@@ -736,7 +736,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     identity(3, 1) = 0.0f;
     identity(3, 2) = 0.0f;
     identity(3, 3) = 1.0f;
-    ECO_VIEW->camera->UnknownVirtualSlot30(&identity);
+    ECO_VIEW->camera->SetWorldMatrix(&identity);
     ECO_VIEW->GetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, &savedPerspective);
     ECO_VIEW->GetRenderState(D3DRENDERSTATE_SHADEMODE, &savedShadeMode);
     // The three face normals: the quad's two sides and the face towards
@@ -788,7 +788,7 @@ int EcoSystem::UnknownVirtualSlot14() {
     if (g_TrackGame->bladeRenderer)
         ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     if (billboardCount) {
-        definitionTable[vegetation[0].definitionIndex]->billboardTexture->UnknownVirtualSlot19();
+        definitionTable[vegetation[0].definitionIndex]->billboardTexture->Bind();
         SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->pixelFormat);
         int next = 0;
         int remaining = billboardCount;
@@ -944,6 +944,6 @@ int EcoSystem::UnknownVirtualSlot14() {
     ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, g_TrackGame->magFilter);
     ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, g_TrackGame->minFilter);
     ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, g_TrackGame->mipFilter);
-    ECO_VIEW->UnknownVirtualSlot19();
+    ECO_VIEW->DisableAlphaTest();
     return GameObject::UnknownVirtualSlot14();
 }
