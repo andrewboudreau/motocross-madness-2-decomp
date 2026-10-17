@@ -70,7 +70,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot3(float distance)
     ManagedTexture* previous = Extra()->texture;
     float detail;
     if (distance != 0.0f)
-        detail = (float)((16 << shift) * Terrain()->field_0x70) / distance;
+        detail = (float)((16 << shift) * Terrain()->cameraFocalLength) / distance;
     else
         detail = 10000.0f;
 

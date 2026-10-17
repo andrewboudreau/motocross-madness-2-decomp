@@ -134,8 +134,8 @@ struct GridTerrain {
     float viewerY;
     float viewerZ;
     int appliedDrawDistance;                  // +0x6c (Terrain.h name)
-    int field_0x70;
-    float drawDistanceRatio;  // +0x74  Terrain 0x00507bb0: appliedDrawDistance / +0x70; scales the error limits (0x004815e0)
+    int cameraFocalLength;                    // +0x70  Terrain cameraFocalLength (0x00507836)
+    float drawDistanceRatio;  // +0x74  Terrain 0x00507bb0: appliedDrawDistance / cameraFocalLength; scales the error limits (0x004815e0)
     float drawDistanceRatioSquared;  // +0x78  Terrain 0x00507bb0: square of +0x74; CanDropVertex's limit factor (0x00481cc0)
     unsigned char field_0x07c[0x88 - 0x7c];
     int indicesDrawn;                          // +0x88 indices drawn

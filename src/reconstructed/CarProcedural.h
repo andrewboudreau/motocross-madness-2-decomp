@@ -68,18 +68,18 @@ public:
 struct CarProceduralBody {
     int swept;                                // +0x0  hull payload +0x00; HullVsHull forwards to HullVsHullSwept when nonzero
     unsigned char field_0x04[0xf8 - 0x04];
-    Vector3 field_0xf8;
+    Vector3 position;                         // +0xF8  hull payload translation row of its current transform (CollisionObject::GetShapePosition 0x00436000 reads hull +0xf8); slot 10 pushes it out by the contact offset
 };
 
 // Contact record reached through CarProceduralCollision::field_0x5c (the
 // collision object's +0x5c, a void* in src/krusty2/collision). Slot 10
-// reads +0x00 as the push-out vector of the body collider (scaled by 1.005
-// into the body's velocity), and from the sensor collider the float at +0
+// reads +0x00 as the push-out vector of the body collider (scaled by 1.005,
+// off the body hull's position), and from the sensor collider the float at +0
 // and the normal at +0x08 (tier 3 roles).
 struct CarProceduralContact {
     Vector3 contactOffset;                    // +0x0  CollisionSweepQuery +0x00, the push-out the body collider subtracts
-    Vector3 field_0x0c;
-    Vector3 field_0x18;
+    Vector3 contactNormal;                    // +0xC  CollisionSweepQuery::contactNormal
+    Vector3 contactPoint;                     // +0x18  CollisionSweepQuery::contact
 };
 
 // Ground query provider at CarProcedural::field_0x20c (0x00507c10, thiscall,
@@ -153,7 +153,7 @@ public:
     int steersFrontWheels;                    // +0x50 wheels 0 and 1 steer (slot 27's a9)
     int started;                              // +0x54 set once slot 10 has run its first update
     int field_0x58;
-    int field_0x5c;
+    int skipSmoothing;                        // +0x5C  provisional: while set slot 10 takes the raw back direction and ground normal; the constructor sets it and Scene::RestartEntry (0x004eb040) rewrites it (0 when the restart time was clamped)
     unsigned int numWheels;                   // +0x60 wheel count
     unsigned int currentPathKey;              // +0x64 current path key
     int field_0x68;
@@ -186,6 +186,6 @@ public:
     Vector3 smoothedNormal;                   // +0x200 smoothed ground normal
     void* groundProvider;                     // +0x20c the ground query provider (CarProceduralTerrain in slot 10)
     CarProceduralNode** wheelNodes;           // +0x210 wheels
-    Vector3 field_0x214;
-    Vector3 field_0x220;
+    Vector3 bodyContactPoint;                 // +0x214  slot 10 copies the body collider's contact record +0x18 (not read in this unit)
+    Vector3 bodyContactNormal;                // +0x220  slot 10 copies the body collider's contact record +0x0c (not read in this unit)
 };

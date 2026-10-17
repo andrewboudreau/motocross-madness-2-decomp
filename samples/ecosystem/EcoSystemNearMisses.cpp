@@ -827,7 +827,7 @@ int EcoSystem::UnknownVirtualSlot14() {
                     VERTEX(offset0 + 0x60).position.z = VERTEX(offset0).position.z;
                     VERTEX(offset0 + 0x20).position.z = z + uLeftWidth * sine;
                     VERTEX(offset0 + 0x40).position.z = VERTEX(offset0 + 0x20).position.z;
-                    VERTEX(offset0).position.y = height * definition->field_0x1d4 + y;
+                    VERTEX(offset0).position.y = height * definition->normalizedMinY + y;
                     VERTEX(offset0 + 0x20).position.y = VERTEX(offset0).position.y;
                     VERTEX(offset0 + 0x40).position.y = height + VERTEX(offset0).position.y;
                     VERTEX(offset0 + 0x60).position.y = VERTEX(offset0 + 0x40).position.y;
@@ -941,9 +941,9 @@ int EcoSystem::UnknownVirtualSlot14() {
     g_MemTagStack->Pop(category);
     ECO_VIEW->SetRenderState(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);
     ECO_VIEW->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedPerspective, 0);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, g_TrackGame->field_0x54c);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, g_TrackGame->field_0x550);
-    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, g_TrackGame->field_0x554);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MAGFILTER, g_TrackGame->magFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MINFILTER, g_TrackGame->minFilter);
+    ECO_VIEW->SetTextureStageState(0, D3DTSS_MIPFILTER, g_TrackGame->mipFilter);
     ECO_VIEW->UnknownVirtualSlot19();
     return GameObject::UnknownVirtualSlot14();
 }

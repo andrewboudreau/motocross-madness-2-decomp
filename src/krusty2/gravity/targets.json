@@ -46,7 +46,7 @@
     "target_va": "0x004f9860",
     "target_size": 39,
     "expect": "exact",
-    "notes": "slot 10: GameObject slot 10, then slot 11 while field_0x38 is 0",
+    "notes": "slot 10: GameObject slot 10, then slot 11 while manualStep is 0",
     "bindings": "SelectiveGravityModel.bindings.json"
   },
   {

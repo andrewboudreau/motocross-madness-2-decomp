@@ -166,7 +166,9 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char hasFinished;                         // +0x7a4 finished
     unsigned char field_0x7a5[0x7ac - 0x7a5];
-    int field_0x7ac[3];                            // copied by EventManager 0x0045c8b0
+    float repairDamage;                       // +0x7ac KrustyBike repairDamage; EventManager 0x0045c8b0 copies it to the result
+    float injuryDamage;                       // +0x7b0 KrustyBike injuryDamage
+    float stuntEarnings;                      // +0x7b4 KrustyBike stuntEarnings
     int lapGate;                              // +0x7b8 gate of the lap (AdvanceGate's gateIndex); racesnd.cpp keeps a copy at +0x1294
     int nextLapGate;                          // +0x7bc lapGate + 1 wrapped by the owner's gate count (RaceStatus.cpp 0x004e6a50)
     int forceGatePass;  // +0x7C0  passed as CountLap/AdvanceGate `forced`: with skipTest the gate/lap counts only when set

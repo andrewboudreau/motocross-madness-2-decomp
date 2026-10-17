@@ -1044,7 +1044,7 @@ void GUIUser::EnableImeInput(int enable) {
 
     if (enable) {
         ImmAssociateContext((HWND)g_TrackGame->windowHandle, (HIMC)g_TrackGame->inputContext);
-        area = focusControl->field_0x214;
+        area = focusControl->caretRect;
         composition.dwStyle = CFS_FORCE_POSITION;
         composition.ptCurrentPos.x = area.left;
         composition.ptCurrentPos.y = area.top;
@@ -1311,8 +1311,8 @@ void HiResMeter::ResetTimerStats() {
     for (i = 0; i < timerCount; i++) {
         timers[i].calls = 0;
         timers[i].totalMs = 0;
-        timers[i].field_0x00 = 0;
-        timers[i].field_0x04 = 0;
+        timers[i].startStampLow = 0;
+        timers[i].startStampHigh = 0;
         timers[i].callsThisTick = 0;
         timers[i].msThisTick = 0;
         timers[i].msAllTicks = 0;
@@ -1329,8 +1329,8 @@ void HiResMeter::ClearTimers() {
     for (i = 0; i < 50; i++) {
         timers[i].calls = 0;
         timers[i].totalMs = 0;
-        timers[i].field_0x00 = 0;
-        timers[i].field_0x04 = 0;
+        timers[i].startStampLow = 0;
+        timers[i].startStampHigh = 0;
         timers[i].callsThisTick = 0;
         timers[i].msThisTick = 0;
         timers[i].msAllTicks = 0;

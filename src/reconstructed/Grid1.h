@@ -63,7 +63,7 @@ struct Grid1Terrain {
     unsigned char field_0x000[0x18];
     GridRenderDevice* renderer;                // +0x18
     unsigned char field_0x01c[0x70 - 0x1c];
-    int field_0x70;                            // +0x70
+    int cameraFocalLength;                    // +0x70  Terrain cameraFocalLength; the block detail is a projected size
     unsigned char field_0x074[0x544 - 0x74];
     ManagedTexture* textures[(0xbec - 0x544) / 4];  // +0x544
     unsigned char field_0xbec[0xc24 - 0xbec];

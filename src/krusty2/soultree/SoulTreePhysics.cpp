@@ -604,11 +604,13 @@ struct SoultreeSinkObject {        // attachment field_0x14 target (type 4)
     char pad_0x00[0x48];
     Vec3 currentPosition;  // +0x48 set by 0x004ba2c0 in slot 21; copied to previousPosition on a trail reset
     Vec3 previousPosition;  // +0x54 slot 21: previousPosition = currentPosition when the attachment's resetTrail is set
-    void Fn_4ba2c0(Vec3 v);    // thiscall, callee pops 0xc
-    void Fn_4ba300();
-    void Fn_4ba320();
-    void Fn_4ba340();
-    void Fn_4ba360(int a, int b, int c);
+    // SteamParticleEmitter's setters (samples/physics/effects/ParticleEmitters.h); the decoded
+    // stores agree. Restart/Burst are that sample's provisional names.
+    void SetPosition(Vec3 v);  // 0x004ba2c0 thiscall, callee pops 0xc: previousPosition = +0x48, then +0x48 = v
+    void Restart();            // 0x004ba300: +0x60 = 1, +0x44 = +0x40, +0x6c = 1
+    void Burst();              // 0x004ba320: +0x44 = 0.0001, +0x6c = +0x70 = 1
+    void StopEmitting();       // 0x004ba340: +0x60 = 0, previousPosition = position
+    void SetColor(int r, int g, int b);  // 0x004ba360: +0x478 = (r << 16) | (g << 8) | (b & 0xff)
 };
 
 // The type-4 attachment target (field_0x14).  Slot 21 reloads it at every use; caching it
@@ -659,18 +661,18 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 switch (attachments[i].type) {
                 case 1:
                     if (hit) {
-                        attachments[i].contactEmitter->Fn_4b8dd0(0x40, 0x40, 0x40);
+                        attachments[i].contactEmitter->SetColor(0x40, 0x40, 0x40);
                         attachments[i].contactEmitter->renderFlags |= 0x800;
                     } else {
-                        attachments[i].contactEmitter->Fn_4b8dd0(0xff, 0xff, 0xff);
+                        attachments[i].contactEmitter->SetColor(0xff, 0xff, 0xff);
                         attachments[i].contactEmitter->renderFlags &= ~0x800;
                     }
                     break;
                 case 4:
                     if (hit)
-                        AttachmentSink(&attachments[i])->Fn_4ba360(0x80, 0x80, 0x80);
+                        AttachmentSink(&attachments[i])->SetColor(0x80, 0x80, 0x80);
                     else
-                        AttachmentSink(&attachments[i])->Fn_4ba360(0xff, 0xff, 0xff);
+                        AttachmentSink(&attachments[i])->SetColor(0xff, 0xff, 0xff);
                     break;
                 }
             }
@@ -703,15 +705,15 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         case 4:
             if (!justReset) {
                 scratchVector = sceneNode->LocalToWorldPoint(a->localOffset);
-                AttachmentSink(a)->Fn_4ba2c0(scratchVector);
+                AttachmentSink(a)->SetPosition(scratchVector);
                 if (a->resetTrail) {
                     AttachmentSink(a)->previousPosition = AttachmentSink(a)->currentPosition;
                     a->resetTrail = 0;
                 }
                 if (settled && !field_0x20e)
-                    AttachmentSink(a)->Fn_4ba300();
+                    AttachmentSink(a)->Restart();
                 else if (UnknownVirtualSlot25())
-                    AttachmentSink(a)->Fn_4ba320();
+                    AttachmentSink(a)->Burst();
             }
             break;
         }
@@ -731,7 +733,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                 ((SoultreePadObject*)attachments[i].field_0x0c)->activeThisFrame = 0;
                 break;
             case 4:
-                AttachmentSink(&attachments[i])->Fn_4ba340();
+                AttachmentSink(&attachments[i])->StopEmitting();
                 break;
             }
         }

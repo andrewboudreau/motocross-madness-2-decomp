@@ -43,7 +43,7 @@ Terrain::Terrain(int a)
     field_0xc08 = 0;
     field_0xc0c = 0;
     appliedDrawDistance = 0;
-    field_0x70 = 0;
+    cameraFocalLength = 0;
     distanceRatioSq = 0;
     distanceRatio = 0;
     invDistanceRatioSq = 0;
@@ -663,7 +663,7 @@ int Terrain::GameObjectVirtualSlot14()
 void Terrain::ComputeRatios()
 {
     int a = appliedDrawDistance;
-    int b = field_0x70;
+    int b = cameraFocalLength;
     distanceRatioSq = (float)(a * a) / (b * b);
     distanceRatio = (float)a / b;
     invDistanceRatioSq = 1.0f / distanceRatioSq;

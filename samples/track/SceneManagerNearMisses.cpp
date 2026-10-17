@@ -547,7 +547,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         } else {
             animationTable->entries[i].keyFramed = 1;
         }
-        animationTable->entries[i].field_0x00_bit5 = 0;
+        animationTable->entries[i].animatesWhileHeld = 0;
         if (animationTable->entries[i].keyFramed && !parameters.GetString("MCF", "", file, 0x104)) {
             sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, scenePath);
             UnknownFunction464e80(message);

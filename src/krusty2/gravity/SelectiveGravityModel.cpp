@@ -19,7 +19,7 @@ SelectiveGravityModel::SelectiveGravityModel(int flags)
 {
     bodies = 0;
     bodyCount = 0;
-    field_0x38 = 0;
+    manualStep = 0;
     gravity = 32.2f;
 }
 
@@ -42,7 +42,7 @@ void SelectiveGravityModel::AddBody(GravityBody* body)
 int SelectiveGravityModel::Tick(float dt)
 {
     GameObject::Tick(dt);
-    if (!field_0x38)
+    if (!manualStep)
         GameObjectVirtualSlot11(dt);
     return 1;
 }

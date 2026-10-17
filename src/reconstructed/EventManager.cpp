@@ -75,9 +75,9 @@ void UnknownEventEntry::Reset() {
     finished = 0;
     strcpy(name, "");
     outOfRace = 0;
-    field_0x34[0] = 0;
-    field_0x34[1] = 0;
-    field_0x34[2] = 0;
+    repairDamage = 0;
+    injuryDamage = 0;
+    stuntEarnings = 0;
 }
 
 // 0x0045c8b0: the racer's results. A racer with +0x4a0 set is listed in
@@ -100,9 +100,9 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         bestTagRun = racer->bestTagRun;
         totalTagRun = racer->totalTagRun;
         aiIndex = racer->aiIndex;
-        field_0x34[0] = racer->field_0x7ac[0];
-        field_0x34[1] = racer->field_0x7ac[1];
-        field_0x34[2] = racer->field_0x7ac[2];
+        repairDamage = racer->repairDamage;
+        injuryDamage = racer->injuryDamage;
+        stuntEarnings = racer->stuntEarnings;
         if (g_TrackGame->mode.raceSettings.eventType == 0 || g_TrackGame->mode.raceSettings.eventType == 4)
             finished = 1;
         else
@@ -117,9 +117,9 @@ void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
         bestTagRun = 0;
         totalTagRun = 0;
         aiIndex = 0;
-        field_0x34[0] = 0;
-        field_0x34[1] = 0;
-        field_0x34[2] = 0;
+        repairDamage = 0;
+        injuryDamage = 0;
+        stuntEarnings = 0;
         finished = 0;
     }
 }
@@ -882,14 +882,14 @@ void EventManager::CloseRace(int mode) {
     g_TrackGame->mode.SaveProfile();
     if (mode == 1) {
         if (owner) {
-            if (owner->field_0x60)
-                owner->field_0x60->Disable();
-            if (owner->field_0x5c)
-                owner->field_0x5c->Disable();
-            if (owner->field_0x68)
-                owner->field_0x68->Disable();
-            if (owner->field_0x64)
-                owner->field_0x64->Disable();
+            if (owner->radarOverlay)
+                owner->radarOverlay->Disable();
+            if (owner->statsOverlay)
+                owner->statsOverlay->Disable();
+            if (owner->instrumentOverlay)
+                owner->instrumentOverlay->Disable();
+            if (owner->chatOverlay)
+                owner->chatOverlay->Disable();
         }
         view->raceCamera->Disable();
         if (view->raceSound)

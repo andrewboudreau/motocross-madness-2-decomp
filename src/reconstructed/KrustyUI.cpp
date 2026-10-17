@@ -848,17 +848,17 @@ int KrustyUI::ResolveRiderFile(const char* name, char* text, int size) {
 }
 
 // 0x0049ba70
-int KrustyUI::AddEntry(int a, int scene, int series, const char* name, int d, int e) {
+int KrustyUI::AddEntry(int directoryIndex, int scene, int series, const char* name, int fileTime, int fileSize) {
     entries = (UnknownKrustyUIEntry*)ResizeDebugBlock(entries, (entryCount + 1) * sizeof(UnknownKrustyUIEntry));
-    entries[entryCount].field_0x00 = a;
+    entries[entryCount].directoryIndex = directoryIndex;
     entries[entryCount].scene = scene;
     entries[entryCount].series = series;
     int length = strlen(name);
     int count = length > 63 ? 63 : length;
     strncpy(entries[entryCount].fileName, name, count);
     entries[entryCount].fileName[count] = 0;
-    entries[entryCount].field_0x0c = d;
-    entries[entryCount].field_0x10 = e;
+    entries[entryCount].trackFileTime = fileTime;
+    entries[entryCount].trackFileSize = fileSize;
     return ++entryCount - 1;
 }
 

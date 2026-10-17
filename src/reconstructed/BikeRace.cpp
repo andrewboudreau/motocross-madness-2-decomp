@@ -358,8 +358,8 @@ int BikeRace::Tick(float frameTime) {
                         if (appliedReplayMode != 4) {
                             appliedReplayMode = 4;
                             if (g_TrackGame->mode.soundOn) {
-                                if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c != 0) {
-                                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Enable();
+                                if (g_TrackGame->eventManager->FindRaceMode()->auralScape != 0) {
+                                    g_TrackGame->eventManager->FindRaceMode()->auralScape->Enable();
                                 }
                                 ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->EnableByClassName("SoundGroup");
                             }
@@ -378,8 +378,8 @@ int BikeRace::Tick(float frameTime) {
                         }
                     } else if (appliedReplayMode != replayMode) {
                         appliedReplayMode = replayMode;
-                        if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c != 0) {
-                            g_TrackGame->eventManager->FindRaceMode()->field_0x9c->Disable();
+                        if (g_TrackGame->eventManager->FindRaceMode()->auralScape != 0) {
+                            g_TrackGame->eventManager->FindRaceMode()->auralScape->Disable();
                         }
                         ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("SoundGroup");
                         ((UnknownBikeRaceRoot*)g_TrackGame->childRoot)->DisableByClassName("ParticleManager");
@@ -507,7 +507,7 @@ int BikeRace::Tick(float frameTime) {
                     if (startCountdown <= 0.0f || AnyRacerRemote()) {
                         startCountdown = 0;
                         isRacing = true;
-                        raceScene->field_0x7c0 = 0;
+                        raceScene->holdAnimations = 0;
                         if (startGate != 0) {
                             raceScene->EnableAutomaticSequence(startGateEntry);
                             startGateTimer = 5.0f;
@@ -539,20 +539,20 @@ int BikeRace::Tick(float frameTime) {
                         }
                         switch (g_TrackGame->mode.raceSettings.eventType) {
                         case 2:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->nationalEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->nationalEvent->chatOverlay;
                             break;
                         case 3:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->supercrossEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->supercrossEvent->chatOverlay;
                             break;
                         case 0:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->quarryEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->quarryEvent->chatOverlay;
                             break;
                         case 1:
                         case 5:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->bajaEnduroEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->bajaEnduroEvent->chatOverlay;
                             break;
                         case 4:
-                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->tagEvent->field_0x64;
+                            chatOverlay = (UnknownBikeRaceOverlay19c*)g_TrackGame->tagEvent->chatOverlay;
                             break;
                         }
                     }
@@ -1338,7 +1338,7 @@ void BikeRace::RestartRace(int mode, char* path, char* description) {
         flagGirlState = 0;
     }
     SetSceneTime(0.0001f);
-    raceScene->field_0x7c0 = 1;
+    raceScene->holdAnimations = 1;
     for (UnknownBikeRaceRacer* racer = NextBike(&iterator); racer != 0;
          racer = NextBike(&iterator)) {
         racer->UnknownRacerVirtualSlot43();
@@ -1791,10 +1791,10 @@ int BikeRace::RecordFrame(int a, void* data, int flag, int b, int* keep, int tim
             GhostBike()->receivedStates[0]->fresh = 1;
             GhostBike()->position = record->position;
             GhostBike()->field_0x5e0 = record->field_0x04;
-            GhostBike()->field_0x5ec = record->field_0x1c;
-            GhostBike()->field_0x5f8 = record->field_0x10;
-            GhostBike()->field_0x5fc = record->field_0x14;
-            GhostBike()->field_0x600 = record->field_0x18;
+            GhostBike()->angularVelocity = record->angularVelocity;
+            GhostBike()->roll = record->roll;
+            GhostBike()->pitch = record->pitch;
+            GhostBike()->yaw = record->yaw;
             GhostBike()->runningTime = replayMode == 11 ? time : record->runningTime;
             *keep = 1;
             if (replayMode == 11) {

@@ -133,7 +133,9 @@ struct UnknownEventEntry {
     float score;                                   // +0x2c: racer +0x768 (score)
     unsigned char aiIndex;                    // +0x30 racer +0x11c0; counted in TrackGame+0x3424 (else Game+0x18)
     unsigned char field_0x31[0x34 - 0x31];
-    int field_0x34[3];                             // racer +0x7ac..+0x7b4
+    float repairDamage;                       // +0x34 racer +0x7ac; PayOutRace 0x004d8c40 charges it x 500 as repairs
+    float injuryDamage;                       // +0x38 racer +0x7b0; charged x 250 as medical costs
+    float stuntEarnings;                      // +0x3c racer +0x7b4; paid x 400 as stunt winnings
     char name[16];                                 // +0x40: racer name (racer +0x5e0)
 };
 

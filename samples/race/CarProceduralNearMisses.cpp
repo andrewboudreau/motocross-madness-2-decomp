@@ -23,7 +23,7 @@
 //
 // CarProcedural::Tick (0x0042fd80, 2909 bytes): the
 // per-frame update along the path (wheel spin and steering, the collision
-// objects' transform and the body velocity). With relocations and frame
+// objects' transform and the body hull position). With relocations and frame
 // offsets masked the instruction stream is 781 instructions like retail's
 // and 88% aligned. Retail facts the source follows: the sensor contact's
 // normal is at +0x08 (`add ecx, 8`); the back and steering points subtract
@@ -32,7 +32,7 @@
 // float local); the collider frame is built by an inline helper taking
 // the axes by value (its locals share slots with the blocks' vectors); the
 // target is built per component (no y sum) and the 4fd5c0 result is a
-// named copy; the body velocity is corrected per component. Left: the
+// named copy; the body hull position is corrected per component. Left: the
 // frame is 0xd0 against retail's 0xdc. Retail's slot groups (frame offsets)
 // are {temps, local, target, first-update position} 0x0, {side, forward
 // axis} 0xc, t 0x18, {box, ahead, right axis, offset} 0x1c, {back, up axis}
@@ -272,7 +272,7 @@ int CarProcedural::Tick(float frameTime)
     float behind = FindOffsetAtDistance(t, -1.0f);
     Vector3 back = PositionAtTime(t - behind) - pathPosition;
     CarNormalizeInPlace(back);
-    if (field_0x5c)
+    if (skipSmoothing)
         smoothedBack = back;
     else
         smoothedBack = smoothedBack * backBlend + back * (1.0f - backBlend);
@@ -301,7 +301,7 @@ int CarProcedural::Tick(float frameTime)
             normal = ((CarProceduralSensorContact*)contact)->field_0x08;
         }
     }
-    if (field_0x5c)
+    if (skipSmoothing)
         smoothedNormal = normal;
     else
         smoothedNormal = smoothedNormal * normalBlend + normal * (1.0f - normalBlend);
@@ -329,12 +329,12 @@ int CarProcedural::Tick(float frameTime)
     bodyCollider->UpdatePlacement();
     if (bodyCollider->QueryCollisions()) {
         CarProceduralContact* contact = bodyCollider->contactRecord;
-        field_0x214 = contact->field_0x18;
-        field_0x220 = contact->field_0x0c;
-        Vector3& velocity = bodyCollider->shape->field_0xf8;
-        velocity.x -= contact->contactOffset.x * 1.005f;
-        velocity.y -= contact->contactOffset.y * 1.005f;
-        velocity.z -= contact->contactOffset.z * 1.005f;
+        bodyContactPoint = contact->contactPoint;
+        bodyContactNormal = contact->contactNormal;
+        Vector3& shapePosition = bodyCollider->shape->position;
+        shapePosition.x -= contact->contactOffset.x * 1.005f;
+        shapePosition.y -= contact->contactOffset.y * 1.005f;
+        shapePosition.z -= contact->contactOffset.z * 1.005f;
     }
     return result;
 }

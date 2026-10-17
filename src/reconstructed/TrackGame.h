@@ -23,7 +23,9 @@ class FollowCamera;
 
 // The race-mode objects at TrackGame+0x558..+0x568 (EventManager uses the
 // first one present). They are GameObjects (slots 4 and 5, the +0x25 flag
-// bits); their classes are not established.
+// bits). Their members at +0x2c..+0x9c sit where BaseQuarryEvent
+// (QuarryEvent.h) keeps its scene, overlays and AuralScape; the exact
+// class of each owner is not established.
 struct UnknownTrackGameViewPart {
     unsigned char field_0x00[0xc4];
     GameObject* soundGroup;  // +0xC4  racesnd.cpp mutes it with slot 16 beside the engine/effects groups; the podium's sound group
@@ -74,21 +76,21 @@ struct TrackGameViewOwner : public GameObject {
     // flagging the two it leaves; `racer` is unused.
     void SelectLapGates(int a, int b, void* racer);
 
-    UnknownTrackGameViewPart* field_0x2c;
+    UnknownTrackGameViewPart* eventScene;     // +0x2C  BaseQuarryEvent::eventScene (0x004df108 stores the Scene that 0x004ea7e0 sets up)
     unsigned char field_0x30[0x34 - 0x30];
     UnknownKrustyBikeView* raceView;          // +0x34
     unsigned char field_0x38[0x3c - 0x38];
     FollowCamera* raceCamera;                 // +0x3c the race camera (InGameProcs.cpp VCRDlg)
     unsigned char field_0x40[0x5c - 0x40];
-    GameObject* field_0x5c;                   // EventManager 0x0045cdc0 calls slot 4 on 0x5c..0x68
-    GameObject* field_0x60;
-    GameObject* field_0x64;
-    GameObject* field_0x68;
+    GameObject* statsOverlay;                 // +0x5C  BaseQuarryEvent::statsOverlay (StatsOverlay ctor 0x00519370, stored by 0x004e07c0)
+    GameObject* radarOverlay;                 // +0x60  BaseQuarryEvent::radarOverlay (RadarOverlay ctor 0x0051b690, stored by 0x004e07c0)
+    GameObject* chatOverlay;                  // +0x64  BaseQuarryEvent::chatOverlay (ChatOverlay ctor 0x0051cda0); BikeRace copies it to its chatOverlay
+    GameObject* instrumentOverlay;            // +0x68  BaseQuarryEvent::instrumentOverlay (InstrumentOverlay ctor 0x00518720, stored by 0x004e07c0)
     TextQueueOverlay* textQueue;              // +0x6c
     float elapsedMinutes;                     // +0x70 compared with the settings' time limit (EventManager 0x0045eef0)
     float elapsedSeconds;                     // +0x74 RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
     unsigned char field_0x78[0x9c - 0x78];
-    GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
+    GameObject* auralScape;                   // +0x9C  BaseQuarryEvent::auralScape (0x004dee7d stores AuralScape::Create); racesnd.cpp enables it with sound on
     unsigned char field_0xa0[0xa8 - 0xa0];
     UnknownEventRacer* followedRacer;         // +0xa8 the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
     // One struct stands in for the three owners at TrackGame +0x55c/+0x560/
@@ -139,7 +141,7 @@ struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 byte
     int playerIndicator;                      // +0x24 ChkPlayerIndicator
     int toolTips;                             // +0x28 ChkToolTips
     int wreckResetOnTrack;                    // +0x2c ChkWreckResetOnTrack
-    int field_0x30;
+    int maxAIBikes;                           // +0x30  (TrackGameMode +0x6dc maxAIBikes, EditMaxAIBikes); 0x00522720 resets it to 2
     int field_0x34;
     int field_0x38;
     int field_0x3c;
