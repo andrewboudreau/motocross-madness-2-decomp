@@ -158,10 +158,11 @@ struct BikeWheel {
     void UpdateDriveShare(void* owner);   // 0x00513f90 (Tire.h name: drive share from the vehicle speed)
 };
 
-// Query object at BikeWheel+0x2a8.
+// Object at BikeWheel+0x2a8: the gearbox (engineState) for driven wheels (Bike's loader).
 struct BikeWheelQ {
-    // 0x004D31B0: per-frame update fed with the wheel vectors (purpose unknown).
-    void Fn_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, float* g);
+    // 0x004D31B0: GearRatios.h UnknownEngineGearbox::DriveForce.
+    void DriveForce(float speedRatio, Vec3* direction, float scale, bool reversing, float reverseForce,
+                    Vec3* force, float* magnitude);
 };
 
 struct BikeA604 {

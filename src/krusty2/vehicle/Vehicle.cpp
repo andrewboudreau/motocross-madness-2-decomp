@@ -198,8 +198,8 @@ void Vehicle::UnknownVirtualSlot86()
         if (w->inContact) {
             if (w->aux) {
                 float sp = linearSpeed;
-                float dt = field_0x4a4;
-                w->aux->Method_004D31B0(sp, &w->rollDirection, dt, backingUp, 100.0f,
+                float scale = driveForceScale;
+                w->aux->DriveForce(sp, &w->rollDirection, scale, backingUp, 100.0f,
                                                 &w->field_0x248, &w->field_0x280);
             }
             w->UpdateDriveShare(this);
@@ -2091,7 +2091,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     attachmentCount = 0;
     attachmentCapacity = 0;
     steerAxis = 0;
-    field_0x4a4 = 1.0f;
+    driveForceScale = 1.0f;
     terrainScale = 1.0f;
     throttleAxis = 0;
     inputMap = 0;

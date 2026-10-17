@@ -468,7 +468,7 @@ void KrustyBike::UnknownVirtualSlot86()
         else
             ramp = 0;
         if (w->aux)
-            w->aux->Fn_004D31B0(KbFloat(linearSpeed), &w->rollDirection, KbFloat(field_0x4a4), backingUp, ramp,
+            w->aux->DriveForce(KbFloat(linearSpeed), &w->rollDirection, KbFloat(driveForceScale), backingUp, ramp,
                                     &w->w_0x248, &w->w_0x280);
         if (g_kbGame->raceMode && !onTrack) {
             rearWheel->w_0x248 *= 0.5f;

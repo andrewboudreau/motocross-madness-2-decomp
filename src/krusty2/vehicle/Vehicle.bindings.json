@@ -43,7 +43,7 @@
   "?Method_004897E0@VehicleAxisSource@@QAEHH@Z": "0x004897e0",
   "?UpdateThrottle@VehicleSpeedState@@QAEXMH_N@Z": "0x004d2f50",
   "?AutoShift@VehicleSpeedState@@QAEXHM@Z": "0x004d3030",
-  "?Method_004D31B0@VehicleWheelAux@@QAEXMPAUVec3@@M_NM00@Z": "0x004d31b0",
+  "?DriveForce@VehicleWheelAux@@QAEXMPAUVec3@@M_NM00@Z": "0x004d31b0",
   "?Method_00513C70@VehicleWheel@@QAEXMHHMPAUVec3@@0@Z": "0x00513c70",
   "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z": "0x00527a20",
   "?Method_005293E0@Vehicle@@QAEXPAM@Z": "0x005293e0",

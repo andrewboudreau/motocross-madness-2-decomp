@@ -300,11 +300,14 @@ struct VehicleRotatingShock : VehicleShock {
     float armLengthSq;               // +0xcc armLength squared
     char pad_0xd0[0x14];             // 0xe4 bytes (the loader's allocation)
 };
-struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
+// Object at VehicleWheel+0x2a8: Bike's loader passes engineState (the gearbox) for driven wheels.
+struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional view)
     char pad_0x00[0x8C];
     int field_0x8c;
     int field_0x90;
-    void Method_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, Vec3* g);
+    // 0x004d31b0: GearRatios.h UnknownEngineGearbox::DriveForce (the last argument is its float* magnitude).
+    void DriveForce(float speedRatio, Vec3* direction, float scale, bool reversing, float reverseForce,
+                    Vec3* force, Vec3* magnitude);
 };
 // The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
 // virtual slot 1 (friction update) is called here, by Method_00527A20.  Provisional view.
@@ -571,7 +574,7 @@ public:
     Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
     Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground
     int outOfRace;  // +0x4A0  set to 1 by slot 44; EventManager counts the racer done, KrustyBike's nearest-bike search skips it
-    float field_0x4a4;
+    float driveForceScale;                    // +0x4A4  the constructor sets 1.0; slot 86 (and KrustyBike's) passes it as the gearbox DriveForce scale
     int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
     float leanAngle;  // +0x4ac slot 56 stores asin(...) of the ground normal against the forward axis; slot 57 returns it; Bike rotates the body by it
     float leanCos;  // +0x4b0 slot 56 stores cos(leanAngle) there
@@ -647,7 +650,7 @@ VEH_CHECK_OFFSET(Vehicle, engineState, 0x480);
 VEH_CHECK_OFFSET(Vehicle, justLanded, 0x484);
 VEH_CHECK_OFFSET(Vehicle, takeoffPosition, 0x488);
 VEH_CHECK_OFFSET(Vehicle, takeoffVelocity, 0x494);
-VEH_CHECK_OFFSET(Vehicle, field_0x4a4, 0x4A4);
+VEH_CHECK_OFFSET(Vehicle, driveForceScale, 0x4A4);
 VEH_CHECK_OFFSET(Vehicle, wheelsInContact, 0x4A8);
 VEH_CHECK_OFFSET(Vehicle, leanAngle, 0x4AC);
 VEH_CHECK_OFFSET(Vehicle, leanCos, 0x4B0);
