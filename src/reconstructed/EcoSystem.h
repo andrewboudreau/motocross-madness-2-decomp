@@ -330,7 +330,7 @@ public:
     float vTop;                               // VTop
     float modelHeightScale;                   // model height scale
     float modelRadiusScale;                   // model radius scale
-    float field_0x1d4;
+    float normalizedMinY;                     // +0x1D4  the model's lowest y over its height (modelHeightScale * minY); the billboards start that far below the object
     int lodCount;                             // NumberOfLOD (at most kMaxLods)
     unsigned int keyColor;                    // key colour
     UnknownEcoTexture* billboardTexture;      // billboard texture
@@ -449,9 +449,9 @@ public:
     unsigned char field_0x03c[0x2d0 - 0x3c];
     int bladeRenderer;                        // +0x2d0 the "Blade" software renderer (Game.h)
     unsigned char field_0x2d4[0x54c - 0x2d4];
-    int field_0x54c;                          // the default texture-stage filters (MAG, MIN, MIP)
-    int field_0x550;
-    int field_0x554;
+    int magFilter;                            // +0x54C  PCGame magFilter; PCGame 0x004c0960 picks it from the device caps
+    int minFilter;                            // +0x550  PCGame minFilter
+    int mipFilter;                            // +0x554  PCGame mipFilter
 };
 extern UnknownEcoTrackGame* g_TrackGame;   // 0x0056e26c (local view of TrackGame)
 unsigned int ReadClock();                     // 0x004bfa80

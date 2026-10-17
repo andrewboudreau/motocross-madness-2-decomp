@@ -243,7 +243,7 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
                 delete block;
             modelHeightScale = 1.0f / (maxY - minY);
             modelRadiusScale = 2.0f / (maxX - minX);
-            field_0x1d4 = modelHeightScale * minY;
+            normalizedMinY = modelHeightScale * minY;
         }
         if (stream)
             delete stream;
