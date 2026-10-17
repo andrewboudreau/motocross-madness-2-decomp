@@ -477,8 +477,8 @@ public:
     unsigned char field_0x138c[0x13f8 - 0x138c];
     float recordStateTimer;  // +0x13F8  KrustyBike recordState(+0x1390).timer: s since the last full record; FLT_MAX/2 forces one
     unsigned char field_0x13fc[0x1414 - 0x13fc];
-    CarProceduralCollision* altBodyA;  // +0x1414  KrustyBike+0x1414 altBodyA (KrustyBike.h); paired between remote racers by the loader
-    CarProceduralCollision* altBodyB;  // +0x1418  KrustyBike+0x1418 altBodyB (KrustyBike.h); paired between remote racers by the loader
+    CarProceduralCollision* bikeAndRiderCollision;  // +0x1414  KrustyBike+0x1414 bikeAndRiderCollision (KrustyBike.h, "BikeAndRider.col"); paired between remote racers by the loader
+    CarProceduralCollision* bikeCollision;  // +0x1418  KrustyBike+0x1418 bikeCollision (KrustyBike.h, "Bike.col"); paired between remote racers by the loader
     unsigned char field_0x141c[0x160c - 0x141c]; // the GameObject virtual base follows (0x1638 bytes)
 };
 

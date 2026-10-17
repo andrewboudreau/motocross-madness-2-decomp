@@ -1531,29 +1531,29 @@ int BikeRace::CreateRacers(void* owner, LightManager* lights, UnknownTextureForm
                 if (a == b)
                     continue;
                 if (racerSlots[b]->isRemote) {
-                    racerSlots[a]->altBodyB->AddIgnoredOwner(racerSlots[b]->altBodyB);
-                    racerSlots[a]->altBodyB->AddIgnoredOwner(racerSlots[b]->altBodyA);
-                    racerSlots[a]->altBodyB->AddIgnoredOwner(racerSlots[b]->frontWheel);
-                    racerSlots[a]->altBodyB->AddIgnoredOwner(racerSlots[b]->rearWheel);
-                    racerSlots[a]->altBodyB->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
-                    racerSlots[a]->altBodyA->AddIgnoredOwner(racerSlots[b]->altBodyB);
-                    racerSlots[a]->altBodyA->AddIgnoredOwner(racerSlots[b]->altBodyA);
-                    racerSlots[a]->altBodyA->AddIgnoredOwner(racerSlots[b]->frontWheel);
-                    racerSlots[a]->altBodyA->AddIgnoredOwner(racerSlots[b]->rearWheel);
-                    racerSlots[a]->altBodyA->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
+                    racerSlots[a]->bikeCollision->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                    racerSlots[a]->bikeCollision->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
+                    racerSlots[a]->bikeCollision->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                    racerSlots[a]->bikeCollision->AddIgnoredOwner(racerSlots[b]->rearWheel);
+                    racerSlots[a]->bikeCollision->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
+                    racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                    racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
+                    racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->frontWheel);
+                    racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->rearWheel);
+                    racerSlots[a]->bikeAndRiderCollision->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
                 }
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->altBodyB);
-                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->altBodyA);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
                 racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->frontWheel);
                 racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->rearWheel);
                 racerSlots[a]->frontWheel->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->altBodyB);
-                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->altBodyA);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
                 racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->frontWheel);
                 racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->rearWheel);
                 racerSlots[a]->rearWheel->AddIgnoredOwner(racerSlots[b]->wrecker->collisionModel);
-                racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->altBodyB);
-                racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->altBodyA);
+                racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->bikeCollision);
+                racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->bikeAndRiderCollision);
                 racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->frontWheel);
                 racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(racerSlots[b]->rearWheel);
                 racerSlots[a]->wrecker->collisionModel->AddIgnoredOwner(
