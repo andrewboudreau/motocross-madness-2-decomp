@@ -44,7 +44,7 @@ struct UnknownCameraVehicle {
     UnknownVehiclePart* modelNode;            // +0x3bc VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float forwardSpeed;  // +0x434  Vehicle +0x434 = dot(velocity, bodyForward) (BikeAI); KrustyBike compares it with 60 mph in ft/s
-    float field_0x438;                   // KrustyBikeCamera slot 34 divisor
+    float referenceSpeed;                     // +0x438  Vehicle +0x438 referenceSpeed (180); the bike cameras divide by it
     float turnRate;                           // +0x43c VehicleCamera slot 42 scale
     int movingForward;                        // +0x440
     int crashState;                           // +0x444 VehicleCamera slots 72, 74, 75

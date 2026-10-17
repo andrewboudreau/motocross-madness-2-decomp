@@ -543,12 +543,12 @@ public:
     // bytes, Bike slot 8 lost its exact match), so the casts are written out.
 
     float forwardSpeed;  // +0x434  velocity along bodyForward (BikeAI dot; UpdateContactPatch out); KrustyBike compares it with 60 mph in ft/s
-    float field_0x438;        // read by Bike slot 59 (0x0040a330) as a float divisor
+    float referenceSpeed;                     // +0x438  LoadVehicle sets 180; Bike slot 59 scales the steer limit by prevSpeed / referenceSpeed; the bike cameras use it in place of 180 (tier 2)
     float turnRate;  // +0x43c = turnAngle * field_0x140 (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
     int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
     int crashState;  // +0x444 nonzero disables input (slots 52/62/64/60 test ==0), switches solver vectors (+0xf0, 0.1 scale, 1,1,1 mask); Bike slot 99 writes it and runs the crash timer 0x454 while set
     int crashDirection;          // +0x448 Bike slot 99 (0x00409b30) stores small codes (1..5)
-    float field_0x44c;        // Bike slot 99 (0x00409b30) multiplies it (float)
+    float impactAccelLimit;                   // +0x44C  LoadVehicle sets 200; Bike slot 99 reports a crash when impulse * invMass > a * impactAccelLimit (tier 2)
     float speedGainLimit;  // +0x450 slot 70: true when (speed field_0xbc - previous speed field_0xb8) < arg * speedGainLimit
     // 0x454/0x458: Bike slot 39 (0x0040a1f0) decrements 0x454 by the frame time and
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).

@@ -90,7 +90,7 @@ Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
         float dot = BikeCameraDot(UnknownVirtualSlot33(), followHeading);
         float height = targetDistance * 0.009f + 1.0f;
         float ratio = fieldOfView / maxFieldOfView;
-        float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
+        float speed = vehicleMode ? vehicle->referenceSpeed : 180.0f;
         float lag = (1.0f - targetDistance * 0.00052631577f) * ratio;
         float distance = lag * (height * height * dot / speed) * 35.0f;
         Vector3 offset = followHeading * distance;

@@ -2014,11 +2014,11 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
     }
     crashReason = 0;
     justLanded = 0;
-    field_0x438 = 180.0f;
+    referenceSpeed = 180.0f;
     maxLeanAngle = 40.0f * 0.01745329f;
     maxLeanRate = 120.0f * 0.01745329f;
     crashTimerReload = 2.0f;
-    field_0x44c = 200.0f;
+    impactAccelLimit = 200.0f;
     speedGainLimit = -1000.0f;
     verticalAccelSmoother = new(__FILE__, 0x19d) VehicleSmoother(0.14f);
     forwardAccelSmoother = new(__FILE__, 0x1a0) VehicleSmoother(0.5f);

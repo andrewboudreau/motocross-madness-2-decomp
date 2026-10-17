@@ -302,7 +302,7 @@ float Bike::UnknownVirtualSlot59()
     if (poseState == 10)
         return steerState->field_0x08;
     float r = steerState->field_0x08 -
-              FastSqrt(prevSpeed / field_0x438 * (steerState->field_0x08 * steerState->field_0x08));
+              FastSqrt(prevSpeed / referenceSpeed * (steerState->field_0x08 * steerState->field_0x08));
     r = (0.0f > r) ? 0.0f : r;
     float m = steerState->field_0x08;
     return (m < r) ? m : r;
@@ -1393,7 +1393,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         crashReason = 4;
         return 1;
     }
-    if (c && d * invMass > a * field_0x44c) {
+    if (c && d * invMass > a * impactAccelLimit) {
         if (angularVelocity.z > 0.0f) {
             crashDirection = 4;
             crashReason = 10;
