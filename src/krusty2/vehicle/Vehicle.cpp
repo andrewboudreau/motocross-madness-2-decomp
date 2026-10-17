@@ -705,7 +705,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
             w->impactPosted = 1;
             float v = w->driveShareComplement * 20.0f;
             ev->impactSink->SetPosition(w->groundPoint, (v > 1.0f) ? v : 1.0f);
@@ -717,7 +717,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + w->surfaceMaterial])) {
             w->impactPosted = 1;
             ev->impactSink->SetPosition(w->groundPoint, 0.0f);
             VehCommitImpact(ev, &ev->impactSink);
@@ -728,7 +728,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     if (collisionPointCount > 0) do {
         VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
         if (c->contactActive && !c->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + c->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x400 + c->surfaceMaterial])) {
             c->impactPosted = 1;
             ev->impactSink->SetPosition(c->impactPosition, 0.0f);
             VehCommitImpact(ev, &ev->impactSink);
@@ -746,7 +746,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
             if (!(w->driveShare < 0.95f))
                 return;
             w->slidePosted = 1;
@@ -769,7 +769,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
     if (wheelCount > 0) do {
         VehicleWheel* w = wheelList[i];
         if (w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
+            (!track || ((VehicleMaterialSet*)track)->environment[0x408 + w->surfaceMaterial])) {
             w->slidePosted = 1;
             if (w->field_0x280.z > 0.2f) {
                 VehCommitImpact(ev, &ev->slideSink);

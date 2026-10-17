@@ -109,10 +109,11 @@ struct VehicleContact {              // elements of Vehicle+0x12c
     char pad_0xAC[0x10];
     unsigned char surfaceMaterial;        // +0xbc surface material id
 };
-// Table object at Vehicle+0x1f0: field_0xa4 points at a byte table (+0x400) indexed by material id.
+// Object at Vehicle+0x1f0, viewed as the Scene (SceneManager.h): environment points at the
+// "Environment" section, whose generateDust/generateDirt bytes are indexed by material id.
 struct VehicleMaterialSet {
     char pad_0x00[0xA4];
-    char* field_0xa4;
+    char* environment;                        // +0xA4  Scene +0xa4 environment (SceneManager.h UnknownSceneEnvironment, byte view): slot 18 tests generateDust (+0x400), slot 19 generateDirt (+0x408) per surface material
 };
 // Sink at VehicleImpactEvent+0x04 (provisional): fields 0x44/0x50/0x60 are touched by slot 18.
 struct VehicleImpactSink {
