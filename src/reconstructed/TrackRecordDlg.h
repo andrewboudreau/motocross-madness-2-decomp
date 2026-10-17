@@ -8,13 +8,14 @@
 // An 8-byte list row (0x0051ffe0, TrackRecord.cpp line 535): a strdup'd
 // name and a value.
 struct UnknownTrackRecordRow {
-    char* field_0x00;
+    char* fileName;                           // +0x00 strdup of the high-score file's name; LstTrack's selection passes it to ShowTrackScores
     int field_0x04;
 };
 
 // The "LstTrack" control. Of the gameui.cpp classes only UIListBox
 // (vtable 0x00553100) and UIDDLListBox have a slot 66, so this is probably
-// UIListBox (strong inference). Only slot 66 is called.
+// UIListBox (strong inference). Only slot 66 is called: UIListBox::ReportClick
+// (GameUi.h, 0x00477d30), which sends the list-select event.
 class UnknownTrackRecordListBox {
 public:
     virtual void UnknownVirtualSlot0();
@@ -83,7 +84,7 @@ public:
     virtual void UnknownVirtualSlot63();
     virtual void UnknownVirtualSlot64();
     virtual void UnknownVirtualSlot65();
-    virtual void UnknownVirtualSlot66(int a);
+    virtual void ReportClick(int* handled);
 };
 
 // RTTI: TrackRecordDlg : UIDialog (vtable 0x0055177c; 0x7f68 bytes, the size
@@ -106,7 +107,7 @@ public:
     void ShowTrackScores(UnknownDialogEvent* event, int times, const char* name);
 
     int selectedSeries;                       // +0x7f58 selected series (0..5)
-    int field_0x7f5c;
+    int selectedSubTab;                       // +0x7f5c TabLeft/TabMiddle/TabRight (0..2); mirrors highScores->extensionIndex, LabelTabs selects it
     UnknownTrackRecordRow** rows;             // +0x7f60 the listed tracks (FreeRows)
     int rowCount;                             // +0x7f64 row count
 };

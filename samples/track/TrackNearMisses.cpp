@@ -141,7 +141,7 @@ void TrackRecordDlg::ListHighScoreTracks(UIControl* list, DirectoryList* directo
             count++;
             rows = (UnknownTrackRecordRow**)DebugRealloc(rows, (rowCount + 1) * 4, __FILE__, 534);
             rows[rowCount] = new(__FILE__, 535) UnknownTrackRecordRow;
-            rows[rowCount]->field_0x00 = strdup(found);
+            rows[rowCount]->fileName = strdup(found);
             rows[rowCount]->field_0x04 = 0;
             rowCount++;
             if (!directory->NextName(found))
