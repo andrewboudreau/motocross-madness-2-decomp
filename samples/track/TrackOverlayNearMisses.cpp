@@ -327,7 +327,7 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
         }
     } else {
         if (s_UnknownGlobal68a444) {
-            sprintf(text, "%.3f", racers[index]->field_0x4a4);
+            sprintf(text, "%.3f", racers[index]->driveForceScale);
         } else {
             if (g_TrackGame->mode.showRiderPositions) {
                 UnknownChatRacer* racer = racers[index];

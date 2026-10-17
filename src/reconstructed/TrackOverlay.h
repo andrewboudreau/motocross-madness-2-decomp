@@ -348,7 +348,7 @@ struct UnknownChatRacer {
     unsigned char field_0x000[0x3bc];
     UnknownChatRacerState* racerState;
     unsigned char field_0x3c0[0x4a4 - 0x3c0];
-    float field_0x4a4;                        // shown when TrackOverlay's 0x0068a444 is set
+    float driveForceScale;                    // +0x4A4  Vehicle +0x4a4 driveForceScale (the racer is a KrustyBike: +0x5e0 riderName, +0x784 finishPosition); the name tag prints it while 0x0068a444 is set
     unsigned char field_0x4a8[0x5e0 - 0x4a8];
     char name[0x10];                          // name
     unsigned char field_0x5f0[0x784 - 0x5f0];
