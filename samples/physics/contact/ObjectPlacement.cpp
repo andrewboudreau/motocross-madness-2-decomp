@@ -73,10 +73,9 @@ int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, 
 
     for (;;) {
         Vec3 plusAOff = g_PlacementAxisZ * radius;
-        float negRadius = -radius;
-        Vec3 minusAOff = g_PlacementAxisZ * negRadius;
+        Vec3 minusAOff = g_PlacementAxisZ * -radius;
         Vec3 plusCOff = g_PlacementAxisX * radius;
-        Vec3 minusCOff = g_PlacementAxisX * negRadius;
+        Vec3 minusCOff = g_PlacementAxisX * -radius;
 
         if (firstPass) {
             centerPt = *c;
