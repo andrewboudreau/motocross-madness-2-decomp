@@ -106,7 +106,7 @@
     "target_va": "0x004db8c0",
     "target_size": 1136,
     "expect": "partial",
-    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dbb5c/0x4dbb8b in an ebp frame; kept as a partial with the C++ (int) casts.",
+    "notes": "Verified exclusion (inline asm): retail rounds with bare fistp dword ptr [eax] at 0x4dbb5c/0x4dbb8b in an ebp frame; kept as a partial with the C++ (int) casts. The 16-bit clear goes through the shared Duff's-device fill (retail's 15-entry jump table), giving the full 1136 B.",
     "bindings": "../../../src/krusty2/shadow/ProjectedShadow.bindings.json"
   },
   {
