@@ -287,7 +287,7 @@ public:
     // 0x004dae50.  The mode is the last argument: KrustyUI 0x004998c0 and QuarryStuntEvent
     // 0x004e00e2 push it first (push 3), then the direction, then the position.
     int SetLight(const ShadowVec3* pos, const ShadowVec3* dir, int newMode);
-    void ComputeBounds();                           // 0x004db0d0
+    int ComputeBounds();                            // 0x004db0d0; every exit returns 1
     void RenderShadow();                            // 0x004db8c0
     void Present();                                 // 0x004dbd30
     void TintCasterVertices();                           // 0x004dc2b0
